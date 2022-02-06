@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+/*
+ * Copyright (c) 2021 Matthew Nelson
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *         https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ **/
+-->
+<resources>
+    <!--
+    Required if Foreground
+    Default: false
+
+    If set to `true`, TorService will run in the foreground. Upon setting to
+    `true`, the bellow attributes that are denoted as `Required` must be set.
+
+    Must add to AndroidManifest.xml the following permission for API 28+:
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+
+    Note that setting this to `true` means that if your application is swiped from
+    the recent app's tray and then Tor is stopped (either by user action, or if
+    `tor_service_stop_service_on_task_removed` is unset or `true`), Tor takes a
+    moment to shutdown. As such, there is approximately 1 second where your
+    application's State is still started (as if the app was not swiped from the
+    recent app's tray).
+
+    This is monitored by TorService and, if the Task is still removed after Tor
+    finally shuts down, exitProcess(0) is called. If the User returns to your
+    application before Tor finally stops (when exitProcess is called) and the
+    last action prior to Task removal was _not_ STOP, TorService will attempt to
+    start itself in order to return to the originally intended state of Tor ON.
+    -->
+    <bool name="tor_service_enable_foreground">true</bool>
+
+    <!--
+    Not Required
+    Default: true
+
+    If set to `false`, when the user swipes your application from the recent app's
+    tray, the service will continue running.
+
+    It is highly advisable to, if setting this option to `false`, also enable the
+    stop notification action.
+    -->
+    <bool name="tor_service_stop_service_on_task_removed">false</bool>
+
+
+    <!-- NOTIFICATION INFO -->
+
+    <!--
+    Required if Foreground
+    Value must be between 1 and 9999
+    -->
+    <integer name="tor_service_notification_id">21</integer>
+    <!--
+    Required if Foreground
+    Value must not be empty
+    -->
+    <string name="tor_service_notification_channel_id">TorService Channel Id</string>
+    <!--
+    Required if Foreground
+    Value must not be empty
+    -->
+    <string name="tor_service_notification_channel_name">TorService Channel Name</string>
+    <!--
+    Required if Foreground
+    Value must not be empty
+    -->
+    <string name="tor_service_notification_channel_description">TorService Channel Description</string>
+    <!--
+    Not Required
+    Default: false
+    -->
+    <bool name="tor_service_notification_channel_show_badge">false</bool>
+
+
+    <!-- NOTIFICATION ICONS -->
+
+    <!--
+    Required if Foreground
+    -->
+    <drawable name="tor_service_notification_icon_network_enabled">@drawable/tor_stat_network_enabled</drawable>
+    <!--
+    Not Required
+    Default: whatever is set to `tor_service_notification_icon_network_enabled`
+    -->
+    <drawable name="tor_service_notification_icon_network_disabled">@drawable/tor_stat_network_disabled</drawable>
+    <!--
+    Not Required
+    Default: whatever is set to `tor_service_notification_icon_network_enabled`
+    -->
+    <drawable name="tor_service_notification_icon_data_xfer">@drawable/tor_stat_network_dataxfer</drawable>
+    <!--
+    Required if Foreground
+    -->
+    <drawable name="tor_service_notification_icon_error">@drawable/tor_stat_notifyerr</drawable>
+
+
+    <!-- NOTIFICATION COLORS -->
+
+    <!--
+    Not Required
+    -->
+    <color name="tor_service_notification_color_when_bootstrapped_true">#FFBB86FC</color>
+    <!--
+    Not Required
+    -->
+    <color name="tor_service_notification_color_when_bootstrapped_false">#FFFFFFFF</color>
+
+
+    <!-- NOTIFICATION VISIBILITY -->
+
+    <!--
+    Not Required
+    Options: @null, public, private, secret
+    Default: private
+    -->
+    <string name="tor_service_notification_visibility">public</string>
+
+
+    <!-- NOTIFICATION ACTIONS (BUTTONS) -->
+
+    <!--
+    Not Required
+    Default: false
+    -->
+    <bool name="tor_service_notification_action_enable_restart">true</bool>
+    <!--
+    Not Required
+    Default: false
+    -->
+    <bool name="tor_service_notification_action_enable_stop">true</bool>
+</resources>
