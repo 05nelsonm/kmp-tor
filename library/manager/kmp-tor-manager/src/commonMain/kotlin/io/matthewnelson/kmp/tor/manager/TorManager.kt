@@ -56,7 +56,6 @@ import io.matthewnelson.kmp.tor.manager.internal.ext.transOpened
 import kotlinx.atomicfu.*
 import kotlinx.atomicfu.locks.synchronized
 import kotlinx.coroutines.*
-import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.coroutineContext
 import kotlin.jvm.JvmSynthetic
 
@@ -224,11 +223,28 @@ private class RealTorManager(
     private val _isDestroyed: AtomicBoolean = atomic(false)
     override val isDestroyed: Boolean get() = _isDestroyed.value
 
-    override fun destroy() {
+    override fun destroy(stopCleanly: Boolean, onCompletion: (() -> Unit)?) {
         synchronized(this) {
             if (isDestroyed) return@synchronized
             _isDestroyed.value = true
             networkObserver?.detach()
+
+            if (!stopCleanly) {
+                supervisor.cancel()
+                loader.close()
+                stateMachine.updateState(TorState.Off, TorNetworkState.Disabled)
+
+                listeners.withLock {
+                    for (listener in this) {
+                        (listener as TorManagerEvent.SealedListener)
+                            .onEvent(TorManagerEvent.Lifecycle(this@RealTorManager, ON_DESTROY))
+                    }
+                    this.clear()
+                }
+
+                onCompletion?.invoke()
+                return@synchronized
+            }
 
             scope.launch(context =
                 Stop.catchInterrupt {}                                               +
@@ -251,6 +267,8 @@ private class RealTorManager(
                     }
                     this.clear()
                 }
+
+                onCompletion?.invoke()
             }
         }
     }

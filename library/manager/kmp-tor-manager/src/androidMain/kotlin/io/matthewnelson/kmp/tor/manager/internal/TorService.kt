@@ -41,7 +41,7 @@ import io.matthewnelson.kmp.tor.manager.internal.notification.TorServiceNotifica
 import kotlinx.coroutines.*
 import kotlin.system.exitProcess
 
-internal class TorService: Service(), TorManagerEvent.SealedListener {
+internal class TorService: Service() {
 
     private val binder = TorServiceBinder()
     private val managerHolder = TorManagerHolder()
@@ -164,7 +164,6 @@ internal class TorService: Service(), TorManagerEvent.SealedListener {
                     if (config.enableForeground) {
                         torManager.addListener(notification)
                     }
-                    torManager.addListener(this@TorService)
                     TorServiceController.prepNewTorManagerInstance(torManager)
                     instance = torManager
                 }
@@ -286,7 +285,12 @@ internal class TorService: Service(), TorManagerEvent.SealedListener {
     override fun onDestroy() {
         TorServiceController.notify(TorManagerEvent.Lifecycle(this, ON_DESTROY))
         supervisor.cancel()
-        managerHolder.instance?.destroy()
+        managerHolder.instance?.destroy(stopCleanly = true) {
+            // onCompletion
+            if (config.enableForeground && isTaskRemoved) {
+                exitProcess(0)
+            }
+        }
         super.onDestroy()
     }
 
@@ -309,19 +313,4 @@ internal class TorService: Service(), TorManagerEvent.SealedListener {
             stopService()
         }
     }
-
-    override fun onEvent(event: TorManagerEvent) {
-        if (
-            config.enableForeground                         &&
-            event is TorManagerEvent.Lifecycle<*>           &&
-            event.event == ON_DESTROY                       &&
-            event.hash == managerHolder.instance.hashCode() &&
-            isTaskRemoved
-        ) {
-            exitProcess(0)
-        }
-    }
-
-    override fun onEvent(event: TorEvent.Type.MultiLineEvent, output: List<String>) { /* no-op */ }
-    override fun onEvent(event: TorEvent.Type.SingleLineEvent, output: String) { /* no-op */ }
 }
