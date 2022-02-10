@@ -12,17 +12,26 @@ include(":library:controller:kmp-tor-controller-common")
 include(":library:manager:kmp-tor-manager")
 include(":library:manager:kmp-tor-manager-common")
 
-// if ANDROID or JVM is not being built, don't include the app
 @Suppress("PrivatePropertyName")
 private val KMP_TARGETS: String? by settings
 @Suppress("PrivatePropertyName")
 private val KMP_TARGETS_ALL: String? by settings
+
+// if ANDROID or JVM is not being built, don't include the android sample
 if (
     KMP_TARGETS_ALL != null ||
     (KMP_TARGETS?.split(',')?.contains("ANDROID") != false &&
     KMP_TARGETS?.split(',')?.contains("JVM") != false)
 ) {
     include(":samples:android")
+}
+
+// if JVM is not being built, don't include the javafx sample
+if (
+    KMP_TARGETS_ALL != null ||
+    KMP_TARGETS?.split(',')?.contains("JVM") != false
+) {
+    include(":samples:javafx")
 }
 
 @Suppress("PrivatePropertyName")

@@ -36,25 +36,20 @@ dependencies {
 
 <!-- TODO: Add sample code for retrieving TorManager -->
  - See the [Sample App](https://github.com/05nelsonm/kmp-tor/tree/master/samples/android/src/main/java/io/matthewnelson/kmp/tor/sample/android) 
-for a basic setup of `TorManager` and your `TorConfig`.  
+   for a basic setup of `TorManager` and your `TorConfig`.  
 
 </details>
 
 <details>
     <summary>Configuring a Java Project</summary>
 
- - See the Java/NodeJS section of [Configuring Gradle](https://github.com/05nelsonm/kmp-tor-binary/blob/master/README.md) 
-   to setup Java Binary dependencies needed by `kmp-tor`.
- - Instantiate your:
-     - [PlatformInstaller](https://github.com/05nelsonm/kmp-tor/blob/master/library/kmp-tor/src/jvmMain/kotlin/io/matthewnelson/kmp/tor/PlatformInstaller.kt)
-     - [TorConfigProviderJvm](https://github.com/05nelsonm/kmp-tor/blob/master/library/kmp-tor/src/jvmMain/kotlin/io/matthewnelson/kmp/tor/TorConfigProviderJvm.kt)
-     - [KmpTorLoaderJvm](https://github.com/05nelsonm/kmp-tor/blob/master/library/kmp-tor/src/jvmMain/kotlin/io/matthewnelson/kmp/tor/KmpTorLoaderJvm.kt)
- - Create a new instance of [TorManager](https://github.com/05nelsonm/kmp-tor/blob/master/library/manager/kmp-tor-manager/src/jvmMain/kotlin/io/matthewnelson/kmp/tor/manager/TorManager.kt)
- ```kotlin
- val manager = TorManager.newInstance(loader = myKmpTorLoaderJvm)
- manager.addListener(myListener)
- manager.startQuietly()
- ```
+ - See the [JavaFX Sample App Gradle Configuration](https://github.com/05nelsonm/kmp-tor/tree/master/samples/javafx/build.gradle.kts) 
+   for a basic gradle/dependency configuration.  
+ - See the [JavaFx Sample App](https://github.com/05nelsonm/kmp-tor/tree/master/samples/javafx/src/jvmMain/kotlin/io/matthewnelson/kmp/tor/sample/javafx/SampleApp.kt) 
+   for a basic setup example.  
+ - Run the JavaFx Sample via `./gradlew :samples:javafx:run` from terminal.
+     - Note: Be sure to run `git submodule update --init` if you haven't yet so git 
+       submodules are initialized.
 
 </details>
 
