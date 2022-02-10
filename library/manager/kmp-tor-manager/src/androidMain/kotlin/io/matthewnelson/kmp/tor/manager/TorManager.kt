@@ -34,7 +34,6 @@ import io.matthewnelson.kmp.tor.manager.common.exceptions.TorNotStartedException
 import io.matthewnelson.kmp.tor.manager.common.state.TorNetworkState
 import io.matthewnelson.kmp.tor.manager.common.state.TorState
 import io.matthewnelson.kmp.tor.manager.common.state.TorStateManager
-import io.matthewnelson.kmp.tor.manager.internal.*
 import io.matthewnelson.kmp.tor.manager.internal.BaseTorManager
 import io.matthewnelson.kmp.tor.manager.internal.BinderState
 import io.matthewnelson.kmp.tor.manager.internal.TorService
@@ -174,7 +173,7 @@ private class RealTorManagerAndroid(
         ActionProcessor.newInstance()
     }
 
-    override fun destroy() {
+    override fun destroy(stopCleanly: Boolean, onCompletion: (() -> Unit)?) {
         synchronized(this) {
             if (isDestroyed) return@synchronized
             _isDestroyed = true
@@ -186,23 +185,33 @@ private class RealTorManagerAndroid(
                     state.binder().stop()
                     TorServiceController.clearLocalListeners(lce)
                     supervisor.cancel()
+                    onCompletion?.invoke()
                 }
                 is BinderState.Starting -> {
-                    scope.launch(context =
-                        Stop.catchInterrupt {}                           +
-                        CoroutineName(name = "RealTorManagerAndroid.destroy")
-                    ) {
-                        actions.withProcessorLock(Stop) {
-                            realStop(checkDestroy = false)
-                        }
-                    }.invokeOnCompletion {
+                    if (!stopCleanly) {
+                        immediateShutdown()
                         TorServiceController.clearLocalListeners(lce)
                         supervisor.cancel()
+                        onCompletion?.invoke()
+                    } else {
+                        scope.launch(context =
+                            Stop.catchInterrupt {}                                  +
+                            CoroutineName(name = "RealTorManagerAndroid.destroy")
+                        ) {
+                            actions.withProcessorLock(Stop) {
+                                realStop(checkDestroy = false)
+                            }
+                        }.invokeOnCompletion {
+                            TorServiceController.clearLocalListeners(lce)
+                            supervisor.cancel()
+                            onCompletion?.invoke()
+                        }
                     }
                 }
                 null -> {
                     TorServiceController.clearLocalListeners(lce)
                     supervisor.cancel()
+                    onCompletion?.invoke()
                 }
             }
 
