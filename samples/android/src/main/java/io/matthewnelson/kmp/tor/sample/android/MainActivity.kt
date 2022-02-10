@@ -24,7 +24,7 @@ import io.matthewnelson.kmp.tor.sample.android.databinding.ActivityMainBinding
 class MainActivity: AppCompatActivity(R.layout.activity_main) {
 
     private val binding: ActivityMainBinding by viewBinding(ActivityMainBinding::bind)
-    private val app: App get() = application as App
+    private val app: SampleApp get() = application as SampleApp
 
     @SuppressLint("SetTextI18n")
     override fun onCreate(savedInstanceState: Bundle?) {
