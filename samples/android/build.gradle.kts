@@ -22,6 +22,7 @@ plugins {
     id("kotlin-android")
 }
 
+// disregard. this is for playing with newly published binaries prior to release
 if (env.kmpTorBinaries.pollStagingRepo) {
     repositories {
         maven("https://oss.sonatype.org/content/groups/staging") {

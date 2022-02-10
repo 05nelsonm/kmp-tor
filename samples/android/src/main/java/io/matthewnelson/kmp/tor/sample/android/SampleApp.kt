@@ -29,12 +29,14 @@ import io.matthewnelson.kmp.tor.controller.common.events.TorEvent
 import io.matthewnelson.kmp.tor.manager.TorManager
 import io.matthewnelson.kmp.tor.manager.TorServiceConfig
 import io.matthewnelson.kmp.tor.manager.common.event.TorManagerEvent
+import io.matthewnelson.kmp.tor.manager.common.state.TorNetworkState
+import io.matthewnelson.kmp.tor.manager.common.state.TorState
 import kotlin.collections.ArrayList
 
-class App: Application(), TorManagerEvent.SealedListener {
+class SampleApp: Application() {
 
     val manager: TorManager by lazy {
-        val configProvider = object : TorConfigProviderAndroid(context = this@App) {
+        val configProvider = object : TorConfigProviderAndroid(context = this@SampleApp) {
             override fun provide(): TorConfig {
                 return TorConfig.Builder {
                     // Any conflicting or unavailable ports provided will fall
@@ -49,7 +51,7 @@ class App: Application(), TorManagerEvent.SealedListener {
                     put(ConnectionPadding().set(AorTorF.False))
                     put(ConnectionPaddingReduced().set(TorF.True))
 
-                    // Tor defaults to 24h. Reducing to 10 min helps mitigate
+                    // Tor default is 24h. Reducing to 10 min helps mitigate
                     // unnecessary mobile data usage.
                     put(DormantClientTimeout().set(Time.Minutes(10)))
 
@@ -62,7 +64,7 @@ class App: Application(), TorManagerEvent.SealedListener {
 
                     // If planning to use v3 Client Authentication in a persistent
                     // manner (where private keys are saved to disk via the "Persist"
-                    // flag, this is needed to be set.
+                    // flag), this is needed to be set.
                     put(ClientOnionAuthDir().set(FileSystemDir(
                         workDir.builder { addSegment(ClientOnionAuthDir.DEFAULT_NAME) }
                     )))
@@ -75,62 +77,72 @@ class App: Application(), TorManagerEvent.SealedListener {
         TorManager.newInstance(application = this, loader = loader)
     }
 
+    private val listener = SampleListener()
+    val events: LiveData<String> get() = listener.eventLines
+    val addressInfo: LiveData<TorManagerEvent.AddressInfo> get() = listener.addressInfo
+    val state: LiveData<TorManagerEvent.State> get() = listener.state
+
     override fun onCreate() {
         super.onCreate()
         manager.debug(true)
-        manager.addListener(this)
-        data.addLine(TorServiceConfig.getMetaData(this).toString())
+        manager.addListener(listener)
+        listener.addLine(TorServiceConfig.getMetaData(this).toString())
     }
 
-
-
-
-
-
-
-
-
-    private class EventData {
-        private val _data: MutableLiveData<String> = MutableLiveData("")
-        val data: LiveData<String> = _data
-        private val list: MutableList<String> = ArrayList(50)
+    private class SampleListener: TorManagerEvent.Listener() {
+        private val _eventLines: MutableLiveData<String> = MutableLiveData("")
+        val eventLines: LiveData<String> = _eventLines
+        private val events: MutableList<String> = ArrayList(50)
 
         fun addLine(line: String) {
             synchronized(this) {
-                if (list.size > 49) {
-                    list.removeAt(0)
+                if (events.size > 49) {
+                    events.removeAt(0)
                 }
-                list.add(line)
-                Log.d("EventListener", line)
-                _data.value = list.joinToString("\n")
+                events.add(line)
+                Log.d("SampleListener", line)
+                _eventLines.value = events.joinToString("\n")
             }
         }
-    }
 
-    private val data = EventData()
-
-    val events: LiveData<String> get() = data.data
-
-    override fun onEvent(event: TorManagerEvent) {
-        data.addLine(event.toString())
-        if (event is TorManagerEvent.Error) {
-            event.value.printStackTrace()
+        private val _addressInfo: MutableLiveData<TorManagerEvent.AddressInfo> =
+            MutableLiveData(TorManagerEvent.AddressInfo())
+        val addressInfo: LiveData<TorManagerEvent.AddressInfo> = _addressInfo
+        override fun managerEventAddressInfo(info: TorManagerEvent.AddressInfo) {
+            _addressInfo.value = info
         }
-    }
 
-    private var lastBandwidth: String = ""
-    override fun onEvent(event: TorEvent.Type.SingleLineEvent, output: String) {
-        if (event is TorEvent.BandwidthUsed) {
-            if (output != lastBandwidth) {
-                lastBandwidth = output
-                data.addLine("event=${event.javaClass.simpleName}, output=$output")
+        private val _state: MutableLiveData<TorManagerEvent.State> =
+            MutableLiveData(TorManagerEvent.State(TorState.Off, TorNetworkState.Disabled))
+        val state: LiveData<TorManagerEvent.State> = _state
+        override fun managerEventState(state: TorManagerEvent.State) {
+            _state.value = state
+        }
+
+        override fun onEvent(event: TorManagerEvent) {
+            addLine(event.toString())
+            if (event is TorManagerEvent.Error) {
+                event.value.printStackTrace()
             }
-        } else {
-            data.addLine("event=${event.javaClass.simpleName}, output=$output")
+
+            super.onEvent(event)
+        }
+
+        private var lastBandwidth: String = ""
+        override fun onEvent(event: TorEvent.Type.SingleLineEvent, output: String) {
+            if (event is TorEvent.BandwidthUsed) {
+                if (output != lastBandwidth) {
+                    lastBandwidth = output
+                    addLine("event=${event.javaClass.simpleName}, output=$output")
+                }
+            } else {
+                addLine("event=${event.javaClass.simpleName}, output=$output")
+            }
+        }
+
+        override fun onEvent(event: TorEvent.Type.MultiLineEvent, output: List<String>) {
+            addLine("event=${event.javaClass.simpleName}\noutput=${output.joinToString("\n")}")
         }
     }
 
-    override fun onEvent(event: TorEvent.Type.MultiLineEvent, output: List<String>) {
-        data.addLine("event=${event.javaClass.simpleName}\noutput=${output.joinToString("\n")}")
-    }
 }
