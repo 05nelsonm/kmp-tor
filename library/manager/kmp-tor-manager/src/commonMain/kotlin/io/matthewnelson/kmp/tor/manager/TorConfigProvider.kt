@@ -129,11 +129,11 @@ abstract class TorConfigProvider {
         val portsToModify: List<Ports> = validatePortOptions(isPortAvailable, clientConfig)
 
         val builder: TorConfig.Builder = clientConfig.newBuilder {
+            put(portsToModify)
+
             for (setting in excludeSettings) {
                 remove(setting)
             }
-
-            put(portsToModify)
             
             // TorManager requires this to be initially set to true (disable network) for several reasons:
             //  - TorManager was passed a network observer and the device has no network, we

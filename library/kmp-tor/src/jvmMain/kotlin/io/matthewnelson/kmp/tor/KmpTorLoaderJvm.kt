@@ -15,6 +15,7 @@
  **/
 package io.matthewnelson.kmp.tor
 
+import io.matthewnelson.kmp.tor.controller.common.config.TorConfig
 import io.matthewnelson.kmp.tor.controller.common.file.toFile
 import io.matthewnelson.kmp.tor.internal.ProcessStreamEater
 import io.matthewnelson.kmp.tor.internal.isStillAlive
@@ -39,6 +40,12 @@ class KmpTorLoaderJvm(
     val installer: PlatformInstaller,
     provider: TorConfigProviderJvm
 ): KmpTorLoader(provider) {
+
+    override val excludeSettings: Set<TorConfig.Setting<*>> = if (installer.isMingw) {
+        setOf(TorConfig.Setting.Ports.Trans())
+    } else {
+        super.excludeSettings
+    }
 
     @Suppress("BlockingMethodInNonBlockingContext")
     @Throws(TorManagerException::class, CancellationException::class)
