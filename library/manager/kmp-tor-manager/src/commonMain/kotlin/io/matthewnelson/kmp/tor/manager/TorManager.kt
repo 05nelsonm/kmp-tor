@@ -927,6 +927,10 @@ private class RealTorManager(
                 loader.close()
             }
 
+            if (isRestart) {
+                loader.cancelTorJob()
+            }
+
             return result
         }
     }

@@ -43,4 +43,7 @@ expect abstract class KmpTorLoader {
 
     @JvmSynthetic
     internal open fun close()
+
+    @JvmSynthetic
+    internal open fun cancelTorJob()
 }

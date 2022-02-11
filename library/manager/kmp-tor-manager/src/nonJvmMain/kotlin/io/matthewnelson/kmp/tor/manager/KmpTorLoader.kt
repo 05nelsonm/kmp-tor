@@ -39,6 +39,8 @@ actual abstract class KmpTorLoader(provider: TorConfigProvider) {
 
     internal actual open fun close() { /* no-op */ }
 
+    internal actual open fun cancelTorJob() { /* no-op */ }
+
     @Throws(TorManagerException::class, CancellationException::class)
     protected actual abstract suspend fun startTor(
         configLines: List<String>,

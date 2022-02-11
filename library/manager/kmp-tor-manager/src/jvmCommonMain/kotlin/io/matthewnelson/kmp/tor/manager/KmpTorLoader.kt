@@ -308,7 +308,13 @@ actual abstract class KmpTorLoader @JvmOverloads constructor(
 
     @JvmSynthetic
     internal actual open fun close() {
+        cancelTorJob()
         torDispatcher.close()
+    }
+
+    @JvmSynthetic
+    internal actual open fun cancelTorJob() {
+        torJob?.cancel()
     }
 
     @Throws(TorManagerException::class)
