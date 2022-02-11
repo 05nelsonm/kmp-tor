@@ -88,6 +88,7 @@ abstract class TorTestHelper {
             put(Ports.Control().set(AorDorPort.Value(Port(9155))))
             put(Ports.Socks().set(AorDorPort.Auto))
             put(Ports.HttpTunnel().set(AorDorPort.Auto))
+            put(Ports.Trans().set(AorDorPort.Auto))
 
             put(ClientOnionAuthDir().set(FileSystemDir(
                 testProvider.workDir.builder { addSegment(ClientOnionAuthDir.DEFAULT_NAME) }
