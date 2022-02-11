@@ -285,7 +285,7 @@ internal class TorService: Service() {
     override fun onDestroy() {
         TorServiceController.notify(TorManagerEvent.Lifecycle(this, ON_DESTROY))
         supervisor.cancel()
-        managerHolder.instance?.destroy(stopCleanly = true) {
+        managerHolder.instance?.destroy(stopCleanly = config.enableForeground || !isTaskRemoved) {
             // onCompletion
             if (config.enableForeground && isTaskRemoved) {
                 exitProcess(0)
