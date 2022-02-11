@@ -16,15 +16,15 @@
 package io.matthewnelson.kmp.tor
 
 import io.matthewnelson.kmp.tor.controller.common.file.toFile
+import io.matthewnelson.kmp.tor.internal.ProcessStreamEater
 import io.matthewnelson.kmp.tor.internal.isStillAlive
 import io.matthewnelson.kmp.tor.manager.KmpTorLoader
 import io.matthewnelson.kmp.tor.manager.common.event.TorManagerEvent
 import io.matthewnelson.kmp.tor.manager.common.exceptions.TorManagerException
-import kotlinx.coroutines.currentCoroutineContext
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.isActive
+import kotlinx.coroutines.*
 import java.io.File
 import java.io.IOException
+import java.util.*
 import kotlin.collections.ArrayList
 import kotlin.coroutines.cancellation.CancellationException
 
@@ -69,6 +69,8 @@ class KmpTorLoaderAndroid(provider: TorConfigProviderAndroid): KmpTorLoader(prov
 
         newLines.addAll(configLines)
 
+        val parentContext = currentCoroutineContext()
+
         var process: Process? = null
         try {
             val builder = ProcessBuilder(newLines)
@@ -78,18 +80,26 @@ class KmpTorLoaderAndroid(provider: TorConfigProviderAndroid): KmpTorLoader(prov
             val p = builder.start()
             process = p
 
+            ProcessStreamEater(
+                parentJob = parentContext.job,
+                input = p.inputStream.bufferedReader(),
+                error = p.errorStream.bufferedReader(),
+                notify = notify
+            )
+
             // Process.waitFor() is runBlocking which we do not want here.
             // Below allows us to monitor a few things that, when no longer
             // true, will drop the while loop suspension and automatically destroy
             // our process:
             //  - The underlying coroutine (or dispatcher) is cancelled/closed
             //  - Tor stops running for some reason
-            while (p.isStillAlive() && currentCoroutineContext().isActive) {
+            while (p.isStillAlive() && parentContext.isActive) {
                 delay(100L)
             }
         } catch (e: IOException) {
             throw TorManagerException("Failed to start Tor", e)
         } finally {
+            notify.invoke(TorManagerEvent.Log.Debug("Tor Process destroyed"))
             process?.destroy()
         }
     }
