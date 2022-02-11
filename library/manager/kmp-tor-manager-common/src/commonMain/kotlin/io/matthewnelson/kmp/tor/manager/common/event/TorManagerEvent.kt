@@ -63,7 +63,7 @@ sealed interface TorManagerEvent {
          * */
         @JvmInline
         value class Debug(val value: String): Log {
-            override fun toString(): String = value
+            override fun toString(): String = "D/$value"
         }
 
         /**
@@ -71,13 +71,22 @@ sealed interface TorManagerEvent {
          * with TorManager.
          * */
         @JvmInline
-        value class Error(val value: Throwable): Log
+        value class Error(val value: Throwable): Log {
+            override fun toString(): String = "E/${value.stackTraceToString()}"
+        }
+
+        @JvmInline
+        value class Info(val value: String): Log {
+            override fun toString(): String = "I/$value"
+        }
 
         /**
          * Warning events. Currently, the only warning is [WAITING_ON_NETWORK].
          * */
         @JvmInline
         value class Warn(val value: String): Log {
+            override fun toString(): String = "W/$value"
+
             companion object {
                 const val WAITING_ON_NETWORK = "No Network Connectivity. Waiting..."
             }
@@ -203,6 +212,7 @@ sealed interface TorManagerEvent {
         open fun managerEventAddressInfo(info: AddressInfo) {}
         open fun managerEventDebug(message: String) {}
         open fun managerEventError(t: Throwable) {}
+        open fun managerEventInfo(message: String) {}
         open fun managerEventWarn(message: String) {}
         open fun managerEventLifecycle(lifecycle: Lifecycle<*>) {}
         open fun managerEventState(state: State) {}
@@ -216,6 +226,7 @@ sealed interface TorManagerEvent {
                 is AddressInfo -> managerEventAddressInfo(event)
                 is Log.Debug -> managerEventDebug(event.value)
                 is Log.Error -> managerEventError(event.value)
+                is Log.Info -> managerEventInfo(event.value)
                 is Log.Warn -> managerEventWarn(event.value)
                 is Lifecycle<*> -> managerEventLifecycle(event)
                 is State -> managerEventState(event)

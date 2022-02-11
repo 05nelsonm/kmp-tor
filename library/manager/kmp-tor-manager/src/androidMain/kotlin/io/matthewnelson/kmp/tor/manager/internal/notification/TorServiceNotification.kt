@@ -167,6 +167,7 @@ internal abstract class TorServiceNotification(
             is AddressInfo,
             is Log.Debug,
             is Log.Error,
+            is Log.Info,
             is Lifecycle<*> -> { /* no-op */ }
 
             is EventAction.Restart -> {

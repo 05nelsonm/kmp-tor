@@ -764,7 +764,7 @@ private class RealTorManager(
     }
 
     private fun notifyListeners(event: TorManagerEvent) {
-        if (event is TorManagerEvent.Log && !debug.value) return
+        if (event is TorManagerEvent.Log.Debug && !debug.value) return
 
         scope.launch {
             notifyListenersNoScope(event)
