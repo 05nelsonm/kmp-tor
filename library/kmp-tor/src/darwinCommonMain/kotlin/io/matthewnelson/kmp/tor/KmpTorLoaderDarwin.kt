@@ -17,9 +17,13 @@ package io.matthewnelson.kmp.tor
 
 import io.matthewnelson.kmp.tor.manager.TorConfigProvider
 import io.matthewnelson.kmp.tor.manager.KmpTorLoader
+import io.matthewnelson.kmp.tor.manager.common.event.TorManagerEvent
 
 class KmpTorLoaderDarwin(provider: TorConfigProvider): KmpTorLoader(provider) {
-    override suspend fun startTor(configLines: List<String>) {
+    override suspend fun startTor(
+        configLines: List<String>,
+        notify: (TorManagerEvent.Log) -> Unit,
+    ) {
         TODO("Not yet implemented")
     }
 }

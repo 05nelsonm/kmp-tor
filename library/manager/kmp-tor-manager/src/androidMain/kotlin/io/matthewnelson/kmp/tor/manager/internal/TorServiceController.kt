@@ -114,7 +114,7 @@ internal object TorServiceController:
 
     @JvmSynthetic
     fun notify(event: TorManagerEvent) {
-        if (event is TorManagerEvent.Debug && !debug) return
+        if (event is TorManagerEvent.Log.Debug && !debug) return
 
         listeners.withLock {
             for (listener in this) {

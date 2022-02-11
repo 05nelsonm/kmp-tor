@@ -224,7 +224,7 @@ private class RealTorManagerAndroid(
 
         scope.launch {
             start().onFailure { ex ->
-                TorServiceController.notify(TorManagerEvent.Error(ex))
+                TorServiceController.notify(TorManagerEvent.Log.Error(ex))
             }
         }
     }
@@ -297,7 +297,7 @@ private class RealTorManagerAndroid(
 
         scope.launch {
             restart().onFailure { ex ->
-                TorServiceController.notify(TorManagerEvent.Error(ex))
+                TorServiceController.notify(TorManagerEvent.Log.Error(ex))
             }
         }
     }
@@ -340,7 +340,7 @@ private class RealTorManagerAndroid(
 
         scope.launch {
             stop().onFailure { ex ->
-                TorServiceController.notify(TorManagerEvent.Error(ex))
+                TorServiceController.notify(TorManagerEvent.Log.Error(ex))
             }
         }
     }

@@ -91,7 +91,7 @@ actual abstract class KmpTorLoader @JvmOverloads constructor(
             if (!controlPortFile.exists() || cookieAuthFile?.exists() == false) {
                 return@let
             }
-            notify.invoke(TorManagerEvent.Debug.Message(value=
+            notify.invoke(TorManagerEvent.Log.Debug(value=
                 "Attempting to re-connect to already running Tor process"
             ))
             // attempt re-connect to already running Tor instance
@@ -154,7 +154,7 @@ actual abstract class KmpTorLoader @JvmOverloads constructor(
                 }
             }
 
-            notify.invoke(TorManagerEvent.Debug.Message("Re-connection attempt successful!"))
+            notify.invoke(TorManagerEvent.Log.Debug("Re-connection attempt successful!"))
             return Result.success(controller)
         }
 
@@ -217,7 +217,7 @@ actual abstract class KmpTorLoader @JvmOverloads constructor(
         ) {
             runLock.withLock {
 
-                notify.invoke(TorManagerEvent.Debug.Message(value=
+                notify.invoke(TorManagerEvent.Log.Debug(value=
                     "Starting Tor with the following settings:\n" +
                     "----------------------------------------------------------------" +
                     "\n${validated.torConfig.text}" +
@@ -225,7 +225,11 @@ actual abstract class KmpTorLoader @JvmOverloads constructor(
                 ))
 
                 withContext(dispatcher) {
-                    startTor(validated.configLines)
+                    startTor(validated.configLines) { log ->
+                        managerScope.launch {
+                            notify.invoke(log)
+                        }
+                    }
                 }
 
                 // throw exception here so it is propagated to the handler in
@@ -304,7 +308,13 @@ actual abstract class KmpTorLoader @JvmOverloads constructor(
 
     @JvmSynthetic
     internal actual open fun close() {
+        cancelTorJob()
         torDispatcher.close()
+    }
+
+    @JvmSynthetic
+    internal actual open fun cancelTorJob() {
+        torJob?.cancel()
     }
 
     @Throws(TorManagerException::class)
@@ -418,5 +428,8 @@ actual abstract class KmpTorLoader @JvmOverloads constructor(
     }
 
     @Throws(TorManagerException::class, CancellationException::class)
-    protected actual abstract suspend fun startTor(configLines: List<String>)
+    protected actual abstract suspend fun startTor(
+        configLines: List<String>,
+        notify: (TorManagerEvent.Log) -> Unit,
+    )
 }

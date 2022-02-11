@@ -29,7 +29,10 @@ expect abstract class KmpTorLoader {
     protected open val excludeSettings: Set<TorConfig.Setting<*>>
 
     @Throws(TorManagerException::class, CancellationException::class)
-    protected abstract suspend fun startTor(configLines: List<String>)
+    protected abstract suspend fun startTor(
+        configLines: List<String>,
+        notify: (TorManagerEvent.Log) -> Unit,
+    )
 
     @JvmSynthetic
     internal open suspend fun load(
@@ -40,4 +43,7 @@ expect abstract class KmpTorLoader {
 
     @JvmSynthetic
     internal open fun close()
+
+    @JvmSynthetic
+    internal open fun cancelTorJob()
 }

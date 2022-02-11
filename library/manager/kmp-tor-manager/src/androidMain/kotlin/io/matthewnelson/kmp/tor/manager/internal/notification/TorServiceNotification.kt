@@ -33,7 +33,7 @@ import io.matthewnelson.kmp.tor.manager.common.event.TorManagerEvent.*
 import io.matthewnelson.kmp.tor.manager.common.event.TorManagerEvent.Lifecycle.Companion.ON_CREATE
 import io.matthewnelson.kmp.tor.manager.common.event.TorManagerEvent.Lifecycle.Companion.ON_REGISTER
 import io.matthewnelson.kmp.tor.manager.common.event.TorManagerEvent.Lifecycle.Companion.ON_UNREGISTER
-import io.matthewnelson.kmp.tor.manager.common.event.TorManagerEvent.Warn.Companion.WAITING_ON_NETWORK
+import io.matthewnelson.kmp.tor.manager.common.event.TorManagerEvent.Log.Warn.Companion.WAITING_ON_NETWORK
 import io.matthewnelson.kmp.tor.manager.common.state.*
 import io.matthewnelson.kmp.tor.manager.common.event.TorManagerEvent.Action as EventAction
 import io.matthewnelson.kmp.tor.manager.internal.TorService
@@ -165,8 +165,9 @@ internal abstract class TorServiceNotification(
         when (event) {
             is EventAction.Controller,
             is AddressInfo,
-            is Debug.Message,
-            is Error,
+            is Log.Debug,
+            is Log.Error,
+            is Log.Info,
             is Lifecycle<*> -> { /* no-op */ }
 
             is EventAction.Restart -> {
@@ -184,7 +185,7 @@ internal abstract class TorServiceNotification(
                     contentText = event.provideStringFor()
                 ))
             }
-            is Warn -> {
+            is Log.Warn -> {
                 if (event.value == WAITING_ON_NETWORK) {
                     render(currentState.copy(contentText = provideStringForWaitingOnNetwork()))
                 }
@@ -597,7 +598,7 @@ private class RealTorServiceNotification(
                     val action = try {
                         Action.valueOf(intent.getStringExtra(intentFilter) ?: return)
                     } catch (e: Exception) {
-                        TorServiceController.notify(Error(e))
+                        TorServiceController.notify(Log.Error(e))
                     }
 
                     when (action) {
@@ -645,7 +646,7 @@ private class RealTorServiceNotification(
                                     }
                                 }
                                 result.onFailure {
-                                    TorServiceController.notify(Error(it))
+                                    TorServiceController.notify(Log.Error(it))
                                 }
                             }
                         }

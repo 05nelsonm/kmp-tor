@@ -56,31 +56,40 @@ sealed interface TorManagerEvent {
         }
     }
 
-    /**
-     * Debug events. Will only be dispatched if debug is enabled.
-     * */
-    sealed interface Debug: TorManagerEvent {
+    sealed interface Log: TorManagerEvent {
+
+        /**
+         * Debug events. Will only be dispatched if debug is enabled.
+         * */
+        @JvmInline
+        value class Debug(val value: String): Log {
+            override fun toString(): String = "D/$value"
+        }
+
+        /**
+         * Error events that are not returned as a [Result] from interacting
+         * with TorManager.
+         * */
+        @JvmInline
+        value class Error(val value: Throwable): Log {
+            override fun toString(): String = "E/${value.stackTraceToString()}"
+        }
 
         @JvmInline
-        value class Message(val value: String): Debug {
-            override fun toString(): String = value
+        value class Info(val value: String): Log {
+            override fun toString(): String = "I/$value"
         }
-    }
 
-    /**
-     * Error events that are not returned as a [Result] from interacting
-     * with TorManager.
-     * */
-    @JvmInline
-    value class Error(val value: Throwable): TorManagerEvent
+        /**
+         * Warning events. Currently, the only warning is [WAITING_ON_NETWORK].
+         * */
+        @JvmInline
+        value class Warn(val value: String): Log {
+            override fun toString(): String = "W/$value"
 
-    /**
-     * Warning events. Currently, the only warning is [WAITING_ON_NETWORK].
-     * */
-    @JvmInline
-    value class Warn(val value: String): TorManagerEvent {
-        companion object {
-            const val WAITING_ON_NETWORK = "No Network Connectivity. Waiting..."
+            companion object {
+                const val WAITING_ON_NETWORK = "No Network Connectivity. Waiting..."
+            }
         }
     }
 
@@ -203,6 +212,7 @@ sealed interface TorManagerEvent {
         open fun managerEventAddressInfo(info: AddressInfo) {}
         open fun managerEventDebug(message: String) {}
         open fun managerEventError(t: Throwable) {}
+        open fun managerEventInfo(message: String) {}
         open fun managerEventWarn(message: String) {}
         open fun managerEventLifecycle(lifecycle: Lifecycle<*>) {}
         open fun managerEventState(state: State) {}
@@ -214,9 +224,10 @@ sealed interface TorManagerEvent {
                 is Action.Start -> managerEventActionStart()
                 is Action.Stop -> managerEventActionStop()
                 is AddressInfo -> managerEventAddressInfo(event)
-                is Debug.Message -> managerEventDebug(event.value)
-                is Error -> managerEventError(event.value)
-                is Warn -> managerEventWarn(event.value)
+                is Log.Debug -> managerEventDebug(event.value)
+                is Log.Error -> managerEventError(event.value)
+                is Log.Info -> managerEventInfo(event.value)
+                is Log.Warn -> managerEventWarn(event.value)
                 is Lifecycle<*> -> managerEventLifecycle(event)
                 is State -> managerEventState(event)
             }
