@@ -18,6 +18,7 @@ package io.matthewnelson.kmp.tor
 import io.matthewnelson.kmp.tor.controller.common.file.toFile
 import io.matthewnelson.kmp.tor.internal.isStillAlive
 import io.matthewnelson.kmp.tor.manager.KmpTorLoader
+import io.matthewnelson.kmp.tor.manager.common.event.TorManagerEvent
 import io.matthewnelson.kmp.tor.manager.common.exceptions.TorManagerException
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.delay
@@ -39,7 +40,10 @@ class KmpTorLoaderJvm(
 
     @Suppress("BlockingMethodInNonBlockingContext")
     @Throws(TorManagerException::class, CancellationException::class)
-    override suspend fun startTor(configLines: List<String>) {
+    override suspend fun startTor(
+        configLines: List<String>,
+        notify: (TorManagerEvent.Log) -> Unit,
+    ) {
         val installationDir = (provider as TorConfigProviderJvm).installationDir.toFile()
         val tor = installer.retrieveTor(installationDir)
 

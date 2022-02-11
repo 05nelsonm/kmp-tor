@@ -225,7 +225,11 @@ actual abstract class KmpTorLoader @JvmOverloads constructor(
                 ))
 
                 withContext(dispatcher) {
-                    startTor(validated.configLines)
+                    startTor(validated.configLines) { log ->
+                        managerScope.launch {
+                            notify.invoke(log)
+                        }
+                    }
                 }
 
                 // throw exception here so it is propagated to the handler in
@@ -418,5 +422,8 @@ actual abstract class KmpTorLoader @JvmOverloads constructor(
     }
 
     @Throws(TorManagerException::class, CancellationException::class)
-    protected actual abstract suspend fun startTor(configLines: List<String>)
+    protected actual abstract suspend fun startTor(
+        configLines: List<String>,
+        notify: (TorManagerEvent.Log) -> Unit,
+    )
 }
