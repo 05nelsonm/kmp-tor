@@ -30,7 +30,7 @@ interface TorOperationManager {
      * Will start Tor using TorManager's coroutine scope.
      *
      * Error response is directed to the [TorManagerEvent.SealedListener] via
-     * [TorManagerEvent.Error]
+     * [TorManagerEvent.Log.Error]
      * */
     fun startQuietly()
 
@@ -43,7 +43,7 @@ interface TorOperationManager {
      * Will restart Tor using TorManager's coroutine scope.
      *
      * Error response is directed to the [TorManagerEvent.SealedListener] via
-     * [TorManagerEvent.Error]
+     * [TorManagerEvent.Log.Error]
      * */
     fun restartQuietly()
 
@@ -56,7 +56,7 @@ interface TorOperationManager {
      * Will stop Tor using TorManager's coroutine scope.
      *
      * Error response is directed to the [TorManagerEvent.SealedListener] via
-     * [TorManagerEvent.Error]
+     * [TorManagerEvent.Log.Error]
      * */
     fun stopQuietly()
 }

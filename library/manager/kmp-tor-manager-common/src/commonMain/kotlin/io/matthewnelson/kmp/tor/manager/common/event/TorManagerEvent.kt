@@ -56,31 +56,31 @@ sealed interface TorManagerEvent {
         }
     }
 
-    /**
-     * Debug events. Will only be dispatched if debug is enabled.
-     * */
-    sealed interface Debug: TorManagerEvent {
+    sealed interface Log: TorManagerEvent {
 
+        /**
+         * Debug events. Will only be dispatched if debug is enabled.
+         * */
         @JvmInline
-        value class Message(val value: String): Debug {
+        value class Debug(val value: String): Log {
             override fun toString(): String = value
         }
-    }
 
-    /**
-     * Error events that are not returned as a [Result] from interacting
-     * with TorManager.
-     * */
-    @JvmInline
-    value class Error(val value: Throwable): TorManagerEvent
+        /**
+         * Error events that are not returned as a [Result] from interacting
+         * with TorManager.
+         * */
+        @JvmInline
+        value class Error(val value: Throwable): Log
 
-    /**
-     * Warning events. Currently, the only warning is [WAITING_ON_NETWORK].
-     * */
-    @JvmInline
-    value class Warn(val value: String): TorManagerEvent {
-        companion object {
-            const val WAITING_ON_NETWORK = "No Network Connectivity. Waiting..."
+        /**
+         * Warning events. Currently, the only warning is [WAITING_ON_NETWORK].
+         * */
+        @JvmInline
+        value class Warn(val value: String): Log {
+            companion object {
+                const val WAITING_ON_NETWORK = "No Network Connectivity. Waiting..."
+            }
         }
     }
 
@@ -214,9 +214,9 @@ sealed interface TorManagerEvent {
                 is Action.Start -> managerEventActionStart()
                 is Action.Stop -> managerEventActionStop()
                 is AddressInfo -> managerEventAddressInfo(event)
-                is Debug.Message -> managerEventDebug(event.value)
-                is Error -> managerEventError(event.value)
-                is Warn -> managerEventWarn(event.value)
+                is Log.Debug -> managerEventDebug(event.value)
+                is Log.Error -> managerEventError(event.value)
+                is Log.Warn -> managerEventWarn(event.value)
                 is Lifecycle<*> -> managerEventLifecycle(event)
                 is State -> managerEventState(event)
             }

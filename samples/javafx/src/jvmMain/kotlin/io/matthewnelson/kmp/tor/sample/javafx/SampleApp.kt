@@ -206,7 +206,7 @@ class SampleApp: App(SampleView::class) {
 
         override fun onEvent(event: TorManagerEvent) {
             addLine(event.toString())
-            if (event is TorManagerEvent.Error) {
+            if (event is TorManagerEvent.Log.Error) {
                 event.value.printStackTrace()
             }
 

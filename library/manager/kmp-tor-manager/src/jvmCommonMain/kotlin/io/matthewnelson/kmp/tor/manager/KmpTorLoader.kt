@@ -91,7 +91,7 @@ actual abstract class KmpTorLoader @JvmOverloads constructor(
             if (!controlPortFile.exists() || cookieAuthFile?.exists() == false) {
                 return@let
             }
-            notify.invoke(TorManagerEvent.Debug.Message(value=
+            notify.invoke(TorManagerEvent.Log.Debug(value=
                 "Attempting to re-connect to already running Tor process"
             ))
             // attempt re-connect to already running Tor instance
@@ -154,7 +154,7 @@ actual abstract class KmpTorLoader @JvmOverloads constructor(
                 }
             }
 
-            notify.invoke(TorManagerEvent.Debug.Message("Re-connection attempt successful!"))
+            notify.invoke(TorManagerEvent.Log.Debug("Re-connection attempt successful!"))
             return Result.success(controller)
         }
 
@@ -217,7 +217,7 @@ actual abstract class KmpTorLoader @JvmOverloads constructor(
         ) {
             runLock.withLock {
 
-                notify.invoke(TorManagerEvent.Debug.Message(value=
+                notify.invoke(TorManagerEvent.Log.Debug(value=
                     "Starting Tor with the following settings:\n" +
                     "----------------------------------------------------------------" +
                     "\n${validated.torConfig.text}" +

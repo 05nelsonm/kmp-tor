@@ -36,7 +36,7 @@ import io.matthewnelson.kmp.tor.manager.common.event.TorManagerEvent
 import io.matthewnelson.kmp.tor.manager.common.event.TorManagerEvent.Action.*
 import io.matthewnelson.kmp.tor.manager.common.event.TorManagerEvent.Lifecycle.Companion.ON_CREATE
 import io.matthewnelson.kmp.tor.manager.common.event.TorManagerEvent.Lifecycle.Companion.ON_DESTROY
-import io.matthewnelson.kmp.tor.manager.common.event.TorManagerEvent.Warn.Companion.WAITING_ON_NETWORK
+import io.matthewnelson.kmp.tor.manager.common.event.TorManagerEvent.Log.Warn.Companion.WAITING_ON_NETWORK
 import io.matthewnelson.kmp.tor.manager.common.exceptions.InterruptedException
 import io.matthewnelson.kmp.tor.manager.common.exceptions.TorManagerException
 import io.matthewnelson.kmp.tor.manager.common.exceptions.TorNotStartedException
@@ -137,7 +137,7 @@ private class RealTorManager(
     private val listeners: ListenersHandler = ListenersHandler.newInstance(3) {
         // Listener threw an exception when being notified for a TorEvent
         try {
-            (it.listener as TorManagerEvent.SealedListener).onEvent(TorManagerEvent.Error(it.error.value))
+            (it.listener as TorManagerEvent.SealedListener).onEvent(TorManagerEvent.Log.Error(it.error.value))
         } catch (_: Exception) {}
     }
     private val controllerListener: ControllerListener = ControllerListener()
@@ -278,7 +278,7 @@ private class RealTorManager(
 
         scope.launch {
             start().onFailure { ex ->
-                notifyListenersNoScope(TorManagerEvent.Error(ex))
+                notifyListenersNoScope(TorManagerEvent.Log.Error(ex))
             }
         }
     }
@@ -319,7 +319,7 @@ private class RealTorManager(
 
         scope.launch {
             restart().onFailure { ex ->
-                notifyListenersNoScope(TorManagerEvent.Error(ex))
+                notifyListenersNoScope(TorManagerEvent.Log.Error(ex))
             }
         }
     }
@@ -379,7 +379,7 @@ private class RealTorManager(
 
         scope.launch {
             stop().onFailure { ex ->
-                notifyListenersNoScope(TorManagerEvent.Error(ex))
+                notifyListenersNoScope(TorManagerEvent.Log.Error(ex))
             }
         }
     }
@@ -764,7 +764,7 @@ private class RealTorManager(
     }
 
     private fun notifyListeners(event: TorManagerEvent) {
-        if (event is TorManagerEvent.Debug && !debug.value) return
+        if (event is TorManagerEvent.Log && !debug.value) return
 
         scope.launch {
             notifyListenersNoScope(event)
@@ -777,9 +777,9 @@ private class RealTorManager(
                 try {
                     (listener as TorManagerEvent.SealedListener).onEvent(event)
                 } catch (e: Exception) {
-                    if (event !is TorManagerEvent.Error) {
+                    if (event !is TorManagerEvent.Log.Error) {
                         try {
-                            (listener as TorManagerEvent.SealedListener).onEvent(TorManagerEvent.Error(e))
+                            (listener as TorManagerEvent.SealedListener).onEvent(TorManagerEvent.Log.Error(e))
                         } catch (ee: Exception) {}
                     }
                 }
@@ -818,10 +818,10 @@ private class RealTorManager(
                 when (item) {
                     is DebugItem.Message -> {
                         if (item.value.startsWith("<< 650 BW ")) return@setDebugger
-                        notifyListeners(TorManagerEvent.Debug.Message(item.value))
+                        notifyListeners(TorManagerEvent.Log.Debug(item.value))
                     }
                     is DebugItem.Error -> {
-                        notifyListeners(TorManagerEvent.Error(item.value))
+                        notifyListeners(TorManagerEvent.Log.Error(item.value))
                     }
                     is DebugItem.ListenerError -> {
                         // ControllerListener threw an exception
@@ -865,7 +865,7 @@ private class RealTorManager(
                     stateMachine.updateState(TorNetworkState.Enabled)
                 }
             } else {
-                notifyListenersNoScope(TorManagerEvent.Warn(WAITING_ON_NETWORK))
+                notifyListenersNoScope(TorManagerEvent.Log.Warn(WAITING_ON_NETWORK))
             }
 
             this.controller.value = controller
@@ -913,7 +913,7 @@ private class RealTorManager(
                     } else {
                         // Force close Tor
                         loader.close()
-                        notifyListenersNoScope(TorManagerEvent.Warn(
+                        notifyListenersNoScope(TorManagerEvent.Log.Warn(
                             "Tor failed to signal shutdown/halt and was forcibly stopped"
                         ))
                         Result.success("Tor was forcibly stopped")

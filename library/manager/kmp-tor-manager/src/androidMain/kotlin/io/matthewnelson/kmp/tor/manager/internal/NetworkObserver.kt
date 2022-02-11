@@ -36,7 +36,7 @@ internal fun networkObserverOrNull(service: TorService): NetworkObserver? {
         ?: return null
 
     if (!service.isPermissionGranted(ACCESS_NETWORK_STATE)) {
-        TorServiceController.notify(TorManagerEvent.Warn(
+        TorServiceController.notify(TorManagerEvent.Log.Warn(
             "Permission ACCESS_NETWORK_STATE not granted. Disabling NetworkObserver"
         ))
         return null
