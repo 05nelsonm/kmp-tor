@@ -799,6 +799,7 @@ private class RealTorManager(
         }
 
         val result = loader.load(scope, stateMachine) { event ->
+            if (event is TorManagerEvent.Log.Debug && !debug.value) return@load
             notifyListenersNoScope(event)
         }
 
