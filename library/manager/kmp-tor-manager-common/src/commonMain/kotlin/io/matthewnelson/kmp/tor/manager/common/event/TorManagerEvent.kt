@@ -72,7 +72,7 @@ sealed interface TorManagerEvent {
          * */
         @JvmInline
         value class Error(val value: Throwable): Log {
-            override fun toString(): String = "E/${value.stackTraceToString()}"
+            override fun toString(): String = "E/$value"
         }
 
         @JvmInline
