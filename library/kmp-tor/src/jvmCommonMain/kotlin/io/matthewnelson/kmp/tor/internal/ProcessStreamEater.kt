@@ -16,6 +16,7 @@
 package io.matthewnelson.kmp.tor.internal
 
 import io.matthewnelson.kmp.tor.manager.common.event.TorManagerEvent
+import io.matthewnelson.kmp.tor.manager.common.exceptions.TorManagerException
 import kotlinx.coroutines.*
 import java.io.BufferedReader
 import java.util.*
@@ -42,7 +43,23 @@ internal class ProcessStreamEater(
                 inputScan = Scanner(input)
 
                 while (currentCoroutineContext().isActive  && inputScan.hasNextLine()) {
-                    notify.invoke(TorManagerEvent.Log.Info(inputScan.nextLine()))
+                    val line = inputScan.nextLine()
+                    when {
+                        line.contains(ERROR) -> {
+                            notify.invoke(TorManagerEvent.Log.Error(TorManagerException(line)))
+                        }
+                        line.contains(NOTICE) -> {
+                            // pipe notices to debug as we are already listening for them
+                            // via the control port by default.
+                            notify.invoke(TorManagerEvent.Log.Debug(line))
+                        }
+                        line.contains(WARN) -> {
+                            notify.invoke(TorManagerEvent.Log.Warn(line))
+                        }
+                        else -> {
+                            notify.invoke(TorManagerEvent.Log.Info(line))
+                        }
+                    }
                 }
             } catch (e: Exception) {
                 notify.invoke(TorManagerEvent.Log.Error(e))
@@ -65,7 +82,9 @@ internal class ProcessStreamEater(
                 errorScan = Scanner(error)
 
                 while (currentCoroutineContext().isActive && errorScan.hasNextLine()) {
-                    notify.invoke(TorManagerEvent.Log.Warn(errorScan.nextLine()))
+                    notify.invoke(TorManagerEvent.Log.Error(
+                        TorManagerException(errorScan.nextLine())
+                    ))
                 }
             } catch (e: Exception) {
                 notify.invoke(TorManagerEvent.Log.Error(e))
@@ -83,5 +102,11 @@ internal class ProcessStreamEater(
         supervisor.invokeOnCompletion {
             dispatcher.close()
         }
+    }
+
+    companion object {
+        private const val ERROR = " [err] "
+        private const val NOTICE = " [notice] "
+        private const val WARN = " [warn] "
     }
 }

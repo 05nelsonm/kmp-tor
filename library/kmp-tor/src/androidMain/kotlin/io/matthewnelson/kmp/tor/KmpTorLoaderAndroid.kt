@@ -24,7 +24,6 @@ import io.matthewnelson.kmp.tor.manager.common.exceptions.TorManagerException
 import kotlinx.coroutines.*
 import java.io.File
 import java.io.IOException
-import java.util.*
 import kotlin.collections.ArrayList
 import kotlin.coroutines.cancellation.CancellationException
 
@@ -33,7 +32,7 @@ import kotlin.coroutines.cancellation.CancellationException
  *
  * @see [TorConfigProviderAndroid]
  * @see [KmpTorLoader]
- * @sample [io.matthewnelson.kmp.tor.sample.android.App]
+ * @sample [io.matthewnelson.kmp.tor.sample.android.SampleApp]
  * */
 class KmpTorLoaderAndroid(provider: TorConfigProviderAndroid): KmpTorLoader(provider) {
 
@@ -80,12 +79,19 @@ class KmpTorLoaderAndroid(provider: TorConfigProviderAndroid): KmpTorLoader(prov
             val p = builder.start()
             process = p
 
+            var errorTime: Long = 0
+            var processError: TorManagerException? = null
             ProcessStreamEater(
                 parentJob = parentContext.job,
                 input = p.inputStream.bufferedReader(),
                 error = p.errorStream.bufferedReader(),
-                notify = notify
-            )
+            ) { log ->
+                if (log is TorManagerEvent.Log.Error && log.value is TorManagerException) {
+                    errorTime = System.currentTimeMillis()
+                    processError = log.value as TorManagerException
+                }
+                notify.invoke(log)
+            }
 
             // Process.waitFor() is runBlocking which we do not want here.
             // Below allows us to monitor a few things that, when no longer
@@ -95,6 +101,13 @@ class KmpTorLoaderAndroid(provider: TorConfigProviderAndroid): KmpTorLoader(prov
             //  - Tor stops running for some reason
             while (p.isStillAlive() && parentContext.isActive) {
                 delay(100L)
+            }
+
+            processError?.let { ex ->
+                // Don't throw if error is stale
+                if ((System.currentTimeMillis() - errorTime) < 250L) {
+                    throw ex
+                }
             }
         } catch (e: IOException) {
             throw TorManagerException("Failed to start Tor", e)

@@ -217,7 +217,7 @@ actual abstract class KmpTorLoader @JvmOverloads constructor(
         ) {
             runLock.withLock {
 
-                notify.invoke(TorManagerEvent.Log.Debug(value=
+                notify.invoke(TorManagerEvent.Log.Info(value=
                     "Starting Tor with the following settings:\n" +
                     "----------------------------------------------------------------" +
                     "\n${validated.torConfig.text}" +

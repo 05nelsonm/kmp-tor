@@ -35,6 +35,7 @@ import kotlin.coroutines.cancellation.CancellationException
  * @see [PlatformInstaller]
  * @see [TorConfigProviderJvm]
  * @see [KmpTorLoader]
+ * @sample [io.matthewnelson.kmp.tor.sample.javafx.SampleApp]
  * */
 class KmpTorLoaderJvm(
     val installer: PlatformInstaller,
@@ -54,7 +55,7 @@ class KmpTorLoaderJvm(
         notify: (TorManagerEvent.Log) -> Unit,
     ) {
         val installationDir = (provider as TorConfigProviderJvm).installationDir.toFile()
-        val tor = installer.retrieveTor(installationDir)
+        val tor = installer.retrieveTor(installationDir, notify)
 
         val newLines: MutableList<String> = ArrayList(configLines.size + 1)
         newLines.add(tor.absolutePath)
@@ -80,12 +81,19 @@ class KmpTorLoaderJvm(
             val p = builder.start()
             process = p
 
+            var errorTime: Long = System.currentTimeMillis()
+            var processError: TorManagerException? = null
             ProcessStreamEater(
                 parentJob = parentContext.job,
                 input = p.inputStream.bufferedReader(),
                 error = p.errorStream.bufferedReader(),
-                notify = notify
-            )
+            ) { log ->
+                if (log is TorManagerEvent.Log.Error && log.value is TorManagerException) {
+                    errorTime = System.currentTimeMillis()
+                    processError = log.value as TorManagerException
+                }
+                notify.invoke(log)
+            }
 
             // Process.waitFor() is runBlocking which we do not want here.
             // Below allows us to monitor a few things that, when no longer
@@ -95,6 +103,13 @@ class KmpTorLoaderJvm(
             //  - Tor stops running for some reason
             while (p.isStillAlive() && parentContext.isActive) {
                 delay(100L)
+            }
+
+            processError?.let { ex ->
+                // Don't throw if error is stale
+                if ((System.currentTimeMillis() - errorTime) < 250L) {
+                    throw ex
+                }
             }
         } catch (e: IOException) {
             throw TorManagerException("Failed to start Tor", e)

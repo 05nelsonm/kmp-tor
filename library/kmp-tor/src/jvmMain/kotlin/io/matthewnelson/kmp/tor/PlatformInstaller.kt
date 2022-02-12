@@ -29,6 +29,7 @@ import io.matthewnelson.kmp.tor.binary.extract.ConstantsBinaries.ZIP_MANIFEST_MI
 import io.matthewnelson.kmp.tor.binary.extract.ConstantsBinaries.ZIP_MANIFEST_MINGW_X86
 import io.matthewnelson.kmp.tor.binary.extract.ZipArchiveExtractor
 import io.matthewnelson.kmp.tor.internal.doesContentMatchExpected
+import io.matthewnelson.kmp.tor.manager.common.event.TorManagerEvent
 import io.matthewnelson.kmp.tor.manager.common.exceptions.TorManagerException
 import java.io.File
 import java.io.IOException
@@ -163,28 +164,38 @@ class PlatformInstaller private constructor(
      * */
     @JvmSynthetic
     @Throws(TorManagerException::class)
-    internal fun retrieveTor(installationDir: File): File {
+    internal fun retrieveTor(
+        installationDir: File,
+        notify: (TorManagerEvent.Log.Debug) -> Unit,
+    ): File {
         return when (installOption) {
             InstallOption.CleanInstallOnEachStart -> {
-                doCleanInstall(installationDir)
+                doCleanInstall(installationDir, notify)
             }
             InstallOption.CleanInstallFirstStartOnly -> {
                 if (firstStartInstallComplete) {
-                    doCleanInstallIfMissing(installationDir)
+                    doCleanInstallIfMissing(installationDir, notify)
                 } else {
-                    val tor = doCleanInstall(installationDir)
+                    val tor = doCleanInstall(installationDir, notify)
                     firstStartInstallComplete = true
                     tor
                 }
             }
             InstallOption.CleanInstallIfMissing -> {
-                doCleanInstallIfMissing(installationDir)
+                doCleanInstallIfMissing(installationDir, notify)
             }
         }
     }
 
     @Throws(TorManagerException::class)
-    private fun doCleanInstall(installationDir: File): File {
+    private fun doCleanInstall(
+        installationDir: File,
+        notify: (TorManagerEvent.Log.Debug) -> Unit,
+    ): File {
+        notify.invoke(TorManagerEvent.Log.Debug(
+            "Performing clean install of Tor binaries to directory: $installationDir"
+        ))
+
         var tor: File? = null
         val extractor = ZipArchiveExtractor.all(
             destinationDir = installationDir,
@@ -230,11 +241,14 @@ class PlatformInstaller private constructor(
     }
 
     @Throws(TorManagerException::class)
-    private fun doCleanInstallIfMissing(installationDir: File): File {
+    private fun doCleanInstallIfMissing(
+        installationDir: File,
+        notify: (TorManagerEvent.Log.Debug) -> Unit,
+    ): File {
         val sha256SumFile = File(installationDir, FILE_NAME_KMPTOR_ZIP_SHA256)
 
         if (!sha256SumFile.doesContentMatchExpected(sha256Sum)) {
-            return doCleanInstall(installationDir)
+            return doCleanInstall(installationDir, notify)
         }
 
         var tor: File? = null
@@ -252,11 +266,14 @@ class PlatformInstaller private constructor(
 
         return tor?.let {
             if (archiveManifestFiles.size == existsCount) {
+                notify.invoke(TorManagerEvent.Log.Debug(
+                    "Tor binaries detected. Skipping extraction"
+                ))
                 it
             } else {
-                doCleanInstall(installationDir)
+                doCleanInstall(installationDir, notify)
             }
-        } ?: doCleanInstall(installationDir)
+        } ?: doCleanInstall(installationDir, notify)
     }
 
     private fun List<String>.toManifestFiles(installationDir: File): List<File> {
