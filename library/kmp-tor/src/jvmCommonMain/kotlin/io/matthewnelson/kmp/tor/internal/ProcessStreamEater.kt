@@ -45,10 +45,15 @@ internal class ProcessStreamEater(
                 while (currentCoroutineContext().isActive  && inputScan.hasNextLine()) {
                     val line = inputScan.nextLine()
                     when {
-                        line.contains(" [err] ") -> {
+                        line.contains(ERROR) -> {
                             notify.invoke(TorManagerEvent.Log.Error(TorManagerException(line)))
                         }
-                        line.contains(" [warn] ") -> {
+                        line.contains(NOTICE) -> {
+                            // pipe notices to debug as we are already listening for them
+                            // via the control port by default.
+                            notify.invoke(TorManagerEvent.Log.Debug(line))
+                        }
+                        line.contains(WARN) -> {
                             notify.invoke(TorManagerEvent.Log.Warn(line))
                         }
                         else -> {
@@ -97,5 +102,11 @@ internal class ProcessStreamEater(
         supervisor.invokeOnCompletion {
             dispatcher.close()
         }
+    }
+
+    companion object {
+        private const val ERROR = " [err] "
+        private const val NOTICE = " [notice] "
+        private const val WARN = " [warn] "
     }
 }
