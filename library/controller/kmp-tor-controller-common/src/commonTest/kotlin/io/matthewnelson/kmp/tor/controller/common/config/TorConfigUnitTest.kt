@@ -128,6 +128,32 @@ class TorConfigUnitTest {
     }
 
     @Test
+    fun givenTorConfigBuilder_whenRemoveInstanceOf_removesAllInstances() {
+        val expectedRemove = TorConfig.Setting.DisableNetwork()
+        val expectedContains = buildSet {
+            add(TorConfig.Setting.Ports.Control())
+            add(TorConfig.Setting.Ports.Dns())
+            add(TorConfig.Setting.Ports.HttpTunnel())
+        }
+
+        val config = TorConfig.Builder {
+            put(expectedRemove)
+            put(expectedContains)
+        }.build()
+
+        assertTrue(config.settings.containsKey(expectedRemove))
+
+        val newConfig = config.newBuilder {
+            removeInstanceOf(expectedRemove::class)
+        }.build()
+
+        assertFalse(newConfig.settings.containsKey(expectedRemove))
+        for (expected in expectedContains) {
+            assertTrue(newConfig.settings.containsKey(expected))
+        }
+    }
+
+    @Test
     fun givenKeyWordPortControl_whenTrySetDisable_remainsUnchanged() {
         val ctrl = TorConfig.Setting.Ports.Control().set(TorConfig.Option.AorDorPort.Disable)
         assertTrue(ctrl.default is TorConfig.Option.AorDorPort.Auto)

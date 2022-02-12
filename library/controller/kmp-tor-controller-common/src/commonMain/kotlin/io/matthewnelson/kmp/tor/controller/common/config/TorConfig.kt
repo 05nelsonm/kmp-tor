@@ -98,6 +98,20 @@ class TorConfig private constructor(
             settings.remove(setting)
         }
 
+        @Suppress("unchecked_cast")
+        fun <T: Setting<*>> removeInstanceOf(clazz: KClass<T>): Builder = apply {
+            val toRemove = mutableListOf<T>()
+            for (setting in settings.keys) {
+                if (setting::class == clazz) {
+                    toRemove.add(setting as T)
+                }
+            }
+
+            for (setting in toRemove) {
+                settings.remove(setting)
+            }
+        }
+
         fun put(config: TorConfig): Builder = apply {
             settings.putAll(config.settings)
         }
