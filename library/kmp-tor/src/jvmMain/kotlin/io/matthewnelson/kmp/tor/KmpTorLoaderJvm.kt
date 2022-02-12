@@ -42,10 +42,22 @@ class KmpTorLoaderJvm(
     provider: TorConfigProviderJvm
 ): KmpTorLoader(provider) {
 
-    override val excludeSettings: Set<TorConfig.Setting<*>> = if (installer.isMingw) {
-        setOf(TorConfig.Setting.Ports.Trans())
-    } else {
-        super.excludeSettings
+    override val excludeSettings: Set<TorConfig.Setting<*>> = when {
+        installer.isMingw -> {
+            buildSet {
+                addAll(super.excludeSettings)
+                add(TorConfig.Setting.Ports.Trans())
+            }
+        }
+        installer.isMacos -> {
+            buildSet {
+                addAll(super.excludeSettings)
+                add(TorConfig.Setting.Ports.Trans())
+            }
+        }
+        else -> {
+            super.excludeSettings
+        }
     }
 
     @Suppress("BlockingMethodInNonBlockingContext")
