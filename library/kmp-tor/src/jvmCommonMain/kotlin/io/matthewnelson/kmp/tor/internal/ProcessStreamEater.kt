@@ -16,6 +16,7 @@
 package io.matthewnelson.kmp.tor.internal
 
 import io.matthewnelson.kmp.tor.manager.common.event.TorManagerEvent
+import io.matthewnelson.kmp.tor.manager.common.exceptions.TorManagerException
 import kotlinx.coroutines.*
 import java.io.BufferedReader
 import java.util.*
@@ -65,7 +66,9 @@ internal class ProcessStreamEater(
                 errorScan = Scanner(error)
 
                 while (currentCoroutineContext().isActive && errorScan.hasNextLine()) {
-                    notify.invoke(TorManagerEvent.Log.Warn(errorScan.nextLine()))
+                    notify.invoke(TorManagerEvent.Log.Error(
+                        TorManagerException(errorScan.nextLine())
+                    ))
                 }
             } catch (e: Exception) {
                 notify.invoke(TorManagerEvent.Log.Error(e))
