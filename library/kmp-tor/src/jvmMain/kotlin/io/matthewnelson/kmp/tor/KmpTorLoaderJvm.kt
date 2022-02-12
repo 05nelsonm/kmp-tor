@@ -80,6 +80,7 @@ class KmpTorLoaderJvm(
             val p = builder.start()
             process = p
 
+            var errorTime: Long = System.currentTimeMillis()
             var processError: TorManagerException? = null
             ProcessStreamEater(
                 parentJob = parentContext.job,
@@ -87,6 +88,7 @@ class KmpTorLoaderJvm(
                 error = p.errorStream.bufferedReader(),
             ) { log ->
                 if (log is TorManagerEvent.Log.Error && log.value is TorManagerException) {
+                    errorTime = System.currentTimeMillis()
                     processError = log.value as TorManagerException
                 }
                 notify.invoke(log)
@@ -103,7 +105,10 @@ class KmpTorLoaderJvm(
             }
 
             processError?.let { ex ->
-                throw ex
+                // Don't throw if error is stale
+                if ((System.currentTimeMillis() - errorTime) < 250L) {
+                    throw ex
+                }
             }
         } catch (e: IOException) {
             throw TorManagerException("Failed to start Tor", e)
