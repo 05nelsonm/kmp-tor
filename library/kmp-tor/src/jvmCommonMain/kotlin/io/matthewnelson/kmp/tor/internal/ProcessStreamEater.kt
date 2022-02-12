@@ -46,21 +46,15 @@ internal class ProcessStreamEater(
                     val line = inputScan.nextLine()
                     when {
                         line.contains(ERROR) -> {
-                            notify.invoke(TorManagerEvent.Log.Error(
-                                TorManagerException(line.substringAfter(ERROR))
-                            ))
+                            notify.invoke(TorManagerEvent.Log.Error(TorManagerException(line)))
                         }
                         line.contains(NOTICE) -> {
                             // pipe notices to debug as we are already listening for them
                             // via the control port by default.
-                            notify.invoke(TorManagerEvent.Log.Debug(
-                                line.substringAfter(NOTICE)
-                            ))
+                            notify.invoke(TorManagerEvent.Log.Debug(line))
                         }
                         line.contains(WARN) -> {
-                            notify.invoke(TorManagerEvent.Log.Warn(
-                                line.substringAfter(WARN)
-                            ))
+                            notify.invoke(TorManagerEvent.Log.Warn(line))
                         }
                         else -> {
                             notify.invoke(TorManagerEvent.Log.Info(line))
