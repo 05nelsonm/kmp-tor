@@ -43,7 +43,18 @@ internal class ProcessStreamEater(
                 inputScan = Scanner(input)
 
                 while (currentCoroutineContext().isActive  && inputScan.hasNextLine()) {
-                    notify.invoke(TorManagerEvent.Log.Info(inputScan.nextLine()))
+                    val line = inputScan.nextLine()
+                    when {
+                        line.contains(" [err] ") -> {
+                            notify.invoke(TorManagerEvent.Log.Error(TorManagerException(line)))
+                        }
+                        line.contains(" [warn] ") -> {
+                            notify.invoke(TorManagerEvent.Log.Warn(line))
+                        }
+                        else -> {
+                            notify.invoke(TorManagerEvent.Log.Info(line))
+                        }
+                    }
                 }
             } catch (e: Exception) {
                 notify.invoke(TorManagerEvent.Log.Error(e))

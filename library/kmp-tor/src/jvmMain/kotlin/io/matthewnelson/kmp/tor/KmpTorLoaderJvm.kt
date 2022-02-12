@@ -80,12 +80,17 @@ class KmpTorLoaderJvm(
             val p = builder.start()
             process = p
 
+            var processError: TorManagerException? = null
             ProcessStreamEater(
                 parentJob = parentContext.job,
                 input = p.inputStream.bufferedReader(),
                 error = p.errorStream.bufferedReader(),
-                notify = notify
-            )
+            ) { log ->
+                if (log is TorManagerEvent.Log.Error && log.value is TorManagerException) {
+                    processError = log.value as TorManagerException
+                }
+                notify.invoke(log)
+            }
 
             // Process.waitFor() is runBlocking which we do not want here.
             // Below allows us to monitor a few things that, when no longer
@@ -95,6 +100,10 @@ class KmpTorLoaderJvm(
             //  - Tor stops running for some reason
             while (p.isStillAlive() && parentContext.isActive) {
                 delay(100L)
+            }
+
+            processError?.let { ex ->
+                throw ex
             }
         } catch (e: IOException) {
             throw TorManagerException("Failed to start Tor", e)
