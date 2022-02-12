@@ -44,7 +44,7 @@ abstract class TorConfigProviderJvm: TorConfigProvider() {
      * loading/starting Tor.
      * */
     open val installationDir: Path by lazy {
-        workDir.builder { addSegment("kmptor") }
+        workDir.builder { addSegment(".kmptor") }
     }
     override val geoIpV4File: Path? by lazy {
         workDir.builder { addSegment("geoip") }
