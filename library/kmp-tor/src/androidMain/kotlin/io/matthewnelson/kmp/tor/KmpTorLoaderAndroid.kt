@@ -24,7 +24,6 @@ import io.matthewnelson.kmp.tor.manager.common.exceptions.TorManagerException
 import kotlinx.coroutines.*
 import java.io.File
 import java.io.IOException
-import java.util.*
 import kotlin.collections.ArrayList
 import kotlin.coroutines.cancellation.CancellationException
 
@@ -33,7 +32,7 @@ import kotlin.coroutines.cancellation.CancellationException
  *
  * @see [TorConfigProviderAndroid]
  * @see [KmpTorLoader]
- * @sample [io.matthewnelson.kmp.tor.sample.android.App]
+ * @sample [io.matthewnelson.kmp.tor.sample.android.SampleApp]
  * */
 class KmpTorLoaderAndroid(provider: TorConfigProviderAndroid): KmpTorLoader(provider) {
 
