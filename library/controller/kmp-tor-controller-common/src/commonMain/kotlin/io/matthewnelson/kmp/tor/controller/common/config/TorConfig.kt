@@ -539,16 +539,36 @@ class TorConfig private constructor(
         sealed class Ports(keyword: String) : Setting<Option.AorDorPort>(keyword) {
 
             override fun equals(other: Any?): Boolean {
-                return  other != null               &&
-                        other is Ports              &&
-                        other.keyword == keyword    &&
-                        other.value == value
+                if (other == null) {
+                    return false
+                }
+
+                if (other !is Ports) {
+                    return false
+                }
+
+                val otherValue = other.value
+                val thisValue = value
+                return if (
+                    otherValue is Option.AorDorPort.Value &&
+                    thisValue is Option.AorDorPort.Value
+                ) {
+                    // compare ports as to disallow setting same port for different Ports
+                    otherValue == thisValue
+                } else {
+                    other.keyword == keyword && otherValue == thisValue
+                }
             }
 
             override fun hashCode(): Int {
-                var result = 17
-                result = result * 31 + keyword.hashCode()
-                result = result * 31 + value.hashCode()
+                var result = 17 - 2
+                if (value is Option.AorDorPort.Value) {
+                    // take value of the port only
+                    result = result * 31 + value.hashCode()
+                } else {
+                    result = result * 31 + keyword.hashCode()
+                    result = result * 31 + value.hashCode()
+                }
                 return result
             }
 
