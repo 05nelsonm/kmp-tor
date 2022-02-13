@@ -147,40 +147,52 @@ sealed interface TorManagerEvent {
     }
 
     /**
-     * [AddressInfo] is dispatched upon Bootstrap completion. Subsequently, if a
-     * port listener is opened or closed, a new [AddressInfo] is dispatched with
-     * the updated information.
+     * [AddressInfo] is dispatched upon Bootstrap completion (when
+     * [TorState.On.isBootstrapped] is `true`). Subsequently, if a
+     * port listener is opened or closed, a new [AddressInfo] is
+     * dispatched with the updated address information.
      *
-     * Upon stopping of Tor, or setting DisableNetwork to true, a new [AddressInfo]
-     * with all arguments set to `null` is dispatched.
+     * Upon stopping of Tor, or setting DisableNetwork to true, a
+     * new [AddressInfo] with all arguments set to `null` is dispatched.
+     *
+     * Addresses dispatched from TorManager will either be `null`, or
+     * contain at least 1 address. You will never encounter [EmptySet].
      *
      * Example address: 127.0.0.1:48494
      * */
     data class AddressInfo(
-        val dns: String? = null,
-        val http: String? = null,
-        val socks: String? = null,
-        val trans: String? = null,
+        val dns: Set<String>? = null,
+        val http: Set<String>? = null,
+        val socks: Set<String>? = null,
+        val trans: Set<String>? = null,
     ): TorManagerEvent {
         val isNull: Boolean = dns == null && http == null && socks == null && trans == null
 
-        fun splitDns(): Result<Pair<String, Port>?> = split("DNS", dns)
-        fun splitHttp(): Result<Pair<String, Port>?> = split("HTTP", http)
-        fun splitSocks(): Result<Pair<String, Port>?> = split("Socks", socks)
-        fun splitTrans(): Result<Pair<String, Port>?> = split("Trans", trans)
+        data class Split(val address: String, val port: Port)
 
-        private fun split(port: String, value: String?): Result<Pair<String, Port>> {
-            if (value == null) {
-                return Result.failure(TorManagerException("$port address was null"))
+        fun splitDns(): Result<Set<Split>> = split("DNS", dns)
+        fun splitHttp(): Result<Set<Split>> = split("HTTP", http)
+        fun splitSocks(): Result<Set<Split>> = split("Socks", socks)
+        fun splitTrans(): Result<Set<Split>> = split("Trans", trans)
+
+        private fun split(portName: String, values: Set<String>?): Result<Set<Split>> {
+            if (values.isNullOrEmpty()) {
+                return Result.failure(TorManagerException("$portName address was null"))
             }
 
-            val splits = value.split(':')
-
-            return try {
-                Result.success(Pair(splits[0].trim(), Port(splits[1].trim().toInt())))
-            } catch (e: Exception) {
-                Result.failure(TorManagerException("Failed to split $port address: $value", e))
+            val set: MutableSet<Split> = LinkedHashSet(values.size)
+            for (value in values) {
+                val splits = value.split(':')
+                try {
+                    set.add(Split(splits[0].trim(), Port(splits[1].trim().toInt())))
+                } catch (e: Exception) {
+                    return Result.failure(
+                        TorManagerException("Failed to split $portName address: $values", e)
+                    )
+                }
             }
+
+            return Result.success(set.toSet())
         }
     }
 

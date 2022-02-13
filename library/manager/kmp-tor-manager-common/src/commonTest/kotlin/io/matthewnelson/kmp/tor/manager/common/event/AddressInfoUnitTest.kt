@@ -24,7 +24,7 @@ class AddressInfoUnitTest {
         const val ADDRESS = "127.0.0.1"
         const val PORT = "48494"
     }
-    private val info = AddressInfo(dns = "$ADDRESS:$PORT")
+    private val info = AddressInfo(dns = setOf("$ADDRESS:$PORT"))
 
     @Test
     fun givenPortInfo_whenNoConstructorArgs_portsAreNull() {
@@ -37,9 +37,9 @@ class AddressInfoUnitTest {
         result.onFailure { ex ->
             fail(cause = ex)
         }
-        result.onSuccess { pair ->
-            assertEquals(ADDRESS, pair?.first)
-            assertEquals(PORT.toInt(), pair?.second?.value)
+        result.onSuccess { set ->
+            assertEquals(ADDRESS, set.first().address)
+            assertEquals(PORT.toInt(), set.first().port.value)
         }
     }
 

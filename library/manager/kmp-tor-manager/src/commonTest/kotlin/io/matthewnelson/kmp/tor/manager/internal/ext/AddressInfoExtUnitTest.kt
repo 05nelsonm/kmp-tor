@@ -25,7 +25,7 @@ import kotlin.test.assertTrue
 
 class AddressInfoExtUnitTest {
 
-    private val info = AddressInfo(socks = "127.0.0.1:9050")
+    private val info = AddressInfo(socks = setOf("127.0.0.1:9050"))
     private val nullInfo = AddressInfo()
 
     @Test

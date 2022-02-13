@@ -39,12 +39,42 @@ class SampleApp: Application() {
         val configProvider = object : TorConfigProviderAndroid(context = this@SampleApp) {
             override fun provide(): TorConfig {
                 return TorConfig.Builder {
-                    // Any conflicting or unavailable ports provided will fall
-                    // back to "auto".
-                    put(Ports.Socks().set(AorDorPort.Value(Port(9150))))
-                    put(Ports.HttpTunnel().set(AorDorPort.Value(Port(9150))))
-                    put(Ports.Dns().set(AorDorPort.Value(Port(9150))))
-                    put(Ports.Trans().set(AorDorPort.Value(Port(9150))))
+                    // Set multiple ports for all of the things
+                    val dns = Ports.Dns()
+                    put(dns.set(AorDorPort.Value(Port(9252))))
+                    put(dns.set(AorDorPort.Value(Port(9253))))
+
+                    val socks = Ports.Socks()
+                    put(socks.set(AorDorPort.Value(Port(9254))))
+                    put(socks.set(AorDorPort.Value(Port(9255))))
+
+                    val http = Ports.HttpTunnel()
+                    put(http.set(AorDorPort.Value(Port(9258))))
+                    put(http.set(AorDorPort.Value(Port(9259))))
+
+                    val trans = Ports.Trans()
+                    put(trans.set(AorDorPort.Value(Port(9262))))
+                    put(trans.set(AorDorPort.Value(Port(9263))))
+
+                    // If a Port is already taken (9263) for any Port type (trans), it
+                    // will not be added and the Ports type set first (trans) will take
+                    // precedent.
+                    put(socks.set(AorDorPort.Value(Port(9263))))
+
+                    // Set Flags
+                    socks.setFlags(setOf(
+                        Ports.Socks.Flag.OnionTrafficOnly
+                    )).setIsolationFlags(setOf(
+                        Ports.IsolationFlag.IsolateClientAddr
+                    )).set(AorDorPort.Value(Port(9264)))
+                    put(socks)
+
+                    // reset our socks object to defaults
+                    socks.setDefault()
+
+                    // Not necessary, as if ControlPort is missing it will be
+                    // automatically added for you; but for demonstration purposes...
+                    put(Ports.Control().set(AorDorPort.Auto))
 
                     // For Android, disabling & reducing connection padding is
                     // advisable to minimize mobile data usage.
