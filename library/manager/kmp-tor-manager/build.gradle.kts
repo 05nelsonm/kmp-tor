@@ -70,6 +70,7 @@ kmpConfiguration {
             dependencies {
                 implementation(deps.kotlin.atomicfu.atomicfu)
                 implementation(deps.kotlin.coroutines.core.core)
+                implementation(deps.kotlin.reflect)
                 implementation(project(":library:controller:kmp-tor-controller")) {
                     exclude(kmpPublishRootProjectConfiguration!!.group, "kmp-tor-common")
                     exclude(kmpPublishRootProjectConfiguration!!.group, "kmp-tor-controller-common")
@@ -79,8 +80,8 @@ kmpConfiguration {
         },
         commonTestSourceSet = {
             dependencies {
-                implementation(kotlin("test"))
                 implementation(depsTest.kotlin.coroutines)
+                implementation(kotlin("test"))
             }
         },
     )

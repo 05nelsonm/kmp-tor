@@ -428,7 +428,7 @@ private class RealTorManager(
         return provide<TorControlConfigLoad, Any?> {
             // TODO: Check settings
             val result = configLoad(config)
-            config.settings.keys.checkNetworkState(this as TorController)
+            config.settings.checkNetworkState(this as TorController)
             result
         }
     }

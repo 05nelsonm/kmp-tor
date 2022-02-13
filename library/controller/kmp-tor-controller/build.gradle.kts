@@ -55,16 +55,17 @@ kmpConfiguration {
         commonPluginIds = setOf("kotlinx-atomicfu"),
         commonMainSourceSet = {
             dependencies {
+                implementation(deps.components.encoding.base16)
                 implementation(deps.kotlin.atomicfu.atomicfu)
                 implementation(deps.kotlin.coroutines.core.core)
-                implementation(deps.components.encoding.base16)
+                implementation(deps.kotlin.reflect)
                 api(project(":library:controller:kmp-tor-controller-common"))
             }
         },
         commonTestSourceSet = {
             dependencies {
-                implementation(kotlin("test"))
                 implementation(depsTest.kotlin.coroutines)
+                implementation(kotlin("test"))
             }
         },
         kotlin = {

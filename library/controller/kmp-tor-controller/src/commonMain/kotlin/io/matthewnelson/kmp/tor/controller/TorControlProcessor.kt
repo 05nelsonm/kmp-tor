@@ -185,16 +185,21 @@ private class RealTorControlProcessor(
                 val command = StringBuilder("+LOADCONF").let { sb ->
                     sb.append(CLRF)
 
-                    val controlPort = TorConfig.Setting.Ports.Control()
-                    val controlPortWriteToFile = TorConfig.Setting.ControlPortWriteToFile()
+                    val kControlPort = TorConfig.Setting.Ports.Control::class
+                    val kControlPortWriteToFile = TorConfig.Setting.ControlPortWriteToFile::class
+                    var needsModification = false
+                    for (setting in config.settings) {
+                        val clazz = setting::class
+                        if (clazz == kControlPort || clazz == kControlPortWriteToFile) {
+                            needsModification = true
+                            break
+                        }
+                    }
 
-                    if (
-                        config.settings.containsKey(controlPort)                ||
-                        config.settings.containsKey(controlPortWriteToFile)
-                    ) {
+                    if (needsModification) {
                         val newConfig: TorConfig = config.newBuilder {
-                            remove(controlPort)
-                            remove(controlPortWriteToFile)
+                            removeInstanceOf(kControlPort)
+                            removeInstanceOf(kControlPortWriteToFile)
                         }.build()
                         sb.append(newConfig.text)
                     } else {

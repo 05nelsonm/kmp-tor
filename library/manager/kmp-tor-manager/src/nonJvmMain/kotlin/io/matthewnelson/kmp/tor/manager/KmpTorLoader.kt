@@ -20,15 +20,20 @@ import io.matthewnelson.kmp.tor.controller.common.config.TorConfig
 import io.matthewnelson.kmp.tor.manager.common.event.TorManagerEvent
 import io.matthewnelson.kmp.tor.manager.common.exceptions.TorManagerException
 import io.matthewnelson.kmp.tor.manager.internal.TorStateMachine
-import kotlinx.atomicfu.locks.ReentrantLock
 import kotlinx.coroutines.CoroutineScope
 import kotlin.coroutines.cancellation.CancellationException
 
 @Suppress("CanBePrimaryConstructorProperty")
 actual abstract class KmpTorLoader(provider: TorConfigProvider) {
 
-    private val provider = provider
+    /**
+     * Calls [TorConfig.Builder.removeInstanceOf] for all present
+     * settings. This is to ensure platform specific settings are
+     * removed during the [TorConfigProvider.retrieve] process, prior
+     * to starting Tor.
+     * */
     protected actual open val excludeSettings: Set<TorConfig.Setting<*>> = emptySet()
+    private val provider = provider
     internal actual open suspend fun load(
         managerScope: CoroutineScope,
         stateMachine: TorStateMachine,

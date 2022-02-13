@@ -24,6 +24,7 @@ import io.matthewnelson.kmp.tor.manager.common.exceptions.TorManagerException
 import kotlinx.atomicfu.AtomicRef
 import kotlinx.atomicfu.atomic
 import kotlin.jvm.JvmSynthetic
+import kotlin.reflect.KClass
 
 /**
  * Base abstraction for preparing and obtaining client [TorConfig].
@@ -121,18 +122,30 @@ abstract class TorConfigProvider {
         val clientConfig = provide()
 
         val dataDir = DataDirectory()
-        val dataDirPath: Path = (clientConfig.settings[dataDir] as? FileSystemDir)
+        val dataDirPath: Path = clientConfig
+            .settings
+            .filterIsInstance<DataDirectory>()
+            .firstOrNull()
+            ?.value
             ?.path
             ?: workDir.builder { addSegment(DataDirectory.DEFAULT_NAME) }
         dataDir.set(FileSystemDir(dataDirPath))
 
-        val portsToModify: List<Ports> = validatePortOptions(isPortAvailable, clientConfig)
+        val validatedPorts: Set<Ports> = validatePortOptions(isPortAvailable, clientConfig)
 
-        val builder: TorConfig.Builder = clientConfig.newBuilder {
-            put(portsToModify)
+        val builder: TorConfig.Builder = TorConfig.Builder {
+            put(validatedPorts)
+
+            for (setting in clientConfig.settings) {
+                if (setting is Ports) {
+                    continue
+                }
+
+                put(setting)
+            }
 
             for (setting in excludeSettings) {
-                remove(setting)
+                removeInstanceOf(setting::class)
             }
             
             // TorManager requires this to be initially set to true (disable network) for several reasons:
@@ -156,13 +169,18 @@ abstract class TorConfigProvider {
             putIfAbsent(SyslogIdentityTag().set(FieldId("TorManager")))
             putIfAbsent(CacheDirectory().set(FileSystemDir(cacheDir)))
             putIfAbsent(dataDir)
-            putIfAbsent(Ports.Control())
+
+            this
         }
 
         // Always add control port file.
         // Prefer path set by client, but fallback to defaults if not set.
         val controlPortFile = ControlPortWriteToFile()
-        val controlPortFilePath = (clientConfig.settings[controlPortFile] as? FileSystemFile)
+        val controlPortFilePath = clientConfig
+            .settings
+            .filterIsInstance<ControlPortWriteToFile>()
+            .firstOrNull()
+            ?.value
             ?.path
             ?: workDir.builder { addSegment(ControlPortWriteToFile.DEFAULT_NAME) }
         controlPortFile.set(FileSystemFile(controlPortFilePath))
@@ -171,13 +189,18 @@ abstract class TorConfigProvider {
 
         val cookieAuth = CookieAuthentication()
         val cookieAuthFile = CookieAuthFile()
-        val cookieAuthFilePath: Path? = (clientConfig.settings[cookieAuthFile] as? FileSystemFile).let { path ->
+        val cookieAuthFilePath: Path? = clientConfig
+            .settings
+            .filterIsInstance<CookieAuthFile>()
+            .firstOrNull()
+            ?.value
+            .let { path ->
 
             val filePath = path
                 ?.path
                 ?: workDir.builder { addSegment(CookieAuthFile.DEFAULT_NAME) }
 
-            when (clientConfig.settings[cookieAuth] as? TorF) {
+            when (clientConfig.settings.filterIsInstance<CookieAuthentication>().firstOrNull()?.value) {
                 null -> {
                     // set cookie authentication if absent
                     builder.put(cookieAuth)
@@ -202,9 +225,14 @@ abstract class TorConfigProvider {
         }
 
         val geoIpFile = GeoIpV4File()
-        val geoIpFilePath: Path? = (clientConfig.settings[geoIpFile] as? FileSystemFile).let { path ->
-            path?.path ?: if (geoIpV4File?.value?.isNotEmpty() == true) geoIpV4File else null
-        }
+        val geoIpFilePath: Path? = clientConfig
+            .settings
+            .filterIsInstance<GeoIpV4File>()
+            .firstOrNull()
+            ?.value
+            .let { path ->
+                path?.path ?: if (geoIpV4File?.value?.isNotEmpty() == true) geoIpV4File else null
+            }
 
         if (geoIpFilePath != null) {
             try {
@@ -220,9 +248,14 @@ abstract class TorConfigProvider {
         }
 
         val geoIp6File = GeoIpV6File()
-        val geoIp6FilePath: Path? = (clientConfig.settings[geoIp6File] as? FileSystemFile).let { path ->
-            path?.path ?: if (geoIpV6File?.value?.isNotEmpty() == true) geoIpV6File else null
-        }
+        val geoIp6FilePath: Path? = clientConfig
+            .settings
+            .filterIsInstance<GeoIpV6File>()
+            .firstOrNull()
+            ?.value
+            .let { path ->
+                path?.path ?: if (geoIpV6File?.value?.isNotEmpty() == true) geoIpV6File else null
+            }
 
         if (geoIp6FilePath != null) {
             try {
@@ -285,38 +318,49 @@ abstract class TorConfigProvider {
     private fun <T: Ports> validatePortOptions(
         isPortAvailable: (Port) -> Boolean,
         clientConfig: TorConfig,
-    ): List<T> {
-        val needsModification: MutableList<T> = mutableListOf()
+    ): Set<T> {
+        val validatedPorts: MutableSet<T> = mutableSetOf()
         val takenPorts: MutableSet<Port> = mutableSetOf()
 
-        for (entry in clientConfig.settings.entries) {
-            val setting = entry.key
+        var hasControlPort = false
+        for (setting in clientConfig.settings) {
             if (setting !is Ports) {
                 continue
             }
 
-            when (val option = entry.value as AorDorPort) {
+            if (setting is Ports.Control) {
+                hasControlPort = true
+            }
+
+            when (val option = setting.value) {
                 is AorDorPort.Auto,
-                is AorDorPort.Disable -> { /* no-op */ }
+                is AorDorPort.Disable -> {
+                    validatedPorts.add(setting as T)
+                }
                 is AorDorPort.Value -> {
                     when {
                         takenPorts.contains(option.port) -> {
                             // port already taken, set to auto
-                            needsModification.add((setting.clone().set(AorDorPort.Auto) as T))
+                            validatedPorts.add((setting.clone().set(AorDorPort.Auto) as T))
                         }
                         !isPortAvailable.invoke(option.port) -> {
                             // port unavailable, set to auto
-                            needsModification.add((setting.clone().set(AorDorPort.Auto) as T))
+                            validatedPorts.add((setting.clone().set(AorDorPort.Auto) as T))
                         }
                         else -> {
                             // add to already set port values
                             takenPorts.add(option.port)
+                            validatedPorts.add(setting as T)
                         }
                     }
                 }
             }
         }
 
-        return needsModification
+        if (!hasControlPort) {
+            validatedPorts.add(Ports.Control() as T)
+        }
+
+        return validatedPorts
     }
 }

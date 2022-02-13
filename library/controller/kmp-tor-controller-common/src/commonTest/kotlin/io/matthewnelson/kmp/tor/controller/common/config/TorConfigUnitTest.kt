@@ -32,8 +32,11 @@ class TorConfigUnitTest {
 
         assertTrue(config.text.contains(expectedKey.keyword))
         assertTrue(config.text.contains(expectedValue.value))
-        assertTrue(config.settings.containsKey(expectedKey))
-        assertEquals(config.settings[expectedKey], expectedValue)
+        assertTrue(config.settings.contains(expectedKey))
+        assertEquals(
+            config.settings.filterIsInstance<TorConfig.Setting.DisableNetwork>().first().value,
+            expectedValue
+        )
     }
 
     @Test
@@ -50,56 +53,9 @@ class TorConfigUnitTest {
         assertEquals(config, newConfig)
         assertEquals(config.text, newConfig.text)
         assertEquals(config.settings.size, newConfig.settings.size)
-        for (entry in config.settings.entries) {
-            assertEquals(entry.value, newConfig.settings[entry.key])
-        }
-    }
-
-    @Test
-    fun givenTorConfig_whenNewBuilderAndUpdated_containsNewArguments() {
-        val expectedKey = TorConfig.Setting.DisableNetwork()
-        val initialValue = TorConfig.Option.TorF.True
-        val expectedValue = TorConfig.Option.TorF.False
-
-        val config: TorConfig = TorConfig.Builder {
-            put(expectedKey.set(initialValue))
-        }.build()
-
-        assertEquals(config.settings[expectedKey], initialValue)
-
-        val updatedConfig = config.newBuilder {
-            updateIfPresent(TorConfig.Setting.DisableNetwork::class) {
-                set(expectedValue)
-            }
-        }.build()
-
-        assertNotEquals(config, updatedConfig)
-        assertNotEquals(config.text, updatedConfig.text)
-        assertEquals(config.settings.size, updatedConfig.settings.size)
-        assertNotEquals(config.settings[expectedKey], updatedConfig.settings[expectedKey])
-    }
-
-    @Test
-    fun givenTorConfig_whenNewBuilderAndUpdatedNonExistentSetting_containsSameArguments() {
-        val expectedKey = TorConfig.Setting.DisableNetwork()
-        val initialValue = TorConfig.Option.TorF.True
-        val expectedValue = TorConfig.Option.TorF.False
-
-        val config: TorConfig = TorConfig.Builder {
-            put(expectedKey.set(initialValue))
-        }.build()
-
-        val newConfig = config.newBuilder {
-            updateIfPresent(TorConfig.Setting.ConnectionPadding::class) {
-                set(expectedValue)
-            }
-        }.build()
-
-        assertEquals(config, newConfig)
-        assertEquals(config.text, newConfig.text)
-        assertEquals(config.settings.size, newConfig.settings.size)
-        for (entry in config.settings.entries) {
-            assertEquals(entry.value, newConfig.settings[entry.key])
+        for ((i, entry) in config.settings.withIndex()) {
+            assertEquals(entry, newConfig.settings.elementAt(i))
+            assertEquals(entry.value, newConfig.settings.elementAt(i).value)
         }
     }
 
@@ -113,8 +69,8 @@ class TorConfigUnitTest {
             put(keyToRemove)
         }.build()
 
-        assertTrue(config.settings.containsKey(expectedKey))
-        assertTrue(config.settings.containsKey(keyToRemove))
+        assertTrue(config.settings.contains(expectedKey))
+        assertTrue(config.settings.contains(keyToRemove))
 
         val newConfig = config.newBuilder {
             remove(keyToRemove)
@@ -123,8 +79,8 @@ class TorConfigUnitTest {
         assertNotEquals(config, newConfig)
         assertNotEquals(config.text, newConfig.text)
         assertNotEquals(config.settings.size, newConfig.settings.size)
-        assertNotNull(config.settings[keyToRemove])
-        assertNull(newConfig.settings[keyToRemove])
+        assertFalse(config.settings.filterIsInstance<TorConfig.Setting.ConnectionPadding>().isEmpty())
+        assertTrue(newConfig.settings.filterIsInstance<TorConfig.Setting.ConnectionPadding>().isEmpty())
     }
 
     @Test
@@ -141,20 +97,85 @@ class TorConfigUnitTest {
             put(expectedContains)
         }.build()
 
-        assertTrue(config.settings.containsKey(expectedRemove))
+        assertTrue(config.settings.contains(expectedRemove))
 
         val newConfig = config.newBuilder {
             removeInstanceOf(expectedRemove::class)
         }.build()
 
-        assertFalse(newConfig.settings.containsKey(expectedRemove))
+        assertFalse(newConfig.settings.contains(expectedRemove))
         for (expected in expectedContains) {
-            assertTrue(newConfig.settings.containsKey(expected))
+            assertTrue(newConfig.settings.contains(expected))
         }
     }
 
     @Test
-    fun givenKeyWordPortControl_whenTrySetDisable_remainsUnchanged() {
+    fun givenMultiplePorts_whenContainsDisable_buildDoesNotInclude() {
+        val tunnelPort = TorConfig.Setting.Ports.HttpTunnel()
+        val auto = TorConfig.Option.AorDorPort.Auto
+        val disabled = TorConfig.Option.AorDorPort.Disable
+        val portValue = TorConfig.Option.AorDorPort.Value(Port(9150))
+
+        val config = TorConfig.Builder {
+            put(tunnelPort.set(auto))
+            put(tunnelPort.set(portValue))
+        }.build()
+
+        assertEquals(2, config.settings.size)
+
+        assertEquals(
+            "${tunnelPort.keyword} ${auto.value}\n${tunnelPort.keyword} ${portValue.value}\n",
+            config.text
+        )
+
+        val newConfig = config.newBuilder {
+            put(tunnelPort.set(disabled))
+        }.build()
+
+        assertEquals(1, newConfig.settings.size)
+        assertEquals("${tunnelPort.keyword} ${disabled.value}\n", newConfig.text)
+    }
+
+    @Test
+    fun givenTorConfig_whenTryModifySetting_settingRemainsUnchanged() {
+        val tunnelPort = TorConfig.Setting.Ports.HttpTunnel()
+        val auto = TorConfig.Option.AorDorPort.Auto
+        val disabled = TorConfig.Option.AorDorPort.Disable
+        val portValue = TorConfig.Option.AorDorPort.Value(Port(9150))
+
+        val config = TorConfig.Builder {
+            put(tunnelPort.set(auto))
+            put(tunnelPort.set(portValue))
+        }.build()
+
+        assertTrue(tunnelPort.isMutable)
+
+        val setting1 = config.settings.first() as TorConfig.Setting.Ports.HttpTunnel
+        assertEquals(setting1.value, auto)
+        assertTrue(setting1.isolationFlags.isNullOrEmpty())
+        assertFalse(setting1.isMutable)
+
+        setting1
+            .setIsolationFlags(setOf(
+                TorConfig.Setting.Ports.IsolationFlag.IsolateClientAddr
+            ))
+            .set(disabled)
+        assertEquals(setting1.value, auto)
+        assertTrue(setting1.isolationFlags.isNullOrEmpty())
+    }
+
+    @Test
+    fun givenSetting_whenImmutable_becomesMutableWhenCloned() {
+        val tunnelPort = TorConfig.Setting.Ports.HttpTunnel()
+        val auto = TorConfig.Option.AorDorPort.Auto
+
+        val tunnelPort2 = tunnelPort.set(auto).setImmutable().clone()
+        assertFalse(tunnelPort.isMutable)
+        assertTrue(tunnelPort2.isMutable)
+    }
+
+    @Test
+    fun givenPortsControl_whenTrySetDisable_remainsUnchanged() {
         val ctrl = TorConfig.Setting.Ports.Control().set(TorConfig.Option.AorDorPort.Disable)
         assertTrue(ctrl.default is TorConfig.Option.AorDorPort.Auto)
         assertTrue(ctrl.isDefault)
@@ -186,12 +207,21 @@ class TorConfigUnitTest {
 
     @Test
     fun givenSameSettings_whenValuesDifferent_settingsStillReturnTrueWhenCompared() {
-        val control1 = TorConfig.Setting.Ports.Control().set(TorConfig.Option.AorDorPort.Value(Port(9051)))
-        val control2 = TorConfig.Setting.Ports.Control()
+        val padding1 = TorConfig.Setting.ConnectionPadding().set(TorConfig.Option.AorTorF.Auto)
+        val padding2 = padding1.clone().set(TorConfig.Option.AorTorF.False)
 
         // equals override compares only the keyword for that setting, so they should register as equal
-        assertEquals(control1, control2)
+        assertEquals(padding1, padding2)
 
+        assertNotEquals(padding1.value, padding2.value)
+    }
+
+    @Test
+    fun givenSamePortSettings_whenValuesDifferent_settingsAreNotEquals() {
+        val control1 = TorConfig.Setting.Ports.Control().set(TorConfig.Option.AorDorPort.Value(Port(9051)))
+        val control2 = control1.clone().set(TorConfig.Option.AorDorPort.Auto)
+
+        assertNotEquals(control1, control2)
         assertNotEquals(control1.value, control2.value)
     }
 

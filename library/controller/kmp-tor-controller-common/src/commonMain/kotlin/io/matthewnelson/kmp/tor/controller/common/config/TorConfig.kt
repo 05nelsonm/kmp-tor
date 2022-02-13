@@ -24,6 +24,7 @@ import io.matthewnelson.kmp.tor.controller.common.config.TorConfig.Option.TorF.F
 import io.matthewnelson.kmp.tor.controller.common.config.TorConfig.Option.TorF.True
 import io.matthewnelson.kmp.tor.controller.common.file.Path
 import kotlin.jvm.JvmInline
+import kotlin.jvm.JvmSynthetic
 import kotlin.reflect.KClass
 
 /**
@@ -35,7 +36,7 @@ import kotlin.reflect.KClass
  * */
 @Suppress("RemoveRedundantQualifierName", "SpellCheckingInspection")
 class TorConfig private constructor(
-    val settings: Map<TorConfig.Setting<*>, TorConfig.Option>,
+    val settings: Set<TorConfig.Setting<*>>,
     val text: String,
 ) {
 
@@ -82,17 +83,14 @@ class TorConfig private constructor(
            val myConfig: TorConfig = myConfigBuilder.build()
 
            val myUpdatedConfig: TorConfig = myConfig.newBuilder {
-               updateIfPresent(DisableNetwork::class) {
-                   setDefault()
-               }
-               put(ConnectionPadding().set(AorTorF.False))
                put(Ports.Control().set(AorDorPort.Value(Port(9051))))
                remove(DisableNetwork())
+               removeInstanceOf(DisableNetwork::class)
            }.build()
        }
      * */
     class Builder {
-        private val settings: MutableMap<TorConfig.Setting<*>, TorConfig.Option> = mutableMapOf()
+        private val settings: MutableSet<TorConfig.Setting<*>> = mutableSetOf()
 
         fun remove(setting: TorConfig.Setting<*>): Builder = apply {
             settings.remove(setting)
@@ -101,7 +99,7 @@ class TorConfig private constructor(
         @Suppress("unchecked_cast")
         fun <T: Setting<*>> removeInstanceOf(clazz: KClass<T>): Builder = apply {
             val toRemove = mutableListOf<T>()
-            for (setting in settings.keys) {
+            for (setting in settings) {
                 if (setting::class == clazz) {
                     toRemove.add(setting as T)
                 }
@@ -113,42 +111,22 @@ class TorConfig private constructor(
         }
 
         fun put(config: TorConfig): Builder = apply {
-            settings.putAll(config.settings)
+            settings.addAll(config.settings)
         }
 
         fun put(setting: TorConfig.Setting<*>): Builder = apply {
-            setting.value?.let { settings[setting] = it } ?: remove(setting)
+            setting.value?.let { settings.add(setting.clone()) } ?: remove(setting)
         }
 
         fun put(settings: Collection<TorConfig.Setting<*>>): Builder = apply {
             for (setting in settings) {
-                setting.value?.let { this.settings[setting] = it } ?: remove(setting)
+                setting.value?.let { this.settings.add(setting.clone()) } ?: remove(setting)
             }
         }
 
         fun putIfAbsent(setting: TorConfig.Setting<*>): Builder = apply {
-            if (settings[setting] == null) {
-                setting.value?.let { settings[setting] = it }
-            }
-        }
-
-        @Suppress("unchecked_cast")
-        fun <T: Option?, V: Setting<T>> updateIfPresent(
-            clazz: KClass<out V>,
-            action: V.() -> Unit
-        ): Builder = apply {
-            var soughtKey: V? = null
-
-            for (key in settings.keys) {
-                if (key::class == clazz) {
-                    action.invoke(key as V)
-                    soughtKey = key
-                    break
-                }
-            }
-
-            if (soughtKey != null) {
-                soughtKey.value?.let { settings[soughtKey] = it } ?: settings.remove(soughtKey)
+            if (!settings.contains(setting)) {
+                setting.value?.let { settings.add(setting.clone()) }
             }
         }
 
@@ -156,17 +134,43 @@ class TorConfig private constructor(
         fun build(): TorConfig {
             val sb = StringBuilder()
 
-            val map = settings.toMap()
-            for (entry in map.entries) {
-                val key = entry.key
-                sb.append(key.keyword)
-                sb.append(SP)
-                sb.append(entry.value.value)
+            val disabledPorts = mutableSetOf<String>()
+            for (setting in settings) {
+                if (setting is Setting.Ports && setting.value is Option.AorDorPort.Disable) {
+                    disabledPorts.add(setting.keyword)
+                }
+            }
 
-                if (key is Setting.Ports) {
-                    when (key) {
+            val writtenDisabledPorts: MutableSet<String> = LinkedHashSet(disabledPorts.size)
+
+            val newSettings = mutableSetOf<Setting<*>>()
+            for (setting in settings) {
+                val value = setting.value ?: continue
+
+                if (setting is Setting.Ports) {
+                    if (disabledPorts.contains(setting.keyword)) {
+                        if (!writtenDisabledPorts.contains(setting.keyword)) {
+                            sb.append(setting.keyword)
+                            sb.append(SP)
+                            sb.append(Option.AorDorPort.Disable.value)
+                            sb.append('\n')
+                            writtenDisabledPorts.add(setting.keyword)
+                        }
+
+                        if (setting.value is Option.AorDorPort.Disable) {
+                            newSettings.add(setting.setImmutable())
+                        }
+
+                        continue
+                    } else {
+                        sb.append(setting.keyword)
+                        sb.append(SP)
+                        sb.append(value)
+                    }
+
+                    when (setting) {
                         is Setting.Ports.Control -> {
-                            key.flags?.let { flags ->
+                            setting.flags?.let { flags ->
                                 for (flag in flags) {
                                     sb.append(SP)
                                     sb.append(flag.value)
@@ -174,7 +178,7 @@ class TorConfig private constructor(
                             }
                         }
                         is Setting.Ports.Dns -> {
-                            key.isolationFlags?.let { flags ->
+                            setting.isolationFlags?.let { flags ->
                                 for (flag in flags) {
                                     sb.append(SP)
                                     sb.append(flag.value)
@@ -182,7 +186,7 @@ class TorConfig private constructor(
                             }
                         }
                         is Setting.Ports.HttpTunnel -> {
-                            key.isolationFlags?.let { flags ->
+                            setting.isolationFlags?.let { flags ->
                                 for (flag in flags) {
                                     sb.append(SP)
                                     sb.append(flag.value)
@@ -190,13 +194,13 @@ class TorConfig private constructor(
                             }
                         }
                         is Setting.Ports.Socks -> {
-                            key.flags?.let { flags ->
+                            setting.flags?.let { flags ->
                                 for (flag in flags) {
                                     sb.append(SP)
                                     sb.append(flag.value)
                                 }
                             }
-                            key.isolationFlags?.let { flags ->
+                            setting.isolationFlags?.let { flags ->
                                 for (flag in flags) {
                                     sb.append(SP)
                                     sb.append(flag.value)
@@ -204,7 +208,7 @@ class TorConfig private constructor(
                             }
                         }
                         is Setting.Ports.Trans -> {
-                            key.isolationFlags?.let { flags ->
+                            setting.isolationFlags?.let { flags ->
                                 for (flag in flags) {
                                     sb.append(SP)
                                     sb.append(flag.value)
@@ -212,12 +216,17 @@ class TorConfig private constructor(
                             }
                         }
                     }
+                } else {
+                    sb.append(setting.keyword)
+                    sb.append(SP)
+                    sb.append(value)
                 }
 
+                newSettings.add(setting.setImmutable())
                 sb.append('\n')
             }
 
-            return TorConfig(map, sb.toString())
+            return TorConfig(newSettings.toSet(), sb.toString())
         }
 
         companion object {
@@ -233,7 +242,6 @@ class TorConfig private constructor(
      * Ex:
      *
      * val socksPort: Setting.Ports.Socks = Setting.Ports.Socks()
-     *     .set(Option.AorDorPort.Value(port = Port(9250)))
      *     .setFlags(flags = setOf(
      *         Setting.Ports.Socks.Flag.OnionTrafficOnly
      *     ))
@@ -241,6 +249,7 @@ class TorConfig private constructor(
      *         Setting.Ports.IsolationFlag.IsolateClientProtocol,
      *         Setting.Ports.IsolationFlag.IsolateDestAddr,
      *     ))
+     *     .set(Option.AorDorPort.Value(port = Port(9250)))
      *
      * https://2019.www.torproject.org/docs/tor-manual.html.en
      * */
@@ -250,15 +259,29 @@ class TorConfig private constructor(
         abstract var value: T
             protected set
         val isDefault: Boolean get() = value == default
+        var isMutable: Boolean = true
+            protected set
+
+        @JvmSynthetic
+        internal fun setImmutable(): Setting<T> {
+            isMutable = false
+            return this
+        }
 
         fun set(value: T): Setting<T> {
-            this.value = value
+            if (isMutable) {
+                this.value = value
+            }
             return this
         }
         open fun setDefault(): Setting<T> {
-            this.value = default
+            if (isMutable) {
+                this.value = default
+            }
             return this
         }
+
+        abstract fun clone(): Setting<T>
 
         override fun equals(other: Any?): Boolean {
             return  other != null               &&
@@ -281,6 +304,10 @@ class TorConfig private constructor(
         class AutomapHostsOnResolve         : Setting<Option.TorF>("AutomapHostsOnResolve") {
             override val default: Option.TorF get() = Option.TorF.True
             override var value: Option.TorF = default
+
+            override fun clone(): AutomapHostsOnResolve {
+                return AutomapHostsOnResolve().set(value) as AutomapHostsOnResolve
+            }
         }
 
         /**
@@ -290,6 +317,10 @@ class TorConfig private constructor(
             override val default: Option.FileSystemDir? = null
             override var value: Option.FileSystemDir? = default
                 set(value) { field = value?.nullIfEmpty }
+
+            override fun clone(): CacheDirectory {
+                return CacheDirectory().set(value) as CacheDirectory
+            }
         }
 
         /**
@@ -299,6 +330,10 @@ class TorConfig private constructor(
             override val default: Option.FileSystemDir? = null
             override var value: Option.FileSystemDir? = default
                 set(value) { field = value?.nullIfEmpty }
+
+            override fun clone(): ClientOnionAuthDir {
+                return ClientOnionAuthDir().set(value) as ClientOnionAuthDir
+            }
 
             companion object {
                 const val DEFAULT_NAME = "auth_private_files"
@@ -311,6 +346,10 @@ class TorConfig private constructor(
         class ConnectionPadding             : Setting<Option.AorTorF>("ConnectionPadding") {
             override val default: Option.AorTorF get() = Option.AorTorF.Auto
             override var value: Option.AorTorF = default
+
+            override fun clone(): ConnectionPadding {
+                return ConnectionPadding().set(value) as ConnectionPadding
+            }
         }
 
         /**
@@ -319,6 +358,10 @@ class TorConfig private constructor(
         class ConnectionPaddingReduced      : Setting<Option.TorF>("ReducedConnectionPadding") {
             override val default: Option.TorF get() = Option.TorF.False
             override var value: Option.TorF = default
+
+            override fun clone(): ConnectionPaddingReduced {
+                return ConnectionPaddingReduced().set(value) as ConnectionPaddingReduced
+            }
         }
 
         /**
@@ -328,6 +371,10 @@ class TorConfig private constructor(
             override val default: Option.FileSystemFile? = null
             override var value: Option.FileSystemFile? = default
                 set(value) { field = value?.nullIfEmpty }
+
+            override fun clone(): ControlPortWriteToFile {
+                return ControlPortWriteToFile().set(value) as ControlPortWriteToFile
+            }
 
             companion object {
                 const val DEFAULT_NAME = "control.txt"
@@ -340,6 +387,10 @@ class TorConfig private constructor(
         class CookieAuthentication          : Setting<Option.TorF>("CookieAuthentication") {
             override val default: Option.TorF get() = Option.TorF.True
             override var value: Option.TorF = default
+
+            override fun clone(): CookieAuthentication {
+                return CookieAuthentication().set(value) as CookieAuthentication
+            }
         }
 
         /**
@@ -349,6 +400,10 @@ class TorConfig private constructor(
             override val default: Option.FileSystemFile? = null
             override var value: Option.FileSystemFile? = default
                 set(value) { field = value?.nullIfEmpty }
+
+            override fun clone(): CookieAuthFile {
+                return CookieAuthFile().set(value) as CookieAuthFile
+            }
 
             companion object {
                 const val DEFAULT_NAME = "control_auth_cookie"
@@ -363,6 +418,10 @@ class TorConfig private constructor(
             override var value: Option.FileSystemDir? = default
                 set(value) { field = value?.nullIfEmpty }
 
+            override fun clone(): DataDirectory {
+                return DataDirectory().set(value) as DataDirectory
+            }
+
             companion object {
                 const val DEFAULT_NAME = "data"
             }
@@ -374,6 +433,10 @@ class TorConfig private constructor(
         class DisableNetwork                : Setting<Option.TorF>("DisableNetwork") {
             override val default: Option.TorF get() = Option.TorF.False
             override var value: Option.TorF = default
+
+            override fun clone(): DisableNetwork {
+                return DisableNetwork().set(value) as DisableNetwork
+            }
         }
 
         /**
@@ -382,6 +445,10 @@ class TorConfig private constructor(
         class DormantCanceledByStartup      : Setting<Option.TorF>("DormantCanceledByStartup") {
             override val default: Option.TorF get() = Option.TorF.False
             override var value: Option.TorF = default
+
+            override fun clone(): DormantCanceledByStartup {
+                return DormantCanceledByStartup().set(value) as DormantCanceledByStartup
+            }
         }
 
         /**
@@ -398,6 +465,10 @@ class TorConfig private constructor(
                         value
                     }
                 }
+
+            override fun clone(): DormantClientTimeout {
+                return DormantClientTimeout().set(value) as DormantClientTimeout
+            }
         }
 
         /**
@@ -406,6 +477,10 @@ class TorConfig private constructor(
         class DormantOnFirstStartup         : Setting<Option.TorF>("DormantOnFirstStartup") {
             override val default: Option.TorF get() = Option.TorF.False
             override var value: Option.TorF = default
+
+            override fun clone(): DormantOnFirstStartup {
+                return DormantOnFirstStartup().set(value) as DormantOnFirstStartup
+            }
         }
 
         /**
@@ -414,6 +489,10 @@ class TorConfig private constructor(
         class DormantTimeoutDisabledByIdleStreams   : Setting<Option.TorF>("DormantTimeoutDisabledByIdleStreams") {
             override val default: Option.TorF get() = Option.TorF.True
             override var value: Option.TorF = default
+
+            override fun clone(): DormantTimeoutDisabledByIdleStreams {
+                return DormantTimeoutDisabledByIdleStreams().set(value) as DormantTimeoutDisabledByIdleStreams
+            }
         }
 
         /**
@@ -422,6 +501,10 @@ class TorConfig private constructor(
         class GeoIPExcludeUnknown           : Setting<Option.AorTorF>("GeoIPExcludeUnknown") {
             override val default: Option.AorTorF get() = Option.AorTorF.Auto
             override var value: Option.AorTorF = default
+
+            override fun clone(): GeoIPExcludeUnknown {
+                return GeoIPExcludeUnknown().set(value) as GeoIPExcludeUnknown
+            }
         }
 
         /**
@@ -431,6 +514,10 @@ class TorConfig private constructor(
             override val default: Option.FileSystemFile? = null
             override var value: Option.FileSystemFile? = default
                 set(value) { field = value?.nullIfEmpty }
+
+            override fun clone(): GeoIpV4File {
+                return GeoIpV4File().set(value) as GeoIpV4File
+            }
         }
 
         /**
@@ -440,6 +527,10 @@ class TorConfig private constructor(
             override val default: Option.FileSystemFile? = null
             override var value: Option.FileSystemFile? = default
                 set(value) { field = value?.nullIfEmpty }
+
+            override fun clone(): GeoIpV6File {
+                return GeoIpV6File().set(value) as GeoIpV6File
+            }
         }
 
         // TODO: Logs.Debug && Logs.Info
@@ -447,10 +538,27 @@ class TorConfig private constructor(
 
         sealed class Ports(keyword: String) : Setting<Option.AorDorPort>(keyword) {
 
-            abstract fun clone(): Ports
+            override fun equals(other: Any?): Boolean {
+                return  other != null               &&
+                        other is Ports              &&
+                        other.keyword == keyword    &&
+                        other.value == value
+            }
+
+            override fun hashCode(): Int {
+                var result = 17
+                result = result * 31 + keyword.hashCode()
+                result = result * 31 + value.hashCode()
+                return result
+            }
 
             /**
              * https://2019.www.torproject.org/docs/tor-manual.html.en#ControlPort
+             *
+             * Note that Tor's default value as per the spec is disabled (0), so
+             * excluding it from your config will not set it to a Port. As this
+             * library depends on the [Control] port, the default value here differs
+             * and cannot be set to [Option.AorDorPort.Disable].
              * */
             class Control                       : Ports("ControlPort") {
                 override val default: Option.AorDorPort get() = Option.AorDorPort.Auto
@@ -465,13 +573,17 @@ class TorConfig private constructor(
                     private set
 
                 override fun setDefault(): Control {
-                    value = default
-                    flags = null
+                    if (isMutable) {
+                        value = default
+                        flags = null
+                    }
                     return this
                 }
 
                 fun setFlags(flags: Set<Flag>?): Control {
-                    this.flags = flags
+                    if (isMutable) {
+                        this.flags = flags?.toSet()
+                    }
                     return this
                 }
 
@@ -497,13 +609,17 @@ class TorConfig private constructor(
                     private set
 
                 override fun setDefault(): Dns {
-                    value = default
-                    isolationFlags = null
+                    if (isMutable) {
+                        value = default
+                        isolationFlags = null
+                    }
                     return this
                 }
 
                 fun setIsolationFlags(flags: Set<IsolationFlag>?): Dns {
-                    isolationFlags = flags
+                    if (isMutable) {
+                        isolationFlags = flags?.toSet()
+                    }
                     return this
                 }
 
@@ -522,13 +638,17 @@ class TorConfig private constructor(
                     private set
 
                 override fun setDefault(): HttpTunnel {
-                    value = default
-                    isolationFlags = null
+                    if (isMutable) {
+                        value = default
+                        isolationFlags = null
+                    }
                     return this
                 }
 
                 fun setIsolationFlags(flags: Set<IsolationFlag>?): HttpTunnel {
-                    isolationFlags = flags
+                    if (isMutable) {
+                        isolationFlags = flags?.toSet()
+                    }
                     return this
                 }
 
@@ -549,19 +669,25 @@ class TorConfig private constructor(
                     private set
 
                 override fun setDefault(): Socks {
-                    value = default
-                    flags = null
-                    isolationFlags = null
+                    if (isMutable) {
+                        value = default
+                        flags = null
+                        isolationFlags = null
+                    }
                     return this
                 }
 
                 fun setFlags(flags: Set<Flag>?): Socks {
-                    this.flags = flags
+                    if (isMutable) {
+                        this.flags = flags?.toSet()
+                    }
                     return this
                 }
 
                 fun setIsolationFlags(flags: Set<IsolationFlag>?): Socks {
-                    isolationFlags = flags
+                    if (isMutable) {
+                        isolationFlags = flags?.toSet()
+                    }
                     return this
                 }
 
@@ -599,13 +725,17 @@ class TorConfig private constructor(
                     private set
 
                 override fun setDefault(): Trans {
-                    value = default
-                    isolationFlags = null
+                    if (isMutable) {
+                        value = default
+                        isolationFlags = null
+                    }
                     return this
                 }
 
                 fun setIsolationFlags(flags: Set<IsolationFlag>?): Trans {
-                    isolationFlags = flags
+                    if (isMutable) {
+                        isolationFlags = flags?.toSet()
+                    }
                     return this
                 }
 
@@ -655,6 +785,10 @@ class TorConfig private constructor(
         class RunAsDaemon                   : Setting<Option.TorF>("RunAsDaemon") {
             override val default: Option.TorF get() = Option.TorF.False
             override var value: Option.TorF = default
+
+            override fun clone(): RunAsDaemon {
+                return RunAsDaemon().set(value) as RunAsDaemon
+            }
         }
 
         /**
@@ -664,6 +798,10 @@ class TorConfig private constructor(
             override val default: Option.FieldId? get() = null
             override var value: Option.FieldId? = default
                 set(value) { field = value?.nullIfEmpty }
+
+            override fun clone(): SyslogIdentityTag {
+                return SyslogIdentityTag().set(value) as SyslogIdentityTag
+            }
         }
     }
 

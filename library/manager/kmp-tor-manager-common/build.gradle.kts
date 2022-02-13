@@ -51,8 +51,8 @@ kmpConfiguration {
         ),
         commonMainSourceSet = {
             dependencies {
-                api(project(":library:controller:kmp-tor-controller-common"))
                 implementation(deps.kotlin.reflect)
+                api(project(":library:controller:kmp-tor-controller-common"))
             }
         },
         commonTestSourceSet = {
