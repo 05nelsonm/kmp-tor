@@ -21,10 +21,10 @@ import io.matthewnelson.kmp.tor.controller.common.config.TorConfig.Setting.*
 import io.matthewnelson.kmp.tor.controller.common.config.TorConfig.Option.*
 import io.matthewnelson.kmp.tor.controller.common.file.Path
 import io.matthewnelson.kmp.tor.manager.common.exceptions.TorManagerException
+import io.matthewnelson.kmp.tor.manager.internal.util.PortValidator
 import kotlinx.atomicfu.AtomicRef
 import kotlinx.atomicfu.atomic
 import kotlin.jvm.JvmSynthetic
-import kotlin.reflect.KClass
 
 /**
  * Base abstraction for preparing and obtaining client [TorConfig].
@@ -131,18 +131,18 @@ abstract class TorConfigProvider {
             ?: workDir.builder { addSegment(DataDirectory.DEFAULT_NAME) }
         dataDir.set(FileSystemDir(dataDirPath))
 
-        val validatedPorts: Set<Ports> = validatePortOptions(isPortAvailable, clientConfig)
-
+        val portValidator = PortValidator()
         val builder: TorConfig.Builder = TorConfig.Builder {
-            put(validatedPorts)
-
             for (setting in clientConfig.settings) {
                 if (setting is Ports) {
+                    portValidator.add(setting)
                     continue
                 }
 
                 put(setting)
             }
+
+            put(portValidator.validate(isPortAvailable))
 
             for (setting in excludeSettings) {
                 removeInstanceOf(setting::class)
@@ -305,62 +305,5 @@ abstract class TorConfigProvider {
         ).also {
             _lastValidatedTorConfig.value = it
         }
-    }
-
-    /**
-     * Validates ports for:
-     *  - Availability
-     *  - No conflicting values
-     *
-     * Returns a list of ports that need modification
-     * */
-    @Suppress("unchecked_cast")
-    private fun <T: Ports> validatePortOptions(
-        isPortAvailable: (Port) -> Boolean,
-        clientConfig: TorConfig,
-    ): Set<T> {
-        val validatedPorts: MutableSet<T> = mutableSetOf()
-        val takenPorts: MutableSet<Port> = mutableSetOf()
-
-        var hasControlPort = false
-        for (setting in clientConfig.settings) {
-            if (setting !is Ports) {
-                continue
-            }
-
-            if (setting is Ports.Control) {
-                hasControlPort = true
-            }
-
-            when (val option = setting.value) {
-                is AorDorPort.Auto,
-                is AorDorPort.Disable -> {
-                    validatedPorts.add(setting as T)
-                }
-                is AorDorPort.Value -> {
-                    when {
-                        takenPorts.contains(option.port) -> {
-                            // port already taken, set to auto
-                            validatedPorts.add((setting.clone().set(AorDorPort.Auto) as T))
-                        }
-                        !isPortAvailable.invoke(option.port) -> {
-                            // port unavailable, set to auto
-                            validatedPorts.add((setting.clone().set(AorDorPort.Auto) as T))
-                        }
-                        else -> {
-                            // add to already set port values
-                            takenPorts.add(option.port)
-                            validatedPorts.add(setting as T)
-                        }
-                    }
-                }
-            }
-        }
-
-        if (!hasControlPort) {
-            validatedPorts.add(Ports.Control() as T)
-        }
-
-        return validatedPorts
     }
 }
