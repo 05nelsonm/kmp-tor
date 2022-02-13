@@ -168,26 +168,41 @@ sealed interface TorManagerEvent {
     ): TorManagerEvent {
         val isNull: Boolean = dns == null && http == null && socks == null && trans == null
 
-        data class Split(val address: String, val port: Port)
+        data class Address(val address: String, val port: Port) {
+            companion object {
+                @Throws(
+                    IllegalArgumentException::class,
+                    IndexOutOfBoundsException::class,
+                    NumberFormatException::class
+                )
+                @JvmStatic
+                fun fromString(value: String): Address {
+                    val splits = value.split(':')
+                    return Address(
+                        splits[0].trim(),
+                        Port(splits[1].trim().toInt())
+                    )
+                }
+            }
+        }
 
-        fun splitDns(): Result<Set<Split>> = split("DNS", dns)
-        fun splitHttp(): Result<Set<Split>> = split("HTTP", http)
-        fun splitSocks(): Result<Set<Split>> = split("Socks", socks)
-        fun splitTrans(): Result<Set<Split>> = split("Trans", trans)
+        fun splitDns(): Result<Set<Address>> = split("DNS", dns)
+        fun splitHttp(): Result<Set<Address>> = split("HTTP", http)
+        fun splitSocks(): Result<Set<Address>> = split("Socks", socks)
+        fun splitTrans(): Result<Set<Address>> = split("Trans", trans)
 
-        private fun split(portName: String, values: Set<String>?): Result<Set<Split>> {
+        private fun split(portName: String, values: Set<String>?): Result<Set<Address>> {
             if (values.isNullOrEmpty()) {
                 return Result.failure(TorManagerException("$portName address was null"))
             }
 
-            val set: MutableSet<Split> = LinkedHashSet(values.size)
+            val set: MutableSet<Address> = LinkedHashSet(values.size)
             for (value in values) {
-                val splits = value.split(':')
                 try {
-                    set.add(Split(splits[0].trim(), Port(splits[1].trim().toInt())))
+                    set.add(Address.fromString(value))
                 } catch (e: Exception) {
                     return Result.failure(
-                        TorManagerException("Failed to split $portName address: $values", e)
+                        TorManagerException("Failed to split $portName address: $value", e)
                     )
                 }
             }
