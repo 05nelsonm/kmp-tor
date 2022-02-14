@@ -105,9 +105,9 @@ class SampleApp: App(SampleView::class) {
                     put(trans.set(AorDorPort.Value(Port(9262))))
                     put(trans.set(AorDorPort.Value(Port(9263))))
 
-                    // If a Port is already taken (9263) for any Port type (trans), it
-                    // will not be added and the Ports type set first (trans) will take
-                    // precedent.
+                    // If a port (9263) is already taken (by ^^^^ trans port above)
+                    // this will take its place and "overwrite" the trans port entry
+                    // because port 9263 is taken.
                     put(socks.set(AorDorPort.Value(Port(9263))))
 
                     // Set Flags

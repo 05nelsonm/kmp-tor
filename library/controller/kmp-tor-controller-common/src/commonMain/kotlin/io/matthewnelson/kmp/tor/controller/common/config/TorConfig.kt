@@ -111,23 +111,32 @@ class TorConfig private constructor(
         }
 
         fun put(config: TorConfig): Builder = apply {
-            settings.addAll(config.settings)
+            for (setting in config.settings) {
+                if (!settings.add(setting)) {
+                    settings.remove(setting)
+                    settings.add(setting)
+                }
+            }
         }
 
         fun put(setting: TorConfig.Setting<*>): Builder = apply {
-            setting.value?.let { settings.add(setting.clone()) } ?: remove(setting)
+            setting.value?.let {
+                val clone = setting.clone()
+                if (!settings.add(clone)) {
+                    settings.remove(clone)
+                    settings.add(clone)
+                }
+            } ?: remove(setting)
         }
 
         fun put(settings: Collection<TorConfig.Setting<*>>): Builder = apply {
             for (setting in settings) {
-                setting.value?.let { this.settings.add(setting.clone()) } ?: remove(setting)
+                put(setting)
             }
         }
 
         fun putIfAbsent(setting: TorConfig.Setting<*>): Builder = apply {
-            if (!settings.contains(setting)) {
-                setting.value?.let { settings.add(setting.clone()) }
-            }
+            setting.value?.let { settings.add(setting.clone()) } ?: remove(setting)
         }
 
         @OptIn(InternalTorApi::class)

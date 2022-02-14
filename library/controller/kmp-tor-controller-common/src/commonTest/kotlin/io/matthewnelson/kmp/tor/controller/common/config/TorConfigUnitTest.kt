@@ -86,6 +86,30 @@ class TorConfigUnitTest {
     }
 
     @Test
+    fun givenTorConfigBuilder_whenSameSettingPut_replacesOldSetting() {
+        val expected = TorF.True
+        val disableNetwork = DisableNetwork().set(TorF.False)
+        val config = TorConfig.Builder {
+            put(disableNetwork)
+            put(disableNetwork.set(expected))
+        }.build()
+
+        assertEquals(expected, config.settings.first().value)
+    }
+
+    @Test
+    fun givenTorConfigBuilder_whenSameSettingPutIfAbsent_doesNotReplaceOldSetting() {
+        val expected = TorF.True
+        val disableNetwork = DisableNetwork().set(TorF.False)
+        val config = TorConfig.Builder {
+            put(disableNetwork)
+            putIfAbsent(disableNetwork.set(expected))
+        }.build()
+
+        assertNotEquals(expected, config.settings.first().value)
+    }
+
+    @Test
     fun givenTorConfigBuilder_whenRemoveInstanceOf_removesAllInstances() {
         val expectedRemove = DisableNetwork()
         val expectedContains = buildSet {
