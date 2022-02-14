@@ -49,8 +49,14 @@ actual abstract class KmpTorLoader @JvmOverloads constructor(
     private val io: CoroutineDispatcher = Dispatchers.IO
 ) {
 
-    private val torDispatcher = DispatcherHandler()
+    /**
+     * Calls [TorConfig.Builder.removeInstanceOf] for all present
+     * settings. This is to ensure platform specific settings are
+     * removed during the [TorConfigProvider.retrieve] process, prior
+     * to starting Tor.
+     * */
     protected actual open val excludeSettings: Set<TorConfig.Setting<*>> = emptySet()
+    private val torDispatcher = DispatcherHandler()
 
     companion object {
         const val READ_INTERVAL = 250L
@@ -167,8 +173,8 @@ actual abstract class KmpTorLoader @JvmOverloads constructor(
         val mkdirsFailure: TorManagerException? = withContext(io) {
 
             // directories specified in the config must be present for Tor to start
-            for (entry in validated.torConfig.settings.entries) {
-                val option = entry.value
+            for (setting in validated.torConfig.settings) {
+                val option = setting.value
                 if (option !is TorConfig.Option.FileSystemDir) {
                     continue
                 }
@@ -323,7 +329,7 @@ actual abstract class KmpTorLoader @JvmOverloads constructor(
         timeout: Long,
         checkException: (() -> Throwable?)? = null,
     ): InetSocketAddress {
-        val fileContents = readFile(file, timeout, checkException)
+        val fileContents = retrieveFirstControlPortFromFile(file, timeout, checkException)
         return try {
             fileContents.split('=')[1].split(':').let { splits ->
                 InetSocketAddress(splits[0].trim(), splits[1].trim().toInt())
@@ -336,7 +342,7 @@ actual abstract class KmpTorLoader @JvmOverloads constructor(
     }
 
     @Throws(TorManagerException::class)
-    private suspend fun readFile(
+    private suspend fun retrieveFirstControlPortFromFile(
         file: File,
         timeout: Long,
         checkException: (() -> Throwable?)?,
@@ -349,9 +355,10 @@ actual abstract class KmpTorLoader @JvmOverloads constructor(
         while (time < timeout) {
             if (file.exists()) {
                 if (file.canRead()) {
-                    val contents = file.readText()
+                    val contents = file.readLines()
                     if (contents.isNotEmpty()) {
-                        return contents
+                        // only take the first ControlPort (if multiple are specified)
+                        return contents.first()
                     }
                 }
             }

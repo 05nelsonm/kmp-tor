@@ -26,6 +26,12 @@ import kotlin.jvm.JvmSynthetic
 
 expect abstract class KmpTorLoader {
 
+    /**
+     * Calls [TorConfig.Builder.removeInstanceOf] for all present
+     * settings. This is to ensure platform specific settings are
+     * removed during the [TorConfigProvider.retrieve] process, prior
+     * to starting Tor.
+     * */
     protected open val excludeSettings: Set<TorConfig.Setting<*>>
 
     @Throws(TorManagerException::class, CancellationException::class)

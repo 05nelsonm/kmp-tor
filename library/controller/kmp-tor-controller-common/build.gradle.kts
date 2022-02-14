@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
+import io.matthewnelson.kotlin.components.dependencies.deps
 import io.matthewnelson.kotlin.components.kmp.KmpTarget
 import kmp.tor.env
 import org.jetbrains.kotlin.gradle.plugin.KotlinJsCompilerType
@@ -50,6 +51,7 @@ kmpConfiguration {
         ),
         commonMainSourceSet = {
             dependencies {
+                implementation(deps.kotlin.reflect)
                 api(project(":library:kmp-tor-common"))
             }
         },

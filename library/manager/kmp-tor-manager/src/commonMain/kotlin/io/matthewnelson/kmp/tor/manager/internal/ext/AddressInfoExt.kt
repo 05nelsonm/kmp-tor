@@ -21,8 +21,10 @@ import kotlin.jvm.JvmSynthetic
 @JvmSynthetic
 @Suppress("nothing_to_inline")
 internal inline fun AddressInfo.dnsOpened(value: String): AddressInfo? {
-    return if (dns != value) {
-        copy(dns = value)
+    val mDns = dns?.toMutableSet() ?: return copy(dns = setOf(value))
+
+    return if (mDns.add(value)) {
+        copy(dns = mDns.toSet())
     } else {
         null
     }
@@ -31,8 +33,14 @@ internal inline fun AddressInfo.dnsOpened(value: String): AddressInfo? {
 @JvmSynthetic
 @Suppress("nothing_to_inline")
 internal inline fun AddressInfo.dnsClosed(value: String): AddressInfo? {
-    return if (dns == value) {
-        copy(dns = null)
+    val mDns = dns?.toMutableSet() ?: return null
+
+    return if (mDns.remove(value)) {
+        if (mDns.isEmpty()) {
+            copy(dns = null)
+        } else {
+            copy(dns = mDns.toSet())
+        }
     } else {
         null
     }
@@ -41,8 +49,10 @@ internal inline fun AddressInfo.dnsClosed(value: String): AddressInfo? {
 @JvmSynthetic
 @Suppress("nothing_to_inline")
 internal inline fun AddressInfo.httpOpened(value: String): AddressInfo? {
-    return if (http != value) {
-        copy(http = value)
+    val mHttp = http?.toMutableSet() ?: return copy(http = setOf(value))
+
+    return if (mHttp.add(value)) {
+        copy(http = mHttp.toSet())
     } else {
         null
     }
@@ -51,8 +61,14 @@ internal inline fun AddressInfo.httpOpened(value: String): AddressInfo? {
 @JvmSynthetic
 @Suppress("nothing_to_inline")
 internal inline fun AddressInfo.httpClosed(value: String): AddressInfo? {
-    return if (http == value) {
-        copy(http = null)
+    val mHttp = http?.toMutableSet() ?: return null
+
+    return if (mHttp.remove(value)) {
+        if (mHttp.isEmpty()) {
+            copy(http = null)
+        } else {
+            copy(http = mHttp.toSet())
+        }
     } else {
         null
     }
@@ -61,8 +77,10 @@ internal inline fun AddressInfo.httpClosed(value: String): AddressInfo? {
 @JvmSynthetic
 @Suppress("nothing_to_inline")
 internal inline fun AddressInfo.socksOpened(value: String): AddressInfo? {
-    return if (socks != value) {
-        copy(socks = value)
+    val mSocks = socks?.toMutableSet() ?: return copy(socks = setOf(value))
+
+    return if (mSocks.add(value)) {
+        copy(socks = mSocks.toSet())
     } else {
         null
     }
@@ -71,8 +89,14 @@ internal inline fun AddressInfo.socksOpened(value: String): AddressInfo? {
 @JvmSynthetic
 @Suppress("nothing_to_inline")
 internal inline fun AddressInfo.socksClosed(value: String): AddressInfo? {
-    return if (socks == value) {
-        copy(socks = null)
+    val mSocks = socks?.toMutableSet() ?: return null
+
+    return if (mSocks.remove(value)) {
+        if (mSocks.isEmpty()) {
+            copy(socks = null)
+        } else {
+            copy(socks = mSocks.toSet())
+        }
     } else {
         null
     }
@@ -81,8 +105,10 @@ internal inline fun AddressInfo.socksClosed(value: String): AddressInfo? {
 @JvmSynthetic
 @Suppress("nothing_to_inline")
 internal inline fun AddressInfo.transOpened(value: String): AddressInfo? {
-    return if (trans != value) {
-        copy(trans = value)
+    val mTrans = trans?.toMutableSet() ?: return copy(trans = setOf(value))
+
+    return if (mTrans.add(value)) {
+        copy(trans = mTrans.toSet())
     } else {
         null
     }
@@ -91,8 +117,14 @@ internal inline fun AddressInfo.transOpened(value: String): AddressInfo? {
 @JvmSynthetic
 @Suppress("nothing_to_inline")
 internal inline fun AddressInfo.transClosed(value: String): AddressInfo? {
-    return if (trans == value) {
-        copy(trans = null)
+    val mTrans = trans?.toMutableSet() ?: return null
+
+    return if (mTrans.remove(value)) {
+        if (mTrans.isEmpty()) {
+            copy(trans = null)
+        } else {
+            copy(trans = mTrans.toSet())
+        }
     } else {
         null
     }
