@@ -16,7 +16,6 @@
 package io.matthewnelson.kmp.tor.manager.internal.util
 
 import io.matthewnelson.kmp.tor.common.address.Port
-import io.matthewnelson.kmp.tor.controller.common.config.TorConfig
 import io.matthewnelson.kmp.tor.controller.common.config.TorConfig.Setting.Ports
 import io.matthewnelson.kmp.tor.controller.common.config.TorConfig.Option.AorDorPort
 import kotlin.test.Test
@@ -28,25 +27,16 @@ class PortValidatorUnitTest {
     private val validator = PortValidator()
 
     @Test
-    fun givenDifferentConfigPortType_whenHasSamePorts_setsToAuto() {
+    fun givenPortWithValue_whenPortUnavailable_setsToAuto() {
         val port = Port(9150)
         val socks = Ports.Socks()
         socks.set(AorDorPort.Value(port))
-        val http = Ports.HttpTunnel()
-        http.set(AorDorPort.Value(port))
-
-        TorConfig.Builder {
-            put(socks)
-            put(http)
-        }
 
         validator.add(socks)
-        validator.add(http)
 
-        val validated = validator.validate { true }
+        val validated = validator.validate { false }
 
-        assertEquals(port, (validated.first().value as AorDorPort.Value).port)
-        assertEquals(AorDorPort.Auto, validated.elementAt(1).value)
+        assertEquals(AorDorPort.Auto, validated.first().value)
     }
 
     @Test
