@@ -19,7 +19,7 @@ Add dependency
 ```kotlin
 // build.gradle.kts
 dependencies {
-    implementation("io.matthewnelson.kotlin-components:kmp-tor:0.4.6.9+0.1.0-alpha2")
+    implementation("io.matthewnelson.kotlin-components:kmp-tor:0.4.6.9+0.1.0-alpha3")
 }
 ```
 
