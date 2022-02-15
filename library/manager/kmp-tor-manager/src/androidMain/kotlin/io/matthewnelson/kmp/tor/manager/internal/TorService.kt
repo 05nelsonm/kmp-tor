@@ -50,11 +50,13 @@ internal class TorService: Service() {
     private val config: TorServiceConfig by lazy(LazyThreadSafetyMode.NONE) {
         TorServiceConfig.getMetaData(this)
     }
+    private var isServiceDestroyed = false
     private val notification: TorServiceNotification by lazy(LazyThreadSafetyMode.NONE) {
         TorServiceNotification.newInstance(
             config,
             this,
             serviceScope,
+            isServiceDestroyed = { isServiceDestroyed },
             stopService = { stopService() },
             restartTor = { managerHolder.instance?.let { manager ->
                 serviceScope.launch {
@@ -283,6 +285,7 @@ internal class TorService: Service() {
     }
 
     override fun onDestroy() {
+        isServiceDestroyed = true
         TorServiceController.notify(TorManagerEvent.Lifecycle(this, ON_DESTROY))
         supervisor.cancel()
         managerHolder.instance?.destroy(stopCleanly = config.enableForeground || !isTaskRemoved) {
@@ -306,7 +309,7 @@ internal class TorService: Service() {
     override fun onTaskRemoved(rootIntent: Intent?) {
         super.onTaskRemoved(rootIntent)
         isTaskRemoved = true
-        TorServiceController.notify(TorManagerEvent.Lifecycle(this, ON_TASK_REMOVED))
+        TorServiceController.notify(TorManagerEvent.Lifecycle(application, ON_TASK_REMOVED))
         if (config.stopServiceOnTaskRemoved) {
             stopService()
         } else if (config.enableForeground && notification.isError) {
