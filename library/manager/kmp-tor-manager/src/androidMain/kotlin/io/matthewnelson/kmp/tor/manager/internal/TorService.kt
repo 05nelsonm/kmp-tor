@@ -50,11 +50,13 @@ internal class TorService: Service() {
     private val config: TorServiceConfig by lazy(LazyThreadSafetyMode.NONE) {
         TorServiceConfig.getMetaData(this)
     }
+    private var isServiceDestroyed = false
     private val notification: TorServiceNotification by lazy(LazyThreadSafetyMode.NONE) {
         TorServiceNotification.newInstance(
             config,
             this,
             serviceScope,
+            isServiceDestroyed = { isServiceDestroyed },
             stopService = { stopService() },
             restartTor = { managerHolder.instance?.let { manager ->
                 serviceScope.launch {
@@ -124,8 +126,7 @@ internal class TorService: Service() {
             }
         }
 
-        override fun onActivityCreated(activity: Activity, savedInstanceState: Bundle?) {}
-        override fun onActivityStarted(activity: Activity) {
+        override fun onActivityCreated(activity: Activity, savedInstanceState: Bundle?) {
             if (isTaskRemoved) {
                 isTaskRemoved = false
                 when (lastAction) {
@@ -134,14 +135,15 @@ internal class TorService: Service() {
 
                     is TorManagerEvent.Action.Restart,
                     is TorManagerEvent.Action.Start -> {
-                        TorServiceController.notify(
-                            TorManagerEvent.Lifecycle(application ?: activity, ON_TASK_RETURNED)
-                        )
                         startQuietly?.second?.invoke()
                     }
                 }
+                TorServiceController.notify(
+                    TorManagerEvent.Lifecycle(application ?: activity, ON_TASK_RETURNED)
+                )
             }
         }
+        override fun onActivityStarted(activity: Activity) {}
         override fun onActivityResumed(activity: Activity) {}
         override fun onActivityPaused(activity: Activity) {}
         override fun onActivityStopped(activity: Activity) {}
@@ -283,6 +285,7 @@ internal class TorService: Service() {
     }
 
     override fun onDestroy() {
+        isServiceDestroyed = true
         TorServiceController.notify(TorManagerEvent.Lifecycle(this, ON_DESTROY))
         supervisor.cancel()
         managerHolder.instance?.destroy(stopCleanly = config.enableForeground || !isTaskRemoved) {
@@ -306,7 +309,7 @@ internal class TorService: Service() {
     override fun onTaskRemoved(rootIntent: Intent?) {
         super.onTaskRemoved(rootIntent)
         isTaskRemoved = true
-        TorServiceController.notify(TorManagerEvent.Lifecycle(this, ON_TASK_REMOVED))
+        TorServiceController.notify(TorManagerEvent.Lifecycle(application, ON_TASK_REMOVED))
         if (config.stopServiceOnTaskRemoved) {
             stopService()
         } else if (config.enableForeground && notification.isError) {

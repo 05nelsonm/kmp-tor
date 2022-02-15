@@ -52,7 +52,8 @@ import kotlin.math.roundToLong
 
 internal abstract class TorServiceNotification(
     protected val config: TorServiceConfig,
-    protected val serviceScope: CoroutineScope
+    protected val serviceScope: CoroutineScope,
+    protected val isServiceDestroyed: () -> Boolean,
 ): TorManagerEvent.SealedListener {
 
     private val actionsEmpty: List<Action> = emptyList()
@@ -110,6 +111,7 @@ internal abstract class TorServiceNotification(
         val old = currentState
         _currentState = new
         if (!config.enableForeground) return
+        if (isServiceDestroyed.invoke()) return
         render(old = old, new = new)
     }
 
@@ -367,6 +369,7 @@ internal abstract class TorServiceNotification(
             config: TorServiceConfig,
             service: TorService,
             serviceScope: CoroutineScope,
+            isServiceDestroyed: () -> Boolean,
             stopService: () -> Unit,
             restartTor: () -> Unit,
             managerProvider: () -> TorManager?,
@@ -375,6 +378,7 @@ internal abstract class TorServiceNotification(
                 config,
                 service,
                 serviceScope,
+                isServiceDestroyed,
                 stopService,
                 restartTor,
                 managerProvider
@@ -386,10 +390,11 @@ private class RealTorServiceNotification(
     config: TorServiceConfig,
     private val service: TorService,
     serviceScope: CoroutineScope,
+    isServiceDestroyed: () -> Boolean,
     private val stopService: () -> Unit,
     private val restartTor: () -> Unit,
     private val managerProvider: () -> TorManager?
-): TorServiceNotification(config, serviceScope) {
+): TorServiceNotification(config, serviceScope, isServiceDestroyed) {
 
     companion object {
         private var isChannelSetup = false
