@@ -126,8 +126,7 @@ internal class TorService: Service() {
             }
         }
 
-        override fun onActivityCreated(activity: Activity, savedInstanceState: Bundle?) {}
-        override fun onActivityStarted(activity: Activity) {
+        override fun onActivityCreated(activity: Activity, savedInstanceState: Bundle?) {
             if (isTaskRemoved) {
                 isTaskRemoved = false
                 when (lastAction) {
@@ -136,14 +135,15 @@ internal class TorService: Service() {
 
                     is TorManagerEvent.Action.Restart,
                     is TorManagerEvent.Action.Start -> {
-                        TorServiceController.notify(
-                            TorManagerEvent.Lifecycle(application ?: activity, ON_TASK_RETURNED)
-                        )
                         startQuietly?.second?.invoke()
                     }
                 }
+                TorServiceController.notify(
+                    TorManagerEvent.Lifecycle(application ?: activity, ON_TASK_RETURNED)
+                )
             }
         }
+        override fun onActivityStarted(activity: Activity) {}
         override fun onActivityResumed(activity: Activity) {}
         override fun onActivityPaused(activity: Activity) {}
         override fun onActivityStopped(activity: Activity) {}
