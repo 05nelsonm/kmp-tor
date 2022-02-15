@@ -213,8 +213,9 @@ private class RealTorServiceConfig(context: Context): TorServiceConfig() {
             }
         }
 
+        stopServiceOnTaskRemoved = meta?.getBoolean(KEY_STOP_SERVICE_ON_TASK_REMOVED, true) ?: true
+
         if (!enableForeground) {
-            stopServiceOnTaskRemoved = true
             notificationId = 0
             channelId = ""
             channelName = ""
@@ -247,8 +248,6 @@ private class RealTorServiceConfig(context: Context): TorServiceConfig() {
                     """.trimIndent()
                 )
             }
-
-            stopServiceOnTaskRemoved = meta.getBoolean(KEY_STOP_SERVICE_ON_TASK_REMOVED, true)
 
             notificationId = meta.getInt(KEY_NOTIFICATION_ID, 0).let { id ->
                 if (id !in 1..9999) {

@@ -47,10 +47,14 @@
     Default: true
 
     If set to `false`, when the user swipes your application from the recent app's
-    tray, the service will continue running.
+    tray, stop service will not be called.
 
-    It is highly advisable to, if setting this option to `false`, also enable the
-    stop notification action.
+    This can be useful if:
+      - You are running TorService in the background, with another
+        service that is running in the Foreground keeping the application alive
+        past task removal.
+      - You are running TorService in the foreground and wish to keep the application
+        alive until an explicit call to `stop` Tor is made.
     -->
     <bool name="tor_service_stop_service_on_task_removed">false</bool>
 
