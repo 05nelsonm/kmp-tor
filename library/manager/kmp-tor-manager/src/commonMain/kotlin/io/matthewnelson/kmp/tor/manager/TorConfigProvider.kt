@@ -47,6 +47,7 @@ abstract class TorConfigProvider {
     }
     open val geoIpV4File: Path? = null
     open val geoIpV6File: Path? = null
+    open val processId: Int? = null
 
     /**
      * Called from a background thread, so it is safe to perform IO from here.
@@ -166,11 +167,14 @@ abstract class TorConfigProvider {
             // controller) fail.
             put(RunAsDaemon().set(TorF.False))
 
-            putIfAbsent(SyslogIdentityTag().set(FieldId("TorManager")))
             putIfAbsent(CacheDirectory().set(FileSystemDir(cacheDir)))
             putIfAbsent(dataDir)
 
-            this
+            processId?.let { pid ->
+                putIfAbsent(OwningControllerProcess().set(ProcessId(pid)))
+            }
+
+            putIfAbsent(SyslogIdentityTag().set(FieldId("TorManager")))
         }
 
         // Always add control port file.
