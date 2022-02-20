@@ -37,10 +37,11 @@ import io.matthewnelson.kmp.tor.controller.internal.*
 import io.matthewnelson.kmp.tor.controller.internal.controller.*
 import io.matthewnelson.kmp.tor.controller.internal.controller.ListenersHandler
 import io.matthewnelson.kmp.tor.controller.internal.controller.Waiter
-import io.matthewnelson.kmp.tor.controller.internal.io.Reader
 import io.matthewnelson.kmp.tor.controller.internal.coroutines.TorCoroutineManager
-import io.matthewnelson.kmp.tor.controller.internal.io.Writer
 import io.matthewnelson.kmp.tor.controller.internal.coroutines.launch
+import io.matthewnelson.kmp.tor.controller.internal.io.ReaderWrapper
+import io.matthewnelson.kmp.tor.controller.internal.io.SocketWrapper
+import io.matthewnelson.kmp.tor.controller.internal.io.WriterWrapper
 import kotlinx.atomicfu.*
 import kotlinx.coroutines.*
 import kotlinx.coroutines.sync.Mutex
@@ -62,6 +63,8 @@ import kotlin.jvm.JvmSynthetic
 expect interface TorController: TorControlProcessor, TorEventProcessor<TorEvent.SealedListener> {
     val isConnected: Boolean
 
+    fun disconnect()
+
     /**
      * Callback will be made upon disconnect, and directly afterwards
      * the reference to the callback cleared.
@@ -74,17 +77,19 @@ expect interface TorController: TorControlProcessor, TorEventProcessor<TorEvent.
 
 @JvmSynthetic
 internal fun realTorController(
-    input: Reader,
-    output: Writer,
+    reader: ReaderWrapper,
+    writer: WriterWrapper,
+    socket: SocketWrapper,
     commandDispatcher: CoroutineDispatcher
 ): TorController =
-    RealTorController(input, output, commandDispatcher)
+    RealTorController(reader, writer, socket, commandDispatcher)
 
 @OptIn(InternalTorApi::class, ExperimentalTorApi::class)
 @Suppress("CanBePrimaryConstructorProperty")
 private class RealTorController(
-    input: Reader,
-    output: Writer,
+    reader: ReaderWrapper,
+    writer: WriterWrapper,
+    socket: SocketWrapper,
     commandDispatcher: CoroutineDispatcher,
 ): TorController, Debuggable {
 
@@ -93,13 +98,14 @@ private class RealTorController(
     private val listeners: ListenersHandler = ListenersHandler.newInstance {
         debugger.safeInvoke(it)
     }
+    private val socket: SocketWrapper = socket
     private val onDisconnect: AtomicRef<((TorController) -> Unit)?> = atomic(null)
 
     @Suppress("SpellCheckingInspection")
     private val controlPortInteractor: ControlPortInteractor by lazy {
         RealControlPortInteractor(
-            input,
-            output,
+            reader,
+            writer,
             commandDispatcher,
         )
     }
@@ -119,13 +125,13 @@ private class RealTorController(
 
     @Suppress("SpellCheckingInspection")
     private inner class RealControlPortInteractor(
-        input: Reader,
-        output: Writer,
+        reader: ReaderWrapper,
+        writer: WriterWrapper,
         commandDispatcher: CoroutineDispatcher,
     ): ControlPortInteractor {
 
-        private val input: Reader = input
-        private val output: Writer = output
+        private val reader: ReaderWrapper = reader
+        private val writer: WriterWrapper = writer
         private val commandDispatcher: CoroutineDispatcher = commandDispatcher
         private val torCoroutineManager: TorCoroutineManager = TorCoroutineManager.newInstance()
         private val waiters: WaitersHolder = WaitersHolder()
@@ -228,11 +234,11 @@ private class RealTorController(
                 val waiter = Waiter.newInstance { isConnected }
                 debugger.safeInvoke(DebugItem.Message(">> $command"))
                 waiters.withLock {
-                    output.write(command)
+                    writer.write(command)
 //                    if (rest != null) {
 //                        writeEscaped(rest)
 //                    }
-                    output.flush()
+                    writer.flush()
                     add(waiter)
                 }
 
@@ -291,7 +297,7 @@ private class RealTorController(
             var char: Char? = null
             while (char != ' ') {
                 currentCoroutineContext().ensureActive()
-                var line = input.readLine()
+                var line = reader.readLine()
 
                 if (line == null) {
                     if (replies.isEmpty()) {
@@ -317,7 +323,7 @@ private class RealTorController(
                 if (char == '+') {
                     // process multi-line reply
                     while (true) {
-                        line = input.readLine()
+                        line = reader.readLine()
                         debugger.safeInvoke(DebugItem.Message("<< $line"))
                         if (line == "$MULTI_LINE_END") {
                             break
@@ -341,6 +347,14 @@ private class RealTorController(
     }
 
     override val isConnected: Boolean get() = controlPortInteractor.isConnected
+
+    override fun disconnect() {
+        try {
+            socket.close()
+        } catch (e: Exception) {
+            debugger.safeInvoke(DebugItem.Error(e))
+        }
+    }
 
     override fun onDisconnect(action: ((TorController) -> Unit)?) {
         onDisconnect.value = action

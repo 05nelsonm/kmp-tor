@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Matthew Nelson
+ * Copyright (c) 2022 Matthew Nelson
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,9 +16,11 @@
 package io.matthewnelson.kmp.tor.controller.internal.io
 
 import io.matthewnelson.kmp.tor.controller.common.exceptions.TorControllerException
+import kotlin.jvm.JvmInline
 import kotlin.jvm.JvmSynthetic
 
-internal interface Reader {
+@JvmInline
+internal expect value class ReaderWrapper private constructor(private val value: Any) {
     @JvmSynthetic
     @Throws(TorControllerException::class)
     fun readLine(): String?

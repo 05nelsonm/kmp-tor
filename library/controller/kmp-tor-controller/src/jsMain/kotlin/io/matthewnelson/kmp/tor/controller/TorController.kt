@@ -33,6 +33,8 @@ import io.matthewnelson.kmp.tor.controller.common.events.TorEventProcessor
 actual interface TorController: TorControlProcessor, TorEventProcessor<TorEvent.SealedListener> {
     actual val isConnected: Boolean
 
+    actual fun disconnect()
+
     /**
      * Callback will be made upon disconnect, and directly afterwards
      * the reference to the callback cleared.

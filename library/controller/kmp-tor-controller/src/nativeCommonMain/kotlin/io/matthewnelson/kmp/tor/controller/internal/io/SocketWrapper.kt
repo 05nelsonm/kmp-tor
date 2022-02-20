@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Matthew Nelson
+ * Copyright (c) 2022 Matthew Nelson
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,15 +15,9 @@
  **/
 package io.matthewnelson.kmp.tor.controller.internal.io
 
-import io.matthewnelson.kmp.tor.controller.common.exceptions.TorControllerException
-import kotlin.jvm.JvmSynthetic
-
-internal interface Writer {
-    @JvmSynthetic
-    @Throws(TorControllerException::class)
-    fun write(string: String)
-
-    @JvmSynthetic
-    @Throws(TorControllerException::class)
-    fun flush()
+internal actual value class SocketWrapper private actual constructor(private val socket: Any) {
+    @Throws(Exception::class)
+    actual fun close() {
+        TODO("Not yet implemented")
+    }
 }
