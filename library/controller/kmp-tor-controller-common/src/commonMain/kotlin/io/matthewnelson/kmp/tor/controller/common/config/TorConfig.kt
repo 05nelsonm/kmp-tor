@@ -545,6 +545,9 @@ class TorConfig private constructor(
         // TODO: Logs.Debug && Logs.Info
         // TODO: Nodes.Entry, Nodes.Exclude, Nodes.Exit, Nodes.Strict
 
+        /**
+         * https://torproject.gitlab.io/torspec/control-spec/#takeownership
+         * */
         class OwningControllerProcess       : Setting<Option.ProcessId?>("__OwningControllerProcess") {
             override val default: Option.ProcessId? = null
             override var value: Option.ProcessId? = default
