@@ -44,15 +44,19 @@ class KmpTorLoaderJvm(
 
     override val excludeSettings: Set<TorConfig.Setting<*>> = when {
         installer.isMingw -> {
-            buildSet {
-                addAll(super.excludeSettings)
-                add(TorConfig.Setting.Ports.Trans())
+            super.excludeSettings.let { settings ->
+                val set: MutableSet<TorConfig.Setting<*>> = LinkedHashSet(settings.size + 1)
+                set.addAll(settings)
+                set.add(TorConfig.Setting.Ports.Trans())
+                set
             }
         }
         installer.isMacos -> {
-            buildSet {
-                addAll(super.excludeSettings)
-                add(TorConfig.Setting.Ports.Trans())
+            super.excludeSettings.let { settings ->
+                val set: MutableSet<TorConfig.Setting<*>> = LinkedHashSet(settings.size + 1)
+                set.addAll(settings)
+                set.add(TorConfig.Setting.Ports.Trans())
+                set
             }
         }
         else -> {
@@ -71,11 +75,6 @@ class KmpTorLoaderJvm(
 
         val newLines: MutableList<String> = ArrayList(configLines.size + 1)
         newLines.add(tor.absolutePath)
-
-        // TODO: Move to TorConfig.Setting
-//        newLines.add("--__OwningControllerProcess")
-//        newLines.add(android.os.Process.myPid().toString())
-
         newLines.addAll(configLines)
 
         val parentContext = currentCoroutineContext()

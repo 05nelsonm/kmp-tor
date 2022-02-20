@@ -53,6 +53,7 @@ abstract class TorConfigProviderAndroid(context: Context): TorConfigProvider() {
     override val geoIpV6File: Path? by lazy {
         workDir.builder { addSegment("geoip6") }
     }
+    override val processId: Int get() = android.os.Process.myPid()
 
     @Throws(TorManagerException::class)
     override fun extractGeoIpV4File(toLocation: Path) {

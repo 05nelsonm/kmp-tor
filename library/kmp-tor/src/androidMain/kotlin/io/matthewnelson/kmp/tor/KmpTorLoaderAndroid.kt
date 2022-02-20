@@ -59,13 +59,8 @@ class KmpTorLoaderAndroid(provider: TorConfigProviderAndroid): KmpTorLoader(prov
             libKmpTor
         } ?: throw TorManagerException("'libKmpTor.so' is missing")
 
-        val newLines: MutableList<String> = ArrayList(configLines.size + 3)
+        val newLines: MutableList<String> = ArrayList(configLines.size + 1)
         newLines.add(tor.absolutePath)
-
-        // TODO: Move to TorConfig.Setting
-        newLines.add("--__OwningControllerProcess")
-        newLines.add(android.os.Process.myPid().toString())
-
         newLines.addAll(configLines)
 
         val parentContext = currentCoroutineContext()
