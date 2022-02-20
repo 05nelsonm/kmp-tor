@@ -545,6 +545,15 @@ class TorConfig private constructor(
         // TODO: Logs.Debug && Logs.Info
         // TODO: Nodes.Entry, Nodes.Exclude, Nodes.Exit, Nodes.Strict
 
+        class OwningControllerProcess       : Setting<Option.ProcessId?>("__OwningControllerProcess") {
+            override val default: Option.ProcessId? = null
+            override var value: Option.ProcessId? = default
+
+            override fun clone(): OwningControllerProcess {
+                return OwningControllerProcess().set(value) as OwningControllerProcess
+            }
+        }
+
         sealed class Ports(keyword: String) : Setting<Option.AorDorPort>(keyword) {
 
             override fun equals(other: Any?): Boolean {
@@ -907,6 +916,12 @@ class TorConfig private constructor(
         @JvmInline
         value class FieldId(override val value: String)     : Option {
             val nullIfEmpty: FieldId? get() = if(value.isEmpty()) null else this
+            override fun toString(): String = value
+        }
+
+        @JvmInline
+        value class ProcessId(val pid: Int)                 : Option {
+            override val value: String get() = "$pid"
             override fun toString(): String = value
         }
 
