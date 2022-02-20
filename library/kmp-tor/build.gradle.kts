@@ -47,6 +47,8 @@ kmpConfiguration {
             KmpTarget.Jvm.Jvm(
                 mainSourceSet = {
                     dependencies {
+                        implementation(project(":library:kmp-tor-internal"))
+
                         // TODO: Remove once js, macosx64, linuxx64, mingwx64 binary targets are published
                         implementation("${pConfig.group}:kmp-tor-binary-geoip:${env.kmpTorBinaries.version.name}")
                         implementation("${pConfig.group}:kmp-tor-binary-extract:${env.kmpTorBinaries.version.name}")
