@@ -5,6 +5,7 @@ includeBuild("kotlin-components/includeBuild/kmp")
 
 include(":library:kmp-tor")
 include(":library:kmp-tor-common")
+include(":library:kmp-tor-internal")
 
 include(":library:controller:kmp-tor-controller")
 include(":library:controller:kmp-tor-controller-common")

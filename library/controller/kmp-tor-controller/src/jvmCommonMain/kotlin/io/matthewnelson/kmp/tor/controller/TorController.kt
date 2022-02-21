@@ -20,9 +20,9 @@ package io.matthewnelson.kmp.tor.controller
 import io.matthewnelson.kmp.tor.common.annotation.ExperimentalTorApi
 import io.matthewnelson.kmp.tor.controller.common.events.TorEvent
 import io.matthewnelson.kmp.tor.controller.common.events.TorEventProcessor
-import io.matthewnelson.kmp.tor.controller.common.exceptions.TorControllerException
-import io.matthewnelson.kmp.tor.controller.internal.io.Reader
-import io.matthewnelson.kmp.tor.controller.internal.io.Writer
+import io.matthewnelson.kmp.tor.controller.internal.io.ReaderWrapper
+import io.matthewnelson.kmp.tor.controller.internal.io.SocketWrapper
+import io.matthewnelson.kmp.tor.controller.internal.io.WriterWrapper
 import kotlinx.coroutines.Dispatchers
 import java.io.*
 import java.net.Socket
@@ -43,6 +43,8 @@ import java.net.SocketException
 actual interface TorController: TorControlProcessor, TorEventProcessor<TorEvent.SealedListener> {
     actual val isConnected: Boolean
 
+    actual fun disconnect()
+
     /**
      * Callback will be made upon disconnect, and directly afterwards
      * the reference to the callback cleared.
@@ -62,52 +64,11 @@ actual interface TorController: TorControlProcessor, TorEventProcessor<TorEvent.
         @JvmStatic
         @Throws(IOException::class, SocketException::class)
         fun newInstance(socket: Socket): TorController =
-            realTorController(socket.asReader(), socket.asWriter(), Dispatchers.IO)
-    }
-}
-
-@Suppress("nothing_to_inline")
-private inline fun Socket.asReader(): Reader {
-    return object : Reader {
-
-        private val reader: BufferedReader = getInputStream().reader().buffered()
-
-        @JvmSynthetic
-        @Throws(TorControllerException::class)
-        override fun readLine(): String? {
-            return try {
-                reader.readLine()
-            } catch (e: IOException) {
-                throw TorControllerException(e)
-            }
-        }
-    }
-}
-
-@Suppress("nothing_to_inline")
-private inline fun Socket.asWriter(): Writer {
-    return object : Writer {
-
-        private val writer = getOutputStream().writer()
-
-        @JvmSynthetic
-        @Throws(TorControllerException::class)
-        override fun write(string: String) {
-            try {
-                writer.write(string)
-            } catch (e: IOException) {
-                throw TorControllerException(e)
-            }
-        }
-
-        @JvmSynthetic
-        @Throws(TorControllerException::class)
-        override fun flush() {
-            try {
-                writer.flush()
-            } catch (e: IOException) {
-                throw TorControllerException(e)
-            }
-        }
+            realTorController(
+                reader = ReaderWrapper.from(socket),
+                writer = WriterWrapper.from(socket),
+                socket = SocketWrapper.wrap(socket),
+                commandDispatcher = Dispatchers.IO,
+            )
     }
 }

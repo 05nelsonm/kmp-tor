@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Matthew Nelson
+ * Copyright (c) 2022 Matthew Nelson
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,13 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-package io.matthewnelson.kmp.tor.controller.internal.io
+package io.matthewnelson.kmp.tor.internal
 
-import io.matthewnelson.kmp.tor.controller.common.exceptions.TorControllerException
-import kotlin.jvm.JvmSynthetic
-
-internal interface Reader {
-    @JvmSynthetic
-    @Throws(TorControllerException::class)
-    fun readLine(): String?
+class ProcessId private constructor() {
+    companion object {
+        @JvmStatic
+        fun get(): Int = java.lang.management.ManagementFactory
+            .getRuntimeMXBean()
+            .name
+            .split('@')[0]
+            .toInt()
+    }
 }

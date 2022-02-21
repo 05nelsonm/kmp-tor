@@ -230,9 +230,9 @@ private class RealTorManager(
             networkObserver?.detach()
 
             if (!stopCleanly) {
+                controller.value?.disconnect()
                 supervisor.cancel()
                 loader.close()
-                stateMachine.updateState(TorState.Off, TorNetworkState.Disabled)
 
                 listeners.withLock {
                     for (listener in this) {
@@ -258,7 +258,6 @@ private class RealTorManager(
             }.invokeOnCompletion {
                 supervisor.cancel()
                 loader.close()
-
 
                 listeners.withLock {
                     for (listener in this) {
@@ -808,77 +807,69 @@ private class RealTorManager(
             return result
         }
 
-        var toReturn: Result<Any?>? = null
-        result.onSuccess { controller ->
+        val controller = result.getOrThrow()
+        notifyListenersNoScope(TorManagerEvent.Lifecycle(controller, ON_CREATE))
 
-            notifyListeners(TorManagerEvent.Lifecycle(controller, ON_CREATE))
+        controller.addListener(controllerListener)
 
-            controller.addListener(controllerListener)
-
-            (controller as Debuggable).setDebugger { item ->
-                when (item) {
-                    is DebugItem.Message -> {
-                        if (item.value.startsWith("<< 650 BW ")) return@setDebugger
-                        notifyListeners(TorManagerEvent.Log.Debug(item.value))
-                    }
-                    is DebugItem.Error -> {
-                        notifyListeners(TorManagerEvent.Log.Error(item.value))
-                    }
-                    is DebugItem.ListenerError -> {
-                        // ControllerListener threw an exception
-                        item.error.value.printStackTrace()
-                    }
+        (controller as Debuggable).setDebugger { item ->
+            when (item) {
+                is DebugItem.Message -> {
+                    if (item.value.startsWith("<< 650 BW ")) return@setDebugger
+                    notifyListeners(TorManagerEvent.Log.Debug(item.value))
+                }
+                is DebugItem.Error -> {
+                    notifyListeners(TorManagerEvent.Log.Error(item.value))
+                }
+                is DebugItem.ListenerError -> {
+                    // ControllerListener threw an exception
+                    item.error.value.printStackTrace()
                 }
             }
-
-            // set shutdown callback
-            @OptIn(ExperimentalTorApi::class)
-            controller.onDisconnect { disconnectedController ->
-
-                notifyListeners(TorManagerEvent.Lifecycle(disconnectedController, ON_DESTROY))
-
-                (disconnectedController as Debuggable).setDebugger(null)
-                disconnectedController.removeListener(controllerListener)
-
-                this.controller.value?.let { currentController ->
-
-                    // check if it's our current controller or not
-                    if (currentController == disconnectedController) {
-                        loader.close()
-                        this.controller.value = null
-                    }
-
-                }
-
-            }
-
-            // TODO: Handle Failure case
-            controller.ownershipTake()
-            controller.setEvents(requiredEvents)
-
-            if (networkObserver?.isNetworkConnected() != false) {
-                // null (no observer) or true
-                val networkResult = controller.configSet(
-                    disableNetwork.set(TorConfig.Option.TorF.False)
-                )
-
-                if (networkResult.isSuccess) {
-                    stateMachine.updateState(TorNetworkState.Enabled)
-                }
-            } else {
-                notifyListenersNoScope(TorManagerEvent.Log.Warn(WAITING_ON_NETWORK))
-            }
-
-            this.controller.value = controller
-            stateMachine.updateState(TorState.On(state.bootstrap))
-            toReturn = Result.success("Tor started successfully")
         }
 
-        return toReturn ?: if (controller.value != null) {
-            Result.success("Tor started successfully")
+        // set shutdown callback
+        @OptIn(ExperimentalTorApi::class)
+        controller.onDisconnect { disconnectedController ->
+
+            notifyListeners(TorManagerEvent.Lifecycle(disconnectedController, ON_DESTROY))
+
+            (disconnectedController as Debuggable).setDebugger(null)
+            disconnectedController.removeListener(controllerListener)
+
+            this.controller.value?.let { currentController ->
+
+                // check if it's our current controller or not
+                if (currentController == disconnectedController) {
+                    loader.close()
+                    this.controller.value = null
+                }
+
+            }
+
+        }
+
+        // TODO: Handle Failure case
+        controller.ownershipTake().onSuccess {
+            // Stop Tor from polling for processId, as we've passed ownership
+            // to the controller which, if it is stopped, Tor will exit.
+            controller.configReset(TorConfig.Setting.OwningControllerProcess())
+        }
+        controller.setEvents(requiredEvents)
+
+        if (networkObserver?.isNetworkConnected() != false) {
+            // null (no observer) or true
+            controller.configSet(disableNetwork.set(TorConfig.Option.TorF.False)).onSuccess {
+                stateMachine.updateState(TorNetworkState.Enabled)
+            }
         } else {
-            Result.failure(TorManagerException("Failed to start Tor"))
+            notifyListenersNoScope(TorManagerEvent.Log.Warn(WAITING_ON_NETWORK))
         }
+
+        this.controller.value = controller
+        stateMachine.updateState(TorState.On(state.bootstrap))
+
+        return Result.success("Tor started successfully")
     }
 
     private suspend fun realStop(
@@ -913,6 +904,7 @@ private class RealTorManager(
                         Result.success("Controller was already shutdown")
                     } else {
                         // Force close Tor
+                        controller.disconnect()
                         loader.close()
                         notifyListenersNoScope(TorManagerEvent.Log.Warn(
                             "Tor failed to signal shutdown/halt and was forcibly stopped"
