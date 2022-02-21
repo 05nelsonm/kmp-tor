@@ -57,16 +57,20 @@ abstract class TorConfigProviderJvm: TorConfigProvider() {
 
     @Throws(TorManagerException::class)
     override fun extractGeoIpV4File(toLocation: Path) {
-        extract(toLocation, zipEntryName = "geoip")
+        extract(toLocation, zipEntryName = "geoip", writeSha256SumOnExtraction = false)
     }
 
     @Throws(TorManagerException::class)
     override fun extractGeoIpV6File(toLocation: Path) {
-        extract(toLocation, zipEntryName = "geoip6")
+        extract(toLocation, zipEntryName = "geoip6", writeSha256SumOnExtraction = true)
     }
 
     @Throws(TorManagerException::class)
-    private fun extract(toLocation: Path, zipEntryName: String) {
+    private fun extract(
+        toLocation: Path,
+        zipEntryName: String,
+        writeSha256SumOnExtraction: Boolean,
+    ) {
         val sha256SumFile = File(workDir.value, FILE_NAME_GEOIPS_ZIP_SHA256)
         val geoipFile = toLocation.toFile()
         val sha256SumMatches = sha256SumFile.doesContentMatchExpected(ZIP_SHA256_GEOIP)
@@ -83,7 +87,7 @@ abstract class TorConfigProviderJvm: TorConfigProvider() {
                     )
             },
             postExtraction = {
-                if (!sha256SumMatches) {
+                if (!sha256SumMatches && writeSha256SumOnExtraction) {
                     try {
                         sha256SumFile.writeText(ZIP_SHA256_GEOIP)
                     } catch (e: Exception) {
