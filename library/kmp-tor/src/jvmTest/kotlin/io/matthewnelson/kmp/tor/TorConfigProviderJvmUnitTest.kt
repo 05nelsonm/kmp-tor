@@ -28,6 +28,7 @@ import org.junit.rules.TemporaryFolder
 import java.io.File
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
 class TorConfigProviderJvmUnitTest {
@@ -86,7 +87,10 @@ class TorConfigProviderJvmUnitTest {
 
         assertTrue(geoipFile.exists())
         assertTrue(geoipFile.length() > 0)
-        assertEquals(ZIP_SHA256_GEOIP, sha256SumFile.readText())
+
+        // writing of sha256sum file is performed when the geoip6 file is extracted
+//        assertEquals(ZIP_SHA256_GEOIP, sha256SumFile.readText())
+        assertFalse(sha256SumFile.exists())
     }
 
     @Test
@@ -112,9 +116,12 @@ class TorConfigProviderJvmUnitTest {
 
         provider.extractGeoIpV4File()
 
+        // sha256sum file is only written when extraction of geoip6 file is performed,
+        // so we must fake it here
+        sha256SumFile.writeText(ZIP_SHA256_GEOIP)
+
         assertTrue(geoipFile.exists())
         assertTrue(geoipFile.length() > 0)
-        assertEquals(ZIP_SHA256_GEOIP, sha256SumFile.readText())
 
         val expectedGeoip = geoipFile.lastModified()
         val expectedSha256 = sha256SumFile.lastModified()
