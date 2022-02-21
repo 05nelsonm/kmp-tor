@@ -130,8 +130,9 @@ private class RealTorManager(
         ?.toMutableSet()
         ?.apply {
             add(TorEvent.LogMsg.Notice)
+            add(TorEvent.ConfChanged)
         }
-        ?: setOf(TorEvent.LogMsg.Notice)
+        ?: setOf(TorEvent.LogMsg.Notice, TorEvent.ConfChanged)
 
     private val debug: AtomicBoolean = atomic(false)
     private val listeners: ListenersHandler = ListenersHandler.newInstance(3) {
@@ -427,7 +428,6 @@ private class RealTorManager(
         return provide<TorControlConfigLoad, Any?> {
             // TODO: Check settings
             val result = configLoad(config)
-            config.settings.checkNetworkState(this as TorController)
             result
         }
     }
@@ -439,7 +439,6 @@ private class RealTorManager(
         return provide<TorControlConfigReset, Any?> {
             // TODO: Check settings
             val result = configReset(setting, setDefault)
-            setting.checkNetworkState(this as TorController)
             result
         }
     }
@@ -451,7 +450,6 @@ private class RealTorManager(
         return provide<TorControlConfigReset, Any?> {
             // TODO: Check settings
             val result = configReset(settings, setDefault)
-            settings.checkNetworkState(this as TorController)
             result
         }
     }
@@ -467,7 +465,6 @@ private class RealTorManager(
         return provide<TorControlConfigSet, Any?> {
             // TODO: Check settings
             val result = configSet(setting)
-            setting.checkNetworkState(this as TorController)
             result
         }
     }
@@ -476,7 +473,6 @@ private class RealTorManager(
         return provide<TorControlConfigSet, Any?> {
             // TODO: Check settings
             val result = configSet(settings)
-            settings.checkNetworkState(this as TorController)
             result
         }
     }
@@ -523,23 +519,6 @@ private class RealTorManager(
                 }
             }
         }
-    }
-
-    private suspend fun TorConfig.Setting<*>.checkNetworkState(controller: TorController) {
-        if (this !is TorConfig.Setting.DisableNetwork) return
-        controller.configGet(disableNetwork).onSuccess { entry ->
-            val networkState: TorNetworkState = if (entry.value == TorConfig.Option.TorF.False.value) {
-                TorNetworkState.Enabled
-            } else {
-                TorNetworkState.Disabled
-            }
-            stateMachine.updateState(networkState)
-        }
-    }
-
-    private suspend fun Set<TorConfig.Setting<*>>.checkNetworkState(controller: TorController) {
-        if (!this.contains(disableNetwork)) return
-        disableNetwork.checkNetworkState(controller)
     }
 
     override suspend fun setEvents(events: Set<TorEvent>, extended: Boolean): Result<Any?> {
@@ -636,119 +615,129 @@ private class RealTorManager(
         }
     }
 
-    private inner class ControllerListener: TorEvent.SealedListener {
+    private inner class ControllerListener: TorEvent.Listener() {
 
         val waiter: AtomicRef<Waiter?> = atomic(null)
 
-        override fun onEvent(event: TorEvent.Type.SingleLineEvent, output: String) {
-            // TODO: Filter and dispatch TorManager events.
-            if (event is TorEvent.LogMsg.Notice) {
-
-                waiter.value?.let { waiter ->
-                    if (output.startsWith(waiter.noticeStartsWith)) {
-                        waiter.setResponse(output)
-                    }
-                }
-
-                when {
-                    output.startsWith("DisableNetwork is set.") -> {
-                        // Clear AddressInfo
-                        addressInfo.value = TorManagerEvent.AddressInfo()
+        override fun eventConfChanged(output: String) {
+            if (output.startsWith(disableNetwork.keyword)) {
+                when (output.substringAfter('=')) {
+                    TorConfig.Option.TorF.True.value -> {
                         scope.launch {
                             stateMachine.updateState(TorNetworkState.Disabled)
                         }
                     }
-                    output.startsWith("Bootstrapped ") -> {
-                        val percent = output.eventNoticeBootstrapProgressOrNull()
+                    TorConfig.Option.TorF.False.value -> {
+                        scope.launch {
+                            stateMachine.updateState(TorNetworkState.Enabled)
+                        }
+                    }
+                }
+            }
+        }
 
-                        if (percent != null) {
-                            scope.launch {
-                                stateMachine.updateState(TorState.On(percent))
+        override fun eventLogNotice(output: String) {
+            waiter.value?.let { waiter ->
+                if (output.startsWith(waiter.noticeStartsWith)) {
+                    waiter.setResponse(output)
+                }
+            }
+
+            when {
+                output.startsWith("Bootstrapped ") -> {
+                    val percent = output.eventNoticeBootstrapProgressOrNull()
+
+                    if (percent != null) {
+                        scope.launch {
+                            stateMachine.updateState(TorState.On(percent))
+                        }
+                    }
+                }
+                // Closing no-longer-configured DNS listener on 127.0.0.1:53085
+                // Closing no-longer-configured HTTP tunnel listener on 127.0.0.1:48932
+                // Closing no-longer-configured Socks listener on 127.0.0.1:9150
+                // Closing no-longer-configured Transparent pf/netfilter listener on 127.0.0.1:45963
+                output.startsWith("Closing no-longer-configured ") &&
+                        output.contains(" listener on ")                                -> {
+
+                    val splits = output.split(' ')
+                    val address = splits.lastOrNull()?.trim()
+
+                    if (address != null) {
+                        val info = addressInfo.value
+                        when (splits.elementAtOrNull(2)?.lowercase()) {
+                            "dns" -> {
+                                info.dnsClosed(address)?.let { newInfo ->
+                                    addressInfo.value = newInfo
+                                    dispatchNewAddressInfo(newInfo)
+                                }
+                            }
+                            "http" -> {
+                                info.httpClosed(address)?.let { newInfo ->
+                                    addressInfo.value = newInfo
+                                    dispatchNewAddressInfo(newInfo)
+                                }
+                            }
+                            "socks" -> {
+                                info.socksClosed(address)?.let { newInfo ->
+                                    addressInfo.value = newInfo
+                                    dispatchNewAddressInfo(newInfo)
+                                }
+                            }
+                            "transparent" -> {
+                                info.transClosed(address)?.let { newInfo ->
+                                    addressInfo.value = newInfo
+                                    dispatchNewAddressInfo(newInfo)
+                                }
                             }
                         }
                     }
-                    // Closing no-longer-configured DNS listener on 127.0.0.1:53085
-                    // Closing no-longer-configured HTTP tunnel listener on 127.0.0.1:48932
-                    // Closing no-longer-configured Socks listener on 127.0.0.1:9150
-                    // Closing no-longer-configured Transparent pf/netfilter listener on 127.0.0.1:45963
-                    output.startsWith("Closing no-longer-configured ") &&
-                    output.contains(" listener on ")                                -> {
+                }
+                // Opened DNS listener connection (ready) on 127.0.0.1:58391
+                // Opened HTTP tunnel listener connection (ready) on 127.0.0.1:48601
+                // Opened Socks listener connection (ready) on 127.0.0.1:9050
+                // Opened Transparent pf/netfilter listener connection (ready) on 127.0.0.1:48494
+                output.startsWith("Opened ") &&
+                        output.contains(" listener connection ")                        -> {
 
-                        val splits = output.split(' ')
-                        val address = splits.lastOrNull()?.trim()
+                    val splits = output.split(' ')
+                    val address = splits.lastOrNull()?.trim()
 
-                        if (address != null) {
-                            val info = addressInfo.value
-                            when (splits.elementAtOrNull(2)?.lowercase()) {
-                                "dns" -> {
-                                    info.dnsClosed(address)?.let { newInfo ->
-                                        addressInfo.value = newInfo
-                                        dispatchNewAddressInfo(newInfo)
-                                    }
-                                }
-                                "http" -> {
-                                    info.httpClosed(address)?.let { newInfo ->
-                                        addressInfo.value = newInfo
-                                        dispatchNewAddressInfo(newInfo)
-                                    }
-                                }
-                                "socks" -> {
-                                    info.socksClosed(address)?.let { newInfo ->
-                                        addressInfo.value = newInfo
-                                        dispatchNewAddressInfo(newInfo)
-                                    }
-                                }
-                                "transparent" -> {
-                                    info.transClosed(address)?.let { newInfo ->
-                                        addressInfo.value = newInfo
-                                        dispatchNewAddressInfo(newInfo)
-                                    }
+                    if (address != null) {
+                        val info = addressInfo.value
+                        when (splits.elementAtOrNull(1)?.lowercase()) {
+                            "dns" -> {
+                                info.dnsOpened(address)?.let { newInfo ->
+                                    addressInfo.value = newInfo
+                                    dispatchNewAddressInfo(newInfo)
                                 }
                             }
-                        }
-                    }
-                    // Opened DNS listener connection (ready) on 127.0.0.1:58391
-                    // Opened HTTP tunnel listener connection (ready) on 127.0.0.1:48601
-                    // Opened Socks listener connection (ready) on 127.0.0.1:9050
-                    // Opened Transparent pf/netfilter listener connection (ready) on 127.0.0.1:48494
-                    output.startsWith("Opened ") &&
-                    output.contains(" listener connection ")                        -> {
-
-                        val splits = output.split(' ')
-                        val address = splits.lastOrNull()?.trim()
-
-                        if (address != null) {
-                            val info = addressInfo.value
-                            when (splits.elementAtOrNull(1)?.lowercase()) {
-                                "dns" -> {
-                                    info.dnsOpened(address)?.let { newInfo ->
-                                        addressInfo.value = newInfo
-                                        dispatchNewAddressInfo(newInfo)
-                                    }
+                            "http" -> {
+                                info.httpOpened(address)?.let { newInfo ->
+                                    addressInfo.value = newInfo
+                                    dispatchNewAddressInfo(newInfo)
                                 }
-                                "http" -> {
-                                    info.httpOpened(address)?.let { newInfo ->
-                                        addressInfo.value = newInfo
-                                        dispatchNewAddressInfo(newInfo)
-                                    }
+                            }
+                            "socks" -> {
+                                info.socksOpened(address)?.let { newInfo ->
+                                    addressInfo.value = newInfo
+                                    dispatchNewAddressInfo(newInfo)
                                 }
-                                "socks" -> {
-                                    info.socksOpened(address)?.let { newInfo ->
-                                        addressInfo.value = newInfo
-                                        dispatchNewAddressInfo(newInfo)
-                                    }
-                                }
-                                "transparent" -> {
-                                    info.transOpened(address)?.let { newInfo ->
-                                        addressInfo.value = newInfo
-                                        dispatchNewAddressInfo(newInfo)
-                                    }
+                            }
+                            "transparent" -> {
+                                info.transOpened(address)?.let { newInfo ->
+                                    addressInfo.value = newInfo
+                                    dispatchNewAddressInfo(newInfo)
                                 }
                             }
                         }
                     }
                 }
             }
+        }
+
+        override fun onEvent(event: TorEvent.Type.SingleLineEvent, output: String) {
+            super.onEvent(event, output)
 
             scope.launch {
                 listeners.notify(event, output)
