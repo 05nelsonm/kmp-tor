@@ -248,7 +248,11 @@ class SampleApp: App(SampleView::class) {
         }
 
         override fun onEvent(event: TorEvent.Type.MultiLineEvent, output: List<String>) {
-            addLine("event=${event.javaClass.simpleName}\noutput=${output.joinToString("\n")}")
+            addLine("-------------- multi-line event start: ${event.javaClass.simpleName} --------------")
+            for (line in output) {
+                addLine(line)
+            }
+            addLine("--------------- multi-line event end: ${event.javaClass.simpleName} ---------------")
         }
     }
 

@@ -30,13 +30,13 @@ class MainActivity: AppCompatActivity(R.layout.activity_main) {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding.buttonStart.setOnClickListener {
-            app.manager.startQuietly()
+            app.torOperationManager.startQuietly()
         }
         binding.buttonRestart.setOnClickListener {
-            app.manager.restartQuietly()
+            app.torOperationManager.restartQuietly()
         }
         binding.buttonStop.setOnClickListener {
-            app.manager.stopQuietly()
+            app.torOperationManager.stopQuietly()
         }
         app.events.observe(this) {
             binding.textViewEvents.text = it
