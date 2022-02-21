@@ -1,5 +1,12 @@
 # CHANGELOG
 
+## Version 0.4.6.10+0.1.0-alpha4 (2022-02-20)
+ - Bumps Tor to version 0.4.6.10
+ - Fixes geoip6 file extraction when newer geoip/geoip6 files are available
+ - Adds support for `OwningControllerProcess`
+ - Adds `TorController.disconnect` method as an additional assurance to shutdown Tor
+ - Cleans up internal functionality
+
 ## Version 0.4.6.9+0.1.0-alpha3 (2022-02-15)
  - Adds reading of Tor Process error/input stream and pipes output to listeners
  - Fixes Jvm loader for Windows and Macos by excluding Transparent Proxy Port if present

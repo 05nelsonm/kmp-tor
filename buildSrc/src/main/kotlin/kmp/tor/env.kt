@@ -18,7 +18,7 @@ package kmp.tor
 @Suppress("ClassName")
 object env {
     // Must be either "-SNAPSHOT" || ""
-    private const val SNAPSHOT              = "-SNAPSHOT"
+    private const val SNAPSHOT              = ""
 
     private const val MANAGER_VERSION_NAME  = "0.1.0-alpha4"
     //                           1.0.0-alpha1  == 01_00_00_11
@@ -31,15 +31,16 @@ object env {
     //                           1.15.1        == 01_15_01_99
     private const val MANAGER_VERSION_CODE  = /*00_0*/1_00_14
 
-    private const val BINARY_VERSION_NAME   = "0.4.6.9"
+    private const val BINARY_VERSION_NAME   = "0.4.6.10"
     //                          0.4.6.9        == 00_04_06_09_00
     //                          0.4.6.9a       == 00_04_06_09_01
     //                          0.4.6.9b       == 00_04_06_09_02
-    private const val BINARY_VERSION_CODE   = /*00_0*/4_06_09_00
+    private const val BINARY_VERSION_CODE   = /*00_0*/4_06_10_00
 
     /**
      * Binaries exist in a different repo. Building against the staged
-     * release is needed in order to run integration tests before publication.
+     * release is needed in order to run integration tests before publishing
+     * them to ensure everything is copacetic.
      * */
     object kmpTorBinaries {
         const val pollStagingRepo           = false
