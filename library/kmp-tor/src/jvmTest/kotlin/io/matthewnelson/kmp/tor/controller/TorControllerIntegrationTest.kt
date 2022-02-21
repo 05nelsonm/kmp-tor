@@ -21,7 +21,9 @@ import io.matthewnelson.kmp.tor.common.clientauth.OnionClientAuthPrivateKey_B32_
 import io.matthewnelson.kmp.tor.controller.common.config.TorConfig
 import io.matthewnelson.kmp.tor.controller.common.control.TorControlOnionClientAuth
 import io.matthewnelson.kmp.tor.controller.common.control.usecase.TorControlInfoGet.KeyWord
+import io.matthewnelson.kmp.tor.controller.common.events.TorEvent
 import io.matthewnelson.kmp.tor.helper.TorTestHelper
+import io.matthewnelson.kmp.tor.manager.common.event.TorManagerEvent
 import kotlinx.coroutines.runBlocking
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -100,7 +102,7 @@ class TorControllerIntegrationTest: TorTestHelper() {
         // get DisableNetwork to an enabled state (DisableNetwork false, ie. enabled)
         val _false = TorConfig.Option.TorF.False
         val disableNetwork = TorConfig.Setting.DisableNetwork().set(_false) // enable it
-
+        var throwable: Throwable? = null
         try {
             manager.configSet(disableNetwork).onFailure { ex ->
                 fail(ex.stackTraceToString())
@@ -130,9 +132,63 @@ class TorControllerIntegrationTest: TorTestHelper() {
             result2.onSuccess { entry ->
                 assertEquals(_true.value, entry.value)
             }
+        } catch (t: Throwable) {
+            throwable = t
         } finally {
             // re-enable it
             manager.configSet(disableNetwork.set(_false))
+
+            if (throwable != null) {
+                throw throwable
+            }
+        }
+
+        Unit
+    }
+
+    @Test
+    fun givenEventConfChangedSet_whenConfigSettingsModified_eventsAreParsedCorrectly() = runBlocking {
+        manager.setEvents(setOf(TorEvent.ConfChanged)).onFailure { ex ->
+            fail(ex.stackTraceToString())
+        }
+
+        val changes: MutableList<String> = mutableListOf()
+        val listener = object : TorManagerEvent.Listener() {
+            override fun eventConfChanged(output: String) {
+                changes.add(output)
+            }
+        }
+
+        manager.addListener(listener)
+        val dormancy = TorConfig.Setting.DormantTimeoutDisabledByIdleStreams()
+        val padding = TorConfig.Setting.ConnectionPadding()
+        var throwable: Throwable? = null
+        try {
+            manager.configSet(setOf(dormancy, padding)).onFailure { ex ->
+                fail(ex.stackTraceToString())
+            }
+
+            assertEquals(0, changes.size)
+
+            dormancy.set(TorConfig.Option.TorF.False)
+            padding.set(TorConfig.Option.AorTorF.False)
+
+            manager.configSet(setOf(dormancy, padding)).onFailure { ex ->
+                fail(ex.stackTraceToString())
+            }
+
+            assertEquals(2, changes.size)
+        } catch (t: Throwable) {
+            throwable = t
+        } finally {
+
+            manager.configReset(setOf(dormancy, padding))
+            manager.setEvents(setOf())
+            manager.removeListener(listener)
+
+            if (throwable != null) {
+                throw throwable
+            }
         }
 
         Unit
