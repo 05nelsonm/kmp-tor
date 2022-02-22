@@ -254,8 +254,11 @@ private class RealTorController(
             }
         }
 
+        @Throws(TorControllerException::class)
         private fun notifyListeners(replies: List<ReplyLine>) {
             if (listeners.isEmpty) return
+
+            var isConfChanged = false
 
             for (reply in replies) {
                 when (reply) {
@@ -265,10 +268,33 @@ private class RealTorController(
                             continue
                         }
 
+                        if (isConfChanged) {
+                            listeners.notify(TorEvent.ConfChanged, reply.message)
+                            continue
+                        }
+
                         // separate event from remainder message
                         val index = reply.message.indexOf(' ')
-                        val eventString = reply.message.substring(0, index).uppercase()
-                        val message = reply.message.substring(index + 1)
+
+                        val (eventString, message) = try {
+                            Pair(
+                                reply.message.substring(0, index).uppercase(),
+                                reply.message.substring(index + 1)
+                            )
+                        } catch (e: IndexOutOfBoundsException) {
+
+                            if (reply.message == TorEvent.ConfChanged.value) {
+                                isConfChanged = true
+                                continue
+                            }
+
+                            throw TorControllerException(
+                                "Failed to parse reply." +
+                                "\nReply being parsed: $reply" +
+                                "\nAll replies: $replies",
+                                e
+                            )
+                        }
 
                         for (event in TorEvent.SINGLE_LINE_EVENTS) {
                             if (event.compareTo(eventString)) {

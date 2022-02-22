@@ -35,9 +35,12 @@ import io.matthewnelson.kmp.tor.sample.javafx.ui.SampleView
 import io.matthewnelson.kmp.tor.sample.javafx.util.Log
 import javafx.application.Platform
 import javafx.stage.Stage
+import kotlinx.coroutines.DelicateCoroutinesApi
+import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
 import tornadofx.*
 
 class SampleApp: App(SampleView::class) {
@@ -248,7 +251,18 @@ class SampleApp: App(SampleView::class) {
         }
 
         override fun onEvent(event: TorEvent.Type.MultiLineEvent, output: List<String>) {
-            addLine("event=${event.javaClass.simpleName}\noutput=${output.joinToString("\n")}")
+            addLine("multi-line event: ${event.javaClass.simpleName}. See Logs.")
+
+            // these events are many many many lines and should be moved
+            // off the main thread if ever needed to be dealt with.
+            @OptIn(DelicateCoroutinesApi::class)
+            GlobalScope.launch {
+                Log.d("SampleListener", "-------------- multi-line event START: ${event.javaClass.simpleName} --------------")
+                for (line in output) {
+                    Log.d("SampleListener", line)
+                }
+                Log.d("SampleListener", "--------------- multi-line event END: ${event.javaClass.simpleName} ---------------")
+            }
         }
     }
 

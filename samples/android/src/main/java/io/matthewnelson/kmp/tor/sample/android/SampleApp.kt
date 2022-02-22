@@ -28,14 +28,19 @@ import io.matthewnelson.kmp.tor.controller.common.config.TorConfig.Option.*
 import io.matthewnelson.kmp.tor.controller.common.events.TorEvent
 import io.matthewnelson.kmp.tor.manager.TorManager
 import io.matthewnelson.kmp.tor.manager.TorServiceConfig
+import io.matthewnelson.kmp.tor.manager.common.TorControlManager
+import io.matthewnelson.kmp.tor.manager.common.TorOperationManager
 import io.matthewnelson.kmp.tor.manager.common.event.TorManagerEvent
 import io.matthewnelson.kmp.tor.manager.common.state.TorNetworkState
 import io.matthewnelson.kmp.tor.manager.common.state.TorState
+import kotlinx.coroutines.DelicateCoroutinesApi
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import kotlin.collections.ArrayList
 
 class SampleApp: Application() {
 
-    val manager: TorManager by lazy {
+    private val manager: TorManager by lazy {
         val configProvider = object : TorConfigProviderAndroid(context = this@SampleApp) {
             override fun provide(): TorConfig {
                 return TorConfig.Builder {
@@ -104,8 +109,12 @@ class SampleApp: Application() {
 
         val loader = KmpTorLoaderAndroid(provider = configProvider)
 
-        TorManager.newInstance(application = this, loader = loader)
+        TorManager.newInstance(application = this, loader = loader, requiredEvents = null)
     }
+
+    // only expose necessary interfaces
+    val torOperationManager: TorOperationManager get() = manager
+    val torControlManager: TorControlManager get() = manager
 
     private val listener = SampleListener()
     val events: LiveData<String> get() = listener.eventLines
@@ -171,7 +180,18 @@ class SampleApp: Application() {
         }
 
         override fun onEvent(event: TorEvent.Type.MultiLineEvent, output: List<String>) {
-            addLine("event=${event.javaClass.simpleName}\noutput=${output.joinToString("\n")}")
+            addLine("multi-line event: ${event.javaClass.simpleName}. See Logs.")
+
+            // these events are many many many lines and should be moved
+            // off the main thread if ever needed to be dealt with.
+            @OptIn(DelicateCoroutinesApi::class)
+            GlobalScope.launch {
+                Log.d("SampleListener", "-------------- multi-line event START: ${event.javaClass.simpleName} --------------")
+                for (line in output) {
+                    Log.d("SampleListener", line)
+                }
+                Log.d("SampleListener", "--------------- multi-line event END: ${event.javaClass.simpleName} ---------------")
+            }
         }
     }
 
