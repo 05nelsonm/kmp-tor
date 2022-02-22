@@ -33,6 +33,9 @@ import io.matthewnelson.kmp.tor.manager.common.TorOperationManager
 import io.matthewnelson.kmp.tor.manager.common.event.TorManagerEvent
 import io.matthewnelson.kmp.tor.manager.common.state.TorNetworkState
 import io.matthewnelson.kmp.tor.manager.common.state.TorState
+import kotlinx.coroutines.DelicateCoroutinesApi
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import kotlin.collections.ArrayList
 
 class SampleApp: Application() {
@@ -177,11 +180,18 @@ class SampleApp: Application() {
         }
 
         override fun onEvent(event: TorEvent.Type.MultiLineEvent, output: List<String>) {
-            addLine("-------------- multi-line event START: ${event.javaClass.simpleName} --------------")
-            for (line in output) {
-                addLine(line)
+            addLine("multi-line event: ${event.javaClass.simpleName}. See Logs.")
+
+            // these events are many many many lines and should be moved
+            // off the main thread if ever needed to be dealt with.
+            @OptIn(DelicateCoroutinesApi::class)
+            GlobalScope.launch {
+                Log.d("SampleListener", "-------------- multi-line event START: ${event.javaClass.simpleName} --------------")
+                for (line in output) {
+                    Log.d("SampleListener", line)
+                }
+                Log.d("SampleListener", "--------------- multi-line event END: ${event.javaClass.simpleName} ---------------")
             }
-            addLine("--------------- multi-line event END: ${event.javaClass.simpleName} ---------------")
         }
     }
 
