@@ -17,7 +17,6 @@ package io.matthewnelson.kmp.tor.common.address
 
 import kotlin.jvm.JvmOverloads
 import kotlin.jvm.JvmStatic
-import kotlin.jvm.JvmSynthetic
 
 enum class Scheme {
     HTTP,
@@ -53,19 +52,4 @@ enum class Scheme {
             }
         }
     }
-}
-
-@Suppress("nothing_to_inline")
-@JvmSynthetic
-internal inline fun String.separateSchemeFromAddress(): Pair<Scheme?, String> {
-    val trimmed = this.trim()
-    val scheme: Scheme? = Scheme.fromString(trimmed, trim = false)
-    return Pair(
-        scheme,
-        if (scheme != null) {
-            trimmed.substring(scheme.toString().length)
-        } else {
-            trimmed
-        }
-    )
 }

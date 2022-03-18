@@ -15,6 +15,7 @@
  **/
 package io.matthewnelson.kmp.tor.common.address
 
+import io.matthewnelson.kmp.tor.common.util.separateSchemeFromAddress
 import kotlin.jvm.JvmInline
 import kotlin.jvm.JvmStatic
 
