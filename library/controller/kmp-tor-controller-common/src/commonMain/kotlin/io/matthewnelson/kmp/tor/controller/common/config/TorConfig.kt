@@ -24,6 +24,7 @@ import io.matthewnelson.kmp.tor.controller.common.config.TorConfig.Option.TorF.F
 import io.matthewnelson.kmp.tor.controller.common.config.TorConfig.Option.TorF.True
 import io.matthewnelson.kmp.tor.controller.common.file.Path
 import kotlin.jvm.JvmInline
+import kotlin.jvm.JvmOverloads
 import kotlin.jvm.JvmSynthetic
 import kotlin.reflect.KClass
 
@@ -225,6 +226,43 @@ class TorConfig private constructor(
                             }
                         }
                     }
+                } else if (setting is Setting.HiddenService) {
+                    val hsDir = setting.value ?: continue
+                    val hsPorts = setting.ports
+
+                    if (hsPorts == null || hsPorts.isEmpty()) {
+                        continue
+                    }
+
+                    sb.append(setting.keyword)
+                    sb.append(SP)
+                    sb.append(hsDir.value)
+
+                    for (hsPort in hsPorts) {
+                        sb.appendLine()
+                        sb.append("HiddenServicePort")
+                        sb.append(SP)
+                        sb.append(hsPort.virtualPort)
+                        sb.append(SP)
+                        sb.append("127.0.0.1")
+                        sb.append(':')
+                        sb.append(hsPort.targetPort)
+                    }
+
+                    setting.maxStreams?.let { maxStreams ->
+                        sb.appendLine()
+                        sb.append("HiddenServiceMaxStreams")
+                        sb.append(SP)
+                        sb.append(maxStreams.value)
+                    }
+
+                    setting.maxStreamsCloseCircuit?.let { closeCircuit ->
+                        sb.appendLine()
+                        sb.append("HiddenServiceMaxStreamsCloseCircuit")
+                        sb.append(SP)
+                        sb.append(closeCircuit.value)
+                    }
+
                 } else {
                     sb.append(setting.keyword)
                     sb.append(SP)
@@ -232,7 +270,7 @@ class TorConfig private constructor(
                 }
 
                 newSettings.add(setting.setImmutable())
-                sb.append('\n')
+                sb.appendLine()
             }
 
             return TorConfig(newSettings.toSet(), sb.toString())
@@ -250,7 +288,7 @@ class TorConfig private constructor(
      *
      * Ex:
      *
-     * val socksPort: Setting.Ports.Socks = Setting.Ports.Socks()
+     * val socksPort = Setting.Ports.Socks()
      *     .setFlags(flags = setOf(
      *         Setting.Ports.Socks.Flag.OnionTrafficOnly
      *     ))
@@ -542,8 +580,124 @@ class TorConfig private constructor(
             }
         }
 
-        // TODO: Logs.Debug && Logs.Info
-        // TODO: Nodes.Entry, Nodes.Exclude, Nodes.Exit, Nodes.Strict
+        /**
+         * val myHiddenService = Setting.HiddenService()
+         *     .setPorts(ports = setOf(
+         *         Setting.HiddenService.Ports(virtualPort = 22, targetPort = 22)
+         *         Setting.HiddenService.Ports(virtualPort = 8022, targetPort = 22)
+         *     ))
+         *     .setMaxStreams(maxStreams = Setting.HiddenService.MaxStreams(2))
+         *     .setMaxStreamsCloseCircuit(value = TorF.False)
+         *     .set(FileSystemDir(
+         *         workDir.builder {
+         *             addSegment(HiddenService.DEFAULT_PARENT_DIR_NAME)
+         *             addSegment("my_hidden_service")
+         *         }
+         *     ))
+         *
+         * Note that both `set` and `setPorts` _must_ be set for it to be added
+         * to your config.
+         *
+         * https://2019.www.torproject.org/docs/tor-manual.html.en#HiddenServiceDir
+         * https://2019.www.torproject.org/docs/tor-manual.html.en#HiddenServicePort
+         * https://2019.www.torproject.org/docs/tor-manual.html.en#HiddenServiceMaxStreams
+         * https://2019.www.torproject.org/docs/tor-manual.html.en#HiddenServiceMaxStreamsCloseCircuit
+         * */
+        class HiddenService                 : Setting<Option.FileSystemDir?>("HiddenServiceDir") {
+            override val default: Option.FileSystemDir? = null
+            override var value: Option.FileSystemDir? = default
+                set(value) { field = value?.nullIfEmpty }
+
+            var ports: Set<HiddenService.Ports>? = null
+                private set
+
+            var maxStreams: MaxStreams? = null
+                private set
+
+            var maxStreamsCloseCircuit: Option.TorF? = null
+                private set
+
+            fun setPorts(ports: Set<Ports>?): HiddenService {
+                if (isMutable) {
+                    this.ports = ports
+                }
+                return this
+            }
+
+            fun setMaxStreams(maxStreams: MaxStreams?): HiddenService {
+                if (isMutable) {
+                    this.maxStreams = maxStreams
+                }
+                return this
+            }
+
+            fun setMaxStreamsCloseCircuit(value: Option.TorF?): HiddenService {
+                if (isMutable) {
+                    maxStreamsCloseCircuit = value
+                }
+                return this
+            }
+
+            override fun setDefault(): HiddenService {
+                if (isMutable) {
+                    value = default
+                    ports = null
+                    maxStreams = null
+                    maxStreamsCloseCircuit = null
+                }
+                return this
+            }
+
+            override fun clone(): HiddenService {
+                return HiddenService()
+                    .setPorts(ports)
+                    .setMaxStreams(maxStreams)
+                    .setMaxStreamsCloseCircuit(maxStreamsCloseCircuit)
+                    .set(value) as HiddenService
+            }
+
+            override fun equals(other: Any?): Boolean {
+                return  other is HiddenService && other.value == value
+            }
+
+            override fun hashCode(): Int {
+                return 14 * 31 + value.hashCode()
+            }
+
+            /**
+             * By default, [virtualPort] is always mapped to 127.0.0.1:[targetPort]. This
+             * can be overridden by expressing a different value for [targetPort].
+             *
+             * https://2019.www.torproject.org/docs/tor-manual.html.en#HiddenServicePort
+             * */
+            data class Ports @JvmOverloads constructor(
+                val virtualPort: Int,
+                val targetPort: Int = virtualPort
+            ) {
+
+                init {
+                    require(virtualPort in 1..65535) {
+                        "HSPorts.virtualPort must be between 1 and 65535"
+                    }
+                    require(targetPort in 1..65535) {
+                        "HSPorts.targetPort must be between 1 and 65535"
+                    }
+                }
+            }
+
+            @JvmInline
+            value class MaxStreams(val value: Int) {
+                init {
+                    require(value in 0..65535) {
+                        "MaxStreams.value must be between 0 and 65535"
+                    }
+                }
+            }
+
+            companion object {
+                const val DEFAULT_PARENT_DIR_NAME = "hidden_services"
+            }
+        }
 
         /**
          * https://torproject.gitlab.io/torspec/control-spec/#takeownership
@@ -852,12 +1006,12 @@ class TorConfig private constructor(
         /**
          * Either [True] or [False]
          * */
-        sealed interface TorF                               : AorTorF {
-            object True                                         : TorF {
+        sealed interface TorF                                           : AorTorF {
+            object True                                                     : TorF {
                 override val value: String = "1"
                 override fun toString(): String = value
             }
-            object False                                        : TorF {
+            object False                                                    : TorF {
                 override val value: String = "0"
                 override fun toString(): String = value
             }
@@ -866,8 +1020,8 @@ class TorConfig private constructor(
         /**
          * Either [Auto], [True], or [False]
          * */
-        sealed interface AorTorF                            : Option {
-            object Auto                                         : AorTorF {
+        sealed interface AorTorF                                        : Option {
+            object Auto                                                     : AorTorF {
                 override val value: String = "auto"
                 override fun toString(): String = value
             }
@@ -884,55 +1038,55 @@ class TorConfig private constructor(
         /**
          * Either [Auto], [Disable], or [Value] containing a [Port]
          * */
-        sealed interface AorDorPort                         : Option {
-            object Auto                                         : AorDorPort {
+        sealed interface AorDorPort                                     : Option {
+            object Auto                                                     : AorDorPort {
                 override val value: String get() = AorTorF.Auto.value
                 override fun toString(): String = value
             }
 
-            object Disable                                      : AorDorPort {
+            object Disable                                                  : AorDorPort {
                 override val value: String get() = TorF.False.value
                 override fun toString(): String = value
             }
 
             @JvmInline
-            value class Value(val port: Port)                   : AorDorPort {
+            value class Value(val port: Port)                               : AorDorPort {
                 override val value: String get() = port.value.toString()
                 override fun toString(): String = value
             }
         }
 
         @JvmInline
-        value class FileSystemFile(val path: Path)          : Option {
+        value class FileSystemFile(val path: Path)                      : Option {
             override val value: String get() = path.value
             val nullIfEmpty: FileSystemFile? get() = if (value.isEmpty()) null else this
             override fun toString(): String = value
         }
 
         @JvmInline
-        value class FileSystemDir(val path: Path)          : Option {
+        value class FileSystemDir(val path: Path)                       : Option {
             override val value: String get() = path.value
             val nullIfEmpty: FileSystemDir? get() = if (value.isEmpty()) null else this
             override fun toString(): String = value
         }
 
         @JvmInline
-        value class FieldId(override val value: String)     : Option {
+        value class FieldId(override val value: String)                 : Option {
             val nullIfEmpty: FieldId? get() = if(value.isEmpty()) null else this
             override fun toString(): String = value
         }
 
         @JvmInline
-        value class ProcessId(val pid: Int)                 : Option {
+        value class ProcessId(val pid: Int)                             : Option {
             override val value: String get() = "$pid"
             override fun toString(): String = value
         }
 
-        sealed interface Time                               : Option {
+        sealed interface Time                                           : Option {
             val time: Int
 
             @JvmInline
-            value class Minutes(override val time: Int)         : Time {
+            value class Minutes(override val time: Int)                     : Time {
                 override val value: String get() = if (time < 1) {
                     "1 minutes"
                 } else {
@@ -943,7 +1097,7 @@ class TorConfig private constructor(
             }
 
             @JvmInline
-            value class Hours(override val time: Int)           : Time {
+            value class Hours(override val time: Int)                       : Time {
                 override val value: String get() = if (time < 1) {
                     "1 hours"
                 } else {
@@ -954,7 +1108,7 @@ class TorConfig private constructor(
             }
 
             @JvmInline
-            value class Days(override val time: Int)            : Time {
+            value class Days(override val time: Int)                        : Time {
                 override val value: String get() = if (time < 1) {
                     "1 days"
                 } else {
@@ -965,7 +1119,7 @@ class TorConfig private constructor(
             }
 
             @JvmInline
-            value class Weeks(override val time: Int)           : Time {
+            value class Weeks(override val time: Int)                       : Time {
                 override val value: String get() = if (time < 1) {
                     "1 weeks"
                 } else {

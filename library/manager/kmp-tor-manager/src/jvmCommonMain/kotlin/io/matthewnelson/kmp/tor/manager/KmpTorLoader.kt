@@ -21,6 +21,7 @@ import io.matthewnelson.kmp.tor.controller.TorController
 import io.matthewnelson.kmp.tor.controller.common.config.TorConfig
 import io.matthewnelson.kmp.tor.controller.common.control.usecase.TorControlInfoGet
 import io.matthewnelson.kmp.tor.controller.common.control.usecase.TorControlSignal
+import io.matthewnelson.kmp.tor.controller.common.file.Path
 import io.matthewnelson.kmp.tor.controller.common.file.toFile
 import io.matthewnelson.kmp.tor.manager.common.event.TorManagerEvent
 import io.matthewnelson.kmp.tor.manager.common.exceptions.InterruptedException
@@ -179,7 +180,8 @@ actual abstract class KmpTorLoader @JvmOverloads constructor(
                     continue
                 }
 
-                val dir = option.nullIfEmpty?.path?.toFile() ?: continue
+                val dirPath = option.nullIfEmpty?.path ?: continue
+                val dir = dirPath.toFile()
                 if (!dir.exists()) {
                     if (!dir.mkdirs()) {
                         return@withContext TorManagerException("Failed to create directory $dir")
@@ -187,6 +189,14 @@ actual abstract class KmpTorLoader @JvmOverloads constructor(
                 } else if (dir.isFile) {
                     if (!dir.delete() && !dir.mkdirs()) {
                         return@withContext TorManagerException("Failed to create directory $dir")
+                    }
+                }
+
+                if (setting is TorConfig.Setting.HiddenService) {
+                    try {
+                        setHiddenServiceDirPermissions(dirPath)
+                    } catch (e: TorManagerException) {
+                        return@withContext e
                     }
                 }
             }
@@ -439,4 +449,10 @@ actual abstract class KmpTorLoader @JvmOverloads constructor(
         configLines: List<String>,
         notify: (TorManagerEvent.Log) -> Unit,
     )
+
+    /**
+     * Not necessary for Android, only Linux && Darwin platforms.
+     * */
+    @Throws(TorManagerException::class)
+    protected actual open fun setHiddenServiceDirPermissions(dir: Path) {}
 }
