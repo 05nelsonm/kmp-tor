@@ -194,23 +194,3 @@ class OnionClientAuth private constructor() {
 //        }
 //    }
 }
-
-@JvmSynthetic
-@Suppress("nothing_to_inline")
-internal inline fun OnionClientAuth.PrivateKey.descriptorString(address: OnionAddressV3): String =
-    StringBuilder(address.value)
-        .append(':')
-        .append(keyType)
-        .append(':')
-        .append(value)
-        .toString()
-
-@JvmSynthetic
-@Suppress("nothing_to_inline")
-internal inline fun OnionClientAuth.PublicKey.descriptorString(): String =
-    StringBuilder(OnionClientAuth.PublicKey.DESCRIPTOR)
-        .append(':')
-        .append(keyType)
-        .append(':')
-        .append(value)
-        .toString()
