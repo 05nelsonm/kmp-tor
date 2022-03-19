@@ -617,16 +617,9 @@ private class RealTorControlProcessor(
         }
     }
 
-    override suspend fun onionClientAuthView(address: OnionAddressV3): Result<ClientAuthEntry> {
+    override suspend fun onionClientAuthView(address: OnionAddressV3): Result<List<ClientAuthEntry>> {
         return try {
-            val list = onionClientAuthView(address.value)
-            for (entry in list) {
-                if (entry.address == address.value) {
-                    return Result.success(entry)
-                }
-            }
-
-            throw TorControllerException("Failed to retrieve a ClientAuthEntry for $address")
+            Result.success(onionClientAuthView(address.value))
         } catch (e: Exception) {
             Result.failure(e)
         }
@@ -649,6 +642,12 @@ private class RealTorControlProcessor(
                     if (reply.message.startsWith("CLIENT ")) {
                         val splits = reply.message.split(' ')
 
+                        val addressString = splits[1]
+
+                        if (address != null && addressString != address) {
+                            return@mapNotNull null
+                        }
+
                         // positioning of Flags & ClientName can be either or, so we have to check for both
                         var clientName: String? = null
                         var flags: List<String>? = null
@@ -667,7 +666,7 @@ private class RealTorControlProcessor(
                         }
 
                         ClientAuthEntry(
-                            address = splits[1],
+                            address = addressString,
                             keyType = splits[2].substringBefore(':'),
                             privateKey = splits[2].substringAfter(':'),
                             clientName = clientName,
