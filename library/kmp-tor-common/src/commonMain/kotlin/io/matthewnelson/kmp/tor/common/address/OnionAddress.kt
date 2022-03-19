@@ -87,21 +87,20 @@ sealed interface OnionAddress {
 
             override fun toString(): String {
                 return when(this) {
-                    is ED25519_V3 -> _ED25519_V3_ACTUAL
+                    is ED25519_V3 -> ED25519_V3_ACTUAL
                 }
             }
 
-            @Suppress("ObjectPropertyName")
             companion object {
-                private const val _ED25519_V3_ACTUAL = "ED25519-V3"
-                private const val _ED25519_V3_CLASS = "ED25519_V3"
+                private const val ED25519_V3_ACTUAL = "ED25519-V3"
+                private const val ED25519_V3_CLASS = "ED25519_V3"
 
                 @JvmStatic
                 @Throws(IllegalArgumentException::class)
                 fun valueOf(value: String): Type {
                     return when (value) {
-                        _ED25519_V3_ACTUAL,
-                        _ED25519_V3_CLASS -> ED25519_V3
+                        ED25519_V3_ACTUAL,
+                        ED25519_V3_CLASS -> ED25519_V3
                         else -> {
                             throw IllegalArgumentException(
                                 "Failed to determine OnionAddress.PrivateKey.Type from $value"
