@@ -37,7 +37,7 @@ value class OnionAddressV3PrivateKey_ED25519(override val value: String): OnionA
 
     init {
         require(value.matches(REGEX)) {
-            "value=$REDACTED was not an 86 character base64 encoded (w/o padding '=' String"
+            "value=$REDACTED was not an 86 character base64 encoded (w/o padding '=') String"
         }
     }
 
