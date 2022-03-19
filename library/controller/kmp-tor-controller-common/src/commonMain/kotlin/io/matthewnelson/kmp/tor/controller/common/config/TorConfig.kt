@@ -263,6 +263,7 @@ class TorConfig private constructor(
                         sb.append(closeCircuit.value)
                     }
 
+                    sb.appendLine()
                 } else {
                     sb.append(setting.keyword)
                     sb.append(SP)
