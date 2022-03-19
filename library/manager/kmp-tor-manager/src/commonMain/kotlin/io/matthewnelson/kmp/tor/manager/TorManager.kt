@@ -165,7 +165,7 @@ private class RealTorManager(
         networkObserver?.attach { connectivity ->
             when (connectivity) {
                 NetworkObserver.Connectivity.Connected -> {
-                    controller.value?.let { controller ->
+                    controller.value?.first?.let { controller ->
                         networkObserverJob.update { job ->
                             job?.cancel()
                             scope.launch {
@@ -182,7 +182,7 @@ private class RealTorManager(
                     }
                 }
                 NetworkObserver.Connectivity.Disconnected -> {
-                    controller.value?.let { controller ->
+                    controller.value?.first?.let { controller ->
                         networkObserverJob.update { job ->
                             job?.cancel()
                             scope.launch {
@@ -204,18 +204,34 @@ private class RealTorManager(
         loader
     }
     private val actions: ActionProcessor = ActionProcessor.newInstance(useStaticLock = true)
-    private val controller: AtomicRef<TorController?> = atomic(null)
+    private val controller: AtomicRef<Pair<
+        TorController,
+        TorManagerEvent.StartUpCompleteForTorInstance?
+    >?> = atomic(null)
 
     // State should be dispatched immediately. as such, only update state machine
     // from Dispatchers.Main
     private val stateMachine: TorStateMachine = TorStateMachine.newInstance { old, new ->
         notifyListenersNoScope(new)
+
         addressInfo.update { info ->
             info.onStateChange(old, new)?.let { newInfo ->
                 addressInfoJob.value?.cancel()
                 notifyListenersNoScope(newInfo)
                 newInfo
             } ?: info
+        }
+
+        // Bootstrapping completed
+        if (!old.torState.isBootstrapped && new.torState.isBootstrapped && new.isNetworkEnabled) {
+            controller.update { pair ->
+                if (pair == null) return@update null
+                if (pair.second != null) return@update pair
+
+                notifyListenersNoScope(TorManagerEvent.StartUpCompleteForTorInstance)
+
+                Pair(pair.first, TorManagerEvent.StartUpCompleteForTorInstance)
+            }
         }
     }
     override val state: TorState get() = stateMachine.state
@@ -231,7 +247,7 @@ private class RealTorManager(
             networkObserver?.detach()
 
             if (!stopCleanly) {
-                controller.value?.disconnect()
+                controller.value?.first?.disconnect()
                 supervisor.cancel()
                 loader.close()
 
@@ -252,7 +268,7 @@ private class RealTorManager(
                 CoroutineName(name ="${Stop}_${coroutineCounter.getAndIncrement()}")
             ) {
                 actions.withProcessorLock(Stop) {
-                    controller.value?.let { controller ->
+                    controller.value?.first?.let { controller ->
                         realStop(controller, isRestart = false)
                     } ?: Result.success("Tor was already stopped")
                 }
@@ -343,7 +359,7 @@ private class RealTorManager(
                     )
                 }
 
-                controller.value?.let { controller ->
+                controller.value?.first?.let { controller ->
                     realStop(controller, isRestart = true)
 
                     if ((actions as ActionQueue).contains(Stop)) {
@@ -403,7 +419,7 @@ private class RealTorManager(
                     )
                 }
 
-                controller.value?.let {
+                controller.value?.first?.let {
                     realStop(it, false)
                 } ?: run {
                     loader.close()
@@ -557,7 +573,7 @@ private class RealTorManager(
                     )
                 }
 
-                controller.value?.let {
+                controller.value?.first?.let {
                     notifyListenersNoScope(Controller)
                     block.invoke(it as T)
                 } ?: Result.failure(TorNotStartedException("Tor is not started"))
@@ -776,7 +792,7 @@ private class RealTorManager(
     }
 
     private suspend fun realStart(isRestart: Boolean = false): Result<Any?> {
-        if (controller.value?.isConnected == true && state is TorState.On) {
+        if (controller.value?.first?.isConnected == true && state is TorState.On) {
             return Result.success("Tor is already started")
         }
 
@@ -855,7 +871,7 @@ private class RealTorManager(
             notifyListenersNoScope(TorManagerEvent.Log.Warn(WAITING_ON_NETWORK))
         }
 
-        this.controller.value = controller
+        this.controller.value = Pair(controller, null)
         stateMachine.updateState(TorState.On(state.bootstrap))
 
         return Result.success("Tor started successfully")
