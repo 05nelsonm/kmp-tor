@@ -212,7 +212,7 @@ sealed interface TorManagerEvent {
     }
 
     /**
-     * Will be issued a single time for a given Tor instance start operation
+     * Will be dispatched a single time for a given Tor instance start operation
      * after bootstrapping has been completed. This can be relied on to perform
      * one time operations, such as adding hidden services and client auth keys.
      *
