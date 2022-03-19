@@ -54,7 +54,7 @@ internal abstract class TorServiceNotification(
     protected val config: TorServiceConfig,
     protected val serviceScope: CoroutineScope,
     protected val isServiceDestroyed: () -> Boolean,
-): TorManagerEvent.SealedListener {
+): TorManagerEvent.Listener() {
 
     private val actionsEmpty: List<Action> = emptyList()
     private val actionsNewId: List<Action> = listOf(Action.NewIdentity)
@@ -161,188 +161,181 @@ internal abstract class TorServiceNotification(
     protected var netState: TorNetworkState = TorNetworkState.Disabled
         private set
 
-    override fun onEvent(event: TorManagerEvent) {
-        if (!config.enableForeground) return
+    override fun managerEventActionRestart() {
+        render(currentState.copy(
+            contentText = TorManagerEvent.Action.Restart.provideStringFor()
+        ))
+    }
 
-        when (event) {
-            is EventAction.Controller,
-            is AddressInfo,
-            is Log.Debug,
-            is Log.Error,
-            is Log.Info,
-            is Lifecycle<*> -> { /* no-op */ }
+    override fun managerEventActionStart() {
+        render(currentState.copy(
+            contentText = TorManagerEvent.Action.Start.provideStringFor()
+        ))
+    }
 
-            is EventAction.Restart -> {
-                render(currentState.copy(
-                    contentText = event.provideStringFor()
-                ))
-            }
-            is EventAction.Start -> {
-                render(currentState.copy(
-                    contentText = event.provideStringFor()
-                ))
-            }
-            is EventAction.Stop -> {
-                render(currentState.copy(
-                    contentText = event.provideStringFor()
-                ))
-            }
-            is Log.Warn -> {
-                if (event.value == WAITING_ON_NETWORK) {
-                    render(currentState.copy(contentText = provideStringForWaitingOnNetwork()))
+    override fun managerEventActionStop() {
+        render(currentState.copy(
+            contentText = TorManagerEvent.Action.Stop.provideStringFor()
+        ))
+    }
+
+    override fun managerEventWarn(message: String) {
+        if (message == WAITING_ON_NETWORK) {
+            render(currentState.copy(contentText = provideStringForWaitingOnNetwork()))
+        }
+    }
+
+    override fun managerEventState(state: State) {
+        val old = this.state
+//        val oldNet = netState
+        val new = state.torState
+        val newNet = state.networkState
+
+        if (old.isOn() && !new.isOn()) {
+            // update current state immediately so
+            // bandwidth updates cease
+            this.state = new
+        }
+
+        val color = if (new.isBootstrapped && newNet.isEnabled()) {
+            config._colorWhenBootstrappedTrue
+        } else {
+            config._colorWhenBootstrappedFalse
+        }
+
+        val progress = if(new.isOn()) {
+
+            when {
+                !old.isBootstrapped && new.isBootstrapped -> {
+                    render(currentState.copy(
+                        color = color,
+                        contentText = "${provideStringForBootstrapped()} ${new.bootstrap}%",
+                        progress = Progress.Determinant(new.bootstrap),
+                    ))
+                    Progress.None
+                }
+                !new.isBootstrapped && newNet.isEnabled() -> {
+                    Progress.Determinant(new.bootstrap)
+                }
+                else -> {
+                    Progress.None
                 }
             }
-            is State -> {
-                val old = state
-//                val oldNet = netState
-                val new = event.torState
-                val newNet = event.networkState
 
-                if (old.isOn() && !new.isOn()) {
-                    // update current state immediately so
-                    // bandwidth updates cease
-                    state = new
-                }
+        } else {
+            Progress.Indeterminate
+        }
 
-                val color = if (new.isBootstrapped && newNet.isEnabled()) {
-                    config._colorWhenBootstrappedTrue
+        val contentText = when (progress) {
+            is Progress.Determinant -> {
+                "${provideStringForBootstrapped()} ${progress.value}%"
+            }
+            is Progress.Indeterminate,
+            is Progress.None -> {
+                val current = currentState.contentText
+                if (current.startsWith(provideStringForBootstrapped()) && newNet.isEnabled()) {
+                    formatBandwidth(down, up)
                 } else {
-                    config._colorWhenBootstrappedFalse
+                    current
                 }
-
-                val progress = if(new.isOn()) {
-
-                    when {
-                        !old.isBootstrapped && new.isBootstrapped -> {
-                            render(currentState.copy(
-                                color = color,
-                                contentText = "${provideStringForBootstrapped()} ${new.bootstrap}%",
-                                progress = Progress.Determinant(new.bootstrap),
-                            ))
-                            Progress.None
-                        }
-                        !new.isBootstrapped && newNet.isEnabled() -> {
-                            Progress.Determinant(new.bootstrap)
-                        }
-                        else -> {
-                            Progress.None
-                        }
-                    }
-
-                } else {
-                    Progress.Indeterminate
-                }
-
-                val contentText = when (progress) {
-                    is Progress.Determinant -> {
-                        "${provideStringForBootstrapped()} ${progress.value}%"
-                    }
-                    is Progress.Indeterminate,
-                    is Progress.None -> {
-                        val current = currentState.contentText
-                        if (current.startsWith(provideStringForBootstrapped()) && newNet.isEnabled()) {
-                            formatBandwidth(down, up)
-                        } else {
-                            current
-                        }
-                    }
-                }
-
-                val actions = when (progress) {
-                    is Progress.Determinant,
-                    is Progress.Indeterminate -> {
-                        actionsEmpty
-                    }
-                    is Progress.None -> {
-                        when {
-                            !new.isBootstrapped -> actionsEmpty
-                            isDeviceLocked -> actionsNewId
-                            else -> actionsAll
-                        }
-                    }
-                }
-
-                val icon = when {
-                    newNet.isDisabled() -> {
-                        // to disable posting any more bandwidth updates
-                        netState = newNet
-
-                        config._iconNetworkDisabled
-                    }
-                    newNet.isEnabled() && new.isBootstrapped -> {
-                        if (down != 0L || up != 0L) {
-                            config._iconDataXfer
-                        } else {
-                            config._iconNetworkEnabled
-                        }
-                    }
-                    else -> {
-                        config._iconNetworkDisabled
-                    }
-                }
-
-                render(NotificationState(
-                    actions = actions,
-                    color = color,
-                    contentText = contentText,
-                    contentTitle = new.provideStringFor(),
-                    progress = progress,
-                    smallIcon = icon
-                ))
-
-                state = new
-                netState = newNet
             }
         }
+
+        val actions = when (progress) {
+            is Progress.Determinant,
+            is Progress.Indeterminate -> {
+                actionsEmpty
+            }
+            is Progress.None -> {
+                when {
+                    !new.isBootstrapped -> actionsEmpty
+                    isDeviceLocked -> actionsNewId
+                    else -> actionsAll
+                }
+            }
+        }
+
+        val icon = when {
+            newNet.isDisabled() -> {
+                // to disable posting any more bandwidth updates
+                netState = newNet
+
+                config._iconNetworkDisabled
+            }
+            newNet.isEnabled() && new.isBootstrapped -> {
+                if (down != 0L || up != 0L) {
+                    config._iconDataXfer
+                } else {
+                    config._iconNetworkEnabled
+                }
+            }
+            else -> {
+                config._iconNetworkDisabled
+            }
+        }
+
+        render(NotificationState(
+            actions = actions,
+            color = color,
+            contentText = contentText,
+            contentTitle = new.provideStringFor(),
+            progress = progress,
+            smallIcon = icon
+        ))
+
+        this.state = new
+        this.netState = newNet
+    }
+
+    override fun onEvent(event: TorManagerEvent) {
+        if (!config.enableForeground) return
+        super.onEvent(event)
     }
 
     private val formatter = NumberFormat.getInstance(Locale.getDefault())
     private var down = 0L
     private var up = 0L
-    override fun onEvent(event: TorEvent.Type.SingleLineEvent, output: String) {
-        if (!config.enableForeground) return
 
-        if (event is TorEvent.BandwidthUsed) {
-            // 1608 2144
-            val splits = output.trim().split(' ')
-            if (splits.size != 2) return
+    override fun eventBandwidthUsed(output: String) {
+        // 1608 2144
+        val splits = output.trim().split(' ')
+        if (splits.size != 2) return
 
-            val down = try {
-                splits[0].toLong()
-            } catch (_: NumberFormatException) {
-                down
-            }
-            val up = try {
-                splits[1].toLong()
-            } catch (_: NumberFormatException) {
-                up
-            }
+        val down = try {
+            splits[0].toLong()
+        } catch (_: NumberFormatException) {
+            down
+        }
+        val up = try {
+            splits[1].toLong()
+        } catch (_: NumberFormatException) {
+            up
+        }
 
-            if (down != this.down || up != this.up) {
-                this.down = down
-                this.up = up
+        if (down != this.down || up != this.up) {
+            this.down = down
+            this.up = up
 
-                if (state.isBootstrapped && netState.isEnabled()) {
+            if (state.isBootstrapped && netState.isEnabled()) {
 
-                    val icon = if (down == 0L && up == 0L) {
-                        config._iconNetworkEnabled
-                    } else {
-                        config._iconDataXfer
-                    }
-
-                    val contentText = if (messageJob?.isActive == true) {
-                        currentState.contentText
-                    } else {
-                        formatBandwidth(down, up)
-                    }
-
-                    render(
-                        currentState.copy(
-                            contentText = contentText,
-                            smallIcon = icon
-                        )
-                    )
+                val icon = if (down == 0L && up == 0L) {
+                    config._iconNetworkEnabled
+                } else {
+                    config._iconDataXfer
                 }
+
+                val contentText = if (messageJob?.isActive == true) {
+                    currentState.contentText
+                } else {
+                    formatBandwidth(down, up)
+                }
+
+                render(
+                    currentState.copy(
+                        contentText = contentText,
+                        smallIcon = icon
+                    )
+                )
             }
         }
     }
@@ -360,6 +353,11 @@ internal abstract class TorServiceNotification(
                 (((value * 100 / 1024 / 1024).toInt()) / 100).toFloat().roundToLong()
             ) + "MBps"
         }
+
+    override fun onEvent(event: TorEvent.Type.SingleLineEvent, output: String) {
+        if (!config.enableForeground) return
+        super.onEvent(event, output)
+    }
 
     override fun onEvent(event: TorEvent.Type.MultiLineEvent, output: List<String>) {}
 
@@ -470,6 +468,10 @@ private class RealTorServiceNotification(
             setSound(null)
             setWhen(startTime)
 
+            // API 17
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
+                setShowWhen(true)
+            }
             // API 20
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT_WATCH) {
                 setGroup("TorService")
