@@ -16,6 +16,7 @@
 package io.matthewnelson.kmp.tor.common.clientauth
 
 import io.matthewnelson.kmp.tor.common.address.OnionAddressV3
+import io.matthewnelson.kmp.tor.common.util.stripString
 import kotlin.jvm.JvmStatic
 import kotlin.jvm.JvmSynthetic
 
@@ -192,40 +193,4 @@ class OnionClientAuth private constructor() {
 //
 //        }
 //    }
-}
-
-@JvmSynthetic
-@Suppress("nothing_to_inline")
-internal inline fun OnionClientAuth.PrivateKey.descriptorString(address: OnionAddressV3): String =
-    StringBuilder(address.value)
-        .append(':')
-        .append(keyType)
-        .append(':')
-        .append(value)
-        .toString()
-
-@JvmSynthetic
-@Suppress("nothing_to_inline")
-internal inline fun OnionClientAuth.PublicKey.descriptorString(): String =
-    StringBuilder(OnionClientAuth.PublicKey.DESCRIPTOR)
-        .append(':')
-        .append(keyType)
-        .append(':')
-        .append(value)
-        .toString()
-
-@Suppress("nothing_to_inline")
-private inline fun String.stripString(): String {
-    var limit = length
-
-    // Disregard padding and/or whitespace from end of string
-    while (limit > 0) {
-        val c = this[limit - 1]
-        if (c != '=' && c != '\n' && c != '\r' && c != ' ' && c != '\t') {
-            break
-        }
-        limit--
-    }
-
-    return this.substring(0, limit).trimStart()
 }

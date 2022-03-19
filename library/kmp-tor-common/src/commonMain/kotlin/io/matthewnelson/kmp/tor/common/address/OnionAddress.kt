@@ -15,6 +15,8 @@
  **/
 package io.matthewnelson.kmp.tor.common.address
 
+import io.matthewnelson.kmp.tor.common.util.separateSchemeFromAddress
+import io.matthewnelson.kmp.tor.common.util.stripString
 import kotlin.jvm.JvmStatic
 
 /**
@@ -43,6 +45,72 @@ sealed interface OnionAddress {
             } catch (e: IllegalArgumentException) {}
 
             return null
+        }
+    }
+
+    sealed interface PrivateKey {
+
+        val value: String
+
+        /**
+         * Returns the raw bytes for the given [value]
+         * */
+        fun decode(): ByteArray
+
+        val keyType: Type
+
+        companion object {
+            @JvmStatic
+            @Throws(IllegalArgumentException::class)
+            fun fromString(value: String): PrivateKey {
+                val stripped = value.stripString()
+
+                try {
+                    return OnionAddressV3PrivateKey_ED25519(stripped)
+                } catch (_: IllegalArgumentException) {}
+
+                throw IllegalArgumentException("String was not an OnionAddress.PrivateKey")
+            }
+
+            @JvmStatic
+            fun fromStringOrNull(value: String): PrivateKey? {
+                return try {
+                    fromString(value)
+                } catch (_: IllegalArgumentException) {
+                    null
+                }
+            }
+        }
+
+        @Suppress("ClassName")
+        sealed class Type {
+
+            override fun toString(): String {
+                return when(this) {
+                    is ED25519_V3 -> ED25519_V3_ACTUAL
+                }
+            }
+
+            companion object {
+                private const val ED25519_V3_ACTUAL = "ED25519-V3"
+                private const val ED25519_V3_CLASS = "ED25519_V3"
+
+                @JvmStatic
+                @Throws(IllegalArgumentException::class)
+                fun valueOf(value: String): Type {
+                    return when (value) {
+                        ED25519_V3_ACTUAL,
+                        ED25519_V3_CLASS -> ED25519_V3
+                        else -> {
+                            throw IllegalArgumentException(
+                                "Failed to determine OnionAddress.PrivateKey.Type from $value"
+                            )
+                        }
+                    }
+                }
+            }
+
+            object ED25519_V3: Type()
         }
     }
 }

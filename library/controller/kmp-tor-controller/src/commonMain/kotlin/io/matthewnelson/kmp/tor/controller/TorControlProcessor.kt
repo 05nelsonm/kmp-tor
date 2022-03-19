@@ -34,6 +34,7 @@ import io.matthewnelson.kmp.tor.controller.common.exceptions.TorControllerExcept
 import io.matthewnelson.kmp.tor.common.util.TorStrings.CLRF
 import io.matthewnelson.kmp.tor.common.util.TorStrings.MULTI_LINE_END
 import io.matthewnelson.kmp.tor.common.util.TorStrings.SP
+import io.matthewnelson.kmp.tor.controller.common.config.HiddenServiceEntry
 import io.matthewnelson.kmp.tor.controller.internal.controller.ControlPortInteractor
 import io.matthewnelson.kmp.tor.controller.internal.controller.ReplyLine
 import kotlinx.coroutines.delay
@@ -419,15 +420,124 @@ private class RealTorControlProcessor(
 //        }
 //    }
 
-//    override suspend fun onionAdd(): Result<Map<String, String>> {
-//        return lock.withLock {
-//            try {
-//                TODO("Not yet implemented")
-//            } catch (e: Exception) {
-//                Result.failure(e)
-//            }
-//        }
-//    }
+    override suspend fun onionAdd(
+        privateKey: OnionAddress.PrivateKey,
+        hsPorts: Set<TorConfig.Setting.HiddenService.Ports>,
+        flags: Set<TorControlOnionAdd.Flag>?,
+        maxStreams: TorConfig.Setting.HiddenService.MaxStreams?
+    ): Result<HiddenServiceEntry> {
+        return lock.withLock {
+            val sb = StringBuilder("ADD_ONION").apply {
+                append(SP)
+                append(privateKey.keyType)
+                append(':')
+                append(privateKey.value)
+            }
+
+            onionAdd(sb, hsPorts, flags, maxStreams)
+        }
+    }
+
+    override suspend fun onionAddNew(
+        type: OnionAddress.PrivateKey.Type,
+        hsPorts: Set<TorConfig.Setting.HiddenService.Ports>,
+        flags: Set<TorControlOnionAdd.Flag>?,
+        maxStreams: TorConfig.Setting.HiddenService.MaxStreams?
+    ): Result<HiddenServiceEntry> {
+        return lock.withLock {
+            val sb = StringBuilder("ADD_ONION").apply {
+                append(SP)
+                append("NEW")
+                append(':')
+                append(type)
+            }
+
+            onionAdd(sb, hsPorts, flags, maxStreams)
+        }
+    }
+
+    private suspend fun onionAdd(
+        sb: StringBuilder,
+        hsPorts: Set<TorConfig.Setting.HiddenService.Ports>,
+        flags: Set<TorControlOnionAdd.Flag>?,
+        maxStreams: TorConfig.Setting.HiddenService.MaxStreams?
+    ): Result<HiddenServiceEntry> {
+        return try {
+            val command = sb.apply {
+                if (flags != null && flags.isNotEmpty()) {
+                    append(SP)
+                    append("Flags=")
+                    flags.joinTo(this, separator = ",")
+                }
+
+                if (maxStreams != null) {
+                    append(SP)
+                    append("MaxStreams=")
+                    append(maxStreams.value)
+                }
+
+                if (hsPorts.isNotEmpty()) {
+                    for (hsPort in hsPorts) {
+                        append(SP)
+                        append("Port=")
+                        append(hsPort.virtualPort)
+                        append(',')
+                        append(hsPort.targetPort)
+                    }
+                }
+
+                append(CLRF)
+            }.toString()
+
+            // SingleLine(status=250, message=ServiceID=bxtow33uhscfu2xscwmha4quznly7ybfocm6i5uh35uyltddbj4yesyd)
+            // SingleLine(status=250, message=PrivateKey=ED25519-V3:cKjLrpfAV0rNDmfn6hMpcWUFsN82MqhVxwre9c3KjnlfkZxkJlyixy756WMKtNlVyMrhSxgaZfECky7rE1O1dA==)
+            // SingleLine(status=250, message=OK)
+            val result = processCommand(command)
+
+            var serviceId: OnionAddress? = null
+            var privateKey: OnionAddress.PrivateKey? = null
+            for (line in result) {
+                val splits = line.message.split('=')
+                when (splits.elementAtOrNull(0)?.lowercase()) {
+                    "serviceid" -> {
+                        serviceId = splits
+                            .elementAtOrNull(1)
+                            ?.let { onionAddress ->
+                                OnionAddress.fromStringOrNull(onionAddress)
+                            }
+                    }
+                    "privatekey" -> {
+                        privateKey = splits
+                            .elementAtOrNull(1)
+                            ?.split(':')
+                            ?.elementAtOrNull(1)
+                            ?.let { key ->
+                                OnionAddress.PrivateKey.fromString(key)
+                            }
+                    }
+                    else -> continue
+                }
+            }
+
+            if (serviceId == null) {
+                throw TorControllerException("Failed to parse reply for onion address")
+            }
+
+            if (flags?.contains(TorControlOnionAdd.Flag.DiscardPK) != true && privateKey == null) {
+                throw TorControllerException("Failed to parse reply for onion address private key")
+            }
+
+            Result.success(
+                HiddenServiceEntry(
+                    address = serviceId,
+                    privateKey = privateKey,
+                    ports = hsPorts
+                )
+            )
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
 
     override suspend fun onionDel(address: OnionAddress): Result<Any?> {
         return lock.withLock {

@@ -90,12 +90,40 @@ abstract class TorTestHelper {
             put(Ports.HttpTunnel().set(AorDorPort.Auto))
             put(Ports.Trans().set(AorDorPort.Auto))
 
-            put(ClientOnionAuthDir().set(FileSystemDir(
-                testProvider.workDir.builder { addSegment(ClientOnionAuthDir.DEFAULT_NAME) }
-            )))
+            put(HiddenService()
+                .setPorts(ports = setOf(
+                    HiddenService.Ports(virtualPort = 1025, targetPort = 1027),
+                    HiddenService.Ports(virtualPort = 1026, targetPort = 1027)
+                ))
+                .setMaxStreams(maxStreams = HiddenService.MaxStreams(value = 2))
+                .setMaxStreamsCloseCircuit(value = TorF.True)
+                .set(FileSystemDir(
+                    testProvider.workDir.builder {
+                        addSegment(HiddenService.DEFAULT_PARENT_DIR_NAME)
+                        addSegment("test_service")
+                    }
+                ))
+            )
+
+            put(HiddenService()
+                .setPorts(ports = setOf(
+                    HiddenService.Ports(virtualPort = 1028, targetPort = 1030),
+                    HiddenService.Ports(virtualPort = 1029, targetPort = 1030)
+                ))
+                .set(FileSystemDir(
+                    testProvider.workDir.builder {
+                        addSegment(HiddenService.DEFAULT_PARENT_DIR_NAME)
+                        addSegment("test_service_2")
+                    }
+                ))
+            )
 
             put(DormantClientTimeout().set(Time.Minutes(10)))
             put(DormantCanceledByStartup().set(TorF.True))
+
+            put(ClientOnionAuthDir().set(FileSystemDir(
+                testProvider.workDir.builder { addSegment(ClientOnionAuthDir.DEFAULT_NAME) }
+            )))
         }.build()
     }
 

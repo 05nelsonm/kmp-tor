@@ -15,6 +15,9 @@
  **/
 package io.matthewnelson.kmp.tor.controller.common.control.usecase
 
+import io.matthewnelson.kmp.tor.common.address.OnionAddress
+import io.matthewnelson.kmp.tor.controller.common.config.HiddenServiceEntry
+import io.matthewnelson.kmp.tor.controller.common.config.TorConfig
 import io.matthewnelson.kmp.tor.controller.common.control.TorControlOnion
 
 /**
@@ -64,7 +67,32 @@ import io.matthewnelson.kmp.tor.controller.common.control.TorControlOnion
  * */
 interface TorControlOnionAdd {
 
-    // TODO: Implement
-//    suspend fun onionAdd(): Result<Map<String, String>>
+    /**
+     * Adds a HiddenService for the given [privateKey] to the running
+     * instance of Tor.
+     * */
+    suspend fun onionAdd(
+        privateKey: OnionAddress.PrivateKey,
+        hsPorts: Set<TorConfig.Setting.HiddenService.Ports>,
+        flags: Set<Flag>? = null,
+        maxStreams: TorConfig.Setting.HiddenService.MaxStreams? = null,
+    ): Result<HiddenServiceEntry>
 
+    /**
+     * Generates new public(onion address)/private keys for the given [type]
+     * and adds the HiddenService to the running instance of Tor.
+     * */
+    suspend fun onionAddNew(
+        type: OnionAddress.PrivateKey.Type,
+        hsPorts: Set<TorConfig.Setting.HiddenService.Ports>,
+        flags: Set<Flag>? = null,
+        maxStreams: TorConfig.Setting.HiddenService.MaxStreams? = null
+    ): Result<HiddenServiceEntry>
+
+    enum class Flag {
+        DiscardPK,
+        Detach,
+        NonAnonymous,
+        MaxStreamsCloseCircuit
+    }
 }

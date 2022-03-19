@@ -17,6 +17,7 @@ package io.matthewnelson.kmp.tor.manager
 
 import io.matthewnelson.kmp.tor.controller.TorController
 import io.matthewnelson.kmp.tor.controller.common.config.TorConfig
+import io.matthewnelson.kmp.tor.controller.common.file.Path
 import io.matthewnelson.kmp.tor.manager.common.event.TorManagerEvent
 import io.matthewnelson.kmp.tor.manager.common.exceptions.TorManagerException
 import io.matthewnelson.kmp.tor.manager.internal.TorStateMachine
@@ -51,4 +52,7 @@ actual abstract class KmpTorLoader(provider: TorConfigProvider) {
         configLines: List<String>,
         notify: (TorManagerEvent.Log) -> Unit,
     )
+
+    @Throws(TorManagerException::class)
+    protected actual open fun setHiddenServiceDirPermissions(dir: Path) {}
 }

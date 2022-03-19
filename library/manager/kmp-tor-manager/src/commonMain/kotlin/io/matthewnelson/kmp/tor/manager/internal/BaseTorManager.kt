@@ -21,6 +21,7 @@ import io.matthewnelson.kmp.tor.common.clientauth.ClientName
 import io.matthewnelson.kmp.tor.common.clientauth.OnionClientAuth
 import io.matthewnelson.kmp.tor.controller.common.config.ClientAuthEntry
 import io.matthewnelson.kmp.tor.controller.common.config.ConfigEntry
+import io.matthewnelson.kmp.tor.controller.common.config.HiddenServiceEntry
 import io.matthewnelson.kmp.tor.controller.common.config.TorConfig
 import io.matthewnelson.kmp.tor.controller.common.control.TorControlOnionClientAuth
 import io.matthewnelson.kmp.tor.controller.common.control.usecase.*
@@ -152,11 +153,27 @@ internal abstract class BaseTorManager: SynchronizedObject(), TorControlManager 
 //        }
 //    }
 
-//    override suspend fun onionAdd(): Result<Map<String, String>> {
-//        return provide<TorControlOnionAdd, Map<String, String>> {
-//            onionAdd()
-//        }
-//    }
+    override suspend fun onionAdd(
+        privateKey: OnionAddress.PrivateKey,
+        hsPorts: Set<TorConfig.Setting.HiddenService.Ports>,
+        flags: Set<TorControlOnionAdd.Flag>?,
+        maxStreams: TorConfig.Setting.HiddenService.MaxStreams?
+    ): Result<HiddenServiceEntry> {
+        return provide<TorControlOnionAdd, HiddenServiceEntry> {
+            onionAdd(privateKey, hsPorts, flags, maxStreams)
+        }
+    }
+
+    override suspend fun onionAddNew(
+        type: OnionAddress.PrivateKey.Type,
+        hsPorts: Set<TorConfig.Setting.HiddenService.Ports>,
+        flags: Set<TorControlOnionAdd.Flag>?,
+        maxStreams: TorConfig.Setting.HiddenService.MaxStreams?
+    ): Result<HiddenServiceEntry> {
+        return provide<TorControlOnionAdd, HiddenServiceEntry> {
+            onionAddNew(type, hsPorts, flags, maxStreams)
+        }
+    }
 
     override suspend fun onionClientAuthAdd(
         address: OnionAddressV3,

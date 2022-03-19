@@ -290,4 +290,48 @@ class TorConfigUnitTest {
 
         assertNotEquals(socks1.value, socks2.value)
     }
+
+    @Test
+    fun givenHiddenService_whenSameDir_settingsAreEqual() {
+        val path = Path("/some_dir")
+
+        val (hs1, hs2) = Pair(HiddenService(), HiddenService())
+
+        hs1.setPorts(setOf(HiddenService.Ports(11)))
+        hs2.setPorts(setOf(HiddenService.Ports(22)))
+
+        hs1.setMaxStreams(HiddenService.MaxStreams(1))
+        hs2.setMaxStreams(HiddenService.MaxStreams(2))
+
+        hs1.setMaxStreamsCloseCircuit(TorF.True)
+
+        hs1.set(FileSystemDir(path))
+        hs2.set(FileSystemDir(path))
+
+        assertNotEquals(hs1.maxStreams, hs2.maxStreams)
+        assertNotEquals(hs1.maxStreamsCloseCircuit, hs2.maxStreamsCloseCircuit)
+        assertNotEquals(hs1.ports, hs2.ports)
+
+        assertEquals(hs1, hs2)
+    }
+
+    @Test
+    fun givenHiddenService_whenCloned_matchesOriginal() {
+        val expectedHs = HiddenService()
+        val expectedDir = FileSystemDir(Path("/some_dir"))
+        val expectedPorts = setOf(HiddenService.Ports(11))
+        val expectedMaxStreams = HiddenService.MaxStreams(1)
+        val expectedMaxStreamsCloseCircuit = TorF.True
+
+        expectedHs.set(expectedDir)
+        expectedHs.setPorts(expectedPorts)
+        expectedHs.setMaxStreams(expectedMaxStreams)
+        expectedHs.setMaxStreamsCloseCircuit(expectedMaxStreamsCloseCircuit)
+
+        val actual = expectedHs.clone()
+        assertEquals(expectedDir, actual.value)
+        assertEquals(expectedPorts, actual.ports)
+        assertEquals(expectedMaxStreams, actual.maxStreams)
+        assertEquals(expectedMaxStreamsCloseCircuit, actual.maxStreamsCloseCircuit)
+    }
 }

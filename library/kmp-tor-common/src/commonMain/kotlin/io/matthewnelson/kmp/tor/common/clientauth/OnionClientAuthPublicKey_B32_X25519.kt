@@ -19,6 +19,7 @@ import io.matthewnelson.component.base64.Base64
 import io.matthewnelson.component.base64.encodeBase64
 import io.matthewnelson.component.encoding.base32.Base32
 import io.matthewnelson.component.encoding.base32.decodeBase32ToArray
+import io.matthewnelson.kmp.tor.common.util.descriptorString
 import kotlin.jvm.JvmInline
 
 /**

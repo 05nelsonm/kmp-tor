@@ -67,43 +67,11 @@ class KmpTorLoaderJvmIntegrationTest: TorTestHelper() {
     }
 
     @Test
-    fun testRestart() = runBlocking {
-        println("==== JAVA - TEST: RESTART 1")
-        val result1 = manager.restart()
-        result1.onFailure { t ->
-            throw t
-        }
+    fun givenTorManager_whenRestartCalled_returnsSuccess() = runBlocking {
+        manager.restart().getOrThrow()
 
         delay(5_000L)
-        println("==== JAVA - TEST: RESTART 2")
-        val result2 = manager.restart()
-        result2.onFailure { t ->
-            throw t
-        }
-
-        Unit
-    }
-
-    @Test
-    fun testRestart2() = runBlocking {
-        println("==== JAVA - TEST: RESTART 3")
-        val result3 = manager.restart()
-        result3.onFailure { t ->
-            throw t
-        }
-
-        delay(5_000L)
-        println("==== JAVA - TEST: RESTART 4")
-        val result4 = manager.restart()
-        result4.onFailure { t ->
-            throw t
-        }
-
-        delay(5_000)
-        val result5 = manager.restart()
-        result5.onFailure { t ->
-            throw t
-        }
+        manager.restart().getOrThrow()
 
         Unit
     }

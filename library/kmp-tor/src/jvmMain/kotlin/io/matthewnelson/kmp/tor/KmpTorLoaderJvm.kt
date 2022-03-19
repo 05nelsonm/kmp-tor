@@ -16,6 +16,7 @@
 package io.matthewnelson.kmp.tor
 
 import io.matthewnelson.kmp.tor.controller.common.config.TorConfig
+import io.matthewnelson.kmp.tor.controller.common.file.Path
 import io.matthewnelson.kmp.tor.controller.common.file.toFile
 import io.matthewnelson.kmp.tor.internal.ProcessStreamEater
 import io.matthewnelson.kmp.tor.internal.isStillAlive
@@ -26,7 +27,10 @@ import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.job
+import java.io.File
 import java.io.IOException
+import java.nio.file.Files
+import java.nio.file.attribute.PosixFilePermission
 import kotlin.coroutines.cancellation.CancellationException
 
 /**
@@ -61,6 +65,27 @@ class KmpTorLoaderJvm(
         }
         else -> {
             super.excludeSettings
+        }
+    }
+
+    @Suppress("NewApi")
+    @Throws(TorManagerException::class)
+    override fun setHiddenServiceDirPermissions(dir: Path) {
+        if (installer.isLinux || installer.isMacos) {
+            try {
+                Files.setPosixFilePermissions(
+                    kotlin.io.path.Path(dir.value),
+                    mutableSetOf(
+                        PosixFilePermission.OWNER_READ,
+                        PosixFilePermission.OWNER_EXECUTE,
+                        PosixFilePermission.OWNER_WRITE,
+                    )
+                )
+            } catch (e: Exception) {
+                throw TorManagerException(
+                    "Failed to set permissions for HiddenService dir ${dir.value}", e
+                )
+            }
         }
     }
 
