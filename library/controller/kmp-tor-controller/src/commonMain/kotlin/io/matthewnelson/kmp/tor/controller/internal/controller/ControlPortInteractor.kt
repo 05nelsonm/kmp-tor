@@ -31,4 +31,15 @@ internal interface ControlPortInteractor {
     )
     @OptIn(InternalTorApi::class)
     suspend fun processCommand(command: String): List<ReplyLine.SingleLine>
+
+    @Throws(
+        CancellationException::class,
+        ControllerShutdownException::class,
+        TorControllerException::class,
+    )
+    @OptIn(InternalTorApi::class)
+    suspend fun <T: Any> processCommand(
+        command: String,
+        transform: List<ReplyLine.SingleLine>.() -> T
+    ): T
 }
