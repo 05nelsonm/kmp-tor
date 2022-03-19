@@ -221,7 +221,7 @@ private class RealTorController(
         override val isConnected: Boolean
             get() = !whileLoopBroke.value && !torCoroutineManager.isClosed
 
-        override suspend fun <T : Any> processCommand(
+        override suspend fun <T : Any?> processCommand(
             command: String,
             transform: List<ReplyLine.SingleLine>.() -> T
         ): T {
