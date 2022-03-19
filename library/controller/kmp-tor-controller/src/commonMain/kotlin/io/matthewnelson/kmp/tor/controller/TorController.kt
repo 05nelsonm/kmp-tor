@@ -221,6 +221,17 @@ private class RealTorController(
         override val isConnected: Boolean
             get() = !whileLoopBroke.value && !torCoroutineManager.isClosed
 
+        override suspend fun <T : Any?> processCommand(
+            command: String,
+            transform: List<ReplyLine.SingleLine>.() -> T
+        ): T {
+            val replies = processCommand(command)
+
+            return withContext(commandDispatcher) {
+                transform.invoke(replies)
+            }
+        }
+
         @Throws(
             CancellationException::class,
             ControllerShutdownException::class,

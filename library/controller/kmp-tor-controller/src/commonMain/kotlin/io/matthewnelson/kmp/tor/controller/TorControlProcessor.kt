@@ -161,8 +161,8 @@ private class RealTorControlProcessor(
                     sb.toString()
                 }
 
-                processCommand(command)
-                    .map { reply ->
+                val configEntry = processCommand(command) {
+                    map { reply ->
                         val kvp = reply.message
                         val index = kvp.indexOf('=')
                         if (index >= 0) {
@@ -171,9 +171,9 @@ private class RealTorControlProcessor(
                             ConfigEntry(kvp)
                         }
                     }
-                    .let {
-                        Result.success(it)
-                    }
+                }
+
+                Result.success(configEntry)
             } catch (e: Exception) {
                 Result.failure(e)
             }
@@ -393,7 +393,9 @@ private class RealTorControlProcessor(
                     sb.toString()
                 }
 
-                Result.success(processCommand(command).toMap())
+                val map = processCommand(command) { toMap() }
+
+                Result.success(map)
             } catch (e: Exception) {
                 Result.failure(e)
             }
@@ -492,48 +494,49 @@ private class RealTorControlProcessor(
             // SingleLine(status=250, message=ServiceID=bxtow33uhscfu2xscwmha4quznly7ybfocm6i5uh35uyltddbj4yesyd)
             // SingleLine(status=250, message=PrivateKey=ED25519-V3:cKjLrpfAV0rNDmfn6hMpcWUFsN82MqhVxwre9c3KjnlfkZxkJlyixy756WMKtNlVyMrhSxgaZfECky7rE1O1dA==)
             // SingleLine(status=250, message=OK)
-            val result = processCommand(command)
+            val hsEntry = processCommand(command) {
 
-            var serviceId: OnionAddress? = null
-            var privateKey: OnionAddress.PrivateKey? = null
-            for (line in result) {
-                val splits = line.message.split('=')
-                when (splits.elementAtOrNull(0)?.lowercase()) {
-                    "serviceid" -> {
-                        serviceId = splits
-                            .elementAtOrNull(1)
-                            ?.let { onionAddress ->
-                                OnionAddress.fromStringOrNull(onionAddress)
-                            }
+                var serviceId: OnionAddress? = null
+                var privateKey: OnionAddress.PrivateKey? = null
+                for (line in this) {
+                    val splits = line.message.split('=')
+                    when (splits.elementAtOrNull(0)?.lowercase()) {
+                        "serviceid" -> {
+                            serviceId = splits
+                                .elementAtOrNull(1)
+                                ?.let { onionAddress ->
+                                    OnionAddress.fromStringOrNull(onionAddress)
+                                }
+                        }
+                        "privatekey" -> {
+                            privateKey = splits
+                                .elementAtOrNull(1)
+                                ?.split(':')
+                                ?.elementAtOrNull(1)
+                                ?.let { key ->
+                                    OnionAddress.PrivateKey.fromString(key)
+                                }
+                        }
+                        else -> continue
                     }
-                    "privatekey" -> {
-                        privateKey = splits
-                            .elementAtOrNull(1)
-                            ?.split(':')
-                            ?.elementAtOrNull(1)
-                            ?.let { key ->
-                                OnionAddress.PrivateKey.fromString(key)
-                            }
-                    }
-                    else -> continue
                 }
-            }
 
-            if (serviceId == null) {
-                throw TorControllerException("Failed to parse reply for onion address")
-            }
+                if (serviceId == null) {
+                    throw TorControllerException("Failed to parse reply for onion address")
+                }
 
-            if (flags?.contains(TorControlOnionAdd.Flag.DiscardPK) != true && privateKey == null) {
-                throw TorControllerException("Failed to parse reply for onion address private key")
-            }
+                if (flags?.contains(TorControlOnionAdd.Flag.DiscardPK) != true && privateKey == null) {
+                    throw TorControllerException("Failed to parse reply for onion address private key")
+                }
 
-            Result.success(
                 HiddenServiceEntry(
                     address = serviceId,
                     privateKey = privateKey,
                     ports = hsPorts
                 )
-            )
+            }
+
+            Result.success(hsEntry)
         } catch (e: Exception) {
             Result.failure(e)
         }
@@ -640,37 +643,39 @@ private class RealTorControlProcessor(
                 sb.toString()
             }
 
-            return processCommand(command).mapNotNull { reply ->
-                // 250-CLIENT 6yxtsbpn2k7exxiarcbiet3fsr4komissliojxjlvl7iytacrnvz2uyd x25519:uDF+ZqDVnC+1k8qN28OOoM9EjQ+FTPTtb33Cdv2rD30= Flags=Permanent ClientName=Test^.HS
-                if (reply.message.startsWith("CLIENT ")) {
-                    val splits = reply.message.split(' ')
+            return processCommand(command) {
+                mapNotNull { reply ->
+                    // 250-CLIENT 6yxtsbpn2k7exxiarcbiet3fsr4komissliojxjlvl7iytacrnvz2uyd x25519:uDF+ZqDVnC+1k8qN28OOoM9EjQ+FTPTtb33Cdv2rD30= Flags=Permanent ClientName=Test^.HS
+                    if (reply.message.startsWith("CLIENT ")) {
+                        val splits = reply.message.split(' ')
 
-                    // positioning of Flags & ClientName can be either or, so we have to check for both
-                    var clientName: String? = null
-                    var flags: List<String>? = null
+                        // positioning of Flags & ClientName can be either or, so we have to check for both
+                        var clientName: String? = null
+                        var flags: List<String>? = null
 
-                    for (i in 3..4) {
-                        splits.elementAtOrNull(i)?.let { split ->
-                            when {
-                                split.startsWith("ClientName=") -> {
-                                    clientName = split.substringAfter('=')
-                                }
-                                split.startsWith("Flags=") -> {
-                                    flags = split.substringAfter('=').split(',')
+                        for (i in 3..4) {
+                            splits.elementAtOrNull(i)?.let { split ->
+                                when {
+                                    split.startsWith("ClientName=") -> {
+                                        clientName = split.substringAfter('=')
+                                    }
+                                    split.startsWith("Flags=") -> {
+                                        flags = split.substringAfter('=').split(',')
+                                    }
                                 }
                             }
                         }
-                    }
 
-                    ClientAuthEntry(
-                        address = splits[1],
-                        keyType = splits[2].substringBefore(':'),
-                        privateKey = splits[2].substringAfter(':'),
-                        clientName = clientName,
-                        flags = flags,
-                    )
-                } else {
-                    null
+                        ClientAuthEntry(
+                            address = splits[1],
+                            keyType = splits[2].substringBefore(':'),
+                            privateKey = splits[2].substringAfter(':'),
+                            clientName = clientName,
+                            flags = flags,
+                        )
+                    } else {
+                        null
+                    }
                 }
             }
         }
