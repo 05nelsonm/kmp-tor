@@ -573,7 +573,7 @@ private class RealTorManager(
                     )
                 }
 
-                controller.value?.let {
+                controller.value?.first?.let {
                     notifyListenersNoScope(Controller)
                     block.invoke(it as T)
                 } ?: Result.failure(TorNotStartedException("Tor is not started"))
