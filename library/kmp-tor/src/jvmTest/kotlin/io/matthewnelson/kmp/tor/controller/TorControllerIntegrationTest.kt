@@ -79,7 +79,7 @@ class TorControllerIntegrationTest: TorTestHelper() {
             flags = setOf(flagPerm),
         ).getOrThrow()
 
-        val entry = manager.onionClientAuthView(address).getOrThrow()
+        val entry = manager.onionClientAuthView(address).getOrThrow().first()
         assertEquals(address.value, entry.address)
         assertEquals(privateKey.keyType.toString(), entry.keyType)
         assertEquals(privateKey.base64(padded = true), entry.privateKey)
