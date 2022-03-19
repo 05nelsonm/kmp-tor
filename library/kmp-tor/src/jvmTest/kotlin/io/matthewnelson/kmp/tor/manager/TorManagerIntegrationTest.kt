@@ -61,9 +61,7 @@ class TorManagerIntegrationTest: TorTestHelper() {
         }
 
         delay(50L)
-        manager.stop().onFailure { ex ->
-            fail(ex.stackTraceToString())
-        }
+        manager.stop().getOrThrow()
 
         for (job in jobs) {
             job.join()

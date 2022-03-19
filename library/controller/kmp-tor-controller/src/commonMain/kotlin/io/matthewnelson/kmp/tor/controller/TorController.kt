@@ -25,6 +25,7 @@ import io.matthewnelson.kmp.tor.common.util.TorStrings.MULTI_LINE_END
 import io.matthewnelson.kmp.tor.common.util.TorStrings.SP
 import io.matthewnelson.kmp.tor.controller.common.config.ClientAuthEntry
 import io.matthewnelson.kmp.tor.controller.common.config.ConfigEntry
+import io.matthewnelson.kmp.tor.controller.common.config.HiddenServiceEntry
 import io.matthewnelson.kmp.tor.controller.common.config.TorConfig
 import io.matthewnelson.kmp.tor.controller.common.control.*
 import io.matthewnelson.kmp.tor.controller.common.control.usecase.*
@@ -490,9 +491,23 @@ private class RealTorController(
 //        return processorDelegate.mapAddress()
 //    }
 
-//    override suspend fun onionAdd(): Result<Map<String, String>> {
-//        return processorDelegate.onionAdd()
-//    }
+    override suspend fun onionAdd(
+        privateKey: OnionAddress.PrivateKey,
+        hsPorts: Set<TorConfig.Setting.HiddenService.Ports>,
+        flags: Set<TorControlOnionAdd.Flag>?,
+        maxStreams: TorConfig.Setting.HiddenService.MaxStreams?
+    ): Result<HiddenServiceEntry> {
+        return processorDelegate.onionAdd(privateKey, hsPorts, flags, maxStreams)
+    }
+
+    override suspend fun onionAddNew(
+        type: OnionAddress.PrivateKey.Type,
+        hsPorts: Set<TorConfig.Setting.HiddenService.Ports>,
+        flags: Set<TorControlOnionAdd.Flag>?,
+        maxStreams: TorConfig.Setting.HiddenService.MaxStreams?
+    ): Result<HiddenServiceEntry> {
+        return processorDelegate.onionAddNew(type, hsPorts, flags, maxStreams)
+    }
 
     override suspend fun onionDel(address: OnionAddress): Result<Any?> {
         return processorDelegate.onionDel(address)
