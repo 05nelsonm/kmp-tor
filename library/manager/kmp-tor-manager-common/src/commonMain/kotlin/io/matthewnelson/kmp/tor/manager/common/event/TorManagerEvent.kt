@@ -216,8 +216,8 @@ sealed interface TorManagerEvent {
      * after bootstrapping has been completed. This can be relied on to perform
      * one time operations, such as adding hidden services and client auth keys.
      *
-     * A new [StartUpCompleteForTorInstance] will be issued in the event Tor is
-     * stopped or restarted, and completes it's bootstrapping process.
+     * A new [StartUpCompleteForTorInstance] will be dispatched in the event Tor
+     * is stopped, then started again and completes it's bootstrapping process.
      * */
     object StartUpCompleteForTorInstance: TorManagerEvent {
         override fun toString(): String {
