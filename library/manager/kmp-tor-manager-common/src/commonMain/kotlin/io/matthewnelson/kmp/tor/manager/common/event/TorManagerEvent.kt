@@ -211,6 +211,16 @@ sealed interface TorManagerEvent {
         }
     }
 
+    /**
+     * Will be issued a single time for a given Tor instance start operation
+     * after bootstrapping has been completed. This can be relied on to perform
+     * one time operations, such as adding hidden services and client auth keys.
+     *
+     * A new [StartUpCompleteForTorInstance] will be issued in the event Tor is
+     * stopped or restarted, and completes it's bootstrapping process.
+     * */
+    object StartUpCompleteForTorInstance: TorManagerEvent
+
     data class State(val torState: TorState, val networkState: TorNetworkState): TorManagerEvent {
         inline val isOff: Boolean get() = torState.isOff()
         inline val isOn: Boolean get() = torState.isOn()
@@ -242,6 +252,7 @@ sealed interface TorManagerEvent {
         open fun managerEventInfo(message: String) {}
         open fun managerEventWarn(message: String) {}
         open fun managerEventLifecycle(lifecycle: Lifecycle<*>) {}
+        open fun managerEventStartUpCompleteForTorInstance() {}
         open fun managerEventState(state: State) {}
 
         override fun onEvent(event: TorManagerEvent) {
@@ -256,6 +267,7 @@ sealed interface TorManagerEvent {
                 is Log.Info -> managerEventInfo(event.value)
                 is Log.Warn -> managerEventWarn(event.value)
                 is Lifecycle<*> -> managerEventLifecycle(event)
+                is StartUpCompleteForTorInstance -> managerEventStartUpCompleteForTorInstance()
                 is State -> managerEventState(event)
             }
         }
