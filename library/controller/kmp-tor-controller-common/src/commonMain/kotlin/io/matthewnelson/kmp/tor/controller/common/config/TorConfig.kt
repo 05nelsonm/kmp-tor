@@ -609,12 +609,25 @@ class TorConfig private constructor(
             override var value: Option.FileSystemDir? = default
                 set(value) { field = value?.nullIfEmpty }
 
+            /**
+             * See [HiddenService.Ports]
+             * */
             var ports: Set<HiddenService.Ports>? = null
                 private set
 
+            /**
+             * A value of `null` means it will not be written to the config and falls
+             * back to Tor's default value of 0 (unlimited).
+             *
+             * @see [MaxStreams]
+             * */
             var maxStreams: MaxStreams? = null
                 private set
 
+            /**
+             * A value of `null` means it will not be written to the config and falls
+             * back to Tor's default setting of [Option.TorF.False]
+             * */
             var maxStreamsCloseCircuit: Option.TorF? = null
                 private set
 
@@ -689,6 +702,12 @@ class TorConfig private constructor(
                 }
             }
 
+            /**
+             * https://2019.www.torproject.org/docs/tor-manual.html.en#HiddenServiceMaxStreams
+             *
+             * @throws [IllegalArgumentException] if [value] is not within the inclusive range
+             *   of 0 and 65535
+             * */
             @JvmInline
             value class MaxStreams(val value: Int) {
                 init {
