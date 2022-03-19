@@ -219,7 +219,11 @@ sealed interface TorManagerEvent {
      * A new [StartUpCompleteForTorInstance] will be issued in the event Tor is
      * stopped or restarted, and completes it's bootstrapping process.
      * */
-    object StartUpCompleteForTorInstance: TorManagerEvent
+    object StartUpCompleteForTorInstance: TorManagerEvent {
+        override fun toString(): String {
+            return "StartUpCompleteForTorInstance"
+        }
+    }
 
     data class State(val torState: TorState, val networkState: TorNetworkState): TorManagerEvent {
         inline val isOff: Boolean get() = torState.isOff()
