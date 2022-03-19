@@ -670,6 +670,9 @@ class TorConfig private constructor(
              * can be overridden by expressing a different value for [targetPort].
              *
              * https://2019.www.torproject.org/docs/tor-manual.html.en#HiddenServicePort
+             *
+             * @throws [IllegalArgumentException] if either [virtualPort] or [targetPort]
+             *   are not within the inclusive range of 1 and 65535
              * */
             data class Ports @JvmOverloads constructor(
                 val virtualPort: Int,
@@ -678,10 +681,10 @@ class TorConfig private constructor(
 
                 init {
                     require(virtualPort in 1..65535) {
-                        "HSPorts.virtualPort must be between 1 and 65535"
+                        "HiddenService.Ports.virtualPort must be between 1 and 65535"
                     }
                     require(targetPort in 1..65535) {
-                        "HSPorts.targetPort must be between 1 and 65535"
+                        "HiddenService.Ports.targetPort must be between 1 and 65535"
                     }
                 }
             }
