@@ -26,7 +26,7 @@ sealed class ReplyLine {
         override val status: String,
         val message: String
     ): ReplyLine() {
-        inline val isCommandResponseStatusSuccess: Boolean get() = status == "250"
+        inline val isCommandResponseStatusSuccess: Boolean get() = status.startsWith("25")
         inline val isEventStatusSuccess: Boolean get() = status == "650" && message == "OK"
     }
 

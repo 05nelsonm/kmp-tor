@@ -28,10 +28,7 @@ import io.matthewnelson.kmp.tor.controller.common.events.TorEvent
 import io.matthewnelson.kmp.tor.helper.TorTestHelper
 import io.matthewnelson.kmp.tor.manager.common.event.TorManagerEvent
 import kotlinx.coroutines.runBlocking
-import kotlin.test.Test
-import kotlin.test.assertEquals
-import kotlin.test.assertNull
-import kotlin.test.assertTrue
+import kotlin.test.*
 
 class TorControllerIntegrationTest: TorTestHelper() {
 
@@ -79,7 +76,10 @@ class TorControllerIntegrationTest: TorTestHelper() {
             flags = setOf(flagPerm),
         ).getOrThrow()
 
-        val entry = manager.onionClientAuthView(address).getOrThrow()
+        val entryResult = manager.onionClientAuthView(address)
+        manager.onionClientAuthRemove(address)
+
+        val entry = entryResult.getOrThrow()
         assertEquals(address.value, entry.address)
         assertEquals(privateKey.keyType.toString(), entry.keyType)
         assertEquals(privateKey.base64(padded = true), entry.privateKey)
@@ -250,6 +250,38 @@ class TorControllerIntegrationTest: TorTestHelper() {
         manager.onionDel(entry.address)
 
         assertTrue(result.isFailure)
+
+        Unit
+    }
+
+    @Test
+    fun givenController_whenReplyIsCodedAs25x_returnsSuccess() = runBlocking {
+        val address = OnionAddressV3("6yxtsbpn2k7exxiarcbiet3fsr4komissliojxjlvl7iytacrnvz2uyd")
+        val privateKey = OnionClientAuthPrivateKey_B32_X25519("XAYX4ZVA2WOC7NMTZKG5XQ4OUDHUJDIPQVGPJ3LPPXBHN7NLB56Q")
+        val privateKey2 = OnionClientAuthPrivateKey_B32_X25519("5BM6QSFGK6HLVDJKMYXHHU7L5IRMDY2W7MXEXN46IYH5URKBTRYA")
+        val clientName = ClientName("Test^.HS")
+        val flagPerm = TorControlOnionClientAuth.Flag.Permanent
+
+        manager.onionClientAuthAdd(
+            address = address,
+            key = privateKey,
+            clientName = clientName,
+            flags = setOf(flagPerm),
+        ).getOrThrow()
+
+        // This will result in Tor responding with a non 250 coded reply.
+        // status=251, message=Client for onion existed and replaced
+        val result = manager.onionClientAuthAdd(
+            address = address,
+            key = privateKey2,
+            clientName = clientName,
+            flags = setOf(flagPerm),
+        )
+
+        manager.onionClientAuthRemove(address)
+
+        // Fail test if kotlin.Result.Failure
+        result.getOrThrow()
 
         Unit
     }
