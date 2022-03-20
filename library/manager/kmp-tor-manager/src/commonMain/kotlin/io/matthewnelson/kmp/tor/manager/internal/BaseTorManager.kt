@@ -198,8 +198,8 @@ internal abstract class BaseTorManager: SynchronizedObject(), TorControlManager 
         }
     }
 
-    override suspend fun onionClientAuthView(address: OnionAddressV3): Result<List<ClientAuthEntry>> {
-        return provide<TorControlOnionClientAuthView, List<ClientAuthEntry>> {
+    override suspend fun onionClientAuthView(address: OnionAddressV3): Result<ClientAuthEntry> {
+        return provide<TorControlOnionClientAuthView, ClientAuthEntry> {
             onionClientAuthView(address)
         }
     }

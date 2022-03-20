@@ -541,7 +541,7 @@ private class RealTorController(
         return processorDelegate.onionClientAuthView()
     }
 
-    override suspend fun onionClientAuthView(address: OnionAddressV3): Result<List<ClientAuthEntry>> {
+    override suspend fun onionClientAuthView(address: OnionAddressV3): Result<ClientAuthEntry> {
         return processorDelegate.onionClientAuthView(address)
     }
 

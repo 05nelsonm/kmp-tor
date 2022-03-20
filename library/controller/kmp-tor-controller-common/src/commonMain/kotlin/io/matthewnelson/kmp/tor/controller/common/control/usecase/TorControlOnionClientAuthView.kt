@@ -30,6 +30,6 @@ interface TorControlOnionClientAuthView {
 
     suspend fun onionClientAuthView(): Result<List<ClientAuthEntry>>
 
-    suspend fun onionClientAuthView(address: OnionAddressV3): Result<List<ClientAuthEntry>>
+    suspend fun onionClientAuthView(address: OnionAddressV3): Result<ClientAuthEntry>
 
 }
