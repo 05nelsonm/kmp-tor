@@ -18,7 +18,7 @@ package kmp.tor
 @Suppress("ClassName")
 object env {
     // Must be either "-SNAPSHOT" || ""
-    private const val SNAPSHOT              = "-SNAPSHOT"
+    private const val SNAPSHOT              = ""
 
     private const val MANAGER_VERSION_NAME  = "0.1.0-beta1"
     //                           1.0.0-alpha1  == 01_00_00_11
@@ -53,6 +53,7 @@ object env {
      * Modules:
      *  - :library:controller:*
      *  - :library:kmp-tor-common
+     *  - :library:kmp-tor-internal
      *  - :library:manager:*
      * */
     object kmpTor {
