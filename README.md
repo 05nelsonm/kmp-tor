@@ -9,9 +9,7 @@
 
 Kotlin Multiplatform support for embedding Tor into your application.
 
-**NOTE:** This project is currently in `alpha` and needs your feedback! Your help in shaping 
-the APIs and working out potential usage kinks is greatly appreciated so that it can move 
-into `beta` where APIs will go stable.
+**NOTE:** This project is currently in `beta`, where APIs are now stable and will not change.
 
 ### Get Started
 
@@ -19,7 +17,7 @@ Add dependency
 ```kotlin
 // build.gradle.kts
 dependencies {
-    implementation("io.matthewnelson.kotlin-components:kmp-tor:0.4.6.10+0.1.0-alpha4")
+    implementation("io.matthewnelson.kotlin-components:kmp-tor:0.4.6.10+0.1.0-beta1")
 }
 ```
 
