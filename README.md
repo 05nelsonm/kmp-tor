@@ -64,3 +64,8 @@ $ git checkout master
 $ git pull
 $ git submodule update --init
 ```
+
+In order to keep submodules updated when pulling the latest code, run:
+```bash
+$ git pull --recurse-submodules
+```
