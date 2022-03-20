@@ -600,6 +600,7 @@ private class RealTorControlProcessor(
                 val command = StringBuilder("ONION_CLIENT_AUTH_REMOVE")
                     .append(SP)
                     .append(address.value)
+                    .append(CLRF)
                     .toString()
 
                 Result.success(processCommand(command))
