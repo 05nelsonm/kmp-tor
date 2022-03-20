@@ -30,6 +30,7 @@ import io.matthewnelson.kmp.tor.manager.common.state.TorNetworkState
 import io.matthewnelson.kmp.tor.manager.common.state.TorState
 import io.matthewnelson.kmp.tor.manager.internal.TorStateMachine
 import io.matthewnelson.kmp.tor.manager.internal.ext.infoGetBootstrapProgressOrNull
+import io.matthewnelson.kmp.tor.manager.util.PortUtil
 import kotlinx.coroutines.*
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
@@ -168,7 +169,7 @@ actual abstract class KmpTorLoader @JvmOverloads constructor(
         torJob?.cancel()
 
         val validated: TorConfigProvider.ValidatedTorConfig = withContext(io) {
-            provider.retrieve(excludeSettings) { port -> isPortAvailable(port) }
+            provider.retrieve(excludeSettings) { port -> PortUtil.isTcpPortAvailable(port) }
         }
 
         val mkdirsFailure: TorManagerException? = withContext(io) {
@@ -427,21 +428,6 @@ actual abstract class KmpTorLoader @JvmOverloads constructor(
         }
 
         throw TorManagerException("Failed to read ${file.name}")
-    }
-
-    private fun isPortAvailable(port: Port): Boolean {
-        return try {
-            // check if TCP port is available. Will throw exception otherwise.
-            val serverSocket = ServerSocketFactory.getDefault().createServerSocket(
-                port.value,
-                1,
-                InetAddress.getByName("localhost")
-            )
-            serverSocket.close()
-            true
-        } catch (_: Exception) {
-            false
-        }
     }
 
     @Throws(TorManagerException::class, CancellationException::class)
