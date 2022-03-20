@@ -15,7 +15,6 @@
  **/
 package io.matthewnelson.kmp.tor.manager
 
-import io.matthewnelson.kmp.tor.common.address.Port
 import io.matthewnelson.kmp.tor.common.annotation.InternalTorApi
 import io.matthewnelson.kmp.tor.controller.TorController
 import io.matthewnelson.kmp.tor.controller.common.config.TorConfig

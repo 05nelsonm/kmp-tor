@@ -20,6 +20,7 @@ import io.matthewnelson.kmp.tor.PlatformInstaller
 import io.matthewnelson.kmp.tor.PlatformInstaller.InstallOption
 import io.matthewnelson.kmp.tor.TorConfigProviderJvm
 import io.matthewnelson.kmp.tor.common.address.Port
+import io.matthewnelson.kmp.tor.common.address.PortProxy
 import io.matthewnelson.kmp.tor.common.annotation.InternalTorApi
 import io.matthewnelson.kmp.tor.controller.common.config.TorConfig
 import io.matthewnelson.kmp.tor.controller.common.config.TorConfig.Setting.*
@@ -85,15 +86,15 @@ abstract class TorTestHelper {
 
     protected open fun testConfig(testProvider: TorConfigProviderJvm): TorConfig {
         return TorConfig.Builder {
-            put(Ports.Control().set(AorDorPort.Value(Port(9155))))
+            put(Ports.Control().set(AorDorPort.Value(PortProxy(9155))))
             put(Ports.Socks().set(AorDorPort.Auto))
             put(Ports.HttpTunnel().set(AorDorPort.Auto))
             put(Ports.Trans().set(AorDorPort.Auto))
 
             put(HiddenService()
                 .setPorts(ports = setOf(
-                    HiddenService.Ports(virtualPort = 1025, targetPort = 1027),
-                    HiddenService.Ports(virtualPort = 1026, targetPort = 1027)
+                    HiddenService.Ports(virtualPort = Port(1025), targetPort = Port(1027)),
+                    HiddenService.Ports(virtualPort = Port(1026), targetPort = Port(1027))
                 ))
                 .setMaxStreams(maxStreams = HiddenService.MaxStreams(value = 2))
                 .setMaxStreamsCloseCircuit(value = TorF.True)
@@ -107,8 +108,8 @@ abstract class TorTestHelper {
 
             put(HiddenService()
                 .setPorts(ports = setOf(
-                    HiddenService.Ports(virtualPort = 1028, targetPort = 1030),
-                    HiddenService.Ports(virtualPort = 1029, targetPort = 1030)
+                    HiddenService.Ports(virtualPort = Port(1028), targetPort = Port(1030)),
+                    HiddenService.Ports(virtualPort = Port(1029), targetPort = Port(1030))
                 ))
                 .set(FileSystemDir(
                     testProvider.workDir.builder {

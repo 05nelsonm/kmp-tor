@@ -38,13 +38,13 @@ actual object PortUtil {
      *   9050 to 9100
      *
      * ex2: (port = Port(65535), limit = 50) will check availability from
-     *   65535, and 1024 to 1073
+     *   65535, and 0 to 48
      *
      * If the initial [port] is available, it will be returned.
      *
      * @throws [RuntimeException] if:
      *   - [limit] has been reached
-     *   - [limit] is less than 1
+     *   - [limit] is less than 1 or greater than 65535
      *   - called from Android's Main Thread.
      * */
     @Throws(RuntimeException::class)

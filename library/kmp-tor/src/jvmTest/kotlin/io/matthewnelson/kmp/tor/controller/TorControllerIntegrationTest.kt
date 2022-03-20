@@ -18,6 +18,7 @@ package io.matthewnelson.kmp.tor.controller
 import io.matthewnelson.kmp.tor.common.address.OnionAddress
 import io.matthewnelson.kmp.tor.common.address.OnionAddressV3
 import io.matthewnelson.kmp.tor.common.address.OnionAddressV3PrivateKey_ED25519
+import io.matthewnelson.kmp.tor.common.address.Port
 import io.matthewnelson.kmp.tor.common.clientauth.ClientName
 import io.matthewnelson.kmp.tor.common.clientauth.OnionClientAuthPrivateKey_B32_X25519
 import io.matthewnelson.kmp.tor.controller.common.config.TorConfig
@@ -172,10 +173,10 @@ class TorControllerIntegrationTest: TorTestHelper() {
         val entry = manager.onionAddNew(
             type = OnionAddress.PrivateKey.Type.ED25519_V3,
             hsPorts = setOf(
-                TorConfig.Setting.HiddenService.Ports(virtualPort = 8761, targetPort = 8760),
-                TorConfig.Setting.HiddenService.Ports(virtualPort = 8762, targetPort = 8760),
-                TorConfig.Setting.HiddenService.Ports(virtualPort = 8763, targetPort = 8760),
-                TorConfig.Setting.HiddenService.Ports(virtualPort = 8764, targetPort = 8760),
+                TorConfig.Setting.HiddenService.Ports(virtualPort = Port(8761), targetPort = Port(8760)),
+                TorConfig.Setting.HiddenService.Ports(virtualPort = Port(8762), targetPort = Port(8760)),
+                TorConfig.Setting.HiddenService.Ports(virtualPort = Port(8763), targetPort = Port(8760)),
+                TorConfig.Setting.HiddenService.Ports(virtualPort = Port(8764), targetPort = Port(8760)),
             ),
             flags = setOf(
                 TorControlOnionAdd.Flag.MaxStreamsCloseCircuit,
@@ -196,7 +197,7 @@ class TorControllerIntegrationTest: TorTestHelper() {
             val entry = manager.onionAdd(
                 privateKey = OnionAddressV3PrivateKey_ED25519("gGNRsNtSKe38fPr/J1UW2nOCNetZNl3qNySlPs9M5Fait1VVruWEBOoNU7fuPRkC4yrS1G7f/VjohBdzKTIQ6Q"),
                 hsPorts = setOf(
-                    TorConfig.Setting.HiddenService.Ports(virtualPort = 8770, targetPort = 8770),
+                    TorConfig.Setting.HiddenService.Ports(virtualPort = Port(8770), targetPort = Port(8770)),
                 ),
                 flags = setOf(
                     TorControlOnionAdd.Flag.DiscardPK,
@@ -236,14 +237,14 @@ class TorControllerIntegrationTest: TorTestHelper() {
         val entry = manager.onionAddNew(
             type = OnionAddress.PrivateKey.Type.ED25519_V3,
             hsPorts = setOf(
-                TorConfig.Setting.HiddenService.Ports(virtualPort = 8771, targetPort = 8770),
+                TorConfig.Setting.HiddenService.Ports(virtualPort = Port(8771), targetPort = Port(8770)),
             ),
         ).getOrThrow()
 
         val result = manager.onionAdd(
             privateKey = entry.privateKey!!,
             hsPorts = setOf(
-                TorConfig.Setting.HiddenService.Ports(virtualPort = 8772, targetPort = 8770),
+                TorConfig.Setting.HiddenService.Ports(virtualPort = Port(8772), targetPort = Port(8770)),
             ),
         )
 

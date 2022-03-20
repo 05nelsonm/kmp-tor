@@ -20,6 +20,7 @@ import io.matthewnelson.kmp.tor.PlatformInstaller
 import io.matthewnelson.kmp.tor.PlatformInstaller.InstallOption
 import io.matthewnelson.kmp.tor.TorConfigProviderJvm
 import io.matthewnelson.kmp.tor.common.address.Port
+import io.matthewnelson.kmp.tor.common.address.PortProxy
 import io.matthewnelson.kmp.tor.controller.common.config.TorConfig
 import io.matthewnelson.kmp.tor.controller.common.config.TorConfig.Setting.*
 import io.matthewnelson.kmp.tor.controller.common.config.TorConfig.Option.*
@@ -93,32 +94,32 @@ class SampleApp: App(SampleView::class) {
                 return TorConfig.Builder {
                     // Set multiple ports for all of the things
                     val dns = Ports.Dns()
-                    put(dns.set(AorDorPort.Value(Port(9252))))
-                    put(dns.set(AorDorPort.Value(Port(9253))))
+                    put(dns.set(AorDorPort.Value(PortProxy(9252))))
+                    put(dns.set(AorDorPort.Value(PortProxy(9253))))
 
                     val socks = Ports.Socks()
-                    put(socks.set(AorDorPort.Value(Port(9254))))
-                    put(socks.set(AorDorPort.Value(Port(9255))))
+                    put(socks.set(AorDorPort.Value(PortProxy(9254))))
+                    put(socks.set(AorDorPort.Value(PortProxy(9255))))
 
                     val http = Ports.HttpTunnel()
-                    put(http.set(AorDorPort.Value(Port(9258))))
-                    put(http.set(AorDorPort.Value(Port(9259))))
+                    put(http.set(AorDorPort.Value(PortProxy(9258))))
+                    put(http.set(AorDorPort.Value(PortProxy(9259))))
 
                     val trans = Ports.Trans()
-                    put(trans.set(AorDorPort.Value(Port(9262))))
-                    put(trans.set(AorDorPort.Value(Port(9263))))
+                    put(trans.set(AorDorPort.Value(PortProxy(9262))))
+                    put(trans.set(AorDorPort.Value(PortProxy(9263))))
 
                     // If a port (9263) is already taken (by ^^^^ trans port above)
                     // this will take its place and "overwrite" the trans port entry
                     // because port 9263 is taken.
-                    put(socks.set(AorDorPort.Value(Port(9263))))
+                    put(socks.set(AorDorPort.Value(PortProxy(9263))))
 
                     // Set Flags
                     socks.setFlags(setOf(
                         Ports.Socks.Flag.OnionTrafficOnly
                     )).setIsolationFlags(setOf(
                         Ports.IsolationFlag.IsolateClientAddr
-                    )).set(AorDorPort.Value(Port(9264)))
+                    )).set(AorDorPort.Value(PortProxy(9264)))
                     put(socks)
 
                     // reset our socks object to defaults
@@ -145,8 +146,8 @@ class SampleApp: App(SampleView::class) {
                     // Add Hidden services
                     put(HiddenService()
                         .setPorts(ports = setOf(
-                            HiddenService.Ports(virtualPort = 1025, targetPort = 1027),
-                            HiddenService.Ports(virtualPort = 1026, targetPort = 1027)
+                            HiddenService.Ports(virtualPort = Port(1025), targetPort = Port(1027)),
+                            HiddenService.Ports(virtualPort = Port(1026), targetPort = Port(1027))
                         ))
                         .setMaxStreams(maxStreams = HiddenService.MaxStreams(value = 2))
                         .setMaxStreamsCloseCircuit(value = TorF.True)
@@ -160,8 +161,8 @@ class SampleApp: App(SampleView::class) {
 
                     put(HiddenService()
                         .setPorts(ports = setOf(
-                            HiddenService.Ports(virtualPort = 1028, targetPort = 1030),
-                            HiddenService.Ports(virtualPort = 1029, targetPort = 1030)
+                            HiddenService.Ports(virtualPort = Port(1028), targetPort = Port(1030)),
+                            HiddenService.Ports(virtualPort = Port(1029), targetPort = Port(1030))
                         ))
                         .set(FileSystemDir(
                             workDir.builder {

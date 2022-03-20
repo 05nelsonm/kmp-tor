@@ -53,28 +53,24 @@ actual object PortUtil {
      *   9050 to 9100
      *
      * ex2: (port = Port(65535), limit = 50) will check availability from
-     *   65535, and 1024 to 1073
+     *   65535, and 0 to 48
      *
      * If the initial [port] is available, it will be returned.
      *
      * @throws [RuntimeException] if:
      *   - [limit] has been reached
-     *   - [limit] is less than 1
+     *   - [limit] is less than 1 or greater than 65535
      *   - called from Android's Main Thread.
      * */
     @JvmStatic
     @Throws(RuntimeException::class)
     actual fun findNextAvailableTcpPort(port: Port, limit: Int): Port {
-        if (limit < 1) {
+        if (limit !in 1..Port.MAX) {
             throw RuntimeException("limit must be greater than or equal to 1")
         }
 
         var currentPort = port.value
-        var countDown = if (limit > Port.MAX - Port.MIN) {
-            Port.MAX - Port.MIN
-        } else {
-            limit
-        }
+        var countDown = limit
 
         while (countDown >= 0) {
             try {

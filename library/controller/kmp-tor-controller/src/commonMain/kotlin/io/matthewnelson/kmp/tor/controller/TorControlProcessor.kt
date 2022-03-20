@@ -482,9 +482,9 @@ private class RealTorControlProcessor(
                     for (hsPort in hsPorts) {
                         append(SP)
                         append("Port=")
-                        append(hsPort.virtualPort)
+                        append(hsPort.virtualPort.value)
                         append(',')
-                        append(hsPort.targetPort)
+                        append(hsPort.targetPort.value)
                     }
                 }
 
