@@ -19,11 +19,13 @@ import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.content.ServiceConnection
+import android.os.Build
 import android.os.IBinder
 import io.matthewnelson.kmp.tor.common.annotation.InternalTorApi
 import io.matthewnelson.kmp.tor.controller.common.events.TorEventProcessor
 import io.matthewnelson.kmp.tor.controller.internal.controller.ListenersHandler
 import io.matthewnelson.kmp.tor.manager.TorManager
+import io.matthewnelson.kmp.tor.manager.TorServiceConfig
 import io.matthewnelson.kmp.tor.manager.common.event.TorManagerEvent
 import kotlin.Exception
 
@@ -59,7 +61,16 @@ internal object TorServiceController:
     @Throws(RuntimeException::class)
     fun startService(context: Context) {
         val intent = Intent(context.applicationContext, TorService::class.java)
-        context.applicationContext.startService(intent)
+
+        if (
+            TorServiceConfig.getMetaData(context).enableForeground &&
+            Build.VERSION.SDK_INT >= Build.VERSION_CODES.O
+        ) {
+            context.applicationContext.startForegroundService(intent)
+        } else {
+            context.applicationContext.startService(intent)
+        }
+
         _binderState = BinderState.Starting
         bindService(context, intent)
     }
