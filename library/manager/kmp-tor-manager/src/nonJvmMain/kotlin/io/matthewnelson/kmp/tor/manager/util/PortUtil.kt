@@ -20,9 +20,35 @@ import io.matthewnelson.kmp.tor.common.address.Port
 actual object PortUtil {
 
     /**
-     * Must be called from a background thread
+     * Must be called from a background thread.
+     *
+     * @throws [RuntimeException] if called from Android's Main thread.
      * */
+    @Throws(RuntimeException::class)
     actual fun isTcpPortAvailable(port: Port): Boolean {
+        TODO("Not yet implemented")
+    }
+
+    /**
+     * Will find the next available [Port] starting from the provided
+     * [port], checking availability in increments of 1 up to the specified
+     * limit of times.
+     *
+     * ex1: (port = Port(9050), limit = 50) Will check availability from
+     *   9050 to 9100
+     *
+     * ex2: (port = Port(65535), limit = 50) will check availability from
+     *   65535, and 1024 to 1073
+     *
+     * If the initial [port] is available, it will be returned.
+     *
+     * @throws [RuntimeException] if:
+     *   - [limit] has been reached
+     *   - [limit] is less than 1
+     *   - called from Android's Main Thread.
+     * */
+    @Throws(RuntimeException::class)
+    actual fun findNextAvailableTcpPort(port: Port, limit: Int): Port {
         TODO("Not yet implemented")
     }
 }
