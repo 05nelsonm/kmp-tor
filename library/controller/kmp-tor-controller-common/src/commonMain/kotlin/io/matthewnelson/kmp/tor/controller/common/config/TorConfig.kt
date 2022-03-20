@@ -146,16 +146,21 @@ class TorConfig private constructor(
             val sb = StringBuilder()
 
             val disabledPorts = mutableSetOf<String>()
-            for (setting in settings) {
-                if (setting is Setting.Ports && setting.value is Option.AorDorPort.Disable) {
-                    disabledPorts.add(setting.keyword)
+            val sorted = settings.sortedBy { setting ->
+                if (setting is Setting.Ports) {
+                    if (setting.value is Option.AorDorPort.Disable) {
+                        disabledPorts.add(setting.keyword)
+                    }
+                    "AAA${setting.keyword}"
+                } else {
+                    setting.keyword
                 }
             }
 
             val writtenDisabledPorts: MutableSet<String> = LinkedHashSet(disabledPorts.size)
 
             val newSettings = mutableSetOf<Setting<*>>()
-            for (setting in settings) {
+            for ((i, setting) in sorted.withIndex()) {
                 val value = setting.value ?: continue
 
                 if (setting is Setting.Ports) {
@@ -233,6 +238,10 @@ class TorConfig private constructor(
 
                     if (hsPorts == null || hsPorts.isEmpty()) {
                         continue
+                    }
+
+                    if (sorted.elementAtOrNull(i - 1) !is Setting.HiddenService) {
+                        sb.appendLine()
                     }
 
                     sb.append(setting.keyword)
