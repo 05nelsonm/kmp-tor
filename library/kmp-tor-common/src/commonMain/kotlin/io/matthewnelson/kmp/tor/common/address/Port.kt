@@ -27,12 +27,15 @@ import kotlin.jvm.JvmStatic
 value class Port(val value: Int) {
 
     init {
-        require(value in 1024..65535) {
-            "Invalid port range. Must be between 1024 and 65535"
+        require(value in MIN..MAX) {
+            "Invalid port range. Must be between $MIN and $MAX"
         }
     }
 
     companion object {
+        const val MIN = 1024
+        const val MAX = 65535
+
         @JvmStatic
         fun fromIntOrNull(port: Int?): Port? {
             return try {
