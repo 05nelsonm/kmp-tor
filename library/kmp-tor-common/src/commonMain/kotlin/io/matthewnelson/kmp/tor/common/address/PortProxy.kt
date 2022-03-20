@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Matthew Nelson
+ * Copyright (c) 2022 Matthew Nelson
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,27 +19,26 @@ import kotlin.jvm.JvmInline
 import kotlin.jvm.JvmStatic
 
 /**
- * Holder for a valid port between 0 and 65535
+ * Holder for a valid proxy port between 1024 and 65535
  *
  * @throws [IllegalArgumentException] if port is not valid
  * */
 @JvmInline
-value class Port(val value: Int) {
+value class PortProxy(val value: Int) {
 
     init {
-        require(value in MIN..MAX) {
-            "Invalid port range. Must be between $MIN and $MAX"
+        require(value in MIN..Port.MAX) {
+            "Invalid port range. Must be between $MIN and ${Port.MAX}"
         }
     }
 
     companion object {
-        const val MIN = 0
-        const val MAX = 65535
+        const val MIN = 1024
 
         @JvmStatic
-        fun fromIntOrNull(port: Int?): Port? {
+        fun fromIntOrNull(port: Int?): PortProxy? {
             return try {
-                Port(port ?: return null)
+                PortProxy(port ?: return null)
             } catch (_: IllegalArgumentException) {
                 null
             }

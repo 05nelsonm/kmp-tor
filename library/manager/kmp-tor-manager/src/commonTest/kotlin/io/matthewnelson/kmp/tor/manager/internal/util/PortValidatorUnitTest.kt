@@ -15,7 +15,7 @@
  **/
 package io.matthewnelson.kmp.tor.manager.internal.util
 
-import io.matthewnelson.kmp.tor.common.address.Port
+import io.matthewnelson.kmp.tor.common.address.PortProxy
 import io.matthewnelson.kmp.tor.controller.common.config.TorConfig.Setting.Ports
 import io.matthewnelson.kmp.tor.controller.common.config.TorConfig.Option.AorDorPort
 import kotlin.test.Test
@@ -28,7 +28,7 @@ class PortValidatorUnitTest {
 
     @Test
     fun givenPortWithValue_whenPortUnavailable_setsToAuto() {
-        val port = Port(9150)
+        val port = PortProxy(9150)
         val socks = Ports.Socks()
         socks.set(AorDorPort.Value(port))
 

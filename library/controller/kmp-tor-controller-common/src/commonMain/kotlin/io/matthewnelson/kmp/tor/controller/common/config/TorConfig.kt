@@ -16,6 +16,7 @@
 package io.matthewnelson.kmp.tor.controller.common.config
 
 import io.matthewnelson.kmp.tor.common.address.Port
+import io.matthewnelson.kmp.tor.common.address.PortProxy
 import io.matthewnelson.kmp.tor.common.annotation.InternalTorApi
 import kotlin.jvm.JvmStatic
 import io.matthewnelson.kmp.tor.common.util.TorStrings.REDACTED
@@ -242,11 +243,11 @@ class TorConfig private constructor(
                         sb.appendLine()
                         sb.append("HiddenServicePort")
                         sb.append(SP)
-                        sb.append(hsPort.virtualPort)
+                        sb.append(hsPort.virtualPort.value)
                         sb.append(SP)
                         sb.append("127.0.0.1")
                         sb.append(':')
-                        sb.append(hsPort.targetPort)
+                        sb.append(hsPort.targetPort.value)
                     }
 
                     setting.maxStreams?.let { maxStreams ->
@@ -584,8 +585,8 @@ class TorConfig private constructor(
         /**
          * val myHiddenService = Setting.HiddenService()
          *     .setPorts(ports = setOf(
-         *         Setting.HiddenService.Ports(virtualPort = 22, targetPort = 22)
-         *         Setting.HiddenService.Ports(virtualPort = 8022, targetPort = 22)
+         *         Setting.HiddenService.Ports(virtualPort = Port(22))
+         *         Setting.HiddenService.Ports(virtualPort = Port(8022), targetPort = Port(22))
          *     ))
          *     .setMaxStreams(maxStreams = Setting.HiddenService.MaxStreams(2))
          *     .setMaxStreamsCloseCircuit(value = TorF.False)
@@ -683,24 +684,8 @@ class TorConfig private constructor(
              * can be overridden by expressing a different value for [targetPort].
              *
              * https://2019.www.torproject.org/docs/tor-manual.html.en#HiddenServicePort
-             *
-             * @throws [IllegalArgumentException] if either [virtualPort] or [targetPort]
-             *   are not within the inclusive range of 1 and 65535
              * */
-            data class Ports @JvmOverloads constructor(
-                val virtualPort: Int,
-                val targetPort: Int = virtualPort
-            ) {
-
-                init {
-                    require(virtualPort in 1..65535) {
-                        "HiddenService.Ports.virtualPort must be between 1 and 65535"
-                    }
-                    require(targetPort in 1..65535) {
-                        "HiddenService.Ports.targetPort must be between 1 and 65535"
-                    }
-                }
-            }
+            data class Ports(val virtualPort: Port, val targetPort: Port = virtualPort)
 
             /**
              * https://2019.www.torproject.org/docs/tor-manual.html.en#HiddenServiceMaxStreams
@@ -711,8 +696,8 @@ class TorConfig private constructor(
             @JvmInline
             value class MaxStreams(val value: Int) {
                 init {
-                    require(value in 0..65535) {
-                        "MaxStreams.value must be between 0 and 65535"
+                    require(value in Port.MIN..Port.MAX) {
+                        "MaxStreams.value must be between ${Port.MIN} and ${Port.MAX}"
                     }
                 }
             }
@@ -879,7 +864,8 @@ class TorConfig private constructor(
              * https://2019.www.torproject.org/docs/tor-manual.html.en#SocksPort
              * */
             class Socks                         : Ports("SocksPort") {
-                override val default: Option.AorDorPort get() = Option.AorDorPort.Value(Port(9050))
+                override val default: Option.AorDorPort
+                    get() = Option.AorDorPort.Value(PortProxy(9050))
                 override var value: Option.AorDorPort = default
                 var flags: Set<Flag>? = null
                     private set
@@ -1073,7 +1059,7 @@ class TorConfig private constructor(
             }
 
             @JvmInline
-            value class Value(val port: Port)                               : AorDorPort {
+            value class Value(val port: PortProxy)                          : AorDorPort {
                 override val value: String get() = port.value.toString()
                 override fun toString(): String = value
             }

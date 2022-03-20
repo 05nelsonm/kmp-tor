@@ -15,7 +15,7 @@
  **/
 package io.matthewnelson.kmp.tor
 
-import io.matthewnelson.kmp.tor.common.address.Port
+import io.matthewnelson.kmp.tor.common.address.PortProxy
 import io.matthewnelson.kmp.tor.controller.common.config.TorConfig
 import io.matthewnelson.kmp.tor.controller.common.config.TorConfig.Setting.*
 import io.matthewnelson.kmp.tor.controller.common.config.TorConfig.Option.*
@@ -28,34 +28,34 @@ class KmpTorLoaderJvmIntegrationTest: TorTestHelper() {
     override fun testConfig(testProvider: TorConfigProviderJvm): TorConfig {
         return TorConfig.Builder {
             val control = Ports.Control()
-            put(control.set(AorDorPort.Value(Port(9150))))
-            put(control.set(AorDorPort.Value(Port(9151))))
-            put(control.set(AorDorPort.Value(Port(9152))))
-            put(control.set(AorDorPort.Value(Port(9153))))
+            put(control.set(AorDorPort.Value(PortProxy(9150))))
+            put(control.set(AorDorPort.Value(PortProxy(9151))))
+            put(control.set(AorDorPort.Value(PortProxy(9152))))
+            put(control.set(AorDorPort.Value(PortProxy(9153))))
 
             val dns = Ports.Dns()
-            put(dns.set(AorDorPort.Value(Port(9154))))
-            put(dns.set(AorDorPort.Value(Port(9155))))
-            put(dns.set(AorDorPort.Value(Port(9156))))
-            put(dns.set(AorDorPort.Value(Port(9157))))
+            put(dns.set(AorDorPort.Value(PortProxy(9154))))
+            put(dns.set(AorDorPort.Value(PortProxy(9155))))
+            put(dns.set(AorDorPort.Value(PortProxy(9156))))
+            put(dns.set(AorDorPort.Value(PortProxy(9157))))
 
             val socks = Ports.Socks()
-            put(socks.set(AorDorPort.Value(Port(9158))))
-            put(socks.set(AorDorPort.Value(Port(9159))))
-            put(socks.set(AorDorPort.Value(Port(9160))))
-            put(socks.set(AorDorPort.Value(Port(9161))))
+            put(socks.set(AorDorPort.Value(PortProxy(9158))))
+            put(socks.set(AorDorPort.Value(PortProxy(9159))))
+            put(socks.set(AorDorPort.Value(PortProxy(9160))))
+            put(socks.set(AorDorPort.Value(PortProxy(9161))))
 
             val http = Ports.HttpTunnel()
-            put(http.set(AorDorPort.Value(Port(9162))))
-            put(http.set(AorDorPort.Value(Port(9163))))
-            put(http.set(AorDorPort.Value(Port(9164))))
-            put(http.set(AorDorPort.Value(Port(9165))))
+            put(http.set(AorDorPort.Value(PortProxy(9162))))
+            put(http.set(AorDorPort.Value(PortProxy(9163))))
+            put(http.set(AorDorPort.Value(PortProxy(9164))))
+            put(http.set(AorDorPort.Value(PortProxy(9165))))
 
             val trans = Ports.Trans()
-            put(trans.set(AorDorPort.Value(Port(9166))))
-            put(trans.set(AorDorPort.Value(Port(9167))))
-            put(trans.set(AorDorPort.Value(Port(9168))))
-            put(trans.set(AorDorPort.Value(Port(9169))))
+            put(trans.set(AorDorPort.Value(PortProxy(9166))))
+            put(trans.set(AorDorPort.Value(PortProxy(9167))))
+            put(trans.set(AorDorPort.Value(PortProxy(9168))))
+            put(trans.set(AorDorPort.Value(PortProxy(9169))))
 
             put(ClientOnionAuthDir().set(FileSystemDir(
                 testProvider.workDir.builder { addSegment(ClientOnionAuthDir.DEFAULT_NAME) }

@@ -16,6 +16,7 @@
 package io.matthewnelson.kmp.tor.controller.common.config
 
 import io.matthewnelson.kmp.tor.common.address.Port
+import io.matthewnelson.kmp.tor.common.address.PortProxy
 import io.matthewnelson.kmp.tor.controller.common.config.TorConfig.Option.*
 import io.matthewnelson.kmp.tor.controller.common.config.TorConfig.Setting.*
 import io.matthewnelson.kmp.tor.controller.common.file.Path
@@ -139,7 +140,7 @@ class TorConfigUnitTest {
     fun givenDifferentPortTypes_whenSamePort_areEqual() {
         val http = Ports.HttpTunnel()
         val socks = Ports.Socks()
-        val port = AorDorPort.Value(Port(9150))
+        val port = AorDorPort.Value(PortProxy(9150))
         http.set(port)
         socks.set(port)
 
@@ -169,7 +170,7 @@ class TorConfigUnitTest {
         val tunnelPort = Ports.HttpTunnel()
         val auto = AorDorPort.Auto
         val disabled = AorDorPort.Disable
-        val portValue = AorDorPort.Value(Port(9150))
+        val portValue = AorDorPort.Value(PortProxy(9150))
 
         val config = TorConfig.Builder {
             put(tunnelPort.set(auto))
@@ -196,7 +197,7 @@ class TorConfigUnitTest {
         val tunnelPort = Ports.HttpTunnel()
         val auto = AorDorPort.Auto
         val disabled = AorDorPort.Disable
-        val portValue = AorDorPort.Value(Port(9150))
+        val portValue = AorDorPort.Value(PortProxy(9150))
 
         val config = TorConfig.Builder {
             put(tunnelPort.set(auto))
@@ -273,7 +274,7 @@ class TorConfigUnitTest {
 
     @Test
     fun givenSamePortSettings_whenValuesDifferent_settingsAreNotEquals() {
-        val control1 = Ports.Control().set(AorDorPort.Value(Port(9051)))
+        val control1 = Ports.Control().set(AorDorPort.Value(PortProxy(9051)))
         val control2 = control1.clone().set(AorDorPort.Auto)
 
         assertNotEquals(control1, control2)
@@ -283,7 +284,7 @@ class TorConfigUnitTest {
     @Test
     fun givenPort_whenCloned_originalPortSettingsNotAffectedByModification() {
         val socks1 = Ports.Socks()
-        socks1.set(AorDorPort.Value(Port(9150)))
+        socks1.set(AorDorPort.Value(PortProxy(9150)))
 
         val socks2 = socks1.clone()
         socks2.set(AorDorPort.Auto)
@@ -297,8 +298,8 @@ class TorConfigUnitTest {
 
         val (hs1, hs2) = Pair(HiddenService(), HiddenService())
 
-        hs1.setPorts(setOf(HiddenService.Ports(11)))
-        hs2.setPorts(setOf(HiddenService.Ports(22)))
+        hs1.setPorts(setOf(HiddenService.Ports(Port(11))))
+        hs2.setPorts(setOf(HiddenService.Ports(Port(22))))
 
         hs1.setMaxStreams(HiddenService.MaxStreams(1))
         hs2.setMaxStreams(HiddenService.MaxStreams(2))
@@ -319,7 +320,7 @@ class TorConfigUnitTest {
     fun givenHiddenService_whenCloned_matchesOriginal() {
         val expectedHs = HiddenService()
         val expectedDir = FileSystemDir(Path("/some_dir"))
-        val expectedPorts = setOf(HiddenService.Ports(11))
+        val expectedPorts = setOf(HiddenService.Ports(Port(11)))
         val expectedMaxStreams = HiddenService.MaxStreams(1)
         val expectedMaxStreamsCloseCircuit = TorF.True
 

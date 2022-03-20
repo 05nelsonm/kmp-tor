@@ -57,7 +57,7 @@ internal class PortValidator internal constructor() {
                     validatedPorts.add(port)
                 }
                 is AorDorPort.Value -> {
-                    if (isPortAvailable.invoke(option.port)) {
+                    if (isPortAvailable.invoke(Port(option.port.value))) {
                         validatedPorts.add(port)
                     } else {
                         // Unavailable. Set to auto
