@@ -483,6 +483,10 @@ private class RealTorServiceNotification(
                 setColor(state.color.retrieve(service))
                 setVisibility(config.visibility)
             }
+            // API 31
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                setForegroundServiceBehavior(Notification.FOREGROUND_SERVICE_IMMEDIATE)
+            }
         }
 
         state.actions.set(builder)
