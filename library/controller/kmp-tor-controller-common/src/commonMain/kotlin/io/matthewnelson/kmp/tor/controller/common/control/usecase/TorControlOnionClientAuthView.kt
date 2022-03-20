@@ -28,8 +28,14 @@ import io.matthewnelson.kmp.tor.controller.common.control.TorControlOnionClientA
  * */
 interface TorControlOnionClientAuthView {
 
+    /**
+     * Returns a list of all [ClientAuthEntry]'s for all [OnionAddressV3]'s
+     * */
     suspend fun onionClientAuthView(): Result<List<ClientAuthEntry>>
 
+    /**
+     * Returns the current [ClientAuthEntry] for the given [OnionAddressV3]
+     * */
     suspend fun onionClientAuthView(address: OnionAddressV3): Result<ClientAuthEntry>
 
 }
