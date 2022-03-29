@@ -24,6 +24,7 @@ import io.matthewnelson.kmp.tor.common.util.TorStrings.SP
 import io.matthewnelson.kmp.tor.controller.common.config.TorConfig.Option.TorF.False
 import io.matthewnelson.kmp.tor.controller.common.config.TorConfig.Option.TorF.True
 import io.matthewnelson.kmp.tor.controller.common.file.Path
+import io.matthewnelson.kmp.tor.controller.common.internal.ControllerUtils
 import kotlin.jvm.JvmInline
 import kotlin.jvm.JvmSynthetic
 import kotlin.reflect.KClass
@@ -91,6 +92,13 @@ class TorConfig private constructor(
        }
      * */
     class Builder {
+
+        init {
+            // Reference so that localhostAddress for JVM can have it's initial
+            // value set immediately from BG thread.
+            ControllerUtils
+        }
+
         private val settings: MutableSet<TorConfig.Setting<*>> = mutableSetOf()
 
         fun remove(setting: TorConfig.Setting<*>): Builder = apply {
@@ -157,6 +165,12 @@ class TorConfig private constructor(
             }
 
             val writtenDisabledPorts: MutableSet<String> = LinkedHashSet(disabledPorts.size)
+
+            val localhostIp: String = try {
+                ControllerUtils.localhostAddress()
+            } catch (_: Exception) {
+                "127.0.0.1"
+            }
 
             val newSettings = mutableSetOf<Setting<*>>()
             for ((i, setting) in sorted.withIndex()) {
@@ -253,7 +267,7 @@ class TorConfig private constructor(
                         sb.append(SP)
                         sb.append(hsPort.virtualPort.value)
                         sb.append(SP)
-                        sb.append("127.0.0.1")
+                        sb.append(localhostIp)
                         sb.append(':')
                         sb.append(hsPort.targetPort.value)
                     }
