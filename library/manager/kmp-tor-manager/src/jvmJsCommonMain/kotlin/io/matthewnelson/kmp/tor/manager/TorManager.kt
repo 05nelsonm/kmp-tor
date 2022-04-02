@@ -31,10 +31,6 @@ import kotlin.jvm.JvmStatic
  * [TorManager]'s primary responsibility is to ensure synchronous execution of
  * Tor operations.
  *
- * Multiple instances of Tor _can_ be run by spinning it up and branching off as
- * a Daemon, but that is beyond the scope of [TorManager]; it manages a single
- * instance of Tor.
- *
  * By implementing [TorControlManager], [TorManager] facilitates pass-through
  * interaction with [TorController] (which is connected to automatically upon
  * every [start]).
@@ -76,7 +72,8 @@ actual interface TorManager:
         private const val DEFAULT_INSTANCE_ID = "DefaultInstance"
 
         /**
-         * Jvm method for retrieving an instance of [TorManager].
+         * Method for retrieving a new instance of [TorManager] using
+         * [DEFAULT_INSTANCE_ID].
          *
          * @param [networkObserver] optional for observing device connectivity to
          *  push connection/disconnection changes to [RealTorManager] so it can

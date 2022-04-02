@@ -16,12 +16,8 @@
 package io.matthewnelson.kmp.tor.manager.instance
 
 import io.matthewnelson.kmp.tor.controller.common.events.TorEvent
-import io.matthewnelson.kmp.tor.manager.KmpTorLoader
-import io.matthewnelson.kmp.tor.manager.NetworkObserver
-import io.matthewnelson.kmp.tor.manager.TorConfigProvider
-import io.matthewnelson.kmp.tor.manager.TorManager
+import io.matthewnelson.kmp.tor.manager.*
 import io.matthewnelson.kmp.tor.manager.internal.util.SynchronizedMutableMap
-import io.matthewnelson.kmp.tor.manager.realTorManager
 import kotlinx.coroutines.sync.Mutex
 import kotlin.jvm.JvmStatic
 import kotlin.jvm.JvmSynthetic
@@ -37,12 +33,23 @@ object TorMultiInstanceManager {
 
     private val instanceLockMap = SynchronizedMutableMap<Mutex>()
 
+    /**
+     * Method for retrieving a new instance of [TorManager] for the given
+     * [InstanceId].
+     *
+     * @param [networkObserver] optional for observing device connectivity to
+     *  push connection/disconnection changes to [RealTorManager] so it can
+     *  set TorConfig setting `DisableNetwork` to `true` or `false`.
+     * @param [requiredEvents] events that are required for your implementation
+     *  to function properly. These events will be set at every Tor start, and
+     *  added to any calls to [TorManager.setEvents] during Tor runtime.
+     * */
     @JvmStatic
     fun newTorManagerInstance(
         instanceId: InstanceId,
         loader: KmpTorLoader,
-        networkObserver: NetworkObserver?,
-        requiredEvents: Set<TorEvent>?
+        networkObserver: NetworkObserver? = null,
+        requiredEvents: Set<TorEvent>? = null,
     ): TorManager {
         val instanceLock: Mutex = instanceLockMap.withLock {
             get(instanceId.value) ?: Mutex()
@@ -61,7 +68,7 @@ object TorMultiInstanceManager {
     }
 
     @JvmSynthetic
-    internal fun removeInstance(instanceId: InstanceId) {
+    internal fun removeLockForInstanceId(instanceId: InstanceId) {
         instanceLockMap.withLock {
             remove(instanceId.value)
         }

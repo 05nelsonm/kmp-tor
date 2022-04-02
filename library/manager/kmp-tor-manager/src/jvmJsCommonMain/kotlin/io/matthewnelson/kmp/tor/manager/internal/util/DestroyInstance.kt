@@ -21,5 +21,5 @@ import kotlin.jvm.JvmSynthetic
 
 @JvmSynthetic
 internal actual fun realTorManagerInstanceDestroyed(instanceId: String) {
-    TorMultiInstanceManager.removeInstance(InstanceId(instanceId))
+    TorMultiInstanceManager.removeLockForInstanceId(InstanceId(instanceId))
 }
