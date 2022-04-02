@@ -19,13 +19,15 @@ import io.matthewnelson.kmp.tor.controller.TorController
 import io.matthewnelson.kmp.tor.controller.common.config.TorConfig
 import io.matthewnelson.kmp.tor.controller.common.file.Path
 import io.matthewnelson.kmp.tor.manager.common.event.TorManagerEvent
-import io.matthewnelson.kmp.tor.manager.common.exceptions.TorManagerException
 import io.matthewnelson.kmp.tor.manager.internal.TorStateMachine
 import kotlinx.coroutines.CoroutineScope
-import kotlin.coroutines.cancellation.CancellationException
 
 @Suppress("CanBePrimaryConstructorProperty")
 actual abstract class KmpTorLoader(provider: TorConfigProvider) {
+
+    actual companion object {
+        internal actual fun removeInstanceRunLock(instanceId: String) { /* no-op */ }
+    }
 
     /**
      * Calls [TorConfig.Builder.removeInstanceOf] for all present

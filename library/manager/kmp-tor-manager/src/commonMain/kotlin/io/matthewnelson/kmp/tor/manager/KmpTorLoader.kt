@@ -27,6 +27,11 @@ import kotlin.jvm.JvmSynthetic
 
 expect abstract class KmpTorLoader {
 
+    companion object {
+        @JvmSynthetic
+        internal fun removeInstanceRunLock(instanceId: String)
+    }
+
     /**
      * Calls [TorConfig.Builder.removeInstanceOf] for all present
      * settings. This is to ensure platform specific settings are

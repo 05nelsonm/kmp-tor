@@ -50,10 +50,17 @@ actual abstract class KmpTorLoader @JvmOverloads constructor(
     private val io: CoroutineDispatcher = Dispatchers.IO
 ) {
 
-    companion object {
+    actual companion object {
         const val READ_INTERVAL = 250L
 
         private val instanceRunLock = SynchronizedMutableMap<Mutex>()
+
+        @JvmSynthetic
+        internal actual fun removeInstanceRunLock(instanceId: String) {
+            instanceRunLock.withLock {
+                remove(instanceId)
+            }
+        }
     }
 
     /**

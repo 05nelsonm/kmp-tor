@@ -31,7 +31,9 @@ import kotlin.jvm.JvmSynthetic
  * */
 object TorMultiInstanceManager {
 
-    private val instanceLockMap = SynchronizedMutableMap<Mutex>()
+    private val instanceLockMap = SynchronizedMutableMap<InstanceLockHolder>()
+
+    private data class InstanceLockHolder(val instanceCount: Int, val lock: Mutex)
 
     /**
      * Method for retrieving a new instance of [TorManager] for the given
@@ -52,10 +54,16 @@ object TorMultiInstanceManager {
         requiredEvents: Set<TorEvent>? = null,
     ): TorManager {
         val instanceLock: Mutex = instanceLockMap.withLock {
-            get(instanceId.value) ?: Mutex()
-                .also { newLock ->
-                    put(instanceId.value, newLock)
-                }
+            val holder = get(instanceId.value)
+
+            if (holder == null) {
+                val newHolder = InstanceLockHolder(1, Mutex())
+                put(instanceId.value, newHolder)
+                newHolder.lock
+            } else {
+                put(instanceId.value, holder.copy(instanceCount = holder.instanceCount + 1))
+                holder.lock
+            }
         }
 
         return realTorManager(
@@ -70,7 +78,14 @@ object TorMultiInstanceManager {
     @JvmSynthetic
     internal fun removeLockForInstanceId(instanceId: InstanceId) {
         instanceLockMap.withLock {
-            remove(instanceId.value)
+            val holder = get(instanceId.value) ?: return@withLock
+
+            if (holder.instanceCount > 1) {
+                put(instanceId.value, holder.copy(instanceCount = holder.instanceCount - 1))
+            } else {
+                remove(instanceId.value)
+                KmpTorLoader.removeInstanceRunLock(instanceId.value)
+            }
         }
     }
 }

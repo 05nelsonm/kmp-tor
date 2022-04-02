@@ -263,7 +263,6 @@ private class RealTorManager(
     override fun destroy(stopCleanly: Boolean, onCompletion: (() -> Unit)?) {
         synchronized(this) {
             if (isDestroyed) return@synchronized
-            realTorManagerInstanceDestroyed(instanceId)
             _isDestroyed.value = true
             networkObserver?.detach()
 
@@ -271,6 +270,7 @@ private class RealTorManager(
                 controller.value?.first?.disconnect()
                 supervisor.cancel()
                 loader.close()
+                realTorManagerInstanceDestroyed(instanceId)
 
                 listeners.withLock {
                     for (listener in this) {
@@ -296,6 +296,7 @@ private class RealTorManager(
             }.invokeOnCompletion {
                 supervisor.cancel()
                 loader.close()
+                realTorManagerInstanceDestroyed(instanceId)
 
                 listeners.withLock {
                     for (listener in this) {

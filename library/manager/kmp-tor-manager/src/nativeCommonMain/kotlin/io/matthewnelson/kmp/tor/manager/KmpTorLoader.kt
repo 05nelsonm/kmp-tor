@@ -27,6 +27,10 @@ import kotlin.coroutines.cancellation.CancellationException
 @Suppress("CanBePrimaryConstructorProperty")
 actual abstract class KmpTorLoader(provider: TorConfigProvider) {
 
+    actual companion object {
+        internal actual fun removeInstanceRunLock(instanceId: String) { /* no-op */ }
+    }
+
     /**
      * Calls [TorConfig.Builder.removeInstanceOf] for all present
      * settings. This is to ensure platform specific settings are
