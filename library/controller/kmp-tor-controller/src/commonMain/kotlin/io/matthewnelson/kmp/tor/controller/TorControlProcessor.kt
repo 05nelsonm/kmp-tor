@@ -35,11 +35,14 @@ import io.matthewnelson.kmp.tor.common.util.TorStrings.CLRF
 import io.matthewnelson.kmp.tor.common.util.TorStrings.MULTI_LINE_END
 import io.matthewnelson.kmp.tor.common.util.TorStrings.SP
 import io.matthewnelson.kmp.tor.controller.common.config.HiddenServiceEntry
+import io.matthewnelson.kmp.tor.controller.common.internal.ControllerUtils
 import io.matthewnelson.kmp.tor.controller.internal.controller.ControlPortInteractor
 import io.matthewnelson.kmp.tor.controller.internal.controller.ReplyLine
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import kotlinx.coroutines.withContext
 import kotlin.jvm.JvmSynthetic
 
 /**
@@ -479,11 +482,21 @@ private class RealTorControlProcessor(
                 }
 
                 if (hsPorts.isNotEmpty()) {
+                    val localHostIp = try {
+                        ControllerUtils.localhostAddress()
+                    } catch (_: RuntimeException) {
+                        withContext(Dispatchers.Default) {
+                            ControllerUtils.localhostAddress()
+                        }
+                    }
+
                     for (hsPort in hsPorts) {
                         append(SP)
                         append("Port=")
                         append(hsPort.virtualPort.value)
                         append(',')
+                        append(localHostIp)
+                        append(':')
                         append(hsPort.targetPort.value)
                     }
                 }

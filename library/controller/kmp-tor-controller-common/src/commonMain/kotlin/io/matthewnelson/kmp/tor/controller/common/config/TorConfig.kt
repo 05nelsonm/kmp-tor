@@ -24,8 +24,8 @@ import io.matthewnelson.kmp.tor.common.util.TorStrings.SP
 import io.matthewnelson.kmp.tor.controller.common.config.TorConfig.Option.TorF.False
 import io.matthewnelson.kmp.tor.controller.common.config.TorConfig.Option.TorF.True
 import io.matthewnelson.kmp.tor.controller.common.file.Path
+import io.matthewnelson.kmp.tor.controller.common.internal.ControllerUtils
 import kotlin.jvm.JvmInline
-import kotlin.jvm.JvmOverloads
 import kotlin.jvm.JvmSynthetic
 import kotlin.reflect.KClass
 
@@ -92,6 +92,13 @@ class TorConfig private constructor(
        }
      * */
     class Builder {
+
+        init {
+            // Reference so that localhostAddress for JVM can have it's initial
+            // value set immediately from BG thread.
+            ControllerUtils
+        }
+
         private val settings: MutableSet<TorConfig.Setting<*>> = mutableSetOf()
 
         fun remove(setting: TorConfig.Setting<*>): Builder = apply {
@@ -158,6 +165,12 @@ class TorConfig private constructor(
             }
 
             val writtenDisabledPorts: MutableSet<String> = LinkedHashSet(disabledPorts.size)
+
+            val localhostIp: String = try {
+                ControllerUtils.localhostAddress()
+            } catch (_: Exception) {
+                "127.0.0.1"
+            }
 
             val newSettings = mutableSetOf<Setting<*>>()
             for ((i, setting) in sorted.withIndex()) {
@@ -254,7 +267,7 @@ class TorConfig private constructor(
                         sb.append(SP)
                         sb.append(hsPort.virtualPort.value)
                         sb.append(SP)
-                        sb.append("127.0.0.1")
+                        sb.append(localhostIp)
                         sb.append(':')
                         sb.append(hsPort.targetPort.value)
                     }
@@ -689,12 +702,38 @@ class TorConfig private constructor(
             }
 
             /**
-             * By default, [virtualPort] is always mapped to 127.0.0.1:[targetPort]. This
+             * By default, [virtualPort] is always mapped to <localhostIp>:[targetPort]. This
              * can be overridden by expressing a different value for [targetPort].
+             *
+             * EX:
+             *  - Server running on Port(31276) with endpoint `/api/v1/endpoint`
+             *  - Listen for all http traffic:
+             *      Ports(virtualPort = Port(80), targetPort = Port(31276))
+             *
+             *      http://<onion-address>.onion/api/v1/endpoint
+             *
+             *  - Server configured for SSL connections, listen for all https traffic:
+             *      Ports(virtualPort = Port(443), targetPort = Port(31276))
+             *
+             *      https://<onion-address>.onion/api/v1/endpoint
+             *
+             *  - Server configured for SSL connections:
+             *      Ports(virtualPort = Port(31276))
+             *
+             *      https://<onion-address>.onion:31276/api/v1/endpoint
              *
              * https://2019.www.torproject.org/docs/tor-manual.html.en#HiddenServicePort
              * */
-            data class Ports(val virtualPort: Port, val targetPort: Port = virtualPort)
+            data class Ports(val virtualPort: Port, val targetPort: Port = virtualPort) {
+
+                override fun equals(other: Any?): Boolean {
+                    return  other is Ports && other.virtualPort == virtualPort
+                }
+
+                override fun hashCode(): Int {
+                    return 18 * 31 + virtualPort.hashCode()
+                }
+            }
 
             /**
              * https://2019.www.torproject.org/docs/tor-manual.html.en#HiddenServiceMaxStreams

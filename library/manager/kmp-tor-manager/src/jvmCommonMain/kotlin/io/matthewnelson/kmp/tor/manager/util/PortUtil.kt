@@ -16,13 +16,12 @@
 package io.matthewnelson.kmp.tor.manager.util
 
 import io.matthewnelson.kmp.tor.common.address.Port
+import io.matthewnelson.kmp.tor.common.annotation.InternalTorApi
+import io.matthewnelson.kmp.tor.controller.common.internal.ControllerUtils.ANDROID_NET_MAIN_THREAD_EXCEPTION
 import java.net.InetAddress
 import javax.net.ServerSocketFactory
 
 actual object PortUtil {
-
-    private const val LOCAL_HOST = "localhost"
-    private const val ANDROID_MAIN_THREAD_EXCEPTION = "android.os.NetworkOnMainThreadException"
 
     /**
      * Must be called from a background thread.
@@ -36,7 +35,8 @@ actual object PortUtil {
             realIsTcpPortAvailable(port.value)
             true
         } catch (e: Exception) {
-            if (e.toString() == ANDROID_MAIN_THREAD_EXCEPTION) {
+            @OptIn(InternalTorApi::class)
+            if (e.toString() == ANDROID_NET_MAIN_THREAD_EXCEPTION) {
                 throw e
             } else {
                 false
@@ -53,7 +53,7 @@ actual object PortUtil {
      *   9050 to 9100
      *
      * ex2: (port = Port(65535), limit = 50) will check availability from
-     *   65535, and 0 to 48
+     *   65535, and 1 to 49
      *
      * If the initial [port] is available, it will be returned.
      *
@@ -69,7 +69,12 @@ actual object PortUtil {
             throw RuntimeException("limit must be greater than or equal to 1")
         }
 
-        var currentPort = port.value
+        var currentPort = if (port.value == Port.MIN) {
+            1
+        } else {
+            port.value
+        }
+
         var countDown = limit
 
         while (countDown >= 0) {
@@ -77,12 +82,13 @@ actual object PortUtil {
                 realIsTcpPortAvailable(currentPort)
                 return Port(currentPort)
             } catch (e: Exception) {
-                if (e.toString() == "android.os.NetworkOnMainThreadException") {
+                @OptIn(InternalTorApi::class)
+                if (e.toString() == ANDROID_NET_MAIN_THREAD_EXCEPTION) {
                     throw e
                 } else {
                     countDown--
                     currentPort = if (currentPort == Port.MAX) {
-                        Port.MIN
+                        1
                     } else {
                         currentPort + 1
                     }
@@ -100,7 +106,7 @@ actual object PortUtil {
         val serverSocket = ServerSocketFactory.getDefault().createServerSocket(
             port,
             1,
-            InetAddress.getByName(LOCAL_HOST)
+            InetAddress.getByName("localhost")
         )
         serverSocket.close()
     }

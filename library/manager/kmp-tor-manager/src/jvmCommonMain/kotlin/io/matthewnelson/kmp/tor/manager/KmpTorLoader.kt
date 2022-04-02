@@ -22,6 +22,7 @@ import io.matthewnelson.kmp.tor.controller.common.control.usecase.TorControlInfo
 import io.matthewnelson.kmp.tor.controller.common.control.usecase.TorControlSignal
 import io.matthewnelson.kmp.tor.controller.common.file.Path
 import io.matthewnelson.kmp.tor.controller.common.file.toFile
+import io.matthewnelson.kmp.tor.controller.common.internal.ControllerUtils
 import io.matthewnelson.kmp.tor.manager.common.event.TorManagerEvent
 import io.matthewnelson.kmp.tor.manager.common.exceptions.InterruptedException
 import io.matthewnelson.kmp.tor.manager.common.exceptions.TorManagerException
@@ -36,12 +37,10 @@ import kotlinx.coroutines.sync.withLock
 import java.io.EOFException
 import java.io.File
 import java.io.FileInputStream
-import java.net.InetAddress
 import java.net.InetSocketAddress
 import java.net.Proxy
 import java.net.Socket
 import java.util.concurrent.Executors
-import javax.net.ServerSocketFactory
 import kotlin.coroutines.cancellation.CancellationException
 
 @Suppress("CanBePrimaryConstructorProperty")
@@ -440,4 +439,10 @@ actual abstract class KmpTorLoader @JvmOverloads constructor(
      * */
     @Throws(TorManagerException::class)
     protected actual open fun setHiddenServiceDirPermissions(dir: Path) {}
+
+    init {
+        // Reference so that localhostAddress for JVM can have it's initial
+        // value set immediately from BG thread.
+        ControllerUtils
+    }
 }

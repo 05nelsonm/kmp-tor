@@ -335,4 +335,15 @@ class TorConfigUnitTest {
         assertEquals(expectedMaxStreams, actual.maxStreams)
         assertEquals(expectedMaxStreamsCloseCircuit, actual.maxStreamsCloseCircuit)
     }
+
+    @Test
+    fun givenHiddenServicePorts_whenMultiplePortsWithSameVirtPort_onlyOneIsUsed() {
+        val set = mutableSetOf<HiddenService.Ports>()
+        val expected = HiddenService.Ports(virtualPort = Port(80))
+        set.add(expected)
+        set.add(HiddenService.Ports(virtualPort = Port(80), targetPort = Port(12345)))
+
+        assertEquals(1, set.size)
+        assertEquals(expected, set.first())
+    }
 }
