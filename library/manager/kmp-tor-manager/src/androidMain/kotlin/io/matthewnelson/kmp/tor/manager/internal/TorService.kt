@@ -57,7 +57,7 @@ internal class TorService: Service() {
             this,
             serviceScope,
             isServiceDestroyed = { isServiceDestroyed },
-            stopService = { stopService() },
+            stopService = { stopService(setLastAction = true) },
             restartTor = { managerHolder.instance?.let { manager ->
                 serviceScope.launch {
                     restart(manager)
@@ -212,8 +212,7 @@ internal class TorService: Service() {
 
         @JvmSynthetic
         fun stop(): Result<Any?> {
-            lastAction = TorManagerEvent.Action.Stop
-            stopService()
+            stopService(setLastAction = true)
             return Result.success("TorService stopped")
         }
 
@@ -290,14 +289,18 @@ internal class TorService: Service() {
         supervisor.cancel()
         managerHolder.instance?.destroy(stopCleanly = config.enableForeground || !isTaskRemoved) {
             // onCompletion
-            if (config.enableForeground && isTaskRemoved) {
+            if (config.ifForegroundExitProcessOnDestroyWhenTaskRemoved && isTaskRemoved) {
                 exitProcess(0)
             }
         }
         super.onDestroy()
     }
 
-    private fun stopService() {
+    private fun stopService(setLastAction: Boolean = false) {
+        if (setLastAction) {
+            lastAction = TorManagerEvent.Action.Stop
+        }
+
         TorServiceController.unbindService(this)
         if (config.enableForeground) {
             managerHolder.instance?.removeListener(notification)

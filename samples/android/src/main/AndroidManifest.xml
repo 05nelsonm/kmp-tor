@@ -67,6 +67,9 @@
             android:name="io.matthewnelson.kmp.tor.stop_service_on_task_removed"
             android:value="@bool/tor_service_stop_service_on_task_removed" />
         <meta-data
+            android:name="io.matthewnelson.kmp.tor.if_foreground_exit_process_on_destroy_when_task_removed"
+            android:value="@bool/tor_service_if_foreground_exit_process_on_destroy_when_task_removed" />
+        <meta-data
             android:name="io.matthewnelson.kmp.tor.notification_id"
             android:value="@integer/tor_service_notification_id" />
         <meta-data

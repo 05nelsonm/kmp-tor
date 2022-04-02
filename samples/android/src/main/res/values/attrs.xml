@@ -32,13 +32,9 @@
     `tor_service_stop_service_on_task_removed` is unset or `true`), Tor takes a
     moment to shutdown. As such, there is approximately 1 second where your
     application's State is still started (as if the app was not swiped from the
-    recent app's tray).
-
-    This is monitored by TorService and, if the Task is still removed after Tor
-    finally shuts down, exitProcess(0) is called. If the User returns to your
-    application before Tor finally stops (when exitProcess is called) and the
-    last action prior to Task removal was _not_ STOP, TorService will attempt to
-    start itself in order to return to the originally intended state of Tor ON.
+    recent app's tray). See attribute
+    `tor_service_if_foreground_exit_process_on_destroy_when_task_removed` below
+    for more information.
     -->
     <bool name="tor_service_enable_foreground">true</bool>
 
@@ -52,11 +48,36 @@
     This can be useful if:
       - You are running TorService in the background, with another
         service that is running in the Foreground keeping the application alive
-        past task removal.
+        past Task removal.
       - You are running TorService in the foreground and wish to keep the application
-        alive until an explicit call to `stop` Tor is made.
+        alive until an explicit call to `stop` TorService is made.
     -->
     <bool name="tor_service_stop_service_on_task_removed">false</bool>
+
+    <!--
+    Not Required
+    Default: whatever `tor_service_enable_foreground` is set to
+
+    If `tor_service_enable_foreground` is set to `true`, no matter what value is
+    set for `tor_service_stop_service_on_task_removed` your application will _not_
+    be killed when TorService.onDestroy is called when the Task has been removed.
+    This is attributed to how Foreground Services work in Android, not KmpTor.
+
+    When TorService.onDestroy is called, TorManager.destroy is also called (it takes
+    approximately 1s to shut down cleanly). Upon TorManager destruction completion,
+    TorService will check to see if the Task is still removed (user has not returned
+    to the application). If it is still removed and this setting is `true`, exitProcess(0)
+    will be called to kill the application. This would be the same behavior as if
+    TorService was running as a background service and the user swipes the application
+    from recent app's tray.
+
+    If this setting is `false`, exitProcess will _not_ be called after TorManager.destroy
+    completes. Your application will continue to run in the background until either:
+      - The user returns to the application
+          - Note that TorService will automatically re-start if the last action was _not_ STOP
+      - Android kills the process to recoup memory (approximately 1m)
+    -->
+    <bool name="tor_service_if_foreground_exit_process_on_destroy_when_task_removed">true</bool>
 
 
     <!-- NOTIFICATION INFO -->
