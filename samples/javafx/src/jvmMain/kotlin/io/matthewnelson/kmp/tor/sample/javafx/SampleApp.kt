@@ -32,6 +32,8 @@ import io.matthewnelson.kmp.tor.manager.common.TorOperationManager
 import io.matthewnelson.kmp.tor.manager.common.event.TorManagerEvent
 import io.matthewnelson.kmp.tor.manager.common.state.TorNetworkState
 import io.matthewnelson.kmp.tor.manager.common.state.TorState
+import io.matthewnelson.kmp.tor.manager.instance.InstanceId
+import io.matthewnelson.kmp.tor.manager.instance.TorMultiInstanceManager
 import io.matthewnelson.kmp.tor.sample.javafx.ui.SampleView
 import io.matthewnelson.kmp.tor.sample.javafx.util.Log
 import javafx.application.Platform
@@ -46,18 +48,10 @@ import tornadofx.*
 
 class SampleApp: App(SampleView::class) {
 
-    /**
-     * Instantiate [TorManager]
-     *
-     * @see [PlatformInstaller]
-     * @see [TorConfigProviderJvm]
-     * @see [KmpTorLoaderJvm]
-     * @see [TorManager.newInstance]
-     * */
-    private val manager: TorManager by lazy {
+    private val platformInstaller: PlatformInstaller by lazy {
         val osName = System.getProperty("os.name")
 
-        val platformInstaller = when {
+        val installer = when {
             osName.contains("Windows") -> {
                 PlatformInstaller.mingwX64(InstallOption.CleanInstallIfMissing)
             }
@@ -72,21 +66,42 @@ class SampleApp: App(SampleView::class) {
             }
         }
 
-        Log.d(this.javaClass.simpleName, "Setting up KmpTor for os: ${platformInstaller.os}, arch: ${platformInstaller.arch}")
+        Log.d(this.javaClass.simpleName, "Setting up KmpTor for os: ${installer.os}, arch: ${installer.arch}")
 
-        // Note that for this example the temp directory is utilized. Keep in mind
-        // that all processes and users have access to the temporary directory and
-        // its use should be avoided in production.
-        val tmpDir: String = System.getProperty("java.io.tmpdir")
+        installer
+    }
+
+    // Note that for this example the temp directory is utilized. Keep in mind
+    // that all processes and users have access to the temporary directory and
+    // its use should be avoided in production.
+    private val tmpDir: Path by lazy {
+        Path(System.getProperty("java.io.tmpdir")
             ?: throw RuntimeException("Could not identify OS's temporary directory")
+        ).builder {
+            addSegment("kmptor-javafx-sample")
+        }
+    }
+
+    private val instanceId1 = InstanceId("INSTANCE_111")
+    private val instanceId2 = InstanceId("INSTANCE_222")
+
+    /**
+     * Instantiate [TorManager]
+     *
+     * @see [PlatformInstaller]
+     * @see [TorConfigProviderJvm]
+     * @see [KmpTorLoaderJvm]
+     * @see [TorManager.newInstance]
+     * */
+    private val managerInstance1: TorManager by lazy {
 
         val configProvider = object: TorConfigProviderJvm() {
-            override val workDir: Path = Path(tmpDir).builder {
-                addSegment("kmptor-javafx-sample")
+            override val workDir: Path = tmpDir.builder {
+                addSegment(instanceId1.value)
                 addSegment("work")
             }
-            override val cacheDir: Path = Path(tmpDir).builder {
-                addSegment("kmptor-javafx-sample")
+            override val cacheDir: Path = tmpDir.builder {
+                addSegment(instanceId1.value)
                 addSegment("cache")
             }
 
@@ -177,25 +192,78 @@ class SampleApp: App(SampleView::class) {
 
         val jvmLoader = KmpTorLoaderJvm(installer = platformInstaller, provider = configProvider)
 
-        TorManager.newInstance(loader = jvmLoader, networkObserver = null, requiredEvents = null)
+        TorMultiInstanceManager.newTorManagerInstance(
+            instanceId = instanceId1,
+            loader = jvmLoader,
+            networkObserver = null,
+            requiredEvents = null
+        )
+    }
+
+    /**
+     * Spin up a 2nd instance of Tor that runs simultaneously.
+     *
+     * @see [TorMultiInstanceManager]
+     * */
+    private val managerInstance2: TorManager by lazy {
+        val configProvider = object : TorConfigProviderJvm() {
+            override val workDir: Path = tmpDir.builder {
+                // Be sure to use different directories than other instances
+                addSegment(instanceId2.value)
+                addSegment("work")
+            }
+
+            override val cacheDir: Path = tmpDir.builder {
+                // Be sure to use different directories than other instances
+                addSegment(instanceId2.value)
+                addSegment("cache")
+            }
+
+            override fun provide(): TorConfig {
+                // run with minimal necessary defaults provided
+                // automatically by TorConfigProvider
+                return TorConfig.Builder().build()
+            }
+        }
+
+        val jvmLoader = KmpTorLoaderJvm(installer = platformInstaller, provider = configProvider)
+
+        TorMultiInstanceManager.newTorManagerInstance(
+            instanceId = instanceId2,
+            loader = jvmLoader,
+            networkObserver = null,
+            requiredEvents = null
+        )
     }
 
     // only expose necessary interfaces
-    val torOperationManager: TorOperationManager get() = manager
-    val torControlManager: TorControlManager get() = manager
+    val torOperationManager1: TorOperationManager get() = managerInstance1
+    val torControlManager1: TorControlManager get() = managerInstance1
+    val torOperationManager2: TorOperationManager get() = managerInstance2
+    val torControlManager2: TorControlManager get() = managerInstance2
 
-    private val listener = SampleListener()
-    val eventLines: StateFlow<String> get() = listener.eventLines
-    val addressInfo: StateFlow<TorManagerEvent.AddressInfo> get() = listener.addressInfo
-    val state: StateFlow<TorManagerEvent.State> get() = listener.state
+    private val listenerInstance1 = SampleListener(instanceId1)
+    private val listenerInstance2 = SampleListener(instanceId2)
+
+    val eventLines1: StateFlow<String> get() = listenerInstance1.eventLines
+    val addressInfo1: StateFlow<TorManagerEvent.AddressInfo> get() = listenerInstance1.addressInfo
+    val state1: StateFlow<TorManagerEvent.State> get() = listenerInstance1.state
+
+    val eventLines2: StateFlow<String> get() = listenerInstance2.eventLines
+    val addressInfo2: StateFlow<TorManagerEvent.AddressInfo> get() = listenerInstance2.addressInfo
+    val state2: StateFlow<TorManagerEvent.State> get() = listenerInstance2.state
 
     override fun start(stage: Stage) {
         Log.d(this.javaClass.simpleName, "start")
-        manager.debug(true)
-        manager.addListener(listener)
+        managerInstance1.debug(true)
+        managerInstance1.addListener(listenerInstance1)
+
+        managerInstance2.debug(true)
+        managerInstance2.addListener(listenerInstance2)
 
         // TODO: Move to SampleView along with stop/restart buttons
-        manager.startQuietly()
+        managerInstance1.startQuietly()
+        managerInstance2.startQuietly()
 
         setupOnCloseIntercept(stage)
 
@@ -215,9 +283,11 @@ class SampleApp: App(SampleView::class) {
             // is running.
             //
             // Upon destruction completion, Platform.exit() will be invoked.
-            manager.destroy(stopCleanly = true) {
-                // onCompletion
-                Platform.exit()
+            managerInstance1.destroy(stopCleanly = true) {
+                managerInstance2.destroy(stopCleanly = true) {
+                    // onCompletion
+                    Platform.exit()
+                }
             }
             event.consume()
         }
@@ -228,7 +298,13 @@ class SampleApp: App(SampleView::class) {
         Log.d(this.javaClass.simpleName, "stop")
 
         // just in case setupOnCloseIntercept fails.
-        manager.destroy(stopCleanly = false) {
+        managerInstance1.destroy(stopCleanly = false) {
+            // will not be invoked if TorManager has already been destroyed
+            Log.w(this.javaClass.simpleName, "onCloseRequest intercept failed. Tor did not stop cleanly.")
+        }
+
+        // just in case setupOnCloseIntercept fails.
+        managerInstance2.destroy(stopCleanly = false) {
             // will not be invoked if TorManager has already been destroyed
             Log.w(this.javaClass.simpleName, "onCloseRequest intercept failed. Tor did not stop cleanly.")
         }
@@ -237,7 +313,7 @@ class SampleApp: App(SampleView::class) {
     /**
      * Listen for and react to [TorManagerEvent]s && [TorEvent]s
      * */
-    private class SampleListener: TorManagerEvent.Listener() {
+    private class SampleListener(private val instanceId: InstanceId): TorManagerEvent.Listener() {
         private val _eventLines: MutableStateFlow<String> = MutableStateFlow("")
         val eventLines: StateFlow<String> = _eventLines.asStateFlow()
         private val events: MutableList<String> = ArrayList(50)
@@ -248,7 +324,7 @@ class SampleApp: App(SampleView::class) {
                     events.removeAt(0)
                 }
                 events.add(line)
-                Log.d("SampleListener", line)
+                Log.d("${instanceId.value}_Listener", line)
                 _eventLines.value = events.joinToString("\n")
             }
         }

@@ -19,13 +19,15 @@ import io.matthewnelson.kmp.tor.controller.TorController
 import io.matthewnelson.kmp.tor.controller.common.config.TorConfig
 import io.matthewnelson.kmp.tor.controller.common.file.Path
 import io.matthewnelson.kmp.tor.manager.common.event.TorManagerEvent
-import io.matthewnelson.kmp.tor.manager.common.exceptions.TorManagerException
 import io.matthewnelson.kmp.tor.manager.internal.TorStateMachine
 import kotlinx.coroutines.CoroutineScope
-import kotlin.coroutines.cancellation.CancellationException
 
 @Suppress("CanBePrimaryConstructorProperty")
 actual abstract class KmpTorLoader(provider: TorConfigProvider) {
+
+    actual companion object {
+        internal actual fun removeInstanceRunLock(instanceId: String) { /* no-op */ }
+    }
 
     /**
      * Calls [TorConfig.Builder.removeInstanceOf] for all present
@@ -36,6 +38,7 @@ actual abstract class KmpTorLoader(provider: TorConfigProvider) {
     protected actual open val excludeSettings: Set<TorConfig.Setting<*>> = emptySet()
     private val provider = provider
     internal actual open suspend fun load(
+        instanceId: String,
         managerScope: CoroutineScope,
         stateMachine: TorStateMachine,
         notify: (TorManagerEvent) -> Unit,
@@ -47,12 +50,10 @@ actual abstract class KmpTorLoader(provider: TorConfigProvider) {
 
     internal actual open fun cancelTorJob() { /* no-op */ }
 
-    @Throws(TorManagerException::class, CancellationException::class)
     protected actual abstract suspend fun startTor(
         configLines: List<String>,
         notify: (TorManagerEvent.Log) -> Unit,
     )
 
-    @Throws(TorManagerException::class)
     protected actual open fun setHiddenServiceDirPermissions(dir: Path) {}
 }

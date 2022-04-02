@@ -23,13 +23,12 @@ import io.matthewnelson.kmp.tor.manager.common.exceptions.TorManagerException
 import io.matthewnelson.kmp.tor.manager.internal.TorStateMachine
 import kotlinx.coroutines.CoroutineScope
 import kotlin.coroutines.cancellation.CancellationException
-import kotlin.jvm.JvmSynthetic
 
-expect abstract class KmpTorLoader {
+@Suppress("CanBePrimaryConstructorProperty")
+actual abstract class KmpTorLoader(provider: TorConfigProvider) {
 
-    companion object {
-        @JvmSynthetic
-        internal fun removeInstanceRunLock(instanceId: String)
+    actual companion object {
+        internal actual fun removeInstanceRunLock(instanceId: String) { /* no-op */ }
     }
 
     /**
@@ -38,28 +37,27 @@ expect abstract class KmpTorLoader {
      * removed during the [TorConfigProvider.retrieve] process, prior
      * to starting Tor.
      * */
-    protected open val excludeSettings: Set<TorConfig.Setting<*>>
+    protected actual open val excludeSettings: Set<TorConfig.Setting<*>> = emptySet()
+    private val provider = provider
+    internal actual open suspend fun load(
+        instanceId: String,
+        managerScope: CoroutineScope,
+        stateMachine: TorStateMachine,
+        notify: (TorManagerEvent) -> Unit,
+    ): Result<TorController> {
+        TODO("Not yet implemented")
+    }
+
+    internal actual open fun close() { /* no-op */ }
+
+    internal actual open fun cancelTorJob() { /* no-op */ }
 
     @Throws(TorManagerException::class, CancellationException::class)
-    protected abstract suspend fun startTor(
+    protected actual abstract suspend fun startTor(
         configLines: List<String>,
         notify: (TorManagerEvent.Log) -> Unit,
     )
 
     @Throws(TorManagerException::class)
-    protected open fun setHiddenServiceDirPermissions(dir: Path)
-
-    @JvmSynthetic
-    internal open suspend fun load(
-        instanceId: String,
-        managerScope: CoroutineScope,
-        stateMachine: TorStateMachine,
-        notify: (TorManagerEvent) -> Unit,
-    ): Result<TorController>
-
-    @JvmSynthetic
-    internal open fun close()
-
-    @JvmSynthetic
-    internal open fun cancelTorJob()
+    protected actual open fun setHiddenServiceDirPermissions(dir: Path) {}
 }

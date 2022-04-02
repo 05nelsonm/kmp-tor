@@ -34,6 +34,8 @@ internal object TorServiceController:
     ServiceConnection,
     TorEventProcessor<TorManagerEvent.SealedListener>
 {
+    internal const val DEFAULT_INSTANCE_ID = "AndroidInstance"
+
     @Volatile
     @Suppress("ObjectPropertyName")
     private var _binderState: BinderState? = null

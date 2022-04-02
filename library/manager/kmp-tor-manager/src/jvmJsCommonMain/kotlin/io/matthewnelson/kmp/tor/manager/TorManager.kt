@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Matthew Nelson
+ * Copyright (c) 2022 Matthew Nelson
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,14 +22,14 @@ import io.matthewnelson.kmp.tor.manager.common.TorControlManager
 import io.matthewnelson.kmp.tor.manager.common.TorOperationManager
 import io.matthewnelson.kmp.tor.manager.common.event.TorManagerEvent
 import io.matthewnelson.kmp.tor.manager.common.state.TorStateManager
+import io.matthewnelson.kmp.tor.manager.instance.InstanceId
+import io.matthewnelson.kmp.tor.manager.instance.TorMultiInstanceManager
+import kotlin.jvm.JvmOverloads
+import kotlin.jvm.JvmStatic
 
 /**
  * [TorManager]'s primary responsibility is to ensure synchronous execution of
  * Tor operations.
- *
- * Multiple instances of Tor _can_ be run by spinning it up and branching off as
- * a Daemon, but that is beyond the scope of [TorManager]; it manages a single
- * instance of Tor.
  *
  * By implementing [TorControlManager], [TorManager] facilitates pass-through
  * interaction with [TorController] (which is connected to automatically upon
@@ -63,13 +63,17 @@ actual interface TorManager:
     TorStateManager,
     TorEventProcessor<TorManagerEvent.SealedListener>
 {
+    actual val instanceId: String
 
     actual fun debug(enable: Boolean)
 
     companion object {
+        
+        private const val DEFAULT_INSTANCE_ID = "DefaultInstance"
 
         /**
-         * Jvm method for retrieving an instance of [TorManager].
+         * Method for retrieving a new instance of [TorManager] using
+         * [DEFAULT_INSTANCE_ID].
          *
          * @param [networkObserver] optional for observing device connectivity to
          *  push connection/disconnection changes to [RealTorManager] so it can
@@ -77,6 +81,7 @@ actual interface TorManager:
          * @param [requiredEvents] events that are required for your implementation
          *  to function properly. These events will be set at every Tor start, and
          *  added to any calls to [TorManager.setEvents] during Tor runtime.
+         * @see [TorMultiInstanceManager]
          * */
         @JvmStatic
         @JvmOverloads
@@ -85,8 +90,9 @@ actual interface TorManager:
             networkObserver: NetworkObserver? = null,
             requiredEvents: Set<TorEvent>? = null
         ): TorManager =
-            realTorManager(
-                loader,
+            TorMultiInstanceManager.newTorManagerInstance(
+                instanceId = InstanceId(DEFAULT_INSTANCE_ID),
+                loader = loader,
                 networkObserver = networkObserver,
                 requiredEvents = requiredEvents,
             )

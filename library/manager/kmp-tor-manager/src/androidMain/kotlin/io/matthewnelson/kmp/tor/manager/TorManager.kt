@@ -46,10 +46,6 @@ import kotlinx.coroutines.*
  * [TorManager]'s primary responsibility is to ensure synchronous execution of
  * Tor operations.
  *
- * Multiple instances of Tor _can_ be run by spinning it up and branching off as
- * a Daemon, but that is beyond the scope of [TorManager]; it manages a single
- * instance of Tor.
- *
  * By implementing [TorControlManager], [TorManager] facilitates pass-through
  * interaction with [TorController] (which is connected to automatically upon
  * every [start]).
@@ -83,6 +79,7 @@ actual interface TorManager:
     TorStateManager,
     TorEventProcessor<TorManagerEvent.SealedListener>
 {
+    actual val instanceId: String
 
     actual fun debug(enable: Boolean)
 
@@ -139,6 +136,8 @@ private class RealTorManagerAndroid(
 ) : BaseTorManager(),
     TorManager
 {
+    override val instanceId: String get() = TorServiceController.DEFAULT_INSTANCE_ID
+
     override val state: TorState
         get() = when (val state = TorServiceController.binderState) {
             null -> TorState.Off

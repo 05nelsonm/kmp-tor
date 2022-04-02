@@ -53,19 +53,17 @@ import io.matthewnelson.kmp.tor.manager.internal.ext.dnsOpened
 import io.matthewnelson.kmp.tor.manager.internal.ext.httpOpened
 import io.matthewnelson.kmp.tor.manager.internal.ext.socksOpened
 import io.matthewnelson.kmp.tor.manager.internal.ext.transOpened
+import io.matthewnelson.kmp.tor.manager.internal.util.realTorManagerInstanceDestroyed
 import kotlinx.atomicfu.*
 import kotlinx.atomicfu.locks.synchronized
 import kotlinx.coroutines.*
+import kotlinx.coroutines.sync.Mutex
 import kotlin.coroutines.coroutineContext
 import kotlin.jvm.JvmSynthetic
 
 /**
  * [TorManager]'s primary responsibility is to ensure synchronous execution of
  * Tor operations.
- *
- * Multiple instances of Tor _can_ be run by spinning it up and branching off as
- * a Daemon, but that is beyond the scope of [TorManager]; it manages a single
- * instance of Tor.
  *
  * By implementing [TorControlManager], [TorManager] facilitates pass-through
  * interaction with [TorController] (which is connected to automatically upon
@@ -99,12 +97,16 @@ expect interface TorManager:
     TorStateManager,
     TorEventProcessor<TorManagerEvent.SealedListener>
 {
+    val instanceId: String
+
     fun debug(enable: Boolean)
 }
 
 @JvmSynthetic
 internal fun realTorManager(
     loader: KmpTorLoader,
+    instanceId: String,
+    processorLock: Mutex,
     main: CoroutineDispatcher = try {
         Dispatchers.Main.immediate
     } catch (e: UnsupportedOperationException) {
@@ -113,12 +115,21 @@ internal fun realTorManager(
     networkObserver: NetworkObserver? = null,
     requiredEvents: Set<TorEvent>? = null,
 ): TorManager =
-    RealTorManager(loader, main, networkObserver, requiredEvents)
+    RealTorManager(
+        loader,
+        instanceId,
+        processorLock,
+        main,
+        networkObserver,
+        requiredEvents
+    )
 
 @OptIn(InternalTorApi::class)
 @Suppress("CanBePrimaryConstructorProperty")
 private class RealTorManager(
     loader: KmpTorLoader,
+    instanceId: String,
+    processorLock: Mutex,
     main: CoroutineDispatcher,
     networkObserver: NetworkObserver?,
     requiredEvents: Set<TorEvent>?,
@@ -151,6 +162,7 @@ private class RealTorManager(
     )
     private val coroutineCounter: AtomicLong = atomic(0L)
 
+    override val instanceId: String = instanceId
     private val networkObserver: NetworkObserver? = networkObserver
     private val disableNetwork = TorConfig.Setting.DisableNetwork()
     private val networkObserverJob: AtomicRef<Job?> = atomic(null)
@@ -202,7 +214,7 @@ private class RealTorManager(
         loader
     }
 
-    private val actions: ActionProcessor = ActionProcessor.newInstance(useStaticLock = true)
+    private val actions: ActionProcessor = ActionProcessor.newInstance(processorLock)
     private val controller: AtomicRef<Pair<
         TorController,
         TorManagerEvent.StartUpCompleteForTorInstance?
@@ -258,6 +270,7 @@ private class RealTorManager(
                 controller.value?.first?.disconnect()
                 supervisor.cancel()
                 loader.close()
+                realTorManagerInstanceDestroyed(instanceId)
 
                 listeners.withLock {
                     for (listener in this) {
@@ -283,6 +296,7 @@ private class RealTorManager(
             }.invokeOnCompletion {
                 supervisor.cancel()
                 loader.close()
+                realTorManagerInstanceDestroyed(instanceId)
 
                 listeners.withLock {
                     for (listener in this) {
@@ -810,7 +824,7 @@ private class RealTorManager(
             notifyListenersNoScope(Start)
         }
 
-        val result = loader.load(scope, stateMachine) { event ->
+        val result = loader.load(instanceId, scope, stateMachine) { event ->
             if (event is TorManagerEvent.Log.Debug && !debug.value) return@load
             notifyListenersNoScope(event)
         }

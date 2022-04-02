@@ -39,6 +39,7 @@ import io.matthewnelson.kmp.tor.manager.common.state.TorState
 import io.matthewnelson.kmp.tor.manager.common.state.TorStateManager
 import io.matthewnelson.kmp.tor.manager.internal.notification.TorServiceNotification
 import kotlinx.coroutines.*
+import kotlinx.coroutines.sync.Mutex
 import kotlin.system.exitProcess
 
 internal class TorService: Service() {
@@ -82,6 +83,7 @@ internal class TorService: Service() {
         private var lastAction: TorManagerEvent.Action = TorManagerEvent.Action.Stop
 
         private val requiredEvents: MutableSet<TorEvent> = mutableSetOf()
+        private val processorLock = Mutex()
 
         @JvmSynthetic
         fun addEvents(events: Set<TorEvent>?) {
@@ -160,6 +162,8 @@ internal class TorService: Service() {
             instance ?: synchronized(this) {
                 instance ?: realTorManager(
                     loader,
+                    instanceId = TorServiceController.DEFAULT_INSTANCE_ID,
+                    processorLock = processorLock,
                     networkObserver = networkObserverOrNull(this@TorService),
                     requiredEvents = getEvents()
                 ).also { torManager ->
