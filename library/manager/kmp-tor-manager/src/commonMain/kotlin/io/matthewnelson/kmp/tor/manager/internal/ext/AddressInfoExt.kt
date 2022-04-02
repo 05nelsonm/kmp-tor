@@ -135,12 +135,12 @@ internal inline fun AddressInfo.transClosed(value: String): AddressInfo? {
 internal inline fun AddressInfo.onStateChange(old: State, new: State): AddressInfo? {
     // Tor went from On, to something else
     if (old.isOn && !new.isOn) {
-        return AddressInfo()
+        return AddressInfo.NULL_VALUES
     }
 
     // DisableNetwork was set to true
     if (old.isNetworkEnabled && new.isNetworkDisabled && new.torState.isBootstrapped) {
-        return AddressInfo()
+        return AddressInfo.NULL_VALUES
     }
 
     // DisableNetwork was set to false (network re-enabled)

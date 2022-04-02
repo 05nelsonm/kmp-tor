@@ -254,7 +254,7 @@ class SampleApp: App(SampleView::class) {
         }
 
         private val _addressInfo: MutableStateFlow<TorManagerEvent.AddressInfo> =
-            MutableStateFlow(TorManagerEvent.AddressInfo())
+            MutableStateFlow(TorManagerEvent.AddressInfo.NULL_VALUES)
         val addressInfo: StateFlow<TorManagerEvent.AddressInfo> = _addressInfo.asStateFlow()
         override fun managerEventAddressInfo(info: TorManagerEvent.AddressInfo) {
             _addressInfo.value = info

@@ -237,6 +237,9 @@ internal class TorService: Service() {
         @get:JvmSynthetic
         override val networkState: TorNetworkState
             get() = managerHolder.instance?.networkState ?: TorNetworkState.Disabled
+        @get:JvmSynthetic
+        override val addressInfo: TorManagerEvent.AddressInfo
+            get() = managerHolder.instance?.addressInfo ?: TorManagerEvent.AddressInfo.NULL_VALUES
     }
 
     private suspend fun restart(manager: TorManager): Result<Any?> {

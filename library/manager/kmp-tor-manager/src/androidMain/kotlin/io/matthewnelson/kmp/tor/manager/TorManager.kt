@@ -148,13 +148,20 @@ private class RealTorManagerAndroid(
 
     override val networkState: TorNetworkState
         get() = when (val state = TorServiceController.binderState) {
-            null -> TorNetworkState.Disabled
-            is BinderState.Bound -> state.binder().networkState
+            null,
             is BinderState.Starting -> TorNetworkState.Disabled
+            is BinderState.Bound -> state.binder().networkState
+        }
+
+    override val addressInfo: TorManagerEvent.AddressInfo
+        get() = when (val state = TorServiceController.binderState) {
+            null,
+            is BinderState.Starting -> TorManagerEvent.AddressInfo.NULL_VALUES
+            is BinderState.Bound -> state.binder().addressInfo
         }
 
     init {
-        TorService.init(application, Pair(hashCode(), { startQuietly() }))
+        TorService.init(application, Pair(hashCode()) { startQuietly() })
     }
 
     @Volatile

@@ -153,8 +153,6 @@ private class RealTorManager(
 
     private val networkObserver: NetworkObserver? = networkObserver
     private val disableNetwork = TorConfig.Setting.DisableNetwork()
-    private val addressInfo = atomic(TorManagerEvent.AddressInfo())
-    private val addressInfoJob: AtomicRef<Job?> = atomic(null)
     private val networkObserverJob: AtomicRef<Job?> = atomic(null)
 
     private val loader: KmpTorLoader by lazy {
@@ -203,18 +201,22 @@ private class RealTorManager(
 
         loader
     }
+
     private val actions: ActionProcessor = ActionProcessor.newInstance(useStaticLock = true)
     private val controller: AtomicRef<Pair<
         TorController,
         TorManagerEvent.StartUpCompleteForTorInstance?
     >?> = atomic(null)
 
+    private val _addressInfo = atomic(TorManagerEvent.AddressInfo.NULL_VALUES)
+    private val addressInfoJob: AtomicRef<Job?> = atomic(null)
+
     // State should be dispatched immediately. as such, only update state machine
     // from Dispatchers.Main
     private val stateMachine: TorStateMachine = TorStateMachine.newInstance { old, new ->
         notifyListenersNoScope(new)
 
-        addressInfo.update { info ->
+        _addressInfo.update { info ->
             info.onStateChange(old, new)?.let { newInfo ->
                 addressInfoJob.value?.cancel()
                 notifyListenersNoScope(newInfo)
@@ -236,6 +238,12 @@ private class RealTorManager(
     }
     override val state: TorState get() = stateMachine.state
     override val networkState: TorNetworkState get() = stateMachine.networkState
+    override val addressInfo: TorManagerEvent.AddressInfo
+        get() = if (state.isBootstrapped && networkState.isEnabled()) {
+            _addressInfo.value
+        } else {
+            TorManagerEvent.AddressInfo.NULL_VALUES
+        }
 
     private val _isDestroyed: AtomicBoolean = atomic(false)
     override val isDestroyed: Boolean get() = _isDestroyed.value
@@ -680,29 +688,29 @@ private class RealTorManager(
                     val address = splits.lastOrNull()?.trim()
 
                     if (address != null) {
-                        val info = addressInfo.value
+                        val info = _addressInfo.value
                         when (splits.elementAtOrNull(2)?.lowercase()) {
                             "dns" -> {
                                 info.dnsClosed(address)?.let { newInfo ->
-                                    addressInfo.value = newInfo
+                                    _addressInfo.value = newInfo
                                     dispatchNewAddressInfo(newInfo)
                                 }
                             }
                             "http" -> {
                                 info.httpClosed(address)?.let { newInfo ->
-                                    addressInfo.value = newInfo
+                                    _addressInfo.value = newInfo
                                     dispatchNewAddressInfo(newInfo)
                                 }
                             }
                             "socks" -> {
                                 info.socksClosed(address)?.let { newInfo ->
-                                    addressInfo.value = newInfo
+                                    _addressInfo.value = newInfo
                                     dispatchNewAddressInfo(newInfo)
                                 }
                             }
                             "transparent" -> {
                                 info.transClosed(address)?.let { newInfo ->
-                                    addressInfo.value = newInfo
+                                    _addressInfo.value = newInfo
                                     dispatchNewAddressInfo(newInfo)
                                 }
                             }
@@ -720,29 +728,29 @@ private class RealTorManager(
                     val address = splits.lastOrNull()?.trim()
 
                     if (address != null) {
-                        val info = addressInfo.value
+                        val info = _addressInfo.value
                         when (splits.elementAtOrNull(1)?.lowercase()) {
                             "dns" -> {
                                 info.dnsOpened(address)?.let { newInfo ->
-                                    addressInfo.value = newInfo
+                                    _addressInfo.value = newInfo
                                     dispatchNewAddressInfo(newInfo)
                                 }
                             }
                             "http" -> {
                                 info.httpOpened(address)?.let { newInfo ->
-                                    addressInfo.value = newInfo
+                                    _addressInfo.value = newInfo
                                     dispatchNewAddressInfo(newInfo)
                                 }
                             }
                             "socks" -> {
                                 info.socksOpened(address)?.let { newInfo ->
-                                    addressInfo.value = newInfo
+                                    _addressInfo.value = newInfo
                                     dispatchNewAddressInfo(newInfo)
                                 }
                             }
                             "transparent" -> {
                                 info.transOpened(address)?.let { newInfo ->
-                                    addressInfo.value = newInfo
+                                    _addressInfo.value = newInfo
                                     dispatchNewAddressInfo(newInfo)
                                 }
                             }

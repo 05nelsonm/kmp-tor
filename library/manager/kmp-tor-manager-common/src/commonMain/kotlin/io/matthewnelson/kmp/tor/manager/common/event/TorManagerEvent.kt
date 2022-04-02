@@ -209,6 +209,11 @@ sealed interface TorManagerEvent {
 
             return Result.success(set.toSet())
         }
+
+        companion object {
+            @get:JvmStatic
+            val NULL_VALUES = AddressInfo()
+        }
     }
 
     /**

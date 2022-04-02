@@ -51,6 +51,9 @@ private class RealTorStateMachine(
         TorManagerEvent.State(TorState.Off, TorNetworkState.Disabled)
     )
 
+    // Unused
+    override val addressInfo: TorManagerEvent.AddressInfo
+        get() = TorManagerEvent.AddressInfo.NULL_VALUES
     override val state: TorState get() = _currentState.value.torState
     override val networkState: TorNetworkState get() = _currentState.value.networkState
 
