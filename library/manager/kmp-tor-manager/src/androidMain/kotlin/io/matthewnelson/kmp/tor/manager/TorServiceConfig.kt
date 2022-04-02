@@ -48,6 +48,7 @@ abstract class TorServiceConfig internal constructor() {
     abstract val enableForeground: Boolean
 
     abstract val stopServiceOnTaskRemoved: Boolean
+    abstract val ifForegroundExitProcessOnDestroyWhenTaskRemoved: Boolean
 
     abstract val notificationId: Int
     abstract val channelId: String
@@ -79,6 +80,7 @@ abstract class TorServiceConfig internal constructor() {
             TorServiceConfig(
                 enableForeground=$enableForeground,
                 stopServiceOnTaskRemoved=$stopServiceOnTaskRemoved,
+                ifForegroundExitProcessOnDestroyWhenTaskRemoved=$ifForegroundExitProcessOnDestroyWhenTaskRemoved,
                 notificationId=$notificationId,
                 channelId=$channelId,
                 channelName=$channelName,
@@ -102,6 +104,7 @@ abstract class TorServiceConfig internal constructor() {
                 other is TorServiceConfig                                       &&
                 other.enableForeground == enableForeground                      &&
                 other.stopServiceOnTaskRemoved == stopServiceOnTaskRemoved      &&
+                other.ifForegroundExitProcessOnDestroyWhenTaskRemoved == ifForegroundExitProcessOnDestroyWhenTaskRemoved &&
                 other.notificationId == notificationId                          &&
                 other.channelId == channelId                                    &&
                 other.channelName == channelName                                &&
@@ -122,6 +125,7 @@ abstract class TorServiceConfig internal constructor() {
         var result = 17
         result = result * 31 + enableForeground.hashCode()
         result = result * 31 + stopServiceOnTaskRemoved.hashCode()
+        result = result * 31 + ifForegroundExitProcessOnDestroyWhenTaskRemoved.hashCode()
         result = result * 31 + notificationId.hashCode()
         result = result * 31 + channelId.hashCode()
         result = result * 31 + channelName.hashCode()
@@ -158,6 +162,7 @@ private class RealTorServiceConfig(context: Context): TorServiceConfig() {
     override val enableForeground: Boolean
 
     override val stopServiceOnTaskRemoved: Boolean
+    override val ifForegroundExitProcessOnDestroyWhenTaskRemoved: Boolean
 
     override val notificationId: Int
     override val channelId: String
@@ -216,6 +221,7 @@ private class RealTorServiceConfig(context: Context): TorServiceConfig() {
         stopServiceOnTaskRemoved = meta?.getBoolean(KEY_STOP_SERVICE_ON_TASK_REMOVED, true) ?: true
 
         if (!enableForeground) {
+            ifForegroundExitProcessOnDestroyWhenTaskRemoved = false
             notificationId = 0
             channelId = ""
             channelName = ""
@@ -248,6 +254,11 @@ private class RealTorServiceConfig(context: Context): TorServiceConfig() {
                     """.trimIndent()
                 )
             }
+
+            ifForegroundExitProcessOnDestroyWhenTaskRemoved = meta.getBoolean(
+                KEY_IF_FOREGROUND_EXIT_PROCESS_ON_DESTROY_WHEN_TASK_REMOVED,
+                true
+            )
 
             notificationId = meta.getInt(KEY_NOTIFICATION_ID, 0).let { id ->
                 if (id !in 1..9999) {
@@ -582,6 +593,7 @@ private class RealTorServiceConfig(context: Context): TorServiceConfig() {
 
         const val KEY_ENABLE_FOREGROUND = "$BASE.enable_foreground"
         const val KEY_STOP_SERVICE_ON_TASK_REMOVED = "$BASE.stop_service_on_task_removed"
+        const val KEY_IF_FOREGROUND_EXIT_PROCESS_ON_DESTROY_WHEN_TASK_REMOVED = "$BASE.if_foreground_exit_process_on_destroy_when_task_removed"
 
         const val KEY_NOTIFICATION_ID = "$BASE.notification_id"
         const val KEY_CHANNEL_ID = "$BASE.notification_channel_id"
