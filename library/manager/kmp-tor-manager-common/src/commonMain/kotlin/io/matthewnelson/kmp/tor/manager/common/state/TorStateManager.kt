@@ -15,7 +15,17 @@
  **/
 package io.matthewnelson.kmp.tor.manager.common.state
 
+import io.matthewnelson.kmp.tor.manager.common.event.TorManagerEvent
+
 interface TorStateManager {
     val state: TorState
     val networkState: TorNetworkState
+
+    /**
+     * Returns [TorManagerEvent.AddressInfo] values only when
+     * [TorState.isBootstrapped] && [TorNetworkState.isEnabled] is
+     * true, otherwise returns [TorManagerEvent.AddressInfo.NULL_VALUES]
+     * until Tor is ready.
+     * */
+    val addressInfo: TorManagerEvent.AddressInfo
 }
