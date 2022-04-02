@@ -1,5 +1,18 @@
 # CHANGELOG
 
+## Version 0.4.6.10+0.1.0-beta2 (2022-04-02)
+ - Added to Jvm and Js the ability to manage multiple instances of `TorManager`
+     - See new `TorMultiInstanceManager` class in `jvmJsCommonMain` source set.
+ - Added to Android's TorServiceConfig the option to call `exitProcess` for Foreground 
+   Service operations in the event TorManager.destroy completes and the application
+   Task has been removed (user swiped the app from recent app's tray)
+ - Added to `TorStateManager` interface the `addressInfo` property getter, so 
+   attached listeners do not always need to store the value locally once dispatched.
+ - Fixes localhost ip address resolution (may not be `127.0.0.1` on some machines)
+ - Fixes `HiddenService.Ports` equals/hashCode to only take into account the `virtualPort`
+   argument as to disallow multiple virtual ports of the same value to be expressed.
+ - Internal code clean up
+
 ## Version 0.4.6.10+0.1.0-beta1 (2022-03-20)
  - Added ability to declare HiddenServices via the `TorConfig.Builder` and
    the `TorController`.
