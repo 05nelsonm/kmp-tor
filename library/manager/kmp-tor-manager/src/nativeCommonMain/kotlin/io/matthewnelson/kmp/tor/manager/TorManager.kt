@@ -21,6 +21,7 @@ import io.matthewnelson.kmp.tor.manager.common.TorControlManager
 import io.matthewnelson.kmp.tor.manager.common.TorOperationManager
 import io.matthewnelson.kmp.tor.manager.common.event.TorManagerEvent
 import io.matthewnelson.kmp.tor.manager.common.state.TorStateManager
+import kotlinx.coroutines.sync.Mutex
 
 actual interface TorManager:
     Destroyable,
@@ -29,10 +30,13 @@ actual interface TorManager:
     TorStateManager,
     TorEventProcessor<TorManagerEvent.SealedListener>
 {
+    actual val instanceId: String
 
     actual fun debug(enable: Boolean)
 
     companion object {
+
+        private val processorLock = Mutex()
 
         /**
          * @param [networkObserver] optional for observing device connectivity to
@@ -50,6 +54,7 @@ actual interface TorManager:
             realTorManager(
                 loader,
                 instanceId = "NativeInstance",
+                processorLock = processorLock,
                 networkObserver = networkObserver,
                 requiredEvents = requiredEvents,
             )

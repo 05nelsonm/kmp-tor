@@ -46,6 +46,7 @@ expect abstract class KmpTorLoader {
 
     @JvmSynthetic
     internal open suspend fun load(
+        instanceId: String,
         managerScope: CoroutineScope,
         stateMachine: TorStateMachine,
         notify: (TorManagerEvent) -> Unit,

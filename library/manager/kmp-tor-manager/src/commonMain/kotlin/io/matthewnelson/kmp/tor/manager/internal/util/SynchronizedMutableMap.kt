@@ -15,11 +15,16 @@
  **/
 package io.matthewnelson.kmp.tor.manager.internal.util
 
-import io.matthewnelson.kmp.tor.manager.instance.InstanceId
-import io.matthewnelson.kmp.tor.manager.instance.TorMultiInstanceManager
-import kotlin.jvm.JvmSynthetic
+import kotlinx.atomicfu.locks.SynchronizedObject
+import kotlinx.atomicfu.locks.synchronized
 
-@JvmSynthetic
-internal actual fun realTorManagerInstanceDestroyed(instanceId: String) {
-    TorMultiInstanceManager.removeInstance(InstanceId(instanceId))
+internal class SynchronizedMutableMap<T: Any>: SynchronizedObject() {
+
+    private val map: MutableMap<String, T> = LinkedHashMap(1)
+
+    fun <V: Any?> withLock(block: MutableMap<String, T>.() -> V): V {
+        return synchronized(this) {
+            block.invoke(map)
+        }
+    }
 }

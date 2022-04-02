@@ -57,6 +57,7 @@ import io.matthewnelson.kmp.tor.manager.internal.util.realTorManagerInstanceDest
 import kotlinx.atomicfu.*
 import kotlinx.atomicfu.locks.synchronized
 import kotlinx.coroutines.*
+import kotlinx.coroutines.sync.Mutex
 import kotlin.coroutines.coroutineContext
 import kotlin.jvm.JvmSynthetic
 
@@ -100,6 +101,8 @@ expect interface TorManager:
     TorStateManager,
     TorEventProcessor<TorManagerEvent.SealedListener>
 {
+    val instanceId: String
+
     fun debug(enable: Boolean)
 }
 
@@ -107,6 +110,7 @@ expect interface TorManager:
 internal fun realTorManager(
     loader: KmpTorLoader,
     instanceId: String,
+    processorLock: Mutex,
     main: CoroutineDispatcher = try {
         Dispatchers.Main.immediate
     } catch (e: UnsupportedOperationException) {
@@ -115,13 +119,21 @@ internal fun realTorManager(
     networkObserver: NetworkObserver? = null,
     requiredEvents: Set<TorEvent>? = null,
 ): TorManager =
-    RealTorManager(loader, instanceId, main, networkObserver, requiredEvents)
+    RealTorManager(
+        loader,
+        instanceId,
+        processorLock,
+        main,
+        networkObserver,
+        requiredEvents
+    )
 
 @OptIn(InternalTorApi::class)
 @Suppress("CanBePrimaryConstructorProperty")
 private class RealTorManager(
     loader: KmpTorLoader,
     instanceId: String,
+    processorLock: Mutex,
     main: CoroutineDispatcher,
     networkObserver: NetworkObserver?,
     requiredEvents: Set<TorEvent>?,
@@ -154,7 +166,7 @@ private class RealTorManager(
     )
     private val coroutineCounter: AtomicLong = atomic(0L)
 
-    private val instanceId: String = instanceId
+    override val instanceId: String = instanceId
     private val networkObserver: NetworkObserver? = networkObserver
     private val disableNetwork = TorConfig.Setting.DisableNetwork()
     private val networkObserverJob: AtomicRef<Job?> = atomic(null)
@@ -206,7 +218,7 @@ private class RealTorManager(
         loader
     }
 
-    private val actions: ActionProcessor = ActionProcessor.newInstance(useStaticLock = true)
+    private val actions: ActionProcessor = ActionProcessor.newInstance(processorLock)
     private val controller: AtomicRef<Pair<
         TorController,
         TorManagerEvent.StartUpCompleteForTorInstance?
@@ -815,7 +827,7 @@ private class RealTorManager(
             notifyListenersNoScope(Start)
         }
 
-        val result = loader.load(scope, stateMachine) { event ->
+        val result = loader.load(instanceId, scope, stateMachine) { event ->
             if (event is TorManagerEvent.Log.Debug && !debug.value) return@load
             notifyListenersNoScope(event)
         }

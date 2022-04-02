@@ -30,6 +30,7 @@ import io.matthewnelson.kmp.tor.manager.common.state.TorNetworkState
 import io.matthewnelson.kmp.tor.manager.common.state.TorState
 import io.matthewnelson.kmp.tor.manager.internal.TorStateMachine
 import io.matthewnelson.kmp.tor.manager.internal.ext.infoGetBootstrapProgressOrNull
+import io.matthewnelson.kmp.tor.manager.internal.util.SynchronizedMutableMap
 import io.matthewnelson.kmp.tor.manager.util.PortUtil
 import kotlinx.coroutines.*
 import kotlinx.coroutines.sync.Mutex
@@ -49,6 +50,12 @@ actual abstract class KmpTorLoader @JvmOverloads constructor(
     private val io: CoroutineDispatcher = Dispatchers.IO
 ) {
 
+    companion object {
+        const val READ_INTERVAL = 250L
+
+        private val instanceRunLock = SynchronizedMutableMap<Mutex>()
+    }
+
     /**
      * Calls [TorConfig.Builder.removeInstanceOf] for all present
      * settings. This is to ensure platform specific settings are
@@ -57,13 +64,7 @@ actual abstract class KmpTorLoader @JvmOverloads constructor(
      * */
     protected actual open val excludeSettings: Set<TorConfig.Setting<*>> = emptySet()
     private val torDispatcher = DispatcherHandler()
-
-    companion object {
-        const val READ_INTERVAL = 250L
-
-        private val runLock: Mutex = Mutex()
-        private var torJob: Job? = null
-    }
+    private var torJob: Job? = null
 
     private class DispatcherHandler {
         @Volatile
@@ -86,6 +87,7 @@ actual abstract class KmpTorLoader @JvmOverloads constructor(
     @JvmSynthetic
     @Suppress("BlockingMethodInNonBlockingContext")
     internal actual open suspend fun load(
+        instanceId: String,
         managerScope: CoroutineScope,
         stateMachine: TorStateMachine,
         notify: (TorManagerEvent) -> Unit,
@@ -230,7 +232,11 @@ actual abstract class KmpTorLoader @JvmOverloads constructor(
             handler                                         +
             CoroutineName(name = "KmpTorLoader.startTor")
         ) {
-            runLock.withLock {
+            instanceRunLock.withLock {
+                // get or create a lock for this instanceId
+                get(instanceId) ?: Mutex()
+                    .also { mutex -> put(instanceId, mutex) }
+            }.withLock {
 
                 notify.invoke(TorManagerEvent.Log.Info(value=
                     "Starting Tor with the following settings:\n" +
@@ -255,7 +261,7 @@ actual abstract class KmpTorLoader @JvmOverloads constructor(
             }
         }
 
-        Companion.torJob = torJob
+        this.torJob = torJob
         torJob.invokeOnCompletion {
             stateMachine.updateState(TorState.Off, TorNetworkState.Disabled)
         }

@@ -36,6 +36,7 @@ actual abstract class KmpTorLoader(provider: TorConfigProvider) {
     protected actual open val excludeSettings: Set<TorConfig.Setting<*>> = emptySet()
     private val provider = provider
     internal actual open suspend fun load(
+        instanceId: String,
         managerScope: CoroutineScope,
         stateMachine: TorStateMachine,
         notify: (TorManagerEvent) -> Unit,

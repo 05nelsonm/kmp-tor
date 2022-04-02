@@ -32,25 +32,17 @@ internal sealed interface ActionProcessor {
         const val INTERRUPT_MESSAGE = "Interrupted by "
 
         @JvmSynthetic
-        internal fun newInstance(useStaticLock: Boolean = false): ActionProcessor =
-            RealActionProcessor(useStaticLock, ActionQueue.newInstance())
+        internal fun newInstance(processorLock: Mutex? = null): ActionProcessor =
+            RealActionProcessor(processorLock, ActionQueue.newInstance())
     }
 }
 
 private class RealActionProcessor(
-    useStaticLock: Boolean,
+    processorLock: Mutex?,
     delegate: ActionQueue
 ): ActionProcessor, ActionQueue by delegate {
 
-    companion object {
-        private val staticLock: Mutex = Mutex()
-    }
-
-    private val lockProcessor: Mutex = if (useStaticLock) {
-        staticLock
-    } else {
-        Mutex()
-    }
+    private val lockProcessor: Mutex = processorLock ?: Mutex()
 
     override suspend fun <T> withProcessorLock(
         action: Action, block: suspend () -> Result<T>

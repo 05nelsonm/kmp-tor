@@ -22,6 +22,8 @@ import io.matthewnelson.kmp.tor.manager.common.TorControlManager
 import io.matthewnelson.kmp.tor.manager.common.TorOperationManager
 import io.matthewnelson.kmp.tor.manager.common.event.TorManagerEvent
 import io.matthewnelson.kmp.tor.manager.common.state.TorStateManager
+import io.matthewnelson.kmp.tor.manager.instance.InstanceId
+import io.matthewnelson.kmp.tor.manager.instance.TorMultiInstanceManager
 import kotlin.jvm.JvmOverloads
 import kotlin.jvm.JvmStatic
 
@@ -65,12 +67,13 @@ actual interface TorManager:
     TorStateManager,
     TorEventProcessor<TorManagerEvent.SealedListener>
 {
+    actual val instanceId: String
 
     actual fun debug(enable: Boolean)
 
     companion object {
         
-        internal const val DEFAULT_INSTANCE = "DefaultInstance"
+        private const val DEFAULT_INSTANCE_ID = "DefaultInstance"
 
         /**
          * Jvm method for retrieving an instance of [TorManager].
@@ -81,6 +84,7 @@ actual interface TorManager:
          * @param [requiredEvents] events that are required for your implementation
          *  to function properly. These events will be set at every Tor start, and
          *  added to any calls to [TorManager.setEvents] during Tor runtime.
+         * @see [TorMultiInstanceManager]
          * */
         @JvmStatic
         @JvmOverloads
@@ -89,9 +93,9 @@ actual interface TorManager:
             networkObserver: NetworkObserver? = null,
             requiredEvents: Set<TorEvent>? = null
         ): TorManager =
-            realTorManager(
-                loader,
-                instanceId = DEFAULT_INSTANCE,
+            TorMultiInstanceManager.newTorManagerInstance(
+                instanceId = InstanceId(DEFAULT_INSTANCE_ID),
+                loader = loader,
                 networkObserver = networkObserver,
                 requiredEvents = requiredEvents,
             )

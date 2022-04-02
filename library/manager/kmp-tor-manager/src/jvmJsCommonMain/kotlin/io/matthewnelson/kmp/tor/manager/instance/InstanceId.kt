@@ -13,13 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-package io.matthewnelson.kmp.tor.manager.internal.util
+package io.matthewnelson.kmp.tor.manager.instance
 
-import io.matthewnelson.kmp.tor.manager.instance.InstanceId
-import io.matthewnelson.kmp.tor.manager.instance.TorMultiInstanceManager
-import kotlin.jvm.JvmSynthetic
+import kotlin.jvm.JvmInline
 
-@JvmSynthetic
-internal actual fun realTorManagerInstanceDestroyed(instanceId: String) {
-    TorMultiInstanceManager.removeInstance(InstanceId(instanceId))
+@JvmInline
+value class InstanceId(val value: String) {
+    init {
+        require(value.isNotBlank()) {
+            "InstanceId.value cannot be blank"
+        }
+    }
 }

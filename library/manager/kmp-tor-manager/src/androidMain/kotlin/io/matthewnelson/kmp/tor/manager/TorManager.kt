@@ -83,6 +83,7 @@ actual interface TorManager:
     TorStateManager,
     TorEventProcessor<TorManagerEvent.SealedListener>
 {
+    actual val instanceId: String
 
     actual fun debug(enable: Boolean)
 
@@ -139,6 +140,8 @@ private class RealTorManagerAndroid(
 ) : BaseTorManager(),
     TorManager
 {
+    override val instanceId: String get() = TorServiceController.DEFAULT_INSTANCE_ID
+
     override val state: TorState
         get() = when (val state = TorServiceController.binderState) {
             null -> TorState.Off
