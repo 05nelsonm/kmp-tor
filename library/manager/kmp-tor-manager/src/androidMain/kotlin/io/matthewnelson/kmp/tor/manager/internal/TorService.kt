@@ -160,6 +160,7 @@ internal class TorService: Service() {
             instance ?: synchronized(this) {
                 instance ?: realTorManager(
                     loader,
+                    instanceId = "AndroidInstance",
                     networkObserver = networkObserverOrNull(this@TorService),
                     requiredEvents = getEvents()
                 ).also { torManager ->

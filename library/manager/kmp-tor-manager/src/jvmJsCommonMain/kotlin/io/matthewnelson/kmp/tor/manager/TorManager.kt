@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Matthew Nelson
+ * Copyright (c) 2022 Matthew Nelson
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,8 @@ import io.matthewnelson.kmp.tor.manager.common.TorControlManager
 import io.matthewnelson.kmp.tor.manager.common.TorOperationManager
 import io.matthewnelson.kmp.tor.manager.common.event.TorManagerEvent
 import io.matthewnelson.kmp.tor.manager.common.state.TorStateManager
+import kotlin.jvm.JvmOverloads
+import kotlin.jvm.JvmStatic
 
 /**
  * [TorManager]'s primary responsibility is to ensure synchronous execution of
@@ -67,6 +69,8 @@ actual interface TorManager:
     actual fun debug(enable: Boolean)
 
     companion object {
+        
+        internal const val DEFAULT_INSTANCE = "DefaultInstance"
 
         /**
          * Jvm method for retrieving an instance of [TorManager].
@@ -87,6 +91,7 @@ actual interface TorManager:
         ): TorManager =
             realTorManager(
                 loader,
+                instanceId = DEFAULT_INSTANCE,
                 networkObserver = networkObserver,
                 requiredEvents = requiredEvents,
             )

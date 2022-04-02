@@ -21,12 +21,9 @@ actual object PortUtil {
 
     /**
      * Must be called from a background thread.
-     *
-     * @throws [RuntimeException] if called from Android's Main thread.
      * */
-    @Throws(RuntimeException::class)
     actual fun isTcpPortAvailable(port: Port): Boolean {
-        TODO("Not yet implemented")
+        throw RuntimeException("Not yet implemented")
     }
 
     /**
@@ -45,10 +42,8 @@ actual object PortUtil {
      * @throws [RuntimeException] if:
      *   - [limit] has been reached
      *   - [limit] is less than 1 or greater than 65535
-     *   - called from Android's Main Thread.
      * */
-    @Throws(RuntimeException::class)
     actual fun findNextAvailableTcpPort(port: Port, limit: Int): Port {
-        TODO("Not yet implemented")
+        throw RuntimeException("Not yet implemented")
     }
 }

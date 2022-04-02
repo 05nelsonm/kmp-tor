@@ -53,6 +53,7 @@ import io.matthewnelson.kmp.tor.manager.internal.ext.dnsOpened
 import io.matthewnelson.kmp.tor.manager.internal.ext.httpOpened
 import io.matthewnelson.kmp.tor.manager.internal.ext.socksOpened
 import io.matthewnelson.kmp.tor.manager.internal.ext.transOpened
+import io.matthewnelson.kmp.tor.manager.internal.util.realTorManagerInstanceDestroyed
 import kotlinx.atomicfu.*
 import kotlinx.atomicfu.locks.synchronized
 import kotlinx.coroutines.*
@@ -105,6 +106,7 @@ expect interface TorManager:
 @JvmSynthetic
 internal fun realTorManager(
     loader: KmpTorLoader,
+    instanceId: String,
     main: CoroutineDispatcher = try {
         Dispatchers.Main.immediate
     } catch (e: UnsupportedOperationException) {
@@ -113,12 +115,13 @@ internal fun realTorManager(
     networkObserver: NetworkObserver? = null,
     requiredEvents: Set<TorEvent>? = null,
 ): TorManager =
-    RealTorManager(loader, main, networkObserver, requiredEvents)
+    RealTorManager(loader, instanceId, main, networkObserver, requiredEvents)
 
 @OptIn(InternalTorApi::class)
 @Suppress("CanBePrimaryConstructorProperty")
 private class RealTorManager(
     loader: KmpTorLoader,
+    instanceId: String,
     main: CoroutineDispatcher,
     networkObserver: NetworkObserver?,
     requiredEvents: Set<TorEvent>?,
@@ -151,6 +154,7 @@ private class RealTorManager(
     )
     private val coroutineCounter: AtomicLong = atomic(0L)
 
+    private val instanceId: String = instanceId
     private val networkObserver: NetworkObserver? = networkObserver
     private val disableNetwork = TorConfig.Setting.DisableNetwork()
     private val networkObserverJob: AtomicRef<Job?> = atomic(null)
@@ -251,6 +255,7 @@ private class RealTorManager(
     override fun destroy(stopCleanly: Boolean, onCompletion: (() -> Unit)?) {
         synchronized(this) {
             if (isDestroyed) return@synchronized
+            realTorManagerInstanceDestroyed(instanceId)
             _isDestroyed.value = true
             networkObserver?.detach()
 

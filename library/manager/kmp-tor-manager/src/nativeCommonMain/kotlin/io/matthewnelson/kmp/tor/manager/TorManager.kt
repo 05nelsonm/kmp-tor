@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Matthew Nelson
+ * Copyright (c) 2022 Matthew Nelson
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -49,6 +49,7 @@ actual interface TorManager:
         ): TorManager =
             realTorManager(
                 loader,
+                instanceId = "NativeInstance",
                 networkObserver = networkObserver,
                 requiredEvents = requiredEvents,
             )
