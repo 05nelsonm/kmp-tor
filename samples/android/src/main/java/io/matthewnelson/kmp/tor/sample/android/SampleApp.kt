@@ -175,7 +175,7 @@ class SampleApp: Application() {
         }
 
         private val _addressInfo: MutableLiveData<TorManagerEvent.AddressInfo> =
-            MutableLiveData(TorManagerEvent.AddressInfo())
+            MutableLiveData(TorManagerEvent.AddressInfo.NULL_VALUES)
         val addressInfo: LiveData<TorManagerEvent.AddressInfo> = _addressInfo
         override fun managerEventAddressInfo(info: TorManagerEvent.AddressInfo) {
             _addressInfo.value = info

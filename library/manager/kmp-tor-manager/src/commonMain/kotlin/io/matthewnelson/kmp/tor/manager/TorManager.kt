@@ -153,7 +153,7 @@ private class RealTorManager(
 
     private val networkObserver: NetworkObserver? = networkObserver
     private val disableNetwork = TorConfig.Setting.DisableNetwork()
-    private val addressInfo = atomic(TorManagerEvent.AddressInfo())
+    private val addressInfo = atomic(TorManagerEvent.AddressInfo.NULL_VALUES)
     private val addressInfoJob: AtomicRef<Job?> = atomic(null)
     private val networkObserverJob: AtomicRef<Job?> = atomic(null)
 

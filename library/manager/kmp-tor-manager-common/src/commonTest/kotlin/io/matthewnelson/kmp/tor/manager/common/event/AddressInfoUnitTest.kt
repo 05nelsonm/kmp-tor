@@ -28,7 +28,7 @@ class AddressInfoUnitTest {
 
     @Test
     fun givenPortInfo_whenNoConstructorArgs_portsAreNull() {
-        assertTrue(AddressInfo().isNull)
+        assertTrue(AddressInfo.NULL_VALUES.isNull)
     }
 
     @Test
