@@ -78,12 +78,11 @@ object TorMultiInstanceManager {
     @JvmSynthetic
     internal fun removeLockForInstanceId(instanceId: InstanceId) {
         instanceLockMap.withLock {
-            val holder = get(instanceId.value) ?: return@withLock
+            val holder = remove(instanceId.value) ?: return@withLock
 
             if (holder.instanceCount > 1) {
                 put(instanceId.value, holder.copy(instanceCount = holder.instanceCount - 1))
             } else {
-                remove(instanceId.value)
                 KmpTorLoader.removeInstanceRunLock(instanceId.value)
             }
         }
