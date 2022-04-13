@@ -439,7 +439,7 @@ private class RealTorControlProcessor(
                 append(privateKey.value)
             }
 
-            onionAdd(sb, hsPorts, flags, maxStreams)
+            onionAdd(sb, hsPorts, flags, maxStreams, privateKey)
         }
     }
 
@@ -457,7 +457,7 @@ private class RealTorControlProcessor(
                 append(type)
             }
 
-            onionAdd(sb, hsPorts, flags, maxStreams)
+            onionAdd(sb, hsPorts, flags, maxStreams, null)
         }
     }
 
@@ -465,7 +465,8 @@ private class RealTorControlProcessor(
         sb: StringBuilder,
         hsPorts: Set<TorConfig.Setting.HiddenService.Ports>,
         flags: Set<TorControlOnionAdd.Flag>?,
-        maxStreams: TorConfig.Setting.HiddenService.MaxStreams?
+        maxStreams: TorConfig.Setting.HiddenService.MaxStreams?,
+        privateKey: OnionAddress.PrivateKey?,
     ): Result<HiddenServiceEntry> {
         return try {
             val command = sb.apply {
@@ -504,13 +505,20 @@ private class RealTorControlProcessor(
                 append(CLRF)
             }.toString()
 
+            val isFlagDiscardPkPresent = flags?.contains(TorControlOnionAdd.Flag.DiscardPK) == true
+
             // SingleLine(status=250, message=ServiceID=bxtow33uhscfu2xscwmha4quznly7ybfocm6i5uh35uyltddbj4yesyd)
             // SingleLine(status=250, message=PrivateKey=ED25519-V3:cKjLrpfAV0rNDmfn6hMpcWUFsN82MqhVxwre9c3KjnlfkZxkJlyixy756WMKtNlVyMrhSxgaZfECky7rE1O1dA==)
             // SingleLine(status=250, message=OK)
             val hsEntry = processCommand(command) {
 
                 var serviceId: OnionAddress? = null
-                var privateKey: OnionAddress.PrivateKey? = null
+                var privKey: OnionAddress.PrivateKey? = if (isFlagDiscardPkPresent) {
+                    null
+                } else {
+                    privateKey
+                }
+
                 for (line in this) {
                     val splits = line.message.split('=')
                     when (splits.elementAtOrNull(0)?.lowercase()) {
@@ -522,12 +530,12 @@ private class RealTorControlProcessor(
                                 }
                         }
                         "privatekey" -> {
-                            privateKey = splits
+                            privKey = splits
                                 .elementAtOrNull(1)
                                 ?.split(':')
                                 ?.elementAtOrNull(1)
                                 ?.let { key ->
-                                    OnionAddress.PrivateKey.fromString(key)
+                                    OnionAddress.PrivateKey.fromStringOrNull(key)
                                 }
                         }
                         else -> continue
@@ -538,13 +546,13 @@ private class RealTorControlProcessor(
                     throw TorControllerException("Failed to parse reply for onion address")
                 }
 
-                if (flags?.contains(TorControlOnionAdd.Flag.DiscardPK) != true && privateKey == null) {
+                if (!isFlagDiscardPkPresent && privKey == null) {
                     throw TorControllerException("Failed to parse reply for onion address private key")
                 }
 
                 HiddenServiceEntry(
                     address = serviceId,
-                    privateKey = privateKey,
+                    privateKey = privKey,
                     ports = hsPorts
                 )
             }
