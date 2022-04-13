@@ -15,6 +15,8 @@
  **/
 package io.matthewnelson.kmp.tor.common.address
 
+import io.matthewnelson.component.encoding.base32.Base32
+import io.matthewnelson.component.encoding.base32.decodeBase32ToArray
 import io.matthewnelson.kmp.tor.common.util.separateSchemeFromAddress
 import kotlin.jvm.JvmInline
 import kotlin.jvm.JvmStatic
@@ -37,6 +39,10 @@ value class OnionAddressV3(override val value: String): OnionAddress {
     }
 
     override val valueDotOnion: String get() = "$value.onion"
+
+    override fun decode(): ByteArray {
+        return value.uppercase().decodeBase32ToArray(Base32.Default)!!
+    }
 
     companion object {
         @get:JvmStatic

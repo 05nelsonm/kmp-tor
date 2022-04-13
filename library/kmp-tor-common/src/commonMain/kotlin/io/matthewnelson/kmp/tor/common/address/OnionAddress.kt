@@ -32,6 +32,8 @@ sealed interface OnionAddress {
      * */
     val valueDotOnion: String
 
+    fun decode(): ByteArray
+
     companion object {
         @JvmStatic
         fun fromStringOrNull(string: String): OnionAddress? {
