@@ -193,22 +193,40 @@ class TorControllerIntegrationTest: TorTestHelper() {
     fun givenHiddenService_whenFlagDiscardPkSet_returnsNullPrivateKey() = runBlocking {
         val expectedAddress = OnionAddressV3("2v4lfb2eo4cuygh6ssuwmkwsqqcdoua5nyjb7vkkxg76wllhbz3ltpad")
 
-        try {
-            val entry = manager.onionAdd(
-                privateKey = OnionAddressV3PrivateKey_ED25519("gGNRsNtSKe38fPr/J1UW2nOCNetZNl3qNySlPs9M5Fait1VVruWEBOoNU7fuPRkC4yrS1G7f/VjohBdzKTIQ6Q"),
-                hsPorts = setOf(
-                    TorConfig.Setting.HiddenService.Ports(virtualPort = Port(8770), targetPort = Port(8770)),
-                ),
-                flags = setOf(
-                    TorControlOnionAdd.Flag.DiscardPK,
-                ),
-            ).getOrThrow()
+        val entry = manager.onionAdd(
+            privateKey = OnionAddressV3PrivateKey_ED25519("gGNRsNtSKe38fPr/J1UW2nOCNetZNl3qNySlPs9M5Fait1VVruWEBOoNU7fuPRkC4yrS1G7f/VjohBdzKTIQ6Q"),
+            hsPorts = setOf(
+                TorConfig.Setting.HiddenService.Ports(virtualPort = Port(8770), targetPort = Port(8770)),
+            ),
+            flags = setOf(
+                TorControlOnionAdd.Flag.DiscardPK,
+            ),
+        ).getOrThrow()
 
-            assertEquals(expectedAddress, entry.address)
-            assertNull(entry.privateKey)
-        } finally {
-            manager.onionDel(expectedAddress)
-        }
+        manager.onionDel(expectedAddress)
+
+        assertEquals(expectedAddress, entry.address)
+        assertNull(entry.privateKey)
+
+        Unit
+    }
+
+    @Test
+    fun givenHiddenService_whenAdded_returnsPrivateKey() = runBlocking {
+        val expectedAddress = OnionAddressV3("2v4lfb2eo4cuygh6ssuwmkwsqqcdoua5nyjb7vkkxg76wllhbz3ltpad")
+        val expectedPrivateKey = OnionAddressV3PrivateKey_ED25519("gGNRsNtSKe38fPr/J1UW2nOCNetZNl3qNySlPs9M5Fait1VVruWEBOoNU7fuPRkC4yrS1G7f/VjohBdzKTIQ6Q")
+
+        val entry = manager.onionAdd(
+            privateKey = expectedPrivateKey,
+            hsPorts = setOf(
+                TorConfig.Setting.HiddenService.Ports(virtualPort = Port(8770), targetPort = Port(8770)),
+            ),
+        ).getOrThrow()
+
+        manager.onionDel(expectedAddress)
+
+        assertEquals(expectedAddress, entry.address)
+        assertEquals(expectedPrivateKey, entry.privateKey)
 
         Unit
     }
