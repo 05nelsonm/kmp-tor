@@ -50,6 +50,11 @@ class OnionAddressV3UnitTest {
     }
 
     @Test
+    fun givenV3OnionAddress_whenDecoded_returnsSuccess() {
+        OnionAddressV3(VALID_ONION_ADDRESS).decode()
+    }
+
+    @Test
     fun givenUrlString_whenAddressIsValidOnionAddress_returnsNotNull() {
         val url = "${Scheme.HTTP}$VALID_ONION_ADDRESS.onion:1234/some/path"
         val actual = OnionAddressV3.fromStringOrNull(url)
