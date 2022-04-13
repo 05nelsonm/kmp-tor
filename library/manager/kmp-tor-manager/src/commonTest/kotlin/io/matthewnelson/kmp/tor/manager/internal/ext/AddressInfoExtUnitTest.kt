@@ -20,7 +20,6 @@ import io.matthewnelson.kmp.tor.manager.common.state.TorNetworkState
 import io.matthewnelson.kmp.tor.manager.common.state.TorState
 import kotlin.test.Test
 import kotlin.test.assertEquals
-import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
 class AddressInfoExtUnitTest {
@@ -62,24 +61,6 @@ class AddressInfoExtUnitTest {
 
         val result = nullInfo.onStateChange(old, new)
         assertEquals(nullInfo, result)
-    }
-
-    @Test
-    fun givenNonNullPortsAndNetworkDisabled_whenBootstrapped_nullIsReturned() {
-        val old = State(TorState.On(95), TorNetworkState.Disabled)
-        val new = old.copy(torState = TorState.On(100))
-
-        val result = info.onStateChange(old, new)
-        assertNull(result)
-    }
-
-    @Test
-    fun givenNullPortsAndNetworkDisabled_whenBootstrapped_nullIsReturned() {
-        val old = State(TorState.On(95), TorNetworkState.Disabled)
-        val new = old.copy(torState = TorState.On(100))
-
-        val result = nullInfo.onStateChange(old, new)
-        assertNull(result)
     }
 
     @Test
