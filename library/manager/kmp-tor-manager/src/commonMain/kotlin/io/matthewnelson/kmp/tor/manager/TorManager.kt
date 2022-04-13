@@ -237,7 +237,7 @@ private class RealTorManager(
         }
 
         // Bootstrapping completed
-        if (!old.torState.isBootstrapped && new.torState.isBootstrapped && new.isNetworkEnabled) {
+        if (!old.torState.isBootstrapped && new.torState.isBootstrapped) {
             controller.update { pair ->
                 if (pair == null) return@update null
                 if (pair.second != null) return@update pair
