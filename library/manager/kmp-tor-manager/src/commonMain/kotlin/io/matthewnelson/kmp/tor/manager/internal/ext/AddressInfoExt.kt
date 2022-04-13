@@ -150,11 +150,7 @@ internal inline fun AddressInfo.onStateChange(old: State, new: State): AddressIn
     }
 
     // Bootstrapping completed
-    if (
-        !old.torState.isBootstrapped &&
-        new.torState.isBootstrapped &&
-        new.isNetworkEnabled
-    ) {
+    if (!old.torState.isBootstrapped && new.torState.isBootstrapped) {
         return this
     }
 
