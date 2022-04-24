@@ -15,9 +15,7 @@
  **/
 package io.matthewnelson.kmp.tor.manager
 
-import kotlinx.atomicfu.AtomicRef
-import kotlinx.atomicfu.atomic
-import kotlinx.atomicfu.update
+import io.matthewnelson.kmp.tor.manager.internal.util.SynchronizedMutableMap
 import kotlin.jvm.JvmSynthetic
 
 /**
@@ -30,46 +28,49 @@ import kotlin.jvm.JvmSynthetic
  * */
 abstract class NetworkObserver {
 
-    private val callback: AtomicRef<((Connectivity) -> Unit)?> = atomic(null)
+    private val callbacks = SynchronizedMutableMap<(Connectivity) -> Unit>()
 
     @JvmSynthetic
-    internal fun attach(callback: (Connectivity) -> Unit): Boolean {
-        var attached = false
-        this.callback.update {
-            if (it == null) {
+    internal fun attach(instanceId: String, callback: (Connectivity) -> Unit): Boolean {
+        return callbacks.withLock {
+            if (containsKey(instanceId)) return@withLock false
+
+            val wasEmpty = isEmpty()
+            this[instanceId] = callback
+
+            if (wasEmpty) {
+                // Only call when first attachment is had
                 try {
                     onManagerAttach()
                 } catch (_: Exception) {}
-                attached = true
-                callback
-            } else {
-                it
             }
+
+            true
         }
-        return attached
     }
 
     @JvmSynthetic
-    internal fun detach() {
-        callback.update {
-            if (it != null) {
+    internal fun detach(instanceId: String) {
+        callbacks.withLock {
+            if (remove(instanceId) != null && isEmpty()) {
                 try {
                     onManagerDetach()
                 } catch (_: Exception) {}
-                null
-            } else {
-                it
             }
         }
     }
 
     /**
      * Called lazily from [RealTorManager] upon first [TorManager.start]
+     *
+     * Will be called when first [RealTorManager] instance attaches itself.
      * */
     protected open fun onManagerAttach() {}
 
     /**
      * Called from [RealTorManager.destroy]
+     *
+     * Will be called when last [RealTorManager] instance detaches itself.
      * */
     protected open fun onManagerDetach() {}
 
@@ -80,7 +81,11 @@ abstract class NetworkObserver {
      * to [RealTorManager]
      * */
     protected fun dispatchConnectivityChange(connectivity: Connectivity) {
-        callback.value?.invoke(connectivity)
+        callbacks.withLock {
+            for (callback in values) {
+                callback.invoke(connectivity)
+            }
+        }
     }
 
     enum class Connectivity {

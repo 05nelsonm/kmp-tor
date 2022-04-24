@@ -40,10 +40,7 @@ import io.matthewnelson.kmp.tor.manager.common.event.TorManagerEvent.Log.Warn.Co
 import io.matthewnelson.kmp.tor.manager.common.exceptions.InterruptedException
 import io.matthewnelson.kmp.tor.manager.common.exceptions.TorManagerException
 import io.matthewnelson.kmp.tor.manager.common.exceptions.TorNotStartedException
-import io.matthewnelson.kmp.tor.manager.common.state.TorNetworkState
-import io.matthewnelson.kmp.tor.manager.common.state.TorState
-import io.matthewnelson.kmp.tor.manager.common.state.TorStateManager
-import io.matthewnelson.kmp.tor.manager.common.state.isEnabled
+import io.matthewnelson.kmp.tor.manager.common.state.*
 import io.matthewnelson.kmp.tor.manager.internal.actions.ActionProcessor
 import io.matthewnelson.kmp.tor.manager.internal.actions.ActionQueue
 import io.matthewnelson.kmp.tor.manager.internal.BaseTorManager
@@ -172,7 +169,7 @@ private class RealTorManager(
         notifyListenersNoScope(TorManagerEvent.Lifecycle(this, ON_CREATE))
 
         // Attach to network observer
-        networkObserver?.attach { connectivity ->
+        networkObserver?.attach(instanceId) { connectivity ->
             when (connectivity) {
                 NetworkObserver.Connectivity.Connected -> {
                     controller.value?.first?.let { controller ->
@@ -264,7 +261,7 @@ private class RealTorManager(
         synchronized(this) {
             if (isDestroyed) return@synchronized
             _isDestroyed.value = true
-            networkObserver?.detach()
+            networkObserver?.detach(instanceId)
 
             if (!stopCleanly) {
                 controller.value?.first?.disconnect()
