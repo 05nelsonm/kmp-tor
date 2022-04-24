@@ -177,13 +177,13 @@ private class RealTorManager(
                             job?.cancel()
                             scope.launch {
                                 delay(300L)
-                                val result = controller.configSet(
+
+                                if (networkState.isEnabled()) return@launch
+
+                                controller.configSet(
                                     TorConfig.Setting.DisableNetwork()
                                         .set(TorConfig.Option.TorF.False)
                                 )
-                                if (result.isSuccess) {
-                                    stateMachine.updateState(TorNetworkState.Enabled)
-                                }
                             }
                         }
                     }
@@ -194,13 +194,13 @@ private class RealTorManager(
                             job?.cancel()
                             scope.launch {
                                 delay(300L)
-                                val result = controller.configSet(
+
+                                if (networkState.isDisabled()) return@launch
+
+                                controller.configSet(
                                     TorConfig.Setting.DisableNetwork()
                                         .set(TorConfig.Option.TorF.True)
                                 )
-                                if (result.isSuccess) {
-                                    stateMachine.updateState(TorNetworkState.Disabled)
-                                }
                             }
                         }
                     }
