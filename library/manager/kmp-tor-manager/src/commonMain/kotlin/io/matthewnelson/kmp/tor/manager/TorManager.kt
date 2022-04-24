@@ -172,36 +172,30 @@ private class RealTorManager(
         networkObserver?.attach(instanceId) { connectivity ->
             when (connectivity) {
                 NetworkObserver.Connectivity.Connected -> {
-                    controller.value?.first?.let { controller ->
-                        networkObserverJob.update { job ->
-                            job?.cancel()
-                            scope.launch {
-                                delay(300L)
+                    networkObserverJob.update { job ->
+                        job?.cancel()
+                        scope.launch {
+                            delay(300L)
 
-                                if (networkState.isEnabled()) return@launch
+                            if (networkState.isEnabled()) return@launch
 
-                                controller.configSet(
-                                    TorConfig.Setting.DisableNetwork()
-                                        .set(TorConfig.Option.TorF.False)
-                                )
-                            }
+                            controller.value?.first?.configSet(
+                                TorConfig.Setting.DisableNetwork().set(TorConfig.Option.TorF.False)
+                            )
                         }
                     }
                 }
                 NetworkObserver.Connectivity.Disconnected -> {
-                    controller.value?.first?.let { controller ->
-                        networkObserverJob.update { job ->
-                            job?.cancel()
-                            scope.launch {
-                                delay(300L)
+                    networkObserverJob.update { job ->
+                        job?.cancel()
+                        scope.launch {
+                            delay(300L)
 
-                                if (networkState.isDisabled()) return@launch
+                            if (networkState.isDisabled()) return@launch
 
-                                controller.configSet(
-                                    TorConfig.Setting.DisableNetwork()
-                                        .set(TorConfig.Option.TorF.True)
-                                )
-                            }
+                            controller.value?.first?.configSet(
+                                TorConfig.Setting.DisableNetwork().set(TorConfig.Option.TorF.True)
+                            )
                         }
                     }
                 }
