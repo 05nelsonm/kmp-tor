@@ -16,6 +16,7 @@
 package io.matthewnelson.kmp.tor.controller.common.file
 
 import io.matthewnelson.kmp.tor.controller.common.internal.fsSeparator
+import kotlin.jvm.JvmField
 import kotlin.jvm.JvmInline
 import kotlin.jvm.JvmOverloads
 
@@ -80,7 +81,7 @@ value class Path(val value: String) {
      *     // Path(value=/io/matthewnelson/kmp/tor/controller)
      * }
      * */
-    class Builder @JvmOverloads constructor(val separator: Char = fsSeparator()) {
+    class Builder @JvmOverloads constructor(@JvmField val separator: Char = fsSeparator()) {
 
         private val sb = StringBuilder()
         private var lastSegment: String? = null

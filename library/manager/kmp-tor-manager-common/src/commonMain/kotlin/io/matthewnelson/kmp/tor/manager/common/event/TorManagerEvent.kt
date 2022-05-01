@@ -19,7 +19,9 @@ import io.matthewnelson.kmp.tor.common.address.Port
 import io.matthewnelson.kmp.tor.controller.common.events.TorEvent
 import io.matthewnelson.kmp.tor.manager.common.exceptions.TorManagerException
 import io.matthewnelson.kmp.tor.manager.common.state.*
+import kotlin.jvm.JvmField
 import kotlin.jvm.JvmInline
+import kotlin.jvm.JvmName
 import kotlin.jvm.JvmStatic
 import kotlin.reflect.KClass
 
@@ -101,8 +103,11 @@ sealed interface TorManagerEvent {
      * All [event] Strings that are dispatched can be found in [Companion] as constants.
      * */
     class Lifecycle<T: Any> private constructor(
+        @JvmField
         val clazz: KClass<T>,
+        @JvmField
         val hash: Int,
+        @JvmField
         val event: String
     ) : TorManagerEvent {
 
@@ -140,7 +145,6 @@ sealed interface TorManagerEvent {
             const val ON_REGISTER = "onRegister"
             const val ON_UNREGISTER = "onUnregister"
 
-            @JvmStatic
             operator fun invoke(any: Any, event: String): Lifecycle<*> =
                 Lifecycle(any::class, any.hashCode(), event)
         }
@@ -161,14 +165,23 @@ sealed interface TorManagerEvent {
      * Example address: 127.0.0.1:48494
      * */
     data class AddressInfo(
+        @JvmField
         val dns: Set<String>? = null,
+        @JvmField
         val http: Set<String>? = null,
+        @JvmField
         val socks: Set<String>? = null,
+        @JvmField
         val trans: Set<String>? = null,
     ): TorManagerEvent {
         val isNull: Boolean = dns == null && http == null && socks == null && trans == null
 
-        data class Address(val address: String, val port: Port) {
+        data class Address(
+            @JvmField
+            val address: String,
+            @get:JvmName("port")
+            val port: Port
+        ) {
             companion object {
                 @Throws(
                     IllegalArgumentException::class,
@@ -230,7 +243,12 @@ sealed interface TorManagerEvent {
         }
     }
 
-    data class State(val torState: TorState, val networkState: TorNetworkState): TorManagerEvent {
+    data class State(
+        @JvmField
+        val torState: TorState,
+        @JvmField
+        val networkState: TorNetworkState
+    ): TorManagerEvent {
         inline val isOff: Boolean get() = torState.isOff()
         inline val isOn: Boolean get() = torState.isOn()
         inline val isStarting: Boolean get() = torState.isStarting()

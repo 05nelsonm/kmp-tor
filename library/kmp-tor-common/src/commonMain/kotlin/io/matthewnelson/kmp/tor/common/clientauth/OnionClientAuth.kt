@@ -17,6 +17,7 @@ package io.matthewnelson.kmp.tor.common.clientauth
 
 import io.matthewnelson.kmp.tor.common.address.OnionAddressV3
 import io.matthewnelson.kmp.tor.common.util.stripString
+import kotlin.jvm.JvmField
 import kotlin.jvm.JvmStatic
 import kotlin.jvm.JvmSynthetic
 
@@ -82,7 +83,7 @@ class OnionClientAuth private constructor() {
          *
          * descriptor:<key type>:<public key>
          *
-         * @see [PublicKey.descriptorString]
+         * @see [io.matthewnelson.kmp.tor.common.util.descriptorString]
          * */
         fun descriptor(): String
 
@@ -130,7 +131,7 @@ class OnionClientAuth private constructor() {
          *
          *  <address>:<key type>:<private key>
          *
-         * @see [PrivateKey.descriptorString]
+         * @see [io.matthewnelson.kmp.tor.common.util.descriptorString]
          * */
         fun descriptor(address: OnionAddressV3): String
 
@@ -162,7 +163,12 @@ class OnionClientAuth private constructor() {
         }
     }
 
-    class KeyPair(val publicKey: PublicKey, val privateKey: PrivateKey) {
+    class KeyPair(
+        @JvmField
+        val publicKey: PublicKey,
+        @JvmField
+        val privateKey: PrivateKey
+    ) {
 
         override fun equals(other: Any?): Boolean {
             return  other != null                   &&
