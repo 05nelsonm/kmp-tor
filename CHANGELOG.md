@@ -1,5 +1,13 @@
 # CHANGELOG
 
+## Version 0.4.6.10+0.1.0 (2022-05-01)
+ - Improvements to Multi-instance performance
+ - Makes `NetworkObserver` reusable with multiple instances
+ - Adds `decode` method to `OnionAddress` interface for obtaining the address in raw bytes
+ - Improves Java compatibility by adding `JvmField` and `JvmName` annotations where applicable
+ - Fixes dispatching of bootstrap completion events
+ - Fixes error returned for `AddOnion` if flag `DiscardPK` was not passed
+
 ## Version 0.4.6.10+0.1.0-beta2 (2022-04-02)
  - Added to Jvm and Js the ability to manage multiple instances of `TorManager`
      - See new `TorMultiInstanceManager` class in `jvmJsCommonMain` source set.
