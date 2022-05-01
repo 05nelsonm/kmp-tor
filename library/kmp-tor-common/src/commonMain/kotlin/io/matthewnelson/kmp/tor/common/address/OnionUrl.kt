@@ -16,6 +16,8 @@
 package io.matthewnelson.kmp.tor.common.address
 
 import io.matthewnelson.kmp.tor.common.util.separateSchemeFromAddress
+import kotlin.jvm.JvmField
+import kotlin.jvm.JvmName
 import kotlin.jvm.JvmStatic
 
 /**
@@ -46,9 +48,13 @@ import kotlin.jvm.JvmStatic
  * ```
  * */
 data class OnionUrl(
+    @JvmField
     val address: OnionAddress,
+    @JvmField
     val path: String = "",
+    @get:JvmName("port")
     val port: Port? = null,
+    @JvmField
     val scheme: Scheme = Scheme.HTTP,
 ) {
 

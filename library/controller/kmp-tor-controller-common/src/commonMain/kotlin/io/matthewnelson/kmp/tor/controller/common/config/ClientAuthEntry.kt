@@ -23,6 +23,7 @@ import io.matthewnelson.kmp.tor.common.clientauth.OnionClientAuthPrivateKey_B64_
 import io.matthewnelson.kmp.tor.common.util.TorStrings.REDACTED
 import io.matthewnelson.kmp.tor.controller.common.control.TorControlOnionClientAuth
 import io.matthewnelson.kmp.tor.controller.common.control.usecase.TorControlOnionClientAuthView
+import kotlin.jvm.JvmField
 
 /**
  * Holder class for raw data returned from [TorControlOnionClientAuthView]
@@ -34,10 +35,15 @@ import io.matthewnelson.kmp.tor.controller.common.control.usecase.TorControlOnio
  * [flags] are a list of [TorControlOnionClientAuth.Flag] or null
  * */
 class ClientAuthEntry(
+    @JvmField
     val address: String,
+    @JvmField
     val keyType: String,
+    @JvmField
     val privateKey: String,
+    @JvmField
     val clientName: String?,
+    @JvmField
     val flags: List<String>?,
 ) {
 

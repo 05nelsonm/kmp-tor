@@ -50,9 +50,13 @@ import java.io.IOException
  * from the `kmp-tor` dependency.
  * */
 class PlatformInstaller private constructor(
+    @JvmField
     val os: String,
+    @JvmField
     val arch: String,
+    @JvmField
     val sha256Sum: String,
+    @JvmField
     val installOption: InstallOption,
     private val archiveManifestProvider: () -> List<String>,
 ) {
@@ -153,8 +157,11 @@ class PlatformInstaller private constructor(
         }
     }
 
+    @get:JvmName("isLinux")
     val isLinux: Boolean get() = os == LINUX
+    @get:JvmName("isMacos")
     val isMacos: Boolean get() = os == MACOS
+    @get:JvmName("isMingw")
     val isMingw: Boolean get() = os == MINGW
     private var firstStartInstallComplete: Boolean = false
 

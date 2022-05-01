@@ -15,6 +15,7 @@
  **/
 package io.matthewnelson.kmp.tor
 
+import android.os.SystemClock
 import io.matthewnelson.kmp.tor.controller.common.file.toFile
 import io.matthewnelson.kmp.tor.internal.ProcessStreamEater
 import io.matthewnelson.kmp.tor.internal.isStillAlive
@@ -82,7 +83,7 @@ class KmpTorLoaderAndroid(provider: TorConfigProviderAndroid): KmpTorLoader(prov
                 error = p.errorStream.bufferedReader(),
             ) { log ->
                 if (log is TorManagerEvent.Log.Error && log.value is TorManagerException) {
-                    errorTime = System.currentTimeMillis()
+                    errorTime = SystemClock.elapsedRealtime()
                     processError = log.value as TorManagerException
                 }
                 notify.invoke(log)
@@ -100,7 +101,7 @@ class KmpTorLoaderAndroid(provider: TorConfigProviderAndroid): KmpTorLoader(prov
 
             processError?.let { ex ->
                 // Don't throw if error is stale
-                if ((System.currentTimeMillis() - errorTime) < 250L) {
+                if ((SystemClock.elapsedRealtime() - errorTime) < 250L) {
                     throw ex
                 }
             }

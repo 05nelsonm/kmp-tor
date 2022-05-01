@@ -25,6 +25,7 @@ import io.matthewnelson.kmp.tor.controller.common.config.TorConfig.Option.TorF.F
 import io.matthewnelson.kmp.tor.controller.common.config.TorConfig.Option.TorF.True
 import io.matthewnelson.kmp.tor.controller.common.file.Path
 import io.matthewnelson.kmp.tor.controller.common.internal.ControllerUtils
+import kotlin.jvm.JvmField
 import kotlin.jvm.JvmInline
 import kotlin.jvm.JvmSynthetic
 import kotlin.reflect.KClass
@@ -38,7 +39,9 @@ import kotlin.reflect.KClass
  * */
 @Suppress("RemoveRedundantQualifierName", "SpellCheckingInspection")
 class TorConfig private constructor(
+    @JvmField
     val settings: Set<TorConfig.Setting<*>>,
+    @JvmField
     val text: String,
 ) {
 
@@ -301,7 +304,6 @@ class TorConfig private constructor(
         }
 
         companion object {
-            @JvmStatic
             operator fun invoke(block: Builder.() -> Builder): Builder =
                 block.invoke(Builder())
         }

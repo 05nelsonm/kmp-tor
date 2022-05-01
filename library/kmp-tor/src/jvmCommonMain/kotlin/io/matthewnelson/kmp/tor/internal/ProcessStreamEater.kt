@@ -42,7 +42,7 @@ internal class ProcessStreamEater(
             try {
                 inputScan = Scanner(input)
 
-                while (currentCoroutineContext().isActive  && inputScan.hasNextLine()) {
+                while (currentCoroutineContext().isActive && inputScan.hasNextLine()) {
                     val line = inputScan.nextLine()
                     when {
                         line.contains(ERROR) -> {

@@ -15,9 +15,14 @@
  **/
 package io.matthewnelson.kmp.tor.controller.common.config
 
+import kotlin.jvm.JvmField
+
 class ConfigEntry {
+    @JvmField
     val key: String
+    @JvmField
     val value: String
+    @JvmField
     val isDefault: Boolean
 
     constructor(key: String, value: String) {

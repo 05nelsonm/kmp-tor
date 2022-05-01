@@ -35,8 +35,8 @@ internal inline fun String.stripString(): String {
     return this.substring(0, limit).trimStart()
 }
 
-@Suppress("nothing_to_inline")
 @JvmSynthetic
+@Suppress("nothing_to_inline")
 internal inline fun String.separateSchemeFromAddress(): Pair<Scheme?, String> {
     val trimmed = this.trim()
     val scheme: Scheme? = Scheme.fromString(trimmed, trim = false)

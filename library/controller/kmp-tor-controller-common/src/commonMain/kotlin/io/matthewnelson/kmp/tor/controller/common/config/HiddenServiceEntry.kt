@@ -16,9 +16,13 @@
 package io.matthewnelson.kmp.tor.controller.common.config
 
 import io.matthewnelson.kmp.tor.common.address.OnionAddress
+import kotlin.jvm.JvmField
 
 data class HiddenServiceEntry(
+    @JvmField
     val address: OnionAddress,
+    @JvmField
     val privateKey: OnionAddress.PrivateKey?,
+    @JvmField
     val ports: Set<TorConfig.Setting.HiddenService.Ports>,
 )
