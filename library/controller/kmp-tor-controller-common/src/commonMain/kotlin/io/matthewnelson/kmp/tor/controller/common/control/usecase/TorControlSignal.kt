@@ -16,6 +16,7 @@
 package io.matthewnelson.kmp.tor.controller.common.control.usecase
 
 import io.matthewnelson.kmp.tor.controller.common.events.TorEvent
+import kotlin.jvm.JvmField
 
 /**
  * "SIGNAL" SP Signal CRLF
@@ -45,7 +46,7 @@ interface TorControlSignal {
 
     suspend fun signal(signal: Signal): Result<Any?>
 
-    enum class Signal(val value: String) {
+    enum class Signal(@JvmField val value: String) {
         Reload(value = "RELOAD"),
         Shutdown(value = "SHUTDOWN"),
         Dump(value = "DUMP"),
