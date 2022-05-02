@@ -63,8 +63,19 @@ sealed interface TorManagerEvent {
         /**
          * Debug events. Will only be dispatched if debug is enabled.
          * */
+        sealed interface Debug: Log {
+            val value: String
+
+            companion object {
+                @JvmStatic
+                operator fun invoke(value: String): Debug {
+                    return DebugValue(value)
+                }
+            }
+        }
+
         @JvmInline
-        value class Debug(val value: String): Log {
+        private value class DebugValue(override val value: String): Debug {
             override fun toString(): String = "D/$value"
         }
 
@@ -72,26 +83,57 @@ sealed interface TorManagerEvent {
          * Error events that are not returned as a [Result] from interacting
          * with TorManager.
          * */
-        @JvmInline
-        value class Error(val value: Throwable): Log {
-            override fun toString(): String = "E/$value"
+        sealed interface Error: Log {
+            val value: Throwable
+
+            companion object {
+                @JvmStatic
+                operator fun invoke(value: Throwable): Error {
+                    return ErrorValue(value)
+                }
+            }
         }
 
         @JvmInline
-        value class Info(val value: String): Log {
+        private value class ErrorValue(override val value: Throwable): Error {
+            override fun toString(): String = "E/$value"
+        }
+
+        sealed interface Info: Log {
+            val value: String
+
+            companion object {
+                @JvmStatic
+                operator fun invoke(value: String): Info {
+                    return InfoValue(value)
+                }
+            }
+        }
+
+        @JvmInline
+        private value class InfoValue(override val value: String): Info {
             override fun toString(): String = "I/$value"
         }
 
         /**
          * Warning events. Currently, the only warning is [WAITING_ON_NETWORK].
          * */
-        @JvmInline
-        value class Warn(val value: String): Log {
-            override fun toString(): String = "W/$value"
+        sealed interface Warn: Log {
+            val value: String
 
             companion object {
                 const val WAITING_ON_NETWORK = "No Network Connectivity. Waiting..."
+
+                @JvmStatic
+                operator fun invoke(value: String): Warn {
+                    return WarnValue(value)
+                }
             }
+        }
+
+        @JvmInline
+        private value class WarnValue(override val value: String): Warn {
+            override fun toString(): String = "W/$value"
         }
     }
 
@@ -145,6 +187,7 @@ sealed interface TorManagerEvent {
             const val ON_REGISTER = "onRegister"
             const val ON_UNREGISTER = "onUnregister"
 
+            @JvmStatic
             operator fun invoke(any: Any, event: String): Lifecycle<*> =
                 Lifecycle(any::class, any.hashCode(), event)
         }
@@ -179,7 +222,7 @@ sealed interface TorManagerEvent {
         data class Address(
             @JvmField
             val address: String,
-            @get:JvmName("port")
+            @JvmField
             val port: Port
         ) {
             companion object {

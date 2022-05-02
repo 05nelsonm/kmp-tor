@@ -26,9 +26,33 @@ import kotlin.jvm.JvmStatic
  *  - \n
  *  - \r
  *  - \t
+ *
+ * @see [ClientNameValue]
  * */
+sealed interface ClientName {
+
+    val value: String
+
+    companion object {
+
+        @JvmStatic
+        @Throws(IllegalArgumentException::class)
+        operator fun invoke(name: String): ClientName {
+            return ClientNameValue(name)
+        }
+
+        @JvmStatic
+        fun fromStringOrNull(name: String): ClientName? =
+            try {
+                ClientName(name)
+            } catch (e: IllegalArgumentException) {
+                null
+            }
+    }
+}
+
 @JvmInline
-value class ClientName(val value: String) {
+private value class ClientNameValue(override val value: String): ClientName {
 
     init {
         require(value.length in 1..16) {
@@ -48,13 +72,7 @@ value class ClientName(val value: String) {
         }
     }
 
-    companion object {
-        @JvmStatic
-        fun fromStringOrNull(value: String): ClientName? =
-            try {
-                ClientName(value)
-            } catch (e: IllegalArgumentException) {
-                null
-            }
+    override fun toString(): String {
+        return "ClientName(value=$value)"
     }
 }

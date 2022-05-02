@@ -20,19 +20,33 @@ import io.matthewnelson.component.encoding.base32.Base32
 import io.matthewnelson.component.encoding.base32.encodeBase32
 import io.matthewnelson.kmp.tor.common.util.descriptorString
 import kotlin.jvm.JvmInline
+import kotlin.jvm.JvmStatic
 
 /**
  * Holder for a valid base64 encoded (without padding '=') x25519 onion client auth public key
  *
  * @see [OnionClientAuthPrivateKey_B64_X25519.REGEX] for public key character requirements
+ * @see [OnionClientAuthPublicKey_B64_X25519Value]
  * @throws [IllegalArgumentException] if [value] is not a 43 character base64
  *  encoded (without padding '=') String
  * */
+@Suppress("ClassName")
+sealed interface OnionClientAuthPublicKey_B64_X25519: OnionClientAuth.PublicKey {
+
+    companion object {
+        @JvmStatic
+        @Throws(IllegalArgumentException::class)
+        operator fun invoke(key: String): OnionClientAuthPublicKey_B64_X25519 {
+            return OnionClientAuthPublicKey_B64_X25519Value(key)
+        }
+    }
+}
+
 @JvmInline
 @Suppress("ClassName")
-value class OnionClientAuthPublicKey_B64_X25519(
+private value class OnionClientAuthPublicKey_B64_X25519Value(
     override val value: String
-): OnionClientAuth.PublicKey {
+): OnionClientAuthPublicKey_B64_X25519 {
 
     init {
         require(value.matches(OnionClientAuthPrivateKey_B64_X25519.REGEX)) {
@@ -66,4 +80,8 @@ value class OnionClientAuthPublicKey_B64_X25519(
     }
 
     override val keyType: OnionClientAuth.Key.Type get() = OnionClientAuth.Key.Type.x25519
+
+    override fun toString(): String {
+        return "OnionClientAuthPublicKey_B64_X25519(value=$value)"
+    }
 }

@@ -1108,35 +1108,92 @@ class TorConfig private constructor(
                 override fun toString(): String = value
             }
 
+            sealed interface Value                                          : AorDorPort {
+                val port: PortProxy
+
+                companion object {
+                    @JvmStatic
+                    operator fun invoke(port: PortProxy): Value {
+                        return PortValue(port)
+                    }
+                }
+            }
+
             @JvmInline
-            value class Value(val port: PortProxy)                          : AorDorPort {
+            private value class PortValue(override val port: PortProxy)     : Value {
                 override val value: String get() = port.value.toString()
                 override fun toString(): String = value
             }
         }
 
+        sealed interface FileSystemFile                                 : Option {
+            val path: Path
+            val nullIfEmpty: FileSystemFile?
+
+            companion object {
+                @JvmStatic
+                operator fun invoke(path: Path): FileSystemFile {
+                    return FileSystemFileValue(path)
+                }
+            }
+        }
+
         @JvmInline
-        value class FileSystemFile(val path: Path)                      : Option {
+        private value class FileSystemFileValue(override val path: Path): FileSystemFile {
             override val value: String get() = path.value
-            val nullIfEmpty: FileSystemFile? get() = if (value.isEmpty()) null else this
+            override val nullIfEmpty: FileSystemFile? get() = if (value.isEmpty()) null else this
             override fun toString(): String = value
         }
 
+        sealed interface FileSystemDir                                  : Option {
+            val path: Path
+            val nullIfEmpty: FileSystemDir?
+
+            companion object {
+                @JvmStatic
+                operator fun invoke(path: Path): FileSystemDir {
+                    return FileSystemDirValue(path)
+                }
+            }
+        }
+
         @JvmInline
-        value class FileSystemDir(val path: Path)                       : Option {
+        private value class FileSystemDirValue(override val path: Path) : FileSystemDir {
             override val value: String get() = path.value
-            val nullIfEmpty: FileSystemDir? get() = if (value.isEmpty()) null else this
+            override val nullIfEmpty: FileSystemDir? get() = if (value.isEmpty()) null else this
             override fun toString(): String = value
         }
 
-        @JvmInline
-        value class FieldId(override val value: String)                 : Option {
-            val nullIfEmpty: FieldId? get() = if(value.isEmpty()) null else this
-            override fun toString(): String = value
+        sealed interface FieldId                                        : Option {
+            val nullIfEmpty: FieldId?
+
+            companion object {
+                @JvmStatic
+                operator fun invoke(value: String): FieldId {
+                    return FieldIdValue(value)
+                }
+            }
         }
 
         @JvmInline
-        value class ProcessId(val pid: Int)                             : Option {
+        private value class FieldIdValue(override val value: String)    : FieldId {
+            override val nullIfEmpty: FieldId? get() = if(value.isEmpty()) null else this
+            override fun toString(): String = value
+        }
+
+        sealed interface ProcessId                                      : Option {
+            val pid: Int
+
+            companion object {
+                @JvmStatic
+                operator fun invoke(pid: Int): ProcessId {
+                    return ProcessIdValue(pid)
+                }
+            }
+        }
+
+        @JvmInline
+        private value class ProcessIdValue(override val pid: Int)       : ProcessId {
             override val value: String get() = "$pid"
             override fun toString(): String = value
         }
@@ -1144,8 +1201,17 @@ class TorConfig private constructor(
         sealed interface Time                                           : Option {
             val time: Int
 
+            sealed interface Minutes                                        : Time {
+                companion object {
+                    @JvmStatic
+                    operator fun invoke(time: Int): Minutes {
+                        return MinutesValue(time)
+                    }
+                }
+            }
+
             @JvmInline
-            value class Minutes(override val time: Int)                     : Time {
+            private value class MinutesValue(override val time: Int)        : Minutes {
                 override val value: String get() = if (time < 1) {
                     "1 minutes"
                 } else {
@@ -1155,8 +1221,17 @@ class TorConfig private constructor(
                 override fun toString(): String = value
             }
 
+            sealed interface Hours                                          : Time {
+                companion object {
+                    @JvmStatic
+                    operator fun invoke(time: Int): Hours {
+                        return HoursValue(time)
+                    }
+                }
+            }
+
             @JvmInline
-            value class Hours(override val time: Int)                       : Time {
+            private value class HoursValue(override val time: Int)          : Hours {
                 override val value: String get() = if (time < 1) {
                     "1 hours"
                 } else {
@@ -1166,8 +1241,17 @@ class TorConfig private constructor(
                 override fun toString(): String = value
             }
 
+            sealed interface Days                                           : Time {
+                companion object {
+                    @JvmStatic
+                    operator fun invoke(time: Int): Days {
+                        return DaysValue(time)
+                    }
+                }
+            }
+
             @JvmInline
-            value class Days(override val time: Int)                        : Time {
+            private value class DaysValue(override val time: Int)           : Days {
                 override val value: String get() = if (time < 1) {
                     "1 days"
                 } else {
@@ -1177,8 +1261,17 @@ class TorConfig private constructor(
                 override fun toString(): String = value
             }
 
+            sealed interface Weeks                                          : Time {
+                companion object {
+                    @JvmStatic
+                    operator fun invoke(time: Int): Weeks {
+                        return WeeksValue(time)
+                    }
+                }
+            }
+
             @JvmInline
-            value class Weeks(override val time: Int)                       : Time {
+            private value class WeeksValue(override val time: Int)          : Weeks {
                 override val value: String get() = if (time < 1) {
                     "1 weeks"
                 } else {

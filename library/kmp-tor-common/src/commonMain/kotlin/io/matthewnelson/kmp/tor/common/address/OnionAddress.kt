@@ -15,7 +15,7 @@
  **/
 package io.matthewnelson.kmp.tor.common.address
 
-import io.matthewnelson.kmp.tor.common.util.separateSchemeFromAddress
+import io.matthewnelson.kmp.tor.common.util.stripAddress
 import io.matthewnelson.kmp.tor.common.util.stripString
 import kotlin.jvm.JvmStatic
 
@@ -36,17 +36,24 @@ sealed interface OnionAddress {
 
     companion object {
         @JvmStatic
-        fun fromStringOrNull(string: String): OnionAddress? {
-            val address = string
-                .separateSchemeFromAddress()
-                .second
-                .substringBefore('.')
+        @Throws(IllegalArgumentException::class)
+        fun fromString(address: String): OnionAddress {
+            val stripped = address.stripAddress()
 
             try {
-                return OnionAddressV3(address)
+                return OnionAddressV3(stripped)
             } catch (e: IllegalArgumentException) {}
 
-            return null
+            throw IllegalArgumentException("String was not an OnionAddress")
+        }
+
+        @JvmStatic
+        fun fromStringOrNull(address: String): OnionAddress? {
+            return try {
+                fromString(address)
+            } catch (e: IllegalArgumentException) {
+                null
+            }
         }
     }
 
@@ -64,8 +71,8 @@ sealed interface OnionAddress {
         companion object {
             @JvmStatic
             @Throws(IllegalArgumentException::class)
-            fun fromString(value: String): PrivateKey {
-                val stripped = value.stripString()
+            fun fromString(key: String): PrivateKey {
+                val stripped = key.stripString()
 
                 try {
                     return OnionAddressV3PrivateKey_ED25519(stripped)
@@ -75,9 +82,9 @@ sealed interface OnionAddress {
             }
 
             @JvmStatic
-            fun fromStringOrNull(value: String): PrivateKey? {
+            fun fromStringOrNull(key: String): PrivateKey? {
                 return try {
-                    fromString(value)
+                    fromString(key)
                 } catch (_: IllegalArgumentException) {
                     null
                 }

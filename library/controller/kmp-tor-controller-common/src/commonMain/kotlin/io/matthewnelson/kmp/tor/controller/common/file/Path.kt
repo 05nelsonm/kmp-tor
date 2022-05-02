@@ -19,38 +19,45 @@ import io.matthewnelson.kmp.tor.controller.common.internal.fsSeparator
 import kotlin.jvm.JvmField
 import kotlin.jvm.JvmInline
 import kotlin.jvm.JvmOverloads
+import kotlin.jvm.JvmStatic
 
 /**
  * Denotes a string as being a path to a file or directory. This is
  * resolved to the given platform's file system.
  *
  * @see [Builder]
+ * @see [PathValue]
  * */
-@JvmInline
-value class Path(val value: String) {
+sealed interface Path {
+
+    val value: String
 
     /**
      * Builds off of the current [Path.value]
      * */
-    @JvmOverloads
-    fun builder(separator: Char = fsSeparator()): Builder =
-        Builder(separator).addSegment(value)
+    fun builder(separator: Char): Builder
 
     /**
      * Builds off of the current [Path.value]
      * */
-    fun builder(block: Builder.() -> Builder): Path =
-        block.invoke(builder()).build()
+    fun builder(block: Builder.() -> Builder): Path
 
     /**
      * Builds off of the current [Path.value]
      * */
-    fun builder(separator: Char, block: Builder.() -> Builder): Path =
-        block.invoke(builder(separator)).build()
+    fun builder(separator: Char, block: Builder.() -> Builder): Path
 
-    @JvmOverloads
-    fun segments(separator: Char = fsSeparator()): List<String> =
-        value.split(separator)
+    fun segments(separator: Char): List<String>
+
+    companion object {
+        @JvmStatic
+        val fsSeparator: Char get() = fsSeparator()
+
+        @JvmStatic
+        operator fun invoke(path: String): Path {
+            return PathValue(path)
+        }
+    }
 
     /**
      * Build a new [Path].
@@ -112,13 +119,31 @@ value class Path(val value: String) {
             }
         }
 
-        fun build(): Path = Path(sb.toString())
+        fun build(): Path = PathValue(sb.toString())
 
         companion object {
+            @JvmStatic
             operator fun invoke(block: Builder.() -> Builder): Path =
                 block.invoke(Builder()).build()
+            @JvmStatic
             operator fun invoke(separator: Char, block: Builder.() -> Builder): Path =
                 block.invoke(Builder(separator)).build()
         }
     }
+}
+
+@JvmInline
+private value class PathValue(override val value: String): Path {
+
+    override fun builder(separator: Char): Path.Builder =
+        Path.Builder(separator).addSegment(value)
+
+    override fun builder(block: Path.Builder.() -> Path.Builder): Path =
+        block.invoke(builder(fsSeparator())).build()
+
+    override fun builder(separator: Char, block: Path.Builder.() -> Path.Builder): Path =
+        block.invoke(builder(separator)).build()
+
+    override fun segments(separator: Char): List<String> =
+        value.split(separator)
 }

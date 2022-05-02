@@ -21,19 +21,23 @@ import kotlin.jvm.JvmStatic
 /**
  * Holder for a valid proxy port between 1024 and 65535
  *
+ * @see [PortProxyValue]
  * @throws [IllegalArgumentException] if port is not valid
  * */
-@JvmInline
-value class PortProxy(val value: Int) {
+sealed interface PortProxy: Port {
 
-    init {
-        require(value in MIN..Port.MAX) {
-            "Invalid port range. Must be between $MIN and ${Port.MAX}"
-        }
-    }
+    // Provided via Port interface
+//    val value: Int
 
     companion object {
         const val MIN = 1024
+        const val MAX = Port.MAX
+
+        @JvmStatic
+        @Throws(IllegalArgumentException::class)
+        operator fun invoke(port: Int): PortProxy {
+            return PortProxyValue(port)
+        }
 
         @JvmStatic
         fun fromIntOrNull(port: Int?): PortProxy? {
@@ -43,5 +47,18 @@ value class PortProxy(val value: Int) {
                 null
             }
         }
+    }
+}
+
+@JvmInline
+private value class PortProxyValue(override val value: Int): PortProxy {
+    init {
+        require(value in PortProxy.MIN..PortProxy.MAX) {
+            "Invalid port range. Must be between ${PortProxy.MIN} and ${PortProxy.MAX}"
+        }
+    }
+
+    override fun toString(): String {
+        return "PortProxy(value=$value)"
     }
 }

@@ -33,15 +33,29 @@ import kotlin.jvm.JvmStatic
  * @throws [IllegalArgumentException] if [value] is not a 43 character base64
  *  encoded (without padding '=') String
  * */
+@Suppress("ClassName")
+sealed interface OnionClientAuthPrivateKey_B64_X25519: OnionClientAuth.PrivateKey {
+
+    companion object {
+        @get:JvmStatic
+        val REGEX: Regex get() = "[${Base64.Default.CHARS}]{43}".toRegex()
+
+        @JvmStatic
+        @Throws(IllegalArgumentException::class)
+        operator fun invoke(key: String): OnionClientAuthPrivateKey_B64_X25519 {
+            return OnionClientAuthPrivateKey_B64_X25519Value(key)
+        }
+    }
+}
 @JvmInline
 @OptIn(InternalTorApi::class)
 @Suppress("ClassName")
-value class OnionClientAuthPrivateKey_B64_X25519(
+private value class OnionClientAuthPrivateKey_B64_X25519Value(
     override val value: String
-): OnionClientAuth.PrivateKey {
+): OnionClientAuthPrivateKey_B64_X25519 {
 
     init {
-        require(value.matches(REGEX)) {
+        require(value.matches(OnionClientAuthPrivateKey_B64_X25519.REGEX)) {
             "value=$REDACTED was not a 43 character base64 encoded (w/o padding '=') String"
         }
     }
@@ -75,10 +89,5 @@ value class OnionClientAuthPrivateKey_B64_X25519(
 
     override fun toString(): String {
         return "OnionClientAuthPrivateKey_B64_X25519(value=$REDACTED)"
-    }
-
-    companion object {
-        @get:JvmStatic
-        val REGEX: Regex get() = "[${Base64.Default.CHARS}]{43}".toRegex()
     }
 }
