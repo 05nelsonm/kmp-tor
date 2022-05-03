@@ -25,14 +25,15 @@ sealed interface InstanceId {
 
     companion object {
         @JvmStatic
+        @Throws(IllegalArgumentException::class)
         operator fun invoke(value: String): InstanceId {
-            return InstanceIdValue(value)
+            return RealInstanceId(value)
         }
     }
 }
 
 @JvmInline
-private value class InstanceIdValue(override val value: String): InstanceId {
+private value class RealInstanceId(override val value: String): InstanceId {
     init {
         require(value.isNotBlank()) {
             "InstanceId.value cannot be blank"
