@@ -18,6 +18,7 @@ package io.matthewnelson.kmp.tor.common.clientauth
 import io.matthewnelson.component.base64.decodeBase64ToArray
 import io.matthewnelson.component.encoding.base32.Base32
 import io.matthewnelson.component.encoding.base32.encodeBase32
+import io.matthewnelson.kmp.tor.common.annotation.SealedValueClass
 import io.matthewnelson.kmp.tor.common.util.descriptorString
 import kotlin.jvm.JvmInline
 import kotlin.jvm.JvmStatic
@@ -31,6 +32,7 @@ import kotlin.jvm.JvmStatic
  *  encoded (without padding '=') String
  * */
 @Suppress("ClassName")
+@SealedValueClass
 sealed interface OnionClientAuthPublicKey_B64_X25519: OnionClientAuth.PublicKey {
 
     companion object {

@@ -15,9 +15,11 @@
  **/
 package io.matthewnelson.kmp.tor.manager.instance
 
+import io.matthewnelson.kmp.tor.common.annotation.SealedValueClass
 import kotlin.jvm.JvmInline
 import kotlin.jvm.JvmStatic
 
+@SealedValueClass
 sealed interface InstanceId {
     val value: String
 

@@ -21,6 +21,7 @@ import io.matthewnelson.component.encoding.base32.Base32
 import io.matthewnelson.component.encoding.base32.decodeBase32ToArray
 import io.matthewnelson.kmp.tor.common.address.OnionAddressV3
 import io.matthewnelson.kmp.tor.common.annotation.InternalTorApi
+import io.matthewnelson.kmp.tor.common.annotation.SealedValueClass
 import io.matthewnelson.kmp.tor.common.util.TorStrings.REDACTED
 import io.matthewnelson.kmp.tor.common.util.descriptorString
 import kotlin.jvm.JvmInline
@@ -35,6 +36,7 @@ import kotlin.jvm.JvmStatic
  *  encoded (without padding '=') String
  * */
 @Suppress("ClassName")
+@SealedValueClass
 sealed interface OnionClientAuthPrivateKey_B32_X25519: OnionClientAuth.PrivateKey {
 
     companion object {

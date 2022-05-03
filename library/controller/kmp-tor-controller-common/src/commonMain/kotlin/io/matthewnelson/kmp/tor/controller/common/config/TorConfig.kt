@@ -18,6 +18,7 @@ package io.matthewnelson.kmp.tor.controller.common.config
 import io.matthewnelson.kmp.tor.common.address.Port
 import io.matthewnelson.kmp.tor.common.address.PortProxy
 import io.matthewnelson.kmp.tor.common.annotation.InternalTorApi
+import io.matthewnelson.kmp.tor.common.annotation.SealedValueClass
 import kotlin.jvm.JvmStatic
 import io.matthewnelson.kmp.tor.common.util.TorStrings.REDACTED
 import io.matthewnelson.kmp.tor.common.util.TorStrings.SP
@@ -743,6 +744,7 @@ class TorConfig private constructor(
              * @throws [IllegalArgumentException] if [value] is not within the inclusive range
              *   of 0 and 65535
              * */
+            @SealedValueClass
             sealed interface MaxStreams {
                 val value: Int
 
@@ -1120,6 +1122,7 @@ class TorConfig private constructor(
                 override fun toString(): String = value
             }
 
+            @SealedValueClass
             sealed interface Value                                          : AorDorPort {
                 val port: PortProxy
 
@@ -1138,6 +1141,7 @@ class TorConfig private constructor(
             }
         }
 
+        @SealedValueClass
         sealed interface FileSystemFile                                 : Option {
             val path: Path
             val nullIfEmpty: FileSystemFile?
@@ -1157,6 +1161,7 @@ class TorConfig private constructor(
             override fun toString(): String = value
         }
 
+        @SealedValueClass
         sealed interface FileSystemDir                                  : Option {
             val path: Path
             val nullIfEmpty: FileSystemDir?
@@ -1176,6 +1181,7 @@ class TorConfig private constructor(
             override fun toString(): String = value
         }
 
+        @SealedValueClass
         sealed interface FieldId                                        : Option {
             val nullIfEmpty: FieldId?
 
@@ -1193,6 +1199,7 @@ class TorConfig private constructor(
             override fun toString(): String = value
         }
 
+        @SealedValueClass
         sealed interface ProcessId                                      : Option {
             val pid: Int
 
@@ -1213,6 +1220,7 @@ class TorConfig private constructor(
         sealed interface Time                                           : Option {
             val time: Int
 
+            @SealedValueClass
             sealed interface Minutes                                        : Time {
                 companion object {
                     @JvmStatic
@@ -1233,6 +1241,7 @@ class TorConfig private constructor(
                 override fun toString(): String = value
             }
 
+            @SealedValueClass
             sealed interface Hours                                          : Time {
                 companion object {
                     @JvmStatic
@@ -1253,6 +1262,7 @@ class TorConfig private constructor(
                 override fun toString(): String = value
             }
 
+            @SealedValueClass
             sealed interface Days                                           : Time {
                 companion object {
                     @JvmStatic
@@ -1273,6 +1283,7 @@ class TorConfig private constructor(
                 override fun toString(): String = value
             }
 
+            @SealedValueClass
             sealed interface Weeks                                          : Time {
                 companion object {
                     @JvmStatic

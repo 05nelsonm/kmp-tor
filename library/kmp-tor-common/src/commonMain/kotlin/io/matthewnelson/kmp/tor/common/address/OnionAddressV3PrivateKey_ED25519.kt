@@ -18,6 +18,7 @@ package io.matthewnelson.kmp.tor.common.address
 import io.matthewnelson.component.base64.Base64
 import io.matthewnelson.component.base64.decodeBase64ToArray
 import io.matthewnelson.kmp.tor.common.annotation.InternalTorApi
+import io.matthewnelson.kmp.tor.common.annotation.SealedValueClass
 import io.matthewnelson.kmp.tor.common.clientauth.OnionClientAuthPrivateKey_B64_X25519.Companion.REGEX
 import io.matthewnelson.kmp.tor.common.util.TorStrings.REDACTED
 import io.matthewnelson.kmp.tor.common.util.stripString
@@ -33,6 +34,7 @@ import kotlin.jvm.JvmStatic
  *  encoded (without padding '=') String
  * */
 @Suppress("ClassName")
+@SealedValueClass
 sealed interface OnionAddressV3PrivateKey_ED25519: OnionAddress.PrivateKey {
 
     companion object {

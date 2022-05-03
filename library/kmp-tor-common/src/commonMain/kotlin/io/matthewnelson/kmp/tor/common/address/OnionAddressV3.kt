@@ -17,6 +17,7 @@ package io.matthewnelson.kmp.tor.common.address
 
 import io.matthewnelson.component.encoding.base32.Base32
 import io.matthewnelson.component.encoding.base32.decodeBase32ToArray
+import io.matthewnelson.kmp.tor.common.annotation.SealedValueClass
 import io.matthewnelson.kmp.tor.common.util.stripAddress
 import kotlin.jvm.JvmInline
 import kotlin.jvm.JvmStatic
@@ -30,6 +31,7 @@ import kotlin.jvm.JvmStatic
  * @see [RealOnionAddressV3]
  * @throws [IllegalArgumentException] if [value] is not a v3 onion address
  * */
+@SealedValueClass
 sealed interface OnionAddressV3: OnionAddress {
 
     companion object {

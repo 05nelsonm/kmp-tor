@@ -15,6 +15,7 @@
  **/
 package io.matthewnelson.kmp.tor.manager.common.state
 
+import io.matthewnelson.kmp.tor.common.annotation.SealedValueClass
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.contract
 import kotlin.jvm.JvmInline
@@ -32,6 +33,7 @@ sealed interface TorState {
         override fun toString(): String = OFF
     }
 
+    @SealedValueClass
     sealed interface On                                             : TorState {
         companion object {
             @JvmStatic

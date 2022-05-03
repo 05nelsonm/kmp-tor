@@ -15,6 +15,7 @@
  **/
 package io.matthewnelson.kmp.tor.common.address
 
+import io.matthewnelson.kmp.tor.common.annotation.SealedValueClass
 import kotlin.jvm.JvmInline
 import kotlin.jvm.JvmStatic
 
@@ -24,6 +25,7 @@ import kotlin.jvm.JvmStatic
  * @see [RealPort]
  * @throws [IllegalArgumentException] if port is not valid
  * */
+@SealedValueClass
 sealed interface Port {
 
     val value: Int

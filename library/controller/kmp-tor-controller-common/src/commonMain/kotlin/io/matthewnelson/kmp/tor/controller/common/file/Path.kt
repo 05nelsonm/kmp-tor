@@ -15,6 +15,7 @@
  **/
 package io.matthewnelson.kmp.tor.controller.common.file
 
+import io.matthewnelson.kmp.tor.common.annotation.SealedValueClass
 import io.matthewnelson.kmp.tor.controller.common.internal.fsSeparator
 import kotlin.jvm.JvmField
 import kotlin.jvm.JvmInline
@@ -28,6 +29,7 @@ import kotlin.jvm.JvmStatic
  * @see [Builder]
  * @see [RealPath]
  * */
+@SealedValueClass
 sealed interface Path {
 
     val value: String

@@ -16,6 +16,7 @@
 package io.matthewnelson.kmp.tor.manager.common.event
 
 import io.matthewnelson.kmp.tor.common.address.Port
+import io.matthewnelson.kmp.tor.common.annotation.SealedValueClass
 import io.matthewnelson.kmp.tor.controller.common.events.TorEvent
 import io.matthewnelson.kmp.tor.manager.common.exceptions.TorManagerException
 import io.matthewnelson.kmp.tor.manager.common.state.*
@@ -62,6 +63,7 @@ sealed interface TorManagerEvent {
         /**
          * Debug events. Will only be dispatched if debug is enabled.
          * */
+        @SealedValueClass
         sealed interface Debug: Log {
             val value: String
 
@@ -82,6 +84,7 @@ sealed interface TorManagerEvent {
          * Error events that are not returned as a [Result] from interacting
          * with TorManager.
          * */
+        @SealedValueClass
         sealed interface Error: Log {
             val value: Throwable
 
@@ -98,6 +101,7 @@ sealed interface TorManagerEvent {
             override fun toString(): String = "E/$value"
         }
 
+        @SealedValueClass
         sealed interface Info: Log {
             val value: String
 
@@ -117,6 +121,7 @@ sealed interface TorManagerEvent {
         /**
          * Warning events. Currently, the only warning is [WAITING_ON_NETWORK].
          * */
+        @SealedValueClass
         sealed interface Warn: Log {
             val value: String
 
