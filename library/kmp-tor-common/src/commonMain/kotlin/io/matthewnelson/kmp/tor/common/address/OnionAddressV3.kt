@@ -17,7 +17,8 @@ package io.matthewnelson.kmp.tor.common.address
 
 import io.matthewnelson.component.encoding.base32.Base32
 import io.matthewnelson.component.encoding.base32.decodeBase32ToArray
-import io.matthewnelson.kmp.tor.common.util.separateSchemeFromAddress
+import io.matthewnelson.kmp.tor.common.annotation.SealedValueClass
+import io.matthewnelson.kmp.tor.common.util.stripAddress
 import kotlin.jvm.JvmInline
 import kotlin.jvm.JvmStatic
 
@@ -27,13 +28,44 @@ import kotlin.jvm.JvmStatic
  * correctness, and does not check validity of bytes.
  *
  * @see [REGEX] for onion address character requirements
+ * @see [RealOnionAddressV3]
  * @throws [IllegalArgumentException] if [value] is not a v3 onion address
  * */
+@SealedValueClass
+sealed interface OnionAddressV3: OnionAddress {
+
+    companion object {
+        @get:JvmStatic
+        val REGEX: Regex get() = "[a-z2-7]{56}".toRegex()
+
+        @JvmStatic
+        @Throws(IllegalArgumentException::class)
+        operator fun invoke(address: String): OnionAddressV3 {
+            return RealOnionAddressV3(address)
+        }
+
+        @JvmStatic
+        @Throws(IllegalArgumentException::class)
+        fun fromString(address: String): OnionAddressV3 {
+            return RealOnionAddressV3(address.stripAddress())
+        }
+
+        @JvmStatic
+        fun fromStringOrNull(address: String): OnionAddressV3? {
+            return try {
+                fromString(address)
+            } catch (_: IllegalArgumentException) {
+                null
+            }
+        }
+    }
+}
+
 @JvmInline
-value class OnionAddressV3(override val value: String): OnionAddress {
+private value class RealOnionAddressV3(override val value: String): OnionAddressV3 {
 
     init {
-        require(value.matches(REGEX)) {
+        require(value.matches(OnionAddressV3.REGEX)) {
             "$value is not a valid onion address"
         }
     }
@@ -44,21 +76,7 @@ value class OnionAddressV3(override val value: String): OnionAddress {
         return value.uppercase().decodeBase32ToArray(Base32.Default)!!
     }
 
-    companion object {
-        @get:JvmStatic
-        val REGEX: Regex get() = "[a-z2-7]{56}".toRegex()
-
-        @JvmStatic
-        fun fromStringOrNull(string: String): OnionAddressV3? {
-            return try {
-                OnionAddressV3(
-                    string.separateSchemeFromAddress()
-                        .second
-                        .substringBefore('.')
-                )
-            } catch (_: IllegalArgumentException) {
-                null
-            }
-        }
+    override fun toString(): String {
+        return "OnionAddressV3(value=$value)"
     }
 }

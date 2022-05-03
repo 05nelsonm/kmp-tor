@@ -15,7 +15,7 @@
  **/
 package io.matthewnelson.kmp.tor.controller.common.events
 
-interface TorEventProcessor<T: TorEvent.SealedListener> {
+interface TorEventProcessor<in T: TorEvent.SealedListener> {
 
     /**
      * Add a [TorEvent.SealedListener] to receive events as they come in off the socket.

@@ -15,6 +15,7 @@
  **/
 package io.matthewnelson.kmp.tor.common.clientauth
 
+import io.matthewnelson.kmp.tor.common.annotation.SealedValueClass
 import kotlin.jvm.JvmInline
 import kotlin.jvm.JvmStatic
 
@@ -26,9 +27,35 @@ import kotlin.jvm.JvmStatic
  *  - \n
  *  - \r
  *  - \t
+ *
+ * @see [RealClientName]
  * */
+@SealedValueClass
+sealed interface ClientName {
+
+    val value: String
+
+    companion object {
+
+        @JvmStatic
+        @Throws(IllegalArgumentException::class)
+        operator fun invoke(name: String): ClientName {
+            return RealClientName(name)
+        }
+
+        @JvmStatic
+        fun fromStringOrNull(name: String): ClientName? {
+            return try {
+                RealClientName(name)
+            } catch (e: IllegalArgumentException) {
+                null
+            }
+        }
+    }
+}
+
 @JvmInline
-value class ClientName(val value: String) {
+private value class RealClientName(override val value: String): ClientName {
 
     init {
         require(value.length in 1..16) {
@@ -48,13 +75,7 @@ value class ClientName(val value: String) {
         }
     }
 
-    companion object {
-        @JvmStatic
-        fun fromStringOrNull(value: String): ClientName? =
-            try {
-                ClientName(value)
-            } catch (e: IllegalArgumentException) {
-                null
-            }
+    override fun toString(): String {
+        return "ClientName(value=$value)"
     }
 }

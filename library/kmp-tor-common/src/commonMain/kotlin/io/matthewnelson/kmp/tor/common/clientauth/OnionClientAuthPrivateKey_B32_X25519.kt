@@ -21,6 +21,7 @@ import io.matthewnelson.component.encoding.base32.Base32
 import io.matthewnelson.component.encoding.base32.decodeBase32ToArray
 import io.matthewnelson.kmp.tor.common.address.OnionAddressV3
 import io.matthewnelson.kmp.tor.common.annotation.InternalTorApi
+import io.matthewnelson.kmp.tor.common.annotation.SealedValueClass
 import io.matthewnelson.kmp.tor.common.util.TorStrings.REDACTED
 import io.matthewnelson.kmp.tor.common.util.descriptorString
 import kotlin.jvm.JvmInline
@@ -30,18 +31,35 @@ import kotlin.jvm.JvmStatic
  * Holder for a valid base32 encoded (without padding '=') x25519 onion client auth private key
  *
  * @see [REGEX] for private key character requirements
+ * @see [RealOnionClientAuthPrivateKey_B32_X25519]
  * @throws [IllegalArgumentException] if [value] is not a 52 character base32
  *  encoded (without padding '=') String
  * */
+@Suppress("ClassName")
+@SealedValueClass
+sealed interface OnionClientAuthPrivateKey_B32_X25519: OnionClientAuth.PrivateKey {
+
+    companion object {
+        @get:JvmStatic
+        val REGEX: Regex get() = "[${Base32.Default.CHARS}]{52}".toRegex()
+
+        @JvmStatic
+        @Throws(IllegalArgumentException::class)
+        operator fun invoke(key: String): OnionClientAuthPrivateKey_B32_X25519 {
+            return RealOnionClientAuthPrivateKey_B32_X25519(key)
+        }
+    }
+}
+
 @JvmInline
 @OptIn(InternalTorApi::class)
 @Suppress("ClassName")
-value class OnionClientAuthPrivateKey_B32_X25519(
+private value class RealOnionClientAuthPrivateKey_B32_X25519(
     override val value: String
-): OnionClientAuth.PrivateKey {
+): OnionClientAuthPrivateKey_B32_X25519 {
 
     init {
-        require(value.matches(REGEX)) {
+        require(value.matches(OnionClientAuthPrivateKey_B32_X25519.REGEX)) {
             "value=$REDACTED was not a 52 character base32 encoded (w/o padding '=') String"
         }
     }
@@ -75,10 +93,5 @@ value class OnionClientAuthPrivateKey_B32_X25519(
 
     override fun toString(): String {
         return "OnionClientAuthPrivateKey_B32_X25519(value=$REDACTED)"
-    }
-
-    companion object {
-        @get:JvmStatic
-        val REGEX: Regex get() = "[${Base32.Default.CHARS}]{52}".toRegex()
     }
 }

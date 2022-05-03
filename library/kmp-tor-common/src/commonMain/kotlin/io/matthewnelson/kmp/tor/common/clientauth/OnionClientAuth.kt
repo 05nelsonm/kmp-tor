@@ -19,7 +19,6 @@ import io.matthewnelson.kmp.tor.common.address.OnionAddressV3
 import io.matthewnelson.kmp.tor.common.util.stripString
 import kotlin.jvm.JvmField
 import kotlin.jvm.JvmStatic
-import kotlin.jvm.JvmSynthetic
 
 /**
  * Onion Client Authentication public/private keys.
@@ -92,8 +91,8 @@ class OnionClientAuth private constructor() {
 
             @JvmStatic
             @Throws(IllegalArgumentException::class)
-            fun fromString(string: String): PublicKey {
-                val stripped = string.stripString()
+            fun fromString(key: String): PublicKey {
+                val stripped = key.stripString()
 
                 try {
                     return OnionClientAuthPublicKey_B64_X25519(stripped)
@@ -107,9 +106,9 @@ class OnionClientAuth private constructor() {
             }
 
             @JvmStatic
-            fun fromStringOrNull(string: String): PublicKey? {
+            fun fromStringOrNull(key: String): PublicKey? {
                 return try {
-                    fromString(string)
+                    fromString(key)
                 } catch (_: IllegalArgumentException) {
                     null
                 }
@@ -138,8 +137,8 @@ class OnionClientAuth private constructor() {
         companion object {
             @JvmStatic
             @Throws(IllegalArgumentException::class)
-            fun fromString(string: String): PrivateKey {
-                val stripped = string.stripString()
+            fun fromString(key: String): PrivateKey {
+                val stripped = key.stripString()
 
                 try {
                     return OnionClientAuthPrivateKey_B64_X25519(stripped)
@@ -153,9 +152,9 @@ class OnionClientAuth private constructor() {
             }
 
             @JvmStatic
-            fun fromStringOrNull(string: String): PrivateKey? {
+            fun fromStringOrNull(key: String): PrivateKey? {
                 return try {
-                    fromString(string)
+                    fromString(key)
                 } catch (_: IllegalArgumentException) {
                     null
                 }

@@ -16,12 +16,13 @@
 package io.matthewnelson.kmp.tor.manager.common.event
 
 import io.matthewnelson.kmp.tor.common.address.Port
+import io.matthewnelson.kmp.tor.common.address.ProxyAddress
+import io.matthewnelson.kmp.tor.common.annotation.SealedValueClass
 import io.matthewnelson.kmp.tor.controller.common.events.TorEvent
 import io.matthewnelson.kmp.tor.manager.common.exceptions.TorManagerException
 import io.matthewnelson.kmp.tor.manager.common.state.*
 import kotlin.jvm.JvmField
 import kotlin.jvm.JvmInline
-import kotlin.jvm.JvmName
 import kotlin.jvm.JvmStatic
 import kotlin.reflect.KClass
 
@@ -31,6 +32,7 @@ import kotlin.reflect.KClass
  * @see [Listener]
  * @see [SealedListener]
  * */
+@Suppress("DEPRECATION")
 sealed interface TorManagerEvent {
 
     /**
@@ -63,8 +65,20 @@ sealed interface TorManagerEvent {
         /**
          * Debug events. Will only be dispatched if debug is enabled.
          * */
+        @SealedValueClass
+        sealed interface Debug: Log {
+            val value: String
+
+            companion object {
+                @JvmStatic
+                operator fun invoke(value: String): Debug {
+                    return RealDebug(value)
+                }
+            }
+        }
+
         @JvmInline
-        value class Debug(val value: String): Log {
+        private value class RealDebug(override val value: String): Debug {
             override fun toString(): String = "D/$value"
         }
 
@@ -72,26 +86,60 @@ sealed interface TorManagerEvent {
          * Error events that are not returned as a [Result] from interacting
          * with TorManager.
          * */
-        @JvmInline
-        value class Error(val value: Throwable): Log {
-            override fun toString(): String = "E/$value"
+        @SealedValueClass
+        sealed interface Error: Log {
+            val value: Throwable
+
+            companion object {
+                @JvmStatic
+                operator fun invoke(value: Throwable): Error {
+                    return RealError(value)
+                }
+            }
         }
 
         @JvmInline
-        value class Info(val value: String): Log {
+        private value class RealError(override val value: Throwable): Error {
+            override fun toString(): String = "E/$value"
+        }
+
+        @SealedValueClass
+        sealed interface Info: Log {
+            val value: String
+
+            companion object {
+                @JvmStatic
+                operator fun invoke(value: String): Info {
+                    return RealInfo(value)
+                }
+            }
+        }
+
+        @JvmInline
+        private value class RealInfo(override val value: String): Info {
             override fun toString(): String = "I/$value"
         }
 
         /**
          * Warning events. Currently, the only warning is [WAITING_ON_NETWORK].
          * */
-        @JvmInline
-        value class Warn(val value: String): Log {
-            override fun toString(): String = "W/$value"
+        @SealedValueClass
+        sealed interface Warn: Log {
+            val value: String
 
             companion object {
                 const val WAITING_ON_NETWORK = "No Network Connectivity. Waiting..."
+
+                @JvmStatic
+                operator fun invoke(value: String): Warn {
+                    return RealWarn(value)
+                }
             }
+        }
+
+        @JvmInline
+        private value class RealWarn(override val value: String): Warn {
+            override fun toString(): String = "W/$value"
         }
     }
 
@@ -145,6 +193,7 @@ sealed interface TorManagerEvent {
             const val ON_REGISTER = "onRegister"
             const val ON_UNREGISTER = "onUnregister"
 
+            @JvmStatic
             operator fun invoke(any: Any, event: String): Lifecycle<*> =
                 Lifecycle(any::class, any.hashCode(), event)
         }
@@ -176,10 +225,97 @@ sealed interface TorManagerEvent {
     ): TorManagerEvent {
         val isNull: Boolean = dns == null && http == null && socks == null && trans == null
 
+        /**
+         * Transform [dns] proxy addresses into individual [ProxyAddress]'s.
+         *
+         * @throws [IllegalStateException] if [dns] info is null.
+         * @throws [TorManagerException] if any addresses failed to translate.
+         * */
+        @Throws(IllegalStateException::class, TorManagerException::class)
+        fun dnsInfoToProxyAddress(): Set<ProxyAddress> = split(dns, "AddressInfo.dns")
+        fun dnsInfoToProxyAddressOrNull(): Set<ProxyAddress>? {
+            return try {
+                dnsInfoToProxyAddress()
+            } catch (_: RuntimeException) {
+                null
+            }
+        }
+
+        /**
+         * Transform [http] proxy addresses into individual [ProxyAddress]'s.
+         *
+         * @throws [IllegalStateException] if [http] info is null.
+         * @throws [TorManagerException] if any addresses failed to translate.
+         * */
+        @Throws(IllegalStateException::class, TorManagerException::class)
+        fun httpInfoToProxyAddress(): Set<ProxyAddress> = split(http, "AddressInfo.http")
+        fun httpInfoToProxyAddressOrNull(): Set<ProxyAddress>? {
+            return try {
+                httpInfoToProxyAddress()
+            } catch (_: RuntimeException) {
+                null
+            }
+        }
+
+        /**
+         * Transform [socks] proxy addresses into individual [ProxyAddress]'s.
+         *
+         * @throws [IllegalStateException] if [socks] info is null.
+         * @throws [TorManagerException] if any addresses failed to translate.
+         * */
+        @Throws(IllegalStateException::class, TorManagerException::class)
+        fun socksInfoToProxyAddress(): Set<ProxyAddress> = split(socks, "AddressInfo.socks")
+        fun socksInfoToProxyAddressOrNull(): Set<ProxyAddress>? {
+            return try {
+                socksInfoToProxyAddress()
+            } catch (_: RuntimeException) {
+                null
+            }
+        }
+
+        /**
+         * Transform [trans] proxy addresses into individual [ProxyAddress]'s.
+         *
+         * @throws [IllegalStateException] if [trans] info is null.
+         * @throws [TorManagerException] if any addresses failed to translate.
+         * */
+        @Throws(IllegalStateException::class, TorManagerException::class)
+        fun transInfoToProxyAddress(): Set<ProxyAddress> = split(trans, "AddressInfo.trans")
+        fun transInfoToProxyAddressOrNull(): Set<ProxyAddress>? {
+            return try {
+                transInfoToProxyAddress()
+            } catch (_: RuntimeException) {
+                null
+            }
+        }
+
+        @Throws(IllegalStateException::class, TorManagerException::class)
+        private fun split(values: Set<String>?, fieldName: String): Set<ProxyAddress> {
+            if (values.isNullOrEmpty()) {
+                throw IllegalStateException("$fieldName contained no info")
+            }
+
+            val set: MutableSet<ProxyAddress> = LinkedHashSet(values.size)
+            for (value in values) {
+                try {
+                    set.add(ProxyAddress.fromString(value))
+                } catch (e: IllegalArgumentException) {
+                    throw TorManagerException("Failed to parse $fieldName address: $value", e)
+                }
+            }
+
+            return set.toSet()
+        }
+
+        @Deprecated(
+            message = "Moved to kmp-tor-common module as ProxyAddress",
+            replaceWith = ReplaceWith("io.matthewnelson.kmp.tor.common.address.ProxyAddress"),
+            level = DeprecationLevel.WARNING
+        )
         data class Address(
             @JvmField
             val address: String,
-            @get:JvmName("port")
+            @JvmField
             val port: Port
         ) {
             companion object {
@@ -199,9 +335,32 @@ sealed interface TorManagerEvent {
             }
         }
 
+        @Deprecated(
+            message = "Replaced with non-Result return type and new common module class",
+            replaceWith = ReplaceWith("dnsInfoToProxyAddressOrNull()"),
+            level = DeprecationLevel.WARNING
+        )
         fun splitDns(): Result<Set<Address>> = split("DNS", dns)
+
+        @Deprecated(
+            message = "Replaced with non-Result return type and new common module class",
+            replaceWith = ReplaceWith("httpInfoToProxyAddressOrNull()"),
+            level = DeprecationLevel.WARNING
+        )
         fun splitHttp(): Result<Set<Address>> = split("HTTP", http)
+
+        @Deprecated(
+            message = "Replaced with non-Result return type and new common module class",
+            replaceWith = ReplaceWith("socksInfoToProxyAddressOrNull()"),
+            level = DeprecationLevel.WARNING
+        )
         fun splitSocks(): Result<Set<Address>> = split("Socks", socks)
+
+        @Deprecated(
+            message = "Replaced with non-Result return type and new common module class",
+            replaceWith = ReplaceWith("transInfoToProxyAddressOrNull()"),
+            level = DeprecationLevel.WARNING
+        )
         fun splitTrans(): Result<Set<Address>> = split("Trans", trans)
 
         private fun split(portName: String, values: Set<String>?): Result<Set<Address>> {

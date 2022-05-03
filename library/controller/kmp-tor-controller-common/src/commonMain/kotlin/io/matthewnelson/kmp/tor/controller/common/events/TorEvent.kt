@@ -17,6 +17,7 @@
 
 package io.matthewnelson.kmp.tor.controller.common.events
 
+import kotlin.jvm.JvmField
 import kotlin.jvm.JvmStatic
 import kotlin.native.concurrent.SharedImmutable
 
@@ -66,7 +67,7 @@ private val MULTI_LINE: Set<TorEvent.Type.MultiLineEvent> by lazy {
 /**
  * https://torproject.gitlab.io/torspec/control-spec/#asynchronous-events
  * */
-sealed class TorEvent private constructor(val value: String) {
+sealed class TorEvent private constructor(@JvmField val value: String) {
 
     companion object {
         @get:JvmStatic

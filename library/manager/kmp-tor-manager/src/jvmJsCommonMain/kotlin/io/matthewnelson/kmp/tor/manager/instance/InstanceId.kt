@@ -15,13 +15,32 @@
  **/
 package io.matthewnelson.kmp.tor.manager.instance
 
+import io.matthewnelson.kmp.tor.common.annotation.SealedValueClass
 import kotlin.jvm.JvmInline
+import kotlin.jvm.JvmStatic
+
+@SealedValueClass
+sealed interface InstanceId {
+    val value: String
+
+    companion object {
+        @JvmStatic
+        @Throws(IllegalArgumentException::class)
+        operator fun invoke(value: String): InstanceId {
+            return RealInstanceId(value)
+        }
+    }
+}
 
 @JvmInline
-value class InstanceId(val value: String) {
+private value class RealInstanceId(override val value: String): InstanceId {
     init {
         require(value.isNotBlank()) {
             "InstanceId.value cannot be blank"
         }
+    }
+
+    override fun toString(): String {
+        return "InstanceId(value=$value)"
     }
 }

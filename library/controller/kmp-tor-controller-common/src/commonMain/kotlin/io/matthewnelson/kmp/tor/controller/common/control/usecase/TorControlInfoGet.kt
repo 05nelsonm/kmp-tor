@@ -18,6 +18,7 @@ package io.matthewnelson.kmp.tor.controller.common.control.usecase
 import io.matthewnelson.kmp.tor.common.address.OnionAddress
 import io.matthewnelson.kmp.tor.common.annotation.InternalTorApi
 import io.matthewnelson.kmp.tor.common.util.TorStrings.REDACTED
+import kotlin.jvm.JvmField
 
 /**
  * "GETINFO" 1*(SP keyword) CRLF
@@ -36,7 +37,7 @@ interface TorControlInfoGet {
      * https://torproject.gitlab.io/torspec/control-spec/#getinfo
      * */
     @OptIn(InternalTorApi::class)
-    sealed class KeyWord(val value: String) {
+    sealed class KeyWord(@JvmField val value: String) {
 
         override fun equals(other: Any?): Boolean {
             return other != null && other is KeyWord && other.value == value
@@ -297,12 +298,12 @@ interface TorControlInfoGet {
                 }
                 class FpSks(fingerprint: String)            : Cert("fp/$fingerprint/sks") {
                     override fun toString(): String {
-                        return value.replaceAfter("cert/fp", "$REDACTED/sks")
+                        return value.replaceAfter("cert/fp/", "$REDACTED/sks")
                     }
                 }
                 class FpDigest(fingerprint: String, digest: String) : Cert("fp/$fingerprint/$digest") {
                     override fun toString(): String {
-                        return value.replaceAfter("cert/fp", "$REDACTED/$REDACTED")
+                        return value.replaceAfter("cert/fp/", "$REDACTED/$REDACTED")
                     }
                 }
             }

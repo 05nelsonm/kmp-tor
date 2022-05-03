@@ -22,9 +22,18 @@ class AddressInfoUnitTest {
 
     companion object {
         const val ADDRESS = "127.0.0.1"
-        const val PORT = "48494"
+        const val PORT_DNS = "48494"
+        const val PORT_HTTP = "48495"
+        const val PORT_SOCKS = "48496"
+        const val PORT_TRANS = "48497"
     }
-    private val info = AddressInfo(dns = setOf("$ADDRESS:$PORT"))
+
+    private val info = AddressInfo(
+        dns = setOf("$ADDRESS:$PORT_DNS"),
+        http = setOf("$ADDRESS:$PORT_HTTP"),
+        socks = setOf("$ADDRESS:$PORT_SOCKS"),
+        trans = setOf("$ADDRESS:$PORT_TRANS"),
+    )
 
     @Test
     fun givenPortInfo_whenNoConstructorArgs_portsAreNull() {
@@ -32,21 +41,38 @@ class AddressInfoUnitTest {
     }
 
     @Test
-    fun givenNonNullPortInfo_whenSplit_returnsSuccessful() {
-        val result = info.splitDns()
-        result.onFailure { ex ->
-            fail(cause = ex)
-        }
-        result.onSuccess { set ->
-            assertEquals(ADDRESS, set.first().address)
-            assertEquals(PORT.toInt(), set.first().port.value)
-        }
+    fun givenNonNullPortInfo_whenDnsSplit_returnsSuccessful() {
+        val set = info.dnsInfoToProxyAddress()
+        assertEquals(ADDRESS, set.first().ipAddress)
+        assertEquals(PORT_DNS.toInt(), set.first().port.value)
+    }
+
+    @Test
+    fun givenNonNullPortInfo_whenHttpSplit_returnsSuccessful() {
+        val set = info.httpInfoToProxyAddress()
+        assertEquals(ADDRESS, set.first().ipAddress)
+        assertEquals(PORT_HTTP.toInt(), set.first().port.value)
+    }
+
+    @Test
+    fun givenNonNullPortInfo_whenSocksSplit_returnsSuccessful() {
+        val set = info.socksInfoToProxyAddress()
+        assertEquals(ADDRESS, set.first().ipAddress)
+        assertEquals(PORT_SOCKS.toInt(), set.first().port.value)
+    }
+
+    @Test
+    fun givenNonNullPortInfo_whenTransSplit_returnsSuccessful() {
+        val set = info.transInfoToProxyAddress()
+        assertEquals(ADDRESS, set.first().ipAddress)
+        assertEquals(PORT_TRANS.toInt(), set.first().port.value)
     }
 
     @Test
     fun givenNullPortInfo_whenSplit_returnsNull() {
-        assertNull(info.http)
-        val result = info.splitHttp()
-        assertTrue(result.isFailure)
+        val newInfo = info.copy(http = null)
+        assertNull(newInfo.http)
+        val result = newInfo.httpInfoToProxyAddressOrNull()
+        assertNull(result)
     }
 }

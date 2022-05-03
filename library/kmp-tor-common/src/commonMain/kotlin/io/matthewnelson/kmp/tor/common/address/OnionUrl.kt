@@ -52,7 +52,7 @@ data class OnionUrl(
     val address: OnionAddress,
     @JvmField
     val path: String = "",
-    @get:JvmName("port")
+    @JvmField
     val port: Port? = null,
     @JvmField
     val scheme: Scheme = Scheme.HTTP,

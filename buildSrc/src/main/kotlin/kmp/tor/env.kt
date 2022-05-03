@@ -29,7 +29,7 @@ object env {
     //                           1.0.1         == 01_00_01_99
     //                           1.1.1         == 01_01_01_99
     //                           1.15.1        == 01_15_01_99
-    private const val MANAGER_VERSION_CODE  = /*00_0*/1_00_99
+    private const val MANAGER_VERSION_CODE  = /*00_0*/1_01_99
 
     private const val BINARY_VERSION_NAME   = "0.4.6.10"
     //                          0.4.6.9        == 00_04_06_09_00

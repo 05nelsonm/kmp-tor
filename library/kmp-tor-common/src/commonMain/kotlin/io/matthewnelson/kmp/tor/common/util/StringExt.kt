@@ -49,3 +49,11 @@ internal inline fun String.separateSchemeFromAddress(): Pair<Scheme?, String> {
         }
     )
 }
+
+@JvmSynthetic
+@Suppress("nothing_to_inline")
+internal inline fun String.stripAddress(): String {
+    return separateSchemeFromAddress()
+        .second
+        .substringBefore('.')
+}

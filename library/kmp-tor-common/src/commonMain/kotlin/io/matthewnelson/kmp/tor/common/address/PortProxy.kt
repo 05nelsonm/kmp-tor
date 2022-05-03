@@ -15,33 +15,49 @@
  **/
 package io.matthewnelson.kmp.tor.common.address
 
+import io.matthewnelson.kmp.tor.common.annotation.SealedValueClass
 import kotlin.jvm.JvmInline
 import kotlin.jvm.JvmStatic
 
 /**
  * Holder for a valid proxy port between 1024 and 65535
  *
+ * @see [RealPortProxy]
  * @throws [IllegalArgumentException] if port is not valid
  * */
-@JvmInline
-value class PortProxy(val value: Int) {
-
-    init {
-        require(value in MIN..Port.MAX) {
-            "Invalid port range. Must be between $MIN and ${Port.MAX}"
-        }
-    }
+@SealedValueClass
+sealed interface PortProxy: Port {
 
     companion object {
         const val MIN = 1024
+        const val MAX = Port.MAX
+
+        @JvmStatic
+        @Throws(IllegalArgumentException::class)
+        operator fun invoke(port: Int): PortProxy {
+            return RealPortProxy(port)
+        }
 
         @JvmStatic
         fun fromIntOrNull(port: Int?): PortProxy? {
             return try {
-                PortProxy(port ?: return null)
+                RealPortProxy(port ?: return null)
             } catch (_: IllegalArgumentException) {
                 null
             }
         }
+    }
+}
+
+@JvmInline
+private value class RealPortProxy(override val value: Int): PortProxy {
+    init {
+        require(value in PortProxy.MIN..PortProxy.MAX) {
+            "Invalid port range. Must be between ${PortProxy.MIN} and ${PortProxy.MAX}"
+        }
+    }
+
+    override fun toString(): String {
+        return "PortProxy(value=$value)"
     }
 }

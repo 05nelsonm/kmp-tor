@@ -15,9 +15,11 @@
  **/
 package io.matthewnelson.kmp.tor.manager.common.state
 
+import io.matthewnelson.kmp.tor.common.annotation.SealedValueClass
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.contract
 import kotlin.jvm.JvmInline
+import kotlin.jvm.JvmStatic
 
 sealed interface TorState {
 
@@ -31,8 +33,18 @@ sealed interface TorState {
         override fun toString(): String = OFF
     }
 
+    @SealedValueClass
+    sealed interface On                                             : TorState {
+        companion object {
+            @JvmStatic
+            operator fun invoke(bootstrap: Int): On {
+                return RealOn(bootstrap)
+            }
+        }
+    }
+
     @JvmInline
-    value class On(override val bootstrap: Int)                     : TorState {
+    private value class RealOn(override val bootstrap: Int)         : On {
         override val isBootstrapped: Boolean get() = bootstrap >= 100
         override fun toString(): String = ON
 
