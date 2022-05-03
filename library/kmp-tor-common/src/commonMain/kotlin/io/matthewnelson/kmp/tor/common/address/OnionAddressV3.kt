@@ -17,7 +17,6 @@ package io.matthewnelson.kmp.tor.common.address
 
 import io.matthewnelson.component.encoding.base32.Base32
 import io.matthewnelson.component.encoding.base32.decodeBase32ToArray
-import io.matthewnelson.kmp.tor.common.util.separateSchemeFromAddress
 import io.matthewnelson.kmp.tor.common.util.stripAddress
 import kotlin.jvm.JvmInline
 import kotlin.jvm.JvmStatic
@@ -28,7 +27,7 @@ import kotlin.jvm.JvmStatic
  * correctness, and does not check validity of bytes.
  *
  * @see [REGEX] for onion address character requirements
- * @see [OnionAddressV3Value]
+ * @see [RealOnionAddressV3]
  * @throws [IllegalArgumentException] if [value] is not a v3 onion address
  * */
 sealed interface OnionAddressV3: OnionAddress {
@@ -40,13 +39,19 @@ sealed interface OnionAddressV3: OnionAddress {
         @JvmStatic
         @Throws(IllegalArgumentException::class)
         operator fun invoke(address: String): OnionAddressV3 {
-            return OnionAddressV3Value(address)
+            return RealOnionAddressV3(address)
+        }
+
+        @JvmStatic
+        @Throws(IllegalArgumentException::class)
+        fun fromString(address: String): OnionAddressV3 {
+            return RealOnionAddressV3(address.stripAddress())
         }
 
         @JvmStatic
         fun fromStringOrNull(address: String): OnionAddressV3? {
             return try {
-                OnionAddressV3(address.stripAddress())
+                fromString(address)
             } catch (_: IllegalArgumentException) {
                 null
             }
@@ -55,7 +60,7 @@ sealed interface OnionAddressV3: OnionAddress {
 }
 
 @JvmInline
-private value class OnionAddressV3Value(override val value: String): OnionAddressV3 {
+private value class RealOnionAddressV3(override val value: String): OnionAddressV3 {
 
     init {
         require(value.matches(OnionAddressV3.REGEX)) {

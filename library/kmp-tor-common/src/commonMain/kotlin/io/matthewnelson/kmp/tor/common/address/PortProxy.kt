@@ -21,13 +21,10 @@ import kotlin.jvm.JvmStatic
 /**
  * Holder for a valid proxy port between 1024 and 65535
  *
- * @see [PortProxyValue]
+ * @see [RealPortProxy]
  * @throws [IllegalArgumentException] if port is not valid
  * */
 sealed interface PortProxy: Port {
-
-    // Provided via Port interface
-//    val value: Int
 
     companion object {
         const val MIN = 1024
@@ -36,13 +33,13 @@ sealed interface PortProxy: Port {
         @JvmStatic
         @Throws(IllegalArgumentException::class)
         operator fun invoke(port: Int): PortProxy {
-            return PortProxyValue(port)
+            return RealPortProxy(port)
         }
 
         @JvmStatic
         fun fromIntOrNull(port: Int?): PortProxy? {
             return try {
-                PortProxy(port ?: return null)
+                RealPortProxy(port ?: return null)
             } catch (_: IllegalArgumentException) {
                 null
             }
@@ -51,7 +48,7 @@ sealed interface PortProxy: Port {
 }
 
 @JvmInline
-private value class PortProxyValue(override val value: Int): PortProxy {
+private value class RealPortProxy(override val value: Int): PortProxy {
     init {
         require(value in PortProxy.MIN..PortProxy.MAX) {
             "Invalid port range. Must be between ${PortProxy.MIN} and ${PortProxy.MAX}"

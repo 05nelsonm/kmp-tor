@@ -28,7 +28,7 @@ import kotlin.jvm.JvmStatic
  * Holder for a valid base64 encoded (without padding '=') ED25519-V3 onion address private key
  *
  * @see [REGEX] for private key character requirements
- * @see [OnionAddressV3PrivateKey_ED25519Value]
+ * @see [RealOnionAddressV3PrivateKey_ED25519]
  * @throws [IllegalArgumentException] if [value] is not an 86 character base64
  *  encoded (without padding '=') String
  * */
@@ -42,13 +42,19 @@ sealed interface OnionAddressV3PrivateKey_ED25519: OnionAddress.PrivateKey {
         @JvmStatic
         @Throws(IllegalArgumentException::class)
         operator fun invoke(key: String): OnionAddressV3PrivateKey_ED25519 {
-            return OnionAddressV3PrivateKey_ED25519Value(key)
+            return RealOnionAddressV3PrivateKey_ED25519(key)
+        }
+
+        @JvmStatic
+        @Throws(IllegalArgumentException::class)
+        fun fromString(key: String): OnionAddressV3PrivateKey_ED25519 {
+            return RealOnionAddressV3PrivateKey_ED25519(key.stripString())
         }
 
         @JvmStatic
         fun fromStringOrNull(key: String): OnionAddressV3PrivateKey_ED25519? {
             return try {
-                OnionAddressV3PrivateKey_ED25519(key.stripString())
+                fromString(key)
             } catch (_: IllegalArgumentException) {
                 null
             }
@@ -59,7 +65,7 @@ sealed interface OnionAddressV3PrivateKey_ED25519: OnionAddress.PrivateKey {
 @JvmInline
 @OptIn(InternalTorApi::class)
 @Suppress("ClassName")
-private value class OnionAddressV3PrivateKey_ED25519Value(
+private value class RealOnionAddressV3PrivateKey_ED25519(
     override val value: String
 ): OnionAddressV3PrivateKey_ED25519 {
 

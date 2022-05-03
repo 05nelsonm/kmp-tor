@@ -26,7 +26,7 @@ import kotlin.jvm.JvmStatic
  * resolved to the given platform's file system.
  *
  * @see [Builder]
- * @see [PathValue]
+ * @see [RealPath]
  * */
 sealed interface Path {
 
@@ -55,7 +55,7 @@ sealed interface Path {
 
         @JvmStatic
         operator fun invoke(path: String): Path {
-            return PathValue(path)
+            return RealPath(path)
         }
     }
 
@@ -119,7 +119,7 @@ sealed interface Path {
             }
         }
 
-        fun build(): Path = PathValue(sb.toString())
+        fun build(): Path = RealPath(sb.toString())
 
         companion object {
             @JvmStatic
@@ -133,7 +133,7 @@ sealed interface Path {
 }
 
 @JvmInline
-private value class PathValue(override val value: String): Path {
+private value class RealPath(override val value: String): Path {
 
     override fun builder(separator: Char): Path.Builder =
         Path.Builder(separator).addSegment(value)

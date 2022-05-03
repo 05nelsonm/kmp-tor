@@ -743,8 +743,20 @@ class TorConfig private constructor(
              * @throws [IllegalArgumentException] if [value] is not within the inclusive range
              *   of 0 and 65535
              * */
+            sealed interface MaxStreams {
+                val value: Int
+
+                companion object {
+                    @JvmStatic
+                    @Throws(IllegalArgumentException::class)
+                    operator fun invoke(value: Int): MaxStreams {
+                        return RealMaxStreams(value)
+                    }
+                }
+            }
+
             @JvmInline
-            value class MaxStreams(val value: Int) {
+            private value class RealMaxStreams(override val value: Int): MaxStreams {
                 init {
                     require(value in Port.MIN..Port.MAX) {
                         "MaxStreams.value must be between ${Port.MIN} and ${Port.MAX}"
@@ -844,7 +856,7 @@ class TorConfig private constructor(
                     return Control().setFlags(flags).set(value) as Control
                 }
 
-                sealed class Flag(val value: String) {
+                sealed class Flag(@JvmField val value: String) {
                     // TODO: Implement Unix domains in addition to Port capabilities
 //                    object GroupWritable                    : Flag("GroupWritable")
 //                    object WorldWritable                    : Flag("WorldWritable")
@@ -949,7 +961,7 @@ class TorConfig private constructor(
                     return Socks().setFlags(flags).setIsolationFlags(isolationFlags).set(value) as Socks
                 }
 
-                sealed class Flag(val value: String) {
+                sealed class Flag(@JvmField val value: String) {
                     object NoIPv4Traffic                    : Flag("NoIPv4Traffic")
                     object IPv6Traffic                      : Flag("IPv6Traffic")
                     object PreferIPv6                       : Flag("PreferIPv6")
@@ -1001,7 +1013,7 @@ class TorConfig private constructor(
             /**
              * https://2019.www.torproject.org/docs/tor-manual.html.en#SocksPort
              * */
-            sealed class IsolationFlag(val value: String) {
+            sealed class IsolationFlag(@JvmField val value: String) {
 
                 override fun toString(): String {
                     return value
@@ -1114,13 +1126,13 @@ class TorConfig private constructor(
                 companion object {
                     @JvmStatic
                     operator fun invoke(port: PortProxy): Value {
-                        return PortValue(port)
+                        return RealValue(port)
                     }
                 }
             }
 
             @JvmInline
-            private value class PortValue(override val port: PortProxy)     : Value {
+            private value class RealValue(override val port: PortProxy)     : Value {
                 override val value: String get() = port.value.toString()
                 override fun toString(): String = value
             }
@@ -1133,13 +1145,13 @@ class TorConfig private constructor(
             companion object {
                 @JvmStatic
                 operator fun invoke(path: Path): FileSystemFile {
-                    return FileSystemFileValue(path)
+                    return RealFileSystemFile(path)
                 }
             }
         }
 
         @JvmInline
-        private value class FileSystemFileValue(override val path: Path): FileSystemFile {
+        private value class RealFileSystemFile(override val path: Path): FileSystemFile {
             override val value: String get() = path.value
             override val nullIfEmpty: FileSystemFile? get() = if (value.isEmpty()) null else this
             override fun toString(): String = value
@@ -1152,13 +1164,13 @@ class TorConfig private constructor(
             companion object {
                 @JvmStatic
                 operator fun invoke(path: Path): FileSystemDir {
-                    return FileSystemDirValue(path)
+                    return RealFileSystemDir(path)
                 }
             }
         }
 
         @JvmInline
-        private value class FileSystemDirValue(override val path: Path) : FileSystemDir {
+        private value class RealFileSystemDir(override val path: Path)  : FileSystemDir {
             override val value: String get() = path.value
             override val nullIfEmpty: FileSystemDir? get() = if (value.isEmpty()) null else this
             override fun toString(): String = value
@@ -1170,13 +1182,13 @@ class TorConfig private constructor(
             companion object {
                 @JvmStatic
                 operator fun invoke(value: String): FieldId {
-                    return FieldIdValue(value)
+                    return RealFieldId(value)
                 }
             }
         }
 
         @JvmInline
-        private value class FieldIdValue(override val value: String)    : FieldId {
+        private value class RealFieldId(override val value: String)     : FieldId {
             override val nullIfEmpty: FieldId? get() = if(value.isEmpty()) null else this
             override fun toString(): String = value
         }
@@ -1187,13 +1199,13 @@ class TorConfig private constructor(
             companion object {
                 @JvmStatic
                 operator fun invoke(pid: Int): ProcessId {
-                    return ProcessIdValue(pid)
+                    return RealProcessId(pid)
                 }
             }
         }
 
         @JvmInline
-        private value class ProcessIdValue(override val pid: Int)       : ProcessId {
+        private value class RealProcessId(override val pid: Int)        : ProcessId {
             override val value: String get() = "$pid"
             override fun toString(): String = value
         }
@@ -1205,13 +1217,13 @@ class TorConfig private constructor(
                 companion object {
                     @JvmStatic
                     operator fun invoke(time: Int): Minutes {
-                        return MinutesValue(time)
+                        return RealMinutes(time)
                     }
                 }
             }
 
             @JvmInline
-            private value class MinutesValue(override val time: Int)        : Minutes {
+            private value class RealMinutes(override val time: Int)         : Minutes {
                 override val value: String get() = if (time < 1) {
                     "1 minutes"
                 } else {
@@ -1225,13 +1237,13 @@ class TorConfig private constructor(
                 companion object {
                     @JvmStatic
                     operator fun invoke(time: Int): Hours {
-                        return HoursValue(time)
+                        return RealHours(time)
                     }
                 }
             }
 
             @JvmInline
-            private value class HoursValue(override val time: Int)          : Hours {
+            private value class RealHours(override val time: Int)           : Hours {
                 override val value: String get() = if (time < 1) {
                     "1 hours"
                 } else {
@@ -1245,13 +1257,13 @@ class TorConfig private constructor(
                 companion object {
                     @JvmStatic
                     operator fun invoke(time: Int): Days {
-                        return DaysValue(time)
+                        return RealDays(time)
                     }
                 }
             }
 
             @JvmInline
-            private value class DaysValue(override val time: Int)           : Days {
+            private value class RealDays(override val time: Int)            : Days {
                 override val value: String get() = if (time < 1) {
                     "1 days"
                 } else {
@@ -1265,13 +1277,13 @@ class TorConfig private constructor(
                 companion object {
                     @JvmStatic
                     operator fun invoke(time: Int): Weeks {
-                        return WeeksValue(time)
+                        return RealWeeks(time)
                     }
                 }
             }
 
             @JvmInline
-            private value class WeeksValue(override val time: Int)          : Weeks {
+            private value class RealWeeks(override val time: Int)           : Weeks {
                 override val value: String get() = if (time < 1) {
                     "1 weeks"
                 } else {

@@ -21,7 +21,6 @@ import io.matthewnelson.kmp.tor.manager.common.exceptions.TorManagerException
 import io.matthewnelson.kmp.tor.manager.common.state.*
 import kotlin.jvm.JvmField
 import kotlin.jvm.JvmInline
-import kotlin.jvm.JvmName
 import kotlin.jvm.JvmStatic
 import kotlin.reflect.KClass
 
@@ -69,13 +68,13 @@ sealed interface TorManagerEvent {
             companion object {
                 @JvmStatic
                 operator fun invoke(value: String): Debug {
-                    return DebugValue(value)
+                    return RealDebug(value)
                 }
             }
         }
 
         @JvmInline
-        private value class DebugValue(override val value: String): Debug {
+        private value class RealDebug(override val value: String): Debug {
             override fun toString(): String = "D/$value"
         }
 
@@ -89,13 +88,13 @@ sealed interface TorManagerEvent {
             companion object {
                 @JvmStatic
                 operator fun invoke(value: Throwable): Error {
-                    return ErrorValue(value)
+                    return RealError(value)
                 }
             }
         }
 
         @JvmInline
-        private value class ErrorValue(override val value: Throwable): Error {
+        private value class RealError(override val value: Throwable): Error {
             override fun toString(): String = "E/$value"
         }
 
@@ -105,13 +104,13 @@ sealed interface TorManagerEvent {
             companion object {
                 @JvmStatic
                 operator fun invoke(value: String): Info {
-                    return InfoValue(value)
+                    return RealInfo(value)
                 }
             }
         }
 
         @JvmInline
-        private value class InfoValue(override val value: String): Info {
+        private value class RealInfo(override val value: String): Info {
             override fun toString(): String = "I/$value"
         }
 
@@ -126,13 +125,13 @@ sealed interface TorManagerEvent {
 
                 @JvmStatic
                 operator fun invoke(value: String): Warn {
-                    return WarnValue(value)
+                    return RealWarn(value)
                 }
             }
         }
 
         @JvmInline
-        private value class WarnValue(override val value: String): Warn {
+        private value class RealWarn(override val value: String): Warn {
             override fun toString(): String = "W/$value"
         }
     }

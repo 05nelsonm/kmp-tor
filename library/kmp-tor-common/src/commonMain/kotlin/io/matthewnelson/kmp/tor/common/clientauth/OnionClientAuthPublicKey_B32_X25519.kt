@@ -27,7 +27,7 @@ import kotlin.jvm.JvmStatic
  * Holder for a valid base32 encoded (without padding '=') x25519 onion client auth public key
  *
  * @see [OnionClientAuthPrivateKey_B32_X25519.REGEX] for public key character requirements
- * @see [OnionClientAuthPublicKey_B32_X25519Value]
+ * @see [RealOnionClientAuthPublicKey_B32_X25519]
  * @throws [IllegalArgumentException] if [value] is not a 52 character base32
  *  encoded (without padding '=') String
  * */
@@ -38,14 +38,14 @@ sealed interface OnionClientAuthPublicKey_B32_X25519: OnionClientAuth.PublicKey 
         @JvmStatic
         @Throws(IllegalArgumentException::class)
         operator fun invoke(key: String): OnionClientAuthPublicKey_B32_X25519 {
-            return OnionClientAuthPublicKey_B32_X25519Value(key)
+            return RealOnionClientAuthPublicKey_B32_X25519(key)
         }
     }
 }
 
 @JvmInline
 @Suppress("ClassName")
-private value class OnionClientAuthPublicKey_B32_X25519Value(
+private value class RealOnionClientAuthPublicKey_B32_X25519(
     override val value: String
 ): OnionClientAuthPublicKey_B32_X25519 {
 

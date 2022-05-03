@@ -36,13 +36,13 @@ sealed interface TorState {
         companion object {
             @JvmStatic
             operator fun invoke(bootstrap: Int): On {
-                return OnValue(bootstrap)
+                return RealOn(bootstrap)
             }
         }
     }
 
     @JvmInline
-    private value class OnValue(override val bootstrap: Int)        : On {
+    private value class RealOn(override val bootstrap: Int)         : On {
         override val isBootstrapped: Boolean get() = bootstrap >= 100
         override fun toString(): String = ON
 

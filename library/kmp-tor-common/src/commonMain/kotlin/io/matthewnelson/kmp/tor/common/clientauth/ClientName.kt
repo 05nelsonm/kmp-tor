@@ -27,7 +27,7 @@ import kotlin.jvm.JvmStatic
  *  - \r
  *  - \t
  *
- * @see [ClientNameValue]
+ * @see [RealClientName]
  * */
 sealed interface ClientName {
 
@@ -38,21 +38,22 @@ sealed interface ClientName {
         @JvmStatic
         @Throws(IllegalArgumentException::class)
         operator fun invoke(name: String): ClientName {
-            return ClientNameValue(name)
+            return RealClientName(name)
         }
 
         @JvmStatic
-        fun fromStringOrNull(name: String): ClientName? =
-            try {
-                ClientName(name)
+        fun fromStringOrNull(name: String): ClientName? {
+            return try {
+                RealClientName(name)
             } catch (e: IllegalArgumentException) {
                 null
             }
+        }
     }
 }
 
 @JvmInline
-private value class ClientNameValue(override val value: String): ClientName {
+private value class RealClientName(override val value: String): ClientName {
 
     init {
         require(value.length in 1..16) {

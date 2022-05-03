@@ -298,12 +298,12 @@ interface TorControlInfoGet {
                 }
                 class FpSks(fingerprint: String)            : Cert("fp/$fingerprint/sks") {
                     override fun toString(): String {
-                        return value.replaceAfter("cert/fp", "$REDACTED/sks")
+                        return value.replaceAfter("cert/fp/", "$REDACTED/sks")
                     }
                 }
                 class FpDigest(fingerprint: String, digest: String) : Cert("fp/$fingerprint/$digest") {
                     override fun toString(): String {
-                        return value.replaceAfter("cert/fp", "$REDACTED/$REDACTED")
+                        return value.replaceAfter("cert/fp/", "$REDACTED/$REDACTED")
                     }
                 }
             }

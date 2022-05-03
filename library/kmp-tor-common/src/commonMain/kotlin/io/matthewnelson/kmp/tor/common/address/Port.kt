@@ -21,7 +21,7 @@ import kotlin.jvm.JvmStatic
 /**
  * Holder for a valid port between 0 and 65535
  *
- * @see [PortValue]
+ * @see [RealPort]
  * @throws [IllegalArgumentException] if port is not valid
  * */
 sealed interface Port {
@@ -35,13 +35,13 @@ sealed interface Port {
         @JvmStatic
         @Throws(IllegalArgumentException::class)
         operator fun invoke(port: Int): Port {
-            return PortValue(port)
+            return RealPort(port)
         }
 
         @JvmStatic
         fun fromIntOrNull(port: Int?): Port? {
             return try {
-                Port(port ?: return null)
+                RealPort(port ?: return null)
             } catch (_: IllegalArgumentException) {
                 null
             }
@@ -50,7 +50,7 @@ sealed interface Port {
 }
 
 @JvmInline
-private value class PortValue(override val value: Int): Port {
+private value class RealPort(override val value: Int): Port {
     init {
         require(value in Port.MIN..Port.MAX) {
             "Invalid port range. Must be between ${Port.MIN} and ${Port.MAX}"

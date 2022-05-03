@@ -43,14 +43,14 @@ sealed interface OnionClientAuthPrivateKey_B64_X25519: OnionClientAuth.PrivateKe
         @JvmStatic
         @Throws(IllegalArgumentException::class)
         operator fun invoke(key: String): OnionClientAuthPrivateKey_B64_X25519 {
-            return OnionClientAuthPrivateKey_B64_X25519Value(key)
+            return RealOnionClientAuthPrivateKey_B64_X25519(key)
         }
     }
 }
 @JvmInline
 @OptIn(InternalTorApi::class)
 @Suppress("ClassName")
-private value class OnionClientAuthPrivateKey_B64_X25519Value(
+private value class RealOnionClientAuthPrivateKey_B64_X25519(
     override val value: String
 ): OnionClientAuthPrivateKey_B64_X25519 {
 
