@@ -19,7 +19,6 @@ import io.matthewnelson.kmp.tor.common.address.Port
 import io.matthewnelson.kmp.tor.common.address.PortProxy
 import io.matthewnelson.kmp.tor.common.annotation.InternalTorApi
 import io.matthewnelson.kmp.tor.common.annotation.SealedValueClass
-import kotlin.jvm.JvmStatic
 import io.matthewnelson.kmp.tor.common.util.TorStrings.REDACTED
 import io.matthewnelson.kmp.tor.common.util.TorStrings.SP
 import io.matthewnelson.kmp.tor.controller.common.config.TorConfig.Option.TorF.False
@@ -28,6 +27,7 @@ import io.matthewnelson.kmp.tor.controller.common.file.Path
 import io.matthewnelson.kmp.tor.controller.common.internal.ControllerUtils
 import kotlin.jvm.JvmField
 import kotlin.jvm.JvmInline
+import kotlin.jvm.JvmStatic
 import kotlin.jvm.JvmSynthetic
 import kotlin.reflect.KClass
 
@@ -327,7 +327,7 @@ class TorConfig private constructor(
      *
      * https://2019.www.torproject.org/docs/tor-manual.html.en
      * */
-    sealed class Setting<T: Option?>(val keyword: String) {
+    sealed class Setting<T: Option?>(@JvmField val keyword: String) {
 
         abstract val default: T
         abstract var value: T
@@ -727,7 +727,12 @@ class TorConfig private constructor(
              *
              * https://2019.www.torproject.org/docs/tor-manual.html.en#HiddenServicePort
              * */
-            data class Ports(val virtualPort: Port, val targetPort: Port = virtualPort) {
+            data class Ports(
+                @JvmField
+                val virtualPort: Port,
+                @JvmField
+                val targetPort: Port = virtualPort
+            ) {
 
                 override fun equals(other: Any?): Boolean {
                     return  other is Ports && other.virtualPort == virtualPort

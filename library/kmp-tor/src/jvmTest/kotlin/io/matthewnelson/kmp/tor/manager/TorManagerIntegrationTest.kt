@@ -18,14 +18,9 @@ package io.matthewnelson.kmp.tor.manager
 import io.matthewnelson.kmp.tor.controller.common.control.usecase.TorControlInfoGet
 import io.matthewnelson.kmp.tor.helper.TorTestHelper
 import io.matthewnelson.kmp.tor.manager.common.exceptions.InterruptedException
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.*
 import kotlin.test.Test
-import kotlin.test.assertEquals
 import kotlin.test.assertTrue
-import kotlin.test.fail
 
 class TorManagerIntegrationTest: TorTestHelper() {
 
@@ -61,10 +56,15 @@ class TorManagerIntegrationTest: TorTestHelper() {
         }
 
         delay(50L)
+
+        // Cancellation of callers job should not
+        // produce any results
+        jobs[3].cancelAndJoin()
+
         manager.stop().getOrThrow()
 
         for (job in jobs) {
-            job.join()
+            job.cancelAndJoin()
         }
 
         assertTrue(failures > 0)

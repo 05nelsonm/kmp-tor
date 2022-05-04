@@ -13,25 +13,26 @@ include(":library:controller:kmp-tor-controller-common")
 include(":library:manager:kmp-tor-manager")
 include(":library:manager:kmp-tor-manager-common")
 
+include(":library:extensions:kmp-tor-ext-callback-controller")
+include(":library:extensions:kmp-tor-ext-callback-controller-common")
+include(":library:extensions:kmp-tor-ext-callback-manager")
+include(":library:extensions:kmp-tor-ext-callback-manager-common")
+
 @Suppress("PrivatePropertyName")
 private val KMP_TARGETS: String? by settings
 @Suppress("PrivatePropertyName")
 private val KMP_TARGETS_ALL: String? by settings
 
-// if ANDROID or JVM is not being built, don't include the android sample
+private val targets = KMP_TARGETS?.split(',')
+
 if (
     KMP_TARGETS_ALL != null ||
-    (KMP_TARGETS?.split(',')?.contains("ANDROID") != false &&
-    KMP_TARGETS?.split(',')?.contains("JVM") != false)
+    (targets?.contains("ANDROID") != false && targets?.contains("JVM") != false)
 ) {
     include(":samples:android")
 }
 
-// if JVM is not being built, don't include the javafx sample
-if (
-    KMP_TARGETS_ALL != null ||
-    KMP_TARGETS?.split(',')?.contains("JVM") != false
-) {
+if (KMP_TARGETS_ALL != null || targets?.contains("JVM") != false) {
     include(":samples:javafx")
 }
 
