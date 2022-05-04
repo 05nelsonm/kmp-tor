@@ -35,17 +35,26 @@ sealed interface Path {
     val value: String
 
     /**
-     * Builds off of the current [Path.value]
+     * Builds off of the current [value] using
+     * the default [fsSeparator] character.
+     * */
+    fun builder(): Builder
+
+    /**
+     * Builds off of the current [value] using
+     * the defined [separator] character.
      * */
     fun builder(separator: Char): Builder
 
     /**
-     * Builds off of the current [Path.value]
+     * Builds off of the current [value] using
+     * the default [fsSeparator] character.
      * */
     fun builder(block: Builder.() -> Builder): Path
 
     /**
-     * Builds off of the current [Path.value]
+     * Builds off of the current [value] using
+     * the defined [separator] character.
      * */
     fun builder(separator: Char, block: Builder.() -> Builder): Path
 
@@ -137,15 +146,23 @@ sealed interface Path {
 @JvmInline
 private value class RealPath(override val value: String): Path {
 
-    override fun builder(separator: Char): Path.Builder =
-        Path.Builder(separator).addSegment(value)
+    override fun builder(): Path.Builder {
+        return Path.Builder().addSegment(value)
+    }
 
-    override fun builder(block: Path.Builder.() -> Path.Builder): Path =
-        block.invoke(builder(fsSeparator())).build()
+    override fun builder(separator: Char): Path.Builder {
+        return Path.Builder(separator).addSegment(value)
+    }
 
-    override fun builder(separator: Char, block: Path.Builder.() -> Path.Builder): Path =
-        block.invoke(builder(separator)).build()
+    override fun builder(block: Path.Builder.() -> Path.Builder): Path {
+        return block.invoke(builder()).build()
+    }
 
-    override fun segments(separator: Char): List<String> =
-        value.split(separator)
+    override fun builder(separator: Char, block: Path.Builder.() -> Path.Builder): Path {
+        return block.invoke(builder(separator)).build()
+    }
+
+    override fun segments(separator: Char): List<String> {
+        return value.split(separator)
+    }
 }
