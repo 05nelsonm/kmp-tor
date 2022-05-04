@@ -64,7 +64,7 @@ kmpConfiguration {
 
 kmpPublish {
     setupModule(
-        pomDescription = "Kotlin Components' Async extension of TorController common code for non-coroutine consumers",
+        pomDescription = "Kotlin Components' Callback extension of TorController common code for non-coroutine consumers",
         holdPublication = env.kmpTor.holdPublication
     )
 }
