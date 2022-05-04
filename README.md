@@ -15,7 +15,9 @@ Add dependency
 ```kotlin
 // build.gradle.kts
 dependencies {
-    implementation("io.matthewnelson.kotlin-components:kmp-tor:0.4.6.10+0.1.0")
+    val vTor = "0.4.6.10"
+    val vKmpTor = "0.1.0"
+    implementation("io.matthewnelson.kotlin-components:kmp-tor:$vTor+$vKmpTor")
 }
 ```
 
@@ -47,6 +49,70 @@ dependencies {
    or cmd prompt.
      - Note: Be sure to run `git submodule update --init` if you haven't yet so git 
        submodules are initialized.
+
+</details>
+
+<details>
+    <summary>Extensions (Callback - Non-Kotlin users)</summary>
+
+For Java projects (who can't use coroutines), you can "wrap" `TorManager` in an implementation
+that uses callbacks (ie. `CallbackTorManager`).
+
+```groovy
+// build.gradle
+
+dependencies {
+   def vTor = '0.4.6.10'
+   def vKmpTor = '0.1.0'
+
+   implementation "io.matthewnelson.kotlin-components:kmp-tor:$vTor+$vKmpTor"
+   // Add the callback extension
+   implementation "io.matthewnelson.kotlin-components:kmp-tor-ext-callback-manager:$vKmpTor"
+   
+   // You will also need to add the Kotlin gradle plugin, and possibly the coroutines
+   // dependency, too.
+}
+```
+
+```java
+class WrapExample {
+    
+    // ..
+    TorManager instance = TorManager.newInstance(/* ... */);
+
+    // Wrap that mug...
+    CallbackTorManager torManager = new CallbackTorManager(
+        instance,
+        new UncaughtExceptionHandler() {
+            @Override
+            public void onUncaughtException(@NonNull Throwable throwable) {
+                Log.e("MyJavaApp", "Some RequestCallback isn't handling an exception...", throwable);
+            }
+        }
+    );
+}
+```
+
+All requests use coroutines under the hood and are Main thread safe.
+Results will be dispatched to the supplied callback on the Main thread.
+
+```java
+class StartExample {
+    
+    // ...
+    Task startTask = torManager.start(new RequestCallback<>() {
+        @Override
+        public void onSuccess(Object o) {
+            Log.d("MyJavaApp", "Tor started successfully");
+        }
+
+        @Override
+        public void onFailure(@NonNull Throwable throwable) {
+            Log.e("MyJavaApp", "Failed to start Tor", throwable);
+        }
+   });
+}
+```
 
 </details>
 
