@@ -18,14 +18,10 @@ package io.matthewnelson.kmp.tor.manager
 import io.matthewnelson.kmp.tor.controller.common.control.usecase.TorControlInfoGet
 import io.matthewnelson.kmp.tor.helper.TorTestHelper
 import io.matthewnelson.kmp.tor.manager.common.exceptions.InterruptedException
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.*
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
-import kotlin.test.fail
 
 class TorManagerIntegrationTest: TorTestHelper() {
 
@@ -43,12 +39,14 @@ class TorManagerIntegrationTest: TorTestHelper() {
         val getVersion = TorControlInfoGet.KeyWord.Status.Version.Current()
         val jobs = ArrayList<Job>(5)
         var failures = 0
+        var successes = 0
         repeat(5) { index ->
             launch {
                 val result = manager.infoGet(getVersion)
                 result.onSuccess {
                     // Don't fail, as the first one may make it through before being interrupted
                     println("Controller Action $index was processed when it should have been interrupted")
+                    successes++
                 }
                 result.onFailure { ex ->
                     assertTrue(ex is InterruptedException)
@@ -61,13 +59,19 @@ class TorManagerIntegrationTest: TorTestHelper() {
         }
 
         delay(50L)
+
+        // Cancellation of callers job should not
+        // produce any results
+        jobs[3].cancelAndJoin()
+
         manager.stop().getOrThrow()
 
         for (job in jobs) {
-            job.join()
+            job.cancelAndJoin()
         }
 
-        assertTrue(failures > 0)
+        assertEquals(5 - 1, failures)
+        assertEquals(0, successes)
 
         Unit
     }
