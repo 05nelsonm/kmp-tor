@@ -51,10 +51,11 @@ object env {
 
     /**
      * Modules:
-     *  - :library:controller:*
-     *  - :library:kmp-tor-common
      *  - :library:kmp-tor-internal
-     *  - :library:manager:*
+     *  - :library:controller:kmp-tor-controller
+     *  - :library:extensions:kmp-tor-ext-callback-controller
+     *  - :library:extensions:kmp-tor-ext-callback-manager
+     *  - :library:manager:kmp-tor-manager
      * */
     object kmpTor {
         const val holdPublication           = false
@@ -65,13 +66,30 @@ object env {
     }
 
     /**
-     * Module :library:kmp-tor (combined kmp-tor + binary distribution)
+     * Modules:
+     *  - :library:kmp-tor (combined tor binary + kmp-tor distribution)
      * */
     object kmpTorAll {
         const val holdPublication           = false
         object version {
             const val name                  = "$BINARY_VERSION_NAME+${kmpTor.version.name}"
             const val code                  = BINARY_VERSION_CODE + MANAGER_VERSION_CODE
+        }
+    }
+
+    /**
+     * Modules:
+     *  - :library:kmp-tor-common
+     *  - :library:controller:kmp-tor-controller-common
+     *  - :library:extensions:kmp-tor-ext-callback-controller-common
+     *  - :library:extensions:kmp-tor-ext-callback-manager-common
+     *  - :library:manager:kmp-tor-manager-common
+     * */
+    object kmpTorCommon {
+        const val holdPublication           = false
+        object version {
+            const val name                  = kmpTor.version.name
+            const val code                  = kmpTor.version.code
         }
     }
 }
