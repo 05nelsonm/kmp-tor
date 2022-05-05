@@ -87,8 +87,8 @@ dependencies {
 ```
 
 ```java
-// Wrapping TorManager instance in it's Callback instance
-class Example1 {
+// Wrapping TorManager instance in it's Callback instance (Java)
+public class Example1 {
     
     // ..
     TorManager instance = TorManager.newInstance(/* ... */);
@@ -107,8 +107,8 @@ All requests use coroutines under the hood and are Main thread safe.
 Results will be dispatched to the supplied callback on the Main thread.
 
 ```java
-// Multiple callbacks of different styles
-class Example2 {
+// Multiple callbacks of different styles (Java)
+public class Example2 {
     
     // ...
     Task startTask = torManager.start(
