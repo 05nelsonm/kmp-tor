@@ -26,7 +26,7 @@ import io.matthewnelson.kmp.tor.ext.callback.controller.common.TorCallback
 interface CallbackTorControlDropGuards {
 
     fun dropGuards(
-        failure: TorCallback<Throwable>,
+        failure: TorCallback<Throwable>?,
         success: TorCallback<Any?>,
     ): Task
 

@@ -28,13 +28,13 @@ interface CallbackTorControlInfoGet {
 
     fun infoGet(
         keyword: KeyWord,
-        failure: TorCallback<Throwable>,
+        failure: TorCallback<Throwable>?,
         success: TorCallback<String>,
     ): Task
 
     fun infoGet(
         keywords: Set<KeyWord>,
-        failure: TorCallback<Throwable>,
+        failure: TorCallback<Throwable>?,
         success: TorCallback<Map<String, String>>,
     ): Task
 

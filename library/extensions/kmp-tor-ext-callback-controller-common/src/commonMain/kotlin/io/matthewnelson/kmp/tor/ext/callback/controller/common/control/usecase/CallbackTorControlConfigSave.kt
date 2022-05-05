@@ -30,7 +30,7 @@ interface CallbackTorControlConfigSave {
 
     fun configSave(
         force: Boolean = false,
-        failure: TorCallback<Throwable>,
+        failure: TorCallback<Throwable>?,
         success: TorCallback<Any?>,
     ): Task
 

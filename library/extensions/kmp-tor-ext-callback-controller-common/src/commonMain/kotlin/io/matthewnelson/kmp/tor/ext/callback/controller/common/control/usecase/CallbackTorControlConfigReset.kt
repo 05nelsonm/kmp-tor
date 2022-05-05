@@ -32,14 +32,14 @@ interface CallbackTorControlConfigReset {
     fun configReset(
         setting: TorConfig.Setting<*>,
         setDefault: Boolean = true,
-        failure: TorCallback<Throwable>,
+        failure: TorCallback<Throwable>?,
         success: TorCallback<Any?>,
     ): Task
 
     fun configReset(
         settings: Set<TorConfig.Setting<*>>,
         setDefault: Boolean = true,
-        failure: TorCallback<Throwable>,
+        failure: TorCallback<Throwable>?,
         success: TorCallback<Any?>,
     ): Task
 

@@ -31,7 +31,7 @@ interface CallbackTorControlConfigLoad {
 
     fun configLoad(
         config: TorConfig,
-        failure: TorCallback<Throwable>,
+        failure: TorCallback<Throwable>?,
         success: TorCallback<Any?>,
     ): Task
 

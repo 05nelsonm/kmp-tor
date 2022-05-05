@@ -23,12 +23,12 @@ import io.matthewnelson.kmp.tor.manager.common.TorOperationManager
  * See [TorOperationManager]
  * */
 interface CallbackTorOperationManager {
-    fun start(failure: TorCallback<Throwable>, success: TorCallback<Any?>): Task
+    fun start(failure: TorCallback<Throwable>?, success: TorCallback<Any?>): Task
     fun startQuietly()
 
-    fun restart(failure: TorCallback<Throwable>, success: TorCallback<Any?>): Task
+    fun restart(failure: TorCallback<Throwable>?, success: TorCallback<Any?>): Task
     fun restartQuietly()
 
-    fun stop(failure: TorCallback<Throwable>, success: TorCallback<Any?>): Task
+    fun stop(failure: TorCallback<Throwable>?, success: TorCallback<Any?>): Task
     fun stopQuietly()
 }

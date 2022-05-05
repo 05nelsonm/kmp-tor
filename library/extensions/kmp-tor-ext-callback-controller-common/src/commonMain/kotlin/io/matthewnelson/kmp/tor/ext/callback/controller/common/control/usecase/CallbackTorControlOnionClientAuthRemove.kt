@@ -33,7 +33,7 @@ interface CallbackTorControlOnionClientAuthRemove {
 
     fun onionClientAuthRemove(
         address: OnionAddressV3,
-        failure: TorCallback<Throwable>,
+        failure: TorCallback<Throwable>?,
         success: TorCallback<Any?>,
     ): Task
 
