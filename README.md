@@ -21,8 +21,18 @@ dependencies {
 }
 ```
 
+```groovy
+// build.gradle
+dependencies {
+   def vTor = '0.4.6.10'
+   def vKmpTor = '0.1.0'
+   implementation "io.matthewnelson.kotlin-components:kmp-tor:$vTor+$vKmpTor"
+}
+```
+
 <details>
     <summary>Configuring an Android Project</summary>
+
 
  - See the Android section of [Configuring Gradle](https://github.com/05nelsonm/kmp-tor-binary/blob/master/README.md) 
    to setup things up so the Tor binaries are properly extracted upon app install.
@@ -41,6 +51,7 @@ dependencies {
 <details>
     <summary>Configuring a Java Project</summary>
 
+
  - See the [JavaFX Sample App Gradle Configuration](https://github.com/05nelsonm/kmp-tor/tree/master/samples/javafx/build.gradle.kts) 
    for a basic gradle/dependency configuration.  
  - See the [JavaFx Sample App](https://github.com/05nelsonm/kmp-tor/tree/master/samples/javafx/src/jvmMain/kotlin/io/matthewnelson/kmp/tor/sample/javafx/SampleApp.kt) 
@@ -54,6 +65,7 @@ dependencies {
 
 <details>
     <summary>Extensions (Callback - Non-Kotlin users)</summary>
+
 
 For Java projects (who can't use coroutines), you can "wrap" `TorManager` in an implementation
 that uses callbacks (ie. `CallbackTorManager`).
@@ -75,7 +87,8 @@ dependencies {
 ```
 
 ```java
-class WrapExample {
+// Wrapping TorManager instance in it's Callback instance
+class Example1 {
     
     // ..
     TorManager instance = TorManager.newInstance(/* ... */);
@@ -83,13 +96,10 @@ class WrapExample {
     // Wrap that mug...
     CallbackTorManager torManager = new CallbackTorManager(
         instance,
-        new UncaughtExceptionHandler() {
-            @Override
-            public void onUncaughtException(@NonNull Throwable throwable) {
-                Log.e("MyJavaApp", "Some RequestCallback isn't handling an exception...", throwable);
-            }
+        uncaughtException -> {
+            Log.e("MyJavaApp", "Some TorCallback isn't handling an exception...", uncaughtException);
         }
-    );
+     );
 }
 ```
 
@@ -97,20 +107,41 @@ All requests use coroutines under the hood and are Main thread safe.
 Results will be dispatched to the supplied callback on the Main thread.
 
 ```java
-class StartExample {
+// Multiple callbacks of different styles
+class Example2 {
     
     // ...
-    Task startTask = torManager.start(new RequestCallback<>() {
-        @Override
-        public void onSuccess(Object o) {
-            Log.d("MyJavaApp", "Tor started successfully");
-        }
+    Task startTask = torManager.start(
+        t -> Log.e(TAG, "Failed to start Tor", t),
+        startSuccess -> {
 
-        @Override
-        public void onFailure(@NonNull Throwable throwable) {
-            Log.e("MyJavaApp", "Failed to start Tor", throwable);
+            Log.d(TAG, "Tor started successfully");
+
+            Task restartTask = torManager.restart(
+                (TorCallback<Throwable>) t -> Log.e(TAG, "Failed to restart Tor", t),
+                (TorCallback<Object>) restartSuccess -> {
+
+                    Log.d(TAG, "Tor restarted successfully");
+
+                    Task restartTask2 = torManager.restart(
+                        new TorCallback<Throwable>() {
+                            @Override
+                            public void invoke(Throwable throwable) {
+                                // Send it to our instance's uncaughtExceptionHandler
+                                throw throwable;
+                            }
+                        },
+                        new TorCallback<Object>() {
+                            @Override
+                            public void invoke(Object o) {
+                                Log.d(TAG, "Tor restarted successfully");
+                            }
+                        }
+                    );
+                }
+            );
         }
-   });
+    );
 }
 ```
 
