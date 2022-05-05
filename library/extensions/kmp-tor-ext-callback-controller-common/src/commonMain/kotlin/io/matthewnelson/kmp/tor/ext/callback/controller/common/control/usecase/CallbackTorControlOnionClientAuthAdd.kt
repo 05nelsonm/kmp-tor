@@ -58,7 +58,7 @@ interface CallbackTorControlOnionClientAuthAdd {
         key: PrivateKey,
         clientName: ClientName?,
         flags: Set<Flag>?,
-        failure: TorCallback<Throwable>,
+        failure: TorCallback<Throwable>?,
         success: TorCallback<Any?>,
     ): Task
 

@@ -33,7 +33,7 @@ interface CallbackTorControlSignal {
 
     fun signal(
         signal: Signal,
-        failure: TorCallback<Throwable>,
+        failure: TorCallback<Throwable>?,
         success: TorCallback<Any?>,
     ): Task
 

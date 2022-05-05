@@ -33,7 +33,7 @@ interface CallbackTorControlOnionDel {
 
     fun onionDel(
         address: OnionAddress,
-        failure: TorCallback<Throwable>,
+        failure: TorCallback<Throwable>?,
         success: TorCallback<Any?>,
     ): Task
 

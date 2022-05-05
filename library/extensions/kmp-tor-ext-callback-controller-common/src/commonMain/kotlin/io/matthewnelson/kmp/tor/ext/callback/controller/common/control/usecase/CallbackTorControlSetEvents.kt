@@ -31,7 +31,7 @@ interface CallbackTorControlSetEvents {
 
     fun setEvents(
         events: Set<TorEvent>,
-        failure: TorCallback<Throwable>,
+        failure: TorCallback<Throwable>?,
         success: TorCallback<Any?>,
     ): Task
 

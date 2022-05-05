@@ -27,7 +27,7 @@ interface CallbackTorControlAuthenticate {
 
     fun authenticate(
         bytes: ByteArray,
-        failure: TorCallback<Throwable>,
+        failure: TorCallback<Throwable>?,
         success: TorCallback<Any?>,
     ): Task
 

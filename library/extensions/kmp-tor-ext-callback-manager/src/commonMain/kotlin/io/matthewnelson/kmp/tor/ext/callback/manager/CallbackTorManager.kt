@@ -110,7 +110,7 @@ class CallbackTorManager(
         return delegate.removeListener(listener)
     }
 
-    override fun start(failure: TorCallback<Throwable>, success: TorCallback<Any?>): Task {
+    override fun start(failure: TorCallback<Throwable>?, success: TorCallback<Any?>): Task {
         failure.shouldFailImmediately(isDestroyed) { destroyedException() }?.let { return it }
 
         return scope.launch {
@@ -122,7 +122,7 @@ class CallbackTorManager(
         delegate.startQuietly()
     }
 
-    override fun restart(failure: TorCallback<Throwable>, success: TorCallback<Any?>): Task {
+    override fun restart(failure: TorCallback<Throwable>?, success: TorCallback<Any?>): Task {
         failure.shouldFailImmediately(isDestroyed) { destroyedException() }?.let { return it }
 
         return scope.launch {
@@ -134,7 +134,7 @@ class CallbackTorManager(
         delegate.restartQuietly()
     }
 
-    override fun stop(failure: TorCallback<Throwable>, success: TorCallback<Any?>): Task {
+    override fun stop(failure: TorCallback<Throwable>?, success: TorCallback<Any?>): Task {
         failure.shouldFailImmediately(isDestroyed) { destroyedException() }?.let { return it }
 
         return scope.launch {
@@ -148,7 +148,7 @@ class CallbackTorManager(
 
     override fun configGet(
         setting: TorConfig.Setting<*>,
-        failure: TorCallback<Throwable>,
+        failure: TorCallback<Throwable>?,
         success: TorCallback<ConfigEntry>
     ): Task {
         failure.shouldFailImmediately(supervisor.isCancelled) {
@@ -162,7 +162,7 @@ class CallbackTorManager(
 
     override fun configGet(
         settings: Set<TorConfig.Setting<*>>,
-        failure: TorCallback<Throwable>,
+        failure: TorCallback<Throwable>?,
         success: TorCallback<List<ConfigEntry>>
     ): Task {
         failure.shouldFailImmediately(supervisor.isCancelled) {
@@ -176,7 +176,7 @@ class CallbackTorManager(
 
     override fun configLoad(
         config: TorConfig,
-        failure: TorCallback<Throwable>,
+        failure: TorCallback<Throwable>?,
         success: TorCallback<Any?>
     ): Task {
         failure.shouldFailImmediately(supervisor.isCancelled) {
@@ -191,7 +191,7 @@ class CallbackTorManager(
     override fun configReset(
         setting: TorConfig.Setting<*>,
         setDefault: Boolean,
-        failure: TorCallback<Throwable>,
+        failure: TorCallback<Throwable>?,
         success: TorCallback<Any?>
     ): Task {
         failure.shouldFailImmediately(supervisor.isCancelled) {
@@ -206,7 +206,7 @@ class CallbackTorManager(
     override fun configReset(
         settings: Set<TorConfig.Setting<*>>,
         setDefault: Boolean,
-        failure: TorCallback<Throwable>,
+        failure: TorCallback<Throwable>?,
         success: TorCallback<Any?>
     ): Task {
         failure.shouldFailImmediately(supervisor.isCancelled) {
@@ -220,7 +220,7 @@ class CallbackTorManager(
 
     override fun configSave(
         force: Boolean,
-        failure: TorCallback<Throwable>,
+        failure: TorCallback<Throwable>?,
         success: TorCallback<Any?>
     ): Task {
         failure.shouldFailImmediately(supervisor.isCancelled) {
@@ -234,7 +234,7 @@ class CallbackTorManager(
 
     override fun configSet(
         setting: TorConfig.Setting<*>,
-        failure: TorCallback<Throwable>,
+        failure: TorCallback<Throwable>?,
         success: TorCallback<Any?>
     ): Task {
         failure.shouldFailImmediately(supervisor.isCancelled) {
@@ -248,7 +248,7 @@ class CallbackTorManager(
 
     override fun configSet(
         settings: Set<TorConfig.Setting<*>>,
-        failure: TorCallback<Throwable>,
+        failure: TorCallback<Throwable>?,
         success: TorCallback<Any?>
     ): Task {
         failure.shouldFailImmediately(supervisor.isCancelled) {
@@ -260,7 +260,7 @@ class CallbackTorManager(
         }.toTask()
     }
 
-    override fun dropGuards(failure: TorCallback<Throwable>, success: TorCallback<Any?>): Task {
+    override fun dropGuards(failure: TorCallback<Throwable>?, success: TorCallback<Any?>): Task {
         failure.shouldFailImmediately(supervisor.isCancelled) {
             destroyedException()
         }?.let { return it }
@@ -272,7 +272,7 @@ class CallbackTorManager(
 
     override fun infoGet(
         keyword: TorControlInfoGet.KeyWord,
-        failure: TorCallback<Throwable>,
+        failure: TorCallback<Throwable>?,
         success: TorCallback<String>
     ): Task {
         failure.shouldFailImmediately(supervisor.isCancelled) {
@@ -286,7 +286,7 @@ class CallbackTorManager(
 
     override fun infoGet(
         keywords: Set<TorControlInfoGet.KeyWord>,
-        failure: TorCallback<Throwable>,
+        failure: TorCallback<Throwable>?,
         success: TorCallback<Map<String, String>>
     ): Task {
         failure.shouldFailImmediately(supervisor.isCancelled) {
@@ -303,7 +303,7 @@ class CallbackTorManager(
         hsPorts: Set<TorConfig.Setting.HiddenService.Ports>,
         flags: Set<TorControlOnionAdd.Flag>?,
         maxStreams: TorConfig.Setting.HiddenService.MaxStreams?,
-        failure: TorCallback<Throwable>,
+        failure: TorCallback<Throwable>?,
         success: TorCallback<HiddenServiceEntry>
     ): Task {
         failure.shouldFailImmediately(supervisor.isCancelled) {
@@ -320,7 +320,7 @@ class CallbackTorManager(
         hsPorts: Set<TorConfig.Setting.HiddenService.Ports>,
         flags: Set<TorControlOnionAdd.Flag>?,
         maxStreams: TorConfig.Setting.HiddenService.MaxStreams?,
-        failure: TorCallback<Throwable>,
+        failure: TorCallback<Throwable>?,
         success: TorCallback<HiddenServiceEntry>
     ): Task {
         failure.shouldFailImmediately(supervisor.isCancelled) {
@@ -334,7 +334,7 @@ class CallbackTorManager(
 
     override fun onionDel(
         address: OnionAddress,
-        failure: TorCallback<Throwable>,
+        failure: TorCallback<Throwable>?,
         success: TorCallback<Any?>
     ): Task {
         failure.shouldFailImmediately(supervisor.isCancelled) {
@@ -351,7 +351,7 @@ class CallbackTorManager(
         key: OnionClientAuth.PrivateKey,
         clientName: ClientName?,
         flags: Set<TorControlOnionClientAuth.Flag>?,
-        failure: TorCallback<Throwable>,
+        failure: TorCallback<Throwable>?,
         success: TorCallback<Any?>
     ): Task {
         failure.shouldFailImmediately(supervisor.isCancelled) {
@@ -365,7 +365,7 @@ class CallbackTorManager(
 
     override fun onionClientAuthRemove(
         address: OnionAddressV3,
-        failure: TorCallback<Throwable>,
+        failure: TorCallback<Throwable>?,
         success: TorCallback<Any?>
     ): Task {
         failure.shouldFailImmediately(supervisor.isCancelled) {
@@ -378,7 +378,7 @@ class CallbackTorManager(
     }
 
     override fun onionClientAuthView(
-        failure: TorCallback<Throwable>,
+        failure: TorCallback<Throwable>?,
         success: TorCallback<List<ClientAuthEntry>>
     ): Task {
         failure.shouldFailImmediately(supervisor.isCancelled) {
@@ -392,7 +392,7 @@ class CallbackTorManager(
 
     override fun onionClientAuthView(
         address: OnionAddressV3,
-        failure: TorCallback<Throwable>,
+        failure: TorCallback<Throwable>?,
         success: TorCallback<ClientAuthEntry>
     ): Task {
         failure.shouldFailImmediately(supervisor.isCancelled) {
@@ -406,7 +406,7 @@ class CallbackTorManager(
 
     override fun setEvents(
         events: Set<TorEvent>,
-        failure: TorCallback<Throwable>,
+        failure: TorCallback<Throwable>?,
         success: TorCallback<Any?>
     ): Task {
         failure.shouldFailImmediately(supervisor.isCancelled) {
@@ -420,7 +420,7 @@ class CallbackTorManager(
 
     override fun signal(
         signal: TorControlSignal.Signal,
-        failure: TorCallback<Throwable>,
+        failure: TorCallback<Throwable>?,
         success: TorCallback<Any?>
     ): Task {
         failure.shouldFailImmediately(supervisor.isCancelled) {

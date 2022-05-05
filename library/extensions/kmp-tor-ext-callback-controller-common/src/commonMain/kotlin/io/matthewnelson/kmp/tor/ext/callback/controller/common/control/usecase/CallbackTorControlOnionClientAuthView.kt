@@ -34,7 +34,7 @@ interface CallbackTorControlOnionClientAuthView {
      * Returns a list of all [ClientAuthEntry]'s for all [OnionAddressV3]'s
      * */
     fun onionClientAuthView(
-        failure: TorCallback<Throwable>,
+        failure: TorCallback<Throwable>?,
         success: TorCallback<List<ClientAuthEntry>>,
     ): Task
 
@@ -43,7 +43,7 @@ interface CallbackTorControlOnionClientAuthView {
      * */
     fun onionClientAuthView(
         address: OnionAddressV3,
-        failure: TorCallback<Throwable>,
+        failure: TorCallback<Throwable>?,
         success: TorCallback<ClientAuthEntry>,
     ): Task
 

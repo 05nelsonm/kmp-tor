@@ -79,7 +79,7 @@ interface CallbackTorControlOnionAdd {
         hsPorts: Set<TorConfig.Setting.HiddenService.Ports>,
         flags: Set<Flag>? = null,
         maxStreams: TorConfig.Setting.HiddenService.MaxStreams? = null,
-        failure: TorCallback<Throwable>,
+        failure: TorCallback<Throwable>?,
         success: TorCallback<HiddenServiceEntry>,
     ): Task
 
@@ -92,7 +92,7 @@ interface CallbackTorControlOnionAdd {
         hsPorts: Set<TorConfig.Setting.HiddenService.Ports>,
         flags: Set<Flag>? = null,
         maxStreams: TorConfig.Setting.HiddenService.MaxStreams? = null,
-        failure: TorCallback<Throwable>,
+        failure: TorCallback<Throwable>?,
         success: TorCallback<HiddenServiceEntry>,
     ): Task
 }

@@ -32,13 +32,13 @@ interface CallbackTorControlConfigSet {
 
     fun configSet(
         setting: TorConfig.Setting<*>,
-        failure: TorCallback<Throwable>,
+        failure: TorCallback<Throwable>?,
         success: TorCallback<Any?>,
     ): Task
 
     fun configSet(
         settings: Set<TorConfig.Setting<*>>,
-        failure: TorCallback<Throwable>,
+        failure: TorCallback<Throwable>?,
         success: TorCallback<Any?>,
     ): Task
 
