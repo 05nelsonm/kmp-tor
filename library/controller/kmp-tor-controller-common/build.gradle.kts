@@ -66,6 +66,6 @@ kmpConfiguration {
 kmpPublish {
     setupModule(
         pomDescription = "Kotlin Components' TorController common code",
-        holdPublication = env.kmpTor.holdPublication
+        holdPublication = env.kmpTorCommon.holdPublication
     )
 }
