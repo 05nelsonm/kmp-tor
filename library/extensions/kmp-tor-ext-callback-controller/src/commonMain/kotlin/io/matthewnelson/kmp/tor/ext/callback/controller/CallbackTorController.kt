@@ -78,7 +78,6 @@ class CallbackTorController(
         }
     }
 
-    @get:JvmName("isConnected")
     val isConnected: Boolean get() = delegate.isConnected
     fun disconnect() {
         delegate.disconnect()
