@@ -39,7 +39,6 @@ import io.matthewnelson.kmp.tor.manager.common.state.TorNetworkState
 import io.matthewnelson.kmp.tor.manager.common.state.TorState
 import io.matthewnelson.kmp.tor.manager.common.state.TorStateManager
 import kotlinx.coroutines.*
-import kotlin.jvm.JvmField
 
 /**
  * Wrapper for [TorManager] such that callbacks
@@ -47,7 +46,7 @@ import kotlin.jvm.JvmField
  * */
 class CallbackTorManager(
     private val delegate: TorManager,
-    private val handler: UncaughtExceptionHandler,
+    private val uncaughtExceptionHandler: TorCallback<Throwable>,
 ) : CallbackDestroyable,
     CallbackTorControlManager,
     CallbackTorOperationManager,
@@ -79,7 +78,7 @@ class CallbackTorManager(
             CoroutineExceptionHandler { _, t ->
                 // Pass all exceptions that are thrown from RequestCallback
                 // to the handler.
-                handler.onUncaughtException(t)
+                uncaughtExceptionHandler.invoke(t)
             }
         )
     }

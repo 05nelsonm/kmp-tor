@@ -16,7 +16,6 @@
 package io.matthewnelson.kmp.tor.ext.callback.manager
 
 import io.matthewnelson.kmp.tor.controller.common.control.usecase.TorControlInfoGet
-import io.matthewnelson.kmp.tor.ext.callback.controller.common.UncaughtExceptionHandler
 import io.matthewnelson.kmp.tor.ext.callback.controller.common.RequestCallback
 import io.matthewnelson.kmp.tor.ext.callback.controller.common.Task
 import io.matthewnelson.kmp.tor.helper.TorTestHelper
@@ -32,11 +31,9 @@ class CallbackTorManagerIntegrationTest: TorTestHelper() {
 
     @Test
     fun givenMultipleControllerActions_whenStartStopOrRestarted_actionsAreInterrupted() = runBlocking {
-        val torManager = CallbackTorManager(manager, object: UncaughtExceptionHandler {
-            override fun onUncaughtException(t: Throwable) {
-                t.printStackTrace()
-            }
-        })
+        val torManager = CallbackTorManager(manager) { result ->
+            result.printStackTrace()
+        }
 
 
         suspendCancellableCoroutine<Any?> { continuation ->

@@ -41,7 +41,7 @@ import kotlinx.coroutines.*
  * */
 class CallbackTorController(
     private val delegate: TorController,
-    private val handler: UncaughtExceptionHandler,
+    private val uncaughtExceptionHandler: TorCallback<Throwable>,
 ) : CallbackTorControlProcessor,
     TorEventProcessor<TorEvent.SealedListener>
 {
@@ -63,7 +63,7 @@ class CallbackTorController(
             CoroutineExceptionHandler { _, t ->
                 // Pass all exceptions that are thrown from RequestCallback
                 // to the handler.
-                handler.onUncaughtException(t)
+                uncaughtExceptionHandler.invoke(t)
             }
         )
 

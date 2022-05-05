@@ -19,3 +19,8 @@ inline fun <T: Any?> Result<T>.toCallback(callback: RequestCallback<T>) {
     onFailure { callback.onFailure(it) }
     onSuccess { callback.onSuccess(it) }
 }
+
+inline fun <T: Any?> Result<T>.toCallback(failure: TorCallback<Throwable>, success: TorCallback<T>) {
+    onFailure { failure.invoke(it) }
+    onSuccess { success.invoke(it) }
+}

@@ -15,6 +15,6 @@
  **/
 package io.matthewnelson.kmp.tor.ext.callback.controller.common
 
-interface UncaughtExceptionHandler {
-    fun onUncaughtException(t: Throwable)
+fun interface TorCallback<in T: Any?> {
+    fun invoke(result: T)
 }
