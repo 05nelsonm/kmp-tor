@@ -16,8 +16,8 @@
 package io.matthewnelson.kmp.tor.ext.callback.controller.common.control.usecase
 
 import io.matthewnelson.kmp.tor.common.address.OnionAddressV3
-import io.matthewnelson.kmp.tor.ext.callback.controller.common.RequestCallback
 import io.matthewnelson.kmp.tor.ext.callback.controller.common.Task
+import io.matthewnelson.kmp.tor.ext.callback.controller.common.TorCallback
 import io.matthewnelson.kmp.tor.ext.callback.controller.common.control.CallbackTorControlOnionClientAuth
 
 /**
@@ -31,6 +31,10 @@ import io.matthewnelson.kmp.tor.ext.callback.controller.common.control.CallbackT
  * */
 interface CallbackTorControlOnionClientAuthRemove {
 
-    fun onionClientAuthRemove(address: OnionAddressV3, callback: RequestCallback<Any?>): Task
+    fun onionClientAuthRemove(
+        address: OnionAddressV3,
+        failure: TorCallback<Throwable>,
+        success: TorCallback<Any?>,
+    ): Task
 
 }

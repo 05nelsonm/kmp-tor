@@ -15,8 +15,8 @@
  **/
 package io.matthewnelson.kmp.tor.ext.callback.controller.common.control.usecase
 
-import io.matthewnelson.kmp.tor.ext.callback.controller.common.RequestCallback
 import io.matthewnelson.kmp.tor.ext.callback.controller.common.Task
+import io.matthewnelson.kmp.tor.ext.callback.controller.common.TorCallback
 import io.matthewnelson.kmp.tor.ext.callback.controller.common.control.CallbackTorControlConfig
 
 /**
@@ -28,6 +28,10 @@ import io.matthewnelson.kmp.tor.ext.callback.controller.common.control.CallbackT
  * */
 interface CallbackTorControlConfigSave {
 
-    fun configSave(force: Boolean = false, callback: RequestCallback<Any?>): Task
+    fun configSave(
+        force: Boolean = false,
+        failure: TorCallback<Throwable>,
+        success: TorCallback<Any?>,
+    ): Task
 
 }

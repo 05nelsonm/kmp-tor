@@ -16,8 +16,8 @@
 package io.matthewnelson.kmp.tor.ext.callback.controller.common.control.usecase
 
 import io.matthewnelson.kmp.tor.controller.common.config.TorConfig
-import io.matthewnelson.kmp.tor.ext.callback.controller.common.RequestCallback
 import io.matthewnelson.kmp.tor.ext.callback.controller.common.Task
+import io.matthewnelson.kmp.tor.ext.callback.controller.common.TorCallback
 import io.matthewnelson.kmp.tor.ext.callback.controller.common.control.CallbackTorControlConfig
 
 /**
@@ -30,8 +30,16 @@ import io.matthewnelson.kmp.tor.ext.callback.controller.common.control.CallbackT
  * */
 interface CallbackTorControlConfigSet {
 
-    fun configSet(setting: TorConfig.Setting<*>, callback: RequestCallback<Any?>): Task
+    fun configSet(
+        setting: TorConfig.Setting<*>,
+        failure: TorCallback<Throwable>,
+        success: TorCallback<Any?>,
+    ): Task
 
-    fun configSet(settings: Set<TorConfig.Setting<*>>, callback: RequestCallback<Any?>): Task
+    fun configSet(
+        settings: Set<TorConfig.Setting<*>>,
+        failure: TorCallback<Throwable>,
+        success: TorCallback<Any?>,
+    ): Task
 
 }

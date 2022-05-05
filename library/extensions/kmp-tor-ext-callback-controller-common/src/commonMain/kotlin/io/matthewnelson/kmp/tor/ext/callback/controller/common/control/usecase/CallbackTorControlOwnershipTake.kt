@@ -15,8 +15,8 @@
  **/
 package io.matthewnelson.kmp.tor.ext.callback.controller.common.control.usecase
 
-import io.matthewnelson.kmp.tor.ext.callback.controller.common.RequestCallback
 import io.matthewnelson.kmp.tor.ext.callback.controller.common.Task
+import io.matthewnelson.kmp.tor.ext.callback.controller.common.TorCallback
 
 /**
  * "TAKEOWNERSHIP" CRLF
@@ -25,6 +25,9 @@ import io.matthewnelson.kmp.tor.ext.callback.controller.common.Task
  * */
 interface CallbackTorControlOwnershipTake {
 
-    fun ownershipTake(callback: RequestCallback<Any?>): Task
+    fun ownershipTake(
+        failure: TorCallback<Throwable>,
+        success: TorCallback<Any?>,
+    ): Task
 
 }
