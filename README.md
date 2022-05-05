@@ -118,7 +118,7 @@ class Example2 {
             Log.d(TAG, "Tor started successfully");
 
             Task restartTask = torManager.restart(
-                (TorCallback<Throwable>) t -> Log.e(TAG, "Failed to restart Tor", t),
+                null, // fail silently by omitting failure callback
                 (TorCallback<Object>) restartSuccess -> {
 
                     Log.d(TAG, "Tor restarted successfully");
