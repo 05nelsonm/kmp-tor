@@ -15,6 +15,7 @@
  **/
 package io.matthewnelson.kmp.tor.common.address
 
+import io.matthewnelson.kmp.tor.common.annotation.ExperimentalTorApi
 import io.matthewnelson.kmp.tor.common.annotation.SealedValueClass
 import kotlin.jvm.JvmInline
 import kotlin.jvm.JvmStatic
@@ -26,6 +27,7 @@ import kotlin.jvm.JvmStatic
  * @throws [IllegalArgumentException] if port is not valid
  * */
 @SealedValueClass
+@OptIn(ExperimentalTorApi::class)
 sealed interface PortProxy: Port {
 
     companion object {

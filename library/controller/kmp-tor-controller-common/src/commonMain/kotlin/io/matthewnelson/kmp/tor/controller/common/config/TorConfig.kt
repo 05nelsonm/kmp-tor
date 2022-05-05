@@ -17,6 +17,7 @@ package io.matthewnelson.kmp.tor.controller.common.config
 
 import io.matthewnelson.kmp.tor.common.address.Port
 import io.matthewnelson.kmp.tor.common.address.PortProxy
+import io.matthewnelson.kmp.tor.common.annotation.ExperimentalTorApi
 import io.matthewnelson.kmp.tor.common.annotation.InternalTorApi
 import io.matthewnelson.kmp.tor.common.annotation.SealedValueClass
 import io.matthewnelson.kmp.tor.common.util.TorStrings.REDACTED
@@ -38,6 +39,7 @@ import kotlin.reflect.KClass
  * @see [Setting]
  * @see [Option]
  * */
+@OptIn(ExperimentalTorApi::class, InternalTorApi::class)
 @Suppress("RemoveRedundantQualifierName", "SpellCheckingInspection")
 class TorConfig private constructor(
     @JvmField
@@ -63,7 +65,6 @@ class TorConfig private constructor(
         return 17 * 31 + text.hashCode()
     }
 
-    @OptIn(InternalTorApi::class)
     override fun toString(): String {
         return "TorConfig(settings=$REDACTED,text=$REDACTED)"
     }
@@ -152,7 +153,6 @@ class TorConfig private constructor(
             setting.value?.let { settings.add(setting.clone()) } ?: remove(setting)
         }
 
-        @OptIn(InternalTorApi::class)
         fun build(): TorConfig {
             val sb = StringBuilder()
 

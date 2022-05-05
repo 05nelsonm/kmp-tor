@@ -18,6 +18,11 @@ package io.matthewnelson.kmp.tor.common.annotation
 import kotlin.jvm.JvmInline
 
 /**
+ * This annotation does absolutely nothing (currently)
+ * and is for informational purposes only. It is marked
+ * as [ExperimentalTorApi] and subject to change/removal
+ * at any time.
+ *
  * Denotes a sealed interface as having an underlying
  * value class annotated with [JvmInline] and can be
  * instantiated in Kotlin just like any other class.
@@ -70,6 +75,7 @@ import kotlin.jvm.JvmInline
  *
  * @examples [io.matthewnelson.kmp.tor.common.address.Port]
  * */
+@ExperimentalTorApi
 @Target(AnnotationTarget.CLASS)
 @Retention(AnnotationRetention.BINARY)
 annotation class SealedValueClass
