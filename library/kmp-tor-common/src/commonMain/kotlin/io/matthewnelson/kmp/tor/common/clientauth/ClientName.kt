@@ -15,6 +15,7 @@
  **/
 package io.matthewnelson.kmp.tor.common.clientauth
 
+import io.matthewnelson.kmp.tor.common.annotation.ExperimentalTorApi
 import io.matthewnelson.kmp.tor.common.annotation.SealedValueClass
 import kotlin.jvm.JvmInline
 import kotlin.jvm.JvmStatic
@@ -31,6 +32,7 @@ import kotlin.jvm.JvmStatic
  * @see [RealClientName]
  * */
 @SealedValueClass
+@OptIn(ExperimentalTorApi::class)
 sealed interface ClientName {
 
     val value: String

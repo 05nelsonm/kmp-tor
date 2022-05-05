@@ -19,6 +19,7 @@ import io.matthewnelson.component.base64.Base64
 import io.matthewnelson.component.base64.encodeBase64
 import io.matthewnelson.component.encoding.base32.Base32
 import io.matthewnelson.component.encoding.base32.decodeBase32ToArray
+import io.matthewnelson.kmp.tor.common.annotation.ExperimentalTorApi
 import io.matthewnelson.kmp.tor.common.annotation.SealedValueClass
 import io.matthewnelson.kmp.tor.common.util.descriptorString
 import kotlin.jvm.JvmInline
@@ -32,8 +33,9 @@ import kotlin.jvm.JvmStatic
  * @throws [IllegalArgumentException] if [value] is not a 52 character base32
  *  encoded (without padding '=') String
  * */
-@Suppress("ClassName")
 @SealedValueClass
+@Suppress("ClassName")
+@OptIn(ExperimentalTorApi::class)
 sealed interface OnionClientAuthPublicKey_B32_X25519: OnionClientAuth.PublicKey {
 
     companion object {
