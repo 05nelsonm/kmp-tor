@@ -141,6 +141,7 @@ kmpConfiguration {
             dependencies {
                 implementation(depsTest.kotlin.coroutines)
                 implementation(kotlin("test"))
+                implementation(project(":library:extensions:kmp-tor-ext-callback-manager"))
             }
         },
         kotlin = {
