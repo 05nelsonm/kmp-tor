@@ -13,8 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-package io.matthewnelson.kmp.tor.ext.callback.controller
+package io.matthewnelson.kmp.tor.ext.callback.controller.common
 
-interface DisconnectCallback {
-    fun onDisconnect(controller: CallbackTorController)
+import io.matthewnelson.kmp.tor.common.annotation.InternalTorApi
+
+fun interface TorCallback<in T: Any?> {
+    fun invoke(result: T)
+}
+
+@InternalTorApi
+inline fun TorCallback<Throwable>?.shouldFailImmediately(
+    failure: Boolean,
+    exceptionProvider: () -> Exception,
+): Task? {
+    return if (failure) {
+        this?.invoke(exceptionProvider.invoke())
+        EmptyTask
+    } else {
+        null
+    }
 }

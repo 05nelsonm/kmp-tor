@@ -18,6 +18,7 @@ package io.matthewnelson.kmp.tor.ext.callback.controller
 import io.matthewnelson.kmp.tor.common.address.OnionAddress
 import io.matthewnelson.kmp.tor.common.address.OnionAddressV3
 import io.matthewnelson.kmp.tor.common.annotation.ExperimentalTorApi
+import io.matthewnelson.kmp.tor.common.annotation.InternalTorApi
 import io.matthewnelson.kmp.tor.common.clientauth.ClientName
 import io.matthewnelson.kmp.tor.common.clientauth.OnionClientAuth
 import io.matthewnelson.kmp.tor.controller.TorController
@@ -39,9 +40,10 @@ import kotlinx.coroutines.*
  * Wrapper for [TorController] such that callbacks
  * can be used in lieu of suspension functions.
  * */
+@OptIn(InternalTorApi::class)
 class CallbackTorController(
     private val delegate: TorController,
-    private val handler: UncaughtExceptionHandler,
+    private val uncaughtExceptionHandler: TorCallback<Throwable>,
 ) : CallbackTorControlProcessor,
     TorEventProcessor<TorEvent.SealedListener>
 {
@@ -63,7 +65,7 @@ class CallbackTorController(
             CoroutineExceptionHandler { _, t ->
                 // Pass all exceptions that are thrown from RequestCallback
                 // to the handler.
-                handler.onUncaughtException(t)
+                uncaughtExceptionHandler.invoke(t)
             }
         )
 
@@ -80,10 +82,10 @@ class CallbackTorController(
     }
 
     @ExperimentalTorApi
-    fun onDisconnect(callback: DisconnectCallback?) {
+    fun onDisconnect(callback: TorCallback<CallbackTorController>?) {
         delegate.onDisconnect {
             supervisor.cancel()
-            callback?.onDisconnect(this)
+            callback?.invoke(this)
         }
     }
 
@@ -95,146 +97,169 @@ class CallbackTorController(
         return delegate.removeListener(listener)
     }
 
-    override fun authenticate(bytes: ByteArray, callback: RequestCallback<Any?>): Task {
-        callback.shouldFailImmediately(supervisor.isCancelled) {
-            provideShutdownException()
+    override fun authenticate(
+        bytes: ByteArray,
+        failure: TorCallback<Throwable>,
+        success: TorCallback<Any?>
+    ): Task {
+        failure.shouldFailImmediately(supervisor.isCancelled) {
+            shutdownException()
         }?.let { return it }
 
         return scope.launch {
-            delegate.authenticate(bytes).toCallback(callback)
+            delegate.authenticate(bytes).toCallback(failure, success)
         }.toTask()
     }
 
     override fun configGet(
         setting: TorConfig.Setting<*>,
-        callback: RequestCallback<ConfigEntry>
+        failure: TorCallback<Throwable>,
+        success: TorCallback<ConfigEntry>
     ): Task {
-        callback.shouldFailImmediately(supervisor.isCancelled) {
-            provideShutdownException()
+        failure.shouldFailImmediately(supervisor.isCancelled) {
+            shutdownException()
         }?.let { return it }
 
         return scope.launch {
-            delegate.configGet(setting).toCallback(callback)
+            delegate.configGet(setting).toCallback(failure, success)
         }.toTask()
     }
 
     override fun configGet(
         settings: Set<TorConfig.Setting<*>>,
-        callback: RequestCallback<List<ConfigEntry>>
+        failure: TorCallback<Throwable>,
+        success: TorCallback<List<ConfigEntry>>
     ): Task {
-        callback.shouldFailImmediately(supervisor.isCancelled) {
-            provideShutdownException()
+        failure.shouldFailImmediately(supervisor.isCancelled) {
+            shutdownException()
         }?.let { return it }
 
         return scope.launch {
-            delegate.configGet(settings).toCallback(callback)
+            delegate.configGet(settings).toCallback(failure, success)
         }.toTask()
     }
 
-    override fun configLoad(config: TorConfig, callback: RequestCallback<Any?>): Task {
-        callback.shouldFailImmediately(supervisor.isCancelled) {
-            provideShutdownException()
+    override fun configLoad(
+        config: TorConfig,
+        failure: TorCallback<Throwable>,
+        success: TorCallback<Any?>
+    ): Task {
+        failure.shouldFailImmediately(supervisor.isCancelled) {
+            shutdownException()
         }?.let { return it }
 
         return scope.launch {
-            delegate.configLoad(config).toCallback(callback)
+            delegate.configLoad(config).toCallback(failure, success)
         }.toTask()
     }
 
     override fun configReset(
         setting: TorConfig.Setting<*>,
         setDefault: Boolean,
-        callback: RequestCallback<Any?>
+        failure: TorCallback<Throwable>,
+        success: TorCallback<Any?>
     ): Task {
-        callback.shouldFailImmediately(supervisor.isCancelled) {
-            provideShutdownException()
+        failure.shouldFailImmediately(supervisor.isCancelled) {
+            shutdownException()
         }?.let { return it }
 
         return scope.launch {
-            delegate.configReset(setting, setDefault).toCallback(callback)
+            delegate.configReset(setting, setDefault).toCallback(failure, success)
         }.toTask()
     }
 
     override fun configReset(
         settings: Set<TorConfig.Setting<*>>,
         setDefault: Boolean,
-        callback: RequestCallback<Any?>
+        failure: TorCallback<Throwable>,
+        success: TorCallback<Any?>
     ): Task {
-        callback.shouldFailImmediately(supervisor.isCancelled) {
-            provideShutdownException()
+        failure.shouldFailImmediately(supervisor.isCancelled) {
+            shutdownException()
         }?.let { return it }
 
         return scope.launch {
-            delegate.configReset(settings, setDefault).toCallback(callback)
+            delegate.configReset(settings, setDefault).toCallback(failure, success)
         }.toTask()
     }
 
-    override fun configSave(force: Boolean, callback: RequestCallback<Any?>): Task {
-        callback.shouldFailImmediately(supervisor.isCancelled) {
-            provideShutdownException()
+    override fun configSave(
+        force: Boolean,
+        failure: TorCallback<Throwable>,
+        success: TorCallback<Any?>
+    ): Task {
+        failure.shouldFailImmediately(supervisor.isCancelled) {
+            shutdownException()
         }?.let { return it }
 
         return scope.launch {
-            delegate.configSave(force).toCallback(callback)
+            delegate.configSave(force).toCallback(failure, success)
         }.toTask()
     }
 
-    override fun configSet(setting: TorConfig.Setting<*>, callback: RequestCallback<Any?>): Task {
-        callback.shouldFailImmediately(supervisor.isCancelled) {
-            provideShutdownException()
+    override fun configSet(
+        setting: TorConfig.Setting<*>,
+        failure: TorCallback<Throwable>,
+        success: TorCallback<Any?>
+    ): Task {
+        failure.shouldFailImmediately(supervisor.isCancelled) {
+            shutdownException()
         }?.let { return it }
 
         return scope.launch {
-            delegate.configSet(setting).toCallback(callback)
+            delegate.configSet(setting).toCallback(failure, success)
         }.toTask()
     }
 
     override fun configSet(
         settings: Set<TorConfig.Setting<*>>,
-        callback: RequestCallback<Any?>
+        failure: TorCallback<Throwable>,
+        success: TorCallback<Any?>
     ): Task {
-        callback.shouldFailImmediately(supervisor.isCancelled) {
-            provideShutdownException()
+        failure.shouldFailImmediately(supervisor.isCancelled) {
+            shutdownException()
         }?.let { return it }
 
         return scope.launch {
-            delegate.configSet(settings).toCallback(callback)
+            delegate.configSet(settings).toCallback(failure, success)
         }.toTask()
     }
 
-    override fun dropGuards(callback: RequestCallback<Any?>): Task {
-        callback.shouldFailImmediately(supervisor.isCancelled) {
-            provideShutdownException()
+    override fun dropGuards(failure: TorCallback<Throwable>, success: TorCallback<Any?>): Task {
+        failure.shouldFailImmediately(supervisor.isCancelled) {
+            shutdownException()
         }?.let { return it }
 
         return scope.launch {
-            delegate.dropGuards().toCallback(callback)
+            delegate.dropGuards().toCallback(failure, success)
         }.toTask()
     }
 
     override fun infoGet(
         keyword: TorControlInfoGet.KeyWord,
-        callback: RequestCallback<String>
+        failure: TorCallback<Throwable>,
+        success: TorCallback<String>
     ): Task {
-        callback.shouldFailImmediately(supervisor.isCancelled) {
-            provideShutdownException()
+        failure.shouldFailImmediately(supervisor.isCancelled) {
+            shutdownException()
         }?.let { return it }
 
         return scope.launch {
-            delegate.infoGet(keyword).toCallback(callback)
+            delegate.infoGet(keyword).toCallback(failure, success)
         }.toTask()
     }
 
     override fun infoGet(
         keywords: Set<TorControlInfoGet.KeyWord>,
-        callback: RequestCallback<Map<String, String>>
+        failure: TorCallback<Throwable>,
+        success: TorCallback<Map<String, String>>
     ): Task {
-        callback.shouldFailImmediately(supervisor.isCancelled) {
-            provideShutdownException()
+        failure.shouldFailImmediately(supervisor.isCancelled) {
+            shutdownException()
         }?.let { return it }
 
         return scope.launch {
-            delegate.infoGet(keywords).toCallback(callback)
+            delegate.infoGet(keywords).toCallback(failure, success)
         }.toTask()
     }
 
@@ -243,14 +268,15 @@ class CallbackTorController(
         hsPorts: Set<TorConfig.Setting.HiddenService.Ports>,
         flags: Set<TorControlOnionAdd.Flag>?,
         maxStreams: TorConfig.Setting.HiddenService.MaxStreams?,
-        callback: RequestCallback<HiddenServiceEntry>
+        failure: TorCallback<Throwable>,
+        success: TorCallback<HiddenServiceEntry>
     ): Task {
-        callback.shouldFailImmediately(supervisor.isCancelled) {
-            provideShutdownException()
+        failure.shouldFailImmediately(supervisor.isCancelled) {
+            shutdownException()
         }?.let { return it }
 
         return scope.launch {
-            delegate.onionAdd(privateKey, hsPorts, flags, maxStreams).toCallback(callback)
+            delegate.onionAdd(privateKey, hsPorts, flags, maxStreams).toCallback(failure, success)
         }.toTask()
     }
 
@@ -259,24 +285,29 @@ class CallbackTorController(
         hsPorts: Set<TorConfig.Setting.HiddenService.Ports>,
         flags: Set<TorControlOnionAdd.Flag>?,
         maxStreams: TorConfig.Setting.HiddenService.MaxStreams?,
-        callback: RequestCallback<HiddenServiceEntry>
+        failure: TorCallback<Throwable>,
+        success: TorCallback<HiddenServiceEntry>
     ): Task {
-        callback.shouldFailImmediately(supervisor.isCancelled) {
-            provideShutdownException()
+        failure.shouldFailImmediately(supervisor.isCancelled) {
+            shutdownException()
         }?.let { return it }
 
         return scope.launch {
-            delegate.onionAddNew(type, hsPorts, flags, maxStreams).toCallback(callback)
+            delegate.onionAddNew(type, hsPorts, flags, maxStreams).toCallback(failure, success)
         }.toTask()
     }
 
-    override fun onionDel(address: OnionAddress, callback: RequestCallback<Any?>): Task {
-        callback.shouldFailImmediately(supervisor.isCancelled) {
-            provideShutdownException()
+    override fun onionDel(
+        address: OnionAddress,
+        failure: TorCallback<Throwable>,
+        success: TorCallback<Any?>
+    ): Task {
+        failure.shouldFailImmediately(supervisor.isCancelled) {
+            shutdownException()
         }?.let { return it }
 
         return scope.launch {
-            delegate.onionDel(address).toCallback(callback)
+            delegate.onionDel(address).toCallback(failure, success)
         }.toTask()
     }
 
@@ -285,94 +316,108 @@ class CallbackTorController(
         key: OnionClientAuth.PrivateKey,
         clientName: ClientName?,
         flags: Set<TorControlOnionClientAuth.Flag>?,
-        callback: RequestCallback<Any?>
+        failure: TorCallback<Throwable>,
+        success: TorCallback<Any?>
     ): Task {
-        callback.shouldFailImmediately(supervisor.isCancelled) {
-            provideShutdownException()
+        failure.shouldFailImmediately(supervisor.isCancelled) {
+            shutdownException()
         }?.let { return it }
 
         return scope.launch {
-            delegate.onionClientAuthAdd(address, key, clientName, flags).toCallback(callback)
+            delegate.onionClientAuthAdd(address, key, clientName, flags).toCallback(failure, success)
         }.toTask()
     }
 
     override fun onionClientAuthRemove(
         address: OnionAddressV3,
-        callback: RequestCallback<Any?>
+        failure: TorCallback<Throwable>,
+        success: TorCallback<Any?>
     ): Task {
-        callback.shouldFailImmediately(supervisor.isCancelled) {
-            provideShutdownException()
+        failure.shouldFailImmediately(supervisor.isCancelled) {
+            shutdownException()
         }?.let { return it }
 
         return scope.launch {
-            delegate.onionClientAuthRemove(address).toCallback(callback)
+            delegate.onionClientAuthRemove(address).toCallback(failure, success)
         }.toTask()
     }
 
-    override fun onionClientAuthView(callback: RequestCallback<List<ClientAuthEntry>>): Task {
-        callback.shouldFailImmediately(supervisor.isCancelled) {
-            provideShutdownException()
+    override fun onionClientAuthView(
+        failure: TorCallback<Throwable>,
+        success: TorCallback<List<ClientAuthEntry>>
+    ): Task {
+        failure.shouldFailImmediately(supervisor.isCancelled) {
+            shutdownException()
         }?.let { return it }
 
         return scope.launch {
-            delegate.onionClientAuthView().toCallback(callback)
+            delegate.onionClientAuthView().toCallback(failure, success)
         }.toTask()
     }
 
     override fun onionClientAuthView(
         address: OnionAddressV3,
-        callback: RequestCallback<ClientAuthEntry>
+        failure: TorCallback<Throwable>,
+        success: TorCallback<ClientAuthEntry>
     ): Task {
-        callback.shouldFailImmediately(supervisor.isCancelled) {
-            provideShutdownException()
+        failure.shouldFailImmediately(supervisor.isCancelled) {
+            shutdownException()
         }?.let { return it }
 
         return scope.launch {
-            delegate.onionClientAuthView(address).toCallback(callback)
+            delegate.onionClientAuthView(address).toCallback(failure, success)
         }.toTask()
     }
 
-    override fun ownershipDrop(callback: RequestCallback<Any?>): Task {
-        callback.shouldFailImmediately(supervisor.isCancelled) {
-            provideShutdownException()
+    override fun ownershipDrop(failure: TorCallback<Throwable>, success: TorCallback<Any?>): Task {
+        failure.shouldFailImmediately(supervisor.isCancelled) {
+            shutdownException()
         }?.let { return it }
 
         return scope.launch {
-            delegate.ownershipDrop().toCallback(callback)
+            delegate.ownershipDrop().toCallback(failure, success)
         }.toTask()
     }
 
-    override fun ownershipTake(callback: RequestCallback<Any?>): Task {
-        callback.shouldFailImmediately(supervisor.isCancelled) {
-            provideShutdownException()
+    override fun ownershipTake(failure: TorCallback<Throwable>, success: TorCallback<Any?>): Task {
+        failure.shouldFailImmediately(supervisor.isCancelled) {
+            shutdownException()
         }?.let { return it }
 
         return scope.launch {
-            delegate.ownershipTake().toCallback(callback)
+            delegate.ownershipTake().toCallback(failure, success)
         }.toTask()
     }
 
-    override fun setEvents(events: Set<TorEvent>, callback: RequestCallback<Any?>): Task {
-        callback.shouldFailImmediately(supervisor.isCancelled) {
-            provideShutdownException()
+    override fun setEvents(
+        events: Set<TorEvent>,
+        failure: TorCallback<Throwable>,
+        success: TorCallback<Any?>
+    ): Task {
+        failure.shouldFailImmediately(supervisor.isCancelled) {
+            shutdownException()
         }?.let { return it }
 
         return scope.launch {
-            delegate.setEvents(events).toCallback(callback)
+            delegate.setEvents(events).toCallback(failure, success)
         }.toTask()
     }
 
-    override fun signal(signal: TorControlSignal.Signal, callback: RequestCallback<Any?>): Task {
-        callback.shouldFailImmediately(supervisor.isCancelled) {
-            provideShutdownException()
+    override fun signal(
+        signal: TorControlSignal.Signal,
+        failure: TorCallback<Throwable>,
+        success: TorCallback<Any?>
+    ): Task {
+        failure.shouldFailImmediately(supervisor.isCancelled) {
+            shutdownException()
         }?.let { return it }
 
         return scope.launch {
-            delegate.signal(signal).toCallback(callback)
+            delegate.signal(signal).toCallback(failure, success)
         }.toTask()
     }
 
-    private fun provideShutdownException(): ControllerShutdownException {
+    private fun shutdownException(): ControllerShutdownException {
         return ControllerShutdownException("Tor has stopped and a new connection is required")
     }
 

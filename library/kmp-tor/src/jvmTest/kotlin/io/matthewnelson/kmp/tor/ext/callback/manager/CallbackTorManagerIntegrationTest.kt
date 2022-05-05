@@ -16,8 +16,6 @@
 package io.matthewnelson.kmp.tor.ext.callback.manager
 
 import io.matthewnelson.kmp.tor.controller.common.control.usecase.TorControlInfoGet
-import io.matthewnelson.kmp.tor.ext.callback.controller.common.UncaughtExceptionHandler
-import io.matthewnelson.kmp.tor.ext.callback.controller.common.RequestCallback
 import io.matthewnelson.kmp.tor.ext.callback.controller.common.Task
 import io.matthewnelson.kmp.tor.helper.TorTestHelper
 import io.matthewnelson.kmp.tor.manager.common.exceptions.InterruptedException
@@ -32,24 +30,20 @@ class CallbackTorManagerIntegrationTest: TorTestHelper() {
 
     @Test
     fun givenMultipleControllerActions_whenStartStopOrRestarted_actionsAreInterrupted() = runBlocking {
-        val torManager = CallbackTorManager(manager, object: UncaughtExceptionHandler {
-            override fun onUncaughtException(t: Throwable) {
-                t.printStackTrace()
-            }
-        })
+        val torManager = CallbackTorManager(manager) { t ->
+            t.printStackTrace()
+        }
 
 
         suspendCancellableCoroutine<Any?> { continuation ->
-            torManager.start(object : RequestCallback<Any?>() {
-                override fun onFailure(t: Throwable) {
+            torManager.start(
+                { t ->
                     continuation.resumeWithException(t)
+                },
+                { success ->
+                    continuation.resume(success, null)
                 }
-
-                override fun onSuccess(result: Any?) {
-                    continuation.resume(result, null)
-                }
-
-            })
+            )
         }
 
         torManager.restartQuietly()
@@ -61,20 +55,20 @@ class CallbackTorManagerIntegrationTest: TorTestHelper() {
         repeat(5) { index ->
             launch {
                 suspendCancellableCoroutine<String> { continuation ->
-                    torManager.infoGet(getVersion, object : RequestCallback<String>() {
-                        override fun onFailure(t: Throwable) {
+                    torManager.infoGet(
+                        getVersion,
+                        { t ->
                             assertTrue(t is InterruptedException)
                             println("Job$index: ${t.message}")
                             failures++
                             continuation.cancel()
-                        }
-
-                        override fun onSuccess(result: String) {
+                        },
+                        { success ->
                             // Don't fail, as the first one may make it through before being interrupted
                             println("Controller Action $index was processed when it should have been interrupted")
-                            continuation.resume(result, null)
+                            continuation.resume(success, null)
                         }
-                    }).let { task ->
+                    ).let { task ->
                         tasks.add(task)
                     }
                 }
@@ -92,16 +86,14 @@ class CallbackTorManagerIntegrationTest: TorTestHelper() {
         tasks[3].cancel()
 
         suspendCancellableCoroutine<Any?> { continuation ->
-            torManager.stop(object : RequestCallback<Any?>() {
-                override fun onFailure(t: Throwable) {
+            torManager.stop(
+                { t ->
                     continuation.resumeWithException(t)
+                },
+                { success ->
+                    continuation.resume(success, null)
                 }
-
-                override fun onSuccess(result: Any?) {
-                    continuation.resume(result, null)
-                }
-
-            })
+            )
         }
 
         for (job in jobs) {

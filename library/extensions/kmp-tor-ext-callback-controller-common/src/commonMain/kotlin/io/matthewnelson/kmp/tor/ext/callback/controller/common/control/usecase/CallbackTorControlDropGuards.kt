@@ -15,8 +15,8 @@
  **/
 package io.matthewnelson.kmp.tor.ext.callback.controller.common.control.usecase
 
-import io.matthewnelson.kmp.tor.ext.callback.controller.common.RequestCallback
 import io.matthewnelson.kmp.tor.ext.callback.controller.common.Task
+import io.matthewnelson.kmp.tor.ext.callback.controller.common.TorCallback
 
 /**
  * "DROPGUARDS" CRLF
@@ -25,6 +25,9 @@ import io.matthewnelson.kmp.tor.ext.callback.controller.common.Task
  * */
 interface CallbackTorControlDropGuards {
 
-    fun dropGuards(callback: RequestCallback<Any?>): Task
+    fun dropGuards(
+        failure: TorCallback<Throwable>,
+        success: TorCallback<Any?>,
+    ): Task
 
 }

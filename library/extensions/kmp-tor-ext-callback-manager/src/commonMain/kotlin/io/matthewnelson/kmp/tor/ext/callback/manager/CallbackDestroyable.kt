@@ -15,9 +15,15 @@
  **/
 package io.matthewnelson.kmp.tor.ext.callback.manager
 
+import io.matthewnelson.kmp.tor.ext.callback.controller.common.TorCallback
+import io.matthewnelson.kmp.tor.manager.Destroyable
+
+/**
+ * See [Destroyable]
+ * */
 interface CallbackDestroyable {
 
     val isDestroyed: Boolean
 
-    fun destroy(stopCleanly: Boolean = true, callback: DestructionCallback? = null)
+    fun destroy(stopCleanly: Boolean = true, callback: TorCallback<Any?>? = null)
 }

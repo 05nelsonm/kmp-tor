@@ -15,7 +15,10 @@
  **/
 package io.matthewnelson.kmp.tor.ext.callback.controller.common
 
-inline fun <T: Any?> Result<T>.toCallback(callback: RequestCallback<T>) {
-    onFailure { callback.onFailure(it) }
-    onSuccess { callback.onSuccess(it) }
+import io.matthewnelson.kmp.tor.common.annotation.InternalTorApi
+
+@InternalTorApi
+inline fun <T: Any?> Result<T>.toCallback(failure: TorCallback<Throwable>, success: TorCallback<T>) {
+    onFailure { failure.invoke(it) }
+    onSuccess { success.invoke(it) }
 }

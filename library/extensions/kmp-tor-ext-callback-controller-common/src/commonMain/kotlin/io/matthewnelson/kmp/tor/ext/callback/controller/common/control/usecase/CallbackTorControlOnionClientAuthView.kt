@@ -17,8 +17,8 @@ package io.matthewnelson.kmp.tor.ext.callback.controller.common.control.usecase
 
 import io.matthewnelson.kmp.tor.common.address.OnionAddressV3
 import io.matthewnelson.kmp.tor.controller.common.config.ClientAuthEntry
-import io.matthewnelson.kmp.tor.ext.callback.controller.common.RequestCallback
 import io.matthewnelson.kmp.tor.ext.callback.controller.common.Task
+import io.matthewnelson.kmp.tor.ext.callback.controller.common.TorCallback
 import io.matthewnelson.kmp.tor.ext.callback.controller.common.control.CallbackTorControlOnionClientAuth
 
 /**
@@ -33,11 +33,18 @@ interface CallbackTorControlOnionClientAuthView {
     /**
      * Returns a list of all [ClientAuthEntry]'s for all [OnionAddressV3]'s
      * */
-    fun onionClientAuthView(callback: RequestCallback<List<ClientAuthEntry>>): Task
+    fun onionClientAuthView(
+        failure: TorCallback<Throwable>,
+        success: TorCallback<List<ClientAuthEntry>>,
+    ): Task
 
     /**
      * Returns the current [ClientAuthEntry] for the given [OnionAddressV3]
      * */
-    fun onionClientAuthView(address: OnionAddressV3, callback: RequestCallback<ClientAuthEntry>): Task
+    fun onionClientAuthView(
+        address: OnionAddressV3,
+        failure: TorCallback<Throwable>,
+        success: TorCallback<ClientAuthEntry>,
+    ): Task
 
 }

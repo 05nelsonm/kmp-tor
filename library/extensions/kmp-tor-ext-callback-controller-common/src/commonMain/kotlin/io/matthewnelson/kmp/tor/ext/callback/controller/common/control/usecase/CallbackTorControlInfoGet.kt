@@ -16,8 +16,8 @@
 package io.matthewnelson.kmp.tor.ext.callback.controller.common.control.usecase
 
 import io.matthewnelson.kmp.tor.controller.common.control.usecase.TorControlInfoGet.KeyWord
-import io.matthewnelson.kmp.tor.ext.callback.controller.common.RequestCallback
 import io.matthewnelson.kmp.tor.ext.callback.controller.common.Task
+import io.matthewnelson.kmp.tor.ext.callback.controller.common.TorCallback
 
 /**
  * "GETINFO" 1*(SP keyword) CRLF
@@ -26,8 +26,16 @@ import io.matthewnelson.kmp.tor.ext.callback.controller.common.Task
  * */
 interface CallbackTorControlInfoGet {
 
-    fun infoGet(keyword: KeyWord, callback: RequestCallback<String>): Task
+    fun infoGet(
+        keyword: KeyWord,
+        failure: TorCallback<Throwable>,
+        success: TorCallback<String>,
+    ): Task
 
-    fun infoGet(keywords: Set<KeyWord>, callback: RequestCallback<Map<String, String>>): Task
+    fun infoGet(
+        keywords: Set<KeyWord>,
+        failure: TorCallback<Throwable>,
+        success: TorCallback<Map<String, String>>,
+    ): Task
 
 }
