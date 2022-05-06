@@ -24,12 +24,9 @@ interface Task {
 }
 
 object EmptyTask: Task {
-    override val isActive: Boolean
-        get() = false
-    override val isCompleted: Boolean
-        get() = false
-    override val isCancelled: Boolean
-        get() = true
+    override val isActive: Boolean = false
+    override val isCompleted: Boolean = isActive
+    override val isCancelled: Boolean = true
 
     override fun cancel() { /* no-op */ }
 }
