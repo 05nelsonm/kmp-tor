@@ -366,6 +366,7 @@ class CallbackTorManager(
         failure.shouldFailImmediately(isDestroyed, { uncaughtExceptionHandler }) {
             TorManagerException("TorManager instance has been destroyed")
         }?.let { emptyTask ->
+            supervisor.cancel()
             return emptyTask
         }
 

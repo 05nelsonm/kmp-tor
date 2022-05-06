@@ -344,6 +344,7 @@ class CallbackTorController(
         failure.shouldFailImmediately(!isConnected, { uncaughtExceptionHandler }) {
             ControllerShutdownException("Tor has stopped and a new connection is required")
         }?.let { emptyTask ->
+            supervisor.cancel()
             return emptyTask
         }
 
