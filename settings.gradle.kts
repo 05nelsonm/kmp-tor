@@ -29,7 +29,7 @@ if (
     KMP_TARGETS_ALL != null ||
     (targets?.contains("ANDROID") != false && targets?.contains("JVM") != false)
 ) {
-    include(":samples:android")
+    include(":samples:kotlin:android")
 }
 
 if (KMP_TARGETS_ALL != null || targets?.contains("JVM") != false) {
