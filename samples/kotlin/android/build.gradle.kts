@@ -112,11 +112,9 @@ android {
 dependencies {
     implementation(deps.androidx.appCompat)
     implementation(deps.androidx.constraintLayout)
+    implementation(deps.viewBindingDelegateNoReflect)
 
     // For SNAPSHOTS
 //    implementation("io.matthewnelson.kotlin-components:kmp-tor:${env.kmpTorAll.version.name}")
     implementation(project(":library:kmp-tor"))
-
-    implementation(deps.viewBindingDelegateNoReflect)
-    implementation(deps.kotlin.coroutines.android)
 }
