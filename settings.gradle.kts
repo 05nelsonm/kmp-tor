@@ -20,20 +20,16 @@ include(":library:extensions:kmp-tor-ext-callback-manager-common")
 
 @Suppress("PrivatePropertyName")
 private val KMP_TARGETS: String? by settings
-@Suppress("PrivatePropertyName")
-private val KMP_TARGETS_ALL: String? by settings
 
+private val allTargets = System.getProperty("KMP_TARGETS_ALL") != null
 private val targets = KMP_TARGETS?.split(',')
 
-if (
-    KMP_TARGETS_ALL != null ||
-    (targets?.contains("ANDROID") != false && targets?.contains("JVM") != false)
-) {
-    include(":samples:kotlin:android")
+if (allTargets || (targets?.contains("ANDROID") != false && targets?.contains("JVM") != false)) {
     include(":samples:java:android")
+    include(":samples:kotlin:android")
 }
 
-if (KMP_TARGETS_ALL != null || targets?.contains("JVM") != false) {
+if (allTargets || targets?.contains("JVM") != false) {
     include(":samples:kotlin:javafx")
 }
 
