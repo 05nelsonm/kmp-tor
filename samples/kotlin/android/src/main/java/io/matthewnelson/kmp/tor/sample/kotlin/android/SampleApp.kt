@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-package io.matthewnelson.kmp.tor.sample.android
+package io.matthewnelson.kmp.tor.sample.kotlin.android
 
 import android.app.Application
 import android.util.Log

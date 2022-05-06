@@ -13,13 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-package io.matthewnelson.kmp.tor.sample.android
+package io.matthewnelson.kmp.tor.sample.kotlin.android
 
 import android.annotation.SuppressLint
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import by.kirich1409.viewbindingdelegate.viewBinding
-import io.matthewnelson.kmp.tor.sample.android.databinding.ActivityMainBinding
+import io.matthewnelson.kmp.tor.sample.kotlin.android.databinding.ActivityMainBinding
 
 class MainActivity: AppCompatActivity(R.layout.activity_main) {
 

@@ -18,7 +18,7 @@
 -->
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    package="io.matthewnelson.kmp.tor.sample.android">
+    package="io.matthewnelson.kmp.tor.sample.kotlin.android">
 
     <!--
     Required for API 28+ if enabling foreground service
@@ -113,7 +113,7 @@
             android:value="@bool/tor_service_notification_action_enable_stop" />
 
         <activity
-            android:name="io.matthewnelson.kmp.tor.sample.android.MainActivity"
+            android:name=".MainActivity"
             android:exported="true"
             android:launchMode="singleTask">
             <intent-filter>

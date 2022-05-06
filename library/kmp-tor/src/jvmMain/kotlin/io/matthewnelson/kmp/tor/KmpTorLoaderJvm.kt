@@ -39,7 +39,7 @@ import kotlin.coroutines.cancellation.CancellationException
  * @see [PlatformInstaller]
  * @see [TorConfigProviderJvm]
  * @see [KmpTorLoader]
- * @sample [io.matthewnelson.kmp.tor.sample.javafx.SampleApp]
+ * @sample [io.matthewnelson.kmp.tor.sample.kotlin.javafx.SampleApp]
  * */
 class KmpTorLoaderJvm(
     @JvmField

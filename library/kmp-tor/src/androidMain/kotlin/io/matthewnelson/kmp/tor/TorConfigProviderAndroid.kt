@@ -38,7 +38,7 @@ import java.io.File
  *
  * @see [TorConfigProvider]
  * @see [KmpTorLoaderAndroid]
- * @sample [io.matthewnelson.kmp.tor.sample.android.App]
+ * @sample [io.matthewnelson.kmp.tor.sample.kotlin.android.SampleApp]
  * */
 abstract class TorConfigProviderAndroid(context: Context): TorConfigProvider() {
     val appContext: Context =
