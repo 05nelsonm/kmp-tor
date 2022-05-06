@@ -18,7 +18,7 @@ import io.matthewnelson.kotlin.components.dependencies.depsTest
 import io.matthewnelson.kotlin.components.dependencies.versions
 import io.matthewnelson.kotlin.components.kmp.KmpTarget
 import io.matthewnelson.kotlin.components.kmp.publish.kmpPublishRootProjectConfiguration
-import io.matthewnelson.kotlin.components.kmp.util.sourceSetJvmJsCommonTest
+import io.matthewnelson.kotlin.components.kmp.util.*
 import io.matthewnelson.kotlin.components.kmp.KmpTarget.Jvm.Android.Companion.SOURCE_SET_MAIN_NAME as KmpAndroidMain
 import kmp.tor.env
 import org.jetbrains.kotlin.gradle.plugin.KotlinJsCompilerType
@@ -29,16 +29,7 @@ plugins {
 }
 
 val pConfig = kmpPublishRootProjectConfiguration!!
-if (env.kmpTorBinaries.pollStagingRepo) {
-    repositories {
-        maven("https://oss.sonatype.org/content/groups/staging") {
-            credentials {
-                username = rootProject.ext.get("mavenCentralUsername").toString()
-                password = rootProject.ext.get("mavenCentralPassword").toString()
-            }
-        }
-    }
-}
+includeStagingRepoIfTrue(env.kmpTorBinaries.pollStagingRepo)
 
 kmpConfiguration {
     setupMultiplatform(
@@ -87,44 +78,44 @@ kmpConfiguration {
                 },
             ),
 
-            KmpTarget.NonJvm.JS(
-                compilerType = KotlinJsCompilerType.BOTH,
-                browser = null,
-                node = KmpTarget.NonJvm.JS.Node(
-                    jsNodeDsl = null
-                ),
-            ),
-
-//            KmpTarget.NonJvm.Native.Unix.Darwin.Ios.All.DEFAULT,
-            KmpTarget.NonJvm.Native.Unix.Darwin.Macos.X64(
-                mainSourceSet = {
-                    dependencies {
-                        // TODO: Uncomment once macosx64 binary target is published
-//                        implementation("${pConfig.group}:kmp-tor-binary-macosx64:${env.kmpTorBinaries.version.name}")
-                    }
-                },
-            ),
-//            KmpTarget.NonJvm.Native.Unix.Darwin.Macos.Arm64.DEFAULT,
-//            KmpTarget.NonJvm.Native.Unix.Darwin.Tvos.All.DEFAULT,
-//            KmpTarget.NonJvm.Native.Unix.Darwin.Watchos.All.DEFAULT,
-
-            KmpTarget.NonJvm.Native.Unix.Linux.X64(
-                mainSourceSet = {
-                    dependencies {
-                        // TODO: Uncomment once linuxx64 binary target is published
-//                        implementation("${pConfig.group}:kmp-tor-binary-linuxx64:${env.kmpTorBinaries.version.name}")
-                    }
-                },
-            ),
-
-            KmpTarget.NonJvm.Native.Mingw.X64(
-                mainSourceSet = {
-                    dependencies {
-                        // TODO: Uncomment once mingwx64 binary target is published
-//                        implementation("${pConfig.group}:kmp-tor-binary-mingwx64:${env.kmpTorBinaries.version.name}")
-                    }
-                },
-            ),
+//            KmpTarget.NonJvm.JS(
+//                compilerType = KotlinJsCompilerType.BOTH,
+//                browser = null,
+//                node = KmpTarget.NonJvm.JS.Node(
+//                    jsNodeDsl = null
+//                ),
+//            ),
+//
+////            KmpTarget.NonJvm.Native.Unix.Darwin.Ios.All.DEFAULT,
+//            KmpTarget.NonJvm.Native.Unix.Darwin.Macos.X64(
+//                mainSourceSet = {
+//                    dependencies {
+//                        // TODO: Uncomment once macosx64 binary target is published
+////                        implementation("${pConfig.group}:kmp-tor-binary-macosx64:${env.kmpTorBinaries.version.name}")
+//                    }
+//                },
+//            ),
+////            KmpTarget.NonJvm.Native.Unix.Darwin.Macos.Arm64.DEFAULT,
+////            KmpTarget.NonJvm.Native.Unix.Darwin.Tvos.All.DEFAULT,
+////            KmpTarget.NonJvm.Native.Unix.Darwin.Watchos.All.DEFAULT,
+//
+//            KmpTarget.NonJvm.Native.Unix.Linux.X64(
+//                mainSourceSet = {
+//                    dependencies {
+//                        // TODO: Uncomment once linuxx64 binary target is published
+////                        implementation("${pConfig.group}:kmp-tor-binary-linuxx64:${env.kmpTorBinaries.version.name}")
+//                    }
+//                },
+//            ),
+//
+//            KmpTarget.NonJvm.Native.Mingw.X64(
+//                mainSourceSet = {
+//                    dependencies {
+//                        // TODO: Uncomment once mingwx64 binary target is published
+////                        implementation("${pConfig.group}:kmp-tor-binary-mingwx64:${env.kmpTorBinaries.version.name}")
+//                    }
+//                },
+//            ),
         ),
         commonMainSourceSet = {
             dependencies {
