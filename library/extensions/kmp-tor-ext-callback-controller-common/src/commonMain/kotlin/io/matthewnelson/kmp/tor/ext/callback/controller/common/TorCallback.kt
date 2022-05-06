@@ -22,12 +22,21 @@ fun interface TorCallback<in T: Any?> {
 }
 
 @InternalTorApi
+@Suppress("nothing_to_inline")
 inline fun TorCallback<Throwable>?.shouldFailImmediately(
     failure: Boolean,
+    uncaughtExceptionHandlerProvider: () -> TorCallback<Throwable>,
     exceptionProvider: () -> Exception,
-): Task? {
+): EmptyTask? {
     return if (failure) {
-        this?.invoke(exceptionProvider.invoke())
+        // Can throw an exception here. Should be piped
+        // to the uncaught exception handler.
+        try {
+            this?.invoke(exceptionProvider.invoke())
+        } catch (t: Throwable) {
+            uncaughtExceptionHandlerProvider.invoke().invoke(t)
+        }
+
         EmptyTask
     } else {
         null

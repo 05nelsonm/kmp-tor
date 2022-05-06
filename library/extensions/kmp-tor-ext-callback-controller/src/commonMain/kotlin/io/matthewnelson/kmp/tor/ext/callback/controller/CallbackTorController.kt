@@ -65,8 +65,8 @@ class CallbackTorController(
             supervisor                                          +
             CoroutineName(name = "CallbackTorController")       +
             CoroutineExceptionHandler { _, t ->
-                // Pass all exceptions that are thrown from RequestCallback
-                // to the handler.
+                // Pass all exceptions that are thrown from requests'
+                // TorCallbacks to the handler.
                 uncaughtExceptionHandler.invoke(t)
             }
         )
@@ -341,9 +341,12 @@ class CallbackTorController(
         success: TorCallback<T>,
         block: suspend TorControlProcessor.() -> Result<T>,
     ): Task {
-        failure.shouldFailImmediately(supervisor.isCancelled) {
+        failure.shouldFailImmediately(!isConnected, { uncaughtExceptionHandler }) {
             ControllerShutdownException("Tor has stopped and a new connection is required")
-        }?.let { return it }
+        }?.let { emptyTask ->
+            supervisor.cancel()
+            return emptyTask
+        }
 
         return scope.launch {
             block.invoke(delegate).toCallback(failure, success)

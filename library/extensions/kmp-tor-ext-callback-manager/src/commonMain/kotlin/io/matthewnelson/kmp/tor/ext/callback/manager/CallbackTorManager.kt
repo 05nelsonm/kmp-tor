@@ -78,8 +78,8 @@ class CallbackTorManager(
             supervisor                                          +
             CoroutineName(name = "CallbackTorManager")          +
             CoroutineExceptionHandler { _, t ->
-                // Pass all exceptions that are thrown from RequestCallback
-                // to the handler.
+                // Pass all exceptions that are thrown from requests'
+                // TorCallbacks to the handler.
                 uncaughtExceptionHandler.invoke(t)
             }
         )
@@ -363,9 +363,12 @@ class CallbackTorManager(
         success: TorCallback<T>,
         block: suspend TorManager.() -> Result<T>,
     ): Task {
-        failure.shouldFailImmediately(isDestroyed) {
+        failure.shouldFailImmediately(isDestroyed, { uncaughtExceptionHandler }) {
             TorManagerException("TorManager instance has been destroyed")
-        }?.let { return it }
+        }?.let { emptyTask ->
+            supervisor.cancel()
+            return emptyTask
+        }
 
         return scope.launch {
             block.invoke(delegate).toCallback(failure, success)
