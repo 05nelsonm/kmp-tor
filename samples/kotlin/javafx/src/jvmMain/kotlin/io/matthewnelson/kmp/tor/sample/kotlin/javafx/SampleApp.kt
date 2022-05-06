@@ -83,7 +83,6 @@ class SampleApp: App(SampleView::class) {
     }
 
     private val instanceId1 = InstanceId("INSTANCE_111")
-    private val instanceId2 = InstanceId("INSTANCE_222")
 
     /**
      * Instantiate [TorManager]
@@ -200,70 +199,23 @@ class SampleApp: App(SampleView::class) {
         )
     }
 
-    /**
-     * Spin up a 2nd instance of Tor that runs simultaneously.
-     *
-     * @see [TorMultiInstanceManager]
-     * */
-    private val managerInstance2: TorManager by lazy {
-        val configProvider = object : TorConfigProviderJvm() {
-            override val workDir: Path = tmpDir.builder {
-                // Be sure to use different directories than other instances
-                addSegment(instanceId2.value)
-                addSegment("work")
-            }
-
-            override val cacheDir: Path = tmpDir.builder {
-                // Be sure to use different directories than other instances
-                addSegment(instanceId2.value)
-                addSegment("cache")
-            }
-
-            override fun provide(): TorConfig {
-                // run with minimal necessary defaults provided
-                // automatically by TorConfigProvider
-                return TorConfig.Builder().build()
-            }
-        }
-
-        val jvmLoader = KmpTorLoaderJvm(installer = platformInstaller, provider = configProvider)
-
-        TorMultiInstanceManager.newTorManagerInstance(
-            instanceId = instanceId2,
-            loader = jvmLoader,
-            networkObserver = null,
-            requiredEvents = null
-        )
-    }
-
     // only expose necessary interfaces
     val torOperationManager1: TorOperationManager get() = managerInstance1
     val torControlManager1: TorControlManager get() = managerInstance1
-    val torOperationManager2: TorOperationManager get() = managerInstance2
-    val torControlManager2: TorControlManager get() = managerInstance2
 
     private val listenerInstance1 = SampleListener(instanceId1)
-    private val listenerInstance2 = SampleListener(instanceId2)
 
     val eventLines1: StateFlow<String> get() = listenerInstance1.eventLines
     val addressInfo1: StateFlow<TorManagerEvent.AddressInfo> get() = listenerInstance1.addressInfo
     val state1: StateFlow<TorManagerEvent.State> get() = listenerInstance1.state
-
-    val eventLines2: StateFlow<String> get() = listenerInstance2.eventLines
-    val addressInfo2: StateFlow<TorManagerEvent.AddressInfo> get() = listenerInstance2.addressInfo
-    val state2: StateFlow<TorManagerEvent.State> get() = listenerInstance2.state
 
     override fun start(stage: Stage) {
         Log.d(this.javaClass.simpleName, "start")
         managerInstance1.debug(true)
         managerInstance1.addListener(listenerInstance1)
 
-        managerInstance2.debug(true)
-        managerInstance2.addListener(listenerInstance2)
-
         // TODO: Move to SampleView along with stop/restart buttons
         managerInstance1.startQuietly()
-        managerInstance2.startQuietly()
 
         setupOnCloseIntercept(stage)
 
@@ -284,10 +236,8 @@ class SampleApp: App(SampleView::class) {
             //
             // Upon destruction completion, Platform.exit() will be invoked.
             managerInstance1.destroy(stopCleanly = true) {
-                managerInstance2.destroy(stopCleanly = true) {
-                    // onCompletion
-                    Platform.exit()
-                }
+                // onCompletion
+                Platform.exit()
             }
             event.consume()
         }
@@ -299,12 +249,6 @@ class SampleApp: App(SampleView::class) {
 
         // just in case setupOnCloseIntercept fails.
         managerInstance1.destroy(stopCleanly = false) {
-            // will not be invoked if TorManager has already been destroyed
-            Log.w(this.javaClass.simpleName, "onCloseRequest intercept failed. Tor did not stop cleanly.")
-        }
-
-        // just in case setupOnCloseIntercept fails.
-        managerInstance2.destroy(stopCleanly = false) {
             // will not be invoked if TorManager has already been destroyed
             Log.w(this.javaClass.simpleName, "onCloseRequest intercept failed. Tor did not stop cleanly.")
         }
