@@ -44,7 +44,7 @@ android {
 
     buildFeatures.viewBinding = true
     defaultConfig {
-        applicationId = "io.matthewnelson.kmp.tor"
+        applicationId = "io.matthewnelson.kmp.tor.sample.kotlin"
         minSdk = versions.android.sdkMin16
         targetSdk = versions.android.sdkTarget
         versionCode = env.kmpTorAll.version.code
