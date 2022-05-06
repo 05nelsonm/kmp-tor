@@ -51,6 +51,11 @@ javafx {
     modules("javafx.controls", "javafx.graphics")
 }
 
+// For SNAPSHOTS
+//repositories {
+//    maven("https://oss.sonatype.org/content/repositories/snapshots/")
+//}
+
 // In order to import the `-jvm` variant of `project(":library:kmp-tor")`, we
 // unfortunately need to setup this sample as a multiplatform project. This
 // is attributed to the `kmp-tor` project utilizing certain gradle.properties,
@@ -74,6 +79,7 @@ kotlin {
                 implementation("org.jetbrains.kotlinx:kotlinx-coroutines-javafx:${versions.kotlin.coroutines}")
 
                 // kmp-tor dependency
+//                implementation("io.matthewnelson.kotlin-components:kmp-tor:${env.kmpTorAll.version.name}") // For SNAPSHOTS
                 implementation(project(":library:kmp-tor"))
 
                 // Add binary dependencies for platform desired to support. Note that this

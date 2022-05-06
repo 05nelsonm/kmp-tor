@@ -48,6 +48,8 @@ android {
         versionCode env.kmpTorAll.version.code
         versionName env.kmpTorAll.version.name
 
+        multiDexEnabled true
+
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         testInstrumentationRunnerArguments disableAnalytics: 'true'
     }
@@ -108,6 +110,7 @@ android {
 dependencies {
     implementation deps.androidx.appCompat
     implementation deps.androidx.constraintLayout
+    implementation deps.androidx.multiDex
     implementation deps.google.material
 
     // For SNAPSHOTS
