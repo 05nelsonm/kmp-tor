@@ -14,11 +14,9 @@
  * limitations under the License.
  **/
 import io.matthewnelson.kotlin.components.dependencies.deps
-import io.matthewnelson.kotlin.components.dependencies.depsTest
 import io.matthewnelson.kotlin.components.dependencies.versions
 import io.matthewnelson.kotlin.components.kmp.KmpTarget
 import io.matthewnelson.kotlin.components.kmp.KmpTarget.Jvm.Android.Companion.SOURCE_SET_MAIN_NAME as KmpAndroidMain
-import io.matthewnelson.kotlin.components.kmp.publish.kmpPublishRootProjectConfiguration
 import kmp.tor.env
 import org.jetbrains.kotlin.gradle.plugin.KotlinJsCompilerType
 
@@ -45,25 +43,25 @@ kmpConfiguration {
                 },
             ),
 
-            KmpTarget.NonJvm.JS(
-                compilerType = KotlinJsCompilerType.BOTH,
-                browser = null,
-                node = KmpTarget.NonJvm.JS.Node(
-                    jsNodeDsl = null
-                ),
-                mainSourceSet = null,
-                testSourceSet = null,
-            ),
-
-            KmpTarget.NonJvm.Native.Unix.Darwin.Ios.All.DEFAULT,
-            KmpTarget.NonJvm.Native.Unix.Darwin.Macos.X64.DEFAULT,
-            KmpTarget.NonJvm.Native.Unix.Darwin.Macos.Arm64.DEFAULT,
-            KmpTarget.NonJvm.Native.Unix.Darwin.Tvos.All.DEFAULT,
-            KmpTarget.NonJvm.Native.Unix.Darwin.Watchos.All.DEFAULT,
-
-            KmpTarget.NonJvm.Native.Unix.Linux.X64.DEFAULT,
-
-            KmpTarget.NonJvm.Native.Mingw.X64.DEFAULT,
+//            KmpTarget.NonJvm.JS(
+//                compilerType = KotlinJsCompilerType.BOTH,
+//                browser = null,
+//                node = KmpTarget.NonJvm.JS.Node(
+//                    jsNodeDsl = null
+//                ),
+//                mainSourceSet = null,
+//                testSourceSet = null,
+//            ),
+//
+//            KmpTarget.NonJvm.Native.Unix.Darwin.Ios.All.DEFAULT,
+//            KmpTarget.NonJvm.Native.Unix.Darwin.Macos.X64.DEFAULT,
+//            KmpTarget.NonJvm.Native.Unix.Darwin.Macos.Arm64.DEFAULT,
+//            KmpTarget.NonJvm.Native.Unix.Darwin.Tvos.All.DEFAULT,
+//            KmpTarget.NonJvm.Native.Unix.Darwin.Watchos.All.DEFAULT,
+//
+//            KmpTarget.NonJvm.Native.Unix.Linux.X64.DEFAULT,
+//
+//            KmpTarget.NonJvm.Native.Mingw.X64.DEFAULT,
         ),
         commonMainSourceSet = {
             dependencies {
