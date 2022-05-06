@@ -43,7 +43,7 @@ dependencies {
    for a basic gradle/dependency configuration.  
  - See the [JavaFx Sample App](https://github.com/05nelsonm/kmp-tor/tree/master/samples/javafx/src/jvmMain/kotlin/io/matthewnelson/kmp/tor/sample/javafx/SampleApp.kt) 
    for a basic setup example.  
- - Run the JavaFx Sample via `./gradlew :samples:javafx:run -PKMP_TARGETS=JVM` from terminal 
+ - Run the JavaFx Sample via `./gradlew :samples:kotlin:javafx:run -PKMP_TARGETS=JVM` from terminal 
    or cmd prompt.
      - Note: Be sure to run `git submodule update --init` if you haven't yet so git 
        submodules are initialized.

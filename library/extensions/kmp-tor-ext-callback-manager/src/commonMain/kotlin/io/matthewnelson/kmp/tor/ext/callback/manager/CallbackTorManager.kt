@@ -44,6 +44,8 @@ import kotlinx.coroutines.*
 /**
  * Wrapper for [TorManager] such that callbacks
  * can be used in lieu of suspension functions.
+ *
+ * @sample [io.matthewnelson.kmp.tor.sample.java.android.App]
  * */
 @OptIn(InternalTorApi::class)
 class CallbackTorManager(

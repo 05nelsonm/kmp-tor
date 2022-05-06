@@ -29,11 +29,12 @@ if (
     KMP_TARGETS_ALL != null ||
     (targets?.contains("ANDROID") != false && targets?.contains("JVM") != false)
 ) {
-    include(":samples:android")
+    include(":samples:kotlin:android")
+    include(":samples:java:android")
 }
 
 if (KMP_TARGETS_ALL != null || targets?.contains("JVM") != false) {
-    include(":samples:javafx")
+    include(":samples:kotlin:javafx")
 }
 
 @Suppress("PrivatePropertyName")

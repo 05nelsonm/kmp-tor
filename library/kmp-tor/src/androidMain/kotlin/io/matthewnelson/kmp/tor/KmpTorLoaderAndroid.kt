@@ -33,7 +33,7 @@ import kotlin.coroutines.cancellation.CancellationException
  *
  * @see [TorConfigProviderAndroid]
  * @see [KmpTorLoader]
- * @sample [io.matthewnelson.kmp.tor.sample.android.SampleApp]
+ * @sample [io.matthewnelson.kmp.tor.sample.kotlin.android.SampleApp]
  * */
 class KmpTorLoaderAndroid(provider: TorConfigProviderAndroid): KmpTorLoader(provider) {
 
