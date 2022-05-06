@@ -16,9 +16,23 @@
 package io.matthewnelson.kmp.tor.ext.callback.controller.common
 
 import io.matthewnelson.kmp.tor.common.annotation.InternalTorApi
+import kotlin.jvm.JvmField
 
 fun interface TorCallback<in T: Any?> {
+
     fun invoke(result: T)
+
+    companion object {
+        /**
+         * Optional static instance that will always throw on request failure.
+         *
+         * Use case is primarily to pipe exceptions to the uncaught exception
+         * handler that was set when instantiating `CallbackTorController` or
+         * `CallbackTorManager`.
+         * */
+        @JvmField
+        val THROW = TorCallback<Throwable> { throw it }
+    }
 }
 
 @InternalTorApi
