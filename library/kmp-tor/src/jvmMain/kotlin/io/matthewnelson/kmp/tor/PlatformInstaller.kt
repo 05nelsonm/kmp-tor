@@ -31,6 +31,8 @@ import io.matthewnelson.kmp.tor.binary.extract.ZipArchiveExtractor
 import io.matthewnelson.kmp.tor.internal.doesContentMatchExpected
 import io.matthewnelson.kmp.tor.manager.common.event.TorManagerEvent
 import io.matthewnelson.kmp.tor.manager.common.exceptions.TorManagerException
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import java.io.File
 import java.io.IOException
 
@@ -157,13 +159,15 @@ class PlatformInstaller private constructor(
         }
     }
 
+    private val lock = Mutex()
+    private val installationDirs: MutableSet<String> = LinkedHashSet(1)
+
     @get:JvmName("isLinux")
     val isLinux: Boolean get() = os == LINUX
     @get:JvmName("isMacos")
     val isMacos: Boolean get() = os == MACOS
     @get:JvmName("isMingw")
     val isMingw: Boolean get() = os == MINGW
-    private var firstStartInstallComplete: Boolean = false
 
     /**
      * Decompresses archive file contents and extracts them to specified
@@ -171,7 +175,7 @@ class PlatformInstaller private constructor(
      * */
     @JvmSynthetic
     @Throws(TorManagerException::class)
-    internal fun retrieveTor(
+    internal suspend fun retrieveTor(
         installationDir: File,
         notify: (TorManagerEvent.Log.Debug) -> Unit,
     ): File {
@@ -180,12 +184,22 @@ class PlatformInstaller private constructor(
                 doCleanInstall(installationDir, notify)
             }
             InstallOption.CleanInstallFirstStartOnly -> {
-                if (firstStartInstallComplete) {
-                    doCleanInstallIfMissing(installationDir, notify)
-                } else {
-                    val tor = doCleanInstall(installationDir, notify)
-                    firstStartInstallComplete = true
-                    tor
+                val canonicalPath = try {
+                    installationDir.canonicalPath
+                } catch (e: IOException) {
+                    throw TorManagerException(
+                        "Failed to retrieve canonical path of installation dir", e
+                    )
+                }
+
+                lock.withLock {
+                    if (installationDirs.contains(canonicalPath)) {
+                        doCleanInstallIfMissing(installationDir, notify)
+                    } else {
+                        val tor = doCleanInstall(installationDir, notify)
+                        installationDirs.add(canonicalPath)
+                        tor
+                    }
                 }
             }
             InstallOption.CleanInstallIfMissing -> {
