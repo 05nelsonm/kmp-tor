@@ -104,10 +104,18 @@ android {
     }
 }
 
+// For SNAPSHOTS
+//repositories {
+//    maven("https://oss.sonatype.org/content/repositories/snapshots/")
+//}
+
 dependencies {
-    implementation(project(":library:kmp-tor"))
     implementation(deps.androidx.appCompat)
     implementation(deps.androidx.constraintLayout)
+
+    // For SNAPSHOTS
+//    implementation("io.matthewnelson.kotlin-components:kmp-tor:${env.kmpTorAll.version.name}")
+    implementation(project(":library:kmp-tor"))
 
     implementation(deps.viewBindingDelegateNoReflect)
     implementation(deps.kotlin.coroutines.android)
