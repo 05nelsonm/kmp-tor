@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-package io.matthewnelson.kmp.tor.sample.javafx
+package io.matthewnelson.kmp.tor.sample.kotlin.javafx
 
 import io.matthewnelson.kmp.tor.KmpTorLoaderJvm
 import io.matthewnelson.kmp.tor.PlatformInstaller
@@ -34,8 +34,8 @@ import io.matthewnelson.kmp.tor.manager.common.state.TorNetworkState
 import io.matthewnelson.kmp.tor.manager.common.state.TorState
 import io.matthewnelson.kmp.tor.manager.instance.InstanceId
 import io.matthewnelson.kmp.tor.manager.instance.TorMultiInstanceManager
-import io.matthewnelson.kmp.tor.sample.javafx.ui.SampleView
-import io.matthewnelson.kmp.tor.sample.javafx.util.Log
+import io.matthewnelson.kmp.tor.sample.kotlin.javafx.ui.SampleView
+import io.matthewnelson.kmp.tor.sample.kotlin.javafx.util.Log
 import javafx.application.Platform
 import javafx.stage.Stage
 import kotlinx.coroutines.DelicateCoroutinesApi

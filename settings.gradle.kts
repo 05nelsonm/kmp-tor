@@ -33,7 +33,7 @@ if (
 }
 
 if (KMP_TARGETS_ALL != null || targets?.contains("JVM") != false) {
-    include(":samples:javafx")
+    include(":samples:kotlin:javafx")
 }
 
 @Suppress("PrivatePropertyName")

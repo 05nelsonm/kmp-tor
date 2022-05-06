@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-package io.matthewnelson.kmp.tor.sample.javafx.util
+package io.matthewnelson.kmp.tor.sample.kotlin.javafx.util
 
 import java.text.SimpleDateFormat
 import java.util.*

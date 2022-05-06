@@ -44,7 +44,7 @@ java {
 }
 
 application {
-    mainClass.set("io.matthewnelson.kmp.tor.sample.javafx.SampleApp")
+    mainClass.set("io.matthewnelson.kmp.tor.sample.kotlin.javafx.SampleApp")
 }
 
 javafx {
