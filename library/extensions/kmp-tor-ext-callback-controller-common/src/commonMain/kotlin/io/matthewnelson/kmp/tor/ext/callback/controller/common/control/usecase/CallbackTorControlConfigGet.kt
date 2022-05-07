@@ -17,8 +17,8 @@ package io.matthewnelson.kmp.tor.ext.callback.controller.common.control.usecase
 
 import io.matthewnelson.kmp.tor.controller.common.config.ConfigEntry
 import io.matthewnelson.kmp.tor.controller.common.config.TorConfig
-import io.matthewnelson.kmp.tor.ext.callback.controller.common.Task
-import io.matthewnelson.kmp.tor.ext.callback.controller.common.TorCallback
+import io.matthewnelson.kmp.tor.ext.callback.common.Task
+import io.matthewnelson.kmp.tor.ext.callback.common.TorCallback
 import io.matthewnelson.kmp.tor.ext.callback.controller.common.control.CallbackTorControlConfig
 
 /**
@@ -32,13 +32,13 @@ interface CallbackTorControlConfigGet {
 
     fun configGet(
         setting: TorConfig.Setting<*>,
-        failure: TorCallback<Throwable>,
+        failure: TorCallback<Throwable>?,
         success: TorCallback<ConfigEntry>,
     ): Task
 
     fun configGet(
         settings: Set<TorConfig.Setting<*>>,
-        failure: TorCallback<Throwable>,
+        failure: TorCallback<Throwable>?,
         success: TorCallback<List<ConfigEntry>>,
     ): Task
 

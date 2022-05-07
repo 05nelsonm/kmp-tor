@@ -16,8 +16,8 @@
 package io.matthewnelson.kmp.tor.ext.callback.controller.common.control.usecase
 
 import io.matthewnelson.kmp.tor.controller.common.control.usecase.TorControlSignal.Signal
-import io.matthewnelson.kmp.tor.ext.callback.controller.common.Task
-import io.matthewnelson.kmp.tor.ext.callback.controller.common.TorCallback
+import io.matthewnelson.kmp.tor.ext.callback.common.Task
+import io.matthewnelson.kmp.tor.ext.callback.common.TorCallback
 
 /**
  * "SIGNAL" SP Signal CRLF
@@ -33,7 +33,7 @@ interface CallbackTorControlSignal {
 
     fun signal(
         signal: Signal,
-        failure: TorCallback<Throwable>,
+        failure: TorCallback<Throwable>?,
         success: TorCallback<Any?>,
     ): Task
 

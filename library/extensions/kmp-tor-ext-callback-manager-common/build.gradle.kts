@@ -13,12 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-import io.matthewnelson.kotlin.components.dependencies.deps
-import io.matthewnelson.kotlin.components.dependencies.depsTest
-import io.matthewnelson.kotlin.components.dependencies.versions
 import io.matthewnelson.kotlin.components.kmp.KmpTarget
-import io.matthewnelson.kotlin.components.kmp.KmpTarget.Jvm.Android.Companion.SOURCE_SET_MAIN_NAME as KmpAndroidMain
-import io.matthewnelson.kotlin.components.kmp.publish.kmpPublishRootProjectConfiguration
 import kmp.tor.env
 import org.jetbrains.kotlin.gradle.plugin.KotlinJsCompilerType
 
@@ -70,6 +65,6 @@ kmpConfiguration {
 kmpPublish {
     setupModule(
         pomDescription = "Kotlin Components' Callback extension of TorManager common code for non-coroutine consumers",
-        holdPublication = env.kmpTor.holdPublication
+        holdPublication = env.kmpTorCommon.holdPublication
     )
 }

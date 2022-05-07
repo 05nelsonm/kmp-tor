@@ -16,9 +16,11 @@
 package io.matthewnelson.kmp.tor.ext.callback.controller.common
 
 import io.matthewnelson.kmp.tor.common.annotation.InternalTorApi
+import io.matthewnelson.kmp.tor.ext.callback.common.TorCallback
 
 @InternalTorApi
-inline fun <T: Any?> Result<T>.toCallback(failure: TorCallback<Throwable>, success: TorCallback<T>) {
-    onFailure { failure.invoke(it) }
+@Suppress("nothing_to_inline")
+inline fun <T: Any?> Result<T>.toCallback(failure: TorCallback<Throwable>?, success: TorCallback<T>) {
+    onFailure { failure?.invoke(it) }
     onSuccess { success.invoke(it) }
 }

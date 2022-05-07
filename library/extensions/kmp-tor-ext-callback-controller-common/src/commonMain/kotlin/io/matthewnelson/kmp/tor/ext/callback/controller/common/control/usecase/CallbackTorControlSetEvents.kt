@@ -16,8 +16,8 @@
 package io.matthewnelson.kmp.tor.ext.callback.controller.common.control.usecase
 
 import io.matthewnelson.kmp.tor.controller.common.events.TorEvent
-import io.matthewnelson.kmp.tor.ext.callback.controller.common.Task
-import io.matthewnelson.kmp.tor.ext.callback.controller.common.TorCallback
+import io.matthewnelson.kmp.tor.ext.callback.common.Task
+import io.matthewnelson.kmp.tor.ext.callback.common.TorCallback
 
 /**
  * "SETEVENTS" [SP "EXTENDED"] *(SP EventCode) CRLF
@@ -31,7 +31,7 @@ interface CallbackTorControlSetEvents {
 
     fun setEvents(
         events: Set<TorEvent>,
-        failure: TorCallback<Throwable>,
+        failure: TorCallback<Throwable>?,
         success: TorCallback<Any?>,
     ): Task
 

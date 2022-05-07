@@ -19,8 +19,8 @@ import io.matthewnelson.kmp.tor.common.address.OnionAddressV3
 import io.matthewnelson.kmp.tor.common.clientauth.ClientName
 import io.matthewnelson.kmp.tor.common.clientauth.OnionClientAuth.PrivateKey
 import io.matthewnelson.kmp.tor.controller.common.control.TorControlOnionClientAuth.Flag
-import io.matthewnelson.kmp.tor.ext.callback.controller.common.Task
-import io.matthewnelson.kmp.tor.ext.callback.controller.common.TorCallback
+import io.matthewnelson.kmp.tor.ext.callback.common.Task
+import io.matthewnelson.kmp.tor.ext.callback.common.TorCallback
 import io.matthewnelson.kmp.tor.ext.callback.controller.common.control.CallbackTorControlOnionClientAuth
 
 /**
@@ -58,7 +58,7 @@ interface CallbackTorControlOnionClientAuthAdd {
         key: PrivateKey,
         clientName: ClientName?,
         flags: Set<Flag>?,
-        failure: TorCallback<Throwable>,
+        failure: TorCallback<Throwable>?,
         success: TorCallback<Any?>,
     ): Task
 

@@ -15,6 +15,7 @@
  **/
 package io.matthewnelson.kmp.tor.manager.common.state
 
+import io.matthewnelson.kmp.tor.common.annotation.ExperimentalTorApi
 import io.matthewnelson.kmp.tor.common.annotation.SealedValueClass
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.contract
@@ -34,6 +35,7 @@ sealed interface TorState {
     }
 
     @SealedValueClass
+    @OptIn(ExperimentalTorApi::class)
     sealed interface On                                             : TorState {
         companion object {
             @JvmStatic
