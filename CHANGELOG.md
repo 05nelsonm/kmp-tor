@@ -1,5 +1,19 @@
 # CHANGELOG
 
+## Version 0.4.6.10+0.1.1 (2022-05-07)
+ - Significant improvements for Java users (library is now usable from Java land):
+     - Removes from public APIs all use of `JvmInline` value classes by use of 
+       sealed interfaces (ie. `SealedValueClass`) w/o disrupting existing APIs.
+     - Adds new `SealedValueClass` annotation as an `ExperimentalTorApi`.
+     - Adds New `Callback` extension libraries for wrapping `TorManager` and `TorController`
+       implementations in callbacks (for non-coroutine users).
+     - Sample improvements.
+     - Fixes all usage of `JvmName`, `JvmField`, `JvmStatic` annotations.
+ - Fixes `PlatformInstaller` when `InstallOption.CleanInstallFirstStartOnly` was elected 
+   for while re-using the `PlatformInstaller` across multiple instances of `TorManager`.
+ - Disables not yet implemented multiplatform targets for non-common modules.
+ - Updates Kotlin-Components (publishing tool updates).
+
 ## Version 0.4.6.10+0.1.0 (2022-05-01)
  - Improvements to Multi-instance performance
  - Makes `NetworkObserver` reusable with multiple instances
