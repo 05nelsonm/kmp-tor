@@ -20,8 +20,8 @@ import android.util.Log;
 
 import androidx.annotation.NonNull;
 
+import java.net.InetSocketAddress;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import io.matthewnelson.kmp.tor.KmpTorLoaderAndroid;
@@ -30,6 +30,7 @@ import io.matthewnelson.kmp.tor.common.address.OnionAddress;
 import io.matthewnelson.kmp.tor.common.address.OnionUrl;
 import io.matthewnelson.kmp.tor.common.address.Port;
 import io.matthewnelson.kmp.tor.common.address.PortProxy;
+import io.matthewnelson.kmp.tor.common.address.ProxyAddress;
 import io.matthewnelson.kmp.tor.common.address.Scheme;
 import io.matthewnelson.kmp.tor.controller.common.config.TorConfig;
 import io.matthewnelson.kmp.tor.controller.common.config.TorConfig.Option.*;
@@ -56,7 +57,20 @@ public class App extends Application {
             @Override
             protected TorConfig provide() {
                 Ports.Socks socks = new Ports.Socks();
+
                 socks.set(AorDorPort.Value.invoke(PortProxy.invoke(9055)));
+
+                Set<Ports.IsolationFlag> socksIsoFlags = new HashSet<>(2);
+                socksIsoFlags.add(Ports.IsolationFlag.IsolateDestAddr.INSTANCE);
+                socksIsoFlags.add(new Ports.IsolationFlag.SessionGroup(5));
+                socks.setIsolationFlags(socksIsoFlags);
+
+                Set<Ports.Socks.Flag> socksFlags = new HashSet<>(1);
+                socksFlags.add(Ports.Socks.Flag.OnionTrafficOnly.INSTANCE);
+                socks.setFlags(socksFlags);
+
+                Ports.HttpTunnel http = new Ports.HttpTunnel();
+                http.set(AorDorPort.Auto.INSTANCE);
 
                 HiddenService myHiddenService = new HiddenService();
 
@@ -77,6 +91,7 @@ public class App extends Application {
 
                 return new TorConfig.Builder()
                     .put(socks)
+                    .put(http)
                     .put(myHiddenService)
                     .build();
             }
@@ -98,6 +113,16 @@ public class App extends Application {
         torManager.addListener(new TorListener());
     }
 
+    /*
+    * Note that AndroidStudio shows override errors because the TorManagerEvent.Listener
+    * extends TorEvent.Listener which is not picked up for some reason when kotlin
+    * compiles it to Java. Everything still works, it is just an inconvenience.
+    *
+    * This issue does not show up in this project b/c we're depending on the module and not
+    * the maven dependency.
+    *
+    * See https://github.com/05nelsonm/kmp-tor/issues/123
+    * */
     private static class TorListener extends TorManagerEvent.Listener {
 
         @Override
@@ -113,8 +138,32 @@ public class App extends Application {
         }
 
         @Override
+        public void managerEventError(@NonNull Throwable t) {
+            t.printStackTrace();
+        }
+
+        @Override
+        public void managerEventAddressInfo(@NonNull TorManagerEvent.AddressInfo info) {
+            if (info.isNull()) {
+                // Tear down HttpClient
+            } else {
+                try {
+                    ProxyAddress socks = info.socksInfoToProxyAddress().iterator().next();
+                    InetSocketAddress socketAddress = new InetSocketAddress(
+                        socks.ipAddress,
+                        socks.port.getValue()
+                    );
+
+                    // Build HttpClient
+                } catch (Exception e) {
+                    Log.e("TorListener", "Failed to build HttpClient with " + info, e);
+                }
+            }
+        }
+
+        @Override
         public void managerEventStartUpCompleteForTorInstance() {
-            // Do stuff once bootstrapped
+            // Do one-time things after we're bootstrapped
 
             Set<HiddenService.Ports> hsPorts = new HashSet<>(2);
             hsPorts.add(new HiddenService.Ports(Port.invoke(80), Port.invoke(8080))); // http
@@ -136,6 +185,14 @@ public class App extends Application {
 
                     torManager.onionDel(hsEntry.address, TorCallback.THROW, s -> {
                         Log.d("TorListener", "Aaaaaaaaand it's gone...");
+
+                        torManager.infoGet(
+                            new TorControlInfoGet.KeyWord.Uptime(),
+                            TorCallback.THROW,
+                            uptime -> {
+                                Log.d("TorListener", "Uptime - " + uptime);
+                            }
+                        );
                     });
                 }
             );
