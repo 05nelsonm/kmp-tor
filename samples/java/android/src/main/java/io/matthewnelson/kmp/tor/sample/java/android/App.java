@@ -75,17 +75,16 @@ public class App extends Application {
                 HiddenService myHiddenService = new HiddenService();
 
                 myHiddenService.set(FileSystemDir.invoke(
-                    getWorkDir()
-                        .builder(Path.getFsSeparator())
+                    getWorkDir().builder()
                         .addSegment(HiddenService.DEFAULT_PARENT_DIR_NAME)
                         .addSegment("my_hidden_service")
                         .build()
                 ));
 
                 Set<HiddenService.Ports> hsPorts = new HashSet<>(2);
-                HiddenService.Ports virtPort80 = new HiddenService.Ports(Port.invoke(80), Port.invoke(8080));
-                hsPorts.add(virtPort80);
-                hsPorts.add(virtPort80.copy(Port.invoke(443), virtPort80.targetPort));
+                HiddenService.Ports httpPort = new HiddenService.Ports(Port.invoke(80), Port.invoke(8080));
+                hsPorts.add(httpPort);
+                hsPorts.add(httpPort.copy(Port.invoke(443), httpPort.targetPort)); // also allow https connections
 
                 myHiddenService.setPorts(hsPorts);
 
