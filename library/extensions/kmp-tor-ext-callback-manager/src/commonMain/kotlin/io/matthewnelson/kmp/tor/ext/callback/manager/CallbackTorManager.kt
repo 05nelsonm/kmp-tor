@@ -30,6 +30,8 @@ import io.matthewnelson.kmp.tor.controller.common.control.usecase.TorControlOnio
 import io.matthewnelson.kmp.tor.controller.common.control.usecase.TorControlSignal
 import io.matthewnelson.kmp.tor.controller.common.events.TorEvent
 import io.matthewnelson.kmp.tor.controller.common.events.TorEventProcessor
+import io.matthewnelson.kmp.tor.ext.callback.common.Task
+import io.matthewnelson.kmp.tor.ext.callback.common.TorCallback
 import io.matthewnelson.kmp.tor.ext.callback.controller.common.*
 import io.matthewnelson.kmp.tor.ext.callback.manager.common.CallbackTorControlManager
 import io.matthewnelson.kmp.tor.ext.callback.manager.common.CallbackTorOperationManager

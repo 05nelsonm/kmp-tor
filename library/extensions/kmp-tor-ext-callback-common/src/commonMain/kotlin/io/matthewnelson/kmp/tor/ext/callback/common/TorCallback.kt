@@ -13,9 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-package io.matthewnelson.kmp.tor.ext.callback.controller.common
+package io.matthewnelson.kmp.tor.ext.callback.common
 
-import io.matthewnelson.kmp.tor.common.annotation.InternalTorApi
 import kotlin.jvm.JvmField
 
 fun interface TorCallback<in T: Any?> {
@@ -32,27 +31,5 @@ fun interface TorCallback<in T: Any?> {
          * */
         @JvmField
         val THROW = TorCallback<Throwable> { throw it }
-    }
-}
-
-@InternalTorApi
-@Suppress("nothing_to_inline")
-inline fun TorCallback<Throwable>?.shouldFailImmediately(
-    failure: Boolean,
-    uncaughtExceptionHandlerProvider: () -> TorCallback<Throwable>,
-    exceptionProvider: () -> Exception,
-): EmptyTask? {
-    return if (failure) {
-        // Can throw an exception here. Should be piped
-        // to the uncaught exception handler.
-        try {
-            this?.invoke(exceptionProvider.invoke())
-        } catch (t: Throwable) {
-            uncaughtExceptionHandlerProvider.invoke().invoke(t)
-        }
-
-        EmptyTask
-    } else {
-        null
     }
 }

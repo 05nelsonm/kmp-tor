@@ -15,8 +15,8 @@
  **/
 package io.matthewnelson.kmp.tor.ext.callback.controller.common.control.usecase
 
-import io.matthewnelson.kmp.tor.ext.callback.controller.common.Task
-import io.matthewnelson.kmp.tor.ext.callback.controller.common.TorCallback
+import io.matthewnelson.kmp.tor.ext.callback.common.Task
+import io.matthewnelson.kmp.tor.ext.callback.common.TorCallback
 
 /**
  * "DROPGUARDS" CRLF

@@ -16,11 +16,27 @@
 package io.matthewnelson.kmp.tor.ext.callback.controller.common
 
 import io.matthewnelson.kmp.tor.common.annotation.InternalTorApi
+import io.matthewnelson.kmp.tor.ext.callback.common.EmptyTask
 import io.matthewnelson.kmp.tor.ext.callback.common.TorCallback
 
 @InternalTorApi
 @Suppress("nothing_to_inline")
-inline fun <T: Any?> Result<T>.toCallback(failure: TorCallback<Throwable>?, success: TorCallback<T>) {
-    onFailure { failure?.invoke(it) }
-    onSuccess { success.invoke(it) }
+inline fun TorCallback<Throwable>?.shouldFailImmediately(
+    failure: Boolean,
+    uncaughtExceptionHandlerProvider: () -> TorCallback<Throwable>,
+    exceptionProvider: () -> Exception,
+): EmptyTask? {
+    return if (failure) {
+        // Can throw an exception here. Should be piped
+        // to the uncaught exception handler.
+        try {
+            this?.invoke(exceptionProvider.invoke())
+        } catch (t: Throwable) {
+            uncaughtExceptionHandlerProvider.invoke().invoke(t)
+        }
+
+        EmptyTask
+    } else {
+        null
+    }
 }

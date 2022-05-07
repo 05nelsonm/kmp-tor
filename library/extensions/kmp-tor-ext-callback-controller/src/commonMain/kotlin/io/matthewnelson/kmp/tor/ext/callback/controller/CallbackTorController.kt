@@ -34,9 +34,10 @@ import io.matthewnelson.kmp.tor.controller.common.control.usecase.TorControlSign
 import io.matthewnelson.kmp.tor.controller.common.events.TorEvent
 import io.matthewnelson.kmp.tor.controller.common.events.TorEventProcessor
 import io.matthewnelson.kmp.tor.controller.common.exceptions.ControllerShutdownException
+import io.matthewnelson.kmp.tor.ext.callback.common.Task
+import io.matthewnelson.kmp.tor.ext.callback.common.TorCallback
 import io.matthewnelson.kmp.tor.ext.callback.controller.common.*
 import kotlinx.coroutines.*
-import kotlin.jvm.JvmName
 
 /**
  * Wrapper for [TorController] such that callbacks

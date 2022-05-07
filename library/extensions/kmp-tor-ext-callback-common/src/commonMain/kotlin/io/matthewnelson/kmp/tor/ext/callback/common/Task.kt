@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-package io.matthewnelson.kmp.tor.ext.callback.controller.common
+package io.matthewnelson.kmp.tor.ext.callback.common
 
 interface Task {
     val isActive: Boolean

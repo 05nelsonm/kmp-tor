@@ -15,7 +15,7 @@
  **/
 package io.matthewnelson.kmp.tor.ext.callback.manager
 
-import io.matthewnelson.kmp.tor.ext.callback.controller.common.TorCallback
+import io.matthewnelson.kmp.tor.ext.callback.common.TorCallback
 import io.matthewnelson.kmp.tor.manager.Destroyable
 
 /**

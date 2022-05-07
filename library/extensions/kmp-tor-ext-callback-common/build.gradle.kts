@@ -48,23 +48,12 @@ kmpConfiguration {
 
             KmpTarget.NonJvm.Native.Mingw.X64.DEFAULT,
         ),
-        commonMainSourceSet = {
-            dependencies {
-                implementation(project(":library:controller:kmp-tor-controller-common"))
-                api(project(":library:extensions:kmp-tor-ext-callback-common"))
-            }
-        },
-        commonTestSourceSet = {
-            dependencies {
-                implementation(kotlin("test"))
-            }
-        },
     )
 }
 
 kmpPublish {
     setupModule(
-        pomDescription = "Kotlin Components' Callback extension of TorController common code for non-coroutine consumers",
+        pomDescription = "Kotlin Components' TorCallback extension for non-coroutine consumers",
         holdPublication = env.kmpTorCommon.holdPublication
     )
 }

@@ -16,8 +16,8 @@
 package io.matthewnelson.kmp.tor.ext.callback.controller.common.control.usecase
 
 import io.matthewnelson.kmp.tor.controller.common.control.usecase.TorControlInfoGet.KeyWord
-import io.matthewnelson.kmp.tor.ext.callback.controller.common.Task
-import io.matthewnelson.kmp.tor.ext.callback.controller.common.TorCallback
+import io.matthewnelson.kmp.tor.ext.callback.common.Task
+import io.matthewnelson.kmp.tor.ext.callback.common.TorCallback
 
 /**
  * "GETINFO" 1*(SP keyword) CRLF
