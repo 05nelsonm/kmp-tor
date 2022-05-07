@@ -13,6 +13,7 @@ include(":library:controller:kmp-tor-controller-common")
 include(":library:manager:kmp-tor-manager")
 include(":library:manager:kmp-tor-manager-common")
 
+include(":library:extensions:kmp-tor-ext-callback-common")
 include(":library:extensions:kmp-tor-ext-callback-controller")
 include(":library:extensions:kmp-tor-ext-callback-controller-common")
 include(":library:extensions:kmp-tor-ext-callback-manager")
