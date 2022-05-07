@@ -39,11 +39,11 @@ dependencies {
 
  - By default, `TorService` needs no configuration and runs in the background. For configuring 
    it to run as a Foreground service, see the following:
-     - [Configuring Attrs](https://github.com/05nelsonm/kmp-tor/blob/master/samples/android/src/main/res/values/attrs.xml)
-     - [Configuring Manifest](https://github.com/05nelsonm/kmp-tor/blob/master/samples/android/src/main/AndroidManifest.xml)
+     - [Configuring Attrs](https://github.com/05nelsonm/kmp-tor/blob/master/samples/kotlin/android/src/main/res/values/attrs.xml)
+     - [Configuring Manifest](https://github.com/05nelsonm/kmp-tor/blob/master/samples/kotlin/android/src/main/AndroidManifest.xml)
 
 <!-- TODO: Add sample code for retrieving TorManager -->
- - See the [Sample App](https://github.com/05nelsonm/kmp-tor/tree/master/samples/android/src/main/java/io/matthewnelson/kmp/tor/sample/android) 
+ - See the [Sample App](https://github.com/05nelsonm/kmp-tor/tree/master/samples/kotlin/android/src/main/java/io/matthewnelson/kmp/tor/sample/android) 
    for a basic setup of `TorManager` and your `TorConfig`.  
 
 </details>
@@ -52,9 +52,9 @@ dependencies {
     <summary>Configuring a Java Project</summary>
 
 
- - See the [JavaFX Sample App Gradle Configuration](https://github.com/05nelsonm/kmp-tor/tree/master/samples/javafx/build.gradle.kts) 
+ - See the [JavaFX Sample App Gradle Configuration](https://github.com/05nelsonm/kmp-tor/tree/master/samples/kotlin/javafx/build.gradle.kts) 
    for a basic gradle/dependency configuration.  
- - See the [JavaFx Sample App](https://github.com/05nelsonm/kmp-tor/tree/master/samples/javafx/src/jvmMain/kotlin/io/matthewnelson/kmp/tor/sample/javafx/SampleApp.kt) 
+ - See the [JavaFx Sample App](https://github.com/05nelsonm/kmp-tor/tree/master/samples/kotlin/javafx/src/jvmMain/kotlin/io/matthewnelson/kmp/tor/sample/javafx/SampleApp.kt) 
    for a basic setup example.  
  - Run the JavaFx Sample via `./gradlew :samples:kotlin:javafx:run -PKMP_TARGETS=JVM` from terminal 
    or cmd prompt.
@@ -67,12 +67,11 @@ dependencies {
     <summary>Extensions (Callback - Non-Kotlin users)</summary>
 
 
-For Java projects (who can't use coroutines), you can "wrap" `TorManager` in an implementation
-that uses callbacks (ie. `CallbackTorManager`).
+ - For Java projects (who can't use coroutines), you can "wrap" `TorManager` in an implementation 
+   that uses callbacks (ie. `CallbackTorManager`).
 
 ```groovy
 // build.gradle
-
 dependencies {
    def vTor = '0.4.6.10'
    def vKmpTor = '0.1.0'
@@ -81,8 +80,7 @@ dependencies {
    // Add the callback extension
    implementation "io.matthewnelson.kotlin-components:kmp-tor-ext-callback-manager:$vKmpTor"
    
-   // You will also need to add the Kotlin gradle plugin, and possibly the coroutines
-   // dependency, too.
+   // You will also need to add the Kotlin Gradle Plugin, and coroutines-android dependency.
 }
 ```
 
@@ -103,8 +101,8 @@ public class Example1 {
 }
 ```
 
-All requests use coroutines under the hood and are Main thread safe.
-Results will be dispatched to the supplied callback on the Main thread.
+ - All requests use coroutines under the hood and are Main thread safe. 
+   Results will be dispatched to the supplied callback on the Main thread.
 
 ```java
 // Multiple callbacks of different styles (Java)
@@ -124,13 +122,10 @@ public class Example2 {
                     Log.d(TAG, "Tor restarted successfully");
 
                     Task restartTask2 = torManager.restart(
-                        new TorCallback<Throwable>() {
-                            @Override
-                            public void invoke(Throwable throwable) {
-                                // Send it to our instance's uncaughtExceptionHandler
-                                throw throwable;
-                            }
-                        },
+                        // Use the provided instance that will automatically throw
+                        // the exception, which will pipe it to the handler.
+                        TorCallback.THROW,
+
                         new TorCallback<Object>() {
                             @Override
                             public void invoke(Object o) {
@@ -144,6 +139,9 @@ public class Example2 {
     );
 }
 ```
+
+ - See the [Java Sample App](https://github.com/05nelsonm/kmp-tor/blob/master/samples/java/android/src/main/java/io/matthewnelson/kmp/tor/sample/java/android/App.java)  
+   for a basic setup examples.
 
 </details>
 
