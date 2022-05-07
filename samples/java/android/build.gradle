@@ -39,16 +39,19 @@ android {
     compileSdk versions.android.sdkCompile
     buildToolsVersion versions.android.buildTools
 
+    // Needed for Tor binary file extraction to nativeDir
     packagingOptions.jniLibs.useLegacyPackaging true
 
     defaultConfig {
         applicationId "io.matthewnelson.kmp.tor.sample.java"
-        minSdk versions.android.sdkMin16
+
+        // can support sdk 16, but you would have to enable multi-dex
+        // and I don't want to do that for a sample.
+        minSdk versions.android.sdkMin21
+
         targetSdk versions.android.sdkTarget
         versionCode env.kmpTorAll.version.code
         versionName env.kmpTorAll.version.name
-
-        multiDexEnabled true
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         testInstrumentationRunnerArguments disableAnalytics: 'true'
@@ -101,16 +104,15 @@ android {
 }
 
 // For SNAPSHOTS
-//repositories {
-//    maven {
-//        url 'https://oss.sonatype.org/content/repositories/snapshots/'
-//    }
-//}
+repositories {
+    maven {
+        url 'https://oss.sonatype.org/content/repositories/snapshots/'
+    }
+}
 
 dependencies {
     implementation deps.androidx.appCompat
     implementation deps.androidx.constraintLayout
-    implementation deps.androidx.multiDex
     implementation deps.google.material
 
     // For SNAPSHOTS
@@ -123,5 +125,5 @@ dependencies {
     // Even through kmp-tor comes with coroutines under the hood
     // and expressing the dependency is _not_ needed in kotlin
     // projects, it _is_ needed in Java only projects.
-    implementation deps.kotlin.coroutines.android
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:${versions.kotlin.coroutines}"
 }

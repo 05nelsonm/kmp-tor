@@ -19,32 +19,29 @@ import io.matthewnelson.kmp.tor.KmpTorLoaderJvm
 import io.matthewnelson.kmp.tor.PlatformInstaller
 import io.matthewnelson.kmp.tor.PlatformInstaller.InstallOption
 import io.matthewnelson.kmp.tor.TorConfigProviderJvm
-import io.matthewnelson.kmp.tor.common.address.Port
-import io.matthewnelson.kmp.tor.common.address.PortProxy
+import io.matthewnelson.kmp.tor.common.address.*
 import io.matthewnelson.kmp.tor.controller.common.config.TorConfig
 import io.matthewnelson.kmp.tor.controller.common.config.TorConfig.Setting.*
 import io.matthewnelson.kmp.tor.controller.common.config.TorConfig.Option.*
+import io.matthewnelson.kmp.tor.controller.common.control.usecase.TorControlInfoGet
 import io.matthewnelson.kmp.tor.controller.common.events.TorEvent
 import io.matthewnelson.kmp.tor.controller.common.file.Path
 import io.matthewnelson.kmp.tor.manager.TorManager
 import io.matthewnelson.kmp.tor.manager.common.TorControlManager
 import io.matthewnelson.kmp.tor.manager.common.TorOperationManager
 import io.matthewnelson.kmp.tor.manager.common.event.TorManagerEvent
-import io.matthewnelson.kmp.tor.manager.common.state.TorNetworkState
-import io.matthewnelson.kmp.tor.manager.common.state.TorState
 import io.matthewnelson.kmp.tor.manager.instance.InstanceId
 import io.matthewnelson.kmp.tor.manager.instance.TorMultiInstanceManager
 import io.matthewnelson.kmp.tor.sample.kotlin.javafx.ui.SampleView
 import io.matthewnelson.kmp.tor.sample.kotlin.javafx.util.Log
 import javafx.application.Platform
 import javafx.stage.Stage
-import kotlinx.coroutines.DelicateCoroutinesApi
-import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.launch
 import tornadofx.*
+import java.net.InetSocketAddress
 
 class SampleApp: App(SampleView::class) {
 
@@ -200,14 +197,12 @@ class SampleApp: App(SampleView::class) {
     }
 
     // only expose necessary interfaces
-    val torOperationManager1: TorOperationManager get() = managerInstance1
-    val torControlManager1: TorControlManager get() = managerInstance1
+    val torOperationManager: TorOperationManager get() = managerInstance1
+    val torControlManager: TorControlManager get() = managerInstance1
 
-    private val listenerInstance1 = SampleListener(instanceId1)
+    private val listenerInstance1 = TorListener(instanceId1)
 
     val eventLines1: StateFlow<String> get() = listenerInstance1.eventLines
-    val addressInfo1: StateFlow<TorManagerEvent.AddressInfo> get() = listenerInstance1.addressInfo
-    val state1: StateFlow<TorManagerEvent.State> get() = listenerInstance1.state
 
     override fun start(stage: Stage) {
         Log.d(this.javaClass.simpleName, "start")
@@ -254,10 +249,14 @@ class SampleApp: App(SampleView::class) {
         }
     }
 
+    private val appScope by lazy {
+        CoroutineScope(Dispatchers.Main.immediate + SupervisorJob())
+    }
+
     /**
      * Listen for and react to [TorManagerEvent]s && [TorEvent]s
      * */
-    private class SampleListener(private val instanceId: InstanceId): TorManagerEvent.Listener() {
+    private inner class TorListener(private val instanceId: InstanceId): TorManagerEvent.Listener() {
         private val _eventLines: MutableStateFlow<String> = MutableStateFlow("")
         val eventLines: StateFlow<String> = _eventLines.asStateFlow()
         private val events: MutableList<String> = ArrayList(50)
@@ -273,45 +272,83 @@ class SampleApp: App(SampleView::class) {
             }
         }
 
-        private val _addressInfo: MutableStateFlow<TorManagerEvent.AddressInfo> =
-            MutableStateFlow(TorManagerEvent.AddressInfo.NULL_VALUES)
-        val addressInfo: StateFlow<TorManagerEvent.AddressInfo> = _addressInfo.asStateFlow()
-        override fun managerEventAddressInfo(info: TorManagerEvent.AddressInfo) {
-            _addressInfo.value = info
-        }
-
-        private val _state: MutableStateFlow<TorManagerEvent.State> =
-            MutableStateFlow(TorManagerEvent.State(TorState.Off, TorNetworkState.Disabled))
-        val state: StateFlow<TorManagerEvent.State> = _state.asStateFlow()
-        override fun managerEventState(state: TorManagerEvent.State) {
-            _state.value = state
-        }
-
         override fun onEvent(event: TorManagerEvent) {
             addLine(event.toString())
-            if (event is TorManagerEvent.Log.Error) {
-                event.value.printStackTrace()
-            }
 
             super.onEvent(event)
         }
 
         override fun onEvent(event: TorEvent.Type.SingleLineEvent, output: String) {
-            addLine("event=${event.javaClass.simpleName}, output=$output")
+            addLine("$event - $output")
+
+            super.onEvent(event, output)
         }
 
         override fun onEvent(event: TorEvent.Type.MultiLineEvent, output: List<String>) {
-            addLine("multi-line event: ${event.javaClass.simpleName}. See Logs.")
+            addLine("multi-line event: $event. See Logs.")
 
             // these events are many many many lines and should be moved
             // off the main thread if ever needed to be dealt with.
-            @OptIn(DelicateCoroutinesApi::class)
-            GlobalScope.launch {
-                Log.d("SampleListener", "-------------- multi-line event START: ${event.javaClass.simpleName} --------------")
+            appScope.launch(Dispatchers.IO) {
+                Log.d("TorListener", "-------------- multi-line event START: $event --------------")
                 for (line in output) {
-                    Log.d("SampleListener", line)
+                    Log.d("TorListener", line)
                 }
-                Log.d("SampleListener", "--------------- multi-line event END: ${event.javaClass.simpleName} ---------------")
+                Log.d("TorListener", "--------------- multi-line event END: $event ---------------")
+            }
+
+            super.onEvent(event, output)
+        }
+
+        override fun managerEventError(t: Throwable) {
+            t.printStackTrace()
+        }
+
+        override fun managerEventAddressInfo(info: TorManagerEvent.AddressInfo) {
+            if (info.isNull) {
+                // Tear down HttpClient
+            } else {
+                info.socksInfoToProxyAddressOrNull()?.firstOrNull()?.let { proxyAddress ->
+                    val proxy = InetSocketAddress(proxyAddress.ipAddress, proxyAddress.port.value)
+
+                    // Build HttpClient
+                }
+            }
+        }
+
+        override fun managerEventStartUpCompleteForTorInstance() {
+            // Do one-time things after we're bootstrapped
+
+            appScope.launch {
+                torControlManager.onionAddNew(
+                    type = OnionAddress.PrivateKey.Type.ED25519_V3,
+                    hsPorts = setOf(HiddenService.Ports(virtualPort = Port(443))),
+                    flags = null,
+                    maxStreams = null,
+                ).onSuccess { hsEntry ->
+                    addLine(
+                        "New HiddenService: " +
+                        "\n - Address: ${OnionUrl(hsEntry.address, scheme = Scheme.HTTPS)}" +
+                        "\n - PrivateKey: ${hsEntry.privateKey}"
+                    )
+
+                    torControlManager.onionDel(hsEntry.address).onSuccess {
+                        addLine("Aaaaaaaaand it's gone...")
+                    }.onFailure { t ->
+                        t.printStackTrace()
+                    }
+
+                }.onFailure { t ->
+                    t.printStackTrace()
+                }
+
+                delay(20_000L)
+
+                torControlManager.infoGet(TorControlInfoGet.KeyWord.Uptime()).onSuccess { uptime ->
+                    addLine("Uptime - $uptime")
+                }.onFailure { t ->
+                    t.printStackTrace()
+                }
             }
         }
     }

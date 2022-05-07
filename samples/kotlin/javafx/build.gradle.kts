@@ -14,6 +14,8 @@
  * limitations under the License.
  **/
 import io.matthewnelson.kotlin.components.dependencies.versions
+import io.matthewnelson.kotlin.components.kmp.util.includeSnapshotsRepoIfTrue
+import io.matthewnelson.kotlin.components.kmp.util.includeStagingRepoIfTrue
 import kmp.tor.env
 
 tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>() {
@@ -27,16 +29,10 @@ plugins {
 }
 
 // disregard. this is for playing with newly published binaries prior to release
-if (env.kmpTorBinaries.pollStagingRepo) {
-    repositories {
-        maven("https://oss.sonatype.org/content/groups/staging") {
-            credentials {
-                username = rootProject.ext.get("mavenCentralUsername").toString()
-                password = rootProject.ext.get("mavenCentralPassword").toString()
-            }
-        }
-    }
-}
+includeStagingRepoIfTrue(env.kmpTorBinaries.pollStagingRepo)
+
+// For SNAPSHOTS
+includeSnapshotsRepoIfTrue(true)
 
 java {
     sourceCompatibility = JavaVersion.VERSION_11
@@ -50,11 +46,6 @@ application {
 javafx {
     modules("javafx.controls", "javafx.graphics")
 }
-
-// For SNAPSHOTS
-//repositories {
-//    maven("https://oss.sonatype.org/content/repositories/snapshots/")
-//}
 
 // In order to import the `-jvm` variant of `project(":library:kmp-tor")`, we
 // unfortunately need to setup this sample as a multiplatform project. This
@@ -78,8 +69,8 @@ kotlin {
                 // `Dispatchers.Main.immediate` support
                 implementation("org.jetbrains.kotlinx:kotlinx-coroutines-javafx:${versions.kotlin.coroutines}")
 
-                // kmp-tor dependency
-//                implementation("io.matthewnelson.kotlin-components:kmp-tor:${env.kmpTorAll.version.name}") // For SNAPSHOTS
+                // For SNAPSHOTS
+//                implementation("io.matthewnelson.kotlin-components:kmp-tor:${env.kmpTorAll.version.name}")
                 implementation(project(":library:kmp-tor"))
 
                 // Add binary dependencies for platform desired to support. Note that this

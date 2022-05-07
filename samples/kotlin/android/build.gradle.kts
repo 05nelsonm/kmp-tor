@@ -15,6 +15,8 @@
  **/
 import io.matthewnelson.kotlin.components.dependencies.deps
 import io.matthewnelson.kotlin.components.dependencies.versions
+import io.matthewnelson.kotlin.components.kmp.util.includeSnapshotsRepoIfTrue
+import io.matthewnelson.kotlin.components.kmp.util.includeStagingRepoIfTrue
 import kmp.tor.env
 
 plugins {
@@ -23,22 +25,19 @@ plugins {
 }
 
 // disregard. this is for playing with newly published binaries prior to release
-if (env.kmpTorBinaries.pollStagingRepo) {
-    repositories {
-        maven("https://oss.sonatype.org/content/groups/staging") {
-            credentials {
-                username = rootProject.ext.get("mavenCentralUsername").toString()
-                password = rootProject.ext.get("mavenCentralPassword").toString()
-            }
-        }
-    }
-}
+includeStagingRepoIfTrue(env.kmpTorBinaries.pollStagingRepo)
+
+// For SNAPSHOTS
+includeSnapshotsRepoIfTrue(true)
 
 android {
     compileSdk = versions.android.sdkCompile
     buildToolsVersion = versions.android.buildTools
 
     packagingOptions {
+        // Needed for Tor binary file extraction to nativeDir
+        jniLibs.useLegacyPackaging = true
+
         resources.excludes.add("META-INF/gradle/incremental.annotation.processors")
     }
 
@@ -104,11 +103,6 @@ android {
     }
 }
 
-// For SNAPSHOTS
-//repositories {
-//    maven("https://oss.sonatype.org/content/repositories/snapshots/")
-//}
-
 dependencies {
     implementation(deps.androidx.appCompat)
     implementation(deps.androidx.constraintLayout)
@@ -117,4 +111,6 @@ dependencies {
     // For SNAPSHOTS
 //    implementation("io.matthewnelson.kotlin-components:kmp-tor:${env.kmpTorAll.version.name}")
     implementation(project(":library:kmp-tor"))
+
+    implementation(deps.kotlin.coroutines.android)
 }
