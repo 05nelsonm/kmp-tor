@@ -16,6 +16,8 @@
 package io.matthewnelson.kmp.tor.ext.callback.controller.common
 
 import io.matthewnelson.kmp.tor.common.annotation.InternalTorApi
+import io.matthewnelson.kmp.tor.ext.callback.common.EmptyTask
+import io.matthewnelson.kmp.tor.ext.callback.common.TorCallback
 
 @InternalTorApi
 @Suppress("nothing_to_inline")

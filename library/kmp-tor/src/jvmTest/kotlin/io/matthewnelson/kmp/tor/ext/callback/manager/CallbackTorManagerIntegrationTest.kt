@@ -16,7 +16,7 @@
 package io.matthewnelson.kmp.tor.ext.callback.manager
 
 import io.matthewnelson.kmp.tor.controller.common.control.usecase.TorControlInfoGet
-import io.matthewnelson.kmp.tor.ext.callback.controller.common.Task
+import io.matthewnelson.kmp.tor.ext.callback.common.Task
 import io.matthewnelson.kmp.tor.helper.TorTestHelper
 import io.matthewnelson.kmp.tor.manager.common.exceptions.InterruptedException
 import kotlinx.coroutines.*

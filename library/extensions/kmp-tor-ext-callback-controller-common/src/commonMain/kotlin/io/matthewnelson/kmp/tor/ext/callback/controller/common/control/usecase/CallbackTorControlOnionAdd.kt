@@ -19,8 +19,8 @@ import io.matthewnelson.kmp.tor.common.address.OnionAddress
 import io.matthewnelson.kmp.tor.controller.common.config.HiddenServiceEntry
 import io.matthewnelson.kmp.tor.controller.common.config.TorConfig
 import io.matthewnelson.kmp.tor.controller.common.control.usecase.TorControlOnionAdd.Flag
-import io.matthewnelson.kmp.tor.ext.callback.controller.common.Task
-import io.matthewnelson.kmp.tor.ext.callback.controller.common.TorCallback
+import io.matthewnelson.kmp.tor.ext.callback.common.Task
+import io.matthewnelson.kmp.tor.ext.callback.common.TorCallback
 import io.matthewnelson.kmp.tor.ext.callback.controller.common.control.CallbackTorControlOnion
 
 /**

@@ -15,8 +15,8 @@
  **/
 package io.matthewnelson.kmp.tor.ext.callback.manager.common
 
-import io.matthewnelson.kmp.tor.ext.callback.controller.common.Task
-import io.matthewnelson.kmp.tor.ext.callback.controller.common.TorCallback
+import io.matthewnelson.kmp.tor.ext.callback.common.Task
+import io.matthewnelson.kmp.tor.ext.callback.common.TorCallback
 import io.matthewnelson.kmp.tor.manager.common.TorOperationManager
 
 /**

@@ -13,20 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-package io.matthewnelson.kmp.tor.ext.callback.controller.common
+package io.matthewnelson.kmp.tor.ext.callback.common
 
-interface Task {
-    val isActive: Boolean
-    val isCompleted: Boolean
-    val isCancelled: Boolean
+import kotlin.jvm.JvmField
 
-    fun cancel()
-}
+fun interface TorCallback<in T: Any?> {
 
-object EmptyTask: Task {
-    override val isActive: Boolean = false
-    override val isCompleted: Boolean = isActive
-    override val isCancelled: Boolean = true
+    fun invoke(result: T)
 
-    override fun cancel() { /* no-op */ }
+    companion object {
+        /**
+         * Optional static instance that will always throw on request failure.
+         *
+         * Use case is primarily to pipe exceptions to the uncaught exception
+         * handler that was set when instantiating `CallbackTorController` or
+         * `CallbackTorManager`.
+         * */
+        @JvmField
+        val THROW = TorCallback<Throwable> { throw it }
+    }
 }

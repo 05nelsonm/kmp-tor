@@ -38,7 +38,7 @@ import io.matthewnelson.kmp.tor.controller.common.config.TorConfig.Setting.*;
 import io.matthewnelson.kmp.tor.controller.common.control.usecase.TorControlInfoGet;
 import io.matthewnelson.kmp.tor.controller.common.events.TorEvent;
 import io.matthewnelson.kmp.tor.controller.common.file.Path;
-import io.matthewnelson.kmp.tor.ext.callback.controller.common.TorCallback;
+import io.matthewnelson.kmp.tor.ext.callback.common.TorCallback;
 import io.matthewnelson.kmp.tor.ext.callback.manager.CallbackTorManager;
 import io.matthewnelson.kmp.tor.manager.TorManager;
 import io.matthewnelson.kmp.tor.manager.common.event.TorManagerEvent;

@@ -22,8 +22,8 @@ import android.util.Log;
 
 import java.util.concurrent.atomic.AtomicLong;
 
-import io.matthewnelson.kmp.tor.ext.callback.controller.common.Task;
-import io.matthewnelson.kmp.tor.ext.callback.controller.common.TorCallback;
+import io.matthewnelson.kmp.tor.ext.callback.common.Task;
+import io.matthewnelson.kmp.tor.ext.callback.common.TorCallback;
 
 public class MainActivity extends AppCompatActivity {
 
