@@ -16,7 +16,7 @@ Add dependency
 // build.gradle.kts
 dependencies {
     val vTor = "0.4.6.10"
-    val vKmpTor = "0.1.0"
+    val vKmpTor = "0.1.1"
     implementation("io.matthewnelson.kotlin-components:kmp-tor:$vTor+$vKmpTor")
 }
 ```
@@ -25,7 +25,7 @@ dependencies {
 // build.gradle
 dependencies {
    def vTor = '0.4.6.10'
-   def vKmpTor = '0.1.0'
+   def vKmpTor = '0.1.1'
    implementation "io.matthewnelson.kotlin-components:kmp-tor:$vTor+$vKmpTor"
 }
 ```
@@ -74,7 +74,7 @@ dependencies {
 // build.gradle
 dependencies {
    def vTor = '0.4.6.10'
-   def vKmpTor = '0.1.0'
+   def vKmpTor = '0.1.1'
 
    implementation "io.matthewnelson.kotlin-components:kmp-tor:$vTor+$vKmpTor"
    // Add the callback extension
