@@ -31,11 +31,11 @@ object env {
     //                           1.15.1        == 01_15_01_99
     private const val MANAGER_VERSION_CODE  = /*00_0*/1_02_99
 
-    private const val BINARY_VERSION_NAME   = "0.4.6.10"
+    private const val BINARY_VERSION_NAME   = "0.4.7.7"
     //                           0.4.6.9       == 00_04_06_09_00
     //                           0.4.6.9a      == 00_04_06_09_01
     //                           0.4.6.9b      == 00_04_06_09_02
-    private const val BINARY_VERSION_CODE   = /*00_0*/4_06_10_00
+    private const val BINARY_VERSION_CODE   = /*00_0*/4_07_07_00
 
     /**
      * Binaries exist in a different repo. Building against the staged
