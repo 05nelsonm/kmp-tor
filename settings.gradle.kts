@@ -31,6 +31,7 @@ if (allTargets || (targets?.contains("ANDROID") != false && targets?.contains("J
 }
 
 if (allTargets || targets?.contains("JVM") != false) {
+    include(":samples:java:javafx")
     include(":samples:kotlin:javafx")
 }
 

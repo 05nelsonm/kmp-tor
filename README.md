@@ -73,14 +73,17 @@ dependencies {
 ```groovy
 // build.gradle
 dependencies {
-   def vTor = '0.4.7.7'
-   def vKmpTor = '0.1.2'
+    def vTor = '0.4.7.7'
+    def vKmpTor = '0.1.2'
 
-   implementation "io.matthewnelson.kotlin-components:kmp-tor:$vTor+$vKmpTor"
-   // Add the callback extension
-   implementation "io.matthewnelson.kotlin-components:kmp-tor-ext-callback-manager:$vKmpTor"
-   
-   // You will also need to add the Kotlin Gradle Plugin, and coroutines-android dependency.
+    implementation "io.matthewnelson.kotlin-components:kmp-tor:$vTor+$vKmpTor"
+    // Add the callback extension
+    implementation "io.matthewnelson.kotlin-components:kmp-tor-ext-callback-manager:$vKmpTor"
+
+    // You will also need to add the Kotlin Gradle Plugin, and Coroutines dependency.
+    
+    // If not Android, you will also need to import the binaries for the platforms you wish to
+    // support.
 }
 ```
 
@@ -140,8 +143,16 @@ public class Example2 {
 }
 ```
 
- - See the [Java Sample App](https://github.com/05nelsonm/kmp-tor/blob/master/samples/java/android/src/main/java/io/matthewnelson/kmp/tor/sample/java/android/App.java)  
-   for a basic setup examples.
+ - Android (Java):
+     - [Android Sample App](https://github.com/05nelsonm/kmp-tor/blob/master/samples/java/android/src/main/java/io/matthewnelson/kmp/tor/sample/java/android/App.java)
+     - [Android Sample Gradle](https://github.com/05nelsonm/kmp-tor/blob/master/samples/java/android/build.gradle)
+ - JavaFx (Java):
+     - [JavaFx Sample App](https://github.com/05nelsonm/kmp-tor/blob/master/samples/java/javafx/src/main/java/io/matthewnelson/kmp/tor/sample/java/javafx/App.java)
+     - [JavaFx Sample Gradle](https://github.com/05nelsonm/kmp-tor/blob/master/samples/java/javafx/build.gradle)
+     - Run the sample via `./gradlew :samples:java:javafx:run -PKMP_TARGETS=JVM` from terminal
+       or cmd prompt.
+         - Note: Be sure to run `git submodule update --init` if you haven't yet so git
+           submodules are initialized.
 
 </details>
 
