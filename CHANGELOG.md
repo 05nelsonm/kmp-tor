@@ -1,5 +1,13 @@
 # CHANGELOG
 
+## Version 0.4.7.7+0.1.2 (2022-05-08)
+ - Updates Kotlin-Components
+     - `kotlin` from `1.6.10` -> `1.6.21`
+     - `atomicfu` from `0.7.1` -> `0.7.2`
+     - `coroutines` from `1.6.0` -> `1.6.1`
+     - `tor-bianry` from `0.4.6.10` -> `0.4.7.7`
+     - `component-encoding` from `1.1.0` -> `1.1.1`
+
 ## Version 0.4.6.10+0.1.1 (2022-05-07)
  - Significant improvements for Java users (library is now usable from Java land):
      - Removes from public APIs all use of `JvmInline` value classes by use of 
