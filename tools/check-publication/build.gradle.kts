@@ -42,51 +42,69 @@ kmpConfiguration {
     setupMultiplatform(
         setOf(
 
-            KmpTarget.Jvm.Jvm.DEFAULT,
+            KmpTarget.Jvm.Jvm(
+                mainSourceSet = {
+                    dependencies {
+                        implementation("${pConfig.group}:kmp-tor:${env.kmpTorAll.version.name}")
+                        implementation("${pConfig.group}:kmp-tor-controller:${env.kmpTor.version.name}")
+                        implementation("${pConfig.group}:kmp-tor-ext-callback-controller:${env.kmpTor.version.name}")
+                        implementation("${pConfig.group}:kmp-tor-ext-callback-manager:${env.kmpTor.version.name}")
+                        implementation("${pConfig.group}:kmp-tor-manager:${env.kmpTor.version.name}")
+                    }
+                }
+            ),
 
             KmpTarget.Jvm.Android(
                 buildTools = versions.android.buildTools,
                 compileSdk = versions.android.sdkCompile,
                 minSdk = versions.android.sdkMin16,
+                mainSourceSet = {
+                    dependencies {
+                        implementation("${pConfig.group}:kmp-tor:${env.kmpTorAll.version.name}")
+                        implementation("${pConfig.group}:kmp-tor-controller:${env.kmpTor.version.name}")
+                        implementation("${pConfig.group}:kmp-tor-ext-callback-controller:${env.kmpTor.version.name}")
+                        implementation("${pConfig.group}:kmp-tor-ext-callback-manager:${env.kmpTor.version.name}")
+                        implementation("${pConfig.group}:kmp-tor-manager:${env.kmpTor.version.name}")
+                    }
+                }
             ),
 
-            // TODO: Uncomment once js target is published
-//            KmpTarget.NonJvm.JS(
-//                compilerType = KotlinJsCompilerType.BOTH,
-//                browser = null,
-//                node = KmpTarget.NonJvm.JS.Node(
-//                    jsNodeDsl = null
-//                )
-//            ),
+            KmpTarget.NonJvm.JS(
+                compilerType = KotlinJsCompilerType.BOTH,
+                browser = null,
+                node = KmpTarget.NonJvm.JS.Node(
+                    jsNodeDsl = null
+                )
+            ),
 
             // TODO: Uncomment once ios target is published
-//            KmpTarget.NonJvm.Native.Unix.Darwin.Ios.All.DEFAULT,
+            KmpTarget.NonJvm.Native.Unix.Darwin.Ios.All.DEFAULT,
 
             // TODO: Uncomment once macosx64 target is published
-//            KmpTarget.NonJvm.Native.Unix.Darwin.Macos.X64.DEFAULT,
+            KmpTarget.NonJvm.Native.Unix.Darwin.Macos.X64.DEFAULT,
 
             // TODO: Uncomment once macosarm64 target is published
-//            KmpTarget.NonJvm.Native.Unix.Darwin.Macos.Arm64.DEFAULT,
+            KmpTarget.NonJvm.Native.Unix.Darwin.Macos.Arm64.DEFAULT,
 
             // TODO: Uncomment once tvos target is published
-//            KmpTarget.NonJvm.Native.Unix.Darwin.Tvos.All.DEFAULT,
+            KmpTarget.NonJvm.Native.Unix.Darwin.Tvos.All.DEFAULT,
 
             // TODO: Uncomment once watchos target is published
-//            KmpTarget.NonJvm.Native.Unix.Darwin.Watchos.All.DEFAULT,
+            KmpTarget.NonJvm.Native.Unix.Darwin.Watchos.All.DEFAULT,
 
             // TODO: Uncomment once linuxx64 target is published
-//            KmpTarget.NonJvm.Native.Unix.Linux.X64.DEFAULT,
+            KmpTarget.NonJvm.Native.Unix.Linux.X64.DEFAULT,
 
             // TODO: Uncomment once mingwx64 target is published
-//            KmpTarget.NonJvm.Native.Mingw.X64.DEFAULT,
+            KmpTarget.NonJvm.Native.Mingw.X64.DEFAULT,
         ),
         commonMainSourceSet = {
             dependencies {
-                implementation("${pConfig.group}:kmp-tor:${env.kmpTorAll.version.name}")
                 implementation("${pConfig.group}:kmp-tor-common:${env.kmpTor.version.name}")
-                implementation("${pConfig.group}:kmp-tor-controller:${env.kmpTor.version.name}")
                 implementation("${pConfig.group}:kmp-tor-controller-common:${env.kmpTor.version.name}")
-                implementation("${pConfig.group}:kmp-tor-manager:${env.kmpTor.version.name}")
+                implementation("${pConfig.group}:kmp-tor-ext-callback-common:${env.kmpTor.version.name}")
+                implementation("${pConfig.group}:kmp-tor-ext-callback-controller-common:${env.kmpTor.version.name}")
+                implementation("${pConfig.group}:kmp-tor-ext-callback-manager-common:${env.kmpTor.version.name}")
                 implementation("${pConfig.group}:kmp-tor-manager-common:${env.kmpTor.version.name}")
             }
         }
