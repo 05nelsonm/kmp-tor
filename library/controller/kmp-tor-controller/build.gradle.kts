@@ -16,8 +16,8 @@
 import io.matthewnelson.kotlin.components.dependencies.deps
 import io.matthewnelson.kotlin.components.dependencies.depsTest
 import io.matthewnelson.kotlin.components.kmp.KmpTarget
-import io.matthewnelson.kotlin.components.kmp.util.sourceSetJvmCommonMain
-import io.matthewnelson.kotlin.components.kmp.util.sourceSetJvmCommonTest
+import io.matthewnelson.kotlin.components.kmp.util.sourceSetJvmAndroidMain
+import io.matthewnelson.kotlin.components.kmp.util.sourceSetJvmAndroidTest
 import kmp.tor.env
 import org.jetbrains.kotlin.gradle.plugin.KotlinJsCompilerType
 
@@ -35,18 +35,26 @@ kmpConfiguration {
 //            KmpTarget.NonJvm.JS(
 //                compilerType = KotlinJsCompilerType.BOTH,
 //                browser = null,
-//                node = KmpTarget.NonJvm.JS.Node(
-//                    jsNodeDsl = null
-//                ),
-//                mainSourceSet = null,
-//                testSourceSet = null,
+//                node = KmpTarget.NonJvm.JS.Node(),
 //            ),
 //
-//            KmpTarget.NonJvm.Native.Unix.Darwin.Ios.All.DEFAULT,
+////            KmpTarget.NonJvm.Native.Unix.Darwin.Ios.Arm32.DEFAULT,
+//            KmpTarget.NonJvm.Native.Unix.Darwin.Ios.Arm64.DEFAULT,
+//            KmpTarget.NonJvm.Native.Unix.Darwin.Ios.X64.DEFAULT,
+////            KmpTarget.NonJvm.Native.Unix.Darwin.Ios.SimulatorArm64.DEFAULT,
+//
 //            KmpTarget.NonJvm.Native.Unix.Darwin.Macos.X64.DEFAULT,
 //            KmpTarget.NonJvm.Native.Unix.Darwin.Macos.Arm64.DEFAULT,
-//            KmpTarget.NonJvm.Native.Unix.Darwin.Tvos.All.DEFAULT,
-//            KmpTarget.NonJvm.Native.Unix.Darwin.Watchos.All.DEFAULT,
+//
+//            KmpTarget.NonJvm.Native.Unix.Darwin.Tvos.Arm64.DEFAULT,
+//            KmpTarget.NonJvm.Native.Unix.Darwin.Tvos.X64.DEFAULT,
+////            KmpTarget.NonJvm.Native.Unix.Darwin.Tvos.SimulatorArm64.DEFAULT,
+//
+//            KmpTarget.NonJvm.Native.Unix.Darwin.Watchos.Arm32.DEFAULT,
+//            KmpTarget.NonJvm.Native.Unix.Darwin.Watchos.Arm64.DEFAULT,
+//            KmpTarget.NonJvm.Native.Unix.Darwin.Watchos.X64.DEFAULT,
+////            KmpTarget.NonJvm.Native.Unix.Darwin.Watchos.X86.DEFAULT,
+////            KmpTarget.NonJvm.Native.Unix.Darwin.Watchos.SimulatorArm64.DEFAULT,
 //
 //            KmpTarget.NonJvm.Native.Unix.Linux.X64.DEFAULT,
 //
@@ -69,12 +77,12 @@ kmpConfiguration {
             }
         },
         kotlin = {
-            sourceSetJvmCommonMain {
+            sourceSetJvmAndroidMain {
                 dependencies {
                     implementation(deps.kotlin.coroutines.core.jvm)
                 }
             }
-            sourceSetJvmCommonTest {
+            sourceSetJvmAndroidTest {
                 dependencies {
                     implementation(deps.kotlin.coroutines.core.jvm)
                     implementation(depsTest.junit)
