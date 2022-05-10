@@ -81,12 +81,14 @@ kmpConfiguration {
 //            KmpTarget.NonJvm.JS(
 //                compilerType = KotlinJsCompilerType.BOTH,
 //                browser = null,
-//                node = KmpTarget.NonJvm.JS.Node(
-//                    jsNodeDsl = null
-//                ),
+//                node = KmpTarget.NonJvm.JS.Node(),
 //            ),
 //
-////            KmpTarget.NonJvm.Native.Unix.Darwin.Ios.All.DEFAULT,
+////            KmpTarget.NonJvm.Native.Unix.Darwin.Ios.Arm32.DEFAULT,
+//            KmpTarget.NonJvm.Native.Unix.Darwin.Ios.Arm64.DEFAULT,
+//            KmpTarget.NonJvm.Native.Unix.Darwin.Ios.X64.DEFAULT,
+////            KmpTarget.NonJvm.Native.Unix.Darwin.Ios.SimulatorArm64.DEFAULT,
+//
 //            KmpTarget.NonJvm.Native.Unix.Darwin.Macos.X64(
 //                mainSourceSet = {
 //                    dependencies {
@@ -96,8 +98,16 @@ kmpConfiguration {
 //                },
 //            ),
 ////            KmpTarget.NonJvm.Native.Unix.Darwin.Macos.Arm64.DEFAULT,
-////            KmpTarget.NonJvm.Native.Unix.Darwin.Tvos.All.DEFAULT,
-////            KmpTarget.NonJvm.Native.Unix.Darwin.Watchos.All.DEFAULT,
+//
+//            KmpTarget.NonJvm.Native.Unix.Darwin.Tvos.Arm64.DEFAULT,
+//            KmpTarget.NonJvm.Native.Unix.Darwin.Tvos.X64.DEFAULT,
+////            KmpTarget.NonJvm.Native.Unix.Darwin.Tvos.SimulatorArm64.DEFAULT,
+//
+//            KmpTarget.NonJvm.Native.Unix.Darwin.Watchos.Arm32.DEFAULT,
+//            KmpTarget.NonJvm.Native.Unix.Darwin.Watchos.Arm64.DEFAULT,
+//            KmpTarget.NonJvm.Native.Unix.Darwin.Watchos.X64.DEFAULT,
+////            KmpTarget.NonJvm.Native.Unix.Darwin.Watchos.X86.DEFAULT,
+////            KmpTarget.NonJvm.Native.Unix.Darwin.Watchos.SimulatorArm64.DEFAULT,
 //
 //            KmpTarget.NonJvm.Native.Unix.Linux.X64(
 //                mainSourceSet = {
@@ -136,7 +146,7 @@ kmpConfiguration {
             }
         },
         kotlin = {
-            sourceSetJvmJsCommonTest {
+            sourceSetJvmJsTest {
                 dependencies {
                     // TODO: Uncomment once js binary targets are published
 //                    implementation("${pConfig.group}:kmp-tor-binary-linuxx64:${env.kmpTorBinaries.version.name}")
