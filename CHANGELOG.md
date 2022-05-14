@@ -1,5 +1,15 @@
 # CHANGELOG
 
+## Version 0.4.7.7+0.1.3 (2022-05-14)
+ - Updates Kotlin-Components
+     - Bumps `component-encoding` from `1.1.1` -> `1.1.2`
+     - Support new targets for `*-common` modules:
+         - `iosArm32`
+         - `iosSimulatorArm64`
+         - `tvosSimulatorArm64`
+         - `watchosx86`
+         - `watchosSimulatorArm64`
+
 ## Version 0.4.7.7+0.1.2 (2022-05-08)
  - Updates Kotlin-Components
      - `kotlin` from `1.6.10` -> `1.6.21`
