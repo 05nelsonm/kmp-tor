@@ -23,6 +23,7 @@ import io.matthewnelson.kmp.tor.common.address.OnionAddressV3
 import io.matthewnelson.kmp.tor.common.annotation.InternalTorApi
 import io.matthewnelson.kmp.tor.common.clientauth.ClientName
 import io.matthewnelson.kmp.tor.common.clientauth.OnionClientAuth
+import io.matthewnelson.kmp.tor.common.server.Server
 import io.matthewnelson.kmp.tor.controller.common.config.ClientAuthEntry
 import io.matthewnelson.kmp.tor.controller.common.config.ConfigEntry
 import io.matthewnelson.kmp.tor.controller.common.config.TorConfig
@@ -345,31 +346,49 @@ private class RealTorControlProcessor(
         }
     }
 
-//    override suspend fun hsFetch(address: OnionAddress, servers: Set<String>?): Result<Any?> {
-//        return lock.withLock {
-//            try {
-//                val command = StringBuilder("HSFETCH").let { sb ->
-//                    sb.append(SP)
-//                    sb.append(address.value)
-//                    if (servers != null && servers.isNotEmpty()) {
-//                        for (server in servers) {
-//                            if (server.isNotEmpty()) {
-//                                sb.append(SP)
-//                                sb.append("SERVER=")
-//                                sb.append(server)
-//                            }
-//                        }
-//                    }
-//                    sb.append(CLRF)
-//                    sb.toString()
-//                }
-//
-//                Result.success(processCommand(command))
-//            } catch (e: Exception) {
-//                Result.failure(e)
-//            }
-//        }
-//    }
+    override suspend fun hsFetch(address: OnionAddress): Result<Any?> {
+        return hsFetch(null, address)
+    }
+
+    override suspend fun hsFetch(address: OnionAddress, server: Server.Fingerprint): Result<Any?> {
+        return hsFetch(setOf(server), address)
+    }
+
+    override suspend fun hsFetch(
+        address: OnionAddress,
+        servers: Set<Server.Fingerprint>
+    ): Result<Any?> {
+        return hsFetch(servers, address)
+    }
+
+    private suspend fun hsFetch(
+        servers: Set<Server.Fingerprint>?,
+        address: OnionAddress
+    ): Result<Any?> {
+        return lock.withLock {
+            try {
+                val command = StringBuilder("HSFETCH").let { sb ->
+                    sb.append(SP)
+                    sb.append(address.value)
+
+                    if (servers != null && servers.isNotEmpty()) {
+                        for (server in servers) {
+                            sb.append(SP)
+                            sb.append("SERVER=")
+                            sb.append(server.value)
+                        }
+                    }
+
+                    sb.append(CLRF)
+                    sb.toString()
+                }
+
+                Result.success(processCommand(command))
+            } catch (e: Exception) {
+                Result.failure(e)
+            }
+        }
+    }
 
 //    override suspend fun hsPost(): Result<Any?> {
 //        return lock.withLock {

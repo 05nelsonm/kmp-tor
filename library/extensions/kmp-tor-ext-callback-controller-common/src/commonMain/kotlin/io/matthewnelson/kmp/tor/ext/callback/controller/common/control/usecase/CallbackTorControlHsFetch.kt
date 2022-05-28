@@ -15,6 +15,10 @@
  **/
 package io.matthewnelson.kmp.tor.ext.callback.controller.common.control.usecase
 
+import io.matthewnelson.kmp.tor.common.address.OnionAddress
+import io.matthewnelson.kmp.tor.common.server.Server
+import io.matthewnelson.kmp.tor.ext.callback.common.Task
+import io.matthewnelson.kmp.tor.ext.callback.common.TorCallback
 import io.matthewnelson.kmp.tor.ext.callback.controller.common.control.CallbackTorControlHs
 
 /**
@@ -32,7 +36,24 @@ import io.matthewnelson.kmp.tor.ext.callback.controller.common.control.CallbackT
  * */
 interface CallbackTorControlHsFetch {
 
-    // TODO: Create wrapper for Server
-//    suspend fun hsFetch(address: OnionAddress, servers: Set<String>?): Result<Any?>
+    fun hsFetch(
+        address: OnionAddress,
+        failure: TorCallback<Throwable>?,
+        success: TorCallback<Any?>,
+    ): Task
+
+    fun hsFetch(
+        address: OnionAddress,
+        server: Server.Fingerprint,
+        failure: TorCallback<Throwable>?,
+        success: TorCallback<Any?>,
+    ): Task
+
+    fun hsFetch(
+        address: OnionAddress,
+        servers: Set<Server.Fingerprint>,
+        failure: TorCallback<Throwable>?,
+        success: TorCallback<Any?>,
+    ): Task
 
 }

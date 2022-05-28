@@ -20,6 +20,7 @@ import io.matthewnelson.kmp.tor.common.address.OnionAddressV3
 import io.matthewnelson.kmp.tor.common.annotation.InternalTorApi
 import io.matthewnelson.kmp.tor.common.clientauth.ClientName
 import io.matthewnelson.kmp.tor.common.clientauth.OnionClientAuth
+import io.matthewnelson.kmp.tor.common.server.Server
 import io.matthewnelson.kmp.tor.controller.common.config.ClientAuthEntry
 import io.matthewnelson.kmp.tor.controller.common.config.ConfigEntry
 import io.matthewnelson.kmp.tor.controller.common.config.HiddenServiceEntry
@@ -241,6 +242,38 @@ class CallbackTorManager(
     ): Task {
         return provideOrFail(failure, success) {
             dropGuards()
+        }
+    }
+
+    override fun hsFetch(
+        address: OnionAddress,
+        failure: TorCallback<Throwable>?,
+        success: TorCallback<Any?>
+    ): Task {
+        return provideOrFail(failure, success) {
+            hsFetch(address)
+        }
+    }
+
+    override fun hsFetch(
+        address: OnionAddress,
+        server: Server.Fingerprint,
+        failure: TorCallback<Throwable>?,
+        success: TorCallback<Any?>
+    ): Task {
+        return provideOrFail(failure, success) {
+            hsFetch(address, server)
+        }
+    }
+
+    override fun hsFetch(
+        address: OnionAddress,
+        servers: Set<Server.Fingerprint>,
+        failure: TorCallback<Throwable>?,
+        success: TorCallback<Any?>
+    ): Task {
+        return provideOrFail(failure, success) {
+            hsFetch(address, servers)
         }
     }
 

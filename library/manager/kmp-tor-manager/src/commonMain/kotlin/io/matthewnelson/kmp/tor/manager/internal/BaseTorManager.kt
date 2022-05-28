@@ -19,6 +19,7 @@ import io.matthewnelson.kmp.tor.common.address.OnionAddress
 import io.matthewnelson.kmp.tor.common.address.OnionAddressV3
 import io.matthewnelson.kmp.tor.common.clientauth.ClientName
 import io.matthewnelson.kmp.tor.common.clientauth.OnionClientAuth
+import io.matthewnelson.kmp.tor.common.server.Server
 import io.matthewnelson.kmp.tor.controller.common.config.ClientAuthEntry
 import io.matthewnelson.kmp.tor.controller.common.config.ConfigEntry
 import io.matthewnelson.kmp.tor.controller.common.config.HiddenServiceEntry
@@ -117,11 +118,26 @@ internal abstract class BaseTorManager: SynchronizedObject(), TorControlManager 
         }
     }
 
-//    override suspend fun hsFetch(address: OnionAddress, servers: Set<String>?): Result<Any?> {
-//        return provide<TorControlHsFetch, Any?> {
-//            hsFetch(address, servers)
-//        }
-//    }
+    override suspend fun hsFetch(address: OnionAddress): Result<Any?> {
+        return provide<TorControlHsFetch, Any?> {
+            hsFetch(address)
+        }
+    }
+
+    override suspend fun hsFetch(address: OnionAddress, server: Server.Fingerprint): Result<Any?> {
+        return provide<TorControlHsFetch, Any?> {
+            hsFetch(address, server)
+        }
+    }
+
+    override suspend fun hsFetch(
+        address: OnionAddress,
+        servers: Set<Server.Fingerprint>
+    ): Result<Any?> {
+        return provide<TorControlHsFetch, Any?> {
+            hsFetch(address, servers)
+        }
+    }
 
 //    override suspend fun hsPost(): Result<Any?> {
 //        return provide<TorControlHsPost, Any?> {

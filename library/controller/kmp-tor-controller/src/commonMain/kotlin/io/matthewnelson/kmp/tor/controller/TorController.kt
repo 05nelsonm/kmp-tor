@@ -21,6 +21,7 @@ import io.matthewnelson.kmp.tor.common.annotation.ExperimentalTorApi
 import io.matthewnelson.kmp.tor.common.annotation.InternalTorApi
 import io.matthewnelson.kmp.tor.common.clientauth.ClientName
 import io.matthewnelson.kmp.tor.common.clientauth.OnionClientAuth
+import io.matthewnelson.kmp.tor.common.server.Server
 import io.matthewnelson.kmp.tor.common.util.TorStrings.MULTI_LINE_END
 import io.matthewnelson.kmp.tor.common.util.TorStrings.SP
 import io.matthewnelson.kmp.tor.controller.common.config.ClientAuthEntry
@@ -478,9 +479,17 @@ private class RealTorController(
         return processorDelegate.dropGuards()
     }
 
-//    override suspend fun hsFetch(address: OnionAddress, servers: Set<String>?): Result<Any?> {
-//        return processorDelegate.hsFetch(address, servers)
-//    }
+    override suspend fun hsFetch(address: OnionAddress): Result<Any?> {
+        return processorDelegate.hsFetch(address)
+    }
+
+    override suspend fun hsFetch(address: OnionAddress, server: Server.Fingerprint): Result<Any?> {
+        return processorDelegate.hsFetch(address, server)
+    }
+
+    override suspend fun hsFetch(address: OnionAddress, servers: Set<Server.Fingerprint>): Result<Any?> {
+        return processorDelegate.hsFetch(address, servers)
+    }
 
 //    override suspend fun hsPost(): Result<Any?> {
 //        return processorDelegate.hsPost()

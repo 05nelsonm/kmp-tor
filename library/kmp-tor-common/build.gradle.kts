@@ -59,6 +59,7 @@ kmpConfiguration {
         ),
         commonMainSourceSet = {
             dependencies {
+                implementation(deps.components.encoding.base16)
                 implementation(deps.components.encoding.base32)
                 implementation(deps.components.encoding.base64)
             }
