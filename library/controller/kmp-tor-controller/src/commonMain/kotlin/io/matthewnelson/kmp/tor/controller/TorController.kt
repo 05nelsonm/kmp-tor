@@ -169,12 +169,10 @@ private class RealTorController(
                                 replies.map { reply ->
                                     when (reply) {
                                         is ReplyLine.MultiLine -> {
-                                            // Should never be the case, but we
-                                            // should have a fallback.
                                             ReplyLine.SingleLine(
                                                 reply.status,
                                                 reply.messages.joinToString(
-                                                    separator = SP,
+                                                    separator = "\n",
                                                     prefix = reply.event
                                                 )
                                             )

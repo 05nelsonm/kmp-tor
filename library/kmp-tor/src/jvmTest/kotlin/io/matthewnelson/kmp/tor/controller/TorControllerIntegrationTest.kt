@@ -30,6 +30,7 @@ import io.matthewnelson.kmp.tor.controller.common.events.TorEvent
 import io.matthewnelson.kmp.tor.helper.TorTestHelper
 import io.matthewnelson.kmp.tor.manager.common.event.TorManagerEvent
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.runBlocking
 import kotlin.test.*
 
@@ -356,7 +357,11 @@ class TorControllerIntegrationTest: TorTestHelper() {
             manager.hsFetch(torProjectAddress).getOrThrow()
 
             // await HSDescriptor event to be dispatched
-            delay(5_000L)
+            var count = 0
+            while (!received && count < 10 && isActive) {
+                delay(1_000)
+                count++
+            }
 
             assertTrue(received)
         } catch (t: Throwable) {
