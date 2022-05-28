@@ -15,6 +15,8 @@
  **/
 package io.matthewnelson.kmp.tor.controller.common.control.usecase
 
+import io.matthewnelson.kmp.tor.common.address.OnionAddress
+import io.matthewnelson.kmp.tor.common.server.Server
 import io.matthewnelson.kmp.tor.controller.common.control.TorControlHs
 
 /**
@@ -32,7 +34,10 @@ import io.matthewnelson.kmp.tor.controller.common.control.TorControlHs
  * */
 interface TorControlHsFetch {
 
-    // TODO: Create wrapper for Server
-//    suspend fun hsFetch(address: OnionAddress, servers: Set<String>?): Result<Any?>
+    suspend fun hsFetch(address: OnionAddress): Result<Any?>
+
+    suspend fun hsFetch(address: OnionAddress, server: Server.Fingerprint): Result<Any?>
+
+    suspend fun hsFetch(address: OnionAddress, servers: Set<Server.Fingerprint>): Result<Any?>
 
 }
