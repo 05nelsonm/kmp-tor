@@ -825,7 +825,7 @@ private class RealTorManager(
             return result
         }
 
-        val controller = result.getOrThrow()
+        val (controller, loadConfig) = result.getOrThrow()
         notifyListenersNoScope(TorManagerEvent.Lifecycle(controller, ON_CREATE))
 
         controller.addListener(controllerListener)
@@ -868,12 +868,16 @@ private class RealTorManager(
         }
 
         // TODO: Handle Failure case
-        controller.ownershipTake().onSuccess {
-            // Stop Tor from polling for processId, as we've passed ownership
-            // to the controller which, if it is stopped, Tor will exit.
-            controller.configReset(TorConfig.Setting.OwningControllerProcess())
-        }
+        controller.ownershipTake()
         controller.setEvents(requiredEvents)
+
+        if (loadConfig != null) {
+            controller.configLoad(loadConfig)
+        }
+
+        // Stop Tor from polling for processId, as we've passed ownership
+        // to the controller which, if it is stopped, Tor will exit.
+        controller.configReset(TorConfig.Setting.OwningControllerProcess())
 
         if (networkObserver?.isNetworkConnected() != false) {
             // null (no observer) or true
