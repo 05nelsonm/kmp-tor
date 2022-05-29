@@ -21,7 +21,6 @@ import io.matthewnelson.kmp.tor.common.address.OnionAddressV3PrivateKey_ED25519
 import io.matthewnelson.kmp.tor.common.address.Port
 import io.matthewnelson.kmp.tor.common.clientauth.ClientName
 import io.matthewnelson.kmp.tor.common.clientauth.OnionClientAuthPrivateKey_B32_X25519
-import io.matthewnelson.kmp.tor.common.server.Server
 import io.matthewnelson.kmp.tor.controller.common.config.TorConfig
 import io.matthewnelson.kmp.tor.controller.common.control.TorControlOnionClientAuth
 import io.matthewnelson.kmp.tor.controller.common.control.usecase.TorControlInfoGet.KeyWord
@@ -104,7 +103,7 @@ class TorControllerIntegrationTest: TorTestHelper() {
             manager.configSet(disableNetwork).getOrThrow()
 
             // Check it is enabled
-            val entry1 = manager.configGet(disableNetwork).getOrThrow()
+            val entry1 = manager.configGet(disableNetwork).getOrThrow().first()
             assertEquals(_false.value, entry1.value)
 
             // Now disable it
@@ -113,7 +112,7 @@ class TorControllerIntegrationTest: TorTestHelper() {
             manager.configSet(disableNetwork).getOrThrow()
 
             // verify disabled
-            val entry2 = manager.configGet(disableNetwork).getOrThrow()
+            val entry2 = manager.configGet(disableNetwork).getOrThrow().first()
             assertEquals(_true.value, entry2.value)
         } catch (t: Throwable) {
             throwable = t
@@ -374,6 +373,26 @@ class TorControllerIntegrationTest: TorTestHelper() {
                 throw throwable
             }
         }
+
+        Unit
+    }
+
+    @Test
+    fun givenTorController_whenConfigGetSingleKeyWord_returnsMultipleEntries() = runBlocking {
+        delay(250L)
+
+        val hsConfigSettings = configProvider
+            .lastValidatedTorConfig!!
+            .torConfig
+            .settings
+            .filterIsInstance<TorConfig.Setting.HiddenService>()
+            .size
+
+        assertTrue(hsConfigSettings > 1)
+
+        val entries = manager.configGet(TorConfig.Setting.HiddenService()).getOrThrow()
+
+        assertEquals(hsConfigSettings, entries.size)
 
         Unit
     }

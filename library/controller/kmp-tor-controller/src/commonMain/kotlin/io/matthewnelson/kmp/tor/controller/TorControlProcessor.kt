@@ -150,8 +150,8 @@ private class RealTorControlProcessor(
 //        }
 //    }
 
-    override suspend fun configGet(setting: TorConfig.Setting<*>): Result<ConfigEntry> {
-        return configGet(setOf(setting)).mapCatching { it.first() }
+    override suspend fun configGet(setting: TorConfig.Setting<*>): Result<List<ConfigEntry>> {
+        return configGet(setOf(setting))
     }
 
     override suspend fun configGet(settings: Set<TorConfig.Setting<*>>): Result<List<ConfigEntry>> {

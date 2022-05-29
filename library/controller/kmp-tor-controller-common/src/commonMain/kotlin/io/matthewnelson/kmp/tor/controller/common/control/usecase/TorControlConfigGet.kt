@@ -28,7 +28,7 @@ import io.matthewnelson.kmp.tor.controller.common.control.TorControlConfig
  * */
 interface TorControlConfigGet {
 
-    suspend fun configGet(setting: TorConfig.Setting<*>) : Result<ConfigEntry>
+    suspend fun configGet(setting: TorConfig.Setting<*>) : Result<List<ConfigEntry>>
 
     suspend fun configGet(settings: Set<TorConfig.Setting<*>>) : Result<List<ConfigEntry>>
 
