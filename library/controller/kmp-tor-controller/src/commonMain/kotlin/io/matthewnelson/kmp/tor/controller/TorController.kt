@@ -448,7 +448,7 @@ private class RealTorController(
 //        return processorDelegate.circuitSetPurpose()
 //    }
 
-    override suspend fun configGet(setting: TorConfig.Setting<*>): Result<ConfigEntry> {
+    override suspend fun configGet(setting: TorConfig.Setting<*>): Result<List<ConfigEntry>> {
         return processorDelegate.configGet(setting)
     }
 

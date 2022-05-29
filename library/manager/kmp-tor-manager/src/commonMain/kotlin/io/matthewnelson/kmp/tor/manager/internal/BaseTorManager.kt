@@ -51,8 +51,8 @@ internal abstract class BaseTorManager: SynchronizedObject(), TorControlManager 
 //        }
 //    }
 
-    override suspend fun configGet(setting: TorConfig.Setting<*>): Result<ConfigEntry> {
-        return provide<TorControlConfigGet, ConfigEntry> {
+    override suspend fun configGet(setting: TorConfig.Setting<*>): Result<List<ConfigEntry>> {
+        return provide<TorControlConfigGet, List<ConfigEntry>> {
             configGet(setting)
         }
     }

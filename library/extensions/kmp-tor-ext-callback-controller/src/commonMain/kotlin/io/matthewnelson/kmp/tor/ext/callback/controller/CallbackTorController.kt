@@ -114,7 +114,7 @@ class CallbackTorController(
     override fun configGet(
         setting: TorConfig.Setting<*>,
         failure: TorCallback<Throwable>?,
-        success: TorCallback<ConfigEntry>
+        success: TorCallback<List<ConfigEntry>>
     ): Task {
         return provideOrFail(failure, success) {
             configGet(setting)
