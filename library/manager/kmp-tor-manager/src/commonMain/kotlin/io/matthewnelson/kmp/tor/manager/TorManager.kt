@@ -21,6 +21,7 @@ import io.matthewnelson.kmp.tor.common.annotation.ExperimentalTorApi
 import io.matthewnelson.kmp.tor.common.annotation.InternalTorApi
 import io.matthewnelson.kmp.tor.controller.TorController
 import io.matthewnelson.kmp.tor.controller.common.config.TorConfig
+import io.matthewnelson.kmp.tor.controller.common.control.TorControlConfig
 import io.matthewnelson.kmp.tor.controller.common.control.usecase.*
 import io.matthewnelson.kmp.tor.controller.common.control.usecase.TorControlSignal.Companion.NEW_NYM_RATE_LIMITED
 import io.matthewnelson.kmp.tor.controller.common.control.usecase.TorControlSignal.Companion.NEW_NYM_SUCCESS
@@ -454,9 +455,19 @@ private class RealTorManager(
     }
 
     override suspend fun configLoad(config: TorConfig): Result<Any?> {
-        return provide<TorControlConfigLoad, Any?> {
-            // TODO: Check settings
+        return provide<TorControlConfig, Any?> {
+            val networkEnabledBefore = networkState.isEnabled()
             val result = configLoad(config)
+
+            if (result.isSuccess) {
+                configReset(TorConfig.Setting.OwningControllerProcess())
+
+                // Startup via TorManager always starts with DisableNetwork set
+                // to true, which configLoad will default back to.
+                if (networkEnabledBefore) {
+                    configSet(disableNetwork.set(TorConfig.Option.TorF.False))
+                }
+            }
             result
         }
     }
@@ -881,9 +892,7 @@ private class RealTorManager(
 
         if (networkObserver?.isNetworkConnected() != false) {
             // null (no observer) or true
-            controller.configSet(disableNetwork.set(TorConfig.Option.TorF.False)).onSuccess {
-                stateMachine.updateState(TorNetworkState.Enabled)
-            }
+            controller.configSet(disableNetwork.set(TorConfig.Option.TorF.False))
         } else {
             notifyListenersNoScope(TorManagerEvent.Log.Warn(WAITING_ON_NETWORK))
         }
