@@ -98,7 +98,7 @@ actual abstract class KmpTorLoader @JvmOverloads constructor(
         managerScope: CoroutineScope,
         stateMachine: TorStateMachine,
         notify: (TorManagerEvent) -> Unit,
-    ): Result<TorController> {
+    ): Result<Pair<TorController, TorConfig?>> {
         provider.lastValidatedTorConfig?.let { validated ->
             val controlPortFile = validated.controlPortFile.toFile()
             val cookieAuthFile = validated.cookieAuthFile?.toFile()
@@ -170,7 +170,7 @@ actual abstract class KmpTorLoader @JvmOverloads constructor(
             }
 
             notify.invoke(TorManagerEvent.Log.Debug("Re-connection attempt successful!"))
-            return Result.success(controller)
+            return Result.success(Pair(controller, null))
         }
 
         torJob?.cancel()
@@ -331,7 +331,7 @@ actual abstract class KmpTorLoader @JvmOverloads constructor(
             ))
         }
 
-        return Result.success(controller)
+        return Result.success(Pair(controller, validated.torConfig))
     }
 
     @JvmSynthetic

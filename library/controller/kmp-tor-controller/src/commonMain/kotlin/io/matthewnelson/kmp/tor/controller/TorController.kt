@@ -22,6 +22,8 @@ import io.matthewnelson.kmp.tor.common.annotation.InternalTorApi
 import io.matthewnelson.kmp.tor.common.clientauth.ClientName
 import io.matthewnelson.kmp.tor.common.clientauth.OnionClientAuth
 import io.matthewnelson.kmp.tor.common.server.Server
+import io.matthewnelson.kmp.tor.common.util.TorStrings
+import io.matthewnelson.kmp.tor.common.util.TorStrings.CLRF
 import io.matthewnelson.kmp.tor.common.util.TorStrings.MULTI_LINE_END
 import io.matthewnelson.kmp.tor.common.util.TorStrings.SP
 import io.matthewnelson.kmp.tor.controller.common.config.ClientAuthEntry
@@ -243,13 +245,28 @@ private class RealTorController(
 
             return withContext(commandDispatcher) {
                 val waiter = Waiter.newInstance { isConnected }
-                debugger.safeInvoke(DebugItem.Message(">> $command"))
                 waiters.withLock {
-                    writer.write(command)
-//                    if (rest != null) {
-//                        writeEscaped(rest)
-//                    }
-                    writer.flush()
+
+                    if (command.startsWith('+')) {
+                        for (line in command.lines()) {
+                            if (line.isBlank()) {
+                                continue
+                            }
+
+                            val trimmed = line.trim()
+
+                            debugger.safeInvoke(DebugItem.Message(">> $trimmed"))
+
+                            writer.write(trimmed)
+                            writer.write(CLRF)
+                            writer.flush()
+                        }
+                    } else {
+                        debugger.safeInvoke(DebugItem.Message(">> $command"))
+                        writer.write(command)
+                        writer.flush()
+                    }
+
                     add(waiter)
                 }
 

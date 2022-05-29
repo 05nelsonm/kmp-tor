@@ -89,11 +89,11 @@ private class RealTorControlProcessor(
     override suspend fun authenticate(bytes: ByteArray): Result<Any?> {
         return lock.withLock {
             try {
-                val command = StringBuilder("AUTHENTICATE")
-                    .append(SP)
-                    .append(bytes.encodeBase16())
-                    .append(CLRF)
-                    .toString()
+                val command = StringBuilder("AUTHENTICATE").apply {
+                    append(SP)
+                    append(bytes.encodeBase16())
+                    append(CLRF)
+                }.toString()
 
                 Result.success(processCommand(command))
             } catch (e: Exception) {
@@ -157,13 +157,12 @@ private class RealTorControlProcessor(
     override suspend fun configGet(settings: Set<TorConfig.Setting<*>>): Result<List<ConfigEntry>> {
         return lock.withLock {
             try {
-                val command = StringBuilder("GETCONF").let { sb ->
+                val command = StringBuilder("GETCONF").apply {
                     if (settings.isNotEmpty()) {
-                        settings.joinTo(sb, SP, SP) { it.keyword }
+                        settings.joinTo(this, SP, SP) { it.keyword }
                     }
-                    sb.append(CLRF)
-                    sb.toString()
-                }
+                    append(CLRF)
+                }.toString()
 
                 val configEntry = processCommand(command) {
                     map { reply ->
@@ -187,35 +186,13 @@ private class RealTorControlProcessor(
     override suspend fun configLoad(config: TorConfig): Result<Any?> {
         return lock.withLock {
             try {
-                val command = StringBuilder("+LOADCONF").let { sb ->
-                    sb.append(CLRF)
-
-                    val kControlPort = TorConfig.Setting.Ports.Control::class
-                    val kControlPortWriteToFile = TorConfig.Setting.ControlPortWriteToFile::class
-                    var needsModification = false
-                    for (setting in config.settings) {
-                        val clazz = setting::class
-                        if (clazz == kControlPort || clazz == kControlPortWriteToFile) {
-                            needsModification = true
-                            break
-                        }
-                    }
-
-                    if (needsModification) {
-                        val newConfig: TorConfig = config.newBuilder {
-                            removeInstanceOf(kControlPort)
-                            removeInstanceOf(kControlPortWriteToFile)
-                        }.build()
-                        sb.append(newConfig.text)
-                    } else {
-                        sb.append(config.text)
-                    }
-
-                    sb.append(CLRF)
-                    sb.append(MULTI_LINE_END)
-                    sb.append(CLRF)
-                    sb.toString()
-                }
+                val command = StringBuilder("+LOADCONF").apply {
+                    append(CLRF)
+                    append(config.text)
+                    append(CLRF)
+                    append(MULTI_LINE_END)
+                    append(CLRF)
+                }.toString()
 
                 Result.success(processCommand(command))
             } catch (e: Exception) {
@@ -237,7 +214,7 @@ private class RealTorControlProcessor(
     ): Result<Any?> {
         return lock.withLock {
             try {
-                val command = StringBuilder("RESETCONF").let { sb ->
+                val command = StringBuilder("RESETCONF").apply {
                     for (setting in settings) {
                         when (setting) {
                             // ControlPort can only be set upon startup
@@ -247,20 +224,20 @@ private class RealTorControlProcessor(
                             else -> { /* no-op */ }
                         }
 
-                        sb.append(SP)
-                        sb.append(setting.keyword)
+                        append(SP)
+                        append(setting.keyword)
 
                         if (!setDefault) {
                             setting.value?.value?.let { kwv ->
-                                sb.append('=')
-                                sb.append(kwv)
+                                append('=')
+                                append(kwv)
                             }
                         }
 
                     }
-                    sb.append(CLRF)
-                    sb.toString()
-                }
+                    append(CLRF)
+                    toString()
+                }.toString()
 
                 Result.success(processCommand(command))
             } catch (e: Exception) {
@@ -272,14 +249,13 @@ private class RealTorControlProcessor(
     override suspend fun configSave(force: Boolean): Result<Any?> {
         return lock.withLock {
             try {
-                val command = StringBuilder("SAVECONF").let { sb ->
+                val command = StringBuilder("SAVECONF").apply {
                     if (force) {
-                        sb.append(SP)
-                        sb.append("FORCE")
+                        append(SP)
+                        append("FORCE")
                     }
-                    sb.append(CLRF)
-                    sb.toString()
-                }
+                    append(CLRF)
+                }.toString()
 
                 Result.success(processCommand(command))
             } catch (e: Exception) {
@@ -295,7 +271,7 @@ private class RealTorControlProcessor(
     override suspend fun configSet(settings: Set<TorConfig.Setting<*>>): Result<Any?> {
         return lock.withLock {
             try {
-                val command = StringBuilder("SETCONF").let { sb ->
+                val command = StringBuilder("SETCONF").apply {
                     for (setting in settings) {
                         when (setting) {
                             // ControlPort can only be set upon startup
@@ -305,17 +281,16 @@ private class RealTorControlProcessor(
                             else -> { /* no-op */ }
                         }
 
-                        sb.append(SP)
-                        sb.append(setting.keyword)
+                        append(SP)
+                        append(setting.keyword)
 
                         setting.value?.value?.let { kwv ->
-                            sb.append('=')
-                            sb.append(kwv)
+                            append('=')
+                            append(kwv)
                         }
                     }
-                    sb.append(CLRF)
-                    sb.toString()
-                }
+                    append(CLRF)
+                }.toString()
 
                 Result.success(processCommand(command))
             } catch (e: Exception) {
@@ -367,21 +342,20 @@ private class RealTorControlProcessor(
     ): Result<Any?> {
         return lock.withLock {
             try {
-                val command = StringBuilder("HSFETCH").let { sb ->
-                    sb.append(SP)
-                    sb.append(address.value)
+                val command = StringBuilder("HSFETCH").apply {
+                    append(SP)
+                    append(address.value)
 
                     if (servers != null && servers.isNotEmpty()) {
                         for (server in servers) {
-                            sb.append(SP)
-                            sb.append("SERVER=")
-                            sb.append(server.value)
+                            append(SP)
+                            append("SERVER=")
+                            append(server.value)
                         }
                     }
 
-                    sb.append(CLRF)
-                    sb.toString()
-                }
+                    append(CLRF)
+                }.toString()
 
                 Result.success(processCommand(command))
             } catch (e: Exception) {
@@ -407,13 +381,12 @@ private class RealTorControlProcessor(
     override suspend fun infoGet(keywords: Set<KeyWord>): Result<Map<String, String>> {
         return lock.withLock {
             try {
-                val command = StringBuilder("GETINFO").let { sb ->
+                val command = StringBuilder("GETINFO").apply {
                     if (keywords.isNotEmpty()) {
-                        keywords.joinTo(sb, separator = SP, prefix = SP) { it.value }
+                        keywords.joinTo(this, separator = SP, prefix = SP) { it.value }
                     }
-                    sb.append(CLRF)
-                    sb.toString()
-                }
+                    append(CLRF)
+                }.toString()
 
                 val map = processCommand(command) { toMap() }
 
@@ -585,11 +558,11 @@ private class RealTorControlProcessor(
     override suspend fun onionDel(address: OnionAddress): Result<Any?> {
         return lock.withLock {
             try {
-                val command = StringBuilder("DEL_ONION")
-                    .append(SP)
-                    .append(address.value)
-                    .append(CLRF)
-                    .toString()
+                val command = StringBuilder("DEL_ONION").apply {
+                    append(SP)
+                    append(address.value)
+                    append(CLRF)
+                }.toString()
 
                 Result.success(processCommand(command))
             } catch (e: Exception) {
@@ -606,26 +579,25 @@ private class RealTorControlProcessor(
     ): Result<Any?> {
         return lock.withLock {
             try {
-                val command = StringBuilder("ONION_CLIENT_AUTH_ADD").let { sb ->
-                    sb.append(SP)
-                    sb.append(address.value)
-                    sb.append(SP)
-                    sb.append(key.keyType)
-                    sb.append(':')
-                    sb.append(key.base64(padded = false))
+                val command = StringBuilder("ONION_CLIENT_AUTH_ADD").apply {
+                    append(SP)
+                    append(address.value)
+                    append(SP)
+                    append(key.keyType)
+                    append(':')
+                    append(key.base64(padded = false))
                     if (clientName != null) {
-                        sb.append(SP)
-                        sb.append("ClientName=")
-                        sb.append(clientName.value)
+                        append(SP)
+                        append("ClientName=")
+                        append(clientName.value)
                     }
                     if (flags != null && flags.isNotEmpty()) {
-                        sb.append(SP)
-                        sb.append("Flags=")
-                        flags.joinTo(sb, separator = ",")
+                        append(SP)
+                        append("Flags=")
+                        flags.joinTo(this, separator = ",")
                     }
-                    sb.append(CLRF)
-                    sb.toString()
-                }
+                    append(CLRF)
+                }.toString()
 
                 Result.success(processCommand(command))
             } catch (e: Exception) {
@@ -637,11 +609,11 @@ private class RealTorControlProcessor(
     override suspend fun onionClientAuthRemove(address: OnionAddressV3): Result<Any?> {
         return lock.withLock {
             try {
-                val command = StringBuilder("ONION_CLIENT_AUTH_REMOVE")
-                    .append(SP)
-                    .append(address.value)
-                    .append(CLRF)
-                    .toString()
+                val command = StringBuilder("ONION_CLIENT_AUTH_REMOVE").apply {
+                    append(SP)
+                    append(address.value)
+                    append(CLRF)
+                }.toString()
 
                 Result.success(processCommand(command))
             } catch (e: Exception) {
@@ -675,14 +647,13 @@ private class RealTorControlProcessor(
 
     private suspend fun onionClientAuthView(address: String?): List<ClientAuthEntry> {
         lock.withLock {
-            val command = StringBuilder("ONION_CLIENT_AUTH_VIEW").let { sb ->
+            val command = StringBuilder("ONION_CLIENT_AUTH_VIEW").apply {
                 if (address != null) {
-                    sb.append(SP)
-                    sb.append(address)
+                    append(SP)
+                    append(address)
                 }
-                sb.append(CLRF)
-                sb.toString()
-            }
+                append(CLRF)
+            }.toString()
 
             return processCommand(command) {
                 mapNotNull { reply ->
@@ -759,17 +730,16 @@ private class RealTorControlProcessor(
     override suspend fun setEvents(events: Set<TorEvent>, extended: Boolean): Result<Any?> {
         return lock.withLock {
             try {
-                val command = StringBuilder("SETEVENTS").let { sb ->
+                val command = StringBuilder("SETEVENTS").apply {
                     if (extended) {
-                        sb.append(SP)
-                        sb.append("EXTENDED")
+                        append(SP)
+                        append("EXTENDED")
                     }
                     if (events.isNotEmpty()) {
-                        events.joinTo(sb, separator = SP, prefix = SP)
+                        events.joinTo(this, separator = SP, prefix = SP)
                     }
-                    sb.append(CLRF)
-                    sb.toString()
-                }
+                    append(CLRF)
+                }.toString()
 
                 Result.success(processCommand(command))
             } catch (e: Exception) {
@@ -781,11 +751,11 @@ private class RealTorControlProcessor(
     override suspend fun signal(signal: TorControlSignal.Signal): Result<Any?> {
         return lock.withLock {
             try {
-                val command = StringBuilder("SIGNAL")
-                    .append(SP)
-                    .append(signal)
-                    .append(CLRF)
-                    .toString()
+                val command = StringBuilder("SIGNAL").apply {
+                    append(SP)
+                    append(signal)
+                    append(CLRF)
+                }.toString()
 
                 val result = processCommand(command)
 

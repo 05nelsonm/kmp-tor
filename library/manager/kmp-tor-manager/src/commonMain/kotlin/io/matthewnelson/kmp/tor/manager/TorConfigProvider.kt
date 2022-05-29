@@ -16,6 +16,7 @@
 package io.matthewnelson.kmp.tor.manager
 
 import io.matthewnelson.kmp.tor.common.address.Port
+import io.matthewnelson.kmp.tor.common.annotation.InternalTorApi
 import io.matthewnelson.kmp.tor.controller.common.config.TorConfig
 import io.matthewnelson.kmp.tor.controller.common.config.TorConfig.Setting.*
 import io.matthewnelson.kmp.tor.controller.common.config.TorConfig.Option.*
@@ -274,8 +275,22 @@ abstract class TorConfigProvider {
             builder.remove(geoIp6File)
         }
 
-        val newConfig = builder.build()
-        val lines = newConfig.text.lines()
+        val configLoad = builder.build()
+
+        // Filter out settings that are not required at
+        // startup.
+        val configStart = TorConfig.Builder {
+            for (setting in configLoad.settings) {
+                @OptIn(InternalTorApi::class)
+                if (setting.isStartArgument) {
+                    put(setting)
+                }
+            }
+
+            this
+        }.build()
+
+        val lines = configStart.text.lines()
         val configLines: MutableList<String> = ArrayList((lines.size * 2) + 5)
 
         configLines.add("-f")
@@ -302,7 +317,7 @@ abstract class TorConfigProvider {
         }
 
         return ValidatedTorConfig(
-            newConfig,
+            configLoad,
             configLines,
             controlPortFilePath,
             cookieAuthFilePath

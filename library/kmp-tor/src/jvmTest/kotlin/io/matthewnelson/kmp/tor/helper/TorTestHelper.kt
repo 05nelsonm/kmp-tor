@@ -86,7 +86,7 @@ abstract class TorTestHelper {
 
     protected open fun testConfig(testProvider: TorConfigProviderJvm): TorConfig {
         return TorConfig.Builder {
-            put(Ports.Control().set(AorDorPort.Value(PortProxy(9155))))
+            put(Ports.Control().set(AorDorPort.Auto))
             put(Ports.Socks().set(AorDorPort.Auto))
             put(Ports.HttpTunnel().set(AorDorPort.Auto))
             put(Ports.Trans().set(AorDorPort.Auto))
@@ -199,9 +199,7 @@ abstract class TorTestHelper {
                 println(event.toString())
             }
 
-            override fun onEvent(event: TorEvent.Type.SingleLineEvent, output: String) {
-                println("event=${event.javaClass.simpleName}, output=$output")
-            }
+            override fun onEvent(event: TorEvent.Type.SingleLineEvent, output: String) {}
 
             override fun onEvent(
                 event: TorEvent.Type.MultiLineEvent,
