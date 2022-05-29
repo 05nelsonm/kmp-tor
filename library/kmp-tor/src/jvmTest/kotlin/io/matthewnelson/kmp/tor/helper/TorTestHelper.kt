@@ -199,9 +199,7 @@ abstract class TorTestHelper {
                 println(event.toString())
             }
 
-            override fun onEvent(event: TorEvent.Type.SingleLineEvent, output: String) {
-                println("event=${event.javaClass.simpleName}, output=$output")
-            }
+            override fun onEvent(event: TorEvent.Type.SingleLineEvent, output: String) {}
 
             override fun onEvent(
                 event: TorEvent.Type.MultiLineEvent,
