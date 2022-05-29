@@ -335,6 +335,8 @@ class TorConfig private constructor(
         val isDefault: Boolean get() = value == default
         var isMutable: Boolean = true
             protected set
+        @InternalTorApi
+        abstract val isStartArgument: Boolean
 
         @JvmSynthetic
         internal fun setImmutable(): Setting<T> {
@@ -378,6 +380,8 @@ class TorConfig private constructor(
         class AutomapHostsOnResolve         : Setting<Option.TorF>("AutomapHostsOnResolve") {
             override val default: Option.TorF get() = Option.TorF.True
             override var value: Option.TorF = default
+            @InternalTorApi
+            override val isStartArgument: Boolean get() = false
 
             override fun clone(): AutomapHostsOnResolve {
                 return AutomapHostsOnResolve().set(value) as AutomapHostsOnResolve
@@ -391,6 +395,8 @@ class TorConfig private constructor(
             override val default: Option.FileSystemDir? = null
             override var value: Option.FileSystemDir? = default
                 set(value) { field = value?.nullIfEmpty }
+            @InternalTorApi
+            override val isStartArgument: Boolean get() = true
 
             override fun clone(): CacheDirectory {
                 return CacheDirectory().set(value) as CacheDirectory
@@ -404,6 +410,8 @@ class TorConfig private constructor(
             override val default: Option.FileSystemDir? = null
             override var value: Option.FileSystemDir? = default
                 set(value) { field = value?.nullIfEmpty }
+            @InternalTorApi
+            override val isStartArgument: Boolean get() = true
 
             override fun clone(): ClientOnionAuthDir {
                 return ClientOnionAuthDir().set(value) as ClientOnionAuthDir
@@ -420,6 +428,8 @@ class TorConfig private constructor(
         class ConnectionPadding             : Setting<Option.AorTorF>("ConnectionPadding") {
             override val default: Option.AorTorF get() = Option.AorTorF.Auto
             override var value: Option.AorTorF = default
+            @InternalTorApi
+            override val isStartArgument: Boolean get() = false
 
             override fun clone(): ConnectionPadding {
                 return ConnectionPadding().set(value) as ConnectionPadding
@@ -432,6 +442,8 @@ class TorConfig private constructor(
         class ConnectionPaddingReduced      : Setting<Option.TorF>("ReducedConnectionPadding") {
             override val default: Option.TorF get() = Option.TorF.False
             override var value: Option.TorF = default
+            @InternalTorApi
+            override val isStartArgument: Boolean get() = false
 
             override fun clone(): ConnectionPaddingReduced {
                 return ConnectionPaddingReduced().set(value) as ConnectionPaddingReduced
@@ -445,6 +457,8 @@ class TorConfig private constructor(
             override val default: Option.FileSystemFile? = null
             override var value: Option.FileSystemFile? = default
                 set(value) { field = value?.nullIfEmpty }
+            @InternalTorApi
+            override val isStartArgument: Boolean get() = true
 
             override fun clone(): ControlPortWriteToFile {
                 return ControlPortWriteToFile().set(value) as ControlPortWriteToFile
@@ -461,6 +475,8 @@ class TorConfig private constructor(
         class CookieAuthentication          : Setting<Option.TorF>("CookieAuthentication") {
             override val default: Option.TorF get() = Option.TorF.True
             override var value: Option.TorF = default
+            @InternalTorApi
+            override val isStartArgument: Boolean get() = true
 
             override fun clone(): CookieAuthentication {
                 return CookieAuthentication().set(value) as CookieAuthentication
@@ -474,6 +490,8 @@ class TorConfig private constructor(
             override val default: Option.FileSystemFile? = null
             override var value: Option.FileSystemFile? = default
                 set(value) { field = value?.nullIfEmpty }
+            @InternalTorApi
+            override val isStartArgument: Boolean get() = true
 
             override fun clone(): CookieAuthFile {
                 return CookieAuthFile().set(value) as CookieAuthFile
@@ -491,6 +509,8 @@ class TorConfig private constructor(
             override val default: Option.FileSystemDir? = null
             override var value: Option.FileSystemDir? = default
                 set(value) { field = value?.nullIfEmpty }
+            @InternalTorApi
+            override val isStartArgument: Boolean get() = true
 
             override fun clone(): DataDirectory {
                 return DataDirectory().set(value) as DataDirectory
@@ -507,6 +527,8 @@ class TorConfig private constructor(
         class DisableNetwork                : Setting<Option.TorF>("DisableNetwork") {
             override val default: Option.TorF get() = Option.TorF.False
             override var value: Option.TorF = default
+            @InternalTorApi
+            override val isStartArgument: Boolean get() = true
 
             override fun clone(): DisableNetwork {
                 return DisableNetwork().set(value) as DisableNetwork
@@ -519,6 +541,8 @@ class TorConfig private constructor(
         class DormantCanceledByStartup      : Setting<Option.TorF>("DormantCanceledByStartup") {
             override val default: Option.TorF get() = Option.TorF.False
             override var value: Option.TorF = default
+            @InternalTorApi
+            override val isStartArgument: Boolean get() = true
 
             override fun clone(): DormantCanceledByStartup {
                 return DormantCanceledByStartup().set(value) as DormantCanceledByStartup
@@ -539,6 +563,8 @@ class TorConfig private constructor(
                         value
                     }
                 }
+            @InternalTorApi
+            override val isStartArgument: Boolean get() = false
 
             override fun clone(): DormantClientTimeout {
                 return DormantClientTimeout().set(value) as DormantClientTimeout
@@ -551,6 +577,8 @@ class TorConfig private constructor(
         class DormantOnFirstStartup         : Setting<Option.TorF>("DormantOnFirstStartup") {
             override val default: Option.TorF get() = Option.TorF.False
             override var value: Option.TorF = default
+            @InternalTorApi
+            override val isStartArgument: Boolean get() = true
 
             override fun clone(): DormantOnFirstStartup {
                 return DormantOnFirstStartup().set(value) as DormantOnFirstStartup
@@ -563,6 +591,8 @@ class TorConfig private constructor(
         class DormantTimeoutDisabledByIdleStreams   : Setting<Option.TorF>("DormantTimeoutDisabledByIdleStreams") {
             override val default: Option.TorF get() = Option.TorF.True
             override var value: Option.TorF = default
+            @InternalTorApi
+            override val isStartArgument: Boolean get() = false
 
             override fun clone(): DormantTimeoutDisabledByIdleStreams {
                 return DormantTimeoutDisabledByIdleStreams().set(value) as DormantTimeoutDisabledByIdleStreams
@@ -575,6 +605,8 @@ class TorConfig private constructor(
         class GeoIPExcludeUnknown           : Setting<Option.AorTorF>("GeoIPExcludeUnknown") {
             override val default: Option.AorTorF get() = Option.AorTorF.Auto
             override var value: Option.AorTorF = default
+            @InternalTorApi
+            override val isStartArgument: Boolean get() = false
 
             override fun clone(): GeoIPExcludeUnknown {
                 return GeoIPExcludeUnknown().set(value) as GeoIPExcludeUnknown
@@ -588,6 +620,8 @@ class TorConfig private constructor(
             override val default: Option.FileSystemFile? = null
             override var value: Option.FileSystemFile? = default
                 set(value) { field = value?.nullIfEmpty }
+            @InternalTorApi
+            override val isStartArgument: Boolean get() = true
 
             override fun clone(): GeoIpV4File {
                 return GeoIpV4File().set(value) as GeoIpV4File
@@ -601,6 +635,8 @@ class TorConfig private constructor(
             override val default: Option.FileSystemFile? = null
             override var value: Option.FileSystemFile? = default
                 set(value) { field = value?.nullIfEmpty }
+            @InternalTorApi
+            override val isStartArgument: Boolean get() = true
 
             override fun clone(): GeoIpV6File {
                 return GeoIpV6File().set(value) as GeoIpV6File
@@ -634,6 +670,8 @@ class TorConfig private constructor(
             override val default: Option.FileSystemDir? = null
             override var value: Option.FileSystemDir? = default
                 set(value) { field = value?.nullIfEmpty }
+            @InternalTorApi
+            override val isStartArgument: Boolean get() = false
 
             /**
              * See [HiddenService.Ports]
@@ -782,6 +820,8 @@ class TorConfig private constructor(
         class OwningControllerProcess       : Setting<Option.ProcessId?>("__OwningControllerProcess") {
             override val default: Option.ProcessId? = null
             override var value: Option.ProcessId? = default
+            @InternalTorApi
+            override val isStartArgument: Boolean get() = true
 
             override fun clone(): OwningControllerProcess {
                 return OwningControllerProcess().set(value) as OwningControllerProcess
@@ -840,6 +880,8 @@ class TorConfig private constructor(
                             field = value
                         }
                     }
+                @InternalTorApi
+                override val isStartArgument: Boolean get() = true
 
                 var flags: Set<Flag>? = null
                     private set
@@ -879,6 +921,8 @@ class TorConfig private constructor(
                 override var value: Option.AorDorPort = default
                 var isolationFlags: Set<IsolationFlag>? = null
                     private set
+                @InternalTorApi
+                override val isStartArgument: Boolean get() = false
 
                 override fun setDefault(): Dns {
                     if (isMutable) {
@@ -908,6 +952,8 @@ class TorConfig private constructor(
                 override var value: Option.AorDorPort = default
                 var isolationFlags: Set<IsolationFlag>? = null
                     private set
+                @InternalTorApi
+                override val isStartArgument: Boolean get() = false
 
                 override fun setDefault(): HttpTunnel {
                     if (isMutable) {
@@ -940,6 +986,8 @@ class TorConfig private constructor(
                     private set
                 var isolationFlags: Set<IsolationFlag>? = null
                     private set
+                @InternalTorApi
+                override val isStartArgument: Boolean get() = false
 
                 override fun setDefault(): Socks {
                     if (isMutable) {
@@ -996,6 +1044,8 @@ class TorConfig private constructor(
                 override var value: Option.AorDorPort = default
                 var isolationFlags: Set<IsolationFlag>? = null
                     private set
+                @InternalTorApi
+                override val isStartArgument: Boolean get() = false
 
                 override fun setDefault(): Trans {
                     if (isMutable) {
@@ -1058,6 +1108,8 @@ class TorConfig private constructor(
         class RunAsDaemon                   : Setting<Option.TorF>("RunAsDaemon") {
             override val default: Option.TorF get() = Option.TorF.False
             override var value: Option.TorF = default
+            @InternalTorApi
+            override val isStartArgument: Boolean get() = true
 
             override fun clone(): RunAsDaemon {
                 return RunAsDaemon().set(value) as RunAsDaemon
@@ -1071,6 +1123,8 @@ class TorConfig private constructor(
             override val default: Option.FieldId? get() = null
             override var value: Option.FieldId? = default
                 set(value) { field = value?.nullIfEmpty }
+            @InternalTorApi
+            override val isStartArgument: Boolean get() = true
 
             override fun clone(): SyslogIdentityTag {
                 return SyslogIdentityTag().set(value) as SyslogIdentityTag
