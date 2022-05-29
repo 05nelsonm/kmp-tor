@@ -464,7 +464,7 @@ private class RealTorManager(
 
                 // Startup via TorManager always starts with DisableNetwork set
                 // to true, which configLoad will default back to.
-                if (networkEnabledBefore) {
+                if (networkEnabledBefore && networkObserver?.isNetworkConnected() != false) {
                     configSet(disableNetwork.set(TorConfig.Option.TorF.False))
                 }
             }
