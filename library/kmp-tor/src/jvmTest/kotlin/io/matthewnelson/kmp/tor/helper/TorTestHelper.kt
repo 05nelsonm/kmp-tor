@@ -86,7 +86,7 @@ abstract class TorTestHelper {
 
     protected open fun testConfig(testProvider: TorConfigProviderJvm): TorConfig {
         return TorConfig.Builder {
-            put(Ports.Control().set(AorDorPort.Value(PortProxy(9155))))
+            put(Ports.Control().set(AorDorPort.Auto))
             put(Ports.Socks().set(AorDorPort.Auto))
             put(Ports.HttpTunnel().set(AorDorPort.Auto))
             put(Ports.Trans().set(AorDorPort.Auto))
