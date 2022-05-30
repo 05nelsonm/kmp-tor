@@ -171,12 +171,6 @@ class TorConfig private constructor(
 
             val writtenDisabledPorts: MutableSet<String> = LinkedHashSet(disabledPorts.size)
 
-            val localhostIp: String = try {
-                ControllerUtils.localhostAddress()
-            } catch (_: Exception) {
-                "127.0.0.1"
-            }
-
             val newSettings = mutableSetOf<Setting<*>>()
             for (setting in sorted) {
 

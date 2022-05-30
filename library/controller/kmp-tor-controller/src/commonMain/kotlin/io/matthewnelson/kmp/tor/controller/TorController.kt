@@ -22,10 +22,8 @@ import io.matthewnelson.kmp.tor.common.annotation.InternalTorApi
 import io.matthewnelson.kmp.tor.common.clientauth.ClientName
 import io.matthewnelson.kmp.tor.common.clientauth.OnionClientAuth
 import io.matthewnelson.kmp.tor.common.server.Server
-import io.matthewnelson.kmp.tor.common.util.TorStrings
 import io.matthewnelson.kmp.tor.common.util.TorStrings.CLRF
 import io.matthewnelson.kmp.tor.common.util.TorStrings.MULTI_LINE_END
-import io.matthewnelson.kmp.tor.common.util.TorStrings.SP
 import io.matthewnelson.kmp.tor.controller.common.config.ClientAuthEntry
 import io.matthewnelson.kmp.tor.controller.common.config.ConfigEntry
 import io.matthewnelson.kmp.tor.controller.common.config.HiddenServiceEntry
@@ -198,26 +196,6 @@ private class RealTorController(
                 onDisconnect.value = null
             }
         }
-
-//        @Throws(TorControllerException::class)
-//        private fun writeEscaped(string: String) {
-//            val splits = string.split('\n')
-//            for (split in splits) {
-//                var line = split
-//                if (line.startsWith(MULTI_LINE_END)) {
-//                    line = ".$line"
-//                }
-//                if (line.endsWith('\r')) {
-//                    line += '\n'
-//                } else {
-//                    line += "$CLRF"
-//                }
-//                debugger.safeInvoke(">> $line")
-//                output.write(line)
-//            }
-//            output.write(".$CLRF")
-//            debugger.safeInvoke(">> .\n")
-//        }
 
         override val isConnected: Boolean
             get() = !whileLoopBroke.value && !torCoroutineManager.isClosed

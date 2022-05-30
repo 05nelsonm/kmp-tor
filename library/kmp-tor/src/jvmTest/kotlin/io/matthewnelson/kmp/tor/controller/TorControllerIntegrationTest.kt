@@ -310,9 +310,10 @@ class TorControllerIntegrationTest: TorTestHelper() {
 
     @Test
     fun givenController_whenHSFetched_descriptorsAreReceived() = runBlocking {
+        manager.setEvents(setOf(TorEvent.HSDescriptor)).getOrThrow()
+
         awaitBootstrap(timeout = 120_000)
 
-        manager.setEvents(setOf(TorEvent.HSDescriptor)).getOrThrow()
         val torProjectAddress = OnionAddressV3("2gzyxa5ihm7nsggfxnu52rck2vv4rvmdlkiu3zzui5du4xyclen53wid")
 
         var received = false
@@ -358,7 +359,7 @@ class TorControllerIntegrationTest: TorTestHelper() {
 
             // await HSDescriptor event to be dispatched
             var count = 0
-            while (!received && count < 10 && isActive) {
+            while (!received && count < 20 && isActive) {
                 delay(1_000)
                 count++
             }

@@ -31,6 +31,7 @@ import io.matthewnelson.kmp.tor.controller.common.file.Path
 import io.matthewnelson.kmp.tor.manager.TorConfigProvider
 import io.matthewnelson.kmp.tor.manager.TorManager
 import io.matthewnelson.kmp.tor.manager.common.event.TorManagerEvent
+import io.matthewnelson.kmp.tor.manager.common.state.isOff
 import io.matthewnelson.kmp.tor.manager.internal.ext.infoGetBootstrapProgress
 import kotlinx.coroutines.*
 import kotlinx.coroutines.test.resetMain
@@ -226,27 +227,18 @@ abstract class TorTestHelper {
     }
 
     protected suspend fun awaitBootstrap(timeout: Long = 30_000L) {
-        var bootstrap = 0
-        val keyword = TorControlInfoGet.KeyWord.Status.BootstrapPhase()
         val timeoutTime = System.currentTimeMillis() + timeout
         println("==== Awaiting Bootstrap")
 
-        while (bootstrap < 100) {
-            val result = manager.infoGet(keyword)
-            result.onFailure {
-                throw AssertionError("Failed to retrieve bootstrap status")
-            }
-            result.onSuccess {
-                println(it)
-                bootstrap = it.infoGetBootstrapProgress()
-            }
+        while (!manager.state.isBootstrapped) {
+            delay(1_000L)
 
             if (System.currentTimeMillis() > timeoutTime) {
                 throw AssertionError("await bootstrap timed out after ${timeout}ms")
             }
 
-            if (bootstrap < 100) {
-                delay(1_000L)
+            if (manager.state.isOff()) {
+                throw AssertionError("TorManager is off")
             }
         }
     }
