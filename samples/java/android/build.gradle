@@ -44,9 +44,6 @@ android {
 
     defaultConfig {
         applicationId "io.matthewnelson.kmp.tor.sample.java"
-
-        // can support sdk 16, but you would have to enable multi-dex
-        // and I don't want to do that for a sample.
         minSdk versions.android.sdkMin21
 
         targetSdk versions.android.sdkTarget
