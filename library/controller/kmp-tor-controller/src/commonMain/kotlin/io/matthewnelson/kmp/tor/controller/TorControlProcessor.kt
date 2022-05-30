@@ -37,6 +37,7 @@ import io.matthewnelson.kmp.tor.common.util.TorStrings.MULTI_LINE_END
 import io.matthewnelson.kmp.tor.common.util.TorStrings.SP
 import io.matthewnelson.kmp.tor.controller.common.config.HiddenServiceEntry
 import io.matthewnelson.kmp.tor.controller.common.internal.ControllerUtils
+import io.matthewnelson.kmp.tor.controller.common.internal.appendTo
 import io.matthewnelson.kmp.tor.controller.internal.controller.ControlPortInteractor
 import io.matthewnelson.kmp.tor.controller.internal.controller.ReplyLine
 import kotlinx.coroutines.Dispatchers
@@ -158,8 +159,9 @@ private class RealTorControlProcessor(
         return lock.withLock {
             try {
                 val command = StringBuilder("GETCONF").apply {
-                    if (settings.isNotEmpty()) {
-                        settings.joinTo(this, SP, SP) { it.keyword }
+                    for (setting in settings) {
+                        append(SP)
+                        setting.appendTo(this, appendValue = false, isWriteTorConfig = false)
                     }
                     append(CLRF)
                 }.toString()
@@ -225,18 +227,9 @@ private class RealTorControlProcessor(
                         }
 
                         append(SP)
-                        append(setting.keyword)
-
-                        if (!setDefault) {
-                            setting.value?.value?.let { kwv ->
-                                append('=')
-                                append(kwv)
-                            }
-                        }
-
+                        setting.appendTo(this, appendValue = !setDefault, isWriteTorConfig = false)
                     }
                     append(CLRF)
-                    toString()
                 }.toString()
 
                 Result.success(processCommand(command))
@@ -282,12 +275,7 @@ private class RealTorControlProcessor(
                         }
 
                         append(SP)
-                        append(setting.keyword)
-
-                        setting.value?.value?.let { kwv ->
-                            append('=')
-                            append(kwv)
-                        }
+                        setting.appendTo(this, appendValue = true, isWriteTorConfig = false)
                     }
                     append(CLRF)
                 }.toString()

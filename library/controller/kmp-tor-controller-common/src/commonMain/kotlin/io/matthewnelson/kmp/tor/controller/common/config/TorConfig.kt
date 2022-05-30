@@ -26,6 +26,7 @@ import io.matthewnelson.kmp.tor.controller.common.config.TorConfig.Option.TorF.F
 import io.matthewnelson.kmp.tor.controller.common.config.TorConfig.Option.TorF.True
 import io.matthewnelson.kmp.tor.controller.common.file.Path
 import io.matthewnelson.kmp.tor.controller.common.internal.ControllerUtils
+import io.matthewnelson.kmp.tor.controller.common.internal.appendTo
 import kotlin.jvm.JvmField
 import kotlin.jvm.JvmInline
 import kotlin.jvm.JvmStatic
@@ -177,8 +178,7 @@ class TorConfig private constructor(
             }
 
             val newSettings = mutableSetOf<Setting<*>>()
-            for ((i, setting) in sorted.withIndex()) {
-                val value = setting.value ?: continue
+            for (setting in sorted) {
 
                 if (setting is Setting.Ports) {
                     if (disabledPorts.contains(setting.keyword)) {
@@ -195,106 +195,11 @@ class TorConfig private constructor(
                         }
 
                         continue
-                    } else {
-                        sb.append(setting.keyword)
-                        sb.append(SP)
-                        sb.append(value)
                     }
 
-                    when (setting) {
-                        is Setting.Ports.Control -> {
-                            setting.flags?.let { flags ->
-                                for (flag in flags) {
-                                    sb.append(SP)
-                                    sb.append(flag.value)
-                                }
-                            }
-                        }
-                        is Setting.Ports.Dns -> {
-                            setting.isolationFlags?.let { flags ->
-                                for (flag in flags) {
-                                    sb.append(SP)
-                                    sb.append(flag.value)
-                                }
-                            }
-                        }
-                        is Setting.Ports.HttpTunnel -> {
-                            setting.isolationFlags?.let { flags ->
-                                for (flag in flags) {
-                                    sb.append(SP)
-                                    sb.append(flag.value)
-                                }
-                            }
-                        }
-                        is Setting.Ports.Socks -> {
-                            setting.flags?.let { flags ->
-                                for (flag in flags) {
-                                    sb.append(SP)
-                                    sb.append(flag.value)
-                                }
-                            }
-                            setting.isolationFlags?.let { flags ->
-                                for (flag in flags) {
-                                    sb.append(SP)
-                                    sb.append(flag.value)
-                                }
-                            }
-                        }
-                        is Setting.Ports.Trans -> {
-                            setting.isolationFlags?.let { flags ->
-                                for (flag in flags) {
-                                    sb.append(SP)
-                                    sb.append(flag.value)
-                                }
-                            }
-                        }
-                    }
-                } else if (setting is Setting.HiddenService) {
-                    val hsDir = setting.value ?: continue
-                    val hsPorts = setting.ports
-
-                    if (hsPorts == null || hsPorts.isEmpty()) {
-                        continue
-                    }
-
-                    if (sorted.elementAtOrNull(i - 1) !is Setting.HiddenService) {
-                        sb.appendLine()
-                    }
-
-                    sb.append(setting.keyword)
-                    sb.append(SP)
-                    sb.append(hsDir.value)
-
-                    for (hsPort in hsPorts) {
-                        sb.appendLine()
-                        sb.append("HiddenServicePort")
-                        sb.append(SP)
-                        sb.append(hsPort.virtualPort.value)
-                        sb.append(SP)
-                        sb.append(localhostIp)
-                        sb.append(':')
-                        sb.append(hsPort.targetPort.value)
-                    }
-
-                    setting.maxStreams?.let { maxStreams ->
-                        sb.appendLine()
-                        sb.append("HiddenServiceMaxStreams")
-                        sb.append(SP)
-                        sb.append(maxStreams.value)
-                    }
-
-                    setting.maxStreamsCloseCircuit?.let { closeCircuit ->
-                        sb.appendLine()
-                        sb.append("HiddenServiceMaxStreamsCloseCircuit")
-                        sb.append(SP)
-                        sb.append(closeCircuit.value)
-                    }
-
-                    sb.appendLine()
+                    setting.appendTo(sb, appendValue = true, isWriteTorConfig = true)
                 } else {
-                    sb.append(setting.keyword)
-                    sb.append(SP)
-                    sb.append(value)
+                    setting.appendTo(sb, appendValue = true, isWriteTorConfig = true)
                 }
 
                 newSettings.add(setting.setImmutable())

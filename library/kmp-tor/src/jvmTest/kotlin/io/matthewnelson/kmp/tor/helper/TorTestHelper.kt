@@ -28,6 +28,7 @@ import io.matthewnelson.kmp.tor.controller.common.config.TorConfig.Option.*
 import io.matthewnelson.kmp.tor.controller.common.control.usecase.TorControlInfoGet
 import io.matthewnelson.kmp.tor.controller.common.events.TorEvent
 import io.matthewnelson.kmp.tor.controller.common.file.Path
+import io.matthewnelson.kmp.tor.manager.TorConfigProvider
 import io.matthewnelson.kmp.tor.manager.TorManager
 import io.matthewnelson.kmp.tor.manager.common.event.TorManagerEvent
 import io.matthewnelson.kmp.tor.manager.internal.ext.infoGetBootstrapProgress
@@ -211,6 +212,17 @@ abstract class TorTestHelper {
 
         sManager = manager
         return manager
+    }
+
+    protected suspend fun awaitLastValidatedTorConfig(): TorConfigProvider.ValidatedTorConfig {
+        var count = 0
+        while (count < 10) {
+            configProvider.lastValidatedTorConfig?.let { return it }
+            delay(50L)
+            count++
+        }
+
+        throw AssertionError("Failed to retrieve LastValidatedTorConfig")
     }
 
     protected suspend fun awaitBootstrap(timeout: Long = 30_000L) {
