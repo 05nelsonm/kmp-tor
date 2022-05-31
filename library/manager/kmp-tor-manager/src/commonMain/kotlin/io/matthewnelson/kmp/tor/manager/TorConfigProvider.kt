@@ -107,9 +107,13 @@ abstract class TorConfigProvider {
     val lastValidatedTorConfig: ValidatedTorConfig? get() = _lastValidatedTorConfig.value
 
     data class ValidatedTorConfig(
+        @JvmField
         val torConfig: TorConfig,
+        @JvmField
         val configLines: List<String>,
+        @JvmField
         val controlPortFile: Path,
+        @get:JvmSynthetic
         internal val cookieAuthFile: Path?, // if null, cookieAuth is set to False
     )
 
