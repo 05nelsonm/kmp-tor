@@ -42,7 +42,7 @@ actual abstract class KmpTorLoader(provider: TorConfigProvider) {
         managerScope: CoroutineScope,
         stateMachine: TorStateMachine,
         notify: (TorManagerEvent) -> Unit,
-    ): Result<TorController> {
+    ): Result<Pair<TorController, TorConfig?>> {
         TODO("Not yet implemented")
     }
 

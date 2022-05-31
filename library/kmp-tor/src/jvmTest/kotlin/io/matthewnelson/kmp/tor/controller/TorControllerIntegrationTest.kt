@@ -15,10 +15,8 @@
  **/
 package io.matthewnelson.kmp.tor.controller
 
-import io.matthewnelson.kmp.tor.common.address.OnionAddress
-import io.matthewnelson.kmp.tor.common.address.OnionAddressV3
-import io.matthewnelson.kmp.tor.common.address.OnionAddressV3PrivateKey_ED25519
-import io.matthewnelson.kmp.tor.common.address.Port
+import io.matthewnelson.kmp.tor.common.address.*
+import io.matthewnelson.kmp.tor.common.annotation.InternalTorApi
 import io.matthewnelson.kmp.tor.common.clientauth.ClientName
 import io.matthewnelson.kmp.tor.common.clientauth.OnionClientAuthPrivateKey_B32_X25519
 import io.matthewnelson.kmp.tor.controller.common.config.TorConfig
@@ -26,11 +24,16 @@ import io.matthewnelson.kmp.tor.controller.common.control.TorControlOnionClientA
 import io.matthewnelson.kmp.tor.controller.common.control.usecase.TorControlInfoGet.KeyWord
 import io.matthewnelson.kmp.tor.controller.common.control.usecase.TorControlOnionAdd
 import io.matthewnelson.kmp.tor.controller.common.events.TorEvent
+import io.matthewnelson.kmp.tor.controller.common.internal.appendTo
 import io.matthewnelson.kmp.tor.helper.TorTestHelper
 import io.matthewnelson.kmp.tor.manager.common.event.TorManagerEvent
+import io.matthewnelson.kmp.tor.manager.util.PortUtil
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.runBlocking
 import kotlin.test.*
 
+@OptIn(InternalTorApi::class)
 class TorControllerIntegrationTest: TorTestHelper() {
 
     @Test
@@ -101,7 +104,7 @@ class TorControllerIntegrationTest: TorTestHelper() {
             manager.configSet(disableNetwork).getOrThrow()
 
             // Check it is enabled
-            val entry1 = manager.configGet(disableNetwork).getOrThrow()
+            val entry1 = manager.configGet(disableNetwork).getOrThrow().first()
             assertEquals(_false.value, entry1.value)
 
             // Now disable it
@@ -110,7 +113,7 @@ class TorControllerIntegrationTest: TorTestHelper() {
             manager.configSet(disableNetwork).getOrThrow()
 
             // verify disabled
-            val entry2 = manager.configGet(disableNetwork).getOrThrow()
+            val entry2 = manager.configGet(disableNetwork).getOrThrow().first()
             assertEquals(_true.value, entry2.value)
         } catch (t: Throwable) {
             throwable = t
@@ -301,6 +304,212 @@ class TorControllerIntegrationTest: TorTestHelper() {
 
         // Fail test if kotlin.Result.Failure
         result.getOrThrow()
+
+        Unit
+    }
+
+    @Test
+    fun givenController_whenHSFetched_descriptorsAreReceived() = runBlocking {
+        manager.setEvents(setOf(TorEvent.HSDescriptor)).getOrThrow()
+
+        awaitBootstrap(timeout = 120_000)
+
+        val torProjectAddress = OnionAddressV3("2gzyxa5ihm7nsggfxnu52rck2vv4rvmdlkiu3zzui5du4xyclen53wid")
+
+        var received = false
+        val listener = object : TorManagerEvent.Listener() {
+            override fun eventHSDescriptor(output: String) {
+
+                // RECEIVED 2gzyxa5ihm7nsggfxnu52rck2vv4rvmdlkiu3zzui5du4xyclen53wid NO_AUTH $C71784391F1DA256250C03F7ACBD4801D0344BB3~Quetzalcoatl 5A8bUxARjHiRswE/D0UDbIEe3qiyNi4Rpy6ZXz4AVJ8
+                val splits = output.split(' ')
+
+                if (
+                    splits.first().equals("RECEIVED", ignoreCase = true) &&
+                    splits.elementAt(1) == torProjectAddress.value
+                ) {
+                    received = true
+                }
+            }
+        }
+
+        manager.addListener(listener)
+
+        var throwable: Throwable? = null
+        try {
+//            // $DD2CE79C61F8395EA93A3194FE87394AC40453F1~hands CONNECTED $AA7630738F82C4DF26BB8EFF131564DACDEAC64C~Unnamed CONNECTED
+//            val orConnInfo = manager.infoGet(KeyWord.Status.ORConn()).getOrThrow().split(' ')
+//
+//            val servers: MutableList<Server.LongName> = ArrayList(orConnInfo.size / 2)
+//
+//            for ((i, status) in orConnInfo.withIndex()) {
+//                if (!status.startsWith('$')) {
+//                    continue
+//                }
+//
+//                val next = orConnInfo.elementAtOrNull(i + 1) ?: continue
+//
+//                if (next.equals("CONNECTED", ignoreCase = true)) {
+//                    servers.add(Server.LongName.fromString(status))
+//                }
+//            }
+//
+//            assertTrue(servers.isNotEmpty())
+
+            manager.hsFetch(torProjectAddress).getOrThrow()
+
+            // await HSDescriptor event to be dispatched
+            var count = 0
+            while (!received && count < 20 && isActive) {
+                delay(1_000)
+                count++
+            }
+
+            assertTrue(received)
+        } catch (t: Throwable) {
+            throwable = t
+        } finally {
+            manager.removeListener(listener)
+            manager.setEvents(setOf())
+
+            if (throwable != null) {
+                throw throwable
+            }
+        }
+
+        Unit
+    }
+
+    @Test
+    fun givenTorController_whenConfigGetSingleKeyWord_returnsMultipleEntries() = runBlocking {
+        val hsConfigSettings = awaitLastValidatedTorConfig()
+            .torConfig
+            .settings
+            .filterIsInstance<TorConfig.Setting.HiddenService>()
+
+        assertTrue(hsConfigSettings.size > 1)
+
+        val entries = manager.configGet(hsConfigSettings.first())
+            .getOrThrow()
+            .filter { it.key == hsConfigSettings.first().keyword }
+
+        assertEquals(hsConfigSettings.size, entries.size)
+
+        Unit
+    }
+
+    @Test
+    fun givenTorController_whenConfigResetHS_returnsSuccess() = runBlocking {
+        val lastConfig = awaitLastValidatedTorConfig()
+
+        val hsConfigSettings = lastConfig
+            .torConfig
+            .settings
+            .filterIsInstance<TorConfig.Setting.HiddenService>()
+
+        assertTrue(hsConfigSettings.size > 1)
+
+        val entries = manager.configGet(hsConfigSettings.first())
+            .getOrThrow()
+            .filter { it.key == hsConfigSettings.first().keyword }
+
+        assertEquals(hsConfigSettings.size, entries.size)
+
+        var throwable: Throwable? = null
+        try {
+            manager.configReset(hsConfigSettings.first(), setDefault = false).getOrThrow()
+
+            val resetEntries = manager.configGet(hsConfigSettings.first())
+                .getOrThrow()
+                .filter { it.key == hsConfigSettings.first().keyword }
+
+            assertEquals(1, resetEntries.size)
+        } catch (t: Throwable) {
+            throwable = t
+        } finally {
+            manager.configLoad(lastConfig.torConfig)
+
+            if (throwable != null) {
+                throw throwable
+            }
+        }
+
+        Unit
+    }
+
+    @Test
+    fun givenTorController_whenConfigSetHS_returnsSuccess() = runBlocking {
+        val lastConfig = awaitLastValidatedTorConfig()
+
+        val hsConfigSettings = lastConfig
+            .torConfig
+            .settings
+            .filterIsInstance<TorConfig.Setting.HiddenService>()
+
+        assertTrue(hsConfigSettings.size > 1)
+
+        val entries = manager.configGet(hsConfigSettings.first())
+            .getOrThrow()
+            .filter { it.key == hsConfigSettings.first().keyword }
+
+        assertEquals(hsConfigSettings.size, entries.size)
+
+        var throwable: Throwable? = null
+        try {
+            manager.configSet(hsConfigSettings.first()).getOrThrow()
+
+            val resetEntries = manager.configGet(hsConfigSettings.first())
+                .getOrThrow()
+                .filter { it.key == hsConfigSettings.first().keyword }
+
+            assertEquals(1, resetEntries.size)
+        } catch (t: Throwable) {
+            throwable = t
+        } finally {
+            manager.configLoad(lastConfig.torConfig)
+
+            if (throwable != null) {
+                throw throwable
+            }
+        }
+
+        Unit
+    }
+
+    @Test
+    fun givenTorController_whenConfigResetPortWithFlags_returnsSuccess() = runBlocking {
+        val port = PortUtil.findNextAvailableTcpPort(port = Port(9155), limit = 1_000)
+
+        val socks = TorConfig.Setting.Ports.Socks()
+            .setFlags(setOf(
+                TorConfig.Setting.Ports.Socks.Flag.CacheDNS,
+                TorConfig.Setting.Ports.Socks.Flag.OnionTrafficOnly,
+            ))
+            .setIsolationFlags(setOf(
+                TorConfig.Setting.Ports.IsolationFlag.IsolateSOCKSAuth,
+            ))
+            .set(TorConfig.Option.AorDorPort.Value(PortProxy(port.value)))
+
+        var throwable: Throwable? = null
+        try {
+
+            manager.configSet(socks).getOrThrow()
+
+            val entry = manager.configGet(socks).getOrThrow().first()
+
+            val sb = StringBuilder()
+            socks.appendTo(sb, appendValue = true, isWriteTorConfig = true)
+            val expected = sb.toString().substringAfter(' ')
+            assertEquals(expected, entry.value)
+
+        } catch (t: Throwable) {
+            throwable = t
+        } finally {
+            manager.configLoad(awaitLastValidatedTorConfig().torConfig)
+
+            if (throwable != null) {
+                throw throwable
+            }
+        }
 
         Unit
     }

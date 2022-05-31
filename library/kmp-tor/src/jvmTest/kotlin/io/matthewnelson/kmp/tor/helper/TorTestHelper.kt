@@ -28,8 +28,10 @@ import io.matthewnelson.kmp.tor.controller.common.config.TorConfig.Option.*
 import io.matthewnelson.kmp.tor.controller.common.control.usecase.TorControlInfoGet
 import io.matthewnelson.kmp.tor.controller.common.events.TorEvent
 import io.matthewnelson.kmp.tor.controller.common.file.Path
+import io.matthewnelson.kmp.tor.manager.TorConfigProvider
 import io.matthewnelson.kmp.tor.manager.TorManager
 import io.matthewnelson.kmp.tor.manager.common.event.TorManagerEvent
+import io.matthewnelson.kmp.tor.manager.common.state.isOff
 import io.matthewnelson.kmp.tor.manager.internal.ext.infoGetBootstrapProgress
 import kotlinx.coroutines.*
 import kotlinx.coroutines.test.resetMain
@@ -86,7 +88,7 @@ abstract class TorTestHelper {
 
     protected open fun testConfig(testProvider: TorConfigProviderJvm): TorConfig {
         return TorConfig.Builder {
-            put(Ports.Control().set(AorDorPort.Value(PortProxy(9155))))
+            put(Ports.Control().set(AorDorPort.Auto))
             put(Ports.Socks().set(AorDorPort.Auto))
             put(Ports.HttpTunnel().set(AorDorPort.Auto))
             put(Ports.Trans().set(AorDorPort.Auto))
@@ -199,9 +201,7 @@ abstract class TorTestHelper {
                 println(event.toString())
             }
 
-            override fun onEvent(event: TorEvent.Type.SingleLineEvent, output: String) {
-                println("event=${event.javaClass.simpleName}, output=$output")
-            }
+            override fun onEvent(event: TorEvent.Type.SingleLineEvent, output: String) {}
 
             override fun onEvent(
                 event: TorEvent.Type.MultiLineEvent,
@@ -215,28 +215,30 @@ abstract class TorTestHelper {
         return manager
     }
 
+    protected suspend fun awaitLastValidatedTorConfig(): TorConfigProvider.ValidatedTorConfig {
+        var count = 0
+        while (count < 10) {
+            configProvider.lastValidatedTorConfig?.let { return it }
+            delay(50L)
+            count++
+        }
+
+        throw AssertionError("Failed to retrieve LastValidatedTorConfig")
+    }
+
     protected suspend fun awaitBootstrap(timeout: Long = 30_000L) {
-        var bootstrap = 0
-        val keyword = TorControlInfoGet.KeyWord.Status.BootstrapPhase()
         val timeoutTime = System.currentTimeMillis() + timeout
         println("==== Awaiting Bootstrap")
 
-        while (bootstrap < 100) {
-            val result = manager.infoGet(keyword)
-            result.onFailure {
-                throw AssertionError("Failed to retrieve bootstrap status")
-            }
-            result.onSuccess {
-                println(it)
-                bootstrap = it.infoGetBootstrapProgress()
-            }
+        while (!manager.state.isBootstrapped) {
+            delay(1_000L)
 
             if (System.currentTimeMillis() > timeoutTime) {
                 throw AssertionError("await bootstrap timed out after ${timeout}ms")
             }
 
-            if (bootstrap < 100) {
-                delay(1_000L)
+            if (manager.state.isOff()) {
+                throw AssertionError("TorManager is off")
             }
         }
     }

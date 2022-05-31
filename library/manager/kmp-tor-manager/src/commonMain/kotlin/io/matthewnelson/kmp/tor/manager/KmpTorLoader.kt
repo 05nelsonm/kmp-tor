@@ -55,7 +55,7 @@ expect abstract class KmpTorLoader {
         managerScope: CoroutineScope,
         stateMachine: TorStateMachine,
         notify: (TorManagerEvent) -> Unit,
-    ): Result<TorController>
+    ): Result<Pair<TorController, TorConfig?>>
 
     @JvmSynthetic
     internal open fun close()

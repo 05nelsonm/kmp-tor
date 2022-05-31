@@ -33,7 +33,7 @@ interface CallbackTorControlConfigGet {
     fun configGet(
         setting: TorConfig.Setting<*>,
         failure: TorCallback<Throwable>?,
-        success: TorCallback<ConfigEntry>,
+        success: TorCallback<List<ConfigEntry>>,
     ): Task
 
     fun configGet(

@@ -21,6 +21,7 @@ import io.matthewnelson.kmp.tor.common.annotation.ExperimentalTorApi
 import io.matthewnelson.kmp.tor.common.annotation.InternalTorApi
 import io.matthewnelson.kmp.tor.common.clientauth.ClientName
 import io.matthewnelson.kmp.tor.common.clientauth.OnionClientAuth
+import io.matthewnelson.kmp.tor.common.server.Server
 import io.matthewnelson.kmp.tor.controller.TorControlProcessor
 import io.matthewnelson.kmp.tor.controller.TorController
 import io.matthewnelson.kmp.tor.controller.common.config.ClientAuthEntry
@@ -113,7 +114,7 @@ class CallbackTorController(
     override fun configGet(
         setting: TorConfig.Setting<*>,
         failure: TorCallback<Throwable>?,
-        success: TorCallback<ConfigEntry>
+        success: TorCallback<List<ConfigEntry>>
     ): Task {
         return provideOrFail(failure, success) {
             configGet(setting)
@@ -198,6 +199,38 @@ class CallbackTorController(
     ): Task {
         return provideOrFail(failure, success) {
             dropGuards()
+        }
+    }
+
+    override fun hsFetch(
+        address: OnionAddress,
+        failure: TorCallback<Throwable>?,
+        success: TorCallback<Any?>
+    ): Task {
+        return provideOrFail(failure, success) {
+            hsFetch(address)
+        }
+    }
+
+    override fun hsFetch(
+        address: OnionAddress,
+        server: Server.Fingerprint,
+        failure: TorCallback<Throwable>?,
+        success: TorCallback<Any?>
+    ): Task {
+        return provideOrFail(failure, success) {
+            hsFetch(address, server)
+        }
+    }
+
+    override fun hsFetch(
+        address: OnionAddress,
+        servers: Set<Server.Fingerprint>,
+        failure: TorCallback<Throwable>?,
+        success: TorCallback<Any?>
+    ): Task {
+        return provideOrFail(failure, success) {
+            hsFetch(address, servers)
         }
     }
 

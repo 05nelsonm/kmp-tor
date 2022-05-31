@@ -21,8 +21,9 @@ import io.matthewnelson.kmp.tor.common.annotation.ExperimentalTorApi
 import io.matthewnelson.kmp.tor.common.annotation.InternalTorApi
 import io.matthewnelson.kmp.tor.common.clientauth.ClientName
 import io.matthewnelson.kmp.tor.common.clientauth.OnionClientAuth
+import io.matthewnelson.kmp.tor.common.server.Server
+import io.matthewnelson.kmp.tor.common.util.TorStrings.CLRF
 import io.matthewnelson.kmp.tor.common.util.TorStrings.MULTI_LINE_END
-import io.matthewnelson.kmp.tor.common.util.TorStrings.SP
 import io.matthewnelson.kmp.tor.controller.common.config.ClientAuthEntry
 import io.matthewnelson.kmp.tor.controller.common.config.ConfigEntry
 import io.matthewnelson.kmp.tor.controller.common.config.HiddenServiceEntry
@@ -168,12 +169,10 @@ private class RealTorController(
                                 replies.map { reply ->
                                     when (reply) {
                                         is ReplyLine.MultiLine -> {
-                                            // Should never be the case, but we
-                                            // should have a fallback.
                                             ReplyLine.SingleLine(
                                                 reply.status,
                                                 reply.messages.joinToString(
-                                                    separator = SP,
+                                                    separator = "\n",
                                                     prefix = reply.event
                                                 )
                                             )
@@ -197,26 +196,6 @@ private class RealTorController(
                 onDisconnect.value = null
             }
         }
-
-//        @Throws(TorControllerException::class)
-//        private fun writeEscaped(string: String) {
-//            val splits = string.split('\n')
-//            for (split in splits) {
-//                var line = split
-//                if (line.startsWith(MULTI_LINE_END)) {
-//                    line = ".$line"
-//                }
-//                if (line.endsWith('\r')) {
-//                    line += '\n'
-//                } else {
-//                    line += "$CLRF"
-//                }
-//                debugger.safeInvoke(">> $line")
-//                output.write(line)
-//            }
-//            output.write(".$CLRF")
-//            debugger.safeInvoke(">> .\n")
-//        }
 
         override val isConnected: Boolean
             get() = !whileLoopBroke.value && !torCoroutineManager.isClosed
@@ -244,13 +223,28 @@ private class RealTorController(
 
             return withContext(commandDispatcher) {
                 val waiter = Waiter.newInstance { isConnected }
-                debugger.safeInvoke(DebugItem.Message(">> $command"))
                 waiters.withLock {
-                    writer.write(command)
-//                    if (rest != null) {
-//                        writeEscaped(rest)
-//                    }
-                    writer.flush()
+
+                    if (command.startsWith('+')) {
+                        for (line in command.lines()) {
+                            if (line.isBlank()) {
+                                continue
+                            }
+
+                            val trimmed = line.trim()
+
+                            debugger.safeInvoke(DebugItem.Message(">> $trimmed"))
+
+                            writer.write(trimmed)
+                            writer.write(CLRF)
+                            writer.flush()
+                        }
+                    } else {
+                        debugger.safeInvoke(DebugItem.Message(">> $command"))
+                        writer.write(command)
+                        writer.flush()
+                    }
+
                     add(waiter)
                 }
 
@@ -432,7 +426,7 @@ private class RealTorController(
 //        return processorDelegate.circuitSetPurpose()
 //    }
 
-    override suspend fun configGet(setting: TorConfig.Setting<*>): Result<ConfigEntry> {
+    override suspend fun configGet(setting: TorConfig.Setting<*>): Result<List<ConfigEntry>> {
         return processorDelegate.configGet(setting)
     }
 
@@ -478,9 +472,17 @@ private class RealTorController(
         return processorDelegate.dropGuards()
     }
 
-//    override suspend fun hsFetch(address: OnionAddress, servers: Set<String>?): Result<Any?> {
-//        return processorDelegate.hsFetch(address, servers)
-//    }
+    override suspend fun hsFetch(address: OnionAddress): Result<Any?> {
+        return processorDelegate.hsFetch(address)
+    }
+
+    override suspend fun hsFetch(address: OnionAddress, server: Server.Fingerprint): Result<Any?> {
+        return processorDelegate.hsFetch(address, server)
+    }
+
+    override suspend fun hsFetch(address: OnionAddress, servers: Set<Server.Fingerprint>): Result<Any?> {
+        return processorDelegate.hsFetch(address, servers)
+    }
 
 //    override suspend fun hsPost(): Result<Any?> {
 //        return processorDelegate.hsPost()
