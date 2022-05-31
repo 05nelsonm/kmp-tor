@@ -5,7 +5,7 @@
  - Fixes `TorController`'s mapping of multi-line responses to single-line
      - Prior versions used a space instead of new line character
      - **WARNING**: This is potentially a breaking change
- - Fixes `TorControlConfigGet.config.get` return type
+ - Fixes `TorControlConfigGet.configGet` return type
      - Now returns a `List<String>` instead of a `String`
      - Method that took a single `TorConfig.Setting` previously returned
        a single `String`. This was incorrect because the setting could
