@@ -50,7 +50,7 @@ kmpConfiguration {
             KmpTarget.Jvm.Android(
                 buildTools = versions.android.buildTools,
                 compileSdk = versions.android.sdkCompile,
-                minSdk = versions.android.sdkMin16,
+                minSdk = versions.android.sdkMin21,
                 mainSourceSet = {
                     dependencies {
                         implementation("${pConfig.group}:kmp-tor:${env.kmpTorAll.version.name}")
