@@ -1,5 +1,38 @@
 # CHANGELOG
 
+## Version 0.4.7.7+0.2.0 (2022-05-31)
+ - Implements Controller use case for `HSFETCH`
+ - Fixes `TorController`'s mapping of multi-line responses to single-line
+     - Prior versions used a space instead of new line character
+     - **WARNING**: This is potentially a breaking change
+ - Fixes `TorControlConfigGet.config.get` return type
+     - Now returns a `List<String>` instead of a `String`
+     - Method that took a single `TorConfig.Setting` previously returned
+       a single `String`. This was incorrect because the setting could
+       potentially be expressed multiple times (ie. SOCKSPort, HiddenServiceDir, etc.)
+     - **WARNING**: This is potentially a breaking change.
+ - Fixes `configGet`, `configSet`, and `configReset` functionality.
+     - Previously, only the `TorConfig.Setting.value` was being taken into account
+      where some `TorConfig.Setting`s has additional parameters (such as Flags) that
+      weren't being passed to the controller.
+     - `TorConfig.Setting.HiddenService` only `HiddenServiceDir` keyword was being
+      queried (`configGet`) or set (`configSet`, `configReset`).
+     - **WARNING**: This is potentially a breaking change.
+ - Fixes `kmp-tor` module's `minSdk` for Android
+     - Tor version `0.4.7.7` for Android no longer works for sdks `16-20` like prior
+       versions did.
+     - **WARNING**: This is potentially a breaking change.
+ - Adds `JvmField` annotations to `TorConfigProvider.ValidatedTorConfig` arguments
+     - **WARNING**: This is potentially a breaking change for Java users.
+ - Fixes `TorControlConfigLoad.configLoad` functionality
+     - Previously, the passed config would be loaded but Tor would
+       not honor the settings if they were used at initial startup.
+       Starting Tor now only uses the minimum required arguments from
+       the provided config and then immediately calls `LOADCONF` to
+       load remaining ones. Future calls to `configLoad` now reset Tor
+       to the initial arguments it was started with, and then will load
+       the additional settings.
+
 ## Version 0.4.7.7+0.1.3 (2022-05-14)
  - Updates Kotlin-Components
      - Bumps `component-encoding` from `1.1.1` -> `1.1.2`
