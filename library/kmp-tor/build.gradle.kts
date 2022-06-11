@@ -64,9 +64,6 @@ kmpConfiguration {
                 target = {
                     publishLibraryVariants("release")
                 },
-                androidMainSourceSet = {
-                    manifest.srcFile("$projectDir/src/$KmpAndroidMain/AndroidManifest.xml")
-                },
                 mainSourceSet = {
                     dependencies {
                         implementation("${pConfig.group}:kmp-tor-binary-android:${env.kmpTorBinaries.version.name}")
