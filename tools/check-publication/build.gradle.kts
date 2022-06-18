@@ -23,7 +23,7 @@ import kmp.tor.env
 import org.jetbrains.kotlin.gradle.plugin.KotlinJsCompilerType
 
 plugins {
-    id("kmp-configuration")
+    id(pluginId.kmp.configuration)
 }
 
 val pConfig = kmpPublishRootProjectConfiguration!!

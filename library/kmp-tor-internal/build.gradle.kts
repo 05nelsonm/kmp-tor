@@ -17,8 +17,8 @@ import io.matthewnelson.kotlin.components.kmp.KmpTarget
 import kmp.tor.env
 
 plugins {
-    id("kmp-configuration")
-    id("kmp-publish")
+    id(pluginId.kmp.configuration)
+    id(pluginId.kmp.publish)
 }
 
 /**

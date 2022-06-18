@@ -59,7 +59,7 @@ allprojects {
 }
 
 plugins {
-    id("kmp-publish")
+    id(pluginId.kmp.publish)
 }
 
 kmpPublish {

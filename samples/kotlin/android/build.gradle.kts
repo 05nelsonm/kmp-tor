@@ -20,8 +20,8 @@ import io.matthewnelson.kotlin.components.kmp.util.includeStagingRepoIfTrue
 import kmp.tor.env
 
 plugins {
-    id("com.android.application")
-    id("kotlin-android")
+    id(pluginId.android.application)
+    id(pluginId.kotlin.android)
 }
 
 // disregard. this is for playing with newly published binaries prior to release

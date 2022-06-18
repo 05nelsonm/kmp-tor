@@ -23,7 +23,7 @@ tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>() {
 }
 
 plugins {
-    kotlin("multiplatform")
+    id(pluginId.kotlin.multiplatform)
     application
     id("org.openjfx.javafxplugin") version("0.0.11")
 }
