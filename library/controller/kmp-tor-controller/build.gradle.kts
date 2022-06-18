@@ -17,7 +17,6 @@ import io.matthewnelson.kotlin.components.dependencies.deps
 import io.matthewnelson.kotlin.components.dependencies.depsTest
 import io.matthewnelson.kotlin.components.kmp.KmpTarget
 import io.matthewnelson.kotlin.components.kmp.util.sourceSetJvmAndroidMain
-import io.matthewnelson.kotlin.components.kmp.util.sourceSetJvmAndroidTest
 import kmp.tor.env
 import org.jetbrains.kotlin.gradle.plugin.KotlinJsCompilerType
 
@@ -78,12 +77,6 @@ kmpConfiguration {
             sourceSetJvmAndroidMain {
                 dependencies {
                     implementation(deps.kotlin.coroutines.core.jvm)
-                }
-            }
-            sourceSetJvmAndroidTest {
-                dependencies {
-                    implementation(deps.kotlin.coroutines.core.jvm)
-                    implementation(depsTest.junit)
                 }
             }
         }
