@@ -23,10 +23,12 @@ import io.matthewnelson.kmp.tor.controller.common.events.TorEventProcessor
 import io.matthewnelson.kmp.tor.controller.internal.io.ReaderWrapper
 import io.matthewnelson.kmp.tor.controller.internal.io.SocketWrapper
 import io.matthewnelson.kmp.tor.controller.internal.io.WriterWrapper
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.asCoroutineDispatcher
 import java.io.*
 import java.net.Socket
 import java.net.SocketException
+import java.util.concurrent.Executors
 
 /**
  * Connects to Tor via it's control port in order to facilitate
@@ -63,12 +65,18 @@ actual interface TorController: TorControlProcessor, TorEventProcessor<TorEvent.
          * */
         @JvmStatic
         @Throws(IOException::class, SocketException::class)
-        fun newInstance(socket: Socket): TorController =
-            realTorController(
-                reader = ReaderWrapper.from(socket),
-                writer = WriterWrapper.from(socket),
-                socket = SocketWrapper.wrap(socket),
-                commandDispatcher = Dispatchers.IO,
+        fun newInstance(socket: Socket): TorController {
+            val readerWrapper = ReaderWrapper.from(socket)
+            val writerWrapper = WriterWrapper.from(socket)
+            val socketWrapper = SocketWrapper.wrap(socket)
+
+            @OptIn(ExperimentalCoroutinesApi::class)
+            return realTorController(
+                reader = readerWrapper,
+                writer = writerWrapper,
+                socket = socketWrapper,
+                dispatchers = Executors.newFixedThreadPool(2).asCoroutineDispatcher(),
             )
+        }
     }
 }

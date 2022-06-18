@@ -39,8 +39,6 @@ import io.matthewnelson.kmp.tor.controller.internal.*
 import io.matthewnelson.kmp.tor.controller.internal.controller.*
 import io.matthewnelson.kmp.tor.controller.internal.controller.ListenersHandler
 import io.matthewnelson.kmp.tor.controller.internal.controller.Waiter
-import io.matthewnelson.kmp.tor.controller.internal.coroutines.TorCoroutineManager
-import io.matthewnelson.kmp.tor.controller.internal.coroutines.launch
 import io.matthewnelson.kmp.tor.controller.internal.io.ReaderWrapper
 import io.matthewnelson.kmp.tor.controller.internal.io.SocketWrapper
 import io.matthewnelson.kmp.tor.controller.internal.io.WriterWrapper
@@ -78,23 +76,27 @@ expect interface TorController: TorControlProcessor, TorEventProcessor<TorEvent.
 }
 
 @JvmSynthetic
+@OptIn(ExperimentalCoroutinesApi::class)
 internal fun realTorController(
     reader: ReaderWrapper,
     writer: WriterWrapper,
     socket: SocketWrapper,
-    commandDispatcher: CoroutineDispatcher
+    dispatchers: CloseableCoroutineDispatcher
 ): TorController =
-    RealTorController(reader, writer, socket, commandDispatcher)
+    RealTorController(reader, writer, socket, dispatchers)
 
-@OptIn(InternalTorApi::class, ExperimentalTorApi::class)
+@OptIn(
+    InternalTorApi::class,
+    ExperimentalTorApi::class,
+    ExperimentalCoroutinesApi::class,
+)
 @Suppress("CanBePrimaryConstructorProperty")
 private class RealTorController(
     reader: ReaderWrapper,
     writer: WriterWrapper,
     socket: SocketWrapper,
-    commandDispatcher: CoroutineDispatcher,
+    dispatchers: CloseableCoroutineDispatcher,
 ): TorController, Debuggable {
-
 
     private val debugger: AtomicRef<((DebugItem) -> Unit)?> = atomic(null)
     private val listeners: ListenersHandler = ListenersHandler.newInstance {
@@ -108,7 +110,7 @@ private class RealTorController(
         RealControlPortInteractor(
             reader,
             writer,
-            commandDispatcher,
+            dispatchers,
         )
     }
 
@@ -129,18 +131,23 @@ private class RealTorController(
     private inner class RealControlPortInteractor(
         reader: ReaderWrapper,
         writer: WriterWrapper,
-        commandDispatcher: CoroutineDispatcher,
+        dispatchers: CloseableCoroutineDispatcher,
     ): ControlPortInteractor {
 
+        private val dispatchers: CloseableCoroutineDispatcher = dispatchers
+        private val supervisor = SupervisorJob()
+        private val scope = CoroutineScope(context =
+            CoroutineName(name = "TorController.Scope") +
+            supervisor                                  +
+            dispatchers
+        )
         private val reader: ReaderWrapper = reader
         private val writer: WriterWrapper = writer
-        private val commandDispatcher: CoroutineDispatcher = commandDispatcher
-        private val torCoroutineManager: TorCoroutineManager = TorCoroutineManager.newInstance()
         private val waiters: WaitersHolder = WaitersHolder()
         private val whileLoopBroke: AtomicBoolean = atomic(false)
 
         init {
-            torCoroutineManager.launch {
+            scope.launch {
                 while (currentCoroutineContext().isActive) {
                     val replies = try {
                         readReply()
@@ -186,27 +193,30 @@ private class RealTorController(
                         }
                     }
                 }
-            }?.invokeOnCompletion { throwable ->
-                if (throwable != null) {
-                    debugger.safeInvoke(DebugItem.Error(throwable))
-                }
-                debugger.safeInvoke(DebugItem.Message("Tor has stopped"))
-                torCoroutineManager.close()
+            }.invokeOnCompletion {
+                scope.cancel()
+                debugger.safeInvoke(DebugItem.Message("Tor has stopped. Shutting down TorController threads."))
+                dispatchers.close()
                 onDisconnect.safeInvoke(this@RealTorController)
                 onDisconnect.value = null
             }
         }
 
         override val isConnected: Boolean
-            get() = !whileLoopBroke.value && !torCoroutineManager.isClosed
+            get() = !whileLoopBroke.value && scope.isActive
 
+        @Throws(
+            CancellationException::class,
+            ControllerShutdownException::class,
+            TorControllerException::class,
+        )
         override suspend fun <T : Any?> processCommand(
             command: String,
             transform: List<ReplyLine.SingleLine>.() -> T
         ): T {
             val replies = processCommand(command)
 
-            return withContext(commandDispatcher) {
+            return withContext(dispatchers) {
                 transform.invoke(replies)
             }
         }
@@ -221,7 +231,7 @@ private class RealTorController(
                 throw ControllerShutdownException("Tor has stopped and a new connection is required")
             }
 
-            return withContext(commandDispatcher) {
+            return withContext(dispatchers) {
                 val waiter = Waiter.newInstance { isConnected }
                 waiters.withLock {
 
@@ -252,7 +262,7 @@ private class RealTorController(
 
                 for (reply in replies) {
                     if (!reply.isCommandResponseStatusSuccess) {
-                        throw TorControllerException("\ncommand=$command)\nreply=$reply\n")
+                        throw TorControllerException("\ncommand=$command\nreply=$reply\n")
                     }
                 }
 

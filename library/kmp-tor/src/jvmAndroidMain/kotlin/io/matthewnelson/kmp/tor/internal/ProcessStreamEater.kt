@@ -67,10 +67,10 @@ internal class ProcessStreamEater(
                 notify.invoke(TorManagerEvent.Log.Debug("Stopped reading Process.inputStream"))
                 try {
                     input.close()
-                } catch (e: Exception) {}
+                } catch (_: Exception) {}
                 try {
                     inputScan?.close()
-                } catch (e: Exception) {}
+                } catch (_: Exception) {}
             }
         }
 
@@ -92,10 +92,10 @@ internal class ProcessStreamEater(
                 notify.invoke(TorManagerEvent.Log.Debug("Stopped reading Process.errorStream"))
                 try {
                     error.close()
-                } catch (e: Exception) {}
+                } catch (_: Exception) {}
                 try {
                     errorScan?.close()
-                } catch (e: Exception) {}
+                } catch (_: Exception) {}
             }
         }
 
