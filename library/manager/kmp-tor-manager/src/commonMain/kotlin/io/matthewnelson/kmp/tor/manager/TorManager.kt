@@ -180,7 +180,7 @@ private class RealTorManager(
 
                             if (networkState.isEnabled()) return@launch
 
-                            controller.value?.first?.configSet(
+                            controllerInstance.value?.controller?.configSet(
                                 TorConfig.Setting.DisableNetwork().set(TorConfig.Option.TorF.False)
                             )
                         }
@@ -194,7 +194,7 @@ private class RealTorManager(
 
                             if (networkState.isDisabled()) return@launch
 
-                            controller.value?.first?.configSet(
+                            controllerInstance.value?.controller?.configSet(
                                 TorConfig.Setting.DisableNetwork().set(TorConfig.Option.TorF.True)
                             )
                         }
@@ -207,10 +207,7 @@ private class RealTorManager(
     }
 
     private val actions: ActionProcessor = ActionProcessor.newInstance(processorLock)
-    private val controller: AtomicRef<Pair<
-        TorController,
-        TorManagerEvent.StartUpCompleteForTorInstance?
-    >?> = atomic(null)
+    private val controllerInstance: AtomicRef<ControllerHolder?> = atomic(null)
 
     private val _addressInfo = atomic(TorManagerEvent.AddressInfo.NULL_VALUES)
     private val addressInfoJob: AtomicRef<Job?> = atomic(null)
@@ -230,13 +227,13 @@ private class RealTorManager(
 
         // Bootstrapping completed
         if (!old.torState.isBootstrapped && new.torState.isBootstrapped) {
-            controller.update { pair ->
-                if (pair == null) return@update null
-                if (pair.second != null) return@update pair
+            controllerInstance.update { holder ->
+                if (holder == null) return@update null
+                if (holder.startupCompletion != null) return@update holder
 
                 notifyListenersNoScope(TorManagerEvent.StartUpCompleteForTorInstance)
 
-                Pair(pair.first, TorManagerEvent.StartUpCompleteForTorInstance)
+                holder.copy(startupCompletion = TorManagerEvent.StartUpCompleteForTorInstance)
             }
         }
     }
@@ -259,7 +256,7 @@ private class RealTorManager(
             networkObserver?.detach(instanceId)
 
             if (!stopCleanly) {
-                controller.value?.first?.disconnect()
+                controllerInstance.value?.controller?.disconnect()
                 supervisor.cancel()
                 loader.close()
                 realTorManagerInstanceDestroyed(instanceId)
@@ -281,7 +278,7 @@ private class RealTorManager(
                 CoroutineName(name ="${Stop}_${coroutineCounter.getAndIncrement()}")
             ) {
                 actions.withProcessorLock(Stop) {
-                    controller.value?.first?.let { controller ->
+                    controllerInstance.value?.controller?.let { controller ->
                         realStop(controller, isRestart = false)
                     } ?: Result.success("Tor was already stopped")
                 }
@@ -373,7 +370,7 @@ private class RealTorManager(
                     )
                 }
 
-                controller.value?.first?.let { controller ->
+                controllerInstance.value?.controller?.let { controller ->
                     realStop(controller, isRestart = true)
 
                     if ((actions as ActionQueue).contains(Stop)) {
@@ -382,9 +379,7 @@ private class RealTorManager(
                         loader.close()
 
                         return@let Result.failure(
-                            InterruptedException(
-                                "$Stop found in queue. $Restart stopping early."
-                            )
+                            InterruptedException("$Stop found in queue. $Restart stopping early.")
                         )
                     }
 
@@ -433,7 +428,7 @@ private class RealTorManager(
                     )
                 }
 
-                controller.value?.first?.let {
+                controllerInstance.value?.controller?.let {
                     realStop(it, false)
                 } ?: run {
                     loader.close()
@@ -597,7 +592,7 @@ private class RealTorManager(
                     )
                 }
 
-                controller.value?.first?.let {
+                controllerInstance.value?.controller?.let {
                     notifyListenersNoScope(Controller)
                     block.invoke(it as T)
                 } ?: Result.failure(TorNotStartedException("Tor is not started"))
@@ -654,6 +649,11 @@ private class RealTorManager(
             eventResponse.value = response
         }
     }
+
+    private data class ControllerHolder(
+        val controller: TorController,
+        val startupCompletion: TorManagerEvent.StartUpCompleteForTorInstance?
+    )
 
     private inner class ControllerListener: TorEvent.Listener() {
 
@@ -808,7 +808,7 @@ private class RealTorManager(
                     if (event !is TorManagerEvent.Log.Error) {
                         try {
                             (listener as TorManagerEvent.SealedListener).onEvent(TorManagerEvent.Log.Error(e))
-                        } catch (ee: Exception) {}
+                        } catch (_: Exception) {}
                     }
                 }
             }
@@ -816,7 +816,7 @@ private class RealTorManager(
     }
 
     private suspend fun realStart(isRestart: Boolean = false): Result<Any?> {
-        if (controller.value?.first?.isConnected == true && state is TorState.On) {
+        if (controllerInstance.value?.controller?.isConnected == true && state is TorState.On) {
             return Result.success("Tor is already started")
         }
 
@@ -866,14 +866,14 @@ private class RealTorManager(
             (disconnectedController as Debuggable).setDebugger(null)
             disconnectedController.removeListener(controllerListener)
 
-            this.controller.value?.let { currentController ->
-
-                // check if it's our current controller or not
-                if (currentController == disconnectedController) {
+            controllerInstance.update { holder ->
+                if (holder?.controller == disconnectedController) {
+                    notifyListeners(TorManagerEvent.Log.Debug("Shutting down Tor threads"))
                     loader.close()
-                    this.controller.value = null
+                    null
+                } else {
+                    holder
                 }
-
             }
 
         }
@@ -897,7 +897,7 @@ private class RealTorManager(
             notifyListenersNoScope(TorManagerEvent.Log.Warn(WAITING_ON_NETWORK))
         }
 
-        this.controller.value = Pair(controller, null)
+        controllerInstance.value = ControllerHolder(controller, null)
         stateMachine.updateState(TorState.On(state.bootstrap))
 
         return Result.success("Tor started successfully")
@@ -907,50 +907,48 @@ private class RealTorManager(
         controller: TorController,
         isRestart: Boolean
     ): Result<Any?> {
-        this.controller.value = null
-
         stateMachine.updateState(TorState.Stopping)
         notifyListenersNoScope(if (isRestart) Restart else Stop)
+
+        if (isRestart) {
+            // clear controller instance so onDisconnect callback doesn't close dispatchers
+            controllerInstance.value = null
+        }
 
         if (networkState.isEnabled()) {
             controller.configSet(disableNetwork.set(TorConfig.Option.TorF.True))
         }
-        val result1 = controller.signal(TorControlSignal.Signal.Shutdown)
+        val shutdown = controller.signal(TorControlSignal.Signal.Shutdown)
 
         when {
-            result1.isSuccess -> {
-                result1
+            shutdown.isSuccess -> {
+                shutdown
             }
-            result1.exceptionOrNull() is ControllerShutdownException -> {
+            shutdown.exceptionOrNull() is ControllerShutdownException -> {
                 Result.success("Controller was already shutdown")
             }
             !controller.isConnected -> {
                 Result.success("Controller was already shutdown")
             }
             else -> {
-                val result2 = controller.signal(TorControlSignal.Signal.Halt)
+                val halt = controller.signal(TorControlSignal.Signal.Halt)
 
-                if (result2.isFailure) {
-                    if (result2.exceptionOrNull() is ControllerShutdownException) {
+                if (halt.isFailure) {
+                    if (halt.exceptionOrNull() is ControllerShutdownException) {
                         Result.success("Controller was already shutdown")
                     } else {
                         // Force close Tor
                         controller.disconnect()
-                        loader.close()
                         notifyListenersNoScope(TorManagerEvent.Log.Warn(
                             "Tor failed to signal shutdown/halt and was forcibly stopped"
                         ))
                         Result.success("Tor was forcibly stopped")
                     }
                 } else {
-                    result2
+                    halt
                 }
             }
         }.let { result ->
-            if (result.isSuccess && !isRestart) {
-                loader.close()
-            }
-
             if (isRestart) {
                 loader.cancelTorJob()
             }
