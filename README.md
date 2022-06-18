@@ -43,7 +43,7 @@ dependencies {
      - [Configuring Manifest](https://github.com/05nelsonm/kmp-tor/blob/master/samples/kotlin/android/src/main/AndroidManifest.xml)
 
 <!-- TODO: Add sample code for retrieving TorManager -->
- - See the [Sample App](https://github.com/05nelsonm/kmp-tor/tree/master/samples/kotlin/android/src/main/java/io/matthewnelson/kmp/tor/sample/android) 
+ - See the [Sample App](https://github.com/05nelsonm/kmp-tor/tree/master/samples/kotlin/android/src/main/java/io/matthewnelson/kmp/tor/sample/kotlin/android) 
    for a basic setup of `TorManager` and your `TorConfig`.  
 
 </details>
@@ -52,9 +52,9 @@ dependencies {
     <summary>Configuring a Java Project</summary>
 
 
- - See the [JavaFX Sample App Gradle Configuration](https://github.com/05nelsonm/kmp-tor/tree/master/samples/kotlin/javafx/build.gradle.kts) 
+ - See the [JavaFX Sample App Gradle Configuration](https://github.com/05nelsonm/kmp-tor/blob/master/samples/kotlin/javafx/build.gradle.kts) 
    for a basic gradle/dependency configuration.  
- - See the [JavaFx Sample App](https://github.com/05nelsonm/kmp-tor/tree/master/samples/kotlin/javafx/src/jvmMain/kotlin/io/matthewnelson/kmp/tor/sample/javafx/SampleApp.kt) 
+ - See the [JavaFx Sample App](https://github.com/05nelsonm/kmp-tor/blob/master/samples/kotlin/javafx/src/jvmMain/kotlin/io/matthewnelson/kmp/tor/sample/kotlin/javafx/SampleApp.kt) 
    for a basic setup example.  
  - Run the JavaFx Sample via `./gradlew :samples:kotlin:javafx:run -PKMP_TARGETS=JVM` from terminal 
    or cmd prompt.
