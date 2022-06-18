@@ -226,7 +226,7 @@ abstract class TorTestHelper {
         throw AssertionError("Failed to retrieve LastValidatedTorConfig")
     }
 
-    protected suspend fun awaitBootstrap(timeout: Long = 30_000L) {
+    protected suspend fun awaitBootstrap(timeout: Long = 180_000L) {
         val timeoutTime = System.currentTimeMillis() + timeout
         println("==== Awaiting Bootstrap")
 
