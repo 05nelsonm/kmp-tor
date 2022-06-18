@@ -17,6 +17,7 @@ package io.matthewnelson.kmp.tor.controller
 
 import io.matthewnelson.kmp.tor.common.address.OnionAddress
 import io.matthewnelson.kmp.tor.common.address.OnionAddressV3
+import io.matthewnelson.kmp.tor.common.address.ProxyAddress
 import io.matthewnelson.kmp.tor.common.annotation.ExperimentalTorApi
 import io.matthewnelson.kmp.tor.common.annotation.InternalTorApi
 import io.matthewnelson.kmp.tor.common.clientauth.ClientName
@@ -73,6 +74,15 @@ expect interface TorController: TorControlProcessor, TorEventProcessor<TorEvent.
      * */
     @ExperimentalTorApi
     fun onDisconnect(action: ((TorController) -> Unit)?)
+
+    companion object {
+
+        /**
+         * Opens a connection at [address] and returns a new [TorController]
+         * */
+        @Throws(TorControllerException::class)
+        suspend fun newInstance(address: ProxyAddress): TorController
+    }
 }
 
 @JvmSynthetic

@@ -15,9 +15,11 @@
  **/
 package io.matthewnelson.kmp.tor.controller
 
+import io.matthewnelson.kmp.tor.common.address.ProxyAddress
 import io.matthewnelson.kmp.tor.common.annotation.ExperimentalTorApi
 import io.matthewnelson.kmp.tor.controller.common.events.TorEvent
 import io.matthewnelson.kmp.tor.controller.common.events.TorEventProcessor
+import io.matthewnelson.kmp.tor.controller.common.exceptions.TorControllerException
 
 /**
  * Connects to Tor via it's control port in order to facilitate
@@ -43,4 +45,11 @@ actual interface TorController: TorControlProcessor, TorEventProcessor<TorEvent.
      * */
     @ExperimentalTorApi
     actual fun onDisconnect(action: ((TorController) -> Unit)?)
+
+    actual companion object {
+        @Throws(TorControllerException::class)
+        actual suspend fun newInstance(address: ProxyAddress): TorController {
+            TODO("Not yet implemented")
+        }
+    }
 }

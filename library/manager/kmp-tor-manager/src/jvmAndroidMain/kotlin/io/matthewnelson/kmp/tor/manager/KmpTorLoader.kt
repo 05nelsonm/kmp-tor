@@ -15,11 +15,13 @@
  **/
 package io.matthewnelson.kmp.tor.manager
 
+import io.matthewnelson.kmp.tor.common.address.ProxyAddress
 import io.matthewnelson.kmp.tor.common.annotation.InternalTorApi
 import io.matthewnelson.kmp.tor.controller.TorController
 import io.matthewnelson.kmp.tor.controller.common.config.TorConfig
 import io.matthewnelson.kmp.tor.controller.common.control.usecase.TorControlInfoGet
 import io.matthewnelson.kmp.tor.controller.common.control.usecase.TorControlSignal
+import io.matthewnelson.kmp.tor.controller.common.exceptions.TorControllerException
 import io.matthewnelson.kmp.tor.controller.common.file.Path
 import io.matthewnelson.kmp.tor.controller.common.file.toFile
 import io.matthewnelson.kmp.tor.controller.common.internal.ControllerUtils
@@ -38,9 +40,6 @@ import kotlinx.coroutines.sync.withLock
 import java.io.EOFException
 import java.io.File
 import java.io.FileInputStream
-import java.net.InetSocketAddress
-import java.net.Proxy
-import java.net.Socket
 import java.util.concurrent.Executors
 import kotlin.coroutines.cancellation.CancellationException
 
@@ -107,12 +106,12 @@ actual abstract class KmpTorLoader(protected val provider: TorConfigProvider) {
             notify.invoke(TorManagerEvent.Log.Debug(value=
                 "Attempting to re-connect to already running Tor process"
             ))
-            // attempt re-connect to already running Tor instance
 
-            val address: InetSocketAddress = withContext(dispatcher) {
+            // attempt re-connect to already running Tor instance
+            val address: ProxyAddress = withContext(dispatcher) {
                 try {
                     readControlPortFile(controlPortFile, timeout = 500L)
-                } catch (_: Exception) {
+                } catch (_: Throwable) {
                     null
                 }
             } ?: return@let
@@ -129,17 +128,8 @@ actual abstract class KmpTorLoader(protected val provider: TorConfigProvider) {
                 ByteArray(0)
             }
 
-            val socket = Socket(Proxy.NO_PROXY)
-            try {
-                withContext(dispatcher) {
-                    socket.connect(address)
-                }
-            } catch (_: Exception) {
-                return@let
-            }
-
             val controller: TorController = try {
-                TorController.newInstance(socket)
+                TorController.newInstance(address)
             } catch (_: Exception) {
                 return@let
             }
@@ -272,11 +262,11 @@ actual abstract class KmpTorLoader(protected val provider: TorConfigProvider) {
 
         val controlPortFile = validated.controlPortFile.toFile()
         val cookieAuthFile = validated.cookieAuthFile?.toFile()
-        val address: InetSocketAddress = try {
+        val address: ProxyAddress = try {
             withContext(dispatcher) {
                 readControlPortFile(controlPortFile, timeout = 10_000) { torJobException }
             }
-        } catch (e: Exception) {
+        } catch (e: Throwable) {
             torJob.cancelAndJoin()
             torDispatcher.close()
             return Result.failure(e)
@@ -296,27 +286,12 @@ actual abstract class KmpTorLoader(protected val provider: TorConfigProvider) {
             ByteArray(0)
         }
 
-        val socket = Socket(Proxy.NO_PROXY)
-        try {
-            withContext(dispatcher) {
-                socket.connect(address)
-            }
-        } catch (e: Exception) {
-            torJob.cancelAndJoin()
-            torDispatcher.close()
-            return Result.failure(TorManagerException(
-                "Failed to connect to control port", e
-            ))
-        }
-
         val controller: TorController = try {
-            TorController.newInstance(socket)
-        } catch (e: Exception) {
+            TorController.newInstance(address)
+        } catch (e: TorControllerException) {
             torJob.cancelAndJoin()
             torDispatcher.close()
-            return Result.failure(TorManagerException(
-                "Failed to create instance of TorController", e
-            ))
+            return Result.failure(e)
         }
 
         controller.authenticate(authenticationBytes).onFailure { ex ->
@@ -342,25 +317,23 @@ actual abstract class KmpTorLoader(protected val provider: TorConfigProvider) {
         torJob?.cancel()
     }
 
-    @Throws(TorManagerException::class)
+    @Throws(Throwable::class)
     private suspend fun readControlPortFile(
         file: File,
         timeout: Long,
         checkException: (() -> Throwable?)? = null,
-    ): InetSocketAddress {
+    ): ProxyAddress {
         val fileContents = retrieveFirstControlPortFromFile(file, timeout, checkException)
         return try {
-            fileContents.split('=')[1].split(':').let { splits ->
-                InetSocketAddress(splits[0].trim(), splits[1].trim().toInt())
-            }
-        } catch (e: Exception) {
+            ProxyAddress.fromString(fileContents.split('=')[1])
+        } catch (e: IllegalArgumentException) {
             throw TorManagerException(
                 "Failed to parse ${file.name} data ($fileContents) when retrieving control port", e
             )
         }
     }
 
-    @Throws(TorManagerException::class)
+    @Throws(Throwable::class)
     private suspend fun retrieveFirstControlPortFromFile(
         file: File,
         timeout: Long,

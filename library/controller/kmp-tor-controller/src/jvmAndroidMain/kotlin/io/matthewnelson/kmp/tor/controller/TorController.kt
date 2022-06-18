@@ -17,15 +17,20 @@
 
 package io.matthewnelson.kmp.tor.controller
 
+import io.matthewnelson.kmp.tor.common.address.ProxyAddress
 import io.matthewnelson.kmp.tor.common.annotation.ExperimentalTorApi
 import io.matthewnelson.kmp.tor.controller.common.events.TorEvent
 import io.matthewnelson.kmp.tor.controller.common.events.TorEventProcessor
+import io.matthewnelson.kmp.tor.controller.common.exceptions.TorControllerException
 import io.matthewnelson.kmp.tor.controller.internal.io.ReaderWrapper
 import io.matthewnelson.kmp.tor.controller.internal.io.SocketWrapper
 import io.matthewnelson.kmp.tor.controller.internal.io.WriterWrapper
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.asCoroutineDispatcher
+import kotlinx.coroutines.withContext
 import java.io.*
+import java.net.InetSocketAddress
+import java.net.Proxy
 import java.net.Socket
 import java.net.SocketException
 import java.util.concurrent.Executors
@@ -56,7 +61,7 @@ actual interface TorController: TorControlProcessor, TorEventProcessor<TorEvent.
     @ExperimentalTorApi
     actual fun onDisconnect(action: ((TorController) -> Unit)?)
 
-    companion object {
+    actual companion object {
         /**
          * Creates a [TorController] from the provided [Socket]
          *
@@ -77,6 +82,36 @@ actual interface TorController: TorControlProcessor, TorEventProcessor<TorEvent.
                 socket = socketWrapper,
                 dispatchers = Executors.newFixedThreadPool(2).asCoroutineDispatcher(),
             )
+        }
+
+        /**
+         * Opens a connection at [address] and returns a new [TorController]
+         * */
+        @Throws(TorControllerException::class)
+        actual suspend fun newInstance(address: ProxyAddress): TorController {
+            val dispatchers = Executors.newFixedThreadPool(2).asCoroutineDispatcher()
+
+            try {
+                val socket = Socket(Proxy.NO_PROXY)
+
+                withContext(dispatchers) {
+                    val socketAddress = InetSocketAddress(address.ipAddress, address.port.value)
+
+                    @Suppress("BlockingMethodInNonBlockingContext")
+                    socket.connect(socketAddress)
+                }
+
+                @OptIn(ExperimentalCoroutinesApi::class)
+                return realTorController(
+                    reader = ReaderWrapper.from(socket),
+                    writer = WriterWrapper.from(socket),
+                    socket = SocketWrapper.wrap(socket),
+                    dispatchers = dispatchers,
+                )
+            } catch (e: Exception) {
+                dispatchers.close()
+                throw TorControllerException("Failed to open socket for $address", e)
+            }
         }
     }
 }
