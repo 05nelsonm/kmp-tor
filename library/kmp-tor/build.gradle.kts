@@ -19,13 +19,12 @@ import io.matthewnelson.kotlin.components.dependencies.versions
 import io.matthewnelson.kotlin.components.kmp.KmpTarget
 import io.matthewnelson.kotlin.components.kmp.publish.kmpPublishRootProjectConfiguration
 import io.matthewnelson.kotlin.components.kmp.util.*
-import io.matthewnelson.kotlin.components.kmp.KmpTarget.Jvm.Android.Companion.SOURCE_SET_MAIN_NAME as KmpAndroidMain
 import kmp.tor.env
 import org.jetbrains.kotlin.gradle.plugin.KotlinJsCompilerType
 
 plugins {
-    id("kmp-configuration")
-    id("kmp-publish")
+    id(pluginId.kmp.configuration)
+    id(pluginId.kmp.publish)
 }
 
 val pConfig = kmpPublishRootProjectConfiguration!!
@@ -39,10 +38,6 @@ kmpConfiguration {
                 mainSourceSet = {
                     dependencies {
                         implementation(project(":library:kmp-tor-internal"))
-
-                        // TODO: Remove once js, macosx64, linuxx64, mingwx64 binary targets are published
-                        implementation("${pConfig.group}:kmp-tor-binary-geoip:${env.kmpTorBinaries.version.name}")
-                        implementation("${pConfig.group}:kmp-tor-binary-extract:${env.kmpTorBinaries.version.name}")
                     }
                 },
                 testSourceSet = {
@@ -67,10 +62,6 @@ kmpConfiguration {
                 mainSourceSet = {
                     dependencies {
                         implementation("${pConfig.group}:kmp-tor-binary-android:${env.kmpTorBinaries.version.name}")
-
-                        // TODO: Remove once js, macosx64, linuxx64, mingwx64 binary targets are published
-                        implementation("${pConfig.group}:kmp-tor-binary-geoip:${env.kmpTorBinaries.version.name}")
-                        implementation("${pConfig.group}:kmp-tor-binary-extract:${env.kmpTorBinaries.version.name}")
                     }
                 },
             ),
@@ -81,36 +72,36 @@ kmpConfiguration {
 //                node = KmpTarget.NonJvm.JS.Node(),
 //            ),
 //
-////            KmpTarget.NonJvm.Native.Unix.Darwin.Ios.Arm32.DEFAULT,
+//            KmpTarget.NonJvm.Native.Unix.Darwin.Ios.Arm32.DEFAULT,
 //            KmpTarget.NonJvm.Native.Unix.Darwin.Ios.Arm64.DEFAULT,
 //            KmpTarget.NonJvm.Native.Unix.Darwin.Ios.X64.DEFAULT,
-////            KmpTarget.NonJvm.Native.Unix.Darwin.Ios.SimulatorArm64.DEFAULT,
+//            KmpTarget.NonJvm.Native.Unix.Darwin.Ios.SimulatorArm64.DEFAULT,
 //
 //            KmpTarget.NonJvm.Native.Unix.Darwin.Macos.X64(
 //                mainSourceSet = {
 //                    dependencies {
 //                        // TODO: Uncomment once macosx64 binary target is published
-////                        implementation("${pConfig.group}:kmp-tor-binary-macosx64:${env.kmpTorBinaries.version.name}")
+//                        implementation("${pConfig.group}:kmp-tor-binary-macosx64:${env.kmpTorBinaries.version.name}")
 //                    }
 //                },
 //            ),
-////            KmpTarget.NonJvm.Native.Unix.Darwin.Macos.Arm64.DEFAULT,
+//            KmpTarget.NonJvm.Native.Unix.Darwin.Macos.Arm64.DEFAULT,
 //
 //            KmpTarget.NonJvm.Native.Unix.Darwin.Tvos.Arm64.DEFAULT,
 //            KmpTarget.NonJvm.Native.Unix.Darwin.Tvos.X64.DEFAULT,
-////            KmpTarget.NonJvm.Native.Unix.Darwin.Tvos.SimulatorArm64.DEFAULT,
+//            KmpTarget.NonJvm.Native.Unix.Darwin.Tvos.SimulatorArm64.DEFAULT,
 //
 //            KmpTarget.NonJvm.Native.Unix.Darwin.Watchos.Arm32.DEFAULT,
 //            KmpTarget.NonJvm.Native.Unix.Darwin.Watchos.Arm64.DEFAULT,
 //            KmpTarget.NonJvm.Native.Unix.Darwin.Watchos.X64.DEFAULT,
-////            KmpTarget.NonJvm.Native.Unix.Darwin.Watchos.X86.DEFAULT,
-////            KmpTarget.NonJvm.Native.Unix.Darwin.Watchos.SimulatorArm64.DEFAULT,
+//            KmpTarget.NonJvm.Native.Unix.Darwin.Watchos.X86.DEFAULT,
+//            KmpTarget.NonJvm.Native.Unix.Darwin.Watchos.SimulatorArm64.DEFAULT,
 //
 //            KmpTarget.NonJvm.Native.Unix.Linux.X64(
 //                mainSourceSet = {
 //                    dependencies {
 //                        // TODO: Uncomment once linuxx64 binary target is published
-////                        implementation("${pConfig.group}:kmp-tor-binary-linuxx64:${env.kmpTorBinaries.version.name}")
+//                        implementation("${pConfig.group}:kmp-tor-binary-linuxx64:${env.kmpTorBinaries.version.name}")
 //                    }
 //                },
 //            ),
@@ -119,7 +110,7 @@ kmpConfiguration {
 //                mainSourceSet = {
 //                    dependencies {
 //                        // TODO: Uncomment once mingwx64 binary target is published
-////                        implementation("${pConfig.group}:kmp-tor-binary-mingwx64:${env.kmpTorBinaries.version.name}")
+//                        implementation("${pConfig.group}:kmp-tor-binary-mingwx64:${env.kmpTorBinaries.version.name}")
 //                    }
 //                },
 //            ),
@@ -128,9 +119,8 @@ kmpConfiguration {
             dependencies {
                 implementation(deps.kotlin.coroutines.core.core)
 
-                // TODO: Uncomment once js, macosx64, linuxx64, mingwx64 binary targets are published
-//                implementation("${pConfig.group}:kmp-tor-binary-geoip:${env.kmpTorBinaries.version.name}")
-//                implementation("${pConfig.group}:kmp-tor-binary-extract:${env.kmpTorBinaries.version.name}")
+                implementation("${pConfig.group}:kmp-tor-binary-geoip:${env.kmpTorBinaries.version.name}")
+                implementation("${pConfig.group}:kmp-tor-binary-extract:${env.kmpTorBinaries.version.name}")
 
                 api(project(":library:manager:kmp-tor-manager"))
             }

@@ -19,8 +19,8 @@ import kmp.tor.env
 import org.jetbrains.kotlin.gradle.plugin.KotlinJsCompilerType
 
 plugins {
-    id("kmp-configuration")
-    id("kmp-publish")
+    id(pluginId.kmp.configuration)
+    id(pluginId.kmp.publish)
 }
 
 kmpConfiguration {
@@ -59,7 +59,6 @@ kmpConfiguration {
         ),
         commonMainSourceSet = {
             dependencies {
-                implementation(deps.kotlin.reflect)
                 api(project(":library:controller:kmp-tor-controller-common"))
             }
         },

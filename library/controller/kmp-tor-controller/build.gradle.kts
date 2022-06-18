@@ -22,8 +22,8 @@ import kmp.tor.env
 import org.jetbrains.kotlin.gradle.plugin.KotlinJsCompilerType
 
 plugins {
-    id("kmp-configuration")
-    id("kmp-publish")
+    id(pluginId.kmp.configuration)
+    id(pluginId.kmp.publish)
 }
 
 kmpConfiguration {
@@ -38,35 +38,33 @@ kmpConfiguration {
 //                node = KmpTarget.NonJvm.JS.Node(),
 //            ),
 //
-////            KmpTarget.NonJvm.Native.Unix.Darwin.Ios.Arm32.DEFAULT,
+//            KmpTarget.NonJvm.Native.Unix.Darwin.Ios.Arm32.DEFAULT,
 //            KmpTarget.NonJvm.Native.Unix.Darwin.Ios.Arm64.DEFAULT,
 //            KmpTarget.NonJvm.Native.Unix.Darwin.Ios.X64.DEFAULT,
-////            KmpTarget.NonJvm.Native.Unix.Darwin.Ios.SimulatorArm64.DEFAULT,
+//            KmpTarget.NonJvm.Native.Unix.Darwin.Ios.SimulatorArm64.DEFAULT,
 //
 //            KmpTarget.NonJvm.Native.Unix.Darwin.Macos.X64.DEFAULT,
 //            KmpTarget.NonJvm.Native.Unix.Darwin.Macos.Arm64.DEFAULT,
 //
 //            KmpTarget.NonJvm.Native.Unix.Darwin.Tvos.Arm64.DEFAULT,
 //            KmpTarget.NonJvm.Native.Unix.Darwin.Tvos.X64.DEFAULT,
-////            KmpTarget.NonJvm.Native.Unix.Darwin.Tvos.SimulatorArm64.DEFAULT,
+//            KmpTarget.NonJvm.Native.Unix.Darwin.Tvos.SimulatorArm64.DEFAULT,
 //
 //            KmpTarget.NonJvm.Native.Unix.Darwin.Watchos.Arm32.DEFAULT,
 //            KmpTarget.NonJvm.Native.Unix.Darwin.Watchos.Arm64.DEFAULT,
 //            KmpTarget.NonJvm.Native.Unix.Darwin.Watchos.X64.DEFAULT,
-////            KmpTarget.NonJvm.Native.Unix.Darwin.Watchos.X86.DEFAULT,
-////            KmpTarget.NonJvm.Native.Unix.Darwin.Watchos.SimulatorArm64.DEFAULT,
+//            KmpTarget.NonJvm.Native.Unix.Darwin.Watchos.X86.DEFAULT,
+//            KmpTarget.NonJvm.Native.Unix.Darwin.Watchos.SimulatorArm64.DEFAULT,
 //
 //            KmpTarget.NonJvm.Native.Unix.Linux.X64.DEFAULT,
 //
 //            KmpTarget.NonJvm.Native.Mingw.X64.DEFAULT,
         ),
-        commonPluginIds = setOf("kotlinx-atomicfu"),
+        commonPluginIds = setOf(pluginId.kotlin.atomicfu),
         commonMainSourceSet = {
             dependencies {
                 implementation(deps.components.encoding.base16)
-                implementation(deps.kotlin.atomicfu.atomicfu)
                 implementation(deps.kotlin.coroutines.core.core)
-                implementation(deps.kotlin.reflect)
                 api(project(":library:controller:kmp-tor-controller-common"))
             }
         },
