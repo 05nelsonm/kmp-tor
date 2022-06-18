@@ -44,11 +44,7 @@ import java.net.Socket
 import java.util.concurrent.Executors
 import kotlin.coroutines.cancellation.CancellationException
 
-@Suppress("CanBePrimaryConstructorProperty")
-actual abstract class KmpTorLoader @JvmOverloads constructor(
-    protected val provider: TorConfigProvider,
-    private val io: CoroutineDispatcher = Dispatchers.IO
-) {
+actual abstract class KmpTorLoader(protected val provider: TorConfigProvider) {
 
     actual companion object {
         const val READ_INTERVAL = 250L
@@ -99,6 +95,8 @@ actual abstract class KmpTorLoader @JvmOverloads constructor(
         stateMachine: TorStateMachine,
         notify: (TorManagerEvent) -> Unit,
     ): Result<Pair<TorController, TorConfig?>> {
+        val dispatcher = torDispatcher.getOrCreate()
+
         provider.lastValidatedTorConfig?.let { validated ->
             val controlPortFile = validated.controlPortFile.toFile()
             val cookieAuthFile = validated.cookieAuthFile?.toFile()
@@ -111,7 +109,7 @@ actual abstract class KmpTorLoader @JvmOverloads constructor(
             ))
             // attempt re-connect to already running Tor instance
 
-            val address: InetSocketAddress = withContext(io) {
+            val address: InetSocketAddress = withContext(dispatcher) {
                 try {
                     readControlPortFile(controlPortFile, timeout = 500L)
                 } catch (_: Exception) {
@@ -120,7 +118,7 @@ actual abstract class KmpTorLoader @JvmOverloads constructor(
             } ?: return@let
 
             val bytes: ByteArray = if (cookieAuthFile != null) {
-                withContext(io) {
+                withContext(dispatcher) {
                     try {
                         readCookieAuthFile(cookieAuthFile, timeout = 500L)
                     } catch (_: Exception) {
@@ -133,7 +131,7 @@ actual abstract class KmpTorLoader @JvmOverloads constructor(
 
             val socket = Socket(Proxy.NO_PROXY)
             try {
-                withContext(io) {
+                withContext(dispatcher) {
                     socket.connect(address)
                 }
             } catch (_: Exception) {
@@ -175,11 +173,11 @@ actual abstract class KmpTorLoader @JvmOverloads constructor(
 
         torJob?.cancel()
 
-        val validated: TorConfigProvider.ValidatedTorConfig = withContext(io) {
+        val validated: TorConfigProvider.ValidatedTorConfig = withContext(dispatcher) {
             provider.retrieve(excludeSettings) { port -> PortUtil.isTcpPortAvailable(port) }
         }
 
-        val mkdirsFailure: TorManagerException? = withContext(io) {
+        val mkdirsFailure: TorManagerException? = withContext(dispatcher) {
 
             // directories specified in the config must be present for Tor to start
             for (setting in validated.torConfig.settings) {
@@ -225,10 +223,9 @@ actual abstract class KmpTorLoader @JvmOverloads constructor(
         }
 
         if (mkdirsFailure != null) {
+            torDispatcher.close()
             return Result.failure(mkdirsFailure)
         }
-
-        val dispatcher = torDispatcher.getOrCreate()
 
         var torJobException: Throwable? = null
         val handler = CoroutineExceptionHandler { _, throwable ->
@@ -276,7 +273,7 @@ actual abstract class KmpTorLoader @JvmOverloads constructor(
         val controlPortFile = validated.controlPortFile.toFile()
         val cookieAuthFile = validated.cookieAuthFile?.toFile()
         val address: InetSocketAddress = try {
-            withContext(io) {
+            withContext(dispatcher) {
                 readControlPortFile(controlPortFile, timeout = 10_000) { torJobException }
             }
         } catch (e: Exception) {
@@ -287,7 +284,7 @@ actual abstract class KmpTorLoader @JvmOverloads constructor(
 
         val authenticationBytes: ByteArray = if (cookieAuthFile != null) {
             try {
-                withContext(io) {
+                withContext(dispatcher) {
                     readCookieAuthFile(cookieAuthFile, timeout = 10_000) { torJobException }
                 }
             } catch (e: Exception) {
@@ -301,7 +298,7 @@ actual abstract class KmpTorLoader @JvmOverloads constructor(
 
         val socket = Socket(Proxy.NO_PROXY)
         try {
-            withContext(io) {
+            withContext(dispatcher) {
                 socket.connect(address)
             }
         } catch (e: Exception) {
