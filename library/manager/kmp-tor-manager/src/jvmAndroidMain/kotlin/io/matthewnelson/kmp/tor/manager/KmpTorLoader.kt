@@ -194,7 +194,7 @@ actual abstract class KmpTorLoader(protected val provider: TorConfigProvider) {
                     }
                 }
 
-                setHiddenServiceDirPermissions(dirPath)
+                setUnixDirPermissions(dirPath)
             }
 
             validated.controlPortFile.toFile().delete()
@@ -441,7 +441,7 @@ actual abstract class KmpTorLoader(protected val provider: TorConfigProvider) {
      * Not necessary for Android, only Linux && Darwin platforms.
      * */
     @Throws(TorManagerException::class)
-    protected actual open fun setHiddenServiceDirPermissions(dir: Path) {}
+    protected actual open fun setUnixDirPermissions(dir: Path) {}
 
     init {
         // Reference so that localhostAddress for JVM can have it's initial

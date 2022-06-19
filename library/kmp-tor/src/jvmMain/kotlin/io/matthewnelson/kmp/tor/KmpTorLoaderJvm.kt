@@ -27,7 +27,6 @@ import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.job
-import java.io.File
 import java.io.IOException
 import java.nio.file.Files
 import java.nio.file.attribute.PosixFilePermission
@@ -71,7 +70,7 @@ class KmpTorLoaderJvm(
 
     @Suppress("NewApi")
     @Throws(TorManagerException::class)
-    override fun setHiddenServiceDirPermissions(dir: Path) {
+    override fun setUnixDirPermissions(dir: Path) {
         if (installer.isLinux || installer.isMacos) {
             try {
                 Files.setPosixFilePermissions(
