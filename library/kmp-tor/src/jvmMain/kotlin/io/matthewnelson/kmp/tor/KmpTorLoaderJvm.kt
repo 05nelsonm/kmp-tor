@@ -49,8 +49,10 @@ class KmpTorLoaderJvm(
     override val excludeSettings: Set<TorConfig.Setting<*>> = when {
         installer.isMingw -> {
             super.excludeSettings.let { settings ->
-                val set: MutableSet<TorConfig.Setting<*>> = LinkedHashSet(settings.size + 1)
+                val set: MutableSet<TorConfig.Setting<*>> = LinkedHashSet(settings.size + 2)
                 set.addAll(settings)
+                set.add(TorConfig.Setting.UnixSocket.Control())
+                // TODO: UnixSocket.Socks (increment size)
                 set.add(TorConfig.Setting.Ports.Trans())
                 set
             }
