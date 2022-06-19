@@ -137,9 +137,14 @@ abstract class TorConfigProvider {
             ?: workDir.builder { addSegment(DataDirectory.DEFAULT_NAME) }
         dataDir.set(FileSystemDir(dataDirPath))
 
+        val excludedClasses = excludeSettings.map { it::class }
         val portValidator = PortValidator()
         val builder: TorConfig.Builder = TorConfig.Builder {
             for (setting in clientConfig.settings) {
+                if (excludedClasses.contains(setting::class)) {
+                    continue
+                }
+
                 if (setting is Ports) {
                     portValidator.add(setting)
                     continue
@@ -149,10 +154,6 @@ abstract class TorConfigProvider {
             }
 
             put(portValidator.validate(isPortAvailable))
-
-            for (setting in excludeSettings) {
-                removeInstanceOf(setting::class)
-            }
             
             // TorManager requires this to be initially set to true (disable network) for several reasons:
             //  - TorManager was passed a network observer and the device has no network, we
