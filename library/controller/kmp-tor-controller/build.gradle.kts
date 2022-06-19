@@ -79,6 +79,7 @@ kmpConfiguration {
         commonMainSourceSet = {
             dependencies {
                 implementation(deps.components.encoding.base16)
+                implementation(deps.kotlin.atomicfu.atomicfu)
                 implementation(deps.kotlin.coroutines.core.core)
                 api(project(":library:controller:kmp-tor-controller-common"))
             }

@@ -72,6 +72,7 @@ kmpConfiguration {
         commonPluginIds = setOf(pluginId.kotlin.atomicfu),
         commonMainSourceSet = {
             dependencies {
+                implementation(deps.kotlin.atomicfu.atomicfu)
                 implementation(deps.kotlin.coroutines.core.core)
                 implementation(project(":library:controller:kmp-tor-controller")) {
                     exclude(kmpPublishRootProjectConfiguration!!.group, "kmp-tor-common")
