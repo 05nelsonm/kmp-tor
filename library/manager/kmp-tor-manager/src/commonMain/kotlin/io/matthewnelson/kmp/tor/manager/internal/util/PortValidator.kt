@@ -16,28 +16,40 @@
 package io.matthewnelson.kmp.tor.manager.internal.util
 
 import io.matthewnelson.kmp.tor.common.address.Port
+import io.matthewnelson.kmp.tor.controller.common.config.TorConfig
 import io.matthewnelson.kmp.tor.controller.common.config.TorConfig.Option.AorDorPort
 import io.matthewnelson.kmp.tor.controller.common.config.TorConfig.Setting.Ports
+import io.matthewnelson.kmp.tor.controller.common.config.TorConfig.Setting.UnixSocket
 
 internal class PortValidator internal constructor() {
     private val configPorts: MutableSet<Ports> = mutableSetOf()
-    var hasControlPort = false
+    private val configUnixSockets: MutableSet<UnixSocket> = mutableSetOf()
+    var hasControl = false
         private set
-    var hasSocksPort = false
+    var hasSocks = false
         private set
 
     fun add(port: Ports) {
         if (port is Ports.Control) {
-            hasControlPort = true
+            hasControl = true
         } else if (port is Ports.Socks) {
-            hasSocksPort = true
+            hasSocks = true
         }
         configPorts.add(port)
     }
 
+    fun add(unixSocket: UnixSocket) {
+        if (unixSocket is UnixSocket.Control) {
+            hasControl = true
+        }/* else if (unixSocket is UnixSocket.Socks) {
+            hasSocks = true
+        }*/
+        configUnixSockets.add(unixSocket)
+    }
+
     @Suppress("unchecked_cast")
-    fun validate(isPortAvailable: (Port) -> Boolean): Set<Ports> {
-        if (!hasSocksPort) {
+    fun validate(isPortAvailable: (Port) -> Boolean): Set<TorConfig.Setting<*>> {
+        if (!hasSocks) {
             // Try to add default 9050 so we can validate that it is open
             val socks = Ports.Socks()
             if (!configPorts.add(socks)) {
@@ -45,10 +57,10 @@ internal class PortValidator internal constructor() {
                 socks.set(AorDorPort.Auto)
                 configPorts.add(socks)
             }
-            hasSocksPort = true
+            hasSocks = true
         }
 
-        val validatedPorts: MutableSet<Ports> = mutableSetOf()
+        val validatedPorts: MutableSet<TorConfig.Setting<*>> = mutableSetOf()
 
         for (port in configPorts) {
             when (val option = port.value) {
@@ -61,15 +73,17 @@ internal class PortValidator internal constructor() {
                         validatedPorts.add(port)
                     } else {
                         // Unavailable. Set to auto
-                        validatedPorts.add(port.clone().set(AorDorPort.Auto) as Ports)
+                        validatedPorts.add(port.clone().set(AorDorPort.Auto))
                     }
                 }
             }
         }
 
-        if (!hasControlPort) {
-            validatedPorts.add(Ports.Control().set(AorDorPort.Auto) as Ports)
+        if (!hasControl) {
+            validatedPorts.add(Ports.Control().set(AorDorPort.Auto))
         }
+
+        validatedPorts.addAll(configUnixSockets)
 
         return validatedPorts
     }

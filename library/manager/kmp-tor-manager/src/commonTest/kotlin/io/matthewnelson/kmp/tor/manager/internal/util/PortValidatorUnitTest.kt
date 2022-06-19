@@ -16,11 +16,11 @@
 package io.matthewnelson.kmp.tor.manager.internal.util
 
 import io.matthewnelson.kmp.tor.common.address.PortProxy
+import io.matthewnelson.kmp.tor.controller.common.config.TorConfig
 import io.matthewnelson.kmp.tor.controller.common.config.TorConfig.Setting.Ports
 import io.matthewnelson.kmp.tor.controller.common.config.TorConfig.Option.AorDorPort
-import kotlin.test.Test
-import kotlin.test.assertEquals
-import kotlin.test.assertNotEquals
+import io.matthewnelson.kmp.tor.controller.common.file.Path
+import kotlin.test.*
 
 class PortValidatorUnitTest {
 
@@ -67,5 +67,17 @@ class PortValidatorUnitTest {
         val controlPort = validated.filterIsInstance<Ports.Control>()
         assertEquals(1, controlPort.size)
         assertEquals(Ports.Control(), controlPort.first())
+    }
+
+    @Test
+    fun givenUnixControlSocket_whenValidationCalled_controlPortIsNotAdded() {
+        val control = TorConfig.Setting.UnixSocket.Control()
+        control.set(TorConfig.Option.FileSystemFile(Path("/some/path")))
+        assertNotNull(control.value)
+
+        validator.add(control)
+        val validated = validator.validate { true }
+        assertTrue(validated.filterIsInstance<Ports.Control>().isEmpty())
+        assertFalse(validated.filterIsInstance<TorConfig.Setting.UnixSocket.Control>().isEmpty())
     }
 }
