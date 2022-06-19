@@ -194,13 +194,7 @@ actual abstract class KmpTorLoader(protected val provider: TorConfigProvider) {
                     }
                 }
 
-                if (setting is TorConfig.Setting.HiddenService) {
-                    try {
-                        setHiddenServiceDirPermissions(dirPath)
-                    } catch (e: TorManagerException) {
-                        return@withContext e
-                    }
-                }
+                setHiddenServiceDirPermissions(dirPath)
             }
 
             validated.controlPortFile.toFile().delete()
