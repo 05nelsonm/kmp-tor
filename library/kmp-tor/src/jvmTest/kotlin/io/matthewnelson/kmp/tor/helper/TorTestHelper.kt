@@ -93,6 +93,13 @@ abstract class TorTestHelper {
             put(Ports.HttpTunnel().set(AorDorPort.Auto))
             put(Ports.Trans().set(AorDorPort.Auto))
 
+            put(UnixSocket.Control().set(FileSystemFile(
+                testProvider.workDir.builder {
+                    addSegment(DataDirectory.DEFAULT_NAME)
+                    addSegment(UnixSocket.Control.DEFAULT_NAME)
+                }
+            )))
+
             put(HiddenService()
                 .setPorts(ports = setOf(
                     HiddenService.Ports(virtualPort = Port(1025), targetPort = Port(1027)),
@@ -198,7 +205,11 @@ abstract class TorTestHelper {
         manager.debug(true)
         manager.addListener(object : TorManagerEvent.SealedListener {
             override fun onEvent(event: TorManagerEvent) {
-                println(event.toString())
+                if (event is TorManagerEvent.Log.Error) {
+                    event.value.printStackTrace()
+                } else {
+                    println(event.toString())
+                }
             }
 
             override fun onEvent(event: TorEvent.Type.SingleLineEvent, output: String) {}
