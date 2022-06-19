@@ -72,6 +72,25 @@ public class App extends Application {
                 Ports.HttpTunnel http = new Ports.HttpTunnel();
                 http.set(AorDorPort.Auto.INSTANCE);
 
+                // Use a UnixSocket instead of TCP for the ControlPort.
+                UnixSocket.Control control = new UnixSocket.Control();
+                control.set(FileSystemFile.invoke(
+                    getWorkDir().builder()
+
+                        // Put the file in the "data" directory
+                        // so that we avoid any directory permission
+                        // issues.
+                        //
+                        // Note that DataDirectory is automatically added
+                        // for you if it is not present in your provided
+                        // config. If you set a custom Path for it, you
+                        // should use it here.
+                        .addSegment(DataDirectory.DEFAULT_NAME)
+
+                        .addSegment(UnixSocket.Control.DEFAULT_NAME)
+                        .build()
+                ));
+
                 HiddenService myHiddenService = new HiddenService();
 
                 myHiddenService.set(FileSystemDir.invoke(
@@ -91,6 +110,7 @@ public class App extends Application {
                 return new TorConfig.Builder()
                     .put(socks)
                     .put(http)
+                    .put(control)
                     .put(myHiddenService)
                     .build();
             }
