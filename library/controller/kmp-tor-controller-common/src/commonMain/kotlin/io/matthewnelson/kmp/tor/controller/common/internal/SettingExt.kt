@@ -68,6 +68,34 @@ fun TorConfig.Setting<*>.appendTo(
             sb.quoteIfTrue(!isWriteTorConfig)
         }
 
+        is TorConfig.Setting.UnixSocket -> {
+            sb.append(keyword)
+
+            if (!appendValue) {
+                return
+            }
+
+            sb.append(delimiter)
+            sb.quoteIfTrue(!isWriteTorConfig)
+            sb.append("unix:")
+            sb.quoteIfTrue(isWriteTorConfig)
+            sb.append(value?.value)
+            sb.quoteIfTrue(isWriteTorConfig)
+
+            when (this) {
+                is TorConfig.Setting.UnixSocket.Control -> {
+                    flags?.let { flags ->
+                        for (flag in flags) {
+                            sb.append(SP)
+                            sb.append(flag.value)
+                        }
+                    }
+                }
+            }
+
+            sb.quoteIfTrue(!isWriteTorConfig)
+        }
+
         is TorConfig.Setting.Ports -> {
             sb.append(keyword)
 
@@ -80,14 +108,7 @@ fun TorConfig.Setting<*>.appendTo(
             sb.append(value)
 
             when (this) {
-                is TorConfig.Setting.Ports.Control -> {
-                    flags?.let { flags ->
-                        for (flag in flags) {
-                            sb.append(SP)
-                            sb.append(flag.value)
-                        }
-                    }
-                }
+                is TorConfig.Setting.Ports.Control -> {}
                 is TorConfig.Setting.Ports.Dns -> {
                     isolationFlags?.let { flags ->
                         for (flag in flags) {

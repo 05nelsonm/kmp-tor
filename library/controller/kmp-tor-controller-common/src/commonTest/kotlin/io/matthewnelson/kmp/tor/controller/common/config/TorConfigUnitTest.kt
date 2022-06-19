@@ -346,4 +346,51 @@ class TorConfigUnitTest {
         assertEquals(1, set.size)
         assertEquals(expected, set.first())
     }
+
+    @Test
+    fun givenUnixSocket_whenPathsSame_equalsEachother() {
+        val control1 = UnixSocket.Control()
+        control1.set(FileSystemFile(Path("/some/path")))
+
+        val control2 = control1.clone()
+        control2.setFlags(setOf(
+            UnixSocket.Control.Flag.GroupWritable
+        ))
+
+        assertEquals(control1, control2)
+
+        val set = mutableSetOf<UnixSocket.Control>()
+        set.add(control1)
+        set.add(control2)
+
+        assertEquals(1, set.size)
+    }
+
+    @Test
+    fun givenUnixSocketControl_whenPathIntegerOrEmpty_valueNotSet() {
+        val control = UnixSocket.Control()
+        control.set(FileSystemFile(Path("0")))
+        assertNull(control.value)
+
+        control.set(FileSystemFile(Path("9051")))
+        assertNull(control.value)
+
+        control.set(FileSystemFile(Path("")))
+        assertNull(control.value)
+    }
+
+    @Test
+    fun givenUnixSocketControl_whenCloned_matchesOriginal() {
+        val control = UnixSocket.Control()
+        control.set(FileSystemFile(Path("/some/path")))
+        control.setFlags(setOf(
+            UnixSocket.Control.Flag.WorldWritable
+        ))
+
+        val clone = control.clone()
+
+        assertEquals(control.value, clone.value)
+        assertEquals(control.flags, clone.flags)
+    }
+
 }

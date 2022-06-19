@@ -159,13 +159,21 @@ class TorConfig private constructor(
 
             val disabledPorts = mutableSetOf<String>()
             val sorted = settings.sortedBy { setting ->
-                if (setting is Setting.Ports) {
-                    if (setting.value is Option.AorDorPort.Disable) {
-                        disabledPorts.add(setting.keyword)
+                when (setting) {
+                    // Ports must come before UnixSocket to ensure
+                    // disabled ports are removed
+                    is Setting.Ports -> {
+                        if (setting.value is Option.AorDorPort.Disable) {
+                            disabledPorts.add(setting.keyword)
+                        }
+                        "AAAA${setting.keyword}"
                     }
-                    "AAA${setting.keyword}"
-                } else {
-                    setting.keyword
+                    is Setting.UnixSocket -> {
+                        "AAA${setting.keyword}"
+                    }
+                    else -> {
+                        setting.keyword
+                    }
                 }
             }
 
@@ -174,26 +182,34 @@ class TorConfig private constructor(
             val newSettings = mutableSetOf<Setting<*>>()
             for (setting in sorted) {
 
-                if (setting is Setting.Ports) {
-                    if (disabledPorts.contains(setting.keyword)) {
-                        if (!writtenDisabledPorts.contains(setting.keyword)) {
-                            sb.append(setting.keyword)
-                            sb.append(SP)
-                            sb.append(Option.AorDorPort.Disable.value)
-                            sb.append('\n')
-                            writtenDisabledPorts.add(setting.keyword)
+                when (setting) {
+                    is Setting.Ports -> {
+                        if (disabledPorts.contains(setting.keyword)) {
+                            if (!writtenDisabledPorts.contains(setting.keyword)) {
+                                sb.append(setting.keyword)
+                                sb.append(SP)
+                                sb.append(Option.AorDorPort.Disable.value)
+                                sb.append('\n')
+                                writtenDisabledPorts.add(setting.keyword)
+                            }
+
+                            if (setting.value is Option.AorDorPort.Disable) {
+                                newSettings.add(setting.setImmutable())
+                            }
+
+                            continue
                         }
 
-                        if (setting.value is Option.AorDorPort.Disable) {
-                            newSettings.add(setting.setImmutable())
-                        }
-
-                        continue
+                        setting.appendTo(sb, appendValue = true, isWriteTorConfig = true)
                     }
+                    is Setting.UnixSocket -> {
+                        if (disabledPorts.contains(setting.keyword)) continue
 
-                    setting.appendTo(sb, appendValue = true, isWriteTorConfig = true)
-                } else {
-                    setting.appendTo(sb, appendValue = true, isWriteTorConfig = true)
+                        setting.appendTo(sb, appendValue = true, isWriteTorConfig = true)
+                    }
+                    else -> {
+                        setting.appendTo(sb, appendValue = true, isWriteTorConfig = true)
+                    }
                 }
 
                 newSettings.add(setting.setImmutable())
@@ -770,6 +786,8 @@ class TorConfig private constructor(
              * excluding it from your config will not set it to a Port. As this
              * library depends on the [Control] port, the default value here differs
              * and cannot be set to [Option.AorDorPort.Disable].
+             *
+             * @see [UnixSocket.Control]
              * */
             class Control                       : Ports("ControlPort") {
                 override val default: Option.AorDorPort get() = Option.AorDorPort.Auto
@@ -782,33 +800,8 @@ class TorConfig private constructor(
                 @InternalTorApi
                 override val isStartArgument: Boolean get() = true
 
-                var flags: Set<Flag>? = null
-                    private set
-
-                override fun setDefault(): Control {
-                    if (isMutable) {
-                        value = default
-                        flags = null
-                    }
-                    return this
-                }
-
-                fun setFlags(flags: Set<Flag>?): Control {
-                    if (isMutable) {
-                        this.flags = flags?.toSet()
-                    }
-                    return this
-                }
-
                 override fun clone(): Control {
-                    return Control().setFlags(flags).set(value) as Control
-                }
-
-                sealed class Flag(@JvmField val value: String) {
-                    // TODO: Implement Unix domains in addition to Port capabilities
-//                    object GroupWritable                    : Flag("GroupWritable")
-//                    object WorldWritable                    : Flag("WorldWritable")
-//                    object RelaxDirModeCheck                : Flag("RelaxDirModeCheck")
+                    return Control().set(value) as Control
                 }
             }
 
@@ -997,6 +990,76 @@ class TorConfig private constructor(
                     override fun hashCode(): Int {
                         return 17 * 31 + "SessionGroup".hashCode()
                     }
+                }
+            }
+        }
+
+        sealed class UnixSocket(keyword: String) : Setting<Option.FileSystemFile?>(keyword) {
+
+            override fun equals(other: Any?): Boolean {
+                if (other == null) {
+                    return false
+                }
+
+                if (other !is UnixSocket) {
+                    return false
+                }
+
+                return other.value == value
+            }
+
+            override fun hashCode(): Int {
+                var result = 17 - 3
+                result = result * 31 + value.hashCode()
+                return result
+            }
+
+            class Control                       : UnixSocket("ControlPort") {
+                override val default: Option.FileSystemFile? = null
+                override var value: Option.FileSystemFile? = default
+                    set(value) {
+                        // Do not set if path is empty
+                        if (value?.nullIfEmpty == null) return
+                        // Do not set if path can be turned into an integer (disabling, or setting a port)
+                        if (value.value.toIntOrNull() != null) return
+                        // Do not set if path is "auto"
+                        if (value.value == Option.AorDorPort.Auto.value) return
+
+                        field = value
+                    }
+                @InternalTorApi
+                override val isStartArgument: Boolean get() = true
+
+                var flags: Set<Flag>? = null
+                    private set
+
+                override fun setDefault(): Control {
+                    if (isMutable) {
+                        value = default
+                        flags = null
+                    }
+                    return this
+                }
+
+                fun setFlags(flags: Set<Flag>?): Control {
+                    if (isMutable) {
+                        this.flags = flags?.toSet()
+                    }
+                    return this
+                }
+
+                override fun clone(): Control {
+                    return Control().setFlags(flags).set(value) as Control
+                }
+
+                sealed class Flag(@JvmField val value: String) {
+                    object GroupWritable                    : Flag("GroupWritable")
+                    object WorldWritable                    : Flag("WorldWritable")
+                    object RelaxDirModeCheck                : Flag("RelaxDirModeCheck")
+                }
+
+                companion object {
+                    const val DEFAULT_NAME = "control.sock"
                 }
             }
         }
