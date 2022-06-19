@@ -145,6 +145,11 @@ abstract class TorConfigProvider {
                     continue
                 }
 
+                if (setting is UnixSocket) {
+                    portValidator.add(setting)
+                    continue
+                }
+
                 if (setting is Ports) {
                     portValidator.add(setting)
                     continue
