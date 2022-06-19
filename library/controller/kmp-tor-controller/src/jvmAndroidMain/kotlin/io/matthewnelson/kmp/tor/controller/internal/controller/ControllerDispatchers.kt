@@ -13,21 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-package io.matthewnelson.kmp.tor.controller.internal.io
+package io.matthewnelson.kmp.tor.controller.internal.controller
 
-import java.io.Closeable
+import kotlinx.coroutines.ExecutorCoroutineDispatcher
+import kotlinx.coroutines.asCoroutineDispatcher
+import java.util.concurrent.Executors
 
-@JvmInline
-internal actual value class SocketWrapper private actual constructor(private val socket: Any) {
-
-    @JvmSynthetic
-    @Throws(Exception::class)
-    actual fun close() {
-        (socket as Closeable).close()
-    }
-
-    companion object {
-        @JvmSynthetic
-        internal fun wrap(socket: Closeable): SocketWrapper = SocketWrapper(socket)
-    }
+@JvmSynthetic
+@Suppress("nothing_to_inline")
+internal actual inline fun getTorControllerDispatchers(): ExecutorCoroutineDispatcher {
+    return Executors.newFixedThreadPool(2).asCoroutineDispatcher()
 }

@@ -19,21 +19,25 @@ package io.matthewnelson.kmp.tor.controller
 
 import io.matthewnelson.kmp.tor.common.address.ProxyAddress
 import io.matthewnelson.kmp.tor.common.annotation.ExperimentalTorApi
+import io.matthewnelson.kmp.tor.controller.common.config.TorConfig
 import io.matthewnelson.kmp.tor.controller.common.events.TorEvent
 import io.matthewnelson.kmp.tor.controller.common.events.TorEventProcessor
 import io.matthewnelson.kmp.tor.controller.common.exceptions.TorControllerException
+import io.matthewnelson.kmp.tor.controller.common.file.Path
+import io.matthewnelson.kmp.tor.controller.internal.controller.getTorControllerDispatchers
 import io.matthewnelson.kmp.tor.controller.internal.io.ReaderWrapper
 import io.matthewnelson.kmp.tor.controller.internal.io.SocketWrapper
 import io.matthewnelson.kmp.tor.controller.internal.io.WriterWrapper
+import io.matthewnelson.kmp.tor.controller.internal.util.toTorController
+import jnr.unixsocket.UnixSocket
+import jnr.unixsocket.UnixSocketAddress
+import jnr.unixsocket.UnixSocketChannel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.asCoroutineDispatcher
 import kotlinx.coroutines.withContext
 import java.io.*
-import java.net.InetSocketAddress
-import java.net.Proxy
 import java.net.Socket
 import java.net.SocketException
-import java.util.concurrent.Executors
+import java.nio.channels.Channels
 
 /**
  * Connects to Tor via it's control port in order to facilitate
@@ -63,54 +67,44 @@ actual interface TorController: TorControlProcessor, TorEventProcessor<TorEvent.
 
     actual companion object {
         /**
-         * Creates a [TorController] from the provided [Socket]
+         * Creates a [TorController] from the provided [Socket]. Socket must
+         * already be connected.
          *
          * @throws [IOException] if an input/output stream cannot be retrieved
          * @throws [SocketException] if an input/output stream cannot be retrieved
          * */
         @JvmStatic
         @Throws(IOException::class, SocketException::class)
-        fun newInstance(socket: Socket): TorController {
-            val readerWrapper = ReaderWrapper.from(socket)
-            val writerWrapper = WriterWrapper.from(socket)
-            val socketWrapper = SocketWrapper.wrap(socket)
-
-            @OptIn(ExperimentalCoroutinesApi::class)
-            return realTorController(
-                reader = readerWrapper,
-                writer = writerWrapper,
-                socket = socketWrapper,
-                dispatchers = Executors.newFixedThreadPool(2).asCoroutineDispatcher(),
-            )
-        }
+        fun newInstance(socket: Socket): TorController = socket.toTorController()
 
         /**
          * Opens a connection at [address] and returns a new [TorController]
          * */
         @Throws(TorControllerException::class)
-        actual suspend fun newInstance(address: ProxyAddress): TorController {
-            val dispatchers = Executors.newFixedThreadPool(2).asCoroutineDispatcher()
+        actual suspend fun newInstance(address: ProxyAddress): TorController = address.toTorController()
+
+        @Throws(TorControllerException::class)
+        actual suspend fun newInstance(unixSocket: Path): TorController {
+            val dispatchers = getTorControllerDispatchers()
+            val socket = UnixSocket(UnixSocketChannel.open())
 
             try {
-                val socket = Socket(Proxy.NO_PROXY)
-
                 withContext(dispatchers) {
-                    val socketAddress = InetSocketAddress(address.ipAddress, address.port.value)
+                    val address = UnixSocketAddress(unixSocket.value)
 
-                    @Suppress("BlockingMethodInNonBlockingContext")
-                    socket.connect(socketAddress)
+                    socket.connect(address)
                 }
 
-                @OptIn(ExperimentalCoroutinesApi::class)
-                return realTorController(
-                    reader = ReaderWrapper.from(socket),
-                    writer = WriterWrapper.from(socket),
-                    socket = SocketWrapper.wrap(socket),
-                    dispatchers = dispatchers,
-                )
+                return socket.toTorController(dispatchers)
             } catch (e: Exception) {
-                dispatchers.close()
-                throw TorControllerException("Failed to open socket for $address", e)
+                try {
+                    socket.close()
+                } catch (_: Exception) {}
+                try {
+                    dispatchers.close()
+                } catch (_: Exception) {}
+
+                throw TorControllerException("Failed to open unix socket to $unixSocket", e)
             }
         }
     }

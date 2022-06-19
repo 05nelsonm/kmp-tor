@@ -13,21 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-package io.matthewnelson.kmp.tor.controller.internal.io
+package io.matthewnelson.kmp.tor.controller.internal.controller
 
-import java.io.Closeable
+import kotlinx.coroutines.CloseableCoroutineDispatcher
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 
-@JvmInline
-internal actual value class SocketWrapper private actual constructor(private val socket: Any) {
-
-    @JvmSynthetic
-    @Throws(Exception::class)
-    actual fun close() {
-        (socket as Closeable).close()
-    }
-
-    companion object {
-        @JvmSynthetic
-        internal fun wrap(socket: Closeable): SocketWrapper = SocketWrapper(socket)
-    }
-}
+@JvmSynthetic
+@Suppress("nothing_to_inline")
+@OptIn(ExperimentalCoroutinesApi::class)
+internal expect inline fun getTorControllerDispatchers(): CloseableCoroutineDispatcher

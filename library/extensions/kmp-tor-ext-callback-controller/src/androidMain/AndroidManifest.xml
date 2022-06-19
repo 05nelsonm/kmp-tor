@@ -1,3 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
 /*
  * Copyright (c) 2022 Matthew Nelson
  *
@@ -13,21 +15,5 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-package io.matthewnelson.kmp.tor.controller.internal.io
-
-import java.io.Closeable
-
-@JvmInline
-internal actual value class SocketWrapper private actual constructor(private val socket: Any) {
-
-    @JvmSynthetic
-    @Throws(Exception::class)
-    actual fun close() {
-        (socket as Closeable).close()
-    }
-
-    companion object {
-        @JvmSynthetic
-        internal fun wrap(socket: Closeable): SocketWrapper = SocketWrapper(socket)
-    }
-}
+-->
+<manifest package="io.matthewnelson.kmp.tor.ext.callback.controller" />

@@ -14,6 +14,7 @@
  * limitations under the License.
  **/
 import io.matthewnelson.kotlin.components.dependencies.deps
+import io.matthewnelson.kotlin.components.dependencies.versions
 import io.matthewnelson.kotlin.components.kmp.KmpTarget
 import kmp.tor.env
 import org.jetbrains.kotlin.gradle.plugin.KotlinJsCompilerType
@@ -28,6 +29,15 @@ kmpConfiguration {
         setOf(
 
             KmpTarget.Jvm.Jvm.DEFAULT,
+
+            KmpTarget.Jvm.Android(
+                buildTools = versions.android.buildTools,
+                compileSdk = versions.android.sdkCompile,
+                minSdk = versions.android.sdkMin16,
+                target = {
+                    publishLibraryVariants("release")
+                },
+            ),
 
 //            KmpTarget.NonJvm.JS(
 //                compilerType = KotlinJsCompilerType.BOTH,
