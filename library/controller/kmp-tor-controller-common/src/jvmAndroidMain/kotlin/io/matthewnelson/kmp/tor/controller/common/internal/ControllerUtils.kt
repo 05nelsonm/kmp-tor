@@ -23,6 +23,11 @@ actual object ControllerUtils {
     @InternalTorApi
     const val ANDROID_NET_MAIN_THREAD_EXCEPTION = "android.os.NetworkOnMainThreadException"
 
+    @InternalTorApi
+    const val UNIX_DOMAIN_SOCKET_FACTORY_CLASS = "io.matthewnelson.kmp.tor.ext.unix.socket.UnixDomainSocketFactory"
+
+    private const val ANDROID_LOCAL_SOCKET_CLASS = "android.net.LocalSocket"
+
     @Volatile
     @Suppress("ObjectPropertyName")
     private var _localhostAddress: String? = null
@@ -59,5 +64,42 @@ actual object ControllerUtils {
             @OptIn(InternalTorApi::class)
             localhostAddress()
         }.start()
+    }
+
+    @JvmStatic
+    val osName: String? by lazy {
+        try {
+            System.getProperty("os.name").lowercase()
+        } catch (_: Exception) {
+            null
+        }
+    }
+
+    @JvmStatic
+    actual val hasUnixDomainSocketSupport: Boolean by lazy {
+        if (osName?.contains("linux") == true) {
+
+            try {
+                // We're on Android, so we have LocalSocket support
+                Class.forName(ANDROID_LOCAL_SOCKET_CLASS)
+                    ?: throw NullPointerException()
+                true
+            } catch (_: Exception) {
+
+                try {
+                    // We're on the JVM, look for the factory class to see
+                    // if dependency is available.
+                    @OptIn(InternalTorApi::class)
+                    Class.forName(UNIX_DOMAIN_SOCKET_FACTORY_CLASS)
+                        ?: throw NullPointerException()
+                    true
+                } catch (_: Exception) {
+                    false
+                }
+
+            }
+        } else {
+            false
+        }
     }
 }

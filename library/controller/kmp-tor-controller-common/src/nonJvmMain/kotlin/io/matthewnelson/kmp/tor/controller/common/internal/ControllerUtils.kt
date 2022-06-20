@@ -15,7 +15,13 @@
  **/
 package io.matthewnelson.kmp.tor.controller.common.internal
 
+import io.matthewnelson.kmp.tor.common.annotation.InternalTorApi
+
+// TODO: Fill out
 actual object ControllerUtils {
-    // TODO
+    @InternalTorApi
     actual fun localhostAddress(): String = "127.0.0.1"
+
+    @InternalTorApi
+    actual val hasUnixDomainSocketSupport: Boolean = false
 }
