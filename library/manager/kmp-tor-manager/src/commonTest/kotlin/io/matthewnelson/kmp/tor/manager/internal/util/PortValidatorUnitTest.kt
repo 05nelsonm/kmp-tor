@@ -19,7 +19,6 @@ import io.matthewnelson.kmp.tor.common.address.PortProxy
 import io.matthewnelson.kmp.tor.controller.common.config.TorConfig
 import io.matthewnelson.kmp.tor.controller.common.config.TorConfig.Setting.Ports
 import io.matthewnelson.kmp.tor.controller.common.config.TorConfig.Option.AorDorPort
-import io.matthewnelson.kmp.tor.controller.common.file.Path
 import kotlin.test.*
 
 class PortValidatorUnitTest {
@@ -72,8 +71,6 @@ class PortValidatorUnitTest {
     @Test
     fun givenUnixControlSocket_whenValidationCalled_controlPortIsNotAdded() {
         val control = TorConfig.Setting.UnixSocket.Control()
-        control.set(TorConfig.Option.FileSystemFile(Path("/some/path")))
-        assertNotNull(control.value)
 
         validator.add(control)
         val validated = validator.validate { true }
