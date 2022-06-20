@@ -71,7 +71,7 @@ kmpConfiguration {
             dependencies {
                 implementation(deps.kotlin.coroutines.core.core)
                 api(project(":library:controller:kmp-tor-controller"))
-                api(project(":library:extensions:kmp-tor-ext-callback-controller-common"))
+                api(project(":library:extensions:callback:kmp-tor-ext-callback-controller-common"))
             }
         },
         commonTestSourceSet = {

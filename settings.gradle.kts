@@ -24,11 +24,11 @@ if (CHECK_PUBLICATION != null) {
     include(":library:manager:kmp-tor-manager")
     include(":library:manager:kmp-tor-manager-common")
 
-    include(":library:extensions:kmp-tor-ext-callback-common")
-    include(":library:extensions:kmp-tor-ext-callback-controller")
-    include(":library:extensions:kmp-tor-ext-callback-controller-common")
-    include(":library:extensions:kmp-tor-ext-callback-manager")
-    include(":library:extensions:kmp-tor-ext-callback-manager-common")
+    include(":library:extensions:callback:kmp-tor-ext-callback-common")
+    include(":library:extensions:callback:kmp-tor-ext-callback-controller")
+    include(":library:extensions:callback:kmp-tor-ext-callback-controller-common")
+    include(":library:extensions:callback:kmp-tor-ext-callback-manager")
+    include(":library:extensions:callback:kmp-tor-ext-callback-manager-common")
 
     if (allTargets || (targets?.contains("ANDROID") != false && targets?.contains("JVM") != false)) {
         include(":samples:java:android")
