@@ -30,6 +30,8 @@ if (CHECK_PUBLICATION != null) {
     include(":library:extensions:callback:kmp-tor-ext-callback-manager")
     include(":library:extensions:callback:kmp-tor-ext-callback-manager-common")
 
+    include(":library:extensions:unix-socket:kmp-tor-ext-unix-socket")
+
     if (allTargets || (targets?.contains("ANDROID") != false && targets?.contains("JVM") != false)) {
         include(":samples:java:android")
         include(":samples:kotlin:android")
