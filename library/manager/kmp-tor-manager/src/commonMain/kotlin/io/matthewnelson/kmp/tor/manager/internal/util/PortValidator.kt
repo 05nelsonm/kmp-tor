@@ -79,6 +79,7 @@ internal class PortValidator internal constructor() {
             }
         }
 
+        // TODO: Check ControllerUtils.hasUnixSocketDomainSupport to prefer unix sockets.
         if (!hasControl) {
             validatedPorts.add(Ports.Control().set(AorDorPort.Auto))
         }
