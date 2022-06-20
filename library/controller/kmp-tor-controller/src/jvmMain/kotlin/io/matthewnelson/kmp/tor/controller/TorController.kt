@@ -19,25 +19,18 @@ package io.matthewnelson.kmp.tor.controller
 
 import io.matthewnelson.kmp.tor.common.address.ProxyAddress
 import io.matthewnelson.kmp.tor.common.annotation.ExperimentalTorApi
-import io.matthewnelson.kmp.tor.controller.common.config.TorConfig
+import io.matthewnelson.kmp.tor.common.annotation.InternalTorApi
 import io.matthewnelson.kmp.tor.controller.common.events.TorEvent
 import io.matthewnelson.kmp.tor.controller.common.events.TorEventProcessor
 import io.matthewnelson.kmp.tor.controller.common.exceptions.TorControllerException
 import io.matthewnelson.kmp.tor.controller.common.file.Path
+import io.matthewnelson.kmp.tor.controller.common.internal.ControllerUtils
 import io.matthewnelson.kmp.tor.controller.internal.controller.getTorControllerDispatchers
-import io.matthewnelson.kmp.tor.controller.internal.io.ReaderWrapper
-import io.matthewnelson.kmp.tor.controller.internal.io.SocketWrapper
-import io.matthewnelson.kmp.tor.controller.internal.io.WriterWrapper
 import io.matthewnelson.kmp.tor.controller.internal.util.toTorController
-import jnr.unixsocket.UnixSocket
-import jnr.unixsocket.UnixSocketAddress
-import jnr.unixsocket.UnixSocketChannel
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.withContext
 import java.io.*
 import java.net.Socket
 import java.net.SocketException
-import java.nio.channels.Channels
 
 /**
  * Connects to Tor via it's control port in order to facilitate
@@ -84,27 +77,33 @@ actual interface TorController: TorControlProcessor, TorEventProcessor<TorEvent.
         actual suspend fun newInstance(address: ProxyAddress): TorController = address.toTorController()
 
         @Throws(TorControllerException::class)
-        actual suspend fun newInstance(unixSocket: Path): TorController {
+        actual suspend fun newInstance(unixDomainSocket: Path): TorController {
+            if (!ControllerUtils.hasUnixDomainSocketSupport) {
+                throw TorControllerException("UnixDomainSockets unsupported")
+            }
+
+            @OptIn(InternalTorApi::class)
+            val clazz: Class<*> = try {
+                Class.forName(ControllerUtils.UNIX_DOMAIN_SOCKET_FACTORY_CLASS)
+                    ?: throw ClassNotFoundException(ControllerUtils.UNIX_DOMAIN_SOCKET_FACTORY_CLASS)
+            } catch (e: ClassNotFoundException) {
+                throw TorControllerException("UnixDomainSockets unsupported. Add the kmp-tor-ext-unix-socket dependency", e)
+            }
+
             val dispatchers = getTorControllerDispatchers()
-            val socket = UnixSocket(UnixSocketChannel.open())
 
-            try {
+            return try {
                 withContext(dispatchers) {
-                    val address = UnixSocketAddress(unixSocket.value)
-
-                    socket.connect(address)
-                }
-
-                return socket.toTorController(dispatchers)
+                    clazz
+                        .getMethod("create", String::class.java)
+                        .invoke(null, unixDomainSocket.value) as Socket
+                }.toTorController(dispatchers)
             } catch (e: Exception) {
-                try {
-                    socket.close()
-                } catch (_: Exception) {}
                 try {
                     dispatchers.close()
                 } catch (_: Exception) {}
 
-                throw TorControllerException("Failed to open unix socket to $unixSocket", e)
+                throw TorControllerException("Failed to open unix socket to $unixDomainSocket", e)
             }
         }
     }

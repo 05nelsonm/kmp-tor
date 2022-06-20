@@ -88,7 +88,7 @@ expect interface TorController: TorControlProcessor, TorEventProcessor<TorEvent.
          * Opens a unix domain socket to Tor's control port at the give [Path]
          * */
         @Throws(TorControllerException::class)
-        suspend fun newInstance(unixSocket: Path): TorController
+        suspend fun newInstance(unixDomainSocket: Path): TorController
     }
 }
 

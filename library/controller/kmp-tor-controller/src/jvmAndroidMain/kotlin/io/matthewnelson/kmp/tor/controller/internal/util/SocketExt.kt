@@ -33,7 +33,7 @@ import java.net.SocketException
 internal inline fun Socket.toTorController(dispatchers: ExecutorCoroutineDispatcher? = null): TorController {
     try {
         if (!isConnected) {
-            throw IOException("Socket.connect must be called before calling TorController.newInstance")
+            throw IOException("Socket.connect must be called before retrieving a new instance of TorController")
         }
 
         val readerWrapper = ReaderWrapper.wrap(getInputStream().reader().buffered())

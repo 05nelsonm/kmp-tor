@@ -80,14 +80,14 @@ actual interface TorController: TorControlProcessor, TorEventProcessor<TorEvent.
         actual suspend fun newInstance(address: ProxyAddress): TorController = address.toTorController()
 
         @Throws(TorControllerException::class)
-        actual suspend fun newInstance(unixSocket: Path): TorController {
+        actual suspend fun newInstance(unixDomainSocket: Path): TorController {
             val dispatchers = getTorControllerDispatchers()
             val socket = LocalSocket(LocalSocket.SOCKET_STREAM)
 
             try {
 
                 val (reader, writer) = withContext(dispatchers) {
-                    val address = LocalSocketAddress(unixSocket.value, LocalSocketAddress.Namespace.FILESYSTEM)
+                    val address = LocalSocketAddress(unixDomainSocket.value, LocalSocketAddress.Namespace.FILESYSTEM)
 
                     socket.connect(address)
 
@@ -112,7 +112,7 @@ actual interface TorController: TorControlProcessor, TorEventProcessor<TorEvent.
                     dispatchers.close()
                 } catch (_: Exception) {}
 
-                throw TorControllerException("Failed to open unix socket to $unixSocket", e)
+                throw TorControllerException("Failed to open unix socket to $unixDomainSocket", e)
             }
         }
     }

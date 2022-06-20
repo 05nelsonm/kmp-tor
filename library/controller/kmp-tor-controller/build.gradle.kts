@@ -30,13 +30,7 @@ kmpConfiguration {
     setupMultiplatform(
         setOf(
 
-            KmpTarget.Jvm.Jvm(
-                mainSourceSet = {
-                    dependencies {
-                        implementation(deps.jnrUnixSocket)
-                    }
-                }
-            ),
+            KmpTarget.Jvm.Jvm.DEFAULT,
 
             KmpTarget.Jvm.Android(
                 buildTools = versions.android.buildTools,
