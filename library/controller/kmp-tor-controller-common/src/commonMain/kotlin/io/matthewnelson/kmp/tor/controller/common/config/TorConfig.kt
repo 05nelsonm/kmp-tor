@@ -1018,6 +1018,8 @@ class TorConfig private constructor(
                 override val default: Option.FileSystemFile? = null
                 override var value: Option.FileSystemFile? = default
                     set(value) {
+                        // Do not set if unixDomainSockets are not supported
+                        if (!ControllerUtils.hasUnixDomainSocketSupport) return
                         // Do not set if path is empty
                         if (value?.nullIfEmpty == null) return
                         // Do not set if path can be turned into an integer (disabling, or setting a port)

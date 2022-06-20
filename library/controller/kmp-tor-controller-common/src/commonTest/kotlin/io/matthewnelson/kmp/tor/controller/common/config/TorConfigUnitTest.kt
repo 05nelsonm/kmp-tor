@@ -17,11 +17,14 @@ package io.matthewnelson.kmp.tor.controller.common.config
 
 import io.matthewnelson.kmp.tor.common.address.Port
 import io.matthewnelson.kmp.tor.common.address.PortProxy
+import io.matthewnelson.kmp.tor.common.annotation.InternalTorApi
 import io.matthewnelson.kmp.tor.controller.common.config.TorConfig.Option.*
 import io.matthewnelson.kmp.tor.controller.common.config.TorConfig.Setting.*
 import io.matthewnelson.kmp.tor.controller.common.file.Path
+import io.matthewnelson.kmp.tor.controller.common.internal.ControllerUtils
 import kotlin.test.*
 
+@OptIn(InternalTorApi::class)
 class TorConfigUnitTest {
 
     @Test
@@ -348,7 +351,10 @@ class TorConfigUnitTest {
     }
 
     @Test
-    fun givenUnixSocket_whenPathsSame_equalsEachother() {
+    fun givenUnixSocket_whenPathsSame_equalsEachOther() {
+        // Only run if support for domain sockets is had
+        if (!ControllerUtils.hasUnixDomainSocketSupport) return
+
         val control1 = UnixSocket.Control()
         control1.set(FileSystemFile(Path("/some/path")))
 
@@ -368,6 +374,9 @@ class TorConfigUnitTest {
 
     @Test
     fun givenUnixSocketControl_whenPathIntegerOrEmpty_valueNotSet() {
+        // Only run if support for domain sockets is had
+        if (!ControllerUtils.hasUnixDomainSocketSupport) return
+
         val control = UnixSocket.Control()
         control.set(FileSystemFile(Path("0")))
         assertNull(control.value)
@@ -381,6 +390,9 @@ class TorConfigUnitTest {
 
     @Test
     fun givenUnixSocketControl_whenCloned_matchesOriginal() {
+        // Only run if support for domain sockets is had
+        if (!ControllerUtils.hasUnixDomainSocketSupport) return
+
         val control = UnixSocket.Control()
         control.set(FileSystemFile(Path("/some/path")))
         control.setFlags(setOf(
@@ -389,6 +401,7 @@ class TorConfigUnitTest {
 
         val clone = control.clone()
 
+        assertNotNull(control.value)
         assertEquals(control.value, clone.value)
         assertEquals(control.flags, clone.flags)
     }
