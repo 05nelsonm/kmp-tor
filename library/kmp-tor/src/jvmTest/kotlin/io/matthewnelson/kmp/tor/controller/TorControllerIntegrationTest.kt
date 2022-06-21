@@ -513,4 +513,44 @@ class TorControllerIntegrationTest: TorTestHelper() {
 
         Unit
     }
+
+    @Test
+    fun givenTorController_whenConfigResetSocksUnixSocketWithFlags_returnsSuccess() = runBlocking {
+        val socks = TorConfig.Setting.UnixSockets.Socks()
+            .setFlags(setOf(
+                TorConfig.Setting.Ports.Socks.Flag.CacheDNS,
+                TorConfig.Setting.Ports.Socks.Flag.OnionTrafficOnly,
+            ))
+            .setIsolationFlags(setOf(
+                TorConfig.Setting.Ports.IsolationFlag.IsolateSOCKSAuth,
+            ))
+            .set(TorConfig.Option.FileSystemFile(configProvider.workDir.builder {
+                addSegment(TorConfig.Setting.DataDirectory.DEFAULT_NAME)
+                addSegment("socks_test_set.sock")
+            }))
+
+        var throwable: Throwable? = null
+        try {
+
+            manager.configSet(socks).getOrThrow()
+
+            val entry = manager.configGet(socks).getOrThrow().first()
+
+            val sb = StringBuilder()
+            socks.appendTo(sb, appendValue = true, isWriteTorConfig = true)
+            val expected = sb.toString().substringAfter(' ')
+            assertEquals(expected, entry.value)
+
+        } catch (t: Throwable) {
+            throwable = t
+        } finally {
+            manager.configLoad(awaitLastValidatedTorConfig().torConfig)
+
+            if (throwable != null) {
+                throw throwable
+            }
+        }
+
+        Unit
+    }
 }

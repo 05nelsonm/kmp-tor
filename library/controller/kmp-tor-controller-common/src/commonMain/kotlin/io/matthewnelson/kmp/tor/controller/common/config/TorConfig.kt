@@ -734,9 +734,6 @@ class TorConfig private constructor(
                 @JvmSynthetic
                 internal abstract fun getVirtPort(): Port
 
-                @JvmSynthetic
-                internal abstract fun getTarget(localHostIp: String, quotePath: Boolean): String
-
             }
 
             /**
@@ -770,10 +767,6 @@ class TorConfig private constructor(
             ): VirtualPort() {
 
                 override fun getVirtPort(): Port = virtualPort
-
-                override fun getTarget(localHostIp: String, quotePath: Boolean): String {
-                    return "$localHostIp:${targetPort.value}"
-                }
 
                 override fun equals(other: Any?): Boolean {
                     return other is VirtualPort && other.getVirtPort() == virtualPort
@@ -816,19 +809,6 @@ class TorConfig private constructor(
             ): VirtualPort() {
 
                 override fun getVirtPort(): Port = virtualPort
-
-                override fun getTarget(localHostIp: String, quotePath: Boolean): String {
-                    return StringBuilder().apply {
-                        append("unix:")
-                        if (quotePath) {
-                            append('"')
-                        }
-                        append(targetUnixSocket.value)
-                        if (quotePath) {
-                            append('"')
-                        }
-                    }.toString()
-                }
 
                 override fun equals(other: Any?): Boolean {
                     return other is VirtualPort && other.getVirtPort() == virtualPort

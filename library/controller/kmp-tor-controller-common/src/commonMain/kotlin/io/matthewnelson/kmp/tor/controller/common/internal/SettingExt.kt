@@ -79,9 +79,11 @@ fun TorConfig.Setting<*>.appendTo(
             sb.append(delimiter)
             sb.quoteIfTrue(!isWriteTorConfig)
             sb.append("unix:")
-            sb.quoteIfTrue(isWriteTorConfig)
+            sb.escapeIfTrue(!isWriteTorConfig)
+            sb.quote()
             sb.append(value?.value)
-            sb.quoteIfTrue(isWriteTorConfig)
+            sb.escapeIfTrue(!isWriteTorConfig)
+            sb.quote()
 
             when (this) {
                 is TorConfig.Setting.UnixSockets.Control -> {
@@ -173,7 +175,7 @@ fun TorConfig.Setting<*>.appendTo(
             sb.quoteIfTrue(!isWriteTorConfig)
         }
 
-        is TorConfig.Setting.HiddenService -> {
+        is HiddenService -> {
             if (!appendValue) {
                 sb.append(keyword)
                 sb.append(SP)
@@ -188,7 +190,7 @@ fun TorConfig.Setting<*>.appendTo(
             val hsDirPath = value ?: return
             val hsPorts = ports
 
-            if (hsPorts.isNullOrEmpty()) {
+            if (hsPorts == null || hsPorts.isEmpty()) {
                 return
             }
 
@@ -214,9 +216,27 @@ fun TorConfig.Setting<*>.appendTo(
                 sb.append("HiddenServicePort")
                 sb.append(delimiter)
                 sb.quoteIfTrue(!isWriteTorConfig)
-                sb.append(hsPort.getVirtPort().value)
-                sb.append(SP)
-                sb.append(hsPort.getTarget(localHostIp = localhostIp, quotePath = isWriteTorConfig))
+
+                when (hsPort) {
+                    is HiddenService.Ports -> {
+                        sb.append(hsPort.virtualPort.value)
+                        sb.append(SP)
+                        sb.append(localhostIp)
+                        sb.append(':')
+                        sb.append(hsPort.targetPort.value)
+                    }
+                    is HiddenService.UnixSocket -> {
+                        sb.append(hsPort.virtualPort.value)
+                        sb.append(SP)
+                        sb.append("unix:")
+                        sb.escapeIfTrue(!isWriteTorConfig)
+                        sb.quote()
+                        sb.append(hsPort.targetUnixSocket.value)
+                        sb.escapeIfTrue(!isWriteTorConfig)
+                        sb.quote()
+                    }
+                }
+
                 sb.quoteIfTrue(!isWriteTorConfig)
             }
 
@@ -227,7 +247,9 @@ fun TorConfig.Setting<*>.appendTo(
 
             sb.append("HiddenServiceMaxStreams")
             sb.append(delimiter)
+            sb.quoteIfTrue(!isWriteTorConfig)
             sb.append(maxStreams?.value ?: "0")
+            sb.quoteIfTrue(!isWriteTorConfig)
 
             sb.newLineIfTrue(isWriteTorConfig) {
                 // if false
@@ -236,8 +258,13 @@ fun TorConfig.Setting<*>.appendTo(
 
             sb.append("HiddenServiceMaxStreamsCloseCircuit")
             sb.append(delimiter)
+            sb.quoteIfTrue(!isWriteTorConfig)
             sb.append(maxStreamsCloseCircuit?.value ?: "0")
-            sb.newLineIfTrue(isWriteTorConfig)
+            sb.newLineIfTrue(isWriteTorConfig) {
+                // if false
+                quote()
+                this
+            }
         }
     }
 }
@@ -245,8 +272,25 @@ fun TorConfig.Setting<*>.appendTo(
 @Suppress("nothing_to_inline")
 private inline fun StringBuilder.quoteIfTrue(addQuote: Boolean) {
     if (addQuote) {
-        append('"')
+        quote()
     }
+}
+
+@Suppress("nothing_to_inline")
+private inline fun StringBuilder.quote() {
+    append('"')
+}
+
+@Suppress("nothing_to_inline")
+private inline fun StringBuilder.escapeIfTrue(addEscape: Boolean) {
+    if (addEscape) {
+        escape()
+    }
+}
+
+@Suppress("nothing_to_inline")
+private inline fun StringBuilder.escape() {
+    append('\\')
 }
 
 @Suppress("nothing_to_inline")
