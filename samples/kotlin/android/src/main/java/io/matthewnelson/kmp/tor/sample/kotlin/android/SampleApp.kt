@@ -68,7 +68,7 @@ class SampleApp: Application() {
                     socks.setFlags(setOf(
                         Ports.Socks.Flag.OnionTrafficOnly
                     )).setIsolationFlags(setOf(
-                        Ports.IsolationFlag.IsolateClientAddr
+                        Ports.IsolationFlag.IsolateClientAddr,
                     )).set(AorDorPort.Value(PortProxy(9264)))
                     put(socks)
 
@@ -77,7 +77,46 @@ class SampleApp: Application() {
 
                     // Not necessary, as if ControlPort is missing it will be
                     // automatically added for you; but for demonstration purposes...
-                    put(Ports.Control().set(AorDorPort.Auto))
+//                    put(Ports.Control().set(AorDorPort.Auto))
+
+                    // Use a UnixSocket instead of TCP for the ControlPort.
+                    //
+                    // A unix domain socket will always be preferred on Android
+                    // if neither Ports.Control or UnixSockets.Control are provided.
+                    put(UnixSockets.Control().set(FileSystemFile(
+                        workDir.builder {
+
+                            // Put the file in the "data" directory
+                            // so that we avoid any directory permission
+                            // issues.
+                            //
+                            // Note that DataDirectory is automatically added
+                            // for you if it is not present in your provided
+                            // config. If you set a custom Path for it, you
+                            // should use it here.
+                            addSegment(DataDirectory.DEFAULT_NAME)
+
+                            addSegment(UnixSockets.Control.DEFAULT_NAME)
+                        }
+                    )))
+
+                    // Use a UnixSocket instead of TCP for the SocksPort.
+                    put(UnixSockets.Socks().set(FileSystemFile(
+                        workDir.builder {
+
+                            // Put the file in the "data" directory
+                            // so that we avoid any directory permission
+                            // issues.
+                            //
+                            // Note that DataDirectory is automatically added
+                            // for you if it is not present in your provided
+                            // config. If you set a custom Path for it, you
+                            // should use it here.
+                            addSegment(DataDirectory.DEFAULT_NAME)
+
+                            addSegment(UnixSockets.Socks.DEFAULT_NAME)
+                        }
+                    )))
 
                     // For Android, disabling & reducing connection padding is
                     // advisable to minimize mobile data usage.
@@ -102,28 +141,29 @@ class SampleApp: Application() {
                         workDir.builder { addSegment(ClientOnionAuthDir.DEFAULT_NAME) }
                     )))
 
+                    val hsPath = workDir.builder {
+                        addSegment(HiddenService.DEFAULT_PARENT_DIR_NAME)
+                        addSegment("test_service")
+                    }
                     // Add Hidden services
                     put(HiddenService()
                         .setPorts(ports = setOf(
-                            HiddenService.Ports(virtualPort = Port(1025), targetPort = Port(1027)),
-                            HiddenService.Ports(virtualPort = Port(1026), targetPort = Port(1027))
+                            // Use a unix domain socket to communicate via IPC instead of over TCP
+                            HiddenService.UnixSocket(virtualPort = Port(80), targetUnixSocket = hsPath.builder {
+                                addSegment(HiddenService.UnixSocket.DEFAULT_UNIX_SOCKET_NAME)
+                            }),
                         ))
                         .setMaxStreams(maxStreams = HiddenService.MaxStreams(value = 2))
                         .setMaxStreamsCloseCircuit(value = TorF.True)
-                        .set(FileSystemDir(
-                            workDir.builder {
-                                addSegment(HiddenService.DEFAULT_PARENT_DIR_NAME)
-                                addSegment("test_service")
-                            }
-                        ))
+                        .set(FileSystemDir(path = hsPath))
                     )
 
                     put(HiddenService()
                         .setPorts(ports = setOf(
-                            HiddenService.Ports(virtualPort = Port(1028), targetPort = Port(1030)),
-                            HiddenService.Ports(virtualPort = Port(1029), targetPort = Port(1030))
+                            HiddenService.Ports(virtualPort = Port(80), targetPort = Port(1030)), // http
+                            HiddenService.Ports(virtualPort = Port(443), targetPort = Port(1030)) // https
                         ))
-                        .set(FileSystemDir(
+                        .set(FileSystemDir(path =
                             workDir.builder {
                                 addSegment(HiddenService.DEFAULT_PARENT_DIR_NAME)
                                 addSegment("test_service_2")

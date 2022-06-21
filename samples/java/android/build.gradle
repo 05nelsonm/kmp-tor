@@ -117,7 +117,7 @@ dependencies {
 //    implementation "io.matthewnelson.kotlin-components:kmp-tor-ext-callback-manager:${env.kmpTor.version.name}"
 
     implementation project(":library:kmp-tor")
-    implementation project(":library:extensions:kmp-tor-ext-callback-manager")
+    implementation project(":library:extensions:callback:kmp-tor-ext-callback-manager")
 
     // Even through kmp-tor comes with coroutines under the hood
     // and expressing the dependency is _not_ needed in kotlin

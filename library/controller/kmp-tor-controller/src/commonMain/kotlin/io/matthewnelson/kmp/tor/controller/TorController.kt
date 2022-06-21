@@ -36,6 +36,7 @@ import io.matthewnelson.kmp.tor.controller.common.events.TorEvent
 import io.matthewnelson.kmp.tor.controller.common.events.TorEventProcessor
 import io.matthewnelson.kmp.tor.controller.common.exceptions.ControllerShutdownException
 import io.matthewnelson.kmp.tor.controller.common.exceptions.TorControllerException
+import io.matthewnelson.kmp.tor.controller.common.file.Path
 import io.matthewnelson.kmp.tor.controller.internal.*
 import io.matthewnelson.kmp.tor.controller.internal.controller.*
 import io.matthewnelson.kmp.tor.controller.internal.controller.ListenersHandler
@@ -78,10 +79,16 @@ expect interface TorController: TorControlProcessor, TorEventProcessor<TorEvent.
     companion object {
 
         /**
-         * Opens a connection at [address] and returns a new [TorController]
+         * Opens a TCP connection to Tor's control port at the given [ProxyAddress]
          * */
         @Throws(TorControllerException::class)
         suspend fun newInstance(address: ProxyAddress): TorController
+
+        /**
+         * Opens a unix domain socket to Tor's control port at the give [Path]
+         * */
+        @Throws(TorControllerException::class)
+        suspend fun newInstance(unixDomainSocket: Path): TorController
     }
 }
 
@@ -182,24 +189,23 @@ private class RealTorController(
                         }
                     } else {
                         waiters.withLock {
-                            removeFirstOrNull()?.let { waiter ->
-                                replies.map { reply ->
-                                    when (reply) {
-                                        is ReplyLine.MultiLine -> {
-                                            ReplyLine.SingleLine(
-                                                reply.status,
-                                                reply.messages.joinToString(
-                                                    separator = "\n",
-                                                    prefix = reply.event
-                                                )
-                                            )
-                                        }
-                                        is ReplyLine.SingleLine -> {
-                                            reply
-                                        }
+                            val waiter = removeFirstOrNull() ?: return@withLock
+
+                            val lines = replies.map { reply ->
+                                when (reply) {
+                                    is ReplyLine.MultiLine -> {
+                                        ReplyLine.SingleLine(
+                                            reply.status,
+                                            reply.messages.joinToString(separator = "\n", prefix = reply.event)
+                                        )
                                     }
-                                }.let { lines -> waiter.setResponse(lines) }
+                                    is ReplyLine.SingleLine -> {
+                                        reply
+                                    }
+                                }
                             }
+
+                            waiter.setResponse(lines)
                         }
                     }
                 }

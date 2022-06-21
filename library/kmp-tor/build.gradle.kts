@@ -42,6 +42,8 @@ kmpConfiguration {
                 },
                 testSourceSet = {
                     dependencies {
+                        implementation(project(":library:extensions:unix-socket:kmp-tor-ext-unix-socket"))
+
                         // TODO: Remove once js binary targets are published
                         implementation("${pConfig.group}:kmp-tor-binary-linuxx64:${env.kmpTorBinaries.version.name}")
                         implementation("${pConfig.group}:kmp-tor-binary-linuxx86:${env.kmpTorBinaries.version.name}")
@@ -129,7 +131,7 @@ kmpConfiguration {
             dependencies {
                 implementation(depsTest.kotlin.coroutines)
                 implementation(kotlin("test"))
-                implementation(project(":library:extensions:kmp-tor-ext-callback-manager"))
+                implementation(project(":library:extensions:callback:kmp-tor-ext-callback-manager"))
             }
         },
         kotlin = {

@@ -27,6 +27,7 @@ import io.matthewnelson.kmp.tor.controller.common.config.TorConfig.Option.TorF.T
 import io.matthewnelson.kmp.tor.controller.common.file.Path
 import io.matthewnelson.kmp.tor.controller.common.internal.ControllerUtils
 import io.matthewnelson.kmp.tor.controller.common.internal.appendTo
+import io.matthewnelson.kmp.tor.controller.common.internal.isUnixPath
 import kotlin.jvm.JvmField
 import kotlin.jvm.JvmInline
 import kotlin.jvm.JvmStatic
@@ -67,7 +68,7 @@ class TorConfig private constructor(
     }
 
     override fun toString(): String {
-        return "TorConfig(settings=$REDACTED,text=$REDACTED)"
+        return "TorConfig(settings=$REDACTED, text=$REDACTED)"
     }
 
     /**
@@ -100,7 +101,7 @@ class TorConfig private constructor(
     class Builder {
 
         init {
-            // Reference so that localhostAddress for JVM can have it's initial
+            // Reference so that localhostAddress for JVM can have its initial
             // value set immediately from BG thread.
             ControllerUtils
         }
@@ -159,13 +160,21 @@ class TorConfig private constructor(
 
             val disabledPorts = mutableSetOf<String>()
             val sorted = settings.sortedBy { setting ->
-                if (setting is Setting.Ports) {
-                    if (setting.value is Option.AorDorPort.Disable) {
-                        disabledPorts.add(setting.keyword)
+                when (setting) {
+                    // Ports must come before UnixSocket to ensure
+                    // disabled ports are removed
+                    is Setting.Ports -> {
+                        if (setting.value is Option.AorDorPort.Disable) {
+                            disabledPorts.add(setting.keyword)
+                        }
+                        "AAAA${setting.keyword}"
                     }
-                    "AAA${setting.keyword}"
-                } else {
-                    setting.keyword
+                    is Setting.UnixSockets -> {
+                        "AAA${setting.keyword}"
+                    }
+                    else -> {
+                        setting.keyword
+                    }
                 }
             }
 
@@ -174,26 +183,34 @@ class TorConfig private constructor(
             val newSettings = mutableSetOf<Setting<*>>()
             for (setting in sorted) {
 
-                if (setting is Setting.Ports) {
-                    if (disabledPorts.contains(setting.keyword)) {
-                        if (!writtenDisabledPorts.contains(setting.keyword)) {
-                            sb.append(setting.keyword)
-                            sb.append(SP)
-                            sb.append(Option.AorDorPort.Disable.value)
-                            sb.append('\n')
-                            writtenDisabledPorts.add(setting.keyword)
+                when (setting) {
+                    is Setting.Ports -> {
+                        if (disabledPorts.contains(setting.keyword)) {
+                            if (!writtenDisabledPorts.contains(setting.keyword)) {
+                                sb.append(setting.keyword)
+                                sb.append(SP)
+                                sb.append(Option.AorDorPort.Disable.value)
+                                sb.appendLine()
+                                writtenDisabledPorts.add(setting.keyword)
+                            }
+
+                            if (setting.value is Option.AorDorPort.Disable) {
+                                newSettings.add(setting.setImmutable())
+                            }
+
+                            continue
                         }
 
-                        if (setting.value is Option.AorDorPort.Disable) {
-                            newSettings.add(setting.setImmutable())
-                        }
-
-                        continue
+                        setting.appendTo(sb, appendValue = true, isWriteTorConfig = true)
                     }
+                    is Setting.UnixSockets -> {
+                        if (disabledPorts.contains(setting.keyword)) continue
 
-                    setting.appendTo(sb, appendValue = true, isWriteTorConfig = true)
-                } else {
-                    setting.appendTo(sb, appendValue = true, isWriteTorConfig = true)
+                        setting.appendTo(sb, appendValue = true, isWriteTorConfig = true)
+                    }
+                    else -> {
+                        setting.appendTo(sb, appendValue = true, isWriteTorConfig = true)
+                    }
                 }
 
                 newSettings.add(setting.setImmutable())
@@ -543,21 +560,24 @@ class TorConfig private constructor(
         }
 
         /**
+         * val hsDirPath = workDir.builder {
+         *     addSegment(HiddenService.DEFAULT_PARENT_DIR_NAME)
+         *     addSegment("my_hidden_service")
+         * }
+         *
          * val myHiddenService = Setting.HiddenService()
          *     .setPorts(ports = setOf(
+         *         Setting.HiddenService.UnixSocket(virtualPort = Port(80), targetUnixSocket = hsDirPath.builder {
+         *             addSegment(Setting.HiddenService.UnixSocket.DEFAULT_UNIX_SOCKET_NAME)
+         *         })
          *         Setting.HiddenService.Ports(virtualPort = Port(22))
          *         Setting.HiddenService.Ports(virtualPort = Port(8022), targetPort = Port(22))
          *     ))
          *     .setMaxStreams(maxStreams = Setting.HiddenService.MaxStreams(2))
          *     .setMaxStreamsCloseCircuit(value = TorF.False)
-         *     .set(FileSystemDir(
-         *         workDir.builder {
-         *             addSegment(HiddenService.DEFAULT_PARENT_DIR_NAME)
-         *             addSegment("my_hidden_service")
-         *         }
-         *     ))
+         *     .set(FileSystemDir(hsDirPath))
          *
-         * Note that both `set` and `setPorts` _must_ be set for it to be added
+         * Note that both `set` and `setPorts` _must_ be called for it to be added
          * to your config.
          *
          * https://2019.www.torproject.org/docs/tor-manual.html.en#HiddenServiceDir
@@ -573,9 +593,9 @@ class TorConfig private constructor(
             override val isStartArgument: Boolean get() = false
 
             /**
-             * See [HiddenService.Ports]
+             * See [HiddenService.VirtualPort]
              * */
-            var ports: Set<HiddenService.Ports>? = null
+            var ports: Set<HiddenService.VirtualPort>? = null
                 private set
 
             /**
@@ -594,10 +614,32 @@ class TorConfig private constructor(
             var maxStreamsCloseCircuit: Option.TorF? = null
                 private set
 
-            fun setPorts(ports: Set<Ports>?): HiddenService {
+            fun setPorts(ports: Set<VirtualPort>?): HiddenService {
                 if (isMutable) {
-                    this.ports = ports
+                    if (ports.isNullOrEmpty()) {
+                        this.ports = null
+                    } else {
+                        val filtered = ports.filter { instance ->
+                            when (instance) {
+                                is UnixSocket -> {
+                                    if (!ControllerUtils.isLinux) {
+                                        false
+                                    } else {
+                                        instance.targetUnixSocket.isUnixPath
+                                    }
+                                }
+                                is Ports -> true
+                            }
+                        }
+
+                        this.ports = if (filtered.isNotEmpty()) {
+                            filtered.toSet()
+                        } else {
+                            null
+                        }
+                    }
                 }
+
                 return this
             }
 
@@ -634,11 +676,24 @@ class TorConfig private constructor(
             }
 
             override fun equals(other: Any?): Boolean {
-                return  other is HiddenService && other.value == value
+                return other is HiddenService && other.value == value
             }
 
             override fun hashCode(): Int {
                 return 14 * 31 + value.hashCode()
+            }
+
+            /**
+             * See [HiddenService.Ports] && [HiddenService.UnixSocket]
+             * */
+            sealed class VirtualPort {
+
+                @JvmSynthetic
+                internal abstract fun getVirtPort(): Port
+
+                @JvmSynthetic
+                internal abstract fun getTarget(localHostIp: String, quotePath: Boolean): String
+
             }
 
             /**
@@ -668,15 +723,80 @@ class TorConfig private constructor(
                 @JvmField
                 val virtualPort: Port,
                 @JvmField
-                val targetPort: Port = virtualPort
-            ) {
+                val targetPort: Port = virtualPort,
+            ): VirtualPort() {
+
+                override fun getVirtPort(): Port = virtualPort
+
+                override fun getTarget(localHostIp: String, quotePath: Boolean): String {
+                    return "$localHostIp:${targetPort.value}"
+                }
 
                 override fun equals(other: Any?): Boolean {
-                    return  other is Ports && other.virtualPort == virtualPort
+                    return other is VirtualPort && other.getVirtPort() == virtualPort
                 }
 
                 override fun hashCode(): Int {
                     return 18 * 31 + virtualPort.hashCode()
+                }
+            }
+
+            /**
+             * Instead of directing traffic to a server on the local machine via
+             * TCP connection (and potentially leaking info), use a Unix Domain
+             * Socket and communicate via IPC.
+             *
+             * Support for this is only available for linux. If not on linux (or
+             * android). All [UnixSocket]s will be removed when [setPorts] is
+             * called, so it is safe to call this from common code.
+             *
+             * You can check [ControllerUtils.isLinux] when setting up your hidden
+             * service if you need to implement a fallback to use TCP.
+             *
+             * EX:
+             *  - Server running on unix domain socket with endpoint `/api/v1/endpoint`
+             *  - Listen for all http traffic:
+             *      UnixSocket(
+             *          virtualPort = Port(80),
+             *          targetUnixSocket = Path("/home/user/.myApp/torservice/hidden_services/my_service/hs.sock")
+             *      )
+             *
+             *      http://<onion-address>.onion/api/v1/endpoint
+             *
+             * https://2019.www.torproject.org/docs/tor-manual.html.en#HiddenServicePort
+             * */
+            data class UnixSocket(
+                @JvmField
+                val virtualPort: Port,
+                @JvmField
+                val targetUnixSocket: Path,
+            ): VirtualPort() {
+
+                override fun getVirtPort(): Port = virtualPort
+
+                override fun getTarget(localHostIp: String, quotePath: Boolean): String {
+                    return StringBuilder().apply {
+                        append("unix:")
+                        if (quotePath) {
+                            append('"')
+                        }
+                        append(targetUnixSocket.value)
+                        if (quotePath) {
+                            append('"')
+                        }
+                    }.toString()
+                }
+
+                override fun equals(other: Any?): Boolean {
+                    return other is VirtualPort && other.getVirtPort() == virtualPort
+                }
+
+                override fun hashCode(): Int {
+                    return 18 * 31 + virtualPort.hashCode()
+                }
+
+                companion object {
+                    const val DEFAULT_UNIX_SOCKET_NAME = "hs.sock"
                 }
             }
 
@@ -705,6 +825,10 @@ class TorConfig private constructor(
                     require(value in Port.MIN..Port.MAX) {
                         "MaxStreams.value must be between ${Port.MIN} and ${Port.MAX}"
                     }
+                }
+
+                override fun toString(): String {
+                    return "MaxStreams(value=$value)"
                 }
             }
 
@@ -770,6 +894,8 @@ class TorConfig private constructor(
              * excluding it from your config will not set it to a Port. As this
              * library depends on the [Control] port, the default value here differs
              * and cannot be set to [Option.AorDorPort.Disable].
+             *
+             * @see [UnixSockets.Control]
              * */
             class Control                       : Ports("ControlPort") {
                 override val default: Option.AorDorPort get() = Option.AorDorPort.Auto
@@ -782,33 +908,8 @@ class TorConfig private constructor(
                 @InternalTorApi
                 override val isStartArgument: Boolean get() = true
 
-                var flags: Set<Flag>? = null
-                    private set
-
-                override fun setDefault(): Control {
-                    if (isMutable) {
-                        value = default
-                        flags = null
-                    }
-                    return this
-                }
-
-                fun setFlags(flags: Set<Flag>?): Control {
-                    if (isMutable) {
-                        this.flags = flags?.toSet()
-                    }
-                    return this
-                }
-
                 override fun clone(): Control {
-                    return Control().setFlags(flags).set(value) as Control
-                }
-
-                sealed class Flag(@JvmField val value: String) {
-                    // TODO: Implement Unix domains in addition to Port capabilities
-//                    object GroupWritable                    : Flag("GroupWritable")
-//                    object WorldWritable                    : Flag("WorldWritable")
-//                    object RelaxDirModeCheck                : Flag("RelaxDirModeCheck")
+                    return Control().set(value) as Control
                 }
             }
 
@@ -818,8 +919,10 @@ class TorConfig private constructor(
             class Dns                           : Ports("DNSPort") {
                 override val default: Option.AorDorPort get() = Option.AorDorPort.Disable
                 override var value: Option.AorDorPort = default
+
                 var isolationFlags: Set<IsolationFlag>? = null
                     private set
+
                 @InternalTorApi
                 override val isStartArgument: Boolean get() = false
 
@@ -849,8 +952,10 @@ class TorConfig private constructor(
             class HttpTunnel                    : Ports("HTTPTunnelPort") {
                 override val default: Option.AorDorPort get() = Option.AorDorPort.Disable
                 override var value: Option.AorDorPort = default
+
                 var isolationFlags: Set<IsolationFlag>? = null
                     private set
+
                 @InternalTorApi
                 override val isStartArgument: Boolean get() = false
 
@@ -881,10 +986,12 @@ class TorConfig private constructor(
                 override val default: Option.AorDorPort
                     get() = Option.AorDorPort.Value(PortProxy(9050))
                 override var value: Option.AorDorPort = default
+
                 var flags: Set<Flag>? = null
                     private set
                 var isolationFlags: Set<IsolationFlag>? = null
                     private set
+
                 @InternalTorApi
                 override val isStartArgument: Boolean get() = false
 
@@ -912,10 +1019,16 @@ class TorConfig private constructor(
                 }
 
                 override fun clone(): Socks {
-                    return Socks().setFlags(flags).setIsolationFlags(isolationFlags).set(value) as Socks
+                    return Socks()
+                        .setFlags(flags)
+                        .setIsolationFlags(isolationFlags)
+                        .set(value) as Socks
                 }
 
                 sealed class Flag(@JvmField val value: String) {
+
+                    override fun toString(): String = value
+
                     object NoIPv4Traffic                    : Flag("NoIPv4Traffic")
                     object IPv6Traffic                      : Flag("IPv6Traffic")
                     object PreferIPv6                       : Flag("PreferIPv6")
@@ -924,8 +1037,6 @@ class TorConfig private constructor(
                     object OnionTrafficOnly                 : Flag("OnionTrafficOnly")
                     object CacheIPv4DNS                     : Flag("CacheIPv4DNS")
                     object CacheIPv6DNS                     : Flag("CacheIPv6DNS")
-//                    object GroupWritable                    : Flag("GroupWritable")
-//                    object WorldWritable                    : Flag("WorldWritable")
                     object CacheDNS                         : Flag("CacheDNS")
                     object UseIPv4Cache                     : Flag("UseIPv4Cache")
                     object UseIPv6Cache                     : Flag("UseIPv6Cache")
@@ -941,8 +1052,10 @@ class TorConfig private constructor(
             class Trans                         : Ports("TransPort") {
                 override val default: Option.AorDorPort get() = Option.AorDorPort.Disable
                 override var value: Option.AorDorPort = default
+
                 var isolationFlags: Set<IsolationFlag>? = null
                     private set
+
                 @InternalTorApi
                 override val isStartArgument: Boolean get() = false
 
@@ -971,9 +1084,7 @@ class TorConfig private constructor(
              * */
             sealed class IsolationFlag(@JvmField val value: String) {
 
-                override fun toString(): String {
-                    return value
-                }
+                override fun toString(): String = value
 
                 object IsolateClientAddr                : IsolationFlag("IsolateClientAddr")
                 object IsolateSOCKSAuth                 : IsolationFlag("IsolateSOCKSAuth")
@@ -990,14 +1101,153 @@ class TorConfig private constructor(
                     }
 
                     override fun equals(other: Any?): Boolean {
-                        return  other != null           &&
-                                other is SessionGroup
+                        return other != null && other is SessionGroup
                     }
 
                     override fun hashCode(): Int {
                         return 17 * 31 + "SessionGroup".hashCode()
                     }
                 }
+            }
+        }
+
+        sealed class UnixSockets(keyword: String) : Setting<Option.FileSystemFile?>(keyword) {
+
+            final override val default: Option.FileSystemFile? = null
+            override var value: Option.FileSystemFile? = default
+                set(value) {
+                    // Do not set if platform is something other than linux
+                    if (!ControllerUtils.isLinux) return
+                    // Do not set if unix domain sockets are not supported for control port
+                    if (this is Control && !ControllerUtils.hasControlUnixDomainSocketSupport) return
+                    // First character of the path must be / (Unix FileSystem) root dir char
+                    if (value?.path?.isUnixPath != true) return
+
+                    field = value
+                }
+
+            override fun equals(other: Any?): Boolean {
+                return other is UnixSockets && other.value == value
+            }
+
+            override fun hashCode(): Int {
+                var result = 17 - 3
+                result = result * 31 + value.hashCode()
+                return result
+            }
+
+            /**
+             * https://2019.www.torproject.org/docs/tor-manual.html.en#ControlPort
+             * */
+            class Control                       : UnixSockets("ControlPort") {
+
+                var unixFlags: Set<UnixSockets.Control.Flag>? = null
+                    private set
+
+                @InternalTorApi
+                override val isStartArgument: Boolean get() = true
+
+                override fun setDefault(): Control {
+                    if (isMutable) {
+                        value = default
+                        unixFlags = null
+                    }
+                    return this
+                }
+
+                fun setUnixFlags(flags: Set<UnixSockets.Control.Flag>?): Control {
+                    if (isMutable) {
+                        unixFlags = flags?.toSet()
+                    }
+                    return this
+                }
+
+                override fun clone(): Control {
+                    return Control().setUnixFlags(unixFlags).set(value) as Control
+                }
+
+                sealed class Flag(@JvmField val value: String) {
+
+                    override fun toString(): String = value
+
+                    object RelaxDirModeCheck         : Flag("RelaxDirModeCheck")
+
+                    // conveniences...
+                    companion object {
+                        @get:JvmStatic
+                        val GroupWritable get() = UnixSockets.Flag.GroupWritable
+                        @get:JvmStatic
+                        val WorldWritable get() = UnixSockets.Flag.WorldWritable
+                    }
+                }
+
+                companion object {
+                    const val DEFAULT_NAME = "control.sock"
+                }
+            }
+
+            /**
+             * https://2019.www.torproject.org/docs/tor-manual.html.en#SocksPort
+             * */
+            class Socks                       : UnixSockets("SocksPort") {
+
+                var flags: Set<Ports.Socks.Flag>? = null
+                    private set
+                var unixFlags: Set<UnixSockets.Flag>? = null
+                    private set
+                var isolationFlags: Set<Ports.IsolationFlag>? = null
+                    private set
+
+                @InternalTorApi
+                override val isStartArgument: Boolean get() = false
+
+                override fun setDefault(): Socks {
+                    if (isMutable) {
+                        value = default
+                        flags = null
+                        unixFlags = null
+                        isolationFlags = null
+                    }
+                    return this
+                }
+
+                fun setFlags(flags: Set<Ports.Socks.Flag>?): Socks {
+                    if (isMutable) {
+                        this.flags = flags?.toSet()
+                    }
+                    return this
+                }
+
+                fun setUnixFlags(flags: Set<UnixSockets.Flag>?): Socks {
+                    if (isMutable) {
+                        unixFlags = flags?.toSet()
+                    }
+                    return this
+                }
+
+                fun setIsolationFlags(flags: Set<Ports.IsolationFlag>?): Socks {
+                    if (isMutable) {
+                        isolationFlags = flags?.toSet()
+                    }
+                    return this
+                }
+
+                override fun clone(): Socks {
+                    return Socks()
+                        .setFlags(flags)
+                        .setUnixFlags(unixFlags)
+                        .setIsolationFlags(isolationFlags)
+                        .set(value) as Socks
+                }
+
+                companion object {
+                    const val DEFAULT_NAME = "socks.sock"
+                }
+            }
+
+            sealed class Flag(value: String): UnixSockets.Control.Flag(value) {
+                object GroupWritable                    : Flag("GroupWritable")
+                object WorldWritable                    : Flag("WorldWritable")
             }
         }
 

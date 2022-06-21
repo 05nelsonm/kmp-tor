@@ -16,61 +16,104 @@
 package io.matthewnelson.kmp.tor.manager.internal.util
 
 import io.matthewnelson.kmp.tor.common.address.Port
+import io.matthewnelson.kmp.tor.common.annotation.InternalTorApi
+import io.matthewnelson.kmp.tor.controller.common.config.TorConfig
 import io.matthewnelson.kmp.tor.controller.common.config.TorConfig.Option.AorDorPort
 import io.matthewnelson.kmp.tor.controller.common.config.TorConfig.Setting.Ports
+import io.matthewnelson.kmp.tor.controller.common.config.TorConfig.Setting.UnixSockets
+import io.matthewnelson.kmp.tor.controller.common.file.Path
+import io.matthewnelson.kmp.tor.controller.common.internal.ControllerUtils
 
-internal class PortValidator internal constructor() {
-    private val configPorts: MutableSet<Ports> = mutableSetOf()
-    var hasControlPort = false
+internal class PortValidator internal constructor(private val dataDir: Path) {
+
+    private val ports: MutableSet<Ports> = mutableSetOf()
+    private val unixSockets: MutableSet<UnixSockets> = mutableSetOf()
+
+    var hasControl = false
         private set
-    var hasSocksPort = false
+    var hasSocks = false
         private set
 
     fun add(port: Ports) {
-        if (port is Ports.Control) {
-            hasControlPort = true
-        } else if (port is Ports.Socks) {
-            hasSocksPort = true
+        if (!ports.add(port)) {
+            return
         }
-        configPorts.add(port)
+
+        if (port is Ports.Control) {
+            hasControl = true
+        } else if (port is Ports.Socks) {
+            hasSocks = true
+        }
     }
 
-    @Suppress("unchecked_cast")
-    fun validate(isPortAvailable: (Port) -> Boolean): Set<Ports> {
-        if (!hasSocksPort) {
-            // Try to add default 9050 so we can validate that it is open
-            val socks = Ports.Socks()
-            if (!configPorts.add(socks)) {
-                // set to auto if another port type is set to 9050
-                socks.set(AorDorPort.Auto)
-                configPorts.add(socks)
-            }
-            hasSocksPort = true
+    fun add(unixSocket: UnixSockets) {
+        if (!unixSockets.add(unixSocket)) {
+            return
         }
 
-        val validatedPorts: MutableSet<Ports> = mutableSetOf()
+        if (unixSocket is UnixSockets.Control) {
+            hasControl = true
+        } else if (unixSocket is UnixSockets.Socks) {
+            hasSocks = true
+        }
+    }
 
-        for (port in configPorts) {
+    fun validate(isPortAvailable: (Port) -> Boolean): Set<TorConfig.Setting<*>> {
+        if (!hasSocks) {
+            // Try to add default 9050 so we can validate that it is open
+            val socks = Ports.Socks()
+            if (!ports.add(socks)) {
+                // set to auto if another port type is set to 9050
+                socks.set(AorDorPort.Auto)
+                ports.add(socks)
+            }
+            hasSocks = true
+        }
+
+        val validated: MutableSet<TorConfig.Setting<*>> = mutableSetOf()
+
+        for (port in ports) {
             when (val option = port.value) {
                 is AorDorPort.Auto,
                 is AorDorPort.Disable -> {
-                    validatedPorts.add(port)
+                    validated.add(port)
                 }
                 is AorDorPort.Value -> {
                     if (isPortAvailable.invoke(Port(option.port.value))) {
-                        validatedPorts.add(port)
+                        validated.add(port)
                     } else {
                         // Unavailable. Set to auto
-                        validatedPorts.add(port.clone().set(AorDorPort.Auto) as Ports)
+                        validated.add(port.clone().set(AorDorPort.Auto))
                     }
                 }
             }
         }
 
-        if (!hasControlPort) {
-            validatedPorts.add(Ports.Control().set(AorDorPort.Auto) as Ports)
+        if (!hasControl) {
+            // Prefer using unix domain socket if it's supported.
+            @OptIn(InternalTorApi::class)
+            val control = if (ControllerUtils.hasControlUnixDomainSocketSupport) {
+                UnixSockets.Control().set(
+                    TorConfig.Option.FileSystemFile(
+                        dataDir.builder {
+                            addSegment(UnixSockets.Control.DEFAULT_NAME)
+                        }
+                    )
+                )
+            } else {
+                Ports.Control().set(AorDorPort.Auto)
+            }
+
+            if (!validated.add(control)) {
+                // Will only be the case if another unix domain socket path
+                // is the same as what we set UnixSocket.Control to.
+                validated.remove(control)
+                validated.add(control)
+            }
         }
 
-        return validatedPorts
+        validated.addAll(unixSockets)
+
+        return validated
     }
 }

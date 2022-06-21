@@ -684,7 +684,7 @@ private class RealTorManager(
             }
 
             when {
-                output.startsWith("Bootstrapped ") -> {
+                output.startsWith(BOOTSTRAPPED) -> {
                     val percent = output.eventNoticeBootstrapProgressOrNull()
 
                     if (percent != null) {
@@ -697,34 +697,44 @@ private class RealTorManager(
                 // Closing no-longer-configured HTTP tunnel listener on 127.0.0.1:48932
                 // Closing no-longer-configured Socks listener on 127.0.0.1:9150
                 // Closing no-longer-configured Transparent pf/netfilter listener on 127.0.0.1:45963
-                output.startsWith("Closing no-longer-configured ") &&
-                        output.contains(" listener on ")                                -> {
+
+                // UNIX DOMAIN SOCKET
+                // Closing no-longer-configured Socks listener on ???:0
+                output.startsWith(PROXY_LISTENER_CLOSING) &&
+                output.contains(PROXY_LISTENER_ON) -> {
 
                     val splits = output.split(' ')
-                    val address = splits.lastOrNull()?.trim()
+                    val address = output.substringAfter(PROXY_LISTENER_ON).trim()
 
-                    if (address != null) {
+                    if (address != output && address.isNotBlank()) {
                         val info = _addressInfo.value
                         when (splits.elementAtOrNull(2)?.lowercase()) {
-                            "dns" -> {
+                            DNS -> {
                                 info.dnsClosed(address)?.let { newInfo ->
                                     _addressInfo.value = newInfo
                                     dispatchNewAddressInfo(newInfo)
                                 }
                             }
-                            "http" -> {
+                            HTTP -> {
                                 info.httpClosed(address)?.let { newInfo ->
                                     _addressInfo.value = newInfo
                                     dispatchNewAddressInfo(newInfo)
                                 }
                             }
-                            "socks" -> {
-                                info.socksClosed(address)?.let { newInfo ->
-                                    _addressInfo.value = newInfo
-                                    dispatchNewAddressInfo(newInfo)
+                            SOCKS -> {
+                                if (address.first() == '?' || address.first() == '/') {
+                                    info.unixSocksClosed(address)?.let { newInfo ->
+                                        _addressInfo.value = newInfo
+                                        dispatchNewAddressInfo(newInfo)
+                                    }
+                                } else {
+                                    info.socksClosed(address)?.let { newInfo ->
+                                        _addressInfo.value = newInfo
+                                        dispatchNewAddressInfo(newInfo)
+                                    }
                                 }
                             }
-                            "transparent" -> {
+                            TRANS -> {
                                 info.transClosed(address)?.let { newInfo ->
                                     _addressInfo.value = newInfo
                                     dispatchNewAddressInfo(newInfo)
@@ -737,34 +747,44 @@ private class RealTorManager(
                 // Opened HTTP tunnel listener connection (ready) on 127.0.0.1:48601
                 // Opened Socks listener connection (ready) on 127.0.0.1:9050
                 // Opened Transparent pf/netfilter listener connection (ready) on 127.0.0.1:48494
-                output.startsWith("Opened ") &&
-                        output.contains(" listener connection ")                        -> {
+
+                // UNIX DOMAIN SOCKET
+                // Opened Socks listener connection (ready) on /tmp/kmptor-javafx-sample/INSTANCE_111/work/data/socks.sock
+                output.startsWith(PROXY_LISTENER_OPENED) &&
+                output.contains(PROXY_LISTENER_CONNECTION_READY) -> {
 
                     val splits = output.split(' ')
-                    val address = splits.lastOrNull()?.trim()
+                    val address = output.substringAfter(PROXY_LISTENER_CONNECTION_READY).trim()
 
-                    if (address != null) {
+                    if (address != output && address.isNotBlank()) {
                         val info = _addressInfo.value
                         when (splits.elementAtOrNull(1)?.lowercase()) {
-                            "dns" -> {
+                            DNS -> {
                                 info.dnsOpened(address)?.let { newInfo ->
                                     _addressInfo.value = newInfo
                                     dispatchNewAddressInfo(newInfo)
                                 }
                             }
-                            "http" -> {
+                            HTTP -> {
                                 info.httpOpened(address)?.let { newInfo ->
                                     _addressInfo.value = newInfo
                                     dispatchNewAddressInfo(newInfo)
                                 }
                             }
-                            "socks" -> {
-                                info.socksOpened(address)?.let { newInfo ->
-                                    _addressInfo.value = newInfo
-                                    dispatchNewAddressInfo(newInfo)
+                            SOCKS -> {
+                                if (address.first() == '/') {
+                                    info.unixSocksOpened(address)?.let { newInfo ->
+                                        _addressInfo.value = newInfo
+                                        dispatchNewAddressInfo(newInfo)
+                                    }
+                                } else {
+                                    info.socksOpened(address)?.let { newInfo ->
+                                        _addressInfo.value = newInfo
+                                        dispatchNewAddressInfo(newInfo)
+                                    }
                                 }
                             }
-                            "transparent" -> {
+                            TRANS -> {
                                 info.transOpened(address)?.let { newInfo ->
                                     _addressInfo.value = newInfo
                                     dispatchNewAddressInfo(newInfo)
@@ -955,6 +975,21 @@ private class RealTorManager(
 
             return result
         }
+    }
+
+    companion object {
+        private const val BOOTSTRAPPED = "Bootstrapped "
+
+        private const val PROXY_LISTENER_CLOSING = "Closing no-longer-configured "
+        private const val PROXY_LISTENER_OPENED = "Opened "
+
+        private const val PROXY_LISTENER_ON = " listener on "
+        private const val PROXY_LISTENER_CONNECTION_READY = " listener connection (ready) on "
+
+        private const val DNS = "dns"
+        private const val HTTP = "http"
+        private const val SOCKS = "socks"
+        private const val TRANS = "transparent"
     }
 
 }

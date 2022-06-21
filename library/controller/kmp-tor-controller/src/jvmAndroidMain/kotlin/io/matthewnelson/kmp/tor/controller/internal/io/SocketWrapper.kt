@@ -15,7 +15,7 @@
  **/
 package io.matthewnelson.kmp.tor.controller.internal.io
 
-import java.net.Socket
+import java.io.Closeable
 
 @JvmInline
 internal actual value class SocketWrapper private actual constructor(private val socket: Any) {
@@ -23,11 +23,11 @@ internal actual value class SocketWrapper private actual constructor(private val
     @JvmSynthetic
     @Throws(Exception::class)
     actual fun close() {
-        (socket as Socket).close()
+        (socket as Closeable).close()
     }
 
     companion object {
         @JvmSynthetic
-        internal fun wrap(socket: Socket): SocketWrapper = SocketWrapper(socket)
+        internal fun wrap(socket: Closeable): SocketWrapper = SocketWrapper(socket)
     }
 }

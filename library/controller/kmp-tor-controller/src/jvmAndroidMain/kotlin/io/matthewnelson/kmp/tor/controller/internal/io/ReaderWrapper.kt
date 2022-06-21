@@ -18,8 +18,6 @@ package io.matthewnelson.kmp.tor.controller.internal.io
 import io.matthewnelson.kmp.tor.controller.common.exceptions.TorControllerException
 import java.io.BufferedReader
 import java.io.IOException
-import java.net.Socket
-import java.net.SocketException
 
 @JvmInline
 internal actual value class ReaderWrapper private actual constructor(private val value: Any) {
@@ -38,8 +36,7 @@ internal actual value class ReaderWrapper private actual constructor(private val
 
     companion object {
         @JvmSynthetic
-        @Throws(IOException::class, SocketException::class)
-        internal fun from(socket: Socket): ReaderWrapper =
-            ReaderWrapper(socket.getInputStream().reader().buffered())
+        internal fun wrap(reader: BufferedReader): ReaderWrapper =
+            ReaderWrapper(reader)
     }
 }

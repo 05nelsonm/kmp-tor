@@ -15,6 +15,7 @@
  **/
 import io.matthewnelson.kotlin.components.dependencies.deps
 import io.matthewnelson.kotlin.components.dependencies.depsTest
+import io.matthewnelson.kotlin.components.dependencies.versions
 import io.matthewnelson.kotlin.components.kmp.KmpTarget
 import io.matthewnelson.kotlin.components.kmp.util.sourceSetJvmAndroidMain
 import kmp.tor.env
@@ -30,6 +31,15 @@ kmpConfiguration {
         setOf(
 
             KmpTarget.Jvm.Jvm.DEFAULT,
+
+            KmpTarget.Jvm.Android(
+                buildTools = versions.android.buildTools,
+                compileSdk = versions.android.sdkCompile,
+                minSdk = versions.android.sdkMin16,
+                target = {
+                    publishLibraryVariants("release")
+                },
+            ),
 
 //            KmpTarget.NonJvm.JS(
 //                compilerType = KotlinJsCompilerType.BOTH,
@@ -63,6 +73,7 @@ kmpConfiguration {
         commonMainSourceSet = {
             dependencies {
                 implementation(deps.components.encoding.base16)
+                implementation(deps.kotlin.atomicfu.atomicfu)
                 implementation(deps.kotlin.coroutines.core.core)
                 api(project(":library:controller:kmp-tor-controller-common"))
             }

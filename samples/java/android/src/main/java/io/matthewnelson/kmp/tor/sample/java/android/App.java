@@ -72,25 +72,53 @@ public class App extends Application {
                 Ports.HttpTunnel http = new Ports.HttpTunnel();
                 http.set(AorDorPort.Auto.INSTANCE);
 
-                HiddenService myHiddenService = new HiddenService();
-
-                myHiddenService.set(FileSystemDir.invoke(
+                // Use a UnixSocket instead of TCP for the ControlPort.
+                //
+                // A unix domain socket will always be preferred on Android
+                // if neither Ports.Control or UnixSockets.Control are provided.
+                UnixSockets.Control control = new UnixSockets.Control();
+                control.set(FileSystemFile.invoke(
                     getWorkDir().builder()
-                        .addSegment(HiddenService.DEFAULT_PARENT_DIR_NAME)
-                        .addSegment("my_hidden_service")
+
+                        // Put the file in the "data" directory
+                        // so that we avoid any directory permission
+                        // issues.
+                        //
+                        // Note that DataDirectory is automatically added
+                        // for you if it is not present in your provided
+                        // config. If you set a custom Path for it, you
+                        // should use it here.
+                        .addSegment(DataDirectory.DEFAULT_NAME)
+
+                        .addSegment(UnixSockets.Control.DEFAULT_NAME)
                         .build()
                 ));
 
-                Set<HiddenService.Ports> hsPorts = new HashSet<>(2);
-                HiddenService.Ports httpPort = new HiddenService.Ports(Port.invoke(80), Port.invoke(8080));
-                hsPorts.add(httpPort);
-                hsPorts.add(httpPort.copy(Port.invoke(443), httpPort.targetPort)); // also allow https connections
+                HiddenService myHiddenService = new HiddenService();
+
+                Path hsPath = getWorkDir().builder()
+                    .addSegment(HiddenService.DEFAULT_PARENT_DIR_NAME)
+                    .addSegment("my_hidden_service")
+                    .build();
+
+                myHiddenService.set(FileSystemDir.invoke(hsPath));
+
+                Set<HiddenService.VirtualPort> hsPorts = new HashSet<>(1);
+                // Use a unix domain socket to communicate via IPC instead of over TCP
+                HiddenService.UnixSocket unixSocket = new HiddenService.UnixSocket(
+                    Port.invoke(80),
+                    hsPath.builder()
+                        .addSegment(HiddenService.UnixSocket.DEFAULT_UNIX_SOCKET_NAME)
+                        .build()
+                );
+                hsPorts.add(unixSocket);
 
                 myHiddenService.setPorts(hsPorts);
 
                 return new TorConfig.Builder()
                     .put(socks)
                     .put(http)
+                    .put(control)
                     .put(myHiddenService)
                     .build();
             }
@@ -143,7 +171,7 @@ public class App extends Application {
 
         @Override
         public void managerEventAddressInfo(@NonNull TorManagerEvent.AddressInfo info) {
-            if (info.isNull()) {
+            if (info.isNull) {
                 // Tear down HttpClient
             } else {
                 try {

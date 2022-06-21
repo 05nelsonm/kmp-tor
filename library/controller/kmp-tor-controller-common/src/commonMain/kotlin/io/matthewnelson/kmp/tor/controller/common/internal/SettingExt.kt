@@ -18,6 +18,7 @@ package io.matthewnelson.kmp.tor.controller.common.internal
 import io.matthewnelson.kmp.tor.common.annotation.InternalTorApi
 import io.matthewnelson.kmp.tor.common.util.TorStrings.SP
 import io.matthewnelson.kmp.tor.controller.common.config.TorConfig
+import io.matthewnelson.kmp.tor.controller.common.config.TorConfig.Setting.HiddenService
 
 @InternalTorApi
 fun TorConfig.Setting<*>.appendTo(
@@ -68,6 +69,54 @@ fun TorConfig.Setting<*>.appendTo(
             sb.quoteIfTrue(!isWriteTorConfig)
         }
 
+        is TorConfig.Setting.UnixSockets -> {
+            sb.append(keyword)
+
+            if (!appendValue) {
+                return
+            }
+
+            sb.append(delimiter)
+            sb.quoteIfTrue(!isWriteTorConfig)
+            sb.append("unix:")
+            sb.quoteIfTrue(isWriteTorConfig)
+            sb.append(value?.value)
+            sb.quoteIfTrue(isWriteTorConfig)
+
+            when (this) {
+                is TorConfig.Setting.UnixSockets.Control -> {
+                    unixFlags?.let { flags ->
+                        for (flag in flags) {
+                            sb.append(SP)
+                            sb.append(flag.value)
+                        }
+                    }
+                }
+                is TorConfig.Setting.UnixSockets.Socks -> {
+                    flags?.let { flags ->
+                        for (flag in flags) {
+                            sb.append(SP)
+                            sb.append(flag.value)
+                        }
+                    }
+                    unixFlags?.let { flags ->
+                        for (flag in flags) {
+                            sb.append(SP)
+                            sb.append(flag.value)
+                        }
+                    }
+                    isolationFlags?.let { flags ->
+                        for (flag in flags) {
+                            sb.append(SP)
+                            sb.append(flag.value)
+                        }
+                    }
+                }
+            }
+
+            sb.quoteIfTrue(!isWriteTorConfig)
+        }
+
         is TorConfig.Setting.Ports -> {
             sb.append(keyword)
 
@@ -80,14 +129,7 @@ fun TorConfig.Setting<*>.appendTo(
             sb.append(value)
 
             when (this) {
-                is TorConfig.Setting.Ports.Control -> {
-                    flags?.let { flags ->
-                        for (flag in flags) {
-                            sb.append(SP)
-                            sb.append(flag.value)
-                        }
-                    }
-                }
+                is TorConfig.Setting.Ports.Control -> {}
                 is TorConfig.Setting.Ports.Dns -> {
                     isolationFlags?.let { flags ->
                         for (flag in flags) {
@@ -146,7 +188,7 @@ fun TorConfig.Setting<*>.appendTo(
             val hsDirPath = value ?: return
             val hsPorts = ports
 
-            if (hsPorts == null || hsPorts.isEmpty()) {
+            if (hsPorts.isNullOrEmpty()) {
                 return
             }
 
@@ -172,11 +214,9 @@ fun TorConfig.Setting<*>.appendTo(
                 sb.append("HiddenServicePort")
                 sb.append(delimiter)
                 sb.quoteIfTrue(!isWriteTorConfig)
-                sb.append(hsPort.virtualPort.value)
+                sb.append(hsPort.getVirtPort().value)
                 sb.append(SP)
-                sb.append(localhostIp)
-                sb.append(':')
-                sb.append(hsPort.targetPort.value)
+                sb.append(hsPort.getTarget(localHostIp = localhostIp, quotePath = isWriteTorConfig))
                 sb.quoteIfTrue(!isWriteTorConfig)
             }
 

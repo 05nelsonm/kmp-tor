@@ -20,19 +20,17 @@ import io.matthewnelson.kmp.tor.PlatformInstaller
 import io.matthewnelson.kmp.tor.PlatformInstaller.InstallOption
 import io.matthewnelson.kmp.tor.TorConfigProviderJvm
 import io.matthewnelson.kmp.tor.common.address.Port
-import io.matthewnelson.kmp.tor.common.address.PortProxy
 import io.matthewnelson.kmp.tor.common.annotation.InternalTorApi
 import io.matthewnelson.kmp.tor.controller.common.config.TorConfig
 import io.matthewnelson.kmp.tor.controller.common.config.TorConfig.Setting.*
 import io.matthewnelson.kmp.tor.controller.common.config.TorConfig.Option.*
-import io.matthewnelson.kmp.tor.controller.common.control.usecase.TorControlInfoGet
 import io.matthewnelson.kmp.tor.controller.common.events.TorEvent
 import io.matthewnelson.kmp.tor.controller.common.file.Path
+import io.matthewnelson.kmp.tor.controller.common.internal.ControllerUtils
 import io.matthewnelson.kmp.tor.manager.TorConfigProvider
 import io.matthewnelson.kmp.tor.manager.TorManager
 import io.matthewnelson.kmp.tor.manager.common.event.TorManagerEvent
 import io.matthewnelson.kmp.tor.manager.common.state.isOff
-import io.matthewnelson.kmp.tor.manager.internal.ext.infoGetBootstrapProgress
 import kotlinx.coroutines.*
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.setMain
@@ -93,19 +91,36 @@ abstract class TorTestHelper {
             put(Ports.HttpTunnel().set(AorDorPort.Auto))
             put(Ports.Trans().set(AorDorPort.Auto))
 
+            put(UnixSockets.Control().set(FileSystemFile(
+                testProvider.workDir.builder {
+                    addSegment(DataDirectory.DEFAULT_NAME)
+                    addSegment(UnixSockets.Control.DEFAULT_NAME)
+                }
+            )))
+
+            put(UnixSockets.Socks().set(FileSystemFile(
+                testProvider.workDir.builder {
+                    addSegment(DataDirectory.DEFAULT_NAME)
+                    addSegment(UnixSockets.Socks.DEFAULT_NAME)
+                }
+            )))
+
+            val hsPath = testProvider.workDir.builder {
+                addSegment(HiddenService.DEFAULT_PARENT_DIR_NAME)
+                addSegment("test_service")
+            }
+
             put(HiddenService()
                 .setPorts(ports = setOf(
+                    HiddenService.UnixSocket(virtualPort = Port(1024), targetUnixSocket = hsPath.builder {
+                        addSegment(HiddenService.UnixSocket.DEFAULT_UNIX_SOCKET_NAME)
+                    }),
                     HiddenService.Ports(virtualPort = Port(1025), targetPort = Port(1027)),
-                    HiddenService.Ports(virtualPort = Port(1026), targetPort = Port(1027))
+                    HiddenService.Ports(virtualPort = Port(1026), targetPort = Port(1027)),
                 ))
                 .setMaxStreams(maxStreams = HiddenService.MaxStreams(value = 2))
                 .setMaxStreamsCloseCircuit(value = TorF.True)
-                .set(FileSystemDir(
-                    testProvider.workDir.builder {
-                        addSegment(HiddenService.DEFAULT_PARENT_DIR_NAME)
-                        addSegment("test_service")
-                    }
-                ))
+                .set(FileSystemDir(hsPath))
             )
 
             put(HiddenService()
@@ -170,26 +185,22 @@ abstract class TorTestHelper {
             }
         }
 
-        val osName = System.getProperty("os.name")
-            ?: throw AssertionError("failed to retrieve os.name from System properties")
         val installOption: InstallOption = InstallOption.CleanInstallIfMissing
 
         val installer: PlatformInstaller = when {
-            osName.contains("Windows") -> {
+            ControllerUtils.isMingw -> {
                 println("\nRunning tests for Windows\n")
                 PlatformInstaller.mingwX64(installOption)
             }
-            osName.contains("Mac") || osName.contains("Darwin") -> {
+            ControllerUtils.isDarwin -> {
                 println("\nRunning tests for Darwin\n")
                 PlatformInstaller.macosX64(installOption)
             }
-            osName.contains("Linux") -> {
+            ControllerUtils.isLinux -> {
                 println("\nRunning tests for Linux\n")
                 PlatformInstaller.linuxX64(installOption)
             }
-            else -> throw AssertionError(
-                "Failed to generate PlatformInstaller for the given os.name value of ($osName)"
-            )
+            else -> throw AssertionError("Failed to determine Operating System")
         }
 
         val loader = KmpTorLoaderJvm(installer, configProvider)
@@ -198,7 +209,11 @@ abstract class TorTestHelper {
         manager.debug(true)
         manager.addListener(object : TorManagerEvent.SealedListener {
             override fun onEvent(event: TorManagerEvent) {
-                println(event.toString())
+                if (event is TorManagerEvent.Log.Error) {
+                    event.value.printStackTrace()
+                } else {
+                    println(event.toString())
+                }
             }
 
             override fun onEvent(event: TorEvent.Type.SingleLineEvent, output: String) {}

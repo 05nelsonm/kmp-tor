@@ -23,6 +23,11 @@ actual object ControllerUtils {
     @InternalTorApi
     const val ANDROID_NET_MAIN_THREAD_EXCEPTION = "android.os.NetworkOnMainThreadException"
 
+    @InternalTorApi
+    const val UNIX_DOMAIN_SOCKET_FACTORY_CLASS = "io.matthewnelson.kmp.tor.ext.unix.socket.UnixDomainSocketFactory"
+
+    private const val ANDROID_LOCAL_SOCKET_CLASS = "android.net.LocalSocket"
+
     @Volatile
     @Suppress("ObjectPropertyName")
     private var _localhostAddress: String? = null
@@ -59,5 +64,59 @@ actual object ControllerUtils {
             @OptIn(InternalTorApi::class)
             localhostAddress()
         }.start()
+    }
+
+    private val osName: String? by lazy {
+        try {
+            System.getProperty("os.name").lowercase()
+        } catch (_: Exception) {
+            null
+        }
+    }
+
+    @JvmStatic
+    actual val isDarwin: Boolean by lazy {
+        osName?.contains("mac") == true || osName?.contains("darwin") == true
+    }
+    @JvmStatic
+    actual val isLinux: Boolean by lazy {
+        osName?.contains("linux") == true
+    }
+    @JvmStatic
+    actual val isMingw: Boolean by lazy {
+        osName?.contains("windows") == true
+    }
+
+    @JvmStatic
+    @InternalTorApi
+    actual val hasControlUnixDomainSocketSupport: Boolean by lazy {
+        if (isLinux) {
+
+            try {
+                Class.forName(ANDROID_LOCAL_SOCKET_CLASS)
+                    ?: throw NullPointerException()
+
+                // We're on Android, so we have LocalSocket support
+                true
+            } catch (_: Exception) {
+
+                // TODO: Check for Java16+ api java.net.UnixDomainSocketAddress
+                //  and implement in jvmMain's TorController.newInstance
+                //  so dependency on kmp-tor-ext-unix-socket won't be necessary.
+                try {
+                    // We're on the JVM, look for the factory class to see
+                    // if dependency is available.
+                    @OptIn(InternalTorApi::class)
+                    Class.forName(UNIX_DOMAIN_SOCKET_FACTORY_CLASS)
+                        ?: throw NullPointerException()
+                    true
+                } catch (_: Exception) {
+                    false
+                }
+
+            }
+        } else {
+            false
+        }
     }
 }

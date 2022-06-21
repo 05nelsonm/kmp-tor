@@ -27,7 +27,13 @@ kmpConfiguration {
     setupMultiplatform(
         setOf(
 
-            KmpTarget.Jvm.Jvm.DEFAULT,
+            KmpTarget.Jvm.Jvm(
+                testSourceSet = {
+                    dependencies {
+                        implementation(project(":library:extensions:unix-socket:kmp-tor-ext-unix-socket"))
+                    }
+                }
+            ),
 
             KmpTarget.NonJvm.JS(
                 compilerType = KotlinJsCompilerType.BOTH,

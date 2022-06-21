@@ -57,6 +57,13 @@ class KmpTorLoaderJvmIntegrationTest: TorTestHelper() {
             put(trans.set(AorDorPort.Value(PortProxy(9168))))
             put(trans.set(AorDorPort.Value(PortProxy(9169))))
 
+            put(UnixSockets.Control().set(FileSystemFile(
+                testProvider.workDir.builder {
+                    addSegment(DataDirectory.DEFAULT_NAME)
+                    addSegment(UnixSockets.Control.DEFAULT_NAME)
+                }
+            )))
+
             put(ClientOnionAuthDir().set(FileSystemDir(
                 testProvider.workDir.builder { addSegment(ClientOnionAuthDir.DEFAULT_NAME) }
             )))

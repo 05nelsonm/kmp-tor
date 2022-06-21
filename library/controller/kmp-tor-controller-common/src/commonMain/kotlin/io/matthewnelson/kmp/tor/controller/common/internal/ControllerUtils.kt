@@ -30,4 +30,15 @@ expect object ControllerUtils {
     @InternalTorApi
     @Throws(RuntimeException::class)
     fun localhostAddress(): String
+
+    @JvmStatic
+    val isDarwin: Boolean
+    @JvmStatic
+    val isLinux: Boolean
+    @JvmStatic
+    val isMingw: Boolean
+
+    @JvmStatic
+    @InternalTorApi
+    val hasControlUnixDomainSocketSupport: Boolean
 }

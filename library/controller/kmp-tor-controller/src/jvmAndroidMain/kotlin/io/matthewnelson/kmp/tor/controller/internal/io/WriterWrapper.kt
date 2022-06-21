@@ -18,8 +18,6 @@ package io.matthewnelson.kmp.tor.controller.internal.io
 import io.matthewnelson.kmp.tor.controller.common.exceptions.TorControllerException
 import java.io.IOException
 import java.io.OutputStreamWriter
-import java.net.Socket
-import java.net.SocketException
 import kotlin.jvm.JvmSynthetic
 
 @JvmInline
@@ -49,8 +47,7 @@ internal actual value class WriterWrapper private actual constructor(private val
 
     companion object {
         @JvmSynthetic
-        @Throws(IOException::class, SocketException::class)
-        internal fun from(socket: Socket): WriterWrapper =
-            WriterWrapper(socket.getOutputStream().writer())
+        internal fun wrap(writer: OutputStreamWriter): WriterWrapper =
+            WriterWrapper(writer)
     }
 }

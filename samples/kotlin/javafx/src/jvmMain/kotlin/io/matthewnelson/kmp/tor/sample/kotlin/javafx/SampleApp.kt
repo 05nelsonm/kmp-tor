@@ -26,6 +26,7 @@ import io.matthewnelson.kmp.tor.controller.common.config.TorConfig.Option.*
 import io.matthewnelson.kmp.tor.controller.common.control.usecase.TorControlInfoGet
 import io.matthewnelson.kmp.tor.controller.common.events.TorEvent
 import io.matthewnelson.kmp.tor.controller.common.file.Path
+import io.matthewnelson.kmp.tor.controller.common.internal.ControllerUtils
 import io.matthewnelson.kmp.tor.manager.TorManager
 import io.matthewnelson.kmp.tor.manager.common.TorControlManager
 import io.matthewnelson.kmp.tor.manager.common.TorOperationManager
@@ -46,20 +47,18 @@ import java.net.InetSocketAddress
 class SampleApp: App(SampleView::class) {
 
     private val platformInstaller: PlatformInstaller by lazy {
-        val osName = System.getProperty("os.name")
-
         val installer = when {
-            osName.contains("Windows") -> {
+            ControllerUtils.isMingw -> {
                 PlatformInstaller.mingwX64(InstallOption.CleanInstallIfMissing)
             }
-            osName.contains("Mac") || osName.contains("Darwin") -> {
+            ControllerUtils.isDarwin -> {
                 PlatformInstaller.macosX64(InstallOption.CleanInstallIfMissing)
             }
-            osName.contains("Linux") -> {
+            ControllerUtils.isLinux -> {
                 PlatformInstaller.linuxX64(InstallOption.CleanInstallIfMissing)
             }
             else -> {
-                throw RuntimeException("Could not identify OS from 'os.name=$osName'")
+                throw RuntimeException("Could not identify Operating System")
             }
         }
 
@@ -138,7 +137,43 @@ class SampleApp: App(SampleView::class) {
 
                     // Not necessary, as if ControlPort is missing it will be
                     // automatically added for you; but for demonstration purposes...
-                    put(Ports.Control().set(AorDorPort.Auto))
+//                    put(Ports.Control().set(AorDorPort.Auto))
+
+                    // Use a UnixSocket instead of TCP for the ControlPort.
+                    put(UnixSockets.Control().set(FileSystemFile(
+                        workDir.builder {
+
+                            // Put the file in the "data" directory
+                            // so that we avoid any directory permission
+                            // issues.
+                            //
+                            // Note that DataDirectory is automatically added
+                            // for you if it is not present in your provided
+                            // config. If you set a custom Path for it, you
+                            // should use it here.
+                            addSegment(DataDirectory.DEFAULT_NAME)
+
+                            addSegment(UnixSockets.Control.DEFAULT_NAME)
+                        }
+                    )))
+
+                    // Use a UnixSocket instead of TCP for the SocksPort.
+                    put(UnixSockets.Socks().set(FileSystemFile(
+                        workDir.builder {
+
+                            // Put the file in the "data" directory
+                            // so that we avoid any directory permission
+                            // issues.
+                            //
+                            // Note that DataDirectory is automatically added
+                            // for you if it is not present in your provided
+                            // config. If you set a custom Path for it, you
+                            // should use it here.
+                            addSegment(DataDirectory.DEFAULT_NAME)
+
+                            addSegment(UnixSockets.Socks.DEFAULT_NAME)
+                        }
+                    )))
 
                     // Tor defaults this setting to false which would mean if
                     // Tor goes dormant (default is after 24h), the next time it
@@ -154,20 +189,25 @@ class SampleApp: App(SampleView::class) {
                         workDir.builder { addSegment(ClientOnionAuthDir.DEFAULT_NAME) }
                     )))
 
+                    val hsPath = workDir.builder {
+                        addSegment(HiddenService.DEFAULT_PARENT_DIR_NAME)
+                        addSegment("test_service")
+                    }
                     // Add Hidden services
                     put(HiddenService()
                         .setPorts(ports = setOf(
+
+                            // Will only be added to HiddenService.ports if on linux
+                            HiddenService.UnixSocket(virtualPort = Port(1024), targetUnixSocket = hsPath.builder {
+                                addSegment(HiddenService.UnixSocket.DEFAULT_UNIX_SOCKET_NAME)
+                            }),
+
                             HiddenService.Ports(virtualPort = Port(1025), targetPort = Port(1027)),
                             HiddenService.Ports(virtualPort = Port(1026), targetPort = Port(1027))
                         ))
                         .setMaxStreams(maxStreams = HiddenService.MaxStreams(value = 2))
                         .setMaxStreamsCloseCircuit(value = TorF.True)
-                        .set(FileSystemDir(
-                            workDir.builder {
-                                addSegment(HiddenService.DEFAULT_PARENT_DIR_NAME)
-                                addSegment("test_service")
-                            }
-                        ))
+                        .set(FileSystemDir(hsPath))
                     )
 
                     put(HiddenService()

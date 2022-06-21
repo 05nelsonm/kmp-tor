@@ -47,7 +47,7 @@ expect abstract class KmpTorLoader {
     )
 
     @Throws(TorManagerException::class)
-    protected open fun setHiddenServiceDirPermissions(dir: Path)
+    protected open fun setUnixDirPermissions(dir: Path)
 
     @JvmSynthetic
     internal open suspend fun load(
