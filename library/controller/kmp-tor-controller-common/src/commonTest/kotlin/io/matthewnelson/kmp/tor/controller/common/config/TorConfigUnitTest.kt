@@ -340,18 +340,6 @@ class TorConfigUnitTest {
     }
 
     @Test
-    fun givenHiddenServicePorts_whenMultiplePortsWithSameVirtPort_onlyOneIsUsed() {
-        val set = mutableSetOf<HiddenService.VirtualPort>()
-        val expected = HiddenService.Ports(virtualPort = Port(80))
-        set.add(expected)
-        set.add(HiddenService.Ports(virtualPort = Port(80), targetPort = Port(12345)))
-        set.add(HiddenService.UnixSocket(virtualPort = Port(80), targetUnixSocket = Path("/some/path")))
-
-        assertEquals(1, set.size)
-        assertEquals(expected, set.first())
-    }
-
-    @Test
     fun givenUnixSocket_whenPathsSame_equalsEachOther() {
         // Only run if support for domain sockets is had
         if (!ControllerUtils.hasControlUnixDomainSocketSupport) return
