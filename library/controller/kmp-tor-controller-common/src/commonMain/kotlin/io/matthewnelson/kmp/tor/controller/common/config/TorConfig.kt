@@ -1094,6 +1094,14 @@ class TorConfig private constructor(
                 @get:JvmName("isolationFlags")
                 val isolationFlags: Set<IsolationFlag>? get() = _isolationFlags.value
 
+                override fun set(value: Option.AorDorPort): Setting<Option.AorDorPort> {
+                    return if (ControllerUtils.isLinux) {
+                        super.set(value)
+                    } else {
+                        this
+                    }
+                }
+
                 override fun setDefault(): Trans {
                     if (isMutable) {
                         super.setDefault()
