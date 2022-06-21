@@ -1,6 +1,6 @@
 # kmp-tor
 [![Kotlin](https://img.shields.io/badge/kotlin-1.6.21-blue.svg?logo=kotlin)](http://kotlinlang.org)
-[![Kotlin Coroutines](https://img.shields.io/badge/coroutines-1.6.2-blue.svg?logo=kotlin)](https://github.com/Kotlin/kotlinx.coroutines)
+[![Kotlin Coroutines](https://img.shields.io/badge/coroutines-1.6.3-blue.svg?logo=kotlin)](https://github.com/Kotlin/kotlinx.coroutines)
 [![Kotlin Atomicfu](https://img.shields.io/badge/atomicfu-0.17.3-blue.svg?logo=kotlin)](https://github.com/Kotlin/kotlinx.atomicfu)
 [![GitHub license](https://img.shields.io/badge/license-Apache%20License%202.0-blue.svg?style=flat)](https://www.apache.org/licenses/LICENSE-2.0)  
 
