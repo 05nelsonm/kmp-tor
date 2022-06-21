@@ -22,6 +22,5 @@ actual object ControllerUtils {
     @InternalTorApi
     actual fun localhostAddress(): String = "127.0.0.1"
 
-    @InternalTorApi
-    actual val hasUnixDomainSocketSupport: Boolean = false
+    actual val hasUnixDomainSocketSupport: Boolean = true
 }
