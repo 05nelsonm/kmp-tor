@@ -15,7 +15,6 @@
  **/
 package io.matthewnelson.kmp.tor
 
-import io.matthewnelson.kmp.tor.controller.common.config.TorConfig
 import io.matthewnelson.kmp.tor.controller.common.file.Path
 import io.matthewnelson.kmp.tor.controller.common.file.toFile
 import io.matthewnelson.kmp.tor.internal.ProcessStreamEater
@@ -45,28 +44,6 @@ class KmpTorLoaderJvm(
     val installer: PlatformInstaller,
     provider: TorConfigProviderJvm
 ): KmpTorLoader(provider) {
-
-    override val excludeSettings: Set<TorConfig.Setting<*>> = when {
-        installer.isMingw -> {
-            super.excludeSettings.let { settings ->
-                val set: MutableSet<TorConfig.Setting<*>> = LinkedHashSet(settings.size + 1)
-                set.addAll(settings)
-                set.add(TorConfig.Setting.Ports.Trans())
-                set
-            }
-        }
-        installer.isMacos -> {
-            super.excludeSettings.let { settings ->
-                val set: MutableSet<TorConfig.Setting<*>> = LinkedHashSet(settings.size + 1)
-                set.addAll(settings)
-                set.add(TorConfig.Setting.Ports.Trans())
-                set
-            }
-        }
-        else -> {
-            super.excludeSettings
-        }
-    }
 
     @Suppress("NewApi")
     @Throws(TorManagerException::class)
