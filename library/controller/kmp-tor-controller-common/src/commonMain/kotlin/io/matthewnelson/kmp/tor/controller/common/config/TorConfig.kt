@@ -28,10 +28,9 @@ import io.matthewnelson.kmp.tor.controller.common.file.Path
 import io.matthewnelson.kmp.tor.controller.common.internal.ControllerUtils
 import io.matthewnelson.kmp.tor.controller.common.internal.appendTo
 import io.matthewnelson.kmp.tor.controller.common.internal.isUnixPath
-import kotlin.jvm.JvmField
-import kotlin.jvm.JvmInline
-import kotlin.jvm.JvmStatic
-import kotlin.jvm.JvmSynthetic
+import kotlinx.atomicfu.AtomicBoolean
+import kotlinx.atomicfu.atomic
+import kotlin.jvm.*
 import kotlin.reflect.KClass
 
 /**
@@ -243,20 +242,26 @@ class TorConfig private constructor(
      *
      * https://2019.www.torproject.org/docs/tor-manual.html.en
      * */
+    @Suppress("PropertyName")
     sealed class Setting<T: Option?>(@JvmField val keyword: String) {
 
         abstract val default: T
         abstract var value: T
             protected set
+
+        @get:JvmName("isDefault")
         val isDefault: Boolean get() = value == default
-        var isMutable: Boolean = true
-            protected set
+
+        private val _isMutable: AtomicBoolean = atomic(true)
+        @get:JvmName("isMutable")
+        val isMutable: Boolean get() = _isMutable.value
+
         @InternalTorApi
         abstract val isStartArgument: Boolean
 
         @JvmSynthetic
         internal fun setImmutable(): Setting<T> {
-            isMutable = false
+            _isMutable.value = false
             return this
         }
 
