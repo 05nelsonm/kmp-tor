@@ -35,21 +35,25 @@ internal class PortValidator internal constructor(private val dataDir: Path) {
         private set
 
     fun add(port: Ports) {
+        if (!ports.add(port)) {
+            return
+        }
+
         if (port is Ports.Control) {
             hasControl = true
         } else if (port is Ports.Socks) {
             hasSocks = true
         }
-        ports.add(port)
     }
 
     fun add(unixSocket: UnixSockets) {
-        if (unixSocket is UnixSockets.Control && unixSockets.add(unixSocket)) {
-            hasControl = true
+        if (!unixSockets.add(unixSocket)) {
             return
         }
 
-        if (unixSocket is UnixSockets.Socks && unixSockets.add(unixSocket)) {
+        if (unixSocket is UnixSockets.Control) {
+            hasControl = true
+        } else if (unixSocket is UnixSockets.Socks) {
             hasSocks = true
         }
     }
