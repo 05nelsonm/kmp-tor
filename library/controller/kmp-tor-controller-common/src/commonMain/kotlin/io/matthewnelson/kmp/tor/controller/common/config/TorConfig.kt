@@ -729,12 +729,7 @@ class TorConfig private constructor(
             /**
              * See [HiddenService.Ports] && [HiddenService.UnixSocket]
              * */
-            sealed class VirtualPort {
-
-                @JvmSynthetic
-                internal abstract fun getVirtPort(): Port
-
-            }
+            sealed class VirtualPort
 
             /**
              * By default, [virtualPort] is always mapped to <localhostIp>:[targetPort]. This
@@ -764,18 +759,7 @@ class TorConfig private constructor(
                 val virtualPort: Port,
                 @JvmField
                 val targetPort: Port = virtualPort,
-            ): VirtualPort() {
-
-                override fun getVirtPort(): Port = virtualPort
-
-                override fun equals(other: Any?): Boolean {
-                    return other is VirtualPort && other.getVirtPort() == virtualPort
-                }
-
-                override fun hashCode(): Int {
-                    return 18 * 31 + virtualPort.hashCode()
-                }
-            }
+            ): VirtualPort()
 
             /**
              * Instead of directing traffic to a server on the local machine via
@@ -807,16 +791,6 @@ class TorConfig private constructor(
                 @JvmField
                 val targetUnixSocket: Path,
             ): VirtualPort() {
-
-                override fun getVirtPort(): Port = virtualPort
-
-                override fun equals(other: Any?): Boolean {
-                    return other is VirtualPort && other.getVirtPort() == virtualPort
-                }
-
-                override fun hashCode(): Int {
-                    return 18 * 31 + virtualPort.hashCode()
-                }
 
                 companion object {
                     const val DEFAULT_UNIX_SOCKET_NAME = "hs.sock"
