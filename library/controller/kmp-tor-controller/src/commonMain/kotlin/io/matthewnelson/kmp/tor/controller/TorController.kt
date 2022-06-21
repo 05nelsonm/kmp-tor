@@ -79,7 +79,7 @@ expect interface TorController: TorControlProcessor, TorEventProcessor<TorEvent.
     companion object {
 
         /**
-         * Opens a TCP connection to Tor's control port at the given [address]
+         * Opens a TCP connection to Tor's control port at the given [ProxyAddress]
          * */
         @Throws(TorControllerException::class)
         suspend fun newInstance(address: ProxyAddress): TorController

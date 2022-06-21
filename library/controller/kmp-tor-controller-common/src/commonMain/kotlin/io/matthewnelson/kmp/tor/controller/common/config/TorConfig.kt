@@ -27,6 +27,7 @@ import io.matthewnelson.kmp.tor.controller.common.config.TorConfig.Option.TorF.T
 import io.matthewnelson.kmp.tor.controller.common.file.Path
 import io.matthewnelson.kmp.tor.controller.common.internal.ControllerUtils
 import io.matthewnelson.kmp.tor.controller.common.internal.appendTo
+import io.matthewnelson.kmp.tor.controller.common.internal.isUnixPath
 import kotlin.jvm.JvmField
 import kotlin.jvm.JvmInline
 import kotlin.jvm.JvmStatic
@@ -589,9 +590,9 @@ class TorConfig private constructor(
             override val isStartArgument: Boolean get() = false
 
             /**
-             * See [HiddenService.Ports]
+             * See [HiddenService.VirtualPort]
              * */
-            var ports: Set<HiddenService.Ports>? = null
+            var ports: Set<HiddenService.VirtualPort>? = null
                 private set
 
             /**
@@ -610,10 +611,32 @@ class TorConfig private constructor(
             var maxStreamsCloseCircuit: Option.TorF? = null
                 private set
 
-            fun setPorts(ports: Set<Ports>?): HiddenService {
+            fun setPorts(ports: Set<VirtualPort>?): HiddenService {
                 if (isMutable) {
-                    this.ports = ports
+                    if (ports.isNullOrEmpty()) {
+                        this.ports = null
+                    } else {
+                        val filtered = ports.filter { instance ->
+                            when (instance) {
+                                is UnixSocketPort -> {
+                                    if (!ControllerUtils.isLinux) {
+                                        false
+                                    } else {
+                                        instance.targetUnixSocket.isUnixPath
+                                    }
+                                }
+                                is Ports -> true
+                            }
+                        }
+
+                        this.ports = if (filtered.isNotEmpty()) {
+                            filtered.toSet()
+                        } else {
+                            null
+                        }
+                    }
                 }
+
                 return this
             }
 
@@ -658,6 +681,19 @@ class TorConfig private constructor(
             }
 
             /**
+             * See [HiddenService.Ports] && [HiddenService.UnixSocketPort]
+             * */
+            sealed class VirtualPort {
+
+                @JvmSynthetic
+                internal abstract fun getVirtPort(): Port
+
+                @JvmSynthetic
+                internal abstract fun getTarget(localHostIp: String, quotePath: Boolean): String
+
+            }
+
+            /**
              * By default, [virtualPort] is always mapped to <localhostIp>:[targetPort]. This
              * can be overridden by expressing a different value for [targetPort].
              *
@@ -684,15 +720,67 @@ class TorConfig private constructor(
                 @JvmField
                 val virtualPort: Port,
                 @JvmField
-                val targetPort: Port = virtualPort
-            ) {
+                val targetPort: Port = virtualPort,
+            ): VirtualPort() {
+
+                override fun getVirtPort(): Port = virtualPort
+
+                override fun getTarget(localHostIp: String, quotePath: Boolean): String {
+                    return "$localHostIp:${targetPort.value}"
+                }
 
                 override fun equals(other: Any?): Boolean {
-                    return  other is Ports && other.virtualPort == virtualPort
+                    return other is VirtualPort && other.getVirtPort() == virtualPort
                 }
 
                 override fun hashCode(): Int {
                     return 18 * 31 + virtualPort.hashCode()
+                }
+            }
+
+            /**
+             * Instead of directing traffic to a server on the local machine via
+             * TCP connection (and potentially leaking info), use a Unix Domain
+             * Socket and communicate via IPC.
+             *
+             * Support for this is only available for linux. If not on linux, all
+             * [UnixSocketPort]s will be removed when [setPorts] is called.
+             *
+             * You can check [ControllerUtils.isLinux] when providing setting up
+             * your hidden service, if you need to.
+             * */
+            data class UnixSocketPort(
+                @JvmField
+                val virtualPort: Port,
+                @JvmField
+                val targetUnixSocket: Path,
+            ): VirtualPort() {
+
+                override fun getVirtPort(): Port = virtualPort
+
+                override fun getTarget(localHostIp: String, quotePath: Boolean): String {
+                    return StringBuilder().apply {
+                        append("unix:")
+                        if (quotePath) {
+                            append('"')
+                        }
+                        append(targetUnixSocket.value)
+                        if (quotePath) {
+                            append('"')
+                        }
+                    }.toString()
+                }
+
+                override fun equals(other: Any?): Boolean {
+                    return other is VirtualPort && other.getVirtPort() == virtualPort
+                }
+
+                override fun hashCode(): Int {
+                    return 18 * 31 + virtualPort.hashCode()
+                }
+
+                companion object {
+                    const val DEFAULT_UNIX_SOCKET_NAME = "hs.sock"
                 }
             }
 
@@ -1009,10 +1097,12 @@ class TorConfig private constructor(
             final override val default: Option.FileSystemFile? = null
             override var value: Option.FileSystemFile? = default
                 set(value) {
-                    // Do not set if unixDomainSockets are not supported
-                    if (!ControllerUtils.hasUnixDomainSocketSupport) return
-                    // First character of the path must be / (Unix FS) root dir char
-                    if (value?.value?.firstOrNull() != '/') return
+                    // Do not set if platform is something other than linux
+                    if (!ControllerUtils.isLinux) return
+                    // Do not set if unix domain sockets are not supported for control port
+                    if (this is Control && !ControllerUtils.hasControlUnixDomainSocketSupport) return
+                    // First character of the path must be / (Unix FileSystem) root dir char
+                    if (value?.path?.isUnixPath != true) return
 
                     field = value
                 }

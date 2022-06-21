@@ -15,17 +15,8 @@
  **/
 package io.matthewnelson.kmp.tor.controller.common.internal
 
-import io.matthewnelson.kmp.tor.common.annotation.InternalTorApi
+import io.matthewnelson.kmp.tor.controller.common.file.Path
+import kotlin.jvm.JvmSynthetic
 
-// TODO: Fill out
-actual object ControllerUtils {
-    @InternalTorApi
-    actual fun localhostAddress(): String = "127.0.0.1"
-
-    actual val isDarwin: Boolean = false
-    actual val isLinux: Boolean = true
-    actual val isMingw: Boolean = false
-
-    @InternalTorApi
-    actual val hasControlUnixDomainSocketSupport: Boolean = false
-}
+@get:JvmSynthetic
+internal inline val Path.isUnixPath: Boolean get() = value.firstOrNull() == '/'

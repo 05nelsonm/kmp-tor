@@ -39,5 +39,6 @@ expect object ControllerUtils {
     val isMingw: Boolean
 
     @JvmStatic
-    val hasUnixDomainSocketSupport: Boolean
+    @InternalTorApi
+    val hasControlUnixDomainSocketSupport: Boolean
 }

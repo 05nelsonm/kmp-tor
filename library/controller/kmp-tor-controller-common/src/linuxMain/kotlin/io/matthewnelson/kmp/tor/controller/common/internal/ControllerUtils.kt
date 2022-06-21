@@ -26,5 +26,6 @@ actual object ControllerUtils {
     actual val isLinux: Boolean = true
     actual val isMingw: Boolean = false
 
-    actual val hasUnixDomainSocketSupport: Boolean = true
+    @InternalTorApi
+    actual val hasControlUnixDomainSocketSupport: Boolean = true
 }

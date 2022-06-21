@@ -88,7 +88,8 @@ actual object ControllerUtils {
     }
 
     @JvmStatic
-    actual val hasUnixDomainSocketSupport: Boolean by lazy {
+    @InternalTorApi
+    actual val hasControlUnixDomainSocketSupport: Boolean by lazy {
         if (isLinux) {
 
             try {

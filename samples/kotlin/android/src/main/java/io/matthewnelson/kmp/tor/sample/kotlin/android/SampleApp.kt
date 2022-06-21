@@ -80,6 +80,9 @@ class SampleApp: Application() {
 //                    put(Ports.Control().set(AorDorPort.Auto))
 
                     // Use a UnixSocket instead of TCP for the ControlPort.
+                    //
+                    // A unix domain socket will always be preferred on Android
+                    // if neither Ports.Control or UnixSockets.Control are provided.
                     put(UnixSockets.Control().set(FileSystemFile(
                         workDir.builder {
 
@@ -138,28 +141,29 @@ class SampleApp: Application() {
                         workDir.builder { addSegment(ClientOnionAuthDir.DEFAULT_NAME) }
                     )))
 
+                    val hsPath = workDir.builder {
+                        addSegment(HiddenService.DEFAULT_PARENT_DIR_NAME)
+                        addSegment("test_service")
+                    }
                     // Add Hidden services
                     put(HiddenService()
                         .setPorts(ports = setOf(
-                            HiddenService.Ports(virtualPort = Port(1025), targetPort = Port(1027)),
-                            HiddenService.Ports(virtualPort = Port(1026), targetPort = Port(1027))
+                            // Use a unix domain socket to communicate via IPC instead of over TCP
+                            HiddenService.UnixSocketPort(virtualPort = Port(80), targetUnixSocket = hsPath.builder {
+                                addSegment(HiddenService.UnixSocketPort.DEFAULT_UNIX_SOCKET_NAME)
+                            }),
                         ))
                         .setMaxStreams(maxStreams = HiddenService.MaxStreams(value = 2))
                         .setMaxStreamsCloseCircuit(value = TorF.True)
-                        .set(FileSystemDir(
-                            workDir.builder {
-                                addSegment(HiddenService.DEFAULT_PARENT_DIR_NAME)
-                                addSegment("test_service")
-                            }
-                        ))
+                        .set(FileSystemDir(path = hsPath))
                     )
 
                     put(HiddenService()
                         .setPorts(ports = setOf(
-                            HiddenService.Ports(virtualPort = Port(1028), targetPort = Port(1030)),
-                            HiddenService.Ports(virtualPort = Port(1029), targetPort = Port(1030))
+                            HiddenService.Ports(virtualPort = Port(80), targetPort = Port(1030)), // http
+                            HiddenService.Ports(virtualPort = Port(443), targetPort = Port(1030)) // https
                         ))
-                        .set(FileSystemDir(
+                        .set(FileSystemDir(path =
                             workDir.builder {
                                 addSegment(HiddenService.DEFAULT_PARENT_DIR_NAME)
                                 addSegment("test_service_2")

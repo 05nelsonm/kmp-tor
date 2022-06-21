@@ -26,6 +26,7 @@ import io.matthewnelson.kmp.tor.controller.common.config.TorConfig.Setting.*
 import io.matthewnelson.kmp.tor.controller.common.config.TorConfig.Option.*
 import io.matthewnelson.kmp.tor.controller.common.events.TorEvent
 import io.matthewnelson.kmp.tor.controller.common.file.Path
+import io.matthewnelson.kmp.tor.controller.common.internal.ControllerUtils
 import io.matthewnelson.kmp.tor.manager.TorConfigProvider
 import io.matthewnelson.kmp.tor.manager.TorManager
 import io.matthewnelson.kmp.tor.manager.common.event.TorManagerEvent
@@ -104,19 +105,22 @@ abstract class TorTestHelper {
                 }
             )))
 
+            val hsPath = testProvider.workDir.builder {
+                addSegment(HiddenService.DEFAULT_PARENT_DIR_NAME)
+                addSegment("test_service")
+            }
+
             put(HiddenService()
                 .setPorts(ports = setOf(
+                    HiddenService.UnixSocketPort(virtualPort = Port(1024), targetUnixSocket = hsPath.builder {
+                        addSegment(HiddenService.UnixSocketPort.DEFAULT_UNIX_SOCKET_NAME)
+                    }),
                     HiddenService.Ports(virtualPort = Port(1025), targetPort = Port(1027)),
-                    HiddenService.Ports(virtualPort = Port(1026), targetPort = Port(1027))
+                    HiddenService.Ports(virtualPort = Port(1026), targetPort = Port(1027)),
                 ))
                 .setMaxStreams(maxStreams = HiddenService.MaxStreams(value = 2))
                 .setMaxStreamsCloseCircuit(value = TorF.True)
-                .set(FileSystemDir(
-                    testProvider.workDir.builder {
-                        addSegment(HiddenService.DEFAULT_PARENT_DIR_NAME)
-                        addSegment("test_service")
-                    }
-                ))
+                .set(FileSystemDir(hsPath))
             )
 
             put(HiddenService()
@@ -181,26 +185,22 @@ abstract class TorTestHelper {
             }
         }
 
-        val osName = System.getProperty("os.name")
-            ?: throw AssertionError("failed to retrieve os.name from System properties")
         val installOption: InstallOption = InstallOption.CleanInstallIfMissing
 
         val installer: PlatformInstaller = when {
-            osName.contains("Windows") -> {
+            ControllerUtils.isMingw -> {
                 println("\nRunning tests for Windows\n")
                 PlatformInstaller.mingwX64(installOption)
             }
-            osName.contains("Mac") || osName.contains("Darwin") -> {
+            ControllerUtils.isDarwin -> {
                 println("\nRunning tests for Darwin\n")
                 PlatformInstaller.macosX64(installOption)
             }
-            osName.contains("Linux") -> {
+            ControllerUtils.isLinux -> {
                 println("\nRunning tests for Linux\n")
                 PlatformInstaller.linuxX64(installOption)
             }
-            else -> throw AssertionError(
-                "Failed to generate PlatformInstaller for the given os.name value of ($osName)"
-            )
+            else -> throw AssertionError("Failed to determine Operating System")
         }
 
         val loader = KmpTorLoaderJvm(installer, configProvider)

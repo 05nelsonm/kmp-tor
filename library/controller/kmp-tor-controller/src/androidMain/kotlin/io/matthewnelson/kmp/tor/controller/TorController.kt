@@ -74,11 +74,14 @@ actual interface TorController: TorControlProcessor, TorEventProcessor<TorEvent.
         fun newInstance(socket: Socket): TorController = socket.toTorController()
 
         /**
-         * Opens a connection at [address] and returns a new [TorController]
+         * Opens a TCP connection to Tor's control port at the given [ProxyAddress]
          * */
         @Throws(TorControllerException::class)
         actual suspend fun newInstance(address: ProxyAddress): TorController = address.toTorController()
 
+        /**
+         * Opens a unix domain socket to Tor's control port at the give [Path]
+         * */
         @Throws(TorControllerException::class)
         actual suspend fun newInstance(unixDomainSocket: Path): TorController {
             val dispatchers = getTorControllerDispatchers()

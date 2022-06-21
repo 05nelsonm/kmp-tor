@@ -18,6 +18,7 @@ package io.matthewnelson.kmp.tor.controller.common.internal
 import io.matthewnelson.kmp.tor.common.annotation.InternalTorApi
 import io.matthewnelson.kmp.tor.common.util.TorStrings.SP
 import io.matthewnelson.kmp.tor.controller.common.config.TorConfig
+import io.matthewnelson.kmp.tor.controller.common.config.TorConfig.Setting.HiddenService
 
 @InternalTorApi
 fun TorConfig.Setting<*>.appendTo(
@@ -187,7 +188,7 @@ fun TorConfig.Setting<*>.appendTo(
             val hsDirPath = value ?: return
             val hsPorts = ports
 
-            if (hsPorts == null || hsPorts.isEmpty()) {
+            if (hsPorts.isNullOrEmpty()) {
                 return
             }
 
@@ -213,11 +214,9 @@ fun TorConfig.Setting<*>.appendTo(
                 sb.append("HiddenServicePort")
                 sb.append(delimiter)
                 sb.quoteIfTrue(!isWriteTorConfig)
-                sb.append(hsPort.virtualPort.value)
+                sb.append(hsPort.getVirtPort().value)
                 sb.append(SP)
-                sb.append(localhostIp)
-                sb.append(':')
-                sb.append(hsPort.targetPort.value)
+                sb.append(hsPort.getTarget(localHostIp = localhostIp, quotePath = isWriteTorConfig))
                 sb.quoteIfTrue(!isWriteTorConfig)
             }
 

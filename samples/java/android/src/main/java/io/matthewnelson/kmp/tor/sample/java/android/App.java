@@ -16,6 +16,8 @@
 package io.matthewnelson.kmp.tor.sample.java.android;
 
 import android.app.Application;
+import android.net.LocalSocket;
+import android.net.LocalSocketAddress;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
@@ -37,6 +39,7 @@ import io.matthewnelson.kmp.tor.controller.common.config.TorConfig.Option.*;
 import io.matthewnelson.kmp.tor.controller.common.config.TorConfig.Setting.*;
 import io.matthewnelson.kmp.tor.controller.common.control.usecase.TorControlInfoGet;
 import io.matthewnelson.kmp.tor.controller.common.events.TorEvent;
+import io.matthewnelson.kmp.tor.controller.common.file.Path;
 import io.matthewnelson.kmp.tor.ext.callback.common.TorCallback;
 import io.matthewnelson.kmp.tor.ext.callback.manager.CallbackTorManager;
 import io.matthewnelson.kmp.tor.manager.TorManager;
@@ -72,6 +75,9 @@ public class App extends Application {
                 http.set(AorDorPort.Auto.INSTANCE);
 
                 // Use a UnixSocket instead of TCP for the ControlPort.
+                //
+                // A unix domain socket will always be preferred on Android
+                // if neither Ports.Control or UnixSockets.Control are provided.
                 UnixSockets.Control control = new UnixSockets.Control();
                 control.set(FileSystemFile.invoke(
                     getWorkDir().builder()
@@ -92,17 +98,22 @@ public class App extends Application {
 
                 HiddenService myHiddenService = new HiddenService();
 
-                myHiddenService.set(FileSystemDir.invoke(
-                    getWorkDir().builder()
-                        .addSegment(HiddenService.DEFAULT_PARENT_DIR_NAME)
-                        .addSegment("my_hidden_service")
-                        .build()
-                ));
+                Path hsPath = getWorkDir().builder()
+                    .addSegment(HiddenService.DEFAULT_PARENT_DIR_NAME)
+                    .addSegment("my_hidden_service")
+                    .build();
 
-                Set<HiddenService.Ports> hsPorts = new HashSet<>(2);
-                HiddenService.Ports httpPort = new HiddenService.Ports(Port.invoke(80), Port.invoke(8080));
-                hsPorts.add(httpPort);
-                hsPorts.add(httpPort.copy(Port.invoke(443), httpPort.targetPort)); // also allow https connections
+                myHiddenService.set(FileSystemDir.invoke(hsPath));
+
+                Set<HiddenService.VirtualPort> hsPorts = new HashSet<>(1);
+                // Use a unix domain socket to communicate via IPC instead of over TCP
+                HiddenService.UnixSocketPort unixSocketPort = new HiddenService.UnixSocketPort(
+                    Port.invoke(80),
+                    hsPath.builder()
+                        .addSegment(HiddenService.UnixSocketPort.DEFAULT_UNIX_SOCKET_NAME)
+                        .build()
+                );
+                hsPorts.add(unixSocketPort);
 
                 myHiddenService.setPorts(hsPorts);
 

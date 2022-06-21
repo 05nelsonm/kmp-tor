@@ -189,20 +189,25 @@ class SampleApp: App(SampleView::class) {
                         workDir.builder { addSegment(ClientOnionAuthDir.DEFAULT_NAME) }
                     )))
 
+                    val hsPath = workDir.builder {
+                        addSegment(HiddenService.DEFAULT_PARENT_DIR_NAME)
+                        addSegment("test_service")
+                    }
                     // Add Hidden services
                     put(HiddenService()
                         .setPorts(ports = setOf(
+
+                            // Will only be added to HiddenService.ports if on linux
+                            HiddenService.UnixSocketPort(virtualPort = Port(1024), targetUnixSocket = hsPath.builder {
+                                addSegment(HiddenService.UnixSocketPort.DEFAULT_UNIX_SOCKET_NAME)
+                            }),
+
                             HiddenService.Ports(virtualPort = Port(1025), targetPort = Port(1027)),
                             HiddenService.Ports(virtualPort = Port(1026), targetPort = Port(1027))
                         ))
                         .setMaxStreams(maxStreams = HiddenService.MaxStreams(value = 2))
                         .setMaxStreamsCloseCircuit(value = TorF.True)
-                        .set(FileSystemDir(
-                            workDir.builder {
-                                addSegment(HiddenService.DEFAULT_PARENT_DIR_NAME)
-                                addSegment("test_service")
-                            }
-                        ))
+                        .set(FileSystemDir(hsPath))
                     )
 
                     put(HiddenService()

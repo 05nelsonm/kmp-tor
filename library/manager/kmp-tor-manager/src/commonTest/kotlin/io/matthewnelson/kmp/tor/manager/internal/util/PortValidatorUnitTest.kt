@@ -75,7 +75,7 @@ class PortValidatorUnitTest {
         val controlSocket = validated.filterIsInstance<UnixSockets.Control>()
         assertEquals(1, controlPort.size + controlSocket.size)
 
-        if (ControllerUtils.hasUnixDomainSocketSupport) {
+        if (ControllerUtils.hasControlUnixDomainSocketSupport) {
             val expected = UnixSockets.Control()
             expected.set(TorConfig.Option.FileSystemFile(Path(DATA_DIR).builder {
                 addSegment(UnixSockets.Control.DEFAULT_NAME)

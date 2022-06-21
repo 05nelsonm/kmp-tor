@@ -16,6 +16,7 @@
 package io.matthewnelson.kmp.tor.manager.internal.util
 
 import io.matthewnelson.kmp.tor.common.address.Port
+import io.matthewnelson.kmp.tor.common.annotation.InternalTorApi
 import io.matthewnelson.kmp.tor.controller.common.config.TorConfig
 import io.matthewnelson.kmp.tor.controller.common.config.TorConfig.Option.AorDorPort
 import io.matthewnelson.kmp.tor.controller.common.config.TorConfig.Setting.Ports
@@ -86,7 +87,8 @@ internal class PortValidator internal constructor(private val dataDir: Path) {
 
         if (!hasControl) {
             // Prefer using unix domain socket if it's supported.
-            val control = if (ControllerUtils.hasUnixDomainSocketSupport) {
+            @OptIn(InternalTorApi::class)
+            val control = if (ControllerUtils.hasControlUnixDomainSocketSupport) {
                 UnixSockets.Control().set(
                     TorConfig.Option.FileSystemFile(
                         dataDir.builder {
