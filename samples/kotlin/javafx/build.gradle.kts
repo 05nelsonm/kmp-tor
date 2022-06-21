@@ -76,9 +76,24 @@ kotlin {
                 // Add binary dependencies for platform desired to support. Note that this
                 // could also be broken out into package variants so you aren't unnecessarily
                 // including windows/macos binaries in the .deb package, for example.
-                implementation("io.matthewnelson.kotlin-components:kmp-tor-binary-linuxx64:${env.kmpTorBinaries.version.name}")
-                implementation("io.matthewnelson.kotlin-components:kmp-tor-binary-macosx64:${env.kmpTorBinaries.version.name}")
-                implementation("io.matthewnelson.kotlin-components:kmp-tor-binary-mingwx64:${env.kmpTorBinaries.version.name}")
+                val osName = System.getProperty("os.name")
+                when {
+                    osName.contains("Windows", true) -> {
+                        implementation("io.matthewnelson.kotlin-components:kmp-tor-binary-mingwx64:${env.kmpTorBinaries.version.name}")
+                    }
+                    osName.contains("Mac", true) || osName.contains("Darwin", true) -> {
+                        implementation("io.matthewnelson.kotlin-components:kmp-tor-binary-macosx64:${env.kmpTorBinaries.version.name}")
+                    }
+                    osName.contains("linux", true) -> {
+                        implementation("io.matthewnelson.kotlin-components:kmp-tor-binary-linuxx64:${env.kmpTorBinaries.version.name}")
+
+                        // Add support for Unix Domain Sockets (only available for Linux)
+                        implementation(project(":library:extensions:unix-socket:kmp-tor-ext-unix-socket"))
+                    }
+                    else -> {
+                        throw GradleException("Failed to determine Operating System from os.name='$osName'")
+                    }
+                }
 
                 // Only supporting x86_64 (x64) for this sample
 //                implementation("io.matthewnelson.kotlin-components:kmp-tor-binary-linuxx86:${env.kmpTorBinaries.version.name}")
