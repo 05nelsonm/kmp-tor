@@ -79,9 +79,11 @@ fun TorConfig.Setting<*>.appendTo(
             sb.append(delimiter)
             sb.quoteIfTrue(!isWriteTorConfig)
             sb.append("unix:")
-            sb.quoteIfTrue(isWriteTorConfig)
+            sb.escapeIfTrue(!isWriteTorConfig)
+            sb.quote()
             sb.append(value?.value)
-            sb.quoteIfTrue(isWriteTorConfig)
+            sb.escapeIfTrue(!isWriteTorConfig)
+            sb.quote()
 
             when (this) {
                 is TorConfig.Setting.UnixSockets.Control -> {
