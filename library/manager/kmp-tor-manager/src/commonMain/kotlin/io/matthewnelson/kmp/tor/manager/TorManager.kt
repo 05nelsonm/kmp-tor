@@ -900,11 +900,12 @@ private class RealTorManager(
 
         // TODO: Handle Failure case
         controller.ownershipTake()
-        controller.setEvents(requiredEvents)
 
         if (loadConfig != null) {
             controller.configLoad(loadConfig)
         }
+
+        controller.setEvents(requiredEvents)
 
         // Stop Tor from polling for processId, as we've passed ownership
         // to the controller which, if it is stopped, Tor will exit.
