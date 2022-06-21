@@ -63,8 +63,10 @@ kmpConfiguration {
 
             KmpTarget.NonJvm.Native.Mingw.X64.DEFAULT,
         ),
+        commonPluginIds = setOf(pluginId.kotlin.atomicfu),
         commonMainSourceSet = {
             dependencies {
+                implementation(deps.kotlin.atomicfu.atomicfu)
                 implementation(deps.kotlin.reflect)
                 api(project(":library:kmp-tor-common"))
             }
