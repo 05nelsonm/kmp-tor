@@ -18,6 +18,7 @@ import io.matthewnelson.kotlin.components.dependencies.depsTest
 import io.matthewnelson.kotlin.components.dependencies.versions
 import io.matthewnelson.kotlin.components.kmp.KmpTarget
 import io.matthewnelson.kotlin.components.kmp.publish.kmpPublishRootProjectConfiguration
+import io.matthewnelson.kotlin.components.kmp.util.sourceSetJvmJsMain
 import kmp.tor.env
 import org.jetbrains.kotlin.gradle.plugin.KotlinJsCompilerType
 
@@ -87,6 +88,13 @@ kmpConfiguration {
                 implementation(kotlin("test"))
             }
         },
+        kotlin = {
+            sourceSetJvmJsMain {
+                dependencies {
+                    implementation(deps.kotlin.coroutines.core.core)
+                }
+            }
+        }
     )
 }
 
