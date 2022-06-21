@@ -468,10 +468,6 @@ private class RealTorServiceNotification(
             setSound(null)
             setWhen(startTime)
 
-            // API 17
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
-                setShowWhen(true)
-            }
             // API 20
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT_WATCH) {
                 setGroup("TorService")
