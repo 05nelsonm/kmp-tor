@@ -138,7 +138,7 @@ abstract class TorConfigProvider {
         dataDir.set(FileSystemDir(dataDirPath))
 
         val excludedClasses = excludeSettings.map { it::class }
-        val portValidator = PortValidator()
+        val portValidator = PortValidator(dataDirPath)
         val builder: TorConfig.Builder = TorConfig.Builder {
             for (setting in clientConfig.settings) {
                 if (excludedClasses.contains(setting::class)) {

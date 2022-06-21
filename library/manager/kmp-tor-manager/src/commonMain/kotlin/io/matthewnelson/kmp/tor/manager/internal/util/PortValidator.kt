@@ -20,10 +20,14 @@ import io.matthewnelson.kmp.tor.controller.common.config.TorConfig
 import io.matthewnelson.kmp.tor.controller.common.config.TorConfig.Option.AorDorPort
 import io.matthewnelson.kmp.tor.controller.common.config.TorConfig.Setting.Ports
 import io.matthewnelson.kmp.tor.controller.common.config.TorConfig.Setting.UnixSocket
+import io.matthewnelson.kmp.tor.controller.common.file.Path
+import io.matthewnelson.kmp.tor.controller.common.internal.ControllerUtils
 
-internal class PortValidator internal constructor() {
-    private val configPorts: MutableSet<Ports> = mutableSetOf()
-    private val configUnixSockets: MutableSet<UnixSocket> = mutableSetOf()
+internal class PortValidator internal constructor(private val dataDir: Path) {
+
+    private val ports: MutableSet<Ports> = mutableSetOf()
+    private val unixSockets: MutableSet<UnixSocket> = mutableSetOf()
+
     var hasControl = false
         private set
     var hasSocks = false
@@ -35,7 +39,7 @@ internal class PortValidator internal constructor() {
         } else if (port is Ports.Socks) {
             hasSocks = true
         }
-        configPorts.add(port)
+        ports.add(port)
     }
 
     fun add(unixSocket: UnixSocket) {
@@ -44,7 +48,7 @@ internal class PortValidator internal constructor() {
         }/* else if (unixSocket is UnixSocket.Socks) {
             hasSocks = true
         }*/
-        configUnixSockets.add(unixSocket)
+        unixSockets.add(unixSocket)
     }
 
     @Suppress("unchecked_cast")
@@ -52,40 +56,57 @@ internal class PortValidator internal constructor() {
         if (!hasSocks) {
             // Try to add default 9050 so we can validate that it is open
             val socks = Ports.Socks()
-            if (!configPorts.add(socks)) {
+            if (!ports.add(socks)) {
                 // set to auto if another port type is set to 9050
                 socks.set(AorDorPort.Auto)
-                configPorts.add(socks)
+                ports.add(socks)
             }
             hasSocks = true
         }
 
-        val validatedPorts: MutableSet<TorConfig.Setting<*>> = mutableSetOf()
+        val validated: MutableSet<TorConfig.Setting<*>> = mutableSetOf()
 
-        for (port in configPorts) {
+        for (port in ports) {
             when (val option = port.value) {
                 is AorDorPort.Auto,
                 is AorDorPort.Disable -> {
-                    validatedPorts.add(port)
+                    validated.add(port)
                 }
                 is AorDorPort.Value -> {
                     if (isPortAvailable.invoke(Port(option.port.value))) {
-                        validatedPorts.add(port)
+                        validated.add(port)
                     } else {
                         // Unavailable. Set to auto
-                        validatedPorts.add(port.clone().set(AorDorPort.Auto))
+                        validated.add(port.clone().set(AorDorPort.Auto))
                     }
                 }
             }
         }
 
-        // TODO: Check ControllerUtils.hasUnixSocketDomainSupport to prefer unix sockets.
         if (!hasControl) {
-            validatedPorts.add(Ports.Control().set(AorDorPort.Auto))
+            // Prefer using unix domain socket if it's supported.
+            val control = if (ControllerUtils.hasUnixDomainSocketSupport) {
+                UnixSocket.Control().set(
+                    TorConfig.Option.FileSystemFile(
+                        dataDir.builder {
+                            addSegment(UnixSocket.Control.DEFAULT_NAME)
+                        }
+                    )
+                )
+            } else {
+                Ports.Control().set(AorDorPort.Auto)
+            }
+
+            if (!validated.add(control)) {
+                // Will only be the case if another unix domain socket path
+                // is the same as what we set UnixSocket.Control to.
+                validated.remove(control)
+                validated.add(control)
+            }
         }
 
-        validatedPorts.addAll(configUnixSockets)
+        validated.addAll(unixSockets)
 
-        return validatedPorts
+        return validated
     }
 }
