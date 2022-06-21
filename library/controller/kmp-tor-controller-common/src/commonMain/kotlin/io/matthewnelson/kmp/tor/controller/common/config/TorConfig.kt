@@ -31,6 +31,7 @@ import io.matthewnelson.kmp.tor.controller.common.internal.isUnixPath
 import kotlinx.atomicfu.AtomicBoolean
 import kotlinx.atomicfu.AtomicRef
 import kotlinx.atomicfu.atomic
+import kotlinx.atomicfu.update
 import kotlin.jvm.*
 import kotlin.reflect.KClass
 
@@ -269,20 +270,20 @@ class TorConfig private constructor(
 
         @JvmSynthetic
         internal fun setImmutable(): Setting<T> {
-            _isMutable.value = false
+            _isMutable.update { false }
             return this
         }
 
         open fun set(value: T): Setting<T> {
             if (isMutable) {
-                _value.value = value
+                _value.update { value }
             }
             return this
         }
 
         open fun setDefault(): Setting<T> {
             if (isMutable) {
-                _value.value = default
+                _value.update { default }
             }
             return this
         }
@@ -657,7 +658,7 @@ class TorConfig private constructor(
             fun setPorts(ports: Set<VirtualPort>?): HiddenService {
                 if (isMutable) {
                     if (ports.isNullOrEmpty()) {
-                        _ports.value = null
+                        _ports.update { null }
                     } else {
                         val filtered = ports.filter { instance ->
                             when (instance) {
@@ -672,10 +673,12 @@ class TorConfig private constructor(
                             }
                         }
 
-                        _ports.value = if (filtered.isNotEmpty()) {
-                            filtered.toSet()
-                        } else {
-                            null
+                        _ports.update {
+                            if (filtered.isNotEmpty()) {
+                                filtered.toSet()
+                            } else {
+                                null
+                            }
                         }
                     }
                 }
@@ -685,14 +688,14 @@ class TorConfig private constructor(
 
             fun setMaxStreams(maxStreams: MaxStreams?): HiddenService {
                 if (isMutable) {
-                    _maxStreams.value = maxStreams
+                    _maxStreams.update { maxStreams }
                 }
                 return this
             }
 
             fun setMaxStreamsCloseCircuit(value: Option.TorF?): HiddenService {
                 if (isMutable) {
-                    _maxStreamsCloseCircuit.value = value
+                    _maxStreamsCloseCircuit.update { value }
                 }
                 return this
             }
@@ -700,9 +703,9 @@ class TorConfig private constructor(
             override fun setDefault(): HiddenService {
                 if (isMutable) {
                     super.setDefault()
-                    _ports.value = null
-                    _maxStreams.value = null
-                    _maxStreamsCloseCircuit.value = null
+                    _ports.update {  null }
+                    _maxStreams.update {  null }
+                    _maxStreamsCloseCircuit.update {  null }
                 }
                 return this
             }
@@ -980,14 +983,14 @@ class TorConfig private constructor(
                 override fun setDefault(): Dns {
                     if (isMutable) {
                         super.setDefault()
-                        _isolationFlags.value = null
+                        _isolationFlags.update { null }
                     }
                     return this
                 }
 
                 fun setIsolationFlags(flags: Set<IsolationFlag>?): Dns {
                     if (isMutable) {
-                        _isolationFlags.value = flags?.toSet()
+                        _isolationFlags.update { flags?.toSet() }
                     }
                     return this
                 }
@@ -1013,14 +1016,14 @@ class TorConfig private constructor(
                 override fun setDefault(): HttpTunnel {
                     if (isMutable) {
                         super.setDefault()
-                        _isolationFlags.value = null
+                        _isolationFlags.update { null }
                     }
                     return this
                 }
 
                 fun setIsolationFlags(flags: Set<IsolationFlag>?): HttpTunnel {
                     if (isMutable) {
-                        _isolationFlags.value = flags?.toSet()
+                        _isolationFlags.update { flags?.toSet() }
                     }
                     return this
                 }
@@ -1050,22 +1053,22 @@ class TorConfig private constructor(
                 override fun setDefault(): Socks {
                     if (isMutable) {
                         super.setDefault()
-                        _flags.value = null
-                        _isolationFlags.value = null
+                        _flags.update { null }
+                        _isolationFlags.update { null }
                     }
                     return this
                 }
 
                 fun setFlags(flags: Set<Flag>?): Socks {
                     if (isMutable) {
-                        _flags.value = flags?.toSet()
+                        _flags.update { flags?.toSet() }
                     }
                     return this
                 }
 
                 fun setIsolationFlags(flags: Set<IsolationFlag>?): Socks {
                     if (isMutable) {
-                        _isolationFlags.value = flags?.toSet()
+                        _isolationFlags.update { flags?.toSet() }
                     }
                     return this
                 }
@@ -1114,14 +1117,14 @@ class TorConfig private constructor(
                 override fun setDefault(): Trans {
                     if (isMutable) {
                         super.setDefault()
-                        _isolationFlags.value = null
+                        _isolationFlags.update { null }
                     }
                     return this
                 }
 
                 fun setIsolationFlags(flags: Set<IsolationFlag>?): Trans {
                     if (isMutable) {
-                        _isolationFlags.value = flags?.toSet()
+                        _isolationFlags.update { flags?.toSet() }
                     }
                     return this
                 }
@@ -1208,14 +1211,14 @@ class TorConfig private constructor(
                 override fun setDefault(): Control {
                     if (isMutable) {
                         super.setDefault()
-                        _unixFlags.value = null
+                        _unixFlags.update { null }
                     }
                     return this
                 }
 
                 fun setUnixFlags(flags: Set<UnixSockets.Control.Flag>?): Control {
                     if (isMutable) {
-                        _unixFlags.value = flags?.toSet()
+                        _unixFlags.update { flags?.toSet() }
                     }
                     return this
                 }
@@ -1267,30 +1270,30 @@ class TorConfig private constructor(
                 override fun setDefault(): Socks {
                     if (isMutable) {
                         super.setDefault()
-                        _flags.value = null
-                        _unixFlags.value = null
-                        _isolationFlags.value = null
+                        _flags.update { null }
+                        _unixFlags.update { null }
+                        _isolationFlags.update { null }
                     }
                     return this
                 }
 
                 fun setFlags(flags: Set<Ports.Socks.Flag>?): Socks {
                     if (isMutable) {
-                        _flags.value = flags?.toSet()
+                        _flags.update { flags?.toSet() }
                     }
                     return this
                 }
 
                 fun setUnixFlags(flags: Set<UnixSockets.Flag>?): Socks {
                     if (isMutable) {
-                        _unixFlags.value = flags?.toSet()
+                        _unixFlags.update { flags?.toSet() }
                     }
                     return this
                 }
 
                 fun setIsolationFlags(flags: Set<Ports.IsolationFlag>?): Socks {
                     if (isMutable) {
-                        _isolationFlags.value = flags?.toSet()
+                        _isolationFlags.update { flags?.toSet() }
                     }
                     return this
                 }
