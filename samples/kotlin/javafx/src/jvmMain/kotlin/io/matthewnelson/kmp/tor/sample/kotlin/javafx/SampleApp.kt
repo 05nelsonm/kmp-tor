@@ -26,6 +26,7 @@ import io.matthewnelson.kmp.tor.controller.common.config.TorConfig.Option.*
 import io.matthewnelson.kmp.tor.controller.common.control.usecase.TorControlInfoGet
 import io.matthewnelson.kmp.tor.controller.common.events.TorEvent
 import io.matthewnelson.kmp.tor.controller.common.file.Path
+import io.matthewnelson.kmp.tor.controller.common.internal.ControllerUtils
 import io.matthewnelson.kmp.tor.manager.TorManager
 import io.matthewnelson.kmp.tor.manager.common.TorControlManager
 import io.matthewnelson.kmp.tor.manager.common.TorOperationManager
@@ -46,20 +47,18 @@ import java.net.InetSocketAddress
 class SampleApp: App(SampleView::class) {
 
     private val platformInstaller: PlatformInstaller by lazy {
-        val osName = System.getProperty("os.name")
-
         val installer = when {
-            osName.contains("Windows") -> {
+            ControllerUtils.isMingw -> {
                 PlatformInstaller.mingwX64(InstallOption.CleanInstallIfMissing)
             }
-            osName.contains("Mac") || osName.contains("Darwin") -> {
+            ControllerUtils.isDarwin -> {
                 PlatformInstaller.macosX64(InstallOption.CleanInstallIfMissing)
             }
-            osName.contains("Linux") -> {
+            ControllerUtils.isLinux -> {
                 PlatformInstaller.linuxX64(InstallOption.CleanInstallIfMissing)
             }
             else -> {
-                throw RuntimeException("Could not identify OS from 'os.name=$osName'")
+                throw RuntimeException("Could not identify Operating System")
             }
         }
 

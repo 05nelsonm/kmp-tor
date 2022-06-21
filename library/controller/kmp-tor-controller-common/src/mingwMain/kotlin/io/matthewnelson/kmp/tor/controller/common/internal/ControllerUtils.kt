@@ -22,5 +22,9 @@ actual object ControllerUtils {
     @InternalTorApi
     actual fun localhostAddress(): String = "127.0.0.1"
 
+    actual val isDarwin: Boolean = false
+    actual val isLinux: Boolean = false
+    actual val isMingw: Boolean = true
+
     actual val hasUnixDomainSocketSupport: Boolean = false
 }

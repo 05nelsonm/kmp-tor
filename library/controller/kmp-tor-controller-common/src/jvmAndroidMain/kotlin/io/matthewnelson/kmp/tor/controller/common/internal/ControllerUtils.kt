@@ -66,8 +66,7 @@ actual object ControllerUtils {
         }.start()
     }
 
-    @JvmStatic
-    val osName: String? by lazy {
+    private val osName: String? by lazy {
         try {
             System.getProperty("os.name").lowercase()
         } catch (_: Exception) {
@@ -76,13 +75,27 @@ actual object ControllerUtils {
     }
 
     @JvmStatic
+    actual val isDarwin: Boolean by lazy {
+        osName?.contains("mac") == true || osName?.contains("darwin") == true
+    }
+    @JvmStatic
+    actual val isLinux: Boolean by lazy {
+        osName?.contains("linux") == true
+    }
+    @JvmStatic
+    actual val isMingw: Boolean by lazy {
+        osName?.contains("windows") == true
+    }
+
+    @JvmStatic
     actual val hasUnixDomainSocketSupport: Boolean by lazy {
-        if (osName?.contains("linux") == true) {
+        if (isLinux) {
 
             try {
-                // We're on Android, so we have LocalSocket support
                 Class.forName(ANDROID_LOCAL_SOCKET_CLASS)
                     ?: throw NullPointerException()
+
+                // We're on Android, so we have LocalSocket support
                 true
             } catch (_: Exception) {
 

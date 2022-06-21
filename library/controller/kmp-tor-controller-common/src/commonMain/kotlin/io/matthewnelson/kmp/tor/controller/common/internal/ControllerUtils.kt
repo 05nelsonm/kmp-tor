@@ -32,5 +32,12 @@ expect object ControllerUtils {
     fun localhostAddress(): String
 
     @JvmStatic
+    val isDarwin: Boolean
+    @JvmStatic
+    val isLinux: Boolean
+    @JvmStatic
+    val isMingw: Boolean
+
+    @JvmStatic
     val hasUnixDomainSocketSupport: Boolean
 }
