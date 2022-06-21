@@ -169,6 +169,6 @@ private value class RealPath(override val value: String): Path {
     }
 
     override fun toString(): String {
-        return "Path(value=$value)"
+        return value
     }
 }
