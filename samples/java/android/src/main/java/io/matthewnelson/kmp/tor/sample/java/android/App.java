@@ -171,7 +171,7 @@ public class App extends Application {
 
         @Override
         public void managerEventAddressInfo(@NonNull TorManagerEvent.AddressInfo info) {
-            if (info.isNull()) {
+            if (info.isNull) {
                 // Tear down HttpClient
             } else {
                 try {
