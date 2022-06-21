@@ -15,8 +15,8 @@
  **/
 package io.matthewnelson.kmp.tor.controller.common.internal
 
+import io.matthewnelson.kmp.tor.common.annotation.InternalTorApi
 import io.matthewnelson.kmp.tor.controller.common.file.Path
-import kotlin.jvm.JvmSynthetic
 
-@get:JvmSynthetic
-internal inline val Path.isUnixPath: Boolean get() = value.firstOrNull() == '/'
+@InternalTorApi
+inline val Path.isUnixPath: Boolean get() = value.firstOrNull() == '/'

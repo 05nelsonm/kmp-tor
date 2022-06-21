@@ -25,6 +25,7 @@ import io.matthewnelson.kmp.tor.controller.common.events.TorEventProcessor
 import io.matthewnelson.kmp.tor.controller.common.exceptions.TorControllerException
 import io.matthewnelson.kmp.tor.controller.common.file.Path
 import io.matthewnelson.kmp.tor.controller.common.internal.ControllerUtils
+import io.matthewnelson.kmp.tor.controller.common.internal.isUnixPath
 import io.matthewnelson.kmp.tor.controller.internal.controller.getTorControllerDispatchers
 import io.matthewnelson.kmp.tor.controller.internal.util.toTorController
 import kotlinx.coroutines.withContext
@@ -81,6 +82,11 @@ actual interface TorController: TorControlProcessor, TorEventProcessor<TorEvent.
          * */
         @Throws(TorControllerException::class)
         actual suspend fun newInstance(unixDomainSocket: Path): TorController {
+            @OptIn(InternalTorApi::class)
+            if (!unixDomainSocket.isUnixPath) {
+                throw TorControllerException("Unix domain socket path must start with '/'")
+            }
+
             @OptIn(InternalTorApi::class)
             if (!ControllerUtils.hasControlUnixDomainSocketSupport) {
                 throw TorControllerException("UnixDomainSockets unsupported")

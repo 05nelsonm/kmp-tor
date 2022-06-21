@@ -100,6 +100,9 @@ actual object ControllerUtils {
                 true
             } catch (_: Exception) {
 
+                // TODO: Check for Java16+ api java.net.UnixDomainSocketAddress
+                //  and implement in jvmMain's TorController.newInstance
+                //  so dependency on kmp-tor-ext-unix-socket won't be necessary.
                 try {
                     // We're on the JVM, look for the factory class to see
                     // if dependency is available.

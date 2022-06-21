@@ -21,10 +21,12 @@ import android.net.LocalSocket
 import android.net.LocalSocketAddress
 import io.matthewnelson.kmp.tor.common.address.ProxyAddress
 import io.matthewnelson.kmp.tor.common.annotation.ExperimentalTorApi
+import io.matthewnelson.kmp.tor.common.annotation.InternalTorApi
 import io.matthewnelson.kmp.tor.controller.common.events.TorEvent
 import io.matthewnelson.kmp.tor.controller.common.events.TorEventProcessor
 import io.matthewnelson.kmp.tor.controller.common.exceptions.TorControllerException
 import io.matthewnelson.kmp.tor.controller.common.file.Path
+import io.matthewnelson.kmp.tor.controller.common.internal.isUnixPath
 import io.matthewnelson.kmp.tor.controller.internal.controller.getTorControllerDispatchers
 import io.matthewnelson.kmp.tor.controller.internal.io.ReaderWrapper
 import io.matthewnelson.kmp.tor.controller.internal.io.SocketWrapper
@@ -84,6 +86,11 @@ actual interface TorController: TorControlProcessor, TorEventProcessor<TorEvent.
          * */
         @Throws(TorControllerException::class)
         actual suspend fun newInstance(unixDomainSocket: Path): TorController {
+            @OptIn(InternalTorApi::class)
+            if (!unixDomainSocket.isUnixPath) {
+                throw TorControllerException("Unix domain socket path must start with '/'")
+            }
+
             val dispatchers = getTorControllerDispatchers()
             val socket = LocalSocket(LocalSocket.SOCKET_STREAM)
 
