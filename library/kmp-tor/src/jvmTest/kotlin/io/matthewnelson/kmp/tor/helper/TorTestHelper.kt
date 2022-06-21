@@ -112,8 +112,8 @@ abstract class TorTestHelper {
 
             put(HiddenService()
                 .setPorts(ports = setOf(
-                    HiddenService.UnixSocketPort(virtualPort = Port(1024), targetUnixSocket = hsPath.builder {
-                        addSegment(HiddenService.UnixSocketPort.DEFAULT_UNIX_SOCKET_NAME)
+                    HiddenService.UnixSocket(virtualPort = Port(1024), targetUnixSocket = hsPath.builder {
+                        addSegment(HiddenService.UnixSocket.DEFAULT_UNIX_SOCKET_NAME)
                     }),
                     HiddenService.Ports(virtualPort = Port(1025), targetPort = Port(1027)),
                     HiddenService.Ports(virtualPort = Port(1026), targetPort = Port(1027)),

@@ -345,7 +345,7 @@ class TorConfigUnitTest {
         val expected = HiddenService.Ports(virtualPort = Port(80))
         set.add(expected)
         set.add(HiddenService.Ports(virtualPort = Port(80), targetPort = Port(12345)))
-        set.add(HiddenService.UnixSocketPort(virtualPort = Port(80), targetUnixSocket = Path("/some/path")))
+        set.add(HiddenService.UnixSocket(virtualPort = Port(80), targetUnixSocket = Path("/some/path")))
 
         assertEquals(1, set.size)
         assertEquals(expected, set.first())

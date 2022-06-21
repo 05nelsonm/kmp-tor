@@ -198,8 +198,8 @@ class SampleApp: App(SampleView::class) {
                         .setPorts(ports = setOf(
 
                             // Will only be added to HiddenService.ports if on linux
-                            HiddenService.UnixSocketPort(virtualPort = Port(1024), targetUnixSocket = hsPath.builder {
-                                addSegment(HiddenService.UnixSocketPort.DEFAULT_UNIX_SOCKET_NAME)
+                            HiddenService.UnixSocket(virtualPort = Port(1024), targetUnixSocket = hsPath.builder {
+                                addSegment(HiddenService.UnixSocket.DEFAULT_UNIX_SOCKET_NAME)
                             }),
 
                             HiddenService.Ports(virtualPort = Port(1025), targetPort = Port(1027)),

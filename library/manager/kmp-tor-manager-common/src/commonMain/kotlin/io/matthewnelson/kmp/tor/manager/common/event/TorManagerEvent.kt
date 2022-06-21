@@ -218,7 +218,8 @@ sealed interface TorManagerEvent {
      * Addresses dispatched from TorManager will either be `null`, or
      * contain at least 1 address. You will never encounter [EmptySet].
      *
-     * Example address: 127.0.0.1:48494
+     * Example address for [dns], [http], [socks], or [trans]: 127.0.0.1:48494
+     * Example unix domain socket [Path] for [unixSocks]: /home/user/.myApp/torservice/data/socks.sock
      * */
     data class AddressInfo @JvmOverloads constructor(
         @JvmField
@@ -232,6 +233,8 @@ sealed interface TorManagerEvent {
         @JvmField
         val unixSocks: Set<Path>? = null,
     ): TorManagerEvent {
+
+        @JvmField
         val isNull: Boolean = dns == null && http == null && socks == null && trans == null && unixSocks == null
 
         /**

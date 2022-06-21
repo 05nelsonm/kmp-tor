@@ -16,8 +16,6 @@
 package io.matthewnelson.kmp.tor.sample.java.android;
 
 import android.app.Application;
-import android.net.LocalSocket;
-import android.net.LocalSocketAddress;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
@@ -107,13 +105,13 @@ public class App extends Application {
 
                 Set<HiddenService.VirtualPort> hsPorts = new HashSet<>(1);
                 // Use a unix domain socket to communicate via IPC instead of over TCP
-                HiddenService.UnixSocketPort unixSocketPort = new HiddenService.UnixSocketPort(
+                HiddenService.UnixSocket unixSocket = new HiddenService.UnixSocket(
                     Port.invoke(80),
                     hsPath.builder()
-                        .addSegment(HiddenService.UnixSocketPort.DEFAULT_UNIX_SOCKET_NAME)
+                        .addSegment(HiddenService.UnixSocket.DEFAULT_UNIX_SOCKET_NAME)
                         .build()
                 );
-                hsPorts.add(unixSocketPort);
+                hsPorts.add(unixSocket);
 
                 myHiddenService.setPorts(hsPorts);
 

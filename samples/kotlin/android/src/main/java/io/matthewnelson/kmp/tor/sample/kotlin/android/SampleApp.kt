@@ -149,8 +149,8 @@ class SampleApp: Application() {
                     put(HiddenService()
                         .setPorts(ports = setOf(
                             // Use a unix domain socket to communicate via IPC instead of over TCP
-                            HiddenService.UnixSocketPort(virtualPort = Port(80), targetUnixSocket = hsPath.builder {
-                                addSegment(HiddenService.UnixSocketPort.DEFAULT_UNIX_SOCKET_NAME)
+                            HiddenService.UnixSocket(virtualPort = Port(80), targetUnixSocket = hsPath.builder {
+                                addSegment(HiddenService.UnixSocket.DEFAULT_UNIX_SOCKET_NAME)
                             }),
                         ))
                         .setMaxStreams(maxStreams = HiddenService.MaxStreams(value = 2))

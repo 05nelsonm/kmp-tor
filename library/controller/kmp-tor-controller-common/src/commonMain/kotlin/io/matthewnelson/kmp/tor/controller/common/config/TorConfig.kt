@@ -68,7 +68,7 @@ class TorConfig private constructor(
     }
 
     override fun toString(): String {
-        return "TorConfig(settings=$REDACTED,text=$REDACTED)"
+        return "TorConfig(settings=$REDACTED, text=$REDACTED)"
     }
 
     /**
@@ -190,7 +190,7 @@ class TorConfig private constructor(
                                 sb.append(setting.keyword)
                                 sb.append(SP)
                                 sb.append(Option.AorDorPort.Disable.value)
-                                sb.append('\n')
+                                sb.appendLine()
                                 writtenDisabledPorts.add(setting.keyword)
                             }
 
@@ -560,21 +560,24 @@ class TorConfig private constructor(
         }
 
         /**
+         * val hsDirPath = workDir.builder {
+         *     addSegment(HiddenService.DEFAULT_PARENT_DIR_NAME)
+         *     addSegment("my_hidden_service")
+         * }
+         *
          * val myHiddenService = Setting.HiddenService()
          *     .setPorts(ports = setOf(
+         *         Setting.HiddenService.UnixSocket(virtualPort = Port(80), targetUnixSocket = hsDirPath.builder {
+         *             addSegment(Setting.HiddenService.UnixSocket.DEFAULT_UNIX_SOCKET_NAME)
+         *         })
          *         Setting.HiddenService.Ports(virtualPort = Port(22))
          *         Setting.HiddenService.Ports(virtualPort = Port(8022), targetPort = Port(22))
          *     ))
          *     .setMaxStreams(maxStreams = Setting.HiddenService.MaxStreams(2))
          *     .setMaxStreamsCloseCircuit(value = TorF.False)
-         *     .set(FileSystemDir(
-         *         workDir.builder {
-         *             addSegment(HiddenService.DEFAULT_PARENT_DIR_NAME)
-         *             addSegment("my_hidden_service")
-         *         }
-         *     ))
+         *     .set(FileSystemDir(hsDirPath))
          *
-         * Note that both `set` and `setPorts` _must_ be set for it to be added
+         * Note that both `set` and `setPorts` _must_ be called for it to be added
          * to your config.
          *
          * https://2019.www.torproject.org/docs/tor-manual.html.en#HiddenServiceDir
@@ -618,7 +621,7 @@ class TorConfig private constructor(
                     } else {
                         val filtered = ports.filter { instance ->
                             when (instance) {
-                                is UnixSocketPort -> {
+                                is UnixSocket -> {
                                     if (!ControllerUtils.isLinux) {
                                         false
                                     } else {
@@ -673,7 +676,7 @@ class TorConfig private constructor(
             }
 
             override fun equals(other: Any?): Boolean {
-                return  other is HiddenService && other.value == value
+                return other is HiddenService && other.value == value
             }
 
             override fun hashCode(): Int {
@@ -681,7 +684,7 @@ class TorConfig private constructor(
             }
 
             /**
-             * See [HiddenService.Ports] && [HiddenService.UnixSocketPort]
+             * See [HiddenService.Ports] && [HiddenService.UnixSocket]
              * */
             sealed class VirtualPort {
 
@@ -743,13 +746,26 @@ class TorConfig private constructor(
              * TCP connection (and potentially leaking info), use a Unix Domain
              * Socket and communicate via IPC.
              *
-             * Support for this is only available for linux. If not on linux, all
-             * [UnixSocketPort]s will be removed when [setPorts] is called.
+             * Support for this is only available for linux. If not on linux (or
+             * android). All [UnixSocket]s will be removed when [setPorts] is
+             * called, so it is safe to call this from common code.
              *
-             * You can check [ControllerUtils.isLinux] when providing setting up
-             * your hidden service, if you need to.
+             * You can check [ControllerUtils.isLinux] when setting up your hidden
+             * service if you need to implement a fallback to use TCP.
+             *
+             * EX:
+             *  - Server running on unix domain socket with endpoint `/api/v1/endpoint`
+             *  - Listen for all http traffic:
+             *      UnixSocket(
+             *          virtualPort = Port(80),
+             *          targetUnixSocket = Path("/home/user/.myApp/torservice/hidden_services/my_service/hs.sock")
+             *      )
+             *
+             *      http://<onion-address>.onion/api/v1/endpoint
+             *
+             * https://2019.www.torproject.org/docs/tor-manual.html.en#HiddenServicePort
              * */
-            data class UnixSocketPort(
+            data class UnixSocket(
                 @JvmField
                 val virtualPort: Port,
                 @JvmField
@@ -809,6 +825,10 @@ class TorConfig private constructor(
                     require(value in Port.MIN..Port.MAX) {
                         "MaxStreams.value must be between ${Port.MIN} and ${Port.MAX}"
                     }
+                }
+
+                override fun toString(): String {
+                    return "MaxStreams(value=$value)"
                 }
             }
 
@@ -1081,8 +1101,7 @@ class TorConfig private constructor(
                     }
 
                     override fun equals(other: Any?): Boolean {
-                        return  other != null           &&
-                                other is SessionGroup
+                        return other != null && other is SessionGroup
                     }
 
                     override fun hashCode(): Int {
@@ -1108,15 +1127,7 @@ class TorConfig private constructor(
                 }
 
             override fun equals(other: Any?): Boolean {
-                if (other == null) {
-                    return false
-                }
-
-                if (other !is UnixSockets) {
-                    return false
-                }
-
-                return other.value == value
+                return other is UnixSockets && other.value == value
             }
 
             override fun hashCode(): Int {
@@ -1125,6 +1136,9 @@ class TorConfig private constructor(
                 return result
             }
 
+            /**
+             * https://2019.www.torproject.org/docs/tor-manual.html.en#ControlPort
+             * */
             class Control                       : UnixSockets("ControlPort") {
 
                 var unixFlags: Set<UnixSockets.Control.Flag>? = null
@@ -1172,6 +1186,9 @@ class TorConfig private constructor(
                 }
             }
 
+            /**
+             * https://2019.www.torproject.org/docs/tor-manual.html.en#SocksPort
+             * */
             class Socks                       : UnixSockets("SocksPort") {
 
                 var flags: Set<Ports.Socks.Flag>? = null
