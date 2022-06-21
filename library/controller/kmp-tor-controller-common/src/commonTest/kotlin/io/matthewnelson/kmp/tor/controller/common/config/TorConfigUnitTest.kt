@@ -355,29 +355,33 @@ class TorConfigUnitTest {
         // Only run if support for domain sockets is had
         if (!ControllerUtils.hasUnixDomainSocketSupport) return
 
-        val control1 = UnixSocket.Control()
-        control1.set(FileSystemFile(Path("/some/path")))
+        val path = Path("/some/path")
 
-        val control2 = control1.clone()
-        control2.setFlags(setOf(
-            UnixSocket.Control.Flag.GroupWritable
+        val control = UnixSockets.Control()
+        control.set(FileSystemFile(path))
+
+        val socks = UnixSockets.Socks()
+        socks.set(FileSystemFile(path))
+        socks.setUnixFlags(setOf(
+            UnixSockets.Flag.GroupWritable
         ))
 
-        assertEquals(control1, control2)
+        assertTrue(control.equals(socks))
 
-        val set = mutableSetOf<UnixSocket.Control>()
-        set.add(control1)
-        set.add(control2)
+        val set = mutableSetOf<UnixSockets>()
+        set.add(control)
+        set.add(socks)
 
         assertEquals(1, set.size)
+        assertTrue(set.first() is UnixSockets.Control)
     }
 
     @Test
-    fun givenUnixSocketControl_whenPathIntegerOrEmpty_valueNotSet() {
+    fun givenUnixSocketControl_whenPathDoseNotStartWithUnixFileSeparator_valueNotSet() {
         // Only run if support for domain sockets is had
         if (!ControllerUtils.hasUnixDomainSocketSupport) return
 
-        val control = UnixSocket.Control()
+        val control = UnixSockets.Control()
         control.set(FileSystemFile(Path("0")))
         assertNull(control.value)
 
@@ -393,17 +397,68 @@ class TorConfigUnitTest {
         // Only run if support for domain sockets is had
         if (!ControllerUtils.hasUnixDomainSocketSupport) return
 
-        val control = UnixSocket.Control()
+        val control = UnixSockets.Control()
         control.set(FileSystemFile(Path("/some/path")))
-        control.setFlags(setOf(
-            UnixSocket.Control.Flag.WorldWritable
+        control.setUnixFlags(setOf(
+            UnixSockets.Control.Flag.WorldWritable
         ))
 
         val clone = control.clone()
 
         assertNotNull(control.value)
         assertEquals(control.value, clone.value)
-        assertEquals(control.flags, clone.flags)
+
+        assertNotNull(control.unixFlags)
+        assertEquals(control.unixFlags, clone.unixFlags)
+    }
+
+
+    @Test
+    fun givenUnixSocketSocks_whenPathDoseNotStartWithUnixFileSeparator_valueNotSet() {
+        // Only run if support for domain sockets is had
+        if (!ControllerUtils.hasUnixDomainSocketSupport) return
+
+        val socks = UnixSockets.Socks()
+        socks.set(FileSystemFile(Path("0")))
+        assertNull(socks.value)
+
+        socks.set(FileSystemFile(Path("9051")))
+        assertNull(socks.value)
+
+        socks.set(FileSystemFile(Path("")))
+        assertNull(socks.value)
+    }
+
+    @Test
+    fun givenUnixSocketSocks_whenCloned_matchesOriginal() {
+        // Only run if support for domain sockets is had
+        if (!ControllerUtils.hasUnixDomainSocketSupport) return
+
+        val socks = UnixSockets.Socks()
+        socks.set(FileSystemFile(Path("/some/path")))
+        socks.setFlags(setOf(
+            Ports.Socks.Flag.OnionTrafficOnly
+        ))
+        socks.setUnixFlags(setOf(
+            UnixSockets.Control.Flag.WorldWritable
+        ))
+        socks.setIsolationFlags(setOf(
+            Ports.IsolationFlag.IsolateSOCKSAuth
+        ))
+
+        val clone = socks.clone()
+
+        assertNotNull(socks.value)
+        assertEquals(socks.value, clone.value)
+
+        assertNotNull(socks.flags)
+        assertEquals(socks.flags, clone.flags)
+
+        assertNotNull(socks.unixFlags)
+        assertEquals(socks.unixFlags, clone.unixFlags)
+
+        assertNotNull(socks.isolationFlags)
+        assertEquals(socks.isolationFlags, clone.isolationFlags)
     }
 
 }

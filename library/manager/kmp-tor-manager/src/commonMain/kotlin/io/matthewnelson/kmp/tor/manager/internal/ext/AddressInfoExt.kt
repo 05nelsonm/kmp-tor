@@ -15,6 +15,7 @@
  **/
 package io.matthewnelson.kmp.tor.manager.internal.ext
 
+import io.matthewnelson.kmp.tor.controller.common.file.Path
 import io.matthewnelson.kmp.tor.manager.common.event.TorManagerEvent.*
 import kotlin.jvm.JvmSynthetic
 
@@ -101,6 +102,44 @@ internal inline fun AddressInfo.socksClosed(value: String): AddressInfo? {
         null
     }
 }
+
+@JvmSynthetic
+@Suppress("nothing_to_inline")
+internal inline fun AddressInfo.unixSocksOpened(value: String): AddressInfo? {
+    val path = Path(value)
+    val mUnixSocks = unixSocks?.toMutableSet() ?: return copy(unixSocks = setOf(path))
+
+    return if (mUnixSocks.add(path)) {
+        copy(unixSocks = mUnixSocks.toSet())
+    } else {
+        null
+    }
+}
+
+@JvmSynthetic
+@Suppress("nothing_to_inline")
+internal inline fun AddressInfo.unixSocksClosed(value: String): AddressInfo? {
+    val mUnixSocks = unixSocks?.toMutableSet() ?: return null
+
+    // remove all unixSocks values as we don't know which one it was...
+    if (value.startsWith('?')) {
+        return copy(unixSocks = null)
+    }
+
+    val path = Path(value)
+
+    return if (mUnixSocks.remove(path)) {
+        if (mUnixSocks.isEmpty()) {
+            copy(unixSocks = null)
+        } else {
+            copy(unixSocks = mUnixSocks.toSet())
+        }
+    } else {
+        null
+    }
+}
+
+
 
 @JvmSynthetic
 @Suppress("nothing_to_inline")

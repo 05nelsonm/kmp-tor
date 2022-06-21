@@ -68,7 +68,7 @@ fun TorConfig.Setting<*>.appendTo(
             sb.quoteIfTrue(!isWriteTorConfig)
         }
 
-        is TorConfig.Setting.UnixSocket -> {
+        is TorConfig.Setting.UnixSockets -> {
             sb.append(keyword)
 
             if (!appendValue) {
@@ -83,8 +83,28 @@ fun TorConfig.Setting<*>.appendTo(
             sb.quoteIfTrue(isWriteTorConfig)
 
             when (this) {
-                is TorConfig.Setting.UnixSocket.Control -> {
+                is TorConfig.Setting.UnixSockets.Control -> {
+                    unixFlags?.let { flags ->
+                        for (flag in flags) {
+                            sb.append(SP)
+                            sb.append(flag.value)
+                        }
+                    }
+                }
+                is TorConfig.Setting.UnixSockets.Socks -> {
                     flags?.let { flags ->
+                        for (flag in flags) {
+                            sb.append(SP)
+                            sb.append(flag.value)
+                        }
+                    }
+                    unixFlags?.let { flags ->
+                        for (flag in flags) {
+                            sb.append(SP)
+                            sb.append(flag.value)
+                        }
+                    }
+                    isolationFlags?.let { flags ->
                         for (flag in flags) {
                             sb.append(SP)
                             sb.append(flag.value)

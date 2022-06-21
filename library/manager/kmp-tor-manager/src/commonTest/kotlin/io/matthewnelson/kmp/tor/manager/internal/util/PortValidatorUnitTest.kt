@@ -18,7 +18,7 @@ package io.matthewnelson.kmp.tor.manager.internal.util
 import io.matthewnelson.kmp.tor.common.address.PortProxy
 import io.matthewnelson.kmp.tor.controller.common.config.TorConfig
 import io.matthewnelson.kmp.tor.controller.common.config.TorConfig.Setting.Ports
-import io.matthewnelson.kmp.tor.controller.common.config.TorConfig.Setting.UnixSocket
+import io.matthewnelson.kmp.tor.controller.common.config.TorConfig.Setting.UnixSockets
 import io.matthewnelson.kmp.tor.controller.common.config.TorConfig.Option.AorDorPort
 import io.matthewnelson.kmp.tor.controller.common.file.Path
 import io.matthewnelson.kmp.tor.controller.common.internal.ControllerUtils
@@ -72,13 +72,13 @@ class PortValidatorUnitTest {
         val validated = validator.validate { true }
 
         val controlPort = validated.filterIsInstance<Ports.Control>()
-        val controlSocket = validated.filterIsInstance<UnixSocket.Control>()
+        val controlSocket = validated.filterIsInstance<UnixSockets.Control>()
         assertEquals(1, controlPort.size + controlSocket.size)
 
         if (ControllerUtils.hasUnixDomainSocketSupport) {
-            val expected = UnixSocket.Control()
+            val expected = UnixSockets.Control()
             expected.set(TorConfig.Option.FileSystemFile(Path(DATA_DIR).builder {
-                addSegment(UnixSocket.Control.DEFAULT_NAME)
+                addSegment(UnixSockets.Control.DEFAULT_NAME)
             }))
 
             assertNotNull(expected.value)
@@ -91,12 +91,18 @@ class PortValidatorUnitTest {
     }
 
     @Test
-    fun givenUnixControlSocket_whenValidationCalled_controlPortIsNotAdded() {
-        val control = UnixSocket.Control()
-
-        validator.add(control)
+    fun givenUnixSocketControl_whenValidationCalled_controlPortIsNotAdded() {
+        validator.add(UnixSockets.Control())
         val validated = validator.validate { true }
         assertTrue(validated.filterIsInstance<Ports.Control>().isEmpty())
-        assertFalse(validated.filterIsInstance<UnixSocket.Control>().isEmpty())
+        assertFalse(validated.filterIsInstance<UnixSockets.Control>().isEmpty())
+    }
+
+    @Test
+    fun givenUnixSocketSocks_whenValidationCalled_socksPortIsNotAdded() {
+        validator.add(UnixSockets.Socks())
+        val validated = validator.validate { true }
+        assertTrue(validated.filterIsInstance<Ports.Socks>().isEmpty())
+        assertFalse(validated.filterIsInstance<UnixSockets.Socks>().isEmpty())
     }
 }

@@ -20,10 +20,12 @@ import io.matthewnelson.kmp.tor.common.address.ProxyAddress
 import io.matthewnelson.kmp.tor.common.annotation.ExperimentalTorApi
 import io.matthewnelson.kmp.tor.common.annotation.SealedValueClass
 import io.matthewnelson.kmp.tor.controller.common.events.TorEvent
+import io.matthewnelson.kmp.tor.controller.common.file.Path
 import io.matthewnelson.kmp.tor.manager.common.exceptions.TorManagerException
 import io.matthewnelson.kmp.tor.manager.common.state.*
 import kotlin.jvm.JvmField
 import kotlin.jvm.JvmInline
+import kotlin.jvm.JvmOverloads
 import kotlin.jvm.JvmStatic
 import kotlin.reflect.KClass
 
@@ -218,7 +220,7 @@ sealed interface TorManagerEvent {
      *
      * Example address: 127.0.0.1:48494
      * */
-    data class AddressInfo(
+    data class AddressInfo @JvmOverloads constructor(
         @JvmField
         val dns: Set<String>? = null,
         @JvmField
@@ -227,8 +229,10 @@ sealed interface TorManagerEvent {
         val socks: Set<String>? = null,
         @JvmField
         val trans: Set<String>? = null,
+        @JvmField
+        val unixSocks: Set<Path>? = null,
     ): TorManagerEvent {
-        val isNull: Boolean = dns == null && http == null && socks == null && trans == null
+        val isNull: Boolean = dns == null && http == null && socks == null && trans == null && unixSocks == null
 
         /**
          * Transform [dns] proxy addresses into individual [ProxyAddress]'s.

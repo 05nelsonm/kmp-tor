@@ -100,7 +100,7 @@ class TorConfig private constructor(
     class Builder {
 
         init {
-            // Reference so that localhostAddress for JVM can have it's initial
+            // Reference so that localhostAddress for JVM can have its initial
             // value set immediately from BG thread.
             ControllerUtils
         }
@@ -168,7 +168,7 @@ class TorConfig private constructor(
                         }
                         "AAAA${setting.keyword}"
                     }
-                    is Setting.UnixSocket -> {
+                    is Setting.UnixSockets -> {
                         "AAA${setting.keyword}"
                     }
                     else -> {
@@ -202,7 +202,7 @@ class TorConfig private constructor(
 
                         setting.appendTo(sb, appendValue = true, isWriteTorConfig = true)
                     }
-                    is Setting.UnixSocket -> {
+                    is Setting.UnixSockets -> {
                         if (disabledPorts.contains(setting.keyword)) continue
 
                         setting.appendTo(sb, appendValue = true, isWriteTorConfig = true)
@@ -787,7 +787,7 @@ class TorConfig private constructor(
              * library depends on the [Control] port, the default value here differs
              * and cannot be set to [Option.AorDorPort.Disable].
              *
-             * @see [UnixSocket.Control]
+             * @see [UnixSockets.Control]
              * */
             class Control                       : Ports("ControlPort") {
                 override val default: Option.AorDorPort get() = Option.AorDorPort.Auto
@@ -811,8 +811,10 @@ class TorConfig private constructor(
             class Dns                           : Ports("DNSPort") {
                 override val default: Option.AorDorPort get() = Option.AorDorPort.Disable
                 override var value: Option.AorDorPort = default
+
                 var isolationFlags: Set<IsolationFlag>? = null
                     private set
+
                 @InternalTorApi
                 override val isStartArgument: Boolean get() = false
 
@@ -842,8 +844,10 @@ class TorConfig private constructor(
             class HttpTunnel                    : Ports("HTTPTunnelPort") {
                 override val default: Option.AorDorPort get() = Option.AorDorPort.Disable
                 override var value: Option.AorDorPort = default
+
                 var isolationFlags: Set<IsolationFlag>? = null
                     private set
+
                 @InternalTorApi
                 override val isStartArgument: Boolean get() = false
 
@@ -874,10 +878,12 @@ class TorConfig private constructor(
                 override val default: Option.AorDorPort
                     get() = Option.AorDorPort.Value(PortProxy(9050))
                 override var value: Option.AorDorPort = default
+
                 var flags: Set<Flag>? = null
                     private set
                 var isolationFlags: Set<IsolationFlag>? = null
                     private set
+
                 @InternalTorApi
                 override val isStartArgument: Boolean get() = false
 
@@ -905,10 +911,16 @@ class TorConfig private constructor(
                 }
 
                 override fun clone(): Socks {
-                    return Socks().setFlags(flags).setIsolationFlags(isolationFlags).set(value) as Socks
+                    return Socks()
+                        .setFlags(flags)
+                        .setIsolationFlags(isolationFlags)
+                        .set(value) as Socks
                 }
 
                 sealed class Flag(@JvmField val value: String) {
+
+                    override fun toString(): String = value
+
                     object NoIPv4Traffic                    : Flag("NoIPv4Traffic")
                     object IPv6Traffic                      : Flag("IPv6Traffic")
                     object PreferIPv6                       : Flag("PreferIPv6")
@@ -917,8 +929,6 @@ class TorConfig private constructor(
                     object OnionTrafficOnly                 : Flag("OnionTrafficOnly")
                     object CacheIPv4DNS                     : Flag("CacheIPv4DNS")
                     object CacheIPv6DNS                     : Flag("CacheIPv6DNS")
-//                    object GroupWritable                    : Flag("GroupWritable")
-//                    object WorldWritable                    : Flag("WorldWritable")
                     object CacheDNS                         : Flag("CacheDNS")
                     object UseIPv4Cache                     : Flag("UseIPv4Cache")
                     object UseIPv6Cache                     : Flag("UseIPv6Cache")
@@ -934,8 +944,10 @@ class TorConfig private constructor(
             class Trans                         : Ports("TransPort") {
                 override val default: Option.AorDorPort get() = Option.AorDorPort.Disable
                 override var value: Option.AorDorPort = default
+
                 var isolationFlags: Set<IsolationFlag>? = null
                     private set
+
                 @InternalTorApi
                 override val isStartArgument: Boolean get() = false
 
@@ -964,9 +976,7 @@ class TorConfig private constructor(
              * */
             sealed class IsolationFlag(@JvmField val value: String) {
 
-                override fun toString(): String {
-                    return value
-                }
+                override fun toString(): String = value
 
                 object IsolateClientAddr                : IsolationFlag("IsolateClientAddr")
                 object IsolateSOCKSAuth                 : IsolationFlag("IsolateSOCKSAuth")
@@ -994,14 +1004,25 @@ class TorConfig private constructor(
             }
         }
 
-        sealed class UnixSocket(keyword: String) : Setting<Option.FileSystemFile?>(keyword) {
+        sealed class UnixSockets(keyword: String) : Setting<Option.FileSystemFile?>(keyword) {
+
+            final override val default: Option.FileSystemFile? = null
+            override var value: Option.FileSystemFile? = default
+                set(value) {
+                    // Do not set if unixDomainSockets are not supported
+                    if (!ControllerUtils.hasUnixDomainSocketSupport) return
+                    // First character of the path must be / (Unix FS) root dir char
+                    if (value?.value?.firstOrNull() != '/') return
+
+                    field = value
+                }
 
             override fun equals(other: Any?): Boolean {
                 if (other == null) {
                     return false
                 }
 
-                if (other !is UnixSocket) {
+                if (other !is UnixSockets) {
                     return false
                 }
 
@@ -1014,55 +1035,112 @@ class TorConfig private constructor(
                 return result
             }
 
-            class Control                       : UnixSocket("ControlPort") {
-                override val default: Option.FileSystemFile? = null
-                override var value: Option.FileSystemFile? = default
-                    set(value) {
-                        // Do not set if unixDomainSockets are not supported
-                        if (!ControllerUtils.hasUnixDomainSocketSupport) return
-                        // Do not set if path is empty
-                        if (value?.nullIfEmpty == null) return
-                        // Do not set if path can be turned into an integer (disabling, or setting a port)
-                        if (value.value.toIntOrNull() != null) return
-                        // Do not set if path is "auto"
-                        if (value.value == Option.AorDorPort.Auto.value) return
+            class Control                       : UnixSockets("ControlPort") {
 
-                        field = value
-                    }
+                var unixFlags: Set<UnixSockets.Control.Flag>? = null
+                    private set
+
                 @InternalTorApi
                 override val isStartArgument: Boolean get() = true
-
-                var flags: Set<Flag>? = null
-                    private set
 
                 override fun setDefault(): Control {
                     if (isMutable) {
                         value = default
-                        flags = null
+                        unixFlags = null
                     }
                     return this
                 }
 
-                fun setFlags(flags: Set<Flag>?): Control {
+                fun setUnixFlags(flags: Set<UnixSockets.Control.Flag>?): Control {
+                    if (isMutable) {
+                        unixFlags = flags?.toSet()
+                    }
+                    return this
+                }
+
+                override fun clone(): Control {
+                    return Control().setUnixFlags(unixFlags).set(value) as Control
+                }
+
+                sealed class Flag(@JvmField val value: String) {
+
+                    override fun toString(): String = value
+
+                    object RelaxDirModeCheck         : Flag("RelaxDirModeCheck")
+
+                    // conveniences...
+                    companion object {
+                        @get:JvmStatic
+                        val GroupWritable get() = UnixSockets.Flag.GroupWritable
+                        @get:JvmStatic
+                        val WorldWritable get() = UnixSockets.Flag.WorldWritable
+                    }
+                }
+
+                companion object {
+                    const val DEFAULT_NAME = "control.sock"
+                }
+            }
+
+            class Socks                       : UnixSockets("SocksPort") {
+
+                var flags: Set<Ports.Socks.Flag>? = null
+                    private set
+                var unixFlags: Set<UnixSockets.Flag>? = null
+                    private set
+                var isolationFlags: Set<Ports.IsolationFlag>? = null
+                    private set
+
+                @InternalTorApi
+                override val isStartArgument: Boolean get() = false
+
+                override fun setDefault(): Socks {
+                    if (isMutable) {
+                        value = default
+                        flags = null
+                        unixFlags = null
+                        isolationFlags = null
+                    }
+                    return this
+                }
+
+                fun setFlags(flags: Set<Ports.Socks.Flag>?): Socks {
                     if (isMutable) {
                         this.flags = flags?.toSet()
                     }
                     return this
                 }
 
-                override fun clone(): Control {
-                    return Control().setFlags(flags).set(value) as Control
+                fun setUnixFlags(flags: Set<UnixSockets.Flag>?): Socks {
+                    if (isMutable) {
+                        unixFlags = flags?.toSet()
+                    }
+                    return this
                 }
 
-                sealed class Flag(@JvmField val value: String) {
-                    object GroupWritable                    : Flag("GroupWritable")
-                    object WorldWritable                    : Flag("WorldWritable")
-                    object RelaxDirModeCheck                : Flag("RelaxDirModeCheck")
+                fun setIsolationFlags(flags: Set<Ports.IsolationFlag>?): Socks {
+                    if (isMutable) {
+                        isolationFlags = flags?.toSet()
+                    }
+                    return this
+                }
+
+                override fun clone(): Socks {
+                    return Socks()
+                        .setFlags(flags)
+                        .setUnixFlags(unixFlags)
+                        .setIsolationFlags(isolationFlags)
+                        .set(value) as Socks
                 }
 
                 companion object {
-                    const val DEFAULT_NAME = "control.sock"
+                    const val DEFAULT_NAME = "socks.sock"
                 }
+            }
+
+            sealed class Flag(value: String): UnixSockets.Control.Flag(value) {
+                object GroupWritable                    : Flag("GroupWritable")
+                object WorldWritable                    : Flag("WorldWritable")
             }
         }
 

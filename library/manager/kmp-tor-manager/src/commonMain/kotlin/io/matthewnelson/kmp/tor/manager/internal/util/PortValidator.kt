@@ -19,14 +19,14 @@ import io.matthewnelson.kmp.tor.common.address.Port
 import io.matthewnelson.kmp.tor.controller.common.config.TorConfig
 import io.matthewnelson.kmp.tor.controller.common.config.TorConfig.Option.AorDorPort
 import io.matthewnelson.kmp.tor.controller.common.config.TorConfig.Setting.Ports
-import io.matthewnelson.kmp.tor.controller.common.config.TorConfig.Setting.UnixSocket
+import io.matthewnelson.kmp.tor.controller.common.config.TorConfig.Setting.UnixSockets
 import io.matthewnelson.kmp.tor.controller.common.file.Path
 import io.matthewnelson.kmp.tor.controller.common.internal.ControllerUtils
 
 internal class PortValidator internal constructor(private val dataDir: Path) {
 
     private val ports: MutableSet<Ports> = mutableSetOf()
-    private val unixSockets: MutableSet<UnixSocket> = mutableSetOf()
+    private val unixSockets: MutableSet<UnixSockets> = mutableSetOf()
 
     var hasControl = false
         private set
@@ -42,16 +42,17 @@ internal class PortValidator internal constructor(private val dataDir: Path) {
         ports.add(port)
     }
 
-    fun add(unixSocket: UnixSocket) {
-        if (unixSocket is UnixSocket.Control) {
+    fun add(unixSocket: UnixSockets) {
+        if (unixSocket is UnixSockets.Control && unixSockets.add(unixSocket)) {
             hasControl = true
-        }/* else if (unixSocket is UnixSocket.Socks) {
+            return
+        }
+
+        if (unixSocket is UnixSockets.Socks && unixSockets.add(unixSocket)) {
             hasSocks = true
-        }*/
-        unixSockets.add(unixSocket)
+        }
     }
 
-    @Suppress("unchecked_cast")
     fun validate(isPortAvailable: (Port) -> Boolean): Set<TorConfig.Setting<*>> {
         if (!hasSocks) {
             // Try to add default 9050 so we can validate that it is open
@@ -86,10 +87,10 @@ internal class PortValidator internal constructor(private val dataDir: Path) {
         if (!hasControl) {
             // Prefer using unix domain socket if it's supported.
             val control = if (ControllerUtils.hasUnixDomainSocketSupport) {
-                UnixSocket.Control().set(
+                UnixSockets.Control().set(
                     TorConfig.Option.FileSystemFile(
                         dataDir.builder {
-                            addSegment(UnixSocket.Control.DEFAULT_NAME)
+                            addSegment(UnixSockets.Control.DEFAULT_NAME)
                         }
                     )
                 )

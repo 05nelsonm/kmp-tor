@@ -167,4 +167,8 @@ private value class RealPath(override val value: String): Path {
     override fun segments(separator: Char): List<String> {
         return value.split(separator)
     }
+
+    override fun toString(): String {
+        return "Path(value=$value)"
+    }
 }

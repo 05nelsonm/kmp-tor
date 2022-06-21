@@ -72,7 +72,7 @@ public class App extends Application {
                 http.set(AorDorPort.Auto.INSTANCE);
 
                 // Use a UnixSocket instead of TCP for the ControlPort.
-                UnixSocket.Control control = new UnixSocket.Control();
+                UnixSockets.Control control = new UnixSockets.Control();
                 control.set(FileSystemFile.invoke(
                     getWorkDir().builder()
 
@@ -86,7 +86,7 @@ public class App extends Application {
                         // should use it here.
                         .addSegment(DataDirectory.DEFAULT_NAME)
 
-                        .addSegment(UnixSocket.Control.DEFAULT_NAME)
+                        .addSegment(UnixSockets.Control.DEFAULT_NAME)
                         .build()
                 ));
 

@@ -20,19 +20,16 @@ import io.matthewnelson.kmp.tor.PlatformInstaller
 import io.matthewnelson.kmp.tor.PlatformInstaller.InstallOption
 import io.matthewnelson.kmp.tor.TorConfigProviderJvm
 import io.matthewnelson.kmp.tor.common.address.Port
-import io.matthewnelson.kmp.tor.common.address.PortProxy
 import io.matthewnelson.kmp.tor.common.annotation.InternalTorApi
 import io.matthewnelson.kmp.tor.controller.common.config.TorConfig
 import io.matthewnelson.kmp.tor.controller.common.config.TorConfig.Setting.*
 import io.matthewnelson.kmp.tor.controller.common.config.TorConfig.Option.*
-import io.matthewnelson.kmp.tor.controller.common.control.usecase.TorControlInfoGet
 import io.matthewnelson.kmp.tor.controller.common.events.TorEvent
 import io.matthewnelson.kmp.tor.controller.common.file.Path
 import io.matthewnelson.kmp.tor.manager.TorConfigProvider
 import io.matthewnelson.kmp.tor.manager.TorManager
 import io.matthewnelson.kmp.tor.manager.common.event.TorManagerEvent
 import io.matthewnelson.kmp.tor.manager.common.state.isOff
-import io.matthewnelson.kmp.tor.manager.internal.ext.infoGetBootstrapProgress
 import kotlinx.coroutines.*
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.setMain
@@ -93,10 +90,17 @@ abstract class TorTestHelper {
             put(Ports.HttpTunnel().set(AorDorPort.Auto))
             put(Ports.Trans().set(AorDorPort.Auto))
 
-            put(UnixSocket.Control().set(FileSystemFile(
+            put(UnixSockets.Control().set(FileSystemFile(
                 testProvider.workDir.builder {
                     addSegment(DataDirectory.DEFAULT_NAME)
-                    addSegment(UnixSocket.Control.DEFAULT_NAME)
+                    addSegment(UnixSockets.Control.DEFAULT_NAME)
+                }
+            )))
+
+            put(UnixSockets.Socks().set(FileSystemFile(
+                testProvider.workDir.builder {
+                    addSegment(DataDirectory.DEFAULT_NAME)
+                    addSegment(UnixSockets.Socks.DEFAULT_NAME)
                 }
             )))
 
