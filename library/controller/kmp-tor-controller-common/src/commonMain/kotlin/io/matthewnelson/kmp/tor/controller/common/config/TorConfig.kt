@@ -279,6 +279,7 @@ class TorConfig private constructor(
             }
             return this
         }
+
         open fun setDefault(): Setting<T> {
             if (isMutable) {
                 _value.value = default
@@ -299,14 +300,13 @@ class TorConfig private constructor(
         }
 
         override fun toString(): String {
-            val simpleName = this::class.simpleName?.let { ".$it" } ?: ""
-            return "TorConfig.Setting$simpleName(keyword=$keyword, value=$value, default=$default)"
+            return "${this::class.simpleName}(keyword=$keyword, value=$value, default=$default)"
         }
 
         /**
          * https://2019.www.torproject.org/docs/tor-manual.html.en#AutomapHostsOnResolve
          * */
-        class AutomapHostsOnResolve         : Setting<Option.TorF>(
+        class AutomapHostsOnResolve                 : Setting<Option.TorF>(
             keyword = "AutomapHostsOnResolve",
             default = Option.TorF.True,
             isStartArgument = false,
@@ -320,7 +320,7 @@ class TorConfig private constructor(
         /**
          * https://2019.www.torproject.org/docs/tor-manual.html.en#CacheDirectory
          * */
-        class CacheDirectory                : Setting<Option.FileSystemDir?>(
+        class CacheDirectory                        : Setting<Option.FileSystemDir?>(
             keyword = "CacheDirectory",
             default = null,
             isStartArgument = true,
@@ -338,7 +338,7 @@ class TorConfig private constructor(
         /**
          * https://2019.www.torproject.org/docs/tor-manual.html.en#ClientOnionAuthDir
          * */
-        class ClientOnionAuthDir            : Setting<Option.FileSystemDir?>(
+        class ClientOnionAuthDir                    : Setting<Option.FileSystemDir?>(
             keyword = "ClientOnionAuthDir",
             default = null,
             isStartArgument = true,
@@ -360,7 +360,7 @@ class TorConfig private constructor(
         /**
          * https://2019.www.torproject.org/docs/tor-manual.html.en#ConnectionPadding
          * */
-        class ConnectionPadding             : Setting<Option.AorTorF>(
+        class ConnectionPadding                     : Setting<Option.AorTorF>(
             keyword = "ConnectionPadding",
             default = Option.AorTorF.Auto,
             isStartArgument = false,
@@ -374,7 +374,7 @@ class TorConfig private constructor(
         /**
          * https://2019.www.torproject.org/docs/tor-manual.html.en#ConnectionPaddingReduced
          * */
-        class ConnectionPaddingReduced      : Setting<Option.TorF>(
+        class ConnectionPaddingReduced              : Setting<Option.TorF>(
             keyword = "ReducedConnectionPadding",
             default = Option.TorF.False,
             isStartArgument = false,
@@ -388,7 +388,7 @@ class TorConfig private constructor(
         /**
          * https://2019.www.torproject.org/docs/tor-manual.html.en#ControlPortWriteToFile
          * */
-        class ControlPortWriteToFile        : Setting<Option.FileSystemFile?>(
+        class ControlPortWriteToFile                : Setting<Option.FileSystemFile?>(
             keyword = "ControlPortWriteToFile",
             default = null,
             isStartArgument = true,
@@ -410,7 +410,7 @@ class TorConfig private constructor(
         /**
          * https://2019.www.torproject.org/docs/tor-manual.html.en#CookieAuthentication
          * */
-        class CookieAuthentication          : Setting<Option.TorF>(
+        class CookieAuthentication                  : Setting<Option.TorF>(
             keyword = "CookieAuthentication",
             default = Option.TorF.True,
             isStartArgument = true,
@@ -424,7 +424,7 @@ class TorConfig private constructor(
         /**
          * https://2019.www.torproject.org/docs/tor-manual.html.en#CookieAuthFile
          * */
-        class CookieAuthFile                : Setting<Option.FileSystemFile?>(
+        class CookieAuthFile                        : Setting<Option.FileSystemFile?>(
             keyword = "CookieAuthFile",
             default = null,
             isStartArgument = true,
@@ -446,7 +446,7 @@ class TorConfig private constructor(
         /**
          * https://2019.www.torproject.org/docs/tor-manual.html.en#DataDirectory
          * */
-        class DataDirectory                 : Setting<Option.FileSystemDir?>(
+        class DataDirectory                         : Setting<Option.FileSystemDir?>(
             keyword = "DataDirectory",
             default = null,
             isStartArgument = true,
@@ -468,7 +468,7 @@ class TorConfig private constructor(
         /**
          * https://2019.www.torproject.org/docs/tor-manual.html.en#DisableNetwork
          * */
-        class DisableNetwork                : Setting<Option.TorF>(
+        class DisableNetwork                        : Setting<Option.TorF>(
             keyword = "DisableNetwork",
             default = Option.TorF.False,
             isStartArgument = true,
@@ -482,7 +482,7 @@ class TorConfig private constructor(
         /**
          * https://2019.www.torproject.org/docs/tor-manual.html.en#DormantCanceledByStartup
          * */
-        class DormantCanceledByStartup      : Setting<Option.TorF>(
+        class DormantCanceledByStartup              : Setting<Option.TorF>(
             keyword = "DormantCanceledByStartup",
             default = Option.TorF.False,
             isStartArgument = true,
@@ -496,7 +496,7 @@ class TorConfig private constructor(
         /**
          * https://2019.www.torproject.org/docs/tor-manual.html.en#DormantClientTimeout
          * */
-        class DormantClientTimeout          : Setting<Option.Time>(
+        class DormantClientTimeout                  : Setting<Option.Time>(
             keyword = "DormantClientTimeout",
             default = Option.Time.Hours(24),
             isStartArgument = false,
@@ -518,7 +518,7 @@ class TorConfig private constructor(
         /**
          * https://2019.www.torproject.org/docs/tor-manual.html.en#DormantOnFirstStartup
          * */
-        class DormantOnFirstStartup         : Setting<Option.TorF>(
+        class DormantOnFirstStartup                 : Setting<Option.TorF>(
             keyword = "DormantOnFirstStartup",
             default = Option.TorF.False,
             isStartArgument = true,
@@ -546,7 +546,7 @@ class TorConfig private constructor(
         /**
          * https://2019.www.torproject.org/docs/tor-manual.html.en#GeoIPExcludeUnknown
          * */
-        class GeoIPExcludeUnknown           : Setting<Option.AorTorF>(
+        class GeoIPExcludeUnknown                   : Setting<Option.AorTorF>(
             keyword = "GeoIPExcludeUnknown",
             default = Option.AorTorF.Auto,
             isStartArgument = false,
@@ -560,7 +560,7 @@ class TorConfig private constructor(
         /**
          * https://2019.www.torproject.org/docs/tor-manual.html.en#GeoIPFile
          * */
-        class GeoIpV4File                   : Setting<Option.FileSystemFile?>(
+        class GeoIpV4File                           : Setting<Option.FileSystemFile?>(
             keyword = "GeoIPFile",
             default = null,
             isStartArgument = true,
@@ -578,7 +578,7 @@ class TorConfig private constructor(
         /**
          * https://2019.www.torproject.org/docs/tor-manual.html.en#GeoIPv6File
          * */
-        class GeoIpV6File                   : Setting<Option.FileSystemFile?>(
+        class GeoIpV6File                           : Setting<Option.FileSystemFile?>(
             keyword = "GeoIPv6File",
             default = null,
             isStartArgument = true,
@@ -619,7 +619,7 @@ class TorConfig private constructor(
          * https://2019.www.torproject.org/docs/tor-manual.html.en#HiddenServiceMaxStreams
          * https://2019.www.torproject.org/docs/tor-manual.html.en#HiddenServiceMaxStreamsCloseCircuit
          * */
-        class HiddenService                 : Setting<Option.FileSystemDir?>(
+        class HiddenService                         : Setting<Option.FileSystemDir?>(
             keyword = "HiddenServiceDir",
             default = null,
             isStartArgument = false,
@@ -877,7 +877,7 @@ class TorConfig private constructor(
         /**
          * https://torproject.gitlab.io/torspec/control-spec/#takeownership
          * */
-        class OwningControllerProcess       : Setting<Option.ProcessId?>(
+        class OwningControllerProcess               : Setting<Option.ProcessId?>(
             keyword = "__OwningControllerProcess",
             default = null,
             isStartArgument = true,
@@ -942,7 +942,7 @@ class TorConfig private constructor(
              *
              * @see [UnixSockets.Control]
              * */
-            class Control                       : Ports(
+            class Control                               : Ports(
                 keyword = "ControlPort",
                 default = Option.AorDorPort.Auto,
                 isStartArgument = true,
@@ -964,7 +964,7 @@ class TorConfig private constructor(
             /**
              * https://2019.www.torproject.org/docs/tor-manual.html.en#DNSPort
              * */
-            class Dns                           : Ports(
+            class Dns                                   : Ports(
                 keyword = "DNSPort",
                 default = Option.AorDorPort.Disable,
                 isStartArgument = false,
@@ -996,7 +996,7 @@ class TorConfig private constructor(
             /**
              * https://2019.www.torproject.org/docs/tor-manual.html.en#HTTPTunnelPort
              * */
-            class HttpTunnel                    : Ports(
+            class HttpTunnel                            : Ports(
                 keyword = "HTTPTunnelPort",
                 default = Option.AorDorPort.Disable,
                 isStartArgument = false,
@@ -1028,7 +1028,7 @@ class TorConfig private constructor(
             /**
              * https://2019.www.torproject.org/docs/tor-manual.html.en#SocksPort
              * */
-            class Socks                         : Ports(
+            class Socks                                 : Ports(
                 keyword = "SocksPort",
                 default = Option.AorDorPort.Value(PortProxy(9050)),
                 isStartArgument = false,
@@ -1093,7 +1093,7 @@ class TorConfig private constructor(
             /**
              * https://2019.www.torproject.org/docs/tor-manual.html.en#TransPort
              * */
-            class Trans                         : Ports(
+            class Trans                                 : Ports(
                 keyword = "TransPort",
                 default = Option.AorDorPort.Disable,
                 isStartArgument = false,
@@ -1187,7 +1187,7 @@ class TorConfig private constructor(
             /**
              * https://2019.www.torproject.org/docs/tor-manual.html.en#ControlPort
              * */
-            class Control                       : UnixSockets(
+            class Control                               : UnixSockets(
                 keyword = "ControlPort",
                 isStartArgument = true,
             ) {
@@ -1237,7 +1237,7 @@ class TorConfig private constructor(
             /**
              * https://2019.www.torproject.org/docs/tor-manual.html.en#SocksPort
              * */
-            class Socks                       : UnixSockets(
+            class Socks                             : UnixSockets(
                 keyword = "SocksPort",
                 isStartArgument = false,
             ) {
@@ -1302,7 +1302,7 @@ class TorConfig private constructor(
         /**
          * https://2019.www.torproject.org/docs/tor-manual.html.en#RunAsDaemon
          * */
-        class RunAsDaemon                   : Setting<Option.TorF>(
+        class RunAsDaemon                           : Setting<Option.TorF>(
             keyword = "RunAsDaemon",
             default = Option.TorF.False,
             isStartArgument = true,
@@ -1316,7 +1316,7 @@ class TorConfig private constructor(
         /**
          * https://2019.www.torproject.org/docs/tor-manual.html.en#SyslogIdentityTag
          * */
-        class SyslogIdentityTag             : Setting<Option.FieldId?>(
+        class SyslogIdentityTag                     : Setting<Option.FieldId?>(
             keyword = "SyslogIdentityTag",
             default = null,
             isStartArgument = true,
