@@ -628,8 +628,9 @@ class TorConfig private constructor(
             /**
              * See [HiddenService.VirtualPort]
              * */
-            var ports: Set<HiddenService.VirtualPort>? = null
-                private set
+            private val _ports: AtomicRef<Set<HiddenService.VirtualPort>?> = atomic(null)
+            @get:JvmName("ports")
+            val ports: Set<HiddenService.VirtualPort>? get() = _ports.value
 
             /**
              * A value of `null` means it will not be written to the config and falls
@@ -637,15 +638,17 @@ class TorConfig private constructor(
              *
              * @see [MaxStreams]
              * */
-            var maxStreams: MaxStreams? = null
-                private set
+            private val _maxStreams: AtomicRef<MaxStreams?> = atomic(null)
+            @get:JvmName("maxStreams")
+            val maxStreams: MaxStreams? get() = _maxStreams.value
 
             /**
              * A value of `null` means it will not be written to the config and falls
              * back to Tor's default setting of [Option.TorF.False]
              * */
-            var maxStreamsCloseCircuit: Option.TorF? = null
-                private set
+            private val _maxStreamsCloseCircuit: AtomicRef<Option.TorF?> = atomic(null)
+            @get:JvmName("maxStreamsCloseCircuit")
+            val maxStreamsCloseCircuit: Option.TorF? get() = _maxStreamsCloseCircuit.value
 
             override fun set(value: Option.FileSystemDir?): Setting<Option.FileSystemDir?> {
                 return super.set(value?.nullIfEmpty)
@@ -654,7 +657,7 @@ class TorConfig private constructor(
             fun setPorts(ports: Set<VirtualPort>?): HiddenService {
                 if (isMutable) {
                     if (ports.isNullOrEmpty()) {
-                        this.ports = null
+                        _ports.value = null
                     } else {
                         val filtered = ports.filter { instance ->
                             when (instance) {
@@ -669,7 +672,7 @@ class TorConfig private constructor(
                             }
                         }
 
-                        this.ports = if (filtered.isNotEmpty()) {
+                        _ports.value = if (filtered.isNotEmpty()) {
                             filtered.toSet()
                         } else {
                             null
@@ -682,14 +685,14 @@ class TorConfig private constructor(
 
             fun setMaxStreams(maxStreams: MaxStreams?): HiddenService {
                 if (isMutable) {
-                    this.maxStreams = maxStreams
+                    _maxStreams.value = maxStreams
                 }
                 return this
             }
 
             fun setMaxStreamsCloseCircuit(value: Option.TorF?): HiddenService {
                 if (isMutable) {
-                    maxStreamsCloseCircuit = value
+                    _maxStreamsCloseCircuit.value = value
                 }
                 return this
             }
@@ -697,9 +700,9 @@ class TorConfig private constructor(
             override fun setDefault(): HiddenService {
                 if (isMutable) {
                     super.setDefault()
-                    ports = null
-                    maxStreams = null
-                    maxStreamsCloseCircuit = null
+                    _ports.value = null
+                    _maxStreams.value = null
+                    _maxStreamsCloseCircuit.value = null
                 }
                 return this
             }
@@ -970,20 +973,21 @@ class TorConfig private constructor(
                 isStartArgument = false,
             ) {
 
-                var isolationFlags: Set<IsolationFlag>? = null
-                    private set
+                private val _isolationFlags: AtomicRef<Set<IsolationFlag>?> = atomic(null)
+                @get:JvmName("isolationFlags")
+                val isolationFlags: Set<IsolationFlag>? get() = _isolationFlags.value
 
                 override fun setDefault(): Dns {
                     if (isMutable) {
                         super.setDefault()
-                        isolationFlags = null
+                        _isolationFlags.value = null
                     }
                     return this
                 }
 
                 fun setIsolationFlags(flags: Set<IsolationFlag>?): Dns {
                     if (isMutable) {
-                        isolationFlags = flags?.toSet()
+                        _isolationFlags.value = flags?.toSet()
                     }
                     return this
                 }
@@ -1002,20 +1006,21 @@ class TorConfig private constructor(
                 isStartArgument = false,
             ) {
 
-                var isolationFlags: Set<IsolationFlag>? = null
-                    private set
+                private val _isolationFlags: AtomicRef<Set<IsolationFlag>?> = atomic(null)
+                @get:JvmName("isolationFlags")
+                val isolationFlags: Set<IsolationFlag>? get() = _isolationFlags.value
 
                 override fun setDefault(): HttpTunnel {
                     if (isMutable) {
                         super.setDefault()
-                        isolationFlags = null
+                        _isolationFlags.value = null
                     }
                     return this
                 }
 
                 fun setIsolationFlags(flags: Set<IsolationFlag>?): HttpTunnel {
                     if (isMutable) {
-                        isolationFlags = flags?.toSet()
+                        _isolationFlags.value = flags?.toSet()
                     }
                     return this
                 }
@@ -1034,30 +1039,33 @@ class TorConfig private constructor(
                 isStartArgument = false,
             ) {
 
-                var flags: Set<Flag>? = null
-                    private set
-                var isolationFlags: Set<IsolationFlag>? = null
-                    private set
+                private val _flags: AtomicRef<Set<Flag>?> = atomic(null)
+                @get:JvmName("flags")
+                val flags: Set<Flag>? get() = _flags.value
+
+                private val _isolationFlags: AtomicRef<Set<IsolationFlag>?> = atomic(null)
+                @get:JvmName("isolationFlags")
+                val isolationFlags: Set<IsolationFlag>? get() = _isolationFlags.value
 
                 override fun setDefault(): Socks {
                     if (isMutable) {
                         super.setDefault()
-                        flags = null
-                        isolationFlags = null
+                        _flags.value = null
+                        _isolationFlags.value = null
                     }
                     return this
                 }
 
                 fun setFlags(flags: Set<Flag>?): Socks {
                     if (isMutable) {
-                        this.flags = flags?.toSet()
+                        _flags.value = flags?.toSet()
                     }
                     return this
                 }
 
                 fun setIsolationFlags(flags: Set<IsolationFlag>?): Socks {
                     if (isMutable) {
-                        isolationFlags = flags?.toSet()
+                        _isolationFlags.value = flags?.toSet()
                     }
                     return this
                 }
@@ -1099,20 +1107,21 @@ class TorConfig private constructor(
                 isStartArgument = false,
             ) {
 
-                var isolationFlags: Set<IsolationFlag>? = null
-                    private set
+                private val _isolationFlags: AtomicRef<Set<IsolationFlag>?> = atomic(null)
+                @get:JvmName("isolationFlags")
+                val isolationFlags: Set<IsolationFlag>? get() = _isolationFlags.value
 
                 override fun setDefault(): Trans {
                     if (isMutable) {
                         super.setDefault()
-                        isolationFlags = null
+                        _isolationFlags.value = null
                     }
                     return this
                 }
 
                 fun setIsolationFlags(flags: Set<IsolationFlag>?): Trans {
                     if (isMutable) {
-                        isolationFlags = flags?.toSet()
+                        _isolationFlags.value = flags?.toSet()
                     }
                     return this
                 }
@@ -1192,20 +1201,21 @@ class TorConfig private constructor(
                 isStartArgument = true,
             ) {
 
-                var unixFlags: Set<UnixSockets.Control.Flag>? = null
-                    private set
+                private val _unixFlags: AtomicRef<Set<UnixSockets.Control.Flag>?> = atomic(null)
+                @get:JvmName("unixFlags")
+                val unixFlags: Set<UnixSockets.Control.Flag>? get() = _unixFlags.value
 
                 override fun setDefault(): Control {
                     if (isMutable) {
                         super.setDefault()
-                        unixFlags = null
+                        _unixFlags.value = null
                     }
                     return this
                 }
 
                 fun setUnixFlags(flags: Set<UnixSockets.Control.Flag>?): Control {
                     if (isMutable) {
-                        unixFlags = flags?.toSet()
+                        _unixFlags.value = flags?.toSet()
                     }
                     return this
                 }
@@ -1242,40 +1252,45 @@ class TorConfig private constructor(
                 isStartArgument = false,
             ) {
 
-                var flags: Set<Ports.Socks.Flag>? = null
-                    private set
-                var unixFlags: Set<UnixSockets.Flag>? = null
-                    private set
-                var isolationFlags: Set<Ports.IsolationFlag>? = null
-                    private set
+                private val _flags: AtomicRef<Set<Ports.Socks.Flag>?> = atomic(null)
+                @get:JvmName("flags")
+                val flags: Set<Ports.Socks.Flag>? get() = _flags.value
+
+                private val _unixFlags: AtomicRef<Set<UnixSockets.Flag>?> = atomic(null)
+                @get:JvmName("unixFlags")
+                val unixFlags: Set<UnixSockets.Flag>? get() = _unixFlags.value
+
+                private val _isolationFlags: AtomicRef<Set<Ports.IsolationFlag>?> = atomic(null)
+                @get:JvmName("isolationFlags")
+                val isolationFlags: Set<Ports.IsolationFlag>? get() = _isolationFlags.value
 
                 override fun setDefault(): Socks {
                     if (isMutable) {
                         super.setDefault()
-                        flags = null
-                        unixFlags = null
-                        isolationFlags = null
+                        _flags.value = null
+                        _unixFlags.value = null
+                        _isolationFlags.value = null
                     }
                     return this
                 }
 
                 fun setFlags(flags: Set<Ports.Socks.Flag>?): Socks {
                     if (isMutable) {
-                        this.flags = flags?.toSet()
+                        _flags.value = flags?.toSet()
                     }
                     return this
                 }
 
                 fun setUnixFlags(flags: Set<UnixSockets.Flag>?): Socks {
                     if (isMutable) {
-                        unixFlags = flags?.toSet()
+                        _unixFlags.value = flags?.toSet()
                     }
                     return this
                 }
 
                 fun setIsolationFlags(flags: Set<Ports.IsolationFlag>?): Socks {
                     if (isMutable) {
-                        isolationFlags = flags?.toSet()
+                        _isolationFlags.value = flags?.toSet()
                     }
                     return this
                 }
