@@ -135,7 +135,7 @@ internal abstract class TorServiceNotification(
     fun postError(t: Throwable) {
         render(currentState.copy(
             actions = actionsEmpty,
-            contentText = "${t.javaClass.simpleName}(${t.message})",
+            contentText = "${t::class.simpleName}(${t.message})",
             progress = Progress.None,
             smallIcon = config._iconError
         ))

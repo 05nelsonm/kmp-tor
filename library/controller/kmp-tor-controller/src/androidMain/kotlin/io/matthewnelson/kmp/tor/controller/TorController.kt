@@ -19,6 +19,7 @@ package io.matthewnelson.kmp.tor.controller
 
 import android.net.LocalSocket
 import android.net.LocalSocketAddress
+import android.os.Build
 import io.matthewnelson.kmp.tor.common.address.ProxyAddress
 import io.matthewnelson.kmp.tor.common.annotation.ExperimentalTorApi
 import io.matthewnelson.kmp.tor.common.annotation.InternalTorApi
@@ -89,6 +90,10 @@ actual interface TorController: TorControlProcessor, TorEventProcessor<TorEvent.
             @OptIn(InternalTorApi::class)
             if (!unixDomainSocket.isUnixPath) {
                 throw TorControllerException("Unix domain socket path must start with '/'")
+            }
+
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.KITKAT) {
+                throw TorControllerException("Unix Domain Sockets unsupported for Android API < 19.")
             }
 
             val dispatchers = getTorControllerDispatchers()
