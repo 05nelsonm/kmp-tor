@@ -62,7 +62,7 @@ abstract class TorTestHelper {
                 .asCoroutineDispatcher()
                 .also { Dispatchers.setMain(it) }
 
-            tmpWorkDir = testDir.newFolder("torservice")
+            tmpWorkDir = testDir.newFolder("tor service")
             tmpCacheDir = testDir.newFolder("cache")
         }
 
