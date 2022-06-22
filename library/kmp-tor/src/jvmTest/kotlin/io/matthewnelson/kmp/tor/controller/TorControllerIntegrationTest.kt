@@ -391,7 +391,7 @@ class TorControllerIntegrationTest: TorTestHelper() {
 
         val entries = manager.configGet(hsConfigSettings.first())
             .getOrThrow()
-            .filter { it.key == hsConfigSettings.first().keyword }
+            .filter { it.key == hsConfigSettings.first().keyword.toString() }
 
         assertEquals(hsConfigSettings.size, entries.size)
 
@@ -411,7 +411,7 @@ class TorControllerIntegrationTest: TorTestHelper() {
 
         val entries = manager.configGet(hsConfigSettings.first())
             .getOrThrow()
-            .filter { it.key == hsConfigSettings.first().keyword }
+            .filter { it.key == hsConfigSettings.first().keyword.toString() }
 
         assertEquals(hsConfigSettings.size, entries.size)
 
@@ -421,7 +421,7 @@ class TorControllerIntegrationTest: TorTestHelper() {
 
             val resetEntries = manager.configGet(hsConfigSettings.first())
                 .getOrThrow()
-                .filter { it.key == hsConfigSettings.first().keyword }
+                .filter { it.key == hsConfigSettings.first().keyword.toString() }
 
             assertEquals(1, resetEntries.size)
         } catch (t: Throwable) {
@@ -450,7 +450,7 @@ class TorControllerIntegrationTest: TorTestHelper() {
 
         val entries = manager.configGet(hsConfigSettings.first())
             .getOrThrow()
-            .filter { it.key == hsConfigSettings.first().keyword }
+            .filter { it.key == hsConfigSettings.first().keyword.toString() }
 
         assertEquals(hsConfigSettings.size, entries.size)
 
@@ -460,7 +460,7 @@ class TorControllerIntegrationTest: TorTestHelper() {
 
             val resetEntries = manager.configGet(hsConfigSettings.first())
                 .getOrThrow()
-                .filter { it.key == hsConfigSettings.first().keyword }
+                .filter { it.key == hsConfigSettings.first().keyword.toString() }
 
             assertEquals(1, resetEntries.size)
         } catch (t: Throwable) {

@@ -41,6 +41,7 @@ import kotlin.reflect.KClass
  * @see [Builder]
  * @see [Setting]
  * @see [Option]
+ * @see [KeyWord]
  * */
 @OptIn(ExperimentalTorApi::class, InternalTorApi::class)
 @Suppress("RemoveRedundantQualifierName", "SpellCheckingInspection")
@@ -159,7 +160,7 @@ class TorConfig private constructor(
         fun build(): TorConfig {
             val sb = StringBuilder()
 
-            val disabledPorts = mutableSetOf<String>()
+            val disabledPorts = mutableSetOf<KeyWord>()
             val sorted = settings.sortedBy { setting ->
                 when (setting) {
                     // Ports must come before UnixSocket to ensure
@@ -174,12 +175,12 @@ class TorConfig private constructor(
                         "AAA${setting.keyword}"
                     }
                     else -> {
-                        setting.keyword
+                        setting.keyword.toString()
                     }
                 }
             }
 
-            val writtenDisabledPorts: MutableSet<String> = LinkedHashSet(disabledPorts.size)
+            val writtenDisabledPorts: MutableSet<KeyWord> = LinkedHashSet(disabledPorts.size)
 
             val newSettings = mutableSetOf<Setting<*>>()
             for (setting in sorted) {
@@ -247,7 +248,7 @@ class TorConfig private constructor(
     @Suppress("PropertyName", "CanBePrimaryConstructorProperty")
     sealed class Setting<T: Option?>(
         @JvmField
-        val keyword: String,
+        val keyword: KeyWord,
         @JvmField
         val default: T,
         isStartArgument: Boolean,
@@ -308,7 +309,7 @@ class TorConfig private constructor(
          * https://2019.www.torproject.org/docs/tor-manual.html.en#AutomapHostsOnResolve
          * */
         class AutomapHostsOnResolve                 : Setting<Option.TorF>(
-            keyword = "AutomapHostsOnResolve",
+            keyword = KeyWord.AutomapHostsOnResolve,
             default = Option.TorF.True,
             isStartArgument = false,
         ) {
@@ -322,7 +323,7 @@ class TorConfig private constructor(
          * https://2019.www.torproject.org/docs/tor-manual.html.en#CacheDirectory
          * */
         class CacheDirectory                        : Setting<Option.FileSystemDir?>(
-            keyword = "CacheDirectory",
+            keyword = KeyWord.CacheDirectory,
             default = null,
             isStartArgument = true,
         ) {
@@ -340,7 +341,7 @@ class TorConfig private constructor(
          * https://2019.www.torproject.org/docs/tor-manual.html.en#ClientOnionAuthDir
          * */
         class ClientOnionAuthDir                    : Setting<Option.FileSystemDir?>(
-            keyword = "ClientOnionAuthDir",
+            keyword = KeyWord.ClientOnionAuthDir,
             default = null,
             isStartArgument = true,
         ) {
@@ -362,7 +363,7 @@ class TorConfig private constructor(
          * https://2019.www.torproject.org/docs/tor-manual.html.en#ConnectionPadding
          * */
         class ConnectionPadding                     : Setting<Option.AorTorF>(
-            keyword = "ConnectionPadding",
+            keyword = KeyWord.ConnectionPadding,
             default = Option.AorTorF.Auto,
             isStartArgument = false,
         ) {
@@ -376,7 +377,7 @@ class TorConfig private constructor(
          * https://2019.www.torproject.org/docs/tor-manual.html.en#ConnectionPaddingReduced
          * */
         class ConnectionPaddingReduced              : Setting<Option.TorF>(
-            keyword = "ReducedConnectionPadding",
+            keyword = KeyWord.ReducedConnectionPadding,
             default = Option.TorF.False,
             isStartArgument = false,
         ) {
@@ -390,7 +391,7 @@ class TorConfig private constructor(
          * https://2019.www.torproject.org/docs/tor-manual.html.en#ControlPortWriteToFile
          * */
         class ControlPortWriteToFile                : Setting<Option.FileSystemFile?>(
-            keyword = "ControlPortWriteToFile",
+            keyword = KeyWord.ControlPortWriteToFile,
             default = null,
             isStartArgument = true,
         ) {
@@ -412,7 +413,7 @@ class TorConfig private constructor(
          * https://2019.www.torproject.org/docs/tor-manual.html.en#CookieAuthentication
          * */
         class CookieAuthentication                  : Setting<Option.TorF>(
-            keyword = "CookieAuthentication",
+            keyword = KeyWord.CookieAuthentication,
             default = Option.TorF.True,
             isStartArgument = true,
         ) {
@@ -426,7 +427,7 @@ class TorConfig private constructor(
          * https://2019.www.torproject.org/docs/tor-manual.html.en#CookieAuthFile
          * */
         class CookieAuthFile                        : Setting<Option.FileSystemFile?>(
-            keyword = "CookieAuthFile",
+            keyword = KeyWord.CookieAuthFile,
             default = null,
             isStartArgument = true,
         ) {
@@ -448,7 +449,7 @@ class TorConfig private constructor(
          * https://2019.www.torproject.org/docs/tor-manual.html.en#DataDirectory
          * */
         class DataDirectory                         : Setting<Option.FileSystemDir?>(
-            keyword = "DataDirectory",
+            keyword = KeyWord.DataDirectory,
             default = null,
             isStartArgument = true,
         ) {
@@ -470,7 +471,7 @@ class TorConfig private constructor(
          * https://2019.www.torproject.org/docs/tor-manual.html.en#DisableNetwork
          * */
         class DisableNetwork                        : Setting<Option.TorF>(
-            keyword = "DisableNetwork",
+            keyword = KeyWord.DisableNetwork,
             default = Option.TorF.False,
             isStartArgument = true,
         ) {
@@ -484,7 +485,7 @@ class TorConfig private constructor(
          * https://2019.www.torproject.org/docs/tor-manual.html.en#DormantCanceledByStartup
          * */
         class DormantCanceledByStartup              : Setting<Option.TorF>(
-            keyword = "DormantCanceledByStartup",
+            keyword = KeyWord.DormantCanceledByStartup,
             default = Option.TorF.False,
             isStartArgument = true,
         ) {
@@ -498,7 +499,7 @@ class TorConfig private constructor(
          * https://2019.www.torproject.org/docs/tor-manual.html.en#DormantClientTimeout
          * */
         class DormantClientTimeout                  : Setting<Option.Time>(
-            keyword = "DormantClientTimeout",
+            keyword = KeyWord.DormantClientTimeout,
             default = Option.Time.Hours(24),
             isStartArgument = false,
         ) {
@@ -520,7 +521,7 @@ class TorConfig private constructor(
          * https://2019.www.torproject.org/docs/tor-manual.html.en#DormantOnFirstStartup
          * */
         class DormantOnFirstStartup                 : Setting<Option.TorF>(
-            keyword = "DormantOnFirstStartup",
+            keyword = KeyWord.DormantOnFirstStartup,
             default = Option.TorF.False,
             isStartArgument = true,
         ) {
@@ -534,7 +535,7 @@ class TorConfig private constructor(
          * https://2019.www.torproject.org/docs/tor-manual.html.en#DormantTimeoutDisabledByIdleStreams
          * */
         class DormantTimeoutDisabledByIdleStreams   : Setting<Option.TorF>(
-            keyword = "DormantTimeoutDisabledByIdleStreams",
+            keyword = KeyWord.DormantTimeoutDisabledByIdleStreams,
             default = Option.TorF.True,
             isStartArgument = false,
         ) {
@@ -548,7 +549,7 @@ class TorConfig private constructor(
          * https://2019.www.torproject.org/docs/tor-manual.html.en#GeoIPExcludeUnknown
          * */
         class GeoIPExcludeUnknown                   : Setting<Option.AorTorF>(
-            keyword = "GeoIPExcludeUnknown",
+            keyword = KeyWord.GeoIPExcludeUnknown,
             default = Option.AorTorF.Auto,
             isStartArgument = false,
         ) {
@@ -562,7 +563,7 @@ class TorConfig private constructor(
          * https://2019.www.torproject.org/docs/tor-manual.html.en#GeoIPFile
          * */
         class GeoIpV4File                           : Setting<Option.FileSystemFile?>(
-            keyword = "GeoIPFile",
+            keyword = KeyWord.GeoIpV4File,
             default = null,
             isStartArgument = true,
         ) {
@@ -580,7 +581,7 @@ class TorConfig private constructor(
          * https://2019.www.torproject.org/docs/tor-manual.html.en#GeoIPv6File
          * */
         class GeoIpV6File                           : Setting<Option.FileSystemFile?>(
-            keyword = "GeoIPv6File",
+            keyword = KeyWord.GeoIPv6File,
             default = null,
             isStartArgument = true,
         ) {
@@ -621,7 +622,7 @@ class TorConfig private constructor(
          * https://2019.www.torproject.org/docs/tor-manual.html.en#HiddenServiceMaxStreamsCloseCircuit
          * */
         class HiddenService                         : Setting<Option.FileSystemDir?>(
-            keyword = "HiddenServiceDir",
+            keyword = KeyWord.HiddenServiceDir,
             default = null,
             isStartArgument = false,
         ) {
@@ -838,7 +839,7 @@ class TorConfig private constructor(
          * https://torproject.gitlab.io/torspec/control-spec/#takeownership
          * */
         class OwningControllerProcess               : Setting<Option.ProcessId?>(
-            keyword = "__OwningControllerProcess",
+            keyword = KeyWord.OwningControllerProcess,
             default = null,
             isStartArgument = true,
         ) {
@@ -849,7 +850,7 @@ class TorConfig private constructor(
         }
 
         sealed class Ports(
-            keyword: String,
+            keyword: TorConfig.KeyWord,
             default: Option.AorDorPort,
             isStartArgument: Boolean,
         ) : Setting<Option.AorDorPort>(
@@ -903,7 +904,7 @@ class TorConfig private constructor(
              * @see [UnixSockets.Control]
              * */
             class Control                               : Ports(
-                keyword = "ControlPort",
+                keyword = KeyWord.PortControl,
                 default = Option.AorDorPort.Auto,
                 isStartArgument = true,
             ) {
@@ -925,7 +926,7 @@ class TorConfig private constructor(
              * https://2019.www.torproject.org/docs/tor-manual.html.en#DNSPort
              * */
             class Dns                                   : Ports(
-                keyword = "DNSPort",
+                keyword = KeyWord.PortDns,
                 default = Option.AorDorPort.Disable,
                 isStartArgument = false,
             ) {
@@ -958,7 +959,7 @@ class TorConfig private constructor(
              * https://2019.www.torproject.org/docs/tor-manual.html.en#HTTPTunnelPort
              * */
             class HttpTunnel                            : Ports(
-                keyword = "HTTPTunnelPort",
+                keyword = KeyWord.PortHttpTunnel,
                 default = Option.AorDorPort.Disable,
                 isStartArgument = false,
             ) {
@@ -991,7 +992,7 @@ class TorConfig private constructor(
              * https://2019.www.torproject.org/docs/tor-manual.html.en#SocksPort
              * */
             class Socks                                 : Ports(
-                keyword = "SocksPort",
+                keyword = KeyWord.PortSocks,
                 default = Option.AorDorPort.Value(PortProxy(9050)),
                 isStartArgument = false,
             ) {
@@ -1059,7 +1060,7 @@ class TorConfig private constructor(
              * https://2019.www.torproject.org/docs/tor-manual.html.en#TransPort
              * */
             class Trans                                 : Ports(
-                keyword = "TransPort",
+                keyword = KeyWord.PortTrans,
                 default = Option.AorDorPort.Disable,
                 isStartArgument = false,
             ) {
@@ -1129,7 +1130,7 @@ class TorConfig private constructor(
         }
 
         sealed class UnixSockets(
-            keyword: String,
+            keyword: TorConfig.KeyWord,
             isStartArgument: Boolean,
         ) : Setting<Option.FileSystemFile?>(
             keyword,
@@ -1162,7 +1163,7 @@ class TorConfig private constructor(
              * https://2019.www.torproject.org/docs/tor-manual.html.en#ControlPort
              * */
             class Control                               : UnixSockets(
-                keyword = "ControlPort",
+                keyword = KeyWord.PortControl,
                 isStartArgument = true,
             ) {
 
@@ -1213,7 +1214,7 @@ class TorConfig private constructor(
              * https://2019.www.torproject.org/docs/tor-manual.html.en#SocksPort
              * */
             class Socks                             : UnixSockets(
-                keyword = "SocksPort",
+                keyword = KeyWord.PortSocks,
                 isStartArgument = false,
             ) {
 
@@ -1283,7 +1284,7 @@ class TorConfig private constructor(
          * https://2019.www.torproject.org/docs/tor-manual.html.en#RunAsDaemon
          * */
         class RunAsDaemon                           : Setting<Option.TorF>(
-            keyword = "RunAsDaemon",
+            keyword = KeyWord.RunAsDaemon,
             default = Option.TorF.False,
             isStartArgument = true,
         ) {
@@ -1297,7 +1298,7 @@ class TorConfig private constructor(
          * https://2019.www.torproject.org/docs/tor-manual.html.en#SyslogIdentityTag
          * */
         class SyslogIdentityTag                     : Setting<Option.FieldId?>(
-            keyword = "SyslogIdentityTag",
+            keyword = KeyWord.SyslogIdentityTag,
             default = null,
             isStartArgument = true,
         ) {
@@ -1543,5 +1544,50 @@ class TorConfig private constructor(
                 override fun toString(): String = value
             }
         }
+    }
+
+    sealed class KeyWord: Comparable<String>, CharSequence {
+
+        object AutomapHostsOnResolve: KeyWord() { override fun toString(): String = "AutomapHostsOnResolve" }
+        object CacheDirectory: KeyWord() { override fun toString(): String = "CacheDirectory" }
+        object ClientOnionAuthDir: KeyWord() { override fun toString(): String = "ClientOnionAuthDir" }
+        object ConnectionPadding: KeyWord() { override fun toString(): String = "ConnectionPadding" }
+        object ReducedConnectionPadding: KeyWord() { override fun toString(): String = "ReducedConnectionPadding" }
+        object ControlPortWriteToFile: KeyWord() { override fun toString(): String = "ControlPortWriteToFile" }
+        object CookieAuthentication: KeyWord() { override fun toString(): String = "CookieAuthentication" }
+        object CookieAuthFile: KeyWord() { override fun toString(): String = "CookieAuthFile" }
+        object DataDirectory: KeyWord() { override fun toString(): String = "DataDirectory" }
+        object DisableNetwork: KeyWord() { override fun toString(): String = "DisableNetwork" }
+        object DormantCanceledByStartup: KeyWord() { override fun toString(): String = "DormantCanceledByStartup" }
+        object DormantClientTimeout: KeyWord() { override fun toString(): String = "DormantClientTimeout" }
+        object DormantOnFirstStartup: KeyWord() { override fun toString(): String = "DormantOnFirstStartup" }
+        object DormantTimeoutDisabledByIdleStreams: KeyWord() { override fun toString(): String = "DormantTimeoutDisabledByIdleStreams" }
+        object GeoIPExcludeUnknown: KeyWord() { override fun toString(): String = "GeoIPExcludeUnknown" }
+        object GeoIpV4File: KeyWord() { override fun toString(): String = "GeoIPFile" }
+        object GeoIPv6File: KeyWord() { override fun toString(): String = "GeoIPv6File" }
+        object HiddenServiceDir: KeyWord() { override fun toString(): String = "HiddenServiceDir" }
+        object HiddenServicePort: KeyWord() { override fun toString(): String = "HiddenServicePort" }
+        object HiddenServiceMaxStreams: KeyWord() { override fun toString(): String = "HiddenServiceMaxStreams" }
+        object HiddenServiceMaxStreamsCloseCircuit: KeyWord() { override fun toString(): String = "HiddenServiceMaxStreamsCloseCircuit" }
+        object OwningControllerProcess: KeyWord() { override fun toString(): String = "__OwningControllerProcess" }
+        object PortControl: KeyWord() { override fun toString(): String = "ControlPort" }
+        object PortDns: KeyWord() { override fun toString(): String = "DNSPort" }
+        object PortHttpTunnel: KeyWord() { override fun toString(): String = "HTTPTunnelPort" }
+        object PortSocks: KeyWord() { override fun toString(): String = "SocksPort" }
+        object PortTrans: KeyWord() { override fun toString(): String = "TransPort" }
+        object RunAsDaemon: KeyWord() { override fun toString(): String = "RunAsDaemon" }
+        object SyslogIdentityTag: KeyWord() { override fun toString(): String = "SyslogIdentityTag" }
+
+        final override val length: Int get() = toString().length
+        final override fun get(index: Int): Char = toString()[index]
+        final override fun subSequence(startIndex: Int, endIndex: Int): CharSequence {
+            return toString().subSequence(startIndex, endIndex)
+        }
+
+        final override fun compareTo(other: String): Int = toString().compareTo(other)
+        operator fun plus(other: Any?): String = toString() + other
+
+        final override fun equals(other: Any?): Boolean = other is KeyWord && other.toString() == toString()
+        final override fun hashCode(): Int = 21 * 31 + toString().hashCode()
     }
 }
