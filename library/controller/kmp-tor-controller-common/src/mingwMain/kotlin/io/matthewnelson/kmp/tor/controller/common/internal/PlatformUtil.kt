@@ -18,13 +18,13 @@ package io.matthewnelson.kmp.tor.controller.common.internal
 import io.matthewnelson.kmp.tor.common.annotation.InternalTorApi
 
 // TODO: Fill out
-actual object ControllerUtils {
+actual object PlatformUtil {
     @InternalTorApi
     actual fun localhostAddress(): String = "127.0.0.1"
 
-    actual val isDarwin: Boolean = true
+    actual val isDarwin: Boolean = false
     actual val isLinux: Boolean = false
-    actual val isMingw: Boolean = false
+    actual val isMingw: Boolean = true
 
     @InternalTorApi
     actual val hasControlUnixDomainSocketSupport: Boolean = false

@@ -36,7 +36,7 @@ import io.matthewnelson.kmp.tor.common.util.TorStrings.CLRF
 import io.matthewnelson.kmp.tor.common.util.TorStrings.MULTI_LINE_END
 import io.matthewnelson.kmp.tor.common.util.TorStrings.SP
 import io.matthewnelson.kmp.tor.controller.common.config.HiddenServiceEntry
-import io.matthewnelson.kmp.tor.controller.common.internal.ControllerUtils
+import io.matthewnelson.kmp.tor.controller.common.internal.PlatformUtil
 import io.matthewnelson.kmp.tor.controller.common.internal.appendTo
 import io.matthewnelson.kmp.tor.controller.internal.controller.ControlPortInteractor
 import io.matthewnelson.kmp.tor.controller.internal.controller.ReplyLine
@@ -487,10 +487,10 @@ private class RealTorControlProcessor(
 
                 if (hsPorts.isNotEmpty()) {
                     val localHostIp = try {
-                        ControllerUtils.localhostAddress()
+                        PlatformUtil.localhostAddress()
                     } catch (_: RuntimeException) {
                         withContext(Dispatchers.Default) {
-                            ControllerUtils.localhostAddress()
+                            PlatformUtil.localhostAddress()
                         }
                     }
 

@@ -22,7 +22,7 @@ import io.matthewnelson.kmp.tor.controller.common.config.TorConfig.Setting.Ports
 import io.matthewnelson.kmp.tor.controller.common.config.TorConfig.Setting.UnixSockets
 import io.matthewnelson.kmp.tor.controller.common.config.TorConfig.Option.AorDorPort
 import io.matthewnelson.kmp.tor.controller.common.file.Path
-import io.matthewnelson.kmp.tor.controller.common.internal.ControllerUtils
+import io.matthewnelson.kmp.tor.controller.common.internal.PlatformUtil
 import kotlin.test.*
 
 @OptIn(InternalTorApi::class)
@@ -77,7 +77,7 @@ class PortValidatorUnitTest {
         val controlSocket = validated.filterIsInstance<UnixSockets.Control>()
         assertEquals(1, controlPort.size + controlSocket.size)
 
-        if (ControllerUtils.hasControlUnixDomainSocketSupport) {
+        if (PlatformUtil.hasControlUnixDomainSocketSupport) {
             val expected = UnixSockets.Control()
             expected.set(TorConfig.Option.FileSystemFile(Path(DATA_DIR).builder {
                 addSegment(UnixSockets.Control.DEFAULT_NAME)

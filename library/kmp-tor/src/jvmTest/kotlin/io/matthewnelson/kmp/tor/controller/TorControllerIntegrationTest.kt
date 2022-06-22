@@ -24,7 +24,7 @@ import io.matthewnelson.kmp.tor.controller.common.control.TorControlOnionClientA
 import io.matthewnelson.kmp.tor.controller.common.control.usecase.TorControlInfoGet.KeyWord
 import io.matthewnelson.kmp.tor.controller.common.control.usecase.TorControlOnionAdd
 import io.matthewnelson.kmp.tor.controller.common.events.TorEvent
-import io.matthewnelson.kmp.tor.controller.common.internal.ControllerUtils
+import io.matthewnelson.kmp.tor.controller.common.internal.PlatformUtil
 import io.matthewnelson.kmp.tor.controller.common.internal.appendTo
 import io.matthewnelson.kmp.tor.helper.TorTestHelper
 import io.matthewnelson.kmp.tor.manager.common.event.TorManagerEvent
@@ -521,7 +521,7 @@ class TorControllerIntegrationTest: TorTestHelper() {
     @Test
     fun givenTorController_whenConfigResetSocksUnixSocketWithFlags_returnsSuccess() = runBlocking {
         // Only run if support for domain sockets is had
-        if (!ControllerUtils.isLinux) return@runBlocking
+        if (!PlatformUtil.isLinux) return@runBlocking
 
         val socks = TorConfig.Setting.UnixSockets.Socks()
             .setFlags(setOf(

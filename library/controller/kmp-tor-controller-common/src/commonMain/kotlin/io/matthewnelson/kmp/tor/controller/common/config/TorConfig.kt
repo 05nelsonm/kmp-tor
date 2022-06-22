@@ -25,7 +25,7 @@ import io.matthewnelson.kmp.tor.common.util.TorStrings.SP
 import io.matthewnelson.kmp.tor.controller.common.config.TorConfig.Option.TorF.False
 import io.matthewnelson.kmp.tor.controller.common.config.TorConfig.Option.TorF.True
 import io.matthewnelson.kmp.tor.controller.common.file.Path
-import io.matthewnelson.kmp.tor.controller.common.internal.ControllerUtils
+import io.matthewnelson.kmp.tor.controller.common.internal.PlatformUtil
 import io.matthewnelson.kmp.tor.controller.common.internal.appendTo
 import io.matthewnelson.kmp.tor.controller.common.internal.isUnixPath
 import kotlinx.atomicfu.AtomicBoolean
@@ -104,7 +104,7 @@ class TorConfig private constructor(
         init {
             // Reference so that localhostAddress for JVM can have its initial
             // value set immediately from BG thread.
-            ControllerUtils
+            PlatformUtil
         }
 
         private val settings: MutableSet<TorConfig.Setting<*>> = mutableSetOf()
@@ -663,7 +663,7 @@ class TorConfig private constructor(
                         val filtered = ports.filter { instance ->
                             when (instance) {
                                 is UnixSocket -> {
-                                    if (!ControllerUtils.isLinux) {
+                                    if (!PlatformUtil.isLinux) {
                                         false
                                     } else {
                                         instance.targetUnixSocket.isUnixPath
@@ -770,7 +770,7 @@ class TorConfig private constructor(
              * android). All [UnixSocket]s will be removed when [setPorts] is
              * called, so it is safe to call this from common code.
              *
-             * You can check [ControllerUtils.isLinux] when setting up your hidden
+             * You can check [PlatformUtil.isLinux] when setting up your hidden
              * service if you need to implement a fallback to use TCP.
              *
              * EX:
@@ -1069,7 +1069,7 @@ class TorConfig private constructor(
                 val isolationFlags: Set<IsolationFlag>? get() = _isolationFlags.value
 
                 override fun set(value: Option.AorDorPort): Setting<Option.AorDorPort> {
-                    return if (ControllerUtils.isLinux) {
+                    return if (PlatformUtil.isLinux) {
                         super.set(value)
                     } else {
                         this
@@ -1139,9 +1139,9 @@ class TorConfig private constructor(
 
             final override fun set(value: Option.FileSystemFile?): Setting<Option.FileSystemFile?> {
                 // Do not set if platform is something other than linux
-                if (!ControllerUtils.isLinux) return this
+                if (!PlatformUtil.isLinux) return this
                 // Do not set if unix domain sockets are not supported for control port
-                if (this is Control && !ControllerUtils.hasControlUnixDomainSocketSupport) return this
+                if (this is Control && !PlatformUtil.hasControlUnixDomainSocketSupport) return this
                 // First character of the path must be / (Unix FileSystem) root dir char
                 if (value?.path?.isUnixPath != true) return this
 

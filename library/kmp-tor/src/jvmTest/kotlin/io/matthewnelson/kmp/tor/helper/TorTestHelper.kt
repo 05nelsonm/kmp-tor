@@ -26,7 +26,7 @@ import io.matthewnelson.kmp.tor.controller.common.config.TorConfig.Setting.*
 import io.matthewnelson.kmp.tor.controller.common.config.TorConfig.Option.*
 import io.matthewnelson.kmp.tor.controller.common.events.TorEvent
 import io.matthewnelson.kmp.tor.controller.common.file.Path
-import io.matthewnelson.kmp.tor.controller.common.internal.ControllerUtils
+import io.matthewnelson.kmp.tor.controller.common.internal.PlatformUtil
 import io.matthewnelson.kmp.tor.manager.TorConfigProvider
 import io.matthewnelson.kmp.tor.manager.TorManager
 import io.matthewnelson.kmp.tor.manager.common.event.TorManagerEvent
@@ -188,15 +188,15 @@ abstract class TorTestHelper {
         val installOption: InstallOption = InstallOption.CleanInstallIfMissing
 
         val installer: PlatformInstaller = when {
-            ControllerUtils.isMingw -> {
+            PlatformUtil.isMingw -> {
                 println("\nRunning tests for Windows\n")
                 PlatformInstaller.mingwX64(installOption)
             }
-            ControllerUtils.isDarwin -> {
+            PlatformUtil.isDarwin -> {
                 println("\nRunning tests for Darwin\n")
                 PlatformInstaller.macosX64(installOption)
             }
-            ControllerUtils.isLinux -> {
+            PlatformUtil.isLinux -> {
                 println("\nRunning tests for Linux\n")
                 PlatformInstaller.linuxX64(installOption)
             }

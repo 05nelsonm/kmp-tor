@@ -21,7 +21,7 @@ import io.matthewnelson.kmp.tor.common.annotation.InternalTorApi
 import io.matthewnelson.kmp.tor.controller.common.config.TorConfig.Option.*
 import io.matthewnelson.kmp.tor.controller.common.config.TorConfig.Setting.*
 import io.matthewnelson.kmp.tor.controller.common.file.Path
-import io.matthewnelson.kmp.tor.controller.common.internal.ControllerUtils
+import io.matthewnelson.kmp.tor.controller.common.internal.PlatformUtil
 import kotlin.test.*
 
 @OptIn(InternalTorApi::class)
@@ -342,7 +342,7 @@ class TorConfigUnitTest {
     @Test
     fun givenUnixSocket_whenPathsSame_equalsEachOther() {
         // Only run if support for domain sockets is had
-        if (!ControllerUtils.hasControlUnixDomainSocketSupport) return
+        if (!PlatformUtil.hasControlUnixDomainSocketSupport) return
 
         val path = Path("/some/path")
 
@@ -368,7 +368,7 @@ class TorConfigUnitTest {
     @Test
     fun givenUnixSocketControl_whenPathDoseNotStartWithUnixFileSeparator_valueNotSet() {
         // Only run if support for domain sockets is had
-        if (!ControllerUtils.hasControlUnixDomainSocketSupport) return
+        if (!PlatformUtil.hasControlUnixDomainSocketSupport) return
 
         val control = UnixSockets.Control()
         control.set(FileSystemFile(Path("0")))
@@ -384,7 +384,7 @@ class TorConfigUnitTest {
     @Test
     fun givenUnixSocketControl_whenCloned_matchesOriginal() {
         // Only run if support for domain sockets is had
-        if (!ControllerUtils.hasControlUnixDomainSocketSupport) return
+        if (!PlatformUtil.hasControlUnixDomainSocketSupport) return
 
         val control = UnixSockets.Control()
         control.set(FileSystemFile(Path("/some/path")))
@@ -405,7 +405,7 @@ class TorConfigUnitTest {
     @Test
     fun givenUnixSocketSocks_whenPathDoseNotStartWithUnixFileSeparator_valueNotSet() {
         // Only run if support for domain sockets is had
-        if (!ControllerUtils.hasControlUnixDomainSocketSupport) return
+        if (!PlatformUtil.hasControlUnixDomainSocketSupport) return
 
         val socks = UnixSockets.Socks()
         socks.set(FileSystemFile(Path("0")))
@@ -421,7 +421,7 @@ class TorConfigUnitTest {
     @Test
     fun givenUnixSocketSocks_whenCloned_matchesOriginal() {
         // Only run if support for domain sockets is had
-        if (!ControllerUtils.hasControlUnixDomainSocketSupport) return
+        if (!PlatformUtil.hasControlUnixDomainSocketSupport) return
 
         val socks = UnixSockets.Socks()
         socks.set(FileSystemFile(Path("/some/path")))
