@@ -51,6 +51,8 @@ import io.matthewnelson.kmp.tor.manager.internal.ext.dnsOpened
 import io.matthewnelson.kmp.tor.manager.internal.ext.httpOpened
 import io.matthewnelson.kmp.tor.manager.internal.ext.socksOpened
 import io.matthewnelson.kmp.tor.manager.internal.ext.transOpened
+import io.matthewnelson.kmp.tor.manager.internal.util.AddressInfoHandler
+import io.matthewnelson.kmp.tor.manager.internal.util.UnixSocksDiffer
 import io.matthewnelson.kmp.tor.manager.internal.util.realTorManagerInstanceDestroyed
 import kotlinx.atomicfu.*
 import kotlinx.atomicfu.locks.synchronized
@@ -143,6 +145,14 @@ private class RealTorManager(
         }
         ?: setOf(TorEvent.LogMsg.Notice, TorEvent.ConfChanged)
 
+    private val supervisor: CompletableJob = SupervisorJob()
+    private val scope: CoroutineScope = CoroutineScope(context =
+        supervisor                                  +
+        main                                        +
+        CoroutineName(name = "tor_manager_scope")
+    )
+    private val coroutineCounter: AtomicLong = atomic(0L)
+
     private val debug: AtomicBoolean = atomic(false)
     private val listeners: ListenersHandler = ListenersHandler.newInstance(3) {
         // Listener threw an exception when being notified for a TorEvent
@@ -151,14 +161,6 @@ private class RealTorManager(
         } catch (_: Exception) {}
     }
     private val controllerListener: ControllerListener = ControllerListener()
-
-    private val supervisor: CompletableJob = SupervisorJob()
-    private val scope: CoroutineScope = CoroutineScope(context =
-        supervisor                                  +
-        main                                        +
-        CoroutineName(name = "tor_manager_scope")
-    )
-    private val coroutineCounter: AtomicLong = atomic(0L)
 
     override val instanceId: String = instanceId
     private val networkObserver: NetworkObserver? = networkObserver
@@ -209,21 +211,11 @@ private class RealTorManager(
     private val actions: ActionProcessor = ActionProcessor.newInstance(processorLock)
     private val controllerInstance: AtomicRef<ControllerHolder?> = atomic(null)
 
-    private val _addressInfo = atomic(TorManagerEvent.AddressInfo.NULL_VALUES)
-    private val addressInfoJob: AtomicRef<Job?> = atomic(null)
-
     // State should be dispatched immediately. as such, only update state machine
     // from Dispatchers.Main
     private val stateMachine: TorStateMachine = TorStateMachine.newInstance { old, new ->
         notifyListenersNoScope(new)
-
-        _addressInfo.update { info ->
-            info.onStateChange(old, new)?.let { newInfo ->
-                addressInfoJob.value?.cancel()
-                notifyListenersNoScope(newInfo)
-                newInfo
-            } ?: info
-        }
+        controllerListener.addressInfoHandler.onStateChange(old, new)
 
         // Bootstrapping completed
         if (!old.torState.isBootstrapped && new.torState.isBootstrapped) {
@@ -241,7 +233,7 @@ private class RealTorManager(
     override val networkState: TorNetworkState get() = stateMachine.networkState
     override val addressInfo: TorManagerEvent.AddressInfo
         get() = if (state.isBootstrapped && networkState.isEnabled()) {
-            _addressInfo.value
+            controllerListener.addressInfoHandler.addressInfo
         } else {
             TorManagerEvent.AddressInfo.NULL_VALUES
         }
@@ -617,18 +609,6 @@ private class RealTorManager(
         return listeners.removeListener(listener)
     }
 
-    private fun dispatchNewAddressInfo(addressInfo: TorManagerEvent.AddressInfo) {
-        if (state.isBootstrapped && networkState.isEnabled()) {
-            addressInfoJob.update { job ->
-                job?.cancel()
-                scope.launch {
-                    delay(100L)
-                    notifyListenersNoScope(addressInfo)
-                }
-            }
-        }
-    }
-
     private class Waiter(val noticeStartsWith: String) {
 
         private val eventResponse: AtomicRef<String?> = atomic(null)
@@ -659,7 +639,21 @@ private class RealTorManager(
 
         val waiter: AtomicRef<Waiter?> = atomic(null)
 
+        val addressInfoHandler = AddressInfoHandler(
+            torManagerScope = scope,
+            stateManager = this@RealTorManager,
+        ) { dispatch ->
+            notifyListenersNoScope(dispatch)
+        }
+
+        private val unixSocksDiffer = UnixSocksDiffer(
+            torManagerScope = scope,
+            handler = addressInfoHandler,
+        )
+
         override fun eventConfChanged(output: String) {
+            unixSocksDiffer.onConfChanged(output)
+
             if (output.startsWith(disableNetwork.keyword)) {
                 when (output.substringAfter('=')) {
                     TorConfig.Option.TorF.True.value -> {
@@ -707,37 +701,30 @@ private class RealTorManager(
                     val address = output.substringAfter(PROXY_LISTENER_ON).trim()
 
                     if (address != output && address.isNotBlank()) {
-                        val info = _addressInfo.value
+                        val info = addressInfoHandler.addressInfo
                         when (splits.elementAtOrNull(2)?.lowercase()) {
                             DNS -> {
                                 info.dnsClosed(address)?.let { newInfo ->
-                                    _addressInfo.value = newInfo
-                                    dispatchNewAddressInfo(newInfo)
+                                    addressInfoHandler.dispatchNewAddressInfo(newInfo)
                                 }
                             }
                             HTTP -> {
                                 info.httpClosed(address)?.let { newInfo ->
-                                    _addressInfo.value = newInfo
-                                    dispatchNewAddressInfo(newInfo)
+                                    addressInfoHandler.dispatchNewAddressInfo(newInfo)
                                 }
                             }
                             SOCKS -> {
                                 if (address.first() == '?' || address.first() == '/') {
-                                    info.unixSocksClosed(address)?.let { newInfo ->
-                                        _addressInfo.value = newInfo
-                                        dispatchNewAddressInfo(newInfo)
-                                    }
+                                    unixSocksDiffer.onClosed()
                                 } else {
                                     info.socksClosed(address)?.let { newInfo ->
-                                        _addressInfo.value = newInfo
-                                        dispatchNewAddressInfo(newInfo)
+                                        addressInfoHandler.dispatchNewAddressInfo(newInfo)
                                     }
                                 }
                             }
                             TRANS -> {
                                 info.transClosed(address)?.let { newInfo ->
-                                    _addressInfo.value = newInfo
-                                    dispatchNewAddressInfo(newInfo)
+                                    addressInfoHandler.dispatchNewAddressInfo(newInfo)
                                 }
                             }
                         }
@@ -757,37 +744,30 @@ private class RealTorManager(
                     val address = output.substringAfter(PROXY_LISTENER_CONNECTION_READY).trim()
 
                     if (address != output && address.isNotBlank()) {
-                        val info = _addressInfo.value
+                        val info = addressInfoHandler.addressInfo
                         when (splits.elementAtOrNull(1)?.lowercase()) {
                             DNS -> {
                                 info.dnsOpened(address)?.let { newInfo ->
-                                    _addressInfo.value = newInfo
-                                    dispatchNewAddressInfo(newInfo)
+                                    addressInfoHandler.dispatchNewAddressInfo(newInfo)
                                 }
                             }
                             HTTP -> {
                                 info.httpOpened(address)?.let { newInfo ->
-                                    _addressInfo.value = newInfo
-                                    dispatchNewAddressInfo(newInfo)
+                                    addressInfoHandler.dispatchNewAddressInfo(newInfo)
                                 }
                             }
                             SOCKS -> {
                                 if (address.first() == '/') {
-                                    info.unixSocksOpened(address)?.let { newInfo ->
-                                        _addressInfo.value = newInfo
-                                        dispatchNewAddressInfo(newInfo)
-                                    }
+                                    unixSocksDiffer.onOpened(address)
                                 } else {
                                     info.socksOpened(address)?.let { newInfo ->
-                                        _addressInfo.value = newInfo
-                                        dispatchNewAddressInfo(newInfo)
+                                        addressInfoHandler.dispatchNewAddressInfo(newInfo)
                                     }
                                 }
                             }
                             TRANS -> {
                                 info.transOpened(address)?.let { newInfo ->
-                                    _addressInfo.value = newInfo
-                                    dispatchNewAddressInfo(newInfo)
+                                    addressInfoHandler.dispatchNewAddressInfo(newInfo)
                                 }
                             }
                         }
