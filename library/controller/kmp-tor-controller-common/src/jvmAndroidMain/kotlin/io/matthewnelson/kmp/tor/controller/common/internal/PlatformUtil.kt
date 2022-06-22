@@ -18,7 +18,7 @@ package io.matthewnelson.kmp.tor.controller.common.internal
 import io.matthewnelson.kmp.tor.common.annotation.InternalTorApi
 import java.net.InetAddress
 
-actual object ControllerUtils {
+actual object PlatformUtil {
 
     @InternalTorApi
     const val ANDROID_NET_MAIN_THREAD_EXCEPTION = "android.os.NetworkOnMainThreadException"

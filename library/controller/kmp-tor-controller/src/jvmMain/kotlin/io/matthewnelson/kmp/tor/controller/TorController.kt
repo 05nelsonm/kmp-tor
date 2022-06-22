@@ -24,7 +24,7 @@ import io.matthewnelson.kmp.tor.controller.common.events.TorEvent
 import io.matthewnelson.kmp.tor.controller.common.events.TorEventProcessor
 import io.matthewnelson.kmp.tor.controller.common.exceptions.TorControllerException
 import io.matthewnelson.kmp.tor.controller.common.file.Path
-import io.matthewnelson.kmp.tor.controller.common.internal.ControllerUtils
+import io.matthewnelson.kmp.tor.controller.common.internal.PlatformUtil
 import io.matthewnelson.kmp.tor.controller.common.internal.isUnixPath
 import io.matthewnelson.kmp.tor.controller.internal.controller.getTorControllerDispatchers
 import io.matthewnelson.kmp.tor.controller.internal.util.toTorController
@@ -88,14 +88,14 @@ actual interface TorController: TorControlProcessor, TorEventProcessor<TorEvent.
             }
 
             @OptIn(InternalTorApi::class)
-            if (!ControllerUtils.hasControlUnixDomainSocketSupport) {
+            if (!PlatformUtil.hasControlUnixDomainSocketSupport) {
                 throw TorControllerException("UnixDomainSockets unsupported")
             }
 
             @OptIn(InternalTorApi::class)
             val clazz: Class<*> = try {
-                Class.forName(ControllerUtils.UNIX_DOMAIN_SOCKET_FACTORY_CLASS)
-                    ?: throw ClassNotFoundException(ControllerUtils.UNIX_DOMAIN_SOCKET_FACTORY_CLASS)
+                Class.forName(PlatformUtil.UNIX_DOMAIN_SOCKET_FACTORY_CLASS)
+                    ?: throw ClassNotFoundException(PlatformUtil.UNIX_DOMAIN_SOCKET_FACTORY_CLASS)
             } catch (e: ClassNotFoundException) {
                 throw TorControllerException("UnixDomainSockets unsupported. Add the kmp-tor-ext-unix-socket dependency", e)
             }

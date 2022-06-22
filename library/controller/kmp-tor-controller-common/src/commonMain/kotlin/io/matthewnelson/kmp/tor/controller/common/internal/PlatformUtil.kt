@@ -16,16 +16,29 @@
 package io.matthewnelson.kmp.tor.controller.common.internal
 
 import io.matthewnelson.kmp.tor.common.annotation.InternalTorApi
+import kotlin.jvm.JvmStatic
 
-// TODO: Fill out
-actual object ControllerUtils {
+expect object PlatformUtil {
+
+    /**
+     * Returns the resolved IP address for localhost (typically 127.0.0.1).
+     *
+     * @throws [RuntimeException] if being called for the first time and is
+     *   called from Android's Main Thread
+     * */
+    @JvmStatic
     @InternalTorApi
-    actual fun localhostAddress(): String = "127.0.0.1"
+    @Throws(RuntimeException::class)
+    fun localhostAddress(): String
 
-    actual val isDarwin: Boolean = false
-    actual val isLinux: Boolean = false
-    actual val isMingw: Boolean = true
+    @JvmStatic
+    val isDarwin: Boolean
+    @JvmStatic
+    val isLinux: Boolean
+    @JvmStatic
+    val isMingw: Boolean
 
+    @JvmStatic
     @InternalTorApi
-    actual val hasControlUnixDomainSocketSupport: Boolean = false
+    val hasControlUnixDomainSocketSupport: Boolean
 }

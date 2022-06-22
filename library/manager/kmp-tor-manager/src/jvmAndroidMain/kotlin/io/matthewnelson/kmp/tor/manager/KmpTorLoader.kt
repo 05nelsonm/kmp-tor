@@ -24,7 +24,7 @@ import io.matthewnelson.kmp.tor.controller.common.control.usecase.TorControlSign
 import io.matthewnelson.kmp.tor.controller.common.exceptions.TorControllerException
 import io.matthewnelson.kmp.tor.controller.common.file.Path
 import io.matthewnelson.kmp.tor.controller.common.file.toFile
-import io.matthewnelson.kmp.tor.controller.common.internal.ControllerUtils
+import io.matthewnelson.kmp.tor.controller.common.internal.PlatformUtil
 import io.matthewnelson.kmp.tor.manager.common.event.TorManagerEvent
 import io.matthewnelson.kmp.tor.manager.common.exceptions.InterruptedException
 import io.matthewnelson.kmp.tor.manager.common.exceptions.TorManagerException
@@ -446,6 +446,6 @@ actual abstract class KmpTorLoader(protected val provider: TorConfigProvider) {
     init {
         // Reference so that localhostAddress for JVM can have it's initial
         // value set immediately from BG thread.
-        ControllerUtils
+        PlatformUtil
     }
 }

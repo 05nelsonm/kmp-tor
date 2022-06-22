@@ -26,7 +26,7 @@ import io.matthewnelson.kmp.tor.controller.common.config.TorConfig.Option.*
 import io.matthewnelson.kmp.tor.controller.common.control.usecase.TorControlInfoGet
 import io.matthewnelson.kmp.tor.controller.common.events.TorEvent
 import io.matthewnelson.kmp.tor.controller.common.file.Path
-import io.matthewnelson.kmp.tor.controller.common.internal.ControllerUtils
+import io.matthewnelson.kmp.tor.controller.common.internal.PlatformUtil
 import io.matthewnelson.kmp.tor.manager.TorManager
 import io.matthewnelson.kmp.tor.manager.common.TorControlManager
 import io.matthewnelson.kmp.tor.manager.common.TorOperationManager
@@ -48,13 +48,13 @@ class SampleApp: App(SampleView::class) {
 
     private val platformInstaller: PlatformInstaller by lazy {
         val installer = when {
-            ControllerUtils.isMingw -> {
+            PlatformUtil.isMingw -> {
                 PlatformInstaller.mingwX64(InstallOption.CleanInstallIfMissing)
             }
-            ControllerUtils.isDarwin -> {
+            PlatformUtil.isDarwin -> {
                 PlatformInstaller.macosX64(InstallOption.CleanInstallIfMissing)
             }
-            ControllerUtils.isLinux -> {
+            PlatformUtil.isLinux -> {
                 PlatformInstaller.linuxX64(InstallOption.CleanInstallIfMissing)
             }
             else -> {

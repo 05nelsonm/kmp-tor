@@ -209,7 +209,7 @@ fun TorConfig.Setting<*>.appendTo(
             sb.quoteIfTrue(!isWriteTorConfig)
 
             val localhostIp: String = try {
-                ControllerUtils.localhostAddress()
+                PlatformUtil.localhostAddress()
             } catch (_: Exception) {
                 "127.0.0.1"
             }

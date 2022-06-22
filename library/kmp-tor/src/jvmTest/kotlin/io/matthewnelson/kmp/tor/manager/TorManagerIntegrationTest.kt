@@ -20,7 +20,7 @@ import io.matthewnelson.kmp.tor.controller.common.config.TorConfig.Option.*
 import io.matthewnelson.kmp.tor.controller.common.config.TorConfig.Setting.*
 import io.matthewnelson.kmp.tor.controller.common.control.usecase.TorControlInfoGet
 import io.matthewnelson.kmp.tor.controller.common.file.Path
-import io.matthewnelson.kmp.tor.controller.common.internal.ControllerUtils
+import io.matthewnelson.kmp.tor.controller.common.internal.PlatformUtil
 import io.matthewnelson.kmp.tor.helper.TorTestHelper
 import io.matthewnelson.kmp.tor.manager.common.event.TorManagerEvent
 import io.matthewnelson.kmp.tor.manager.common.exceptions.InterruptedException
@@ -99,7 +99,7 @@ class TorManagerIntegrationTest: TorTestHelper() {
     @Test
     fun givenTorManager_whenUnixSocksPortOpenClose_addressInfoIsProperlyDispatched() = runBlocking {
         // Only run if support for domain sockets is had
-        if (!ControllerUtils.isLinux) return@runBlocking
+        if (!PlatformUtil.isLinux) return@runBlocking
 
         val initialSocksInstances = awaitLastValidatedTorConfig().torConfig.settings
             .filterIsInstance<UnixSockets.Socks>()

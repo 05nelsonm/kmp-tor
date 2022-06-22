@@ -17,7 +17,7 @@ package io.matthewnelson.kmp.tor.manager.util
 
 import io.matthewnelson.kmp.tor.common.address.Port
 import io.matthewnelson.kmp.tor.common.annotation.InternalTorApi
-import io.matthewnelson.kmp.tor.controller.common.internal.ControllerUtils.ANDROID_NET_MAIN_THREAD_EXCEPTION
+import io.matthewnelson.kmp.tor.controller.common.internal.PlatformUtil.ANDROID_NET_MAIN_THREAD_EXCEPTION
 import java.net.InetAddress
 import javax.net.ServerSocketFactory
 
