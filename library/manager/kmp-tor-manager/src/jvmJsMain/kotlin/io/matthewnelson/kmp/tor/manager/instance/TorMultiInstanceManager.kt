@@ -17,7 +17,7 @@ package io.matthewnelson.kmp.tor.manager.instance
 
 import io.matthewnelson.kmp.tor.controller.common.events.TorEvent
 import io.matthewnelson.kmp.tor.manager.*
-import io.matthewnelson.kmp.tor.manager.internal.util.SynchronizedMutableMap
+import io.matthewnelson.kmp.tor.manager.internal.util.synchronous.SynchronizedMutableMap
 import kotlinx.coroutines.sync.Mutex
 import kotlin.jvm.JvmStatic
 import kotlin.jvm.JvmSynthetic
