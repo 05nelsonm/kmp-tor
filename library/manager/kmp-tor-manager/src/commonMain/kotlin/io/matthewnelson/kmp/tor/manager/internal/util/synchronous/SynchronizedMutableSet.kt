@@ -13,18 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-package io.matthewnelson.kmp.tor.manager.internal.util
+package io.matthewnelson.kmp.tor.manager.internal.util.synchronous
 
 import kotlinx.atomicfu.locks.SynchronizedObject
 import kotlinx.atomicfu.locks.synchronized
 
-internal class SynchronizedMutableMap<T: Any>: SynchronizedObject() {
+internal class SynchronizedMutableSet<T: Any?>(initialCapacity: Int = 1): SynchronizedObject() {
 
-    private val map: MutableMap<String, T> = LinkedHashMap(1)
+    private val set: MutableSet<T> = LinkedHashSet(initialCapacity)
 
-    fun <V: Any?> withLock(block: MutableMap<String, T>.() -> V): V {
+    @JvmSynthetic
+    internal fun <V: Any?> withLock(block: MutableSet<T>.() -> V): V {
         return synchronized(this) {
-            block.invoke(map)
+            block.invoke(set)
         }
     }
 }

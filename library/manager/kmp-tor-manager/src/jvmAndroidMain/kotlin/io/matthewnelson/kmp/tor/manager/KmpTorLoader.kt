@@ -32,7 +32,7 @@ import io.matthewnelson.kmp.tor.manager.common.state.TorNetworkState
 import io.matthewnelson.kmp.tor.manager.common.state.TorState
 import io.matthewnelson.kmp.tor.manager.internal.TorStateMachine
 import io.matthewnelson.kmp.tor.manager.internal.ext.infoGetBootstrapProgressOrNull
-import io.matthewnelson.kmp.tor.manager.internal.util.SynchronizedMutableMap
+import io.matthewnelson.kmp.tor.manager.internal.util.synchronous.SynchronizedMutableMap
 import io.matthewnelson.kmp.tor.manager.util.PortUtil
 import kotlinx.coroutines.*
 import kotlinx.coroutines.sync.Mutex
