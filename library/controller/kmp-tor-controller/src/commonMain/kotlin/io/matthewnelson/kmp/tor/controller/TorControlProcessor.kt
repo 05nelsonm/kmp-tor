@@ -221,14 +221,25 @@ private class RealTorControlProcessor(
                         when (setting) {
                             // ControlPort can only be set upon startup
                             is TorConfig.Setting.Ports.Control,
+                            is TorConfig.Setting.UnixSockets.Control,
+
+                            // Cookie authentication can only be set upon startup
+                            is TorConfig.Setting.CookieAuthFile,
+                            is TorConfig.Setting.CookieAuthentication,
+
                             // ControlPortWriteToFile can only be set upon startup
-                            is TorConfig.Setting.ControlPortWriteToFile -> continue
+                            is TorConfig.Setting.ControlPortWriteToFile -> {
+                                throw TorControllerException("${setting.keyword} cannot be modified via RESETCONF")
+                            }
                             else -> { /* no-op */ }
                         }
 
                         append(SP)
-                        setting.appendTo(this, appendValue = !setDefault, isWriteTorConfig = false)
+                        if (!setting.appendTo(this, appendValue = !setDefault, isWriteTorConfig = false)) {
+                            throw TorControllerException("Failed to add ${setting.keyword} to RESETCONF command")
+                        }
                     }
+
                     append(CLRF)
                 }.toString()
 
@@ -265,18 +276,30 @@ private class RealTorControlProcessor(
         return lock.withLock {
             try {
                 val command = StringBuilder("SETCONF").apply {
+
                     for (setting in settings) {
                         when (setting) {
                             // ControlPort can only be set upon startup
                             is TorConfig.Setting.Ports.Control,
+                            is TorConfig.Setting.UnixSockets.Control,
+
+                            // Cookie authentication can only be set upon startup
+                            is TorConfig.Setting.CookieAuthFile,
+                            is TorConfig.Setting.CookieAuthentication,
+
                             // ControlPortWriteToFile can only be set upon startup
-                            is TorConfig.Setting.ControlPortWriteToFile -> continue
+                            is TorConfig.Setting.ControlPortWriteToFile -> {
+                                throw TorControllerException("${setting.keyword} cannot be modified via SETCONF")
+                            }
                             else -> { /* no-op */ }
                         }
 
                         append(SP)
-                        setting.appendTo(this, appendValue = true, isWriteTorConfig = false)
+                        if (!setting.appendTo(this, appendValue = true, isWriteTorConfig = false)) {
+                            throw TorControllerException("Failed to add ${setting.keyword} to SETCONF command")
+                        }
                     }
+
                     append(CLRF)
                 }.toString()
 
