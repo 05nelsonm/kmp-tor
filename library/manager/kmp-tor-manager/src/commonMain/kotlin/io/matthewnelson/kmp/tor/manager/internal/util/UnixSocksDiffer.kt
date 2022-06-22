@@ -48,7 +48,7 @@ import kotlinx.coroutines.launch
  * This just keeps track of what was opened, what was confirmed
  * via the config change, and then removes the unconfirmed.
  * */
-internal class UnixSocksDiffer(private val torManagerScope: CoroutineScope, private val handler: AddressInfoHandler, ) {
+internal class UnixSocksDiffer(private val torManagerScope: CoroutineScope, private val handler: AddressInfoHandler) {
 
     private val pathsToRemove = SynchronizedMutableSet<Path>()
     private val closingJob: AtomicRef<Job?> = atomic(null)
@@ -113,5 +113,4 @@ internal class UnixSocksDiffer(private val torManagerScope: CoroutineScope, priv
         private const val SOCKS_PORT = "SocksPort="
         private const val UNIX = "unix:\""
     }
-
 }
