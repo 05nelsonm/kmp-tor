@@ -22,10 +22,41 @@ actual object ControllerUtils {
     @InternalTorApi
     actual fun localhostAddress(): String = "127.0.0.1"
 
-    actual val isDarwin: Boolean = false
-    actual val isLinux: Boolean = true
-    actual val isMingw: Boolean = false
+    actual val isDarwin: Boolean by lazy {
+        platform == "darwin"
+    }
+    actual val isLinux: Boolean by lazy {
+        platform == "linux" || platform == "android"
+    }
+    actual val isMingw: Boolean by lazy {
+        platform == "win32"
+    }
 
     @InternalTorApi
     actual val hasControlUnixDomainSocketSupport: Boolean = false
 }
+
+/**
+ * Returns:
+ *  - aix
+ *  - android
+ *  - darwin
+ *  - freebsd
+ *  - linux
+ *  - openbsd
+ *  - sunos
+ *  - win32
+ * */
+private val platform: String
+    get() {
+        return os?.platform() as? String ?: "linux"
+    }
+
+private val os: dynamic
+    get() {
+        return try {
+            js("require('os')")
+        } catch (_: Throwable) {
+            null
+        }
+    }

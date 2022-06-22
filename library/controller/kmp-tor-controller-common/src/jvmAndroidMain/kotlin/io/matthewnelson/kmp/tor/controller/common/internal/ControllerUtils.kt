@@ -66,25 +66,17 @@ actual object ControllerUtils {
         }.start()
     }
 
-    private val osName: String? by lazy {
-        try {
-            System.getProperty("os.name").lowercase()
-        } catch (_: Exception) {
-            null
-        }
-    }
-
     @JvmStatic
     actual val isDarwin: Boolean by lazy {
-        osName?.contains("mac") == true || osName?.contains("darwin") == true
+        osName.contains("mac") || osName.contains("darwin")
     }
     @JvmStatic
     actual val isLinux: Boolean by lazy {
-        osName?.contains("linux") == true
+        osName.contains("linux")
     }
     @JvmStatic
     actual val isMingw: Boolean by lazy {
-        osName?.contains("windows") == true
+        osName.contains("windows")
     }
 
     @JvmStatic
@@ -120,3 +112,12 @@ actual object ControllerUtils {
         }
     }
 }
+
+private val osName: String
+    get() {
+        return try {
+            System.getProperty("os.name").lowercase()
+        } catch (_: Exception) {
+            "linux"
+        }
+    }
