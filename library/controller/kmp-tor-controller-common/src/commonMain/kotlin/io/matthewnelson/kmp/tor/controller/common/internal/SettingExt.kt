@@ -20,14 +20,18 @@ import io.matthewnelson.kmp.tor.common.util.TorStrings.SP
 import io.matthewnelson.kmp.tor.controller.common.config.TorConfig
 import io.matthewnelson.kmp.tor.controller.common.config.TorConfig.Setting.HiddenService
 
+/**
+ * Returns false if nothing was appended to the StringBuilder,
+ * and true if something was.
+ * */
 @InternalTorApi
 fun TorConfig.Setting<*>.appendTo(
     sb: StringBuilder,
     appendValue: Boolean,
     isWriteTorConfig: Boolean,
-) {
+): Boolean {
     if (appendValue && this.value == null) {
-        return
+        return false
     }
 
     val delimiter = if (isWriteTorConfig) {
@@ -60,20 +64,21 @@ fun TorConfig.Setting<*>.appendTo(
             sb.append(keyword)
 
             if (!appendValue) {
-                return
+                return true
             }
 
             sb.append(delimiter)
             sb.quoteIfTrue(!isWriteTorConfig)
             sb.append(value)
             sb.quoteIfTrue(!isWriteTorConfig)
+            return true
         }
 
         is TorConfig.Setting.UnixSockets -> {
             sb.append(keyword)
 
             if (!appendValue) {
-                return
+                return true
             }
 
             sb.append(delimiter)
@@ -117,13 +122,14 @@ fun TorConfig.Setting<*>.appendTo(
             }
 
             sb.quoteIfTrue(!isWriteTorConfig)
+            return true
         }
 
         is TorConfig.Setting.Ports -> {
             sb.append(keyword)
 
             if (!appendValue) {
-                return
+                return true
             }
 
             sb.append(delimiter)
@@ -173,6 +179,7 @@ fun TorConfig.Setting<*>.appendTo(
             }
 
             sb.quoteIfTrue(!isWriteTorConfig)
+            return true
         }
 
         is HiddenService -> {
@@ -184,14 +191,14 @@ fun TorConfig.Setting<*>.appendTo(
                 sb.append("HiddenServiceMaxStreams")
                 sb.append(SP)
                 sb.append("HiddenServiceMaxStreamsCloseCircuit")
-                return
+                return true
             }
 
-            val hsDirPath = value ?: return
+            val hsDirPath = value ?: return false
             val hsPorts = ports
 
             if (hsPorts == null || hsPorts.isEmpty()) {
-                return
+                return false
             }
 
             sb.newLineIfTrue(isWriteTorConfig)
@@ -265,6 +272,7 @@ fun TorConfig.Setting<*>.appendTo(
                 quote()
                 this
             }
+            return true
         }
     }
 }
