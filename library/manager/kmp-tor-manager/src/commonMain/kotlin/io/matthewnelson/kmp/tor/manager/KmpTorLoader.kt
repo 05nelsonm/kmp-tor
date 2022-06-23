@@ -33,12 +33,10 @@ expect abstract class KmpTorLoader {
     }
 
     /**
-     * Calls [TorConfig.Builder.removeInstanceOf] for all present
-     * settings. This is to ensure platform specific settings are
-     * removed during the [TorConfigProvider.retrieve] process, prior
-     * to starting Tor.
+     * Will exclude settings for the given [TorConfig.KeyWord]
+     * when validating the provided config.
      * */
-    protected open val excludeSettings: Set<TorConfig.Setting<*>>
+    protected open val excludeSettings: Set<TorConfig.KeyWord>
 
     @Throws(TorManagerException::class, CancellationException::class)
     protected abstract suspend fun startTor(

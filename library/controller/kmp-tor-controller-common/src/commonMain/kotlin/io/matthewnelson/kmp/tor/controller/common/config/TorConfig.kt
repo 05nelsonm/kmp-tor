@@ -904,7 +904,7 @@ class TorConfig private constructor(
              * @see [UnixSockets.Control]
              * */
             class Control                               : Ports(
-                keyword = KeyWord.PortControl,
+                keyword = KeyWord.ControlPort,
                 default = Option.AorDorPort.Auto,
                 isStartArgument = true,
             ) {
@@ -926,7 +926,7 @@ class TorConfig private constructor(
              * https://2019.www.torproject.org/docs/tor-manual.html.en#DNSPort
              * */
             class Dns                                   : Ports(
-                keyword = KeyWord.PortDns,
+                keyword = KeyWord.DnsPort,
                 default = Option.AorDorPort.Disable,
                 isStartArgument = false,
             ) {
@@ -959,7 +959,7 @@ class TorConfig private constructor(
              * https://2019.www.torproject.org/docs/tor-manual.html.en#HTTPTunnelPort
              * */
             class HttpTunnel                            : Ports(
-                keyword = KeyWord.PortHttpTunnel,
+                keyword = KeyWord.HttpTunnelPort,
                 default = Option.AorDorPort.Disable,
                 isStartArgument = false,
             ) {
@@ -992,7 +992,7 @@ class TorConfig private constructor(
              * https://2019.www.torproject.org/docs/tor-manual.html.en#SocksPort
              * */
             class Socks                                 : Ports(
-                keyword = KeyWord.PortSocks,
+                keyword = KeyWord.SocksPort,
                 default = Option.AorDorPort.Value(PortProxy(9050)),
                 isStartArgument = false,
             ) {
@@ -1060,7 +1060,7 @@ class TorConfig private constructor(
              * https://2019.www.torproject.org/docs/tor-manual.html.en#TransPort
              * */
             class Trans                                 : Ports(
-                keyword = KeyWord.PortTrans,
+                keyword = KeyWord.TransPort,
                 default = Option.AorDorPort.Disable,
                 isStartArgument = false,
             ) {
@@ -1163,7 +1163,7 @@ class TorConfig private constructor(
              * https://2019.www.torproject.org/docs/tor-manual.html.en#ControlPort
              * */
             class Control                               : UnixSockets(
-                keyword = KeyWord.PortControl,
+                keyword = KeyWord.ControlPort,
                 isStartArgument = true,
             ) {
 
@@ -1214,7 +1214,7 @@ class TorConfig private constructor(
              * https://2019.www.torproject.org/docs/tor-manual.html.en#SocksPort
              * */
             class Socks                             : UnixSockets(
-                keyword = KeyWord.PortSocks,
+                keyword = KeyWord.SocksPort,
                 isStartArgument = false,
             ) {
 
@@ -1570,11 +1570,13 @@ class TorConfig private constructor(
         object HiddenServiceMaxStreams: KeyWord() { override fun toString(): String = "HiddenServiceMaxStreams" }
         object HiddenServiceMaxStreamsCloseCircuit: KeyWord() { override fun toString(): String = "HiddenServiceMaxStreamsCloseCircuit" }
         object OwningControllerProcess: KeyWord() { override fun toString(): String = "__OwningControllerProcess" }
-        object PortControl: KeyWord() { override fun toString(): String = "ControlPort" }
-        object PortDns: KeyWord() { override fun toString(): String = "DNSPort" }
-        object PortHttpTunnel: KeyWord() { override fun toString(): String = "HTTPTunnelPort" }
-        object PortSocks: KeyWord() { override fun toString(): String = "SocksPort" }
-        object PortTrans: KeyWord() { override fun toString(): String = "TransPort" }
+
+        object ControlPort: KeyWord() { override fun toString(): String = "ControlPort" }
+        object DnsPort: KeyWord() { override fun toString(): String = "DNSPort" }
+        object HttpTunnelPort: KeyWord() { override fun toString(): String = "HTTPTunnelPort" }
+        object SocksPort: KeyWord() { override fun toString(): String = "SocksPort" }
+        object TransPort: KeyWord() { override fun toString(): String = "TransPort" }
+
         object RunAsDaemon: KeyWord() { override fun toString(): String = "RunAsDaemon" }
         object SyslogIdentityTag: KeyWord() { override fun toString(): String = "SyslogIdentityTag" }
 
