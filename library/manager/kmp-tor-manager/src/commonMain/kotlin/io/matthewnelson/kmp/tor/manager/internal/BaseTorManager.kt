@@ -51,15 +51,15 @@ internal abstract class BaseTorManager: SynchronizedObject(), TorControlManager 
 //        }
 //    }
 
-    override suspend fun configGet(setting: TorConfig.Setting<*>): Result<List<ConfigEntry>> {
+    override suspend fun configGet(keyword: TorConfig.KeyWord): Result<List<ConfigEntry>> {
         return provide<TorControlConfigGet, List<ConfigEntry>> {
-            configGet(setting)
+            configGet(keyword)
         }
     }
 
-    override suspend fun configGet(settings: Set<TorConfig.Setting<*>>): Result<List<ConfigEntry>> {
+    override suspend fun configGet(keywords: Set<TorConfig.KeyWord>): Result<List<ConfigEntry>> {
         return provide<TorControlConfigGet, List<ConfigEntry>> {
-            configGet(settings)
+            configGet(keywords)
         }
     }
 
@@ -69,21 +69,15 @@ internal abstract class BaseTorManager: SynchronizedObject(), TorControlManager 
         }
     }
 
-    override suspend fun configReset(
-        setting: TorConfig.Setting<*>,
-        setDefault: Boolean
-    ): Result<Any?> {
+    override suspend fun configReset(keyword: TorConfig.KeyWord): Result<Any?> {
         return provide<TorControlConfigReset, Any?> {
-            configReset(setting, setDefault)
+            configReset(keyword)
         }
     }
 
-    override suspend fun configReset(
-        settings: Set<TorConfig.Setting<*>>,
-        setDefault: Boolean
-    ): Result<Any?> {
+    override suspend fun configReset(keywords: Set<TorConfig.KeyWord>): Result<Any?> {
         return provide<TorControlConfigReset, Any?> {
-            configReset(settings, setDefault)
+            configReset(keywords)
         }
     }
 

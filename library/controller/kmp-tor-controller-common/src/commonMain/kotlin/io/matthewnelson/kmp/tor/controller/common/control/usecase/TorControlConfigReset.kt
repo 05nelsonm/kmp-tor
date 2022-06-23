@@ -23,18 +23,18 @@ import io.matthewnelson.kmp.tor.controller.common.control.TorControlConfig
  *
  * https://torproject.gitlab.io/torspec/control-spec/#resetconf
  *
+ * Functionality does not follow spec, and _only_ sets the config
+ * to its default setting for the given [TorConfig.KeyWord]. If you
+ * need to modify a config value to a non-default setting, use
+ * [TorControlConfigSet.configSet].
+ *
  * @see [TorControlConfig]
+ * @see [TorControlConfigSet]
  * */
 interface TorControlConfigReset {
 
-    suspend fun configReset(
-        setting: TorConfig.Setting<*>,
-        setDefault: Boolean = true
-    ): Result<Any?>
+    suspend fun configReset(keyword: TorConfig.KeyWord): Result<Any?>
 
-    suspend fun configReset(
-        settings: Set<TorConfig.Setting<*>>,
-        setDefault: Boolean = true
-    ): Result<Any?>
+    suspend fun configReset(keywords: Set<TorConfig.KeyWord>): Result<Any?>
 
 }

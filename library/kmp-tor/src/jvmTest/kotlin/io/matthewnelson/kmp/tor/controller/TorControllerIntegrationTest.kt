@@ -56,9 +56,9 @@ class TorControllerIntegrationTest: TorTestHelper() {
     @Test
     fun givenCommandConfigGet_whenTorQueried_returnsSuccess() = runBlocking {
         val getConfig = setOf(
-            TorConfig.Setting.CookieAuthentication(),
-            TorConfig.Setting.DisableNetwork(),
-            TorConfig.Setting.Ports.Control(),
+            TorConfig.KeyWord.CookieAuthentication,
+            TorConfig.KeyWord.DisableNetwork,
+            TorConfig.KeyWord.ControlPort,
         )
 
         manager.configGet(getConfig).getOrThrow()
@@ -105,7 +105,7 @@ class TorControllerIntegrationTest: TorTestHelper() {
             manager.configSet(disableNetwork).getOrThrow()
 
             // Check it is enabled
-            val entry1 = manager.configGet(disableNetwork).getOrThrow().first()
+            val entry1 = manager.configGet(disableNetwork.keyword).getOrThrow().first()
             assertEquals(_false.value, entry1.value)
 
             // Now disable it
@@ -114,7 +114,7 @@ class TorControllerIntegrationTest: TorTestHelper() {
             manager.configSet(disableNetwork).getOrThrow()
 
             // verify disabled
-            val entry2 = manager.configGet(disableNetwork).getOrThrow().first()
+            val entry2 = manager.configGet(disableNetwork.keyword).getOrThrow().first()
             assertEquals(_true.value, entry2.value)
         } catch (t: Throwable) {
             throwable = t
@@ -160,7 +160,7 @@ class TorControllerIntegrationTest: TorTestHelper() {
             throwable = t
         } finally {
 
-            manager.configReset(setOf(dormancy, padding))
+            manager.configSet(setOf(dormancy, padding))
             manager.setEvents(setOf())
             manager.removeListener(listener)
 
@@ -389,7 +389,7 @@ class TorControllerIntegrationTest: TorTestHelper() {
 
         assertTrue(hsConfigSettings.size > 1)
 
-        val entries = manager.configGet(hsConfigSettings.first())
+        val entries = manager.configGet(hsConfigSettings.first().keyword)
             .getOrThrow()
             .filter { it.key == hsConfigSettings.first().keyword.toString() }
 
@@ -409,7 +409,7 @@ class TorControllerIntegrationTest: TorTestHelper() {
 
         assertTrue(hsConfigSettings.size > 1)
 
-        val entries = manager.configGet(hsConfigSettings.first())
+        val entries = manager.configGet(hsConfigSettings.first().keyword)
             .getOrThrow()
             .filter { it.key == hsConfigSettings.first().keyword.toString() }
 
@@ -417,9 +417,9 @@ class TorControllerIntegrationTest: TorTestHelper() {
 
         var throwable: Throwable? = null
         try {
-            manager.configReset(hsConfigSettings.first(), setDefault = false).getOrThrow()
+            manager.configSet(hsConfigSettings.first()).getOrThrow()
 
-            val resetEntries = manager.configGet(hsConfigSettings.first())
+            val resetEntries = manager.configGet(hsConfigSettings.first().keyword)
                 .getOrThrow()
                 .filter { it.key == hsConfigSettings.first().keyword.toString() }
 
@@ -448,7 +448,7 @@ class TorControllerIntegrationTest: TorTestHelper() {
 
         assertTrue(hsConfigSettings.size > 1)
 
-        val entries = manager.configGet(hsConfigSettings.first())
+        val entries = manager.configGet(hsConfigSettings.first().keyword)
             .getOrThrow()
             .filter { it.key == hsConfigSettings.first().keyword.toString() }
 
@@ -458,7 +458,7 @@ class TorControllerIntegrationTest: TorTestHelper() {
         try {
             manager.configSet(hsConfigSettings.first()).getOrThrow()
 
-            val resetEntries = manager.configGet(hsConfigSettings.first())
+            val resetEntries = manager.configGet(hsConfigSettings.first().keyword)
                 .getOrThrow()
                 .filter { it.key == hsConfigSettings.first().keyword.toString() }
 
@@ -495,7 +495,7 @@ class TorControllerIntegrationTest: TorTestHelper() {
 
             manager.configSet(socks).getOrThrow()
 
-            val entry = manager.configGet(socks).getOrThrow().first()
+            val entry = manager.configGet(socks.keyword).getOrThrow().first()
 
             val sb = StringBuilder()
             socks.appendTo(sb, appendValue = true, isWriteTorConfig = true)
@@ -541,7 +541,7 @@ class TorControllerIntegrationTest: TorTestHelper() {
 
             manager.configSet(socks).getOrThrow()
 
-            val entry = manager.configGet(socks).getOrThrow().first()
+            val entry = manager.configGet(socks.keyword).getOrThrow().first()
 
             val sb = StringBuilder()
             socks.appendTo(sb, appendValue = true, isWriteTorConfig = true)
