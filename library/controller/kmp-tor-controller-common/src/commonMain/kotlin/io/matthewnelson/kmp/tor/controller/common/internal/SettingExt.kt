@@ -27,14 +27,8 @@ import io.matthewnelson.kmp.tor.controller.common.config.TorConfig.Setting.*
  * and true if something was.
  * */
 @InternalTorApi
-fun TorConfig.Setting<*>.appendTo(
-    sb: StringBuilder,
-    appendValue: Boolean,
-    isWriteTorConfig: Boolean,
-): Boolean {
-    if (appendValue && this.value == null) {
-        return false
-    }
+fun TorConfig.Setting<*>.appendTo(sb: StringBuilder, isWriteTorConfig: Boolean): Boolean {
+    val value = value ?: return false
 
     val delimiter = if (isWriteTorConfig) {
         ' '
@@ -64,11 +58,6 @@ fun TorConfig.Setting<*>.appendTo(
         is RunAsDaemon,
         is SyslogIdentityTag -> {
             sb.append(keyword)
-
-            if (!appendValue) {
-                return true
-            }
-
             sb.append(delimiter)
             sb.quoteIfTrue(!isWriteTorConfig)
             sb.append(value)
@@ -78,17 +67,12 @@ fun TorConfig.Setting<*>.appendTo(
 
         is UnixSockets -> {
             sb.append(keyword)
-
-            if (!appendValue) {
-                return true
-            }
-
             sb.append(delimiter)
             sb.quoteIfTrue(!isWriteTorConfig)
             sb.append("unix:")
             sb.escapeIfTrue(!isWriteTorConfig)
             sb.quote()
-            sb.append(value?.value)
+            sb.append(value.value)
             sb.escapeIfTrue(!isWriteTorConfig)
             sb.quote()
 
@@ -129,11 +113,6 @@ fun TorConfig.Setting<*>.appendTo(
 
         is Ports -> {
             sb.append(keyword)
-
-            if (!appendValue) {
-                return true
-            }
-
             sb.append(delimiter)
             sb.quoteIfTrue(!isWriteTorConfig)
             sb.append(value)
@@ -185,18 +164,6 @@ fun TorConfig.Setting<*>.appendTo(
         }
 
         is HiddenService -> {
-            if (!appendValue) {
-                sb.append(keyword)
-                sb.append(SP)
-                sb.append(KeyWord.HiddenServicePort)
-                sb.append(SP)
-                sb.append(KeyWord.HiddenServiceMaxStreams)
-                sb.append(SP)
-                sb.append(KeyWord.HiddenServiceMaxStreamsCloseCircuit)
-                return true
-            }
-
-            val hsDirPath = value ?: return false
             val hsPorts = ports
 
             if (hsPorts == null || hsPorts.isEmpty()) {
@@ -207,7 +174,7 @@ fun TorConfig.Setting<*>.appendTo(
             sb.append(keyword)
             sb.append(delimiter)
             sb.quoteIfTrue(!isWriteTorConfig)
-            sb.append(hsDirPath.value)
+            sb.append(value.value)
             sb.quoteIfTrue(!isWriteTorConfig)
 
             val localhostIp: String = try {

@@ -498,7 +498,7 @@ class TorControllerIntegrationTest: TorTestHelper() {
             val entry = manager.configGet(socks.keyword).getOrThrow().first()
 
             val sb = StringBuilder()
-            socks.appendTo(sb, appendValue = true, isWriteTorConfig = true)
+            socks.appendTo(sb, isWriteTorConfig = true)
 
             // Remove Keyword (SocksPort)
             val expected = sb.toString().substringAfter(' ')
@@ -544,7 +544,7 @@ class TorControllerIntegrationTest: TorTestHelper() {
             val entry = manager.configGet(socks.keyword).getOrThrow().first()
 
             val sb = StringBuilder()
-            socks.appendTo(sb, appendValue = true, isWriteTorConfig = true)
+            socks.appendTo(sb, isWriteTorConfig = true)
 
             // Remove Keyword (SocksPort)
             val expected = sb.toString().substringAfter(' ')

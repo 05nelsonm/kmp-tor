@@ -285,7 +285,7 @@ private class RealTorControlProcessor(
                         }
 
                         append(SP)
-                        if (!setting.appendTo(this, appendValue = true, isWriteTorConfig = false)) {
+                        if (!setting.appendTo(this, isWriteTorConfig = false)) {
                             throw TorControllerException("Failed to add ${setting.keyword} to SETCONF command")
                         }
                     }
