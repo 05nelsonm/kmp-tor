@@ -248,7 +248,7 @@ class TorConfig private constructor(
     @Suppress("PropertyName", "CanBePrimaryConstructorProperty")
     sealed class Setting<T: Option?>(
         @JvmField
-        val keyword: KeyWord,
+        val keyword: TorConfig.KeyWord,
         @JvmField
         val default: T,
         isStartArgument: Boolean,
