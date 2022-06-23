@@ -136,7 +136,7 @@ class TorManagerIntegrationTest: TorTestHelper() {
         try {
             // Run 1: Set Socks1 and Socks2 ports
             manager.configSet(setOf(socks1, socks2)).getOrThrow()
-            val entries1 = manager.configGet(socks1).getOrThrow()
+            val entries1 = manager.configGet(socks1.keyword).getOrThrow()
 
             assertEquals(2, entries1.size)
             assertTrue(entries1[0].value.contains(socks1.value?.path?.value!!))
@@ -153,7 +153,7 @@ class TorManagerIntegrationTest: TorTestHelper() {
             // Run 2: Disable SocksPort
             manager.configSet(Ports.Socks().set(AorDorPort.Disable)).getOrThrow()
 
-            val entries2 = manager.configGet(socks1).getOrThrow()
+            val entries2 = manager.configGet(socks1.keyword).getOrThrow()
             assertEquals(1, entries2.size)
             assertEquals(AorDorPort.Disable.value, entries2.first().value)
 
@@ -165,7 +165,7 @@ class TorManagerIntegrationTest: TorTestHelper() {
             // Run 3: Set Socks1
             manager.configSet(socks1).getOrThrow()
 
-            val entries3 = manager.configGet(socks1).getOrThrow()
+            val entries3 = manager.configGet(socks1.keyword).getOrThrow()
             assertEquals(1, entries3.size)
             assertTrue(entries3.first().value.contains(socks1.value?.path?.value!!))
 

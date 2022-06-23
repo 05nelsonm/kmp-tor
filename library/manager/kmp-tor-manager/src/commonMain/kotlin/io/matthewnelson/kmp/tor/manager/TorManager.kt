@@ -164,7 +164,6 @@ private class RealTorManager(
 
     override val instanceId: String = instanceId
     private val networkObserver: NetworkObserver? = networkObserver
-    private val disableNetwork = TorConfig.Setting.DisableNetwork()
     private val networkObserverJob: AtomicRef<Job?> = atomic(null)
 
     private val loader: KmpTorLoader by lazy {
@@ -182,9 +181,9 @@ private class RealTorManager(
 
                             if (networkState.isEnabled()) return@launch
 
-                            controllerInstance.value?.controller?.configSet(
-                                TorConfig.Setting.DisableNetwork().set(TorConfig.Option.TorF.False)
-                            )
+                            controllerInstance.value
+                                ?.controller
+                                ?.configReset(TorConfig.KeyWord.DisableNetwork)
                         }
                     }
                 }
@@ -447,59 +446,18 @@ private class RealTorManager(
             val result = configLoad(config)
 
             if (result.isSuccess) {
-                configReset(TorConfig.Setting.OwningControllerProcess())
 
                 // Startup via TorManager always starts with DisableNetwork set
                 // to true, which configLoad will default back to.
                 if (networkEnabledBefore && networkObserver?.isNetworkConnected() != false) {
-                    configSet(disableNetwork.set(TorConfig.Option.TorF.False))
+                    configReset(setOf(
+                        TorConfig.KeyWord.DisableNetwork,
+                        TorConfig.KeyWord.OwningControllerProcess
+                    ))
+                } else {
+                    configReset(TorConfig.KeyWord.OwningControllerProcess)
                 }
             }
-            result
-        }
-    }
-
-    override suspend fun configReset(
-        setting: TorConfig.Setting<*>,
-        setDefault: Boolean
-    ): Result<Any?> {
-        return provide<TorControlConfigReset, Any?> {
-            // TODO: Check settings
-            val result = configReset(setting, setDefault)
-            result
-        }
-    }
-
-    override suspend fun configReset(
-        settings: Set<TorConfig.Setting<*>>,
-        setDefault: Boolean
-    ): Result<Any?> {
-        return provide<TorControlConfigReset, Any?> {
-            // TODO: Check settings
-            val result = configReset(settings, setDefault)
-            result
-        }
-    }
-
-    // TODO: Maybe???
-    override suspend fun configSave(force: Boolean): Result<Any?> {
-        return provide<TorControlConfigSave, Any?> {
-            configSave(force)
-        }
-    }
-
-    override suspend fun configSet(setting: TorConfig.Setting<*>): Result<Any?> {
-        return provide<TorControlConfigSet, Any?> {
-            // TODO: Check settings
-            val result = configSet(setting)
-            result
-        }
-    }
-
-    override suspend fun configSet(settings: Set<TorConfig.Setting<*>>): Result<Any?> {
-        return provide<TorControlConfigSet, Any?> {
-            // TODO: Check settings
-            val result = configSet(settings)
             result
         }
     }
@@ -654,7 +612,7 @@ private class RealTorManager(
         override fun eventConfChanged(output: String) {
             unixSocksDiffer.onConfChanged(output)
 
-            if (output.startsWith(disableNetwork.keyword)) {
+            if (output.startsWith(TorConfig.KeyWord.DisableNetwork)) {
                 when (output.substringAfter('=')) {
                     TorConfig.Option.TorF.True.value -> {
                         scope.launch {
@@ -887,14 +845,14 @@ private class RealTorManager(
 
         controller.setEvents(requiredEvents)
 
-        // Stop Tor from polling for processId, as we've passed ownership
-        // to the controller which, if it is stopped, Tor will exit.
-        controller.configReset(TorConfig.Setting.OwningControllerProcess())
-
         if (networkObserver?.isNetworkConnected() != false) {
             // null (no observer) or true
-            controller.configSet(disableNetwork.set(TorConfig.Option.TorF.False))
+            controller.configReset(setOf(
+                TorConfig.KeyWord.DisableNetwork,
+                TorConfig.KeyWord.OwningControllerProcess,
+            ))
         } else {
+            controller.configReset(TorConfig.KeyWord.OwningControllerProcess)
             notifyListenersNoScope(TorManagerEvent.Log.Warn(WAITING_ON_NETWORK))
         }
 
@@ -917,7 +875,7 @@ private class RealTorManager(
         }
 
         if (networkState.isEnabled()) {
-            controller.configSet(disableNetwork.set(TorConfig.Option.TorF.True))
+            controller.configSet(TorConfig.Setting.DisableNetwork().set(TorConfig.Option.TorF.True))
         }
         val shutdown = controller.signal(TorControlSignal.Signal.Shutdown)
 

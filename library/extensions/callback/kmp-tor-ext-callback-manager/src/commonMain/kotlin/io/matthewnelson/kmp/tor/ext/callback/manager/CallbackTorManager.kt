@@ -155,22 +155,22 @@ class CallbackTorManager(
     }
 
     override fun configGet(
-        setting: TorConfig.Setting<*>,
+        keyword: TorConfig.KeyWord,
         failure: TorCallback<Throwable>?,
         success: TorCallback<List<ConfigEntry>>
     ): Task {
         return provideOrFail(failure, success) {
-            configGet(setting)
+            configGet(keyword)
         }
     }
 
     override fun configGet(
-        settings: Set<TorConfig.Setting<*>>,
+        keywords: Set<TorConfig.KeyWord>,
         failure: TorCallback<Throwable>?,
         success: TorCallback<List<ConfigEntry>>
     ): Task {
         return provideOrFail(failure, success) {
-            configGet(settings)
+            configGet(keywords)
         }
     }
 
@@ -185,24 +185,22 @@ class CallbackTorManager(
     }
 
     override fun configReset(
-        setting: TorConfig.Setting<*>,
-        setDefault: Boolean,
+        keyword: TorConfig.KeyWord,
         failure: TorCallback<Throwable>?,
         success: TorCallback<Any?>
     ): Task {
         return provideOrFail(failure, success) {
-            configReset(setting)
+            configReset(keyword)
         }
     }
 
     override fun configReset(
-        settings: Set<TorConfig.Setting<*>>,
-        setDefault: Boolean,
+        keywords: Set<TorConfig.KeyWord>,
         failure: TorCallback<Throwable>?,
         success: TorCallback<Any?>
     ): Task {
         return provideOrFail(failure, success) {
-            configReset(settings, setDefault)
+            configReset(keywords)
         }
     }
 

@@ -122,7 +122,7 @@ abstract class TorConfigProvider {
         // remove certain settings if present, for example,
         // anything to do with Unix Sockets for Android,
         // Jvm (windows), NodeJs (windows), Windows targets.
-        excludeSettings: Set<TorConfig.Setting<*>>,
+        excludeSettings: Set<TorConfig.KeyWord>,
         isPortAvailable: (Port) -> Boolean
     ): ValidatedTorConfig {
         val clientConfig = provide()
@@ -137,11 +137,10 @@ abstract class TorConfigProvider {
             ?: workDir.builder { addSegment(DataDirectory.DEFAULT_NAME) }
         dataDir.set(FileSystemDir(dataDirPath))
 
-        val excludedClasses = excludeSettings.map { it::class }
         val portValidator = PortValidator(dataDirPath)
         val builder: TorConfig.Builder = TorConfig.Builder {
             for (setting in clientConfig.settings) {
-                if (excludedClasses.contains(setting::class)) {
+                if (excludeSettings.contains(setting.keyword)) {
                     continue
                 }
 

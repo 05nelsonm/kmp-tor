@@ -31,15 +31,14 @@ import io.matthewnelson.kmp.tor.ext.callback.controller.common.control.CallbackT
 interface CallbackTorControlConfigGet {
 
     fun configGet(
-        setting: TorConfig.Setting<*>,
+        keyword: TorConfig.KeyWord,
         failure: TorCallback<Throwable>?,
         success: TorCallback<List<ConfigEntry>>,
     ): Task
 
     fun configGet(
-        settings: Set<TorConfig.Setting<*>>,
+        keywords: Set<TorConfig.KeyWord>,
         failure: TorCallback<Throwable>?,
         success: TorCallback<List<ConfigEntry>>,
     ): Task
-
 }

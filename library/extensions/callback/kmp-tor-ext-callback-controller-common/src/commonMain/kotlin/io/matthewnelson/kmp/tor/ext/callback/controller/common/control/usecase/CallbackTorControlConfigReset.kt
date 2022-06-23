@@ -25,22 +25,25 @@ import io.matthewnelson.kmp.tor.ext.callback.controller.common.control.CallbackT
  *
  * https://torproject.gitlab.io/torspec/control-spec/#resetconf
  *
+ * Functionality does not follow spec, and _only_ sets the config
+ * to its default setting for the given [TorConfig.KeyWord]. If you
+ * need to modify a config value to a non-default setting, use
+ * [CallbackTorControlConfigSet.configSet].
+ *
  * @see [CallbackTorControlConfig]
+ * @see [CallbackTorControlConfigSet]
  * */
 interface CallbackTorControlConfigReset {
 
     fun configReset(
-        setting: TorConfig.Setting<*>,
-        setDefault: Boolean = true,
+        keyword: TorConfig.KeyWord,
         failure: TorCallback<Throwable>?,
         success: TorCallback<Any?>,
     ): Task
 
     fun configReset(
-        settings: Set<TorConfig.Setting<*>>,
-        setDefault: Boolean = true,
+        keywords: Set<TorConfig.KeyWord>,
         failure: TorCallback<Throwable>?,
         success: TorCallback<Any?>,
     ): Task
-
 }

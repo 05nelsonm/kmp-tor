@@ -452,30 +452,24 @@ private class RealTorController(
 //        return processorDelegate.circuitSetPurpose()
 //    }
 
-    override suspend fun configGet(setting: TorConfig.Setting<*>): Result<List<ConfigEntry>> {
-        return processorDelegate.configGet(setting)
+    override suspend fun configGet(keyword: TorConfig.KeyWord): Result<List<ConfigEntry>> {
+        return processorDelegate.configGet(keyword)
     }
 
-    override suspend fun configGet(settings: Set<TorConfig.Setting<*>>): Result<List<ConfigEntry>> {
-        return processorDelegate.configGet(settings)
+    override suspend fun configGet(keywords: Set<TorConfig.KeyWord>): Result<List<ConfigEntry>> {
+        return processorDelegate.configGet(keywords)
     }
 
     override suspend fun configLoad(config: TorConfig): Result<Any?> {
         return processorDelegate.configLoad(config)
     }
 
-    override suspend fun configReset(
-        setting: TorConfig.Setting<*>,
-        setDefault: Boolean
-    ): Result<Any?> {
-        return processorDelegate.configReset(setting, setDefault)
+    override suspend fun configReset(keyword: TorConfig.KeyWord): Result<Any?> {
+        return processorDelegate.configReset(keyword)
     }
 
-    override suspend fun configReset(
-        settings: Set<TorConfig.Setting<*>>,
-        setDefault: Boolean
-    ): Result<Any?> {
-        return processorDelegate.configReset(settings, setDefault)
+    override suspend fun configReset(keywords: Set<TorConfig.KeyWord>): Result<Any?> {
+        return processorDelegate.configReset(keywords)
     }
 
     override suspend fun configSave(force: Boolean): Result<Any?> {

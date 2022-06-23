@@ -18,21 +18,17 @@ package io.matthewnelson.kmp.tor.controller.common.internal
 import io.matthewnelson.kmp.tor.common.annotation.InternalTorApi
 import io.matthewnelson.kmp.tor.common.util.TorStrings.SP
 import io.matthewnelson.kmp.tor.controller.common.config.TorConfig
-import io.matthewnelson.kmp.tor.controller.common.config.TorConfig.Setting.HiddenService
+import io.matthewnelson.kmp.tor.controller.common.config.TorConfig.KeyWord
+import io.matthewnelson.kmp.tor.controller.common.config.TorConfig.Option.*
+import io.matthewnelson.kmp.tor.controller.common.config.TorConfig.Setting.*
 
 /**
  * Returns false if nothing was appended to the StringBuilder,
  * and true if something was.
  * */
 @InternalTorApi
-fun TorConfig.Setting<*>.appendTo(
-    sb: StringBuilder,
-    appendValue: Boolean,
-    isWriteTorConfig: Boolean,
-): Boolean {
-    if (appendValue && this.value == null) {
-        return false
-    }
+fun TorConfig.Setting<*>.appendTo(sb: StringBuilder, isWriteTorConfig: Boolean): Boolean {
+    val value = value ?: return false
 
     val delimiter = if (isWriteTorConfig) {
         ' '
@@ -41,32 +37,27 @@ fun TorConfig.Setting<*>.appendTo(
     }
 
     when (this) {
-        is TorConfig.Setting.AutomapHostsOnResolve,
-        is TorConfig.Setting.CacheDirectory,
-        is TorConfig.Setting.ClientOnionAuthDir,
-        is TorConfig.Setting.ConnectionPadding,
-        is TorConfig.Setting.ConnectionPaddingReduced,
-        is TorConfig.Setting.ControlPortWriteToFile,
-        is TorConfig.Setting.CookieAuthFile,
-        is TorConfig.Setting.CookieAuthentication,
-        is TorConfig.Setting.DataDirectory,
-        is TorConfig.Setting.DisableNetwork,
-        is TorConfig.Setting.DormantCanceledByStartup,
-        is TorConfig.Setting.DormantClientTimeout,
-        is TorConfig.Setting.DormantOnFirstStartup,
-        is TorConfig.Setting.DormantTimeoutDisabledByIdleStreams,
-        is TorConfig.Setting.GeoIPExcludeUnknown,
-        is TorConfig.Setting.GeoIpV4File,
-        is TorConfig.Setting.GeoIpV6File,
-        is TorConfig.Setting.OwningControllerProcess,
-        is TorConfig.Setting.RunAsDaemon,
-        is TorConfig.Setting.SyslogIdentityTag -> {
+        is AutomapHostsOnResolve,
+        is CacheDirectory,
+        is ClientOnionAuthDir,
+        is ConnectionPadding,
+        is ConnectionPaddingReduced,
+        is ControlPortWriteToFile,
+        is CookieAuthFile,
+        is CookieAuthentication,
+        is DataDirectory,
+        is DisableNetwork,
+        is DormantCanceledByStartup,
+        is DormantClientTimeout,
+        is DormantOnFirstStartup,
+        is DormantTimeoutDisabledByIdleStreams,
+        is GeoIPExcludeUnknown,
+        is GeoIpV4File,
+        is GeoIpV6File,
+        is OwningControllerProcess,
+        is RunAsDaemon,
+        is SyslogIdentityTag -> {
             sb.append(keyword)
-
-            if (!appendValue) {
-                return true
-            }
-
             sb.append(delimiter)
             sb.quoteIfTrue(!isWriteTorConfig)
             sb.append(value)
@@ -74,24 +65,19 @@ fun TorConfig.Setting<*>.appendTo(
             return true
         }
 
-        is TorConfig.Setting.UnixSockets -> {
+        is UnixSockets -> {
             sb.append(keyword)
-
-            if (!appendValue) {
-                return true
-            }
-
             sb.append(delimiter)
             sb.quoteIfTrue(!isWriteTorConfig)
             sb.append("unix:")
             sb.escapeIfTrue(!isWriteTorConfig)
             sb.quote()
-            sb.append(value?.value)
+            sb.append(value.value)
             sb.escapeIfTrue(!isWriteTorConfig)
             sb.quote()
 
             when (this) {
-                is TorConfig.Setting.UnixSockets.Control -> {
+                is UnixSockets.Control -> {
                     unixFlags?.let { flags ->
                         for (flag in flags) {
                             sb.append(SP)
@@ -99,7 +85,7 @@ fun TorConfig.Setting<*>.appendTo(
                         }
                     }
                 }
-                is TorConfig.Setting.UnixSockets.Socks -> {
+                is UnixSockets.Socks -> {
                     flags?.let { flags ->
                         for (flag in flags) {
                             sb.append(SP)
@@ -125,20 +111,15 @@ fun TorConfig.Setting<*>.appendTo(
             return true
         }
 
-        is TorConfig.Setting.Ports -> {
+        is Ports -> {
             sb.append(keyword)
-
-            if (!appendValue) {
-                return true
-            }
-
             sb.append(delimiter)
             sb.quoteIfTrue(!isWriteTorConfig)
             sb.append(value)
 
             when (this) {
-                is TorConfig.Setting.Ports.Control -> {}
-                is TorConfig.Setting.Ports.Dns -> {
+                is Ports.Control -> {}
+                is Ports.Dns -> {
                     isolationFlags?.let { flags ->
                         for (flag in flags) {
                             sb.append(SP)
@@ -146,7 +127,7 @@ fun TorConfig.Setting<*>.appendTo(
                         }
                     }
                 }
-                is TorConfig.Setting.Ports.HttpTunnel -> {
+                is Ports.HttpTunnel -> {
                     isolationFlags?.let { flags ->
                         for (flag in flags) {
                             sb.append(SP)
@@ -154,7 +135,7 @@ fun TorConfig.Setting<*>.appendTo(
                         }
                     }
                 }
-                is TorConfig.Setting.Ports.Socks -> {
+                is Ports.Socks -> {
                     flags?.let { flags ->
                         for (flag in flags) {
                             sb.append(SP)
@@ -168,7 +149,7 @@ fun TorConfig.Setting<*>.appendTo(
                         }
                     }
                 }
-                is TorConfig.Setting.Ports.Trans -> {
+                is Ports.Trans -> {
                     isolationFlags?.let { flags ->
                         for (flag in flags) {
                             sb.append(SP)
@@ -183,18 +164,6 @@ fun TorConfig.Setting<*>.appendTo(
         }
 
         is HiddenService -> {
-            if (!appendValue) {
-                sb.append(keyword)
-                sb.append(SP)
-                sb.append("HiddenServicePort")
-                sb.append(SP)
-                sb.append("HiddenServiceMaxStreams")
-                sb.append(SP)
-                sb.append("HiddenServiceMaxStreamsCloseCircuit")
-                return true
-            }
-
-            val hsDirPath = value ?: return false
             val hsPorts = ports
 
             if (hsPorts == null || hsPorts.isEmpty()) {
@@ -205,7 +174,7 @@ fun TorConfig.Setting<*>.appendTo(
             sb.append(keyword)
             sb.append(delimiter)
             sb.quoteIfTrue(!isWriteTorConfig)
-            sb.append(hsDirPath.value)
+            sb.append(value.value)
             sb.quoteIfTrue(!isWriteTorConfig)
 
             val localhostIp: String = try {
@@ -220,7 +189,7 @@ fun TorConfig.Setting<*>.appendTo(
                     append(SP)
                 }
 
-                sb.append("HiddenServicePort")
+                sb.append(KeyWord.HiddenServicePort)
                 sb.append(delimiter)
                 sb.quoteIfTrue(!isWriteTorConfig)
 
@@ -252,10 +221,10 @@ fun TorConfig.Setting<*>.appendTo(
                 append(SP)
             }
 
-            sb.append("HiddenServiceMaxStreams")
+            sb.append(KeyWord.HiddenServiceMaxStreams)
             sb.append(delimiter)
             sb.quoteIfTrue(!isWriteTorConfig)
-            sb.append(maxStreams?.value ?: "0")
+            sb.append(maxStreams?.value ?: AorDorPort.Disable)
             sb.quoteIfTrue(!isWriteTorConfig)
 
             sb.newLineIfTrue(isWriteTorConfig) {
@@ -263,10 +232,10 @@ fun TorConfig.Setting<*>.appendTo(
                 append(SP)
             }
 
-            sb.append("HiddenServiceMaxStreamsCloseCircuit")
+            sb.append(KeyWord.HiddenServiceMaxStreamsCloseCircuit)
             sb.append(delimiter)
             sb.quoteIfTrue(!isWriteTorConfig)
-            sb.append(maxStreamsCloseCircuit?.value ?: "0")
+            sb.append(maxStreamsCloseCircuit?.value ?: TorF.False)
             sb.newLineIfTrue(isWriteTorConfig) {
                 // if false
                 quote()
