@@ -18,15 +18,6 @@ package io.matthewnelson.kmp.tor.controller.common.internal
 import io.matthewnelson.kmp.tor.common.annotation.InternalTorApi
 import kotlin.jvm.JvmStatic
 
-@Deprecated(
-    message = "ControllerUtils name was changed to PlatformUtil",
-    replaceWith = ReplaceWith(
-        "PlatformUtil",
-        "io.matthewnelson.kmp.tor.controller.common.internal.PlatformUtil"
-    )
-)
-typealias ControllerUtils = PlatformUtil
-
 expect object PlatformUtil {
 
     /**
