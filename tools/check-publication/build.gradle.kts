@@ -42,6 +42,7 @@ kmpConfiguration {
                         implementation("${pConfig.group}:kmp-tor-controller:${env.kmpTor.version.name}")
                         implementation("${pConfig.group}:kmp-tor-ext-callback-controller:${env.kmpTor.version.name}")
                         implementation("${pConfig.group}:kmp-tor-ext-callback-manager:${env.kmpTor.version.name}")
+                        implementation("${pConfig.group}:kmp-tor-ext-unix-socket:${env.kmpTor.version.name}")
                         implementation("${pConfig.group}:kmp-tor-manager:${env.kmpTor.version.name}")
                     }
                 }

@@ -58,7 +58,7 @@ kmpConfiguration {
         ),
         commonMainSourceSet = {
             dependencies {
-                api(project(":library:extensions:callback:kmp-tor-ext-callback-controller-common"))
+                api(project(":library:extensions:kmp-tor-ext-callback-controller-common"))
                 implementation(project(":library:manager:kmp-tor-manager-common"))
             }
         },

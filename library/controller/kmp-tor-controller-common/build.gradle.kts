@@ -30,7 +30,7 @@ kmpConfiguration {
             KmpTarget.Jvm.Jvm(
                 testSourceSet = {
                     dependencies {
-                        implementation(project(":library:extensions:unix-socket:kmp-tor-ext-unix-socket"))
+                        implementation(project(":library:extensions:kmp-tor-ext-unix-socket"))
                     }
                 }
             ),

@@ -88,7 +88,7 @@ kotlin {
                         implementation("io.matthewnelson.kotlin-components:kmp-tor-binary-linuxx64:${env.kmpTorBinaries.version.name}")
 
                         // Add support for Unix Domain Sockets (only available for Linux)
-                        implementation(project(":library:extensions:unix-socket:kmp-tor-ext-unix-socket"))
+                        implementation(project(":library:extensions:kmp-tor-ext-unix-socket"))
                     }
                     else -> {
                         throw GradleException("Failed to determine Operating System from os.name='$osName'")
