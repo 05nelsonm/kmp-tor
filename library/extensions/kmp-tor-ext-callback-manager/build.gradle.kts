@@ -70,7 +70,7 @@ kmpConfiguration {
         commonMainSourceSet = {
             dependencies {
                 implementation(deps.kotlin.coroutines.core.core)
-                api(project(":library:extensions:callback:kmp-tor-ext-callback-manager-common"))
+                api(project(":library:extensions:kmp-tor-ext-callback-manager-common"))
                 implementation(project(":library:manager:kmp-tor-manager"))
             }
         },
