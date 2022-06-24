@@ -20,6 +20,7 @@ import io.matthewnelson.kmp.tor.PlatformInstaller
 import io.matthewnelson.kmp.tor.PlatformInstaller.InstallOption
 import io.matthewnelson.kmp.tor.TorConfigProviderJvm
 import io.matthewnelson.kmp.tor.common.address.*
+import io.matthewnelson.kmp.tor.common.annotation.InternalTorApi
 import io.matthewnelson.kmp.tor.controller.common.config.TorConfig
 import io.matthewnelson.kmp.tor.controller.common.config.TorConfig.Setting.*
 import io.matthewnelson.kmp.tor.controller.common.config.TorConfig.Option.*
@@ -47,6 +48,8 @@ import java.net.InetSocketAddress
 class SampleApp: App(SampleView::class) {
 
     private val platformInstaller: PlatformInstaller by lazy {
+
+        @OptIn(InternalTorApi::class)
         val installer = when {
             PlatformUtil.isMingw -> {
                 PlatformInstaller.mingwX64(InstallOption.CleanInstallIfMissing)
