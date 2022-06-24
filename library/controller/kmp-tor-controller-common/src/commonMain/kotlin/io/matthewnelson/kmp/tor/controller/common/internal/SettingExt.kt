@@ -29,10 +29,10 @@ import io.matthewnelson.kmp.tor.controller.common.file.Path
  * */
 @InternalTorApi
 fun TorConfig.Setting<*>.appendTo(sb: StringBuilder, isWriteTorConfig: Boolean): Boolean {
-    val value = when(val v = value) {
+    val value: TorConfig.Option = when(val v = value) {
         null -> return false
         is FileSystemFile -> {
-            if (!isWriteTorConfig && PlatformUtil.isMingw) {
+            if (!isWriteTorConfig && Path.fsSeparator == '\\') {
                 val escapedPath = v.path.value.replace("\\", "\\\\")
                 FileSystemFile(Path(escapedPath))
             } else {
@@ -40,7 +40,7 @@ fun TorConfig.Setting<*>.appendTo(sb: StringBuilder, isWriteTorConfig: Boolean):
             }
         }
         is FileSystemDir -> {
-            if (!isWriteTorConfig && PlatformUtil.isMingw) {
+            if (!isWriteTorConfig && Path.fsSeparator == '\\') {
                 val escapedPath = v.path.value.replace("\\", "\\\\")
                 FileSystemDir(Path(escapedPath))
             } else {
