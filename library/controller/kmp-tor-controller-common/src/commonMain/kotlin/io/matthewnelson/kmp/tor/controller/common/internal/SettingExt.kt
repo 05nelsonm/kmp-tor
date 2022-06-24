@@ -80,7 +80,7 @@ fun TorConfig.Setting<*>.appendTo(sb: StringBuilder, isWriteTorConfig: Boolean):
             sb.append(keyword)
             sb.append(delimiter)
             sb.quoteIfTrue(!isWriteTorConfig)
-            sb.append(value)
+            sb.append(value.value)
             sb.quoteIfTrue(!isWriteTorConfig)
             return true
         }
@@ -135,7 +135,7 @@ fun TorConfig.Setting<*>.appendTo(sb: StringBuilder, isWriteTorConfig: Boolean):
             sb.append(keyword)
             sb.append(delimiter)
             sb.quoteIfTrue(!isWriteTorConfig)
-            sb.append(value)
+            sb.append(value.value)
 
             when (this) {
                 is Ports.Control -> {}
@@ -244,7 +244,7 @@ fun TorConfig.Setting<*>.appendTo(sb: StringBuilder, isWriteTorConfig: Boolean):
             sb.append(KeyWord.HiddenServiceMaxStreams)
             sb.append(delimiter)
             sb.quoteIfTrue(!isWriteTorConfig)
-            sb.append(maxStreams?.value ?: AorDorPort.Disable)
+            sb.append(maxStreams?.value ?: AorDorPort.Disable.value)
             sb.quoteIfTrue(!isWriteTorConfig)
 
             sb.newLineIfTrue(isWriteTorConfig) {
