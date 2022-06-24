@@ -22,12 +22,15 @@ actual object PlatformUtil {
     @InternalTorApi
     actual fun localhostAddress(): String = "127.0.0.1"
 
+    @InternalTorApi
     actual val isDarwin: Boolean by lazy {
         platform == "darwin"
     }
+    @InternalTorApi
     actual val isLinux: Boolean by lazy {
         platform == "linux" || platform == "android"
     }
+    @InternalTorApi
     actual val isMingw: Boolean by lazy {
         platform == "win32"
     }

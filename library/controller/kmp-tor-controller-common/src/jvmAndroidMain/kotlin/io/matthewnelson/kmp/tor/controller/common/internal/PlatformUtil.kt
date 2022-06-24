@@ -67,14 +67,17 @@ actual object PlatformUtil {
     }
 
     @JvmStatic
+    @InternalTorApi
     actual val isDarwin: Boolean by lazy {
         osName.contains("mac") || osName.contains("darwin")
     }
     @JvmStatic
+    @InternalTorApi
     actual val isLinux: Boolean by lazy {
         osName.contains("linux")
     }
     @JvmStatic
+    @InternalTorApi
     actual val isMingw: Boolean by lazy {
         osName.contains("windows")
     }

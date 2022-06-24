@@ -32,10 +32,13 @@ expect object PlatformUtil {
     fun localhostAddress(): String
 
     @JvmStatic
+    @InternalTorApi
     val isDarwin: Boolean
     @JvmStatic
+    @InternalTorApi
     val isLinux: Boolean
     @JvmStatic
+    @InternalTorApi
     val isMingw: Boolean
 
     @JvmStatic

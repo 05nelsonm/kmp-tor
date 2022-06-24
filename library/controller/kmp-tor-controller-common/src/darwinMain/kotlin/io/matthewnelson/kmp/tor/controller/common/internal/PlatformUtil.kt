@@ -22,8 +22,11 @@ actual object PlatformUtil {
     @InternalTorApi
     actual fun localhostAddress(): String = "127.0.0.1"
 
+    @InternalTorApi
     actual val isDarwin: Boolean = true
+    @InternalTorApi
     actual val isLinux: Boolean = false
+    @InternalTorApi
     actual val isMingw: Boolean = false
 
     @InternalTorApi
