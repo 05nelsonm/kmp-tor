@@ -21,6 +21,7 @@ import io.matthewnelson.kmp.tor.controller.common.config.TorConfig
 import io.matthewnelson.kmp.tor.controller.common.config.TorConfig.KeyWord
 import io.matthewnelson.kmp.tor.controller.common.config.TorConfig.Option.*
 import io.matthewnelson.kmp.tor.controller.common.config.TorConfig.Setting.*
+import io.matthewnelson.kmp.tor.controller.common.file.Path
 
 /**
  * Returns false if nothing was appended to the StringBuilder,
@@ -28,7 +29,26 @@ import io.matthewnelson.kmp.tor.controller.common.config.TorConfig.Setting.*
  * */
 @InternalTorApi
 fun TorConfig.Setting<*>.appendTo(sb: StringBuilder, isWriteTorConfig: Boolean): Boolean {
-    val value = value ?: return false
+    val value: TorConfig.Option = when(val v = value) {
+        null -> return false
+        is FileSystemFile -> {
+            if (!isWriteTorConfig && Path.fsSeparator == '\\') {
+                val escapedPath = v.path.value.replace("\\", "\\\\")
+                FileSystemFile(Path(escapedPath))
+            } else {
+                v
+            }
+        }
+        is FileSystemDir -> {
+            if (!isWriteTorConfig && Path.fsSeparator == '\\') {
+                val escapedPath = v.path.value.replace("\\", "\\\\")
+                FileSystemDir(Path(escapedPath))
+            } else {
+                v
+            }
+        }
+        else -> v
+    }
 
     val delimiter = if (isWriteTorConfig) {
         ' '
