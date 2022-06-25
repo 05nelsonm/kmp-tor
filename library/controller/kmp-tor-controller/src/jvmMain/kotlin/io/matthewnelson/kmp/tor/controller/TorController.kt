@@ -26,7 +26,7 @@ import io.matthewnelson.kmp.tor.controller.common.exceptions.TorControllerExcept
 import io.matthewnelson.kmp.tor.controller.common.file.Path
 import io.matthewnelson.kmp.tor.controller.common.internal.PlatformUtil
 import io.matthewnelson.kmp.tor.controller.common.internal.isUnixPath
-import io.matthewnelson.kmp.tor.controller.internal.controller.getTorControllerDispatchers
+import io.matthewnelson.kmp.tor.controller.internal.controller.getTorControllerDispatcher
 import io.matthewnelson.kmp.tor.controller.internal.util.toTorController
 import kotlinx.coroutines.withContext
 import java.io.*
@@ -100,7 +100,7 @@ actual interface TorController: TorControlProcessor, TorEventProcessor<TorEvent.
                 throw TorControllerException("UnixDomainSockets unsupported. Add the kmp-tor-ext-unix-socket dependency", e)
             }
 
-            val dispatchers = getTorControllerDispatchers()
+            val dispatchers = getTorControllerDispatcher()
 
             return try {
                 withContext(dispatchers) {

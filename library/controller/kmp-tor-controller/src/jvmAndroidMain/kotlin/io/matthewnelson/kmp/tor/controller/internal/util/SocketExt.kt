@@ -16,7 +16,7 @@
 package io.matthewnelson.kmp.tor.controller.internal.util
 
 import io.matthewnelson.kmp.tor.controller.TorController
-import io.matthewnelson.kmp.tor.controller.internal.controller.getTorControllerDispatchers
+import io.matthewnelson.kmp.tor.controller.internal.controller.getTorControllerDispatcher
 import io.matthewnelson.kmp.tor.controller.internal.io.ReaderWrapper
 import io.matthewnelson.kmp.tor.controller.internal.io.SocketWrapper
 import io.matthewnelson.kmp.tor.controller.internal.io.WriterWrapper
@@ -32,7 +32,7 @@ import java.net.SocketException
 @JvmSynthetic
 @Suppress("nothing_to_inline")
 @Throws(IOException::class, SocketException::class)
-internal inline fun Socket.toTorController(dispatchers: ExecutorCoroutineDispatcher? = null): TorController {
+internal inline fun Socket.toTorController(dispatcher: ExecutorCoroutineDispatcher? = null): TorController {
     try {
         if (!isConnected) {
             throw IOException("Socket.connect must be called before retrieving a new instance of TorController")
@@ -47,14 +47,14 @@ internal inline fun Socket.toTorController(dispatchers: ExecutorCoroutineDispatc
             reader = readerWrapper,
             writer = writerWrapper,
             socket = socketWrapper,
-            dispatchers = dispatchers ?: getTorControllerDispatchers(),
+            dispatcher = dispatcher ?: getTorControllerDispatcher(),
         )
     } catch (e: Exception) {
         try {
             close()
         } catch (_: Exception) {}
         try {
-            dispatchers?.close()
+            dispatcher?.close()
         } catch (_: Exception) {}
         throw e
     }

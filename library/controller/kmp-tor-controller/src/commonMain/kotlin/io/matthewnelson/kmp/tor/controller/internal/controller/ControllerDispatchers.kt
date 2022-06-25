@@ -22,4 +22,4 @@ import kotlin.jvm.JvmSynthetic
 @JvmSynthetic
 @Suppress("nothing_to_inline")
 @OptIn(ExperimentalCoroutinesApi::class)
-internal expect inline fun getTorControllerDispatchers(): CloseableCoroutineDispatcher
+internal expect inline fun getTorControllerDispatcher(): CloseableCoroutineDispatcher

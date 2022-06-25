@@ -18,7 +18,7 @@ package io.matthewnelson.kmp.tor.controller.internal.util
 import io.matthewnelson.kmp.tor.common.address.ProxyAddress
 import io.matthewnelson.kmp.tor.controller.TorController
 import io.matthewnelson.kmp.tor.controller.common.exceptions.TorControllerException
-import io.matthewnelson.kmp.tor.controller.internal.controller.getTorControllerDispatchers
+import io.matthewnelson.kmp.tor.controller.internal.controller.getTorControllerDispatcher
 import kotlin.jvm.Throws
 import kotlin.jvm.JvmSynthetic
 import kotlinx.coroutines.withContext
@@ -30,7 +30,7 @@ import java.net.Socket
 @Throws(TorControllerException::class)
 @Suppress("nothing_to_inline", "BlockingMethodInNonBlockingContext")
 internal suspend inline fun ProxyAddress.toTorController(): TorController {
-    val dispatchers = getTorControllerDispatchers()
+    val dispatchers = getTorControllerDispatcher()
     val socket = Socket(Proxy.NO_PROXY)
 
     try {
