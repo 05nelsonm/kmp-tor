@@ -506,9 +506,9 @@ private class RealTorManager(
         }
     }
 
-    override suspend fun setEvents(events: Set<TorEvent>, extended: Boolean): Result<Any?> {
+    override suspend fun setEvents(events: Set<TorEvent>): Result<Any?> {
         return provide<TorControlSetEvents, Any?> {
-            setEvents(events.toMutableSet().apply { addAll(requiredEvents) }, extended)
+            setEvents(events.toMutableSet().apply { addAll(requiredEvents) })
         }
     }
 

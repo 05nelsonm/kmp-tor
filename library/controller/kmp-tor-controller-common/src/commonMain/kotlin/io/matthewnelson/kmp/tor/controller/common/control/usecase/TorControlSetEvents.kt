@@ -27,6 +27,6 @@ import io.matthewnelson.kmp.tor.controller.common.events.TorEvent
  * */
 interface TorControlSetEvents {
 
-    suspend fun setEvents(events: Set<TorEvent>, extended: Boolean = false): Result<Any?>
+    suspend fun setEvents(events: Set<TorEvent>): Result<Any?>
 
 }

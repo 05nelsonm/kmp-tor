@@ -226,9 +226,9 @@ internal abstract class BaseTorManager: SynchronizedObject(), TorControlManager 
 //        }
 //    }
 
-    override suspend fun setEvents(events: Set<TorEvent>, extended: Boolean): Result<Any?> {
+    override suspend fun setEvents(events: Set<TorEvent>): Result<Any?> {
         return provide<TorControlSetEvents, Any?> {
-            setEvents(events, extended)
+            setEvents(events)
         }
     }
 
