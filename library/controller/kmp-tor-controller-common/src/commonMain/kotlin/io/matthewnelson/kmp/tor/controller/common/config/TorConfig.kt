@@ -855,6 +855,16 @@ class TorConfig private constructor(
             }
         }
 
+        /**
+         * Configure TCP Ports for Tor's
+         *  - [KeyWord.ControlPort]
+         *  - [KeyWord.DnsPort]
+         *  - [KeyWord.HttpTunnelPort]
+         *  - [KeyWord.SocksPort]
+         *  - [KeyWord.TransPort]
+         *
+         * @see [UnixSockets]
+         * */
         sealed class Ports(
             keyword: TorConfig.KeyWord,
             default: Option.AorDorPort,
@@ -900,12 +910,17 @@ class TorConfig private constructor(
             }
 
             /**
-             * https://2019.www.torproject.org/docs/tor-manual.html.en#ControlPort
              *
              * Note that Tor's default value as per the spec is disabled (0), so
              * excluding it from your config will not set it to a Port. As this
              * library depends on the [Control] port, the default value here differs
              * and cannot be set to [Option.AorDorPort.Disable].
+             *
+             * It is not necessary to add this to your [TorConfig] when using TorManager,
+             * as if it is absent `TorManager.start` will automatically configure the
+             * [KeyWord.ControlPort] and open a Tor control connection for you.
+             *
+             * https://2019.www.torproject.org/docs/tor-manual.html.en#ControlPort
              *
              * @see [UnixSockets.Control]
              * */
@@ -1135,12 +1150,19 @@ class TorConfig private constructor(
             }
         }
 
+        /**
+         * Specific [Setting] for using unix domain sockets for the [KeyWord.ControlPort] and
+         * [KeyWord.SocksPort]. Unix Domain Socket support is limited by Tor to Linux (and Android).
+         *
+         * @see [UnixSockets.Control]
+         * @see [UnixSockets.Socks]
+         * */
         sealed class UnixSockets(
             keyword: TorConfig.KeyWord,
             isStartArgument: Boolean,
         ) : Setting<Option.FileSystemFile?>(
             keyword,
-            null,
+            default = null,
             isStartArgument
         ) {
 
@@ -1166,6 +1188,19 @@ class TorConfig private constructor(
             }
 
             /**
+             * [UnixSockets.Control] must have support to be added to the [TorConfig]. For Android,
+             * nothing is needed as native support is had via `android.net.LocalSocket`. For the JVM,
+             * the extension `kmp-tor-ext-unix-socket` must be added to you Linux distrobution.
+             *
+             * If [PlatformUtil.hasControlUnixDomainSocketSupport] is false, calling [Control.set] will
+             * result in the [Option.FileSystemFile] not being set, and thus not being added to
+             * [TorConfig].
+             *
+             * It is not necessary to add this to your [TorConfig] when using TorManager, as if
+             * [PlatformUtil.hasControlUnixDomainSocketSupport] is true, it will automatically be
+             * added for you as the preferred way to establish a Tor control connection. To override
+             * this behavior, you can specify [Ports.Control] with your provided config.
+             *
              * https://2019.www.torproject.org/docs/tor-manual.html.en#ControlPort
              * */
             class Control                               : UnixSockets(
@@ -1217,6 +1252,20 @@ class TorConfig private constructor(
             }
 
             /**
+             * [UnixSockets.Socks] must have support to be added to the [TorConfig].
+             *
+             * If [PlatformUtil.isLinux] is false, calling [Socks.set] will result in
+             * the [Option.FileSystemFile] not being set, and thus not being added to
+             * [TorConfig].
+             *
+             * If using TorManager, when you provide your [TorConfig] and there is
+             * neither a [Ports.Socks] or [UnixSockets.Socks] present, [Ports.Socks]
+             * will automatically be added for you. So, you can always add this [Setting]
+             * when providing your [TorConfig] to prefer using [UnixSockets] over [Ports].
+             *
+             * The resulting [Path] for [UnixSockets.Socks] will be dispatched via
+             * `AddressInfo.unixSocks` property when Tor bootstrapping is complete.
+             *
              * https://2019.www.torproject.org/docs/tor-manual.html.en#SocksPort
              * */
             class Socks                             : UnixSockets(
