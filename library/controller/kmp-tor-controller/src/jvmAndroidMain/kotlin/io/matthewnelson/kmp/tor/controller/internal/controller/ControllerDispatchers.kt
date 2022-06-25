@@ -21,6 +21,6 @@ import java.util.concurrent.Executors
 
 @JvmSynthetic
 @Suppress("nothing_to_inline")
-internal actual inline fun getTorControllerDispatchers(): ExecutorCoroutineDispatcher {
+internal actual inline fun getTorControllerDispatcher(): ExecutorCoroutineDispatcher {
     return Executors.newFixedThreadPool(2).asCoroutineDispatcher()
 }

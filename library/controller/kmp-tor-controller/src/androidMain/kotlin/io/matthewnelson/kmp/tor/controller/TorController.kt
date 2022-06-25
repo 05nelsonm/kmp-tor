@@ -27,7 +27,7 @@ import io.matthewnelson.kmp.tor.controller.common.events.TorEventProcessor
 import io.matthewnelson.kmp.tor.controller.common.exceptions.TorControllerException
 import io.matthewnelson.kmp.tor.controller.common.file.Path
 import io.matthewnelson.kmp.tor.controller.common.internal.isUnixPath
-import io.matthewnelson.kmp.tor.controller.internal.controller.getTorControllerDispatchers
+import io.matthewnelson.kmp.tor.controller.internal.controller.getTorControllerDispatcher
 import io.matthewnelson.kmp.tor.controller.internal.io.ReaderWrapper
 import io.matthewnelson.kmp.tor.controller.internal.io.SocketWrapper
 import io.matthewnelson.kmp.tor.controller.internal.io.WriterWrapper
@@ -91,12 +91,12 @@ actual interface TorController: TorControlProcessor, TorEventProcessor<TorEvent.
                 throw TorControllerException("Unix domain socket path must start with '/'")
             }
 
-            val dispatchers = getTorControllerDispatchers()
+            val dispatcher = getTorControllerDispatcher()
             val socket = LocalSocket(LocalSocket.SOCKET_STREAM)
 
             try {
 
-                val (reader, writer) = withContext(dispatchers) {
+                val (reader, writer) = withContext(dispatcher) {
                     val address = LocalSocketAddress(unixDomainSocket.value, LocalSocketAddress.Namespace.FILESYSTEM)
 
                     socket.connect(address)
@@ -112,14 +112,14 @@ actual interface TorController: TorControlProcessor, TorEventProcessor<TorEvent.
                     reader = ReaderWrapper.wrap(reader),
                     writer = WriterWrapper.wrap(writer),
                     socket = SocketWrapper.wrap(socket),
-                    dispatchers = dispatchers,
+                    dispatcher = dispatcher,
                 )
             } catch (e: Exception) {
                 try {
                     socket.close()
                 } catch (_: Exception) {}
                 try {
-                    dispatchers.close()
+                    dispatcher.close()
                 } catch (_: Exception) {}
 
                 throw TorControllerException("Failed to open unix socket to $unixDomainSocket", e)

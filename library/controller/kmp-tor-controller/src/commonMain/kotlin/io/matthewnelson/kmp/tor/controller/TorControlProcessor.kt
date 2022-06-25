@@ -39,11 +39,10 @@ import io.matthewnelson.kmp.tor.controller.common.config.HiddenServiceEntry
 import io.matthewnelson.kmp.tor.controller.common.internal.PlatformUtil
 import io.matthewnelson.kmp.tor.controller.common.internal.appendTo
 import io.matthewnelson.kmp.tor.controller.internal.controller.ControlPortInteractor
+import io.matthewnelson.kmp.tor.controller.internal.controller.TorControlProcessorLock
 import io.matthewnelson.kmp.tor.controller.internal.controller.ReplyLine
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.sync.Mutex
-import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import kotlin.jvm.JvmSynthetic
 
@@ -76,78 +75,61 @@ interface TorControlProcessor:
 {
     companion object {
         @JvmSynthetic
-        internal fun newInstance(interactor: ControlPortInteractor): TorControlProcessor =
-            RealTorControlProcessor(interactor)
+        internal fun newInstance(
+            interactor: ControlPortInteractor,
+            processorLock: TorControlProcessorLock,
+        ): TorControlProcessor =
+            RealTorControlProcessor(interactor, processorLock)
     }
 }
 
 @OptIn(InternalTorApi::class)
 private class RealTorControlProcessor(
-    interactor: ControlPortInteractor
+    interactor: ControlPortInteractor,
+    private val processorLock: TorControlProcessorLock,
 ): TorControlProcessor, ControlPortInteractor by interactor {
-    private val lock = Mutex()
 
     override suspend fun authenticate(bytes: ByteArray): Result<Any?> {
-        return lock.withLock {
-            try {
-                val command = StringBuilder("AUTHENTICATE").apply {
-                    append(SP)
-                    append(bytes.encodeBase16())
-                    append(CLRF)
-                }.toString()
+        return processorLock.withContextAndLock {
+            val command = StringBuilder("AUTHENTICATE").apply {
+                append(SP)
+                append(bytes.encodeBase16())
+                append(CLRF)
+            }.toString()
 
-                Result.success(processCommand(command))
-            } catch (e: Exception) {
-                Result.failure(e)
-            }
+            Result.success(processCommand(command))
         }
     }
 
 //    override suspend fun challengeAuth(clientNonce: String): Result<Map<String, String>> {
-//        return lock.withLock {
-//            try {
-//                val command = StringBuilder("AUTHCHALLENGE")
-//                    .append(SP)
-//                    .append("SAFECOOKIE")
-//                    .append(SP)
-//                    .append(clientNonce)
-//                    .append(CLRF)
-//                    .toString()
+//        return processorLock.withContextAndLock {
+//            val command = StringBuilder("AUTHCHALLENGE")
+//                .append(SP)
+//                .append("SAFECOOKIE")
+//                .append(SP)
+//                .append(clientNonce)
+//                .append(CLRF)
+//                .toString()
 //
-//                Result.success(processCommand(command).toMap())
-//            } catch (e: Exception) {
-//                Result.failure(e)
-//            }
+//            Result.success(processCommand(command).toMap())
 //        }
 //    }
 
 //    override suspend fun circuitClose(): Result<Any?> {
-//        return lock.withLock {
-//            try {
-//                TODO("Not yet implemented")
-//            } catch (e: Exception) {
-//                Result.failure(e)
-//            }
+//        return processorLock.withContextAndLock {
+//            TODO("Not yet implemented")
 //        }
 //    }
 
 //    override suspend fun circuitExtend(): Result<String> {
-//        return lock.withLock {
-//            try {
-//                TODO("Not yet implemented")
-//            } catch (e: Exception) {
-//                Result.failure(e)
-//            }
+//        return processorLock.withContextAndLock {
+//            TODO("Not yet implemented")
 //        }
 //    }
 
 //    override suspend fun circuitSetPurpose(): Result<Any?> {
-//        return lock.withLock {
-//            try {
-//                TODO("Not yet implemented")
-//            } catch (e: Exception) {
-//                Result.failure(e)
-//            }
+//        return processorLock.withContextAndLock {
+//            TODO("Not yet implemented")
 //        }
 //    }
 
@@ -156,50 +138,40 @@ private class RealTorControlProcessor(
     }
 
     override suspend fun configGet(keywords: Set<TorConfig.KeyWord>): Result<List<ConfigEntry>> {
-        return lock.withLock {
-            try {
-                val command = StringBuilder("GETCONF").apply {
-                    for (keyword in keywords) {
-                        append(SP)
-                        append(keyword)
-                    }
-                    append(CLRF)
-                }.toString()
-
-                val configEntry = processCommand(command) {
-                    map { reply ->
-                        val kvp = reply.message
-                        val index = kvp.indexOf('=')
-                        if (index >= 0) {
-                            ConfigEntry(kvp.substring(0, index), kvp.substring(index + 1))
-                        } else {
-                            ConfigEntry(kvp)
-                        }
-                    }
+        return processorLock.withContextAndLock {
+            val command = StringBuilder("GETCONF").apply {
+                for (keyword in keywords) {
+                    append(SP)
+                    append(keyword)
                 }
+                append(CLRF)
+            }.toString()
 
-                Result.success(configEntry)
-            } catch (e: Exception) {
-                Result.failure(e)
+            val configEntry = processCommand(command).map { reply ->
+                val kvp = reply.message
+                val index = kvp.indexOf('=')
+                if (index >= 0) {
+                    ConfigEntry(kvp.substring(0, index), kvp.substring(index + 1))
+                } else {
+                    ConfigEntry(kvp)
+                }
             }
+
+            Result.success(configEntry)
         }
     }
 
     override suspend fun configLoad(config: TorConfig): Result<Any?> {
-        return lock.withLock {
-            try {
-                val command = StringBuilder("+LOADCONF").apply {
-                    append(CLRF)
-                    append(config.text)
-                    append(CLRF)
-                    append(MULTI_LINE_END)
-                    append(CLRF)
-                }.toString()
+        return processorLock.withContextAndLock {
+            val command = StringBuilder("+LOADCONF").apply {
+                append(CLRF)
+                append(config.text)
+                append(CLRF)
+                append(MULTI_LINE_END)
+                append(CLRF)
+            }.toString()
 
-                Result.success(processCommand(command))
-            } catch (e: Exception) {
-                Result.failure(e)
-            }
+            Result.success(processCommand(command))
         }
     }
 
@@ -208,54 +180,46 @@ private class RealTorControlProcessor(
     }
 
     override suspend fun configReset(keywords: Set<TorConfig.KeyWord>): Result<Any?> {
-        return lock.withLock {
-            try {
-                val command = StringBuilder("RESETCONF").apply {
-                    for (keyword in keywords) {
-                        when (keyword) {
-                            // ControlPort can only be set upon startup
-                            is TorConfig.KeyWord.ControlPort,
+        return processorLock.withContextAndLock {
+            val command = StringBuilder("RESETCONF").apply {
+                for (keyword in keywords) {
+                    when (keyword) {
+                        // ControlPort can only be set upon startup
+                        is TorConfig.KeyWord.ControlPort,
 
-                            // Cookie authentication can only be set upon startup
-                            is TorConfig.KeyWord.CookieAuthFile,
-                            is TorConfig.KeyWord.CookieAuthentication,
+                        // Cookie authentication can only be set upon startup
+                        is TorConfig.KeyWord.CookieAuthFile,
+                        is TorConfig.KeyWord.CookieAuthentication,
 
-                            // ControlPortWriteToFile can only be set upon startup
-                            is TorConfig.KeyWord.ControlPortWriteToFile -> {
-                                throw TorControllerException("$keyword cannot be modified via RESETCONF")
-                            }
-                            else -> { /* no-op */ }
+                        // ControlPortWriteToFile can only be set upon startup
+                        is TorConfig.KeyWord.ControlPortWriteToFile -> {
+                            throw TorControllerException("$keyword cannot be modified via RESETCONF")
                         }
-
-                        append(SP)
-                        append(keyword)
+                        else -> { /* no-op */ }
                     }
 
-                    append(CLRF)
-                }.toString()
+                    append(SP)
+                    append(keyword)
+                }
 
-                Result.success(processCommand(command))
-            } catch (e: Exception) {
-                Result.failure(e)
-            }
+                append(CLRF)
+            }.toString()
+
+            Result.success(processCommand(command))
         }
     }
 
     override suspend fun configSave(force: Boolean): Result<Any?> {
-        return lock.withLock {
-            try {
-                val command = StringBuilder("SAVECONF").apply {
-                    if (force) {
-                        append(SP)
-                        append("FORCE")
-                    }
-                    append(CLRF)
-                }.toString()
+        return processorLock.withContextAndLock {
+            val command = StringBuilder("SAVECONF").apply {
+                if (force) {
+                    append(SP)
+                    append("FORCE")
+                }
+                append(CLRF)
+            }.toString()
 
-                Result.success(processCommand(command))
-            } catch (e: Exception) {
-                Result.failure(e)
-            }
+            Result.success(processCommand(command))
         }
     }
 
@@ -264,61 +228,49 @@ private class RealTorControlProcessor(
     }
 
     override suspend fun configSet(settings: Set<TorConfig.Setting<*>>): Result<Any?> {
-        return lock.withLock {
-            try {
-                val command = StringBuilder("SETCONF").apply {
+        return processorLock.withContextAndLock {
+            val command = StringBuilder("SETCONF").apply {
 
-                    for (setting in settings) {
-                        when (setting.keyword) {
-                            // ControlPort can only be set upon startup
-                            is TorConfig.KeyWord.ControlPort,
+                for (setting in settings) {
+                    when (setting.keyword) {
+                        // ControlPort can only be set upon startup
+                        is TorConfig.KeyWord.ControlPort,
 
-                            // Cookie authentication can only be set upon startup
-                            is TorConfig.KeyWord.CookieAuthFile,
-                            is TorConfig.KeyWord.CookieAuthentication,
+                        // Cookie authentication can only be set upon startup
+                        is TorConfig.KeyWord.CookieAuthFile,
+                        is TorConfig.KeyWord.CookieAuthentication,
 
-                            // ControlPortWriteToFile can only be set upon startup
-                            is TorConfig.KeyWord.ControlPortWriteToFile -> {
-                                throw TorControllerException("${setting.keyword} cannot be modified via SETCONF")
-                            }
-                            else -> { /* no-op */ }
+                        // ControlPortWriteToFile can only be set upon startup
+                        is TorConfig.KeyWord.ControlPortWriteToFile -> {
+                            throw TorControllerException("${setting.keyword} cannot be modified via SETCONF")
                         }
-
-                        append(SP)
-                        if (!setting.appendTo(this, isWriteTorConfig = false)) {
-                            throw TorControllerException("Failed to add ${setting.keyword} to SETCONF command")
-                        }
+                        else -> { /* no-op */ }
                     }
 
-                    append(CLRF)
-                }.toString()
+                    append(SP)
+                    if (!setting.appendTo(this, isWriteTorConfig = false)) {
+                        throw TorControllerException("Failed to add ${setting.keyword} to SETCONF command")
+                    }
+                }
 
-                Result.success(processCommand(command))
-            } catch (e: Exception) {
-                Result.failure(e)
-            }
+                append(CLRF)
+            }.toString()
+
+            Result.success(processCommand(command))
         }
     }
 
 //    override suspend fun descriptorPost(): Result<String> {
-//        return lock.withLock {
-//            try {
-//                TODO("Not yet implemented")
-//            } catch (e: Exception) {
-//                Result.failure(e)
-//            }
+//        return processorLock.withContextAndLock {
+//            TODO("Not yet implemented")
 //        }
 //    }
 
     override suspend fun dropGuards(): Result<Any?> {
-        return lock.withLock {
-            try {
-                val command = "DROPGUARDS$CLRF"
+        return processorLock.withContextAndLock {
+            val command = "DROPGUARDS$CLRF"
 
-                Result.success(processCommand(command))
-            } catch (e: Exception) {
-                Result.failure(e)
-            }
+            Result.success(processCommand(command))
         }
     }
 
@@ -341,37 +293,29 @@ private class RealTorControlProcessor(
         servers: Set<Server.Fingerprint>?,
         address: OnionAddress
     ): Result<Any?> {
-        return lock.withLock {
-            try {
-                val command = StringBuilder("HSFETCH").apply {
-                    append(SP)
-                    append(address.value)
+        return processorLock.withContextAndLock {
+            val command = StringBuilder("HSFETCH").apply {
+                append(SP)
+                append(address.value)
 
-                    if (servers != null && servers.isNotEmpty()) {
-                        for (server in servers) {
-                            append(SP)
-                            append("SERVER=")
-                            append(server.value)
-                        }
+                if (servers != null && servers.isNotEmpty()) {
+                    for (server in servers) {
+                        append(SP)
+                        append("SERVER=")
+                        append(server.value)
                     }
+                }
 
-                    append(CLRF)
-                }.toString()
+                append(CLRF)
+            }.toString()
 
-                Result.success(processCommand(command))
-            } catch (e: Exception) {
-                Result.failure(e)
-            }
+            Result.success(processCommand(command))
         }
     }
 
 //    override suspend fun hsPost(): Result<Any?> {
-//        return lock.withLock {
-//            try {
-//                TODO("Not yet implemented")
-//            } catch (e: Exception) {
-//                Result.failure(e)
-//            }
+//        return processorLock.withContextAndLock {
+//            TODO("Not yet implemented")
 //        }
 //    }
 
@@ -380,41 +324,29 @@ private class RealTorControlProcessor(
     }
 
     override suspend fun infoGet(keywords: Set<KeyWord>): Result<Map<String, String>> {
-        return lock.withLock {
-            try {
-                val command = StringBuilder("GETINFO").apply {
-                    if (keywords.isNotEmpty()) {
-                        keywords.joinTo(this, separator = SP, prefix = SP) { it.value }
-                    }
-                    append(CLRF)
-                }.toString()
+        return processorLock.withContextAndLock {
+            val command = StringBuilder("GETINFO").apply {
+                if (keywords.isNotEmpty()) {
+                    keywords.joinTo(this, separator = SP, prefix = SP) { it.value }
+                }
+                append(CLRF)
+            }.toString()
 
-                val map = processCommand(command) { toMap() }
+            val map = processCommand(command).toMap()
 
-                Result.success(map)
-            } catch (e: Exception) {
-                Result.failure(e)
-            }
+            Result.success(map)
         }
     }
 
 //    override suspend fun infoProtocol(): Result<Any?> {
-//        return lock.withLock {
-//            try {
-//                TODO("Not yet implemented")
-//            } catch (e: Exception) {
-//                Result.failure(e)
-//            }
+//        return processorLock.withContextAndLock {
+//            TODO("Not yet implemented")
 //        }
 //    }
 
 //    override suspend fun mapAddress(): Result<Map<String, String>> {
-//        return lock.withLock {
-//            try {
-//                TODO("Not yet implemented")
-//            } catch (e: Exception) {
-//                Result.failure(e)
-//            }
+//        return processorLock.withContextAndLock {
+//            TODO("Not yet implemented")
 //        }
 //    }
 
@@ -424,7 +356,7 @@ private class RealTorControlProcessor(
         flags: Set<TorControlOnionAdd.Flag>?,
         maxStreams: TorConfig.Setting.HiddenService.MaxStreams?
     ): Result<HiddenServiceEntry> {
-        return lock.withLock {
+        return processorLock.withContextAndLock {
             val sb = StringBuilder("ADD_ONION").apply {
                 append(SP)
                 append(privateKey.keyType)
@@ -442,7 +374,7 @@ private class RealTorControlProcessor(
         flags: Set<TorControlOnionAdd.Flag>?,
         maxStreams: TorConfig.Setting.HiddenService.MaxStreams?
     ): Result<HiddenServiceEntry> {
-        return lock.withLock {
+        return processorLock.withContextAndLock {
             val sb = StringBuilder("ADD_ONION").apply {
                 append(SP)
                 append("NEW")
@@ -461,114 +393,106 @@ private class RealTorControlProcessor(
         maxStreams: TorConfig.Setting.HiddenService.MaxStreams?,
         privateKey: OnionAddress.PrivateKey?,
     ): Result<HiddenServiceEntry> {
-        return try {
-            val command = sb.apply {
-                if (flags != null && flags.isNotEmpty()) {
-                    append(SP)
-                    append("Flags=")
-                    flags.joinTo(this, separator = ",")
-                }
-
-                if (maxStreams != null) {
-                    append(SP)
-                    append("MaxStreams=")
-                    append(maxStreams.value)
-                }
-
-                if (hsPorts.isNotEmpty()) {
-                    val localHostIp = try {
-                        PlatformUtil.localhostAddress()
-                    } catch (_: RuntimeException) {
-                        withContext(Dispatchers.Default) {
-                            PlatformUtil.localhostAddress()
-                        }
-                    }
-
-                    for (hsPort in hsPorts) {
-                        append(SP)
-                        append("Port=")
-                        append(hsPort.virtualPort.value)
-                        append(',')
-                        append(localHostIp)
-                        append(':')
-                        append(hsPort.targetPort.value)
-                    }
-                }
-
-                append(CLRF)
-            }.toString()
-
-            val isFlagDiscardPkPresent = flags?.contains(TorControlOnionAdd.Flag.DiscardPK) == true
-
-            // SingleLine(status=250, message=ServiceID=bxtow33uhscfu2xscwmha4quznly7ybfocm6i5uh35uyltddbj4yesyd)
-            // SingleLine(status=250, message=PrivateKey=ED25519-V3:cKjLrpfAV0rNDmfn6hMpcWUFsN82MqhVxwre9c3KjnlfkZxkJlyixy756WMKtNlVyMrhSxgaZfECky7rE1O1dA==)
-            // SingleLine(status=250, message=OK)
-            val hsEntry = processCommand(command) {
-
-                var serviceId: OnionAddress? = null
-                var privKey: OnionAddress.PrivateKey? = if (isFlagDiscardPkPresent) {
-                    null
-                } else {
-                    privateKey
-                }
-
-                for (line in this) {
-                    val splits = line.message.split('=')
-                    when (splits.elementAtOrNull(0)?.lowercase()) {
-                        "serviceid" -> {
-                            serviceId = splits
-                                .elementAtOrNull(1)
-                                ?.let { onionAddress ->
-                                    OnionAddress.fromStringOrNull(onionAddress)
-                                }
-                        }
-                        "privatekey" -> {
-                            privKey = splits
-                                .elementAtOrNull(1)
-                                ?.split(':')
-                                ?.elementAtOrNull(1)
-                                ?.let { key ->
-                                    OnionAddress.PrivateKey.fromStringOrNull(key)
-                                }
-                        }
-                        else -> continue
-                    }
-                }
-
-                if (serviceId == null) {
-                    throw TorControllerException("Failed to parse reply for onion address")
-                }
-
-                if (!isFlagDiscardPkPresent && privKey == null) {
-                    throw TorControllerException("Failed to parse reply for onion address private key")
-                }
-
-                HiddenServiceEntry(
-                    address = serviceId,
-                    privateKey = privKey,
-                    ports = hsPorts
-                )
+        val command = sb.apply {
+            if (flags != null && flags.isNotEmpty()) {
+                append(SP)
+                append("Flags=")
+                flags.joinTo(this, separator = ",")
             }
 
-            Result.success(hsEntry)
-        } catch (e: Exception) {
-            Result.failure(e)
+            if (maxStreams != null) {
+                append(SP)
+                append("MaxStreams=")
+                append(maxStreams.value)
+            }
+
+            if (hsPorts.isNotEmpty()) {
+                val localHostIp = try {
+                    PlatformUtil.localhostAddress()
+                } catch (_: RuntimeException) {
+                    withContext(Dispatchers.Default) {
+                        PlatformUtil.localhostAddress()
+                    }
+                }
+
+                for (hsPort in hsPorts) {
+                    append(SP)
+                    append("Port=")
+                    append(hsPort.virtualPort.value)
+                    append(',')
+                    append(localHostIp)
+                    append(':')
+                    append(hsPort.targetPort.value)
+                }
+            }
+
+            append(CLRF)
+        }.toString()
+
+        val isFlagDiscardPkPresent = flags?.contains(TorControlOnionAdd.Flag.DiscardPK) == true
+
+        // SingleLine(status=250, message=ServiceID=bxtow33uhscfu2xscwmha4quznly7ybfocm6i5uh35uyltddbj4yesyd)
+        // SingleLine(status=250, message=PrivateKey=ED25519-V3:cKjLrpfAV0rNDmfn6hMpcWUFsN82MqhVxwre9c3KjnlfkZxkJlyixy756WMKtNlVyMrhSxgaZfECky7rE1O1dA==)
+        // SingleLine(status=250, message=OK)
+        val hsEntry = processCommand(command).let { lines ->
+
+            var serviceId: OnionAddress? = null
+            var privKey: OnionAddress.PrivateKey? = if (isFlagDiscardPkPresent) {
+                null
+            } else {
+                privateKey
+            }
+
+            for (line in lines) {
+                val splits = line.message.split('=')
+                when (splits.elementAtOrNull(0)?.lowercase()) {
+                    "serviceid" -> {
+                        serviceId = splits
+                            .elementAtOrNull(1)
+                            ?.let { onionAddress ->
+                                OnionAddress.fromStringOrNull(onionAddress)
+                            }
+                    }
+                    "privatekey" -> {
+                        privKey = splits
+                            .elementAtOrNull(1)
+                            ?.split(':')
+                            ?.elementAtOrNull(1)
+                            ?.let { key ->
+                                OnionAddress.PrivateKey.fromStringOrNull(key)
+                            }
+                    }
+                    else -> continue
+                }
+            }
+
+            if (serviceId == null) {
+                throw TorControllerException("Failed to parse reply for onion address")
+            }
+
+            if (!isFlagDiscardPkPresent && privKey == null) {
+                throw TorControllerException("Failed to parse reply for onion address private key")
+            }
+
+            HiddenServiceEntry(
+                address = serviceId,
+                privateKey = privKey,
+                ports = hsPorts
+            )
         }
+
+        return Result.success(hsEntry)
     }
 
     override suspend fun onionDel(address: OnionAddress): Result<Any?> {
-        return lock.withLock {
-            try {
-                val command = StringBuilder("DEL_ONION").apply {
-                    append(SP)
-                    append(address.value)
-                    append(CLRF)
-                }.toString()
+        return processorLock.withContextAndLock {
+            val command = StringBuilder("DEL_ONION").apply {
+                append(SP)
+                append(address.value)
+                append(CLRF)
+            }.toString()
 
-                Result.success(processCommand(command))
-            } catch (e: Exception) {
-                Result.failure(e)
-            }
+            Result.success(processCommand(command))
         }
     }
 
@@ -578,234 +502,189 @@ private class RealTorControlProcessor(
         clientName: ClientName?,
         flags: Set<TorControlOnionClientAuth.Flag>?
     ): Result<Any?> {
-        return lock.withLock {
-            try {
-                val command = StringBuilder("ONION_CLIENT_AUTH_ADD").apply {
+        return processorLock.withContextAndLock {
+            val command = StringBuilder("ONION_CLIENT_AUTH_ADD").apply {
+                append(SP)
+                append(address.value)
+                append(SP)
+                append(key.keyType)
+                append(':')
+                append(key.base64(padded = false))
+                if (clientName != null) {
                     append(SP)
-                    append(address.value)
-                    append(SP)
-                    append(key.keyType)
-                    append(':')
-                    append(key.base64(padded = false))
-                    if (clientName != null) {
-                        append(SP)
-                        append("ClientName=")
-                        append(clientName.value)
-                    }
-                    if (flags != null && flags.isNotEmpty()) {
-                        append(SP)
-                        append("Flags=")
-                        flags.joinTo(this, separator = ",")
-                    }
-                    append(CLRF)
-                }.toString()
-
-                Result.success(processCommand(command))
-            } catch (e: Exception) {
-                Result.failure(e)
-            }
-        }
-    }
-
-    override suspend fun onionClientAuthRemove(address: OnionAddressV3): Result<Any?> {
-        return lock.withLock {
-            try {
-                val command = StringBuilder("ONION_CLIENT_AUTH_REMOVE").apply {
-                    append(SP)
-                    append(address.value)
-                    append(CLRF)
-                }.toString()
-
-                Result.success(processCommand(command))
-            } catch (e: Exception) {
-                Result.failure(e)
-            }
-        }
-    }
-
-    override suspend fun onionClientAuthView(): Result<List<ClientAuthEntry>> {
-        return try {
-            Result.success(onionClientAuthView(null))
-        } catch (e: Exception) {
-            Result.failure(e)
-        }
-    }
-
-    override suspend fun onionClientAuthView(address: OnionAddressV3): Result<ClientAuthEntry> {
-        return try {
-            val list = onionClientAuthView(address.value)
-            for (entry in list) {
-                if (entry.address == address.value) {
-                    return Result.success(entry)
+                    append("ClientName=")
+                    append(clientName.value)
                 }
-            }
-
-            throw TorControllerException("Failed to retrieve a ClientAuthEntry for $address")
-        } catch (e: Exception) {
-            Result.failure(e)
-        }
-    }
-
-    private suspend fun onionClientAuthView(address: String?): List<ClientAuthEntry> {
-        lock.withLock {
-            val command = StringBuilder("ONION_CLIENT_AUTH_VIEW").apply {
-                if (address != null) {
+                if (flags != null && flags.isNotEmpty()) {
                     append(SP)
-                    append(address)
+                    append("Flags=")
+                    flags.joinTo(this, separator = ",")
                 }
                 append(CLRF)
             }.toString()
 
-            return processCommand(command) {
-                mapNotNull { reply ->
-                    // 250-CLIENT 6yxtsbpn2k7exxiarcbiet3fsr4komissliojxjlvl7iytacrnvz2uyd x25519:uDF+ZqDVnC+1k8qN28OOoM9EjQ+FTPTtb33Cdv2rD30= Flags=Permanent ClientName=Test^.HS
-                    if (reply.message.startsWith("CLIENT ")) {
-                        val splits = reply.message.split(' ')
+            Result.success(processCommand(command))
+        }
+    }
 
-                        // positioning of Flags & ClientName can be either or, so we have to check for both
-                        var clientName: String? = null
-                        var flags: List<String>? = null
+    override suspend fun onionClientAuthRemove(address: OnionAddressV3): Result<Any?> {
+        return processorLock.withContextAndLock {
+            val command = StringBuilder("ONION_CLIENT_AUTH_REMOVE").apply {
+                append(SP)
+                append(address.value)
+                append(CLRF)
+            }.toString()
 
-                        for (i in 3..4) {
-                            splits.elementAtOrNull(i)?.let { split ->
-                                when {
-                                    split.startsWith("ClientName=") -> {
-                                        clientName = split.substringAfter('=')
-                                    }
-                                    split.startsWith("Flags=") -> {
-                                        flags = split.substringAfter('=').split(',')
-                                    }
-                                }
+            Result.success(processCommand(command))
+        }
+    }
+
+    override suspend fun onionClientAuthView(): Result<List<ClientAuthEntry>> {
+        return processorLock.withContextAndLock {
+            Result.success(onionClientAuthView(null))
+        }
+    }
+
+    override suspend fun onionClientAuthView(address: OnionAddressV3): Result<ClientAuthEntry> {
+        return processorLock.withContextAndLock {
+            val entries = onionClientAuthView(address.value)
+
+            var entry: ClientAuthEntry? = null
+            for (item in entries) {
+                if (item.address == address.value) {
+                    entry = item
+                    break
+                }
+            }
+
+            if (entry != null) {
+                Result.success(entry)
+            } else {
+                throw TorControllerException("Failed to retrieve a ClientAuthEntry for $address")
+            }
+        }
+    }
+
+    private suspend fun onionClientAuthView(address: String?): List<ClientAuthEntry> {
+        val command = StringBuilder("ONION_CLIENT_AUTH_VIEW").apply {
+            if (address != null) {
+                append(SP)
+                append(address)
+            }
+            append(CLRF)
+        }.toString()
+
+        return processCommand(command).mapNotNull { reply ->
+            // 250-CLIENT 6yxtsbpn2k7exxiarcbiet3fsr4komissliojxjlvl7iytacrnvz2uyd x25519:uDF+ZqDVnC+1k8qN28OOoM9EjQ+FTPTtb33Cdv2rD30= Flags=Permanent ClientName=Test^.HS
+            if (reply.message.startsWith("CLIENT ")) {
+                val splits = reply.message.split(' ')
+
+                // positioning of Flags & ClientName can be either or, so we have to check for both
+                var clientName: String? = null
+                var flags: List<String>? = null
+
+                for (i in 3..4) {
+                    splits.elementAtOrNull(i)?.let { split ->
+                        when {
+                            split.startsWith("ClientName=") -> {
+                                clientName = split.substringAfter('=')
+                            }
+                            split.startsWith("Flags=") -> {
+                                flags = split.substringAfter('=').split(',')
                             }
                         }
-
-                        ClientAuthEntry(
-                            address = splits[1],
-                            keyType = splits[2].substringBefore(':'),
-                            privateKey = splits[2].substringAfter(':'),
-                            clientName = clientName,
-                            flags = flags,
-                        )
-                    } else {
-                        null
                     }
                 }
+
+                ClientAuthEntry(
+                    address = splits[1],
+                    keyType = splits[2].substringBefore(':'),
+                    privateKey = splits[2].substringAfter(':'),
+                    clientName = clientName,
+                    flags = flags,
+                )
+            } else {
+                null
             }
         }
     }
 
     override suspend fun ownershipDrop(): Result<Any?> {
-        return lock.withLock {
-            try {
-                val command = "DROPOWNERSHIP$CLRF"
+        return processorLock.withContextAndLock {
+            val command = "DROPOWNERSHIP$CLRF"
 
-                Result.success(processCommand(command))
-            } catch (e: Exception) {
-                Result.failure(e)
-            }
+            Result.success(processCommand(command))
         }
     }
 
     override suspend fun ownershipTake(): Result<Any?> {
-        return lock.withLock {
-            try {
-                val command = "TAKEOWNERSHIP$CLRF"
+        return processorLock.withContextAndLock {
+            val command = "TAKEOWNERSHIP$CLRF"
 
-                Result.success(processCommand(command))
-            } catch (e: Exception) {
-                Result.failure(e)
-            }
+            Result.success(processCommand(command))
         }
     }
 
 //    override suspend fun resolve(): Result<Any?> {
-//        return lock.withLock {
-//            try {
-//                TODO("Not yet implemented")
-//            } catch (e: Exception) {
-//                Result.failure(e)
-//            }
+//        return processorLock.withContextAndLock {
+//            TODO("Not yet implemented")
 //        }
 //    }
 
     override suspend fun setEvents(events: Set<TorEvent>): Result<Any?> {
-        return lock.withLock {
-            try {
-                val command = StringBuilder("SETEVENTS").apply {
-                    if (events.isNotEmpty()) {
-                        events.joinTo(this, separator = SP, prefix = SP)
-                    }
-                    append(CLRF)
-                }.toString()
+        return processorLock.withContextAndLock {
+            val command = StringBuilder("SETEVENTS").apply {
+                if (events.isNotEmpty()) {
+                    events.joinTo(this, separator = SP, prefix = SP)
+                }
+                append(CLRF)
+            }.toString()
 
-                Result.success(processCommand(command))
-            } catch (e: Exception) {
-                Result.failure(e)
-            }
+            Result.success(processCommand(command))
         }
     }
 
     override suspend fun signal(signal: TorControlSignal.Signal): Result<Any?> {
-        return lock.withLock {
-            try {
-                val command = StringBuilder("SIGNAL").apply {
-                    append(SP)
-                    append(signal)
-                    append(CLRF)
-                }.toString()
+        return processorLock.withContextAndLock {
+            val command = StringBuilder("SIGNAL").apply {
+                append(SP)
+                append(signal)
+                append(CLRF)
+            }.toString()
 
-                val result = processCommand(command)
+            val result = processCommand(command)
 
-                when (signal) {
-                    TorControlSignal.Signal.Halt,
-                    TorControlSignal.Signal.Shutdown -> { delay(500L) }
-                    else -> { /* no-op */ }
-                }
-
-                Result.success(result)
-            } catch (e: Exception) {
-                Result.failure(e)
+            when (signal) {
+                TorControlSignal.Signal.Halt,
+                TorControlSignal.Signal.Shutdown -> { delay(500L) }
+                else -> { /* no-op */ }
             }
+
+            Result.success(result)
         }
     }
 
 //    override suspend fun streamAttach(): Result<Any?> {
-//        return lock.withLock {
-//            try {
-//                TODO("Not yet implemented")
-//            } catch (e: Exception) {
-//                Result.failure(e)
-//            }
+//        return processorLock.withContextAndLock {
+//            TODO("Not yet implemented")
 //        }
 //    }
 
 //    override suspend fun streamClose(): Result<Any?> {
-//        return lock.withLock {
-//            try {
-//                TODO("Not yet implemented")
-//            } catch (e: Exception) {
-//                Result.failure(e)
-//            }
+//        return processorLock.withContextAndLock {
+//            TODO("Not yet implemented")
 //        }
 //    }
 
 //    override suspend fun streamRedirect(): Result<Any?> {
-//        return lock.withLock {
-//            try {
-//                TODO("Not yet implemented")
-//            } catch (e: Exception) {
-//                Result.failure(e)
-//            }
+//        return processorLock.withContextAndLock {
+//            TODO("Not yet implemented")
 //        }
 //    }
 
 //    override suspend fun useFeature(): Result<Any?> {
-//        return lock.withLock {
-//            try {
-//                TODO("Not yet implemented")
-//            } catch (e: Exception) {
-//                Result.failure(e)
-//            }
+//        return processorLock.withContextAndLock {
+//            TODO("Not yet implemented")
 //        }
 //    }
 

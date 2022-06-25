@@ -98,9 +98,9 @@ internal fun realTorController(
     reader: ReaderWrapper,
     writer: WriterWrapper,
     socket: SocketWrapper,
-    dispatchers: CloseableCoroutineDispatcher
+    dispatcher: CloseableCoroutineDispatcher
 ): TorController =
-    RealTorController(reader, writer, socket, dispatchers)
+    RealTorController(reader, writer, socket, dispatcher)
 
 @OptIn(
     InternalTorApi::class,
@@ -112,7 +112,7 @@ private class RealTorController(
     reader: ReaderWrapper,
     writer: WriterWrapper,
     socket: SocketWrapper,
-    dispatchers: CloseableCoroutineDispatcher,
+    dispatcher: CloseableCoroutineDispatcher,
 ): TorController, Debuggable {
 
     private val debugger: AtomicRef<((DebugItem) -> Unit)?> = atomic(null)
@@ -127,12 +127,18 @@ private class RealTorController(
         RealControlPortInteractor(
             reader,
             writer,
-            dispatchers,
+            dispatcher,
         )
     }
 
     private val processorDelegate: TorControlProcessor by lazy {
-        TorControlProcessor.newInstance(controlPortInteractor)
+        TorControlProcessor.newInstance(
+            controlPortInteractor,
+            TorControlProcessorLock(
+                dispatcher = dispatcher,
+                isConnected = { isConnected }
+            )
+        )
     }
 
     private class WaitersHolder {
@@ -226,64 +232,42 @@ private class RealTorController(
             ControllerShutdownException::class,
             TorControllerException::class,
         )
-        override suspend fun <T : Any?> processCommand(
-            command: String,
-            transform: List<ReplyLine.SingleLine>.() -> T
-        ): T {
-            val replies = processCommand(command)
-
-            return withContext(dispatchers) {
-                transform.invoke(replies)
-            }
-        }
-
-        @Throws(
-            CancellationException::class,
-            ControllerShutdownException::class,
-            TorControllerException::class,
-        )
         override suspend fun processCommand(command: String): List<ReplyLine.SingleLine> {
-            if (!isConnected) {
-                throw ControllerShutdownException("Tor has stopped and a new connection is required")
-            }
+            val waiter = Waiter.newInstance { isConnected }
+            waiters.withLock {
 
-            return withContext(dispatchers) {
-                val waiter = Waiter.newInstance { isConnected }
-                waiters.withLock {
-
-                    if (command.startsWith('+')) {
-                        for (line in command.lines()) {
-                            if (line.isBlank()) {
-                                continue
-                            }
-
-                            val trimmed = line.trim()
-
-                            debugger.safeInvoke(DebugItem.Message(">> $trimmed"))
-
-                            writer.write(trimmed)
-                            writer.write(CLRF)
-                            writer.flush()
+                if (command.startsWith('+')) {
+                    for (line in command.lines()) {
+                        if (line.isBlank()) {
+                            continue
                         }
-                    } else {
-                        debugger.safeInvoke(DebugItem.Message(">> $command"))
-                        writer.write(command)
+
+                        val trimmed = line.trim()
+
+                        debugger.safeInvoke(DebugItem.Message(">> $trimmed"))
+
+                        writer.write(trimmed)
+                        writer.write(CLRF)
                         writer.flush()
                     }
-
-                    add(waiter)
+                } else {
+                    debugger.safeInvoke(DebugItem.Message(">> $command"))
+                    writer.write(command)
+                    writer.flush()
                 }
 
-                val replies: List<ReplyLine.SingleLine> = waiter.getResponse()
-
-                for (reply in replies) {
-                    if (!reply.isCommandResponseStatusSuccess) {
-                        throw TorControllerException("\ncommand=$command\nreply=$reply\n")
-                    }
-                }
-
-                replies
+                add(waiter)
             }
+
+            val replies: List<ReplyLine.SingleLine> = waiter.getResponse()
+
+            for (reply in replies) {
+                if (!reply.isCommandResponseStatusSuccess) {
+                    throw TorControllerException("\ncommand=$command\nreply=$reply\n")
+                }
+            }
+
+            return replies
         }
 
         @Throws(TorControllerException::class)
