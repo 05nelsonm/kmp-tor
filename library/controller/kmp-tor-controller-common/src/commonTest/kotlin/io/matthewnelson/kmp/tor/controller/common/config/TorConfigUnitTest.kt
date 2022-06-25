@@ -22,6 +22,7 @@ import io.matthewnelson.kmp.tor.controller.common.config.TorConfig.Option.*
 import io.matthewnelson.kmp.tor.controller.common.config.TorConfig.Setting.*
 import io.matthewnelson.kmp.tor.controller.common.file.Path
 import io.matthewnelson.kmp.tor.controller.common.internal.PlatformUtil
+import io.matthewnelson.kmp.tor.controller.common.internal.appendTo
 import kotlin.test.*
 
 @OptIn(InternalTorApi::class)
@@ -448,6 +449,22 @@ class TorConfigUnitTest {
 
         assertNotNull(socks.isolationFlags)
         assertEquals(socks.isolationFlags, clone.isolationFlags)
+    }
+
+    @Test
+    fun givenSetting_whenAppendingToStringBuilderFalse_doesNotAddSettingToTorConfig() {
+        // By not calling .setPorts, our appendTo method should _not_ append anything
+        // to our string builder
+        val hsSetting = HiddenService().set(FileSystemDir(Path("/some/path")))
+        assertFalse(hsSetting.appendTo(StringBuilder(), isWriteTorConfig = true))
+        assertFalse(hsSetting.appendTo(StringBuilder(), isWriteTorConfig = false))
+
+        val config = TorConfig.Builder {
+            put(hsSetting)
+        }.build()
+
+        assertTrue(config.settings.isEmpty())
+        assertTrue(config.text.isEmpty())
     }
 
 }

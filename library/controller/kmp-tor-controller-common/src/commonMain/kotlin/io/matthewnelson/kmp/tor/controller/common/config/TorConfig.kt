@@ -203,15 +203,21 @@ class TorConfig private constructor(
                             continue
                         }
 
-                        setting.appendTo(sb, isWriteTorConfig = true)
+                        if (!setting.appendTo(sb, isWriteTorConfig = true)) {
+                            continue
+                        }
                     }
                     is Setting.UnixSockets -> {
                         if (disabledPorts.contains(setting.keyword)) continue
 
-                        setting.appendTo(sb, isWriteTorConfig = true)
+                        if (!setting.appendTo(sb, isWriteTorConfig = true)) {
+                            continue
+                        }
                     }
                     else -> {
-                        setting.appendTo(sb, isWriteTorConfig = true)
+                        if (!setting.appendTo(sb, isWriteTorConfig = true)) {
+                            continue
+                        }
                     }
                 }
 
