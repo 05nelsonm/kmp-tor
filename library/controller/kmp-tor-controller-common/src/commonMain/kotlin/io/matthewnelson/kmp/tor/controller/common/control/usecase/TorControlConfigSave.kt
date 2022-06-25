@@ -26,6 +26,6 @@ import io.matthewnelson.kmp.tor.controller.common.control.TorControlConfig
  * */
 interface TorControlConfigSave {
 
-    suspend fun configSave(force: Boolean = false): Result<Any?>
+    suspend fun configSave(force: Boolean): Result<Any?>
 
 }

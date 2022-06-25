@@ -29,7 +29,7 @@ import io.matthewnelson.kmp.tor.ext.callback.controller.common.control.CallbackT
 interface CallbackTorControlConfigSave {
 
     fun configSave(
-        force: Boolean = false,
+        force: Boolean,
         failure: TorCallback<Throwable>?,
         success: TorCallback<Any?>,
     ): Task
