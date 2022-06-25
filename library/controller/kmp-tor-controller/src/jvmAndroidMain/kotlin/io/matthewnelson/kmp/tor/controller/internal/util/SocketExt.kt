@@ -15,16 +15,18 @@
  **/
 package io.matthewnelson.kmp.tor.controller.internal.util
 
-import java.net.Socket
 import io.matthewnelson.kmp.tor.controller.TorController
 import io.matthewnelson.kmp.tor.controller.internal.controller.getTorControllerDispatchers
 import io.matthewnelson.kmp.tor.controller.internal.io.ReaderWrapper
 import io.matthewnelson.kmp.tor.controller.internal.io.SocketWrapper
 import io.matthewnelson.kmp.tor.controller.internal.io.WriterWrapper
 import io.matthewnelson.kmp.tor.controller.realTorController
+import kotlin.jvm.Throws
+import kotlin.jvm.JvmSynthetic
 import kotlinx.coroutines.ExecutorCoroutineDispatcher
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import java.io.IOException
+import java.net.Socket
 import java.net.SocketException
 
 @JvmSynthetic

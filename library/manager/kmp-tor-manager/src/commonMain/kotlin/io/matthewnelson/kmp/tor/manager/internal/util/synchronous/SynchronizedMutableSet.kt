@@ -17,6 +17,7 @@ package io.matthewnelson.kmp.tor.manager.internal.util.synchronous
 
 import kotlinx.atomicfu.locks.SynchronizedObject
 import kotlinx.atomicfu.locks.synchronized
+import kotlin.jvm.JvmSynthetic
 
 internal class SynchronizedMutableSet<T: Any?>(initialCapacity: Int = 1): SynchronizedObject() {
 

@@ -27,6 +27,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlin.jvm.JvmSynthetic
 
 internal class AddressInfoHandler(
     private val torManagerScope: CoroutineScope,

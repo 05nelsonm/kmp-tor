@@ -19,6 +19,8 @@ import io.matthewnelson.kmp.tor.common.address.ProxyAddress
 import io.matthewnelson.kmp.tor.controller.TorController
 import io.matthewnelson.kmp.tor.controller.common.exceptions.TorControllerException
 import io.matthewnelson.kmp.tor.controller.internal.controller.getTorControllerDispatchers
+import kotlin.jvm.Throws
+import kotlin.jvm.JvmSynthetic
 import kotlinx.coroutines.withContext
 import java.net.InetSocketAddress
 import java.net.Proxy

@@ -17,6 +17,7 @@ package io.matthewnelson.kmp.tor.controller.internal.controller
 
 import kotlinx.coroutines.CloseableCoroutineDispatcher
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlin.jvm.JvmSynthetic
 
 @JvmSynthetic
 @Suppress("nothing_to_inline")

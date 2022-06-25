@@ -25,6 +25,7 @@ import io.matthewnelson.kmp.tor.manager.common.exceptions.TorManagerException
 import io.matthewnelson.kmp.tor.manager.internal.util.PortValidator
 import kotlinx.atomicfu.AtomicRef
 import kotlinx.atomicfu.atomic
+import kotlin.jvm.JvmField
 import kotlin.jvm.JvmSynthetic
 
 /**
