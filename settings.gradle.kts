@@ -38,7 +38,7 @@ if (CHECK_PUBLICATION != null) {
     }
 
     if (allTargets || targets?.contains("JVM") != false) {
-        include(":samples:java:javafx")
+//        include(":samples:java:javafx")
         include(":samples:kotlin:javafx")
     }
 }
