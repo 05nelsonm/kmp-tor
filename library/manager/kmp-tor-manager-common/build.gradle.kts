@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-import io.matthewnelson.kotlin.components.dependencies.deps
 import io.matthewnelson.kotlin.components.kmp.KmpTarget
 import kmp.tor.env
 import org.jetbrains.kotlin.gradle.plugin.KotlinJsCompilerType
@@ -57,6 +56,7 @@ kmpConfiguration {
 
             KmpTarget.NonJvm.Native.Mingw.X64.DEFAULT,
         ),
+        commonPluginIdsPostConfiguration = setOf(pluginId.kotlin.atomicfu),
         commonMainSourceSet = {
             dependencies {
                 api(project(":library:controller:kmp-tor-controller-common"))

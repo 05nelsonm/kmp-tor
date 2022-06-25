@@ -56,6 +56,7 @@ kmpConfiguration {
 
             KmpTarget.NonJvm.Native.Mingw.X64.DEFAULT,
         ),
+        commonPluginIdsPostConfiguration = setOf(pluginId.kotlin.atomicfu),
         commonMainSourceSet = {
             dependencies {
                 api(project(":library:extensions:kmp-tor-ext-callback-controller-common"))

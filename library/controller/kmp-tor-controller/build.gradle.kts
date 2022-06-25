@@ -17,7 +17,6 @@ import io.matthewnelson.kotlin.components.dependencies.deps
 import io.matthewnelson.kotlin.components.dependencies.depsTest
 import io.matthewnelson.kotlin.components.dependencies.versions
 import io.matthewnelson.kotlin.components.kmp.KmpTarget
-import io.matthewnelson.kotlin.components.kmp.util.sourceSetJvmAndroidMain
 import kmp.tor.env
 import org.jetbrains.kotlin.gradle.plugin.KotlinJsCompilerType
 
@@ -39,6 +38,12 @@ kmpConfiguration {
                 target = {
                     publishLibraryVariants("release")
                 },
+                mainSourceSet = {
+                    dependencies {
+                        // https://github.com/Kotlin/kotlinx.atomicfu/issues/145
+                        implementation(deps.kotlin.atomicfu.jvm)
+                    }
+                }
             ),
 
 //            KmpTarget.NonJvm.JS(
@@ -69,11 +74,10 @@ kmpConfiguration {
 //
 //            KmpTarget.NonJvm.Native.Mingw.X64.DEFAULT,
         ),
-        commonPluginIds = setOf(pluginId.kotlin.atomicfu),
+        commonPluginIdsPostConfiguration = setOf(pluginId.kotlin.atomicfu),
         commonMainSourceSet = {
             dependencies {
                 implementation(deps.components.encoding.base16)
-                implementation(deps.kotlin.atomicfu.atomicfu)
                 implementation(deps.kotlin.coroutines.core.core)
                 api(project(":library:controller:kmp-tor-controller-common"))
             }
@@ -84,13 +88,6 @@ kmpConfiguration {
                 implementation(kotlin("test"))
             }
         },
-        kotlin = {
-            sourceSetJvmAndroidMain {
-                dependencies {
-                    implementation(deps.kotlin.coroutines.core.jvm)
-                }
-            }
-        }
     )
 }
 
