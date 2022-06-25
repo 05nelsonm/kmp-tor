@@ -728,14 +728,10 @@ private class RealTorControlProcessor(
 //        }
 //    }
 
-    override suspend fun setEvents(events: Set<TorEvent>, extended: Boolean): Result<Any?> {
+    override suspend fun setEvents(events: Set<TorEvent>): Result<Any?> {
         return lock.withLock {
             try {
                 val command = StringBuilder("SETEVENTS").apply {
-                    if (extended) {
-                        append(SP)
-                        append("EXTENDED")
-                    }
                     if (events.isNotEmpty()) {
                         events.joinTo(this, separator = SP, prefix = SP)
                     }

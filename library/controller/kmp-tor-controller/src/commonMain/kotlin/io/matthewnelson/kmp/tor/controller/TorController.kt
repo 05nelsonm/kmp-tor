@@ -579,8 +579,8 @@ private class RealTorController(
 //        return processorDelegate.resolve()
 //    }
 
-    override suspend fun setEvents(events: Set<TorEvent>, extended: Boolean): Result<Any?> {
-        return processorDelegate.setEvents(events, extended)
+    override suspend fun setEvents(events: Set<TorEvent>): Result<Any?> {
+        return processorDelegate.setEvents(events)
     }
 
     override suspend fun signal(signal: TorControlSignal.Signal): Result<Any?> {

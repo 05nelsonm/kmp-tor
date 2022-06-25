@@ -74,8 +74,8 @@ interface TorControlOnionAdd {
     suspend fun onionAdd(
         privateKey: OnionAddress.PrivateKey,
         hsPorts: Set<TorConfig.Setting.HiddenService.Ports>,
-        flags: Set<Flag>? = null,
-        maxStreams: TorConfig.Setting.HiddenService.MaxStreams? = null,
+        flags: Set<Flag>?,
+        maxStreams: TorConfig.Setting.HiddenService.MaxStreams?,
     ): Result<HiddenServiceEntry>
 
     /**
@@ -85,8 +85,8 @@ interface TorControlOnionAdd {
     suspend fun onionAddNew(
         type: OnionAddress.PrivateKey.Type,
         hsPorts: Set<TorConfig.Setting.HiddenService.Ports>,
-        flags: Set<Flag>? = null,
-        maxStreams: TorConfig.Setting.HiddenService.MaxStreams? = null
+        flags: Set<Flag>?,
+        maxStreams: TorConfig.Setting.HiddenService.MaxStreams?
     ): Result<HiddenServiceEntry>
 
     enum class Flag {

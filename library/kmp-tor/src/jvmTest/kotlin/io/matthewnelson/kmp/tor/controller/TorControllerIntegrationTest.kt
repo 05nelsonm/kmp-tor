@@ -205,6 +205,7 @@ class TorControllerIntegrationTest: TorTestHelper() {
             flags = setOf(
                 TorControlOnionAdd.Flag.DiscardPK,
             ),
+            maxStreams = null,
         ).getOrThrow()
 
         manager.onionDel(expectedAddress)
@@ -225,6 +226,8 @@ class TorControllerIntegrationTest: TorTestHelper() {
             hsPorts = setOf(
                 TorConfig.Setting.HiddenService.Ports(virtualPort = Port(8770), targetPort = Port(8770)),
             ),
+            flags = null,
+            maxStreams = null,
         ).getOrThrow()
 
         manager.onionDel(expectedAddress)
@@ -239,14 +242,18 @@ class TorControllerIntegrationTest: TorTestHelper() {
     fun givenHiddenService_whenNoPortsProvided_returnsFailure() = runBlocking {
         val resultNew = manager.onionAddNew(
             type = OnionAddress.PrivateKey.Type.ED25519_V3,
-            hsPorts = emptySet()
+            hsPorts = emptySet(),
+            flags = null,
+            maxStreams = null,
         )
 
         assertTrue(resultNew.isFailure)
 
         val resultExisting = manager.onionAdd(
             privateKey = OnionAddressV3PrivateKey_ED25519("gGNRsNtSKe38fPr/J1UW2nOCNetZNl3qNySlPs9M5Fait1VVruWEBOoNU7fuPRkC4yrS1G7f/VjohBdzKTIQ6Q"),
-            hsPorts = emptySet()
+            hsPorts = emptySet(),
+            flags = null,
+            maxStreams = null,
         )
 
         assertTrue(resultExisting.isFailure)
@@ -261,6 +268,8 @@ class TorControllerIntegrationTest: TorTestHelper() {
             hsPorts = setOf(
                 TorConfig.Setting.HiddenService.Ports(virtualPort = Port(8771), targetPort = Port(8770)),
             ),
+            flags = null,
+            maxStreams = null,
         ).getOrThrow()
 
         val result = manager.onionAdd(
@@ -268,6 +277,8 @@ class TorControllerIntegrationTest: TorTestHelper() {
             hsPorts = setOf(
                 TorConfig.Setting.HiddenService.Ports(virtualPort = Port(8772), targetPort = Port(8770)),
             ),
+            flags = null,
+            maxStreams = null,
         )
 
         manager.onionDel(entry.address)
