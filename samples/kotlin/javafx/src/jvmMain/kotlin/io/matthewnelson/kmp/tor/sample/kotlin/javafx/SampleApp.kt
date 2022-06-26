@@ -143,6 +143,12 @@ class SampleApp: App(SampleView::class) {
 //                    put(Ports.Control().set(AorDorPort.Auto))
 
                     // Use a UnixSocket instead of TCP for the ControlPort.
+                    //
+                    // This is just for demonstration purposes because it is not
+                    // needed as if neither `Ports.Control` or `UnixSockets.Control`
+                    // are provided here, if there is support for `UnixSockets.Control`,
+                    // it will be the preferred way for establishing a Tor control
+                    // connection and automatically added for you.
                     put(UnixSockets.Control().set(FileSystemFile(
                         workDir.builder {
 
