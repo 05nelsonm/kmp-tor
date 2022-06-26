@@ -1,5 +1,102 @@
 # CHANGELOG
 
+## Version 0.4.7.8+1.0.0 (2022-06-25)
+ - Updates `atomicfu` dependency from `0.17.2` -> `0.17.3`
+ - Updates `coroutines` dependency from `1.6.1` -> `1.6.3`
+ - Updates `encoding` dependency from `1.1.2` -> `1.1.3`
+ - Updates `kmp-tor-binary` dependency from `0.4.7.7` -> `0.4.7.8`
+ - Re-enable compiler flag `kotlin.mpp.enableCompatibilityMetadataVariant=true` 
+   to support non-hierarchical projects. (sorry...)
+ - Adds `android` source set to `kmp-tor-controller` module
+ - Increases `minSdk` from `16` -> `19` on `android` source sets for 
+   `kmp-tor-controller` and `kmp-tor-manager`
+ - Optimizes internal coroutine usage
+ - Adds use of atomics to `TorConfig.Setting` classes
+     - See **BREAKING CHANGES**
+ - Adds `TorManager.KeyWord` classes to decouple them from needing a 
+   `TorConfig.Setting` to use
+     - See **BREAKING CHANGES**
+ - Adds Unix Domain Socket support on Linux (and Android) for:
+     - `ControlPort` via `TorConfig.Setting.UnixSockets.Control`
+     - `SocksPort` via `TorConfig.Setting.UnixSockets.Socks`
+     - `HiddenServicePort` via `TorConfig.Setting.HiddenService.UnixSocket`
+ - Adds `TorManagerEvent.AddressInfo.unixSocks` argument specifically for when 
+   configuring a `SocksPort` as a unix domain socket 
+ - Adds new common code apis to instantiate a TorController connection using:
+     - a `Path` (for a Unix Domain Socket)
+     - a `ProxyAddress` (for a TCP connection)
+ - Fixes `TorManager`'s internal comparison of disconnected `TorController` 
+   to held reference when shutting down.
+ - Fixes setting multiple virtual ports of the same value for a 
+   `TorConfig.Setting.HiddenService`
+ - Fixes `TorConfig.Builder.build` where an improperly configured setting
+   that was not written to `TorConfig.text` was still being added to 
+   the `TorConfig.settings` `Set`
+ - Fixes issue on Windows when adding a `TorConfig.Setting.HiddenService` 
+   via `TorController`, where the path was not properly escaped
+ - Fixes `Path.toString()`. Now returns the `value` instead of 
+   `Path(value=/some/path)`
+ - Fixes `TorManager` startup operations by calling `setEvents` after 
+   `configLoad` to mitigate unnecessary dispatching of `CONF_CHANGED` events
+ - Removes default overloads from `TorControl*` use case interfaces
+     - See **BREAKING CHANGES**
+ - Modified `TorControlConfigGet` and `TorControlConfigReset` to use 
+   `TorConfig.KeyWord`s
+     - See **BREAKING CHANGES**
+
+**BREAKING CHANGES**
+ - `KmpTorLoader`
+     - Note that these changes will only affect library consumers if they
+       had their own implementations of `KmpTorLoader` and were not using those
+       provided via the `kmp-tor` dependency.
+     - `KmpTorLoader.io` constructor argument was removed
+     - `KmpTorLoader.setHiddenServiceDirPermissions` method name was changed to
+       `setUnixDirPermissions`
+     - `KmpTorLoader.excludeSettings` type was changed from `Set<TorConfig.Setting<*>>`
+       to `Set<TorConfig.KeyWord>`
+ - `TorConfig`
+     - `TorConfig.keyword` type was changed from `String` to `TorConfig.KeyWord`
+     - `TorConfig.Setting.HiddenService.ports` type was changed from 
+       `TorConfig.Setting.HiddenService.Ports` to
+       `TorConfig.Setting.HiddenService.VirtualPort`
+ - `ControllerUtils` was renamed to `PlatformUtil`
+     - Note that all methods were annotated with `InternalTorApi` (and still are)
+ - `TorControlConfigGet.configGet()` was changed from accepting a `TorConfig.Setting<*>`,
+   to accepting a `TorConfig.KeyWord`
+ - `TorControlConfigReset.configReset()` was changed from accepting a 
+   `TorConfig.Setting<*>` to accepting a `TorConfig.KeyWord`
+ - `CallbackTorControlConfigGet.configGet()` was changed from accepting a
+   `TorConfig.Setting<*>`, to accepting a `TorConfig.KeyWord`
+ - `CallbackTorControlConfigReset.configReset()` was changed from accepting a
+   `TorConfig.Setting<*>` to accepting a `TorConfig.KeyWord`
+ - `TorControlConfigSave.configSave` overloads were removed
+ - `TorControlOnionAdd.onionAdd` overloads were removed
+ - `TorControlOnionAdd.onionAddNew` overloads were removed
+ - `TorControlSetEvents.setEvents` argument `extended` was removed (obsoleted by Tor)
+ - `CallbackTorControlConfigSave.configSave` overloads were removed
+ - `CallbackTorControlOnionAdd.onionAdd` overloads were removed
+ - `CallbackTorControlOnionAdd.onionAddNew` overloads were removed
+ - Java only users:
+     - `AddressInfo.isNull()` method changed to `isNull` property
+     - `TorConfig.Setting.value` method changed from `getValue()` to `value()`
+     - `TorConfig.Setting.isMutable` method changed from `getIsMutable()` to `isMutable()`
+     - `TorConfig.Setting.default` method changed from `getDefault()` to property `default`
+     - `TorConfig.Setting.isDefault` method changed from `getIsDefault()` to `isDefault()`
+     - `TorConfig.Setting.HiddenService.ports` method changed from `getPorts()` to `ports()`
+     - `TorConfig.Setting.HiddenService.maxStreams` method changed from `getMaxStreams()`
+       to `maxStreams()`
+     - `TorConfig.Setting.HiddenService.maxStreamsCloseCircuit` method changed from
+       `getMaxStreamsCloseCircuit()` to `maxStreamsCloseCircuit()`
+     - `TorConfig.Setting.Ports.Dns.isolationFlags` method changed from `getIsolationFlags()`
+       to `isolationFlags()`
+     - `TorConfig.Setting.Ports.HttpTunnel.isolationFlags` method changed from
+       `getIsolationFlags()` to `isolationFlags()`
+     - `TorConfig.Setting.Ports.Socks.flags` method changed from `getFlags()` to `flags()`
+     - `TorConfig.Setting.Ports.Socks.isolationFlags` method changed from `getIsolationFlags()`
+       to `isolationFlags()`
+     - `TorConfig.Setting.Ports.Trans.isolationFlags` method changed from `getIsolationFlags()`
+       to `isolationFlags()`
+
 ## Version 0.4.7.7+0.2.0 (2022-05-31)
  - Implements Controller use case for `HSFETCH`
  - Fixes `TorController`'s mapping of multi-line responses to single-line
