@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
+import io.matthewnelson.kotlin.components.dependencies.deps
 import io.matthewnelson.kotlin.components.kmp.KmpTarget
 import kmp.tor.env
 import org.jetbrains.kotlin.gradle.plugin.KotlinJsCompilerType
@@ -32,6 +33,12 @@ kmpConfiguration {
                 compilerType = KotlinJsCompilerType.BOTH,
                 browser = null,
                 node = KmpTarget.NonJvm.JS.Node(),
+                mainSourceSet = {
+                    dependencies {
+                        // https://github.com/05nelsonm/kmp-tor/issues/205
+                        implementation(deps.kotlin.atomicfu.js)
+                    }
+                },
             ),
 
             KmpTarget.NonJvm.Native.Unix.Darwin.Ios.Arm32.DEFAULT,
