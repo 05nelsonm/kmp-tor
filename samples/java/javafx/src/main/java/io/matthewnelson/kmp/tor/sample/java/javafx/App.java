@@ -199,43 +199,61 @@ public class App extends Application {
                 http.set(AorDorPort.Auto.INSTANCE);
 
                 // Use a UnixSocket instead of TCP for the ControlPort.
-//                    put(UnixSocket.Control().set(FileSystemFile(
-//                        workDir.builder {
-//
-//                            // Put the file in the "data" directory
-//                            // so that we avoid any directory permission
-//                            // issues.
-//                            //
-//                            // Note that DataDirectory is automatically added
-//                            // for you if it is not present in your provided
-//                            // config. If you set a custom Path for it, you
-//                            // should use it here.
-//                            addSegment(DataDirectory.DEFAULT_NAME)
-//
-//                            addSegment(UnixSocket.Control.DEFAULT_NAME)
-//                        }
-//                    )))
-
-                HiddenService myHiddenService = new HiddenService();
-
-                myHiddenService.set(FileSystemDir.invoke(
+                //
+                // This is just for demonstration purposes because it is not
+                // needed as if neither `Ports.Control` or `UnixSockets.Control`
+                // are provided here, if there is support for `UnixSockets.Control`,
+                // it will be the preferred way for establishing a Tor control
+                // connection and automatically added for you.
+                UnixSockets.Control control = new UnixSockets.Control();
+                control.set(FileSystemFile.invoke(
                     workDir.builder()
-                        .addSegment(HiddenService.DEFAULT_PARENT_DIR_NAME)
-                        .addSegment("my_hidden_service")
+
+                        // Put the file in the "data" directory
+                        // so that we avoid any directory permission
+                        // issues.
+                        //
+                        // Note that DataDirectory is automatically added
+                        // for you if it is not present in your provided
+                        // config. If you set a custom Path for it, you
+                        // should use it here.
+                        .addSegment(DataDirectory.DEFAULT_NAME)
+
+                        .addSegment(UnixSockets.Control.DEFAULT_NAME)
                         .build()
                 ));
 
-                Set<HiddenService.Ports> hsPorts = new HashSet<>(2);
+                HiddenService myHiddenService = new HiddenService();
+                Path hsDirPath = workDir.builder()
+                    .addSegment(HiddenService.DEFAULT_PARENT_DIR_NAME)
+                    .addSegment("my_hidden_service")
+                    .build();
+
+                myHiddenService.set(FileSystemDir.invoke(hsDirPath));
+
+                Set<HiddenService.VirtualPort> hsPorts = new HashSet<>(3);
                 HiddenService.Ports httpPort = new HiddenService.Ports(Port.invoke(80), Port.invoke(8080));
+                HiddenService.Ports httpsPort = httpPort.copy(Port.invoke(443), httpPort.targetPort);
+                HiddenService.UnixSocket httpUnixSocket = new HiddenService.UnixSocket(
+                    Port.invoke(80),
+                    hsDirPath.builder()
+                        .addSegment(HiddenService.UnixSocket.DEFAULT_UNIX_SOCKET_NAME)
+                        .build()
+                );
+
+                // May show an error in IDE, but it will compile b/c
+                // `HiddenService.Ports` and `HiddenService.UnixSocket`
+                // both extend `HiddenService.VirtualPort`
                 hsPorts.add(httpPort);
-                hsPorts.add(httpPort.copy(Port.invoke(443), httpPort.targetPort)); // also allow https connections
+                hsPorts.add(httpsPort);
+                hsPorts.add(httpUnixSocket);
 
                 myHiddenService.setPorts(hsPorts);
 
                 return new TorConfig.Builder()
                     .put(socks)
                     .put(http)
-//                    .put(control)
+                    .put(control)
                     .put(myHiddenService)
                     .build();
             }
@@ -276,7 +294,7 @@ public class App extends Application {
 
         @Override
         public void managerEventAddressInfo(TorManagerEvent.AddressInfo info) {
-            if (info.isNull()) {
+            if (info.isNull) {
                 // Tear down HttpClient
             } else {
                 try {

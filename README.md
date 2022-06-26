@@ -15,8 +15,8 @@ Add dependency
 ```kotlin
 // build.gradle.kts
 dependencies {
-    val vTor = "0.4.7.7"
-    val vKmpTor = "0.2.0"
+    val vTor = "0.4.7.8"
+    val vKmpTor = "1.0.0"
     implementation("io.matthewnelson.kotlin-components:kmp-tor:$vTor+$vKmpTor")
 }
 ```
@@ -24,8 +24,8 @@ dependencies {
 ```groovy
 // build.gradle
 dependencies {
-   def vTor = '0.4.7.7'
-   def vKmpTor = '0.2.0'
+   def vTor = '0.4.7.8'
+   def vKmpTor = '1.0.0'
    implementation "io.matthewnelson.kotlin-components:kmp-tor:$vTor+$vKmpTor"
 }
 ```
@@ -63,9 +63,51 @@ dependencies {
 
 </details>
 
-<details>
-    <summary>Extensions (Callback - Non-Kotlin users)</summary>
+### Extensions
 
+<details>
+    <summary>Unix Domain Sockets</summary>
+
+### Tor supports use of unix domain sockets on Linux (and Android) for the following:
+ - ControlPort
+ - SocksPort
+ - HiddenServicePort
+
+### How to enable unix domain socket support for the `ControlPort`:
+ - For Android, **nothing is needed**.
+ - For JVM, you will need to add the following dependency to your Linux distributions:
+
+```kotlin
+// build.gradlew.kts
+dependencies {
+    val vTor = "0.4.7.8"
+    val vKmpTor = "1.0.0"
+    
+    implementation("io.matthewnelson.kotlin-components:kmp-tor:$vTor+$vKmpTor")
+    
+    if (isLinuxBuild) {
+        // Add the Unix Domain Socket support extension
+        implementation("io.matthewnelson.kotlin-components:kmp-tor-ext-unix-socket:$vKmpTor")
+    }
+}
+```
+
+See the [JavaFX Sample App Gradle Configuration](https://github.com/05nelsonm/kmp-tor/blob/master/samples/kotlin/javafx/build.gradle.kts)
+`dependencies` block for more info.
+
+If neither `TorConfig.Setting.Ports.Control` or `TorConfig.Setting.UnixSockets.Control` are expressed in 
+your config, `TorConfig.Setting.UnixSockets.Control` will always be the preferred setting for establishing 
+a connection to Tor's control port, **if support is had (JVM + Linux + extension, or on Android)**. To 
+override this behavior, you can express the `TorConfig.Setting.Ports.Control` setting when providing your 
+config at startup.
+
+### How to enable unix domain socket support for the `SocksPort` and `HiddenServicePort` settings:
+ - Be running on Linux (or Android)
+
+</details>
+
+<details>
+    <summary>Callbacks (non-kotlin consumers)</summary>
 
  - For Java projects (who can't use coroutines), you can "wrap" `TorManager` in an implementation 
    that uses callbacks (ie. `CallbackTorManager`).
@@ -73,8 +115,8 @@ dependencies {
 ```groovy
 // build.gradle
 dependencies {
-    def vTor = '0.4.7.7'
-    def vKmpTor = '0.2.0'
+    def vTor = '0.4.7.8'
+    def vKmpTor = '1.0.0'
 
     implementation "io.matthewnelson.kotlin-components:kmp-tor:$vTor+$vKmpTor"
     // Add the callback extension
@@ -88,7 +130,7 @@ dependencies {
 ```
 
 ```java
-// Wrapping TorManager instance in it's Callback instance (Java)
+// Wrapping TorManager instance in its Callback instance (Java)
 public class Example1 {
     
     // ..
