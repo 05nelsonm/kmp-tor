@@ -39,6 +39,12 @@ kmpConfiguration {
                 compilerType = KotlinJsCompilerType.BOTH,
                 browser = null,
                 node = KmpTarget.NonJvm.JS.Node(),
+                mainSourceSet = {
+                    dependencies {
+                        // https://github.com/05nelsonm/kmp-tor/issues/205
+                        implementation(deps.kotlin.atomicfu.js)
+                    }
+                },
             ),
 
             KmpTarget.NonJvm.Native.Unix.Darwin.Ios.Arm32.DEFAULT,
