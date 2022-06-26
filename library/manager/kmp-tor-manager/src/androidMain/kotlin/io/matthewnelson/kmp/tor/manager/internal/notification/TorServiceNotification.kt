@@ -674,6 +674,7 @@ private class RealTorServiceNotification(
         super.stoppingService()
         service.unregisterReceiver(receiver)
         TorServiceController.notify(Lifecycle(receiver, ON_UNREGISTER))
+        service.stopForeground(true)
     }
 
     init {

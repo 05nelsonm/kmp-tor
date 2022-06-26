@@ -308,11 +308,11 @@ internal class TorService: Service() {
             lastAction = TorManagerEvent.Action.Stop
         }
 
-        TorServiceController.unbindService(this)
         if (config.enableForeground) {
             managerHolder.instance?.removeListener(notification)
             notification.stoppingService()
         }
+        TorServiceController.unbindService(this)
         stopSelf()
     }
 

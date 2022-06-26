@@ -52,7 +52,7 @@
       - You are running TorService in the foreground and wish to keep the application
         alive until an explicit call to `stop` TorService is made.
     -->
-    <bool name="tor_service_stop_service_on_task_removed">false</bool>
+    <bool name="tor_service_stop_service_on_task_removed">true</bool>
 
     <!--
     Not Required
