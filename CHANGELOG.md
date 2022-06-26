@@ -1,15 +1,17 @@
 # CHANGELOG
 
-## Version 0.4.7.8+1.0.0 (2022-06-25)
+## Version 0.4.7.8+1.0.0 (2022-06-26)
  - Updates `atomicfu` dependency from `0.17.2` -> `0.17.3`
  - Updates `coroutines` dependency from `1.6.1` -> `1.6.3`
  - Updates `encoding` dependency from `1.1.2` -> `1.1.3`
  - Updates `kmp-tor-binary` dependency from `0.4.7.7` -> `0.4.7.8`
  - Re-enable compiler flag `kotlin.mpp.enableCompatibilityMetadataVariant=true` 
    to support non-hierarchical projects. (sorry...)
- - Adds `android` source set to `kmp-tor-controller` module
+ - Adds `android` source set to `kmp-tor-controller` and 
+   `kmp-tor-ext-callback-controller` modules
  - Increases `minSdk` from `16` -> `19` on `android` source sets for 
-   `kmp-tor-controller` and `kmp-tor-manager`
+   `kmp-tor-controller`, `kmp-tor-ext-callback-controller`, `kmp-tor-manager`,
+   and `kmp-tor-ext-callback-tor-manager` modules
  - Optimizes internal coroutine usage
  - Adds use of atomics to `TorConfig.Setting` classes
      - See **BREAKING CHANGES**
@@ -31,7 +33,7 @@
    `TorConfig.Setting.HiddenService`
  - Fixes `TorConfig.Builder.build` where an improperly configured setting
    that was not written to `TorConfig.text` was still being added to 
-   the `TorConfig.settings` `Set`
+   the `TorConfig.settings`
  - Fixes issue on Windows when adding a `TorConfig.Setting.HiddenService` 
    via `TorController`, where the path was not properly escaped
  - Fixes `Path.toString()`. Now returns the `value` instead of 
