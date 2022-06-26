@@ -129,6 +129,10 @@ class TorManagerIntegrationTest: TorTestHelper() {
                 addSegment(DataDirectory.DEFAULT_NAME)
                 addSegment("socks_test_1.sock")
             }))
+        socks1.setFlags(setOf(
+            Ports.Socks.Flag.OnionTrafficOnly
+        ))
+
         val socks2 = socks1.clone()
         socks2.set(FileSystemFile(configProvider.workDir.builder {
             addSegment(DataDirectory.DEFAULT_NAME)

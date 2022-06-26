@@ -97,8 +97,10 @@ internal class UnixSocksDiffer(private val torManagerScope: CoroutineScope, priv
         if (!output.startsWith(SOCKS_PORT_UNIX)) return
 
         pathsToKeep.withLock {
-            val path = output.substringAfter(SOCKS_PORT_UNIX)
-                .replace("\"", "")
+            val path = output
+                .substringAfter(SOCKS_PORT_UNIX)
+                .drop(1)
+                .substringBefore('"')
 
             add(Path(path))
         }
