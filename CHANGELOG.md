@@ -40,6 +40,9 @@
    `Path(value=/some/path)`
  - Fixes `TorManager` startup operations by calling `setEvents` after 
    `configLoad` to mitigate unnecessary dispatching of `CONF_CHANGED` events
+ - Fixes a bug on android where API < 26 where, for some `TorService`
+   configurations resulted in a notification not being removed when the service
+   was stopped while task was removed.
  - Removes default overloads from `TorControl*` use case interfaces
      - See **BREAKING CHANGES**
  - Modified `TorControlConfigGet` and `TorControlConfigReset` to use 
