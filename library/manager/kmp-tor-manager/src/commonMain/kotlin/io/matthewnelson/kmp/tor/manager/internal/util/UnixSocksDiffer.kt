@@ -15,7 +15,6 @@
  **/
 package io.matthewnelson.kmp.tor.manager.internal.util
 
-import io.matthewnelson.kmp.tor.controller.common.config.TorConfig
 import io.matthewnelson.kmp.tor.controller.common.file.Path
 import io.matthewnelson.kmp.tor.manager.common.event.TorManagerEvent.AddressInfo
 import io.matthewnelson.kmp.tor.manager.internal.ext.unixSocksClosed
@@ -51,14 +50,13 @@ import kotlin.jvm.JvmSynthetic
  * */
 internal class UnixSocksDiffer(private val torManagerScope: CoroutineScope, private val handler: AddressInfoHandler) {
 
-    private val pathsToRemove = SynchronizedMutableSet<Path>()
+    private val pathsToKeep = SynchronizedMutableSet<Path>()
     private val closingJob: AtomicRef<Job?> = atomic(null)
 
     @JvmSynthetic
     internal fun onOpened(address: String) {
-        pathsToRemove.withLock {
+        pathsToKeep.withLock {
             handler.addressInfo.unixSocksOpened(address)?.let { info ->
-                info.unixSocks?.let { paths -> addAll(paths) }
                 handler.dispatchNewAddressInfo(info)
             }
         }
@@ -71,10 +69,19 @@ internal class UnixSocksDiffer(private val torManagerScope: CoroutineScope, priv
 
             torManagerScope.launch {
                 delay(50L)
-                pathsToRemove.withLock {
-                    for (toRemove in this) {
-                        handler.addressInfo.unixSocksClosed(toRemove.value)?.let { info ->
-                            handler.dispatchNewAddressInfo(info)
+                pathsToKeep.withLock {
+                    val pathsBeingDispatched = handler.addressInfo.unixSocks
+
+                    if (pathsBeingDispatched == null) {
+                        clear()
+                        return@withLock
+                    }
+
+                    for (path in pathsBeingDispatched) {
+                        if (!this.contains(path)) {
+                            handler.addressInfo.unixSocksClosed(path.value)?.let { info ->
+                                handler.dispatchNewAddressInfo(info)
+                            }
                         }
                     }
 
@@ -86,32 +93,20 @@ internal class UnixSocksDiffer(private val torManagerScope: CoroutineScope, priv
 
     @JvmSynthetic
     internal fun onConfChanged(output: String) {
-        // TODO: Issue #157 use TorConfig.KeyWord
-        if (!output.startsWith(SOCKS_PORT)) return
+        // SocksPort=unix:"/tmp/junit15600960770888728454/tor service/data/socks_test_set.sock" CacheDNS OnionTrafficOnly IsolateSOCKSAuth
+        if (!output.startsWith(SOCKS_PORT_UNIX)) return
 
-        pathsToRemove.withLock {
-            val value = output.substringAfter(SOCKS_PORT)
+        pathsToKeep.withLock {
+            val path = output
+                .substringAfter(SOCKS_PORT_UNIX)
+                .drop(1)
+                .substringBefore('"')
 
-            if (value == TorConfig.Option.AorDorPort.Disable.value) {
-                // If SocksPort has been disabled, we need to add all
-                // current paths to mark them for removal
-                handler.addressInfo.unixSocks?.let { paths -> addAll(paths) }
-                return@withLock
-            }
-
-            if (value.startsWith(UNIX)) {
-                // SocksPort=unix:"/tmp/junit15600960770888728454/tor service/data/socks_test_set.sock" CacheDNS OnionTrafficOnly IsolateSOCKSAuth
-                val address = value
-                    .substringAfter(UNIX)
-                    .substringBefore('"')
-
-                remove(Path(address))
-            }
+            add(Path(path))
         }
     }
 
     companion object {
-        private const val SOCKS_PORT = "SocksPort="
-        private const val UNIX = "unix:\""
+        private const val SOCKS_PORT_UNIX = "SocksPort=unix:"
     }
 }

@@ -15,6 +15,8 @@
  **/
 package io.matthewnelson.kmp.tor.manager
 
+import io.matthewnelson.kmp.tor.common.address.Port
+import io.matthewnelson.kmp.tor.common.address.PortProxy
 import io.matthewnelson.kmp.tor.common.annotation.InternalTorApi
 import io.matthewnelson.kmp.tor.controller.common.config.TorConfig.Option.*
 import io.matthewnelson.kmp.tor.controller.common.config.TorConfig.Setting.*
@@ -24,6 +26,7 @@ import io.matthewnelson.kmp.tor.controller.common.internal.PlatformUtil
 import io.matthewnelson.kmp.tor.helper.TorTestHelper
 import io.matthewnelson.kmp.tor.manager.common.event.TorManagerEvent
 import io.matthewnelson.kmp.tor.manager.common.exceptions.InterruptedException
+import io.matthewnelson.kmp.tor.manager.util.PortUtil
 import kotlinx.coroutines.*
 import kotlin.test.*
 
@@ -126,6 +129,10 @@ class TorManagerIntegrationTest: TorTestHelper() {
                 addSegment(DataDirectory.DEFAULT_NAME)
                 addSegment("socks_test_1.sock")
             }))
+        socks1.setFlags(setOf(
+            Ports.Socks.Flag.OnionTrafficOnly
+        ))
+
         val socks2 = socks1.clone()
         socks2.set(FileSystemFile(configProvider.workDir.builder {
             addSegment(DataDirectory.DEFAULT_NAME)
@@ -150,47 +157,61 @@ class TorManagerIntegrationTest: TorTestHelper() {
             assertEquals(socks1.value?.path, dispatch1.elementAt(0))
             assertEquals(socks2.value?.path, dispatch1.elementAt(1))
 
-            // Run 2: Disable SocksPort
-            manager.configSet(Ports.Socks().set(AorDorPort.Disable)).getOrThrow()
+            // Run 2: Set Socks1
+            manager.configSet(socks1).getOrThrow()
 
             val entries2 = manager.configGet(socks1.keyword).getOrThrow()
             assertEquals(1, entries2.size)
-            assertEquals(AorDorPort.Disable.value, entries2.first().value)
+            assertTrue(entries2.first().value.contains(socks1.value?.path?.value!!))
 
             delay(250L)
 
-            val dispatch2 = listener.unixSocksOrNull()
-            assertNull(dispatch2)
+            val dispatch2 = listener.unixSocksOrThrow()
+            assertEquals(1, dispatch2.size)
+            assertEquals(socks1.value?.path, dispatch2.first())
 
-            // Run 3: Set Socks1
-            manager.configSet(socks1).getOrThrow()
+            // Run 3: Non-unix SocksPort
+            val port = PortUtil.findNextAvailableTcpPort(Port(9055), limit = 90)
+            manager.configSet(Ports.Socks().set(AorDorPort.Value(PortProxy(port.value)))).getOrThrow()
 
             val entries3 = manager.configGet(socks1.keyword).getOrThrow()
             assertEquals(1, entries3.size)
-            assertTrue(entries3.first().value.contains(socks1.value?.path?.value!!))
+            assertEquals(port.value.toString(), entries3.first().value)
 
             delay(250L)
 
-            val dispatch3 = listener.unixSocksOrThrow()
-            assertEquals(1, dispatch3.size)
-            assertEquals(socks1.value?.path, dispatch3.first())
+            val dispatch3 = listener.unixSocksOrNull()
+            assertNull(dispatch3)
 
-            // Run 4: Disable Network
+            // Run 4: Set Socks2
+            manager.configSet(socks2).getOrThrow()
+
+            val entries4 = manager.configGet(socks2.keyword).getOrThrow()
+            assertEquals(1, entries4.size)
+            assertTrue(entries4.first().value.contains(socks2.value?.path?.value!!))
+
+            delay(250L)
+
+            val dispatch4 = listener.unixSocksOrThrow()
+            assertEquals(1, dispatch4.size)
+            assertEquals(socks2.value?.path, dispatch4.first())
+
+            // Run 5: Disable Network
             val disableNet = DisableNetwork()
             manager.configSet(disableNet.set(TorF.True))
 
-            val dispatch4 = listener.unixSocksOrNull()
-            assertNull(dispatch4)
+            val dispatch5 = listener.unixSocksOrNull()
+            assertNull(dispatch5)
 
-            // Run 5: Enable Network
+            // Run 6: Enable Network
             manager.configSet(disableNet.set(TorF.False))
 
             delay(250L)
-            val dispatch5 = listener.unixSocksOrThrow()
-            assertEquals(1, dispatch5.size)
-            assertEquals(socks1.value?.path, dispatch5.first())
+            val dispatch6 = listener.unixSocksOrThrow()
+            assertEquals(1, dispatch6.size)
+            assertEquals(socks2.value?.path, dispatch6.first())
 
-            assertEquals(6, listener.dispatchCount)
+            assertEquals(7, listener.dispatchCount)
         } catch (t: Throwable) {
             throwable = t
         } finally {
