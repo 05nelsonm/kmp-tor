@@ -165,7 +165,7 @@ internal abstract class BaseTorManager: SynchronizedObject(), TorControlManager 
 
     override suspend fun onionAdd(
         privateKey: OnionAddress.PrivateKey,
-        hsPorts: Set<TorConfig.Setting.HiddenService.Ports>,
+        hsPorts: Set<TorConfig.Setting.HiddenService.VirtualPort>,
         flags: Set<TorControlOnionAdd.Flag>?,
         maxStreams: TorConfig.Setting.HiddenService.MaxStreams?
     ): Result<HiddenServiceEntry> {
@@ -176,7 +176,7 @@ internal abstract class BaseTorManager: SynchronizedObject(), TorControlManager 
 
     override suspend fun onionAddNew(
         type: OnionAddress.PrivateKey.Type,
-        hsPorts: Set<TorConfig.Setting.HiddenService.Ports>,
+        hsPorts: Set<TorConfig.Setting.HiddenService.VirtualPort>,
         flags: Set<TorControlOnionAdd.Flag>?,
         maxStreams: TorConfig.Setting.HiddenService.MaxStreams?
     ): Result<HiddenServiceEntry> {

@@ -180,7 +180,15 @@ class TorControllerIntegrationTest: TorTestHelper() {
                 TorConfig.Setting.HiddenService.Ports(virtualPort = Port(8761), targetPort = Port(8760)),
                 TorConfig.Setting.HiddenService.Ports(virtualPort = Port(8762), targetPort = Port(8760)),
                 TorConfig.Setting.HiddenService.Ports(virtualPort = Port(8763), targetPort = Port(8760)),
-                TorConfig.Setting.HiddenService.Ports(virtualPort = Port(8764), targetPort = Port(8760)),
+
+                // Will fail if targetUnixSocket contains space in the path
+                TorConfig.Setting.HiddenService.UnixSocket(
+                    virtualPort = Port(8764),
+                    targetUnixSocket = configProvider.workDir.builder {
+                        addSegment(TorConfig.Setting.DataDirectory.DEFAULT_NAME)
+                        addSegment("test_hs.sock")
+                    }
+                ),
             ),
             flags = setOf(
                 TorControlOnionAdd.Flag.MaxStreamsCloseCircuit,

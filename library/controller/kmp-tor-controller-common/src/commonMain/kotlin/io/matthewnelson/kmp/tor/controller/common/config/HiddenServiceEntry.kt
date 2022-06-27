@@ -24,5 +24,5 @@ data class HiddenServiceEntry(
     @JvmField
     val privateKey: OnionAddress.PrivateKey?,
     @JvmField
-    val ports: Set<TorConfig.Setting.HiddenService.Ports>,
+    val ports: Set<TorConfig.Setting.HiddenService.VirtualPort>,
 )

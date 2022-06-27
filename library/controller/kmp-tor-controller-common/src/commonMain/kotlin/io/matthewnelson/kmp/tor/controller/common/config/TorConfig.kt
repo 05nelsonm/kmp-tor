@@ -27,6 +27,7 @@ import io.matthewnelson.kmp.tor.controller.common.config.TorConfig.Option.TorF.T
 import io.matthewnelson.kmp.tor.controller.common.file.Path
 import io.matthewnelson.kmp.tor.controller.common.internal.PlatformUtil
 import io.matthewnelson.kmp.tor.controller.common.internal.appendTo
+import io.matthewnelson.kmp.tor.controller.common.internal.filterSupportedOnly
 import io.matthewnelson.kmp.tor.controller.common.internal.isUnixPath
 import kotlinx.atomicfu.AtomicBoolean
 import kotlinx.atomicfu.AtomicRef
@@ -667,26 +668,8 @@ class TorConfig private constructor(
                     if (ports.isNullOrEmpty()) {
                         _ports.update { null }
                     } else {
-                        val filtered = ports.filter { instance ->
-                            when (instance) {
-                                is UnixSocket -> {
-                                    if (!PlatformUtil.isLinux) {
-                                        false
-                                    } else {
-                                        instance.targetUnixSocket.isUnixPath
-                                    }
-                                }
-                                is Ports -> true
-                            }
-                        }
-
-                        _ports.update {
-                            if (filtered.isNotEmpty()) {
-                                filtered.toSet()
-                            } else {
-                                null
-                            }
-                        }
+                        val filtered = ports.filterSupportedOnly()
+                        _ports.update { filtered }
                     }
                 }
 

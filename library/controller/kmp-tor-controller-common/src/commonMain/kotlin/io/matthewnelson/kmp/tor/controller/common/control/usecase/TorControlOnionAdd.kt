@@ -73,7 +73,7 @@ interface TorControlOnionAdd {
      * */
     suspend fun onionAdd(
         privateKey: OnionAddress.PrivateKey,
-        hsPorts: Set<TorConfig.Setting.HiddenService.Ports>,
+        hsPorts: Set<TorConfig.Setting.HiddenService.VirtualPort>,
         flags: Set<Flag>?,
         maxStreams: TorConfig.Setting.HiddenService.MaxStreams?,
     ): Result<HiddenServiceEntry>
@@ -84,7 +84,7 @@ interface TorControlOnionAdd {
      * */
     suspend fun onionAddNew(
         type: OnionAddress.PrivateKey.Type,
-        hsPorts: Set<TorConfig.Setting.HiddenService.Ports>,
+        hsPorts: Set<TorConfig.Setting.HiddenService.VirtualPort>,
         flags: Set<Flag>?,
         maxStreams: TorConfig.Setting.HiddenService.MaxStreams?
     ): Result<HiddenServiceEntry>

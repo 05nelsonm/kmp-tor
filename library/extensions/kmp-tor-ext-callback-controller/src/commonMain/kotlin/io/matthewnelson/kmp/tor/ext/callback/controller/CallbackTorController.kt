@@ -254,7 +254,7 @@ class CallbackTorController(
 
     override fun onionAdd(
         privateKey: OnionAddress.PrivateKey,
-        hsPorts: Set<TorConfig.Setting.HiddenService.Ports>,
+        hsPorts: Set<TorConfig.Setting.HiddenService.VirtualPort>,
         flags: Set<TorControlOnionAdd.Flag>?,
         maxStreams: TorConfig.Setting.HiddenService.MaxStreams?,
         failure: TorCallback<Throwable>?,
@@ -267,7 +267,7 @@ class CallbackTorController(
 
     override fun onionAddNew(
         type: OnionAddress.PrivateKey.Type,
-        hsPorts: Set<TorConfig.Setting.HiddenService.Ports>,
+        hsPorts: Set<TorConfig.Setting.HiddenService.VirtualPort>,
         flags: Set<TorControlOnionAdd.Flag>?,
         maxStreams: TorConfig.Setting.HiddenService.MaxStreams?,
         failure: TorCallback<Throwable>?,
