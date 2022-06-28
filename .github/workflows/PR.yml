@@ -43,23 +43,5 @@ jobs:
         run: |
           ./gradlew check --stacktrace -PKMP_TARGETS=JVM,JS,MINGW_X64,MINGW_X86
 
-      - name: Build Kotlin Android Sample
-        if: matrix.os == 'macOs-latest' && matrix.job == 'build'
-        uses: gradle/gradle-build-action@v2
-        with:
-          arguments: build --stacktrace -PKMP_TARGETS=ANDROID,JVM
-          build-root-directory: samples/kotlin/android
-          cache-disabled: true
-
-      - name: Build TornadoFx Sample
-        if: matrix.os == 'macOS-latest' && matrix.job == 'build'
-        uses: gradle/gradle-build-action@v2
-        with:
-          arguments: build --stacktrace -PKMP_TARGETS=JVM
-          build-root-directory: samples/kotlin/javafx
-          cache-disabled: true
-
-## TODO: Upload build reports
-
 env:
   GRADLE_OPTS: -Dorg.gradle.daemon=false -Dkotlin.incremental=false -Dorg.gradle.jvmargs="-XX:+HeapDumpOnOutOfMemoryError -XX:MetaspaceSize=1g"
