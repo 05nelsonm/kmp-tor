@@ -7,7 +7,7 @@ jobs:
     strategy:
       matrix:
         os: [ macOS-latest, ubuntu-18.04, windows-latest ]
-        job: [ build, test ]
+        job: [ test ]
 
     runs-on: ${{ matrix.os }}
 
@@ -41,7 +41,7 @@ jobs:
       - name: Run Windows Tests
         if: matrix.os == 'windows-latest' && matrix.job == 'test'
         run: |
-          ./gradlew check --stacktrace -PKMP_TARGETS=JVM,JS,MINGW_X64,MINGW_X86
+          ./gradlew check --stacktrace -PKMP_TARGETS="JVM,JS,MINGW_X64,MINGW_X86"
 
 env:
   GRADLE_OPTS: -Dorg.gradle.daemon=false -Dkotlin.incremental=false -Dorg.gradle.jvmargs="-XX:+HeapDumpOnOutOfMemoryError -XX:MetaspaceSize=1g"
