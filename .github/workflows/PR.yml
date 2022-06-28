@@ -54,4 +54,4 @@ jobs:
 ## TODO: Upload build reports
 
 env:
-  GRADLE_OPTS: -Dorg.gradle.daemon=false -Dkotlin.incremental=false =Dorg.gradle.jvmargs="-XX:+HeapDumpOnOutOfMemoryError -XX:MetaspaceSize=1g"
+  GRADLE_OPTS: -Dorg.gradle.daemon=false -Dkotlin.incremental=false -Dorg.gradle.jvmargs="-XX:+HeapDumpOnOutOfMemoryError -XX:MetaspaceSize=1g"
