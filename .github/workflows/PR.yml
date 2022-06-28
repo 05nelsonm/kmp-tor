@@ -45,6 +45,7 @@ jobs:
 
       - name: Build Kotlin Android Sample
         if: matrix.os == 'macOs-latest' && matrix.job == 'build'
+        uses: gradle/gradle-build-action@v2
         with:
           arguments: build --stacktrace -PKMP_TARGETS=ANDROID,JVM
           build-root-directory: samples/kotlin/android
