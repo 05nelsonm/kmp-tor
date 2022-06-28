@@ -7,6 +7,7 @@ jobs:
     strategy:
       matrix:
         os: [ macOS-latest, ubuntu-18.04, windows-latest ]
+        # TODO: Add Android instrumentation tests
         job: [ test ]
 
     runs-on: ${{ matrix.os }}
