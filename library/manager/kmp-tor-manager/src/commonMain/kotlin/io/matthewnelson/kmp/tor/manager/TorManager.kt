@@ -452,10 +452,10 @@ private class RealTorManager(
                 if (networkEnabledBefore && networkObserver?.isNetworkConnected() != false) {
                     configReset(setOf(
                         TorConfig.KeyWord.DisableNetwork,
-                        TorConfig.KeyWord.OwningControllerProcess
+                        TorConfig.KeyWord.__OwningControllerProcess
                     ))
                 } else {
-                    configReset(TorConfig.KeyWord.OwningControllerProcess)
+                    configReset(TorConfig.KeyWord.__OwningControllerProcess)
                 }
             }
             result
@@ -849,10 +849,10 @@ private class RealTorManager(
             // null (no observer) or true
             controller.configReset(setOf(
                 TorConfig.KeyWord.DisableNetwork,
-                TorConfig.KeyWord.OwningControllerProcess,
+                TorConfig.KeyWord.__OwningControllerProcess,
             ))
         } else {
-            controller.configReset(TorConfig.KeyWord.OwningControllerProcess)
+            controller.configReset(TorConfig.KeyWord.__OwningControllerProcess)
             notifyListenersNoScope(TorManagerEvent.Log.Warn(WAITING_ON_NETWORK))
         }
 
