@@ -1490,7 +1490,7 @@ class TorConfig private constructor(
 
         @JvmInline
         private value class RealFieldId(override val value: String)     : FieldId {
-            override val nullIfEmpty: FieldId? get() = if(value.isEmpty()) null else this
+            override val nullIfEmpty: FieldId? get() = if (value.isEmpty()) null else this
             override fun toString(): String = value
         }
 
