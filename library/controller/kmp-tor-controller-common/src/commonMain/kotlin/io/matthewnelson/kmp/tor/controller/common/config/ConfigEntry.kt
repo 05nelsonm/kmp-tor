@@ -54,6 +54,6 @@ class ConfigEntry {
     }
 
     override fun toString(): String {
-        return "ConfigEntry(key=$key,value=$value,isDefault=$isDefault)"
+        return "ConfigEntry(key=$key, value=$value, isDefault=$isDefault)"
     }
 }
