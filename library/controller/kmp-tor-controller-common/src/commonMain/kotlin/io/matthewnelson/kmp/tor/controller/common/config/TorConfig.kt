@@ -1614,6 +1614,9 @@ class TorConfig private constructor(
      * */
     @Suppress("ClassName")
     sealed class KeyWord: Comparable<String>, CharSequence {
+        // NOTE: If adding any KeyWords, be sure to update the integration test model at
+        // `:library:kmp-tor:commonTest/kotlin/io/matthewnelson/kmp/tor/helpers/model/KeyWordModel.kt`
+        // to validate it via the integration test.
 
 /* IMPLEMENTED */
 /* === GENERAL OPTIONS ======================== IMPLEMENTED as a TorConfig.Setting ================================== */
