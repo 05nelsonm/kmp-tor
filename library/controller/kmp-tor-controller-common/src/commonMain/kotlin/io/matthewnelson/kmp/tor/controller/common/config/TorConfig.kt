@@ -2008,6 +2008,7 @@ class TorConfig private constructor(
         object __NATDPort: KeyWord() { override fun toString(): String = "__NATDPort" }
         object __ORPort: KeyWord() { override fun toString(): String = "__ORPort" }
         object __SocksPort: KeyWord() { override fun toString(): String = "__SocksPort" }
+        object __HttpTunnelPort: KeyWord() { override fun toString(): String = "__HttpTunnelPort" }
         object __TransPort: KeyWord() { override fun toString(): String = "__TransPort" }
 
 

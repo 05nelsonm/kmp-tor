@@ -323,6 +323,7 @@ class KeyWordModel {
             add(TorConfig.KeyWord.__NATDPort)
             add(TorConfig.KeyWord.__ORPort)
             add(TorConfig.KeyWord.__SocksPort)
+            add(TorConfig.KeyWord.__HttpTunnelPort)
             add(TorConfig.KeyWord.__TransPort)
             add(TorConfig.KeyWord.__AllDirActionsPrivate)
             add(TorConfig.KeyWord.__DisablePredictedCircuits)
