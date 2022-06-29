@@ -26,7 +26,7 @@ import io.matthewnelson.kmp.tor.controller.common.control.usecase.TorControlOnio
 import io.matthewnelson.kmp.tor.controller.common.events.TorEvent
 import io.matthewnelson.kmp.tor.controller.common.internal.PlatformUtil
 import io.matthewnelson.kmp.tor.controller.common.internal.appendTo
-import io.matthewnelson.kmp.tor.helper.TorTestHelper
+import io.matthewnelson.kmp.tor.helpers.TorTestHelper
 import io.matthewnelson.kmp.tor.manager.common.event.TorManagerEvent
 import io.matthewnelson.kmp.tor.manager.util.PortUtil
 import kotlinx.coroutines.delay

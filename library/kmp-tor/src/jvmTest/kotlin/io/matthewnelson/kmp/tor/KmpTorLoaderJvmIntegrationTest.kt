@@ -19,7 +19,7 @@ import io.matthewnelson.kmp.tor.common.address.PortProxy
 import io.matthewnelson.kmp.tor.controller.common.config.TorConfig
 import io.matthewnelson.kmp.tor.controller.common.config.TorConfig.Setting.*
 import io.matthewnelson.kmp.tor.controller.common.config.TorConfig.Option.*
-import io.matthewnelson.kmp.tor.helper.TorTestHelper
+import io.matthewnelson.kmp.tor.helpers.TorTestHelper
 import kotlinx.coroutines.*
 import org.junit.*
 
