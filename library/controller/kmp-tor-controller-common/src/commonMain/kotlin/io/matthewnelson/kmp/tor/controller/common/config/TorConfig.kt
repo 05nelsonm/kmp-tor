@@ -573,7 +573,7 @@ class TorConfig private constructor(
          * https://2019.www.torproject.org/docs/tor-manual.html.en#GeoIPFile
          * */
         class GeoIpV4File                           : Setting<Option.FileSystemFile?>(
-            keyword = KeyWord.GeoIpFile,
+            keyword = KeyWord.GeoIPFile,
             default = null,
             isStartArgument = true,
         ) {
@@ -1682,7 +1682,7 @@ class TorConfig private constructor(
 
 
 /* === SERVER OPTIONS ========================= IMPLEMENTED as a TorConfig.Setting ================================== */
-        object GeoIpFile: KeyWord() { override fun toString(): String = "GeoIPFile" }
+        object GeoIPFile: KeyWord() { override fun toString(): String = "GeoIPFile" }
         object GeoIPv6File: KeyWord() { override fun toString(): String = "GeoIPv6File" }
 
 

@@ -43,7 +43,7 @@ class KeyWordModel {
             add(TorConfig.KeyWord.DormantTimeoutDisabledByIdleStreams)
             add(TorConfig.KeyWord.DormantOnFirstStartup)
             add(TorConfig.KeyWord.DormantCanceledByStartup)
-            add(TorConfig.KeyWord.GeoIpFile)
+            add(TorConfig.KeyWord.GeoIPFile)
             add(TorConfig.KeyWord.GeoIPv6File)
             add(TorConfig.KeyWord.HiddenServiceDir)
             add(TorConfig.KeyWord.HiddenServicePort)
