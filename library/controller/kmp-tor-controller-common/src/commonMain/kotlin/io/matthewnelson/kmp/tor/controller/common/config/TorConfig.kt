@@ -251,7 +251,11 @@ class TorConfig private constructor(
      *
      * https://2019.www.torproject.org/docs/tor-manual.html.en
      * */
-    @Suppress("PropertyName", "CanBePrimaryConstructorProperty")
+    @Suppress(
+        "ClassName",
+        "PropertyName",
+        "CanBePrimaryConstructorProperty"
+    )
     sealed class Setting<T: Option?>(
         @JvmField
         val keyword: TorConfig.KeyWord,
@@ -844,14 +848,14 @@ class TorConfig private constructor(
         /**
          * https://torproject.gitlab.io/torspec/control-spec/#takeownership
          * */
-        class OwningControllerProcess               : Setting<Option.ProcessId?>(
+        class __OwningControllerProcess             : Setting<Option.ProcessId?>(
             keyword = KeyWord.__OwningControllerProcess,
             default = null,
             isStartArgument = true,
         ) {
 
-            override fun clone(): OwningControllerProcess {
-                return OwningControllerProcess().set(value) as OwningControllerProcess
+            override fun clone(): __OwningControllerProcess {
+                return __OwningControllerProcess().set(value) as __OwningControllerProcess
             }
         }
 
@@ -1364,6 +1368,24 @@ class TorConfig private constructor(
 
             override fun clone(): SyslogIdentityTag {
                 return SyslogIdentityTag().set(value) as SyslogIdentityTag
+            }
+        }
+
+        /**
+         * https://torproject.gitlab.io/torspec/control-spec/#takeownership
+         * */
+        @Deprecated(
+            message = "Use TorConfig.Setting.__OwningControllerProcess",
+            replaceWith = ReplaceWith("TorConfig.Setting.__OwningControllerProcess")
+        )
+        class OwningControllerProcess             : Setting<Option.ProcessId?>(
+            keyword = KeyWord.__OwningControllerProcess,
+            default = null,
+            isStartArgument = true,
+        ) {
+
+            override fun clone(): OwningControllerProcess {
+                return OwningControllerProcess().set(value) as OwningControllerProcess
             }
         }
     }

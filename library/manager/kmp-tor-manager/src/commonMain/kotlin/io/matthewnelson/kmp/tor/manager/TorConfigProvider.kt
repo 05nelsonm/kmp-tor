@@ -182,7 +182,7 @@ abstract class TorConfigProvider {
             putIfAbsent(dataDir)
 
             processId?.let { pid ->
-                putIfAbsent(OwningControllerProcess().set(ProcessId(pid)))
+                putIfAbsent(__OwningControllerProcess().set(ProcessId(pid)))
             }
 
             putIfAbsent(SyslogIdentityTag().set(FieldId("TorManager")))
