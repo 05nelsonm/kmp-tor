@@ -1618,6 +1618,18 @@ class TorConfig private constructor(
         // `:library:kmp-tor:commonTest/kotlin/io/matthewnelson/kmp/tor/helpers/model/KeyWordModel.kt`
         // to validate it via the integration test.
 
+        final override val length: Int get() = toString().length
+        final override fun get(index: Int): Char = toString()[index]
+        final override fun subSequence(startIndex: Int, endIndex: Int): CharSequence {
+            return toString().subSequence(startIndex, endIndex)
+        }
+
+        final override fun compareTo(other: String): Int = toString().compareTo(other)
+        operator fun plus(other: Any?): String = toString() + other
+
+        final override fun equals(other: Any?): Boolean = other is KeyWord && other.toString() == toString()
+        final override fun hashCode(): Int = 21 * 31 + toString().hashCode()
+
 /* IMPLEMENTED */
 /* === GENERAL OPTIONS ======================== IMPLEMENTED as a TorConfig.Setting ================================== */
         object DisableNetwork: KeyWord() { override fun toString(): String = "DisableNetwork" }
@@ -2039,17 +2051,5 @@ class TorConfig private constructor(
         object GeoIpV4File: KeyWord() { override fun toString(): String = "GeoIPFile" }
         @Deprecated(message = "Use KeyWord.__OwningControllerProcess", replaceWith = ReplaceWith(expression = "TorConfig.KeyWord.__OwningControllerProcess"))
         object OwningControllerProcess: KeyWord() { override fun toString(): String = "__OwningControllerProcess" }
-
-        final override val length: Int get() = toString().length
-        final override fun get(index: Int): Char = toString()[index]
-        final override fun subSequence(startIndex: Int, endIndex: Int): CharSequence {
-            return toString().subSequence(startIndex, endIndex)
-        }
-
-        final override fun compareTo(other: String): Int = toString().compareTo(other)
-        operator fun plus(other: Any?): String = toString() + other
-
-        final override fun equals(other: Any?): Boolean = other is KeyWord && other.toString() == toString()
-        final override fun hashCode(): Int = 21 * 31 + toString().hashCode()
     }
 }
