@@ -1384,6 +1384,7 @@ class TorConfig private constructor(
             isStartArgument = true,
         ) {
 
+            @Suppress("DEPRECATION")
             override fun clone(): OwningControllerProcess {
                 return OwningControllerProcess().set(value) as OwningControllerProcess
             }
