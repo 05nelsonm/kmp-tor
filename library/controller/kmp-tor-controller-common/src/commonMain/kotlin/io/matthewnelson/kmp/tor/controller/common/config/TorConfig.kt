@@ -572,7 +572,7 @@ class TorConfig private constructor(
         /**
          * https://2019.www.torproject.org/docs/tor-manual.html.en#GeoIPFile
          * */
-        class GeoIpV4File                           : Setting<Option.FileSystemFile?>(
+        class GeoIPFile                           : Setting<Option.FileSystemFile?>(
             keyword = KeyWord.GeoIPFile,
             default = null,
             isStartArgument = true,
@@ -582,8 +582,8 @@ class TorConfig private constructor(
                 return super.set(value?.nullIfEmpty)
             }
 
-            override fun clone(): GeoIpV4File {
-                return GeoIpV4File().set(value) as GeoIpV4File
+            override fun clone(): GeoIPFile {
+                return GeoIPFile().set(value) as GeoIPFile
             }
         }
 
@@ -1368,6 +1368,26 @@ class TorConfig private constructor(
 
             override fun clone(): SyslogIdentityTag {
                 return SyslogIdentityTag().set(value) as SyslogIdentityTag
+            }
+        }
+
+        @Deprecated(
+            message = "Use TorConfig.Setting.GeoIPFile",
+            replaceWith = ReplaceWith(expression = "TorConfig.Setting.GeoIPFile")
+        )
+        class GeoIpV4File                           : Setting<Option.FileSystemFile?>(
+            keyword = KeyWord.GeoIPFile,
+            default = null,
+            isStartArgument = true,
+        ) {
+
+            override fun set(value: Option.FileSystemFile?): Setting<Option.FileSystemFile?> {
+                return super.set(value?.nullIfEmpty)
+            }
+
+            @Suppress("DEPRECATION")
+            override fun clone(): GeoIpV4File {
+                return GeoIpV4File().set(value) as GeoIpV4File
             }
         }
 

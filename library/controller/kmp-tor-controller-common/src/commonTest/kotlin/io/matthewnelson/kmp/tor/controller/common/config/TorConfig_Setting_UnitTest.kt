@@ -84,7 +84,7 @@ class TorConfig_Setting_UnitTest {
 
     @Test
     fun givenGeoIpV4File_whenEmptyPath_remainsNull() {
-        val setting = GeoIpV4File().set(FileSystemFile(Path("")))
+        val setting = GeoIPFile().set(FileSystemFile(Path("")))
         assertNull(setting.value)
     }
 
