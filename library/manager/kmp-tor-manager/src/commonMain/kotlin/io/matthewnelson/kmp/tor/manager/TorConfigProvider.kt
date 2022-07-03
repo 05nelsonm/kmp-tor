@@ -59,13 +59,13 @@ abstract class TorConfigProvider {
     /**
      * Called from a background thread, so it is safe to perform IO from here.
      *
-     * This will only be called if [TorConfig.Setting.GeoIpV4File] is set
+     * This will only be called if [TorConfig.Setting.GeoIPFile] is set
      * in the client config retrieved from [provide], or if [geoIpV4File] is not null.
      *
      * The [geoIpV4File] setting is always preferred over the client [TorConfig]
      * setting.
      *
-     * [TorConfig.Setting.GeoIpV4File] will automatically be added to the [TorConfig]
+     * [TorConfig.Setting.GeoIPFile] will automatically be added to the [TorConfig]
      * upon successful extraction if it is not present.
      *
      * @throws [TorManagerException] if extraction failed
@@ -182,7 +182,7 @@ abstract class TorConfigProvider {
             putIfAbsent(dataDir)
 
             processId?.let { pid ->
-                putIfAbsent(OwningControllerProcess().set(ProcessId(pid)))
+                putIfAbsent(__OwningControllerProcess().set(ProcessId(pid)))
             }
 
             putIfAbsent(SyslogIdentityTag().set(FieldId("TorManager")))
@@ -239,14 +239,13 @@ abstract class TorConfigProvider {
             }
         }
 
-        val geoIpFile = GeoIpV4File()
+        val geoIpFile = GeoIPFile()
         val geoIpFilePath: Path? = clientConfig
             .settings
-            .filterIsInstance<GeoIpV4File>()
-            .firstOrNull()
+            .firstOrNull { it.keyword.toString() == TorConfig.KeyWord.GeoIPFile.toString() }
             ?.value
-            .let { path ->
-                path?.path ?: if (geoIpV4File?.value?.isNotEmpty() == true) geoIpV4File else null
+            .let { option ->
+                (option as? FileSystemFile)?.path ?: if (geoIpV4File?.value?.isNotEmpty() == true) geoIpV4File else null
             }
 
         if (geoIpFilePath != null) {
@@ -265,11 +264,10 @@ abstract class TorConfigProvider {
         val geoIp6File = GeoIpV6File()
         val geoIp6FilePath: Path? = clientConfig
             .settings
-            .filterIsInstance<GeoIpV6File>()
-            .firstOrNull()
+            .firstOrNull { it.keyword.toString() == TorConfig.KeyWord.GeoIPv6File.toString() }
             ?.value
-            .let { path ->
-                path?.path ?: if (geoIpV6File?.value?.isNotEmpty() == true) geoIpV6File else null
+            .let { option ->
+                (option as? FileSystemFile)?.path ?: if (geoIpV6File?.value?.isNotEmpty() == true) geoIpV6File else null
             }
 
         if (geoIp6FilePath != null) {

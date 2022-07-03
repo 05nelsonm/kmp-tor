@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-package io.matthewnelson.kmp.tor.helper
+package io.matthewnelson.kmp.tor.helpers
 
 import io.matthewnelson.kmp.tor.KmpTorLoaderJvm
 import io.matthewnelson.kmp.tor.PlatformInstaller

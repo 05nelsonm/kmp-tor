@@ -23,7 +23,7 @@ import io.matthewnelson.kmp.tor.controller.common.config.TorConfig.Setting.*
 import io.matthewnelson.kmp.tor.controller.common.control.usecase.TorControlInfoGet
 import io.matthewnelson.kmp.tor.controller.common.file.Path
 import io.matthewnelson.kmp.tor.controller.common.internal.PlatformUtil
-import io.matthewnelson.kmp.tor.helper.TorTestHelper
+import io.matthewnelson.kmp.tor.helpers.TorTestHelper
 import io.matthewnelson.kmp.tor.manager.common.event.TorManagerEvent
 import io.matthewnelson.kmp.tor.manager.common.exceptions.InterruptedException
 import io.matthewnelson.kmp.tor.manager.util.PortUtil
