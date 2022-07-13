@@ -13,27 +13,61 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-package io.matthewnelson.kmp.tor.controller.internal.util
+package io.matthewnelson.kmp.tor.controller.internal
 
+import io.matthewnelson.kmp.tor.common.address.ProxyAddress
 import io.matthewnelson.kmp.tor.controller.TorController
+import io.matthewnelson.kmp.tor.controller.common.exceptions.TorControllerException
 import io.matthewnelson.kmp.tor.controller.internal.controller.RealTorController
-import io.matthewnelson.kmp.tor.controller.internal.controller.getTorControllerDispatcher
 import io.matthewnelson.kmp.tor.controller.internal.io.ReaderWrapper
 import io.matthewnelson.kmp.tor.controller.internal.io.SocketWrapper
 import io.matthewnelson.kmp.tor.controller.internal.io.WriterWrapper
-import io.matthewnelson.kmp.tor.controller.realTorController
-import kotlin.jvm.Throws
-import kotlin.jvm.JvmSynthetic
 import kotlinx.coroutines.ExecutorCoroutineDispatcher
-import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.asCoroutineDispatcher
+import kotlinx.coroutines.withContext
 import java.io.IOException
+import java.net.InetSocketAddress
+import java.net.Proxy
 import java.net.Socket
 import java.net.SocketException
+import java.util.concurrent.Executors
 
-@JvmSynthetic
+@Suppress("nothing_to_inline")
+internal actual inline fun getTorControllerDispatcher(): ExecutorCoroutineDispatcher {
+    return Executors.newFixedThreadPool(2).asCoroutineDispatcher()
+}
+
+@Throws(TorControllerException::class)
+@Suppress("nothing_to_inline", "BlockingMethodInNonBlockingContext")
+internal suspend inline fun ProxyAddress.toTorController(): TorController {
+    val dispatchers = getTorControllerDispatcher()
+    val socket = Socket(Proxy.NO_PROXY)
+
+    try {
+        withContext(dispatchers) {
+            val address = InetSocketAddress(ipAddress, port.value)
+
+            socket.connect(address)
+        }
+
+        return socket.toTorController(dispatchers)
+    } catch (e: Exception) {
+        try {
+            socket.close()
+        } catch (_: Exception){}
+        try {
+            dispatchers.close()
+        } catch (_: Exception) {}
+
+        throw TorControllerException("Failed to open socket for $this", e)
+    }
+}
+
 @Suppress("nothing_to_inline")
 @Throws(IOException::class, SocketException::class)
-internal inline fun Socket.toTorController(dispatcher: ExecutorCoroutineDispatcher? = null): TorController {
+internal inline fun Socket.toTorController(
+    dispatcher: ExecutorCoroutineDispatcher? = null
+): TorController {
     try {
         if (!isConnected) {
             throw IOException("Socket.connect must be called before retrieving a new instance of TorController")
@@ -43,7 +77,6 @@ internal inline fun Socket.toTorController(dispatcher: ExecutorCoroutineDispatch
         val writerWrapper = WriterWrapper.wrap(getOutputStream().writer())
         val socketWrapper = SocketWrapper.wrap(this)
 
-        @OptIn(ExperimentalCoroutinesApi::class)
         return RealTorController(
             reader = readerWrapper,
             writer = writerWrapper,

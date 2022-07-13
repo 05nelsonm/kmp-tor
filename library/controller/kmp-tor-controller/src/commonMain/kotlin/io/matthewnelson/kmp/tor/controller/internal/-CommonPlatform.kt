@@ -13,14 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-package io.matthewnelson.kmp.tor.controller.internal.controller
+package io.matthewnelson.kmp.tor.controller.internal
 
-import kotlinx.coroutines.ExecutorCoroutineDispatcher
-import kotlinx.coroutines.asCoroutineDispatcher
-import java.util.concurrent.Executors
+import kotlinx.coroutines.CloseableCoroutineDispatcher
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 
-@JvmSynthetic
 @Suppress("nothing_to_inline")
-internal actual inline fun getTorControllerDispatcher(): ExecutorCoroutineDispatcher {
-    return Executors.newFixedThreadPool(2).asCoroutineDispatcher()
-}
+@OptIn(ExperimentalCoroutinesApi::class)
+internal expect inline fun getTorControllerDispatcher(): CloseableCoroutineDispatcher
