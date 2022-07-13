@@ -16,6 +16,7 @@
 package io.matthewnelson.kmp.tor.controller.internal.util
 
 import io.matthewnelson.kmp.tor.controller.TorController
+import io.matthewnelson.kmp.tor.controller.internal.controller.RealTorController
 import io.matthewnelson.kmp.tor.controller.internal.controller.getTorControllerDispatcher
 import io.matthewnelson.kmp.tor.controller.internal.io.ReaderWrapper
 import io.matthewnelson.kmp.tor.controller.internal.io.SocketWrapper
@@ -43,7 +44,7 @@ internal inline fun Socket.toTorController(dispatcher: ExecutorCoroutineDispatch
         val socketWrapper = SocketWrapper.wrap(this)
 
         @OptIn(ExperimentalCoroutinesApi::class)
-        return realTorController(
+        return RealTorController(
             reader = readerWrapper,
             writer = writerWrapper,
             socket = socketWrapper,

@@ -26,6 +26,7 @@ import io.matthewnelson.kmp.tor.controller.common.exceptions.TorControllerExcept
 import io.matthewnelson.kmp.tor.controller.common.file.Path
 import io.matthewnelson.kmp.tor.controller.common.internal.PlatformUtil
 import io.matthewnelson.kmp.tor.controller.common.internal.isUnixPath
+import io.matthewnelson.kmp.tor.controller.internal.controller.RealTorController
 import io.matthewnelson.kmp.tor.controller.internal.controller.getTorControllerDispatcher
 import io.matthewnelson.kmp.tor.controller.internal.util.toTorController
 import kotlinx.coroutines.withContext
@@ -38,7 +39,7 @@ import java.net.SocketException
  * asynchronous communication.
  *
  * Upon connecting, [TorController] will run continuously until
- * Tor has been shutdown.
+ * Tor has been shutdown or [disconnect] has been called.
  *
  * @see [newInstance]
  * @see [RealTorController]
