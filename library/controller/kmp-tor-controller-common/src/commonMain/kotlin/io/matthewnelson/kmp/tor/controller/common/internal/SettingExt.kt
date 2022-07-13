@@ -252,7 +252,6 @@ fun TorConfig.Setting<*>.appendTo(sb: StringBuilder, isWriteTorConfig: Boolean):
             sb.newLineIfTrue(isWriteTorConfig) {
                 // if false
                 quote()
-                this
             }
             return true
         }
@@ -283,27 +282,31 @@ fun Set<HiddenService.VirtualPort>.filterSupportedOnly(): Set<HiddenService.Virt
 }
 
 @Suppress("nothing_to_inline")
-private inline fun StringBuilder.quoteIfTrue(addQuote: Boolean) {
+private inline fun StringBuilder.quoteIfTrue(addQuote: Boolean): StringBuilder {
     if (addQuote) {
         quote()
     }
+
+    return this
 }
 
 @Suppress("nothing_to_inline")
-private inline fun StringBuilder.quote() {
-    append('"')
+private inline fun StringBuilder.quote(): StringBuilder {
+    return append('"')
 }
 
 @Suppress("nothing_to_inline")
-private inline fun StringBuilder.escapeIfTrue(addEscape: Boolean) {
+private inline fun StringBuilder.escapeIfTrue(addEscape: Boolean): StringBuilder {
     if (addEscape) {
         escape()
     }
+
+    return this
 }
 
 @Suppress("nothing_to_inline")
-private inline fun StringBuilder.escape() {
-    append('\\')
+private inline fun StringBuilder.escape(): StringBuilder {
+    return append('\\')
 }
 
 @Suppress("nothing_to_inline")

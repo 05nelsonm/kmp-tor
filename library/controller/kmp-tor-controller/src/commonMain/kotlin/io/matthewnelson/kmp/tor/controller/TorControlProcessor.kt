@@ -433,7 +433,7 @@ private class RealTorControlProcessor(
                         append(',')
                         append("unix:")
 
-                        // TODO: If path has a space in it, controller fails
+                        // NOTE: If path has a space in it, controller fails
                         //  as it cannot parse. There is no ability to quote
                         //  the unix:"/pa th/to/hs.sock" like usual...
                         //  .
