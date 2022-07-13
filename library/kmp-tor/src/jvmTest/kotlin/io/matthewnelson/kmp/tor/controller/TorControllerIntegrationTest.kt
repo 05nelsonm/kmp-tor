@@ -219,7 +219,10 @@ class TorControllerIntegrationTest: TorTestHelper() {
             maxStreams = TorConfig.Setting.HiddenService.MaxStreams(4)
         )
 
-        if (entryResult.isFailure && workDir.value.contains(' ')) {
+        if (
+            entryResult.toString().contains("Bad arguments to ADD_ONION: Cannot parse keyword argument(s)") &&
+            workDir.value.contains(' ')
+        ) {
             // https://gitlab.torproject.org/tpo/core/tor/-/issues/40633
             // Pass the test
         } else {
