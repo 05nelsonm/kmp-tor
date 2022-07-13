@@ -17,13 +17,14 @@ package io.matthewnelson.kmp.tor.manager.instance
 
 import io.matthewnelson.kmp.tor.controller.common.events.TorEvent
 import io.matthewnelson.kmp.tor.manager.*
+import io.matthewnelson.kmp.tor.manager.internal.RealTorManager
 import io.matthewnelson.kmp.tor.manager.internal.util.synchronous.SynchronizedMutableMap
 import kotlinx.coroutines.sync.Mutex
 import kotlin.jvm.JvmStatic
 import kotlin.jvm.JvmSynthetic
 
 /**
- * Enables multi-instance operations of Tor by managing locks used by [realTorManager].
+ * Enables multi-instance operations of Tor by managing locks used by [RealTorManager].
  *
  * When using multiple instances, you must ensure that [TorConfigProvider] directory
  * and file paths are unique to the given instance. If Tor is sharing directories between
@@ -66,7 +67,7 @@ object TorMultiInstanceManager {
             }
         }
 
-        return realTorManager(
+        return RealTorManager(
             loader = loader,
             instanceId = instanceId.value,
             processorLock = instanceLock,

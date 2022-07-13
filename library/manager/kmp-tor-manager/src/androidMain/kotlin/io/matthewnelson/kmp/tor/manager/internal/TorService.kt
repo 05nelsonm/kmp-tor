@@ -160,7 +160,7 @@ internal class TorService: Service() {
 
         fun getOrCreate(loader: KmpTorLoader): TorManager =
             instance ?: synchronized(this) {
-                instance ?: realTorManager(
+                instance ?: RealTorManager(
                     loader,
                     instanceId = TorServiceController.DEFAULT_INSTANCE_ID,
                     processorLock = processorLock,
