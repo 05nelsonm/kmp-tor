@@ -17,9 +17,7 @@ package io.matthewnelson.kmp.tor.manager.internal.ext
 
 import io.matthewnelson.kmp.tor.controller.common.file.Path
 import io.matthewnelson.kmp.tor.manager.common.event.TorManagerEvent.*
-import kotlin.jvm.JvmSynthetic
 
-@JvmSynthetic
 @Suppress("nothing_to_inline")
 internal inline fun AddressInfo.dnsOpened(value: String): AddressInfo? {
     val mDns = dns?.toMutableSet() ?: return copy(dns = setOf(value))
@@ -31,7 +29,6 @@ internal inline fun AddressInfo.dnsOpened(value: String): AddressInfo? {
     }
 }
 
-@JvmSynthetic
 @Suppress("nothing_to_inline")
 internal inline fun AddressInfo.dnsClosed(value: String): AddressInfo? {
     val mDns = dns?.toMutableSet() ?: return null
@@ -47,7 +44,6 @@ internal inline fun AddressInfo.dnsClosed(value: String): AddressInfo? {
     }
 }
 
-@JvmSynthetic
 @Suppress("nothing_to_inline")
 internal inline fun AddressInfo.httpOpened(value: String): AddressInfo? {
     val mHttp = http?.toMutableSet() ?: return copy(http = setOf(value))
@@ -59,7 +55,6 @@ internal inline fun AddressInfo.httpOpened(value: String): AddressInfo? {
     }
 }
 
-@JvmSynthetic
 @Suppress("nothing_to_inline")
 internal inline fun AddressInfo.httpClosed(value: String): AddressInfo? {
     val mHttp = http?.toMutableSet() ?: return null
@@ -75,7 +70,6 @@ internal inline fun AddressInfo.httpClosed(value: String): AddressInfo? {
     }
 }
 
-@JvmSynthetic
 @Suppress("nothing_to_inline")
 internal inline fun AddressInfo.socksOpened(value: String): AddressInfo? {
     val mSocks = socks?.toMutableSet() ?: return copy(socks = setOf(value))
@@ -87,7 +81,6 @@ internal inline fun AddressInfo.socksOpened(value: String): AddressInfo? {
     }
 }
 
-@JvmSynthetic
 @Suppress("nothing_to_inline")
 internal inline fun AddressInfo.socksClosed(value: String): AddressInfo? {
     val mSocks = socks?.toMutableSet() ?: return null
@@ -103,7 +96,6 @@ internal inline fun AddressInfo.socksClosed(value: String): AddressInfo? {
     }
 }
 
-@JvmSynthetic
 @Suppress("nothing_to_inline")
 internal inline fun AddressInfo.unixSocksOpened(value: String): AddressInfo? {
     val path = Path(value)
@@ -116,7 +108,6 @@ internal inline fun AddressInfo.unixSocksOpened(value: String): AddressInfo? {
     }
 }
 
-@JvmSynthetic
 @Suppress("nothing_to_inline")
 internal inline fun AddressInfo.unixSocksClosed(value: String): AddressInfo? {
     val mUnixSocks = unixSocks?.toMutableSet() ?: return null
@@ -139,9 +130,6 @@ internal inline fun AddressInfo.unixSocksClosed(value: String): AddressInfo? {
     }
 }
 
-
-
-@JvmSynthetic
 @Suppress("nothing_to_inline")
 internal inline fun AddressInfo.transOpened(value: String): AddressInfo? {
     val mTrans = trans?.toMutableSet() ?: return copy(trans = setOf(value))
@@ -153,7 +141,6 @@ internal inline fun AddressInfo.transOpened(value: String): AddressInfo? {
     }
 }
 
-@JvmSynthetic
 @Suppress("nothing_to_inline")
 internal inline fun AddressInfo.transClosed(value: String): AddressInfo? {
     val mTrans = trans?.toMutableSet() ?: return null
@@ -169,7 +156,6 @@ internal inline fun AddressInfo.transClosed(value: String): AddressInfo? {
     }
 }
 
-@JvmSynthetic
 @Suppress("nothing_to_inline")
 internal inline fun AddressInfo.onStateChange(old: State, new: State): AddressInfo? {
     // Tor went from On, to something else

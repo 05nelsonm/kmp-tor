@@ -23,7 +23,6 @@ import android.os.Build
 @JvmInline
 internal value class ColorRes(val id: Int)
 
-@JvmSynthetic
 @Suppress("deprecation", "nothing_to_inline")
 @Throws(Resources.NotFoundException::class)
 internal inline fun ColorRes.retrieve(context: Context): Int {
@@ -37,7 +36,6 @@ internal inline fun ColorRes.retrieve(context: Context): Int {
 @JvmInline
 internal value class DrawableRes(val id: Int)
 
-@JvmSynthetic
 @Suppress("deprecation", "nothing_to_inline")
 @Throws(Resources.NotFoundException::class)
 internal inline fun DrawableRes.retrieve(context: Context): Drawable? {

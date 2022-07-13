@@ -27,7 +27,7 @@ internal data class NotificationState(
     val smallIcon: DrawableRes
 ) {
 
-    fun diff(
+    internal fun diff(
         old: NotificationState,
         setColor: (ColorRes) -> Unit,
         setContentText: (String) -> Unit,
@@ -52,7 +52,7 @@ internal data class NotificationState(
         }
     }
 
-    fun isActionRefreshNeeded(old: List<Action>): Boolean {
+    internal fun isActionRefreshNeeded(old: List<Action>): Boolean {
         return old.size != actions.size
     }
 
@@ -62,7 +62,7 @@ internal data class NotificationState(
         StopTor(3);
     }
 
-    sealed interface Progress {
+    internal sealed interface Progress {
         @JvmInline
         value class Determinant(val value: Int): Progress
         object Indeterminate: Progress

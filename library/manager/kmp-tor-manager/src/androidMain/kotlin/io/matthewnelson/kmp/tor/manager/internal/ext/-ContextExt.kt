@@ -13,7 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-package io.matthewnelson.kmp.tor.manager.internal.util
+package io.matthewnelson.kmp.tor.manager.internal.ext
 
-@JvmSynthetic
-internal actual fun realTorManagerInstanceDestroyed(instanceId: String) { /* no-op */ }
+import android.content.Context
+import android.content.pm.PackageManager.PERMISSION_GRANTED
+import android.os.Process
+
+@Suppress("nothing_to_inline")
+internal inline fun Context.isPermissionGranted(permission: String): Boolean {
+    return checkPermission(permission, Process.myPid(), Process.myUid()) == PERMISSION_GRANTED
+}

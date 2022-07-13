@@ -58,7 +58,6 @@ internal abstract class TorServiceNotification(
 
     private val actionsEmpty: List<Action> = emptyList()
     private val actionsNewId: List<Action> = listOf(Action.NewIdentity)
-    @OptIn(ExperimentalStdlibApi::class)
     private val actionsAll: List<Action> = buildList {
         add(Action.NewIdentity)
         if (config.enableRestartAction) {
@@ -116,8 +115,8 @@ internal abstract class TorServiceNotification(
     }
 
     private var messageJob: Job? = null
-    @JvmSynthetic
-    fun postMessage(message: String, millis: Long = 3_500) {
+
+    internal fun postMessage(message: String, millis: Long = 3_500) {
         messageJob?.cancel()
         messageJob = serviceScope.launch {
             render(currentState.copy(contentText = message))
@@ -131,8 +130,8 @@ internal abstract class TorServiceNotification(
 
     var isError: Boolean = false
         private set
-    @JvmSynthetic
-    fun postError(t: Throwable) {
+
+    internal fun postError(t: Throwable) {
         render(currentState.copy(
             actions = actionsEmpty,
             contentText = "${t::class.simpleName}(${t.message})",
@@ -142,8 +141,7 @@ internal abstract class TorServiceNotification(
         isError = true
     }
 
-    @JvmSynthetic
-    open fun stoppingService() {
+    internal open fun stoppingService() {
         messageJob?.cancel()
         render(NotificationState(
             actions = actionsEmpty,
@@ -362,8 +360,7 @@ internal abstract class TorServiceNotification(
     override fun onEvent(event: TorEvent.Type.MultiLineEvent, output: List<String>) {}
 
     companion object {
-        @JvmSynthetic
-        fun newInstance(
+        internal fun newInstance(
             config: TorServiceConfig,
             service: TorService,
             serviceScope: CoroutineScope,

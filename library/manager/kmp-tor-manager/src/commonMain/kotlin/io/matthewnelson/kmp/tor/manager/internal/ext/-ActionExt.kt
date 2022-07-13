@@ -21,7 +21,6 @@ import io.matthewnelson.kmp.tor.manager.internal.actions.ActionProcessor
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlin.jvm.JvmSynthetic
 
-@JvmSynthetic
 internal inline fun Action.catchInterrupt(crossinline block: (Throwable) -> Unit) =
     CoroutineExceptionHandler { _, throwable ->
         val thrown = throwable.cause?.let { cause ->

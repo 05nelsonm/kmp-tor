@@ -23,7 +23,7 @@ interface Destroyable {
 
     /**
      * Destroys the instance rendering it unusable. In [TorManager]'s case,
-     * it stops Tor, removes all listeners, cancels it's scope, shuts down
+     * it stops Tor, removes all listeners, cancels its scope, shuts down
      * threads, etc.
      *
      * Tf [stopCleanly] is true, [RealTorManager.destroy] launches a coroutine

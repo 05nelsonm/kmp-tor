@@ -136,7 +136,8 @@ internal class RealTorManager(
         loader
     }
 
-    private val actions: ActionProcessor = ActionProcessor.newInstance(processorLock)
+    private val actions: ActionProcessor =
+        ActionProcessor(processorLock)
     private val controllerInstance: AtomicRef<ControllerHolder?> = atomic(null)
 
     // State should be dispatched immediately. as such, only update state machine

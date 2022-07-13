@@ -35,7 +35,7 @@ class ActionQueueUnitTest {
 
     private val lock = Mutex()
     private var lockCount = 0
-    private val queue = ActionQueue.newInstance() // RealActionQueue
+    private val queue = ActionQueue() // RealActionQueue
     private var dispatcher: CoroutineDispatcher? = null
 
     @Before

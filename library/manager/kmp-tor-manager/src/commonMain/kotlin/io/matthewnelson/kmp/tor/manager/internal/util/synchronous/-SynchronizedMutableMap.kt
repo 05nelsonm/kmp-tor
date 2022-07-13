@@ -13,9 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-package io.matthewnelson.kmp.tor.manager.internal.util
+package io.matthewnelson.kmp.tor.manager.internal.util.synchronous
 
-import kotlin.jvm.JvmSynthetic
+import kotlinx.atomicfu.locks.SynchronizedObject
+import kotlinx.atomicfu.locks.synchronized
 
-@JvmSynthetic
-internal expect fun realTorManagerInstanceDestroyed(instanceId: String)
+internal class SynchronizedMutableMap<T: Any>(initialCapacity: Int = 1): SynchronizedObject() {
+
+    private val map: MutableMap<String, T> = LinkedHashMap(initialCapacity)
+
+    internal fun <V: Any?> withLock(block: MutableMap<String, T>.() -> V): V {
+        return synchronized(this) {
+            block.invoke(map)
+        }
+    }
+}

@@ -85,8 +85,7 @@ internal class TorService: Service() {
         private val requiredEvents: MutableSet<TorEvent> = mutableSetOf()
         private val processorLock = Mutex()
 
-        @JvmSynthetic
-        fun addEvents(events: Set<TorEvent>?) {
+        internal fun addEvents(events: Set<TorEvent>?) {
             if (events != null) {
                 synchronized(this) {
                     requiredEvents.addAll(events)
@@ -94,8 +93,7 @@ internal class TorService: Service() {
             }
         }
 
-        @JvmSynthetic
-        fun destroy(context: Context, hashCode: Int) {
+        internal fun destroy(context: Context, hashCode: Int) {
             synchronized(this) {
                 requiredEvents.clear()
                 if (TorServiceConfig.getMetaData(context).enableForeground) {
@@ -113,7 +111,6 @@ internal class TorService: Service() {
                 requiredEvents.toSet()
             }
 
-        @JvmSynthetic
         internal fun init(application: Application, startTor: Pair<Int, () -> Unit>) {
             synchronized(this) {
                 if (this.application == null) {
@@ -181,11 +178,9 @@ internal class TorService: Service() {
         TorStateManager,
         TorEventProcessor<TorManagerEvent.SealedListener>
     {
-        @JvmSynthetic
-        fun manager(loader: KmpTorLoader): TorManager = managerHolder.getOrCreate(loader)
+        internal fun manager(loader: KmpTorLoader): TorManager = managerHolder.getOrCreate(loader)
 
-        @JvmSynthetic
-        suspend fun start(loader: KmpTorLoader): Result<Any?> {
+        internal suspend fun start(loader: KmpTorLoader): Result<Any?> {
             val manager = managerHolder.getOrCreate(loader)
             val result = manager.start()
             if (result.isSuccess) {
@@ -208,40 +203,32 @@ internal class TorService: Service() {
             return result
         }
 
-        @JvmSynthetic
-        suspend fun restart(loader: KmpTorLoader): Result<Any?> {
+        internal suspend fun restart(loader: KmpTorLoader): Result<Any?> {
             val manager = managerHolder.getOrCreate(loader)
             return restart(manager)
         }
 
-        @JvmSynthetic
-        fun stop(): Result<Any?> {
+        internal fun stop(): Result<Any?> {
             stopService(setLastAction = true)
             return Result.success("TorService stopped")
         }
 
-        @JvmSynthetic
         override fun addListener(listener: TorManagerEvent.SealedListener): Boolean {
             return managerHolder.instance?.addListener(listener) ?: false
         }
 
-        @JvmSynthetic
         override fun removeListener(listener: TorManagerEvent.SealedListener): Boolean {
             return managerHolder.instance?.removeListener(listener) ?: true
         }
 
-        @JvmSynthetic
         fun debug(enable: Boolean) {
             managerHolder.instance?.debug(enable)
         }
 
-        @get:JvmSynthetic
         override val state: TorState
             get() = managerHolder.instance?.state ?: TorState.Off
-        @get:JvmSynthetic
         override val networkState: TorNetworkState
             get() = managerHolder.instance?.networkState ?: TorNetworkState.Disabled
-        @get:JvmSynthetic
         override val addressInfo: TorManagerEvent.AddressInfo
             get() = managerHolder.instance?.addressInfo ?: TorManagerEvent.AddressInfo.NULL_VALUES
     }

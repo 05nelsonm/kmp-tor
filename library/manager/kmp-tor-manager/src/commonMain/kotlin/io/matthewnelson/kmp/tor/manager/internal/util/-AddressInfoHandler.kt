@@ -27,7 +27,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import kotlin.jvm.JvmSynthetic
 
 internal class AddressInfoHandler(
     private val torManagerScope: CoroutineScope,
@@ -36,12 +35,10 @@ internal class AddressInfoHandler(
 ) {
 
     private val _addressInfo: AtomicRef<AddressInfo> = atomic(AddressInfo.NULL_VALUES)
-    @get:JvmSynthetic
     internal val addressInfo: AddressInfo get() = _addressInfo.value
 
     private val addressInfoJob: AtomicRef<Job?> = atomic(null)
 
-    @JvmSynthetic
     internal fun onStateChange(old: State, new: State) {
         _addressInfo.update { info ->
             info.onStateChange(old, new)?.let { newInfo ->
@@ -52,7 +49,6 @@ internal class AddressInfoHandler(
         }
     }
 
-    @JvmSynthetic
     internal fun dispatchNewAddressInfo(addressInfo: AddressInfo) {
         _addressInfo.update { addressInfo }
 

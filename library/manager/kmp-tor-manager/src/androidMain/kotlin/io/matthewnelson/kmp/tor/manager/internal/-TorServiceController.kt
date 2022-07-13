@@ -40,8 +40,7 @@ internal object TorServiceController:
     @Suppress("ObjectPropertyName")
     private var _binderState: BinderState? = null
 
-    @get:JvmSynthetic
-    val binderState: BinderState? get() = _binderState
+    internal val binderState: BinderState? get() = _binderState
 
     private fun clear() {
         _binderState = null
@@ -59,9 +58,8 @@ internal object TorServiceController:
         clear()
     }
 
-    @JvmSynthetic
     @Throws(RuntimeException::class)
-    fun startService(context: Context) {
+    internal fun startService(context: Context) {
         val intent = Intent(context.applicationContext, TorService::class.java)
 
         if (
@@ -77,8 +75,7 @@ internal object TorServiceController:
         bindService(context, intent)
     }
 
-    @JvmSynthetic
-    fun bindService(context: Context, intent: Intent) {
+    private fun bindService(context: Context, intent: Intent) {
         context.applicationContext.bindService(
             intent,
             this,
@@ -86,8 +83,7 @@ internal object TorServiceController:
         )
     }
 
-    @JvmSynthetic
-    fun unbindService(service: TorService) {
+    internal fun unbindService(service: TorService) {
         clear()
         try {
             unbindService(service.applicationContext)
@@ -95,7 +91,6 @@ internal object TorServiceController:
         } catch (_: IllegalArgumentException) {}
     }
 
-    @JvmSynthetic
     @Throws(IllegalArgumentException::class)
     fun unbindService(context: Context) {
         context.applicationContext.unbindService(this)
@@ -103,8 +98,7 @@ internal object TorServiceController:
 
     private val listeners: ListenersHandler = ListenersHandler.newInstance() {}
 
-    @JvmSynthetic
-    fun prepNewTorManagerInstance(manager: TorManager) {
+    internal fun prepNewTorManagerInstance(manager: TorManager) {
         listeners.withLock {
             for (listener in this) {
                 manager.addListener(listener as TorManagerEvent.SealedListener)
@@ -113,8 +107,7 @@ internal object TorServiceController:
         manager.debug(debug)
     }
 
-    @JvmSynthetic
-    fun clearLocalListeners(event: TorManagerEvent) {
+    internal fun clearLocalListeners(event: TorManagerEvent) {
         listeners.withLock {
             for (listener in this) {
                 try {
@@ -125,8 +118,7 @@ internal object TorServiceController:
         }
     }
 
-    @JvmSynthetic
-    fun notify(event: TorManagerEvent) {
+    internal fun notify(event: TorManagerEvent) {
         if (event is TorManagerEvent.Log.Debug && !debug) return
 
         listeners.withLock {
@@ -161,7 +153,7 @@ internal object TorServiceController:
     @Volatile
     private var debug: Boolean = false
 
-    fun debug(enable: Boolean) {
+    internal fun debug(enable: Boolean) {
         debug = enable
         binderState?.let {
             if (it is BinderState.Bound) {
@@ -175,7 +167,6 @@ internal sealed interface BinderState {
     object Starting: BinderState
     @JvmInline
     value class Bound(private val binder: TorService.TorServiceBinder): BinderState {
-        @JvmSynthetic
-        fun binder(): TorService.TorServiceBinder = binder
+        internal fun binder(): TorService.TorServiceBinder = binder
     }
 }

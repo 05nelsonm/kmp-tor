@@ -15,23 +15,18 @@
  **/
 package io.matthewnelson.kmp.tor.manager.internal.ext
 
-import io.matthewnelson.kmp.tor.common.annotation.InternalTorApi
-import kotlin.jvm.JvmSynthetic
-
 // NOTICE BOOTSTRAP PROGRESS=100 TAG=<some tag> SUMMARY="<some summary>"
-@InternalTorApi
 @Suppress("nothing_to_inline")
 @Throws(IndexOutOfBoundsException::class, NumberFormatException::class)
-inline fun String.infoGetBootstrapProgress(): Int =
+internal inline fun String.infoGetBootstrapProgress(): Int =
     split(' ')
     .elementAt(2)
     .split('=')
     .elementAt(1)
     .toInt()
 
-@InternalTorApi
 @Suppress("nothing_to_inline")
-inline fun String.infoGetBootstrapProgressOrNull(): Int? =
+internal inline fun String.infoGetBootstrapProgressOrNull(): Int? =
     try {
         infoGetBootstrapProgress()
     } catch (_: Exception) {
@@ -39,18 +34,16 @@ inline fun String.infoGetBootstrapProgressOrNull(): Int? =
     }
 
 // Bootstrapped 10% (conn_done): Connected to a relay
-@InternalTorApi
 @Suppress("nothing_to_inline")
 @Throws(IndexOutOfBoundsException::class, NumberFormatException::class)
-inline fun String.eventNoticeBootstrapProgress(): Int =
+internal inline fun String.eventNoticeBootstrapProgress(): Int =
     split(' ')
     .elementAt(1)
     .dropLast(1)
     .toInt()
 
-@InternalTorApi
 @Suppress("nothing_to_inline")
-inline fun String.eventNoticeBootstrapProgressOrNull(): Int? =
+internal inline fun String.eventNoticeBootstrapProgressOrNull(): Int? =
     try {
         eventNoticeBootstrapProgress()
     } catch (_: Exception) {

@@ -13,13 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-package io.matthewnelson.kmp.tor.manager.internal.util
+package io.matthewnelson.kmp.tor.manager.internal.util.synchronous
 
-import io.matthewnelson.kmp.tor.manager.instance.InstanceId
-import io.matthewnelson.kmp.tor.manager.instance.TorMultiInstanceManager
-import kotlin.jvm.JvmSynthetic
+import kotlinx.atomicfu.locks.SynchronizedObject
+import kotlinx.atomicfu.locks.synchronized
 
-@JvmSynthetic
-internal actual fun realTorManagerInstanceDestroyed(instanceId: String) {
-    TorMultiInstanceManager.removeLockForInstanceId(InstanceId(instanceId))
+internal class SynchronizedMutableSet<T: Any?>(initialCapacity: Int = 1): SynchronizedObject() {
+
+    private val set: MutableSet<T> = LinkedHashSet(initialCapacity)
+
+    internal fun <V: Any?> withLock(block: MutableSet<T>.() -> V): V {
+        return synchronized(this) {
+            block.invoke(set)
+        }
+    }
 }

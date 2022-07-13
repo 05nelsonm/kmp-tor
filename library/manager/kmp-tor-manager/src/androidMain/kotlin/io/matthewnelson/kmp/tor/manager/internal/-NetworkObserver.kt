@@ -30,7 +30,6 @@ import io.matthewnelson.kmp.tor.manager.internal.ext.isPermissionGranted
 import java.math.BigInteger
 import java.security.SecureRandom
 
-@JvmSynthetic
 internal fun networkObserverOrNull(service: TorService): NetworkObserver? {
     val manager = service.getSystemService(Context.CONNECTIVITY_SERVICE) as? ConnectivityManager
         ?: return null

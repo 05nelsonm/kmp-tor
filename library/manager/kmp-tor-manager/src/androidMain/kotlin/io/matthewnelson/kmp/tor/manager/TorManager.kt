@@ -36,6 +36,7 @@ import io.matthewnelson.kmp.tor.manager.common.state.TorState
 import io.matthewnelson.kmp.tor.manager.common.state.TorStateManager
 import io.matthewnelson.kmp.tor.manager.internal.BaseTorManager
 import io.matthewnelson.kmp.tor.manager.internal.BinderState
+import io.matthewnelson.kmp.tor.manager.internal.RealTorManager
 import io.matthewnelson.kmp.tor.manager.internal.TorService
 import io.matthewnelson.kmp.tor.manager.internal.TorServiceController
 import io.matthewnelson.kmp.tor.manager.internal.actions.ActionProcessor
@@ -176,7 +177,7 @@ private class RealTorManagerAndroid(
 
     private val actions: ActionProcessor by lazy {
         TorServiceController.notify(TorManagerEvent.Lifecycle(this, ON_CREATE))
-        ActionProcessor.newInstance()
+        ActionProcessor()
     }
 
     override fun destroy(stopCleanly: Boolean, onCompletion: (() -> Unit)?) {
@@ -255,7 +256,7 @@ private class RealTorManagerAndroid(
 
                 val localResult: Result<Any?>
 
-                var timeout: Long = 0L
+                var timeout = 0L
                 while (true) {
                     when (val binder = TorServiceController.binderState) {
                         null -> {
@@ -315,7 +316,7 @@ private class RealTorManagerAndroid(
 
         var result: Result<Any?>? = null
 
-        var timeout: Long = 0L
+        var timeout = 0L
         while (currentCoroutineContext().isActive) {
             when (val state = TorServiceController.binderState) {
                 null -> {
@@ -381,7 +382,7 @@ private class RealTorManagerAndroid(
 
         val result: Result<Any?>
 
-        var timeout: Long = 0L
+        var timeout = 0L
         while (true) {
             when (val state = TorServiceController.binderState) {
                 null -> {

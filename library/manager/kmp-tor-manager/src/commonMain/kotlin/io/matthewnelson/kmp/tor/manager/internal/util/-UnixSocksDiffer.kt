@@ -27,7 +27,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import kotlin.jvm.JvmSynthetic
 
 /**
  * This helper class handles managing of closing/opening of unix SocksPort
@@ -48,12 +47,14 @@ import kotlin.jvm.JvmSynthetic
  * This just keeps track of what was opened, what was confirmed
  * via the config change, and then removes the unconfirmed.
  * */
-internal class UnixSocksDiffer(private val torManagerScope: CoroutineScope, private val handler: AddressInfoHandler) {
+internal class UnixSocksDiffer(
+    private val torManagerScope: CoroutineScope,
+    private val handler: AddressInfoHandler
+) {
 
     private val pathsToKeep = SynchronizedMutableSet<Path>()
     private val closingJob: AtomicRef<Job?> = atomic(null)
 
-    @JvmSynthetic
     internal fun onOpened(address: String) {
         pathsToKeep.withLock {
             handler.addressInfo.unixSocksOpened(address)?.let { info ->
@@ -62,7 +63,6 @@ internal class UnixSocksDiffer(private val torManagerScope: CoroutineScope, priv
         }
     }
 
-    @JvmSynthetic
     internal fun onClosed() {
         closingJob.update { job ->
             job?.cancel()
@@ -91,7 +91,6 @@ internal class UnixSocksDiffer(private val torManagerScope: CoroutineScope, priv
         }
     }
 
-    @JvmSynthetic
     internal fun onConfChanged(output: String) {
         // SocksPort=unix:"/tmp/junit15600960770888728454/tor service/data/socks_test_set.sock" CacheDNS OnionTrafficOnly IsolateSOCKSAuth
         // __SocksPort=unix:"/tmp/junit15600960770888728454/tor service/data/socks_test_set.sock" CacheDNS OnionTrafficOnly IsolateSOCKSAuth

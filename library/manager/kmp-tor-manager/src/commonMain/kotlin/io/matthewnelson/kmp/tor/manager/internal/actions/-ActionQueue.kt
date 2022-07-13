@@ -20,30 +20,19 @@ import io.matthewnelson.kmp.tor.manager.internal.actions.ActionProcessor.Compani
 import kotlinx.coroutines.*
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
-import kotlin.jvm.JvmSynthetic
 
 internal sealed interface ActionQueue {
-    @JvmSynthetic
     suspend fun add(holder: ActionHolder): Boolean
-    @JvmSynthetic
     suspend fun clear(interruptingAction: Action)
-    @JvmSynthetic
     suspend fun contains(holder: ActionHolder): Boolean
-    @JvmSynthetic
     suspend fun contains(job: Job): Boolean
-    @JvmSynthetic
     suspend fun contains(action: Action): Boolean
-    @JvmSynthetic
     suspend fun isEmpty(): Boolean
-    @JvmSynthetic
     suspend fun removeByAction(action: Action, cancelJobMessage: String): Boolean
-    @JvmSynthetic
     suspend fun removeByHolder(holder: ActionHolder): Boolean
-    @JvmSynthetic
     suspend fun <T> withQueueLock(block: suspend () -> T): T
 
     companion object {
-        @JvmSynthetic
         internal fun newInstance(): ActionQueue =
             RealActionQueue()
     }

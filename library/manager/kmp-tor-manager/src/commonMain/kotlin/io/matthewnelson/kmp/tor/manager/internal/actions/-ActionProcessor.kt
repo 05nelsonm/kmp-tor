@@ -22,29 +22,23 @@ import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.job
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
-import kotlin.jvm.JvmSynthetic
 
-internal sealed interface ActionProcessor {
-    @JvmSynthetic
-    suspend fun <T> withProcessorLock(action: Action, block: suspend () -> Result<T>): Result<T>
+internal class ActionProcessor private constructor(
+    processorLock: Mutex?,
+    delegate: ActionQueue
+): ActionQueue by delegate {
 
     companion object {
         const val INTERRUPT_MESSAGE = "Interrupted by "
 
-        @JvmSynthetic
-        internal fun newInstance(processorLock: Mutex? = null): ActionProcessor =
-            RealActionProcessor(processorLock, ActionQueue.newInstance())
+        internal operator fun invoke(processorLock: Mutex? = null): ActionProcessor {
+            return ActionProcessor(processorLock, ActionQueue.newInstance())
+        }
     }
-}
-
-private class RealActionProcessor(
-    processorLock: Mutex?,
-    delegate: ActionQueue
-): ActionProcessor, ActionQueue by delegate {
 
     private val lockProcessor: Mutex = processorLock ?: Mutex()
 
-    override suspend fun <T> withProcessorLock(
+    internal suspend fun <T> withProcessorLock(
         action: Action, block: suspend () -> Result<T>
     ): Result<T> {
         val holder = ActionHolder(action, currentCoroutineContext().job)
