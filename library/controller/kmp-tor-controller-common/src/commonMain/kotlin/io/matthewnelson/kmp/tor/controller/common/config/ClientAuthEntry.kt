@@ -76,8 +76,8 @@ class ClientAuthEntry(
 
     @OptIn(InternalTorApi::class)
     override fun toString(): String {
-        return "ClientAuthEntry(address=$REDACTED,keyType=$keyType," +
-                "privateKey=$REDACTED,clientName=$clientName," +
+        return "ClientAuthEntry(address=$REDACTED, keyType=$keyType, " +
+                "privateKey=$REDACTED, clientName=$clientName, " +
                 "flags=${flags?.joinToString()})"
     }
 }

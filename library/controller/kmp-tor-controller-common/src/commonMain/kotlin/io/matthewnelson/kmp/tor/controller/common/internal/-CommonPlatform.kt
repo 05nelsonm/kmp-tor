@@ -15,7 +15,4 @@
  **/
 package io.matthewnelson.kmp.tor.controller.common.internal
 
-import kotlin.jvm.JvmSynthetic
-
-@JvmSynthetic
 internal expect fun fsSeparator(): Char

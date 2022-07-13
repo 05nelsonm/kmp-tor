@@ -17,5 +17,4 @@ package io.matthewnelson.kmp.tor.controller.common.internal
 
 import java.io.File
 
-@JvmSynthetic
 internal actual fun fsSeparator(): Char = File.separatorChar
