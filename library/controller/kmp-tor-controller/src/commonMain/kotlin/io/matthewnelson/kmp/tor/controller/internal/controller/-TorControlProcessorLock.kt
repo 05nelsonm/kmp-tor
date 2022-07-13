@@ -20,7 +20,6 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
-import kotlin.jvm.JvmSynthetic
 
 internal class TorControlProcessorLock(
     private val dispatcher: CoroutineDispatcher,
@@ -29,7 +28,6 @@ internal class TorControlProcessorLock(
 
     private val lock = Mutex()
 
-    @JvmSynthetic
     internal suspend fun <T: Any?> withContextAndLock(block: suspend () -> Result<T>): Result<T> {
         if (!isConnected.invoke()) {
             return Result.failure(ControllerShutdownException("Tor has stopped and a new connection is required"))
