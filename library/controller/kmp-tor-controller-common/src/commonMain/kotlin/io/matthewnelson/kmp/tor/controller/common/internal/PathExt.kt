@@ -20,3 +20,14 @@ import io.matthewnelson.kmp.tor.controller.common.file.Path
 
 @InternalTorApi
 inline val Path.isUnixPath: Boolean get() = value.firstOrNull() == '/'
+
+@InternalTorApi
+@Suppress("nothing_to_inline")
+inline fun Path.writeEscapedIfTrue(ifTrue: Boolean): Path {
+    return if (ifTrue && Path.fsSeparator == '\\') {
+        val escapedPath = value.replace("\\", "\\\\")
+        Path(escapedPath)
+    } else {
+        this
+    }
+}

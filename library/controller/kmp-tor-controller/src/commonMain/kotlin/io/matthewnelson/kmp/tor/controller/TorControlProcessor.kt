@@ -36,14 +36,15 @@ import io.matthewnelson.kmp.tor.common.util.TorStrings.CLRF
 import io.matthewnelson.kmp.tor.common.util.TorStrings.MULTI_LINE_END
 import io.matthewnelson.kmp.tor.common.util.TorStrings.SP
 import io.matthewnelson.kmp.tor.controller.common.config.HiddenServiceEntry
+import io.matthewnelson.kmp.tor.controller.common.file.Path
 import io.matthewnelson.kmp.tor.controller.common.internal.PlatformUtil
 import io.matthewnelson.kmp.tor.controller.common.internal.appendTo
+import io.matthewnelson.kmp.tor.controller.common.internal.filterSupportedOnly
+import io.matthewnelson.kmp.tor.controller.common.internal.writeEscapedIfTrue
 import io.matthewnelson.kmp.tor.controller.internal.controller.ControlPortInteractor
 import io.matthewnelson.kmp.tor.controller.internal.controller.TorControlProcessorLock
 import io.matthewnelson.kmp.tor.controller.internal.controller.ReplyLine
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.withContext
 import kotlin.jvm.JvmSynthetic
 
 /**
@@ -352,11 +353,15 @@ private class RealTorControlProcessor(
 
     override suspend fun onionAdd(
         privateKey: OnionAddress.PrivateKey,
-        hsPorts: Set<TorConfig.Setting.HiddenService.Ports>,
+        hsPorts: Set<TorConfig.Setting.HiddenService.VirtualPort>,
         flags: Set<TorControlOnionAdd.Flag>?,
         maxStreams: TorConfig.Setting.HiddenService.MaxStreams?
     ): Result<HiddenServiceEntry> {
         return processorLock.withContextAndLock {
+            val filtered = hsPorts.filterSupportedOnly() ?: throw TorControllerException(
+                "Invalid HiddenService.VirtualPort(s) provided: $hsPorts"
+            )
+
             val sb = StringBuilder("ADD_ONION").apply {
                 append(SP)
                 append(privateKey.keyType)
@@ -364,17 +369,21 @@ private class RealTorControlProcessor(
                 append(privateKey.value)
             }
 
-            onionAdd(sb, hsPorts, flags, maxStreams, privateKey)
+            onionAdd(sb, filtered, flags, maxStreams, privateKey)
         }
     }
 
     override suspend fun onionAddNew(
         type: OnionAddress.PrivateKey.Type,
-        hsPorts: Set<TorConfig.Setting.HiddenService.Ports>,
+        hsPorts: Set<TorConfig.Setting.HiddenService.VirtualPort>,
         flags: Set<TorControlOnionAdd.Flag>?,
         maxStreams: TorConfig.Setting.HiddenService.MaxStreams?
     ): Result<HiddenServiceEntry> {
         return processorLock.withContextAndLock {
+            val filtered = hsPorts.filterSupportedOnly() ?: throw TorControllerException(
+                "Invalid HiddenService.VirtualPort(s) provided: $hsPorts"
+            )
+
             val sb = StringBuilder("ADD_ONION").apply {
                 append(SP)
                 append("NEW")
@@ -382,13 +391,13 @@ private class RealTorControlProcessor(
                 append(type)
             }
 
-            onionAdd(sb, hsPorts, flags, maxStreams, null)
+            onionAdd(sb, filtered, flags, maxStreams, null)
         }
     }
 
     private suspend fun onionAdd(
         sb: StringBuilder,
-        hsPorts: Set<TorConfig.Setting.HiddenService.Ports>,
+        hsPorts: Set<TorConfig.Setting.HiddenService.VirtualPort>,
         flags: Set<TorControlOnionAdd.Flag>?,
         maxStreams: TorConfig.Setting.HiddenService.MaxStreams?,
         privateKey: OnionAddress.PrivateKey?,
@@ -406,23 +415,37 @@ private class RealTorControlProcessor(
                 append(maxStreams.value)
             }
 
-            if (hsPorts.isNotEmpty()) {
-                val localHostIp = try {
-                    PlatformUtil.localhostAddress()
-                } catch (_: RuntimeException) {
-                    withContext(Dispatchers.Default) {
-                        PlatformUtil.localhostAddress()
-                    }
-                }
+            val localHostIp = PlatformUtil.localhostAddress()
 
-                for (hsPort in hsPorts) {
-                    append(SP)
-                    append("Port=")
-                    append(hsPort.virtualPort.value)
-                    append(',')
-                    append(localHostIp)
-                    append(':')
-                    append(hsPort.targetPort.value)
+            for (hsPort in hsPorts) {
+                append(SP)
+                append("Port=")
+                when (hsPort) {
+                    is TorConfig.Setting.HiddenService.Ports -> {
+                        append(hsPort.virtualPort.value)
+                        append(',')
+                        append(localHostIp)
+                        append(':')
+                        append(hsPort.targetPort.value)
+                    }
+                    is TorConfig.Setting.HiddenService.UnixSocket -> {
+                        append(hsPort.virtualPort.value)
+                        append(',')
+                        append("unix:")
+
+                        // NOTE: If path has a space in it, controller fails
+                        //  as it cannot parse. There is no ability to quote
+                        //  the unix:"/pa th/to/hs.sock" like usual...
+                        //  .
+                        //  https://github.com/05nelsonm/kmp-tor/issues/207#issuecomment-1166722564
+                        //  https://gitlab.torproject.org/tpo/core/tor/-/issues/40633
+                        val path = hsPort
+                            .targetUnixSocket
+                            .writeEscapedIfTrue(true)
+                            .value
+
+                        append(path)
+                    }
                 }
             }
 

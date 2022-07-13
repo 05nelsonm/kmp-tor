@@ -31,22 +31,8 @@ import io.matthewnelson.kmp.tor.controller.common.file.Path
 fun TorConfig.Setting<*>.appendTo(sb: StringBuilder, isWriteTorConfig: Boolean): Boolean {
     val value: TorConfig.Option = when(val v = value) {
         null -> return false
-        is FileSystemFile -> {
-            if (!isWriteTorConfig && Path.fsSeparator == '\\') {
-                val escapedPath = v.path.value.replace("\\", "\\\\")
-                FileSystemFile(Path(escapedPath))
-            } else {
-                v
-            }
-        }
-        is FileSystemDir -> {
-            if (!isWriteTorConfig && Path.fsSeparator == '\\') {
-                val escapedPath = v.path.value.replace("\\", "\\\\")
-                FileSystemDir(Path(escapedPath))
-            } else {
-                v
-            }
-        }
+        is FileSystemFile -> FileSystemFile(v.path.writeEscapedIfTrue(!isWriteTorConfig))
+        is FileSystemDir -> FileSystemDir(v.path.writeEscapedIfTrue(!isWriteTorConfig))
         else -> v
     }
 
@@ -234,7 +220,7 @@ fun TorConfig.Setting<*>.appendTo(sb: StringBuilder, isWriteTorConfig: Boolean):
                         sb.append("unix:")
                         sb.escapeIfTrue(!isWriteTorConfig)
                         sb.quote()
-                        sb.append(hsPort.targetUnixSocket.value)
+                        sb.append(hsPort.targetUnixSocket.writeEscapedIfTrue(!isWriteTorConfig).value)
                         sb.escapeIfTrue(!isWriteTorConfig)
                         sb.quote()
                     }
@@ -266,35 +252,61 @@ fun TorConfig.Setting<*>.appendTo(sb: StringBuilder, isWriteTorConfig: Boolean):
             sb.newLineIfTrue(isWriteTorConfig) {
                 // if false
                 quote()
-                this
             }
             return true
         }
     }
 }
 
+/**
+ * Returns null in the event of an [EmptySet] is a result of filtering.
+ *
+ * A returned non-null [Set] will have at least 1 item in it.
+ * */
+@InternalTorApi
+fun Set<HiddenService.VirtualPort>.filterSupportedOnly(): Set<HiddenService.VirtualPort>? {
+    val filtered =  filter { instance ->
+        when (instance) {
+            is HiddenService.Ports -> true
+            is HiddenService.UnixSocket -> {
+                if (!PlatformUtil.isLinux) {
+                    false
+                } else {
+                    instance.targetUnixSocket.isUnixPath
+                }
+            }
+        }
+    }
+
+    return filtered.ifEmpty { null }?.toSet()
+}
+
 @Suppress("nothing_to_inline")
-private inline fun StringBuilder.quoteIfTrue(addQuote: Boolean) {
+private inline fun StringBuilder.quoteIfTrue(addQuote: Boolean): StringBuilder {
     if (addQuote) {
         quote()
     }
+
+    return this
 }
 
 @Suppress("nothing_to_inline")
-private inline fun StringBuilder.quote() {
-    append('"')
+private inline fun StringBuilder.quote(): StringBuilder {
+    return append('"')
 }
 
 @Suppress("nothing_to_inline")
-private inline fun StringBuilder.escapeIfTrue(addEscape: Boolean) {
+private inline fun StringBuilder.escapeIfTrue(addEscape: Boolean): StringBuilder {
     if (addEscape) {
         escape()
     }
+
+    return this
 }
 
 @Suppress("nothing_to_inline")
-private inline fun StringBuilder.escape() {
-    append('\\')
+private inline fun StringBuilder.escape(): StringBuilder {
+    return append('\\')
 }
 
 @Suppress("nothing_to_inline")
