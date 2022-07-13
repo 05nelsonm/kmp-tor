@@ -17,7 +17,6 @@ package io.matthewnelson.kmp.tor.internal
 
 import java.io.File
 
-@JvmSynthetic
 @Suppress("nothing_to_inline")
 internal inline fun File.doesContentMatchExpected(expected: String): Boolean {
     return try {

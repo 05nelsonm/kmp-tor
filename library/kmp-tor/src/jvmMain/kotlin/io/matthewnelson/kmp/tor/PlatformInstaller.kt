@@ -49,7 +49,7 @@ import java.io.IOException
  *
  * The binary dependencies for Java/NodeJs are not automatically imported
  * like other platforms for kmp-tor, and must be declared independently
- * from the `kmp-tor` dependency.
+ * of the `kmp-tor` dependency.
  * */
 class PlatformInstaller private constructor(
     @JvmField

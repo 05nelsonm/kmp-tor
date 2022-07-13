@@ -15,7 +15,6 @@
  **/
 package io.matthewnelson.kmp.tor.internal
 
-@JvmSynthetic
 @Suppress("nothing_to_inline")
 internal inline fun Process.isStillAlive(): Boolean =
     try {
