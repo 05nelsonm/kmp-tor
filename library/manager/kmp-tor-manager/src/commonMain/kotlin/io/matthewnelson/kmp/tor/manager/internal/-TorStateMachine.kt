@@ -23,30 +23,11 @@ import kotlinx.atomicfu.AtomicRef
 import kotlinx.atomicfu.atomic
 import kotlinx.atomicfu.locks.synchronized
 import kotlinx.atomicfu.locks.SynchronizedObject
-import kotlin.jvm.JvmSynthetic
 
-internal sealed interface TorStateMachine: TorStateManager {
-    @JvmSynthetic
-    fun updateState(state: TorState): Boolean
-    @JvmSynthetic
-    fun updateState(state: TorNetworkState): Boolean
-    @JvmSynthetic
-    fun updateState(state: TorState, networkState: TorNetworkState): Boolean
-
-    companion object {
-        @JvmSynthetic
-        internal fun newInstance(
-            dispatch: (old: TorManagerEvent.State, new: TorManagerEvent.State) -> Unit
-        ): TorStateMachine =
-            RealTorStateMachine(dispatch)
-    }
-}
-
-private class RealTorStateMachine(
+internal class TorStateMachine(
     private val dispatch: (old: TorManagerEvent.State, new: TorManagerEvent.State) -> Unit
-) : SynchronizedObject(),
-    TorStateMachine
-{
+) : SynchronizedObject(), TorStateManager {
+
     private val _currentState: AtomicRef<TorManagerEvent.State> = atomic(
         TorManagerEvent.State(TorState.Off, TorNetworkState.Disabled)
     )
@@ -57,7 +38,7 @@ private class RealTorStateMachine(
     override val state: TorState get() = _currentState.value.torState
     override val networkState: TorNetworkState get() = _currentState.value.networkState
 
-    override fun updateState(state: TorState, networkState: TorNetworkState): Boolean {
+    internal fun updateState(state: TorState, networkState: TorNetworkState): Boolean {
         return synchronized(this) {
             val current = _currentState.value
             if (current.torState != state || current.networkState != networkState) {
@@ -71,7 +52,7 @@ private class RealTorStateMachine(
         }
     }
 
-    override fun updateState(state: TorState): Boolean {
+    internal fun updateState(state: TorState): Boolean {
         return synchronized(this) {
             val current = _currentState.value
             if (current.torState != state) {
@@ -85,7 +66,7 @@ private class RealTorStateMachine(
         }
     }
 
-    override fun updateState(state: TorNetworkState): Boolean {
+    internal fun updateState(state: TorNetworkState): Boolean {
         return synchronized(this) {
             val current = _currentState.value
             if (current.networkState != state) {

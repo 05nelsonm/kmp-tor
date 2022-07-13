@@ -22,7 +22,7 @@ import kotlin.test.*
 
 class TorStateMachineUnitTest {
 
-    private val machine: TorStateMachine = TorStateMachine.newInstance { _, new ->
+    private val machine: TorStateMachine = TorStateMachine { _, new ->
         this.dispatched = new
     }
     private var dispatched = TorManagerEvent.State(machine.state, machine.networkState)

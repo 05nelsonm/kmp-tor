@@ -15,6 +15,8 @@
  **/
 package io.matthewnelson.kmp.tor.manager
 
+import io.matthewnelson.kmp.tor.manager.internal.RealTorManager
+
 interface Destroyable {
 
     val isDestroyed: Boolean

@@ -141,7 +141,7 @@ internal class RealTorManager(
 
     // State should be dispatched immediately. as such, only update state machine
     // from Dispatchers.Main
-    private val stateMachine: TorStateMachine = TorStateMachine.newInstance { old, new ->
+    private val stateMachine: TorStateMachine = TorStateMachine { old, new ->
         notifyListenersNoScope(new)
         controllerListener.addressInfoHandler.onStateChange(old, new)
 
