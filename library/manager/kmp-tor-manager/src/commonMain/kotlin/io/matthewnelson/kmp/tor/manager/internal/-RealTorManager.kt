@@ -43,7 +43,6 @@ import io.matthewnelson.kmp.tor.manager.internal.actions.ActionQueue
 import io.matthewnelson.kmp.tor.manager.internal.ext.*
 import io.matthewnelson.kmp.tor.manager.internal.util.AddressInfoHandler
 import io.matthewnelson.kmp.tor.manager.internal.util.UnixSocksDiffer
-import io.matthewnelson.kmp.tor.manager.internal.util.realTorManagerInstanceDestroyed
 import kotlinx.atomicfu.*
 import kotlinx.coroutines.*
 import kotlinx.coroutines.sync.Mutex
