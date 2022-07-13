@@ -175,18 +175,39 @@ class TorControllerIntegrationTest: TorTestHelper() {
     }
 
     @Test
-    fun givenHiddenService_whenNewlyGenerated_returnsSuccess() = runBlocking {
+    fun givenNewHiddenService_whenTCPPortOnly_returnsSuccess() = runBlocking {
         val entry = manager.onionAddNew(
             type = OnionAddress.PrivateKey.Type.ED25519_V3,
             hsPorts = setOf(
                 TorConfig.Setting.HiddenService.Ports(virtualPort = Port(8761), targetPort = Port(8760)),
                 TorConfig.Setting.HiddenService.Ports(virtualPort = Port(8762), targetPort = Port(8760)),
                 TorConfig.Setting.HiddenService.Ports(virtualPort = Port(8763), targetPort = Port(8760)),
+            ),
+            flags = setOf(
+                TorControlOnionAdd.Flag.MaxStreamsCloseCircuit,
+            ),
+            maxStreams = TorConfig.Setting.HiddenService.MaxStreams(4)
+        ).getOrThrow()
+
+        manager.onionDel(entry.address).getOrThrow()
+
+        Unit
+    }
+
+    @Test
+    fun givenNewHiddenService_whenUnixSocketPortOnly_returnsSuccess() = runBlocking {
+        if (!PlatformUtil.isLinux) return@runBlocking
+
+        val workDir = configProvider.workDir
+
+        val entryResult = manager.onionAddNew(
+            type = OnionAddress.PrivateKey.Type.ED25519_V3,
+            hsPorts = setOf(
 
                 // Will fail if targetUnixSocket contains space in the path
                 TorConfig.Setting.HiddenService.UnixSocket(
                     virtualPort = Port(8764),
-                    targetUnixSocket = configProvider.workDir.builder {
+                    targetUnixSocket = workDir.builder {
                         addSegment(TorConfig.Setting.DataDirectory.DEFAULT_NAME)
                         addSegment("test_hs.sock")
                     }
@@ -196,9 +217,14 @@ class TorControllerIntegrationTest: TorTestHelper() {
                 TorControlOnionAdd.Flag.MaxStreamsCloseCircuit,
             ),
             maxStreams = TorConfig.Setting.HiddenService.MaxStreams(4)
-        ).getOrThrow()
+        )
 
-        manager.onionDel(entry.address).getOrThrow()
+        if (entryResult.isFailure && workDir.value.contains(' ')) {
+            // https://gitlab.torproject.org/tpo/core/tor/-/issues/40633
+            // Pass the test
+        } else {
+            manager.onionDel(entryResult.getOrThrow().address).getOrThrow()
+        }
 
         Unit
     }
