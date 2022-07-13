@@ -16,7 +16,8 @@
 package io.matthewnelson.kmp.tor.controller.internal.io
 
 internal actual value class SocketWrapper private actual constructor(private val socket: Any) {
-    actual fun close() {
+    @Throws(Exception::class)
+    internal actual fun close() {
         TODO("Not yet implemented")
     }
 }

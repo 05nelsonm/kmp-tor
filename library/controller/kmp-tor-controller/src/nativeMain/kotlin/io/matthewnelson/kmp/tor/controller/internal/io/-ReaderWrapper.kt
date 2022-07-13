@@ -15,12 +15,11 @@
  **/
 package io.matthewnelson.kmp.tor.controller.internal.io
 
-internal actual value class WriterWrapper private actual constructor(private val value: Any) {
-    actual fun write(string: String) {
-        TODO("Not yet implemented")
-    }
+import io.matthewnelson.kmp.tor.controller.common.exceptions.TorControllerException
 
-    actual fun flush() {
+internal actual value class ReaderWrapper private actual constructor(private val value: Any) {
+    @Throws(TorControllerException::class)
+    internal actual fun readLine(): String? {
         TODO("Not yet implemented")
     }
 }

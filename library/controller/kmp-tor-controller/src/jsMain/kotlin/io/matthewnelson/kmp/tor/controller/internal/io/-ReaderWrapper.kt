@@ -16,7 +16,7 @@
 package io.matthewnelson.kmp.tor.controller.internal.io
 
 internal actual value class ReaderWrapper private actual constructor(private val value: Any) {
-    actual fun readLine(): String? {
+    internal actual fun readLine(): String? {
         TODO("Not yet implemented")
     }
 }

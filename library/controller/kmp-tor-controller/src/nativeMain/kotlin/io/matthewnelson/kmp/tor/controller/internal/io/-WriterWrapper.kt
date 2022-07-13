@@ -19,12 +19,12 @@ import io.matthewnelson.kmp.tor.controller.common.exceptions.TorControllerExcept
 
 internal actual value class WriterWrapper private actual constructor(private val value: Any) {
     @Throws(TorControllerException::class)
-    actual fun write(string: String) {
+    internal actual fun write(string: String) {
         TODO("Not yet implemented")
     }
 
     @Throws(TorControllerException::class)
-    actual fun flush() {
+    internal actual fun flush() {
         TODO("Not yet implemented")
     }
 }

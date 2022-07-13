@@ -28,6 +28,7 @@ import io.matthewnelson.kmp.tor.controller.common.exceptions.TorControllerExcept
 import io.matthewnelson.kmp.tor.controller.common.file.Path
 import io.matthewnelson.kmp.tor.controller.common.internal.isUnixPath
 import io.matthewnelson.kmp.tor.controller.internal.controller.RealTorController
+import io.matthewnelson.kmp.tor.controller.internal.controller.RealTorControlProcessor
 import io.matthewnelson.kmp.tor.controller.internal.getTorControllerDispatcher
 import io.matthewnelson.kmp.tor.controller.internal.io.ReaderWrapper
 import io.matthewnelson.kmp.tor.controller.internal.io.SocketWrapper

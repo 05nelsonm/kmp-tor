@@ -15,19 +15,8 @@
  **/
 package io.matthewnelson.kmp.tor.controller.internal.io
 
-import java.io.Closeable
-
-@JvmInline
 internal actual value class SocketWrapper private actual constructor(private val socket: Any) {
-
-    @JvmSynthetic
-    @Throws(Exception::class)
-    actual fun close() {
-        (socket as Closeable).close()
-    }
-
-    companion object {
-        @JvmSynthetic
-        internal fun wrap(socket: Closeable): SocketWrapper = SocketWrapper(socket)
+    internal actual fun close() {
+        TODO("Not yet implemented")
     }
 }

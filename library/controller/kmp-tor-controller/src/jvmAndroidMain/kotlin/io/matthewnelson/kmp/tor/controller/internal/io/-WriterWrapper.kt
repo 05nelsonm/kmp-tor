@@ -16,12 +16,33 @@
 package io.matthewnelson.kmp.tor.controller.internal.io
 
 import io.matthewnelson.kmp.tor.controller.common.exceptions.TorControllerException
-import kotlin.jvm.JvmInline
-import kotlin.jvm.JvmSynthetic
+import java.io.IOException
+import java.io.OutputStreamWriter
 
 @JvmInline
-internal expect value class ReaderWrapper private constructor(private val value: Any) {
-    @JvmSynthetic
+internal actual value class WriterWrapper private actual constructor(private val value: Any) {
+
+    private inline val asWriter: OutputStreamWriter get() = value as OutputStreamWriter
+
     @Throws(TorControllerException::class)
-    fun readLine(): String?
+    internal actual fun write(string: String) {
+        try {
+            asWriter.write(string)
+        } catch (e: IOException) {
+            throw TorControllerException(e)
+        }
+    }
+
+    @Throws(TorControllerException::class)
+    internal actual fun flush() {
+        try {
+            asWriter.flush()
+        } catch (e: IOException) {
+            throw TorControllerException(e)
+        }
+    }
+
+    companion object {
+        internal fun wrap(writer: OutputStreamWriter): WriterWrapper = WriterWrapper(writer)
+    }
 }

@@ -16,11 +16,10 @@
 package io.matthewnelson.kmp.tor.controller.internal.io
 
 import kotlin.jvm.JvmInline
-import kotlin.jvm.JvmSynthetic
 
 @JvmInline
 internal expect value class SocketWrapper private constructor(private val socket: Any) {
-    @JvmSynthetic
+
     @Throws(Exception::class)
-    fun close()
+    internal fun close()
 }
