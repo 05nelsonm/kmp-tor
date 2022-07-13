@@ -78,7 +78,7 @@ internal class RealTorController(
     }
 
     private val processorDelegate: TorControlProcessor by lazy {
-        TorControlProcessor.newInstance(
+        RealTorControlProcessor(
             controlPortInteractor,
             TorControlProcessorLock(
                 dispatcher = dispatcher,
