@@ -42,6 +42,7 @@ fun TorConfig.Setting<*>.appendTo(sb: StringBuilder, isWriteTorConfig: Boolean):
         '='
     }
 
+    @Suppress("DEPRECATION")
     when (this) {
         is AutomapHostsOnResolve,
         is CacheDirectory,
@@ -58,11 +59,17 @@ fun TorConfig.Setting<*>.appendTo(sb: StringBuilder, isWriteTorConfig: Boolean):
         is DormantOnFirstStartup,
         is DormantTimeoutDisabledByIdleStreams,
         is GeoIPExcludeUnknown,
-        is GeoIpV4File,
+        is GeoIPFile,
         is GeoIpV6File,
-        is OwningControllerProcess,
         is RunAsDaemon,
-        is SyslogIdentityTag -> {
+        is SyslogIdentityTag,
+        is __OwningControllerProcess,
+
+        // DEPRECATED
+        is GeoIpV4File,
+        is OwningControllerProcess,
+
+        -> {
             sb.append(keyword)
             sb.append(delimiter)
             sb.quoteIfTrue(!isWriteTorConfig)

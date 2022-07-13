@@ -94,19 +94,23 @@ internal class UnixSocksDiffer(private val torManagerScope: CoroutineScope, priv
     @JvmSynthetic
     internal fun onConfChanged(output: String) {
         // SocksPort=unix:"/tmp/junit15600960770888728454/tor service/data/socks_test_set.sock" CacheDNS OnionTrafficOnly IsolateSOCKSAuth
-        if (!output.startsWith(SOCKS_PORT_UNIX)) return
+        // __SocksPort=unix:"/tmp/junit15600960770888728454/tor service/data/socks_test_set.sock" CacheDNS OnionTrafficOnly IsolateSOCKSAuth
+        if (output.startsWith(SOCKS_PORT_UNIX) || output.startsWith(__SOCKS_PORT_UNIX)) {
 
-        pathsToKeep.withLock {
-            val path = output
-                .substringAfter(SOCKS_PORT_UNIX)
-                .drop(1)
-                .substringBefore('"')
+            pathsToKeep.withLock {
+                val path = output
+                    .substringAfter(SOCKS_PORT_UNIX)
+                    .drop(1)
+                    .substringBefore('"')
 
-            add(Path(path))
+                add(Path(path))
+            }
         }
     }
 
     companion object {
         private const val SOCKS_PORT_UNIX = "SocksPort=unix:"
+        @Suppress("ObjectPropertyName")
+        private const val __SOCKS_PORT_UNIX = "__$SOCKS_PORT_UNIX"
     }
 }

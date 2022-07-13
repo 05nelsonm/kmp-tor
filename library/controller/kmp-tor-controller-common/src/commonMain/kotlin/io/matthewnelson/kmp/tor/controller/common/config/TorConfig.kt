@@ -252,7 +252,11 @@ class TorConfig private constructor(
      *
      * https://2019.www.torproject.org/docs/tor-manual.html.en
      * */
-    @Suppress("PropertyName", "CanBePrimaryConstructorProperty")
+    @Suppress(
+        "ClassName",
+        "PropertyName",
+        "CanBePrimaryConstructorProperty"
+    )
     sealed class Setting<T: Option?>(
         @JvmField
         val keyword: TorConfig.KeyWord,
@@ -569,8 +573,8 @@ class TorConfig private constructor(
         /**
          * https://2019.www.torproject.org/docs/tor-manual.html.en#GeoIPFile
          * */
-        class GeoIpV4File                           : Setting<Option.FileSystemFile?>(
-            keyword = KeyWord.GeoIpV4File,
+        class GeoIPFile                           : Setting<Option.FileSystemFile?>(
+            keyword = KeyWord.GeoIPFile,
             default = null,
             isStartArgument = true,
         ) {
@@ -579,8 +583,8 @@ class TorConfig private constructor(
                 return super.set(value?.nullIfEmpty)
             }
 
-            override fun clone(): GeoIpV4File {
-                return GeoIpV4File().set(value) as GeoIpV4File
+            override fun clone(): GeoIPFile {
+                return GeoIPFile().set(value) as GeoIPFile
             }
         }
 
@@ -827,14 +831,14 @@ class TorConfig private constructor(
         /**
          * https://torproject.gitlab.io/torspec/control-spec/#takeownership
          * */
-        class OwningControllerProcess               : Setting<Option.ProcessId?>(
-            keyword = KeyWord.OwningControllerProcess,
+        class __OwningControllerProcess             : Setting<Option.ProcessId?>(
+            keyword = KeyWord.__OwningControllerProcess,
             default = null,
             isStartArgument = true,
         ) {
 
-            override fun clone(): OwningControllerProcess {
-                return OwningControllerProcess().set(value) as OwningControllerProcess
+            override fun clone(): __OwningControllerProcess {
+                return __OwningControllerProcess().set(value) as __OwningControllerProcess
             }
         }
 
@@ -1349,6 +1353,45 @@ class TorConfig private constructor(
                 return SyslogIdentityTag().set(value) as SyslogIdentityTag
             }
         }
+
+        @Deprecated(
+            message = "Use TorConfig.Setting.GeoIPFile",
+            replaceWith = ReplaceWith(expression = "TorConfig.Setting.GeoIPFile")
+        )
+        class GeoIpV4File                           : Setting<Option.FileSystemFile?>(
+            keyword = KeyWord.GeoIPFile,
+            default = null,
+            isStartArgument = true,
+        ) {
+
+            override fun set(value: Option.FileSystemFile?): Setting<Option.FileSystemFile?> {
+                return super.set(value?.nullIfEmpty)
+            }
+
+            @Suppress("DEPRECATION")
+            override fun clone(): GeoIpV4File {
+                return GeoIpV4File().set(value) as GeoIpV4File
+            }
+        }
+
+        /**
+         * https://torproject.gitlab.io/torspec/control-spec/#takeownership
+         * */
+        @Deprecated(
+            message = "Use TorConfig.Setting.__OwningControllerProcess",
+            replaceWith = ReplaceWith("TorConfig.Setting.__OwningControllerProcess")
+        )
+        class OwningControllerProcess             : Setting<Option.ProcessId?>(
+            keyword = KeyWord.__OwningControllerProcess,
+            default = null,
+            isStartArgument = true,
+        ) {
+
+            @Suppress("DEPRECATION")
+            override fun clone(): OwningControllerProcess {
+                return OwningControllerProcess().set(value) as OwningControllerProcess
+            }
+        }
     }
 
     sealed interface Option {
@@ -1473,7 +1516,7 @@ class TorConfig private constructor(
 
         @JvmInline
         private value class RealFieldId(override val value: String)     : FieldId {
-            override val nullIfEmpty: FieldId? get() = if(value.isEmpty()) null else this
+            override val nullIfEmpty: FieldId? get() = if (value.isEmpty()) null else this
             override fun toString(): String = value
         }
 
@@ -1584,39 +1627,22 @@ class TorConfig private constructor(
         }
     }
 
+    /**
+     * KeyWords utilized in TorConfig, as defined in:
+     *  - https://2019.www.torproject.org/docs/tor-manual.html.en
+     *  - https://torproject.gitlab.io/torspec/control-spec/#tor-config-options-for-use-by-controllers
+     *
+     * Ordering of KeyWords match that of what is in the above manuals. To keep track of what
+     * has and has not been implemented as a [Setting], the following "headers" are used:
+     *
+     *     /* IMPLEMENTED */
+     *     /* NOT IMPLEMENTED */
+     * */
+    @Suppress("ClassName")
     sealed class KeyWord: Comparable<String>, CharSequence {
-
-        object AutomapHostsOnResolve: KeyWord() { override fun toString(): String = "AutomapHostsOnResolve" }
-        object CacheDirectory: KeyWord() { override fun toString(): String = "CacheDirectory" }
-        object ClientOnionAuthDir: KeyWord() { override fun toString(): String = "ClientOnionAuthDir" }
-        object ConnectionPadding: KeyWord() { override fun toString(): String = "ConnectionPadding" }
-        object ReducedConnectionPadding: KeyWord() { override fun toString(): String = "ReducedConnectionPadding" }
-        object ControlPortWriteToFile: KeyWord() { override fun toString(): String = "ControlPortWriteToFile" }
-        object CookieAuthentication: KeyWord() { override fun toString(): String = "CookieAuthentication" }
-        object CookieAuthFile: KeyWord() { override fun toString(): String = "CookieAuthFile" }
-        object DataDirectory: KeyWord() { override fun toString(): String = "DataDirectory" }
-        object DisableNetwork: KeyWord() { override fun toString(): String = "DisableNetwork" }
-        object DormantCanceledByStartup: KeyWord() { override fun toString(): String = "DormantCanceledByStartup" }
-        object DormantClientTimeout: KeyWord() { override fun toString(): String = "DormantClientTimeout" }
-        object DormantOnFirstStartup: KeyWord() { override fun toString(): String = "DormantOnFirstStartup" }
-        object DormantTimeoutDisabledByIdleStreams: KeyWord() { override fun toString(): String = "DormantTimeoutDisabledByIdleStreams" }
-        object GeoIPExcludeUnknown: KeyWord() { override fun toString(): String = "GeoIPExcludeUnknown" }
-        object GeoIpV4File: KeyWord() { override fun toString(): String = "GeoIPFile" }
-        object GeoIPv6File: KeyWord() { override fun toString(): String = "GeoIPv6File" }
-        object HiddenServiceDir: KeyWord() { override fun toString(): String = "HiddenServiceDir" }
-        object HiddenServicePort: KeyWord() { override fun toString(): String = "HiddenServicePort" }
-        object HiddenServiceMaxStreams: KeyWord() { override fun toString(): String = "HiddenServiceMaxStreams" }
-        object HiddenServiceMaxStreamsCloseCircuit: KeyWord() { override fun toString(): String = "HiddenServiceMaxStreamsCloseCircuit" }
-        object OwningControllerProcess: KeyWord() { override fun toString(): String = "__OwningControllerProcess" }
-
-        object ControlPort: KeyWord() { override fun toString(): String = "ControlPort" }
-        object DnsPort: KeyWord() { override fun toString(): String = "DNSPort" }
-        object HttpTunnelPort: KeyWord() { override fun toString(): String = "HTTPTunnelPort" }
-        object SocksPort: KeyWord() { override fun toString(): String = "SocksPort" }
-        object TransPort: KeyWord() { override fun toString(): String = "TransPort" }
-
-        object RunAsDaemon: KeyWord() { override fun toString(): String = "RunAsDaemon" }
-        object SyslogIdentityTag: KeyWord() { override fun toString(): String = "SyslogIdentityTag" }
+        // NOTE: If adding any KeyWords, be sure to update the integration test model at
+        // `:library:kmp-tor:commonTest/kotlin/io/matthewnelson/kmp/tor/helpers/model/KeyWordModel.kt`
+        // to validate it via the integration test.
 
         final override val length: Int get() = toString().length
         final override fun get(index: Int): Char = toString()[index]
@@ -1629,5 +1655,427 @@ class TorConfig private constructor(
 
         final override fun equals(other: Any?): Boolean = other is KeyWord && other.toString() == toString()
         final override fun hashCode(): Int = 21 * 31 + toString().hashCode()
+
+/* IMPLEMENTED */
+/* === GENERAL OPTIONS ======================== IMPLEMENTED as a TorConfig.Setting ================================== */
+        object DisableNetwork: KeyWord() { override fun toString(): String = "DisableNetwork" }
+        object ControlPort: KeyWord() { override fun toString(): String = "ControlPort" }
+        object CookieAuthentication: KeyWord() { override fun toString(): String = "CookieAuthentication" }
+        object CookieAuthFile: KeyWord() { override fun toString(): String = "CookieAuthFile" }
+        object ControlPortWriteToFile: KeyWord() { override fun toString(): String = "ControlPortWriteToFile" }
+        object DataDirectory: KeyWord() { override fun toString(): String = "DataDirectory" }
+        object CacheDirectory: KeyWord() { override fun toString(): String = "CacheDirectory" }
+        object RunAsDaemon: KeyWord() { override fun toString(): String = "RunAsDaemon" }
+        object SyslogIdentityTag: KeyWord() { override fun toString(): String = "SyslogIdentityTag" }
+
+
+/* === CLIENT OPTIONS ========================= IMPLEMENTED as a TorConfig.Setting ================================== */
+        object ConnectionPadding: KeyWord() { override fun toString(): String = "ConnectionPadding" }
+        object ReducedConnectionPadding: KeyWord() { override fun toString(): String = "ReducedConnectionPadding" }
+        object GeoIPExcludeUnknown: KeyWord() { override fun toString(): String = "GeoIPExcludeUnknown" }
+        object ClientOnionAuthDir: KeyWord() { override fun toString(): String = "ClientOnionAuthDir" }
+        object SocksPort: KeyWord() { override fun toString(): String = "SocksPort" }
+        object HttpTunnelPort: KeyWord() { override fun toString(): String = "HTTPTunnelPort" }
+        object TransPort: KeyWord() { override fun toString(): String = "TransPort" }
+        object AutomapHostsOnResolve: KeyWord() { override fun toString(): String = "AutomapHostsOnResolve" }
+        object DnsPort: KeyWord() { override fun toString(): String = "DNSPort" }
+        object DormantClientTimeout: KeyWord() { override fun toString(): String = "DormantClientTimeout" }
+        object DormantTimeoutDisabledByIdleStreams: KeyWord() { override fun toString(): String = "DormantTimeoutDisabledByIdleStreams" }
+        object DormantOnFirstStartup: KeyWord() { override fun toString(): String = "DormantOnFirstStartup" }
+        object DormantCanceledByStartup: KeyWord() { override fun toString(): String = "DormantCanceledByStartup" }
+
+
+/* === SERVER OPTIONS ========================= IMPLEMENTED as a TorConfig.Setting ================================== */
+        object GeoIPFile: KeyWord() { override fun toString(): String = "GeoIPFile" }
+        object GeoIPv6File: KeyWord() { override fun toString(): String = "GeoIPv6File" }
+
+
+/* === DIRECTORY SERVER OPTIONS =============== IMPLEMENTED as a TorConfig.Setting ================================== */
+
+
+/* === DENAIL OF SERVICE MITIGATION OPTIONS === IMPLEMENTED as a TorConfig.Setting ================================== */
+
+
+/* === DIRECTORY AUTHORITY SERVER OPTIONS ===== IMPLEMENTED as a TorConfig.Setting ================================== */
+
+
+/* === HIDDEN SERVICE OPTIONS ================= IMPLEMENTED as a TorConfig.Setting ================================== */
+        object HiddenServiceDir: KeyWord() { override fun toString(): String = "HiddenServiceDir" }
+        object HiddenServicePort: KeyWord() { override fun toString(): String = "HiddenServicePort" }
+        object HiddenServiceMaxStreams: KeyWord() { override fun toString(): String = "HiddenServiceMaxStreams" }
+        object HiddenServiceMaxStreamsCloseCircuit: KeyWord() { override fun toString(): String = "HiddenServiceMaxStreamsCloseCircuit" }
+
+
+/* === TESTING NETWORK OPTIONS ================ IMPLEMENTED as a TorConfig.Setting ================================== */
+
+
+/* === NON-PERSISTENT OPTIONS ================= IMPLEMENTED as a TorConfig.Setting ================================== */
+
+
+/* === NON-PERSISTENT CONTROLLER OPTIONS ====== IMPLEMENTED as a TorConfig.Setting ================================== */
+        object __OwningControllerProcess: KeyWord() { override fun toString(): String = "__OwningControllerProcess" }
+
+
+/* NOT IMPLEMENTED */
+/* === GENERAL OPTIONS ======================== NOT yet implemented as a TorConfig.Setting ========================== */
+        object BandwidthRate: KeyWord() { override fun toString(): String = "BandwidthRate" }
+        object BandwidthBurst: KeyWord() { override fun toString(): String = "BandwidthBurst" }
+        object MaxAdvertisedBandwidth: KeyWord() { override fun toString(): String = "MaxAdvertisedBandwidth" }
+        object RelayBandwidthRate: KeyWord() { override fun toString(): String = "RelayBandwidthRate" }
+        object RelayBandwidthBurst: KeyWord() { override fun toString(): String = "RelayBandwidthBurst" }
+        object PerConnBWRate: KeyWord() { override fun toString(): String = "PerConnBWRate" }
+        object PerConnBWBurst: KeyWord() { override fun toString(): String = "PerConnBWBurst" }
+        object ClientTransportPlugin: KeyWord() { override fun toString(): String = "ClientTransportPlugin" }
+        object ServerTransportPlugin: KeyWord() { override fun toString(): String = "ServerTransportPlugin" }
+        object ServerTransportListenAddr: KeyWord() { override fun toString(): String = "ServerTransportListenAddr" }
+        object ServerTransportOptions: KeyWord() { override fun toString(): String = "ServerTransportOptions" }
+        object ExtORPort: KeyWord() { override fun toString(): String = "ExtORPort" }
+        object ExtORPortCookieAuthFile: KeyWord() { override fun toString(): String = "ExtORPortCookieAuthFile" }
+        object ExtORPortCookieAuthFileGroupReadable: KeyWord() { override fun toString(): String = "ExtORPortCookieAuthFileGroupReadable" }
+        object ConnLimit: KeyWord() { override fun toString(): String = "ConnLimit" }
+        // DisableNetwork (IMPLEMENTED)
+        object ConstrainedSockets: KeyWord() { override fun toString(): String = "ConstrainedSockets" }
+        object ConstrainedSockSize: KeyWord() { override fun toString(): String = "ConstrainedSockSize" }
+        // ControlPort (IMPLEMENTED)
+        object ControlSocket: KeyWord() { override fun toString(): String = "ControlSocket" }
+        object ControlSocketsGroupWritable: KeyWord() { override fun toString(): String = "ControlSocketsGroupWritable" }
+        object HashedControlPassword: KeyWord() { override fun toString(): String = "HashedControlPassword" }
+        // CookieAuthentication (IMPLEMENTED)
+        // CookieAuthFile (IMPLEMENTED)
+        object CookieAuthFileGroupReadable: KeyWord() { override fun toString(): String = "CookieAuthFileGroupReadable" }
+        // ControlPortWriteToFile (IMPLEMENTED)
+        object ControlPortFileGroupReadable: KeyWord() { override fun toString(): String = "ControlPortFileGroupReadable" }
+        // DataDirectory (IMPLEMENTED)
+        object DataDirectoryGroupReadable: KeyWord() { override fun toString(): String = "DataDirectoryGroupReadable" }
+        // CacheDirectory (IMPLEMENTED)
+        object CacheDirectoryGroupReadable: KeyWord() { override fun toString(): String = "CacheDirectoryGroupReadable" }
+        object FallbackDir: KeyWord() { override fun toString(): String = "FallbackDir" }
+        object UseDefaultFallbackDirs: KeyWord() { override fun toString(): String = "UseDefaultFallbackDirs" }
+        object DirAuthority: KeyWord() { override fun toString(): String = "DirAuthority" }
+        object DirAuthorityFallbackRate: KeyWord() { override fun toString(): String = "DirAuthorityFallbackRate" }
+        object AlternateBridgeAuthority: KeyWord() { override fun toString(): String = "AlternateBridgeAuthority" }
+        object DisableAllSwap: KeyWord() { override fun toString(): String = "DisableAllSwap" }
+        object DisableDebuggerAttachment: KeyWord() { override fun toString(): String = "DisableDebuggerAttachment" }
+        object FetchDirInfoEarly: KeyWord() { override fun toString(): String = "FetchDirInfoEarly" }
+        object FetchDirInfoExtraEarly: KeyWord() { override fun toString(): String = "FetchDirInfoExtraEarly" }
+        object FetchHidServDescriptors: KeyWord() { override fun toString(): String = "FetchHidServDescriptors" }
+        object FetchServerDescriptors: KeyWord() { override fun toString(): String = "FetchServerDescriptors" }
+        object FetchUselessDescriptors: KeyWord() { override fun toString(): String = "FetchUselessDescriptors" }
+        // HTTPProxy (DEPRECATED)
+        // HTTPProxyAuthenticator (DEPRECATED)
+        object HTTPSProxy: KeyWord() { override fun toString(): String = "HTTPSProxy" }
+        object HTTPSProxyAuthenticator: KeyWord() { override fun toString(): String = "HTTPSProxyAuthenticator" }
+        object Sandbox: KeyWord() { override fun toString(): String = "Sandbox" }
+        object Socks4Proxy: KeyWord() { override fun toString(): String = "Socks4Proxy" }
+        object Socks5Proxy: KeyWord() { override fun toString(): String = "Socks5Proxy" }
+        object Socks5ProxyPassword: KeyWord() { override fun toString(): String = "Socks5ProxyPassword" }
+        object UnixSocksGroupWritable: KeyWord() { override fun toString(): String = "UnixSocksGroupWritable" }
+        object KeepalivePeriod: KeyWord() { override fun toString(): String = "KeepalivePeriod" }
+        object Log: KeyWord() { override fun toString(): String = "Log" }
+        object LogMessageDomains: KeyWord() { override fun toString(): String = "LogMessageDomains" }
+        object MaxUnparseableDescSizeToLog: KeyWord() { override fun toString(): String = "MaxUnparseableDescSizeToLog" }
+        object OutboundBindAddress: KeyWord() { override fun toString(): String = "OutboundBindAddress" }
+        object OutboundBindAddressOR: KeyWord() { override fun toString(): String = "OutboundBindAddressOR" }
+        object OutboundBindAddressExit: KeyWord() { override fun toString(): String = "OutboundBindAddressExit" }
+        object PidFile: KeyWord() { override fun toString(): String = "PidFile" }
+        object ProtocolWarnings: KeyWord() { override fun toString(): String = "ProtocolWarnings" }
+        // RunAsDaemon (IMPLEMENTED)
+        object LogTimeGranularity: KeyWord() { override fun toString(): String = "LogTimeGranularity" }
+        object TruncateLogFile: KeyWord() { override fun toString(): String = "TruncateLogFile" }
+        // SyslogIdentityTag (IMPLEMENTED)
+        object AndroidIdentityTag: KeyWord() { override fun toString(): String = "AndroidIdentityTag" }
+        object SafeLogging: KeyWord() { override fun toString(): String = "SafeLogging" }
+        object User: KeyWord() { override fun toString(): String = "User" }
+        object KeepBindCapabilities: KeyWord() { override fun toString(): String = "KeepBindCapabilities" }
+        object HardwareAccel: KeyWord() { override fun toString(): String = "HardwareAccel" }
+        object AccelName: KeyWord() { override fun toString(): String = "AccelName" }
+        object AccelDir: KeyWord() { override fun toString(): String = "AccelDir" }
+        object AvoidDiskWrites: KeyWord() { override fun toString(): String = "AvoidDiskWrites" }
+        object CircuitPriorityHalflife: KeyWord() { override fun toString(): String = "CircuitPriorityHalflife" }
+        object CountPrivateBandwidth: KeyWord() { override fun toString(): String = "CountPrivateBandwidth" }
+        object ExtendByEd25519ID: KeyWord() { override fun toString(): String = "ExtendByEd25519ID" }
+        object NoExec: KeyWord() { override fun toString(): String = "NoExec" }
+        object Schedulers: KeyWord() { override fun toString(): String = "Schedulers" }
+        object KISTSchedRunInterval: KeyWord() { override fun toString(): String = "KISTSchedRunInterval" }
+        object KISTSockBufSizeFactor: KeyWord() { override fun toString(): String = "KISTSockBufSizeFactor" }
+
+
+/* === CLIENT OPTIONS ========================= NOT yet implemented as a TorConfig.Setting ========================== */
+        object Bridge: KeyWord() { override fun toString(): String = "Bridge" }
+        object LearnCircuitBuildTimeout: KeyWord() { override fun toString(): String = "LearnCircuitBuildTimeout" }
+        object CircuitBuildTimeout: KeyWord() { override fun toString(): String = "CircuitBuildTimeout" }
+        object CircuitsAvailableTimeout: KeyWord() { override fun toString(): String = "CircuitsAvailableTimeout" }
+        object CircuitStreamTimeout: KeyWord() { override fun toString(): String = "CircuitStreamTimeout" }
+        object ClientOnly: KeyWord() { override fun toString(): String = "ClientOnly" }
+        // ConnectionPadding (IMPLEMENTED)
+        // ReducedConnectionPadding (IMPLEMENTED)
+        object ExcludeNodes: KeyWord() { override fun toString(): String = "ExcludeNodes" }
+        object ExcludeExitNodes: KeyWord() { override fun toString(): String = "ExcludeExitNodes" }
+        // GeoIPExcludeUnknown (IMPLEMENTED)
+        object ExitNodes: KeyWord() { override fun toString(): String = "ExitNodes" }
+        object MiddleNodes: KeyWord() { override fun toString(): String = "MiddleNodes" }
+        object EntryNodes: KeyWord() { override fun toString(): String = "EntryNodes" }
+        object StrictNodes: KeyWord() { override fun toString(): String = "StrictNodes" }
+        object FascistFirewall: KeyWord() { override fun toString(): String = "FascistFirewall" }
+        // FirewallPorts (DEPRECATED)
+        object ReachableAddresses: KeyWord() { override fun toString(): String = "ReachableAddresses" }
+        // ReachableDirAddresses (DEPRECATED)
+        object ReachableORAddresses: KeyWord() { override fun toString(): String = "ReachableORAddresses" }
+        object HidServAuth: KeyWord() { override fun toString(): String = "HidServAuth" }
+        // ClientOnionAuthDir (IMPLEMENTED)
+        object LongLivedPorts: KeyWord() { override fun toString(): String = "LongLivedPorts" }
+        object MapAddress: KeyWord() { override fun toString(): String = "MapAddress" }
+        object NewCircuitPeriod: KeyWord() { override fun toString(): String = "NewCircuitPeriod" }
+        object MaxCircuitDirtiness: KeyWord() { override fun toString(): String = "MaxCircuitDirtiness" }
+        object MaxClientCircuitsPending: KeyWord() { override fun toString(): String = "MaxClientCircuitsPending" }
+        object NodeFamily: KeyWord() { override fun toString(): String = "NodeFamily" }
+        object EnforceDistinctSubnets: KeyWord() { override fun toString(): String = "EnforceDistinctSubnets" }
+        // SocksPort (IMPLEMENTED)
+        object SocksPolicy: KeyWord() { override fun toString(): String = "SocksPolicy" }
+        object SocksTimeout: KeyWord() { override fun toString(): String = "SocksTimeout" }
+        object TokenBucketRefillInterval: KeyWord() { override fun toString(): String = "TokenBucketRefillInterval" }
+        object TrackHostExits: KeyWord() { override fun toString(): String = "TrackHostExits" }
+        object TrackHostExitsExpire: KeyWord() { override fun toString(): String = "TrackHostExitsExpire" }
+        object UpdateBridgesFromAuthority: KeyWord() { override fun toString(): String = "UpdateBridgesFromAuthority" }
+        object UseBridges: KeyWord() { override fun toString(): String = "UseBridges" }
+        object UseEntryGuards: KeyWord() { override fun toString(): String = "UseEntryGuards" }
+        object GuardfractionFile: KeyWord() { override fun toString(): String = "GuardfractionFile" }
+        object UseGuardFraction: KeyWord() { override fun toString(): String = "UseGuardFraction" }
+        object NumEntryGuards: KeyWord() { override fun toString(): String = "NumEntryGuards" }
+        object NumPrimaryGuards: KeyWord() { override fun toString(): String = "NumPrimaryGuards" }
+        object NumDirectoryGuards: KeyWord() { override fun toString(): String = "NumDirectoryGuards" }
+        object GuardLifetime: KeyWord() { override fun toString(): String = "GuardLifetime" }
+        object SafeSocks: KeyWord() { override fun toString(): String = "SafeSocks" }
+        object TestSocks: KeyWord() { override fun toString(): String = "TestSocks" }
+        object VirtualAddrNetworkIPv6: KeyWord() { override fun toString(): String = "VirtualAddrNetworkIPv6" }
+        object AllowNonRFC953Hostnames: KeyWord() { override fun toString(): String = "AllowNonRFC953Hostnames" }
+        // HTTPTunnelPort (IMPLEMENTED)
+        // TransPort (IMPLEMENTED)
+        object TransProxyType: KeyWord() { override fun toString(): String = "TransProxyType" }
+        object NATDPort: KeyWord() { override fun toString(): String = "NATDPort" }
+        // AutomapHostsOnResolve (IMPLEMENTED)
+        object AutomapHostsSuffixes: KeyWord() { override fun toString(): String = "AutomapHostsSuffixes" }
+        // DNSPort (IMPLEMENTED)
+        object ClientDNSRejectInternalAddresses: KeyWord() { override fun toString(): String = "ClientDNSRejectInternalAddresses" }
+        object ClientRejectInternalAddresses: KeyWord() { override fun toString(): String = "ClientRejectInternalAddresses" }
+        object DownloadExtraInfo: KeyWord() { override fun toString(): String = "DownloadExtraInfo" }
+        object WarnPlaintextPorts: KeyWord() { override fun toString(): String = "WarnPlaintextPorts" }
+        object RejectPlaintextPorts: KeyWord() { override fun toString(): String = "RejectPlaintextPorts" }
+        object OptimisticData: KeyWord() { override fun toString(): String = "OptimisticData" }
+        object HSLayer2Nodes: KeyWord() { override fun toString(): String = "HSLayer2Nodes" }
+        object HSLayer3Nodes: KeyWord() { override fun toString(): String = "HSLayer3Nodes" }
+        object UseMicrodescriptors: KeyWord() { override fun toString(): String = "UseMicrodescriptors" }
+        object PathBiasScaleThreshold: KeyWord() { override fun toString(): String = "PathBiasScaleThreshold" }
+        object PathBiasScaleUseThreshold: KeyWord() { override fun toString(): String = "PathBiasScaleUseThreshold" }
+        object ClientUseIPv4: KeyWord() { override fun toString(): String = "ClientUseIPv4" }
+        object ClientUseIPv6: KeyWord() { override fun toString(): String = "ClientUseIPv6" }
+        object ClientPreferIPv6ORPort: KeyWord() { override fun toString(): String = "ClientPreferIPv6ORPort" }
+        object ClientAutoIPv6ORPort: KeyWord() { override fun toString(): String = "ClientAutoIPv6ORPort" }
+        object PathsNeededToBuildCircuits: KeyWord() { override fun toString(): String = "PathsNeededToBuildCircuits" }
+        object ClientBootstrapConsensusAuthorityDownloadInitialDelay: KeyWord() { override fun toString(): String = "ClientBootstrapConsensusAuthorityDownloadInitialDelay" }
+        object ClientBootstrapConsensusFallbackDownloadInitialDelay: KeyWord() { override fun toString(): String = "ClientBootstrapConsensusFallbackDownloadInitialDelay" }
+        object ClientBootstrapConsensusAuthorityOnlyDownloadInitialDelay: KeyWord() { override fun toString(): String = "ClientBootstrapConsensusAuthorityOnlyDownloadInitialDelay" }
+        object ClientBootstrapConsensusMaxInProgressTries: KeyWord() { override fun toString(): String = "ClientBootstrapConsensusMaxInProgressTries" }
+        // DormantClientTimeout (IMPLEMENTED)
+        // DormantTimeoutDisabledByIdleStreams (IMPLEMENTED)
+        // DormantOnFirstStartup (IMPLEMENTED)
+        // DormantCanceledByStartup (IMPLEMENTED)
+
+
+/* === SERVER OPTIONS ========================= NOT yet implemented as a TorConfig.Setting ========================== */
+        object Address: KeyWord() { override fun toString(): String = "Address" }
+        object AssumeReachable: KeyWord() { override fun toString(): String = "AssumeReachable" }
+        object BridgeRelay: KeyWord() { override fun toString(): String = "BridgeRelay" }
+        object BridgeDistribution: KeyWord() { override fun toString(): String = "BridgeDistribution" }
+        object ContactInfo: KeyWord() { override fun toString(): String = "ContactInfo" }
+        object ExitRelay: KeyWord() { override fun toString(): String = "ExitRelay" }
+        object ExitPolicy: KeyWord() { override fun toString(): String = "ExitPolicy" }
+        object ExitPolicyRejectPrivate: KeyWord() { override fun toString(): String = "ExitPolicyRejectPrivate" }
+        object ExitPolicyRejectLocalInterfaces: KeyWord() { override fun toString(): String = "ExitPolicyRejectLocalInterfaces" }
+        object ReducedExitPolicy: KeyWord() { override fun toString(): String = "ReducedExitPolicy" }
+        object IPv6Exit: KeyWord() { override fun toString(): String = "IPv6Exit" }
+        object MaxOnionQueueDelay: KeyWord() { override fun toString(): String = "MaxOnionQueueDelay" }
+        object MyFamily: KeyWord() { override fun toString(): String = "MyFamily" }
+        object Nickname: KeyWord() { override fun toString(): String = "Nickname" }
+        object NumCPUs: KeyWord() { override fun toString(): String = "NumCPUs" }
+        object ORPort: KeyWord() { override fun toString(): String = "ORPort" }
+        object PublishServerDescriptor: KeyWord() { override fun toString(): String = "PublishServerDescriptor" }
+        object ShutdownWaitLength: KeyWord() { override fun toString(): String = "ShutdownWaitLength" }
+        object SSLKeyLifetime: KeyWord() { override fun toString(): String = "SSLKeyLifetime" }
+        object HeartbeatPeriod: KeyWord() { override fun toString(): String = "HeartbeatPeriod" }
+        object MainloopStats: KeyWord() { override fun toString(): String = "MainloopStats" }
+        object AccountingMax: KeyWord() { override fun toString(): String = "AccountingMax" }
+        object AccountingRule: KeyWord() { override fun toString(): String = "AccountingRule" }
+        object AccountingStart: KeyWord() { override fun toString(): String = "AccountingStart" }
+        object RefuseUnknownExits: KeyWord() { override fun toString(): String = "RefuseUnknownExits" }
+        object ServerDNSResolvConfFile: KeyWord() { override fun toString(): String = "ServerDNSResolvConfFile" }
+        object ServerDNSAllowBrokenConfig: KeyWord() { override fun toString(): String = "ServerDNSAllowBrokenConfig" }
+        object ServerDNSSearchDomains: KeyWord() { override fun toString(): String = "ServerDNSSearchDomains" }
+        object ServerDNSDetectHijacking: KeyWord() { override fun toString(): String = "ServerDNSDetectHijacking" }
+        object ServerDNSTestAddresses: KeyWord() { override fun toString(): String = "ServerDNSTestAddresses" }
+        object ServerDNSAllowNonRFC953Hostnames: KeyWord() { override fun toString(): String = "ServerDNSAllowNonRFC953Hostnames" }
+        object BridgeRecordUsageByCountry: KeyWord() { override fun toString(): String = "BridgeRecordUsageByCountry" }
+        object ServerDNSRandomizeCase: KeyWord() { override fun toString(): String = "ServerDNSRandomizeCase" }
+        // GeoIPFile (IMPLEMENTED)
+        // GeoIPv6File (IMPLEMENTED)
+        object CellStatistics: KeyWord() { override fun toString(): String = "CellStatistics" }
+        object PaddingStatistics: KeyWord() { override fun toString(): String = "PaddingStatistics" }
+        object DirReqStatistics: KeyWord() { override fun toString(): String = "DirReqStatistics" }
+        object EntryStatistics: KeyWord() { override fun toString(): String = "EntryStatistics" }
+        object ExitPortStatistics: KeyWord() { override fun toString(): String = "ExitPortStatistics" }
+        object ConnDirectionStatistics: KeyWord() { override fun toString(): String = "ConnDirectionStatistics" }
+        object HiddenServiceStatistics: KeyWord() { override fun toString(): String = "HiddenServiceStatistics" }
+        object ExtraInfoStatistics: KeyWord() { override fun toString(): String = "ExtraInfoStatistics" }
+        object ExtendAllowPrivateAddresses: KeyWord() { override fun toString(): String = "ExtendAllowPrivateAddresses" }
+        object MaxMemInQueues: KeyWord() { override fun toString(): String = "MaxMemInQueues" }
+        object DisableOOSCheck: KeyWord() { override fun toString(): String = "DisableOOSCheck" }
+        object SigningKeyLifetime: KeyWord() { override fun toString(): String = "SigningKeyLifetime" }
+        object OfflineMasterKey: KeyWord() { override fun toString(): String = "OfflineMasterKey" }
+        object KeyDirectory: KeyWord() { override fun toString(): String = "KeyDirectory" }
+        object KeyDirectoryGroupReadable: KeyWord() { override fun toString(): String = "KeyDirectoryGroupReadable" }
+        object RephistTrackTime: KeyWord() { override fun toString(): String = "RephistTrackTime" }
+
+
+/* === DIRECTORY SERVER OPTIONS =============== NOT yet implemented as a TorConfig.Setting ========================== */
+        object DirPortFrontPage: KeyWord() { override fun toString(): String = "DirPortFrontPage" }
+        object DirPort: KeyWord() { override fun toString(): String = "DirPort" }
+        object DirPolicy: KeyWord() { override fun toString(): String = "DirPolicy" }
+        object DirCache: KeyWord() { override fun toString(): String = "DirCache" }
+        object MaxConsensusAgeForDiffs: KeyWord() { override fun toString(): String = "MaxConsensusAgeForDiffs" }
+
+
+/* === DENAIL OF SERVICE MITIGATION OPTIONS === NOT yet implemented as a TorConfig.Setting ========================== */
+        object DoSCircuitCreationEnabled: KeyWord() { override fun toString(): String = "DoSCircuitCreationEnabled" }
+        object DoSCircuitCreationMinConnections: KeyWord() { override fun toString(): String = "DoSCircuitCreationMinConnections" }
+        object DoSCircuitCreationRate: KeyWord() { override fun toString(): String = "DoSCircuitCreationRate" }
+        object DoSCircuitCreationBurst: KeyWord() { override fun toString(): String = "DoSCircuitCreationBurst" }
+        object DoSCircuitCreationDefenseType: KeyWord() { override fun toString(): String = "DoSCircuitCreationDefenseType" }
+        object DoSCircuitCreationDefenseTimePeriod: KeyWord() { override fun toString(): String = "DoSCircuitCreationDefenseTimePeriod" }
+        object DoSConnectionEnabled: KeyWord() { override fun toString(): String = "DoSConnectionEnabled" }
+        object DoSConnectionMaxConcurrentCount: KeyWord() { override fun toString(): String = "DoSConnectionMaxConcurrentCount" }
+        object DoSConnectionDefenseType: KeyWord() { override fun toString(): String = "DoSConnectionDefenseType" }
+        object DoSRefuseSingleHopClientRendezvous: KeyWord() { override fun toString(): String = "DoSRefuseSingleHopClientRendezvous" }
+
+
+/* === DIRECTORY AUTHORITY SERVER OPTIONS ===== NOT yet implemented as a TorConfig.Setting ========================== */
+        object AuthoritativeDirectory: KeyWord() { override fun toString(): String = "AuthoritativeDirectory" }
+        object V3AuthoritativeDirectory: KeyWord() { override fun toString(): String = "V3AuthoritativeDirectory" }
+        object VersioningAuthoritativeDirectory: KeyWord() { override fun toString(): String = "VersioningAuthoritativeDirectory" }
+        object RecommendedVersions: KeyWord() { override fun toString(): String = "RecommendedVersions" }
+        object RecommendedPackages: KeyWord() { override fun toString(): String = "RecommendedPackages" }
+        object RecommendedClientVersions: KeyWord() { override fun toString(): String = "RecommendedClientVersions" }
+        object BridgeAuthoritativeDir: KeyWord() { override fun toString(): String = "BridgeAuthoritativeDir" }
+        object MinUptimeHidServDirectoryV2: KeyWord() { override fun toString(): String = "MinUptimeHidServDirectoryV2" }
+        object RecommendedServerVersions: KeyWord() { override fun toString(): String = "RecommendedServerVersions" }
+        object ConsensusParams: KeyWord() { override fun toString(): String = "ConsensusParams" }
+        object DirAllowPrivateAddresses: KeyWord() { override fun toString(): String = "DirAllowPrivateAddresses" }
+        object AuthDirBadExit: KeyWord() { override fun toString(): String = "AuthDirBadExit" }
+        object AuthDirInvalid: KeyWord() { override fun toString(): String = "AuthDirInvalid" }
+        object AuthDirReject: KeyWord() { override fun toString(): String = "AuthDirReject" }
+        object AuthDirRejectCCs: KeyWord() { override fun toString(): String = "AuthDirRejectCCs" }
+        object AuthDirListBadExits: KeyWord() { override fun toString(): String = "AuthDirListBadExits" }
+        object AuthDirMaxServersPerAddr: KeyWord() { override fun toString(): String = "AuthDirMaxServersPerAddr" }
+        object AuthDirFastGuarantee: KeyWord() { override fun toString(): String = "AuthDirFastGuarantee" }
+        object AuthDirGuardBWGuarantee: KeyWord() { override fun toString(): String = "AuthDirGuardBWGuarantee" }
+        object AuthDirPinKeys: KeyWord() { override fun toString(): String = "AuthDirPinKeys" }
+        object AuthDirSharedRandomness: KeyWord() { override fun toString(): String = "AuthDirSharedRandomness" }
+        object AuthDirTestEd25519LinkKeys: KeyWord() { override fun toString(): String = "AuthDirTestEd25519LinkKeys" }
+        object BridgePassword: KeyWord() { override fun toString(): String = "BridgePassword" }
+        object V3AuthVotingInterval: KeyWord() { override fun toString(): String = "V3AuthVotingInterval" }
+        object V3AuthVoteDelay: KeyWord() { override fun toString(): String = "V3AuthVoteDelay" }
+        object V3AuthDistDelay: KeyWord() { override fun toString(): String = "V3AuthDistDelay" }
+        object V3AuthNIntervalsValid: KeyWord() { override fun toString(): String = "V3AuthNIntervalsValid" }
+        object V3BandwidthsFile: KeyWord() { override fun toString(): String = "V3BandwidthsFile" }
+        object V3AuthUseLegacyKey: KeyWord() { override fun toString(): String = "V3AuthUseLegacyKey" }
+        object AuthDirHasIPv6Connectivity: KeyWord() { override fun toString(): String = "AuthDirHasIPv6Connectivity" }
+        object MinMeasuredBWsForAuthToIgnoreAdvertised: KeyWord() { override fun toString(): String = "MinMeasuredBWsForAuthToIgnoreAdvertised" }
+
+
+/* === HIDDEN SERVICE OPTIONS ================= NOT yet implemented as a TorConfig.Setting ========================== */
+        // HiddenServiceDir (IMPLEMENTED)
+        // HiddenServicePort (IMPLEMENTED)
+        object PublishHidServDescriptors: KeyWord() { override fun toString(): String = "PublishHidServDescriptors" }
+        object HiddenServiceVersion: KeyWord() { override fun toString(): String = "HiddenServiceVersion" }
+        object HiddenServiceAuthorizeClient: KeyWord() { override fun toString(): String = "HiddenServiceAuthorizeClient" }
+        object HiddenServiceAllowUnknownPorts: KeyWord() { override fun toString(): String = "HiddenServiceAllowUnknownPorts" }
+        object HiddenServiceExportCircuitID: KeyWord() { override fun toString(): String = "HiddenServiceExportCircuitID" }
+        // HiddenServiceMaxStreams (IMPLEMENTED)
+        // HiddenServiceMaxStreamsCloseCircuit (IMPLEMENTED)
+        object RendPostPeriod: KeyWord() { override fun toString(): String = "RendPostPeriod" }
+        object HiddenServiceDirGroupReadable: KeyWord() { override fun toString(): String = "HiddenServiceDirGroupReadable" }
+        object HiddenServiceNumIntroductionPoints: KeyWord() { override fun toString(): String = "HiddenServiceNumIntroductionPoints" }
+        object HiddenServiceSingleHopMode: KeyWord() { override fun toString(): String = "HiddenServiceSingleHopMode" }
+        object HiddenServiceNonAnonymousMode: KeyWord() { override fun toString(): String = "HiddenServiceNonAnonymousMode" }
+
+
+/* === TESTING NETWORK OPTIONS ================ NOT yet implemented as a TorConfig.Setting ========================== */
+        object TestingTorNetwork: KeyWord() { override fun toString(): String = "TestingTorNetwork" }
+        object TestingV3AuthInitialVotingInterval: KeyWord() { override fun toString(): String = "TestingV3AuthInitialVotingInterval" }
+        object TestingV3AuthInitialVoteDelay: KeyWord() { override fun toString(): String = "TestingV3AuthInitialVoteDelay" }
+        object TestingV3AuthInitialDistDelay: KeyWord() { override fun toString(): String = "TestingV3AuthInitialDistDelay" }
+        object TestingV3AuthVotingStartOffset: KeyWord() { override fun toString(): String = "TestingV3AuthVotingStartOffset" }
+        object TestingAuthDirTimeToLearnReachability: KeyWord() { override fun toString(): String = "TestingAuthDirTimeToLearnReachability" }
+        object TestingMinFastFlagThreshold: KeyWord() { override fun toString(): String = "TestingMinFastFlagThreshold" }
+        object TestingServerDownloadInitialDelay: KeyWord() { override fun toString(): String = "TestingServerDownloadInitialDelay" }
+        object TestingClientDownloadInitialDelay: KeyWord() { override fun toString(): String = "TestingClientDownloadInitialDelay" }
+        object TestingServerConsensusDownloadInitialDelay: KeyWord() { override fun toString(): String = "TestingServerConsensusDownloadInitialDelay" }
+        object TestingClientConsensusDownloadInitialDelay: KeyWord() { override fun toString(): String = "TestingClientConsensusDownloadInitialDelay" }
+        object TestingBridgeDownloadInitialDelay: KeyWord() { override fun toString(): String = "TestingBridgeDownloadInitialDelay" }
+        object TestingBridgeBootstrapDownloadInitialDelay: KeyWord() { override fun toString(): String = "TestingBridgeBootstrapDownloadInitialDelay" }
+        object TestingClientMaxIntervalWithoutRequest: KeyWord() { override fun toString(): String = "TestingClientMaxIntervalWithoutRequest" }
+        object TestingDirConnectionMaxStall: KeyWord() { override fun toString(): String = "TestingDirConnectionMaxStall" }
+        object TestingDirAuthVoteExit: KeyWord() { override fun toString(): String = "TestingDirAuthVoteExit" }
+        object TestingDirAuthVoteExitIsStrict: KeyWord() { override fun toString(): String = "TestingDirAuthVoteExitIsStrict" }
+        object TestingDirAuthVoteGuard: KeyWord() { override fun toString(): String = "TestingDirAuthVoteGuard" }
+        object TestingDirAuthVoteGuardIsStrict: KeyWord() { override fun toString(): String = "TestingDirAuthVoteGuardIsStrict" }
+        object TestingDirAuthVoteHSDir: KeyWord() { override fun toString(): String = "TestingDirAuthVoteHSDir" }
+        object TestingDirAuthVoteHSDirIsStrict: KeyWord() { override fun toString(): String = "TestingDirAuthVoteHSDirIsStrict" }
+        object TestingEnableConnBwEvent: KeyWord() { override fun toString(): String = "TestingEnableConnBwEvent" }
+        object TestingEnableCellStatsEvent: KeyWord() { override fun toString(): String = "TestingEnableCellStatsEvent" }
+        object TestingMinExitFlagThreshold: KeyWord() { override fun toString(): String = "TestingMinExitFlagThreshold" }
+        object TestingLinkCertLifetime: KeyWord() { override fun toString(): String = "TestingLinkCertLifetime" }
+        object TestingAuthKeyLifetime: KeyWord() { override fun toString(): String = "TestingAuthKeyLifetime" }
+        object TestingSigningKeySlop: KeyWord() { override fun toString(): String = "TestingSigningKeySlop" }
+
+
+/* === NON-PERSISTENT OPTIONS ================= NOT yet implemented as a TorConfig.Setting ========================== */
+        object __ControlPort: KeyWord() { override fun toString(): String = "__ControlPort" }
+        object __DirPort: KeyWord() { override fun toString(): String = "__DirPort" }
+        object __DNSPort: KeyWord() { override fun toString(): String = "__DNSPort" }
+        object __ExtORPort: KeyWord() { override fun toString(): String = "__ExtORPort" }
+        object __NATDPort: KeyWord() { override fun toString(): String = "__NATDPort" }
+        object __ORPort: KeyWord() { override fun toString(): String = "__ORPort" }
+        object __SocksPort: KeyWord() { override fun toString(): String = "__SocksPort" }
+        object __HttpTunnelPort: KeyWord() { override fun toString(): String = "__HttpTunnelPort" }
+        object __TransPort: KeyWord() { override fun toString(): String = "__TransPort" }
+
+
+/* === NON-PERSISTENT CONTROLLER OPTIONS ====== NOT yet implemented as a TorConfig.Setting ========================== */
+        // See: https://torproject.gitlab.io/torspec/control-spec/#tor-config-options-for-use-by-controllers
+        object __AllDirActionsPrivate: KeyWord() { override fun toString(): String = "__AllDirActionsPrivate" }
+        object __DisablePredictedCircuits: KeyWord() { override fun toString(): String = "__DisablePredictedCircuits" }
+        object __LeaveStreamsUnattached: KeyWord() { override fun toString(): String = "__LeaveStreamsUnattached" }
+        object __HashedControlSessionPassword: KeyWord() { override fun toString(): String = "__HashedControlSessionPassword" }
+        object __ReloadTorrcOnSIGHUP: KeyWord() { override fun toString(): String = "__ReloadTorrcOnSIGHUP" }
+        object __OwningControllerFD: KeyWord() { override fun toString(): String = "__OwningControllerFD" }
+        object __DisableSignalHandlers: KeyWord() { override fun toString(): String = "__DisableSignalHandlers" }
+
+
+        // DEPRECATED
+        @Deprecated(message = "DEPRECATED: As of 0.3.1.0-alpha you should use HTTPSProxy.")
+        object HTTPProxy: KeyWord() { override fun toString(): String = "HTTPProxy" }
+        @Deprecated(message = "DEPRECATED: As of 0.3.1.0-alpha you should use HTTPSProxyAuthenticator.")
+        object HTTPProxyAuthenticator: KeyWord() { override fun toString(): String = "HTTPProxyAuthenticator" }
+        @Deprecated(message = "This option is deprecated; use ReachableAddresses instead.")
+        object FirewallPorts: KeyWord() { override fun toString(): String = "FirewallPorts" }
+        @Deprecated(message = "DEPRECATED: This option has had no effect for some time.")
+        object ReachableDirAddresses: KeyWord() { override fun toString(): String = "ReachableDirAddresses" }
+        @Deprecated(message = "DEPRECATED: This option has had no effect for some time.")
+        object ClientPreferIPv6DirPort: KeyWord() { override fun toString(): String = "ClientPreferIPv6DirPort" }
+
+        @Deprecated(message = "Use KeyWord.GeoIPFile", replaceWith = ReplaceWith(expression = "TorConfig.KeyWord.GeoIPFile"))
+        object GeoIpV4File: KeyWord() { override fun toString(): String = "GeoIPFile" }
+        @Deprecated(message = "Use KeyWord.__OwningControllerProcess", replaceWith = ReplaceWith(expression = "TorConfig.KeyWord.__OwningControllerProcess"))
+        object OwningControllerProcess: KeyWord() { override fun toString(): String = "__OwningControllerProcess" }
     }
 }

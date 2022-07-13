@@ -19,6 +19,7 @@ import io.matthewnelson.kmp.tor.common.address.*
 import io.matthewnelson.kmp.tor.common.annotation.InternalTorApi
 import io.matthewnelson.kmp.tor.common.clientauth.ClientName
 import io.matthewnelson.kmp.tor.common.clientauth.OnionClientAuthPrivateKey_B32_X25519
+import io.matthewnelson.kmp.tor.controller.common.config.ConfigEntry
 import io.matthewnelson.kmp.tor.controller.common.config.TorConfig
 import io.matthewnelson.kmp.tor.controller.common.control.TorControlOnionClientAuth
 import io.matthewnelson.kmp.tor.controller.common.control.usecase.TorControlInfoGet.KeyWord
@@ -26,7 +27,8 @@ import io.matthewnelson.kmp.tor.controller.common.control.usecase.TorControlOnio
 import io.matthewnelson.kmp.tor.controller.common.events.TorEvent
 import io.matthewnelson.kmp.tor.controller.common.internal.PlatformUtil
 import io.matthewnelson.kmp.tor.controller.common.internal.appendTo
-import io.matthewnelson.kmp.tor.helper.TorTestHelper
+import io.matthewnelson.kmp.tor.helpers.model.KeyWordModel
+import io.matthewnelson.kmp.tor.helpers.TorTestHelper
 import io.matthewnelson.kmp.tor.manager.common.event.TorManagerEvent
 import io.matthewnelson.kmp.tor.manager.util.PortUtil
 import kotlinx.coroutines.delay
@@ -579,6 +581,33 @@ class TorControllerIntegrationTest: TorTestHelper() {
                 throw throwable
             }
         }
+
+        Unit
+    }
+
+    /**
+     * Validate all [TorConfig.KeyWord]s as recognized by Tor.
+     * */
+    @Test
+    fun givenKeyWord_whenInfoGet_returnsAsRecognized() = runBlocking {
+        val keywords = KeyWordModel().getAll()
+
+        val successes = mutableListOf<Result<List<ConfigEntry>>>()
+        val failures = mutableListOf<Result<List<ConfigEntry>>>()
+
+        for (keyword in keywords) {
+            val response = manager.configGet(keyword)
+            if (response.isSuccess) {
+                successes.add(response)
+            } else {
+                failures.add(response)
+            }
+        }
+
+        for (response in failures) {
+            println(response)
+        }
+        assertTrue(failures.isEmpty())
 
         Unit
     }
