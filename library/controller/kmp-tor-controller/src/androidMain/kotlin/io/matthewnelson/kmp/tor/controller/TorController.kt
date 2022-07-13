@@ -33,7 +33,7 @@ import io.matthewnelson.kmp.tor.controller.internal.getTorControllerDispatcher
 import io.matthewnelson.kmp.tor.controller.internal.io.ReaderWrapper
 import io.matthewnelson.kmp.tor.controller.internal.io.SocketWrapper
 import io.matthewnelson.kmp.tor.controller.internal.io.WriterWrapper
-import io.matthewnelson.kmp.tor.controller.internal.toTorController
+import io.matthewnelson.kmp.tor.controller.internal.ext.toTorController
 import kotlinx.coroutines.withContext
 import java.io.*
 import java.net.Socket

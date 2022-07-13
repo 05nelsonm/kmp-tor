@@ -29,7 +29,7 @@ import io.matthewnelson.kmp.tor.controller.common.internal.isUnixPath
 import io.matthewnelson.kmp.tor.controller.internal.controller.RealTorController
 import io.matthewnelson.kmp.tor.controller.internal.controller.RealTorControlProcessor
 import io.matthewnelson.kmp.tor.controller.internal.getTorControllerDispatcher
-import io.matthewnelson.kmp.tor.controller.internal.toTorController
+import io.matthewnelson.kmp.tor.controller.internal.ext.toTorController
 import kotlinx.coroutines.withContext
 import java.io.*
 import java.net.Socket
