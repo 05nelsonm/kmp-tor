@@ -15,8 +15,8 @@
  **/
 package io.matthewnelson.kmp.tor.common.address
 
-import io.matthewnelson.kmp.tor.common.util.stripAddress
-import io.matthewnelson.kmp.tor.common.util.stripString
+import io.matthewnelson.kmp.tor.common.internal.stripAddress
+import io.matthewnelson.kmp.tor.common.internal.stripString
 import kotlin.jvm.JvmStatic
 
 /**
@@ -42,7 +42,7 @@ sealed interface OnionAddress {
 
             try {
                 return OnionAddressV3(stripped)
-            } catch (e: IllegalArgumentException) {}
+            } catch (_: IllegalArgumentException) {}
 
             throw IllegalArgumentException("String was not an OnionAddress")
         }

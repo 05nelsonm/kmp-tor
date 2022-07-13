@@ -13,12 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-package io.matthewnelson.kmp.tor.common.util
+package io.matthewnelson.kmp.tor.common.internal
 
 import io.matthewnelson.kmp.tor.common.address.Scheme
-import kotlin.jvm.JvmSynthetic
 
-@JvmSynthetic
 @Suppress("nothing_to_inline")
 internal inline fun String.stripString(): String {
     var limit = length
@@ -35,7 +33,6 @@ internal inline fun String.stripString(): String {
     return this.substring(0, limit).trimStart()
 }
 
-@JvmSynthetic
 @Suppress("nothing_to_inline")
 internal inline fun String.separateSchemeFromAddress(): Pair<Scheme?, String> {
     val trimmed = this.trim()
@@ -50,7 +47,6 @@ internal inline fun String.separateSchemeFromAddress(): Pair<Scheme?, String> {
     )
 }
 
-@JvmSynthetic
 @Suppress("nothing_to_inline")
 internal inline fun String.stripAddress(): String {
     return separateSchemeFromAddress()

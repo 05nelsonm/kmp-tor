@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Matthew Nelson
+ * Copyright (c) 2022 Matthew Nelson
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,10 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-package io.matthewnelson.kmp.tor.common.util
+package io.matthewnelson.kmp.tor.common.internal
 
 import io.matthewnelson.kmp.tor.common.annotation.InternalTorApi
 
+@InternalTorApi
 object TorStrings {
     @InternalTorApi
     @Suppress("SpellCheckingInspection")

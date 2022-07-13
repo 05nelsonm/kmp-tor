@@ -20,7 +20,7 @@ import io.matthewnelson.component.encoding.base32.Base32
 import io.matthewnelson.component.encoding.base32.encodeBase32
 import io.matthewnelson.kmp.tor.common.annotation.ExperimentalTorApi
 import io.matthewnelson.kmp.tor.common.annotation.SealedValueClass
-import io.matthewnelson.kmp.tor.common.util.descriptorString
+import io.matthewnelson.kmp.tor.common.internal.descriptorString
 import kotlin.jvm.JvmInline
 import kotlin.jvm.JvmStatic
 

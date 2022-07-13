@@ -23,8 +23,8 @@ import io.matthewnelson.kmp.tor.common.annotation.InternalTorApi
 import io.matthewnelson.kmp.tor.common.clientauth.ClientName
 import io.matthewnelson.kmp.tor.common.clientauth.OnionClientAuth
 import io.matthewnelson.kmp.tor.common.server.Server
-import io.matthewnelson.kmp.tor.common.util.TorStrings.CLRF
-import io.matthewnelson.kmp.tor.common.util.TorStrings.MULTI_LINE_END
+import io.matthewnelson.kmp.tor.common.internal.TorStrings.CLRF
+import io.matthewnelson.kmp.tor.common.internal.TorStrings.MULTI_LINE_END
 import io.matthewnelson.kmp.tor.controller.common.config.ClientAuthEntry
 import io.matthewnelson.kmp.tor.controller.common.config.ConfigEntry
 import io.matthewnelson.kmp.tor.controller.common.config.HiddenServiceEntry

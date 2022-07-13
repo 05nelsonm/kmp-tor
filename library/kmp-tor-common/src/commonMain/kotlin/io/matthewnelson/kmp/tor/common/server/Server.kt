@@ -29,7 +29,7 @@ import kotlin.jvm.JvmStatic
 class Server private constructor() {
 
     /**
-     * Holder for a valid base16 encoded (without padding '=') Server Fingerprint
+     * Holder for a valid base16 encoded Server Fingerprint
      *
      * Ex: F00EC2E0A2CA79A57FE7A0918A087987747D772D
      * */

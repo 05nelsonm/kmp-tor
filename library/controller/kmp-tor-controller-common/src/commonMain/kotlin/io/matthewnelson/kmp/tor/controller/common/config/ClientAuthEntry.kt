@@ -20,7 +20,7 @@ import io.matthewnelson.kmp.tor.common.annotation.InternalTorApi
 import io.matthewnelson.kmp.tor.common.clientauth.ClientName
 import io.matthewnelson.kmp.tor.common.clientauth.OnionClientAuth.Key.Type
 import io.matthewnelson.kmp.tor.common.clientauth.OnionClientAuthPrivateKey_B64_X25519
-import io.matthewnelson.kmp.tor.common.util.TorStrings.REDACTED
+import io.matthewnelson.kmp.tor.common.internal.TorStrings.REDACTED
 import io.matthewnelson.kmp.tor.controller.common.control.TorControlOnionClientAuth
 import io.matthewnelson.kmp.tor.controller.common.control.usecase.TorControlOnionClientAuthView
 import kotlin.jvm.JvmField

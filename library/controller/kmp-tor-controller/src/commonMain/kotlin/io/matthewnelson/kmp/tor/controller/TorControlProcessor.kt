@@ -32,11 +32,10 @@ import io.matthewnelson.kmp.tor.controller.common.control.usecase.*
 import io.matthewnelson.kmp.tor.controller.common.control.usecase.TorControlInfoGet.KeyWord
 import io.matthewnelson.kmp.tor.controller.common.events.TorEvent
 import io.matthewnelson.kmp.tor.controller.common.exceptions.TorControllerException
-import io.matthewnelson.kmp.tor.common.util.TorStrings.CLRF
-import io.matthewnelson.kmp.tor.common.util.TorStrings.MULTI_LINE_END
-import io.matthewnelson.kmp.tor.common.util.TorStrings.SP
+import io.matthewnelson.kmp.tor.common.internal.TorStrings.CLRF
+import io.matthewnelson.kmp.tor.common.internal.TorStrings.MULTI_LINE_END
+import io.matthewnelson.kmp.tor.common.internal.TorStrings.SP
 import io.matthewnelson.kmp.tor.controller.common.config.HiddenServiceEntry
-import io.matthewnelson.kmp.tor.controller.common.file.Path
 import io.matthewnelson.kmp.tor.controller.common.internal.PlatformUtil
 import io.matthewnelson.kmp.tor.controller.common.internal.appendTo
 import io.matthewnelson.kmp.tor.controller.common.internal.filterSupportedOnly

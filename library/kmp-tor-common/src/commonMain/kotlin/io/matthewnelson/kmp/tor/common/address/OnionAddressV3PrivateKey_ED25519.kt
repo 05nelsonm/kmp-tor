@@ -21,8 +21,8 @@ import io.matthewnelson.kmp.tor.common.annotation.ExperimentalTorApi
 import io.matthewnelson.kmp.tor.common.annotation.InternalTorApi
 import io.matthewnelson.kmp.tor.common.annotation.SealedValueClass
 import io.matthewnelson.kmp.tor.common.clientauth.OnionClientAuthPrivateKey_B64_X25519.Companion.REGEX
-import io.matthewnelson.kmp.tor.common.util.TorStrings.REDACTED
-import io.matthewnelson.kmp.tor.common.util.stripString
+import io.matthewnelson.kmp.tor.common.internal.TorStrings.REDACTED
+import io.matthewnelson.kmp.tor.common.internal.stripString
 import kotlin.jvm.JvmInline
 import kotlin.jvm.JvmStatic
 

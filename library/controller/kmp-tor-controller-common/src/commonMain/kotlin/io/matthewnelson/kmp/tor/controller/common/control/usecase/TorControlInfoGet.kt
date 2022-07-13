@@ -17,7 +17,7 @@ package io.matthewnelson.kmp.tor.controller.common.control.usecase
 
 import io.matthewnelson.kmp.tor.common.address.OnionAddress
 import io.matthewnelson.kmp.tor.common.annotation.InternalTorApi
-import io.matthewnelson.kmp.tor.common.util.TorStrings.REDACTED
+import io.matthewnelson.kmp.tor.common.internal.TorStrings.REDACTED
 import kotlin.jvm.JvmField
 
 /**

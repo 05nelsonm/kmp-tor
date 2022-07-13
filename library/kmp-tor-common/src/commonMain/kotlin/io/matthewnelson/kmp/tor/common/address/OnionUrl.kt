@@ -15,9 +15,8 @@
  **/
 package io.matthewnelson.kmp.tor.common.address
 
-import io.matthewnelson.kmp.tor.common.util.separateSchemeFromAddress
+import io.matthewnelson.kmp.tor.common.internal.separateSchemeFromAddress
 import kotlin.jvm.JvmField
-import kotlin.jvm.JvmName
 import kotlin.jvm.JvmStatic
 
 /**
@@ -96,7 +95,7 @@ data class OnionUrl(
 
 //            val oAddress = try {
 //                OnionAddressV3(splits[0])
-//            } catch (e: IllegalArgumentException) {
+//            } catch (_: IllegalArgumentException) {
 //                OnionAddressV4(splits[0])
 //            }
 

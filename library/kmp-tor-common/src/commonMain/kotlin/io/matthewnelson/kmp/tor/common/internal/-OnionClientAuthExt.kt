@@ -13,13 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-package io.matthewnelson.kmp.tor.common.util
+package io.matthewnelson.kmp.tor.common.internal
 
 import io.matthewnelson.kmp.tor.common.address.OnionAddressV3
 import io.matthewnelson.kmp.tor.common.clientauth.OnionClientAuth
-import kotlin.jvm.JvmSynthetic
 
-@JvmSynthetic
 @Suppress("nothing_to_inline")
 internal inline fun OnionClientAuth.PrivateKey.descriptorString(address: OnionAddressV3): String =
     StringBuilder(address.value)
@@ -29,7 +27,6 @@ internal inline fun OnionClientAuth.PrivateKey.descriptorString(address: OnionAd
         .append(value)
         .toString()
 
-@JvmSynthetic
 @Suppress("nothing_to_inline")
 internal inline fun OnionClientAuth.PublicKey.descriptorString(): String =
     StringBuilder(OnionClientAuth.PublicKey.DESCRIPTOR)

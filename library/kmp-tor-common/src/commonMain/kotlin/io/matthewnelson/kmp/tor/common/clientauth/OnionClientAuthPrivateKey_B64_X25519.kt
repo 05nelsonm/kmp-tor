@@ -23,8 +23,8 @@ import io.matthewnelson.kmp.tor.common.address.OnionAddressV3
 import io.matthewnelson.kmp.tor.common.annotation.ExperimentalTorApi
 import io.matthewnelson.kmp.tor.common.annotation.InternalTorApi
 import io.matthewnelson.kmp.tor.common.annotation.SealedValueClass
-import io.matthewnelson.kmp.tor.common.util.TorStrings.REDACTED
-import io.matthewnelson.kmp.tor.common.util.descriptorString
+import io.matthewnelson.kmp.tor.common.internal.TorStrings.REDACTED
+import io.matthewnelson.kmp.tor.common.internal.descriptorString
 import kotlin.jvm.JvmInline
 import kotlin.jvm.JvmStatic
 
