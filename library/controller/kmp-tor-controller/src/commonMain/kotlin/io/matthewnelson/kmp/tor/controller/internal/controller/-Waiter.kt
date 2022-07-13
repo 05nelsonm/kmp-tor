@@ -25,30 +25,15 @@ import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlin.coroutines.cancellation.CancellationException
-import kotlin.jvm.JvmSynthetic
 
 @OptIn(InternalTorApi::class)
-internal sealed interface Waiter {
-    @Throws(CancellationException::class, ControllerShutdownException::class)
-    suspend fun getResponse(): List<ReplyLine.SingleLine>
-    fun setResponse(response: List<ReplyLine.SingleLine>)
+internal class Waiter(val isConnected: () -> Boolean) {
 
-    companion object {
-        @JvmSynthetic
-        internal fun newInstance(isConnected: () -> Boolean): Waiter =
-            RealWaiter(isConnected)
-    }
-}
-
-@OptIn(InternalTorApi::class)
-private class RealWaiter(
-    val isConnected: () -> Boolean
-): Waiter {
     private val response: AtomicRef<List<ReplyLine.SingleLine>?> = atomic(null)
     private val lock = Mutex()
 
     @Throws(CancellationException::class, ControllerShutdownException::class)
-    override suspend fun getResponse(): List<ReplyLine.SingleLine> {
+    internal suspend fun getResponse(): List<ReplyLine.SingleLine> {
         lock.withLock {
             while (true) {
                 response.value?.let { return it }
@@ -59,7 +44,7 @@ private class RealWaiter(
         }
     }
 
-    override fun setResponse(response: List<ReplyLine.SingleLine>) {
+    internal fun setResponse(response: List<ReplyLine.SingleLine>) {
         this.response.value = response
     }
 }

@@ -179,7 +179,7 @@ internal class RealTorController(
             TorControllerException::class,
         )
         override suspend fun processCommand(command: String): List<ReplyLine.SingleLine> {
-            val waiter = Waiter.newInstance { isConnected }
+            val waiter = Waiter { isConnected }
             waiters.withLock {
 
                 if (command.startsWith('+')) {
