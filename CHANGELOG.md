@@ -1,5 +1,16 @@
 # CHANGELOG
 
+## Version 0.4.7.8+1.1.0 (2022-07-14)
+ - Optimized `TorEvent.Listener`
+ - Adds remaining `TorConfig.KeyWord`s
+ - Adds ability to pass `HiddenService.UnixSocket` when adding a `HiddenService` via 
+   the control port.
+     - Minor breaking change here, as the `TorControlOnionAdd` interface
+       methods were modified from accepting `Set<HiddenService.Ports>`, to accept
+       `Set<HiddenService.VirtualPort>`
+ - Refactored/cleaned up internals
+ - CI/Build improvements
+
 ## Version 0.4.7.8+1.0.0 (2022-06-26)
  - Updates `atomicfu` dependency from `0.17.2` -> `0.17.3`
  - Updates `coroutines` dependency from `1.6.1` -> `1.6.3`
