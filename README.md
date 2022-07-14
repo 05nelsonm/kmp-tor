@@ -5,6 +5,8 @@
 [![badge-kotlin]][url-kotlin]
 [![badge-atomicfu]][url-atomicfu]
 [![badge-coroutines]][url-coroutines]
+[![badge-encoding]][url-encoding]
+[![badge-kmp-tor-binary]][url-kmp-tor-binary]
 
 ![badge-platform-android]
 ![badge-platform-jvm]
@@ -223,13 +225,19 @@ $ git pull --recurse-submodules
 ```
 
 <!-- TAG_VERSION -->
+<!-- If Tor version was updated, don't forget to update [badge-kmp-tor-binary] -->
 
 [badge-latest-release]: https://img.shields.io/badge/latest--release-0.4.7.8+1.1.0-5d2f68.svg?logo=torproject&style=flat&logoColor=5d2f68
-
 [badge-license]: https://img.shields.io/badge/license-Apache%20License%202.0-blue.svg?style=flat
+
+<!-- TAG_DEPENDENCIES -->
 [badge-kotlin]: https://img.shields.io/badge/kotlin-1.6.21-blue.svg?logo=kotlin
 [badge-atomicfu]: https://img.shields.io/badge/atomicfu-0.17.3-blue.svg?logo=kotlin
 [badge-coroutines]: https://img.shields.io/badge/coroutines-1.6.3-blue.svg?logo=kotlin
+[badge-encoding]: https://img.shields.io/badge/encoding-1.1.3-blue.svg?style=flat
+[badge-kmp-tor-binary]: https://img.shields.io/badge/kmp--tor--binary-0.4.7.8-5d2f68.svg?logo=torproject&style=flat&logoColor=5d2f68
+
+<!-- TAG_PLATFORMS -->
 [badge-platform-android]: https://camo.githubusercontent.com/b1d9ad56ab51c4ad1417e9a5ad2a8fe63bcc4755e584ec7defef83755c23f923/687474703a2f2f696d672e736869656c64732e696f2f62616467652f706c6174666f726d2d616e64726f69642d3645444238442e7376673f7374796c653d666c6174
 [badge-platform-jvm]: https://camo.githubusercontent.com/700f5dcd442fd835875568c038ae5cd53518c80ae5a0cf12c7c5cf4743b5225b/687474703a2f2f696d672e736869656c64732e696f2f62616467652f706c6174666f726d2d6a766d2d4442343133442e7376673f7374796c653d666c6174
 
@@ -238,6 +246,8 @@ $ git pull --recurse-submodules
 [url-kotlin]: https://kotlinlang.org
 [url-atomicfu]: https://github.com/Kotlin/kotlinx.atomicfu
 [url-coroutines]: https://github.com/Kotlin/kotlinx.coroutines
+[url-encoding]: https://github.com/05nelsonm/component-encoding
+[url-kmp-tor-binary]: https://github.com/05nelsonm/kmp-tor-binary
 [url-kmp-tor-binary]: https://github.com/05nelsonm/kmp-tor-binary/blob/master/README.md
 [url-android-kotlin-app]: https://github.com/05nelsonm/kmp-tor/tree/master/samples/kotlin/android/src/main/java/io/matthewnelson/kmp/tor/sample/kotlin/android
 [url-android-kotlin-attrs]: https://github.com/05nelsonm/kmp-tor/blob/master/samples/kotlin/android/src/main/res/values/attrs.xml
