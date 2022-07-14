@@ -59,7 +59,10 @@ allprojects {
 }
 
 plugins {
+    val vBinaryCompat = io.matthewnelson.kotlin.components.dependencies.versions.gradle.binaryCompat
+
     id(pluginId.kmp.publish)
+    id(pluginId.kotlin.binaryCompat) version(vBinaryCompat)
 }
 
 kmpPublish {
@@ -68,4 +71,38 @@ kmpPublish {
         versionCode = env.kmpTor.version.code,
         pomInceptionYear = 2021,
     )
+}
+
+@Suppress("LocalVariableName")
+apiValidation {
+    val KMP_TARGETS = findProperty("KMP_TARGETS") as? String
+    val CHECK_PUBLICATION = findProperty("CHECK_PUBLICATION") as? String
+    val KMP_TARGETS_ALL = System.getProperty("KMP_TARGETS_ALL") != null
+    val TARGETS = KMP_TARGETS?.split(',')
+
+    if (CHECK_PUBLICATION != null) {
+        ignoredProjects.add("check-publication")
+    } else {
+        nonPublicMarkers.add("io.matthewnelson.kmp.tor.common.annotation.InternalTorApi")
+
+        val JVM = TARGETS?.contains("JVM") != false
+        val ANDROID = TARGETS?.contains("ANDROID") != false
+
+        // Don't check these projects when building JVM only
+        if (!KMP_TARGETS_ALL && (!ANDROID && JVM)) {
+            ignoredProjects.add("kmp-tor")
+            ignoredProjects.add("kmp-tor-controller")
+            ignoredProjects.add("kmp-tor-manager")
+            ignoredProjects.add("kmp-tor-ext-callback-controller")
+            ignoredProjects.add("kmp-tor-ext-callback-manager")
+        }
+
+        if (KMP_TARGETS_ALL || (ANDROID && JVM)) {
+            ignoredProjects.add("android")
+        }
+
+        if (KMP_TARGETS_ALL || JVM) {
+            ignoredProjects.add("javafx")
+        }
+    }
 }

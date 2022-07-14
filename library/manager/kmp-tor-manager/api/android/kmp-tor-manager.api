@@ -1,0 +1,122 @@
+public final class io/matthewnelson/kmp/tor/manager/BuildConfig {
+	public static final field BUILD_TYPE Ljava/lang/String;
+	public static final field DEBUG Z
+	public static final field LIBRARY_PACKAGE_NAME Ljava/lang/String;
+	public fun <init> ()V
+}
+
+public abstract interface class io/matthewnelson/kmp/tor/manager/Destroyable {
+	public abstract fun destroy (ZLkotlin/jvm/functions/Function0;)V
+	public abstract fun isDestroyed ()Z
+}
+
+public final class io/matthewnelson/kmp/tor/manager/Destroyable$DefaultImpls {
+	public static synthetic fun destroy$default (Lio/matthewnelson/kmp/tor/manager/Destroyable;ZLkotlin/jvm/functions/Function0;ILjava/lang/Object;)V
+}
+
+public abstract class io/matthewnelson/kmp/tor/manager/KmpTorLoader {
+	public static final field Companion Lio/matthewnelson/kmp/tor/manager/KmpTorLoader$Companion;
+	public fun <init> (Lio/matthewnelson/kmp/tor/manager/TorConfigProvider;)V
+	protected fun getExcludeSettings ()Ljava/util/Set;
+	protected final fun getProvider ()Lio/matthewnelson/kmp/tor/manager/TorConfigProvider;
+	protected fun setUnixDirPermissions (Lio/matthewnelson/kmp/tor/controller/common/file/Path;)V
+	protected abstract fun startTor (Ljava/util/List;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+}
+
+public final class io/matthewnelson/kmp/tor/manager/KmpTorLoader$Companion {
+}
+
+public abstract class io/matthewnelson/kmp/tor/manager/NetworkObserver {
+	public fun <init> ()V
+	protected final fun dispatchConnectivityChange (Lio/matthewnelson/kmp/tor/manager/NetworkObserver$Connectivity;)V
+	public abstract fun isNetworkConnected ()Z
+	protected fun onManagerAttach ()V
+	protected fun onManagerDetach ()V
+}
+
+public final class io/matthewnelson/kmp/tor/manager/NetworkObserver$Connectivity : java/lang/Enum {
+	public static final field Connected Lio/matthewnelson/kmp/tor/manager/NetworkObserver$Connectivity;
+	public static final field Disconnected Lio/matthewnelson/kmp/tor/manager/NetworkObserver$Connectivity;
+	public static fun valueOf (Ljava/lang/String;)Lio/matthewnelson/kmp/tor/manager/NetworkObserver$Connectivity;
+	public static fun values ()[Lio/matthewnelson/kmp/tor/manager/NetworkObserver$Connectivity;
+}
+
+public abstract class io/matthewnelson/kmp/tor/manager/TorConfigProvider {
+	public fun <init> ()V
+	protected fun extractGeoIpV4File (Lio/matthewnelson/kmp/tor/controller/common/file/Path;)V
+	protected fun extractGeoIpV6File (Lio/matthewnelson/kmp/tor/controller/common/file/Path;)V
+	public abstract fun getCacheDir ()Lio/matthewnelson/kmp/tor/controller/common/file/Path;
+	public fun getGeoIpV4File ()Lio/matthewnelson/kmp/tor/controller/common/file/Path;
+	public fun getGeoIpV6File ()Lio/matthewnelson/kmp/tor/controller/common/file/Path;
+	public final fun getLastValidatedTorConfig ()Lio/matthewnelson/kmp/tor/manager/TorConfigProvider$ValidatedTorConfig;
+	public fun getProcessId ()Ljava/lang/Integer;
+	public fun getTorrcDefaultsFile ()Lio/matthewnelson/kmp/tor/controller/common/file/Path;
+	public fun getTorrcFile ()Lio/matthewnelson/kmp/tor/controller/common/file/Path;
+	public abstract fun getWorkDir ()Lio/matthewnelson/kmp/tor/controller/common/file/Path;
+	protected abstract fun provide ()Lio/matthewnelson/kmp/tor/controller/common/config/TorConfig;
+}
+
+public final class io/matthewnelson/kmp/tor/manager/TorConfigProvider$ValidatedTorConfig {
+	public final field configLines Ljava/util/List;
+	public final field controlPortFile Lio/matthewnelson/kmp/tor/controller/common/file/Path;
+	public final field torConfig Lio/matthewnelson/kmp/tor/controller/common/config/TorConfig;
+	public fun <init> (Lio/matthewnelson/kmp/tor/controller/common/config/TorConfig;Ljava/util/List;Lio/matthewnelson/kmp/tor/controller/common/file/Path;Lio/matthewnelson/kmp/tor/controller/common/file/Path;)V
+	public final fun component1 ()Lio/matthewnelson/kmp/tor/controller/common/config/TorConfig;
+	public final fun component2 ()Ljava/util/List;
+	public final fun component3 ()Lio/matthewnelson/kmp/tor/controller/common/file/Path;
+	public final fun copy (Lio/matthewnelson/kmp/tor/controller/common/config/TorConfig;Ljava/util/List;Lio/matthewnelson/kmp/tor/controller/common/file/Path;Lio/matthewnelson/kmp/tor/controller/common/file/Path;)Lio/matthewnelson/kmp/tor/manager/TorConfigProvider$ValidatedTorConfig;
+	public static synthetic fun copy$default (Lio/matthewnelson/kmp/tor/manager/TorConfigProvider$ValidatedTorConfig;Lio/matthewnelson/kmp/tor/controller/common/config/TorConfig;Ljava/util/List;Lio/matthewnelson/kmp/tor/controller/common/file/Path;Lio/matthewnelson/kmp/tor/controller/common/file/Path;ILjava/lang/Object;)Lio/matthewnelson/kmp/tor/manager/TorConfigProvider$ValidatedTorConfig;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public abstract interface class io/matthewnelson/kmp/tor/manager/TorManager : io/matthewnelson/kmp/tor/controller/common/events/TorEventProcessor, io/matthewnelson/kmp/tor/manager/Destroyable, io/matthewnelson/kmp/tor/manager/common/TorControlManager, io/matthewnelson/kmp/tor/manager/common/TorOperationManager, io/matthewnelson/kmp/tor/manager/common/state/TorStateManager {
+	public static final field Companion Lio/matthewnelson/kmp/tor/manager/TorManager$Companion;
+	public abstract fun debug (Z)V
+	public abstract fun getInstanceId ()Ljava/lang/String;
+	public static fun newInstance (Landroid/app/Application;Lio/matthewnelson/kmp/tor/manager/KmpTorLoader;)Lio/matthewnelson/kmp/tor/manager/TorManager;
+	public static fun newInstance (Landroid/app/Application;Lio/matthewnelson/kmp/tor/manager/KmpTorLoader;Ljava/util/Set;)Lio/matthewnelson/kmp/tor/manager/TorManager;
+}
+
+public final class io/matthewnelson/kmp/tor/manager/TorManager$Companion {
+	public final fun newInstance (Landroid/app/Application;Lio/matthewnelson/kmp/tor/manager/KmpTorLoader;)Lio/matthewnelson/kmp/tor/manager/TorManager;
+	public final fun newInstance (Landroid/app/Application;Lio/matthewnelson/kmp/tor/manager/KmpTorLoader;Ljava/util/Set;)Lio/matthewnelson/kmp/tor/manager/TorManager;
+	public static synthetic fun newInstance$default (Lio/matthewnelson/kmp/tor/manager/TorManager$Companion;Landroid/app/Application;Lio/matthewnelson/kmp/tor/manager/KmpTorLoader;Ljava/util/Set;ILjava/lang/Object;)Lio/matthewnelson/kmp/tor/manager/TorManager;
+}
+
+public abstract class io/matthewnelson/kmp/tor/manager/TorServiceConfig {
+	public static final field Companion Lio/matthewnelson/kmp/tor/manager/TorServiceConfig$Companion;
+	public fun equals (Ljava/lang/Object;)Z
+	public abstract fun getChannelDescription ()Ljava/lang/String;
+	public abstract fun getChannelId ()Ljava/lang/String;
+	public abstract fun getChannelName ()Ljava/lang/String;
+	public abstract fun getChannelShowBadge ()Z
+	public final fun getColorWhenBootstrappedFalse ()I
+	public final fun getColorWhenBootstrappedTrue ()I
+	public abstract fun getEnableForeground ()Z
+	public abstract fun getEnableRestartAction ()Z
+	public abstract fun getEnableStopAction ()Z
+	public final fun getIconDataXfer ()I
+	public final fun getIconError ()I
+	public final fun getIconNetworkDisabled ()I
+	public final fun getIconNetworkEnabled ()I
+	public abstract fun getIfForegroundExitProcessOnDestroyWhenTaskRemoved ()Z
+	public static final fun getMetaData (Landroid/content/Context;)Lio/matthewnelson/kmp/tor/manager/TorServiceConfig;
+	public abstract fun getNotificationId ()I
+	public abstract fun getStopServiceOnTaskRemoved ()Z
+	public abstract fun getVisibility ()I
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/matthewnelson/kmp/tor/manager/TorServiceConfig$Companion {
+	public final fun getMetaData (Landroid/content/Context;)Lio/matthewnelson/kmp/tor/manager/TorServiceConfig;
+}
+
+public final class io/matthewnelson/kmp/tor/manager/util/PortUtil {
+	public static final field INSTANCE Lio/matthewnelson/kmp/tor/manager/util/PortUtil;
+	public static final fun findNextAvailableTcpPort (Lio/matthewnelson/kmp/tor/common/address/Port;I)Lio/matthewnelson/kmp/tor/common/address/Port;
+	public static final fun isTcpPortAvailable (Lio/matthewnelson/kmp/tor/common/address/Port;)Z
+}
+

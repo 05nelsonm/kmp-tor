@@ -1,0 +1,23 @@
+public final class io/matthewnelson/kmp/tor/BuildConfig {
+	public static final field BUILD_TYPE Ljava/lang/String;
+	public static final field DEBUG Z
+	public static final field LIBRARY_PACKAGE_NAME Ljava/lang/String;
+	public fun <init> ()V
+}
+
+public final class io/matthewnelson/kmp/tor/KmpTorLoaderAndroid : io/matthewnelson/kmp/tor/manager/KmpTorLoader {
+	public fun <init> (Lio/matthewnelson/kmp/tor/TorConfigProviderAndroid;)V
+}
+
+public abstract class io/matthewnelson/kmp/tor/TorConfigProviderAndroid : io/matthewnelson/kmp/tor/manager/TorConfigProvider {
+	public fun <init> (Landroid/content/Context;)V
+	protected fun extractGeoIpV4File (Lio/matthewnelson/kmp/tor/controller/common/file/Path;)V
+	protected fun extractGeoIpV6File (Lio/matthewnelson/kmp/tor/controller/common/file/Path;)V
+	public final fun getAppContext ()Landroid/content/Context;
+	public fun getCacheDir ()Lio/matthewnelson/kmp/tor/controller/common/file/Path;
+	public fun getGeoIpV4File ()Lio/matthewnelson/kmp/tor/controller/common/file/Path;
+	public fun getGeoIpV6File ()Lio/matthewnelson/kmp/tor/controller/common/file/Path;
+	public fun getProcessId ()Ljava/lang/Integer;
+	public fun getWorkDir ()Lio/matthewnelson/kmp/tor/controller/common/file/Path;
+}
+
