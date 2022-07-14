@@ -85,14 +85,23 @@ apiValidation {
     } else {
         nonPublicMarkers.add("io.matthewnelson.kmp.tor.common.annotation.InternalTorApi")
 
-        if (
-            KMP_TARGETS_ALL ||
-            (TARGETS?.contains("ANDROID") != false && TARGETS?.contains("JVM") != false)
-        ) {
+        val JVM = TARGETS?.contains("JVM") != false
+        val ANDROID = TARGETS?.contains("ANDROID") != false
+
+        // Don't check these projects when building JVM only
+        if (!KMP_TARGETS_ALL && (!ANDROID && JVM)) {
+            ignoredProjects.add("kmp-tor")
+            ignoredProjects.add("kmp-tor-controller")
+            ignoredProjects.add("kmp-tor-manager")
+            ignoredProjects.add("kmp-tor-ext-callback-controller")
+            ignoredProjects.add("kmp-tor-ext-callback-manager")
+        }
+
+        if (KMP_TARGETS_ALL || (ANDROID && JVM)) {
             ignoredProjects.add("android")
         }
 
-        if (KMP_TARGETS_ALL || TARGETS?.contains("JVM") != false) {
+        if (KMP_TARGETS_ALL || JVM) {
             ignoredProjects.add("javafx")
         }
     }
