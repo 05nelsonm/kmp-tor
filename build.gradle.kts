@@ -59,7 +59,10 @@ allprojects {
 }
 
 plugins {
+    val vBinaryCompat = io.matthewnelson.kotlin.components.dependencies.versions.gradle.binaryCompat
+
     id(pluginId.kmp.publish)
+    id(pluginId.kotlin.binaryCompat) version(vBinaryCompat)
 }
 
 kmpPublish {
@@ -68,4 +71,10 @@ kmpPublish {
         versionCode = env.kmpTor.version.code,
         pomInceptionYear = 2021,
     )
+}
+
+apiValidation {
+    ignoredProjects.add("android")
+    ignoredProjects.add("javafx")
+    nonPublicMarkers.add("io.matthewnelson.kmp.tor.common.annotation.InternalTorApi")
 }
