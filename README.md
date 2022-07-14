@@ -1,11 +1,13 @@
 # kmp-tor
-[![Kotlin](https://img.shields.io/badge/kotlin-1.6.21-blue.svg?logo=kotlin)](http://kotlinlang.org)
-[![Kotlin Coroutines](https://img.shields.io/badge/coroutines-1.6.3-blue.svg?logo=kotlin)](https://github.com/Kotlin/kotlinx.coroutines)
-[![Kotlin Atomicfu](https://img.shields.io/badge/atomicfu-0.17.3-blue.svg?logo=kotlin)](https://github.com/Kotlin/kotlinx.atomicfu)
-[![GitHub license](https://img.shields.io/badge/license-Apache%20License%202.0-blue.svg?style=flat)](https://www.apache.org/licenses/LICENSE-2.0)  
+[![badge-license]][url-license]
+![badge-kmp-tor]
 
-![android](https://camo.githubusercontent.com/b1d9ad56ab51c4ad1417e9a5ad2a8fe63bcc4755e584ec7defef83755c23f923/687474703a2f2f696d672e736869656c64732e696f2f62616467652f706c6174666f726d2d616e64726f69642d3645444238442e7376673f7374796c653d666c6174)
-![jvm](https://camo.githubusercontent.com/700f5dcd442fd835875568c038ae5cd53518c80ae5a0cf12c7c5cf4743b5225b/687474703a2f2f696d672e736869656c64732e696f2f62616467652f706c6174666f726d2d6a766d2d4442343133442e7376673f7374796c653d666c6174)  
+[![badge-kotlin]][url-kotlin]
+[![badge-atomicfu]][url-atomicfu]
+[![badge-coroutines]][url-coroutines]
+
+![badge-platform-android]
+![badge-platform-jvm]
 
 Kotlin Multiplatform support for embedding Tor into your application.
 
@@ -16,7 +18,7 @@ Add dependency
 // build.gradle.kts
 dependencies {
     val vTor = "0.4.7.8"
-    val vKmpTor = "1.0.0"
+    val vKmpTor = "1.1.0"
     implementation("io.matthewnelson.kotlin-components:kmp-tor:$vTor+$vKmpTor")
 }
 ```
@@ -25,7 +27,7 @@ dependencies {
 // build.gradle
 dependencies {
    def vTor = '0.4.7.8'
-   def vKmpTor = '1.0.0'
+   def vKmpTor = '1.1.0'
    implementation "io.matthewnelson.kotlin-components:kmp-tor:$vTor+$vKmpTor"
 }
 ```
@@ -34,17 +36,16 @@ dependencies {
     <summary>Configuring an Android Project</summary>
 
 
- - See the Android section of [Configuring Gradle](https://github.com/05nelsonm/kmp-tor-binary/blob/master/README.md) 
+ - See the Android section of [Configuring Gradle][url-kmp-tor-binary] 
    to setup things up so the Tor binaries are properly extracted upon app install.
 
  - By default, `TorService` needs no configuration and runs in the background. For configuring 
    it to run as a Foreground service, see the following:
-     - [Configuring Attrs](https://github.com/05nelsonm/kmp-tor/blob/master/samples/kotlin/android/src/main/res/values/attrs.xml)
-     - [Configuring Manifest](https://github.com/05nelsonm/kmp-tor/blob/master/samples/kotlin/android/src/main/AndroidManifest.xml)
+     - [Configuring Attrs][url-android-kotlin-attrs]
+     - [Configuring Manifest][url-android-kotlin-manifest]
 
 <!-- TODO: Add sample code for retrieving TorManager -->
- - See the [Sample App](https://github.com/05nelsonm/kmp-tor/tree/master/samples/kotlin/android/src/main/java/io/matthewnelson/kmp/tor/sample/kotlin/android) 
-   for a basic setup of `TorManager` and your `TorConfig`.  
+ - See the [Sample App][url-android-kotlin-app] for a basic setup of `TorManager` and your `TorConfig`.  
 
 </details>
 
@@ -52,9 +53,9 @@ dependencies {
     <summary>Configuring a Java Project</summary>
 
 
- - See the [JavaFX Sample App Gradle Configuration](https://github.com/05nelsonm/kmp-tor/blob/master/samples/kotlin/javafx/build.gradle.kts) 
+ - See the [JavaFX Sample App Gradle Configuration][url-javafx-kotlin-gradle]
    for a basic gradle/dependency configuration.  
- - See the [JavaFx Sample App](https://github.com/05nelsonm/kmp-tor/blob/master/samples/kotlin/javafx/src/jvmMain/kotlin/io/matthewnelson/kmp/tor/sample/kotlin/javafx/SampleApp.kt) 
+ - See the [JavaFx Sample App][url-javafx-kotlin-app] 
    for a basic setup example.  
  - Run the JavaFx Sample via `./gradlew :samples:kotlin:javafx:run -PKMP_TARGETS=JVM` from terminal 
    or cmd prompt.
@@ -81,7 +82,7 @@ dependencies {
 // build.gradlew.kts
 dependencies {
     val vTor = "0.4.7.8"
-    val vKmpTor = "1.0.0"
+    val vKmpTor = "1.1.0"
     
     implementation("io.matthewnelson.kotlin-components:kmp-tor:$vTor+$vKmpTor")
     
@@ -92,7 +93,7 @@ dependencies {
 }
 ```
 
-See the [JavaFX Sample App Gradle Configuration](https://github.com/05nelsonm/kmp-tor/blob/master/samples/kotlin/javafx/build.gradle.kts)
+See the [JavaFX Sample App Gradle Configuration][url-javafx-kotlin-gradle]
 `dependencies` block for more info.
 
 If neither `TorConfig.Setting.Ports.Control` or `TorConfig.Setting.UnixSockets.Control` are expressed in 
@@ -116,7 +117,7 @@ config at startup.
 // build.gradle
 dependencies {
     def vTor = '0.4.7.8'
-    def vKmpTor = '1.0.0'
+    def vKmpTor = '1.1.0'
 
     implementation "io.matthewnelson.kotlin-components:kmp-tor:$vTor+$vKmpTor"
     // Add the callback extension
@@ -186,11 +187,11 @@ public class Example2 {
 ```
 
  - Android (Java):
-     - [Android Sample App](https://github.com/05nelsonm/kmp-tor/blob/master/samples/java/android/src/main/java/io/matthewnelson/kmp/tor/sample/java/android/App.java)
-     - [Android Sample Gradle](https://github.com/05nelsonm/kmp-tor/blob/master/samples/java/android/build.gradle)
+     - [Android Sample App][url-android-java-app]
+     - [Android Sample Gradle][url-android-java-gradle]
  - JavaFx (Java):
-     - [JavaFx Sample App](https://github.com/05nelsonm/kmp-tor/blob/master/samples/java/javafx/src/main/java/io/matthewnelson/kmp/tor/sample/java/javafx/App.java)
-     - [JavaFx Sample Gradle](https://github.com/05nelsonm/kmp-tor/blob/master/samples/java/javafx/build.gradle)
+     - [JavaFx Sample App][url-javafx-java-app]
+     - [JavaFx Sample Gradle][url-javafx-java-gradle]
      - Run the sample via `./gradlew :samples:java:javafx:run -PKMP_TARGETS=JVM` from terminal
        or cmd prompt.
          - Note: Be sure to run `git submodule update --init` if you haven't yet so git
@@ -213,3 +214,27 @@ In order to keep submodules updated when pulling the latest code, run:
 ```bash
 $ git pull --recurse-submodules
 ```
+
+[badge-kmp-tor]: https://img.shields.io/badge/kmp--tor-0.4.7.8+1.1.0-5d2f68.svg?logo=torproject&style=flat&logoColor=5d2f68
+
+[badge-license]: https://img.shields.io/badge/license-Apache%20License%202.0-blue.svg?style=flat
+[badge-kotlin]: https://img.shields.io/badge/kotlin-1.6.21-blue.svg?logo=kotlin
+[badge-atomicfu]: https://img.shields.io/badge/atomicfu-0.17.3-blue.svg?logo=kotlin
+[badge-coroutines]: https://img.shields.io/badge/coroutines-1.6.3-blue.svg?logo=kotlin
+[badge-platform-android]: https://camo.githubusercontent.com/b1d9ad56ab51c4ad1417e9a5ad2a8fe63bcc4755e584ec7defef83755c23f923/687474703a2f2f696d672e736869656c64732e696f2f62616467652f706c6174666f726d2d616e64726f69642d3645444238442e7376673f7374796c653d666c6174
+[badge-platform-jvm]: https://camo.githubusercontent.com/700f5dcd442fd835875568c038ae5cd53518c80ae5a0cf12c7c5cf4743b5225b/687474703a2f2f696d672e736869656c64732e696f2f62616467652f706c6174666f726d2d6a766d2d4442343133442e7376673f7374796c653d666c6174
+
+[url-license]: https://www.apache.org/licenses/LICENSE-2.0
+[url-kotlin]: https://kotlinlang.org
+[url-atomicfu]: https://github.com/Kotlin/kotlinx.atomicfu
+[url-coroutines]: https://github.com/Kotlin/kotlinx.coroutines
+[url-kmp-tor-binary]: https://github.com/05nelsonm/kmp-tor-binary/blob/master/README.md
+[url-android-kotlin-app]: https://github.com/05nelsonm/kmp-tor/tree/master/samples/kotlin/android/src/main/java/io/matthewnelson/kmp/tor/sample/kotlin/android
+[url-android-kotlin-attrs]: https://github.com/05nelsonm/kmp-tor/blob/master/samples/kotlin/android/src/main/res/values/attrs.xml
+[url-android-kotlin-manifest]: https://github.com/05nelsonm/kmp-tor/blob/master/samples/kotlin/android/src/main/AndroidManifest.xml
+[url-android-java-app]: https://github.com/05nelsonm/kmp-tor/blob/master/samples/java/android/src/main/java/io/matthewnelson/kmp/tor/sample/java/android/App.java
+[url-android-java-gradle]: https://github.com/05nelsonm/kmp-tor/blob/master/samples/java/android/build.gradle
+[url-javafx-kotlin-app]: https://github.com/05nelsonm/kmp-tor/blob/master/samples/kotlin/javafx/src/jvmMain/kotlin/io/matthewnelson/kmp/tor/sample/kotlin/javafx/SampleApp.kt
+[url-javafx-kotlin-gradle]: https://github.com/05nelsonm/kmp-tor/blob/master/samples/kotlin/javafx/build.gradle.kts
+[url-javafx-java-app]: https://github.com/05nelsonm/kmp-tor/blob/master/samples/java/javafx/src/main/java/io/matthewnelson/kmp/tor/sample/java/javafx/App.java
+[url-javafx-java-gradle]: https://github.com/05nelsonm/kmp-tor/blob/master/samples/java/javafx/build.gradle
