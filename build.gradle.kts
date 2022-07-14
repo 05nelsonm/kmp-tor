@@ -73,8 +73,27 @@ kmpPublish {
     )
 }
 
+@Suppress("LocalVariableName")
 apiValidation {
-    ignoredProjects.add("android")
-    ignoredProjects.add("javafx")
-    nonPublicMarkers.add("io.matthewnelson.kmp.tor.common.annotation.InternalTorApi")
+    val KMP_TARGETS = findProperty("KMP_TARGETS") as? String
+    val CHECK_PUBLICATION = findProperty("CHECK_PUBLICATION") as? String
+    val KMP_TARGETS_ALL = System.getProperty("KMP_TARGETS_ALL") != null
+    val TARGETS = KMP_TARGETS?.split(',')
+
+    if (CHECK_PUBLICATION != null) {
+        ignoredProjects.add("check-publication")
+    } else {
+        nonPublicMarkers.add("io.matthewnelson.kmp.tor.common.annotation.InternalTorApi")
+
+        if (
+            KMP_TARGETS_ALL ||
+            (TARGETS?.contains("ANDROID") != false && TARGETS?.contains("JVM") != false)
+        ) {
+            ignoredProjects.add("android")
+        }
+
+        if (KMP_TARGETS_ALL || TARGETS?.contains("JVM") != false) {
+            ignoredProjects.add("javafx")
+        }
+    }
 }
