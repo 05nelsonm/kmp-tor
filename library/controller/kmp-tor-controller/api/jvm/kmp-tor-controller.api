@@ -1,0 +1,50 @@
+public abstract interface class io/matthewnelson/kmp/tor/controller/TorControlProcessor : io/matthewnelson/kmp/tor/controller/common/control/TorControlCircuit, io/matthewnelson/kmp/tor/controller/common/control/TorControlConfig, io/matthewnelson/kmp/tor/controller/common/control/TorControlHs, io/matthewnelson/kmp/tor/controller/common/control/TorControlOnion, io/matthewnelson/kmp/tor/controller/common/control/TorControlOnionClientAuth, io/matthewnelson/kmp/tor/controller/common/control/TorControlStream, io/matthewnelson/kmp/tor/controller/common/control/usecase/TorControlAuthenticate, io/matthewnelson/kmp/tor/controller/common/control/usecase/TorControlChallengeAuth, io/matthewnelson/kmp/tor/controller/common/control/usecase/TorControlDescriptorPost, io/matthewnelson/kmp/tor/controller/common/control/usecase/TorControlDropGuards, io/matthewnelson/kmp/tor/controller/common/control/usecase/TorControlInfoGet, io/matthewnelson/kmp/tor/controller/common/control/usecase/TorControlInfoProtocol, io/matthewnelson/kmp/tor/controller/common/control/usecase/TorControlMapAddress, io/matthewnelson/kmp/tor/controller/common/control/usecase/TorControlOwnershipDrop, io/matthewnelson/kmp/tor/controller/common/control/usecase/TorControlOwnershipTake, io/matthewnelson/kmp/tor/controller/common/control/usecase/TorControlResolve, io/matthewnelson/kmp/tor/controller/common/control/usecase/TorControlSetEvents, io/matthewnelson/kmp/tor/controller/common/control/usecase/TorControlSignal, io/matthewnelson/kmp/tor/controller/common/control/usecase/TorControlUseFeature {
+}
+
+public abstract interface class io/matthewnelson/kmp/tor/controller/TorController : io/matthewnelson/kmp/tor/controller/TorControlProcessor, io/matthewnelson/kmp/tor/controller/common/events/TorEventProcessor {
+	public static final field Companion Lio/matthewnelson/kmp/tor/controller/TorController$Companion;
+	public abstract fun disconnect ()V
+	public abstract fun isConnected ()Z
+	public static fun newInstance (Ljava/net/Socket;)Lio/matthewnelson/kmp/tor/controller/TorController;
+	public abstract fun onDisconnect (Lkotlin/jvm/functions/Function1;)V
+}
+
+public final class io/matthewnelson/kmp/tor/controller/TorController$Companion {
+	public final fun newInstance (Lio/matthewnelson/kmp/tor/common/address/ProxyAddress;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public final fun newInstance (Lio/matthewnelson/kmp/tor/controller/common/file/Path;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public final fun newInstance (Ljava/net/Socket;)Lio/matthewnelson/kmp/tor/controller/TorController;
+}
+
+public final class io/matthewnelson/kmp/tor/controller/internal/controller/ListenersHandler$Companion {
+}
+
+public final class io/matthewnelson/kmp/tor/controller/internal/controller/ReplyLine$MultiLine : io/matthewnelson/kmp/tor/controller/internal/controller/ReplyLine {
+	public fun <init> (Ljava/lang/String;Ljava/lang/String;Ljava/util/List;)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun component2 ()Ljava/lang/String;
+	public final fun component3 ()Ljava/util/List;
+	public final fun copy (Ljava/lang/String;Ljava/lang/String;Ljava/util/List;)Lio/matthewnelson/kmp/tor/controller/internal/controller/ReplyLine$MultiLine;
+	public static synthetic fun copy$default (Lio/matthewnelson/kmp/tor/controller/internal/controller/ReplyLine$MultiLine;Ljava/lang/String;Ljava/lang/String;Ljava/util/List;ILjava/lang/Object;)Lio/matthewnelson/kmp/tor/controller/internal/controller/ReplyLine$MultiLine;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getEvent ()Ljava/lang/String;
+	public final fun getMessages ()Ljava/util/List;
+	public fun getStatus ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/matthewnelson/kmp/tor/controller/internal/controller/ReplyLine$SingleLine : io/matthewnelson/kmp/tor/controller/internal/controller/ReplyLine {
+	public fun <init> (Ljava/lang/String;Ljava/lang/String;)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun component2 ()Ljava/lang/String;
+	public final fun copy (Ljava/lang/String;Ljava/lang/String;)Lio/matthewnelson/kmp/tor/controller/internal/controller/ReplyLine$SingleLine;
+	public static synthetic fun copy$default (Lio/matthewnelson/kmp/tor/controller/internal/controller/ReplyLine$SingleLine;Ljava/lang/String;Ljava/lang/String;ILjava/lang/Object;)Lio/matthewnelson/kmp/tor/controller/internal/controller/ReplyLine$SingleLine;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getMessage ()Ljava/lang/String;
+	public fun getStatus ()Ljava/lang/String;
+	public fun hashCode ()I
+	public final fun isCommandResponseStatusSuccess ()Z
+	public final fun isEventStatusSuccess ()Z
+	public fun toString ()Ljava/lang/String;
+}
+

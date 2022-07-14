@@ -46,7 +46,7 @@ import kotlin.coroutines.cancellation.CancellationException
 actual abstract class KmpTorLoader(protected val provider: TorConfigProvider) {
 
     actual companion object {
-        const val READ_INTERVAL = 250L
+        private const val READ_INTERVAL = 250L
 
         private val instanceRunLock = SynchronizedMutableMap<Mutex>()
 
