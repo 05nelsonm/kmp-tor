@@ -1,6 +1,6 @@
 # kmp-tor
 [![badge-license]][url-license]
-![badge-latest-release]
+[![badge-latest-release]][url-latest-release]
 
 [![badge-kotlin]][url-kotlin]
 [![badge-atomicfu]][url-atomicfu]
@@ -233,6 +233,7 @@ $ git pull --recurse-submodules
 [badge-platform-android]: https://camo.githubusercontent.com/b1d9ad56ab51c4ad1417e9a5ad2a8fe63bcc4755e584ec7defef83755c23f923/687474703a2f2f696d672e736869656c64732e696f2f62616467652f706c6174666f726d2d616e64726f69642d3645444238442e7376673f7374796c653d666c6174
 [badge-platform-jvm]: https://camo.githubusercontent.com/700f5dcd442fd835875568c038ae5cd53518c80ae5a0cf12c7c5cf4743b5225b/687474703a2f2f696d672e736869656c64732e696f2f62616467652f706c6174666f726d2d6a766d2d4442343133442e7376673f7374796c653d666c6174
 
+[url-latest-release]: https://github.com/05nelsonm/kmp-tor/releases/latest
 [url-license]: https://www.apache.org/licenses/LICENSE-2.0
 [url-kotlin]: https://kotlinlang.org
 [url-atomicfu]: https://github.com/Kotlin/kotlinx.atomicfu
