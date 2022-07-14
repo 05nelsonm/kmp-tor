@@ -1,6 +1,6 @@
 # kmp-tor
 [![badge-license]][url-license]
-![badge-kmp-tor]
+![badge-latest-release]
 
 [![badge-kotlin]][url-kotlin]
 [![badge-atomicfu]][url-atomicfu]
@@ -13,6 +13,8 @@ Kotlin Multiplatform support for embedding Tor into your application.
 
 ### Get Started
 
+<!-- TAG_VERSION -->
+
 Add dependency  
 ```kotlin
 // build.gradle.kts
@@ -22,6 +24,7 @@ dependencies {
     implementation("io.matthewnelson.kotlin-components:kmp-tor:$vTor+$vKmpTor")
 }
 ```
+<!-- TAG_VERSION -->
 
 ```groovy
 // build.gradle
@@ -78,6 +81,8 @@ dependencies {
  - For Android, **nothing is needed**.
  - For JVM, you will need to add the following dependency to your Linux distributions:
 
+<!-- TAG_VERSION -->
+
 ```kotlin
 // build.gradlew.kts
 dependencies {
@@ -112,6 +117,8 @@ config at startup.
 
  - For Java projects (who can't use coroutines), you can "wrap" `TorManager` in an implementation 
    that uses callbacks (ie. `CallbackTorManager`).
+
+<!-- TAG_VERSION -->
 
 ```groovy
 // build.gradle
@@ -215,7 +222,9 @@ In order to keep submodules updated when pulling the latest code, run:
 $ git pull --recurse-submodules
 ```
 
-[badge-kmp-tor]: https://img.shields.io/badge/kmp--tor-0.4.7.8+1.1.0-5d2f68.svg?logo=torproject&style=flat&logoColor=5d2f68
+<!-- TAG_VERSION -->
+
+[badge-latest-release]: https://img.shields.io/badge/latest--release-0.4.7.8+1.1.0-5d2f68.svg?logo=torproject&style=flat&logoColor=5d2f68
 
 [badge-license]: https://img.shields.io/badge/license-Apache%20License%202.0-blue.svg?style=flat
 [badge-kotlin]: https://img.shields.io/badge/kotlin-1.6.21-blue.svg?logo=kotlin
