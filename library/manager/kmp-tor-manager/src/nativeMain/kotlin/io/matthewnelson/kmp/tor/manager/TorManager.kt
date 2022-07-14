@@ -21,6 +21,7 @@ import io.matthewnelson.kmp.tor.manager.common.TorControlManager
 import io.matthewnelson.kmp.tor.manager.common.TorOperationManager
 import io.matthewnelson.kmp.tor.manager.common.event.TorManagerEvent
 import io.matthewnelson.kmp.tor.manager.common.state.TorStateManager
+import io.matthewnelson.kmp.tor.manager.internal.RealTorManager
 import kotlinx.coroutines.sync.Mutex
 
 actual interface TorManager:
@@ -51,7 +52,7 @@ actual interface TorManager:
             networkObserver: NetworkObserver? = null,
             requiredEvents: Set<TorEvent>? = null
         ): TorManager =
-            realTorManager(
+            RealTorManager(
                 loader,
                 instanceId = "NativeInstance",
                 processorLock = processorLock,

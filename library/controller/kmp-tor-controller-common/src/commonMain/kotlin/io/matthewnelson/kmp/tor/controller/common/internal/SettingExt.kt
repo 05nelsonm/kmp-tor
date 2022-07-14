@@ -16,12 +16,11 @@
 package io.matthewnelson.kmp.tor.controller.common.internal
 
 import io.matthewnelson.kmp.tor.common.annotation.InternalTorApi
-import io.matthewnelson.kmp.tor.common.util.TorStrings.SP
+import io.matthewnelson.kmp.tor.common.internal.TorStrings.SP
 import io.matthewnelson.kmp.tor.controller.common.config.TorConfig
 import io.matthewnelson.kmp.tor.controller.common.config.TorConfig.KeyWord
 import io.matthewnelson.kmp.tor.controller.common.config.TorConfig.Option.*
 import io.matthewnelson.kmp.tor.controller.common.config.TorConfig.Setting.*
-import io.matthewnelson.kmp.tor.controller.common.file.Path
 
 /**
  * Returns false if nothing was appended to the StringBuilder,

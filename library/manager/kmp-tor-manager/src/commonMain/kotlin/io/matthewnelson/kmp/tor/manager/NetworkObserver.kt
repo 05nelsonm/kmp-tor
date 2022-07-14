@@ -15,6 +15,7 @@
  **/
 package io.matthewnelson.kmp.tor.manager
 
+import io.matthewnelson.kmp.tor.manager.internal.RealTorManager
 import io.matthewnelson.kmp.tor.manager.internal.util.synchronous.SynchronizedMutableMap
 import kotlin.jvm.JvmSynthetic
 

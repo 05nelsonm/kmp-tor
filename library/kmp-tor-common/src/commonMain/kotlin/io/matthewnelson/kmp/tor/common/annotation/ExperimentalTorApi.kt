@@ -21,7 +21,7 @@ package io.matthewnelson.kmp.tor.common.annotation
  *
  * Any usage of a declaration annotated with [ExperimentalTorApi]
  * must be accepted by annotating that usage with the [OptIn]
- * annotation, e.g @Optin(ExperimentalTorApi::class), or by using
+ * annotation, e.g @OptIn(ExperimentalTorApi::class), or by using
  * the following compiler argument:
  *
  *   -Xopt-in=io.matthewnelson.kmp.tor.common.annotation.ExperimentalTorApi

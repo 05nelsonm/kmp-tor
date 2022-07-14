@@ -20,8 +20,8 @@ import io.matthewnelson.kmp.tor.common.address.PortProxy
 import io.matthewnelson.kmp.tor.common.annotation.ExperimentalTorApi
 import io.matthewnelson.kmp.tor.common.annotation.InternalTorApi
 import io.matthewnelson.kmp.tor.common.annotation.SealedValueClass
-import io.matthewnelson.kmp.tor.common.util.TorStrings.REDACTED
-import io.matthewnelson.kmp.tor.common.util.TorStrings.SP
+import io.matthewnelson.kmp.tor.common.internal.TorStrings.REDACTED
+import io.matthewnelson.kmp.tor.common.internal.TorStrings.SP
 import io.matthewnelson.kmp.tor.controller.common.config.TorConfig.Option.TorF.False
 import io.matthewnelson.kmp.tor.controller.common.config.TorConfig.Option.TorF.True
 import io.matthewnelson.kmp.tor.controller.common.file.Path

@@ -15,7 +15,7 @@
  **/
 package io.matthewnelson.kmp.tor.common.address
 
-import io.matthewnelson.kmp.tor.common.util.separateSchemeFromAddress
+import io.matthewnelson.kmp.tor.common.internal.separateSchemeFromAddress
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNull

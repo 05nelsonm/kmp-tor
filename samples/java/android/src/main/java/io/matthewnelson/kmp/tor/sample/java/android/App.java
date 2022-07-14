@@ -126,8 +126,6 @@ public class App extends Application {
 
         KmpTorLoaderAndroid loader = new KmpTorLoaderAndroid(provider);
 
-        new TorControlInfoGet.KeyWord.Accounting.Enabled();
-
         // Instantiate new TorManager
         TorManager manager = TorManager.newInstance(this, loader);
 
@@ -145,7 +143,7 @@ public class App extends Application {
     * extends TorEvent.Listener which is not picked up for some reason when kotlin
     * compiles it to Java. Everything still works, it is just an inconvenience.
     *
-    * This issue does not show up in this project b/c we're depending on the module and not
+    * This issue does not show up in this project b/c we depend on the module and not
     * the maven dependency.
     *
     * See https://github.com/05nelsonm/kmp-tor/issues/123

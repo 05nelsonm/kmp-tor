@@ -16,7 +16,7 @@
 package io.matthewnelson.kmp.tor.common.clientauth
 
 import io.matthewnelson.kmp.tor.common.address.OnionAddressV3
-import io.matthewnelson.kmp.tor.common.util.stripString
+import io.matthewnelson.kmp.tor.common.internal.stripString
 import kotlin.jvm.JvmField
 import kotlin.jvm.JvmStatic
 
@@ -82,7 +82,7 @@ class OnionClientAuth private constructor() {
          *
          * descriptor:<key type>:<public key>
          *
-         * @see [io.matthewnelson.kmp.tor.common.util.descriptorString]
+         * @see [io.matthewnelson.kmp.tor.common.internal.descriptorString]
          * */
         fun descriptor(): String
 
@@ -130,7 +130,7 @@ class OnionClientAuth private constructor() {
          *
          *  <address>:<key type>:<private key>
          *
-         * @see [io.matthewnelson.kmp.tor.common.util.descriptorString]
+         * @see [io.matthewnelson.kmp.tor.common.internal.descriptorString]
          * */
         fun descriptor(address: OnionAddressV3): String
 

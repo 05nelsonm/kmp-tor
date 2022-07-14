@@ -27,12 +27,13 @@ import io.matthewnelson.kmp.tor.controller.common.events.TorEventProcessor
 import io.matthewnelson.kmp.tor.controller.common.exceptions.TorControllerException
 import io.matthewnelson.kmp.tor.controller.common.file.Path
 import io.matthewnelson.kmp.tor.controller.common.internal.isUnixPath
-import io.matthewnelson.kmp.tor.controller.internal.controller.getTorControllerDispatcher
+import io.matthewnelson.kmp.tor.controller.internal.controller.RealTorController
+import io.matthewnelson.kmp.tor.controller.internal.controller.RealTorControlProcessor
+import io.matthewnelson.kmp.tor.controller.internal.getTorControllerDispatcher
 import io.matthewnelson.kmp.tor.controller.internal.io.ReaderWrapper
 import io.matthewnelson.kmp.tor.controller.internal.io.SocketWrapper
 import io.matthewnelson.kmp.tor.controller.internal.io.WriterWrapper
-import io.matthewnelson.kmp.tor.controller.internal.util.toTorController
-import kotlinx.coroutines.ExperimentalCoroutinesApi
+import io.matthewnelson.kmp.tor.controller.internal.ext.toTorController
 import kotlinx.coroutines.withContext
 import java.io.*
 import java.net.Socket
@@ -43,7 +44,7 @@ import java.net.SocketException
  * asynchronous communication.
  *
  * Upon connecting, [TorController] will run continuously until
- * Tor has been shutdown.
+ * Tor has been shutdown or [disconnect] has been called.
  *
  * @see [newInstance]
  * @see [RealTorController]
@@ -107,8 +108,7 @@ actual interface TorController: TorControlProcessor, TorEventProcessor<TorEvent.
                     )
                 }
 
-                @OptIn(ExperimentalCoroutinesApi::class)
-                return realTorController(
+                return RealTorController(
                     reader = ReaderWrapper.wrap(reader),
                     writer = WriterWrapper.wrap(writer),
                     socket = SocketWrapper.wrap(socket),

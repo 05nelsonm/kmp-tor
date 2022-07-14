@@ -28,7 +28,8 @@ import java.util.concurrent.Executors
 @OptIn(ExperimentalCoroutinesApi::class)
 class ActionProcessorUnitTest {
 
-    private val processor: ActionProcessor = ActionProcessor.newInstance()
+    private val processor: ActionProcessor =
+        ActionProcessor()
     private var dispatcher: CoroutineDispatcher? = null
 
     @Before

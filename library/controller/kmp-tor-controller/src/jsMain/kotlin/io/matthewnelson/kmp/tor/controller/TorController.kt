@@ -26,7 +26,7 @@ import io.matthewnelson.kmp.tor.controller.common.exceptions.TorControllerExcept
  * asynchronous communication.
  *
  * Upon connecting, [TorController] will run continuously until
- * Tor has been shutdown.
+ * Tor has been shutdown or [disconnect] has been called.
  *
  * @see [RealTorController]
  * @see [TorControlProcessor]
@@ -47,9 +47,21 @@ actual interface TorController: TorControlProcessor, TorEventProcessor<TorEvent.
     actual fun onDisconnect(action: ((TorController) -> Unit)?)
 
     actual companion object {
+
+        /**
+         * Opens a TCP connection to Tor's control port at the given [ProxyAddress]
+         * */
         @Throws(TorControllerException::class)
         actual suspend fun newInstance(address: ProxyAddress): TorController {
-            TODO("Not yet implemented")
+            throw TorControllerException("Not yet implemented")
+        }
+
+        /**
+         * Opens a unix domain socket to Tor's control port at the give [Path]
+         * */
+        @Throws(TorControllerException::class)
+        actual suspend fun newInstance(unixDomainSocket: Path): TorController {
+            throw TorControllerException("Not yet implemented")
         }
     }
 }
