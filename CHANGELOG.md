@@ -3,11 +3,23 @@
 ## Version 0.4.7.8+1.1.0 (2022-07-14)
  - Optimized `TorEvent.Listener`
  - Adds remaining `TorConfig.KeyWord`s
+     - **DEPRECATIONS:**
+         - `TorConfig.KeyWord.GeoIpV4File` was deprecated in favor of 
+           `TorConfig.KeyWord.GeoIPFile`
+         - `TorConfig.KeyWord.OwningControllerProcess` was deprecated in 
+           favor of `TorConfig.KeyWord.__OwningControllerProcess`
+         - `TorConfig.Setting.GeoIpV4File` was deprecated in favor of 
+           `TorConfig.Setting.GeoIPFile`
+         - `TorConfig.Setting.OwningControllerProcess` was deprecated in 
+           favor of `TorConfig.Setting.__OwningControllerProcess`
  - Adds ability to pass `HiddenService.UnixSocket` when adding a `HiddenService` via 
    the control port.
-     - Minor breaking change here, as the `TorControlOnionAdd` interface
-       methods were modified from accepting `Set<HiddenService.Ports>`, to accept
-       `Set<HiddenService.VirtualPort>`
+     - **BREAKING CHANGE** (Minor):
+         - `TorControlOnionAdd` interface methods were changed to accept
+           `Set<HiddenService.VirtualPort>`, whereas before they accepted
+           only `Set<HiddenService.Ports>`.
+         - `HiddenService.Ports` and `HiddenService.UnixSocket` both 
+           extend `HiddenService.VirtualPort`.
  - Refactored/cleaned up internals
  - CI/Build improvements
 
