@@ -31,7 +31,7 @@ jobs:
       - name: Run MacOS Tests
         if: matrix.os == 'macOS-latest' && matrix.job == 'test'
         run: |
-          ./gradlew check --stacktrace -PKMP_TARGETS=JVM,JS,IOS_ARM32,IOS_ARM64,IOS_X64,IOS_SIMULATOR_ARM64,MACOS_ARM64,MACOS_X64,TVOS_ARM64,TVOS_X64,TVOS_SIMULATOR_ARM64,WATCHOS_ARM32,WATCHOS_ARM64,WATCHOS_X64,WATCHOS_X86,WATCHOS_SIMULATOR_ARM64
+          ./gradlew check --stacktrace -PKMP_TARGETS=ANDROID,JVM,JS,IOS_ARM32,IOS_ARM64,IOS_X64,IOS_SIMULATOR_ARM64,MACOS_ARM64,MACOS_X64,TVOS_ARM64,TVOS_X64,TVOS_SIMULATOR_ARM64,WATCHOS_ARM32,WATCHOS_ARM64,WATCHOS_X64,WATCHOS_X86,WATCHOS_SIMULATOR_ARM64
 
       - name: Run Linux Tests
         if: matrix.os == 'ubuntu-18.04' && matrix.job == 'test'
@@ -41,7 +41,7 @@ jobs:
       - name: Run Windows Tests
         if: matrix.os == 'windows-latest' && matrix.job == 'test'
         run: |
-          ./gradlew check --stacktrace -PKMP_TARGETS="JVM,JS,MINGW_X64,MINGW_X86"
+          ./gradlew check --stacktrace -PKMP_TARGETS="ANDROID,JVM,JS,MINGW_X64,MINGW_X86"
 
 env:
   GRADLE_OPTS: -Dorg.gradle.daemon=false -Dkotlin.incremental=false -Dorg.gradle.jvmargs="-XX:+HeapDumpOnOutOfMemoryError -XX:MetaspaceSize=1g"
