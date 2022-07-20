@@ -29,7 +29,7 @@ plugins {
  * exposed as this dependency will be transitively provided.
  * */
 kmpConfiguration {
-    setupMultiplatform(
+    setupMultiplatform(targets =
         setOf(
 
             KmpTarget.Jvm.Jvm(
@@ -39,6 +39,7 @@ kmpConfiguration {
             ),
 
         ),
+
         commonTestSourceSet = {
             dependencies {
                 implementation(kotlin("test"))

@@ -27,10 +27,8 @@ plugins {
 }
 
 kmpConfiguration {
-    setupMultiplatform(
+    setupMultiplatform(targets =
         setOf(
-
-            KmpTarget.Jvm.Jvm.DEFAULT,
 
             KmpTarget.Jvm.Android(
                 buildTools = versions.android.buildTools,
@@ -47,6 +45,8 @@ kmpConfiguration {
                 }
             ),
 
+            KmpTarget.Jvm.Jvm.DEFAULT,
+
 //            KmpTarget.NonJvm.JS(
 //                compilerType = KotlinJsCompilerType.BOTH,
 //                browser = null,
@@ -59,29 +59,17 @@ kmpConfiguration {
 //                },
 //            ),
 //
-//            KmpTarget.NonJvm.Native.Unix.Darwin.Ios.Arm32.DEFAULT,
-//            KmpTarget.NonJvm.Native.Unix.Darwin.Ios.Arm64.DEFAULT,
-//            KmpTarget.NonJvm.Native.Unix.Darwin.Ios.X64.DEFAULT,
-//            KmpTarget.NonJvm.Native.Unix.Darwin.Ios.SimulatorArm64.DEFAULT,
-//
-//            KmpTarget.NonJvm.Native.Unix.Darwin.Macos.X64.DEFAULT,
-//            KmpTarget.NonJvm.Native.Unix.Darwin.Macos.Arm64.DEFAULT,
-//
-//            KmpTarget.NonJvm.Native.Unix.Darwin.Tvos.Arm64.DEFAULT,
-//            KmpTarget.NonJvm.Native.Unix.Darwin.Tvos.X64.DEFAULT,
-//            KmpTarget.NonJvm.Native.Unix.Darwin.Tvos.SimulatorArm64.DEFAULT,
-//
-//            KmpTarget.NonJvm.Native.Unix.Darwin.Watchos.Arm32.DEFAULT,
-//            KmpTarget.NonJvm.Native.Unix.Darwin.Watchos.Arm64.DEFAULT,
-//            KmpTarget.NonJvm.Native.Unix.Darwin.Watchos.X64.DEFAULT,
-//            KmpTarget.NonJvm.Native.Unix.Darwin.Watchos.X86.DEFAULT,
-//            KmpTarget.NonJvm.Native.Unix.Darwin.Watchos.SimulatorArm64.DEFAULT,
-//
 //            KmpTarget.NonJvm.Native.Unix.Linux.X64.DEFAULT,
 //
 //            KmpTarget.NonJvm.Native.Mingw.X64.DEFAULT,
-        ),
+        )/* +
+        KmpTarget.NonJvm.Native.Unix.Darwin.Ios.ALL_DEFAULT     +
+        KmpTarget.NonJvm.Native.Unix.Darwin.Macos.ALL_DEFAULT   +
+        KmpTarget.NonJvm.Native.Unix.Darwin.Tvos.ALL_DEFAULT    +
+        KmpTarget.NonJvm.Native.Unix.Darwin.Watchos.ALL_DEFAULT*/,
+
         commonPluginIdsPostConfiguration = setOf(pluginId.kotlin.atomicfu),
+
         commonMainSourceSet = {
             dependencies {
                 implementation(deps.kotlin.coroutines.core.core)
@@ -92,6 +80,7 @@ kmpConfiguration {
                 api(project(":library:manager:kmp-tor-manager-common"))
             }
         },
+
         commonTestSourceSet = {
             dependencies {
                 implementation(depsTest.kotlin.coroutines)

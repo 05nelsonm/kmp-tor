@@ -15,6 +15,8 @@
  **/
 package io.matthewnelson.kmp.tor.common.address
 
+import io.matthewnelson.component.parcelize.Parcelable
+import io.matthewnelson.component.parcelize.Parcelize
 import io.matthewnelson.kmp.tor.common.internal.stripAddress
 import io.matthewnelson.kmp.tor.common.internal.stripString
 import kotlin.jvm.JvmStatic
@@ -24,7 +26,7 @@ import kotlin.jvm.JvmStatic
  *
  * @see [OnionAddressV3]
  * */
-sealed interface OnionAddress {
+sealed interface OnionAddress: Parcelable {
     val value: String
 
     /**
@@ -57,7 +59,7 @@ sealed interface OnionAddress {
         }
     }
 
-    sealed interface PrivateKey {
+    sealed interface PrivateKey: Parcelable {
 
         val value: String
 

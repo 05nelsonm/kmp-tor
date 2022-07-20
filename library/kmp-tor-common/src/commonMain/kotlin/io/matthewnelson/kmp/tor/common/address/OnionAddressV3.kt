@@ -17,6 +17,7 @@ package io.matthewnelson.kmp.tor.common.address
 
 import io.matthewnelson.component.encoding.base32.Base32
 import io.matthewnelson.component.encoding.base32.decodeBase32ToArray
+import io.matthewnelson.component.parcelize.Parcelize
 import io.matthewnelson.kmp.tor.common.annotation.ExperimentalTorApi
 import io.matthewnelson.kmp.tor.common.annotation.SealedValueClass
 import io.matthewnelson.kmp.tor.common.internal.stripAddress
@@ -64,6 +65,7 @@ sealed interface OnionAddressV3: OnionAddress {
 }
 
 @JvmInline
+@Parcelize
 private value class RealOnionAddressV3(override val value: String): OnionAddressV3 {
 
     init {

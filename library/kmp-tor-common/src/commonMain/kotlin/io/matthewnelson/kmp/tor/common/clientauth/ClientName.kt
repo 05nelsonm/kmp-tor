@@ -15,6 +15,8 @@
  **/
 package io.matthewnelson.kmp.tor.common.clientauth
 
+import io.matthewnelson.component.parcelize.Parcelable
+import io.matthewnelson.component.parcelize.Parcelize
 import io.matthewnelson.kmp.tor.common.annotation.ExperimentalTorApi
 import io.matthewnelson.kmp.tor.common.annotation.SealedValueClass
 import kotlin.jvm.JvmInline
@@ -33,7 +35,7 @@ import kotlin.jvm.JvmStatic
  * */
 @SealedValueClass
 @OptIn(ExperimentalTorApi::class)
-sealed interface ClientName {
+sealed interface ClientName: Parcelable {
 
     val value: String
 
@@ -57,6 +59,7 @@ sealed interface ClientName {
 }
 
 @JvmInline
+@Parcelize
 private value class RealClientName(override val value: String): ClientName {
 
     init {

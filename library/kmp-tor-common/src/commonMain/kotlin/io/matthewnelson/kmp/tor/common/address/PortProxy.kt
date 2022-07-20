@@ -15,6 +15,7 @@
  **/
 package io.matthewnelson.kmp.tor.common.address
 
+import io.matthewnelson.component.parcelize.Parcelize
 import io.matthewnelson.kmp.tor.common.annotation.ExperimentalTorApi
 import io.matthewnelson.kmp.tor.common.annotation.SealedValueClass
 import kotlin.jvm.JvmInline
@@ -52,6 +53,7 @@ sealed interface PortProxy: Port {
 }
 
 @JvmInline
+@Parcelize
 private value class RealPortProxy(override val value: Int): PortProxy {
     init {
         require(value in PortProxy.MIN..PortProxy.MAX) {

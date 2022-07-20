@@ -1,4 +1,4 @@
-public abstract interface class io/matthewnelson/kmp/tor/common/address/OnionAddress {
+public abstract interface class io/matthewnelson/kmp/tor/common/address/OnionAddress : io/matthewnelson/component/parcelize/Parcelable {
 	public static final field Companion Lio/matthewnelson/kmp/tor/common/address/OnionAddress$Companion;
 	public abstract fun decode ()[B
 	public static fun fromString (Ljava/lang/String;)Lio/matthewnelson/kmp/tor/common/address/OnionAddress;
@@ -12,7 +12,7 @@ public final class io/matthewnelson/kmp/tor/common/address/OnionAddress$Companio
 	public final fun fromStringOrNull (Ljava/lang/String;)Lio/matthewnelson/kmp/tor/common/address/OnionAddress;
 }
 
-public abstract interface class io/matthewnelson/kmp/tor/common/address/OnionAddress$PrivateKey {
+public abstract interface class io/matthewnelson/kmp/tor/common/address/OnionAddress$PrivateKey : io/matthewnelson/component/parcelize/Parcelable {
 	public static final field Companion Lio/matthewnelson/kmp/tor/common/address/OnionAddress$PrivateKey$Companion;
 	public abstract fun decode ()[B
 	public static fun fromString (Ljava/lang/String;)Lio/matthewnelson/kmp/tor/common/address/OnionAddress$PrivateKey;
@@ -70,7 +70,7 @@ public final class io/matthewnelson/kmp/tor/common/address/OnionAddressV3Private
 	public final fun invoke (Ljava/lang/String;)Lio/matthewnelson/kmp/tor/common/address/OnionAddressV3PrivateKey_ED25519;
 }
 
-public final class io/matthewnelson/kmp/tor/common/address/OnionUrl {
+public final class io/matthewnelson/kmp/tor/common/address/OnionUrl : io/matthewnelson/component/parcelize/Parcelable {
 	public static final field Companion Lio/matthewnelson/kmp/tor/common/address/OnionUrl$Companion;
 	public final field address Lio/matthewnelson/kmp/tor/common/address/OnionAddress;
 	public final field path Ljava/lang/String;
@@ -96,7 +96,7 @@ public final class io/matthewnelson/kmp/tor/common/address/OnionUrl$Companion {
 	public final fun fromStringOrNull (Ljava/lang/String;)Lio/matthewnelson/kmp/tor/common/address/OnionUrl;
 }
 
-public abstract interface class io/matthewnelson/kmp/tor/common/address/Port {
+public abstract interface class io/matthewnelson/kmp/tor/common/address/Port : io/matthewnelson/component/parcelize/Parcelable {
 	public static final field Companion Lio/matthewnelson/kmp/tor/common/address/Port$Companion;
 	public static final field MAX I
 	public static final field MIN I
@@ -127,7 +127,7 @@ public final class io/matthewnelson/kmp/tor/common/address/PortProxy$Companion {
 	public final fun invoke (I)Lio/matthewnelson/kmp/tor/common/address/PortProxy;
 }
 
-public final class io/matthewnelson/kmp/tor/common/address/ProxyAddress {
+public final class io/matthewnelson/kmp/tor/common/address/ProxyAddress : io/matthewnelson/component/parcelize/Parcelable {
 	public static final field Companion Lio/matthewnelson/kmp/tor/common/address/ProxyAddress$Companion;
 	public final field ipAddress Ljava/lang/String;
 	public final field port Lio/matthewnelson/kmp/tor/common/address/Port;
@@ -146,7 +146,7 @@ public final class io/matthewnelson/kmp/tor/common/address/ProxyAddress$Companio
 	public final fun fromString (Ljava/lang/String;)Lio/matthewnelson/kmp/tor/common/address/ProxyAddress;
 }
 
-public final class io/matthewnelson/kmp/tor/common/address/Scheme : java/lang/Enum {
+public final class io/matthewnelson/kmp/tor/common/address/Scheme : java/lang/Enum, io/matthewnelson/component/parcelize/Parcelable {
 	public static final field Companion Lio/matthewnelson/kmp/tor/common/address/Scheme$Companion;
 	public static final field HTTP Lio/matthewnelson/kmp/tor/common/address/Scheme;
 	public static final field HTTPS Lio/matthewnelson/kmp/tor/common/address/Scheme;
@@ -178,7 +178,7 @@ public abstract interface annotation class io/matthewnelson/kmp/tor/common/annot
 public abstract interface annotation class io/matthewnelson/kmp/tor/common/annotation/SealedValueClass : java/lang/annotation/Annotation {
 }
 
-public abstract interface class io/matthewnelson/kmp/tor/common/clientauth/ClientName {
+public abstract interface class io/matthewnelson/kmp/tor/common/clientauth/ClientName : io/matthewnelson/component/parcelize/Parcelable {
 	public static final field Companion Lio/matthewnelson/kmp/tor/common/clientauth/ClientName$Companion;
 	public static fun fromStringOrNull (Ljava/lang/String;)Lio/matthewnelson/kmp/tor/common/clientauth/ClientName;
 	public abstract fun getValue ()Ljava/lang/String;
@@ -193,7 +193,7 @@ public final class io/matthewnelson/kmp/tor/common/clientauth/ClientName$Compani
 public final class io/matthewnelson/kmp/tor/common/clientauth/OnionClientAuth {
 }
 
-public abstract interface class io/matthewnelson/kmp/tor/common/clientauth/OnionClientAuth$Key {
+public abstract interface class io/matthewnelson/kmp/tor/common/clientauth/OnionClientAuth$Key : io/matthewnelson/component/parcelize/Parcelable {
 	public abstract fun base32 (Z)Ljava/lang/String;
 	public abstract fun base64 (Z)Ljava/lang/String;
 	public abstract fun decode ()[B
@@ -212,7 +212,7 @@ public final class io/matthewnelson/kmp/tor/common/clientauth/OnionClientAuth$Ke
 	public static fun values ()[Lio/matthewnelson/kmp/tor/common/clientauth/OnionClientAuth$Key$Type;
 }
 
-public final class io/matthewnelson/kmp/tor/common/clientauth/OnionClientAuth$KeyPair {
+public final class io/matthewnelson/kmp/tor/common/clientauth/OnionClientAuth$KeyPair : io/matthewnelson/component/parcelize/Parcelable {
 	public final field privateKey Lio/matthewnelson/kmp/tor/common/clientauth/OnionClientAuth$PrivateKey;
 	public final field publicKey Lio/matthewnelson/kmp/tor/common/clientauth/OnionClientAuth$PublicKey;
 	public fun <init> (Lio/matthewnelson/kmp/tor/common/clientauth/OnionClientAuth$PublicKey;Lio/matthewnelson/kmp/tor/common/clientauth/OnionClientAuth$PrivateKey;)V
@@ -290,7 +290,7 @@ public final class io/matthewnelson/kmp/tor/common/clientauth/OnionClientAuthPub
 public final class io/matthewnelson/kmp/tor/common/server/Server {
 }
 
-public abstract interface class io/matthewnelson/kmp/tor/common/server/Server$Fingerprint {
+public abstract interface class io/matthewnelson/kmp/tor/common/server/Server$Fingerprint : io/matthewnelson/component/parcelize/Parcelable {
 	public static final field Companion Lio/matthewnelson/kmp/tor/common/server/Server$Fingerprint$Companion;
 	public static final field PREFIX C
 	public abstract fun decode ()[B
@@ -308,7 +308,7 @@ public final class io/matthewnelson/kmp/tor/common/server/Server$Fingerprint$Com
 	public final fun invoke (Ljava/lang/String;)Lio/matthewnelson/kmp/tor/common/server/Server$Fingerprint;
 }
 
-public final class io/matthewnelson/kmp/tor/common/server/Server$LongName {
+public final class io/matthewnelson/kmp/tor/common/server/Server$LongName : io/matthewnelson/component/parcelize/Parcelable {
 	public static final field Companion Lio/matthewnelson/kmp/tor/common/server/Server$LongName$Companion;
 	public static final field DELIMITER C
 	public final field fingerprint Lio/matthewnelson/kmp/tor/common/server/Server$Fingerprint;
@@ -330,7 +330,7 @@ public final class io/matthewnelson/kmp/tor/common/server/Server$LongName$Compan
 	public final fun fromStringOrNull (Ljava/lang/String;)Lio/matthewnelson/kmp/tor/common/server/Server$LongName;
 }
 
-public abstract interface class io/matthewnelson/kmp/tor/common/server/Server$Nickname {
+public abstract interface class io/matthewnelson/kmp/tor/common/server/Server$Nickname : io/matthewnelson/component/parcelize/Parcelable {
 	public static final field Companion Lio/matthewnelson/kmp/tor/common/server/Server$Nickname$Companion;
 	public static fun fromStringOrNull (Ljava/lang/String;)Lio/matthewnelson/kmp/tor/common/server/Server$Nickname;
 	public static fun getREGEX ()Lkotlin/text/Regex;

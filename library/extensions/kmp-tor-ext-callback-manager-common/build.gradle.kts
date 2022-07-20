@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
+import io.matthewnelson.kotlin.components.dependencies.versions
 import io.matthewnelson.kotlin.components.kmp.KmpTarget
 import kmp.tor.env
 import org.jetbrains.kotlin.gradle.plugin.KotlinJsCompilerType
@@ -23,8 +24,14 @@ plugins {
 }
 
 kmpConfiguration {
-    setupMultiplatform(
+    setupMultiplatform(targets =
         setOf(
+
+            KmpTarget.Jvm.Android(
+                compileSdk = versions.android.sdkCompile,
+                minSdk = versions.android.sdkMin16,
+                buildTools = versions.android.buildTools,
+            ),
 
             KmpTarget.Jvm.Jvm.DEFAULT,
 
@@ -34,35 +41,24 @@ kmpConfiguration {
                 node = KmpTarget.NonJvm.JS.Node(),
             ),
 
-            KmpTarget.NonJvm.Native.Unix.Darwin.Ios.Arm32.DEFAULT,
-            KmpTarget.NonJvm.Native.Unix.Darwin.Ios.Arm64.DEFAULT,
-            KmpTarget.NonJvm.Native.Unix.Darwin.Ios.X64.DEFAULT,
-            KmpTarget.NonJvm.Native.Unix.Darwin.Ios.SimulatorArm64.DEFAULT,
-
-            KmpTarget.NonJvm.Native.Unix.Darwin.Macos.X64.DEFAULT,
-            KmpTarget.NonJvm.Native.Unix.Darwin.Macos.Arm64.DEFAULT,
-
-            KmpTarget.NonJvm.Native.Unix.Darwin.Tvos.Arm64.DEFAULT,
-            KmpTarget.NonJvm.Native.Unix.Darwin.Tvos.X64.DEFAULT,
-            KmpTarget.NonJvm.Native.Unix.Darwin.Tvos.SimulatorArm64.DEFAULT,
-
-            KmpTarget.NonJvm.Native.Unix.Darwin.Watchos.Arm32.DEFAULT,
-            KmpTarget.NonJvm.Native.Unix.Darwin.Watchos.Arm64.DEFAULT,
-            KmpTarget.NonJvm.Native.Unix.Darwin.Watchos.X64.DEFAULT,
-            KmpTarget.NonJvm.Native.Unix.Darwin.Watchos.X86.DEFAULT,
-            KmpTarget.NonJvm.Native.Unix.Darwin.Watchos.SimulatorArm64.DEFAULT,
-
             KmpTarget.NonJvm.Native.Unix.Linux.X64.DEFAULT,
 
             KmpTarget.NonJvm.Native.Mingw.X64.DEFAULT,
-        ),
+        ) +
+        KmpTarget.NonJvm.Native.Unix.Darwin.Ios.ALL_DEFAULT     +
+        KmpTarget.NonJvm.Native.Unix.Darwin.Macos.ALL_DEFAULT   +
+        KmpTarget.NonJvm.Native.Unix.Darwin.Tvos.ALL_DEFAULT    +
+        KmpTarget.NonJvm.Native.Unix.Darwin.Watchos.ALL_DEFAULT,
+
         commonPluginIdsPostConfiguration = setOf(pluginId.kotlin.atomicfu),
+
         commonMainSourceSet = {
             dependencies {
                 api(project(":library:extensions:kmp-tor-ext-callback-controller-common"))
                 implementation(project(":library:manager:kmp-tor-manager-common"))
             }
         },
+
         commonTestSourceSet = {
             dependencies {
                 implementation(kotlin("test"))
