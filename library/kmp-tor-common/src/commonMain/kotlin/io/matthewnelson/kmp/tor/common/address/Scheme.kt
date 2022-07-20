@@ -15,10 +15,13 @@
  **/
 package io.matthewnelson.kmp.tor.common.address
 
+import io.matthewnelson.component.parcelize.Parcelable
+import io.matthewnelson.component.parcelize.Parcelize
 import kotlin.jvm.JvmOverloads
 import kotlin.jvm.JvmStatic
 
-enum class Scheme {
+@Parcelize
+enum class Scheme: Parcelable {
     HTTP,
     HTTPS,
     WS,

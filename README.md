@@ -7,6 +7,7 @@
 [![badge-coroutines]][url-coroutines]
 [![badge-encoding]][url-encoding]
 [![badge-kmp-tor-binary]][url-kmp-tor-binary]
+<!-- TODO: [![badge-parcelize]][url-parcelize] -->
 
 ![badge-platform-android]
 ![badge-platform-jvm]
@@ -235,6 +236,7 @@ $ git pull --recurse-submodules
 [badge-atomicfu]: https://img.shields.io/badge/atomicfu-0.17.3-blue.svg?logo=kotlin
 [badge-coroutines]: https://img.shields.io/badge/coroutines-1.6.3-blue.svg?logo=kotlin
 [badge-encoding]: https://img.shields.io/badge/encoding-1.1.3-blue.svg?style=flat
+[badge-parcelize]: https://img.shields.io/badge/parcelize-0.1.0-blue.svg?style=flat
 [badge-kmp-tor-binary]: https://img.shields.io/badge/kmp--tor--binary-0.4.7.8-5d2f68.svg?logo=torproject&style=flat&logoColor=5d2f68
 
 <!-- TAG_PLATFORMS -->
@@ -247,8 +249,8 @@ $ git pull --recurse-submodules
 [url-atomicfu]: https://github.com/Kotlin/kotlinx.atomicfu
 [url-coroutines]: https://github.com/Kotlin/kotlinx.coroutines
 [url-encoding]: https://github.com/05nelsonm/component-encoding
+[url-parcelize]: https://github.com/05nelsonm/component-parcelize
 [url-kmp-tor-binary]: https://github.com/05nelsonm/kmp-tor-binary
-[url-kmp-tor-binary]: https://github.com/05nelsonm/kmp-tor-binary/blob/master/README.md
 [url-android-kotlin-app]: https://github.com/05nelsonm/kmp-tor/tree/master/samples/kotlin/android/src/main/java/io/matthewnelson/kmp/tor/sample/kotlin/android
 [url-android-kotlin-attrs]: https://github.com/05nelsonm/kmp-tor/blob/master/samples/kotlin/android/src/main/res/values/attrs.xml
 [url-android-kotlin-manifest]: https://github.com/05nelsonm/kmp-tor/blob/master/samples/kotlin/android/src/main/AndroidManifest.xml

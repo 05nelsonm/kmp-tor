@@ -17,6 +17,8 @@ package io.matthewnelson.kmp.tor.common.server
 
 import io.matthewnelson.component.base64.Base64
 import io.matthewnelson.component.encoding.base16.decodeBase16ToArray
+import io.matthewnelson.component.parcelize.Parcelable
+import io.matthewnelson.component.parcelize.Parcelize
 import io.matthewnelson.kmp.tor.common.annotation.ExperimentalTorApi
 import io.matthewnelson.kmp.tor.common.annotation.SealedValueClass
 import kotlin.jvm.JvmField
@@ -35,7 +37,7 @@ class Server private constructor() {
      * */
     @SealedValueClass
     @OptIn(ExperimentalTorApi::class)
-    sealed interface Fingerprint {
+    sealed interface Fingerprint: Parcelable {
         val value: String
         val valueWithPrefix: String
 
@@ -69,6 +71,7 @@ class Server private constructor() {
     }
 
     @JvmInline
+    @Parcelize
     private value class RealFingerprint(override val value: String): Fingerprint {
 
         init {
@@ -96,7 +99,7 @@ class Server private constructor() {
      * */
     @SealedValueClass
     @OptIn(ExperimentalTorApi::class)
-    sealed interface Nickname {
+    sealed interface Nickname: Parcelable {
         val value: String
 
         companion object {
@@ -121,6 +124,7 @@ class Server private constructor() {
     }
 
     @JvmInline
+    @Parcelize
     private value class RealNickname(override val value: String): Nickname {
 
         init {
@@ -134,12 +138,13 @@ class Server private constructor() {
         }
     }
 
+    @Parcelize
     data class LongName(
         @JvmField
         val fingerprint: Fingerprint,
         @JvmField
         val nickname: Nickname?,
-    ) {
+    ): Parcelable {
 
         override fun toString(): String {
             return if (nickname != null) {

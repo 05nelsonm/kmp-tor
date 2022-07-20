@@ -19,6 +19,7 @@ import io.matthewnelson.component.base64.Base64
 import io.matthewnelson.component.base64.decodeBase64ToArray
 import io.matthewnelson.component.encoding.base32.Base32
 import io.matthewnelson.component.encoding.base32.encodeBase32
+import io.matthewnelson.component.parcelize.Parcelize
 import io.matthewnelson.kmp.tor.common.address.OnionAddressV3
 import io.matthewnelson.kmp.tor.common.annotation.ExperimentalTorApi
 import io.matthewnelson.kmp.tor.common.annotation.InternalTorApi
@@ -53,6 +54,7 @@ sealed interface OnionClientAuthPrivateKey_B64_X25519: OnionClientAuth.PrivateKe
 }
 
 @JvmInline
+@Parcelize
 @OptIn(InternalTorApi::class)
 @Suppress("ClassName")
 private value class RealOnionClientAuthPrivateKey_B64_X25519(

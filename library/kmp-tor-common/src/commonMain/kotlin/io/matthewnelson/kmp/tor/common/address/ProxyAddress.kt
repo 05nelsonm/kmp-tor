@@ -15,6 +15,8 @@
  **/
 package io.matthewnelson.kmp.tor.common.address
 
+import io.matthewnelson.component.parcelize.Parcelable
+import io.matthewnelson.component.parcelize.Parcelize
 import kotlin.jvm.JvmField
 import kotlin.jvm.JvmStatic
 
@@ -31,12 +33,13 @@ import kotlin.jvm.JvmStatic
  *
  * @see [fromString]
  * */
+@Parcelize
 data class ProxyAddress(
     @JvmField
     val ipAddress: String,
     @JvmField
     val port: Port
-) {
+): Parcelable {
 
     override fun toString(): String {
         return "$ipAddress:${port.value}"

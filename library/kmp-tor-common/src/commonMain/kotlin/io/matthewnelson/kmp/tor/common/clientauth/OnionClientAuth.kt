@@ -15,6 +15,8 @@
  **/
 package io.matthewnelson.kmp.tor.common.clientauth
 
+import io.matthewnelson.component.parcelize.Parcelable
+import io.matthewnelson.component.parcelize.Parcelize
 import io.matthewnelson.kmp.tor.common.address.OnionAddressV3
 import io.matthewnelson.kmp.tor.common.internal.stripString
 import kotlin.jvm.JvmField
@@ -38,7 +40,7 @@ class OnionClientAuth private constructor() {
     /**
      * Base interface to [PublicKey] & [PrivateKey]
      * */
-    sealed interface Key {
+    sealed interface Key: Parcelable {
 
         val value: String
 
@@ -162,12 +164,13 @@ class OnionClientAuth private constructor() {
         }
     }
 
+    @Parcelize
     class KeyPair(
         @JvmField
         val publicKey: PublicKey,
         @JvmField
         val privateKey: PrivateKey
-    ) {
+    ): Parcelable {
 
         override fun equals(other: Any?): Boolean {
             return  other != null                   &&

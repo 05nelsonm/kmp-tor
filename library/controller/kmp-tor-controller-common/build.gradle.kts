@@ -32,7 +32,6 @@ kmpConfiguration {
                 compileSdk = versions.android.sdkCompile,
                 minSdk = versions.android.sdkMin16,
                 buildTools = versions.android.buildTools,
-                pluginIds = setOf(pluginId.kotlin.parcelize),
             ),
 
             KmpTarget.Jvm.Jvm(

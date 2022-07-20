@@ -32,6 +32,7 @@ kmpConfiguration {
                 compileSdk = versions.android.sdkCompile,
                 minSdk = versions.android.sdkMin16,
                 buildTools = versions.android.buildTools,
+                pluginIds = setOf(pluginId.kotlin.parcelize),
             ),
 
             KmpTarget.Jvm.Jvm.DEFAULT,
@@ -56,6 +57,8 @@ kmpConfiguration {
                 implementation(deps.components.encoding.base16)
                 implementation(deps.components.encoding.base32)
                 implementation(deps.components.encoding.base64)
+
+                api(deps.components.parcelize)
             }
         },
 

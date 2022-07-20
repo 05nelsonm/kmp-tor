@@ -5,7 +5,7 @@ public final class io/matthewnelson/kmp/tor/common/BuildConfig {
 	public fun <init> ()V
 }
 
-public abstract interface class io/matthewnelson/kmp/tor/common/address/OnionAddress {
+public abstract interface class io/matthewnelson/kmp/tor/common/address/OnionAddress : android/os/Parcelable {
 	public static final field Companion Lio/matthewnelson/kmp/tor/common/address/OnionAddress$Companion;
 	public abstract fun decode ()[B
 	public static fun fromString (Ljava/lang/String;)Lio/matthewnelson/kmp/tor/common/address/OnionAddress;
@@ -19,7 +19,7 @@ public final class io/matthewnelson/kmp/tor/common/address/OnionAddress$Companio
 	public final fun fromStringOrNull (Ljava/lang/String;)Lio/matthewnelson/kmp/tor/common/address/OnionAddress;
 }
 
-public abstract interface class io/matthewnelson/kmp/tor/common/address/OnionAddress$PrivateKey {
+public abstract interface class io/matthewnelson/kmp/tor/common/address/OnionAddress$PrivateKey : android/os/Parcelable {
 	public static final field Companion Lio/matthewnelson/kmp/tor/common/address/OnionAddress$PrivateKey$Companion;
 	public abstract fun decode ()[B
 	public static fun fromString (Ljava/lang/String;)Lio/matthewnelson/kmp/tor/common/address/OnionAddress$PrivateKey;
@@ -77,7 +77,8 @@ public final class io/matthewnelson/kmp/tor/common/address/OnionAddressV3Private
 	public final fun invoke (Ljava/lang/String;)Lio/matthewnelson/kmp/tor/common/address/OnionAddressV3PrivateKey_ED25519;
 }
 
-public final class io/matthewnelson/kmp/tor/common/address/OnionUrl {
+public final class io/matthewnelson/kmp/tor/common/address/OnionUrl : android/os/Parcelable {
+	public static final field CREATOR Landroid/os/Parcelable$Creator;
 	public static final field Companion Lio/matthewnelson/kmp/tor/common/address/OnionUrl$Companion;
 	public final field address Lio/matthewnelson/kmp/tor/common/address/OnionAddress;
 	public final field path Ljava/lang/String;
@@ -91,11 +92,13 @@ public final class io/matthewnelson/kmp/tor/common/address/OnionUrl {
 	public final fun component4 ()Lio/matthewnelson/kmp/tor/common/address/Scheme;
 	public final fun copy (Lio/matthewnelson/kmp/tor/common/address/OnionAddress;Ljava/lang/String;Lio/matthewnelson/kmp/tor/common/address/Port;Lio/matthewnelson/kmp/tor/common/address/Scheme;)Lio/matthewnelson/kmp/tor/common/address/OnionUrl;
 	public static synthetic fun copy$default (Lio/matthewnelson/kmp/tor/common/address/OnionUrl;Lio/matthewnelson/kmp/tor/common/address/OnionAddress;Ljava/lang/String;Lio/matthewnelson/kmp/tor/common/address/Port;Lio/matthewnelson/kmp/tor/common/address/Scheme;ILjava/lang/Object;)Lio/matthewnelson/kmp/tor/common/address/OnionUrl;
+	public fun describeContents ()I
 	public fun equals (Ljava/lang/Object;)Z
 	public static final fun fromString (Ljava/lang/String;)Lio/matthewnelson/kmp/tor/common/address/OnionUrl;
 	public static final fun fromStringOrNull (Ljava/lang/String;)Lio/matthewnelson/kmp/tor/common/address/OnionUrl;
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
+	public fun writeToParcel (Landroid/os/Parcel;I)V
 }
 
 public final class io/matthewnelson/kmp/tor/common/address/OnionUrl$Companion {
@@ -103,7 +106,15 @@ public final class io/matthewnelson/kmp/tor/common/address/OnionUrl$Companion {
 	public final fun fromStringOrNull (Ljava/lang/String;)Lio/matthewnelson/kmp/tor/common/address/OnionUrl;
 }
 
-public abstract interface class io/matthewnelson/kmp/tor/common/address/Port {
+public final class io/matthewnelson/kmp/tor/common/address/OnionUrl$Creator : android/os/Parcelable$Creator {
+	public fun <init> ()V
+	public final fun createFromParcel (Landroid/os/Parcel;)Lio/matthewnelson/kmp/tor/common/address/OnionUrl;
+	public synthetic fun createFromParcel (Landroid/os/Parcel;)Ljava/lang/Object;
+	public final fun newArray (I)[Lio/matthewnelson/kmp/tor/common/address/OnionUrl;
+	public synthetic fun newArray (I)[Ljava/lang/Object;
+}
+
+public abstract interface class io/matthewnelson/kmp/tor/common/address/Port : android/os/Parcelable {
 	public static final field Companion Lio/matthewnelson/kmp/tor/common/address/Port$Companion;
 	public static final field MAX I
 	public static final field MIN I
@@ -134,7 +145,8 @@ public final class io/matthewnelson/kmp/tor/common/address/PortProxy$Companion {
 	public final fun invoke (I)Lio/matthewnelson/kmp/tor/common/address/PortProxy;
 }
 
-public final class io/matthewnelson/kmp/tor/common/address/ProxyAddress {
+public final class io/matthewnelson/kmp/tor/common/address/ProxyAddress : android/os/Parcelable {
+	public static final field CREATOR Landroid/os/Parcelable$Creator;
 	public static final field Companion Lio/matthewnelson/kmp/tor/common/address/ProxyAddress$Companion;
 	public final field ipAddress Ljava/lang/String;
 	public final field port Lio/matthewnelson/kmp/tor/common/address/Port;
@@ -143,17 +155,60 @@ public final class io/matthewnelson/kmp/tor/common/address/ProxyAddress {
 	public final fun component2 ()Lio/matthewnelson/kmp/tor/common/address/Port;
 	public final fun copy (Ljava/lang/String;Lio/matthewnelson/kmp/tor/common/address/Port;)Lio/matthewnelson/kmp/tor/common/address/ProxyAddress;
 	public static synthetic fun copy$default (Lio/matthewnelson/kmp/tor/common/address/ProxyAddress;Ljava/lang/String;Lio/matthewnelson/kmp/tor/common/address/Port;ILjava/lang/Object;)Lio/matthewnelson/kmp/tor/common/address/ProxyAddress;
+	public fun describeContents ()I
 	public fun equals (Ljava/lang/Object;)Z
 	public static final fun fromString (Ljava/lang/String;)Lio/matthewnelson/kmp/tor/common/address/ProxyAddress;
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
+	public fun writeToParcel (Landroid/os/Parcel;I)V
 }
 
 public final class io/matthewnelson/kmp/tor/common/address/ProxyAddress$Companion {
 	public final fun fromString (Ljava/lang/String;)Lio/matthewnelson/kmp/tor/common/address/ProxyAddress;
 }
 
-public final class io/matthewnelson/kmp/tor/common/address/Scheme : java/lang/Enum {
+public final class io/matthewnelson/kmp/tor/common/address/ProxyAddress$Creator : android/os/Parcelable$Creator {
+	public fun <init> ()V
+	public final fun createFromParcel (Landroid/os/Parcel;)Lio/matthewnelson/kmp/tor/common/address/ProxyAddress;
+	public synthetic fun createFromParcel (Landroid/os/Parcel;)Ljava/lang/Object;
+	public final fun newArray (I)[Lio/matthewnelson/kmp/tor/common/address/ProxyAddress;
+	public synthetic fun newArray (I)[Ljava/lang/Object;
+}
+
+public final class io/matthewnelson/kmp/tor/common/address/RealOnionAddressV3$Creator : android/os/Parcelable$Creator {
+	public fun <init> ()V
+	public synthetic fun createFromParcel (Landroid/os/Parcel;)Ljava/lang/Object;
+	public final fun createFromParcel-mTnPENQ (Landroid/os/Parcel;)Ljava/lang/String;
+	public final fun newArray (I)[Lio/matthewnelson/kmp/tor/common/address/RealOnionAddressV3;
+	public synthetic fun newArray (I)[Ljava/lang/Object;
+}
+
+public final class io/matthewnelson/kmp/tor/common/address/RealOnionAddressV3PrivateKey_ED25519$Creator : android/os/Parcelable$Creator {
+	public fun <init> ()V
+	public synthetic fun createFromParcel (Landroid/os/Parcel;)Ljava/lang/Object;
+	public final fun createFromParcel-R9FjxC8 (Landroid/os/Parcel;)Ljava/lang/String;
+	public final fun newArray (I)[Lio/matthewnelson/kmp/tor/common/address/RealOnionAddressV3PrivateKey_ED25519;
+	public synthetic fun newArray (I)[Ljava/lang/Object;
+}
+
+public final class io/matthewnelson/kmp/tor/common/address/RealPort$Creator : android/os/Parcelable$Creator {
+	public fun <init> ()V
+	public synthetic fun createFromParcel (Landroid/os/Parcel;)Ljava/lang/Object;
+	public final fun createFromParcel-l6JZK04 (Landroid/os/Parcel;)I
+	public final fun newArray (I)[Lio/matthewnelson/kmp/tor/common/address/RealPort;
+	public synthetic fun newArray (I)[Ljava/lang/Object;
+}
+
+public final class io/matthewnelson/kmp/tor/common/address/RealPortProxy$Creator : android/os/Parcelable$Creator {
+	public fun <init> ()V
+	public synthetic fun createFromParcel (Landroid/os/Parcel;)Ljava/lang/Object;
+	public final fun createFromParcel-FKtFi9I (Landroid/os/Parcel;)I
+	public final fun newArray (I)[Lio/matthewnelson/kmp/tor/common/address/RealPortProxy;
+	public synthetic fun newArray (I)[Ljava/lang/Object;
+}
+
+public final class io/matthewnelson/kmp/tor/common/address/Scheme : java/lang/Enum, android/os/Parcelable {
+	public static final field CREATOR Landroid/os/Parcelable$Creator;
 	public static final field Companion Lio/matthewnelson/kmp/tor/common/address/Scheme$Companion;
 	public static final field HTTP Lio/matthewnelson/kmp/tor/common/address/Scheme;
 	public static final field HTTPS Lio/matthewnelson/kmp/tor/common/address/Scheme;
@@ -163,17 +218,27 @@ public final class io/matthewnelson/kmp/tor/common/address/Scheme : java/lang/En
 	public static final field SCHEME_WSS Ljava/lang/String;
 	public static final field WS Lio/matthewnelson/kmp/tor/common/address/Scheme;
 	public static final field WSS Lio/matthewnelson/kmp/tor/common/address/Scheme;
+	public fun describeContents ()I
 	public static final fun fromString (Ljava/lang/String;)Lio/matthewnelson/kmp/tor/common/address/Scheme;
 	public static final fun fromString (Ljava/lang/String;Z)Lio/matthewnelson/kmp/tor/common/address/Scheme;
 	public fun toString ()Ljava/lang/String;
 	public static fun valueOf (Ljava/lang/String;)Lio/matthewnelson/kmp/tor/common/address/Scheme;
 	public static fun values ()[Lio/matthewnelson/kmp/tor/common/address/Scheme;
+	public fun writeToParcel (Landroid/os/Parcel;I)V
 }
 
 public final class io/matthewnelson/kmp/tor/common/address/Scheme$Companion {
 	public final fun fromString (Ljava/lang/String;)Lio/matthewnelson/kmp/tor/common/address/Scheme;
 	public final fun fromString (Ljava/lang/String;Z)Lio/matthewnelson/kmp/tor/common/address/Scheme;
 	public static synthetic fun fromString$default (Lio/matthewnelson/kmp/tor/common/address/Scheme$Companion;Ljava/lang/String;ZILjava/lang/Object;)Lio/matthewnelson/kmp/tor/common/address/Scheme;
+}
+
+public final class io/matthewnelson/kmp/tor/common/address/Scheme$Creator : android/os/Parcelable$Creator {
+	public fun <init> ()V
+	public final fun createFromParcel (Landroid/os/Parcel;)Lio/matthewnelson/kmp/tor/common/address/Scheme;
+	public synthetic fun createFromParcel (Landroid/os/Parcel;)Ljava/lang/Object;
+	public final fun newArray (I)[Lio/matthewnelson/kmp/tor/common/address/Scheme;
+	public synthetic fun newArray (I)[Ljava/lang/Object;
 }
 
 public abstract interface annotation class io/matthewnelson/kmp/tor/common/annotation/ExperimentalTorApi : java/lang/annotation/Annotation {
@@ -185,7 +250,7 @@ public abstract interface annotation class io/matthewnelson/kmp/tor/common/annot
 public abstract interface annotation class io/matthewnelson/kmp/tor/common/annotation/SealedValueClass : java/lang/annotation/Annotation {
 }
 
-public abstract interface class io/matthewnelson/kmp/tor/common/clientauth/ClientName {
+public abstract interface class io/matthewnelson/kmp/tor/common/clientauth/ClientName : android/os/Parcelable {
 	public static final field Companion Lio/matthewnelson/kmp/tor/common/clientauth/ClientName$Companion;
 	public static fun fromStringOrNull (Ljava/lang/String;)Lio/matthewnelson/kmp/tor/common/clientauth/ClientName;
 	public abstract fun getValue ()Ljava/lang/String;
@@ -200,7 +265,7 @@ public final class io/matthewnelson/kmp/tor/common/clientauth/ClientName$Compani
 public final class io/matthewnelson/kmp/tor/common/clientauth/OnionClientAuth {
 }
 
-public abstract interface class io/matthewnelson/kmp/tor/common/clientauth/OnionClientAuth$Key {
+public abstract interface class io/matthewnelson/kmp/tor/common/clientauth/OnionClientAuth$Key : android/os/Parcelable {
 	public abstract fun base32 (Z)Ljava/lang/String;
 	public abstract fun base64 (Z)Ljava/lang/String;
 	public abstract fun decode ()[B
@@ -219,13 +284,24 @@ public final class io/matthewnelson/kmp/tor/common/clientauth/OnionClientAuth$Ke
 	public static fun values ()[Lio/matthewnelson/kmp/tor/common/clientauth/OnionClientAuth$Key$Type;
 }
 
-public final class io/matthewnelson/kmp/tor/common/clientauth/OnionClientAuth$KeyPair {
+public final class io/matthewnelson/kmp/tor/common/clientauth/OnionClientAuth$KeyPair : android/os/Parcelable {
+	public static final field CREATOR Landroid/os/Parcelable$Creator;
 	public final field privateKey Lio/matthewnelson/kmp/tor/common/clientauth/OnionClientAuth$PrivateKey;
 	public final field publicKey Lio/matthewnelson/kmp/tor/common/clientauth/OnionClientAuth$PublicKey;
 	public fun <init> (Lio/matthewnelson/kmp/tor/common/clientauth/OnionClientAuth$PublicKey;Lio/matthewnelson/kmp/tor/common/clientauth/OnionClientAuth$PrivateKey;)V
+	public fun describeContents ()I
 	public fun equals (Ljava/lang/Object;)Z
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
+	public fun writeToParcel (Landroid/os/Parcel;I)V
+}
+
+public final class io/matthewnelson/kmp/tor/common/clientauth/OnionClientAuth$KeyPair$Creator : android/os/Parcelable$Creator {
+	public fun <init> ()V
+	public final fun createFromParcel (Landroid/os/Parcel;)Lio/matthewnelson/kmp/tor/common/clientauth/OnionClientAuth$KeyPair;
+	public synthetic fun createFromParcel (Landroid/os/Parcel;)Ljava/lang/Object;
+	public final fun newArray (I)[Lio/matthewnelson/kmp/tor/common/clientauth/OnionClientAuth$KeyPair;
+	public synthetic fun newArray (I)[Ljava/lang/Object;
 }
 
 public abstract interface class io/matthewnelson/kmp/tor/common/clientauth/OnionClientAuth$PrivateKey : io/matthewnelson/kmp/tor/common/clientauth/OnionClientAuth$Key {
@@ -294,10 +370,50 @@ public final class io/matthewnelson/kmp/tor/common/clientauth/OnionClientAuthPub
 	public final fun invoke (Ljava/lang/String;)Lio/matthewnelson/kmp/tor/common/clientauth/OnionClientAuthPublicKey_B64_X25519;
 }
 
+public final class io/matthewnelson/kmp/tor/common/clientauth/RealClientName$Creator : android/os/Parcelable$Creator {
+	public fun <init> ()V
+	public synthetic fun createFromParcel (Landroid/os/Parcel;)Ljava/lang/Object;
+	public final fun createFromParcel-eXUQ4WU (Landroid/os/Parcel;)Ljava/lang/String;
+	public final fun newArray (I)[Lio/matthewnelson/kmp/tor/common/clientauth/RealClientName;
+	public synthetic fun newArray (I)[Ljava/lang/Object;
+}
+
+public final class io/matthewnelson/kmp/tor/common/clientauth/RealOnionClientAuthPrivateKey_B32_X25519$Creator : android/os/Parcelable$Creator {
+	public fun <init> ()V
+	public synthetic fun createFromParcel (Landroid/os/Parcel;)Ljava/lang/Object;
+	public final fun createFromParcel-aW9Ndbk (Landroid/os/Parcel;)Ljava/lang/String;
+	public final fun newArray (I)[Lio/matthewnelson/kmp/tor/common/clientauth/RealOnionClientAuthPrivateKey_B32_X25519;
+	public synthetic fun newArray (I)[Ljava/lang/Object;
+}
+
+public final class io/matthewnelson/kmp/tor/common/clientauth/RealOnionClientAuthPrivateKey_B64_X25519$Creator : android/os/Parcelable$Creator {
+	public fun <init> ()V
+	public synthetic fun createFromParcel (Landroid/os/Parcel;)Ljava/lang/Object;
+	public final fun createFromParcel-sd9d87I (Landroid/os/Parcel;)Ljava/lang/String;
+	public final fun newArray (I)[Lio/matthewnelson/kmp/tor/common/clientauth/RealOnionClientAuthPrivateKey_B64_X25519;
+	public synthetic fun newArray (I)[Ljava/lang/Object;
+}
+
+public final class io/matthewnelson/kmp/tor/common/clientauth/RealOnionClientAuthPublicKey_B32_X25519$Creator : android/os/Parcelable$Creator {
+	public fun <init> ()V
+	public synthetic fun createFromParcel (Landroid/os/Parcel;)Ljava/lang/Object;
+	public final fun createFromParcel-WOl69kM (Landroid/os/Parcel;)Ljava/lang/String;
+	public final fun newArray (I)[Lio/matthewnelson/kmp/tor/common/clientauth/RealOnionClientAuthPublicKey_B32_X25519;
+	public synthetic fun newArray (I)[Ljava/lang/Object;
+}
+
+public final class io/matthewnelson/kmp/tor/common/clientauth/RealOnionClientAuthPublicKey_B64_X25519$Creator : android/os/Parcelable$Creator {
+	public fun <init> ()V
+	public synthetic fun createFromParcel (Landroid/os/Parcel;)Ljava/lang/Object;
+	public final fun createFromParcel-ZDIA0SU (Landroid/os/Parcel;)Ljava/lang/String;
+	public final fun newArray (I)[Lio/matthewnelson/kmp/tor/common/clientauth/RealOnionClientAuthPublicKey_B64_X25519;
+	public synthetic fun newArray (I)[Ljava/lang/Object;
+}
+
 public final class io/matthewnelson/kmp/tor/common/server/Server {
 }
 
-public abstract interface class io/matthewnelson/kmp/tor/common/server/Server$Fingerprint {
+public abstract interface class io/matthewnelson/kmp/tor/common/server/Server$Fingerprint : android/os/Parcelable {
 	public static final field Companion Lio/matthewnelson/kmp/tor/common/server/Server$Fingerprint$Companion;
 	public static final field PREFIX C
 	public abstract fun decode ()[B
@@ -315,7 +431,8 @@ public final class io/matthewnelson/kmp/tor/common/server/Server$Fingerprint$Com
 	public final fun invoke (Ljava/lang/String;)Lio/matthewnelson/kmp/tor/common/server/Server$Fingerprint;
 }
 
-public final class io/matthewnelson/kmp/tor/common/server/Server$LongName {
+public final class io/matthewnelson/kmp/tor/common/server/Server$LongName : android/os/Parcelable {
+	public static final field CREATOR Landroid/os/Parcelable$Creator;
 	public static final field Companion Lio/matthewnelson/kmp/tor/common/server/Server$LongName$Companion;
 	public static final field DELIMITER C
 	public final field fingerprint Lio/matthewnelson/kmp/tor/common/server/Server$Fingerprint;
@@ -325,11 +442,13 @@ public final class io/matthewnelson/kmp/tor/common/server/Server$LongName {
 	public final fun component2 ()Lio/matthewnelson/kmp/tor/common/server/Server$Nickname;
 	public final fun copy (Lio/matthewnelson/kmp/tor/common/server/Server$Fingerprint;Lio/matthewnelson/kmp/tor/common/server/Server$Nickname;)Lio/matthewnelson/kmp/tor/common/server/Server$LongName;
 	public static synthetic fun copy$default (Lio/matthewnelson/kmp/tor/common/server/Server$LongName;Lio/matthewnelson/kmp/tor/common/server/Server$Fingerprint;Lio/matthewnelson/kmp/tor/common/server/Server$Nickname;ILjava/lang/Object;)Lio/matthewnelson/kmp/tor/common/server/Server$LongName;
+	public fun describeContents ()I
 	public fun equals (Ljava/lang/Object;)Z
 	public static final fun fromString (Ljava/lang/String;)Lio/matthewnelson/kmp/tor/common/server/Server$LongName;
 	public static final fun fromStringOrNull (Ljava/lang/String;)Lio/matthewnelson/kmp/tor/common/server/Server$LongName;
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
+	public fun writeToParcel (Landroid/os/Parcel;I)V
 }
 
 public final class io/matthewnelson/kmp/tor/common/server/Server$LongName$Companion {
@@ -337,7 +456,15 @@ public final class io/matthewnelson/kmp/tor/common/server/Server$LongName$Compan
 	public final fun fromStringOrNull (Ljava/lang/String;)Lio/matthewnelson/kmp/tor/common/server/Server$LongName;
 }
 
-public abstract interface class io/matthewnelson/kmp/tor/common/server/Server$Nickname {
+public final class io/matthewnelson/kmp/tor/common/server/Server$LongName$Creator : android/os/Parcelable$Creator {
+	public fun <init> ()V
+	public final fun createFromParcel (Landroid/os/Parcel;)Lio/matthewnelson/kmp/tor/common/server/Server$LongName;
+	public synthetic fun createFromParcel (Landroid/os/Parcel;)Ljava/lang/Object;
+	public final fun newArray (I)[Lio/matthewnelson/kmp/tor/common/server/Server$LongName;
+	public synthetic fun newArray (I)[Ljava/lang/Object;
+}
+
+public abstract interface class io/matthewnelson/kmp/tor/common/server/Server$Nickname : android/os/Parcelable {
 	public static final field Companion Lio/matthewnelson/kmp/tor/common/server/Server$Nickname$Companion;
 	public static fun fromStringOrNull (Ljava/lang/String;)Lio/matthewnelson/kmp/tor/common/server/Server$Nickname;
 	public static fun getREGEX ()Lkotlin/text/Regex;
@@ -349,5 +476,21 @@ public final class io/matthewnelson/kmp/tor/common/server/Server$Nickname$Compan
 	public final fun fromStringOrNull (Ljava/lang/String;)Lio/matthewnelson/kmp/tor/common/server/Server$Nickname;
 	public final fun getREGEX ()Lkotlin/text/Regex;
 	public final fun invoke (Ljava/lang/String;)Lio/matthewnelson/kmp/tor/common/server/Server$Nickname;
+}
+
+public final class io/matthewnelson/kmp/tor/common/server/Server$RealFingerprint$Creator : android/os/Parcelable$Creator {
+	public fun <init> ()V
+	public synthetic fun createFromParcel (Landroid/os/Parcel;)Ljava/lang/Object;
+	public final fun createFromParcel-J7yM4kg (Landroid/os/Parcel;)Ljava/lang/String;
+	public final fun newArray (I)[Lio/matthewnelson/kmp/tor/common/server/Server$RealFingerprint;
+	public synthetic fun newArray (I)[Ljava/lang/Object;
+}
+
+public final class io/matthewnelson/kmp/tor/common/server/Server$RealNickname$Creator : android/os/Parcelable$Creator {
+	public fun <init> ()V
+	public synthetic fun createFromParcel (Landroid/os/Parcel;)Ljava/lang/Object;
+	public final fun createFromParcel-1bkgZ44 (Landroid/os/Parcel;)Ljava/lang/String;
+	public final fun newArray (I)[Lio/matthewnelson/kmp/tor/common/server/Server$RealNickname;
+	public synthetic fun newArray (I)[Ljava/lang/Object;
 }
 

@@ -19,6 +19,7 @@ import io.matthewnelson.component.base64.Base64
 import io.matthewnelson.component.base64.encodeBase64
 import io.matthewnelson.component.encoding.base32.Base32
 import io.matthewnelson.component.encoding.base32.decodeBase32ToArray
+import io.matthewnelson.component.parcelize.Parcelize
 import io.matthewnelson.kmp.tor.common.annotation.ExperimentalTorApi
 import io.matthewnelson.kmp.tor.common.annotation.SealedValueClass
 import io.matthewnelson.kmp.tor.common.internal.descriptorString
@@ -48,6 +49,7 @@ sealed interface OnionClientAuthPublicKey_B32_X25519: OnionClientAuth.PublicKey 
 }
 
 @JvmInline
+@Parcelize
 @Suppress("ClassName")
 private value class RealOnionClientAuthPublicKey_B32_X25519(
     override val value: String

@@ -15,6 +15,8 @@
  **/
 package io.matthewnelson.kmp.tor.common.address
 
+import io.matthewnelson.component.parcelize.Parcelable
+import io.matthewnelson.component.parcelize.Parcelize
 import io.matthewnelson.kmp.tor.common.internal.separateSchemeFromAddress
 import kotlin.jvm.JvmField
 import kotlin.jvm.JvmStatic
@@ -46,6 +48,7 @@ import kotlin.jvm.JvmStatic
  * // output >>> wss://6yxtsbpn2k7exxiarcbiet3fsr4komissliojxjlvl7iytacrnvz2uyd.onion/some/path
  * ```
  * */
+@Parcelize
 data class OnionUrl(
     @JvmField
     val address: OnionAddress,
@@ -55,7 +58,7 @@ data class OnionUrl(
     val port: Port? = null,
     @JvmField
     val scheme: Scheme = Scheme.HTTP,
-) {
+): Parcelable {
 
     override fun toString(): String {
         return StringBuilder().let { sb ->

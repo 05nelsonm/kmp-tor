@@ -17,6 +17,7 @@ package io.matthewnelson.kmp.tor.common.address
 
 import io.matthewnelson.component.base64.Base64
 import io.matthewnelson.component.base64.decodeBase64ToArray
+import io.matthewnelson.component.parcelize.Parcelize
 import io.matthewnelson.kmp.tor.common.annotation.ExperimentalTorApi
 import io.matthewnelson.kmp.tor.common.annotation.InternalTorApi
 import io.matthewnelson.kmp.tor.common.annotation.SealedValueClass
@@ -67,6 +68,7 @@ sealed interface OnionAddressV3PrivateKey_ED25519: OnionAddress.PrivateKey {
 }
 
 @JvmInline
+@Parcelize
 @OptIn(InternalTorApi::class)
 @Suppress("ClassName")
 private value class RealOnionAddressV3PrivateKey_ED25519(
