@@ -91,10 +91,15 @@ apiValidation {
         // Don't check these projects when building JVM only
         if (!KMP_TARGETS_ALL && (!ANDROID && JVM)) {
             ignoredProjects.add("kmp-tor")
+            ignoredProjects.add("kmp-tor-common")
             ignoredProjects.add("kmp-tor-controller")
+            ignoredProjects.add("kmp-tor-controller-common")
             ignoredProjects.add("kmp-tor-manager")
+            ignoredProjects.add("kmp-tor-manager-common")
             ignoredProjects.add("kmp-tor-ext-callback-controller")
+            ignoredProjects.add("kmp-tor-ext-callback-controller-common")
             ignoredProjects.add("kmp-tor-ext-callback-manager")
+            ignoredProjects.add("kmp-tor-ext-callback-manager-common")
         }
 
         if (KMP_TARGETS_ALL || (ANDROID && JVM)) {
