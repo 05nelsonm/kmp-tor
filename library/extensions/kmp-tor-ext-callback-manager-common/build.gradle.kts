@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
+import io.matthewnelson.kotlin.components.dependencies.versions
 import io.matthewnelson.kotlin.components.kmp.KmpTarget
 import kmp.tor.env
 import org.jetbrains.kotlin.gradle.plugin.KotlinJsCompilerType
@@ -25,6 +26,12 @@ plugins {
 kmpConfiguration {
     setupMultiplatform(targets =
         setOf(
+
+            KmpTarget.Jvm.Android(
+                compileSdk = versions.android.sdkCompile,
+                minSdk = versions.android.sdkMin16,
+                buildTools = versions.android.buildTools,
+            ),
 
             KmpTarget.Jvm.Jvm.DEFAULT,
 
