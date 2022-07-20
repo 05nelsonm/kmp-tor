@@ -1,3 +1,10 @@
+public final class io/matthewnelson/kmp/tor/ext/callback/manager/common/BuildConfig {
+	public static final field BUILD_TYPE Ljava/lang/String;
+	public static final field DEBUG Z
+	public static final field LIBRARY_PACKAGE_NAME Ljava/lang/String;
+	public fun <init> ()V
+}
+
 public abstract interface class io/matthewnelson/kmp/tor/ext/callback/manager/common/CallbackTorControlManager : io/matthewnelson/kmp/tor/ext/callback/controller/common/control/CallbackTorControlCircuit, io/matthewnelson/kmp/tor/ext/callback/controller/common/control/CallbackTorControlConfig, io/matthewnelson/kmp/tor/ext/callback/controller/common/control/CallbackTorControlHs, io/matthewnelson/kmp/tor/ext/callback/controller/common/control/CallbackTorControlOnion, io/matthewnelson/kmp/tor/ext/callback/controller/common/control/CallbackTorControlOnionClientAuth, io/matthewnelson/kmp/tor/ext/callback/controller/common/control/CallbackTorControlStream, io/matthewnelson/kmp/tor/ext/callback/controller/common/control/usecase/CallbackTorControlDescriptorPost, io/matthewnelson/kmp/tor/ext/callback/controller/common/control/usecase/CallbackTorControlDropGuards, io/matthewnelson/kmp/tor/ext/callback/controller/common/control/usecase/CallbackTorControlInfoGet, io/matthewnelson/kmp/tor/ext/callback/controller/common/control/usecase/CallbackTorControlInfoProtocol, io/matthewnelson/kmp/tor/ext/callback/controller/common/control/usecase/CallbackTorControlMapAddress, io/matthewnelson/kmp/tor/ext/callback/controller/common/control/usecase/CallbackTorControlResolve, io/matthewnelson/kmp/tor/ext/callback/controller/common/control/usecase/CallbackTorControlSetEvents, io/matthewnelson/kmp/tor/ext/callback/controller/common/control/usecase/CallbackTorControlSignal, io/matthewnelson/kmp/tor/ext/callback/controller/common/control/usecase/CallbackTorControlUseFeature {
 }
 
