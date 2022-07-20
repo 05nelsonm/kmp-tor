@@ -24,7 +24,7 @@ plugins {
 }
 
 kmpConfiguration {
-    setupMultiplatform(
+    setupMultiplatform(targets =
         setOf(
 
             KmpTarget.Jvm.Jvm.DEFAULT,
@@ -35,28 +35,15 @@ kmpConfiguration {
                 node = KmpTarget.NonJvm.JS.Node(),
             ),
 
-            KmpTarget.NonJvm.Native.Unix.Darwin.Ios.Arm32.DEFAULT,
-            KmpTarget.NonJvm.Native.Unix.Darwin.Ios.Arm64.DEFAULT,
-            KmpTarget.NonJvm.Native.Unix.Darwin.Ios.X64.DEFAULT,
-            KmpTarget.NonJvm.Native.Unix.Darwin.Ios.SimulatorArm64.DEFAULT,
-
-            KmpTarget.NonJvm.Native.Unix.Darwin.Macos.X64.DEFAULT,
-            KmpTarget.NonJvm.Native.Unix.Darwin.Macos.Arm64.DEFAULT,
-
-            KmpTarget.NonJvm.Native.Unix.Darwin.Tvos.Arm64.DEFAULT,
-            KmpTarget.NonJvm.Native.Unix.Darwin.Tvos.X64.DEFAULT,
-            KmpTarget.NonJvm.Native.Unix.Darwin.Tvos.SimulatorArm64.DEFAULT,
-
-            KmpTarget.NonJvm.Native.Unix.Darwin.Watchos.Arm32.DEFAULT,
-            KmpTarget.NonJvm.Native.Unix.Darwin.Watchos.Arm64.DEFAULT,
-            KmpTarget.NonJvm.Native.Unix.Darwin.Watchos.X64.DEFAULT,
-            KmpTarget.NonJvm.Native.Unix.Darwin.Watchos.X86.DEFAULT,
-            KmpTarget.NonJvm.Native.Unix.Darwin.Watchos.SimulatorArm64.DEFAULT,
-
             KmpTarget.NonJvm.Native.Unix.Linux.X64.DEFAULT,
 
             KmpTarget.NonJvm.Native.Mingw.X64.DEFAULT,
-        ),
+        ) +
+        KmpTarget.NonJvm.Native.Unix.Darwin.Ios.ALL_DEFAULT     +
+        KmpTarget.NonJvm.Native.Unix.Darwin.Macos.ALL_DEFAULT   +
+        KmpTarget.NonJvm.Native.Unix.Darwin.Tvos.ALL_DEFAULT    +
+        KmpTarget.NonJvm.Native.Unix.Darwin.Watchos.ALL_DEFAULT,
+
         commonMainSourceSet = {
             dependencies {
                 implementation(deps.components.encoding.base16)
@@ -64,6 +51,7 @@ kmpConfiguration {
                 implementation(deps.components.encoding.base64)
             }
         },
+
         commonTestSourceSet = {
             dependencies {
                 implementation(kotlin("test"))

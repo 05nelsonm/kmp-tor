@@ -31,8 +31,22 @@ val pConfig = kmpPublishRootProjectConfiguration!!
 includeStagingRepoIfTrue(env.kmpTorBinaries.pollStagingRepo)
 
 kmpConfiguration {
-    setupMultiplatform(
+    setupMultiplatform(targets =
         setOf(
+
+            KmpTarget.Jvm.Android(
+                buildTools = versions.android.buildTools,
+                compileSdk = versions.android.sdkCompile,
+                minSdk = versions.android.sdkMin21,
+                target = {
+                    publishLibraryVariants("release")
+                },
+                mainSourceSet = {
+                    dependencies {
+                        implementation("${pConfig.group}:kmp-tor-binary-android:${env.kmpTorBinaries.version.name}")
+                    }
+                },
+            ),
 
             KmpTarget.Jvm.Jvm(
                 mainSourceSet = {
@@ -50,20 +64,6 @@ kmpConfiguration {
                         implementation("${pConfig.group}:kmp-tor-binary-macosx64:${env.kmpTorBinaries.version.name}")
                         implementation("${pConfig.group}:kmp-tor-binary-mingwx64:${env.kmpTorBinaries.version.name}")
                         implementation("${pConfig.group}:kmp-tor-binary-mingwx86:${env.kmpTorBinaries.version.name}")
-                    }
-                },
-            ),
-
-            KmpTarget.Jvm.Android(
-                buildTools = versions.android.buildTools,
-                compileSdk = versions.android.sdkCompile,
-                minSdk = versions.android.sdkMin21,
-                target = {
-                    publishLibraryVariants("release")
-                },
-                mainSourceSet = {
-                    dependencies {
-                        implementation("${pConfig.group}:kmp-tor-binary-android:${env.kmpTorBinaries.version.name}")
                     }
                 },
             ),
@@ -117,6 +117,7 @@ kmpConfiguration {
 //                },
 //            ),
         ),
+
         commonMainSourceSet = {
             dependencies {
                 implementation(deps.kotlin.coroutines.core.core)
@@ -127,6 +128,7 @@ kmpConfiguration {
                 api(project(":library:manager:kmp-tor-manager"))
             }
         },
+
         commonTestSourceSet = {
             dependencies {
                 implementation(depsTest.kotlin.coroutines)
@@ -134,6 +136,7 @@ kmpConfiguration {
                 implementation(project(":library:extensions:kmp-tor-ext-callback-manager"))
             }
         },
+
         kotlin = {
             sourceSetJvmJsTest {
                 dependencies {
