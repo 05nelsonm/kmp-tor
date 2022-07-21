@@ -6,8 +6,8 @@
 [![badge-atomicfu]][url-atomicfu]
 [![badge-coroutines]][url-coroutines]
 [![badge-encoding]][url-encoding]
+[![badge-parcelize]][url-parcelize]
 [![badge-kmp-tor-binary]][url-kmp-tor-binary]
-<!-- TODO: [![badge-parcelize]][url-parcelize] -->
 
 ![badge-platform-android]
 ![badge-platform-jvm]
@@ -23,7 +23,7 @@ Add dependency
 // build.gradle.kts
 dependencies {
     val vTor = "0.4.7.8"
-    val vKmpTor = "1.1.0"
+    val vKmpTor = "1.2.0"
     implementation("io.matthewnelson.kotlin-components:kmp-tor:$vTor+$vKmpTor")
 }
 ```
@@ -33,7 +33,7 @@ dependencies {
 // build.gradle
 dependencies {
    def vTor = '0.4.7.8'
-   def vKmpTor = '1.1.0'
+   def vKmpTor = '1.2.0'
    implementation "io.matthewnelson.kotlin-components:kmp-tor:$vTor+$vKmpTor"
 }
 ```
@@ -90,7 +90,7 @@ dependencies {
 // build.gradlew.kts
 dependencies {
     val vTor = "0.4.7.8"
-    val vKmpTor = "1.1.0"
+    val vKmpTor = "1.2.0"
     
     implementation("io.matthewnelson.kotlin-components:kmp-tor:$vTor+$vKmpTor")
     
@@ -127,7 +127,7 @@ config at startup.
 // build.gradle
 dependencies {
     def vTor = '0.4.7.8'
-    def vKmpTor = '1.1.0'
+    def vKmpTor = '1.2.0'
 
     implementation "io.matthewnelson.kotlin-components:kmp-tor:$vTor+$vKmpTor"
     // Add the callback extension
@@ -228,7 +228,7 @@ $ git pull --recurse-submodules
 <!-- TAG_VERSION -->
 <!-- If Tor version was updated, don't forget to update [badge-kmp-tor-binary] -->
 
-[badge-latest-release]: https://img.shields.io/badge/latest--release-0.4.7.8+1.1.0-5d2f68.svg?logo=torproject&style=flat&logoColor=5d2f68
+[badge-latest-release]: https://img.shields.io/badge/latest--release-0.4.7.8+1.2.0-5d2f68.svg?logo=torproject&style=flat&logoColor=5d2f68
 [badge-license]: https://img.shields.io/badge/license-Apache%20License%202.0-blue.svg?style=flat
 
 <!-- TAG_DEPENDENCIES -->

@@ -1,5 +1,12 @@
 # CHANGELOG
 
+## Version 0.4.7.8+1.2.0 (2022-07-21)
+ - Adds `-android` variants to all `*-common` modules
+ - Adds dependency on `io.matthewnelson.kotlin-components:parcelize`
+ - Implements `android.os.Parcelable` for wrapper classes within the
+   `kmp-tor-common` module.
+ - Build improvements
+
 ## Version 0.4.7.8+1.1.0 (2022-07-14)
  - Optimized `TorEvent.Listener`
  - Adds remaining `TorConfig.KeyWord`s
