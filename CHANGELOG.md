@@ -1,5 +1,8 @@
 # CHANGELOG
 
+## Version 0.4.7.8+1.2.1 (2022-07-21)
+ - Fixes `-android` publication for `*-common` modules
+
 ## Version 0.4.7.8+1.2.0 (2022-07-21)
  - Adds `-android` variants to all `*-common` modules
  - Adds dependency on `io.matthewnelson.kotlin-components:parcelize`
