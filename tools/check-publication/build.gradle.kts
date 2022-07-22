@@ -35,30 +35,50 @@ kmpConfiguration {
     setupMultiplatform(
         setOf(
 
-            KmpTarget.Jvm.Jvm(
-                mainSourceSet = {
-                    dependencies {
-                        implementation("${pConfig.group}:kmp-tor:${env.kmpTorAll.version.name}")
-                        implementation("${pConfig.group}:kmp-tor-controller:${env.kmpTor.version.name}")
-                        implementation("${pConfig.group}:kmp-tor-ext-callback-controller:${env.kmpTor.version.name}")
-                        implementation("${pConfig.group}:kmp-tor-ext-callback-manager:${env.kmpTor.version.name}")
-                        implementation("${pConfig.group}:kmp-tor-ext-unix-socket:${env.kmpTor.version.name}")
-                        implementation("${pConfig.group}:kmp-tor-manager:${env.kmpTor.version.name}")
-                    }
-                }
-            ),
-
             KmpTarget.Jvm.Android(
                 buildTools = versions.android.buildTools,
                 compileSdk = versions.android.sdkCompile,
                 minSdk = versions.android.sdkMin21,
                 mainSourceSet = {
                     dependencies {
-                        implementation("${pConfig.group}:kmp-tor:${env.kmpTorAll.version.name}")
-                        implementation("${pConfig.group}:kmp-tor-controller:${env.kmpTor.version.name}")
-                        implementation("${pConfig.group}:kmp-tor-ext-callback-controller:${env.kmpTor.version.name}")
-                        implementation("${pConfig.group}:kmp-tor-ext-callback-manager:${env.kmpTor.version.name}")
-                        implementation("${pConfig.group}:kmp-tor-manager:${env.kmpTor.version.name}")
+                        implementation("${pConfig.group}:kmp-tor-android:${env.kmpTorAll.version.name}")
+                        implementation("${pConfig.group}:kmp-tor-common-android:${env.kmpTorAll.version.name}")
+
+                        implementation("${pConfig.group}:kmp-tor-controller-android:${env.kmpTor.version.name}")
+                        implementation("${pConfig.group}:kmp-tor-controller-common-android:${env.kmpTor.version.name}")
+
+                        implementation("${pConfig.group}:kmp-tor-ext-callback-controller-android:${env.kmpTor.version.name}")
+                        implementation("${pConfig.group}:kmp-tor-ext-callback-controller-common-android:${env.kmpTor.version.name}")
+
+                        implementation("${pConfig.group}:kmp-tor-ext-callback-manager-android:${env.kmpTor.version.name}")
+                        implementation("${pConfig.group}:kmp-tor-ext-callback-manager-common-android:${env.kmpTor.version.name}")
+
+                        implementation("${pConfig.group}:kmp-tor-manager-android:${env.kmpTor.version.name}")
+                        implementation("${pConfig.group}:kmp-tor-manager-common-android:${env.kmpTor.version.name}")
+                    }
+                }
+            ),
+
+            KmpTarget.Jvm.Jvm(
+                mainSourceSet = {
+                    dependencies {
+                        implementation("${pConfig.group}:kmp-tor-jvm:${env.kmpTorAll.version.name}")
+                        implementation("${pConfig.group}:kmp-tor-common-jvm:${env.kmpTorAll.version.name}")
+                        implementation("${pConfig.group}:kmp-tor-internal-jvm:${env.kmpTorAll.version.name}")
+
+                        implementation("${pConfig.group}:kmp-tor-controller-jvm:${env.kmpTor.version.name}")
+                        implementation("${pConfig.group}:kmp-tor-controller-common-jvm:${env.kmpTor.version.name}")
+
+                        implementation("${pConfig.group}:kmp-tor-ext-callback-controller-jvm:${env.kmpTor.version.name}")
+                        implementation("${pConfig.group}:kmp-tor-ext-callback-controller-common-jvm:${env.kmpTor.version.name}")
+
+                        implementation("${pConfig.group}:kmp-tor-ext-callback-manager-jvm:${env.kmpTor.version.name}")
+                        implementation("${pConfig.group}:kmp-tor-ext-callback-manager-common-jvm:${env.kmpTor.version.name}")
+
+                        implementation("${pConfig.group}:kmp-tor-ext-unix-socket-jvm:${env.kmpTor.version.name}")
+
+                        implementation("${pConfig.group}:kmp-tor-manager-jvm:${env.kmpTor.version.name}")
+                        implementation("${pConfig.group}:kmp-tor-manager-common-jvm:${env.kmpTor.version.name}")
                     }
                 }
             ),
@@ -69,28 +89,15 @@ kmpConfiguration {
                 node = KmpTarget.NonJvm.JS.Node(),
             ),
 
-            KmpTarget.NonJvm.Native.Unix.Darwin.Ios.Arm32.DEFAULT,
-            KmpTarget.NonJvm.Native.Unix.Darwin.Ios.Arm64.DEFAULT,
-            KmpTarget.NonJvm.Native.Unix.Darwin.Ios.X64.DEFAULT,
-            KmpTarget.NonJvm.Native.Unix.Darwin.Ios.SimulatorArm64.DEFAULT,
-
-            KmpTarget.NonJvm.Native.Unix.Darwin.Macos.X64.DEFAULT,
-            KmpTarget.NonJvm.Native.Unix.Darwin.Macos.Arm64.DEFAULT,
-
-            KmpTarget.NonJvm.Native.Unix.Darwin.Tvos.Arm64.DEFAULT,
-            KmpTarget.NonJvm.Native.Unix.Darwin.Tvos.X64.DEFAULT,
-            KmpTarget.NonJvm.Native.Unix.Darwin.Tvos.SimulatorArm64.DEFAULT,
-
-            KmpTarget.NonJvm.Native.Unix.Darwin.Watchos.Arm32.DEFAULT,
-            KmpTarget.NonJvm.Native.Unix.Darwin.Watchos.Arm64.DEFAULT,
-            KmpTarget.NonJvm.Native.Unix.Darwin.Watchos.X64.DEFAULT,
-            KmpTarget.NonJvm.Native.Unix.Darwin.Watchos.X86.DEFAULT,
-            KmpTarget.NonJvm.Native.Unix.Darwin.Watchos.SimulatorArm64.DEFAULT,
-
             KmpTarget.NonJvm.Native.Unix.Linux.X64.DEFAULT,
 
             KmpTarget.NonJvm.Native.Mingw.X64.DEFAULT,
-        ),
+        ) +
+        KmpTarget.NonJvm.Native.Unix.Darwin.Ios.ALL_DEFAULT     +
+        KmpTarget.NonJvm.Native.Unix.Darwin.Macos.ALL_DEFAULT   +
+        KmpTarget.NonJvm.Native.Unix.Darwin.Tvos.ALL_DEFAULT    +
+        KmpTarget.NonJvm.Native.Unix.Darwin.Watchos.ALL_DEFAULT,
+
         commonMainSourceSet = {
             dependencies {
                 implementation("${pConfig.group}:kmp-tor-common:${env.kmpTor.version.name}")
