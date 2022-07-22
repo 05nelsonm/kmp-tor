@@ -42,7 +42,7 @@ kmpConfiguration {
                 mainSourceSet = {
                     dependencies {
                         implementation("${pConfig.group}:kmp-tor-android:${env.kmpTorAll.version.name}")
-                        implementation("${pConfig.group}:kmp-tor-common-android:${env.kmpTorAll.version.name}")
+                        implementation("${pConfig.group}:kmp-tor-common-android:${env.kmpTor.version.name}")
 
                         implementation("${pConfig.group}:kmp-tor-controller-android:${env.kmpTor.version.name}")
                         implementation("${pConfig.group}:kmp-tor-controller-common-android:${env.kmpTor.version.name}")
@@ -63,8 +63,8 @@ kmpConfiguration {
                 mainSourceSet = {
                     dependencies {
                         implementation("${pConfig.group}:kmp-tor-jvm:${env.kmpTorAll.version.name}")
-                        implementation("${pConfig.group}:kmp-tor-common-jvm:${env.kmpTorAll.version.name}")
-                        implementation("${pConfig.group}:kmp-tor-internal-jvm:${env.kmpTorAll.version.name}")
+                        implementation("${pConfig.group}:kmp-tor-common-jvm:${env.kmpTor.version.name}")
+                        implementation("${pConfig.group}:kmp-tor-internal-jvm:${env.kmpTor.version.name}")
 
                         implementation("${pConfig.group}:kmp-tor-controller-jvm:${env.kmpTor.version.name}")
                         implementation("${pConfig.group}:kmp-tor-controller-common-jvm:${env.kmpTor.version.name}")
