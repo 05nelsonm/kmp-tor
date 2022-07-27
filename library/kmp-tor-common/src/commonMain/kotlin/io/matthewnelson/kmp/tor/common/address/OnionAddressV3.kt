@@ -74,7 +74,14 @@ private value class RealOnionAddressV3(override val value: String): OnionAddress
         }
     }
 
+    @Deprecated(
+        "Use hostname",
+        replaceWith = ReplaceWith("hostname"),
+        level = DeprecationLevel.WARNING
+    )
     override val valueDotOnion: String get() = "$value.onion"
+
+    override val hostname: String get() = "$value.onion"
 
     override fun decode(): ByteArray {
         return value.uppercase().decodeBase32ToArray(Base32.Default)!!
