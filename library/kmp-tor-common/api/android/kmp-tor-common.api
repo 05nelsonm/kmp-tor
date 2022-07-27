@@ -10,6 +10,7 @@ public abstract interface class io/matthewnelson/kmp/tor/common/address/OnionAdd
 	public abstract fun decode ()[B
 	public static fun fromString (Ljava/lang/String;)Lio/matthewnelson/kmp/tor/common/address/OnionAddress;
 	public static fun fromStringOrNull (Ljava/lang/String;)Lio/matthewnelson/kmp/tor/common/address/OnionAddress;
+	public abstract fun getHostname ()Ljava/lang/String;
 	public abstract fun getValue ()Ljava/lang/String;
 	public abstract fun getValueDotOnion ()Ljava/lang/String;
 }
@@ -84,14 +85,20 @@ public final class io/matthewnelson/kmp/tor/common/address/OnionUrl : android/os
 	public final field path Ljava/lang/String;
 	public final field port Lio/matthewnelson/kmp/tor/common/address/Port;
 	public final field scheme Lio/matthewnelson/kmp/tor/common/address/Scheme;
+	public final field subdomain Ljava/lang/String;
+	public fun <init> (Lio/matthewnelson/kmp/tor/common/address/OnionAddress;)V
+	public fun <init> (Lio/matthewnelson/kmp/tor/common/address/OnionAddress;Ljava/lang/String;)V
+	public fun <init> (Lio/matthewnelson/kmp/tor/common/address/OnionAddress;Ljava/lang/String;Lio/matthewnelson/kmp/tor/common/address/Port;)V
 	public fun <init> (Lio/matthewnelson/kmp/tor/common/address/OnionAddress;Ljava/lang/String;Lio/matthewnelson/kmp/tor/common/address/Port;Lio/matthewnelson/kmp/tor/common/address/Scheme;)V
-	public synthetic fun <init> (Lio/matthewnelson/kmp/tor/common/address/OnionAddress;Ljava/lang/String;Lio/matthewnelson/kmp/tor/common/address/Port;Lio/matthewnelson/kmp/tor/common/address/Scheme;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public fun <init> (Lio/matthewnelson/kmp/tor/common/address/OnionAddress;Ljava/lang/String;Lio/matthewnelson/kmp/tor/common/address/Port;Lio/matthewnelson/kmp/tor/common/address/Scheme;Ljava/lang/String;)V
+	public synthetic fun <init> (Lio/matthewnelson/kmp/tor/common/address/OnionAddress;Ljava/lang/String;Lio/matthewnelson/kmp/tor/common/address/Port;Lio/matthewnelson/kmp/tor/common/address/Scheme;Ljava/lang/String;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
 	public final fun component1 ()Lio/matthewnelson/kmp/tor/common/address/OnionAddress;
 	public final fun component2 ()Ljava/lang/String;
 	public final fun component3 ()Lio/matthewnelson/kmp/tor/common/address/Port;
 	public final fun component4 ()Lio/matthewnelson/kmp/tor/common/address/Scheme;
-	public final fun copy (Lio/matthewnelson/kmp/tor/common/address/OnionAddress;Ljava/lang/String;Lio/matthewnelson/kmp/tor/common/address/Port;Lio/matthewnelson/kmp/tor/common/address/Scheme;)Lio/matthewnelson/kmp/tor/common/address/OnionUrl;
-	public static synthetic fun copy$default (Lio/matthewnelson/kmp/tor/common/address/OnionUrl;Lio/matthewnelson/kmp/tor/common/address/OnionAddress;Ljava/lang/String;Lio/matthewnelson/kmp/tor/common/address/Port;Lio/matthewnelson/kmp/tor/common/address/Scheme;ILjava/lang/Object;)Lio/matthewnelson/kmp/tor/common/address/OnionUrl;
+	public final fun component5 ()Ljava/lang/String;
+	public final fun copy (Lio/matthewnelson/kmp/tor/common/address/OnionAddress;Ljava/lang/String;Lio/matthewnelson/kmp/tor/common/address/Port;Lio/matthewnelson/kmp/tor/common/address/Scheme;Ljava/lang/String;)Lio/matthewnelson/kmp/tor/common/address/OnionUrl;
+	public static synthetic fun copy$default (Lio/matthewnelson/kmp/tor/common/address/OnionUrl;Lio/matthewnelson/kmp/tor/common/address/OnionAddress;Ljava/lang/String;Lio/matthewnelson/kmp/tor/common/address/Port;Lio/matthewnelson/kmp/tor/common/address/Scheme;Ljava/lang/String;ILjava/lang/Object;)Lio/matthewnelson/kmp/tor/common/address/OnionUrl;
 	public fun describeContents ()I
 	public fun equals (Ljava/lang/Object;)Z
 	public static final fun fromString (Ljava/lang/String;)Lio/matthewnelson/kmp/tor/common/address/OnionUrl;
