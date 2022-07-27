@@ -19,6 +19,7 @@ import io.matthewnelson.component.parcelize.Parcelable
 import io.matthewnelson.component.parcelize.Parcelize
 import io.matthewnelson.kmp.tor.common.internal.separateSchemeFromAddress
 import kotlin.jvm.JvmField
+import kotlin.jvm.JvmOverloads
 import kotlin.jvm.JvmStatic
 
 /**
@@ -49,7 +50,7 @@ import kotlin.jvm.JvmStatic
  * ```
  * */
 @Parcelize
-data class OnionUrl(
+data class OnionUrl @JvmOverloads constructor(
     @JvmField
     val address: OnionAddress,
     @JvmField
@@ -58,12 +59,17 @@ data class OnionUrl(
     val port: Port? = null,
     @JvmField
     val scheme: Scheme = Scheme.HTTP,
+    @JvmField
+    val subdomain: String = "",
 ): Parcelable {
 
     override fun toString(): String {
         return StringBuilder().let { sb ->
             sb.append(scheme)
-            sb.append(address.valueDotOnion)
+            if (subdomain.isNotEmpty()) {
+                sb.append(subdomain).append('.')
+            }
+            sb.append(address.hostname)
             if (port != null) {
                 sb.append(':').append(port.value)
             }
@@ -94,7 +100,13 @@ data class OnionUrl(
                 throw IllegalArgumentException("Failed to parse url")
             }
 
-            val oAddress = OnionAddressV3(splits[0])
+            val subdomain = if (splits[0].contains('.')) {
+                splits[0].substringBeforeLast('.')
+            } else {
+                ""
+            }
+
+            val oAddress = OnionAddressV3(splits[0].substringAfterLast('.'))
 
 //            val oAddress = try {
 //                OnionAddressV3(splits[0])
@@ -127,7 +139,8 @@ data class OnionUrl(
                 address = oAddress,
                 path = path,
                 port = port,
-                scheme = scheme ?: Scheme.HTTP
+                scheme = scheme ?: Scheme.HTTP,
+                subdomain = subdomain
             )
         }
 
