@@ -16,7 +16,6 @@
 package io.matthewnelson.kmp.tor.common.address
 
 import io.matthewnelson.component.parcelize.Parcelable
-import io.matthewnelson.component.parcelize.Parcelize
 import io.matthewnelson.kmp.tor.common.internal.stripAddress
 import io.matthewnelson.kmp.tor.common.internal.stripString
 import kotlin.jvm.JvmStatic
@@ -32,7 +31,17 @@ sealed interface OnionAddress: Parcelable {
     /**
      * Appends .onion to the given [value]
      * */
+    @Deprecated(
+        message = "Use hostname",
+        replaceWith = ReplaceWith("hostname"),
+        level = DeprecationLevel.WARNING
+    )
     val valueDotOnion: String
+
+    /**
+     * Appends .onion to the given [value]
+     * */
+    val hostname: String
 
     fun decode(): ByteArray
 
