@@ -29,38 +29,81 @@ import kotlin.jvm.JvmStatic
  *
  * Will be translated to:
  *
- *   ProxyAddress(ipAddress=127.0.0.1, port=Port(value=9050))
+ *   val proxyAddress = ProxyAddress(address = IPAddressV4("127.0.0.1"), port = Port(9050))
+ *   println(proxyAddress) // output >>> 127.0.0.1:9050
+ *
+ *   -OR-
+ *
+ *   val proxyAddress = ProxyAddress(address = IPAddressV6("::1"), port = Port(9050))
+ *   println(proxyAddress) // output >>> [::1]:9050
  *
  * @see [fromString]
  * */
 @Parcelize
-data class ProxyAddress(
+class ProxyAddress(
     @JvmField
-    val ipAddress: String,
+    val address: IPAddress,
     @JvmField
-    val port: Port
+    val port: Port,
 ): Parcelable {
 
-    override fun toString(): String {
-        return "$ipAddress:${port.value}"
+    fun copy() = ProxyAddress(address, port)
+    fun copy(address: IPAddress) = ProxyAddress(address, port)
+    fun copy(port: Port) = ProxyAddress(address, port)
+    fun copy(address: IPAddress, port: Port) = ProxyAddress(address, port)
+
+    override fun equals(other: Any?): Boolean {
+        return  other is ProxyAddress       &&
+                other.address == address    &&
+                other.port == port
     }
+
+    override fun hashCode(): Int {
+        var result = 17
+        result = result * 31 + address.hashCode()
+        result = result * 31 + port.hashCode()
+        return result
+    }
+
+    override fun toString(): String = "$address:${port.value}"
 
     companion object {
         @JvmStatic
         @Throws(IllegalArgumentException::class)
         fun fromString(address: String): ProxyAddress {
-            val splits = address.split(':')
+            try {
+                val portString = address.substringAfterLast(':')
+                val port = Port(portString.toInt())
+                val ipAddress = address.substringBeforeLast(":$portString")
 
-            return try {
-                ProxyAddress(
-                    ipAddress = splits[0].trim(),
-                    port = Port(splits[1].trim().toInt())
-                )
+                return ProxyAddress(address = IPAddress.fromString(ipAddress), port = port)
             } catch (e: IllegalArgumentException) {
                 throw e
             } catch (e: Exception) {
-                throw IllegalArgumentException("Failed parse $address for an ipAddress and port")
+                throw IllegalArgumentException("Failed to parse $address for an ipAddress and port")
             }
         }
     }
+
+    @Throws(IllegalArgumentException::class)
+    @Deprecated(message = "Use ProxyAddress(IPAddress.fromString(...), Port(...))")
+    constructor(ipAddress: String, port: Port): this(IPAddress.fromString(ipAddress), port)
+
+    @Throws(IllegalArgumentException::class)
+    @Suppress("DeprecatedCallableAddReplaceWith")
+    @Deprecated(message = "Use copy(address = IPAddress.fromString(...))")
+    fun copy(ipAddress: String) = ProxyAddress(IPAddress.fromString(ipAddress), port)
+
+    @Throws(IllegalArgumentException::class)
+    @Suppress("DeprecatedCallableAddReplaceWith")
+    @Deprecated(message = "Use copy(address = IPAddress.fromString(...), port = Port(...))")
+    fun copy(ipAddress: String, port: Port) = ProxyAddress(IPAddress.fromString(ipAddress), port)
+
+    @JvmField
+    @Deprecated(
+        message = "Use address.value",
+        replaceWith = ReplaceWith("address.value"),
+        level = DeprecationLevel.WARNING,
+    )
+    val ipAddress: String = address.value
 }
