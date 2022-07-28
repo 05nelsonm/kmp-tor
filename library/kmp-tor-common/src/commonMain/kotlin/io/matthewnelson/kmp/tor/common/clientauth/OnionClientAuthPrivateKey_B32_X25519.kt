@@ -43,8 +43,8 @@ import kotlin.jvm.JvmStatic
 sealed interface OnionClientAuthPrivateKey_B32_X25519: OnionClientAuth.PrivateKey {
 
     companion object {
-        @get:JvmStatic
-        val REGEX: Regex get() = "[${Base32.Default.CHARS}]{52}".toRegex()
+        @JvmStatic
+        val REGEX: Regex = "[${Base32.Default.CHARS}]{52}".toRegex()
 
         @JvmStatic
         @Throws(IllegalArgumentException::class)

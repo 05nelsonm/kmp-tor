@@ -26,6 +26,7 @@ import io.matthewnelson.kmp.tor.common.annotation.InternalTorApi
 import io.matthewnelson.kmp.tor.common.annotation.SealedValueClass
 import io.matthewnelson.kmp.tor.common.internal.TorStrings.REDACTED
 import io.matthewnelson.kmp.tor.common.internal.descriptorString
+import kotlin.jvm.JvmField
 import kotlin.jvm.JvmInline
 import kotlin.jvm.JvmStatic
 
@@ -42,8 +43,8 @@ import kotlin.jvm.JvmStatic
 sealed interface OnionClientAuthPrivateKey_B64_X25519: OnionClientAuth.PrivateKey {
 
     companion object {
-        @get:JvmStatic
-        val REGEX: Regex get() = "[${Base64.Default.CHARS}]{43}".toRegex()
+        @JvmStatic
+        val REGEX: Regex = "[${Base64.Default.CHARS}]{43}".toRegex()
 
         @JvmStatic
         @Throws(IllegalArgumentException::class)

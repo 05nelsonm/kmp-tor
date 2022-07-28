@@ -41,8 +41,8 @@ import kotlin.jvm.JvmStatic
 sealed interface OnionAddressV3PrivateKey_ED25519: OnionAddress.PrivateKey {
 
     companion object {
-        @get:JvmStatic
-        val REGEX: Regex get() = "[${Base64.Default.CHARS}]{86}".toRegex()
+        @JvmStatic
+        val REGEX: Regex = "[${Base64.Default.CHARS}]{86}".toRegex()
 
         @JvmStatic
         @Throws(IllegalArgumentException::class)

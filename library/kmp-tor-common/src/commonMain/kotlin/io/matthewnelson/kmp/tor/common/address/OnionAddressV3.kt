@@ -38,8 +38,8 @@ import kotlin.jvm.JvmStatic
 sealed interface OnionAddressV3: OnionAddress {
 
     companion object {
-        @get:JvmStatic
-        val REGEX: Regex get() = "[a-z2-7]{56}".toRegex()
+        @JvmStatic
+        val REGEX: Regex = "[a-z2-7]{56}".toRegex()
 
         @JvmStatic
         @Throws(IllegalArgumentException::class)

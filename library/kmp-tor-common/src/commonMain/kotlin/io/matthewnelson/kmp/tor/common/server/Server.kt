@@ -44,8 +44,8 @@ class Server private constructor() {
         fun decode(): ByteArray
 
         companion object {
-            @get:JvmStatic
-            val REGEX: Regex get() = "[A-F0-9]{40}".toRegex()
+            @JvmStatic
+            val REGEX: Regex = "[A-F0-9]{40}".toRegex()
 
             const val PREFIX = '$'
 
@@ -103,8 +103,8 @@ class Server private constructor() {
         val value: String
 
         companion object {
-            @get:JvmStatic
-            val REGEX: Regex get() = "[${Base64.Default.CHARS.dropLast(2)}]{1,19}".toRegex()
+            @JvmStatic
+            val REGEX: Regex = "[${Base64.Default.CHARS.dropLast(2)}]{1,19}".toRegex()
 
             @JvmStatic
             @Throws(IllegalArgumentException::class)
