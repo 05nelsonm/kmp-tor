@@ -1,3 +1,41 @@
+public abstract interface class io/matthewnelson/kmp/tor/common/address/IPAddress : io/matthewnelson/component/parcelize/Parcelable {
+	public static final field Companion Lio/matthewnelson/kmp/tor/common/address/IPAddress$Companion;
+	public static fun fromString (Ljava/lang/String;)Lio/matthewnelson/kmp/tor/common/address/IPAddress;
+	public static fun fromStringOrNull (Ljava/lang/String;)Lio/matthewnelson/kmp/tor/common/address/IPAddress;
+	public abstract fun getValue ()Ljava/lang/String;
+}
+
+public final class io/matthewnelson/kmp/tor/common/address/IPAddress$Companion {
+	public final fun fromString (Ljava/lang/String;)Lio/matthewnelson/kmp/tor/common/address/IPAddress;
+	public final fun fromStringOrNull (Ljava/lang/String;)Lio/matthewnelson/kmp/tor/common/address/IPAddress;
+}
+
+public abstract interface class io/matthewnelson/kmp/tor/common/address/IPAddressV4 : io/matthewnelson/kmp/tor/common/address/IPAddress {
+	public static final field Companion Lio/matthewnelson/kmp/tor/common/address/IPAddressV4$Companion;
+	public static fun fromStringOrNull (Ljava/lang/String;)Lio/matthewnelson/kmp/tor/common/address/IPAddressV4;
+	public static fun getREGEX ()Lkotlin/text/Regex;
+	public static fun invoke (Ljava/lang/String;)Lio/matthewnelson/kmp/tor/common/address/IPAddressV4;
+}
+
+public final class io/matthewnelson/kmp/tor/common/address/IPAddressV4$Companion {
+	public final fun fromStringOrNull (Ljava/lang/String;)Lio/matthewnelson/kmp/tor/common/address/IPAddressV4;
+	public final fun getREGEX ()Lkotlin/text/Regex;
+	public final fun invoke (Ljava/lang/String;)Lio/matthewnelson/kmp/tor/common/address/IPAddressV4;
+}
+
+public abstract interface class io/matthewnelson/kmp/tor/common/address/IPAddressV6 : io/matthewnelson/kmp/tor/common/address/IPAddress {
+	public static final field Companion Lio/matthewnelson/kmp/tor/common/address/IPAddressV6$Companion;
+	public static fun fromStringOrNull (Ljava/lang/String;)Lio/matthewnelson/kmp/tor/common/address/IPAddressV6;
+	public static fun getREGEX ()Lkotlin/text/Regex;
+	public static fun invoke (Ljava/lang/String;)Lio/matthewnelson/kmp/tor/common/address/IPAddressV6;
+}
+
+public final class io/matthewnelson/kmp/tor/common/address/IPAddressV6$Companion {
+	public final fun fromStringOrNull (Ljava/lang/String;)Lio/matthewnelson/kmp/tor/common/address/IPAddressV6;
+	public final fun getREGEX ()Lkotlin/text/Regex;
+	public final fun invoke (Ljava/lang/String;)Lio/matthewnelson/kmp/tor/common/address/IPAddressV6;
+}
+
 public abstract interface class io/matthewnelson/kmp/tor/common/address/OnionAddress : io/matthewnelson/component/parcelize/Parcelable {
 	public static final field Companion Lio/matthewnelson/kmp/tor/common/address/OnionAddress$Companion;
 	public abstract fun decode ()[B
@@ -136,13 +174,19 @@ public final class io/matthewnelson/kmp/tor/common/address/PortProxy$Companion {
 
 public final class io/matthewnelson/kmp/tor/common/address/ProxyAddress : io/matthewnelson/component/parcelize/Parcelable {
 	public static final field Companion Lio/matthewnelson/kmp/tor/common/address/ProxyAddress$Companion;
+	public final field address Lio/matthewnelson/kmp/tor/common/address/IPAddress;
 	public final field ipAddress Ljava/lang/String;
 	public final field port Lio/matthewnelson/kmp/tor/common/address/Port;
+	public fun <init> (Lio/matthewnelson/kmp/tor/common/address/IPAddress;Lio/matthewnelson/kmp/tor/common/address/Port;)V
 	public fun <init> (Ljava/lang/String;Lio/matthewnelson/kmp/tor/common/address/Port;)V
 	public final fun component1 ()Ljava/lang/String;
 	public final fun component2 ()Lio/matthewnelson/kmp/tor/common/address/Port;
+	public final fun copy ()Lio/matthewnelson/kmp/tor/common/address/ProxyAddress;
+	public final fun copy (Lio/matthewnelson/kmp/tor/common/address/IPAddress;)Lio/matthewnelson/kmp/tor/common/address/ProxyAddress;
+	public final fun copy (Lio/matthewnelson/kmp/tor/common/address/IPAddress;Lio/matthewnelson/kmp/tor/common/address/Port;)Lio/matthewnelson/kmp/tor/common/address/ProxyAddress;
+	public final fun copy (Lio/matthewnelson/kmp/tor/common/address/Port;)Lio/matthewnelson/kmp/tor/common/address/ProxyAddress;
+	public final fun copy (Ljava/lang/String;)Lio/matthewnelson/kmp/tor/common/address/ProxyAddress;
 	public final fun copy (Ljava/lang/String;Lio/matthewnelson/kmp/tor/common/address/Port;)Lio/matthewnelson/kmp/tor/common/address/ProxyAddress;
-	public static synthetic fun copy$default (Lio/matthewnelson/kmp/tor/common/address/ProxyAddress;Ljava/lang/String;Lio/matthewnelson/kmp/tor/common/address/Port;ILjava/lang/Object;)Lio/matthewnelson/kmp/tor/common/address/ProxyAddress;
 	public fun equals (Ljava/lang/Object;)Z
 	public static final fun fromString (Ljava/lang/String;)Lio/matthewnelson/kmp/tor/common/address/ProxyAddress;
 	public fun hashCode ()I
