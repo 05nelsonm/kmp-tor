@@ -89,6 +89,20 @@ class ProxyAddress(
     @Deprecated(message = "Use ProxyAddress(IPAddress.fromString(...), Port(...))")
     constructor(ipAddress: String, port: Port): this(IPAddress.fromString(ipAddress), port)
 
+    @Deprecated(
+        message = "Use address.value",
+        replaceWith = ReplaceWith("address.value"),
+        level = DeprecationLevel.WARNING,
+    )
+    fun component1(): String = address.value
+
+    @Deprecated(
+        message = "Use port",
+        replaceWith = ReplaceWith("port"),
+        level = DeprecationLevel.WARNING,
+    )
+    fun component2(): Port = port
+
     @Throws(IllegalArgumentException::class)
     @Suppress("DeprecatedCallableAddReplaceWith")
     @Deprecated(message = "Use copy(address = IPAddress.fromString(...))")
