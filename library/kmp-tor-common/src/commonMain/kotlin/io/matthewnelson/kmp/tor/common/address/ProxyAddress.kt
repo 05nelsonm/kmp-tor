@@ -105,13 +105,10 @@ class ProxyAddress(
 
     @Throws(IllegalArgumentException::class)
     @Suppress("DeprecatedCallableAddReplaceWith")
-    @Deprecated(message = "Use copy(address = IPAddress.fromString(...))")
-    fun copy(ipAddress: String) = ProxyAddress(IPAddress.fromString(ipAddress), port)
-
-    @Throws(IllegalArgumentException::class)
-    @Suppress("DeprecatedCallableAddReplaceWith")
     @Deprecated(message = "Use copy(address = IPAddress.fromString(...), port = Port(...))")
-    fun copy(ipAddress: String, port: Port) = ProxyAddress(IPAddress.fromString(ipAddress), port)
+    fun copy(ipAddress: String = address.value, port: Port = this.port): ProxyAddress {
+        return ProxyAddress(IPAddress.fromString(ipAddress), port)
+    }
 
     @JvmField
     @Deprecated(
