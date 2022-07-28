@@ -75,7 +75,7 @@ private value class RealOnionAddressV3(override val value: String): OnionAddress
     }
 
     @Deprecated(
-        "Use hostname",
+        message = "Use hostname",
         replaceWith = ReplaceWith("hostname"),
         level = DeprecationLevel.WARNING
     )
