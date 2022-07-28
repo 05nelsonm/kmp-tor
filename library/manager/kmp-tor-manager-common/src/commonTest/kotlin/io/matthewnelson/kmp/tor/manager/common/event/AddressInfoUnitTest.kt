@@ -66,28 +66,28 @@ class AddressInfoUnitTest {
     @Test
     fun givenNonNullAddressInfo_whenDnsSplit_returnsSuccessful() {
         val set = info.dnsInfoToProxyAddress()
-        assertEquals(ADDRESS, set.first().ipAddress)
+        assertEquals(ADDRESS, set.first().address.value)
         assertEquals(PORT_DNS.toInt(), set.first().port.value)
     }
 
     @Test
     fun givenNonNullAddressInfo_whenHttpSplit_returnsSuccessful() {
         val set = info.httpInfoToProxyAddress()
-        assertEquals(ADDRESS, set.first().ipAddress)
+        assertEquals(ADDRESS, set.first().address.value)
         assertEquals(PORT_HTTP.toInt(), set.first().port.value)
     }
 
     @Test
     fun givenNonNullAddressInfo_whenSocksSplit_returnsSuccessful() {
         val set = info.socksInfoToProxyAddress()
-        assertEquals(ADDRESS, set.first().ipAddress)
+        assertEquals(ADDRESS, set.first().address.value)
         assertEquals(PORT_SOCKS.toInt(), set.first().port.value)
     }
 
     @Test
     fun givenNonNullAddressInfo_whenTransSplit_returnsSuccessful() {
         val set = info.transInfoToProxyAddress()
-        assertEquals(ADDRESS, set.first().ipAddress)
+        assertEquals(ADDRESS, set.first().address.value)
         assertEquals(PORT_TRANS.toInt(), set.first().port.value)
     }
 

@@ -15,6 +15,7 @@
  **/
 package io.matthewnelson.kmp.tor.controller.common.internal
 
+import io.matthewnelson.kmp.tor.common.address.IPAddress
 import io.matthewnelson.kmp.tor.common.annotation.InternalTorApi
 import java.net.InetAddress
 
@@ -30,7 +31,7 @@ actual object PlatformUtil {
 
     @Volatile
     @Suppress("ObjectPropertyName")
-    private var _localhostAddress: String? = null
+    private var _localhostAddress: IPAddress? = null
 
     /**
      * Returns the resolved IP address for localhost (typically 127.0.0.1).
@@ -41,7 +42,7 @@ actual object PlatformUtil {
     @JvmStatic
     @InternalTorApi
     @Throws(RuntimeException::class)
-    actual fun localhostAddress(): String =
+    actual fun localhostAddress(): IPAddress =
         _localhostAddress ?: synchronized(this) {
             _localhostAddress ?: run {
                 val address = try {
@@ -53,7 +54,7 @@ actual object PlatformUtil {
                     null
                 }
 
-                (address ?: "127.0.0.1")
+                IPAddress.fromString(address ?: "127.0.0.1")
                     .also { _localhostAddress = it }
             }
         }

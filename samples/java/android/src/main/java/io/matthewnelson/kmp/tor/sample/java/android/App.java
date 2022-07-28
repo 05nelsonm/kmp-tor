@@ -26,12 +26,7 @@ import java.util.Set;
 
 import io.matthewnelson.kmp.tor.KmpTorLoaderAndroid;
 import io.matthewnelson.kmp.tor.TorConfigProviderAndroid;
-import io.matthewnelson.kmp.tor.common.address.OnionAddress;
-import io.matthewnelson.kmp.tor.common.address.OnionUrl;
-import io.matthewnelson.kmp.tor.common.address.Port;
-import io.matthewnelson.kmp.tor.common.address.PortProxy;
-import io.matthewnelson.kmp.tor.common.address.ProxyAddress;
-import io.matthewnelson.kmp.tor.common.address.Scheme;
+import io.matthewnelson.kmp.tor.common.address.*;
 import io.matthewnelson.kmp.tor.controller.common.config.TorConfig;
 import io.matthewnelson.kmp.tor.controller.common.config.TorConfig.Option.*;
 import io.matthewnelson.kmp.tor.controller.common.config.TorConfig.Setting.*;
@@ -175,7 +170,7 @@ public class App extends Application {
                 try {
                     ProxyAddress socks = info.socksInfoToProxyAddress().iterator().next();
                     InetSocketAddress socketAddress = new InetSocketAddress(
-                        socks.ipAddress,
+                        socks.address.getValue(),
                         socks.port.getValue()
                     );
 

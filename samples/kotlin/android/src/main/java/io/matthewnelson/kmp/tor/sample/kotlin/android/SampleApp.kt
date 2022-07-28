@@ -254,7 +254,7 @@ class SampleApp: Application() {
                 // Tear down HttpClient
             } else {
                 info.socksInfoToProxyAddressOrNull()?.firstOrNull()?.let { proxyAddress ->
-                    val proxy = InetSocketAddress(proxyAddress.ipAddress, proxyAddress.port.value)
+                    val proxy = InetSocketAddress(proxyAddress.address.value, proxyAddress.port.value)
 
                     // Build HttpClient
                 }
