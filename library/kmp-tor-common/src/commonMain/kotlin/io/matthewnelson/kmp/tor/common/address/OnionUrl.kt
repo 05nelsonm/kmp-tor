@@ -48,6 +48,16 @@ import kotlin.jvm.JvmStatic
  * // output >>> wss://6yxtsbpn2k7exxiarcbiet3fsr4komissliojxjlvl7iytacrnvz2uyd.onion/some/path
  * ```
  * */
+@Deprecated(
+    message = """
+        This class was initially offered as a convenience, but has many
+        issues related to parsing and building of URLs (which is beyond the
+        scope of kmp-tor). As it is not utilized by inheriting module APIs,
+        it was deemed unnecessary to maintain and should not be used.
+        
+        For more info, see: https://github.com/05nelsonm/kmp-tor/issues/232
+    """
+)
 @Parcelize
 data class OnionUrl(
     @JvmField
