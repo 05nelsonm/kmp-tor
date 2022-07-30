@@ -61,11 +61,4 @@ class OnionAddressV3UnitTest {
         assertNotNull(actual)
     }
 
-    @Test
-    fun givenUrlString_whenSubdomainPresent_returnsNotNull() {
-        val url = "some.subdomain.$VALID_ONION_ADDRESS.onion"
-        val actual = OnionAddressV3.fromStringOrNull(url)
-        assertNotNull(actual)
-    }
-
 }
