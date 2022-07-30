@@ -35,7 +35,7 @@ internal inline fun String.stripString(): String {
 
 @Suppress("nothing_to_inline")
 internal inline fun String.separateSchemeFromAddress(): Pair<Scheme?, String> {
-    val trimmed = trim()
+    val trimmed = this.trim()
     val scheme: Scheme? = Scheme.fromString(trimmed, trim = false)
     return Pair(
         scheme,
@@ -51,8 +51,5 @@ internal inline fun String.separateSchemeFromAddress(): Pair<Scheme?, String> {
 internal inline fun String.stripAddress(): String {
     return separateSchemeFromAddress()
         .second
-        .substringBefore('/')
-        .substringBefore(':')
-        .substringBefore(".onion")
-        .substringAfterLast('.')
+        .substringBefore('.')
 }
