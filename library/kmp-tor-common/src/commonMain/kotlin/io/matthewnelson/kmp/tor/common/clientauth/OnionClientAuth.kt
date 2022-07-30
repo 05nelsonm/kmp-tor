@@ -18,7 +18,7 @@ package io.matthewnelson.kmp.tor.common.clientauth
 import io.matthewnelson.component.parcelize.Parcelable
 import io.matthewnelson.component.parcelize.Parcelize
 import io.matthewnelson.kmp.tor.common.address.OnionAddressV3
-import io.matthewnelson.kmp.tor.common.internal.stripString
+import io.matthewnelson.kmp.tor.common.internal.stripBaseEncoding
 import kotlin.jvm.JvmField
 import kotlin.jvm.JvmStatic
 
@@ -94,7 +94,7 @@ class OnionClientAuth private constructor() {
             @JvmStatic
             @Throws(IllegalArgumentException::class)
             fun fromString(key: String): PublicKey {
-                val stripped = key.stripString()
+                val stripped = key.stripBaseEncoding()
 
                 try {
                     return OnionClientAuthPublicKey_B64_X25519(stripped)
@@ -140,7 +140,7 @@ class OnionClientAuth private constructor() {
             @JvmStatic
             @Throws(IllegalArgumentException::class)
             fun fromString(key: String): PrivateKey {
-                val stripped = key.stripString()
+                val stripped = key.stripBaseEncoding()
 
                 try {
                     return OnionClientAuthPrivateKey_B64_X25519(stripped)

@@ -20,7 +20,7 @@ package io.matthewnelson.kmp.tor.common.internal
 import io.matthewnelson.kmp.tor.common.address.Scheme
 
 @Suppress("nothing_to_inline")
-internal inline fun String.stripString(): String {
+internal inline fun String.stripBaseEncoding(): String {
     var limit = length
 
     // Disregard padding and/or whitespace from end of string

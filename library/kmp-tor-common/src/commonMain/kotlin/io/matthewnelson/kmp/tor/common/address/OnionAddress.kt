@@ -16,9 +16,8 @@
 package io.matthewnelson.kmp.tor.common.address
 
 import io.matthewnelson.component.parcelize.Parcelable
-import io.matthewnelson.component.parcelize.Parcelize
 import io.matthewnelson.kmp.tor.common.internal.stripAddress
-import io.matthewnelson.kmp.tor.common.internal.stripString
+import io.matthewnelson.kmp.tor.common.internal.stripBaseEncoding
 import kotlin.jvm.JvmStatic
 
 /**
@@ -74,7 +73,7 @@ sealed interface OnionAddress: Parcelable {
             @JvmStatic
             @Throws(IllegalArgumentException::class)
             fun fromString(key: String): PrivateKey {
-                val stripped = key.stripString()
+                val stripped = key.stripBaseEncoding()
 
                 try {
                     return OnionAddressV3PrivateKey_ED25519(stripped)
