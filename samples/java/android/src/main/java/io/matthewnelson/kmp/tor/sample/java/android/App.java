@@ -199,7 +199,7 @@ public class App extends Application {
                     Log.d(
                         "TorListener",
                         "New HiddenService: \n - Address: " +
-                        new OnionUrl(hsEntry.address, "", null, Scheme.HTTPS) +
+                        "https://" + hsEntry.address.canonicalHostname() +
                         "\n - PrivateKey: " + hsEntry.privateKey
                     );
 

@@ -13,6 +13,14 @@ sealed interface IPAddress: Parcelable {
 
     val value: String
 
+    /**
+     * Prints the [IPAddress] as it's canonicalized hostname.
+     *
+     * [IPAddressV4] -> "127.0.0.1"
+     * [IPAddressV6] -> "[::1]" // bracketed
+     * */
+    fun canonicalHostname(): String
+
     companion object {
         @JvmStatic
         @Throws(IllegalArgumentException::class)

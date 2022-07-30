@@ -210,7 +210,7 @@ fun TorConfig.Setting<*>.appendTo(sb: StringBuilder, isWriteTorConfig: Boolean):
                     is HiddenService.Ports -> {
                         sb.append(hsPort.virtualPort.value)
                         sb.append(SP)
-                        sb.append(localhostIp)
+                        sb.append(localhostIp.canonicalHostname())
                         sb.append(':')
                         sb.append(hsPort.targetPort.value)
                     }

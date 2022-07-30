@@ -273,7 +273,7 @@ class SampleApp: Application() {
                 ).onSuccess { hsEntry ->
                     addLine(
                         "New HiddenService: " +
-                        "\n - Address: https://${hsEntry.address}" +
+                        "\n - Address: https://${hsEntry.address.canonicalHostname()}" +
                         "\n - PrivateKey: ${hsEntry.privateKey}"
                     )
 

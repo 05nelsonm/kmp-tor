@@ -52,9 +52,9 @@ class IPAddressV4UnitTest {
     }
 
     @Test
-    fun givenIPAddressV4_whenToString_returnsUnderlyingValue() {
+    fun givenIPAddressV4_whenCanonicalized_returnsUnderlyingValue() {
         val expected = "127.0.0.1"
-        val actual = IPAddressV4(expected).toString()
+        val actual = IPAddressV4(expected).canonicalHostname()
         assertEquals(expected, actual)
     }
 

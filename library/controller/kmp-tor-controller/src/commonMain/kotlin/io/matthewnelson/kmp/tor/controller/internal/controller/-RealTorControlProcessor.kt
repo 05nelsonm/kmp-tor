@@ -379,7 +379,7 @@ internal class RealTorControlProcessor(
                     is TorConfig.Setting.HiddenService.Ports -> {
                         append(hsPort.virtualPort.value)
                         append(',')
-                        append(localHostIp)
+                        append(localHostIp.canonicalHostname())
                         append(':')
                         append(hsPort.targetPort.value)
                     }

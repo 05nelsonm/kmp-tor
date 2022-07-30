@@ -38,12 +38,12 @@ class IPAddressV6UnitTest {
     }
 
     @Test
-    fun givenIPAddressV6_whenToString_returnsUnderlyingValue() {
+    fun givenIPAddressV6_whenCanonicalized_returnsBracketed() {
         val rawAddress = "35f4:c60a:8296:4c90:79ad:3939:69d9:ba10"
         val address = IPAddressV6(rawAddress)
 
         val expected = "[$rawAddress]"
-        val actual = address.toString()
+        val actual = address.canonicalHostname()
         assertEquals(expected, actual)
     }
 

@@ -7,6 +7,7 @@ public final class io/matthewnelson/kmp/tor/common/BuildConfig {
 
 public abstract interface class io/matthewnelson/kmp/tor/common/address/IPAddress : android/os/Parcelable {
 	public static final field Companion Lio/matthewnelson/kmp/tor/common/address/IPAddress$Companion;
+	public abstract fun canonicalHostname ()Ljava/lang/String;
 	public static fun fromString (Ljava/lang/String;)Lio/matthewnelson/kmp/tor/common/address/IPAddress;
 	public static fun fromStringOrNull (Ljava/lang/String;)Lio/matthewnelson/kmp/tor/common/address/IPAddress;
 	public abstract fun getValue ()Ljava/lang/String;
@@ -196,7 +197,6 @@ public final class io/matthewnelson/kmp/tor/common/address/ProxyAddress : androi
 	public final fun component2 ()Lio/matthewnelson/kmp/tor/common/address/Port;
 	public final fun copy ()Lio/matthewnelson/kmp/tor/common/address/ProxyAddress;
 	public final fun copy (Lio/matthewnelson/kmp/tor/common/address/IPAddress;)Lio/matthewnelson/kmp/tor/common/address/ProxyAddress;
-	public final fun copy (Lio/matthewnelson/kmp/tor/common/address/IPAddress;Lio/matthewnelson/kmp/tor/common/address/Port;)Lio/matthewnelson/kmp/tor/common/address/ProxyAddress;
 	public final fun copy (Lio/matthewnelson/kmp/tor/common/address/Port;)Lio/matthewnelson/kmp/tor/common/address/ProxyAddress;
 	public final fun copy (Ljava/lang/String;Lio/matthewnelson/kmp/tor/common/address/Port;)Lio/matthewnelson/kmp/tor/common/address/ProxyAddress;
 	public static synthetic fun copy$default (Lio/matthewnelson/kmp/tor/common/address/ProxyAddress;Ljava/lang/String;Lio/matthewnelson/kmp/tor/common/address/Port;ILjava/lang/Object;)Lio/matthewnelson/kmp/tor/common/address/ProxyAddress;

@@ -24,9 +24,6 @@ import kotlin.jvm.JvmStatic
 /**
  * Holder for a valid IPv6 address
  *
- * Note that [toString] will enclose [value] in brackets
- * (ie. [a01e:67d4:f5ac:1d66:8a17:ddc5:8a4a:190f])
- *
  * @see [REGEX]
  * @see [RealIPAddressV6]
  * */
@@ -93,5 +90,7 @@ private value class RealIPAddressV6(override val value: String): IPAddressV6 {
         }
     }
 
-    override fun toString(): String = "[$value]"
+    override fun canonicalHostname(): String = "[$value]"
+
+    override fun toString(): String = "IPAddressV6(value=$value)"
 }

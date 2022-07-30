@@ -120,7 +120,7 @@ actual object PlatformUtil {
 private val osName: String
     get() {
         return try {
-            System.getProperty("os.name").lowercase()
+            System.getProperty("os.name")?.lowercase() ?: throw Exception()
         } catch (_: Exception) {
             "linux"
         }

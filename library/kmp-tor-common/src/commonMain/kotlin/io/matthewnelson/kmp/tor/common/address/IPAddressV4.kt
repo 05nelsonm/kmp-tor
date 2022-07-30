@@ -72,5 +72,7 @@ private value class RealIPAddressV4(override val value: String): IPAddressV4 {
         }
     }
 
-    override fun toString(): String = value
+    override fun canonicalHostname(): String = value
+
+    override fun toString(): String = "IPAddressV4(value=$value)"
 }

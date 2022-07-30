@@ -377,7 +377,7 @@ class SampleApp: App(SampleView::class) {
                 ).onSuccess { hsEntry ->
                     addLine(
                         "New HiddenService: " +
-                        "\n - Address: ${OnionUrl(hsEntry.address, scheme = Scheme.HTTPS)}" +
+                        "\n - Address: https://${hsEntry.address.canonicalHostname()}" +
                         "\n - PrivateKey: ${hsEntry.privateKey}"
                     )
 

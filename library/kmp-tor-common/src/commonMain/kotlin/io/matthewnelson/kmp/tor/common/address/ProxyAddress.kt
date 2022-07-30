@@ -15,6 +15,7 @@
  **/
 package io.matthewnelson.kmp.tor.common.address
 
+import io.matthewnelson.component.parcelize.IgnoredOnParcel
 import io.matthewnelson.component.parcelize.Parcelable
 import io.matthewnelson.component.parcelize.Parcelize
 import kotlin.jvm.JvmField
@@ -50,7 +51,6 @@ class ProxyAddress(
     fun copy() = ProxyAddress(address, port)
     fun copy(address: IPAddress) = ProxyAddress(address, port)
     fun copy(port: Port) = ProxyAddress(address, port)
-    fun copy(address: IPAddress, port: Port) = ProxyAddress(address, port)
 
     override fun equals(other: Any?): Boolean {
         return  other is ProxyAddress       &&
@@ -65,7 +65,7 @@ class ProxyAddress(
         return result
     }
 
-    override fun toString(): String = "$address:${port.value}"
+    override fun toString(): String = "${address.canonicalHostname()}:${port.value}"
 
     companion object {
         @JvmStatic
@@ -116,5 +116,6 @@ class ProxyAddress(
         replaceWith = ReplaceWith("address.value"),
         level = DeprecationLevel.WARNING,
     )
+    @IgnoredOnParcel
     val ipAddress: String = address.value
 }
