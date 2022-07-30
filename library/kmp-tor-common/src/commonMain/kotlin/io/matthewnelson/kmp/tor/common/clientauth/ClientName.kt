@@ -80,7 +80,5 @@ private value class RealClientName(override val value: String): ClientName {
         }
     }
 
-    override fun toString(): String {
-        return "ClientName(value=$value)"
-    }
+    override fun toString(): String = "ClientName(value=$value)"
 }

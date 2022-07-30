@@ -90,13 +90,16 @@ private value class RealOnionAddressV3(override val value: String): OnionAddress
         }
     }
 
+    @Deprecated(
+        message = "Replaced by canonicalHostname method",
+        replaceWith = ReplaceWith("canonicalHostname()"),
+        level = DeprecationLevel.WARNING
+    )
     override val valueDotOnion: String get() = "$value.onion"
 
-    override fun decode(): ByteArray {
-        return value.uppercase().decodeBase32ToArray(Base32.Default)!!
-    }
+    override fun canonicalHostname(): String = "$value.onion"
 
-    override fun toString(): String {
-        return "OnionAddressV3(value=$value)"
-    }
+    override fun decode(): ByteArray = value.uppercase().decodeBase32ToArray(Base32.Default)!!
+
+    override fun toString(): String = "OnionAddressV3(value=$value)"
 }

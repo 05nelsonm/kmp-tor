@@ -273,7 +273,7 @@ class SampleApp: Application() {
                 ).onSuccess { hsEntry ->
                     addLine(
                         "New HiddenService: " +
-                        "\n - Address: ${OnionUrl(hsEntry.address, scheme = Scheme.HTTPS)}" +
+                        "\n - Address: https://${hsEntry.address}" +
                         "\n - PrivateKey: ${hsEntry.privateKey}"
                     )
 

@@ -73,7 +73,7 @@ data class OnionUrl(
     override fun toString(): String {
         return StringBuilder().let { sb ->
             sb.append(scheme)
-            sb.append(address.valueDotOnion)
+            sb.append(address.canonicalHostname())
             if (port != null) {
                 sb.append(':').append(port.value)
             }
