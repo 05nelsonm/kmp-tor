@@ -7,6 +7,7 @@ public final class io/matthewnelson/kmp/tor/common/BuildConfig {
 
 public abstract interface class io/matthewnelson/kmp/tor/common/address/OnionAddress : android/os/Parcelable {
 	public static final field Companion Lio/matthewnelson/kmp/tor/common/address/OnionAddress$Companion;
+	public abstract fun canonicalHostname ()Ljava/lang/String;
 	public abstract fun decode ()[B
 	public static fun fromString (Ljava/lang/String;)Lio/matthewnelson/kmp/tor/common/address/OnionAddress;
 	public static fun fromStringOrNull (Ljava/lang/String;)Lio/matthewnelson/kmp/tor/common/address/OnionAddress;
@@ -416,6 +417,7 @@ public final class io/matthewnelson/kmp/tor/common/server/Server {
 public abstract interface class io/matthewnelson/kmp/tor/common/server/Server$Fingerprint : android/os/Parcelable {
 	public static final field Companion Lio/matthewnelson/kmp/tor/common/server/Server$Fingerprint$Companion;
 	public static final field PREFIX C
+	public abstract fun canonicalName ()Ljava/lang/String;
 	public abstract fun decode ()[B
 	public static fun fromStringOrNull (Ljava/lang/String;)Lio/matthewnelson/kmp/tor/common/server/Server$Fingerprint;
 	public static fun getREGEX ()Lkotlin/text/Regex;

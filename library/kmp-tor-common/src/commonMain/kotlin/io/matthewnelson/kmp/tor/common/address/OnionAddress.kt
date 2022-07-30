@@ -28,13 +28,24 @@ import kotlin.jvm.JvmStatic
  * @see [OnionAddressV3]
  * */
 sealed interface OnionAddress: Parcelable {
+
     val value: String
+
+    @Deprecated(
+        message = "Replaced by canonicalHostname method",
+        replaceWith = ReplaceWith("canonicalHostname()"),
+        level = DeprecationLevel.WARNING,
+    )
+    val valueDotOnion: String
 
     /**
      * Appends .onion to the given [value]
      * */
-    val valueDotOnion: String
+    fun canonicalHostname(): String
 
+    /**
+     * Returns the raw bytes for the given [value]
+     * */
     fun decode(): ByteArray
 
     companion object {

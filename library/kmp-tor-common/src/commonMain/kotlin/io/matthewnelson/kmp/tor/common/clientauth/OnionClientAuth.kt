@@ -186,9 +186,7 @@ class OnionClientAuth private constructor() {
             return result
         }
 
-        override fun toString(): String {
-            return "KeyPair(publicKey=$publicKey, privateKey=$privateKey)"
-        }
+        override fun toString(): String = "KeyPair(publicKey=$publicKey, privateKey=$privateKey)"
     }
 
 //    sealed interface KeyFactory: OnionClientAuth {

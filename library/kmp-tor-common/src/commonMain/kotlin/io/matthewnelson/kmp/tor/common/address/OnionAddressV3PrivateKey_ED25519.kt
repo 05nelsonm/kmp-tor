@@ -81,13 +81,9 @@ private value class RealOnionAddressV3PrivateKey_ED25519(
         }
     }
 
-    override fun decode(): ByteArray {
-        return value.decodeBase64ToArray()!!
-    }
+    override fun decode(): ByteArray = value.decodeBase64ToArray()!!
 
     override val keyType: OnionAddress.PrivateKey.Type get() = OnionAddress.PrivateKey.Type.ED25519_V3
 
-    override fun toString(): String {
-        return "OnionAddressV3PrivateKey_ED25519(value=$REDACTED)"
-    }
+    override fun toString(): String = "OnionAddressV3PrivateKey_ED25519(value=$REDACTED)"
 }

@@ -55,13 +55,12 @@ sealed interface PortProxy: Port {
 @JvmInline
 @Parcelize
 private value class RealPortProxy(override val value: Int): PortProxy {
+
     init {
         require(value in PortProxy.MIN..PortProxy.MAX) {
             "Invalid port range. Must be between ${PortProxy.MIN} and ${PortProxy.MAX}"
         }
     }
 
-    override fun toString(): String {
-        return "PortProxy(value=$value)"
-    }
+    override fun toString(): String = "PortProxy(value=$value)"
 }
