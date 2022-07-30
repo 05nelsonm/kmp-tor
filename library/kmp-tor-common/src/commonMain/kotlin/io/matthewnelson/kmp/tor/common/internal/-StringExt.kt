@@ -50,8 +50,13 @@ internal inline fun String.separateSchemeFromAddress(): Pair<Scheme?, String> {
 }
 
 @Suppress("nothing_to_inline")
-internal inline fun String.stripAddress(): String {
-    return separateSchemeFromAddress()
-        .second
-        .substringBefore('.')
+internal inline fun String.findOnionAddressFromUrl(): String {
+    val hostname = substringAfter("://") // scheme
+        .substringAfter('@') // username:password
+        .substringBefore('/') // path
+        .substringBefore(':') // port
+
+    return hostname
+        .substringBeforeLast(".onion")
+        .substringAfterLast('.') // subdomains
 }
