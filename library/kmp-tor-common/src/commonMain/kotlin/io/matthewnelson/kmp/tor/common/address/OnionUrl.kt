@@ -17,7 +17,6 @@ package io.matthewnelson.kmp.tor.common.address
 
 import io.matthewnelson.component.parcelize.Parcelable
 import io.matthewnelson.component.parcelize.Parcelize
-import io.matthewnelson.kmp.tor.common.internal.separateSchemeFromAddress
 import kotlin.jvm.JvmField
 import kotlin.jvm.JvmStatic
 
@@ -140,6 +139,20 @@ data class OnionUrl(
                 path = path,
                 port = port,
                 scheme = scheme ?: Scheme.HTTP
+            )
+        }
+
+        @Suppress("DEPRECATION")
+        private fun String.separateSchemeFromAddress(): Pair<Scheme?, String> {
+            val trimmed = trim()
+            val scheme: Scheme? = Scheme.fromString(trimmed, trim = false)
+            return Pair(
+                scheme,
+                if (scheme != null) {
+                    trimmed.substring(scheme.toString().length)
+                } else {
+                    trimmed
+                }
             )
         }
 

@@ -13,11 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-@file:Suppress("DEPRECATION")
-
 package io.matthewnelson.kmp.tor.common.internal
-
-import io.matthewnelson.kmp.tor.common.address.Scheme
 
 @Suppress("nothing_to_inline")
 internal inline fun String.stripBaseEncoding(): String {
@@ -33,20 +29,6 @@ internal inline fun String.stripBaseEncoding(): String {
     }
 
     return this.substring(0, limit).trimStart()
-}
-
-@Suppress("nothing_to_inline")
-internal inline fun String.separateSchemeFromAddress(): Pair<Scheme?, String> {
-    val trimmed = this.trim()
-    val scheme: Scheme? = Scheme.fromString(trimmed, trim = false)
-    return Pair(
-        scheme,
-        if (scheme != null) {
-            trimmed.substring(scheme.toString().length)
-        } else {
-            trimmed
-        }
-    )
 }
 
 @Suppress("nothing_to_inline")
