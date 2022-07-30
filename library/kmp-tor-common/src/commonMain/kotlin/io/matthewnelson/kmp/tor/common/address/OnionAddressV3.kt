@@ -20,7 +20,8 @@ import io.matthewnelson.component.encoding.base32.decodeBase32ToArray
 import io.matthewnelson.component.parcelize.Parcelize
 import io.matthewnelson.kmp.tor.common.annotation.ExperimentalTorApi
 import io.matthewnelson.kmp.tor.common.annotation.SealedValueClass
-import io.matthewnelson.kmp.tor.common.internal.stripAddress
+import io.matthewnelson.kmp.tor.common.internal.findOnionAddressFromUrl
+import io.matthewnelson.kmp.tor.common.internal.stripBaseEncoding
 import kotlin.jvm.JvmInline
 import kotlin.jvm.JvmStatic
 
@@ -47,10 +48,25 @@ sealed interface OnionAddressV3: OnionAddress {
             return RealOnionAddressV3(address)
         }
 
+        /**
+         * Attempts to find the [OnionAddressV3] for a given
+         * string. This could be a URL, a newly base32 encoded
+         * string, or the properly formatted address itself.
+         *
+         * @see [findOnionAddressFromUrl]
+         * */
         @JvmStatic
         @Throws(IllegalArgumentException::class)
         fun fromString(address: String): OnionAddressV3 {
-            return RealOnionAddressV3(address.stripAddress())
+            val stripped = address
+                // Treat it as a URL at first and attempt to
+                // strip out everything but the onion address.
+                .findOnionAddressFromUrl()
+                // If it's a freshly encoded value, it could be
+                // still formatted improperly as all uppercase.
+                .lowercase()
+
+            return RealOnionAddressV3(stripped)
         }
 
         @JvmStatic
@@ -75,19 +91,15 @@ private value class RealOnionAddressV3(override val value: String): OnionAddress
     }
 
     @Deprecated(
-        message = "Use hostname",
-        replaceWith = ReplaceWith("hostname"),
+        message = "Replaced by canonicalHostname method",
+        replaceWith = ReplaceWith("canonicalHostname()"),
         level = DeprecationLevel.WARNING
     )
     override val valueDotOnion: String get() = "$value.onion"
 
-    override val hostname: String get() = "$value.onion"
+    override fun canonicalHostname(): String = "$value.onion"
 
-    override fun decode(): ByteArray {
-        return value.uppercase().decodeBase32ToArray(Base32.Default)!!
-    }
+    override fun decode(): ByteArray = value.uppercase().decodeBase32ToArray(Base32.Default)!!
 
-    override fun toString(): String {
-        return "OnionAddressV3(value=$value)"
-    }
+    override fun toString(): String = "OnionAddressV3(value=$value)"
 }

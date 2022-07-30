@@ -23,7 +23,7 @@ import io.matthewnelson.kmp.tor.common.annotation.InternalTorApi
 import io.matthewnelson.kmp.tor.common.annotation.SealedValueClass
 import io.matthewnelson.kmp.tor.common.clientauth.OnionClientAuthPrivateKey_B64_X25519.Companion.REGEX
 import io.matthewnelson.kmp.tor.common.internal.TorStrings.REDACTED
-import io.matthewnelson.kmp.tor.common.internal.stripString
+import io.matthewnelson.kmp.tor.common.internal.stripBaseEncoding
 import kotlin.jvm.JvmInline
 import kotlin.jvm.JvmStatic
 
@@ -53,7 +53,7 @@ sealed interface OnionAddressV3PrivateKey_ED25519: OnionAddress.PrivateKey {
         @JvmStatic
         @Throws(IllegalArgumentException::class)
         fun fromString(key: String): OnionAddressV3PrivateKey_ED25519 {
-            return RealOnionAddressV3PrivateKey_ED25519(key.stripString())
+            return RealOnionAddressV3PrivateKey_ED25519(key.stripBaseEncoding())
         }
 
         @JvmStatic
@@ -81,13 +81,9 @@ private value class RealOnionAddressV3PrivateKey_ED25519(
         }
     }
 
-    override fun decode(): ByteArray {
-        return value.decodeBase64ToArray()!!
-    }
+    override fun decode(): ByteArray = value.decodeBase64ToArray()!!
 
     override val keyType: OnionAddress.PrivateKey.Type get() = OnionAddress.PrivateKey.Type.ED25519_V3
 
-    override fun toString(): String {
-        return "OnionAddressV3PrivateKey_ED25519(value=$REDACTED)"
-    }
+    override fun toString(): String = "OnionAddressV3PrivateKey_ED25519(value=$REDACTED)"
 }

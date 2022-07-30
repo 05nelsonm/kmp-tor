@@ -58,13 +58,12 @@ sealed interface Port: Parcelable {
 @JvmInline
 @Parcelize
 private value class RealPort(override val value: Int): Port {
+
     init {
         require(value in Port.MIN..Port.MAX) {
             "Invalid port range. Must be between ${Port.MIN} and ${Port.MAX}"
         }
     }
 
-    override fun toString(): String {
-        return "Port(value=$value)"
-    }
+    override fun toString(): String = "Port(value=$value)"
 }

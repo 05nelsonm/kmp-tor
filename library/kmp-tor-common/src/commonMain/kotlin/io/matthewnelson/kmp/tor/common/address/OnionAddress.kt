@@ -16,8 +16,10 @@
 package io.matthewnelson.kmp.tor.common.address
 
 import io.matthewnelson.component.parcelize.Parcelable
-import io.matthewnelson.kmp.tor.common.internal.stripAddress
-import io.matthewnelson.kmp.tor.common.internal.stripString
+import io.matthewnelson.kmp.tor.common.annotation.InternalTorApi
+import io.matthewnelson.kmp.tor.common.internal.TorStrings.REDACTED
+import io.matthewnelson.kmp.tor.common.internal.findOnionAddressFromUrl
+import io.matthewnelson.kmp.tor.common.internal.stripBaseEncoding
 import kotlin.jvm.JvmStatic
 
 /**
@@ -26,43 +28,58 @@ import kotlin.jvm.JvmStatic
  * @see [OnionAddressV3]
  * */
 sealed interface OnionAddress: Parcelable {
+
     val value: String
 
-    /**
-     * Appends .onion to the given [value]
-     * */
     @Deprecated(
-        message = "Use hostname",
-        replaceWith = ReplaceWith("hostname"),
-        level = DeprecationLevel.WARNING
+        message = "Replaced by canonicalHostname method",
+        replaceWith = ReplaceWith("canonicalHostname()"),
+        level = DeprecationLevel.WARNING,
     )
     val valueDotOnion: String
 
     /**
      * Appends .onion to the given [value]
      * */
-    val hostname: String
+    fun canonicalHostname(): String
 
+    /**
+     * Returns the raw bytes for the given [value]
+     * */
     fun decode(): ByteArray
 
     companion object {
+
+        /**
+         * Attempts to find the [OnionAddress] for a given
+         * string. This could be a URL, a newly base32 encoded
+         * string, or the properly formatted address itself.
+         *
+         * @see [findOnionAddressFromUrl]
+         * */
         @JvmStatic
         @Throws(IllegalArgumentException::class)
         fun fromString(address: String): OnionAddress {
-            val stripped = address.stripAddress()
+            val stripped = address
+                // Treat it as a URL at first and attempt to
+                // strip out everything but the onion address.
+                .findOnionAddressFromUrl()
+                // If it's a freshly encoded value, it could be
+                // still formatted improperly as all uppercase.
+                .lowercase()
 
             try {
                 return OnionAddressV3(stripped)
             } catch (_: IllegalArgumentException) {}
 
-            throw IllegalArgumentException("String was not an OnionAddress")
+            throw IllegalArgumentException("Failed to find a valid OnionAddress from $address")
         }
 
         @JvmStatic
         fun fromStringOrNull(address: String): OnionAddress? {
             return try {
                 fromString(address)
-            } catch (e: IllegalArgumentException) {
+            } catch (_: IllegalArgumentException) {
                 null
             }
         }
@@ -83,13 +100,14 @@ sealed interface OnionAddress: Parcelable {
             @JvmStatic
             @Throws(IllegalArgumentException::class)
             fun fromString(key: String): PrivateKey {
-                val stripped = key.stripString()
+                val stripped = key.stripBaseEncoding()
 
                 try {
                     return OnionAddressV3PrivateKey_ED25519(stripped)
                 } catch (_: IllegalArgumentException) {}
 
-                throw IllegalArgumentException("String was not an OnionAddress.PrivateKey")
+                @OptIn(InternalTorApi::class)
+                throw IllegalArgumentException("Failed to find a valid OnionAddress.Private key from string: $REDACTED")
             }
 
             @JvmStatic

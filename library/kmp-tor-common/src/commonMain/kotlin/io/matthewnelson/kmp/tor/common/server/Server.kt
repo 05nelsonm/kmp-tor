@@ -38,9 +38,24 @@ class Server private constructor() {
     @SealedValueClass
     @OptIn(ExperimentalTorApi::class)
     sealed interface Fingerprint: Parcelable {
+
         val value: String
+
+        @Deprecated(
+            message = "Use canonicalName",
+            replaceWith = ReplaceWith("canonicalName()"),
+            level = DeprecationLevel.WARNING,
+        )
         val valueWithPrefix: String
 
+        /**
+         * Prepends [value] with the [PREFIX] expected by Tor.
+         * */
+        fun canonicalName(): String
+
+        /**
+         * Returns the raw bytes for the given [value]
+         * */
         fun decode(): ByteArray
 
         companion object {
@@ -80,15 +95,18 @@ class Server private constructor() {
             }
         }
 
+        @Deprecated(
+            message = "Use canonicalName",
+            replaceWith = ReplaceWith("canonicalName()"),
+            level = DeprecationLevel.WARNING
+        )
         override val valueWithPrefix: String get() = "${Fingerprint.PREFIX}$value"
 
-        override fun decode(): ByteArray {
-            return value.decodeBase16ToArray()!!
-        }
+        override fun canonicalName(): String = "${Fingerprint.PREFIX}$value"
 
-        override fun toString(): String {
-            return "Fingerprint(value=$value)"
-        }
+        override fun decode(): ByteArray = value.decodeBase16ToArray()!!
+
+        override fun toString(): String = "Fingerprint(value=$value)"
     }
 
     /**
@@ -100,6 +118,7 @@ class Server private constructor() {
     @SealedValueClass
     @OptIn(ExperimentalTorApi::class)
     sealed interface Nickname: Parcelable {
+
         val value: String
 
         companion object {
@@ -133,9 +152,7 @@ class Server private constructor() {
             }
         }
 
-        override fun toString(): String {
-            return "Nickname(value=$value)"
-        }
+        override fun toString(): String = "Nickname(value=$value)"
     }
 
     @Parcelize
@@ -148,9 +165,9 @@ class Server private constructor() {
 
         override fun toString(): String {
             return if (nickname != null) {
-                "${fingerprint.valueWithPrefix}$DELIMITER${nickname.value}"
+                "${fingerprint.canonicalName()}$DELIMITER${nickname.value}"
             } else {
-                fingerprint.valueWithPrefix
+                fingerprint.canonicalName()
             }
         }
 

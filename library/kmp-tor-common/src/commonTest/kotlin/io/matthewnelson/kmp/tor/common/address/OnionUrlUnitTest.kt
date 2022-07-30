@@ -17,6 +17,7 @@ package io.matthewnelson.kmp.tor.common.address
 
 import kotlin.test.*
 
+@Suppress("DEPRECATION")
 class OnionUrlUnitTest {
 
     @Test
@@ -28,6 +29,7 @@ class OnionUrlUnitTest {
         val expectedUrl = "$expectedScheme$expectedAddress.onion:$expectedPort$expectedPath"
 
         val onionUrl = OnionUrl.fromString(expectedUrl)
+        assertNotNull(onionUrl)
         assertEquals(expectedScheme, onionUrl.scheme)
         assertEquals(expectedAddress, onionUrl.address.value)
         assertEquals(expectedPath, onionUrl.path)
@@ -43,6 +45,7 @@ class OnionUrlUnitTest {
 
         val onionUrl = OnionUrl.fromString(expectedAddress)
 
+        assertNotNull(onionUrl)
         assertEquals(expectedUrl, onionUrl.toString())
     }
 
@@ -74,9 +77,9 @@ class OnionUrlUnitTest {
 
         val onionUrl = OnionUrl.fromString(expectedUrl)
 
+        assertNotNull(onionUrl)
         assertEquals(expectedPath, onionUrl.path)
         assertEquals(expectedPort, onionUrl.port?.value)
-        assertTrue(onionUrl.subdomain.isEmpty())
         assertEquals(expectedUrl, onionUrl.toString())
     }
 
@@ -88,9 +91,9 @@ class OnionUrlUnitTest {
 
         val onionUrl = OnionUrl.fromString(expectedUrl)
 
+        assertNotNull(onionUrl)
         assertEquals(expectedPath, onionUrl.path)
         assertNull(onionUrl.port)
-        assertTrue(onionUrl.subdomain.isEmpty())
         assertEquals(expectedUrl, onionUrl.toString())
     }
 
@@ -103,9 +106,9 @@ class OnionUrlUnitTest {
 
         val onionUrl = OnionUrl.fromString(expectedUrl)
 
+        assertNotNull(onionUrl)
         assertEquals(expectedPath, onionUrl.path)
         assertEquals(expectedPort, onionUrl.port?.value)
-        assertTrue(onionUrl.subdomain.isEmpty())
         assertEquals(expectedUrl, onionUrl.toString())
     }
 
@@ -117,9 +120,9 @@ class OnionUrlUnitTest {
 
         val onionUrl = OnionUrl.fromString(expectedUrl)
 
+        assertNotNull(onionUrl)
         assertEquals(expectedPath, onionUrl.path)
         assertNull(onionUrl.port)
-        assertTrue(onionUrl.subdomain.isEmpty())
         assertEquals(expectedUrl, onionUrl.toString())
     }
 
@@ -133,28 +136,9 @@ class OnionUrlUnitTest {
 
         val onionUrl = OnionUrl.fromString(url)
 
+        assertNotNull(onionUrl)
         assertEquals(expectedPath, onionUrl.path)
         assertEquals(expectedPort, onionUrl.port?.value)
-        assertTrue(onionUrl.subdomain.isEmpty())
         assertEquals(expectedUrl, onionUrl.toString())
-    }
-
-    @Test
-    fun givenUrlString_whenSubdomainPresent_returnsOnionUrl() {
-        val expectedAddress = OnionAddressV3UnitTest.VALID_ONION_ADDRESS
-        val expectedSubdomain = "sub.domain"
-        val url = "$expectedSubdomain.$expectedAddress.onion"
-
-        val onionUrl = OnionUrl.fromString(url)
-
-        assertEquals(expectedSubdomain, onionUrl.subdomain)
-        assertEquals(expectedAddress, onionUrl.address.value)
-        assertEquals("${Scheme.HTTP}$url", onionUrl.toString())
-    }
-
-    @Test
-    fun givenUrlString_whenJustOnionAddress_returnsOnionUrl() {
-        val onionUrl = OnionUrl.fromStringOrNull(OnionAddressV3UnitTest.VALID_ONION_ADDRESS)
-        assertNotNull(onionUrl)
     }
 }

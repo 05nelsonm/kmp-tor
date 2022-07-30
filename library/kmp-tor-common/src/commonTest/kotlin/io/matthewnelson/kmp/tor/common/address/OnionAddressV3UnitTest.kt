@@ -16,13 +16,8 @@
 package io.matthewnelson.kmp.tor.common.address
 
 import kotlin.test.Test
-import kotlin.test.assertNotNull
 
 class OnionAddressV3UnitTest {
-
-    companion object {
-        const val VALID_ONION_ADDRESS = "6yxtsbpn2k7exxiarcbiet3fsr4komissliojxjlvl7iytacrnvz2uyd"
-    }
 
     @Test
     fun givenValidAddressString_whenStoredAsOnionAddress_doesNotThrow() {
@@ -50,22 +45,40 @@ class OnionAddressV3UnitTest {
     }
 
     @Test
-    fun givenV3OnionAddress_whenDecoded_returnsSuccess() {
+    fun givenV3OnionAddress_whenDecoded_doesNotThrowException() {
         OnionAddressV3(VALID_ONION_ADDRESS).decode()
     }
 
     @Test
-    fun givenUrlString_whenAddressIsValidOnionAddress_returnsNotNull() {
-        val url = "${Scheme.HTTP}$VALID_ONION_ADDRESS.onion:1234/some/path"
-        val actual = OnionAddressV3.fromStringOrNull(url)
-        assertNotNull(actual)
+    fun givenUrls_whenFromString_returnsOnionAddress() {
+        for (url in FROM_STRING_TEST_DATA) {
+            OnionAddressV3.fromString(url)
+        }
     }
 
-    @Test
-    fun givenUrlString_whenSubdomainPresent_returnsNotNull() {
-        val url = "some.subdomain.$VALID_ONION_ADDRESS.onion"
-        val actual = OnionAddressV3.fromStringOrNull(url)
-        assertNotNull(actual)
-    }
+    companion object {
+        const val VALID_ONION_ADDRESS = "6yxtsbpn2k7exxiarcbiet3fsr4komissliojxjlvl7iytacrnvz2uyd"
 
+        val FROM_STRING_TEST_DATA = listOf(
+            VALID_ONION_ADDRESS,
+            VALID_ONION_ADDRESS.uppercase(),
+            "$VALID_ONION_ADDRESS.onion",
+            "some.subdomain.$VALID_ONION_ADDRESS",
+            "some.subdomain.$VALID_ONION_ADDRESS.onion",
+            "http://$VALID_ONION_ADDRESS.onion",
+            "http://$VALID_ONION_ADDRESS.onion/path",
+            "http://$VALID_ONION_ADDRESS.onion:8080/some/path/#some-fragment",
+            "http://subdomain.$VALID_ONION_ADDRESS.onion:8080/some/path",
+            "http://sub.domain.$VALID_ONION_ADDRESS.onion:8080/some/path",
+            "http://username@$VALID_ONION_ADDRESS.onion",
+            "http://username@$VALID_ONION_ADDRESS.onion:8080",
+            "http://username@$VALID_ONION_ADDRESS.onion:8080/some/path",
+            "http://username:password@$VALID_ONION_ADDRESS.onion",
+            "http://username:password@$VALID_ONION_ADDRESS.onion:8080",
+            "http://username:password@$VALID_ONION_ADDRESS.onion:8080/some/path",
+            "http://some.sub.domain.$VALID_ONION_ADDRESS.onion:8080/some/path",
+            "http://username@some.sub.domain.$VALID_ONION_ADDRESS.onion:8080/some/path",
+            "http://username:password@some.sub.domain.$VALID_ONION_ADDRESS.onion:8080/some/path",
+        )
+    }
 }

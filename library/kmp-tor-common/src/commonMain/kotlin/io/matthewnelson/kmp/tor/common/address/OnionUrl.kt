@@ -17,9 +17,7 @@ package io.matthewnelson.kmp.tor.common.address
 
 import io.matthewnelson.component.parcelize.Parcelable
 import io.matthewnelson.component.parcelize.Parcelize
-import io.matthewnelson.kmp.tor.common.internal.separateSchemeFromAddress
 import kotlin.jvm.JvmField
-import kotlin.jvm.JvmOverloads
 import kotlin.jvm.JvmStatic
 
 /**
@@ -49,8 +47,18 @@ import kotlin.jvm.JvmStatic
  * // output >>> wss://6yxtsbpn2k7exxiarcbiet3fsr4komissliojxjlvl7iytacrnvz2uyd.onion/some/path
  * ```
  * */
+@Deprecated(
+    message = """
+        This class was initially offered as a convenience, but has many
+        issues related to parsing and building of URLs (which is beyond the
+        scope of kmp-tor). As it is not utilized by inheriting module APIs,
+        it was deemed unnecessary to maintain and should not be used.
+        
+        For more info, see: https://github.com/05nelsonm/kmp-tor/issues/232
+    """
+)
 @Parcelize
-data class OnionUrl @JvmOverloads constructor(
+data class OnionUrl(
     @JvmField
     val address: OnionAddress,
     @JvmField
@@ -58,18 +66,14 @@ data class OnionUrl @JvmOverloads constructor(
     @JvmField
     val port: Port? = null,
     @JvmField
+    @Suppress("DEPRECATION")
     val scheme: Scheme = Scheme.HTTP,
-    @JvmField
-    val subdomain: String = "",
 ): Parcelable {
 
     override fun toString(): String {
         return StringBuilder().let { sb ->
             sb.append(scheme)
-            if (subdomain.isNotEmpty()) {
-                sb.append(subdomain).append('.')
-            }
-            sb.append(address.hostname)
+            sb.append(address.canonicalHostname())
             if (port != null) {
                 sb.append(':').append(port.value)
             }
@@ -92,6 +96,7 @@ data class OnionUrl @JvmOverloads constructor(
          *  - port is not a valid [Port]
          * */
         @JvmStatic
+        @Suppress("DEPRECATION")
         @Throws(IllegalArgumentException::class)
         fun fromString(url: String): OnionUrl {
             val (scheme, substring) = url.separateSchemeFromAddress()
@@ -100,13 +105,7 @@ data class OnionUrl @JvmOverloads constructor(
                 throw IllegalArgumentException("Failed to parse url")
             }
 
-            val subdomain = if (splits[0].contains('.')) {
-                splits[0].substringBeforeLast('.')
-            } else {
-                ""
-            }
-
-            val oAddress = OnionAddressV3(splits[0].substringAfterLast('.'))
+            val oAddress = OnionAddressV3(splits[0])
 
 //            val oAddress = try {
 //                OnionAddressV3(splits[0])
@@ -139,12 +138,26 @@ data class OnionUrl @JvmOverloads constructor(
                 address = oAddress,
                 path = path,
                 port = port,
-                scheme = scheme ?: Scheme.HTTP,
-                subdomain = subdomain
+                scheme = scheme ?: Scheme.HTTP
+            )
+        }
+
+        @Suppress("DEPRECATION")
+        private fun String.separateSchemeFromAddress(): Pair<Scheme?, String> {
+            val trimmed = trim()
+            val scheme: Scheme? = Scheme.fromString(trimmed, trim = false)
+            return Pair(
+                scheme,
+                if (scheme != null) {
+                    trimmed.substring(scheme.toString().length)
+                } else {
+                    trimmed
+                }
             )
         }
 
         @JvmStatic
+        @Suppress("DEPRECATION")
         fun fromStringOrNull(url: String): OnionUrl? {
             return try {
                 fromString(url)

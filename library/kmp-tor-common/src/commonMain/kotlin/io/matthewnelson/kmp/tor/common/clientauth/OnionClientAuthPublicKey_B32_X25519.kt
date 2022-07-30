@@ -78,17 +78,11 @@ private value class RealOnionClientAuthPublicKey_B32_X25519(
         }
     }
 
-    override fun decode(): ByteArray {
-        return value.decodeBase32ToArray(Base32.Default)!!
-    }
+    override fun decode(): ByteArray = value.decodeBase32ToArray(Base32.Default)!!
 
-    override fun descriptor(): String {
-        return descriptorString()
-    }
+    override fun descriptor(): String = descriptorString()
 
     override val keyType: OnionClientAuth.Key.Type get() = OnionClientAuth.Key.Type.x25519
 
-    override fun toString(): String {
-        return "OnionClientAuthPublicKey_B32_X25519(value=$value)"
-    }
+    override fun toString(): String = "OnionClientAuthPublicKey_B32_X25519(value=$value)"
 }
