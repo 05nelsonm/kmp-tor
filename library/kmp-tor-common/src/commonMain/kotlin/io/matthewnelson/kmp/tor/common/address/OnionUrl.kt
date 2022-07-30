@@ -67,6 +67,7 @@ data class OnionUrl(
     @JvmField
     val port: Port? = null,
     @JvmField
+    @Suppress("DEPRECATION")
     val scheme: Scheme = Scheme.HTTP,
 ): Parcelable {
 
@@ -96,6 +97,7 @@ data class OnionUrl(
          *  - port is not a valid [Port]
          * */
         @JvmStatic
+        @Suppress("DEPRECATION")
         @Throws(IllegalArgumentException::class)
         fun fromString(url: String): OnionUrl {
             val (scheme, substring) = url.separateSchemeFromAddress()
@@ -142,6 +144,7 @@ data class OnionUrl(
         }
 
         @JvmStatic
+        @Suppress("DEPRECATION")
         fun fromStringOrNull(url: String): OnionUrl? {
             return try {
                 fromString(url)

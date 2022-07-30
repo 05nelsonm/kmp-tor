@@ -20,6 +20,16 @@ import io.matthewnelson.component.parcelize.Parcelize
 import kotlin.jvm.JvmOverloads
 import kotlin.jvm.JvmStatic
 
+@Deprecated(
+    message = """
+        This class was initially offered as a convenience in conjunction
+        with OnionUrl. As OnionUrl has been deprecated for its many issues,
+        and this class not being utilized by inheriting module APIs, it was
+        deemed unnecessary to maintain and should not be used.
+        
+        For more info, see: https://github.com/05nelsonm/kmp-tor/issues/235
+    """
+)
 @Parcelize
 enum class Scheme: Parcelable {
     HTTP,
@@ -44,6 +54,7 @@ enum class Scheme: Parcelable {
 
         @JvmStatic
         @JvmOverloads
+        @Suppress("DEPRECATION")
         fun fromString(string: String, trim: Boolean = true): Scheme? {
             val trimmed = if (trim) string.trim() else string
             return when {

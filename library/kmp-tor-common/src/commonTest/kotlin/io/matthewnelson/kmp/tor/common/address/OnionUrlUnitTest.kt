@@ -17,6 +17,7 @@ package io.matthewnelson.kmp.tor.common.address
 
 import kotlin.test.*
 
+@Suppress("DEPRECATION")
 class OnionUrlUnitTest {
 
     @Test
