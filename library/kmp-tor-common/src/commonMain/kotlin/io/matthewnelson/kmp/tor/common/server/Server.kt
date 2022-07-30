@@ -41,13 +41,6 @@ class Server private constructor() {
 
         val value: String
 
-        @Deprecated(
-            message = "Use canonicalName",
-            replaceWith = ReplaceWith("canonicalName()"),
-            level = DeprecationLevel.WARNING,
-        )
-        val valueWithPrefix: String
-
         /**
          * Prepends [value] with the [PREFIX] expected by Tor.
          * */
@@ -59,8 +52,8 @@ class Server private constructor() {
         fun decode(): ByteArray
 
         companion object {
-            @get:JvmStatic
-            val REGEX: Regex get() = "[A-F0-9]{40}".toRegex()
+            @JvmStatic
+            val REGEX: Regex = "[A-F0-9]{40}".toRegex()
 
             const val PREFIX = '$'
 
@@ -83,6 +76,13 @@ class Server private constructor() {
                 }
             }
         }
+
+        @Deprecated(
+            message = "Use canonicalName",
+            replaceWith = ReplaceWith("canonicalName()"),
+            level = DeprecationLevel.WARNING,
+        )
+        val valueWithPrefix: String
     }
 
     @JvmInline
@@ -95,18 +95,18 @@ class Server private constructor() {
             }
         }
 
+        override fun canonicalName(): String = "${Fingerprint.PREFIX}$value"
+
+        override fun decode(): ByteArray = value.decodeBase16ToArray()!!
+
+        override fun toString(): String = "Fingerprint(value=$value)"
+
         @Deprecated(
             message = "Use canonicalName",
             replaceWith = ReplaceWith("canonicalName()"),
             level = DeprecationLevel.WARNING
         )
         override val valueWithPrefix: String get() = "${Fingerprint.PREFIX}$value"
-
-        override fun canonicalName(): String = "${Fingerprint.PREFIX}$value"
-
-        override fun decode(): ByteArray = value.decodeBase16ToArray()!!
-
-        override fun toString(): String = "Fingerprint(value=$value)"
     }
 
     /**
@@ -122,8 +122,8 @@ class Server private constructor() {
         val value: String
 
         companion object {
-            @get:JvmStatic
-            val REGEX: Regex get() = "[${Base64.Default.CHARS.dropLast(2)}]{1,19}".toRegex()
+            @JvmStatic
+            val REGEX: Regex = "[${Base64.Default.CHARS.dropLast(2)}]{1,19}".toRegex()
 
             @JvmStatic
             @Throws(IllegalArgumentException::class)

@@ -15,6 +15,7 @@
  **/
 package io.matthewnelson.kmp.tor.controller.common.internal
 
+import io.matthewnelson.kmp.tor.common.address.IPAddress
 import io.matthewnelson.kmp.tor.common.annotation.InternalTorApi
 import kotlin.jvm.JvmStatic
 
@@ -29,7 +30,7 @@ expect object PlatformUtil {
     @JvmStatic
     @InternalTorApi
     @Throws(RuntimeException::class)
-    fun localhostAddress(): String
+    fun localhostAddress(): IPAddress
 
     @JvmStatic
     @InternalTorApi

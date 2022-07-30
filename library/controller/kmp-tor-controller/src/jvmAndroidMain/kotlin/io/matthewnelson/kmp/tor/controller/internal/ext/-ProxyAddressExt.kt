@@ -32,7 +32,7 @@ internal suspend inline fun ProxyAddress.toTorController(): TorController {
 
     try {
         withContext(dispatchers) {
-            val address = InetSocketAddress(ipAddress, port.value)
+            val address = InetSocketAddress(address.value, port.value)
 
             socket.connect(address)
         }

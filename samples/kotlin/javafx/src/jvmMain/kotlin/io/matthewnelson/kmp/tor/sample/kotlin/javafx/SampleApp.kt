@@ -358,7 +358,7 @@ class SampleApp: App(SampleView::class) {
                 // Tear down HttpClient
             } else {
                 info.socksInfoToProxyAddressOrNull()?.firstOrNull()?.let { proxyAddress ->
-                    val proxy = InetSocketAddress(proxyAddress.ipAddress, proxyAddress.port.value)
+                    val proxy = InetSocketAddress(proxyAddress.address.value, proxyAddress.port.value)
 
                     // Build HttpClient
                 }
@@ -377,7 +377,7 @@ class SampleApp: App(SampleView::class) {
                 ).onSuccess { hsEntry ->
                     addLine(
                         "New HiddenService: " +
-                        "\n - Address: ${OnionUrl(hsEntry.address, scheme = Scheme.HTTPS)}" +
+                        "\n - Address: https://${hsEntry.address.canonicalHostname()}" +
                         "\n - PrivateKey: ${hsEntry.privateKey}"
                     )
 

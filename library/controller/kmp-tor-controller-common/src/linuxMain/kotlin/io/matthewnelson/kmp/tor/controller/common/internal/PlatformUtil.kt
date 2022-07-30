@@ -15,12 +15,14 @@
  **/
 package io.matthewnelson.kmp.tor.controller.common.internal
 
+import io.matthewnelson.kmp.tor.common.address.IPAddress
+import io.matthewnelson.kmp.tor.common.address.IPAddressV4
 import io.matthewnelson.kmp.tor.common.annotation.InternalTorApi
 
 // TODO: Fill out
 actual object PlatformUtil {
     @InternalTorApi
-    actual fun localhostAddress(): String = "127.0.0.1"
+    actual fun localhostAddress(): IPAddress = IPAddressV4("127.0.0.1")
 
     @InternalTorApi
     actual val isDarwin: Boolean = false

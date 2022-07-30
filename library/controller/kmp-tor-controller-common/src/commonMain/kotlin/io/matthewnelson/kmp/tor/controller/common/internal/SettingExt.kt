@@ -15,6 +15,7 @@
  **/
 package io.matthewnelson.kmp.tor.controller.common.internal
 
+import io.matthewnelson.kmp.tor.common.address.*
 import io.matthewnelson.kmp.tor.common.annotation.InternalTorApi
 import io.matthewnelson.kmp.tor.common.internal.TorStrings.SP
 import io.matthewnelson.kmp.tor.controller.common.config.TorConfig
@@ -189,10 +190,10 @@ fun TorConfig.Setting<*>.appendTo(sb: StringBuilder, isWriteTorConfig: Boolean):
             sb.append(value.value)
             sb.quoteIfTrue(!isWriteTorConfig)
 
-            val localhostIp: String = try {
+            val localhostIp: IPAddress = try {
                 PlatformUtil.localhostAddress()
             } catch (_: Exception) {
-                "127.0.0.1"
+                IPAddressV4("127.0.0.1")
             }
 
             for (hsPort in hsPorts) {
@@ -209,7 +210,7 @@ fun TorConfig.Setting<*>.appendTo(sb: StringBuilder, isWriteTorConfig: Boolean):
                     is HiddenService.Ports -> {
                         sb.append(hsPort.virtualPort.value)
                         sb.append(SP)
-                        sb.append(localhostIp)
+                        sb.append(localhostIp.canonicalHostname())
                         sb.append(':')
                         sb.append(hsPort.targetPort.value)
                     }

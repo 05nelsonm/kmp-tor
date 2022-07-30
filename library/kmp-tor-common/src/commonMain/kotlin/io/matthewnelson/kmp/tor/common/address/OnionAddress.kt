@@ -31,13 +31,6 @@ sealed interface OnionAddress: Parcelable {
 
     val value: String
 
-    @Deprecated(
-        message = "Replaced by canonicalHostname method",
-        replaceWith = ReplaceWith("canonicalHostname()"),
-        level = DeprecationLevel.WARNING,
-    )
-    val valueDotOnion: String
-
     /**
      * Appends .onion to the given [value]
      * */
@@ -151,4 +144,11 @@ sealed interface OnionAddress: Parcelable {
             object ED25519_V3: Type()
         }
     }
+
+    @Deprecated(
+        message = "Replaced by canonicalHostname method",
+        replaceWith = ReplaceWith("canonicalHostname()"),
+        level = DeprecationLevel.WARNING,
+    )
+    val valueDotOnion: String
 }

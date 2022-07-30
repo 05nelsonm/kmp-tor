@@ -16,8 +16,7 @@
 package io.matthewnelson.kmp.tor.controller.internal.controller
 
 import io.matthewnelson.component.encoding.base16.encodeBase16
-import io.matthewnelson.kmp.tor.common.address.OnionAddress
-import io.matthewnelson.kmp.tor.common.address.OnionAddressV3
+import io.matthewnelson.kmp.tor.common.address.*
 import io.matthewnelson.kmp.tor.common.annotation.InternalTorApi
 import io.matthewnelson.kmp.tor.common.clientauth.ClientName
 import io.matthewnelson.kmp.tor.common.clientauth.OnionClientAuth
@@ -380,7 +379,7 @@ internal class RealTorControlProcessor(
                     is TorConfig.Setting.HiddenService.Ports -> {
                         append(hsPort.virtualPort.value)
                         append(',')
-                        append(localHostIp)
+                        append(localHostIp.canonicalHostname())
                         append(':')
                         append(hsPort.targetPort.value)
                     }

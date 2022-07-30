@@ -39,8 +39,8 @@ import kotlin.jvm.JvmStatic
 sealed interface OnionAddressV3: OnionAddress {
 
     companion object {
-        @get:JvmStatic
-        val REGEX: Regex get() = "[a-z2-7]{56}".toRegex()
+        @JvmStatic
+        val REGEX: Regex = "[a-z2-7]{56}".toRegex()
 
         @JvmStatic
         @Throws(IllegalArgumentException::class)
@@ -90,16 +90,16 @@ private value class RealOnionAddressV3(override val value: String): OnionAddress
         }
     }
 
+    override fun canonicalHostname(): String = "$value.onion"
+
+    override fun decode(): ByteArray = value.uppercase().decodeBase32ToArray(Base32.Default)!!
+
+    override fun toString(): String = "OnionAddressV3(value=$value)"
+
     @Deprecated(
         message = "Replaced by canonicalHostname method",
         replaceWith = ReplaceWith("canonicalHostname()"),
         level = DeprecationLevel.WARNING
     )
     override val valueDotOnion: String get() = "$value.onion"
-
-    override fun canonicalHostname(): String = "$value.onion"
-
-    override fun decode(): ByteArray = value.uppercase().decodeBase32ToArray(Base32.Default)!!
-
-    override fun toString(): String = "OnionAddressV3(value=$value)"
 }
