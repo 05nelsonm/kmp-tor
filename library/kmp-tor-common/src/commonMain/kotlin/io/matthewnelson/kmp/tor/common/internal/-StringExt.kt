@@ -13,14 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-@file:Suppress("DEPRECATION")
-
 package io.matthewnelson.kmp.tor.common.internal
 
-import io.matthewnelson.kmp.tor.common.address.Scheme
-
 @Suppress("nothing_to_inline")
-internal inline fun String.stripString(): String {
+internal inline fun String.stripBaseEncoding(): String {
     var limit = length
 
     // Disregard padding and/or whitespace from end of string
@@ -36,22 +32,13 @@ internal inline fun String.stripString(): String {
 }
 
 @Suppress("nothing_to_inline")
-internal inline fun String.separateSchemeFromAddress(): Pair<Scheme?, String> {
-    val trimmed = this.trim()
-    val scheme: Scheme? = Scheme.fromString(trimmed, trim = false)
-    return Pair(
-        scheme,
-        if (scheme != null) {
-            trimmed.substring(scheme.toString().length)
-        } else {
-            trimmed
-        }
-    )
-}
+internal inline fun String.findOnionAddressFromUrl(): String {
+    val hostname = substringAfter("://") // scheme
+        .substringAfter('@') // username:password
+        .substringBefore('/') // path
+        .substringBefore(':') // port
 
-@Suppress("nothing_to_inline")
-internal inline fun String.stripAddress(): String {
-    return separateSchemeFromAddress()
-        .second
-        .substringBefore('.')
+    return hostname
+        .substringBeforeLast(".onion")
+        .substringAfterLast('.') // subdomains
 }
