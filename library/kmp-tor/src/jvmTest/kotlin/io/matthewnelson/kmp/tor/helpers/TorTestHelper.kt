@@ -19,6 +19,8 @@ import io.matthewnelson.kmp.tor.KmpTorLoaderJvm
 import io.matthewnelson.kmp.tor.PlatformInstaller
 import io.matthewnelson.kmp.tor.PlatformInstaller.InstallOption
 import io.matthewnelson.kmp.tor.TorConfigProviderJvm
+import io.matthewnelson.kmp.tor.common.address.IPAddressV4
+import io.matthewnelson.kmp.tor.common.address.IPAddressV6
 import io.matthewnelson.kmp.tor.common.address.Port
 import io.matthewnelson.kmp.tor.common.annotation.InternalTorApi
 import io.matthewnelson.kmp.tor.controller.common.config.TorConfig
@@ -141,6 +143,15 @@ abstract class TorTestHelper {
 
             put(ClientOnionAuthDir().set(FileSystemDir(
                 testProvider.workDir.builder { addSegment(ClientOnionAuthDir.DEFAULT_NAME) }
+            )))
+
+            put(VirtualAddrNetworkIPv4().set(Range.NetworkIPv4(
+                address = IPAddressV4("127.192.0.0"),
+                bits = 16,
+            )))
+            put(VirtualAddrNetworkIPv6().set(Range.NetworkIPv6(
+                address = IPAddressV6("FA77::"),
+                bits = 104,
             )))
         }.build()
     }

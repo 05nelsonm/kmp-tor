@@ -1566,6 +1566,11 @@ public final class io/matthewnelson/kmp/tor/controller/common/config/TorConfig$K
 	public fun toString ()Ljava/lang/String;
 }
 
+public final class io/matthewnelson/kmp/tor/controller/common/config/TorConfig$KeyWord$VirtualAddrNetworkIPv4 : io/matthewnelson/kmp/tor/controller/common/config/TorConfig$KeyWord {
+	public static final field INSTANCE Lio/matthewnelson/kmp/tor/controller/common/config/TorConfig$KeyWord$VirtualAddrNetworkIPv4;
+	public fun toString ()Ljava/lang/String;
+}
+
 public final class io/matthewnelson/kmp/tor/controller/common/config/TorConfig$KeyWord$VirtualAddrNetworkIPv6 : io/matthewnelson/kmp/tor/controller/common/config/TorConfig$KeyWord {
 	public static final field INSTANCE Lio/matthewnelson/kmp/tor/controller/common/config/TorConfig$KeyWord$VirtualAddrNetworkIPv6;
 	public fun toString ()Ljava/lang/String;
@@ -1747,6 +1752,27 @@ public abstract interface class io/matthewnelson/kmp/tor/controller/common/confi
 
 public final class io/matthewnelson/kmp/tor/controller/common/config/TorConfig$Option$ProcessId$Companion {
 	public final fun invoke (I)Lio/matthewnelson/kmp/tor/controller/common/config/TorConfig$Option$ProcessId;
+}
+
+public abstract interface class io/matthewnelson/kmp/tor/controller/common/config/TorConfig$Option$Range : io/matthewnelson/kmp/tor/controller/common/config/TorConfig$Option {
+}
+
+public abstract interface class io/matthewnelson/kmp/tor/controller/common/config/TorConfig$Option$Range$NetworkIPv4 : io/matthewnelson/kmp/tor/controller/common/config/TorConfig$Option$Range {
+	public static final field Companion Lio/matthewnelson/kmp/tor/controller/common/config/TorConfig$Option$Range$NetworkIPv4$Companion;
+	public static fun invoke (Lio/matthewnelson/kmp/tor/common/address/IPAddressV4;I)Lio/matthewnelson/kmp/tor/controller/common/config/TorConfig$Option$Range$NetworkIPv4;
+}
+
+public final class io/matthewnelson/kmp/tor/controller/common/config/TorConfig$Option$Range$NetworkIPv4$Companion {
+	public final fun invoke (Lio/matthewnelson/kmp/tor/common/address/IPAddressV4;I)Lio/matthewnelson/kmp/tor/controller/common/config/TorConfig$Option$Range$NetworkIPv4;
+}
+
+public abstract interface class io/matthewnelson/kmp/tor/controller/common/config/TorConfig$Option$Range$NetworkIPv6 : io/matthewnelson/kmp/tor/controller/common/config/TorConfig$Option$Range {
+	public static final field Companion Lio/matthewnelson/kmp/tor/controller/common/config/TorConfig$Option$Range$NetworkIPv6$Companion;
+	public static fun invoke (Lio/matthewnelson/kmp/tor/common/address/IPAddressV6;I)Lio/matthewnelson/kmp/tor/controller/common/config/TorConfig$Option$Range$NetworkIPv6;
+}
+
+public final class io/matthewnelson/kmp/tor/controller/common/config/TorConfig$Option$Range$NetworkIPv6$Companion {
+	public final fun invoke (Lio/matthewnelson/kmp/tor/common/address/IPAddressV6;I)Lio/matthewnelson/kmp/tor/controller/common/config/TorConfig$Option$Range$NetworkIPv6;
 }
 
 public abstract interface class io/matthewnelson/kmp/tor/controller/common/config/TorConfig$Option$Time : io/matthewnelson/kmp/tor/controller/common/config/TorConfig$Option {
@@ -2279,6 +2305,18 @@ public final class io/matthewnelson/kmp/tor/controller/common/config/TorConfig$S
 }
 
 public final class io/matthewnelson/kmp/tor/controller/common/config/TorConfig$Setting$UnixSockets$Socks$Companion {
+}
+
+public final class io/matthewnelson/kmp/tor/controller/common/config/TorConfig$Setting$VirtualAddrNetworkIPv4 : io/matthewnelson/kmp/tor/controller/common/config/TorConfig$Setting {
+	public fun <init> ()V
+	public fun clone ()Lio/matthewnelson/kmp/tor/controller/common/config/TorConfig$Setting$VirtualAddrNetworkIPv4;
+	public synthetic fun clone ()Lio/matthewnelson/kmp/tor/controller/common/config/TorConfig$Setting;
+}
+
+public final class io/matthewnelson/kmp/tor/controller/common/config/TorConfig$Setting$VirtualAddrNetworkIPv6 : io/matthewnelson/kmp/tor/controller/common/config/TorConfig$Setting {
+	public fun <init> ()V
+	public fun clone ()Lio/matthewnelson/kmp/tor/controller/common/config/TorConfig$Setting$VirtualAddrNetworkIPv6;
+	public synthetic fun clone ()Lio/matthewnelson/kmp/tor/controller/common/config/TorConfig$Setting;
 }
 
 public final class io/matthewnelson/kmp/tor/controller/common/config/TorConfig$Setting$__OwningControllerProcess : io/matthewnelson/kmp/tor/controller/common/config/TorConfig$Setting {

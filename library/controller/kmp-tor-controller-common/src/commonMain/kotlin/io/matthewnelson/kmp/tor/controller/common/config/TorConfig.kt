@@ -15,6 +15,8 @@
  **/
 package io.matthewnelson.kmp.tor.controller.common.config
 
+import io.matthewnelson.kmp.tor.common.address.IPAddressV4
+import io.matthewnelson.kmp.tor.common.address.IPAddressV6
 import io.matthewnelson.kmp.tor.common.address.Port
 import io.matthewnelson.kmp.tor.common.address.PortProxy
 import io.matthewnelson.kmp.tor.common.annotation.ExperimentalTorApi
@@ -1354,6 +1356,40 @@ class TorConfig private constructor(
             }
         }
 
+        /**
+         * https://2019.www.torproject.org/docs/tor-manual.html.en#VirtualAddrNetworkIPv4
+         * */
+        class VirtualAddrNetworkIPv4                : Setting<Option.Range.NetworkIPv4>(
+            keyword = KeyWord.VirtualAddrNetworkIPv4,
+            default = Option.Range.NetworkIPv4(
+                address = IPAddressV4("127.192.0.0"),
+                bits = 10,
+            ),
+            isStartArgument = false
+        ) {
+
+            override fun clone(): VirtualAddrNetworkIPv4 {
+                return VirtualAddrNetworkIPv4().set(value) as VirtualAddrNetworkIPv4
+            }
+        }
+
+        /**
+         * https://2019.www.torproject.org/docs/tor-manual.html.en#VirtualAddrNetworkIPv6
+         * */
+        class VirtualAddrNetworkIPv6                : Setting<Option.Range.NetworkIPv6>(
+            keyword = KeyWord.VirtualAddrNetworkIPv6,
+            default = Option.Range.NetworkIPv6(
+                address = IPAddressV6("FE80::"),
+                bits = 10,
+            ),
+            isStartArgument = false
+        ) {
+
+            override fun clone(): VirtualAddrNetworkIPv6 {
+                return VirtualAddrNetworkIPv6().set(value) as VirtualAddrNetworkIPv6
+            }
+        }
+
         @Deprecated(
             message = "Use TorConfig.Setting.GeoIPFile",
             replaceWith = ReplaceWith(expression = "TorConfig.Setting.GeoIPFile")
@@ -1536,6 +1572,55 @@ class TorConfig private constructor(
         private value class RealProcessId(override val pid: Int)        : ProcessId {
             override val value: String get() = "$pid"
             override fun toString(): String = value
+        }
+
+        sealed interface Range                                          : Option {
+
+            @SealedValueClass
+            sealed interface NetworkIPv4                                    : Range {
+                companion object {
+
+                    /**
+                     * [bits] must be between 0 and 16
+                     * */
+                    @JvmStatic
+                    @Throws(IllegalArgumentException::class)
+                    operator fun invoke(address: IPAddressV4, bits: Int): NetworkIPv4 {
+                        require(bits in 0..16) {
+                            "bits must be between 0 and 16"
+                        }
+                        return RealNetworkIPv4Range("${address.canonicalHostname()}/$bits")
+                    }
+                }
+            }
+
+            @JvmInline
+            private value class RealNetworkIPv4Range(override val value: String)    : NetworkIPv4 {
+                override fun toString(): String = value
+            }
+
+            @SealedValueClass
+            sealed interface NetworkIPv6                                    : Range {
+                companion object {
+
+                    /**
+                     * [bits] must be between 0 and 104
+                     * */
+                    @JvmStatic
+                    @Throws(IllegalArgumentException::class)
+                    operator fun invoke(address: IPAddressV6, bits: Int): NetworkIPv6 {
+                        require(bits in 0..104) {
+                            "bits must be between 0 and 104"
+                        }
+                        return RealNetworkIPv6Range("${address.canonicalHostname()}/$bits")
+                    }
+                }
+            }
+
+            @JvmInline
+            private value class RealNetworkIPv6Range(override val value: String): NetworkIPv6 {
+                override fun toString(): String = value
+            }
         }
 
         sealed interface Time                                           : Option {
@@ -1847,6 +1932,7 @@ class TorConfig private constructor(
         object GuardLifetime: KeyWord() { override fun toString(): String = "GuardLifetime" }
         object SafeSocks: KeyWord() { override fun toString(): String = "SafeSocks" }
         object TestSocks: KeyWord() { override fun toString(): String = "TestSocks" }
+        object VirtualAddrNetworkIPv4: KeyWord() { override fun toString(): String = "VirtualAddrNetworkIPv4" }
         object VirtualAddrNetworkIPv6: KeyWord() { override fun toString(): String = "VirtualAddrNetworkIPv6" }
         object AllowNonRFC953Hostnames: KeyWord() { override fun toString(): String = "AllowNonRFC953Hostnames" }
         // HTTPTunnelPort (IMPLEMENTED)

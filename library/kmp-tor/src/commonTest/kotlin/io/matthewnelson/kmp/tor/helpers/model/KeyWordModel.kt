@@ -159,6 +159,7 @@ class KeyWordModel {
             add(TorConfig.KeyWord.GuardLifetime)
             add(TorConfig.KeyWord.SafeSocks)
             add(TorConfig.KeyWord.TestSocks)
+            add(TorConfig.KeyWord.VirtualAddrNetworkIPv4)
             add(TorConfig.KeyWord.VirtualAddrNetworkIPv6)
             add(TorConfig.KeyWord.AllowNonRFC953Hostnames)
             add(TorConfig.KeyWord.TransProxyType)
