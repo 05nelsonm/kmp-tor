@@ -25,16 +25,10 @@ import kotlin.jvm.JvmStatic
 /**
  * Base interface for denoting a String value is an [OnionAddress]
  *
+ * @see [Address]
  * @see [OnionAddressV3]
  * */
-sealed interface OnionAddress: Parcelable {
-
-    val value: String
-
-    /**
-     * Appends .onion to the given [value]
-     * */
-    fun canonicalHostname(): String
+sealed interface OnionAddress: Address {
 
     /**
      * Returns the raw bytes for the given [value]

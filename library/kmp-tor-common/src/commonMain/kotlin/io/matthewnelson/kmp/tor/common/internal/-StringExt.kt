@@ -32,13 +32,16 @@ internal inline fun String.stripBaseEncoding(): String {
 }
 
 @Suppress("nothing_to_inline")
-internal inline fun String.findOnionAddressFromUrl(): String {
-    val hostname = substringAfter("://") // scheme
+internal inline fun String.findHostnameAndPortFromUrl(): String {
+    return substringAfter("://") // scheme
         .substringAfter('@') // username:password
         .substringBefore('/') // path
-        .substringBefore(':') // port
+}
 
-    return hostname
+@Suppress("nothing_to_inline")
+internal inline fun String.findOnionAddressFromUrl(): String {
+    return findHostnameAndPortFromUrl()
+        .substringBefore(':') // port
         .substringBeforeLast(".onion")
         .substringAfterLast('.') // subdomains
 }

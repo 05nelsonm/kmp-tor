@@ -1,25 +1,15 @@
 package io.matthewnelson.kmp.tor.common.address
 
-import io.matthewnelson.component.parcelize.Parcelable
 import kotlin.jvm.JvmStatic
 
 /**
  * Base interface for denoting a String value is an [IPAddress]
  *
+ * @see [Address]
  * @see [IPAddressV4]
  * @see [IPAddressV6]
  * */
-sealed interface IPAddress: Parcelable {
-
-    val value: String
-
-    /**
-     * Prints the [IPAddress] as it's canonicalized hostname.
-     *
-     * [IPAddressV4] -> "127.0.0.1"
-     * [IPAddressV6] -> "[::1]" // bracketed
-     * */
-    fun canonicalHostname(): String
+sealed interface IPAddress: Address {
 
     companion object {
         @JvmStatic
