@@ -1,5 +1,45 @@
 # CHANGELOG
 
+## Version 0.4.7.8+1.3.0 (2022-08-06)
+ - `kmp-tor-common` module:
+     - Adds base `Address` interface for all `*Address` classes to
+       inherit from.
+         - `OnionAddress` now implements `Address`.
+     - Adds `IPAddress`, `IPAddressV4`, and `IPAddressV6` to support
+       modeling of IP addresses.
+     - Refactors `ProxyAddress` to now use `IPAddress` as a constructor
+       argument instead of `String`.
+     - Refactors `ProxyAddress` to `class` instead of `data class`.
+     - Improves URL parsing when using `fromString` methods for `*Address`
+       classes.
+     - **DEPRECATIONS:**
+         - `OnionAddress.valueDotOnion` in favor of `canonicalHostname()`
+         - `ProxyAddress.component1()` in favor of `address.value`
+         - `ProxyAddress.component2()` in favor of `port`
+         - `ProxyAddress.ipAddress` in favor of `address.value`
+         - `ProxyAddress` constructor which takes `ipAddress: String` in favor
+           of constructor which takes `address: IPAddress`.
+         - `ProxyAddress.copy` which uses `ipAddress: String` in favor of 
+           `copy()`, `copy(address: IPAddress)`, and `copy(port: Port)` methods.
+         - `Server.Fingerprint.valueWithPrefix` in favor of `canonicalName()`
+         - `OnionUrl` class is now deprecated
+         - `Scheme` enum is now deprecated
+
+
+ - `kmp-tor-controller-common` module:
+     - Adds `TorConfig.KeyWord.VirtualAddrNetworkIPv4`
+     - Adds `TorConfig.Setting.VirtualAddrNetworkIPv4` to configure non-default
+       IPv4 network ranges when mapping addresses.
+     - Adds `TorConfig.Setting.VirtualAddrNetworkIPv6` to configure non-default
+       IPv6 network ranges when mapping addresses.
+     - Implements `TorControlMapAddress.mapAddress`
+     - Implements `TorControlResolve.resolve`
+
+
+ - `kmp-tor-ext-callback-controller-common` module:
+     - Implements `CallbackTorControlMapAddress.mapAddress`
+     - Implements `CallbackTorControlResolve.resolve`
+
 ## Version 0.4.7.8+1.2.1 (2022-07-21)
  - Fixes `-android` publication for `*-common` modules
 
@@ -22,6 +62,8 @@
            `TorConfig.Setting.GeoIPFile`
          - `TorConfig.Setting.OwningControllerProcess` was deprecated in 
            favor of `TorConfig.Setting.__OwningControllerProcess`
+
+
  - Adds ability to pass `HiddenService.UnixSocket` when adding a `HiddenService` via 
    the control port.
      - **BREAKING CHANGE** (Minor):
@@ -30,6 +72,8 @@
            only `Set<HiddenService.Ports>`.
          - `HiddenService.Ports` and `HiddenService.UnixSocket` both 
            extend `HiddenService.VirtualPort`.
+
+
  - Refactored/cleaned up internals
  - CI/Build improvements
 
