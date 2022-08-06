@@ -27,6 +27,8 @@ import kotlin.jvm.JvmStatic
  * "MAPADDRESS" 1*(Address "=" Address SP) CRLF
  *
  * https://torproject.gitlab.io/torspec/control-spec/#mapaddress
+ *
+ * @see [TorControlInfoGet.KeyWord.AddressMappings]
  * */
 interface TorControlMapAddress {
 

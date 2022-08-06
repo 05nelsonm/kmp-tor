@@ -39,20 +39,11 @@ interface TorControlInfoGet {
     @OptIn(InternalTorApi::class)
     sealed class KeyWord(@JvmField val value: String) {
 
-        override fun equals(other: Any?): Boolean {
-            return other != null && other is KeyWord && other.value == value
-        }
+        override fun equals(other: Any?): Boolean = other is KeyWord && other.value == value
+        override fun hashCode(): Int = 17 * 31 + value.hashCode()
+        override fun toString(): String = value
 
-        override fun hashCode(): Int {
-            return 17 * 31 + value.hashCode()
-        }
-
-        override fun toString(): String {
-            return value
-        }
-
-        fun compareTo(other: String?): Boolean =
-            other != null && other == value
+        fun compareTo(other: String?): Boolean = other != null && other == value
 
         class Version                               : KeyWord("version")
 
@@ -78,14 +69,10 @@ interface TorControlInfoGet {
         sealed class Desc(value: String)            : KeyWord("desc$value") {
             class AllRecent                             : Desc("/all-recent")
             class Id(identity: String)                  : Desc("/id/$identity") {
-                override fun toString(): String {
-                    return value.replaceAfter("desc/id/", REDACTED)
-                }
+                override fun toString(): String = value.replaceAfter("desc/id/", REDACTED)
             }
             class Name(nickname: String)                : Desc("/name/$nickname") {
-                override fun toString(): String {
-                    return value.replaceAfter("desc/name/", REDACTED)
-                }
+                override fun toString(): String = value.replaceAfter("desc/name/", REDACTED)
             }
             class DownloadEnabled                       : Desc("/download-enabled")
             class Annotations(identity: String)         : Desc("-annotations/id/$identity")
@@ -94,14 +81,10 @@ interface TorControlInfoGet {
         sealed class MicroDesc(value: String)       : KeyWord("md/$value") {
             class All                                   : MicroDesc("all")
             class Id(identity: String)                  : MicroDesc("id/$identity") {
-                override fun toString(): String {
-                    return value.replaceAfter("md/id/", REDACTED)
-                }
+                override fun toString(): String = value.replaceAfter("md/id/", REDACTED)
             }
             class Name(nickname: String)                : MicroDesc("name/$nickname") {
-                override fun toString(): String {
-                    return value.replaceAfter("md/name/", REDACTED)
-                }
+                override fun toString(): String = value.replaceAfter("md/name/", REDACTED)
             }
             class DownloadEnabled                       : MicroDesc("download-enabled")
         }
@@ -110,22 +93,16 @@ interface TorControlInfoGet {
 
         // TODO: use an actual wrapper class to get the hex digest
         class ExtraInfo(digest: String)             : KeyWord("extra-info/digest/$digest") {
-            override fun toString(): String {
-                return value.replaceAfter("extra-info/digest/", REDACTED)
-            }
+            override fun toString(): String = value.replaceAfter("extra-info/digest/", REDACTED)
         }
 
         sealed class NetworkStatus(value: String)   : KeyWord("ns/$value") {
             class All                                   : NetworkStatus("all")
             class Id(identity: String)                  : NetworkStatus("id/$identity") {
-                override fun toString(): String {
-                    return value.replaceAfter("ns/id/", REDACTED)
-                }
+                override fun toString(): String = value.replaceAfter("ns/id/", REDACTED)
             }
             class Name(nickname: String)                : NetworkStatus("name/$nickname") {
-                override fun toString(): String {
-                    return value.replaceAfter("ns/name/", REDACTED)
-                }
+                override fun toString(): String = value.replaceAfter("ns/name/", REDACTED)
             }
             class Purpose(purpose: String = "bridge")   : NetworkStatus("purpose/$purpose")
         }
@@ -259,14 +236,10 @@ interface TorControlInfoGet {
 
         sealed class HSDescriptors(value: String)   : KeyWord("hs/$value") {
             class Client(address: OnionAddress)         : HSDescriptors("client/desc/id/${address.value}") {
-                override fun toString(): String {
-                    return value.replaceAfter("hs/client/desc/id/", REDACTED)
-                }
+                override fun toString(): String = value.replaceAfter("hs/client/desc/id/", REDACTED)
             }
             class Service(address: OnionAddress)        : HSDescriptors("service/desc/id/${address.value}") {
-                override fun toString(): String {
-                    return value.replaceAfter("hs/service/desc/id/", REDACTED)
-                }
+                override fun toString(): String = value.replaceAfter("hs/service/desc/id/", REDACTED)
             }
         }
 
@@ -292,37 +265,27 @@ interface TorControlInfoGet {
             sealed class Cert(value: String)            : Downloads("cert/$value") {
                 class Fps                                   : Cert("fps")
                 class Fp(fingerprint: String)               : Cert("fp/$fingerprint") {
-                    override fun toString(): String {
-                        return value.replaceAfter("cert/fp/", REDACTED)
-                    }
+                    override fun toString(): String = value.replaceAfter("cert/fp/", REDACTED)
                 }
                 class FpSks(fingerprint: String)            : Cert("fp/$fingerprint/sks") {
-                    override fun toString(): String {
-                        return value.replaceAfter("cert/fp/", "$REDACTED/sks")
-                    }
+                    override fun toString(): String = value.replaceAfter("cert/fp/", "$REDACTED/sks")
                 }
                 class FpDigest(fingerprint: String, digest: String) : Cert("fp/$fingerprint/$digest") {
-                    override fun toString(): String {
-                        return value.replaceAfter("cert/fp/", "$REDACTED/$REDACTED")
-                    }
+                    override fun toString(): String = value.replaceAfter("cert/fp/", "$REDACTED/$REDACTED")
                 }
             }
 
             sealed class Desc(value: String)            : Downloads("desc/$value") {
                 class Descs                                 : Desc("descs")
                 class Digest(digest: String)                : Desc(digest) {
-                    override fun toString(): String {
-                        return value.replaceAfter("desc/", REDACTED)
-                    }
+                    override fun toString(): String = value.replaceAfter("desc/", REDACTED)
                 }
             }
 
             sealed class Bridge(value: String)          : Downloads("bridge/$value") {
                 class Bridges                               : Bridge("bridges")
                 class Digest(digest: String)                : Bridge(digest) {
-                    override fun toString(): String {
-                        return value.replaceAfter("bridge/", REDACTED)
-                    }
+                    override fun toString(): String = value.replaceAfter("bridge/", REDACTED)
                 }
             }
         }
