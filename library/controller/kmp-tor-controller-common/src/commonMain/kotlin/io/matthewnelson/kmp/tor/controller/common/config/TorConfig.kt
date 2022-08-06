@@ -1760,6 +1760,8 @@ class TorConfig private constructor(
         object GeoIPExcludeUnknown: KeyWord() { override fun toString(): String = "GeoIPExcludeUnknown" }
         object ClientOnionAuthDir: KeyWord() { override fun toString(): String = "ClientOnionAuthDir" }
         object SocksPort: KeyWord() { override fun toString(): String = "SocksPort" }
+        object VirtualAddrNetworkIPv4: KeyWord() { override fun toString(): String = "VirtualAddrNetworkIPv4" }
+        object VirtualAddrNetworkIPv6: KeyWord() { override fun toString(): String = "VirtualAddrNetworkIPv6" }
         object HttpTunnelPort: KeyWord() { override fun toString(): String = "HTTPTunnelPort" }
         object TransPort: KeyWord() { override fun toString(): String = "TransPort" }
         object AutomapHostsOnResolve: KeyWord() { override fun toString(): String = "AutomapHostsOnResolve" }
@@ -1932,8 +1934,8 @@ class TorConfig private constructor(
         object GuardLifetime: KeyWord() { override fun toString(): String = "GuardLifetime" }
         object SafeSocks: KeyWord() { override fun toString(): String = "SafeSocks" }
         object TestSocks: KeyWord() { override fun toString(): String = "TestSocks" }
-        object VirtualAddrNetworkIPv4: KeyWord() { override fun toString(): String = "VirtualAddrNetworkIPv4" }
-        object VirtualAddrNetworkIPv6: KeyWord() { override fun toString(): String = "VirtualAddrNetworkIPv6" }
+        // VirtualAddrNetworkIPv4 (IMPLEMENTED)
+        // VirtualAddrNetworkIPv6 (IMPLEMENTED)
         object AllowNonRFC953Hostnames: KeyWord() { override fun toString(): String = "AllowNonRFC953Hostnames" }
         // HTTPTunnelPort (IMPLEMENTED)
         // TransPort (IMPLEMENTED)
