@@ -2995,6 +2995,53 @@ public abstract interface class io/matthewnelson/kmp/tor/controller/common/contr
 }
 
 public abstract interface class io/matthewnelson/kmp/tor/controller/common/control/usecase/TorControlMapAddress {
+	public abstract fun mapAddress-gIAlu-s (Lio/matthewnelson/kmp/tor/controller/common/control/usecase/TorControlMapAddress$Mapping;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public abstract fun mapAddress-gIAlu-s (Ljava/util/Set;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+}
+
+public final class io/matthewnelson/kmp/tor/controller/common/control/usecase/TorControlMapAddress$Mapped {
+	public final field from Ljava/lang/String;
+	public final field to Ljava/lang/String;
+	public fun <init> (Ljava/lang/String;Ljava/lang/String;)V
+	public fun equals (Ljava/lang/Object;)Z
+	public fun hashCode ()I
+	public final fun isUnmapping ()Z
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/matthewnelson/kmp/tor/controller/common/control/usecase/TorControlMapAddress$Mapping {
+	public static final field Companion Lio/matthewnelson/kmp/tor/controller/common/control/usecase/TorControlMapAddress$Mapping$Companion;
+	public final field from Ljava/lang/String;
+	public final field to Ljava/lang/String;
+	public fun <init> (Lio/matthewnelson/kmp/tor/common/address/IPAddress;Lio/matthewnelson/kmp/tor/common/address/IPAddress;)V
+	public fun <init> (Lio/matthewnelson/kmp/tor/common/address/IPAddress;Lio/matthewnelson/kmp/tor/common/address/OnionAddress;)V
+	public fun <init> (Lio/matthewnelson/kmp/tor/common/address/IPAddress;Ljava/lang/String;)V
+	public fun <init> (Ljava/lang/String;Lio/matthewnelson/kmp/tor/common/address/IPAddress;)V
+	public fun <init> (Ljava/lang/String;Ljava/lang/String;)V
+	public static final fun anyHost (Ljava/lang/String;)Lio/matthewnelson/kmp/tor/controller/common/control/usecase/TorControlMapAddress$Mapping;
+	public static final fun anyIPv4 (Lio/matthewnelson/kmp/tor/common/address/OnionAddress;)Lio/matthewnelson/kmp/tor/controller/common/control/usecase/TorControlMapAddress$Mapping;
+	public static final fun anyIPv4 (Ljava/lang/String;)Lio/matthewnelson/kmp/tor/controller/common/control/usecase/TorControlMapAddress$Mapping;
+	public static final fun anyIPv6 (Lio/matthewnelson/kmp/tor/common/address/OnionAddress;)Lio/matthewnelson/kmp/tor/controller/common/control/usecase/TorControlMapAddress$Mapping;
+	public static final fun anyIPv6 (Ljava/lang/String;)Lio/matthewnelson/kmp/tor/controller/common/control/usecase/TorControlMapAddress$Mapping;
+	public final fun component1 ()Ljava/lang/String;
+	public final fun component2 ()Ljava/lang/String;
+	public final fun copy (Ljava/lang/String;Ljava/lang/String;)Lio/matthewnelson/kmp/tor/controller/common/control/usecase/TorControlMapAddress$Mapping;
+	public static synthetic fun copy$default (Lio/matthewnelson/kmp/tor/controller/common/control/usecase/TorControlMapAddress$Mapping;Ljava/lang/String;Ljava/lang/String;ILjava/lang/Object;)Lio/matthewnelson/kmp/tor/controller/common/control/usecase/TorControlMapAddress$Mapping;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+	public static final fun unmap (Lio/matthewnelson/kmp/tor/common/address/IPAddress;)Lio/matthewnelson/kmp/tor/controller/common/control/usecase/TorControlMapAddress$Mapping;
+	public static final fun unmap (Ljava/lang/String;)Lio/matthewnelson/kmp/tor/controller/common/control/usecase/TorControlMapAddress$Mapping;
+}
+
+public final class io/matthewnelson/kmp/tor/controller/common/control/usecase/TorControlMapAddress$Mapping$Companion {
+	public final fun anyHost (Ljava/lang/String;)Lio/matthewnelson/kmp/tor/controller/common/control/usecase/TorControlMapAddress$Mapping;
+	public final fun anyIPv4 (Lio/matthewnelson/kmp/tor/common/address/OnionAddress;)Lio/matthewnelson/kmp/tor/controller/common/control/usecase/TorControlMapAddress$Mapping;
+	public final fun anyIPv4 (Ljava/lang/String;)Lio/matthewnelson/kmp/tor/controller/common/control/usecase/TorControlMapAddress$Mapping;
+	public final fun anyIPv6 (Lio/matthewnelson/kmp/tor/common/address/OnionAddress;)Lio/matthewnelson/kmp/tor/controller/common/control/usecase/TorControlMapAddress$Mapping;
+	public final fun anyIPv6 (Ljava/lang/String;)Lio/matthewnelson/kmp/tor/controller/common/control/usecase/TorControlMapAddress$Mapping;
+	public final fun unmap (Lio/matthewnelson/kmp/tor/common/address/IPAddress;)Lio/matthewnelson/kmp/tor/controller/common/control/usecase/TorControlMapAddress$Mapping;
+	public final fun unmap (Ljava/lang/String;)Lio/matthewnelson/kmp/tor/controller/common/control/usecase/TorControlMapAddress$Mapping;
 }
 
 public abstract interface class io/matthewnelson/kmp/tor/controller/common/control/usecase/TorControlOnionAdd {

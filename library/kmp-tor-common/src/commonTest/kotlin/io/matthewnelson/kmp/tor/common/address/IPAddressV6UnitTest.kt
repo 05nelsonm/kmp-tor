@@ -54,6 +54,13 @@ class IPAddressV6UnitTest {
         assertEquals(expected, actual)
     }
 
+    @Test
+    fun givenIPAddressV6Url_whenFromString_returnsSuccess() {
+        val expected = IPAddressV6("35f4:c60a:8296:4c90:79ad:3939:69d9:ba10")
+        val actual = IPAddressV6.fromStringOrNull("https://username:password@${expected.canonicalHostname()}:9822/some/path")
+        assertEquals(expected, actual)
+    }
+
     companion object {
         val IPV6_TEST_ADDRESSES = """
             a01e:67d4:f5ac:1d66:8a17:ddc5:8a4a:190f

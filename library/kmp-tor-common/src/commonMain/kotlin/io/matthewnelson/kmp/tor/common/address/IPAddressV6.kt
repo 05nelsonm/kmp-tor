@@ -18,6 +18,7 @@ package io.matthewnelson.kmp.tor.common.address
 import io.matthewnelson.component.parcelize.Parcelize
 import io.matthewnelson.kmp.tor.common.annotation.ExperimentalTorApi
 import io.matthewnelson.kmp.tor.common.annotation.SealedValueClass
+import io.matthewnelson.kmp.tor.common.internal.findHostnameAndPortFromUrl
 import kotlin.jvm.JvmInline
 import kotlin.jvm.JvmStatic
 
@@ -69,10 +70,35 @@ sealed interface IPAddressV6: IPAddress {
             return RealIPAddressV6(stripped)
         }
 
+        /**
+         * Attempts to find the [IPAddressV6] for a given
+         * string. This could be a URL, or the properly
+         * formatted IPv6 address itself.
+         *
+         * @see [findHostnameAndPortFromUrl]
+         * @see [fromStringOrNull]
+         * */
+        @JvmStatic
+        @Throws(IllegalArgumentException::class)
+        fun fromString(address: String): IPAddressV6 {
+            val hostnameAndPort = address.findHostnameAndPortFromUrl()
+
+            try {
+                // is canonicalized with port >> [::1]:8080
+                return if (hostnameAndPort.startsWith('[') && hostnameAndPort.contains("]:")) {
+                    invoke(hostnameAndPort.substringBeforeLast(':'))
+                } else {
+                    invoke(hostnameAndPort)
+                }
+            } catch (_: IllegalArgumentException) {}
+
+            throw IllegalArgumentException("Failed to find valid IPv6 address from $address")
+        }
+
         @JvmStatic
         fun fromStringOrNull(address: String): IPAddressV6? {
             return try {
-                invoke(address)
+                fromString(address)
             } catch (_: IllegalArgumentException) {
                 null
             }

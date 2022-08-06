@@ -23,6 +23,7 @@ import io.matthewnelson.kmp.tor.controller.common.config.ConfigEntry
 import io.matthewnelson.kmp.tor.controller.common.config.TorConfig
 import io.matthewnelson.kmp.tor.controller.common.control.TorControlOnionClientAuth
 import io.matthewnelson.kmp.tor.controller.common.control.usecase.TorControlInfoGet.KeyWord
+import io.matthewnelson.kmp.tor.controller.common.control.usecase.TorControlMapAddress.*
 import io.matthewnelson.kmp.tor.controller.common.control.usecase.TorControlOnionAdd
 import io.matthewnelson.kmp.tor.controller.common.events.TorEvent
 import io.matthewnelson.kmp.tor.controller.common.internal.PlatformUtil
@@ -637,6 +638,76 @@ class TorControllerIntegrationTest: TorTestHelper() {
             println(response)
         }
         assertTrue(failures.isEmpty())
+
+        Unit
+    }
+
+    @Test
+    fun givenTorController_whenMapAddress_returnsSuccess() = runBlocking {
+        manager.setEvents(setOf(TorEvent.AddressMap)).getOrThrow()
+
+        // Helper function to return all Mapped addresses from
+        // infoGet response.
+        //
+        // i7myviemoo4vnprq.virtual torproject.org NEVER
+        fun String.parseInfoMapping(): Set<Mapped> {
+            val lines = lines()
+            val set = LinkedHashSet<Mapped>(lines.size)
+
+            for (line in lines) {
+                val splits = line.split(' ')
+                set.add(Mapped(splits[0], splits[1]))
+            }
+
+            return set
+        }
+
+        try {
+
+            val mapping1 = manager
+                .mapAddress(Mapping.anyIPv4(to = "2gzyxa5ihm7nsggfxnu52rck2vv4rvmdlkiu3zzui5du4xyclen53wid.onion"))
+                .getOrThrow()
+
+            val mapping1Info = manager
+                .infoGet(KeyWord.AddressMappings.All())
+                .getOrThrow()
+
+            assertTrue(mapping1Info.parseInfoMapping().contains(mapping1))
+
+            val mapping2 = manager
+                .mapAddress(Mapping.anyHost(to = "torproject.org"))
+                .getOrThrow()
+
+            val mapping2Info = manager
+                .infoGet(KeyWord.AddressMappings.All())
+                .getOrThrow()
+
+            assertTrue(mapping2Info.parseInfoMapping().contains(mapping2))
+
+            val unMapping1 = manager
+                .mapAddress(Mapping.unmap(mapping1.from))
+                .getOrThrow()
+
+            val unMapping1Info = manager
+                .infoGet(KeyWord.AddressMappings.All())
+                .getOrThrow()
+
+            assertFalse(unMapping1Info.parseInfoMapping().contains(unMapping1))
+            assertTrue(unMapping1.isUnmapping)
+        } finally {
+            // Unmap any remaining test data
+            manager
+                .infoGet(KeyWord.AddressMappings.All())
+                .onSuccess { result ->
+                    val toUnMap = result.parseInfoMapping().map { mapped ->
+                        Mapping.unmap(mapped.from)
+                    }.toSet()
+
+                    manager.mapAddress(toUnMap)
+                }
+
+            manager.setEvents(emptySet())
+        }
 
         Unit
     }

@@ -30,6 +30,7 @@ import io.matthewnelson.kmp.tor.controller.common.config.HiddenServiceEntry
 import io.matthewnelson.kmp.tor.controller.common.config.TorConfig
 import io.matthewnelson.kmp.tor.controller.common.control.TorControlOnionClientAuth
 import io.matthewnelson.kmp.tor.controller.common.control.usecase.TorControlInfoGet
+import io.matthewnelson.kmp.tor.controller.common.control.usecase.TorControlMapAddress
 import io.matthewnelson.kmp.tor.controller.common.control.usecase.TorControlOnionAdd
 import io.matthewnelson.kmp.tor.controller.common.control.usecase.TorControlSignal
 import io.matthewnelson.kmp.tor.controller.common.events.TorEvent
@@ -249,6 +250,26 @@ class CallbackTorController(
     ): Task {
         return provideOrFail(failure, success) {
             infoGet(keywords)
+        }
+    }
+
+    override fun mapAddress(
+        mapping: TorControlMapAddress.Mapping,
+        failure: TorCallback<Throwable>?,
+        success: TorCallback<TorControlMapAddress.Mapped>
+    ): Task {
+        return provideOrFail(failure, success) {
+            mapAddress(mapping)
+        }
+    }
+
+    override fun mapAddress(
+        mappings: Set<TorControlMapAddress.Mapping>,
+        failure: TorCallback<Throwable>?,
+        success: TorCallback<Set<TorControlMapAddress.Mapped>>
+    ): Task {
+        return provideOrFail(failure, success) {
+            mapAddress(mappings)
         }
     }
 

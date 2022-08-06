@@ -18,6 +18,7 @@ package io.matthewnelson.kmp.tor.common.address
 import io.matthewnelson.component.parcelize.Parcelize
 import io.matthewnelson.kmp.tor.common.annotation.ExperimentalTorApi
 import io.matthewnelson.kmp.tor.common.annotation.SealedValueClass
+import io.matthewnelson.kmp.tor.common.internal.findHostnameAndPortFromUrl
 import kotlin.jvm.JvmInline
 import kotlin.jvm.JvmStatic
 
@@ -51,10 +52,31 @@ sealed interface IPAddressV4: IPAddress {
             return RealIPAddressV4(address)
         }
 
+        /**
+         * Attempts to find the [IPAddressV4] for a given
+         * string. This could be a URL, or the properly
+         * formatted address itself.
+         *
+         * @see [findHostnameAndPortFromUrl]
+         * @see [fromStringOrNull]
+         * */
+        @JvmStatic
+        @Throws(IllegalArgumentException::class)
+        fun fromString(address: String): IPAddressV4 {
+            val hostname = address.findHostnameAndPortFromUrl()
+                .substringBeforeLast(':') // port
+
+            try {
+                return invoke(hostname)
+            } catch (_: IllegalArgumentException) {}
+
+            throw IllegalArgumentException("Failed to find valid IPv4 address from $address")
+        }
+
         @JvmStatic
         fun fromStringOrNull(address: String): IPAddressV4? {
             return try {
-                invoke(address)
+                fromString(address)
             } catch (_: IllegalArgumentException) {
                 null
             }

@@ -93,6 +93,8 @@ public abstract interface class io/matthewnelson/kmp/tor/ext/callback/controller
 }
 
 public abstract interface class io/matthewnelson/kmp/tor/ext/callback/controller/common/control/usecase/CallbackTorControlMapAddress {
+	public abstract fun mapAddress (Lio/matthewnelson/kmp/tor/controller/common/control/usecase/TorControlMapAddress$Mapping;Lio/matthewnelson/kmp/tor/ext/callback/common/TorCallback;Lio/matthewnelson/kmp/tor/ext/callback/common/TorCallback;)Lio/matthewnelson/kmp/tor/ext/callback/common/Task;
+	public abstract fun mapAddress (Ljava/util/Set;Lio/matthewnelson/kmp/tor/ext/callback/common/TorCallback;Lio/matthewnelson/kmp/tor/ext/callback/common/TorCallback;)Lio/matthewnelson/kmp/tor/ext/callback/common/Task;
 }
 
 public abstract interface class io/matthewnelson/kmp/tor/ext/callback/controller/common/control/usecase/CallbackTorControlOnionAdd {

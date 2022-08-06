@@ -21,7 +21,6 @@ import io.matthewnelson.component.parcelize.Parcelize
 import io.matthewnelson.kmp.tor.common.annotation.ExperimentalTorApi
 import io.matthewnelson.kmp.tor.common.annotation.SealedValueClass
 import io.matthewnelson.kmp.tor.common.internal.findOnionAddressFromUrl
-import io.matthewnelson.kmp.tor.common.internal.stripBaseEncoding
 import kotlin.jvm.JvmInline
 import kotlin.jvm.JvmStatic
 
@@ -54,6 +53,7 @@ sealed interface OnionAddressV3: OnionAddress {
          * string, or the properly formatted address itself.
          *
          * @see [findOnionAddressFromUrl]
+         * @see [fromStringOrNull]
          * */
         @JvmStatic
         @Throws(IllegalArgumentException::class)
@@ -66,7 +66,11 @@ sealed interface OnionAddressV3: OnionAddress {
                 // still formatted improperly as all uppercase.
                 .lowercase()
 
-            return RealOnionAddressV3(stripped)
+            try {
+                return invoke(stripped)
+            } catch (_: IllegalArgumentException) {}
+
+            throw IllegalArgumentException("Failed to find a valid v3 OnionAddress from $address")
         }
 
         @JvmStatic

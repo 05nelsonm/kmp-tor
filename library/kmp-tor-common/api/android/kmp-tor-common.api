@@ -5,12 +5,15 @@ public final class io/matthewnelson/kmp/tor/common/BuildConfig {
 	public fun <init> ()V
 }
 
-public abstract interface class io/matthewnelson/kmp/tor/common/address/IPAddress : android/os/Parcelable {
-	public static final field Companion Lio/matthewnelson/kmp/tor/common/address/IPAddress$Companion;
+public abstract interface class io/matthewnelson/kmp/tor/common/address/Address : android/os/Parcelable {
 	public abstract fun canonicalHostname ()Ljava/lang/String;
+	public abstract fun getValue ()Ljava/lang/String;
+}
+
+public abstract interface class io/matthewnelson/kmp/tor/common/address/IPAddress : io/matthewnelson/kmp/tor/common/address/Address {
+	public static final field Companion Lio/matthewnelson/kmp/tor/common/address/IPAddress$Companion;
 	public static fun fromString (Ljava/lang/String;)Lio/matthewnelson/kmp/tor/common/address/IPAddress;
 	public static fun fromStringOrNull (Ljava/lang/String;)Lio/matthewnelson/kmp/tor/common/address/IPAddress;
-	public abstract fun getValue ()Ljava/lang/String;
 }
 
 public final class io/matthewnelson/kmp/tor/common/address/IPAddress$Companion {
@@ -20,12 +23,14 @@ public final class io/matthewnelson/kmp/tor/common/address/IPAddress$Companion {
 
 public abstract interface class io/matthewnelson/kmp/tor/common/address/IPAddressV4 : io/matthewnelson/kmp/tor/common/address/IPAddress {
 	public static final field Companion Lio/matthewnelson/kmp/tor/common/address/IPAddressV4$Companion;
+	public static fun fromString (Ljava/lang/String;)Lio/matthewnelson/kmp/tor/common/address/IPAddressV4;
 	public static fun fromStringOrNull (Ljava/lang/String;)Lio/matthewnelson/kmp/tor/common/address/IPAddressV4;
 	public static fun getREGEX ()Lkotlin/text/Regex;
 	public static fun invoke (Ljava/lang/String;)Lio/matthewnelson/kmp/tor/common/address/IPAddressV4;
 }
 
 public final class io/matthewnelson/kmp/tor/common/address/IPAddressV4$Companion {
+	public final fun fromString (Ljava/lang/String;)Lio/matthewnelson/kmp/tor/common/address/IPAddressV4;
 	public final fun fromStringOrNull (Ljava/lang/String;)Lio/matthewnelson/kmp/tor/common/address/IPAddressV4;
 	public final fun getREGEX ()Lkotlin/text/Regex;
 	public final fun invoke (Ljava/lang/String;)Lio/matthewnelson/kmp/tor/common/address/IPAddressV4;
@@ -33,24 +38,24 @@ public final class io/matthewnelson/kmp/tor/common/address/IPAddressV4$Companion
 
 public abstract interface class io/matthewnelson/kmp/tor/common/address/IPAddressV6 : io/matthewnelson/kmp/tor/common/address/IPAddress {
 	public static final field Companion Lio/matthewnelson/kmp/tor/common/address/IPAddressV6$Companion;
+	public static fun fromString (Ljava/lang/String;)Lio/matthewnelson/kmp/tor/common/address/IPAddressV6;
 	public static fun fromStringOrNull (Ljava/lang/String;)Lio/matthewnelson/kmp/tor/common/address/IPAddressV6;
 	public static fun getREGEX ()Lkotlin/text/Regex;
 	public static fun invoke (Ljava/lang/String;)Lio/matthewnelson/kmp/tor/common/address/IPAddressV6;
 }
 
 public final class io/matthewnelson/kmp/tor/common/address/IPAddressV6$Companion {
+	public final fun fromString (Ljava/lang/String;)Lio/matthewnelson/kmp/tor/common/address/IPAddressV6;
 	public final fun fromStringOrNull (Ljava/lang/String;)Lio/matthewnelson/kmp/tor/common/address/IPAddressV6;
 	public final fun getREGEX ()Lkotlin/text/Regex;
 	public final fun invoke (Ljava/lang/String;)Lio/matthewnelson/kmp/tor/common/address/IPAddressV6;
 }
 
-public abstract interface class io/matthewnelson/kmp/tor/common/address/OnionAddress : android/os/Parcelable {
+public abstract interface class io/matthewnelson/kmp/tor/common/address/OnionAddress : io/matthewnelson/kmp/tor/common/address/Address {
 	public static final field Companion Lio/matthewnelson/kmp/tor/common/address/OnionAddress$Companion;
-	public abstract fun canonicalHostname ()Ljava/lang/String;
 	public abstract fun decode ()[B
 	public static fun fromString (Ljava/lang/String;)Lio/matthewnelson/kmp/tor/common/address/OnionAddress;
 	public static fun fromStringOrNull (Ljava/lang/String;)Lio/matthewnelson/kmp/tor/common/address/OnionAddress;
-	public abstract fun getValue ()Ljava/lang/String;
 	public abstract fun getValueDotOnion ()Ljava/lang/String;
 }
 

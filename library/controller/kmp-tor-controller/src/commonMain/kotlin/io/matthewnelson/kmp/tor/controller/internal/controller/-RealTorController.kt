@@ -31,6 +31,7 @@ import io.matthewnelson.kmp.tor.controller.common.config.HiddenServiceEntry
 import io.matthewnelson.kmp.tor.controller.common.config.TorConfig
 import io.matthewnelson.kmp.tor.controller.common.control.TorControlOnionClientAuth
 import io.matthewnelson.kmp.tor.controller.common.control.usecase.TorControlInfoGet
+import io.matthewnelson.kmp.tor.controller.common.control.usecase.TorControlMapAddress
 import io.matthewnelson.kmp.tor.controller.common.control.usecase.TorControlOnionAdd
 import io.matthewnelson.kmp.tor.controller.common.control.usecase.TorControlSignal
 import io.matthewnelson.kmp.tor.controller.common.events.TorEvent
@@ -450,9 +451,13 @@ internal class RealTorController(
 //        return processorDelegate.infoProtocol()
 //    }
 
-//    override suspend fun mapAddress(): Result<Map<String, String>> {
-//        return processorDelegate.mapAddress()
-//    }
+    override suspend fun mapAddress(mapping: TorControlMapAddress.Mapping): Result<TorControlMapAddress.Mapped> {
+        return processorDelegate.mapAddress(mapping)
+    }
+
+    override suspend fun mapAddress(mappings: Set<TorControlMapAddress.Mapping>): Result<Set<TorControlMapAddress.Mapped>> {
+        return processorDelegate.mapAddress(mappings)
+    }
 
     override suspend fun onionAdd(
         privateKey: OnionAddress.PrivateKey,
