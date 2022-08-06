@@ -26,11 +26,9 @@ import io.matthewnelson.kmp.tor.PlatformInstaller;
 import io.matthewnelson.kmp.tor.PlatformInstaller.InstallOption;
 import io.matthewnelson.kmp.tor.TorConfigProviderJvm;
 import io.matthewnelson.kmp.tor.common.address.OnionAddress;
-import io.matthewnelson.kmp.tor.common.address.OnionUrl;
 import io.matthewnelson.kmp.tor.common.address.Port;
 import io.matthewnelson.kmp.tor.common.address.PortProxy;
 import io.matthewnelson.kmp.tor.common.address.ProxyAddress;
-import io.matthewnelson.kmp.tor.common.address.Scheme;
 import io.matthewnelson.kmp.tor.controller.common.config.TorConfig;
 import io.matthewnelson.kmp.tor.controller.common.config.TorConfig.Setting.*;
 import io.matthewnelson.kmp.tor.controller.common.config.TorConfig.Option.*;
@@ -329,8 +327,7 @@ public class App extends Application {
                     Log.d(
                         "TorListener",
                         "New HiddenService: \n - Address: " +
-                        new OnionUrl(hsEntry.address, "", null, Scheme.HTTPS) +
-//                        "https://" + hsEntry.address.canonicalHostname() +
+                        "https://" + hsEntry.address.canonicalHostname() +
                         "\n - PrivateKey: " + hsEntry.privateKey
                     );
 
