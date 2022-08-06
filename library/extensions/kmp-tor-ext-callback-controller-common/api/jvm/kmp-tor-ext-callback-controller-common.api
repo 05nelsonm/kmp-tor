@@ -121,6 +121,8 @@ public abstract interface class io/matthewnelson/kmp/tor/ext/callback/controller
 }
 
 public abstract interface class io/matthewnelson/kmp/tor/ext/callback/controller/common/control/usecase/CallbackTorControlResolve {
+	public abstract fun resolve (Lio/matthewnelson/kmp/tor/common/address/IPAddressV4;ZLio/matthewnelson/kmp/tor/ext/callback/common/TorCallback;Lio/matthewnelson/kmp/tor/ext/callback/common/TorCallback;)Lio/matthewnelson/kmp/tor/ext/callback/common/Task;
+	public abstract fun resolve (Ljava/lang/String;ZLio/matthewnelson/kmp/tor/ext/callback/common/TorCallback;Lio/matthewnelson/kmp/tor/ext/callback/common/TorCallback;)Lio/matthewnelson/kmp/tor/ext/callback/common/Task;
 }
 
 public abstract interface class io/matthewnelson/kmp/tor/ext/callback/controller/common/control/usecase/CallbackTorControlSetEvents {

@@ -15,6 +15,8 @@
  **/
 package io.matthewnelson.kmp.tor.controller.common.control.usecase
 
+import io.matthewnelson.kmp.tor.common.address.IPAddressV4
+
 /**
  * "RESOLVE" *Option *Address CRLF
  *
@@ -25,7 +27,14 @@ package io.matthewnelson.kmp.tor.controller.common.control.usecase
  * */
 interface TorControlResolve {
 
-    // TODO: Implement
-//    suspend fun resolve(): Result<Any?>
+    suspend fun resolve(
+        hostname: String,
+        reverse: Boolean,
+    ): Result<Any?>
+
+    suspend fun resolve(
+        ipAddress: IPAddressV4,
+        reverse: Boolean,
+    ): Result<Any?>
 
 }

@@ -15,6 +15,7 @@
  **/
 package io.matthewnelson.kmp.tor.manager.internal
 
+import io.matthewnelson.kmp.tor.common.address.IPAddressV4
 import io.matthewnelson.kmp.tor.common.address.OnionAddress
 import io.matthewnelson.kmp.tor.common.address.OnionAddressV3
 import io.matthewnelson.kmp.tor.common.clientauth.ClientName
@@ -226,11 +227,17 @@ internal abstract class BaseTorManager: SynchronizedObject(), TorControlManager 
         }
     }
 
-//    override suspend fun resolve(): Result<Any?> {
-//        return provide<TorControlResolve, Any?> {
-//            resolve()
-//        }
-//    }
+    override suspend fun resolve(hostname: String, reverse: Boolean): Result<Any?> {
+        return provide<TorControlResolve, Any?> {
+            resolve(hostname, reverse)
+        }
+    }
+
+    override suspend fun resolve(ipAddress: IPAddressV4, reverse: Boolean): Result<Any?> {
+        return provide<TorControlResolve, Any?> {
+            resolve(ipAddress, reverse)
+        }
+    }
 
     override suspend fun setEvents(events: Set<TorEvent>): Result<Any?> {
         return provide<TorControlSetEvents, Any?> {

@@ -3084,6 +3084,8 @@ public abstract interface class io/matthewnelson/kmp/tor/controller/common/contr
 }
 
 public abstract interface class io/matthewnelson/kmp/tor/controller/common/control/usecase/TorControlResolve {
+	public abstract fun resolve-0E7RQCE (Lio/matthewnelson/kmp/tor/common/address/IPAddressV4;ZLkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public abstract fun resolve-0E7RQCE (Ljava/lang/String;ZLkotlin/coroutines/Continuation;)Ljava/lang/Object;
 }
 
 public abstract interface class io/matthewnelson/kmp/tor/controller/common/control/usecase/TorControlSetEvents {
