@@ -43,6 +43,7 @@ sealed interface OnionAddress: Address {
          * string, or the properly formatted address itself.
          *
          * @see [findOnionAddressFromUrl]
+         * @see [fromStringOrNull]
          * */
         @JvmStatic
         @Throws(IllegalArgumentException::class)

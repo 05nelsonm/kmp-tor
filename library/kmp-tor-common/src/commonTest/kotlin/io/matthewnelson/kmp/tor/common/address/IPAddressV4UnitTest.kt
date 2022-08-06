@@ -58,6 +58,13 @@ class IPAddressV4UnitTest {
         assertEquals(expected, actual)
     }
 
+    @Test
+    fun givenIPAddressV4Url_whenFromString_returnsSuccess() {
+        val expected = IPAddressV4("192.168.7.111")
+        val actual = IPAddressV4.fromStringOrNull("https://username:password@${expected.canonicalHostname()}:9822/some/path")
+        assertEquals(expected, actual)
+    }
+
     companion object {
         val IPV4_TEST_ADDRESSES = """
             66.250.238.47

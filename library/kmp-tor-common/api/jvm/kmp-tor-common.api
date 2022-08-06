@@ -16,12 +16,14 @@ public final class io/matthewnelson/kmp/tor/common/address/IPAddress$Companion {
 
 public abstract interface class io/matthewnelson/kmp/tor/common/address/IPAddressV4 : io/matthewnelson/kmp/tor/common/address/IPAddress {
 	public static final field Companion Lio/matthewnelson/kmp/tor/common/address/IPAddressV4$Companion;
+	public static fun fromString (Ljava/lang/String;)Lio/matthewnelson/kmp/tor/common/address/IPAddressV4;
 	public static fun fromStringOrNull (Ljava/lang/String;)Lio/matthewnelson/kmp/tor/common/address/IPAddressV4;
 	public static fun getREGEX ()Lkotlin/text/Regex;
 	public static fun invoke (Ljava/lang/String;)Lio/matthewnelson/kmp/tor/common/address/IPAddressV4;
 }
 
 public final class io/matthewnelson/kmp/tor/common/address/IPAddressV4$Companion {
+	public final fun fromString (Ljava/lang/String;)Lio/matthewnelson/kmp/tor/common/address/IPAddressV4;
 	public final fun fromStringOrNull (Ljava/lang/String;)Lio/matthewnelson/kmp/tor/common/address/IPAddressV4;
 	public final fun getREGEX ()Lkotlin/text/Regex;
 	public final fun invoke (Ljava/lang/String;)Lio/matthewnelson/kmp/tor/common/address/IPAddressV4;
@@ -29,12 +31,14 @@ public final class io/matthewnelson/kmp/tor/common/address/IPAddressV4$Companion
 
 public abstract interface class io/matthewnelson/kmp/tor/common/address/IPAddressV6 : io/matthewnelson/kmp/tor/common/address/IPAddress {
 	public static final field Companion Lio/matthewnelson/kmp/tor/common/address/IPAddressV6$Companion;
+	public static fun fromString (Ljava/lang/String;)Lio/matthewnelson/kmp/tor/common/address/IPAddressV6;
 	public static fun fromStringOrNull (Ljava/lang/String;)Lio/matthewnelson/kmp/tor/common/address/IPAddressV6;
 	public static fun getREGEX ()Lkotlin/text/Regex;
 	public static fun invoke (Ljava/lang/String;)Lio/matthewnelson/kmp/tor/common/address/IPAddressV6;
 }
 
 public final class io/matthewnelson/kmp/tor/common/address/IPAddressV6$Companion {
+	public final fun fromString (Ljava/lang/String;)Lio/matthewnelson/kmp/tor/common/address/IPAddressV6;
 	public final fun fromStringOrNull (Ljava/lang/String;)Lio/matthewnelson/kmp/tor/common/address/IPAddressV6;
 	public final fun getREGEX ()Lkotlin/text/Regex;
 	public final fun invoke (Ljava/lang/String;)Lio/matthewnelson/kmp/tor/common/address/IPAddressV6;

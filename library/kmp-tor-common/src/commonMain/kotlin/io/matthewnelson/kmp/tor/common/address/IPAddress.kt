@@ -17,7 +17,7 @@ sealed interface IPAddress: Address {
         fun fromString(address: String): IPAddress {
             return IPAddressV4.fromStringOrNull(address)
                 ?: IPAddressV6.fromStringOrNull(address)
-                ?: throw IllegalArgumentException("'$address' was neither an IPv4 or IPv6 address")
+                ?: throw IllegalArgumentException("Failed to find an IPv4 or IPv6 address from $address")
         }
 
         @JvmStatic

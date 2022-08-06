@@ -53,7 +53,7 @@ sealed interface OnionAddressV3PrivateKey_ED25519: OnionAddress.PrivateKey {
         @JvmStatic
         @Throws(IllegalArgumentException::class)
         fun fromString(key: String): OnionAddressV3PrivateKey_ED25519 {
-            return RealOnionAddressV3PrivateKey_ED25519(key.stripBaseEncoding())
+            return invoke(key.stripBaseEncoding())
         }
 
         @JvmStatic
