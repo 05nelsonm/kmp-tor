@@ -646,22 +646,7 @@ class TorControllerIntegrationTest: TorTestHelper() {
     fun givenTorController_whenMapAddress_returnsSuccess() = runBlocking {
         manager.setEvents(setOf(TorEvent.AddressMap)).getOrThrow()
 
-        // Helper function to return all Mapped addresses from
-        // infoGet response.
-        //
-        // i7myviemoo4vnprq.virtual torproject.org NEVER
-        fun String.parseInfoMapping(): Set<Mapped> {
-            val lines = lines()
-            val set = LinkedHashSet<Mapped>(lines.size)
-
-            for (line in lines) {
-                val splits = line.split(' ')
-                set.add(Mapped(splits[0], splits[1]))
-            }
-
-            return set
-        }
-
+        var throwable: Throwable? = null
         try {
 
             val mapping1 = manager
@@ -694,21 +679,92 @@ class TorControllerIntegrationTest: TorTestHelper() {
 
             assertFalse(unMapping1Info.parseInfoMapping().contains(unMapping1))
             assertTrue(unMapping1.isUnmapping)
+        } catch (t: Throwable) {
+            throwable = t
         } finally {
-            // Unmap any remaining test data
-            manager
-                .infoGet(KeyWord.AddressMappings.All())
-                .onSuccess { result ->
-                    val toUnMap = result.parseInfoMapping().map { mapped ->
-                        Mapping.unmap(mapped.from)
-                    }.toSet()
-
-                    manager.mapAddress(toUnMap)
-                }
-
             manager.setEvents(emptySet())
+            removeAllMappings()
+            throwable?.let { throw it }
         }
 
         Unit
+    }
+
+    @Test
+    fun givenTorController_whenResolve_returnsSuccess() = runBlocking {
+        manager.setEvents(setOf(TorEvent.AddressMap)).getOrThrow()
+
+        val mappedAddresses = mutableSetOf<Mapped>()
+
+        val listener = object : TorManagerEvent.Listener() {
+            override fun eventAddressMap(output: String) {
+                mappedAddresses.addAll(output.parseInfoMapping())
+            }
+        }
+
+        var throwable: Throwable? = null
+        try {
+            awaitBootstrap()
+            manager.addListener(listener)
+            manager.resolve(hostname = "torproject.org", reverse = false).getOrThrow()
+
+            var timeout = 30_000L
+            while (timeout > 0 && mappedAddresses.isEmpty()) {
+                delay(100L)
+                timeout -= 100L
+            }
+
+            val mapped = mappedAddresses.find { it.from == "torproject.org" }
+            assertNotNull(mapped)
+        } catch (t: Throwable) {
+            throwable = t
+        } finally {
+            manager.setEvents(emptySet())
+            manager.removeListener(listener)
+            removeAllMappings()
+            throwable?.let { throw it }
+        }
+
+        Unit
+    }
+
+    // Helper function to return all Mapped addresses from
+    // infoGet response.
+    //
+    // i7myviemoo4vnprq.virtual torproject.org NEVER
+    private fun String.parseInfoMapping(): Set<Mapped> {
+        val lines = lines()
+        val set = LinkedHashSet<Mapped>(lines.size)
+
+        for (line in lines) {
+            try {
+                val splits = line.split(' ')
+                val from = splits[0]
+                val to = splits[1]
+
+                if (to == "<error>") continue
+
+                set.add(Mapped(from, to))
+            } catch (_: IndexOutOfBoundsException) {
+                continue
+            }
+        }
+
+        return set
+    }
+
+    private suspend fun removeAllMappings() {
+        // Unmap any remaining test data
+        manager
+            .infoGet(KeyWord.AddressMappings.All())
+            .onSuccess { result ->
+                val toUnMap = result.parseInfoMapping().map { mapped ->
+                    Mapping.unmap(mapped.from)
+                }.toSet()
+
+                if (toUnMap.isNotEmpty()) {
+                    manager.mapAddress(toUnMap)
+                }
+            }
     }
 }

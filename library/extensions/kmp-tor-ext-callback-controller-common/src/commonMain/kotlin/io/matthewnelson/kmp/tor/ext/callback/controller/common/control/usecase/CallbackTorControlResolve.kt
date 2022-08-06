@@ -15,6 +15,11 @@
  **/
 package io.matthewnelson.kmp.tor.ext.callback.controller.common.control.usecase
 
+import io.matthewnelson.kmp.tor.common.address.IPAddressV4
+import io.matthewnelson.kmp.tor.ext.callback.common.Task
+import io.matthewnelson.kmp.tor.ext.callback.common.TorCallback
+import io.matthewnelson.kmp.tor.controller.common.control.usecase.TorControlResolve
+
 /**
  * "RESOLVE" *Option *Address CRLF
  *
@@ -22,10 +27,23 @@ package io.matthewnelson.kmp.tor.ext.callback.controller.common.control.usecase
  * Address = a hostname or IPv4 address
  *
  * https://torproject.gitlab.io/torspec/control-spec/#resolve
+ *
+ * @see [TorControlResolve]
  * */
 interface CallbackTorControlResolve {
 
-    // TODO: Implement
-//    suspend fun resolve(): Result<Any?>
+    fun resolve(
+        hostname: String,
+        reverse: Boolean,
+        failure: TorCallback<Throwable>?,
+        success: TorCallback<Any?>,
+    ): Task
+
+    fun resolve(
+        ipAddress: IPAddressV4,
+        reverse: Boolean,
+        failure: TorCallback<Throwable>?,
+        success: TorCallback<Any?>,
+    ): Task
 
 }

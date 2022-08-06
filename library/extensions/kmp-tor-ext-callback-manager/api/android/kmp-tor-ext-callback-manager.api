@@ -50,6 +50,8 @@ public final class io/matthewnelson/kmp/tor/ext/callback/manager/CallbackTorMana
 	public fun onionDel (Lio/matthewnelson/kmp/tor/common/address/OnionAddress;Lio/matthewnelson/kmp/tor/ext/callback/common/TorCallback;Lio/matthewnelson/kmp/tor/ext/callback/common/TorCallback;)Lio/matthewnelson/kmp/tor/ext/callback/common/Task;
 	public synthetic fun removeListener (Lio/matthewnelson/kmp/tor/controller/common/events/TorEvent$SealedListener;)Z
 	public fun removeListener (Lio/matthewnelson/kmp/tor/manager/common/event/TorManagerEvent$SealedListener;)Z
+	public fun resolve (Lio/matthewnelson/kmp/tor/common/address/IPAddressV4;ZLio/matthewnelson/kmp/tor/ext/callback/common/TorCallback;Lio/matthewnelson/kmp/tor/ext/callback/common/TorCallback;)Lio/matthewnelson/kmp/tor/ext/callback/common/Task;
+	public fun resolve (Ljava/lang/String;ZLio/matthewnelson/kmp/tor/ext/callback/common/TorCallback;Lio/matthewnelson/kmp/tor/ext/callback/common/TorCallback;)Lio/matthewnelson/kmp/tor/ext/callback/common/Task;
 	public fun restart (Lio/matthewnelson/kmp/tor/ext/callback/common/TorCallback;Lio/matthewnelson/kmp/tor/ext/callback/common/TorCallback;)Lio/matthewnelson/kmp/tor/ext/callback/common/Task;
 	public fun restartQuietly ()V
 	public fun setEvents (Ljava/util/Set;Lio/matthewnelson/kmp/tor/ext/callback/common/TorCallback;Lio/matthewnelson/kmp/tor/ext/callback/common/TorCallback;)Lio/matthewnelson/kmp/tor/ext/callback/common/Task;

@@ -30,10 +30,7 @@ import io.matthewnelson.kmp.tor.controller.common.config.ConfigEntry
 import io.matthewnelson.kmp.tor.controller.common.config.HiddenServiceEntry
 import io.matthewnelson.kmp.tor.controller.common.config.TorConfig
 import io.matthewnelson.kmp.tor.controller.common.control.TorControlOnionClientAuth
-import io.matthewnelson.kmp.tor.controller.common.control.usecase.TorControlInfoGet
-import io.matthewnelson.kmp.tor.controller.common.control.usecase.TorControlMapAddress
-import io.matthewnelson.kmp.tor.controller.common.control.usecase.TorControlOnionAdd
-import io.matthewnelson.kmp.tor.controller.common.control.usecase.TorControlSignal
+import io.matthewnelson.kmp.tor.controller.common.control.usecase.*
 import io.matthewnelson.kmp.tor.controller.common.events.TorEvent
 import io.matthewnelson.kmp.tor.controller.common.exceptions.TorControllerException
 import io.matthewnelson.kmp.tor.controller.common.internal.PlatformUtil
@@ -630,11 +627,28 @@ internal class RealTorControlProcessor(
         }
     }
 
-//    override suspend fun resolve(): Result<Any?> {
-//        return processorLock.withContextAndLock {
-//            TODO("Not yet implemented")
-//        }
-//    }
+    override suspend fun resolve(hostname: String, reverse: Boolean): Result<Any?> {
+        return processorLock.withContextAndLock {
+            val command = StringBuilder("RESOLVE").apply {
+                append(SP)
+
+                if (reverse) {
+                    append("mode=reverse")
+                    append(SP)
+                }
+
+                append(hostname)
+
+                append(CLRF)
+            }.toString()
+
+            Result.success(processCommand(command))
+        }
+    }
+
+    override suspend fun resolve(ipAddress: IPAddressV4, reverse: Boolean): Result<Any?> {
+        return resolve(ipAddress.value, reverse)
+    }
 
     override suspend fun setEvents(events: Set<TorEvent>): Result<Any?> {
         return processorLock.withContextAndLock {

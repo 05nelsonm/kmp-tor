@@ -34,6 +34,8 @@ public final class io/matthewnelson/kmp/tor/ext/callback/controller/CallbackTorC
 	public fun ownershipDrop (Lio/matthewnelson/kmp/tor/ext/callback/common/TorCallback;Lio/matthewnelson/kmp/tor/ext/callback/common/TorCallback;)Lio/matthewnelson/kmp/tor/ext/callback/common/Task;
 	public fun ownershipTake (Lio/matthewnelson/kmp/tor/ext/callback/common/TorCallback;Lio/matthewnelson/kmp/tor/ext/callback/common/TorCallback;)Lio/matthewnelson/kmp/tor/ext/callback/common/Task;
 	public fun removeListener (Lio/matthewnelson/kmp/tor/controller/common/events/TorEvent$SealedListener;)Z
+	public fun resolve (Lio/matthewnelson/kmp/tor/common/address/IPAddressV4;ZLio/matthewnelson/kmp/tor/ext/callback/common/TorCallback;Lio/matthewnelson/kmp/tor/ext/callback/common/TorCallback;)Lio/matthewnelson/kmp/tor/ext/callback/common/Task;
+	public fun resolve (Ljava/lang/String;ZLio/matthewnelson/kmp/tor/ext/callback/common/TorCallback;Lio/matthewnelson/kmp/tor/ext/callback/common/TorCallback;)Lio/matthewnelson/kmp/tor/ext/callback/common/Task;
 	public fun setEvents (Ljava/util/Set;Lio/matthewnelson/kmp/tor/ext/callback/common/TorCallback;Lio/matthewnelson/kmp/tor/ext/callback/common/TorCallback;)Lio/matthewnelson/kmp/tor/ext/callback/common/Task;
 	public fun signal (Lio/matthewnelson/kmp/tor/controller/common/control/usecase/TorControlSignal$Signal;Lio/matthewnelson/kmp/tor/ext/callback/common/TorCallback;Lio/matthewnelson/kmp/tor/ext/callback/common/TorCallback;)Lio/matthewnelson/kmp/tor/ext/callback/common/Task;
 }

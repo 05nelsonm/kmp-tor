@@ -15,6 +15,7 @@
  **/
 package io.matthewnelson.kmp.tor.controller.internal.controller
 
+import io.matthewnelson.kmp.tor.common.address.IPAddressV4
 import io.matthewnelson.kmp.tor.common.address.OnionAddress
 import io.matthewnelson.kmp.tor.common.address.OnionAddressV3
 import io.matthewnelson.kmp.tor.common.annotation.ExperimentalTorApi
@@ -30,10 +31,7 @@ import io.matthewnelson.kmp.tor.controller.common.config.ConfigEntry
 import io.matthewnelson.kmp.tor.controller.common.config.HiddenServiceEntry
 import io.matthewnelson.kmp.tor.controller.common.config.TorConfig
 import io.matthewnelson.kmp.tor.controller.common.control.TorControlOnionClientAuth
-import io.matthewnelson.kmp.tor.controller.common.control.usecase.TorControlInfoGet
-import io.matthewnelson.kmp.tor.controller.common.control.usecase.TorControlMapAddress
-import io.matthewnelson.kmp.tor.controller.common.control.usecase.TorControlOnionAdd
-import io.matthewnelson.kmp.tor.controller.common.control.usecase.TorControlSignal
+import io.matthewnelson.kmp.tor.controller.common.control.usecase.*
 import io.matthewnelson.kmp.tor.controller.common.events.TorEvent
 import io.matthewnelson.kmp.tor.controller.common.exceptions.ControllerShutdownException
 import io.matthewnelson.kmp.tor.controller.common.exceptions.TorControllerException
@@ -510,9 +508,13 @@ internal class RealTorController(
         return processorDelegate.ownershipTake()
     }
 
-//    override suspend fun resolve(): Result<Any?> {
-//        return processorDelegate.resolve()
-//    }
+    override suspend fun resolve(hostname: String, reverse: Boolean): Result<Any?> {
+        return processorDelegate.resolve(hostname, reverse)
+    }
+
+    override suspend fun resolve(ipAddress: IPAddressV4, reverse: Boolean): Result<Any?> {
+        return processorDelegate.resolve(ipAddress, reverse)
+    }
 
     override suspend fun setEvents(events: Set<TorEvent>): Result<Any?> {
         return processorDelegate.setEvents(events)

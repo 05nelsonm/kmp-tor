@@ -15,6 +15,7 @@
  **/
 package io.matthewnelson.kmp.tor.ext.callback.manager
 
+import io.matthewnelson.kmp.tor.common.address.IPAddressV4
 import io.matthewnelson.kmp.tor.common.address.OnionAddress
 import io.matthewnelson.kmp.tor.common.address.OnionAddressV3
 import io.matthewnelson.kmp.tor.common.annotation.InternalTorApi
@@ -391,6 +392,28 @@ class CallbackTorManager(
     ): Task {
         return provideOrFail(failure, success) {
             onionClientAuthView(address)
+        }
+    }
+
+    override fun resolve(
+        hostname: String,
+        reverse: Boolean,
+        failure: TorCallback<Throwable>?,
+        success: TorCallback<Any?>
+    ): Task {
+        return provideOrFail(failure, success) {
+            resolve(hostname, reverse)
+        }
+    }
+
+    override fun resolve(
+        ipAddress: IPAddressV4,
+        reverse: Boolean,
+        failure: TorCallback<Throwable>?,
+        success: TorCallback<Any?>
+    ): Task {
+        return provideOrFail(failure, success) {
+            resolve(ipAddress, reverse)
         }
     }
 
