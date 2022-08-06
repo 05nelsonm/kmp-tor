@@ -63,6 +63,8 @@ fun TorConfig.Setting<*>.appendTo(sb: StringBuilder, isWriteTorConfig: Boolean):
         is GeoIpV6File,
         is RunAsDaemon,
         is SyslogIdentityTag,
+        is VirtualAddrNetworkIPv4,
+        is VirtualAddrNetworkIPv6,
         is __OwningControllerProcess,
 
         // DEPRECATED
