@@ -157,11 +157,17 @@ internal abstract class BaseTorManager: SynchronizedObject(), TorControlManager 
 //        }
 //    }
 
-//    override suspend fun mapAddress(): Result<Map<String, String>> {
-//        return provide<TorControlMapAddress, Map<String, String>> {
-//            mapAddress()
-//        }
-//    }
+    override suspend fun mapAddress(mapping: TorControlMapAddress.Mapping): Result<TorControlMapAddress.Mapped> {
+        return provide<TorControlMapAddress, TorControlMapAddress.Mapped> {
+            mapAddress(mapping)
+        }
+    }
+
+    override suspend fun mapAddress(mappings: Set<TorControlMapAddress.Mapping>): Result<Set<TorControlMapAddress.Mapped>> {
+        return provide<TorControlMapAddress, Set<TorControlMapAddress.Mapped>> {
+            mapAddress(mappings)
+        }
+    }
 
     override suspend fun onionAdd(
         privateKey: OnionAddress.PrivateKey,

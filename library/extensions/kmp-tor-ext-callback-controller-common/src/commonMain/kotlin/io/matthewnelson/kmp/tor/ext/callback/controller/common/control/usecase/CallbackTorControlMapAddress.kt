@@ -15,14 +15,30 @@
  **/
 package io.matthewnelson.kmp.tor.ext.callback.controller.common.control.usecase
 
+import io.matthewnelson.kmp.tor.controller.common.control.usecase.TorControlMapAddress
+import io.matthewnelson.kmp.tor.controller.common.control.usecase.TorControlMapAddress.*
+import io.matthewnelson.kmp.tor.ext.callback.common.Task
+import io.matthewnelson.kmp.tor.ext.callback.common.TorCallback
+
 /**
  * "MAPADDRESS" 1*(Address "=" Address SP) CRLF
  *
  * https://torproject.gitlab.io/torspec/control-spec/#mapaddress
+ *
+ * @see [TorControlMapAddress]
  * */
 interface CallbackTorControlMapAddress {
 
-    // TODO: Implement
-//    suspend fun mapAddress(): Result<Map<String, String>>
+    fun mapAddress(
+        mapping: Mapping,
+        failure: TorCallback<Throwable>?,
+        success: TorCallback<Mapped>,
+    ): Task
+
+    fun mapAddress(
+        mappings: Set<Mapping>,
+        failure: TorCallback<Throwable>?,
+        success: TorCallback<Set<Mapped>>,
+    ): Task
 
 }
