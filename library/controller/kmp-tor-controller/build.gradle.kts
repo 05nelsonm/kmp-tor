@@ -32,7 +32,7 @@ kmpConfiguration {
             KmpTarget.Jvm.Android(
                 buildTools = versions.android.buildTools,
                 compileSdk = versions.android.sdkCompile,
-                minSdk = versions.android.sdkMin19,
+                minSdk = versions.android.sdkMin16,
                 target = {
                     publishLibraryVariants("release")
                 },
