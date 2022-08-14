@@ -298,7 +298,7 @@ public class App extends Application {
                 try {
                     ProxyAddress socks = info.socksInfoToProxyAddress().iterator().next();
                     InetSocketAddress socketAddress = new InetSocketAddress(
-                        socks.ipAddress,
+                        socks.address.getValue(),
                         socks.port.getValue()
                     );
 
