@@ -19,6 +19,7 @@ package io.matthewnelson.kmp.tor.controller
 
 import android.net.LocalSocket
 import android.net.LocalSocketAddress
+import android.os.Build
 import io.matthewnelson.kmp.tor.common.address.ProxyAddress
 import io.matthewnelson.kmp.tor.common.annotation.ExperimentalTorApi
 import io.matthewnelson.kmp.tor.common.annotation.InternalTorApi
@@ -93,7 +94,7 @@ actual interface TorController: TorControlProcessor, TorEventProcessor<TorEvent.
             }
 
             val dispatcher = getTorControllerDispatcher()
-            val socket = LocalSocket(LocalSocket.SOCKET_STREAM)
+            val socket = LocalSocket()
 
             try {
 
@@ -108,10 +109,16 @@ actual interface TorController: TorControlProcessor, TorEventProcessor<TorEvent.
                     )
                 }
 
+                val closeable: Closeable = if (Build.VERSION.SDK_INT > Build.VERSION_CODES.JELLY_BEAN_MR1) {
+                    socket
+                } else {
+                    Closeable { socket.close() }
+                }
+
                 return RealTorController(
                     reader = ReaderWrapper.wrap(reader),
                     writer = WriterWrapper.wrap(writer),
-                    socket = SocketWrapper.wrap(socket),
+                    socket = SocketWrapper.wrap(closeable),
                     dispatcher = dispatcher,
                 )
             } catch (e: Exception) {
