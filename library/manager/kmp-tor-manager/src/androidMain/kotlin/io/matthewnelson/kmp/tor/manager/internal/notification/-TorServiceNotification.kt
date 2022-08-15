@@ -568,7 +568,8 @@ private class RealTorServiceNotification(
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                     builder.setColor(color.retrieve(service))
                 }
-            },            setContentText = { text ->
+            },
+            setContentText = { text ->
                 builder.setContentText(text)
             },
             setContentTitle = { title ->
