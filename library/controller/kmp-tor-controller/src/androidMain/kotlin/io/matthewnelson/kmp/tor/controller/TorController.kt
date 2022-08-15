@@ -109,7 +109,7 @@ actual interface TorController: TorControlProcessor, TorEventProcessor<TorEvent.
                     )
                 }
 
-                val closeable: Closeable = if (Build.VERSION.SDK_INT > Build.VERSION_CODES.JELLY_BEAN_MR1) {
+                val closeable: Closeable = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
                     socket
                 } else {
                     Closeable { socket.close() }
