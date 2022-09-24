@@ -58,7 +58,7 @@
         ** See also the above permissions needed **
 
         For additional information and explanations, see HERE:
-        - https://github.com/05nelsonm/kmp-tor/blob/master/samples/android/src/main/res/values/attrs.xml
+        - https://github.com/05nelsonm/kmp-tor/blob/master/samples/kotlin/android/src/main/res/values/attrs.xml
         -->
         <meta-data
             android:name="io.matthewnelson.kmp.tor.enable_foreground"
