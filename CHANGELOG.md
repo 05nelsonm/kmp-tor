@@ -1,5 +1,14 @@
 # CHANGELOG
 
+## Version 0.4.7.8+1.3.1 (2022-09-24)
+ - Refactors Android instantiation of `TorController` when using unix
+   domain sockets (i.e. `LocalSocket`).
+     - Allows for `minSdk` to be reduced from `19` -> `16` for modules
+         - `kmp-tor-controller`
+         - `kmp-tor-manager`
+         - `kmp-tor-ext-callback-controller`
+         - `kmp-tor-ext-callback-manager`
+
 ## Version 0.4.7.8+1.3.0 (2022-08-06)
  - `kmp-tor-common` module:
      - Adds base `Address` interface for all `*Address` classes to
