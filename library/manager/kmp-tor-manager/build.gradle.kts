@@ -93,6 +93,6 @@ kmpConfiguration {
 kmpPublish {
     setupModule(
         pomDescription = "Kotlin Components' TorManager for managing startup, shutdown, state, etc.",
-        holdPublication = env.kmpTor.holdPublication
+        holdPublication = env.kmpTorAll.isBinaryRelease || env.kmpTor.holdPublication
     )
 }

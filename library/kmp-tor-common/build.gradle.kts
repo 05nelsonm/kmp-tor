@@ -76,6 +76,6 @@ kmpConfiguration {
 kmpPublish {
     setupModule(
         pomDescription = "Kotlin Components' Tor common code and utils",
-        holdPublication = env.kmpTorCommon.holdPublication
+        holdPublication = env.kmpTorAll.isBinaryRelease || env.kmpTorCommon.holdPublication
     )
 }

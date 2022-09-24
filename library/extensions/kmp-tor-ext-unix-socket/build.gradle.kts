@@ -44,6 +44,6 @@ kmpConfiguration {
 kmpPublish {
     setupModule(
         pomDescription = "Kotlin Components' UnixSocket extension for JDK",
-        holdPublication = env.kmpTor.holdPublication
+        holdPublication = env.kmpTorAll.isBinaryRelease || env.kmpTor.holdPublication
     )
 }

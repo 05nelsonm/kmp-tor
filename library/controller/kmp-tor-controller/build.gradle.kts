@@ -89,6 +89,6 @@ kmpConfiguration {
 kmpPublish {
     setupModule(
         pomDescription = "Kotlin Components' TorController for interacting with Tor over it's control port",
-        holdPublication = env.kmpTor.holdPublication
+        holdPublication = env.kmpTorAll.isBinaryRelease || env.kmpTor.holdPublication
     )
 }

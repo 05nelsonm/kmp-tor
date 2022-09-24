@@ -1,5 +1,8 @@
 # CHANGELOG
 
+## Version 0.4.7.10+1.3.1 (2022-09-24)
+ - Bumps Tor from `0.4.7.8` -> `0.4.7.10`
+
 ## Version 0.4.7.8+1.3.1 (2022-09-24)
  - Refactors Android instantiation of `TorController` when using unix
    domain sockets (i.e. `LocalSocket`).

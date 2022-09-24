@@ -18,9 +18,9 @@ package kmp.tor
 @Suppress("ClassName")
 object env {
     // Must be either "-SNAPSHOT" || ""
-    private const val SNAPSHOT              = "-SNAPSHOT"
+    private const val SNAPSHOT              = ""
 
-    private const val MANAGER_VERSION_NAME  = "1.3.2"
+    private const val MANAGER_VERSION_NAME  = "1.3.1"
     //                       1.0.0-alpha1  ==     01_00_00_11
     //                       1.0.0-alpha2  ==     01_00_00_12
     //                       1.0.0-beta1   ==     01_00_00_21
@@ -29,13 +29,13 @@ object env {
     //                       1.0.1         ==     01_00_01_99
     //                       1.1.1         ==     01_01_01_99
     //                       1.15.1        ==     01_15_01_99
-    private const val MANAGER_VERSION_CODE  = /*0*/1_03_02_99
+    private const val MANAGER_VERSION_CODE  = /*0*/1_03_01_99
 
-    private const val BINARY_VERSION_NAME   = "0.4.7.8"
+    private const val BINARY_VERSION_NAME   = "0.4.7.10"
     //                       0.4.6.9       ==     00_04_06_09_00
     //                       0.4.6.9a      ==     00_04_06_09_01
     //                       0.4.6.9b      ==     00_04_06_09_02
-    private const val BINARY_VERSION_CODE   = /*00_0*/4_07_08_00
+    private const val BINARY_VERSION_CODE   = /*00_0*/4_07_10_00
 
     /**
      * Binaries exist in a different repo. Building against the staged
@@ -43,7 +43,9 @@ object env {
      * them to ensure everything is copacetic.
      * */
     object kmpTorBinaries {
+
         const val pollStagingRepo           = false
+
         object version {
             const val name                  = BINARY_VERSION_NAME
         }
@@ -59,7 +61,9 @@ object env {
      *  - :library:manager:kmp-tor-manager
      * */
     object kmpTor {
+
         const val holdPublication           = false
+
         object version {
             const val name                  = "$MANAGER_VERSION_NAME$SNAPSHOT"
             const val code                  = MANAGER_VERSION_CODE
@@ -71,7 +75,14 @@ object env {
      *  - :library:kmp-tor (combined tor binary + kmp-tor distribution)
      * */
     object kmpTorAll {
+
+        /**
+         * Indicates that the release is only bumping Tor versions,
+         * and to hold publication for all other modules.
+         * */
+        const val isBinaryRelease           = true
         const val holdPublication           = false
+
         object version {
             const val name                  = "$BINARY_VERSION_NAME+${kmpTor.version.name}"
             const val code                  = BINARY_VERSION_CODE + MANAGER_VERSION_CODE
@@ -88,7 +99,9 @@ object env {
      *  - :library:manager:kmp-tor-manager-common
      * */
     object kmpTorCommon {
+
         const val holdPublication           = false
+
         object version {
             const val name                  = kmpTor.version.name
             const val code                  = kmpTor.version.code
