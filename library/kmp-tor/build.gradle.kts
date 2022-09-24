@@ -51,12 +51,20 @@ kmpConfiguration {
             KmpTarget.Jvm.Jvm(
                 mainSourceSet = {
                     dependencies {
-                        implementation(project(":library:kmp-tor-internal"))
+                        if (env.kmpTorAll.isBinaryRelease) {
+                            implementation("${pConfig.group}:kmp-tor-internal:${env.kmpTor.version.name}")
+                        } else {
+                            implementation(project(":library:kmp-tor-internal"))
+                        }
                     }
                 },
                 testSourceSet = {
                     dependencies {
-                        implementation(project(":library:extensions:kmp-tor-ext-unix-socket"))
+                        if (env.kmpTorAll.isBinaryRelease) {
+                            implementation("${pConfig.group}:kmp-tor-ext-unix-socket:${env.kmpTor.version.name}")
+                        } else {
+                            implementation(project(":library:extensions:kmp-tor-ext-unix-socket"))
+                        }
 
                         // TODO: Remove once js binary targets are published
                         implementation("${pConfig.group}:kmp-tor-binary-linuxx64:${env.kmpTorBinaries.version.name}")
@@ -125,7 +133,11 @@ kmpConfiguration {
                 implementation("${pConfig.group}:kmp-tor-binary-geoip:${env.kmpTorBinaries.version.name}")
                 implementation("${pConfig.group}:kmp-tor-binary-extract:${env.kmpTorBinaries.version.name}")
 
-                api(project(":library:manager:kmp-tor-manager"))
+                if (env.kmpTorAll.isBinaryRelease) {
+                    api("${pConfig.group}:kmp-tor-manager:${env.kmpTor.version.name}")
+                } else {
+                    api(project(":library:manager:kmp-tor-manager"))
+                }
             }
         },
 
@@ -133,7 +145,12 @@ kmpConfiguration {
             dependencies {
                 implementation(depsTest.kotlin.coroutines)
                 implementation(kotlin("test"))
-                implementation(project(":library:extensions:kmp-tor-ext-callback-manager"))
+
+                if (env.kmpTorAll.isBinaryRelease) {
+                    implementation("${pConfig.group}:kmp-tor-ext-callback-manager:${env.kmpTor.version.name}")
+                } else {
+                    implementation(project(":library:extensions:kmp-tor-ext-callback-manager"))
+                }
             }
         },
 

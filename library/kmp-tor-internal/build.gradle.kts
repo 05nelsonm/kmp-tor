@@ -51,6 +51,6 @@ kmpConfiguration {
 kmpPublish {
     setupModule(
         pomDescription = "Kotlin Components' kmp-tor internal utils",
-        holdPublication = env.kmpTor.holdPublication
+        holdPublication = env.kmpTorAll.isBinaryRelease || env.kmpTor.holdPublication
     )
 }

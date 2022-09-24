@@ -48,6 +48,6 @@ kmpConfiguration {
 kmpPublish {
     setupModule(
         pomDescription = "Kotlin Components' TorCallback extension for non-coroutine consumers",
-        holdPublication = env.kmpTorCommon.holdPublication
+        holdPublication = env.kmpTorAll.isBinaryRelease || env.kmpTorCommon.holdPublication
     )
 }

@@ -73,6 +73,6 @@ kmpConfiguration {
 kmpPublish {
     setupModule(
         pomDescription = "Kotlin Components' Callback extension of TorController for non-coroutine consumers",
-        holdPublication = env.kmpTor.holdPublication
+        holdPublication = env.kmpTorAll.isBinaryRelease || env.kmpTor.holdPublication
     )
 }
