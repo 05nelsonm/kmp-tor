@@ -16,18 +16,11 @@
 package io.matthewnelson.kmp.tor
 
 import android.content.Context
-import io.matthewnelson.kmp.tor.binary.extract.ConstantsBinaries.FILE_NAME_GEOIPS_ZIP
-import io.matthewnelson.kmp.tor.binary.extract.ConstantsBinaries.FILE_NAME_GEOIPS_ZIP_SHA256
-import io.matthewnelson.kmp.tor.binary.extract.ConstantsBinaries.ZIP_SHA256_GEOIP
-import io.matthewnelson.kmp.tor.binary.extract.ZipArchiveExtractor
-import io.matthewnelson.kmp.tor.binary.extract.ZipExtractionException
+import io.matthewnelson.kmp.tor.binary.extract.*
 import io.matthewnelson.kmp.tor.controller.common.config.TorConfig
 import io.matthewnelson.kmp.tor.controller.common.file.Path
-import io.matthewnelson.kmp.tor.controller.common.file.toFile
-import io.matthewnelson.kmp.tor.internal.doesContentMatchExpected
 import io.matthewnelson.kmp.tor.manager.TorConfigProvider
 import io.matthewnelson.kmp.tor.manager.common.exceptions.TorManagerException
-import java.io.File
 
 /**
  * Android implementation for providing client [TorConfig] when loading Tor.
@@ -57,61 +50,26 @@ abstract class TorConfigProviderAndroid(context: Context): TorConfigProvider() {
 
     @Throws(TorManagerException::class)
     override fun extractGeoIpV4File(toLocation: Path) {
-        extract(toLocation, zipEntryName = "geoip", writeSha256SumOnExtraction = false)
+        try {
+            Extractor(appContext).extract(
+                resource = TorResourceGeoip,
+                destination = toLocation.value,
+                cleanExtraction = false
+            )
+        } catch (e: ExtractionException) {
+            throw TorManagerException(e)
+        }
     }
 
     @Throws(TorManagerException::class)
     override fun extractGeoIpV6File(toLocation: Path) {
-        extract(toLocation, zipEntryName = "geoip6", writeSha256SumOnExtraction = true)
-    }
-
-    @Throws(TorManagerException::class)
-    private fun extract(
-        toLocation: Path,
-        zipEntryName: String,
-        writeSha256SumOnExtraction: Boolean,
-    ) {
-        val sha256SumFile = File(workDir.value, FILE_NAME_GEOIPS_ZIP_SHA256)
-        val geoipFile = toLocation.toFile()
-        val sha256SumMatches = sha256SumFile.doesContentMatchExpected(ZIP_SHA256_GEOIP)
-
-        if (sha256SumMatches && geoipFile.exists()) {
-            return
-        }
-
-        val extractor = ZipArchiveExtractor.selective(
-            zipFileStreamProvider = {
-                try {
-                    appContext.assets.open("kmptor/${FILE_NAME_GEOIPS_ZIP}")
-                } catch (e: Exception) {
-                    throw TorManagerException(
-                        "Failed to open resource for $zipEntryName extraction", e
-                    )
-                }
-            },
-            postExtraction = {
-                if (!sha256SumMatches && writeSha256SumOnExtraction) {
-                    try {
-                        sha256SumFile.writeText(ZIP_SHA256_GEOIP)
-                    } catch (e: Exception) {
-                        delete()
-                        sha256SumFile.delete()
-                        throw TorManagerException("Failed to write $sha256SumFile", e)
-                    }
-                }
-            },
-            extractToFile = {
-                if (name == zipEntryName) {
-                    geoipFile
-                } else {
-                    null
-                }
-            }
-        )
-
         try {
-            extractor.extract()
-        } catch (e: ZipExtractionException) {
+            Extractor(appContext).extract(
+                resource = TorResourceGeoip6,
+                destination = toLocation.value,
+                cleanExtraction = false
+            )
+        } catch (e: ExtractionException) {
             throw TorManagerException(e)
         }
     }
