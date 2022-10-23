@@ -15,21 +15,7 @@
  **/
 package io.matthewnelson.kmp.tor
 
-import io.matthewnelson.kmp.tor.binary.extract.ConstantsBinaries.FILE_NAME_KMPTOR_ZIP
-import io.matthewnelson.kmp.tor.binary.extract.ConstantsBinaries.FILE_NAME_KMPTOR_ZIP_SHA256
-import io.matthewnelson.kmp.tor.binary.extract.ConstantsBinaries.ZIP_SHA256_LINUX_X64
-import io.matthewnelson.kmp.tor.binary.extract.ConstantsBinaries.ZIP_SHA256_LINUX_X86
-import io.matthewnelson.kmp.tor.binary.extract.ConstantsBinaries.ZIP_SHA256_MACOS_X64
-import io.matthewnelson.kmp.tor.binary.extract.ConstantsBinaries.ZIP_SHA256_MINGW_X64
-import io.matthewnelson.kmp.tor.binary.extract.ConstantsBinaries.ZIP_SHA256_MINGW_X86
-import io.matthewnelson.kmp.tor.binary.extract.ConstantsBinaries.ZIP_MANIFEST_LINUX_X64
-import io.matthewnelson.kmp.tor.binary.extract.ConstantsBinaries.ZIP_MANIFEST_LINUX_X86
-import io.matthewnelson.kmp.tor.binary.extract.ConstantsBinaries.ZIP_MANIFEST_MACOS_X64
-import io.matthewnelson.kmp.tor.binary.extract.ConstantsBinaries.ZIP_MANIFEST_MINGW_X64
-import io.matthewnelson.kmp.tor.binary.extract.ConstantsBinaries.ZIP_MANIFEST_MINGW_X86
-import io.matthewnelson.kmp.tor.binary.extract.ZipArchiveExtractor
-import io.matthewnelson.kmp.tor.internal.doesContentMatchExpected
-import io.matthewnelson.kmp.tor.manager.common.event.TorManagerEvent
+import io.matthewnelson.kmp.tor.binary.extract.*
 import io.matthewnelson.kmp.tor.manager.common.exceptions.TorManagerException
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
@@ -40,6 +26,7 @@ import java.io.IOException
  * Choose between the following supported platforms:
  *  - [linuxX64]
  *  - [linuxX86]
+ *  - [macosArm64]
  *  - [macosX64]
  *  - [mingwX64]
  *  - [mingwX86]
@@ -53,40 +40,33 @@ import java.io.IOException
  * */
 class PlatformInstaller private constructor(
     @JvmField
-    val os: String,
-    @JvmField
-    val arch: String,
-    @JvmField
-    val sha256Sum: String,
-    @JvmField
     val installOption: InstallOption,
-    private val archiveManifestProvider: () -> List<String>,
+    private val resource: TorResource.Binaries,
 ) {
 
     enum class InstallOption {
         /**
-         * Perform a clean install of Tor binaries every time Tor is
+         * Perform a clean installation of Tor binaries every time Tor is
          * started.
          * */
         CleanInstallOnEachStart,
 
         /**
-         * Perform a clean install of Tor binaries on first startup
+         * Perform a clean installation of Tor binaries on first startup
          * of Tor for the Application's runtime. Subsequent startups
          * will only perform a clean install if binary files are missing.
          * */
         CleanInstallFirstStartOnly,
 
         /**
-         * Perform a clean install of Tor binaries only if they are missing
+         * Perform a clean installation of Tor binaries only if they are missing
          * from the specified directory.
          *
-         * Note that upon successful extraction of binaries, the kmptor.zip
-         * file's sha256sum value is always written to a file in the specified
-         * installation directory (ie: [FILE_NAME_KMPTOR_ZIP_SHA256]). That
-         * persisted value is checked against [sha256Sum] such that upon
-         * dependency updates where new binary's are present, a clean install
-         * can be triggered.
+         * Note that upon successful extraction of binaries, the
+         * [TorResource.sha256sum] value is always written to a file in the
+         * specified installation directory. That persisted value is checked
+         * against [sha256Sum] such that upon dependency updates where new
+         * binaries are present, a clean install can be triggered.
          * */
         CleanInstallIfMissing,
     }
@@ -98,69 +78,84 @@ class PlatformInstaller private constructor(
         private const val MINGW = "mingw"
 
         // arch
+        private const val ARM64 = "arm64"
         private const val X64 = "x64"
         private const val X86 = "x86"
-
-        private const val TOR = "tor"
 
         @JvmStatic
         fun linuxX64(option: InstallOption): PlatformInstaller {
             return PlatformInstaller(
-                os = LINUX,
-                arch = X64,
-                sha256Sum = ZIP_SHA256_LINUX_X64,
                 installOption = option,
-                archiveManifestProvider = { ZIP_MANIFEST_LINUX_X64 },
+                resource = TorResourceLinuxX64,
             )
         }
 
         @JvmStatic
         fun linuxX86(option: InstallOption): PlatformInstaller {
             return PlatformInstaller(
-                os = LINUX,
-                arch = X86,
-                sha256Sum = ZIP_SHA256_LINUX_X86,
                 installOption = option,
-                archiveManifestProvider = { ZIP_MANIFEST_LINUX_X86 },
+                resource = TorResourceLinuxX86,
+            )
+        }
+
+        @JvmStatic
+        fun macosArm64(option: InstallOption): PlatformInstaller {
+            return PlatformInstaller(
+                installOption = option,
+                resource = TorResourceMacosArm64,
             )
         }
 
         @JvmStatic
         fun macosX64(option: InstallOption): PlatformInstaller {
             return PlatformInstaller(
-                os = MACOS,
-                arch = X64,
-                sha256Sum = ZIP_SHA256_MACOS_X64,
                 installOption = option,
-                archiveManifestProvider = { ZIP_MANIFEST_MACOS_X64 },
+                resource = TorResourceMacosX64,
             )
         }
 
         @JvmStatic
         fun mingwX64(option: InstallOption): PlatformInstaller {
             return PlatformInstaller(
-                os = MINGW,
-                arch = X64,
-                sha256Sum = ZIP_SHA256_MINGW_X64,
                 installOption = option,
-                archiveManifestProvider = { ZIP_MANIFEST_MINGW_X64 },
+                resource = TorResourceMingwX64
             )
         }
 
         @JvmStatic
         fun mingwX86(option: InstallOption): PlatformInstaller {
             return PlatformInstaller(
-                os = MINGW,
-                arch = X86,
-                sha256Sum = ZIP_SHA256_MINGW_X86,
                 installOption = option,
-                archiveManifestProvider = { ZIP_MANIFEST_MINGW_X86 },
+                resource = TorResourceMingwX86,
             )
         }
     }
 
+    @JvmField
+    val os: String = when (resource) {
+        is TorResourceLinuxX64,
+        is TorResourceLinuxX86 -> LINUX
+        is TorResourceMacosX64,
+        is TorResourceMacosArm64 -> MACOS
+        is TorResourceMingwX64,
+        is TorResourceMingwX86 -> MINGW
+    }
+
+    @JvmField
+    val arch: String = when (resource) {
+        is TorResourceLinuxX64 -> X64
+        is TorResourceLinuxX86 -> X86
+        is TorResourceMacosX64 -> X64
+        is TorResourceMacosArm64 -> ARM64
+        is TorResourceMingwX64 -> X64
+        is TorResourceMingwX86 -> X86
+    }
+
+    @JvmField
+    val sha256Sum: String = resource.sha256sum
+
     private val lock = Mutex()
-    private val installationDirs: MutableSet<String> = LinkedHashSet(1)
+    private val installationDirs: MutableSet<String> = LinkedHashSet(/* initialCapacity */1,/* loadFactor */ 1.0F)
 
     @get:JvmName("isLinux")
     val isLinux: Boolean get() = os == LINUX
@@ -175,138 +170,56 @@ class PlatformInstaller private constructor(
      * */
     @JvmSynthetic
     @Throws(TorManagerException::class)
-    internal suspend fun retrieveTor(
-        installationDir: File,
-        notify: (TorManagerEvent.Log.Debug) -> Unit,
-    ): File {
-        return when (installOption) {
-            InstallOption.CleanInstallOnEachStart -> {
-                doCleanInstall(installationDir, notify)
-            }
-            InstallOption.CleanInstallFirstStartOnly -> {
-                val canonicalPath = try {
-                    installationDir.canonicalPath
-                } catch (e: IOException) {
-                    throw TorManagerException(
-                        "Failed to retrieve canonical path of installation dir", e
+    internal suspend fun retrieveTor(installationDir: File): File {
+        val extractor = Extractor()
+
+        return try {
+            when (installOption) {
+                InstallOption.CleanInstallOnEachStart -> {
+                    extractor.extract(
+                        resource = resource,
+                        destinationDir = installationDir.path,
+                        cleanExtraction = true,
                     )
                 }
-
-                lock.withLock {
-                    if (installationDirs.contains(canonicalPath)) {
-                        doCleanInstallIfMissing(installationDir, notify)
-                    } else {
-                        val tor = doCleanInstall(installationDir, notify)
-                        installationDirs.add(canonicalPath)
-                        tor
-                    }
-                }
-            }
-            InstallOption.CleanInstallIfMissing -> {
-                doCleanInstallIfMissing(installationDir, notify)
-            }
-        }
-    }
-
-    @Throws(TorManagerException::class)
-    private fun doCleanInstall(
-        installationDir: File,
-        notify: (TorManagerEvent.Log.Debug) -> Unit,
-    ): File {
-        notify.invoke(TorManagerEvent.Log.Debug(
-            "Performing clean install of Tor binaries to directory: $installationDir"
-        ))
-
-        var tor: File? = null
-        val extractor = ZipArchiveExtractor.all(
-            destinationDir = installationDir,
-            postExtraction = {
-                for (file in this) {
-                    if (file.nameWithoutExtension.lowercase() == TOR) {
-                        tor = file
+                InstallOption.CleanInstallFirstStartOnly -> {
+                    val canonicalPath = try {
+                        installationDir.canonicalPath
+                    } catch (e: IOException) {
+                        throw TorManagerException("Failed to retrieve canonical path of installation dir", e)
                     }
 
-                    file.setExecutable(true, true)
-                }
-
-                if (tor == null) {
-                    for (file in this) {
-                        file.delete()
-                    }
-                    // let complete to throw exception.
-                } else {
-                    try {
-                        File(installationDir, FILE_NAME_KMPTOR_ZIP_SHA256).writeText(sha256Sum)
-                    } catch (e: Exception) {
-                        for (file in this) {
-                            file.delete()
+                    lock.withLock {
+                        if (installationDirs.contains(canonicalPath)) {
+                            extractor.extract(
+                                resource = resource,
+                                destinationDir = installationDir.path,
+                                cleanExtraction = false,
+                            )
+                        } else {
+                            val tor = extractor.extract(
+                                resource = resource,
+                                destinationDir = installationDir.path,
+                                cleanExtraction = true,
+                            )
+                            installationDirs.add(canonicalPath)
+                            tor
                         }
-                        throw e
                     }
                 }
-            },
-            zipFileStreamProvider = {
-                val path = "/kmptor/$os/$arch/$FILE_NAME_KMPTOR_ZIP"
-                javaClass.getResourceAsStream(path)
-                    ?: throw IOException("Failed to obtain resource stream at path: $path")
-            }
-        )
 
-        try {
-            extractor.extract()
-        } catch (e: Exception) {
+                InstallOption.CleanInstallIfMissing -> {
+                    extractor.extract(
+                        resource = resource,
+                        destinationDir = installationDir.path,
+                        cleanExtraction = false,
+                    )
+                }
+            }.let { path ->
+                File(path)
+            }
+        } catch (e: ExtractionException) {
             throw TorManagerException(e)
         }
-
-        return tor ?: throw TorManagerException("Failed to extract and retrieve the Tor executable")
-    }
-
-    @Throws(TorManagerException::class)
-    private fun doCleanInstallIfMissing(
-        installationDir: File,
-        notify: (TorManagerEvent.Log.Debug) -> Unit,
-    ): File {
-        val sha256SumFile = File(installationDir, FILE_NAME_KMPTOR_ZIP_SHA256)
-
-        if (!sha256SumFile.doesContentMatchExpected(sha256Sum)) {
-            return doCleanInstall(installationDir, notify)
-        }
-
-        var tor: File? = null
-        var existsCount = 0
-        val archiveManifestFiles = archiveManifestProvider.invoke().toManifestFiles(installationDir)
-
-        for (file in archiveManifestFiles) {
-            if (file.exists()) {
-                existsCount++
-                if (file.nameWithoutExtension.lowercase() == TOR) {
-                    tor = file
-                }
-            }
-        }
-
-        return tor?.let {
-            if (archiveManifestFiles.size == existsCount) {
-                notify.invoke(TorManagerEvent.Log.Debug(
-                    "Tor binaries detected. Skipping extraction"
-                ))
-                it
-            } else {
-                doCleanInstall(installationDir, notify)
-            }
-        } ?: doCleanInstall(installationDir, notify)
-    }
-
-    private fun List<String>.toManifestFiles(installationDir: File): List<File> {
-        val newList: MutableList<File> = ArrayList(size)
-        for (entry in this) {
-            // exclude directories
-            if (entry.endsWith('/')) {
-                continue
-            }
-
-            newList.add(File(installationDir, entry))
-        }
-        return newList
     }
 }

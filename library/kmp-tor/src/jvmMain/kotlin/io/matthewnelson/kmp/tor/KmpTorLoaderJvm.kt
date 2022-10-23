@@ -73,7 +73,7 @@ class KmpTorLoaderJvm(
         notify: (TorManagerEvent.Log) -> Unit,
     ) {
         val installationDir = (provider as TorConfigProviderJvm).installationDir.toFile()
-        val tor = installer.retrieveTor(installationDir, notify)
+        val tor = installer.retrieveTor(installationDir)
 
         val newLines: MutableList<String> = ArrayList(configLines.size + 1)
         newLines.add(tor.absolutePath)
