@@ -1,5 +1,23 @@
 # CHANGELOG
 
+## Version 4.7.10-1-1.3.1 (2022-10-23)
+ - Bumps `kmp-tor-binary` from `0.4.7.11` -> `4.7.11-1`
+     - Tor version stayed the same but was a sub-release of `kmp-tor-binary`
+       which contained improvements and changes for supporting Kotlin/JS in the
+       near future
+ - Adds support for `macOS arm64` for `Java` projects
+     - See the `kmp-tor-binary` project `README`'s `Java` section
+ - Reworks internals for extracting binary/geoip files to use new method
+   provided by `kmp-tor-binary` sub-release
+ - Changes the project's version scheme to be compliant with `npmjs` publication
+   so support in the very near future can be had
+     - Ex: `4.7.10  -  1  -  1.3.1`
+         - `tor` version `0.4.7.10`
+         - `kmp-tor-binary` sub-release `1`
+         - `kmp-tor` release `1.3.1`
+ - Bumps `kotlin-components` submodule to latest commit
+     - Build + publishing improvements
+
 ## Version 0.4.7.10+1.3.1 (2022-09-24)
  - Bumps Tor from `0.4.7.8` -> `0.4.7.10`
 

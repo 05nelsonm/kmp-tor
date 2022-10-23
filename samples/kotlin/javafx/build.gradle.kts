@@ -97,6 +97,7 @@ kotlin {
 
                 // Only supporting x86_64 (x64) for this sample
 //                implementation("io.matthewnelson.kotlin-components:kmp-tor-binary-linuxx86:${env.kmpTorBinaries.version.name}")
+//                implementation("io.matthewnelson.kotlin-components:kmp-tor-binary-macosarm64:${env.kmpTorBinaries.version.name}")
 //                implementation("io.matthewnelson.kotlin-components:kmp-tor-binary-mingwx86:${env.kmpTorBinaries.version.name}")
             }
         }
