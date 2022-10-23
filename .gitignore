@@ -20,7 +20,8 @@ out/
 # Gradle files
 .gradle/
 /build
-kotlin-js-store/
+
+# Yarn/NPM
 
 # Local configuration file (sdk path, etc)
 local.properties
