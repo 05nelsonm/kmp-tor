@@ -242,7 +242,7 @@ git pull --recurse-submodules
 [badge-coroutines]: https://img.shields.io/badge/coroutines-1.6.3-blue.svg?logo=kotlin
 [badge-encoding]: https://img.shields.io/badge/encoding-1.1.3-blue.svg?style=flat
 [badge-parcelize]: https://img.shields.io/badge/parcelize-0.1.0-blue.svg?style=flat
-[badge-kmp-tor-binary]: https://img.shields.io/badge/kmp--tor--binary-4.7.10--1-5d2f68.svg?logo=torproject&style=flat&logoColor=5d2f68
+[badge-kmp-tor-binary]: https://img.shields.io/badge/kmp--tor--binary-4.7.11--0-5d2f68.svg?logo=torproject&style=flat&logoColor=5d2f68
 
 <!-- TAG_PLATFORMS -->
 [badge-platform-android]: https://camo.githubusercontent.com/b1d9ad56ab51c4ad1417e9a5ad2a8fe63bcc4755e584ec7defef83755c23f923/687474703a2f2f696d672e736869656c64732e696f2f62616467652f706c6174666f726d2d616e64726f69642d3645444238442e7376673f7374796c653d666c6174
