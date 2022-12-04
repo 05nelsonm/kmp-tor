@@ -63,7 +63,7 @@ dependencies {
     def vKmpTor = versions.components.kmptor.kmptor
 
     // kmp-tor dependency
-    implementation("io.matthewnelson.kotlin-components:kmp-tor:$vTor+$vKmpTor")
+    implementation("io.matthewnelson.kotlin-components:kmp-tor:$vTor-$vKmpTor")
     // kmp-tor callback extension
     implementation("io.matthewnelson.kotlin-components:kmp-tor-ext-callback-manager:$vKmpTor")
 
