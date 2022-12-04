@@ -411,7 +411,7 @@ class TorControllerIntegrationTest: TorTestHelper() {
 
             // await HSDescriptor event to be dispatched
             var count = 0
-            while (!received && count < 45 && isActive) {
+            while (!received && count < 120 && isActive) {
                 delay(1_000)
                 count++
             }
