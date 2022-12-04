@@ -1,7 +1,12 @@
 # CHANGELOG
 
+## Version 4.7.11-0-1.3.1 (2022-10-23)
+ - Bumps `kmp-tor-binary` from `4.7.10-1` -> `4.7.11-0`
+ - Updates `kotlin-components` submodule to latest commit
+     - Documentation + publishing improvements
+
 ## Version 4.7.10-1-1.3.1 (2022-10-23)
- - Bumps `kmp-tor-binary` from `0.4.7.11` -> `4.7.11-1`
+ - Bumps `kmp-tor-binary` from `0.4.7.10` -> `4.7.10-1`
      - Tor version stayed the same but was a sub-release of `kmp-tor-binary`
        which contained improvements and changes for supporting Kotlin/JS in the
        near future
@@ -218,7 +223,7 @@
      - Now returns a `List<String>` instead of a `String`
      - Method that took a single `TorConfig.Setting` previously returned
        a single `String`. This was incorrect because the setting could
-       potentially be expressed multiple times (ie. SOCKSPort, HiddenServiceDir, etc.)
+       potentially be expressed multiple times (i.e. SOCKSPort, HiddenServiceDir, etc.)
      - **WARNING**: This is potentially a breaking change.
  - Fixes `configGet`, `configSet`, and `configReset` functionality.
      - Previously, only the `TorConfig.Setting.value` was being taken into account
@@ -286,7 +291,7 @@
  - Added to Jvm and Js the ability to manage multiple instances of `TorManager`
      - See new `TorMultiInstanceManager` class in `jvmJsCommonMain` source set.
  - Added to Android's TorServiceConfig the option to call `exitProcess` for Foreground 
-   Service operations in the event TorManager.destroy completes and the application
+   Service operations in the event `TorManager.destroy` completes and the application
    Task has been removed (user swiped the app from recent app's tray)
  - Added to `TorStateManager` interface the `addressInfo` property getter, so 
    attached listeners do not always need to store the value locally once dispatched.
@@ -324,12 +329,12 @@
  - Bumps Tor to version 0.4.6.10
  - Fixes geoip6 file extraction when newer geoip/geoip6 files are available
  - Adds support for `OwningControllerProcess`
- - Adds `TorController.disconnect` method as an additional assurance to shutdown Tor
+ - Adds `TorController.disconnect` method as an additional assurance to shut down Tor
  - Cleans up internal functionality
 
 ## Version 0.4.6.9+0.1.0-alpha3 (2022-02-15)
  - Adds reading of Tor Process error/input stream and pipes output to listeners
- - Fixes Jvm loader for Windows and Macos by excluding Transparent Proxy Port if present
+ - Fixes Jvm loader for Windows and macOS by excluding Transparent Proxy Port if present
  - Adds arguments to `Destroyable.destroy` method for:
     - Callback invocation upon destruction completion
     - Boolean value to stop cleanly via signaling SHUTDOWN, or stopping immediately by
