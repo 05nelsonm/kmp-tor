@@ -23,7 +23,7 @@ Add dependency
 // build.gradle.kts
 
 dependencies {
-    val vTor = "4.7.10-1"
+    val vTor = "4.7.11-0"
     val vKmpTor = "1.3.1"
 
     implementation("io.matthewnelson.kotlin-components:kmp-tor:$vTor-$vKmpTor")
@@ -35,7 +35,7 @@ dependencies {
 // build.gradle
 
 dependencies {
-    def vTor = '4.7.10-1'
+    def vTor = '4.7.11-0'
     def vKmpTor = '1.3.1'
 
     implementation "io.matthewnelson.kotlin-components:kmp-tor:$vTor-$vKmpTor"
@@ -93,7 +93,7 @@ dependencies {
 // build.gradlew.kts
 
 dependencies {
-    val vTor = "4.7.10-1"
+    val vTor = "4.7.11-0"
     val vKmpTor = "1.3.1"
     
     implementation("io.matthewnelson.kotlin-components:kmp-tor:$vTor-$vKmpTor")
@@ -131,7 +131,7 @@ config at startup.
 // build.gradle
 
 dependencies {
-    def vTor = '4.7.10-1'
+    def vTor = '4.7.11-0'
     def vKmpTor = '1.3.1'
 
     implementation "io.matthewnelson.kotlin-components:kmp-tor:$vTor-$vKmpTor"
@@ -233,7 +233,7 @@ git pull --recurse-submodules
 <!-- TAG_VERSION -->
 <!-- If Tor version was updated, don't forget to update [badge-kmp-tor-binary] -->
 
-[badge-latest-release]: https://img.shields.io/badge/latest--release-4.7.10--1--1.3.1-5d2f68.svg?logo=torproject&style=flat&logoColor=5d2f68
+[badge-latest-release]: https://img.shields.io/badge/latest--release-4.7.11--0--1.3.1-5d2f68.svg?logo=torproject&style=flat&logoColor=5d2f68
 [badge-license]: https://img.shields.io/badge/license-Apache%20License%202.0-blue.svg?style=flat
 
 <!-- TAG_DEPENDENCIES -->

@@ -1,7 +1,12 @@
 # CHANGELOG
 
+## Version 4.7.11-0-1.3.1 (2022-10-23)
+ - Bumps `kmp-tor-binary` from `4.7.10-1` -> `4.7.11-0`
+ - Updates `kotlin-components` submodule to latest commit
+     - Documentation + publishing improvements
+
 ## Version 4.7.10-1-1.3.1 (2022-10-23)
- - Bumps `kmp-tor-binary` from `0.4.7.11` -> `4.7.11-1`
+ - Bumps `kmp-tor-binary` from `0.4.7.10` -> `4.7.10-1`
      - Tor version stayed the same but was a sub-release of `kmp-tor-binary`
        which contained improvements and changes for supporting Kotlin/JS in the
        near future
