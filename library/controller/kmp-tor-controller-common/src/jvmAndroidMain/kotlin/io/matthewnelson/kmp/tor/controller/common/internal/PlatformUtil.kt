@@ -27,6 +27,9 @@ actual object PlatformUtil {
     @InternalTorApi
     const val UNIX_DOMAIN_SOCKET_FACTORY_CLASS = "io.matthewnelson.kmp.tor.ext.unix.socket.UnixDomainSocketFactory"
 
+    @InternalTorApi
+    const val JAVA_NET_UNIX_DOMAIN_SOCKET_ADDRESS_CLASS = "java.net.UnixDomainSocketAddress"
+
     private const val ANDROID_LOCAL_SOCKET_CLASS = "android.net.LocalSocket"
 
     @Volatile
@@ -87,26 +90,30 @@ actual object PlatformUtil {
     @InternalTorApi
     actual val hasControlUnixDomainSocketSupport: Boolean by lazy {
         try {
+            // Check if on Android and can use LocalSocket
             Class.forName(ANDROID_LOCAL_SOCKET_CLASS)
                 ?: throw NullPointerException()
 
-            // We're on Android, so we have LocalSocket support
             true
-        } catch (_: Exception) {
+        } catch (_: Throwable) {
 
-            // TODO: Check for Java16+ api java.net.UnixDomainSocketAddress
-            //  and implement in jvmMain's TorController.newInstance
-            //  so dependency on kmp-tor-ext-unix-socket won't be necessary.
             try {
-                // We're on the JVM, look for the factory class to see
-                // if dependency is available.
-                @OptIn(InternalTorApi::class)
-                Class.forName(UNIX_DOMAIN_SOCKET_FACTORY_CLASS)
+                // Check if running jdk16+ and can use UnixDomainSocketAddress
+                Class.forName(JAVA_NET_UNIX_DOMAIN_SOCKET_ADDRESS_CLASS)
                     ?: throw NullPointerException()
 
                 isLinux || isDarwin
-            } catch (_: Exception) {
-                false
+            } catch (_: Throwable) {
+
+                try {
+                    // Check for kmp-tor-ext-unix-socket extension library
+                    Class.forName(UNIX_DOMAIN_SOCKET_FACTORY_CLASS)
+                        ?: throw NullPointerException()
+
+                    isLinux || isDarwin
+                } catch (_: Throwable) {
+                    false
+                }
             }
 
         }

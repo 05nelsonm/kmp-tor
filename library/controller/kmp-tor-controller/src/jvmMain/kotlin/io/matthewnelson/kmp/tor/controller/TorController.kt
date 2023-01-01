@@ -30,10 +30,16 @@ import io.matthewnelson.kmp.tor.controller.internal.controller.RealTorController
 import io.matthewnelson.kmp.tor.controller.internal.controller.RealTorControlProcessor
 import io.matthewnelson.kmp.tor.controller.internal.getTorControllerDispatcher
 import io.matthewnelson.kmp.tor.controller.internal.ext.toTorController
+import io.matthewnelson.kmp.tor.controller.internal.io.ReaderWrapper
+import io.matthewnelson.kmp.tor.controller.internal.io.SocketWrapper
+import io.matthewnelson.kmp.tor.controller.internal.io.WriterWrapper
 import kotlinx.coroutines.withContext
 import java.io.*
 import java.net.Socket
+import java.net.SocketAddress
 import java.net.SocketException
+import java.nio.channels.Channels
+import java.nio.channels.SocketChannel
 
 /**
  * Connects to Tor via it's control port in order to facilitate
@@ -94,28 +100,63 @@ actual interface TorController: TorControlProcessor, TorEventProcessor<TorEvent.
                 throw TorControllerException("UnixDomainSockets unsupported")
             }
 
-            @OptIn(InternalTorApi::class)
-            val clazz: Class<*> = try {
-                Class.forName(PlatformUtil.UNIX_DOMAIN_SOCKET_FACTORY_CLASS)
-                    ?: throw ClassNotFoundException(PlatformUtil.UNIX_DOMAIN_SOCKET_FACTORY_CLASS)
+            val (isJdk16, clazz) = try {
+                @OptIn(InternalTorApi::class)
+                val c = Class.forName(PlatformUtil.JAVA_NET_UNIX_DOMAIN_SOCKET_ADDRESS_CLASS)
+                    ?: throw ClassNotFoundException(PlatformUtil.JAVA_NET_UNIX_DOMAIN_SOCKET_ADDRESS_CLASS)
+
+                Pair(true, c)
             } catch (e: ClassNotFoundException) {
-                throw TorControllerException("UnixDomainSockets unsupported. Add the kmp-tor-ext-unix-socket dependency", e)
+
+                try {
+                    @OptIn(InternalTorApi::class)
+                    val c = Class.forName(PlatformUtil.UNIX_DOMAIN_SOCKET_FACTORY_CLASS)
+                        ?: throw ClassNotFoundException(PlatformUtil.UNIX_DOMAIN_SOCKET_FACTORY_CLASS)
+
+                    Pair(false, c)
+                } catch (_: ClassNotFoundException) {
+                    throw TorControllerException("UnixDomainSockets unsupported.", e)
+                }
             }
 
             val dispatchers = getTorControllerDispatcher()
 
             return try {
-                withContext(dispatchers) {
-                    clazz
-                        .getMethod("create", String::class.java)
-                        .invoke(null, unixDomainSocket.value) as Socket
-                }.toTorController(dispatchers)
-            } catch (e: Exception) {
+                if (isJdk16) {
+                    val channel = withContext(dispatchers) {
+                        val address = clazz
+                            .getMethod("of", String::class.java)
+                            .invoke(null, unixDomainSocket.value) as SocketAddress
+
+                        @Suppress("BlockingMethodInNonBlockingContext")
+                        SocketChannel.open(address)
+                    }
+
+                    val readerWrapper = ReaderWrapper.wrap(Channels.newInputStream(channel).reader().buffered())
+                    val writerWrapper = WriterWrapper.wrap(Channels.newOutputStream(channel).writer())
+                    val socketWrapper = SocketWrapper.wrap(channel)
+
+                    RealTorController(
+                        reader = readerWrapper,
+                        writer = writerWrapper,
+                        socket = socketWrapper,
+                        dispatcher = dispatchers,
+                    )
+                } else {
+                    val socket = withContext(dispatchers) {
+                        clazz
+                            .getMethod("create", String::class.java)
+                            .invoke(null, unixDomainSocket.value) as Socket
+                    }
+
+                    socket.toTorController(dispatchers)
+                }
+            } catch (t: Throwable) {
                 try {
                     dispatchers.close()
                 } catch (_: Exception) {}
 
-                throw TorControllerException("Failed to open unix socket to $unixDomainSocket", e)
+                throw TorControllerException("Failed to open unix socket to $unixDomainSocket", t)
             }
         }
     }
