@@ -65,7 +65,7 @@ kotlin {
 
                 implementation("no.tornado:tornadofx:1.7.20")
 
-                // Add the javafx coroutine dependency so we have
+                // Add the javafx coroutine dependency so that we have
                 // `Dispatchers.Main.immediate` support
                 implementation("org.jetbrains.kotlinx:kotlinx-coroutines-javafx:${versions.kotlin.coroutines}")
 
@@ -75,7 +75,7 @@ kotlin {
 
                 // Add binary dependencies for platform desired to support. Note that this
                 // could also be broken out into package variants so you aren't unnecessarily
-                // including windows/macos binaries in the .deb package, for example.
+                // including windows/macOS binaries in the .deb package, for example.
                 val osName = System.getProperty("os.name")
                 when {
                     osName.contains("Windows", true) -> {
@@ -86,14 +86,14 @@ kotlin {
                     }
                     osName.contains("linux", true) -> {
                         implementation("io.matthewnelson.kotlin-components:kmp-tor-binary-linuxx64:${env.kmpTorBinaries.version.name}")
-
-                        // Add support for Unix Domain Sockets (only available for Linux)
-                        implementation(project(":library:extensions:kmp-tor-ext-unix-socket"))
                     }
                     else -> {
                         throw GradleException("Failed to determine Operating System from os.name='$osName'")
                     }
                 }
+
+                // Add support for Unix Domain Sockets
+                implementation(project(":library:extensions:kmp-tor-ext-unix-socket"))
 
                 // Only supporting x86_64 (x64) for this sample
 //                implementation("io.matthewnelson.kotlin-components:kmp-tor-binary-linuxx86:${env.kmpTorBinaries.version.name}")

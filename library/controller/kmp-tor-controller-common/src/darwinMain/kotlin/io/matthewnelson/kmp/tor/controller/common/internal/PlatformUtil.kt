@@ -32,5 +32,5 @@ actual object PlatformUtil {
     actual val isMingw: Boolean = false
 
     @InternalTorApi
-    actual val hasControlUnixDomainSocketSupport: Boolean = false
+    actual val hasControlUnixDomainSocketSupport: Boolean = true
 }

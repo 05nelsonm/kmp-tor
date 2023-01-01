@@ -51,7 +51,7 @@ class TorConfig_Setting_UnixSockets_UnitTest {
 
     @Test
     fun givenUnixSocketSocks_whenUnsupported_unableToSet() {
-        if (PlatformUtil.isLinux) return
+        if (PlatformUtil.isDarwin || PlatformUtil.isLinux) return
 
         val socks = UnixSockets.Socks()
         socks.set(FileSystemFile(unixPath))
@@ -61,7 +61,7 @@ class TorConfig_Setting_UnixSockets_UnitTest {
 
     @Test
     fun givenUnixSocketSocks_whenSupported_ableToSet() {
-        if (!PlatformUtil.isLinux) return
+        if (!(PlatformUtil.isDarwin || PlatformUtil.isLinux)) return
 
         val socks = UnixSockets.Socks()
         socks.set(FileSystemFile(unixPath))

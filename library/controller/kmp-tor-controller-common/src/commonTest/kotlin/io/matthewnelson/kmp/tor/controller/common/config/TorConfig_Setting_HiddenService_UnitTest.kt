@@ -73,7 +73,7 @@ class TorConfig_Setting_HiddenService_UnitTest {
 
     @Test
     fun givenHiddenService_whenUnixSocketUnsupported_setPortsFiltersThemOut() {
-        if (PlatformUtil.isLinux) return
+        if (PlatformUtil.isDarwin || PlatformUtil.isLinux) return
 
         val hs = HiddenService()
 
@@ -88,7 +88,7 @@ class TorConfig_Setting_HiddenService_UnitTest {
 
     @Test
     fun givenHiddenService_whenUnixSocketSupported_setPortsDoesNotFilterThemOut() {
-        if (!PlatformUtil.isLinux) return
+        if (!(PlatformUtil.isDarwin || PlatformUtil.isLinux)) return
 
         val hs = HiddenService()
 
@@ -103,7 +103,7 @@ class TorConfig_Setting_HiddenService_UnitTest {
 
     @Test
     fun givenHiddenService_whenUnixSocketPathNonUnixPath_setPortsFiltersThemOut() {
-        if (!PlatformUtil.isLinux) return
+        if (!(PlatformUtil.isDarwin || PlatformUtil.isLinux)) return
 
         val hs = HiddenService()
 

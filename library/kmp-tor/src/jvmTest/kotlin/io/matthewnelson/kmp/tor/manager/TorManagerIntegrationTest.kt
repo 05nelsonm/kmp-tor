@@ -102,7 +102,7 @@ class TorManagerIntegrationTest: TorTestHelper() {
     @Test
     fun givenTorManager_whenUnixSocksPortOpenClose_addressInfoIsProperlyDispatched() = runBlocking {
         // Only run if support for domain sockets is had
-        if (!PlatformUtil.isLinux) return@runBlocking
+        if (!(PlatformUtil.isDarwin || PlatformUtil.isLinux)) return@runBlocking
 
         val initialSocksInstances = awaitLastValidatedTorConfig().torConfig.settings
             .filterIsInstance<UnixSockets.Socks>()

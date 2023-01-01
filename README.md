@@ -78,14 +78,14 @@ dependencies {
 <details>
     <summary>Unix Domain Sockets</summary>
 
-### Tor supports use of unix domain sockets on Linux (and Android) for the following:
+### Tor supports use of unix domain sockets on Darwin and Linux (also Android) for the following:
  - ControlPort
  - SocksPort
  - HiddenServicePort
 
 ### How to enable unix domain socket support for the `ControlPort`:
  - For Android, **nothing is needed**.
- - For JVM, you will need to add the following dependency to your Linux distributions:
+ - For JVM, you will need to add the following dependency to your Linux/Darwin distributions:
 
 <!-- TAG_VERSION -->
 
@@ -98,7 +98,7 @@ dependencies {
     
     implementation("io.matthewnelson.kotlin-components:kmp-tor:$vTor-$vKmpTor")
     
-    if (isLinuxBuild) {
+    if (isLinuxBuild || isDarwinBuild) {
         // Add the Unix Domain Socket support extension
         implementation("io.matthewnelson.kotlin-components:kmp-tor-ext-unix-socket:$vKmpTor")
     }

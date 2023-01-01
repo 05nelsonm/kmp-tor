@@ -271,10 +271,10 @@ fun Set<HiddenService.VirtualPort>.filterSupportedOnly(): Set<HiddenService.Virt
         when (instance) {
             is HiddenService.Ports -> true
             is HiddenService.UnixSocket -> {
-                if (!PlatformUtil.isLinux) {
-                    false
-                } else {
+                if (PlatformUtil.isDarwin || PlatformUtil.isLinux) {
                     instance.targetUnixSocket.isUnixPath
+                } else {
+                    false
                 }
             }
         }
