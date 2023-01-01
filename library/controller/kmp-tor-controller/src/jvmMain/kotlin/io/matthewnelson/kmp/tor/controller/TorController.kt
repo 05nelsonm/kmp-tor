@@ -123,13 +123,15 @@ actual interface TorController: TorControlProcessor, TorEventProcessor<TorEvent.
 
             return try {
                 if (isJdk16) {
+                    @Suppress("BlockingMethodInNonBlockingContext")
                     val channel = withContext(dispatchers) {
                         val address = clazz
                             .getMethod("of", String::class.java)
                             .invoke(null, unixDomainSocket.value) as SocketAddress
 
-                        @Suppress("BlockingMethodInNonBlockingContext")
-                        SocketChannel.open(address)
+                        SocketChannel.open(address).apply {
+                            configureBlocking(true)
+                        }
                     }
 
                     val readerWrapper = ReaderWrapper.wrap(Channels.newInputStream(channel).reader().buffered())
