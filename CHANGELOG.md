@@ -1,5 +1,8 @@
 # CHANGELOG
 
+## Version 4.7.12-0-1.3.1 (2023-01-01)
+ - Bumps `kmp-tor-binary` from `4.7.11-0` -> `4.7.12-0`
+
 ## Version 4.7.11-0-1.3.1 (2022-10-23)
  - Bumps `kmp-tor-binary` from `4.7.10-1` -> `4.7.11-0`
  - Updates `kotlin-components` submodule to latest commit
