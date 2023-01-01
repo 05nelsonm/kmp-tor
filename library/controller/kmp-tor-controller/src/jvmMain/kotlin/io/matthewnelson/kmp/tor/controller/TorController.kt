@@ -32,13 +32,16 @@ import io.matthewnelson.kmp.tor.controller.internal.getTorControllerDispatcher
 import io.matthewnelson.kmp.tor.controller.internal.ext.toTorController
 import io.matthewnelson.kmp.tor.controller.internal.io.ReaderWrapper
 import io.matthewnelson.kmp.tor.controller.internal.io.SocketWrapper
+import io.matthewnelson.kmp.tor.controller.internal.io.UnselectableByteChannel
 import io.matthewnelson.kmp.tor.controller.internal.io.WriterWrapper
 import kotlinx.coroutines.withContext
 import java.io.*
 import java.net.Socket
 import java.net.SocketAddress
 import java.net.SocketException
+import java.nio.ByteBuffer
 import java.nio.channels.Channels
+import java.nio.channels.ReadableByteChannel
 import java.nio.channels.SocketChannel
 
 /**
@@ -129,9 +132,7 @@ actual interface TorController: TorControlProcessor, TorEventProcessor<TorEvent.
                             .getMethod("of", String::class.java)
                             .invoke(null, unixDomainSocket.value) as SocketAddress
 
-                        SocketChannel.open(address).apply {
-                            configureBlocking(true)
-                        }
+                        UnselectableByteChannel(SocketChannel.open(address))
                     }
 
                     val readerWrapper = ReaderWrapper.wrap(Channels.newInputStream(channel).reader().buffered())
