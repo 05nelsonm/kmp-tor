@@ -77,11 +77,11 @@ class SampleApp: App(SampleView::class) {
         Path(System.getProperty("java.io.tmpdir")
             ?: throw RuntimeException("Could not identify OS's temporary directory")
         ).builder {
-            addSegment("kmptor-javafx-sample")
+            addSegment("kmptor-k")
         }
     }
 
-    private val instanceId1 = InstanceId("INSTANCE_111")
+    private val instanceId1 = InstanceId("1")
 
     /**
      * Instantiate [TorManager]
@@ -105,7 +105,7 @@ class SampleApp: App(SampleView::class) {
 
             override fun provide(): TorConfig {
                 return TorConfig.Builder {
-                    // Set multiple ports for all of the things
+                    // Set multiple ports for all the things
                     val dns = Ports.Dns()
                     put(dns.set(AorDorPort.Value(PortProxy(9252))))
                     put(dns.set(AorDorPort.Value(PortProxy(9253))))

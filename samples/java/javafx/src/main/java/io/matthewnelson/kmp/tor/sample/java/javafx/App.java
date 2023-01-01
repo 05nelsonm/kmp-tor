@@ -153,7 +153,7 @@ public class App extends Application {
 
         Path tempDirPath = Path.invoke(tempDir)
                 .builder()
-                .addSegment("kmptor-java-javafx-sample")
+                .addSegment("kmptor-j")
                 .build();
 
         return new TorConfigProviderJvm() {

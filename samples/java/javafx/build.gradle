@@ -82,12 +82,12 @@ dependencies {
         implementation("io.matthewnelson.kotlin-components:kmp-tor-binary-macosx64:${env.kmpTorBinaries.version.name}")
     } else if (osName.contains("linux")) {
         implementation("io.matthewnelson.kotlin-components:kmp-tor-binary-linuxx64:${env.kmpTorBinaries.version.name}")
-
-        // Add support for Unix Domain Sockets (only available for Linux)
-        implementation("io.matthewnelson.kotlin-components:kmp-tor-ext-unix-socket:$vKmpTor")
     } else {
         throw GradleException("Faild to determine Operating System from os.name='$osName'")
     }
+
+    // Add support for UnixSockets
+    implementation("io.matthewnelson.kotlin-components:kmp-tor-ext-unix-socket:$vKmpTor")
 
     // Only supporting x86_64 (x64) for this sample
 //  implementation("io.matthewnelson.kotlin-components:kmp-tor-binary-linuxx86:${env.kmpTorBinaries.version.name}")
