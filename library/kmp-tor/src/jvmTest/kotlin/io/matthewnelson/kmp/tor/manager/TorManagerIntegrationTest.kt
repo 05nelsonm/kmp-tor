@@ -65,7 +65,7 @@ class TorManagerIntegrationTest: TorTestHelper() {
         val getVersion = TorControlInfoGet.KeyWord.Status.Version.Current()
         val jobs = ArrayList<Job>(5)
         var failures = 0
-        repeat(5) { index ->
+        repeat(10) { index ->
             launch {
                 val result = manager.infoGet(getVersion)
                 result.onSuccess {
@@ -82,7 +82,7 @@ class TorManagerIntegrationTest: TorTestHelper() {
             }
         }
 
-        delay(50L)
+        delay(100L)
 
         // Cancellation of callers job should not
         // produce any results
