@@ -116,7 +116,7 @@ a connection to Tor's control port, **if support is had** (as noted above). To o
 can express the `TorConfig.Setting.Ports.Control` setting when providing your config at startup.
 
 ### How to enable unix domain socket support for the `SocksPort` and `HiddenServicePort` settings:
- - Be running on Linux (or Android)
+ - Be running on Darwin or Linux (also Android)
 
 </details>
 
