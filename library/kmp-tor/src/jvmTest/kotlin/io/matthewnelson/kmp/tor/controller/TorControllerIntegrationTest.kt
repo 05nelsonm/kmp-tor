@@ -197,7 +197,8 @@ class TorControllerIntegrationTest: TorTestHelper() {
 
     @Test
     fun givenNewHiddenService_whenUnixSocketPortOnly_returnsSuccess() = runBlocking {
-        if (!PlatformUtil.isLinux) return@runBlocking
+        // Only run if support for domain sockets is had by Tor
+        if (!(PlatformUtil.isDarwin || PlatformUtil.isLinux)) return@runBlocking
 
         val workDir = configProvider.workDir
 
@@ -571,8 +572,8 @@ class TorControllerIntegrationTest: TorTestHelper() {
 
     @Test
     fun givenTorController_whenConfigResetSocksUnixSocketWithFlags_returnsSuccess() = runBlocking {
-        // Only run if support for domain sockets is had
-        if (!PlatformUtil.isLinux) return@runBlocking
+        // Only run if support for domain sockets is had by Tor
+        if (!(PlatformUtil.isDarwin || PlatformUtil.isLinux)) return@runBlocking
 
         val socks = TorConfig.Setting.UnixSockets.Socks()
             .setFlags(setOf(
