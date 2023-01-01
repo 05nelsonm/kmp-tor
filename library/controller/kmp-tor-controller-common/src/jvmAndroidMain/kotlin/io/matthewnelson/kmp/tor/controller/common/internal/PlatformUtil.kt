@@ -86,33 +86,29 @@ actual object PlatformUtil {
     @JvmStatic
     @InternalTorApi
     actual val hasControlUnixDomainSocketSupport: Boolean by lazy {
-        if (isLinux) {
+        try {
+            Class.forName(ANDROID_LOCAL_SOCKET_CLASS)
+                ?: throw NullPointerException()
 
+            // We're on Android, so we have LocalSocket support
+            true
+        } catch (_: Exception) {
+
+            // TODO: Check for Java16+ api java.net.UnixDomainSocketAddress
+            //  and implement in jvmMain's TorController.newInstance
+            //  so dependency on kmp-tor-ext-unix-socket won't be necessary.
             try {
-                Class.forName(ANDROID_LOCAL_SOCKET_CLASS)
+                // We're on the JVM, look for the factory class to see
+                // if dependency is available.
+                @OptIn(InternalTorApi::class)
+                Class.forName(UNIX_DOMAIN_SOCKET_FACTORY_CLASS)
                     ?: throw NullPointerException()
 
-                // We're on Android, so we have LocalSocket support
-                true
+                isLinux || isDarwin
             } catch (_: Exception) {
-
-                // TODO: Check for Java16+ api java.net.UnixDomainSocketAddress
-                //  and implement in jvmMain's TorController.newInstance
-                //  so dependency on kmp-tor-ext-unix-socket won't be necessary.
-                try {
-                    // We're on the JVM, look for the factory class to see
-                    // if dependency is available.
-                    @OptIn(InternalTorApi::class)
-                    Class.forName(UNIX_DOMAIN_SOCKET_FACTORY_CLASS)
-                        ?: throw NullPointerException()
-                    true
-                } catch (_: Exception) {
-                    false
-                }
-
+                false
             }
-        } else {
-            false
+
         }
     }
 }

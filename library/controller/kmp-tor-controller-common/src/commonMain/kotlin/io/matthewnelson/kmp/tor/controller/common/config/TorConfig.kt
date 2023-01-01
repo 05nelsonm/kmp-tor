@@ -1156,8 +1156,7 @@ class TorConfig private constructor(
         ) {
 
             final override fun set(value: Option.FileSystemFile?): Setting<Option.FileSystemFile?> {
-                // Do not set if platform is something other than linux
-                if (!PlatformUtil.isLinux) return this
+                if (!(PlatformUtil.isLinux || PlatformUtil.isDarwin)) return this
                 // Do not set if unix domain sockets are not supported for control port
                 if (this is Control && !PlatformUtil.hasControlUnixDomainSocketSupport) return this
                 // First character of the path must be / (Unix FileSystem) root dir char
