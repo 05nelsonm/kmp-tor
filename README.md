@@ -84,35 +84,36 @@ dependencies {
  - HiddenServicePort
 
 ### How to enable unix domain socket support for the `ControlPort`:
- - For Android, **nothing is needed**.
- - For JVM, you will need to add the following dependency to your Linux/Darwin distributions:
 
 <!-- TAG_VERSION -->
 
-```kotlin
-// build.gradlew.kts
+ - For Android, nothing is needed
+ - For JVM
+     - If **JDK 16+**, nothing is needed
+     - Otherwise, add the following dependency to your darwin/linux builds:
+     ```kotlin
+     // build.gradlew.kts
 
-dependencies {
-    val vTor = "4.7.12-0"
-    val vKmpTor = "1.3.1"
+     dependencies {
+         val vTor = "4.7.12-0"
+         val vKmpTor = "1.3.1"
     
-    implementation("io.matthewnelson.kotlin-components:kmp-tor:$vTor-$vKmpTor")
-    
-    if (isLinuxBuild || isDarwinBuild) {
-        // Add the Unix Domain Socket support extension
-        implementation("io.matthewnelson.kotlin-components:kmp-tor-ext-unix-socket:$vKmpTor")
-    }
-}
-```
+         implementation("io.matthewnelson.kotlin-components:kmp-tor:$vTor-$vKmpTor")
+
+         if (isLinuxBuild || isDarwinBuild) {
+             // Unix Domain Socket support extension (JDK 15 and below)
+             implementation("io.matthewnelson.kotlin-components:kmp-tor-ext-unix-socket:$vKmpTor")
+         }
+     }
+     ```
 
 See the [JavaFX Sample App Gradle Configuration][url-javafx-kotlin-gradle]
 `dependencies` block for more info.
 
 If neither `TorConfig.Setting.Ports.Control` or `TorConfig.Setting.UnixSockets.Control` are expressed in 
 your config, `TorConfig.Setting.UnixSockets.Control` will always be the preferred setting for establishing 
-a connection to Tor's control port, **if support is had (JVM + Linux + extension, or on Android)**. To 
-override this behavior, you can express the `TorConfig.Setting.Ports.Control` setting when providing your 
-config at startup.
+a connection to Tor's control port, **if support is had** (as noted above). To override this behavior, you 
+can express the `TorConfig.Setting.Ports.Control` setting when providing your config at startup.
 
 ### How to enable unix domain socket support for the `SocksPort` and `HiddenServicePort` settings:
  - Be running on Linux (or Android)

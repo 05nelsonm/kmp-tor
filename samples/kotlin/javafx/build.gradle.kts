@@ -48,7 +48,7 @@ javafx {
 }
 
 // In order to import the `-jvm` variant of `project(":library:kmp-tor")`, we
-// unfortunately need to setup this sample as a multiplatform project. This
+// unfortunately need to set up this sample as a multiplatform project. This
 // is attributed to the `kmp-tor` project utilizing certain gradle.properties,
 // along with the `kmp-tor` module having an `-android` target available.
 //
@@ -74,7 +74,7 @@ kotlin {
                 implementation(project(":library:kmp-tor"))
 
                 // Add binary dependencies for platform desired to support. Note that this
-                // could also be broken out into package variants so you aren't unnecessarily
+                // could also be broken out into package variants so that you aren't unnecessarily
                 // including windows/macOS binaries in the .deb package, for example.
                 val osName = System.getProperty("os.name")
                 when {
@@ -92,7 +92,7 @@ kotlin {
                     }
                 }
 
-                // Add support for Unix Domain Sockets
+                // Add support for Unix Domain Sockets (Only necessary for JDK 15 and below)
                 implementation(project(":library:extensions:kmp-tor-ext-unix-socket"))
 
                 // Only supporting x86_64 (x64) for this sample
