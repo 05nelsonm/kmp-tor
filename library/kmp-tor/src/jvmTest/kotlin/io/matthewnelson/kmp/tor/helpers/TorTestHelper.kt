@@ -183,7 +183,7 @@ abstract class TorTestHelper {
     @Before
     fun beforeHelper() = runBlocking {
         ensureStarted()
-        delay(25L)
+        delay(250L)
     }
 
     private fun ensureStarted(): TorManager {
