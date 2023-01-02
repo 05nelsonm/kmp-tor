@@ -24,7 +24,7 @@ Add dependency
 
 dependencies {
     val vTor = "4.7.12-0"
-    val vKmpTor = "1.3.1"
+    val vKmpTor = "1.3.2"
 
     implementation("io.matthewnelson.kotlin-components:kmp-tor:$vTor-$vKmpTor")
 }
@@ -36,7 +36,7 @@ dependencies {
 
 dependencies {
     def vTor = '4.7.12-0'
-    def vKmpTor = '1.3.1'
+    def vKmpTor = '1.3.2'
 
     implementation "io.matthewnelson.kotlin-components:kmp-tor:$vTor-$vKmpTor"
 }
@@ -96,7 +96,7 @@ dependencies {
 
      dependencies {
          val vTor = "4.7.12-0"
-         val vKmpTor = "1.3.1"
+         val vKmpTor = "1.3.2"
     
          implementation("io.matthewnelson.kotlin-components:kmp-tor:$vTor-$vKmpTor")
 
@@ -133,7 +133,7 @@ can express the `TorConfig.Setting.Ports.Control` setting when providing your co
 
 dependencies {
     def vTor = '4.7.12-0'
-    def vKmpTor = '1.3.1'
+    def vKmpTor = '1.3.2'
 
     implementation "io.matthewnelson.kotlin-components:kmp-tor:$vTor-$vKmpTor"
     // Add the callback extension
@@ -234,7 +234,7 @@ git pull --recurse-submodules
 <!-- TAG_VERSION -->
 <!-- If Tor version was updated, don't forget to update [badge-kmp-tor-binary] -->
 
-[badge-latest-release]: https://img.shields.io/badge/latest--release-4.7.12--0--1.3.1-5d2f68.svg?logo=torproject&style=flat&logoColor=5d2f68
+[badge-latest-release]: https://img.shields.io/badge/latest--release-4.7.12--0--1.3.2-5d2f68.svg?logo=torproject&style=flat&logoColor=5d2f68
 [badge-license]: https://img.shields.io/badge/license-Apache%20License%202.0-blue.svg?style=flat
 
 <!-- TAG_DEPENDENCIES -->

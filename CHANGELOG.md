@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## Version 4.7.12-0-1.3.2 (2023-01-01)
+ - Enables support for using Unix Domain Sockets on darwin
+ - Adds JDK 16+ support for Unix Domain Sockets
+     - Extension `kmp-tor-ext-unix-socket` is now only needed when running
+       JDK 15 and below if you want to use Unix Domain Sockets.
+
 ## Version 4.7.12-0-1.3.1 (2023-01-01)
  - Bumps `kmp-tor-binary` from `4.7.11-0` -> `4.7.12-0`
 
