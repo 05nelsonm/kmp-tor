@@ -86,7 +86,7 @@ dependencies {
         throw GradleException("Faild to determine Operating System from os.name='$osName'")
     }
 
-    // Add support for UnixSockets
+    // Add support for Unix Domain Sockets (Only necessary for JDK 15 and below)
     implementation("io.matthewnelson.kotlin-components:kmp-tor-ext-unix-socket:$vKmpTor")
 
     // Only supporting x86_64 (x64) for this sample

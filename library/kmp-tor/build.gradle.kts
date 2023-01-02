@@ -60,10 +60,13 @@ kmpConfiguration {
                 },
                 testSourceSet = {
                     dependencies {
-                        if (env.kmpTorAll.isBinaryRelease) {
-                            implementation("${pConfig.group}:kmp-tor-ext-unix-socket:${env.kmpTor.version.name}")
-                        } else {
-                            implementation(project(":library:extensions:kmp-tor-ext-unix-socket"))
+                        if (System.getProperty("java.version").substringBefore('.').toInt() < 16) {
+                            // Use unix socket factory library
+                            if (env.kmpTorAll.isBinaryRelease) {
+                                implementation("${pConfig.group}:kmp-tor-ext-unix-socket:${env.kmpTor.version.name}")
+                            } else {
+                                implementation(project(":library:extensions:kmp-tor-ext-unix-socket"))
+                            }
                         }
 
                         // TODO: Remove once js binary targets are published

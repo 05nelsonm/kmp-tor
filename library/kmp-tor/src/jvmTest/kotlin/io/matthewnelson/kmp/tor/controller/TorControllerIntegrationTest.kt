@@ -412,7 +412,7 @@ class TorControllerIntegrationTest: TorTestHelper() {
 
             // await HSDescriptor event to be dispatched
             var count = 0
-            while (!received && count < 120 && isActive) {
+            while (!received && count < 180 && isActive) {
                 delay(1_000)
                 count++
             }
@@ -709,7 +709,7 @@ class TorControllerIntegrationTest: TorTestHelper() {
             manager.addListener(listener)
             manager.resolve(hostname = "torproject.org", reverse = false).getOrThrow()
 
-            var timeout = 30_000L
+            var timeout = 60_000L
             while (timeout > 0 && mappedAddresses.isEmpty()) {
                 delay(100L)
                 timeout -= 100L
