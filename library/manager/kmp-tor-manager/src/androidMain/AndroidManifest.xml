@@ -16,8 +16,7 @@
  * limitations under the License.
  **/
 -->
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="io.matthewnelson.kmp.tor.manager">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
     <application>
         <service

@@ -33,6 +33,7 @@ includeSnapshotsRepoIfTrue(true)
 android {
     compileSdk = versions.android.sdkCompile
     buildToolsVersion = versions.android.buildTools
+    namespace = "io.matthewnelson.kmp.tor.sample.kotlin.android"
 
     packagingOptions {
         // Needed for Tor binary file extraction to nativeDir
@@ -106,6 +107,7 @@ android {
 dependencies {
     implementation(deps.androidx.appCompat)
     implementation(deps.androidx.constraintLayout)
+    implementation(deps.androidx.lifecycle.viewModel)
     implementation(deps.viewBindingDelegateNoReflect)
 
     // For SNAPSHOTS
