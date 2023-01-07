@@ -38,6 +38,7 @@ if (env.kmpTorBinaries.pollStagingRepo) {
 android {
     compileSdk versions.android.sdkCompile
     buildToolsVersion versions.android.buildTools
+    namespace "io.matthewnelson.kmp.tor.sample.java.android"
 
     // Needed for Tor binary file extraction to nativeDir
     packagingOptions.jniLibs.useLegacyPackaging true

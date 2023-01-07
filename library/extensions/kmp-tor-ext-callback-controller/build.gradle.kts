@@ -32,6 +32,7 @@ kmpConfiguration {
                 buildTools = versions.android.buildTools,
                 compileSdk = versions.android.sdkCompile,
                 minSdk = versions.android.sdkMin16,
+                namespace = "io.matthewnelson.kmp.tor.ext.callback.controller",
                 target = {
                     publishLibraryVariants("release")
                 },
