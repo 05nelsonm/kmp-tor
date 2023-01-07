@@ -1,5 +1,15 @@
 # CHANGELOG
 
+## Version 4.7.12-1-1.3.3 (2023-01-07)
+ - Updates `kotlin-components` submodule
+     - Kotlin `1.6.21` -> `1.7.20`
+     - AtomicFu `0.17.3` -> `0.18.5`
+     - Coroutines `1.6.3` -> `1.6.4`
+     - KmpTorBinary `4.7.12-0` -> `4.7.12-1`
+     - Encoding `1.1.3` -> `1.1.4`
+     - Parcelize `0.1.0` -> `0.1.1`
+     - JnrUnixSocket `0.38.17` -> `0.38.19`
+
 ## Version 4.7.12-0-1.3.2 (2023-01-01)
  - Enables support for using Unix Domain Sockets on darwin
  - Adds JDK 16+ support for Unix Domain Sockets

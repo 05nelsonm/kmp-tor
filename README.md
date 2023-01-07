@@ -23,8 +23,8 @@ Add dependency
 // build.gradle.kts
 
 dependencies {
-    val vTor = "4.7.12-0"
-    val vKmpTor = "1.3.2"
+    val vTor = "4.7.12-1"
+    val vKmpTor = "1.3.3"
 
     implementation("io.matthewnelson.kotlin-components:kmp-tor:$vTor-$vKmpTor")
 }
@@ -35,8 +35,8 @@ dependencies {
 // build.gradle
 
 dependencies {
-    def vTor = '4.7.12-0'
-    def vKmpTor = '1.3.2'
+    def vTor = '4.7.12-1'
+    def vKmpTor = '1.3.3'
 
     implementation "io.matthewnelson.kotlin-components:kmp-tor:$vTor-$vKmpTor"
 }
@@ -95,8 +95,8 @@ dependencies {
      // build.gradlew.kts
 
      dependencies {
-         val vTor = "4.7.12-0"
-         val vKmpTor = "1.3.2"
+         val vTor = "4.7.12-1"
+         val vKmpTor = "1.3.3"
     
          implementation("io.matthewnelson.kotlin-components:kmp-tor:$vTor-$vKmpTor")
 
@@ -132,8 +132,8 @@ can express the `TorConfig.Setting.Ports.Control` setting when providing your co
 // build.gradle
 
 dependencies {
-    def vTor = '4.7.12-0'
-    def vKmpTor = '1.3.2'
+    def vTor = '4.7.12-1'
+    def vKmpTor = '1.3.3'
 
     implementation "io.matthewnelson.kotlin-components:kmp-tor:$vTor-$vKmpTor"
     // Add the callback extension
@@ -234,20 +234,32 @@ git pull --recurse-submodules
 <!-- TAG_VERSION -->
 <!-- If Tor version was updated, don't forget to update [badge-kmp-tor-binary] -->
 
-[badge-latest-release]: https://img.shields.io/badge/latest--release-4.7.12--0--1.3.2-5d2f68.svg?logo=torproject&style=flat&logoColor=5d2f68
+[badge-latest-release]: https://img.shields.io/badge/latest--release-4.7.12--1--1.3.3-5d2f68.svg?logo=torproject&style=flat&logoColor=5d2f68
 [badge-license]: https://img.shields.io/badge/license-Apache%20License%202.0-blue.svg?style=flat
 
 <!-- TAG_DEPENDENCIES -->
-[badge-kotlin]: https://img.shields.io/badge/kotlin-1.6.21-blue.svg?logo=kotlin
-[badge-atomicfu]: https://img.shields.io/badge/atomicfu-0.17.3-blue.svg?logo=kotlin
-[badge-coroutines]: https://img.shields.io/badge/coroutines-1.6.3-blue.svg?logo=kotlin
-[badge-encoding]: https://img.shields.io/badge/encoding-1.1.3-blue.svg?style=flat
-[badge-parcelize]: https://img.shields.io/badge/parcelize-0.1.0-blue.svg?style=flat
-[badge-kmp-tor-binary]: https://img.shields.io/badge/kmp--tor--binary-4.7.12--0-5d2f68.svg?logo=torproject&style=flat&logoColor=5d2f68
+[badge-kotlin]: https://img.shields.io/badge/kotlin-1.7.20-blue.svg?logo=kotlin
+[badge-atomicfu]: https://img.shields.io/badge/atomicfu-0.18.5-blue.svg?logo=kotlin
+[badge-coroutines]: https://img.shields.io/badge/coroutines-1.6.4-blue.svg?logo=kotlin
+[badge-encoding]: https://img.shields.io/badge/encoding-1.1.4-blue.svg?style=flat
+[badge-parcelize]: https://img.shields.io/badge/parcelize-0.1.1-blue.svg?style=flat
+[badge-kmp-tor-binary]: https://img.shields.io/badge/kmp--tor--binary-4.7.12--1-5d2f68.svg?logo=torproject&style=flat&logoColor=5d2f68
 
 <!-- TAG_PLATFORMS -->
-[badge-platform-android]: https://camo.githubusercontent.com/b1d9ad56ab51c4ad1417e9a5ad2a8fe63bcc4755e584ec7defef83755c23f923/687474703a2f2f696d672e736869656c64732e696f2f62616467652f706c6174666f726d2d616e64726f69642d3645444238442e7376673f7374796c653d666c6174
-[badge-platform-jvm]: https://camo.githubusercontent.com/700f5dcd442fd835875568c038ae5cd53518c80ae5a0cf12c7c5cf4743b5225b/687474703a2f2f696d672e736869656c64732e696f2f62616467652f706c6174666f726d2d6a766d2d4442343133442e7376673f7374796c653d666c6174
+[badge-platform-android]: http://img.shields.io/badge/-android-6EDB8D.svg?style=flat
+[badge-platform-jvm]: http://img.shields.io/badge/-jvm-DB413D.svg?style=flat
+[badge-platform-js]: http://img.shields.io/badge/-js-F8DB5D.svg?style=flat
+[badge-platform-js-node]: https://img.shields.io/badge/-nodejs-68a063.svg?style=flat
+[badge-platform-linux]: http://img.shields.io/badge/-linux-2D3F6C.svg?style=flat
+[badge-platform-macos]: http://img.shields.io/badge/-macos-111111.svg?style=flat
+[badge-platform-ios]: http://img.shields.io/badge/-ios-CDCDCD.svg?style=flat
+[badge-platform-tvos]: http://img.shields.io/badge/-tvos-808080.svg?style=flat
+[badge-platform-watchos]: http://img.shields.io/badge/-watchos-C0C0C0.svg?style=flat
+[badge-platform-wasm]: https://img.shields.io/badge/-wasm-624FE8.svg?style=flat
+[badge-platform-windows]: http://img.shields.io/badge/-windows-4D76CD.svg?style=flat
+[badge-support-android-native]: http://img.shields.io/badge/support-[AndroidNative]-6EDB8D.svg?style=flat
+[badge-support-apple-silicon]: http://img.shields.io/badge/support-[AppleSilicon]-43BBFF.svg?style=flat
+[badge-support-js-ir]: https://img.shields.io/badge/support-[js--IR]-AAC4E0.svg?style=flat
 
 [url-latest-release]: https://github.com/05nelsonm/kmp-tor/releases/latest
 [url-license]: https://www.apache.org/licenses/LICENSE-2.0
