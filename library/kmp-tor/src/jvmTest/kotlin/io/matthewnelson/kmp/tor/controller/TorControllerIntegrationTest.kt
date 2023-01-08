@@ -678,7 +678,7 @@ class TorControllerIntegrationTest: TorTestHelper() {
                 .infoGet(KeyWord.AddressMappings.All())
                 .getOrThrow()
 
-            assertFalse(unMapping1Info.parseInfoMapping().contains(unMapping1))
+            assertTrue(!unMapping1Info.parseInfoMapping().contains(unMapping1))
             assertTrue(unMapping1.isUnmapping)
         } catch (t: Throwable) {
             throwable = t

@@ -22,7 +22,6 @@ import io.matthewnelson.kmp.tor.manager.common.exceptions.InterruptedException
 import kotlinx.coroutines.*
 import kotlin.coroutines.resumeWithException
 import kotlin.test.Test
-import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
 @ExperimentalCoroutinesApi
@@ -101,7 +100,7 @@ class CallbackTorManagerIntegrationTest: TorTestHelper() {
         }
 
         for (task in tasks) {
-            assertFalse(task.isActive)
+            assertTrue(!task.isActive)
         }
 
         assertTrue(failures > 0)

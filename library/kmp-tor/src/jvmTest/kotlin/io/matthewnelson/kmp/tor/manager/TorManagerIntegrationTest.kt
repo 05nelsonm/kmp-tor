@@ -107,7 +107,7 @@ class TorManagerIntegrationTest: TorTestHelper() {
         val initialSocksInstances = awaitLastValidatedTorConfig().torConfig.settings
             .filterIsInstance<UnixSockets.Socks>()
 
-        assertFalse(initialSocksInstances.isEmpty())
+        assertTrue(initialSocksInstances.isNotEmpty())
 
         val listener = TestListener()
         manager.addListener(listener)
