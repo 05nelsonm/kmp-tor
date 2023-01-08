@@ -16,10 +16,12 @@
 package io.matthewnelson.kmp.tor.manager.internal.notification
 
 import android.app.*
+import android.app.Service.STOP_FOREGROUND_REMOVE
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import android.graphics.drawable.Icon
 import android.os.Build
 import io.matthewnelson.kmp.tor.controller.common.control.usecase.TorControlSignal
 import io.matthewnelson.kmp.tor.controller.common.control.usecase.TorControlSignal.Companion.NEW_NYM_RATE_LIMITED
@@ -416,13 +418,14 @@ private class RealTorServiceNotification(
 
     private fun pendingIntentFlags(): Int {
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            // API 31+
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         } else {
+            // API 30-
             PendingIntent.FLAG_UPDATE_CURRENT
         }
     }
 
-    @Suppress("deprecation")
     private fun List<Action>.set(builder: Notification.Builder) {
         for (action in this) {
             val intent = Intent(intentFilter)
@@ -431,28 +434,41 @@ private class RealTorServiceNotification(
 
             val pIntent = PendingIntent.getBroadcast(
                 service,
-                action.requestCode,
+                action.ordinal,
                 intent,
                 pendingIntentFlags()
             )
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT_WATCH) {
-                val aBuilder = Notification.Action.Builder(0, action.provideStringFor(), pIntent)
-                builder.addAction(aBuilder.build())
+                // API 20+
+                val nAction: Notification.Action = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                    // API 23+
+                    val icon = Icon.createWithResource("", 0)
+                    Notification.Action.Builder(icon, action.provideStringFor(), pIntent).build()
+                } else {
+                    // API 22-
+                    @Suppress("DEPRECATION")
+                    Notification.Action.Builder(0, action.provideStringFor(), pIntent).build()
+                }
+
+                builder.addAction(nAction)
             } else {
+                // API 19-
+                @Suppress("DEPRECATION")
                 builder.addAction(0, action.provideStringFor(), pIntent)
             }
         }
     }
 
-    @Suppress("deprecation")
     private fun newBuilder(state: NotificationState): Notification.Builder {
         val builder: Notification.Builder = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            // API 26
+            // API 26+
             Notification.Builder(service, config.channelId)
                 .setGroupAlertBehavior(Notification.GROUP_ALERT_SUMMARY)
                 .setTimeoutAfter(10L)
         } else {
+            // API 25-
+            @Suppress("DEPRECATION")
             Notification.Builder(service)
         }
 
@@ -462,26 +478,30 @@ private class RealTorServiceNotification(
             setOngoing(true)
             setOnlyAlertOnce(true)
             setSmallIcon(state.smallIcon.id)
-            setSound(null)
             setWhen(startTime)
 
-            // API 17
+            if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.TIRAMISU) {
+                // API 33-
+                @Suppress("DEPRECATION")
+                setSound(null)
+            }
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
+                // API 17+
                 setShowWhen(true)
             }
-            // API 20
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT_WATCH) {
+                // API 20+
                 setGroup("TorService")
                 setGroupSummary(false)
             }
-            // API 21
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                // API 21+
                 setCategory(Notification.CATEGORY_PROGRESS)
                 setColor(state.color.retrieve(service))
                 setVisibility(config.visibility)
             }
-            // API 31
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                // API 31+
                 setForegroundServiceBehavior(Notification.FOREGROUND_SERVICE_IMMEDIATE)
             }
         }
@@ -566,6 +586,7 @@ private class RealTorServiceNotification(
             old = old,
             setColor = { color ->
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                    // API 21+
                     builder.setColor(color.retrieve(service))
                 }
             },
@@ -675,7 +696,15 @@ private class RealTorServiceNotification(
         super.stoppingService()
         service.unregisterReceiver(receiver)
         TorServiceController.notify(Lifecycle(receiver, ON_UNREGISTER))
-        service.stopForeground(true)
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            // API 33+
+            service.stopForeground(STOP_FOREGROUND_REMOVE)
+        } else {
+            // API 32-
+            @Suppress("DEPRECATION")
+            service.stopForeground(true)
+        }
     }
 
     init {
@@ -685,9 +714,9 @@ private class RealTorServiceNotification(
         if (config.enableForeground) {
 
             if (!isChannelSetup) {
-                isChannelSetup = true
 
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    // API 26+
                     val channel = NotificationChannel(
                         config.channelId,
                         config.channelName,
@@ -699,6 +728,8 @@ private class RealTorServiceNotification(
                     }
                     notificationManager?.createNotificationChannel(channel)
                 }
+
+                isChannelSetup = true
             }
 
             val filter = IntentFilter(intentFilter)

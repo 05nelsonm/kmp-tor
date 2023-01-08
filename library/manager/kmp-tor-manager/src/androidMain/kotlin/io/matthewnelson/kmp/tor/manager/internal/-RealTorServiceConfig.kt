@@ -16,7 +16,6 @@
 package io.matthewnelson.kmp.tor.manager.internal
 
 import android.Manifest
-import android.R
 import android.content.Context
 import android.content.pm.PackageManager
 import android.content.res.Resources
@@ -72,20 +71,33 @@ internal class RealTorServiceConfig(context: Context): TorServiceConfig() {
     }
 
     init {
-        val meta: Bundle? = context.applicationContext
-            .packageManager
-            .getApplicationInfo(context.applicationContext.packageName, PackageManager.GET_META_DATA)
-            .metaData
+        val meta: Bundle? = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            // API 33+
+            val flag = PackageManager.ApplicationInfoFlags.of(PackageManager.GET_META_DATA.toLong())
+
+            context.applicationContext
+                .packageManager
+                .getApplicationInfo(context.applicationContext.packageName, flag)
+                .metaData
+        } else {
+            // API 32-
+            @Suppress("DEPRECATION")
+            context.applicationContext
+                .packageManager
+                .getApplicationInfo(context.applicationContext.packageName, PackageManager.GET_META_DATA)
+                .metaData
+        }
 
         enableForeground = (meta?.getBoolean(KEY_ENABLE_FOREGROUND, false) ?: false).let { enable ->
             if (enable) {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+                    // API 28+
                     context.isPermissionGranted(Manifest.permission.FOREGROUND_SERVICE)
                 } else {
-                    enable
+                    true
                 }
             } else {
-                enable
+                false
             }
         }
 
@@ -102,8 +114,8 @@ internal class RealTorServiceConfig(context: Context): TorServiceConfig() {
             _iconNetworkDisabled = DrawableRes(0)
             _iconDataXfer = DrawableRes(0)
             _iconError = DrawableRes(0)
-            _colorWhenBootstrappedTrue = ColorRes(R.color.white)
-            _colorWhenBootstrappedFalse = ColorRes(R.color.white)
+            _colorWhenBootstrappedTrue = ColorRes(android.R.color.white)
+            _colorWhenBootstrappedFalse = ColorRes(android.R.color.white)
             visibility = 0
             enableRestartAction = false
             enableStopAction = false
@@ -120,8 +132,8 @@ internal class RealTorServiceConfig(context: Context): TorServiceConfig() {
                         This should _never_ happen...
 
                         See Examples Here:
-                        - https://github.com/05nelsonm/kmp-tor/blob/master/samples/android/src/main/AndroidManifest.xml
-                        - https://github.com/05nelsonm/kmp-tor/blob/master/samples/android/src/main/res/values/attrs.xml
+                        - https://github.com/05nelsonm/kmp-tor/blob/master/samples/kotlin/android/src/main/AndroidManifest.xml
+                        - https://github.com/05nelsonm/kmp-tor/blob/master/samples/kotlin/android/src/main/res/values/attrs.xml
                     """.trimIndent()
                 )
             }
@@ -154,8 +166,8 @@ internal class RealTorServiceConfig(context: Context): TorServiceConfig() {
                             ```
                             
                             See Examples Here:
-                            - https://github.com/05nelsonm/kmp-tor/blob/master/samples/android/src/main/AndroidManifest.xml
-                            - https://github.com/05nelsonm/kmp-tor/blob/master/samples/android/src/main/res/values/attrs.xml
+                            - https://github.com/05nelsonm/kmp-tor/blob/master/samples/kotlin/android/src/main/AndroidManifest.xml
+                            - https://github.com/05nelsonm/kmp-tor/blob/master/samples/kotlin/android/src/main/res/values/attrs.xml
                         """.trimIndent()
                     )
                 }
@@ -186,8 +198,8 @@ internal class RealTorServiceConfig(context: Context): TorServiceConfig() {
                             ```
                             
                             See Examples Here:
-                            - https://github.com/05nelsonm/kmp-tor/blob/master/samples/android/src/main/AndroidManifest.xml
-                            - https://github.com/05nelsonm/kmp-tor/blob/master/samples/android/src/main/res/values/attrs.xml
+                            - https://github.com/05nelsonm/kmp-tor/blob/master/samples/kotlin/android/src/main/AndroidManifest.xml
+                            - https://github.com/05nelsonm/kmp-tor/blob/master/samples/kotlin/android/src/main/res/values/attrs.xml
                         """.trimIndent()
                     )
                 }
@@ -218,8 +230,8 @@ internal class RealTorServiceConfig(context: Context): TorServiceConfig() {
                             ```
                             
                             See Examples Here:
-                            - https://github.com/05nelsonm/kmp-tor/blob/master/samples/android/src/main/AndroidManifest.xml
-                            - https://github.com/05nelsonm/kmp-tor/blob/master/samples/android/src/main/res/values/attrs.xml
+                            - https://github.com/05nelsonm/kmp-tor/blob/master/samples/kotlin/android/src/main/AndroidManifest.xml
+                            - https://github.com/05nelsonm/kmp-tor/blob/master/samples/kotlin/android/src/main/res/values/attrs.xml
                         """.trimIndent()
                     )
                 }
@@ -250,8 +262,8 @@ internal class RealTorServiceConfig(context: Context): TorServiceConfig() {
                             ```
                             
                             See Examples Here:
-                            - https://github.com/05nelsonm/kmp-tor/blob/master/samples/android/src/main/AndroidManifest.xml
-                            - https://github.com/05nelsonm/kmp-tor/blob/master/samples/android/src/main/res/values/attrs.xml
+                            - https://github.com/05nelsonm/kmp-tor/blob/master/samples/kotlin/android/src/main/AndroidManifest.xml
+                            - https://github.com/05nelsonm/kmp-tor/blob/master/samples/kotlin/android/src/main/res/values/attrs.xml
                         """.trimIndent()
                     )
                 }
@@ -284,8 +296,8 @@ internal class RealTorServiceConfig(context: Context): TorServiceConfig() {
                             ```
                             
                             See Examples Here:
-                            - https://github.com/05nelsonm/kmp-tor/blob/master/samples/android/src/main/AndroidManifest.xml
-                            - https://github.com/05nelsonm/kmp-tor/blob/master/samples/android/src/main/res/values/attrs.xml
+                            - https://github.com/05nelsonm/kmp-tor/blob/master/samples/kotlin/android/src/main/AndroidManifest.xml
+                            - https://github.com/05nelsonm/kmp-tor/blob/master/samples/kotlin/android/src/main/res/values/attrs.xml
                         """.trimIndent()
                     )
                 }
@@ -327,8 +339,8 @@ internal class RealTorServiceConfig(context: Context): TorServiceConfig() {
                             ```
                             
                             See Examples Here:
-                            - https://github.com/05nelsonm/kmp-tor/blob/master/samples/android/src/main/AndroidManifest.xml
-                            - https://github.com/05nelsonm/kmp-tor/blob/master/samples/android/src/main/res/values/attrs.xml
+                            - https://github.com/05nelsonm/kmp-tor/blob/master/samples/kotlin/android/src/main/AndroidManifest.xml
+                            - https://github.com/05nelsonm/kmp-tor/blob/master/samples/kotlin/android/src/main/res/values/attrs.xml
                         """.trimIndent()
                     )
                 }
@@ -383,7 +395,7 @@ internal class RealTorServiceConfig(context: Context): TorServiceConfig() {
 
             _colorWhenBootstrappedTrue = meta.getInt(KEY_COLOR_WHEN_BOOTSTRAPPED_TRUE, 0).let { resId ->
                 when {
-                    resId < 1 -> ColorRes(R.color.white)
+                    resId < 1 -> ColorRes(android.R.color.white)
                     !ColorRes(resId).isValid(context) -> {
                         throw Resources.NotFoundException(
                             """
@@ -400,7 +412,7 @@ internal class RealTorServiceConfig(context: Context): TorServiceConfig() {
 
             _colorWhenBootstrappedFalse = meta.getInt(KEY_COLOR_WHEN_BOOTSTRAPPED_FALSE, 0).let { resId ->
                 when {
-                    resId < 1 -> ColorRes(R.color.white)
+                    resId < 1 -> ColorRes(android.R.color.white)
                     !ColorRes(resId).isValid(context) -> {
                         throw Resources.NotFoundException(
                             """
@@ -446,8 +458,8 @@ internal class RealTorServiceConfig(context: Context): TorServiceConfig() {
                                 ```
                                 
                                 See Examples Here:
-                                - https://github.com/05nelsonm/kmp-tor/blob/master/samples/android/src/main/AndroidManifest.xml
-                                - https://github.com/05nelsonm/kmp-tor/blob/master/samples/android/src/main/res/values/attrs.xml
+                                - https://github.com/05nelsonm/kmp-tor/blob/master/samples/kotlin/android/src/main/AndroidManifest.xml
+                                - https://github.com/05nelsonm/kmp-tor/blob/master/samples/kotlin/android/src/main/res/values/attrs.xml
                             """.trimIndent()
                         )
                     }

@@ -56,10 +56,10 @@ internal data class NotificationState(
         return old.size != actions.size
     }
 
-    internal enum class Action(val requestCode: Int) {
-        NewIdentity(1),
-        RestartTor(2),
-        StopTor(3);
+    internal enum class Action {
+        NewIdentity,
+        RestartTor,
+        StopTor;
     }
 
     internal sealed interface Progress {
