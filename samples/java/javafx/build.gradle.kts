@@ -13,54 +13,42 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-import io.matthewnelson.kotlin.components.dependencies.versions
+import io.matthewnelson.kotlin.components.kmp.util.includeSnapshotsRepoIfTrue
+import io.matthewnelson.kotlin.components.kmp.util.includeStagingRepoIfTrue
 import kmp.tor.env
 
 plugins {
-    id 'application'
-    id 'org.jetbrains.kotlin.jvm'
-    id 'org.openjfx.javafxplugin' version '0.0.11'
+    application
+    id("org.jetbrains.kotlin.jvm")
+    id("org.openjfx.javafxplugin") version("0.0.11")
 }
 
 // disregard. this is for playing with newly published binaries prior to release
-if (env.kmpTorBinaries.pollStagingRepo) {
-    repositories {
-        maven {
-            url { "https://oss.sonatype.org/content/groups/staging" }
-            credentials {
-                username rootProject.ext.get("mavenCentralUsername").toString()
-                password rootProject.ext.get("mavenCentralPassword").toString()
-            }
-        }
-    }
-}
+includeStagingRepoIfTrue(env.kmpTorBinaries.pollStagingRepo)
 
-// For SNAPSHOTS. disregard
-repositories {
-    maven {
-        url 'https://oss.sonatype.org/content/repositories/snapshots/'
-    }
-}
-
-javafx {
-    modules = [ 'javafx.controls' ]
-}
+// For SNAPSHOTS
+includeSnapshotsRepoIfTrue(true)
 
 java {
     sourceCompatibility = JavaVersion.VERSION_11
     targetCompatibility = JavaVersion.VERSION_11
 }
 
-mainClassName = 'io.matthewnelson.kmp.tor.sample.java.javafx.App'
+application {
+    mainClass.set("io.matthewnelson.kmp.tor.sample.java.javafx.App")
+}
+
+javafx {
+    modules("javafx.controls", "javafx.graphics")
+}
 
 dependencies {
-
     // For SNAPSHOTS disregard
 //    implementation("io.matthewnelson.kotlin-components:kmp-tor:${env.kmpTorAll.version.name}")
 //    implementation("io.matthewnelson.kotlin-components:kmp-tor-ext-callback-manager:${env.kmpTor.version.name}")
 
-    def vTor = versions.components.kmptor.binary
-    def vKmpTor = versions.components.kmptor.kmptor
+    val vTor = versions.components.kmptor.binary
+    val vKmpTor = versions.components.kmptor.kmptor
 
     // kmp-tor dependency
     implementation("io.matthewnelson.kotlin-components:kmp-tor:$vTor-$vKmpTor")
@@ -73,17 +61,22 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-javafx:${versions.kotlin.coroutines}")
 
     // Add binary dependencies for platform desired to support. Note that this
-    // could also be broken out into package variants so you aren't unnecessarily
-    // including windows/macos binaries in the .deb package, for example.
-    def osName = System.getProperty("os.name").toLowerCase()
-    if (osName.contains("windows")) {
-        implementation("io.matthewnelson.kotlin-components:kmp-tor-binary-mingwx64:${env.kmpTorBinaries.version.name}")
-    } else if (osName.contains("mac") || osName.contains("darwin")) {
-        implementation("io.matthewnelson.kotlin-components:kmp-tor-binary-macosx64:${env.kmpTorBinaries.version.name}")
-    } else if (osName.contains("linux")) {
-        implementation("io.matthewnelson.kotlin-components:kmp-tor-binary-linuxx64:${env.kmpTorBinaries.version.name}")
-    } else {
-        throw GradleException("Faild to determine Operating System from os.name='$osName'")
+    // could also be broken out into package variants so that you aren't unnecessarily
+    // including windows/macOS binaries in the .deb package, for example.
+    val osName = System.getProperty("os.name")
+    when {
+        osName.contains("Windows", true) -> {
+            implementation("io.matthewnelson.kotlin-components:kmp-tor-binary-mingwx64:${env.kmpTorBinaries.version.name}")
+        }
+        osName.contains("Mac", true) || osName.contains("Darwin", true) -> {
+            implementation("io.matthewnelson.kotlin-components:kmp-tor-binary-macosx64:${env.kmpTorBinaries.version.name}")
+        }
+        osName.contains("linux", true) -> {
+            implementation("io.matthewnelson.kotlin-components:kmp-tor-binary-linuxx64:${env.kmpTorBinaries.version.name}")
+        }
+        else -> {
+            throw GradleException("Failed to determine Operating System from os.name='$osName'")
+        }
     }
 
     // Add support for Unix Domain Sockets (Only necessary for JDK 15 and below)

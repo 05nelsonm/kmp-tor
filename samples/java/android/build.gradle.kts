@@ -31,7 +31,7 @@ includeSnapshotsRepoIfTrue(true)
 android {
     compileSdk = versions.android.sdkCompile
     buildToolsVersion = versions.android.buildTools
-    namespace = "io.matthewnelson.kmp.tor.sample.kotlin.android"
+    namespace = "io.matthewnelson.kmp.tor.sample.java.android"
 
     packagingOptions {
         // Needed for Tor binary file extraction to nativeDir
@@ -42,7 +42,7 @@ android {
 
     buildFeatures.viewBinding = true
     defaultConfig {
-        applicationId = "io.matthewnelson.kmp.tor.sample.kotlin"
+        applicationId = "io.matthewnelson.kmp.tor.sample.java"
         minSdk = versions.android.sdkMin21
         targetSdk = versions.android.sdkTarget
         versionCode = env.kmpTorAll.version.code
@@ -105,12 +105,17 @@ android {
 dependencies {
     implementation(deps.androidx.appCompat)
     implementation(deps.androidx.constraintLayout)
-    implementation(deps.androidx.lifecycle.viewModel)
-    implementation(deps.viewBindingDelegateNoReflect)
+    implementation(deps.google.material)
 
     // For SNAPSHOTS
 //    implementation("io.matthewnelson.kotlin-components:kmp-tor:${env.kmpTorAll.version.name}")
-    implementation(project(":library:kmp-tor"))
+//    implementation("io.matthewnelson.kotlin-components:kmp-tor-ext-callback-manager:${env.kmpTor.version.name}")
 
+    implementation(project(":library:kmp-tor"))
+    implementation(project(":library:extensions:kmp-tor-ext-callback-manager"))
+
+    // Even through kmp-tor comes with coroutines under the hood
+    // and expressing the dependency is _not_ needed in kotlin
+    // projects, it _is_ needed in Java only projects.
     implementation(deps.kotlin.coroutines.android)
 }
