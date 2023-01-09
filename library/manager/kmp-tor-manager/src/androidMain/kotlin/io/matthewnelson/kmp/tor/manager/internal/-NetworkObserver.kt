@@ -62,7 +62,7 @@ private class RealNetworkObserver(
 
             if (context == null || intent == null) return
             when (intent.action) {
-                @Suppress("deprecation")
+                @Suppress("DEPRECATION")
                 ConnectivityManager.CONNECTIVITY_ACTION -> {
                     dispatchConnectivityChange(
                         if (isNetworkConnected()) {
@@ -78,7 +78,7 @@ private class RealNetworkObserver(
 
     override fun onManagerAttach() {
         val filter = IntentFilter(intentFilter)
-        @Suppress("deprecation")
+        @Suppress("DEPRECATION")
         filter.addAction(ConnectivityManager.CONNECTIVITY_ACTION)
         service.registerReceiver(receiver, filter)
         TorServiceController.notify(TorManagerEvent.Lifecycle(receiver, ON_REGISTER))
@@ -91,8 +91,9 @@ private class RealNetworkObserver(
         } catch (_: IllegalArgumentException) {}
     }
 
-    @Suppress("deprecation", "MissingPermission")
+    @Suppress("MissingPermission")
     override fun isNetworkConnected(): Boolean {
+        @Suppress("DEPRECATION")
         return manager.activeNetworkInfo?.isConnected ?: false
     }
 

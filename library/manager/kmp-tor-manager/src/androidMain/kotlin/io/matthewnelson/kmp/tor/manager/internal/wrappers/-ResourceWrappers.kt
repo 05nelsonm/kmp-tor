@@ -23,12 +23,15 @@ import android.os.Build
 @JvmInline
 internal value class ColorRes(val id: Int)
 
-@Suppress("deprecation", "nothing_to_inline")
+@Suppress("nothing_to_inline")
 @Throws(Resources.NotFoundException::class)
 internal inline fun ColorRes.retrieve(context: Context): Int {
     return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+        // API 23+
         context.getColor(id)
     } else {
+        // API 22-
+        @Suppress("DEPRECATION")
         context.resources.getColor(id)
     }
 }
@@ -36,12 +39,15 @@ internal inline fun ColorRes.retrieve(context: Context): Int {
 @JvmInline
 internal value class DrawableRes(val id: Int)
 
-@Suppress("deprecation", "nothing_to_inline")
+@Suppress("nothing_to_inline")
 @Throws(Resources.NotFoundException::class)
 internal inline fun DrawableRes.retrieve(context: Context): Drawable? {
     return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+        // API 21+
         context.getDrawable(id)
     } else {
+        // API 20-
+        @Suppress("DEPRECATION")
         context.resources.getDrawable(id)
     }
 }

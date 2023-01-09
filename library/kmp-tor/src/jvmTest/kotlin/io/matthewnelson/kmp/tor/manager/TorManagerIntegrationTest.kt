@@ -91,7 +91,7 @@ class TorManagerIntegrationTest: TorTestHelper() {
         manager.stop().getOrThrow()
 
         for (job in jobs) {
-            job.cancelAndJoin()
+            job.join()
         }
 
         assertTrue(failures > 0)

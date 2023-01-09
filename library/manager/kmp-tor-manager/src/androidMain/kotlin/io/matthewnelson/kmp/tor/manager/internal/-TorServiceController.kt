@@ -37,25 +37,19 @@ internal object TorServiceController:
     internal const val DEFAULT_INSTANCE_ID = "AndroidInstance"
 
     @Volatile
-    @Suppress("ObjectPropertyName")
-    private var _binderState: BinderState? = null
-
-    internal val binderState: BinderState? get() = _binderState
-
-    private fun clear() {
-        _binderState = null
-    }
+    internal var binderState: BinderState? = null
+        private set
 
     override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
-        if (service != null && service is TorService.TorServiceBinder) {
-            _binderState = BinderState.Bound(service)
+        binderState = if (service != null && service is TorService.TorServiceBinder) {
+            BinderState.Bound(service)
         } else {
-            clear()
+            null
         }
     }
 
     override fun onServiceDisconnected(name: ComponentName?) {
-        clear()
+        binderState = null
     }
 
     @Throws(RuntimeException::class)
@@ -71,7 +65,7 @@ internal object TorServiceController:
             context.applicationContext.startService(intent)
         }
 
-        _binderState = BinderState.Starting
+        binderState = BinderState.Starting
         bindService(context, intent)
     }
 
@@ -84,7 +78,7 @@ internal object TorServiceController:
     }
 
     internal fun unbindService(service: TorService) {
-        clear()
+        binderState = null
         try {
             unbindService(service.applicationContext)
             notify(TorManagerEvent.Lifecycle(service, "onUnbind"))
@@ -134,7 +128,7 @@ internal object TorServiceController:
         val added = listeners.addListener(listener)
         binderState?.let {
             if (it is BinderState.Bound) {
-                it.binder().addListener(listener)
+                it.binder.addListener(listener)
             }
         }
         return added
@@ -144,7 +138,7 @@ internal object TorServiceController:
         val removed = listeners.removeListener(listener)
         binderState?.let {
             if (it is BinderState.Bound) {
-                it.binder().removeListener(listener)
+                it.binder.removeListener(listener)
             }
         }
         return removed
@@ -157,7 +151,7 @@ internal object TorServiceController:
         debug = enable
         binderState?.let {
             if (it is BinderState.Bound) {
-                it.binder().debug(debug)
+                it.binder.debug(debug)
             }
         }
     }
@@ -166,7 +160,5 @@ internal object TorServiceController:
 internal sealed interface BinderState {
     object Starting: BinderState
     @JvmInline
-    value class Bound(private val binder: TorService.TorServiceBinder): BinderState {
-        internal fun binder(): TorService.TorServiceBinder = binder
-    }
+    value class Bound(val binder: TorService.TorServiceBinder): BinderState
 }

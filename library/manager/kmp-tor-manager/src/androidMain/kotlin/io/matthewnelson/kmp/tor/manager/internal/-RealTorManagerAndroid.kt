@@ -52,7 +52,7 @@ internal class RealTorManagerAndroid(
     override val state: TorState
         get() = when (val state = TorServiceController.binderState) {
             null -> TorState.Off
-            is BinderState.Bound -> state.binder().state
+            is BinderState.Bound -> state.binder.state
             is BinderState.Starting -> TorState.Starting
         }
 
@@ -60,14 +60,14 @@ internal class RealTorManagerAndroid(
         get() = when (val state = TorServiceController.binderState) {
             null,
             is BinderState.Starting -> TorNetworkState.Disabled
-            is BinderState.Bound -> state.binder().networkState
+            is BinderState.Bound -> state.binder.networkState
         }
 
     override val addressInfo: TorManagerEvent.AddressInfo
         get() = when (val state = TorServiceController.binderState) {
             null,
             is BinderState.Starting -> TorManagerEvent.AddressInfo.NULL_VALUES
-            is BinderState.Bound -> state.binder().addressInfo
+            is BinderState.Bound -> state.binder.addressInfo
         }
 
     init {
@@ -80,9 +80,9 @@ internal class RealTorManagerAndroid(
 
     private val supervisor = SupervisorJob()
     private val scope: CoroutineScope = CoroutineScope(context =
-    supervisor                                          +
-            Dispatchers.Main.immediate                          +
-            CoroutineName("RealTorManagerAndroid")
+        supervisor                                          +
+        Dispatchers.Main.immediate                          +
+        CoroutineName("RealTorManagerAndroid")
     )
 
     private val actions: ActionProcessor by lazy {
@@ -99,7 +99,7 @@ internal class RealTorManagerAndroid(
 
             when (val state = TorServiceController.binderState) {
                 is BinderState.Bound -> {
-                    state.binder().stop()
+                    state.binder.stop()
                     TorServiceController.clearLocalListeners(lce)
                     supervisor.cancel()
                     onCompletion?.invoke()
@@ -112,8 +112,8 @@ internal class RealTorManagerAndroid(
                         onCompletion?.invoke()
                     } else {
                         scope.launch(context =
-                        TorManagerEvent.Action.Stop.catchInterrupt {}                                  +
-                                CoroutineName(name = "RealTorManagerAndroid.destroy")
+                            TorManagerEvent.Action.Stop.catchInterrupt {}           +
+                            CoroutineName(name = "RealTorManagerAndroid.destroy")
                         ) {
                             actions.withProcessorLock(TorManagerEvent.Action.Stop) {
                                 realStop(checkDestroy = false)
@@ -154,8 +154,8 @@ internal class RealTorManagerAndroid(
         var result: Result<Any?>? = null
 
         scope.launch(context =
-        TorManagerEvent.Action.Start.catchInterrupt { result = Result.failure(it) }     +
-                CoroutineName(name = "RealTorServiceAndroid.start")
+            TorManagerEvent.Action.Start.catchInterrupt { result = Result.failure(it) }     +
+            CoroutineName(name = "RealTorServiceAndroid.start")
         ) {
             result = actions.withProcessorLock(TorManagerEvent.Action.Start) {
                 if (isDestroyed) {
@@ -180,7 +180,7 @@ internal class RealTorManagerAndroid(
                             }
                         }
                         is BinderState.Bound -> {
-                            localResult = binder.binder().start(loader)
+                            localResult = binder.binder.start(loader)
                             break
                         }
                         is BinderState.Starting -> {
@@ -234,7 +234,7 @@ internal class RealTorManagerAndroid(
                     break
                 }
                 is BinderState.Bound -> {
-                    result = state.binder().restart(loader)
+                    result = state.binder.restart(loader)
                     break
                 }
                 is BinderState.Starting -> {
@@ -270,8 +270,8 @@ internal class RealTorManagerAndroid(
         var result: Result<Any?>? = null
 
         scope.launch(context =
-        TorManagerEvent.Action.Stop.catchInterrupt { result = Result.failure(it) }      +
-                CoroutineName(name = "RealTorServiceAndroid.stop")
+            TorManagerEvent.Action.Stop.catchInterrupt { result = Result.failure(it) }      +
+            CoroutineName(name = "RealTorServiceAndroid.stop")
         ) {
             result = actions.withProcessorLock(TorManagerEvent.Action.Stop) {
                 realStop(checkDestroy = true)
@@ -300,7 +300,7 @@ internal class RealTorManagerAndroid(
                     break
                 }
                 is BinderState.Bound -> {
-                    result = state.binder().stop()
+                    result = state.binder.stop()
                     break
                 }
                 is BinderState.Starting -> {
@@ -387,7 +387,7 @@ internal class RealTorManagerAndroid(
                     break
                 }
                 is BinderState.Bound -> {
-                    result = block.invoke(state.binder().manager(loader) as T)
+                    result = block.invoke(state.binder.manager(loader) as T)
                     break
                 }
                 is BinderState.Starting -> {

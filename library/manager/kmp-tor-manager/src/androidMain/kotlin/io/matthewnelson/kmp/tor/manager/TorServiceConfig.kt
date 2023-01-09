@@ -33,9 +33,10 @@ import io.matthewnelson.kmp.tor.manager.internal.wrappers.DrawableRes
  * <application> tag.
  *
  * To set config options, see examples here:
- * - https://github.com/05nelsonm/kmp-tor/blob/master/samples/android/src/main/AndroidManifest.xml
- * - https://github.com/05nelsonm/kmp-tor/blob/master/samples/android/src/main/res/values/attrs.xml
+ * - https://github.com/05nelsonm/kmp-tor/blob/master/samples/kotlin/android/src/main/AndroidManifest.xml
+ * - https://github.com/05nelsonm/kmp-tor/blob/master/samples/kotlin/android/src/main/res/values/attrs.xml
  *
+ * @see [getMetaData]
  * @see [RealTorServiceConfig]
  * */
 @Suppress("PropertyName")

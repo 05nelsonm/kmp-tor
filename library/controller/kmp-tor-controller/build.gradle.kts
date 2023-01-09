@@ -13,9 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-import io.matthewnelson.kotlin.components.dependencies.deps
-import io.matthewnelson.kotlin.components.dependencies.depsTest
-import io.matthewnelson.kotlin.components.dependencies.versions
 import io.matthewnelson.kotlin.components.kmp.KmpTarget
 import kmp.tor.env
 import org.jetbrains.kotlin.gradle.plugin.KotlinJsCompilerType
@@ -33,6 +30,7 @@ kmpConfiguration {
                 buildTools = versions.android.buildTools,
                 compileSdk = versions.android.sdkCompile,
                 minSdk = versions.android.sdkMin16,
+                namespace = "io.matthewnelson.kmp.tor.controller",
                 target = {
                     publishLibraryVariants("release")
                 },

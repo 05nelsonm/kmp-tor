@@ -39,7 +39,7 @@ if (CHECK_PUBLICATION != null) {
     }
 
     if (KMP_TARGETS_ALL || TARGETS?.contains("JVM") != false) {
-        include(":samples:java:javafx")
+//        include(":samples:java:javafx")
         include(":samples:kotlin:javafx")
     }
 }
