@@ -44,7 +44,7 @@ jobs:
         with:
           path: ~/.gradle/caches
           key: ${{ runner.os }}-java${{ matrix.java-version }}-gradle-caches-${{ hashFiles('**/*.gradle.kts') }}-${{ hashFiles('kotlin-components/includeBuild/dependencies/src/main/kotlin/versions.kt') }}
-          restore-keys: ${{ runner.os }}-gradle-caches-
+          restore-keys: ${{ runner.os }}-java${{ matrix.java-version }}-gradle-caches-
 
       - name: Setup JDK
         uses: actions/setup-java@v3.4.0
