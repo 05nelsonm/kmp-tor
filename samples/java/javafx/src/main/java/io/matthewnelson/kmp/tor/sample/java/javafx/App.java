@@ -80,12 +80,7 @@ public class App extends Application {
 
     @Override
     public void stop() throws Exception {
-
-        // just in case setupOnCloseIntercept fails.
-        torManager.destroy(/* stopCleanly = */ false, whenComplete -> {
-            // will not be invoked if TorManager has already been destroyed
-            Log.d("App", "onCloseRequest intercept failed. Tor did not stop cleanly.");
-        });
+        torManager.destroy(/* stopCleanly = */ false, null);
         super.stop();
     }
 

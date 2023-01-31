@@ -290,12 +290,7 @@ class SampleApp: App(SampleView::class) {
     override fun stop() {
         super.stop()
         Log.d(this.javaClass.simpleName, "stop")
-
-        // just in case setupOnCloseIntercept fails.
-        managerInstance1.destroy(stopCleanly = false) {
-            // will not be invoked if TorManager has already been destroyed
-            Log.w(this.javaClass.simpleName, "onCloseRequest intercept failed. Tor did not stop cleanly.")
-        }
+        managerInstance1.destroy(stopCleanly = false)
     }
 
     private val appScope by lazy {
