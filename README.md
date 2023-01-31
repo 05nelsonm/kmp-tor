@@ -241,7 +241,7 @@ git pull --recurse-submodules
 [badge-kotlin]: https://img.shields.io/badge/kotlin-1.8.0-blue.svg?logo=kotlin
 [badge-atomicfu]: https://img.shields.io/badge/atomicfu-0.19.0-blue.svg?logo=kotlin
 [badge-coroutines]: https://img.shields.io/badge/coroutines-1.6.4-blue.svg?logo=kotlin
-[badge-encoding]: https://img.shields.io/badge/encoding-1.1.5-blue.svg?style=flat
+[badge-encoding]: https://img.shields.io/badge/encoding-1.2.0-blue.svg?style=flat
 [badge-parcelize]: https://img.shields.io/badge/parcelize-0.1.2-blue.svg?style=flat
 [badge-kmp-tor-binary]: https://img.shields.io/badge/kmp--tor--binary-4.7.12--2-5d2f68.svg?logo=torproject&style=flat&logoColor=5d2f68
 

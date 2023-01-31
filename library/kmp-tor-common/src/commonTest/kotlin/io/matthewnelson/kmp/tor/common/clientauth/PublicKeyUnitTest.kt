@@ -15,15 +15,15 @@
  **/
 package io.matthewnelson.kmp.tor.common.clientauth
 
-import io.matthewnelson.component.base64.Base64
-import io.matthewnelson.component.base64.encodeBase64
-import io.matthewnelson.component.encoding.base32.Base32
-import io.matthewnelson.component.encoding.base32.encodeBase32
+import io.matthewnelson.encoding.core.Encoder.Companion.encodeToString
+import io.matthewnelson.kmp.tor.common.annotation.InternalTorApi
+import io.matthewnelson.kmp.tor.common.internal.TorStrings
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
+@OptIn(InternalTorApi::class)
 class PublicKeyUnitTest {
 
     companion object {
@@ -78,7 +78,7 @@ class PublicKeyUnitTest {
     fun givenBase32PublicKey_whenBase64withPaddingCalled_returnsBase64String() {
         val key = OnionClientAuthPublicKey_B32_X25519(VALID_BASE32_PUBLIC_KEY)
         val b64 = key.base64(padded = true)
-        assertEquals(key.decode().encodeBase64(Base64.Default), b64)
+        assertEquals(key.decode().encodeToString(TorStrings.base64), b64)
     }
 
     @Test
@@ -92,7 +92,7 @@ class PublicKeyUnitTest {
     fun givenBase32PublicKey_whenBase32withPaddingCalled_returnsBase32String() {
         val key = OnionClientAuthPublicKey_B32_X25519(VALID_BASE32_PUBLIC_KEY)
         val b32 = key.base32(padded = true)
-        assertEquals(key.decode().encodeBase32(Base32.Default), b32)
+        assertEquals(key.decode().encodeToString(TorStrings.base32), b32)
     }
 
     @Test
@@ -106,7 +106,7 @@ class PublicKeyUnitTest {
     fun givenBase64PublicKey_whenBase32withPaddingCalled_returnsBase32String() {
         val key = OnionClientAuthPublicKey_B64_X25519(VALID_BASE64_PUBLIC_KEY)
         val b32 = key.base32(padded = true)
-        assertEquals(key.decode().encodeBase32(Base32.Default), b32)
+        assertEquals(key.decode().encodeToString(TorStrings.base32), b32)
     }
 
     @Test
@@ -120,7 +120,7 @@ class PublicKeyUnitTest {
     fun givenBase64PublicKey_whenBase64withPaddingCalled_returnsBase64String() {
         val key = OnionClientAuthPublicKey_B64_X25519(VALID_BASE64_PUBLIC_KEY)
         val b64 = key.base64(padded = true)
-        assertEquals(key.decode().encodeBase64(Base64.Default), b64)
+        assertEquals(key.decode().encodeToString(TorStrings.base64), b64)
     }
 
     @Test

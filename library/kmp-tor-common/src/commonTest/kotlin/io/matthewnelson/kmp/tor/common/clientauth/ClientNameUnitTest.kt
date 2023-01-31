@@ -15,7 +15,7 @@
  **/
 package io.matthewnelson.kmp.tor.common.clientauth
 
-import io.matthewnelson.component.base64.Base64
+import io.matthewnelson.encoding.base64.Base64
 import kotlin.test.Test
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull

@@ -17,10 +17,13 @@ package io.matthewnelson.kmp.tor.common.clientauth
 
 import io.matthewnelson.component.parcelize.Parcelable
 import io.matthewnelson.component.parcelize.Parcelize
+import io.matthewnelson.encoding.builders.Base32Default
+import io.matthewnelson.encoding.builders.Base64
 import io.matthewnelson.kmp.tor.common.address.OnionAddressV3
 import io.matthewnelson.kmp.tor.common.internal.stripBaseEncoding
 import kotlin.jvm.JvmField
 import kotlin.jvm.JvmStatic
+import kotlin.jvm.JvmSynthetic
 
 /**
  * Onion Client Authentication public/private keys.

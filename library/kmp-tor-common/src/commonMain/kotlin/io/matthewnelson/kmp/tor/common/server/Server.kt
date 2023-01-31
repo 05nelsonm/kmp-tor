@@ -15,12 +15,16 @@
  **/
 package io.matthewnelson.kmp.tor.common.server
 
-import io.matthewnelson.component.base64.Base64
-import io.matthewnelson.component.encoding.base16.decodeBase16ToArray
 import io.matthewnelson.component.parcelize.Parcelable
 import io.matthewnelson.component.parcelize.Parcelize
+import io.matthewnelson.encoding.base64.Base64
+import io.matthewnelson.encoding.base16.Base16
+import io.matthewnelson.encoding.builders.Base16
+import io.matthewnelson.encoding.core.Decoder.Companion.decodeToByteArray
 import io.matthewnelson.kmp.tor.common.annotation.ExperimentalTorApi
+import io.matthewnelson.kmp.tor.common.annotation.InternalTorApi
 import io.matthewnelson.kmp.tor.common.annotation.SealedValueClass
+import io.matthewnelson.kmp.tor.common.internal.TorStrings
 import kotlin.jvm.JvmField
 import kotlin.jvm.JvmInline
 import kotlin.jvm.JvmStatic
@@ -53,7 +57,7 @@ class Server private constructor() {
 
         companion object {
             @JvmStatic
-            val REGEX: Regex = "[A-F0-9]{40}".toRegex()
+            val REGEX: Regex = "[${Base16.CHARS_UPPER}]{40}".toRegex()
 
             const val PREFIX = '$'
 
@@ -87,6 +91,7 @@ class Server private constructor() {
 
     @JvmInline
     @Parcelize
+    @OptIn(InternalTorApi::class)
     private value class RealFingerprint(override val value: String): Fingerprint {
 
         init {
@@ -97,7 +102,7 @@ class Server private constructor() {
 
         override fun canonicalName(): String = "${Fingerprint.PREFIX}$value"
 
-        override fun decode(): ByteArray = value.decodeBase16ToArray()!!
+        override fun decode(): ByteArray = value.decodeToByteArray(TorStrings.base16)
 
         override fun toString(): String = "Fingerprint(value=$value)"
 

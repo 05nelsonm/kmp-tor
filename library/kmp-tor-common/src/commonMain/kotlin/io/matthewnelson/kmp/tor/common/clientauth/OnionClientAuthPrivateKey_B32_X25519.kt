@@ -15,15 +15,15 @@
  **/
 package io.matthewnelson.kmp.tor.common.clientauth
 
-import io.matthewnelson.component.base64.Base64
-import io.matthewnelson.component.base64.encodeBase64
-import io.matthewnelson.component.encoding.base32.Base32
-import io.matthewnelson.component.encoding.base32.decodeBase32ToArray
 import io.matthewnelson.component.parcelize.Parcelize
+import io.matthewnelson.encoding.base32.Base32
+import io.matthewnelson.encoding.core.Decoder.Companion.decodeToByteArray
+import io.matthewnelson.encoding.core.Encoder.Companion.encodeToString
 import io.matthewnelson.kmp.tor.common.address.OnionAddressV3
 import io.matthewnelson.kmp.tor.common.annotation.ExperimentalTorApi
 import io.matthewnelson.kmp.tor.common.annotation.InternalTorApi
 import io.matthewnelson.kmp.tor.common.annotation.SealedValueClass
+import io.matthewnelson.kmp.tor.common.internal.TorStrings
 import io.matthewnelson.kmp.tor.common.internal.TorStrings.REDACTED
 import io.matthewnelson.kmp.tor.common.internal.descriptorString
 import kotlin.jvm.JvmInline
@@ -44,7 +44,7 @@ sealed interface OnionClientAuthPrivateKey_B32_X25519: OnionClientAuth.PrivateKe
 
     companion object {
         @JvmStatic
-        val REGEX: Regex = "[${Base32.Default.CHARS}]{52}".toRegex()
+        val REGEX: Regex = "[${Base32.Default.CHARS_UPPER}]{52}".toRegex()
 
         @JvmStatic
         @Throws(IllegalArgumentException::class)
@@ -69,7 +69,7 @@ private value class RealOnionClientAuthPrivateKey_B32_X25519(
     }
 
     override fun base64(padded: Boolean): String {
-        val b64 = decode().encodeBase64(Base64.Default)
+        val b64 = decode().encodeToString(TorStrings.base64)
         return if (padded) {
             b64
         } else {
@@ -85,7 +85,7 @@ private value class RealOnionClientAuthPrivateKey_B32_X25519(
         }
     }
 
-    override fun decode(): ByteArray = value.decodeBase32ToArray(Base32.Default)!!
+    override fun decode(): ByteArray = value.decodeToByteArray(TorStrings.base32)
 
     override fun descriptor(address: OnionAddressV3): String = descriptorString(address)
 
