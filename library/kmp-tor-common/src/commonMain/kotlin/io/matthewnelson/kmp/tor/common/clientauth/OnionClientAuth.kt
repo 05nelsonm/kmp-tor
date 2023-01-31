@@ -26,7 +26,7 @@ import kotlin.jvm.JvmStatic
  * Onion Client Authentication public/private keys.
  *
  * Tor utilizes base32 and base64 encoded key blobs for different things. For example,
- * interacting with Tor over it's control port requires a base64 encoded private key,
+ * interacting with Tor over its control port requires a base64 encoded private key,
  * while persisting the key to the file system requires it to be base32 encoded for Tor
  * to read on startup (otherwise Tor will throw errors and not start).
  *

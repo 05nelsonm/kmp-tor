@@ -15,7 +15,8 @@
  **/
 package io.matthewnelson.kmp.tor.controller.internal.controller
 
-import io.matthewnelson.component.encoding.base16.encodeBase16
+import io.matthewnelson.encoding.builders.Base16
+import io.matthewnelson.encoding.core.Encoder.Companion.encodeToString
 import io.matthewnelson.kmp.tor.common.address.*
 import io.matthewnelson.kmp.tor.common.annotation.InternalTorApi
 import io.matthewnelson.kmp.tor.common.clientauth.ClientName
@@ -49,7 +50,7 @@ internal class RealTorControlProcessor(
         return processorLock.withContextAndLock {
             val command = StringBuilder("AUTHENTICATE").apply {
                 append(SP)
-                append(bytes.encodeBase16())
+                append(bytes.encodeToString(Base16()))
                 append(CLRF)
             }.toString()
 

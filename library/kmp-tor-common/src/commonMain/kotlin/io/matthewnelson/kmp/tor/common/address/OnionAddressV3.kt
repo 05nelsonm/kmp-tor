@@ -15,11 +15,13 @@
  **/
 package io.matthewnelson.kmp.tor.common.address
 
-import io.matthewnelson.component.encoding.base32.Base32
-import io.matthewnelson.component.encoding.base32.decodeBase32ToArray
 import io.matthewnelson.component.parcelize.Parcelize
+import io.matthewnelson.encoding.base32.Base32
+import io.matthewnelson.encoding.core.Decoder.Companion.decodeToByteArray
 import io.matthewnelson.kmp.tor.common.annotation.ExperimentalTorApi
+import io.matthewnelson.kmp.tor.common.annotation.InternalTorApi
 import io.matthewnelson.kmp.tor.common.annotation.SealedValueClass
+import io.matthewnelson.kmp.tor.common.internal.TorStrings
 import io.matthewnelson.kmp.tor.common.internal.findOnionAddressFromUrl
 import kotlin.jvm.JvmInline
 import kotlin.jvm.JvmStatic
@@ -39,7 +41,7 @@ sealed interface OnionAddressV3: OnionAddress {
 
     companion object {
         @JvmStatic
-        val REGEX: Regex = "[a-z2-7]{56}".toRegex()
+        val REGEX: Regex = "[${Base32.Default.CHARS_LOWER}]{56}".toRegex()
 
         @JvmStatic
         @Throws(IllegalArgumentException::class)
@@ -86,6 +88,7 @@ sealed interface OnionAddressV3: OnionAddress {
 
 @JvmInline
 @Parcelize
+@OptIn(InternalTorApi::class)
 private value class RealOnionAddressV3(override val value: String): OnionAddressV3 {
 
     init {
@@ -96,7 +99,7 @@ private value class RealOnionAddressV3(override val value: String): OnionAddress
 
     override fun canonicalHostname(): String = "$value.onion"
 
-    override fun decode(): ByteArray = value.uppercase().decodeBase32ToArray(Base32.Default)!!
+    override fun decode(): ByteArray = value.decodeToByteArray(TorStrings.base32)
 
     override fun toString(): String = "OnionAddressV3(value=$value)"
 
