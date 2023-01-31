@@ -92,7 +92,10 @@ internal class RealTorManagerAndroid(
 
     override fun destroy(stopCleanly: Boolean, onCompletion: (() -> Unit)?) {
         synchronized(this) {
-            if (isDestroyed) return@synchronized
+            if (isDestroyed) {
+                onCompletion?.invoke()
+                return@synchronized
+            }
             _isDestroyed = true
 
             val lce = TorManagerEvent.Lifecycle(this, TorManagerEvent.Lifecycle.ON_DESTROY)
