@@ -171,7 +171,10 @@ internal class RealTorManager(
 
     override fun destroy(stopCleanly: Boolean, onCompletion: (() -> Unit)?) {
         kotlinx.atomicfu.locks.synchronized(this) {
-            if (isDestroyed) return@synchronized
+            if (isDestroyed) {
+                onCompletion?.invoke()
+                return@synchronized
+            }
             _isDestroyed.value = true
             networkObserver?.detach(instanceId)
 

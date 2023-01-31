@@ -27,12 +27,15 @@ interface Destroyable {
      * threads, etc.
      *
      * Tf [stopCleanly] is true, [RealTorManager.destroy] launches a coroutine
-     * in order to stop Tor via it's control port so it can clean up properly.
+     * in order to stop Tor via it's control port, so it can clean up properly.
      * This takes approximately 500ms (if Tor is running).
      *
      * By passing a lambda via [onCompletion] you can perform other necessary
      * post destruction tasks and cleanup after Tor has been shutdown (or killed
      * if [stopCleanly] is set to false).
+     *
+     * [onCompletion] is **always** invoked, whether [TorManager] was already
+     * destroyed or not.
      * */
     fun destroy(stopCleanly: Boolean = true, onCompletion: (() -> Unit)? = null)
 }
