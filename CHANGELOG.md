@@ -1,5 +1,17 @@
 # CHANGELOG
 
+## Version 4.7.13-0-1.3.4 (2023-01-31)
+ - Fixes `Destroyeable.onDestroy` invocation of `onCompletion` lambda only
+   being invoked if `TorManager` was not yet destroyed. Now `onCompletion`
+   is **always** invoked, regardless of whether `TorManager` is already
+   destroyed.
+ - Updates KmpTorBinary `4.7.12-2` -> `4.7.13-0`
+ - Updates `kotlin-components` submodule
+     - Encoding `1.1.5` -> `1.2.1`
+         - Updates deprecated encoding APIs
+     - Publication improvements
+ - Adds caching to CI
+
 ## Version 4.7.12-2-1.3.3 (2023-01-09)
  - Updates `kotlin-components` submodule
      - Kotlin `1.6.21` -> `1.8.0`
