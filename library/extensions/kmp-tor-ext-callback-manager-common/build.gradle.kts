@@ -26,8 +26,6 @@ kmpConfiguration {
         publish = !(env.kmpTorAll.isBinaryRelease || env.kmpTorCommon.holdPublication)
     ) {
         common {
-            pluginIds(libs.plugins.atomicfu.get().pluginId)
-
             sourceSetMain {
                 dependencies {
                     api(project(":library:extensions:kmp-tor-ext-callback-controller-common"))

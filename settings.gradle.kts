@@ -1,21 +1,6 @@
 rootProject.name = "kmp-tor"
 
 pluginManagement {
-    resolutionStrategy {
-        eachPlugin {
-            requested.version?.let { version ->
-                when ("${requested.id}") {
-                    "com.android.library",
-                    "com.android.application" -> {
-                        useModule("com.android.tools.build:gradle:$version")
-                    }
-                    "kotlinx-atomicfu" -> {
-                        useModule("org.jetbrains.kotlinx:atomicfu-gradle-plugin:$version")
-                    }
-                }
-            }
-        }
-    }
     repositories {
         mavenCentral()
         google()
@@ -24,9 +9,7 @@ pluginManagement {
 }
 
 includeBuild("build-logic")
-
-//includeBuild("kotlin-components/includeBuild/dependencies")
-//includeBuild("kotlin-components/includeBuild/kmp")
+includeBuild("build-environment")
 
 @Suppress("PrivatePropertyName")
 private val KMP_TARGETS: String? by settings

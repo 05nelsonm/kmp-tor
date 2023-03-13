@@ -32,20 +32,11 @@ kmpConfiguration {
                 }
             }
         }
-        js {
-            sourceSetMain {
-                dependencies {
-                    // https://github.com/05nelsonm/kmp-tor/issues/205
-                    implementation(libs.atomicfu.js)
-                }
-            }
-        }
 
         common {
-            pluginIds(libs.plugins.atomicfu.get().pluginId)
-
             sourceSetMain {
                 dependencies {
+                    implementation(libs.atomicfu)
                     api(project(":library:kmp-tor-common"))
                 }
             }

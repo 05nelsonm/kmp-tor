@@ -24,20 +24,10 @@ kmpConfiguration {
         androidNameSpace = "io.matthewnelson.kmp.tor.manager",
         publish = !(env.kmpTorAll.isBinaryRelease || env.kmpTor.holdPublication),
     ) {
-        androidLibrary {
-            sourceSetMain {
-                dependencies {
-                    // https://github.com/Kotlin/kotlinx.atomicfu/issues/145
-                    implementation(libs.atomicfu.jvm)
-                }
-            }
-        }
-
         common {
-            pluginIds(libs.plugins.atomicfu.get().pluginId)
-
             sourceSetMain {
                 dependencies {
+                    implementation(libs.atomicfu)
                     implementation(libs.coroutines.core)
                     implementation(project(":library:controller:kmp-tor-controller")) {
                         exclude(group, "kmp-tor-common")

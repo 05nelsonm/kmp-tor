@@ -47,8 +47,8 @@ dependencies {
 //    implementation("io.matthewnelson.kotlin-components:kmp-tor:${env.kmpTorAll.version.name}")
 //    implementation("io.matthewnelson.kotlin-components:kmp-tor-ext-callback-manager:${env.kmpTor.version.name}")
 
-    val vTor = "4.7.13-0"
-    val vKmpTor = "1.3.4"
+    val vTor = libs.versions.kmpTorBinary.get()
+    val vKmpTor = libs.versions.kmpTor.get()
 
     // kmp-tor dependency
     implementation("io.matthewnelson.kotlin-components:kmp-tor:$vTor-$vKmpTor")

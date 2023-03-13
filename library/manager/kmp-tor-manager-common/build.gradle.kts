@@ -25,20 +25,10 @@ kmpConfiguration {
         isCommonModule = true,
         publish = !(env.kmpTorAll.isBinaryRelease || env.kmpTorCommon.holdPublication),
     ) {
-        js {
-            sourceSetMain {
-                dependencies {
-                    // https://github.com/05nelsonm/kmp-tor/issues/205
-                    implementation(libs.atomicfu.js)
-                }
-            }
-        }
-
         common {
-            pluginIds(libs.plugins.atomicfu.get().pluginId)
-
             sourceSetMain {
                 dependencies {
+                    implementation(libs.atomicfu)
                     api(project(":library:controller:kmp-tor-controller-common"))
                 }
             }
