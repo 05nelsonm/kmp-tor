@@ -215,22 +215,6 @@ public class Example2 {
 
 </details>
 
-### Git
-
-This project utilizes git submodules. You will need to initialize them when
-cloning the repository via:
-
-```
-git checkout master
-git pull
-git submodule update --init
-```
-
-In order to keep submodules updated when pulling the latest code, run:
-```
-git pull --recurse-submodules
-```
-
 <!-- TAG_VERSION -->
 <!-- If Tor version was updated, don't forget to update [badge-kmp-tor-binary] -->
 
