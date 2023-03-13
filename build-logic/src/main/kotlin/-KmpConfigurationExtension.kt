@@ -20,21 +20,18 @@ import org.gradle.api.JavaVersion
 
 fun KmpConfigurationExtension.configureShared(
     androidNameSpace: String? = null,
-    enableJvm: Boolean = true,
     isCommonModule: Boolean = false,
     publish: Boolean = false,
     explicitApi: Boolean = false,
     action: Action<KmpConfigurationContainerDsl>
 ) {
     configure {
-        if (enableJvm) {
-            jvm {
-                if (androidNameSpace == null) { target { withJava() } }
+        jvm {
+            if (androidNameSpace == null) { target { withJava() } }
 
-                kotlinJvmTarget = JavaVersion.VERSION_1_8
-                compileSourceCompatibility = JavaVersion.VERSION_1_8
-                compileTargetCompatibility = JavaVersion.VERSION_1_8
-            }
+            kotlinJvmTarget = JavaVersion.VERSION_1_8
+            compileSourceCompatibility = JavaVersion.VERSION_1_8
+            compileTargetCompatibility = JavaVersion.VERSION_1_8
         }
 
         if (androidNameSpace != null) {

@@ -19,7 +19,7 @@ import org.jetbrains.kotlin.gradle.plugin.KotlinJsCompilerType
 
 plugins {
     id(pluginId.kmp.configuration)
-    id(pluginId.kmp.publish)
+//    id(pluginId.kmp.publish)
 }
 
 kmpConfiguration {
@@ -75,9 +75,9 @@ kmpConfiguration {
     )
 }
 
-kmpPublish {
-    setupModule(
-        pomDescription = "Kotlin Components' TorManager common code",
-        holdPublication = env.kmpTorAll.isBinaryRelease || env.kmpTorCommon.holdPublication
-    )
-}
+//kmpPublish {
+//    setupModule(
+//        pomDescription = "Kotlin Components' TorManager common code",
+//        holdPublication = env.kmpTorAll.isBinaryRelease || env.kmpTorCommon.holdPublication
+//    )
+//}

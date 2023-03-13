@@ -19,7 +19,7 @@ import org.jetbrains.kotlin.gradle.plugin.KotlinJsCompilerType
 
 plugins {
     id(pluginId.kmp.configuration)
-    id(pluginId.kmp.publish)
+//    id(pluginId.kmp.publish)
 }
 
 kmpConfiguration {
@@ -69,9 +69,9 @@ kmpConfiguration {
     )
 }
 
-kmpPublish {
-    setupModule(
-        pomDescription = "Kotlin Components' Callback extension of TorManager for non-coroutine consumers",
-        holdPublication = env.kmpTorAll.isBinaryRelease || env.kmpTor.holdPublication
-    )
-}
+//kmpPublish {
+//    setupModule(
+//        pomDescription = "Kotlin Components' Callback extension of TorManager for non-coroutine consumers",
+//        holdPublication = env.kmpTorAll.isBinaryRelease || env.kmpTor.holdPublication
+//    )
+//}

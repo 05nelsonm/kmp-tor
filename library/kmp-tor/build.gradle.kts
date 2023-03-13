@@ -14,18 +14,18 @@
  * limitations under the License.
  **/
 import io.matthewnelson.kotlin.components.kmp.KmpTarget
-import io.matthewnelson.kotlin.components.kmp.publish.kmpPublishRootProjectConfiguration
+//import io.matthewnelson.kotlin.components.kmp.publish.kmpPublishRootProjectConfiguration
 import io.matthewnelson.kotlin.components.kmp.util.*
 import kmp.tor.env
 import org.jetbrains.kotlin.gradle.plugin.KotlinJsCompilerType
 
 plugins {
     id(pluginId.kmp.configuration)
-    id(pluginId.kmp.publish)
+//    id(pluginId.kmp.publish)
 }
 
-val pConfig = kmpPublishRootProjectConfiguration!!
-includeStagingRepoIfTrue(env.kmpTorBinaries.pollStagingRepo)
+//val pConfig = kmpPublishRootProjectConfiguration!!
+//includeStagingRepoIfTrue(env.kmpTorBinaries.pollStagingRepo)
 
 kmpConfiguration {
     setupMultiplatform(targets =
@@ -41,7 +41,7 @@ kmpConfiguration {
                 },
                 mainSourceSet = {
                     dependencies {
-                        implementation("${pConfig.group}:kmp-tor-binary-android:${env.kmpTorBinaries.version.name}")
+                        implementation("$group:kmp-tor-binary-android:${env.kmpTorBinaries.version.name}")
                     }
                 },
             ),
@@ -50,7 +50,7 @@ kmpConfiguration {
                 mainSourceSet = {
                     dependencies {
                         if (env.kmpTorAll.isBinaryRelease) {
-                            implementation("${pConfig.group}:kmp-tor-internal:${env.kmpTor.version.name}")
+                            implementation("$group:kmp-tor-internal:${env.kmpTor.version.name}")
                         } else {
                             implementation(project(":library:kmp-tor-internal"))
                         }
@@ -61,18 +61,18 @@ kmpConfiguration {
                         if (System.getProperty("java.version").substringBefore('.').toInt() < 16) {
                             // Use unix socket factory library
                             if (env.kmpTorAll.isBinaryRelease) {
-                                implementation("${pConfig.group}:kmp-tor-ext-unix-socket:${env.kmpTor.version.name}")
+                                implementation("$group:kmp-tor-ext-unix-socket:${env.kmpTor.version.name}")
                             } else {
                                 implementation(project(":library:extensions:kmp-tor-ext-unix-socket"))
                             }
                         }
 
                         // TODO: Remove once js binary targets are published
-                        implementation("${pConfig.group}:kmp-tor-binary-linuxx64:${env.kmpTorBinaries.version.name}")
-                        implementation("${pConfig.group}:kmp-tor-binary-linuxx86:${env.kmpTorBinaries.version.name}")
-                        implementation("${pConfig.group}:kmp-tor-binary-macosx64:${env.kmpTorBinaries.version.name}")
-                        implementation("${pConfig.group}:kmp-tor-binary-mingwx64:${env.kmpTorBinaries.version.name}")
-                        implementation("${pConfig.group}:kmp-tor-binary-mingwx86:${env.kmpTorBinaries.version.name}")
+                        implementation("$group:kmp-tor-binary-linuxx64:${env.kmpTorBinaries.version.name}")
+                        implementation("$group:kmp-tor-binary-linuxx86:${env.kmpTorBinaries.version.name}")
+                        implementation("$group:kmp-tor-binary-macosx64:${env.kmpTorBinaries.version.name}")
+                        implementation("$group:kmp-tor-binary-mingwx64:${env.kmpTorBinaries.version.name}")
+                        implementation("$group:kmp-tor-binary-mingwx86:${env.kmpTorBinaries.version.name}")
                     }
                 },
             ),
@@ -131,11 +131,11 @@ kmpConfiguration {
             dependencies {
                 implementation(deps.kotlin.coroutines.core.core)
 
-                implementation("${pConfig.group}:kmp-tor-binary-geoip:${env.kmpTorBinaries.version.name}")
-                implementation("${pConfig.group}:kmp-tor-binary-extract:${env.kmpTorBinaries.version.name}")
+                implementation("$group:kmp-tor-binary-geoip:${env.kmpTorBinaries.version.name}")
+                implementation("$group:kmp-tor-binary-extract:${env.kmpTorBinaries.version.name}")
 
                 if (env.kmpTorAll.isBinaryRelease) {
-                    api("${pConfig.group}:kmp-tor-manager:${env.kmpTor.version.name}")
+                    api("$group:kmp-tor-manager:${env.kmpTor.version.name}")
                 } else {
                     api(project(":library:manager:kmp-tor-manager"))
                 }
@@ -148,7 +148,7 @@ kmpConfiguration {
                 implementation(kotlin("test"))
 
                 if (env.kmpTorAll.isBinaryRelease) {
-                    implementation("${pConfig.group}:kmp-tor-ext-callback-manager:${env.kmpTor.version.name}")
+                    implementation("$group:kmp-tor-ext-callback-manager:${env.kmpTor.version.name}")
                 } else {
                     implementation(project(":library:extensions:kmp-tor-ext-callback-manager"))
                 }
@@ -170,11 +170,11 @@ kmpConfiguration {
     )
 }
 
-kmpPublish {
-    setupModule(
-        pomDescription = "Kotlin Components' TorManager & TorBinary distribution",
-        holdPublication = env.kmpTorAll.holdPublication,
-        versionCodeOverride = env.kmpTorAll.version.code,
-        versionNameOverride = env.kmpTorAll.version.name
-    )
-}
+//kmpPublish {
+//    setupModule(
+//        pomDescription = "Kotlin Components' TorManager & TorBinary distribution",
+//        holdPublication = env.kmpTorAll.holdPublication,
+//        versionCodeOverride = env.kmpTorAll.version.code,
+//        versionNameOverride = env.kmpTorAll.version.name
+//    )
+//}

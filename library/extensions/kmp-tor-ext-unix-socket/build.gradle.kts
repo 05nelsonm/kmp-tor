@@ -18,7 +18,7 @@ import kmp.tor.env
 
 plugins {
     id(pluginId.kmp.configuration)
-    id(pluginId.kmp.publish)
+//    id(pluginId.kmp.publish)
 }
 
 kmpConfiguration {
@@ -40,9 +40,9 @@ kmpConfiguration {
     )
 }
 
-kmpPublish {
-    setupModule(
-        pomDescription = "Kotlin Components' UnixSocket extension for JDK",
-        holdPublication = env.kmpTorAll.isBinaryRelease || env.kmpTor.holdPublication
-    )
-}
+//kmpPublish {
+//    setupModule(
+//        pomDescription = "Kotlin Components' UnixSocket extension for JDK",
+//        holdPublication = env.kmpTorAll.isBinaryRelease || env.kmpTor.holdPublication
+//    )
+//}

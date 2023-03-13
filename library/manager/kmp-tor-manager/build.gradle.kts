@@ -20,7 +20,7 @@ import org.jetbrains.kotlin.gradle.plugin.KotlinJsCompilerType
 
 plugins {
     id(pluginId.kmp.configuration)
-    id(pluginId.kmp.publish)
+//    id(pluginId.kmp.publish)
 }
 
 kmpConfiguration {
@@ -72,8 +72,8 @@ kmpConfiguration {
             dependencies {
                 implementation(deps.kotlin.coroutines.core.core)
                 implementation(project(":library:controller:kmp-tor-controller")) {
-                    exclude(kmpPublishRootProjectConfiguration!!.group, "kmp-tor-common")
-                    exclude(kmpPublishRootProjectConfiguration!!.group, "kmp-tor-controller-common")
+                    exclude(group, "kmp-tor-common")
+                    exclude(group, "kmp-tor-controller-common")
                 }
                 api(project(":library:manager:kmp-tor-manager-common"))
             }
@@ -88,9 +88,9 @@ kmpConfiguration {
     )
 }
 
-kmpPublish {
-    setupModule(
-        pomDescription = "Kotlin Components' TorManager for managing startup, shutdown, state, etc.",
-        holdPublication = env.kmpTorAll.isBinaryRelease || env.kmpTor.holdPublication
-    )
-}
+//kmpPublish {
+//    setupModule(
+//        pomDescription = "Kotlin Components' TorManager for managing startup, shutdown, state, etc.",
+//        holdPublication = env.kmpTorAll.isBinaryRelease || env.kmpTor.holdPublication
+//    )
+//}

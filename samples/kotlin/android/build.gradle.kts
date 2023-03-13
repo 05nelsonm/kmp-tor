@@ -13,8 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-import io.matthewnelson.kotlin.components.kmp.util.includeSnapshotsRepoIfTrue
-import io.matthewnelson.kotlin.components.kmp.util.includeStagingRepoIfTrue
+//import io.matthewnelson.kotlin.components.kmp.util.includeSnapshotsRepoIfTrue
+//import io.matthewnelson.kotlin.components.kmp.util.includeStagingRepoIfTrue
 import kmp.tor.env
 
 plugins {
@@ -22,11 +22,11 @@ plugins {
     id(pluginId.kotlin.android)
 }
 
-// disregard. this is for playing with newly published binaries prior to release
-includeStagingRepoIfTrue(env.kmpTorBinaries.pollStagingRepo)
-
-// For SNAPSHOTS
-includeSnapshotsRepoIfTrue(true)
+//// disregard. this is for playing with newly published binaries prior to release
+//includeStagingRepoIfTrue(env.kmpTorBinaries.pollStagingRepo)
+//
+//// For SNAPSHOTS
+//includeSnapshotsRepoIfTrue(true)
 
 android {
     compileSdk = versions.android.sdkCompile

@@ -13,13 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-import io.matthewnelson.kotlin.components.kmp.util.configureYarn
 import kmp.tor.env
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import org.gradle.api.tasks.testing.logging.TestLogEvent.FAILED
 import org.gradle.api.tasks.testing.logging.TestLogEvent.PASSED
 import org.gradle.api.tasks.testing.logging.TestLogEvent.SKIPPED
 import org.gradle.api.tasks.testing.logging.TestLogEvent.STARTED
+import org.jetbrains.kotlin.gradle.targets.js.yarn.YarnPlugin
+import org.jetbrains.kotlin.gradle.targets.js.yarn.YarnRootExtension
 
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 buildscript {
@@ -41,7 +42,14 @@ buildscript {
     }
 }
 
+ext.set("VERSION_NAME", env.kmpTor.version.name)
+ext.set("VERSION_CODE", env.kmpTor.version.code)
+
 allprojects {
+
+    findProperty("GROUP")?.let { group = it }
+    findProperty("VERSION_NAME")?.let { version = it }
+    findProperty("POM_DESCRIPTION")?.let { description = it.toString() }
 
     repositories {
         mavenCentral()
@@ -59,23 +67,12 @@ allprojects {
 
 }
 
-configureYarn { rootYarn, _ ->
-    rootYarn.apply {
-        lockFileDirectory = project.rootDir.resolve(".kotlin-js-store")
-    }
+plugins.withType<YarnPlugin> {
+    the<YarnRootExtension>().lockFileDirectory = rootDir.resolve(".kotlin-js-store")
 }
 
 plugins {
-    id(pluginId.kmp.publish)
     id(pluginId.kotlin.binaryCompat) version(versions.gradle.binaryCompat)
-}
-
-kmpPublish {
-    setupRootProject(
-        versionName = env.kmpTor.version.name,
-        versionCode = env.kmpTor.version.code,
-        pomInceptionYear = 2021,
-    )
 }
 
 @Suppress("LocalVariableName")
@@ -93,8 +90,8 @@ apiValidation {
         val JVM = TARGETS?.contains("JVM") != false
         val ANDROID = TARGETS?.contains("ANDROID") != false
 
-        // Don't check these projects when building JVM only
-        if (!KMP_TARGETS_ALL && (!ANDROID && JVM)) {
+        // Don't check these projects when building JVM only or ANDROID only
+        if (!KMP_TARGETS_ALL && ((!ANDROID && JVM) || (ANDROID && !JVM))) {
             ignoredProjects.add("kmp-tor")
             ignoredProjects.add("kmp-tor-common")
             ignoredProjects.add("kmp-tor-controller")
@@ -107,7 +104,7 @@ apiValidation {
             ignoredProjects.add("kmp-tor-ext-callback-manager-common")
         }
 
-        if (KMP_TARGETS_ALL || (ANDROID && JVM)) {
+        if (KMP_TARGETS_ALL || ANDROID) {
             ignoredProjects.add("android")
         }
 
