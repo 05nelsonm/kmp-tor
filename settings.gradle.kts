@@ -1,5 +1,15 @@
 rootProject.name = "kmp-tor"
 
+pluginManagement {
+    repositories {
+        mavenCentral()
+        google()
+        gradlePluginPortal()
+    }
+}
+
+includeBuild("build-logic")
+
 includeBuild("kotlin-components/includeBuild/dependencies")
 includeBuild("kotlin-components/includeBuild/kmp")
 
