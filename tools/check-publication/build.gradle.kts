@@ -19,23 +19,8 @@ plugins {
     id("configuration")
 }
 
-// TODO: Move to build-environment
-repositories {
-    val host = "https://s01.oss.sonatype.org"
-
-    if (version.toString().endsWith("-SNAPSHOT")) {
-        maven("$host/content/repositories/snapshots/")
-    } else {
-        maven("$host/content/groups/staging") {
-            val p = rootProject.properties
-
-            credentials {
-                username = p["mavenCentralUsername"]?.toString()
-                password = p["mavenCentralPassword"]?.toString()
-            }
-        }
-    }
-}
+includeSnapshotRepoIfTrue(isSnapshot)
+includeStagingRepoIfTrue(!isSnapshot)
 
 kmpConfiguration {
     configureShared(

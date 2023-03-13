@@ -19,8 +19,7 @@ plugins {
     id("configuration")
 }
 
-// TODO
-//includeStagingRepoIfTrue(env.kmpTorBinaries.pollStagingRepo)
+includeStagingRepoIfTrue(env.kmpTorBinaries.pollStagingRepo)
 
 // Override
 ext.set("VERSION_NAME", env.kmpTorAll.version.name)

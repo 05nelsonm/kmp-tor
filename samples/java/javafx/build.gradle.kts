@@ -22,7 +22,6 @@ plugins {
     alias(libs.plugins.javafx)
 }
 
-// TODO
 //// disregard. this is for playing with newly published binaries prior to release
 //includeStagingRepoIfTrue(env.kmpTorBinaries.pollStagingRepo)
 //
