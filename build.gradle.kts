@@ -14,32 +14,15 @@
  * limitations under the License.
  **/
 import kmp.tor.env
-import org.gradle.api.tasks.testing.logging.TestExceptionFormat
-import org.gradle.api.tasks.testing.logging.TestLogEvent.FAILED
-import org.gradle.api.tasks.testing.logging.TestLogEvent.PASSED
-import org.gradle.api.tasks.testing.logging.TestLogEvent.SKIPPED
-import org.gradle.api.tasks.testing.logging.TestLogEvent.STARTED
 import org.jetbrains.kotlin.gradle.targets.js.yarn.YarnPlugin
 import org.jetbrains.kotlin.gradle.targets.js.yarn.YarnRootExtension
 
-// Top-level build file where you can add configuration options common to all sub-projects/modules.
-buildscript {
-
-    repositories {
-        mavenCentral()
-        google()
-        gradlePluginPortal()
-    }
-
-    dependencies {
-        classpath(pluginDeps.android.gradle)
-        classpath(pluginDeps.kotlin.gradle)
-        classpath(pluginDeps.kotlin.atomicfu)
-        classpath(pluginDeps.mavenPublish)
-
-        // NOTE: Do not place your application dependencies here; they belong
-        // in the individual module build.gradle.kts files
-    }
+@Suppress("DSL_SCOPE_VIOLATION")
+plugins {
+    alias(libs.plugins.multiplatform) apply(false)
+    alias(libs.plugins.atomicfu) apply(false)
+    alias(libs.plugins.android.library) apply(false)
+    alias(libs.plugins.binaryCompat)
 }
 
 ext.set("VERSION_NAME", env.kmpTor.version.name)
@@ -57,22 +40,10 @@ allprojects {
         gradlePluginPortal()
     }
 
-    tasks.withType<Test> {
-        testLogging {
-            exceptionFormat = TestExceptionFormat.FULL
-            events(STARTED, PASSED, SKIPPED, FAILED)
-            showStandardStreams = true
-        }
-    }
-
 }
 
 plugins.withType<YarnPlugin> {
     the<YarnRootExtension>().lockFileDirectory = rootDir.resolve(".kotlin-js-store")
-}
-
-plugins {
-    id(pluginId.kotlin.binaryCompat) version(versions.gradle.binaryCompat)
 }
 
 @Suppress("LocalVariableName")

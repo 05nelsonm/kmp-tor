@@ -13,13 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-//import io.matthewnelson.kotlin.components.kmp.util.includeSnapshotsRepoIfTrue
-//import io.matthewnelson.kotlin.components.kmp.util.includeStagingRepoIfTrue
 import kmp.tor.env
 
+@Suppress("DSL_SCOPE_VIOLATION")
 plugins {
-    id(pluginId.android.application)
-    id(pluginId.kotlin.android)
+    id(libs.plugins.android.app.get().pluginId)
+    id(libs.plugins.kotlin.android.get().pluginId)
 }
 
 //// disregard. this is for playing with newly published binaries prior to release
@@ -29,8 +28,8 @@ plugins {
 //includeSnapshotsRepoIfTrue(true)
 
 android {
-    compileSdk = versions.android.sdkCompile
-    buildToolsVersion = versions.android.buildTools
+    compileSdk = 33
+    buildToolsVersion = "33.0.1"
     namespace = "io.matthewnelson.kmp.tor.sample.kotlin.android"
 
     packagingOptions {
@@ -43,8 +42,8 @@ android {
     buildFeatures.viewBinding = true
     defaultConfig {
         applicationId = "io.matthewnelson.kmp.tor.sample.kotlin"
-        minSdk = versions.android.sdkMin21
-        targetSdk = versions.android.sdkTarget
+        minSdk = 21
+        targetSdk = 33
         versionCode = env.kmpTorAll.version.code
         versionName = env.kmpTorAll.version.name
 
@@ -103,14 +102,14 @@ android {
 }
 
 dependencies {
-    implementation(deps.androidx.appCompat)
-    implementation(deps.androidx.constraintLayout)
-    implementation(deps.androidx.lifecycle.viewModel)
-    implementation(deps.viewBindingDelegateNoReflect)
+    implementation(libs.androidx.appCompat)
+    implementation(libs.androidx.constraintLayout)
+    implementation(libs.androidx.lifecycle.viewModel)
+    implementation(libs.viewBindingDelegate)
 
     // For SNAPSHOTS
 //    implementation("io.matthewnelson.kotlin-components:kmp-tor:${env.kmpTorAll.version.name}")
     implementation(project(":library:kmp-tor"))
 
-    implementation(deps.kotlin.coroutines.android)
+    implementation(libs.coroutines.android)
 }

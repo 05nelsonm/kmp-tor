@@ -13,168 +13,97 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-import io.matthewnelson.kotlin.components.kmp.KmpTarget
-//import io.matthewnelson.kotlin.components.kmp.publish.kmpPublishRootProjectConfiguration
-import io.matthewnelson.kotlin.components.kmp.util.*
 import kmp.tor.env
-import org.jetbrains.kotlin.gradle.plugin.KotlinJsCompilerType
 
 plugins {
-    id(pluginId.kmp.configuration)
-//    id(pluginId.kmp.publish)
+    id("configuration")
 }
 
-//val pConfig = kmpPublishRootProjectConfiguration!!
+// TODO
 //includeStagingRepoIfTrue(env.kmpTorBinaries.pollStagingRepo)
 
+// Override
+ext.set("VERSION_NAME", env.kmpTorAll.version.name)
+ext.set("VERSION_CODE", env.kmpTorAll.version.code)
+
 kmpConfiguration {
-    setupMultiplatform(targets =
-        setOf(
-
-            KmpTarget.Jvm.Android(
-                buildTools = versions.android.buildTools,
-                compileSdk = versions.android.sdkCompile,
-                minSdk = versions.android.sdkMin21,
-                namespace = "io.matthewnelson.kmp.tor",
-                target = {
-                    publishLibraryVariants("release")
-                },
-                mainSourceSet = {
-                    dependencies {
-                        implementation("$group:kmp-tor-binary-android:${env.kmpTorBinaries.version.name}")
-                    }
-                },
-            ),
-
-            KmpTarget.Jvm.Jvm(
-                mainSourceSet = {
-                    dependencies {
-                        if (env.kmpTorAll.isBinaryRelease) {
-                            implementation("$group:kmp-tor-internal:${env.kmpTor.version.name}")
-                        } else {
-                            implementation(project(":library:kmp-tor-internal"))
-                        }
-                    }
-                },
-                testSourceSet = {
-                    dependencies {
-                        if (System.getProperty("java.version").substringBefore('.').toInt() < 16) {
-                            // Use unix socket factory library
-                            if (env.kmpTorAll.isBinaryRelease) {
-                                implementation("$group:kmp-tor-ext-unix-socket:${env.kmpTor.version.name}")
-                            } else {
-                                implementation(project(":library:extensions:kmp-tor-ext-unix-socket"))
-                            }
-                        }
-
-                        // TODO: Remove once js binary targets are published
-                        implementation("$group:kmp-tor-binary-linuxx64:${env.kmpTorBinaries.version.name}")
-                        implementation("$group:kmp-tor-binary-linuxx86:${env.kmpTorBinaries.version.name}")
-                        implementation("$group:kmp-tor-binary-macosx64:${env.kmpTorBinaries.version.name}")
-                        implementation("$group:kmp-tor-binary-mingwx64:${env.kmpTorBinaries.version.name}")
-                        implementation("$group:kmp-tor-binary-mingwx86:${env.kmpTorBinaries.version.name}")
-                    }
-                },
-            ),
-
-//            KmpTarget.NonJvm.JS(
-//                compilerType = KotlinJsCompilerType.BOTH,
-//                browser = null,
-//                node = KmpTarget.NonJvm.JS.Node(),
-//            ),
-//
-//            KmpTarget.NonJvm.Native.Unix.Darwin.Ios.Arm32.DEFAULT,
-//            KmpTarget.NonJvm.Native.Unix.Darwin.Ios.Arm64.DEFAULT,
-//            KmpTarget.NonJvm.Native.Unix.Darwin.Ios.X64.DEFAULT,
-//            KmpTarget.NonJvm.Native.Unix.Darwin.Ios.SimulatorArm64.DEFAULT,
-//
-//            KmpTarget.NonJvm.Native.Unix.Darwin.Macos.X64(
-//                mainSourceSet = {
-//                    dependencies {
-//                        // TODO: Uncomment once macosx64 binary target is published
-//                        implementation("${pConfig.group}:kmp-tor-binary-macosx64:${env.kmpTorBinaries.version.name}")
-//                    }
-//                },
-//            ),
-//            KmpTarget.NonJvm.Native.Unix.Darwin.Macos.Arm64.DEFAULT,
-//
-//            KmpTarget.NonJvm.Native.Unix.Darwin.Tvos.Arm64.DEFAULT,
-//            KmpTarget.NonJvm.Native.Unix.Darwin.Tvos.X64.DEFAULT,
-//            KmpTarget.NonJvm.Native.Unix.Darwin.Tvos.SimulatorArm64.DEFAULT,
-//
-//            KmpTarget.NonJvm.Native.Unix.Darwin.Watchos.Arm32.DEFAULT,
-//            KmpTarget.NonJvm.Native.Unix.Darwin.Watchos.Arm64.DEFAULT,
-//            KmpTarget.NonJvm.Native.Unix.Darwin.Watchos.X64.DEFAULT,
-//            KmpTarget.NonJvm.Native.Unix.Darwin.Watchos.X86.DEFAULT,
-//            KmpTarget.NonJvm.Native.Unix.Darwin.Watchos.SimulatorArm64.DEFAULT,
-//
-//            KmpTarget.NonJvm.Native.Unix.Linux.X64(
-//                mainSourceSet = {
-//                    dependencies {
-//                        // TODO: Uncomment once linuxx64 binary target is published
-//                        implementation("${pConfig.group}:kmp-tor-binary-linuxx64:${env.kmpTorBinaries.version.name}")
-//                    }
-//                },
-//            ),
-//
-//            KmpTarget.NonJvm.Native.Mingw.X64(
-//                mainSourceSet = {
-//                    dependencies {
-//                        // TODO: Uncomment once mingwx64 binary target is published
-//                        implementation("${pConfig.group}:kmp-tor-binary-mingwx64:${env.kmpTorBinaries.version.name}")
-//                    }
-//                },
-//            ),
-        ),
-
-        commonMainSourceSet = {
-            dependencies {
-                implementation(deps.kotlin.coroutines.core.core)
-
-                implementation("$group:kmp-tor-binary-geoip:${env.kmpTorBinaries.version.name}")
-                implementation("$group:kmp-tor-binary-extract:${env.kmpTorBinaries.version.name}")
-
-                if (env.kmpTorAll.isBinaryRelease) {
-                    api("$group:kmp-tor-manager:${env.kmpTor.version.name}")
-                } else {
-                    api(project(":library:manager:kmp-tor-manager"))
+    configureShared(
+        androidNameSpace = "io.matthewnelson.kmp.tor",
+        publish = !(env.kmpTorAll.holdPublication),
+    ) {
+        androidLibrary {
+            android {
+                defaultConfig {
+                    minSdk = 21
                 }
             }
-        },
-
-        commonTestSourceSet = {
-            dependencies {
-                implementation(depsTest.kotlin.coroutines)
-                implementation(kotlin("test"))
-
-                if (env.kmpTorAll.isBinaryRelease) {
-                    implementation("$group:kmp-tor-ext-callback-manager:${env.kmpTor.version.name}")
-                } else {
-                    implementation(project(":library:extensions:kmp-tor-ext-callback-manager"))
-                }
-            }
-        },
-
-        kotlin = {
-            sourceSetJvmJsTest {
+            sourceSetMain {
                 dependencies {
-                    // TODO: Uncomment once js binary targets are published
-//                    implementation("${pConfig.group}:kmp-tor-binary-linuxx64:${env.kmpTorBinaries.version.name}")
-//                    implementation("${pConfig.group}:kmp-tor-binary-linuxx86:${env.kmpTorBinaries.version.name}")
-//                    implementation("${pConfig.group}:kmp-tor-binary-macosx64:${env.kmpTorBinaries.version.name}")
-//                    implementation("${pConfig.group}:kmp-tor-binary-mingwx64:${env.kmpTorBinaries.version.name}")
-//                    implementation("${pConfig.group}:kmp-tor-binary-mingwx86:${env.kmpTorBinaries.version.name}")
+                    implementation("$group:kmp-tor-binary-android:${env.kmpTorBinaries.version.name}")
                 }
             }
         }
-    )
-}
 
-//kmpPublish {
-//    setupModule(
-//        pomDescription = "Kotlin Components' TorManager & TorBinary distribution",
-//        holdPublication = env.kmpTorAll.holdPublication,
-//        versionCodeOverride = env.kmpTorAll.version.code,
-//        versionNameOverride = env.kmpTorAll.version.name
-//    )
-//}
+        jvm {
+            sourceSetMain {
+                dependencies {
+                    if (env.kmpTorAll.isBinaryRelease) {
+                        implementation("$group:kmp-tor-internal:${env.kmpTor.version.name}")
+                    } else {
+                        implementation(project(":library:kmp-tor-internal"))
+                    }
+                }
+            }
+            sourceSetTest {
+                dependencies {
+                    if (System.getProperty("java.version").substringBefore('.').toInt() < 16) {
+                        // Use unix socket factory library
+                        if (env.kmpTorAll.isBinaryRelease) {
+                            implementation("$group:kmp-tor-ext-unix-socket:${env.kmpTor.version.name}")
+                        } else {
+                            implementation(project(":library:extensions:kmp-tor-ext-unix-socket"))
+                        }
+                    }
+
+                    implementation("$group:kmp-tor-binary-linuxx64:${env.kmpTorBinaries.version.name}")
+                    implementation("$group:kmp-tor-binary-linuxx86:${env.kmpTorBinaries.version.name}")
+                    implementation("$group:kmp-tor-binary-macosx64:${env.kmpTorBinaries.version.name}")
+                    implementation("$group:kmp-tor-binary-mingwx64:${env.kmpTorBinaries.version.name}")
+                    implementation("$group:kmp-tor-binary-mingwx86:${env.kmpTorBinaries.version.name}")
+                }
+            }
+
+            // Requires Java 11+ b/c of kmp-tor-internal module
+            kotlinJvmTarget = JavaVersion.VERSION_11
+            compileSourceCompatibility = JavaVersion.VERSION_11
+            compileTargetCompatibility = JavaVersion.VERSION_11
+        }
+
+        common {
+            sourceSetMain {
+                dependencies {
+                    implementation(libs.coroutines.core)
+                    implementation("$group:kmp-tor-binary-geoip:${env.kmpTorBinaries.version.name}")
+                    implementation("$group:kmp-tor-binary-extract:${env.kmpTorBinaries.version.name}")
+
+                    if (env.kmpTorAll.isBinaryRelease) {
+                        api("$group:kmp-tor-manager:${env.kmpTor.version.name}")
+                    } else {
+                        api(project(":library:manager:kmp-tor-manager"))
+                    }
+                }
+            }
+            sourceSetTest {
+                dependencies {
+                    implementation(libs.coroutines.test)
+
+                    if (env.kmpTorAll.isBinaryRelease) {
+                        implementation("$group:kmp-tor-ext-callback-manager:${env.kmpTor.version.name}")
+                    } else {
+                        implementation(project(":library:extensions:kmp-tor-ext-callback-manager"))
+                    }
+                }
+            }
+        }
+    }
+}

@@ -13,65 +13,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-import io.matthewnelson.kotlin.components.kmp.KmpTarget
 import kmp.tor.env
-import org.jetbrains.kotlin.gradle.plugin.KotlinJsCompilerType
 
 plugins {
-    id(pluginId.kmp.configuration)
-//    id(pluginId.kmp.publish)
+    id("configuration")
 }
 
 kmpConfiguration {
-    setupMultiplatform(targets =
-        setOf(
-
-            KmpTarget.Jvm.Android(
-                buildTools = versions.android.buildTools,
-                compileSdk = versions.android.sdkCompile,
-                minSdk = versions.android.sdkMin16,
-                namespace = "io.matthewnelson.kmp.tor.ext.callback.controller",
-                target = {
-                    publishLibraryVariants("release")
-                },
-            ),
-
-            KmpTarget.Jvm.Jvm.DEFAULT,
-
-//            KmpTarget.NonJvm.JS(
-//                compilerType = KotlinJsCompilerType.BOTH,
-//                browser = null,
-//                node = KmpTarget.NonJvm.JS.Node(),
-//            ),
-//
-//            KmpTarget.NonJvm.Native.Unix.Linux.X64.DEFAULT,
-//
-//            KmpTarget.NonJvm.Native.Mingw.X64.DEFAULT,
-        )/* +
-        KmpTarget.NonJvm.Native.Unix.Darwin.Ios.ALL_DEFAULT     +
-        KmpTarget.NonJvm.Native.Unix.Darwin.Macos.ALL_DEFAULT   +
-        KmpTarget.NonJvm.Native.Unix.Darwin.Tvos.ALL_DEFAULT    +
-        KmpTarget.NonJvm.Native.Unix.Darwin.Watchos.ALL_DEFAULT*/,
-
-        commonMainSourceSet = {
-            dependencies {
-                implementation(deps.kotlin.coroutines.core.core)
-                api(project(":library:controller:kmp-tor-controller"))
-                api(project(":library:extensions:kmp-tor-ext-callback-controller-common"))
+    configureShared(
+        androidNameSpace = "io.matthewnelson.kmp.tor.ext.callback.controller",
+        publish = !(env.kmpTorAll.isBinaryRelease || env.kmpTor.holdPublication),
+    ) {
+        common {
+            sourceSetMain {
+                dependencies {
+                    implementation(libs.coroutines.core)
+                    api(project(":library:controller:kmp-tor-controller"))
+                    api(project(":library:extensions:kmp-tor-ext-callback-controller-common"))
+                }
             }
-        },
-
-        commonTestSourceSet = {
-            dependencies {
-                implementation(kotlin("test"))
-            }
-        },
-    )
+        }
+    }
 }
-
-//kmpPublish {
-//    setupModule(
-//        pomDescription = "Kotlin Components' Callback extension of TorController for non-coroutine consumers",
-//        holdPublication = env.kmpTorAll.isBinaryRelease || env.kmpTor.holdPublication
-//    )
-//}

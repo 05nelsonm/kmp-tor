@@ -13,12 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-import io.matthewnelson.kotlin.components.kmp.KmpTarget
 import kmp.tor.env
 
 plugins {
-    id(pluginId.kmp.configuration)
-//    id(pluginId.kmp.publish)
+    id("configuration")
 }
 
 /**
@@ -29,28 +27,13 @@ plugins {
  * exposed as this dependency will be transitively provided.
  * */
 kmpConfiguration {
-    setupMultiplatform(targets =
-        setOf(
-
-            KmpTarget.Jvm.Jvm(
-                target = {
-                    withJava()
-                }
-            ),
-
-        ),
-
-        commonTestSourceSet = {
-            dependencies {
-                implementation(kotlin("test"))
-            }
-        },
-    )
+    configureShared(
+        publish = !(env.kmpTorAll.isBinaryRelease || env.kmpTor.holdPublication)
+    ) {
+        jvm {
+            kotlinJvmTarget = JavaVersion.VERSION_11
+            compileSourceCompatibility = JavaVersion.VERSION_11
+            compileTargetCompatibility = JavaVersion.VERSION_11
+        }
+    }
 }
-
-//kmpPublish {
-//    setupModule(
-//        pomDescription = "Kotlin Components' kmp-tor internal utils",
-//        holdPublication = env.kmpTorAll.isBinaryRelease || env.kmpTor.holdPublication
-//    )
-//}

@@ -13,36 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-import io.matthewnelson.kotlin.components.kmp.KmpTarget
 import kmp.tor.env
 
 plugins {
-    id(pluginId.kmp.configuration)
-//    id(pluginId.kmp.publish)
+    id("configuration")
 }
 
 kmpConfiguration {
-    setupMultiplatform(targets =
-        setOf(
-
-            KmpTarget.Jvm.Jvm(
-                target = {
-                    withJava()
-                },
-                mainSourceSet = {
-                    dependencies {
-                        implementation(deps.jnrUnixSocket)
-                    }
+    configureShared(
+        publish = !(env.kmpTorAll.isBinaryRelease || env.kmpTor.holdPublication),
+    ) {
+        jvm {
+            sourceSetMain {
+                dependencies {
+                    implementation(libs.jnrUnixSocket)
                 }
-            ),
-
-        ),
-    )
+            }
+        }
+    }
 }
-
-//kmpPublish {
-//    setupModule(
-//        pomDescription = "Kotlin Components' UnixSocket extension for JDK",
-//        holdPublication = env.kmpTorAll.isBinaryRelease || env.kmpTor.holdPublication
-//    )
-//}
