@@ -10,6 +10,7 @@ public final class io/matthewnelson/kmp/tor/PlatformInstaller {
 	public final field os Ljava/lang/String;
 	public final field sha256Sum Ljava/lang/String;
 	public synthetic fun <init> (Lio/matthewnelson/kmp/tor/PlatformInstaller$InstallOption;Lio/matthewnelson/kmp/tor/binary/extract/TorResource$Binaries;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public static final fun custom (Lio/matthewnelson/kmp/tor/PlatformInstaller$InstallOption;Lio/matthewnelson/kmp/tor/binary/extract/TorBinaryResource;)Lio/matthewnelson/kmp/tor/PlatformInstaller;
 	public final fun isLinux ()Z
 	public final fun isMacos ()Z
 	public final fun isMingw ()Z
@@ -22,6 +23,7 @@ public final class io/matthewnelson/kmp/tor/PlatformInstaller {
 }
 
 public final class io/matthewnelson/kmp/tor/PlatformInstaller$Companion {
+	public final fun custom (Lio/matthewnelson/kmp/tor/PlatformInstaller$InstallOption;Lio/matthewnelson/kmp/tor/binary/extract/TorBinaryResource;)Lio/matthewnelson/kmp/tor/PlatformInstaller;
 	public final fun linuxX64 (Lio/matthewnelson/kmp/tor/PlatformInstaller$InstallOption;)Lio/matthewnelson/kmp/tor/PlatformInstaller;
 	public final fun linuxX86 (Lio/matthewnelson/kmp/tor/PlatformInstaller$InstallOption;)Lio/matthewnelson/kmp/tor/PlatformInstaller;
 	public final fun macosArm64 (Lio/matthewnelson/kmp/tor/PlatformInstaller$InstallOption;)Lio/matthewnelson/kmp/tor/PlatformInstaller;
