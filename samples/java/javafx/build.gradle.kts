@@ -71,7 +71,7 @@ dependencies {
             implementation("io.matthewnelson.kotlin-components:kmp-tor-binary-macosx64:$vTor")
         }
         osName.contains("Mac", true) -> {
-            implementation("io.matthewnelson.kotlin-components:kmp-tor-binary-macosx64:$vTor")
+            implementation("io.matthewnelson.kotlin-components:kmp-tor-binary-macosarm64:$vTor")
         }
         osName.contains("linux", true) -> {
             // Will be providing our own binary resources for x64 Tor 0.4.7.12 as an example
