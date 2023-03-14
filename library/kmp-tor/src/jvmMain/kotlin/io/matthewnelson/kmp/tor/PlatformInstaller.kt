@@ -139,6 +139,7 @@ class PlatformInstaller private constructor(
         is TorResourceMacosArm64 -> MACOS
         is TorResourceMingwX64,
         is TorResourceMingwX86 -> MINGW
+        is TorBinaryResource -> resource.osName
     }
 
     @JvmField
@@ -149,6 +150,7 @@ class PlatformInstaller private constructor(
         is TorResourceMacosArm64 -> ARM64
         is TorResourceMingwX64 -> X64
         is TorResourceMingwX86 -> X86
+        is TorBinaryResource -> resource.arch
     }
 
     @JvmField
