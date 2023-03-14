@@ -21,14 +21,12 @@ import io.matthewnelson.kmp.tor.PlatformInstaller.InstallOption
 import io.matthewnelson.kmp.tor.TorConfigProviderJvm
 import io.matthewnelson.kmp.tor.binary.extract.TorBinaryResource
 import io.matthewnelson.kmp.tor.common.address.*
-import io.matthewnelson.kmp.tor.common.annotation.InternalTorApi
 import io.matthewnelson.kmp.tor.controller.common.config.TorConfig
 import io.matthewnelson.kmp.tor.controller.common.config.TorConfig.Setting.*
 import io.matthewnelson.kmp.tor.controller.common.config.TorConfig.Option.*
 import io.matthewnelson.kmp.tor.controller.common.control.usecase.TorControlInfoGet
 import io.matthewnelson.kmp.tor.controller.common.events.TorEvent
 import io.matthewnelson.kmp.tor.controller.common.file.Path
-import io.matthewnelson.kmp.tor.controller.common.internal.PlatformUtil
 import io.matthewnelson.kmp.tor.manager.TorManager
 import io.matthewnelson.kmp.tor.manager.common.TorControlManager
 import io.matthewnelson.kmp.tor.manager.common.TorOperationManager
@@ -52,7 +50,7 @@ class SampleApp: App(SampleView::class) {
 
         val osName = System.getProperty("os.name")
 
-        when {
+        val installer = when {
             osName.contains("Windows", true) -> {
                 PlatformInstaller.mingwX64(InstallOption.CleanInstallIfMissing)
             }
@@ -79,22 +77,6 @@ class SampleApp: App(SampleView::class) {
                 )
             }
             osName.contains("linux", true) -> {
-                PlatformInstaller.linuxX64(InstallOption.CleanInstallIfMissing)
-            }
-            else -> {
-                throw RuntimeException("Could not identify Operating System")
-            }
-        }
-        @OptIn(InternalTorApi::class)
-        val installer = when {
-            PlatformUtil.isMingw -> {
-                PlatformInstaller.mingwX64(InstallOption.CleanInstallIfMissing)
-            }
-            PlatformUtil.isDarwin -> {
-                val osName = System.getProperty("os.name")
-                PlatformInstaller.macosX64(InstallOption.CleanInstallIfMissing)
-            }
-            PlatformUtil.isLinux -> {
                 PlatformInstaller.linuxX64(InstallOption.CleanInstallIfMissing)
             }
             else -> {
