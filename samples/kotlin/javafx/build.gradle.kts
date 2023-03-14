@@ -79,8 +79,13 @@ kotlin {
                     osName.contains("Windows", true) -> {
                         implementation("io.matthewnelson.kotlin-components:kmp-tor-binary-mingwx64:${env.kmpTorBinaries.version.name}")
                     }
-                    osName.contains("Mac", true) || osName.contains("Darwin", true) -> {
+                    osName == "Mac OS X" -> {
                         implementation("io.matthewnelson.kotlin-components:kmp-tor-binary-macosx64:${env.kmpTorBinaries.version.name}")
+                    }
+                    osName.contains("Mac", true) -> {
+                        // Will be providing our own binary resources for arm64 Tor 0.4.7.12 as an example
+                        // which are located in resources/kmptor/macos/arm64 of this sample.
+//                        implementation("io.matthewnelson.kotlin-components:kmp-tor-binary-macosx64:${env.kmpTorBinaries.version.name}")
                     }
                     osName.contains("linux", true) -> {
                         implementation("io.matthewnelson.kotlin-components:kmp-tor-binary-linuxx64:${env.kmpTorBinaries.version.name}")
@@ -89,6 +94,11 @@ kotlin {
                         throw GradleException("Failed to determine Operating System from os.name='$osName'")
                     }
                 }
+
+                // In order to model our binary resources for macOS arm64, will need the extract
+                // dependency (which is not provided with the kmp-tor import) to be able to use
+                // the TorBinaryResource class
+                implementation("io.matthewnelson.kotlin-components:kmp-tor-binary-extract:${env.kmpTorBinaries.version.name}")
 
                 // Add support for Unix Domain Sockets (Only necessary for JDK 15 and below)
                 implementation(project(":library:extensions:kmp-tor-ext-unix-socket"))

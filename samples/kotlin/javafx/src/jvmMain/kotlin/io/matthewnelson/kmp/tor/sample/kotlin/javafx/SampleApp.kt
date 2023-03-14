@@ -19,6 +19,7 @@ import io.matthewnelson.kmp.tor.KmpTorLoaderJvm
 import io.matthewnelson.kmp.tor.PlatformInstaller
 import io.matthewnelson.kmp.tor.PlatformInstaller.InstallOption
 import io.matthewnelson.kmp.tor.TorConfigProviderJvm
+import io.matthewnelson.kmp.tor.binary.extract.TorBinaryResource
 import io.matthewnelson.kmp.tor.common.address.*
 import io.matthewnelson.kmp.tor.common.annotation.InternalTorApi
 import io.matthewnelson.kmp.tor.controller.common.config.TorConfig
@@ -49,12 +50,48 @@ class SampleApp: App(SampleView::class) {
 
     private val platformInstaller: PlatformInstaller by lazy {
 
+        val osName = System.getProperty("os.name")
+
+        when {
+            osName.contains("Windows", true) -> {
+                PlatformInstaller.mingwX64(InstallOption.CleanInstallIfMissing)
+            }
+            osName == "Mac OS X" -> {
+                PlatformInstaller.macosX64(InstallOption.CleanInstallIfMissing)
+            }
+            osName.contains("Mac", true) -> {
+
+                // Example of providing your own packaged binary resources in the event a
+                // platform or architecture is not currently supported by kmp-tor-binary.
+                //
+                // Note that there IS a macOS arm64 binary dependency provided by
+                // kmp-tor-binary and that should be used instead; this is just an example.
+                //
+                // Files are located in this sample's resources/kmptor/macos/arm64 directory
+                PlatformInstaller.custom(
+                    InstallOption.CleanInstallIfMissing,
+                    TorBinaryResource.from(
+                        os = TorBinaryResource.OS.Macos,
+                        arch = "arm64",
+                        sha256sum = "0d9217a47af322d72e9213c1afdd53f4f571ff0483d8053726e56efeec850ff1",
+                        resourceManifest = listOf("libevent-2.1.7.dylib.gz", "tor.gz")
+                    )
+                )
+            }
+            osName.contains("linux", true) -> {
+                PlatformInstaller.linuxX64(InstallOption.CleanInstallIfMissing)
+            }
+            else -> {
+                throw RuntimeException("Could not identify Operating System")
+            }
+        }
         @OptIn(InternalTorApi::class)
         val installer = when {
             PlatformUtil.isMingw -> {
                 PlatformInstaller.mingwX64(InstallOption.CleanInstallIfMissing)
             }
             PlatformUtil.isDarwin -> {
+                val osName = System.getProperty("os.name")
                 PlatformInstaller.macosX64(InstallOption.CleanInstallIfMissing)
             }
             PlatformUtil.isLinux -> {
