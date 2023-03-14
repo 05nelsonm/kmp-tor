@@ -15,10 +15,12 @@
  **/
 package io.matthewnelson.kmp.tor.sample.java.javafx;
 
+import io.matthewnelson.kmp.tor.binary.extract.TorBinaryResource;
 import org.jetbrains.annotations.NotNull;
 
 import java.net.InetSocketAddress;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import io.matthewnelson.kmp.tor.KmpTorLoaderJvm;
@@ -127,10 +129,34 @@ public class App extends Application {
             throw new RuntimeException("os.name was null wtf?");
         } else if (osName.contains("Windows")) {
             return PlatformInstaller.mingwX64(InstallOption.CleanInstallIfMissing);
-        } else if (osName.contains("Mac") || osName.contains("Darwin")) {
+        } else if (osName.equals("Mac OS X")) {
             return PlatformInstaller.macosX64(InstallOption.CleanInstallIfMissing);
+        } else if (osName.contains("Mac") || osName.contains("Darwin")) {
+            return PlatformInstaller.macosArm64(InstallOption.CleanInstallIfMissing);
         } else if (osName.contains("Linux")) {
-            return PlatformInstaller.linuxX64(InstallOption.CleanInstallIfMissing);
+
+            // Example of providing your own packaged binary resources in the event a
+            // platform or architecture is not currently supported by kmp-tor-binary.
+            //
+            // Note that there IS a linux x64 binary dependency provided by
+            // kmp-tor-binary and that should be used instead; this is just an example.
+            //
+            // Files are located in this sample's resources/kmptor/linux/x64 directory
+            return PlatformInstaller.custom(
+                InstallOption.CleanInstallIfMissing,
+                TorBinaryResource.from(
+                    /* os */ TorBinaryResource.OS.Linux,
+                    /* arch */"x64",
+                    /* sha256sum */ "7ea1e0a19f63d2542b34e1cfe8f8135b278a0eea5a7fd8d25e78e12972834ae2",
+                    /* resourceManifest */ List.of(
+                        "libcrypto.so.1.1.gz",
+                        "libevent-2.1.so.7.gz",
+                        "libssl.so.1.1.gz",
+                        "libstdc++.so.6.gz",
+                        "tor.gz"
+                    )
+                )
+            );
         } else {
             throw new RuntimeException("Could not identify OS from 'os.name-" + osName);
         }

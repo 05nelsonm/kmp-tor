@@ -65,24 +65,34 @@ dependencies {
     val osName = System.getProperty("os.name")
     when {
         osName.contains("Windows", true) -> {
-            implementation("io.matthewnelson.kotlin-components:kmp-tor-binary-mingwx64:${env.kmpTorBinaries.version.name}")
+            implementation("io.matthewnelson.kotlin-components:kmp-tor-binary-mingwx64:$vTor")
         }
-        osName.contains("Mac", true) || osName.contains("Darwin", true) -> {
-            implementation("io.matthewnelson.kotlin-components:kmp-tor-binary-macosx64:${env.kmpTorBinaries.version.name}")
+        osName == "Mac OS X" -> {
+            implementation("io.matthewnelson.kotlin-components:kmp-tor-binary-macosx64:$vTor")
+        }
+        osName.contains("Mac", true) -> {
+            implementation("io.matthewnelson.kotlin-components:kmp-tor-binary-macosx64:$vTor")
         }
         osName.contains("linux", true) -> {
-            implementation("io.matthewnelson.kotlin-components:kmp-tor-binary-linuxx64:${env.kmpTorBinaries.version.name}")
+            // Will be providing our own binary resources for arm64 Tor 0.4.7.12 as an example
+            // which are located in resources/kmptor/linux/x64 of this sample.
+//            implementation("io.matthewnelson.kotlin-components:kmp-tor-binary-linuxx64:$vTor")
         }
         else -> {
             throw GradleException("Failed to determine Operating System from os.name='$osName'")
         }
     }
 
+    // In order to model our binary resources for linux x64, will need the extract
+    // dependency (which is not provided with the kmp-tor import) to be able to use
+    // the TorBinaryResource class
+    implementation("io.matthewnelson.kotlin-components:kmp-tor-binary-extract:$vTor")
+
     // Add support for Unix Domain Sockets (Only necessary for JDK 15 and below)
     implementation("io.matthewnelson.kotlin-components:kmp-tor-ext-unix-socket:$vKmpTor")
 
     // Only supporting x86_64 (x64) for this sample
-//  implementation("io.matthewnelson.kotlin-components:kmp-tor-binary-linuxx86:${env.kmpTorBinaries.version.name}")
-//  implementation("io.matthewnelson.kotlin-components:kmp-tor-binary-macosarm64:${env.kmpTorBinaries.version.name}")
-//  implementation("io.matthewnelson.kotlin-components:kmp-tor-binary-mingwx86:${env.kmpTorBinaries.version.name}")
+//  implementation("io.matthewnelson.kotlin-components:kmp-tor-binary-linuxx86:$vTor")
+//  implementation("io.matthewnelson.kotlin-components:kmp-tor-binary-macosarm64:$vTor")
+//  implementation("io.matthewnelson.kotlin-components:kmp-tor-binary-mingwx86:$vTor")
 }
