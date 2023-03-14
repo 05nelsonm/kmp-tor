@@ -196,10 +196,13 @@ git merge --no-ff -S release_"$VERSION_NAME"
 ```
 
 - Update `:build-environment src/main/kotlin/kmp/tor/env` version constants
-    - Remove `-SNAPSHOT`
+    - Re-add `-SNAPSHOT`
     - Bump `MANAGER_VERSION_NAME` and `MANAGER_VERSION_CODE`
     - If it was a tor binary version update only:
         - Set `env.kmpTorAll.isBinaryRelease` back to `false`
+- Update `gradle/libs.versions.toml` for javafx sample app
+    - `[versions].kmpTorBinary`
+    - `[versions].kmpTor`
 
 - Commit changes
 ```bash

@@ -1,5 +1,13 @@
 # CHANGELOG
 
+## Version 4.7.13-1-1.4.0 (2023-03-14)
+ - Update Kotlin `1.8.0` -> `1.8.10`
+ - Update AtomicFu `0.19.0` -> `0.20.0`
+ - Adds ability for library consumers to package and load their own
+   Tor binary resources (Jvm/JS) [[#284]][pr-284]
+ - Refactors gradle build system to use composite builds [[#283]][pr-283]
+     - Removes submodule `kotlin-components`
+
 ## Version 4.7.13-0-1.3.4 (2023-01-31)
  - Fixes `Destroyeable.onDestroy` invocation of `onCompletion` lambda only
    being invoked if `TorManager` was not yet destroyed. Now `onCompletion`
@@ -394,3 +402,6 @@
 
 ## Version 0.4.6.9+0.1.0-alpha1 (2022-02-06)
  - Initial `alpha` release
+
+[pr-284]: https://github.com/05nelsonm/kmp-tor/pull/284
+[pr-284]: https://github.com/05nelsonm/kmp-tor/pull/283
