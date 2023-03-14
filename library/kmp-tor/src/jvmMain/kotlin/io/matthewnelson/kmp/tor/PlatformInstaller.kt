@@ -135,6 +135,10 @@ class PlatformInstaller private constructor(
          * can package your own, model the resources via [TorBinaryResource], and then have
          * the files extracted and loaded at runtime.
          *
+         * DISCLAIMER: Using this option does **not** guarantee kmp-tor compatibility with
+         * the version of Tor being loaded, as kmp-tor is only tested against binaries
+         * provided by the kmp-tor-binary project.
+         *
          * Must:
          *  - Add dependency:
          *      - io.matthewnelson.kotlin-components:kmp-tor-binary-extract:(version)
