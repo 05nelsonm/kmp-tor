@@ -13,25 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-import io.matthewnelson.kotlin.components.kmp.util.includeSnapshotsRepoIfTrue
-import io.matthewnelson.kotlin.components.kmp.util.includeStagingRepoIfTrue
 import kmp.tor.env
 
 tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>() {
     kotlinOptions.jvmTarget = JavaVersion.VERSION_11.toString()
 }
 
+@Suppress("DSL_SCOPE_VIOLATION")
 plugins {
-    id(pluginId.kotlin.multiplatform)
+    id(libs.plugins.multiplatform.get().pluginId)
     application
-    id("org.openjfx.javafxplugin") version("0.0.11")
+    alias(libs.plugins.javafx)
 }
 
-// disregard. this is for playing with newly published binaries prior to release
-includeStagingRepoIfTrue(env.kmpTorBinaries.pollStagingRepo)
-
-// For SNAPSHOTS
-includeSnapshotsRepoIfTrue(true)
+//// disregard. this is for playing with newly published binaries prior to release
+//includeStagingRepoIfTrue(env.kmpTorBinaries.pollStagingRepo)
+//
+//// For SNAPSHOTS
+//includeSnapshotsRepoIfTrue(true)
 
 java {
     sourceCompatibility = JavaVersion.VERSION_11
@@ -58,15 +57,15 @@ kotlin {
         withJava()
     }
 
-    sourceSets {
-        val jvmMain by getting {
+    with(sourceSets) {
+        getByName("jvmMain") {
             dependencies {
 
-                implementation("no.tornado:tornadofx:1.7.20")
+                implementation(libs.tornadofx)
 
                 // Add the javafx coroutine dependency so that we have
                 // `Dispatchers.Main.immediate` support
-                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-javafx:${versions.kotlin.coroutines}")
+                implementation(libs.coroutines.javafx)
 
                 // For SNAPSHOTS
 //                implementation("io.matthewnelson.kotlin-components:kmp-tor:${env.kmpTorAll.version.name}")

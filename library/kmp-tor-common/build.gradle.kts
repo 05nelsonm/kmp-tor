@@ -13,68 +13,31 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-import io.matthewnelson.kotlin.components.kmp.KmpTarget
 import kmp.tor.env
-import org.jetbrains.kotlin.gradle.plugin.KotlinJsCompilerType
 
 plugins {
-    id(pluginId.kmp.configuration)
-    id(pluginId.kmp.publish)
+    id("configuration")
 }
 
 kmpConfiguration {
-    setupMultiplatform(targets =
-        setOf(
+    configureShared(
+        androidNameSpace = "io.matthewnelson.kmp.tor.common",
+        isCommonModule = true,
+        publish = !(env.kmpTorAll.isBinaryRelease || env.kmpTorCommon.holdPublication),
+    ) {
+        androidLibrary {
+            pluginIds(libs.plugins.parcelize.get().pluginId)
+        }
 
-            KmpTarget.Jvm.Android(
-                compileSdk = versions.android.sdkCompile,
-                minSdk = versions.android.sdkMin16,
-                buildTools = versions.android.buildTools,
-                namespace = "io.matthewnelson.kmp.tor.common",
-                pluginIds = setOf(pluginId.kotlin.parcelize),
-                target = {
-                    publishLibraryVariants("release")
-                },
-            ),
-
-            KmpTarget.Jvm.Jvm.DEFAULT,
-
-            KmpTarget.NonJvm.JS(
-                compilerType = KotlinJsCompilerType.BOTH,
-                browser = null,
-                node = KmpTarget.NonJvm.JS.Node(),
-            ),
-
-            KmpTarget.NonJvm.Native.Unix.Linux.X64.DEFAULT,
-
-            KmpTarget.NonJvm.Native.Mingw.X64.DEFAULT,
-        ) +
-        KmpTarget.NonJvm.Native.Unix.Darwin.Ios.ALL_DEFAULT     +
-        KmpTarget.NonJvm.Native.Unix.Darwin.Macos.ALL_DEFAULT   +
-        KmpTarget.NonJvm.Native.Unix.Darwin.Tvos.ALL_DEFAULT    +
-        KmpTarget.NonJvm.Native.Unix.Darwin.Watchos.ALL_DEFAULT,
-
-        commonMainSourceSet = {
-            dependencies {
-                implementation(deps.components.encoding.base16)
-                implementation(deps.components.encoding.base32)
-                implementation(deps.components.encoding.base64)
-
-                api(deps.components.parcelize)
+        common {
+            sourceSetMain {
+                dependencies {
+                    implementation(libs.encoding.base16)
+                    implementation(libs.encoding.base32)
+                    implementation(libs.encoding.base64)
+                    api(libs.kmpParcelize)
+                }
             }
-        },
-
-        commonTestSourceSet = {
-            dependencies {
-                implementation(kotlin("test"))
-            }
-        },
-    )
-}
-
-kmpPublish {
-    setupModule(
-        pomDescription = "Kotlin Components' Tor common code and utils",
-        holdPublication = env.kmpTorAll.isBinaryRelease || env.kmpTorCommon.holdPublication
-    )
+        }
+    }
 }

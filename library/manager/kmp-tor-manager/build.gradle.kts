@@ -13,84 +13,34 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-import io.matthewnelson.kotlin.components.kmp.KmpTarget
-import io.matthewnelson.kotlin.components.kmp.publish.kmpPublishRootProjectConfiguration
 import kmp.tor.env
-import org.jetbrains.kotlin.gradle.plugin.KotlinJsCompilerType
 
 plugins {
-    id(pluginId.kmp.configuration)
-    id(pluginId.kmp.publish)
+    id("configuration")
 }
 
 kmpConfiguration {
-    setupMultiplatform(targets =
-        setOf(
-
-            KmpTarget.Jvm.Android(
-                buildTools = versions.android.buildTools,
-                compileSdk = versions.android.sdkCompile,
-                minSdk = versions.android.sdkMin16,
-                namespace = "io.matthewnelson.kmp.tor.manager",
-                target = {
-                    publishLibraryVariants("release")
-                },
-                mainSourceSet = {
-                    dependencies {
-                        // https://github.com/Kotlin/kotlinx.atomicfu/issues/145
-                        implementation(deps.kotlin.atomicfu.jvm)
+    configureShared(
+        androidNameSpace = "io.matthewnelson.kmp.tor.manager",
+        publish = !(env.kmpTorAll.isBinaryRelease || env.kmpTor.holdPublication),
+    ) {
+        common {
+            sourceSetMain {
+                dependencies {
+                    implementation(libs.atomicfu)
+                    implementation(libs.coroutines.core)
+                    implementation(project(":library:controller:kmp-tor-controller")) {
+                        exclude(group, "kmp-tor-common")
+                        exclude(group, "kmp-tor-controller-common")
                     }
+                    api(project(":library:manager:kmp-tor-manager-common"))
                 }
-            ),
-
-            KmpTarget.Jvm.Jvm.DEFAULT,
-
-//            KmpTarget.NonJvm.JS(
-//                compilerType = KotlinJsCompilerType.BOTH,
-//                browser = null,
-//                node = KmpTarget.NonJvm.JS.Node(),
-//                mainSourceSet = {
-//                    dependencies {
-//                        // https://github.com/05nelsonm/kmp-tor/issues/205
-//                        implementation(deps.kotlin.atomicfu.js)
-//                    }
-//                },
-//            ),
-//
-//            KmpTarget.NonJvm.Native.Unix.Linux.X64.DEFAULT,
-//
-//            KmpTarget.NonJvm.Native.Mingw.X64.DEFAULT,
-        )/* +
-        KmpTarget.NonJvm.Native.Unix.Darwin.Ios.ALL_DEFAULT     +
-        KmpTarget.NonJvm.Native.Unix.Darwin.Macos.ALL_DEFAULT   +
-        KmpTarget.NonJvm.Native.Unix.Darwin.Tvos.ALL_DEFAULT    +
-        KmpTarget.NonJvm.Native.Unix.Darwin.Watchos.ALL_DEFAULT*/,
-
-        commonPluginIdsPostConfiguration = setOf(pluginId.kotlin.atomicfu),
-
-        commonMainSourceSet = {
-            dependencies {
-                implementation(deps.kotlin.coroutines.core.core)
-                implementation(project(":library:controller:kmp-tor-controller")) {
-                    exclude(kmpPublishRootProjectConfiguration!!.group, "kmp-tor-common")
-                    exclude(kmpPublishRootProjectConfiguration!!.group, "kmp-tor-controller-common")
+            }
+            sourceSetTest {
+                dependencies {
+                    implementation(libs.coroutines.test)
                 }
-                api(project(":library:manager:kmp-tor-manager-common"))
             }
-        },
-
-        commonTestSourceSet = {
-            dependencies {
-                implementation(depsTest.kotlin.coroutines)
-                implementation(kotlin("test"))
-            }
-        },
-    )
-}
-
-kmpPublish {
-    setupModule(
-        pomDescription = "Kotlin Components' TorManager for managing startup, shutdown, state, etc.",
-        holdPublication = env.kmpTorAll.isBinaryRelease || env.kmpTor.holdPublication
-    )
+        }
+    }
 }

@@ -13,69 +13,40 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-import io.matthewnelson.kotlin.components.kmp.util.configureYarn
+import com.github.benmanes.gradle.versions.updates.DependencyUpdatesTask
 import kmp.tor.env
-import org.gradle.api.tasks.testing.logging.TestExceptionFormat
-import org.gradle.api.tasks.testing.logging.TestLogEvent.FAILED
-import org.gradle.api.tasks.testing.logging.TestLogEvent.PASSED
-import org.gradle.api.tasks.testing.logging.TestLogEvent.SKIPPED
-import org.gradle.api.tasks.testing.logging.TestLogEvent.STARTED
+import org.jetbrains.kotlin.gradle.targets.js.yarn.YarnPlugin
+import org.jetbrains.kotlin.gradle.targets.js.yarn.YarnRootExtension
 
-// Top-level build file where you can add configuration options common to all sub-projects/modules.
-buildscript {
-
-    repositories {
-        mavenCentral()
-        google()
-        gradlePluginPortal()
-    }
-
-    dependencies {
-        classpath(pluginDeps.android.gradle)
-        classpath(pluginDeps.kotlin.gradle)
-        classpath(pluginDeps.kotlin.atomicfu)
-        classpath(pluginDeps.mavenPublish)
-
-        // NOTE: Do not place your application dependencies here; they belong
-        // in the individual module build.gradle.kts files
-    }
+@Suppress("DSL_SCOPE_VIOLATION")
+plugins {
+    id("environment")
+    alias(libs.plugins.multiplatform) apply(false)
+    alias(libs.plugins.android.app) apply(false)
+    alias(libs.plugins.android.library) apply(false)
+    alias(libs.plugins.binaryCompat)
+    alias(libs.plugins.gradleVersions)
 }
+
+ext.set("VERSION_NAME", env.kmpTor.version.name)
+ext.set("VERSION_CODE", env.kmpTor.version.code)
 
 allprojects {
 
+    findProperty("GROUP")?.let { group = it }
+    findProperty("VERSION_NAME")?.let { version = it }
+    findProperty("POM_DESCRIPTION")?.let { description = it.toString() }
+
     repositories {
         mavenCentral()
         google()
         gradlePluginPortal()
     }
 
-    tasks.withType<Test> {
-        testLogging {
-            exceptionFormat = TestExceptionFormat.FULL
-            events(STARTED, PASSED, SKIPPED, FAILED)
-            showStandardStreams = true
-        }
-    }
-
 }
 
-configureYarn { rootYarn, _ ->
-    rootYarn.apply {
-        lockFileDirectory = project.rootDir.resolve(".kotlin-js-store")
-    }
-}
-
-plugins {
-    id(pluginId.kmp.publish)
-    id(pluginId.kotlin.binaryCompat) version(versions.gradle.binaryCompat)
-}
-
-kmpPublish {
-    setupRootProject(
-        versionName = env.kmpTor.version.name,
-        versionCode = env.kmpTor.version.code,
-        pomInceptionYear = 2021,
-    )
+plugins.withType<YarnPlugin> {
+    the<YarnRootExtension>().lockFileDirectory = rootDir.resolve(".kotlin-js-store")
 }
 
 @Suppress("LocalVariableName")
@@ -93,8 +64,8 @@ apiValidation {
         val JVM = TARGETS?.contains("JVM") != false
         val ANDROID = TARGETS?.contains("ANDROID") != false
 
-        // Don't check these projects when building JVM only
-        if (!KMP_TARGETS_ALL && (!ANDROID && JVM)) {
+        // Don't check these projects when building JVM only or ANDROID only
+        if (!KMP_TARGETS_ALL && ((!ANDROID && JVM) || (ANDROID && !JVM))) {
             ignoredProjects.add("kmp-tor")
             ignoredProjects.add("kmp-tor-common")
             ignoredProjects.add("kmp-tor-controller")
@@ -107,12 +78,42 @@ apiValidation {
             ignoredProjects.add("kmp-tor-ext-callback-manager-common")
         }
 
-        if (KMP_TARGETS_ALL || (ANDROID && JVM)) {
+        if (KMP_TARGETS_ALL || ANDROID) {
             ignoredProjects.add("android")
         }
 
         if (KMP_TARGETS_ALL || JVM) {
             ignoredProjects.add("javafx")
+        }
+    }
+}
+
+fun isNonStable(version: String): Boolean {
+    val stableKeyword = listOf("RELEASE", "FINAL", "GA").any { version.toUpperCase().contains(it) }
+    val regex = "^[0-9,.v-]+(-r)?$".toRegex()
+    val isStable = stableKeyword || regex.matches(version)
+    return isStable.not()
+}
+
+tasks.withType<DependencyUpdatesTask> {
+    // Example 1: reject all non stable versions
+    rejectVersionIf {
+        isNonStable(candidate.version)
+    }
+
+    // Example 2: disallow release candidates as upgradable versions from stable versions
+    rejectVersionIf {
+        isNonStable(candidate.version) && !isNonStable(currentVersion)
+    }
+
+    // Example 3: using the full syntax
+    resolutionStrategy {
+        componentSelection {
+            all {
+                if (isNonStable(candidate.version) && !isNonStable(currentVersion)) {
+                    reject("Release candidate")
+                }
+            }
         }
     }
 }

@@ -1,7 +1,15 @@
 rootProject.name = "kmp-tor"
 
-includeBuild("kotlin-components/includeBuild/dependencies")
-includeBuild("kotlin-components/includeBuild/kmp")
+pluginManagement {
+    repositories {
+        mavenCentral()
+        google()
+        gradlePluginPortal()
+    }
+}
+
+includeBuild("build-logic")
+includeBuild("build-environment")
 
 @Suppress("PrivatePropertyName")
 private val KMP_TARGETS: String? by settings
@@ -15,25 +23,25 @@ private val TARGETS = KMP_TARGETS?.split(',')
 if (CHECK_PUBLICATION != null) {
     include(":tools:check-publication")
 } else {
-    include(":library:kmp-tor")
-    include(":library:kmp-tor-common")
-    include(":library:kmp-tor-internal")
+    listOf(
+        "kmp-tor",
+        "kmp-tor-common",
+        "kmp-tor-internal",
+        "controller:kmp-tor-controller",
+        "controller:kmp-tor-controller-common",
+        "manager:kmp-tor-manager",
+        "manager:kmp-tor-manager-common",
+        "extensions:kmp-tor-ext-callback-common",
+        "extensions:kmp-tor-ext-callback-controller",
+        "extensions:kmp-tor-ext-callback-controller-common",
+        "extensions:kmp-tor-ext-callback-manager",
+        "extensions:kmp-tor-ext-callback-manager-common",
+        "extensions:kmp-tor-ext-unix-socket",
+    ).forEach { name ->
+        include(":library:$name")
+    }
 
-    include(":library:controller:kmp-tor-controller")
-    include(":library:controller:kmp-tor-controller-common")
-
-    include(":library:manager:kmp-tor-manager")
-    include(":library:manager:kmp-tor-manager-common")
-
-    include(":library:extensions:kmp-tor-ext-callback-common")
-    include(":library:extensions:kmp-tor-ext-callback-controller")
-    include(":library:extensions:kmp-tor-ext-callback-controller-common")
-    include(":library:extensions:kmp-tor-ext-callback-manager")
-    include(":library:extensions:kmp-tor-ext-callback-manager-common")
-
-    include(":library:extensions:kmp-tor-ext-unix-socket")
-
-    if (KMP_TARGETS_ALL || (TARGETS?.contains("ANDROID") != false && TARGETS?.contains("JVM") != false)) {
+    if (KMP_TARGETS_ALL || TARGETS?.contains("ANDROID") != false) {
         include(":samples:java:android")
         include(":samples:kotlin:android")
     }

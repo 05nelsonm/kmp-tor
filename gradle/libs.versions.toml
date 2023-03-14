@@ -1,0 +1,69 @@
+[versions]
+atomicfu = "0.20.0"
+coroutines = "1.6.4"
+encoding = "1.2.1"
+kmpParcelize = "0.1.2"
+jnrUnixSocket = "0.38.19"
+
+# Gradle Plugins
+android = "7.3.1"
+binaryCompat = "0.13.0"
+configuration = "0.1.0-beta02"
+gradleVersions = "0.46.0"
+kotlin = "1.8.10"
+publish = "0.24.0"
+
+# Samples
+androidx-appCompat = "1.5.1"
+androidx-constraintLayout = "2.1.4"
+androidx-lifecycle = "2.5.1"
+google-material = "1.7.0"
+viewBindingDelegate = "1.5.6"
+javafx = "0.0.11"
+tornadofx = "1.7.20"
+kmpTorBinary = "4.7.13-0"
+kmpTor = "1.3.4"
+
+[libraries]
+atomicfu = { module = "org.jetbrains.kotlinx:atomicfu", version.ref = "atomicfu" }
+
+coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "coroutines" }
+
+encoding-base16 = { module = "io.matthewnelson.kotlin-components:encoding-base16", version.ref = "encoding" }
+encoding-base32 = { module = "io.matthewnelson.kotlin-components:encoding-base32", version.ref = "encoding" }
+encoding-base64 = { module = "io.matthewnelson.kotlin-components:encoding-base64", version.ref = "encoding" }
+
+jnrUnixSocket = { module = "com.github.jnr:jnr-unixsocket", version.ref = "jnrUnixSocket" }
+
+kmpParcelize = { module = "io.matthewnelson.kotlin-components:parcelize", version.ref = "kmpParcelize"}
+
+gradle-android = { module = "com.android.tools.build:gradle", version.ref = "android" }
+gradle-kmp-configuration = { module = "io.matthewnelson:gradle-kmp-configuration-plugin", version.ref = "configuration" }
+gradle-kotlin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
+gradle-maven-publish = { module = "com.vanniktech:gradle-maven-publish-plugin", version.ref = "publish" }
+
+# Tests
+coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "coroutines" }
+
+# Samples
+androidx-appCompat = { module = "androidx.appcompat:appcompat", version.ref = "androidx-appCompat" }
+androidx-constraintLayout = { module = "androidx.constraintlayout:constraintlayout", version.ref = "androidx-constraintLayout" }
+androidx-lifecycle-viewModel = { module = "androidx.lifecycle:lifecycle-viewmodel-ktx", version.ref = "androidx-lifecycle" }
+coroutines-android = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version.ref = "coroutines" }
+coroutines-javafx = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-javafx", version.ref = "coroutines" }
+google-material = { module = "com.google.android.material:material", version.ref = "google-material" }
+tornadofx = { module = "no.tornado:tornadofx", version.ref = "tornadofx" }
+viewBindingDelegate = { module = "com.github.kirich1409:viewbindingpropertydelegate-noreflection", version.ref = "viewBindingDelegate" }
+
+[plugins]
+android-library = { id = "com.android.library", version.ref = "android" }
+binaryCompat = { id = "org.jetbrains.kotlinx.binary-compatibility-validator", version.ref = "binaryCompat" }
+gradleVersions = { id = "com.github.ben-manes.versions", version.ref = "gradleVersions" }
+multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
+parcelize = { id = "kotlin-parcelize", version.ref = "kotlin" }
+
+# Samples
+kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
+kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
+android-app = { id = "com.android.application", version.ref = "android" }
+javafx = { id = "org.openjfx.javafxplugin", version.ref = "javafx" }

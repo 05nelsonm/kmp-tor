@@ -13,21 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-import io.matthewnelson.kotlin.components.kmp.util.includeSnapshotsRepoIfTrue
-import io.matthewnelson.kotlin.components.kmp.util.includeStagingRepoIfTrue
 import kmp.tor.env
 
+@Suppress("DSL_SCOPE_VIOLATION")
 plugins {
     application
-    id("org.jetbrains.kotlin.jvm")
-    id("org.openjfx.javafxplugin") version("0.0.11")
+    id(libs.plugins.kotlin.jvm.get().pluginId)
+    alias(libs.plugins.javafx)
 }
 
-// disregard. this is for playing with newly published binaries prior to release
-includeStagingRepoIfTrue(env.kmpTorBinaries.pollStagingRepo)
-
-// For SNAPSHOTS
-includeSnapshotsRepoIfTrue(true)
+//// disregard. this is for playing with newly published binaries prior to release
+//includeStagingRepoIfTrue(env.kmpTorBinaries.pollStagingRepo)
+//
+//// For SNAPSHOTS
+//includeSnapshotsRepoIfTrue(true)
 
 java {
     sourceCompatibility = JavaVersion.VERSION_11
@@ -47,8 +46,8 @@ dependencies {
 //    implementation("io.matthewnelson.kotlin-components:kmp-tor:${env.kmpTorAll.version.name}")
 //    implementation("io.matthewnelson.kotlin-components:kmp-tor-ext-callback-manager:${env.kmpTor.version.name}")
 
-    val vTor = versions.components.kmptor.binary
-    val vKmpTor = versions.components.kmptor.kmptor
+    val vTor = libs.versions.kmpTorBinary.get()
+    val vKmpTor = libs.versions.kmpTor.get()
 
     // kmp-tor dependency
     implementation("io.matthewnelson.kotlin-components:kmp-tor:$vTor-$vKmpTor")
@@ -58,7 +57,7 @@ dependencies {
     // Even through kmp-tor comes with coroutines under the hood
     // and expressing the dependency is _not_ needed in kotlin
     // projects, it _is_ needed in Java only projects.
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-javafx:${versions.kotlin.coroutines}")
+    implementation(libs.coroutines.javafx)
 
     // Add binary dependencies for platform desired to support. Note that this
     // could also be broken out into package variants so that you aren't unnecessarily
