@@ -171,7 +171,7 @@ ykman openpgp keys set-touch sig on
 
 - **Release** publications from Sonatype OSS Nexus StagingRepositories manager
     - Alternatively, can use Curl with the given repository id's that were output
-      to terminal when publishing, e.g. `orgkotlincrypto-1018`
+      to terminal when publishing, e.g. `iomatthewnelson-1018`
       ```shell
       curl -v -u "<USER NAME>" \
         -H "Content-Type: application/json" \
@@ -244,7 +244,7 @@ git branch -D release_"$VERSION_NAME"
 
 ### Linux
 
-- Wait for releases to become available on [MavenCentral](https://repo1.maven.org/maven2/org/kotlincrypto/)
+- Wait for releases to become available on [MavenCentral](https://repo1.maven.org/maven2/io/matthewnelson/kotlin-components/)
 - Draft new release on GitHub
     - Enter the release name <VersionName> as tag and title
     - Have the description point to the changelog
