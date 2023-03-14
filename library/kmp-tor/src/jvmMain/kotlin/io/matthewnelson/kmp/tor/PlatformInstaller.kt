@@ -129,6 +129,31 @@ class PlatformInstaller private constructor(
                 resource = TorResourceMingwX86,
             )
         }
+
+        /**
+         * In the event a platform and given architecture is not supported by kmp-tor, you
+         * can package your own, model the resources via [TorBinaryResource], and then have
+         * the files extracted and loaded at runtime.
+         *
+         * DISCLAIMER: Using this option does **not** guarantee kmp-tor compatibility with
+         * the version of Tor being loaded, as kmp-tor is only tested against binaries
+         * provided by the kmp-tor-binary project.
+         *
+         * Must:
+         *  - Add dependency:
+         *      - io.matthewnelson.kotlin-components:kmp-tor-binary-extract:(version)
+         *  - package and model your binary resources in accordance with [TorBinaryResource]
+         * */
+        @JvmStatic
+        fun custom(
+            option: InstallOption,
+            resource: TorBinaryResource
+        ): PlatformInstaller {
+            return PlatformInstaller(
+                installOption = option,
+                resource = resource,
+            )
+        }
     }
 
     @JvmField
@@ -139,6 +164,7 @@ class PlatformInstaller private constructor(
         is TorResourceMacosArm64 -> MACOS
         is TorResourceMingwX64,
         is TorResourceMingwX86 -> MINGW
+        is TorBinaryResource -> resource.osName
     }
 
     @JvmField
@@ -149,6 +175,7 @@ class PlatformInstaller private constructor(
         is TorResourceMacosArm64 -> ARM64
         is TorResourceMingwX64 -> X64
         is TorResourceMingwX86 -> X86
+        is TorBinaryResource -> resource.arch
     }
 
     @JvmField
