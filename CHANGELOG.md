@@ -1,6 +1,6 @@
 # CHANGELOG
 
-## Version 4.7.13-2-1.4.0 (2023-03-14)
+## Version 4.7.13-2-1.4.0 (2023-03-16)
  - Updates KmpTorBinary `4.7.13-1` -> `4.7.13-2`
      - Intermediate fix for JVM `macOS aarch64` binaries failing to execute
      -  More information can be found in [[#285]][issue-285] and 
