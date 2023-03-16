@@ -23,7 +23,7 @@ Add dependency
 // build.gradle.kts
 
 dependencies {
-    val vTor = "4.7.13-1"
+    val vTor = "4.7.13-2"
     val vKmpTor = "1.4.0"
 
     implementation("io.matthewnelson.kotlin-components:kmp-tor:$vTor-$vKmpTor")
@@ -35,7 +35,7 @@ dependencies {
 // build.gradle
 
 dependencies {
-    def vTor = '4.7.13-1'
+    def vTor = '4.7.13-2'
     def vKmpTor = '1.4.0'
 
     implementation "io.matthewnelson.kotlin-components:kmp-tor:$vTor-$vKmpTor"
@@ -95,7 +95,7 @@ dependencies {
      // build.gradlew.kts
 
      dependencies {
-         val vTor = "4.7.13-1"
+         val vTor = "4.7.13-2"
          val vKmpTor = "1.4.0"
     
          implementation("io.matthewnelson.kotlin-components:kmp-tor:$vTor-$vKmpTor")
@@ -132,7 +132,7 @@ can express the `TorConfig.Setting.Ports.Control` setting when providing your co
 // build.gradle
 
 dependencies {
-    def vTor = '4.7.13-1'
+    def vTor = '4.7.13-2'
     def vKmpTor = '1.4.0'
 
     implementation "io.matthewnelson.kotlin-components:kmp-tor:$vTor-$vKmpTor"
@@ -218,7 +218,7 @@ public class Example2 {
 <!-- TAG_VERSION -->
 <!-- If Tor version was updated, don't forget to update [badge-kmp-tor-binary] -->
 
-[badge-latest-release]: https://img.shields.io/badge/latest--release-4.7.13--1--1.4.0-5d2f68.svg?logo=torproject&style=flat&logoColor=5d2f68
+[badge-latest-release]: https://img.shields.io/badge/latest--release-4.7.13--2--1.4.0-5d2f68.svg?logo=torproject&style=flat&logoColor=5d2f68
 [badge-license]: https://img.shields.io/badge/license-Apache%20License%202.0-blue.svg?style=flat
 
 <!-- TAG_DEPENDENCIES -->
@@ -227,7 +227,7 @@ public class Example2 {
 [badge-coroutines]: https://img.shields.io/badge/coroutines-1.6.4-blue.svg?logo=kotlin
 [badge-encoding]: https://img.shields.io/badge/encoding-1.2.1-blue.svg?style=flat
 [badge-parcelize]: https://img.shields.io/badge/parcelize-0.1.2-blue.svg?style=flat
-[badge-kmp-tor-binary]: https://img.shields.io/badge/kmp--tor--binary-4.7.13--1-5d2f68.svg?logo=torproject&style=flat&logoColor=5d2f68
+[badge-kmp-tor-binary]: https://img.shields.io/badge/kmp--tor--binary-4.7.13--2-5d2f68.svg?logo=torproject&style=flat&logoColor=5d2f68
 
 <!-- TAG_PLATFORMS -->
 [badge-platform-android]: http://img.shields.io/badge/-android-6EDB8D.svg?style=flat

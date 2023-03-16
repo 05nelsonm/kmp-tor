@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## Version 4.7.13-2-1.4.0 (2023-03-14)
+ - Updates KmpTorBinary `4.7.13-1` -> `4.7.13-2`
+     - Intermediate fix for JVM `macOS aarch64` binaries failing to execute
+     -  More information can be found in [[#285]][issue-285] and 
+       [[kmp-tor-binary-#66]][issue-kmp-tor-binary-66]
+
 ## Version 4.7.13-1-1.4.0 (2023-03-14)
  - Update Kotlin `1.8.0` -> `1.8.10`
  - Update AtomicFu `0.19.0` -> `0.20.0`
@@ -405,3 +411,5 @@
 
 [pr-283]: https://github.com/05nelsonm/kmp-tor/pull/283
 [pr-284]: https://github.com/05nelsonm/kmp-tor/pull/284
+[issue-285]: https://github.com/05nelsonm/kmp-tor/issues/285
+[issue-kmp-tor-binary-66]: https://github.com/05nelsonm/kmp-tor-binary/issues/66
