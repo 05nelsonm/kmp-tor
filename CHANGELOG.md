@@ -1,5 +1,13 @@
 # CHANGELOG
 
+## Version 4.7.13-2-1.4.1 (2023-03-21)
+ - Moves process id retrieval to call-site in `kmp-tor` module 
+   and removes its dependency on `kmp-tor-internal` module. [[#289]][pr-289]
+     - The `kmp-tor-internal` dependency will still be published as to 
+       not break anyone's project if they had it as a dependency, but
+       it will cease to be published on next major version release (`2.0.0`) 
+       and should be removed.
+
 ## Version 4.7.13-2-1.4.0 (2023-03-16)
  - Updates KmpTorBinary `4.7.13-1` -> `4.7.13-2`
      - Intermediate fix for JVM `macOS aarch64` binaries failing to execute
@@ -411,5 +419,6 @@
 
 [pr-283]: https://github.com/05nelsonm/kmp-tor/pull/283
 [pr-284]: https://github.com/05nelsonm/kmp-tor/pull/284
+[pr-289]: https://github.com/05nelsonm/kmp-tor/pull/289
 [issue-285]: https://github.com/05nelsonm/kmp-tor/issues/285
 [issue-kmp-tor-binary-66]: https://github.com/05nelsonm/kmp-tor-binary/issues/66
