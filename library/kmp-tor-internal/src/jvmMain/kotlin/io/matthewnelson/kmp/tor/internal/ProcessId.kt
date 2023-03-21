@@ -15,6 +15,14 @@
  **/
 package io.matthewnelson.kmp.tor.internal
 
+@Deprecated(
+    message = """
+        Functionality was moved to TorConfigProviderJvm.
+        This dependency will cease to be published in the
+        next major version release (2.0.0) and should be
+        removed.
+        """,
+)
 class ProcessId private constructor() {
     companion object {
         @JvmStatic
