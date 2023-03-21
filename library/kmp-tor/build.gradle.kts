@@ -44,15 +44,6 @@ kmpConfiguration {
         }
 
         jvm {
-            sourceSetMain {
-                dependencies {
-                    if (env.kmpTorAll.isBinaryRelease) {
-                        implementation("$group:kmp-tor-internal:${env.kmpTor.version.name}")
-                    } else {
-                        implementation(project(":library:kmp-tor-internal"))
-                    }
-                }
-            }
             sourceSetTest {
                 dependencies {
                     if (System.getProperty("java.version").substringBefore('.').toInt() < 16) {
@@ -72,7 +63,8 @@ kmpConfiguration {
                 }
             }
 
-            // Requires Java 11+ b/c of kmp-tor-internal module
+            // Requires Java 11+ b/c of java.lang.management.ManagementFactory
+            // to retrieve process id.
             kotlinJvmTarget = JavaVersion.VERSION_11
             compileSourceCompatibility = JavaVersion.VERSION_11
             compileTargetCompatibility = JavaVersion.VERSION_11

@@ -18,7 +18,6 @@ package io.matthewnelson.kmp.tor
 import io.matthewnelson.kmp.tor.binary.extract.*
 import io.matthewnelson.kmp.tor.controller.common.config.TorConfig
 import io.matthewnelson.kmp.tor.controller.common.file.Path
-import io.matthewnelson.kmp.tor.internal.ProcessId
 import io.matthewnelson.kmp.tor.manager.TorConfigProvider
 import io.matthewnelson.kmp.tor.manager.common.exceptions.TorManagerException
 
@@ -46,7 +45,11 @@ abstract class TorConfigProviderJvm: TorConfigProvider() {
     override val geoIpV6File: Path? by lazy {
         workDir.builder { addSegment("geoip6") }
     }
-    override val processId: Int get() = ProcessId.get()
+    override val processId: Int get() = java.lang.management.ManagementFactory
+        .getRuntimeMXBean()
+        .name
+        .split('@')[0]
+        .toInt()
 
     @Throws(TorManagerException::class)
     override fun extractGeoIpV4File(toLocation: Path) {
