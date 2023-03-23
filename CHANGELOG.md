@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## Version 4.7.13-3-1.4.1 (2023-03-23)
+ - Updates KmpTorBinary `4.7.13-2` -> `4.7.13-3`
+     - Fixed an issue with Java 9 modularization and not being able to load
+       resources. [[kmp-tor-binary-#75]][kmp-tor-binary-75]
+
 ## Version 4.7.13-2-1.4.1 (2023-03-21)
  - Moves process id retrieval to call-site in `kmp-tor` module 
    and removes its dependency on `kmp-tor-internal` module. [[#289]][pr-289]
@@ -12,7 +17,7 @@
  - Updates KmpTorBinary `4.7.13-1` -> `4.7.13-2`
      - Intermediate fix for JVM `macOS aarch64` binaries failing to execute
      -  More information can be found in [[#285]][issue-285] and 
-       [[kmp-tor-binary-#66]][issue-kmp-tor-binary-66]
+       [[kmp-tor-binary-#66]][kmp-tor-binary-66]
 
 ## Version 4.7.13-1-1.4.0 (2023-03-14)
  - Update Kotlin `1.8.0` -> `1.8.10`
@@ -421,4 +426,5 @@
 [pr-284]: https://github.com/05nelsonm/kmp-tor/pull/284
 [pr-289]: https://github.com/05nelsonm/kmp-tor/pull/289
 [issue-285]: https://github.com/05nelsonm/kmp-tor/issues/285
-[issue-kmp-tor-binary-66]: https://github.com/05nelsonm/kmp-tor-binary/issues/66
+[kmp-tor-binary-66]: https://github.com/05nelsonm/kmp-tor-binary/issues/66
+[kmp-tor-binary-75]: https://github.com/05nelsonm/kmp-tor-binary/pull/75
