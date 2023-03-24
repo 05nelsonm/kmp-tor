@@ -67,7 +67,7 @@ actual object PlatformUtil {
         Thread {
             @OptIn(InternalTorApi::class)
             localhostAddress()
-        }.start()
+        }.apply { isDaemon = true }.start()
     }
 
     @JvmStatic
