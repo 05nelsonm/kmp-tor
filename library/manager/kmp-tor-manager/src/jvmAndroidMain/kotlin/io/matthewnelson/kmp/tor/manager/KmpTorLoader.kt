@@ -72,8 +72,9 @@ actual abstract class KmpTorLoader(protected val provider: TorConfigProvider) {
 
         fun getOrCreate(): ExecutorCoroutineDispatcher =
             synchronized(this) {
-                dispatcher ?: Executors.newSingleThreadExecutor().asCoroutineDispatcher()
-                    .also { dispatcher = it }
+                dispatcher ?: Executors.newSingleThreadExecutor { runnable ->
+                    Thread(runnable).apply { isDaemon = true }
+                }.asCoroutineDispatcher().also { dispatcher = it }
             }
 
         fun close() {
