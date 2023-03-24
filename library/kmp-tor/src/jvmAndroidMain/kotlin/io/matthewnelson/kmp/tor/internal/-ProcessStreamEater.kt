@@ -31,7 +31,9 @@ internal class ProcessStreamEater(
 ) {
 
     private val supervisor = SupervisorJob(parentJob)
-    private val dispatcher = Executors.newFixedThreadPool(2).asCoroutineDispatcher()
+    private val dispatcher = Executors.newFixedThreadPool(2) { runnable ->
+        Thread(runnable).apply { isDaemon = true }
+    }.asCoroutineDispatcher()
     private val scope = CoroutineScope(supervisor + dispatcher)
 
     init {
