@@ -1,5 +1,13 @@
 # CHANGELOG
 
+## Version 4.7.13-4-1.4.2 (2023-03-25)
+ - Updates KmpTorBinary `4.7.13-3` -> `4.7.13-4`
+     - Actually fixes issue with Java 9 modularization not being able to extract
+       resources. [[kmp-tor-binary-#76]][kmp-tor-binary-76]
+ - Fixes an issue with coroutine dispatcher threads executing in userspace
+   instead of application JVM whereby closing of the application was inhibited
+   if `TorManager.destroy` was not called. [[#294]][pr-294]
+
 ## Version 4.7.13-3-1.4.1 (2023-03-23)
  - Updates KmpTorBinary `4.7.13-2` -> `4.7.13-3`
      - Fixed an issue with Java 9 modularization and not being able to load
@@ -425,6 +433,8 @@
 [pr-283]: https://github.com/05nelsonm/kmp-tor/pull/283
 [pr-284]: https://github.com/05nelsonm/kmp-tor/pull/284
 [pr-289]: https://github.com/05nelsonm/kmp-tor/pull/289
+[pr-294]: https://github.com/05nelsonm/kmp-tor/pull/294
 [issue-285]: https://github.com/05nelsonm/kmp-tor/issues/285
 [kmp-tor-binary-66]: https://github.com/05nelsonm/kmp-tor-binary/issues/66
 [kmp-tor-binary-75]: https://github.com/05nelsonm/kmp-tor-binary/pull/75
+[kmp-tor-binary-76]: https://github.com/05nelsonm/kmp-tor-binary/pull/76
