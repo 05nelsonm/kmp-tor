@@ -1,17 +1,17 @@
 [versions]
-atomicfu = "0.20.0"
-coroutines = "1.6.4"
-encoding = "1.2.1"
+atomicfu = "0.20.2"
+coroutines = "1.7.1"
+encoding = "1.2.3-SNAPSHOT"
 kmpParcelize = "0.1.2"
-jnrUnixSocket = "0.38.19"
+jnrUnixSocket = "0.38.20"
 
 # Gradle Plugins
-android = "7.3.1"
-binaryCompat = "0.13.0"
-configuration = "0.1.0-beta02"
+android = "7.4.2"
+binaryCompat = "0.13.2"
+configuration = "0.1.0"
 gradleVersions = "0.46.0"
-kotlin = "1.8.10"
-publish = "0.24.0"
+kotlin = "1.8.21"
+publish = "0.25.2"
 
 # Samples
 androidx-appCompat = "1.5.1"
