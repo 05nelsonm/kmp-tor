@@ -14,6 +14,7 @@
  * limitations under the License.
  **/
 @file:JvmName("androidTorController")
+@file:Suppress("UnnecessaryOptInAnnotation")
 
 package io.matthewnelson.kmp.tor.controller
 
@@ -35,6 +36,7 @@ import io.matthewnelson.kmp.tor.controller.internal.io.ReaderWrapper
 import io.matthewnelson.kmp.tor.controller.internal.io.SocketWrapper
 import io.matthewnelson.kmp.tor.controller.internal.io.WriterWrapper
 import io.matthewnelson.kmp.tor.controller.internal.ext.toTorController
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.withContext
 import java.io.*
 import java.net.Socket
@@ -115,6 +117,7 @@ actual interface TorController: TorControlProcessor, TorEventProcessor<TorEvent.
                     Closeable { socket.close() }
                 }
 
+                @OptIn(ExperimentalCoroutinesApi::class)
                 return RealTorController(
                     reader = ReaderWrapper.wrap(reader),
                     writer = WriterWrapper.wrap(writer),

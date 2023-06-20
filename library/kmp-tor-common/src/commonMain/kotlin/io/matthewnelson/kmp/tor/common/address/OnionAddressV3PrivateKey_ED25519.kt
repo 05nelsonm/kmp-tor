@@ -21,9 +21,7 @@ import io.matthewnelson.encoding.core.Decoder.Companion.decodeToByteArray
 import io.matthewnelson.kmp.tor.common.annotation.ExperimentalTorApi
 import io.matthewnelson.kmp.tor.common.annotation.InternalTorApi
 import io.matthewnelson.kmp.tor.common.annotation.SealedValueClass
-import io.matthewnelson.kmp.tor.common.clientauth.OnionClientAuth
 import io.matthewnelson.kmp.tor.common.clientauth.OnionClientAuthPrivateKey_B64_X25519.Companion.REGEX
-import io.matthewnelson.kmp.tor.common.internal.TorStrings
 import io.matthewnelson.kmp.tor.common.internal.TorStrings.REDACTED
 import io.matthewnelson.kmp.tor.common.internal.stripBaseEncoding
 import kotlin.jvm.JvmInline
@@ -83,7 +81,7 @@ private value class RealOnionAddressV3PrivateKey_ED25519(
         }
     }
 
-    override fun decode(): ByteArray = value.decodeToByteArray(TorStrings.base64)
+    override fun decode(): ByteArray = value.decodeToByteArray(Base64.Default)
 
     override val keyType: OnionAddress.PrivateKey.Type get() = OnionAddress.PrivateKey.Type.ED25519_V3
 

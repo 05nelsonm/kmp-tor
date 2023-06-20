@@ -19,12 +19,10 @@ import io.matthewnelson.component.parcelize.Parcelable
 import io.matthewnelson.component.parcelize.Parcelize
 import io.matthewnelson.encoding.base64.Base64
 import io.matthewnelson.encoding.base16.Base16
-import io.matthewnelson.encoding.builders.Base16
 import io.matthewnelson.encoding.core.Decoder.Companion.decodeToByteArray
 import io.matthewnelson.kmp.tor.common.annotation.ExperimentalTorApi
 import io.matthewnelson.kmp.tor.common.annotation.InternalTorApi
 import io.matthewnelson.kmp.tor.common.annotation.SealedValueClass
-import io.matthewnelson.kmp.tor.common.internal.TorStrings
 import kotlin.jvm.JvmField
 import kotlin.jvm.JvmInline
 import kotlin.jvm.JvmStatic
@@ -102,7 +100,7 @@ class Server private constructor() {
 
         override fun canonicalName(): String = "${Fingerprint.PREFIX}$value"
 
-        override fun decode(): ByteArray = value.decodeToByteArray(TorStrings.base16)
+        override fun decode(): ByteArray = value.decodeToByteArray(Base16)
 
         override fun toString(): String = "Fingerprint(value=$value)"
 
