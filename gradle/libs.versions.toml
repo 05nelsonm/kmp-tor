@@ -1,7 +1,7 @@
 [versions]
 atomicfu = "0.20.2"
 coroutines = "1.7.1"
-encoding = "1.2.3-SNAPSHOT"
+encoding = "2.0.0-SNAPSHOT"
 kmpParcelize = "0.1.2"
 jnrUnixSocket = "0.38.20"
 
