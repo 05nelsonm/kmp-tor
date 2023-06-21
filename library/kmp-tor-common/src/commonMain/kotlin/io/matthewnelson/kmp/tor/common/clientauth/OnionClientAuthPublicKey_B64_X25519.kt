@@ -16,12 +16,12 @@
 package io.matthewnelson.kmp.tor.common.clientauth
 
 import io.matthewnelson.component.parcelize.Parcelize
+import io.matthewnelson.encoding.base32.Base32
+import io.matthewnelson.encoding.base64.Base64
 import io.matthewnelson.encoding.core.Decoder.Companion.decodeToByteArray
 import io.matthewnelson.encoding.core.Encoder.Companion.encodeToString
 import io.matthewnelson.kmp.tor.common.annotation.ExperimentalTorApi
-import io.matthewnelson.kmp.tor.common.annotation.InternalTorApi
 import io.matthewnelson.kmp.tor.common.annotation.SealedValueClass
-import io.matthewnelson.kmp.tor.common.internal.TorStrings
 import io.matthewnelson.kmp.tor.common.internal.descriptorString
 import kotlin.jvm.JvmInline
 import kotlin.jvm.JvmStatic
@@ -51,7 +51,6 @@ sealed interface OnionClientAuthPublicKey_B64_X25519: OnionClientAuth.PublicKey 
 @JvmInline
 @Parcelize
 @Suppress("ClassName")
-@OptIn(InternalTorApi::class)
 private value class RealOnionClientAuthPublicKey_B64_X25519(
     override val value: String
 ): OnionClientAuthPublicKey_B64_X25519 {
@@ -71,7 +70,7 @@ private value class RealOnionClientAuthPublicKey_B64_X25519(
     }
 
     override fun base32(padded: Boolean): String {
-        val b32 = decode().encodeToString(TorStrings.base32)
+        val b32 = decode().encodeToString(Base32.Default)
         return if (padded) {
             b32
         } else {
@@ -79,7 +78,7 @@ private value class RealOnionClientAuthPublicKey_B64_X25519(
         }
     }
 
-    override fun decode(): ByteArray = value.decodeToByteArray(TorStrings.base64)
+    override fun decode(): ByteArray = value.decodeToByteArray(Base64.Default)
 
     override fun descriptor(): String = descriptorString()
 

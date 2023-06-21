@@ -13,6 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
+@file:Suppress("UnnecessaryOptInAnnotation")
+
 package io.matthewnelson.kmp.tor.controller.internal.ext
 
 import io.matthewnelson.kmp.tor.controller.TorController
@@ -22,6 +24,7 @@ import io.matthewnelson.kmp.tor.controller.internal.io.ReaderWrapper
 import io.matthewnelson.kmp.tor.controller.internal.io.SocketWrapper
 import io.matthewnelson.kmp.tor.controller.internal.io.WriterWrapper
 import kotlinx.coroutines.ExecutorCoroutineDispatcher
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import java.io.IOException
 import java.net.Socket
 import java.net.SocketException
@@ -40,6 +43,7 @@ internal inline fun Socket.toTorController(
         val writerWrapper = WriterWrapper.wrap(getOutputStream().writer())
         val socketWrapper = SocketWrapper.wrap(this)
 
+        @OptIn(ExperimentalCoroutinesApi::class)
         return RealTorController(
             reader = readerWrapper,
             writer = writerWrapper,

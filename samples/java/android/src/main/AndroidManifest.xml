@@ -32,6 +32,10 @@
     Required for connecting to the Tor network.
     -->
     <uses-permission android:name="android.permission.INTERNET" />
+    <!--
+    Required when targeting API 33+ and are using foreground service.
+    -->
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 
     <application
         android:name=".App"

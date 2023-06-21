@@ -15,11 +15,7 @@
  **/
 package io.matthewnelson.kmp.tor.common.internal
 
-import io.matthewnelson.encoding.builders.Base16
-import io.matthewnelson.encoding.builders.Base32Default
-import io.matthewnelson.encoding.builders.Base64
 import io.matthewnelson.kmp.tor.common.annotation.InternalTorApi
-import kotlin.jvm.JvmSynthetic
 
 @InternalTorApi
 object TorStrings {
@@ -32,27 +28,4 @@ object TorStrings {
     const val REDACTED: String = "[REDACTED]"
     @InternalTorApi
     const val SP: String = " "
-
-    @JvmSynthetic
-    internal val base16 = Base16 {
-        isLenient = true
-        lineBreakInterval = 0
-        encodeToLowercase = false
-    }
-
-    @JvmSynthetic
-    internal val base32 = Base32Default {
-        isLenient = true
-        lineBreakInterval = 0
-        encodeToLowercase = false
-        padEncoded = true
-    }
-
-    @JvmSynthetic
-    internal val base64 = Base64 {
-        isLenient = true
-        lineBreakInterval = 0
-        encodeToUrlSafe = false
-        padEncoded = true
-    }
 }

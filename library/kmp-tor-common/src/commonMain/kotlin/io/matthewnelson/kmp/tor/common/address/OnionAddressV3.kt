@@ -21,7 +21,6 @@ import io.matthewnelson.encoding.core.Decoder.Companion.decodeToByteArray
 import io.matthewnelson.kmp.tor.common.annotation.ExperimentalTorApi
 import io.matthewnelson.kmp.tor.common.annotation.InternalTorApi
 import io.matthewnelson.kmp.tor.common.annotation.SealedValueClass
-import io.matthewnelson.kmp.tor.common.internal.TorStrings
 import io.matthewnelson.kmp.tor.common.internal.findOnionAddressFromUrl
 import kotlin.jvm.JvmInline
 import kotlin.jvm.JvmStatic
@@ -99,7 +98,7 @@ private value class RealOnionAddressV3(override val value: String): OnionAddress
 
     override fun canonicalHostname(): String = "$value.onion"
 
-    override fun decode(): ByteArray = value.decodeToByteArray(TorStrings.base32)
+    override fun decode(): ByteArray = value.decodeToByteArray(Base32.Default)
 
     override fun toString(): String = "OnionAddressV3(value=$value)"
 

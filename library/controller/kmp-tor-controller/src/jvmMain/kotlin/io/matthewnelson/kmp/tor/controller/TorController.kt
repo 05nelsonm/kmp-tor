@@ -14,6 +14,7 @@
  * limitations under the License.
  **/
 @file:JvmName("jvmTorController")
+@file:Suppress("UnnecessaryOptInAnnotation")
 
 package io.matthewnelson.kmp.tor.controller
 
@@ -34,6 +35,7 @@ import io.matthewnelson.kmp.tor.controller.internal.io.ReaderWrapper
 import io.matthewnelson.kmp.tor.controller.internal.io.SocketWrapper
 import io.matthewnelson.kmp.tor.controller.internal.io.UnselectableByteChannel
 import io.matthewnelson.kmp.tor.controller.internal.io.WriterWrapper
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.withContext
 import java.io.*
 import java.net.Socket
@@ -139,6 +141,7 @@ actual interface TorController: TorControlProcessor, TorEventProcessor<TorEvent.
                     val writerWrapper = WriterWrapper.wrap(Channels.newOutputStream(channel).writer())
                     val socketWrapper = SocketWrapper.wrap(channel)
 
+                    @OptIn(ExperimentalCoroutinesApi::class)
                     RealTorController(
                         reader = readerWrapper,
                         writer = writerWrapper,
