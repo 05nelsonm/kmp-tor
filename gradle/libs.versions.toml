@@ -1,14 +1,14 @@
 [versions]
 atomicfu = "0.20.2"
 coroutines = "1.7.1"
-encoding = "2.0.0-SNAPSHOT"
+encoding = "2.0.0"
 kmpParcelize = "0.1.2"
 jnrUnixSocket = "0.38.20"
 
 # Gradle Plugins
 android = "7.4.2"
 binaryCompat = "0.13.2"
-configuration = "0.1.0"
+configuration = "0.1.1"
 gradleVersions = "0.46.0"
 kotlin = "1.8.21"
 publish = "0.25.2"
@@ -29,9 +29,9 @@ atomicfu = { module = "org.jetbrains.kotlinx:atomicfu", version.ref = "atomicfu"
 
 coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "coroutines" }
 
-encoding-base16 = { module = "io.matthewnelson.kotlin-components:encoding-base16", version.ref = "encoding" }
-encoding-base32 = { module = "io.matthewnelson.kotlin-components:encoding-base32", version.ref = "encoding" }
-encoding-base64 = { module = "io.matthewnelson.kotlin-components:encoding-base64", version.ref = "encoding" }
+encoding-base16 = { module = "io.matthewnelson.encoding:base16", version.ref = "encoding" }
+encoding-base32 = { module = "io.matthewnelson.encoding:base32", version.ref = "encoding" }
+encoding-base64 = { module = "io.matthewnelson.encoding:base64", version.ref = "encoding" }
 
 jnrUnixSocket = { module = "com.github.jnr:jnr-unixsocket", version.ref = "jnrUnixSocket" }
 
