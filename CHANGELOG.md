@@ -1,5 +1,14 @@
 # CHANGELOG
 
+## Version 4.7.13-4-1.4.3 (2023-06-21)
+ - Updates dependencies
+     - `atomicfu` -> `0.20.2`
+     - `coroutines` -> `1.7.1`
+     - `encoding` -> `2.0.0`
+     - `kotlin` -> `1.8.21`
+     - `jnr-unix-socket` -> `0.38.20`
+ - Fixes JPMS split package errors attributed to encoding library
+
 ## Version 4.7.13-4-1.4.2 (2023-03-25)
  - Updates KmpTorBinary `4.7.13-3` -> `4.7.13-4`
      - Actually fixes issue with Java 9 modularization not being able to extract

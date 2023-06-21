@@ -24,7 +24,7 @@ Add dependency
 
 dependencies {
     val vTor = "4.7.13-4"
-    val vKmpTor = "1.4.2"
+    val vKmpTor = "1.4.3"
 
     implementation("io.matthewnelson.kotlin-components:kmp-tor:$vTor-$vKmpTor")
 }
@@ -36,7 +36,7 @@ dependencies {
 
 dependencies {
     def vTor = '4.7.13-4'
-    def vKmpTor = '1.4.2'
+    def vKmpTor = '1.4.3'
 
     implementation "io.matthewnelson.kotlin-components:kmp-tor:$vTor-$vKmpTor"
 }
@@ -96,7 +96,7 @@ dependencies {
 
      dependencies {
          val vTor = "4.7.13-4"
-         val vKmpTor = "1.4.2"
+         val vKmpTor = "1.4.3"
     
          implementation("io.matthewnelson.kotlin-components:kmp-tor:$vTor-$vKmpTor")
 
@@ -133,7 +133,7 @@ can express the `TorConfig.Setting.Ports.Control` setting when providing your co
 
 dependencies {
     def vTor = '4.7.13-4'
-    def vKmpTor = '1.4.2'
+    def vKmpTor = '1.4.3'
 
     implementation "io.matthewnelson.kotlin-components:kmp-tor:$vTor-$vKmpTor"
     // Add the callback extension
@@ -218,14 +218,14 @@ public class Example2 {
 <!-- TAG_VERSION -->
 <!-- If Tor version was updated, don't forget to update [badge-kmp-tor-binary] -->
 
-[badge-latest-release]: https://img.shields.io/badge/latest--release-4.7.13--4--1.4.2-5d2f68.svg?logo=torproject&style=flat&logoColor=5d2f68
+[badge-latest-release]: https://img.shields.io/badge/latest--release-4.7.13--4--1.4.3-5d2f68.svg?logo=torproject&style=flat&logoColor=5d2f68
 [badge-license]: https://img.shields.io/badge/license-Apache%20License%202.0-blue.svg?style=flat
 
 <!-- TAG_DEPENDENCIES -->
-[badge-kotlin]: https://img.shields.io/badge/kotlin-1.8.10-blue.svg?logo=kotlin
-[badge-atomicfu]: https://img.shields.io/badge/atomicfu-0.20.0-blue.svg?logo=kotlin
-[badge-coroutines]: https://img.shields.io/badge/coroutines-1.6.4-blue.svg?logo=kotlin
-[badge-encoding]: https://img.shields.io/badge/encoding-1.2.1-blue.svg?style=flat
+[badge-kotlin]: https://img.shields.io/badge/kotlin-1.8.21-blue.svg?logo=kotlin
+[badge-atomicfu]: https://img.shields.io/badge/atomicfu-0.20.2-blue.svg?logo=kotlin
+[badge-coroutines]: https://img.shields.io/badge/coroutines-1.7.1-blue.svg?logo=kotlin
+[badge-encoding]: https://img.shields.io/badge/encoding-2.0.0-blue.svg?style=flat
 [badge-parcelize]: https://img.shields.io/badge/parcelize-0.1.2-blue.svg?style=flat
 [badge-kmp-tor-binary]: https://img.shields.io/badge/kmp--tor--binary-4.7.13--4-5d2f68.svg?logo=torproject&style=flat&logoColor=5d2f68
 
