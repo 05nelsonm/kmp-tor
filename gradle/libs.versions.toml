@@ -22,7 +22,7 @@ viewBindingDelegate = "1.5.6"
 javafx = "0.0.11"
 tornadofx = "1.7.20"
 kmpTorBinary = "4.7.13-4"
-kmpTor = "1.4.2"
+kmpTor = "1.4.3"
 
 [libraries]
 atomicfu = { module = "org.jetbrains.kotlinx:atomicfu", version.ref = "atomicfu" }
