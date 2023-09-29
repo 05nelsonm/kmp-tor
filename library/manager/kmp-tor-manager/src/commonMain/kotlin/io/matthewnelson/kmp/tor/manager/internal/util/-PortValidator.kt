@@ -23,6 +23,7 @@ import io.matthewnelson.kmp.tor.controller.common.config.TorConfig.Setting.Ports
 import io.matthewnelson.kmp.tor.controller.common.config.TorConfig.Setting.UnixSockets
 import io.matthewnelson.kmp.tor.controller.common.file.Path
 import io.matthewnelson.kmp.tor.controller.common.internal.PlatformUtil
+import io.matthewnelson.kmp.tor.manager.common.exceptions.TorManagerException
 
 internal class PortValidator internal constructor(private val dataDir: Path) {
 
@@ -46,7 +47,12 @@ internal class PortValidator internal constructor(private val dataDir: Path) {
         }
     }
 
+    @Throws(TorManagerException::class)
     fun add(unixSocket: UnixSockets) {
+        if (!unixSocket.isAcceptablePathLength) {
+            throw TorManagerException("UnixSocket path must be less than or equal to 105 characters: $unixSocket")
+        }
+
         if (!unixSockets.add(unixSocket)) {
             return
         }
@@ -93,13 +99,20 @@ internal class PortValidator internal constructor(private val dataDir: Path) {
             // Prefer using unix domain socket if it's supported.
             @OptIn(InternalTorApi::class)
             val control = if (PlatformUtil.hasControlUnixDomainSocketSupport) {
-                UnixSockets.Control().set(
+                val unix = UnixSockets.Control()
+                unix.set(
                     TorConfig.Option.FileSystemFile(
                         dataDir.builder {
                             addSegment(UnixSockets.Control.DEFAULT_NAME)
                         }
                     )
                 )
+
+                if (unix.isAcceptablePathLength) {
+                    unix
+                } else {
+                    Ports.Control().set(AorDorPort.Auto)
+                }
             } else {
                 Ports.Control().set(AorDorPort.Auto)
             }
@@ -117,3 +130,6 @@ internal class PortValidator internal constructor(private val dataDir: Path) {
         return validated
     }
 }
+
+@Suppress("NOTHING_TO_INLINE", "KotlinRedundantDiagnosticSuppress")
+private inline val UnixSockets.isAcceptablePathLength: Boolean get() = (value?.value?.length ?: 0) <= 105

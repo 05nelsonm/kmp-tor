@@ -23,6 +23,7 @@ import io.matthewnelson.kmp.tor.controller.common.config.TorConfig.Setting.UnixS
 import io.matthewnelson.kmp.tor.controller.common.config.TorConfig.Option.AorDorPort
 import io.matthewnelson.kmp.tor.controller.common.file.Path
 import io.matthewnelson.kmp.tor.controller.common.internal.PlatformUtil
+import io.matthewnelson.kmp.tor.manager.common.exceptions.TorManagerException
 import kotlin.test.*
 
 @OptIn(InternalTorApi::class)
@@ -106,5 +107,23 @@ class PortValidatorUnitTest {
         val validated = validator.validate { true }
         assertTrue(validated.filterIsInstance<Ports.Socks>().isEmpty())
         assertFalse(validated.filterIsInstance<UnixSockets.Socks>().isEmpty())
+    }
+
+    @Test
+    fun givenUnixSocket_whenInvalidLength_thenFails() {
+        val sb = StringBuilder()
+        sb.append('/') // so check for unix fs succeeds
+        repeat(104) { sb.append('a') }
+
+        val socks = UnixSockets.Socks()
+        socks.set(TorConfig.Option.FileSystemFile(Path(sb.toString())))
+        println(socks.value?.value?.length)
+        validator.add(socks)
+        sb.append('j')
+        socks.set(TorConfig.Option.FileSystemFile(Path(sb.toString())))
+
+        assertFailsWith<TorManagerException> {
+            validator.add(socks)
+        }
     }
 }
