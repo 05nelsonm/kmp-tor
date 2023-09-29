@@ -11,8 +11,7 @@ jobs:
       fail-fast: false
       matrix:
         os: [ macos-latest, ubuntu-latest, windows-latest ]
-        java-version: [ 11, 16 ]
-        job: [ test ]
+        java-version: [ 11, 19 ]
 
     runs-on: ${{ matrix.os }}
 
@@ -51,31 +50,31 @@ jobs:
           java-version: ${{ matrix.java-version }}
 
       - name: Run macOS Tests
-        if: matrix.os == 'macos-latest' && matrix.job == 'test' && matrix.java-version == 11
+        if: matrix.os == 'macos-latest' && matrix.java-version == 19
         run: >
           ./gradlew check --stacktrace
           -PKMP_TARGETS="JVM,JS,IOS_ARM32,IOS_ARM64,IOS_X64,IOS_SIMULATOR_ARM64,MACOS_ARM64,MACOS_X64,TVOS_ARM64,TVOS_X64,TVOS_SIMULATOR_ARM64,WATCHOS_ARM32,WATCHOS_ARM64,WATCHOS_DEVICE_ARM64,WATCHOS_X64,WATCHOS_X86,WATCHOS_SIMULATOR_ARM64,WASM,WASM_32"
 
-      - name: Run macOS Java16 Tests
-        if: matrix.os == 'macos-latest' && matrix.job == 'test' && matrix.java-version == 16
+      - name: Run macOS Java11 Tests
+        if: matrix.os == 'macos-latest' && matrix.java-version == 11
         run: >
           ./gradlew check --stacktrace
           -PKMP_TARGETS="JVM"
 
       - name: Run Linux Tests
-        if: matrix.os == 'ubuntu-latest' && matrix.job == 'test' && matrix.java-version == 11
+        if: matrix.os == 'ubuntu-latest' && matrix.java-version == 19
         run: >
           ./gradlew check --stacktrace
-          -PKMP_TARGETS="JVM,JS,ANDROID,ANDROID_ARM32,ANDROID_ARM64,ANDROID_X64,ANDROID_X86,LINUX_ARM32HFP,LINUX_ARM64,LINUX_MIPS32,LINUX_MIPSEL32,LINUX_X64,WASM,WASM_32"
+          -PKMP_TARGETS="JVM,ANDROID,JS,ANDROID_ARM32,ANDROID_ARM64,ANDROID_X64,ANDROID_X86,LINUX_ARM32HFP,LINUX_ARM64,LINUX_MIPS32,LINUX_MIPSEL32,LINUX_X64,WASM,WASM_32"
 
-      - name: Run Linux Java16 Tests
-        if: matrix.os == 'ubuntu-latest' && matrix.job == 'test' && matrix.java-version == 16
+      - name: Run Linux Java11 Tests
+        if: matrix.os == 'ubuntu-latest' && matrix.java-version == 11
         run: >
           ./gradlew check --stacktrace
           -PKMP_TARGETS="JVM"
 
       - name: Run Windows Tests
-        if: matrix.os == 'windows-latest' && matrix.job == 'test' && matrix.java-version == 11
+        if: matrix.os == 'windows-latest' && matrix.java-version == 11
         run: >
           ./gradlew check --stacktrace
           -PKMP_TARGETS="JVM,JS,MINGW_X64,MINGW_X86,WASM,WASM_32"
