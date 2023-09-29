@@ -285,7 +285,7 @@ class KeyWordModel {
             add(TorConfig.KeyWord.HiddenServiceAuthorizeClient)
             add(TorConfig.KeyWord.HiddenServiceAllowUnknownPorts)
             add(TorConfig.KeyWord.HiddenServiceExportCircuitID)
-            add(TorConfig.KeyWord.RendPostPeriod)
+//            add(TorConfig.KeyWord.RendPostPeriod)
             add(TorConfig.KeyWord.HiddenServiceDirGroupReadable)
             add(TorConfig.KeyWord.HiddenServiceNumIntroductionPoints)
             add(TorConfig.KeyWord.HiddenServiceSingleHopMode)

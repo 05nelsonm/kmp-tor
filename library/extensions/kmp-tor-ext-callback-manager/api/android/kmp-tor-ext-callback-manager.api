@@ -1,10 +1,3 @@
-public final class io/matthewnelson/kmp/tor/ext/callback/manager/BuildConfig {
-	public static final field BUILD_TYPE Ljava/lang/String;
-	public static final field DEBUG Z
-	public static final field LIBRARY_PACKAGE_NAME Ljava/lang/String;
-	public fun <init> ()V
-}
-
 public abstract interface class io/matthewnelson/kmp/tor/ext/callback/manager/CallbackDestroyable {
 	public abstract fun destroy (ZLio/matthewnelson/kmp/tor/ext/callback/common/TorCallback;)V
 	public abstract fun isDestroyed ()Z

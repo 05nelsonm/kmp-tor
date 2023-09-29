@@ -1,10 +1,3 @@
-public final class io/matthewnelson/kmp/tor/controller/BuildConfig {
-	public static final field BUILD_TYPE Ljava/lang/String;
-	public static final field DEBUG Z
-	public static final field LIBRARY_PACKAGE_NAME Ljava/lang/String;
-	public fun <init> ()V
-}
-
 public abstract interface class io/matthewnelson/kmp/tor/controller/TorControlProcessor : io/matthewnelson/kmp/tor/controller/common/control/TorControlCircuit, io/matthewnelson/kmp/tor/controller/common/control/TorControlConfig, io/matthewnelson/kmp/tor/controller/common/control/TorControlHs, io/matthewnelson/kmp/tor/controller/common/control/TorControlOnion, io/matthewnelson/kmp/tor/controller/common/control/TorControlOnionClientAuth, io/matthewnelson/kmp/tor/controller/common/control/TorControlStream, io/matthewnelson/kmp/tor/controller/common/control/usecase/TorControlAuthenticate, io/matthewnelson/kmp/tor/controller/common/control/usecase/TorControlChallengeAuth, io/matthewnelson/kmp/tor/controller/common/control/usecase/TorControlDescriptorPost, io/matthewnelson/kmp/tor/controller/common/control/usecase/TorControlDropGuards, io/matthewnelson/kmp/tor/controller/common/control/usecase/TorControlInfoGet, io/matthewnelson/kmp/tor/controller/common/control/usecase/TorControlInfoProtocol, io/matthewnelson/kmp/tor/controller/common/control/usecase/TorControlMapAddress, io/matthewnelson/kmp/tor/controller/common/control/usecase/TorControlOwnershipDrop, io/matthewnelson/kmp/tor/controller/common/control/usecase/TorControlOwnershipTake, io/matthewnelson/kmp/tor/controller/common/control/usecase/TorControlResolve, io/matthewnelson/kmp/tor/controller/common/control/usecase/TorControlSetEvents, io/matthewnelson/kmp/tor/controller/common/control/usecase/TorControlSignal, io/matthewnelson/kmp/tor/controller/common/control/usecase/TorControlUseFeature {
 }
 

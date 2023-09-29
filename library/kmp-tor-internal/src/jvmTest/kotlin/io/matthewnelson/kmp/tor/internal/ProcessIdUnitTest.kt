@@ -23,6 +23,7 @@ class ProcessIdUnitTest {
     @Test
     fun givenProcess_whenProcessIdQueried_returnsExpected() {
         val pid = try {
+            @Suppress("DEPRECATION")
             ProcessId.get()
         } catch (e: Exception) {
             null
