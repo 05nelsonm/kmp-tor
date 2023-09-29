@@ -36,6 +36,7 @@ public final class io/matthewnelson/kmp/tor/PlatformInstaller$InstallOption : ja
 	public static final field CleanInstallFirstStartOnly Lio/matthewnelson/kmp/tor/PlatformInstaller$InstallOption;
 	public static final field CleanInstallIfMissing Lio/matthewnelson/kmp/tor/PlatformInstaller$InstallOption;
 	public static final field CleanInstallOnEachStart Lio/matthewnelson/kmp/tor/PlatformInstaller$InstallOption;
+	public static fun getEntries ()Lkotlin/enums/EnumEntries;
 	public static fun valueOf (Ljava/lang/String;)Lio/matthewnelson/kmp/tor/PlatformInstaller$InstallOption;
 	public static fun values ()[Lio/matthewnelson/kmp/tor/PlatformInstaller$InstallOption;
 }

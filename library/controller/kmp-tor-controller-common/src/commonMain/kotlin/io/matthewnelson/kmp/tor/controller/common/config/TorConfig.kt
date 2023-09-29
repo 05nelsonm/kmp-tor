@@ -2088,7 +2088,6 @@ class TorConfig private constructor(
         object HiddenServiceExportCircuitID: KeyWord() { override fun toString(): String = "HiddenServiceExportCircuitID" }
         // HiddenServiceMaxStreams (IMPLEMENTED)
         // HiddenServiceMaxStreamsCloseCircuit (IMPLEMENTED)
-        object RendPostPeriod: KeyWord() { override fun toString(): String = "RendPostPeriod" }
         object HiddenServiceDirGroupReadable: KeyWord() { override fun toString(): String = "HiddenServiceDirGroupReadable" }
         object HiddenServiceNumIntroductionPoints: KeyWord() { override fun toString(): String = "HiddenServiceNumIntroductionPoints" }
         object HiddenServiceSingleHopMode: KeyWord() { override fun toString(): String = "HiddenServiceSingleHopMode" }
@@ -2164,5 +2163,9 @@ class TorConfig private constructor(
         object GeoIpV4File: KeyWord() { override fun toString(): String = "GeoIPFile" }
         @Deprecated(message = "Use KeyWord.__OwningControllerProcess", replaceWith = ReplaceWith(expression = "TorConfig.KeyWord.__OwningControllerProcess"))
         object OwningControllerProcess: KeyWord() { override fun toString(): String = "__OwningControllerProcess" }
+
+        // REMOVED
+        @Deprecated(message = "Removed from Tor As of 0.4.8.6")
+        object RendPostPeriod: KeyWord() { override fun toString(): String = "RendPostPeriod" }
     }
 }

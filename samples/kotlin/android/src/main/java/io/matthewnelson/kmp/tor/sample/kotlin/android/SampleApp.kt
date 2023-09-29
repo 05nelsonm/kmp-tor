@@ -254,6 +254,7 @@ class SampleApp: Application() {
                 // Tear down HttpClient
             } else {
                 info.socksInfoToProxyAddressOrNull()?.firstOrNull()?.let { proxyAddress ->
+                    @Suppress("UNUSED_VARIABLE")
                     val proxy = InetSocketAddress(proxyAddress.address.value, proxyAddress.port.value)
 
                     // Build HttpClient

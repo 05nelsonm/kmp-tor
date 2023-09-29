@@ -2342,6 +2342,7 @@ public abstract interface class io/matthewnelson/kmp/tor/controller/common/contr
 
 public final class io/matthewnelson/kmp/tor/controller/common/control/TorControlOnionClientAuth$Flag : java/lang/Enum {
 	public static final field Permanent Lio/matthewnelson/kmp/tor/controller/common/control/TorControlOnionClientAuth$Flag;
+	public static fun getEntries ()Lkotlin/enums/EnumEntries;
 	public static fun valueOf (Ljava/lang/String;)Lio/matthewnelson/kmp/tor/controller/common/control/TorControlOnionClientAuth$Flag;
 	public static fun values ()[Lio/matthewnelson/kmp/tor/controller/common/control/TorControlOnionClientAuth$Flag;
 }
@@ -3085,6 +3086,7 @@ public final class io/matthewnelson/kmp/tor/controller/common/control/usecase/To
 	public static final field DiscardPK Lio/matthewnelson/kmp/tor/controller/common/control/usecase/TorControlOnionAdd$Flag;
 	public static final field MaxStreamsCloseCircuit Lio/matthewnelson/kmp/tor/controller/common/control/usecase/TorControlOnionAdd$Flag;
 	public static final field NonAnonymous Lio/matthewnelson/kmp/tor/controller/common/control/usecase/TorControlOnionAdd$Flag;
+	public static fun getEntries ()Lkotlin/enums/EnumEntries;
 	public static fun valueOf (Ljava/lang/String;)Lio/matthewnelson/kmp/tor/controller/common/control/usecase/TorControlOnionAdd$Flag;
 	public static fun values ()[Lio/matthewnelson/kmp/tor/controller/common/control/usecase/TorControlOnionAdd$Flag;
 }
@@ -3147,6 +3149,7 @@ public final class io/matthewnelson/kmp/tor/controller/common/control/usecase/To
 	public static final field SetDormant Lio/matthewnelson/kmp/tor/controller/common/control/usecase/TorControlSignal$Signal;
 	public static final field Shutdown Lio/matthewnelson/kmp/tor/controller/common/control/usecase/TorControlSignal$Signal;
 	public final field value Ljava/lang/String;
+	public static fun getEntries ()Lkotlin/enums/EnumEntries;
 	public fun toString ()Ljava/lang/String;
 	public static fun valueOf (Ljava/lang/String;)Lio/matthewnelson/kmp/tor/controller/common/control/usecase/TorControlSignal$Signal;
 	public static fun values ()[Lio/matthewnelson/kmp/tor/controller/common/control/usecase/TorControlSignal$Signal;

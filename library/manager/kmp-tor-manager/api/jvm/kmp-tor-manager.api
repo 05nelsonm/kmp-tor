@@ -30,6 +30,7 @@ public abstract class io/matthewnelson/kmp/tor/manager/NetworkObserver {
 public final class io/matthewnelson/kmp/tor/manager/NetworkObserver$Connectivity : java/lang/Enum {
 	public static final field Connected Lio/matthewnelson/kmp/tor/manager/NetworkObserver$Connectivity;
 	public static final field Disconnected Lio/matthewnelson/kmp/tor/manager/NetworkObserver$Connectivity;
+	public static fun getEntries ()Lkotlin/enums/EnumEntries;
 	public static fun valueOf (Ljava/lang/String;)Lio/matthewnelson/kmp/tor/manager/NetworkObserver$Connectivity;
 	public static fun values ()[Lio/matthewnelson/kmp/tor/manager/NetworkObserver$Connectivity;
 }

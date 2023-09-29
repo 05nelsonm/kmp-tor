@@ -1,10 +1,3 @@
-public final class io/matthewnelson/kmp/tor/manager/BuildConfig {
-	public static final field BUILD_TYPE Ljava/lang/String;
-	public static final field DEBUG Z
-	public static final field LIBRARY_PACKAGE_NAME Ljava/lang/String;
-	public fun <init> ()V
-}
-
 public abstract interface class io/matthewnelson/kmp/tor/manager/Destroyable {
 	public abstract fun destroy (ZLkotlin/jvm/functions/Function0;)V
 	public abstract fun isDestroyed ()Z
@@ -37,6 +30,7 @@ public abstract class io/matthewnelson/kmp/tor/manager/NetworkObserver {
 public final class io/matthewnelson/kmp/tor/manager/NetworkObserver$Connectivity : java/lang/Enum {
 	public static final field Connected Lio/matthewnelson/kmp/tor/manager/NetworkObserver$Connectivity;
 	public static final field Disconnected Lio/matthewnelson/kmp/tor/manager/NetworkObserver$Connectivity;
+	public static fun getEntries ()Lkotlin/enums/EnumEntries;
 	public static fun valueOf (Ljava/lang/String;)Lio/matthewnelson/kmp/tor/manager/NetworkObserver$Connectivity;
 	public static fun values ()[Lio/matthewnelson/kmp/tor/manager/NetworkObserver$Connectivity;
 }
