@@ -45,7 +45,7 @@ dependencies {
 <details>
     <summary>Configuring an Android Project</summary>
 
-
+ - Ensure that the Kotlin Gradle Plugin is applied to your project
  - See the `Android` section of the [kmp-tor-binary][url-kmp-tor-binary] project's
    `README` to set things up so the Tor binaries are properly extracted upon app install.
 
