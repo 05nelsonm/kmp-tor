@@ -222,12 +222,12 @@ public class Example2 {
 [badge-license]: https://img.shields.io/badge/license-Apache%20License%202.0-blue.svg?style=flat
 
 <!-- TAG_DEPENDENCIES -->
-[badge-kotlin]: https://img.shields.io/badge/kotlin-1.8.21-blue.svg?logo=kotlin
-[badge-atomicfu]: https://img.shields.io/badge/atomicfu-0.20.2-blue.svg?logo=kotlin
-[badge-coroutines]: https://img.shields.io/badge/coroutines-1.7.1-blue.svg?logo=kotlin
+[badge-kotlin]: https://img.shields.io/badge/kotlin-1.9.10-blue.svg?logo=kotlin
+[badge-atomicfu]: https://img.shields.io/badge/atomicfu-0.21.0-blue.svg?logo=kotlin
+[badge-coroutines]: https://img.shields.io/badge/coroutines-1.7.3-blue.svg?logo=kotlin
 [badge-encoding]: https://img.shields.io/badge/encoding-2.0.0-blue.svg?style=flat
 [badge-parcelize]: https://img.shields.io/badge/parcelize-0.1.2-blue.svg?style=flat
-[badge-kmp-tor-binary]: https://img.shields.io/badge/kmp--tor--binary-4.7.13--4-5d2f68.svg?logo=torproject&style=flat&logoColor=5d2f68
+[badge-kmp-tor-binary]: https://img.shields.io/badge/kmp--tor--binary-4.8.6--0-5d2f68.svg?logo=torproject&style=flat&logoColor=5d2f68
 
 <!-- TAG_PLATFORMS -->
 [badge-platform-android]: http://img.shields.io/badge/-android-6EDB8D.svg?style=flat
