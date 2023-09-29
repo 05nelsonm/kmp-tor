@@ -1,5 +1,15 @@
 # CHANGELOG
 
+## Version 4.8.6-0-1.4.4 (2023-09-29)
+ - Updates dependencies
+     - `atomicfu` -> `0.21.0`
+     - `coroutines` -> `1.7.3`
+     - `kotlin` -> `1.9.10`
+     - `jnr-unix-socket` -> `0.38.21`
+     - `kmp-tor-binary` -> `4.8.6-0`
+ - Fixes start failure when `UnixSocket` path length exceeded 105 characters [[#304]][pr-304]
+ - Removed gradle.property `kotlin.mpp.enableCompatibilityMetadataVariant`
+
 ## Version 4.7.13-4-1.4.3 (2023-06-21)
  - Updates dependencies
      - `atomicfu` -> `0.20.2`
@@ -443,6 +453,7 @@
 [pr-284]: https://github.com/05nelsonm/kmp-tor/pull/284
 [pr-289]: https://github.com/05nelsonm/kmp-tor/pull/289
 [pr-294]: https://github.com/05nelsonm/kmp-tor/pull/294
+[pr-304]: https://github.com/05nelsonm/kmp-tor/pull/304
 [issue-285]: https://github.com/05nelsonm/kmp-tor/issues/285
 [kmp-tor-binary-66]: https://github.com/05nelsonm/kmp-tor-binary/issues/66
 [kmp-tor-binary-75]: https://github.com/05nelsonm/kmp-tor-binary/pull/75

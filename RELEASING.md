@@ -2,7 +2,7 @@
 
 ### Linux
 
-- Ensure java version is greater than or equal to 11
+- Ensure java version is greater than or equal to 17 (required for Android)
 ```bash
 java --version
 ```
