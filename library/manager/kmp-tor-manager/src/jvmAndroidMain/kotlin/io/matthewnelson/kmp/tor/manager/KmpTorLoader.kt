@@ -168,8 +168,13 @@ actual abstract class KmpTorLoader(protected val provider: TorConfigProvider) {
 
         torJob?.cancel()
 
-        val validated: TorConfigProvider.ValidatedTorConfig = withContext(dispatcher) {
-            provider.retrieve(excludeSettings) { port -> PortUtil.isTcpPortAvailable(port) }
+        val validated: TorConfigProvider.ValidatedTorConfig = try {
+            withContext(dispatcher) {
+                provider.retrieve(excludeSettings) { port -> PortUtil.isTcpPortAvailable(port) }
+            }
+        } catch (t: TorManagerException) {
+            torDispatcher.close()
+            return Result.failure(t)
         }
 
         val mkdirsFailure: TorManagerException? = withContext(dispatcher) {
