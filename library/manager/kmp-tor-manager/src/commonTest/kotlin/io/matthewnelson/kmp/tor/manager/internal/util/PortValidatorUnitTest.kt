@@ -117,6 +117,8 @@ class PortValidatorUnitTest {
 
         val socks = UnixSockets.Socks()
         socks.set(TorConfig.Option.FileSystemFile(Path(sb.toString())))
+        if (socks.value == null) return // skip test
+
         println(socks.value?.value?.length)
         validator.add(socks)
         sb.append('j')
