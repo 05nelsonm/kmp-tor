@@ -18,9 +18,9 @@ package kmp.tor
 @Suppress("ClassName")
 object env {
     // Must be either "-SNAPSHOT" || ""
-    private const val SNAPSHOT              = ""
+    private const val SNAPSHOT              = "-SNAPSHOT"
 
-    private const val MANAGER_VERSION_NAME  = "1.4.4"
+    private const val MANAGER_VERSION_NAME  = "1.4.5"
     //                       1.0.0-alpha1  ==     01_00_00_11
     //                       1.0.0-alpha2  ==     01_00_00_12
     //                       1.0.0-beta1   ==     01_00_00_21
@@ -80,7 +80,7 @@ object env {
          * Indicates that the release is only bumping Tor versions,
          * and to hold publication for all other modules.
          * */
-        const val isBinaryRelease           = true
+        const val isBinaryRelease           = false
         const val holdPublication           = false
 
         object version {
