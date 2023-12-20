@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## Version 4.8.10-0-1.4.4 (2023-12-20)
+ - Updates dependencies
+     - `kmp-tor-binary` -> `4.8.10-0`
+
 ## Version 4.8.6-0-1.4.4 (2023-09-29)
  - Updates dependencies
      - `atomicfu` -> `0.21.0`

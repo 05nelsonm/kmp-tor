@@ -18,9 +18,9 @@ package kmp.tor
 @Suppress("ClassName")
 object env {
     // Must be either "-SNAPSHOT" || ""
-    private const val SNAPSHOT              = "-SNAPSHOT"
+    private const val SNAPSHOT              = ""
 
-    private const val MANAGER_VERSION_NAME  = "1.4.5"
+    private const val MANAGER_VERSION_NAME  = "1.4.4"
     //                       1.0.0-alpha1  ==     01_00_00_11
     //                       1.0.0-alpha2  ==     01_00_00_12
     //                       1.0.0-beta1   ==     01_00_00_21
@@ -31,11 +31,11 @@ object env {
     //                       1.15.1        ==     01_15_01_99
     private const val MANAGER_VERSION_CODE  = /*0*/1_04_05_99
 
-    private const val BINARY_VERSION_NAME   = "4.8.6-0"
+    private const val BINARY_VERSION_NAME   = "4.8.10-0"
     //                       4.6.9-0       ==     00_04_06_09_00
     //                       4.6.9-1       ==     00_04_06_09_01
     //                       4.6.9-2       ==     00_04_06_09_02
-    private const val BINARY_VERSION_CODE   = /*00_0*/4_08_06_00
+    private const val BINARY_VERSION_CODE   = /*00_0*/4_08_10_00
 
     /**
      * Binaries exist in a different repo. Building against the staged
@@ -80,7 +80,7 @@ object env {
          * Indicates that the release is only bumping Tor versions,
          * and to hold publication for all other modules.
          * */
-        const val isBinaryRelease           = false
+        const val isBinaryRelease           = true
         const val holdPublication           = false
 
         object version {
