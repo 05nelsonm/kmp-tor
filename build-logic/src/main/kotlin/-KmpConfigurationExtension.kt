@@ -42,6 +42,7 @@ fun KmpConfigurationExtension.configureShared(
         js {
             target {
                 nodejs {
+                    @Suppress("RedundantSamConstructor")
                     testTask(Action {
                         useMocha { timeout = "30s" }
                     })

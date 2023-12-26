@@ -13,6 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-package io.matthewnelson.component.tools.check.publication
+package tools.check.publication
 
 internal fun stub() { /* no-op */ }
