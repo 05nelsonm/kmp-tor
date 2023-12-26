@@ -13,23 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-import com.github.benmanes.gradle.versions.updates.DependencyUpdatesTask
-import kmp.tor.env
 import org.jetbrains.kotlin.gradle.targets.js.yarn.YarnPlugin
 import org.jetbrains.kotlin.gradle.targets.js.yarn.YarnRootExtension
 
-@Suppress("DSL_SCOPE_VIOLATION")
 plugins {
-    id("environment")
-    alias(libs.plugins.multiplatform) apply(false)
+    alias(libs.plugins.kotlin.multiplatform) apply(false)
     alias(libs.plugins.android.app) apply(false)
     alias(libs.plugins.android.library) apply(false)
-    alias(libs.plugins.binaryCompat)
-    alias(libs.plugins.gradleVersions)
+    alias(libs.plugins.binary.compat)
 }
-
-ext.set("VERSION_NAME", env.kmpTor.version.name)
-ext.set("VERSION_CODE", env.kmpTor.version.code)
 
 allprojects {
 
@@ -58,69 +50,11 @@ plugins.withType<YarnPlugin> {
 
 @Suppress("LocalVariableName")
 apiValidation {
-    val KMP_TARGETS = findProperty("KMP_TARGETS") as? String
     val CHECK_PUBLICATION = findProperty("CHECK_PUBLICATION") as? String
-    val KMP_TARGETS_ALL = System.getProperty("KMP_TARGETS_ALL") != null
-    val TARGETS = KMP_TARGETS?.split(',')
 
     if (CHECK_PUBLICATION != null) {
         ignoredProjects.add("check-publication")
     } else {
         nonPublicMarkers.add("io.matthewnelson.kmp.tor.common.annotation.InternalTorApi")
-
-        val JVM = TARGETS?.contains("JVM") != false
-        val ANDROID = TARGETS?.contains("ANDROID") != false
-
-        // Don't check these projects when building JVM only or ANDROID only
-        if (!KMP_TARGETS_ALL && ((!ANDROID && JVM) || (ANDROID && !JVM))) {
-            ignoredProjects.add("kmp-tor")
-            ignoredProjects.add("kmp-tor-common")
-            ignoredProjects.add("kmp-tor-controller")
-            ignoredProjects.add("kmp-tor-controller-common")
-            ignoredProjects.add("kmp-tor-manager")
-            ignoredProjects.add("kmp-tor-manager-common")
-            ignoredProjects.add("kmp-tor-ext-callback-controller")
-            ignoredProjects.add("kmp-tor-ext-callback-controller-common")
-            ignoredProjects.add("kmp-tor-ext-callback-manager")
-            ignoredProjects.add("kmp-tor-ext-callback-manager-common")
-        }
-
-        if (KMP_TARGETS_ALL || ANDROID) {
-            ignoredProjects.add("android")
-        }
-
-        if (KMP_TARGETS_ALL || JVM) {
-            ignoredProjects.add("javafx")
-        }
-    }
-}
-
-fun isNonStable(version: String): Boolean {
-    val stableKeyword = listOf("RELEASE", "FINAL", "GA").any { version.uppercase().contains(it) }
-    val regex = "^[0-9,.v-]+(-r)?$".toRegex()
-    val isStable = stableKeyword || regex.matches(version)
-    return isStable.not()
-}
-
-tasks.withType<DependencyUpdatesTask> {
-    // Example 1: reject all non stable versions
-    rejectVersionIf {
-        isNonStable(candidate.version)
-    }
-
-    // Example 2: disallow release candidates as upgradable versions from stable versions
-    rejectVersionIf {
-        isNonStable(candidate.version) && !isNonStable(currentVersion)
-    }
-
-    // Example 3: using the full syntax
-    resolutionStrategy {
-        componentSelection {
-            all(Action {
-                if (isNonStable(candidate.version) && !isNonStable(currentVersion)) {
-                    reject("Release candidate")
-                }
-            })
-        }
     }
 }
