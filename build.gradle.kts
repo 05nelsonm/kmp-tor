@@ -58,40 +58,12 @@ plugins.withType<YarnPlugin> {
 
 @Suppress("LocalVariableName")
 apiValidation {
-    val KMP_TARGETS = findProperty("KMP_TARGETS") as? String
     val CHECK_PUBLICATION = findProperty("CHECK_PUBLICATION") as? String
-    val KMP_TARGETS_ALL = System.getProperty("KMP_TARGETS_ALL") != null
-    val TARGETS = KMP_TARGETS?.split(',')
 
     if (CHECK_PUBLICATION != null) {
         ignoredProjects.add("check-publication")
     } else {
         nonPublicMarkers.add("io.matthewnelson.kmp.tor.common.annotation.InternalTorApi")
-
-        val JVM = TARGETS?.contains("JVM") != false
-        val ANDROID = TARGETS?.contains("ANDROID") != false
-
-        // Don't check these projects when building JVM only or ANDROID only
-        if (!KMP_TARGETS_ALL && ((!ANDROID && JVM) || (ANDROID && !JVM))) {
-            ignoredProjects.add("kmp-tor")
-            ignoredProjects.add("kmp-tor-common")
-            ignoredProjects.add("kmp-tor-controller")
-            ignoredProjects.add("kmp-tor-controller-common")
-            ignoredProjects.add("kmp-tor-manager")
-            ignoredProjects.add("kmp-tor-manager-common")
-            ignoredProjects.add("kmp-tor-ext-callback-controller")
-            ignoredProjects.add("kmp-tor-ext-callback-controller-common")
-            ignoredProjects.add("kmp-tor-ext-callback-manager")
-            ignoredProjects.add("kmp-tor-ext-callback-manager-common")
-        }
-
-        if (KMP_TARGETS_ALL || ANDROID) {
-            ignoredProjects.add("android")
-        }
-
-        if (KMP_TARGETS_ALL || JVM) {
-            ignoredProjects.add("javafx")
-        }
     }
 }
 
