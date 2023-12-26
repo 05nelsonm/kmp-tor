@@ -24,6 +24,9 @@ if (CHECK_PUBLICATION != null) {
     include(":tools:check-publication")
 } else {
     listOf(
+        "runtime",
+        "runtime-api",
+        "runtime-ctrl",
         "kmp-tor",
         "kmp-tor-common",
         "kmp-tor-internal",
