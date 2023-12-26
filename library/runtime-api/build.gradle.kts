@@ -19,6 +19,13 @@ plugins {
 
 kmpConfiguration {
     configureShared(publish = true) {
-
+        common {
+            sourceSetMain {
+                dependencies {
+                    api(libs.kmp.tor.core.api)
+                    implementation(libs.kmp.tor.core.resource)
+                }
+            }
+        }
     }
 }

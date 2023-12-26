@@ -6,9 +6,14 @@ encoding = "2.1.0"
 
 gradle-android = "8.1.4"
 gradle-binary-compat = "0.13.2"
-gradle-kmp-configuration = "0.1.6"
+gradle-kmp-configuration = "0.1.7"
 gradle-kotlin = "1.9.21"
 gradle-publish-maven = "0.25.3"
+
+kmp-tor-core = "2.0.0-alpha02"
+kmp-tor-resource = "408.10.0-SNAPSHOT"
+
+kotlinx-coroutines = "1.7.3"
 
 [libraries]
 androidx-test-core = { module = "androidx.test:core", version.ref = "androidx-test-core" }
@@ -22,6 +27,15 @@ gradle-android = { module = "com.android.tools.build:gradle", version.ref = "gra
 gradle-kmp-configuration = { module = "io.matthewnelson:gradle-kmp-configuration-plugin", version.ref = "gradle-kmp-configuration" }
 gradle-kotlin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "gradle-kotlin" }
 gradle-publish-maven = { module = "com.vanniktech:gradle-maven-publish-plugin", version.ref = "gradle-publish-maven" }
+
+kmp-tor-core-api = { module = "io.matthewnelson.kmp-tor:core-api", version.ref = "kmp-tor-core" }
+kmp-tor-core-resource = { module = "io.matthewnelson.kmp-tor:core-resource", version.ref = "kmp-tor-core" }
+
+kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "kotlinx-coroutines" }
+kotlinx-coroutines-android = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version.ref = "kotlinx-coroutines" }
+kotlinx-coroutines-javafx = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-javafx", version.ref = "kotlinx-coroutines" }
+kotlinx-coroutines-swing = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-swing", version.ref = "kotlinx-coroutines" }
+kotlinx-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "kotlinx-coroutines" }
 
 [plugins]
 android-app = { id = "com.android.application", version.ref = "gradle-android" }

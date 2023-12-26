@@ -19,6 +19,13 @@ plugins {
 
 kmpConfiguration {
     configureShared(publish = true) {
-
+        common {
+            sourceSetMain {
+                dependencies {
+                    api(project(":library:runtime-api"))
+                    implementation(project(":library:runtime-ctrl"))
+                }
+            }
+        }
     }
 }
