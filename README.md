@@ -29,7 +29,7 @@ published until `2.0.0` work has been completed.
 <!-- TAG_DEPENDENCIES -->
 [badge-kotlin]: https://img.shields.io/badge/kotlin-1.9.21-blue.svg?logo=kotlin
 [badge-coroutines]: https://img.shields.io/badge/kotlinx.coroutines-1.7.3-blue.svg?logo=kotlin
-[badge-encoding]: https://img.shields.io/badge/encoding-2.0.0-blue.svg?style=flat
+[badge-encoding]: https://img.shields.io/badge/encoding-2.1.0-blue.svg?style=flat
 [badge-kmp-tor-core]: https://img.shields.io/badge/kmp--tor--core-2.0.0--alpha02-blue.svg?style=flat
 
 <!-- TAG_PLATFORMS -->
