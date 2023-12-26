@@ -15,83 +15,49 @@
  **/
 import io.matthewnelson.kmp.configuration.extension.KmpConfigurationExtension
 import io.matthewnelson.kmp.configuration.extension.container.target.KmpConfigurationContainerDsl
+import io.matthewnelson.kmp.configuration.extension.container.target.TargetAndroidContainer
 import org.gradle.api.Action
 import org.gradle.api.JavaVersion
 
 fun KmpConfigurationExtension.configureShared(
-    androidNameSpace: String? = null,
-    isCommonModule: Boolean = false,
+    androidNamespace: String? = null,
     publish: Boolean = false,
-    explicitApi: Boolean = false,
     action: Action<KmpConfigurationContainerDsl>
 ) {
     configure {
+        if (androidNamespace != null) {
+            androidLibrary(namespace = androidNamespace) {
+                if (publish) target { publishLibraryVariants("release") }
+            }
+        }
+
         jvm {
-            if (androidNameSpace == null) { target { withJava() } }
+            if (androidNamespace == null) target { withJava() }
 
             kotlinJvmTarget = JavaVersion.VERSION_1_8
             compileSourceCompatibility = JavaVersion.VERSION_1_8
             compileTargetCompatibility = JavaVersion.VERSION_1_8
         }
 
-        if (androidNameSpace != null) {
-            androidLibrary {
-                target { publishLibraryVariants("release") }
-
-                android {
-                    buildToolsVersion = "33.0.1"
-                    compileSdk = 33
-                    namespace = androidNameSpace
-
-                    defaultConfig {
-                        minSdk = 16
-                        targetSdk = 33
-
-                        testInstrumentationRunnerArguments["disableAnalytics"] = "true"
-                    }
+        js {
+            target {
+                nodejs {
+                    testTask(Action {
+                        useMocha { timeout = "30s" }
+                    })
                 }
-
-                kotlinJvmTarget = JavaVersion.VERSION_1_8
-                compileSourceCompatibility = JavaVersion.VERSION_1_8
-                compileTargetCompatibility = JavaVersion.VERSION_1_8
             }
         }
 
-        if (isCommonModule) {
-            js {
-                target {
-                    nodejs {
-                        testTask {
-                            useMocha { timeout = "30s" }
-                        }
-                    }
-                }
-            }
-
-            linuxX64()
-            mingwX64()
-
-            iosArm32()
-            iosArm64()
-            iosX64()
-            iosSimulatorArm64()
-
-            macosArm64()
-            macosX64()
-
-            tvosArm64()
-            tvosX64()
-            tvosSimulatorArm64()
-
-            watchosArm32()
-            watchosArm64()
-            watchosX64()
-            watchosX86()
-            watchosSimulatorArm64()
-        }
+        iosAll()
+        linuxAll()
+        macosAll()
+//        mingwAll()
+//        tvosAll()
+//        watchosAll()
 
         common {
-            if (publish) { pluginIds("publication") }
+            if (publish) pluginIds("publication")
 
             sourceSetTest {
                 dependencies {
@@ -100,30 +66,37 @@ fun KmpConfigurationExtension.configureShared(
             }
         }
 
-        kotlin {
-            if (explicitApi) { explicitApi() }
+        kotlin { explicitApi() }
 
-            with(sourceSets) {
-                val jvmMain = findByName("jvmMain")
-                val jsMain = findByName("jsMain")
+        action.execute(this)
+    }
+}
 
-                if (jvmMain != null || jsMain != null) {
-                    val jvmJsMain = maybeCreate("jvmJsMain").apply {
-                        dependsOn(getByName("commonMain"))
-                    }
-                    val jvmJsTest = maybeCreate("jvmJsTest").apply {
-                        dependsOn(getByName("commonTest"))
-                    }
+fun KmpConfigurationContainerDsl.androidLibrary(
+    namespace: String,
+    buildTools: String? = "33.0.2",
+    compileSdk: Int = 33,
+    minSdk: Int = 16,
+    javaVersion: JavaVersion = JavaVersion.VERSION_1_8,
+    action: (Action<TargetAndroidContainer.Library>)? = null,
+) {
+    androidLibrary {
+        android {
+            buildTools?.let { buildToolsVersion = it }
+            this.compileSdk = compileSdk
+            this.namespace = namespace
 
-                    jvmMain?.apply { dependsOn(jvmJsMain) }
-                    findByName("jvmTest")?.apply { dependsOn(jvmJsTest) }
+            defaultConfig {
+                this.minSdk = minSdk
 
-                    jsMain?.apply { dependsOn(jvmJsMain) }
-                    findByName("jsTest")?.apply { dependsOn(jvmJsTest) }
-                }
+                testInstrumentationRunnerArguments["disableAnalytics"] = true.toString()
             }
         }
 
-        action.execute(this)
+        kotlinJvmTarget = javaVersion
+        compileSourceCompatibility = javaVersion
+        compileTargetCompatibility = javaVersion
+
+        action?.execute(this)
     }
 }

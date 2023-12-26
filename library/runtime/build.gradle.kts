@@ -18,9 +18,7 @@ plugins {
 }
 
 kmpConfiguration {
-    configure {
-        jvm {
+    configureShared(publish = true) {
 
-        }
     }
 }

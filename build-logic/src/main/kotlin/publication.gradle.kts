@@ -24,3 +24,8 @@ if (!version.toString().endsWith("-SNAPSHOT")) {
         useGpgCmd()
     }
 }
+
+tasks.withType<AbstractArchiveTask>().configureEach {
+    isPreserveFileTimestamps = false
+    isReproducibleFileOrder = true
+}
