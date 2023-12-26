@@ -1,69 +1,30 @@
 [versions]
-atomicfu = "0.21.0"
-coroutines = "1.7.3"
-encoding = "2.0.0"
-kmpParcelize = "0.1.2"
-jnrUnixSocket = "0.38.21"
+androidx-test-core = "1.5.0"
+androidx-test-runner = "1.5.2"
 
-# Gradle Plugins
-android = "8.1.2"
-binaryCompat = "0.13.2"
-configuration = "0.1.4"
-gradleVersions = "0.48.0"
-kotlin = "1.9.10"
-publish = "0.25.3"
+encoding = "2.1.0"
 
-# Samples
-androidx-appCompat = "1.6.1"
-androidx-constraintLayout = "2.1.4"
-androidx-lifecycle = "2.6.2"
-google-material = "1.9.0"
-viewBindingDelegate = "1.5.9"
-javafx = "0.0.11"
-tornadofx = "1.7.20"
-kmpTorBinary = "4.8.10-0"
-kmpTor = "1.4.4"
+gradle-android = "8.1.4"
+gradle-binary-compat = "0.13.2"
+gradle-kmp-configuration = "0.1.6"
+gradle-kotlin = "1.9.21"
+gradle-publish-maven = "0.25.3"
 
 [libraries]
-atomicfu = { module = "org.jetbrains.kotlinx:atomicfu", version.ref = "atomicfu" }
-
-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "coroutines" }
+androidx-test-core = { module = "androidx.test:core", version.ref = "androidx-test-core" }
+androidx-test-runner = { module = "androidx.test:runner", version.ref = "androidx-test-runner" }
 
 encoding-base16 = { module = "io.matthewnelson.encoding:base16", version.ref = "encoding" }
 encoding-base32 = { module = "io.matthewnelson.encoding:base32", version.ref = "encoding" }
 encoding-base64 = { module = "io.matthewnelson.encoding:base64", version.ref = "encoding" }
 
-jnrUnixSocket = { module = "com.github.jnr:jnr-unixsocket", version.ref = "jnrUnixSocket" }
-
-kmpParcelize = { module = "io.matthewnelson.kotlin-components:parcelize", version.ref = "kmpParcelize"}
-
-gradle-android = { module = "com.android.tools.build:gradle", version.ref = "android" }
-gradle-kmp-configuration = { module = "io.matthewnelson:gradle-kmp-configuration-plugin", version.ref = "configuration" }
-gradle-kotlin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
-gradle-maven-publish = { module = "com.vanniktech:gradle-maven-publish-plugin", version.ref = "publish" }
-
-# Tests
-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "coroutines" }
-
-# Samples
-androidx-appCompat = { module = "androidx.appcompat:appcompat", version.ref = "androidx-appCompat" }
-androidx-constraintLayout = { module = "androidx.constraintlayout:constraintlayout", version.ref = "androidx-constraintLayout" }
-androidx-lifecycle-viewModel = { module = "androidx.lifecycle:lifecycle-viewmodel-ktx", version.ref = "androidx-lifecycle" }
-coroutines-android = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version.ref = "coroutines" }
-coroutines-javafx = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-javafx", version.ref = "coroutines" }
-google-material = { module = "com.google.android.material:material", version.ref = "google-material" }
-tornadofx = { module = "no.tornado:tornadofx", version.ref = "tornadofx" }
-viewBindingDelegate = { module = "com.github.kirich1409:viewbindingpropertydelegate-noreflection", version.ref = "viewBindingDelegate" }
+gradle-android = { module = "com.android.tools.build:gradle", version.ref = "gradle-android" }
+gradle-kmp-configuration = { module = "io.matthewnelson:gradle-kmp-configuration-plugin", version.ref = "gradle-kmp-configuration" }
+gradle-kotlin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "gradle-kotlin" }
+gradle-publish-maven = { module = "com.vanniktech:gradle-maven-publish-plugin", version.ref = "gradle-publish-maven" }
 
 [plugins]
-android-library = { id = "com.android.library", version.ref = "android" }
-binaryCompat = { id = "org.jetbrains.kotlinx.binary-compatibility-validator", version.ref = "binaryCompat" }
-gradleVersions = { id = "com.github.ben-manes.versions", version.ref = "gradleVersions" }
-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
-parcelize = { id = "kotlin-parcelize", version.ref = "kotlin" }
-
-# Samples
-kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
-kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
-android-app = { id = "com.android.application", version.ref = "android" }
-javafx = { id = "org.openjfx.javafxplugin", version.ref = "javafx" }
+android-app = { id = "com.android.application", version.ref = "gradle-android" }
+android-library = { id = "com.android.library", version.ref = "gradle-android" }
+binary-compat = { id = "org.jetbrains.kotlinx.binary-compatibility-validator", version.ref = "gradle-binary-compat" }
+kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "gradle-kotlin" }

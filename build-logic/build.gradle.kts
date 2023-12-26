@@ -21,5 +21,5 @@ dependencies {
     implementation(libs.gradle.android)
     implementation(libs.gradle.kmp.configuration)
     implementation(libs.gradle.kotlin)
-    implementation(libs.gradle.maven.publish)
+    implementation(libs.gradle.publish.maven)
 }
