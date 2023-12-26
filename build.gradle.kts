@@ -14,22 +14,16 @@
  * limitations under the License.
  **/
 import com.github.benmanes.gradle.versions.updates.DependencyUpdatesTask
-import kmp.tor.env
 import org.jetbrains.kotlin.gradle.targets.js.yarn.YarnPlugin
 import org.jetbrains.kotlin.gradle.targets.js.yarn.YarnRootExtension
 
-@Suppress("DSL_SCOPE_VIOLATION")
 plugins {
-    id("environment")
     alias(libs.plugins.multiplatform) apply(false)
     alias(libs.plugins.android.app) apply(false)
     alias(libs.plugins.android.library) apply(false)
     alias(libs.plugins.binaryCompat)
     alias(libs.plugins.gradleVersions)
 }
-
-ext.set("VERSION_NAME", env.kmpTor.version.name)
-ext.set("VERSION_CODE", env.kmpTor.version.code)
 
 allprojects {
 

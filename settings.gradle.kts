@@ -9,7 +9,6 @@ pluginManagement {
 }
 
 includeBuild("build-logic")
-includeBuild("build-environment")
 
 @Suppress("PrivatePropertyName")
 private val CHECK_PUBLICATION: String? by settings
