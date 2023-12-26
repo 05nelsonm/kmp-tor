@@ -24,6 +24,7 @@ kmpConfiguration {
                 dependencies {
                     api(project(":library:runtime-api"))
                     implementation(project(":library:runtime-ctrl"))
+                    implementation(libs.kmp.tor.core.resource)
                 }
             }
         }

@@ -23,6 +23,7 @@ kmpConfiguration {
             sourceSetMain {
                 dependencies {
                     api(project(":library:runtime-api"))
+                    implementation(libs.kmp.tor.core.resource)
                 }
             }
         }
