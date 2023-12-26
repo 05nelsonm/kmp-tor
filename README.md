@@ -14,6 +14,9 @@
 
 Kotlin Multiplatform support for embedding Tor into your application.
 
+**NOTICE:** `kmp-tor` is being overhauled. This branch is for the `1.x.x` version. See 
+[HERE][url-kmp-tor-master] for the latest and greatest.
+
 ### Get Started
 
 <!-- TAG_VERSION -->
@@ -262,3 +265,4 @@ public class Example2 {
 [url-javafx-kotlin-gradle]: https://github.com/05nelsonm/kmp-tor/blob/master/samples/kotlin/javafx/build.gradle.kts
 [url-javafx-java-app]: https://github.com/05nelsonm/kmp-tor/blob/master/samples/java/javafx/src/main/java/io/matthewnelson/kmp/tor/sample/java/javafx/App.java
 [url-javafx-java-gradle]: https://github.com/05nelsonm/kmp-tor/blob/master/samples/java/javafx/build.gradle.kts
+[url-kmp-tor-master]: https://github.com/05nelsonm/kmp-tor/tree/master
