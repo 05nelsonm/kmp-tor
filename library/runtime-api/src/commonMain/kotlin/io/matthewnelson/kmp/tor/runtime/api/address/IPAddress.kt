@@ -49,7 +49,7 @@ public sealed class IPAddress private constructor(value: String): Address(value)
      * */
     public class V4 private constructor(value: String): IPAddress(value) {
 
-        override fun canonicalHostname(): String = value
+        public override fun canonicalHostname(): String = value
 
         public companion object {
 
@@ -90,7 +90,7 @@ public sealed class IPAddress private constructor(value: String): Address(value)
      * */
     public class V6 private constructor(value: String): IPAddress(value) {
 
-        override fun canonicalHostname(): String = "[$value]"
+        public override fun canonicalHostname(): String = "[$value]"
 
         public companion object {
 

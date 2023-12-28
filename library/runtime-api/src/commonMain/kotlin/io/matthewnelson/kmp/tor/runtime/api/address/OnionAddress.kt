@@ -22,18 +22,19 @@ import io.matthewnelson.encoding.core.Encoder.Companion.encodeToString
 import io.matthewnelson.kmp.tor.runtime.api.address.OnionAddress.V3.Companion.toOnionAddressV3OrNull
 import io.matthewnelson.kmp.tor.runtime.api.internal.findHostnameAndPortFromURL
 import io.matthewnelson.kmp.tor.runtime.api.internal.stripBaseEncoding
+import io.matthewnelson.kmp.tor.runtime.api.key.AddressKey
+import io.matthewnelson.kmp.tor.runtime.api.key.ED25519_V3
 import kotlin.jvm.JvmName
 import kotlin.jvm.JvmStatic
 
 /**
- * Base abstraction for denoting a String value as a .onion address public key
- *
- * Currently, only ED25519-V3 is supported.
+ * Base abstraction for denoting a String value as a .onion address
  * */
 public sealed class OnionAddress private constructor(value: String): Address(value) {
 
-    final override fun canonicalHostname(): String = "$value.onion"
+    public final override fun canonicalHostname(): String = "$value.onion"
     public abstract fun decode(): ByteArray
+    public abstract fun asPublicKey(): AddressKey.Public
 
     public companion object {
 
@@ -76,7 +77,8 @@ public sealed class OnionAddress private constructor(value: String): Address(val
      * */
     public class V3 private constructor(value: String): OnionAddress(value) {
 
-        override fun decode(): ByteArray = value.decodeToByteArray(Base32.Default)
+        public override fun decode(): ByteArray = value.decodeToByteArray(Base32.Default)
+        public override fun asPublicKey(): ED25519_V3.PublicKey = ED25519_V3.PublicKey(this)
 
         public companion object {
 
@@ -110,7 +112,7 @@ public sealed class OnionAddress private constructor(value: String): Address(val
             @JvmStatic
             @JvmName("getOrNull")
             public fun ByteArray.toOnionAddressV3OrNull(): V3? {
-                if (size != 35) return null
+                if (size != BYTE_SIZE) return null
 
                 val encoded = encodeToString(Base32Default {
                     encodeToLowercase = true
@@ -120,6 +122,7 @@ public sealed class OnionAddress private constructor(value: String): Address(val
                 return V3(encoded)
             }
 
+            internal const val BYTE_SIZE: Int = 35
             private val REGEX: Regex = "[${Base32.Default.CHARS_LOWER}]{56}".toRegex()
         }
     }

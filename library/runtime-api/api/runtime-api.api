@@ -1,3 +1,8 @@
+public abstract interface class io/matthewnelson/kmp/tor/runtime/api/Destroyable {
+	public abstract fun destroy ()V
+	public abstract fun isDestroyed ()Z
+}
+
 public abstract class io/matthewnelson/kmp/tor/runtime/api/address/Address : java/lang/Comparable {
 	public final field value Ljava/lang/String;
 	public synthetic fun <init> (Ljava/lang/String;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
@@ -50,6 +55,7 @@ public final class io/matthewnelson/kmp/tor/runtime/api/address/IPAddress$V6$Com
 public abstract class io/matthewnelson/kmp/tor/runtime/api/address/OnionAddress : io/matthewnelson/kmp/tor/runtime/api/address/Address {
 	public static final field Companion Lio/matthewnelson/kmp/tor/runtime/api/address/OnionAddress$Companion;
 	public synthetic fun <init> (Ljava/lang/String;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public abstract fun asPublicKey ()Lio/matthewnelson/kmp/tor/runtime/api/key/AddressKey$Public;
 	public final fun canonicalHostname ()Ljava/lang/String;
 	public abstract fun decode ()[B
 	public static final fun get (Ljava/lang/String;)Lio/matthewnelson/kmp/tor/runtime/api/address/OnionAddress;
@@ -68,6 +74,8 @@ public final class io/matthewnelson/kmp/tor/runtime/api/address/OnionAddress$Com
 public final class io/matthewnelson/kmp/tor/runtime/api/address/OnionAddress$V3 : io/matthewnelson/kmp/tor/runtime/api/address/OnionAddress {
 	public static final field Companion Lio/matthewnelson/kmp/tor/runtime/api/address/OnionAddress$V3$Companion;
 	public synthetic fun <init> (Ljava/lang/String;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public synthetic fun asPublicKey ()Lio/matthewnelson/kmp/tor/runtime/api/key/AddressKey$Public;
+	public fun asPublicKey ()Lio/matthewnelson/kmp/tor/runtime/api/key/ED25519_V3$PublicKey;
 	public fun decode ()[B
 	public static final fun get (Ljava/lang/String;)Lio/matthewnelson/kmp/tor/runtime/api/address/OnionAddress$V3;
 	public static final fun get ([B)Lio/matthewnelson/kmp/tor/runtime/api/address/OnionAddress$V3;
@@ -139,5 +147,179 @@ public final class io/matthewnelson/kmp/tor/runtime/api/address/ProxyAddress : i
 public final class io/matthewnelson/kmp/tor/runtime/api/address/ProxyAddress$Companion {
 	public final fun get (Ljava/lang/String;)Lio/matthewnelson/kmp/tor/runtime/api/address/ProxyAddress;
 	public final fun getOrNull (Ljava/lang/String;)Lio/matthewnelson/kmp/tor/runtime/api/address/ProxyAddress;
+}
+
+public final class io/matthewnelson/kmp/tor/runtime/api/key/AddressKey {
+}
+
+public abstract class io/matthewnelson/kmp/tor/runtime/api/key/AddressKey$Private : io/matthewnelson/kmp/tor/runtime/api/key/Key$Private {
+	public synthetic fun <init> ([BLkotlin/jvm/internal/DefaultConstructorMarker;)V
+}
+
+public abstract class io/matthewnelson/kmp/tor/runtime/api/key/AddressKey$Public : io/matthewnelson/kmp/tor/runtime/api/key/Key$Public, java/lang/Comparable {
+	public synthetic fun <init> (Lio/matthewnelson/kmp/tor/runtime/api/address/OnionAddress;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public fun address ()Lio/matthewnelson/kmp/tor/runtime/api/address/OnionAddress;
+	public final fun base16 ()Ljava/lang/String;
+	public final fun base32 ()Ljava/lang/String;
+	public final fun base64 ()Ljava/lang/String;
+	public final fun compareTo (Lio/matthewnelson/kmp/tor/runtime/api/key/AddressKey$Public;)I
+	public synthetic fun compareTo (Ljava/lang/Object;)I
+	public final fun encoded ()[B
+	public final fun equals (Ljava/lang/Object;)Z
+	public final fun hashCode ()I
+}
+
+public final class io/matthewnelson/kmp/tor/runtime/api/key/AuthKey {
+}
+
+public abstract class io/matthewnelson/kmp/tor/runtime/api/key/AuthKey$Private : io/matthewnelson/kmp/tor/runtime/api/key/Key$Private {
+	public synthetic fun <init> ([BLkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun descriptorBase32 (Lio/matthewnelson/kmp/tor/runtime/api/address/OnionAddress;)Ljava/lang/String;
+	public final fun descriptorBase32 (Lio/matthewnelson/kmp/tor/runtime/api/key/AddressKey$Public;)Ljava/lang/String;
+	public final fun descriptorBase32OrNull (Lio/matthewnelson/kmp/tor/runtime/api/address/OnionAddress;)Ljava/lang/String;
+	public final fun descriptorBase32OrNull (Lio/matthewnelson/kmp/tor/runtime/api/key/AddressKey$Public;)Ljava/lang/String;
+	public final fun descriptorBase64 (Lio/matthewnelson/kmp/tor/runtime/api/address/OnionAddress;)Ljava/lang/String;
+	public final fun descriptorBase64 (Lio/matthewnelson/kmp/tor/runtime/api/key/AddressKey$Public;)Ljava/lang/String;
+	public final fun descriptorBase64OrNull (Lio/matthewnelson/kmp/tor/runtime/api/address/OnionAddress;)Ljava/lang/String;
+	public final fun descriptorBase64OrNull (Lio/matthewnelson/kmp/tor/runtime/api/key/AddressKey$Public;)Ljava/lang/String;
+	protected abstract fun isCompatible (Lio/matthewnelson/kmp/tor/runtime/api/key/AddressKey$Public;)Z
+}
+
+public abstract class io/matthewnelson/kmp/tor/runtime/api/key/AuthKey$Public : io/matthewnelson/kmp/tor/runtime/api/key/Key$Public {
+	public synthetic fun <init> ([BLkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun base16 ()Ljava/lang/String;
+	public final fun base32 ()Ljava/lang/String;
+	public final fun base64 ()Ljava/lang/String;
+	public final fun descriptorBase32 ()Ljava/lang/String;
+	public final fun descriptorBase64 ()Ljava/lang/String;
+	public final fun encoded ()[B
+	public final fun equals (Ljava/lang/Object;)Z
+	public final fun hashCode ()I
+}
+
+public final class io/matthewnelson/kmp/tor/runtime/api/key/ED25519_V3 : io/matthewnelson/kmp/tor/runtime/api/key/KeyType$Address {
+	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/api/key/ED25519_V3;
+	public fun algorithm ()Ljava/lang/String;
+}
+
+public final class io/matthewnelson/kmp/tor/runtime/api/key/ED25519_V3$PrivateKey : io/matthewnelson/kmp/tor/runtime/api/key/AddressKey$Private {
+	public static final field Companion Lio/matthewnelson/kmp/tor/runtime/api/key/ED25519_V3$PrivateKey$Companion;
+	public synthetic fun <init> ([BLkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public fun algorithm ()Ljava/lang/String;
+	public static final fun get (Ljava/lang/String;)Lio/matthewnelson/kmp/tor/runtime/api/key/ED25519_V3$PrivateKey;
+	public static final fun get ([B)Lio/matthewnelson/kmp/tor/runtime/api/key/ED25519_V3$PrivateKey;
+	public static final fun getOrNull (Ljava/lang/String;)Lio/matthewnelson/kmp/tor/runtime/api/key/ED25519_V3$PrivateKey;
+	public static final fun getOrNull ([B)Lio/matthewnelson/kmp/tor/runtime/api/key/ED25519_V3$PrivateKey;
+}
+
+public final class io/matthewnelson/kmp/tor/runtime/api/key/ED25519_V3$PrivateKey$Companion {
+	public final fun get (Ljava/lang/String;)Lio/matthewnelson/kmp/tor/runtime/api/key/ED25519_V3$PrivateKey;
+	public final fun get ([B)Lio/matthewnelson/kmp/tor/runtime/api/key/ED25519_V3$PrivateKey;
+	public final fun getOrNull (Ljava/lang/String;)Lio/matthewnelson/kmp/tor/runtime/api/key/ED25519_V3$PrivateKey;
+	public final fun getOrNull ([B)Lio/matthewnelson/kmp/tor/runtime/api/key/ED25519_V3$PrivateKey;
+}
+
+public final class io/matthewnelson/kmp/tor/runtime/api/key/ED25519_V3$PublicKey : io/matthewnelson/kmp/tor/runtime/api/key/AddressKey$Public {
+	public static final field Companion Lio/matthewnelson/kmp/tor/runtime/api/key/ED25519_V3$PublicKey$Companion;
+	public fun <init> (Lio/matthewnelson/kmp/tor/runtime/api/address/OnionAddress$V3;)V
+	public fun address ()Lio/matthewnelson/kmp/tor/runtime/api/address/OnionAddress$V3;
+	public synthetic fun address ()Lio/matthewnelson/kmp/tor/runtime/api/address/OnionAddress;
+	public fun algorithm ()Ljava/lang/String;
+	public static final fun get (Ljava/lang/String;)Lio/matthewnelson/kmp/tor/runtime/api/key/ED25519_V3$PublicKey;
+	public static final fun get ([B)Lio/matthewnelson/kmp/tor/runtime/api/key/ED25519_V3$PublicKey;
+	public static final fun getOrNull (Ljava/lang/String;)Lio/matthewnelson/kmp/tor/runtime/api/key/ED25519_V3$PublicKey;
+	public static final fun getOrNull ([B)Lio/matthewnelson/kmp/tor/runtime/api/key/ED25519_V3$PublicKey;
+}
+
+public final class io/matthewnelson/kmp/tor/runtime/api/key/ED25519_V3$PublicKey$Companion {
+	public final fun get (Ljava/lang/String;)Lio/matthewnelson/kmp/tor/runtime/api/key/ED25519_V3$PublicKey;
+	public final fun get ([B)Lio/matthewnelson/kmp/tor/runtime/api/key/ED25519_V3$PublicKey;
+	public final fun getOrNull (Ljava/lang/String;)Lio/matthewnelson/kmp/tor/runtime/api/key/ED25519_V3$PublicKey;
+	public final fun getOrNull ([B)Lio/matthewnelson/kmp/tor/runtime/api/key/ED25519_V3$PublicKey;
+}
+
+public abstract class io/matthewnelson/kmp/tor/runtime/api/key/Key : java/security/Key {
+	protected static final field Companion Lio/matthewnelson/kmp/tor/runtime/api/key/Key$Companion;
+	public abstract fun algorithm ()Ljava/lang/String;
+	public abstract fun encoded ()[B
+	public final fun getAlgorithm ()Ljava/lang/String;
+	public final fun getEncoded ()[B
+	public final fun getFormat ()Ljava/lang/String;
+}
+
+protected final class io/matthewnelson/kmp/tor/runtime/api/key/Key$Companion {
+}
+
+public abstract class io/matthewnelson/kmp/tor/runtime/api/key/Key$Private : io/matthewnelson/kmp/tor/runtime/api/key/Key, io/matthewnelson/kmp/tor/runtime/api/Destroyable, java/security/PrivateKey {
+	public synthetic fun <init> ([BLkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun base16 ()Ljava/lang/String;
+	public final fun base16OrNull ()Ljava/lang/String;
+	public final fun base32 ()Ljava/lang/String;
+	public final fun base32OrNull ()Ljava/lang/String;
+	public final fun base64 ()Ljava/lang/String;
+	public final fun base64OrNull ()Ljava/lang/String;
+	public final fun destroy ()V
+	public final fun encoded ()[B
+	public final fun isDestroyed ()Z
+	public final fun toString ()Ljava/lang/String;
+	protected final fun withKeyOrNull (Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
+}
+
+public abstract class io/matthewnelson/kmp/tor/runtime/api/key/Key$Public : io/matthewnelson/kmp/tor/runtime/api/key/Key, java/security/PublicKey {
+	public abstract fun base16 ()Ljava/lang/String;
+	public abstract fun base32 ()Ljava/lang/String;
+	public abstract fun base64 ()Ljava/lang/String;
+	public abstract fun encoded ()[B
+	public final fun toString ()Ljava/lang/String;
+}
+
+public abstract class io/matthewnelson/kmp/tor/runtime/api/key/KeyType {
+	public abstract fun algorithm ()Ljava/lang/String;
+	public final fun toString ()Ljava/lang/String;
+}
+
+public abstract class io/matthewnelson/kmp/tor/runtime/api/key/KeyType$Address : io/matthewnelson/kmp/tor/runtime/api/key/KeyType {
+}
+
+public abstract class io/matthewnelson/kmp/tor/runtime/api/key/KeyType$Auth : io/matthewnelson/kmp/tor/runtime/api/key/KeyType {
+}
+
+public final class io/matthewnelson/kmp/tor/runtime/api/key/X25519 : io/matthewnelson/kmp/tor/runtime/api/key/KeyType$Auth {
+	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/api/key/X25519;
+	public fun algorithm ()Ljava/lang/String;
+}
+
+public final class io/matthewnelson/kmp/tor/runtime/api/key/X25519$PrivateKey : io/matthewnelson/kmp/tor/runtime/api/key/AuthKey$Private {
+	public static final field Companion Lio/matthewnelson/kmp/tor/runtime/api/key/X25519$PrivateKey$Companion;
+	public synthetic fun <init> ([BLkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public fun algorithm ()Ljava/lang/String;
+	public static final fun get (Ljava/lang/String;)Lio/matthewnelson/kmp/tor/runtime/api/key/X25519$PrivateKey;
+	public static final fun get ([B)Lio/matthewnelson/kmp/tor/runtime/api/key/X25519$PrivateKey;
+	public static final fun getOrNull (Ljava/lang/String;)Lio/matthewnelson/kmp/tor/runtime/api/key/X25519$PrivateKey;
+	public static final fun getOrNull ([B)Lio/matthewnelson/kmp/tor/runtime/api/key/X25519$PrivateKey;
+}
+
+public final class io/matthewnelson/kmp/tor/runtime/api/key/X25519$PrivateKey$Companion {
+	public final fun get (Ljava/lang/String;)Lio/matthewnelson/kmp/tor/runtime/api/key/X25519$PrivateKey;
+	public final fun get ([B)Lio/matthewnelson/kmp/tor/runtime/api/key/X25519$PrivateKey;
+	public final fun getOrNull (Ljava/lang/String;)Lio/matthewnelson/kmp/tor/runtime/api/key/X25519$PrivateKey;
+	public final fun getOrNull ([B)Lio/matthewnelson/kmp/tor/runtime/api/key/X25519$PrivateKey;
+}
+
+public final class io/matthewnelson/kmp/tor/runtime/api/key/X25519$PublicKey : io/matthewnelson/kmp/tor/runtime/api/key/AuthKey$Public {
+	public static final field Companion Lio/matthewnelson/kmp/tor/runtime/api/key/X25519$PublicKey$Companion;
+	public synthetic fun <init> ([BLkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public fun algorithm ()Ljava/lang/String;
+	public static final fun get (Ljava/lang/String;)Lio/matthewnelson/kmp/tor/runtime/api/key/X25519$PublicKey;
+	public static final fun get ([B)Lio/matthewnelson/kmp/tor/runtime/api/key/X25519$PublicKey;
+	public static final fun getOrNull (Ljava/lang/String;)Lio/matthewnelson/kmp/tor/runtime/api/key/X25519$PublicKey;
+	public static final fun getOrNull ([B)Lio/matthewnelson/kmp/tor/runtime/api/key/X25519$PublicKey;
+}
+
+public final class io/matthewnelson/kmp/tor/runtime/api/key/X25519$PublicKey$Companion {
+	public final fun get (Ljava/lang/String;)Lio/matthewnelson/kmp/tor/runtime/api/key/X25519$PublicKey;
+	public final fun get ([B)Lio/matthewnelson/kmp/tor/runtime/api/key/X25519$PublicKey;
+	public final fun getOrNull (Ljava/lang/String;)Lio/matthewnelson/kmp/tor/runtime/api/key/X25519$PublicKey;
+	public final fun getOrNull ([B)Lio/matthewnelson/kmp/tor/runtime/api/key/X25519$PublicKey;
 }
 

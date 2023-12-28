@@ -29,7 +29,7 @@ public open class Port private constructor(
     public val value: Int,
 ): Comparable<Port> {
 
-    final override fun compareTo(other: Port): Int = value.compareTo(other.value)
+    public final override fun compareTo(other: Port): Int = value.compareTo(other.value)
 
     public companion object {
 
@@ -118,7 +118,7 @@ public open class Port private constructor(
         }
     }
 
-    final override fun equals(other: Any?): Boolean = other is Port && other.value == value
-    final override fun hashCode(): Int = 17 * 31 + value.hashCode()
-    final override fun toString(): String = value.toString()
+    public final override fun equals(other: Any?): Boolean = other is Port && other.value == value
+    public final override fun hashCode(): Int = 17 * 31 + value.hashCode()
+    public final override fun toString(): String = value.toString()
 }

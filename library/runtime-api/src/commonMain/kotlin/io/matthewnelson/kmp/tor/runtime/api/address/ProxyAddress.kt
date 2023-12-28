@@ -34,7 +34,7 @@ public class ProxyAddress(
     public operator fun component1(): IPAddress = address
     public operator fun component2(): Port = port
 
-    override fun canonicalHostname(): String = address.canonicalHostname()
+    public override fun canonicalHostname(): String = address.canonicalHostname()
 
     public companion object {
 

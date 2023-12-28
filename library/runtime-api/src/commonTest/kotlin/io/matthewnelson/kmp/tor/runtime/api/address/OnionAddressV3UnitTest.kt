@@ -39,7 +39,7 @@ class OnionAddressV3UnitTest {
 
     @Test
     fun givenOnionAddress_whenDecoded_thenIsSuccess() {
-        ONION_ADDRESS_V3.toOnionAddressV3().decode()
+        assertEquals(ONION_ADDRESS_V3, ONION_ADDRESS_V3.toOnionAddressV3().decode().toOnionAddressV3().value)
     }
 
     @Test

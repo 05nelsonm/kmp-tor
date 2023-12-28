@@ -46,7 +46,7 @@ public sealed class Address(
      *     )
      *     // [::1]
      *
-     *     println("2gzyxa5ihm7nsggfxnu52rck2vv4rvmdlkiu3zzui5du4xyclen53wid"
+     *     println("http://2gzyxa5ihm7nsggfxnu52rck2vv4rvmdlkiu3zzui5du4xyclen53wid.onion"
      *         .toOnionAddressV3()
      *         .canonicalHostname()
      *     )
@@ -60,21 +60,21 @@ public sealed class Address(
      * */
     public abstract fun canonicalHostname(): String
 
-    final override fun compareTo(other: Address): Int = value.compareTo(other.value)
+    public final override fun compareTo(other: Address): Int = value.compareTo(other.value)
 
-    final override fun equals(other: Any?): Boolean {
+    public final override fun equals(other: Any?): Boolean {
         if (other === this) return true
         if (other !is Address) return false
         if (other::class != this::class) return false
         return other.value == value
     }
 
-    final override fun hashCode(): Int {
+    public final override fun hashCode(): Int {
         var result = 17
         result = result * 31 + this::class.hashCode()
         result = result * 31 + value.hashCode()
         return result
     }
 
-    final override fun toString(): String = value
+    public final override fun toString(): String = value
 }

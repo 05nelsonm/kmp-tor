@@ -17,6 +17,12 @@
 
 package io.matthewnelson.kmp.tor.runtime.api.internal
 
+import io.matthewnelson.encoding.base16.Base16
+import io.matthewnelson.encoding.base32.Base32
+import io.matthewnelson.encoding.base64.Base64
+import io.matthewnelson.encoding.core.Decoder
+import io.matthewnelson.encoding.core.Decoder.Companion.decodeToByteArrayOrNull
+
 @Suppress("NOTHING_TO_INLINE")
 internal inline fun String.stripBaseEncoding(): String {
     var limit = length
@@ -38,4 +44,25 @@ internal inline fun String.findHostnameAndPortFromURL(): String {
     return substringAfter("://") // scheme
         .substringAfter('@') // username:password
         .substringBefore('/') // path
+}
+
+@Suppress("NOTHING_TO_INLINE")
+internal inline fun String.tryDecodeOrNull(
+    expectedSize: Int,
+    decoders: List<Decoder<*>> = listOf(
+        Base16,
+        Base32.Default,
+        Base64.Default,
+    )
+): ByteArray? {
+    decoders.forEach { decoder ->
+        val bytes = decodeToByteArrayOrNull(decoder) ?: return@forEach
+        if (bytes.size == expectedSize) {
+            return bytes
+        } else {
+            bytes.fill(0)
+        }
+    }
+
+    return null
 }
