@@ -24,6 +24,9 @@ kmpConfiguration {
                 dependencies {
                     api(libs.kmp.tor.core.api)
                     implementation(libs.kmp.tor.core.resource)
+                    implementation(libs.encoding.base16)
+                    implementation(libs.encoding.base32)
+                    implementation(libs.encoding.base64)
                 }
             }
         }
