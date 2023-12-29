@@ -46,6 +46,9 @@ public expect sealed class Key private constructor() {
         public final override fun encoded(): ByteArray?
 
         @Throws(IllegalStateException::class)
+        public fun encodedOrThrow(): ByteArray
+
+        @Throws(IllegalStateException::class)
         public fun base16(): String
         @Throws(IllegalStateException::class)
         public fun base32(): String

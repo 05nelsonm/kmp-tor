@@ -262,6 +262,7 @@ public abstract class io/matthewnelson/kmp/tor/runtime/api/key/Key$Private : io/
 	public final fun base64OrNull ()Ljava/lang/String;
 	public final fun destroy ()V
 	public final fun encoded ()[B
+	public final fun encodedOrThrow ()[B
 	public final fun isDestroyed ()Z
 	public final fun toString ()Ljava/lang/String;
 	protected final fun withKeyOrNull (Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;

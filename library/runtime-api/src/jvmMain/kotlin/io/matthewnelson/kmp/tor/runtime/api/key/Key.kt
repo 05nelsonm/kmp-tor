@@ -74,6 +74,9 @@ public actual sealed class Key private actual constructor(): java.security.Key {
         public actual final override fun encoded(): ByteArray? = withKeyOrNull { it.copyOf() }
 
         @Throws(IllegalStateException::class)
+        public actual fun encodedOrThrow(): ByteArray = encoded() ?: throw IllegalStateException("isDestroyed[$isDestroyed]")
+
+        @Throws(IllegalStateException::class)
         public actual fun base16(): String = base16OrNull() ?: throw IllegalStateException("isDestroyed[$isDestroyed]")
         @Throws(IllegalStateException::class)
         public actual fun base32(): String = base32OrNull() ?: throw IllegalStateException("isDestroyed[$isDestroyed]")
