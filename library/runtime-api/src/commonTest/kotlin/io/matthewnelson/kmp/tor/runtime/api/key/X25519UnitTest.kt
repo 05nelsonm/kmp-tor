@@ -19,9 +19,12 @@ import io.matthewnelson.encoding.base16.Base16
 import io.matthewnelson.encoding.base64.Base64
 import io.matthewnelson.encoding.core.Decoder.Companion.decodeToByteArray
 import io.matthewnelson.kmp.tor.runtime.api.key.X25519.PrivateKey.Companion.toX25519PrivateKey
+import io.matthewnelson.kmp.tor.runtime.api.key.X25519.PrivateKey.Companion.toX25519PrivateKeyOrNull
 import io.matthewnelson.kmp.tor.runtime.api.key.X25519.PublicKey.Companion.toX25519PublicKey
+import io.matthewnelson.kmp.tor.runtime.api.key.X25519.PublicKey.Companion.toX25519PublicKeyOrNull
 import kotlin.test.Test
 import kotlin.test.assertContentEquals
+import kotlin.test.assertNull
 
 class X25519UnitTest: AuthKeyBaseUnitTest<X25519.PublicKey, X25519.PrivateKey>(
     keyType = X25519,
@@ -57,6 +60,18 @@ class X25519UnitTest: AuthKeyBaseUnitTest<X25519.PublicKey, X25519.PrivateKey>(
     @Test
     fun givenX25519PrivateKey_whenBytes_thenToKeyIsSuccessful() {
         PRIVATE_KEY_B64.decodeToByteArray(Base64.Default).toX25519PrivateKey()
+    }
+
+    @Test
+    fun givenInvalidInput_whenToPublicKey_thenReturnsNull() {
+        assertNull(PUBLIC_KEY_B16.dropLast(2).toX25519PublicKeyOrNull())
+        assertNull(PUBLIC_KEY_B16.dropLast(2).decodeToByteArray(Base16).toX25519PublicKeyOrNull())
+    }
+
+    @Test
+    fun givenInvalidInput_whenToPrivateKey_thenReturnsNull() {
+        assertNull(PRIVATE_KEY_B16.dropLast(2).toX25519PrivateKeyOrNull())
+        assertNull(PRIVATE_KEY_B16.dropLast(2).decodeToByteArray(Base16).toX25519PrivateKeyOrNull())
     }
 
     companion object {

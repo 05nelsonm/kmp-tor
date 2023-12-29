@@ -22,9 +22,12 @@ import io.matthewnelson.encoding.base64.Base64
 import io.matthewnelson.encoding.core.Decoder.Companion.decodeToByteArray
 import io.matthewnelson.kmp.tor.runtime.api.address.OnionAddressV3UnitTest
 import io.matthewnelson.kmp.tor.runtime.api.key.ED25519_V3.PrivateKey.Companion.toED25519_V3PrivateKey
+import io.matthewnelson.kmp.tor.runtime.api.key.ED25519_V3.PrivateKey.Companion.toED25519_V3PrivateKeyOrNull
 import io.matthewnelson.kmp.tor.runtime.api.key.ED25519_V3.PublicKey.Companion.toED25519_V3PublicKey
+import io.matthewnelson.kmp.tor.runtime.api.key.ED25519_V3.PublicKey.Companion.toED25519_V3PublicKeyOrNull
 import kotlin.test.Test
 import kotlin.test.assertContentEquals
+import kotlin.test.assertNull
 
 class ED25519_V3UnitTest: AddressKeyBaseUnitTest<ED25519_V3.PublicKey, ED25519_V3.PrivateKey>(
     keyType = ED25519_V3,
@@ -60,6 +63,18 @@ class ED25519_V3UnitTest: AddressKeyBaseUnitTest<ED25519_V3.PublicKey, ED25519_V
     @Test
     fun givenED25519V3PrivateKey_whenBytes_thenToKeyIsSuccessful() {
         PRIVATE_KEY_B64.decodeToByteArray(Base64.Default).toED25519_V3PrivateKey()
+    }
+
+    @Test
+    fun givenInvalidInput_whenToPublicKey_thenReturnsNull() {
+        assertNull(PUBLIC_KEY_B16.dropLast(2).toED25519_V3PublicKeyOrNull())
+        assertNull(PUBLIC_KEY_B16.dropLast(2).decodeToByteArray(Base16).toED25519_V3PublicKeyOrNull())
+    }
+
+    @Test
+    fun givenInvalidInput_whenToPrivateKey_thenReturnsNull() {
+        assertNull(PRIVATE_KEY_B16.dropLast(2).toED25519_V3PrivateKeyOrNull())
+        assertNull(PRIVATE_KEY_B16.dropLast(2).decodeToByteArray(Base16).toED25519_V3PrivateKeyOrNull())
     }
 
     companion object {
