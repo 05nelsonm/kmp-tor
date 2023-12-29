@@ -15,6 +15,9 @@
  **/
 package io.matthewnelson.kmp.tor.runtime.api.key
 
+import io.matthewnelson.kmp.tor.runtime.api.address.OnionAddress.Companion.toOnionAddress
+import io.matthewnelson.kmp.tor.runtime.api.address.OnionAddressV3UnitTest
+import io.matthewnelson.kmp.tor.runtime.api.address.OnionAddressV3UnitTest.Companion.ONION_ADDRESS_V3
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -27,11 +30,33 @@ abstract class AuthKeyBaseUnitTest<T: AuthKey.Public, V: AuthKey.Private>(
     abstract override val privateKey: V
 
     @Test
-    fun givenAddressKey_whenAlgorithm_thenIsAsExpected() {
+    fun givenAuthKey_whenAlgorithm_thenIsAsExpected() {
         assertEquals(expectedAlgorithm, keyType.algorithm())
     }
 
-    // TODO: Descriptor tests
+    @Test
+    fun givenPublicKey_whenBase32Descriptor_thenIsAsExpected() {
+        val expected = "descriptor:" + expectedAlgorithm + ":" + publicKey.base32()
+        assertEquals(expected, publicKey.descriptorBase32())
+    }
+
+    @Test
+    fun givenPublicKey_whenBase64Descriptor_thenIsAsExpected() {
+        val expected = "descriptor:" + expectedAlgorithm + ":" + publicKey.base64()
+        assertEquals(expected, publicKey.descriptorBase64())
+    }
+
+    @Test
+    fun givenPrivateKey_whenBase32Descriptor_thenIsAsExpected() {
+        val expected = ONION_ADDRESS_V3 + ":" + expectedAlgorithm + ":" + privateKey.base32()
+        assertEquals(expected, privateKey.descriptorBase32(ONION_ADDRESS_V3.toOnionAddress()))
+    }
+
+    @Test
+    fun givenPrivateKey_whenBase64Descriptor_thenIsAsExpected() {
+        val expected = ONION_ADDRESS_V3 + ":" + expectedAlgorithm + ":" + privateKey.base64()
+        assertEquals(expected, privateKey.descriptorBase64(ONION_ADDRESS_V3.toOnionAddress()))
+    }
 
     // TODO: Factory function tests
 }
