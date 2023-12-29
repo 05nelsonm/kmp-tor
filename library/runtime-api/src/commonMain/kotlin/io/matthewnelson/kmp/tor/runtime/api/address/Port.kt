@@ -44,6 +44,15 @@ public open class Port private constructor(
                 ?: throw IllegalArgumentException("$this is not a valid port")
         }
 
+        /**
+         * Parses a String for a port between 0 and 65535.
+         *
+         * String can be either a URL containing the port, or the
+         * port itself.
+         *
+         * @return [Port]
+         * @throws [IllegalArgumentException] if no port is found
+         * */
         @JvmStatic
         @JvmName("get")
         @Throws(IllegalArgumentException::class)
@@ -61,6 +70,14 @@ public open class Port private constructor(
             return Port(this)
         }
 
+        /**
+         * Parses a String for a port between 0 and 65535.
+         *
+         * String can be either a URL containing the port, or the
+         * port itself.
+         *
+         * @return [Port] or null
+         * */
         @JvmStatic
         @JvmName("getOrNull")
         public fun String.toPortOrNull(): Port? {
@@ -93,6 +110,15 @@ public open class Port private constructor(
                     ?: throw IllegalArgumentException("$this is not a valid proxy port")
             }
 
+            /**
+             * Parses a String for a port between 1024 and 65535.
+             *
+             * String can be either a URL containing the port, or the
+             * port itself.
+             *
+             * @return [Port.Proxy]
+             * @throws [IllegalArgumentException] if no port is found
+             * */
             @JvmStatic
             @JvmName("get")
             @Throws(IllegalArgumentException::class)
@@ -108,6 +134,14 @@ public open class Port private constructor(
                 return Proxy(this)
             }
 
+            /**
+             * Parses a String for a port between 1024 and 65535.
+             *
+             * String can be either a URL containing the port, or the
+             * port itself.
+             *
+             * @return [Port.Proxy] or null
+             * */
             @JvmStatic
             @JvmName("getOrNull")
             public fun String.toPortProxyOrNull(): Proxy? {

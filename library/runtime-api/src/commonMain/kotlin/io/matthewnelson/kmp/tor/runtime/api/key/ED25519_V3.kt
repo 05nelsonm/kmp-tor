@@ -36,6 +36,15 @@ public object ED25519_V3: KeyType.Address<ED25519_V3.PublicKey, ED25519_V3.Priva
 
         public companion object {
 
+            /**
+             * Parses a String for an ED25519-V3 public key.
+             *
+             * String can be a URL containing a v3 `.onion` address, the v3 `.onion`
+             * address itself, or Base 16/32/64 encoded raw value.
+             *
+             * @return [ED25519_V3.PublicKey]
+             * @throws [IllegalArgumentException] if no key is found
+             * */
             @JvmStatic
             @JvmName("get")
             @Throws(IllegalArgumentException::class)
@@ -44,6 +53,12 @@ public object ED25519_V3: KeyType.Address<ED25519_V3.PublicKey, ED25519_V3.Priva
                     ?: throw IllegalArgumentException("$this is not an ${algorithm()} public key")
             }
 
+            /**
+             * Transforms provided bytes into a ED25519-V3 public key.
+             *
+             * @return [ED25519_V3.PublicKey]
+             * @throws [IllegalArgumentException] if byte array size is inappropriate
+             * */
             @JvmStatic
             @JvmName("get")
             @Throws(IllegalArgumentException::class)
@@ -52,6 +67,14 @@ public object ED25519_V3: KeyType.Address<ED25519_V3.PublicKey, ED25519_V3.Priva
                     ?: throw IllegalArgumentException("bytes are not an ${algorithm()} public key")
             }
 
+            /**
+             * Parses a String for an ED25519-V3 public key.
+             *
+             * String can be a URL containing a v3 `.onion` address, the v3 `.onion`
+             * address itself, or Base 16/32/64 encoded raw value.
+             *
+             * @return [ED25519_V3.PublicKey] or null
+             * */
             @JvmStatic
             @JvmName("getOrNull")
             public fun String.toED25519_V3PublicKeyOrNull(): PublicKey? {
@@ -70,6 +93,11 @@ public object ED25519_V3: KeyType.Address<ED25519_V3.PublicKey, ED25519_V3.Priva
                 return PublicKey(address)
             }
 
+            /**
+             * Transforms provided bytes into a ED25519-V3 public key.
+             *
+             * @return [ED25519_V3.PublicKey] or null
+             * */
             @JvmStatic
             @JvmName("getOrNull")
             public fun ByteArray.toED25519_V3PublicKeyOrNull(): PublicKey? {
@@ -87,6 +115,14 @@ public object ED25519_V3: KeyType.Address<ED25519_V3.PublicKey, ED25519_V3.Priva
 
         public companion object {
 
+            /**
+             * Parses a String for an ED25519-V3 private key.
+             *
+             * String can be a Base 16/32/64 encoded raw value.
+             *
+             * @return [ED25519_V3.PrivateKey]
+             * @throws [IllegalArgumentException] if no key is found
+             * */
             @JvmStatic
             @JvmName("get")
             @Throws(IllegalArgumentException::class)
@@ -95,6 +131,12 @@ public object ED25519_V3: KeyType.Address<ED25519_V3.PublicKey, ED25519_V3.Priva
                     ?: throw IllegalArgumentException("Tried base 16/32/64 decoding, but failed to find a $BYTE_SIZE byte key")
             }
 
+            /**
+             * Transforms provided bytes into a ED25519-V3 private key.
+             *
+             * @return [ED25519_V3.PrivateKey]
+             * @throws [IllegalArgumentException] if byte array size is inappropriate
+             * */
             @JvmStatic
             @JvmName("get")
             @Throws(IllegalArgumentException::class)
@@ -103,6 +145,13 @@ public object ED25519_V3: KeyType.Address<ED25519_V3.PublicKey, ED25519_V3.Priva
                     ?: throw IllegalArgumentException("Invalid key size. Must be $BYTE_SIZE bytes")
             }
 
+            /**
+             * Parses a String for an ED25519-V3 private key.
+             *
+             * String can be a Base 16/32/64 encoded raw value.
+             *
+             * @return [ED25519_V3.PrivateKey] or null
+             * */
             @JvmStatic
             @JvmName("getOrNull")
             public fun String.toED25519_V3PrivateKeyOrNull(): PrivateKey? {
@@ -110,6 +159,11 @@ public object ED25519_V3: KeyType.Address<ED25519_V3.PublicKey, ED25519_V3.Priva
                 return PrivateKey(decoded)
             }
 
+            /**
+             * Transforms provided bytes into a ED25519-V3 private key.
+             *
+             * @return [ED25519_V3.PrivateKey] or null
+             * */
             @JvmStatic
             @JvmName("getOrNull")
             public fun ByteArray.toED25519_V3PrivateKeyOrNull(): PrivateKey? {

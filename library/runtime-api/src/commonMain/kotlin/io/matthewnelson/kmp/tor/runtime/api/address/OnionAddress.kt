@@ -28,7 +28,7 @@ import kotlin.jvm.JvmName
 import kotlin.jvm.JvmStatic
 
 /**
- * Base abstraction for denoting a String value as a .onion address
+ * Base abstraction for denoting a String value as a `.onion` address
  * */
 public sealed class OnionAddress private constructor(value: String): Address(value) {
 
@@ -38,6 +38,17 @@ public sealed class OnionAddress private constructor(value: String): Address(val
 
     public companion object {
 
+        /**
+         * Parses a String for any `.onion` address.
+         *
+         * String can be either a URL containing the `.onion` address, or the
+         * `.onion` address itself.
+         *
+         * Currently, only v3 `.onion` addresses are supported.
+         *
+         * @return [OnionAddress]
+         * @throws [IllegalArgumentException] if no `.onion` address is found
+         * */
         @JvmStatic
         @JvmName("get")
         @Throws(IllegalArgumentException::class)
@@ -46,6 +57,14 @@ public sealed class OnionAddress private constructor(value: String): Address(val
                 ?: throw IllegalArgumentException("$this does not contain an onion address")
         }
 
+        /**
+         * Transforms provided bytes into a `.onion` address.
+         *
+         * Currently, only v3 `.onion` addresses are supported.
+         *
+         * @return [OnionAddress]
+         * @throws [IllegalArgumentException] if byte array size is inappropriate
+         * */
         @JvmStatic
         @JvmName("get")
         @Throws(IllegalArgumentException::class)
@@ -54,13 +73,29 @@ public sealed class OnionAddress private constructor(value: String): Address(val
                 ?: throw IllegalArgumentException("bytes are not an onion address")
         }
 
-
+        /**
+         * Parses a String for any `.onion` address.
+         *
+         * String can be either a URL containing the `.onion` address, or the
+         * `.onion` address itself.
+         *
+         * Currently, only v3 `.onion` addresses are supported.
+         *
+         * @return [OnionAddress] or null
+         * */
         @JvmStatic
         @JvmName("getOrNull")
         public fun String.toOnionAddressOrNull(): OnionAddress? {
             return toOnionAddressV3OrNull()
         }
 
+        /**
+         * Transforms provided bytes into a `.onion` address.
+         *
+         * Currently, only v3 `.onion` addresses are supported.
+         *
+         * @return [OnionAddress] or null
+         * */
         @JvmStatic
         @JvmName("getOrNull")
         public fun ByteArray.toOnionAddressOrNull(): OnionAddress? {
@@ -73,7 +108,7 @@ public sealed class OnionAddress private constructor(value: String): Address(val
      * appended.
      *
      * This is only a preliminary check for character and length correctness.
-     * Public key validity is not checked
+     * Public key validity is not checked.
      * */
     public class V3 private constructor(value: String): OnionAddress(value) {
 
@@ -82,6 +117,15 @@ public sealed class OnionAddress private constructor(value: String): Address(val
 
         public companion object {
 
+            /**
+             * Parses a String for a v3 `.onion` address.
+             *
+             * String can be either a URL containing the v3 `.onion` address, or the
+             * v3 `.onion` address itself.
+             *
+             * @return [OnionAddress.V3]
+             * @throws [IllegalArgumentException] if no v3 `.onion` address is found
+             * */
             @JvmStatic
             @JvmName("get")
             @Throws(IllegalArgumentException::class)
@@ -90,6 +134,12 @@ public sealed class OnionAddress private constructor(value: String): Address(val
                     ?: throw IllegalArgumentException("$this does not contain a v3 onion address")
             }
 
+            /**
+             * Transforms provided bytes into a v3 `.onion` address.
+             *
+             * @return [OnionAddress.V3]
+             * @throws [IllegalArgumentException] if byte array size is inappropriate
+             * */
             @JvmStatic
             @JvmName("get")
             @Throws(IllegalArgumentException::class)
@@ -98,6 +148,14 @@ public sealed class OnionAddress private constructor(value: String): Address(val
                     ?: throw IllegalArgumentException("bytes are not a v3 onion address")
             }
 
+            /**
+             * Parses a String for a v3 `.onion` address.
+             *
+             * String can be either a URL containing the v3 `.onion` address, or the
+             * v3 `.onion` address itself.
+             *
+             * @return [OnionAddress.V3] or null
+             * */
             @JvmStatic
             @JvmName("getOrNull")
             public fun String.toOnionAddressV3OrNull(): V3? {
@@ -109,6 +167,11 @@ public sealed class OnionAddress private constructor(value: String): Address(val
                 return V3(stripped)
             }
 
+            /**
+             * Transforms provided bytes into a v3 `.onion` address.
+             *
+             * @return [OnionAddress.V3] or null
+             * */
             @JvmStatic
             @JvmName("getOrNull")
             public fun ByteArray.toOnionAddressV3OrNull(): V3? {

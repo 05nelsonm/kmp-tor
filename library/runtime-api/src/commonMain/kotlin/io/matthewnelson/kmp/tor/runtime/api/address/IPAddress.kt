@@ -28,6 +28,15 @@ public sealed class IPAddress private constructor(value: String): Address(value)
 
     public companion object {
 
+        /**
+         * Parses a String for its IPv4 or IPv6 address.
+         *
+         * String can be either a URL containing the IP address, or the
+         * IPv4/IPv6 address itself.
+         *
+         * @return [IPAddress]
+         * @throws [IllegalArgumentException] if no IP address is found
+         * */
         @JvmStatic
         @JvmName("get")
         @Throws(IllegalArgumentException::class)
@@ -36,6 +45,14 @@ public sealed class IPAddress private constructor(value: String): Address(value)
                 ?: throw IllegalArgumentException("$this does not contain an IP address")
         }
 
+        /**
+         * Parses a String for its IPv4 or IPv6 address.
+         *
+         * String can be either a URL containing the IP address, or the
+         * IPv4/IPv6 address itself.
+         *
+         * @return [IPAddress] or null
+         * */
         @JvmStatic
         @JvmName("getOrNull")
         public fun String.toIPAddressOrNull(): IPAddress? {
@@ -53,6 +70,15 @@ public sealed class IPAddress private constructor(value: String): Address(value)
 
         public companion object {
 
+            /**
+             * Parses a String for its IPv4 address.
+             *
+             * String can be either a URL containing the IPv4 address, or the
+             * IPv4 address itself.
+             *
+             * @return [IPAddress.V4]
+             * @throws [IllegalArgumentException] if no IPv4 address is found
+             * */
             @JvmStatic
             @JvmName("get")
             @Throws(IllegalArgumentException::class)
@@ -61,6 +87,14 @@ public sealed class IPAddress private constructor(value: String): Address(value)
                     ?: throw IllegalArgumentException("$this does not contain an IPv4 address")
             }
 
+            /**
+             * Parses a String for its IPv4 address.
+             *
+             * String can be either a URL containing the IPv4 address, or the
+             * IPv4 address itself.
+             *
+             * @return [IPAddress.V4] or null
+             * */
             @JvmStatic
             @JvmName("getOrNull")
             public fun String.toIPAddressV4OrNull(): V4? {
@@ -94,6 +128,15 @@ public sealed class IPAddress private constructor(value: String): Address(value)
 
         public companion object {
 
+            /**
+             * Parses a String for its IPv6 address.
+             *
+             * String can be either a URL containing the IPv6 address, or the
+             * IPv6 address itself.
+             *
+             * @return [IPAddress.V6]
+             * @throws [IllegalArgumentException] if no IPv6 address is found
+             * */
             @JvmStatic
             @JvmName("get")
             @Throws(IllegalArgumentException::class)
@@ -102,6 +145,14 @@ public sealed class IPAddress private constructor(value: String): Address(value)
                     ?: throw IllegalArgumentException("$this does not contain an IPv6 address")
             }
 
+            /**
+             * Parses a String for its IPv6 address.
+             *
+             * String can be either a URL containing the IPv6 address, or the
+             * IPv6 address itself.
+             *
+             * @return [IPAddress.V6] or null
+             * */
             @JvmStatic
             @JvmName("getOrNull")
             public fun String.toIPAddressV6OrNull(): V6? {

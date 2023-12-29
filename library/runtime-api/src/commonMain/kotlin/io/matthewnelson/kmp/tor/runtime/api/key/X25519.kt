@@ -31,6 +31,14 @@ public object X25519: KeyType.Auth<X25519.PublicKey, X25519.PrivateKey>() {
 
         public companion object {
 
+            /**
+             * Parses a String for a x25519 public key.
+             *
+             * String can be a Base 16/32/64 encoded raw value.
+             *
+             * @return [X25519.PublicKey]
+             * @throws [IllegalArgumentException] if no key is found
+             * */
             @JvmStatic
             @JvmName("get")
             @Throws(IllegalArgumentException::class)
@@ -39,6 +47,12 @@ public object X25519: KeyType.Auth<X25519.PublicKey, X25519.PrivateKey>() {
                     ?: throw IllegalArgumentException("Tried base 16/32/64 decoding, but failed to find a $BYTE_SIZE byte key")
             }
 
+            /**
+             * Transforms provided bytes into a x25519 public key.
+             *
+             * @return [X25519.PublicKey]
+             * @throws [IllegalArgumentException] if byte array size is inappropriate
+             * */
             @JvmStatic
             @JvmName("get")
             @Throws(IllegalArgumentException::class)
@@ -47,6 +61,13 @@ public object X25519: KeyType.Auth<X25519.PublicKey, X25519.PrivateKey>() {
                     ?: throw IllegalArgumentException("Invalid key size. Must be $BYTE_SIZE bytes")
             }
 
+            /**
+             * Parses a String for a x25519 public key.
+             *
+             * String can be a Base 16/32/64 encoded raw value.
+             *
+             * @return [X25519.PublicKey] or null
+             * */
             @JvmStatic
             @JvmName("getOrNull")
             public fun String.toX25519PublicKeyOrNull(): PublicKey? {
@@ -54,6 +75,11 @@ public object X25519: KeyType.Auth<X25519.PublicKey, X25519.PrivateKey>() {
                 return PublicKey(decoded)
             }
 
+            /**
+             * Transforms provided bytes into a x25519 public key.
+             *
+             * @return [X25519.PublicKey] or null
+             * */
             @JvmStatic
             @JvmName("getOrNull")
             public fun ByteArray.toX25519PublicKeyOrNull(): PublicKey? {
@@ -71,6 +97,14 @@ public object X25519: KeyType.Auth<X25519.PublicKey, X25519.PrivateKey>() {
 
         public companion object {
 
+            /**
+             * Parses a String for a x25519 private key.
+             *
+             * String can be a Base 16/32/64 encoded raw value.
+             *
+             * @return [X25519.PrivateKey]
+             * @throws [IllegalArgumentException] if no key is found
+             * */
             @JvmStatic
             @JvmName("get")
             @Throws(IllegalArgumentException::class)
@@ -79,6 +113,12 @@ public object X25519: KeyType.Auth<X25519.PublicKey, X25519.PrivateKey>() {
                     ?: throw IllegalArgumentException("Tried base 16/32/64 decoding, but failed to find a $BYTE_SIZE byte key")
             }
 
+            /**
+             * Transforms provided bytes into a x25519 private key.
+             *
+             * @return [X25519.PrivateKey]
+             * @throws [IllegalArgumentException] if byte array size is inappropriate
+             * */
             @JvmStatic
             @JvmName("get")
             @Throws(IllegalArgumentException::class)
@@ -87,6 +127,13 @@ public object X25519: KeyType.Auth<X25519.PublicKey, X25519.PrivateKey>() {
                     ?: throw IllegalArgumentException("Invalid key size. Must be $BYTE_SIZE bytes")
             }
 
+            /**
+             * Parses a String for a x25519 private key.
+             *
+             * String can be a Base 16/32/64 encoded raw value.
+             *
+             * @return [X25519.PrivateKey] or null
+             * */
             @JvmStatic
             @JvmName("getOrNull")
             public fun String.toX25519PrivateKeyOrNull(): PrivateKey? {
@@ -94,6 +141,11 @@ public object X25519: KeyType.Auth<X25519.PublicKey, X25519.PrivateKey>() {
                 return PrivateKey(decoded)
             }
 
+            /**
+             * Transforms provided bytes into a x25519 private key.
+             *
+             * @return [X25519.PrivateKey] or null
+             * */
             @JvmStatic
             @JvmName("getOrNull")
             public fun ByteArray.toX25519PrivateKeyOrNull(): PrivateKey? {
