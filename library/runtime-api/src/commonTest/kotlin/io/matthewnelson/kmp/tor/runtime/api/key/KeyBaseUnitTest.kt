@@ -61,6 +61,32 @@ abstract class KeyBaseUnitTest(protected val expectedAlgorithm: String) {
     }
 
     @Test
+    fun givenPublicKey_whenEncoded_thenReturnedBytesAreACopy() {
+        val bytes = publicKey.encoded()
+        bytes.fill(5)
+
+        try {
+            assertContentEquals(publicKey.encoded(), bytes)
+            throw IllegalStateException()
+        } catch (_: AssertionError) {
+            // pass
+        }
+    }
+
+    @Test
+    fun givenPrivateKey_whenEncoded_thenReturnedBytesAreACopy() {
+        val bytes = privateKey.encodedOrThrow()
+        bytes.fill(5)
+
+        try {
+            assertContentEquals(privateKey.encodedOrThrow(), bytes)
+            throw IllegalStateException()
+        } catch (_: AssertionError) {
+            // pass
+        }
+    }
+
+    @Test
     fun givenPublicKey_whenEncodings_thenAreAsExpected() {
         val bytes = publicKey.encoded()
 
