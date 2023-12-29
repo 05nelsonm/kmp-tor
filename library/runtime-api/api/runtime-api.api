@@ -140,6 +140,8 @@ public final class io/matthewnelson/kmp/tor/runtime/api/address/ProxyAddress : i
 	public fun canonicalHostname ()Ljava/lang/String;
 	public final fun component1 ()Lio/matthewnelson/kmp/tor/runtime/api/address/IPAddress;
 	public final fun component2 ()Lio/matthewnelson/kmp/tor/runtime/api/address/Port;
+	public final fun copy (Lio/matthewnelson/kmp/tor/runtime/api/address/IPAddress;)Lio/matthewnelson/kmp/tor/runtime/api/address/ProxyAddress;
+	public final fun copy (Lio/matthewnelson/kmp/tor/runtime/api/address/Port;)Lio/matthewnelson/kmp/tor/runtime/api/address/ProxyAddress;
 	public static final fun get (Ljava/lang/String;)Lio/matthewnelson/kmp/tor/runtime/api/address/ProxyAddress;
 	public static final fun getOrNull (Ljava/lang/String;)Lio/matthewnelson/kmp/tor/runtime/api/address/ProxyAddress;
 }

@@ -36,6 +36,9 @@ public class ProxyAddress(
 
     public override fun canonicalHostname(): String = address.canonicalHostname()
 
+    public fun copy(address: IPAddress): ProxyAddress = ProxyAddress(address, port)
+    public fun copy(port: Port): ProxyAddress = ProxyAddress(address, port)
+
     public companion object {
 
         @JvmStatic
