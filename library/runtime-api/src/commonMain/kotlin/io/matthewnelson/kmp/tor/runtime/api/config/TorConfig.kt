@@ -1718,7 +1718,7 @@ public class TorConfig private constructor(
      *
      * e.g.
      *
-     *     |   keyword   | argument |              extras              |
+     *     |   keyword   | argument |            optionals             |
      *       __SocksPort     9050     OnionTrafficOnly IsolateDestPort
      * */
     public class LineItem private constructor(
