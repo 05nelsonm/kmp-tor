@@ -19,29 +19,23 @@ import io.matthewnelson.kmp.file.SysPathSep
 import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
 import io.matthewnelson.kmp.tor.core.resource.OSHost
 import io.matthewnelson.kmp.tor.core.resource.OSInfo
+import kotlin.jvm.JvmSynthetic
 
 @get:JvmSynthetic
 @OptIn(InternalKmpTorApi::class)
-internal actual val UnixSocketsNotSupportedMessage: String? by lazy {
-    // Android support via android.net.LocalSocket since API 1
-    if (OSInfo.INSTANCE.isAndroidRuntime()) return@lazy null
-
-    val host = OSInfo.INSTANCE.osHost
-    if (host is OSHost.Windows) {
-        return@lazy "Tor does not support Unix Sockets on Windows"
+internal actual val IsUnixLikeHost: Boolean get() {
+    return when (OSInfo.INSTANCE.osHost) {
+        is OSHost.FreeBSD,
+        is OSHost.Linux,
+        is OSHost.MacOS -> true
+        is OSHost.Windows -> false
+        else -> SysPathSep == '/'
     }
+}
 
-    if (SysPathSep != '/') {
-        return@lazy "Unsupported OSHost[$host]"
-    }
-
-    // Check if Java 16+
-    try {
-        Class.forName("java.net.UnixDomainSocketAddress")
-            ?: throw NullPointerException()
-
-        null
-    } catch (_: Throwable) {
-        "Unix Sockets are not supported for Java 15 or below"
-    }
+@get:JvmSynthetic
+@OptIn(InternalKmpTorApi::class)
+internal actual val IsAndroidHost: Boolean get() {
+    // Could be Java running on Android via Termux if JVM
+    return OSInfo.INSTANCE.osHost is OSHost.Linux.Android
 }
