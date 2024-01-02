@@ -55,6 +55,6 @@ apiValidation {
     if (CHECK_PUBLICATION != null) {
         ignoredProjects.add("check-publication")
     } else {
-        nonPublicMarkers.add("io.matthewnelson.kmp.tor.common.annotation.InternalTorApi")
+        nonPublicMarkers.add("io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi")
     }
 }
