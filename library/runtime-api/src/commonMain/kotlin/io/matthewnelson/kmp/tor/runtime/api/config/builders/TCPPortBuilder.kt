@@ -60,11 +60,7 @@ public sealed class TCPPortBuilder private constructor() {
             @JvmSynthetic
             internal fun build(
                 block: ThisBlock<Control>
-            ): String {
-                val b = Control().apply(block)
-
-                return b.port
-            }
+            ): String = Control().apply(block).port
         }
     }
 
@@ -104,11 +100,7 @@ public sealed class TCPPortBuilder private constructor() {
             @JvmSynthetic
             internal fun build(
                 block: ThisBlock<Socks>
-            ): String {
-                val b = Socks().apply(block)
-
-                return b.port
-            }
+            ): String = Socks().apply(block).port
         }
     }
 
@@ -128,11 +120,7 @@ public sealed class TCPPortBuilder private constructor() {
             @JvmSynthetic
             internal fun build(
                 block: ThisBlock<HiddenService>
-            ): String? {
-                val b = HiddenService().apply(block)
-
-                return b.target?.toString()
-            }
+            ): String? = HiddenService().apply(block).target?.toString()
         }
     }
 
