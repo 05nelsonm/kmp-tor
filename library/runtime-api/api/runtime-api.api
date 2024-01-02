@@ -404,14 +404,12 @@ public final class io/matthewnelson/kmp/tor/runtime/api/config/TorConfig$HiddenS
 public final class io/matthewnelson/kmp/tor/runtime/api/config/TorConfig$HiddenServiceNumIntroductionPoints$Companion : io/matthewnelson/kmp/tor/runtime/api/config/TorConfig$Keyword {
 }
 
-public final class io/matthewnelson/kmp/tor/runtime/api/config/TorConfig$HiddenServicePort : io/matthewnelson/kmp/tor/runtime/api/config/builders/TCPPortBuilder$DSL, io/matthewnelson/kmp/tor/runtime/api/config/builders/UnixSocketBuilder$DSL {
+public final class io/matthewnelson/kmp/tor/runtime/api/config/TorConfig$HiddenServicePort {
 	public static final field Companion Lio/matthewnelson/kmp/tor/runtime/api/config/TorConfig$HiddenServicePort$Companion;
 	public field virtual Lio/matthewnelson/kmp/tor/runtime/api/address/Port;
-	public fun asPort (Lio/matthewnelson/kmp/tor/runtime/api/ThisBlock;)Lio/matthewnelson/kmp/tor/runtime/api/config/TorConfig$HiddenServicePort;
-	public synthetic fun asPort (Lio/matthewnelson/kmp/tor/runtime/api/ThisBlock;)Ljava/lang/Object;
-	public fun asUnixSocket (Lio/matthewnelson/kmp/tor/runtime/api/ThisBlock;)Lio/matthewnelson/kmp/tor/runtime/api/config/TorConfig$HiddenServicePort;
-	public synthetic fun asUnixSocket (Lio/matthewnelson/kmp/tor/runtime/api/ThisBlock;)Ljava/lang/Object;
 	public final fun targetArgument ()Ljava/lang/String;
+	public final fun targetAsPort (Lio/matthewnelson/kmp/tor/runtime/api/ThisBlock;)Lio/matthewnelson/kmp/tor/runtime/api/config/TorConfig$HiddenServicePort;
+	public final fun targetAsUnixSocket (Lio/matthewnelson/kmp/tor/runtime/api/ThisBlock;)Lio/matthewnelson/kmp/tor/runtime/api/config/TorConfig$HiddenServicePort;
 }
 
 public final class io/matthewnelson/kmp/tor/runtime/api/config/TorConfig$HiddenServicePort$Companion : io/matthewnelson/kmp/tor/runtime/api/config/TorConfig$Keyword {

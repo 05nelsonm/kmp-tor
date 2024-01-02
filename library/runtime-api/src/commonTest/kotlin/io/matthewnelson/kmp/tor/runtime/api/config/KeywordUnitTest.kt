@@ -56,13 +56,13 @@ class KeywordUnitTest {
 
             port {
                 virtual = 80.toPort()
-                asUnixSocket {
+                targetAsUnixSocket {
                     file = dir.resolve("hs.sock")
                 }
             }
             port {
                 virtual = 80.toPort()
-                asPort {
+                targetAsPort {
                     target = 8080.toPort()
                 }
             }

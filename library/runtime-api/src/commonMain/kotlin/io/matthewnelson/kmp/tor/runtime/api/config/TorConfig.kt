@@ -1186,10 +1186,7 @@ public class TorConfig private constructor(
      * [HiddenServicePort](https://2019.www.torproject.org/docs/tor-manual.html.en#HiddenServicePort)
      * */
     @KmpTorDsl
-    public class HiddenServicePort private constructor():
-        TCPPortBuilder.DSL<TCPPortBuilder.HiddenService, HiddenServicePort>,
-        UnixSocketBuilder.DSL<HiddenServicePort>
-    {
+    public class HiddenServicePort private constructor() {
 
         // TODO: Check if can be 0
         @JvmField
@@ -1201,8 +1198,8 @@ public class TorConfig private constructor(
          *
          * Can be either a TCP Port or a Unix Socket path.
          *
-         * @see [asPort]
-         * @see [asUnixSocket]
+         * @see [targetAsPort]
+         * @see [targetAsUnixSocket]
          * */
         @get:JvmName("targetArgument")
         public var targetArgument: String? = null
@@ -1215,16 +1212,21 @@ public class TorConfig private constructor(
          * is required.
          * */
         @KmpTorDsl
-        public override fun asPort(
+        public fun targetAsPort(
             block: ThisBlock<TCPPortBuilder.HiddenService>
         ): HiddenServicePort {
             targetArgument = TCPPortBuilder.HiddenService.build(block)
             return this
         }
 
+        /**
+         * Configure the [targetArgument] to use a Unix Socket
+         *
+         * @throws [UnsupportedOperationException] see [UnixSocketBuilder.DSL]
+         * */
         @KmpTorDsl
         @Throws(UnsupportedOperationException::class)
-        public override fun asUnixSocket(
+        public fun targetAsUnixSocket(
             block: ThisBlock<UnixSocketBuilder>
         ): HiddenServicePort {
             val path = UnixSocketBuilder.build(block) ?: return this

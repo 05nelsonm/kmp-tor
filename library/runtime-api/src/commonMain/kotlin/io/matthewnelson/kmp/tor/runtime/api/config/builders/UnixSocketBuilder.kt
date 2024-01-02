@@ -100,7 +100,8 @@ public class UnixSocketBuilder private constructor() {
          * @throws [UnsupportedOperationException] when:
          *   - Is Windows
          *   - Non-Android Runtime Java 15 or lower
-         *   - Path length exceeds 105 characters
+         *   - Configured path length exceeds 105 characters
+         *   - Configured path is multiple lines
          * */
         @KmpTorDsl
         @Throws(UnsupportedOperationException::class)
