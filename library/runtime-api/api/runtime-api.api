@@ -600,8 +600,6 @@ public final class io/matthewnelson/kmp/tor/runtime/api/config/TorConfig$__DNSPo
 	public final fun isolationFlags ()Ljava/util/Set;
 	public fun isolationFlags (Lio/matthewnelson/kmp/tor/runtime/api/ThisBlock;)Lio/matthewnelson/kmp/tor/runtime/api/config/TorConfig$__DNSPort;
 	public synthetic fun isolationFlags (Lio/matthewnelson/kmp/tor/runtime/api/ThisBlock;)Ljava/lang/Object;
-	public fun port (I)Lio/matthewnelson/kmp/tor/runtime/api/config/TorConfig$__DNSPort;
-	public synthetic fun port (I)Ljava/lang/Object;
 	public fun port (Lio/matthewnelson/kmp/tor/runtime/api/address/Port$Proxy;)Lio/matthewnelson/kmp/tor/runtime/api/config/TorConfig$__DNSPort;
 	public synthetic fun port (Lio/matthewnelson/kmp/tor/runtime/api/address/Port;)Ljava/lang/Object;
 }
@@ -619,8 +617,6 @@ public final class io/matthewnelson/kmp/tor/runtime/api/config/TorConfig$__HTTPT
 	public final fun isolationFlags ()Ljava/util/Set;
 	public fun isolationFlags (Lio/matthewnelson/kmp/tor/runtime/api/ThisBlock;)Lio/matthewnelson/kmp/tor/runtime/api/config/TorConfig$__HTTPTunnelPort;
 	public synthetic fun isolationFlags (Lio/matthewnelson/kmp/tor/runtime/api/ThisBlock;)Ljava/lang/Object;
-	public fun port (I)Lio/matthewnelson/kmp/tor/runtime/api/config/TorConfig$__HTTPTunnelPort;
-	public synthetic fun port (I)Ljava/lang/Object;
 	public fun port (Lio/matthewnelson/kmp/tor/runtime/api/address/Port$Proxy;)Lio/matthewnelson/kmp/tor/runtime/api/config/TorConfig$__HTTPTunnelPort;
 	public synthetic fun port (Lio/matthewnelson/kmp/tor/runtime/api/address/Port;)Ljava/lang/Object;
 }
@@ -663,8 +659,6 @@ public final class io/matthewnelson/kmp/tor/runtime/api/config/TorConfig$__Trans
 	public final fun isolationFlags ()Ljava/util/Set;
 	public fun isolationFlags (Lio/matthewnelson/kmp/tor/runtime/api/ThisBlock;)Lio/matthewnelson/kmp/tor/runtime/api/config/TorConfig$__TransPort;
 	public synthetic fun isolationFlags (Lio/matthewnelson/kmp/tor/runtime/api/ThisBlock;)Ljava/lang/Object;
-	public fun port (I)Lio/matthewnelson/kmp/tor/runtime/api/config/TorConfig$__TransPort;
-	public synthetic fun port (I)Ljava/lang/Object;
 	public fun port (Lio/matthewnelson/kmp/tor/runtime/api/address/Port$Proxy;)Lio/matthewnelson/kmp/tor/runtime/api/config/TorConfig$__TransPort;
 	public synthetic fun port (Lio/matthewnelson/kmp/tor/runtime/api/address/Port;)Ljava/lang/Object;
 }

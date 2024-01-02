@@ -33,18 +33,8 @@ public sealed interface TCPPortDisable<out R: Any> {
 
 @InternalKmpTorApi
 public sealed interface TCPPortPort<out R: Any, in P: Port> {
-
     @KmpTorDsl
     public fun port(port: P): R
-
-    /**
-     * A [Port] (or [Port.Proxy])
-     *
-     * @throws [IllegalArgumentException] if port is inappropriate
-     * */
-    @KmpTorDsl
-    @Throws(IllegalArgumentException::class)
-    public fun port(port: Int): R
 }
 
 @InternalKmpTorApi

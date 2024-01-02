@@ -244,10 +244,6 @@ public class TorConfig private constructor(
         }
 
         @KmpTorDsl
-        @Throws(IllegalArgumentException::class)
-        public override fun port(port: Int): __DNSPort = port(port.toPortProxy())
-
-        @KmpTorDsl
         public override fun isolationFlags(
             block: ThisBlock<IsolationFlagBuilder>,
         ): __DNSPort {
@@ -303,10 +299,6 @@ public class TorConfig private constructor(
             argument = port.toString()
             return this
         }
-
-        @KmpTorDsl
-        @Throws(IllegalArgumentException::class)
-        public override fun port(port: Int): __HTTPTunnelPort = port(port.toPortProxy())
 
         @KmpTorDsl
         public override fun isolationFlags(
@@ -458,10 +450,6 @@ public class TorConfig private constructor(
             argument = port.toString()
             return this
         }
-
-        @KmpTorDsl
-        @Throws(IllegalArgumentException::class)
-        public override fun port(port: Int): __TransPort = port(port.toPortProxy())
 
         @KmpTorDsl
         public override fun isolationFlags(
