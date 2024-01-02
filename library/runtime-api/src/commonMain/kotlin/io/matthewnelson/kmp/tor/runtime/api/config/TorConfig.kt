@@ -31,6 +31,8 @@ import io.matthewnelson.kmp.tor.runtime.api.address.IPAddress.V6.Companion.toIPA
 import io.matthewnelson.kmp.tor.runtime.api.address.Port
 import io.matthewnelson.kmp.tor.runtime.api.config.TorConfig.Keyword.Attribute
 import io.matthewnelson.kmp.tor.runtime.api.config.TorConfig.LineItem.Companion.toLineItem
+import io.matthewnelson.kmp.tor.runtime.api.config.TorConfig.Setting.Companion.filterByAttribute
+import io.matthewnelson.kmp.tor.runtime.api.config.TorConfig.Setting.Companion.filterByKeyword
 import io.matthewnelson.kmp.tor.runtime.api.config.builders.*
 import io.matthewnelson.kmp.tor.runtime.api.internal.normalizedAbsolutePath
 import io.matthewnelson.kmp.tor.runtime.api.internal.toByte
@@ -81,6 +83,8 @@ public class TorConfig private constructor(
     public class Builder private constructor(other: TorConfig?) {
 
         private val settings = mutableSetOf<Setting>()
+        // For dealing with inherited disabled port
+        private val inheritedDisabledPorts = mutableSetOf<Setting>()
 
         /**
          * Add an already configured [Setting]
@@ -102,10 +106,23 @@ public class TorConfig private constructor(
         @KmpTorDsl
         public fun add(setting: Setting?): Builder {
             if (setting == null) return this
-            // TODO:
-            //  - Bump other if add is false
-            //  - Maybe split into 2 groups, other and ports?
-            settings.add(setting)
+
+            inheritedDisabledPorts.find {
+                it.keyword == setting.keyword
+            }?.let { disabled ->
+                // It is being overridden by a newly
+                // configured port. Remove the inherited
+                // setting.
+                inheritedDisabledPorts.remove(disabled)
+            }
+
+            if (!settings.add(setting)) {
+                // Remove and replace the other item
+                // e.g. SocksPort and DNSPort are configured
+                //      with the same port value
+                settings.remove(setting)
+                settings.add(setting)
+            }
             return this
         }
 
@@ -133,7 +150,23 @@ public class TorConfig private constructor(
         ): Builder = add(factory.Builder(block))
 
         init {
-            other?.settings?.forEach { add(it) }
+            if (other != null) {
+                val disabledPorts = mutableSetOf<Setting>()
+
+                other.settings.forEach { setting ->
+                    if (
+                        setting.keyword.attributes.contains(Attribute.Port)
+                        && setting.argument == "0"
+                    ) {
+                        disabledPorts.add(setting)
+                        return@forEach
+                    }
+
+                    add(setting)
+                }
+
+                inheritedDisabledPorts.addAll(disabledPorts)
+            }
         }
 
         internal companion object {
@@ -144,10 +177,25 @@ public class TorConfig private constructor(
                 block: ThisBlock<Builder>,
             ): TorConfig {
                 val b = Builder(other).apply(block)
+                // Copy our settings in before we modify them
+                val settings = b.settings.toMutableSet()
+                settings.addAll(b.inheritedDisabledPorts)
 
-                // TODO
+                settings.filterByAttribute<Attribute.Port>().forEach { setting ->
+                    if (setting.keyword is HiddenServiceDir.Companion) return@forEach
+                    if (setting.argument != "0") return@forEach
 
-                return TorConfig(b.settings.toImmutableSet())
+                    // A port is configured as disabled.
+                    // remove all other ports of that type
+                    val toRemove = settings.filter { otherSetting ->
+                        otherSetting.keyword == setting.keyword
+                        && otherSetting.argument != setting.argument
+                    }
+                    if (toRemove.isEmpty()) return@forEach
+                    settings.removeAll(toRemove.toSet())
+                }
+
+                return TorConfig(settings.toImmutableSet())
             }
         }
     }
@@ -480,6 +528,8 @@ public class TorConfig private constructor(
         TCPPortBuilder.DSLPort<__TransPort>,
         IsolationFlagBuilder.DSL<__TransPort>
     {
+
+        // TODO: Only supported on non-windows platforms
 
         @get:JvmName("port")
         public var port: String = "0"
