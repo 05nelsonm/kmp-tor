@@ -63,15 +63,6 @@ public class IsolationFlagBuilder private constructor() {
         return this
     }
 
-    @InternalKmpTorApi
-    public interface DSL<out R: Any> {
-
-        @KmpTorDsl
-        public fun isolationFlags(
-            block: ThisBlock<IsolationFlagBuilder>,
-        ): R
-    }
-
     internal companion object {
 
         @JvmSynthetic
@@ -113,5 +104,14 @@ public class IsolationFlagBuilder private constructor() {
                 if (id >= 0) flags.add("$flag=$id")
             }
         }
+    }
+
+    @InternalKmpTorApi
+    public interface DSL<out R: Any> {
+
+        @KmpTorDsl
+        public fun isolationFlags(
+            block: ThisBlock<IsolationFlagBuilder>,
+        ): R
     }
 }

@@ -134,7 +134,7 @@ public sealed class TCPPortBuilder private constructor() {
     }
 
     @InternalKmpTorApi
-    public interface DSL<T: TCPPortBuilder, R: Any> {
+    public interface DSL<out T: TCPPortBuilder, out R: Any> {
 
         /**
          * For a [TorConfig.Keyword] that can be configured to use

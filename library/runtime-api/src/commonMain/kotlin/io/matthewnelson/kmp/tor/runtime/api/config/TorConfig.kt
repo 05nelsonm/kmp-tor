@@ -20,20 +20,18 @@ package io.matthewnelson.kmp.tor.runtime.api.config
 import io.matthewnelson.kmp.file.File
 import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
 import io.matthewnelson.kmp.tor.core.api.annotation.KmpTorDsl
-import io.matthewnelson.kmp.tor.core.resource.ImmutableMap.Companion.toImmutableMap
-import io.matthewnelson.kmp.tor.core.resource.ImmutableSet.Companion.toImmutableSet
+import io.matthewnelson.kmp.tor.core.resource.immutableSetOf
+import io.matthewnelson.kmp.tor.core.resource.toImmutableMap
+import io.matthewnelson.kmp.tor.core.resource.toImmutableSet
 import io.matthewnelson.kmp.tor.runtime.api.ThisBlock
 import io.matthewnelson.kmp.tor.runtime.api.apply
 import io.matthewnelson.kmp.tor.runtime.api.address.IPAddress
 import io.matthewnelson.kmp.tor.runtime.api.address.IPAddress.V4.Companion.toIPAddressV4
 import io.matthewnelson.kmp.tor.runtime.api.address.IPAddress.V6.Companion.toIPAddressV6
 import io.matthewnelson.kmp.tor.runtime.api.address.Port
+import io.matthewnelson.kmp.tor.runtime.api.config.TorConfig.Keyword.Attribute
 import io.matthewnelson.kmp.tor.runtime.api.config.TorConfig.LineItem.Companion.toLineItem
-import io.matthewnelson.kmp.tor.runtime.api.config.builders.IsolationFlagBuilder
-import io.matthewnelson.kmp.tor.runtime.api.config.builders.SocksFlagBuilder
-import io.matthewnelson.kmp.tor.runtime.api.config.builders.TCPPortBuilder
-import io.matthewnelson.kmp.tor.runtime.api.config.builders.UnixFlagBuilder
-import io.matthewnelson.kmp.tor.runtime.api.internal.immutableSetOf
+import io.matthewnelson.kmp.tor.runtime.api.config.builders.*
 import io.matthewnelson.kmp.tor.runtime.api.internal.normalizedAbsolutePath
 import io.matthewnelson.kmp.tor.runtime.api.internal.toByte
 import kotlin.jvm.JvmField
@@ -167,13 +165,15 @@ public class TorConfig private constructor(
     public class __ControlPort private constructor(): Setting.Builder(
         keyword = Companion,
     ),  TCPPortBuilder.DSL<TCPPortBuilder.Control, __ControlPort>,
-        UnixFlagBuilder.DSL<__ControlPort>
+        UnixFlagBuilder.DSL<__ControlPort>,
+        UnixSocketBuilder.DSL<__ControlPort>
     {
 
         /**
          * Can be either a TCP Port or a Unix Socket path.
          *
          * @see [asPort]
+         * @see [asUnixSocket]
          * */
         @get:JvmName("argument")
         public var argument: String = AUTO
@@ -191,8 +191,15 @@ public class TorConfig private constructor(
             return this
         }
 
-        // TODO: asUnixSocket
-        //  throw UnsupportedOperationException if platform support not had
+        @KmpTorDsl
+        @Throws(UnsupportedOperationException::class)
+        public override fun asUnixSocket(
+            block: ThisBlock<UnixSocketBuilder>
+        ): __ControlPort {
+            val path = UnixSocketBuilder.build(block) ?: return this
+            argument = path
+            return this
+        }
 
         @KmpTorDsl
         public override fun unixFlags(
@@ -210,16 +217,10 @@ public class TorConfig private constructor(
             factory = { __ControlPort() },
             build = {
                 val argument = argument
-                val unixFlags = if (argument.startsWith("unix:")) _unixFlags else null
-                build(argument, extras = unixFlags)!!
+                val flags = if (argument.startsWith("unix:")) _unixFlags else emptySet()
+                build(argument, optionals = flags)!!
             },
-        ) {
-            /**
-             * A default file name to use (if desired) when configuring as
-             * a unix socket.
-             * */
-            public const val DEFAULT_NAME: String = "control.sock"
-        }
+        )
     }
 
     /**
@@ -236,7 +237,7 @@ public class TorConfig private constructor(
         IsolationFlagBuilder.DSL<__DNSPort>
     {
 
-        @get:JvmName("argument")
+        @get:JvmName("port")
         public var port: String = "0"
             private set
 
@@ -278,8 +279,8 @@ public class TorConfig private constructor(
             factory = { __DNSPort() },
             build = {
                 val port = port
-                val isolationFlags = if (port == "0") null else _isolationFlags
-                build(port, extras = isolationFlags)!!
+                val flags = if (port == "0") emptySet() else _isolationFlags
+                build(port, optionals = flags)!!
             },
         )
     }
@@ -298,7 +299,7 @@ public class TorConfig private constructor(
         IsolationFlagBuilder.DSL<__HTTPTunnelPort>
     {
 
-        @get:JvmName("argument")
+        @get:JvmName("port")
         public var port: String = "0"
             private set
 
@@ -340,8 +341,8 @@ public class TorConfig private constructor(
             factory = { __HTTPTunnelPort() },
             build = {
                 val port = port
-                val isolationFlags = if (port == "0") null else _isolationFlags
-                build(port, extras = isolationFlags)!!
+                val flags = if (port == "0") emptySet() else _isolationFlags
+                build(port, optionals = flags)!!
             },
         )
     }
@@ -377,13 +378,15 @@ public class TorConfig private constructor(
         keyword = Companion,
     ),  IsolationFlagBuilder.DSL<__SocksPort>,
         TCPPortBuilder.DSL<TCPPortBuilder.Socks, __SocksPort>,
-        UnixFlagBuilder.DSL<__SocksPort>
+        UnixFlagBuilder.DSL<__SocksPort>,
+        UnixSocketBuilder.DSL<__SocksPort>
     {
 
         /**
          * Can be either a TCP Port or a Unix Socket path.
          *
          * @see [asPort]
+         * @see [asUnixSocket]
          * */
         @get:JvmName("argument")
         public var argument: String = "9050"
@@ -408,8 +411,16 @@ public class TorConfig private constructor(
             argument = TCPPortBuilder.Socks.build(block)
             return this
         }
-        // TODO: asUnixSocket
-        //  throw UnsupportedOperationException if platform support not had
+
+        @KmpTorDsl
+        @Throws(UnsupportedOperationException::class)
+        public override fun asUnixSocket(
+            block: ThisBlock<UnixSocketBuilder>
+        ): __SocksPort {
+            val path = UnixSocketBuilder.build(block) ?: return this
+            argument = path
+            return this
+        }
 
         @KmpTorDsl
         public fun socksFlags(
@@ -443,23 +454,17 @@ public class TorConfig private constructor(
             factory = { __SocksPort() },
             build = {
                 val argument = argument
-                val extras = if (argument == "0") {
-                    null
+                val flags = if (argument == "0") {
+                    emptySet()
                 } else {
-                    val flags = _socksFlags.toMutableSet()
-                    if (argument.startsWith("unix:")) flags.addAll(_unixFlags)
-                    flags.addAll(_isolationFlags)
-                    flags
+                    val set = _socksFlags.toMutableSet()
+                    if (argument.startsWith("unix:")) set.addAll(_unixFlags)
+                    set.addAll(_isolationFlags)
+                    set
                 }
-                build(argument, extras = extras)!!
+                build(argument, optionals = flags)!!
             },
-        ) {
-            /**
-             * A default file name to use (if desired) when configuring as
-             * a unix socket.
-             * */
-            public const val DEFAULT_NAME: String = "socks.sock"
-        }
+        )
     }
 
     /**
@@ -476,7 +481,7 @@ public class TorConfig private constructor(
         IsolationFlagBuilder.DSL<__TransPort>
     {
 
-        @get:JvmName("argument")
+        @get:JvmName("port")
         public var port: String = "0"
             private set
 
@@ -516,7 +521,11 @@ public class TorConfig private constructor(
             isStartArgument = false,
             isUnique = false,
             factory = { __TransPort() },
-            build = { TODO() },
+            build = {
+                val port = port
+                val flags = if (port == "0") emptySet() else _isolationFlags
+                build(port, optionals = flags)!!
+            },
         )
     }
 
@@ -867,32 +876,32 @@ public class TorConfig private constructor(
         keyword = Companion,
     ) {
 
-        @get:JvmName("argument")
-        public var argument: String = "24 hours"
+        @get:JvmName("timeout")
+        public var timeout: String = "24 hours"
             private set
 
         @KmpTorDsl
         public fun minutes(n: Int): DormantClientTimeout {
             // Must be at LEAST 10 minutes
-            argument = "${if (n < 10) 10 else n} minutes"
+            timeout = "${if (n < 10) 10 else n} minutes"
             return this
         }
 
         @KmpTorDsl
         public fun hours(n: Int): DormantClientTimeout {
-            argument = "${if (n < 1) 1 else n} hours"
+            timeout = "${if (n < 1) 1 else n} hours"
             return this
         }
 
         @KmpTorDsl
         public fun days(n: Int): DormantClientTimeout {
-            argument = "${if (n < 1) 1 else n} days"
+            timeout = "${if (n < 1) 1 else n} days"
             return this
         }
 
         @KmpTorDsl
         public fun weeks(n: Int): DormantClientTimeout {
-            argument = "${if (n < 1) 1 else n} weeks"
+            timeout = "${if (n < 1) 1 else n} weeks"
             return this
         }
 
@@ -902,7 +911,7 @@ public class TorConfig private constructor(
             isStartArgument = false,
             isUnique = true,
             factory = { DormantClientTimeout() },
-            build = { build(argument)!! },
+            build = { build(timeout)!! },
         )
     }
 
@@ -936,7 +945,7 @@ public class TorConfig private constructor(
     ) {
 
         @JvmField
-        public var disable: Boolean = true
+        public var enable: Boolean = true
 
         public companion object: Setting.Factory<DormantTimeoutDisabledByIdleStreams, Setting>(
             name = "DormantTimeoutDisabledByIdleStreams",
@@ -944,7 +953,7 @@ public class TorConfig private constructor(
             isStartArgument = false,
             isUnique = true,
             factory = { DormantTimeoutDisabledByIdleStreams() },
-            build = { build(disable.toByte().toString())!! },
+            build = { build(enable.toByte().toString())!! },
         )
     }
 
@@ -1177,38 +1186,56 @@ public class TorConfig private constructor(
      * [HiddenServicePort](https://2019.www.torproject.org/docs/tor-manual.html.en#HiddenServicePort)
      * */
     @KmpTorDsl
-    public class HiddenServicePort private constructor() {
+    public class HiddenServicePort private constructor():
+        TCPPortBuilder.DSL<TCPPortBuilder.HiddenService, HiddenServicePort>,
+        UnixSocketBuilder.DSL<HiddenServicePort>
+    {
 
         // TODO: Check if can be 0
         @JvmField
         public var virtual: Port? = null
 
         /**
-         * If left unconfigured, [virtual] will be utilized.
+         * If left unconfigured, whatever [virtual] has been
+         * configured as is utilized.
          *
          * Can be either a TCP Port or a Unix Socket path.
          *
-         * @see [targetPort]
+         * @see [asPort]
+         * @see [asUnixSocket]
          * */
-        @get:JvmName("target")
+        @get:JvmName("targetArgument")
         public var targetArgument: String? = null
             private set
 
-        public fun targetPort(
+        /**
+         * Configure the [targetArgument] to use a TCP Port.
+         *
+         * Only necessary if a value different than [virtual]
+         * is required.
+         * */
+        @KmpTorDsl
+        public override fun asPort(
             block: ThisBlock<TCPPortBuilder.HiddenService>
         ): HiddenServicePort {
             targetArgument = TCPPortBuilder.HiddenService.build(block)
             return this
         }
 
-        // TODO: targetUnixSocket
-        //  throw UnsupportedOperationException if platform support not had
+        @KmpTorDsl
+        @Throws(UnsupportedOperationException::class)
+        public override fun asUnixSocket(
+            block: ThisBlock<UnixSocketBuilder>
+        ): HiddenServicePort {
+            val path = UnixSocketBuilder.build(block) ?: return this
+            targetArgument = path
+            return this
+        }
 
         private fun build(): LineItem? {
             val virtual = virtual ?: return null
             val target = targetArgument ?: virtual.toString()
-            // TODO
-            return null
+            return toLineItem("$virtual $target")
         }
 
         public companion object: Keyword(
@@ -1217,11 +1244,6 @@ public class TorConfig private constructor(
             isStartArgument = false,
             isUnique = false,
         ) {
-            /**
-             * A default file name to use (if desired) when configuring as
-             * a unix socket.
-             * */
-            public const val DEFAULT_NAME: String = "hs.sock"
 
             @JvmSynthetic
             internal fun build(
@@ -1572,7 +1594,7 @@ public class TorConfig private constructor(
         @JvmField
         public val argument: String,
         @JvmField
-        public val extras: Set<String>,
+        public val optionals: Set<String>,
     ) {
 
         // TODO: public override fun equals(other: Any?): Boolean
@@ -1585,17 +1607,17 @@ public class TorConfig private constructor(
             @JvmSynthetic
             internal fun Keyword.toLineItem(
                 argument: String?,
-                extras: MutableSet<String>? = null,
+                optionals: Set<String>? = null,
             ): LineItem? {
                 if (argument.isNullOrBlank()) return null
                 if (argument.lines().size != 1) return null
 
-                extras?.forEach {
+                optionals?.forEach {
                     if (it.isBlank()) return null
                     if (it.lines().size != 1) return null
                 }
 
-                return LineItem(this, argument, extras?.toImmutableSet() ?: emptySet())
+                return LineItem(this, argument, optionals?.toImmutableSet() ?: emptySet())
             }
         }
     }
@@ -1633,8 +1655,8 @@ public class TorConfig private constructor(
         public val keyword: Keyword get() = items.first().keyword
         @get:JvmName("argument")
         public val argument: String get() = items.first().argument
-        @get:JvmName("extras")
-        public val extras: Set<String> get() = items.first().extras
+        @get:JvmName("optionals")
+        public val optionals: Set<String> get() = items.first().optionals
 
         @KmpTorDsl
         public sealed class Builder(
@@ -1644,21 +1666,21 @@ public class TorConfig private constructor(
 
             // Returns null when:
             //  - argument is null, blank, or multi-line
-            //  - extras contains a blank or multi-line value
+            //  - optionals contains a blank or multi-line value
             protected fun build(
                 argument: String?,
-                extras: MutableSet<String>? = null,
-                others: MutableSet<LineItem>? = null,
-                extraInfo: MutableMap<String, String>? = null
+                optionals: Set<String> = emptySet(),
+                others: Set<LineItem> = emptySet(),
+                extraInfo: Map<String, String> = emptyMap(),
             ): Setting? {
-                val first = keyword.toLineItem(argument, extras) ?: return null
+                val first = keyword.toLineItem(argument, optionals) ?: return null
 
-                val set = HashSet<LineItem>(1 + (others?.size ?: 0), 1.0F)
+                val set = HashSet<LineItem>(1 + others.size, 1.0F)
                 set.add(first)
-                if (others != null) set.addAll(others)
+                set.addAll(others)
 
                 @OptIn(InternalKmpTorApi::class)
-                return Setting(set.toImmutableSet(), extraInfo?.toImmutableMap() ?: emptyMap())
+                return Setting(set.toImmutableSet(), extraInfo.toImmutableMap())
             }
         }
 
@@ -1688,9 +1710,46 @@ public class TorConfig private constructor(
             public fun Builder(block: ThisBlock<B>): S = build(factory().apply(block))
         }
 
+
+
+        public companion object {
+
+            /**
+             * Iterates through all [Setting.items], returning all settings which contain
+             * the specified [Keyword].
+             * */
+            @JvmStatic
+            public inline fun <reified T: Keyword> Iterable<Setting>.filterByKeyword(): List<Setting> {
+                return filter { setting ->
+                    setting.items.forEach { item ->
+                        if (item.keyword is T) return@filter true
+                    }
+                    false
+                }
+            }
+
+            /**
+             * Iterates through all [Setting.items], returning all settings which contain
+             * the specified [Attribute].
+             * */
+            @JvmStatic
+            public inline fun <reified T: Attribute> Iterable<Setting>.filterByAttribute(): List<Setting> {
+                return filter { setting ->
+                    setting.items.forEach { item ->
+                        item.keyword.attributes.forEach { attr ->
+                            if (attr is T) return@filter true
+                        }
+                    }
+                    false
+                }
+            }
+        }
+
         public override fun equals(other: Any?): Boolean = other is Setting && other.items.first() == items.first()
         public override fun hashCode(): Int = 17 * 31 + items.first().hashCode()
-        public override fun toString(): String = buildString { items.forEach { appendLine(it.toString()) } }
+        public override fun toString(): String = buildString {
+            items.joinTo(this, separator = "\n")
+        }
         // TODO: public fun toCtrlString(): String
     }
 
@@ -1709,8 +1768,8 @@ public class TorConfig private constructor(
      * [Docs](https://2019.www.torproject.org/docs/tor-manual.html.en)
      *
      * @see [Setting.Factory]
-     * @see [filterByKeyword]
-     * @see [filterByAttribute]
+     * @see [Setting.filterByKeyword]
+     * @see [Setting.filterByAttribute]
      *
      * @param [name] The string value (e.g. `RunAsDaemon`)
      * @param [attributes] Attributes specific to the Keyword (used for filtering)
@@ -1752,39 +1811,6 @@ public class TorConfig private constructor(
             public data object HiddenService: Attribute()
             public data object Port: Attribute()
             public data object UnixSocket: Attribute()
-        }
-
-        public companion object {
-
-            /**
-             * Iterates through all [Setting.items], returning all settings which contain
-             * the specified [Keyword].
-             * */
-            @JvmStatic
-            public inline fun <reified T: Keyword> Iterable<Setting>.filterByKeyword(): List<Setting> {
-                return filter { setting ->
-                    setting.items.forEach { item ->
-                        if (item.keyword is T) return@filter true
-                    }
-                    false
-                }
-            }
-
-            /**
-             * Iterates through all [Setting.items], returning all settings which contain
-             * the specified [Attribute].
-             * */
-            @JvmStatic
-            public inline fun <reified T: Attribute> Iterable<Setting>.filterByAttribute(): List<Setting> {
-                return filter { setting ->
-                    setting.items.forEach { item ->
-                        item.keyword.attributes.forEach { attr ->
-                            if (attr is T) return@filter true
-                        }
-                    }
-                    false
-                }
-            }
         }
     }
 

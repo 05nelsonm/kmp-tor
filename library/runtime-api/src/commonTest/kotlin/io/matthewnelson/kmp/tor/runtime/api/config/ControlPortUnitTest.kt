@@ -27,6 +27,6 @@ class ControlPortUnitTest {
         }
 
         assertEquals("auto", setting.argument)
-        assertEquals(0, setting.extras.size)
+        assertEquals(0, setting.optionals.size)
     }
 }

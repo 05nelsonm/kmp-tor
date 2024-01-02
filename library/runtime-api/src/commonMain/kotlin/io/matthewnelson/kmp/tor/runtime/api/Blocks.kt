@@ -17,7 +17,6 @@
 
 package io.matthewnelson.kmp.tor.runtime.api
 
-// TODO: Move to core-api
 /**
  * Helper for non-Kotlin consumers instead of using
  * `T.() -> Unit` which would force a return of `Unit`.

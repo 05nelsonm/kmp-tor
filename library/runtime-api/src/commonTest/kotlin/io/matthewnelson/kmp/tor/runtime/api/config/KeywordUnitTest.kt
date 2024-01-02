@@ -16,8 +16,8 @@
 package io.matthewnelson.kmp.tor.runtime.api.config
 
 import io.matthewnelson.kmp.file.File
-import io.matthewnelson.kmp.tor.runtime.api.config.TorConfig.Keyword.Companion.filterByAttribute
-import io.matthewnelson.kmp.tor.runtime.api.config.TorConfig.Keyword.Companion.filterByKeyword
+import io.matthewnelson.kmp.tor.runtime.api.config.TorConfig.Setting.Companion.filterByAttribute
+import io.matthewnelson.kmp.tor.runtime.api.config.TorConfig.Setting.Companion.filterByKeyword
 import kotlin.test.Test
 import kotlin.test.assertEquals
 

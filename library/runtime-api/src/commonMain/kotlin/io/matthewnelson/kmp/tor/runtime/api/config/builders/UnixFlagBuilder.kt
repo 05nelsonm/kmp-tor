@@ -53,18 +53,6 @@ public class UnixFlagBuilder private constructor() {
     @JvmField
     public var RelaxDirModeCheck: Boolean? = null
 
-    @InternalKmpTorApi
-    public interface DSL<out R: Any> {
-
-        /**
-         * For [TorConfig.__ControlPort] and [TorConfig.__SocksPort].
-         * */
-        @KmpTorDsl
-        public fun unixFlags(
-            block: ThisBlock<UnixFlagBuilder>,
-        ): R
-    }
-
     internal companion object {
 
         @JvmSynthetic
@@ -90,5 +78,17 @@ public class UnixFlagBuilder private constructor() {
                 if (it) flags.add(flag) else flags.remove(flag)
             }
         }
+    }
+
+    @InternalKmpTorApi
+    public interface DSL<out R: Any> {
+
+        /**
+         * For [TorConfig.__ControlPort] and [TorConfig.__SocksPort].
+         * */
+        @KmpTorDsl
+        public fun unixFlags(
+            block: ThisBlock<UnixFlagBuilder>,
+        ): R
     }
 }

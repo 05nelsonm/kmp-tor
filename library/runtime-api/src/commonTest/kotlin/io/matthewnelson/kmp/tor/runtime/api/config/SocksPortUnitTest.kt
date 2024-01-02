@@ -27,6 +27,6 @@ class SocksPortUnitTest {
         }
 
         assertEquals("9050", setting.argument)
-        assertEquals(0, setting.extras.size)
+        assertEquals(0, setting.optionals.size)
     }
 }
