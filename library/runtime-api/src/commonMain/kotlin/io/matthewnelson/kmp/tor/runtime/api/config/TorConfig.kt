@@ -18,8 +18,6 @@
 package io.matthewnelson.kmp.tor.runtime.api.config
 
 import io.matthewnelson.kmp.file.File
-import io.matthewnelson.kmp.file.absolutePath
-import io.matthewnelson.kmp.file.normalize
 import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
 import io.matthewnelson.kmp.tor.core.api.annotation.KmpTorDsl
 import io.matthewnelson.kmp.tor.core.resource.ImmutableMap.Companion.toImmutableMap
@@ -30,9 +28,9 @@ import io.matthewnelson.kmp.tor.runtime.api.address.IPAddress
 import io.matthewnelson.kmp.tor.runtime.api.address.IPAddress.V4.Companion.toIPAddressV4
 import io.matthewnelson.kmp.tor.runtime.api.address.IPAddress.V6.Companion.toIPAddressV6
 import io.matthewnelson.kmp.tor.runtime.api.address.Port
-import io.matthewnelson.kmp.tor.runtime.api.address.Port.Proxy.Companion.toPortProxy
 import io.matthewnelson.kmp.tor.runtime.api.config.TorConfig.LineItem.Companion.toLineItem
 import io.matthewnelson.kmp.tor.runtime.api.internal.immutableSetOf
+import io.matthewnelson.kmp.tor.runtime.api.internal.normalizedAbsolutePath
 import io.matthewnelson.kmp.tor.runtime.api.internal.toByte
 import kotlin.jvm.JvmField
 import kotlin.jvm.JvmName
@@ -45,6 +43,7 @@ import kotlin.jvm.JvmSynthetic
  * @see [Builder]
  * @see [Companion.Builder]
  * */
+@OptIn(InternalKmpTorApi::class)
 public class TorConfig private constructor(
     @JvmField
     public val settings: Set<Setting>,
@@ -70,7 +69,7 @@ public class TorConfig private constructor(
             block: ThisBlock<Builder>,
         ): TorConfig = Builder.build(other, block)
 
-        private const val AUTO = "auto"
+        internal const val AUTO = "auto"
     }
 
     /**
@@ -146,7 +145,6 @@ public class TorConfig private constructor(
 
                 // TODO
 
-                @OptIn(InternalKmpTorApi::class)
                 return TorConfig(b.settings.toImmutableSet())
             }
         }
@@ -162,12 +160,17 @@ public class TorConfig private constructor(
      * [Non-Persistent Options](https://2019.www.torproject.org/docs/tor-manual.html.en#_non_persistent_options)
      * */
     @KmpTorDsl
-    @OptIn(InternalKmpTorApi::class)
     public class __ControlPort private constructor(): Setting.Builder(
         keyword = Companion,
-    ),  UnixFlagBuilder.DSL<__ControlPort>
+    ),  TCPPortBuilder.DSL<TCPPortBuilder.Control, __ControlPort>,
+        UnixFlagBuilder.DSL<__ControlPort>
     {
 
+        /**
+         * Can be either a TCP Port or a Unix Socket path.
+         *
+         * @see [asPort]
+         * */
         @get:JvmName("argument")
         public var argument: String = AUTO
             private set
@@ -176,7 +179,14 @@ public class TorConfig private constructor(
         @get:JvmName("unixFlags")
         public val unixFlags: Set<String> get() = _unixFlags.toImmutableSet()
 
-        // TODO: asPort
+        @KmpTorDsl
+        public override fun asPort(
+            block: ThisBlock<TCPPortBuilder.Control>,
+        ): __ControlPort {
+            argument = TCPPortBuilder.Control.build(block)
+            return this
+        }
+
         // TODO: asUnixSocket
         //  throw UnsupportedOperationException if platform support not had
 
@@ -194,7 +204,11 @@ public class TorConfig private constructor(
             isStartArgument = true,
             isUnique = false,
             factory = { __ControlPort() },
-            build = { TODO() },
+            build = {
+                val argument = argument
+                val unixFlags = if (argument.startsWith("unix:")) _unixFlags else null
+                build(argument, extras = unixFlags)!!
+            },
         ) {
             /**
              * A default file name to use (if desired) when configuring as
@@ -210,15 +224,16 @@ public class TorConfig private constructor(
      * [Non-Persistent Options](https://2019.www.torproject.org/docs/tor-manual.html.en#_non_persistent_options)
      * */
     @KmpTorDsl
-    @OptIn(InternalKmpTorApi::class)
     public class __DNSPort private constructor(): Setting.Builder(
         keyword = Companion,
-    ),  TCPPortDSL<__DNSPort>,
+    ),  TCPPortBuilder.DSLAuto<__DNSPort>,
+        TCPPortBuilder.DSLDisable<__DNSPort>,
+        TCPPortBuilder.DSLPort<__DNSPort>,
         IsolationFlagBuilder.DSL<__DNSPort>
     {
 
         @get:JvmName("argument")
-        public var argument: String = "0"
+        public var port: String = "0"
             private set
 
         private val _isolationFlags = mutableSetOf<String>()
@@ -227,19 +242,19 @@ public class TorConfig private constructor(
 
         @KmpTorDsl
         public override fun auto(): __DNSPort {
-            argument = AUTO
+            port = AUTO
             return this
         }
 
         @KmpTorDsl
         public override fun disable(): __DNSPort {
-            argument = "0"
+            port = "0"
             return this
         }
 
         @KmpTorDsl
         public override fun port(port: Port.Proxy): __DNSPort {
-            argument = port.toString()
+            this.port = port.toString()
             return this
         }
 
@@ -257,7 +272,11 @@ public class TorConfig private constructor(
             isStartArgument = false,
             isUnique = false,
             factory = { __DNSPort() },
-            build = { TODO() },
+            build = {
+                val port = port
+                val isolationFlags = if (port == "0") null else _isolationFlags
+                build(port, extras = isolationFlags)!!
+            },
         )
     }
 
@@ -267,15 +286,16 @@ public class TorConfig private constructor(
      * [Non-Persistent Options](https://2019.www.torproject.org/docs/tor-manual.html.en#_non_persistent_options)
      * */
     @KmpTorDsl
-    @OptIn(InternalKmpTorApi::class)
     public class __HTTPTunnelPort private constructor(): Setting.Builder(
         keyword = Companion,
-    ),  TCPPortDSL<__HTTPTunnelPort>,
+    ),  TCPPortBuilder.DSLAuto<__HTTPTunnelPort>,
+        TCPPortBuilder.DSLDisable<__HTTPTunnelPort>,
+        TCPPortBuilder.DSLPort<__HTTPTunnelPort>,
         IsolationFlagBuilder.DSL<__HTTPTunnelPort>
     {
 
         @get:JvmName("argument")
-        public var argument: String = "0"
+        public var port: String = "0"
             private set
 
         private val _isolationFlags = mutableSetOf<String>()
@@ -284,19 +304,19 @@ public class TorConfig private constructor(
 
         @KmpTorDsl
         public override fun auto(): __HTTPTunnelPort {
-            argument = AUTO
+            port = AUTO
             return this
         }
 
         @KmpTorDsl
         public override fun disable(): __HTTPTunnelPort {
-            argument = "0"
+            port = "0"
             return this
         }
 
         @KmpTorDsl
         public override fun port(port: Port.Proxy): __HTTPTunnelPort {
-            argument = port.toString()
+            this.port = port.toString()
             return this
         }
 
@@ -314,7 +334,11 @@ public class TorConfig private constructor(
             isStartArgument = false,
             isUnique = false,
             factory = { __HTTPTunnelPort() },
-            build = { TODO() },
+            build = {
+                val port = port
+                val isolationFlags = if (port == "0") null else _isolationFlags
+                build(port, extras = isolationFlags)!!
+            },
         )
     }
 
@@ -345,13 +369,18 @@ public class TorConfig private constructor(
      * [Non-Persistent Options](https://2019.www.torproject.org/docs/tor-manual.html.en#_non_persistent_options)
      * */
     @KmpTorDsl
-    @OptIn(InternalKmpTorApi::class)
     public class __SocksPort private constructor(): Setting.Builder(
         keyword = Companion,
     ),  IsolationFlagBuilder.DSL<__SocksPort>,
+        TCPPortBuilder.DSL<TCPPortBuilder.Socks, __SocksPort>,
         UnixFlagBuilder.DSL<__SocksPort>
     {
 
+        /**
+         * Can be either a TCP Port or a Unix Socket path.
+         *
+         * @see [asPort]
+         * */
         @get:JvmName("argument")
         public var argument: String = "9050"
             private set
@@ -368,7 +397,13 @@ public class TorConfig private constructor(
         @get:JvmName("isolationFlags")
         public val isolationFlags: Set<String> get() = _isolationFlags.toImmutableSet()
 
-        // TODO: asPort
+        @KmpTorDsl
+        public override fun asPort(
+            block: ThisBlock<TCPPortBuilder.Socks>
+        ): __SocksPort {
+            argument = TCPPortBuilder.Socks.build(block)
+            return this
+        }
         // TODO: asUnixSocket
         //  throw UnsupportedOperationException if platform support not had
 
@@ -402,7 +437,18 @@ public class TorConfig private constructor(
             isStartArgument = false,
             isUnique = false,
             factory = { __SocksPort() },
-            build = { TODO() },
+            build = {
+                val argument = argument
+                val extras = if (argument == "0") {
+                    null
+                } else {
+                    val flags = _socksFlags.toMutableSet()
+                    if (argument.startsWith("unix:")) flags.addAll(_unixFlags)
+                    flags.addAll(_isolationFlags)
+                    flags
+                }
+                build(argument, extras = extras)!!
+            },
         ) {
             /**
              * A default file name to use (if desired) when configuring as
@@ -418,15 +464,16 @@ public class TorConfig private constructor(
      * [Non-Persistent Options](https://2019.www.torproject.org/docs/tor-manual.html.en#_non_persistent_options)
      * */
     @KmpTorDsl
-    @OptIn(InternalKmpTorApi::class)
     public class __TransPort private constructor(): Setting.Builder(
         keyword = Companion,
-    ), TCPPortDSL<__TransPort>,
+    ),  TCPPortBuilder.DSLAuto<__TransPort>,
+        TCPPortBuilder.DSLDisable<__TransPort>,
+        TCPPortBuilder.DSLPort<__TransPort>,
         IsolationFlagBuilder.DSL<__TransPort>
     {
 
         @get:JvmName("argument")
-        public var argument: String = "0"
+        public var port: String = "0"
             private set
 
         private val _isolationFlags = mutableSetOf<String>()
@@ -435,19 +482,19 @@ public class TorConfig private constructor(
 
         @KmpTorDsl
         public override fun auto(): __TransPort {
-            argument = AUTO
+            port = AUTO
             return this
         }
 
         @KmpTorDsl
         public override fun disable(): __TransPort {
-            argument = "0"
+            port = "0"
             return this
         }
 
         @KmpTorDsl
         public override fun port(port: Port.Proxy): __TransPort {
-            argument = port.toString()
+            this.port = port.toString()
             return this
         }
 
@@ -983,7 +1030,6 @@ public class TorConfig private constructor(
      * [HiddenServiceDir](https://2019.www.torproject.org/docs/tor-manual.html.en#HiddenServiceDir)
      * */
     @KmpTorDsl
-    @OptIn(InternalKmpTorApi::class)
     public class HiddenServiceDir private constructor(): Setting.Builder(
         keyword = Companion,
     ) {
@@ -1131,14 +1177,32 @@ public class TorConfig private constructor(
 
         // TODO: Check if can be 0
         @JvmField
-        public var virtualPort: Port? = null
+        public var virtual: Port? = null
 
-        // TODO: IPAddress (localhost)
-        // TODO: asPort
-        // TODO: asUnixSocket
+        /**
+         * If left unconfigured, [virtual] will be utilized.
+         *
+         * Can be either a TCP Port or a Unix Socket path.
+         *
+         * @see [targetPort]
+         * */
+        @get:JvmName("target")
+        public var targetArgument: String? = null
+            private set
+
+        public fun targetPort(
+            block: ThisBlock<TCPPortBuilder.HiddenService>
+        ): HiddenServicePort {
+            targetArgument = TCPPortBuilder.HiddenService.build(block)
+            return this
+        }
+
+        // TODO: targetUnixSocket
         //  throw UnsupportedOperationException if platform support not had
 
         private fun build(): LineItem? {
+            val virtual = virtual ?: return null
+            val target = targetArgument ?: virtual.toString()
             // TODO
             return null
         }
@@ -1527,7 +1591,6 @@ public class TorConfig private constructor(
                     if (it.lines().size != 1) return null
                 }
 
-                @OptIn(InternalKmpTorApi::class)
                 return LineItem(this, argument, extras?.toImmutableSet() ?: emptySet())
             }
         }
@@ -1726,6 +1789,3 @@ public class TorConfig private constructor(
     // TODO: override fun toString(): String
     // TODO: override fun toCtrlString(): String
 }
-
-@Suppress("NOTHING_TO_INLINE", "KotlinRedundantDiagnosticSuppress")
-private inline fun File.normalizedAbsolutePath(): String = normalize().absolutePath
