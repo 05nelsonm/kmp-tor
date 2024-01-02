@@ -170,6 +170,9 @@ public final class io/matthewnelson/kmp/tor/runtime/api/config/TorConfig {
 	public synthetic fun <init> (Ljava/util/Set;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
 	public static final fun Builder (Lio/matthewnelson/kmp/tor/runtime/api/ThisBlock;)Lio/matthewnelson/kmp/tor/runtime/api/config/TorConfig;
 	public static final fun Builder (Lio/matthewnelson/kmp/tor/runtime/api/config/TorConfig;Lio/matthewnelson/kmp/tor/runtime/api/ThisBlock;)Lio/matthewnelson/kmp/tor/runtime/api/config/TorConfig;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
 }
 
 public final class io/matthewnelson/kmp/tor/runtime/api/config/TorConfig$AutomapHostsOnResolve : io/matthewnelson/kmp/tor/runtime/api/config/TorConfig$Setting$Builder {

@@ -1564,8 +1564,10 @@ public class TorConfig private constructor(
             isUnique = true,
             factory = { SyslogIdentityTag() },
             build = {
-                // TODO: parse tag (line length limitation on Android)
-                build(tag)
+                tag?.let { tag ->
+                    // TODO: parse tag (line length limitation on Android)
+                    build(tag)
+                }
             },
         )
     }
@@ -1983,8 +1985,10 @@ public class TorConfig private constructor(
         }
     }
 
-    // TODO: override fun equals(other: Any?): Boolean
-    // TODO: override fun hashCode(): Int
-    // TODO: override fun toString(): String
+    public override fun equals(other: Any?): Boolean = other is TorConfig && other.settings == settings
+    public override fun hashCode(): Int = 5 * 42 + settings.hashCode()
+    public override fun toString(): String = buildString {
+        settings.joinTo(this, separator = "\n")
+    }
     // TODO: override fun toCtrlString(): String
 }
