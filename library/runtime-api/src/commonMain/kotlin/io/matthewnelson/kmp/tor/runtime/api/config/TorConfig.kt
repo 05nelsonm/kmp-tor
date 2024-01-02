@@ -34,6 +34,7 @@ import io.matthewnelson.kmp.tor.runtime.api.config.TorConfig.LineItem.Companion.
 import io.matthewnelson.kmp.tor.runtime.api.config.TorConfig.Setting.Companion.filterByAttribute
 import io.matthewnelson.kmp.tor.runtime.api.config.TorConfig.Setting.Companion.filterByKeyword
 import io.matthewnelson.kmp.tor.runtime.api.config.builders.*
+import io.matthewnelson.kmp.tor.runtime.api.internal.IsUnixLikeHost
 import io.matthewnelson.kmp.tor.runtime.api.internal.normalizedAbsolutePath
 import io.matthewnelson.kmp.tor.runtime.api.internal.toByte
 import kotlin.jvm.JvmField
@@ -529,8 +530,6 @@ public class TorConfig private constructor(
         IsolationFlagBuilder.DSL<__TransPort>
     {
 
-        // TODO: Only supported on non-windows platforms
-
         @get:JvmName("port")
         public var port: String = "0"
             private set
@@ -541,18 +540,21 @@ public class TorConfig private constructor(
 
         @KmpTorDsl
         public override fun auto(): __TransPort {
+            if (!IsUnixLikeHost) return this
             port = AUTO
             return this
         }
 
         @KmpTorDsl
         public override fun disable(): __TransPort {
+            if (!IsUnixLikeHost) return this
             port = "0"
             return this
         }
 
         @KmpTorDsl
         public override fun port(port: Port.Proxy): __TransPort {
+            if (!IsUnixLikeHost) return this
             this.port = port.toString()
             return this
         }
@@ -561,6 +563,7 @@ public class TorConfig private constructor(
         public override fun isolationFlags(
             block: ThisBlock<IsolationFlagBuilder>,
         ): __TransPort {
+            if (!IsUnixLikeHost) return this
             IsolationFlagBuilder.configure(_isolationFlags, block)
             return this
         }
@@ -576,7 +579,9 @@ public class TorConfig private constructor(
                 val flags = if (port == "0") emptySet() else _isolationFlags
                 build(port, optionals = flags)!!
             },
-        )
+        ) {
+
+        }
     }
 
     /**

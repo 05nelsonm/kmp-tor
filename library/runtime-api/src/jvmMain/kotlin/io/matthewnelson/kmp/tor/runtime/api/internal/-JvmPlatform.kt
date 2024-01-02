@@ -45,3 +45,15 @@ internal actual val UnixSocketsNotSupportedMessage: String? by lazy {
         "Unix Sockets are not supported for Java 15 or below"
     }
 }
+
+@get:JvmSynthetic
+@OptIn(InternalKmpTorApi::class)
+internal actual val IsUnixLikeHost: Boolean by lazy {
+    when (OSInfo.INSTANCE.osHost) {
+        is OSHost.FreeBSD,
+        is OSHost.Linux,
+        is OSHost.MacOS -> true
+        is OSHost.Windows -> false
+        else -> SysPathSep == '/'
+    }
+}
