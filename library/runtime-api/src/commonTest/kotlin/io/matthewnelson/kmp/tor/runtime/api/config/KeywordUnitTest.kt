@@ -51,16 +51,20 @@ class KeywordUnitTest {
         }.let { list.add(it) }
 
         TorConfig.HiddenServiceDir.Builder {
-            directory = "/some/path/to/dir".toFile()
+            val dir = "/path/to/data_dir/${TorConfig.HiddenServiceDir.DEFAULT_PARENT_DIR_NAME}/hs_test".toFile()
+            directory = dir
 
             port {
                 virtual = 80.toPort()
                 asUnixSocket {
-                    file = "/some/path/to/dir/hs.sock".toFile()
+                    file = dir.resolve("hs.sock")
                 }
             }
             port {
                 virtual = 80.toPort()
+                asPort {
+                    target = 8080.toPort()
+                }
             }
             version {
                 HSv(3)

@@ -129,13 +129,13 @@ class SettingUnitTest {
         val dir = ".".toFile()
         val a = TorConfig.HiddenServiceDir.Builder {
             directory = dir
-            port { asPort { virtual = 80.toPort() } }
-            port { asPort { virtual = 443.toPort() } }
+            port { virtual = 80.toPort() }
+            port { virtual = 443.toPort() }
             version { HSv(3) }
         }!!
         val b = TorConfig.HiddenServiceDir.Builder {
             directory = dir
-            port { asPort { virtual = 80.toPort() } }
+            port { virtual = 80.toPort() }
             version { HSv(3) }
         }!!
 

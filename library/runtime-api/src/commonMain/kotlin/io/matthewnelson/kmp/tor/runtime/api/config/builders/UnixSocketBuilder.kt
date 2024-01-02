@@ -36,6 +36,7 @@ import kotlin.jvm.JvmSynthetic
  * port is made (e.g. starting tor), it will fail unless a Unix
  * Socket is being utilized.
  * */
+@KmpTorDsl
 public class UnixSocketBuilder private constructor() {
 
     @JvmField

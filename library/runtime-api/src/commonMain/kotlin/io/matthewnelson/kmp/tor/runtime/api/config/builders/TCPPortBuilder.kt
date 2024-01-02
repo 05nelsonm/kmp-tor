@@ -34,6 +34,7 @@ public sealed class TCPPortBuilder private constructor() {
     /**
      * For configuring [TorConfig.__ControlPort] to use a TCP Port.
      * */
+    @KmpTorDsl
     public class Control private constructor(): TCPPortBuilder(),
         DSLAuto<Control>,
         DSLPort<Control>
@@ -70,6 +71,7 @@ public sealed class TCPPortBuilder private constructor() {
     /**
      * For configuring [TorConfig.__SocksPort] to use a TCP Port.
      * */
+    @KmpTorDsl
     public class Socks private constructor(): TCPPortBuilder(),
         DSLAuto<Socks>,
         DSLDisable<Socks>,
@@ -115,6 +117,7 @@ public sealed class TCPPortBuilder private constructor() {
      * target TCP Port, instead of utilizing the specified
      * [TorConfig.HiddenServicePort.virtual] port.
      * */
+    @KmpTorDsl
     public class HiddenService private constructor(): TCPPortBuilder() {
 
         @JvmField
