@@ -29,6 +29,10 @@ import io.matthewnelson.kmp.tor.runtime.api.address.IPAddress.V4.Companion.toIPA
 import io.matthewnelson.kmp.tor.runtime.api.address.IPAddress.V6.Companion.toIPAddressV6
 import io.matthewnelson.kmp.tor.runtime.api.address.Port
 import io.matthewnelson.kmp.tor.runtime.api.config.TorConfig.LineItem.Companion.toLineItem
+import io.matthewnelson.kmp.tor.runtime.api.config.builders.IsolationFlagBuilder
+import io.matthewnelson.kmp.tor.runtime.api.config.builders.SocksFlagBuilder
+import io.matthewnelson.kmp.tor.runtime.api.config.builders.TCPPortBuilder
+import io.matthewnelson.kmp.tor.runtime.api.config.builders.UnixFlagBuilder
 import io.matthewnelson.kmp.tor.runtime.api.internal.immutableSetOf
 import io.matthewnelson.kmp.tor.runtime.api.internal.normalizedAbsolutePath
 import io.matthewnelson.kmp.tor.runtime.api.internal.toByte

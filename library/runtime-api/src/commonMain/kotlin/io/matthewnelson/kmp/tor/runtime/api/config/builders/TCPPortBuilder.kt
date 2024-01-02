@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Matthew Nelson
+ * Copyright (c) 2024 Matthew Nelson
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,13 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-package io.matthewnelson.kmp.tor.runtime.api.config
+package io.matthewnelson.kmp.tor.runtime.api.config.builders
 
 import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
 import io.matthewnelson.kmp.tor.core.api.annotation.KmpTorDsl
 import io.matthewnelson.kmp.tor.runtime.api.ThisBlock
 import io.matthewnelson.kmp.tor.runtime.api.address.Port
 import io.matthewnelson.kmp.tor.runtime.api.apply
+import io.matthewnelson.kmp.tor.runtime.api.config.TorConfig
 import kotlin.jvm.JvmField
 import kotlin.jvm.JvmName
 import kotlin.jvm.JvmSynthetic
@@ -133,7 +134,7 @@ public sealed class TCPPortBuilder private constructor() {
     }
 
     @InternalKmpTorApi
-    public sealed interface DSL<T: TCPPortBuilder, R: Any> {
+    public interface DSL<T: TCPPortBuilder, R: Any> {
 
         /**
          * For a [TorConfig.Keyword] that can be configured to use
@@ -146,7 +147,7 @@ public sealed class TCPPortBuilder private constructor() {
     }
 
     @InternalKmpTorApi
-    public sealed interface DSLAuto<out R: Any> {
+    public interface DSLAuto<out R: Any> {
 
         /**
          * Sets the port to "auto", indicating that Tor should
@@ -157,7 +158,7 @@ public sealed class TCPPortBuilder private constructor() {
     }
 
     @InternalKmpTorApi
-    public sealed interface DSLDisable<out R: Any> {
+    public interface DSLDisable<out R: Any> {
 
         /**
          * Disables the [TorConfig.Keyword] by setting its port
@@ -170,7 +171,7 @@ public sealed class TCPPortBuilder private constructor() {
     // TODO: IPAddress/Localhost
 
     @InternalKmpTorApi
-    public sealed interface DSLPort<out R: Any> {
+    public interface DSLPort<out R: Any> {
 
         /**
          * Specify a port

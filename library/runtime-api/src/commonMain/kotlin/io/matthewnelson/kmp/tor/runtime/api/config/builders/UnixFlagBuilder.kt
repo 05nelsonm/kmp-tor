@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Matthew Nelson
+ * Copyright (c) 2024 Matthew Nelson
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,12 +15,13 @@
  **/
 @file:Suppress("FunctionName", "PropertyName")
 
-package io.matthewnelson.kmp.tor.runtime.api.config
+package io.matthewnelson.kmp.tor.runtime.api.config.builders
 
 import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
 import io.matthewnelson.kmp.tor.core.api.annotation.KmpTorDsl
 import io.matthewnelson.kmp.tor.runtime.api.ThisBlock
 import io.matthewnelson.kmp.tor.runtime.api.apply
+import io.matthewnelson.kmp.tor.runtime.api.config.TorConfig
 import kotlin.jvm.JvmField
 import kotlin.jvm.JvmSynthetic
 
@@ -53,7 +54,7 @@ public class UnixFlagBuilder private constructor() {
     public var RelaxDirModeCheck: Boolean? = null
 
     @InternalKmpTorApi
-    public sealed interface DSL<out R: Any> {
+    public interface DSL<out R: Any> {
 
         /**
          * For [TorConfig.__ControlPort] and [TorConfig.__SocksPort].
@@ -73,6 +74,7 @@ public class UnixFlagBuilder private constructor() {
             block: ThisBlock<UnixFlagBuilder>,
         ) {
             val b = UnixFlagBuilder().apply(block)
+
             b.GroupWritable?.let {
                 val flag = "GroupWritable"
                 if (it) flags.add(flag) else flags.remove(flag)

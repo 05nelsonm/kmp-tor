@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Matthew Nelson
+ * Copyright (c) 2024 Matthew Nelson
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,7 @@
  **/
 @file:Suppress("FunctionName", "PropertyName")
 
-package io.matthewnelson.kmp.tor.runtime.api.config
+package io.matthewnelson.kmp.tor.runtime.api.config.builders
 
 import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
 import io.matthewnelson.kmp.tor.core.api.annotation.KmpTorDsl
@@ -64,7 +64,7 @@ public class IsolationFlagBuilder private constructor() {
     }
 
     @InternalKmpTorApi
-    public sealed interface DSL<out R: Any> {
+    public interface DSL<out R: Any> {
 
         @KmpTorDsl
         public fun isolationFlags(
@@ -80,6 +80,7 @@ public class IsolationFlagBuilder private constructor() {
             block: ThisBlock<IsolationFlagBuilder>,
         ) {
             val b = IsolationFlagBuilder().apply(block)
+
             b.IsolateClientAddr?.let {
                 val flag = "IsolateClientAddr"
                 if (it) flags.add(flag) else flags.remove(flag)
