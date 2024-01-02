@@ -145,4 +145,25 @@ class SettingUnitTest {
         assertEquals(a.hashCode(), b.hashCode())
         assertEquals(1, setOf(a, b).size)
     }
+
+    @Test
+    fun givenEqualsHash_whenHiddenServiceDifferentDirectory_thenAreDifferent() {
+        val a = TorConfig.HiddenServiceDir.Builder {
+            directory = ".".toFile()
+            port { virtual = 80.toPort() }
+            port { virtual = 443.toPort() }
+            version { HSv(3) }
+        }!!
+        val b = TorConfig.HiddenServiceDir.Builder {
+            directory = "/some/random/path".toFile()
+            port { virtual = 80.toPort() }
+            version { HSv(3) }
+        }!!
+
+        assertNotEquals(a, b)
+        assertNotEquals(a.argument, b.argument)
+        assertNotEquals(a.items, b.items)
+        assertNotEquals(a.hashCode(), b.hashCode())
+        assertEquals(2, setOf(a, b).size)
+    }
 }
