@@ -48,12 +48,19 @@ internal actual val UnixSocketsNotSupportedMessage: String? by lazy {
 
 @get:JvmSynthetic
 @OptIn(InternalKmpTorApi::class)
-internal actual val IsUnixLikeHost: Boolean by lazy {
-    when (OSInfo.INSTANCE.osHost) {
+internal actual val IsUnixLikeHost: Boolean get() {
+    return when (OSInfo.INSTANCE.osHost) {
         is OSHost.FreeBSD,
         is OSHost.Linux,
         is OSHost.MacOS -> true
         is OSHost.Windows -> false
         else -> SysPathSep == '/'
     }
+}
+
+@get:JvmSynthetic
+@OptIn(InternalKmpTorApi::class)
+internal actual val IsAndroidHost: Boolean get() {
+    // Could be Java running on Android via Termux
+    return OSInfo.INSTANCE.osHost is OSHost.Linux.Android
 }

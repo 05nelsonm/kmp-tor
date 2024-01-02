@@ -175,6 +175,13 @@ public final class io/matthewnelson/kmp/tor/runtime/api/config/TorConfig {
 	public fun toString ()Ljava/lang/String;
 }
 
+public final class io/matthewnelson/kmp/tor/runtime/api/config/TorConfig$AndroidIdentityTag {
+	public static final field Companion Lio/matthewnelson/kmp/tor/runtime/api/config/TorConfig$AndroidIdentityTag$Companion;
+}
+
+public final class io/matthewnelson/kmp/tor/runtime/api/config/TorConfig$AndroidIdentityTag$Companion : io/matthewnelson/kmp/tor/runtime/api/config/TorConfig$Keyword {
+}
+
 public final class io/matthewnelson/kmp/tor/runtime/api/config/TorConfig$AutomapHostsOnResolve : io/matthewnelson/kmp/tor/runtime/api/config/TorConfig$Setting$Builder {
 	public static final field Companion Lio/matthewnelson/kmp/tor/runtime/api/config/TorConfig$AutomapHostsOnResolve$Companion;
 	public field enable Z
@@ -465,6 +472,13 @@ public final class io/matthewnelson/kmp/tor/runtime/api/config/TorConfig$Keyword
 
 public final class io/matthewnelson/kmp/tor/runtime/api/config/TorConfig$Keyword$Attribute$HiddenService : io/matthewnelson/kmp/tor/runtime/api/config/TorConfig$Keyword$Attribute {
 	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/api/config/TorConfig$Keyword$Attribute$HiddenService;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/matthewnelson/kmp/tor/runtime/api/config/TorConfig$Keyword$Attribute$Logging : io/matthewnelson/kmp/tor/runtime/api/config/TorConfig$Keyword$Attribute {
+	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/api/config/TorConfig$Keyword$Attribute$Logging;
 	public fun equals (Ljava/lang/Object;)Z
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;

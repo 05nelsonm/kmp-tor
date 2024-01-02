@@ -18,3 +18,5 @@ package io.matthewnelson.kmp.tor.runtime.api.internal
 internal expect val UnixSocketsNotSupportedMessage: String?
 
 internal expect val IsUnixLikeHost: Boolean
+
+internal expect val IsAndroidHost: Boolean

@@ -34,6 +34,7 @@ import io.matthewnelson.kmp.tor.runtime.api.config.TorConfig.LineItem.Companion.
 import io.matthewnelson.kmp.tor.runtime.api.config.TorConfig.Setting.Companion.filterByAttribute
 import io.matthewnelson.kmp.tor.runtime.api.config.TorConfig.Setting.Companion.filterByKeyword
 import io.matthewnelson.kmp.tor.runtime.api.config.builders.*
+import io.matthewnelson.kmp.tor.runtime.api.internal.IsAndroidHost
 import io.matthewnelson.kmp.tor.runtime.api.internal.IsUnixLikeHost
 import io.matthewnelson.kmp.tor.runtime.api.internal.normalizedAbsolutePath
 import io.matthewnelson.kmp.tor.runtime.api.internal.toByte
@@ -1552,23 +1553,59 @@ public class TorConfig private constructor(
     ) {
 
         /**
-         * TODO: write constraints
+         * Acceptable Tag Constraints:
+         *  - Characters: a-z
+         *  - Characters: A-Z
+         *  - Characters: 0-9
+         *  - Character: _
+         *  - Character Range: 1 to 19 (inclusive)
+         *
+         * `null` will be returned if the above constraints
+         * are not met.
          * */
         @JvmField
         public var tag: String? = null
 
         public companion object: Setting.Factory<SyslogIdentityTag, Setting?>(
             name = "SyslogIdentityTag",
-            attributes = emptySet(),
+            attributes = immutableSetOf(Attribute.Logging),
             isStartArgument = true,
             isUnique = true,
             factory = { SyslogIdentityTag() },
             build = {
                 tag?.let { tag ->
-                    // TODO: parse tag (line length limitation on Android)
-                    build(tag)
+                    @Suppress("RedundantCompanionReference")
+                    if (!tag.matches(Companion.REGEX)) return@let null
+
+                    val others = if (IsAndroidHost) {
+                        setOf(AndroidIdentityTag.toLineItem(tag)!!)
+                    } else {
+                        emptySet()
+                    }
+
+                    build(tag, others = others)
                 }
             },
+        ) {
+
+            // Max length is 23 - "tor-".length
+            // Android's max Log tag length is 23 characters
+            private val REGEX = "[a-zA-Z0-9_]{1,19}".toRegex()
+        }
+    }
+
+    /**
+     * This is automatically added via [SyslogIdentityTag] as a second
+     * [Setting.items] if Android Runtime is observed.
+     *
+     * [AndroidIdentityTag](https://2019.www.torproject.org/docs/tor-manual.html.en#AndroidIdentityTag)
+     * */
+    public class AndroidIdentityTag private constructor() {
+        public companion object: Keyword(
+            name = "AndroidIdentityTag",
+            attributes = immutableSetOf(Attribute.Logging),
+            isStartArgument = true,
+            isUnique = true
         )
     }
 
@@ -1662,7 +1699,11 @@ public class TorConfig private constructor(
             attrs.contains(Attribute.File)
             || attrs.contains(Attribute.Directory)
         }
-        private val isPortAutoOrDisabled = if (isPort) argument == "0" || argument == AUTO else false
+        private val isPortAutoOrDisabled = if (isPort) {
+            argument == "0" || argument == AUTO
+        } else {
+            false
+        }
 
         public override fun equals(other: Any?): Boolean {
             if (other !is LineItem) return false
@@ -1738,17 +1779,17 @@ public class TorConfig private constructor(
             @JvmSynthetic
             internal fun Keyword.toLineItem(
                 argument: String?,
-                optionals: Set<String>? = null,
+                optionals: Set<String> = emptySet(),
             ): LineItem? {
                 if (argument.isNullOrBlank()) return null
                 if (argument.lines().size != 1) return null
 
-                optionals?.forEach {
+                optionals.forEach {
                     if (it.isBlank()) return null
                     if (it.lines().size != 1) return null
                 }
 
-                return LineItem(this, argument, optionals?.toImmutableSet() ?: emptySet())
+                return LineItem(this, argument, optionals.toImmutableSet())
             }
         }
     }
@@ -1980,6 +2021,7 @@ public class TorConfig private constructor(
             public data object Directory: Attribute()
             public data object File: Attribute()
             public data object HiddenService: Attribute()
+            public data object Logging: Attribute()
             public data object Port: Attribute()
             public data object UnixSocket: Attribute()
         }

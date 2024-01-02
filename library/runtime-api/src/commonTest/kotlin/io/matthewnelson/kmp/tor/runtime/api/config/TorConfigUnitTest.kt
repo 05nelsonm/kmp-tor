@@ -53,6 +53,11 @@ class TorConfigUnitTest {
     }
 
     @Test
+    fun lll() {
+        val r = "[a-zA-Z0-9_]{1,23}".toRegex()
+        println(" ".matches(r))
+    }
+    @Test
     fun givenUniqueKeyword_whenMultipleExpressions_thenLastConfiguredRemovesFirst() {
         val settings = TorConfig.Builder {
             add(TorConfig.RunAsDaemon) { enable = true }
