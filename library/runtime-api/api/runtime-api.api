@@ -288,10 +288,10 @@ public final class io/matthewnelson/kmp/tor/runtime/api/config/TorConfig$Dormant
 
 public final class io/matthewnelson/kmp/tor/runtime/api/config/TorConfig$DormantClientTimeout : io/matthewnelson/kmp/tor/runtime/api/config/TorConfig$Setting$Builder {
 	public static final field Companion Lio/matthewnelson/kmp/tor/runtime/api/config/TorConfig$DormantClientTimeout$Companion;
-	public final fun argument ()Ljava/lang/String;
 	public final fun days (I)Lio/matthewnelson/kmp/tor/runtime/api/config/TorConfig$DormantClientTimeout;
 	public final fun hours (I)Lio/matthewnelson/kmp/tor/runtime/api/config/TorConfig$DormantClientTimeout;
 	public final fun minutes (I)Lio/matthewnelson/kmp/tor/runtime/api/config/TorConfig$DormantClientTimeout;
+	public final fun timeout ()Ljava/lang/String;
 	public final fun weeks (I)Lio/matthewnelson/kmp/tor/runtime/api/config/TorConfig$DormantClientTimeout;
 }
 
@@ -308,7 +308,7 @@ public final class io/matthewnelson/kmp/tor/runtime/api/config/TorConfig$Dormant
 
 public final class io/matthewnelson/kmp/tor/runtime/api/config/TorConfig$DormantTimeoutDisabledByIdleStreams : io/matthewnelson/kmp/tor/runtime/api/config/TorConfig$Setting$Builder {
 	public static final field Companion Lio/matthewnelson/kmp/tor/runtime/api/config/TorConfig$DormantTimeoutDisabledByIdleStreams$Companion;
-	public field disable Z
+	public field enable Z
 }
 
 public final class io/matthewnelson/kmp/tor/runtime/api/config/TorConfig$DormantTimeoutDisabledByIdleStreams$Companion : io/matthewnelson/kmp/tor/runtime/api/config/TorConfig$Setting$Factory {
@@ -404,12 +404,14 @@ public final class io/matthewnelson/kmp/tor/runtime/api/config/TorConfig$HiddenS
 public final class io/matthewnelson/kmp/tor/runtime/api/config/TorConfig$HiddenServiceNumIntroductionPoints$Companion : io/matthewnelson/kmp/tor/runtime/api/config/TorConfig$Keyword {
 }
 
-public final class io/matthewnelson/kmp/tor/runtime/api/config/TorConfig$HiddenServicePort {
+public final class io/matthewnelson/kmp/tor/runtime/api/config/TorConfig$HiddenServicePort : io/matthewnelson/kmp/tor/runtime/api/config/builders/TCPPortBuilder$DSL, io/matthewnelson/kmp/tor/runtime/api/config/builders/UnixSocketBuilder$DSL {
 	public static final field Companion Lio/matthewnelson/kmp/tor/runtime/api/config/TorConfig$HiddenServicePort$Companion;
-	public static final field DEFAULT_NAME Ljava/lang/String;
 	public field virtual Lio/matthewnelson/kmp/tor/runtime/api/address/Port;
-	public final fun target ()Ljava/lang/String;
-	public final fun targetPort (Lio/matthewnelson/kmp/tor/runtime/api/ThisBlock;)Lio/matthewnelson/kmp/tor/runtime/api/config/TorConfig$HiddenServicePort;
+	public fun asPort (Lio/matthewnelson/kmp/tor/runtime/api/ThisBlock;)Lio/matthewnelson/kmp/tor/runtime/api/config/TorConfig$HiddenServicePort;
+	public synthetic fun asPort (Lio/matthewnelson/kmp/tor/runtime/api/ThisBlock;)Ljava/lang/Object;
+	public fun asUnixSocket (Lio/matthewnelson/kmp/tor/runtime/api/ThisBlock;)Lio/matthewnelson/kmp/tor/runtime/api/config/TorConfig$HiddenServicePort;
+	public synthetic fun asUnixSocket (Lio/matthewnelson/kmp/tor/runtime/api/ThisBlock;)Ljava/lang/Object;
+	public final fun targetArgument ()Ljava/lang/String;
 }
 
 public final class io/matthewnelson/kmp/tor/runtime/api/config/TorConfig$HiddenServicePort$Companion : io/matthewnelson/kmp/tor/runtime/api/config/TorConfig$Keyword {
@@ -426,7 +428,6 @@ public final class io/matthewnelson/kmp/tor/runtime/api/config/TorConfig$HiddenS
 }
 
 public abstract class io/matthewnelson/kmp/tor/runtime/api/config/TorConfig$Keyword : java/lang/CharSequence, java/lang/Comparable {
-	public static final field Companion Lio/matthewnelson/kmp/tor/runtime/api/config/TorConfig$Keyword$Companion;
 	public final field attributes Ljava/util/Set;
 	public final field isStartArgument Z
 	public final field isUnique Z
@@ -483,14 +484,14 @@ public final class io/matthewnelson/kmp/tor/runtime/api/config/TorConfig$Keyword
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/matthewnelson/kmp/tor/runtime/api/config/TorConfig$Keyword$Companion {
-}
-
 public final class io/matthewnelson/kmp/tor/runtime/api/config/TorConfig$LineItem {
 	public final field argument Ljava/lang/String;
-	public final field extras Ljava/util/Set;
 	public final field keyword Lio/matthewnelson/kmp/tor/runtime/api/config/TorConfig$Keyword;
+	public final field optionals Ljava/util/Set;
 	public synthetic fun <init> (Lio/matthewnelson/kmp/tor/runtime/api/config/TorConfig$Keyword;Ljava/lang/String;Ljava/util/Set;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public fun equals (Ljava/lang/Object;)Z
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
 }
 
 public final class io/matthewnelson/kmp/tor/runtime/api/config/TorConfig$RunAsDaemon : io/matthewnelson/kmp/tor/runtime/api/config/TorConfig$Setting$Builder {
@@ -502,14 +503,15 @@ public final class io/matthewnelson/kmp/tor/runtime/api/config/TorConfig$RunAsDa
 }
 
 public final class io/matthewnelson/kmp/tor/runtime/api/config/TorConfig$Setting {
+	public static final field Companion Lio/matthewnelson/kmp/tor/runtime/api/config/TorConfig$Setting$Companion;
 	public final field extraInfo Ljava/util/Map;
 	public final field items Ljava/util/Set;
 	public synthetic fun <init> (Ljava/util/Set;Ljava/util/Map;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
 	public final fun argument ()Ljava/lang/String;
 	public fun equals (Ljava/lang/Object;)Z
-	public final fun extras ()Ljava/util/Set;
 	public fun hashCode ()I
 	public final fun keyword ()Lio/matthewnelson/kmp/tor/runtime/api/config/TorConfig$Keyword;
+	public final fun optionals ()Ljava/util/Set;
 	public fun toString ()Ljava/lang/String;
 }
 
@@ -518,6 +520,9 @@ public abstract class io/matthewnelson/kmp/tor/runtime/api/config/TorConfig$Sett
 	public synthetic fun <init> (Lio/matthewnelson/kmp/tor/runtime/api/config/TorConfig$Keyword;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
 	protected final fun build (Ljava/lang/String;Ljava/util/Set;Ljava/util/Set;Ljava/util/Map;)Lio/matthewnelson/kmp/tor/runtime/api/config/TorConfig$Setting;
 	public static synthetic fun build$default (Lio/matthewnelson/kmp/tor/runtime/api/config/TorConfig$Setting$Builder;Ljava/lang/String;Ljava/util/Set;Ljava/util/Set;Ljava/util/Map;ILjava/lang/Object;)Lio/matthewnelson/kmp/tor/runtime/api/config/TorConfig$Setting;
+}
+
+public final class io/matthewnelson/kmp/tor/runtime/api/config/TorConfig$Setting$Companion {
 }
 
 public abstract class io/matthewnelson/kmp/tor/runtime/api/config/TorConfig$Setting$Factory : io/matthewnelson/kmp/tor/runtime/api/config/TorConfig$Keyword {
@@ -551,12 +556,13 @@ public final class io/matthewnelson/kmp/tor/runtime/api/config/TorConfig$Virtual
 public final class io/matthewnelson/kmp/tor/runtime/api/config/TorConfig$VirtualAddrNetworkIPv6$Companion : io/matthewnelson/kmp/tor/runtime/api/config/TorConfig$Setting$Factory {
 }
 
-public final class io/matthewnelson/kmp/tor/runtime/api/config/TorConfig$__ControlPort : io/matthewnelson/kmp/tor/runtime/api/config/TorConfig$Setting$Builder, io/matthewnelson/kmp/tor/runtime/api/config/builders/TCPPortBuilder$DSL, io/matthewnelson/kmp/tor/runtime/api/config/builders/UnixFlagBuilder$DSL {
+public final class io/matthewnelson/kmp/tor/runtime/api/config/TorConfig$__ControlPort : io/matthewnelson/kmp/tor/runtime/api/config/TorConfig$Setting$Builder, io/matthewnelson/kmp/tor/runtime/api/config/builders/TCPPortBuilder$DSL, io/matthewnelson/kmp/tor/runtime/api/config/builders/UnixFlagBuilder$DSL, io/matthewnelson/kmp/tor/runtime/api/config/builders/UnixSocketBuilder$DSL {
 	public static final field Companion Lio/matthewnelson/kmp/tor/runtime/api/config/TorConfig$__ControlPort$Companion;
-	public static final field DEFAULT_NAME Ljava/lang/String;
 	public final fun argument ()Ljava/lang/String;
 	public fun asPort (Lio/matthewnelson/kmp/tor/runtime/api/ThisBlock;)Lio/matthewnelson/kmp/tor/runtime/api/config/TorConfig$__ControlPort;
 	public synthetic fun asPort (Lio/matthewnelson/kmp/tor/runtime/api/ThisBlock;)Ljava/lang/Object;
+	public fun asUnixSocket (Lio/matthewnelson/kmp/tor/runtime/api/ThisBlock;)Lio/matthewnelson/kmp/tor/runtime/api/config/TorConfig$__ControlPort;
+	public synthetic fun asUnixSocket (Lio/matthewnelson/kmp/tor/runtime/api/ThisBlock;)Ljava/lang/Object;
 	public final fun unixFlags ()Ljava/util/Set;
 	public fun unixFlags (Lio/matthewnelson/kmp/tor/runtime/api/ThisBlock;)Lio/matthewnelson/kmp/tor/runtime/api/config/TorConfig$__ControlPort;
 	public synthetic fun unixFlags (Lio/matthewnelson/kmp/tor/runtime/api/ThisBlock;)Ljava/lang/Object;
@@ -567,7 +573,6 @@ public final class io/matthewnelson/kmp/tor/runtime/api/config/TorConfig$__Contr
 
 public final class io/matthewnelson/kmp/tor/runtime/api/config/TorConfig$__DNSPort : io/matthewnelson/kmp/tor/runtime/api/config/TorConfig$Setting$Builder, io/matthewnelson/kmp/tor/runtime/api/config/builders/IsolationFlagBuilder$DSL, io/matthewnelson/kmp/tor/runtime/api/config/builders/TCPPortBuilder$DSLAuto, io/matthewnelson/kmp/tor/runtime/api/config/builders/TCPPortBuilder$DSLDisable, io/matthewnelson/kmp/tor/runtime/api/config/builders/TCPPortBuilder$DSLPort {
 	public static final field Companion Lio/matthewnelson/kmp/tor/runtime/api/config/TorConfig$__DNSPort$Companion;
-	public final fun argument ()Ljava/lang/String;
 	public fun auto ()Lio/matthewnelson/kmp/tor/runtime/api/config/TorConfig$__DNSPort;
 	public synthetic fun auto ()Ljava/lang/Object;
 	public fun disable ()Lio/matthewnelson/kmp/tor/runtime/api/config/TorConfig$__DNSPort;
@@ -575,6 +580,7 @@ public final class io/matthewnelson/kmp/tor/runtime/api/config/TorConfig$__DNSPo
 	public final fun isolationFlags ()Ljava/util/Set;
 	public fun isolationFlags (Lio/matthewnelson/kmp/tor/runtime/api/ThisBlock;)Lio/matthewnelson/kmp/tor/runtime/api/config/TorConfig$__DNSPort;
 	public synthetic fun isolationFlags (Lio/matthewnelson/kmp/tor/runtime/api/ThisBlock;)Ljava/lang/Object;
+	public final fun port ()Ljava/lang/String;
 	public fun port (Lio/matthewnelson/kmp/tor/runtime/api/address/Port$Proxy;)Lio/matthewnelson/kmp/tor/runtime/api/config/TorConfig$__DNSPort;
 	public synthetic fun port (Lio/matthewnelson/kmp/tor/runtime/api/address/Port$Proxy;)Ljava/lang/Object;
 }
@@ -584,7 +590,6 @@ public final class io/matthewnelson/kmp/tor/runtime/api/config/TorConfig$__DNSPo
 
 public final class io/matthewnelson/kmp/tor/runtime/api/config/TorConfig$__HTTPTunnelPort : io/matthewnelson/kmp/tor/runtime/api/config/TorConfig$Setting$Builder, io/matthewnelson/kmp/tor/runtime/api/config/builders/IsolationFlagBuilder$DSL, io/matthewnelson/kmp/tor/runtime/api/config/builders/TCPPortBuilder$DSLAuto, io/matthewnelson/kmp/tor/runtime/api/config/builders/TCPPortBuilder$DSLDisable, io/matthewnelson/kmp/tor/runtime/api/config/builders/TCPPortBuilder$DSLPort {
 	public static final field Companion Lio/matthewnelson/kmp/tor/runtime/api/config/TorConfig$__HTTPTunnelPort$Companion;
-	public final fun argument ()Ljava/lang/String;
 	public fun auto ()Lio/matthewnelson/kmp/tor/runtime/api/config/TorConfig$__HTTPTunnelPort;
 	public synthetic fun auto ()Ljava/lang/Object;
 	public fun disable ()Lio/matthewnelson/kmp/tor/runtime/api/config/TorConfig$__HTTPTunnelPort;
@@ -592,6 +597,7 @@ public final class io/matthewnelson/kmp/tor/runtime/api/config/TorConfig$__HTTPT
 	public final fun isolationFlags ()Ljava/util/Set;
 	public fun isolationFlags (Lio/matthewnelson/kmp/tor/runtime/api/ThisBlock;)Lio/matthewnelson/kmp/tor/runtime/api/config/TorConfig$__HTTPTunnelPort;
 	public synthetic fun isolationFlags (Lio/matthewnelson/kmp/tor/runtime/api/ThisBlock;)Ljava/lang/Object;
+	public final fun port ()Ljava/lang/String;
 	public fun port (Lio/matthewnelson/kmp/tor/runtime/api/address/Port$Proxy;)Lio/matthewnelson/kmp/tor/runtime/api/config/TorConfig$__HTTPTunnelPort;
 	public synthetic fun port (Lio/matthewnelson/kmp/tor/runtime/api/address/Port$Proxy;)Ljava/lang/Object;
 }
@@ -607,12 +613,13 @@ public final class io/matthewnelson/kmp/tor/runtime/api/config/TorConfig$__Ownin
 public final class io/matthewnelson/kmp/tor/runtime/api/config/TorConfig$__OwningControllerProcess$Companion : io/matthewnelson/kmp/tor/runtime/api/config/TorConfig$Setting$Factory {
 }
 
-public final class io/matthewnelson/kmp/tor/runtime/api/config/TorConfig$__SocksPort : io/matthewnelson/kmp/tor/runtime/api/config/TorConfig$Setting$Builder, io/matthewnelson/kmp/tor/runtime/api/config/builders/IsolationFlagBuilder$DSL, io/matthewnelson/kmp/tor/runtime/api/config/builders/TCPPortBuilder$DSL, io/matthewnelson/kmp/tor/runtime/api/config/builders/UnixFlagBuilder$DSL {
+public final class io/matthewnelson/kmp/tor/runtime/api/config/TorConfig$__SocksPort : io/matthewnelson/kmp/tor/runtime/api/config/TorConfig$Setting$Builder, io/matthewnelson/kmp/tor/runtime/api/config/builders/IsolationFlagBuilder$DSL, io/matthewnelson/kmp/tor/runtime/api/config/builders/TCPPortBuilder$DSL, io/matthewnelson/kmp/tor/runtime/api/config/builders/UnixFlagBuilder$DSL, io/matthewnelson/kmp/tor/runtime/api/config/builders/UnixSocketBuilder$DSL {
 	public static final field Companion Lio/matthewnelson/kmp/tor/runtime/api/config/TorConfig$__SocksPort$Companion;
-	public static final field DEFAULT_NAME Ljava/lang/String;
 	public final fun argument ()Ljava/lang/String;
 	public fun asPort (Lio/matthewnelson/kmp/tor/runtime/api/ThisBlock;)Lio/matthewnelson/kmp/tor/runtime/api/config/TorConfig$__SocksPort;
 	public synthetic fun asPort (Lio/matthewnelson/kmp/tor/runtime/api/ThisBlock;)Ljava/lang/Object;
+	public fun asUnixSocket (Lio/matthewnelson/kmp/tor/runtime/api/ThisBlock;)Lio/matthewnelson/kmp/tor/runtime/api/config/TorConfig$__SocksPort;
+	public synthetic fun asUnixSocket (Lio/matthewnelson/kmp/tor/runtime/api/ThisBlock;)Ljava/lang/Object;
 	public final fun isolationFlags ()Ljava/util/Set;
 	public fun isolationFlags (Lio/matthewnelson/kmp/tor/runtime/api/ThisBlock;)Lio/matthewnelson/kmp/tor/runtime/api/config/TorConfig$__SocksPort;
 	public synthetic fun isolationFlags (Lio/matthewnelson/kmp/tor/runtime/api/ThisBlock;)Ljava/lang/Object;
@@ -628,7 +635,6 @@ public final class io/matthewnelson/kmp/tor/runtime/api/config/TorConfig$__Socks
 
 public final class io/matthewnelson/kmp/tor/runtime/api/config/TorConfig$__TransPort : io/matthewnelson/kmp/tor/runtime/api/config/TorConfig$Setting$Builder, io/matthewnelson/kmp/tor/runtime/api/config/builders/IsolationFlagBuilder$DSL, io/matthewnelson/kmp/tor/runtime/api/config/builders/TCPPortBuilder$DSLAuto, io/matthewnelson/kmp/tor/runtime/api/config/builders/TCPPortBuilder$DSLDisable, io/matthewnelson/kmp/tor/runtime/api/config/builders/TCPPortBuilder$DSLPort {
 	public static final field Companion Lio/matthewnelson/kmp/tor/runtime/api/config/TorConfig$__TransPort$Companion;
-	public final fun argument ()Ljava/lang/String;
 	public fun auto ()Lio/matthewnelson/kmp/tor/runtime/api/config/TorConfig$__TransPort;
 	public synthetic fun auto ()Ljava/lang/Object;
 	public fun disable ()Lio/matthewnelson/kmp/tor/runtime/api/config/TorConfig$__TransPort;
@@ -636,6 +642,7 @@ public final class io/matthewnelson/kmp/tor/runtime/api/config/TorConfig$__Trans
 	public final fun isolationFlags ()Ljava/util/Set;
 	public fun isolationFlags (Lio/matthewnelson/kmp/tor/runtime/api/ThisBlock;)Lio/matthewnelson/kmp/tor/runtime/api/config/TorConfig$__TransPort;
 	public synthetic fun isolationFlags (Lio/matthewnelson/kmp/tor/runtime/api/ThisBlock;)Ljava/lang/Object;
+	public final fun port ()Ljava/lang/String;
 	public fun port (Lio/matthewnelson/kmp/tor/runtime/api/address/Port$Proxy;)Lio/matthewnelson/kmp/tor/runtime/api/config/TorConfig$__TransPort;
 	public synthetic fun port (Lio/matthewnelson/kmp/tor/runtime/api/address/Port$Proxy;)Ljava/lang/Object;
 }
@@ -699,6 +706,17 @@ public final class io/matthewnelson/kmp/tor/runtime/api/config/builders/UnixFlag
 	public field GroupWritable Ljava/lang/Boolean;
 	public field RelaxDirModeCheck Ljava/lang/Boolean;
 	public field WorldWritable Ljava/lang/Boolean;
+}
+
+public final class io/matthewnelson/kmp/tor/runtime/api/config/builders/UnixSocketBuilder {
+	public static final field Companion Lio/matthewnelson/kmp/tor/runtime/api/config/builders/UnixSocketBuilder$Companion;
+	public static final field DEFAULT_NAME_CTRL Ljava/lang/String;
+	public static final field DEFAULT_NAME_HS Ljava/lang/String;
+	public static final field DEFAULT_NAME_SOCKS Ljava/lang/String;
+	public field file Ljava/io/File;
+}
+
+public final class io/matthewnelson/kmp/tor/runtime/api/config/builders/UnixSocketBuilder$Companion {
 }
 
 public final class io/matthewnelson/kmp/tor/runtime/api/key/AddressKey {
