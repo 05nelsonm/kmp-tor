@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-@file:Suppress("FunctionName")
+@file:Suppress("FunctionName", "PropertyName")
 
 package io.matthewnelson.kmp.tor.runtime.api.config
 
@@ -21,73 +21,44 @@ import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
 import io.matthewnelson.kmp.tor.core.api.annotation.KmpTorDsl
 import io.matthewnelson.kmp.tor.runtime.api.ThisBlock
 import io.matthewnelson.kmp.tor.runtime.api.apply
+import kotlin.jvm.JvmField
 import kotlin.jvm.JvmSynthetic
 
 /**
+ * Configure a Ports Isolation Flags
+ *
+ * - `null`  - no action (default)
+ * - `true`  - add the flag if not present
+ * - `false` - remove the flag if present
+ *
  * [SocksPort](https://2019.www.torproject.org/docs/tor-manual.html.en#SocksPort)
  * */
 @KmpTorDsl
-public class IsolationFlagBuilder private constructor(private val flags: MutableSet<String>) {
+public class IsolationFlagBuilder private constructor() {
 
-    // To inhibit modification after closure
-    private var isConfigured: Boolean = false
-    // negative number to disable
-    private var sessionGroupId: Int = -1
+    @JvmField
+    public var IsolateClientAddr: Boolean? = null
+    @JvmField
+    public var IsolateSOCKSAuth: Boolean? = null
+    @JvmField
+    public var IsolateClientProtocol: Boolean? = null
+    @JvmField
+    public var IsolateDestPort: Boolean? = null
+    @JvmField
+    public var IsolateDestAddr: Boolean? = null
+    @JvmField
+    public var KeepAliveIsolateSOCKSAuth: Boolean? = null
 
-    @KmpTorDsl
-    public fun IsolateClientAddr(): IsolationFlagBuilder {
-        if (isConfigured) return this
-        flags.add("IsolateClientAddr")
-        return this
-    }
-
-    @KmpTorDsl
-    public fun IsolateSOCKSAuth(): IsolationFlagBuilder {
-        if (isConfigured) return this
-        flags.add("IsolateSOCKSAuth")
-        return this
-    }
-
-    @KmpTorDsl
-    public fun IsolateClientProtocol(): IsolationFlagBuilder {
-        if (isConfigured) return this
-        flags.add("IsolateClientProtocol")
-        return this
-    }
-
-    @KmpTorDsl
-    public fun IsolateDestPort(): IsolationFlagBuilder {
-        if (isConfigured) return this
-        flags.add("IsolateDestPort")
-        return this
-    }
-
-    @KmpTorDsl
-    public fun IsolateDestAddr(): IsolationFlagBuilder {
-        if (isConfigured) return this
-        flags.add("IsolateDestAddr")
-        return this
-    }
-
-    @KmpTorDsl
-    public fun KeepAliveIsolateSOCKSAuth(): IsolationFlagBuilder {
-        if (isConfigured) return this
-        flags.add("KeepAliveIsolateSOCKSAuth")
-        return this
-    }
+    private var sessionGroupId: Int? = null
 
     /**
-     * Declaring an [id] greater than or equal to 0 enables the flag.
+     * Declaring an id greater than or equal to 0 will add
+     * the flag.
      *
-     * Declaring a negative [id] will disable the flag (the default).
+     * Declaring an id less than 0 will remove flag if present.
      * */
     @KmpTorDsl
     public fun SessionGroup(id: Int): IsolationFlagBuilder {
-        if (isConfigured) return this
-        flags.firstOrNull {
-            it.startsWith("SessionGroup=")
-        }?.let { flags.remove(it) }
-
         sessionGroupId = id
         return this
     }
@@ -108,9 +79,38 @@ public class IsolationFlagBuilder private constructor(private val flags: Mutable
             flags: MutableSet<String>,
             block: ThisBlock<IsolationFlagBuilder>,
         ) {
-            val b = IsolationFlagBuilder(flags).apply(block)
-            b.isConfigured = true
-            b.sessionGroupId.let { id -> if (id >= 0) flags.add("SessionGroup=$id") }
+            val b = IsolationFlagBuilder().apply(block)
+            b.IsolateClientAddr?.let {
+                val flag = "IsolateClientAddr"
+                if (it) flags.add(flag) else flags.remove(flag)
+            }
+            b.IsolateSOCKSAuth?.let {
+                val flag = "IsolateSOCKSAuth"
+                if (it) flags.add(flag) else flags.remove(flag)
+            }
+            b.IsolateClientProtocol?.let {
+                val flag = "IsolateClientProtocol"
+                if (it) flags.add(flag) else flags.remove(flag)
+            }
+            b.IsolateDestPort?.let {
+                val flag = "IsolateDestPort"
+                if (it) flags.add(flag) else flags.remove(flag)
+            }
+            b.IsolateDestAddr?.let {
+                val flag = "IsolateDestAddr"
+                if (it) flags.add(flag) else flags.remove(flag)
+            }
+            b.KeepAliveIsolateSOCKSAuth?.let {
+                val flag = "KeepAliveIsolateSOCKSAuth"
+                if (it) flags.add(flag) else flags.remove(flag)
+            }
+            b.sessionGroupId?.let { id ->
+                val flag = "SessionGroup"
+                // always remove
+                flags.firstOrNull { it.startsWith(flag) }?.let { flags.remove(it) }
+                // only add if positive
+                if (id >= 0) flags.add("$flag=$id")
+            }
         }
     }
 }

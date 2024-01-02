@@ -36,15 +36,33 @@ class IsolationFlagBuilderUnitTest {
     }
 
     @Test
-    fun givenLambdaClosure_whenConfigurationAttempt_thenDoesNothing() {
+    fun givenFlags_whenFalse_thenAreRemoved() {
         val flags = mutableSetOf<String>()
-        var builder: IsolationFlagBuilder? = null
-        IsolationFlagBuilder.configure(flags) {
-            builder = IsolateDestAddr()
+        val allFlags = mutableSetOf<String>()
+
+        var i = 0
+        listOf<Triple<String, IsolationFlagBuilder.() -> Unit, IsolationFlagBuilder.() -> Unit>>(
+            Triple("IsolateClientAddr", { IsolateClientAddr = true }, { IsolateClientAddr = false }),
+            Triple("IsolateSOCKSAuth", { IsolateSOCKSAuth = true }, { IsolateSOCKSAuth = false }),
+            Triple("IsolateClientProtocol", { IsolateClientProtocol = true }, { IsolateClientProtocol = false }),
+            Triple("IsolateDestPort", { IsolateDestPort = true }, { IsolateDestPort = false }),
+            Triple("IsolateDestAddr", { IsolateDestAddr = true }, { IsolateDestAddr = false }),
+            Triple("KeepAliveIsolateSOCKSAuth", { KeepAliveIsolateSOCKSAuth = true }, { KeepAliveIsolateSOCKSAuth = false }),
+        ).forEach { (expected, enable, disable) ->
+            i++
+            IsolationFlagBuilder.configure(allFlags) { enable() }
+
+            IsolationFlagBuilder.configure(flags) { enable() }
+            assertEquals(1, flags.size)
+            assertEquals(expected, flags.first())
+
+            IsolationFlagBuilder.configure(flags) { /* no action */ }
+            assertEquals(1, flags.size)
+
+            IsolationFlagBuilder.configure(flags) { disable() }
+            assertEquals(0, flags.size)
         }
 
-        assertEquals(1, flags.size)
-        builder!!.IsolateClientProtocol()
-        assertEquals(1, flags.size)
+        assertEquals(i, allFlags.size)
     }
 }

@@ -15,6 +15,7 @@
  **/
 package io.matthewnelson.kmp.tor.runtime.api.config
 
+import io.matthewnelson.kmp.tor.runtime.api.ThisBlock
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -24,7 +25,7 @@ class UnixFlagBuilderUnitTest {
     fun givenRelaxDirModeCheck_whenNotController_thenDoesNotAdd() {
         val flags = mutableSetOf<String>()
 
-        UnixFlagBuilder.configure(isControl = false, flags) { RelaxDirModeCheck() }
+        UnixFlagBuilder.configure(isControl = false, flags) { RelaxDirModeCheck = true }
         assertEquals(0, flags.size)
     }
 
@@ -32,20 +33,35 @@ class UnixFlagBuilderUnitTest {
     fun givenRelaxDirModeCheck_whenController_thenDoesAdd() {
         val flags = mutableSetOf<String>()
 
-        UnixFlagBuilder.configure(isControl = true, flags) { RelaxDirModeCheck() }
+        UnixFlagBuilder.configure(isControl = true, flags) { RelaxDirModeCheck = true }
         assertEquals(1, flags.size)
     }
 
     @Test
-    fun givenLambdaClosure_whenConfigurationAttempt_thenDoesNothing() {
+    fun givenFlags_whenFalse_thenAreRemoved() {
         val flags = mutableSetOf<String>()
-        var builder: UnixFlagBuilder? = null
-        UnixFlagBuilder.configure(isControl = false, flags) {
-            builder = GroupWritable()
+        val allFlags = mutableSetOf<String>()
+
+        var i = 0
+        listOf<Triple<String, UnixFlagBuilder.() -> Unit, UnixFlagBuilder.() -> Unit>>(
+            Triple("GroupWritable", { GroupWritable = true }, { GroupWritable = false }),
+            Triple("WorldWritable", { WorldWritable = true }, { WorldWritable = false }),
+            Triple("RelaxDirModeCheck", { RelaxDirModeCheck = true }, { RelaxDirModeCheck = false }),
+        ).forEach { (expected, enable, disable) ->
+            i++
+            UnixFlagBuilder.configure(isControl = true, allFlags) { enable() }
+
+            UnixFlagBuilder.configure(isControl = true, flags) { enable() }
+            assertEquals(1, flags.size)
+            assertEquals(expected, flags.first())
+
+            UnixFlagBuilder.configure(isControl = true, flags) { /* no action */ }
+            assertEquals(1, flags.size)
+
+            UnixFlagBuilder.configure(isControl = true, flags) { disable() }
+            assertEquals(0, flags.size)
         }
 
-        assertEquals(1, flags.size)
-        builder!!.WorldWritable()
-        assertEquals(1, flags.size)
+        assertEquals(i, allFlags.size)
     }
 }

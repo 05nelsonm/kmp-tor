@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-@file:Suppress("FunctionName")
+@file:Suppress("FunctionName", "PropertyName")
 
 package io.matthewnelson.kmp.tor.runtime.api.config
 
@@ -21,45 +21,43 @@ import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
 import io.matthewnelson.kmp.tor.core.api.annotation.KmpTorDsl
 import io.matthewnelson.kmp.tor.runtime.api.ThisBlock
 import io.matthewnelson.kmp.tor.runtime.api.apply
+import kotlin.jvm.JvmField
 import kotlin.jvm.JvmSynthetic
 
+/**
+ * Configure flags specific to [TorConfig.__ControlPort] and
+ * [TorConfig.__SocksPort] when they are set up as Unix Sockets.
+ *
+ * Flags can be configured no matter if the port is configured as
+ * a TCP Port, or a Unix Socket. They will only be added to the
+ * [TorConfig.Setting] if the final builder result is that of a
+ * Unix Socket.
+ *
+ * - `null`  - no action (default)
+ * - `true`  - add the flag if not present
+ * - `false` - remove the flag if present
+ * */
 @KmpTorDsl
-public class UnixFlagBuilder private constructor(
-    private val isControl: Boolean,
-    private val flags: MutableSet<String>,
-) {
+public class UnixFlagBuilder private constructor() {
 
-    // To inhibit modification after closure
-    private var isConfigured: Boolean = false
+    @JvmField
+    public var GroupWritable: Boolean? = null
 
-    @KmpTorDsl
-    public fun GroupWritable(): UnixFlagBuilder {
-        if (isConfigured) return this
-        flags.add("GroupWritable")
-        return this
-    }
-
-    @KmpTorDsl
-    public fun WorldWritable(): UnixFlagBuilder {
-        if (isConfigured) return this
-        flags.add("WorldWritable")
-        return this
-    }
+    @JvmField
+    public var WorldWritable: Boolean? = null
 
     /**
-     * Only applicable for the Control Port
+     * Only applicable for [TorConfig.__ControlPort]
      * */
-    @KmpTorDsl
-    public fun RelaxDirModeCheck(): UnixFlagBuilder {
-        if (isConfigured) return this
-        if (!isControl) return this
-        flags.add("RelaxDirModeCheck")
-        return this
-    }
+    @JvmField
+    public var RelaxDirModeCheck: Boolean? = null
 
     @InternalKmpTorApi
     public sealed interface DSL<out R: Any> {
 
+        /**
+         * For [TorConfig.__ControlPort] and [TorConfig.__SocksPort].
+         * */
         @KmpTorDsl
         public fun unixFlags(
             block: ThisBlock<UnixFlagBuilder>,
@@ -73,6 +71,22 @@ public class UnixFlagBuilder private constructor(
             isControl: Boolean,
             flags: MutableSet<String>,
             block: ThisBlock<UnixFlagBuilder>,
-        ) { UnixFlagBuilder(isControl, flags).apply(block).isConfigured = true }
+        ) {
+            val b = UnixFlagBuilder().apply(block)
+            b.GroupWritable?.let {
+                val flag = "GroupWritable"
+                if (it) flags.add(flag) else flags.remove(flag)
+            }
+            b.WorldWritable?.let {
+                val flag = "WorldWritable"
+                if (it) flags.add(flag) else flags.remove(flag)
+            }
+
+            if (!isControl) return
+            b.RelaxDirModeCheck?.let {
+                val flag = "RelaxDirModeCheck"
+                if (it) flags.add(flag) else flags.remove(flag)
+            }
+        }
     }
 }
