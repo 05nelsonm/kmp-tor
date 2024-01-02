@@ -980,7 +980,7 @@ public class TorConfig private constructor(
     ) {
 
         @JvmField
-        public var dormant: Boolean = false
+        public var enable: Boolean = false
 
         public companion object: Setting.Factory<DormantOnFirstStartup, Setting>(
             name = "DormantOnFirstStartup",
@@ -988,7 +988,7 @@ public class TorConfig private constructor(
             isStartArgument = true,
             isUnique = true,
             factory = { DormantOnFirstStartup() },
-            build = { build(dormant.toByte().toString())!! },
+            build = { build(enable.toByte().toString())!! },
         )
     }
 

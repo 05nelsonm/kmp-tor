@@ -310,7 +310,7 @@ public final class io/matthewnelson/kmp/tor/runtime/api/config/TorConfig$Dormant
 
 public final class io/matthewnelson/kmp/tor/runtime/api/config/TorConfig$DormantOnFirstStartup : io/matthewnelson/kmp/tor/runtime/api/config/TorConfig$Setting$Builder {
 	public static final field Companion Lio/matthewnelson/kmp/tor/runtime/api/config/TorConfig$DormantOnFirstStartup$Companion;
-	public field dormant Z
+	public field enable Z
 }
 
 public final class io/matthewnelson/kmp/tor/runtime/api/config/TorConfig$DormantOnFirstStartup$Companion : io/matthewnelson/kmp/tor/runtime/api/config/TorConfig$Setting$Factory {
