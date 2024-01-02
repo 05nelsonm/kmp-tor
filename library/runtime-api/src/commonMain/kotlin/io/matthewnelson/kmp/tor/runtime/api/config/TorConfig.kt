@@ -1597,9 +1597,80 @@ public class TorConfig private constructor(
         public val optionals: Set<String>,
     ) {
 
-        // TODO: public override fun equals(other: Any?): Boolean
-        // TODO: public override fun hashCode(): Int
-        // TODO: public override fun toString(): String
+        private val isPort = keyword.attributes.contains(Attribute.Port)
+        private val isPath = keyword.attributes.let { attrs ->
+            attrs.contains(Attribute.File)
+            || attrs.contains(Attribute.Directory)
+        }
+        private val isPortAutoOrDisabled = if (isPort) argument == "0" || argument == AUTO else false
+
+        public override fun equals(other: Any?): Boolean {
+            if (other !is LineItem) return false
+
+            if (keyword.isUnique || other.keyword.isUnique) {
+                // If either are unique, compare only the keyword
+                return other.keyword == keyword
+            }
+
+            // Have to compare 2 non-unique Items
+
+            // If both are ports
+            if (other.isPort && isPort) {
+                return if (other.isPortAutoOrDisabled || isPortAutoOrDisabled) {
+                    other.keyword == keyword && other.argument == argument
+                } else {
+                    // neither are disabled or set to auto, compare
+                    // only their port arguments (or unix socket paths)
+                    other.argument == argument
+                }
+            }
+
+            // If either is a port, don't bother checking
+            // file paths just return early
+            if (other.isPort || isPort) {
+                return  other.keyword == keyword
+                        && other.argument == argument
+            }
+
+            // if both are file paths
+            if (other.isPath && isPath) {
+                // compare only by their arguments (file paths)
+                return argument == other.argument
+            }
+
+            return  other.keyword == keyword
+                    && other.argument == argument
+        }
+
+        public override fun hashCode(): Int {
+            var result = 13
+            if (keyword.isUnique) {
+                return result * 42 + keyword.hashCode()
+            }
+
+            if (isPortAutoOrDisabled) {
+                result = result * 42 + keyword.hashCode()
+                return result * 42 + argument.hashCode()
+            }
+
+            if (isPort || isPath) {
+                return result * 42 + argument.hashCode()
+            }
+
+            result = result * 42 + keyword.hashCode()
+            return result * 42 + argument.hashCode()
+        }
+
+        public override fun toString(): String = buildString {
+            append(keyword)
+            append(' ')
+            append(argument)
+            if (optionals.isNotEmpty()) {
+                append(' ')
+                optionals.joinTo(this, separator = " ")
+            }
+        }
+
         // TODO: public fun toCtrlString(): String
 
         internal companion object {
