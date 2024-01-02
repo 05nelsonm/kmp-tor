@@ -22,7 +22,7 @@ import kotlin.jvm.JvmName
 import kotlin.jvm.JvmStatic
 
 /**
- * Holder for a port between 0 and 65535
+ * Holder for a port between 0 and 65535 (inclusive)
  * */
 public open class Port private constructor(
     @JvmField
@@ -45,7 +45,7 @@ public open class Port private constructor(
         }
 
         /**
-         * Parses a String for a port between 0 and 65535.
+         * Parses a String for a port between 0 and 65535 (inclusive).
          *
          * String can be either a URL containing the port, or the
          * port itself.
@@ -71,7 +71,7 @@ public open class Port private constructor(
         }
 
         /**
-         * Parses a String for a port between 0 and 65535.
+         * Parses a String for a port between 0 and 65535 (inclusive).
          *
          * String can be either a URL containing the port, or the
          * port itself.
@@ -93,7 +93,7 @@ public open class Port private constructor(
     }
 
     /**
-     * A [Port] with a more constrained range of 1024 and 65535
+     * A [Port] with a more constrained range of 1024 and 65535 (inclusive)
      * */
     public class Proxy private constructor(value: Int): Port(value) {
 
@@ -111,7 +111,7 @@ public open class Port private constructor(
             }
 
             /**
-             * Parses a String for a port between 1024 and 65535.
+             * Parses a String for a port between 1024 and 65535 (inclusive).
              *
              * String can be either a URL containing the port, or the
              * port itself.
@@ -135,7 +135,7 @@ public open class Port private constructor(
             }
 
             /**
-             * Parses a String for a port between 1024 and 65535.
+             * Parses a String for a port between 1024 and 65535 (inclusive).
              *
              * String can be either a URL containing the port, or the
              * port itself.
