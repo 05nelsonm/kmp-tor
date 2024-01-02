@@ -421,7 +421,7 @@ public final class io/matthewnelson/kmp/tor/runtime/api/config/TorConfig$HiddenS
 public final class io/matthewnelson/kmp/tor/runtime/api/config/TorConfig$HiddenServiceVersion {
 	public static final field Companion Lio/matthewnelson/kmp/tor/runtime/api/config/TorConfig$HiddenServiceVersion$Companion;
 	public final fun HSv (B)Lio/matthewnelson/kmp/tor/runtime/api/config/TorConfig$HiddenServiceVersion;
-	public final fun version ()Ljava/lang/Byte;
+	public final fun argument ()Ljava/lang/Byte;
 }
 
 public final class io/matthewnelson/kmp/tor/runtime/api/config/TorConfig$HiddenServiceVersion$Companion : io/matthewnelson/kmp/tor/runtime/api/config/TorConfig$Keyword {

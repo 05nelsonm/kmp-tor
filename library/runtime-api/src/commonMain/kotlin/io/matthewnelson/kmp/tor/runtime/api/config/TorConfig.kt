@@ -1315,7 +1315,7 @@ public class TorConfig private constructor(
      * by Tor (which will fall back to whatever its default is).
      *
      * If a new version is introduced by Tor, it may cause a conflict for
-     * already created hidden services. By explicitly expressing it within
+     * already created hidden services. By explicitly declaring it within
      * your code, this potential issue is mitigated.
      *
      * [HiddenServiceVersion](https://2019.www.torproject.org/docs/tor-manual.html.en#HiddenServiceVersion)
@@ -1323,8 +1323,8 @@ public class TorConfig private constructor(
     @KmpTorDsl
     public class HiddenServiceVersion private constructor() {
 
-        @get:JvmName("version")
-        public var version: Byte? = null
+        @get:JvmName("argument")
+        public var argument: Byte? = null
             private set
 
         /**
@@ -1342,11 +1342,11 @@ public class TorConfig private constructor(
             // HiddenServiceDir._numIntroductionPoints Map with
             // its default value.
             require(version in 3..3) { "Unsupported HS version of $version" }
-            this.version = version
+            this.argument = version
             return this
         }
 
-        private fun build(): LineItem? = toLineItem(version?.toString())
+        private fun build(): LineItem? = toLineItem(argument?.toString())
 
         public companion object: Keyword(
             name = "HiddenServiceVersion",
