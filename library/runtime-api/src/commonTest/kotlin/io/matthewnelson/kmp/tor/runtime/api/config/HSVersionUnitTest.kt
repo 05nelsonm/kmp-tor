@@ -25,8 +25,8 @@ class HSVersionUnitTest {
     @Test
     fun givenVersion_whenNotSupported_thenThrowsException() {
         val lineItem = TorConfig.HiddenServiceVersion.build {
-            assertFailsWith<IllegalArgumentException> { version(2) }
-            assertFailsWith<IllegalArgumentException> { version(4) }
+            assertFailsWith<IllegalArgumentException> { HSv(2) }
+            assertFailsWith<IllegalArgumentException> { HSv(4) }
         }
 
         assertNull(lineItem)
@@ -34,7 +34,7 @@ class HSVersionUnitTest {
 
     @Test
     fun givenVersion_whenSupported_thenReturnsNonNull() {
-        val lineItem = TorConfig.HiddenServiceVersion.build { version(3) }
+        val lineItem = TorConfig.HiddenServiceVersion.build { HSv(3) }
         assertNotNull(lineItem)
     }
 }

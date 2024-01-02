@@ -1149,7 +1149,7 @@ public class TorConfig private constructor(
                 HiddenServiceNumIntroductionPoints.toLineItem(points.toString())!!
             }
 
-            val others = HashSet<LineItem>(ports.size + 6, 1.0F)
+            val others = LinkedHashSet<LineItem>(ports.size + 6, 1.0F)
             others.add(version)
             others.addAll(ports)
             others.add(allowUnknownPorts)
@@ -1268,6 +1268,7 @@ public class TorConfig private constructor(
 
         @get:JvmName("version")
         public var version: Byte? = null
+            private set
 
         /**
          * Currently, the only supported version is 3
@@ -1279,7 +1280,7 @@ public class TorConfig private constructor(
          * */
         @KmpTorDsl
         @Throws(IllegalArgumentException::class)
-        public fun version(version: Byte): HiddenServiceVersion {
+        public fun HSv(version: Byte): HiddenServiceVersion {
             // NOTE: If adding a version, also update
             // HiddenServiceDir._numIntroductionPoints Map with
             // its default value.
@@ -1746,7 +1747,7 @@ public class TorConfig private constructor(
             ): Setting? {
                 val first = keyword.toLineItem(argument, optionals) ?: return null
 
-                val set = HashSet<LineItem>(1 + others.size, 1.0F)
+                val set = LinkedHashSet<LineItem>(1 + others.size, 1.0F)
                 set.add(first)
                 set.addAll(others)
 
@@ -1806,13 +1807,53 @@ public class TorConfig private constructor(
             @JvmStatic
             public inline fun <reified T: Attribute> Iterable<Setting>.filterByAttribute(): List<Setting> {
                 return filter { setting ->
-                    setting.items.forEach { item ->
-                        item.keyword.attributes.forEach { attr ->
-                            if (attr is T) return@filter true
+                    setting.items.forEach forEachItem@ { item ->
+                        item.keyword.attributes.forEach forEachAttr@ { attr ->
+                            if (attr !is T) return@forEachAttr
+                            // Found specified attribute T
+
+                            if (attr is Attribute.Port) {
+                                if (item.isArgumentAUnixSocket()) {
+                                    return@forEachItem
+                                }
+                            }
+
+                            if (attr is Attribute.UnixSocket) {
+                                if (item.isArgumentAPort()) {
+                                    return@forEachItem
+                                }
+                            }
+
+                            // T is not Port or UnixSocket
+                            return@filter true
                         }
                     }
                     false
                 }
+            }
+
+            @PublishedApi
+            @JvmSynthetic
+            internal fun LineItem.isArgumentAPort(): Boolean {
+                if (!keyword.attributes.contains(Attribute.Port)) return false
+                // If not a unix socket configurable Port keyword, then it MUST be
+                // configured as a port.
+                //
+                // If potentially a unix socket, see if the argument is set to one
+                return !isArgumentAUnixSocket()
+            }
+
+            @PublishedApi
+            @JvmSynthetic
+            internal fun LineItem.isArgumentAUnixSocket(): Boolean {
+                if (!keyword.attributes.contains(Attribute.UnixSocket)) return false
+
+                return if (keyword is HiddenServicePort.Companion) {
+                    // Check the target, not the virtual port
+                    argument.substringAfter(' ')
+                } else {
+                    argument
+                }.startsWith("unix:")
             }
         }
 

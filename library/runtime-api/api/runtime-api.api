@@ -419,9 +419,8 @@ public final class io/matthewnelson/kmp/tor/runtime/api/config/TorConfig$HiddenS
 
 public final class io/matthewnelson/kmp/tor/runtime/api/config/TorConfig$HiddenServiceVersion {
 	public static final field Companion Lio/matthewnelson/kmp/tor/runtime/api/config/TorConfig$HiddenServiceVersion$Companion;
-	public final fun setVersion (Ljava/lang/Byte;)V
+	public final fun HSv (B)Lio/matthewnelson/kmp/tor/runtime/api/config/TorConfig$HiddenServiceVersion;
 	public final fun version ()Ljava/lang/Byte;
-	public final fun version (B)Lio/matthewnelson/kmp/tor/runtime/api/config/TorConfig$HiddenServiceVersion;
 }
 
 public final class io/matthewnelson/kmp/tor/runtime/api/config/TorConfig$HiddenServiceVersion$Companion : io/matthewnelson/kmp/tor/runtime/api/config/TorConfig$Keyword {
@@ -523,6 +522,8 @@ public abstract class io/matthewnelson/kmp/tor/runtime/api/config/TorConfig$Sett
 }
 
 public final class io/matthewnelson/kmp/tor/runtime/api/config/TorConfig$Setting$Companion {
+	public final synthetic fun isArgumentAPort (Lio/matthewnelson/kmp/tor/runtime/api/config/TorConfig$LineItem;)Z
+	public final synthetic fun isArgumentAUnixSocket (Lio/matthewnelson/kmp/tor/runtime/api/config/TorConfig$LineItem;)Z
 }
 
 public abstract class io/matthewnelson/kmp/tor/runtime/api/config/TorConfig$Setting$Factory : io/matthewnelson/kmp/tor/runtime/api/config/TorConfig$Keyword {

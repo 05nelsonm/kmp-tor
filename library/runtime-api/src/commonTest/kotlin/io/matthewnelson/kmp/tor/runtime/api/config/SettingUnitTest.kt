@@ -15,7 +15,6 @@
  **/
 package io.matthewnelson.kmp.tor.runtime.api.config
 
-import io.matthewnelson.kmp.file.absoluteFile
 import io.matthewnelson.kmp.file.toFile
 import io.matthewnelson.kmp.tor.runtime.api.address.Port.Companion.toPort
 import io.matthewnelson.kmp.tor.runtime.api.address.Port.Proxy.Companion.toPortProxy
@@ -132,12 +131,12 @@ class SettingUnitTest {
             directory = dir
             port { asPort { virtual = 80.toPort() } }
             port { asPort { virtual = 443.toPort() } }
-            version { version(3) }
+            version { HSv(3) }
         }!!
         val b = TorConfig.HiddenServiceDir.Builder {
             directory = dir
             port { asPort { virtual = 80.toPort() } }
-            version { version(3) }
+            version { HSv(3) }
         }!!
 
         assertEquals(a, b)
