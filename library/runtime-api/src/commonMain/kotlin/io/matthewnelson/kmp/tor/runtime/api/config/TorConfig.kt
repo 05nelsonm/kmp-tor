@@ -1245,14 +1245,50 @@ public class TorConfig private constructor(
     public class HiddenServicePort private constructor() {
 
         // TODO: Check if can be 0
+        /**
+         * Configures the virtual port that this HiddenServicePort
+         * declaration will listen on.
+         *
+         * e.g.
+         *
+         *     HiddenServicePort 80
+         *     // http://<onion-address>.onion
+         *
+         *     HiddenServicePort 443
+         *     // https://<onion-address>.onion
+         *
+         *     HiddenServicePort 8080
+         *     // http://<onion-address>.onion:8080
+         * */
         @JvmField
         public var virtual: Port? = null
 
         /**
+         * Configures the target port that [virtual] will be mapped
+         * to.
+         *
          * If left unconfigured, whatever [virtual] has been
          * configured as is utilized.
          *
          * Can be either a TCP Port or a Unix Socket path.
+         *
+         * e.g.
+         *
+         *     HiddenServicePort 80 8080
+         *     // http://<onion-address>.onion
+         *     // will connect to server running on localhost at port 8080
+         *
+         *     HiddenServicePort 443 8443
+         *     // https://<onion-address>.onion
+         *     // will connect to server running on localhost at port 8443
+         *
+         *     HiddenServicePort 8080 8081
+         *     // http://<onion-address>.onion:8080
+         *     // will connect to server running on localhost at port 8081
+         *
+         *     HiddenServicePort 80 unix:"/path/to/tor/data/hidden_services/my_service/hs.sock"
+         *     // http://<onion-address>.onion
+         *     // will connect to server running the unix domain socket at specified path
          *
          * @see [targetAsPort]
          * @see [targetAsUnixSocket]
