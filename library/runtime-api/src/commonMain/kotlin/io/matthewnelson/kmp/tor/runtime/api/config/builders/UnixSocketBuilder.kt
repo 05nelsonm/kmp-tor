@@ -15,13 +15,12 @@
  **/
 package io.matthewnelson.kmp.tor.runtime.api.config.builders
 
-import io.matthewnelson.kmp.file.File
+import io.matthewnelson.kmp.file.*
 import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
 import io.matthewnelson.kmp.tor.core.api.annotation.KmpTorDsl
 import io.matthewnelson.kmp.tor.runtime.api.ThisBlock
 import io.matthewnelson.kmp.tor.runtime.api.apply
 import io.matthewnelson.kmp.tor.runtime.api.internal.UnixSocketsNotSupportedMessage
-import io.matthewnelson.kmp.tor.runtime.api.internal.normalizedAbsolutePath
 import kotlin.jvm.JvmField
 import kotlin.jvm.JvmSynthetic
 
@@ -72,7 +71,9 @@ public class UnixSocketBuilder private constructor() {
             val path = UnixSocketBuilder()
                 .apply(block)
                 .file
-                ?.normalizedAbsolutePath()
+                ?.absoluteFile
+                ?.normalize()
+                ?.path
                 ?: return null
 
             if (path.length > 105) {

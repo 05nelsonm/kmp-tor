@@ -17,7 +17,7 @@
 
 package io.matthewnelson.kmp.tor.runtime.api.config
 
-import io.matthewnelson.kmp.file.File
+import io.matthewnelson.kmp.file.*
 import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
 import io.matthewnelson.kmp.tor.core.api.annotation.KmpTorDsl
 import io.matthewnelson.kmp.tor.core.resource.immutableSetOf
@@ -36,7 +36,6 @@ import io.matthewnelson.kmp.tor.runtime.api.config.TorConfig.Setting.Companion.f
 import io.matthewnelson.kmp.tor.runtime.api.config.builders.*
 import io.matthewnelson.kmp.tor.runtime.api.internal.IsAndroidHost
 import io.matthewnelson.kmp.tor.runtime.api.internal.IsUnixLikeHost
-import io.matthewnelson.kmp.tor.runtime.api.internal.normalizedAbsolutePath
 import io.matthewnelson.kmp.tor.runtime.api.internal.toByte
 import kotlin.jvm.JvmField
 import kotlin.jvm.JvmName
@@ -698,7 +697,7 @@ public class TorConfig private constructor(
             isStartArgument = true,
             isUnique = true,
             factory = { CacheDirectory() },
-            build = { build(directory?.normalizedAbsolutePath()) },
+            build = { build(directory?.absoluteFile?.normalize()?.path) },
         )
     }
 
@@ -719,7 +718,7 @@ public class TorConfig private constructor(
             isStartArgument = true,
             isUnique = true,
             factory = { ClientOnionAuthDir() },
-            build = { build(directory?.normalizedAbsolutePath()) },
+            build = { build(directory?.absoluteFile?.normalize()?.path) },
         ) {
             /**
              * A default directory name to use (if desired).
@@ -800,7 +799,7 @@ public class TorConfig private constructor(
             isStartArgument = true,
             isUnique = true,
             factory = { ControlPortWriteToFile() },
-            build = { build(file?.normalizedAbsolutePath()) },
+            build = { build(file?.absoluteFile?.normalize()?.path) },
         ) {
             /**
              * A default file name to use (if desired).
@@ -847,7 +846,7 @@ public class TorConfig private constructor(
             isStartArgument = true,
             isUnique = true,
             factory = { CookieAuthFile() },
-            build = { build(file?.normalizedAbsolutePath()) },
+            build = { build(file?.absoluteFile?.normalize()?.path) },
         ) {
             /**
              * A default file name to use (if desired).
@@ -873,7 +872,7 @@ public class TorConfig private constructor(
             isStartArgument = true,
             isUnique = true,
             factory = { DataDirectory() },
-            build = { build(directory?.normalizedAbsolutePath()) },
+            build = { build(directory?.absoluteFile?.normalize()?.path) },
         ) {
             /**
              * A default directory name to use (if desired).
@@ -1064,7 +1063,7 @@ public class TorConfig private constructor(
             isStartArgument = true,
             isUnique = true,
             factory = { GeoIPFile() },
-            build = { build(file?.normalizedAbsolutePath()) },
+            build = { build(file?.absoluteFile?.normalize()?.path) },
         )
     }
 
@@ -1085,7 +1084,7 @@ public class TorConfig private constructor(
             isStartArgument = true,
             isUnique = true,
             factory = { GeoIPv6File() },
-            build = { build(file?.normalizedAbsolutePath()) },
+            build = { build(file?.absoluteFile?.normalize()?.path) },
         )
     }
 
@@ -1197,7 +1196,7 @@ public class TorConfig private constructor(
         }
 
         private fun build(): Setting? {
-            val directory = directory?.normalizedAbsolutePath() ?: return null
+            val directory = directory?.absoluteFile?.normalize()?.path ?: return null
             val version = version ?: return null
             val ports = ports.also { if (it.isEmpty()) return null }
 
@@ -1760,13 +1759,6 @@ public class TorConfig private constructor(
                     // only their port arguments (or unix socket paths)
                     other.argument == argument
                 }
-            }
-
-            // If either is a port, don't bother checking
-            // file paths just return early
-            if (other.isPort || isPort) {
-                return  other.keyword == keyword
-                        && other.argument == argument
             }
 
             // if both are file paths
