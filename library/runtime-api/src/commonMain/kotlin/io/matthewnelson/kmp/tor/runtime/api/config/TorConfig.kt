@@ -58,6 +58,8 @@ public class TorConfig private constructor(
 
         /**
          * Opener for creating a new [TorConfig]
+         *
+         * @see [TorConfig.Builder]
          * */
         @JvmStatic
         public fun Builder(
@@ -67,6 +69,8 @@ public class TorConfig private constructor(
         /**
          * Opener for creating a new [TorConfig] that inherits
          * settings from another [TorConfig].
+         *
+         * @see [TorConfig.Builder]
          * */
         @JvmStatic
         public fun Builder(
@@ -78,7 +82,43 @@ public class TorConfig private constructor(
     }
 
     /**
-     * Creates a new [TorConfig]
+     * Configures a new [TorConfig]
+     *
+     * e.g. (Kotlin)
+     *
+     *     val dns = TorConfig.__DNSPort.Builder { auto() }
+     *
+     *     val config = TorConfig.Builder {
+     *         // An already configured setting
+     *         put(dns)
+     *
+     *         // Via the Setting.Factory
+     *         put(TorConfig.__SocksPort) {
+     *             asPort {
+     *                 port(9050.toPortProxy())
+     *             }
+     *         }
+     *     }
+     *
+     * e.g. (Java)
+     *
+     *     TorConfig.Setting dns = TorConfig.__DNSPort.Companion.Builder(b -> {
+     *         b.auto();
+     *     });
+     *
+     *     TorConfig config = TorConfig.Builder(b -> {
+     *         // An already configured setting
+     *         b.put(dns)
+     *
+     *         // Via the Setting.Factory
+     *         b.put(TorConfig.__SocksPort.Companion, f -> {
+     *             f.asPort(p -> {
+     *                 p.port(Port.Proxy.get(9050));
+     *             });
+     *         });
+     *     });
+     *
+     * @see [TorConfig.Companion.Builder]
      * */
     @KmpTorDsl
     public class Builder private constructor(other: TorConfig?) {
@@ -88,67 +128,63 @@ public class TorConfig private constructor(
         private val inheritedDisabledPorts = mutableSetOf<Setting>()
 
         /**
-         * Add an already configured [Setting]
-         *
-         * e.g.
-         *
-         *     // Kotlin
-         *     TorConfig.Builder {
-         *         add(TorConfig.__DNSPort.Builder { auto() })
-         *     }
-         *
-         *     // Java
-         *     TorConfig.Builder(b -> {
-         *         b.add(TorConfig.__DNSPort.Companion.Builder(p -> {
-         *             p.auto();
-         *         }));
-         *     });
+         * Add an already configured [Setting].
          * */
         @KmpTorDsl
-        public fun add(setting: Setting?): Builder {
+        public fun put(setting: Setting?): Builder = put(setting, ifAbsent = false)
+
+        /**
+         * Add an already configured [Setting] if not currently
+         * present.
+         * */
+        @KmpTorDsl
+        public fun putIfAbsent(setting: Setting?): Builder = put(setting, ifAbsent = true)
+
+        /**
+         * Configure a [Setting] via its [Setting.Factory] and add.
+         * */
+        @KmpTorDsl
+        public fun <B: Setting.Builder, S: Setting?> put(
+            factory: Setting.Factory<B, S>,
+            block: ThisBlock<B>,
+        ): Builder = put(factory.Builder(block), ifAbsent = false)
+
+        /**
+         * Configure a [Setting] via its [Setting.Factory] and add
+         * if not currently present.
+         * */
+        @KmpTorDsl
+        public fun <B: Setting.Builder, S: Setting?> putIfAbsent(
+            factory: Setting.Factory<B, S>,
+            block: ThisBlock<B>,
+        ): Builder = put(factory.Builder(block), ifAbsent = true)
+
+        private fun put(setting: Setting?, ifAbsent: Boolean): Builder {
             if (setting == null) return this
 
-            inheritedDisabledPorts.find {
-                it.keyword == setting.keyword
-            }?.let { disabled ->
-                // It is being overridden by a newly
-                // configured port. Remove the inherited
-                // setting.
-                inheritedDisabledPorts.remove(disabled)
-            }
+            var added = settings.add(setting)
 
-            if (!settings.add(setting)) {
+            if (!added && !ifAbsent) {
                 // Remove and replace the other item
                 // e.g. SocksPort and DNSPort are configured
                 //      with the same port value
                 settings.remove(setting)
-                settings.add(setting)
+                added = settings.add(setting)
             }
+
+            if (added) {
+                inheritedDisabledPorts.find {
+                    it.keyword == setting.keyword
+                }?.let { disabled ->
+                    // It is being overridden by a newly
+                    // configured port. Remove the inherited
+                    // setting.
+                    inheritedDisabledPorts.remove(disabled)
+                }
+            }
+
             return this
         }
-
-        /**
-         * Configure and add a setting using the [Setting.Factory]
-         *
-         * e.g.
-         *
-         *     // Kotlin
-         *     TorConfig.Builder {
-         *         add(TorConfig.__DNSPort) { auto() }
-         *     }
-         *
-         *     // Java
-         *     TorConfig.Builder(b -> {
-         *         b.add(TorConfig.__DNSPort.Companion, p -> {
-         *             p.auto();
-         *         });
-         *     })
-         * */
-        @KmpTorDsl
-        public fun <B: Setting.Builder, S: Setting?> add(
-            factory: Setting.Factory<B, S>,
-            block: ThisBlock<B>,
-        ): Builder = add(factory.Builder(block))
 
         init {
             if (other != null) {
@@ -163,7 +199,7 @@ public class TorConfig private constructor(
                         return@forEach
                     }
 
-                    add(setting)
+                    put(setting)
                 }
 
                 inheritedDisabledPorts.addAll(disabledPorts)
@@ -202,9 +238,9 @@ public class TorConfig private constructor(
     }
 
     /**
-     * Note that Tor's default value as per the spec is disabled (0), so excluding it
-     * from the config will not set it. As this library depends on the control port the
-     * default value used is "auto" and it cannot be disabled.
+     * Note that Tor's default value as per the spec is disabled (0). As this library
+     * depends on the control port the default [argument] used is "auto" and it cannot
+     * be set to disabled (0).
      *
      * [ControlPort](https://2019.www.torproject.org/docs/tor-manual.html.en#ControlPort)
      *
