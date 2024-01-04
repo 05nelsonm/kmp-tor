@@ -10,7 +10,7 @@ gradle-kmp-configuration = "0.1.7"
 gradle-kotlin = "1.9.21"
 gradle-publish-maven = "0.25.3"
 
-kmp-tor-core = "2.0.0-alpha03"
+kmp-tor-core = "2.0.0-alpha04"
 kmp-tor-resource = "408.10.0-SNAPSHOT"
 
 kotlinx-coroutines = "1.7.3"
