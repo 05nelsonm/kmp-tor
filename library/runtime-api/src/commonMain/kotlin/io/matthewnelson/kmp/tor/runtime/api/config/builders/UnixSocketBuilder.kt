@@ -77,7 +77,7 @@ public class UnixSocketBuilder private constructor() {
                 ?: return null
 
             if (path.length > 105) {
-                throw UnsupportedOperationException("Unix Socket path cannot exceed 105 characters")
+                throw UnsupportedOperationException("path cannot exceed 105 characters")
             }
 
             if (path.lines().size != 1) {

@@ -21,27 +21,26 @@ import io.matthewnelson.kmp.tor.runtime.api.config.TorConfig.Setting.Companion.f
 import io.matthewnelson.kmp.tor.runtime.api.internal.toByte
 import kotlin.test.Test
 import kotlin.test.assertEquals
-import kotlin.test.assertIs
 
 class TorConfigUnitTest {
 
     @Test
     fun givenMultiplePortsConfigured_whenDisabled_thenAllOfThatTypeAreRemoved() {
         val settings = TorConfig.Builder {
-            add(TorConfig.__ControlPort) { /* defaults to auto */ }
-            add(TorConfig.__SocksPort) { asPort { auto() } }
-            add(TorConfig.__SocksPort) { asPort { disable() } }
-            add(TorConfig.__SocksPort) { asPort { port(9055.toPortProxy()) } }
+            put(TorConfig.__ControlPort) { /* defaults to auto */ }
+            put(TorConfig.__SocksPort) { asPort { auto() } }
+            put(TorConfig.__SocksPort) { asPort { disable() } }
+            put(TorConfig.__SocksPort) { asPort { port(9055.toPortProxy()) } }
 
             try {
                 // Should also be removed if SocksPort is set to disabled
-                add(TorConfig.__SocksPort) { asUnixSocket { file = "/some/path".toFile() } }
+                put(TorConfig.__SocksPort) { asUnixSocket { file = "/some/path".toFile() } }
             } catch (_: UnsupportedOperationException) {
                 // ignore
             }
 
-            add(TorConfig.__DNSPort) { auto() }
-            add(TorConfig.__DNSPort) { port(1080.toPortProxy()) }
+            put(TorConfig.__DNSPort) { auto() }
+            put(TorConfig.__DNSPort) { port(1080.toPortProxy()) }
         }.settings
 
         assertEquals(1, settings.filterByKeyword<TorConfig.__ControlPort.Companion>().size)
@@ -53,15 +52,10 @@ class TorConfigUnitTest {
     }
 
     @Test
-    fun lll() {
-        val r = "[a-zA-Z0-9_]{1,23}".toRegex()
-        println(" ".matches(r))
-    }
-    @Test
-    fun givenUniqueKeyword_whenMultipleExpressions_thenLastConfiguredRemovesFirst() {
+    fun givenUniqueKeyword_whenMultipleExpressions_thenPutRemovesLast() {
         val settings = TorConfig.Builder {
-            add(TorConfig.RunAsDaemon) { enable = true }
-            add(TorConfig.RunAsDaemon) { enable = false }
+            put(TorConfig.RunAsDaemon) { enable = true }
+            put(TorConfig.RunAsDaemon) { enable = false }
         }.settings
 
         assertEquals(1, settings.size)
@@ -69,12 +63,23 @@ class TorConfigUnitTest {
     }
 
     @Test
+    fun givenUniqueKeyword_whenMultipleExpressions_thenPutIfAbsentDoesNotRemoveLast() {
+        val settings = TorConfig.Builder {
+            put(TorConfig.RunAsDaemon) { enable = true }
+            putIfAbsent(TorConfig.RunAsDaemon) { enable = false }
+        }.settings
+
+        assertEquals(1, settings.size)
+        assertEquals(true.toByte().toString(), settings.first().argument)
+    }
+
+    @Test
     fun givenInheritingConfig_whenContainsDisabledPorts_thenAreRemovedAtFirstOverride() {
         val other = TorConfig.Builder {
-            add(TorConfig.__SocksPort) { asPort { port(9055.toPortProxy()) } }
-            add(TorConfig.__SocksPort) { asPort { disable() } }
-            add(TorConfig.__HTTPTunnelPort) { disable() }
-            add(TorConfig.__DNSPort) { auto() }
+            put(TorConfig.__SocksPort) { asPort { port(9055.toPortProxy()) } }
+            put(TorConfig.__SocksPort) { asPort { disable() } }
+            put(TorConfig.__HTTPTunnelPort) { disable() }
+            put(TorConfig.__DNSPort) { auto() }
         }
 
         assertEquals(3, other.settings.size)
@@ -85,7 +90,7 @@ class TorConfigUnitTest {
         assertEquals("0", settings1.filterByKeyword<TorConfig.__HTTPTunnelPort.Companion>().first().argument)
 
         val settings2 = TorConfig.Builder(other) {
-            add(TorConfig.__SocksPort) { asPort { auto() } }
+            put(TorConfig.__SocksPort) { asPort { auto() } }
         }.settings
 
         assertEquals(3, settings2.size)
