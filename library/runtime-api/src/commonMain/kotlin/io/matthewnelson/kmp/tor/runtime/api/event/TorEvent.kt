@@ -196,13 +196,13 @@ public enum class TorEvent {
      *
      * e.g. (Kotlin)
      *
-     *     val bwListener = TorEvent.BW.newListener { event ->
+     *     val bwListener = TorEvent.BW.listener { event ->
      *         updateNotification(event.formatBandwidth())
      *     }
      *
      * e.g. (Java)
      *
-     *     TorEvent.Listener bwListener = TorEvent.BW.newListener(e -> {
+     *     TorEvent.Listener bwListener = TorEvent.BW.listener(e -> {
      *         updateNotification(formatBandwidth(e));
      *     });
      *
@@ -221,13 +221,13 @@ public enum class TorEvent {
      *
      * e.g. (Kotlin)
      *
-     *     val bwListener = TorEvent.BW.newListener("my service") { event ->
+     *     val bwListener = TorEvent.BW.listener("my service") { event ->
      *         updateNotification(event.formatBandwidth())
      *     }
      *
      * e.g. (Java)
      *
-     *     TorEvent.Listener bwListener = TorEvent.BW.newListener("my service", e -> {
+     *     TorEvent.Listener bwListener = TorEvent.BW.listener("my service", e -> {
      *         updateNotification(formatBandwidth(e));
      *     });
      *
