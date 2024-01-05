@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-package io.matthewnelson.kmp.tor.runtime.api.config
+package io.matthewnelson.kmp.tor.runtime.api
 
 import io.matthewnelson.kmp.file.toFile
 import io.matthewnelson.kmp.tor.runtime.api.address.Port.Companion.toPort

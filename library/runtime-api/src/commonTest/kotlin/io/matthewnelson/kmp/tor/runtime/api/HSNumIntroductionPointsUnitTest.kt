@@ -13,20 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-package io.matthewnelson.kmp.tor.runtime.api.config
+package io.matthewnelson.kmp.tor.runtime.api
 
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
-class ControlPortUnitTest {
+class HSNumIntroductionPointsUnitTest {
 
     @Test
-    fun givenTCPPortConfiguration_whenUnixFlags_thenAreNotAddedAsExtras() {
-        val setting = TorConfig.__ControlPort.Builder {
-            unixFlags { GroupWritable = true }
+    fun givenLambdaClosure_whenConfigurationAttempt_thenDoesNothing() {
+        val map = mutableMapOf("3" to 3)
+        var builder: TorConfig.HiddenServiceNumIntroductionPoints? = null
+        TorConfig.HiddenServiceNumIntroductionPoints.configure(map) {
+            builder = HSv3(points = 10)
         }
-
-        assertEquals("auto", setting.argument)
-        assertEquals(0, setting.optionals.size)
+        assertEquals(10, map["3"])
+        builder!!.HSv3(5)
+        assertEquals(10, map["3"])
     }
 }

@@ -13,14 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-package io.matthewnelson.kmp.tor.runtime.api.config.builders
+package io.matthewnelson.kmp.tor.runtime.api.builder
 
 import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
 import io.matthewnelson.kmp.tor.core.api.annotation.KmpTorDsl
 import io.matthewnelson.kmp.tor.runtime.api.ThisBlock
 import io.matthewnelson.kmp.tor.runtime.api.address.Port
 import io.matthewnelson.kmp.tor.runtime.api.apply
-import io.matthewnelson.kmp.tor.runtime.api.config.TorConfig
+import io.matthewnelson.kmp.tor.runtime.api.TorConfig
 import kotlin.jvm.JvmField
 import kotlin.jvm.JvmName
 import kotlin.jvm.JvmSynthetic

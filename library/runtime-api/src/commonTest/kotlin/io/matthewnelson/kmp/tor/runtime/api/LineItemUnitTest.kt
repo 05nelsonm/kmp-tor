@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Matthew Nelson
+ * Copyright (c) 2024 Matthew Nelson
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,9 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-package io.matthewnelson.kmp.tor.runtime.api.config
+package io.matthewnelson.kmp.tor.runtime.api
 
-import io.matthewnelson.kmp.tor.runtime.api.config.TorConfig.LineItem.Companion.toLineItem
+import io.matthewnelson.kmp.tor.runtime.api.TorConfig.LineItem.Companion.toLineItem
 import kotlin.test.Test
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
@@ -28,7 +28,8 @@ class LineItemUnitTest {
 
         assertNull(TorConfig.__ControlPort.toLineItem("   "))
         assertNull(TorConfig.__ControlPort.toLineItem(null))
-        assertNull(TorConfig.__ControlPort.toLineItem("""auto
+        assertNull(
+            TorConfig.__ControlPort.toLineItem("""auto
 
         """.trimMargin()))
     }
@@ -38,7 +39,8 @@ class LineItemUnitTest {
         assertNotNull(TorConfig.__ControlPort.toLineItem("auto", mutableSetOf("extra")))
 
         assertNull(TorConfig.__ControlPort.toLineItem("auto", mutableSetOf("    ")))
-        assertNull(TorConfig.__ControlPort.toLineItem("auto", mutableSetOf("""extra
+        assertNull(
+            TorConfig.__ControlPort.toLineItem("auto", mutableSetOf("""extra
 
         """.trimIndent())))
     }
