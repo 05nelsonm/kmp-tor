@@ -15,7 +15,7 @@
  **/
 @file:Suppress("FunctionName", "PropertyName")
 
-package io.matthewnelson.kmp.tor.runtime.api.config.builders
+package io.matthewnelson.kmp.tor.runtime.api.builder
 
 import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
 import io.matthewnelson.kmp.tor.core.api.annotation.KmpTorDsl

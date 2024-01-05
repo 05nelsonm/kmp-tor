@@ -15,6 +15,7 @@
  **/
 package io.matthewnelson.kmp.tor.runtime.api.config.builders
 
+import io.matthewnelson.kmp.tor.runtime.api.builder.UnixSocketBuilderBaseTest
 import kotlin.test.Test
 
 class UnixSocketBuilderUnixUnitTest: UnixSocketBuilderBaseTest() {

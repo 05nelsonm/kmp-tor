@@ -15,12 +15,11 @@
  **/
 @file:Suppress("SpellCheckingInspection")
 
-package io.matthewnelson.kmp.tor.runtime.api.event
+package io.matthewnelson.kmp.tor.runtime.api
 
 import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
 import io.matthewnelson.kmp.tor.core.resource.SynchronizedObject
 import io.matthewnelson.kmp.tor.core.resource.synchronized
-import io.matthewnelson.kmp.tor.runtime.api.ItBlock
 import kotlin.jvm.JvmField
 
 /**

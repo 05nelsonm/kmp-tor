@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Matthew Nelson
+ * Copyright (c) 2024 Matthew Nelson
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,7 @@
  **/
 @file:Suppress("ClassName", "FunctionName")
 
-package io.matthewnelson.kmp.tor.runtime.api.config
+package io.matthewnelson.kmp.tor.runtime.api
 
 import io.matthewnelson.kmp.file.*
 import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
@@ -23,17 +23,15 @@ import io.matthewnelson.kmp.tor.core.api.annotation.KmpTorDsl
 import io.matthewnelson.kmp.tor.core.resource.immutableSetOf
 import io.matthewnelson.kmp.tor.core.resource.toImmutableMap
 import io.matthewnelson.kmp.tor.core.resource.toImmutableSet
-import io.matthewnelson.kmp.tor.runtime.api.ThisBlock
-import io.matthewnelson.kmp.tor.runtime.api.apply
 import io.matthewnelson.kmp.tor.runtime.api.address.IPAddress
 import io.matthewnelson.kmp.tor.runtime.api.address.IPAddress.V4.Companion.toIPAddressV4
 import io.matthewnelson.kmp.tor.runtime.api.address.IPAddress.V6.Companion.toIPAddressV6
 import io.matthewnelson.kmp.tor.runtime.api.address.Port
-import io.matthewnelson.kmp.tor.runtime.api.config.TorConfig.Keyword.Attribute
-import io.matthewnelson.kmp.tor.runtime.api.config.TorConfig.LineItem.Companion.toLineItem
-import io.matthewnelson.kmp.tor.runtime.api.config.TorConfig.Setting.Companion.filterByAttribute
-import io.matthewnelson.kmp.tor.runtime.api.config.TorConfig.Setting.Companion.filterByKeyword
-import io.matthewnelson.kmp.tor.runtime.api.config.builders.*
+import io.matthewnelson.kmp.tor.runtime.api.TorConfig.Keyword.Attribute
+import io.matthewnelson.kmp.tor.runtime.api.TorConfig.LineItem.Companion.toLineItem
+import io.matthewnelson.kmp.tor.runtime.api.TorConfig.Setting.Companion.filterByAttribute
+import io.matthewnelson.kmp.tor.runtime.api.TorConfig.Setting.Companion.filterByKeyword
+import io.matthewnelson.kmp.tor.runtime.api.builder.*
 import io.matthewnelson.kmp.tor.runtime.api.internal.IsAndroidHost
 import io.matthewnelson.kmp.tor.runtime.api.internal.IsUnixLikeHost
 import io.matthewnelson.kmp.tor.runtime.api.internal.toByte
