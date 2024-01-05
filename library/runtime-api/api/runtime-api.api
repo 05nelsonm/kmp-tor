@@ -737,6 +737,65 @@ public final class io/matthewnelson/kmp/tor/runtime/api/config/builders/UnixSock
 public final class io/matthewnelson/kmp/tor/runtime/api/config/builders/UnixSocketBuilder$Companion {
 }
 
+public final class io/matthewnelson/kmp/tor/runtime/api/event/TorEvent : java/lang/Enum {
+	public static final field ADDRMAP Lio/matthewnelson/kmp/tor/runtime/api/event/TorEvent;
+	public static final field BUILDTIMEOUT_SET Lio/matthewnelson/kmp/tor/runtime/api/event/TorEvent;
+	public static final field BW Lio/matthewnelson/kmp/tor/runtime/api/event/TorEvent;
+	public static final field CELL_STATS Lio/matthewnelson/kmp/tor/runtime/api/event/TorEvent;
+	public static final field CIRC Lio/matthewnelson/kmp/tor/runtime/api/event/TorEvent;
+	public static final field CIRC_BW Lio/matthewnelson/kmp/tor/runtime/api/event/TorEvent;
+	public static final field CIRC_MINOR Lio/matthewnelson/kmp/tor/runtime/api/event/TorEvent;
+	public static final field CLIENTS_SEEN Lio/matthewnelson/kmp/tor/runtime/api/event/TorEvent;
+	public static final field CONF_CHANGED Lio/matthewnelson/kmp/tor/runtime/api/event/TorEvent;
+	public static final field CONN_BW Lio/matthewnelson/kmp/tor/runtime/api/event/TorEvent;
+	public static final field DEBUG Lio/matthewnelson/kmp/tor/runtime/api/event/TorEvent;
+	public static final field DESCCHANGED Lio/matthewnelson/kmp/tor/runtime/api/event/TorEvent;
+	public static final field ERR Lio/matthewnelson/kmp/tor/runtime/api/event/TorEvent;
+	public static final field GUARD Lio/matthewnelson/kmp/tor/runtime/api/event/TorEvent;
+	public static final field HS_DESC Lio/matthewnelson/kmp/tor/runtime/api/event/TorEvent;
+	public static final field HS_DESC_CONTENT Lio/matthewnelson/kmp/tor/runtime/api/event/TorEvent;
+	public static final field INFO Lio/matthewnelson/kmp/tor/runtime/api/event/TorEvent;
+	public static final field NETWORK_LIVENESS Lio/matthewnelson/kmp/tor/runtime/api/event/TorEvent;
+	public static final field NEWCONSENSUS Lio/matthewnelson/kmp/tor/runtime/api/event/TorEvent;
+	public static final field NEWDESC Lio/matthewnelson/kmp/tor/runtime/api/event/TorEvent;
+	public static final field NOTICE Lio/matthewnelson/kmp/tor/runtime/api/event/TorEvent;
+	public static final field NS Lio/matthewnelson/kmp/tor/runtime/api/event/TorEvent;
+	public static final field ORCONN Lio/matthewnelson/kmp/tor/runtime/api/event/TorEvent;
+	public static final field SIGNAL Lio/matthewnelson/kmp/tor/runtime/api/event/TorEvent;
+	public static final field STATUS_CLIENT Lio/matthewnelson/kmp/tor/runtime/api/event/TorEvent;
+	public static final field STATUS_GENERAL Lio/matthewnelson/kmp/tor/runtime/api/event/TorEvent;
+	public static final field STATUS_SERVER Lio/matthewnelson/kmp/tor/runtime/api/event/TorEvent;
+	public static final field STREAM Lio/matthewnelson/kmp/tor/runtime/api/event/TorEvent;
+	public static final field STREAM_BW Lio/matthewnelson/kmp/tor/runtime/api/event/TorEvent;
+	public static final field TRANSPORT_LAUNCHED Lio/matthewnelson/kmp/tor/runtime/api/event/TorEvent;
+	public static final field WARN Lio/matthewnelson/kmp/tor/runtime/api/event/TorEvent;
+	public static fun getEntries ()Lkotlin/enums/EnumEntries;
+	public final fun listener (Lio/matthewnelson/kmp/tor/runtime/api/ItBlock;)Lio/matthewnelson/kmp/tor/runtime/api/event/TorEvent$Listener;
+	public final fun listener (Ljava/lang/String;Lio/matthewnelson/kmp/tor/runtime/api/ItBlock;)Lio/matthewnelson/kmp/tor/runtime/api/event/TorEvent$Listener;
+	public static fun valueOf (Ljava/lang/String;)Lio/matthewnelson/kmp/tor/runtime/api/event/TorEvent;
+	public static fun values ()[Lio/matthewnelson/kmp/tor/runtime/api/event/TorEvent;
+}
+
+public class io/matthewnelson/kmp/tor/runtime/api/event/TorEvent$Listener {
+	public final field block Lio/matthewnelson/kmp/tor/runtime/api/ItBlock;
+	public final field event Lio/matthewnelson/kmp/tor/runtime/api/event/TorEvent;
+	public final field tag Ljava/lang/String;
+	public fun <init> (Ljava/lang/String;Lio/matthewnelson/kmp/tor/runtime/api/event/TorEvent;Lio/matthewnelson/kmp/tor/runtime/api/ItBlock;)V
+}
+
+public abstract class io/matthewnelson/kmp/tor/runtime/api/event/TorEvent$Processor {
+	public final fun add (Lio/matthewnelson/kmp/tor/runtime/api/event/TorEvent$Listener;)V
+	public final fun add ([Lio/matthewnelson/kmp/tor/runtime/api/event/TorEvent$Listener;)V
+	public fun clearListeners ()V
+	protected final fun notify (Lio/matthewnelson/kmp/tor/runtime/api/event/TorEvent;Ljava/lang/String;)V
+	public final fun remove (Lio/matthewnelson/kmp/tor/runtime/api/event/TorEvent$Listener;)V
+	public final fun remove ([Lio/matthewnelson/kmp/tor/runtime/api/event/TorEvent$Listener;)V
+	public fun removeAll (Lio/matthewnelson/kmp/tor/runtime/api/event/TorEvent;)V
+	public fun removeAll (Ljava/lang/String;)V
+	public final fun removeAll ([Lio/matthewnelson/kmp/tor/runtime/api/event/TorEvent;)V
+	protected final fun withListeners (Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
+}
+
 public final class io/matthewnelson/kmp/tor/runtime/api/key/AddressKey {
 }
 
