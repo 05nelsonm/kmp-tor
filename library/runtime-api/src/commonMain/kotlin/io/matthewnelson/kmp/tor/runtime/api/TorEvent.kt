@@ -25,8 +25,8 @@ import kotlin.jvm.JvmField
 /**
  * [Asynchronous Events](https://torproject.gitlab.io/torspec/control-spec/#asynchronous-events)
  *
- * @see [Listener]
- * @see [listener]
+ * @see [Observer]
+ * @see [observer]
  * @see [Processor]
  * */
 public enum class TorEvent {
@@ -191,28 +191,28 @@ public enum class TorEvent {
 //    PT_STATUS,
 
     /**
-     * Create a listener for a given [TorEvent]
+     * Create an observer for the given [TorEvent]
      *
      * e.g. (Kotlin)
      *
-     *     val bwListener = TorEvent.BW.listener { event ->
+     *     val bwObserver = TorEvent.BW.observer { event ->
      *         updateNotification(event.formatBandwidth())
      *     }
      *
      * e.g. (Java)
      *
-     *     TorEvent.Listener bwListener = TorEvent.BW.listener(e -> {
+     *     TorEvent.Observer bwObserver = TorEvent.BW.observer(e -> {
      *         updateNotification(formatBandwidth(e));
      *     });
      *
      * @param [block] the callback to pass the event text to
      * */
-    public fun listener(
+    public fun observer(
         block: ItBlock<String>,
-    ): Listener = Listener(null,this, block)
+    ): Observer = observer("", block)
 
     /**
-     * Create a listener for a given [TorEvent] and [tag].
+     * Create an observer for the given [TorEvent] and [tag].
      *
      * This is useful for lifecycle aware components, all of which
      * can be removed with a single call using the [tag] upon
@@ -220,32 +220,34 @@ public enum class TorEvent {
      *
      * e.g. (Kotlin)
      *
-     *     val bwListener = TorEvent.BW.listener("my service") { event ->
+     *     val bwObserver = TorEvent.BW.observer("my service") { event ->
      *         updateNotification(event.formatBandwidth())
      *     }
      *
      * e.g. (Java)
      *
-     *     TorEvent.Listener bwListener = TorEvent.BW.listener("my service", e -> {
+     *     TorEvent.Observer bwObserver = TorEvent.BW.observer("my service", e -> {
      *         updateNotification(formatBandwidth(e));
      *     });
      *
      * @param [tag] Any non-blank string value
      * @param [block] the callback to pass the event text to
      * */
-    public fun listener(
+    public fun observer(
         tag: String,
         block: ItBlock<String>,
-    ): Listener = Listener(tag.ifBlank { null },this, block)
+    ): Observer = Observer(tag,this, block)
 
-    public open class Listener(
-        @JvmField
-        public val tag: String?,
+    public class Observer(
+        tag: String?,
         @JvmField
         public val event: TorEvent,
         @JvmField
         public val block: ItBlock<String>,
-    )
+    ) {
+        @JvmField
+        public val tag: String? = tag?.ifBlank { null }
+    }
 
     /**
      * Base abstraction for implementations that process [TorEvent].
@@ -254,94 +256,94 @@ public enum class TorEvent {
     @InternalKmpTorApi
     protected constructor() {
 
-        private val listeners = mutableSetOf<Listener>()
+        private val observers = mutableSetOf<Observer>()
 
         @OptIn(InternalKmpTorApi::class)
         private val lock = SynchronizedObject()
 
         /**
-         * Add a single [Listener].
+         * Add a single [Observer].
          * */
-        public fun add(listener: Listener) {
-            withListeners { add(listener) }
+        public fun add(observer: Observer) {
+            withObservers { add(observer) }
         }
 
         /**
-         * Add multiple [Listener].
+         * Add multiple [Observer].
          * */
-        public fun add(vararg listeners: Listener) {
-            if (listeners.isEmpty()) return
-            withListeners { listeners.forEach { add(it) } }
+        public fun add(vararg observers: Observer) {
+            if (observers.isEmpty()) return
+            withObservers { observers.forEach { add(it) } }
         }
 
         /**
-         * Remove a single [Listener].
+         * Remove a single [Observer].
          * */
-        public fun remove(listener: Listener) {
-            withListeners { remove(listener) }
+        public fun remove(observer: Observer) {
+            withObservers { remove(observer) }
         }
 
         /**
-         * Remove multiple [Listener].
+         * Remove multiple [Observer].
          * */
-        public fun remove(vararg listeners: Listener) {
-            if (listeners.isEmpty()) return
-            withListeners { listeners.forEach { remove(it) } }
+        public fun remove(vararg observers: Observer) {
+            if (observers.isEmpty()) return
+            withObservers { observers.forEach { remove(it) } }
         }
 
         /**
-         * Remove all [Listener] for given [event]
+         * Remove all [Observer] for given [event]
          * */
         public open fun removeAll(event: TorEvent) {
-            withListeners {
-                val listeners = filter { it.event == event }
-                removeAll(listeners.toSet())
+            withObservers {
+                val observers = filter { it.event == event }
+                removeAll(observers.toSet())
             }
         }
 
         /**
-         * Remove all [Listener] for given [events]
+         * Remove all [Observer] for given [events]
          * */
         public fun removeAll(vararg events: TorEvent) {
             if (events.isEmpty()) return
-            withListeners {
-                val listeners = filter { events.contains(it.event) }
-                removeAll(listeners.toSet())
+            withObservers {
+                val observers = filter { events.contains(it.event) }
+                removeAll(observers.toSet())
             }
         }
 
         /**
-         * Remove all [Listener] for a given [tag]
+         * Remove all [Observer] for a given [tag]
          * */
         public open fun removeAll(tag: String) {
-            withListeners {
-                val listeners = filter { it.tag == tag }
-                removeAll(listeners.toSet())
+            withObservers {
+                val observers = filter { it.tag == tag }
+                removeAll(observers.toSet())
             }
         }
 
         /**
-         * Removes all [Listener] for all [TorEvent]s.
+         * Removes all [Observer] for all [TorEvent]s.
          * */
-        public open fun clearListeners() {
-            withListeners { clear() }
+        public open fun clearObservers() {
+            withObservers { clear() }
         }
 
-        protected fun notify(event: TorEvent, output: String) {
-            withListeners {
-                forEach { listener ->
-                    if (listener.event != event) return@forEach
-                    listener.block.invoke(output)
+        protected fun notifyObservers(event: TorEvent, output: String) {
+            withObservers {
+                for (observer in this) {
+                    if (observer.event != event) continue
+                    observer.block.invoke(output)
                 }
             }
         }
 
-        protected fun <T: Any?> withListeners(
-            block: MutableSet<Listener>.() -> T,
+        protected fun <T: Any?> withObservers(
+            block: MutableSet<Observer>.() -> T,
         ): T {
             @OptIn(InternalKmpTorApi::class)
             val result = synchronized(lock) {
-                block(listeners)
+                block(observers)
             }
 
             return result
