@@ -553,13 +553,13 @@ public final class io/matthewnelson/kmp/tor/runtime/api/TorEvent : java/lang/Enu
 	public static final field TRANSPORT_LAUNCHED Lio/matthewnelson/kmp/tor/runtime/api/TorEvent;
 	public static final field WARN Lio/matthewnelson/kmp/tor/runtime/api/TorEvent;
 	public static fun getEntries ()Lkotlin/enums/EnumEntries;
-	public final fun listener (Lio/matthewnelson/kmp/tor/runtime/api/ItBlock;)Lio/matthewnelson/kmp/tor/runtime/api/TorEvent$Listener;
-	public final fun listener (Ljava/lang/String;Lio/matthewnelson/kmp/tor/runtime/api/ItBlock;)Lio/matthewnelson/kmp/tor/runtime/api/TorEvent$Listener;
+	public final fun observer (Lio/matthewnelson/kmp/tor/runtime/api/ItBlock;)Lio/matthewnelson/kmp/tor/runtime/api/TorEvent$Observer;
+	public final fun observer (Ljava/lang/String;Lio/matthewnelson/kmp/tor/runtime/api/ItBlock;)Lio/matthewnelson/kmp/tor/runtime/api/TorEvent$Observer;
 	public static fun valueOf (Ljava/lang/String;)Lio/matthewnelson/kmp/tor/runtime/api/TorEvent;
 	public static fun values ()[Lio/matthewnelson/kmp/tor/runtime/api/TorEvent;
 }
 
-public class io/matthewnelson/kmp/tor/runtime/api/TorEvent$Listener {
+public final class io/matthewnelson/kmp/tor/runtime/api/TorEvent$Observer {
 	public final field block Lio/matthewnelson/kmp/tor/runtime/api/ItBlock;
 	public final field event Lio/matthewnelson/kmp/tor/runtime/api/TorEvent;
 	public final field tag Ljava/lang/String;
@@ -567,16 +567,16 @@ public class io/matthewnelson/kmp/tor/runtime/api/TorEvent$Listener {
 }
 
 public abstract class io/matthewnelson/kmp/tor/runtime/api/TorEvent$Processor {
-	public final fun add (Lio/matthewnelson/kmp/tor/runtime/api/TorEvent$Listener;)V
-	public final fun add ([Lio/matthewnelson/kmp/tor/runtime/api/TorEvent$Listener;)V
-	public fun clearListeners ()V
-	protected final fun notify (Lio/matthewnelson/kmp/tor/runtime/api/TorEvent;Ljava/lang/String;)V
-	public final fun remove (Lio/matthewnelson/kmp/tor/runtime/api/TorEvent$Listener;)V
-	public final fun remove ([Lio/matthewnelson/kmp/tor/runtime/api/TorEvent$Listener;)V
+	public final fun add (Lio/matthewnelson/kmp/tor/runtime/api/TorEvent$Observer;)V
+	public final fun add ([Lio/matthewnelson/kmp/tor/runtime/api/TorEvent$Observer;)V
+	public fun clearObservers ()V
+	protected final fun notifyObservers (Lio/matthewnelson/kmp/tor/runtime/api/TorEvent;Ljava/lang/String;)V
+	public final fun remove (Lio/matthewnelson/kmp/tor/runtime/api/TorEvent$Observer;)V
+	public final fun remove ([Lio/matthewnelson/kmp/tor/runtime/api/TorEvent$Observer;)V
 	public fun removeAll (Lio/matthewnelson/kmp/tor/runtime/api/TorEvent;)V
 	public fun removeAll (Ljava/lang/String;)V
 	public final fun removeAll ([Lio/matthewnelson/kmp/tor/runtime/api/TorEvent;)V
-	protected final fun withListeners (Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
+	protected final fun withObservers (Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
 }
 
 public abstract class io/matthewnelson/kmp/tor/runtime/api/address/Address : java/lang/Comparable {

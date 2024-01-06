@@ -26,9 +26,7 @@ import io.matthewnelson.kmp.tor.runtime.api.address.OnionAddress
  * */
 public class AuthKey private constructor() {
 
-    public sealed class Public(
-        private val key: ByteArray
-    ): Key.Public() {
+    public sealed class Public(private val key: ByteArray): Key.Public() {
 
         // TODO: writeDescriptorToFile
 
