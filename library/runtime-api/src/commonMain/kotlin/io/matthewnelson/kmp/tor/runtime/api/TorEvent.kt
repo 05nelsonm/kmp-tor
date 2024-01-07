@@ -17,9 +17,7 @@
 
 package io.matthewnelson.kmp.tor.runtime.api
 
-import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
-import io.matthewnelson.kmp.tor.core.resource.SynchronizedObject
-import io.matthewnelson.kmp.tor.core.resource.synchronized
+import kotlin.apply
 import kotlin.jvm.JvmField
 
 /**
@@ -247,106 +245,60 @@ public enum class TorEvent {
     ) {
         @JvmField
         public val tag: String? = tag?.ifBlank { null }
+
+        override fun toString(): String = buildString {
+            append("TorEvent.Observer[tag=")
+            append(tag.toString())
+            append(",event=")
+            append(event.name)
+            append("]@")
+            append(hashCode())
+        }
     }
 
     /**
-     * Base abstraction for implementations that process [TorEvent].
+     * Base interface for implementations that process [TorEvent].
      * */
-    public abstract class Processor
-    @InternalKmpTorApi
-    protected constructor() {
-
-        private val observers = mutableSetOf<Observer>()
-
-        @OptIn(InternalKmpTorApi::class)
-        private val lock = SynchronizedObject()
+    public interface Processor {
 
         /**
          * Add a single [Observer].
          * */
-        public fun add(observer: Observer) {
-            withObservers { add(observer) }
-        }
+        public fun add(observer: Observer)
 
         /**
          * Add multiple [Observer].
          * */
-        public fun add(vararg observers: Observer) {
-            if (observers.isEmpty()) return
-            withObservers { observers.forEach { add(it) } }
-        }
+        public fun add(vararg observers: Observer)
 
         /**
          * Remove a single [Observer].
          * */
-        public fun remove(observer: Observer) {
-            withObservers { remove(observer) }
-        }
+        public fun remove(observer: Observer)
 
         /**
          * Remove multiple [Observer].
          * */
-        public fun remove(vararg observers: Observer) {
-            if (observers.isEmpty()) return
-            withObservers { observers.forEach { remove(it) } }
-        }
+        public fun remove(vararg observers: Observer)
 
         /**
-         * Remove all [Observer] for given [event]
+         * Remove all [Observer] of a single [TorEvent]
          * */
-        public open fun removeAll(event: TorEvent) {
-            withObservers {
-                val observers = filter { it.event == event }
-                removeAll(observers.toSet())
-            }
-        }
+        public fun removeAll(event: TorEvent)
 
         /**
-         * Remove all [Observer] for given [events]
+         * Remove all [Observer] of multiple [TorEvent]
          * */
-        public fun removeAll(vararg events: TorEvent) {
-            if (events.isEmpty()) return
-            withObservers {
-                val observers = filter { events.contains(it.event) }
-                removeAll(observers.toSet())
-            }
-        }
+        public fun removeAll(vararg events: TorEvent)
 
         /**
-         * Remove all [Observer] for a given [tag]
+         * Remove all [Observer] with the given [tag]
          * */
-        public open fun removeAll(tag: String) {
-            withObservers {
-                val observers = filter { it.tag == tag }
-                removeAll(observers.toSet())
-            }
-        }
+        public fun removeAll(tag: String)
 
         /**
-         * Removes all [Observer] for all [TorEvent]s.
+         * Remove all [Observer] that are currently registered.
          * */
-        public open fun clearObservers() {
-            withObservers { clear() }
-        }
-
-        protected fun notifyObservers(event: TorEvent, output: String) {
-            withObservers {
-                for (observer in this) {
-                    if (observer.event != event) continue
-                    observer.block.invoke(output)
-                }
-            }
-        }
-
-        protected fun <T: Any?> withObservers(
-            block: MutableSet<Observer>.() -> T,
-        ): T {
-            @OptIn(InternalKmpTorApi::class)
-            val result = synchronized(lock) {
-                block(observers)
-            }
-
-            return result
-        }
+        public fun clearObservers()
     }
 }
