@@ -18,7 +18,7 @@ if (CHECK_PUBLICATION != null) {
 } else {
     listOf(
         "runtime",
-        "runtime-api",
+        "runtime-ctrl-api",
         "runtime-ctrl",
     ).forEach { name ->
         include(":library:$name")
