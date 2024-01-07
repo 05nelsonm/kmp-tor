@@ -40,8 +40,8 @@ kmpConfiguration {
             sourceSetMain {
                 dependencies {
                     implementation("$group:runtime:$version")
-                    implementation("$group:runtime-api:$version")
                     implementation("$group:runtime-ctrl:$version")
+                    implementation("$group:runtime-ctrl-api:$version")
                 }
             }
         }

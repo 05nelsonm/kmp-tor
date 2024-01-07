@@ -22,7 +22,7 @@ kmpConfiguration {
         common {
             sourceSetMain {
                 dependencies {
-                    api(project(":library:runtime-api"))
+                    api(project(":library:runtime-ctrl-api"))
                     implementation(libs.kmp.tor.core.resource)
                 }
             }

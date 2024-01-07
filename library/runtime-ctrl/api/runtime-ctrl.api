@@ -1,13 +1,13 @@
-public abstract class io/matthewnelson/kmp/tor/runtime/ctrl/AbstractTorEventProcessor : io/matthewnelson/kmp/tor/runtime/api/TorEvent$Processor {
-	public final fun add (Lio/matthewnelson/kmp/tor/runtime/api/TorEvent$Observer;)V
-	public final fun add ([Lio/matthewnelson/kmp/tor/runtime/api/TorEvent$Observer;)V
+public abstract class io/matthewnelson/kmp/tor/runtime/ctrl/AbstractTorEventProcessor : io/matthewnelson/kmp/tor/runtime/ctrl/api/TorEvent$Processor {
+	public final fun add (Lio/matthewnelson/kmp/tor/runtime/ctrl/api/TorEvent$Observer;)V
+	public final fun add ([Lio/matthewnelson/kmp/tor/runtime/ctrl/api/TorEvent$Observer;)V
 	public fun clearObservers ()V
-	protected final fun notifyObservers (Lio/matthewnelson/kmp/tor/runtime/api/TorEvent;Ljava/lang/String;)V
-	public final fun remove (Lio/matthewnelson/kmp/tor/runtime/api/TorEvent$Observer;)V
-	public final fun remove ([Lio/matthewnelson/kmp/tor/runtime/api/TorEvent$Observer;)V
-	public final fun removeAll (Lio/matthewnelson/kmp/tor/runtime/api/TorEvent;)V
+	protected final fun notifyObservers (Lio/matthewnelson/kmp/tor/runtime/ctrl/api/TorEvent;Ljava/lang/String;)V
+	public final fun remove (Lio/matthewnelson/kmp/tor/runtime/ctrl/api/TorEvent$Observer;)V
+	public final fun remove ([Lio/matthewnelson/kmp/tor/runtime/ctrl/api/TorEvent$Observer;)V
+	public final fun removeAll (Lio/matthewnelson/kmp/tor/runtime/ctrl/api/TorEvent;)V
 	public fun removeAll (Ljava/lang/String;)V
-	public final fun removeAll ([Lio/matthewnelson/kmp/tor/runtime/api/TorEvent;)V
+	public final fun removeAll ([Lio/matthewnelson/kmp/tor/runtime/ctrl/api/TorEvent;)V
 	protected final fun withObservers (Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
 }
 

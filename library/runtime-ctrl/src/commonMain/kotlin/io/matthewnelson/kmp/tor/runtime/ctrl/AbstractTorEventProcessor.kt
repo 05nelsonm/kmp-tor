@@ -18,7 +18,7 @@ package io.matthewnelson.kmp.tor.runtime.ctrl
 import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
 import io.matthewnelson.kmp.tor.core.resource.SynchronizedObject
 import io.matthewnelson.kmp.tor.core.resource.synchronized
-import io.matthewnelson.kmp.tor.runtime.api.TorEvent
+import io.matthewnelson.kmp.tor.runtime.ctrl.api.TorEvent
 
 /**
  * Base abstraction for implementations that process [TorEvent].
