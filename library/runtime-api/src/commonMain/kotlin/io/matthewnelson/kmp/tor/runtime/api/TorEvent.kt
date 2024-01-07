@@ -17,7 +17,6 @@
 
 package io.matthewnelson.kmp.tor.runtime.api
 
-import kotlin.apply
 import kotlin.jvm.JvmField
 
 /**
