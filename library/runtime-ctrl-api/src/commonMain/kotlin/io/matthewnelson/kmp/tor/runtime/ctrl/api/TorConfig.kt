@@ -17,12 +17,12 @@
 
 package io.matthewnelson.kmp.tor.runtime.ctrl.api
 
+import io.matthewnelson.immutable.collections.immutableSetOf
+import io.matthewnelson.immutable.collections.toImmutableMap
+import io.matthewnelson.immutable.collections.toImmutableSet
 import io.matthewnelson.kmp.file.*
 import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
 import io.matthewnelson.kmp.tor.core.api.annotation.KmpTorDsl
-import io.matthewnelson.kmp.tor.core.resource.immutableSetOf
-import io.matthewnelson.kmp.tor.core.resource.toImmutableMap
-import io.matthewnelson.kmp.tor.core.resource.toImmutableSet
 import io.matthewnelson.kmp.tor.runtime.ctrl.api.address.IPAddress
 import io.matthewnelson.kmp.tor.runtime.ctrl.api.address.IPAddress.V4.Companion.toIPAddressV4
 import io.matthewnelson.kmp.tor.runtime.ctrl.api.address.IPAddress.V6.Companion.toIPAddressV6
