@@ -30,7 +30,7 @@ public sealed class Address(
 ): Comparable<Address> {
 
     /**
-     * Returns the [value] in it's canonicalized hostname form
+     * Returns the [value] in its canonicalized hostname form
      *
      * e.g.
      *
