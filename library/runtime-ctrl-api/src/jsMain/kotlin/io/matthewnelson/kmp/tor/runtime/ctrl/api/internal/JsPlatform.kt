@@ -34,10 +34,4 @@ internal actual val UnixSocketsNotSupportedMessage: String? by lazy {
     }
 }
 
-internal actual val ProcessID: Int? get() {
-    return try {
-        js("require('process')").pid as Int
-    } catch (_: Throwable) {
-        null
-    }
-}
+internal actual val ProcessID: Int? get() = process_pid
