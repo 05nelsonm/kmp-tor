@@ -13,12 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-package io.matthewnelson.kmp.tor.runtime.ctrl.api.internal
+package io.matthewnelson.kmp.tor.runtime.ctrl.api
 
-internal expect val UnixSocketsNotSupportedMessage: String?
+import kotlin.test.Test
+import kotlin.test.assertNotNull
 
-internal expect val IsUnixLikeHost: Boolean
+class OwningControllerProcessUnitTest {
 
-internal expect val IsAndroidHost: Boolean
-
-internal expect val ProcessID: Int?
+    @Test
+    fun givenSetting_whenDefault_thenIsNotNull() {
+        val setting = TorConfig.__OwningControllerProcess.Builder {}
+        // Ensures that the default value is non-null
+        assertNotNull(setting)
+        println(setting)
+    }
+}

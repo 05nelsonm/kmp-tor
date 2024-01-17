@@ -13,12 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-package io.matthewnelson.kmp.tor.runtime.ctrl.api.internal
+package io.matthewnelson.kmp.tor.runtime.ctrl.api.builder
 
-internal expect val UnixSocketsNotSupportedMessage: String?
+import io.matthewnelson.kmp.tor.runtime.ctrl.api.internal.UnixSocketsNotSupportedMessage
+import kotlin.test.Test
 
-internal expect val IsUnixLikeHost: Boolean
+class UnixSocketBuilderJsUnitTest: UnixSocketBuilderBaseTest() {
 
-internal expect val IsAndroidHost: Boolean
+    // Will only run when host machine running the test supports it
+    override val hostSupportsUnixSockets: Boolean = UnixSocketsNotSupportedMessage == null
 
-internal expect val ProcessID: Int?
+    @Test
+    fun stub() {}
+}

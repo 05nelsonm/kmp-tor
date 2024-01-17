@@ -45,3 +45,31 @@ internal actual val UnixSocketsNotSupportedMessage: String? by lazy {
         "Unix Sockets are not supported for Java 15 or below"
     }
 }
+
+@get:JvmSynthetic
+internal actual val ProcessID: Int? get() {
+    @OptIn(InternalKmpTorApi::class)
+    return if (OSInfo.INSTANCE.isAndroidRuntime()) {
+        AndroidPID
+    } else {
+        try {
+            java.lang.management.ManagementFactory
+                .getRuntimeMXBean()
+                .name
+                .split('@')[0]
+                .toInt()
+        } catch (_: Throwable) {
+            null
+        }
+    }
+}
+
+private val AndroidPID: Int? by lazy {
+    try {
+        Class.forName("android.os.Process")
+            ?.getMethod("myPid")
+            ?.invoke(null) as? Int
+    } catch (_: Throwable) {
+        null
+    }
+}

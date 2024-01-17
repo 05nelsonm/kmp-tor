@@ -13,9 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-package io.matthewnelson.kmp.tor.runtime.ctrl.api.config.builders
+package io.matthewnelson.kmp.tor.runtime.ctrl.api.builder
 
-import io.matthewnelson.kmp.tor.runtime.ctrl.api.builder.UnixSocketBuilderBaseTest
 import kotlin.test.Test
 
 class UnixSocketBuilderUnixUnitTest: UnixSocketBuilderBaseTest() {

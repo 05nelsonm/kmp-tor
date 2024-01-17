@@ -33,3 +33,5 @@ internal actual val UnixSocketsNotSupportedMessage: String? by lazy {
         null
     }
 }
+
+internal actual val ProcessID: Int? get() = process_pid

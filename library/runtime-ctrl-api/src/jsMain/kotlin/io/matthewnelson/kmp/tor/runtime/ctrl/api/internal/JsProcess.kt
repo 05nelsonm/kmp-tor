@@ -13,17 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-package io.matthewnelson.kmp.tor.runtime.ctrl.api.config.builders
+@file:JsModule("process")
+@file:JsNonModule
 
-import io.matthewnelson.kmp.tor.runtime.ctrl.api.builder.UnixSocketBuilderBaseTest
-import io.matthewnelson.kmp.tor.runtime.ctrl.api.internal.UnixSocketsNotSupportedMessage
-import kotlin.test.Test
+package io.matthewnelson.kmp.tor.runtime.ctrl.api.internal
 
-class UnixSocketBuilderJvmUnitTest: UnixSocketBuilderBaseTest() {
-
-    // Will only run when host machine running the test supports it
-    override val hostSupportsUnixSockets: Boolean = UnixSocketsNotSupportedMessage == null
-
-    @Test
-    fun stub() {}
-}
+/** [docs](https://nodejs.org/api/process.html#processpid) */
+@JsName("pid")
+internal external val process_pid: Int

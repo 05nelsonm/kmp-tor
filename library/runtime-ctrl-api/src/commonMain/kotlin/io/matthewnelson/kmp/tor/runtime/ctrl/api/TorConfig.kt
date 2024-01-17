@@ -34,6 +34,7 @@ import io.matthewnelson.kmp.tor.runtime.ctrl.api.TorConfig.Setting.Companion.fil
 import io.matthewnelson.kmp.tor.runtime.ctrl.api.builder.*
 import io.matthewnelson.kmp.tor.runtime.ctrl.api.internal.IsAndroidHost
 import io.matthewnelson.kmp.tor.runtime.ctrl.api.internal.IsUnixLikeHost
+import io.matthewnelson.kmp.tor.runtime.ctrl.api.internal.ProcessID
 import io.matthewnelson.kmp.tor.runtime.ctrl.api.internal.toByte
 import kotlin.jvm.JvmField
 import kotlin.jvm.JvmName
@@ -439,7 +440,7 @@ public class TorConfig private constructor(
     ) {
 
         @JvmField
-        public var processId: Int? = null
+        public var processId: Int? = ProcessID
 
         public companion object: Setting.Factory<__OwningControllerProcess, Setting?>(
             name = "__OwningControllerProcess",
@@ -1913,7 +1914,6 @@ public class TorConfig private constructor(
                 set.add(first)
                 set.addAll(others)
 
-                @OptIn(InternalKmpTorApi::class)
                 return Setting(set.toImmutableSet(), extraInfo.toImmutableMap())
             }
         }
@@ -1922,12 +1922,12 @@ public class TorConfig private constructor(
          * Factory function provider for [TorConfig] subclasses to utilize
          * on their companion objects.
          *
-         * e.g.
+         * e.g. (Kotlin)
          *
-         *     // Kotlin
          *     val setting = TorConfig.RunAsDaemon.Builder { enable = true }
          *
-         *     // Java
+         * e.g. (Java)
+         *
          *     TorSetting setting = TorConfig.RunAsDaemon.Companion.Builder(b -> {
          *         b.enable = true;
          *     });
