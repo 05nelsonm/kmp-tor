@@ -15,8 +15,12 @@
  **/
 package io.matthewnelson.kmp.tor.runtime.ctrl.api.internal
 
+import platform.posix.getpid
+
 internal actual val UnixSocketsNotSupportedMessage: String? = null
 
 internal actual val IsUnixLikeHost: Boolean get() = true
 
 internal actual val IsAndroidHost: Boolean get() = false
+
+internal actual val ProcessID: Int? get() = getpid()

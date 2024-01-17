@@ -20,3 +20,5 @@ internal expect val UnixSocketsNotSupportedMessage: String?
 internal expect val IsUnixLikeHost: Boolean
 
 internal expect val IsAndroidHost: Boolean
+
+internal expect val ProcessID: Int?
