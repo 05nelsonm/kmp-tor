@@ -13,13 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-package io.matthewnelson.kmp.tor.runtime.ctrl.api.config.builders
+package io.matthewnelson.kmp.tor.runtime.ctrl.api.builder
 
-import io.matthewnelson.kmp.tor.runtime.ctrl.api.builder.UnixSocketBuilderBaseTest
 import io.matthewnelson.kmp.tor.runtime.ctrl.api.internal.UnixSocketsNotSupportedMessage
 import kotlin.test.Test
 
-class UnixSocketBuilderJsUnitTest: UnixSocketBuilderBaseTest() {
+class UnixSocketBuilderJvmUnitTest: UnixSocketBuilderBaseTest() {
 
     // Will only run when host machine running the test supports it
     override val hostSupportsUnixSockets: Boolean = UnixSocketsNotSupportedMessage == null
