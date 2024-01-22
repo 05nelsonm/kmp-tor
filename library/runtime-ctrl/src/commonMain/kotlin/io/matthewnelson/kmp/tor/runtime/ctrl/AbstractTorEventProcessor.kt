@@ -19,6 +19,10 @@ import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
 import io.matthewnelson.kmp.tor.core.resource.SynchronizedObject
 import io.matthewnelson.kmp.tor.core.resource.synchronized
 import io.matthewnelson.kmp.tor.runtime.ctrl.api.TorEvent
+import kotlin.concurrent.Volatile
+import kotlin.jvm.JvmField
+import kotlin.jvm.JvmName
+import kotlin.jvm.JvmStatic
 
 /**
  * Base abstraction for implementations that process [TorEvent].
@@ -26,8 +30,15 @@ import io.matthewnelson.kmp.tor.runtime.ctrl.api.TorEvent
 public abstract class AbstractTorEventProcessor
 @InternalKmpTorApi
 protected constructor(
+    @JvmField
+    protected val staticTag: String?,
     initialObservers: Set<TorEvent.Observer>
 ): TorEvent.Processor {
+
+    @Volatile
+    @get:JvmName("isDestroyed")
+    protected var isDestroyed: Boolean = false
+        private set
 
     private val observers = initialObservers.toMutableSet()
 
@@ -57,6 +68,8 @@ protected constructor(
             val iterator = iterator()
             while (iterator.hasNext()) {
                 val observer = iterator.next()
+                if (staticTag != null && observer.tag == staticTag) continue
+
                 if (observer.event == event) {
                     iterator.remove()
                 }
@@ -70,6 +83,8 @@ protected constructor(
             val iterator = iterator()
             while (iterator.hasNext()) {
                 val observer = iterator.next()
+                if (staticTag != null && observer.tag == staticTag) continue
+
                 if (events.contains(observer.event)) {
                     iterator.remove()
                 }
@@ -78,10 +93,14 @@ protected constructor(
     }
 
     public override fun removeAll(tag: String) {
+        if (staticTag != null && tag == staticTag) return
+
         withObservers {
             val iterator = iterator()
             while (iterator.hasNext()) {
                 val observer = iterator.next()
+                if (staticTag != null && observer.tag == staticTag) continue
+
                 if (observer.tag == tag) {
                     iterator.remove()
                 }
@@ -90,10 +109,18 @@ protected constructor(
     }
 
     public override fun clearObservers() {
-        withObservers { clear() }
+        withObservers {
+            val iterator = iterator()
+            while (iterator.hasNext()) {
+                val observer = iterator.next()
+                if (staticTag != null && observer.tag == staticTag) continue
+                iterator.remove()
+            }
+        }
     }
 
-    protected fun notifyObservers(event: TorEvent, output: String) {
+    protected fun TorEvent.notifyObservers(output: String) {
+        val event = this
         withObservers {
             for (observer in this) {
                 if (observer.event != event) continue
@@ -102,14 +129,56 @@ protected constructor(
         }
     }
 
+    protected open fun onDestroy() {
+        if (isDestroyed) return
+        withObservers { clear(); isDestroyed = true }
+    }
+
+    @OptIn(InternalKmpTorApi::class)
     protected fun <T: Any?> withObservers(
         block: MutableSet<TorEvent.Observer>.() -> T,
     ): T {
-        @OptIn(InternalKmpTorApi::class)
-        val result = synchronized(lock) {
-            block(observers)
-        }
+        if (isDestroyed) return block(noOpMutableSet())
 
-        return result
+        return synchronized(lock) {
+            block(if (isDestroyed) noOpMutableSet() else observers)
+        }
+    }
+
+    protected companion object {
+
+        @JvmStatic
+        @InternalKmpTorApi
+        @Suppress("UNCHECKED_CAST")
+        protected fun <T> noOpMutableSet(): MutableSet<T> = NoOpMutableSet as MutableSet<T>
+    }
+}
+
+private object NoOpMutableSet: MutableSet<Any> {
+
+    override fun equals(other: Any?): Boolean = other is MutableSet<*> && other.isEmpty()
+    override fun hashCode(): Int = 0
+    override fun toString(): String = "[]"
+
+    override val size: Int get() = 0
+    override fun isEmpty(): Boolean = true
+    override fun contains(element: Any): Boolean = false
+    override fun containsAll(elements: Collection<Any>): Boolean = elements.isEmpty()
+
+    override fun iterator(): MutableIterator<Any> = EmptyMutableIterator
+
+    override fun add(element: Any): Boolean = false
+    override fun addAll(elements: Collection<Any>): Boolean = elements.isEmpty()
+
+    override fun clear() {}
+
+    override fun retainAll(elements: Collection<Any>): Boolean = elements.isEmpty()
+    override fun removeAll(elements: Collection<Any>): Boolean = elements.isEmpty()
+    override fun remove(element: Any): Boolean = false
+
+    private object EmptyMutableIterator: MutableIterator<Any> {
+        override fun hasNext(): Boolean = false
+        override fun next(): Any = throw NoSuchElementException()
+        override fun remove() { throw NoSuchElementException() }
     }
 }
