@@ -20,6 +20,7 @@ if (CHECK_PUBLICATION != null) {
         "runtime",
         "runtime-ctrl-api",
         "runtime-ctrl",
+        "runtime-mobile",
     ).forEach { name ->
         include(":library:$name")
     }
