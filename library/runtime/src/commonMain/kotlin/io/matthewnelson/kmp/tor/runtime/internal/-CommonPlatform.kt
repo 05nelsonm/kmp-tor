@@ -17,5 +17,13 @@
 
 package io.matthewnelson.kmp.tor.runtime.internal
 
+import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
+import io.matthewnelson.kmp.tor.runtime.TorRuntime
+
+@OptIn(InternalKmpTorApi::class)
+internal expect fun TorRuntime.ServiceFactory.Companion.serviceRuntimeOrNull(
+    block: () -> TorRuntime.ServiceFactory,
+): TorRuntime?
+
 @Suppress("NOTHING_TO_INLINE")
 internal expect inline fun ByteArray.sha256(): String

@@ -28,6 +28,8 @@ import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
 import io.matthewnelson.kmp.tor.core.api.annotation.KmpTorDsl
 import io.matthewnelson.kmp.tor.runtime.ctrl.api.*
 import io.matthewnelson.kmp.tor.runtime.internal.InstanceKeeper
+import io.matthewnelson.kmp.tor.runtime.internal.RealTorRuntime
+import io.matthewnelson.kmp.tor.runtime.internal.RealTorRuntime.Companion.checkInstance
 import io.matthewnelson.kmp.tor.runtime.internal.sha256
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -101,7 +103,7 @@ public interface TorRuntime: TorEvent.Processor, RuntimeEvent.Processor {
         public var allowPortReassignment: Boolean = true
 
         @JvmField
-        public var networkObserver: NetworkObserver? = null
+        public var networkObserver: NetworkObserver = NetworkObserver.NOOP
 
         /**
          * If false, will use [Dispatchers.Main] when dispatching events.
@@ -185,7 +187,16 @@ public interface TorRuntime: TorEvent.Processor, RuntimeEvent.Processor {
                 val b = Builder(environment)
                 if (block != null) b.apply(block)
 
-                TODO()
+                RealTorRuntime.of(
+                    environment = environment,
+                    networkObserver = b.networkObserver,
+                    allowPortReassignment = b.allowPortReassignment,
+                    eventThreadBackground = b.eventThreadBackground,
+                    config = b.config.toImmutableList(),
+                    staticTorEvents = b.staticTorEvents.toImmutableSet(),
+                    staticTorEventObservers = b.staticTorEventObservers.toImmutableSet(),
+                    staticRuntimeEventObservers = b.staticRuntimeEventObservers.toImmutableSet(),
+                )
             }
         }
     }
@@ -299,7 +310,7 @@ public interface TorRuntime: TorEvent.Processor, RuntimeEvent.Processor {
             @JvmStatic
             @InternalKmpTorApi
             @Throws(IllegalStateException::class)
-            public fun checkInstance(factory: ServiceFactory) { TODO() }
+            public fun checkInstance(factory: ServiceFactory) { factory.checkInstance() }
         }
     }
 }

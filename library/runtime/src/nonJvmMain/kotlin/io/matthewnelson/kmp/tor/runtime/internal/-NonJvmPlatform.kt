@@ -19,7 +19,14 @@ package io.matthewnelson.kmp.tor.runtime.internal
 
 import io.matthewnelson.encoding.base16.Base16
 import io.matthewnelson.encoding.core.Encoder.Companion.encodeToString
+import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
+import io.matthewnelson.kmp.tor.runtime.TorRuntime
 import org.kotlincrypto.hash.sha2.SHA256
+
+@OptIn(InternalKmpTorApi::class)
+internal actual fun TorRuntime.ServiceFactory.Companion.serviceRuntimeOrNull(
+    block: () -> TorRuntime.ServiceFactory,
+): TorRuntime? = null
 
 @Suppress("NOTHING_TO_INLINE")
 internal actual inline fun ByteArray.sha256(): String {
