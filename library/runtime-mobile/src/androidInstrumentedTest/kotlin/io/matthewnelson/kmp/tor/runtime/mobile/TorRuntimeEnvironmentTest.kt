@@ -20,6 +20,7 @@ import androidx.test.core.app.ApplicationProvider
 import io.matthewnelson.kmp.tor.core.api.ResourceInstaller
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.fail
 
 class TorRuntimeEnvironmentTest {
 
@@ -60,9 +61,7 @@ class TorRuntimeEnvironmentTest {
     fun givenContext_whenBlankDirName_thenIsAsExpected() {
         val environment = app.createTorRuntimeEnvironment(dirName = "  ") { installationDir ->
             object : ResourceInstaller<ResourceInstaller.Paths.Tor>(installationDir) {
-                override fun install(): Paths.Tor {
-                    TODO("Not yet implemented")
-                }
+                override fun install(): Paths.Tor { fail() }
             }
         }
 

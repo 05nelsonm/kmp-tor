@@ -2,8 +2,8 @@ public abstract class io/matthewnelson/kmp/tor/runtime/NetworkObserver {
 	public static final field Companion Lio/matthewnelson/kmp/tor/runtime/NetworkObserver$Companion;
 	public static final field NOOP Lio/matthewnelson/kmp/tor/runtime/NetworkObserver;
 	public fun <init> ()V
-	protected final fun dispatch (Lio/matthewnelson/kmp/tor/runtime/NetworkObserver$Connectivity;)V
 	public abstract fun isNetworkConnected ()Z
+	protected final fun notify (Lio/matthewnelson/kmp/tor/runtime/NetworkObserver$Connectivity;)V
 	protected fun onObserversEmpty ()V
 	protected fun onObserversNotEmpty ()V
 }
@@ -94,6 +94,7 @@ public final class io/matthewnelson/kmp/tor/runtime/TorRuntime$Builder {
 	public field allowPortReassignment Z
 	public field eventThreadBackground Z
 	public field networkObserver Lio/matthewnelson/kmp/tor/runtime/NetworkObserver;
+	public field omitGeoIPFileSettings Z
 	public synthetic fun <init> (Lio/matthewnelson/kmp/tor/runtime/TorRuntime$Environment;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
 	public final fun config (Lio/matthewnelson/kmp/tor/runtime/ctrl/api/ThisBlock$WithIt;)Lio/matthewnelson/kmp/tor/runtime/TorRuntime$Builder;
 	public final fun staticEvent (Lio/matthewnelson/kmp/tor/runtime/ctrl/api/TorEvent;)Lio/matthewnelson/kmp/tor/runtime/TorRuntime$Builder;

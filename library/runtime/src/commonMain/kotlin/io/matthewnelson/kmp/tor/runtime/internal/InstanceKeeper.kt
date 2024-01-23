@@ -35,7 +35,7 @@ internal abstract class InstanceKeeper<K, V> internal constructor(
             .also { instances[key] = it }
     }
 
-    internal class Open<K, V> internal constructor(
+    internal open class Open<K, V> internal constructor(
         initialCapacity: Int = 1,
         loadFactor: Float = 1.0F,
     ): InstanceKeeper<K, V>(initialCapacity, loadFactor) {

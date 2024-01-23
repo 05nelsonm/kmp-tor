@@ -28,7 +28,7 @@ class NetworkObserverUnitTest {
         override fun onObserversNotEmpty() { onObserversCount++ }
         override fun onObserversEmpty() { onObserversCount-- }
 
-        fun dispatchInvoke() { dispatch(Connectivity.Connected) }
+        fun notifyInvoke() { notify(Connectivity.Connected) }
     }
 
     private val networkObserver = TestNetworkObserver()
@@ -71,10 +71,10 @@ class NetworkObserverUnitTest {
         val o1: (NetworkObserver.Connectivity) -> Unit = { invocations++ }
         networkObserver.subscribe(o1)
         networkObserver.subscribe(o1)
-        networkObserver.dispatchInvoke()
+        networkObserver.notifyInvoke()
         assertEquals(1, invocations)
         networkObserver.unsubscribe(o1)
-        networkObserver.dispatchInvoke()
+        networkObserver.notifyInvoke()
         assertEquals(1, invocations)
     }
 }

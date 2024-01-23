@@ -21,6 +21,7 @@ import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
 import io.matthewnelson.kmp.tor.runtime.TorRuntime
 
 @OptIn(InternalKmpTorApi::class)
+@Throws(IllegalStateException::class)
 internal expect fun TorRuntime.ServiceFactory.Companion.serviceRuntimeOrNull(
     block: () -> TorRuntime.ServiceFactory,
 ): TorRuntime?

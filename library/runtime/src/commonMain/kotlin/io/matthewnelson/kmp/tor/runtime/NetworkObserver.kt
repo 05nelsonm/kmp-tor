@@ -18,9 +18,21 @@ package io.matthewnelson.kmp.tor.runtime
 import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
 import io.matthewnelson.kmp.tor.core.resource.SynchronizedObject
 import io.matthewnelson.kmp.tor.core.resource.synchronized
+import io.matthewnelson.kmp.tor.runtime.ctrl.api.TorConfig
 import kotlin.jvm.JvmField
 import kotlin.jvm.JvmSynthetic
 
+/**
+ * A Hook for [TorRuntime] that controls [TorConfig.DisableNetwork]
+ * toggling when device connectivity is lost/gained.
+ *
+ * Multiple instances of [TorRuntime] can [subscribe] to a single
+ * [NetworkObserver].
+ *
+ * @see [notify]
+ * @see [NOOP]
+ * @see [TorRuntime.Builder.networkObserver]
+ * */
 public abstract class NetworkObserver {
 
     @OptIn(InternalKmpTorApi::class)
@@ -74,7 +86,11 @@ public abstract class NetworkObserver {
 
     public abstract fun isNetworkConnected(): Boolean
 
-    protected fun dispatch(connectivity: Connectivity) {
+    /**
+     * Notifies all registered [observers] of a change in
+     * [Connectivity]
+     * */
+    protected fun notify(connectivity: Connectivity) {
         @OptIn(InternalKmpTorApi::class)
         synchronized(lock) {
             observers.forEach { it(connectivity) }
@@ -88,6 +104,9 @@ public abstract class NetworkObserver {
 
     public companion object {
 
+        /**
+         * A non-operational [NetworkObserver]
+         * */
         @JvmField
         public val NOOP: NetworkObserver = object : NetworkObserver() {
             override fun subscribe(observer: (Connectivity) -> Unit) {}

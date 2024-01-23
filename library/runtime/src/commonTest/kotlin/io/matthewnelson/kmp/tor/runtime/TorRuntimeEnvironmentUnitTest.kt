@@ -22,6 +22,7 @@ import io.matthewnelson.kmp.tor.core.api.ResourceInstaller
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotEquals
+import kotlin.test.fail
 
 class TorRuntimeEnvironmentUnitTest {
 
@@ -29,9 +30,7 @@ class TorRuntimeEnvironmentUnitTest {
     fun givenSameWorkDir_whenEnvironmentBuilder_thenReturnsSameInstance() {
         val work = "".toFile().absoluteFile
         val torResource = object : ResourceInstaller<ResourceInstaller.Paths.Tor>(work) {
-            override fun install(): Paths.Tor {
-                TODO("Not yet implemented")
-            }
+            override fun install(): Paths.Tor { fail() }
         }
 
         val env1 = TorRuntime.Environment.Builder(work, work.resolve("cache")) { torResource }

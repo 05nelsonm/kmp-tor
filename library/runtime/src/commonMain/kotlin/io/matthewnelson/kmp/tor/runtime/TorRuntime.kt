@@ -26,6 +26,9 @@ import io.matthewnelson.kmp.tor.core.api.ResourceInstaller
 import io.matthewnelson.kmp.tor.core.api.ResourceInstaller.Paths
 import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
 import io.matthewnelson.kmp.tor.core.api.annotation.KmpTorDsl
+import io.matthewnelson.kmp.tor.runtime.TorRuntime.Companion.Builder
+import io.matthewnelson.kmp.tor.runtime.TorRuntime.Environment.Builder
+import io.matthewnelson.kmp.tor.runtime.TorRuntime.Environment.Companion.Builder
 import io.matthewnelson.kmp.tor.runtime.ctrl.api.*
 import io.matthewnelson.kmp.tor.runtime.internal.InstanceKeeper
 import io.matthewnelson.kmp.tor.runtime.internal.RealTorRuntime
@@ -67,9 +70,12 @@ public interface TorRuntime: TorEvent.Processor, RuntimeEvent.Processor {
     public companion object {
 
         /**
-         * Opener for creating a new [TorRuntime] instance.
+         * Opener for creating a [TorRuntime] instance.
          *
-         * @see [Environment]
+         * If a [TorRuntime] has already been created for the provided
+         * [Environment], that [TorRuntime] instance will be returned.
+         *
+         * @param [environment] the operational environment for the instance
          * @see [TorRuntime.Builder]
          * */
         @JvmStatic
@@ -100,6 +106,17 @@ public interface TorRuntime: TorEvent.Processor, RuntimeEvent.Processor {
         @JvmField
         public var allowPortReassignment: Boolean = true
 
+        /**
+         * If true, [Paths.Tor.geoip] and [Paths.Tor.geoip6] will **not** be
+         * automatically configured for your [TorConfig].
+         * */
+        @JvmField
+        public var omitGeoIPFileSettings: Boolean = false
+
+        /**
+         * This setting is ignored if utilizing the `kmp-tor-mobile` dependency
+         * as it has its own implementation which will be utilized.
+         * */
         @JvmField
         public var networkObserver: NetworkObserver = NetworkObserver.NOOP
 
@@ -116,10 +133,16 @@ public interface TorRuntime: TorEvent.Processor, RuntimeEvent.Processor {
          *
          * [block] is always invoked from a background thread, so it is safe
          * to perform IO within the lambda (e.g. writing settings that are
-         * not currently supported to the torrc file).
+         * not currently supported to the [Environment.torrcFile]).
          *
-         * Any exceptions thrown within [block] are propagated to the caller
+         * Any exception thrown within [block] will be propagated to the caller
          * of start.
+         *
+         * **NOTE:** This can be omitted as a minimum viable configuration
+         * is always created using [Environment].
+         *
+         * **NOTE:** [block] should not contain any non-singleton references
+         * such as Android Activity context.
          * */
         @KmpTorDsl
         public fun config(
@@ -173,13 +196,13 @@ public interface TorRuntime: TorEvent.Processor, RuntimeEvent.Processor {
             return this
         }
 
-        internal companion object: InstanceKeeper<Environment, TorRuntime>() {
+        internal companion object: InstanceKeeper<String, TorRuntime>() {
 
             @JvmSynthetic
             internal fun build(
                 environment: Environment,
                 block: ThisBlock<Builder>?,
-            ): TorRuntime = getOrCreateInstance(environment) {
+            ): TorRuntime = getOrCreateInstance(environment.id) {
                 val b = Builder(environment)
                 if (block != null) b.apply(block)
 
@@ -187,6 +210,7 @@ public interface TorRuntime: TorEvent.Processor, RuntimeEvent.Processor {
                     environment = environment,
                     networkObserver = b.networkObserver,
                     allowPortReassignment = b.allowPortReassignment,
+                    omitGeoIPFileSettings = b.omitGeoIPFileSettings,
                     eventThreadBackground = b.eventThreadBackground,
                     config = b.config.toImmutableList(),
                     staticTorEvents = b.staticTorEvents.toImmutableSet(),
@@ -197,6 +221,14 @@ public interface TorRuntime: TorEvent.Processor, RuntimeEvent.Processor {
         }
     }
 
+    /**
+     * The environment for which [TorRuntime] operates.
+     *
+     * Specified directories/files are utilized by [TorRuntime.Builder.config]
+     * to create a minimum viable [TorConfig].
+     *
+     * @see [Companion.Builder]
+     * */
     public class Environment private constructor(
         @JvmField
         public val workDir: File,
@@ -210,6 +242,9 @@ public interface TorRuntime: TorEvent.Processor, RuntimeEvent.Processor {
         public val torResource: ResourceInstaller<Paths.Tor>,
     ) {
 
+        /**
+         * SHA-256 hash of the [workDir] path.
+         * */
         @get:JvmName("id")
         public val id: String by lazy { workDir.path.encodeToByteArray().sha256() }
 
@@ -218,6 +253,31 @@ public interface TorRuntime: TorEvent.Processor, RuntimeEvent.Processor {
 
         public companion object {
 
+            /**
+             * Opener for creating a [Environment] instance.
+             *
+             * If an [Environment] has already been created for the provided
+             * [workDir], that [Environment] instance will be returned.
+             *
+             * [workDir] should be specified within your application's home
+             * directory (e.g. `$HOME/.my_application/torservice`)
+             *
+             * [cacheDir] should be specified within your application's cache
+             * directory (e.g. `$HOME/.my_application/cache/torservice`)
+             *
+             * It is advisable to keep the dirname for [workDir] and [cacheDir]
+             * identical (e.g. `torservice`), especially when creating multiple
+             * instances of [Environment].
+             *
+             * When running multiple instances, declaring the same [cacheDir] as
+             * another [Environment] will result in a bad day. No checks are
+             * performed for this clash.
+             *
+             * @param [workDir] tor's working directory (e.g. `$HOME/.my_application/torservice`)
+             * @param [cacheDir] tor's cache directory (e.g. `$HOME/.my_application/cache/torservice`)
+             * @param [installer] lambda for creating [ResourceInstaller] using
+             *   the default [Builder.installationDir]
+             * */
             @JvmStatic
             public fun Builder(
                 workDir: File,
@@ -225,6 +285,32 @@ public interface TorRuntime: TorEvent.Processor, RuntimeEvent.Processor {
                 installer: (installationDir: File) -> ResourceInstaller<Paths.Tor>,
             ): Environment = Builder.build(workDir, cacheDir, installer, null)
 
+            /**
+             * Opener for creating a [Environment] instance.
+             *
+             * If an [Environment] has already been created for the provided
+             * [workDir], that [Environment] instance will be returned.
+             *
+             * [workDir] should be specified within your application's home
+             * directory (e.g. `$HOME/.my_application/torservice`)
+             *
+             * [cacheDir] should be specified within your application's cache
+             * directory (e.g. `$HOME/.my_application/cache/torservice`)
+             *
+             * It is advisable to keep the dirname for [workDir] and [cacheDir]
+             * identical (e.g. `torservice`), especially when creating multiple
+             * instances of [Environment].
+             *
+             * When running multiple instances, declaring the same [cacheDir] as
+             * another [Environment] will result in a bad day. No checks are
+             * performed for this clash.
+             *
+             * @param [workDir] tor's working directory (e.g. `$HOME/.my_application/torservice`)
+             * @param [cacheDir] tor's cache directory (e.g. `$HOME/.my_application/cache/torservice`)
+             * @param [installer] lambda for creating [ResourceInstaller] using
+             *   the default [Builder.installationDir]
+             * @param [block] optional lambda for modifying default parameters.
+             * */
             @JvmStatic
             public fun Builder(
                 workDir: File,
@@ -243,7 +329,7 @@ public interface TorRuntime: TorEvent.Processor, RuntimeEvent.Processor {
         ) {
 
             /**
-             * The directory in which **all** resources will be installed
+             * The directory for which **all** resources will be installed
              * */
             @JvmField
             public var installationDir: File = workDir
@@ -294,7 +380,7 @@ public interface TorRuntime: TorEvent.Processor, RuntimeEvent.Processor {
 
         public val environment: Environment
 
-        public fun <R: Any> RuntimeEvent<R>.notify(output: R)
+        public fun <R: Any> notify(event: RuntimeEvent<R>, output: R)
 
         public fun create(
             lifecycleHook: Job,

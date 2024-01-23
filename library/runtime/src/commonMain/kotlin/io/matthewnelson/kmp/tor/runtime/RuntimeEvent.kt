@@ -22,22 +22,81 @@ import kotlin.jvm.JvmField
 import kotlin.jvm.JvmName
 import kotlin.jvm.JvmStatic
 
+/**
+ * Events specific to [TorRuntime]
+ *
+ * @see [Observer]
+ * @see [observer]
+ * @see [Processor]
+ * */
 public sealed class RuntimeEvent<R: Any> private constructor() {
 
     @get:JvmName("name")
     public val name: String get() = toString()
 
+    /**
+     * Debug log messages
+     * */
     public data object DEBUG: RuntimeEvent<String>()
+
+    /**
+     * Error log messages
+     * */
     public data object ERROR: RuntimeEvent<String>()
+
+    /**
+     * Info log messages
+     * */
     public data object INFO: RuntimeEvent<String>()
+
+    /**
+     * Warn log messages
+     * */
     public data object WARN: RuntimeEvent<String>()
 
-    // TODO: Actions
+    // TODO: Other events
 
+    /**
+     * Create an observer for the given [RuntimeEvent]
+     * to register via [Processor.add]
+     *
+     * e.g. (Kotlin)
+     *
+     *     RuntimeEvent.DEBUG.observer { output ->
+     *         println(output)
+     *     }
+     *
+     * e.g. (Java)
+     *
+     *     RuntimeEvent.DEBUG.INSTANCE.observer(output -> {
+     *         System.out.println(output);
+     *     });
+     *
+     * @param [block] the callback to pass the event text to
+     * */
     public fun observer(
         block: ItBlock<R>,
     ): Observer<R> = observer("", block)
 
+    /**
+     * Create an observer for the given [RuntimeEvent]
+     * to register via [Processor.add]
+     *
+     * e.g. (Kotlin)
+     *
+     *     RuntimeEvent.DEBUG.observer { output ->
+     *         println(output)
+     *     }
+     *
+     * e.g. (Java)
+     *
+     *     RuntimeEvent.DEBUG.INSTANCE.observer(output -> {
+     *         System.out.println(output);
+     *     });
+     *
+     * @param [tag] Any non-blank string value
+     * @param [block] the callback to pass the event text to
+     * */
     public fun observer(
         tag: String,
         block: ItBlock<R>,

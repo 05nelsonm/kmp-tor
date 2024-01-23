@@ -24,6 +24,7 @@ import io.matthewnelson.kmp.tor.runtime.TorRuntime
 import org.kotlincrypto.hash.sha2.SHA256
 
 @OptIn(InternalKmpTorApi::class)
+@Throws(IllegalStateException::class)
 internal actual fun TorRuntime.ServiceFactory.Companion.serviceRuntimeOrNull(
     block: () -> TorRuntime.ServiceFactory,
 ): TorRuntime? = null

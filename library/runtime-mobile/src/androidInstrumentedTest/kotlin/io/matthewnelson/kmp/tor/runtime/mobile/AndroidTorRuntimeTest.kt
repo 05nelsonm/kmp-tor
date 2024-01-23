@@ -22,6 +22,7 @@ import io.matthewnelson.kmp.tor.core.api.ResourceInstaller.Paths
 import io.matthewnelson.kmp.tor.runtime.TorRuntime
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.fail
 
 class AndroidTorRuntimeTest {
 
@@ -31,9 +32,7 @@ class AndroidTorRuntimeTest {
     fun givenTorRuntime_whenAndroidRuntime_thenIsAndroidTorRuntime() {
         val environment = app.createTorRuntimeEnvironment { installationDir ->
             object : ResourceInstaller<Paths.Tor>(installationDir) {
-                override fun install(): Paths.Tor {
-                    TODO("Not yet implemented")
-                }
+                override fun install(): Paths.Tor { fail() }
             }
         }
 

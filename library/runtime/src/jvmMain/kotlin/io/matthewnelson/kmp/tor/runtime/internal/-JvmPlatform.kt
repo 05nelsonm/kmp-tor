@@ -26,6 +26,7 @@ import java.security.MessageDigest
 
 @JvmSynthetic
 @OptIn(InternalKmpTorApi::class)
+@Throws(IllegalStateException::class)
 internal actual fun TorRuntime.ServiceFactory.Companion.serviceRuntimeOrNull(
     block: () -> TorRuntime.ServiceFactory,
 ): TorRuntime? {

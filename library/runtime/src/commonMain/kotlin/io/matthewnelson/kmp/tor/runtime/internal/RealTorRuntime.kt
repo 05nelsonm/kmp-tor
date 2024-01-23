@@ -60,6 +60,7 @@ internal class RealTorRuntime private constructor(
             environment: TorRuntime.Environment,
             networkObserver: NetworkObserver,
             allowPortReassignment: Boolean,
+            omitGeoIPFileSettings: Boolean,
             eventThreadBackground: Boolean,
             config: List<ThisBlock.WithIt<TorConfig.Builder, TorRuntime.Environment>>,
             staticTorEvents: Set<TorEvent>,
@@ -111,8 +112,7 @@ internal class RealTorRuntime private constructor(
     ), TorRuntime.ServiceFactory {
 
         private val staticTorEvents = if (!staticTorEvents.contains(TorEvent.BW)) {
-            buildSet {
-                addAll(staticTorEvents)
+            staticTorEvents.toMutableSet().apply {
                 add(TorEvent.BW)
             }.toImmutableSet()
         } else {
@@ -142,7 +142,7 @@ internal class RealTorRuntime private constructor(
             }
         }.toImmutableSet()
 
-        override fun <R : Any> RuntimeEvent<R>.notify(output: R) { notifyObservers(output) }
+        override fun <R : Any> notify(event: RuntimeEvent<R>, output: R) { event.notifyObservers(output) }
 
         override fun create(
             lifecycleHook: Job,
