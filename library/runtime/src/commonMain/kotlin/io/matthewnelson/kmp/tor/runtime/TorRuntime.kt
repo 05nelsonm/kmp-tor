@@ -387,6 +387,7 @@ public interface TorRuntime: TorEvent.Processor, RuntimeEvent.Processor {
             observer: NetworkObserver?,
         ): TorRuntime
 
+        @InternalKmpTorApi
         public companion object {
 
             @JvmStatic

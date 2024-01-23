@@ -133,6 +133,3 @@ public final class io/matthewnelson/kmp/tor/runtime/TorRuntime$Environment$Compa
 	public final fun Builder (Ljava/io/File;Ljava/io/File;Lkotlin/jvm/functions/Function1;Lio/matthewnelson/kmp/tor/runtime/ctrl/api/ThisBlock;)Lio/matthewnelson/kmp/tor/runtime/TorRuntime$Environment;
 }
 
-public final class io/matthewnelson/kmp/tor/runtime/TorRuntime$ServiceFactory$Companion {
-}
-
