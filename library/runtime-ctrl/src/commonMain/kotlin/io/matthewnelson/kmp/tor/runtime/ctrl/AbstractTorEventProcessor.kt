@@ -30,8 +30,7 @@ import kotlin.jvm.JvmStatic
 public abstract class AbstractTorEventProcessor
 @InternalKmpTorApi
 protected constructor(
-    @JvmField
-    protected val staticTag: String?,
+    private val staticTag: String?,
     initialObservers: Set<TorEvent.Observer>
 ): TorEvent.Processor {
 
@@ -68,7 +67,7 @@ protected constructor(
             val iterator = iterator()
             while (iterator.hasNext()) {
                 val observer = iterator.next()
-                if (staticTag != null && observer.tag == staticTag) continue
+                if (observer.tag.isStaticTag()) continue
 
                 if (observer.event == event) {
                     iterator.remove()
@@ -83,7 +82,7 @@ protected constructor(
             val iterator = iterator()
             while (iterator.hasNext()) {
                 val observer = iterator.next()
-                if (staticTag != null && observer.tag == staticTag) continue
+                if (observer.tag.isStaticTag()) continue
 
                 if (events.contains(observer.event)) {
                     iterator.remove()
@@ -93,13 +92,13 @@ protected constructor(
     }
 
     public override fun removeAll(tag: String) {
-        if (staticTag != null && tag == staticTag) return
+        if (tag.isStaticTag()) return
 
         withObservers {
             val iterator = iterator()
             while (iterator.hasNext()) {
                 val observer = iterator.next()
-                if (staticTag != null && observer.tag == staticTag) continue
+                if (observer.tag.isStaticTag()) continue
 
                 if (observer.tag == tag) {
                     iterator.remove()
@@ -113,7 +112,7 @@ protected constructor(
             val iterator = iterator()
             while (iterator.hasNext()) {
                 val observer = iterator.next()
-                if (staticTag != null && observer.tag == staticTag) continue
+                if (observer.tag.isStaticTag()) continue
                 iterator.remove()
             }
         }
@@ -144,6 +143,8 @@ protected constructor(
             block(if (isDestroyed) noOpMutableSet() else observers)
         }
     }
+
+    protected fun String?.isStaticTag(): Boolean = this != null && staticTag != null && this == staticTag
 
     protected companion object {
 

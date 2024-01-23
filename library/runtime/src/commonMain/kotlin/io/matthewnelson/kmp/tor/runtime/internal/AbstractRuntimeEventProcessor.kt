@@ -59,7 +59,7 @@ internal abstract class AbstractRuntimeEventProcessor(
             val iterator = iterator()
             while (iterator.hasNext()) {
                 val observer = iterator.next()
-                if (staticTag != null && observer.tag == staticTag) continue
+                if (observer.tag.isStaticTag()) continue
 
                 if (observer.event == event) {
                     iterator.remove()
@@ -74,7 +74,7 @@ internal abstract class AbstractRuntimeEventProcessor(
             val iterator = iterator()
             while (iterator.hasNext()) {
                 val observer = iterator.next()
-                if (staticTag != null && observer.tag == staticTag) continue
+                if (observer.tag.isStaticTag()) continue
 
                 if (events.contains(observer.event)) {
                     iterator.remove()
@@ -84,13 +84,13 @@ internal abstract class AbstractRuntimeEventProcessor(
     }
 
     public final override fun removeAll(tag: String) {
-        if (staticTag != null && tag == staticTag) return
+        if (tag.isStaticTag()) return
 
         withRuntimeObservers {
             val iterator = iterator()
             while (iterator.hasNext()) {
                 val observer = iterator.next()
-                if (staticTag != null && observer.tag == staticTag) continue
+                if (observer.tag.isStaticTag()) continue
 
                 if (observer.tag == tag) {
                     iterator.remove()
@@ -106,7 +106,7 @@ internal abstract class AbstractRuntimeEventProcessor(
             val iterator = iterator()
             while (iterator.hasNext()) {
                 val observer = iterator.next()
-                if (staticTag != null && observer.tag == staticTag) continue
+                if (observer.tag.isStaticTag()) continue
                 iterator.remove()
             }
         }
