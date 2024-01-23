@@ -164,6 +164,6 @@ class AbstractTorEventProcessorUnitTest {
         val iterator = set.iterator()
         assertFalse(iterator.hasNext())
         assertFailsWith<NoSuchElementException> { iterator.next() }
-        assertFailsWith<NoSuchElementException> { iterator.remove() }
+        assertFailsWith<IllegalStateException> { iterator.remove() }
     }
 }

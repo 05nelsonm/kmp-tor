@@ -179,6 +179,6 @@ private object NoOpMutableSet: MutableSet<Any> {
     private object EmptyMutableIterator: MutableIterator<Any> {
         override fun hasNext(): Boolean = false
         override fun next(): Any = throw NoSuchElementException()
-        override fun remove() { throw NoSuchElementException() }
+        override fun remove() { throw IllegalStateException() }
     }
 }

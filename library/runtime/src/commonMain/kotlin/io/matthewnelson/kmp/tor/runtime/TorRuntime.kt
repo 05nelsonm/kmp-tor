@@ -347,7 +347,7 @@ public interface TorRuntime: TorEvent.Processor, RuntimeEvent.Processor {
                     workDir: File,
                     cacheDir: File,
                     installer: (installationDir: File) -> ResourceInstaller<Paths.Tor>,
-                    block: ThisBlock<Builder>?
+                    block: ThisBlock<Builder>?,
                 ): Environment {
                     val absoluteWorkDir = workDir.absoluteFile.normalize()
 
