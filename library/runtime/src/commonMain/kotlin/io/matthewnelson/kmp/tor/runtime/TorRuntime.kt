@@ -108,7 +108,7 @@ public interface TorRuntime: TorEvent.Processor, RuntimeEvent.Processor {
 
         /**
          * If true, [Paths.Tor.geoip] and [Paths.Tor.geoip6] will **not** be
-         * automatically configured for your [TorConfig].
+         * automatically to your [TorConfig].
          * */
         @JvmField
         public var omitGeoIPFileSettings: Boolean = false
@@ -121,7 +121,8 @@ public interface TorRuntime: TorEvent.Processor, RuntimeEvent.Processor {
         public var networkObserver: NetworkObserver = NetworkObserver.NOOP
 
         /**
-         * If false, will use [Dispatchers.Main] when dispatching events.
+         * If false, will use [Dispatchers.Main] when dispatching [RuntimeEvent]
+         * and [TorEvent] to registered observers.
          * */
         @JvmField
         public var eventThreadBackground: Boolean = true
@@ -135,8 +136,7 @@ public interface TorRuntime: TorEvent.Processor, RuntimeEvent.Processor {
          * to perform IO within the lambda (e.g. writing settings that are
          * not currently supported to the [Environment.torrcFile]).
          *
-         * Any exception thrown within [block] will be propagated to the caller
-         * of start.
+         * Any exception thrown within [block] will be propagated to the caller.
          *
          * **NOTE:** This can be omitted as a minimum viable configuration
          * is always created using [Environment].

@@ -72,7 +72,7 @@ public sealed class RuntimeEvent<R: Any> private constructor() {
      *         System.out.println(output);
      *     });
      *
-     * @param [block] the callback to pass the event text to
+     * @param [block] the callback to pass the event output to
      * */
     public fun observer(
         block: ItBlock<R>,
@@ -95,7 +95,7 @@ public sealed class RuntimeEvent<R: Any> private constructor() {
      *     });
      *
      * @param [tag] Any non-blank string value
-     * @param [block] the callback to pass the event text to
+     * @param [block] the callback to pass the event output to
      * */
     public fun observer(
         tag: String,
