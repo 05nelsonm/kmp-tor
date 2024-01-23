@@ -30,9 +30,7 @@ class TorRuntimeEnvironmentTest {
     fun givenContext_whenDefaultDirname_thenIsAsExpected() {
         val environment = app.createTorRuntimeEnvironment { installationDir ->
             object : ResourceInstaller<ResourceInstaller.Paths.Tor>(installationDir) {
-                override fun install(): Paths.Tor {
-                    TODO("Not yet implemented")
-                }
+                override fun install(): Paths.Tor { fail() }
             }
         }
 
@@ -45,9 +43,7 @@ class TorRuntimeEnvironmentTest {
         val environment = app.createTorRuntimeEnvironment(
             installer = { installationDir ->
                 object : ResourceInstaller<ResourceInstaller.Paths.Tor>(installationDir) {
-                    override fun install(): Paths.Tor {
-                        TODO("Not yet implemented")
-                    }
+                    override fun install(): Paths.Tor { fail() }
                 }
             },
             block = {},
