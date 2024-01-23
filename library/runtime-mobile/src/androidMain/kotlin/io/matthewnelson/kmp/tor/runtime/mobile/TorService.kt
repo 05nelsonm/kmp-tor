@@ -18,7 +18,6 @@ package io.matthewnelson.kmp.tor.runtime.mobile
 import android.content.Context
 import android.content.Intent
 import androidx.startup.AppInitializer
-import androidx.startup.Initializer
 import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
 import io.matthewnelson.kmp.tor.runtime.RuntimeEvent
 import io.matthewnelson.kmp.tor.runtime.TorRuntime

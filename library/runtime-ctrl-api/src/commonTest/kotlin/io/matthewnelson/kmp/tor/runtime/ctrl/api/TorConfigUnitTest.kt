@@ -16,12 +16,18 @@
 package io.matthewnelson.kmp.tor.runtime.ctrl.api
 
 import io.matthewnelson.kmp.file.toFile
+import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
 import io.matthewnelson.kmp.tor.runtime.ctrl.api.address.Port.Proxy.Companion.toPortProxy
 import io.matthewnelson.kmp.tor.runtime.ctrl.api.TorConfig.Setting.Companion.filterByKeyword
+import io.matthewnelson.kmp.tor.runtime.ctrl.api.address.Port.Companion.toPort
+import io.matthewnelson.kmp.tor.runtime.ctrl.api.builder.ExtendedTorConfigBuilder
 import io.matthewnelson.kmp.tor.runtime.ctrl.api.internal.toByte
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFalse
+import kotlin.test.assertTrue
 
+@OptIn(InternalKmpTorApi::class)
 class TorConfigUnitTest {
 
     @Test
@@ -96,5 +102,39 @@ class TorConfigUnitTest {
         assertEquals(3, settings2.size)
         assertEquals("auto", settings2.filterByKeyword<TorConfig.__SocksPort.Companion>().first().argument)
         assertEquals("0", settings2.filterByKeyword<TorConfig.__HTTPTunnelPort.Companion>().first().argument)
+    }
+
+    @Test
+    fun givenExtendedConfig_whenCastAs_thenWorksAsExpected() {
+        TorConfig.Builder {
+            val dns = TorConfig.__DNSPort.Builder { port(1080.toPortProxy()) }
+
+            put(dns)
+            put(TorConfig.__SocksPort) { asPort {} }
+            put(TorConfig.HiddenServiceDir) {
+                directory = "".toFile()
+                version { HSv(3) }
+                port {
+                    virtual = 80.toPort()
+                    targetAsPort { target = 443.toPort() }
+                }
+            }
+
+            // contains
+            assertTrue((this as ExtendedTorConfigBuilder).contains(TorConfig.__SocksPort))
+            assertTrue(contains(TorConfig.HiddenServiceMaxStreams))
+            assertFalse(contains(TorConfig.__ControlPort))
+
+            // ports
+            var ports = ports()
+            assertTrue(ports.contains(dns))
+            assertEquals(2, ports.size)
+
+            // remove
+            remove(dns)
+            ports = ports()
+            assertFalse(ports.contains(dns))
+            assertEquals(1, ports.size)
+        }
     }
 }

@@ -120,11 +120,11 @@ public class TorConfig private constructor(
      * @see [TorConfig.Companion.Builder]
      * */
     @KmpTorDsl
-    public class Builder private constructor(other: TorConfig?) {
+    public open class Builder private constructor(other: TorConfig?) {
 
-        private val settings = mutableSetOf<Setting>()
+        protected val settings: MutableSet<Setting> = mutableSetOf()
         // For dealing with inherited disabled port
-        private val inheritedDisabledPorts = mutableSetOf<Setting>()
+        protected val inheritedDisabledPorts: MutableSet<Setting> = mutableSetOf()
 
         /**
          * Add an already configured [Setting].
@@ -212,7 +212,7 @@ public class TorConfig private constructor(
                 other: TorConfig?,
                 block: ThisBlock<Builder>,
             ): TorConfig {
-                val b = Builder(other).apply(block)
+                val b = Extended(other).apply(block)
                 // Copy our settings in before we modify them
                 val settings = b.settings.toMutableSet()
                 settings.addAll(b.inheritedDisabledPorts)
@@ -232,6 +232,32 @@ public class TorConfig private constructor(
                 }
 
                 return TorConfig(settings.toImmutableSet())
+            }
+        }
+
+        // Used by TorRuntime for startup configuration
+        private class Extended(other: TorConfig?): Builder(other), ExtendedTorConfigBuilder {
+            override fun contains(keyword: Keyword): Boolean {
+                for (setting in settings) {
+                    for (item in setting.items) {
+                        if (item.keyword == keyword) return true
+                    }
+                }
+
+                return false
+            }
+
+            override fun ports(): List<Setting> {
+                return settings
+                    .filterByAttribute<Attribute.Port>()
+                    .filter { setting ->
+                        // remove any configured hidden service settings
+                        setting.keyword != HiddenServiceDir
+                    }
+            }
+
+            override fun remove(setting: Setting) {
+                settings.remove(setting)
             }
         }
     }
