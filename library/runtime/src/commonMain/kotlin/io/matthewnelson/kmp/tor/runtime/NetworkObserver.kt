@@ -37,10 +37,14 @@ public abstract class NetworkObserver {
 
     @OptIn(InternalKmpTorApi::class)
     private val lock = SynchronizedObject()
-    private val observers = mutableSetOf<(Connectivity) -> Unit>()
+    private val observers = mutableSetOf<Observer>()
+
+    internal fun interface Observer {
+        operator fun invoke(connectivity: Connectivity)
+    }
 
     @JvmSynthetic
-    internal open fun subscribe(observer: (Connectivity) -> Unit) {
+    internal open fun subscribe(observer: Observer) {
         @OptIn(InternalKmpTorApi::class)
         val initialAttach = synchronized(lock) {
             val wasEmpty = observers.isEmpty()
@@ -55,7 +59,7 @@ public abstract class NetworkObserver {
     }
 
     @JvmSynthetic
-    internal open fun unsubscribe(observer: (Connectivity) -> Unit) {
+    internal open fun unsubscribe(observer: Observer) {
         @OptIn(InternalKmpTorApi::class)
         val lastRemoved = synchronized(lock) {
             observers.remove(observer) && observers.isEmpty()
@@ -109,8 +113,8 @@ public abstract class NetworkObserver {
          * */
         @JvmField
         public val NOOP: NetworkObserver = object : NetworkObserver() {
-            override fun subscribe(observer: (Connectivity) -> Unit) {}
-            override fun unsubscribe(observer: (Connectivity) -> Unit) {}
+            override fun subscribe(observer: Observer) {}
+            override fun unsubscribe(observer: Observer) {}
             override fun isNetworkConnected(): Boolean = true
         }
     }

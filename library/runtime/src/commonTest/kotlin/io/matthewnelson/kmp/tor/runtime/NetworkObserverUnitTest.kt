@@ -17,6 +17,7 @@ package io.matthewnelson.kmp.tor.runtime
 
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import io.matthewnelson.kmp.tor.runtime.NetworkObserver.Observer
 
 class NetworkObserverUnitTest {
 
@@ -45,8 +46,8 @@ class NetworkObserverUnitTest {
     @Test
     fun givenRemoveObserver_whenMultiple_thenOnObserversEmptyInvokedOnLastOnly() {
         assertEquals(0, networkObserver.onObserversCount)
-        val o1: (NetworkObserver.Connectivity) -> Unit = {}
-        val o2: (NetworkObserver.Connectivity) -> Unit = {}
+        val o1 = Observer {}
+        val o2 = Observer {}
         networkObserver.subscribe(o1)
         networkObserver.subscribe(o2)
         assertEquals(1, networkObserver.onObserversCount)
@@ -68,7 +69,7 @@ class NetworkObserverUnitTest {
     @Test
     fun givenObserver_whenAddMultipleTimes_thenOnlyRegisteredOnce() {
         var invocations = 0
-        val o1: (NetworkObserver.Connectivity) -> Unit = { invocations++ }
+        val o1 = Observer { invocations++ }
         networkObserver.subscribe(o1)
         networkObserver.subscribe(o1)
         networkObserver.notifyInvoke()
