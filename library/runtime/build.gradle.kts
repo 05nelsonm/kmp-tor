@@ -24,7 +24,17 @@ kmpConfiguration {
                 dependencies {
                     api(project(":library:runtime-ctrl-api"))
                     implementation(project(":library:runtime-ctrl"))
+                    implementation(libs.encoding.base16)
                     implementation(libs.kmp.tor.core.resource)
+                    implementation(libs.kotlinx.coroutines.core)
+                }
+            }
+        }
+
+        kotlin {
+            sourceSets.findByName("nonJvmMain")?.apply {
+                dependencies {
+                    implementation(libs.kotlincrypto.hash.sha2)
                 }
             }
         }

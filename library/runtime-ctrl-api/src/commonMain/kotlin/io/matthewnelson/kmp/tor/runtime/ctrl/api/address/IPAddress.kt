@@ -23,6 +23,9 @@ import kotlin.jvm.JvmStatic
 
 /**
  * Base abstraction for denoting a String value as an ip address
+ *
+ * @see [V4]
+ * @see [V6]
  * */
 public sealed class IPAddress private constructor(value: String): Address(value) {
 

@@ -29,6 +29,8 @@ import kotlin.jvm.JvmStatic
 
 /**
  * Base abstraction for denoting a String value as a `.onion` address
+ *
+ * @see [V3]
  * */
 public sealed class OnionAddress private constructor(value: String): Address(value) {
 

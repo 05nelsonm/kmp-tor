@@ -23,6 +23,8 @@ import kotlin.jvm.JvmStatic
 
 /**
  * Holder for a port between 0 and 65535 (inclusive)
+ *
+ * @see [Proxy]
  * */
 public open class Port private constructor(
     @JvmField

@@ -19,52 +19,85 @@ package io.matthewnelson.kmp.tor.runtime.ctrl.api
 
 /**
  * Helper for non-Kotlin consumers instead of using
- * `T.() -> Unit` which would force a return of `Unit`.
  *
- * e.g.
+ *     T.() -> Unit
  *
- *     // Java
+ * which would force a return of `Unit`.
+ *
+ * e.g. (Kotlin)
+ *
+ *     My.Builder {
+ *         add(My.Factory) { enable = true }
+ *     }
+ *
+ * e.g. (Java)
+ *
  *     My.Builder(b -> {
  *         b.add(My.Factory.Companion, s -> {
  *             s.enable = true;
  *         });
  *     });
  *
- *     // Kotlin
- *     My.Builder {
- *         add(My.Factory) {
- *             enable = true
- *         }
- *     }
- *
  * @see [ItBlock]
+ * @see [WithIt]
  * @see [apply]
  * */
 public fun interface ThisBlock<in T: Any> {
     public operator fun T.invoke()
+
+    /**
+     * Helper for non-Kotlin consumers instead of using
+     *
+     *     T.(V) -> Unit
+     *
+     * which would force a return of `Unit`.
+     * 
+     * e.g. (Kotlin)
+     * 
+     *     My.Builder {
+     *         add(My.Factory) { arg -> enable = arg.someLogic() }
+     *     }
+     *
+     * e.g. (Java)
+     *
+     *     My.Builder(b -> {
+     *         b.add(My.Factory.Companion, (s, arg) -> {
+     *             s.enable = arg.someLogic();
+     *         });
+     *     });
+     * 
+     * @see [ThisBlock]
+     * @see [ItBlock]
+     * @see [apply]
+     * */
+    public fun interface WithIt<in T: Any, in V: Any> {
+        public operator fun T.invoke(it: V)
+    }
 }
 
 /**
  * Helper for non-Kotlin consumers instead of using
- * `(T) -> Unit` which would force a return of `Unit`.
  *
- * e.g.
+ *     (T) -> Unit
  *
- *     // Java
+ * which would force a return of `Unit`.
+ *
+ * e.g. (Kotlin)
+ *
+ *     My.Builder {
+ *         it.add(My.Factory) { s -> s.enable = true }
+ *     }
+ *
+ * e.g. (Java)
+ *
  *     My.Builder(b -> {
  *         b.add(My.Factory.Companion, s -> {
  *             s.enable = true;
  *         });
  *     });
  *
- *     // Kotlin
- *     My.Builder {
- *         it.add(My.Factory) { s ->
- *             s.enable = true
- *         }
- *     }
- *
  * @see [ThisBlock]
+ * @see [ThisBlock.WithIt]
  * @see [apply]
  * */
 public fun interface ItBlock<in T: Any> {
@@ -74,6 +107,12 @@ public fun interface ItBlock<in T: Any> {
 @Suppress("NOTHING_TO_INLINE")
 public inline fun <T: Any> T.apply(block: ThisBlock<T>): T {
     with(block) { invoke() }
+    return this
+}
+
+@Suppress("NOTHING_TO_INLINE")
+public inline fun <T: Any, V: Any> T.apply(block: ThisBlock.WithIt<T, V>, arg: V): T {
+    with(block) { invoke(arg) }
     return this
 }
 

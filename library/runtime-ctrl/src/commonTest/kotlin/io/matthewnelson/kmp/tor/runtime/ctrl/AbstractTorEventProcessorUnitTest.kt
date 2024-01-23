@@ -17,16 +17,16 @@ package io.matthewnelson.kmp.tor.runtime.ctrl
 
 import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
 import io.matthewnelson.kmp.tor.runtime.ctrl.api.TorEvent
-import kotlin.test.Test
-import kotlin.test.assertEquals
-import kotlin.test.assertNull
+import kotlin.test.*
 
 @OptIn(InternalKmpTorApi::class)
 class AbstractTorEventProcessorUnitTest {
 
-    private class TestProcessor: AbstractTorEventProcessor(emptySet()) {
+    private class TestProcessor: AbstractTorEventProcessor("static", emptySet()) {
         val size: Int get() = withObservers { size }
-        fun notify(event: TorEvent, output: String) { notifyObservers(event, output) }
+        fun notify(event: TorEvent, output: String) { event.notifyObservers(output) }
+        fun destroy() { onDestroy() }
+        fun <T> noOpSet(): MutableSet<T> = noOpMutableSet()
     }
 
     private val processor = TestProcessor()
@@ -43,7 +43,7 @@ class AbstractTorEventProcessorUnitTest {
     }
 
     @Test
-    fun givenObservers_whenRemoveByEvent_thenAreRemoved() {
+    fun givenObservers_whenRemoveAllByEvent_thenAreRemoved() {
         var invocations = 0
         val o1 = TorEvent.CIRC.observer { invocations++ }
         val o2 = TorEvent.BW.observer {}
@@ -59,7 +59,7 @@ class AbstractTorEventProcessorUnitTest {
     }
 
     @Test
-    fun givenObservers_whenRemoveAll_thenAreRemoved() {
+    fun givenObservers_whenRemoveMultiple_thenAreRemoved() {
         var invocations = 0
         val o1 = TorEvent.CIRC.observer { invocations++ }
         val o2 = TorEvent.BW.observer {}
@@ -94,5 +94,76 @@ class AbstractTorEventProcessorUnitTest {
     @Test
     fun givenBlankTag_whenObserver_thenTagIsNull() {
         assertNull(TorEvent.Observer("  ", TorEvent.CIRC) { }.tag)
+    }
+
+    @Test
+    fun givenStaticTag_whenRemove_thenDoesNothing() {
+        processor.add(TorEvent.BW.observer("static") {})
+
+        val nonStaticObserver = TorEvent.BW.observer("non-static") {}
+        processor.add(nonStaticObserver)
+
+        // should do nothing
+        processor.removeAll("static")
+        assertEquals(2, processor.size)
+
+        // Should only remove the non-static observer
+        processor.removeAll(TorEvent.BW)
+        assertEquals(1, processor.size)
+
+        // Should only remove the non-static observer
+        processor.add(nonStaticObserver)
+        assertEquals(2, processor.size)
+        processor.removeAll(TorEvent.BW, TorEvent.ADDRMAP)
+        assertEquals(1, processor.size)
+
+        // Should not remove the static observer
+        processor.add(nonStaticObserver)
+        assertEquals(2, processor.size)
+        processor.clearObservers()
+        assertEquals(1, processor.size)
+    }
+
+    @Test
+    fun givenStaticObservers_whenOnDestroy_thenEvictsAll() {
+        val observer = TorEvent.BW.observer("static") {}
+        processor.add(observer)
+        assertEquals(1, processor.size)
+
+        processor.clearObservers()
+        assertEquals(1, processor.size)
+
+        processor.destroy()
+        assertEquals(0, processor.size)
+
+        processor.add(observer)
+        assertEquals(0, processor.size)
+    }
+
+    @Test
+    fun givenNoOpMutableSet_whenModified_thenDoesNothing() {
+        val set = processor.noOpSet<Any>()
+        assertEquals(0, set.size)
+        assertEquals(0, set.apply { add("") }.size)
+        assertFalse(set.add(""))
+        assertTrue(set.addAll(emptyList()))
+        assertFalse(set.addAll(listOf("", "a")))
+        assertTrue(set.retainAll(emptySet()))
+        assertFalse(set.retainAll(listOf("", "a")))
+        assertTrue(set.removeAll(emptySet()))
+        assertFalse(set.removeAll(listOf("", "a")))
+        assertFalse(set.remove("a"))
+        assertTrue(set.isEmpty())
+        assertFalse(set.contains(""))
+        assertTrue(set.containsAll(emptySet()))
+        assertFalse(set.containsAll(listOf("", "a")))
+
+        // does nothing
+        set.clear()
+
+        val iterator = set.iterator()
+        assertFalse(iterator.hasNext())
+        assertFailsWith<NoSuchElementException> { iterator.next() }
+        assertFailsWith<IllegalStateException> { iterator.remove() }
     }
 }

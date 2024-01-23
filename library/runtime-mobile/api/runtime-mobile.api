@@ -1,0 +1,7 @@
+public final class io/matthewnelson/kmp/tor/runtime/mobile/TorRuntimeEnvironment {
+	public static final fun Builder (Landroid/content/Context;Ljava/lang/String;Lkotlin/jvm/functions/Function1;)Lio/matthewnelson/kmp/tor/runtime/TorRuntime$Environment;
+	public static final fun Builder (Landroid/content/Context;Ljava/lang/String;Lkotlin/jvm/functions/Function1;Lio/matthewnelson/kmp/tor/runtime/ctrl/api/ThisBlock;)Lio/matthewnelson/kmp/tor/runtime/TorRuntime$Environment;
+	public static final fun Builder (Landroid/content/Context;Lkotlin/jvm/functions/Function1;)Lio/matthewnelson/kmp/tor/runtime/TorRuntime$Environment;
+	public static final fun Builder (Landroid/content/Context;Lkotlin/jvm/functions/Function1;Lio/matthewnelson/kmp/tor/runtime/ctrl/api/ThisBlock;)Lio/matthewnelson/kmp/tor/runtime/TorRuntime$Environment;
+}
+

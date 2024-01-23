@@ -189,17 +189,18 @@ public enum class TorEvent {
 
     /**
      * Create an observer for the given [TorEvent]
+     * to register via [Processor.add]
      *
      * e.g. (Kotlin)
      *
-     *     val bwObserver = TorEvent.BW.observer { event ->
-     *         updateNotification(event.formatBandwidth())
+     *     TorEvent.BW.observer { output ->
+     *         updateNotification(output.formatBandwidth())
      *     }
      *
      * e.g. (Java)
      *
-     *     TorEvent.Observer bwObserver = TorEvent.BW.observer(e -> {
-     *         updateNotification(formatBandwidth(e));
+     *     TorEvent.BW.observer(output -> {
+     *         updateNotification(formatBandwidth(output));
      *     });
      *
      * @param [block] the callback to pass the event text to
@@ -209,7 +210,8 @@ public enum class TorEvent {
     ): Observer = observer("", block)
 
     /**
-     * Create an observer for the given [TorEvent] and [tag].
+     * Create an observer for the given [TorEvent] and [tag]
+     * to register via [Processor.add]
      *
      * This is useful for lifecycle aware components, all of which
      * can be removed with a single call using the [tag] upon
@@ -217,14 +219,14 @@ public enum class TorEvent {
      *
      * e.g. (Kotlin)
      *
-     *     val bwObserver = TorEvent.BW.observer("my service") { event ->
-     *         updateNotification(event.formatBandwidth())
+     *     TorEvent.BW.observer("my service") { output ->
+     *         updateNotification(output.formatBandwidth())
      *     }
      *
      * e.g. (Java)
      *
-     *     TorEvent.Observer bwObserver = TorEvent.BW.observer("my service", e -> {
-     *         updateNotification(formatBandwidth(e));
+     *     TorEvent.BW.observer("my service", output -> {
+     *         updateNotification(formatBandwidth(output));
      *     });
      *
      * @param [tag] Any non-blank string value
