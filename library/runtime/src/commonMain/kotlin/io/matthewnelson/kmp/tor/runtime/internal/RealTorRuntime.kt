@@ -61,7 +61,7 @@ internal class RealTorRuntime private constructor(
             networkObserver: NetworkObserver,
             allowPortReassignment: Boolean,
             eventThreadBackground: Boolean,
-            config: List<ThisBlock<TorConfig.Builder>>,
+            config: List<ThisBlock.WithIt<TorConfig.Builder, TorRuntime.Environment>>,
             staticTorEvents: Set<TorEvent>,
             staticTorEventObservers: Set<TorEvent.Observer>,
             staticRuntimeEventObservers: Set<RuntimeEvent.Observer<*>>,

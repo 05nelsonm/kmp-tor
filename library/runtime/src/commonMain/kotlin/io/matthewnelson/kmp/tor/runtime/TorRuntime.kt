@@ -79,14 +79,12 @@ public interface TorRuntime: TorEvent.Processor, RuntimeEvent.Processor {
         ): TorRuntime = Builder.build(environment, block)
     }
 
-    // do not annotate with KmpTorDsl so that environment is
-    // available within config lambda
+    @KmpTorDsl
     public class Builder private constructor(
-        @JvmField
-        public val environment: Environment,
+        private val environment: Environment
     ) {
 
-        private var config = mutableListOf<ThisBlock<TorConfig.Builder>>()
+        private var config = mutableListOf<ThisBlock.WithIt<TorConfig.Builder, Environment>>()
         private val staticTorEvents = mutableSetOf(TorEvent.CONF_CHANGED, TorEvent.NOTICE)
         private val staticTorEventObservers = mutableSetOf<TorEvent.Observer>()
         private val staticRuntimeEventObservers = mutableSetOf<RuntimeEvent.Observer<*>>()
@@ -120,14 +118,12 @@ public interface TorRuntime: TorEvent.Processor, RuntimeEvent.Processor {
          * to perform IO within the lambda (e.g. writing settings that are
          * not currently supported to the torrc file).
          *
-         * Any exceptions thrown are propagated to the caller of start.
-         *
-         * **NOTE:** You can safely reference [environment] from within
-         * the lambda to use when creating [TorConfig].
+         * Any exceptions thrown within [block] are propagated to the caller
+         * of start.
          * */
         @KmpTorDsl
         public fun config(
-            block: ThisBlock<TorConfig.Builder>,
+            block: ThisBlock.WithIt<TorConfig.Builder, Environment>,
         ): Builder {
             config.add(block)
             return this

@@ -1,5 +1,6 @@
 public final class io/matthewnelson/kmp/tor/runtime/ctrl/api/BlocksKt {
 	public static final fun apply (Ljava/lang/Object;Lio/matthewnelson/kmp/tor/runtime/ctrl/api/ItBlock;)Ljava/lang/Object;
+	public static final fun apply (Ljava/lang/Object;Lio/matthewnelson/kmp/tor/runtime/ctrl/api/ThisBlock$WithIt;Ljava/lang/Object;)Ljava/lang/Object;
 	public static final fun apply (Ljava/lang/Object;Lio/matthewnelson/kmp/tor/runtime/ctrl/api/ThisBlock;)Ljava/lang/Object;
 }
 
@@ -14,6 +15,10 @@ public abstract interface class io/matthewnelson/kmp/tor/runtime/ctrl/api/ItBloc
 
 public abstract interface class io/matthewnelson/kmp/tor/runtime/ctrl/api/ThisBlock {
 	public abstract fun invoke (Ljava/lang/Object;)V
+}
+
+public abstract interface class io/matthewnelson/kmp/tor/runtime/ctrl/api/ThisBlock$WithIt {
+	public abstract fun invoke (Ljava/lang/Object;Ljava/lang/Object;)V
 }
 
 public final class io/matthewnelson/kmp/tor/runtime/ctrl/api/TorConfig {
