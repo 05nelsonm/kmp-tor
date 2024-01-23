@@ -34,12 +34,4 @@ internal abstract class InstanceKeeper<K, V> internal constructor(
         instances[key] ?: block()
             .also { instances[key] = it }
     }
-
-    internal open class Open<K, V> internal constructor(
-        initialCapacity: Int = 1,
-        loadFactor: Float = 1.0F,
-    ): InstanceKeeper<K, V>(initialCapacity, loadFactor) {
-
-        internal fun getOrCreate(key: K, block: () -> V): V = getOrCreateInstance(key, block)
-    }
 }
