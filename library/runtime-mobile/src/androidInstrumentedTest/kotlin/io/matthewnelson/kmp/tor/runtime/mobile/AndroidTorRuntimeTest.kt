@@ -29,7 +29,7 @@ class AndroidTorRuntimeTest {
 
     @Test
     fun givenTorRuntime_whenAndroidRuntime_thenIsAndroidTorRuntime() {
-        val environment = app.toTorRuntimeEnvironment { installationDir ->
+        val environment = app.createTorRuntimeEnvironment { installationDir ->
             object : ResourceInstaller<Paths.Tor>(installationDir) {
                 override fun install(): Paths.Tor {
                     TODO("Not yet implemented")

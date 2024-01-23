@@ -25,25 +25,62 @@ import io.matthewnelson.kmp.tor.runtime.TorRuntime
 import io.matthewnelson.kmp.tor.runtime.ctrl.api.ThisBlock
 
 /**
- * Android extension which utilizes [Context] to acquire default
- * tor directory locations when configuring [TorRuntime.Environment].
+ * Android extension which utilizes [Context.getDir] and [Context.getCacheDir]
+ * to acquire default tor directory locations within the application's data
+ * directory to create [TorRuntime.Environment].
+ *
+ * workDir: app_torservice
+ * cacheDir: cache/torservice
  * */
 @JvmName("Builder")
-public fun Context.toTorRuntimeEnvironment(
+public fun Context.createTorRuntimeEnvironment(
     installer: (installationDir: File) -> ResourceInstaller<Paths.Tor>,
-): TorRuntime.Environment = toTorRuntimeEnvironment(installer) {}
+): TorRuntime.Environment = createTorRuntimeEnvironment("torservice", installer)
 
 /**
- * Android extension which utilizes [Context] to acquire default
- * tor directory locations when configuring [TorRuntime.Environment].
+ * Android extension which utilizes [Context.getDir] and [Context.getCacheDir]
+ * to acquire default tor directory locations within the application's data
+ * directory to create [TorRuntime.Environment].
+ *
+ * workDir: app_torservice
+ * cacheDir: cache/torservice
  * */
 @JvmName("Builder")
-public fun Context.toTorRuntimeEnvironment(
+public fun Context.createTorRuntimeEnvironment(
+    installer: (installationDir: File) -> ResourceInstaller<Paths.Tor>,
+    block: ThisBlock<TorRuntime.Environment.Builder>,
+): TorRuntime.Environment = createTorRuntimeEnvironment("torservice", installer, block)
+
+/**
+ * Android extension which utilizes [Context.getDir] and [Context.getCacheDir]
+ * to acquire tor directory locations within the application's data directory
+ * for specified [dirName] to create [TorRuntime.Environment] with.
+ *
+ * workDir: app_[dirName]
+ * cacheDir: cache/[dirName]
+ * */
+@JvmName("Builder")
+public fun Context.createTorRuntimeEnvironment(
+    dirName: String,
+    installer: (installationDir: File) -> ResourceInstaller<Paths.Tor>,
+): TorRuntime.Environment = createTorRuntimeEnvironment(dirName, installer) {}
+
+/**
+ * Android extension which utilizes [Context.getDir] and [Context.getCacheDir]
+ * to acquire tor directory locations within the application's data directory
+ * for specified [dirName] to create [TorRuntime.Environment] with.
+ *
+ * workDir: app_[dirName]
+ * cacheDir: cache/[dirName]
+ * */
+@JvmName("Builder")
+public fun Context.createTorRuntimeEnvironment(
+    dirName: String,
     installer: (installationDir: File) -> ResourceInstaller<Paths.Tor>,
     block: ThisBlock<TorRuntime.Environment.Builder>,
 ): TorRuntime.Environment = TorRuntime.Environment.Builder(
-    workDir = getDir("torservice", Context.MODE_PRIVATE),
-    cacheDir = cacheDir.resolve("torservice"),
+    workDir = getDir(dirName.ifBlank { "torservice" }, Context.MODE_PRIVATE),
+    cacheDir = cacheDir.resolve(dirName.ifBlank { "torservice" }),
     installer = installer,
     block = block
 )
