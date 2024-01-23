@@ -74,10 +74,10 @@ internal class TorService internal constructor(): AbstractTorService() {
 
             val initializer = AppInitializer.getInstance(context)
             check(initializer.isEagerlyInitialized(javaClass)) {
-                val classPath = "io.matthewnelson.kmp.tor.runtime.mobile.TorService$" + "Initializer$" + "Impl"
+                val classPath = "io.matthewnelson.kmp.tor.runtime.mobile.TorService$" + "Initializer"
 
                 """
-                    TorService.Initializer.Impl cannot be initialized lazily.
+                    TorService.Initializer cannot be initialized lazily.
                     Please ensure that you have:
                     <meta-data
                         android:name='$classPath'
