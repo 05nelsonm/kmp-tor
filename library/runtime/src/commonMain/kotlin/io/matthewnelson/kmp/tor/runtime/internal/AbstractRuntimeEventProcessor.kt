@@ -69,6 +69,7 @@ internal abstract class AbstractRuntimeEventProcessor(
     }
 
     public final override fun removeAll(vararg events: RuntimeEvent<*>) {
+        if (events.isEmpty()) return
         withRuntimeObservers {
             val iterator = iterator()
             while (iterator.hasNext()) {
