@@ -298,7 +298,7 @@ public enum class TorEvent {
         public fun removeAll(tag: String)
 
         /**
-         * Remove all [Observer] that are currently registered.
+         * Remove all non-static [Observer] that are currently registered.
          * */
         public fun clearObservers()
     }

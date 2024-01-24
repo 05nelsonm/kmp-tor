@@ -93,7 +93,6 @@ protected constructor(
 
     public override fun removeAll(tag: String) {
         if (tag.isStaticTag()) return
-
         withObservers {
             val iterator = iterator()
             while (iterator.hasNext()) {

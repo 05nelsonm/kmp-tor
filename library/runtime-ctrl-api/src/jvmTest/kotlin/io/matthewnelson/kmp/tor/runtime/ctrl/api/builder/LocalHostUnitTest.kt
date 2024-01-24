@@ -13,25 +13,31 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-@file:Suppress("KotlinRedundantDiagnosticSuppress")
+package io.matthewnelson.kmp.tor.runtime.ctrl.api.builder
 
-package io.matthewnelson.kmp.tor.runtime.ctrl.api.internal
-
-import io.matthewnelson.kmp.tor.runtime.ctrl.api.address.IPAddress
+import io.matthewnelson.kmp.file.IOException
 import io.matthewnelson.kmp.tor.runtime.ctrl.api.address.LocalHost
+import kotlin.test.Test
+import kotlin.test.assertNotNull
 
-internal expect val UnixSocketsNotSupportedMessage: String?
+// TODO: Move to commonMain
+class LocalHostUnitTest {
 
-internal expect val IsUnixLikeHost: Boolean
+    @Test
+    fun givenIPv4_whenResolved_thenIsCached() {
+        LocalHost.resolveIPv4()
+        assertNotNull(LocalHost.cachedIPv4OrNull())
+    }
 
-internal expect val IsAndroidHost: Boolean
+    @Test
+    fun givenIPv6_whenResolved_thenIsCached() {
+        try {
+            LocalHost.resolveIPv6()
+        } catch (e: IOException) {
+            println("IPv6 unavailable for host. Skipping...")
+            return
+        }
 
-internal expect val ProcessID: Int?
-
-@Throws(Exception::class)
-@Suppress("NOTHING_TO_INLINE")
-internal expect inline fun LocalHost.platformResolveIPv4(): IPAddress.V4
-
-@Throws(Exception::class)
-@Suppress("NOTHING_TO_INLINE")
-internal expect inline fun LocalHost.platformResolveIPv6(): IPAddress.V6
+        assertNotNull(LocalHost.cachedIPv6OrNull())
+    }
+}

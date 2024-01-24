@@ -13,25 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-@file:Suppress("KotlinRedundantDiagnosticSuppress")
+@file:Suppress("EXPECT_ACTUAL_CLASSIFIERS_ARE_IN_BETA_WARNING", "ACTUAL_ANNOTATIONS_NOT_MATCH_EXPECT")
 
 package io.matthewnelson.kmp.tor.runtime.ctrl.api.internal
 
 import io.matthewnelson.kmp.tor.runtime.ctrl.api.address.IPAddress
-import io.matthewnelson.kmp.tor.runtime.ctrl.api.address.LocalHost
 
-internal expect val UnixSocketsNotSupportedMessage: String?
+internal actual class PortAvailability private constructor() {
 
-internal expect val IsUnixLikeHost: Boolean
+    internal actual fun isAvailable(port: Int): Boolean {
+        // check exception error code
+        TODO()
+    }
 
-internal expect val IsAndroidHost: Boolean
+    internal actual companion object {
 
-internal expect val ProcessID: Int?
-
-@Throws(Exception::class)
-@Suppress("NOTHING_TO_INLINE")
-internal expect inline fun LocalHost.platformResolveIPv4(): IPAddress.V4
-
-@Throws(Exception::class)
-@Suppress("NOTHING_TO_INLINE")
-internal expect inline fun LocalHost.platformResolveIPv6(): IPAddress.V6
+        internal actual fun of(address: IPAddress): PortAvailability {
+            TODO()
+        }
+    }
+}

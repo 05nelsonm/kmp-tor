@@ -31,6 +31,10 @@ import io.matthewnelson.kmp.tor.runtime.ctrl.api.TorConfig.Keyword.Attribute
 import io.matthewnelson.kmp.tor.runtime.ctrl.api.TorConfig.LineItem.Companion.toLineItem
 import io.matthewnelson.kmp.tor.runtime.ctrl.api.TorConfig.Setting.Companion.filterByAttribute
 import io.matthewnelson.kmp.tor.runtime.ctrl.api.TorConfig.Setting.Companion.filterByKeyword
+import io.matthewnelson.kmp.tor.runtime.ctrl.api.address.LocalHost
+import io.matthewnelson.kmp.tor.runtime.ctrl.api.address.Port.Companion.toPort
+import io.matthewnelson.kmp.tor.runtime.ctrl.api.address.ProxyAddress
+import io.matthewnelson.kmp.tor.runtime.ctrl.api.address.ProxyAddress.Companion.toProxyAddressOrNull
 import io.matthewnelson.kmp.tor.runtime.ctrl.api.builder.*
 import io.matthewnelson.kmp.tor.runtime.ctrl.api.internal.IsAndroidHost
 import io.matthewnelson.kmp.tor.runtime.ctrl.api.internal.IsUnixLikeHost
@@ -120,11 +124,13 @@ public class TorConfig private constructor(
      * @see [TorConfig.Companion.Builder]
      * */
     @KmpTorDsl
-    public class Builder private constructor(other: TorConfig?) {
+    public open class Builder private constructor(other: TorConfig?) {
 
-        private val settings = mutableSetOf<Setting>()
+        @JvmField
+        protected val settings: MutableSet<Setting> = mutableSetOf()
         // For dealing with inherited disabled port
-        private val inheritedDisabledPorts = mutableSetOf<Setting>()
+        @JvmField
+        protected val inheritedDisabledPorts: MutableSet<Setting> = mutableSetOf()
 
         /**
          * Add an already configured [Setting].
@@ -212,7 +218,7 @@ public class TorConfig private constructor(
                 other: TorConfig?,
                 block: ThisBlock<Builder>,
             ): TorConfig {
-                val b = Builder(other).apply(block)
+                val b = Extended(other).apply(block)
                 // Copy our settings in before we modify them
                 val settings = b.settings.toMutableSet()
                 settings.addAll(b.inheritedDisabledPorts)
@@ -232,6 +238,40 @@ public class TorConfig private constructor(
                 }
 
                 return TorConfig(settings.toImmutableSet())
+            }
+        }
+
+        // Used by TorRuntime for startup configuration
+        private class Extended(other: TorConfig?): Builder(other), ExtendedTorConfigBuilder {
+            override fun contains(keyword: Keyword): Boolean {
+                for (setting in settings) {
+                    for (item in setting.items) {
+                        if (item.keyword == keyword) return true
+                    }
+                }
+
+                if (keyword.attributes.contains(Attribute.Port)) {
+                    for (port in inheritedDisabledPorts) {
+                        if (port.keyword == keyword) return true
+                    }
+                }
+
+                return false
+            }
+
+            override fun ports(): List<Setting> {
+                val ports = settings
+                    .filterByAttribute<Attribute.Port>()
+                    .filter { setting ->
+                        // remove any configured hidden service settings
+                        setting.keyword != HiddenServiceDir
+                    }.toMutableList()
+                ports.addAll(inheritedDisabledPorts)
+                return ports
+            }
+
+            override fun remove(setting: Setting) {
+                settings.remove(setting)
             }
         }
     }
@@ -2025,6 +2065,48 @@ public class TorConfig private constructor(
             items.joinTo(this, separator = "\n")
         }
         // TODO: public fun toCtrlString(): String
+
+        // Returns null if setting is not a configured
+        // TCP Port, or that port was available. Otherwise,
+        // Will return a modified Setting with "auto" as its
+        // argument.
+        @InternalKmpTorApi
+        @Throws(IOException::class)
+        public fun checkTCPPortAvailability(
+            isPortAvailable: (IPAddress, Port) -> Boolean = { ip, p -> p.isAvailable(ip) },
+        ): Setting? {
+            // Setting does not have Attribute.Port
+            if (!keyword.attributes.contains(Attribute.Port)) return null
+
+            // Not configured as a TCP port that needs validation
+            if (argument == "0" || argument == AUTO) return null
+            if (argument.startsWith("unix:")) return null
+
+            val (address, port) = argument.toProxyAddressOrNull() ?: run {
+                val localhost = try {
+                    LocalHost.resolveIPv4()
+                } catch (_: IOException) {
+                    // TODO: Issue #313
+                    //  Move to builders
+                    "127.0.0.1".toIPAddressV4()
+                }
+
+                ProxyAddress(localhost, argument.toPort())
+            }
+
+            // Assigned TCP Port is available. No action required
+            if (isPortAvailable(address, port)) return null
+
+            // Remove and replace argument with auto
+            val list = items.toMutableList()
+            val removed = list.removeAt(0)
+
+            // TODO: Issue #313
+            //  Will need to figure out how to handle a non-localhost IPAddress
+            list.add(0, removed.keyword.toLineItem(AUTO, removed.optionals)!!)
+
+            return Setting(list.toImmutableSet(), extraInfo)
+        }
     }
 
     /**
@@ -2065,6 +2147,15 @@ public class TorConfig private constructor(
         public val isUnique: Boolean,
     ): Comparable<Keyword>, CharSequence {
 
+        public sealed class Attribute private constructor() {
+            public data object Directory: Attribute()
+            public data object File: Attribute()
+            public data object HiddenService: Attribute()
+            public data object Logging: Attribute()
+            public data object Port: Attribute()
+            public data object UnixSocket: Attribute()
+        }
+
         public final override val length: Int get() = name.length
         public final override fun get(index: Int): Char = name[index]
         public final override fun subSequence(
@@ -2078,15 +2169,6 @@ public class TorConfig private constructor(
         public final override fun equals(other: Any?): Boolean = other is Keyword && other.name == name
         public final override fun hashCode(): Int = 21 * 31 + name.hashCode()
         public final override fun toString(): String = name
-
-        public sealed class Attribute private constructor() {
-            public data object Directory: Attribute()
-            public data object File: Attribute()
-            public data object HiddenService: Attribute()
-            public data object Logging: Attribute()
-            public data object Port: Attribute()
-            public data object UnixSocket: Attribute()
-        }
     }
 
     public override fun equals(other: Any?): Boolean = other is TorConfig && other.settings == settings

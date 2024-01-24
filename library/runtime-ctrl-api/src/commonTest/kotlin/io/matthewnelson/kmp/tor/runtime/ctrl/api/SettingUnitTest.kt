@@ -15,13 +15,15 @@
  **/
 package io.matthewnelson.kmp.tor.runtime.ctrl.api
 
+import io.matthewnelson.kmp.file.absoluteFile
+import io.matthewnelson.kmp.file.resolve
 import io.matthewnelson.kmp.file.toFile
+import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
 import io.matthewnelson.kmp.tor.runtime.ctrl.api.address.Port.Companion.toPort
 import io.matthewnelson.kmp.tor.runtime.ctrl.api.address.Port.Proxy.Companion.toPortProxy
-import kotlin.test.Test
-import kotlin.test.assertEquals
-import kotlin.test.assertNotEquals
+import kotlin.test.*
 
+@OptIn(InternalKmpTorApi::class)
 class SettingUnitTest {
 
     @Test
@@ -165,5 +167,49 @@ class SettingUnitTest {
         assertNotEquals(a.items, b.items)
         assertNotEquals(a.hashCode(), b.hashCode())
         assertEquals(2, setOf(a, b).size)
+    }
+
+    @Test
+    fun givenTCPPort_whenNotConfiguredWithPortArgument_thenValidationReturnsNull() {
+        TorConfig.__DNSPort.Builder { disable() }.let { dns ->
+            assertNull(dns.checkTCPPortAvailability { _, _ -> fail() })
+        }
+        TorConfig.__SocksPort.Builder {
+            // Will check functionality on non-windows hosts
+            try {
+                asUnixSocket {
+                    file = "".toFile().absoluteFile
+                        .resolve("socks.sock")
+                }
+            } catch (_: UnsupportedOperationException) {
+                asPort { disable() }
+            }
+        }.let { socks ->
+            assertNull(socks.checkTCPPortAvailability { _, _ -> fail() })
+        }
+        TorConfig.__ControlPort.Builder { asPort { auto() } }.let { ctrl ->
+            assertNull(ctrl.checkTCPPortAvailability { _, _ -> fail() })
+        }
+    }
+
+    @Test
+    fun givenTCPPort_whenConfiguredWithPortArgument_thenReassignsWhenNotAvailable() {
+        TorConfig.__SocksPort.Builder { asPort { /* 9050 */ } }.let { socks ->
+            assertNotNull(socks.checkTCPPortAvailability { _, _ -> false })
+        }
+    }
+
+    @Test
+    fun givenTCPPort_whenConfiguredWithPortArgument_thenNoReassignsWhenAvailable() {
+        TorConfig.__SocksPort.Builder { asPort { /* 9050 */ } }.let { socks ->
+            assertNull(socks.checkTCPPortAvailability { _, _ -> true })
+        }
+    }
+
+    @Test
+    fun givenNonPortSetting_whenValidate_thenReturnsNull() {
+        TorConfig.RunAsDaemon.Builder { enable = true }.let { setting ->
+            assertNull(setting.checkTCPPortAvailability { _, _ -> fail() })
+        }
     }
 }
