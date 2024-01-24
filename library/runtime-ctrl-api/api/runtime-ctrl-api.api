@@ -57,9 +57,9 @@ public final class io/matthewnelson/kmp/tor/runtime/ctrl/api/TorConfig$AutomapHo
 }
 
 public class io/matthewnelson/kmp/tor/runtime/ctrl/api/TorConfig$Builder {
+	protected final field inheritedDisabledPorts Ljava/util/Set;
+	protected final field settings Ljava/util/Set;
 	public synthetic fun <init> (Lio/matthewnelson/kmp/tor/runtime/ctrl/api/TorConfig;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
-	protected final fun getInheritedDisabledPorts ()Ljava/util/Set;
-	protected final fun getSettings ()Ljava/util/Set;
 	public final fun put (Lio/matthewnelson/kmp/tor/runtime/ctrl/api/TorConfig$Setting$Factory;Lio/matthewnelson/kmp/tor/runtime/ctrl/api/ThisBlock;)Lio/matthewnelson/kmp/tor/runtime/ctrl/api/TorConfig$Builder;
 	public final fun put (Lio/matthewnelson/kmp/tor/runtime/ctrl/api/TorConfig$Setting;)Lio/matthewnelson/kmp/tor/runtime/ctrl/api/TorConfig$Builder;
 	public final fun putIfAbsent (Lio/matthewnelson/kmp/tor/runtime/ctrl/api/TorConfig$Setting$Factory;Lio/matthewnelson/kmp/tor/runtime/ctrl/api/ThisBlock;)Lio/matthewnelson/kmp/tor/runtime/ctrl/api/TorConfig$Builder;
