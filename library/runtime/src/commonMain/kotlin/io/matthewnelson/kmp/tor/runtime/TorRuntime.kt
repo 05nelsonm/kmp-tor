@@ -376,11 +376,13 @@ public interface TorRuntime: TorEvent.Processor, RuntimeEvent.Processor {
     }
 
     @InternalKmpTorApi
-    public interface ServiceFactory: TorEvent.Processor, RuntimeEvent.Processor {
+    public interface ServiceFactory:
+        TorEvent.Processor,
+        RuntimeEvent.Processor,
+        RuntimeEvent.Notifier
+    {
 
         public val environment: Environment
-
-        public fun <R: Any> notify(event: RuntimeEvent<R>, output: R)
 
         public fun create(
             lifecycleHook: Job,

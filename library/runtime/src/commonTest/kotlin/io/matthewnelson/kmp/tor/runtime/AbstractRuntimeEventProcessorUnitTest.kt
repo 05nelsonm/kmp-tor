@@ -33,7 +33,7 @@ class AbstractRuntimeEventProcessorUnitTest {
 
     @Test
     fun givenObserver_whenAddRemove_thenIsAsExpected() {
-        val observer = RuntimeEvent.DEBUG.observer {}
+        val observer = RuntimeEvent.LOG.DEBUG.observer {}
         processor.add(observer)
         assertEquals(1, processor.sizeRuntime)
         processor.add(observer)
@@ -45,41 +45,41 @@ class AbstractRuntimeEventProcessorUnitTest {
     @Test
     fun givenObservers_whenRemoveAllByEvent_thenAreRemoved() {
         var invocations = 0
-        val o1 = RuntimeEvent.DEBUG.observer { invocations++ }
-        val o2 = RuntimeEvent.INFO.observer {}
-        val o3 = RuntimeEvent.INFO.observer {}
+        val o1 = RuntimeEvent.LOG.DEBUG.observer { invocations++ }
+        val o2 = RuntimeEvent.LOG.INFO.observer {}
+        val o3 = RuntimeEvent.LOG.INFO.observer {}
         processor.add(o1, o2, o3, o3)
         assertEquals(3, processor.sizeRuntime)
 
-        processor.removeAll(RuntimeEvent.INFO)
+        processor.removeAll(RuntimeEvent.LOG.INFO)
         assertEquals(1, processor.sizeRuntime)
 
-        processor.notify(RuntimeEvent.DEBUG, "out")
+        processor.notify(RuntimeEvent.LOG.DEBUG, "out")
         assertEquals(1, invocations)
     }
 
     @Test
     fun givenObservers_whenRemoveMultiple_thenAreRemoved() {
         var invocations = 0
-        val o1 = RuntimeEvent.DEBUG.observer { invocations++ }
-        val o2 = RuntimeEvent.INFO.observer {}
-        val o3 = RuntimeEvent.INFO.observer {}
+        val o1 = RuntimeEvent.LOG.DEBUG.observer { invocations++ }
+        val o2 = RuntimeEvent.LOG.INFO.observer {}
+        val o3 = RuntimeEvent.LOG.INFO.observer {}
         processor.add(o1, o2, o3)
         assertEquals(3, processor.sizeRuntime)
 
         processor.remove(o2, o3)
         assertEquals(1, processor.sizeRuntime)
 
-        processor.notify(RuntimeEvent.DEBUG, "out")
+        processor.notify(RuntimeEvent.LOG.DEBUG, "out")
         assertEquals(1, invocations)
     }
 
     @Test
     fun givenTaggedObserver_whenRemoveByTag_thenAreRemoved() {
         var invocations = 0
-        val o1 = RuntimeEvent.DEBUG.observer("test1") { invocations++ }
-        val o2 = RuntimeEvent.INFO.observer("test2") {}
-        val o3 = RuntimeEvent.WARN.observer("test2") {}
+        val o1 = RuntimeEvent.LOG.DEBUG.observer("test1") { invocations++ }
+        val o2 = RuntimeEvent.LOG.INFO.observer("test2") {}
+        val o3 = RuntimeEvent.LOG.WARN.observer("test2") {}
         processor.add(o1, o1, o2, o2, o3, o3)
         assertEquals(3, processor.sizeRuntime)
 
@@ -87,20 +87,20 @@ class AbstractRuntimeEventProcessorUnitTest {
         assertEquals(1, processor.sizeRuntime)
 
         // Is the proper tagged observer removed
-        processor.notify(RuntimeEvent.DEBUG, "out")
+        processor.notify(RuntimeEvent.LOG.DEBUG, "out")
         assertEquals(1, invocations)
     }
 
     @Test
     fun givenBlankTag_whenObserver_thenTagIsNull() {
-        assertNull(RuntimeEvent.Observer("  ", RuntimeEvent.DEBUG) { }.tag)
+        assertNull(RuntimeEvent.Observer("  ", RuntimeEvent.LOG.DEBUG) { }.tag)
     }
 
     @Test
     fun givenStaticTag_whenRemove_thenDoesNothing() {
-        processor.add(RuntimeEvent.DEBUG.observer("static") {})
+        processor.add(RuntimeEvent.LOG.DEBUG.observer("static") {})
 
-        val nonStaticObserver = RuntimeEvent.DEBUG.observer("non-static") {}
+        val nonStaticObserver = RuntimeEvent.LOG.DEBUG.observer("non-static") {}
         processor.add(nonStaticObserver)
 
         // should do nothing
@@ -108,13 +108,13 @@ class AbstractRuntimeEventProcessorUnitTest {
         assertEquals(2, processor.sizeRuntime)
 
         // Should only remove the non-static observer
-        processor.removeAll(RuntimeEvent.DEBUG)
+        processor.removeAll(RuntimeEvent.LOG.DEBUG)
         assertEquals(1, processor.sizeRuntime)
 
         // Should only remove the non-static observer
         processor.add(nonStaticObserver)
         assertEquals(2, processor.sizeRuntime)
-        processor.removeAll(RuntimeEvent.DEBUG, RuntimeEvent.WARN)
+        processor.removeAll(RuntimeEvent.LOG.DEBUG, RuntimeEvent.LOG.WARN)
         assertEquals(1, processor.sizeRuntime)
 
         // Should not remove the static observer
@@ -126,7 +126,7 @@ class AbstractRuntimeEventProcessorUnitTest {
 
     @Test
     fun givenStaticObservers_whenOnDestroy_thenEvictsAll() {
-        val observer = RuntimeEvent.DEBUG.observer("static") {}
+        val observer = RuntimeEvent.LOG.DEBUG.observer("static") {}
         processor.add(observer)
         processor.add(TorEvent.BW.observer("static") {})
 

@@ -85,7 +85,6 @@ internal abstract class AbstractRuntimeEventProcessor(
 
     public final override fun removeAll(tag: String) {
         if (tag.isStaticTag()) return
-
         withRuntimeObservers {
             val iterator = iterator()
             while (iterator.hasNext()) {

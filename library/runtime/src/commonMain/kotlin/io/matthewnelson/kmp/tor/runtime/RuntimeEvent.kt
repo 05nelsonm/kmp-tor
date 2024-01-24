@@ -16,6 +16,7 @@
 package io.matthewnelson.kmp.tor.runtime
 
 import io.matthewnelson.immutable.collections.immutableSetOf
+import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
 import io.matthewnelson.kmp.tor.runtime.ctrl.api.ItBlock
 import io.matthewnelson.kmp.tor.runtime.ctrl.api.TorEvent
 import kotlin.jvm.JvmField
@@ -35,24 +36,14 @@ public sealed class RuntimeEvent<R: Any> private constructor() {
     public val name: String get() = toString()
 
     /**
-     * Debug log messages
+     * Log Messages
      * */
-    public data object DEBUG: RuntimeEvent<String>()
-
-    /**
-     * Error log messages
-     * */
-    public data object ERROR: RuntimeEvent<String>()
-
-    /**
-     * Info log messages
-     * */
-    public data object INFO: RuntimeEvent<String>()
-
-    /**
-     * Warn log messages
-     * */
-    public data object WARN: RuntimeEvent<String>()
+    public sealed class LOG private constructor(): RuntimeEvent<String>() {
+        public data object DEBUG: LOG()
+        public data object ERROR: LOG()
+        public data object INFO: LOG()
+        public data object WARN: LOG()
+    }
 
     // TODO: Other events
 
@@ -167,7 +158,7 @@ public sealed class RuntimeEvent<R: Any> private constructor() {
         public fun removeAll(tag: String)
 
         /**
-         * Remove all [Observer] that are currently registered.
+         * Remove all non-static [Observer] that are currently registered.
          *
          * If the implementing class extends both [Processor]
          * and [TorEvent.Processor], all [TorEvent.Observer]
@@ -194,10 +185,15 @@ public sealed class RuntimeEvent<R: Any> private constructor() {
 
         @JvmField
         public val entries: Set<RuntimeEvent<*>> = immutableSetOf(
-            DEBUG,
-            ERROR,
-            INFO,
-            WARN,
+            LOG.DEBUG,
+            LOG.ERROR,
+            LOG.INFO,
+            LOG.WARN,
         )
+    }
+
+    @InternalKmpTorApi
+    public interface Notifier {
+        public fun <R: Any> notify(event: RuntimeEvent<R>, output: R)
     }
 }
