@@ -106,11 +106,12 @@ class TorConfigUnitTest {
 
     @Test
     fun givenExtendedConfig_whenCastAs_thenWorksAsExpected() {
-        TorConfig.Builder {
-            val dns = TorConfig.__DNSPort.Builder { port(1080.toPortProxy()) }
+        val dns = TorConfig.__DNSPort.Builder { port(1080.toPortProxy()) }
+
+        val config = TorConfig.Builder {
 
             put(dns)
-            put(TorConfig.__SocksPort) { asPort {} }
+            put(TorConfig.__SocksPort) { asPort { disable() } }
             put(TorConfig.HiddenServiceDir) {
                 directory = "".toFile()
                 version { HSv(3) }
@@ -135,6 +136,23 @@ class TorConfigUnitTest {
             ports = ports()
             assertFalse(ports.contains(dns))
             assertEquals(1, ports.size)
+        }
+
+        // Check inherited disabled ports
+        TorConfig.Builder(other = config) {
+            (this as ExtendedTorConfigBuilder).remove(dns)
+
+            // Should contain disabled socks port that was inherited
+            var ports = ports()
+            assertEquals(1, ports.size)
+            assertEquals("0", ports.first().argument)
+            assertTrue(contains(TorConfig.__SocksPort))
+
+            val expected = "9055"
+            put(TorConfig.__SocksPort) { asPort { port(expected.toPortProxy()) } }
+            ports = ports()
+            assertEquals(1, ports.size)
+            assertEquals(expected, ports.first().argument)
         }
     }
 }

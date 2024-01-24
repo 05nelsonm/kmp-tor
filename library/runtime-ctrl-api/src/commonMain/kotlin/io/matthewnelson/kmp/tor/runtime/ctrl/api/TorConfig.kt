@@ -244,16 +244,24 @@ public class TorConfig private constructor(
                     }
                 }
 
+                if (keyword.attributes.contains(Attribute.Port)) {
+                    for (port in inheritedDisabledPorts) {
+                        if (port.keyword == keyword) return true
+                    }
+                }
+
                 return false
             }
 
             override fun ports(): List<Setting> {
-                return settings
+                val ports = settings
                     .filterByAttribute<Attribute.Port>()
                     .filter { setting ->
                         // remove any configured hidden service settings
                         setting.keyword != HiddenServiceDir
-                    }
+                    }.toMutableList()
+                ports.addAll(inheritedDisabledPorts)
+                return ports
             }
 
             override fun remove(setting: Setting) {
