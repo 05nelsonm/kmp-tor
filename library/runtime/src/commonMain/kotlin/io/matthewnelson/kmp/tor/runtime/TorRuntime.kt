@@ -139,7 +139,8 @@ public interface TorRuntime: TorEvent.Processor, RuntimeEvent.Processor {
          * Any exception thrown within [block] will be propagated to the caller.
          *
          * **NOTE:** This can be omitted as a minimum viable configuration
-         * is always created using [Environment].
+         * is always created. See [TorConfigGenerator.validate] for what settings
+         * are automatically applied.
          *
          * **NOTE:** [block] should not contain any non-singleton references
          * such as Android Activity context.
@@ -205,6 +206,8 @@ public interface TorRuntime: TorEvent.Processor, RuntimeEvent.Processor {
             ): TorRuntime = getOrCreateInstance(environment.id) {
                 val b = Builder(environment)
                 if (block != null) b.apply(block)
+
+                // TODO: Use TorConfigGenerator.of
 
                 RealTorRuntime.of(
                     environment = environment,
