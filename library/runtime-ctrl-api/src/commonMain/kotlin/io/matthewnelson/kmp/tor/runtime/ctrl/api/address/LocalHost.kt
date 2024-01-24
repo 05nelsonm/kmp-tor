@@ -41,11 +41,11 @@ public object LocalHost: Address("localhost") {
 
         private val timeMark = TimeSource.Monotonic.markNow()
 
-        private fun isExpired(): Boolean {
+        private fun isNotExpired(): Boolean {
             val elapsedNanos = timeMark.elapsedNow().inWholeNanoseconds
             // java uses 5s expiry time, so the extra 250 ns
             // ensures there is always going to be a refresh.
-            return elapsedNanos > 5_000_000_250L
+            return elapsedNanos < 5_000_000_250L
         }
 
         object IPv4 {
@@ -56,7 +56,7 @@ public object LocalHost: Address("localhost") {
             @JvmStatic
             fun getOrNull(): IPAddress.V4? {
                 val cached = cache ?: return null
-                if (!cached.isExpired()) {
+                if (cached.isNotExpired()) {
                     return cached.address as IPAddress.V4
                 }
                 cache = null
@@ -85,7 +85,7 @@ public object LocalHost: Address("localhost") {
             @JvmStatic
             fun getOrNull(): IPAddress.V6? {
                 val cached = cache ?: return null
-                if (!cached.isExpired()) {
+                if (cached.isNotExpired()) {
                     return cached.address as IPAddress.V6
                 }
                 cache = null
