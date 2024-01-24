@@ -693,6 +693,9 @@ public class io/matthewnelson/kmp/tor/runtime/ctrl/api/address/Port : java/lang/
 	public static final fun getOrNull (I)Lio/matthewnelson/kmp/tor/runtime/ctrl/api/address/Port;
 	public static final fun getOrNull (Ljava/lang/String;)Lio/matthewnelson/kmp/tor/runtime/ctrl/api/address/Port;
 	public final fun hashCode ()I
+	public final fun isAvailable ()Z
+	public final fun isAvailable (Lio/matthewnelson/kmp/tor/runtime/ctrl/api/address/IPAddress;)Z
+	public static synthetic fun isAvailable$default (Lio/matthewnelson/kmp/tor/runtime/ctrl/api/address/Port;Lio/matthewnelson/kmp/tor/runtime/ctrl/api/address/IPAddress;ILjava/lang/Object;)Z
 	public final fun toString ()Ljava/lang/String;
 }
 
@@ -708,6 +711,9 @@ public final class io/matthewnelson/kmp/tor/runtime/ctrl/api/address/Port$Proxy 
 	public static final field MAX I
 	public static final field MIN I
 	public synthetic fun <init> (ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun findAvailable (I)Lio/matthewnelson/kmp/tor/runtime/ctrl/api/address/Port$Proxy;
+	public final fun findAvailable (ILio/matthewnelson/kmp/tor/runtime/ctrl/api/address/IPAddress;)Lio/matthewnelson/kmp/tor/runtime/ctrl/api/address/Port$Proxy;
+	public static synthetic fun findAvailable$default (Lio/matthewnelson/kmp/tor/runtime/ctrl/api/address/Port$Proxy;ILio/matthewnelson/kmp/tor/runtime/ctrl/api/address/IPAddress;ILjava/lang/Object;)Lio/matthewnelson/kmp/tor/runtime/ctrl/api/address/Port$Proxy;
 	public static final fun get (I)Lio/matthewnelson/kmp/tor/runtime/ctrl/api/address/Port$Proxy;
 	public static final fun get (Ljava/lang/String;)Lio/matthewnelson/kmp/tor/runtime/ctrl/api/address/Port$Proxy;
 	public static final fun getOrNull (I)Lio/matthewnelson/kmp/tor/runtime/ctrl/api/address/Port$Proxy;

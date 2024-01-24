@@ -43,12 +43,12 @@ internal actual val ProcessID: Int? get() = process_pid
 
 @Suppress("NOTHING_TO_INLINE", "ACTUAL_ANNOTATIONS_NOT_MATCH_EXPECT")
 internal actual inline fun LocalHost.platformResolveIPv4(): IPAddress.V4 {
-    // check exception code
+    // check exception error code
     TODO()
 }
 
 @Suppress("NOTHING_TO_INLINE", "ACTUAL_ANNOTATIONS_NOT_MATCH_EXPECT")
 internal actual inline fun LocalHost.platformResolveIPv6(): IPAddress.V6 {
-    // check exception code
+    // check exception error code
     TODO()
 }
