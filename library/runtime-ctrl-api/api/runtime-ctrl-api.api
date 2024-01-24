@@ -634,6 +634,13 @@ public final class io/matthewnelson/kmp/tor/runtime/ctrl/api/address/IPAddress$V
 	public final fun getOrNull (Ljava/lang/String;)Lio/matthewnelson/kmp/tor/runtime/ctrl/api/address/IPAddress$V6;
 }
 
+public final class io/matthewnelson/kmp/tor/runtime/ctrl/api/address/LocalHost : io/matthewnelson/kmp/tor/runtime/ctrl/api/address/Address {
+	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/ctrl/api/address/LocalHost;
+	public fun canonicalHostname ()Ljava/lang/String;
+	public static final fun resolveIPv4 ()Lio/matthewnelson/kmp/tor/runtime/ctrl/api/address/IPAddress$V4;
+	public static final fun resolveIPv6 ()Lio/matthewnelson/kmp/tor/runtime/ctrl/api/address/IPAddress$V6;
+}
+
 public abstract class io/matthewnelson/kmp/tor/runtime/ctrl/api/address/OnionAddress : io/matthewnelson/kmp/tor/runtime/ctrl/api/address/Address {
 	public static final field Companion Lio/matthewnelson/kmp/tor/runtime/ctrl/api/address/OnionAddress$Companion;
 	public synthetic fun <init> (Ljava/lang/String;Lkotlin/jvm/internal/DefaultConstructorMarker;)V

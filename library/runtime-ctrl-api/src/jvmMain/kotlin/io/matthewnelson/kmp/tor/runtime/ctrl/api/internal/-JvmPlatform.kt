@@ -13,14 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
+@file:Suppress("KotlinRedundantDiagnosticSuppress")
+
 package io.matthewnelson.kmp.tor.runtime.ctrl.api.internal
 
 import io.matthewnelson.kmp.file.SysPathSep
 import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
 import io.matthewnelson.kmp.tor.core.resource.OSHost
 import io.matthewnelson.kmp.tor.core.resource.OSInfo
+import io.matthewnelson.kmp.tor.runtime.ctrl.api.address.IPAddress
+import io.matthewnelson.kmp.tor.runtime.ctrl.api.address.IPAddress.V4.Companion.toIPAddressV4
+import io.matthewnelson.kmp.tor.runtime.ctrl.api.address.IPAddress.V6.Companion.toIPAddressV6
+import io.matthewnelson.kmp.tor.runtime.ctrl.api.address.LocalHost
+import java.net.Inet4Address
+import java.net.Inet6Address
 
-@get:JvmSynthetic
 @OptIn(InternalKmpTorApi::class)
 internal actual val UnixSocketsNotSupportedMessage: String? by lazy {
     // Android support via android.net.LocalSocket since API 1
@@ -46,7 +53,6 @@ internal actual val UnixSocketsNotSupportedMessage: String? by lazy {
     }
 }
 
-@get:JvmSynthetic
 internal actual val ProcessID: Int? get() {
     @OptIn(InternalKmpTorApi::class)
     return if (OSInfo.INSTANCE.isAndroidRuntime()) {
@@ -72,4 +78,16 @@ private val AndroidPID: Int? by lazy {
     } catch (_: Throwable) {
         null
     }
+}
+
+@Throws(Exception::class)
+@Suppress("NOTHING_TO_INLINE")
+internal actual inline fun LocalHost.platformResolveIPv4(): IPAddress.V4 {
+    return Inet4Address.getByName(value).hostAddress.toIPAddressV4()
+}
+
+@Throws(Exception::class)
+@Suppress("NOTHING_TO_INLINE")
+internal actual inline fun LocalHost.platformResolveIPv6(): IPAddress.V6 {
+    return Inet6Address.getByName(value).hostAddress.toIPAddressV6()
 }
