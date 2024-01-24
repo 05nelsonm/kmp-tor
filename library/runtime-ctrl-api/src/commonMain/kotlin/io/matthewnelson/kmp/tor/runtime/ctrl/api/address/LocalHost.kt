@@ -29,11 +29,11 @@ public object LocalHost: Address("localhost") {
 
     @JvmStatic
     @Throws(IOException::class)
-    public fun resolveIPv4(): IPAddress.V4 = Cache.V4.resolve(checkCache = true)
+    public fun resolveIPv4(): IPAddress.V4 = Cache.IPv4.resolve(checkCache = true)
 
     @JvmStatic
     @Throws(IOException::class)
-    public fun resolveIPv6(): IPAddress.V6 = Cache.V6.resolve(checkCache = true)
+    public fun resolveIPv6(): IPAddress.V6 = Cache.IPv6.resolve(checkCache = true)
 
     public override fun canonicalHostname(): String = value
 
@@ -48,7 +48,7 @@ public object LocalHost: Address("localhost") {
             return elapsedNanos > 5_000_000_250L
         }
 
-        object V4 {
+        object IPv4 {
 
             @Volatile
             private var cache: Cache? = null
@@ -77,7 +77,7 @@ public object LocalHost: Address("localhost") {
             }
         }
 
-        object V6 {
+        object IPv6 {
 
             @Volatile
             private var cache: Cache? = null
@@ -110,15 +110,15 @@ public object LocalHost: Address("localhost") {
     @JvmStatic
     @InternalKmpTorApi
     @Throws(IOException::class)
-    public fun resolveIPv4NoCache(): IPAddress.V4 = Cache.V4.resolve(checkCache = false)
+    public fun resolveIPv4NoCache(): IPAddress.V4 = Cache.IPv4.resolve(checkCache = false)
 
     @JvmStatic
     @InternalKmpTorApi
     @Throws(IOException::class)
-    public fun resolveIPv6NoCache(): IPAddress.V6 = Cache.V6.resolve(checkCache = false)
+    public fun resolveIPv6NoCache(): IPAddress.V6 = Cache.IPv6.resolve(checkCache = false)
 
     @JvmSynthetic
-    internal fun cachedIPv4OrNull(): IPAddress.V4? = Cache.V4.getOrNull()
+    internal fun cachedIPv4OrNull(): IPAddress.V4? = Cache.IPv4.getOrNull()
     @JvmSynthetic
-    internal fun cachedIPv6OrNull(): IPAddress.V6? = Cache.V6.getOrNull()
+    internal fun cachedIPv6OrNull(): IPAddress.V6? = Cache.IPv6.getOrNull()
 }
