@@ -77,8 +77,8 @@ private val AndroidPID: Int? by lazy {
 }
 
 @Throws(Exception::class)
-internal actual fun LocalHost.resolveAll(): Set<IPAddress> {
-    val addresses = InetAddress.getAllByName(value)
+internal actual fun LocalHost.Companion.resolveAll(): Set<IPAddress> {
+    val addresses = InetAddress.getAllByName("localhost")
     val set = LinkedHashSet<IPAddress>(addresses.size, 1.0F)
     return addresses.mapTo(set) { it.hostAddress.toIPAddress() }
 }

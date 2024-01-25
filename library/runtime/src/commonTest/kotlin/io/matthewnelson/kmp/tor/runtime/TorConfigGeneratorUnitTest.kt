@@ -25,6 +25,7 @@ import io.matthewnelson.kmp.tor.runtime.ctrl.api.ThisBlock
 import io.matthewnelson.kmp.tor.runtime.ctrl.api.TorConfig
 import io.matthewnelson.kmp.tor.runtime.ctrl.api.TorConfig.Setting.Companion.filterByKeyword
 import io.matthewnelson.kmp.tor.runtime.ctrl.api.address.IPAddress
+import io.matthewnelson.kmp.tor.runtime.ctrl.api.address.LocalHost
 import io.matthewnelson.kmp.tor.runtime.ctrl.api.address.Port
 import io.matthewnelson.kmp.tor.runtime.ctrl.api.address.Port.Proxy.Companion.toPortProxy
 import kotlin.test.Test
@@ -105,7 +106,7 @@ class TorConfigGeneratorUnitTest {
                     put(TorConfig.__DNSPort) { port(1080.toPortProxy()) }
                 }
             ),
-            isPortAvailable = { false }
+            isPortAvailable = { _, _ -> false }
         ).generate(notifier).settings
 
         val socks = settings.filterByKeyword<TorConfig.__SocksPort.Companion>().first()
@@ -122,7 +123,7 @@ class TorConfigGeneratorUnitTest {
         allowPortReassignment: Boolean = true,
         omitGeoIPFileSettings: Boolean = false,
         config: List<ThisBlock.WithIt<TorConfig.Builder, TorRuntime.Environment>> = emptyList(),
-        isPortAvailable: (Port) -> Boolean = { true },
+        isPortAvailable: (LocalHost, Port) -> Boolean = { _, _ -> true },
     ): TorConfigGenerator = TorConfigGenerator.of(
         environment,
         allowPortReassignment,

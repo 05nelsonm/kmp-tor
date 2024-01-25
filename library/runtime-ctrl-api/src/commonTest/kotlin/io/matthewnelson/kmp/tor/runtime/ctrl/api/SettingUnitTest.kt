@@ -172,7 +172,7 @@ class SettingUnitTest {
     @Test
     fun givenTCPPort_whenNotConfiguredWithPortArgument_thenValidationReturnsNull() {
         TorConfig.__DNSPort.Builder { disable() }.let { dns ->
-            assertNull(dns.checkTCPPortAvailability { fail() })
+            assertNull(dns.checkTCPPortAvailability { _, _ -> fail() })
         }
         TorConfig.__SocksPort.Builder {
             // Will check functionality on non-windows hosts
@@ -185,31 +185,31 @@ class SettingUnitTest {
                 asPort { disable() }
             }
         }.let { socks ->
-            assertNull(socks.checkTCPPortAvailability { fail() })
+            assertNull(socks.checkTCPPortAvailability { _, _ -> fail() })
         }
         TorConfig.__ControlPort.Builder { asPort { auto() } }.let { ctrl ->
-            assertNull(ctrl.checkTCPPortAvailability { fail() })
+            assertNull(ctrl.checkTCPPortAvailability { _, _ -> fail() })
         }
     }
 
     @Test
     fun givenTCPPort_whenConfiguredWithPortArgument_thenReassignsWhenNotAvailable() {
         TorConfig.__SocksPort.Builder { asPort { /* 9050 */ } }.let { socks ->
-            assertNotNull(socks.checkTCPPortAvailability { false })
+            assertNotNull(socks.checkTCPPortAvailability { _, _ -> false })
         }
     }
 
     @Test
     fun givenTCPPort_whenConfiguredWithPortArgument_thenNoReassignsWhenAvailable() {
         TorConfig.__SocksPort.Builder { asPort { /* 9050 */ } }.let { socks ->
-            assertNull(socks.checkTCPPortAvailability { true })
+            assertNull(socks.checkTCPPortAvailability { _, _ -> true })
         }
     }
 
     @Test
     fun givenNonPortSetting_whenValidate_thenReturnsNull() {
         TorConfig.RunAsDaemon.Builder { enable = true }.let { setting ->
-            assertNull(setting.checkTCPPortAvailability { fail() })
+            assertNull(setting.checkTCPPortAvailability { _, _ -> fail() })
         }
     }
 }

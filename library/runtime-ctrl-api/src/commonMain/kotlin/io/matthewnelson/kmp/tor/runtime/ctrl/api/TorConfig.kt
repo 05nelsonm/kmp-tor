@@ -33,7 +33,6 @@ import io.matthewnelson.kmp.tor.runtime.ctrl.api.TorConfig.Setting.Companion.fil
 import io.matthewnelson.kmp.tor.runtime.ctrl.api.TorConfig.Setting.Companion.filterByKeyword
 import io.matthewnelson.kmp.tor.runtime.ctrl.api.address.LocalHost
 import io.matthewnelson.kmp.tor.runtime.ctrl.api.address.Port.Companion.toPort
-import io.matthewnelson.kmp.tor.runtime.ctrl.api.address.ProxyAddress
 import io.matthewnelson.kmp.tor.runtime.ctrl.api.address.ProxyAddress.Companion.toProxyAddressOrNull
 import io.matthewnelson.kmp.tor.runtime.ctrl.api.builder.*
 import io.matthewnelson.kmp.tor.runtime.ctrl.api.internal.IsAndroidHost
@@ -2073,7 +2072,7 @@ public class TorConfig private constructor(
         @InternalKmpTorApi
         @Throws(IOException::class)
         public fun checkTCPPortAvailability(
-            isPortAvailable: (Port) -> Boolean = { it.isAvailable() },
+            isPortAvailable: (LocalHost, Port) -> Boolean = { h, p -> p.isAvailable(h) },
         ): Setting? {
             // Setting does not have Attribute.Port
             if (!keyword.attributes.contains(Attribute.Port)) return null
@@ -2082,8 +2081,22 @@ public class TorConfig private constructor(
             if (argument == "0" || argument == AUTO) return null
             if (argument.startsWith("unix:")) return null
 
+            val (host, port) = argument.toProxyAddressOrNull().let { pAddress ->
+                if (pAddress != null) {
+                    val host = when (pAddress.address) {
+                        is IPAddress.V4 -> LocalHost.IPv4
+                        is IPAddress.V6 -> LocalHost.IPv6
+                    }
+
+                    Pair(host, pAddress.port)
+                } else {
+                    Pair(LocalHost.IPv4, argument.toPort())
+                }
+            }
+
+            // TODO: Issue #313
             // Assigned TCP Port is available. No action required
-            if (isPortAvailable(argument.toPort())) return null
+            if (isPortAvailable(host, port)) return null
 
             // Remove and replace argument with auto
             val list = items.toMutableList()

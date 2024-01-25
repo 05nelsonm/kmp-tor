@@ -24,13 +24,13 @@ class LocalHostUnitTest {
 
     @Test
     fun givenIPv4_whenResolved_thenIsCached() {
-        LocalHost.resolveIPv4()
-        assertNotNull(LocalHost.cachedIPv4OrNull())
+        LocalHost.IPv4.resolve()
+        assertNotNull(LocalHost.IPv4.fromCache())
     }
 
     @Test
     fun givenIPv6_whenResolved_thenIsCached() {
-        LocalHost.resolveIPv6()
-        assertNotNull(LocalHost.cachedIPv6OrNull())
+        LocalHost.IPv6.resolve()
+        assertNotNull(LocalHost.IPv6.fromCache())
     }
 }

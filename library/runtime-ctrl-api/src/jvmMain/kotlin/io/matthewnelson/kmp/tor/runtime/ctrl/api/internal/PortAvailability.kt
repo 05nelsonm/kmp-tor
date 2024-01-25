@@ -20,18 +20,16 @@ package io.matthewnelson.kmp.tor.runtime.ctrl.api.internal
 import io.matthewnelson.kmp.file.IOException
 import io.matthewnelson.kmp.tor.runtime.ctrl.api.address.IPAddress
 import java.net.InetAddress
-import javax.net.ServerSocketFactory
+import java.net.ServerSocket
 
 internal actual class PortAvailability private constructor(
     private val address: InetAddress,
 ) {
 
-    private val factory = ServerSocketFactory.getDefault()
-
     @Throws(Exception::class)
     internal actual fun isAvailable(port: Int): Boolean {
         try {
-            factory.createServerSocket(port, 1, address).close()
+            ServerSocket(port, 1, address).close()
             return true
         } catch (t: Throwable) {
             // Android will throw NetworkOnMainThreadException here,

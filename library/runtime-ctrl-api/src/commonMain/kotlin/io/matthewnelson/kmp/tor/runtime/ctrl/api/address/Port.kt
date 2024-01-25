@@ -41,14 +41,16 @@ public open class Port private constructor(
      * **NOTE:** This is a blocking call and should be invoked from
      * a background thread.
      *
+     * @param [host] either [LocalHost.IPv4] or [LocalHost.IPv6]
      * @throws [IOException] if the check fails (e.g. calling from Main thread on Android)
      * */
+    @JvmOverloads
     @Throws(IOException::class)
-    public fun isAvailable(): Boolean {
-        val ipAddress = LocalHost.resolveIPv4()
+    public fun isAvailable(host: LocalHost = LocalHost.IPv4): Boolean {
+        val ipAddress = host.resolve()
 
-        try {
-            return PortAvailability.of(ipAddress).isAvailable(value)
+        return try {
+            PortAvailability.of(ipAddress).isAvailable(value)
         } catch (t: Throwable) {
             throw t.wrapIOException()
         }
@@ -130,22 +132,22 @@ public open class Port private constructor(
          * **NOTE:** This is a blocking call and should be invoked from
          * a background thread.
          *
+         * @param [host] either [LocalHost.IPv4] or [LocalHost.IPv6]
          * @param [limit] the number of ports to scan. min: 1, max: 1_000
          * @throws [IllegalArgumentException] if [limit] is not between 1 and 1_000 (inclusive)
          * @throws [IOException] if the check fails (e.g. calling from Main thread on Android)
          * */
+        @JvmOverloads
         @Throws(IllegalArgumentException::class, IOException::class)
-        public fun findAvailable(limit: Int): Proxy {
-            require(limit in 1..1_000) { "limit must be between 1 to 10_000 (inclusive)" }
+        public fun findAvailable(limit: Int, host: LocalHost = LocalHost.IPv4): Proxy {
+            require(limit in 1..1_000) { "limit must be between 1 to 1_000 (inclusive)" }
 
-            val ipAddress = LocalHost.resolveIPv4()
+            val ipAddress = host.resolve()
 
             val availability = try {
                 PortAvailability.of(ipAddress)
             } catch (t: Throwable) {
-                throw t.wrapIOException {
-                    "Failed to create ${PortAvailability::class.simpleName} for ${ipAddress.canonicalHostname()}"
-                }
+                throw t.wrapIOException()
             }
 
             var remaining = limit

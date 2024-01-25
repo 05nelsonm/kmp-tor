@@ -85,7 +85,7 @@ public abstract interface class io/matthewnelson/kmp/tor/runtime/RuntimeEvent$Pr
 }
 
 public final class io/matthewnelson/kmp/tor/runtime/TorConfigGenerator {
-	public synthetic fun <init> (Lio/matthewnelson/kmp/tor/runtime/TorRuntime$Environment;ZZLjava/util/List;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public synthetic fun <init> (Lio/matthewnelson/kmp/tor/runtime/TorRuntime$Environment;ZZLjava/util/List;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
 }
 
 public abstract interface class io/matthewnelson/kmp/tor/runtime/TorRuntime : io/matthewnelson/kmp/tor/runtime/RuntimeEvent$Processor, io/matthewnelson/kmp/tor/runtime/ctrl/api/TorEvent$Processor {

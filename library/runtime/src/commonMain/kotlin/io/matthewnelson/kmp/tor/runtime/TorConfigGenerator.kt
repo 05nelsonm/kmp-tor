@@ -45,7 +45,7 @@ public class TorConfigGenerator private constructor(
     private val allowPortReassignment: Boolean,
     private val omitGeoIPFileSettings: Boolean,
     private val config: List<ThisBlock.WithIt<Builder, TorRuntime.Environment>>,
-    private val isPortAvailable: (Port) -> Boolean,
+    private val isPortAvailable: (LocalHost, Port) -> Boolean,
 ) {
 
     @Throws(Exception::class)
@@ -148,7 +148,7 @@ public class TorConfigGenerator private constructor(
             allowPortReassignment: Boolean,
             omitGeoIPFileSettings: Boolean,
             config: List<ThisBlock.WithIt<Builder, TorRuntime.Environment>>,
-            isPortAvailable: (Port) -> Boolean = { it.isAvailable() },
+            isPortAvailable: (LocalHost, Port) -> Boolean = { h, p -> p.isAvailable(h) },
         ): TorConfigGenerator = TorConfigGenerator(
             environment,
             allowPortReassignment,

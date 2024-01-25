@@ -42,14 +42,16 @@ internal actual val UnixSocketsNotSupportedMessage: String? by lazy {
 internal actual val ProcessID: Int? get() = process_pid
 
 @Suppress("ACTUAL_ANNOTATIONS_NOT_MATCH_EXPECT")
-internal actual fun LocalHost.resolveAll(): Set<IPAddress> {
+internal actual fun LocalHost.Companion.resolveAll(): Set<IPAddress> {
     val interfacesValues = objectValues(os_networkInterfaces())
 
     val set = LinkedHashSet<IPAddress>(2, 1.0F)
+
     interfacesValues.forEach { values ->
         values.forEach values@ { entry ->
-            if (!(entry.internal as Boolean)) return@values
-            set.add((entry.address as String).toIPAddress())
+            if (entry.internal as Boolean) {
+                set.add((entry.address as String).toIPAddress())
+            }
         }
     }
 

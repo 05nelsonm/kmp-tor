@@ -27,17 +27,30 @@ import kotlin.jvm.JvmStatic
 import kotlin.jvm.JvmSynthetic
 import kotlin.time.TimeSource
 
-public object LocalHost: Address("localhost") {
+public sealed class LocalHost private constructor(): Address("localhost") {
 
-    @JvmStatic
+    public object IPv4: LocalHost() {
+
+        @Throws(IOException::class)
+        override fun resolve(): IPAddress.V4 = Cache.resolve(checkCache = true).firstOrThrow()
+
+        @JvmSynthetic
+        internal override fun fromCache(): IPAddress.V4? = Cache.getOrNull()?.firstOrNull()
+    }
+
+    public object IPv6: LocalHost() {
+
+        @Throws(IOException::class)
+        override fun resolve(): IPAddress.V6 = Cache.resolve(checkCache = true).firstOrThrow()
+
+        @JvmSynthetic
+        internal override fun fromCache(): IPAddress.V6? = Cache.getOrNull()?.firstOrNull()
+    }
+
     @Throws(IOException::class)
-    public fun resolveIPv4(): IPAddress.V4 = Cache.resolve(checkCache = true).firstOrThrow()
+    public abstract fun resolve(): IPAddress
 
-    @JvmStatic
-    @Throws(IOException::class)
-    public fun resolveIPv6(): IPAddress.V6 = Cache.resolve(checkCache = true).firstOrThrow()
-
-    public override fun canonicalHostname(): String = value
+    public final override fun canonicalHostname(): String = value
 
     private class Cache private constructor(private val addresses: Set<IPAddress>) {
 
@@ -72,11 +85,11 @@ public object LocalHost: Address("localhost") {
                 val addresses = try {
                     resolveAll()
                 } catch (t: Throwable) {
-                    throw t.wrapIOException { "Failed to resolve IP addresses for $value" }
+                    throw t.wrapIOException { "Failed to resolve IP addresses for localhost" }
                 }
 
                 if (addresses.isEmpty()) {
-                    throw IOException("No IP addresses found for $value")
+                    throw IOException("No IP addresses found for localhost")
                 }
 
                 cache = Cache(addresses.toImmutableSet())
@@ -87,7 +100,7 @@ public object LocalHost: Address("localhost") {
             @Throws(IOException::class)
             inline fun <reified T: IPAddress> Set<IPAddress>.firstOrThrow(): T {
                 return firstOrNull<T>()
-                    ?: throw IOException("IP${T::class.simpleName?.lowercase()} address not found for $value")
+                    ?: throw IOException("IP${T::class.simpleName?.lowercase()} address not found for localhost")
             }
 
             @JvmStatic
@@ -98,12 +111,13 @@ public object LocalHost: Address("localhost") {
         }
     }
 
-    @InternalKmpTorApi
-    @Throws(IOException::class)
-    public fun refreshCache() { Cache.resolve(checkCache = false) }
+    public companion object {
+
+        @InternalKmpTorApi
+        @Throws(IOException::class)
+        public fun refreshCache() { Cache.resolve(checkCache = false) }
+    }
 
     @JvmSynthetic
-    internal fun cachedIPv4OrNull(): IPAddress.V4? = Cache.getOrNull()?.firstOrNull()
-    @JvmSynthetic
-    internal fun cachedIPv6OrNull(): IPAddress.V6? = Cache.getOrNull()?.firstOrNull()
+    internal abstract fun fromCache(): IPAddress?
 }
