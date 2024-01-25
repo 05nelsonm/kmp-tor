@@ -53,23 +53,10 @@ public class TorConfigGenerator private constructor(
         n.notify(LOG.DEBUG, "Installing tor resources (if needed)")
         val pathsTor = environment.torResource.install()
 
-        // TODO: Issue #313
-        //  Resolve localhost so that it is in the cache
-        //  and the builders can set as default.
         try {
-            n.notify(LOG.DEBUG, "Resolving localhost IPv4 address to cache")
-            LocalHost.resolveIPv4NoCache()
-        } catch (_: IOException) {
-            n.notify(LOG.WARN, "localhost IPv4 resolution failed")
-        }
-
-        try {
-            n.notify(LOG.DEBUG, "Resolving localhost IPv6 address to cache")
-            LocalHost.resolveIPv6NoCache()
-        } catch (_: IOException) {
-            // no WARN like with IPv4 b/c a lot of machines/networks have IPv6 disabled
-            n.notify(LOG.DEBUG, "localhost IPv6 resolution failed")
-        }
+            n.notify(LOG.DEBUG, "Refreshing localhost IP address cache")
+            LocalHost.refreshCache()
+        } catch (_: IOException) {}
 
         // Apply library consumers' configuration(s)
         config.forEach { apply(it, environment) }

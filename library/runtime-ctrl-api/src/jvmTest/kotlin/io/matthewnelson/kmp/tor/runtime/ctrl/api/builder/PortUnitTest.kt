@@ -29,7 +29,7 @@ class PortUnitTest {
     @Test
     fun givenLocalHostIPv4_whenFindAvailable_thenSucceeds() {
         // Should not fail on any host
-        Port.Proxy.MIN.toPortProxy().findAvailable(10_000)
+        Port.Proxy.MIN.toPortProxy().findAvailable(1_000)
     }
 
     @Test
@@ -41,13 +41,13 @@ class PortUnitTest {
             return
         }
 
-        Port.Proxy.MIN.toPortProxy().findAvailable(10_000, localhost)
+        Port.Proxy.MIN.toPortProxy().findAvailable(1_000, localhost)
     }
 
     @Test
     fun givenFindAvailable_whenInvalidLimit_thenThrowsException() {
         val port = Port.Proxy.MIN.toPortProxy()
         assertFailsWith<IllegalArgumentException> { port.findAvailable(0) }
-        assertFailsWith<IllegalArgumentException> { port.findAvailable(10_001) }
+        assertFailsWith<IllegalArgumentException> { port.findAvailable(1_001) }
     }
 }

@@ -15,7 +15,6 @@
  **/
 package io.matthewnelson.kmp.tor.runtime.ctrl.api.builder
 
-import io.matthewnelson.kmp.file.IOException
 import io.matthewnelson.kmp.tor.runtime.ctrl.api.address.LocalHost
 import kotlin.test.Test
 import kotlin.test.assertNotNull
@@ -31,13 +30,7 @@ class LocalHostUnitTest {
 
     @Test
     fun givenIPv6_whenResolved_thenIsCached() {
-        try {
-            LocalHost.resolveIPv6()
-        } catch (e: IOException) {
-            println("IPv6 unavailable for host. Skipping...")
-            return
-        }
-
+        LocalHost.resolveIPv6()
         assertNotNull(LocalHost.cachedIPv6OrNull())
     }
 }

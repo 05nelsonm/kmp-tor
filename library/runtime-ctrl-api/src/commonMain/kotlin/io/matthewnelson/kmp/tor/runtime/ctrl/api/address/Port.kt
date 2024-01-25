@@ -35,8 +35,6 @@ public open class Port private constructor(
     public val value: Int,
 ): Comparable<Port> {
 
-    public final override fun compareTo(other: Port): Int = value.compareTo(other.value)
-
     /**
      * Checks if the TCP port is available or not for the specified [address].
      *
@@ -134,14 +132,15 @@ public open class Port private constructor(
          * **NOTE:** This is a blocking call and should be invoked from
          * a background thread.
          *
+         * @param [limit] the number of ports to scan. min: 1, max: 1_000
          * @param [address] The [IPAddress] to check. If null, [LocalHost.resolveIPv4] is used
-         * @throws [IllegalArgumentException] if [limit] is not between 1 to 10_000 (inclusive)
+         * @throws [IllegalArgumentException] if [limit] is not between 1 and 1_000 (inclusive)
          * @throws [IOException] if the check fails (e.g. calling from Main thread on Android)
          * */
         @JvmOverloads
         @Throws(IllegalArgumentException::class, IOException::class)
         public fun findAvailable(limit: Int, address: IPAddress? = null): Proxy {
-            require(limit in 1..10_000) { "limit must be between 1 to 10_000 (inclusive)" }
+            require(limit in 1..1_000) { "limit must be between 1 to 10_000 (inclusive)" }
 
             val ipAddress = address ?: LocalHost.resolveIPv4()
 
@@ -157,7 +156,13 @@ public open class Port private constructor(
             var port = value
 
             while (remaining-- > 0) {
-                if (availability.isAvailable(port)) return Proxy(port)
+                val available = try {
+                    availability.isAvailable(port)
+                } catch (t: Throwable) {
+                    throw t.wrapIOException()
+                }
+
+                if (available) return Proxy(port)
                 port = if (port == Port.MAX) MIN else port + 1
             }
 
@@ -226,6 +231,8 @@ public open class Port private constructor(
             }
         }
     }
+
+    public final override fun compareTo(other: Port): Int = value.compareTo(other.value)
 
     public final override fun equals(other: Any?): Boolean = other is Port && other.value == value
     public final override fun hashCode(): Int = 17 * 31 + value.hashCode()

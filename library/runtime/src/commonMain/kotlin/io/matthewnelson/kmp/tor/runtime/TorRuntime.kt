@@ -90,7 +90,7 @@ public interface TorRuntime: TorEvent.Processor, RuntimeEvent.Processor {
         private val environment: Environment
     ) {
 
-        private var config = mutableListOf<ThisBlock.WithIt<TorConfig.Builder, Environment>>()
+        private val config = mutableListOf<ThisBlock.WithIt<TorConfig.Builder, Environment>>()
         private val staticTorEvents = mutableSetOf(TorEvent.CONF_CHANGED, TorEvent.NOTICE)
         private val staticTorEventObservers = mutableSetOf<TorEvent.Observer>()
         private val staticRuntimeEventObservers = mutableSetOf<RuntimeEvent.Observer<*>>()

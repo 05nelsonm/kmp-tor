@@ -18,7 +18,6 @@
 package io.matthewnelson.kmp.tor.runtime.ctrl.api.internal
 
 import io.matthewnelson.kmp.file.SysPathSep
-import io.matthewnelson.kmp.file.wrapIOException
 import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
 import io.matthewnelson.kmp.tor.core.resource.OSHost
 import io.matthewnelson.kmp.tor.core.resource.OSInfo
@@ -42,13 +41,7 @@ internal actual val UnixSocketsNotSupportedMessage: String? by lazy {
 internal actual val ProcessID: Int? get() = process_pid
 
 @Suppress("NOTHING_TO_INLINE", "ACTUAL_ANNOTATIONS_NOT_MATCH_EXPECT")
-internal actual inline fun LocalHost.platformResolveIPv4(): IPAddress.V4 {
-    // check exception error code
-    TODO()
-}
-
-@Suppress("NOTHING_TO_INLINE", "ACTUAL_ANNOTATIONS_NOT_MATCH_EXPECT")
-internal actual inline fun LocalHost.platformResolveIPv6(): IPAddress.V6 {
+internal actual inline fun LocalHost.resolveAll(): Set<IPAddress> {
     // check exception error code
     TODO()
 }

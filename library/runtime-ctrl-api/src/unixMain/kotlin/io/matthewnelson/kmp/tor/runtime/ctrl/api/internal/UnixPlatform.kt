@@ -31,12 +31,7 @@ internal actual val ProcessID: Int? get() = getpid()
 
 @Throws(Exception::class)
 @Suppress("NOTHING_TO_INLINE")
-internal actual inline fun LocalHost.platformResolveIPv4(): IPAddress.V4 {
-    TODO()
-}
-
-@Throws(Exception::class)
-@Suppress("NOTHING_TO_INLINE")
-internal actual inline fun LocalHost.platformResolveIPv6(): IPAddress.V6 {
+internal actual inline fun LocalHost.resolveAll(): Set<IPAddress> {
+    // check exception error code
     TODO()
 }

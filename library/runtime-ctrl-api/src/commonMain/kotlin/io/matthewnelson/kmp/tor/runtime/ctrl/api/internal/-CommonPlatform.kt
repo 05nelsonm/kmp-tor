@@ -30,8 +30,4 @@ internal expect val ProcessID: Int?
 
 @Throws(Exception::class)
 @Suppress("NOTHING_TO_INLINE")
-internal expect inline fun LocalHost.platformResolveIPv4(): IPAddress.V4
-
-@Throws(Exception::class)
-@Suppress("NOTHING_TO_INLINE")
-internal expect inline fun LocalHost.platformResolveIPv6(): IPAddress.V6
+internal expect inline fun LocalHost.resolveAll(): Set<IPAddress>
