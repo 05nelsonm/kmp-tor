@@ -36,18 +36,16 @@ public open class Port private constructor(
 ): Comparable<Port> {
 
     /**
-     * Checks if the TCP port is available or not for the specified [address].
+     * Checks if the TCP port is available on [LocalHost] or not.
      *
      * **NOTE:** This is a blocking call and should be invoked from
      * a background thread.
      *
-     * @param [address] The [IPAddress] to check. If null, [LocalHost.resolveIPv4] is used
      * @throws [IOException] if the check fails (e.g. calling from Main thread on Android)
      * */
-    @JvmOverloads
     @Throws(IOException::class)
-    public fun isAvailable(address: IPAddress? = null): Boolean {
-        val ipAddress = address ?: LocalHost.resolveIPv4()
+    public fun isAvailable(): Boolean {
+        val ipAddress = LocalHost.resolveIPv4()
 
         try {
             return PortAvailability.of(ipAddress).isAvailable(value)
@@ -123,7 +121,7 @@ public open class Port private constructor(
     public class Proxy private constructor(value: Int): Port(value) {
 
         /**
-         * Finds the next available TCP port starting with the current
+         * Finds an available TCP port on [LocalHost] starting with the current
          * [value] and iterating up [limit] times.
          *
          * If [MAX] is exceeded while iterating through ports and [limit]
@@ -133,16 +131,14 @@ public open class Port private constructor(
          * a background thread.
          *
          * @param [limit] the number of ports to scan. min: 1, max: 1_000
-         * @param [address] The [IPAddress] to check. If null, [LocalHost.resolveIPv4] is used
          * @throws [IllegalArgumentException] if [limit] is not between 1 and 1_000 (inclusive)
          * @throws [IOException] if the check fails (e.g. calling from Main thread on Android)
          * */
-        @JvmOverloads
         @Throws(IllegalArgumentException::class, IOException::class)
-        public fun findAvailable(limit: Int, address: IPAddress? = null): Proxy {
+        public fun findAvailable(limit: Int): Proxy {
             require(limit in 1..1_000) { "limit must be between 1 to 10_000 (inclusive)" }
 
-            val ipAddress = address ?: LocalHost.resolveIPv4()
+            val ipAddress = LocalHost.resolveIPv4()
 
             val availability = try {
                 PortAvailability.of(ipAddress)

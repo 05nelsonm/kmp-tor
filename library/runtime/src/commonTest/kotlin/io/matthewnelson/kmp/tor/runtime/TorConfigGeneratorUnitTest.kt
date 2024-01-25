@@ -105,7 +105,7 @@ class TorConfigGeneratorUnitTest {
                     put(TorConfig.__DNSPort) { port(1080.toPortProxy()) }
                 }
             ),
-            isPortAvailable = { _, _ -> false }
+            isPortAvailable = { false }
         ).generate(notifier).settings
 
         val socks = settings.filterByKeyword<TorConfig.__SocksPort.Companion>().first()
@@ -122,7 +122,7 @@ class TorConfigGeneratorUnitTest {
         allowPortReassignment: Boolean = true,
         omitGeoIPFileSettings: Boolean = false,
         config: List<ThisBlock.WithIt<TorConfig.Builder, TorRuntime.Environment>> = emptyList(),
-        isPortAvailable: (IPAddress, Port) -> Boolean = { _, _ -> true },
+        isPortAvailable: (Port) -> Boolean = { true },
     ): TorConfigGenerator = TorConfigGenerator.of(
         environment,
         allowPortReassignment,

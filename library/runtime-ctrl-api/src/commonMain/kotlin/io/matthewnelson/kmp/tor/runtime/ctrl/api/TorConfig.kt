@@ -2073,7 +2073,7 @@ public class TorConfig private constructor(
         @InternalKmpTorApi
         @Throws(IOException::class)
         public fun checkTCPPortAvailability(
-            isPortAvailable: (IPAddress, Port) -> Boolean = { ip, p -> p.isAvailable(ip) },
+            isPortAvailable: (Port) -> Boolean = { it.isAvailable() },
         ): Setting? {
             // Setting does not have Attribute.Port
             if (!keyword.attributes.contains(Attribute.Port)) return null
@@ -2082,20 +2082,8 @@ public class TorConfig private constructor(
             if (argument == "0" || argument == AUTO) return null
             if (argument.startsWith("unix:")) return null
 
-            val (address, port) = argument.toProxyAddressOrNull() ?: run {
-                val localhost = try {
-                    LocalHost.resolveIPv4()
-                } catch (_: IOException) {
-                    // TODO: Issue #313
-                    //  Move to builders
-                    "127.0.0.1".toIPAddressV4()
-                }
-
-                ProxyAddress(localhost, argument.toPort())
-            }
-
             // Assigned TCP Port is available. No action required
-            if (isPortAvailable(address, port)) return null
+            if (isPortAvailable(argument.toPort())) return null
 
             // Remove and replace argument with auto
             val list = items.toMutableList()

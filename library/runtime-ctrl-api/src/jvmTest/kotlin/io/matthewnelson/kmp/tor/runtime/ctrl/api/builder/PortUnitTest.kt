@@ -15,8 +15,6 @@
  **/
 package io.matthewnelson.kmp.tor.runtime.ctrl.api.builder
 
-import io.matthewnelson.kmp.file.IOException
-import io.matthewnelson.kmp.tor.runtime.ctrl.api.address.LocalHost
 import io.matthewnelson.kmp.tor.runtime.ctrl.api.address.Port
 import io.matthewnelson.kmp.tor.runtime.ctrl.api.address.Port.Proxy.Companion.toPortProxy
 import java.lang.IllegalArgumentException
@@ -27,21 +25,8 @@ import kotlin.test.assertFailsWith
 class PortUnitTest {
 
     @Test
-    fun givenLocalHostIPv4_whenFindAvailable_thenSucceeds() {
-        // Should not fail on any host
+    fun givenPortProxy_whenFindAvailable_thenSucceeds() {
         Port.Proxy.MIN.toPortProxy().findAvailable(1_000)
-    }
-
-    @Test
-    fun givenLocalHostIPv6_whenFindAvailable_thenSucceeds() {
-        val localhost = try {
-            LocalHost.resolveIPv6()
-        } catch (e: IOException) {
-            println("IPv6 unavailable for host. Skipping...")
-            return
-        }
-
-        Port.Proxy.MIN.toPortProxy().findAvailable(1_000, localhost)
     }
 
     @Test
