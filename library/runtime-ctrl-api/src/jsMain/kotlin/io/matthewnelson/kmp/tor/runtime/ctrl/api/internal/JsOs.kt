@@ -13,22 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
+@file:Suppress("FunctionName")
+@file:JsModule("os")
+@file:JsNonModule
+
 package io.matthewnelson.kmp.tor.runtime.ctrl.api.internal
 
-import io.matthewnelson.kmp.tor.runtime.ctrl.api.address.IPAddress
-import io.matthewnelson.kmp.tor.runtime.ctrl.api.address.LocalHost
-import platform.posix.getpid
-
-internal actual val UnixSocketsNotSupportedMessage: String? = null
-
-internal actual val IsUnixLikeHost: Boolean get() = true
-
-internal actual val IsAndroidHost: Boolean get() = false
-
-internal actual val ProcessID: Int? get() = getpid()
-
-@Throws(Exception::class)
-internal actual fun LocalHost.resolveAll(): Set<IPAddress> {
-    // check exception error code
-    TODO()
-}
+/** [docs](https://nodejs.org/api/os.html#osnetworkinterfaces) */
+@JsName("networkInterfaces")
+internal external fun os_networkInterfaces(): dynamic

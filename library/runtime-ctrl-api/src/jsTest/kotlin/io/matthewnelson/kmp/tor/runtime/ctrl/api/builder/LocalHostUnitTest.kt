@@ -13,22 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-package io.matthewnelson.kmp.tor.runtime.ctrl.api.internal
+package io.matthewnelson.kmp.tor.runtime.ctrl.api.builder
 
-import io.matthewnelson.kmp.tor.runtime.ctrl.api.address.IPAddress
 import io.matthewnelson.kmp.tor.runtime.ctrl.api.address.LocalHost
-import platform.posix.getpid
+import kotlin.test.Test
+import kotlin.test.assertNotNull
 
-internal actual val UnixSocketsNotSupportedMessage: String? = null
+// TODO: Move to commonMain
+class LocalHostUnitTest {
 
-internal actual val IsUnixLikeHost: Boolean get() = true
+    @Test
+    fun givenIPv4_whenResolved_thenIsCached() {
+        LocalHost.resolveIPv4()
+        assertNotNull(LocalHost.cachedIPv4OrNull())
+    }
 
-internal actual val IsAndroidHost: Boolean get() = false
-
-internal actual val ProcessID: Int? get() = getpid()
-
-@Throws(Exception::class)
-internal actual fun LocalHost.resolveAll(): Set<IPAddress> {
-    // check exception error code
-    TODO()
+    @Test
+    fun givenIPv6_whenResolved_thenIsCached() {
+        LocalHost.resolveIPv6()
+        assertNotNull(LocalHost.cachedIPv6OrNull())
+    }
 }

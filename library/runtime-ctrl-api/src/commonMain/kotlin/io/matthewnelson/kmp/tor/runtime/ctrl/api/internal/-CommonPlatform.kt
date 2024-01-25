@@ -13,8 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-@file:Suppress("KotlinRedundantDiagnosticSuppress")
-
 package io.matthewnelson.kmp.tor.runtime.ctrl.api.internal
 
 import io.matthewnelson.kmp.tor.runtime.ctrl.api.address.IPAddress
@@ -29,5 +27,4 @@ internal expect val IsAndroidHost: Boolean
 internal expect val ProcessID: Int?
 
 @Throws(Exception::class)
-@Suppress("NOTHING_TO_INLINE")
-internal expect inline fun LocalHost.resolveAll(): Set<IPAddress>
+internal expect fun LocalHost.resolveAll(): Set<IPAddress>

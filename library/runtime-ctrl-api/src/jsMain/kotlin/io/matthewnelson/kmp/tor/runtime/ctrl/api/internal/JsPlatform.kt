@@ -22,6 +22,7 @@ import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
 import io.matthewnelson.kmp.tor.core.resource.OSHost
 import io.matthewnelson.kmp.tor.core.resource.OSInfo
 import io.matthewnelson.kmp.tor.runtime.ctrl.api.address.IPAddress
+import io.matthewnelson.kmp.tor.runtime.ctrl.api.address.IPAddress.Companion.toIPAddress
 import io.matthewnelson.kmp.tor.runtime.ctrl.api.address.LocalHost
 
 @OptIn(InternalKmpTorApi::class)
@@ -40,8 +41,22 @@ internal actual val UnixSocketsNotSupportedMessage: String? by lazy {
 
 internal actual val ProcessID: Int? get() = process_pid
 
-@Suppress("NOTHING_TO_INLINE", "ACTUAL_ANNOTATIONS_NOT_MATCH_EXPECT")
-internal actual inline fun LocalHost.resolveAll(): Set<IPAddress> {
-    // check exception error code
-    TODO()
+@Suppress("ACTUAL_ANNOTATIONS_NOT_MATCH_EXPECT")
+internal actual fun LocalHost.resolveAll(): Set<IPAddress> {
+    val interfacesValues = objectValues(os_networkInterfaces())
+
+    val set = LinkedHashSet<IPAddress>(2, 1.0F)
+    interfacesValues.forEach { values ->
+        values.forEach values@ { entry ->
+            if (!(entry.internal as Boolean)) return@values
+            set.add((entry.address as String).toIPAddress())
+        }
+    }
+
+    return set
+}
+
+@Suppress("NOTHING_TO_INLINE")
+private inline fun objectValues(jsObject: dynamic): Array<Array<dynamic>> {
+    return js("Object").values(jsObject).unsafeCast<Array<Array<dynamic>>>()
 }
