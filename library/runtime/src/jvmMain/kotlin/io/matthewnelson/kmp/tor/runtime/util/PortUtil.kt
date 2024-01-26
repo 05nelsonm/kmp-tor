@@ -23,7 +23,9 @@ import io.matthewnelson.kmp.tor.runtime.ctrl.api.address.IPAddress
 import io.matthewnelson.kmp.tor.runtime.ctrl.api.address.LocalHost
 import io.matthewnelson.kmp.tor.runtime.ctrl.api.address.Port
 import io.matthewnelson.kmp.tor.runtime.internal.PortProxyIterator.Companion.iterator
+import io.matthewnelson.kmp.tor.runtime.internal.cancellationOrIOException
 import io.matthewnelson.kmp.tor.runtime.internal.isTorRuntime
+import io.matthewnelson.kmp.tor.runtime.internal.jobOrNull
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.isActive
@@ -70,10 +72,6 @@ public actual suspend fun Port.Proxy.findAvailableAsync(
     host: LocalHost,
 ): Port.Proxy {
     val ctx = currentCoroutineContext()
-    // TODO: Need to run tests to see if, in the event of
-    //  coroutine cancellation, we need to swallow the
-    //  exception so that it is not thrown after context
-    //  has gone inactive
     return if (ctx.isTorRuntime) {
         findAvailable(limit, host, ctx)
     } else {
@@ -121,7 +119,7 @@ public actual fun Port.Proxy.findAvailable(
     host: LocalHost,
 ): Port.Proxy = findAvailable(limit, host, null)
 
-@Throws(IOException::class)
+@Throws(IOException::class, CancellationException::class)
 private fun Port.Proxy.findAvailable(
     limit: Int,
     host: LocalHost,
@@ -135,7 +133,7 @@ private fun Port.Proxy.findAvailable(
         return i.toPortProxy()
     }
 
-    throw i.unavailableException(ipAddress)
+    throw context.cancellationOrIOException(ipAddress, i)
 }
 
 @Throws(IOException::class)

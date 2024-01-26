@@ -13,18 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-@file:Suppress("KotlinRedundantDiagnosticSuppress")
+@file:Suppress("UnnecessaryOptInAnnotation")
 
-package io.matthewnelson.kmp.tor.runtime.internal
+package io.matthewnelson.kmp.tor.runtime.util
 
-import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
-import io.matthewnelson.kmp.tor.runtime.TorRuntime
+import io.matthewnelson.kmp.tor.runtime.PortUtilBaseTest
+import io.matthewnelson.kmp.tor.runtime.ctrl.api.address.IPAddress
+import java.net.InetAddress
+import java.net.ServerSocket
 
-@OptIn(InternalKmpTorApi::class)
-@Throws(IllegalStateException::class)
-internal expect fun TorRuntime.ServiceFactory.Companion.serviceRuntimeOrNull(
-    block: () -> TorRuntime.ServiceFactory,
-): TorRuntime?
+@OptIn(ExperimentalStdlibApi::class)
+class PortUtilJvmUnitTest: PortUtilBaseTest() {
 
-@Suppress("NOTHING_TO_INLINE")
-internal expect inline fun ByteArray.sha256(): String
+    override fun serverSocket(
+        ipAddress: IPAddress,
+        port: Int,
+    ): ServerSocket {
+        val inetAddress = InetAddress.getByName(ipAddress.canonicalHostname())
+        return ServerSocket(port, 1, inetAddress)
+    }
+}

@@ -13,14 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-@file:Suppress("ACTUAL_ANNOTATIONS_NOT_MATCH_EXPECT")
+@file:Suppress("ACTUAL_ANNOTATIONS_NOT_MATCH_EXPECT", "KotlinRedundantDiagnosticSuppress")
 
 package io.matthewnelson.kmp.tor.runtime.util
 
 import io.matthewnelson.kmp.file.IOException
+import io.matthewnelson.kmp.tor.runtime.ctrl.api.address.IPAddress
 import io.matthewnelson.kmp.tor.runtime.ctrl.api.address.LocalHost
 import io.matthewnelson.kmp.tor.runtime.ctrl.api.address.Port
-import kotlinx.coroutines.CancellationException
+import io.matthewnelson.kmp.tor.runtime.internal.PortProxyIterator.Companion.iterator
+import io.matthewnelson.kmp.tor.runtime.internal.cancellationOrIOException
+import io.matthewnelson.kmp.tor.runtime.internal.net_createServer
+import io.matthewnelson.kmp.tor.runtime.internal.onError
+import io.matthewnelson.kmp.tor.runtime.internal.onListening
+import kotlinx.coroutines.*
+import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.TimeSource
 
 /**
  * Checks if the TCP port is available on [LocalHost] or not.
@@ -32,11 +40,7 @@ import kotlinx.coroutines.CancellationException
 // @Throws(IOException::class, CancellationException::class)
 public actual suspend fun Port.isAvailableAsync(
     host: LocalHost,
-): Boolean {
-    // TODO: Check coroutine name to determine if it is
-    //  RealTorRuntime to switch dispatchers or not
-    TODO()
-}
+): Boolean = host.resolve().isPortAvailable(value)
 
 /**
  * Finds an available TCP port on [LocalHost] starting with the current
@@ -55,8 +59,68 @@ public actual suspend fun Port.isAvailableAsync(
 public actual suspend fun Port.Proxy.findAvailableAsync(
     limit: Int,
     host: LocalHost,
+): Port.Proxy = host.findAvailablePort(limit, this)
+
+// @Throws(IOException::class, CancellationException::class)
+private suspend fun LocalHost.findAvailablePort(
+    limit: Int,
+    port: Port.Proxy,
 ): Port.Proxy {
-    // TODO: Check coroutine name to determine if it is
-    //  RealTorRuntime to switch dispatchers or not
-    TODO()
+    val i = port.iterator(limit)
+    val ipAddress = resolve()
+
+    val ctx = currentCoroutineContext()
+    while (ctx.isActive && i.hasNext()) {
+        if (!ipAddress.isPortAvailable(i.next())) continue
+        return i.toPortProxy()
+    }
+
+    throw ctx.cancellationOrIOException(ipAddress, i)
+}
+
+// @Throws(IOException::class, CancellationException::class)
+private suspend fun IPAddress.isPortAvailable(port: Int): Boolean {
+    val timeMark = TimeSource.Monotonic.markNow()
+    val latch = Job()
+    val ipAddress = value
+
+    val server = net_createServer { it.destroy() }
+
+    latch.invokeOnCompletion { server.close() }
+
+    var error: IOException? = null
+    var isAvailable: Boolean? = null
+
+    server.onListening {
+        isAvailable = true
+        latch.cancel()
+    }
+
+    server.onError { err ->
+        if ((err.code as String) == "EADDRINUSE") {
+            isAvailable = false
+        } else {
+            error = IOException(err.toString())
+        }
+        latch.cancel()
+    }
+
+    server.listen(port, ipAddress, 1) {
+        isAvailable = true
+        latch.cancel()
+    }
+
+    while (
+        currentCoroutineContext().isActive
+        && latch.isActive
+        && isAvailable == null
+        && error == null
+    ) {
+        if (timeMark.elapsedNow() > 12.milliseconds) break
+        delay(1.milliseconds)
+    }
+
+    latch.cancel()
+    isAvailable?.let { return it }
+    throw error ?: IOException("Failed to determine availability of ${canonicalHostname()}:$port")
 }

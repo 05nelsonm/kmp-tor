@@ -13,18 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-@file:Suppress("KotlinRedundantDiagnosticSuppress")
+@file:Suppress("ClassName", "FunctionName")
+@file:JsModule("net")
+@file:JsNonModule
 
 package io.matthewnelson.kmp.tor.runtime.internal
 
-import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
-import io.matthewnelson.kmp.tor.runtime.TorRuntime
-
-@OptIn(InternalKmpTorApi::class)
-@Throws(IllegalStateException::class)
-internal expect fun TorRuntime.ServiceFactory.Companion.serviceRuntimeOrNull(
-    block: () -> TorRuntime.ServiceFactory,
-): TorRuntime?
-
-@Suppress("NOTHING_TO_INLINE")
-internal expect inline fun ByteArray.sha256(): String
+/** [docs](https://nodejs.org/api/events.html#class-eventemitter) */
+@JsName("EventEmitter")
+internal open external class events_EventEmitter {
+    fun <R> on(eventName: String, listener: Function<R>)
+}
