@@ -76,7 +76,7 @@ abstract class PortUtilBaseTest {
         // Slight delay to ensure blocking code
         // is actually running
         withContext(Dispatchers.Default) {
-            delay(7.milliseconds)
+            delay(4.milliseconds)
         }
 
         job.cancel()
