@@ -85,7 +85,7 @@ public abstract interface class io/matthewnelson/kmp/tor/runtime/RuntimeEvent$Pr
 }
 
 public final class io/matthewnelson/kmp/tor/runtime/TorConfigGenerator {
-	public synthetic fun <init> (Lio/matthewnelson/kmp/tor/runtime/TorRuntime$Environment;ZZLjava/util/List;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public synthetic fun <init> (Lio/matthewnelson/kmp/tor/runtime/TorRuntime$Environment;ZZLjava/util/List;Lkotlin/jvm/functions/Function3;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
 }
 
 public abstract interface class io/matthewnelson/kmp/tor/runtime/TorRuntime : io/matthewnelson/kmp/tor/runtime/RuntimeEvent$Processor, io/matthewnelson/kmp/tor/runtime/ctrl/api/TorEvent$Processor {
@@ -138,5 +138,12 @@ public final class io/matthewnelson/kmp/tor/runtime/TorRuntime$Environment$Build
 public final class io/matthewnelson/kmp/tor/runtime/TorRuntime$Environment$Companion {
 	public final fun Builder (Ljava/io/File;Ljava/io/File;Lkotlin/jvm/functions/Function1;)Lio/matthewnelson/kmp/tor/runtime/TorRuntime$Environment;
 	public final fun Builder (Ljava/io/File;Ljava/io/File;Lkotlin/jvm/functions/Function1;Lio/matthewnelson/kmp/tor/runtime/ctrl/api/ThisBlock;)Lio/matthewnelson/kmp/tor/runtime/TorRuntime$Environment;
+}
+
+public final class io/matthewnelson/kmp/tor/runtime/util/PortUtil {
+	public static final fun findAvailable (Lio/matthewnelson/kmp/tor/runtime/ctrl/api/address/Port$Proxy;ILio/matthewnelson/kmp/tor/runtime/ctrl/api/address/LocalHost;)Lio/matthewnelson/kmp/tor/runtime/ctrl/api/address/Port$Proxy;
+	public static final fun findAvailableAsync (Lio/matthewnelson/kmp/tor/runtime/ctrl/api/address/Port$Proxy;ILio/matthewnelson/kmp/tor/runtime/ctrl/api/address/LocalHost;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static final fun isAvailable (Lio/matthewnelson/kmp/tor/runtime/ctrl/api/address/Port;Lio/matthewnelson/kmp/tor/runtime/ctrl/api/address/LocalHost;)Z
+	public static final fun isAvailableAsync (Lio/matthewnelson/kmp/tor/runtime/ctrl/api/address/Port;Lio/matthewnelson/kmp/tor/runtime/ctrl/api/address/LocalHost;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 }
 

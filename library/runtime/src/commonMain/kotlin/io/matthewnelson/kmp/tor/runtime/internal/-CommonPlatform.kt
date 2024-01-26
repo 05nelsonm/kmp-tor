@@ -19,6 +19,8 @@ package io.matthewnelson.kmp.tor.runtime.internal
 
 import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
 import io.matthewnelson.kmp.tor.runtime.TorRuntime
+import kotlinx.coroutines.CoroutineName
+import kotlin.coroutines.CoroutineContext
 
 @OptIn(InternalKmpTorApi::class)
 @Throws(IllegalStateException::class)
@@ -28,3 +30,10 @@ internal expect fun TorRuntime.ServiceFactory.Companion.serviceRuntimeOrNull(
 
 @Suppress("NOTHING_TO_INLINE")
 internal expect inline fun ByteArray.sha256(): String
+
+@Suppress("NOTHING_TO_INLINE")
+internal inline val CoroutineContext.isTorRuntime: Boolean get() {
+    // TODO: Check dispatcher name
+    val name = this[CoroutineName]?.name ?: ""
+    return name.startsWith("TorRuntime")
+}

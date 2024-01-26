@@ -21,6 +21,5 @@ import io.matthewnelson.kmp.tor.runtime.ctrl.api.TorConfig
 @InternalKmpTorApi
 public interface ExtendedTorConfigBuilder {
     public fun contains(keyword: TorConfig.Keyword): Boolean
-    public fun ports(): List<TorConfig.Setting>
     public fun remove(setting: TorConfig.Setting)
 }

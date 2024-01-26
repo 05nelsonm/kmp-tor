@@ -15,46 +15,23 @@
  **/
 package io.matthewnelson.kmp.tor.runtime.ctrl.api.address
 
-import io.matthewnelson.kmp.file.IOException
-import io.matthewnelson.kmp.file.wrapIOException
 import io.matthewnelson.kmp.tor.runtime.ctrl.api.address.Port.Proxy.Companion.toPortProxyOrNull
-import io.matthewnelson.kmp.tor.runtime.ctrl.api.internal.PortAvailability
 import io.matthewnelson.kmp.tor.runtime.ctrl.api.internal.findHostnameAndPortFromURL
 import kotlin.jvm.JvmField
 import kotlin.jvm.JvmName
-import kotlin.jvm.JvmOverloads
 import kotlin.jvm.JvmStatic
 
 /**
  * Holder for a port between 0 and 65535 (inclusive)
  *
  * @see [Proxy]
+ * @see [io.matthewnelson.kmp.tor.runtime.util.isAvailable]
+ * @see [io.matthewnelson.kmp.tor.runtime.util.isAvailableAsync]
  * */
 public open class Port private constructor(
     @JvmField
     public val value: Int,
 ): Comparable<Port> {
-
-    /**
-     * Checks if the TCP port is available on [LocalHost] or not.
-     *
-     * **NOTE:** This is a blocking call and should be invoked from
-     * a background thread.
-     *
-     * @param [host] either [LocalHost.IPv4] or [LocalHost.IPv6]
-     * @throws [IOException] if the check fails (e.g. calling from Main thread on Android)
-     * */
-    @JvmOverloads
-    @Throws(IOException::class)
-    public fun isAvailable(host: LocalHost = LocalHost.IPv4): Boolean {
-        val ipAddress = host.resolve()
-
-        return try {
-            PortAvailability.of(ipAddress).isAvailable(value)
-        } catch (t: Throwable) {
-            throw t.wrapIOException()
-        }
-    }
 
     public companion object {
 
@@ -119,61 +96,13 @@ public open class Port private constructor(
 
     /**
      * A [Port] with a more constrained range of 1024 and 65535 (inclusive)
+     *
+     * @see [io.matthewnelson.kmp.tor.runtime.util.isAvailable]
+     * @see [io.matthewnelson.kmp.tor.runtime.util.isAvailableAsync]
+     * @see [io.matthewnelson.kmp.tor.runtime.util.findAvailable]
+     * @see [io.matthewnelson.kmp.tor.runtime.util.findAvailableAsync]
      * */
     public class Proxy private constructor(value: Int): Port(value) {
-
-        /**
-         * Finds an available TCP port on [LocalHost] starting with the current
-         * [value] and iterating up [limit] times.
-         *
-         * If [MAX] is exceeded while iterating through ports and [limit]
-         * has not been exhausted, the remaining checks will start from [MIN].
-         *
-         * **NOTE:** This is a blocking call and should be invoked from
-         * a background thread.
-         *
-         * @param [host] either [LocalHost.IPv4] or [LocalHost.IPv6]
-         * @param [limit] the number of ports to scan. min: 1, max: 1_000
-         * @throws [IllegalArgumentException] if [limit] is not between 1 and 1_000 (inclusive)
-         * @throws [IOException] if the check fails (e.g. calling from Main thread on Android)
-         * */
-        @JvmOverloads
-        @Throws(IllegalArgumentException::class, IOException::class)
-        public fun findAvailable(limit: Int, host: LocalHost = LocalHost.IPv4): Proxy {
-            require(limit in 1..1_000) { "limit must be between 1 to 1_000 (inclusive)" }
-
-            val ipAddress = host.resolve()
-
-            val availability = try {
-                PortAvailability.of(ipAddress)
-            } catch (t: Throwable) {
-                throw t.wrapIOException()
-            }
-
-            var remaining = limit
-            var port = value
-
-            while (remaining-- > 0) {
-                val available = try {
-                    availability.isAvailable(port)
-                } catch (t: Throwable) {
-                    throw t.wrapIOException()
-                }
-
-                if (available) return Proxy(port)
-                port = if (port == Port.MAX) MIN else port + 1
-            }
-
-            val top = value + limit
-            val ranges = if (top <= MAX) {
-                "($value - $top)"
-            } else {
-                val bottom = top - MAX + MIN
-                "($value - $MAX) and ($MIN - $bottom)"
-            }
-
-            throw IOException("Failed to find available port for ${ipAddress.canonicalHostname()} $ranges")
-        }
 
         public companion object {
 

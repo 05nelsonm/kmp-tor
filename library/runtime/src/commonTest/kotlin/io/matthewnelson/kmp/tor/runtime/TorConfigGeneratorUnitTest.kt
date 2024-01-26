@@ -28,6 +28,7 @@ import io.matthewnelson.kmp.tor.runtime.ctrl.api.address.IPAddress
 import io.matthewnelson.kmp.tor.runtime.ctrl.api.address.LocalHost
 import io.matthewnelson.kmp.tor.runtime.ctrl.api.address.Port
 import io.matthewnelson.kmp.tor.runtime.ctrl.api.address.Port.Proxy.Companion.toPortProxy
+import kotlinx.coroutines.test.runTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
@@ -54,22 +55,22 @@ class TorConfigGeneratorUnitTest {
     }
 
     @Test
-    fun givenGeoipOmission_whenGenerate_thenDoesNotContainSettings() {
+    fun givenGeoipOmission_whenGenerate_thenDoesNotContainSettings() = runTest {
         val settings = newGenerator(omitGeoIPFileSettings = true).generate(notifier).settings
         assertEquals(0, settings.filterByKeyword<TorConfig.GeoIPFile.Companion>().size)
         assertEquals(0, settings.filterByKeyword<TorConfig.GeoIPv6File.Companion>().size)
     }
 
     @Test
-    fun givenGeoipNoOmission_whenGenerate_thenContainsSettings() {
-        with(newGenerator(omitGeoIPFileSettings = false).generate(notifier).settings) {
+    fun givenGeoipNoOmission_whenGenerate_thenContainsSettings() = runTest {
+        with(newGenerator(omitGeoIPFileSettings = false).generate(notifier)) {
             assertContains(TorConfig.GeoIPFile)
             assertContains(TorConfig.GeoIPv6File)
         }
     }
 
     @Test
-    fun givenMultipleUserConfigs_whenGenerate_thenAllAreApplied() {
+    fun givenMultipleUserConfigs_whenGenerate_thenAllAreApplied() = runTest {
         var invocations = 0
         newGenerator(
             config = listOf(
@@ -82,8 +83,8 @@ class TorConfigGeneratorUnitTest {
     }
 
     @Test
-    fun givenNoConfig_whenGenerate_thenMinimumSettingsApplied() {
-        with(newGenerator().generate(notifier).settings) {
+    fun givenNoConfig_whenGenerate_thenMinimumSettingsApplied() = runTest {
+        with(newGenerator().generate(notifier)) {
             assertContains(TorConfig.DataDirectory)
             assertContains(TorConfig.CacheDirectory)
             assertContains(TorConfig.ControlPortWriteToFile)
@@ -97,7 +98,7 @@ class TorConfigGeneratorUnitTest {
     }
 
     @Test
-    fun givenUnavailablePort_whenGenerate_thenPortRemovedAndReplaced() {
+    fun givenUnavailablePort_whenGenerate_thenPortRemovedAndReplaced() = runTest {
         // socks port at 9050 is automatically added
         val settings = newGenerator(
             allowPortReassignment = true,
@@ -115,7 +116,8 @@ class TorConfigGeneratorUnitTest {
         assertEquals("auto", dns.argument)
     }
 
-    private inline fun <reified K: TorConfig.Keyword> Set<TorConfig.Setting>.assertContains(keyword: K) {
+    @Suppress("UNUSED_PARAMETER")
+    private inline fun <reified K: TorConfig.Keyword> TorConfig.assertContains(keyword: K) {
         assertTrue(filterByKeyword<K>().isNotEmpty())
     }
 
@@ -123,7 +125,7 @@ class TorConfigGeneratorUnitTest {
         allowPortReassignment: Boolean = true,
         omitGeoIPFileSettings: Boolean = false,
         config: List<ThisBlock.WithIt<TorConfig.Builder, TorRuntime.Environment>> = emptyList(),
-        isPortAvailable: (LocalHost, Port) -> Boolean = { _, _ -> true },
+        isPortAvailable: suspend (LocalHost, Port) -> Boolean = { _, _ -> true },
     ): TorConfigGenerator = TorConfigGenerator.of(
         environment,
         allowPortReassignment,

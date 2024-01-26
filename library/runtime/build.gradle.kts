@@ -29,12 +29,30 @@ kmpConfiguration {
                     implementation(libs.kotlinx.coroutines.core)
                 }
             }
+
+            sourceSetTest {
+                dependencies {
+                    implementation(libs.kotlinx.coroutines.test)
+                }
+            }
         }
 
         kotlin {
-            sourceSets.findByName("nonJvmMain")?.apply {
-                dependencies {
-                    implementation(libs.kotlincrypto.hash.sha2)
+            with(sourceSets) {
+                findByName("nonJvmMain")?.apply {
+                    dependencies {
+                        implementation(libs.kotlincrypto.hash.sha2)
+                    }
+                }
+
+                val jvmMain = findByName("jvmMain")
+                val nativeMain = findByName("nativeMain")
+
+                if (jvmMain != null || nativeMain != null) {
+                    val nonJsMain = maybeCreate("nonJsMain")
+                    nonJsMain.dependsOn(getByName("commonMain"))
+                    jvmMain?.apply { dependsOn(nonJsMain) }
+                    nativeMain?.apply { dependsOn(nonJsMain) }
                 }
             }
         }
