@@ -23,7 +23,7 @@ import kotlin.test.*
 class PortProxyIteratorUnitTest {
 
     @Test
-    fun given() {
+    fun givenPortProxy_whenIterator_thenWorksAsExpected() {
         var i = Port.Proxy.MIN.toPortProxy().iterator(2)
         assertTrue(i.hasNext())
         assertEquals(1024, i.toPortProxy().value)
