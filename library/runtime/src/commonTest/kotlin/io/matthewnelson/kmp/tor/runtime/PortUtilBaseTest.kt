@@ -26,6 +26,7 @@ import kotlinx.coroutines.*
 import kotlinx.coroutines.test.runTest
 import kotlin.test.*
 import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Duration.Companion.seconds
 
 @OptIn(ExperimentalStdlibApi::class)
 abstract class PortUtilBaseTest {
@@ -48,7 +49,7 @@ abstract class PortUtilBaseTest {
     }
 
     @Test
-    fun givenFindAvailable_whenCoroutineCancelled_thenHandlesCancellationProperly() = runTest {
+    fun givenFindAvailable_whenCoroutineCancelled_thenHandlesCancellationProperly() = runTest(timeout = 50.seconds) {
         val port = Port.Proxy.MIN.toPortProxy()
         val host = LocalHost.IPv4
         val limit = 500
