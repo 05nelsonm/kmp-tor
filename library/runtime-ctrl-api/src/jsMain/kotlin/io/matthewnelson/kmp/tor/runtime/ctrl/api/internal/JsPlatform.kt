@@ -17,6 +17,7 @@
 
 package io.matthewnelson.kmp.tor.runtime.ctrl.api.internal
 
+import io.matthewnelson.kmp.file.IOException
 import io.matthewnelson.kmp.file.SysPathSep
 import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
 import io.matthewnelson.kmp.tor.core.resource.OSHost
@@ -43,7 +44,17 @@ internal actual val ProcessID: Int? get() = process_pid
 
 @Suppress("ACTUAL_ANNOTATIONS_NOT_MATCH_EXPECT")
 internal actual fun LocalHost.Companion.resolveAll(): Set<IPAddress> {
-    val interfacesValues = objectValues(os_networkInterfaces())
+    val interfaces = try {
+        os_networkInterfaces()
+    } catch (t: Throwable) {
+        throw IOException("Failed to resolve network interfaces", t)
+    }
+
+    val interfacesValues = try {
+        objectValues(interfaces)
+    } catch (t: Throwable) {
+        throw IOException("Failed to acquire object values", t)
+    }
 
     val set = LinkedHashSet<IPAddress>(2, 1.0F)
 
