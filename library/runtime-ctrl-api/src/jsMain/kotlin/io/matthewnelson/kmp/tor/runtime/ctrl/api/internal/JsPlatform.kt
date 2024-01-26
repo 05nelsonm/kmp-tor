@@ -17,13 +17,13 @@
 
 package io.matthewnelson.kmp.tor.runtime.ctrl.api.internal
 
-import io.matthewnelson.kmp.file.IOException
-import io.matthewnelson.kmp.file.SysPathSep
+import io.matthewnelson.kmp.file.*
 import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
 import io.matthewnelson.kmp.tor.core.resource.OSHost
 import io.matthewnelson.kmp.tor.core.resource.OSInfo
 import io.matthewnelson.kmp.tor.runtime.ctrl.api.address.IPAddress
 import io.matthewnelson.kmp.tor.runtime.ctrl.api.address.IPAddress.Companion.toIPAddress
+import io.matthewnelson.kmp.tor.runtime.ctrl.api.address.IPAddress.Companion.toIPAddressOrNull
 import io.matthewnelson.kmp.tor.runtime.ctrl.api.address.LocalHost
 
 @OptIn(InternalKmpTorApi::class)
@@ -66,10 +66,47 @@ internal actual fun LocalHost.Companion.resolveAll(): Set<IPAddress> {
         }
     }
 
+    set.addEtcHostsIfNeeded()
+
     return set
 }
 
 @Suppress("NOTHING_TO_INLINE")
 private inline fun objectValues(jsObject: dynamic): Array<Array<dynamic>> {
     return js("Object").values(jsObject).unsafeCast<Array<Array<dynamic>>>()
+}
+
+private fun LinkedHashSet<IPAddress>.addEtcHostsIfNeeded() {
+    if (!IsUnixLikeHost) return
+
+    var hasIPv4 = false
+    var hasIPv6 = false
+    forEach { address ->
+        when (address) {
+            is IPAddress.V4 -> hasIPv4 = true
+            is IPAddress.V6 -> hasIPv6 = true
+        }
+    }
+    if (hasIPv4 && hasIPv6) return
+
+    val etcHosts = "/etc/hosts".toFile()
+    if (!etcHosts.exists()) return
+
+    val lines = try {
+        etcHosts.readUtf8().lines()
+    } catch (t: Throwable) {
+        @OptIn(DelicateFileApi::class)
+        throw t.toIOException()
+    }
+
+    for (line in lines) {
+        if (line.startsWith('#')) continue
+        if (!line.contains("localhost")) continue
+
+        val address = line.substringBefore(' ')
+            .toIPAddressOrNull()
+            ?: continue
+
+        add(address)
+    }
 }
