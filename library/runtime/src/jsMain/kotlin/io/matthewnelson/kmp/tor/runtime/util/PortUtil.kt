@@ -84,43 +84,46 @@ private suspend fun IPAddress.isPortAvailable(port: Int): Boolean {
     val latch = Job()
     val ipAddress = value
 
-    val server = net_createServer { it.destroy() }
-
-    latch.invokeOnCompletion { server.close() }
-
     var error: IOException? = null
     var isAvailable: Boolean? = null
 
-    server.onListening {
-        isAvailable = true
-        latch.cancel()
-    }
+    try {
+        val server = net_createServer { it.destroy() }
 
-    server.onError { err ->
-        if ((err.code as String) == "EADDRINUSE") {
-            isAvailable = false
-        } else {
-            error = IOException(err.toString())
+        latch.invokeOnCompletion { server.close() }
+
+        server.onListening {
+            isAvailable = true
+            latch.cancel()
         }
+
+        server.onError { err ->
+            if ((err.code as String) == "EADDRINUSE") {
+                isAvailable = false
+            } else {
+                error = IOException(err.toString())
+            }
+            latch.cancel()
+        }
+
+        server.listen(port, ipAddress, 1) {
+            isAvailable = true
+            latch.cancel()
+        }
+
+        while (
+            currentCoroutineContext().isActive
+            && latch.isActive
+            && isAvailable == null
+            && error == null
+        ) {
+            if (timeMark.elapsedNow() > 12.milliseconds) break
+            delay(1.milliseconds)
+        }
+    } finally {
         latch.cancel()
     }
 
-    server.listen(port, ipAddress, 1) {
-        isAvailable = true
-        latch.cancel()
-    }
-
-    while (
-        currentCoroutineContext().isActive
-        && latch.isActive
-        && isAvailable == null
-        && error == null
-    ) {
-        if (timeMark.elapsedNow() > 12.milliseconds) break
-        delay(1.milliseconds)
-    }
-
-    latch.cancel()
     isAvailable?.let { return it }
     throw error ?: IOException("Failed to determine availability of ${canonicalHostname()}:$port")
 }
