@@ -59,15 +59,9 @@ public actual suspend fun Port.isAvailableAsync(
 public actual suspend fun Port.Proxy.findAvailableAsync(
     limit: Int,
     host: LocalHost,
-): Port.Proxy = host.findAvailablePort(limit, this)
-
-// @Throws(IOException::class, CancellationException::class)
-private suspend fun LocalHost.findAvailablePort(
-    limit: Int,
-    port: Port.Proxy,
 ): Port.Proxy {
-    val i = port.iterator(limit)
-    val ipAddress = resolve()
+    val i = iterator(limit)
+    val ipAddress = host.resolve()
 
     val ctx = currentCoroutineContext()
     while (ctx.isActive && i.hasNext()) {
