@@ -24,8 +24,6 @@ import io.matthewnelson.kmp.tor.core.resource.OSInfo
 import io.matthewnelson.kmp.tor.runtime.ctrl.api.address.IPAddress
 import io.matthewnelson.kmp.tor.runtime.ctrl.api.address.IPAddress.Companion.toIPAddress
 import io.matthewnelson.kmp.tor.runtime.ctrl.api.address.IPAddress.Companion.toIPAddressOrNull
-import io.matthewnelson.kmp.tor.runtime.ctrl.api.address.IPAddress.V4.Companion.toIPAddressV4
-import io.matthewnelson.kmp.tor.runtime.ctrl.api.address.IPAddress.V6.Companion.toIPAddressV6
 import io.matthewnelson.kmp.tor.runtime.ctrl.api.address.LocalHost
 
 @OptIn(InternalKmpTorApi::class)
@@ -50,29 +48,18 @@ internal actual fun LocalHost.Companion.resolveAll(): Set<IPAddress> {
 
     tryOsInterfaces(set)
     if (set.hasIPv4IPv6) return set
-
-    if (!IsUnixLikeHost) {
-        // Windows... fake it till we make it
-        set.add("127.0.0.1".toIPAddressV4())
-        set.add("::1".toIPAddressV6())
-        return set
-    }
+    if (!IsUnixLikeHost) return set
 
     // Try some shell commands
-    tryParseIFConfig(set)
+    tryParseIfConfig(set)
     if (set.hasIPv4IPv6) return set
 
     // last resort. Read from /etc/hosts
     tryParseEtcHosts(set)
-    if (set.hasIPv4IPv6) return set
-
-    // More faking it...
-    set.add("127.0.0.1".toIPAddressV4())
-    set.add("::1".toIPAddressV6())
     return set
 }
 
-private fun tryOsInterfaces(set: LinkedHashSet<IPAddress>) {
+private fun LocalHost.Companion.tryOsInterfaces(set: LinkedHashSet<IPAddress>) {
     try {
         objectValues(os_networkInterfaces()).forEach { values ->
             values.forEach values@ { entry ->
@@ -104,7 +91,7 @@ private inline val LinkedHashSet<IPAddress>.hasIPv4IPv6: Boolean get() {
     return hasIPv4 && hasIPv6
 }
 
-private fun tryParseIFConfig(set: LinkedHashSet<IPAddress>) {
+internal fun LocalHost.Companion.tryParseIfConfig(set: LinkedHashSet<IPAddress>) {
     val ifConfig = try {
         val buffer = child_process_execSync("ifconfig")
         @OptIn(DelicateFileApi::class)
@@ -117,17 +104,21 @@ private fun tryParseIFConfig(set: LinkedHashSet<IPAddress>) {
     ifConfig.lines().forEach { line ->
         if (line.isBlank()) return@forEach
         if (!line.startsWith(' ')) {
-            configs.add(mutableListOf(line.trim()))
+            configs.add(0, mutableListOf(line.trim()))
             return@forEach
         }
         configs.first().add(line.trim())
     }
 
-    configs.forEach configs@ { config ->
-        if (config.isEmpty()) return@configs
+    configs.reversed().forEach { config ->
+        if (config.isEmpty()) return@forEach
 
         val i = config.iterator()
-        if (!i.next().contains("LOOPBACK")) return@configs
+        val flags = i.next().substringAfter('<')
+            .substringBefore('>')
+            .split(',')
+        if (!flags.contains("LOOPBACK")) return@forEach
+        if (!flags.contains("UP")) return@forEach
 
         // look for inet and inet6
         while (i.hasNext()) {
@@ -142,23 +133,33 @@ private fun tryParseIFConfig(set: LinkedHashSet<IPAddress>) {
     }
 }
 
-private fun tryParseEtcHosts(set: LinkedHashSet<IPAddress>) {
+internal fun LocalHost.Companion.tryParseEtcHosts(set: LinkedHashSet<IPAddress>) {
     val etcHosts = "/etc/hosts".toFile()
     if (!etcHosts.exists()) return
 
     val lines = try {
         etcHosts.readUtf8().lines()
-    } catch (t: Throwable) {
+    } catch (_: Throwable) {
         return
     }
 
-    for (line in lines) {
-        if (line.startsWith('#')) continue
-        if (!line.contains("localhost")) continue
+    lines.forEach { line ->
+        val trimmed = line.trim()
+        if (trimmed.isBlank()) return@forEach
+        if (trimmed.startsWith('#')) return@forEach
+        if (!trimmed.contains("localhost")) return@forEach
 
-        val address = line.substringBefore(' ')
+        val sb = StringBuilder()
+        val i = trimmed.iterator()
+        while (i.hasNext()) {
+            val c = i.next()
+            if (c == ' ' || c == '\r' || c == '\t') break
+            sb.append(c)
+        }
+
+        val address = sb.toString()
             .toIPAddressOrNull()
-            ?: continue
+            ?: return@forEach
 
         set.add(address)
     }
