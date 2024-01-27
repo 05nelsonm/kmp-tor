@@ -15,9 +15,6 @@
  **/
 package io.matthewnelson.kmp.tor.runtime.ctrl.api.internal
 
-import io.matthewnelson.kmp.tor.runtime.ctrl.api.address.IPAddress
-import io.matthewnelson.kmp.tor.runtime.ctrl.api.address.LocalHost
-
 internal expect val UnixSocketsNotSupportedMessage: String?
 
 internal expect val IsUnixLikeHost: Boolean
@@ -25,6 +22,3 @@ internal expect val IsUnixLikeHost: Boolean
 internal expect val IsAndroidHost: Boolean
 
 internal expect val ProcessID: Int?
-
-@Throws(Exception::class)
-internal expect fun LocalHost.Companion.resolveAllTo(set: LinkedHashSet<IPAddress>)

@@ -21,7 +21,8 @@ import io.matthewnelson.kmp.file.wrapIOException
 import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
 import io.matthewnelson.kmp.tor.runtime.ctrl.api.address.LocalHost.Cache.Companion.firstOrNull
 import io.matthewnelson.kmp.tor.runtime.ctrl.api.address.LocalHost.Cache.Companion.firstOrThrow
-import io.matthewnelson.kmp.tor.runtime.ctrl.api.internal.resolveAllTo
+import io.matthewnelson.kmp.tor.runtime.ctrl.api.internal.*
+import io.matthewnelson.kmp.tor.runtime.ctrl.api.internal.tryPlatformResolve
 import kotlin.concurrent.Volatile
 import kotlin.jvm.JvmStatic
 import kotlin.jvm.JvmSynthetic
@@ -101,11 +102,15 @@ public sealed class LocalHost private constructor(): Address("localhost") {
                 val addresses = LinkedHashSet<IPAddress>(2, 1.0F)
 
                 try {
-                    resolveAllTo(addresses)
+                    tryPlatformResolve(addresses)
                 } catch (t: Throwable) {
                     // Android can throw if called from Main thread
+                    // which we do not want to swallow.
                     throw t.wrapIOException { "Failed to resolve IP addresses for localhost" }
                 }
+
+                tryParsingIfConfig(addresses)
+                tryParsingEtcHosts(addresses)
 
                 if (addresses.isEmpty()) {
                     throw IOException("No IP addresses found for localhost")

@@ -15,25 +15,38 @@
  **/
 package io.matthewnelson.kmp.tor.runtime.ctrl.api.internal
 
+import io.matthewnelson.kmp.file.Buffer
+import io.matthewnelson.kmp.file.DelicateFileApi
 import io.matthewnelson.kmp.tor.runtime.ctrl.api.address.IPAddress
+import io.matthewnelson.kmp.tor.runtime.ctrl.api.address.IPAddress.Companion.toIPAddress
 import io.matthewnelson.kmp.tor.runtime.ctrl.api.address.LocalHost
-import platform.posix.getpid
 
-internal actual val UnixSocketsNotSupportedMessage: String? = null
-
-internal actual val IsUnixLikeHost: Boolean get() = true
-
-internal actual val IsAndroidHost: Boolean get() = false
-
-internal actual val ProcessID: Int? get() = getpid()
-
-@Throws(Exception::class)
+@Suppress("ACTUAL_ANNOTATIONS_NOT_MATCH_EXPECT")
 internal actual fun LocalHost.Companion.tryPlatformResolve(set: LinkedHashSet<IPAddress>) {
-    // check exception error code
-    TODO()
+    try {
+        objectValues(os_networkInterfaces()).forEach { values ->
+            values.forEach { entry ->
+                if (entry.internal as Boolean) {
+                    set.add((entry.address as String).toIPAddress())
+                }
+            }
+        }
+    } catch (_: Throwable) {
+        return
+    }
 }
 
 internal actual fun LocalHost.Companion.execIfConfig(): String {
-    // TODO
-    return ""
+    return try {
+        val buffer = child_process_execSync("ifconfig")
+        @OptIn(DelicateFileApi::class)
+        Buffer.wrap(buffer).toUtf8()
+    } catch (_: Throwable) {
+        ""
+    }
+}
+
+@Suppress("NOTHING_TO_INLINE")
+private inline fun objectValues(jsObject: dynamic): Array<Array<dynamic>> {
+    return js("Object").values(jsObject).unsafeCast<Array<Array<dynamic>>>()
 }

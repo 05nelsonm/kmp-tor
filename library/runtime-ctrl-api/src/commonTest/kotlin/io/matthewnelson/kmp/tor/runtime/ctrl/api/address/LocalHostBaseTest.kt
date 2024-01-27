@@ -15,6 +15,8 @@
  **/
 package io.matthewnelson.kmp.tor.runtime.ctrl.api.address
 
+import io.matthewnelson.kmp.tor.runtime.ctrl.api.internal.tryParsingEtcHosts
+import io.matthewnelson.kmp.tor.runtime.ctrl.api.internal.tryParsingIfConfig
 import kotlin.test.Test
 import kotlin.test.assertNotNull
 
@@ -30,5 +32,21 @@ abstract class LocalHostBaseTest {
     fun givenIPv6_whenResolved_thenIsCached() {
         LocalHost.IPv6.resolve()
         assertNotNull(LocalHost.IPv6.fromCache())
+    }
+
+    @Test
+    fun givenUnixHost_whenIfConfig_thenReturnsLocalHostIPs() {
+        val set = LinkedHashSet<IPAddress>(2, 1.0F)
+        LocalHost.tryParsingIfConfig(set)
+        // No assertions here as host machine running tests may not have
+        println("IF_CONFIG: $set")
+    }
+
+    @Test
+    fun givenUnixHost_whenEtcHosts_thenReturnsLocalHostIPs() {
+        val set = LinkedHashSet<IPAddress>(2, 1.0F)
+        LocalHost.tryParsingEtcHosts(set)
+        // No assertions here as host machine running tests may not have
+        println("ETC_HOSTS: $set")
     }
 }

@@ -1,0 +1,120 @@
+/*
+ * Copyright (c) 2024 Matthew Nelson
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ **/
+@file:Suppress("KotlinRedundantDiagnosticSuppress")
+
+package io.matthewnelson.kmp.tor.runtime.ctrl.api.internal
+
+import io.matthewnelson.kmp.file.readUtf8
+import io.matthewnelson.kmp.file.toFile
+import io.matthewnelson.kmp.tor.runtime.ctrl.api.address.IPAddress
+import io.matthewnelson.kmp.tor.runtime.ctrl.api.address.IPAddress.Companion.toIPAddressOrNull
+import io.matthewnelson.kmp.tor.runtime.ctrl.api.address.LocalHost
+
+@Throws(Exception::class)
+internal expect fun LocalHost.Companion.tryPlatformResolve(set: LinkedHashSet<IPAddress>)
+
+internal expect fun LocalHost.Companion.execIfConfig(): String
+
+internal fun LocalHost.Companion.tryParsingIfConfig(set: LinkedHashSet<IPAddress>) {
+    if (!IsUnixLikeHost) return
+    if (IsAndroidHost) return
+    if (set.hasIPv4IPv6) return
+
+    val out = execIfConfig().trimIndent()
+    if (out.isBlank()) return
+
+    val configs = mutableListOf<MutableList<String>>()
+    out.lines().forEach { line ->
+        if (line.isBlank()) return@forEach
+        if (!line.startsWith(' ')) {
+            configs.add(0, mutableListOf(line.trim()))
+            return@forEach
+        }
+        configs.firstOrNull()?.add(line.trim())
+    }
+
+    while (configs.isNotEmpty()) {
+        val config = configs.removeLast()
+        if (config.isEmpty()) continue
+
+        val i = config.iterator()
+        val flags = i.next().substringAfter('<')
+            .substringBefore('>')
+            .split(',')
+
+        if (!flags.contains("LOOPBACK")) continue
+        if (!flags.contains("UP")) continue
+
+        // look for inet and inet6
+        while (i.hasNext()) {
+            val line = i.next()
+            if (!line.startsWith("inet")) continue
+            val address = line.substringAfter(' ')
+                .substringBefore(' ')
+                .toIPAddressOrNull()
+                ?: continue
+            set.add(address)
+        }
+    }
+}
+
+internal fun LocalHost.Companion.tryParsingEtcHosts(set: LinkedHashSet<IPAddress>) {
+    if (!IsUnixLikeHost) return
+    if (set.hasIPv4IPv6) return
+
+    val etcHosts = "/etc/hosts".toFile()
+    if (!etcHosts.exists()) return
+
+    val lines = try {
+        etcHosts.readUtf8().lines()
+    } catch (_: Throwable) {
+        return
+    }
+
+    lines.forEach { line ->
+        val trimmed = line.trim()
+        if (trimmed.isBlank()) return@forEach
+        if (trimmed.startsWith('#')) return@forEach
+        if (!trimmed.contains("localhost")) return@forEach
+
+        val sb = StringBuilder()
+        val i = trimmed.iterator()
+        while (i.hasNext()) {
+            val c = i.next()
+            if (c == ' ' || c == '\r' || c == '\t') break
+            sb.append(c)
+        }
+
+        val address = sb.toString()
+            .toIPAddressOrNull()
+            ?: return@forEach
+
+        set.add(address)
+    }
+}
+
+@Suppress("NOTHING_TO_INLINE")
+private inline val LinkedHashSet<IPAddress>.hasIPv4IPv6: Boolean get() {
+    var hasIPv4 = false
+    var hasIPv6 = false
+    forEach { address ->
+        when (address) {
+            is IPAddress.V4 -> hasIPv4 = true
+            is IPAddress.V6 -> hasIPv6 = true
+        }
+    }
+    return hasIPv4 && hasIPv6
+}

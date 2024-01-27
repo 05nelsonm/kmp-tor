@@ -15,4 +15,4 @@
  **/
 package io.matthewnelson.kmp.tor.runtime.ctrl.api.address
 
-class LocalHostJvmUnitTest: LocalHostBaseTest() {}
+class LocalHostJvmUnitTest: LocalHostBaseTest()
