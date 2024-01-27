@@ -27,9 +27,15 @@ import io.matthewnelson.kmp.tor.runtime.ctrl.api.address.IPAddress
 import io.matthewnelson.kmp.tor.runtime.ctrl.api.address.LocalHost
 import io.matthewnelson.kmp.tor.runtime.ctrl.api.address.Port
 import io.matthewnelson.kmp.tor.runtime.ctrl.api.address.Port.Companion.toPort
+import io.matthewnelson.kmp.tor.runtime.ctrl.api.address.Port.Companion.toPortOrNull
+import io.matthewnelson.kmp.tor.runtime.ctrl.api.address.Port.Proxy.Companion.toPortProxy
+import io.matthewnelson.kmp.tor.runtime.ctrl.api.address.Port.Proxy.Companion.toPortProxyOrNull
+import io.matthewnelson.kmp.tor.runtime.ctrl.api.address.ProxyAddress.Companion.toProxyAddressOrNull
 import io.matthewnelson.kmp.tor.runtime.ctrl.api.apply
 import io.matthewnelson.kmp.tor.runtime.ctrl.api.builder.ExtendedTorConfigBuilder
 import io.matthewnelson.kmp.tor.runtime.ctrl.api.builder.UnixSocketBuilder
+import io.matthewnelson.kmp.tor.runtime.util.isAvailableAsync
+import kotlinx.coroutines.delay
 import kotlin.jvm.JvmSynthetic
 
 /**
@@ -45,39 +51,29 @@ public class TorConfigGenerator private constructor(
     private val allowPortReassignment: Boolean,
     private val omitGeoIPFileSettings: Boolean,
     private val config: List<ThisBlock.WithIt<Builder, TorRuntime.Environment>>,
-    private val isPortAvailable: (IPAddress, Port) -> Boolean,
+    private val isPortAvailable: suspend (LocalHost, Port) -> Boolean,
 ) {
 
     @Throws(Exception::class)
-    internal fun generate(n: Notifier): TorConfig = TorConfig.Builder {
+    internal suspend fun generate(n: Notifier): TorConfig = createConfig(n)
+        .validateTCPPorts(n)
+
+    private fun createConfig(n: Notifier): TorConfig = TorConfig.Builder {
         n.notify(LOG.DEBUG, "Installing tor resources (if needed)")
         val pathsTor = environment.torResource.install()
 
-        // TODO: Issue #313
-        //  Resolve localhost so that it is in the cache
-        //  and the builders can set as default.
         try {
-            n.notify(LOG.DEBUG, "Resolving localhost IPv4 address to cache")
-            LocalHost.resolveIPv4NoCache()
-        } catch (_: IOException) {
-            n.notify(LOG.WARN, "localhost IPv4 resolution failed")
-        }
-
-        try {
-            n.notify(LOG.DEBUG, "Resolving localhost IPv6 address to cache")
-            LocalHost.resolveIPv6NoCache()
-        } catch (_: IOException) {
-            // no WARN like with IPv4 b/c a lot of machines/networks have IPv6 disabled
-            n.notify(LOG.DEBUG, "localhost IPv6 resolution failed")
-        }
+            n.notify(LOG.DEBUG, "Refreshing localhost IP address cache")
+            LocalHost.refreshCache()
+        } catch (_: IOException) {}
 
         // Apply library consumers' configuration(s)
         config.forEach { apply(it, environment) }
 
-        validate(n, pathsTor)
+        putDefaults(pathsTor)
     }
 
-    private fun Builder.validate(n: Notifier, pathsTor: ResourceInstaller.Paths.Tor) {
+    private fun Builder.putDefaults(pathsTor: ResourceInstaller.Paths.Tor) {
         // Dirs/Files
         if (!omitGeoIPFileSettings) {
             put(GeoIPFile) { file = pathsTor.geoip }
@@ -129,27 +125,56 @@ public class TorConfigGenerator private constructor(
             }
         }
 
-        checkPortAvailability(n)
-
         // Required for TorRuntime
         put(DisableNetwork) { disable = true }
         put(RunAsDaemon) { enable = false }
         put(__OwningControllerProcess) { /* default */ }
     }
 
-    private fun Builder.checkPortAvailability(n: Notifier) {
-        if (!allowPortReassignment) return
-        (this as ExtendedTorConfigBuilder).ports().forEach { port ->
-            val reassigned = port.checkTCPPortAvailability(isPortAvailable) ?: return@forEach
+    private suspend fun TorConfig.validateTCPPorts(n: Notifier): TorConfig {
+        if (!allowPortReassignment) return this
+        val ports = filterByAttribute<Keyword.Attribute.Port>().filter { setting ->
+            if (setting.keyword.attributes.contains(Keyword.Attribute.HiddenService)) return@filter false
+            // TODO: Investigate why Node.js does not adhere to filterByAttribute
+            if (!setting.keyword.attributes.contains(Keyword.Attribute.Port)) return@filter false
+            if (setting.argument == "0") return@filter false
+            if (setting.argument == "auto") return@filter false
+            // If configured as UnixSocket, it's filtered out by filterByAttribute
+            true
+        }
+
+        if (ports.isEmpty()) return this
+
+        val reassignments = ports.mapNotNull { setting ->
+            val (host, port) = setting.argument.toProxyAddressOrNull().let { pAddress ->
+                if (pAddress != null) {
+                    val host = when (pAddress.address) {
+                        is IPAddress.V4 -> LocalHost.IPv4
+                        is IPAddress.V6 -> LocalHost.IPv6
+                    }
+
+                    Pair(host, pAddress.port)
+                } else {
+                    Pair(LocalHost.IPv4, setting.argument.toPortProxy())
+                }
+            }
+
+            if (isPortAvailable(host, port)) return@mapNotNull null
+            val reassigned = setting.reassignTCPPortAutoOrNull() ?: return@mapNotNull null
             n.notify(
                 LOG.WARN,
-                "Unavailable Port[${port.argument.toPort()}]. " +
-                "${port.keyword} reassigned to ${reassigned.argument}"
+                "UNAVAILABLE_PORT[${setting.keyword}] ${setting.argument} reassigned to 'auto'"
             )
+            Pair(setting, reassigned)
+        }
 
-            // Remove and replace
-            remove(port)
-            put(reassigned)
+        if (reassignments.isEmpty()) return this
+
+        return TorConfig.Builder(other = this) {
+            reassignments.forEach { (old, new) ->
+                (this as ExtendedTorConfigBuilder).remove(old)
+                put(new)
+            }
         }
     }
 
@@ -161,7 +186,7 @@ public class TorConfigGenerator private constructor(
             allowPortReassignment: Boolean,
             omitGeoIPFileSettings: Boolean,
             config: List<ThisBlock.WithIt<Builder, TorRuntime.Environment>>,
-            isPortAvailable: (IPAddress, Port) -> Boolean = { ip, p -> p.isAvailable(ip) },
+            isPortAvailable: suspend (LocalHost, Port) -> Boolean = { h, p -> p.isAvailableAsync(h) },
         ): TorConfigGenerator = TorConfigGenerator(
             environment,
             allowPortReassignment,

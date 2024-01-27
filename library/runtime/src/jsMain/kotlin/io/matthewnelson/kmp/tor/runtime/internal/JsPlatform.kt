@@ -13,24 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-@file:Suppress("EXPECT_ACTUAL_CLASSIFIERS_ARE_IN_BETA_WARNING")
+@file:Suppress("KotlinRedundantDiagnosticSuppress")
 
-package io.matthewnelson.kmp.tor.runtime.ctrl.api.internal
+package io.matthewnelson.kmp.tor.runtime.internal
 
-import io.matthewnelson.kmp.tor.runtime.ctrl.api.address.IPAddress
+@Suppress("NOTHING_TO_INLINE")
+internal inline fun events_EventEmitter.onError(
+    noinline callback: (err: dynamic) -> Unit,
+) {
+    on("error", callback)
+}
 
-internal actual class PortAvailability private constructor() {
-
-    @Throws(Exception::class)
-    internal actual fun isAvailable(port: Int): Boolean {
-        TODO()
-    }
-
-    internal actual companion object {
-
-        @Throws(Exception::class)
-        internal actual fun of(address: IPAddress): PortAvailability {
-            TODO()
-        }
-    }
+@Suppress("NOTHING_TO_INLINE")
+internal inline fun events_EventEmitter.onListening(
+    noinline callback: () -> Unit,
+) {
+    on("listening", callback)
 }

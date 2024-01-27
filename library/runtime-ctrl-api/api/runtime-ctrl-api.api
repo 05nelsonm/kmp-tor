@@ -634,11 +634,27 @@ public final class io/matthewnelson/kmp/tor/runtime/ctrl/api/address/IPAddress$V
 	public final fun getOrNull (Ljava/lang/String;)Lio/matthewnelson/kmp/tor/runtime/ctrl/api/address/IPAddress$V6;
 }
 
-public final class io/matthewnelson/kmp/tor/runtime/ctrl/api/address/LocalHost : io/matthewnelson/kmp/tor/runtime/ctrl/api/address/Address {
-	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/ctrl/api/address/LocalHost;
-	public fun canonicalHostname ()Ljava/lang/String;
-	public static final fun resolveIPv4 ()Lio/matthewnelson/kmp/tor/runtime/ctrl/api/address/IPAddress$V4;
-	public static final fun resolveIPv6 ()Lio/matthewnelson/kmp/tor/runtime/ctrl/api/address/IPAddress$V6;
+public abstract class io/matthewnelson/kmp/tor/runtime/ctrl/api/address/LocalHost : io/matthewnelson/kmp/tor/runtime/ctrl/api/address/Address {
+	public static final field Companion Lio/matthewnelson/kmp/tor/runtime/ctrl/api/address/LocalHost$Companion;
+	public final fun canonicalHostname ()Ljava/lang/String;
+	public abstract fun resolve ()Lio/matthewnelson/kmp/tor/runtime/ctrl/api/address/IPAddress;
+}
+
+public final class io/matthewnelson/kmp/tor/runtime/ctrl/api/address/LocalHost$Companion {
+}
+
+public final class io/matthewnelson/kmp/tor/runtime/ctrl/api/address/LocalHost$IPv4 : io/matthewnelson/kmp/tor/runtime/ctrl/api/address/LocalHost {
+	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/ctrl/api/address/LocalHost$IPv4;
+	public synthetic fun fromCache$runtime_ctrl_api ()Lio/matthewnelson/kmp/tor/runtime/ctrl/api/address/IPAddress;
+	public fun resolve ()Lio/matthewnelson/kmp/tor/runtime/ctrl/api/address/IPAddress$V4;
+	public synthetic fun resolve ()Lio/matthewnelson/kmp/tor/runtime/ctrl/api/address/IPAddress;
+}
+
+public final class io/matthewnelson/kmp/tor/runtime/ctrl/api/address/LocalHost$IPv6 : io/matthewnelson/kmp/tor/runtime/ctrl/api/address/LocalHost {
+	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/ctrl/api/address/LocalHost$IPv6;
+	public synthetic fun fromCache$runtime_ctrl_api ()Lio/matthewnelson/kmp/tor/runtime/ctrl/api/address/IPAddress;
+	public fun resolve ()Lio/matthewnelson/kmp/tor/runtime/ctrl/api/address/IPAddress$V6;
+	public synthetic fun resolve ()Lio/matthewnelson/kmp/tor/runtime/ctrl/api/address/IPAddress;
 }
 
 public abstract class io/matthewnelson/kmp/tor/runtime/ctrl/api/address/OnionAddress : io/matthewnelson/kmp/tor/runtime/ctrl/api/address/Address {
@@ -693,9 +709,6 @@ public class io/matthewnelson/kmp/tor/runtime/ctrl/api/address/Port : java/lang/
 	public static final fun getOrNull (I)Lio/matthewnelson/kmp/tor/runtime/ctrl/api/address/Port;
 	public static final fun getOrNull (Ljava/lang/String;)Lio/matthewnelson/kmp/tor/runtime/ctrl/api/address/Port;
 	public final fun hashCode ()I
-	public final fun isAvailable ()Z
-	public final fun isAvailable (Lio/matthewnelson/kmp/tor/runtime/ctrl/api/address/IPAddress;)Z
-	public static synthetic fun isAvailable$default (Lio/matthewnelson/kmp/tor/runtime/ctrl/api/address/Port;Lio/matthewnelson/kmp/tor/runtime/ctrl/api/address/IPAddress;ILjava/lang/Object;)Z
 	public final fun toString ()Ljava/lang/String;
 }
 
@@ -711,9 +724,6 @@ public final class io/matthewnelson/kmp/tor/runtime/ctrl/api/address/Port$Proxy 
 	public static final field MAX I
 	public static final field MIN I
 	public synthetic fun <init> (ILkotlin/jvm/internal/DefaultConstructorMarker;)V
-	public final fun findAvailable (I)Lio/matthewnelson/kmp/tor/runtime/ctrl/api/address/Port$Proxy;
-	public final fun findAvailable (ILio/matthewnelson/kmp/tor/runtime/ctrl/api/address/IPAddress;)Lio/matthewnelson/kmp/tor/runtime/ctrl/api/address/Port$Proxy;
-	public static synthetic fun findAvailable$default (Lio/matthewnelson/kmp/tor/runtime/ctrl/api/address/Port$Proxy;ILio/matthewnelson/kmp/tor/runtime/ctrl/api/address/IPAddress;ILjava/lang/Object;)Lio/matthewnelson/kmp/tor/runtime/ctrl/api/address/Port$Proxy;
 	public static final fun get (I)Lio/matthewnelson/kmp/tor/runtime/ctrl/api/address/Port$Proxy;
 	public static final fun get (Ljava/lang/String;)Lio/matthewnelson/kmp/tor/runtime/ctrl/api/address/Port$Proxy;
 	public static final fun getOrNull (I)Lio/matthewnelson/kmp/tor/runtime/ctrl/api/address/Port$Proxy;

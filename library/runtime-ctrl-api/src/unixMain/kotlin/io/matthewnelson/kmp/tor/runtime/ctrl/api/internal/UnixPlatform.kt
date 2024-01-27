@@ -13,8 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-@file:Suppress("KotlinRedundantDiagnosticSuppress")
-
 package io.matthewnelson.kmp.tor.runtime.ctrl.api.internal
 
 import io.matthewnelson.kmp.tor.runtime.ctrl.api.address.IPAddress
@@ -30,13 +28,7 @@ internal actual val IsAndroidHost: Boolean get() = false
 internal actual val ProcessID: Int? get() = getpid()
 
 @Throws(Exception::class)
-@Suppress("NOTHING_TO_INLINE")
-internal actual inline fun LocalHost.platformResolveIPv4(): IPAddress.V4 {
-    TODO()
-}
-
-@Throws(Exception::class)
-@Suppress("NOTHING_TO_INLINE")
-internal actual inline fun LocalHost.platformResolveIPv6(): IPAddress.V6 {
+internal actual fun LocalHost.Companion.resolveAll(): Set<IPAddress> {
+    // check exception error code
     TODO()
 }

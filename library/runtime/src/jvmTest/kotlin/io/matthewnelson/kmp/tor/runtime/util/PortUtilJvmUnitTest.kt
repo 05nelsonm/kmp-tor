@@ -13,23 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-@file:Suppress("EXPECT_ACTUAL_CLASSIFIERS_ARE_IN_BETA_WARNING", "ACTUAL_ANNOTATIONS_NOT_MATCH_EXPECT")
+@file:Suppress("UnnecessaryOptInAnnotation")
 
-package io.matthewnelson.kmp.tor.runtime.ctrl.api.internal
+package io.matthewnelson.kmp.tor.runtime.util
 
+import io.matthewnelson.kmp.tor.runtime.PortUtilBaseTest
 import io.matthewnelson.kmp.tor.runtime.ctrl.api.address.IPAddress
+import java.net.InetAddress
+import java.net.ServerSocket
 
-internal actual class PortAvailability private constructor() {
+@OptIn(ExperimentalStdlibApi::class)
+class PortUtilJvmUnitTest: PortUtilBaseTest() {
 
-    internal actual fun isAvailable(port: Int): Boolean {
-        // check exception error code
-        TODO()
-    }
-
-    internal actual companion object {
-
-        internal actual fun of(address: IPAddress): PortAvailability {
-            TODO()
-        }
+    override fun serverSocket(
+        ipAddress: IPAddress,
+        port: Int,
+    ): ServerSocket {
+        val inetAddress = InetAddress.getByName(ipAddress.canonicalHostname())
+        return ServerSocket(port, 1, inetAddress)
     }
 }

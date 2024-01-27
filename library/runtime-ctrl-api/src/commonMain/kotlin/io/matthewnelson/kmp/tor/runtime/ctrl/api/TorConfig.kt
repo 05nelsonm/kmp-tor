@@ -31,10 +31,6 @@ import io.matthewnelson.kmp.tor.runtime.ctrl.api.TorConfig.Keyword.Attribute
 import io.matthewnelson.kmp.tor.runtime.ctrl.api.TorConfig.LineItem.Companion.toLineItem
 import io.matthewnelson.kmp.tor.runtime.ctrl.api.TorConfig.Setting.Companion.filterByAttribute
 import io.matthewnelson.kmp.tor.runtime.ctrl.api.TorConfig.Setting.Companion.filterByKeyword
-import io.matthewnelson.kmp.tor.runtime.ctrl.api.address.LocalHost
-import io.matthewnelson.kmp.tor.runtime.ctrl.api.address.Port.Companion.toPort
-import io.matthewnelson.kmp.tor.runtime.ctrl.api.address.ProxyAddress
-import io.matthewnelson.kmp.tor.runtime.ctrl.api.address.ProxyAddress.Companion.toProxyAddressOrNull
 import io.matthewnelson.kmp.tor.runtime.ctrl.api.builder.*
 import io.matthewnelson.kmp.tor.runtime.ctrl.api.internal.IsAndroidHost
 import io.matthewnelson.kmp.tor.runtime.ctrl.api.internal.IsUnixLikeHost
@@ -56,6 +52,14 @@ public class TorConfig private constructor(
     @JvmField
     public val settings: Set<Setting>,
 ) {
+
+    public inline fun <reified T: Keyword> filterByKeyword(): List<Setting> {
+        return settings.filterByKeyword<T>()
+    }
+
+    public inline fun <reified T: Attribute> filterByAttribute(): List<Setting> {
+        return settings.filterByAttribute<T>()
+    }
 
     public companion object {
 
@@ -257,17 +261,6 @@ public class TorConfig private constructor(
                 }
 
                 return false
-            }
-
-            override fun ports(): List<Setting> {
-                val ports = settings
-                    .filterByAttribute<Attribute.Port>()
-                    .filter { setting ->
-                        // remove any configured hidden service settings
-                        setting.keyword != HiddenServiceDir
-                    }.toMutableList()
-                ports.addAll(inheritedDisabledPorts)
-                return ports
             }
 
             override fun remove(setting: Setting) {
@@ -2066,36 +2059,16 @@ public class TorConfig private constructor(
         }
         // TODO: public fun toCtrlString(): String
 
-        // Returns null if setting is not a configured
-        // TCP Port, or that port was available. Otherwise,
-        // Will return a modified Setting with "auto" as its
-        // argument.
+        // Returns a new Setting if it is a *Port that is
+        // not configured as disabled or auto.
         @InternalKmpTorApi
-        @Throws(IOException::class)
-        public fun checkTCPPortAvailability(
-            isPortAvailable: (IPAddress, Port) -> Boolean = { ip, p -> p.isAvailable(ip) },
-        ): Setting? {
+        public fun reassignTCPPortAutoOrNull(): Setting? {
             // Setting does not have Attribute.Port
             if (!keyword.attributes.contains(Attribute.Port)) return null
 
-            // Not configured as a TCP port that needs validation
+            // Not configured as a TCP port
             if (argument == "0" || argument == AUTO) return null
             if (argument.startsWith("unix:")) return null
-
-            val (address, port) = argument.toProxyAddressOrNull() ?: run {
-                val localhost = try {
-                    LocalHost.resolveIPv4()
-                } catch (_: IOException) {
-                    // TODO: Issue #313
-                    //  Move to builders
-                    "127.0.0.1".toIPAddressV4()
-                }
-
-                ProxyAddress(localhost, argument.toPort())
-            }
-
-            // Assigned TCP Port is available. No action required
-            if (isPortAvailable(address, port)) return null
 
             // Remove and replace argument with auto
             val list = items.toMutableList()

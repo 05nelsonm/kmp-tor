@@ -13,20 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-@file:Suppress("EXPECT_ACTUAL_CLASSIFIERS_ARE_IN_BETA_WARNING")
+@file:Suppress("ClassName", "FunctionName")
+@file:JsModule("net")
+@file:JsNonModule
 
-package io.matthewnelson.kmp.tor.runtime.ctrl.api.internal
+package io.matthewnelson.kmp.tor.runtime.internal
 
-import io.matthewnelson.kmp.tor.runtime.ctrl.api.address.IPAddress
-
-internal expect class PortAvailability {
-
-    @Throws(Exception::class)
-    internal fun isAvailable(port: Int): Boolean
-
-    internal companion object {
-
-        @Throws(Exception::class)
-        internal fun of(address: IPAddress): PortAvailability
-    }
+/** [docs](https://nodejs.org/api/events.html#class-eventemitter) */
+@JsName("EventEmitter")
+internal open external class events_EventEmitter {
+    fun <R> on(eventName: String, listener: Function<R>)
 }

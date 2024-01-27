@@ -86,6 +86,7 @@ public actual sealed class Key private actual constructor(): java.security.Key {
         public actual fun base16OrNull(): String? = withKeyOrNull { it.encodeToString(BASE_16) }
         public actual fun base32OrNull(): String? = withKeyOrNull { it.encodeToString(BASE_32) }
         public actual fun base64OrNull(): String? = withKeyOrNull { it.encodeToString(BASE_64) }
+
         @OptIn(InternalKmpTorApi::class)
         protected actual fun <T : Any> withKeyOrNull(
             block: (key: ByteArray) -> T

@@ -15,29 +15,44 @@
  **/
 package io.matthewnelson.kmp.tor.runtime.ctrl.api.address
 
+import io.matthewnelson.immutable.collections.toImmutableSet
 import io.matthewnelson.kmp.file.IOException
 import io.matthewnelson.kmp.file.wrapIOException
 import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
-import io.matthewnelson.kmp.tor.runtime.ctrl.api.internal.platformResolveIPv4
-import io.matthewnelson.kmp.tor.runtime.ctrl.api.internal.platformResolveIPv6
+import io.matthewnelson.kmp.tor.runtime.ctrl.api.address.LocalHost.Cache.Companion.firstOrNull
+import io.matthewnelson.kmp.tor.runtime.ctrl.api.address.LocalHost.Cache.Companion.firstOrThrow
+import io.matthewnelson.kmp.tor.runtime.ctrl.api.internal.resolveAll
 import kotlin.concurrent.Volatile
 import kotlin.jvm.JvmStatic
 import kotlin.jvm.JvmSynthetic
 import kotlin.time.TimeSource
 
-public object LocalHost: Address("localhost") {
+public sealed class LocalHost private constructor(): Address("localhost") {
 
-    @JvmStatic
+    public object IPv4: LocalHost() {
+
+        @Throws(IOException::class)
+        override fun resolve(): IPAddress.V4 = Cache.resolve(checkCache = true).firstOrThrow()
+
+        @JvmSynthetic
+        internal override fun fromCache(): IPAddress.V4? = Cache.getOrNull()?.firstOrNull()
+    }
+
+    public object IPv6: LocalHost() {
+
+        @Throws(IOException::class)
+        override fun resolve(): IPAddress.V6 = Cache.resolve(checkCache = true).firstOrThrow()
+
+        @JvmSynthetic
+        internal override fun fromCache(): IPAddress.V6? = Cache.getOrNull()?.firstOrNull()
+    }
+
     @Throws(IOException::class)
-    public fun resolveIPv4(): IPAddress.V4 = Cache.IPv4.resolve(checkCache = true)
+    public abstract fun resolve(): IPAddress
 
-    @JvmStatic
-    @Throws(IOException::class)
-    public fun resolveIPv6(): IPAddress.V6 = Cache.IPv6.resolve(checkCache = true)
+    public final override fun canonicalHostname(): String = value
 
-    public override fun canonicalHostname(): String = value
-
-    private class Cache private constructor(private val address: IPAddress) {
+    private class Cache private constructor(private val addresses: Set<IPAddress>) {
 
         private val timeMark = TimeSource.Monotonic.markNow()
 
@@ -48,77 +63,61 @@ public object LocalHost: Address("localhost") {
             return elapsedNanos < 5_000_000_250L
         }
 
-        object IPv4 {
+        companion object {
 
             @Volatile
             private var cache: Cache? = null
 
             @JvmStatic
-            fun getOrNull(): IPAddress.V4? {
-                val cached = cache ?: return null
-                if (cached.isNotExpired()) {
-                    return cached.address as IPAddress.V4
+            internal fun getOrNull(): Set<IPAddress>? {
+                val cache = cache ?: return null
+                if (cache.isNotExpired()) {
+                    return cache.addresses
                 }
-                cache = null
+                this.cache = null
                 return null
             }
 
             @JvmStatic
             @Throws(IOException::class)
-            fun resolve(checkCache: Boolean): IPAddress.V4 {
+            internal fun resolve(checkCache: Boolean): Set<IPAddress> {
                 if (checkCache) getOrNull()?.let { return it }
-                val address: IPAddress.V4 = try {
-                    platformResolveIPv4()
+                val addresses = try {
+                    resolveAll()
                 } catch (t: Throwable) {
-                    throw t.wrapIOException { "Failed to resolve IPv4 address for $value" }
+                    throw t.wrapIOException { "Failed to resolve IP addresses for localhost" }
                 }
-                cache = Cache(address)
-                return address
-            }
-        }
 
-        object IPv6 {
-
-            @Volatile
-            private var cache: Cache? = null
-
-            @JvmStatic
-            fun getOrNull(): IPAddress.V6? {
-                val cached = cache ?: return null
-                if (cached.isNotExpired()) {
-                    return cached.address as IPAddress.V6
+                if (addresses.isEmpty()) {
+                    throw IOException("No IP addresses found for localhost")
                 }
-                cache = null
-                return null
+
+                cache = Cache(addresses.toImmutableSet())
+                return addresses
             }
 
             @JvmStatic
             @Throws(IOException::class)
-            fun resolve(checkCache: Boolean): IPAddress.V6 {
-                if (checkCache) getOrNull()?.let { return it }
-                val address: IPAddress.V6 = try {
-                    platformResolveIPv6()
-                } catch (t: Throwable) {
-                    throw t.wrapIOException { "Failed to resolve IPv6 address for $value" }
-                }
-                cache = Cache(address)
-                return address
+            inline fun <reified T: IPAddress> Set<IPAddress>.firstOrThrow(): T {
+                return firstOrNull<T>()
+                    ?: throw IOException("IP${T::class.simpleName?.lowercase()} address not found for localhost")
+            }
+
+            @JvmStatic
+            inline fun <reified T: IPAddress> Set<IPAddress>.firstOrNull(): T? {
+                forEach { if (it is T) return it }
+                return null
             }
         }
     }
 
-    @JvmStatic
-    @InternalKmpTorApi
-    @Throws(IOException::class)
-    public fun resolveIPv4NoCache(): IPAddress.V4 = Cache.IPv4.resolve(checkCache = false)
+    public companion object {
 
-    @JvmStatic
-    @InternalKmpTorApi
-    @Throws(IOException::class)
-    public fun resolveIPv6NoCache(): IPAddress.V6 = Cache.IPv6.resolve(checkCache = false)
+        @InternalKmpTorApi
+        @Throws(IOException::class)
+        public fun refreshCache() { Cache.resolve(checkCache = false) }
+    }
 
     @JvmSynthetic
-    internal fun cachedIPv4OrNull(): IPAddress.V4? = Cache.IPv4.getOrNull()
-    @JvmSynthetic
-    internal fun cachedIPv6OrNull(): IPAddress.V6? = Cache.IPv6.getOrNull()
+    internal abstract fun fromCache(): IPAddress?
 }

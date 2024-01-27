@@ -75,6 +75,10 @@ class KeywordUnitTest {
             auto()
         }.let { list.add(it) }
 
+        TorConfig.DataDirectory.Builder {
+            directory = "".toFile()
+        }.let { list.add(it!!) }
+
         val byPort = list.filterByAttribute<TorConfig.Keyword.Attribute.Port>()
         assertEquals(2, byPort.size)
         assertNotNull(byPort.find { it.keyword is TorConfig.__DNSPort.Companion })
