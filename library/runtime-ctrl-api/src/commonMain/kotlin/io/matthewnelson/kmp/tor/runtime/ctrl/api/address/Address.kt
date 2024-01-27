@@ -21,6 +21,7 @@ import kotlin.jvm.JvmField
  * Base abstraction for all address types
  *
  * @see [IPAddress]
+ * @see [LocalHost]
  * @see [OnionAddress]
  * @see [ProxyAddress]
  * */

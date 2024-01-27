@@ -98,16 +98,27 @@ public interface TorRuntime: TorEvent.Processor, RuntimeEvent.Processor {
          * In the event that a configured TCP port is unavailable on the host
          * device, tor will fail to startup.
          *
-         * Setting this to true will result in reassignment of any unavailable
-         * TCP port arguments to "auto" just prior to startup in order to
-         * mitigate start failures.
+         * Setting this to true (the default value) will result in reassignment
+         * of any unavailable TCP port arguments to "auto".
+         *
+         * Port availability is verified just prior to startup in order to
+         * mitigate potential failures.
+         *
+         * If false, no port availability checks will be performed prior to
+         * startup. This may result in tor start failure if a configured port
+         * is taken, but that **could** be a desired behavior depending on your
+         * implementation of [TorRuntime].
          * */
         @JvmField
         public var allowPortReassignment: Boolean = true
 
         /**
          * If true, [Paths.Tor.geoip] and [Paths.Tor.geoip6] will **not** be
-         * automatically to your [TorConfig].
+         * automatically added to your [TorConfig].
+         *
+         * Useful if using [TorRuntime] with a system installation of tor (such
+         * as a Docker container) instead of
+         * [kmp-tor-resource](https://github.com/05nelsonm/kmp-tor-resource)
          * */
         @JvmField
         public var omitGeoIPFileSettings: Boolean = false
