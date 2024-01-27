@@ -13,38 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-package io.matthewnelson.kmp.tor.runtime.ctrl.api.builder
+package io.matthewnelson.kmp.tor.runtime.ctrl.api.address
 
-import io.matthewnelson.kmp.tor.runtime.ctrl.api.address.IPAddress
-import io.matthewnelson.kmp.tor.runtime.ctrl.api.address.LocalHost
-import io.matthewnelson.kmp.tor.runtime.ctrl.api.internal.IsUnixLikeHost
 import io.matthewnelson.kmp.tor.runtime.ctrl.api.internal.tryParseEtcHosts
 import io.matthewnelson.kmp.tor.runtime.ctrl.api.internal.tryParseIfConfig
 import kotlin.test.Test
-import kotlin.test.assertNotNull
 
-// TODO: Move to commonMain
-class LocalHostUnitTest {
-
-    @Test
-    fun givenIPv4_whenResolved_thenIsCached() {
-        LocalHost.IPv4.resolve()
-        assertNotNull(LocalHost.IPv4.fromCache())
-    }
-
-    @Test
-    fun givenIPv6_whenResolved_thenIsCached() {
-        LocalHost.IPv6.resolve()
-        assertNotNull(LocalHost.IPv6.fromCache())
-    }
+class LocalHostJsUnitTest: LocalHostBaseTest() {
 
     @Test
     fun givenUnixHost_whenIfConfig_thenReturnsLocalHostIPs() {
-        if (!IsUnixLikeHost) {
-            println("Skipping test...")
-            return
-        }
-
         val set = LinkedHashSet<IPAddress>(2, 1.0F)
         LocalHost.tryParseIfConfig(set)
         // No assertions here as host machine running tests may not have
@@ -53,13 +31,9 @@ class LocalHostUnitTest {
 
     @Test
     fun givenUnixHost_whenEtcHosts_thenReturnsLocalHostIPs() {
-        if (!IsUnixLikeHost) {
-            println("Skipping test...")
-            return
-        }
-
         val set = LinkedHashSet<IPAddress>(2, 1.0F)
         LocalHost.tryParseEtcHosts(set)
+        // No assertions here as host machine running tests may not have
         println(set)
     }
 }

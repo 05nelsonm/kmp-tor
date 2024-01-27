@@ -13,24 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-package io.matthewnelson.kmp.tor.runtime.ctrl.api.builder
+package io.matthewnelson.kmp.tor.runtime.ctrl.api.address
 
-import io.matthewnelson.kmp.tor.runtime.ctrl.api.address.LocalHost
-import kotlin.test.Test
-import kotlin.test.assertNotNull
-
-// TODO: Move to commonMain
-class LocalHostUnitTest {
-
-    @Test
-    fun givenIPv4_whenResolved_thenIsCached() {
-        LocalHost.IPv4.resolve()
-        assertNotNull(LocalHost.IPv4.fromCache())
-    }
-
-    @Test
-    fun givenIPv6_whenResolved_thenIsCached() {
-        LocalHost.IPv6.resolve()
-        assertNotNull(LocalHost.IPv6.fromCache())
-    }
-}
+class LocalHostJvmUnitTest: LocalHostBaseTest() {}

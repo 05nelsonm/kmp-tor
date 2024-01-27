@@ -47,12 +47,9 @@ internal actual fun LocalHost.Companion.resolveAll(): Set<IPAddress> {
     val set = LinkedHashSet<IPAddress>(2, 1.0F)
 
     tryOsInterfaces(set)
-    if (set.hasIPv4IPv6) return set
-    if (!IsUnixLikeHost) return set
 
     // Try some shell commands
     tryParseIfConfig(set)
-    if (set.hasIPv4IPv6) return set
 
     // last resort. Read from /etc/hosts
     tryParseEtcHosts(set)
@@ -92,6 +89,9 @@ private inline val LinkedHashSet<IPAddress>.hasIPv4IPv6: Boolean get() {
 }
 
 internal fun LocalHost.Companion.tryParseIfConfig(set: LinkedHashSet<IPAddress>) {
+    if (!IsUnixLikeHost) return
+    if (set.hasIPv4IPv6) return
+
     val ifConfig = try {
         val buffer = child_process_execSync("ifconfig")
         @OptIn(DelicateFileApi::class)
@@ -134,6 +134,9 @@ internal fun LocalHost.Companion.tryParseIfConfig(set: LinkedHashSet<IPAddress>)
 }
 
 internal fun LocalHost.Companion.tryParseEtcHosts(set: LinkedHashSet<IPAddress>) {
+    if (!IsUnixLikeHost) return
+    if (set.hasIPv4IPv6) return
+
     val etcHosts = "/etc/hosts".toFile()
     if (!etcHosts.exists()) return
 
