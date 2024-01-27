@@ -28,7 +28,7 @@ internal actual val IsAndroidHost: Boolean get() = false
 internal actual val ProcessID: Int? get() = getpid()
 
 @Throws(Exception::class)
-internal actual fun LocalHost.Companion.resolveAll(): Set<IPAddress> {
+internal actual fun LocalHost.Companion.resolveAllTo(set: LinkedHashSet<IPAddress>) {
     // check exception error code
     TODO()
 }

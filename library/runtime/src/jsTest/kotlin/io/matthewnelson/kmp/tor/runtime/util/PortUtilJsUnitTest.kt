@@ -24,7 +24,7 @@ import kotlin.test.fail
 @OptIn(ExperimentalStdlibApi::class)
 class PortUtilJsUnitTest: PortUtilBaseTest() {
 
-    override fun serverSocket(
+    override fun openServerSocket(
         ipAddress: IPAddress,
         port: Int,
     ): AutoCloseable {

@@ -15,11 +15,20 @@
  **/
 package io.matthewnelson.kmp.tor.runtime.ctrl.api.address
 
+import io.matthewnelson.kmp.tor.runtime.ctrl.api.internal.tryOsNetworkInterfaces
 import io.matthewnelson.kmp.tor.runtime.ctrl.api.internal.tryParseEtcHosts
 import io.matthewnelson.kmp.tor.runtime.ctrl.api.internal.tryParseIfConfig
 import kotlin.test.Test
 
 class LocalHostJsUnitTest: LocalHostBaseTest() {
+
+    @Test
+    fun givenUnixHost_whenOsNetworkInterfaces_thenReturnsLocalHostIPs() {
+        val set = LinkedHashSet<IPAddress>(2, 1.0F)
+        LocalHost.tryOsNetworkInterfaces(set)
+        // No assertions here as host machine running tests may not have
+        println(set)
+    }
 
     @Test
     fun givenUnixHost_whenIfConfig_thenReturnsLocalHostIPs() {

@@ -17,8 +17,10 @@
 
 package io.matthewnelson.kmp.tor.runtime.internal
 
-import io.matthewnelson.kmp.tor.runtime.ctrl.api.address.IPAddress
 import kotlinx.coroutines.*
+import kotlin.contracts.ExperimentalContracts
+import kotlin.contracts.InvocationKind
+import kotlin.contracts.contract
 import kotlin.coroutines.CoroutineContext
 
 @Suppress("NOTHING_TO_INLINE")
@@ -29,25 +31,21 @@ internal inline val CoroutineContext.isTorRuntime: Boolean get() {
 }
 
 @Suppress("NOTHING_TO_INLINE")
-internal inline val CoroutineContext.jobOrNull: Job? get() {
-    return try {
-        job
-    } catch (_: Throwable) {
-        null
+internal inline val CoroutineContext.jobOrNull: Job? get() = get(Job)
+
+@OptIn(ExperimentalContracts::class)
+internal inline fun <T: Throwable> CoroutineContext?.cancellationExceptionOr(
+    block: () -> T,
+): Throwable {
+    contract {
+        callsInPlace(block, InvocationKind.AT_MOST_ONCE)
     }
-}
 
-@Suppress("NOTHING_TO_INLINE")
-internal inline fun CoroutineContext?.cancellationOrIOException(
-    ipAddress: IPAddress,
-    i: PortProxyIterator
-): Exception {
-    if (this == null) return i.unavailableException(ipAddress)
+    if (this == null) return block()
 
-    return if (jobOrNull?.isCancelled == true || !isActive) {
-        CancellationException("")
+    return if (jobOrNull?.isCancelled == true) {
+        CancellationException("Job was cancelled")
     } else {
-        i.unavailableException(ipAddress)
+        block()
     }
-
 }

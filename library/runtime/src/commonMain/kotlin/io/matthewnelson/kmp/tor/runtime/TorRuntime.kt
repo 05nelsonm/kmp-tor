@@ -27,7 +27,6 @@ import io.matthewnelson.kmp.tor.core.api.ResourceInstaller.Paths
 import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
 import io.matthewnelson.kmp.tor.core.api.annotation.KmpTorDsl
 import io.matthewnelson.kmp.tor.runtime.TorRuntime.Companion.Builder
-import io.matthewnelson.kmp.tor.runtime.TorRuntime.Environment.Builder
 import io.matthewnelson.kmp.tor.runtime.TorRuntime.Environment.Companion.Builder
 import io.matthewnelson.kmp.tor.runtime.ctrl.api.*
 import io.matthewnelson.kmp.tor.runtime.internal.InstanceKeeper
@@ -139,8 +138,8 @@ public interface TorRuntime: TorEvent.Processor, RuntimeEvent.Processor {
          * Any exception thrown within [block] will be propagated to the caller.
          *
          * **NOTE:** This can be omitted as a minimum viable configuration
-         * is always created. See [TorConfigGenerator.validate] for what settings
-         * are automatically applied.
+         * is always created. See [TorConfigGenerator.putDefaults] for what
+         * settings are automatically applied.
          *
          * **NOTE:** [block] should not contain any non-singleton references
          * such as Android Activity context.

@@ -43,20 +43,17 @@ internal actual val UnixSocketsNotSupportedMessage: String? by lazy {
 internal actual val ProcessID: Int? get() = process_pid
 
 @Suppress("ACTUAL_ANNOTATIONS_NOT_MATCH_EXPECT")
-internal actual fun LocalHost.Companion.resolveAll(): Set<IPAddress> {
-    val set = LinkedHashSet<IPAddress>(2, 1.0F)
-
-    tryOsInterfaces(set)
+internal actual fun LocalHost.Companion.resolveAllTo(set: LinkedHashSet<IPAddress>) {
+    tryOsNetworkInterfaces(set)
 
     // Try some shell commands
     tryParseIfConfig(set)
 
     // last resort. Read from /etc/hosts
     tryParseEtcHosts(set)
-    return set
 }
 
-private fun LocalHost.Companion.tryOsInterfaces(set: LinkedHashSet<IPAddress>) {
+internal fun LocalHost.Companion.tryOsNetworkInterfaces(set: LinkedHashSet<IPAddress>) {
     try {
         objectValues(os_networkInterfaces()).forEach { values ->
             values.forEach values@ { entry ->
@@ -68,24 +65,6 @@ private fun LocalHost.Companion.tryOsInterfaces(set: LinkedHashSet<IPAddress>) {
     } catch (_: Throwable) {
         return
     }
-}
-
-@Suppress("NOTHING_TO_INLINE")
-private inline fun objectValues(jsObject: dynamic): Array<Array<dynamic>> {
-    return js("Object").values(jsObject).unsafeCast<Array<Array<dynamic>>>()
-}
-
-@Suppress("NOTHING_TO_INLINE")
-private inline val LinkedHashSet<IPAddress>.hasIPv4IPv6: Boolean get() {
-    var hasIPv4 = false
-    var hasIPv6 = false
-    forEach { address ->
-        when (address) {
-            is IPAddress.V4 -> hasIPv4 = true
-            is IPAddress.V6 -> hasIPv6 = true
-        }
-    }
-    return hasIPv4 && hasIPv6
 }
 
 internal fun LocalHost.Companion.tryParseIfConfig(set: LinkedHashSet<IPAddress>) {
@@ -166,4 +145,22 @@ internal fun LocalHost.Companion.tryParseEtcHosts(set: LinkedHashSet<IPAddress>)
 
         set.add(address)
     }
+}
+
+@Suppress("NOTHING_TO_INLINE")
+private inline fun objectValues(jsObject: dynamic): Array<Array<dynamic>> {
+    return js("Object").values(jsObject).unsafeCast<Array<Array<dynamic>>>()
+}
+
+@Suppress("NOTHING_TO_INLINE")
+private inline val LinkedHashSet<IPAddress>.hasIPv4IPv6: Boolean get() {
+    var hasIPv4 = false
+    var hasIPv6 = false
+    forEach { address ->
+        when (address) {
+            is IPAddress.V4 -> hasIPv4 = true
+            is IPAddress.V6 -> hasIPv6 = true
+        }
+    }
+    return hasIPv4 && hasIPv6
 }

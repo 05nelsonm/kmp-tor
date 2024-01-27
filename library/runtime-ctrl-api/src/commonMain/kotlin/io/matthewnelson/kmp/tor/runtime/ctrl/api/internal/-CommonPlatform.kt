@@ -27,4 +27,4 @@ internal expect val IsAndroidHost: Boolean
 internal expect val ProcessID: Int?
 
 @Throws(Exception::class)
-internal expect fun LocalHost.Companion.resolveAll(): Set<IPAddress>
+internal expect fun LocalHost.Companion.resolveAllTo(set: LinkedHashSet<IPAddress>)

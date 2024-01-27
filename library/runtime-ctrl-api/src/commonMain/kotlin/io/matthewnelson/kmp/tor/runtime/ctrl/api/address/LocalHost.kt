@@ -21,13 +21,31 @@ import io.matthewnelson.kmp.file.wrapIOException
 import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
 import io.matthewnelson.kmp.tor.runtime.ctrl.api.address.LocalHost.Cache.Companion.firstOrNull
 import io.matthewnelson.kmp.tor.runtime.ctrl.api.address.LocalHost.Cache.Companion.firstOrThrow
-import io.matthewnelson.kmp.tor.runtime.ctrl.api.internal.resolveAll
+import io.matthewnelson.kmp.tor.runtime.ctrl.api.internal.resolveAllTo
 import kotlin.concurrent.Volatile
 import kotlin.jvm.JvmStatic
 import kotlin.jvm.JvmSynthetic
 import kotlin.time.TimeSource
 
+/**
+ * The host machine's loopback [IPv4] and [IPv6] addresses,
+ * typically 127.0.0.1 and ::1, respectively.
+ *
+ * Results from system sources are cached for 5s to inhibit
+ * unnecessary repeated calls.
+ * */
 public sealed class LocalHost private constructor(): Address("localhost") {
+
+    /**
+     * Resolves "localhost" to an [IPAddress] via system calls
+     *
+     * **NOTE:** This is a blocking call and should be invoked from
+     * a background thread.
+     *
+     * @throws [IOException] if there were any errors (e.g. calling from Main thread on Android)
+     * */
+    @Throws(IOException::class)
+    public abstract fun resolve(): IPAddress
 
     public object IPv4: LocalHost() {
 
@@ -46,9 +64,6 @@ public sealed class LocalHost private constructor(): Address("localhost") {
         @JvmSynthetic
         internal override fun fromCache(): IPAddress.V6? = Cache.getOrNull()?.firstOrNull()
     }
-
-    @Throws(IOException::class)
-    public abstract fun resolve(): IPAddress
 
     public final override fun canonicalHostname(): String = value
 
@@ -82,9 +97,13 @@ public sealed class LocalHost private constructor(): Address("localhost") {
             @Throws(IOException::class)
             internal fun resolve(checkCache: Boolean): Set<IPAddress> {
                 if (checkCache) getOrNull()?.let { return it }
-                val addresses = try {
-                    resolveAll()
+
+                val addresses = LinkedHashSet<IPAddress>(2, 1.0F)
+
+                try {
+                    resolveAllTo(addresses)
                 } catch (t: Throwable) {
+                    // Android can throw if called from Main thread
                     throw t.wrapIOException { "Failed to resolve IP addresses for localhost" }
                 }
 

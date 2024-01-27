@@ -25,7 +25,7 @@ import java.net.ServerSocket
 @OptIn(ExperimentalStdlibApi::class)
 class PortUtilJvmUnitTest: PortUtilBaseTest() {
 
-    override fun serverSocket(
+    override fun openServerSocket(
         ipAddress: IPAddress,
         port: Int,
     ): ServerSocket {
