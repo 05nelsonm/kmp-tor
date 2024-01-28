@@ -37,7 +37,7 @@ public abstract class NetworkObserver {
 
     @OptIn(InternalKmpTorApi::class)
     private val lock = SynchronizedObject()
-    private val observers = mutableSetOf<Observer>()
+    private val observers = LinkedHashSet<Observer>(1, 1.0F)
 
     internal fun interface Observer {
         operator fun invoke(connectivity: Connectivity)

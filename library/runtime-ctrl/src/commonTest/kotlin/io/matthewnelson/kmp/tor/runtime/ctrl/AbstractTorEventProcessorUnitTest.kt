@@ -23,7 +23,7 @@ import kotlin.test.*
 class AbstractTorEventProcessorUnitTest {
 
     private class TestProcessor: AbstractTorEventProcessor("static", emptySet()) {
-        val size: Int get() = withObservers { size }
+        val size: Int get() = registered()
         fun notify(event: TorEvent, output: String) { event.notifyObservers(output) }
         fun destroy() { onDestroy() }
         fun <T> noOpSet(): MutableSet<T> = noOpMutableSet()

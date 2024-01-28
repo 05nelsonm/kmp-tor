@@ -7,12 +7,12 @@ public abstract class io/matthewnelson/kmp/tor/runtime/ctrl/AbstractTorEventProc
 	protected final fun isStaticTag (Ljava/lang/String;)Z
 	protected final fun notifyObservers (Lio/matthewnelson/kmp/tor/runtime/ctrl/api/TorEvent;Ljava/lang/String;)V
 	protected fun onDestroy ()V
+	protected fun registered ()I
 	public final fun remove (Lio/matthewnelson/kmp/tor/runtime/ctrl/api/TorEvent$Observer;)V
 	public final fun remove ([Lio/matthewnelson/kmp/tor/runtime/ctrl/api/TorEvent$Observer;)V
 	public final fun removeAll (Lio/matthewnelson/kmp/tor/runtime/ctrl/api/TorEvent;)V
 	public fun removeAll (Ljava/lang/String;)V
 	public final fun removeAll ([Lio/matthewnelson/kmp/tor/runtime/ctrl/api/TorEvent;)V
-	protected final fun withObservers (Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
 }
 
 protected final class io/matthewnelson/kmp/tor/runtime/ctrl/AbstractTorEventProcessor$Companion {

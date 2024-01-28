@@ -32,30 +32,34 @@ internal abstract class AbstractRuntimeEventProcessor(
     RuntimeEvent.Processor
 {
 
-    private val observers = initialObservers.toMutableSet()
+    private val observers = LinkedHashSet<RuntimeEvent.Observer<*>>(initialObservers.size + 1, 1.0F)
 
     private val lock = SynchronizedObject()
 
+    init {
+        observers.addAll(initialObservers)
+    }
+
     public final override fun add(observer: RuntimeEvent.Observer<*>) {
-        withRuntimeObservers { add(observer) }
+        withObservers { add(observer) }
     }
 
     public final override fun add(vararg observers: RuntimeEvent.Observer<*>) {
         if (observers.isEmpty()) return
-        withRuntimeObservers { observers.forEach { add(it) } }
+        withObservers { observers.forEach { add(it) } }
     }
 
     public final override fun remove(observer: RuntimeEvent.Observer<*>) {
-        withRuntimeObservers { remove(observer) }
+        withObservers { remove(observer) }
     }
 
     public final override fun remove(vararg observers: RuntimeEvent.Observer<*>) {
         if (observers.isEmpty()) return
-        withRuntimeObservers { observers.forEach { remove(it) } }
+        withObservers { observers.forEach { remove(it) } }
     }
 
     public final override fun removeAll(event: RuntimeEvent<*>) {
-        withRuntimeObservers {
+        withObservers {
             val iterator = iterator()
             while (iterator.hasNext()) {
                 val observer = iterator.next()
@@ -70,7 +74,7 @@ internal abstract class AbstractRuntimeEventProcessor(
 
     public final override fun removeAll(vararg events: RuntimeEvent<*>) {
         if (events.isEmpty()) return
-        withRuntimeObservers {
+        withObservers {
             val iterator = iterator()
             while (iterator.hasNext()) {
                 val observer = iterator.next()
@@ -85,7 +89,7 @@ internal abstract class AbstractRuntimeEventProcessor(
 
     public final override fun removeAll(tag: String) {
         if (tag.isStaticTag()) return
-        withRuntimeObservers {
+        withObservers {
             val iterator = iterator()
             while (iterator.hasNext()) {
                 val observer = iterator.next()
@@ -101,7 +105,7 @@ internal abstract class AbstractRuntimeEventProcessor(
     }
 
     public final override fun clearObservers() {
-        withRuntimeObservers {
+        withObservers {
             val iterator = iterator()
             while (iterator.hasNext()) {
                 val observer = iterator.next()
@@ -113,9 +117,11 @@ internal abstract class AbstractRuntimeEventProcessor(
         super.clearObservers()
     }
 
+    protected final override fun registered(): Int = super.registered() + withObservers { size }
+
     protected fun <R: Any> RuntimeEvent<R>.notifyObservers(output: R) {
         val event = this
-        withRuntimeObservers {
+        withObservers {
             for (observer in this) {
                 if (observer.event != event) continue
 
@@ -127,11 +133,10 @@ internal abstract class AbstractRuntimeEventProcessor(
 
     protected override fun onDestroy() {
         if (isDestroyed) return
-        withRuntimeObservers { clear() }
-        super.onDestroy()
+        withObservers { clear(); super.onDestroy() }
     }
 
-    protected fun <T: Any?> withRuntimeObservers(
+    private fun <T: Any?> withObservers(
         block: MutableSet<RuntimeEvent.Observer<*>>.() -> T,
     ): T {
         if (isDestroyed) return block(noOpMutableSet())

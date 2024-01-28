@@ -22,8 +22,7 @@ import kotlin.test.*
 class AbstractRuntimeEventProcessorUnitTest {
 
     private class TestProcessor: AbstractRuntimeEventProcessor("static", emptySet(), emptySet()) {
-        val sizeRuntime: Int get() = withRuntimeObservers { size }
-        val sizeTor: Int get() = withObservers { size }
+        val size: Int get() = registered()
 
         fun <R: Any> notify(event: RuntimeEvent<R>, output: R) { event.notifyObservers(output) }
         fun destroy() { onDestroy() }
@@ -35,11 +34,11 @@ class AbstractRuntimeEventProcessorUnitTest {
     fun givenObserver_whenAddRemove_thenIsAsExpected() {
         val observer = RuntimeEvent.LOG.DEBUG.observer {}
         processor.add(observer)
-        assertEquals(1, processor.sizeRuntime)
+        assertEquals(1, processor.size)
         processor.add(observer)
-        assertEquals(1, processor.sizeRuntime)
+        assertEquals(1, processor.size)
         processor.remove(observer)
-        assertEquals(0, processor.sizeRuntime)
+        assertEquals(0, processor.size)
     }
 
     @Test
@@ -49,10 +48,10 @@ class AbstractRuntimeEventProcessorUnitTest {
         val o2 = RuntimeEvent.LOG.INFO.observer {}
         val o3 = RuntimeEvent.LOG.INFO.observer {}
         processor.add(o1, o2, o3, o3)
-        assertEquals(3, processor.sizeRuntime)
+        assertEquals(3, processor.size)
 
         processor.removeAll(RuntimeEvent.LOG.INFO)
-        assertEquals(1, processor.sizeRuntime)
+        assertEquals(1, processor.size)
 
         processor.notify(RuntimeEvent.LOG.DEBUG, "out")
         assertEquals(1, invocations)
@@ -65,10 +64,10 @@ class AbstractRuntimeEventProcessorUnitTest {
         val o2 = RuntimeEvent.LOG.INFO.observer {}
         val o3 = RuntimeEvent.LOG.INFO.observer {}
         processor.add(o1, o2, o3)
-        assertEquals(3, processor.sizeRuntime)
+        assertEquals(3, processor.size)
 
         processor.remove(o2, o3)
-        assertEquals(1, processor.sizeRuntime)
+        assertEquals(1, processor.size)
 
         processor.notify(RuntimeEvent.LOG.DEBUG, "out")
         assertEquals(1, invocations)
@@ -81,10 +80,10 @@ class AbstractRuntimeEventProcessorUnitTest {
         val o2 = RuntimeEvent.LOG.INFO.observer("test2") {}
         val o3 = RuntimeEvent.LOG.WARN.observer("test2") {}
         processor.add(o1, o1, o2, o2, o3, o3)
-        assertEquals(3, processor.sizeRuntime)
+        assertEquals(3, processor.size)
 
         processor.removeAll("test2")
-        assertEquals(1, processor.sizeRuntime)
+        assertEquals(1, processor.size)
 
         // Is the proper tagged observer removed
         processor.notify(RuntimeEvent.LOG.DEBUG, "out")
@@ -105,23 +104,23 @@ class AbstractRuntimeEventProcessorUnitTest {
 
         // should do nothing
         processor.removeAll("static")
-        assertEquals(2, processor.sizeRuntime)
+        assertEquals(2, processor.size)
 
         // Should only remove the non-static observer
         processor.removeAll(RuntimeEvent.LOG.DEBUG)
-        assertEquals(1, processor.sizeRuntime)
+        assertEquals(1, processor.size)
 
         // Should only remove the non-static observer
         processor.add(nonStaticObserver)
-        assertEquals(2, processor.sizeRuntime)
+        assertEquals(2, processor.size)
         processor.removeAll(RuntimeEvent.LOG.DEBUG, RuntimeEvent.LOG.WARN)
-        assertEquals(1, processor.sizeRuntime)
+        assertEquals(1, processor.size)
 
         // Should not remove the static observer
         processor.add(nonStaticObserver)
-        assertEquals(2, processor.sizeRuntime)
+        assertEquals(2, processor.size)
         processor.clearObservers()
-        assertEquals(1, processor.sizeRuntime)
+        assertEquals(1, processor.size)
     }
 
     @Test
@@ -131,15 +130,13 @@ class AbstractRuntimeEventProcessorUnitTest {
         processor.add(TorEvent.BW.observer("static") {})
 
         processor.clearObservers()
-        assertEquals(1, processor.sizeRuntime)
-        assertEquals(1, processor.sizeTor)
+        assertEquals(2, processor.size)
 
         // Should also clear out static TorEvent observers
         processor.destroy()
-        assertEquals(0, processor.sizeRuntime)
-        assertEquals(0, processor.sizeTor)
+        assertEquals(0, processor.size)
 
         processor.add(observer)
-        assertEquals(0, processor.sizeRuntime)
+        assertEquals(0, processor.size)
     }
 }
