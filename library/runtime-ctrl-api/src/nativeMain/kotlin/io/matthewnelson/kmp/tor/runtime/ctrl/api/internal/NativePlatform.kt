@@ -13,6 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-package io.matthewnelson.kmp.tor.runtime.ctrl.api.address
+package io.matthewnelson.kmp.tor.runtime.ctrl.api.internal
 
-class LocalHostJsUnitTest: LocalHostBaseTest()
+import platform.posix.getpid
+
+internal actual val ProcessID: Int? get() = getpid()

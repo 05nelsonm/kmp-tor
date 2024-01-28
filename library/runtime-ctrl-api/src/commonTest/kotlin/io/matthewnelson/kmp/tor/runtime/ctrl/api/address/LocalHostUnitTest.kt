@@ -17,10 +17,11 @@ package io.matthewnelson.kmp.tor.runtime.ctrl.api.address
 
 import io.matthewnelson.kmp.tor.runtime.ctrl.api.internal.tryParsingEtcHosts
 import io.matthewnelson.kmp.tor.runtime.ctrl.api.internal.tryParsingIfConfig
+import io.matthewnelson.kmp.tor.runtime.ctrl.api.internal.tryPlatformResolve
 import kotlin.test.Test
 import kotlin.test.assertNotNull
 
-abstract class LocalHostBaseTest {
+class LocalHostUnitTest {
 
     @Test
     fun givenIPv4_whenResolved_thenIsCached() {
@@ -32,6 +33,14 @@ abstract class LocalHostBaseTest {
     fun givenIPv6_whenResolved_thenIsCached() {
         LocalHost.IPv6.resolve()
         assertNotNull(LocalHost.IPv6.fromCache())
+    }
+
+    @Test
+    fun givenAnyHost_whenPlatformResolve_thenReturnsLocalHostIPs() {
+        val set = LinkedHashSet<IPAddress>(2, 1.0F)
+        LocalHost.tryPlatformResolve(set)
+        // No assertions here as host machine running tests may not have
+        println("PLATFORM: $set")
     }
 
     @Test
