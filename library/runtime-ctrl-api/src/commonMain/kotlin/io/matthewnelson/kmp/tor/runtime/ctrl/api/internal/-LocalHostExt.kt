@@ -39,7 +39,7 @@ internal fun LocalHost.Companion.tryParsingIfConfig(set: LinkedHashSet<IPAddress
     val configs = mutableListOf<MutableList<String>>()
     out.lines().forEach { line ->
         if (line.isBlank()) return@forEach
-        if (!line.startsWith(' ')) {
+        if (!line.first().isWhitespace()) {
             configs.add(0, mutableListOf(line.trim()))
             return@forEach
         }
@@ -62,10 +62,25 @@ internal fun LocalHost.Companion.tryParsingIfConfig(set: LinkedHashSet<IPAddress
         while (i.hasNext()) {
             val line = i.next()
             if (!line.startsWith("inet")) continue
-            val address = line.substringAfter(' ')
-                .substringBefore(' ')
+
+            val sb = StringBuilder()
+            val ci = line.iterator()
+            var space = false
+            while (ci.hasNext()) {
+                val c = ci.next()
+                if (c.isWhitespace()) {
+                    if (space && sb.isNotEmpty()) break
+                    space = true
+                    continue
+                }
+                if (!space) continue
+                sb.append(c)
+            }
+
+            val address = sb.toString()
                 .toIPAddressOrNull()
                 ?: continue
+
             set.add(address)
         }
     }
@@ -94,7 +109,7 @@ internal fun LocalHost.Companion.tryParsingEtcHosts(set: LinkedHashSet<IPAddress
         val i = trimmed.iterator()
         while (i.hasNext()) {
             val c = i.next()
-            if (c == ' ' || c == '\r' || c == '\t') break
+            if (c.isWhitespace()) break
             sb.append(c)
         }
 
