@@ -77,9 +77,10 @@ internal fun LocalHost.Companion.tryParsingIfConfig(set: LinkedHashSet<IPAddress
                 sb.append(c)
             }
 
-            val address = sb.toString()
-                .toIPAddressOrNull()
-                ?: continue
+            val string = sb.toString()
+            if (string.contains('%')) continue
+
+            val address = string.toIPAddressOrNull() ?: continue
 
             set.add(address)
         }

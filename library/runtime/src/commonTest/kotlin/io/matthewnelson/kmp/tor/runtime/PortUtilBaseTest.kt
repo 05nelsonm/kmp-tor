@@ -73,17 +73,16 @@ abstract class PortUtilBaseTest {
             result = port.findAvailableAsync(limit + 50, host)
         }
 
-        // Slight delay to ensure blocking code
-        // is actually running
+        // Slight delay to ensure blocking code is running
         withContext(Dispatchers.Default) {
             delay(3.milliseconds)
         }
 
         job.cancel()
 
-        // Ensure any exceptions are propagated to our handler
+        // Ensure any exceptions/results are propagated
         withContext(Dispatchers.Default) {
-            delay(250.milliseconds)
+            delay(5_000.milliseconds)
         }
 
         // If it threw an IOException, that would be propagated

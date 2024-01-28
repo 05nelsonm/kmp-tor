@@ -13,10 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
+@file:Suppress("KotlinRedundantDiagnosticSuppress", "FunctionName")
+
 package io.matthewnelson.kmp.tor.runtime.ctrl.api.internal
 
-internal actual val UnixSocketsNotSupportedMessage: String? = null
+import kotlinx.cinterop.ByteVar
+import kotlinx.cinterop.CPointer
+import kotlinx.cinterop.CValuesRef
+import kotlinx.cinterop.ExperimentalForeignApi
+import platform.linux.inet_ntop
+import platform.posix.socklen_t
 
-internal actual val IsUnixLikeHost: Boolean get() = true
-
-internal actual val IsAndroidHost: Boolean get() = false
+@Suppress("NOTHING_TO_INLINE")
+@OptIn(ExperimentalForeignApi::class)
+internal actual inline fun platform_inet_ntop(
+    family: Int,
+    src: CValuesRef<*>?,
+    dst: CValuesRef<ByteVar>?,
+    size: socklen_t,
+): CPointer<ByteVar>? = inet_ntop(family, src, dst, size)
