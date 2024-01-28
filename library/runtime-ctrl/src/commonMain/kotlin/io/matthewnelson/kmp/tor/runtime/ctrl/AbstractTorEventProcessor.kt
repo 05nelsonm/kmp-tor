@@ -20,7 +20,6 @@ import io.matthewnelson.kmp.tor.core.resource.SynchronizedObject
 import io.matthewnelson.kmp.tor.core.resource.synchronized
 import io.matthewnelson.kmp.tor.runtime.ctrl.api.TorEvent
 import kotlin.concurrent.Volatile
-import kotlin.jvm.JvmField
 import kotlin.jvm.JvmName
 import kotlin.jvm.JvmStatic
 
@@ -39,10 +38,14 @@ protected constructor(
     protected var isDestroyed: Boolean = false
         private set
 
-    private val observers = initialObservers.toMutableSet()
+    private val observers = LinkedHashSet<TorEvent.Observer>(initialObservers.size + 1, 1.0F)
 
     @OptIn(InternalKmpTorApi::class)
     private val lock = SynchronizedObject()
+
+    init {
+        observers.addAll(initialObservers)
+    }
 
     public final override fun add(observer: TorEvent.Observer) {
         withObservers { add(observer) }
@@ -117,6 +120,8 @@ protected constructor(
         }
     }
 
+    protected open fun registered(): Int = withObservers { size }
+
     protected fun TorEvent.notifyObservers(output: String) {
         val event = this
         withObservers {
@@ -133,7 +138,7 @@ protected constructor(
     }
 
     @OptIn(InternalKmpTorApi::class)
-    protected fun <T: Any?> withObservers(
+    private fun <T: Any?> withObservers(
         block: MutableSet<TorEvent.Observer>.() -> T,
     ): T {
         if (isDestroyed) return block(noOpMutableSet())
