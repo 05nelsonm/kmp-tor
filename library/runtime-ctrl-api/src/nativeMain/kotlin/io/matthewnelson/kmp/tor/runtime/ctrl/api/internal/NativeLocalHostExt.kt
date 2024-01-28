@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-@file:Suppress("KotlinRedundantDiagnosticSuppress", "FunctionName")
+@file:Suppress("KotlinRedundantDiagnosticSuppress", "FunctionName", "UnnecessaryOptInAnnotation")
 
 package io.matthewnelson.kmp.tor.runtime.ctrl.api.internal
 
@@ -57,7 +57,7 @@ internal actual fun LocalHost.Companion.tryPlatformResolve(set: LinkedHashSet<IP
     }
 }
 
-@OptIn(ExperimentalForeignApi::class)
+@OptIn(UnsafeNumber::class, ExperimentalForeignApi::class)
 private fun sockaddr.toIPAddressOrNull(): IPAddress? {
     return when (sa_family.toInt()) {
         AF_INET -> ptr.reinterpret<sockaddr_in>()
@@ -71,7 +71,7 @@ private fun sockaddr.toIPAddressOrNull(): IPAddress? {
 }
 
 @Suppress("NOTHING_TO_INLINE")
-@OptIn(ExperimentalForeignApi::class)
+@OptIn(UnsafeNumber::class, ExperimentalForeignApi::class)
 private inline fun sockaddr_in.toIPAddressV4OrNull(): IPAddress.V4? = memScoped {
     val string = allocArray<ByteVar>(INET_ADDRSTRLEN)
     val value = cValue<in_addr> {
@@ -87,7 +87,7 @@ private inline fun sockaddr_in.toIPAddressV4OrNull(): IPAddress.V4? = memScoped 
 }
 
 @Suppress("NOTHING_TO_INLINE")
-@OptIn(ExperimentalForeignApi::class)
+@OptIn(UnsafeNumber::class, ExperimentalForeignApi::class)
 private inline fun sockaddr_in6.toIPAddressV6OrNull(): IPAddress.V6? = memScoped {
     val string = allocArray<ByteVar>(INET6_ADDRSTRLEN)
 
