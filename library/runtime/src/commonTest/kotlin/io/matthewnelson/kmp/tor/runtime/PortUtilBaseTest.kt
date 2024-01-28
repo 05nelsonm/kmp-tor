@@ -31,28 +31,28 @@ import kotlin.time.Duration.Companion.seconds
 @OptIn(ExperimentalStdlibApi::class)
 abstract class PortUtilBaseTest {
 
-    protected abstract fun serverSocket(
+    protected abstract fun openServerSocket(
         ipAddress: IPAddress,
         port: Int,
     ): AutoCloseable
 
     @Test
     fun givenPort_whenIPv4Unavailable_thenIsAvailableReturnsFalse() = runTest {
-        val port = LocalHost.IPv4.serverSocket()
+        val port = LocalHost.IPv4.holdServerSocket()
         assertFalse(port.isAvailableAsync(LocalHost.IPv4))
     }
 
     @Test
     fun givenPort_whenIPv6Unavailable_thenIsAvailableReturnsFalse() = runTest {
-        val port = LocalHost.IPv6.serverSocket()
+        val port = LocalHost.IPv6.holdServerSocket()
         assertFalse(port.isAvailableAsync(LocalHost.IPv6))
     }
 
     @Test
-    fun givenFindAvailable_whenCoroutineCancelled_thenHandlesCancellationProperly() = runTest(timeout = 50.seconds) {
+    fun givenFindAvailable_whenCoroutineCancelled_thenHandlesCancellationProperly() = runTest(timeout = 45.seconds) {
         val port = Port.Proxy.MIN.toPortProxy()
         val host = LocalHost.IPv4
-        val limit = 500
+        val limit = 750
         val i = port.iterator(limit)
 
         var count = 0
@@ -61,7 +61,7 @@ abstract class PortUtilBaseTest {
         while (i.hasNext()) {
             val next = i.next().toPortProxy()
             if (!next.isAvailableAsync(host)) continue
-            host.serverSocket(next)
+            host.holdServerSocket(next)
             count++
         }
 
@@ -76,7 +76,7 @@ abstract class PortUtilBaseTest {
         // Slight delay to ensure blocking code
         // is actually running
         withContext(Dispatchers.Default) {
-            delay(4.milliseconds)
+            delay(3.milliseconds)
         }
 
         job.cancel()
@@ -100,14 +100,14 @@ abstract class PortUtilBaseTest {
         assertNull(result)
     }
 
-    private suspend fun LocalHost.serverSocket(
+    private suspend fun LocalHost.holdServerSocket(
         port: Port.Proxy? = null
     ): Port.Proxy {
         val portProxy = port ?: Port.Proxy.MIN
             .toPortProxy()
             .findAvailableAsync(1_000, this)
 
-        val socket = serverSocket(resolve(), portProxy.value)
+        val socket = openServerSocket(resolve(), portProxy.value)
         currentCoroutineContext().job.invokeOnCompletion {
             try {
                 socket.close()

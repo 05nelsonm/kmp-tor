@@ -15,25 +15,27 @@
  **/
 package io.matthewnelson.kmp.tor.runtime.ctrl.api.internal
 
+import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
+import io.matthewnelson.kmp.tor.core.resource.waitFor
 import io.matthewnelson.kmp.tor.runtime.ctrl.api.address.IPAddress
+import io.matthewnelson.kmp.tor.runtime.ctrl.api.address.IPAddress.Companion.toIPAddress
 import io.matthewnelson.kmp.tor.runtime.ctrl.api.address.LocalHost
-import platform.posix.getpid
-
-internal actual val UnixSocketsNotSupportedMessage: String? = null
-
-internal actual val IsUnixLikeHost: Boolean get() = true
-
-internal actual val IsAndroidHost: Boolean get() = false
-
-internal actual val ProcessID: Int? get() = getpid()
+import java.net.InetAddress
+import kotlin.time.Duration.Companion.milliseconds
 
 @Throws(Exception::class)
 internal actual fun LocalHost.Companion.tryPlatformResolve(set: LinkedHashSet<IPAddress>) {
-    // check exception error code
-    TODO()
+    val addresses = InetAddress.getAllByName("localhost")
+    addresses.mapTo(set) { it.hostAddress.toIPAddress() }
 }
 
 internal actual fun LocalHost.Companion.execIfConfig(): String {
-    // TODO
-    return ""
+    return try {
+        val p = Runtime.getRuntime().exec(arrayOf("ifconfig"))
+        @OptIn(InternalKmpTorApi::class)
+        p.waitFor(150.milliseconds)
+        p.inputStream.reader().readText()
+    } catch (_: Throwable) {
+        ""
+    }
 }

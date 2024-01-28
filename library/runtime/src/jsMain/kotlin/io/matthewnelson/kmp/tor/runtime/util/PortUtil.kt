@@ -21,8 +21,8 @@ import io.matthewnelson.kmp.file.IOException
 import io.matthewnelson.kmp.tor.runtime.ctrl.api.address.IPAddress
 import io.matthewnelson.kmp.tor.runtime.ctrl.api.address.LocalHost
 import io.matthewnelson.kmp.tor.runtime.ctrl.api.address.Port
+import io.matthewnelson.kmp.tor.runtime.internal.*
 import io.matthewnelson.kmp.tor.runtime.internal.PortProxyIterator.Companion.iterator
-import io.matthewnelson.kmp.tor.runtime.internal.cancellationOrIOException
 import io.matthewnelson.kmp.tor.runtime.internal.net_createServer
 import io.matthewnelson.kmp.tor.runtime.internal.onError
 import io.matthewnelson.kmp.tor.runtime.internal.onListening
@@ -69,13 +69,14 @@ public actual suspend fun Port.Proxy.findAvailableAsync(
         return i.toPortProxy()
     }
 
-    throw ctx.cancellationOrIOException(ipAddress, i)
+    throw ctx.cancellationExceptionOr { i.unavailableException(ipAddress) }
 }
 
 // @Throws(IOException::class, CancellationException::class)
 private suspend fun IPAddress.isPortAvailable(port: Int): Boolean {
     val timeMark = TimeSource.Monotonic.markNow()
     val latch = Job()
+    val ctx = currentCoroutineContext()
     val ipAddress = value
 
     var error: IOException? = null
@@ -106,18 +107,20 @@ private suspend fun IPAddress.isPortAvailable(port: Int): Boolean {
         }
 
         while (
-            currentCoroutineContext().isActive
+            ctx.isActive
             && latch.isActive
             && isAvailable == null
             && error == null
         ) {
-            if (timeMark.elapsedNow() > 12.milliseconds) break
             delay(1.milliseconds)
+            if (timeMark.elapsedNow() > 42.milliseconds) break
         }
     } finally {
         latch.cancel()
     }
 
     isAvailable?.let { return it }
-    throw error ?: IOException("Failed to determine availability of ${canonicalHostname()}:$port")
+    throw ctx.cancellationExceptionOr {
+        error ?: IOException("Failed to determine availability of ${canonicalHostname()}:$port")
+    }
 }

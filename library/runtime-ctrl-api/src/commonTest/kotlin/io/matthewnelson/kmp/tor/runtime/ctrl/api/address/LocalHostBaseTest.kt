@@ -13,18 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-package io.matthewnelson.kmp.tor.runtime.ctrl.api.builder
+package io.matthewnelson.kmp.tor.runtime.ctrl.api.address
 
-import io.matthewnelson.kmp.tor.runtime.ctrl.api.address.IPAddress
-import io.matthewnelson.kmp.tor.runtime.ctrl.api.address.LocalHost
-import io.matthewnelson.kmp.tor.runtime.ctrl.api.internal.IsUnixLikeHost
-import io.matthewnelson.kmp.tor.runtime.ctrl.api.internal.tryParseEtcHosts
-import io.matthewnelson.kmp.tor.runtime.ctrl.api.internal.tryParseIfConfig
+import io.matthewnelson.kmp.tor.runtime.ctrl.api.internal.tryParsingEtcHosts
+import io.matthewnelson.kmp.tor.runtime.ctrl.api.internal.tryParsingIfConfig
 import kotlin.test.Test
 import kotlin.test.assertNotNull
 
-// TODO: Move to commonMain
-class LocalHostUnitTest {
+abstract class LocalHostBaseTest {
 
     @Test
     fun givenIPv4_whenResolved_thenIsCached() {
@@ -40,26 +36,17 @@ class LocalHostUnitTest {
 
     @Test
     fun givenUnixHost_whenIfConfig_thenReturnsLocalHostIPs() {
-        if (!IsUnixLikeHost) {
-            println("Skipping test...")
-            return
-        }
-
         val set = LinkedHashSet<IPAddress>(2, 1.0F)
-        LocalHost.tryParseIfConfig(set)
+        LocalHost.tryParsingIfConfig(set)
         // No assertions here as host machine running tests may not have
-        println(set)
+        println("IF_CONFIG: $set")
     }
 
     @Test
     fun givenUnixHost_whenEtcHosts_thenReturnsLocalHostIPs() {
-        if (!IsUnixLikeHost) {
-            println("Skipping test...")
-            return
-        }
-
         val set = LinkedHashSet<IPAddress>(2, 1.0F)
-        LocalHost.tryParseEtcHosts(set)
-        println(set)
+        LocalHost.tryParsingEtcHosts(set)
+        // No assertions here as host machine running tests may not have
+        println("ETC_HOSTS: $set")
     }
 }

@@ -19,10 +19,6 @@ import io.matthewnelson.kmp.file.SysPathSep
 import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
 import io.matthewnelson.kmp.tor.core.resource.OSHost
 import io.matthewnelson.kmp.tor.core.resource.OSInfo
-import io.matthewnelson.kmp.tor.runtime.ctrl.api.address.IPAddress
-import io.matthewnelson.kmp.tor.runtime.ctrl.api.address.IPAddress.Companion.toIPAddress
-import io.matthewnelson.kmp.tor.runtime.ctrl.api.address.LocalHost
-import java.net.InetAddress
 
 @OptIn(InternalKmpTorApi::class)
 internal actual val UnixSocketsNotSupportedMessage: String? by lazy {
@@ -74,11 +70,4 @@ private val AndroidPID: Int? by lazy {
     } catch (_: Throwable) {
         null
     }
-}
-
-@Throws(Exception::class)
-internal actual fun LocalHost.Companion.resolveAll(): Set<IPAddress> {
-    val addresses = InetAddress.getAllByName("localhost")
-    val set = LinkedHashSet<IPAddress>(addresses.size, 1.0F)
-    return addresses.mapTo(set) { it.hostAddress.toIPAddress() }
 }

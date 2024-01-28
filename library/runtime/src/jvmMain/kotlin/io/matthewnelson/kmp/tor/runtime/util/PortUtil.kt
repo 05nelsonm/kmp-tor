@@ -23,9 +23,8 @@ import io.matthewnelson.kmp.tor.runtime.ctrl.api.address.IPAddress
 import io.matthewnelson.kmp.tor.runtime.ctrl.api.address.LocalHost
 import io.matthewnelson.kmp.tor.runtime.ctrl.api.address.Port
 import io.matthewnelson.kmp.tor.runtime.internal.PortProxyIterator.Companion.iterator
-import io.matthewnelson.kmp.tor.runtime.internal.cancellationOrIOException
+import io.matthewnelson.kmp.tor.runtime.internal.cancellationExceptionOr
 import io.matthewnelson.kmp.tor.runtime.internal.isTorRuntime
-import io.matthewnelson.kmp.tor.runtime.internal.jobOrNull
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.isActive
@@ -133,7 +132,7 @@ private fun Port.Proxy.findAvailable(
         return i.toPortProxy()
     }
 
-    throw context.cancellationOrIOException(ipAddress, i)
+    throw context.cancellationExceptionOr { i.unavailableException(ipAddress) }
 }
 
 @Throws(IOException::class)

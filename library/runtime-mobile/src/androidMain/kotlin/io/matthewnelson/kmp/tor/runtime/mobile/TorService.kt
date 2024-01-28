@@ -34,10 +34,6 @@ internal class TorService internal constructor(): AbstractTorService() {
 
         override fun environment(): TorRuntime.Environment = factory.environment
 
-        override fun removeAll(tag: String) { factory.removeAll(tag) }
-        override fun removeAll(vararg events: RuntimeEvent<*>) { factory.removeAll(*events) }
-        override fun clearObservers() { factory.clearObservers() }
-
         override fun startDaemon() {
             // TODO
         }
@@ -65,9 +61,14 @@ internal class TorService internal constructor(): AbstractTorService() {
                 return AndroidTorRuntime(factory, newIntent)
             }
         }
+
+        override fun removeAll(tag: String) { factory.removeAll(tag) }
+        override fun removeAll(vararg events: RuntimeEvent<*>) { factory.removeAll(*events) }
+        override fun clearObservers() { factory.clearObservers() }
     }
 
     internal class Initializer internal constructor(): androidx.startup.Initializer<Initializer.Companion> {
+
         override fun create(context: Context): Companion {
             if (isInitialized) return Companion
 
@@ -97,9 +98,7 @@ internal class TorService internal constructor(): AbstractTorService() {
                     .forName("io.matthewnelson.kmp.tor.core.lib.locator.KmpTorLibLocator\$Initializer")
 
                 @Suppress("UNCHECKED_CAST")
-                (clazz as? Class<androidx.startup.Initializer<*>>)?.let { return listOf(it) }
-
-                return emptyList()
+                listOf((clazz as Class<androidx.startup.Initializer<*>>))
             } catch (_: Throwable) {
                 emptyList()
             }
