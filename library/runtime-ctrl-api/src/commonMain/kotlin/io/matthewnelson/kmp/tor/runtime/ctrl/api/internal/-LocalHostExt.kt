@@ -106,14 +106,25 @@ internal fun LocalHost.Companion.tryParsingEtcHosts(set: LinkedHashSet<IPAddress
         if (!trimmed.contains("localhost")) return@forEach
 
         val sb = StringBuilder()
+        val args = mutableListOf<String>()
+
         val i = trimmed.iterator()
         while (i.hasNext()) {
             val c = i.next()
-            if (c.isWhitespace()) break
+            if (c.isWhitespace()) {
+                if (sb.isEmpty()) continue
+                args.add(sb.toString())
+                sb.clear()
+                continue
+            }
             sb.append(c)
         }
 
-        val address = sb.toString()
+        if (sb.isNotEmpty()) args.add(sb.toString())
+        // Check for EXACT domain 'localhost'
+        if (!args.contains("localhost")) return@forEach
+
+        val address = args.first()
             .toIPAddressOrNull()
             ?: return@forEach
 
