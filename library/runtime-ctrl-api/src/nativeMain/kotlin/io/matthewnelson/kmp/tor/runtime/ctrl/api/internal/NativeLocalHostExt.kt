@@ -109,6 +109,6 @@ internal expect inline fun platform_inet_ntop(
 ): CPointer<ByteVar>?
 
 internal actual fun LocalHost.Companion.execIfConfig(): String {
-    // TODO
+    // TODO: Issue #327
     return ""
 }
