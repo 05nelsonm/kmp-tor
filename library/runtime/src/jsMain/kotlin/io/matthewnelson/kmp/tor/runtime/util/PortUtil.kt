@@ -113,7 +113,7 @@ private suspend fun IPAddress.isPortAvailable(port: Int): Boolean {
             && error == null
         ) {
             delay(1.milliseconds)
-            if (timeMark.elapsedNow() > 12.milliseconds) break
+            if (timeMark.elapsedNow() > 42.milliseconds) break
         }
     } finally {
         latch.cancel()

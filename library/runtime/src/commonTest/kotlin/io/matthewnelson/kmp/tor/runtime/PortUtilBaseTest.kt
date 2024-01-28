@@ -52,7 +52,7 @@ abstract class PortUtilBaseTest {
     fun givenFindAvailable_whenCoroutineCancelled_thenHandlesCancellationProperly() = runTest(timeout = 45.seconds) {
         val port = Port.Proxy.MIN.toPortProxy()
         val host = LocalHost.IPv4
-        val limit = 500
+        val limit = 750
         val i = port.iterator(limit)
 
         var count = 0
@@ -76,7 +76,7 @@ abstract class PortUtilBaseTest {
         // Slight delay to ensure blocking code
         // is actually running
         withContext(Dispatchers.Default) {
-            delay(4.milliseconds)
+            delay(3.milliseconds)
         }
 
         job.cancel()
@@ -116,7 +116,7 @@ abstract class PortUtilBaseTest {
         withContext(Dispatchers.Default) {
             // Need to switch context here for an actual delay
             // b/c JS needs to establish the connection
-            delay(5.milliseconds)
+            delay(10.milliseconds)
         }
         return portProxy
     }
