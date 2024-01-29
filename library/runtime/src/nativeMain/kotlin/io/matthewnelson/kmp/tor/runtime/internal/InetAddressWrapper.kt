@@ -36,53 +36,62 @@ internal actual value class InetAddressWrapper private actual constructor(
 ) {
 
     @Throws(Exception::class)
-    internal actual fun openServerSocket(port: Int): AutoCloseable {
-        val descriptor = memScoped {
-            val address = value as Address
+    internal actual fun openServerSocket(port: Int): AutoCloseable = memScoped {
+        val address = value as Address
 
-            val descriptor = socket(address.family.convert(), SOCK_STREAM, 0)
-            if (descriptor < 0) {
-                val errno = errno
-                val message = strerror(errno)?.toKString() ?: "errno: $errno"
-                throw IllegalStateException(message)
-            }
-
-            // Enable address re-use
-            alloc<IntVar> { this.value = 1 }.let { reuseAddress ->
-                setsockopt(descriptor, SOL_SOCKET, SO_REUSEADDR, reuseAddress.ptr, sizeOf<IntVar>().convert())
-            }
-            // Disable port re-use
-            alloc<IntVar> { this.value = 0 }.let { reusePort ->
-                setsockopt(descriptor, SOL_SOCKET, SO_REUSEPORT, reusePort.ptr, sizeOf<IntVar>().convert())
-            }
-            // non-blocking
-            if (fcntl(descriptor, F_SETFL, O_NONBLOCK) != 0) {
-                val errno = errno
-                val message = strerror(errno)?.toKString() ?: "errno: $errno"
-                throw IllegalStateException(message)
-            }
-
-            address.callback(port) { pointer, size ->
-                val result = bind(descriptor, pointer, size)
-                if (result != 0) throw errnoToIOException(errno)
-            }
-
-            listen(descriptor, 1).let { result ->
-                if (result == 0) return@let
-                val errno = errno
-                val message = strerror(errno)?.toKString() ?: "errno: $errno"
-                throw IllegalStateException(message)
-            }
-
-            descriptor
+        val descriptor = socket(address.family.convert(), SOCK_STREAM, 0)
+        if (descriptor < 0) {
+            val errno = errno
+            val message = strerror(errno)?.toKString() ?: "errno: $errno"
+            throw IllegalStateException(message)
         }
 
-        return object : AutoCloseable {
+        val closeableDescriptor = object : AutoCloseable {
             override fun close() {
-                shutdown(descriptor, SHUT_RDWR)
                 close(descriptor)
             }
         }
+
+        // Enable address re-use
+        alloc<IntVar> { this.value = 1 }.let { reuseAddress ->
+            setsockopt(descriptor, SOL_SOCKET, SO_REUSEADDR, reuseAddress.ptr, sizeOf<IntVar>().convert())
+        }
+        // Disable port re-use
+        alloc<IntVar> { this.value = 0 }.let { reusePort ->
+            setsockopt(descriptor, SOL_SOCKET, SO_REUSEPORT, reusePort.ptr, sizeOf<IntVar>().convert())
+        }
+        // non-blocking
+        if (fcntl(descriptor, F_SETFL, O_NONBLOCK) != 0) {
+            closeableDescriptor.use {}
+            val errno = errno
+            val message = strerror(errno)?.toKString() ?: "errno: $errno"
+            throw IllegalStateException(message)
+        }
+
+        address.callback(port) { pointer, size ->
+            val result = bind(descriptor, pointer, size)
+            if (result != 0) {
+                closeableDescriptor.use {}
+                throw errnoToIOException(errno)
+            }
+        }
+
+        val closeableShutdown = object : AutoCloseable {
+            override fun close() {
+                shutdown(descriptor, SHUT_RDWR)
+                closeableDescriptor.use {}
+            }
+        }
+
+        listen(descriptor, 1).let { result ->
+            if (result == 0) return@let
+            val errno = errno
+            val message = strerror(errno)?.toKString() ?: "errno: $errno"
+            closeableShutdown.use {}
+            throw IllegalStateException(message)
+        }
+
+        closeableShutdown
     }
 
     internal actual companion object {
