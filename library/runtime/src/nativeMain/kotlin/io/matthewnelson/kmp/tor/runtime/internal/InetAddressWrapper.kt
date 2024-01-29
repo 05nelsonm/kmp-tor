@@ -41,7 +41,11 @@ internal actual value class InetAddressWrapper private actual constructor(
             val address = value as Address
 
             val descriptor = socket(address.family.convert(), SOCK_STREAM, 0)
-            if (descriptor < 0) throw errnoToIOException(errno)
+            if (descriptor < 0) {
+                val errno = errno
+                val message = strerror(errno)?.toKString() ?: "errno: $errno"
+                throw IllegalStateException(message)
+            }
 
             // Enable address re-use
             alloc<IntVar> { this.value = 1 }.let { reuseAddress ->
@@ -60,7 +64,10 @@ internal actual value class InetAddressWrapper private actual constructor(
             }
 
             listen(descriptor, 1).let { result ->
-                if (result != 0) throw errnoToIOException(errno)
+                if (result == 0) return@let
+                val errno = errno
+                val message = strerror(errno)?.toKString() ?: "errno: $errno"
+                throw IllegalStateException(message)
             }
 
             descriptor
