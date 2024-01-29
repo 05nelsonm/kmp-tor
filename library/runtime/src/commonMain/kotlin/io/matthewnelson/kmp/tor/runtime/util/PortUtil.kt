@@ -25,7 +25,7 @@ import kotlin.coroutines.cancellation.CancellationException
  *
  * @param [host] either [LocalHost.IPv4] or [LocalHost.IPv6]
  * @throws [IOException] if [LocalHost.resolve] fails
- * @throws [CancellationException]
+ * @throws [CancellationException] if underlying coroutine was cancelled
  * */
 @Throws(IOException::class, CancellationException::class)
 public expect suspend fun Port.isAvailableAsync(
@@ -43,7 +43,7 @@ public expect suspend fun Port.isAvailableAsync(
  * @param [limit] the number of ports to scan. min: 1, max: 1_000
  * @throws [IllegalArgumentException] if [limit] is not between 1 and 1_000 (inclusive)
  * @throws [IOException] if [LocalHost.resolve] fails
- * @throws [CancellationException]
+ * @throws [CancellationException] if underlying coroutine was cancelled
  * */
 @Throws(IOException::class, CancellationException::class)
 public expect suspend fun Port.Proxy.findAvailableAsync(
