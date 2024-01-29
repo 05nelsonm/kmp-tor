@@ -39,5 +39,25 @@ class TorRuntimeEnvironmentUnitTest {
 
         val env3 = TorRuntime.Environment.Builder(work.resolve("work"), work.resolve("cache")) { torResource }
         assertNotEquals(env1, env3)
+
+        val innerOuterWork = work.resolve("lambda")
+        var envInner: TorRuntime.Environment? = null
+        val envOuter = TorRuntime.Environment.Builder(
+            innerOuterWork,
+            innerOuterWork.resolve("outer"),
+            { torResource },
+        ) {
+            // Should be the expected instance
+            envInner = TorRuntime.Environment.Builder(
+                innerOuterWork,
+                innerOuterWork.resolve("inner"),
+                { torResource },
+            ) {
+
+            }
+        }
+
+        assertEquals(innerOuterWork.resolve("inner"), envInner?.cacheDir)
+        assertEquals(innerOuterWork.resolve("inner"), envOuter.cacheDir)
     }
 }

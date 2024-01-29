@@ -213,23 +213,28 @@ public interface TorRuntime: TorEvent.Processor, RuntimeEvent.Processor {
             internal fun build(
                 environment: Environment,
                 block: ThisBlock<Builder>?,
-            ): TorRuntime = getOrCreateInstance(environment.id) {
+            ): TorRuntime {
                 val b = Builder(environment)
+                // Apply block outside getOrCreateInstance call to
+                // prevent double instance creation
                 if (block != null) b.apply(block)
 
-                // TODO: Use TorConfigGenerator.of
+                return getOrCreateInstance(environment.id) {
 
-                RealTorRuntime.of(
-                    environment = environment,
-                    networkObserver = b.networkObserver,
-                    allowPortReassignment = b.allowPortReassignment,
-                    omitGeoIPFileSettings = b.omitGeoIPFileSettings,
-                    eventThreadBackground = b.eventThreadBackground,
-                    config = b.config.toImmutableList(),
-                    staticTorEvents = b.staticTorEvents.toImmutableSet(),
-                    staticTorEventObservers = b.staticTorEventObservers.toImmutableSet(),
-                    staticRuntimeEventObservers = b.staticRuntimeEventObservers.toImmutableSet(),
-                )
+                    // TODO: Use TorConfigGenerator.of
+
+                    RealTorRuntime.of(
+                        environment = environment,
+                        networkObserver = b.networkObserver,
+                        allowPortReassignment = b.allowPortReassignment,
+                        omitGeoIPFileSettings = b.omitGeoIPFileSettings,
+                        eventThreadBackground = b.eventThreadBackground,
+                        config = b.config.toImmutableList(),
+                        staticTorEvents = b.staticTorEvents.toImmutableSet(),
+                        staticTorEventObservers = b.staticTorEventObservers.toImmutableSet(),
+                        staticRuntimeEventObservers = b.staticRuntimeEventObservers.toImmutableSet(),
+                    )
+                }
             }
         }
     }
@@ -362,12 +367,12 @@ public interface TorRuntime: TorEvent.Processor, RuntimeEvent.Processor {
                     installer: (installationDir: File) -> ResourceInstaller<Paths.Tor>,
                     block: ThisBlock<Builder>?,
                 ): Environment {
-                    val absoluteWorkDir = workDir.absoluteFile.normalize()
+                    val b = Builder(workDir.absoluteFile.normalize(), cacheDir.absoluteFile.normalize())
+                    // Apply block outside getOrCreateInstance call to
+                    // prevent double instance creation
+                    if (block != null) b.apply(block)
 
-                    return getOrCreateInstance(key = absoluteWorkDir) {
-                        val b = Builder(absoluteWorkDir, cacheDir.absoluteFile.normalize())
-                        if (block != null) b.apply(block)
-
+                    return getOrCreateInstance(key = b.workDir) {
                         val torResource = installer(b.installationDir.absoluteFile.normalize())
 
                         Environment(
