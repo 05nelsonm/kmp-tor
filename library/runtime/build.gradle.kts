@@ -41,6 +41,7 @@ kmpConfiguration {
             with(sourceSets) {
                 findByName("nonJvmMain")?.apply {
                     dependencies {
+                        implementation(libs.kotlincrypto.endians)
                         implementation(libs.kotlincrypto.hash.sha2)
                     }
                 }
@@ -50,9 +51,15 @@ kmpConfiguration {
 
                 if (jvmMain != null || nativeMain != null) {
                     val nonJsMain = maybeCreate("nonJsMain")
+                    val nonJsTest = maybeCreate("nonJsTest")
+
                     nonJsMain.dependsOn(getByName("commonMain"))
+                    nonJsTest.dependsOn(getByName("commonTest"))
+
                     jvmMain?.apply { dependsOn(nonJsMain) }
+                    findByName("jvmTest")?.apply { dependsOn(nonJsTest) }
                     nativeMain?.apply { dependsOn(nonJsMain) }
+                    findByName("nativeTest")?.apply { dependsOn(nonJsTest) }
                 }
             }
         }
