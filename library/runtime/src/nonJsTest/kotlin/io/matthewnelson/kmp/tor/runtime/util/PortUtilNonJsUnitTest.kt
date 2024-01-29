@@ -19,17 +19,14 @@ package io.matthewnelson.kmp.tor.runtime.util
 
 import io.matthewnelson.kmp.tor.runtime.PortUtilBaseTest
 import io.matthewnelson.kmp.tor.runtime.ctrl.api.address.IPAddress
-import java.net.InetAddress
-import java.net.ServerSocket
+import io.matthewnelson.kmp.tor.runtime.internal.InetAddressWrapper.Companion.toInetAddressWrapper
 
 @OptIn(ExperimentalStdlibApi::class)
-class PortUtilJvmUnitTest: PortUtilBaseTest() {
+class PortUtilNonJsUnitTest: PortUtilBaseTest() {
 
     override fun openServerSocket(
         ipAddress: IPAddress,
         port: Int,
-    ): ServerSocket {
-        val inetAddress = InetAddress.getByName(ipAddress.canonicalHostname())
-        return ServerSocket(port, 1, inetAddress)
-    }
+    ): AutoCloseable = ipAddress.toInetAddressWrapper()
+        .openServerSocket(port)
 }

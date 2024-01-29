@@ -54,6 +54,8 @@ internal actual fun LocalHost.Companion.tryPlatformResolve(set: LinkedHashSet<IP
 
             info = info.ai_next?.pointed
         }
+
+        freeaddrinfo(result.value)
     }
 }
 
