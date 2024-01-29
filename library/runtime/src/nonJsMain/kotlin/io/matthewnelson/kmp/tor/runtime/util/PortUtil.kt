@@ -18,6 +18,7 @@
 package io.matthewnelson.kmp.tor.runtime.util
 
 import io.matthewnelson.kmp.file.IOException
+import io.matthewnelson.kmp.file.wrapIOException
 import io.matthewnelson.kmp.tor.runtime.ctrl.api.address.LocalHost
 import io.matthewnelson.kmp.tor.runtime.ctrl.api.address.Port
 import io.matthewnelson.kmp.tor.runtime.internal.InetAddressWrapper.Companion.toInetAddressWrapper
@@ -123,9 +124,13 @@ private fun Port.Proxy.findAvailable(
     val ipAddress = host.resolve()
     val inetAddress = ipAddress.toInetAddressWrapper()
 
-    while (context?.isActive != false && i.hasNext()) {
-        if (!inetAddress.isPortAvailable(i.next())) continue
-        return i.toPortProxy()
+    try {
+        while (context?.isActive != false && i.hasNext()) {
+            if (!inetAddress.isPortAvailable(i.next())) continue
+            return i.toPortProxy()
+        }
+    } catch (t: Throwable) {
+        throw context.cancellationExceptionOr { t.wrapIOException() }
     }
 
     throw context.cancellationExceptionOr { i.unavailableException(ipAddress) }
