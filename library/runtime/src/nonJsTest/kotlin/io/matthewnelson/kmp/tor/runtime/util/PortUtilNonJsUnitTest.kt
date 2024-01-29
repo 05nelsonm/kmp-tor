@@ -21,9 +21,8 @@ import io.matthewnelson.kmp.tor.runtime.PortUtilBaseTest
 import io.matthewnelson.kmp.tor.runtime.ctrl.api.address.IPAddress
 import io.matthewnelson.kmp.tor.runtime.internal.InetAddressWrapper.Companion.toInetAddressWrapper
 
-// TODO: move to nonJsTest
 @OptIn(ExperimentalStdlibApi::class)
-class PortUtilJvmUnitTest: PortUtilBaseTest() {
+class PortUtilNonJsUnitTest: PortUtilBaseTest() {
 
     override fun openServerSocket(
         ipAddress: IPAddress,
