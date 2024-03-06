@@ -15,7 +15,7 @@
  **/
 package io.matthewnelson.kmp.tor.runtime.ctrl.api.internal
 
-import io.matthewnelson.kmp.file.SysPathSep
+import io.matthewnelson.kmp.file.SysDirSep
 import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
 import io.matthewnelson.kmp.tor.core.resource.OSHost
 import io.matthewnelson.kmp.tor.core.resource.OSInfo
@@ -30,7 +30,7 @@ internal actual val UnixSocketsNotSupportedMessage: String? by lazy {
         return@lazy "Tor does not support Unix Sockets on Windows"
     }
 
-    if (SysPathSep != '/') {
+    if (SysDirSep != '/') {
         return@lazy "Unsupported OSHost[$host]"
     }
 
@@ -42,32 +42,5 @@ internal actual val UnixSocketsNotSupportedMessage: String? by lazy {
         null
     } catch (_: Throwable) {
         "Unix Sockets are not supported for Java 15 or below"
-    }
-}
-
-internal actual val ProcessID: Int? get() {
-    @OptIn(InternalKmpTorApi::class)
-    return if (OSInfo.INSTANCE.isAndroidRuntime()) {
-        AndroidPID
-    } else {
-        try {
-            java.lang.management.ManagementFactory
-                .getRuntimeMXBean()
-                .name
-                .split('@')[0]
-                .toInt()
-        } catch (_: Throwable) {
-            null
-        }
-    }
-}
-
-private val AndroidPID: Int? by lazy {
-    try {
-        Class.forName("android.os.Process")
-            ?.getMethod("myPid")
-            ?.invoke(null) as? Int
-    } catch (_: Throwable) {
-        null
     }
 }

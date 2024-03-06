@@ -15,6 +15,22 @@
  **/
 package io.matthewnelson.kmp.tor.runtime.ctrl.api.internal
 
-import platform.posix.getpid
+import kotlin.experimental.ExperimentalNativeApi
 
-internal actual val ProcessID: Int? get() = getpid()
+internal actual val IsAndroidHost: Boolean get() {
+    @OptIn(ExperimentalNativeApi::class)
+    return when (Platform.osFamily) {
+        OsFamily.ANDROID -> true
+        else -> false
+    }
+}
+
+internal actual val IsDarwinMobile: Boolean get() {
+    @OptIn(ExperimentalNativeApi::class)
+    return when (Platform.osFamily) {
+        OsFamily.IOS,
+        OsFamily.TVOS,
+        OsFamily.WATCHOS-> true
+        else -> false
+    }
+}

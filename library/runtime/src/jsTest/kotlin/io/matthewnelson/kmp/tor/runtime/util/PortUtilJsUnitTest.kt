@@ -15,13 +15,14 @@
  **/
 package io.matthewnelson.kmp.tor.runtime.util
 
+import io.matthewnelson.kmp.process.InternalProcessApi
 import io.matthewnelson.kmp.tor.runtime.PortUtilBaseTest
 import io.matthewnelson.kmp.tor.runtime.ctrl.api.address.IPAddress
 import io.matthewnelson.kmp.tor.runtime.internal.net_createServer
 import io.matthewnelson.kmp.tor.runtime.internal.onError
 import kotlin.test.fail
 
-@OptIn(ExperimentalStdlibApi::class)
+@OptIn(ExperimentalStdlibApi::class, InternalProcessApi::class)
 class PortUtilJsUnitTest: PortUtilBaseTest() {
 
     override fun openServerSocket(

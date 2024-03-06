@@ -15,7 +15,7 @@
  **/
 package io.matthewnelson.kmp.tor.runtime.ctrl.api.builder
 
-import io.matthewnelson.kmp.file.SysPathSep
+import io.matthewnelson.kmp.file.SysDirSep
 import io.matthewnelson.kmp.file.path
 import io.matthewnelson.kmp.file.toFile
 import kotlin.test.*
@@ -45,7 +45,7 @@ abstract class UnixSocketBuilderBaseTest {
 
         val path = buildString {
             // rooted so current working dir (test dir) isn't resolved
-            append(SysPathSep)
+            append(SysDirSep)
             // sep + 104 characters (maximum size allowed is 105)
             repeat(104) { append('a') }
         }
@@ -66,7 +66,7 @@ abstract class UnixSocketBuilderBaseTest {
         }
 
         val path = buildString {
-            append(SysPathSep)
+            append(SysDirSep)
             repeat(15) { append('a') }
             appendLine()
             repeat(15) { append('a') }

@@ -15,8 +15,6 @@
  **/
 package io.matthewnelson.kmp.tor.runtime.ctrl.api.internal
 
-import io.matthewnelson.kmp.file.Buffer
-import io.matthewnelson.kmp.file.DelicateFileApi
 import io.matthewnelson.kmp.tor.runtime.ctrl.api.address.IPAddress
 import io.matthewnelson.kmp.tor.runtime.ctrl.api.address.IPAddress.Companion.toIPAddress
 import io.matthewnelson.kmp.tor.runtime.ctrl.api.address.LocalHost
@@ -33,16 +31,6 @@ internal actual fun LocalHost.Companion.tryPlatformResolve(set: LinkedHashSet<IP
         }
     } catch (_: Throwable) {
         return
-    }
-}
-
-internal actual fun LocalHost.Companion.execIfConfig(): String {
-    return try {
-        val buffer = child_process_execSync("ifconfig")
-        @OptIn(DelicateFileApi::class)
-        Buffer.wrap(buffer).toUtf8()
-    } catch (_: Throwable) {
-        ""
     }
 }
 

@@ -484,7 +484,7 @@ public final class io/matthewnelson/kmp/tor/runtime/ctrl/api/TorConfig$__HTTPTun
 
 public final class io/matthewnelson/kmp/tor/runtime/ctrl/api/TorConfig$__OwningControllerProcess : io/matthewnelson/kmp/tor/runtime/ctrl/api/TorConfig$Setting$Builder {
 	public static final field Companion Lio/matthewnelson/kmp/tor/runtime/ctrl/api/TorConfig$__OwningControllerProcess$Companion;
-	public field processId Ljava/lang/Integer;
+	public field processId I
 }
 
 public final class io/matthewnelson/kmp/tor/runtime/ctrl/api/TorConfig$__OwningControllerProcess$Companion : io/matthewnelson/kmp/tor/runtime/ctrl/api/TorConfig$Setting$Factory {

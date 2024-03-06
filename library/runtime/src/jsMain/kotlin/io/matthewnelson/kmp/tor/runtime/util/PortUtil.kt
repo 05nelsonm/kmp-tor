@@ -18,6 +18,7 @@
 package io.matthewnelson.kmp.tor.runtime.util
 
 import io.matthewnelson.kmp.file.IOException
+import io.matthewnelson.kmp.process.InternalProcessApi
 import io.matthewnelson.kmp.tor.runtime.ctrl.api.address.IPAddress
 import io.matthewnelson.kmp.tor.runtime.ctrl.api.address.LocalHost
 import io.matthewnelson.kmp.tor.runtime.ctrl.api.address.Port
@@ -72,6 +73,7 @@ public actual suspend fun Port.Proxy.findAvailableAsync(
     throw ctx.cancellationExceptionOr { i.unavailableException(ipAddress) }
 }
 
+@OptIn(InternalProcessApi::class)
 // @Throws(IOException::class, CancellationException::class)
 private suspend fun IPAddress.isPortAvailable(port: Int): Boolean {
     val timeMark = TimeSource.Monotonic.markNow()

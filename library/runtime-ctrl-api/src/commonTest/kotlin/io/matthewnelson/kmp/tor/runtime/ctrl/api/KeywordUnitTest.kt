@@ -32,7 +32,7 @@ class KeywordUnitTest {
     fun givenSettings_whenFilter_thenReturnsExpected() {
         val list = mutableListOf<TorConfig.Setting>()
         list.add(TorConfig.RunAsDaemon.Builder { enable = true })
-        list.add(TorConfig.__OwningControllerProcess.Builder { processId = 22 }!!)
+        list.add(TorConfig.__OwningControllerProcess.Builder { processId = 22 })
         list.add(TorConfig.DataDirectory.Builder { directory = File(".") }!!)
 
         assertEquals(3, list.size)

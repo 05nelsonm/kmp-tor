@@ -17,7 +17,11 @@
 
 package io.matthewnelson.kmp.tor.runtime.internal
 
+import io.matthewnelson.kmp.process.InternalProcessApi
+import io.matthewnelson.kmp.process.internal.events_EventEmitter
+
 @Suppress("NOTHING_TO_INLINE")
+@OptIn(InternalProcessApi::class)
 internal inline fun events_EventEmitter.onError(
     noinline callback: (err: dynamic) -> Unit,
 ) {
@@ -25,6 +29,7 @@ internal inline fun events_EventEmitter.onError(
 }
 
 @Suppress("NOTHING_TO_INLINE")
+@OptIn(InternalProcessApi::class)
 internal inline fun events_EventEmitter.onListening(
     noinline callback: () -> Unit,
 ) {

@@ -17,8 +17,11 @@
 
 package io.matthewnelson.kmp.tor.runtime.ctrl.api.internal
 
+import io.matthewnelson.kmp.file.IOException
 import io.matthewnelson.kmp.file.readUtf8
 import io.matthewnelson.kmp.file.toFile
+import io.matthewnelson.kmp.process.Process
+import io.matthewnelson.kmp.process.Stdio
 import io.matthewnelson.kmp.tor.runtime.ctrl.api.address.IPAddress
 import io.matthewnelson.kmp.tor.runtime.ctrl.api.address.IPAddress.Companion.toIPAddressOrNull
 import io.matthewnelson.kmp.tor.runtime.ctrl.api.address.LocalHost
@@ -26,14 +29,22 @@ import io.matthewnelson.kmp.tor.runtime.ctrl.api.address.LocalHost
 @Throws(Exception::class)
 internal expect fun LocalHost.Companion.tryPlatformResolve(set: LinkedHashSet<IPAddress>)
 
-internal expect fun LocalHost.Companion.execIfConfig(): String
-
 internal fun LocalHost.Companion.tryParsingIfConfig(set: LinkedHashSet<IPAddress>) {
     if (!IsUnixLikeHost) return
     if (IsAndroidHost) return
+    if (IsDarwinMobile) return
     if (set.hasIPv4IPv6) return
 
-    val out = execIfConfig().trimIndent()
+    val out = try {
+        Process.Builder(command = "ifconfig")
+            .stdin(Stdio.Null)
+            .output()
+            .stdout
+            .trimIndent()
+    } catch (_: IOException) {
+        return
+    }
+
     if (out.isBlank()) return
 
     val configs = mutableListOf<MutableList<String>>()

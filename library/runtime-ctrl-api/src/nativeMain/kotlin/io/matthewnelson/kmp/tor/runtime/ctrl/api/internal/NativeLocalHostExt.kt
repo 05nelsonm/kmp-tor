@@ -109,8 +109,3 @@ internal expect inline fun platform_inet_ntop(
     dst: CValuesRef<ByteVar>?,
     size: socklen_t,
 ): CPointer<ByteVar>?
-
-internal actual fun LocalHost.Companion.execIfConfig(): String {
-    // TODO: Issue #327
-    return ""
-}
