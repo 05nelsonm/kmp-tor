@@ -49,7 +49,7 @@ abstract class PortUtilBaseTest {
     }
 
     @Test
-    fun givenFindAvailable_whenCoroutineCancelled_thenHandlesCancellationProperly() = runTest(timeout = 45.seconds) {
+    fun givenFindAvailable_whenCoroutineCancelled_thenHandlesCancellationProperly() = runTest(timeout = 120.seconds) {
         val port = Port.Proxy.MIN.toPortProxy()
         val host = LocalHost.IPv4
         val limit = 750

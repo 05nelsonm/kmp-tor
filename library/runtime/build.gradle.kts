@@ -25,6 +25,7 @@ kmpConfiguration {
                     api(project(":library:runtime-ctrl-api"))
                     implementation(project(":library:runtime-ctrl"))
                     implementation(libs.encoding.base16)
+                    implementation(libs.kmp.process)
                     implementation(libs.kmp.tor.core.resource)
                     implementation(libs.kotlinx.coroutines.core)
                 }

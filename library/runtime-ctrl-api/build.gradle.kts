@@ -22,12 +22,12 @@ kmpConfiguration {
         common {
             sourceSetMain {
                 dependencies {
-                    api(libs.kmp.tor.core.api)
-                    implementation(libs.kmp.process)
-                    implementation(libs.kmp.tor.core.resource)
                     implementation(libs.encoding.base16)
                     implementation(libs.encoding.base32)
                     implementation(libs.encoding.base64)
+                    api(libs.kmp.tor.core.api)
+                    implementation(libs.kmp.process)
+                    implementation(libs.kmp.tor.core.resource)
                 }
             }
         }
