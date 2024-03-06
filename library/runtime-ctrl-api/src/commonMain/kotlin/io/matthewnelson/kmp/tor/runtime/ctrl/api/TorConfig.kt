@@ -21,6 +21,7 @@ import io.matthewnelson.immutable.collections.immutableSetOf
 import io.matthewnelson.immutable.collections.toImmutableMap
 import io.matthewnelson.immutable.collections.toImmutableSet
 import io.matthewnelson.kmp.file.*
+import io.matthewnelson.kmp.process.Process
 import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
 import io.matthewnelson.kmp.tor.core.api.annotation.KmpTorDsl
 import io.matthewnelson.kmp.tor.runtime.ctrl.api.address.IPAddress
@@ -34,7 +35,6 @@ import io.matthewnelson.kmp.tor.runtime.ctrl.api.TorConfig.Setting.Companion.fil
 import io.matthewnelson.kmp.tor.runtime.ctrl.api.builder.*
 import io.matthewnelson.kmp.tor.runtime.ctrl.api.internal.IsAndroidHost
 import io.matthewnelson.kmp.tor.runtime.ctrl.api.internal.IsUnixLikeHost
-import io.matthewnelson.kmp.tor.runtime.ctrl.api.internal.ProcessID
 import io.matthewnelson.kmp.tor.runtime.ctrl.api.internal.toByte
 import kotlin.jvm.JvmField
 import kotlin.jvm.JvmName
@@ -473,15 +473,15 @@ public class TorConfig private constructor(
     ) {
 
         @JvmField
-        public var processId: Int? = ProcessID
+        public var processId: Int = Process.Current.pid()
 
-        public companion object: Setting.Factory<__OwningControllerProcess, Setting?>(
+        public companion object: Setting.Factory<__OwningControllerProcess, Setting>(
             name = "__OwningControllerProcess",
             attributes = emptySet(),
             isStartArgument = true,
             isUnique = true,
             factory = { __OwningControllerProcess() },
-            build = { build(processId?.toString()) },
+            build = { build(processId.toString())!! },
         )
     }
 

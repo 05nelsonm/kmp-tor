@@ -29,11 +29,9 @@ internal actual val UnixSocketsNotSupportedMessage: String? by lazy {
         return@lazy "Tor does not support Unix Sockets on Windows"
     }
 
-    if (SysPathSep != '/') {
+    if (SysDirSep != '/') {
         "Unsupported OSHost[$host]"
     } else {
         null
     }
 }
-
-internal actual val ProcessID: Int? get() = process_pid

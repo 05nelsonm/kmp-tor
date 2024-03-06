@@ -15,7 +15,7 @@
  **/
 package io.matthewnelson.kmp.tor.runtime.ctrl.api.internal
 
-import io.matthewnelson.kmp.file.SysPathSep
+import io.matthewnelson.kmp.file.SysDirSep
 import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
 import io.matthewnelson.kmp.tor.core.resource.OSHost
 import io.matthewnelson.kmp.tor.core.resource.OSInfo
@@ -29,7 +29,7 @@ internal actual val IsUnixLikeHost: Boolean get() {
         is OSHost.Linux,
         is OSHost.MacOS -> true
         is OSHost.Windows -> false
-        else -> SysPathSep == '/'
+        else -> SysDirSep == '/'
     }
 }
 
@@ -39,3 +39,5 @@ internal actual val IsAndroidHost: Boolean get() {
     // Could be Java running on Android via Termux if JVM
     return OSInfo.INSTANCE.osHost is OSHost.Linux.Android
 }
+
+internal actual val IsDarwinMobile: Boolean get() = false

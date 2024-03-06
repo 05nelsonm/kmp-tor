@@ -23,6 +23,7 @@ kmpConfiguration {
             sourceSetMain {
                 dependencies {
                     api(libs.kmp.tor.core.api)
+                    implementation(libs.kmp.process)
                     implementation(libs.kmp.tor.core.resource)
                     implementation(libs.encoding.base16)
                     implementation(libs.encoding.base32)
