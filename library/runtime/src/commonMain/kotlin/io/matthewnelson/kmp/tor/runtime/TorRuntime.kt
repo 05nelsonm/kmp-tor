@@ -32,9 +32,9 @@ import io.matthewnelson.kmp.tor.runtime.ctrl.api.*
 import io.matthewnelson.kmp.tor.runtime.internal.InstanceKeeper
 import io.matthewnelson.kmp.tor.runtime.internal.RealTorRuntime
 import io.matthewnelson.kmp.tor.runtime.internal.RealTorRuntime.Companion.checkInstance
-import io.matthewnelson.kmp.tor.runtime.internal.sha256
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import org.kotlincrypto.hash.sha2.SHA256
 import kotlin.jvm.JvmField
 import kotlin.jvm.JvmName
 import kotlin.jvm.JvmStatic
@@ -264,7 +264,11 @@ public interface TorRuntime: TorEvent.Processor, RuntimeEvent.Processor {
          * SHA-256 hash of the [workDir] path.
          * */
         @get:JvmName("id")
-        public val id: String by lazy { workDir.path.encodeToByteArray().sha256() }
+        public val id: String by lazy {
+            SHA256()
+                .digest(workDir.path.encodeToByteArray())
+                .encodeToString(Base16)
+        }
 
         // TODO: debug & ability for RealTorRuntime to attach
         // TODO: hashPassword
