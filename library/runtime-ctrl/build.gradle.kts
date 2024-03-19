@@ -18,7 +18,7 @@ plugins {
 }
 
 kmpConfiguration {
-    configureShared(publish = true) {
+    configureShared(java9ModuleName = "io.matthewnelson.kmp.tor.runtime.ctrl", publish = true) {
         common {
             sourceSetMain {
                 dependencies {
