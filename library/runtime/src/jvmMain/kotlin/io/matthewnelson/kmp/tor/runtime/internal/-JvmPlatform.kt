@@ -17,12 +17,9 @@
 
 package io.matthewnelson.kmp.tor.runtime.internal
 
-import io.matthewnelson.encoding.base16.Base16
-import io.matthewnelson.encoding.core.Encoder.Companion.encodeToString
 import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
 import io.matthewnelson.kmp.tor.core.resource.OSInfo
 import io.matthewnelson.kmp.tor.runtime.TorRuntime
-import java.security.MessageDigest
 
 @JvmSynthetic
 @OptIn(InternalKmpTorApi::class)
@@ -45,12 +42,4 @@ private val AndroidTorRuntimeCreate by lazy {
     } catch (_: Throwable) {
         null
     }
-}
-
-@Suppress("NOTHING_TO_INLINE")
-internal actual inline fun ByteArray.sha256(): String {
-    return MessageDigest
-        .getInstance("SHA-256")
-        .digest(this)
-        .encodeToString(Base16)
 }

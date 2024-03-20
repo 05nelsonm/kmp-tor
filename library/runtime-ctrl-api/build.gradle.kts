@@ -18,15 +18,15 @@ plugins {
 }
 
 kmpConfiguration {
-    configureShared(publish = true) {
+    configureShared(java9ModuleName = "io.matthewnelson.kmp.tor.runtime.ctrl.api", publish = true) {
         common {
             sourceSetMain {
                 dependencies {
                     implementation(libs.encoding.base16)
                     implementation(libs.encoding.base32)
                     implementation(libs.encoding.base64)
-                    api(libs.kmp.tor.core.api)
                     implementation(libs.kmp.process)
+                    api(libs.kmp.tor.core.api)
                     implementation(libs.kmp.tor.core.resource)
                 }
             }

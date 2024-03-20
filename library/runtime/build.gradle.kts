@@ -18,7 +18,7 @@ plugins {
 }
 
 kmpConfiguration {
-    configureShared(publish = true) {
+    configureShared(java9ModuleName = "io.matthewnelson.kmp.tor.runtime", publish = true) {
         common {
             sourceSetMain {
                 dependencies {
@@ -27,6 +27,7 @@ kmpConfiguration {
                     implementation(libs.encoding.base16)
                     implementation(libs.kmp.process)
                     implementation(libs.kmp.tor.core.resource)
+                    implementation(libs.kotlincrypto.hash.sha2)
                     implementation(libs.kotlinx.coroutines.core)
                 }
             }
@@ -40,15 +41,12 @@ kmpConfiguration {
 
         kotlin {
             with(sourceSets) {
-                findByName("nonJvmMain")?.apply {
+                val jvmMain = findByName("jvmMain")
+                val nativeMain = findByName("nativeMain")?.apply {
                     dependencies {
                         implementation(libs.kotlincrypto.endians)
-                        implementation(libs.kotlincrypto.hash.sha2)
                     }
                 }
-
-                val jvmMain = findByName("jvmMain")
-                val nativeMain = findByName("nativeMain")
 
                 if (jvmMain != null || nativeMain != null) {
                     val nonJsMain = maybeCreate("nonJsMain")
