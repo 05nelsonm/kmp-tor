@@ -25,8 +25,8 @@ import kotlin.jvm.JvmStatic
  * Holder for a port between 0 and 65535 (inclusive)
  *
  * @see [Proxy]
- * @see [io.matthewnelson.kmp.tor.runtime.util.isAvailable]
- * @see [io.matthewnelson.kmp.tor.runtime.util.isAvailableAsync]
+ * @see [io.matthewnelson.kmp.tor.runtime.ctrl.api.util.isAvailable]
+ * @see [io.matthewnelson.kmp.tor.runtime.ctrl.api.util.isAvailableAsync]
  * */
 public open class Port private constructor(
     @JvmField
@@ -97,10 +97,10 @@ public open class Port private constructor(
     /**
      * A [Port] with a more constrained range of 1024 and 65535 (inclusive)
      *
-     * @see [io.matthewnelson.kmp.tor.runtime.util.isAvailable]
-     * @see [io.matthewnelson.kmp.tor.runtime.util.isAvailableAsync]
-     * @see [io.matthewnelson.kmp.tor.runtime.util.findAvailable]
-     * @see [io.matthewnelson.kmp.tor.runtime.util.findAvailableAsync]
+     * @see [io.matthewnelson.kmp.tor.runtime.ctrl.api.util.isAvailable]
+     * @see [io.matthewnelson.kmp.tor.runtime.ctrl.api.util.isAvailableAsync]
+     * @see [io.matthewnelson.kmp.tor.runtime.ctrl.api.util.findAvailable]
+     * @see [io.matthewnelson.kmp.tor.runtime.ctrl.api.util.findAvailableAsync]
      * */
     public class Proxy private constructor(value: Int): Port(value) {
 
