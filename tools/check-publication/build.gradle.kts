@@ -36,6 +36,14 @@ repositories {
 
 kmpConfiguration {
     configureShared(androidNamespace = "tools.check.publication") {
+        androidLibrary {
+            sourceSetMain {
+                dependencies {
+                    implementation("$group:runtime-mobile:$version")
+                }
+            }
+        }
+
         common {
             sourceSetMain {
                 dependencies {
@@ -43,6 +51,12 @@ kmpConfiguration {
                     implementation("$group:runtime-core:$version")
                     implementation("$group:runtime-ctrl:$version")
                 }
+            }
+        }
+
+        kotlin {
+            sourceSets.findByName("iosMain")?.dependencies {
+                implementation("$group:runtime-mobile:$version")
             }
         }
     }
