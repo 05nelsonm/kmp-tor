@@ -20,8 +20,8 @@ import io.matthewnelson.kmp.tor.core.resource.SynchronizedObject
 import io.matthewnelson.kmp.tor.core.resource.synchronized
 import io.matthewnelson.kmp.tor.runtime.RuntimeEvent
 import io.matthewnelson.kmp.tor.runtime.ctrl.AbstractTorEventProcessor
-import io.matthewnelson.kmp.tor.runtime.ctrl.api.ItBlock
-import io.matthewnelson.kmp.tor.runtime.ctrl.api.TorEvent
+import io.matthewnelson.kmp.tor.runtime.core.ItBlock
+import io.matthewnelson.kmp.tor.runtime.core.TorEvent
 
 @OptIn(InternalKmpTorApi::class)
 internal abstract class AbstractRuntimeEventProcessor(

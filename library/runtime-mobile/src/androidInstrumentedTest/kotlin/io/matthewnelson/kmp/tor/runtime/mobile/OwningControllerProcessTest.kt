@@ -15,7 +15,7 @@
  **/
 package io.matthewnelson.kmp.tor.runtime.mobile
 
-import io.matthewnelson.kmp.tor.runtime.ctrl.api.TorConfig
+import io.matthewnelson.kmp.tor.runtime.core.TorConfig
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull

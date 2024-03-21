@@ -15,7 +15,7 @@
  **/
 package io.matthewnelson.kmp.tor.runtime
 
-import io.matthewnelson.kmp.tor.runtime.ctrl.api.TorEvent
+import io.matthewnelson.kmp.tor.runtime.core.TorEvent
 import io.matthewnelson.kmp.tor.runtime.internal.AbstractRuntimeEventProcessor
 import kotlin.test.*
 

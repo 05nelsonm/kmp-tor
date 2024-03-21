@@ -1,4 +1,4 @@
-module io.matthewnelson.kmp.tor.runtime.ctrl.api {
+module io.matthewnelson.kmp.tor.runtime.core {
     requires transitive kotlin.stdlib;
     requires io.matthewnelson.encoding.base16;
     requires io.matthewnelson.encoding.base32;
@@ -10,9 +10,9 @@ module io.matthewnelson.kmp.tor.runtime.ctrl.api {
     requires io.matthewnelson.kmp.tor.core.resource;
     requires kotlinx.coroutines.core;
 
-    exports io.matthewnelson.kmp.tor.runtime.ctrl.api;
-    exports io.matthewnelson.kmp.tor.runtime.ctrl.api.address;
-    exports io.matthewnelson.kmp.tor.runtime.ctrl.api.builder;
-    exports io.matthewnelson.kmp.tor.runtime.ctrl.api.key;
-    exports io.matthewnelson.kmp.tor.runtime.ctrl.api.util;
+    exports io.matthewnelson.kmp.tor.runtime.core;
+    exports io.matthewnelson.kmp.tor.runtime.core.address;
+    exports io.matthewnelson.kmp.tor.runtime.core.builder;
+    exports io.matthewnelson.kmp.tor.runtime.core.key;
+    exports io.matthewnelson.kmp.tor.runtime.core.util;
 }

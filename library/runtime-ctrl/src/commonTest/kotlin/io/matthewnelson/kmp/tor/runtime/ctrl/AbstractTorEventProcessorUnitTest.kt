@@ -16,7 +16,7 @@
 package io.matthewnelson.kmp.tor.runtime.ctrl
 
 import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
-import io.matthewnelson.kmp.tor.runtime.ctrl.api.TorEvent
+import io.matthewnelson.kmp.tor.runtime.core.TorEvent
 import kotlin.test.*
 
 @OptIn(InternalKmpTorApi::class)

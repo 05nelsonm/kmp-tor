@@ -1,18 +1,18 @@
-public abstract class io/matthewnelson/kmp/tor/runtime/ctrl/AbstractTorEventProcessor : io/matthewnelson/kmp/tor/runtime/ctrl/api/TorEvent$Processor {
+public abstract class io/matthewnelson/kmp/tor/runtime/ctrl/AbstractTorEventProcessor : io/matthewnelson/kmp/tor/runtime/core/TorEvent$Processor {
 	protected static final field Companion Lio/matthewnelson/kmp/tor/runtime/ctrl/AbstractTorEventProcessor$Companion;
-	public final fun add (Lio/matthewnelson/kmp/tor/runtime/ctrl/api/TorEvent$Observer;)V
-	public final fun add ([Lio/matthewnelson/kmp/tor/runtime/ctrl/api/TorEvent$Observer;)V
+	public final fun add (Lio/matthewnelson/kmp/tor/runtime/core/TorEvent$Observer;)V
+	public final fun add ([Lio/matthewnelson/kmp/tor/runtime/core/TorEvent$Observer;)V
 	public fun clearObservers ()V
 	protected final fun isDestroyed ()Z
 	protected final fun isStaticTag (Ljava/lang/String;)Z
-	protected final fun notifyObservers (Lio/matthewnelson/kmp/tor/runtime/ctrl/api/TorEvent;Ljava/lang/String;)V
+	protected final fun notifyObservers (Lio/matthewnelson/kmp/tor/runtime/core/TorEvent;Ljava/lang/String;)V
 	protected fun onDestroy ()V
 	protected fun registered ()I
-	public final fun remove (Lio/matthewnelson/kmp/tor/runtime/ctrl/api/TorEvent$Observer;)V
-	public final fun remove ([Lio/matthewnelson/kmp/tor/runtime/ctrl/api/TorEvent$Observer;)V
-	public final fun removeAll (Lio/matthewnelson/kmp/tor/runtime/ctrl/api/TorEvent;)V
+	public final fun remove (Lio/matthewnelson/kmp/tor/runtime/core/TorEvent$Observer;)V
+	public final fun remove ([Lio/matthewnelson/kmp/tor/runtime/core/TorEvent$Observer;)V
+	public final fun removeAll (Lio/matthewnelson/kmp/tor/runtime/core/TorEvent;)V
 	public fun removeAll (Ljava/lang/String;)V
-	public final fun removeAll ([Lio/matthewnelson/kmp/tor/runtime/ctrl/api/TorEvent;)V
+	public final fun removeAll ([Lio/matthewnelson/kmp/tor/runtime/core/TorEvent;)V
 }
 
 protected final class io/matthewnelson/kmp/tor/runtime/ctrl/AbstractTorEventProcessor$Companion {

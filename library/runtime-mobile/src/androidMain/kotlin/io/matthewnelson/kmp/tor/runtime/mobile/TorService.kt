@@ -21,7 +21,7 @@ import androidx.startup.AppInitializer
 import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
 import io.matthewnelson.kmp.tor.runtime.RuntimeEvent
 import io.matthewnelson.kmp.tor.runtime.TorRuntime
-import io.matthewnelson.kmp.tor.runtime.ctrl.api.TorEvent
+import io.matthewnelson.kmp.tor.runtime.core.TorEvent
 import kotlin.concurrent.Volatile
 
 internal class TorService internal constructor(): AbstractTorService() {

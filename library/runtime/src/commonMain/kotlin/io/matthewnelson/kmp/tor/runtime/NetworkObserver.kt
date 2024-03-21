@@ -18,7 +18,7 @@ package io.matthewnelson.kmp.tor.runtime
 import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
 import io.matthewnelson.kmp.tor.core.resource.SynchronizedObject
 import io.matthewnelson.kmp.tor.core.resource.synchronized
-import io.matthewnelson.kmp.tor.runtime.ctrl.api.TorConfig
+import io.matthewnelson.kmp.tor.runtime.core.TorConfig
 import kotlin.jvm.JvmField
 import kotlin.jvm.JvmSynthetic
 
