@@ -22,7 +22,7 @@ kmpConfiguration {
         common {
             sourceSetMain {
                 dependencies {
-                    api(project(":library:runtime-ctrl-api"))
+                    api(project(":library:runtime-core"))
                     implementation(project(":library:runtime-ctrl"))
                     implementation(libs.encoding.base16)
                     implementation(libs.kmp.process)

@@ -48,11 +48,8 @@ plugins.withType<YarnPlugin> {
     the<YarnRootExtension>().lockFileDirectory = rootDir.resolve(".kotlin-js-store")
 }
 
-@Suppress("LocalVariableName")
 apiValidation {
-    val CHECK_PUBLICATION = findProperty("CHECK_PUBLICATION") as? String
-
-    if (CHECK_PUBLICATION != null) {
+    if (findProperty("CHECK_PUBLICATION") != null) {
         ignoredProjects.add("check-publication")
     } else {
         nonPublicMarkers.add("io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi")
