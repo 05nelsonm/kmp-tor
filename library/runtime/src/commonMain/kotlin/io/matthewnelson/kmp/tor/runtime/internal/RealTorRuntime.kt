@@ -20,9 +20,9 @@ import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
 import io.matthewnelson.kmp.tor.runtime.NetworkObserver
 import io.matthewnelson.kmp.tor.runtime.RuntimeEvent
 import io.matthewnelson.kmp.tor.runtime.TorRuntime
-import io.matthewnelson.kmp.tor.runtime.ctrl.api.ThisBlock
-import io.matthewnelson.kmp.tor.runtime.ctrl.api.TorConfig
-import io.matthewnelson.kmp.tor.runtime.ctrl.api.TorEvent
+import io.matthewnelson.kmp.tor.runtime.core.ThisBlock
+import io.matthewnelson.kmp.tor.runtime.core.TorConfig
+import io.matthewnelson.kmp.tor.runtime.core.TorEvent
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.NonCancellable
 import kotlin.jvm.JvmSynthetic

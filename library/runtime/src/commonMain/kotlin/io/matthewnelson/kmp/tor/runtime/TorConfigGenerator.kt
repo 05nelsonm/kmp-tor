@@ -20,18 +20,18 @@ import io.matthewnelson.kmp.file.resolve
 import io.matthewnelson.kmp.tor.core.api.ResourceInstaller
 import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
 import io.matthewnelson.kmp.tor.runtime.RuntimeEvent.*
-import io.matthewnelson.kmp.tor.runtime.ctrl.api.ThisBlock
-import io.matthewnelson.kmp.tor.runtime.ctrl.api.TorConfig
-import io.matthewnelson.kmp.tor.runtime.ctrl.api.TorConfig.*
-import io.matthewnelson.kmp.tor.runtime.ctrl.api.address.IPAddress
-import io.matthewnelson.kmp.tor.runtime.ctrl.api.address.LocalHost
-import io.matthewnelson.kmp.tor.runtime.ctrl.api.address.Port
-import io.matthewnelson.kmp.tor.runtime.ctrl.api.address.Port.Proxy.Companion.toPortProxy
-import io.matthewnelson.kmp.tor.runtime.ctrl.api.address.ProxyAddress.Companion.toProxyAddressOrNull
-import io.matthewnelson.kmp.tor.runtime.ctrl.api.apply
-import io.matthewnelson.kmp.tor.runtime.ctrl.api.builder.ExtendedTorConfigBuilder
-import io.matthewnelson.kmp.tor.runtime.ctrl.api.builder.UnixSocketBuilder
-import io.matthewnelson.kmp.tor.runtime.ctrl.api.util.isAvailableAsync
+import io.matthewnelson.kmp.tor.runtime.core.ThisBlock
+import io.matthewnelson.kmp.tor.runtime.core.TorConfig
+import io.matthewnelson.kmp.tor.runtime.core.TorConfig.*
+import io.matthewnelson.kmp.tor.runtime.core.address.IPAddress
+import io.matthewnelson.kmp.tor.runtime.core.address.LocalHost
+import io.matthewnelson.kmp.tor.runtime.core.address.Port
+import io.matthewnelson.kmp.tor.runtime.core.address.Port.Proxy.Companion.toPortProxy
+import io.matthewnelson.kmp.tor.runtime.core.address.ProxyAddress.Companion.toProxyAddressOrNull
+import io.matthewnelson.kmp.tor.runtime.core.apply
+import io.matthewnelson.kmp.tor.runtime.core.builder.ExtendedTorConfigBuilder
+import io.matthewnelson.kmp.tor.runtime.core.builder.UnixSocketBuilder
+import io.matthewnelson.kmp.tor.runtime.core.util.isAvailableAsync
 import kotlin.jvm.JvmSynthetic
 
 /**

@@ -22,7 +22,7 @@ import io.matthewnelson.kmp.file.File
 import io.matthewnelson.kmp.tor.core.api.ResourceInstaller
 import io.matthewnelson.kmp.tor.core.api.ResourceInstaller.Paths
 import io.matthewnelson.kmp.tor.runtime.TorRuntime
-import io.matthewnelson.kmp.tor.runtime.ctrl.api.ThisBlock
+import io.matthewnelson.kmp.tor.runtime.core.ThisBlock
 
 /**
  * Android extension which utilizes [Context.getDir] and [Context.getCacheDir]

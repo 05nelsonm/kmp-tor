@@ -32,7 +32,7 @@ if (CHECK_PUBLICATION != null) {
 } else {
     listOf(
         "runtime",
-        "runtime-ctrl-api",
+        "runtime-core",
         "runtime-ctrl",
         "runtime-mobile",
     ).forEach { name ->
