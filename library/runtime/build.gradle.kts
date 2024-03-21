@@ -27,7 +27,8 @@ kmpConfiguration {
                     implementation(libs.encoding.base16)
                     implementation(libs.kmp.process)
                     implementation(libs.kmp.tor.core.resource)
-                    implementation(libs.kotlincrypto.hash.sha2)
+                    implementation(kotlincrypto.secureRandom)
+                    implementation(kotlincrypto.hash.sha2)
                     implementation(libs.kotlinx.coroutines.core)
                 }
             }
@@ -44,7 +45,7 @@ kmpConfiguration {
                 val jvmMain = findByName("jvmMain")
                 val nativeMain = findByName("nativeMain")?.apply {
                     dependencies {
-                        implementation(libs.kotlincrypto.endians)
+                        implementation(kotlincrypto.endians.endians)
                     }
                 }
 
