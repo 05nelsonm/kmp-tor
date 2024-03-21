@@ -28,6 +28,12 @@ kmpConfiguration {
                     implementation(libs.kmp.process)
                     api(libs.kmp.tor.core.api)
                     implementation(libs.kmp.tor.core.resource)
+                    implementation(libs.kotlinx.coroutines.core)
+                }
+            }
+            sourceSetTest {
+                dependencies {
+                    implementation(libs.kotlinx.coroutines.test)
                 }
             }
         }
@@ -42,6 +48,25 @@ kmpConfiguration {
                     nonNativeMain.dependsOn(getByName("commonMain"))
                     jvmMain?.apply { dependsOn(nonNativeMain) }
                     jsMain?.apply { dependsOn(nonNativeMain) }
+                }
+
+                val nativeMain = findByName("nativeMain")?.apply {
+                    dependencies {
+                        implementation(kotlincrypto.endians.endians)
+                    }
+                }
+
+                if (jvmMain != null || nativeMain != null) {
+                    val nonJsMain = maybeCreate("nonJsMain")
+                    val nonJsTest = maybeCreate("nonJsTest")
+
+                    nonJsMain.dependsOn(getByName("commonMain"))
+                    nonJsTest.dependsOn(getByName("commonTest"))
+
+                    jvmMain?.apply { dependsOn(nonJsMain) }
+                    findByName("jvmTest")?.apply { dependsOn(nonJsTest) }
+                    nativeMain?.apply { dependsOn(nonJsMain) }
+                    findByName("nativeTest")?.apply { dependsOn(nonJsTest) }
                 }
             }
         }

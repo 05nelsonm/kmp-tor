@@ -27,7 +27,8 @@ kmpConfiguration {
                     implementation(libs.encoding.base16)
                     implementation(libs.kmp.process)
                     implementation(libs.kmp.tor.core.resource)
-                    implementation(libs.kotlincrypto.hash.sha2)
+                    implementation(kotlincrypto.secureRandom)
+                    implementation(kotlincrypto.hash.sha2)
                     implementation(libs.kotlinx.coroutines.core)
                 }
             }
@@ -35,30 +36,6 @@ kmpConfiguration {
             sourceSetTest {
                 dependencies {
                     implementation(libs.kotlinx.coroutines.test)
-                }
-            }
-        }
-
-        kotlin {
-            with(sourceSets) {
-                val jvmMain = findByName("jvmMain")
-                val nativeMain = findByName("nativeMain")?.apply {
-                    dependencies {
-                        implementation(libs.kotlincrypto.endians)
-                    }
-                }
-
-                if (jvmMain != null || nativeMain != null) {
-                    val nonJsMain = maybeCreate("nonJsMain")
-                    val nonJsTest = maybeCreate("nonJsTest")
-
-                    nonJsMain.dependsOn(getByName("commonMain"))
-                    nonJsTest.dependsOn(getByName("commonTest"))
-
-                    jvmMain?.apply { dependsOn(nonJsMain) }
-                    findByName("jvmTest")?.apply { dependsOn(nonJsTest) }
-                    nativeMain?.apply { dependsOn(nonJsMain) }
-                    findByName("nativeTest")?.apply { dependsOn(nonJsTest) }
                 }
             }
         }

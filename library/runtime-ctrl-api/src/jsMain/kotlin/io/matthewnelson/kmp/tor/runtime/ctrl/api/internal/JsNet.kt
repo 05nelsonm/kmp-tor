@@ -13,42 +13,32 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-@file:Suppress("KotlinRedundantDiagnosticSuppress")
+@file:Suppress("ClassName", "FunctionName")
+@file:JsModule("net")
+@file:JsNonModule
 
 package io.matthewnelson.kmp.tor.runtime.ctrl.api.internal
 
-import io.matthewnelson.kmp.file.*
 import io.matthewnelson.kmp.process.InternalProcessApi
+import io.matthewnelson.kmp.process.internal.events_EventEmitter
 import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
-import io.matthewnelson.kmp.tor.core.resource.OSHost
-import io.matthewnelson.kmp.tor.core.resource.OSInfo
 
+/** [docs](https://nodejs.org/api/net.html#netcreateserveroptions-connectionlistener) */
+@JsName("createServer")
 @OptIn(InternalKmpTorApi::class)
-internal actual val UnixSocketsNotSupportedMessage: String? by lazy {
-    val host = OSInfo.INSTANCE.osHost
-    if (host is OSHost.Windows) {
-        return@lazy "Tor does not support Unix Sockets on Windows"
-    }
+internal external fun net_createServer(connectionListener: (socket: net_Socket) -> Unit): net_Server
 
-    if (SysDirSep != '/') {
-        "Unsupported OSHost[$host]"
-    } else {
-        null
-    }
+/** [docs](https://nodejs.org/api/net.html#class-netserver) */
+@JsName("Server")
+@OptIn(InternalProcessApi::class)
+internal external class net_Server: events_EventEmitter {
+    fun close()
+    fun listen(port: Int, host: String, backlog: Int, callback: () -> Unit)
 }
 
-@Suppress("NOTHING_TO_INLINE")
-@OptIn(InternalProcessApi::class)
-internal inline fun net_Server.onError(
-    noinline callback: (err: dynamic) -> Unit,
-) {
-    on("error", callback)
-}
-
-@Suppress("NOTHING_TO_INLINE")
-@OptIn(InternalProcessApi::class)
-internal inline fun net_Server.onListening(
-    noinline callback: () -> Unit,
-) {
-    on("listening", callback)
+/** [docs](https://nodejs.org/api/net.html#class-netsocket) */
+@JsName("Socket")
+@InternalKmpTorApi
+public external class net_Socket {
+    public fun destroy()
 }

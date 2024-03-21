@@ -26,16 +26,12 @@ import io.matthewnelson.kmp.tor.runtime.ctrl.api.TorConfig.*
 import io.matthewnelson.kmp.tor.runtime.ctrl.api.address.IPAddress
 import io.matthewnelson.kmp.tor.runtime.ctrl.api.address.LocalHost
 import io.matthewnelson.kmp.tor.runtime.ctrl.api.address.Port
-import io.matthewnelson.kmp.tor.runtime.ctrl.api.address.Port.Companion.toPort
-import io.matthewnelson.kmp.tor.runtime.ctrl.api.address.Port.Companion.toPortOrNull
 import io.matthewnelson.kmp.tor.runtime.ctrl.api.address.Port.Proxy.Companion.toPortProxy
-import io.matthewnelson.kmp.tor.runtime.ctrl.api.address.Port.Proxy.Companion.toPortProxyOrNull
 import io.matthewnelson.kmp.tor.runtime.ctrl.api.address.ProxyAddress.Companion.toProxyAddressOrNull
 import io.matthewnelson.kmp.tor.runtime.ctrl.api.apply
 import io.matthewnelson.kmp.tor.runtime.ctrl.api.builder.ExtendedTorConfigBuilder
 import io.matthewnelson.kmp.tor.runtime.ctrl.api.builder.UnixSocketBuilder
-import io.matthewnelson.kmp.tor.runtime.util.isAvailableAsync
-import kotlinx.coroutines.delay
+import io.matthewnelson.kmp.tor.runtime.ctrl.api.util.isAvailableAsync
 import kotlin.jvm.JvmSynthetic
 
 /**

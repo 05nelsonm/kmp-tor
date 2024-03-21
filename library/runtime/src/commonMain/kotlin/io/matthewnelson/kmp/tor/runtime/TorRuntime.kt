@@ -34,6 +34,8 @@ import io.matthewnelson.kmp.tor.runtime.internal.RealTorRuntime
 import io.matthewnelson.kmp.tor.runtime.internal.RealTorRuntime.Companion.checkInstance
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import org.kotlincrypto.SecRandomCopyException
+import org.kotlincrypto.SecureRandom
 import org.kotlincrypto.hash.sha2.SHA256
 import kotlin.jvm.JvmField
 import kotlin.jvm.JvmName
@@ -265,13 +267,9 @@ public interface TorRuntime: TorEvent.Processor, RuntimeEvent.Processor {
          * */
         @get:JvmName("id")
         public val id: String by lazy {
-            SHA256()
-                .digest(workDir.path.encodeToByteArray())
-                .encodeToString(Base16)
+            val bytes = workDir.path.encodeToByteArray()
+            SHA256().digest(bytes).encodeToString(Base16)
         }
-
-        // TODO: debug & ability for RealTorRuntime to attach
-        // TODO: hashPassword
 
         public companion object {
 
@@ -393,7 +391,11 @@ public interface TorRuntime: TorEvent.Processor, RuntimeEvent.Processor {
 
         @get:JvmSynthetic
         internal val staticObserverTag: String by lazy {
-            Random.Default.nextBytes(16).encodeToString(Base16)
+            try {
+                SecureRandom().nextBytesOf(16)
+            } catch (_: SecRandomCopyException) {
+                Random.Default.nextBytes(16)
+            }.encodeToString(Base16)
         }
     }
 
