@@ -25,6 +25,7 @@ import io.matthewnelson.kmp.tor.runtime.TorRuntime
 import io.matthewnelson.kmp.tor.runtime.core.ItBlock
 import io.matthewnelson.kmp.tor.runtime.core.TorEvent
 import io.matthewnelson.kmp.tor.runtime.core.TorJob
+import io.matthewnelson.kmp.tor.runtime.core.ctrl.TorCmd
 
 internal class TorService internal constructor(): AbstractTorService() {
 
@@ -38,6 +39,14 @@ internal class TorService internal constructor(): AbstractTorService() {
             action: RuntimeAction,
             onFailure: ItBlock<Throwable>?,
             onSuccess: ItBlock<Unit>,
+        ): TorJob {
+            TODO("Not yet implemented")
+        }
+
+        override fun <Response : Any> enqueue(
+            cmd: TorCmd.Unprivileged<Response>,
+            onFailure: ItBlock<Throwable>?,
+            onSuccess: ItBlock<Response>
         ): TorJob {
             TODO("Not yet implemented")
         }

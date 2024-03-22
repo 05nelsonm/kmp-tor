@@ -29,6 +29,7 @@ import io.matthewnelson.kmp.tor.core.api.annotation.KmpTorDsl
 import io.matthewnelson.kmp.tor.runtime.TorRuntime.Companion.Builder
 import io.matthewnelson.kmp.tor.runtime.TorRuntime.Environment.Companion.Builder
 import io.matthewnelson.kmp.tor.runtime.core.*
+import io.matthewnelson.kmp.tor.runtime.core.ctrl.TorCmd
 import io.matthewnelson.kmp.tor.runtime.internal.InstanceKeeper
 import io.matthewnelson.kmp.tor.runtime.internal.RealTorRuntime
 import io.matthewnelson.kmp.tor.runtime.internal.RealTorRuntime.Companion.checkInstance
@@ -49,6 +50,7 @@ import kotlin.random.Random
  * @see [Companion.Builder]
  * */
 public interface TorRuntime:
+    TorCmd.Unprivileged.Processor,
     TorEvent.Processor,
     RuntimeAction.Processor,
     RuntimeEvent.Processor

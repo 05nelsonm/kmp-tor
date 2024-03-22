@@ -119,7 +119,7 @@ public final class io/matthewnelson/kmp/tor/runtime/TorConfigGenerator {
 	public synthetic fun <init> (Lio/matthewnelson/kmp/tor/runtime/TorRuntime$Environment;ZZLjava/util/List;Lkotlin/jvm/functions/Function3;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
 }
 
-public abstract interface class io/matthewnelson/kmp/tor/runtime/TorRuntime : io/matthewnelson/kmp/tor/runtime/RuntimeAction$Processor, io/matthewnelson/kmp/tor/runtime/RuntimeEvent$Processor, io/matthewnelson/kmp/tor/runtime/core/TorEvent$Processor {
+public abstract interface class io/matthewnelson/kmp/tor/runtime/TorRuntime : io/matthewnelson/kmp/tor/runtime/RuntimeAction$Processor, io/matthewnelson/kmp/tor/runtime/RuntimeEvent$Processor, io/matthewnelson/kmp/tor/runtime/core/TorEvent$Processor, io/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$Unprivileged$Processor {
 	public static final field Companion Lio/matthewnelson/kmp/tor/runtime/TorRuntime$Companion;
 	public static fun Builder (Lio/matthewnelson/kmp/tor/runtime/TorRuntime$Environment;Lio/matthewnelson/kmp/tor/runtime/core/ThisBlock;)Lio/matthewnelson/kmp/tor/runtime/TorRuntime;
 	public abstract fun environment ()Lio/matthewnelson/kmp/tor/runtime/TorRuntime$Environment;

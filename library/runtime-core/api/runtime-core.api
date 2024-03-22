@@ -848,6 +848,318 @@ public final class io/matthewnelson/kmp/tor/runtime/core/builder/UnixSocketBuild
 public final class io/matthewnelson/kmp/tor/runtime/core/builder/UnixSocketBuilder$Companion {
 }
 
+public final class io/matthewnelson/kmp/tor/runtime/core/ctrl/AddressMapping {
+	public fun <init> ()V
+}
+
+public final class io/matthewnelson/kmp/tor/runtime/core/ctrl/AddressMapping$Result {
+	public fun <init> ()V
+}
+
+public final class io/matthewnelson/kmp/tor/runtime/core/ctrl/ClientAuthEntry {
+	public fun <init> ()V
+}
+
+public final class io/matthewnelson/kmp/tor/runtime/core/ctrl/ConfigEntry {
+	public fun <init> ()V
+}
+
+public final class io/matthewnelson/kmp/tor/runtime/core/ctrl/HiddenServiceEntry {
+	public fun <init> ()V
+}
+
+public abstract class io/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd {
+	public static final field Companion Lio/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$Companion;
+	public final field name Lio/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$Name;
+	public synthetic fun <init> (Lio/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$Name;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public static final fun enqueueAsync (Lio/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$Privileged$Processor;Lio/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$Privileged;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static final fun enqueueAsync (Lio/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$Unprivileged$Processor;Lio/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$Unprivileged;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public final fun toString ()Ljava/lang/String;
+}
+
+public final class io/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$Authenticate : io/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$Privileged {
+	public static final field Companion Lio/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$Authenticate$Companion;
+	public static final field NONE Lio/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$Authenticate;
+	public final field key Ljava/lang/String;
+	public synthetic fun <init> (Ljava/lang/String;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public static final fun cookie ([B)Lio/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$Authenticate;
+	public static final fun password (Ljava/lang/String;)Lio/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$Authenticate;
+}
+
+public final class io/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$Authenticate$Companion {
+	public final fun cookie ([B)Lio/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$Authenticate;
+	public final fun password (Ljava/lang/String;)Lio/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$Authenticate;
+}
+
+public final class io/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$Companion {
+	public final fun enqueueAsync (Lio/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$Privileged$Processor;Lio/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$Privileged;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public final fun enqueueAsync (Lio/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$Unprivileged$Processor;Lio/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$Unprivileged;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+}
+
+public final class io/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$Config {
+	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$Config;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$Config$Get : io/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$Unprivileged {
+	public final field keywords Ljava/util/Set;
+	public fun <init> (Lio/matthewnelson/kmp/tor/runtime/core/TorConfig$Keyword;)V
+	public fun <init> (Ljava/util/Collection;)V
+	public fun <init> ([Lio/matthewnelson/kmp/tor/runtime/core/TorConfig$Keyword;)V
+}
+
+public final class io/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$Config$Load : io/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$Privileged {
+	public final field config Lio/matthewnelson/kmp/tor/runtime/core/TorConfig;
+	public fun <init> (Lio/matthewnelson/kmp/tor/runtime/core/TorConfig;)V
+}
+
+public final class io/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$Config$Reset : io/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$Unprivileged {
+	public final field keywords Ljava/util/Set;
+	public fun <init> (Lio/matthewnelson/kmp/tor/runtime/core/TorConfig$Keyword;)V
+	public fun <init> (Ljava/util/Collection;)V
+	public fun <init> ([Lio/matthewnelson/kmp/tor/runtime/core/TorConfig$Keyword;)V
+}
+
+public final class io/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$Config$Save : io/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$Unprivileged {
+	public final field force Z
+	public fun <init> ()V
+	public fun <init> (Z)V
+}
+
+public final class io/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$Config$Set : io/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$Unprivileged {
+	public final field settings Ljava/util/Set;
+	public fun <init> (Lio/matthewnelson/kmp/tor/runtime/core/TorConfig$Setting;)V
+	public fun <init> (Ljava/util/Collection;)V
+	public fun <init> ([Lio/matthewnelson/kmp/tor/runtime/core/TorConfig$Setting;)V
+}
+
+public final class io/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$DropGuards : io/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$Unprivileged {
+	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$DropGuards;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun hashCode ()I
+}
+
+public final class io/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$Hs {
+	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$Hs;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$Hs$Fetch : io/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$Unprivileged {
+	public final field address Lio/matthewnelson/kmp/tor/runtime/core/address/OnionAddress;
+	public fun <init> (Lio/matthewnelson/kmp/tor/runtime/core/address/OnionAddress;)V
+	public fun <init> (Lio/matthewnelson/kmp/tor/runtime/core/key/AddressKey$Public;)V
+}
+
+public final class io/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$Info {
+	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$Info;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$Info$Get : io/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$Unprivileged {
+	public final field keywords Ljava/util/Set;
+	public fun <init> (Ljava/lang/String;)V
+	public fun <init> (Ljava/util/Collection;)V
+	public fun <init> ([Ljava/lang/String;)V
+}
+
+public final class io/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$MapAddress : io/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$Unprivileged {
+	public final field mappings Ljava/util/Set;
+	public fun <init> (Lio/matthewnelson/kmp/tor/runtime/core/ctrl/AddressMapping;)V
+	public fun <init> (Ljava/util/Collection;)V
+	public fun <init> ([Lio/matthewnelson/kmp/tor/runtime/core/ctrl/AddressMapping;)V
+}
+
+public final class io/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$Name : java/lang/Enum {
+	public static final field ADD_ONION Lio/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$Name;
+	public static final field AUTHENTICATE Lio/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$Name;
+	public static final field DEL_ONION Lio/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$Name;
+	public static final field DROPGUARDS Lio/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$Name;
+	public static final field DROPOWNERSHIP Lio/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$Name;
+	public static final field GETCONF Lio/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$Name;
+	public static final field GETINFO Lio/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$Name;
+	public static final field HSFETCH Lio/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$Name;
+	public static final field LOADCONF Lio/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$Name;
+	public static final field MAPADDRESS Lio/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$Name;
+	public static final field ONION_CLIENT_AUTH_ADD Lio/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$Name;
+	public static final field ONION_CLIENT_AUTH_REMOVE Lio/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$Name;
+	public static final field ONION_CLIENT_AUTH_VIEW Lio/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$Name;
+	public static final field RESETCONF Lio/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$Name;
+	public static final field RESOLVE Lio/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$Name;
+	public static final field SAVECONF Lio/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$Name;
+	public static final field SETCONF Lio/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$Name;
+	public static final field SETEVENTS Lio/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$Name;
+	public static final field SIGNAL Lio/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$Name;
+	public static final field TAKEOWNERSHIP Lio/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$Name;
+	public static fun getEntries ()Lkotlin/enums/EnumEntries;
+	public static fun valueOf (Ljava/lang/String;)Lio/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$Name;
+	public static fun values ()[Lio/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$Name;
+}
+
+public final class io/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$Onion {
+	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$Onion;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$Onion$Add : io/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$Unprivileged {
+}
+
+public final class io/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$Onion$Delete : io/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$Unprivileged {
+	public final field address Lio/matthewnelson/kmp/tor/runtime/core/address/OnionAddress;
+	public fun <init> (Lio/matthewnelson/kmp/tor/runtime/core/address/OnionAddress;)V
+	public fun <init> (Lio/matthewnelson/kmp/tor/runtime/core/key/AddressKey$Public;)V
+}
+
+public final class io/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$OnionClientAuth {
+	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$OnionClientAuth;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$OnionClientAuth$Add : io/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$Unprivileged {
+}
+
+public final class io/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$OnionClientAuth$Remove : io/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$Unprivileged {
+	public final field address Lio/matthewnelson/kmp/tor/runtime/core/address/OnionAddress;
+	public fun <init> (Lio/matthewnelson/kmp/tor/runtime/core/address/OnionAddress$V3;)V
+	public fun <init> (Lio/matthewnelson/kmp/tor/runtime/core/key/ED25519_V3$PublicKey;)V
+}
+
+public final class io/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$OnionClientAuth$View : io/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$Unprivileged {
+	public static final field ALL Lio/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$OnionClientAuth$View;
+	public static final field Companion Lio/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$OnionClientAuth$View$Companion;
+	public final field address Lio/matthewnelson/kmp/tor/runtime/core/address/OnionAddress;
+	public fun <init> (Lio/matthewnelson/kmp/tor/runtime/core/address/OnionAddress$V3;)V
+	public fun <init> (Lio/matthewnelson/kmp/tor/runtime/core/key/ED25519_V3$PublicKey;)V
+}
+
+public final class io/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$OnionClientAuth$View$Companion {
+}
+
+public final class io/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$Ownership {
+	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$Ownership;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$Ownership$Drop : io/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$Privileged {
+	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$Ownership$Drop;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun hashCode ()I
+}
+
+public final class io/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$Ownership$Take : io/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$Privileged {
+	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$Ownership$Take;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun hashCode ()I
+}
+
+public abstract class io/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$Privileged : io/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd {
+	public synthetic fun <init> (Lio/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$Name;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
+}
+
+public abstract interface class io/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$Privileged$Processor : io/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$Unprivileged$Processor {
+	public abstract fun enqueue (Lio/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$Privileged;Lio/matthewnelson/kmp/tor/runtime/core/ItBlock;Lio/matthewnelson/kmp/tor/runtime/core/ItBlock;)Lio/matthewnelson/kmp/tor/runtime/core/TorJob;
+}
+
+public final class io/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$Resolve : io/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$Unprivileged {
+	public final field hostname Ljava/lang/String;
+	public final field reverse Z
+	public fun <init> (Lio/matthewnelson/kmp/tor/runtime/core/address/IPAddress$V4;Z)V
+	public fun <init> (Ljava/lang/String;Z)V
+}
+
+public final class io/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$SetEvents : io/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$Unprivileged {
+	public final field events Ljava/util/Set;
+	public fun <init> (Lio/matthewnelson/kmp/tor/runtime/core/TorEvent;)V
+	public fun <init> (Ljava/util/Collection;)V
+	public fun <init> ([Lio/matthewnelson/kmp/tor/runtime/core/TorEvent;)V
+}
+
+public final class io/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$Signal {
+	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$Signal;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$Signal$Active : io/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$Unprivileged {
+	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$Signal$Active;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun hashCode ()I
+}
+
+public final class io/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$Signal$ClearDnsCache : io/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$Unprivileged {
+	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$Signal$ClearDnsCache;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun hashCode ()I
+}
+
+public final class io/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$Signal$Debug : io/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$Unprivileged {
+	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$Signal$Debug;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun hashCode ()I
+}
+
+public final class io/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$Signal$Dormant : io/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$Unprivileged {
+	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$Signal$Dormant;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun hashCode ()I
+}
+
+public final class io/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$Signal$Dump : io/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$Unprivileged {
+	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$Signal$Dump;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun hashCode ()I
+}
+
+public final class io/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$Signal$Halt : io/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$Privileged {
+	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$Signal$Halt;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun hashCode ()I
+}
+
+public final class io/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$Signal$Heartbeat : io/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$Unprivileged {
+	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$Signal$Heartbeat;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun hashCode ()I
+}
+
+public final class io/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$Signal$NewNym : io/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$Unprivileged {
+	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$Signal$NewNym;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun hashCode ()I
+}
+
+public final class io/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$Signal$Reload : io/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$Unprivileged {
+	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$Signal$Reload;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun hashCode ()I
+}
+
+public final class io/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$Signal$Shutdown : io/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$Privileged {
+	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$Signal$Shutdown;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun hashCode ()I
+}
+
+public abstract class io/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$Unprivileged : io/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd {
+	public synthetic fun <init> (Lio/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$Name;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
+}
+
+public abstract interface class io/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$Unprivileged$Processor {
+	public abstract fun enqueue (Lio/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$Unprivileged;Lio/matthewnelson/kmp/tor/runtime/core/ItBlock;Lio/matthewnelson/kmp/tor/runtime/core/ItBlock;)Lio/matthewnelson/kmp/tor/runtime/core/TorJob;
+}
+
 public final class io/matthewnelson/kmp/tor/runtime/core/key/AddressKey {
 }
 
