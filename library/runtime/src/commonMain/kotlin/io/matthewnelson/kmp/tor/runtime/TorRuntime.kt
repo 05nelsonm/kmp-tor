@@ -43,30 +43,18 @@ import kotlin.jvm.JvmStatic
 import kotlin.jvm.JvmSynthetic
 import kotlin.random.Random
 
-public interface TorRuntime: TorEvent.Processor, RuntimeEvent.Processor {
+/**
+ * Base interface for managing and interacting with tor.
+ *
+ * @see [Companion.Builder]
+ * */
+public interface TorRuntime:
+    TorEvent.Processor,
+    RuntimeAction.Processor,
+    RuntimeEvent.Processor
+{
 
     public fun environment(): Environment
-
-    /**
-     * Starts the tor daemon.
-     *
-     * If tor is running, will do nothing.
-     * */
-    public fun startDaemon()
-
-    /**
-     * Stops the tor daemon.
-     *
-     * If tor is not running, will do nothing.
-     * */
-    public fun stopDaemon()
-
-    /**
-     * Stops and then starts the tor daemon.
-     *
-     * If tor is not running, will do nothing.
-     * */
-    public fun restartDaemon()
 
     public companion object {
 
@@ -87,9 +75,7 @@ public interface TorRuntime: TorEvent.Processor, RuntimeEvent.Processor {
     }
 
     @KmpTorDsl
-    public class Builder private constructor(
-        private val environment: Environment
-    ) {
+    public class Builder private constructor(private val environment: Environment) {
 
         private val config = mutableListOf<ThisBlock.WithIt<TorConfig.Builder, Environment>>()
         private val staticTorEvents = mutableSetOf(TorEvent.CONF_CHANGED, TorEvent.NOTICE)
@@ -360,6 +346,8 @@ public interface TorRuntime: TorEvent.Processor, RuntimeEvent.Processor {
             @JvmField
             public var torrcDefaultsFile: File = workDir.resolve("torrc-defaults")
 
+            // TODO: error handler
+
             internal companion object: InstanceKeeper<File, Environment>() {
 
                 @JvmSynthetic
@@ -373,10 +361,9 @@ public interface TorRuntime: TorEvent.Processor, RuntimeEvent.Processor {
                     // Apply block outside getOrCreateInstance call to
                     // prevent double instance creation
                     if (block != null) b.apply(block)
+                    val torResource = installer(b.installationDir.absoluteFile.normalize())
 
                     return getOrCreateInstance(key = b.workDir) {
-                        val torResource = installer(b.installationDir.absoluteFile.normalize())
-
                         Environment(
                             workDir = b.workDir,
                             cacheDir = b.cacheDir,

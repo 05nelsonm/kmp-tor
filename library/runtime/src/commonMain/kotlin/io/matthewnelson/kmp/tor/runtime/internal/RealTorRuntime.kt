@@ -19,12 +19,12 @@ import io.matthewnelson.immutable.collections.toImmutableSet
 import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
 import io.matthewnelson.kmp.tor.runtime.NetworkObserver
 import io.matthewnelson.kmp.tor.runtime.RuntimeEvent
+import io.matthewnelson.kmp.tor.runtime.RuntimeAction
 import io.matthewnelson.kmp.tor.runtime.TorRuntime
-import io.matthewnelson.kmp.tor.runtime.core.ThisBlock
-import io.matthewnelson.kmp.tor.runtime.core.TorConfig
-import io.matthewnelson.kmp.tor.runtime.core.TorEvent
+import io.matthewnelson.kmp.tor.runtime.core.*
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.NonCancellable
+import kotlin.apply
 import kotlin.jvm.JvmSynthetic
 
 @OptIn(InternalKmpTorApi::class)
@@ -39,19 +39,15 @@ internal class RealTorRuntime private constructor(
     TorRuntime
 {
 
+    override fun enqueue(
+        action: RuntimeAction,
+        onFailure: ItBlock<Throwable>?,
+        onSuccess: ItBlock<Unit>,
+    ): TorJob {
+        TODO("Not yet implemented")
+    }
+
     override fun environment(): TorRuntime.Environment = environment
-
-    override fun startDaemon() {
-        // TODO("Not yet implemented")
-    }
-
-    override fun stopDaemon() {
-        // TODO("Not yet implemented")
-    }
-
-    override fun restartDaemon() {
-        // TODO("Not yet implemented")
-    }
 
     internal companion object {
 
