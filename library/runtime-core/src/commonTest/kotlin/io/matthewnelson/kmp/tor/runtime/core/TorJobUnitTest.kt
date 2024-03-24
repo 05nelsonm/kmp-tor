@@ -24,7 +24,7 @@ class TorJobUnitTest {
 
     @Test
     fun givenInstantiation_whenInitialState_thenIsEnqueued() {
-        assertEquals(TorJob.State.Enqueued, TestJob().state)
+        assertEquals(QueuedJob.State.Enqueued, TestJob().state)
     }
 
     @Test
@@ -47,7 +47,7 @@ class TorJobUnitTest {
         job.cancel(IllegalArgumentException())
         assertEquals(1, invocationCancel)
         assertEquals(1, invocationFail)
-        assertEquals(TorJob.State.Cancelled, job.state)
+        assertEquals(QueuedJob.State.Cancelled, job.state)
         assertFalse(job.isActive)
 
         job.cancel(Throwable())
@@ -72,15 +72,15 @@ class TorJobUnitTest {
         val job = TestJob()
 
         job.executing()
-        assertEquals(TorJob.State.Executing, job.state)
+        assertEquals(QueuedJob.State.Executing, job.state)
         assertTrue(job.isActive)
 
         job.cancel(null)
-        assertEquals(TorJob.State.Executing, job.state)
+        assertEquals(QueuedJob.State.Executing, job.state)
         assertTrue(job.isActive)
 
         job.completion {  }
-        assertEquals(TorJob.State.Completed, job.state)
+        assertEquals(QueuedJob.State.Completed, job.state)
         assertFalse(job.isActive)
     }
 
@@ -88,7 +88,7 @@ class TorJobUnitTest {
         name: String = "",
         private val cancellation: (cause: Throwable?) -> Unit = {},
         onFailure: ItBlock<Throwable>? = null,
-    ): TorJob(name, onFailure) {
+    ): QueuedJob(name, onFailure) {
         override fun onCancellation(cause: Throwable?) {
             cancellation(cause)
         }

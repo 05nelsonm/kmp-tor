@@ -17,12 +17,14 @@ package io.matthewnelson.kmp.tor.runtime.ctrl
 
 import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
 import io.matthewnelson.kmp.tor.runtime.core.TorEvent
+import io.matthewnelson.kmp.tor.runtime.core.UncaughtExceptionHandler
 import kotlin.test.*
 
 @OptIn(InternalKmpTorApi::class)
 class AbstractTorEventProcessorUnitTest {
 
     private class TestProcessor: AbstractTorEventProcessor("static", emptySet()) {
+        override val exceptionHandler: UncaughtExceptionHandler = UncaughtExceptionHandler.THROW
         val size: Int get() = registered()
         fun notify(event: TorEvent, output: String) { event.notifyObservers(output) }
         fun destroy() { onDestroy() }

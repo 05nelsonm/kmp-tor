@@ -22,6 +22,7 @@ import io.matthewnelson.kmp.tor.runtime.RuntimeEvent
 import io.matthewnelson.kmp.tor.runtime.ctrl.AbstractTorEventProcessor
 import io.matthewnelson.kmp.tor.runtime.core.ItBlock
 import io.matthewnelson.kmp.tor.runtime.core.TorEvent
+import io.matthewnelson.kmp.tor.runtime.core.UncaughtExceptionHandler.Companion.tryCatch
 
 @OptIn(InternalKmpTorApi::class)
 internal abstract class AbstractRuntimeEventProcessor(
@@ -33,7 +34,6 @@ internal abstract class AbstractRuntimeEventProcessor(
 {
 
     private val observers = LinkedHashSet<RuntimeEvent.Observer<*>>(initialObservers.size + 1, 1.0F)
-
     private val lock = SynchronizedObject()
 
     init {
@@ -126,23 +126,26 @@ internal abstract class AbstractRuntimeEventProcessor(
                 if (observer.event != event) continue
 
                 @Suppress("UNCHECKED_CAST")
-                (observer.output as ItBlock<R>).invoke(output)
+                val block = (observer.output as ItBlock<R>)
+                exceptionHandler.tryCatch(observer) {
+                    block.invoke(output)
+                }
             }
         }
     }
 
     protected override fun onDestroy() {
-        if (isDestroyed) return
+        if (destroyed) return
         withObservers { clear(); super.onDestroy() }
     }
 
     private fun <T: Any?> withObservers(
         block: MutableSet<RuntimeEvent.Observer<*>>.() -> T,
     ): T {
-        if (isDestroyed) return block(noOpMutableSet())
+        if (destroyed) return block(noOpMutableSet())
 
         return synchronized(lock) {
-            block(if (isDestroyed) noOpMutableSet() else observers)
+            block(if (destroyed) noOpMutableSet() else observers)
         }
     }
 }

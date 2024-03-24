@@ -16,6 +16,7 @@
 package io.matthewnelson.kmp.tor.runtime
 
 import io.matthewnelson.kmp.tor.runtime.core.TorEvent
+import io.matthewnelson.kmp.tor.runtime.core.UncaughtExceptionHandler
 import io.matthewnelson.kmp.tor.runtime.internal.AbstractRuntimeEventProcessor
 import kotlin.test.*
 
@@ -23,7 +24,7 @@ class AbstractRuntimeEventProcessorUnitTest {
 
     private class TestProcessor: AbstractRuntimeEventProcessor("static", emptySet(), emptySet()) {
         val size: Int get() = registered()
-
+        override val exceptionHandler: UncaughtExceptionHandler = UncaughtExceptionHandler.THROW
         fun <R: Any> notify(event: RuntimeEvent<R>, output: R) { event.notifyObservers(output) }
         fun destroy() { onDestroy() }
     }

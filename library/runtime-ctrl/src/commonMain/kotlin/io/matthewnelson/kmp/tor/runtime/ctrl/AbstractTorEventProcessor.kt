@@ -19,6 +19,8 @@ import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
 import io.matthewnelson.kmp.tor.core.resource.SynchronizedObject
 import io.matthewnelson.kmp.tor.core.resource.synchronized
 import io.matthewnelson.kmp.tor.runtime.core.TorEvent
+import io.matthewnelson.kmp.tor.runtime.core.UncaughtExceptionHandler
+import io.matthewnelson.kmp.tor.runtime.core.UncaughtExceptionHandler.Companion.tryCatch
 import kotlin.concurrent.Volatile
 import kotlin.jvm.JvmName
 import kotlin.jvm.JvmStatic
@@ -26,21 +28,21 @@ import kotlin.jvm.JvmStatic
 /**
  * Base abstraction for implementations that process [TorEvent].
  * */
-public abstract class AbstractTorEventProcessor
 @InternalKmpTorApi
-protected constructor(
-    private val staticTag: String?,
-    initialObservers: Set<TorEvent.Observer>
+public abstract class AbstractTorEventProcessor protected constructor(
+    staticTag: String?,
+    initialObservers: Set<TorEvent.Observer>,
 ): TorEvent.Processor {
 
+    private val staticTag: String? = staticTag?.ifBlank { null }
+    protected abstract val exceptionHandler: UncaughtExceptionHandler
+
     @Volatile
-    @get:JvmName("isDestroyed")
-    protected var isDestroyed: Boolean = false
+    @get:JvmName("destroyed")
+    protected var destroyed: Boolean = false
         private set
 
     private val observers = LinkedHashSet<TorEvent.Observer>(initialObservers.size + 1, 1.0F)
-
-    @OptIn(InternalKmpTorApi::class)
     private val lock = SynchronizedObject()
 
     init {
@@ -127,24 +129,32 @@ protected constructor(
         withObservers {
             for (observer in this) {
                 if (observer.event != event) continue
-                observer.block.invoke(output)
+
+                exceptionHandler.tryCatch(observer) {
+                    observer.block.invoke(output)
+                }
             }
         }
     }
 
     protected open fun onDestroy() {
-        if (isDestroyed) return
-        withObservers { clear(); isDestroyed = true }
+        if (destroyed) return
+
+        withObservers {
+            if (destroyed) return@withObservers
+
+            clear()
+            destroyed = true
+        }
     }
 
-    @OptIn(InternalKmpTorApi::class)
     private fun <T: Any?> withObservers(
         block: MutableSet<TorEvent.Observer>.() -> T,
     ): T {
-        if (isDestroyed) return block(noOpMutableSet())
+        if (destroyed) return block(noOpMutableSet())
 
         return synchronized(lock) {
-            block(if (isDestroyed) noOpMutableSet() else observers)
+            block(if (destroyed) noOpMutableSet() else observers)
         }
     }
 

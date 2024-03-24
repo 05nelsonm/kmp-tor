@@ -248,6 +248,8 @@ public interface TorRuntime:
         public val torrcDefaultsFile: File,
         @JvmField
         public val torResource: ResourceInstaller<Paths.Tor>,
+        @JvmField
+        public val exceptionHandler: UncaughtExceptionHandler,
     ) {
 
         /**
@@ -318,6 +320,7 @@ public interface TorRuntime:
              * @param [installer] lambda for creating [ResourceInstaller] using
              *   the default [Builder.installationDir]
              * @param [block] optional lambda for modifying default parameters.
+             * @see [io.matthewnelson.kmp.tor.runtime.mobile.createTorRuntimeEnvironment]
              * */
             @JvmStatic
             public fun Builder(
@@ -348,7 +351,8 @@ public interface TorRuntime:
             @JvmField
             public var torrcDefaultsFile: File = workDir.resolve("torrc-defaults")
 
-            // TODO: error handler
+            @JvmField
+            public var exceptionHandler: UncaughtExceptionHandler = UncaughtExceptionHandler.THROW
 
             internal companion object: InstanceKeeper<File, Environment>() {
 
@@ -372,6 +376,7 @@ public interface TorRuntime:
                             torrcFile = b.torrcFile.absoluteFile.normalize(),
                             torrcDefaultsFile = b.torrcDefaultsFile.absoluteFile.normalize(),
                             torResource = torResource,
+                            exceptionHandler = b.exceptionHandler,
                         )
                     }
                 }

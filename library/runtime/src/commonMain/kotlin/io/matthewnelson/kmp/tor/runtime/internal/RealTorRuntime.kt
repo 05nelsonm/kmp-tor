@@ -40,11 +40,13 @@ internal class RealTorRuntime private constructor(
     TorRuntime
 {
 
+    protected override val exceptionHandler: UncaughtExceptionHandler get() = environment.exceptionHandler
+
     override fun enqueue(
         action: RuntimeAction,
-        onFailure: ItBlock<Throwable>?,
+        onFailure: ItBlock<Throwable>,
         onSuccess: ItBlock<Unit>,
-    ): TorJob {
+    ): QueuedJob {
         TODO("Not yet implemented")
     }
 
@@ -52,7 +54,7 @@ internal class RealTorRuntime private constructor(
         cmd: TorCmd.Unprivileged<Response>,
         onFailure: ItBlock<Throwable>?,
         onSuccess: ItBlock<Response>
-    ): TorJob {
+    ): QueuedJob {
         TODO("Not yet implemented")
     }
 
@@ -115,6 +117,8 @@ internal class RealTorRuntime private constructor(
         staticRuntimeEventObservers,
         staticTorEventObservers
     ), TorRuntime.ServiceFactory {
+
+        protected override val exceptionHandler: UncaughtExceptionHandler get() = environment.exceptionHandler
 
         private val staticTorEvents = if (!staticTorEvents.contains(TorEvent.BW)) {
             staticTorEvents.toMutableSet().apply {

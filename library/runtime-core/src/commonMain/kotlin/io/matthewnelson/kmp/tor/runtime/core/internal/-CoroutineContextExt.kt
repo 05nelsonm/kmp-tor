@@ -22,6 +22,7 @@ import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
 import kotlin.coroutines.CoroutineContext
+import kotlin.coroutines.cancellation.CancellationException
 
 @OptIn(ExperimentalContracts::class)
 internal inline fun <T: Throwable> CoroutineContext?.cancellationExceptionOr(

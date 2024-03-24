@@ -19,19 +19,15 @@ import io.matthewnelson.encoding.base16.Base16
 import io.matthewnelson.encoding.core.Encoder.Companion.encodeToString
 import io.matthewnelson.immutable.collections.immutableSetOf
 import io.matthewnelson.immutable.collections.toImmutableSet
-import io.matthewnelson.kmp.file.IOException
 import io.matthewnelson.kmp.tor.runtime.core.ItBlock
-import io.matthewnelson.kmp.tor.runtime.core.TorJob
+import io.matthewnelson.kmp.tor.runtime.core.QueuedJob
 import io.matthewnelson.kmp.tor.runtime.core.TorConfig
 import io.matthewnelson.kmp.tor.runtime.core.TorEvent
 import io.matthewnelson.kmp.tor.runtime.core.address.IPAddress
 import io.matthewnelson.kmp.tor.runtime.core.address.OnionAddress
 import io.matthewnelson.kmp.tor.runtime.core.key.AddressKey
 import io.matthewnelson.kmp.tor.runtime.core.key.ED25519_V3
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlin.coroutines.cancellation.CancellationException
-import kotlin.coroutines.resumeWithException
 import kotlin.jvm.JvmField
 import kotlin.jvm.JvmStatic
 
@@ -555,6 +551,8 @@ public sealed class TorCmd<Response: Any> private constructor(
         public data object Reload: Unprivileged<Unit>(Name.SIGNAL)
         public data object Dump: Unprivileged<Unit>(Name.SIGNAL)
         public data object Debug: Unprivileged<Unit>(Name.SIGNAL)
+
+        // TODO: Return OK or RateLimited
         public data object NewNym: Unprivileged<Unit>(Name.SIGNAL)
         public data object ClearDnsCache: Unprivileged<Unit>(Name.SIGNAL)
         public data object Heartbeat: Unprivileged<Unit>(Name.SIGNAL)
@@ -640,25 +638,28 @@ public sealed class TorCmd<Response: Any> private constructor(
 
         /**
          * Base interface for implementations that process [Privileged] type [TorCmd]
+         *
+         * @see [io.matthewnelson.kmp.tor.runtime.core.util.execute]
+         * @see [io.matthewnelson.kmp.tor.runtime.core.util.executeAsync]
          * */
         public interface Processor: Unprivileged.Processor {
 
             /**
              * Adds the [cmd] to the queue.
              *
-             * **NOTE:** If the returned [TorJob] gets cancelled,
+             * **NOTE:** If the returned [QueuedJob] gets cancelled,
              * [onFailure] will be invoked with [CancellationException].
              *
-             * @return [TorJob]
-             * @see [enqueueAsync]
-             * @throws [IOException] if tor has not been started.
+             * @return [QueuedJob]
+             * @throws [IllegalStateException] if tor has not been started, or
+             *   the [Processor] is destroyed.
              * */
-            @Throws(IOException::class)
+            @Throws(IllegalStateException::class)
             public fun <Response: Any> enqueue(
                 cmd: Privileged<Response>,
                 onFailure: ItBlock<Throwable>?,
                 onSuccess: ItBlock<Response>,
-            ): TorJob
+            ): QueuedJob
         }
     }
 
@@ -671,86 +672,28 @@ public sealed class TorCmd<Response: Any> private constructor(
 
         /**
          * Base interface for implementations that process [Unprivileged] type [TorCmd]
+         *
+         * @see [io.matthewnelson.kmp.tor.runtime.core.util.execute]
+         * @see [io.matthewnelson.kmp.tor.runtime.core.util.executeAsync]
          * */
         public interface Processor {
 
             /**
              * Adds the [cmd] to the queue.
              *
-             * **NOTE:** If the returned [TorJob] gets cancelled,
+             * **NOTE:** If the returned [QueuedJob] gets cancelled,
              * [onFailure] will be invoked with [CancellationException].
              *
-             * @return [TorJob]
-             * @see [enqueueAsync]
-             * @throws [IOException] if tor has not been started.
+             * @return [QueuedJob]
+             * @throws [IllegalStateException] if tor has not been started, or
+             *   the [Processor] is destroyed.
              * */
-            @Throws(IOException::class)
+            @Throws(IllegalStateException::class)
             public fun <Response: Any> enqueue(
                 cmd: Unprivileged<Response>,
                 onFailure: ItBlock<Throwable>?,
                 onSuccess: ItBlock<Response>,
-            ): TorJob
-        }
-    }
-
-    public companion object {
-
-        /**
-         * Enqueues the [cmd], suspending the coroutine until completion
-         * or cancellation/error.
-         * */
-        @JvmStatic
-        @Throws(IOException::class, Throwable::class)
-        public suspend fun <Response: Any> Privileged.Processor.enqueueAsync(
-            cmd: Privileged<Response>,
-        ): Response = suspendCancellableCoroutine { continuation ->
-            var job: TorJob? = null
-
-            try {
-                job = enqueue(
-                    cmd = cmd,
-                    onFailure = { t ->
-                        continuation.resumeWithException(t)
-                    },
-                    onSuccess = { result ->
-                        @OptIn(ExperimentalCoroutinesApi::class)
-                        continuation.resume(result, onCancellation = { t -> job?.cancel(t) })
-                    },
-                )
-            } catch (e: IOException) {
-                continuation.resumeWithException(e)
-            }
-
-            continuation.invokeOnCancellation { t -> job?.cancel(t) }
-        }
-
-        /**
-         * Enqueues the [cmd], suspending the coroutine until completion
-         * or cancellation/error.
-         * */
-        @JvmStatic
-        @Throws(IOException::class, Throwable::class)
-        public suspend fun <Response: Any> Unprivileged.Processor.enqueueAsync(
-            cmd: Unprivileged<Response>,
-        ): Response = suspendCancellableCoroutine { continuation ->
-            var job: TorJob? = null
-
-            try {
-                job = enqueue(
-                    cmd = cmd,
-                    onFailure = { t ->
-                        continuation.resumeWithException(t)
-                    },
-                    onSuccess = { result ->
-                        @OptIn(ExperimentalCoroutinesApi::class)
-                        continuation.resume(result, onCancellation = { t -> job?.cancel(t) })
-                    },
-                )
-            } catch (e: IOException) {
-                continuation.resumeWithException(e)
-            }
-
-            continuation.invokeOnCancellation { t -> job?.cancel(t) }
+            ): QueuedJob
         }
     }
 

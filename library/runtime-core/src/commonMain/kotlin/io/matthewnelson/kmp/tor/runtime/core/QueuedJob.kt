@@ -18,7 +18,7 @@ package io.matthewnelson.kmp.tor.runtime.core
 import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
 import io.matthewnelson.kmp.tor.core.resource.SynchronizedObject
 import io.matthewnelson.kmp.tor.core.resource.synchronized
-import io.matthewnelson.kmp.tor.runtime.core.TorJob.State.*
+import io.matthewnelson.kmp.tor.runtime.core.QueuedJob.State.*
 import kotlin.concurrent.Volatile
 import kotlin.coroutines.cancellation.CancellationException
 import kotlin.jvm.JvmField
@@ -27,12 +27,10 @@ import kotlin.jvm.JvmName
 /**
  * Base abstraction for single-use model that tracks the state
  * of a queue-able job. Once completed, either successfully or
- * by cancellation/error, the [TorJob] is dead and should be
+ * by cancellation/error, the [QueuedJob] is dead and should be
  * discarded.
  * */
-public abstract class TorJob
-@InternalKmpTorApi
-public constructor(
+public abstract class QueuedJob protected constructor(
     @JvmField
     public val name: String,
     @Volatile
@@ -62,28 +60,30 @@ public constructor(
     public enum class State {
 
         /**
-         * The initial state of a call
+         * The initial state.
          * */
         Enqueued,
 
         /**
-         * Point of no return where the job has been
-         * de-queued and is being executed.
+         * Point of no return where the job has been de-queued
+         * and is being executed. Cancellation does nothing and
+         * the next state transition will either be [onCompletion]
+         * or [onError].
          * */
         Executing,
 
         /**
-         * If the call completed by cancellation.
+         * If the job completed by cancellation.
          * */
         Cancelled,
 
         /**
-         * If the call completed successfully.
+         * If the job completed successfully.
          * */
         Completed,
 
         /**
-         * If the call completed by error.
+         * If the job completed by error.
          * */
         Error,
     }
@@ -91,9 +91,11 @@ public constructor(
     /**
      * Cancels the job.
      *
-     * Does nothing if [state] is anything other than [State.Enqueued].
+     * Does nothing if [state] is anything other than
+     * [State.Enqueued].
      *
-     * If cancelled, [onFailure] will invoke with [CancellationException].
+     * If cancelled, [onFailure] will be invoked with
+     * [CancellationException] to indicate so.
      * */
     public fun cancel(cause: Throwable?) {
         if (state != Enqueued) return
@@ -130,14 +132,14 @@ public constructor(
     // This is a nuanced API in which the following things should
     // **NOT** be done from within block's lambda.
     //
-    //  - If the TorJob implementation returns some sort of response
-    //    via a callback, that callback should be invoked using the
+    //  - If the implementation returns some sort of response via
+    //    a callback, that callback should be invoked using the
     //    return value of onCompletion and not from within block's
     //    lambda.
-    //  - Other TorJob functions that acquire the lock (such as cancel,
-    //    onError, and onExecuting) should not be invoked within block,
-    //    nor should the implementation expose externally any uncontrolled
-    //    functionality which may call the aforementioned TorJob functions
+    //  - Other functions that acquire the lock (such as cancel, onError,
+    //    and onExecuting) should not be invoked within block, nor should
+    //    the implementation expose externally any uncontrolled functionality
+    //    which may call the aforementioned functions.
     @Throws(IllegalStateException::class)
     protected fun <T: Any?> onCompletion(block: () -> T): T {
         @OptIn(InternalKmpTorApi::class)
@@ -176,5 +178,5 @@ public constructor(
         onFailure(cause)
     }
 
-    final override fun toString(): String = "TorJob[action=$name,state=$state]@${hashCode()}"
+    final override fun toString(): String = "QueuedJob[name=$name,state=$state]@${hashCode()}"
 }
