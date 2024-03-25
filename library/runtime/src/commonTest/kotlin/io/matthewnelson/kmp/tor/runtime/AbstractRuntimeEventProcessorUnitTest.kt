@@ -26,7 +26,9 @@ class AbstractRuntimeEventProcessorUnitTest {
         private const val STATIC_TAG = "TAG_STATIC_1234"
     }
 
-    private class TestProcessor: AbstractRuntimeEventProcessor(STATIC_TAG, emptySet(), emptySet()) {
+    private class TestProcessor(): AbstractRuntimeEventProcessor(STATIC_TAG, emptySet(), emptySet()) {
+        var _debug: Boolean = true
+        override val debug: Boolean get() = _debug
         val size: Int get() = registered()
         fun <R: Any> notify(event: RuntimeEvent<R>, output: R) { event.notifyObservers(output) }
         fun notify(event: TorEvent, output: String) { event.notifyObservers(output) }
@@ -169,6 +171,24 @@ class AbstractRuntimeEventProcessorUnitTest {
         assertEquals(1, invocations)
 
         processor.notify(TorEvent.INFO, "something")
+        assertEquals(2, invocations)
+    }
+
+    @Test
+    fun givenDebug_whenToggled_thenDispatchesAsExpected() {
+        var invocations = 0
+        val observer = RuntimeEvent.LOG.DEBUG.observer { invocations++ }
+        processor.add(observer)
+
+        processor.notify(observer.event, "")
+        assertEquals(1, invocations)
+
+        processor._debug = false
+        processor.notify(observer.event, "")
+        assertEquals(1, invocations)
+
+        processor._debug = true
+        processor.notify(observer.event, "")
         assertEquals(2, invocations)
     }
 }

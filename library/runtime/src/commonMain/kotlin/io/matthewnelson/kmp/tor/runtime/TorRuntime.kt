@@ -33,11 +33,11 @@ import io.matthewnelson.kmp.tor.runtime.core.ctrl.TorCmd
 import io.matthewnelson.kmp.tor.runtime.internal.InstanceKeeper
 import io.matthewnelson.kmp.tor.runtime.internal.RealTorRuntime
 import io.matthewnelson.kmp.tor.runtime.internal.RealTorRuntime.Companion.checkInstance
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import org.kotlincrypto.SecRandomCopyException
 import org.kotlincrypto.SecureRandom
 import org.kotlincrypto.hash.sha2.SHA256
+import kotlin.concurrent.Volatile
 import kotlin.jvm.JvmField
 import kotlin.jvm.JvmName
 import kotlin.jvm.JvmStatic
@@ -119,13 +119,6 @@ public interface TorRuntime:
          * */
         @JvmField
         public var networkObserver: NetworkObserver = NetworkObserver.NOOP
-
-        /**
-         * If false, will use [Dispatchers.Main] when dispatching [RuntimeEvent]
-         * and [TorEvent] to registered observers.
-         * */
-        @JvmField
-        public var eventThreadBackground: Boolean = true
 
         /**
          * Configure the [TorConfig] at each startup. Multiple [block] may
@@ -218,7 +211,6 @@ public interface TorRuntime:
                         networkObserver = b.networkObserver,
                         allowPortReassignment = b.allowPortReassignment,
                         omitGeoIPFileSettings = b.omitGeoIPFileSettings,
-                        eventThreadBackground = b.eventThreadBackground,
                         config = b.config.toImmutableList(),
                         staticTorEvents = b.staticTorEvents.toImmutableSet(),
                         staticTorEventObservers = b.staticTorEventObservers.toImmutableSet(),
@@ -249,6 +241,16 @@ public interface TorRuntime:
         @JvmField
         public val torResource: ResourceInstaller<Paths.Tor>,
     ) {
+
+        /**
+         * Toggle to dispatch [RuntimeEvent.LOG.DEBUG] or not.
+         *
+         * **NOTE:** This does not alter control connection
+         * events to include [TorEvent.DEBUG].
+         * */
+        @JvmField
+        @Volatile
+        public var debug: Boolean = false
 
         /**
          * SHA-256 hash of the [workDir] path.

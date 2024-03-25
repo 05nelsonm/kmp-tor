@@ -19,23 +19,41 @@ import kotlin.jvm.JvmField
 import kotlin.jvm.JvmStatic
 
 /**
+ * A special exception to indicate something went terribly wrong.
  *
+ * @see [io.matthewnelson.kmp.tor.runtime.RuntimeEvent.LOG.ERROR]
  * */
 public class UncaughtException private constructor(
     override val message: String,
     override val cause: Throwable,
 ): Exception(message, cause) {
 
+    /**
+     * Producer for [UncaughtException]
+     *
+     * @see [tryCatch]
+     * */
     public fun interface Handler: ItBlock<UncaughtException> {
 
         public companion object {
 
+            /**
+             * Instance that prints the [UncaughtException]
+             * stack trace.
+             * */
             @JvmField
             public val PRINT: Handler = Handler { it.printStackTrace() }
 
+            /**
+             * Instance that suppresses (does nothing) with the
+             * [UncaughtException].
+             * */
             @JvmField
             public val SUPPRESS: Handler = Handler {}
 
+            /**
+             * Instance that automatically throws [UncaughtException]
+             * */
             @JvmField
             public val THROW: Handler = Handler { throw it }
 

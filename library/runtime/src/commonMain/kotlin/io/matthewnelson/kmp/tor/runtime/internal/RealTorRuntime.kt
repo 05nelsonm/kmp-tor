@@ -40,6 +40,8 @@ internal class RealTorRuntime private constructor(
     TorRuntime
 {
 
+    protected override val debug: Boolean get() = environment.debug
+
     override fun enqueue(
         action: RuntimeAction,
         onFailure: ItBlock<Throwable>,
@@ -66,7 +68,6 @@ internal class RealTorRuntime private constructor(
             networkObserver: NetworkObserver,
             allowPortReassignment: Boolean,
             omitGeoIPFileSettings: Boolean,
-            eventThreadBackground: Boolean,
             config: List<ThisBlock.WithIt<TorConfig.Builder, TorRuntime.Environment>>,
             staticTorEvents: Set<TorEvent>,
             staticTorEventObservers: Set<TorEvent.Observer>,
@@ -76,7 +77,6 @@ internal class RealTorRuntime private constructor(
             val runtime = TorRuntime.ServiceFactory.serviceRuntimeOrNull {
                 ServiceFactory(
                     environment,
-                    eventThreadBackground,
                     staticTorEvents,
                     staticTorEventObservers,
                     staticRuntimeEventObservers,
@@ -106,7 +106,6 @@ internal class RealTorRuntime private constructor(
 
     private class ServiceFactory(
         override val environment: TorRuntime.Environment,
-        private val eventThreadBackground: Boolean,
         staticTorEvents: Set<TorEvent>,
         staticTorEventObservers: Set<TorEvent.Observer>,
         staticRuntimeEventObservers: Set<RuntimeEvent.Observer<*>>,
@@ -115,6 +114,8 @@ internal class RealTorRuntime private constructor(
         staticRuntimeEventObservers,
         staticTorEventObservers
     ), TorRuntime.ServiceFactory {
+
+        protected override val debug: Boolean get() = environment.debug
 
         private val staticTorEvents = if (!staticTorEvents.contains(TorEvent.BW)) {
             staticTorEvents.toMutableSet().apply {

@@ -19,6 +19,7 @@ import io.matthewnelson.immutable.collections.immutableSetOf
 import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
 import io.matthewnelson.kmp.tor.runtime.core.ItBlock
 import io.matthewnelson.kmp.tor.runtime.core.TorEvent
+import io.matthewnelson.kmp.tor.runtime.core.UncaughtException
 import kotlin.jvm.JvmField
 import kotlin.jvm.JvmStatic
 import kotlin.jvm.JvmSynthetic
@@ -35,13 +36,29 @@ public sealed class RuntimeEvent<R: Any> private constructor(
     public val name: String,
 ) {
 
-    /**
-     * Log Messages
-     * */
     public data object LOG {
+
+        /**
+         * Debug level logging. Events will only be dispatched
+         * when [TorRuntime.Environment.debug] is set to `true`.
+         * */
         public data object DEBUG: RuntimeEvent<String>("LOG_DEBUG")
+
+        /**
+         * Error level logging. Note that all [UncaughtException]
+         * are redirected to [ERROR] observers. All exceptions
+         * thrown by [ERROR] observers are suppressed.
+         * */
         public data object ERROR: RuntimeEvent<Throwable>("LOG_ERROR")
+
+        /**
+         * Info level logging.
+         * */
         public data object INFO: RuntimeEvent<String>("LOG_INFO")
+
+        /**
+         * Warn level logging. These are non-fatal errors.
+         * */
         public data object WARN: RuntimeEvent<String>("LOG_WARN")
     }
 

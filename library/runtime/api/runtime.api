@@ -130,7 +130,6 @@ public abstract interface class io/matthewnelson/kmp/tor/runtime/TorRuntime : io
 
 public final class io/matthewnelson/kmp/tor/runtime/TorRuntime$Builder {
 	public field allowPortReassignment Z
-	public field eventThreadBackground Z
 	public field networkObserver Lio/matthewnelson/kmp/tor/runtime/NetworkObserver;
 	public field omitGeoIPFileSettings Z
 	public synthetic fun <init> (Lio/matthewnelson/kmp/tor/runtime/TorRuntime$Environment;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
@@ -147,6 +146,7 @@ public final class io/matthewnelson/kmp/tor/runtime/TorRuntime$Companion {
 public final class io/matthewnelson/kmp/tor/runtime/TorRuntime$Environment {
 	public static final field Companion Lio/matthewnelson/kmp/tor/runtime/TorRuntime$Environment$Companion;
 	public final field cacheDir Ljava/io/File;
+	public field debug Z
 	public final field torResource Lio/matthewnelson/kmp/tor/core/api/ResourceInstaller;
 	public final field torrcDefaultsFile Ljava/io/File;
 	public final field torrcFile Ljava/io/File;
