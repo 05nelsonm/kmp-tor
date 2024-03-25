@@ -17,10 +17,11 @@ public abstract class io/matthewnelson/kmp/tor/runtime/core/QueuedJob {
 	public final field name Ljava/lang/String;
 	protected fun <init> (Ljava/lang/String;Lio/matthewnelson/kmp/tor/runtime/core/ItBlock;)V
 	public final fun cancel (Ljava/lang/Throwable;)V
+	public final fun invokeOnCompletion (Lio/matthewnelson/kmp/tor/runtime/core/ItBlock;)V
 	public final fun isActive ()Z
-	protected abstract fun onCancellation (Ljava/lang/Throwable;)V
-	protected final fun onCompletion (Lkotlin/jvm/functions/Function0;)Ljava/lang/Object;
-	protected final fun onError (Ljava/lang/Throwable;)V
+	protected fun onCancellation (Ljava/lang/Throwable;)V
+	protected final fun onCompletion (Ljava/lang/Object;Lkotlin/jvm/functions/Function0;)V
+	protected final fun onError (Ljava/lang/Throwable;Lio/matthewnelson/kmp/tor/runtime/core/ItBlock;)V
 	protected final fun onExecuting ()V
 	public final fun state ()Lio/matthewnelson/kmp/tor/runtime/core/QueuedJob$State;
 	public final fun toString ()Ljava/lang/String;
@@ -611,6 +612,7 @@ public abstract interface class io/matthewnelson/kmp/tor/runtime/core/TorEvent$P
 }
 
 public final class io/matthewnelson/kmp/tor/runtime/core/UncaughtException : java/lang/Exception {
+	public final field context Ljava/lang/String;
 	public synthetic fun <init> (Ljava/lang/String;Ljava/lang/Throwable;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
 	public fun getCause ()Ljava/lang/Throwable;
 	public fun getMessage ()Ljava/lang/String;

@@ -42,8 +42,8 @@ package io.matthewnelson.kmp.tor.runtime.core
  * @see [WithIt]
  * @see [apply]
  * */
-public fun interface ThisBlock<in T: Any> {
-    public operator fun T.invoke()
+public fun interface ThisBlock<in This: Any> {
+    public operator fun This.invoke()
 
     /**
      * Helper for non-Kotlin consumers instead of using
@@ -70,8 +70,8 @@ public fun interface ThisBlock<in T: Any> {
      * @see [ItBlock]
      * @see [apply]
      * */
-    public fun interface WithIt<in T: Any, in V: Any> {
-        public operator fun T.invoke(it: V)
+    public fun interface WithIt<in This: Any, in It: Any> {
+        public operator fun This.invoke(it: It)
     }
 }
 
@@ -100,24 +100,24 @@ public fun interface ThisBlock<in T: Any> {
  * @see [ThisBlock.WithIt]
  * @see [apply]
  * */
-public fun interface ItBlock<in T: Any> {
-    public operator fun invoke(it: T)
+public fun interface ItBlock<in It: Any> {
+    public operator fun invoke(it: It)
 }
 
 @Suppress("NOTHING_TO_INLINE")
-public inline fun <T: Any> T.apply(block: ThisBlock<T>): T {
+public inline fun <This: Any> This.apply(block: ThisBlock<This>): This {
     with(block) { invoke() }
     return this
 }
 
 @Suppress("NOTHING_TO_INLINE")
-public inline fun <T: Any, V: Any> T.apply(block: ThisBlock.WithIt<T, V>, arg: V): T {
+public inline fun <This: Any, It: Any> This.apply(block: ThisBlock.WithIt<This, It>, arg: It): This {
     with(block) { invoke(arg) }
     return this
 }
 
 @Suppress("NOTHING_TO_INLINE")
-public inline fun <T: Any> T.apply(block: ItBlock<T>): T {
+public inline fun <It: Any> It.apply(block: ItBlock<It>): It {
     block(this)
     return this
 }

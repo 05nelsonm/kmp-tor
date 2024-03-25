@@ -15,12 +15,10 @@
  **/
 package io.matthewnelson.kmp.tor.runtime.core
 
-import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
 import kotlin.coroutines.cancellation.CancellationException
 import kotlin.test.*
 
-@OptIn(InternalKmpTorApi::class)
-class TorJobUnitTest {
+class QueuedJobUnitTest {
 
     @Test
     fun givenInstantiation_whenInitialState_thenIsEnqueued() {
@@ -62,7 +60,7 @@ class TorJobUnitTest {
         assertEquals(1, invocationCancel)
         assertEquals(1, invocationFail)
 
-        assertFailsWith<IllegalStateException> { job.completion {  } }
+        job.completion()
         assertEquals(1, invocationCancel)
         assertEquals(1, invocationFail)
     }
@@ -79,24 +77,104 @@ class TorJobUnitTest {
         assertEquals(QueuedJob.State.Executing, job.state)
         assertTrue(job.isActive)
 
-        job.completion {  }
+        job.completion()
         assertEquals(QueuedJob.State.Completed, job.state)
         assertFalse(job.isActive)
+    }
+
+    @Test
+    fun givenInvokeOnCompletion_whenCancelled_thenIsInvoked() {
+        var invocationFailure = false
+        val job = TestJob(onFailure = { invocationFailure = true })
+
+        var invocationCompletion = false
+        job.invokeOnCompletion {
+            invocationCompletion = true
+            // Ensure cancellation was dispatched before
+            // invoking all completion callbacks
+            assertTrue(invocationFailure)
+        }
+
+        job.cancel(null)
+        assertTrue(invocationCompletion)
+    }
+
+    @Test
+    fun givenInvokeOnCompletion_whenCompleted_thenIsInvoked() {
+        var invocationSuccess = false
+        val job = TestJob(onSuccess = { invocationSuccess = true })
+
+        var invocationCompletion = false
+        job.invokeOnCompletion {
+            invocationCompletion = true
+            // Ensure success was dispatched before
+            // invoking all completion callbacks
+            assertTrue(invocationSuccess)
+        }
+
+        job.completion()
+        assertTrue(invocationCompletion)
+    }
+
+    @Test
+    fun givenInvokeOnCompletion_whenErrored_thenIsInvoked() {
+        var invocationFailure = 0
+        val job = TestJob(onFailure = { invocationFailure++ })
+
+        var invocationCompletion = 0
+        val cb = ItBlock<Unit> {
+            invocationCompletion++
+            // Ensure error was dispatched before
+            // invoking all completion callbacks
+            assertEquals(1, invocationFailure)
+        }
+
+        // Ensure same callback cannot be added
+        // more than once.
+        job.invokeOnCompletion(cb)
+        job.invokeOnCompletion(cb)
+        job.invokeOnCompletion(cb)
+
+        job.error(Throwable())
+        assertEquals(1, invocationCompletion)
+    }
+
+    @Test
+    fun givenInvokeOnCompletion_whenJobCompleted_thenInvokesImmediately() {
+        val job = TestJob()
+        job.completion()
+        var invocationCompletion = false
+        job.invokeOnCompletion { invocationCompletion = true }
+        assertTrue(invocationCompletion)
+    }
+
+    @Test
+    fun givenInvokeOnCompletion_whenThrows_thenIsIgnored() {
+        val job = TestJob()
+        var invocationCompletion = 0
+        job.invokeOnCompletion { invocationCompletion++; fail() }
+
+        job.completion()
+        assertEquals(1, invocationCompletion)
+
+        // Also check that immediate invocation suppresses
+        job.invokeOnCompletion { invocationCompletion++; fail() }
+        assertEquals(2, invocationCompletion)
     }
 
     private class TestJob(
         name: String = "",
         private val cancellation: (cause: Throwable?) -> Unit = {},
         onFailure: ItBlock<Throwable>? = null,
+        private val onSuccess: ItBlock<Unit>? = null,
     ): QueuedJob(name, onFailure) {
         override fun onCancellation(cause: Throwable?) {
             cancellation(cause)
         }
 
-        public fun error(cause: Throwable) { onError(cause) }
+        public fun error(cause: Throwable) { onError(cause) {} }
         @Throws(IllegalStateException::class)
         public fun executing() { onExecuting() }
-        @Throws(IllegalStateException::class)
-        public fun <T: Any?> completion(block: () -> T): T = onCompletion(block)
+        public fun completion() { onCompletion(Unit, withLock = { onSuccess }) }
     }
 }

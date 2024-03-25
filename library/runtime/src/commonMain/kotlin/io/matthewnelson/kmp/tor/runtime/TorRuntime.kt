@@ -80,7 +80,7 @@ public interface TorRuntime:
     public class Builder private constructor(private val environment: Environment) {
 
         private val config = mutableListOf<ThisBlock.WithIt<TorConfig.Builder, Environment>>()
-        private val staticTorEvents = mutableSetOf(TorEvent.CONF_CHANGED, TorEvent.NOTICE)
+        private val requiredTorEvents = mutableSetOf(TorEvent.CONF_CHANGED, TorEvent.NOTICE)
         private val staticTorEventObservers = mutableSetOf<TorEvent.Observer>()
         private val staticRuntimeEventObservers = mutableSetOf<RuntimeEvent.Observer<*>>()
 
@@ -125,18 +125,20 @@ public interface TorRuntime:
          * be set, each of which will be applied to the [TorConfig.Builder]
          * before starting tor.
          *
-         * [block] is always invoked from a background thread, so it is safe
-         * to perform IO within the lambda (e.g. writing settings that are
-         * not currently supported to the [Environment.torrcFile]).
+         * [block] is always invoked from a background thread on Jvm & Native,
+         * so it is safe to perform IO within the lambda (e.g. writing settings
+         * that are not currently supported to the [Environment.torrcFile]).
          *
-         * Any exception thrown within [block] will be propagated to the caller.
+         * Any exception thrown within [block] will be propagated to the caller
+         * of [RuntimeAction.StartDaemon] or [RuntimeAction.RestartDaemon] and
+         * a [RuntimeEvent.LOG.ERROR] will be dispatched to registered observers.
          *
          * **NOTE:** This can be omitted as a minimum viable configuration
          * is always created. See [TorConfigGenerator.putDefaults] for what
          * settings are automatically applied.
          *
-         * **NOTE:** [block] should not contain any non-singleton references
-         * such as Android Activity context.
+         * **NOTE:** [block] should not contain any external contextual
+         * references, such as Android Activity Context.
          * */
         @KmpTorDsl
         public fun config(
@@ -148,17 +150,17 @@ public interface TorRuntime:
 
         /**
          * Add [TorEvent] that are required for your implementation. All
-         * configured [staticEvent] will be set at startup when the control
-         * connection is established via SETEVENTS.
+         * configured [TorEvent] will be set at startup when the control
+         * connection is established via [TorCmd.SetEvents].
          *
-         * Any subsequent calls for SETEVENTS during runtime will be intercepted
-         * and modified to include all configured [staticEvent].
+         * Any subsequent calls for [TorCmd.SetEvents] during runtime will
+         * be intercepted and modified to include all required [TorEvent].
          * */
         @KmpTorDsl
-        public fun staticEvent(
+        public fun required(
             event: TorEvent,
         ): Builder {
-            staticTorEvents.add(event)
+            requiredTorEvents.add(event)
             return this
         }
 
@@ -212,7 +214,7 @@ public interface TorRuntime:
                         allowPortReassignment = b.allowPortReassignment,
                         omitGeoIPFileSettings = b.omitGeoIPFileSettings,
                         config = b.config.toImmutableList(),
-                        staticTorEvents = b.staticTorEvents.toImmutableSet(),
+                        requiredTorEvents = b.requiredTorEvents.toImmutableSet(),
                         staticTorEventObservers = b.staticTorEventObservers.toImmutableSet(),
                         staticRuntimeEventObservers = b.staticRuntimeEventObservers.toImmutableSet(),
                     )

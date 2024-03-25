@@ -153,10 +153,9 @@ internal abstract class AbstractRuntimeEventProcessor(
             for (observer in this) {
                 if (observer.event != event) continue
 
-                @Suppress("UNCHECKED_CAST")
-                val block = (observer.block as ItBlock<R>)
                 handler.tryCatch(observer.toString(isStatic = observer.tag.isStaticTag())) {
-                    block.invoke(output)
+                    @Suppress("UNCHECKED_CAST")
+                    (observer.block as ItBlock<R>).invoke(output)
                 }
             }
         }

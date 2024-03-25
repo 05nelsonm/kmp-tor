@@ -39,6 +39,8 @@ public abstract class QueuedJob protected constructor(
 
     @Volatile
     private var _state: State = Enqueued
+    @Volatile
+    private var completionCallbacks: LinkedHashSet<ItBlock<Unit>>? = LinkedHashSet(1, 1.0f)
     @OptIn(InternalKmpTorApi::class)
     private val lock = SynchronizedObject()
 
@@ -89,6 +91,28 @@ public abstract class QueuedJob protected constructor(
     }
 
     /**
+     * Attach a [callback] to be invoked when this [QueuedJob]
+     * completes, either successfully or by cancellation/error.
+     *
+     * If the job has already completed, [callback] is invoked
+     * immediately.
+     *
+     * [callback] should **NOT** throw exception. In the event
+     * that it does, it will be swallowed.
+     * */
+    public fun invokeOnCompletion(callback: ItBlock<Unit>) {
+        @OptIn(InternalKmpTorApi::class)
+        val invokeImmediately = synchronized(lock) {
+            completionCallbacks?.add(callback)
+        } == null
+
+        if (!invokeImmediately) return
+        try {
+            callback(Unit)
+        } catch (_: Throwable) {}
+    }
+
+    /**
      * Cancels the job.
      *
      * Does nothing if [state] is anything other than
@@ -112,9 +136,9 @@ public abstract class QueuedJob protected constructor(
 
         if (!notify) return
 
+        onCancellation(cause)
+
         try {
-            onCancellation(cause)
-        } finally {
             if (onFailure != null) {
                 val e = if (cause is CancellationException) {
                     cause
@@ -124,34 +148,25 @@ public abstract class QueuedJob protected constructor(
 
                 onFailure(e)
             }
+        } finally {
+            doInvokeOnCompletion()
         }
     }
 
-    protected abstract fun onCancellation(cause: Throwable?)
+    /**
+     * Notifies the implementation that the [QueuedJob]
+     * has been cancelled in order to perform cleanup, if
+     * necessary.
+     *
+     * @param [cause] The exception, if any, passed to [cancel].
+     * */
+    protected open fun onCancellation(cause: Throwable?) {}
 
-    // This is a nuanced API in which the following things should
-    // **NOT** be done from within block's lambda.
-    //
-    //  - If the implementation returns some sort of response via
-    //    a callback, that callback should be invoked using the
-    //    return value of onCompletion and not from within block's
-    //    lambda.
-    //  - Other functions that acquire the lock (such as cancel, onError,
-    //    and onExecuting) should not be invoked within block, nor should
-    //    the implementation expose externally any uncontrolled functionality
-    //    which may call the aforementioned functions.
-    @Throws(IllegalStateException::class)
-    protected fun <T: Any?> onCompletion(block: () -> T): T {
-        @OptIn(InternalKmpTorApi::class)
-        return synchronized(lock) {
-            if (!isActive) throw IllegalStateException(toString())
-            val result = block()
-            _state = Completed
-            onFailure = null
-            result
-        }
-    }
-
+    /**
+     * Moves the state to [State.Executing]
+     *
+     * @throws [IllegalStateException] if job has already completed.
+     * */
     @Throws(IllegalStateException::class)
     protected fun onExecuting() {
         @OptIn(InternalKmpTorApi::class)
@@ -161,7 +176,48 @@ public abstract class QueuedJob protected constructor(
         }
     }
 
-    protected fun onError(cause: Throwable) {
+    /**
+     * Sets the job state to [State.Completed] and invokes
+     * [ItBlock] (onSuccess) returned by [withLock] with provided
+     * [response]. Does nothing if the job is already completed.
+     *
+     * **NOTE:** [withLock] lambda should not call any other
+     * functions which acquire the lock such as [cancel], [onError],
+     * or [invokeOnCompletion].
+     * */
+    protected fun <T: Any> onCompletion(response: T, withLock: () -> ItBlock<T>?) {
+        if (!isActive) return
+
+        var onSuccess: ItBlock<T>? = null
+
+        @OptIn(InternalKmpTorApi::class)
+        val notify = synchronized(lock) {
+            if (!isActive) return@synchronized false
+            onSuccess = withLock()
+            _state = Completed
+            onFailure = null
+            true
+        }
+
+        if (!notify) return
+
+        try {
+            onSuccess?.let { it(response) }
+        } finally {
+            doInvokeOnCompletion()
+        }
+    }
+
+    /**
+     * Sets the job state to [State.Error] and invokes [onFailure]
+     * with provided [cause]. Does nothing if the job is already
+     * completed.
+     *
+     * **NOTE:** [withLock] lambda should not call any other
+     * functions which obtain the lock such as [cancel], [onCompletion],
+     * or [invokeOnCompletion].
+     * */
+    protected fun onError(cause: Throwable, withLock: ItBlock<Unit>) {
         if (!isActive) return
 
         val onFailure = onFailure
@@ -171,11 +227,32 @@ public abstract class QueuedJob protected constructor(
             if (!isActive) return@synchronized false
             _state = Error
             this.onFailure = null
+            withLock(Unit)
             true
         }
 
-        if (!notify || onFailure == null) return
-        onFailure(cause)
+        if (!notify) return
+
+        try {
+            if (onFailure != null) {
+                onFailure(cause)
+            }
+        } finally {
+            doInvokeOnCompletion()
+        }
+    }
+
+    private fun doInvokeOnCompletion() {
+        @OptIn(InternalKmpTorApi::class)
+        synchronized(lock) {
+            val callbacks = completionCallbacks
+            completionCallbacks = null
+            callbacks
+        }?.forEach { callback ->
+            try {
+                callback(Unit)
+            } catch (_: Throwable) {}
+        }
     }
 
     final override fun toString(): String = "QueuedJob[name=$name,state=$state]@${hashCode()}"

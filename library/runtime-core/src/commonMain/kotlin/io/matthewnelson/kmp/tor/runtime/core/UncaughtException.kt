@@ -19,7 +19,7 @@ import kotlin.jvm.JvmField
 import kotlin.jvm.JvmStatic
 
 /**
- * A special exception to indicate something went terribly wrong.
+ * A special exception to indicate something went terribly wrong somewhere.
  *
  * @see [io.matthewnelson.kmp.tor.runtime.RuntimeEvent.LOG.ERROR]
  * */
@@ -27,6 +27,15 @@ public class UncaughtException private constructor(
     override val message: String,
     override val cause: Throwable,
 ): Exception(message, cause) {
+
+    /**
+     * A typealias for message with contextual information about
+     * where and what threw the exception.
+     *
+     * @see [Handler.tryCatch]
+     * */
+    @JvmField
+    public val context: String = message
 
     /**
      * Producer for [UncaughtException]
@@ -38,15 +47,13 @@ public class UncaughtException private constructor(
         public companion object {
 
             /**
-             * Instance that prints the [UncaughtException]
-             * stack trace.
+             * Instance that prints [UncaughtException] stack trace to stderr.
              * */
             @JvmField
             public val PRINT: Handler = Handler { it.printStackTrace() }
 
             /**
-             * Instance that suppresses (does nothing) with the
-             * [UncaughtException].
+             * Instance that suppresses (does nothing) the [UncaughtException].
              * */
             @JvmField
             public val SUPPRESS: Handler = Handler {}
@@ -59,9 +66,20 @@ public class UncaughtException private constructor(
 
             /**
              * Helper for wrapping external function calls in order to redirect
-             * any uncaught exceptions due to a bad implementation. For example,
-             * when notifying attached [TorEvent.Observer] where an exception
-             * should not be thrown.
+             * any uncaught exceptions.
+             *
+             * For example, when notifying attached [TorEvent.Observer] and one
+             * does not properly handle its exceptions, instead of it causing the
+             * entire program to crash, an [UncaughtException] is redirected to
+             * [Handler].
+             *
+             * **NOTE:** If [Handler] is null, [block] is still invoked and the
+             * unwrapped exception is thrown.
+             *
+             * @param [context] Contextual information about where/what [block] is
+             *   to include in the [UncaughtException]
+             * @param [block] the thing to do that may or may not throw exception.
+             * @see [io.matthewnelson.kmp.tor.runtime.RuntimeEvent.LOG.ERROR]
              * */
             @JvmStatic
             public fun Handler?.tryCatch(context: Any, block: ItBlock<Unit>) {

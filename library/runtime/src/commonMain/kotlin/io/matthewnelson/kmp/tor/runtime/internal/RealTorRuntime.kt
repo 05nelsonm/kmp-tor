@@ -33,7 +33,7 @@ internal class RealTorRuntime private constructor(
     private val environment: TorRuntime.Environment,
     private val lifecycleHook: Job,
     private val networkObserver: NetworkObserver,
-    private val staticTorEvents: Set<TorEvent>,
+    private val requiredTorEvents: Set<TorEvent>,
     staticTorEventObservers: Set<TorEvent.Observer>,
     staticRuntimeEventObservers: Set<RuntimeEvent.Observer<*>>,
 ):  AbstractRuntimeEventProcessor(environment.staticObserverTag, staticRuntimeEventObservers, staticTorEventObservers),
@@ -69,7 +69,7 @@ internal class RealTorRuntime private constructor(
             allowPortReassignment: Boolean,
             omitGeoIPFileSettings: Boolean,
             config: List<ThisBlock.WithIt<TorConfig.Builder, TorRuntime.Environment>>,
-            staticTorEvents: Set<TorEvent>,
+            requiredTorEvents: Set<TorEvent>,
             staticTorEventObservers: Set<TorEvent.Observer>,
             staticRuntimeEventObservers: Set<RuntimeEvent.Observer<*>>,
         ): TorRuntime {
@@ -77,7 +77,7 @@ internal class RealTorRuntime private constructor(
             val runtime = TorRuntime.ServiceFactory.serviceRuntimeOrNull {
                 ServiceFactory(
                     environment,
-                    staticTorEvents,
+                    requiredTorEvents,
                     staticTorEventObservers,
                     staticRuntimeEventObservers,
                 )
@@ -89,7 +89,7 @@ internal class RealTorRuntime private constructor(
                 environment,
                 NonCancellable,
                 networkObserver,
-                staticTorEvents,
+                requiredTorEvents,
                 staticTorEventObservers,
                 staticRuntimeEventObservers,
             )
@@ -106,7 +106,7 @@ internal class RealTorRuntime private constructor(
 
     private class ServiceFactory(
         override val environment: TorRuntime.Environment,
-        staticTorEvents: Set<TorEvent>,
+        requiredTorEvents: Set<TorEvent>,
         staticTorEventObservers: Set<TorEvent.Observer>,
         staticRuntimeEventObservers: Set<RuntimeEvent.Observer<*>>,
     ): AbstractRuntimeEventProcessor(
@@ -117,12 +117,12 @@ internal class RealTorRuntime private constructor(
 
         protected override val debug: Boolean get() = environment.debug
 
-        private val staticTorEvents = if (!staticTorEvents.contains(TorEvent.BW)) {
-            staticTorEvents.toMutableSet().apply {
+        private val requiredTorEvents = if (!requiredTorEvents.contains(TorEvent.BW)) {
+            requiredTorEvents.toMutableSet().apply {
                 add(TorEvent.BW)
             }.toImmutableSet()
         } else {
-            staticTorEvents
+            requiredTorEvents
         }
 
         private val staticTorEventObservers = buildSet {
@@ -157,7 +157,7 @@ internal class RealTorRuntime private constructor(
             environment,
             lifecycleHook,
             observer ?: NetworkObserver.NOOP,
-            staticTorEvents,
+            requiredTorEvents,
             staticTorEventObservers,
             staticRuntimeEventObservers,
         )
