@@ -40,8 +40,6 @@ internal class RealTorRuntime private constructor(
     TorRuntime
 {
 
-    protected override val exceptionHandler: UncaughtExceptionHandler get() = environment.exceptionHandler
-
     override fun enqueue(
         action: RuntimeAction,
         onFailure: ItBlock<Throwable>,
@@ -118,8 +116,6 @@ internal class RealTorRuntime private constructor(
         staticTorEventObservers
     ), TorRuntime.ServiceFactory {
 
-        protected override val exceptionHandler: UncaughtExceptionHandler get() = environment.exceptionHandler
-
         private val staticTorEvents = if (!staticTorEvents.contains(TorEvent.BW)) {
             staticTorEvents.toMutableSet().apply {
                 add(TorEvent.BW)
@@ -142,7 +138,10 @@ internal class RealTorRuntime private constructor(
 
             RuntimeEvent.entries.forEach { event ->
                 val observer = when (event) {
-                    is RuntimeEvent.LOG -> event.observer(tag) { event.notifyObservers(it) }
+                    is RuntimeEvent.LOG.DEBUG -> event.observer(tag) { event.notifyObservers(it) }
+                    is RuntimeEvent.LOG.ERROR -> event.observer(tag) { event.notifyObservers(it) }
+                    is RuntimeEvent.LOG.INFO -> event.observer(tag) { event.notifyObservers(it) }
+                    is RuntimeEvent.LOG.WARN -> event.observer(tag) { event.notifyObservers(it) }
                 }
                 add(observer)
             }

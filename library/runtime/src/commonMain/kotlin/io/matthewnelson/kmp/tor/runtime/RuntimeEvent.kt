@@ -20,8 +20,8 @@ import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
 import io.matthewnelson.kmp.tor.runtime.core.ItBlock
 import io.matthewnelson.kmp.tor.runtime.core.TorEvent
 import kotlin.jvm.JvmField
-import kotlin.jvm.JvmName
 import kotlin.jvm.JvmStatic
+import kotlin.jvm.JvmSynthetic
 
 /**
  * Events specific to [TorRuntime]
@@ -30,19 +30,19 @@ import kotlin.jvm.JvmStatic
  * @see [observer]
  * @see [Processor]
  * */
-public sealed class RuntimeEvent<R: Any> private constructor() {
-
-    @get:JvmName("name")
-    public val name: String get() = toString()
+public sealed class RuntimeEvent<R: Any> private constructor(
+    @JvmField
+    public val name: String,
+) {
 
     /**
      * Log Messages
      * */
-    public sealed class LOG private constructor(): RuntimeEvent<String>() {
-        public data object DEBUG: LOG()
-        public data object ERROR: LOG()
-        public data object INFO: LOG()
-        public data object WARN: LOG()
+    public data object LOG {
+        public data object DEBUG: RuntimeEvent<String>("LOG_DEBUG")
+        public data object ERROR: RuntimeEvent<Throwable>("LOG_ERROR")
+        public data object INFO: RuntimeEvent<String>("LOG_INFO")
+        public data object WARN: RuntimeEvent<String>("LOG_WARN")
     }
 
     // TODO: Other events
@@ -98,12 +98,16 @@ public sealed class RuntimeEvent<R: Any> private constructor() {
         @JvmField
         public val event: RuntimeEvent<R>,
         @JvmField
-        public val output: ItBlock<R>
+        public val block: ItBlock<R>,
     ) {
         @JvmField
         public val tag: String? = tag?.ifBlank { null }
 
-        override fun toString(): String = buildString {
+        public override fun toString(): String = toString(isStatic = false)
+
+        public fun toString(isStatic: Boolean): String = buildString {
+            val tag = if (tag != null && isStatic) "STATIC" else tag
+
             append("RuntimeEvent.Observer[tag=")
             append(tag.toString())
             append(",event=")
@@ -173,7 +177,7 @@ public sealed class RuntimeEvent<R: Any> private constructor() {
         @Throws(IllegalArgumentException::class)
         public fun valueOf(name: String): RuntimeEvent<*> {
             return valueOfOrNull(name)
-                ?: throw IllegalArgumentException("Unknown RuntimeEvent of $name")
+                ?: throw IllegalArgumentException("Unknown RuntimeEvent.name[$name]")
         }
 
         @JvmStatic
@@ -196,4 +200,6 @@ public sealed class RuntimeEvent<R: Any> private constructor() {
     public interface Notifier {
         public fun <R: Any> notify(event: RuntimeEvent<R>, output: R)
     }
+
+    final override fun toString(): String = name
 }

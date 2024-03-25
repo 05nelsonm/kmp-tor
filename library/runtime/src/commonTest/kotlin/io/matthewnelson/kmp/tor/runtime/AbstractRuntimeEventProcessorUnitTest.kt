@@ -16,16 +16,20 @@
 package io.matthewnelson.kmp.tor.runtime
 
 import io.matthewnelson.kmp.tor.runtime.core.TorEvent
-import io.matthewnelson.kmp.tor.runtime.core.UncaughtExceptionHandler
+import io.matthewnelson.kmp.tor.runtime.core.UncaughtException
 import io.matthewnelson.kmp.tor.runtime.internal.AbstractRuntimeEventProcessor
 import kotlin.test.*
 
 class AbstractRuntimeEventProcessorUnitTest {
 
-    private class TestProcessor: AbstractRuntimeEventProcessor("static", emptySet(), emptySet()) {
+    private companion object {
+        private const val STATIC_TAG = "TAG_STATIC_1234"
+    }
+
+    private class TestProcessor: AbstractRuntimeEventProcessor(STATIC_TAG, emptySet(), emptySet()) {
         val size: Int get() = registered()
-        override val exceptionHandler: UncaughtExceptionHandler = UncaughtExceptionHandler.THROW
         fun <R: Any> notify(event: RuntimeEvent<R>, output: R) { event.notifyObservers(output) }
+        fun notify(event: TorEvent, output: String) { event.notifyObservers(output) }
         fun destroy() { onDestroy() }
     }
 
@@ -98,13 +102,13 @@ class AbstractRuntimeEventProcessorUnitTest {
 
     @Test
     fun givenStaticTag_whenRemove_thenDoesNothing() {
-        processor.add(RuntimeEvent.LOG.DEBUG.observer("static") {})
+        processor.add(RuntimeEvent.LOG.DEBUG.observer(STATIC_TAG) {})
 
         val nonStaticObserver = RuntimeEvent.LOG.DEBUG.observer("non-static") {}
         processor.add(nonStaticObserver)
 
         // should do nothing
-        processor.removeAll("static")
+        processor.removeAll(STATIC_TAG)
         assertEquals(2, processor.size)
 
         // Should only remove the non-static observer
@@ -126,9 +130,9 @@ class AbstractRuntimeEventProcessorUnitTest {
 
     @Test
     fun givenStaticObservers_whenOnDestroy_thenEvictsAll() {
-        val observer = RuntimeEvent.LOG.DEBUG.observer("static") {}
+        val observer = RuntimeEvent.LOG.DEBUG.observer(STATIC_TAG) {}
         processor.add(observer)
-        processor.add(TorEvent.BW.observer("static") {})
+        processor.add(TorEvent.BW.observer(STATIC_TAG) {})
 
         processor.clearObservers()
         assertEquals(2, processor.size)
@@ -139,5 +143,32 @@ class AbstractRuntimeEventProcessorUnitTest {
 
         processor.add(observer)
         assertEquals(0, processor.size)
+    }
+
+    @Test
+    fun givenUncaughtException_whenRedirectedToLogError_thenIsAsExpected() {
+        processor.add(RuntimeEvent.LOG.DEBUG.observer(STATIC_TAG) { throw IllegalStateException() })
+        processor.add(TorEvent.INFO.observer(STATIC_TAG) { throw IllegalStateException() })
+
+        var invocations = 0
+        processor.add(RuntimeEvent.LOG.ERROR.observer { t ->
+            invocations++
+            assertIs<UncaughtException>(t)
+            assertIs<IllegalStateException>(t.cause)
+
+            // ensure observer.toString (which is utilized
+            // as context) does not leak the static tag value.
+            assertFalse(t.message.contains(STATIC_TAG))
+            assertTrue(t.message.contains("tag=STATIC"))
+
+            // should be swallowed
+            throw t
+        })
+
+        processor.notify(RuntimeEvent.LOG.DEBUG, "something")
+        assertEquals(1, invocations)
+
+        processor.notify(TorEvent.INFO, "something")
+        assertEquals(2, invocations)
     }
 }

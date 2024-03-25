@@ -19,8 +19,8 @@ import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
 import io.matthewnelson.kmp.tor.core.resource.SynchronizedObject
 import io.matthewnelson.kmp.tor.core.resource.synchronized
 import io.matthewnelson.kmp.tor.runtime.core.TorEvent
-import io.matthewnelson.kmp.tor.runtime.core.UncaughtExceptionHandler
-import io.matthewnelson.kmp.tor.runtime.core.UncaughtExceptionHandler.Companion.tryCatch
+import io.matthewnelson.kmp.tor.runtime.core.UncaughtException
+import io.matthewnelson.kmp.tor.runtime.core.UncaughtException.Handler.Companion.tryCatch
 import kotlin.concurrent.Volatile
 import kotlin.jvm.JvmName
 import kotlin.jvm.JvmStatic
@@ -35,7 +35,7 @@ public abstract class AbstractTorEventProcessor protected constructor(
 ): TorEvent.Processor {
 
     private val staticTag: String? = staticTag?.ifBlank { null }
-    protected abstract val exceptionHandler: UncaughtExceptionHandler
+    protected abstract val handler: UncaughtException.Handler
 
     @Volatile
     @get:JvmName("destroyed")
@@ -130,7 +130,7 @@ public abstract class AbstractTorEventProcessor protected constructor(
             for (observer in this) {
                 if (observer.event != event) continue
 
-                exceptionHandler.tryCatch(observer) {
+                handler.tryCatch(observer.toString(isStatic = observer.tag.isStaticTag())) {
                     observer.block.invoke(output)
                 }
             }

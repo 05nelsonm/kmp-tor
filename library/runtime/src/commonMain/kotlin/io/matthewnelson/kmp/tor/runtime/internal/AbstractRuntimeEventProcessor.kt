@@ -22,7 +22,8 @@ import io.matthewnelson.kmp.tor.runtime.RuntimeEvent
 import io.matthewnelson.kmp.tor.runtime.ctrl.AbstractTorEventProcessor
 import io.matthewnelson.kmp.tor.runtime.core.ItBlock
 import io.matthewnelson.kmp.tor.runtime.core.TorEvent
-import io.matthewnelson.kmp.tor.runtime.core.UncaughtExceptionHandler.Companion.tryCatch
+import io.matthewnelson.kmp.tor.runtime.core.UncaughtException
+import io.matthewnelson.kmp.tor.runtime.core.UncaughtException.Handler.Companion.tryCatch
 
 @OptIn(InternalKmpTorApi::class)
 internal abstract class AbstractRuntimeEventProcessor(
@@ -35,6 +36,9 @@ internal abstract class AbstractRuntimeEventProcessor(
 
     private val observers = LinkedHashSet<RuntimeEvent.Observer<*>>(initialObservers.size + 1, 1.0F)
     private val lock = SynchronizedObject()
+    protected final override val handler: UncaughtException.Handler = UncaughtException.Handler { t ->
+        RuntimeEvent.LOG.ERROR.notifyObservers(t)
+    }
 
     init {
         observers.addAll(initialObservers)
@@ -119,15 +123,35 @@ internal abstract class AbstractRuntimeEventProcessor(
 
     protected final override fun registered(): Int = super.registered() + withObservers { size }
 
+    // ONLY utilize within notifyObservers as the lock
+    // needs to be held to iterate over observers
+    private val runtimeHandler = UncaughtException.Handler { t ->
+        for (observer in observers) {
+            if (observer.event != RuntimeEvent.LOG.ERROR) continue
+
+            @Suppress("UNCHECKED_CAST")
+            val block = (observer.block as ItBlock<Throwable>)
+            try {
+                block.invoke(t)
+            } catch (_: Throwable) {}
+        }
+    }
+
     protected fun <R: Any> RuntimeEvent<R>.notifyObservers(output: R) {
         val event = this
         withObservers {
+            val handler = if (event is RuntimeEvent.LOG.ERROR) {
+                UncaughtException.Handler.SUPPRESS
+            } else {
+                runtimeHandler
+            }
+
             for (observer in this) {
                 if (observer.event != event) continue
 
                 @Suppress("UNCHECKED_CAST")
-                val block = (observer.output as ItBlock<R>)
-                exceptionHandler.tryCatch(observer) {
+                val block = (observer.block as ItBlock<R>)
+                handler.tryCatch(observer.toString(isStatic = observer.tag.isStaticTag())) {
                     block.invoke(output)
                 }
             }

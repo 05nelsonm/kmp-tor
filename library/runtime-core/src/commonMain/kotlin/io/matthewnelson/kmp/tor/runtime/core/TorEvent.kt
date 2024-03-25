@@ -247,7 +247,11 @@ public enum class TorEvent {
         @JvmField
         public val tag: String? = tag?.ifBlank { null }
 
-        override fun toString(): String = buildString {
+        override fun toString(): String = toString(isStatic = false)
+
+        public fun toString(isStatic: Boolean): String = buildString {
+            val tag = if (tag != null && isStatic) "STATIC" else tag
+
             append("TorEvent.Observer[tag=")
             append(tag.toString())
             append(",event=")

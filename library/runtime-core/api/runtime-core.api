@@ -596,6 +596,7 @@ public final class io/matthewnelson/kmp/tor/runtime/core/TorEvent$Observer {
 	public final field tag Ljava/lang/String;
 	public fun <init> (Ljava/lang/String;Lio/matthewnelson/kmp/tor/runtime/core/TorEvent;Lio/matthewnelson/kmp/tor/runtime/core/ItBlock;)V
 	public fun toString ()Ljava/lang/String;
+	public final fun toString (Z)Ljava/lang/String;
 }
 
 public abstract interface class io/matthewnelson/kmp/tor/runtime/core/TorEvent$Processor {
@@ -609,17 +610,22 @@ public abstract interface class io/matthewnelson/kmp/tor/runtime/core/TorEvent$P
 	public abstract fun removeAll ([Lio/matthewnelson/kmp/tor/runtime/core/TorEvent;)V
 }
 
-public abstract interface class io/matthewnelson/kmp/tor/runtime/core/UncaughtExceptionHandler {
-	public static final field Companion Lio/matthewnelson/kmp/tor/runtime/core/UncaughtExceptionHandler$Companion;
-	public static final field PRINT Lio/matthewnelson/kmp/tor/runtime/core/UncaughtExceptionHandler;
-	public static final field SUPPRESS Lio/matthewnelson/kmp/tor/runtime/core/UncaughtExceptionHandler;
-	public static final field THROW Lio/matthewnelson/kmp/tor/runtime/core/UncaughtExceptionHandler;
-	public abstract fun invoke (Ljava/lang/String;Ljava/lang/Throwable;)V
-	public static fun tryCatch (Lio/matthewnelson/kmp/tor/runtime/core/UncaughtExceptionHandler;Ljava/lang/Object;Lio/matthewnelson/kmp/tor/runtime/core/ItBlock;)V
+public final class io/matthewnelson/kmp/tor/runtime/core/UncaughtException : java/lang/Exception {
+	public synthetic fun <init> (Ljava/lang/String;Ljava/lang/Throwable;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public fun getCause ()Ljava/lang/Throwable;
+	public fun getMessage ()Ljava/lang/String;
 }
 
-public final class io/matthewnelson/kmp/tor/runtime/core/UncaughtExceptionHandler$Companion {
-	public final fun tryCatch (Lio/matthewnelson/kmp/tor/runtime/core/UncaughtExceptionHandler;Ljava/lang/Object;Lio/matthewnelson/kmp/tor/runtime/core/ItBlock;)V
+public abstract interface class io/matthewnelson/kmp/tor/runtime/core/UncaughtException$Handler : io/matthewnelson/kmp/tor/runtime/core/ItBlock {
+	public static final field Companion Lio/matthewnelson/kmp/tor/runtime/core/UncaughtException$Handler$Companion;
+	public static final field PRINT Lio/matthewnelson/kmp/tor/runtime/core/UncaughtException$Handler;
+	public static final field SUPPRESS Lio/matthewnelson/kmp/tor/runtime/core/UncaughtException$Handler;
+	public static final field THROW Lio/matthewnelson/kmp/tor/runtime/core/UncaughtException$Handler;
+	public static fun tryCatch (Lio/matthewnelson/kmp/tor/runtime/core/UncaughtException$Handler;Ljava/lang/Object;Lio/matthewnelson/kmp/tor/runtime/core/ItBlock;)V
+}
+
+public final class io/matthewnelson/kmp/tor/runtime/core/UncaughtException$Handler$Companion {
+	public final fun tryCatch (Lio/matthewnelson/kmp/tor/runtime/core/UncaughtException$Handler;Ljava/lang/Object;Lio/matthewnelson/kmp/tor/runtime/core/ItBlock;)V
 }
 
 public abstract class io/matthewnelson/kmp/tor/runtime/core/address/Address : java/lang/Comparable {

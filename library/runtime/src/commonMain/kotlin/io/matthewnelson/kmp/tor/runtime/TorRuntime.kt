@@ -248,8 +248,6 @@ public interface TorRuntime:
         public val torrcDefaultsFile: File,
         @JvmField
         public val torResource: ResourceInstaller<Paths.Tor>,
-        @JvmField
-        public val exceptionHandler: UncaughtExceptionHandler,
     ) {
 
         /**
@@ -351,9 +349,6 @@ public interface TorRuntime:
             @JvmField
             public var torrcDefaultsFile: File = workDir.resolve("torrc-defaults")
 
-            @JvmField
-            public var exceptionHandler: UncaughtExceptionHandler = UncaughtExceptionHandler.THROW
-
             internal companion object: InstanceKeeper<File, Environment>() {
 
                 @JvmSynthetic
@@ -376,7 +371,6 @@ public interface TorRuntime:
                             torrcFile = b.torrcFile.absoluteFile.normalize(),
                             torrcDefaultsFile = b.torrcDefaultsFile.absoluteFile.normalize(),
                             torResource = torResource,
-                            exceptionHandler = b.exceptionHandler,
                         )
                     }
                 }
