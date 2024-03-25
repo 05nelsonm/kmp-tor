@@ -5,8 +5,14 @@ public final class io/matthewnelson/kmp/tor/runtime/core/BlocksKt {
 }
 
 public abstract interface class io/matthewnelson/kmp/tor/runtime/core/Destroyable {
+	public static final field Companion Lio/matthewnelson/kmp/tor/runtime/core/Destroyable$Companion;
+	public static fun checkDestroy (Lio/matthewnelson/kmp/tor/runtime/core/Destroyable;)V
 	public abstract fun destroy ()V
 	public abstract fun isDestroyed ()Z
+}
+
+public final class io/matthewnelson/kmp/tor/runtime/core/Destroyable$Companion {
+	public final fun checkDestroy (Lio/matthewnelson/kmp/tor/runtime/core/Destroyable;)V
 }
 
 public abstract interface class io/matthewnelson/kmp/tor/runtime/core/ItBlock {
@@ -620,8 +626,8 @@ public final class io/matthewnelson/kmp/tor/runtime/core/UncaughtException : jav
 
 public abstract interface class io/matthewnelson/kmp/tor/runtime/core/UncaughtException$Handler : io/matthewnelson/kmp/tor/runtime/core/ItBlock {
 	public static final field Companion Lio/matthewnelson/kmp/tor/runtime/core/UncaughtException$Handler$Companion;
+	public static final field IGNORE Lio/matthewnelson/kmp/tor/runtime/core/UncaughtException$Handler;
 	public static final field PRINT Lio/matthewnelson/kmp/tor/runtime/core/UncaughtException$Handler;
-	public static final field SUPPRESS Lio/matthewnelson/kmp/tor/runtime/core/UncaughtException$Handler;
 	public static final field THROW Lio/matthewnelson/kmp/tor/runtime/core/UncaughtException$Handler;
 	public static fun tryCatch (Lio/matthewnelson/kmp/tor/runtime/core/UncaughtException$Handler;Ljava/lang/Object;Lio/matthewnelson/kmp/tor/runtime/core/ItBlock;)V
 }

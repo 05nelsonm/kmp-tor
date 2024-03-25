@@ -102,11 +102,8 @@ public abstract class AbstractTorEventProcessor protected constructor(
             val iterator = iterator()
             while (iterator.hasNext()) {
                 val observer = iterator.next()
-                if (observer.tag.isStaticTag()) continue
-
-                if (observer.tag == tag) {
-                    iterator.remove()
-                }
+                if (observer.tag != tag) continue
+                iterator.remove()
             }
         }
     }

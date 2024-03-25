@@ -53,10 +53,10 @@ public class UncaughtException private constructor(
             public val PRINT: Handler = Handler { it.printStackTrace() }
 
             /**
-             * Instance that suppresses (does nothing) the [UncaughtException].
+             * Instance that swallows (ignores) the [UncaughtException].
              * */
             @JvmField
-            public val SUPPRESS: Handler = Handler {}
+            public val IGNORE: Handler = Handler {}
 
             /**
              * Instance that automatically throws [UncaughtException]

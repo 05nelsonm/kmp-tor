@@ -98,11 +98,8 @@ internal abstract class AbstractRuntimeEventProcessor(
             val iterator = iterator()
             while (iterator.hasNext()) {
                 val observer = iterator.next()
-                if (observer.tag.isStaticTag()) continue
-
-                if (observer.tag == tag) {
-                    iterator.remove()
-                }
+                if (observer.tag != tag) continue
+                iterator.remove()
             }
         }
 
@@ -145,7 +142,7 @@ internal abstract class AbstractRuntimeEventProcessor(
 
         withObservers {
             val handler = if (event is RuntimeEvent.LOG.ERROR) {
-                UncaughtException.Handler.SUPPRESS
+                UncaughtException.Handler.IGNORE
             } else {
                 runtimeHandler
             }
@@ -163,7 +160,13 @@ internal abstract class AbstractRuntimeEventProcessor(
 
     protected override fun onDestroy() {
         if (destroyed) return
-        withObservers { clear(); super.onDestroy() }
+
+        withObservers {
+            if (destroyed) return@withObservers
+
+            clear()
+            super.onDestroy()
+        }
     }
 
     private fun <T: Any?> withObservers(
