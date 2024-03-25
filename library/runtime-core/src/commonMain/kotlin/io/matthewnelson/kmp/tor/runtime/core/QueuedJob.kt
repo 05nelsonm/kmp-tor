@@ -163,15 +163,19 @@ public abstract class QueuedJob protected constructor(
     protected open fun onCancellation(cause: Throwable?) {}
 
     /**
-     * Moves the state to [State.Executing]
+     * Moves the state from [Enqueued] to [Executing], indicating
+     * that the caller has "taken ownership" of the [QueuedJob].
      *
-     * @throws [IllegalStateException] if job has already completed.
+     * If a different caller attempts to invoke [onExecuting] again,
+     * an exception is raised to prevent multiple executions.
+     *
+     * @throws [IllegalStateException] if current state is not [Enqueued].
      * */
     @Throws(IllegalStateException::class)
     protected fun onExecuting() {
         @OptIn(InternalKmpTorApi::class)
         synchronized(lock) {
-            if (!isActive) throw IllegalStateException(toString())
+            if (state != Enqueued) throw IllegalStateException(toString())
             _state = Executing
         }
     }

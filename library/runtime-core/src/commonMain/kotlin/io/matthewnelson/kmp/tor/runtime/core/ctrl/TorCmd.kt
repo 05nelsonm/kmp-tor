@@ -47,7 +47,7 @@ import kotlin.jvm.JvmStatic
  * */
 public sealed class TorCmd<Response: Any> private constructor(
     @JvmField
-    public val name: Name,
+    public val keyword: Keyword,
 ) {
 
     /**
@@ -57,8 +57,8 @@ public sealed class TorCmd<Response: Any> private constructor(
      * */
     public class Authenticate private constructor(
         @JvmField
-        public val key: String,
-    ): Privileged<Unit>(Name.AUTHENTICATE) {
+        public val value: String,
+    ): Privileged<Unit>(Keyword.AUTHENTICATE) {
 
         public companion object {
 
@@ -86,7 +86,7 @@ public sealed class TorCmd<Response: Any> private constructor(
 //     *
 //     * [docs](https://torproject.gitlab.io/torspec/control-spec/#authchallenge)
 //     * */
-//    public class ChallengeAuth: Privileged<Unit>(Name.AUTHCHALLENGE)
+//    public class ChallengeAuth: Privileged<Unit>(Keyword.AUTHCHALLENGE)
 
 //    public data object Circuit {
 //
@@ -97,7 +97,7 @@ public sealed class TorCmd<Response: Any> private constructor(
 //         *
 //         * [docs](https://torproject.gitlab.io/torspec/control-spec/#closecircuit)
 //         * */
-//        public class Close: Unprivileged<Unit>(Name.CLOSECIRCUIT)
+//        public class Close: Unprivileged<Unit>(Keyword.CLOSECIRCUIT)
 //
 //        /**
 //         * "EXTENDCIRCUIT" SP CircuitID
@@ -106,14 +106,14 @@ public sealed class TorCmd<Response: Any> private constructor(
 //         *
 //         * [docs](https://torproject.gitlab.io/torspec/control-spec/#extendcircuit)
 //         * */
-//        public class Extend: Unprivileged<String>(Name.EXTENDCIRCUIT)
+//        public class Extend: Unprivileged<String>(Keyword.EXTENDCIRCUIT)
 //
 //        /**
 //         * "SETCIRCUITPURPOSE" SP CircuitID SP "purpose=" Purpose CRLF
 //         *
 //         * [docs](https://torproject.gitlab.io/torspec/control-spec/#setcircuitpurpose)
 //         * */
-//        public class SetPurpose: Unprivileged<Unit>(Name.SETCIRCUITPURPOSE)
+//        public class SetPurpose: Unprivileged<Unit>(Keyword.SETCIRCUITPURPOSE)
 //    }
 
     public data object Config {
@@ -128,15 +128,15 @@ public sealed class TorCmd<Response: Any> private constructor(
             @JvmField
             public val keywords: kotlin.collections.Set<TorConfig.Keyword>
 
-            public constructor(keyword: TorConfig.Keyword): super(Name.GETCONF) {
+            public constructor(keyword: TorConfig.Keyword): super(Keyword.GETCONF) {
                 this.keywords = immutableSetOf(keyword)
             }
 
-            public constructor(keywords: Collection<TorConfig.Keyword>): super(Name.GETCONF) {
+            public constructor(keywords: Collection<TorConfig.Keyword>): super(Keyword.GETCONF) {
                 this.keywords = keywords.toImmutableSet()
             }
 
-            public constructor(vararg keywords: TorConfig.Keyword): super(Name.GETCONF) {
+            public constructor(vararg keywords: TorConfig.Keyword): super(Keyword.GETCONF) {
                 this.keywords = immutableSetOf(*keywords)
             }
         }
@@ -149,7 +149,7 @@ public sealed class TorCmd<Response: Any> private constructor(
         public class Load(
             @JvmField
             public val config: TorConfig,
-        ): Privileged<Unit>(Name.LOADCONF)
+        ): Privileged<Unit>(Keyword.LOADCONF)
 
         /**
          * "RESETCONF" 1*(SP keyword ["=" String]) CRLF
@@ -161,15 +161,15 @@ public sealed class TorCmd<Response: Any> private constructor(
             @JvmField
             public val keywords: kotlin.collections.Set<TorConfig.Keyword>
 
-            public constructor(keyword: TorConfig.Keyword): super(Name.RESETCONF) {
+            public constructor(keyword: TorConfig.Keyword): super(Keyword.RESETCONF) {
                 this.keywords = immutableSetOf(keyword)
             }
 
-            public constructor(keywords: Collection<TorConfig.Keyword>): super(Name.RESETCONF) {
+            public constructor(keywords: Collection<TorConfig.Keyword>): super(Keyword.RESETCONF) {
                 this.keywords = keywords.toImmutableSet()
             }
 
-            public constructor(vararg keywords: TorConfig.Keyword): super(Name.RESETCONF) {
+            public constructor(vararg keywords: TorConfig.Keyword): super(Keyword.RESETCONF) {
                 this.keywords = immutableSetOf(*keywords)
             }
         }
@@ -182,7 +182,7 @@ public sealed class TorCmd<Response: Any> private constructor(
         public class Save(
             @JvmField
             public val force: Boolean,
-        ): Unprivileged<Unit>(Name.SAVECONF) {
+        ): Unprivileged<Unit>(Keyword.SAVECONF) {
 
             public constructor(): this(force = false)
         }
@@ -199,15 +199,15 @@ public sealed class TorCmd<Response: Any> private constructor(
             @JvmField
             public val settings: kotlin.collections.Set<TorConfig.Setting>
 
-            public constructor(setting: TorConfig.Setting): super(Name.SETCONF) {
+            public constructor(setting: TorConfig.Setting): super(Keyword.SETCONF) {
                 this.settings = immutableSetOf(setting)
             }
 
-            public constructor(settings: Collection<TorConfig.Setting>): super(Name.SETCONF) {
+            public constructor(settings: Collection<TorConfig.Setting>): super(Keyword.SETCONF) {
                 this.settings = settings.toImmutableSet()
             }
 
-            public constructor(vararg settings: TorConfig.Setting): super(Name.SETCONF) {
+            public constructor(vararg settings: TorConfig.Setting): super(Keyword.SETCONF) {
                 this.settings = immutableSetOf(*settings)
             }
         }
@@ -218,7 +218,7 @@ public sealed class TorCmd<Response: Any> private constructor(
      *
      * [docs](https://torproject.gitlab.io/torspec/control-spec/#dropguards)
      * */
-    public data object DropGuards: Unprivileged<Unit>(Name.DROPGUARDS)
+    public data object DropGuards: Unprivileged<Unit>(Keyword.DROPGUARDS)
 
     public data object Hs {
 
@@ -240,7 +240,7 @@ public sealed class TorCmd<Response: Any> private constructor(
             @JvmField
             public val address: OnionAddress,
             // TODO: Set<Server.Fingerprint>,
-        ): Unprivileged<Unit>(Name.HSFETCH) {
+        ): Unprivileged<Unit>(Keyword.HSFETCH) {
 
             public constructor(key: AddressKey.Public): this(key.address())
         }
@@ -256,7 +256,7 @@ public sealed class TorCmd<Response: Any> private constructor(
 //         *
 //         * [docs](https://torproject.gitlab.io/torspec/control-spec/#hspost)
 //         * */
-//        public class Post: Unprivileged<Unit>(Name.HSPOST)
+//        public class Post: Unprivileged<Unit>(Keyword.HSPOST)
     }
 
     public data object Info {
@@ -271,15 +271,15 @@ public sealed class TorCmd<Response: Any> private constructor(
             @JvmField
             public val keywords: Set<String>
 
-            public constructor(keyword: String): super(Name.GETINFO) {
+            public constructor(keyword: String): super(Keyword.GETINFO) {
                 this.keywords = immutableSetOf(keyword)
             }
 
-            public constructor(keywords: Collection<String>): super(Name.GETINFO) {
+            public constructor(keywords: Collection<String>): super(Keyword.GETINFO) {
                 this.keywords = keywords.toImmutableSet()
             }
 
-            public constructor(vararg keywords: String): super(Name.GETINFO) {
+            public constructor(vararg keywords: String): super(Keyword.GETINFO) {
                 this.keywords = immutableSetOf(*keywords)
             }
         }
@@ -289,7 +289,7 @@ public sealed class TorCmd<Response: Any> private constructor(
 //         *
 //         * [docs](https://torproject.gitlab.io/torspec/control-spec/#protocolinfo)
 //         * */
-//        public class Protocol: Privileged<Map<String, String>>(Name.PROTOCOLINFO)
+//        public class Protocol: Privileged<Map<String, String>>(Keyword.PROTOCOLINFO)
     }
 
     /**
@@ -302,15 +302,15 @@ public sealed class TorCmd<Response: Any> private constructor(
         @JvmField
         public val mappings: Set<AddressMapping>
 
-        public constructor(mapping: AddressMapping): super(Name.MAPADDRESS) {
+        public constructor(mapping: AddressMapping): super(Keyword.MAPADDRESS) {
             this.mappings = immutableSetOf(mapping)
         }
 
-        public constructor(mappings: Collection<AddressMapping>): super(Name.MAPADDRESS) {
+        public constructor(mappings: Collection<AddressMapping>): super(Keyword.MAPADDRESS) {
             this.mappings = mappings.toImmutableSet()
         }
 
-        public constructor(vararg mappings: AddressMapping): super(Name.MAPADDRESS) {
+        public constructor(vararg mappings: AddressMapping): super(Keyword.MAPADDRESS) {
             this.mappings = immutableSetOf(*mappings)
         }
     }
@@ -366,7 +366,7 @@ public sealed class TorCmd<Response: Any> private constructor(
          * */
         public class Add private constructor(
             // TODO: Builder
-        ): Unprivileged<HiddenServiceEntry>(Name.ADD_ONION)
+        ): Unprivileged<HiddenServiceEntry>(Keyword.ADD_ONION)
 
         /**
          * "DEL_ONION" SP ServiceID CRLF
@@ -378,7 +378,7 @@ public sealed class TorCmd<Response: Any> private constructor(
         public class Delete(
             @JvmField
             public val address: OnionAddress,
-        ): Unprivileged<Unit>(Name.DEL_ONION) {
+        ): Unprivileged<Unit>(Keyword.DEL_ONION) {
 
             public constructor(key: AddressKey.Public): this(key.address())
         }
@@ -416,7 +416,7 @@ public sealed class TorCmd<Response: Any> private constructor(
          * */
         public class Add private constructor(
             // TODO
-        ): Unprivileged<Unit>(Name.ONION_CLIENT_AUTH_ADD)
+        ): Unprivileged<Unit>(Keyword.ONION_CLIENT_AUTH_ADD)
 
         /**
          * "ONION_CLIENT_AUTH_REMOVE" SP HSAddress
@@ -428,7 +428,7 @@ public sealed class TorCmd<Response: Any> private constructor(
         public class Remove private constructor(
             @JvmField
             public val address: OnionAddress,
-        ): Unprivileged<Unit>(Name.ONION_CLIENT_AUTH_REMOVE) {
+        ): Unprivileged<Unit>(Keyword.ONION_CLIENT_AUTH_REMOVE) {
 
             public constructor(address: OnionAddress.V3): this(address as OnionAddress)
             public constructor(key: ED25519_V3.PublicKey): this(key.address())
@@ -444,15 +444,15 @@ public sealed class TorCmd<Response: Any> private constructor(
             @JvmField
             public val address: OnionAddress?
 
-            private constructor(): super(Name.ONION_CLIENT_AUTH_VIEW) {
+            private constructor(): super(Keyword.ONION_CLIENT_AUTH_VIEW) {
                 this.address = null
             }
 
-            public constructor(address: OnionAddress.V3): super(Name.ONION_CLIENT_AUTH_VIEW) {
+            public constructor(address: OnionAddress.V3): super(Keyword.ONION_CLIENT_AUTH_VIEW) {
                 this.address = address
             }
 
-            public constructor(key: ED25519_V3.PublicKey): super(Name.ONION_CLIENT_AUTH_VIEW) {
+            public constructor(key: ED25519_V3.PublicKey): super(Keyword.ONION_CLIENT_AUTH_VIEW) {
                 this.address = key.address()
             }
 
@@ -471,14 +471,14 @@ public sealed class TorCmd<Response: Any> private constructor(
          *
          * [docs](https://torproject.gitlab.io/torspec/control-spec/#dropownership)
          * */
-        public data object Drop: Privileged<Unit>(Name.DROPOWNERSHIP)
+        public data object Drop: Privileged<Unit>(Keyword.DROPOWNERSHIP)
 
         /**
          * "TAKEOWNERSHIP" CRLF
          *
          * [docs](https://torproject.gitlab.io/torspec/control-spec/#takeownership)
          * */
-        public data object Take: Privileged<Unit>(Name.TAKEOWNERSHIP)
+        public data object Take: Privileged<Unit>(Keyword.TAKEOWNERSHIP)
     }
 
 //    /**
@@ -487,7 +487,7 @@ public sealed class TorCmd<Response: Any> private constructor(
 //     *
 //     * [docs](https://torproject.gitlab.io/torspec/control-spec/#postdescriptor)
 //     * */
-//    public class PostDescriptor: Unprivileged<String>(Name.POSTDESCRIPTOR)
+//    public class PostDescriptor: Unprivileged<String>(Keyword.POSTDESCRIPTOR)
 
     /**
      * "RESOLVE" *Option *Address CRLF
@@ -503,7 +503,7 @@ public sealed class TorCmd<Response: Any> private constructor(
         public val hostname: String,
         @JvmField
         public val reverse: Boolean,
-    ): Unprivileged<Unit>(Name.RESOLVE) {
+    ): Unprivileged<Unit>(Keyword.RESOLVE) {
 
         public constructor(
             address: IPAddress.V4,
@@ -524,15 +524,15 @@ public sealed class TorCmd<Response: Any> private constructor(
         @JvmField
         public val events: Set<TorEvent>
 
-        public constructor(event: TorEvent): super(Name.SETEVENTS) {
+        public constructor(event: TorEvent): super(Keyword.SETEVENTS) {
             this.events = immutableSetOf(event)
         }
 
-        public constructor(events: Collection<TorEvent>): super(Name.SETEVENTS) {
+        public constructor(events: Collection<TorEvent>): super(Keyword.SETEVENTS) {
             this.events = events.toImmutableSet()
         }
 
-        public constructor(vararg events: TorEvent): super(Name.SETEVENTS) {
+        public constructor(vararg events: TorEvent): super(Keyword.SETEVENTS) {
             this.events = immutableSetOf(*events)
         }
     }
@@ -548,19 +548,19 @@ public sealed class TorCmd<Response: Any> private constructor(
      * */
     public data object Signal {
 
-        public data object Reload: Unprivileged<Unit>(Name.SIGNAL)
-        public data object Dump: Unprivileged<Unit>(Name.SIGNAL)
-        public data object Debug: Unprivileged<Unit>(Name.SIGNAL)
+        public data object Reload: Unprivileged<Unit>(Keyword.SIGNAL)
+        public data object Dump: Unprivileged<Unit>(Keyword.SIGNAL)
+        public data object Debug: Unprivileged<Unit>(Keyword.SIGNAL)
 
         // TODO: Return OK or RateLimited
-        public data object NewNym: Unprivileged<Unit>(Name.SIGNAL)
-        public data object ClearDnsCache: Unprivileged<Unit>(Name.SIGNAL)
-        public data object Heartbeat: Unprivileged<Unit>(Name.SIGNAL)
-        public data object Active: Unprivileged<Unit>(Name.SIGNAL)
-        public data object Dormant: Unprivileged<Unit>(Name.SIGNAL)
+        public data object NewNym: Unprivileged<Unit>(Keyword.SIGNAL)
+        public data object ClearDnsCache: Unprivileged<Unit>(Keyword.SIGNAL)
+        public data object Heartbeat: Unprivileged<Unit>(Keyword.SIGNAL)
+        public data object Active: Unprivileged<Unit>(Keyword.SIGNAL)
+        public data object Dormant: Unprivileged<Unit>(Keyword.SIGNAL)
 
-        public data object Shutdown: Privileged<Unit>(Name.SIGNAL)
-        public data object Halt: Privileged<Unit>(Name.SIGNAL)
+        public data object Shutdown: Privileged<Unit>(Keyword.SIGNAL)
+        public data object Halt: Privileged<Unit>(Keyword.SIGNAL)
     }
 
 //    public data object Stream {
@@ -570,21 +570,21 @@ public sealed class TorCmd<Response: Any> private constructor(
 //         *
 //         * [ATTACHSTREAM](https://torproject.gitlab.io/torspec/control-spec/#attachstream)
 //         * */
-//        public class Attach: Unprivileged<Unit>(Name.ATTACHSTREAM)
+//        public class Attach: Unprivileged<Unit>(Keyword.ATTACHSTREAM)
 //
 //        /**
 //         * "CLOSESTREAM" SP StreamID SP Reason *(SP Flag) CRLF
 //         *
 //         * [CLOSESTREAM](https://torproject.gitlab.io/torspec/control-spec/#closestream)
 //         * */
-//        public class Close: Unprivileged<Unit>(Name.CLOSESTREAM)
+//        public class Close: Unprivileged<Unit>(Keyword.CLOSESTREAM)
 //
 //        /**
 //         * "REDIRECTSTREAM" SP StreamID SP Address [SP Port] CRLF
 //         *
 //         * [REDIRECTSTREAM](https://torproject.gitlab.io/torspec/control-spec/#redirectstream)
 //         * */
-//        public class Redirect: Unprivileged<Unit>(Name.REDIRECTSTREAM)
+//        public class Redirect: Unprivileged<Unit>(Keyword.REDIRECTSTREAM)
 //    }
 
 //    /**
@@ -594,9 +594,9 @@ public sealed class TorCmd<Response: Any> private constructor(
 //     *
 //     * [USEFEATURE](https://torproject.gitlab.io/torspec/control-spec/#usefeature)
 //     * */
-//    public class UseFeature: Unprivileged<Unit>(Name.USEFEATURE)
+//    public class UseFeature: Unprivileged<Unit>(Keyword.USEFEATURE)
 
-    public enum class Name {
+    public enum class Keyword {
         AUTHENTICATE,
 //        AUTHCHALLENGE,
 //        CLOSECIRCUIT,
@@ -634,7 +634,7 @@ public sealed class TorCmd<Response: Any> private constructor(
      * A [TorCmd] whose use is restricted to only that of the control
      * connection, and not with TorRuntime.
      * */
-    public sealed class Privileged<Response: Any>(name: Name): TorCmd<Response>(name) {
+    public sealed class Privileged<Response: Any>(keyword: Keyword): TorCmd<Response>(keyword) {
 
         /**
          * Base interface for implementations that process [Privileged] type [TorCmd]
@@ -668,7 +668,7 @@ public sealed class TorCmd<Response: Any> private constructor(
      * control connection and TorRuntime (which passes it through to
      * the underlying control connection).
      * */
-    public sealed class Unprivileged<Response: Any>(name: Name): TorCmd<Response>(name) {
+    public sealed class Unprivileged<Response: Any>(keyword: Keyword): TorCmd<Response>(keyword) {
 
         /**
          * Base interface for implementations that process [Unprivileged] type [TorCmd]
@@ -697,5 +697,5 @@ public sealed class TorCmd<Response: Any> private constructor(
         }
     }
 
-    final override fun toString(): String = "$name@${hashCode()}"
+    final override fun toString(): String = "$keyword@${hashCode()}"
 }
