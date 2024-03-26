@@ -639,7 +639,10 @@ public sealed class TorCmd<Response: Any> private constructor(
         /**
          * Base interface for implementations that process [Privileged] type [TorCmd]
          *
-         * @see [io.matthewnelson.kmp.tor.runtime.core.util.execute]
+         * **NOTE:** Implementors **MUST** process the command on a different
+         * thread than what [enqueue] is called from for Jvm & Native.
+         *
+         * @see [io.matthewnelson.kmp.tor.runtime.core.util.executeSync]
          * @see [io.matthewnelson.kmp.tor.runtime.core.util.executeAsync]
          * */
         public interface Processor: Unprivileged.Processor {
@@ -673,7 +676,10 @@ public sealed class TorCmd<Response: Any> private constructor(
         /**
          * Base interface for implementations that process [Unprivileged] type [TorCmd]
          *
-         * @see [io.matthewnelson.kmp.tor.runtime.core.util.execute]
+         * **NOTE:** Implementors **MUST** process the command on a different
+         * thread than what [enqueue] is called from for Jvm & Native.
+         *
+         * @see [io.matthewnelson.kmp.tor.runtime.core.util.executeSync]
          * @see [io.matthewnelson.kmp.tor.runtime.core.util.executeAsync]
          * */
         public interface Processor {

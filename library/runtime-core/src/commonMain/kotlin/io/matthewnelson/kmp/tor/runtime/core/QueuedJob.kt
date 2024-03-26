@@ -33,6 +33,9 @@ import kotlin.jvm.JvmName
 public abstract class QueuedJob protected constructor(
     @JvmField
     public val name: String,
+    // TODO:
+    //  @JvmField
+    //  public val canCancelWhileExecuting: Boolean
     @Volatile
     private var onFailure: ItBlock<Throwable>?,
 ) {

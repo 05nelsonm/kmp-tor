@@ -17,18 +17,18 @@
 
 package io.matthewnelson.kmp.tor.runtime.core.util
 
+import io.matthewnelson.kmp.process.Blocking
 import io.matthewnelson.kmp.tor.runtime.core.ctrl.TorCmd
 import io.matthewnelson.kmp.tor.runtime.core.internal.commonExecuteAsync
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.IO
-import kotlinx.coroutines.runBlocking
 import kotlin.jvm.JvmName
+import kotlin.time.Duration.Companion.milliseconds
 
 /**
  * Enqueues the [cmd], suspending the current coroutine until completion
  * or cancellation/error.
  *
  * @see [TorCmd.Privileged.Processor]
+ * @see [executeSync]
  * */
 @Throws(Throwable::class)
 public actual suspend fun <Response: Any> TorCmd.Privileged.Processor.executeAsync(
@@ -40,6 +40,7 @@ public actual suspend fun <Response: Any> TorCmd.Privileged.Processor.executeAsy
  * or cancellation/error.
  *
  * @see [TorCmd.Unprivileged.Processor]
+ * @see [executeSync]
  * */
 @Throws(Throwable::class)
 public actual suspend fun <Response: Any> TorCmd.Unprivileged.Processor.executeAsync(
@@ -50,20 +51,58 @@ public actual suspend fun <Response: Any> TorCmd.Unprivileged.Processor.executeA
  * Enqueues the [cmd], blocking the current thread until completion
  * or cancellation/error.
  *
+ * **NOTE:** This is a blocking call and should be invoked from
+ * a background thread.
+ *
  * @see [TorCmd.Privileged.Processor]
+ * @see [executeAsync]
  * */
 @Throws(Throwable::class)
-public fun <Response: Any> TorCmd.Privileged.Processor.execute(
+public fun <Response: Any> TorCmd.Privileged.Processor.executeSync(
     cmd: TorCmd.Privileged<Response>,
-): Response = runBlocking(Dispatchers.IO) { executeAsync(cmd) }
+): Response {
+    var fail: Throwable? = null
+    var success: Response? = null
+
+    enqueue(
+        cmd = cmd,
+        onFailure = { fail = it },
+        onSuccess = { success = it },
+    )
+
+    while (true) {
+        success?.let { return it }
+        fail?.let { throw it }
+        Blocking.threadSleep(5.milliseconds)
+    }
+}
 
 /**
  * Enqueues the [cmd], blocking the current thread until completion
  * or cancellation/error.
  *
+ * **NOTE:** This is a blocking call and should be invoked from
+ * a background thread.
+ *
  * @see [TorCmd.Unprivileged.Processor]
+ * @see [executeAsync]
  * */
 @Throws(Throwable::class)
-public fun <Response: Any> TorCmd.Unprivileged.Processor.execute(
+public fun <Response: Any> TorCmd.Unprivileged.Processor.executeSync(
     cmd: TorCmd.Unprivileged<Response>,
-): Response = runBlocking(Dispatchers.IO) { executeAsync(cmd) }
+): Response {
+    var fail: Throwable? = null
+    var success: Response? = null
+
+    enqueue(
+        cmd = cmd,
+        onFailure = { fail = it },
+        onSuccess = { success = it },
+    )
+
+    while (true) {
+        success?.let { return it }
+        fail?.let { throw it }
+        Blocking.threadSleep(5.milliseconds)
+    }
+}

@@ -22,6 +22,7 @@ import io.matthewnelson.kmp.tor.runtime.core.ctrl.TorCmd
  * or cancellation/error.
  *
  * @see [TorCmd.Privileged.Processor]
+ * @see [io.matthewnelson.kmp.tor.runtime.core.util.executeSync]
  * */
 @Throws(Throwable::class)
 public expect suspend fun <Response: Any> TorCmd.Privileged.Processor.executeAsync(
@@ -33,6 +34,7 @@ public expect suspend fun <Response: Any> TorCmd.Privileged.Processor.executeAsy
  * or cancellation/error.
  *
  * @see [TorCmd.Unprivileged.Processor]
+ * @see [io.matthewnelson.kmp.tor.runtime.core.util.executeSync]
  * */
 @Throws(Throwable::class)
 public expect suspend fun <Response: Any> TorCmd.Unprivileged.Processor.executeAsync(

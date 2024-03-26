@@ -1358,16 +1358,16 @@ public final class io/matthewnelson/kmp/tor/runtime/core/key/X25519$PublicKey$Co
 }
 
 public final class io/matthewnelson/kmp/tor/runtime/core/util/PortUtil {
-	public static final fun findAvailable (Lio/matthewnelson/kmp/tor/runtime/core/address/Port$Proxy;ILio/matthewnelson/kmp/tor/runtime/core/address/LocalHost;)Lio/matthewnelson/kmp/tor/runtime/core/address/Port$Proxy;
 	public static final fun findAvailableAsync (Lio/matthewnelson/kmp/tor/runtime/core/address/Port$Proxy;ILio/matthewnelson/kmp/tor/runtime/core/address/LocalHost;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public static final fun isAvailable (Lio/matthewnelson/kmp/tor/runtime/core/address/Port;Lio/matthewnelson/kmp/tor/runtime/core/address/LocalHost;)Z
+	public static final fun findAvailableSync (Lio/matthewnelson/kmp/tor/runtime/core/address/Port$Proxy;ILio/matthewnelson/kmp/tor/runtime/core/address/LocalHost;)Lio/matthewnelson/kmp/tor/runtime/core/address/Port$Proxy;
 	public static final fun isAvailableAsync (Lio/matthewnelson/kmp/tor/runtime/core/address/Port;Lio/matthewnelson/kmp/tor/runtime/core/address/LocalHost;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static final fun isAvailableSync (Lio/matthewnelson/kmp/tor/runtime/core/address/Port;Lio/matthewnelson/kmp/tor/runtime/core/address/LocalHost;)Z
 }
 
 public final class io/matthewnelson/kmp/tor/runtime/core/util/TorCmdUtil {
-	public static final fun execute (Lio/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$Privileged$Processor;Lio/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$Privileged;)Ljava/lang/Object;
-	public static final fun execute (Lio/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$Unprivileged$Processor;Lio/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$Unprivileged;)Ljava/lang/Object;
 	public static final fun executeAsync (Lio/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$Privileged$Processor;Lio/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$Privileged;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public static final fun executeAsync (Lio/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$Unprivileged$Processor;Lio/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$Unprivileged;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static final fun executeSync (Lio/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$Privileged$Processor;Lio/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$Privileged;)Ljava/lang/Object;
+	public static final fun executeSync (Lio/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$Unprivileged$Processor;Lio/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$Unprivileged;)Ljava/lang/Object;
 }
 

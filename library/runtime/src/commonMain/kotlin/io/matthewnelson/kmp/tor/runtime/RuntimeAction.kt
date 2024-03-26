@@ -19,11 +19,7 @@ import io.matthewnelson.kmp.tor.runtime.core.ItBlock
 import io.matthewnelson.kmp.tor.runtime.core.TorConfig
 import io.matthewnelson.kmp.tor.runtime.core.QueuedJob
 import io.matthewnelson.kmp.tor.runtime.core.ctrl.TorCmd
-import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlin.coroutines.cancellation.CancellationException
-import kotlin.coroutines.resume
-import kotlin.coroutines.resumeWithException
-import kotlin.jvm.JvmStatic
 
 public enum class RuntimeAction {
 
@@ -68,6 +64,15 @@ public enum class RuntimeAction {
      * */
     RestartDaemon;
 
+    /**
+     * Base interface for implementations that process [RuntimeAction].
+     *
+     * **NOTE:** Implementors **MUST** process the action on a different
+     * thread than what [enqueue] is called from for Jvm & Native.
+     *
+     * @see [io.matthewnelson.kmp.tor.runtime.util.executeAsync]
+     * @see [io.matthewnelson.kmp.tor.runtime.util.executeSync]
+     * */
     public interface Processor {
 
         /**
@@ -77,95 +82,11 @@ public enum class RuntimeAction {
          * [onFailure] will be invoked with [CancellationException].
          *
          * @return [QueuedJob]
-         * @see [startDaemon]
-         * @see [stopDaemon]
-         * @see [restartDaemon]
-         * @see [enqueueAsync]
-         * @see [startDaemonAsync]
-         * @see [stopDaemonAsync]
-         * @see [restartDaemonAsync]
          * */
         public fun enqueue(
             action: RuntimeAction,
             onFailure: ItBlock<Throwable>,
             onSuccess: ItBlock<Unit>,
         ): QueuedJob
-    }
-
-    public companion object {
-
-        /**
-         * Starts the tor daemon.
-         *
-         * @see [StartDaemon]
-         * */
-        @JvmStatic
-        public fun Processor.startDaemon(
-            onFailure: ItBlock<Throwable>,
-            onSuccess: ItBlock<Unit>,
-        ): QueuedJob = enqueue(StartDaemon, onFailure, onSuccess)
-
-        /**
-         * Starts the tor daemon.
-         *
-         * @see [StartDaemon]
-         * */
-        @JvmStatic
-        public suspend fun Processor.startDaemonAsync(): Unit = enqueueAsync(StartDaemon)
-
-        /**
-         * Stops the tor daemon.
-         *
-         * @see [StopDaemon]
-         * */
-        @JvmStatic
-        public fun Processor.stopDaemon(
-            onFailure: ItBlock<Throwable>,
-            onSuccess: ItBlock<Unit>,
-        ): QueuedJob = enqueue(StopDaemon, onFailure, onSuccess)
-
-        /**
-         * Stops the tor daemon.
-         *
-         * @see [StopDaemon]
-         * */
-        @JvmStatic
-        public suspend fun Processor.stopDaemonAsync(): Unit = enqueueAsync(StopDaemon)
-
-        /**
-         * Restarts the tor daemon.
-         *
-         * @see [RestartDaemon]
-         * */
-        @JvmStatic
-        public fun Processor.restartDaemon(
-            onFailure: ItBlock<Throwable>,
-            onSuccess: ItBlock<Unit>,
-        ): QueuedJob = enqueue(RestartDaemon, onFailure, onSuccess)
-
-        /**
-         * Restarts the tor daemon.
-         *
-         * @see [RestartDaemon]
-         * */
-        @JvmStatic
-        public suspend fun Processor.restartDaemonAsync(): Unit = enqueueAsync(RestartDaemon)
-
-        @JvmStatic
-        public suspend fun Processor.enqueueAsync(
-            action: RuntimeAction
-        ): Unit = suspendCancellableCoroutine { continuation ->
-            val job = enqueue(
-                action = action,
-                onFailure = { t ->
-                    continuation.resumeWithException(t)
-                },
-                onSuccess = { result ->
-                    continuation.resume(result)
-                }
-            )
-
-            continuation.invokeOnCancellation { t -> job.cancel(t) }
-        }
     }
 }
