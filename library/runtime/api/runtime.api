@@ -32,7 +32,7 @@ public final class io/matthewnelson/kmp/tor/runtime/RuntimeAction : java/lang/En
 }
 
 public abstract interface class io/matthewnelson/kmp/tor/runtime/RuntimeAction$Processor {
-	public abstract fun enqueue (Lio/matthewnelson/kmp/tor/runtime/RuntimeAction;Lio/matthewnelson/kmp/tor/runtime/core/ItBlock;Lio/matthewnelson/kmp/tor/runtime/core/ItBlock;)Lio/matthewnelson/kmp/tor/runtime/core/QueuedJob;
+	public abstract fun enqueue (Lio/matthewnelson/kmp/tor/runtime/RuntimeAction;Lio/matthewnelson/kmp/tor/runtime/core/Callback;Lio/matthewnelson/kmp/tor/runtime/core/Callback;)Lio/matthewnelson/kmp/tor/runtime/core/QueuedJob;
 }
 
 public abstract class io/matthewnelson/kmp/tor/runtime/RuntimeEvent {
@@ -40,8 +40,8 @@ public abstract class io/matthewnelson/kmp/tor/runtime/RuntimeEvent {
 	public static final field entries Ljava/util/Set;
 	public final field name Ljava/lang/String;
 	public synthetic fun <init> (Ljava/lang/String;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
-	public final fun observer (Lio/matthewnelson/kmp/tor/runtime/core/ItBlock;)Lio/matthewnelson/kmp/tor/runtime/RuntimeEvent$Observer;
-	public final fun observer (Ljava/lang/String;Lio/matthewnelson/kmp/tor/runtime/core/ItBlock;)Lio/matthewnelson/kmp/tor/runtime/RuntimeEvent$Observer;
+	public final fun observer (Lio/matthewnelson/kmp/tor/runtime/core/Callback;)Lio/matthewnelson/kmp/tor/runtime/RuntimeEvent$Observer;
+	public final fun observer (Ljava/lang/String;Lio/matthewnelson/kmp/tor/runtime/core/Callback;)Lio/matthewnelson/kmp/tor/runtime/RuntimeEvent$Observer;
 	public final fun toString ()Ljava/lang/String;
 	public static final fun valueOf (Ljava/lang/String;)Lio/matthewnelson/kmp/tor/runtime/RuntimeEvent;
 	public static final fun valueOfOrNull (Ljava/lang/String;)Lio/matthewnelson/kmp/tor/runtime/RuntimeEvent;
@@ -84,10 +84,10 @@ public final class io/matthewnelson/kmp/tor/runtime/RuntimeEvent$LOG$WARN : io/m
 }
 
 public final class io/matthewnelson/kmp/tor/runtime/RuntimeEvent$Observer {
-	public final field block Lio/matthewnelson/kmp/tor/runtime/core/ItBlock;
+	public final field callback Lio/matthewnelson/kmp/tor/runtime/core/Callback;
 	public final field event Lio/matthewnelson/kmp/tor/runtime/RuntimeEvent;
 	public final field tag Ljava/lang/String;
-	public fun <init> (Ljava/lang/String;Lio/matthewnelson/kmp/tor/runtime/RuntimeEvent;Lio/matthewnelson/kmp/tor/runtime/core/ItBlock;)V
+	public fun <init> (Ljava/lang/String;Lio/matthewnelson/kmp/tor/runtime/RuntimeEvent;Lio/matthewnelson/kmp/tor/runtime/core/Callback;)V
 	public fun toString ()Ljava/lang/String;
 	public final fun toString (Z)Ljava/lang/String;
 }
@@ -120,8 +120,8 @@ public final class io/matthewnelson/kmp/tor/runtime/TorRuntime$Builder {
 	public synthetic fun <init> (Lio/matthewnelson/kmp/tor/runtime/TorRuntime$Environment;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
 	public final fun config (Lio/matthewnelson/kmp/tor/runtime/ConfigBuilderCallback;)Lio/matthewnelson/kmp/tor/runtime/TorRuntime$Builder;
 	public final fun required (Lio/matthewnelson/kmp/tor/runtime/core/TorEvent;)Lio/matthewnelson/kmp/tor/runtime/TorRuntime$Builder;
-	public final fun staticObserver (Lio/matthewnelson/kmp/tor/runtime/RuntimeEvent;Lio/matthewnelson/kmp/tor/runtime/core/ItBlock;)Lio/matthewnelson/kmp/tor/runtime/TorRuntime$Builder;
-	public final fun staticObserver (Lio/matthewnelson/kmp/tor/runtime/core/TorEvent;Lio/matthewnelson/kmp/tor/runtime/core/ItBlock;)Lio/matthewnelson/kmp/tor/runtime/TorRuntime$Builder;
+	public final fun staticObserver (Lio/matthewnelson/kmp/tor/runtime/RuntimeEvent;Lio/matthewnelson/kmp/tor/runtime/core/Callback;)Lio/matthewnelson/kmp/tor/runtime/TorRuntime$Builder;
+	public final fun staticObserver (Lio/matthewnelson/kmp/tor/runtime/core/TorEvent;Lio/matthewnelson/kmp/tor/runtime/core/Callback;)Lio/matthewnelson/kmp/tor/runtime/TorRuntime$Builder;
 }
 
 public final class io/matthewnelson/kmp/tor/runtime/TorRuntime$Companion {

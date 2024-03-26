@@ -122,7 +122,7 @@ class QueuedJobUnitTest {
         val job = TestJob(onFailure = { invocationFailure++ })
 
         var invocationCompletion = 0
-        val cb = ItBlock<Unit> {
+        val cb = Callback<Unit> {
             invocationCompletion++
             // Ensure error was dispatched before
             // invoking all completion callbacks
@@ -165,8 +165,8 @@ class QueuedJobUnitTest {
     private class TestJob(
         name: String = "",
         private val cancellation: (cause: Throwable?) -> Unit = {},
-        onFailure: ItBlock<Throwable>? = null,
-        private val onSuccess: ItBlock<Unit>? = null,
+        onFailure: Callback<Throwable>? = null,
+        private val onSuccess: Callback<Unit>? = null,
     ): QueuedJob(name, onFailure) {
         override fun onCancellation(cause: Throwable?) {
             cancellation(cause)

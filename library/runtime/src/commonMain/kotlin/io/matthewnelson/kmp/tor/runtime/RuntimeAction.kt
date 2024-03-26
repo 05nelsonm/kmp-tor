@@ -15,6 +15,7 @@
  **/
 package io.matthewnelson.kmp.tor.runtime
 
+import io.matthewnelson.kmp.tor.runtime.core.Callback
 import io.matthewnelson.kmp.tor.runtime.core.ItBlock
 import io.matthewnelson.kmp.tor.runtime.core.TorConfig
 import io.matthewnelson.kmp.tor.runtime.core.QueuedJob
@@ -85,8 +86,8 @@ public enum class RuntimeAction {
          * */
         public fun enqueue(
             action: RuntimeAction,
-            onFailure: ItBlock<Throwable>,
-            onSuccess: ItBlock<Unit>,
+            onFailure: Callback<Throwable>,
+            onSuccess: Callback<Unit>,
         ): QueuedJob
     }
 }

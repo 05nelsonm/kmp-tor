@@ -19,6 +19,7 @@ import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
 import io.matthewnelson.kmp.tor.core.resource.SynchronizedObject
 import io.matthewnelson.kmp.tor.core.resource.synchronized
 import io.matthewnelson.kmp.tor.runtime.RuntimeEvent
+import io.matthewnelson.kmp.tor.runtime.core.Callback
 import io.matthewnelson.kmp.tor.runtime.ctrl.AbstractTorEventProcessor
 import io.matthewnelson.kmp.tor.runtime.core.ItBlock
 import io.matthewnelson.kmp.tor.runtime.core.TorEvent
@@ -127,10 +128,9 @@ internal abstract class AbstractRuntimeEventProcessor(
         for (observer in observers) {
             if (observer.event != RuntimeEvent.LOG.ERROR) continue
 
-            @Suppress("UNCHECKED_CAST")
-            val block = (observer.block as ItBlock<Throwable>)
             try {
-                block.invoke(t)
+                @Suppress("UNCHECKED_CAST")
+                (observer.callback as Callback<Throwable>).invoke(t)
             } catch (_: Throwable) {}
         }
     }
@@ -152,7 +152,7 @@ internal abstract class AbstractRuntimeEventProcessor(
 
                 handler.tryCatch(observer.toString(isStatic = observer.tag.isStaticTag())) {
                     @Suppress("UNCHECKED_CAST")
-                    (observer.block as ItBlock<R>).invoke(output)
+                    (observer.callback as Callback<R>).invoke(output)
                 }
             }
         }

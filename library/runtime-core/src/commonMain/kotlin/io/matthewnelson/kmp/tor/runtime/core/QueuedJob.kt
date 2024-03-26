@@ -37,13 +37,13 @@ public abstract class QueuedJob protected constructor(
     //  @JvmField
     //  public val canCancelWhileExecuting: Boolean
     @Volatile
-    private var onFailure: ItBlock<Throwable>?,
+    private var onFailure: Callback<Throwable>?,
 ) {
 
     @Volatile
     private var _state: State = Enqueued
     @Volatile
-    private var completionCallbacks: LinkedHashSet<ItBlock<Unit>>? = LinkedHashSet(1, 1.0f)
+    private var completionCallbacks: LinkedHashSet<Callback<Unit>>? = LinkedHashSet(1, 1.0f)
     @OptIn(InternalKmpTorApi::class)
     private val lock = SynchronizedObject()
 
@@ -103,7 +103,7 @@ public abstract class QueuedJob protected constructor(
      * [callback] should **NOT** throw exception. In the event
      * that it does, it will be swallowed.
      * */
-    public fun invokeOnCompletion(callback: ItBlock<Unit>) {
+    public fun invokeOnCompletion(callback: Callback<Unit>) {
         @OptIn(InternalKmpTorApi::class)
         val invokeImmediately = synchronized(lock) {
             completionCallbacks?.add(callback)
@@ -192,10 +192,10 @@ public abstract class QueuedJob protected constructor(
      * functions which acquire the lock such as [cancel], [onError],
      * or [invokeOnCompletion].
      * */
-    protected fun <T: Any> onCompletion(response: T, withLock: () -> ItBlock<T>?) {
+    protected fun <T: Any> onCompletion(response: T, withLock: () -> Callback<T>?) {
         if (!isActive) return
 
-        var onSuccess: ItBlock<T>? = null
+        var onSuccess: Callback<T>? = null
 
         @OptIn(InternalKmpTorApi::class)
         val notify = synchronized(lock) {

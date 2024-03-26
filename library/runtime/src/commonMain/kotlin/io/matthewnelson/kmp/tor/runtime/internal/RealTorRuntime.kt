@@ -41,16 +41,16 @@ internal class RealTorRuntime private constructor(
 
     override fun enqueue(
         action: RuntimeAction,
-        onFailure: ItBlock<Throwable>,
-        onSuccess: ItBlock<Unit>,
+        onFailure: Callback<Throwable>,
+        onSuccess: Callback<Unit>,
     ): QueuedJob {
         TODO("Not yet implemented")
     }
 
     override fun <Response : Any> enqueue(
         cmd: TorCmd.Unprivileged<Response>,
-        onFailure: ItBlock<Throwable>?,
-        onSuccess: ItBlock<Response>
+        onFailure: Callback<Throwable>?,
+        onSuccess: Callback<Response>
     ): QueuedJob {
         TODO("Not yet implemented")
     }

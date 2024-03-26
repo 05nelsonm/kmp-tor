@@ -128,7 +128,7 @@ public abstract class AbstractTorEventProcessor protected constructor(
                 if (observer.event != event) continue
 
                 handler.tryCatch(observer.toString(isStatic = observer.tag.isStaticTag())) {
-                    observer.block.invoke(output)
+                    observer.callback.invoke(output)
                 }
             }
         }

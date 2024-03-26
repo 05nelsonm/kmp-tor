@@ -19,10 +19,7 @@ import io.matthewnelson.encoding.base16.Base16
 import io.matthewnelson.encoding.core.Encoder.Companion.encodeToString
 import io.matthewnelson.immutable.collections.immutableSetOf
 import io.matthewnelson.immutable.collections.toImmutableSet
-import io.matthewnelson.kmp.tor.runtime.core.ItBlock
-import io.matthewnelson.kmp.tor.runtime.core.QueuedJob
-import io.matthewnelson.kmp.tor.runtime.core.TorConfig
-import io.matthewnelson.kmp.tor.runtime.core.TorEvent
+import io.matthewnelson.kmp.tor.runtime.core.*
 import io.matthewnelson.kmp.tor.runtime.core.address.IPAddress
 import io.matthewnelson.kmp.tor.runtime.core.address.OnionAddress
 import io.matthewnelson.kmp.tor.runtime.core.key.AddressKey
@@ -660,8 +657,8 @@ public sealed class TorCmd<Response: Any> private constructor(
             @Throws(IllegalStateException::class)
             public fun <Response: Any> enqueue(
                 cmd: Privileged<Response>,
-                onFailure: ItBlock<Throwable>?,
-                onSuccess: ItBlock<Response>,
+                onFailure: Callback<Throwable>?,
+                onSuccess: Callback<Response>,
             ): QueuedJob
         }
     }
@@ -697,8 +694,8 @@ public sealed class TorCmd<Response: Any> private constructor(
             @Throws(IllegalStateException::class)
             public fun <Response: Any> enqueue(
                 cmd: Unprivileged<Response>,
-                onFailure: ItBlock<Throwable>?,
-                onSuccess: ItBlock<Response>,
+                onFailure: Callback<Throwable>?,
+                onSuccess: Callback<Response>,
             ): QueuedJob
         }
     }
