@@ -20,7 +20,6 @@ import io.matthewnelson.kmp.file.resolve
 import io.matthewnelson.kmp.tor.core.api.ResourceInstaller
 import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
 import io.matthewnelson.kmp.tor.runtime.RuntimeEvent.*
-import io.matthewnelson.kmp.tor.runtime.core.ThisBlock
 import io.matthewnelson.kmp.tor.runtime.core.TorConfig
 import io.matthewnelson.kmp.tor.runtime.core.TorConfig.*
 import io.matthewnelson.kmp.tor.runtime.core.address.IPAddress
@@ -46,7 +45,7 @@ public class TorConfigGenerator private constructor(
     private val environment: TorRuntime.Environment,
     private val allowPortReassignment: Boolean,
     private val omitGeoIPFileSettings: Boolean,
-    private val config: List<ThisBlock.WithIt<Builder, TorRuntime.Environment>>,
+    private val config: Set<ConfigBuilderCallback>,
     private val isPortAvailable: suspend (LocalHost, Port) -> Boolean,
 ) {
 
@@ -181,7 +180,7 @@ public class TorConfigGenerator private constructor(
             environment: TorRuntime.Environment,
             allowPortReassignment: Boolean,
             omitGeoIPFileSettings: Boolean,
-            config: List<ThisBlock.WithIt<Builder, TorRuntime.Environment>>,
+            config: Set<ConfigBuilderCallback>,
             isPortAvailable: suspend (LocalHost, Port) -> Boolean = { h, p -> p.isAvailableAsync(h) },
         ): TorConfigGenerator = TorConfigGenerator(
             environment,

@@ -1366,9 +1366,7 @@ public final class io/matthewnelson/kmp/tor/runtime/core/util/PortUtil {
 
 public final class io/matthewnelson/kmp/tor/runtime/core/util/TorCmdUtil {
 	public static final fun execute (Lio/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$Privileged$Processor;Lio/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$Privileged;)Ljava/lang/Object;
-	public static final fun execute (Lio/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$Privileged$Processor;Lkotlin/coroutines/CoroutineContext;Lio/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$Privileged;)Ljava/lang/Object;
 	public static final fun execute (Lio/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$Unprivileged$Processor;Lio/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$Unprivileged;)Ljava/lang/Object;
-	public static final fun execute (Lio/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$Unprivileged$Processor;Lkotlin/coroutines/CoroutineContext;Lio/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$Unprivileged;)Ljava/lang/Object;
 	public static final fun executeAsync (Lio/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$Privileged$Processor;Lio/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$Privileged;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public static final fun executeAsync (Lio/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$Unprivileged$Processor;Lio/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$Unprivileged;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 }

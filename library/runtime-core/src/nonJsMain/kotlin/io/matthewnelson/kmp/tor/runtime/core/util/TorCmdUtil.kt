@@ -22,7 +22,6 @@ import io.matthewnelson.kmp.tor.runtime.core.internal.commonExecuteAsync
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
 import kotlinx.coroutines.runBlocking
-import kotlin.coroutines.CoroutineContext
 import kotlin.jvm.JvmName
 
 /**
@@ -56,19 +55,7 @@ public actual suspend fun <Response: Any> TorCmd.Unprivileged.Processor.executeA
 @Throws(Throwable::class)
 public fun <Response: Any> TorCmd.Privileged.Processor.execute(
     cmd: TorCmd.Privileged<Response>,
-): Response = execute(Dispatchers.IO, cmd)
-
-/**
- * Enqueues the [cmd], blocking the current thread until completion
- * or cancellation/error.
- *
- * @see [TorCmd.Privileged.Processor]
- * */
-@Throws(Throwable::class)
-public fun <Response: Any> TorCmd.Privileged.Processor.execute(
-    context: CoroutineContext,
-    cmd: TorCmd.Privileged<Response>,
-): Response = runBlocking(context) { executeAsync(cmd) }
+): Response = runBlocking(Dispatchers.IO) { executeAsync(cmd) }
 
 /**
  * Enqueues the [cmd], blocking the current thread until completion
@@ -79,16 +66,4 @@ public fun <Response: Any> TorCmd.Privileged.Processor.execute(
 @Throws(Throwable::class)
 public fun <Response: Any> TorCmd.Unprivileged.Processor.execute(
     cmd: TorCmd.Unprivileged<Response>,
-): Response = execute(Dispatchers.IO, cmd)
-
-/**
- * Enqueues the [cmd], blocking the current thread until completion
- * or cancellation/error.
- *
- * @see [TorCmd.Unprivileged.Processor]
- * */
-@Throws(Throwable::class)
-public fun <Response: Any> TorCmd.Unprivileged.Processor.execute(
-    context: CoroutineContext,
-    cmd: TorCmd.Unprivileged<Response>,
-): Response = runBlocking(context) { executeAsync(cmd) }
+): Response = runBlocking(Dispatchers.IO) { executeAsync(cmd) }

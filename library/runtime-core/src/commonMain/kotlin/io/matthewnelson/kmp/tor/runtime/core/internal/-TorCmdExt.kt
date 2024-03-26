@@ -19,8 +19,8 @@ package io.matthewnelson.kmp.tor.runtime.core.internal
 
 import io.matthewnelson.kmp.tor.runtime.core.QueuedJob
 import io.matthewnelson.kmp.tor.runtime.core.ctrl.TorCmd
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.suspendCancellableCoroutine
+import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 
 @Suppress("NOTHING_TO_INLINE")
@@ -36,8 +36,7 @@ internal suspend inline fun <Response: Any> TorCmd.Privileged.Processor.commonEx
                 continuation.resumeWithException(t)
             },
             onSuccess = { result ->
-                @OptIn(ExperimentalCoroutinesApi::class)
-                continuation.resume(result, onCancellation = { t -> job?.cancel(t) })
+                continuation.resume(result)
             },
         )
     } catch (e: IllegalStateException) {
@@ -60,8 +59,7 @@ internal suspend inline fun <Response: Any> TorCmd.Unprivileged.Processor.common
                 continuation.resumeWithException(t)
             },
             onSuccess = { result ->
-                @OptIn(ExperimentalCoroutinesApi::class)
-                continuation.resume(result, onCancellation = { t -> job?.cancel(t) })
+                continuation.resume(result)
             },
         )
     } catch (e: IllegalStateException) {

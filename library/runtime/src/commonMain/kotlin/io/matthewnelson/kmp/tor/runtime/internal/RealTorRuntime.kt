@@ -17,10 +17,7 @@ package io.matthewnelson.kmp.tor.runtime.internal
 
 import io.matthewnelson.immutable.collections.toImmutableSet
 import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
-import io.matthewnelson.kmp.tor.runtime.NetworkObserver
-import io.matthewnelson.kmp.tor.runtime.RuntimeEvent
-import io.matthewnelson.kmp.tor.runtime.RuntimeAction
-import io.matthewnelson.kmp.tor.runtime.TorRuntime
+import io.matthewnelson.kmp.tor.runtime.*
 import io.matthewnelson.kmp.tor.runtime.core.*
 import io.matthewnelson.kmp.tor.runtime.core.ctrl.TorCmd
 import kotlinx.coroutines.Job
@@ -68,7 +65,7 @@ internal class RealTorRuntime private constructor(
             networkObserver: NetworkObserver,
             allowPortReassignment: Boolean,
             omitGeoIPFileSettings: Boolean,
-            config: List<ThisBlock.WithIt<TorConfig.Builder, TorRuntime.Environment>>,
+            config: Set<ConfigBuilderCallback>,
             requiredTorEvents: Set<TorEvent>,
             staticTorEventObservers: Set<TorEvent.Observer>,
             staticRuntimeEventObservers: Set<RuntimeEvent.Observer<*>>,

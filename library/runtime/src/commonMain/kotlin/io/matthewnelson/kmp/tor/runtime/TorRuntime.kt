@@ -19,7 +19,6 @@ package io.matthewnelson.kmp.tor.runtime
 
 import io.matthewnelson.encoding.base16.Base16
 import io.matthewnelson.encoding.core.Encoder.Companion.encodeToString
-import io.matthewnelson.immutable.collections.toImmutableList
 import io.matthewnelson.immutable.collections.toImmutableSet
 import io.matthewnelson.kmp.file.*
 import io.matthewnelson.kmp.tor.core.api.ResourceInstaller
@@ -79,7 +78,7 @@ public interface TorRuntime:
     @KmpTorDsl
     public class Builder private constructor(private val environment: Environment) {
 
-        private val config = mutableListOf<ThisBlock.WithIt<TorConfig.Builder, Environment>>()
+        private val config = mutableSetOf<ConfigBuilderCallback>()
         private val requiredTorEvents = mutableSetOf(TorEvent.CONF_CHANGED, TorEvent.NOTICE)
         private val staticTorEventObservers = mutableSetOf<TorEvent.Observer>()
         private val staticRuntimeEventObservers = mutableSetOf<RuntimeEvent.Observer<*>>()
@@ -130,8 +129,7 @@ public interface TorRuntime:
          * that are not currently supported to the [Environment.torrcFile]).
          *
          * Any exception thrown within [block] will be propagated to the caller
-         * of [RuntimeAction.StartDaemon] or [RuntimeAction.RestartDaemon] and
-         * a [RuntimeEvent.LOG.ERROR] will be dispatched to registered observers.
+         * of [RuntimeAction.StartDaemon] or [RuntimeAction.RestartDaemon].
          *
          * **NOTE:** This can be omitted as a minimum viable configuration
          * is always created. See [TorConfigGenerator.putDefaults] for what
@@ -142,7 +140,7 @@ public interface TorRuntime:
          * */
         @KmpTorDsl
         public fun config(
-            block: ThisBlock.WithIt<TorConfig.Builder, Environment>,
+            block: ConfigBuilderCallback,
         ): Builder {
             config.add(block)
             return this
@@ -166,6 +164,7 @@ public interface TorRuntime:
 
         /**
          * Add [TorEvent.Observer] which will never be removed from [TorRuntime].
+         *
          * Useful for logging purposes.
          * */
         @KmpTorDsl
@@ -180,6 +179,7 @@ public interface TorRuntime:
 
         /**
          * Add [RuntimeEvent.Observer] which will never be removed from [TorRuntime].
+         *
          * Useful for logging purposes.
          * */
         @KmpTorDsl
@@ -213,7 +213,7 @@ public interface TorRuntime:
                         networkObserver = b.networkObserver,
                         allowPortReassignment = b.allowPortReassignment,
                         omitGeoIPFileSettings = b.omitGeoIPFileSettings,
-                        config = b.config.toImmutableList(),
+                        config = b.config.toImmutableSet(),
                         requiredTorEvents = b.requiredTorEvents.toImmutableSet(),
                         staticTorEventObservers = b.staticTorEventObservers.toImmutableSet(),
                         staticRuntimeEventObservers = b.staticRuntimeEventObservers.toImmutableSet(),

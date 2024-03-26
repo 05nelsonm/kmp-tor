@@ -19,9 +19,9 @@ import io.matthewnelson.kmp.tor.runtime.core.ItBlock
 import io.matthewnelson.kmp.tor.runtime.core.TorConfig
 import io.matthewnelson.kmp.tor.runtime.core.QueuedJob
 import io.matthewnelson.kmp.tor.runtime.core.ctrl.TorCmd
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlin.coroutines.cancellation.CancellationException
+import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 import kotlin.jvm.JvmStatic
 
@@ -30,8 +30,8 @@ public enum class RuntimeAction {
     /**
      * Starts the tor daemon.
      *
-     * If tor is running, the [QueuedJob] returned
-     * by [Processor.enqueue] will complete immediately with
+     * If tor is running, the [QueuedJob] returned by
+     * [Processor.enqueue] will complete immediately with
      * success.
      *
      * **NOTE:** Tor's startup process is broken out
@@ -155,16 +155,13 @@ public enum class RuntimeAction {
         public suspend fun Processor.enqueueAsync(
             action: RuntimeAction
         ): Unit = suspendCancellableCoroutine { continuation ->
-            var job: QueuedJob? = null
-
-            job = enqueue(
+            val job = enqueue(
                 action = action,
                 onFailure = { t ->
                     continuation.resumeWithException(t)
                 },
                 onSuccess = { result ->
-                    @OptIn(ExperimentalCoroutinesApi::class)
-                    continuation.resume(result, onCancellation = { t -> job?.cancel(t) })
+                    continuation.resume(result)
                 }
             )
 

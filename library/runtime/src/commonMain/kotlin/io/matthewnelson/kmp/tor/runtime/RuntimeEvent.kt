@@ -179,7 +179,8 @@ public sealed class RuntimeEvent<R: Any> private constructor(
         public fun removeAll(tag: String)
 
         /**
-         * Remove all non-static [Observer] that are currently registered.
+         * Remove all non-static [Observer] that are currently
+         * registered.
          *
          * If the implementing class extends both [Processor]
          * and [TorEvent.Processor], all [TorEvent.Observer]

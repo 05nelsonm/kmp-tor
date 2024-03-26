@@ -1977,8 +1977,6 @@ public class TorConfig private constructor(
             public fun Builder(block: ThisBlock<B>): S = build(factory().apply(block))
         }
 
-
-
         public companion object {
 
             /**
