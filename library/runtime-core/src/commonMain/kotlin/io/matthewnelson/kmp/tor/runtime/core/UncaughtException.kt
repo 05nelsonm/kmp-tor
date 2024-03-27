@@ -104,10 +104,27 @@ public class UncaughtException private constructor(
              * which is then propagated to the current handler (if
              * there even was an [UncaughtException]).
              *
-             * Great for loops and stuff.
+             * [SuppressedHandler] used in [block] will throw an
+             * [IllegalStateException] if it is referenced outside
+             * of [withSuppression] lambda, so do not hold onto the
+             * reference, treat as a disposable resource.
              *
-             * **NOTE:** If [Handler] is null, [block] is still invoked and the
-             * [UncaughtException] (if there is one) is thrown on lambda closure.
+             * Nested calls of [withSuppression] will use the root
+             * [SuppressedHandler], so all [tryCatch] invocations
+             * are propagated to root.
+             *
+             * e.g.
+             *
+             *   myHandler.withSuppression {
+             *       val suppressed = this
+             *
+             *       withSuppression {
+             *           val nested = this
+             *           assertEquals(suppressed, nested)
+             *       }
+             *   }
+             *
+             * Great for loops and stuff.
              *
              * e.g.
              *
@@ -127,6 +144,9 @@ public class UncaughtException private constructor(
              *         // (if there is one) will be passed back to
              *         // myHandler
              *     }
+             *
+             * **NOTE:** If [Handler] is null, [block] is still invoked and the
+             * [UncaughtException] (if there is one) is thrown on lambda closure.
              * */
             @JvmStatic
             public fun <T: Any?> Handler?.withSuppression(
@@ -134,11 +154,17 @@ public class UncaughtException private constructor(
             ): T {
                 val delegate = this
                 var threw: UncaughtException? = null
+                var isActive = true
 
                 val suppressed = if (delegate is SuppressedHandler) {
                     delegate
                 } else {
                     SuppressedHandler { t ->
+                        if (!isActive) {
+                            val msg = "SuppressedHandler cannot be referenced outside of withSuppression lambda"
+                            throw IllegalStateException(msg, t)
+                        }
+
                         if (threw != null) {
                             threw?.addSuppressed(t)
                         } else {
@@ -148,9 +174,13 @@ public class UncaughtException private constructor(
                 }
 
                 val result = block(suppressed)
+                isActive = false
                 threw?.let { if (delegate != null) delegate(it) else THROW(it) }
                 return result
             }
+
+            @JvmStatic
+            public fun Handler.isSuppressedHandler(): Boolean = this is SuppressedHandler
         }
     }
 

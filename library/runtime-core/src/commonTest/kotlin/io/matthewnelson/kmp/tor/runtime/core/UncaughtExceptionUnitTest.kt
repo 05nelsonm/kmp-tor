@@ -15,10 +15,13 @@
  **/
 package io.matthewnelson.kmp.tor.runtime.core
 
+import io.matthewnelson.kmp.tor.runtime.core.UncaughtException.Handler.Companion.isSuppressedHandler
 import io.matthewnelson.kmp.tor.runtime.core.UncaughtException.Handler.Companion.tryCatch
 import io.matthewnelson.kmp.tor.runtime.core.UncaughtException.Handler.Companion.withSuppression
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFailsWith
+import kotlin.test.assertTrue
 
 class UncaughtExceptionUnitTest {
 
@@ -44,5 +47,20 @@ class UncaughtExceptionUnitTest {
 
         assertEquals(1, exceptions.size)
         assertEquals(2, exceptions.first().suppressedExceptions.size)
+    }
+
+    @Test
+    fun givenSuppression_whenLeakedOutsideLambda_thenThrowsIllegalStateException() {
+        val exceptions = mutableListOf<UncaughtException>()
+        val suppressed = UncaughtException.Handler { exceptions.add(it) }.withSuppression {
+            repeat(3) { i -> tryCatch(i) { throw IllegalStateException("i") } }
+            this
+        }
+
+        assertTrue(suppressed.isSuppressedHandler())
+
+        assertFailsWith<IllegalStateException> {
+            suppressed.invoke(exceptions.firstOrNull()!!)
+        }
     }
 }
