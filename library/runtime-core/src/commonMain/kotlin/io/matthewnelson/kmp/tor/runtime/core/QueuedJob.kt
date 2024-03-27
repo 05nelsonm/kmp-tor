@@ -19,6 +19,8 @@ import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
 import io.matthewnelson.kmp.tor.core.resource.SynchronizedObject
 import io.matthewnelson.kmp.tor.core.resource.synchronized
 import io.matthewnelson.kmp.tor.runtime.core.QueuedJob.State.*
+import io.matthewnelson.kmp.tor.runtime.core.UncaughtException.Handler.Companion.tryCatch
+import io.matthewnelson.kmp.tor.runtime.core.UncaughtException.Handler.Companion.withSuppression
 import kotlin.concurrent.Volatile
 import kotlin.coroutines.cancellation.CancellationException
 import kotlin.jvm.JvmField
@@ -36,17 +38,17 @@ public abstract class QueuedJob protected constructor(
     // TODO:
     //  @JvmField
     //  public val canCancelWhileExecuting: Boolean
-    // TODO:
-    //  @Volatile
-    //  private var handler: UncaughtException.Handler
     @Volatile
     private var onFailure: Callback<Throwable>?,
+    handler: UncaughtException.Handler,
 ) {
 
     @Volatile
     private var _state: State = Enqueued
     @Volatile
     private var completionCallbacks: LinkedHashSet<ItBlock<Unit>>? = LinkedHashSet(1, 1.0f)
+    @Volatile
+    private var handler: UncaughtException.Handler? = handler
     @OptIn(InternalKmpTorApi::class)
     private val lock = SynchronizedObject()
 
@@ -106,7 +108,10 @@ public abstract class QueuedJob protected constructor(
      * immediately and [Disposable.NOOP] is returned.
      *
      * [handle] should **NOT** throw exception. In the event
-     * that it does, it will be swallowed. [handle] should be
+     * that it does, it will be delegated to the closest
+     * [UncaughtException.Handler]. If [handle] is being invoked
+     * immediately (job completed), exceptions will be delegated
+     * to [UncaughtException.Handler.THROW]. [handle] should be
      * non-blocking, fast, and thread-safe.
      *
      * There is no guarantee on the execution context for which
@@ -117,20 +122,24 @@ public abstract class QueuedJob protected constructor(
      * */
     public fun invokeOnCompletion(handle: ItBlock<Unit>): Disposable {
         @OptIn(InternalKmpTorApi::class)
-        val result = synchronized(lock) {
+        val wasAdded = synchronized(lock) {
+            // doFinal (which de-references callbacks) is not called
+            // within synchronized. Need to check if active while
+            // holding the lock.
+            if (!isActive) return@synchronized null
+
             completionCallbacks?.add(handle)
         }
 
-        if (result == null) {
-            // invoke immediately
-            try {
+        // Invoke immediately
+        if (wasAdded == null) {
+            UncaughtException.Handler.THROW.tryCatch(toString()) {
                 handle(Unit)
-            } catch (_: Throwable) {}
+            }
             return Disposable.NOOP
         }
 
-        // Was not added
-        if (!result) return Disposable.NOOP
+        if (!wasAdded) return Disposable.NOOP
 
         return Disposable {
             if (!isActive) return@Disposable
@@ -157,25 +166,23 @@ public abstract class QueuedJob protected constructor(
         val onFailure = onFailure
 
         @OptIn(InternalKmpTorApi::class)
-        val notify = synchronized(lock) {
+        val complete = synchronized(lock) {
             if (state != Enqueued) return@synchronized false
             _state = Cancelled
             this.onFailure = null
             true
         }
 
-        if (!notify) return false
+        if (!complete) return false
 
         onCancellation(cause)
 
-        try {
+        doFinal(action = {
             if (onFailure != null) {
                 val e = cause ?: CancellationException(toString())
                 onFailure(e)
             }
-        } finally {
-            doInvokeOnCompletion()
-        }
+        })
 
         return true
     }
@@ -222,7 +229,7 @@ public abstract class QueuedJob protected constructor(
         var onSuccess: Callback<T>? = null
 
         @OptIn(InternalKmpTorApi::class)
-        val notify = synchronized(lock) {
+        val complete = synchronized(lock) {
             if (!isActive) return@synchronized false
             onSuccess = withLock()
             _state = Completed
@@ -230,13 +237,11 @@ public abstract class QueuedJob protected constructor(
             true
         }
 
-        if (!notify) return
+        if (!complete) return
 
-        try {
+        doFinal(action = {
             onSuccess?.let { it(response) }
-        } finally {
-            doInvokeOnCompletion()
-        }
+        })
     }
 
     /**
@@ -254,7 +259,7 @@ public abstract class QueuedJob protected constructor(
         val onFailure = onFailure
 
         @OptIn(InternalKmpTorApi::class)
-        val notify = synchronized(lock) {
+        val complete = synchronized(lock) {
             if (!isActive) return@synchronized false
             _state = Error
             this.onFailure = null
@@ -262,27 +267,32 @@ public abstract class QueuedJob protected constructor(
             true
         }
 
-        if (!notify) return
+        if (!complete) return
 
-        try {
+        doFinal(action = {
             if (onFailure != null) {
                 onFailure(cause)
             }
-        } finally {
-            doInvokeOnCompletion()
-        }
+        })
     }
 
-    private fun doInvokeOnCompletion() {
-        @OptIn(InternalKmpTorApi::class)
-        synchronized(lock) {
-            val callbacks = completionCallbacks
-            completionCallbacks = null
-            callbacks
-        }?.forEach { callback ->
-            try {
-                callback(Unit)
-            } catch (_: Throwable) {}
+    private fun doFinal(action: () -> Unit) {
+        val context = toString()
+
+        handler.withSuppression {
+            tryCatch(context) { action() }
+
+            @OptIn(InternalKmpTorApi::class)
+            synchronized(lock) {
+                val callbacks = completionCallbacks
+                completionCallbacks = null
+                handler = null
+                callbacks
+            }?.forEach { callback ->
+                tryCatch("$context.invokeOnCompletion") {
+                    callback(Unit)
+                }
+            }
         }
     }
 

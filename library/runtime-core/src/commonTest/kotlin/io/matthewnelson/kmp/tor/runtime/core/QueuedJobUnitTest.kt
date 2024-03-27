@@ -143,8 +143,10 @@ class QueuedJobUnitTest {
         // Ensure same callback cannot be added
         // more than once.
         job.invokeOnCompletion(cb)
-        job.invokeOnCompletion(cb)
-        job.invokeOnCompletion(cb)
+
+        // Should return Disposable.NOOP
+        job.invokeOnCompletion(cb).invoke()
+        job.invokeOnCompletion(cb).invoke()
 
         job.error(Throwable())
         assertEquals(1, invocationCompletion)
@@ -160,17 +162,21 @@ class QueuedJobUnitTest {
     }
 
     @Test
-    fun givenInvokeOnCompletion_whenThrows_thenIsIgnored() {
-        val job = TestJob()
-        var invocationCompletion = 0
-        job.invokeOnCompletion { invocationCompletion++; fail() }
+    fun givenInvokeOnCompletion_whenThrows_thenIsDelegatedToHandler() {
+        val exceptions = mutableListOf<UncaughtException>()
+        val handler = UncaughtException.Handler { t -> exceptions.add(t) }
+        val job = TestJob(handler = handler)
+        job.invokeOnCompletion { fail() }
 
         job.completion()
-        assertEquals(1, invocationCompletion)
+        assertEquals(1, exceptions.size)
 
-        // Also check that immediate invocation suppresses
-        job.invokeOnCompletion { invocationCompletion++; fail() }
-        assertEquals(2, invocationCompletion)
+        // Check that immediate invocation utilizes
+        // UncaughtException.Handler.THROW and not the
+        // one passed to TestJob (do not leak handler after
+        // completion).
+        assertFailsWith<UncaughtException>{ job.invokeOnCompletion { fail() } }
+        assertEquals(1, exceptions.size)
     }
 
     private class TestJob(
@@ -178,7 +184,8 @@ class QueuedJobUnitTest {
         private val cancellation: (cause: CancellationException?) -> Unit = {},
         onFailure: Callback<Throwable>? = null,
         private val onSuccess: Callback<Unit>? = null,
-    ): QueuedJob(name, onFailure) {
+        handler: UncaughtException.Handler = UncaughtException.Handler.THROW,
+    ): QueuedJob(name, onFailure, handler) {
         override fun onCancellation(cause: CancellationException?) {
             cancellation(cause)
         }
