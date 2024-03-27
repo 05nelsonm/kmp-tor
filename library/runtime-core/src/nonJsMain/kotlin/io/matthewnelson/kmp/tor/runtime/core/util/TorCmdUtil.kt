@@ -73,7 +73,7 @@ public fun <Response: Any> TorCmd.Privileged.Processor.executeSync(
     while (true) {
         success?.let { return it }
         fail?.let { throw it }
-        Blocking.threadSleep(5.milliseconds)
+        Blocking.threadSleep(25.milliseconds)
     }
 }
 
@@ -103,6 +103,6 @@ public fun <Response: Any> TorCmd.Unprivileged.Processor.executeSync(
     while (true) {
         success?.let { return it }
         fail?.let { throw it }
-        Blocking.threadSleep(5.milliseconds)
+        Blocking.threadSleep(25.milliseconds)
     }
 }

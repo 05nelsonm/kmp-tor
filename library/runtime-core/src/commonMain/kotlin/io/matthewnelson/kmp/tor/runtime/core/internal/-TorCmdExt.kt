@@ -20,6 +20,7 @@ package io.matthewnelson.kmp.tor.runtime.core.internal
 import io.matthewnelson.kmp.tor.runtime.core.QueuedJob
 import io.matthewnelson.kmp.tor.runtime.core.ctrl.TorCmd
 import kotlinx.coroutines.suspendCancellableCoroutine
+import kotlin.coroutines.cancellation.CancellationException
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 
@@ -43,7 +44,10 @@ internal suspend inline fun <Response: Any> TorCmd.Privileged.Processor.commonEx
         continuation.resumeWithException(e)
     }
 
-    continuation.invokeOnCancellation { t -> job?.cancel(t) }
+    continuation.invokeOnCancellation { t ->
+        val e = if (t is CancellationException) t else CancellationException(t)
+        job?.cancel(e)
+    }
 }
 
 @Suppress("NOTHING_TO_INLINE")
@@ -66,5 +70,8 @@ internal suspend inline fun <Response: Any> TorCmd.Unprivileged.Processor.common
         continuation.resumeWithException(e)
     }
 
-    continuation.invokeOnCancellation { t -> job?.cancel(t) }
+    continuation.invokeOnCancellation { t ->
+        val e = if (t is CancellationException) t else CancellationException(t)
+        job?.cancel(e)
+    }
 }

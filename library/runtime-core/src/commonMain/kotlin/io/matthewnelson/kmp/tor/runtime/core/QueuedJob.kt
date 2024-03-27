@@ -36,6 +36,9 @@ public abstract class QueuedJob protected constructor(
     // TODO:
     //  @JvmField
     //  public val canCancelWhileExecuting: Boolean
+    // TODO:
+    //  @Volatile
+    //  private var handler: UncaughtException.Handler
     @Volatile
     private var onFailure: Callback<Throwable>?,
 ) {
@@ -43,7 +46,7 @@ public abstract class QueuedJob protected constructor(
     @Volatile
     private var _state: State = Enqueued
     @Volatile
-    private var completionCallbacks: LinkedHashSet<Callback<Unit>>? = LinkedHashSet(1, 1.0f)
+    private var completionCallbacks: LinkedHashSet<ItBlock<Unit>>? = LinkedHashSet(1, 1.0f)
     @OptIn(InternalKmpTorApi::class)
     private val lock = SynchronizedObject()
 
@@ -94,25 +97,49 @@ public abstract class QueuedJob protected constructor(
     }
 
     /**
-     * Attach a [callback] to be invoked when this [QueuedJob]
+     * Register a [handle] to be invoked when this [QueuedJob]
      * completes, either successfully or by cancellation/error.
+     * If [handle] is already registered, [Disposable.NOOP] is
+     * returned.
      *
-     * If the job has already completed, [callback] is invoked
-     * immediately.
+     * If the job has already completed, [handle] is invoked
+     * immediately and [Disposable.NOOP] is returned.
      *
-     * [callback] should **NOT** throw exception. In the event
-     * that it does, it will be swallowed.
+     * [handle] should **NOT** throw exception. In the event
+     * that it does, it will be swallowed. [handle] should be
+     * non-blocking, fast, and thread-safe.
+     *
+     * There is no guarantee on the execution context for which
+     * [handle] is invoked from.
+     *
+     * @return [Disposable] to de-register [handle] if it is no
+     *   longer needed.
      * */
-    public fun invokeOnCompletion(callback: Callback<Unit>) {
+    public fun invokeOnCompletion(handle: ItBlock<Unit>): Disposable {
         @OptIn(InternalKmpTorApi::class)
-        val invokeImmediately = synchronized(lock) {
-            completionCallbacks?.add(callback)
-        } == null
+        val result = synchronized(lock) {
+            completionCallbacks?.add(handle)
+        }
 
-        if (!invokeImmediately) return
-        try {
-            callback(Unit)
-        } catch (_: Throwable) {}
+        if (result == null) {
+            // invoke immediately
+            try {
+                handle(Unit)
+            } catch (_: Throwable) {}
+            return Disposable.NOOP
+        }
+
+        // Was not added
+        if (!result) return Disposable.NOOP
+
+        return Disposable {
+            if (!isActive) return@Disposable
+
+            @OptIn(InternalKmpTorApi::class)
+            synchronized(lock) {
+                completionCallbacks?.remove(handle)
+            }
+        }
     }
 
     /**
@@ -124,8 +151,8 @@ public abstract class QueuedJob protected constructor(
      * If cancelled, [onFailure] will be invoked with
      * [CancellationException] to indicate so.
      * */
-    public fun cancel(cause: Throwable?) {
-        if (state != Enqueued) return
+    public fun cancel(cause: CancellationException?): Boolean {
+        if (state != Enqueued) return false
 
         val onFailure = onFailure
 
@@ -137,23 +164,20 @@ public abstract class QueuedJob protected constructor(
             true
         }
 
-        if (!notify) return
+        if (!notify) return false
 
         onCancellation(cause)
 
         try {
             if (onFailure != null) {
-                val e = if (cause is CancellationException) {
-                    cause
-                } else {
-                    CancellationException(toString(), cause)
-                }
-
+                val e = cause ?: CancellationException(toString())
                 onFailure(e)
             }
         } finally {
             doInvokeOnCompletion()
         }
+
+        return true
     }
 
     /**
@@ -163,7 +187,7 @@ public abstract class QueuedJob protected constructor(
      *
      * @param [cause] The exception, if any, passed to [cancel].
      * */
-    protected open fun onCancellation(cause: Throwable?) {}
+    protected open fun onCancellation(cause: CancellationException?) {}
 
     /**
      * Moves the state from [Enqueued] to [Executing], indicating

@@ -33,7 +33,7 @@ class QueuedJobUnitTest {
         val job = TestJob(
             cancellation = { t ->
                 invocationCancel++
-                assertIs<IllegalArgumentException>(t)
+                assertNull(t)
             },
             onFailure = { t ->
                 invocationFail++
@@ -42,13 +42,13 @@ class QueuedJobUnitTest {
         )
 
         assertTrue(job.isActive)
-        job.cancel(IllegalArgumentException())
+        assertTrue(job.cancel(null))
         assertEquals(1, invocationCancel)
         assertEquals(1, invocationFail)
         assertEquals(QueuedJob.State.Cancelled, job.state)
         assertFalse(job.isActive)
 
-        job.cancel(Throwable())
+        assertFalse(job.cancel(CancellationException()))
         assertEquals(1, invocationCancel)
         assertEquals(1, invocationFail)
 
@@ -80,6 +80,17 @@ class QueuedJobUnitTest {
         job.completion()
         assertEquals(QueuedJob.State.Completed, job.state)
         assertFalse(job.isActive)
+    }
+
+    @Test
+    fun givenInvokeOnCompletion_whenDisposed_thenDoesNotExecute() {
+        var invocations = 0
+        val job = TestJob()
+        job.invokeOnCompletion { invocations++ }
+        val disposable = job.invokeOnCompletion { invocations++ }
+        disposable.invoke()
+        job.cancel(null)
+        assertEquals(1, invocations)
     }
 
     @Test
@@ -122,7 +133,7 @@ class QueuedJobUnitTest {
         val job = TestJob(onFailure = { invocationFailure++ })
 
         var invocationCompletion = 0
-        val cb = Callback<Unit> {
+        val cb = ItBlock<Unit> {
             invocationCompletion++
             // Ensure error was dispatched before
             // invoking all completion callbacks
@@ -164,11 +175,11 @@ class QueuedJobUnitTest {
 
     private class TestJob(
         name: String = "",
-        private val cancellation: (cause: Throwable?) -> Unit = {},
+        private val cancellation: (cause: CancellationException?) -> Unit = {},
         onFailure: Callback<Throwable>? = null,
         private val onSuccess: Callback<Unit>? = null,
     ): QueuedJob(name, onFailure) {
-        override fun onCancellation(cause: Throwable?) {
+        override fun onCancellation(cause: CancellationException?) {
             cancellation(cause)
         }
 

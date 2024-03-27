@@ -21,6 +21,7 @@ import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
 import io.matthewnelson.kmp.tor.runtime.RuntimeAction
 import io.matthewnelson.kmp.tor.runtime.TorRuntime
 import kotlinx.coroutines.suspendCancellableCoroutine
+import kotlin.coroutines.cancellation.CancellationException
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 
@@ -45,5 +46,8 @@ internal suspend inline fun <T: RuntimeAction.Processor> T.commonExecuteAsync(
         }
     )
 
-    continuation.invokeOnCancellation { t -> job.cancel(t) }
+    continuation.invokeOnCancellation { t ->
+        val e = if (t is CancellationException) t else CancellationException(t)
+        job.cancel(e)
+    }
 }

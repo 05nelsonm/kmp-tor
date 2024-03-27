@@ -17,6 +17,8 @@
 
 package io.matthewnelson.kmp.tor.runtime.core
 
+import kotlin.jvm.JvmField
+
 /**
  * A callback for dispatching things.
  * */
@@ -24,6 +26,23 @@ public expect fun interface Callback<in It: Any> {
 
     public operator fun invoke(it: It)
 
-    // TODO: DispatchMain Issue 349
+    // TODO: DispatchMain Issue #349
 
+}
+
+/**
+ * A callback to return to callers to "undo", or
+ * "dispose" something.
+ * */
+public fun interface Disposable {
+    public operator fun invoke()
+
+    public companion object {
+
+        /**
+         * A non-operational implementation of [Disposable]
+         * */
+        @JvmField
+        public val NOOP: Disposable = Disposable {}
+    }
 }

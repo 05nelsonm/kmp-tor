@@ -66,7 +66,7 @@ public fun <T: RuntimeAction.Processor> T.executeSync(
     while (true) {
         if (success != null) return this
         fail?.let { throw it }
-        Blocking.threadSleep(5.milliseconds)
+        Blocking.threadSleep(25.milliseconds)
     }
 }
 
