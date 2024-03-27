@@ -120,8 +120,6 @@ internal abstract class AbstractRuntimeEventProcessor(
         super.clearObservers()
     }
 
-    protected final override fun registered(): Int = super.registered() + withObservers { size }
-
     // ONLY utilize within notifyObservers as the lock
     // needs to be held to iterate over observers
     private val runtimeHandler = UncaughtException.Handler { t ->
@@ -158,15 +156,10 @@ internal abstract class AbstractRuntimeEventProcessor(
         }
     }
 
-    protected override fun onDestroy() {
-        if (destroyed) return
-
-        withObservers {
-            if (destroyed) return@withObservers
-
-            clear()
-            super.onDestroy()
-        }
+    protected override fun onDestroy(): Boolean {
+        val wasDestroyed = super.onDestroy()
+        if (wasDestroyed) synchronized(lock) { observers.clear() }
+        return wasDestroyed
     }
 
     private fun <T: Any?> withObservers(
@@ -178,4 +171,6 @@ internal abstract class AbstractRuntimeEventProcessor(
             block(if (destroyed) noOpMutableSet() else observers)
         }
     }
+
+    protected final override fun registered(): Int = super.registered() + synchronized(lock) { observers.size }
 }

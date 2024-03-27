@@ -119,8 +119,6 @@ public abstract class AbstractTorEventProcessor protected constructor(
         }
     }
 
-    protected open fun registered(): Int = withObservers { size }
-
     protected fun TorEvent.notifyObservers(output: String) {
         val event = this
         withObservers {
@@ -134,15 +132,18 @@ public abstract class AbstractTorEventProcessor protected constructor(
         }
     }
 
-    protected open fun onDestroy() {
-        if (destroyed) return
+    protected open fun onDestroy(): Boolean {
+        if (destroyed) return false
 
-        withObservers {
-            if (destroyed) return@withObservers
+        val wasDestroyed = withObservers {
+            if (destroyed) return@withObservers false
 
             clear()
             destroyed = true
+            true
         }
+
+        return wasDestroyed
     }
 
     private fun <T: Any?> withObservers(
@@ -162,8 +163,11 @@ public abstract class AbstractTorEventProcessor protected constructor(
         @JvmStatic
         @InternalKmpTorApi
         @Suppress("UNCHECKED_CAST")
-        protected fun <T> noOpMutableSet(): MutableSet<T> = NoOpMutableSet as MutableSet<T>
+        protected fun <T: Any> noOpMutableSet(): MutableSet<T> = NoOpMutableSet as MutableSet<T>
     }
+
+    // testing
+    protected open fun registered(): Int = synchronized(lock) { observers.size }
 }
 
 private object NoOpMutableSet: MutableSet<Any> {

@@ -28,7 +28,7 @@ class AbstractTorEventProcessorUnitTest {
         val size: Int get() = registered()
         fun notify(event: TorEvent, output: String) { event.notifyObservers(output) }
         fun destroy() { onDestroy() }
-        fun <T> noOpSet(): MutableSet<T> = noOpMutableSet()
+        fun <T: Any> noOpSet(): MutableSet<T> = noOpMutableSet()
     }
 
     private val processor = TestProcessor()
