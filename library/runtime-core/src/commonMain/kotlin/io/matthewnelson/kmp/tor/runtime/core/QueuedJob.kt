@@ -124,8 +124,9 @@ public abstract class QueuedJob protected constructor(
         @OptIn(InternalKmpTorApi::class)
         val wasAdded = synchronized(lock) {
             // doFinal (which de-references callbacks) is not called
-            // within synchronized. Need to check if active while
-            // holding the lock.
+            // within synchronized block of cancel/onError/onCompletion
+            // when state is updated. Cannot rely on completionCallbacks
+            // being null to detect if still active. Need to check.
             if (!isActive) return@synchronized null
 
             completionCallbacks?.add(handle)
@@ -201,7 +202,7 @@ public abstract class QueuedJob protected constructor(
      * that the caller has "taken ownership" of the [QueuedJob].
      *
      * If a different caller attempts to invoke [onExecuting] again,
-     * an exception is raised to prevent multiple executions.
+     * an exception is raised to prevent duplicate execution.
      *
      * @throws [IllegalStateException] if current state is not [Enqueued].
      * */

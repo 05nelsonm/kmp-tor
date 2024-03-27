@@ -18,9 +18,12 @@
 package io.matthewnelson.kmp.tor.runtime.core.util
 
 import io.matthewnelson.kmp.process.Blocking
+import io.matthewnelson.kmp.tor.runtime.core.QueuedJob
 import io.matthewnelson.kmp.tor.runtime.core.ctrl.TorCmd
 import io.matthewnelson.kmp.tor.runtime.core.internal.commonExecuteAsync
+import kotlin.coroutines.cancellation.CancellationException
 import kotlin.jvm.JvmName
+import kotlin.jvm.JvmOverloads
 import kotlin.time.Duration.Companion.milliseconds
 
 /**
@@ -56,25 +59,29 @@ public actual suspend fun <Response: Any> TorCmd.Unprivileged.Processor.executeA
  *
  * @see [TorCmd.Privileged.Processor]
  * @see [executeAsync]
+ * @param [cancellation] optional callback which is invoked
+ *   after every thread sleep (so, multiple times) in order
+ *   to trigger job cancellation if a non-null exception
+ *   value is returned.
  * */
+@JvmOverloads
 @Throws(Throwable::class)
 public fun <Response: Any> TorCmd.Privileged.Processor.executeSync(
     cmd: TorCmd.Privileged<Response>,
+    cancellation: (() -> CancellationException?)? = null,
 ): Response {
-    var fail: Throwable? = null
+    var failure: Throwable? = null
     var success: Response? = null
 
-    enqueue(
+    return enqueue(
         cmd = cmd,
-        onFailure = { fail = it },
+        onFailure = { failure = it },
         onSuccess = { success = it },
+    ).executeSync(
+        success = { success },
+        failure = { failure },
+        cancellation = cancellation,
     )
-
-    while (true) {
-        success?.let { return it }
-        fail?.let { throw it }
-        Blocking.threadSleep(25.milliseconds)
-    }
 }
 
 /**
@@ -86,23 +93,58 @@ public fun <Response: Any> TorCmd.Privileged.Processor.executeSync(
  *
  * @see [TorCmd.Unprivileged.Processor]
  * @see [executeAsync]
+ * @param [cancellation] optional callback which is invoked
+ *   after every thread sleep (so, multiple times) in order
+ *   to trigger job cancellation if a non-null exception
+ *   value is returned.
  * */
+@JvmOverloads
 @Throws(Throwable::class)
 public fun <Response: Any> TorCmd.Unprivileged.Processor.executeSync(
     cmd: TorCmd.Unprivileged<Response>,
+    cancellation: (() -> CancellationException?)? = null,
 ): Response {
     var fail: Throwable? = null
     var success: Response? = null
 
-    enqueue(
+    return enqueue(
         cmd = cmd,
         onFailure = { fail = it },
         onSuccess = { success = it },
+    ).executeSync(
+        success = { success },
+        failure = { fail },
+        cancellation = cancellation,
     )
+}
+
+private inline fun <Response: Any> QueuedJob.executeSync(
+    success: () -> Response?,
+    failure: () -> Throwable?,
+    noinline cancellation: (() -> CancellationException?)?,
+): Response {
+    var callback = cancellation
 
     while (true) {
-        success?.let { return it }
-        fail?.let { throw it }
+        success()?.let { return it }
+        failure()?.let { throw it }
+
         Blocking.threadSleep(25.milliseconds)
+
+        // No possibility of cancellation. Skip.
+        if (callback == null) continue
+
+        val exception = try {
+            callback() ?: continue
+        } catch (t: Throwable) {
+            if (t is CancellationException) t else CancellationException(t)
+        }
+
+        // de-reference callback as to not invoke it anymore
+        // in the event that job is unable to be cancelled (e.g.
+        // is in State.Executing), will just continue to loop
+        // until execution completes.
+        callback = null
+        cancel(exception)
     }
 }

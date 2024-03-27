@@ -21,7 +21,9 @@ package io.matthewnelson.kmp.tor.runtime.util
 import io.matthewnelson.kmp.process.Blocking
 import io.matthewnelson.kmp.tor.runtime.RuntimeAction
 import io.matthewnelson.kmp.tor.runtime.internal.commonExecuteAsync
+import kotlin.coroutines.cancellation.CancellationException
 import kotlin.jvm.JvmName
+import kotlin.jvm.JvmOverloads
 import kotlin.time.Duration.Companion.milliseconds
 
 /**
@@ -49,24 +51,49 @@ public actual suspend fun <T: RuntimeAction.Processor> T.executeAsync(
  * @see [stopDaemonSync]
  * @see [restartDaemonSync]
  * @see [executeAsync]
+ * @param [cancellation] optional callback which is invoked
+ *   after every thread sleep (so, multiple times) in order
+ *   to trigger job cancellation if a non-null exception
+ *   value is returned.
  * */
+@JvmOverloads
 @Throws(Throwable::class)
 public fun <T: RuntimeAction.Processor> T.executeSync(
     action: RuntimeAction,
+    cancellation: (() -> CancellationException?)? = null,
 ): T {
-    var fail: Throwable? = null
+    var failure: Throwable? = null
     var success: Unit? = null
 
-    enqueue(
+    val job = enqueue(
         action = action,
-        onFailure = { fail = it },
+        onFailure = { failure = it },
         onSuccess = { success = it },
     )
 
+    var callback = cancellation
+
     while (true) {
         if (success != null) return this
-        fail?.let { throw it }
+        failure?.let { throw it }
+
         Blocking.threadSleep(25.milliseconds)
+
+        // No possibility of cancellation. Skip.
+        if (callback == null) continue
+
+        val exception = try {
+            callback() ?: continue
+        } catch (t: Throwable) {
+            if (t is CancellationException) t else CancellationException(t)
+        }
+
+        // de-reference callback as to not invoke it anymore
+        // in the event that job is unable to be cancelled (e.g.
+        // is in State.Executing), will just continue to loop
+        // until execution completes.
+        callback = null
+        job.cancel(exception)
     }
 }
 
@@ -112,11 +139,17 @@ public actual suspend inline fun <T: RuntimeAction.Processor> T.restartDaemonAsy
  *
  * @see [RuntimeAction.StartDaemon]
  * @see [startDaemonAsync]
+ * @param [cancellation] optional callback which is invoked
+ *   after every thread sleep (so, multiple times) in order
+ *   to trigger job cancellation if a non-null exception
+ *   value is returned.
  * */
+@JvmOverloads
 @Throws(Throwable::class)
 @Suppress("NOTHING_TO_INLINE")
-public inline fun <T: RuntimeAction.Processor> T.startDaemonSync(): T =
-    executeSync(RuntimeAction.StartDaemon)
+public inline fun <T: RuntimeAction.Processor> T.startDaemonSync(
+    noinline cancellation: (() -> CancellationException?)? = null,
+): T = executeSync(RuntimeAction.StartDaemon, cancellation)
 
 /**
  * Stops the tor daemon, blocking the current thread
@@ -127,11 +160,17 @@ public inline fun <T: RuntimeAction.Processor> T.startDaemonSync(): T =
  *
  * @see [RuntimeAction.StopDaemon]
  * @see [stopDaemonAsync]
+ * @param [cancellation] optional callback which is invoked
+ *   after every thread sleep (so, multiple times) in order
+ *   to trigger job cancellation if a non-null exception
+ *   value is returned.
  * */
+@JvmOverloads
 @Throws(Throwable::class)
 @Suppress("NOTHING_TO_INLINE")
-public inline fun <T: RuntimeAction.Processor> T.stopDaemonSync(): T =
-    executeSync(RuntimeAction.StopDaemon)
+public inline fun <T: RuntimeAction.Processor> T.stopDaemonSync(
+    noinline cancellation: (() -> CancellationException?)? = null,
+): T = executeSync(RuntimeAction.StopDaemon, cancellation)
 
 /**
  * Stops and then starts the tor daemon, blocking the
@@ -142,8 +181,14 @@ public inline fun <T: RuntimeAction.Processor> T.stopDaemonSync(): T =
  *
  * @see [RuntimeAction.RestartDaemon]
  * @see [restartDaemonAsync]
+ * @param [cancellation] optional callback which is invoked
+ *   after every thread sleep (so, multiple times) in order
+ *   to trigger job cancellation if a non-null exception
+ *   value is returned.
  * */
+@JvmOverloads
 @Throws(Throwable::class)
 @Suppress("NOTHING_TO_INLINE")
-public inline fun <T: RuntimeAction.Processor> T.restartDaemonSync(): T =
-    executeSync(RuntimeAction.RestartDaemon)
+public inline fun <T: RuntimeAction.Processor> T.restartDaemonSync(
+    noinline cancellation: (() -> CancellationException?)? = null,
+): T = executeSync(RuntimeAction.RestartDaemon, cancellation)
