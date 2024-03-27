@@ -16,7 +16,9 @@
 package io.matthewnelson.kmp.tor.runtime.core
 
 import kotlin.jvm.JvmField
+import kotlin.jvm.JvmName
 import kotlin.jvm.JvmStatic
+import kotlin.jvm.JvmSynthetic
 
 /**
  * A special exception to indicate something went terribly wrong somewhere.
@@ -77,13 +79,23 @@ public class UncaughtException private constructor(
              * **NOTE:** If [Handler] is null, [block] is still invoked and the
              * [UncaughtException] is thrown.
              *
+             * **NOTE:** [IllegalStateException] is thrown if handler is a leaked
+             * reference of [withSuppression] (i.e. [withSuppression] was used and
+             * the [SuppressedHandler] is being utilized **after** lambda closure).
+             *
              * @param [context] Contextual information about where/what [block] is
              *   to include in the [UncaughtException]
              * @param [block] the thing to do that may or may not throw exception.
              * @see [io.matthewnelson.kmp.tor.runtime.RuntimeEvent.LOG.ERROR]
+             * @see [withSuppression]
+             * @throws [IllegalStateException] if [SuppressedHandler.isActive] is false
+             * @throws [UncaughtException] if handler is null or [Handler.invoke] is
+             *   set up to throw the exception
              * */
             @JvmStatic
             public fun Handler?.tryCatch(context: Any, block: ItBlock<Unit>) {
+                (this as? SuppressedHandler)?.checkActive()
+
                 try {
                     block(Unit)
                 } catch (t: Throwable) {
@@ -115,14 +127,14 @@ public class UncaughtException private constructor(
              *
              * e.g.
              *
-             *   myHandler.withSuppression {
-             *       val suppressed = this
+             *     myHandler.withSuppression {
+             *         val suppressed = this
              *
-             *       withSuppression {
-             *           val nested = this
-             *           assertEquals(suppressed, nested)
-             *       }
-             *   }
+             *         withSuppression {
+             *             val nested = this
+             *             assertEquals(suppressed, nested)
+             *         }
+             *     }
              *
              * Great for loops and stuff.
              *
@@ -159,17 +171,9 @@ public class UncaughtException private constructor(
                 val suppressed = if (delegate is SuppressedHandler) {
                     delegate
                 } else {
-                    SuppressedHandler { t ->
-                        if (!isActive) {
-                            val msg = "SuppressedHandler cannot be referenced outside of withSuppression lambda"
-                            throw IllegalStateException(msg, t)
-                        }
-
-                        if (threw != null) {
-                            threw?.addSuppressed(t)
-                        } else {
-                            threw = t
-                        }
+                    SuppressedHandler.of(isActive = { isActive }) { t ->
+                        val result: Unit? = threw?.addSuppressed(t)
+                        if (result == null) threw = t
                     }
                 }
 
@@ -178,11 +182,50 @@ public class UncaughtException private constructor(
                 threw?.let { if (delegate != null) delegate(it) else THROW(it) }
                 return result
             }
-
-            @JvmStatic
-            public fun Handler.isSuppressedHandler(): Boolean = this is SuppressedHandler
         }
     }
 
-    private fun interface SuppressedHandler: Handler
+    /**
+     * A special handler utilized within [Handler.withSuppression]
+     * lambda which propagates all exceptions thrown via [Handler.tryCatch]
+     * into a single, root exception (the first thrown), with all
+     * subsequent exceptions added via [Throwable.addSuppressed].
+     * */
+    public class SuppressedHandler private constructor(
+        private val _isActive: () -> Boolean,
+        private val handler: Handler
+    ): Handler {
+
+        /**
+         * If the [Handler.withSuppression] block has completed.
+         * */
+        @get:JvmName("isActive")
+        public val isActive: Boolean get() = _isActive()
+
+        override fun invoke(it: UncaughtException) {
+            checkActive(it)
+            handler(it)
+        }
+
+        @JvmSynthetic
+        @Throws(IllegalStateException::class)
+        internal fun checkActive(cause: UncaughtException? = null) {
+            if (isActive) return
+
+            val msg = "$this cannot be referenced outside of withSuppression block"
+            throw IllegalStateException(msg, cause)
+        }
+
+        internal companion object {
+
+            @JvmSynthetic
+            internal fun of(
+                isActive: () -> Boolean,
+                handler: Handler
+            ): SuppressedHandler {
+                if (handler is SuppressedHandler) return handler
+                return SuppressedHandler(isActive, handler)
+            }
+        }
+    }
 }

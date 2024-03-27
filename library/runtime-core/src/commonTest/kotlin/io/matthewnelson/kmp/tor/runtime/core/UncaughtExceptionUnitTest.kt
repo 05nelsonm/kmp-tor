@@ -15,13 +15,9 @@
  **/
 package io.matthewnelson.kmp.tor.runtime.core
 
-import io.matthewnelson.kmp.tor.runtime.core.UncaughtException.Handler.Companion.isSuppressedHandler
 import io.matthewnelson.kmp.tor.runtime.core.UncaughtException.Handler.Companion.tryCatch
 import io.matthewnelson.kmp.tor.runtime.core.UncaughtException.Handler.Companion.withSuppression
-import kotlin.test.Test
-import kotlin.test.assertEquals
-import kotlin.test.assertFailsWith
-import kotlin.test.assertTrue
+import kotlin.test.*
 
 class UncaughtExceptionUnitTest {
 
@@ -57,10 +53,14 @@ class UncaughtExceptionUnitTest {
             this
         }
 
-        assertTrue(suppressed.isSuppressedHandler())
+        assertIs<UncaughtException.SuppressedHandler>(suppressed)
 
         assertFailsWith<IllegalStateException> {
             suppressed.invoke(exceptions.firstOrNull()!!)
+        }
+
+        assertFailsWith<IllegalStateException> {
+            suppressed.tryCatch("") {}
         }
     }
 }
