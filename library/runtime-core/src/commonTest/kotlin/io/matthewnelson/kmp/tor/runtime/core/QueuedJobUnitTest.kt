@@ -101,12 +101,15 @@ class QueuedJobUnitTest {
                 invocationSuccess++
                 assertNotEquals(QueuedJob.State.Success, job!!.state)
                 assertTrue(job!!.isActive)
+                assertTrue(job!!.isCompleting)
 
                 // Should still be able to add completion invocations
                 val disposable = job!!.invokeOnCompletion {
                     invocationCompletion++
 
-                    // Should be suppressed
+                    assertTrue(job!!.isCompleting)
+
+                    // Should be caught by handler
                     fail()
                 }
                 assertNotEquals(Disposable.NOOP, disposable)
@@ -170,9 +173,11 @@ class QueuedJobUnitTest {
 
             // completed by cancellation
             assertNotNull(it)
+            assertTrue(job.isCompleting)
         }
 
         job.cancel(null)
+        assertFalse(job.isCompleting)
         assertTrue(invocationCompletion)
     }
 

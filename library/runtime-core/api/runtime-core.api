@@ -39,6 +39,7 @@ public abstract class io/matthewnelson/kmp/tor/runtime/core/QueuedJob {
 	public final fun cancellationException ()Ljava/util/concurrent/CancellationException;
 	public final fun invokeOnCompletion (Lio/matthewnelson/kmp/tor/runtime/core/ItBlock;)Lio/matthewnelson/kmp/tor/runtime/core/Disposable;
 	public final fun isActive ()Z
+	public final fun isCompleting ()Z
 	protected fun onCancellation (Ljava/util/concurrent/CancellationException;)V
 	protected final fun onCompletion (Ljava/lang/Object;Lkotlin/jvm/functions/Function0;)V
 	protected final fun onError (Ljava/lang/Throwable;Lio/matthewnelson/kmp/tor/runtime/core/ItBlock;)V

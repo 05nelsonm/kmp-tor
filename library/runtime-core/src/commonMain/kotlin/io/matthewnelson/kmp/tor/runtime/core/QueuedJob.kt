@@ -55,8 +55,6 @@ protected constructor(
     @Volatile
     private var _state: State = Enqueued
     @Volatile
-    private var isCompleting: Boolean = false
-    @Volatile
     private var completionCallbacks: LinkedHashSet<ItBlock<CancellationException?>>? = LinkedHashSet(1, 1.0f)
     @Volatile
     private var handler: UncaughtException.Handler? = handler
@@ -88,6 +86,18 @@ protected constructor(
         Enqueued,
         Executing -> true
     }
+
+    /**
+     * An intermediate "state" indicating that completion,
+     * either by success or error/cancellation is underway.
+     *
+     * Will be set back false after all [invokeOnCompletion]
+     * callbacks have been run.
+     * */
+    @Volatile
+    @get:JvmName("isCompleting")
+    public var isCompleting: Boolean = false
+        private set
 
     public enum class State {
 
@@ -322,7 +332,6 @@ protected constructor(
                 _state = this@doFinal
 
                 // de-reference all the things
-                isCompleting = false
                 handler = null
                 onFailure = null
 
@@ -334,6 +343,8 @@ protected constructor(
                     callback(cancellationException)
                 }
             }
+
+            isCompleting = false
         }
     }
 
