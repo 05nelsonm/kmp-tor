@@ -128,7 +128,7 @@ internal abstract class AbstractRuntimeEventProcessor(
 
             try {
                 @Suppress("UNCHECKED_CAST")
-                (observer.callback as Callback<Throwable>).invoke(t)
+                (observer.callback as Callback<Throwable>)(t)
             } catch (_: Throwable) {}
         }
     }
@@ -150,7 +150,7 @@ internal abstract class AbstractRuntimeEventProcessor(
 
                 handler.tryCatch(observer.toString(isStatic = observer.tag.isStaticTag())) {
                     @Suppress("UNCHECKED_CAST")
-                    (observer.callback as Callback<R>).invoke(output)
+                    (observer.callback as Callback<R>)(output)
                 }
             }
         }

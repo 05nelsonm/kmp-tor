@@ -223,6 +223,8 @@ public class UncaughtException private constructor(
         override fun invoke(it: UncaughtException) {
             checkIsActive(it)
 
+            // Prevent potential ConcurrentModificationException
+            // if being utilized in multithreaded manner.
             @OptIn(InternalKmpTorApi::class)
             synchronized(lock) { handler(it) }
         }

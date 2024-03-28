@@ -128,7 +128,7 @@ protected constructor(
                 if (observer.event != event) continue
 
                 handler.tryCatch(observer.toString(isStatic = observer.tag.isStaticTag())) {
-                    observer.callback.invoke(output)
+                    observer.callback(output)
                 }
             }
         }

@@ -154,7 +154,7 @@ class QueuedJobUnitTest {
         val job = TestJob()
         job.invokeOnCompletion { invocations++ }
         val disposable = job.invokeOnCompletion { invocations++ }
-        disposable.invoke()
+        disposable()
         job.cancel(null)
         assertEquals(1, invocations)
     }
@@ -219,8 +219,8 @@ class QueuedJobUnitTest {
         job.invokeOnCompletion(cb)
 
         // Should return Disposable.NOOP
-        job.invokeOnCompletion(cb).invoke()
-        job.invokeOnCompletion(cb).invoke()
+        job.invokeOnCompletion(cb)()
+        job.invokeOnCompletion(cb)()
 
         job.error(Throwable())
         assertEquals(1, invocationCompletion)
@@ -253,7 +253,7 @@ class QueuedJobUnitTest {
         assertEquals(1, exceptions.size)
     }
 
-    private class TestJob(
+    public class TestJob(
         name: String = "",
         private val cancellation: (cause: CancellationException?) -> Unit = {},
         onFailure: OnFailure = OnFailure {},

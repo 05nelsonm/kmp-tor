@@ -17,9 +17,7 @@
 
 package io.matthewnelson.kmp.tor.runtime.core.util
 
-import io.matthewnelson.kmp.file.InterruptedException
 import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
-import io.matthewnelson.kmp.tor.runtime.core.QueuedJob
 import io.matthewnelson.kmp.tor.runtime.core.ctrl.TorCmd
 import io.matthewnelson.kmp.tor.runtime.core.internal.commonExecuteAsync
 import kotlin.coroutines.cancellation.CancellationException
@@ -58,14 +56,15 @@ public actual suspend fun <Response: Any> TorCmd.Unprivileged.Processor.executeA
  * a background thread.
  *
  * @see [TorCmd.Privileged.Processor]
+ * @see [awaitSync]
  * @see [executeAsync]
  * @param [cancellation] optional callback which is invoked
  *   after every thread sleep (so, multiple times) in order
  *   to trigger job cancellation if a non-null exception
- *   value is returned. See [QueuedJob.cancel].
+ *   value is returned.
  * */
 @JvmOverloads
-@Throws(InterruptedException::class, Throwable::class)
+@Throws(Throwable::class)
 public fun <Response: Any> TorCmd.Privileged.Processor.executeSync(
     cmd: TorCmd.Privileged<Response>,
     cancellation: (() -> CancellationException?)? = null,
@@ -93,14 +92,15 @@ public fun <Response: Any> TorCmd.Privileged.Processor.executeSync(
  * a background thread.
  *
  * @see [TorCmd.Unprivileged.Processor]
+ * @see [awaitSync]
  * @see [executeAsync]
  * @param [cancellation] optional callback which is invoked
  *   after every thread sleep (so, multiple times) in order
  *   to trigger job cancellation if a non-null exception
- *   value is returned. See [QueuedJob.cancel].
+ *   value is returned.
  * */
 @JvmOverloads
-@Throws(InterruptedException::class, Throwable::class)
+@Throws(Throwable::class)
 public fun <Response: Any> TorCmd.Unprivileged.Processor.executeSync(
     cmd: TorCmd.Unprivileged<Response>,
     cancellation: (() -> CancellationException?)? = null,

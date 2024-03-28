@@ -67,6 +67,8 @@ public sealed class TorCmd<Response: Any> private constructor(
                 bytes: ByteArray
             ): Authenticate = if (bytes.isEmpty()) NONE else Authenticate(bytes.encodeToString(Base16()))
 
+            // TODO: Issue #1
+            //  escape quotes
             @JvmStatic
             public fun password(
                 value: String,

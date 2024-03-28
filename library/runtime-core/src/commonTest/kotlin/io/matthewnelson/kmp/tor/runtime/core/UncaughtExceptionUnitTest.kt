@@ -56,7 +56,7 @@ class UncaughtExceptionUnitTest {
         assertIs<UncaughtException.SuppressedHandler>(suppressed)
 
         assertFailsWith<IllegalStateException> {
-            suppressed.invoke(exceptions.firstOrNull()!!)
+            suppressed(exceptions.firstOrNull()!!)
         }
 
         assertFailsWith<IllegalStateException> {

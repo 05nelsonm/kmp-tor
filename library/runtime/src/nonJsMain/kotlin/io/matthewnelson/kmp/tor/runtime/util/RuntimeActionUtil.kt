@@ -18,10 +18,8 @@
 
 package io.matthewnelson.kmp.tor.runtime.util
 
-import io.matthewnelson.kmp.file.InterruptedException
 import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
 import io.matthewnelson.kmp.tor.runtime.RuntimeAction
-import io.matthewnelson.kmp.tor.runtime.core.QueuedJob
 import io.matthewnelson.kmp.tor.runtime.core.util.awaitSync
 import io.matthewnelson.kmp.tor.runtime.internal.commonExecuteAsync
 import kotlin.coroutines.cancellation.CancellationException
@@ -52,14 +50,15 @@ public actual suspend fun <T: RuntimeAction.Processor> T.executeAsync(
  * @see [startDaemonSync]
  * @see [stopDaemonSync]
  * @see [restartDaemonSync]
+ * @see [awaitSync]
  * @see [executeAsync]
  * @param [cancellation] optional callback which is invoked
  *   after every thread sleep (so, multiple times) in order
  *   to trigger job cancellation if a non-null exception
- *   value is returned. See [QueuedJob.cancel].
+ *   value is returned.
  * */
 @JvmOverloads
-@Throws(InterruptedException::class, Throwable::class)
+@Throws(Throwable::class)
 public fun <T: RuntimeAction.Processor> T.executeSync(
     action: RuntimeAction,
     cancellation: (() -> CancellationException?)? = null,
@@ -120,15 +119,16 @@ public actual suspend inline fun <T: RuntimeAction.Processor> T.restartDaemonAsy
  * a background thread.
  *
  * @see [RuntimeAction.StartDaemon]
+ * @see [awaitSync]
  * @see [startDaemonAsync]
  * @param [cancellation] optional callback which is invoked
  *   after every thread sleep (so, multiple times) in order
  *   to trigger job cancellation if a non-null exception
- *   value is returned. See [QueuedJob.cancel].
+ *   value is returned.
  * */
 @JvmOverloads
+@Throws(Throwable::class)
 @Suppress("NOTHING_TO_INLINE")
-@Throws(InterruptedException::class, Throwable::class)
 public inline fun <T: RuntimeAction.Processor> T.startDaemonSync(
     noinline cancellation: (() -> CancellationException?)? = null,
 ): T = executeSync(RuntimeAction.StartDaemon, cancellation)
@@ -141,15 +141,16 @@ public inline fun <T: RuntimeAction.Processor> T.startDaemonSync(
  * a background thread.
  *
  * @see [RuntimeAction.StopDaemon]
+ * @see [awaitSync]
  * @see [stopDaemonAsync]
  * @param [cancellation] optional callback which is invoked
  *   after every thread sleep (so, multiple times) in order
  *   to trigger job cancellation if a non-null exception
- *   value is returned. See [QueuedJob.cancel].
+ *   value is returned.
  * */
 @JvmOverloads
+@Throws(Throwable::class)
 @Suppress("NOTHING_TO_INLINE")
-@Throws(InterruptedException::class, Throwable::class)
 public inline fun <T: RuntimeAction.Processor> T.stopDaemonSync(
     noinline cancellation: (() -> CancellationException?)? = null,
 ): T = executeSync(RuntimeAction.StopDaemon, cancellation)
@@ -162,15 +163,16 @@ public inline fun <T: RuntimeAction.Processor> T.stopDaemonSync(
  * a background thread.
  *
  * @see [RuntimeAction.RestartDaemon]
+ * @see [awaitSync]
  * @see [restartDaemonAsync]
  * @param [cancellation] optional callback which is invoked
  *   after every thread sleep (so, multiple times) in order
  *   to trigger job cancellation if a non-null exception
- *   value is returned. See [QueuedJob.cancel].
+ *   value is returned.
  * */
 @JvmOverloads
+@Throws(Throwable::class)
 @Suppress("NOTHING_TO_INLINE")
-@Throws(InterruptedException::class, Throwable::class)
 public inline fun <T: RuntimeAction.Processor> T.restartDaemonSync(
     noinline cancellation: (() -> CancellationException?)? = null,
 ): T = executeSync(RuntimeAction.RestartDaemon, cancellation)

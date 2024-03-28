@@ -91,8 +91,8 @@ protected constructor(
      * An intermediate "state" indicating that completion,
      * either by success or error/cancellation is underway.
      *
-     * Will be set back false after all [invokeOnCompletion]
-     * callbacks have been run.
+     * Will be set back to false after all [invokeOnCompletion]
+     * handles have been run.
      * */
     @Volatile
     @get:JvmName("isCompleting")
@@ -201,8 +201,8 @@ protected constructor(
         @OptIn(InternalKmpTorApi::class)
         val complete = synchronized(lock) {
             if (isCompleting || state != Enqueued) return@synchronized false
-            isCompleting = true
             cancellationException = cause ?: CancellationException(toString(Cancelled))
+            isCompleting = true
             true
         }
 

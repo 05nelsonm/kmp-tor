@@ -20,17 +20,45 @@ package io.matthewnelson.kmp.tor.runtime.core.util
 import io.matthewnelson.kmp.file.InterruptedException
 import io.matthewnelson.kmp.process.Blocking
 import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
+import io.matthewnelson.kmp.tor.runtime.core.OnFailure
+import io.matthewnelson.kmp.tor.runtime.core.OnSuccess
 import io.matthewnelson.kmp.tor.runtime.core.QueuedJob
 import kotlin.coroutines.cancellation.CancellationException
 import kotlin.jvm.JvmName
 import kotlin.time.Duration.Companion.milliseconds
 
+/**
+ * Helper for building higher order, functional,
+ * synchronous APIs.
+ *
+ * In the event that the caller thread is interrupted,
+ * [QueuedJob.cancel] will be attempted. If successful,
+ * the [CancellationException] will be thrown. If
+ * unsuccessful, the [InterruptedException] is ignored
+ * as the [QueuedJob] is in a non-cancellable state.
+ *
+ * [success] should **NOT** throw exception, and
+ * should return the result of [OnSuccess].
+ *
+ * [failure] should **NOT** throw exception, and
+ * should return the result of [OnFailure].
+ *
+ * [cancellation] callback (if non-null) is available
+ * to check things between while loop execution. A return
+ * value of null indicates "do not cancel". A return value of
+ * [CancellationException] will pass it to [QueuedJob.cancel].
+ * If unable to cancel the [QueuedJob] because it is in a
+ * non-cancellable state, no further invocations of
+ * [cancellation] will be had.
+ *
+ * @example [executeSync]
+ * */
 @InternalKmpTorApi
-@Throws(InterruptedException::class, Throwable::class)
-public inline fun <Response: Any> QueuedJob.awaitSync(
+@Throws(Throwable::class)
+public fun <Response: Any> QueuedJob.awaitSync(
     success: () -> Response?,
     failure: () -> Throwable?,
-    noinline cancellation: (() -> CancellationException?)?,
+    cancellation: (() -> CancellationException?)?,
 ): Response {
     var callback = cancellation
 
@@ -38,10 +66,18 @@ public inline fun <Response: Any> QueuedJob.awaitSync(
         success()?.let { return it }
         failure()?.let { throw it }
 
-        Blocking.threadSleep(10.milliseconds)
+        try {
+            Blocking.threadSleep(10.milliseconds)
+        } catch (e: InterruptedException) {
+            // Try to cancel
+            if (cancel(CancellationException("Interrupted", e))) break
+
+            // non-cancellable state. continue.
+        }
 
         // No possibility of cancellation. Skip.
         if (callback == null) continue
+        if (!isActive) break
 
         val cause = try {
             callback() ?: continue
@@ -61,9 +97,12 @@ public inline fun <Response: Any> QueuedJob.awaitSync(
         cancel(cause)
     }
 
-    success()?.let { return it }
+    if (state == QueuedJob.State.Success) {
+        success()?.let { return it }
+        throw IllegalStateException("$this completed successfully, but no response was recovered by awaitSync.success()")
+    }
 
     throw cancellationException
         ?: failure()
-        ?: IllegalStateException("$this completed, but no cause was recovered by awaitSync.failure")
+        ?: IllegalStateException("$this completed exceptionally, but no cause was recovered by awaitSync.failure()")
 }
