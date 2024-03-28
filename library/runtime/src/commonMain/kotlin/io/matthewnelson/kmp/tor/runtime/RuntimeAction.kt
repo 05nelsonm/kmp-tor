@@ -15,10 +15,7 @@
  **/
 package io.matthewnelson.kmp.tor.runtime
 
-import io.matthewnelson.kmp.tor.runtime.core.Callback
-import io.matthewnelson.kmp.tor.runtime.core.ItBlock
-import io.matthewnelson.kmp.tor.runtime.core.TorConfig
-import io.matthewnelson.kmp.tor.runtime.core.QueuedJob
+import io.matthewnelson.kmp.tor.runtime.core.*
 import io.matthewnelson.kmp.tor.runtime.core.ctrl.TorCmd
 import kotlin.coroutines.cancellation.CancellationException
 
@@ -70,9 +67,6 @@ public enum class RuntimeAction {
      *
      * **NOTE:** Implementors **MUST** process the action on a different
      * thread than what [enqueue] is called from for Jvm & Native.
-     *
-     * @see [io.matthewnelson.kmp.tor.runtime.util.executeAsync]
-     * @see [io.matthewnelson.kmp.tor.runtime.util.executeSync]
      * */
     public interface Processor {
 
@@ -83,11 +77,13 @@ public enum class RuntimeAction {
          * [onFailure] will be invoked with [CancellationException].
          *
          * @return [QueuedJob]
+         * @see [io.matthewnelson.kmp.tor.runtime.util.executeAsync]
+         * @see [io.matthewnelson.kmp.tor.runtime.util.executeSync]
          * */
         public fun enqueue(
             action: RuntimeAction,
-            onFailure: ItBlock<Throwable>,
-            onSuccess: ItBlock<Unit>,
+            onFailure: OnFailure,
+            onSuccess: OnSuccess<Unit>,
         ): QueuedJob
     }
 }

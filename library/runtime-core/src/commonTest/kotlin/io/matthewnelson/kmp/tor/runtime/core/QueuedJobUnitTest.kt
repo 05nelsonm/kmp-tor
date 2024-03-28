@@ -15,6 +15,7 @@
  **/
 package io.matthewnelson.kmp.tor.runtime.core
 
+import io.matthewnelson.kmp.file.IOException
 import kotlin.coroutines.cancellation.CancellationException
 import kotlin.test.*
 
@@ -78,8 +79,70 @@ class QueuedJobUnitTest {
         assertTrue(job.isActive)
 
         job.completion()
-        assertEquals(QueuedJob.State.Completed, job.state)
+        assertEquals(QueuedJob.State.Success, job.state)
         assertFalse(job.isActive)
+    }
+
+    @Test
+    fun givenSuccess_whenIsCompleting_thenJobOperatesAsExpected() {
+        var job: TestJob? = null
+        var invocationCompletion = 0
+        var invocationSuccess = 0
+        var invocationFailure = 0
+
+        val exceptions = mutableListOf<UncaughtException>()
+        val handler = UncaughtException.Handler { exceptions.add(it) }
+
+        job = TestJob(
+            onFailure = {
+                invocationFailure++
+            },
+            onSuccess = {
+                invocationSuccess++
+                assertNotEquals(QueuedJob.State.Success, job!!.state)
+                assertTrue(job!!.isActive)
+
+                // Should still be able to add completion invocations
+                val disposable = job!!.invokeOnCompletion {
+                    invocationCompletion++
+
+                    // Should be suppressed
+                    fail()
+                }
+                assertNotEquals(Disposable.NOOP, disposable)
+
+                // isCompleting is true right here so the following
+                // invocations should all be ignored, b/c some
+                // other completion function is being executed.
+                assertFalse(job!!.cancel(null))
+                job!!.error(Throwable())
+                assertFailsWith<IllegalStateException> { job!!.executing() }
+
+                // In case completion _actually_ triggers,
+                // this assertion will inhibit recursive
+                // execution
+                assertEquals(1, invocationSuccess)
+                job!!.completion()
+
+                // Should be caught by handler and still complete
+                throw IOException()
+            },
+            handler = handler,
+        )
+
+        job.invokeOnCompletion {
+            assertNull(it)
+            invocationCompletion++
+        }
+
+        job.completion()
+        assertEquals(2, invocationCompletion)
+        assertEquals(1, invocationSuccess)
+        assertEquals(0, invocationFailure)
+        assertEquals(1, exceptions.size)
+        assertIs<IOException>(exceptions.first().cause)
+
+        assertEquals(QueuedJob.State.Success, job.state)
     }
 
     @Test
@@ -104,6 +167,9 @@ class QueuedJobUnitTest {
             // Ensure cancellation was dispatched before
             // invoking all completion callbacks
             assertTrue(invocationFailure)
+
+            // completed by cancellation
+            assertNotNull(it)
         }
 
         job.cancel(null)
@@ -133,11 +199,14 @@ class QueuedJobUnitTest {
         val job = TestJob(onFailure = { invocationFailure++ })
 
         var invocationCompletion = 0
-        val cb = ItBlock<Unit> {
+        val cb = ItBlock<CancellationException?> {
             invocationCompletion++
             // Ensure error was dispatched before
             // invoking all completion callbacks
             assertEquals(1, invocationFailure)
+
+            // completion by error, not by cancellation
+            assertNull(it)
         }
 
         // Ensure same callback cannot be added
@@ -182,8 +251,8 @@ class QueuedJobUnitTest {
     private class TestJob(
         name: String = "",
         private val cancellation: (cause: CancellationException?) -> Unit = {},
-        onFailure: ItBlock<Throwable> = ItBlock {},
-        private val onSuccess: ItBlock<Unit>? = null,
+        onFailure: OnFailure = OnFailure {},
+        private val onSuccess: OnSuccess<Unit>? = null,
         handler: UncaughtException.Handler = UncaughtException.Handler.THROW,
     ): QueuedJob(name, onFailure, handler) {
         override fun onCancellation(cause: CancellationException?) {

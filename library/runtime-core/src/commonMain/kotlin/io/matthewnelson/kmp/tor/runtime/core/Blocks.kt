@@ -70,7 +70,7 @@ public fun interface ThisBlock<in This: Any> {
      * @see [ItBlock]
      * @see [apply]
      * */
-    public fun interface WithIt<in This: Any, in It: Any> {
+    public fun interface WithIt<in This: Any, in It: Any?> {
         public operator fun This.invoke(it: It)
     }
 }
@@ -100,7 +100,7 @@ public fun interface ThisBlock<in This: Any> {
  * @see [ThisBlock.WithIt]
  * @see [apply]
  * */
-public fun interface ItBlock<in It: Any> {
+public fun interface ItBlock<in It: Any?> {
     public operator fun invoke(it: It)
 }
 
@@ -111,13 +111,13 @@ public inline fun <This: Any> This.apply(block: ThisBlock<This>): This {
 }
 
 @Suppress("NOTHING_TO_INLINE")
-public inline fun <This: Any, It: Any> This.apply(block: ThisBlock.WithIt<This, It>, arg: It): This {
-    with(block) { invoke(arg) }
+public inline fun <This: Any, It: Any?> This.apply(it: It, block: ThisBlock.WithIt<This, It>): This {
+    with(block) { invoke(it) }
     return this
 }
 
 @Suppress("NOTHING_TO_INLINE")
-public inline fun <It: Any> It.apply(block: ItBlock<It>): It {
+public inline fun <It: Any?> It.apply(block: ItBlock<It>): It {
     block(this)
     return this
 }

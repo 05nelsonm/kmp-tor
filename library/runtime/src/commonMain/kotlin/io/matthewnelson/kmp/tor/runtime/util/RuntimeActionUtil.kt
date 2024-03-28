@@ -17,7 +17,6 @@ package io.matthewnelson.kmp.tor.runtime.util
 
 import io.matthewnelson.kmp.tor.runtime.RuntimeAction
 
-
 /**
  * Enqueues the [action], suspending the current coroutine
  * until completion or cancellation/error.

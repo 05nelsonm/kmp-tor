@@ -19,6 +19,7 @@ import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
 import io.matthewnelson.kmp.tor.core.resource.SynchronizedObject
 import io.matthewnelson.kmp.tor.core.resource.synchronized
 import io.matthewnelson.kmp.tor.runtime.core.QueuedJob.State.*
+import io.matthewnelson.kmp.tor.runtime.core.UncaughtException.Handler.Companion.requireInstanceIsNotSuppressed
 import io.matthewnelson.kmp.tor.runtime.core.UncaughtException.Handler.Companion.tryCatch
 import io.matthewnelson.kmp.tor.runtime.core.UncaughtException.Handler.Companion.withSuppression
 import kotlin.concurrent.Volatile
@@ -31,27 +32,47 @@ import kotlin.jvm.JvmName
  * of a queue-able job. Once completed, either successfully or
  * by cancellation/error, the [QueuedJob] is dead and should be
  * discarded.
+ *
+ * Heavily inspired by [kotlinx.coroutines.Job]
+ *
+ * @throws [IllegalArgumentException] if [handler] is a leaked
+ *   reference of [UncaughtException.SuppressedHandler]
  * */
-public abstract class QueuedJob protected constructor(
+public abstract class QueuedJob
+@Throws(IllegalArgumentException::class)
+protected constructor(
     @JvmField
     public val name: String,
     // TODO:
     //  @JvmField
     //  public val canCancelWhileExecuting: Boolean
-    onFailure: ItBlock<Throwable>,
+    onFailure: OnFailure,
     handler: UncaughtException.Handler,
 ) {
+
+    init { handler.requireInstanceIsNotSuppressed() }
 
     @Volatile
     private var _state: State = Enqueued
     @Volatile
-    private var completionCallbacks: LinkedHashSet<ItBlock<Unit>>? = LinkedHashSet(1, 1.0f)
+    private var isCompleting: Boolean = false
+    @Volatile
+    private var completionCallbacks: LinkedHashSet<ItBlock<CancellationException?>>? = LinkedHashSet(1, 1.0f)
     @Volatile
     private var handler: UncaughtException.Handler? = handler
     @Volatile
-    private var onFailure: ItBlock<Throwable>? = onFailure
+    private var onFailure: OnFailure? = onFailure
     @OptIn(InternalKmpTorApi::class)
     private val lock = SynchronizedObject()
+
+    /**
+     * If [cancel] was invoked successfully, this **will not**
+     * be null.
+     * */
+    @Volatile
+    @get:JvmName("cancellationException")
+    public var cancellationException: CancellationException? = null
+        private set
 
     /**
      * The current [State] of the job
@@ -62,7 +83,7 @@ public abstract class QueuedJob protected constructor(
     @get:JvmName("isActive")
     public val isActive: Boolean get() = when (state) {
         Cancelled,
-        Completed,
+        Success,
         Error -> false
         Enqueued,
         Executing -> true
@@ -91,10 +112,10 @@ public abstract class QueuedJob protected constructor(
         /**
          * If the job completed successfully.
          * */
-        Completed,
+        Success,
 
         /**
-         * If the job completed by error.
+         * If the job completed exceptionally.
          * */
         Error,
     }
@@ -107,6 +128,10 @@ public abstract class QueuedJob protected constructor(
      *
      * If the job has already completed, [handle] is invoked
      * immediately and [Disposable.NOOP] is returned.
+     *
+     * If the job completed by cancellation, [handle] will
+     * be invoked with a [CancellationException] argument to
+     * indicate as such.
      *
      * [handle] should **NOT** throw exception. In the event
      * that it does, it will be delegated to the closest
@@ -121,22 +146,16 @@ public abstract class QueuedJob protected constructor(
      * @return [Disposable] to de-register [handle] if it is no
      *   longer needed.
      * */
-    public fun invokeOnCompletion(handle: ItBlock<Unit>): Disposable {
+    public fun invokeOnCompletion(handle: ItBlock<CancellationException?>): Disposable {
         @OptIn(InternalKmpTorApi::class)
         val wasAdded = synchronized(lock) {
-            // doFinal (which de-references callbacks) is not called
-            // within synchronized block of cancel/onError/onCompletion
-            // when state is updated. Cannot rely on completionCallbacks
-            // being null to detect if still active. Need to check.
-            if (!isActive) return@synchronized null
-
             completionCallbacks?.add(handle)
         }
 
         // Invoke immediately
         if (wasAdded == null) {
             UncaughtException.Handler.THROW.tryCatch(toString()) {
-                handle(Unit)
+                handle(cancellationException)
             }
             return Disposable.NOOP
         }
@@ -157,34 +176,35 @@ public abstract class QueuedJob protected constructor(
      * Cancels the job.
      *
      * Does nothing if [state] is anything other than
-     * [State.Enqueued].
+     * [State.Enqueued] or [isCompleting] is true.
      *
-     * If cancelled, [onFailure] will be invoked with
-     * [CancellationException] to indicate so.
+     * If cancelled, [cancellationException] will be set,
+     * [onFailure] will be invoked with [CancellationException]
+     * to indicate cancellation, and all [invokeOnCompletion]
+     * callbacks will be run.
+     *
+     * @return true if cancellation was successful
      * */
     public fun cancel(cause: CancellationException?): Boolean {
-        if (state != Enqueued) return false
-
-        val onFailure = onFailure
+        if (isCompleting || state != Enqueued) return false
 
         @OptIn(InternalKmpTorApi::class)
         val complete = synchronized(lock) {
-            if (state != Enqueued) return@synchronized false
-            _state = Cancelled
-            this.onFailure = null
+            if (isCompleting || state != Enqueued) return@synchronized false
+            isCompleting = true
+            cancellationException = cause ?: CancellationException(toString(Cancelled))
             true
         }
 
         if (!complete) return false
 
-        onCancellation(cause)
-
-        doFinal(action = {
-            if (onFailure != null) {
-                val e = cause ?: CancellationException(toString())
-                onFailure(e)
+        Cancelled.doFinal {
+            try {
+                onFailure?.let { it(cancellationException!!) }
+            } finally {
+                onCancellation(cause)
             }
-        })
+        }
 
         return true
     }
@@ -203,47 +223,51 @@ public abstract class QueuedJob protected constructor(
      * that the caller has "taken ownership" of the [QueuedJob].
      *
      * If a different caller attempts to invoke [onExecuting] again,
-     * an exception is raised to prevent duplicate execution.
+     * an exception is raised to prevent duplicate executions.
      *
-     * @throws [IllegalStateException] if current state is not [Enqueued].
+     * @throws [IllegalStateException] if current state is not [Enqueued]
+     *   or [isCompleting] is true.
      * */
     @Throws(IllegalStateException::class)
     protected fun onExecuting() {
         @OptIn(InternalKmpTorApi::class)
         synchronized(lock) {
-            if (state != Enqueued) throw IllegalStateException(toString())
+            if (isCompleting || state != Enqueued) throw IllegalStateException(toString())
             _state = Executing
         }
     }
 
     /**
-     * Sets the job state to [State.Completed] and invokes
-     * [ItBlock] (onSuccess) returned by [withLock] with provided
-     * [response]. Does nothing if the job is already completed.
+     * Sets the job state to [State.Success] and invokes
+     * [OnSuccess] returned by [withLock] with provided
+     * [response]. Does nothing if the job is already completed
+     * or [isCompleting] is true.
      *
      * **NOTE:** [withLock] lambda should not call any other
      * functions which acquire the lock such as [cancel], [onError],
-     * or [invokeOnCompletion].
+     * or [invokeOnCompletion]. It **MUST NOT** throw exception.
      * */
-    protected fun <T: Any> onCompletion(response: T, withLock: () -> ItBlock<T>?) {
-        if (!isActive) return
+    protected fun <T: Any> onCompletion(response: T, withLock: () -> OnSuccess<T>?) {
+        if (isCompleting || !isActive) return
 
-        var onSuccess: ItBlock<T>? = null
+        var onSuccess: OnSuccess<T>? = null
 
         @OptIn(InternalKmpTorApi::class)
         val complete = synchronized(lock) {
-            if (!isActive) return@synchronized false
+            if (isCompleting || !isActive) return@synchronized false
+            // Set before invoking withLock so that
+            // if implementation calls again it will
+            // not lock up.
+            isCompleting = true
             onSuccess = withLock()
-            _state = Completed
-            onFailure = null
             true
         }
 
         if (!complete) return
 
-        doFinal(action = {
+        Success.doFinal {
             onSuccess?.let { it(response) }
-        })
+        }
     }
 
     /**
@@ -256,47 +280,64 @@ public abstract class QueuedJob protected constructor(
      * or [invokeOnCompletion].
      * */
     protected fun onError(cause: Throwable, withLock: ItBlock<Unit>) {
-        if (!isActive) return
-
-        val onFailure = onFailure
+        if (isCompleting || !isActive) return
 
         @OptIn(InternalKmpTorApi::class)
         val complete = synchronized(lock) {
-            if (!isActive) return@synchronized false
-            _state = Error
-            this.onFailure = null
+            if (isCompleting || !isActive) return@synchronized false
+            // Set before invoking withLock so that
+            // if implementation calls again it will
+            // not lock up.
+            isCompleting = true
             withLock(Unit)
             true
         }
 
         if (!complete) return
 
-        doFinal(action = {
-            if (onFailure != null) {
-                onFailure(cause)
-            }
-        })
+        Error.doFinal {
+            onFailure?.let { it(cause) }
+        }
     }
 
-    private fun doFinal(action: () -> Unit) {
-        val context = toString()
+    private fun State.doFinal(action: () -> Unit) {
+        check(isCompleting) { "isCompleting must be true when doFinal is called" }
+        check(isActive) { "isActive must be true when doFinal is called" }
+
+        when (this) {
+            Enqueued,
+            Executing -> throw IllegalArgumentException("$this cannot call doFinal")
+            Cancelled,
+            Success,
+            Error -> {}
+        }
+
+        val context = toString(this)
 
         handler.withSuppression {
             tryCatch(context) { action() }
 
             @OptIn(InternalKmpTorApi::class)
             synchronized(lock) {
+                _state = this@doFinal
+
+                // de-reference all the things
+                isCompleting = false
+                handler = null
+                onFailure = null
+
                 val callbacks = completionCallbacks
                 completionCallbacks = null
-                handler = null
                 callbacks
             }?.forEach { callback ->
                 tryCatch("$context.invokeOnCompletion") {
-                    callback(Unit)
+                    callback(cancellationException)
                 }
             }
         }
     }
 
-    final override fun toString(): String = "QueuedJob[name=$name,state=$state]@${hashCode()}"
+    final override fun toString(): String = toString(state)
+
+    private fun toString(state: State): String = "QueuedJob[name=$name,state=$state]@${hashCode()}"
 }

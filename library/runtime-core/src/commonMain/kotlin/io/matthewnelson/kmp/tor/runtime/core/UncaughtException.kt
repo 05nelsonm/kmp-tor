@@ -15,6 +15,9 @@
  **/
 package io.matthewnelson.kmp.tor.runtime.core
 
+import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
+import io.matthewnelson.kmp.tor.core.resource.SynchronizedObject
+import io.matthewnelson.kmp.tor.core.resource.synchronized
 import kotlin.jvm.JvmField
 import kotlin.jvm.JvmName
 import kotlin.jvm.JvmStatic
@@ -94,7 +97,7 @@ public class UncaughtException private constructor(
              * */
             @JvmStatic
             public fun Handler?.tryCatch(context: Any, block: ItBlock<Unit>) {
-                (this as? SuppressedHandler)?.checkActive()
+                (this as? SuppressedHandler)?.checkIsActive()
 
                 try {
                     block(Unit)
@@ -123,7 +126,8 @@ public class UncaughtException private constructor(
              *
              * Nested calls of [withSuppression] will use the root
              * [SuppressedHandler], so all [tryCatch] invocations
-             * are propagated to root.
+             * are propagated to a root exception and added as a
+             * suppressed exception.
              *
              * e.g.
              *
@@ -182,6 +186,18 @@ public class UncaughtException private constructor(
                 threw?.let { if (delegate != null) delegate(it) else THROW(it) }
                 return result
             }
+
+            /**
+             * Helper for API builders utilizing [Handler] that checks
+             * if the instance is not a leaked reference of [SuppressedHandler]
+             * */
+            @JvmStatic
+            @Throws(IllegalArgumentException::class)
+            public fun Handler.requireInstanceIsNotSuppressed() {
+                require(this !is SuppressedHandler) {
+                    "handler is an instance of SuppressedHandler (leaked reference)"
+                }
+            }
         }
     }
 
@@ -201,15 +217,19 @@ public class UncaughtException private constructor(
          * */
         @get:JvmName("isActive")
         public val isActive: Boolean get() = _isActive()
+        @OptIn(InternalKmpTorApi::class)
+        private val lock = SynchronizedObject()
 
         override fun invoke(it: UncaughtException) {
-            checkActive(it)
-            handler(it)
+            checkIsActive(it)
+
+            @OptIn(InternalKmpTorApi::class)
+            synchronized(lock) { handler(it) }
         }
 
         @JvmSynthetic
         @Throws(IllegalStateException::class)
-        internal fun checkActive(cause: UncaughtException? = null) {
+        internal fun checkIsActive(cause: UncaughtException? = null) {
             if (isActive) return
 
             val msg = "$this cannot be referenced outside of withSuppression block"

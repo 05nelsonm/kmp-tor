@@ -13,21 +13,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-@file:Suppress("EXPECT_ACTUAL_CLASSIFIERS_ARE_IN_BETA_WARNING")
-
 package io.matthewnelson.kmp.tor.runtime.core
 
 import kotlin.jvm.JvmField
 
 /**
+ * An alias of [ItBlock] indicating a callback for
+ * something occurring successfully.
+ * */
+public typealias OnSuccess<T> = ItBlock<T>
+
+/**
+ * An alias of [ItBlock] indicating a callback for
+ * something occurring exceptionally.
+ * */
+public typealias OnFailure = ItBlock<Throwable>
+
+/**
  * A callback for dispatching things.
  * */
-public expect fun interface Callback<in It: Any> {
-
+public fun interface Callback<in It: Any> {
     public operator fun invoke(it: It)
 
     // TODO: DispatchMain Issue #349
-
 }
 
 /**

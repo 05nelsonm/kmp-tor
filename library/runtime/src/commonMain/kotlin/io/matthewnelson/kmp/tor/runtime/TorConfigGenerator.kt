@@ -63,7 +63,7 @@ public class TorConfigGenerator private constructor(
         } catch (_: IOException) {}
 
         // Apply library consumers' configuration(s)
-        config.forEach { apply(it, environment) }
+        config.forEach { block -> apply(environment, block) }
 
         putDefaults(pathsTor)
     }

@@ -17,6 +17,7 @@
 
 package io.matthewnelson.kmp.tor.runtime.core.util
 
+import io.matthewnelson.kmp.file.InterruptedException
 import io.matthewnelson.kmp.process.Blocking
 import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
 import io.matthewnelson.kmp.tor.runtime.core.QueuedJob
@@ -25,6 +26,7 @@ import kotlin.jvm.JvmName
 import kotlin.time.Duration.Companion.milliseconds
 
 @InternalKmpTorApi
+@Throws(InterruptedException::class, Throwable::class)
 public inline fun <Response: Any> QueuedJob.awaitSync(
     success: () -> Response?,
     failure: () -> Throwable?,
@@ -32,19 +34,23 @@ public inline fun <Response: Any> QueuedJob.awaitSync(
 ): Response {
     var callback = cancellation
 
-    while (true) {
+    while (isActive) {
         success()?.let { return it }
         failure()?.let { throw it }
 
-        Blocking.threadSleep(25.milliseconds)
+        Blocking.threadSleep(10.milliseconds)
 
         // No possibility of cancellation. Skip.
         if (callback == null) continue
 
-        val exception = try {
+        val cause = try {
             callback() ?: continue
         } catch (t: Throwable) {
-            if (t is CancellationException) t else CancellationException(t)
+            if (t is CancellationException) {
+                t
+            } else {
+                CancellationException("awaitSync.cancellation threw exception", t)
+            }
         }
 
         // de-reference callback as to not invoke it anymore
@@ -52,6 +58,12 @@ public inline fun <Response: Any> QueuedJob.awaitSync(
         // is in State.Executing), will just continue to loop
         // until execution completes.
         callback = null
-        cancel(exception)
+        cancel(cause)
     }
+
+    success()?.let { return it }
+
+    throw cancellationException
+        ?: failure()
+        ?: IllegalStateException("$this completed, but no cause was recovered by awaitSync.failure")
 }
