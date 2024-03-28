@@ -38,16 +38,16 @@ internal class TorService internal constructor(): AbstractTorService() {
 
         override fun enqueue(
             action: RuntimeAction,
-            onFailure: Callback<Throwable>,
-            onSuccess: Callback<Unit>,
+            onFailure: ItBlock<Throwable>,
+            onSuccess: ItBlock<Unit>,
         ): QueuedJob {
             TODO("Not yet implemented")
         }
 
         override fun <Response : Any> enqueue(
             cmd: TorCmd.Unprivileged<Response>,
-            onFailure: Callback<Throwable>?,
-            onSuccess: Callback<Response>,
+            onFailure: ItBlock<Throwable>,
+            onSuccess: ItBlock<Response>,
         ): QueuedJob {
             TODO("Not yet implemented")
         }

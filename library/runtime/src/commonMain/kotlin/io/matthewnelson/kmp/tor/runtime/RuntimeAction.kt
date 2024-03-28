@@ -86,8 +86,8 @@ public enum class RuntimeAction {
          * */
         public fun enqueue(
             action: RuntimeAction,
-            onFailure: Callback<Throwable>,
-            onSuccess: Callback<Unit>,
+            onFailure: ItBlock<Throwable>,
+            onSuccess: ItBlock<Unit>,
         ): QueuedJob
     }
 }

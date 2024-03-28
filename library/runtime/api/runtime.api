@@ -32,7 +32,7 @@ public final class io/matthewnelson/kmp/tor/runtime/RuntimeAction : java/lang/En
 }
 
 public abstract interface class io/matthewnelson/kmp/tor/runtime/RuntimeAction$Processor {
-	public abstract fun enqueue (Lio/matthewnelson/kmp/tor/runtime/RuntimeAction;Lio/matthewnelson/kmp/tor/runtime/core/Callback;Lio/matthewnelson/kmp/tor/runtime/core/Callback;)Lio/matthewnelson/kmp/tor/runtime/core/QueuedJob;
+	public abstract fun enqueue (Lio/matthewnelson/kmp/tor/runtime/RuntimeAction;Lio/matthewnelson/kmp/tor/runtime/core/ItBlock;Lio/matthewnelson/kmp/tor/runtime/core/ItBlock;)Lio/matthewnelson/kmp/tor/runtime/core/QueuedJob;
 }
 
 public abstract class io/matthewnelson/kmp/tor/runtime/RuntimeEvent {

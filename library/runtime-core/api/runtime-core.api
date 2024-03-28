@@ -34,7 +34,7 @@ public abstract interface class io/matthewnelson/kmp/tor/runtime/core/ItBlock {
 
 public abstract class io/matthewnelson/kmp/tor/runtime/core/QueuedJob {
 	public final field name Ljava/lang/String;
-	protected fun <init> (Ljava/lang/String;Lio/matthewnelson/kmp/tor/runtime/core/Callback;Lio/matthewnelson/kmp/tor/runtime/core/UncaughtException$Handler;)V
+	protected fun <init> (Ljava/lang/String;Lio/matthewnelson/kmp/tor/runtime/core/ItBlock;Lio/matthewnelson/kmp/tor/runtime/core/UncaughtException$Handler;)V
 	public final fun cancel (Ljava/util/concurrent/CancellationException;)Z
 	public final fun invokeOnCompletion (Lio/matthewnelson/kmp/tor/runtime/core/ItBlock;)Lio/matthewnelson/kmp/tor/runtime/core/Disposable;
 	public final fun isActive ()Z
@@ -1110,7 +1110,7 @@ public abstract class io/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$Privileg
 }
 
 public abstract interface class io/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$Privileged$Processor : io/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$Unprivileged$Processor {
-	public abstract fun enqueue (Lio/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$Privileged;Lio/matthewnelson/kmp/tor/runtime/core/Callback;Lio/matthewnelson/kmp/tor/runtime/core/Callback;)Lio/matthewnelson/kmp/tor/runtime/core/QueuedJob;
+	public abstract fun enqueue (Lio/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$Privileged;Lio/matthewnelson/kmp/tor/runtime/core/ItBlock;Lio/matthewnelson/kmp/tor/runtime/core/ItBlock;)Lio/matthewnelson/kmp/tor/runtime/core/QueuedJob;
 }
 
 public final class io/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$Resolve : io/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$Unprivileged {
@@ -1199,7 +1199,7 @@ public abstract class io/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$Unprivil
 }
 
 public abstract interface class io/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$Unprivileged$Processor {
-	public abstract fun enqueue (Lio/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$Unprivileged;Lio/matthewnelson/kmp/tor/runtime/core/Callback;Lio/matthewnelson/kmp/tor/runtime/core/Callback;)Lio/matthewnelson/kmp/tor/runtime/core/QueuedJob;
+	public abstract fun enqueue (Lio/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$Unprivileged;Lio/matthewnelson/kmp/tor/runtime/core/ItBlock;Lio/matthewnelson/kmp/tor/runtime/core/ItBlock;)Lio/matthewnelson/kmp/tor/runtime/core/QueuedJob;
 }
 
 public final class io/matthewnelson/kmp/tor/runtime/core/key/AddressKey {

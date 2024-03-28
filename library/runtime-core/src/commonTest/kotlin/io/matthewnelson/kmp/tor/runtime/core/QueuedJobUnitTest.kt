@@ -182,8 +182,8 @@ class QueuedJobUnitTest {
     private class TestJob(
         name: String = "",
         private val cancellation: (cause: CancellationException?) -> Unit = {},
-        onFailure: Callback<Throwable>? = null,
-        private val onSuccess: Callback<Unit>? = null,
+        onFailure: ItBlock<Throwable> = ItBlock {},
+        private val onSuccess: ItBlock<Unit>? = null,
         handler: UncaughtException.Handler = UncaughtException.Handler.THROW,
     ): QueuedJob(name, onFailure, handler) {
         override fun onCancellation(cause: CancellationException?) {

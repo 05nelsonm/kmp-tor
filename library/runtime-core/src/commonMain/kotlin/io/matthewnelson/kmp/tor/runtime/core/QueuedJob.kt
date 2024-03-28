@@ -38,8 +38,7 @@ public abstract class QueuedJob protected constructor(
     // TODO:
     //  @JvmField
     //  public val canCancelWhileExecuting: Boolean
-    @Volatile
-    private var onFailure: Callback<Throwable>?,
+    onFailure: ItBlock<Throwable>,
     handler: UncaughtException.Handler,
 ) {
 
@@ -49,6 +48,8 @@ public abstract class QueuedJob protected constructor(
     private var completionCallbacks: LinkedHashSet<ItBlock<Unit>>? = LinkedHashSet(1, 1.0f)
     @Volatile
     private var handler: UncaughtException.Handler? = handler
+    @Volatile
+    private var onFailure: ItBlock<Throwable>? = onFailure
     @OptIn(InternalKmpTorApi::class)
     private val lock = SynchronizedObject()
 
@@ -224,10 +225,10 @@ public abstract class QueuedJob protected constructor(
      * functions which acquire the lock such as [cancel], [onError],
      * or [invokeOnCompletion].
      * */
-    protected fun <T: Any> onCompletion(response: T, withLock: () -> Callback<T>?) {
+    protected fun <T: Any> onCompletion(response: T, withLock: () -> ItBlock<T>?) {
         if (!isActive) return
 
-        var onSuccess: Callback<T>? = null
+        var onSuccess: ItBlock<T>? = null
 
         @OptIn(InternalKmpTorApi::class)
         val complete = synchronized(lock) {

@@ -18,13 +18,13 @@
 
 package io.matthewnelson.kmp.tor.runtime.util
 
-import io.matthewnelson.kmp.process.Blocking
+import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
 import io.matthewnelson.kmp.tor.runtime.RuntimeAction
+import io.matthewnelson.kmp.tor.runtime.core.util.awaitSync
 import io.matthewnelson.kmp.tor.runtime.internal.commonExecuteAsync
 import kotlin.coroutines.cancellation.CancellationException
 import kotlin.jvm.JvmName
 import kotlin.jvm.JvmOverloads
-import kotlin.time.Duration.Companion.milliseconds
 
 /**
  * Enqueues the [action], suspending the current coroutine
@@ -63,38 +63,18 @@ public fun <T: RuntimeAction.Processor> T.executeSync(
     cancellation: (() -> CancellationException?)? = null,
 ): T {
     var failure: Throwable? = null
-    var success: Unit? = null
+    var success: T? = null
 
-    val job = enqueue(
+    @OptIn(InternalKmpTorApi::class)
+    return enqueue(
         action = action,
         onFailure = { failure = it },
-        onSuccess = { success = it },
+        onSuccess = { success = this },
+    ).awaitSync(
+        success = { success },
+        failure = { failure },
+        cancellation = cancellation,
     )
-
-    var callback = cancellation
-
-    while (true) {
-        if (success != null) return this
-        failure?.let { throw it }
-
-        Blocking.threadSleep(25.milliseconds)
-
-        // No possibility of cancellation. Skip.
-        if (callback == null) continue
-
-        val exception = try {
-            callback() ?: continue
-        } catch (t: Throwable) {
-            if (t is CancellationException) t else CancellationException(t)
-        }
-
-        // de-reference callback as to not invoke it anymore
-        // in the event that job is unable to be cancelled (e.g.
-        // is in State.Executing), will just continue to loop
-        // until execution completes.
-        callback = null
-        job.cancel(exception)
-    }
 }
 
 /**

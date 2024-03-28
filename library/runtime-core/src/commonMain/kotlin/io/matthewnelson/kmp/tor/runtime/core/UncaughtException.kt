@@ -162,7 +162,7 @@ public class UncaughtException private constructor(
              * */
             @JvmStatic
             public fun <T: Any?> Handler?.withSuppression(
-                block: Handler.() -> T
+                block: SuppressedHandler.() -> T
             ): T {
                 val delegate = this
                 var threw: UncaughtException? = null

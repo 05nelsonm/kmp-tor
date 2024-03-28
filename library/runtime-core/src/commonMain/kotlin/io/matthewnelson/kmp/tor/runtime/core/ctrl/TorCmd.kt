@@ -657,8 +657,8 @@ public sealed class TorCmd<Response: Any> private constructor(
             @Throws(IllegalStateException::class)
             public fun <Response: Any> enqueue(
                 cmd: Privileged<Response>,
-                onFailure: Callback<Throwable>?,
-                onSuccess: Callback<Response>,
+                onFailure: ItBlock<Throwable>,
+                onSuccess: ItBlock<Response>,
             ): QueuedJob
         }
     }
@@ -694,8 +694,8 @@ public sealed class TorCmd<Response: Any> private constructor(
             @Throws(IllegalStateException::class)
             public fun <Response: Any> enqueue(
                 cmd: Unprivileged<Response>,
-                onFailure: Callback<Throwable>?,
-                onSuccess: Callback<Response>,
+                onFailure: ItBlock<Throwable>,
+                onSuccess: ItBlock<Response>,
             ): QueuedJob
         }
     }

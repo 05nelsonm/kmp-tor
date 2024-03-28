@@ -17,21 +17,19 @@
 
 package io.matthewnelson.kmp.tor.runtime.core.util
 
-import io.matthewnelson.kmp.process.Blocking
-import io.matthewnelson.kmp.tor.runtime.core.QueuedJob
+import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
 import io.matthewnelson.kmp.tor.runtime.core.ctrl.TorCmd
 import io.matthewnelson.kmp.tor.runtime.core.internal.commonExecuteAsync
 import kotlin.coroutines.cancellation.CancellationException
 import kotlin.jvm.JvmName
 import kotlin.jvm.JvmOverloads
-import kotlin.time.Duration.Companion.milliseconds
 
 /**
  * Enqueues the [cmd], suspending the current coroutine until completion
  * or cancellation/error.
  *
  * @see [TorCmd.Privileged.Processor]
- * @see [executeSync]
+ * @see [awaitSync]
  * */
 @Throws(Throwable::class)
 public actual suspend fun <Response: Any> TorCmd.Privileged.Processor.executeAsync(
@@ -43,7 +41,7 @@ public actual suspend fun <Response: Any> TorCmd.Privileged.Processor.executeAsy
  * or cancellation/error.
  *
  * @see [TorCmd.Unprivileged.Processor]
- * @see [executeSync]
+ * @see [awaitSync]
  * */
 @Throws(Throwable::class)
 public actual suspend fun <Response: Any> TorCmd.Unprivileged.Processor.executeAsync(
@@ -73,11 +71,12 @@ public fun <Response: Any> TorCmd.Privileged.Processor.executeSync(
     var failure: Throwable? = null
     var success: Response? = null
 
+    @OptIn(InternalKmpTorApi::class)
     return enqueue(
         cmd = cmd,
         onFailure = { failure = it },
         onSuccess = { success = it },
-    ).executeSync(
+    ).awaitSync(
         success = { success },
         failure = { failure },
         cancellation = cancellation,
@@ -107,44 +106,14 @@ public fun <Response: Any> TorCmd.Unprivileged.Processor.executeSync(
     var fail: Throwable? = null
     var success: Response? = null
 
+    @OptIn(InternalKmpTorApi::class)
     return enqueue(
         cmd = cmd,
         onFailure = { fail = it },
         onSuccess = { success = it },
-    ).executeSync(
+    ).awaitSync(
         success = { success },
         failure = { fail },
         cancellation = cancellation,
     )
-}
-
-private inline fun <Response: Any> QueuedJob.executeSync(
-    success: () -> Response?,
-    failure: () -> Throwable?,
-    noinline cancellation: (() -> CancellationException?)?,
-): Response {
-    var callback = cancellation
-
-    while (true) {
-        success()?.let { return it }
-        failure()?.let { throw it }
-
-        Blocking.threadSleep(25.milliseconds)
-
-        // No possibility of cancellation. Skip.
-        if (callback == null) continue
-
-        val exception = try {
-            callback() ?: continue
-        } catch (t: Throwable) {
-            if (t is CancellationException) t else CancellationException(t)
-        }
-
-        // de-reference callback as to not invoke it anymore
-        // in the event that job is unable to be cancelled (e.g.
-        // is in State.Executing), will just continue to loop
-        // until execution completes.
-        callback = null
-        cancel(exception)
-    }
 }
