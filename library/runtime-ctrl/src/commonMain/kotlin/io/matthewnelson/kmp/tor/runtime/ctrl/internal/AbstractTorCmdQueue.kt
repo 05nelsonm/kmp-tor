@@ -25,6 +25,7 @@ import io.matthewnelson.kmp.tor.runtime.core.UncaughtException.Handler.Companion
 import io.matthewnelson.kmp.tor.runtime.core.ctrl.TorCmd
 import io.matthewnelson.kmp.tor.runtime.ctrl.AbstractTorEventProcessor
 import kotlin.coroutines.cancellation.CancellationException
+import kotlin.jvm.JvmSynthetic
 
 @OptIn(InternalKmpTorApi::class)
 internal abstract class AbstractTorCmdQueue internal constructor(
@@ -55,6 +56,32 @@ internal abstract class AbstractTorCmdQueue internal constructor(
         onFailure: OnFailure,
         onSuccess: OnSuccess<Response>,
     ): TorCmdJob<Response> = enqueueImpl(cmd, onFailure, onSuccess)
+
+    @JvmSynthetic
+    @Throws(IllegalStateException::class)
+    internal fun transferAllUnprivileged(queue: ArrayList<TorCmdJob<*>>) {
+        checkDestroy()
+        if (queue.isEmpty()) return
+
+        var start = false
+
+        synchronized(lock) {
+            checkDestroy()
+
+            val i = queue.iterator()
+            while (i.hasNext()) {
+                val job = i.next()
+                if (job.cmd is TorCmd.Privileged) continue
+
+                i.remove()
+                queueExecute.add(job)
+                start = true
+            }
+        }
+
+        if (!start) return
+        startProcessor()
+    }
 
     @Throws(IllegalStateException::class)
     private fun <Response: Any> enqueueImpl(

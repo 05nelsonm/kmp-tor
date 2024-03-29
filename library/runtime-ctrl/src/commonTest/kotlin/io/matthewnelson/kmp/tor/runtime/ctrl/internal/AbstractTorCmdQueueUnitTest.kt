@@ -34,13 +34,15 @@ class AbstractTorCmdQueueUnitTest {
         override fun destroy() { onDestroy() }
 
         @Suppress("UNCHECKED_CAST")
+        fun dequeueNext(): TorCmdJob<Unit>? = dequeueNextOrNull() as? TorCmdJob<Unit>
+
         fun processAll() {
-            var job: TorCmdJob<Unit>? = dequeueNextOrNull() as? TorCmdJob<Unit>
+            var job: TorCmdJob<Unit>? = dequeueNext()
 
             while (job != null) {
                 assertEquals(QueuedJob.State.Executing, job.state)
                 job.completion(Unit)
-                job = dequeueNextOrNull() as? TorCmdJob<Unit>
+                job = dequeueNext()
             }
         }
     }
@@ -90,5 +92,43 @@ class AbstractTorCmdQueueUnitTest {
             jobs.forEach { job -> assertEquals(QueuedJob.State.Cancelled, job.state) }
             assertEquals(jobs.size, invocationFailure)
         }
+    }
+
+    @Test
+    fun givenTemporaryQueue_whenTransferred_thenRemovesAllUnprivileged() {
+        val tempQueue = ArrayList<TorCmdJob<*>>(5)
+        var invocationSuccess = 0
+        var invocationFailure = 0
+
+        val onFailure = OnFailure { invocationFailure++ }
+        val onSuccess = OnSuccess<Unit> { invocationSuccess++ }
+
+        repeat(4) {
+            val job = TorCmdJob.of(
+                TorCmd.Signal.Dump,
+                onSuccess,
+                onFailure,
+                UncaughtException.Handler.THROW
+            )
+            tempQueue.add(job)
+        }
+
+        // TorCmd.Privileged type
+        tempQueue.add(TorCmdJob.of(
+            TorCmd.Ownership.Take,
+            onSuccess,
+            onFailure,
+            UncaughtException.Handler.THROW
+        ))
+
+        val queue = TestQueue()
+        queue.transferAllUnprivileged(tempQueue)
+        assertEquals(1, tempQueue.size)
+        assertEquals(1, queue.invocationStart)
+
+        // Verify they were transferred
+        queue.processAll()
+        assertEquals(4, invocationSuccess)
+        assertEquals(0, invocationFailure)
     }
 }
