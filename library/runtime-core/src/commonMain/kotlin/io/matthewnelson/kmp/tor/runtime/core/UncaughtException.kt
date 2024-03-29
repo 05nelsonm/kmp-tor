@@ -202,10 +202,14 @@ public class UncaughtException private constructor(
     }
 
     /**
-     * A special handler utilized within [Handler.withSuppression]
-     * lambda which propagates all exceptions thrown via [Handler.tryCatch]
+     * A special [Handler] utilized within [Handler.withSuppression]
+     * lambda which propagates all exceptions caught by [Handler.tryCatch]
      * into a single, root exception (the first thrown), with all
      * subsequent exceptions added via [Throwable.addSuppressed].
+     *
+     * **NOTE:** Utilization outside [Handler.withSuppression] lambda
+     * will result in [IllegalStateException] being thrown by
+     * [Handler.tryCatch] and [invoke].
      * */
     public class SuppressedHandler private constructor(
         private val _isActive: () -> Boolean,

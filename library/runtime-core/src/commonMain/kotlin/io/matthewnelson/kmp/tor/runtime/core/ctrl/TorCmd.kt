@@ -650,6 +650,8 @@ public sealed class TorCmd<Response: Any> private constructor(
              * [onFailure] will be invoked with [CancellationException].
              *
              * @return [QueuedJob]
+             * @see [OnFailure]
+             * @see [OnSuccess]
              * @see [io.matthewnelson.kmp.tor.runtime.core.util.executeSync]
              * @see [io.matthewnelson.kmp.tor.runtime.core.util.executeAsync]
              * @throws [IllegalStateException] if tor has not been started, or
@@ -686,6 +688,8 @@ public sealed class TorCmd<Response: Any> private constructor(
              * [onFailure] will be invoked with [CancellationException].
              *
              * @return [QueuedJob]
+             * @see [OnFailure]
+             * @see [OnSuccess]
              * @see [io.matthewnelson.kmp.tor.runtime.core.util.executeSync]
              * @see [io.matthewnelson.kmp.tor.runtime.core.util.executeAsync]
              * @throws [IllegalStateException] if tor has not been started, or

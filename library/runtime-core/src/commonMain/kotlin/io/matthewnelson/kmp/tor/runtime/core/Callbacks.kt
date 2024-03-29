@@ -20,12 +20,26 @@ import kotlin.jvm.JvmField
 /**
  * An alias of [ItBlock] indicating a callback for
  * something occurring successfully.
+ *
+ * **NOTE:** Exceptions should not be thrown
+ * within the [OnSuccess] lambda. If [OnSuccess] is
+ * being utilized with TorRuntime APIs, it will be
+ * treated as an [UncaughtException] and dispatched
+ * to [io.matthewnelson.kmp.tor.runtime.RuntimeEvent.LOG.ERROR]
+ * observers.
  * */
 public typealias OnSuccess<T> = ItBlock<T>
 
 /**
  * An alias of [ItBlock] indicating a callback for
  * something occurring exceptionally.
+ *
+ * **NOTE:** The exception should not be re-thrown
+ * within the [OnFailure] lambda. If [OnFailure] is
+ * being utilized with TorRuntime APIs, it will be
+ * treated as an [UncaughtException] and dispatched
+ * to [io.matthewnelson.kmp.tor.runtime.RuntimeEvent.LOG.ERROR]
+ * observers.
  * */
 public typealias OnFailure = ItBlock<Throwable>
 

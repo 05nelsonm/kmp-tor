@@ -77,6 +77,8 @@ public enum class RuntimeAction {
          * [onFailure] will be invoked with [CancellationException].
          *
          * @return [QueuedJob]
+         * @see [OnFailure]
+         * @see [OnSuccess]
          * @see [io.matthewnelson.kmp.tor.runtime.util.executeAsync]
          * @see [io.matthewnelson.kmp.tor.runtime.util.executeSync]
          * */

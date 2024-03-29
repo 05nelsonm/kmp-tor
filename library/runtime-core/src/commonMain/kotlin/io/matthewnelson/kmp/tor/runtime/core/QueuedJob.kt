@@ -55,6 +55,10 @@ protected constructor(
     @Volatile
     private var _state: State = Enqueued
     @Volatile
+    private var _cancellationException: CancellationException? = null
+    @Volatile
+    private var _isCompleting: Boolean = false
+    @Volatile
     private var completionCallbacks: LinkedHashSet<ItBlock<CancellationException?>>? = LinkedHashSet(1, 1.0f)
     @Volatile
     private var handler: UncaughtException.Handler? = handler
@@ -64,19 +68,26 @@ protected constructor(
     private val lock = SynchronizedObject()
 
     /**
-     * If [cancel] was invoked successfully, this **will not**
-     * be null.
+     * If [cancel] was invoked successfully, this **will not** be null.
      * */
-    @Volatile
     @get:JvmName("cancellationException")
-    public var cancellationException: CancellationException? = null
-        private set
+    public val cancellationException: CancellationException? get() = _cancellationException
 
     /**
      * The current [State] of the job
      * */
     @get:JvmName("state")
     public val state: State get() = _state
+
+    /**
+     * An intermediate "state" indicating that completion,
+     * either by success or error/cancellation is underway.
+     *
+     * Will be set back to false after all [invokeOnCompletion]
+     * handles have been run.
+     * */
+    @get:JvmName("isCompleting")
+    public val isCompleting: Boolean get() = _isCompleting
 
     @get:JvmName("isActive")
     public val isActive: Boolean get() = when (state) {
@@ -86,18 +97,6 @@ protected constructor(
         Enqueued,
         Executing -> true
     }
-
-    /**
-     * An intermediate "state" indicating that completion,
-     * either by success or error/cancellation is underway.
-     *
-     * Will be set back to false after all [invokeOnCompletion]
-     * handles have been run.
-     * */
-    @Volatile
-    @get:JvmName("isCompleting")
-    public var isCompleting: Boolean = false
-        private set
 
     public enum class State {
 
@@ -201,8 +200,8 @@ protected constructor(
         @OptIn(InternalKmpTorApi::class)
         val complete = synchronized(lock) {
             if (isCompleting || state != Enqueued) return@synchronized false
-            cancellationException = cause ?: CancellationException(toString(Cancelled))
-            isCompleting = true
+            _cancellationException = cause ?: CancellationException(toString(Cancelled))
+            _isCompleting = true
             true
         }
 
@@ -268,7 +267,7 @@ protected constructor(
             // Set before invoking withLock so that
             // if implementation calls again it will
             // not lock up.
-            isCompleting = true
+            _isCompleting = true
             onSuccess = withLock()
             true
         }
@@ -298,7 +297,7 @@ protected constructor(
             // Set before invoking withLock so that
             // if implementation calls again it will
             // not lock up.
-            isCompleting = true
+            _isCompleting = true
             withLock(Unit)
             true
         }
@@ -344,7 +343,7 @@ protected constructor(
                 }
             }
 
-            isCompleting = false
+            _isCompleting = false
         }
     }
 
