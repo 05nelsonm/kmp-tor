@@ -15,17 +15,20 @@
  **/
 package io.matthewnelson.kmp.tor.runtime.ctrl.internal
 
+import io.matthewnelson.kmp.file.IOException
 import io.matthewnelson.kmp.tor.runtime.core.OnFailure
 import io.matthewnelson.kmp.tor.runtime.core.OnSuccess
 import io.matthewnelson.kmp.tor.runtime.core.QueuedJob
 import io.matthewnelson.kmp.tor.runtime.core.ctrl.TorCmd
 import io.matthewnelson.kmp.tor.runtime.core.UncaughtException
-import kotlin.test.Test
-import kotlin.test.assertEquals
+import kotlin.coroutines.cancellation.CancellationException
+import kotlin.test.*
 
 class AbstractTorCmdQueueUnitTest {
 
-    private class TestQueue: AbstractTorCmdQueue(null, emptySet(), UncaughtException.Handler.THROW) {
+    private class TestQueue(
+        handler: UncaughtException.Handler = UncaughtException.Handler.THROW
+    ): AbstractTorCmdQueue(null, emptySet(), handler) {
 
         var invocationStart = 0
             private set
@@ -95,7 +98,7 @@ class AbstractTorCmdQueueUnitTest {
     }
 
     @Test
-    fun givenTemporaryQueue_whenTransferred_thenRemovesAllUnprivileged() {
+    fun givenTemporaryQueue_whenTransferred_thenTransfersUnprivilegedCommands() {
         val tempQueue = ArrayList<TorCmdJob<*>>(5)
         var invocationSuccess = 0
         var invocationFailure = 0
@@ -130,5 +133,76 @@ class AbstractTorCmdQueueUnitTest {
         queue.processAll()
         assertEquals(4, invocationSuccess)
         assertEquals(0, invocationFailure)
+    }
+
+    @Test
+    fun givenOnDestroy_whenQueuedJobs_thenAllAreCancelled() {
+        val queue = TestQueue()
+        var invocationSuccess = 0
+        var invocationFailure = 0
+
+        val onFailure = OnFailure {
+            invocationFailure++
+            assertIs<CancellationException>(it)
+
+            assertFailsWith<IllegalStateException> {
+                queue.enqueue(TorCmd.Signal.Dump, {}, {})
+            }
+
+            // Verify exception suppression functionality such that
+            // all the things still execute and then propagate single
+            // exception (with suppressed exceptions) to handler.
+            throw IOException()
+        }
+        val onSuccess = OnSuccess<Unit> { invocationSuccess++ }
+
+        // Issuance of Halt will transfer all current queue
+        // jobs to a cancellation queue which is handled on
+        // next invocation of dequeueNextOrNull. In this case,
+        // we are not invoking that but are checking that
+        // those still get cancelled when onDestroy happens
+        val commands = listOf(
+            TorCmd.Signal.Dump,
+            TorCmd.Signal.Dump,
+            TorCmd.Signal.Halt,
+            TorCmd.Signal.Dump,
+            TorCmd.Signal.Halt,
+            TorCmd.Signal.Dump,
+            TorCmd.Signal.Dump,
+        )
+        commands.forEach { command ->
+            when (command) {
+                is TorCmd.Privileged<Unit> -> queue.enqueue(command, onFailure, onSuccess)
+                is TorCmd.Unprivileged<Unit> -> queue.enqueue(command, onFailure, onSuccess)
+            }
+        }
+
+        try {
+            queue.destroy()
+            fail()
+        } catch (e: UncaughtException) {
+            // pass
+            assertIs<IOException>(e.cause)
+
+            val suppressed = e.suppressedExceptions
+            assertEquals(commands.size - 1, suppressed.size)
+            suppressed.forEach { t ->
+                assertIs<UncaughtException>(t)
+                assertIs<IOException>(t.cause)
+            }
+        }
+
+        assertTrue(queue.isDestroyed())
+
+        // This indicates that the 2 separate queues, both of
+        // which encountered exceptions, were still handled
+        // and the exception thrown after.
+        assertEquals(commands.size, invocationFailure)
+        assertEquals(0, invocationSuccess)
+
+        // Unprivileged
+        assertFailsWith<IllegalStateException> { queue.enqueue(TorCmd.Signal.Dump, onFailure, onSuccess) }
+        // Privileged
+        assertFailsWith<IllegalStateException> { queue.enqueue(TorCmd.Signal.Halt, onFailure, onSuccess) }
     }
 }
