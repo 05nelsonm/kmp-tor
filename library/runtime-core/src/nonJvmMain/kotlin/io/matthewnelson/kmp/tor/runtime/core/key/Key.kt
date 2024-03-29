@@ -48,34 +48,34 @@ public actual sealed class Key private actual constructor() {
     ): Key(), Destroyable {
 
         @Volatile
-        private var isDestroyed = false
+        private var _destroyed = false
         @OptIn(InternalKmpTorApi::class)
         private val lock = SynchronizedObject()
 
         public actual final override fun destroy() {
-            if (isDestroyed) return
+            if (_destroyed) return
 
             @OptIn(InternalKmpTorApi::class)
             synchronized(lock) {
-                if (isDestroyed) return@synchronized
+                if (_destroyed) return@synchronized
                 key.fill(0)
-                isDestroyed = true
+                _destroyed = true
             }
         }
 
-        public actual final override fun isDestroyed(): Boolean = isDestroyed
+        public actual final override fun isDestroyed(): Boolean = _destroyed
 
         public actual final override fun encoded(): ByteArray? = withKeyOrNull { it.copyOf() }
 
         @Throws(IllegalStateException::class)
-        public actual fun encodedOrThrow(): ByteArray = encoded() ?: throw IllegalStateException("isDestroyed[$isDestroyed]")
+        public actual fun encodedOrThrow(): ByteArray = encoded() ?: throw IllegalStateException("isDestroyed[$_destroyed]")
 
         @Throws(IllegalStateException::class)
-        public actual fun base16(): String = base16OrNull() ?: throw IllegalStateException("isDestroyed[$isDestroyed]")
+        public actual fun base16(): String = base16OrNull() ?: throw IllegalStateException("isDestroyed[$_destroyed]")
         @Throws(IllegalStateException::class)
-        public actual fun base32(): String = base32OrNull() ?: throw IllegalStateException("isDestroyed[$isDestroyed]")
+        public actual fun base32(): String = base32OrNull() ?: throw IllegalStateException("isDestroyed[$_destroyed]")
         @Throws(IllegalStateException::class)
-        public actual fun base64(): String = base64OrNull() ?: throw IllegalStateException("isDestroyed[$isDestroyed]")
+        public actual fun base64(): String = base64OrNull() ?: throw IllegalStateException("isDestroyed[$_destroyed]")
 
         public actual fun base16OrNull(): String? = withKeyOrNull { it.encodeToString(BASE_16) }
         public actual fun base32OrNull(): String? = withKeyOrNull { it.encodeToString(BASE_32) }
@@ -85,7 +85,7 @@ public actual sealed class Key private actual constructor() {
         protected actual fun <T : Any> withKeyOrNull(
             block: (key: ByteArray) -> T
         ): T? = synchronized(lock) {
-            if (isDestroyed) return@synchronized null
+            if (_destroyed) return@synchronized null
             block(key)
         }
 

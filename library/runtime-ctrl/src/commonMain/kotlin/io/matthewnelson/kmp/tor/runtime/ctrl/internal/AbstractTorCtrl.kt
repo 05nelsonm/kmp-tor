@@ -33,13 +33,13 @@ internal abstract class AbstractTorCtrl internal constructor(
     TorCtrl
 {
 
-    private val lock = SynchronizedObject()
     @Volatile
-    private var destroyCallbacks: LinkedHashSet<ItBlock<TorCtrl>>? = LinkedHashSet(1, 1.0f)
+    private var _destroyCallbacks: LinkedHashSet<ItBlock<TorCtrl>>? = LinkedHashSet(1, 1.0f)
+    private val lock = SynchronizedObject()
 
     public final override fun invokeOnDestroy(handle: ItBlock<TorCtrl>): Disposable {
         val wasAdded = synchronized(lock) {
-            destroyCallbacks?.add(handle)
+            _destroyCallbacks?.add(handle)
         }
 
         if (wasAdded == null) {
@@ -54,7 +54,7 @@ internal abstract class AbstractTorCtrl internal constructor(
             if (isDestroyed()) return@Disposable
 
             synchronized(lock) {
-                destroyCallbacks?.remove(handle)
+                _destroyCallbacks?.remove(handle)
             }
         }
     }
@@ -73,9 +73,9 @@ internal abstract class AbstractTorCtrl internal constructor(
             }
 
             val callbacks = synchronized(lock) {
-                val callbacks = destroyCallbacks
+                val callbacks = _destroyCallbacks
                 // de-reference
-                destroyCallbacks = null
+                _destroyCallbacks = null
                 callbacks
             }
 

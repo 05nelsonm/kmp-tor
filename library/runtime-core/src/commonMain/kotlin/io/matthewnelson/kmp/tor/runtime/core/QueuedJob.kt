@@ -35,7 +35,7 @@ import kotlin.jvm.JvmName
  *
  * Heavily inspired by [kotlinx.coroutines.Job]
  *
- * @throws [IllegalArgumentException] if [handler] is a leaked
+ * @throws [IllegalArgumentException] if [_handler] is a leaked
  *   reference of [UncaughtException.SuppressedHandler]
  * */
 public abstract class QueuedJob
@@ -53,17 +53,17 @@ protected constructor(
     init { handler.requireInstanceIsNotSuppressed() }
 
     @Volatile
-    private var _state: State = Enqueued
-    @Volatile
     private var _cancellationException: CancellationException? = null
+    @Volatile
+    private var _completionCallbacks: LinkedHashSet<ItBlock<CancellationException?>>? = LinkedHashSet(1, 1.0f)
     @Volatile
     private var _isCompleting: Boolean = false
     @Volatile
-    private var completionCallbacks: LinkedHashSet<ItBlock<CancellationException?>>? = LinkedHashSet(1, 1.0f)
+    private var _handler: UncaughtException.Handler? = handler
     @Volatile
-    private var handler: UncaughtException.Handler? = handler
+    private var _onFailure: OnFailure? = onFailure
     @Volatile
-    private var onFailure: OnFailure? = onFailure
+    private var _state: State = Enqueued
     @OptIn(InternalKmpTorApi::class)
     private val lock = SynchronizedObject()
 
@@ -72,12 +72,6 @@ protected constructor(
      * */
     @get:JvmName("cancellationException")
     public val cancellationException: CancellationException? get() = _cancellationException
-
-    /**
-     * The current [State] of the job
-     * */
-    @get:JvmName("state")
-    public val state: State get() = _state
 
     /**
      * An intermediate "state" indicating that completion,
@@ -90,13 +84,19 @@ protected constructor(
     public val isCompleting: Boolean get() = _isCompleting
 
     @get:JvmName("isActive")
-    public val isActive: Boolean get() = when (state) {
+    public val isActive: Boolean get() = when (_state) {
         Cancelled,
         Success,
         Error -> false
         Enqueued,
         Executing -> true
     }
+
+    /**
+     * The current [State] of the job
+     * */
+    @get:JvmName("state")
+    public val state: State get() = _state
 
     public enum class State {
 
@@ -158,13 +158,13 @@ protected constructor(
     public fun invokeOnCompletion(handle: ItBlock<CancellationException?>): Disposable {
         @OptIn(InternalKmpTorApi::class)
         val wasAdded = synchronized(lock) {
-            completionCallbacks?.add(handle)
+            _completionCallbacks?.add(handle)
         }
 
         // Invoke immediately
         if (wasAdded == null) {
             UncaughtException.Handler.THROW.tryCatch(toString()) {
-                handle(cancellationException)
+                handle(_cancellationException)
             }
             return Disposable.NOOP
         }
@@ -176,7 +176,7 @@ protected constructor(
 
             @OptIn(InternalKmpTorApi::class)
             synchronized(lock) {
-                completionCallbacks?.remove(handle)
+                _completionCallbacks?.remove(handle)
             }
         }
     }
@@ -188,18 +188,18 @@ protected constructor(
      * [State.Enqueued] or [isCompleting] is true.
      *
      * If cancelled, [cancellationException] will be set,
-     * [onFailure] will be invoked with [CancellationException]
+     * [_onFailure] will be invoked with [CancellationException]
      * to indicate cancellation, and all [invokeOnCompletion]
      * callbacks will be run.
      *
      * @return true if cancellation was successful
      * */
     public fun cancel(cause: CancellationException?): Boolean {
-        if (isCompleting || state != Enqueued) return false
+        if (_isCompleting || _state != Enqueued) return false
 
         @OptIn(InternalKmpTorApi::class)
         val complete = synchronized(lock) {
-            if (isCompleting || state != Enqueued) return@synchronized false
+            if (_isCompleting || _state != Enqueued) return@synchronized false
             _cancellationException = cause ?: CancellationException(toString(Cancelled))
             _isCompleting = true
             true
@@ -209,7 +209,7 @@ protected constructor(
 
         Cancelled.doFinal {
             try {
-                onFailure?.let { it(cancellationException!!) }
+                _onFailure?.let { it(_cancellationException!!) }
             } finally {
                 onCancellation(cause)
             }
@@ -239,11 +239,11 @@ protected constructor(
      * */
     @Throws(IllegalStateException::class)
     protected fun onExecuting() {
-        if (isCompleting || state != Enqueued) throw IllegalStateException(toString())
+        if (_isCompleting || _state != Enqueued) throw IllegalStateException(toString())
 
         @OptIn(InternalKmpTorApi::class)
         synchronized(lock) {
-            if (isCompleting || state != Enqueued) throw IllegalStateException(toString())
+            if (_isCompleting || _state != Enqueued) throw IllegalStateException(toString())
             _state = Executing
         }
     }
@@ -259,13 +259,13 @@ protected constructor(
      * or [invokeOnCompletion]. It **MUST NOT** throw exception.
      * */
     protected fun <T: Any> onCompletion(response: T, withLock: () -> OnSuccess<T>?) {
-        if (isCompleting || !isActive) return
+        if (_isCompleting || !isActive) return
 
         var onSuccess: OnSuccess<T>? = null
 
         @OptIn(InternalKmpTorApi::class)
         val complete = synchronized(lock) {
-            if (isCompleting || !isActive) return@synchronized false
+            if (_isCompleting || !isActive) return@synchronized false
             // Set before invoking withLock so that
             // if implementation calls again it will
             // not lock up.
@@ -282,7 +282,7 @@ protected constructor(
     }
 
     /**
-     * Sets the job state to [State.Error] and invokes [onFailure]
+     * Sets the job state to [State.Error] and invokes [_onFailure]
      * with provided [cause]. Does nothing if the job is already
      * completed.
      *
@@ -291,11 +291,11 @@ protected constructor(
      * or [invokeOnCompletion].
      * */
     protected fun onError(cause: Throwable, withLock: ItBlock<Unit>) {
-        if (isCompleting || !isActive) return
+        if (_isCompleting || !isActive) return
 
         @OptIn(InternalKmpTorApi::class)
         val complete = synchronized(lock) {
-            if (isCompleting || !isActive) return@synchronized false
+            if (_isCompleting || !isActive) return@synchronized false
             // Set before invoking withLock so that
             // if implementation calls again it will
             // not lock up.
@@ -307,12 +307,12 @@ protected constructor(
         if (!complete) return
 
         Error.doFinal {
-            onFailure?.let { it(cause) }
+            _onFailure?.let { it(cause) }
         }
     }
 
     private fun State.doFinal(action: () -> Unit) {
-        check(isCompleting) { "isCompleting must be true when doFinal is called" }
+        check(_isCompleting) { "isCompleting must be true when doFinal is called" }
         check(isActive) { "isActive must be true when doFinal is called" }
 
         when (this) {
@@ -325,7 +325,7 @@ protected constructor(
 
         val context = toString(this)
 
-        handler.withSuppression {
+        _handler.withSuppression {
             tryCatch(context) { action() }
 
             @OptIn(InternalKmpTorApi::class)
@@ -333,15 +333,15 @@ protected constructor(
                 _state = this@doFinal
 
                 // de-reference all the things
-                handler = null
-                onFailure = null
+                _handler = null
+                _onFailure = null
 
-                val callbacks = completionCallbacks
-                completionCallbacks = null
+                val callbacks = _completionCallbacks
+                _completionCallbacks = null
                 callbacks
             }?.forEach { callback ->
                 tryCatch("$context.invokeOnCompletion") {
-                    callback(cancellationException)
+                    callback(_cancellationException)
                 }
             }
 
@@ -349,7 +349,7 @@ protected constructor(
         }
     }
 
-    final override fun toString(): String = toString(state)
+    final override fun toString(): String = toString(_state)
 
     private fun toString(state: State): String = "QueuedJob[name=$name,state=$state]@${hashCode()}"
 }

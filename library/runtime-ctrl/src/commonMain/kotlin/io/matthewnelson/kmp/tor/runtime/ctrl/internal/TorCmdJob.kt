@@ -29,9 +29,9 @@ internal class TorCmdJob<Response: Any> private constructor(
 ): QueuedJob(cmd.keyword.name, onFailure, handler) {
 
     @Volatile
-    private var onSuccess: OnSuccess<Response>? = onSuccess
+    private var _onSuccess: OnSuccess<Response>? = onSuccess
 
-    protected override fun onCancellation(cause: CancellationException?) { onSuccess = null }
+    protected override fun onCancellation(cause: CancellationException?) { _onSuccess = null }
 
     @JvmSynthetic
     @Throws(IllegalStateException::class)
@@ -39,14 +39,14 @@ internal class TorCmdJob<Response: Any> private constructor(
 
     @JvmSynthetic
     internal fun error(cause: Throwable) {
-        onError(cause, withLock = { onSuccess = null })
+        onError(cause, withLock = { _onSuccess = null })
     }
 
     @JvmSynthetic
     internal fun completion(response: Response) {
         onCompletion(response, withLock = {
-            val onSuccess = onSuccess
-            this.onSuccess = null
+            val onSuccess = _onSuccess
+            this._onSuccess = null
             onSuccess
         })
     }

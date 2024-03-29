@@ -22,7 +22,6 @@ import io.matthewnelson.kmp.tor.runtime.core.*
 import io.matthewnelson.kmp.tor.runtime.core.Destroyable.Companion.checkDestroy
 import io.matthewnelson.kmp.tor.runtime.core.UncaughtException.Handler.Companion.requireInstanceIsNotSuppressed
 import io.matthewnelson.kmp.tor.runtime.core.ctrl.TorCmd
-import io.matthewnelson.kmp.tor.runtime.ctrl.internal.AbstractTorCmdQueue
 import io.matthewnelson.kmp.tor.runtime.ctrl.internal.AbstractTorCmdQueue.Companion.cancelAndClearAll
 import io.matthewnelson.kmp.tor.runtime.ctrl.internal.AbstractTorCtrl
 import io.matthewnelson.kmp.tor.runtime.ctrl.internal.TorCmdJob
@@ -53,7 +52,7 @@ public constructor(
     @Volatile
     private var _connection: AbstractTorCtrl? = null
     @Volatile
-    private var destroyed = false
+    private var _destroyed = false
     private val lock = SynchronizedObject()
     private val queue = ArrayList<TorCmdJob<*>>(1)
 
@@ -66,7 +65,7 @@ public constructor(
         require(connection is AbstractTorCtrl) { "TorCtrl must implement ${AbstractTorCtrl::class.simpleName}" }
 
         synchronized(lock) {
-            check(this.connection == null) { "TorCtrl is already attached" }
+            check(_connection == null) { "TorCtrl is already attached" }
             checkDestroy()
             connection.transferAllUnprivileged(queue)
             _connection = connection
@@ -75,15 +74,15 @@ public constructor(
         connection.invokeOnDestroy { destroy() }
     }
 
-    public override fun isDestroyed(): Boolean = connection?.isDestroyed() ?: destroyed
+    public override fun isDestroyed(): Boolean = _connection?.isDestroyed() ?: _destroyed
 
     // @Throws(UncaughtException::class)
     public override fun destroy() {
-        if (destroyed) return
+        if (_destroyed) return
 
         val cancelAll = synchronized(lock) {
-            if (destroyed) return@synchronized false
-            destroyed = true
+            if (_destroyed) return@synchronized false
+            _destroyed = true
             true
         }
 

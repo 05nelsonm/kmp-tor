@@ -36,17 +36,16 @@ protected constructor(
     initialObservers: Set<TorEvent.Observer>,
 ): TorEvent.Processor {
 
-    private val staticTag: String? = staticTag?.ifBlank { null }
-    protected abstract val handler: UncaughtException.Handler
-    protected open val debug: Boolean = true
-
     @Volatile
-    @get:JvmName("destroyed")
-    protected var destroyed: Boolean = false
-        private set
-
-    private val observers = LinkedHashSet<TorEvent.Observer>(initialObservers.size + 1, 1.0F)
+    private var _destroyed: Boolean = false
     private val lock = SynchronizedObject()
+    private val observers = LinkedHashSet<TorEvent.Observer>(initialObservers.size + 1, 1.0F)
+    private val staticTag: String? = staticTag?.ifBlank { null }
+
+    @get:JvmName("destroyed")
+    protected val destroyed: Boolean get() = _destroyed
+    protected open val debug: Boolean = true
+    protected abstract val handler: UncaughtException.Handler
 
     init {
         observers.addAll(initialObservers)
@@ -139,13 +138,13 @@ protected constructor(
     }
 
     protected open fun onDestroy(): Boolean {
-        if (destroyed) return false
+        if (_destroyed) return false
 
         val wasDestroyed = withObservers {
-            if (destroyed) return@withObservers false
+            if (_destroyed) return@withObservers false
 
             clear()
-            destroyed = true
+            _destroyed = true
             true
         }
 
@@ -155,10 +154,10 @@ protected constructor(
     private fun <T: Any?> withObservers(
         block: MutableSet<TorEvent.Observer>.() -> T,
     ): T {
-        if (destroyed) return block(noOpMutableSet())
+        if (_destroyed) return block(noOpMutableSet())
 
         return synchronized(lock) {
-            block(if (destroyed) noOpMutableSet() else observers)
+            block(if (_destroyed) noOpMutableSet() else observers)
         }
     }
 
