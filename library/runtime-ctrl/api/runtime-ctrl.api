@@ -4,6 +4,7 @@ public abstract class io/matthewnelson/kmp/tor/runtime/ctrl/AbstractTorEventProc
 	public final fun add ([Lio/matthewnelson/kmp/tor/runtime/core/TorEvent$Observer;)V
 	public fun clearObservers ()V
 	protected final fun destroyed ()Z
+	protected fun getDebug ()Z
 	protected abstract fun getHandler ()Lio/matthewnelson/kmp/tor/runtime/core/UncaughtException$Handler;
 	protected final fun isStaticTag (Ljava/lang/String;)Z
 	protected final fun notifyObservers (Lio/matthewnelson/kmp/tor/runtime/core/TorEvent;Ljava/lang/String;)V

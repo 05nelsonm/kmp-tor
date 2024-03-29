@@ -245,10 +245,12 @@ public interface TorRuntime:
     ) {
 
         /**
-         * Toggle to dispatch [RuntimeEvent.LOG.DEBUG] or not.
+         * Toggle to dispatch [RuntimeEvent.LOG.DEBUG] and [TorEvent.DEBUG]
+         * or not.
          *
-         * **NOTE:** This does not alter control connection
-         * events to include [TorEvent.DEBUG].
+         * **NOTE:** This does not alter control connection event listeners
+         * via [TorCmd.SetEvents]. Add [TorEvent.DEBUG] via
+         * [TorRuntime.Builder.required] if debug logs from tor are needed.
          * */
         @JvmField
         @Volatile

@@ -38,6 +38,7 @@ protected constructor(
 
     private val staticTag: String? = staticTag?.ifBlank { null }
     protected abstract val handler: UncaughtException.Handler
+    protected open val debug: Boolean = true
 
     @Volatile
     @get:JvmName("destroyed")
@@ -123,6 +124,9 @@ protected constructor(
 
     protected fun TorEvent.notifyObservers(output: String) {
         val event = this
+
+        if (event == TorEvent.DEBUG && !debug) return
+
         withObservers {
             for (observer in this) {
                 if (observer.event != event) continue

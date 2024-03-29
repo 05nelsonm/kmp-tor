@@ -35,7 +35,6 @@ internal abstract class AbstractRuntimeEventProcessor(
     RuntimeEvent.Processor
 {
 
-    protected abstract val debug: Boolean
     private val observers = LinkedHashSet<RuntimeEvent.Observer<*>>(initialObservers.size + 1, 1.0F)
     private val lock = SynchronizedObject()
     protected final override val handler: UncaughtException.Handler = UncaughtException.Handler { t ->
