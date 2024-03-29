@@ -68,7 +68,7 @@ internal abstract class AbstractTorCtrl internal constructor(
             // Potential for super invocation to throw when cancelling
             // jobs if Factory.handler is THROW. Need to wrap it up in
             // order to ensure destroy callbacks get invoked.
-            tryCatch("${this::class.simpleName}.onDestroy") {
+            tryCatch("AbstractTorCtrl.onDestroy") {
                 super.onDestroy()
             }
 
@@ -91,7 +91,7 @@ internal abstract class AbstractTorCtrl internal constructor(
     }
 
     private fun ItBlock<TorCtrl>.invokeDestroyed(handler: UncaughtException.Handler) {
-        val context = "${this@AbstractTorCtrl::class.simpleName ?: "AbstractTorCtrl"}.invokeOnDestroy"
+        val context = "AbstractTorCtrl.invokeOnDestroy"
         handler.tryCatch(context) { invoke(this@AbstractTorCtrl) }
     }
 }

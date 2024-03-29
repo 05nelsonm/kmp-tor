@@ -148,8 +148,7 @@ internal abstract class AbstractTorCmdQueue internal constructor(
         val wasDestroyed = super.onDestroy()
 
         if (wasDestroyed) {
-            val context = "${this::class.simpleName ?: "AbstractTorCmdQueue"}.onDestroy"
-            val cause = CancellationException(context)
+            val cause = CancellationException("AbstractTorCmdQueue.onDestroy")
 
             handler.withSuppression {
                 doCancellations(this)
@@ -205,6 +204,8 @@ internal abstract class AbstractTorCmdQueue internal constructor(
             cause: CancellationException?,
             handler: UncaughtException.Handler,
         ) {
+            if (isEmpty()) return
+
             handler.withSuppression {
                 while (isNotEmpty()) {
                     val job = removeFirst()

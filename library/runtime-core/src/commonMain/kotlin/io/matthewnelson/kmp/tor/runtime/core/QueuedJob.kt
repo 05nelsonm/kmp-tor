@@ -239,6 +239,8 @@ protected constructor(
      * */
     @Throws(IllegalStateException::class)
     protected fun onExecuting() {
+        if (isCompleting || state != Enqueued) throw IllegalStateException(toString())
+
         @OptIn(InternalKmpTorApi::class)
         synchronized(lock) {
             if (isCompleting || state != Enqueued) throw IllegalStateException(toString())
