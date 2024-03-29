@@ -27,7 +27,7 @@ import kotlin.test.*
 class AbstractTorCmdQueueUnitTest {
 
     private class TestQueue(
-        handler: UncaughtException.Handler = UncaughtException.Handler.THROW
+        handler: UncaughtException.Handler = UncaughtException.Handler.THROW,
     ): AbstractTorCmdQueue(null, emptySet(), handler) {
 
         var invocationStart = 0
