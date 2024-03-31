@@ -21,7 +21,6 @@ import io.matthewnelson.kmp.tor.core.resource.synchronized
 import io.matthewnelson.kmp.tor.runtime.RuntimeEvent
 import io.matthewnelson.kmp.tor.runtime.core.Callback
 import io.matthewnelson.kmp.tor.runtime.ctrl.AbstractTorEventProcessor
-import io.matthewnelson.kmp.tor.runtime.core.ItBlock
 import io.matthewnelson.kmp.tor.runtime.core.TorEvent
 import io.matthewnelson.kmp.tor.runtime.core.UncaughtException
 import io.matthewnelson.kmp.tor.runtime.core.UncaughtException.Handler.Companion.tryCatch
@@ -119,38 +118,24 @@ internal abstract class AbstractRuntimeEventProcessor(
         super.clearObservers()
     }
 
-    // ONLY utilize within notifyObservers as the lock
-    // needs to be held to iterate over observers
-    private val runtimeHandler = UncaughtException.Handler { t ->
-        for (observer in observers) {
-            if (observer.event != RuntimeEvent.LOG.ERROR) continue
-
-            try {
-                @Suppress("UNCHECKED_CAST")
-                (observer.callback as Callback<Throwable>)(t)
-            } catch (_: Throwable) {}
-        }
-    }
-
     protected fun <R: Any> RuntimeEvent<R>.notifyObservers(output: R) {
         val event = this
 
         if (event is RuntimeEvent.LOG.DEBUG && !debug) return
 
+        val handler = if (event is RuntimeEvent.LOG.ERROR) {
+            UncaughtException.Handler.IGNORE
+        } else {
+            handler
+        }
+
         withObservers {
-            val handler = if (event is RuntimeEvent.LOG.ERROR) {
-                UncaughtException.Handler.IGNORE
-            } else {
-                runtimeHandler
-            }
-
-            for (observer in this) {
-                if (observer.event != event) continue
-
-                handler.tryCatch(observer.toString(isStatic = observer.tag.isStaticTag())) {
-                    @Suppress("UNCHECKED_CAST")
-                    (observer.callback as Callback<R>)(output)
-                }
+            if (isEmpty()) return@withObservers null
+            mapNotNull { if (it.event == event) it else null }
+        }?.forEach { observer ->
+            handler.tryCatch(observer.toString(isStatic = observer.tag.isStaticTag())) {
+                @Suppress("UNCHECKED_CAST")
+                (observer.callback as Callback<R>)(output)
             }
         }
     }

@@ -49,6 +49,22 @@ class AbstractRuntimeEventProcessorUnitTest {
     }
 
     @Test
+    fun givenObservers_whenNotified_thenIsOutsideOfLock() {
+        var observer: RuntimeEvent.Observer<String>? = null
+        observer = RuntimeEvent.LOG.DEBUG.observer {
+            // If observers are notified while holding
+            // the processor's lock, this would lock up
+            // b/c removal also obtains the lock to modify
+            // the Set
+            processor.remove(observer!!)
+        }
+        processor.add(observer)
+        assertEquals(1, processor.size)
+        processor.notify(observer.event, "")
+        assertEquals(0, processor.size)
+    }
+
+    @Test
     fun givenObservers_whenRemoveAllByEvent_thenAreRemoved() {
         var invocations = 0
         val o1 = RuntimeEvent.LOG.DEBUG.observer { invocations++ }

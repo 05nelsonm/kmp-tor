@@ -127,12 +127,11 @@ protected constructor(
         if (event == TorEvent.DEBUG && !debug) return
 
         withObservers {
-            for (observer in this) {
-                if (observer.event != event) continue
-
-                handler.tryCatch(observer.toString(isStatic = observer.tag.isStaticTag())) {
-                    observer.callback(output)
-                }
+            if (isEmpty()) return@withObservers null
+            mapNotNull { if (it.event == event) it else null }
+        }?.forEach { observer ->
+            handler.tryCatch(observer.toString(isStatic = observer.tag.isStaticTag())) {
+                observer.callback(output)
             }
         }
     }
