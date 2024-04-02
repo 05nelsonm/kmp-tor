@@ -18,7 +18,6 @@
 package io.matthewnelson.kmp.tor.runtime.core.util
 
 import io.matthewnelson.kmp.file.IOException
-import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
 import io.matthewnelson.kmp.tor.runtime.core.address.IPAddress
 import io.matthewnelson.kmp.tor.runtime.core.address.LocalHost
 import io.matthewnelson.kmp.tor.runtime.core.address.Port
@@ -53,7 +52,7 @@ public actual suspend fun Port.isAvailableAsync(
  * @param [host] either [LocalHost.IPv4] or [LocalHost.IPv6]
  * @param [limit] the number of ports to scan. min: 1, max: 1_000
  * @throws [IllegalArgumentException] if [limit] is not between 1 and 1_000 (inclusive)
- * @throws [IOException] if [LocalHost.resolve] fails
+ * @throws [IOException] if [LocalHost.resolve] fails, or no ports are available
  * @throws [CancellationException] if underlying coroutine was cancelled
  * */
 // @Throws(IOException::class, CancellationException::class)
@@ -84,7 +83,6 @@ private suspend fun IPAddress.isPortAvailable(port: Int): Boolean {
     var isAvailable: Boolean? = null
 
     try {
-        @OptIn(InternalKmpTorApi::class)
         val server = net_createServer { it.destroy() }
 
         latch.invokeOnCompletion { server.close() }

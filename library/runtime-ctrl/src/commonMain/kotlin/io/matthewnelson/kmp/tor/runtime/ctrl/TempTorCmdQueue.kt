@@ -22,9 +22,9 @@ import io.matthewnelson.kmp.tor.runtime.core.*
 import io.matthewnelson.kmp.tor.runtime.core.Destroyable.Companion.checkDestroy
 import io.matthewnelson.kmp.tor.runtime.core.UncaughtException.Handler.Companion.requireInstanceIsNotSuppressed
 import io.matthewnelson.kmp.tor.runtime.core.ctrl.TorCmd
-import io.matthewnelson.kmp.tor.runtime.ctrl.internal.AbstractTorCmdQueue.Companion.cancelAndClearAll
 import io.matthewnelson.kmp.tor.runtime.ctrl.internal.AbstractTorCtrl
 import io.matthewnelson.kmp.tor.runtime.ctrl.internal.TorCmdJob
+import io.matthewnelson.kmp.tor.runtime.ctrl.internal.cancelAndClearAll
 import kotlin.concurrent.Volatile
 import kotlin.coroutines.cancellation.CancellationException
 import kotlin.jvm.JvmName

@@ -11,7 +11,7 @@ gradle-kmp-configuration = "0.2.1"
 gradle-kotlin = "1.9.23"
 gradle-publish-maven = "0.27.0"
 
-kmp-process = "0.1.0-alpha02"
+kmp-process = "0.1.0-alpha03"
 kmp-tor-core = "2.0.0-alpha10"
 kmp-tor-resource = "408.10.0-SNAPSHOT"
 kotlinx-coroutines = "1.8.0"
@@ -34,6 +34,7 @@ kmp-process = { module = "io.matthewnelson.kmp-process:process", version.ref = "
 kmp-tor-core-api = { module = "io.matthewnelson.kmp-tor:core-api", version.ref = "kmp-tor-core" }
 kmp-tor-core-lib-locator = { module = "io.matthewnelson.kmp-tor:core-lib-locator", version.ref = "kmp-tor-core" }
 kmp-tor-core-resource = { module = "io.matthewnelson.kmp-tor:core-resource", version.ref = "kmp-tor-core" }
+kmp-tor-resource-tor = { module = "io.matthewnelson.kmp-tor:resource-tor", version.ref = "kmp-tor-resource" }
 kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "kotlinx-coroutines" }
 kotlinx-coroutines-android = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version.ref = "kotlinx-coroutines" }
 kotlinx-coroutines-javafx = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-javafx", version.ref = "kotlinx-coroutines" }

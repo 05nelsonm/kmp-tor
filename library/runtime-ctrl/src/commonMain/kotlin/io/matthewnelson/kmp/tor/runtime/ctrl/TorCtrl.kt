@@ -13,6 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
+@file:Suppress("EXPECT_ACTUAL_CLASSIFIERS_ARE_IN_BETA_WARNING")
+
 package io.matthewnelson.kmp.tor.runtime.ctrl
 
 import io.matthewnelson.kmp.file.File
@@ -22,6 +24,7 @@ import io.matthewnelson.kmp.tor.runtime.core.UncaughtException
 import io.matthewnelson.kmp.tor.runtime.core.UncaughtException.Handler.Companion.requireInstanceIsNotSuppressed
 import io.matthewnelson.kmp.tor.runtime.core.address.ProxyAddress
 import io.matthewnelson.kmp.tor.runtime.core.ctrl.TorCmd
+import kotlin.coroutines.cancellation.CancellationException
 import kotlin.jvm.JvmOverloads
 
 /**
@@ -33,7 +36,7 @@ import kotlin.jvm.JvmOverloads
  *
  * @see [Factory]
  * */
-public interface TorCtrl: Destroyable, TorEvent.Processor, TorCmd.Privileged.Processor {
+public expect interface TorCtrl: Destroyable, TorEvent.Processor, TorCmd.Privileged.Processor {
 
     /**
      * Immediately disconnects from the control listener resulting
@@ -44,7 +47,11 @@ public interface TorCtrl: Destroyable, TorEvent.Processor, TorCmd.Privileged.Pro
      * then it will also stop the tor process.
      *
      * Successive invocations do nothing.
+     *
+     * @throws [IOException] if underlying Socket.close() failed
+     *   for the given platform
      * */
+    // @Throws(IOException::class)
     public override fun destroy()
 
     /**
@@ -61,11 +68,12 @@ public interface TorCtrl: Destroyable, TorEvent.Processor, TorCmd.Privileged.Pro
      * delegated to [UncaughtException.Handler.THROW]. [handle] should
      * be non-blocking, fast, and thread-safe.
      *
-     * Implementations of [TorCtrl] returned by [Factory.connect] invoke
-     * [handle] from its background thread on Jvm & Native, unless
+     * Implementations of [TorCtrl] returned by [Factory.connectAsync]
+     * or [io.matthewnelson.kmp.tor.runtime.ctrl.TorCtrl.Factory.connect]
+     * invoke [handle] from its background thread on Jvm & Native, unless
      * immediate invocation is being had due to [TorCtrl] already being
      * destroyed, in which case it will be invoked from the context of
-     * invokeOnDestroy caller.
+     * [invokeOnDestroy] caller.
      *
      * @return [Disposable] to de-register [handle] if it is no
      *   longer needed.
@@ -73,42 +81,51 @@ public interface TorCtrl: Destroyable, TorEvent.Processor, TorCmd.Privileged.Pro
     public fun invokeOnDestroy(handle: ItBlock<TorCtrl>): Disposable
 
     /**
-     * A factory class for
+     * A factory class for connecting to tor via its control listener.
      *
+     * @see [connectAsync]
+     * @see [io.matthewnelson.kmp.tor.runtime.ctrl.TorCtrl.Factory.connect]
+     * @param [staticTag] Special string that will exclude [TorEvent.Observer]
+     *   with the same tag from removal until destroyed
+     * @param [initialObservers] Some initial observers to start with, static
+     *   or not.
+     * @param [debugger] A callback for debugging info. **MUST** be thread
+     *   safe. Any exceptions it throws will be swallowed.
+     * @param [handler] The [UncaughtException.Handler] to pipe bad behavior
+     *   to.
      * @throws [IllegalArgumentException] if [handler] is an instance
      *   of [UncaughtException.SuppressedHandler] (a leaked reference)
      * */
     public class Factory
-    @JvmOverloads
     @Throws(IllegalArgumentException::class)
     public constructor(
-        internal val staticTag: String? = null,
-        internal val initialObservers: Set<TorEvent.Observer> = emptySet(),
-        internal val handler: UncaughtException.Handler,
+        staticTag: String? = null,
+        initialObservers: Set<TorEvent.Observer> = emptySet(),
+        debugger: ItBlock<String>? = null,
+        handler: UncaughtException.Handler,
     ) {
 
-        init { handler.requireInstanceIsNotSuppressed() }
+        internal val staticTag: String?
+        internal val initialObservers: Set<TorEvent.Observer>
+        internal val handler: UncaughtException.Handler
+        internal val debugger: ItBlock<String>?
 
         /**
-         * Connects to a tor control listener via TCP
+         * Connects to a tor control listener via TCP port.
+         *
+         * @throws [IOException] If connection attempt fails
          * */
-        @Throws(IOException::class)
-        public fun connect(address: ProxyAddress): TorCtrl {
-
-            // TODO
-            throw IOException("Not yet implemented")
-        }
+        @Throws(CancellationException::class, IOException::class)
+        public suspend fun connectAsync(address: ProxyAddress): TorCtrl
 
         /**
-         * Connects to a tor control listener via UnixDomainSocket
+         * Connects to a tor control listener via UnixDomainSocket.
+         *
+         * @throws [IOException] If connection attempt fails
+         * @throws [UnsupportedOperationException] if tor, or system this is running
+         *   on does not support UnixDomainSockets
          * */
-        @Throws(IOException::class, UnsupportedOperationException::class)
-        public fun connect(path: File): TorCtrl {
-            // Check platform/system availability
-            TorConfig.__ControlPort.Builder { asUnixSocket { file = path } }
-
-            // TODO
-            throw IOException("Not yet implemented")
-        }
+        @Throws(CancellationException::class, IOException::class, UnsupportedOperationException::class)
+        public suspend fun connectAsync(path: File): TorCtrl
     }
 }

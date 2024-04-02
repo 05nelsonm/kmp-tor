@@ -22,6 +22,7 @@ import io.matthewnelson.kmp.tor.runtime.core.*
 import io.matthewnelson.kmp.tor.runtime.ctrl.TorCtrl
 import io.matthewnelson.kmp.tor.runtime.core.UncaughtException.Handler.Companion.tryCatch
 import io.matthewnelson.kmp.tor.runtime.core.UncaughtException.Handler.Companion.withSuppression
+import io.matthewnelson.kmp.tor.runtime.ctrl.internal.Debugger.Companion.d
 import kotlin.concurrent.Volatile
 
 @OptIn(InternalKmpTorApi::class)
@@ -44,7 +45,7 @@ internal abstract class AbstractTorCtrl internal constructor(
 
         if (wasAdded == null) {
             // invoke immediately. Do not leak destroyed handler.
-            handle.invokeDestroyed(UncaughtException.Handler.THROW)
+            handle.invokeDestroyed(UncaughtException.Handler.THROW, true)
             return Disposable.NOOP
         }
 
@@ -80,6 +81,7 @@ internal abstract class AbstractTorCtrl internal constructor(
             }
 
             if (!callbacks.isNullOrEmpty()) {
+                LOG.d(this@AbstractTorCtrl) { "Invoking onDestroy callbacks" }
                 val suppressed = this
                 callbacks.forEach { callback -> callback.invokeDestroyed(suppressed) }
             }
@@ -90,8 +92,13 @@ internal abstract class AbstractTorCtrl internal constructor(
         return wasDestroyed
     }
 
-    private fun ItBlock<TorCtrl>.invokeDestroyed(handler: UncaughtException.Handler) {
-        val context = "AbstractTorCtrl.invokeOnDestroy"
+    private fun ItBlock<TorCtrl>.invokeDestroyed(
+        handler: UncaughtException.Handler,
+        isImmediate: Boolean = false,
+    ) {
+        val context = "AbstractTorCtrl.invokeOnDestroy" +
+            if (isImmediate) "[immediate]" else ""
+
         handler.tryCatch(context) { invoke(this@AbstractTorCtrl) }
     }
 }

@@ -23,7 +23,35 @@ kmpConfiguration {
             sourceSetMain {
                 dependencies {
                     api(project(":library:runtime-core"))
+                    implementation(libs.kmp.process)
                     implementation(libs.kmp.tor.core.resource)
+                    implementation(libs.kotlinx.coroutines.core)
+                }
+            }
+            sourceSetTest {
+                dependencies {
+                    implementation(libs.kmp.tor.resource.tor)
+                    implementation(libs.kotlinx.coroutines.test)
+                }
+            }
+        }
+
+        kotlin {
+            with(sourceSets) {
+                val jvmMain = findByName("jvmMain")
+                val nativeMain = findByName("nativeMain")
+
+                if (jvmMain != null || nativeMain != null) {
+                    val nonJsMain = maybeCreate("nonJsMain")
+                    val nonJsTest = maybeCreate("nonJsTest")
+
+                    nonJsMain.dependsOn(getByName("commonMain"))
+                    nonJsTest.dependsOn(getByName("commonTest"))
+
+                    jvmMain?.apply { dependsOn(nonJsMain) }
+                    findByName("jvmTest")?.apply { dependsOn(nonJsTest) }
+                    nativeMain?.apply { dependsOn(nonJsMain) }
+                    findByName("nativeTest")?.apply { dependsOn(nonJsTest) }
                 }
             }
         }

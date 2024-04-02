@@ -20,10 +20,11 @@ import io.matthewnelson.kmp.tor.core.resource.SynchronizedObject
 import io.matthewnelson.kmp.tor.core.resource.synchronized
 import io.matthewnelson.kmp.tor.runtime.core.*
 import io.matthewnelson.kmp.tor.runtime.core.Destroyable.Companion.checkDestroy
-import io.matthewnelson.kmp.tor.runtime.core.UncaughtException.Handler.Companion.tryCatch
 import io.matthewnelson.kmp.tor.runtime.core.UncaughtException.Handler.Companion.withSuppression
 import io.matthewnelson.kmp.tor.runtime.core.ctrl.TorCmd
 import io.matthewnelson.kmp.tor.runtime.ctrl.AbstractTorEventProcessor
+import io.matthewnelson.kmp.tor.runtime.ctrl.internal.Debugger.Companion.d
+import kotlin.concurrent.Volatile
 import kotlin.coroutines.cancellation.CancellationException
 import kotlin.jvm.JvmSynthetic
 
@@ -40,6 +41,9 @@ internal abstract class AbstractTorCmdQueue internal constructor(
     private val lock = SynchronizedObject()
     private val queueCancellation = ArrayList<ItBlock<UncaughtException.Handler>>(1)
     private val queueExecute = ArrayList<TorCmdJob<*>>(1)
+    @Volatile
+    @Suppress("PropertyName")
+    protected open var LOG: Debugger? = null
 
     public final override fun isDestroyed(): Boolean = destroyed
 
@@ -127,7 +131,7 @@ internal abstract class AbstractTorCmdQueue internal constructor(
         doCancellations(handler)
 
         if (isDestroyed()) return null
-        return synchronized(lock) {
+        val job = synchronized(lock) {
             var job: TorCmdJob<*>? = null
             while (!isDestroyed() && queueExecute.isNotEmpty()) {
                 job = queueExecute.removeFirst()
@@ -141,6 +145,10 @@ internal abstract class AbstractTorCmdQueue internal constructor(
             }
             job
         }
+
+        if (job != null) LOG.d(this) { "$job" }
+
+        return job
     }
 
     // @Throws(UncaughtException::class)
@@ -161,6 +169,8 @@ internal abstract class AbstractTorCmdQueue internal constructor(
                     // so just to be on the safe side, copy over all
                     // before cancelling them.
                     ArrayList(queueExecute).also { queueExecute.clear() }
+                }?.also {
+                    LOG.d(this@AbstractTorCmdQueue) { "Cancelling QueuedJobs" }
                 }?.cancelAndClearAll(cause, this)
             }
         }
@@ -174,6 +184,7 @@ internal abstract class AbstractTorCmdQueue internal constructor(
             ArrayList(queueCancellation).also { queueCancellation.clear() }
         } ?: return
 
+        LOG.d(this) { "Cancelling QueuedJobs" }
         handler.withSuppression {
             while (cancellations.isNotEmpty()) {
                 val cancellation = cancellations.removeFirst()
@@ -194,24 +205,5 @@ internal abstract class AbstractTorCmdQueue internal constructor(
         return super.registered()
     }
 
-    internal companion object {
-
-        // Should only be invoked from OUTSIDE a lock lambda, and on
-        // a local instance of MutableList containing the jobs to cancel.
-        // as to not encounter ConcurrentModificationException.
-        @Throws(ConcurrentModificationException::class)
-        internal fun <T: QueuedJob> MutableList<T>.cancelAndClearAll(
-            cause: CancellationException?,
-            handler: UncaughtException.Handler,
-        ) {
-            if (isEmpty()) return
-
-            handler.withSuppression {
-                while (isNotEmpty()) {
-                    val job = removeFirst()
-                    tryCatch(job) { job.cancel(cause) }
-                }
-            }
-        }
-    }
+    final override fun toString(): String = "TorCtrl@${hashCode()}"
 }

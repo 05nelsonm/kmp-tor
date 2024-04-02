@@ -44,7 +44,7 @@ public expect suspend fun Port.isAvailableAsync(
  * @param [limit] the number of ports to scan. min: 1, max: 1_000
  * @see [io.matthewnelson.kmp.tor.runtime.core.util.findAvailableSync]
  * @throws [IllegalArgumentException] if [limit] is not between 1 and 1_000 (inclusive)
- * @throws [IOException] if [LocalHost.resolve] fails
+ * @throws [IOException] if [LocalHost.resolve] fails, or no ports are available
  * @throws [CancellationException] if underlying coroutine was cancelled
  * */
 @Throws(IOException::class, CancellationException::class)

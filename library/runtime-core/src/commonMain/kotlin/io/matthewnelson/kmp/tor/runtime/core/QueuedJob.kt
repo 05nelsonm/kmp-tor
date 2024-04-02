@@ -35,7 +35,7 @@ import kotlin.jvm.JvmName
  *
  * Heavily inspired by [kotlinx.coroutines.Job]
  *
- * @throws [IllegalArgumentException] if [_handler] is a leaked
+ * @throws [IllegalArgumentException] if handler is a leaked
  *   reference of [UncaughtException.SuppressedHandler]
  * */
 public abstract class QueuedJob
