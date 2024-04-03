@@ -128,7 +128,7 @@ public actual interface TorCtrl : Destroyable, TorEvent.Processor, TorCmd.Privil
                 is IPAddress.V4 -> 4
                 is IPAddress.V6 -> 6
             }
-            return connect(options)
+            return withContext(Dispatchers.Main) { connect(options) }
         }
 
         /**
@@ -144,7 +144,7 @@ public actual interface TorCtrl : Destroyable, TorEvent.Processor, TorCmd.Privil
 
             val options = js("{}")
             options["path"] = path.path
-            return connect(options)
+            return withContext(Dispatchers.Main) { connect(options) }
         }
 
         // @Throws(IOException::class)

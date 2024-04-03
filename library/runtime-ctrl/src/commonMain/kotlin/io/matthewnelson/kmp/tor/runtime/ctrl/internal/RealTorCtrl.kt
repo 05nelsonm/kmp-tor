@@ -60,6 +60,19 @@ internal class RealTorCtrl private constructor(
 
             super.parse(line)
         }
+
+        override fun onError(details: String) {
+            // TODO
+            LOG.d(this) { details }
+        }
+
+        override fun TorEvent.notify(output: String) {
+            notifyObservers(output)
+        }
+
+        override fun ArrayList<Reply>.respond() {
+            // TODO: Waiters
+        }
     }
 
     override fun destroy() {
