@@ -37,9 +37,9 @@ public abstract interface class io/matthewnelson/kmp/tor/runtime/RuntimeAction$P
 
 public abstract class io/matthewnelson/kmp/tor/runtime/RuntimeEvent {
 	public static final field Companion Lio/matthewnelson/kmp/tor/runtime/RuntimeEvent$Companion;
-	public static final field entries Ljava/util/Set;
 	public final field name Ljava/lang/String;
 	public synthetic fun <init> (Ljava/lang/String;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public static final fun entries ()Ljava/util/Set;
 	public final fun observer (Lio/matthewnelson/kmp/tor/runtime/core/Callback;)Lio/matthewnelson/kmp/tor/runtime/RuntimeEvent$Observer;
 	public final fun observer (Ljava/lang/String;Lio/matthewnelson/kmp/tor/runtime/core/Callback;)Lio/matthewnelson/kmp/tor/runtime/RuntimeEvent$Observer;
 	public final fun toString ()Ljava/lang/String;
@@ -48,6 +48,7 @@ public abstract class io/matthewnelson/kmp/tor/runtime/RuntimeEvent {
 }
 
 public final class io/matthewnelson/kmp/tor/runtime/RuntimeEvent$Companion {
+	public final fun entries ()Ljava/util/Set;
 	public final fun valueOf (Ljava/lang/String;)Lio/matthewnelson/kmp/tor/runtime/RuntimeEvent;
 	public final fun valueOfOrNull (Ljava/lang/String;)Lio/matthewnelson/kmp/tor/runtime/RuntimeEvent;
 }

@@ -18,10 +18,10 @@ package io.matthewnelson.kmp.tor.runtime
 import io.matthewnelson.immutable.collections.immutableSetOf
 import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
 import io.matthewnelson.kmp.tor.runtime.core.Callback
-import io.matthewnelson.kmp.tor.runtime.core.ItBlock
 import io.matthewnelson.kmp.tor.runtime.core.TorEvent
 import io.matthewnelson.kmp.tor.runtime.core.UncaughtException
 import kotlin.jvm.JvmField
+import kotlin.jvm.JvmName
 import kotlin.jvm.JvmStatic
 
 /**
@@ -205,13 +205,16 @@ public sealed class RuntimeEvent<R: Any> private constructor(
             }
         }
 
-        @JvmField
-        public val entries: Set<RuntimeEvent<*>> = immutableSetOf(
-            LOG.DEBUG,
-            LOG.ERROR,
-            LOG.INFO,
-            LOG.WARN,
-        )
+        @get:JvmStatic
+        @get:JvmName("entries")
+        public val entries: Set<RuntimeEvent<*>> by lazy {
+            immutableSetOf(
+                LOG.DEBUG,
+                LOG.ERROR,
+                LOG.INFO,
+                LOG.WARN,
+            )
+        }
     }
 
     @InternalKmpTorApi

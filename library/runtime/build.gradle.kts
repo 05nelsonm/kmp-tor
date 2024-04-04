@@ -19,6 +19,14 @@ plugins {
 
 kmpConfiguration {
     configureShared(java9ModuleName = "io.matthewnelson.kmp.tor.runtime", publish = true) {
+        jvm {
+            sourceSetTest {
+                dependencies {
+                    implementation(kotlin("reflect"))
+                }
+            }
+        }
+
         common {
             sourceSetMain {
                 dependencies {
