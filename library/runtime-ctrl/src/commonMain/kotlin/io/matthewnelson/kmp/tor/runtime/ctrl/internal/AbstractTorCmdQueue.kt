@@ -48,18 +48,18 @@ internal abstract class AbstractTorCmdQueue internal constructor(
     public final override fun isDestroyed(): Boolean = destroyed
 
     @Throws(IllegalStateException::class)
-    public final override fun <Response : Any> enqueue(
-        cmd: TorCmd.Privileged<Response>,
+    public final override fun <Success : Any> enqueue(
+        cmd: TorCmd.Privileged<Success>,
         onFailure: OnFailure,
-        onSuccess: OnSuccess<Response>,
-    ): TorCmdJob<Response> = enqueueImpl(cmd, onFailure, onSuccess)
+        onSuccess: OnSuccess<Success>,
+    ): TorCmdJob<Success> = enqueueImpl(cmd, onFailure, onSuccess)
 
     @Throws(IllegalStateException::class)
-    public final override fun <Response : Any> enqueue(
-        cmd: TorCmd.Unprivileged<Response>,
+    public final override fun <Success : Any> enqueue(
+        cmd: TorCmd.Unprivileged<Success>,
         onFailure: OnFailure,
-        onSuccess: OnSuccess<Response>,
-    ): TorCmdJob<Response> = enqueueImpl(cmd, onFailure, onSuccess)
+        onSuccess: OnSuccess<Success>,
+    ): TorCmdJob<Success> = enqueueImpl(cmd, onFailure, onSuccess)
 
     @JvmSynthetic
     @Throws(IllegalStateException::class)
@@ -88,11 +88,11 @@ internal abstract class AbstractTorCmdQueue internal constructor(
     }
 
     @Throws(IllegalStateException::class)
-    private fun <Response: Any> enqueueImpl(
-        cmd: TorCmd<Response>,
+    private fun <Success: Any> enqueueImpl(
+        cmd: TorCmd<Success>,
         onFailure: OnFailure,
-        onSuccess: OnSuccess<Response>
-    ): TorCmdJob<Response> {
+        onSuccess: OnSuccess<Success>
+    ): TorCmdJob<Success> {
         checkDestroy()
 
         val job = synchronized(lock) {

@@ -15,16 +15,11 @@
  **/
 package io.matthewnelson.kmp.tor.runtime.ctrl
 
-import io.matthewnelson.kmp.file.SysTempDir
-import io.matthewnelson.kmp.file.path
 import io.matthewnelson.kmp.file.resolve
 import io.matthewnelson.kmp.process.Process
-import io.matthewnelson.kmp.process.Signal
-import io.matthewnelson.kmp.process.Stdio
 import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
 import io.matthewnelson.kmp.tor.core.resource.SynchronizedObject
 import io.matthewnelson.kmp.tor.core.resource.synchronized
-import io.matthewnelson.kmp.tor.resource.tor.TorResources
 import io.matthewnelson.kmp.tor.runtime.core.TorConfig
 import io.matthewnelson.kmp.tor.runtime.core.UncaughtException
 import io.matthewnelson.kmp.tor.runtime.core.address.LocalHost
@@ -61,7 +56,7 @@ abstract class TorCtrlFactoryUnitTest {
 
     @Test
     fun givenUnixDomainSocket_whenConnect_thenIsSuccessful() = runTest {
-        val uds = INSTALLER.installationDir
+        val uds = TestUtils.INSTALLER.installationDir
             .resolve("data")
             .resolve("ctrl.sock")
 
@@ -76,11 +71,7 @@ abstract class TorCtrlFactoryUnitTest {
             return@runTest
         }
 
-        val p = startTor(ctrlArg)
-
-        withContext(Dispatchers.Default) {
-            delay(250.milliseconds)
-        }
+        val p = TestUtils.startTor(ctrlArg)
 
         val ctrl = try {
             TorCtrl.Factory(handler = UncaughtException.Handler.THROW)
@@ -89,9 +80,7 @@ abstract class TorCtrlFactoryUnitTest {
             p.destroy()
         }
 
-        withContext(Dispatchers.Default) {
-            delay(250.milliseconds)
-        }
+        withContext(Dispatchers.Default) { delay(250.milliseconds) }
 
         assertTrue(ctrl.isDestroyed())
     }
@@ -115,11 +104,7 @@ abstract class TorCtrlFactoryUnitTest {
 
         val address = ProxyAddress(host, port)
 
-        val process = startTor(ctrlPortArg = address.toString())
-
-        withContext(Dispatchers.Default) {
-            delay(250.milliseconds)
-        }
+        val process = TestUtils.startTor(ctrlPortArg = address.toString())
 
         val ctrl = factory.connectAsync(address)
         var invocationDestroy = 0
@@ -127,9 +112,7 @@ abstract class TorCtrlFactoryUnitTest {
 
         block(process, ctrl)
 
-        withContext(Dispatchers.Default) {
-            delay(250.milliseconds)
-        }
+        withContext(Dispatchers.Default) { delay(250.milliseconds) }
 
         assertEquals(1, invocationDestroy)
 
@@ -155,48 +138,6 @@ abstract class TorCtrlFactoryUnitTest {
 
                 fail("Debug logs did not contain $log")
             }
-        }
-    }
-
-    private suspend fun startTor(ctrlPortArg: String): Process {
-        val paths = INSTALLER.install()
-        val homeDir = INSTALLER.installationDir
-        val dataDir = homeDir.resolve("data")
-        val cacheDir = homeDir.resolve("cache")
-        val p = Process.Builder(paths.tor)
-            .args("--DataDirectory")
-            .args(dataDir.also { it.mkdirs() }.path)
-            .args("--CacheDirectory")
-            .args(cacheDir.also { it.mkdirs() }.path)
-            .args("--GeoIPFile")
-            .args(paths.geoip.path)
-            .args("--GeoIPv6File")
-            .args(paths.geoip6.path)
-            .args("--DormantCanceledByStartup")
-            .args("1")
-            .args("--ControlPort")
-            .args(ctrlPortArg)
-            .args("--SocksPort")
-            .args("0")
-            .args("--DisableNetwork")
-            .args("1")
-            .args("--RunAsDaemon")
-            .args("0")
-            .destroySignal(Signal.SIGTERM)
-            .environment("HOME", homeDir.path)
-            .stdin(Stdio.Null)
-            .stdout(Stdio.Null)
-            .stderr(Stdio.Null)
-            .spawn()
-
-        currentCoroutineContext().job.invokeOnCompletion { p.destroy() }
-        return p
-    }
-
-    private companion object {
-
-        private val INSTALLER by lazy {
-            TorResources(installationDir = SysTempDir.resolve("kmp_tor_ctrl"))
         }
     }
 }

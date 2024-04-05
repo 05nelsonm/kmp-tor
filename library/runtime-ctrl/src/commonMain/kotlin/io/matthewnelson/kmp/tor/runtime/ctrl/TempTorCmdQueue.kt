@@ -92,10 +92,10 @@ public constructor(
     }
 
     @Throws(IllegalStateException::class)
-    public override fun <Response : Any> enqueue(
-        cmd: TorCmd.Unprivileged<Response>,
+    public override fun <Success : Any> enqueue(
+        cmd: TorCmd.Unprivileged<Success>,
         onFailure: OnFailure,
-        onSuccess: OnSuccess<Response>,
+        onSuccess: OnSuccess<Success>,
     ): QueuedJob = connection?.enqueue(cmd, onFailure, onSuccess) ?: synchronized(lock) {
         var job = connection?.enqueue(cmd, onFailure, onSuccess)
         if (job != null) return@synchronized job

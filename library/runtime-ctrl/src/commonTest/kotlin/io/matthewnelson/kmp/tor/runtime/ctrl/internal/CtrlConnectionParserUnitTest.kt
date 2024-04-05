@@ -16,6 +16,7 @@
 package io.matthewnelson.kmp.tor.runtime.ctrl.internal
 
 import io.matthewnelson.kmp.tor.runtime.core.TorEvent
+import io.matthewnelson.kmp.tor.runtime.core.ctrl.Reply
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -114,7 +115,7 @@ class CtrlConnectionParserUnitTest {
 
     @Test
     fun givenResponse_whenMultiLineKvp_thenIsAsExpected() {
-        val response = mutableListOf<ArrayList<CtrlConnection.Parser.Reply>>()
+        val response = mutableListOf<ArrayList<Reply>>()
         val p = TestParser(
             onRespond = { replies ->
                 response.add(replies)

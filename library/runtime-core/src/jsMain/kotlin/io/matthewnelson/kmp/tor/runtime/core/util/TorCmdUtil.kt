@@ -27,9 +27,9 @@ import io.matthewnelson.kmp.tor.runtime.core.internal.commonExecuteAsync
  * @see [TorCmd.Privileged.Processor]
  * */
 // @Throws(Throwable::class)
-public actual suspend fun <Response: Any> TorCmd.Privileged.Processor.executeAsync(
-    cmd: TorCmd.Privileged<Response>,
-): Response = commonExecuteAsync(cmd)
+public actual suspend fun <Success: Any> TorCmd.Privileged.Processor.executeAsync(
+    cmd: TorCmd.Privileged<Success>,
+): Success = commonExecuteAsync(cmd)
 
 /**
  * Enqueues the [cmd], suspending the current coroutine until completion
@@ -38,6 +38,6 @@ public actual suspend fun <Response: Any> TorCmd.Privileged.Processor.executeAsy
  * @see [TorCmd.Unprivileged.Processor]
  * */
 // @Throws(Throwable::class)
-public actual suspend fun <Response: Any> TorCmd.Unprivileged.Processor.executeAsync(
-    cmd: TorCmd.Unprivileged<Response>,
-): Response = commonExecuteAsync(cmd)
+public actual suspend fun <Success: Any> TorCmd.Unprivileged.Processor.executeAsync(
+    cmd: TorCmd.Unprivileged<Success>,
+): Success = commonExecuteAsync(cmd)

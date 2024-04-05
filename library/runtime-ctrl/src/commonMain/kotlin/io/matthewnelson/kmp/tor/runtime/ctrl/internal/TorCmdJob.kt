@@ -21,15 +21,15 @@ import kotlin.concurrent.Volatile
 import kotlin.coroutines.cancellation.CancellationException
 import kotlin.jvm.JvmSynthetic
 
-internal class TorCmdJob<Response: Any> private constructor(
-    internal val cmd: TorCmd<Response>,
-    onSuccess: OnSuccess<Response>,
+internal class TorCmdJob<Success: Any> private constructor(
+    internal val cmd: TorCmd<Success>,
+    onSuccess: OnSuccess<Success>,
     onFailure: OnFailure,
     handler: UncaughtException.Handler,
-): QueuedJob(cmd.keyword.name, onFailure, handler) {
+): QueuedJob(cmd.keyword, onFailure, handler) {
 
     @Volatile
-    private var _onSuccess: OnSuccess<Response>? = onSuccess
+    private var _onSuccess: OnSuccess<Success>? = onSuccess
 
     protected override fun onCancellation(cause: CancellationException?) { _onSuccess = null }
 
@@ -43,7 +43,7 @@ internal class TorCmdJob<Response: Any> private constructor(
     }
 
     @JvmSynthetic
-    internal fun completion(response: Response) {
+    internal fun completion(response: Success) {
         onCompletion(response, withLock = {
             val onSuccess = _onSuccess
             this._onSuccess = null
@@ -54,11 +54,11 @@ internal class TorCmdJob<Response: Any> private constructor(
     internal companion object {
 
         @JvmSynthetic
-        internal fun <Response: Any> of(
-            cmd: TorCmd<Response>,
-            onSuccess: OnSuccess<Response>,
+        internal fun <Success: Any> of(
+            cmd: TorCmd<Success>,
+            onSuccess: OnSuccess<Success>,
             onFailure: OnFailure,
             handler: UncaughtException.Handler,
-        ): TorCmdJob<Response> = TorCmdJob(cmd, onSuccess, onFailure, handler)
+        ): TorCmdJob<Success> = TorCmdJob(cmd, onSuccess, onFailure, handler)
     }
 }

@@ -17,6 +17,7 @@ package io.matthewnelson.kmp.tor.runtime.ctrl.internal
 
 import io.matthewnelson.kmp.file.IOException
 import io.matthewnelson.kmp.tor.runtime.core.TorEvent
+import io.matthewnelson.kmp.tor.runtime.core.ctrl.Reply
 import kotlin.coroutines.cancellation.CancellationException
 
 internal interface CtrlConnection {
@@ -107,7 +108,7 @@ internal interface CtrlConnection {
                     return@with
                 }
 
-                replies.add(Reply(status, message))
+                replies.add(Reply.of(status, message))
             }
 
             if (job.delim != ' ') return
@@ -209,12 +210,10 @@ internal interface CtrlConnection {
                     if (message.isEmpty()) return@run
                     if (multi != null) return@run
 
-                    replies.add(Reply(status, message))
+                    replies.add(Reply.of(status, message))
                 }
             }
         }
-
-        internal class Reply(internal val status: String, internal val message: String)
 
         private class Multi private constructor(
             val status: String,
@@ -259,7 +258,7 @@ internal interface CtrlConnection {
                 sb.clear()
                 repeat(count) { sb.append(' ') }
 
-                return Reply(status, message)
+                return Reply.of(status, message)
             }
         }
 

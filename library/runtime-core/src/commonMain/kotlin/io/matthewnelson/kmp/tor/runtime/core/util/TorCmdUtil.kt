@@ -25,9 +25,9 @@ import io.matthewnelson.kmp.tor.runtime.core.ctrl.TorCmd
  * @see [io.matthewnelson.kmp.tor.runtime.core.util.executeSync]
  * */
 @Throws(Throwable::class)
-public expect suspend fun <Response: Any> TorCmd.Privileged.Processor.executeAsync(
-    cmd: TorCmd.Privileged<Response>,
-): Response
+public expect suspend fun <Success: Any> TorCmd.Privileged.Processor.executeAsync(
+    cmd: TorCmd.Privileged<Success>,
+): Success
 
 /**
  * Enqueues the [cmd], suspending the current coroutine until completion
@@ -37,6 +37,6 @@ public expect suspend fun <Response: Any> TorCmd.Privileged.Processor.executeAsy
  * @see [io.matthewnelson.kmp.tor.runtime.core.util.executeSync]
  * */
 @Throws(Throwable::class)
-public expect suspend fun <Response: Any> TorCmd.Unprivileged.Processor.executeAsync(
-    cmd: TorCmd.Unprivileged<Response>,
-): Response
+public expect suspend fun <Success: Any> TorCmd.Unprivileged.Processor.executeAsync(
+    cmd: TorCmd.Unprivileged<Success>,
+): Success

@@ -25,9 +25,9 @@ import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 
 @Suppress("NOTHING_TO_INLINE")
-internal suspend inline fun <Response: Any> TorCmd.Privileged.Processor.commonExecuteAsync(
-    cmd: TorCmd.Privileged<Response>,
-): Response = suspendCancellableCoroutine { continuation ->
+internal suspend inline fun <Success: Any> TorCmd.Privileged.Processor.commonExecuteAsync(
+    cmd: TorCmd.Privileged<Success>,
+): Success = suspendCancellableCoroutine { continuation ->
     var job: QueuedJob? = null
 
     try {
@@ -51,9 +51,9 @@ internal suspend inline fun <Response: Any> TorCmd.Privileged.Processor.commonEx
 }
 
 @Suppress("NOTHING_TO_INLINE")
-internal suspend inline fun <Response: Any> TorCmd.Unprivileged.Processor.commonExecuteAsync(
-    cmd: TorCmd.Unprivileged<Response>,
-): Response = suspendCancellableCoroutine { continuation ->
+internal suspend inline fun <Success: Any> TorCmd.Unprivileged.Processor.commonExecuteAsync(
+    cmd: TorCmd.Unprivileged<Success>,
+): Success = suspendCancellableCoroutine { continuation ->
     var job: QueuedJob? = null
 
     try {

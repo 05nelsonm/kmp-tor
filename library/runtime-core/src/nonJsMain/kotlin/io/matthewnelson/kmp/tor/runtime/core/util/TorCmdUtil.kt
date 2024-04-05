@@ -32,9 +32,9 @@ import kotlin.jvm.JvmOverloads
  * @see [awaitSync]
  * */
 @Throws(Throwable::class)
-public actual suspend fun <Response: Any> TorCmd.Privileged.Processor.executeAsync(
-    cmd: TorCmd.Privileged<Response>,
-): Response = commonExecuteAsync(cmd)
+public actual suspend fun <Success: Any> TorCmd.Privileged.Processor.executeAsync(
+    cmd: TorCmd.Privileged<Success>,
+): Success = commonExecuteAsync(cmd)
 
 /**
  * Enqueues the [cmd], suspending the current coroutine until completion
@@ -44,9 +44,9 @@ public actual suspend fun <Response: Any> TorCmd.Privileged.Processor.executeAsy
  * @see [awaitSync]
  * */
 @Throws(Throwable::class)
-public actual suspend fun <Response: Any> TorCmd.Unprivileged.Processor.executeAsync(
-    cmd: TorCmd.Unprivileged<Response>,
-): Response = commonExecuteAsync(cmd)
+public actual suspend fun <Success: Any> TorCmd.Unprivileged.Processor.executeAsync(
+    cmd: TorCmd.Unprivileged<Success>,
+): Success = commonExecuteAsync(cmd)
 
 /**
  * Enqueues the [cmd], blocking the current thread until completion
@@ -65,12 +65,12 @@ public actual suspend fun <Response: Any> TorCmd.Unprivileged.Processor.executeA
  * */
 @JvmOverloads
 @Throws(Throwable::class)
-public fun <Response: Any> TorCmd.Privileged.Processor.executeSync(
-    cmd: TorCmd.Privileged<Response>,
+public fun <Success: Any> TorCmd.Privileged.Processor.executeSync(
+    cmd: TorCmd.Privileged<Success>,
     cancellation: (() -> CancellationException?)? = null,
-): Response {
+): Success {
     var failure: Throwable? = null
-    var success: Response? = null
+    var success: Success? = null
 
     @OptIn(InternalKmpTorApi::class)
     return enqueue(
@@ -101,12 +101,12 @@ public fun <Response: Any> TorCmd.Privileged.Processor.executeSync(
  * */
 @JvmOverloads
 @Throws(Throwable::class)
-public fun <Response: Any> TorCmd.Unprivileged.Processor.executeSync(
-    cmd: TorCmd.Unprivileged<Response>,
+public fun <Success: Any> TorCmd.Unprivileged.Processor.executeSync(
+    cmd: TorCmd.Unprivileged<Success>,
     cancellation: (() -> CancellationException?)? = null,
-): Response {
+): Success {
     var fail: Throwable? = null
-    var success: Response? = null
+    var success: Success? = null
 
     @OptIn(InternalKmpTorApi::class)
     return enqueue(

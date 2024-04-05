@@ -21,6 +21,7 @@ import io.matthewnelson.kmp.tor.runtime.core.OnSuccess
 import io.matthewnelson.kmp.tor.runtime.core.QueuedJob
 import io.matthewnelson.kmp.tor.runtime.core.ctrl.TorCmd
 import io.matthewnelson.kmp.tor.runtime.core.UncaughtException
+import io.matthewnelson.kmp.tor.runtime.core.ctrl.Reply
 import kotlin.coroutines.cancellation.CancellationException
 import kotlin.test.*
 
@@ -37,14 +38,14 @@ class AbstractTorCmdQueueUnitTest {
         override fun destroy() { onDestroy() }
 
         @Suppress("UNCHECKED_CAST")
-        fun dequeueNext(): TorCmdJob<Unit>? = dequeueNextOrNull() as? TorCmdJob<Unit>
+        fun dequeueNext(): TorCmdJob<Reply.Success.OK>? = dequeueNextOrNull() as? TorCmdJob<Reply.Success.OK>
 
         fun processAll() {
-            var job: TorCmdJob<Unit>? = dequeueNext()
+            var job: TorCmdJob<Reply.Success.OK>? = dequeueNext()
 
             while (job != null) {
                 assertEquals(QueuedJob.State.Executing, job.state)
-                job.completion(Unit)
+                job.completion(Reply.Success.OK)
                 job = dequeueNext()
             }
         }
@@ -61,7 +62,7 @@ class AbstractTorCmdQueueUnitTest {
             var invocationFailure = 0
 
             val onFailure = OnFailure { invocationFailure++ }
-            val onSuccess = OnSuccess<Unit> { invocationSuccess++ }
+            val onSuccess = OnSuccess<Reply.Success.OK> { invocationSuccess++ }
 
             val jobs = mutableListOf<QueuedJob>()
 
@@ -104,7 +105,7 @@ class AbstractTorCmdQueueUnitTest {
         var invocationFailure = 0
 
         val onFailure = OnFailure { invocationFailure++ }
-        val onSuccess = OnSuccess<Unit> { invocationSuccess++ }
+        val onSuccess = OnSuccess<Reply.Success.OK> { invocationSuccess++ }
 
         repeat(4) {
             val job = TorCmdJob.of(
@@ -154,7 +155,7 @@ class AbstractTorCmdQueueUnitTest {
             // exception (with suppressed exceptions) to handler.
             throw IOException()
         }
-        val onSuccess = OnSuccess<Unit> { invocationSuccess++ }
+        val onSuccess = OnSuccess<Reply.Success.OK> { invocationSuccess++ }
 
         // Issuance of Halt will transfer all current queue
         // jobs to a cancellation queue which is handled on
@@ -172,8 +173,8 @@ class AbstractTorCmdQueueUnitTest {
         )
         commands.forEach { command ->
             when (command) {
-                is TorCmd.Privileged<Unit> -> queue.enqueue(command, onFailure, onSuccess)
-                is TorCmd.Unprivileged<Unit> -> queue.enqueue(command, onFailure, onSuccess)
+                is TorCmd.Privileged<Reply.Success.OK> -> queue.enqueue(command, onFailure, onSuccess)
+                is TorCmd.Unprivileged<Reply.Success.OK> -> queue.enqueue(command, onFailure, onSuccess)
             }
         }
 
