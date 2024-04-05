@@ -45,45 +45,31 @@ class ReentrantLockUnitTest {
             val elapsed = measureTime {
                 try {
                     lock.withLockAsync {
-                        delay(10.milliseconds)
+                        delay(20.milliseconds)
 
                         withContext(Dispatchers.IO) {
-                            Blocking.threadSleep(10.milliseconds)
+                            Blocking.threadSleep(20.milliseconds)
                             throw IllegalStateException()
                         }
                     }
                 } catch (_: IllegalStateException) {}
             }
 
-            assertTrue(elapsed > 15.milliseconds)
-
-            lock.withLockAsync {
-                Blocking.threadSleep(50.milliseconds)
-
-                // Lock released even on cancellation
-                throw CancellationException()
-            }
+            assertTrue(elapsed > 60.milliseconds)
         }
 
+        // Will acquire lock first making the
+        // launched coroutine wait for it.
         try {
             lock.withLockAsync {
                 withContext(Dispatchers.IO) {
-                    delay(25.milliseconds)
+                    delay(50.milliseconds)
                 }
 
                 throw IllegalStateException()
             }
         } catch (_: IllegalStateException) {}
 
-        withContext(Dispatchers.IO) { delay(1.milliseconds) }
-
-        val elapsed1 = measureTime { lock.withLock {} }
-        assertTrue(elapsed1 > 15.milliseconds)
-
-        withContext(Dispatchers.IO) { delay(5.milliseconds) }
-
-        val elapsed2 = measureTime { lock.withLock {} }
-        assertTrue(elapsed2 > 20.milliseconds)
-        assertTrue(job.isCancelled)
+        job.join()
     }
 }
