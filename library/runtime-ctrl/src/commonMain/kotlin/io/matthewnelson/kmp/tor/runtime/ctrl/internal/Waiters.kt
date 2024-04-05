@@ -13,17 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
+@file:Suppress("PrivatePropertyName")
+
 package io.matthewnelson.kmp.tor.runtime.ctrl.internal
 
-import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
 import io.matthewnelson.kmp.tor.runtime.core.Destroyable
 import io.matthewnelson.kmp.tor.runtime.core.Destroyable.Companion.checkDestroy
 import io.matthewnelson.kmp.tor.runtime.core.ctrl.Reply
+import io.matthewnelson.kmp.tor.runtime.ctrl.internal.Debugger.Companion.d
 import kotlinx.coroutines.delay
 import kotlin.concurrent.Volatile
 import kotlin.time.Duration.Companion.milliseconds
 
-internal class Waiters: Destroyable {
+internal class Waiters(private val LOG: () -> Debugger?): Destroyable {
 
     private val rLock = ReentrantLock()
     private val waiters = ArrayList<Waiter>(1)
@@ -53,7 +55,12 @@ internal class Waiters: Destroyable {
         val waiter = rLock.withLock {
             checkDestroy()
             waiters.removeFirstOrNull()
-        } ?: return
+        }
+
+        if (waiter == null) {
+            LOG().d(null) { "No waiters found for replies$replies" }
+            return
+        }
 
         waiter.response = replies
     }

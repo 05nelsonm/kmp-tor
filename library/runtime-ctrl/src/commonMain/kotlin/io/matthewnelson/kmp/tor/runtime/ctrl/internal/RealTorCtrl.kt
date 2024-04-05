@@ -53,7 +53,7 @@ internal class RealTorCtrl private constructor(
     private var _isDisconnected = false
     private val lock = SynchronizedObject()
 
-    private val waiters = Waiters()
+    private val waiters = Waiters { LOG }
     private val processor = Processor()
 
     private val parser = object : CtrlConnection.Parser() {
