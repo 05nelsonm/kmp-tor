@@ -286,6 +286,10 @@ protected constructor(
      * with provided [cause]. Does nothing if the job is already
      * completed.
      *
+     * If [cause] is [CancellationException], [cancellationException] will
+     * be set and [State.Cancelled] will be utilized for the completion
+     * state.
+     *
      * **NOTE:** [withLock] lambda should not call any other
      * functions which obtain the lock such as [cancel], [onCompletion],
      * or [invokeOnCompletion].
@@ -293,9 +297,14 @@ protected constructor(
     protected fun onError(cause: Throwable, withLock: ItBlock<Unit>) {
         if (_isCompleting || !isActive) return
 
+        val isCancellation = cause is CancellationException
+
         @OptIn(InternalKmpTorApi::class)
         val complete = synchronized(lock) {
             if (_isCompleting || !isActive) return@synchronized false
+            if (isCancellation) {
+                _cancellationException = cause as CancellationException
+            }
             // Set before invoking withLock so that
             // if implementation calls again it will
             // not lock up.
@@ -306,8 +315,14 @@ protected constructor(
 
         if (!complete) return
 
-        Error.doFinal {
-            _onFailure?.let { it(cause) }
+        (if (isCancellation) Cancelled else Error).doFinal {
+            try {
+                _onFailure?.let { it(cause) }
+            } finally {
+                if (isCancellation) {
+                    onCancellation(_cancellationException)
+                }
+            }
         }
     }
 
@@ -351,5 +366,5 @@ protected constructor(
 
     final override fun toString(): String = toString(_state)
 
-    private fun toString(state: State): String = "QueuedJob[name=$name,state=$state]@${hashCode()}"
+    private fun toString(state: State): String = "QueuedJob[name=$name, state=$state]@${hashCode()}"
 }
