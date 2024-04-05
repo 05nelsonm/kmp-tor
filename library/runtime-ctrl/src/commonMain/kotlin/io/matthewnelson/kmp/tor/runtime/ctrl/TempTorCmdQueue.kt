@@ -28,6 +28,7 @@ import io.matthewnelson.kmp.tor.runtime.ctrl.internal.cancelAndClearAll
 import kotlin.concurrent.Volatile
 import kotlin.coroutines.cancellation.CancellationException
 import kotlin.jvm.JvmName
+import kotlin.jvm.JvmSynthetic
 
 /**
  * Helper for TorRuntime to maintain a temporary queue for
@@ -38,16 +39,13 @@ import kotlin.jvm.JvmName
  * After [attach] is invoked, all enqueued calls are transferred
  * and any further calls to [enqueue] will be delegated to
  * [TorCtrl].
+ *
+ * @see [TorCtrl.Factory.tempQueue]
  * */
 @OptIn(InternalKmpTorApi::class)
-public class TempTorCmdQueue
-@InternalKmpTorApi
-@Throws(IllegalArgumentException::class)
-public constructor(
+public class TempTorCmdQueue private constructor(
     private val handler: UncaughtException.Handler,
 ): Destroyable, TorCmd.Unprivileged.Processor {
-
-    init { handler.requireInstanceIsNotSuppressed() }
 
     @Volatile
     private var _connection: AbstractTorCtrl? = null
@@ -104,5 +102,17 @@ public constructor(
         job = TorCmdJob.of(cmd, onSuccess, onFailure, handler)
         queue.add(job)
         job
+    }
+
+    internal companion object {
+
+        @JvmSynthetic
+        @Throws(IllegalArgumentException::class)
+        internal fun of(
+            handler: UncaughtException.Handler
+        ): TempTorCmdQueue {
+            handler.requireInstanceIsNotSuppressed()
+            return TempTorCmdQueue(handler)
+        }
     }
 }

@@ -21,6 +21,7 @@ protected final class io/matthewnelson/kmp/tor/runtime/ctrl/AbstractTorEventProc
 }
 
 public final class io/matthewnelson/kmp/tor/runtime/ctrl/TempTorCmdQueue : io/matthewnelson/kmp/tor/runtime/core/Destroyable, io/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$Unprivileged$Processor {
+	public synthetic fun <init> (Lio/matthewnelson/kmp/tor/runtime/core/UncaughtException$Handler;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
 	public final fun attach (Lio/matthewnelson/kmp/tor/runtime/ctrl/TorCtrl;)V
 	public final fun connection ()Lio/matthewnelson/kmp/tor/runtime/ctrl/TorCtrl;
 	public fun destroy ()V

@@ -20,6 +20,7 @@ package io.matthewnelson.kmp.tor.runtime.ctrl
 import io.matthewnelson.kmp.file.File
 import io.matthewnelson.kmp.file.IOException
 import io.matthewnelson.kmp.file.wrapIOException
+import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
 import io.matthewnelson.kmp.tor.runtime.core.*
 import io.matthewnelson.kmp.tor.runtime.core.UncaughtException.Handler.Companion.requireInstanceIsNotSuppressed
 import io.matthewnelson.kmp.tor.runtime.core.address.ProxyAddress
@@ -193,5 +194,8 @@ public actual interface TorCtrl : Destroyable, TorEvent.Processor, TorCmd.Privil
 
             return RealTorCtrl.of(this, dispatcher, connection)
         }
+
+        @InternalKmpTorApi
+        public actual fun tempQueue(): TempTorCmdQueue = TempTorCmdQueue.of(handler)
     }
 }

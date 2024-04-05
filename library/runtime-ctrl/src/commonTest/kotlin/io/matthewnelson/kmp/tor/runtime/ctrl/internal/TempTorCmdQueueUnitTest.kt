@@ -15,7 +15,6 @@
  **/
 package io.matthewnelson.kmp.tor.runtime.ctrl.internal
 
-import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
 import io.matthewnelson.kmp.tor.runtime.core.QueuedJob
 import io.matthewnelson.kmp.tor.runtime.core.UncaughtException
 import io.matthewnelson.kmp.tor.runtime.core.ctrl.TorCmd
@@ -23,11 +22,10 @@ import io.matthewnelson.kmp.tor.runtime.ctrl.TempTorCmdQueue
 import io.matthewnelson.kmp.tor.runtime.ctrl.internal.AbstractTorCtrlUnitTest.TestCtrl
 import kotlin.test.*
 
-@OptIn(InternalKmpTorApi::class)
 class TempTorCmdQueueUnitTest {
 
     private val ctrl = TestCtrl()
-    private val queue = TempTorCmdQueue(UncaughtException.Handler.THROW)
+    private val queue = TempTorCmdQueue.of(UncaughtException.Handler.THROW)
 
     @Test
     fun givenEnqueuedJob_whenAttach_thenIsTransferred() {

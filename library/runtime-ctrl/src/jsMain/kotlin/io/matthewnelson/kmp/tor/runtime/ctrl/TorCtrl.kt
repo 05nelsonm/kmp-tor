@@ -280,5 +280,8 @@ public actual interface TorCtrl : Destroyable, TorEvent.Processor, TorCmd.Privil
 
             return RealTorCtrl.of(this, Dispatchers.Main, connection)
         }
+
+        @InternalKmpTorApi
+        public actual fun tempQueue(): TempTorCmdQueue = TempTorCmdQueue.of(handler)
     }
 }

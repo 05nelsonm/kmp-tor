@@ -19,6 +19,7 @@ package io.matthewnelson.kmp.tor.runtime.ctrl
 
 import io.matthewnelson.kmp.file.File
 import io.matthewnelson.kmp.file.IOException
+import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
 import io.matthewnelson.kmp.tor.runtime.core.*
 import io.matthewnelson.kmp.tor.runtime.core.UncaughtException
 import io.matthewnelson.kmp.tor.runtime.core.UncaughtException.Handler.Companion.requireInstanceIsNotSuppressed
@@ -127,5 +128,8 @@ public expect interface TorCtrl: Destroyable, TorEvent.Processor, TorCmd.Privile
          * */
         @Throws(CancellationException::class, IOException::class, UnsupportedOperationException::class)
         public suspend fun connectAsync(path: File): TorCtrl
+
+        @InternalKmpTorApi
+        public fun tempQueue(): TempTorCmdQueue
     }
 }

@@ -36,6 +36,9 @@ class ReentrantLockUnitTest {
         currentCoroutineContext().job.invokeOnCompletion { dispatcher.close() }
 
         val job = launch(dispatcher) {
+
+            delay(2.milliseconds)
+
             val elapsed = measureTime {
                 try {
                     lock.withLockAsync {
