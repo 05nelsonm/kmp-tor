@@ -13,6 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
+@file:Suppress("UnnecessaryOptInAnnotation")
+
 package io.matthewnelson.kmp.tor.runtime.ctrl
 
 import io.matthewnelson.kmp.process.Blocking
@@ -25,7 +27,11 @@ import kotlin.test.assertTrue
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.measureTime
 
-@OptIn(ExperimentalCoroutinesApi::class, InternalKmpTorApi::class)
+@OptIn(
+    DelicateCoroutinesApi::class,
+    ExperimentalCoroutinesApi::class,
+    InternalKmpTorApi::class,
+)
 class ReentrantLockUnitTest {
 
     @Test
@@ -52,7 +58,7 @@ class ReentrantLockUnitTest {
             assertTrue(elapsed > 15.milliseconds)
 
             lock.withLockAsync {
-                delay(20.milliseconds)
+                Blocking.threadSleep(50.milliseconds)
 
                 // Lock released even on cancellation
                 throw CancellationException()
@@ -74,10 +80,10 @@ class ReentrantLockUnitTest {
         val elapsed1 = measureTime { lock.withLock {} }
         assertTrue(elapsed1 > 15.milliseconds)
 
-        withContext(Dispatchers.IO) { delay(1.milliseconds) }
+        withContext(Dispatchers.IO) { delay(5.milliseconds) }
 
         val elapsed2 = measureTime { lock.withLock {} }
-        assertTrue(elapsed2 > 10.milliseconds)
+        assertTrue(elapsed2 > 20.milliseconds)
         assertTrue(job.isCancelled)
     }
 }
