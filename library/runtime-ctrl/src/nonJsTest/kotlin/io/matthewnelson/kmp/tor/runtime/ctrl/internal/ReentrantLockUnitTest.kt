@@ -15,23 +15,17 @@
  **/
 @file:Suppress("UnnecessaryOptInAnnotation")
 
-package io.matthewnelson.kmp.tor.runtime.ctrl
+package io.matthewnelson.kmp.tor.runtime.ctrl.internal
 
 import io.matthewnelson.kmp.process.Blocking
-import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
 import kotlinx.coroutines.*
 import kotlinx.coroutines.test.runTest
-import kotlin.coroutines.cancellation.CancellationException
 import kotlin.test.Test
 import kotlin.test.assertTrue
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.measureTime
 
-@OptIn(
-    DelicateCoroutinesApi::class,
-    ExperimentalCoroutinesApi::class,
-    InternalKmpTorApi::class,
-)
+@OptIn(DelicateCoroutinesApi::class, ExperimentalCoroutinesApi::class)
 class ReentrantLockUnitTest {
 
     @Test

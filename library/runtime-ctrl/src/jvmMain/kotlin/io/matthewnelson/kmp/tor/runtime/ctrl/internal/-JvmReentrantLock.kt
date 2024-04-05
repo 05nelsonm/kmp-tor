@@ -15,16 +15,13 @@
  **/
 @file:Suppress("EXPECT_ACTUAL_CLASSIFIERS_ARE_IN_BETA_WARNING")
 
-package io.matthewnelson.kmp.tor.runtime.ctrl
+package io.matthewnelson.kmp.tor.runtime.ctrl.internal
 
-import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
 import kotlin.concurrent.withLock as _withLock
 
-@InternalKmpTorApi
-public actual typealias ReentrantLock = java.util.concurrent.locks.ReentrantLock
+@Suppress("ACTUAL_WITHOUT_EXPECT")
+internal actual typealias ReentrantLock = java.util.concurrent.locks.ReentrantLock
 
-@PublishedApi
-@InternalKmpTorApi
 internal actual inline fun <T: Any?> ReentrantLock.withLockImpl(
     block: () -> T
 ): T = _withLock(block)

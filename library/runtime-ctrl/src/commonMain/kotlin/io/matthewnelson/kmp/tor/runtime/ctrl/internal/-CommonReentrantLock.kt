@@ -15,29 +15,24 @@
  **/
 @file:Suppress("EXPECT_ACTUAL_CLASSIFIERS_ARE_IN_BETA_WARNING", "KotlinRedundantDiagnosticSuppress")
 
-package io.matthewnelson.kmp.tor.runtime.ctrl
+package io.matthewnelson.kmp.tor.runtime.ctrl.internal
 
-import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
 
-@InternalKmpTorApi
-public expect class ReentrantLock() {
-    public fun lock()
-    public fun tryLock(): Boolean
-    public fun unlock()
+internal expect class ReentrantLock() {
+    internal fun lock()
+    internal fun tryLock(): Boolean
+    internal fun unlock()
 }
 
-@PublishedApi
-@InternalKmpTorApi
 internal expect inline fun <T: Any?> ReentrantLock.withLockImpl(
     block: () -> T
 ): T
 
-@InternalKmpTorApi
 @OptIn(ExperimentalContracts::class)
-public inline fun <T: Any?> ReentrantLock.withLock(
+internal inline fun <T: Any?> ReentrantLock.withLock(
     block: () -> T
 ): T {
     contract {
@@ -49,9 +44,8 @@ public inline fun <T: Any?> ReentrantLock.withLock(
 
 // Needed because Jvm using withLock is not possible
 // with coroutines because block is a critical section
-@InternalKmpTorApi
 @OptIn(ExperimentalContracts::class)
-public suspend fun <T: Any?> ReentrantLock.withLockAsync(
+internal suspend fun <T: Any?> ReentrantLock.withLockAsync(
     block: suspend () -> T
 ): T {
     contract {

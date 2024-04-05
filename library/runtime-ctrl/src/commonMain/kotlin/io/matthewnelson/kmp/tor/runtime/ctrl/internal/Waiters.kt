@@ -19,14 +19,10 @@ import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
 import io.matthewnelson.kmp.tor.runtime.core.Destroyable
 import io.matthewnelson.kmp.tor.runtime.core.Destroyable.Companion.checkDestroy
 import io.matthewnelson.kmp.tor.runtime.core.ctrl.Reply
-import io.matthewnelson.kmp.tor.runtime.ctrl.ReentrantLock
-import io.matthewnelson.kmp.tor.runtime.ctrl.withLock
-import io.matthewnelson.kmp.tor.runtime.ctrl.withLockAsync
 import kotlinx.coroutines.delay
 import kotlin.concurrent.Volatile
 import kotlin.time.Duration.Companion.milliseconds
 
-@OptIn(InternalKmpTorApi::class)
 internal class Waiters: Destroyable {
 
     private val rLock = ReentrantLock()

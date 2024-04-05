@@ -15,16 +15,14 @@
  **/
 @file:Suppress("EXPECT_ACTUAL_CLASSIFIERS_ARE_IN_BETA_WARNING")
 
-package io.matthewnelson.kmp.tor.runtime.ctrl
+package io.matthewnelson.kmp.tor.runtime.ctrl.internal
 
-import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
-import kotlinx.atomicfu.locks.withLock as _withLock
+internal actual class ReentrantLock {
+    internal actual fun lock() {}
+    internal actual fun tryLock(): Boolean = true
+    internal actual fun unlock() {}
+}
 
-@InternalKmpTorApi
-public actual typealias ReentrantLock = kotlinx.atomicfu.locks.SynchronizedObject
-
-@PublishedApi
-@InternalKmpTorApi
 internal actual inline fun <T: Any?> ReentrantLock.withLockImpl(
     block: () -> T
-): T = _withLock(block)
+): T = block()
