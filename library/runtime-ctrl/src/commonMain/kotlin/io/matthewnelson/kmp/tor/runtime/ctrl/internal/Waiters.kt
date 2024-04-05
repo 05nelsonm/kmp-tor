@@ -66,27 +66,35 @@ internal class Waiters(private val LOG: () -> Debugger?): Destroyable {
     }
 
     @Throws(IllegalStateException::class)
-    internal suspend fun wait(
-        write: suspend () -> Unit,
-    ): ArrayList<Reply> {
+    internal suspend fun create(
+        writeCmd: suspend () -> Unit,
+    ): Wait {
         checkDestroy()
 
         val waiter = rLock.withLockAsync {
             checkDestroy()
-            write()
+            writeCmd()
             val w = Waiter()
             waiters.add(w)
             w
         }
 
-        while (true) {
-            delay(1.milliseconds)
-            waiter.response?.let { return it }
-        }
+        return waiter
     }
 
-    private class Waiter {
+    internal interface Wait {
+        suspend operator fun invoke(): ArrayList<Reply>
+    }
+
+    private class Waiter: Wait {
         @Volatile
         var response: ArrayList<Reply>? = null
+
+        override suspend operator fun invoke(): ArrayList<Reply> {
+            while (true) {
+                delay(1.milliseconds)
+                response?.let { return it }
+            }
+        }
     }
 }

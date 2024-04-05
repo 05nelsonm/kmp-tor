@@ -108,10 +108,15 @@ internal class RealTorCtrl private constructor(
             // TODO: do better
         }
 
+        // Waiters must be destroyed BEFORE cancelling
+        // scope (if they haven't already been b/c of EOS).
+        // This is to ensure that all currently waiting
+        // replies get cancelled, and no more QueuedJob
+        // will be executed.
+        waiters.destroy()
+
         scope.cancel()
         LOG.d(this) { "Scope Cancelled" }
-
-        waiters.destroy()
 
         val wasDestroyed = try {
             // May throw UncaughtException if handler is
@@ -174,8 +179,8 @@ internal class RealTorCtrl private constructor(
                     continue
                 }
 
-                val replies = try {
-                    waiters.wait(write = {
+                val wait = try {
+                    waiters.create(writeCmd = {
                         connection.write(command)
                     })
                 } catch (t: Throwable) {
@@ -189,13 +194,41 @@ internal class RealTorCtrl private constructor(
                     command.fill(0)
                 }
 
+                wait.awaitReplies(cmdJob)
+            }
+        }
+
+        /**
+         * As described in the spec, "Servers respond to messages
+         * in the order messages are received". See
+         * [Protocol outline](https://torproject.gitlab.io/torspec/control-spec.html#protocol-outline).
+         *
+         * This allows for moving the wait functionality to a separate
+         * coroutine so that more queued jobs can be executed while
+         * this one finishes up.
+         * */
+        private fun Waiters.Wait.awaitReplies(cmdJob: TorCmdJob<*>) {
+            val wait = this
+
+            scope.launch {
                 try {
+                    val replies = wait()
+
                     cmdJob.respond(replies)
+                } catch (e: CancellationException) {
+                    cmdJob.error(e)
+                    throw e
                 } catch (e: NotImplementedError) {
                     // TODO
                     cmdJob.error(e)
-                    continue
                 }
+            }.invokeOnCompletion {
+                if (!cmdJob.isActive) return@invokeOnCompletion
+
+                // Will only occur if scope has been cancelled
+                // and the coroutine never fired. This ensures
+                // that the job will always be completed.
+                cmdJob.error(CancellationException("CtrlConnection Stream Ended"))
             }
         }
     }
