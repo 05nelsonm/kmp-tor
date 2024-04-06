@@ -44,56 +44,91 @@ private inline fun TorCmd.Authenticate.encode(LOG: Debugger?): ByteArray {
         if (hex.isNotEmpty()) {
             SP().append(hex)
         }
-        LOG.d(null) { ">> $keyword [REDACTED]" }
+        LOG.d { ">> $keyword [REDACTED]" }
         CRLF()
     }.encodeToByteArray()
 }
 
 @Suppress("NOTHING_TO_INLINE")
 private inline fun TorCmd.Config.Get.encode(LOG: Debugger?): ByteArray {
+    // TODO: check if keywords can be empty??
     TODO()
 }
 
 @Suppress("NOTHING_TO_INLINE")
 private inline fun TorCmd.Config.Load.encode(LOG: Debugger?): ByteArray {
-    TODO()
+    return StringBuilder().apply {
+        append('+').append(keyword)
+        LOG.d { ">> ${toString()}" }
+        CRLF()
+        configText.lines().joinTo(
+            buffer = this,
+            separator = "\n",
+            transform = { line ->
+                LOG.d { ">> $line" }
+                line
+            }
+        )
+        CRLF()
+        LOG.d { ">> ." }
+        append('.')
+        CRLF()
+    }.encodeToByteArray()
 }
 
 @Suppress("NOTHING_TO_INLINE")
 private inline fun TorCmd.Config.Reset.encode(LOG: Debugger?): ByteArray {
+    // TODO: check if keywords can be empty??
     TODO()
 }
 
 @Suppress("NOTHING_TO_INLINE")
 private inline fun TorCmd.Config.Save.encode(LOG: Debugger?): ByteArray {
-    TODO()
+    return StringBuilder(keyword).apply {
+        if (force) {
+            SP().append("FORCE")
+        }
+        LOG.d { ">> ${toString()}" }
+        CRLF()
+    }.encodeToByteArray()
 }
 
 @Suppress("NOTHING_TO_INLINE")
+@Throws(IllegalArgumentException::class)
 private inline fun TorCmd.Config.Set.encode(LOG: Debugger?): ByteArray {
+    // TODO: check if settings can be empty??
     TODO()
 }
 
 @Suppress("NOTHING_TO_INLINE")
 private inline fun TorCmd.DropGuards.encode(LOG: Debugger?): ByteArray {
     return StringBuilder(keyword).apply {
-        LOG.d(null) { ">> ${toString()}" }
+        LOG.d { ">> ${toString()}" }
         CRLF()
     }.encodeToByteArray()
 }
 
 @Suppress("NOTHING_TO_INLINE")
 private inline fun TorCmd.Hs.Fetch.encode(LOG: Debugger?): ByteArray {
-    TODO()
+    return StringBuilder(keyword).apply {
+        SP().append(address)
+        // TODO: server fingerprints
+        LOG.d { ">> ${toString()}" }
+        CRLF()
+    }.encodeToByteArray()
 }
 
 @Suppress("NOTHING_TO_INLINE")
+@Throws(IllegalArgumentException::class)
 private inline fun TorCmd.Info.Get.encode(LOG: Debugger?): ByteArray {
+    // TODO: check if keywords can be empty??
+    // TODO: check single line non-blank
     TODO()
 }
 
 @Suppress("NOTHING_TO_INLINE")
 private inline fun TorCmd.MapAddress.encode(LOG: Debugger?): ByteArray {
+    // TODO: check if keywords can be empty??
     TODO()
 }
 
@@ -106,7 +141,7 @@ private inline fun TorCmd.Onion.Add.encode(LOG: Debugger?): ByteArray {
 private inline fun TorCmd.Onion.Delete.encode(LOG: Debugger?): ByteArray {
     return StringBuilder(keyword).apply {
         SP().append(address)
-        LOG.d(null) { ">> ${toString()}" }
+        LOG.d { ">> ${toString()}" }
         CRLF()
     }.encodeToByteArray()
 }
@@ -120,7 +155,7 @@ private inline fun TorCmd.OnionClientAuth.Add.encode(LOG: Debugger?): ByteArray 
 private inline fun TorCmd.OnionClientAuth.Remove.encode(LOG: Debugger?): ByteArray {
     return StringBuilder(keyword).apply {
         SP().append(address)
-        LOG.d(null) { ">> ${toString()}" }
+        LOG.d { ">> ${toString()}" }
         CRLF()
     }.encodeToByteArray()
 }
@@ -131,7 +166,7 @@ private inline fun TorCmd.OnionClientAuth.View.encode(LOG: Debugger?): ByteArray
         if (address != null) {
             SP().append(address)
         }
-        LOG.d(null) { ">> ${toString()}" }
+        LOG.d { ">> ${toString()}" }
         CRLF()
     }.encodeToByteArray()
 }
@@ -139,7 +174,7 @@ private inline fun TorCmd.OnionClientAuth.View.encode(LOG: Debugger?): ByteArray
 @Suppress("NOTHING_TO_INLINE")
 private inline fun TorCmd.Ownership.Drop.encode(LOG: Debugger?): ByteArray {
     return StringBuilder(keyword).apply {
-        LOG.d(null) { ">> ${toString()}" }
+        LOG.d { ">> ${toString()}" }
         CRLF()
     }.encodeToByteArray()
 }
@@ -147,7 +182,7 @@ private inline fun TorCmd.Ownership.Drop.encode(LOG: Debugger?): ByteArray {
 @Suppress("NOTHING_TO_INLINE")
 private inline fun TorCmd.Ownership.Take.encode(LOG: Debugger?): ByteArray {
     return StringBuilder(keyword).apply {
-        LOG.d(null) { ">> ${toString()}" }
+        LOG.d { ">> ${toString()}" }
         CRLF()
     }.encodeToByteArray()
 }
@@ -162,7 +197,7 @@ private inline fun TorCmd.Resolve.encode(LOG: Debugger?): ByteArray {
             SP().append("mode=reverse")
         }
         SP().append(hostname)
-        LOG.d(null) { ">> ${toString()}" }
+        LOG.d { ">> ${toString()}" }
         CRLF()
     }.encodeToByteArray()
 }
@@ -173,7 +208,7 @@ private inline fun TorCmd.SetEvents.encode(LOG: Debugger?): ByteArray {
         for (event in events) {
             SP().append(event.name)
         }
-        LOG.d(null) { ">> ${toString()}" }
+        LOG.d { ">> ${toString()}" }
         CRLF()
     }.encodeToByteArray()
 }
@@ -232,7 +267,7 @@ private inline fun TorCmd.Signal.Halt.encode(LOG: Debugger?): ByteArray {
 private inline fun TorCmd.Signal.encode(cmd: String, LOG: Debugger?): ByteArray {
     return StringBuilder("SIGNAL").apply {
         SP().append(cmd)
-        LOG.d(null) { ">> ${toString()}" }
+        LOG.d { ">> ${toString()}" }
         CRLF()
     }.encodeToByteArray()
 }

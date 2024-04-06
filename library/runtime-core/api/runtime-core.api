@@ -991,8 +991,8 @@ public final class io/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$Config$Get 
 }
 
 public final class io/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$Config$Load : io/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$Privileged {
-	public final field config Lio/matthewnelson/kmp/tor/runtime/core/TorConfig;
-	public fun <init> (Lio/matthewnelson/kmp/tor/runtime/core/TorConfig;)V
+	public final field configText Ljava/lang/String;
+	public fun <init> (Ljava/lang/String;)V
 }
 
 public final class io/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$Config$Reset : io/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$Unprivileged {

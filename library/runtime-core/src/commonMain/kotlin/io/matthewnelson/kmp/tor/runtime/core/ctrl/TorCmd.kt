@@ -57,14 +57,14 @@ public sealed class TorCmd<Success: Any> private constructor(
         public val hex: String
 
         /** No Password (i.e. unauthenticated control connection) */
-        public constructor(): this("")
+        public constructor(): this(EMPTY_BYTES)
 
         /** Un-Hashed (raw) Password for HashedControlPassword (e.g. `"Hello World!"`) */
         public constructor(password: String): this(password.encodeToByteArray())
 
         /** Cookie authentication bytes (or password UTF-8 encoded to bytes) */
         public constructor(cookie: ByteArray): super("AUTHENTICATE") {
-            hex = cookie.encodeToString(Base16())
+            hex = if (cookie.isEmpty()) "" else cookie.encodeToString(Base16())
         }
     }
 
@@ -127,9 +127,7 @@ public sealed class TorCmd<Success: Any> private constructor(
          * */
         public class Load(
             @JvmField
-            public val config: TorConfig,
-            // TODO: torrc file + defaults
-            //  and read them in?
+            public val configText: String,
         ): Privileged<Reply.Success.OK>("LOADCONF")
 
         /**
@@ -142,16 +140,12 @@ public sealed class TorCmd<Success: Any> private constructor(
             @JvmField
             public val keywords: kotlin.collections.Set<TorConfig.Keyword>
 
-            public constructor(keyword: TorConfig.Keyword): super("RESETCONF") {
-                this.keywords = immutableSetOf(keyword)
-            }
+            public constructor(keyword: TorConfig.Keyword): this(immutableSetOf(keyword))
+
+            public constructor(vararg keywords: TorConfig.Keyword): this(immutableSetOf(*keywords))
 
             public constructor(keywords: Collection<TorConfig.Keyword>): super("RESETCONF") {
                 this.keywords = keywords.toImmutableSet()
-            }
-
-            public constructor(vararg keywords: TorConfig.Keyword): super("RESETCONF") {
-                this.keywords = immutableSetOf(*keywords)
             }
         }
 
@@ -165,6 +159,7 @@ public sealed class TorCmd<Success: Any> private constructor(
             public val force: Boolean,
         ): Unprivileged<Reply.Success.OK>("SAVECONF") {
 
+            /** Default of [force] = `false` */
             public constructor(): this(force = false)
         }
 
@@ -178,16 +173,12 @@ public sealed class TorCmd<Success: Any> private constructor(
             @JvmField
             public val settings: kotlin.collections.Set<TorConfig.Setting>
 
-            public constructor(setting: TorConfig.Setting): super("SETCONF") {
-                this.settings = immutableSetOf(setting)
-            }
+            public constructor(setting: TorConfig.Setting): this(immutableSetOf(setting))
+
+            public constructor(vararg settings: TorConfig.Setting): this(immutableSetOf(*settings))
 
             public constructor(settings: Collection<TorConfig.Setting>): super("SETCONF") {
                 this.settings = settings.toImmutableSet()
-            }
-
-            public constructor(vararg settings: TorConfig.Setting): super("SETCONF") {
-                this.settings = immutableSetOf(*settings)
             }
         }
     }
@@ -318,6 +309,7 @@ public sealed class TorCmd<Success: Any> private constructor(
         ): Unprivileged<Reply.Success>("ONION_CLIENT_AUTH_REMOVE") {
 
             public constructor(address: OnionAddress.V3): this(address as OnionAddress)
+
             public constructor(key: ED25519_V3.PublicKey): this(key.address())
         }
 
@@ -335,12 +327,10 @@ public sealed class TorCmd<Success: Any> private constructor(
                 this.address = null
             }
 
+            public constructor(key: ED25519_V3.PublicKey): this(key.address())
+
             public constructor(address: OnionAddress.V3): super("ONION_CLIENT_AUTH_VIEW") {
                 this.address = address
-            }
-
-            public constructor(key: ED25519_V3.PublicKey): super("ONION_CLIENT_AUTH_VIEW") {
-                this.address = key.address()
             }
 
             public companion object {
@@ -403,20 +393,14 @@ public sealed class TorCmd<Success: Any> private constructor(
         @JvmField
         public val events: Set<TorEvent>
 
-        public constructor(): super("SETEVENTS") {
-            this.events = emptySet()
-        }
+        public constructor(): this(emptySet())
 
-        public constructor(event: TorEvent): super("SETEVENTS") {
-            this.events = immutableSetOf(event)
-        }
+        public constructor(event: TorEvent): this(immutableSetOf(event))
+
+        public constructor(vararg events: TorEvent): this(immutableSetOf(*events))
 
         public constructor(events: Collection<TorEvent>): super("SETEVENTS") {
             this.events = events.toImmutableSet()
-        }
-
-        public constructor(vararg events: TorEvent): super("SETEVENTS") {
-            this.events = immutableSetOf(*events)
         }
     }
 
@@ -549,4 +533,8 @@ public sealed class TorCmd<Success: Any> private constructor(
     }
 
     final override fun toString(): String = keyword
+
+    private companion object {
+        private val EMPTY_BYTES: ByteArray = ByteArray(0)
+    }
 }

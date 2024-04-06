@@ -81,7 +81,7 @@ internal abstract class AbstractTorCtrl internal constructor(
             }
 
             if (!callbacks.isNullOrEmpty()) {
-                LOG.d(this@AbstractTorCtrl) { "Invoking onDestroy callbacks" }
+                LOG.d { "Invoking onDestroy callbacks" }
                 val suppressed = this
                 callbacks.forEach { callback -> callback.invokeDestroyed(suppressed) }
             }

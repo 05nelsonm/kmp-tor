@@ -17,18 +17,33 @@ package io.matthewnelson.kmp.tor.runtime.ctrl.internal
 
 import io.matthewnelson.kmp.tor.runtime.core.ItBlock
 import kotlin.jvm.JvmInline
+import kotlin.jvm.JvmSynthetic
 
 @JvmInline
-internal value class Debugger(private val block: ItBlock<String>) {
+internal value class Debugger private constructor(private val callback: Callback) {
 
     internal companion object {
 
-        internal fun Debugger?.d(prefix: Any?, text: () -> String) {
+        @JvmSynthetic
+        internal fun of(
+            prefix: Any,
+            block: ItBlock<String>
+        ): Debugger = Debugger(Callback(prefix.toString(), block))
+
+        internal fun Debugger?.d(text: () -> String) {
             if (this == null) return
+            val t = text()
+            callback(t)
+        }
+    }
+
+    private class Callback(
+        private val prefix: String,
+        private val block: ItBlock<String>,
+    ): ItBlock<String> {
+        override fun invoke(it: String) {
             try {
-                val p = if (prefix != null) "$prefix - " else ""
-                val t = text()
-                block(p + t)
+                block("$prefix $it")
             } catch (_: Throwable) {}
         }
     }

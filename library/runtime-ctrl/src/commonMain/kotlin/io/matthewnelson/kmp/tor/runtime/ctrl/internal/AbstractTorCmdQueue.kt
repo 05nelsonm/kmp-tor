@@ -146,7 +146,7 @@ internal abstract class AbstractTorCmdQueue internal constructor(
             job
         }
 
-        if (job != null) LOG.d(this) { "$job" }
+        if (job != null) LOG.d { "$job" }
 
         return job
     }
@@ -170,7 +170,7 @@ internal abstract class AbstractTorCmdQueue internal constructor(
                     // before cancelling them.
                     ArrayList(queueExecute).also { queueExecute.clear() }
                 }?.also {
-                    LOG.d(this@AbstractTorCmdQueue) { "Cancelling QueuedJobs" }
+                    LOG.d { "Cancelling QueuedJobs" }
                 }?.cancelAndClearAll(cause, this)
             }
         }
@@ -184,7 +184,7 @@ internal abstract class AbstractTorCmdQueue internal constructor(
             ArrayList(queueCancellation).also { queueCancellation.clear() }
         } ?: return
 
-        LOG.d(this) { "Cancelling QueuedJobs" }
+        LOG.d { "Cancelling QueuedJobs" }
         handler.withSuppression {
             while (cancellations.isNotEmpty()) {
                 val cancellation = cancellations.removeFirst()

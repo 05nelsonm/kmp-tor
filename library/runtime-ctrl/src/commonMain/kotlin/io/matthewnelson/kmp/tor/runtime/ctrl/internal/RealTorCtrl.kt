@@ -40,7 +40,7 @@ internal class RealTorCtrl private constructor(
 ) {
 
     @Volatile
-    protected override var LOG = factory.debugger?.let { Debugger(it) }
+    protected override var LOG = factory.debugger?.let { Debugger.of(this, it) }
 
     private val scope = CoroutineScope(context =
         // TODO: Handler?
@@ -59,10 +59,10 @@ internal class RealTorCtrl private constructor(
     private val parser = object : CtrlConnection.Parser() {
         internal override fun parse(line: String?) {
             if (line == null) {
-                LOG.d(this@RealTorCtrl) { "End Of Stream" }
+                LOG.d { "End Of Stream" }
                 waiters.destroy()
             } else {
-                LOG.d(null) { "<< $line" }
+                LOG.d { "<< $line" }
             }
 
             super.parse(line)
@@ -70,7 +70,7 @@ internal class RealTorCtrl private constructor(
 
         override fun onError(details: String) {
             // TODO
-            LOG.d(this) { details }
+            LOG.d { details }
         }
 
         override fun TorEvent.notify(output: String) {
@@ -94,7 +94,7 @@ internal class RealTorCtrl private constructor(
         if (!disconnect) return
 
         connection.close()
-        LOG.d(this) { "Connection Closed" }
+        LOG.d { "Connection Closed" }
     }
 
     override fun startProcessor() { processor.start() }
@@ -116,7 +116,7 @@ internal class RealTorCtrl private constructor(
         waiters.destroy()
 
         scope.cancel()
-        LOG.d(this) { "Scope Cancelled" }
+        LOG.d { "Scope Cancelled" }
 
         val wasDestroyed = try {
             // May throw UncaughtException if handler is
@@ -131,10 +131,10 @@ internal class RealTorCtrl private constructor(
 
     init {
         scope.launch {
-            LOG.d(this@RealTorCtrl) { "Starting Read" }
+            LOG.d { "Starting Read" }
             connection.startRead(parser)
         }.invokeOnCompletion {
-            LOG.d(this) { "Stopped Reading" }
+            LOG.d { "Stopped Reading" }
             onDestroy()
         }
     }
@@ -155,7 +155,7 @@ internal class RealTorCtrl private constructor(
         }
 
         private suspend fun CoroutineScope.loop() {
-            LOG.d(this@RealTorCtrl) { "Processor Started" }
+            LOG.d { "Processor Started" }
 
             while (isActive && !waiters.isDestroyed()) {
                 val cmdJob = synchronized(processorLock) {
@@ -194,7 +194,7 @@ internal class RealTorCtrl private constructor(
                     command.fill(0)
                 }
 
-                wait.awaitReplies(cmdJob)
+                cmdJob.awaitReplies(wait)
             }
         }
 
@@ -207,8 +207,8 @@ internal class RealTorCtrl private constructor(
          * coroutine so that more queued jobs can be executed while
          * this one finishes up.
          * */
-        private fun Waiters.Wait.awaitReplies(cmdJob: TorCmdJob<*>) {
-            val wait = this
+        private fun TorCmdJob<*>.awaitReplies(wait: Waiters.Wait) {
+            val cmdJob = this
 
             scope.launch {
                 try {
@@ -222,13 +222,19 @@ internal class RealTorCtrl private constructor(
                     // TODO
                     cmdJob.error(e)
                 }
-            }.invokeOnCompletion {
-                if (!cmdJob.isActive) return@invokeOnCompletion
+            }.invokeOnCompletion { t ->
+                if (!cmdJob.isActive || cmdJob.isCompleting) return@invokeOnCompletion
 
                 // Will only occur if scope has been cancelled
                 // and the coroutine never fired. This ensures
                 // that the job will always be completed.
-                cmdJob.error(CancellationException("CtrlConnection Stream Ended"))
+                val e = if (t is CancellationException) {
+                    t
+                } else {
+                    CancellationException("CtrlConnection Stream Ended", t)
+                }
+
+                cmdJob.error(e)
             }
         }
     }

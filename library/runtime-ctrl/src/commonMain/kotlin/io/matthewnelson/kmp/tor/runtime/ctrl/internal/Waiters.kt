@@ -58,7 +58,7 @@ internal class Waiters(private val LOG: () -> Debugger?): Destroyable {
         }
 
         if (waiter == null) {
-            LOG().d(null) { "No waiters found for replies$replies" }
+            LOG().d { "No waiters found for replies$replies" }
             return
         }
 
