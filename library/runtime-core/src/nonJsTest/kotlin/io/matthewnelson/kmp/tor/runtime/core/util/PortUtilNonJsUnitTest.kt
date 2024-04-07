@@ -18,7 +18,7 @@
 package io.matthewnelson.kmp.tor.runtime.core.util
 
 import io.matthewnelson.kmp.tor.runtime.core.address.IPAddress
-import io.matthewnelson.kmp.tor.runtime.core.internal.InetAddressWrapper.Companion.toInetAddressWrapper
+import io.matthewnelson.kmp.tor.runtime.core.internal.ServerSocketProducer.Companion.toServerSocketProducer
 
 @OptIn(ExperimentalStdlibApi::class)
 class PortUtilNonJsUnitTest: PortUtilBaseTest() {
@@ -26,6 +26,6 @@ class PortUtilNonJsUnitTest: PortUtilBaseTest() {
     override fun openServerSocket(
         ipAddress: IPAddress,
         port: Int,
-    ): AutoCloseable = ipAddress.toInetAddressWrapper()
-        .openServerSocket(port)
+    ): AutoCloseable = ipAddress.toServerSocketProducer()
+        .open(port)
 }

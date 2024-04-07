@@ -23,13 +23,13 @@ import io.matthewnelson.kmp.tor.runtime.core.address.IPAddress
 import java.net.ServerSocket
 
 @JvmInline
-internal actual value class InetAddressWrapper private actual constructor(
+internal actual value class ServerSocketProducer private actual constructor(
     private actual val value: Any
 ) {
 
     @Throws(Exception::class)
     @OptIn(ExperimentalStdlibApi::class)
-    internal actual fun openServerSocket(port: Int): AutoCloseable {
+    internal actual fun open(port: Int): AutoCloseable {
         return ServerSocket(port, 1, value as java.net.InetAddress)
     }
 
@@ -37,7 +37,7 @@ internal actual value class InetAddressWrapper private actual constructor(
 
         @JvmSynthetic
         @Throws(IOException::class)
-        internal actual fun IPAddress.toInetAddressWrapper(): InetAddressWrapper {
+        internal actual fun IPAddress.toServerSocketProducer(): ServerSocketProducer {
             val jInetAddress = try {
                 // TODO: Issue #336
                 //  Use get by address
@@ -46,7 +46,7 @@ internal actual value class InetAddressWrapper private actual constructor(
                 throw t.wrapIOException()
             }
 
-            return InetAddressWrapper(jInetAddress)
+            return ServerSocketProducer(jInetAddress)
         }
     }
 }

@@ -21,7 +21,7 @@ import io.matthewnelson.kmp.file.IOException
 import io.matthewnelson.kmp.file.wrapIOException
 import io.matthewnelson.kmp.tor.runtime.core.address.LocalHost
 import io.matthewnelson.kmp.tor.runtime.core.address.Port
-import io.matthewnelson.kmp.tor.runtime.core.internal.InetAddressWrapper.Companion.toInetAddressWrapper
+import io.matthewnelson.kmp.tor.runtime.core.internal.ServerSocketProducer.Companion.toServerSocketProducer
 import io.matthewnelson.kmp.tor.runtime.core.internal.PortProxyIterator.Companion.iterator
 import io.matthewnelson.kmp.tor.runtime.core.internal.cancellationExceptionOr
 import io.matthewnelson.kmp.tor.runtime.core.internal.isPortAvailable
@@ -81,7 +81,7 @@ public actual suspend fun Port.Proxy.findAvailableAsync(
 public fun Port.isAvailableSync(
     host: LocalHost,
 ): Boolean = host.resolve()
-    .toInetAddressWrapper()
+    .toServerSocketProducer()
     .isPortAvailable(value)
 
 /**
@@ -114,7 +114,7 @@ private fun Port.Proxy.findAvailableSync(
 ): Port.Proxy {
     val i = iterator(limit)
     val ipAddress = host.resolve()
-    val inetAddress = ipAddress.toInetAddressWrapper()
+    val inetAddress = ipAddress.toServerSocketProducer()
 
     try {
         while (context?.isActive != false && i.hasNext()) {
