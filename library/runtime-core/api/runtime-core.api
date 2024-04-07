@@ -1030,8 +1030,15 @@ public final class io/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$Hs {
 
 public final class io/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$Hs$Fetch : io/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$Unprivileged {
 	public final field address Lio/matthewnelson/kmp/tor/runtime/core/address/OnionAddress;
+	public final field servers Ljava/util/Set;
 	public fun <init> (Lio/matthewnelson/kmp/tor/runtime/core/address/OnionAddress;)V
+	public fun <init> (Lio/matthewnelson/kmp/tor/runtime/core/address/OnionAddress;Ljava/lang/String;)V
+	public fun <init> (Lio/matthewnelson/kmp/tor/runtime/core/address/OnionAddress;Ljava/util/Collection;)V
+	public fun <init> (Lio/matthewnelson/kmp/tor/runtime/core/address/OnionAddress;[Ljava/lang/String;)V
 	public fun <init> (Lio/matthewnelson/kmp/tor/runtime/core/key/AddressKey$Public;)V
+	public fun <init> (Lio/matthewnelson/kmp/tor/runtime/core/key/AddressKey$Public;Ljava/lang/String;)V
+	public fun <init> (Lio/matthewnelson/kmp/tor/runtime/core/key/AddressKey$Public;Ljava/util/Collection;)V
+	public fun <init> (Lio/matthewnelson/kmp/tor/runtime/core/key/AddressKey$Public;[Ljava/lang/String;)V
 }
 
 public final class io/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$Info {

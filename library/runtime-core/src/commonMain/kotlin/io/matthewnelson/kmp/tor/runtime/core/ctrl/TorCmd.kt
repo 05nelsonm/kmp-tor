@@ -57,7 +57,7 @@ public sealed class TorCmd<Success: Any> private constructor(
         public val hex: String
 
         /** No Password (i.e. unauthenticated control connection) */
-        public constructor(): this(EMPTY_BYTES)
+        public constructor(): this(ByteArray(0))
 
         /** Un-Hashed (raw) Password for HashedControlPassword (e.g. `"Hello World!"`) */
         public constructor(password: String): this(password.encodeToByteArray())
@@ -197,13 +197,27 @@ public sealed class TorCmd<Success: Any> private constructor(
          *
          * [docs](https://torproject.gitlab.io/torspec/control-spec/#hsfetch)
          * */
-        public class Fetch(
+        public class Fetch: Unprivileged<Reply.Success.OK> {
+
             @JvmField
-            public val address: OnionAddress,
-            // TODO: Set<Server.Fingerprint>,
-        ): Unprivileged<Reply.Success.OK>("HSFETCH") {
+            public val address: OnionAddress
+            @JvmField
+            public val servers: Set<String>
 
             public constructor(key: AddressKey.Public): this(key.address())
+            public constructor(address: OnionAddress): this(address, emptySet())
+
+            public constructor(key: AddressKey.Public, server: String): this(key.address(), server)
+            public constructor(address: OnionAddress, server: String): this(address, immutableSetOf(server))
+
+            public constructor(key: AddressKey.Public, vararg servers: String): this(key, immutableSetOf(*servers))
+            public constructor(address: OnionAddress, vararg servers: String): this(address, immutableSetOf(*servers))
+
+            public constructor(key: AddressKey.Public, servers: Collection<String>): this(key.address(), servers)
+            public constructor(address: OnionAddress, servers: Collection<String>): super("HSFETCH") {
+                this.address = address
+                this.servers = servers.toImmutableSet()
+            }
         }
 
 //        /**
@@ -308,9 +322,9 @@ public sealed class TorCmd<Success: Any> private constructor(
             public val address: OnionAddress,
         ): Unprivileged<Reply.Success>("ONION_CLIENT_AUTH_REMOVE") {
 
-            public constructor(address: OnionAddress.V3): this(address as OnionAddress)
-
             public constructor(key: ED25519_V3.PublicKey): this(key.address())
+
+            public constructor(address: OnionAddress.V3): this(address as OnionAddress)
         }
 
         /**
@@ -323,20 +337,18 @@ public sealed class TorCmd<Success: Any> private constructor(
             @JvmField
             public val address: OnionAddress?
 
-            private constructor(): super("ONION_CLIENT_AUTH_VIEW") {
-                this.address = null
-            }
-
             public constructor(key: ED25519_V3.PublicKey): this(key.address())
 
-            public constructor(address: OnionAddress.V3): super("ONION_CLIENT_AUTH_VIEW") {
+            public constructor(address: OnionAddress.V3): this(address as OnionAddress)
+
+            private constructor(address: OnionAddress?): super("ONION_CLIENT_AUTH_VIEW") {
                 this.address = address
             }
 
             public companion object {
 
                 @JvmField
-                public val ALL: View = View()
+                public val ALL: View = View(null)
             }
         }
     }
@@ -414,7 +426,6 @@ public sealed class TorCmd<Success: Any> private constructor(
         public data object Reload: Unprivileged<Reply.Success.OK>("SIGNAL")
         public data object Dump: Unprivileged<Reply.Success.OK>("SIGNAL")
         public data object Debug: Unprivileged<Reply.Success.OK>("SIGNAL")
-
         public data object NewNym: Unprivileged<Reply.Success.OK>("SIGNAL")
         public data object ClearDnsCache: Unprivileged<Reply.Success.OK>("SIGNAL")
         public data object Heartbeat: Unprivileged<Reply.Success.OK>("SIGNAL")
@@ -533,8 +544,4 @@ public sealed class TorCmd<Success: Any> private constructor(
     }
 
     final override fun toString(): String = keyword
-
-    private companion object {
-        private val EMPTY_BYTES: ByteArray = ByteArray(0)
-    }
 }

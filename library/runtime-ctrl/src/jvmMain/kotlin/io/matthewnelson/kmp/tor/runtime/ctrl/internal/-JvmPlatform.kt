@@ -120,7 +120,11 @@ private fun Disposable.toCtrlConnection(
     }
 
     @Throws(IOException::class)
-    override fun close() { this@toCtrlConnection.invoke() }
+    override fun close() {
+        synchronized(this) {
+            this@toCtrlConnection.invoke()
+        }
+    }
 }
 
 private object UnixSocketReflect {

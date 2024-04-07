@@ -1868,8 +1868,6 @@ public class TorConfig private constructor(
             }
         }
 
-        // TODO: public fun toCtrlString(): String
-
         internal companion object {
 
             @JvmSynthetic
@@ -2055,7 +2053,6 @@ public class TorConfig private constructor(
         public override fun toString(): String = buildString {
             items.joinTo(this, separator = "\n")
         }
-        // TODO: public fun toCtrlString(): String
 
         // Returns a new Setting if it is a *Port that is
         // not configured as disabled or auto.
@@ -2147,5 +2144,4 @@ public class TorConfig private constructor(
     public override fun toString(): String = buildString {
         settings.joinTo(this, separator = "\n")
     }
-    // TODO: override fun toCtrlString(): String
 }

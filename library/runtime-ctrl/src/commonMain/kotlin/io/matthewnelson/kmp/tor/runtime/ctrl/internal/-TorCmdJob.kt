@@ -17,6 +17,7 @@
 
 package io.matthewnelson.kmp.tor.runtime.ctrl.internal
 
+import io.matthewnelson.immutable.collections.toImmutableMap
 import io.matthewnelson.kmp.tor.runtime.core.ctrl.Reply
 import io.matthewnelson.kmp.tor.runtime.core.ctrl.Reply.Error.Companion.toError
 import io.matthewnelson.kmp.tor.runtime.core.ctrl.TorCmd
@@ -41,48 +42,47 @@ internal fun TorCmdJob<*>.respond(replies: ArrayList<Reply>) {
             @Suppress("UNCHECKED_CAST")
             replies as ArrayList<Reply.Success>
         } else {
-            error(replies.toError())
             null
         }
     }
 
-    if (success == null) return
+    if (success == null) {
+        error(replies.toError())
+        return
+    }
 
     when (cmd) {
-        is TorCmd.Authenticate -> cmd.complete(this)
+        is TorCmd.Authenticate -> completeOK()
         is TorCmd.Config.Get -> cmd.complete(this, success)
-        is TorCmd.Config.Load -> cmd.complete(this)
-        is TorCmd.Config.Reset -> cmd.complete(this)
-        is TorCmd.Config.Save -> cmd.complete(this)
-        is TorCmd.Config.Set -> cmd.complete(this)
-        is TorCmd.DropGuards -> cmd.complete(this)
-        is TorCmd.Hs.Fetch -> cmd.complete(this)
+        is TorCmd.Config.Load -> completeOK()
+        is TorCmd.Config.Reset -> completeOK()
+        is TorCmd.Config.Save -> completeOK()
+        is TorCmd.Config.Set -> completeOK()
+        is TorCmd.DropGuards -> completeOK()
+        is TorCmd.Hs.Fetch -> completeOK()
         is TorCmd.Info.Get -> cmd.complete(this, success)
         is TorCmd.MapAddress -> cmd.complete(this, success)
         is TorCmd.Onion.Add -> cmd.complete(this, success)
-        is TorCmd.Onion.Delete -> cmd.complete(this, success)
-        is TorCmd.OnionClientAuth.Add -> cmd.complete(this, success)
-        is TorCmd.OnionClientAuth.Remove -> cmd.complete(this, success)
+        is TorCmd.Onion.Delete -> completeSuccess(success)
+        is TorCmd.OnionClientAuth.Add -> completeSuccess(success)
+        is TorCmd.OnionClientAuth.Remove -> completeSuccess(success)
         is TorCmd.OnionClientAuth.View -> cmd.complete(this, success)
-        is TorCmd.Ownership.Drop -> cmd.complete(this)
-        is TorCmd.Ownership.Take -> cmd.complete(this)
-        is TorCmd.Resolve -> cmd.complete(this)
-        is TorCmd.SetEvents -> cmd.complete(this)
-        is TorCmd.Signal.Halt -> cmd.complete(this)
-        is TorCmd.Signal.Shutdown -> cmd.complete(this)
-        is TorCmd.Signal.Active -> cmd.complete(this)
-        is TorCmd.Signal.ClearDnsCache -> cmd.complete(this)
-        is TorCmd.Signal.Debug -> cmd.complete(this)
-        is TorCmd.Signal.Dormant -> cmd.complete(this)
-        is TorCmd.Signal.Dump -> cmd.complete(this)
-        is TorCmd.Signal.Heartbeat -> cmd.complete(this)
-        is TorCmd.Signal.NewNym -> cmd.complete(this)
-        is TorCmd.Signal.Reload -> cmd.complete(this)
+        is TorCmd.Ownership.Drop -> completeOK()
+        is TorCmd.Ownership.Take -> completeOK()
+        is TorCmd.Resolve -> completeOK()
+        is TorCmd.SetEvents -> completeOK()
+        is TorCmd.Signal.Reload -> completeOK()
+        is TorCmd.Signal.Dump -> completeOK()
+        is TorCmd.Signal.Debug -> completeOK()
+        is TorCmd.Signal.NewNym -> completeOK()
+        is TorCmd.Signal.ClearDnsCache -> completeOK()
+        is TorCmd.Signal.Heartbeat -> completeOK()
+        is TorCmd.Signal.Active -> completeOK()
+        is TorCmd.Signal.Dormant -> completeOK()
+        is TorCmd.Signal.Shutdown -> completeOK()
+        is TorCmd.Signal.Halt -> completeOK()
     }
 }
-
-@Suppress("NOTHING_TO_INLINE")
-private inline fun TorCmd.Authenticate.complete(job: TorCmdJob<*>) { job.completeOK() }
 
 @Suppress("NOTHING_TO_INLINE")
 private inline fun TorCmd.Config.Get.complete(job: TorCmdJob<*>, replies: ArrayList<Reply.Success>) {
@@ -90,26 +90,20 @@ private inline fun TorCmd.Config.Get.complete(job: TorCmdJob<*>, replies: ArrayL
 }
 
 @Suppress("NOTHING_TO_INLINE")
-private inline fun TorCmd.Config.Load.complete(job: TorCmdJob<*>) { job.completeOK() }
-
-@Suppress("NOTHING_TO_INLINE")
-private inline fun TorCmd.Config.Reset.complete(job: TorCmdJob<*>) { job.completeOK() }
-
-@Suppress("NOTHING_TO_INLINE")
-private inline fun TorCmd.Config.Save.complete(job: TorCmdJob<*>) { job.completeOK() }
-
-@Suppress("NOTHING_TO_INLINE")
-private inline fun TorCmd.Config.Set.complete(job: TorCmdJob<*>) { job.completeOK() }
-
-@Suppress("NOTHING_TO_INLINE")
-private inline fun TorCmd.DropGuards.complete(job: TorCmdJob<*>) { job.completeOK() }
-
-@Suppress("NOTHING_TO_INLINE")
-private inline fun TorCmd.Hs.Fetch.complete(job: TorCmdJob<*>) { job.completeOK() }
-
-@Suppress("NOTHING_TO_INLINE")
 private inline fun TorCmd.Info.Get.complete(job: TorCmdJob<*>, replies: ArrayList<Reply.Success>) {
-    TODO()
+    val map = LinkedHashMap<String, String>(keywords.size, 1.0f)
+
+    for (reply in replies) {
+        if (reply is Reply.Success.OK) continue
+
+        val kvp = reply.message
+        val i = kvp.indexOf('=')
+        if (i == -1) continue
+
+        map[kvp.substring(0, i)] = kvp.substring(i + 1)
+    }
+
+    job.unsafeCast<Map<String, String>>().completion(map.toImmutableMap())
 }
 
 @Suppress("NOTHING_TO_INLINE")
@@ -123,69 +117,19 @@ private inline fun TorCmd.Onion.Add.complete(job: TorCmdJob<*>, replies: ArrayLi
 }
 
 @Suppress("NOTHING_TO_INLINE")
-private inline fun TorCmd.Onion.Delete.complete(job: TorCmdJob<*>, replies: ArrayList<Reply.Success>) {
-    job.unsafeCast<Reply.Success>().completion(replies.first())
-}
-
-@Suppress("NOTHING_TO_INLINE")
-private inline fun TorCmd.OnionClientAuth.Add.complete(job: TorCmdJob<*>, replies: ArrayList<Reply.Success>) {
-    job.unsafeCast<Reply.Success>().completion(replies.first())
-}
-
-@Suppress("NOTHING_TO_INLINE")
-private inline fun TorCmd.OnionClientAuth.Remove.complete(job: TorCmdJob<*>, replies: ArrayList<Reply.Success>) {
-    job.unsafeCast<Reply.Success>().completion(replies.first())
-}
-
-@Suppress("NOTHING_TO_INLINE")
 private inline fun TorCmd.OnionClientAuth.View.complete(job: TorCmdJob<*>, replies: ArrayList<Reply.Success>) {
     TODO()
 }
 
 @Suppress("NOTHING_TO_INLINE")
-private inline fun TorCmd.Ownership.Drop.complete(job: TorCmdJob<*>) { job.completeOK() }
+private inline fun TorCmdJob<*>.completeOK() {
+    unsafeCast<Reply.Success.OK>().completion(Reply.Success.OK)
+}
 
 @Suppress("NOTHING_TO_INLINE")
-private inline fun TorCmd.Ownership.Take.complete(job: TorCmdJob<*>) { job.completeOK() }
-
-@Suppress("NOTHING_TO_INLINE")
-private inline fun TorCmd.Resolve.complete(job: TorCmdJob<*>) { job.completeOK() }
-
-@Suppress("NOTHING_TO_INLINE")
-private inline fun TorCmd.SetEvents.complete(job: TorCmdJob<*>) { job.completeOK() }
-
-@Suppress("NOTHING_TO_INLINE")
-private inline fun TorCmd.Signal.Reload.complete(job: TorCmdJob<*>) { job.completeOK() }
-
-@Suppress("NOTHING_TO_INLINE")
-private inline fun TorCmd.Signal.Dump.complete(job: TorCmdJob<*>) { job.completeOK() }
-
-@Suppress("NOTHING_TO_INLINE")
-private inline fun TorCmd.Signal.Debug.complete(job: TorCmdJob<*>) { job.completeOK() }
-
-@Suppress("NOTHING_TO_INLINE")
-private inline fun TorCmd.Signal.NewNym.complete(job: TorCmdJob<*>) { job.completeOK() }
-
-@Suppress("NOTHING_TO_INLINE")
-private inline fun TorCmd.Signal.ClearDnsCache.complete(job: TorCmdJob<*>) { job.completeOK() }
-
-@Suppress("NOTHING_TO_INLINE")
-private inline fun TorCmd.Signal.Heartbeat.complete(job: TorCmdJob<*>) { job.completeOK() }
-
-@Suppress("NOTHING_TO_INLINE")
-private inline fun TorCmd.Signal.Active.complete(job: TorCmdJob<*>) { job.completeOK() }
-
-@Suppress("NOTHING_TO_INLINE")
-private inline fun TorCmd.Signal.Dormant.complete(job: TorCmdJob<*>) { job.completeOK() }
-
-@Suppress("NOTHING_TO_INLINE")
-private inline fun TorCmd.Signal.Shutdown.complete(job: TorCmdJob<*>) { job.completeOK() }
-
-@Suppress("NOTHING_TO_INLINE")
-private inline fun TorCmd.Signal.Halt.complete(job: TorCmdJob<*>) { job.completeOK() }
-
-@Suppress("NOTHING_TO_INLINE")
-private inline fun TorCmdJob<*>.completeOK() { unsafeCast<Reply.Success.OK>().completion(Reply.Success.OK) }
+private inline fun TorCmdJob<*>.completeSuccess(success: ArrayList<Reply.Success>) {
+    unsafeCast<Reply.Success>().completion(success.first())
+}
 
 @Suppress("NOTHING_TO_INLINE", "UNCHECKED_CAST")
 private inline fun <T: Any> TorCmdJob<*>.unsafeCast(): TorCmdJob<T> = this as TorCmdJob<T>
