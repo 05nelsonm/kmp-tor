@@ -13,6 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
+@file:Suppress("UnnecessaryOptInAnnotation")
+
 package io.matthewnelson.kmp.tor.runtime.core.internal
 
 import io.matthewnelson.kmp.file.IOException
@@ -23,6 +25,7 @@ import kotlinx.cinterop.*
 import platform.posix.*
 
 @InternalKmpTorApi
+@OptIn(UnsafeNumber::class)
 public sealed class InetAddress private constructor(public val family: sa_family_t) {
 
     public class V4 internal constructor(
