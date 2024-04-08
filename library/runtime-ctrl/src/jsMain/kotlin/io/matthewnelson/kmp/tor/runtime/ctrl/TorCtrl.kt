@@ -163,17 +163,22 @@ public actual interface TorCtrl : Destroyable, TorEvent.Processor, TorCmd.Privil
                 }
             }
 
+            val rBuf = ReadBuffer.allocate()
+
             fun callback(nread: Int, buf: dynamic) {
-                val jsBuf = Buffer.wrap(buf)
-                val readBuf = ReadBuffer.of(jsBuf)
+                val readBuf = try {
+                    val jsBuf = Buffer.wrap(buf)
+                    ReadBuffer.of(jsBuf)
+                } catch (_: Throwable) {
+                    rBuf
+                }
+
                 feed.onData(readBuf, nread)
             }
 
-            val buf = ReadBuffer.allocate()
-
             run {
                 val onReadOptions = js("{}")
-                onReadOptions["buffer"] = buf.buf.unwrap()
+                onReadOptions["buffer"] = rBuf.buf.unwrap()
                 onReadOptions["callback"] = ::callback
 
                 options["onread"] = onReadOptions
@@ -192,7 +197,7 @@ public actual interface TorCtrl : Destroyable, TorEvent.Processor, TorCmd.Privil
                     threw = IOException("$error")
                 }
 
-                socket.onceClose { feed.close(); buf.buf.fill() }
+                socket.onceClose { feed.close(); rBuf.buf.fill() }
 
                 withContext(NonCancellable) {
                     val mark = TimeSource.Monotonic.markNow()
