@@ -32,6 +32,7 @@ import io.matthewnelson.kmp.tor.runtime.ctrl.internal.RealTorCtrl
 import io.matthewnelson.kmp.tor.runtime.ctrl.internal.checkUnixSockedSupport
 import io.matthewnelson.kmp.tor.runtime.ctrl.internal.net_createConnection
 import kotlinx.coroutines.*
+import org.khronos.webgl.Uint8Array
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.TimeSource
 
@@ -246,12 +247,21 @@ public actual interface TorCtrl : Destroyable, TorEvent.Processor, TorCmd.Privil
                 override suspend fun write(command: ByteArray) {
                     if (command.isEmpty()) return
 
+                    val chunk = Uint8Array(command.size)
+                    @Suppress("LocalVariableName")
+                    val _chunk = chunk.asDynamic()
+                    for (i in command.indices) { _chunk[i] = command[i]  }
+
                     val wLatch = Job()
                     var dLatch: Job? = null
 
                     try {
-                        // Must utilize string because windows
-                        val immediate = socket.write(command.decodeToString()) { wLatch.cancel() }
+                        val immediate = socket.write(chunk, callback = {
+                            wLatch.cancel()
+
+                            // fill
+                            for (i in command.indices) { _chunk[i] = 0 }
+                        })
 
                         if (!immediate) {
                             dLatch = Job()

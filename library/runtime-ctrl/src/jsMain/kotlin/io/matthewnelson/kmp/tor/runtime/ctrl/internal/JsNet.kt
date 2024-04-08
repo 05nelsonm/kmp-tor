@@ -37,7 +37,7 @@ internal external class net_Socket: events_EventEmitter {
 
     // @Throws(Throwable::class)
     internal fun write(
-        data: String,
+        chunk: Uint8Array,
         callback: () -> Unit,
     ): Boolean
 
