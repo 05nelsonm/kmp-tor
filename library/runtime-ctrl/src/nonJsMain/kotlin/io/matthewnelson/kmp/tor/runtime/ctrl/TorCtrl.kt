@@ -19,7 +19,9 @@ package io.matthewnelson.kmp.tor.runtime.ctrl
 
 import io.matthewnelson.kmp.file.File
 import io.matthewnelson.kmp.file.IOException
+import io.matthewnelson.kmp.file.InterruptedException
 import io.matthewnelson.kmp.file.wrapIOException
+import io.matthewnelson.kmp.process.Blocking
 import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
 import io.matthewnelson.kmp.tor.runtime.core.*
 import io.matthewnelson.kmp.tor.runtime.core.UncaughtException.Handler.Companion.requireInstanceIsNotSuppressed
@@ -36,6 +38,7 @@ import kotlin.contracts.contract
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.cancellation.CancellationException
 import kotlin.jvm.JvmOverloads
+import kotlin.time.Duration.Companion.milliseconds
 
 /**
  * A Tor control connection
@@ -56,11 +59,7 @@ public actual interface TorCtrl : Destroyable, TorEvent.Processor, TorCmd.Privil
      * then it will also stop the tor process.
      *
      * Successive invocations do nothing.
-     *
-     * @throws [IOException] if underlying Socket.close() failed
-     *   for the given platform
      * */
-    // @Throws(IOException::class)
     public actual override fun destroy()
 
     /**
@@ -192,7 +191,19 @@ public actual interface TorCtrl : Destroyable, TorEvent.Processor, TorCmd.Privil
                 throw t.wrapIOException()
             }
 
-            return RealTorCtrl.of(this, dispatcher, connection)
+            val ctrl = RealTorCtrl.of(this, dispatcher, connection)
+
+            try {
+                // A slight delay is needed before returning in order
+                // to ensure that the coroutine starts before able
+                // to call destroy on it.
+                Blocking.threadSleep(25.milliseconds)
+            } catch (e: InterruptedException) {
+                ctrl.destroy()
+                throw IOException("Interrupted", e)
+            }
+
+            return ctrl
         }
 
         @InternalKmpTorApi

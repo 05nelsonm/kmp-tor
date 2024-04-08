@@ -55,11 +55,7 @@ public actual interface TorCtrl : Destroyable, TorEvent.Processor, TorCmd.Privil
      * then it will also stop the tor process.
      *
      * Successive invocations do nothing.
-     *
-     * @throws [IOException] if underlying Socket.close() failed
-     *   for the given platform
      * */
-    // @Throws(IOException::class)
     public actual override fun destroy()
 
     /**
@@ -280,7 +276,19 @@ public actual interface TorCtrl : Destroyable, TorEvent.Processor, TorCmd.Privil
                 override fun close() { socket.destroy() }
             }
 
-            return RealTorCtrl.of(this, Dispatchers.Main, connection)
+            val ctrl = RealTorCtrl.of(this, Dispatchers.Main, connection)
+
+            try {
+                // A slight delay is needed before returning in order
+                // to ensure that the coroutine starts before able
+                // to call destroy on it.
+                delay(25.milliseconds)
+            } catch (t: Throwable) {
+                ctrl.destroy()
+                throw t
+            }
+
+            return ctrl
         }
 
         @InternalKmpTorApi
