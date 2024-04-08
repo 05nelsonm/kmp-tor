@@ -252,20 +252,20 @@ public actual interface TorCtrl : Destroyable, TorEvent.Processor, TorCmd.Privil
                     val _chunk = chunk.asDynamic()
                     for (i in command.indices) { _chunk[i] = command[i]  }
 
-                    val wLatch = Job()
-                    var dLatch: Job? = null
+                    val wLatch: CompletableJob = Job(currentCoroutineContext()[Job])
+                    var dLatch: CompletableJob? = null
 
                     try {
                         val immediate = socket.write(chunk, callback = {
-                            wLatch.cancel()
+                            wLatch.complete()
 
                             // fill
                             for (i in command.indices) { _chunk[i] = 0 }
                         })
 
                         if (!immediate) {
-                            dLatch = Job()
-                            socket.once("drain") { dLatch.cancel() }
+                            dLatch = Job(wLatch)
+                            socket.once("drain") { dLatch.complete() }
                         }
                     } catch (t: Throwable) {
                         wLatch.cancel()
