@@ -23,13 +23,14 @@ package io.matthewnelson.kmp.tor.runtime.core.internal
 
 import io.matthewnelson.kmp.file.IOException
 import io.matthewnelson.kmp.file.errnoToIOException
-import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
 import io.matthewnelson.kmp.tor.runtime.core.address.IPAddress
 import io.matthewnelson.kmp.tor.runtime.core.internal.InetAddress.Companion.toInetAddress
 import kotlinx.cinterop.*
+import org.kotlincrypto.endians.BigEndian.Companion.toBigEndian
 import platform.posix.*
+import kotlin.experimental.ExperimentalNativeApi
 
-@OptIn(ExperimentalForeignApi::class, ExperimentalStdlibApi::class, InternalKmpTorApi::class, UnsafeNumber::class)
+@OptIn(ExperimentalForeignApi::class, ExperimentalStdlibApi::class, UnsafeNumber::class)
 internal actual value class ServerSocketProducer private actual constructor(
     private actual val value: Any
 ) {
@@ -68,8 +69,8 @@ internal actual value class ServerSocketProducer private actual constructor(
         }
 
         address.doBind(port) { pointer, size ->
-            val result = bind(descriptor, pointer, size)
-            if (result != 0) {
+            if (bind(descriptor, pointer, size) != 0) {
+                val errno = errno
                 closeableDescriptor.use {}
                 throw errnoToIOException(errno)
             }
@@ -106,9 +107,9 @@ internal actual value class ServerSocketProducer private actual constructor(
         ) {
             when (this) {
                 is InetAddress.V4 -> cValue<sockaddr_in> {
+                    sin_family = family
                     sin_addr.s_addr = address
                     sin_port = port.toSinPort()
-                    sin_family = family
 
                     block(ptr.reinterpret(), sizeOf<sockaddr_in>().convert())
                 }
@@ -121,6 +122,17 @@ internal actual value class ServerSocketProducer private actual constructor(
                     block(ptr.reinterpret(), sizeOf<sockaddr_in6>().convert())
                 }
             }
+        }
+
+        private fun Int.toSinPort(): UShort {
+            @OptIn(ExperimentalNativeApi::class)
+            if (!Platform.isLittleEndian) return toUShort()
+
+            return toShort()
+                .toBigEndian()
+                .toLittleEndian()
+                .toShort()
+                .toUShort()
         }
     }
 }

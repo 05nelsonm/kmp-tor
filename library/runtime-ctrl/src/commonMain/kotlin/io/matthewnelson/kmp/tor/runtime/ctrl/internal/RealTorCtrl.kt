@@ -27,6 +27,7 @@ import kotlinx.coroutines.*
 import kotlin.concurrent.Volatile
 import kotlin.coroutines.cancellation.CancellationException
 import kotlin.jvm.JvmSynthetic
+import kotlin.time.Duration.Companion.milliseconds
 
 @OptIn(InternalKmpTorApi::class)
 internal class RealTorCtrl private constructor(
@@ -132,7 +133,20 @@ internal class RealTorCtrl private constructor(
     init {
         scope.launch {
             LOG.d { "Starting Read" }
-            connection.startRead(parser)
+            try {
+                connection.startRead(parser)
+            } catch (_: IllegalStateException) {
+                // Can happen if destroy is called immediately
+                // after connect returns the instance (before
+                // the coroutine lambda actually executes in bg
+                // thread).
+                //
+                // If so, need to ensure parser's EOS gets triggered.
+                parser.parse(null)
+
+                // Slight delay before invoking onDestroy
+                delay(25.milliseconds)
+            }
         }.invokeOnCompletion {
             LOG.d { "Stopped Reading" }
             onDestroy()

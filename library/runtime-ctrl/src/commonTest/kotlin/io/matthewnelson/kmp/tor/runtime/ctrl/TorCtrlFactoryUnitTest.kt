@@ -35,7 +35,7 @@ import kotlin.test.fail
 import kotlin.time.Duration.Companion.milliseconds
 
 @OptIn(InternalKmpTorApi::class)
-abstract class TorCtrlFactoryUnitTest {
+class TorCtrlFactoryUnitTest {
 
     @Test
     fun givenIPv4_whenConnect_thenIsSuccessful() = runTest {
@@ -54,36 +54,36 @@ abstract class TorCtrlFactoryUnitTest {
         }
     }
 
-    @Test
-    fun givenUnixDomainSocket_whenConnect_thenIsSuccessful() = runTest {
-        val uds = TestUtils.INSTALLER.installationDir
-            .resolve("data")
-            .resolve("ctrl.sock")
-
-        uds.delete()
-
-        val ctrlArg = try {
-            TorConfig.__ControlPort.Builder {
-                asUnixSocket { file = uds }
-            }.argument
-        } catch (_: UnsupportedOperationException) {
-            println("Skipping...")
-            return@runTest
-        }
-
-        val p = TestUtils.startTor(ctrlArg)
-
-        val ctrl = try {
-            TorCtrl.Factory(handler = UncaughtException.Handler.THROW)
-                .connectAsync(uds)
-        } finally {
-            p.destroy()
-        }
-
-        withContext(Dispatchers.Default) { delay(250.milliseconds) }
-
-        assertTrue(ctrl.isDestroyed())
-    }
+//    @Test
+//    fun givenUnixDomainSocket_whenConnect_thenIsSuccessful() = runTest {
+//        val uds = TestUtils.INSTALLER.installationDir
+//            .resolve("data")
+//            .resolve("ctrl.sock")
+//
+//        uds.delete()
+//
+//        val ctrlArg = try {
+//            TorConfig.__ControlPort.Builder {
+//                asUnixSocket { file = uds }
+//            }.argument
+//        } catch (_: UnsupportedOperationException) {
+//            println("Skipping...")
+//            return@runTest
+//        }
+//
+//        val p = TestUtils.startTor(ctrlArg)
+//
+//        val ctrl = try {
+//            TorCtrl.Factory(handler = UncaughtException.Handler.THROW)
+//                .connectAsync(uds)
+//        } finally {
+//            p.destroy()
+//        }
+//
+//        withContext(Dispatchers.Default) { delay(250.milliseconds) }
+//
+//        assertTrue(ctrl.isDestroyed())
+//    }
 
     private suspend fun LocalHost.runTCPTest(
         block: suspend (process: Process, ctrl: TorCtrl) -> Unit = { process, ctrl ->

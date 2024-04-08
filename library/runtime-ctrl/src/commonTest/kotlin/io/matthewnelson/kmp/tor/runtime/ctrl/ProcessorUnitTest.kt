@@ -35,7 +35,7 @@ import kotlin.test.assertEquals
 import kotlin.time.Duration.Companion.milliseconds
 
 @OptIn(InternalKmpTorApi::class)
-abstract class ProcessorUnitTest {
+class ProcessorUnitTest {
 
     @Test
     fun givenCommands_whenMultiple_thenSingleProcessorUtilized() = runTest {

@@ -83,13 +83,16 @@ private fun Disposable.toCtrlConnection(
 ): CtrlConnection = object : CtrlConnection {
 
     @Volatile
+    private var _isClosed: Boolean = false
+    @Volatile
     private var _isReading: Boolean = false
 
-    @Throws(IOException::class)
+    @Throws(IllegalStateException::class)
     @OptIn(InternalProcessApi::class)
     override suspend fun startRead(parser: CtrlConnection.Parser) {
         synchronized(this) {
-            if (_isReading) throw IOException("Already reading input")
+            if (_isClosed) throw IllegalStateException("Connection is closed")
+            if (_isReading) throw IllegalStateException("Already reading input")
             _isReading = true
         }
 
@@ -121,7 +124,11 @@ private fun Disposable.toCtrlConnection(
 
     @Throws(IOException::class)
     override fun close() {
+        if (_isClosed) return
+
         synchronized(this) {
+            if (_isClosed) return
+            _isClosed = true
             this@toCtrlConnection.invoke()
         }
     }

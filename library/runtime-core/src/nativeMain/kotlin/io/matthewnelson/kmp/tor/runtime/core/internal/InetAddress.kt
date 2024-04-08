@@ -19,32 +19,29 @@ package io.matthewnelson.kmp.tor.runtime.core.internal
 
 import io.matthewnelson.kmp.file.IOException
 import io.matthewnelson.kmp.file.errnoToIOException
-import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
 import io.matthewnelson.kmp.tor.runtime.core.address.IPAddress
 import kotlinx.cinterop.*
 import platform.posix.*
 
-@InternalKmpTorApi
 @OptIn(UnsafeNumber::class)
-public sealed class InetAddress private constructor(public val family: sa_family_t) {
+internal sealed class InetAddress private constructor(internal val family: sa_family_t) {
 
-    public class V4 internal constructor(
+    internal class V4 internal constructor(
         family: sa_family_t,
-        public val address: in_addr_t,
+        internal val address: in_addr_t,
     ): InetAddress(family)
 
-    public class V6 internal constructor(
+    internal class V6 internal constructor(
         family: sa_family_t,
-        public val flowInfo: uint32_t,
-        public val scopeId: uint32_t,
+        internal val flowInfo: uint32_t,
+        internal val scopeId: uint32_t,
     ): InetAddress(family)
 
-    public companion object {
+    internal companion object {
 
-        @InternalKmpTorApi
-        @ExperimentalForeignApi
         @Throws(IOException::class)
-        public fun IPAddress.toInetAddress(): InetAddress = memScoped {
+        @OptIn(ExperimentalForeignApi::class)
+        internal fun IPAddress.toInetAddress(): InetAddress = memScoped {
             val hint: CValue<addrinfo> = cValue {
                 ai_family = when (this@toInetAddress) {
                     is IPAddress.V4 -> AF_INET

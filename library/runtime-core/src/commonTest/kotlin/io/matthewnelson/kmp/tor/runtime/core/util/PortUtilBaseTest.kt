@@ -36,14 +36,18 @@ abstract class PortUtilBaseTest {
 
     @Test
     fun givenPort_whenIPv4Unavailable_thenIsAvailableReturnsFalse() = runTest {
-        val port = LocalHost.IPv4.holdServerSocket()
+        val (socket, port) = LocalHost.IPv4.holdServerSocket()
         assertFalse(port.isAvailableAsync(LocalHost.IPv4))
+        socket.close()
+        assertTrue(port.isAvailableAsync(LocalHost.IPv4))
     }
 
     @Test
     fun givenPort_whenIPv6Unavailable_thenIsAvailableReturnsFalse() = runTest {
-        val port = LocalHost.IPv6.holdServerSocket()
+        val (socket, port) = LocalHost.IPv6.holdServerSocket()
         assertFalse(port.isAvailableAsync(LocalHost.IPv6))
+        socket.close()
+        assertTrue(port.isAvailableAsync(LocalHost.IPv6))
     }
 
     @Test
@@ -99,7 +103,7 @@ abstract class PortUtilBaseTest {
 
     private suspend fun LocalHost.holdServerSocket(
         port: Port.Proxy? = null
-    ): Port.Proxy {
+    ): Pair<AutoCloseable, Port.Proxy> {
         val portProxy = port ?: Port.Proxy.MIN
             .toPortProxy()
             .findAvailableAsync(1_000, this)
@@ -115,6 +119,6 @@ abstract class PortUtilBaseTest {
             // b/c JS needs to establish the connection
             delay(10.milliseconds)
         }
-        return portProxy
+        return socket to portProxy
     }
 }

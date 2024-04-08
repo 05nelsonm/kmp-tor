@@ -20,11 +20,6 @@ import io.matthewnelson.kmp.file.IOException
 import io.matthewnelson.kmp.tor.runtime.core.address.ProxyAddress
 
 @Throws(Throwable::class)
-internal actual fun ProxyAddress.connect(): CtrlConnection {
-    throw IOException("Not yet implemented")
-}
-
-@Throws(Throwable::class)
 internal actual fun File.connect(): CtrlConnection {
     throw IOException("Not yet implemented")
 }
