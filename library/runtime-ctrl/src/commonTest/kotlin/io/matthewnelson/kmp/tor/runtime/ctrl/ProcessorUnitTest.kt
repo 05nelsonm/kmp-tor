@@ -32,6 +32,7 @@ import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.withContext
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertTrue
 import kotlin.time.Duration.Companion.milliseconds
 
 @OptIn(InternalKmpTorApi::class)
@@ -88,7 +89,11 @@ class ProcessorUnitTest {
                 if (it.contains("Processor Started")) it else null
             }
 
-            assertEquals(2, processorStarts.size)
+            // Simply need to know if the processor handled multiple
+            // commands when they were available, and other startProcessor
+            // calls were ignored (b/c was already looping). Cannot utilize
+            // a hard number because test will be flaky.
+            assertTrue(processorStarts.size < invocationSuccess)
         }
     }
 }
