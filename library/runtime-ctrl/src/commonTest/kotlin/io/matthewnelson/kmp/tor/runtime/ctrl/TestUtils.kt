@@ -40,6 +40,9 @@ public object TestUtils {
         val homeDir = INSTALLER.installationDir
         val dataDir = homeDir.resolve("data")
         val cacheDir = homeDir.resolve("cache")
+
+        withContext(Dispatchers.Default) { delay(250.milliseconds) }
+
         val p = Process.Builder(paths.tor)
             .args("--DataDirectory")
             .args(dataDir.also { it.mkdirs() }.path)
