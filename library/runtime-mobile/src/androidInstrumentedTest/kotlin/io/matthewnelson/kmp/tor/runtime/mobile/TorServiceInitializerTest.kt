@@ -27,7 +27,7 @@ class TorServiceInitializerTest {
     }
 
     @Test
-    fun givenDependencies_whenKmpTorLibLocatorNotPresent_thenDoesNotAddAsDependency() {
-        assertEquals(0, TorService.Initializer().dependencies().size)
+    fun givenDependencies_whenKmpTorLibLocatorPresent_thenAddsAsDependency() {
+        assertEquals(1, TorService.Initializer().dependencies().size)
     }
 }

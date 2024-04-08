@@ -21,23 +21,23 @@
 
 package io.matthewnelson.kmp.tor.runtime.core.internal
 
-import io.matthewnelson.kmp.file.DelicateFileApi
 import io.matthewnelson.kmp.file.IOException
 import io.matthewnelson.kmp.file.errnoToIOException
 import io.matthewnelson.kmp.tor.runtime.core.address.IPAddress
+import io.matthewnelson.kmp.tor.runtime.core.internal.InetAddress.Companion.toInetAddress
 import kotlinx.cinterop.*
 import org.kotlincrypto.endians.BigEndian.Companion.toBigEndian
 import platform.posix.*
 import kotlin.experimental.ExperimentalNativeApi
 
-@OptIn(ExperimentalForeignApi::class, ExperimentalStdlibApi::class, DelicateFileApi::class, UnsafeNumber::class)
-internal actual value class InetAddressWrapper private actual constructor(
+@OptIn(ExperimentalForeignApi::class, ExperimentalStdlibApi::class, UnsafeNumber::class)
+internal actual value class ServerSocketProducer private actual constructor(
     private actual val value: Any
 ) {
 
     @Throws(Exception::class)
-    internal actual fun openServerSocket(port: Int): AutoCloseable = memScoped {
-        val address = value as Address
+    internal actual fun open(port: Int): AutoCloseable = memScoped {
+        val address = value as InetAddress
 
         val descriptor = socket(address.family.convert(), SOCK_STREAM, 0)
         if (descriptor < 0) {
@@ -68,9 +68,9 @@ internal actual value class InetAddressWrapper private actual constructor(
             throw IllegalStateException(message)
         }
 
-        address.callback(port) { pointer, size ->
-            val result = bind(descriptor, pointer, size)
-            if (result != 0) {
+        address.doBind(port) { pointer, size ->
+            if (bind(descriptor, pointer, size) != 0) {
+                val errno = errno
                 closeableDescriptor.use {}
                 throw errnoToIOException(errno)
             }
@@ -97,85 +97,42 @@ internal actual value class InetAddressWrapper private actual constructor(
     internal actual companion object {
 
         @Throws(IOException::class)
-        internal actual fun IPAddress.toInetAddressWrapper(): InetAddressWrapper = memScoped {
-            val hint: CValue<addrinfo> = cValue {
-                ai_family = when (this@toInetAddressWrapper) {
-                    is IPAddress.V4 -> AF_INET
-                    is IPAddress.V6 -> AF_INET6
-                }
-                ai_socktype = SOCK_STREAM
-                ai_flags = AI_NUMERICHOST
-                ai_protocol = 0
-            }
-
-            val result = alloc<CPointerVar<addrinfo>>()
-            if (getaddrinfo(value, null, hint, result.ptr) != 0) {
-                throw errnoToIOException(errno)
-            }
-
-            defer { freeaddrinfo(result.value) }
-
-            val addr = result.pointed
-                ?.ai_addr
-                ?.pointed
-                ?: throw IOException("Failed to retrieve sockaddr for ${canonicalHostname()}")
-
-            val family: sa_family_t = addr.sa_family
-
-            val callback: Callback = when (this@toInetAddressWrapper) {
-                is IPAddress.V4 -> {
-                    val sockaddr = addr.reinterpret<sockaddr_in>()
-                    val address: in_addr_t = sockaddr.sin_addr.s_addr
-
-                    Callback { port, block ->
-                        cValue<sockaddr_in> {
-                            sin_addr.s_addr = address
-                            sin_port = portToSinPort(port)
-                            sin_family = family
-
-                            block(ptr.reinterpret(), sizeOf<sockaddr_in>().convert())
-                        }
-                    }
-                }
-                is IPAddress.V6 -> {
-                    val sockaddr = addr.reinterpret<sockaddr_in6>()
-                    val flowInfo: uint32_t = sockaddr.sin6_flowinfo
-                    val scopeId: uint32_t = sockaddr.sin6_scope_id
-
-                    Callback { port, block ->
-                        cValue<sockaddr_in6> {
-                            sin6_family = family
-                            sin6_flowinfo = flowInfo
-                            sin6_port = portToSinPort(port)
-                            sin6_scope_id = scopeId
-
-                            block(ptr.reinterpret(), sizeOf<sockaddr_in6>().convert())
-                        }
-                    }
-                }
-            }
-
-            InetAddressWrapper(Address(family, callback))
+        internal actual fun IPAddress.toServerSocketProducer(): ServerSocketProducer {
+            return ServerSocketProducer(toInetAddress())
         }
 
-        private fun portToSinPort(port: Int): UShort {
-            @OptIn(ExperimentalNativeApi::class)
-            if (!Platform.isLittleEndian) return port.toUShort()
+        private fun InetAddress.doBind(
+            port: Int,
+            block: (CPointer<sockaddr>, socklen_t) -> Unit
+        ) {
+            when (this) {
+                is InetAddress.V4 -> cValue<sockaddr_in> {
+                    sin_family = family
+                    sin_addr.s_addr = address
+                    sin_port = port.toSinPort()
 
-            return port.toShort()
+                    block(ptr.reinterpret(), sizeOf<sockaddr_in>().convert())
+                }
+                is InetAddress.V6 -> cValue<sockaddr_in6> {
+                    sin6_family = family
+                    sin6_flowinfo = flowInfo
+                    sin6_port = port.toSinPort()
+                    sin6_scope_id = scopeId
+
+                    block(ptr.reinterpret(), sizeOf<sockaddr_in6>().convert())
+                }
+            }
+        }
+
+        private fun Int.toSinPort(): UShort {
+            @OptIn(ExperimentalNativeApi::class)
+            if (!Platform.isLittleEndian) return toUShort()
+
+            return toShort()
                 .toBigEndian()
                 .toLittleEndian()
                 .toShort()
                 .toUShort()
         }
-    }
-
-    private class Address(val family: sa_family_t, val callback: Callback)
-
-    private fun interface Callback {
-        operator fun invoke(
-            port: Int,
-            block: (CPointer<sockaddr>, socklen_t) -> Unit,
-        )
     }
 }

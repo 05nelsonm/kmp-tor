@@ -81,15 +81,15 @@ public sealed class LocalHost private constructor(): Address("localhost") {
         companion object {
 
             @Volatile
-            private var cache: Cache? = null
+            private var _cache: Cache? = null
 
             @JvmStatic
             internal fun getOrNull(): Set<IPAddress>? {
-                val cache = cache ?: return null
+                val cache = _cache ?: return null
                 if (cache.isNotExpired()) {
                     return cache.addresses
                 }
-                this.cache = null
+                _cache = null
                 return null
             }
 
@@ -115,7 +115,7 @@ public sealed class LocalHost private constructor(): Address("localhost") {
                     throw IOException("No IP addresses found for localhost")
                 }
 
-                cache = Cache(addresses.toImmutableSet())
+                _cache = Cache(addresses.toImmutableSet())
                 return addresses
             }
 

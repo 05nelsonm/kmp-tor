@@ -46,14 +46,14 @@ abstract class UnixSocketBuilderBaseTest {
         val path = buildString {
             // rooted so current working dir (test dir) isn't resolved
             append(SysDirSep)
-            // sep + 104 characters (maximum size allowed is 105)
-            repeat(104) { append('a') }
+            // sep + 104 characters (maximum size allowed is 104)
+            repeat(103) { append('a') }
         }
 
         assertNotNull(UnixSocketBuilder.build { file = path.toFile() })
 
         assertFailsWith<UnsupportedOperationException> {
-            // 106 characters
+            // 105 characters
             UnixSocketBuilder.build { file = (path + "a").toFile() }
         }
     }

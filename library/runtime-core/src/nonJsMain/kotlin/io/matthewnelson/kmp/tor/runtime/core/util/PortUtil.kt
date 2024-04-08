@@ -21,7 +21,7 @@ import io.matthewnelson.kmp.file.IOException
 import io.matthewnelson.kmp.file.wrapIOException
 import io.matthewnelson.kmp.tor.runtime.core.address.LocalHost
 import io.matthewnelson.kmp.tor.runtime.core.address.Port
-import io.matthewnelson.kmp.tor.runtime.core.internal.InetAddressWrapper.Companion.toInetAddressWrapper
+import io.matthewnelson.kmp.tor.runtime.core.internal.ServerSocketProducer.Companion.toServerSocketProducer
 import io.matthewnelson.kmp.tor.runtime.core.internal.PortProxyIterator.Companion.iterator
 import io.matthewnelson.kmp.tor.runtime.core.internal.cancellationExceptionOr
 import io.matthewnelson.kmp.tor.runtime.core.internal.isPortAvailable
@@ -34,6 +34,7 @@ import kotlin.jvm.JvmName
  * Checks if the TCP port is available on [LocalHost] or not.
  *
  * @param [host] either [LocalHost.IPv4] or [LocalHost.IPv6]
+ * @see [isAvailableSync]
  * @throws [IOException] if [LocalHost.resolve] fails
  * @throws [CancellationException] if underlying coroutine was cancelled
  * */
@@ -41,7 +42,7 @@ import kotlin.jvm.JvmName
 public actual suspend fun Port.isAvailableAsync(
     host: LocalHost,
 ): Boolean = withContext(Dispatchers.IO) {
-    isAvailable(host)
+    isAvailableSync(host)
 }
 
 /**
@@ -53,8 +54,9 @@ public actual suspend fun Port.isAvailableAsync(
  *
  * @param [host] either [LocalHost.IPv4] or [LocalHost.IPv6]
  * @param [limit] the number of ports to scan. min: 1, max: 1_000
+ * @see [findAvailableSync]
  * @throws [IllegalArgumentException] if [limit] is not between 1 and 1_000 (inclusive)
- * @throws [IOException] if [LocalHost.resolve] fails
+ * @throws [IOException] if [LocalHost.resolve] fails, or no ports are available
  * @throws [CancellationException] if underlying coroutine was cancelled
  * */
 @Throws(IOException::class, CancellationException::class)
@@ -62,7 +64,7 @@ public actual suspend fun Port.Proxy.findAvailableAsync(
     limit: Int,
     host: LocalHost,
 ): Port.Proxy = withContext(Dispatchers.IO) {
-    findAvailable(limit, host, currentCoroutineContext())
+    findAvailableSync(limit, host, currentCoroutineContext())
 }
 
 /**
@@ -72,13 +74,14 @@ public actual suspend fun Port.Proxy.findAvailableAsync(
  * a background thread.
  *
  * @param [host] either [LocalHost.IPv4] or [LocalHost.IPv6]
+ * @see [isAvailableAsync]
  * @throws [IOException] if the check fails (e.g. calling from Main thread on Android)
  * */
 @Throws(IOException::class)
-public fun Port.isAvailable(
+public fun Port.isAvailableSync(
     host: LocalHost,
 ): Boolean = host.resolve()
-    .toInetAddressWrapper()
+    .toServerSocketProducer()
     .isPortAvailable(value)
 
 /**
@@ -93,24 +96,25 @@ public fun Port.isAvailable(
  *
  * @param [host] either [LocalHost.IPv4] or [LocalHost.IPv6]
  * @param [limit] the number of ports to scan. min: 1, max: 1_000
+ * @see [findAvailableAsync]
  * @throws [IllegalArgumentException] if [limit] is not between 1 and 1_000 (inclusive)
  * @throws [IOException] if the check fails (e.g. calling from Main thread on Android)
  * */
 @Throws(IOException::class)
-public fun Port.Proxy.findAvailable(
+public fun Port.Proxy.findAvailableSync(
     limit: Int,
     host: LocalHost,
-): Port.Proxy = findAvailable(limit, host, null)
+): Port.Proxy = findAvailableSync(limit, host, null)
 
 @Throws(IOException::class, CancellationException::class)
-private fun Port.Proxy.findAvailable(
+private fun Port.Proxy.findAvailableSync(
     limit: Int,
     host: LocalHost,
     context: CoroutineContext?,
 ): Port.Proxy {
     val i = iterator(limit)
     val ipAddress = host.resolve()
-    val inetAddress = ipAddress.toInetAddressWrapper()
+    val inetAddress = ipAddress.toServerSocketProducer()
 
     try {
         while (context?.isActive != false && i.hasNext()) {

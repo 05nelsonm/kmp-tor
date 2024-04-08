@@ -17,14 +17,12 @@ package io.matthewnelson.kmp.tor.runtime.internal
 
 import io.matthewnelson.immutable.collections.toImmutableSet
 import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
-import io.matthewnelson.kmp.tor.runtime.NetworkObserver
-import io.matthewnelson.kmp.tor.runtime.RuntimeEvent
-import io.matthewnelson.kmp.tor.runtime.TorRuntime
-import io.matthewnelson.kmp.tor.runtime.core.ThisBlock
-import io.matthewnelson.kmp.tor.runtime.core.TorConfig
-import io.matthewnelson.kmp.tor.runtime.core.TorEvent
+import io.matthewnelson.kmp.tor.runtime.*
+import io.matthewnelson.kmp.tor.runtime.core.*
+import io.matthewnelson.kmp.tor.runtime.core.ctrl.TorCmd
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.NonCancellable
+import kotlin.apply
 import kotlin.jvm.JvmSynthetic
 
 @OptIn(InternalKmpTorApi::class)
@@ -32,26 +30,32 @@ internal class RealTorRuntime private constructor(
     private val environment: TorRuntime.Environment,
     private val lifecycleHook: Job,
     private val networkObserver: NetworkObserver,
-    private val staticTorEvents: Set<TorEvent>,
+    private val requiredTorEvents: Set<TorEvent>,
     staticTorEventObservers: Set<TorEvent.Observer>,
     staticRuntimeEventObservers: Set<RuntimeEvent.Observer<*>>,
 ):  AbstractRuntimeEventProcessor(environment.staticObserverTag, staticRuntimeEventObservers, staticTorEventObservers),
     TorRuntime
 {
 
+    protected override val debug: Boolean get() = environment.debug
+
+    override fun enqueue(
+        action: RuntimeAction,
+        onFailure: OnFailure,
+        onSuccess: OnSuccess<Unit>,
+    ): QueuedJob {
+        TODO("Not yet implemented")
+    }
+
+    override fun <Response : Any> enqueue(
+        cmd: TorCmd.Unprivileged<Response>,
+        onFailure: OnFailure,
+        onSuccess: OnSuccess<Response>
+    ): QueuedJob {
+        TODO("Not yet implemented")
+    }
+
     override fun environment(): TorRuntime.Environment = environment
-
-    override fun startDaemon() {
-        // TODO("Not yet implemented")
-    }
-
-    override fun stopDaemon() {
-        // TODO("Not yet implemented")
-    }
-
-    override fun restartDaemon() {
-        // TODO("Not yet implemented")
-    }
 
     internal companion object {
 
@@ -61,9 +65,8 @@ internal class RealTorRuntime private constructor(
             networkObserver: NetworkObserver,
             allowPortReassignment: Boolean,
             omitGeoIPFileSettings: Boolean,
-            eventThreadBackground: Boolean,
-            config: List<ThisBlock.WithIt<TorConfig.Builder, TorRuntime.Environment>>,
-            staticTorEvents: Set<TorEvent>,
+            config: Set<ConfigBuilderCallback>,
+            requiredTorEvents: Set<TorEvent>,
             staticTorEventObservers: Set<TorEvent.Observer>,
             staticRuntimeEventObservers: Set<RuntimeEvent.Observer<*>>,
         ): TorRuntime {
@@ -71,8 +74,7 @@ internal class RealTorRuntime private constructor(
             val runtime = TorRuntime.ServiceFactory.serviceRuntimeOrNull {
                 ServiceFactory(
                     environment,
-                    eventThreadBackground,
-                    staticTorEvents,
+                    requiredTorEvents,
                     staticTorEventObservers,
                     staticRuntimeEventObservers,
                 )
@@ -84,7 +86,7 @@ internal class RealTorRuntime private constructor(
                 environment,
                 NonCancellable,
                 networkObserver,
-                staticTorEvents,
+                requiredTorEvents,
                 staticTorEventObservers,
                 staticRuntimeEventObservers,
             )
@@ -101,8 +103,7 @@ internal class RealTorRuntime private constructor(
 
     private class ServiceFactory(
         override val environment: TorRuntime.Environment,
-        private val eventThreadBackground: Boolean,
-        staticTorEvents: Set<TorEvent>,
+        requiredTorEvents: Set<TorEvent>,
         staticTorEventObservers: Set<TorEvent.Observer>,
         staticRuntimeEventObservers: Set<RuntimeEvent.Observer<*>>,
     ): AbstractRuntimeEventProcessor(
@@ -111,12 +112,14 @@ internal class RealTorRuntime private constructor(
         staticTorEventObservers
     ), TorRuntime.ServiceFactory {
 
-        private val staticTorEvents = if (!staticTorEvents.contains(TorEvent.BW)) {
-            staticTorEvents.toMutableSet().apply {
+        protected override val debug: Boolean get() = environment.debug
+
+        private val requiredTorEvents = if (!requiredTorEvents.contains(TorEvent.BW)) {
+            requiredTorEvents.toMutableSet().apply {
                 add(TorEvent.BW)
             }.toImmutableSet()
         } else {
-            staticTorEvents
+            requiredTorEvents
         }
 
         private val staticTorEventObservers = buildSet {
@@ -133,7 +136,10 @@ internal class RealTorRuntime private constructor(
 
             RuntimeEvent.entries.forEach { event ->
                 val observer = when (event) {
-                    is RuntimeEvent.LOG -> event.observer(tag) { event.notifyObservers(it) }
+                    is RuntimeEvent.LOG.DEBUG -> event.observer(tag) { event.notifyObservers(it) }
+                    is RuntimeEvent.LOG.ERROR -> event.observer(tag) { event.notifyObservers(it) }
+                    is RuntimeEvent.LOG.INFO -> event.observer(tag) { event.notifyObservers(it) }
+                    is RuntimeEvent.LOG.WARN -> event.observer(tag) { event.notifyObservers(it) }
                 }
                 add(observer)
             }
@@ -148,7 +154,7 @@ internal class RealTorRuntime private constructor(
             environment,
             lifecycleHook,
             observer ?: NetworkObserver.NOOP,
-            staticTorEvents,
+            requiredTorEvents,
             staticTorEventObservers,
             staticRuntimeEventObservers,
         )

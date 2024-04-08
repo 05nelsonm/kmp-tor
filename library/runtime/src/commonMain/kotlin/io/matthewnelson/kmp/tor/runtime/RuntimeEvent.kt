@@ -17,8 +17,9 @@ package io.matthewnelson.kmp.tor.runtime
 
 import io.matthewnelson.immutable.collections.immutableSetOf
 import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
-import io.matthewnelson.kmp.tor.runtime.core.ItBlock
+import io.matthewnelson.kmp.tor.runtime.core.Callback
 import io.matthewnelson.kmp.tor.runtime.core.TorEvent
+import io.matthewnelson.kmp.tor.runtime.core.UncaughtException
 import kotlin.jvm.JvmField
 import kotlin.jvm.JvmName
 import kotlin.jvm.JvmStatic
@@ -30,19 +31,35 @@ import kotlin.jvm.JvmStatic
  * @see [observer]
  * @see [Processor]
  * */
-public sealed class RuntimeEvent<R: Any> private constructor() {
+public sealed class RuntimeEvent<R: Any> private constructor(
+    @JvmField
+    public val name: String,
+) {
 
-    @get:JvmName("name")
-    public val name: String get() = toString()
+    public data object LOG {
 
-    /**
-     * Log Messages
-     * */
-    public sealed class LOG private constructor(): RuntimeEvent<String>() {
-        public data object DEBUG: LOG()
-        public data object ERROR: LOG()
-        public data object INFO: LOG()
-        public data object WARN: LOG()
+        /**
+         * Debug level logging. Events will only be dispatched
+         * when [TorRuntime.Environment.debug] is set to `true`.
+         * */
+        public data object DEBUG: RuntimeEvent<String>("LOG_DEBUG")
+
+        /**
+         * Error level logging. Note that all [UncaughtException]
+         * are redirected to [ERROR] observers. All exceptions
+         * thrown by [ERROR] observers are suppressed.
+         * */
+        public data object ERROR: RuntimeEvent<Throwable>("LOG_ERROR")
+
+        /**
+         * Info level logging.
+         * */
+        public data object INFO: RuntimeEvent<String>("LOG_INFO")
+
+        /**
+         * Warn level logging. These are non-fatal errors.
+         * */
+        public data object WARN: RuntimeEvent<String>("LOG_WARN")
     }
 
     // TODO: Other events
@@ -63,11 +80,11 @@ public sealed class RuntimeEvent<R: Any> private constructor() {
      *         System.out.println(output);
      *     });
      *
-     * @param [block] the callback to pass the event output to
+     * @param [callback] the callback to pass the event output to
      * */
     public fun observer(
-        block: ItBlock<R>,
-    ): Observer<R> = observer("", block)
+        callback: Callback<R>,
+    ): Observer<R> = observer("", callback)
 
     /**
      * Create an observer for the given [RuntimeEvent]
@@ -86,24 +103,28 @@ public sealed class RuntimeEvent<R: Any> private constructor() {
      *     });
      *
      * @param [tag] Any non-blank string value
-     * @param [block] the callback to pass the event output to
+     * @param [callback] the callback to pass the event output to
      * */
     public fun observer(
         tag: String,
-        block: ItBlock<R>,
-    ): Observer<R> = Observer(tag, this, block)
+        callback: Callback<R>,
+    ): Observer<R> = Observer(tag, this, callback)
 
     public class Observer<R: Any>(
         tag: String?,
         @JvmField
         public val event: RuntimeEvent<R>,
         @JvmField
-        public val output: ItBlock<R>
+        public val callback: Callback<R>,
     ) {
         @JvmField
         public val tag: String? = tag?.ifBlank { null }
 
-        override fun toString(): String = buildString {
+        public override fun toString(): String = toString(isStatic = false)
+
+        public fun toString(isStatic: Boolean): String = buildString {
+            val tag = if (tag != null && isStatic) "STATIC" else tag
+
             append("RuntimeEvent.Observer[tag=")
             append(tag.toString())
             append(",event=")
@@ -158,7 +179,8 @@ public sealed class RuntimeEvent<R: Any> private constructor() {
         public fun removeAll(tag: String)
 
         /**
-         * Remove all non-static [Observer] that are currently registered.
+         * Remove all non-static [Observer] that are currently
+         * registered.
          *
          * If the implementing class extends both [Processor]
          * and [TorEvent.Processor], all [TorEvent.Observer]
@@ -173,7 +195,7 @@ public sealed class RuntimeEvent<R: Any> private constructor() {
         @Throws(IllegalArgumentException::class)
         public fun valueOf(name: String): RuntimeEvent<*> {
             return valueOfOrNull(name)
-                ?: throw IllegalArgumentException("Unknown RuntimeEvent of $name")
+                ?: throw IllegalArgumentException("Unknown RuntimeEvent.name[$name]")
         }
 
         @JvmStatic
@@ -183,17 +205,22 @@ public sealed class RuntimeEvent<R: Any> private constructor() {
             }
         }
 
-        @JvmField
-        public val entries: Set<RuntimeEvent<*>> = immutableSetOf(
-            LOG.DEBUG,
-            LOG.ERROR,
-            LOG.INFO,
-            LOG.WARN,
-        )
+        @get:JvmStatic
+        @get:JvmName("entries")
+        public val entries: Set<RuntimeEvent<*>> by lazy {
+            immutableSetOf(
+                LOG.DEBUG,
+                LOG.ERROR,
+                LOG.INFO,
+                LOG.WARN,
+            )
+        }
     }
 
     @InternalKmpTorApi
     public interface Notifier {
         public fun <R: Any> notify(event: RuntimeEvent<R>, output: R)
     }
+
+    final override fun toString(): String = name
 }

@@ -1402,7 +1402,7 @@ public class TorConfig private constructor(
         public companion object: Keyword(
             name = "HiddenServicePort",
             attributes = immutableSetOf(Attribute.HiddenService, Attribute.Port, Attribute.UnixSocket),
-            isStartArgument = false,
+            isCmdLineArg = false,
             isUnique = false,
         ) {
 
@@ -1455,7 +1455,7 @@ public class TorConfig private constructor(
         public companion object: Keyword(
             name = "HiddenServiceVersion",
             attributes = immutableSetOf(Attribute.HiddenService),
-            isStartArgument = false,
+            isCmdLineArg = false,
             isUnique = false,
         ) {
 
@@ -1480,7 +1480,7 @@ public class TorConfig private constructor(
         public companion object: Keyword(
             name = "HiddenServiceAllowUnknownPorts",
             attributes = immutableSetOf(Attribute.HiddenService),
-            isStartArgument = false,
+            isCmdLineArg = false,
             isUnique = false,
         ) {
 
@@ -1521,7 +1521,7 @@ public class TorConfig private constructor(
         public companion object: Keyword(
             name = "HiddenServiceMaxStreams",
             attributes = immutableSetOf(Attribute.HiddenService),
-            isStartArgument = false,
+            isCmdLineArg = false,
             isUnique = false,
         ) {
 
@@ -1546,7 +1546,7 @@ public class TorConfig private constructor(
         public companion object: Keyword(
             name = "HiddenServiceMaxStreamsCloseCircuit",
             attributes = immutableSetOf(Attribute.HiddenService),
-            isStartArgument = false,
+            isCmdLineArg = false,
             isUnique = false,
         ) {
 
@@ -1571,7 +1571,7 @@ public class TorConfig private constructor(
         public companion object: Keyword(
             name = "HiddenServiceDirGroupReadable",
             attributes = immutableSetOf(Attribute.HiddenService),
-            isStartArgument = false,
+            isCmdLineArg = false,
             isUnique = false,
         ) {
 
@@ -1614,7 +1614,7 @@ public class TorConfig private constructor(
         public companion object: Keyword(
             name = "HiddenServiceNumIntroductionPoints",
             attributes = immutableSetOf(Attribute.HiddenService),
-            isStartArgument = false,
+            isCmdLineArg = false,
             isUnique = false,
         ) {
 
@@ -1707,7 +1707,7 @@ public class TorConfig private constructor(
         public companion object: Keyword(
             name = "AndroidIdentityTag",
             attributes = immutableSetOf(Attribute.Logging),
-            isStartArgument = true,
+            isCmdLineArg = true,
             isUnique = true
         )
     }
@@ -1868,8 +1868,6 @@ public class TorConfig private constructor(
             }
         }
 
-        // TODO: public fun toCtrlString(): String
-
         internal companion object {
 
             @JvmSynthetic
@@ -1977,8 +1975,6 @@ public class TorConfig private constructor(
             public fun Builder(block: ThisBlock<B>): S = build(factory().apply(block))
         }
 
-
-
         public companion object {
 
             /**
@@ -2057,7 +2053,6 @@ public class TorConfig private constructor(
         public override fun toString(): String = buildString {
             items.joinTo(this, separator = "\n")
         }
-        // TODO: public fun toCtrlString(): String
 
         // Returns a new Setting if it is a *Port that is
         // not configured as disabled or auto.
@@ -2102,9 +2097,9 @@ public class TorConfig private constructor(
      *
      * @param [name] The string value (e.g. `RunAsDaemon`)
      * @param [attributes] Attributes specific to the Keyword (used for filtering)
-     * @param [isStartArgument] KmpTor specific flag used to determine
+     * @param [isCmdLineArg] KmpTor specific flag used to determine
      *   if the argument should be utilized in the start arguments passed
-     *   to tor's main function, or loaded via the controller after
+     *   to tor's main function, or loaded via the control connection after
      *   initial startup of the tor daemon.
      * @param [isUnique] If the Keyword can be included multiple times
      *   within a configuration.
@@ -2115,7 +2110,7 @@ public class TorConfig private constructor(
         @JvmField
         public val attributes: Set<Attribute>,
         @JvmField
-        public val isStartArgument: Boolean,
+        public val isCmdLineArg: Boolean,
         @JvmField
         public val isUnique: Boolean,
     ): Comparable<Keyword>, CharSequence {
@@ -2149,5 +2144,4 @@ public class TorConfig private constructor(
     public override fun toString(): String = buildString {
         settings.joinTo(this, separator = "\n")
     }
-    // TODO: override fun toCtrlString(): String
 }

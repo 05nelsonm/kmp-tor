@@ -24,28 +24,28 @@ import kotlin.jvm.JvmInline
 import kotlin.jvm.JvmSynthetic
 
 @JvmInline
-internal expect value class InetAddressWrapper private constructor(
+internal expect value class ServerSocketProducer private constructor(
     private val value: Any
 ) {
 
     @Throws(Exception::class)
     @OptIn(ExperimentalStdlibApi::class)
-    internal fun openServerSocket(port: Int): AutoCloseable
+    internal fun open(port: Int): AutoCloseable
 
     internal companion object {
 
         @JvmSynthetic
         @Throws(IOException::class)
-        internal fun IPAddress.toInetAddressWrapper(): InetAddressWrapper
+        internal fun IPAddress.toServerSocketProducer(): ServerSocketProducer
     }
 }
 
 @Throws(IOException::class)
 @Suppress("NOTHING_TO_INLINE")
-internal inline fun InetAddressWrapper.isPortAvailable(port: Int): Boolean {
+internal inline fun ServerSocketProducer.isPortAvailable(port: Int): Boolean {
     try {
         @OptIn(ExperimentalStdlibApi::class)
-        openServerSocket(port).use {}
+        open(port).use {}
         return true
     } catch (t: Throwable) {
         // Android will throw NetworkOnMainThreadException here,

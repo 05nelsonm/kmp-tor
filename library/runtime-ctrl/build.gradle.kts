@@ -13,6 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
+import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
+import org.jetbrains.kotlin.konan.target.Family
+
 plugins {
     id("configuration")
 }
@@ -23,9 +26,59 @@ kmpConfiguration {
             sourceSetMain {
                 dependencies {
                     api(project(":library:runtime-core"))
+                    implementation(libs.kmp.process)
                     implementation(libs.kmp.tor.core.resource)
+                    implementation(libs.kotlinx.coroutines.core)
+                }
+            }
+            sourceSetTest {
+                dependencies {
+                    implementation(libs.kmp.tor.resource.tor)
+                    implementation(libs.kotlinx.coroutines.test)
                 }
             }
         }
+
+        kotlin {
+            with(sourceSets) {
+                val jvmMain = findByName("jvmMain")
+                val nativeMain = findByName("nativeMain")
+
+                if (jvmMain != null || nativeMain != null) {
+                    val nonJsMain = maybeCreate("nonJsMain")
+                    val nonJsTest = maybeCreate("nonJsTest")
+
+                    nonJsMain.dependsOn(getByName("commonMain"))
+                    nonJsTest.dependsOn(getByName("commonTest"))
+
+                    jvmMain?.apply { dependsOn(nonJsMain) }
+                    findByName("jvmTest")?.apply { dependsOn(nonJsTest) }
+                    nativeMain?.apply { dependsOn(nonJsMain) }
+                    findByName("nativeTest")?.apply { dependsOn(nonJsTest) }
+                }
+            }
+
+            val cInteropDir = projectDir
+                .resolve("src")
+                .resolve("nativeInterop")
+                .resolve("cinterop")
+
+            targets.filterIsInstance<KotlinNativeTarget>()
+                .unCInterop(cInteropDir)
+        }
     }
+}
+
+fun List<KotlinNativeTarget>.unCInterop(
+    cInteropDir: File,
+): List<KotlinNativeTarget> {
+    forEach { target ->
+        if (target.konanTarget.family != Family.IOS) return@forEach
+
+        target.compilations["main"].cinterops.create("un").apply {
+            defFile = cInteropDir.resolve("un.def")
+        }
+    }
+
+    return this
 }

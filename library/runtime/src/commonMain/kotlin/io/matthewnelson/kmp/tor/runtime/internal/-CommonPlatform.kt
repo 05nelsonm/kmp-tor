@@ -18,10 +18,36 @@
 package io.matthewnelson.kmp.tor.runtime.internal
 
 import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
+import io.matthewnelson.kmp.tor.runtime.RuntimeAction
 import io.matthewnelson.kmp.tor.runtime.TorRuntime
+import kotlinx.coroutines.suspendCancellableCoroutine
+import kotlin.coroutines.cancellation.CancellationException
+import kotlin.coroutines.resume
+import kotlin.coroutines.resumeWithException
 
 @OptIn(InternalKmpTorApi::class)
 @Throws(IllegalStateException::class)
 internal expect fun TorRuntime.ServiceFactory.Companion.serviceRuntimeOrNull(
     block: () -> TorRuntime.ServiceFactory,
 ): TorRuntime?
+
+@Throws(Throwable::class)
+@Suppress("NOTHING_TO_INLINE")
+internal suspend inline fun <T: RuntimeAction.Processor> T.commonExecuteAsync(
+    action: RuntimeAction,
+): T = suspendCancellableCoroutine { continuation ->
+    val job = enqueue(
+        action = action,
+        onFailure = { t ->
+            continuation.resumeWithException(t)
+        },
+        onSuccess = {
+            continuation.resume(this)
+        }
+    )
+
+    continuation.invokeOnCancellation { t ->
+        val e = if (t is CancellationException) t else CancellationException(t)
+        job.cancel(e)
+    }
+}

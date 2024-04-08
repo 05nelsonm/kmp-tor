@@ -19,6 +19,8 @@ import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
 import io.matthewnelson.kmp.tor.core.resource.SynchronizedObject
 import io.matthewnelson.kmp.tor.core.resource.synchronized
 import io.matthewnelson.kmp.tor.runtime.core.TorEvent
+import io.matthewnelson.kmp.tor.runtime.core.UncaughtException
+import io.matthewnelson.kmp.tor.runtime.core.UncaughtException.Handler.Companion.tryCatch
 import kotlin.concurrent.Volatile
 import kotlin.jvm.JvmName
 import kotlin.jvm.JvmStatic
@@ -26,22 +28,24 @@ import kotlin.jvm.JvmStatic
 /**
  * Base abstraction for implementations that process [TorEvent].
  * */
+@OptIn(InternalKmpTorApi::class)
 public abstract class AbstractTorEventProcessor
 @InternalKmpTorApi
 protected constructor(
-    private val staticTag: String?,
-    initialObservers: Set<TorEvent.Observer>
+    staticTag: String?,
+    initialObservers: Set<TorEvent.Observer>,
 ): TorEvent.Processor {
 
     @Volatile
-    @get:JvmName("isDestroyed")
-    protected var isDestroyed: Boolean = false
-        private set
-
-    private val observers = LinkedHashSet<TorEvent.Observer>(initialObservers.size + 1, 1.0F)
-
-    @OptIn(InternalKmpTorApi::class)
+    private var _destroyed: Boolean = false
     private val lock = SynchronizedObject()
+    private val observers = LinkedHashSet<TorEvent.Observer>(initialObservers.size + 1, 1.0F)
+    private val staticTag: String? = staticTag?.ifBlank { null }
+
+    @get:JvmName("destroyed")
+    protected val destroyed: Boolean get() = _destroyed
+    protected open val debug: Boolean = true
+    protected abstract val handler: UncaughtException.Handler
 
     init {
         observers.addAll(initialObservers)
@@ -100,11 +104,8 @@ protected constructor(
             val iterator = iterator()
             while (iterator.hasNext()) {
                 val observer = iterator.next()
-                if (observer.tag.isStaticTag()) continue
-
-                if (observer.tag == tag) {
-                    iterator.remove()
-                }
+                if (observer.tag != tag) continue
+                iterator.remove()
             }
         }
     }
@@ -120,31 +121,42 @@ protected constructor(
         }
     }
 
-    protected open fun registered(): Int = withObservers { size }
-
     protected fun TorEvent.notifyObservers(output: String) {
         val event = this
+
+        if (event == TorEvent.DEBUG && !debug) return
+
         withObservers {
-            for (observer in this) {
-                if (observer.event != event) continue
-                observer.block.invoke(output)
+            if (isEmpty()) return@withObservers null
+            mapNotNull { if (it.event == event) it else null }
+        }?.forEach { observer ->
+            handler.tryCatch(observer.toString(isStatic = observer.tag.isStaticTag())) {
+                observer.callback(output)
             }
         }
     }
 
-    protected open fun onDestroy() {
-        if (isDestroyed) return
-        withObservers { clear(); isDestroyed = true }
+    protected open fun onDestroy(): Boolean {
+        if (_destroyed) return false
+
+        val wasDestroyed = withObservers {
+            if (_destroyed) return@withObservers false
+
+            clear()
+            _destroyed = true
+            true
+        }
+
+        return wasDestroyed
     }
 
-    @OptIn(InternalKmpTorApi::class)
     private fun <T: Any?> withObservers(
         block: MutableSet<TorEvent.Observer>.() -> T,
     ): T {
-        if (isDestroyed) return block(noOpMutableSet())
+        if (_destroyed) return block(noOpMutableSet())
 
         return synchronized(lock) {
-            block(if (isDestroyed) noOpMutableSet() else observers)
+            block(if (_destroyed) noOpMutableSet() else observers)
         }
     }
 
@@ -155,8 +167,11 @@ protected constructor(
         @JvmStatic
         @InternalKmpTorApi
         @Suppress("UNCHECKED_CAST")
-        protected fun <T> noOpMutableSet(): MutableSet<T> = NoOpMutableSet as MutableSet<T>
+        protected fun <T: Any> noOpMutableSet(): MutableSet<T> = NoOpMutableSet as MutableSet<T>
     }
+
+    // testing
+    protected open fun registered(): Int = synchronized(lock) { observers.size }
 }
 
 private object NoOpMutableSet: MutableSet<Any> {

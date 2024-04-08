@@ -19,6 +19,14 @@ plugins {
 
 kmpConfiguration {
     configureShared(java9ModuleName = "io.matthewnelson.kmp.tor.runtime", publish = true) {
+        jvm {
+            sourceSetTest {
+                dependencies {
+                    implementation(kotlin("reflect"))
+                }
+            }
+        }
+
         common {
             sourceSetMain {
                 dependencies {
@@ -36,6 +44,26 @@ kmpConfiguration {
             sourceSetTest {
                 dependencies {
                     implementation(libs.kotlinx.coroutines.test)
+                }
+            }
+        }
+
+        kotlin {
+            with(sourceSets) {
+                val jvmMain = findByName("jvmMain")
+                val nativeMain = findByName("nativeMain")
+
+                if (jvmMain != null || nativeMain != null) {
+                    val nonJsMain = maybeCreate("nonJsMain")
+                    val nonJsTest = maybeCreate("nonJsTest")
+
+                    nonJsMain.dependsOn(getByName("commonMain"))
+                    nonJsTest.dependsOn(getByName("commonTest"))
+
+                    jvmMain?.apply { dependsOn(nonJsMain) }
+                    findByName("jvmTest")?.apply { dependsOn(nonJsTest) }
+                    nativeMain?.apply { dependsOn(nonJsMain) }
+                    findByName("nativeTest")?.apply { dependsOn(nonJsTest) }
                 }
             }
         }

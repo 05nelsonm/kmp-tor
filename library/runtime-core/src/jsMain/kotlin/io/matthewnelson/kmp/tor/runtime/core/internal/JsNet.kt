@@ -21,12 +21,10 @@ package io.matthewnelson.kmp.tor.runtime.core.internal
 
 import io.matthewnelson.kmp.process.InternalProcessApi
 import io.matthewnelson.kmp.process.internal.events_EventEmitter
-import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
 
 /** [docs](https://nodejs.org/api/net.html#netcreateserveroptions-connectionlistener) */
 @JsName("createServer")
-@OptIn(InternalKmpTorApi::class)
-internal external fun net_createServer(connectionListener: (socket: net_Socket) -> Unit): net_Server
+internal external fun net_createServer(connectionListener: (socket: dynamic) -> Unit): net_Server
 
 /** [docs](https://nodejs.org/api/net.html#class-netserver) */
 @JsName("Server")
@@ -34,11 +32,4 @@ internal external fun net_createServer(connectionListener: (socket: net_Socket) 
 internal external class net_Server: events_EventEmitter {
     fun close()
     fun listen(port: Int, host: String, backlog: Int, callback: () -> Unit)
-}
-
-/** [docs](https://nodejs.org/api/net.html#class-netsocket) */
-@JsName("Socket")
-@InternalKmpTorApi
-public external class net_Socket {
-    public fun destroy()
 }

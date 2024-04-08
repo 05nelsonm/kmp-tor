@@ -203,11 +203,11 @@ public enum class TorEvent {
      *         updateNotification(formatBandwidth(output));
      *     });
      *
-     * @param [block] the callback to pass the event text to
+     * @param [callback] the callback to pass the event text to
      * */
     public fun observer(
-        block: ItBlock<String>,
-    ): Observer = observer("", block)
+        callback: Callback<String>,
+    ): Observer = observer("", callback)
 
     /**
      * Create an observer for the given [TorEvent] and [tag]
@@ -230,24 +230,28 @@ public enum class TorEvent {
      *     });
      *
      * @param [tag] Any non-blank string value
-     * @param [block] the callback to pass the event text to
+     * @param [callback] the callback to pass the event text to
      * */
     public fun observer(
         tag: String,
-        block: ItBlock<String>,
-    ): Observer = Observer(tag,this, block)
+        callback: Callback<String>,
+    ): Observer = Observer(tag,this, callback)
 
     public class Observer(
         tag: String?,
         @JvmField
         public val event: TorEvent,
         @JvmField
-        public val block: ItBlock<String>,
+        public val callback: Callback<String>,
     ) {
         @JvmField
         public val tag: String? = tag?.ifBlank { null }
 
-        override fun toString(): String = buildString {
+        override fun toString(): String = toString(isStatic = false)
+
+        public fun toString(isStatic: Boolean): String = buildString {
+            val tag = if (tag != null && isStatic) "STATIC" else tag
+
             append("TorEvent.Observer[tag=")
             append(tag.toString())
             append(",event=")
@@ -298,7 +302,8 @@ public enum class TorEvent {
         public fun removeAll(tag: String)
 
         /**
-         * Remove all non-static [Observer] that are currently registered.
+         * Remove all non-static [Observer] that are currently
+         * registered.
          * */
         public fun clearObservers()
     }

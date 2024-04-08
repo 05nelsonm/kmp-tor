@@ -32,6 +32,13 @@ kmpConfiguration {
                 defaultConfig {
                     testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
                 }
+
+                sourceSets["androidTest"].manifest.srcFile(
+                    projectDir
+                        .resolve("src")
+                        .resolve("androidInstrumentedTest")
+                        .resolve("AndroidManifest.xml")
+                )
             }
 
             sourceSetMain {
@@ -41,16 +48,13 @@ kmpConfiguration {
                 }
             }
 
-            sourceSetTest {
-                dependencies {
-                    implementation(libs.kmp.tor.core.lib.locator)
-                }
-            }
-
             sourceSetTestInstrumented {
                 dependencies {
                     implementation(libs.androidx.test.core)
                     implementation(libs.androidx.test.runner)
+                    implementation(libs.kmp.process)
+                    implementation(libs.kmp.tor.resource.tor)
+                    implementation(project(":library:runtime-ctrl"))
                 }
             }
         }
@@ -68,6 +72,7 @@ kmpConfiguration {
             sourceSetTest {
                 dependencies {
                     implementation(kotlin("test"))
+                    implementation(libs.kotlinx.coroutines.test)
                 }
             }
         }

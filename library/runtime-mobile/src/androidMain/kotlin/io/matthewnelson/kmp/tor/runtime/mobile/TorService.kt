@@ -20,9 +20,10 @@ import android.content.Intent
 import androidx.startup.AppInitializer
 import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
 import io.matthewnelson.kmp.tor.runtime.RuntimeEvent
+import io.matthewnelson.kmp.tor.runtime.RuntimeAction
 import io.matthewnelson.kmp.tor.runtime.TorRuntime
-import io.matthewnelson.kmp.tor.runtime.core.TorEvent
-import kotlin.concurrent.Volatile
+import io.matthewnelson.kmp.tor.runtime.core.*
+import io.matthewnelson.kmp.tor.runtime.core.ctrl.TorCmd
 
 internal class TorService internal constructor(): AbstractTorService() {
 
@@ -32,19 +33,23 @@ internal class TorService internal constructor(): AbstractTorService() {
         private val newIntent: () -> Intent,
     ): TorRuntime, TorEvent.Processor by factory, RuntimeEvent.Processor by factory {
 
+        override fun enqueue(
+            action: RuntimeAction,
+            onFailure: OnFailure,
+            onSuccess: OnSuccess<Unit>,
+        ): QueuedJob {
+            TODO("Not yet implemented")
+        }
+
+        override fun <Response : Any> enqueue(
+            cmd: TorCmd.Unprivileged<Response>,
+            onFailure: OnFailure,
+            onSuccess: OnSuccess<Response>,
+        ): QueuedJob {
+            TODO("Not yet implemented")
+        }
+
         override fun environment(): TorRuntime.Environment = factory.environment
-
-        override fun startDaemon() {
-            // TODO
-        }
-
-        override fun stopDaemon() {
-            // TODO
-        }
-
-        override fun restartDaemon() {
-            // TODO
-        }
 
         companion object {
 
@@ -70,7 +75,7 @@ internal class TorService internal constructor(): AbstractTorService() {
     internal class Initializer internal constructor(): androidx.startup.Initializer<Initializer.Companion> {
 
         override fun create(context: Context): Companion {
-            if (isInitialized) return Companion
+            if (isInitialized()) return Companion
 
             val initializer = AppInitializer.getInstance(context)
             check(initializer.isEagerlyInitialized(javaClass)) {
@@ -87,8 +92,6 @@ internal class TorService internal constructor(): AbstractTorService() {
             }
             val appContext = context.applicationContext
             newIntent = { Intent(appContext, TorService::class.java) }
-
-            isInitialized = true
             return Companion
         }
 
@@ -106,11 +109,8 @@ internal class TorService internal constructor(): AbstractTorService() {
 
         internal companion object {
 
-            @Volatile
-            private var isInitialized: Boolean = false
-
             @JvmSynthetic
-            internal fun isInitialized(): Boolean = isInitialized
+            internal fun isInitialized(): Boolean = newIntent != null
         }
     }
 

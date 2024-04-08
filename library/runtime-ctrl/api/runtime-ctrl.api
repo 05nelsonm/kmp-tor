@@ -3,10 +3,12 @@ public abstract class io/matthewnelson/kmp/tor/runtime/ctrl/AbstractTorEventProc
 	public final fun add (Lio/matthewnelson/kmp/tor/runtime/core/TorEvent$Observer;)V
 	public final fun add ([Lio/matthewnelson/kmp/tor/runtime/core/TorEvent$Observer;)V
 	public fun clearObservers ()V
-	protected final fun isDestroyed ()Z
+	protected final fun destroyed ()Z
+	protected fun getDebug ()Z
+	protected abstract fun getHandler ()Lio/matthewnelson/kmp/tor/runtime/core/UncaughtException$Handler;
 	protected final fun isStaticTag (Ljava/lang/String;)Z
 	protected final fun notifyObservers (Lio/matthewnelson/kmp/tor/runtime/core/TorEvent;Ljava/lang/String;)V
-	protected fun onDestroy ()V
+	protected fun onDestroy ()Z
 	protected fun registered ()I
 	public final fun remove (Lio/matthewnelson/kmp/tor/runtime/core/TorEvent$Observer;)V
 	public final fun remove ([Lio/matthewnelson/kmp/tor/runtime/core/TorEvent$Observer;)V
@@ -16,5 +18,31 @@ public abstract class io/matthewnelson/kmp/tor/runtime/ctrl/AbstractTorEventProc
 }
 
 protected final class io/matthewnelson/kmp/tor/runtime/ctrl/AbstractTorEventProcessor$Companion {
+}
+
+public final class io/matthewnelson/kmp/tor/runtime/ctrl/TempTorCmdQueue : io/matthewnelson/kmp/tor/runtime/core/Destroyable, io/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$Unprivileged$Processor {
+	public synthetic fun <init> (Lio/matthewnelson/kmp/tor/runtime/core/UncaughtException$Handler;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun attach (Lio/matthewnelson/kmp/tor/runtime/ctrl/TorCtrl;)V
+	public final fun connection ()Lio/matthewnelson/kmp/tor/runtime/ctrl/TorCtrl;
+	public fun destroy ()V
+	public fun enqueue (Lio/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$Unprivileged;Lio/matthewnelson/kmp/tor/runtime/core/ItBlock;Lio/matthewnelson/kmp/tor/runtime/core/ItBlock;)Lio/matthewnelson/kmp/tor/runtime/core/QueuedJob;
+	public fun isDestroyed ()Z
+}
+
+public abstract interface class io/matthewnelson/kmp/tor/runtime/ctrl/TorCtrl : io/matthewnelson/kmp/tor/runtime/core/Destroyable, io/matthewnelson/kmp/tor/runtime/core/TorEvent$Processor, io/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$Privileged$Processor {
+	public abstract fun destroy ()V
+	public abstract fun invokeOnDestroy (Lio/matthewnelson/kmp/tor/runtime/core/ItBlock;)Lio/matthewnelson/kmp/tor/runtime/core/Disposable;
+}
+
+public final class io/matthewnelson/kmp/tor/runtime/ctrl/TorCtrl$Factory {
+	public fun <init> (Lio/matthewnelson/kmp/tor/runtime/core/UncaughtException$Handler;)V
+	public fun <init> (Ljava/lang/String;Lio/matthewnelson/kmp/tor/runtime/core/UncaughtException$Handler;)V
+	public fun <init> (Ljava/lang/String;Ljava/util/Set;Lio/matthewnelson/kmp/tor/runtime/core/ItBlock;Lio/matthewnelson/kmp/tor/runtime/core/UncaughtException$Handler;)V
+	public synthetic fun <init> (Ljava/lang/String;Ljava/util/Set;Lio/matthewnelson/kmp/tor/runtime/core/ItBlock;Lio/matthewnelson/kmp/tor/runtime/core/UncaughtException$Handler;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public fun <init> (Ljava/lang/String;Ljava/util/Set;Lio/matthewnelson/kmp/tor/runtime/core/UncaughtException$Handler;)V
+	public final fun connect (Lio/matthewnelson/kmp/tor/runtime/core/address/ProxyAddress;)Lio/matthewnelson/kmp/tor/runtime/ctrl/TorCtrl;
+	public final fun connect (Ljava/io/File;)Lio/matthewnelson/kmp/tor/runtime/ctrl/TorCtrl;
+	public final fun connectAsync (Lio/matthewnelson/kmp/tor/runtime/core/address/ProxyAddress;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public final fun connectAsync (Ljava/io/File;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 }
 

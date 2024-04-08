@@ -15,7 +15,21 @@
  **/
 package io.matthewnelson.kmp.tor.runtime.core
 
+import kotlin.jvm.JvmStatic
+
 public interface Destroyable {
+
     public fun destroy()
     public fun isDestroyed(): Boolean
+
+    public companion object {
+
+        @JvmStatic
+        @Throws(IllegalStateException::class)
+        public fun Destroyable.checkDestroy() {
+            if (!isDestroyed()) return
+            val name = this::class.simpleName ?: "UnknownClass"
+            throw IllegalStateException("$name.isDestroyed[true]")
+        }
+    }
 }

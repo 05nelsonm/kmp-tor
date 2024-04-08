@@ -19,7 +19,6 @@ package io.matthewnelson.kmp.tor.runtime
 
 import io.matthewnelson.encoding.base16.Base16
 import io.matthewnelson.encoding.core.Encoder.Companion.encodeToString
-import io.matthewnelson.immutable.collections.toImmutableList
 import io.matthewnelson.immutable.collections.toImmutableSet
 import io.matthewnelson.kmp.file.*
 import io.matthewnelson.kmp.tor.core.api.ResourceInstaller
@@ -29,44 +28,34 @@ import io.matthewnelson.kmp.tor.core.api.annotation.KmpTorDsl
 import io.matthewnelson.kmp.tor.runtime.TorRuntime.Companion.Builder
 import io.matthewnelson.kmp.tor.runtime.TorRuntime.Environment.Companion.Builder
 import io.matthewnelson.kmp.tor.runtime.core.*
+import io.matthewnelson.kmp.tor.runtime.core.ctrl.TorCmd
 import io.matthewnelson.kmp.tor.runtime.internal.InstanceKeeper
 import io.matthewnelson.kmp.tor.runtime.internal.RealTorRuntime
 import io.matthewnelson.kmp.tor.runtime.internal.RealTorRuntime.Companion.checkInstance
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import org.kotlincrypto.SecRandomCopyException
 import org.kotlincrypto.SecureRandom
 import org.kotlincrypto.hash.sha2.SHA256
+import kotlin.concurrent.Volatile
 import kotlin.jvm.JvmField
 import kotlin.jvm.JvmName
 import kotlin.jvm.JvmStatic
 import kotlin.jvm.JvmSynthetic
 import kotlin.random.Random
 
-public interface TorRuntime: TorEvent.Processor, RuntimeEvent.Processor {
+/**
+ * Base interface for managing and interacting with tor.
+ *
+ * @see [Companion.Builder]
+ * */
+public interface TorRuntime:
+    TorCmd.Unprivileged.Processor,
+    TorEvent.Processor,
+    RuntimeAction.Processor,
+    RuntimeEvent.Processor
+{
 
     public fun environment(): Environment
-
-    /**
-     * Starts the tor daemon.
-     *
-     * If tor is running, will do nothing.
-     * */
-    public fun startDaemon()
-
-    /**
-     * Stops the tor daemon.
-     *
-     * If tor is not running, will do nothing.
-     * */
-    public fun stopDaemon()
-
-    /**
-     * Stops and then starts the tor daemon.
-     *
-     * If tor is not running, will do nothing.
-     * */
-    public fun restartDaemon()
 
     public companion object {
 
@@ -87,12 +76,10 @@ public interface TorRuntime: TorEvent.Processor, RuntimeEvent.Processor {
     }
 
     @KmpTorDsl
-    public class Builder private constructor(
-        private val environment: Environment
-    ) {
+    public class Builder private constructor(private val environment: Environment) {
 
-        private val config = mutableListOf<ThisBlock.WithIt<TorConfig.Builder, Environment>>()
-        private val staticTorEvents = mutableSetOf(TorEvent.CONF_CHANGED, TorEvent.NOTICE)
+        private val config = mutableSetOf<ConfigBuilderCallback>()
+        private val requiredTorEvents = mutableSetOf(TorEvent.CONF_CHANGED, TorEvent.NOTICE)
         private val staticTorEventObservers = mutableSetOf<TorEvent.Observer>()
         private val staticRuntimeEventObservers = mutableSetOf<RuntimeEvent.Observer<*>>()
 
@@ -133,33 +120,27 @@ public interface TorRuntime: TorEvent.Processor, RuntimeEvent.Processor {
         public var networkObserver: NetworkObserver = NetworkObserver.NOOP
 
         /**
-         * If false, will use [Dispatchers.Main] when dispatching [RuntimeEvent]
-         * and [TorEvent] to registered observers.
-         * */
-        @JvmField
-        public var eventThreadBackground: Boolean = true
-
-        /**
          * Configure the [TorConfig] at each startup. Multiple [block] may
          * be set, each of which will be applied to the [TorConfig.Builder]
          * before starting tor.
          *
-         * [block] is always invoked from a background thread, so it is safe
-         * to perform IO within the lambda (e.g. writing settings that are
-         * not currently supported to the [Environment.torrcFile]).
+         * [block] is always invoked from a background thread on Jvm & Native,
+         * so it is safe to perform IO within the lambda (e.g. writing settings
+         * that are not currently supported to the [Environment.torrcFile]).
          *
-         * Any exception thrown within [block] will be propagated to the caller.
+         * Any exception thrown within [block] will be propagated to the caller
+         * of [RuntimeAction.StartDaemon] or [RuntimeAction.RestartDaemon].
          *
          * **NOTE:** This can be omitted as a minimum viable configuration
          * is always created. See [TorConfigGenerator.putDefaults] for what
          * settings are automatically applied.
          *
-         * **NOTE:** [block] should not contain any non-singleton references
-         * such as Android Activity context.
+         * **NOTE:** [block] should not contain any external contextual
+         * references, such as Android Activity Context.
          * */
         @KmpTorDsl
         public fun config(
-            block: ThisBlock.WithIt<TorConfig.Builder, Environment>,
+            block: ConfigBuilderCallback,
         ): Builder {
             config.add(block)
             return this
@@ -167,44 +148,46 @@ public interface TorRuntime: TorEvent.Processor, RuntimeEvent.Processor {
 
         /**
          * Add [TorEvent] that are required for your implementation. All
-         * configured [staticEvent] will be set at startup when the control
-         * connection is established via SETEVENTS.
+         * configured [TorEvent] will be set at startup when the control
+         * connection is established via [TorCmd.SetEvents].
          *
-         * Any subsequent calls for SETEVENTS during runtime will be intercepted
-         * and modified to include all configured [staticEvent].
+         * Any subsequent calls for [TorCmd.SetEvents] during runtime will
+         * be intercepted and modified to include all required [TorEvent].
          * */
         @KmpTorDsl
-        public fun staticEvent(
+        public fun required(
             event: TorEvent,
         ): Builder {
-            staticTorEvents.add(event)
+            requiredTorEvents.add(event)
             return this
         }
 
         /**
          * Add [TorEvent.Observer] which will never be removed from [TorRuntime].
+         *
          * Useful for logging purposes.
          * */
         @KmpTorDsl
         public fun staticObserver(
             event: TorEvent,
-            block: ItBlock<String>,
+            callback: Callback<String>,
         ): Builder {
-            val observer = event.observer(environment.staticObserverTag, block)
+            val observer = event.observer(environment.staticObserverTag, callback)
             staticTorEventObservers.add(observer)
             return this
         }
 
         /**
          * Add [RuntimeEvent.Observer] which will never be removed from [TorRuntime].
+         *
          * Useful for logging purposes.
          * */
         @KmpTorDsl
         public fun <R: Any> staticObserver(
             event: RuntimeEvent<R>,
-            block: ItBlock<R>,
+            callback: Callback<R>,
         ): Builder {
-            val observer = event.observer(environment.staticObserverTag, block)
+            val observer = event.observer(environment.staticObserverTag, callback)
             staticRuntimeEventObservers.add(observer)
             return this
         }
@@ -230,9 +213,8 @@ public interface TorRuntime: TorEvent.Processor, RuntimeEvent.Processor {
                         networkObserver = b.networkObserver,
                         allowPortReassignment = b.allowPortReassignment,
                         omitGeoIPFileSettings = b.omitGeoIPFileSettings,
-                        eventThreadBackground = b.eventThreadBackground,
-                        config = b.config.toImmutableList(),
-                        staticTorEvents = b.staticTorEvents.toImmutableSet(),
+                        config = b.config.toImmutableSet(),
+                        requiredTorEvents = b.requiredTorEvents.toImmutableSet(),
                         staticTorEventObservers = b.staticTorEventObservers.toImmutableSet(),
                         staticRuntimeEventObservers = b.staticRuntimeEventObservers.toImmutableSet(),
                     )
@@ -261,6 +243,18 @@ public interface TorRuntime: TorEvent.Processor, RuntimeEvent.Processor {
         @JvmField
         public val torResource: ResourceInstaller<Paths.Tor>,
     ) {
+
+        /**
+         * Toggle to dispatch [RuntimeEvent.LOG.DEBUG] and [TorEvent.DEBUG]
+         * or not.
+         *
+         * **NOTE:** This does not alter control connection event listeners
+         * via [TorCmd.SetEvents]. Add [TorEvent.DEBUG] via
+         * [TorRuntime.Builder.required] if debug logs from tor are needed.
+         * */
+        @JvmField
+        @Volatile
+        public var debug: Boolean = false
 
         /**
          * SHA-256 hash of the [workDir] path.
@@ -330,6 +324,7 @@ public interface TorRuntime: TorEvent.Processor, RuntimeEvent.Processor {
              * @param [installer] lambda for creating [ResourceInstaller] using
              *   the default [Builder.installationDir]
              * @param [block] optional lambda for modifying default parameters.
+             * @see [io.matthewnelson.kmp.tor.runtime.mobile.createTorRuntimeEnvironment]
              * */
             @JvmStatic
             public fun Builder(
@@ -373,10 +368,9 @@ public interface TorRuntime: TorEvent.Processor, RuntimeEvent.Processor {
                     // Apply block outside getOrCreateInstance call to
                     // prevent double instance creation
                     if (block != null) b.apply(block)
+                    val torResource = installer(b.installationDir.absoluteFile.normalize())
 
                     return getOrCreateInstance(key = b.workDir) {
-                        val torResource = installer(b.installationDir.absoluteFile.normalize())
-
                         Environment(
                             workDir = b.workDir,
                             cacheDir = b.cacheDir,

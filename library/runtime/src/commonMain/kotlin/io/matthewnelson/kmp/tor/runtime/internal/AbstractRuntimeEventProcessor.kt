@@ -19,9 +19,11 @@ import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
 import io.matthewnelson.kmp.tor.core.resource.SynchronizedObject
 import io.matthewnelson.kmp.tor.core.resource.synchronized
 import io.matthewnelson.kmp.tor.runtime.RuntimeEvent
+import io.matthewnelson.kmp.tor.runtime.core.Callback
 import io.matthewnelson.kmp.tor.runtime.ctrl.AbstractTorEventProcessor
-import io.matthewnelson.kmp.tor.runtime.core.ItBlock
 import io.matthewnelson.kmp.tor.runtime.core.TorEvent
+import io.matthewnelson.kmp.tor.runtime.core.UncaughtException
+import io.matthewnelson.kmp.tor.runtime.core.UncaughtException.Handler.Companion.tryCatch
 
 @OptIn(InternalKmpTorApi::class)
 internal abstract class AbstractRuntimeEventProcessor(
@@ -33,8 +35,10 @@ internal abstract class AbstractRuntimeEventProcessor(
 {
 
     private val observers = LinkedHashSet<RuntimeEvent.Observer<*>>(initialObservers.size + 1, 1.0F)
-
     private val lock = SynchronizedObject()
+    protected final override val handler: UncaughtException.Handler = UncaughtException.Handler { t ->
+        RuntimeEvent.LOG.ERROR.notifyObservers(t)
+    }
 
     init {
         observers.addAll(initialObservers)
@@ -93,11 +97,8 @@ internal abstract class AbstractRuntimeEventProcessor(
             val iterator = iterator()
             while (iterator.hasNext()) {
                 val observer = iterator.next()
-                if (observer.tag.isStaticTag()) continue
-
-                if (observer.tag == tag) {
-                    iterator.remove()
-                }
+                if (observer.tag != tag) continue
+                iterator.remove()
             }
         }
 
@@ -117,32 +118,43 @@ internal abstract class AbstractRuntimeEventProcessor(
         super.clearObservers()
     }
 
-    protected final override fun registered(): Int = super.registered() + withObservers { size }
-
     protected fun <R: Any> RuntimeEvent<R>.notifyObservers(output: R) {
         val event = this
-        withObservers {
-            for (observer in this) {
-                if (observer.event != event) continue
 
+        if (event is RuntimeEvent.LOG.DEBUG && !debug) return
+
+        val handler = if (event is RuntimeEvent.LOG.ERROR) {
+            UncaughtException.Handler.IGNORE
+        } else {
+            handler
+        }
+
+        withObservers {
+            if (isEmpty()) return@withObservers null
+            mapNotNull { if (it.event == event) it else null }
+        }?.forEach { observer ->
+            handler.tryCatch(observer.toString(isStatic = observer.tag.isStaticTag())) {
                 @Suppress("UNCHECKED_CAST")
-                (observer.output as ItBlock<R>).invoke(output)
+                (observer.callback as Callback<R>)(output)
             }
         }
     }
 
-    protected override fun onDestroy() {
-        if (isDestroyed) return
-        withObservers { clear(); super.onDestroy() }
+    protected override fun onDestroy(): Boolean {
+        val wasDestroyed = super.onDestroy()
+        if (wasDestroyed) synchronized(lock) { observers.clear() }
+        return wasDestroyed
     }
 
     private fun <T: Any?> withObservers(
         block: MutableSet<RuntimeEvent.Observer<*>>.() -> T,
     ): T {
-        if (isDestroyed) return block(noOpMutableSet())
+        if (destroyed) return block(noOpMutableSet())
 
         return synchronized(lock) {
-            block(if (isDestroyed) noOpMutableSet() else observers)
+            block(if (destroyed) noOpMutableSet() else observers)
         }
     }
+
+    protected final override fun registered(): Int = super.registered() + synchronized(lock) { observers.size }
 }

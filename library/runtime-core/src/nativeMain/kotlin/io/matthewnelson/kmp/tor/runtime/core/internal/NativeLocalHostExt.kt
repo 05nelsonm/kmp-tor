@@ -17,7 +17,6 @@
 
 package io.matthewnelson.kmp.tor.runtime.core.internal
 
-import io.matthewnelson.kmp.file.DelicateFileApi
 import io.matthewnelson.kmp.file.errnoToIOException
 import io.matthewnelson.kmp.tor.runtime.core.address.IPAddress
 import io.matthewnelson.kmp.tor.runtime.core.address.IPAddress.V4.Companion.toIPAddressV4OrNull
@@ -40,7 +39,6 @@ internal actual fun LocalHost.Companion.tryPlatformResolve(set: LinkedHashSet<IP
         val result = alloc<CPointerVar<addrinfo>>()
 
         if (getaddrinfo("localhost", null, hint, result.ptr) != 0) {
-            @OptIn(DelicateFileApi::class)
             throw errnoToIOException(errno)
         }
 

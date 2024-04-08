@@ -21,7 +21,6 @@ import io.matthewnelson.kmp.file.toFile
 import io.matthewnelson.kmp.tor.core.api.ResourceInstaller
 import io.matthewnelson.kmp.tor.core.api.ResourceInstaller.Paths
 import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
-import io.matthewnelson.kmp.tor.runtime.core.ThisBlock
 import io.matthewnelson.kmp.tor.runtime.core.TorConfig
 import io.matthewnelson.kmp.tor.runtime.core.TorConfig.Setting.Companion.filterByKeyword
 import io.matthewnelson.kmp.tor.runtime.core.address.LocalHost
@@ -72,9 +71,9 @@ class TorConfigGeneratorUnitTest {
     fun givenMultipleUserConfigs_whenGenerate_thenAllAreApplied() = runTest {
         var invocations = 0
         newGenerator(
-            config = listOf(
-                ThisBlock.WithIt { _ -> invocations++ },
-                ThisBlock.WithIt { _ -> invocations++ },
+            config = setOf(
+                ConfigBuilderCallback { _ -> invocations++ },
+                ConfigBuilderCallback { _ -> invocations++ },
             )
         ).generate(notifier)
 
@@ -101,8 +100,8 @@ class TorConfigGeneratorUnitTest {
         // socks port at 9050 is automatically added
         val settings = newGenerator(
             allowPortReassignment = true,
-            config = listOf(
-                ThisBlock.WithIt {
+            config = setOf(
+                ConfigBuilderCallback {
                     put(TorConfig.__DNSPort) { port(1080.toPortProxy()) }
                 }
             ),
@@ -123,7 +122,7 @@ class TorConfigGeneratorUnitTest {
     private fun newGenerator(
         allowPortReassignment: Boolean = true,
         omitGeoIPFileSettings: Boolean = false,
-        config: List<ThisBlock.WithIt<TorConfig.Builder, TorRuntime.Environment>> = emptyList(),
+        config: Set<ConfigBuilderCallback> = emptySet(),
         isPortAvailable: suspend (LocalHost, Port) -> Boolean = { _, _ -> true },
     ): TorConfigGenerator = TorConfigGenerator.of(
         environment,
