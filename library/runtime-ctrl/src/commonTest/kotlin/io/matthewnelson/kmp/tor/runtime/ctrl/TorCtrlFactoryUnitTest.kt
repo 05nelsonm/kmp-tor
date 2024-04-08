@@ -55,36 +55,36 @@ class TorCtrlFactoryUnitTest {
         }
     }
 
-//    @Test
-//    fun givenUnixDomainSocket_whenConnect_thenIsSuccessful() = runTest {
-//        val uds = TestUtils.INSTALLER.installationDir
-//            .resolve("data")
-//            .resolve("ctrl.sock")
-//
-//        uds.delete()
-//
-//        val ctrlArg = try {
-//            TorConfig.__ControlPort.Builder {
-//                asUnixSocket { file = uds }
-//            }.argument
-//        } catch (_: UnsupportedOperationException) {
-//            println("Skipping...")
-//            return@runTest
-//        }
-//
-//        val p = TestUtils.startTor(ctrlArg)
-//
-//        val ctrl = try {
-//            TorCtrl.Factory(handler = UncaughtException.Handler.THROW)
-//                .connectAsync(uds)
-//        } finally {
-//            p.destroy()
-//        }
-//
-//        withContext(Dispatchers.Default) { delay(250.milliseconds) }
-//
-//        assertTrue(ctrl.isDestroyed())
-//    }
+    @Test
+    fun givenUnixDomainSocket_whenConnect_thenIsSuccessful() = runTest {
+        val uds = TestUtils.INSTALLER.installationDir
+            .resolve("data")
+            .resolve("ctrl.sock")
+
+        uds.delete()
+
+        val ctrlArg = try {
+            TorConfig.__ControlPort.Builder {
+                asUnixSocket { file = uds }
+            }.argument
+        } catch (_: UnsupportedOperationException) {
+            println("Skipping...")
+            return@runTest
+        }
+
+        val p = TestUtils.startTor(ctrlArg)
+
+        val ctrl = try {
+            TorCtrl.Factory(handler = UncaughtException.Handler.THROW)
+                .connectAsync(uds)
+        } finally {
+            p.destroy()
+        }
+
+        withContext(Dispatchers.Default) { delay(250.milliseconds) }
+
+        assertTrue(ctrl.isDestroyed())
+    }
 
     private suspend fun LocalHost.runTCPTest(
         startPort: Port.Proxy,

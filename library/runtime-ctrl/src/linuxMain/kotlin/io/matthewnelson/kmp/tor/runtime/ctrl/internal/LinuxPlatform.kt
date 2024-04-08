@@ -13,34 +13,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-@file:Suppress("UnnecessaryOptInAnnotation")
-
 package io.matthewnelson.kmp.tor.runtime.ctrl.internal
 
 import io.matthewnelson.kmp.file.File
-import io.matthewnelson.kmp.file.errnoToIOException
+import io.matthewnelson.kmp.file.path
 import kotlinx.cinterop.*
-import platform.posix.*
-
-@Throws(Throwable::class)
-@OptIn(ExperimentalForeignApi::class, UnsafeNumber::class)
-internal actual fun File.connect(): CtrlConnection {
-    val descriptor = socket(AF_UNIX, SOCK_STREAM, 0)
-    if (descriptor < 0) throw errnoToIOException(errno)
-
-    socketAddress(AF_UNIX.convert()) { pointer, len ->
-        if (connect(descriptor, pointer, len) != 0) {
-            val errno = errno
-            close(descriptor)
-            throw errnoToIOException(errno)
-        }
-    }
-
-    return NativeCtrlConnection(descriptor)
-}
+import platform.linux.sockaddr_un
+import platform.posix.sockaddr
+import platform.posix.socklen_t
+import platform.posix.strcpy
 
 @OptIn(ExperimentalForeignApi::class)
-internal expect fun File.socketAddress(
+internal actual fun File.socketAddress(
     family: UShort,
     block: (CValuesRef<sockaddr>, len: socklen_t) -> Unit,
-)
+) {
+    cValue<sockaddr_un> {
+        strcpy(sun_path, path)
+        sun_family = family
+
+        block(ptr.reinterpret(), sizeOf<sockaddr_un>().convert())
+    }
+}
