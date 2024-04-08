@@ -45,3 +45,11 @@ internal inline fun net_Socket.onceClose(
     once("close", listener)
     return this
 }
+
+@OptIn(InternalProcessApi::class)
+internal inline fun net_Socket.onData(
+    noinline listener: (data: dynamic) -> Unit
+): net_Socket {
+    on("data", listener)
+    return this
+}

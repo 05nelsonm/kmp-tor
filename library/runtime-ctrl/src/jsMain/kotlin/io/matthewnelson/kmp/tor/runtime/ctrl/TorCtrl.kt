@@ -163,27 +163,6 @@ public actual interface TorCtrl : Destroyable, TorEvent.Processor, TorCmd.Privil
                 }
             }
 
-            val rBuf = ReadBuffer.allocate()
-
-            run {
-                fun callback(nread: Int, buf: dynamic) {
-                    val readBuf = try {
-                        val jsBuf = Buffer.wrap(buf)
-                        ReadBuffer.of(jsBuf)
-                    } catch (_: Throwable) {
-                        rBuf
-                    }
-
-                    feed.onData(readBuf, nread)
-                }
-
-                val onReadOptions = js("{}")
-                onReadOptions["buffer"] = rBuf.buf.unwrap()
-                onReadOptions["callback"] = ::callback
-
-                options["onread"] = onReadOptions
-            }
-
             val socket = run {
                 var isConnected = false
                 val socket = try {
@@ -197,13 +176,21 @@ public actual interface TorCtrl : Destroyable, TorEvent.Processor, TorCmd.Privil
                     threw = IOException("$error")
                 }
 
-                socket.onceClose { feed.close(); rBuf.buf.fill() }
+                socket
+                    .onceClose {
+                        feed.close()
+                    }
+                    .onData { buf ->
+                        val jsBuf = Buffer.wrap(buf)
+                        val readBuf = ReadBuffer.of(jsBuf)
+                        feed.onData(readBuf, jsBuf.length.toInt())
+                    }
 
                 withContext(NonCancellable) {
                     val mark = TimeSource.Monotonic.markNow()
 
                     while (!isConnected && threw == null) {
-                        delay(1.milliseconds)
+                        delay(5.milliseconds)
 
                         if (mark.elapsedNow() < 42.milliseconds) continue
 
