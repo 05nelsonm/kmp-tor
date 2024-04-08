@@ -164,13 +164,8 @@ public actual interface TorCtrl : Destroyable, TorEvent.Processor, TorCmd.Privil
             }
 
             fun callback(nread: Int, buf: dynamic) {
-                val readBuf = try {
-                    val jsBuf = Buffer.wrap(buf)
-                    ReadBuffer.of(jsBuf)
-                } catch (_: Throwable) {
-                    return
-                }
-
+                val jsBuf = Buffer.wrap(buf)
+                val readBuf = ReadBuffer.of(jsBuf)
                 feed.onData(readBuf, nread)
             }
 
@@ -216,6 +211,7 @@ public actual interface TorCtrl : Destroyable, TorEvent.Processor, TorCmd.Privil
 
                 threw?.let { throw it }
 
+                socket.onError { /* ignore */ }
                 errorDisposable.invoke()
                 socket
             }

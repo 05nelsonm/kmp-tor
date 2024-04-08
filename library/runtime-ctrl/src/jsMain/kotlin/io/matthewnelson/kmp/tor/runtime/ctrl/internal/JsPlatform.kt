@@ -19,6 +19,16 @@ import io.matthewnelson.kmp.process.InternalProcessApi
 import io.matthewnelson.kmp.tor.runtime.core.Disposable
 
 @OptIn(InternalProcessApi::class)
+internal inline fun net_Socket.onError(
+    noinline listener: (error: dynamic) -> Unit
+): Disposable {
+    on("error", listener)
+    return Disposable {
+        removeListener("error", listener)
+    }
+}
+
+@OptIn(InternalProcessApi::class)
 internal inline fun net_Socket.onceError(
     noinline listener: (error: dynamic) -> Unit
 ): Disposable {
