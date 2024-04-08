@@ -20,6 +20,8 @@ import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
 import io.matthewnelson.kmp.tor.core.resource.SynchronizedObject
 import io.matthewnelson.kmp.tor.core.resource.synchronized
 import io.matthewnelson.kmp.tor.runtime.core.TorEvent
+import io.matthewnelson.kmp.tor.runtime.core.UncaughtException.Handler.Companion.tryCatch
+import io.matthewnelson.kmp.tor.runtime.core.UncaughtException.Handler.Companion.withSuppression
 import io.matthewnelson.kmp.tor.runtime.core.ctrl.Reply
 import io.matthewnelson.kmp.tor.runtime.ctrl.TorCtrl
 import io.matthewnelson.kmp.tor.runtime.ctrl.internal.Debugger.Companion.d
@@ -52,6 +54,8 @@ internal class RealTorCtrl private constructor(
 
     @Volatile
     private var _isDisconnected = false
+    @Volatile
+    private var _closeException: IOException? = null
     private val lock = SynchronizedObject()
 
     private val waiters = Waiters { LOG }
@@ -94,7 +98,12 @@ internal class RealTorCtrl private constructor(
 
         if (!disconnect) return
 
-        connection.close()
+        try {
+            connection.close()
+        } catch (e: IOException) {
+            _closeException = e
+        }
+
         LOG.d { "Connection Closed" }
     }
 
@@ -102,12 +111,11 @@ internal class RealTorCtrl private constructor(
 
     // @Throws(UncaughtException::class)
     protected override fun onDestroy(): Boolean {
-        try {
-            // ensure connection.close is called
-            destroy()
-        } catch (_: IOException) {
-            // TODO: do better
-        }
+        // Already destroyed
+        if (!scope.isActive) return false
+
+        // ensure connection.close is called
+        destroy()
 
         // Waiters must be destroyed BEFORE cancelling
         // scope (if they haven't already been b/c of EOS).
@@ -119,15 +127,19 @@ internal class RealTorCtrl private constructor(
         scope.cancel()
         LOG.d { "Scope Cancelled" }
 
-        val wasDestroyed = try {
-            // May throw UncaughtException if handler is
-            // UncaughtException.Handler.THROW
-            super.onDestroy()
-        } finally {
+        handler.withSuppression {
+            val context = "RealTorCtrl.onDestroy"
+
+            tryCatch(context) { super.onDestroy() }
+
+            _closeException?.let { ex ->
+                tryCatch(context) { throw ex }
+            }
+
             LOG = null
         }
 
-        return wasDestroyed
+        return true
     }
 
     init {
@@ -143,10 +155,10 @@ internal class RealTorCtrl private constructor(
                 //
                 // If so, need to ensure parser's EOS gets triggered.
                 parser.parse(null)
-
-                // Slight delay before invoking onDestroy
-                delay(25.milliseconds)
             }
+
+            // Slight delay before invoking onDestroy
+            delay(50.milliseconds)
         }.invokeOnCompletion {
             LOG.d { "Stopped Reading" }
             onDestroy()

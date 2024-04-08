@@ -48,11 +48,7 @@ public expect interface TorCtrl: Destroyable, TorEvent.Processor, TorCmd.Privile
      * then it will also stop the tor process.
      *
      * Successive invocations do nothing.
-     *
-     * @throws [IOException] if underlying Socket.close() failed
-     *   for the given platform
      * */
-    // @Throws(IOException::class)
     public override fun destroy()
 
     /**
