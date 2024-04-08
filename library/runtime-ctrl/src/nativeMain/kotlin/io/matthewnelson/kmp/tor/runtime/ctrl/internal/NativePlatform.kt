@@ -19,20 +19,13 @@ package io.matthewnelson.kmp.tor.runtime.ctrl.internal
 
 import io.matthewnelson.kmp.file.IOException
 import io.matthewnelson.kmp.file.errnoToIOException
-import io.matthewnelson.kmp.process.InternalProcessApi
-import io.matthewnelson.kmp.process.ReadBuffer
-import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
-import io.matthewnelson.kmp.tor.core.resource.SynchronizedObject
-import io.matthewnelson.kmp.tor.core.resource.synchronized
 import io.matthewnelson.kmp.tor.runtime.core.address.IPAddress
 import io.matthewnelson.kmp.tor.runtime.core.address.ProxyAddress
 import kotlinx.cinterop.*
 import platform.posix.*
-import kotlin.concurrent.Volatile
-import kotlin.coroutines.cancellation.CancellationException
 
 @Throws(Throwable::class)
-@OptIn(ExperimentalForeignApi::class, InternalKmpTorApi::class, UnsafeNumber::class)
+@OptIn(ExperimentalForeignApi::class, UnsafeNumber::class)
 internal actual fun ProxyAddress.connect(): CtrlConnection = memScoped {
     val (family, len) = when (address) {
         is IPAddress.V4 -> AF_INET to sizeOf<sockaddr_in>()
@@ -78,89 +71,5 @@ internal actual fun ProxyAddress.connect(): CtrlConnection = memScoped {
             ?: IOException("Failed to connect to ${this@connect}")
     }
 
-    descriptor
-}.toCtrlConnection()
-
-@Throws(Throwable::class)
-@OptIn(ExperimentalForeignApi::class, InternalKmpTorApi::class, UnsafeNumber::class)
-internal fun Int.toCtrlConnection(): CtrlConnection = object : CtrlConnection {
-
-    private val descriptor = this@toCtrlConnection
-
-    @Volatile
-    private var _isClosed: Boolean = false
-    @Volatile
-    private var _isReading: Boolean = false
-    private val lock = SynchronizedObject()
-
-    @OptIn(InternalProcessApi::class)
-    @Throws(CancellationException::class, IllegalStateException::class)
-    override suspend fun startRead(parser: CtrlConnection.Parser) {
-        synchronized(lock) {
-            if (_isClosed) throw IllegalStateException("Connection is closed")
-            if (_isReading) throw IllegalStateException("Already reading input")
-            _isReading = true
-        }
-
-        val feed = ReadBuffer.lineOutputFeed(parser::parse)
-        val buf = ReadBuffer.allocate()
-
-        while (true) {
-            val read = buf.buf.usePinned { pinned ->
-                read(
-                    descriptor,
-                    pinned.addressOf(0),
-                    buf.buf.size.convert(),
-                ).toInt()
-            }
-
-            if (read <= 0) break
-
-            feed.onData(buf, read)
-        }
-
-        buf.buf.fill(0)
-        feed.close()
-    }
-
-    @Throws(CancellationException::class, IOException::class)
-    override suspend fun write(command: ByteArray) {
-        if (_isClosed) throw IOException("Connection is closed")
-        if (command.isEmpty()) return
-
-        synchronized(lock) {
-            if (_isClosed) throw IOException("Connection is closed")
-
-            command.usePinned { pinned ->
-                var written = 0
-                while (written < command.size) {
-                    val write = send(
-                        descriptor,
-                        pinned.addressOf(0),
-                        command.size.convert(),
-                        0,
-                    ).toInt()
-
-                    if (write == 0) break
-                    if (write == -1) {
-                        throw errnoToIOException(errno)
-                    }
-
-                    written += write
-                }
-            }
-        }
-    }
-
-    @Throws(IOException::class)
-    override fun close() {
-        if (_isClosed) return
-
-        synchronized(lock) {
-            if (_isClosed) return
-            _isClosed = true
-            shutdown(descriptor, SHUT_RDWR)
-            close(descriptor)
-        }
-    }
+    NativeCtrlConnection(descriptor)
 }

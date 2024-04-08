@@ -23,6 +23,7 @@ import io.matthewnelson.kmp.tor.core.resource.synchronized
 import io.matthewnelson.kmp.tor.runtime.core.TorConfig
 import io.matthewnelson.kmp.tor.runtime.core.UncaughtException
 import io.matthewnelson.kmp.tor.runtime.core.address.LocalHost
+import io.matthewnelson.kmp.tor.runtime.core.address.Port
 import io.matthewnelson.kmp.tor.runtime.core.address.Port.Proxy.Companion.toPortProxy
 import io.matthewnelson.kmp.tor.runtime.core.address.ProxyAddress
 import io.matthewnelson.kmp.tor.runtime.core.util.findAvailableAsync
@@ -39,17 +40,17 @@ class TorCtrlFactoryUnitTest {
 
     @Test
     fun givenIPv4_whenConnect_thenIsSuccessful() = runTest {
-        LocalHost.IPv4.runTCPTest()
+        LocalHost.IPv4.runTCPTest(9055.toPortProxy())
     }
 
     @Test
     fun givenIPv6_whenConnect_thenIsSuccessful() = runTest {
-        LocalHost.IPv6.runTCPTest()
+        LocalHost.IPv6.runTCPTest(9155.toPortProxy())
     }
 
     @Test
     fun givenConnection_whenTorStops_thenDestroysItself() = runTest {
-        LocalHost.IPv4.runTCPTest { process, _ ->
+        LocalHost.IPv4.runTCPTest(9255.toPortProxy()) { process, _ ->
             process.destroy()
         }
     }
@@ -86,6 +87,7 @@ class TorCtrlFactoryUnitTest {
 //    }
 
     private suspend fun LocalHost.runTCPTest(
+        startPort: Port.Proxy,
         block: suspend (process: Process, ctrl: TorCtrl) -> Unit = { process, ctrl ->
             // default test behavior is to disconnect ctrl listener first
             ctrl.destroy()
@@ -100,7 +102,7 @@ class TorCtrlFactoryUnitTest {
         )
 
         val host = resolve()
-        val port = 9055.toPortProxy().findAvailableAsync(1_000, this)
+        val port = startPort.findAvailableAsync(1_000, this)
 
         val address = ProxyAddress(host, port)
 
