@@ -24,8 +24,20 @@ import kotlin.test.*
 
 class TempTorCmdQueueUnitTest {
 
-    private val ctrl = TestCtrl()
-    private val queue = TempTorCmdQueue.of(UncaughtException.Handler.THROW)
+    private lateinit var ctrl: TestCtrl
+    private lateinit var queue: TempTorCmdQueue
+
+    @BeforeTest
+    fun setup() {
+        ctrl = TestCtrl()
+        queue = TempTorCmdQueue.of(UncaughtException.Handler.THROW)
+    }
+
+    @AfterTest
+    fun tearDown() {
+        ctrl.destroy()
+        queue.destroy()
+    }
 
     @Test
     fun givenEnqueuedJob_whenAttach_thenIsTransferred() {
