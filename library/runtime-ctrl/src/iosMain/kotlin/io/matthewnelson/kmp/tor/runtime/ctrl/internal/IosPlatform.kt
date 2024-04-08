@@ -18,7 +18,6 @@ package io.matthewnelson.kmp.tor.runtime.ctrl.internal
 import io.matthewnelson.kmp.file.File
 import io.matthewnelson.kmp.file.path
 import kotlinx.cinterop.*
-import platform.darwin.sockaddr_un
 import platform.posix.sockaddr
 import platform.posix.socklen_t
 import platform.posix.strcpy
@@ -30,7 +29,7 @@ internal actual fun File.socketAddress(
 ) {
     cValue<sockaddr_un> {
         strcpy(sun_path, path)
-        sun_family = family
+        sun_family = family.convert()
 
         block(ptr.reinterpret(), sizeOf<sockaddr_un>().convert())
     }

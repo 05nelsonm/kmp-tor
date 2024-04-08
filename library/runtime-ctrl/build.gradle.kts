@@ -13,6 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
+import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
+import org.jetbrains.kotlin.konan.target.Family
+
 plugins {
     id("configuration")
 }
@@ -54,6 +57,28 @@ kmpConfiguration {
                     findByName("nativeTest")?.apply { dependsOn(nonJsTest) }
                 }
             }
+
+            val cInteropDir = projectDir
+                .resolve("src")
+                .resolve("nativeInterop")
+                .resolve("cinterop")
+
+            targets.filterIsInstance<KotlinNativeTarget>()
+                .unCInterop(cInteropDir)
         }
     }
+}
+
+fun List<KotlinNativeTarget>.unCInterop(
+    cInteropDir: File,
+): List<KotlinNativeTarget> {
+    forEach { target ->
+        if (target.konanTarget.family != Family.IOS) return@forEach
+
+        target.compilations["main"].cinterops.create("un").apply {
+            defFile = cInteropDir.resolve("un.def")
+        }
+    }
+
+    return this
 }
