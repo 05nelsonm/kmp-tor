@@ -106,6 +106,8 @@ private suspend fun IPAddress.isPortAvailable(port: Int): Boolean {
             latch.cancel()
         }
 
+        val waitTime = (if (IsUnixLikeHost) 42 else 84).milliseconds
+
         while (
             ctx.isActive
             && latch.isActive
@@ -113,7 +115,7 @@ private suspend fun IPAddress.isPortAvailable(port: Int): Boolean {
             && error == null
         ) {
             delay(1.milliseconds)
-            if (timeMark.elapsedNow() > 42.milliseconds) break
+            if (timeMark.elapsedNow() > waitTime) break
         }
     } finally {
         latch.cancel()
