@@ -49,24 +49,34 @@ internal actual fun ProxyAddress.connect(): CtrlConnection = memScoped {
     var info: addrinfo? = result.pointed
         ?: throw IOException("Failed to resolve addrinfo for ${this@connect}")
 
-    val descriptor = socket(family, SOCK_STREAM, 0)
-    if (descriptor < 0) throw errnoToIOException(errno)
-
-    var connected = false
+    var descriptor: Int? = null
     var lastErrno: Int? = null
-    while (info != null && !connected) {
+    while (info != null && descriptor == null) {
         val sockaddr = info.ai_addr?.pointed
 
         if (sockaddr != null) {
-            connected = connect(descriptor, sockaddr.ptr, len.convert()) == 0
-            if (!connected) lastErrno = errno
+            val socket = socket(family, SOCK_STREAM, 0)
+
+            if (socket < 0) {
+                lastErrno = errno
+            } else {
+                // connect man7 NOTES:
+                // If connect() fails, consider the state of the socket
+                // as unspecified. Portable applications should close
+                // the socket and create a new one for reconnecting.
+                if (connect(socket, sockaddr.ptr, len.convert()) != 0) {
+                    lastErrno = errno
+                    close(socket)
+                } else {
+                    descriptor = socket
+                }
+            }
         }
 
         info = info.ai_next?.pointed
     }
 
-    if (!connected) {
-        close(descriptor)
+    if (descriptor == null) {
         throw lastErrno?.let { errnoToIOException(it) }
             ?: IOException("Failed to connect to ${this@connect}")
     }

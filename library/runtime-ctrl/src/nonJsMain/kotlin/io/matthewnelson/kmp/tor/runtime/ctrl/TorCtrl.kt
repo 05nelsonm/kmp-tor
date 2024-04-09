@@ -99,7 +99,7 @@ public actual interface TorCtrl : Destroyable, TorEvent.Processor, TorCmd.Privil
      * @param [debugger] A callback for debugging info. **MUST** be thread
      *   safe. Any exceptions it throws will be swallowed.
      * @param [handler] The [UncaughtException.Handler] to pipe bad behavior
-     *   to.
+     *   to. It **MUST** be thread-safe.
      * @throws [IllegalArgumentException] if [handler] is an instance
      *   of [UncaughtException.SuppressedHandler] (a leaked reference)
      * */
