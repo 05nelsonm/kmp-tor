@@ -81,7 +81,7 @@ class TorCtrlFactoryUnitTest {
             p.destroy()
         }
 
-        withContext(Dispatchers.Default) { delay(250.milliseconds) }
+        withContext(Dispatchers.Default) { delay(350.milliseconds) }
 
         assertTrue(ctrl.isDestroyed())
     }
@@ -102,7 +102,7 @@ class TorCtrlFactoryUnitTest {
         )
 
         val host = resolve()
-        val port = startPort.findAvailableAsync(1_000, this)
+        val port = startPort.findAvailableAsync(100, this)
 
         val address = ProxyAddress(host, port)
 
@@ -114,7 +114,7 @@ class TorCtrlFactoryUnitTest {
 
         block(process, ctrl)
 
-        withContext(Dispatchers.Default) { delay(250.milliseconds) }
+        withContext(Dispatchers.Default) { delay(500.milliseconds) }
 
         assertEquals(1, invocationDestroy)
 

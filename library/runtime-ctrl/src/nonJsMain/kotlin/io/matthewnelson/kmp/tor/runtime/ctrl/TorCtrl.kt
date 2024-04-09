@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-@file:Suppress("EXPECT_ACTUAL_CLASSIFIERS_ARE_IN_BETA_WARNING")
+@file:Suppress("EXPECT_ACTUAL_CLASSIFIERS_ARE_IN_BETA_WARNING", "KotlinRedundantDiagnosticSuppress")
 
 package io.matthewnelson.kmp.tor.runtime.ctrl
 
@@ -122,8 +122,12 @@ public actual interface TorCtrl : Destroyable, TorEvent.Processor, TorCmd.Privil
          * */
         @Throws(CancellationException::class, IOException::class)
         public actual suspend fun connectAsync(address: ProxyAddress): TorCtrl {
-            return connect { context ->
-                withContext(context) { address.connect() }
+            return withDelayedReturnAsync {
+                connect { context ->
+                    withContext(context) {
+                        address.connect()
+                    }
+                }
             }
         }
 
@@ -138,8 +142,12 @@ public actual interface TorCtrl : Destroyable, TorEvent.Processor, TorCmd.Privil
         public actual suspend fun connectAsync(path: File): TorCtrl {
             path.checkUnixSockedSupport()
 
-            return connect { context ->
-                withContext(context) { path.connect() }
+            return withDelayedReturnAsync {
+                connect { context ->
+                    withContext(context) {
+                        path.connect()
+                    }
+                }
             }
         }
 
@@ -153,7 +161,9 @@ public actual interface TorCtrl : Destroyable, TorEvent.Processor, TorCmd.Privil
          * */
         @Throws(IOException::class)
         public fun connect(address: ProxyAddress): TorCtrl {
-            return connect { address.connect() }
+            return withDelayedReturn {
+                connect { address.connect() }
+            }
         }
 
         /**
@@ -170,10 +180,13 @@ public actual interface TorCtrl : Destroyable, TorEvent.Processor, TorCmd.Privil
         public fun connect(path: File): TorCtrl {
             path.checkUnixSockedSupport()
 
-            return connect { path.connect() }
+            return withDelayedReturn {
+                connect { path.connect() }
+            }
         }
 
         @Throws(IOException::class)
+        @Suppress("NOTHING_TO_INLINE")
         @OptIn(ExperimentalContracts::class)
         private inline fun connect(
             connect: (context: CoroutineContext) -> CtrlConnection,
@@ -182,8 +195,7 @@ public actual interface TorCtrl : Destroyable, TorEvent.Processor, TorCmd.Privil
                 callsInPlace(connect, InvocationKind.EXACTLY_ONCE)
             }
 
-            @OptIn(ExperimentalCoroutinesApi::class)
-            val dispatcher = Dispatchers.IO.limitedParallelism(2)
+            val dispatcher = Dispatchers.IO
 
             val connection = try {
                 connect(dispatcher)
@@ -191,16 +203,52 @@ public actual interface TorCtrl : Destroyable, TorEvent.Processor, TorCmd.Privil
                 throw t.wrapIOException()
             }
 
-            val ctrl = RealTorCtrl.of(this, dispatcher, connection)
+            return RealTorCtrl.of(this, dispatcher, connection)
+        }
+
+        /**
+         * A slight delay is needed before returning in order
+         * to ensure that the coroutine starts before able
+         * to call destroy on it.
+         * */
+        @Suppress("NOTHING_TO_INLINE")
+        @OptIn(ExperimentalContracts::class)
+        private inline fun withDelayedReturn(block: () -> TorCtrl): TorCtrl {
+            contract {
+                callsInPlace(block, InvocationKind.EXACTLY_ONCE)
+            }
+
+            val ctrl = block()
 
             try {
-                // A slight delay is needed before returning in order
-                // to ensure that the coroutine starts before able
-                // to call destroy on it.
                 Blocking.threadSleep(25.milliseconds)
             } catch (e: InterruptedException) {
                 ctrl.destroy()
                 throw IOException("Interrupted", e)
+            }
+
+            return ctrl
+        }
+
+        /**
+         * A slight delay is needed before returning in order
+         * to ensure that the coroutine starts before able
+         * to call destroy on it.
+         * */
+        @Suppress("NOTHING_TO_INLINE")
+        @OptIn(ExperimentalContracts::class)
+        private suspend inline fun withDelayedReturnAsync(block: () -> TorCtrl): TorCtrl {
+            contract {
+                callsInPlace(block, InvocationKind.EXACTLY_ONCE)
+            }
+
+            val ctrl = block()
+
+            try {
+                delay(25.milliseconds)
+            } catch (e: CancellationException) {
+                ctrl.destroy()
+                throw e
             }
 
             return ctrl

@@ -31,5 +31,5 @@ internal external fun net_createServer(connectionListener: (socket: dynamic) -> 
 @OptIn(InternalProcessApi::class)
 internal external class net_Server: events_EventEmitter {
     fun close()
-    fun listen(port: Int, host: String, backlog: Int, callback: () -> Unit)
+    fun listen(options: dynamic, callback: () -> Unit)
 }

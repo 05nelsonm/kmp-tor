@@ -25,8 +25,8 @@ import io.matthewnelson.kmp.tor.runtime.core.internal.*
 import io.matthewnelson.kmp.tor.runtime.core.internal.PortProxyIterator.Companion.iterator
 import io.matthewnelson.kmp.tor.runtime.core.internal.net_createServer
 import io.matthewnelson.kmp.tor.runtime.core.internal.onError
-import io.matthewnelson.kmp.tor.runtime.core.internal.onListening
 import kotlinx.coroutines.*
+import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.TimeSource
 
@@ -40,7 +40,7 @@ import kotlin.time.TimeSource
 // @Throws(IOException::class, CancellationException::class)
 public actual suspend fun Port.isAvailableAsync(
     host: LocalHost,
-): Boolean = host.resolve().isPortAvailable(value)
+): Boolean = host.resolve().isPortAvailable(value, timeout = 100.milliseconds)
 
 /**
  * Finds an available TCP port on [LocalHost] starting with the current
@@ -64,16 +64,35 @@ public actual suspend fun Port.Proxy.findAvailableAsync(
     val ipAddress = host.resolve()
 
     val ctx = currentCoroutineContext()
-    while (ctx.isActive && i.hasNext()) {
-        if (!ipAddress.isPortAvailable(i.next())) continue
+    val maxTimeouts = 5
+    var timeouts = 0
+    while (ctx.isActive && i.hasNext() && timeouts < maxTimeouts) {
+        try {
+            val isAvailable = ipAddress.isPortAvailable(i.next())
+            timeouts = 0
+            if (!isAvailable) continue
+        } catch (_: IOException) {
+            timeouts++
+            continue
+        }
+
         return i.toPortProxy()
     }
 
-    throw ctx.cancellationExceptionOr { i.unavailableException(ipAddress) }
+    throw ctx.cancellationExceptionOr {
+        if (timeouts >= maxTimeouts) {
+            IOException("$maxTimeouts successive timeouts occurred when checking availability")
+        } else {
+            i.unavailableException(ipAddress)
+        }
+    }
 }
 
 // @Throws(IOException::class, CancellationException::class)
-private suspend fun IPAddress.isPortAvailable(port: Int): Boolean {
+private suspend fun IPAddress.isPortAvailable(
+    port: Int,
+    timeout: Duration = 42.milliseconds
+): Boolean {
     val timeMark = TimeSource.Monotonic.markNow()
     val ctx = currentCoroutineContext()
     val latch = Job(ctx[Job])
@@ -87,11 +106,6 @@ private suspend fun IPAddress.isPortAvailable(port: Int): Boolean {
 
         latch.invokeOnCompletion { server.close() }
 
-        server.onListening {
-            isAvailable = true
-            latch.complete()
-        }
-
         server.onError { err ->
             if ((err.code as String) == "EADDRINUSE") {
                 isAvailable = false
@@ -101,12 +115,15 @@ private suspend fun IPAddress.isPortAvailable(port: Int): Boolean {
             latch.complete()
         }
 
-        server.listen(port, ipAddress, 1) {
+        val options = js("{}")
+        options["port"] = port
+        options["host"] = ipAddress
+        options["backlog"] = 1
+
+        server.listen(options) {
             isAvailable = true
             latch.complete()
         }
-
-        val waitTime = (if (IsUnixLikeHost) 42 else 84).milliseconds
 
         withContext(NonCancellable) {
             while (
@@ -116,7 +133,7 @@ private suspend fun IPAddress.isPortAvailable(port: Int): Boolean {
                 && error == null
             ) {
                 delay(5.milliseconds)
-                if (timeMark.elapsedNow() > waitTime) break
+                if (timeMark.elapsedNow() > timeout) break
             }
         }
     } finally {

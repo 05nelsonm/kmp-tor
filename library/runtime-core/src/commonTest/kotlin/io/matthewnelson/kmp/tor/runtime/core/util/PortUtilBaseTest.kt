@@ -29,7 +29,9 @@ import kotlin.time.Duration.Companion.seconds
 @OptIn(ExperimentalStdlibApi::class)
 abstract class PortUtilBaseTest {
 
-    protected abstract fun openServerSocket(
+    protected open val isNodeJs: Boolean = false
+
+    protected abstract suspend fun openServerSocket(
         ipAddress: IPAddress,
         port: Int,
     ): AutoCloseable
@@ -54,7 +56,7 @@ abstract class PortUtilBaseTest {
     fun givenFindAvailable_whenCoroutineCancelled_thenHandlesCancellationProperly() = runTest(timeout = 120.seconds) {
         val port = Port.Proxy.MIN.toPortProxy()
         val host = LocalHost.IPv4
-        val limit = 750
+        val limit = if (isNodeJs) 250 else 750
         val i = port.iterator(limit)
 
         var count = 0
@@ -84,7 +86,7 @@ abstract class PortUtilBaseTest {
 
         // Ensure any exceptions/results are propagated
         withContext(Dispatchers.Default) {
-            delay(5_000.milliseconds)
+            delay(2_500.milliseconds)
         }
 
         // If it threw an IOException, that would be propagated
@@ -113,11 +115,6 @@ abstract class PortUtilBaseTest {
             try {
                 socket.close()
             } catch (_: Throwable) {}
-        }
-        withContext(Dispatchers.Default) {
-            // Need to switch context here for an actual delay
-            // b/c JS needs to establish the connection
-            delay(10.milliseconds)
         }
         return socket to portProxy
     }

@@ -41,7 +41,7 @@ public object TestUtils {
         val dataDir = homeDir.resolve("data")
         val cacheDir = homeDir.resolve("cache")
 
-        withContext(Dispatchers.Default) { delay(250.milliseconds) }
+        withContext(Dispatchers.Default) { delay(350.milliseconds) }
 
         val p = Process.Builder(paths.tor)
             .args("--DataDirectory")
@@ -64,6 +64,8 @@ public object TestUtils {
             .args("1")
             .args("--RunAsDaemon")
             .args("0")
+            .args("__OwningControllerProcess")
+            .args(Process.Current.pid().toString())
             .destroySignal(Signal.SIGTERM)
             .environment("HOME", homeDir.path)
             .stdin(Stdio.Null)
@@ -73,7 +75,7 @@ public object TestUtils {
 
         currentCoroutineContext().job.invokeOnCompletion { p.destroy() }
 
-        withContext(Dispatchers.Default) { delay(250.milliseconds) }
+        withContext(Dispatchers.Default) { delay(350.milliseconds) }
 
         return p
     }
