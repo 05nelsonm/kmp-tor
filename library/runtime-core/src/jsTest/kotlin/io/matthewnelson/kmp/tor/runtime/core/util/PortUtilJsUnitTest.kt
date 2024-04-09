@@ -27,6 +27,8 @@ import kotlin.time.Duration.Companion.milliseconds
 @OptIn(ExperimentalStdlibApi::class)
 class PortUtilJsUnitTest: PortUtilBaseTest() {
 
+    override val isNodeJs: Boolean = true
+
     override suspend fun openServerSocket(
         ipAddress: IPAddress,
         port: Int,

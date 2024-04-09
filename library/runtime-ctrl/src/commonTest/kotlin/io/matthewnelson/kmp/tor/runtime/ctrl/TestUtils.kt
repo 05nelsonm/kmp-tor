@@ -41,7 +41,7 @@ public object TestUtils {
         val dataDir = homeDir.resolve("data")
         val cacheDir = homeDir.resolve("cache")
 
-        withContext(Dispatchers.Default) { delay(250.milliseconds) }
+        withContext(Dispatchers.Default) { delay(350.milliseconds) }
 
         val p = Process.Builder(paths.tor)
             .args("--DataDirectory")
@@ -73,7 +73,7 @@ public object TestUtils {
 
         currentCoroutineContext().job.invokeOnCompletion { p.destroy() }
 
-        withContext(Dispatchers.Default) { delay(250.milliseconds) }
+        withContext(Dispatchers.Default) { delay(350.milliseconds) }
 
         return p
     }

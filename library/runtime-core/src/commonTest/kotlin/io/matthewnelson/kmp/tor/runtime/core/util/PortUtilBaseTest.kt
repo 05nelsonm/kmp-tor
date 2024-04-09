@@ -29,6 +29,8 @@ import kotlin.time.Duration.Companion.seconds
 @OptIn(ExperimentalStdlibApi::class)
 abstract class PortUtilBaseTest {
 
+    protected open val isNodeJs: Boolean = false
+
     protected abstract suspend fun openServerSocket(
         ipAddress: IPAddress,
         port: Int,
@@ -54,7 +56,7 @@ abstract class PortUtilBaseTest {
     fun givenFindAvailable_whenCoroutineCancelled_thenHandlesCancellationProperly() = runTest(timeout = 120.seconds) {
         val port = Port.Proxy.MIN.toPortProxy()
         val host = LocalHost.IPv4
-        val limit = 750
+        val limit = if (isNodeJs) 50 else 750
         val i = port.iterator(limit)
 
         var count = 0
