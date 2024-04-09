@@ -286,25 +286,17 @@ public class TorConfig private constructor(
         UnixSocketBuilder.DSL<__ControlPort>
     {
 
-        /**
-         * Can be either a TCP Port or a Unix Socket path.
-         *
-         * @see [asPort]
-         * @see [asUnixSocket]
-         * */
-        @get:JvmName("argument")
-        public var argument: String = AUTO
-            private set
-
-        private val _unixFlags = mutableSetOf<String>()
-        @get:JvmName("unixFlags")
-        public val unixFlags: Set<String> get() = _unixFlags.toImmutableSet()
+        private var argument: String = AUTO
+        private var allowReassign = true
+        private val unixFlags = mutableSetOf<String>()
 
         @KmpTorDsl
         public override fun asPort(
             block: ThisBlock<TCPPortBuilder.Control>,
         ): __ControlPort {
-            argument = TCPPortBuilder.Control.build(block)
+            val (reassign, arg) = TCPPortBuilder.Control.build(block)
+            argument = arg
+            allowReassign = reassign
             return this
         }
 
@@ -322,20 +314,21 @@ public class TorConfig private constructor(
         public override fun unixFlags(
             block: ThisBlock<UnixFlagBuilder>
         ): __ControlPort {
-            UnixFlagBuilder.configure(isControl = true, _unixFlags, block)
+            UnixFlagBuilder.configure(isControl = true, unixFlags, block)
             return this
         }
 
         public companion object: Setting.Factory<__ControlPort, Setting>(
             name = "__ControlPort",
             attributes = immutableSetOf(Attribute.Port, Attribute.UnixSocket),
-            isStartArgument = true,
+            isCmdLineArg = true,
             isUnique = false,
             factory = { __ControlPort() },
             build = {
                 val argument = argument
-                val flags = if (argument.startsWith("unix:")) _unixFlags else emptySet()
-                build(argument, optionals = flags)!!
+                val flags = if (argument.startsWith("unix:")) unixFlags else emptySet()
+                val extras = Extra.AllowReassign.create(argument, allowReassign)
+                build(argument, optionals = flags, extras = extras)!!
             },
         )
     }
@@ -354,29 +347,25 @@ public class TorConfig private constructor(
         IsolationFlagBuilder.DSL<__DNSPort>
     {
 
-        @get:JvmName("port")
-        public var port: String = "0"
-            private set
-
-        private val _isolationFlags = mutableSetOf<String>()
-        @get:JvmName("isolationFlags")
-        public val isolationFlags: Set<String> get() = _isolationFlags.toImmutableSet()
+        private var argument: String = "0"
+        private var allowReassign: Boolean = true
+        private val isolationFlags = mutableSetOf<String>()
 
         @KmpTorDsl
         public override fun auto(): __DNSPort {
-            port = AUTO
+            argument = AUTO
             return this
         }
 
         @KmpTorDsl
         public override fun disable(): __DNSPort {
-            port = "0"
+            argument = "0"
             return this
         }
 
         @KmpTorDsl
         public override fun port(port: Port.Proxy): __DNSPort {
-            this.port = port.toString()
+            argument = port.toString()
             return this
         }
 
@@ -384,20 +373,27 @@ public class TorConfig private constructor(
         public override fun isolationFlags(
             block: ThisBlock<IsolationFlagBuilder>,
         ): __DNSPort {
-            IsolationFlagBuilder.configure(_isolationFlags, block)
+            IsolationFlagBuilder.configure(isolationFlags, block)
+            return this
+        }
+
+        @KmpTorDsl
+        public override fun reassignable(allow: Boolean): __DNSPort {
+            allowReassign = allow
             return this
         }
 
         public companion object: Setting.Factory<__DNSPort, Setting>(
             name = "__DNSPort",
             attributes = immutableSetOf(Attribute.Port),
-            isStartArgument = false,
+            isCmdLineArg = false,
             isUnique = false,
             factory = { __DNSPort() },
             build = {
-                val port = port
-                val flags = if (port == "0") emptySet() else _isolationFlags
-                build(port, optionals = flags)!!
+                val argument = argument
+                val flags = if (argument == "0") emptySet() else isolationFlags
+                val extras = Extra.AllowReassign.create(argument, allowReassign)
+                build(argument, optionals = flags, extras = extras)!!
             },
         )
     }
@@ -416,29 +412,25 @@ public class TorConfig private constructor(
         IsolationFlagBuilder.DSL<__HTTPTunnelPort>
     {
 
-        @get:JvmName("port")
-        public var port: String = "0"
-            private set
-
-        private val _isolationFlags = mutableSetOf<String>()
-        @get:JvmName("isolationFlags")
-        public val isolationFlags: Set<String> get() = _isolationFlags.toImmutableSet()
+        private var argument: String = "0"
+        private var allowReassign: Boolean = true
+        private val isolationFlags = mutableSetOf<String>()
 
         @KmpTorDsl
         public override fun auto(): __HTTPTunnelPort {
-            port = AUTO
+            argument = AUTO
             return this
         }
 
         @KmpTorDsl
         public override fun disable(): __HTTPTunnelPort {
-            port = "0"
+            argument = "0"
             return this
         }
 
         @KmpTorDsl
         public override fun port(port: Port.Proxy): __HTTPTunnelPort {
-            this.port = port.toString()
+            argument = port.toString()
             return this
         }
 
@@ -446,20 +438,27 @@ public class TorConfig private constructor(
         public override fun isolationFlags(
             block: ThisBlock<IsolationFlagBuilder>,
         ): __HTTPTunnelPort {
-            IsolationFlagBuilder.configure(_isolationFlags, block)
+            IsolationFlagBuilder.configure(isolationFlags, block)
+            return this
+        }
+
+        @KmpTorDsl
+        public override fun reassignable(allow: Boolean): __HTTPTunnelPort {
+            allowReassign = allow
             return this
         }
 
         public companion object: Setting.Factory<__HTTPTunnelPort, Setting>(
             name = "__HTTPTunnelPort",
             attributes = immutableSetOf(Attribute.Port),
-            isStartArgument = false,
+            isCmdLineArg = false,
             isUnique = false,
             factory = { __HTTPTunnelPort() },
             build = {
-                val port = port
-                val flags = if (port == "0") emptySet() else _isolationFlags
-                build(port, optionals = flags)!!
+                val argument = argument
+                val flags = if (argument == "0") emptySet() else isolationFlags
+                val extras = Extra.AllowReassign.create(argument, allowReassign)
+                build(argument, optionals = flags, extras = extras)!!
             },
         )
     }
@@ -478,7 +477,7 @@ public class TorConfig private constructor(
         public companion object: Setting.Factory<__OwningControllerProcess, Setting>(
             name = "__OwningControllerProcess",
             attributes = emptySet(),
-            isStartArgument = true,
+            isCmdLineArg = true,
             isUnique = true,
             factory = { __OwningControllerProcess() },
             build = { build(processId.toString())!! },
@@ -499,33 +498,19 @@ public class TorConfig private constructor(
         UnixSocketBuilder.DSL<__SocksPort>
     {
 
-        /**
-         * Can be either a TCP Port or a Unix Socket path.
-         *
-         * @see [asPort]
-         * @see [asUnixSocket]
-         * */
-        @get:JvmName("argument")
-        public var argument: String = "9050"
-            private set
-
-        private val _socksFlags = mutableSetOf<String>()
-        @get:JvmName("socksFlags")
-        public val socksFlags: Set<String> get() = _socksFlags.toImmutableSet()
-
-        private val _unixFlags = mutableSetOf<String>()
-        @get:JvmName("unixFlags")
-        public val unixFlags: Set<String> get() = _unixFlags.toImmutableSet()
-
-        private val _isolationFlags = mutableSetOf<String>()
-        @get:JvmName("isolationFlags")
-        public val isolationFlags: Set<String> get() = _isolationFlags.toImmutableSet()
+        private var argument: String = "9050"
+        private var allowReassign = true
+        private val socksFlags = mutableSetOf<String>()
+        private val unixFlags = mutableSetOf<String>()
+        private val isolationFlags = mutableSetOf<String>()
 
         @KmpTorDsl
         public override fun asPort(
             block: ThisBlock<TCPPortBuilder.Socks>
         ): __SocksPort {
-            argument = TCPPortBuilder.Socks.build(block)
+            val (reassign, arg) = TCPPortBuilder.Socks.build(block)
+            argument = arg
+            allowReassign = reassign
             return this
         }
 
@@ -543,7 +528,7 @@ public class TorConfig private constructor(
         public fun socksFlags(
             block: ThisBlock<SocksFlagBuilder>,
         ): __SocksPort {
-            SocksFlagBuilder.configure(_socksFlags, block)
+            SocksFlagBuilder.configure(socksFlags, block)
             return this
         }
 
@@ -551,7 +536,7 @@ public class TorConfig private constructor(
         public override fun unixFlags(
             block: ThisBlock<UnixFlagBuilder>
         ): __SocksPort {
-            UnixFlagBuilder.configure(isControl = false, _unixFlags, block)
+            UnixFlagBuilder.configure(isControl = false, unixFlags, block)
             return this
         }
 
@@ -559,14 +544,14 @@ public class TorConfig private constructor(
         public override fun isolationFlags(
             block: ThisBlock<IsolationFlagBuilder>,
         ): __SocksPort {
-            IsolationFlagBuilder.configure(_isolationFlags, block)
+            IsolationFlagBuilder.configure(isolationFlags, block)
             return this
         }
 
         public companion object: Setting.Factory<__SocksPort, Setting>(
             name = "__SocksPort",
             attributes = immutableSetOf(Attribute.Port, Attribute.UnixSocket),
-            isStartArgument = false,
+            isCmdLineArg = false,
             isUnique = false,
             factory = { __SocksPort() },
             build = {
@@ -574,12 +559,13 @@ public class TorConfig private constructor(
                 val flags = if (argument == "0") {
                     emptySet()
                 } else {
-                    val set = _socksFlags.toMutableSet()
-                    if (argument.startsWith("unix:")) set.addAll(_unixFlags)
-                    set.addAll(_isolationFlags)
+                    val set = socksFlags.toMutableSet()
+                    if (argument.startsWith("unix:")) set.addAll(unixFlags)
+                    set.addAll(isolationFlags)
                     set
                 }
-                build(argument, optionals = flags)!!
+                val extras = Extra.AllowReassign.create(argument, allowReassign)
+                build(argument, optionals = flags, extras = extras)!!
             },
         )
     }
@@ -598,13 +584,9 @@ public class TorConfig private constructor(
         IsolationFlagBuilder.DSL<__TransPort>
     {
 
-        @get:JvmName("port")
-        public var port: String = "0"
-            private set
-
-        private val _isolationFlags = mutableSetOf<String>()
-        @get:JvmName("isolationFlags")
-        public val isolationFlags: Set<String> get() = _isolationFlags.toImmutableSet()
+        private var port: String = "0"
+        private var allowReassign: Boolean = true
+        private val isolationFlags = mutableSetOf<String>()
 
         @KmpTorDsl
         public override fun auto(): __TransPort {
@@ -632,20 +614,27 @@ public class TorConfig private constructor(
             block: ThisBlock<IsolationFlagBuilder>,
         ): __TransPort {
             if (!IsUnixLikeHost) return this
-            IsolationFlagBuilder.configure(_isolationFlags, block)
+            IsolationFlagBuilder.configure(isolationFlags, block)
+            return this
+        }
+
+        @KmpTorDsl
+        public override fun reassignable(allow: Boolean): __TransPort {
+            this.allowReassign = allow
             return this
         }
 
         public companion object: Setting.Factory<__TransPort, Setting>(
             name = "__TransPort",
             attributes = immutableSetOf(Attribute.Port),
-            isStartArgument = false,
+            isCmdLineArg = false,
             isUnique = false,
             factory = { __TransPort() },
             build = {
                 val port = port
-                val flags = if (port == "0") emptySet() else _isolationFlags
-                build(port, optionals = flags)!!
+                val flags = if (port == "0") emptySet() else isolationFlags
+                val extras = Extra.AllowReassign.create(port, allowReassign)
+                build(port, optionals = flags, extras = extras)!!
             },
         ) {
 
@@ -666,7 +655,7 @@ public class TorConfig private constructor(
         public companion object: Setting.Factory<AutomapHostsOnResolve, Setting>(
             name = "AutomapHostsOnResolve",
             attributes = emptySet(),
-            isStartArgument = false,
+            isCmdLineArg = false,
             isUnique = true,
             factory = { AutomapHostsOnResolve() },
             build = { build(enable.toByte().toString())!! },
@@ -737,7 +726,7 @@ public class TorConfig private constructor(
         public companion object: Setting.Factory<AutomapHostsSuffixes, Setting>(
             name = "AutomapHostsSuffixes",
             attributes = emptySet(),
-            isStartArgument = false,
+            isCmdLineArg = false,
             isUnique = true,
             factory = { AutomapHostsSuffixes() },
             build = {
@@ -762,7 +751,7 @@ public class TorConfig private constructor(
         public companion object: Setting.Factory<CacheDirectory, Setting?>(
             name = "CacheDirectory",
             attributes = immutableSetOf(Attribute.Directory),
-            isStartArgument = true,
+            isCmdLineArg = true,
             isUnique = true,
             factory = { CacheDirectory() },
             build = { build(directory?.absoluteFile?.normalize()?.path) },
@@ -783,7 +772,7 @@ public class TorConfig private constructor(
         public companion object: Setting.Factory<ClientOnionAuthDir, Setting?>(
             name = "ClientOnionAuthDir",
             attributes = immutableSetOf(Attribute.Directory),
-            isStartArgument = true,
+            isCmdLineArg = true,
             isUnique = true,
             factory = { ClientOnionAuthDir() },
             build = { build(directory?.absoluteFile?.normalize()?.path) },
@@ -803,9 +792,7 @@ public class TorConfig private constructor(
         keyword = Companion,
     ) {
 
-        @get:JvmName("argument")
-        public var argument: String = AUTO
-            private set
+        private var argument: String = AUTO
 
         @KmpTorDsl
         public fun auto(): ConnectionPadding {
@@ -822,7 +809,7 @@ public class TorConfig private constructor(
         public companion object: Setting.Factory<ConnectionPadding, Setting>(
             name = "ConnectionPadding",
             attributes = emptySet(),
-            isStartArgument = false,
+            isCmdLineArg = false,
             isUnique = true,
             factory = { ConnectionPadding() },
             build = { build(argument)!! },
@@ -843,7 +830,7 @@ public class TorConfig private constructor(
         public companion object: Setting.Factory<ConnectionPaddingReduced, Setting>(
             name = "ConnectionPaddingReduced",
             attributes = emptySet(),
-            isStartArgument = false,
+            isCmdLineArg = false,
             isUnique = true,
             factory = { ConnectionPaddingReduced() },
             build = { build(enable.toByte().toString())!! },
@@ -864,7 +851,7 @@ public class TorConfig private constructor(
         public companion object: Setting.Factory<ControlPortWriteToFile, Setting?>(
             name = "ControlPortWriteToFile",
             attributes = immutableSetOf(Attribute.File),
-            isStartArgument = true,
+            isCmdLineArg = true,
             isUnique = true,
             factory = { ControlPortWriteToFile() },
             build = { build(file?.absoluteFile?.normalize()?.path) },
@@ -890,7 +877,7 @@ public class TorConfig private constructor(
         public companion object: Setting.Factory<CookieAuthentication, Setting>(
             name = "CookieAuthentication",
             attributes = emptySet(),
-            isStartArgument = true,
+            isCmdLineArg = true,
             isUnique = true,
             factory = { CookieAuthentication() },
             build = { build(enable.toByte().toString())!! },
@@ -911,7 +898,7 @@ public class TorConfig private constructor(
         public companion object: Setting.Factory<CookieAuthFile, Setting?>(
             name = "CookieAuthFile",
             attributes = immutableSetOf(Attribute.File),
-            isStartArgument = true,
+            isCmdLineArg = true,
             isUnique = true,
             factory = { CookieAuthFile() },
             build = { build(file?.absoluteFile?.normalize()?.path) },
@@ -937,7 +924,7 @@ public class TorConfig private constructor(
         public companion object: Setting.Factory<DataDirectory, Setting?>(
             name = "DataDirectory",
             attributes = immutableSetOf(Attribute.Directory),
-            isStartArgument = true,
+            isCmdLineArg = true,
             isUnique = true,
             factory = { DataDirectory() },
             build = { build(directory?.absoluteFile?.normalize()?.path) },
@@ -963,7 +950,7 @@ public class TorConfig private constructor(
         public companion object: Setting.Factory<DisableNetwork, Setting>(
             name = "DisableNetwork",
             attributes = emptySet(),
-            isStartArgument = true,
+            isCmdLineArg = true,
             isUnique = true,
             factory = { DisableNetwork() },
             build = { build(disable.toByte().toString())!! },
@@ -984,7 +971,7 @@ public class TorConfig private constructor(
         public companion object: Setting.Factory<DormantCanceledByStartup, Setting>(
             name = "DormantCanceledByStartup",
             attributes = emptySet(),
-            isStartArgument = true,
+            isCmdLineArg = true,
             isUnique = true,
             factory = { DormantCanceledByStartup() },
             build = { build(cancel.toByte().toString())!! },
@@ -999,9 +986,7 @@ public class TorConfig private constructor(
         keyword = Companion,
     ) {
 
-        @get:JvmName("timeout")
-        public var timeout: String = "24 hours"
-            private set
+        private var timeout: String = "24 hours"
 
         @KmpTorDsl
         public fun minutes(n: Int): DormantClientTimeout {
@@ -1031,7 +1016,7 @@ public class TorConfig private constructor(
         public companion object: Setting.Factory<DormantClientTimeout, Setting>(
             name = "DormantClientTimeout",
             attributes = emptySet(),
-            isStartArgument = false,
+            isCmdLineArg = false,
             isUnique = true,
             factory = { DormantClientTimeout() },
             build = { build(timeout)!! },
@@ -1052,7 +1037,7 @@ public class TorConfig private constructor(
         public companion object: Setting.Factory<DormantOnFirstStartup, Setting>(
             name = "DormantOnFirstStartup",
             attributes = emptySet(),
-            isStartArgument = true,
+            isCmdLineArg = true,
             isUnique = true,
             factory = { DormantOnFirstStartup() },
             build = { build(enable.toByte().toString())!! },
@@ -1073,7 +1058,7 @@ public class TorConfig private constructor(
         public companion object: Setting.Factory<DormantTimeoutDisabledByIdleStreams, Setting>(
             name = "DormantTimeoutDisabledByIdleStreams",
             attributes = emptySet(),
-            isStartArgument = false,
+            isCmdLineArg = false,
             isUnique = true,
             factory = { DormantTimeoutDisabledByIdleStreams() },
             build = { build(enable.toByte().toString())!! },
@@ -1088,9 +1073,7 @@ public class TorConfig private constructor(
         keyword = Companion,
     ) {
 
-        @get:JvmName("argument")
-        public var argument: String = AUTO
-            private set
+        private var argument: String = AUTO
 
         @KmpTorDsl
         public fun auto(): GeoIPExcludeUnknown {
@@ -1107,7 +1090,7 @@ public class TorConfig private constructor(
         public companion object: Setting.Factory<GeoIPExcludeUnknown, Setting>(
             name = "GeoIPExcludeUnknown",
             attributes = emptySet(),
-            isStartArgument = false,
+            isCmdLineArg = false,
             isUnique = true,
             factory = { GeoIPExcludeUnknown() },
             build = { build(argument)!! },
@@ -1128,7 +1111,7 @@ public class TorConfig private constructor(
         public companion object: Setting.Factory<GeoIPFile, Setting?>(
             name = "GeoIPFile",
             attributes = immutableSetOf(Attribute.File),
-            isStartArgument = true,
+            isCmdLineArg = true,
             isUnique = true,
             factory = { GeoIPFile() },
             build = { build(file?.absoluteFile?.normalize()?.path) },
@@ -1149,7 +1132,7 @@ public class TorConfig private constructor(
         public companion object: Setting.Factory<GeoIPv6File, Setting?>(
             name = "GeoIPv6File",
             attributes = immutableSetOf(Attribute.File),
-            isStartArgument = true,
+            isCmdLineArg = true,
             isUnique = true,
             factory = { GeoIPv6File() },
             build = { build(file?.absoluteFile?.normalize()?.path) },
@@ -1160,8 +1143,18 @@ public class TorConfig private constructor(
      * All other HiddenService options are only configurable from within
      * the [HiddenServiceDir] DSL (the "root" [Setting.items] [LineItem]).
      *
-     * The [directory], [version], and a minimum of 1 [port] must be configured
+     * The [directory], [version], and a minimum of 1 [port] **MUST** be configured
      * in order to create the hidden service [Setting].
+     *
+     * e.g. (Minimum)
+     *
+     *     val setting = HiddenServiceDir.Builder {
+     *         directory = "/some/path".toFile()
+     *         port { virtual = 80.toPort() }
+     *         version { HSv(3) }
+     *     }
+     *
+     *     assertNotNull(setting)
      *
      * [HiddenServiceDir](https://2019.www.torproject.org/docs/tor-manual.html.en#HiddenServiceDir)
      * */
@@ -1170,47 +1163,24 @@ public class TorConfig private constructor(
         keyword = Companion,
     ) {
 
+        private val ports = mutableSetOf<LineItem>()
+        private var version: LineItem? = null
+        private var allowUnknownPorts: LineItem = DEFAULT_ALLOW_UNKNOWN_PORTS
+//        private var exportCircuitID: LineItem = DEFAULT_EXPORT_CIRCUIT_ID
+        private var maxStreams: LineItem = DEFAULT_MAX_STREAMS
+        private var maxStreamsCloseCircuit: LineItem = DEFAULT_MAX_STREAMS_CLOSE_CIRCUIT
+        private var dirGroupReadable: LineItem = DEFAULT_DIR_GROUP_READABLE
+        private val numIntroductionPoints = mutableMapOf("3" to 3)
+
         @JvmField
         public var directory: File? = null
-
-        private val _ports = mutableSetOf<LineItem>()
-        @get:JvmName("ports")
-        public val ports: Set<LineItem> get() = _ports.toImmutableSet()
-
-        @get:JvmName("version")
-        public var version: LineItem? = null
-            private set
-
-        @get:JvmName("allowUnknownPorts")
-        public var allowUnknownPorts: LineItem = DEFAULT_ALLOW_UNKNOWN_PORTS
-            private set
-
-//        @get:JvmName("exportCircuitID")
-//        public var exportCircuitID: LineItem = DEFAULT_EXPORT_CIRCUIT_ID
-//            private set
-
-        @get:JvmName("maxStreams")
-        public var maxStreams: LineItem = DEFAULT_MAX_STREAMS
-            private set
-
-        @get:JvmName("maxStreamsCloseCircuit")
-        public var maxStreamsCloseCircuit: LineItem = DEFAULT_MAX_STREAMS_CLOSE_CIRCUIT
-            private set
-
-        @get:JvmName("dirGroupReadable")
-        public var dirGroupReadable: LineItem = DEFAULT_DIR_GROUP_READABLE
-            private set
-
-        private val _numIntroductionPoints = mutableMapOf("3" to 3)
-        @get:JvmName("numIntroductionPoints")
-        public val numIntroductionPoints: Map<String, Int> get() = _numIntroductionPoints.toImmutableMap()
 
         @KmpTorDsl
         public fun port(
             block: ThisBlock<HiddenServicePort>,
         ): HiddenServiceDir {
             val port = HiddenServicePort.build(block)
-            if (port != null) _ports.add(port)
+            if (port != null) ports.add(port)
             return this
         }
 
@@ -1259,7 +1229,7 @@ public class TorConfig private constructor(
         public fun numIntroductionPoints(
             block: ThisBlock<HiddenServiceNumIntroductionPoints>,
         ): HiddenServiceDir {
-            HiddenServiceNumIntroductionPoints.configure(_numIntroductionPoints, block)
+            HiddenServiceNumIntroductionPoints.configure(numIntroductionPoints, block)
             return this
         }
 
@@ -1268,7 +1238,7 @@ public class TorConfig private constructor(
             val version = version ?: return null
             val ports = ports.also { if (it.isEmpty()) return null }
 
-            val numIntroductionPoints = (_numIntroductionPoints[version.argument] ?: 3).let { points ->
+            val numIntroductionPoints = (numIntroductionPoints[version.argument] ?: 3).let { points ->
                 HiddenServiceNumIntroductionPoints.toLineItem(points.toString())!!
             }
 
@@ -1287,7 +1257,7 @@ public class TorConfig private constructor(
         public companion object: Setting.Factory<HiddenServiceDir, Setting?>(
             name = "HiddenServiceDir",
             attributes = immutableSetOf(Attribute.Directory, Attribute.HiddenService),
-            isStartArgument = false,
+            isCmdLineArg = false,
             isUnique = false,
             factory = { HiddenServiceDir() },
             build = { build() },
@@ -1311,6 +1281,8 @@ public class TorConfig private constructor(
     @KmpTorDsl
     public class HiddenServicePort private constructor() {
 
+        private var targetArgument: String? = null
+
         // TODO: Check if can be 0
         /**
          * Configures the virtual port that this HiddenServicePort
@@ -1331,41 +1303,7 @@ public class TorConfig private constructor(
         public var virtual: Port? = null
 
         /**
-         * Configures the target port that [virtual] will be mapped
-         * to.
-         *
-         * If left unconfigured, whatever [virtual] has been
-         * configured as is utilized.
-         *
-         * Can be either a TCP Port or a Unix Socket path.
-         *
-         * e.g.
-         *
-         *     HiddenServicePort 80 8080
-         *     // http://<onion-address>.onion
-         *     // will connect to server running on localhost at port 8080
-         *
-         *     HiddenServicePort 443 8443
-         *     // https://<onion-address>.onion
-         *     // will connect to server running on localhost at port 8443
-         *
-         *     HiddenServicePort 8080 8081
-         *     // http://<onion-address>.onion:8080
-         *     // will connect to server running on localhost at port 8081
-         *
-         *     HiddenServicePort 80 unix:"/path/to/tor/data/hidden_services/my_service/hs.sock"
-         *     // http://<onion-address>.onion
-         *     // will connect to server running the unix domain socket at specified path
-         *
-         * @see [targetAsPort]
-         * @see [targetAsUnixSocket]
-         * */
-        @get:JvmName("targetArgument")
-        public var targetArgument: String? = null
-            private set
-
-        /**
-         * Configure the [targetArgument] to use a TCP Port.
+         * Configure the target to use a TCP Port.
          *
          * Only necessary if a value different than [virtual]
          * is required.
@@ -1379,7 +1317,7 @@ public class TorConfig private constructor(
         }
 
         /**
-         * Configure the [targetArgument] to use a Unix Socket
+         * Configure the target to use a Unix Socket
          *
          * @throws [UnsupportedOperationException] see [UnixSocketBuilder.DSL]
          * */
@@ -1427,9 +1365,7 @@ public class TorConfig private constructor(
     @KmpTorDsl
     public class HiddenServiceVersion private constructor() {
 
-        @get:JvmName("argument")
-        public var argument: Byte? = null
-            private set
+        private var argument: Byte? = null
 
         /**
          * Currently, the only supported version is 3
@@ -1446,7 +1382,7 @@ public class TorConfig private constructor(
             // HiddenServiceDir._numIntroductionPoints Map with
             // its default value.
             require(version in 3..3) { "Unsupported HS version of $version" }
-            this.argument = version
+            argument = version
             return this
         }
 
@@ -1640,7 +1576,7 @@ public class TorConfig private constructor(
         public companion object: Setting.Factory<RunAsDaemon, Setting>(
             name = "RunAsDaemon",
             attributes = emptySet(),
-            isStartArgument = true,
+            isCmdLineArg = true,
             isUnique = true,
             factory = { RunAsDaemon() },
             build = { build(enable.toByte().toString())!! },
@@ -1672,7 +1608,7 @@ public class TorConfig private constructor(
         public companion object: Setting.Factory<SyslogIdentityTag, Setting?>(
             name = "SyslogIdentityTag",
             attributes = immutableSetOf(Attribute.Logging),
-            isStartArgument = true,
+            isCmdLineArg = true,
             isUnique = true,
             factory = { SyslogIdentityTag() },
             build = {
@@ -1733,7 +1669,7 @@ public class TorConfig private constructor(
         public companion object: Setting.Factory<VirtualAddrNetworkIPv4, Setting>(
             name = "VirtualAddrNetworkIPv4",
             attributes = emptySet(),
-            isStartArgument = false,
+            isCmdLineArg = false,
             isUnique = true,
             factory = { VirtualAddrNetworkIPv4() },
             build = {
@@ -1767,7 +1703,7 @@ public class TorConfig private constructor(
         public companion object: Setting.Factory<VirtualAddrNetworkIPv6, Setting>(
             name = "VirtualAddrNetworkIPv6",
             attributes = emptySet(),
-            isStartArgument = false,
+            isCmdLineArg = false,
             isUnique = true,
             factory = { VirtualAddrNetworkIPv6() },
             build = {
@@ -1798,9 +1734,8 @@ public class TorConfig private constructor(
     ) {
 
         private val isPort = keyword.attributes.contains(Attribute.Port)
-        private val isPath = keyword.attributes.let { attrs ->
-            attrs.contains(Attribute.File)
-            || attrs.contains(Attribute.Directory)
+        private val isPath = with(keyword.attributes) {
+            contains(Attribute.File) || contains(Attribute.Directory)
         }
         private val isPortAutoOrDisabled = if (isPort) {
             argument == "0" || argument == AUTO
@@ -1912,10 +1847,17 @@ public class TorConfig private constructor(
          *
          * e.g. The un-hashed password for HashedControlPassword to
          *      establish a control connection.
+         *
+         * @see [get]
          * */
-        @JvmField
-        public val extraInfo: Map<String, String>,
+        private val extras: Map<Extra<*>, Any>,
     ) {
+
+        public operator fun <T: Any> get(key: Extra<T>): T? {
+            val value = extras[key] ?: return null
+            @Suppress("UNCHECKED_CAST")
+            return value as? T
+        }
 
         @get:JvmName("keyword")
         public val keyword: Keyword get() = items.first().keyword
@@ -1937,7 +1879,7 @@ public class TorConfig private constructor(
                 argument: String?,
                 optionals: Set<String> = emptySet(),
                 others: Set<LineItem> = emptySet(),
-                extraInfo: Map<String, String> = emptyMap(),
+                extras: Map<Extra<*>, Any> = emptyMap(),
             ): Setting? {
                 val first = keyword.toLineItem(argument, optionals) ?: return null
 
@@ -1945,7 +1887,7 @@ public class TorConfig private constructor(
                 set.add(first)
                 set.addAll(others)
 
-                return Setting(set.toImmutableSet(), extraInfo.toImmutableMap())
+                return Setting(set.toImmutableSet(), extras.toImmutableMap())
             }
         }
 
@@ -1966,11 +1908,11 @@ public class TorConfig private constructor(
         public sealed class Factory<out B: Builder, out S: Setting?>(
             name: String,
             attributes: Set<Attribute>,
-            isStartArgument: Boolean,
+            isCmdLineArg: Boolean,
             isUnique: Boolean,
             private val factory: () -> B,
             private val build: B.() -> S,
-        ): Keyword(name, attributes, isStartArgument, isUnique) {
+        ): Keyword(name, attributes, isCmdLineArg, isUnique) {
 
             public fun Builder(block: ThisBlock<B>): S = build(factory().apply(block))
         }
@@ -2060,10 +2002,7 @@ public class TorConfig private constructor(
         public fun reassignTCPPortAutoOrNull(): Setting? {
             // Setting does not have Attribute.Port
             if (!keyword.attributes.contains(Attribute.Port)) return null
-
-            // Not configured as a TCP port
-            if (argument == "0" || argument == AUTO) return null
-            if (argument.startsWith("unix:")) return null
+            if (this[Extra.AllowReassign] != true) return null
 
             // Remove and replace argument with auto
             val list = items.toMutableList()
@@ -2073,7 +2012,10 @@ public class TorConfig private constructor(
             //  Will need to figure out how to handle a non-localhost IPAddress
             list.add(0, removed.keyword.toLineItem(AUTO, removed.optionals)!!)
 
-            return Setting(list.toImmutableSet(), extraInfo)
+            val extras = extras.toMutableMap()
+            extras.remove(Extra.AllowReassign)
+
+            return Setting(list.toImmutableSet(), extras.toImmutableMap())
         }
     }
 
@@ -2137,6 +2079,33 @@ public class TorConfig private constructor(
         public final override fun equals(other: Any?): Boolean = other is Keyword && other.name == name
         public final override fun hashCode(): Int = 21 * 31 + name.hashCode()
         public final override fun toString(): String = name
+    }
+
+    /**
+     * A key for extra information about a [Setting] that is
+     * excluded from the tor configuration, but may be utilized
+     * elsewhere in `kmp-tor`.
+     * */
+    public sealed class Extra<T: Any> {
+
+        /**
+         * An [Extra] which signals that if a TCP port is not available,
+         * it can be reassigned to "auto", or one that **is** available.
+         *
+         * Will only be added as an extra to the [Setting] if the builder
+         * argument is a port value and reassignable was true.
+         * */
+        public data object AllowReassign: Extra<Boolean>() {
+
+            @JvmSynthetic
+            internal fun create(argument: String, allow: Boolean): Map<Extra<*>, Any> {
+                if (!allow) return emptyMap()
+                if (argument == "0") return emptyMap()
+                if (argument == AUTO) return emptyMap()
+                if (argument.startsWith("unix:")) return emptyMap()
+                return mapOf(Pair(AllowReassign, allow))
+            }
+        }
     }
 
     public override fun equals(other: Any?): Boolean = other is TorConfig && other.settings == settings

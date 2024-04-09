@@ -43,7 +43,6 @@ import kotlin.jvm.JvmSynthetic
 @OptIn(InternalKmpTorApi::class)
 public class TorConfigGenerator private constructor(
     private val environment: TorRuntime.Environment,
-    private val allowPortReassignment: Boolean,
     private val omitGeoIPFileSettings: Boolean,
     private val config: Set<ConfigBuilderCallback>,
     private val isPortAvailable: suspend (LocalHost, Port) -> Boolean,
@@ -127,15 +126,8 @@ public class TorConfigGenerator private constructor(
     }
 
     private suspend fun TorConfig.validateTCPPorts(n: Notifier): TorConfig {
-        if (!allowPortReassignment) return this
         val ports = filterByAttribute<Keyword.Attribute.Port>().filter { setting ->
-            if (setting.keyword.attributes.contains(Keyword.Attribute.HiddenService)) return@filter false
-            // TODO: Investigate why Node.js does not adhere to filterByAttribute
-            if (!setting.keyword.attributes.contains(Keyword.Attribute.Port)) return@filter false
-            if (setting.argument == "0") return@filter false
-            if (setting.argument == "auto") return@filter false
-            // If configured as UnixSocket, it's filtered out by filterByAttribute
-            true
+            setting[Extra.AllowReassign] == true
         }
 
         if (ports.isEmpty()) return this
@@ -178,13 +170,11 @@ public class TorConfigGenerator private constructor(
         @JvmSynthetic
         internal fun of(
             environment: TorRuntime.Environment,
-            allowPortReassignment: Boolean,
             omitGeoIPFileSettings: Boolean,
             config: Set<ConfigBuilderCallback>,
             isPortAvailable: suspend (LocalHost, Port) -> Boolean = { h, p -> p.isAvailableAsync(h) },
         ): TorConfigGenerator = TorConfigGenerator(
             environment,
-            allowPortReassignment,
             omitGeoIPFileSettings,
             config,
             isPortAvailable

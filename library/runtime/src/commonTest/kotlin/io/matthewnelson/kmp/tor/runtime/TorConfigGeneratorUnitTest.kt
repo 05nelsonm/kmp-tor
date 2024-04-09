@@ -99,7 +99,6 @@ class TorConfigGeneratorUnitTest {
     fun givenUnavailablePort_whenGenerate_thenPortRemovedAndReplaced() = runTest {
         // socks port at 9050 is automatically added
         val settings = newGenerator(
-            allowPortReassignment = true,
             config = setOf(
                 ConfigBuilderCallback {
                     put(TorConfig.__DNSPort) { port(1080.toPortProxy()) }
@@ -120,13 +119,11 @@ class TorConfigGeneratorUnitTest {
     }
 
     private fun newGenerator(
-        allowPortReassignment: Boolean = true,
         omitGeoIPFileSettings: Boolean = false,
         config: Set<ConfigBuilderCallback> = emptySet(),
         isPortAvailable: suspend (LocalHost, Port) -> Boolean = { _, _ -> true },
     ): TorConfigGenerator = TorConfigGenerator.of(
         environment,
-        allowPortReassignment,
         omitGeoIPFileSettings,
         config,
         isPortAvailable

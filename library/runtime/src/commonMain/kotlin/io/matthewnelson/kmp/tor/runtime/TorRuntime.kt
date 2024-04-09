@@ -84,24 +84,6 @@ public interface TorRuntime:
         private val staticRuntimeEventObservers = mutableSetOf<RuntimeEvent.Observer<*>>()
 
         /**
-         * In the event that a configured TCP port is unavailable on the host
-         * device, tor will fail to startup.
-         *
-         * Setting this to true (the default value) will result in reassignment
-         * of any unavailable TCP port arguments to "auto".
-         *
-         * Port availability is verified just prior to startup in order to
-         * mitigate potential failures.
-         *
-         * If false, no port availability checks will be performed prior to
-         * startup. This may result in tor start failure if a configured port
-         * is taken, but that **could** be a desired behavior depending on your
-         * implementation of [TorRuntime].
-         * */
-        @JvmField
-        public var allowPortReassignment: Boolean = true
-
-        /**
          * If true, [Paths.Tor.geoip] and [Paths.Tor.geoip6] will **not** be
          * automatically added to your [TorConfig].
          *
@@ -211,7 +193,6 @@ public interface TorRuntime:
                     RealTorRuntime.of(
                         environment = environment,
                         networkObserver = b.networkObserver,
-                        allowPortReassignment = b.allowPortReassignment,
                         omitGeoIPFileSettings = b.omitGeoIPFileSettings,
                         config = b.config.toImmutableSet(),
                         requiredTorEvents = b.requiredTorEvents.toImmutableSet(),

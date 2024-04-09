@@ -13,6 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
+@file:Suppress("SpellCheckingInspection")
+
 package io.matthewnelson.kmp.tor.runtime.core.builder
 
 import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
@@ -22,7 +24,6 @@ import io.matthewnelson.kmp.tor.runtime.core.address.Port
 import io.matthewnelson.kmp.tor.runtime.core.apply
 import io.matthewnelson.kmp.tor.runtime.core.TorConfig
 import kotlin.jvm.JvmField
-import kotlin.jvm.JvmName
 import kotlin.jvm.JvmSynthetic
 
 // TODO: allowPortReassignment
@@ -39,19 +40,24 @@ public sealed class TCPPortBuilder private constructor() {
         DSLAuto<Control>,
         DSLPort<Control>
     {
-        @get:JvmName("port")
-        public var port: String = TorConfig.AUTO
-            private set
+        private var argument: String = TorConfig.AUTO
+        private var allowReassign: Boolean = true
 
         @KmpTorDsl
         public override fun auto(): Control {
-            port = TorConfig.AUTO
+            argument = TorConfig.AUTO
             return this
         }
 
         @KmpTorDsl
         public override fun port(port: Port.Proxy): Control {
-            this.port = port.toString()
+            argument = port.toString()
+            return this
+        }
+
+        @KmpTorDsl
+        public override fun reassignable(allow: Boolean): Control {
+            allowReassign = allow
             return this
         }
 
@@ -60,7 +66,10 @@ public sealed class TCPPortBuilder private constructor() {
             @JvmSynthetic
             internal fun build(
                 block: ThisBlock<Control>
-            ): String = Control().apply(block).port
+            ): Pair<Boolean, String> {
+                val b = Control().apply(block)
+                return b.allowReassign to b.argument
+            }
         }
     }
 
@@ -73,25 +82,30 @@ public sealed class TCPPortBuilder private constructor() {
         DSLDisable<Socks>,
         DSLPort<Socks>
     {
-        @get:JvmName("port")
-        public var port: String = "9050"
-            private set
+        private var argument: String = "9050"
+        private var allowReassign: Boolean = true
 
         @KmpTorDsl
         public override fun auto(): Socks {
-            port = TorConfig.AUTO
+            argument = TorConfig.AUTO
             return this
         }
 
         @KmpTorDsl
         public override fun disable(): Socks {
-            port = "0"
+            argument = "0"
             return this
         }
 
         @KmpTorDsl
         public override fun port(port: Port.Proxy): Socks {
-            this.port = port.toString()
+            argument = port.toString()
+            return this
+        }
+
+        @KmpTorDsl
+        public override fun reassignable(allow: Boolean): Socks {
+            allowReassign = allow
             return this
         }
 
@@ -100,7 +114,10 @@ public sealed class TCPPortBuilder private constructor() {
             @JvmSynthetic
             internal fun build(
                 block: ThisBlock<Socks>
-            ): String = Socks().apply(block).port
+            ): Pair<Boolean, String> {
+                val b = Socks().apply(block)
+                return b.allowReassign to b.argument
+            }
         }
     }
 
@@ -162,12 +179,36 @@ public sealed class TCPPortBuilder private constructor() {
     // TODO: IPAddress/Localhost
 
     @InternalKmpTorApi
-    public interface DSLPort<out R: Any> {
+    public interface DSLPort<out R: Any>: DSLReassign<R> {
 
         /**
          * Specify a port
          * */
         @KmpTorDsl
         public fun port(port: Port.Proxy): R
+    }
+
+    @InternalKmpTorApi
+    public interface DSLReassign<out R: Any> {
+
+        /**
+         * In the event that a configured TCP port is unavailable on the host
+         * device, tor will fail to start.
+         *
+         * Setting this to true (the default value) will add
+         * [TorConfig.Extra.AllowReassign] to the [TorConfig.Setting] extras,
+         * resulting in reassignment of the unavailable TCP port argument to
+         * "auto" prior to starting tor via `TorRuntime`.
+         *
+         * Port availability is verified just prior to each `TorRuntime` startup
+         * in order to mitigate potential failures.
+         *
+         * If false, no port availability checks will be performed. This may
+         * result in tor start failure if a configured port is taken, but that
+         * **could** be a desired behavior depending on your use case of
+         * `TorRuntime`.
+         * */
+        @KmpTorDsl
+        public fun reassignable(allow: Boolean): R
     }
 }
