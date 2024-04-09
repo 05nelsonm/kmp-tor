@@ -15,7 +15,6 @@
  **/
 package io.matthewnelson.kmp.tor.runtime.core.util
 
-import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
 import io.matthewnelson.kmp.tor.runtime.core.address.IPAddress
 import io.matthewnelson.kmp.tor.runtime.core.internal.net_createServer
 import io.matthewnelson.kmp.tor.runtime.core.internal.onError
@@ -28,8 +27,7 @@ class PortUtilJsUnitTest: PortUtilBaseTest() {
         ipAddress: IPAddress,
         port: Int,
     ): AutoCloseable {
-        @OptIn(InternalKmpTorApi::class)
-        val server = net_createServer { it.destroy() }
+        val server = net_createServer { it.destroy(); Unit }
         server.onError { err -> fail(err.toString()) }
         server.listen(port, ipAddress.value, 1) {}
         return object : AutoCloseable {

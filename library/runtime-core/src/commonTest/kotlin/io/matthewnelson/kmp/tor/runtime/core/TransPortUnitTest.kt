@@ -15,25 +15,31 @@
  **/
 package io.matthewnelson.kmp.tor.runtime.core
 
+import io.matthewnelson.kmp.tor.runtime.core.address.Port.Proxy.Companion.toPortProxy
 import io.matthewnelson.kmp.tor.runtime.core.internal.IsUnixLikeHost
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertNull
 
 class TransPortUnitTest {
 
     @Test
     fun givenHostMachine_whenConfigured_thenAllowsIfSupported() {
-        val argument = TorConfig.__TransPort.Builder {
-            auto()
-        }.argument
+        val setting = TorConfig.__TransPort.Builder {
+            port(1080.toPortProxy())
+        }
+
+        val argument = setting.argument
 
         println("IsUnixLikeHost[$IsUnixLikeHost]")
         println("__TransPort $argument")
 
         if (IsUnixLikeHost) {
-            assertEquals("auto", argument)
+            assertEquals("1080", argument)
+            assertEquals(true, setting[TorConfig.Extra.AllowReassign])
         } else {
             assertEquals("0", argument)
+            assertNull(setting[TorConfig.Extra.AllowReassign])
         }
     }
 }

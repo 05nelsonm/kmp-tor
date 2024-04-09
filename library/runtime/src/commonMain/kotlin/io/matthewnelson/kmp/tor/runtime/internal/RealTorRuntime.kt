@@ -63,7 +63,6 @@ internal class RealTorRuntime private constructor(
         internal fun of(
             environment: TorRuntime.Environment,
             networkObserver: NetworkObserver,
-            allowPortReassignment: Boolean,
             omitGeoIPFileSettings: Boolean,
             config: Set<ConfigBuilderCallback>,
             requiredTorEvents: Set<TorEvent>,

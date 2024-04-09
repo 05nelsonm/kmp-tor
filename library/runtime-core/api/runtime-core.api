@@ -231,6 +231,16 @@ public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$DormantTimeou
 public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$DormantTimeoutDisabledByIdleStreams$Companion : io/matthewnelson/kmp/tor/runtime/core/TorConfig$Setting$Factory {
 }
 
+public abstract class io/matthewnelson/kmp/tor/runtime/core/TorConfig$Extra {
+}
+
+public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$Extra$AllowReassign : io/matthewnelson/kmp/tor/runtime/core/TorConfig$Extra {
+	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/core/TorConfig$Extra$AllowReassign;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
 public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$GeoIPExcludeUnknown : io/matthewnelson/kmp/tor/runtime/core/TorConfig$Setting$Builder {
 	public static final field Companion Lio/matthewnelson/kmp/tor/runtime/core/TorConfig$GeoIPExcludeUnknown$Companion;
 	public final fun argument ()Ljava/lang/String;
@@ -425,11 +435,11 @@ public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$RunAsDaemon$C
 
 public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$Setting {
 	public static final field Companion Lio/matthewnelson/kmp/tor/runtime/core/TorConfig$Setting$Companion;
-	public final field extraInfo Ljava/util/Map;
 	public final field items Ljava/util/Set;
 	public synthetic fun <init> (Ljava/util/Set;Ljava/util/Map;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
 	public final fun argument ()Ljava/lang/String;
 	public fun equals (Ljava/lang/Object;)Z
+	public final fun get (Lio/matthewnelson/kmp/tor/runtime/core/TorConfig$Extra;)Ljava/lang/Object;
 	public fun hashCode ()I
 	public final fun keyword ()Lio/matthewnelson/kmp/tor/runtime/core/TorConfig$Keyword;
 	public final fun optionals ()Ljava/util/Set;
@@ -481,12 +491,10 @@ public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$VirtualAddrNe
 
 public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$__ControlPort : io/matthewnelson/kmp/tor/runtime/core/TorConfig$Setting$Builder, io/matthewnelson/kmp/tor/runtime/core/builder/TCPPortBuilder$DSL, io/matthewnelson/kmp/tor/runtime/core/builder/UnixFlagBuilder$DSL, io/matthewnelson/kmp/tor/runtime/core/builder/UnixSocketBuilder$DSL {
 	public static final field Companion Lio/matthewnelson/kmp/tor/runtime/core/TorConfig$__ControlPort$Companion;
-	public final fun argument ()Ljava/lang/String;
 	public fun asPort (Lio/matthewnelson/kmp/tor/runtime/core/ThisBlock;)Lio/matthewnelson/kmp/tor/runtime/core/TorConfig$__ControlPort;
 	public synthetic fun asPort (Lio/matthewnelson/kmp/tor/runtime/core/ThisBlock;)Ljava/lang/Object;
 	public fun asUnixSocket (Lio/matthewnelson/kmp/tor/runtime/core/ThisBlock;)Lio/matthewnelson/kmp/tor/runtime/core/TorConfig$__ControlPort;
 	public synthetic fun asUnixSocket (Lio/matthewnelson/kmp/tor/runtime/core/ThisBlock;)Ljava/lang/Object;
-	public final fun unixFlags ()Ljava/util/Set;
 	public fun unixFlags (Lio/matthewnelson/kmp/tor/runtime/core/ThisBlock;)Lio/matthewnelson/kmp/tor/runtime/core/TorConfig$__ControlPort;
 	public synthetic fun unixFlags (Lio/matthewnelson/kmp/tor/runtime/core/ThisBlock;)Ljava/lang/Object;
 }
@@ -500,12 +508,12 @@ public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$__DNSPort : i
 	public synthetic fun auto ()Ljava/lang/Object;
 	public fun disable ()Lio/matthewnelson/kmp/tor/runtime/core/TorConfig$__DNSPort;
 	public synthetic fun disable ()Ljava/lang/Object;
-	public final fun isolationFlags ()Ljava/util/Set;
 	public fun isolationFlags (Lio/matthewnelson/kmp/tor/runtime/core/ThisBlock;)Lio/matthewnelson/kmp/tor/runtime/core/TorConfig$__DNSPort;
 	public synthetic fun isolationFlags (Lio/matthewnelson/kmp/tor/runtime/core/ThisBlock;)Ljava/lang/Object;
-	public final fun port ()Ljava/lang/String;
 	public fun port (Lio/matthewnelson/kmp/tor/runtime/core/address/Port$Proxy;)Lio/matthewnelson/kmp/tor/runtime/core/TorConfig$__DNSPort;
 	public synthetic fun port (Lio/matthewnelson/kmp/tor/runtime/core/address/Port$Proxy;)Ljava/lang/Object;
+	public fun reassignable (Z)Lio/matthewnelson/kmp/tor/runtime/core/TorConfig$__DNSPort;
+	public synthetic fun reassignable (Z)Ljava/lang/Object;
 }
 
 public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$__DNSPort$Companion : io/matthewnelson/kmp/tor/runtime/core/TorConfig$Setting$Factory {
@@ -517,12 +525,12 @@ public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$__HTTPTunnelP
 	public synthetic fun auto ()Ljava/lang/Object;
 	public fun disable ()Lio/matthewnelson/kmp/tor/runtime/core/TorConfig$__HTTPTunnelPort;
 	public synthetic fun disable ()Ljava/lang/Object;
-	public final fun isolationFlags ()Ljava/util/Set;
 	public fun isolationFlags (Lio/matthewnelson/kmp/tor/runtime/core/ThisBlock;)Lio/matthewnelson/kmp/tor/runtime/core/TorConfig$__HTTPTunnelPort;
 	public synthetic fun isolationFlags (Lio/matthewnelson/kmp/tor/runtime/core/ThisBlock;)Ljava/lang/Object;
-	public final fun port ()Ljava/lang/String;
 	public fun port (Lio/matthewnelson/kmp/tor/runtime/core/address/Port$Proxy;)Lio/matthewnelson/kmp/tor/runtime/core/TorConfig$__HTTPTunnelPort;
 	public synthetic fun port (Lio/matthewnelson/kmp/tor/runtime/core/address/Port$Proxy;)Ljava/lang/Object;
+	public fun reassignable (Z)Lio/matthewnelson/kmp/tor/runtime/core/TorConfig$__HTTPTunnelPort;
+	public synthetic fun reassignable (Z)Ljava/lang/Object;
 }
 
 public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$__HTTPTunnelPort$Companion : io/matthewnelson/kmp/tor/runtime/core/TorConfig$Setting$Factory {
@@ -538,17 +546,13 @@ public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$__OwningContr
 
 public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$__SocksPort : io/matthewnelson/kmp/tor/runtime/core/TorConfig$Setting$Builder, io/matthewnelson/kmp/tor/runtime/core/builder/IsolationFlagBuilder$DSL, io/matthewnelson/kmp/tor/runtime/core/builder/TCPPortBuilder$DSL, io/matthewnelson/kmp/tor/runtime/core/builder/UnixFlagBuilder$DSL, io/matthewnelson/kmp/tor/runtime/core/builder/UnixSocketBuilder$DSL {
 	public static final field Companion Lio/matthewnelson/kmp/tor/runtime/core/TorConfig$__SocksPort$Companion;
-	public final fun argument ()Ljava/lang/String;
 	public fun asPort (Lio/matthewnelson/kmp/tor/runtime/core/ThisBlock;)Lio/matthewnelson/kmp/tor/runtime/core/TorConfig$__SocksPort;
 	public synthetic fun asPort (Lio/matthewnelson/kmp/tor/runtime/core/ThisBlock;)Ljava/lang/Object;
 	public fun asUnixSocket (Lio/matthewnelson/kmp/tor/runtime/core/ThisBlock;)Lio/matthewnelson/kmp/tor/runtime/core/TorConfig$__SocksPort;
 	public synthetic fun asUnixSocket (Lio/matthewnelson/kmp/tor/runtime/core/ThisBlock;)Ljava/lang/Object;
-	public final fun isolationFlags ()Ljava/util/Set;
 	public fun isolationFlags (Lio/matthewnelson/kmp/tor/runtime/core/ThisBlock;)Lio/matthewnelson/kmp/tor/runtime/core/TorConfig$__SocksPort;
 	public synthetic fun isolationFlags (Lio/matthewnelson/kmp/tor/runtime/core/ThisBlock;)Ljava/lang/Object;
-	public final fun socksFlags ()Ljava/util/Set;
 	public final fun socksFlags (Lio/matthewnelson/kmp/tor/runtime/core/ThisBlock;)Lio/matthewnelson/kmp/tor/runtime/core/TorConfig$__SocksPort;
-	public final fun unixFlags ()Ljava/util/Set;
 	public fun unixFlags (Lio/matthewnelson/kmp/tor/runtime/core/ThisBlock;)Lio/matthewnelson/kmp/tor/runtime/core/TorConfig$__SocksPort;
 	public synthetic fun unixFlags (Lio/matthewnelson/kmp/tor/runtime/core/ThisBlock;)Ljava/lang/Object;
 }
@@ -562,12 +566,12 @@ public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$__TransPort :
 	public synthetic fun auto ()Ljava/lang/Object;
 	public fun disable ()Lio/matthewnelson/kmp/tor/runtime/core/TorConfig$__TransPort;
 	public synthetic fun disable ()Ljava/lang/Object;
-	public final fun isolationFlags ()Ljava/util/Set;
 	public fun isolationFlags (Lio/matthewnelson/kmp/tor/runtime/core/ThisBlock;)Lio/matthewnelson/kmp/tor/runtime/core/TorConfig$__TransPort;
 	public synthetic fun isolationFlags (Lio/matthewnelson/kmp/tor/runtime/core/ThisBlock;)Ljava/lang/Object;
-	public final fun port ()Ljava/lang/String;
 	public fun port (Lio/matthewnelson/kmp/tor/runtime/core/address/Port$Proxy;)Lio/matthewnelson/kmp/tor/runtime/core/TorConfig$__TransPort;
 	public synthetic fun port (Lio/matthewnelson/kmp/tor/runtime/core/address/Port$Proxy;)Ljava/lang/Object;
+	public fun reassignable (Z)Lio/matthewnelson/kmp/tor/runtime/core/TorConfig$__TransPort;
+	public synthetic fun reassignable (Z)Ljava/lang/Object;
 }
 
 public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$__TransPort$Companion : io/matthewnelson/kmp/tor/runtime/core/TorConfig$Setting$Factory {
@@ -866,9 +870,10 @@ public abstract class io/matthewnelson/kmp/tor/runtime/core/builder/TCPPortBuild
 public final class io/matthewnelson/kmp/tor/runtime/core/builder/TCPPortBuilder$Control : io/matthewnelson/kmp/tor/runtime/core/builder/TCPPortBuilder, io/matthewnelson/kmp/tor/runtime/core/builder/TCPPortBuilder$DSLAuto, io/matthewnelson/kmp/tor/runtime/core/builder/TCPPortBuilder$DSLPort {
 	public fun auto ()Lio/matthewnelson/kmp/tor/runtime/core/builder/TCPPortBuilder$Control;
 	public synthetic fun auto ()Ljava/lang/Object;
-	public final fun port ()Ljava/lang/String;
 	public fun port (Lio/matthewnelson/kmp/tor/runtime/core/address/Port$Proxy;)Lio/matthewnelson/kmp/tor/runtime/core/builder/TCPPortBuilder$Control;
 	public synthetic fun port (Lio/matthewnelson/kmp/tor/runtime/core/address/Port$Proxy;)Ljava/lang/Object;
+	public fun reassignable (Z)Lio/matthewnelson/kmp/tor/runtime/core/builder/TCPPortBuilder$Control;
+	public synthetic fun reassignable (Z)Ljava/lang/Object;
 }
 
 public final class io/matthewnelson/kmp/tor/runtime/core/builder/TCPPortBuilder$HiddenService : io/matthewnelson/kmp/tor/runtime/core/builder/TCPPortBuilder {
@@ -880,9 +885,10 @@ public final class io/matthewnelson/kmp/tor/runtime/core/builder/TCPPortBuilder$
 	public synthetic fun auto ()Ljava/lang/Object;
 	public fun disable ()Lio/matthewnelson/kmp/tor/runtime/core/builder/TCPPortBuilder$Socks;
 	public synthetic fun disable ()Ljava/lang/Object;
-	public final fun port ()Ljava/lang/String;
 	public fun port (Lio/matthewnelson/kmp/tor/runtime/core/address/Port$Proxy;)Lio/matthewnelson/kmp/tor/runtime/core/builder/TCPPortBuilder$Socks;
 	public synthetic fun port (Lio/matthewnelson/kmp/tor/runtime/core/address/Port$Proxy;)Ljava/lang/Object;
+	public fun reassignable (Z)Lio/matthewnelson/kmp/tor/runtime/core/builder/TCPPortBuilder$Socks;
+	public synthetic fun reassignable (Z)Ljava/lang/Object;
 }
 
 public final class io/matthewnelson/kmp/tor/runtime/core/builder/UnixFlagBuilder {

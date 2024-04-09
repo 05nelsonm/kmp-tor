@@ -17,16 +17,29 @@ package io.matthewnelson.kmp.tor.runtime.core
 
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertNull
 
 class SocksPortUnitTest {
 
     @Test
-    fun givenTCPPortConfiguration_whenUnixFlags_thenAreNotAddedAsExtras() {
+    fun givenTCPPortConfiguration_whenUnixFlags_thenAreNotAddedAsOptionals() {
         val setting = TorConfig.__SocksPort.Builder {
             unixFlags { GroupWritable = true }
         }
 
         assertEquals("9050", setting.argument)
         assertEquals(0, setting.optionals.size)
+        assertEquals(true, setting[TorConfig.Extra.AllowReassign])
+    }
+
+    @Test
+    fun givenTCPPortConfiguration_whenReassignFalse_thenNoExtras() {
+        val setting = TorConfig.__SocksPort.Builder {
+            asPort {
+                reassignable(allow = false)
+            }
+        }
+
+        assertNull(setting[TorConfig.Extra.AllowReassign])
     }
 }
