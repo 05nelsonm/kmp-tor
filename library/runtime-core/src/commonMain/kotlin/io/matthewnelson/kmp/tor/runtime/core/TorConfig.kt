@@ -792,9 +792,7 @@ public class TorConfig private constructor(
         keyword = Companion,
     ) {
 
-        @get:JvmName("argument")
-        public var argument: String = AUTO
-            private set
+        private var argument: String = AUTO
 
         @KmpTorDsl
         public fun auto(): ConnectionPadding {
@@ -988,9 +986,7 @@ public class TorConfig private constructor(
         keyword = Companion,
     ) {
 
-        @get:JvmName("timeout")
-        public var timeout: String = "24 hours"
-            private set
+        private var timeout: String = "24 hours"
 
         @KmpTorDsl
         public fun minutes(n: Int): DormantClientTimeout {
@@ -1077,9 +1073,7 @@ public class TorConfig private constructor(
         keyword = Companion,
     ) {
 
-        @get:JvmName("argument")
-        public var argument: String = AUTO
-            private set
+        private var argument: String = AUTO
 
         @KmpTorDsl
         public fun auto(): GeoIPExcludeUnknown {
@@ -1149,8 +1143,18 @@ public class TorConfig private constructor(
      * All other HiddenService options are only configurable from within
      * the [HiddenServiceDir] DSL (the "root" [Setting.items] [LineItem]).
      *
-     * The [directory], [version], and a minimum of 1 [port] must be configured
+     * The [directory], [version], and a minimum of 1 [port] **MUST** be configured
      * in order to create the hidden service [Setting].
+     *
+     * e.g. (Minimum)
+     *
+     *     val setting = HiddenServiceDir.Builder {
+     *         directory = "/some/path".toFile()
+     *         port { virtual = 80.toPort() }
+     *         version { HSv(3) }
+     *     }
+     *
+     *     assertNotNull(setting)
      *
      * [HiddenServiceDir](https://2019.www.torproject.org/docs/tor-manual.html.en#HiddenServiceDir)
      * */
@@ -1159,47 +1163,24 @@ public class TorConfig private constructor(
         keyword = Companion,
     ) {
 
+        private val ports = mutableSetOf<LineItem>()
+        private var version: LineItem? = null
+        private var allowUnknownPorts: LineItem = DEFAULT_ALLOW_UNKNOWN_PORTS
+//        private var exportCircuitID: LineItem = DEFAULT_EXPORT_CIRCUIT_ID
+        private var maxStreams: LineItem = DEFAULT_MAX_STREAMS
+        private var maxStreamsCloseCircuit: LineItem = DEFAULT_MAX_STREAMS_CLOSE_CIRCUIT
+        private var dirGroupReadable: LineItem = DEFAULT_DIR_GROUP_READABLE
+        private val numIntroductionPoints = mutableMapOf("3" to 3)
+
         @JvmField
         public var directory: File? = null
-
-        private val _ports = mutableSetOf<LineItem>()
-        @get:JvmName("ports")
-        public val ports: Set<LineItem> get() = _ports.toImmutableSet()
-
-        @get:JvmName("version")
-        public var version: LineItem? = null
-            private set
-
-        @get:JvmName("allowUnknownPorts")
-        public var allowUnknownPorts: LineItem = DEFAULT_ALLOW_UNKNOWN_PORTS
-            private set
-
-//        @get:JvmName("exportCircuitID")
-//        public var exportCircuitID: LineItem = DEFAULT_EXPORT_CIRCUIT_ID
-//            private set
-
-        @get:JvmName("maxStreams")
-        public var maxStreams: LineItem = DEFAULT_MAX_STREAMS
-            private set
-
-        @get:JvmName("maxStreamsCloseCircuit")
-        public var maxStreamsCloseCircuit: LineItem = DEFAULT_MAX_STREAMS_CLOSE_CIRCUIT
-            private set
-
-        @get:JvmName("dirGroupReadable")
-        public var dirGroupReadable: LineItem = DEFAULT_DIR_GROUP_READABLE
-            private set
-
-        private val _numIntroductionPoints = mutableMapOf("3" to 3)
-        @get:JvmName("numIntroductionPoints")
-        public val numIntroductionPoints: Map<String, Int> get() = _numIntroductionPoints.toImmutableMap()
 
         @KmpTorDsl
         public fun port(
             block: ThisBlock<HiddenServicePort>,
         ): HiddenServiceDir {
             val port = HiddenServicePort.build(block)
-            if (port != null) _ports.add(port)
+            if (port != null) ports.add(port)
             return this
         }
 
@@ -1248,7 +1229,7 @@ public class TorConfig private constructor(
         public fun numIntroductionPoints(
             block: ThisBlock<HiddenServiceNumIntroductionPoints>,
         ): HiddenServiceDir {
-            HiddenServiceNumIntroductionPoints.configure(_numIntroductionPoints, block)
+            HiddenServiceNumIntroductionPoints.configure(numIntroductionPoints, block)
             return this
         }
 
@@ -1257,7 +1238,7 @@ public class TorConfig private constructor(
             val version = version ?: return null
             val ports = ports.also { if (it.isEmpty()) return null }
 
-            val numIntroductionPoints = (_numIntroductionPoints[version.argument] ?: 3).let { points ->
+            val numIntroductionPoints = (numIntroductionPoints[version.argument] ?: 3).let { points ->
                 HiddenServiceNumIntroductionPoints.toLineItem(points.toString())!!
             }
 
@@ -1300,6 +1281,8 @@ public class TorConfig private constructor(
     @KmpTorDsl
     public class HiddenServicePort private constructor() {
 
+        private var targetArgument: String? = null
+
         // TODO: Check if can be 0
         /**
          * Configures the virtual port that this HiddenServicePort
@@ -1320,41 +1303,7 @@ public class TorConfig private constructor(
         public var virtual: Port? = null
 
         /**
-         * Configures the target port that [virtual] will be mapped
-         * to.
-         *
-         * If left unconfigured, whatever [virtual] has been
-         * configured as is utilized.
-         *
-         * Can be either a TCP Port or a Unix Socket path.
-         *
-         * e.g.
-         *
-         *     HiddenServicePort 80 8080
-         *     // http://<onion-address>.onion
-         *     // will connect to server running on localhost at port 8080
-         *
-         *     HiddenServicePort 443 8443
-         *     // https://<onion-address>.onion
-         *     // will connect to server running on localhost at port 8443
-         *
-         *     HiddenServicePort 8080 8081
-         *     // http://<onion-address>.onion:8080
-         *     // will connect to server running on localhost at port 8081
-         *
-         *     HiddenServicePort 80 unix:"/path/to/tor/data/hidden_services/my_service/hs.sock"
-         *     // http://<onion-address>.onion
-         *     // will connect to server running the unix domain socket at specified path
-         *
-         * @see [targetAsPort]
-         * @see [targetAsUnixSocket]
-         * */
-        @get:JvmName("targetArgument")
-        public var targetArgument: String? = null
-            private set
-
-        /**
-         * Configure the [targetArgument] to use a TCP Port.
+         * Configure the target to use a TCP Port.
          *
          * Only necessary if a value different than [virtual]
          * is required.
@@ -1368,7 +1317,7 @@ public class TorConfig private constructor(
         }
 
         /**
-         * Configure the [targetArgument] to use a Unix Socket
+         * Configure the target to use a Unix Socket
          *
          * @throws [UnsupportedOperationException] see [UnixSocketBuilder.DSL]
          * */
@@ -1416,9 +1365,7 @@ public class TorConfig private constructor(
     @KmpTorDsl
     public class HiddenServiceVersion private constructor() {
 
-        @get:JvmName("argument")
-        public var argument: Byte? = null
-            private set
+        private var argument: Byte? = null
 
         /**
          * Currently, the only supported version is 3
@@ -1435,7 +1382,7 @@ public class TorConfig private constructor(
             // HiddenServiceDir._numIntroductionPoints Map with
             // its default value.
             require(version in 3..3) { "Unsupported HS version of $version" }
-            this.argument = version
+            argument = version
             return this
         }
 

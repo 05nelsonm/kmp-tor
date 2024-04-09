@@ -136,7 +136,6 @@ public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$Companion {
 
 public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$ConnectionPadding : io/matthewnelson/kmp/tor/runtime/core/TorConfig$Setting$Builder {
 	public static final field Companion Lio/matthewnelson/kmp/tor/runtime/core/TorConfig$ConnectionPadding$Companion;
-	public final fun argument ()Ljava/lang/String;
 	public final fun auto ()Lio/matthewnelson/kmp/tor/runtime/core/TorConfig$ConnectionPadding;
 	public final fun enable (Z)Lio/matthewnelson/kmp/tor/runtime/core/TorConfig$ConnectionPadding;
 }
@@ -208,7 +207,6 @@ public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$DormantClient
 	public final fun days (I)Lio/matthewnelson/kmp/tor/runtime/core/TorConfig$DormantClientTimeout;
 	public final fun hours (I)Lio/matthewnelson/kmp/tor/runtime/core/TorConfig$DormantClientTimeout;
 	public final fun minutes (I)Lio/matthewnelson/kmp/tor/runtime/core/TorConfig$DormantClientTimeout;
-	public final fun timeout ()Ljava/lang/String;
 	public final fun weeks (I)Lio/matthewnelson/kmp/tor/runtime/core/TorConfig$DormantClientTimeout;
 }
 
@@ -243,7 +241,6 @@ public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$Extra$AllowRe
 
 public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$GeoIPExcludeUnknown : io/matthewnelson/kmp/tor/runtime/core/TorConfig$Setting$Builder {
 	public static final field Companion Lio/matthewnelson/kmp/tor/runtime/core/TorConfig$GeoIPExcludeUnknown$Companion;
-	public final fun argument ()Ljava/lang/String;
 	public final fun auto ()Lio/matthewnelson/kmp/tor/runtime/core/TorConfig$GeoIPExcludeUnknown;
 	public final fun exclude (Z)Lio/matthewnelson/kmp/tor/runtime/core/TorConfig$GeoIPExcludeUnknown;
 }
@@ -279,19 +276,12 @@ public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$HiddenService
 	public static final field Companion Lio/matthewnelson/kmp/tor/runtime/core/TorConfig$HiddenServiceDir$Companion;
 	public static final field DEFAULT_PARENT_DIR_NAME Ljava/lang/String;
 	public field directory Ljava/io/File;
-	public final fun allowUnknownPorts ()Lio/matthewnelson/kmp/tor/runtime/core/TorConfig$LineItem;
 	public final fun allowUnknownPorts (Lio/matthewnelson/kmp/tor/runtime/core/ThisBlock;)Lio/matthewnelson/kmp/tor/runtime/core/TorConfig$HiddenServiceDir;
-	public final fun dirGroupReadable ()Lio/matthewnelson/kmp/tor/runtime/core/TorConfig$LineItem;
 	public final fun dirGroupReadable (Lio/matthewnelson/kmp/tor/runtime/core/ThisBlock;)Lio/matthewnelson/kmp/tor/runtime/core/TorConfig$HiddenServiceDir;
-	public final fun maxStreams ()Lio/matthewnelson/kmp/tor/runtime/core/TorConfig$LineItem;
 	public final fun maxStreams (Lio/matthewnelson/kmp/tor/runtime/core/ThisBlock;)Lio/matthewnelson/kmp/tor/runtime/core/TorConfig$HiddenServiceDir;
-	public final fun maxStreamsCloseCircuit ()Lio/matthewnelson/kmp/tor/runtime/core/TorConfig$LineItem;
 	public final fun maxStreamsCloseCircuit (Lio/matthewnelson/kmp/tor/runtime/core/ThisBlock;)Lio/matthewnelson/kmp/tor/runtime/core/TorConfig$HiddenServiceDir;
-	public final fun numIntroductionPoints ()Ljava/util/Map;
 	public final fun numIntroductionPoints (Lio/matthewnelson/kmp/tor/runtime/core/ThisBlock;)Lio/matthewnelson/kmp/tor/runtime/core/TorConfig$HiddenServiceDir;
 	public final fun port (Lio/matthewnelson/kmp/tor/runtime/core/ThisBlock;)Lio/matthewnelson/kmp/tor/runtime/core/TorConfig$HiddenServiceDir;
-	public final fun ports ()Ljava/util/Set;
-	public final fun version ()Lio/matthewnelson/kmp/tor/runtime/core/TorConfig$LineItem;
 	public final fun version (Lio/matthewnelson/kmp/tor/runtime/core/ThisBlock;)Lio/matthewnelson/kmp/tor/runtime/core/TorConfig$HiddenServiceDir;
 }
 
@@ -334,7 +324,6 @@ public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$HiddenService
 public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$HiddenServicePort {
 	public static final field Companion Lio/matthewnelson/kmp/tor/runtime/core/TorConfig$HiddenServicePort$Companion;
 	public field virtual Lio/matthewnelson/kmp/tor/runtime/core/address/Port;
-	public final fun targetArgument ()Ljava/lang/String;
 	public final fun targetAsPort (Lio/matthewnelson/kmp/tor/runtime/core/ThisBlock;)Lio/matthewnelson/kmp/tor/runtime/core/TorConfig$HiddenServicePort;
 	public final fun targetAsUnixSocket (Lio/matthewnelson/kmp/tor/runtime/core/ThisBlock;)Lio/matthewnelson/kmp/tor/runtime/core/TorConfig$HiddenServicePort;
 }
@@ -345,7 +334,6 @@ public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$HiddenService
 public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$HiddenServiceVersion {
 	public static final field Companion Lio/matthewnelson/kmp/tor/runtime/core/TorConfig$HiddenServiceVersion$Companion;
 	public final fun HSv (B)Lio/matthewnelson/kmp/tor/runtime/core/TorConfig$HiddenServiceVersion;
-	public final fun argument ()Ljava/lang/Byte;
 }
 
 public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$HiddenServiceVersion$Companion : io/matthewnelson/kmp/tor/runtime/core/TorConfig$Keyword {
