@@ -18,18 +18,27 @@ package io.matthewnelson.kmp.tor.runtime.core.util
 import io.matthewnelson.kmp.tor.runtime.core.address.IPAddress
 import io.matthewnelson.kmp.tor.runtime.core.internal.net_createServer
 import io.matthewnelson.kmp.tor.runtime.core.internal.onError
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.withContext
 import kotlin.test.fail
+import kotlin.time.Duration.Companion.milliseconds
 
 @OptIn(ExperimentalStdlibApi::class)
 class PortUtilJsUnitTest: PortUtilBaseTest() {
 
-    override fun openServerSocket(
+    override suspend fun openServerSocket(
         ipAddress: IPAddress,
         port: Int,
     ): AutoCloseable {
         val server = net_createServer { it.destroy(); Unit }
         server.onError { err -> fail(err.toString()) }
-        server.listen(port, ipAddress.value, 1) {}
+        val options = js("{}")
+        options["port"] = port
+        options["host"] = ipAddress.value
+        options["backlog"] = 1
+        server.listen(options) {}
+        withContext(Dispatchers.Default) { delay(10.milliseconds) }
         return object : AutoCloseable {
             override fun close() { server.close() }
         }

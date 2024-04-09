@@ -23,7 +23,7 @@ import io.matthewnelson.kmp.tor.runtime.core.internal.ServerSocketProducer.Compa
 @OptIn(ExperimentalStdlibApi::class)
 class PortUtilNonJsUnitTest: PortUtilBaseTest() {
 
-    override fun openServerSocket(
+    override suspend fun openServerSocket(
         ipAddress: IPAddress,
         port: Int,
     ): AutoCloseable = ipAddress.toServerSocketProducer()

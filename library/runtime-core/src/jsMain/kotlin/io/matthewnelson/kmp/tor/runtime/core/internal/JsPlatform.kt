@@ -44,11 +44,3 @@ internal inline fun net_Server.onError(
 ) {
     on("error", callback)
 }
-
-@Suppress("NOTHING_TO_INLINE")
-@OptIn(InternalProcessApi::class)
-internal inline fun net_Server.onListening(
-    noinline callback: () -> Unit,
-) {
-    on("listening", callback)
-}
