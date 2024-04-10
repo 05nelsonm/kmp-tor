@@ -102,7 +102,17 @@ public interface TorRuntime:
         public var networkObserver: NetworkObserver = NetworkObserver.NOOP
 
         /**
+         * Declare a default [OnEvent.Executor] to utilize when dispatching
+         * [TorEvent] and [RuntimeEvent] to registered observers (if the observer
+         * does not provide its own). This can be overridden on a per-observer
+         * basis when creating them, given the needs of that observer and how it
+         * is being used and/or implemented.
          *
+         * **NOTE:** This should be a singleton with **no** contextual or
+         * non-singleton references outside the [OnEvent.Executor.execute]
+         * lambda.
+         *
+         * Default: [OnEvent.Executor.Unconfined]
          * */
         @JvmField
         public var defaultEventExecutor: OnEvent.Executor = OnEvent.Executor.Unconfined
