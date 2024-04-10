@@ -150,15 +150,17 @@ public sealed class RuntimeEvent<R: Any> private constructor(
      * Model to be registered with a [Processor] for being notified
      * via callback invocation with [RuntimeEvent] output information.
      * */
-    public class Observer<R: Any> public constructor(
+    public open class Observer<R: Any>(
         /**
          * The [RuntimeEvent] this is observing
          * */
         @JvmField
         public val event: RuntimeEvent<R>,
         tag: String?,
-        private val executor: OnEvent.Executor?,
-        private val onEvent: OnEvent<R>,
+        @JvmField
+        protected val executor: OnEvent.Executor?,
+        @JvmField
+        protected val onEvent: OnEvent<R>,
     ) {
 
         /**
@@ -177,7 +179,7 @@ public sealed class RuntimeEvent<R: Any> private constructor(
             (executor ?: default).execute { onEvent(event) }
         }
 
-        public override fun toString(): String = toString(isStatic = false)
+        public final override fun toString(): String = toString(isStatic = false)
 
         public fun toString(isStatic: Boolean): String = buildString {
             val tag = if (tag != null && isStatic) "STATIC" else tag

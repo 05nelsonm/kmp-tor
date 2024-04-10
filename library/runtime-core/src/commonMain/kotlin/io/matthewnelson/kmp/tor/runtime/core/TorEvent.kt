@@ -273,15 +273,17 @@ public enum class TorEvent {
      * Model to be registered with a [Processor] for being notified
      * via callback invocation with [TorEvent] output information.
      * */
-    public class Observer(
+    public open class Observer(
         /**
          * The [TorEvent] this is observing
          * */
         @JvmField
         public val event: TorEvent,
         tag: String?,
-        private val executor: OnEvent.Executor?,
-        private val onEvent: OnEvent<String>,
+        @JvmField
+        protected val executor: OnEvent.Executor?,
+        @JvmField
+        protected val onEvent: OnEvent<String>,
     ) {
 
         /**
@@ -300,7 +302,7 @@ public enum class TorEvent {
             (executor ?: default).execute { onEvent(event) }
         }
 
-        override fun toString(): String = toString(isStatic = false)
+        public final override fun toString(): String = toString(isStatic = false)
 
         public fun toString(isStatic: Boolean): String = buildString {
             val tag = if (tag != null && isStatic) "STATIC" else tag

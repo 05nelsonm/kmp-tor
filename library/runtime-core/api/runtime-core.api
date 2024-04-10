@@ -620,12 +620,14 @@ public final class io/matthewnelson/kmp/tor/runtime/core/TorEvent : java/lang/En
 	public static fun values ()[Lio/matthewnelson/kmp/tor/runtime/core/TorEvent;
 }
 
-public final class io/matthewnelson/kmp/tor/runtime/core/TorEvent$Observer {
+public class io/matthewnelson/kmp/tor/runtime/core/TorEvent$Observer {
 	public final field event Lio/matthewnelson/kmp/tor/runtime/core/TorEvent;
+	protected final field executor Lio/matthewnelson/kmp/tor/runtime/core/OnEvent$Executor;
+	protected final field onEvent Lio/matthewnelson/kmp/tor/runtime/core/OnEvent;
 	public final field tag Ljava/lang/String;
 	public fun <init> (Lio/matthewnelson/kmp/tor/runtime/core/TorEvent;Ljava/lang/String;Lio/matthewnelson/kmp/tor/runtime/core/OnEvent$Executor;Lio/matthewnelson/kmp/tor/runtime/core/OnEvent;)V
 	public final fun notify (Lio/matthewnelson/kmp/tor/runtime/core/OnEvent$Executor;Ljava/lang/String;)V
-	public fun toString ()Ljava/lang/String;
+	public final fun toString ()Ljava/lang/String;
 	public final fun toString (Z)Ljava/lang/String;
 }
 
