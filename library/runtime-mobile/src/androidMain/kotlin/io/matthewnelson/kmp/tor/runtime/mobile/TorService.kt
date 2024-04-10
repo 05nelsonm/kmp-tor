@@ -67,8 +67,8 @@ internal class TorService internal constructor(): AbstractTorService() {
             }
         }
 
-        override fun removeAll(tag: String) { factory.removeAll(tag) }
-        override fun removeAll(vararg events: RuntimeEvent<*>) { factory.removeAll(*events) }
+        override fun unsubscribeAll(tag: String) { factory.unsubscribeAll(tag) }
+        override fun unsubscribeAll(vararg events: RuntimeEvent<*>) { factory.unsubscribeAll(*events) }
         override fun clearObservers() { factory.clearObservers() }
     }
 

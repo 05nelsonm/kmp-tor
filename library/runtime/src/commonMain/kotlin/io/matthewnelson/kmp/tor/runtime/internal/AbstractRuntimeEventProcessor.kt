@@ -45,25 +45,25 @@ internal abstract class AbstractRuntimeEventProcessor(
         observers.addAll(initialObservers)
     }
 
-    public final override fun add(observer: RuntimeEvent.Observer<*>) {
+    public final override fun subscribe(observer: RuntimeEvent.Observer<*>) {
         withObservers { add(observer) }
     }
 
-    public final override fun add(vararg observers: RuntimeEvent.Observer<*>) {
+    public final override fun subscribe(vararg observers: RuntimeEvent.Observer<*>) {
         if (observers.isEmpty()) return
         withObservers { observers.forEach { add(it) } }
     }
 
-    public final override fun remove(observer: RuntimeEvent.Observer<*>) {
+    public final override fun unsubscribe(observer: RuntimeEvent.Observer<*>) {
         withObservers { remove(observer) }
     }
 
-    public final override fun remove(vararg observers: RuntimeEvent.Observer<*>) {
+    public final override fun unsubscribe(vararg observers: RuntimeEvent.Observer<*>) {
         if (observers.isEmpty()) return
         withObservers { observers.forEach { remove(it) } }
     }
 
-    public final override fun removeAll(event: RuntimeEvent<*>) {
+    public final override fun unsubscribeAll(event: RuntimeEvent<*>) {
         withObservers {
             val iterator = iterator()
             while (iterator.hasNext()) {
@@ -77,7 +77,7 @@ internal abstract class AbstractRuntimeEventProcessor(
         }
     }
 
-    public final override fun removeAll(vararg events: RuntimeEvent<*>) {
+    public final override fun unsubscribeAll(vararg events: RuntimeEvent<*>) {
         if (events.isEmpty()) return
         withObservers {
             val iterator = iterator()
@@ -92,7 +92,7 @@ internal abstract class AbstractRuntimeEventProcessor(
         }
     }
 
-    public final override fun removeAll(tag: String) {
+    public final override fun unsubscribeAll(tag: String) {
         if (tag.isStaticTag()) return
         withObservers {
             val iterator = iterator()
@@ -103,7 +103,7 @@ internal abstract class AbstractRuntimeEventProcessor(
             }
         }
 
-        super.removeAll(tag)
+        super.unsubscribeAll(tag)
     }
 
     public final override fun clearObservers() {

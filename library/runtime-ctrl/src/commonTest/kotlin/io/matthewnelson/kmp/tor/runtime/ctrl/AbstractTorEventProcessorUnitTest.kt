@@ -37,11 +37,11 @@ class AbstractTorEventProcessorUnitTest {
     @Test
     fun givenObserver_whenAddRemove_thenIsAsExpected() {
         val observer = TorEvent.CIRC.observer {}
-        processor.add(observer)
+        processor.subscribe(observer)
         assertEquals(1, processor.size)
-        processor.add(observer)
+        processor.subscribe(observer)
         assertEquals(1, processor.size)
-        processor.remove(observer)
+        processor.unsubscribe(observer)
         assertEquals(0, processor.size)
     }
 
@@ -53,9 +53,9 @@ class AbstractTorEventProcessorUnitTest {
             // the processor's lock, this would lock up
             // b/c removal also obtains the lock to modify
             // the Set
-            processor.remove(observer!!)
+            processor.unsubscribe(observer!!)
         }
-        processor.add(observer)
+        processor.subscribe(observer)
         assertEquals(1, processor.size)
         processor.notify(observer.event, "")
         assertEquals(0, processor.size)
@@ -67,10 +67,10 @@ class AbstractTorEventProcessorUnitTest {
         val o1 = TorEvent.CIRC.observer { invocations++ }
         val o2 = TorEvent.BW.observer {}
         val o3 = TorEvent.BW.observer {}
-        processor.add(o1, o2, o3, o3)
+        processor.subscribe(o1, o2, o3, o3)
         assertEquals(3, processor.size)
 
-        processor.removeAll(TorEvent.BW)
+        processor.unsubscribeAll(TorEvent.BW)
         assertEquals(1, processor.size)
 
         processor.notify(TorEvent.CIRC, "out")
@@ -83,10 +83,10 @@ class AbstractTorEventProcessorUnitTest {
         val o1 = TorEvent.CIRC.observer { invocations++ }
         val o2 = TorEvent.BW.observer {}
         val o3 = TorEvent.BW.observer {}
-        processor.add(o1, o2, o3)
+        processor.subscribe(o1, o2, o3)
         assertEquals(3, processor.size)
 
-        processor.remove(o2, o3)
+        processor.unsubscribe(o2, o3)
         assertEquals(1, processor.size)
 
         processor.notify(TorEvent.CIRC, "out")
@@ -99,10 +99,10 @@ class AbstractTorEventProcessorUnitTest {
         val o1 = TorEvent.CIRC.observer("test1") { invocations++ }
         val o2 = TorEvent.BW.observer("test2") {}
         val o3 = TorEvent.HS_DESC.observer("test2") {}
-        processor.add(o1, o1, o2, o2, o3, o3)
+        processor.subscribe(o1, o1, o2, o2, o3, o3)
         assertEquals(3, processor.size)
 
-        processor.removeAll("test2")
+        processor.unsubscribeAll("test2")
         assertEquals(1, processor.size)
 
         // Is the proper tagged observer removed
@@ -117,27 +117,27 @@ class AbstractTorEventProcessorUnitTest {
 
     @Test
     fun givenStaticTag_whenRemove_thenDoesNothing() {
-        processor.add(TorEvent.BW.observer("static") {})
+        processor.subscribe(TorEvent.BW.observer("static") {})
 
         val nonStaticObserver = TorEvent.BW.observer("non-static") {}
-        processor.add(nonStaticObserver)
+        processor.subscribe(nonStaticObserver)
 
         // should do nothing
-        processor.removeAll("static")
+        processor.unsubscribeAll("static")
         assertEquals(2, processor.size)
 
         // Should only remove the non-static observer
-        processor.removeAll(TorEvent.BW)
+        processor.unsubscribeAll(TorEvent.BW)
         assertEquals(1, processor.size)
 
         // Should only remove the non-static observer
-        processor.add(nonStaticObserver)
+        processor.subscribe(nonStaticObserver)
         assertEquals(2, processor.size)
-        processor.removeAll(TorEvent.BW, TorEvent.ADDRMAP)
+        processor.unsubscribeAll(TorEvent.BW, TorEvent.ADDRMAP)
         assertEquals(1, processor.size)
 
         // Should not remove the static observer
-        processor.add(nonStaticObserver)
+        processor.subscribe(nonStaticObserver)
         assertEquals(2, processor.size)
         processor.clearObservers()
         assertEquals(1, processor.size)
@@ -146,7 +146,7 @@ class AbstractTorEventProcessorUnitTest {
     @Test
     fun givenStaticObservers_whenOnDestroy_thenEvictsAll() {
         val observer = TorEvent.BW.observer("static") {}
-        processor.add(observer)
+        processor.subscribe(observer)
         assertEquals(1, processor.size)
 
         processor.clearObservers()
@@ -155,7 +155,7 @@ class AbstractTorEventProcessorUnitTest {
         processor.destroy()
         assertEquals(0, processor.size)
 
-        processor.add(observer)
+        processor.subscribe(observer)
         assertEquals(0, processor.size)
     }
 

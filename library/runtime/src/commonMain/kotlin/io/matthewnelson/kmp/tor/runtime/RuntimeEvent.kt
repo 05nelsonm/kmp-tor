@@ -19,7 +19,6 @@ import io.matthewnelson.immutable.collections.immutableSetOf
 import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
 import io.matthewnelson.kmp.tor.runtime.core.OnEvent
 import io.matthewnelson.kmp.tor.runtime.core.TorEvent
-import io.matthewnelson.kmp.tor.runtime.core.TorEvent.Observer
 import io.matthewnelson.kmp.tor.runtime.core.UncaughtException
 import kotlin.jvm.JvmField
 import kotlin.jvm.JvmName
@@ -67,7 +66,7 @@ public sealed class RuntimeEvent<R: Any> private constructor(
 
     /**
      * Create an observer for the given [RuntimeEvent]
-     * to register via [Processor.add].
+     * to register via [Processor.subscribe].
      *
      * e.g. (Kotlin)
      *
@@ -89,7 +88,7 @@ public sealed class RuntimeEvent<R: Any> private constructor(
 
     /**
      * Create an observer for the given [RuntimeEvent]
-     * to register via [Processor.add].
+     * to register via [Processor.subscribe].
      *
      * This is useful for lifecycle aware components, all of which
      * can be removed with a single call using the [tag] upon
@@ -117,7 +116,7 @@ public sealed class RuntimeEvent<R: Any> private constructor(
 
     /**
      * Create an observer for the given [RuntimeEvent], [tag] and
-     * [OnEvent.Executor] to register via [Processor.add].
+     * [OnEvent.Executor] to register via [Processor.subscribe].
      *
      * e.g. (Kotlin)
      *
@@ -211,32 +210,32 @@ public sealed class RuntimeEvent<R: Any> private constructor(
         /**
          * Add a single [Observer].
          * */
-        public fun add(observer: Observer<*>)
+        public fun subscribe(observer: Observer<*>)
 
         /**
          * Add multiple [Observer].
          * */
-        public fun add(vararg observers: Observer<*>)
+        public fun subscribe(vararg observers: Observer<*>)
 
         /**
          * Remove a single [Observer].
          * */
-        public fun remove(observer: Observer<*>)
+        public fun unsubscribe(observer: Observer<*>)
 
         /**
          * Remove multiple [Observer].
          * */
-        public fun remove(vararg observers: Observer<*>)
+        public fun unsubscribe(vararg observers: Observer<*>)
 
         /**
          * Remove all [Observer] of a single [RuntimeEvent]
          * */
-        public fun removeAll(event: RuntimeEvent<*>)
+        public fun unsubscribeAll(event: RuntimeEvent<*>)
 
         /**
          * Remove all [Observer] of multiple [RuntimeEvent]
          * */
-        public fun removeAll(vararg events: RuntimeEvent<*>)
+        public fun unsubscribeAll(vararg events: RuntimeEvent<*>)
 
         /**
          * Remove all [Observer] with the given [tag].
@@ -245,7 +244,7 @@ public sealed class RuntimeEvent<R: Any> private constructor(
          * and [TorEvent.Processor], [TorEvent.Observer] with
          * the given [tag] will also be removed.
          * */
-        public fun removeAll(tag: String)
+        public fun unsubscribeAll(tag: String)
 
         /**
          * Remove all non-static [Observer] that are currently

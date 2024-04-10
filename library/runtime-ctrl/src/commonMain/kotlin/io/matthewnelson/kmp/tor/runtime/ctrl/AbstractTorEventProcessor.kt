@@ -53,25 +53,25 @@ protected constructor(
         observers.addAll(initialObservers)
     }
 
-    public final override fun add(observer: TorEvent.Observer) {
+    public final override fun subscribe(observer: TorEvent.Observer) {
         withObservers { add(observer) }
     }
 
-    public final override fun add(vararg observers: TorEvent.Observer) {
+    public final override fun subscribe(vararg observers: TorEvent.Observer) {
         if (observers.isEmpty()) return
         withObservers { observers.forEach { add(it) } }
     }
 
-    public final override fun remove(observer: TorEvent.Observer) {
+    public final override fun unsubscribe(observer: TorEvent.Observer) {
         withObservers { remove(observer) }
     }
 
-    public final override fun remove(vararg observers: TorEvent.Observer) {
+    public final override fun unsubscribe(vararg observers: TorEvent.Observer) {
         if (observers.isEmpty()) return
         withObservers { observers.forEach { remove(it) } }
     }
 
-    public final override fun removeAll(event: TorEvent) {
+    public final override fun unsubscribeAll(event: TorEvent) {
         withObservers {
             val iterator = iterator()
             while (iterator.hasNext()) {
@@ -85,7 +85,7 @@ protected constructor(
         }
     }
 
-    public final override fun removeAll(vararg events: TorEvent) {
+    public final override fun unsubscribeAll(vararg events: TorEvent) {
         if (events.isEmpty()) return
         withObservers {
             val iterator = iterator()
@@ -100,7 +100,7 @@ protected constructor(
         }
     }
 
-    public override fun removeAll(tag: String) {
+    public override fun unsubscribeAll(tag: String) {
         if (tag.isStaticTag()) return
         withObservers {
             val iterator = iterator()

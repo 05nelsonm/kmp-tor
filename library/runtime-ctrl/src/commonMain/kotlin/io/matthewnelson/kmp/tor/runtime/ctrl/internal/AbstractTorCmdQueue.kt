@@ -194,8 +194,8 @@ internal abstract class AbstractTorCmdQueue internal constructor(
         }
     }
 
-    public final override fun removeAll(tag: String) {
-        super.removeAll(tag)
+    public final override fun unsubscribeAll(tag: String) {
+        super.unsubscribeAll(tag)
     }
 
     public final override fun clearObservers() {
