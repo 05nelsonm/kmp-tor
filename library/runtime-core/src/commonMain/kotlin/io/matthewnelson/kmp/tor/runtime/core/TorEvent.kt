@@ -203,11 +203,11 @@ public enum class TorEvent {
      *         updateNotification(formatBandwidth(output));
      *     });
      *
-     * @param [callback] the callback to pass the event text to
+     * @param [onEvent] the callback to pass the event text to
      * */
     public fun observer(
-        callback: Callback<String>,
-    ): Observer = observer("", callback)
+        onEvent: OnEvent<String>,
+    ): Observer = observer("", onEvent)
 
     /**
      * Create an observer for the given [TorEvent] and [tag]
@@ -230,19 +230,19 @@ public enum class TorEvent {
      *     });
      *
      * @param [tag] Any non-blank string value
-     * @param [callback] the callback to pass the event text to
+     * @param [onEvent] the callback to pass the event text to
      * */
     public fun observer(
         tag: String,
-        callback: Callback<String>,
-    ): Observer = Observer(tag,this, callback)
+        onEvent: OnEvent<String>,
+    ): Observer = Observer(tag,this, onEvent)
 
     public class Observer(
         tag: String?,
         @JvmField
         public val event: TorEvent,
         @JvmField
-        public val callback: Callback<String>,
+        public val onEvent: OnEvent<String>,
     ) {
         @JvmField
         public val tag: String? = tag?.ifBlank { null }

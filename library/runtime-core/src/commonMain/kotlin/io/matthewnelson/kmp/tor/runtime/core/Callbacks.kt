@@ -44,13 +44,9 @@ public typealias OnSuccess<T> = ItBlock<T>
 public typealias OnFailure = ItBlock<Throwable>
 
 /**
- * A callback for dispatching things.
+ * A callback for dispatching events.
  * */
-public fun interface Callback<in It: Any> {
-    public operator fun invoke(it: It)
-
-    // TODO: DispatchMain Issue #349
-}
+public fun interface OnEvent<in It: Any>: ItBlock<It>
 
 /**
  * A callback to return to callers to "undo", or

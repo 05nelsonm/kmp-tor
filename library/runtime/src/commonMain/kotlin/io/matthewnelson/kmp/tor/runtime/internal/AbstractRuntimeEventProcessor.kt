@@ -19,7 +19,7 @@ import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
 import io.matthewnelson.kmp.tor.core.resource.SynchronizedObject
 import io.matthewnelson.kmp.tor.core.resource.synchronized
 import io.matthewnelson.kmp.tor.runtime.RuntimeEvent
-import io.matthewnelson.kmp.tor.runtime.core.Callback
+import io.matthewnelson.kmp.tor.runtime.core.OnEvent
 import io.matthewnelson.kmp.tor.runtime.ctrl.AbstractTorEventProcessor
 import io.matthewnelson.kmp.tor.runtime.core.TorEvent
 import io.matthewnelson.kmp.tor.runtime.core.UncaughtException
@@ -135,7 +135,7 @@ internal abstract class AbstractRuntimeEventProcessor(
         }?.forEach { observer ->
             handler.tryCatch(observer.toString(isStatic = observer.tag.isStaticTag())) {
                 @Suppress("UNCHECKED_CAST")
-                (observer.callback as Callback<R>)(output)
+                (observer.onEvent as OnEvent<R>)(output)
             }
         }
     }

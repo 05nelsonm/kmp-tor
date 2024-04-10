@@ -17,7 +17,7 @@ package io.matthewnelson.kmp.tor.runtime
 
 import io.matthewnelson.immutable.collections.immutableSetOf
 import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
-import io.matthewnelson.kmp.tor.runtime.core.Callback
+import io.matthewnelson.kmp.tor.runtime.core.OnEvent
 import io.matthewnelson.kmp.tor.runtime.core.TorEvent
 import io.matthewnelson.kmp.tor.runtime.core.UncaughtException
 import kotlin.jvm.JvmField
@@ -80,11 +80,11 @@ public sealed class RuntimeEvent<R: Any> private constructor(
      *         System.out.println(output);
      *     });
      *
-     * @param [callback] the callback to pass the event output to
+     * @param [onEvent] the callback to pass the event output to
      * */
     public fun observer(
-        callback: Callback<R>,
-    ): Observer<R> = observer("", callback)
+        onEvent: OnEvent<R>,
+    ): Observer<R> = observer("", onEvent)
 
     /**
      * Create an observer for the given [RuntimeEvent]
@@ -103,19 +103,19 @@ public sealed class RuntimeEvent<R: Any> private constructor(
      *     });
      *
      * @param [tag] Any non-blank string value
-     * @param [callback] the callback to pass the event output to
+     * @param [onEvent] the callback to pass the event output to
      * */
     public fun observer(
         tag: String,
-        callback: Callback<R>,
-    ): Observer<R> = Observer(tag, this, callback)
+        onEvent: OnEvent<R>,
+    ): Observer<R> = Observer(tag, this, onEvent)
 
     public class Observer<R: Any>(
         tag: String?,
         @JvmField
         public val event: RuntimeEvent<R>,
         @JvmField
-        public val callback: Callback<R>,
+        public val onEvent: OnEvent<R>,
     ) {
         @JvmField
         public val tag: String? = tag?.ifBlank { null }

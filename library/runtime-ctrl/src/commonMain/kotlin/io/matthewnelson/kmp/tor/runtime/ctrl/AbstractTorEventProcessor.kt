@@ -131,7 +131,7 @@ protected constructor(
             mapNotNull { if (it.event == event) it else null }
         }?.forEach { observer ->
             handler.tryCatch(observer.toString(isStatic = observer.tag.isStaticTag())) {
-                observer.callback(output)
+                observer.onEvent(output)
             }
         }
     }

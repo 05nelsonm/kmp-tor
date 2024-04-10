@@ -152,9 +152,9 @@ public interface TorRuntime:
         @KmpTorDsl
         public fun staticObserver(
             event: TorEvent,
-            callback: Callback<String>,
+            onEvent: OnEvent<String>,
         ): Builder {
-            val observer = event.observer(environment.staticObserverTag, callback)
+            val observer = event.observer(environment.staticObserverTag, onEvent)
             staticTorEventObservers.add(observer)
             return this
         }
@@ -167,9 +167,9 @@ public interface TorRuntime:
         @KmpTorDsl
         public fun <R: Any> staticObserver(
             event: RuntimeEvent<R>,
-            callback: Callback<R>,
+            onEvent: OnEvent<R>,
         ): Builder {
-            val observer = event.observer(environment.staticObserverTag, callback)
+            val observer = event.observer(environment.staticObserverTag, onEvent)
             staticRuntimeEventObservers.add(observer)
             return this
         }
