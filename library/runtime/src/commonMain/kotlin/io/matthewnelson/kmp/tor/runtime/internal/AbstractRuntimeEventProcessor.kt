@@ -29,8 +29,9 @@ import io.matthewnelson.kmp.tor.runtime.core.UncaughtException.Handler.Companion
 internal abstract class AbstractRuntimeEventProcessor(
     staticTag: String?,
     initialObservers: Set<RuntimeEvent.Observer<*>>,
+    defaultExecutor: OnEvent.Executor,
     initialTorEventObservers: Set<TorEvent.Observer>,
-):  AbstractTorEventProcessor(staticTag, initialTorEventObservers),
+):  AbstractTorEventProcessor(staticTag, initialTorEventObservers, defaultExecutor),
     RuntimeEvent.Processor
 {
 
@@ -135,7 +136,7 @@ internal abstract class AbstractRuntimeEventProcessor(
         }?.forEach { observer ->
             handler.tryCatch(observer.toString(isStatic = observer.tag.isStaticTag())) {
                 @Suppress("UNCHECKED_CAST")
-                (observer.onEvent as OnEvent<R>)(output)
+                (observer as RuntimeEvent.Observer<R>).notify(defaultExecutor, output)
             }
         }
     }

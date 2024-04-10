@@ -16,11 +16,8 @@
 package io.matthewnelson.kmp.tor.runtime.ctrl.internal
 
 import io.matthewnelson.kmp.file.IOException
-import io.matthewnelson.kmp.tor.runtime.core.OnFailure
-import io.matthewnelson.kmp.tor.runtime.core.OnSuccess
-import io.matthewnelson.kmp.tor.runtime.core.QueuedJob
+import io.matthewnelson.kmp.tor.runtime.core.*
 import io.matthewnelson.kmp.tor.runtime.core.ctrl.TorCmd
-import io.matthewnelson.kmp.tor.runtime.core.UncaughtException
 import io.matthewnelson.kmp.tor.runtime.core.ctrl.Reply
 import kotlin.coroutines.cancellation.CancellationException
 import kotlin.test.*
@@ -29,7 +26,7 @@ class AbstractTorCmdQueueUnitTest {
 
     private class TestQueue(
         handler: UncaughtException.Handler = UncaughtException.Handler.THROW,
-    ): AbstractTorCmdQueue(null, emptySet(), handler) {
+    ): AbstractTorCmdQueue(null, emptySet(), OnEvent.Executor.Unconfined, handler) {
 
         var invocationStart = 0
             private set

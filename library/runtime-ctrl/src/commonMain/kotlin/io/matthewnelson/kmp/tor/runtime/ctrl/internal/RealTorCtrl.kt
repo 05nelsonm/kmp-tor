@@ -39,7 +39,8 @@ internal class RealTorCtrl private constructor(
 ): AbstractTorCtrl(
     factory.staticTag,
     factory.initialObservers,
-    factory.handler,
+    factory.defaultExecutor,
+    CloseableExceptionHandler(factory.handler),
 ) {
 
     @Volatile
@@ -127,16 +128,20 @@ internal class RealTorCtrl private constructor(
         scope.cancel()
         LOG.d { "Scope Cancelled" }
 
-        handler.withSuppression {
-            val context = "RealTorCtrl.onDestroy"
+        try {
+            handler.withSuppression {
+                val context = "RealTorCtrl.onDestroy"
 
-            tryCatch(context) { super.onDestroy() }
+                tryCatch(context) { super.onDestroy() }
 
-            _closeException?.let { ex ->
-                tryCatch(context) { throw ex }
+                _closeException?.let { ex ->
+                    tryCatch(context) { throw ex }
+                }
+
+                LOG = null
             }
-
-            LOG = null
+        } finally {
+            (handler as CloseableExceptionHandler).close()
         }
 
         return true

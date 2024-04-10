@@ -96,6 +96,8 @@ public actual interface TorCtrl : Destroyable, TorEvent.Processor, TorCmd.Privil
      *   with the same tag from removal until destroyed
      * @param [initialObservers] Some initial observers to start with, static
      *   or not.
+     * @param [defaultExecutor] The default [OnEvent.Executor] to fall back to
+     *   when calling [TorEvent.Observer.notify] if it does not have its own.
      * @param [debugger] A callback for debugging info. **MUST** be thread
      *   safe. Any exceptions it throws will be swallowed.
      * @param [handler] The [UncaughtException.Handler] to pipe bad behavior
@@ -109,6 +111,7 @@ public actual interface TorCtrl : Destroyable, TorEvent.Processor, TorCmd.Privil
     public actual constructor(
         internal actual val staticTag: String?,
         internal actual val initialObservers: Set<TorEvent.Observer>,
+        internal actual val defaultExecutor: OnEvent.Executor,
         internal actual val debugger: ItBlock<String>?,
         internal actual val handler: UncaughtException.Handler,
     ) {

@@ -41,6 +41,7 @@ public abstract class io/matthewnelson/kmp/tor/runtime/RuntimeEvent {
 	public synthetic fun <init> (Ljava/lang/String;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
 	public static final fun entries ()Ljava/util/Set;
 	public final fun observer (Lio/matthewnelson/kmp/tor/runtime/core/OnEvent;)Lio/matthewnelson/kmp/tor/runtime/RuntimeEvent$Observer;
+	public final fun observer (Ljava/lang/String;Lio/matthewnelson/kmp/tor/runtime/core/OnEvent$Executor;Lio/matthewnelson/kmp/tor/runtime/core/OnEvent;)Lio/matthewnelson/kmp/tor/runtime/RuntimeEvent$Observer;
 	public final fun observer (Ljava/lang/String;Lio/matthewnelson/kmp/tor/runtime/core/OnEvent;)Lio/matthewnelson/kmp/tor/runtime/RuntimeEvent$Observer;
 	public final fun toString ()Ljava/lang/String;
 	public static final fun valueOf (Ljava/lang/String;)Lio/matthewnelson/kmp/tor/runtime/RuntimeEvent;
@@ -86,9 +87,9 @@ public final class io/matthewnelson/kmp/tor/runtime/RuntimeEvent$LOG$WARN : io/m
 
 public final class io/matthewnelson/kmp/tor/runtime/RuntimeEvent$Observer {
 	public final field event Lio/matthewnelson/kmp/tor/runtime/RuntimeEvent;
-	public final field onEvent Lio/matthewnelson/kmp/tor/runtime/core/OnEvent;
 	public final field tag Ljava/lang/String;
-	public fun <init> (Ljava/lang/String;Lio/matthewnelson/kmp/tor/runtime/RuntimeEvent;Lio/matthewnelson/kmp/tor/runtime/core/OnEvent;)V
+	public fun <init> (Lio/matthewnelson/kmp/tor/runtime/RuntimeEvent;Ljava/lang/String;Lio/matthewnelson/kmp/tor/runtime/core/OnEvent$Executor;Lio/matthewnelson/kmp/tor/runtime/core/OnEvent;)V
+	public final fun notify (Lio/matthewnelson/kmp/tor/runtime/core/OnEvent$Executor;Ljava/lang/Object;)V
 	public fun toString ()Ljava/lang/String;
 	public final fun toString (Z)Ljava/lang/String;
 }
@@ -115,6 +116,7 @@ public abstract interface class io/matthewnelson/kmp/tor/runtime/TorRuntime : io
 }
 
 public final class io/matthewnelson/kmp/tor/runtime/TorRuntime$Builder {
+	public field defaultEventExecutor Lio/matthewnelson/kmp/tor/runtime/core/OnEvent$Executor;
 	public field networkObserver Lio/matthewnelson/kmp/tor/runtime/NetworkObserver;
 	public field omitGeoIPFileSettings Z
 	public synthetic fun <init> (Lio/matthewnelson/kmp/tor/runtime/TorRuntime$Environment;Lkotlin/jvm/internal/DefaultConstructorMarker;)V

@@ -29,8 +29,9 @@ import kotlin.concurrent.Volatile
 internal abstract class AbstractTorCtrl internal constructor(
     staticTag: String?,
     initialObservers: Set<TorEvent.Observer>,
+    defaultExecutor: OnEvent.Executor,
     handler: UncaughtException.Handler,
-):  AbstractTorCmdQueue(staticTag, initialObservers, handler),
+):  AbstractTorCmdQueue(staticTag, initialObservers, defaultExecutor, handler),
     TorCtrl
 {
 

@@ -18,6 +18,7 @@ package io.matthewnelson.kmp.tor.runtime.ctrl
 import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
 import io.matthewnelson.kmp.tor.core.resource.SynchronizedObject
 import io.matthewnelson.kmp.tor.core.resource.synchronized
+import io.matthewnelson.kmp.tor.runtime.core.OnEvent
 import io.matthewnelson.kmp.tor.runtime.core.TorEvent
 import io.matthewnelson.kmp.tor.runtime.core.UncaughtException
 import io.matthewnelson.kmp.tor.runtime.core.UncaughtException.Handler.Companion.tryCatch
@@ -34,6 +35,7 @@ public abstract class AbstractTorEventProcessor
 protected constructor(
     staticTag: String?,
     initialObservers: Set<TorEvent.Observer>,
+    protected val defaultExecutor: OnEvent.Executor
 ): TorEvent.Processor {
 
     @Volatile
@@ -131,7 +133,7 @@ protected constructor(
             mapNotNull { if (it.event == event) it else null }
         }?.forEach { observer ->
             handler.tryCatch(observer.toString(isStatic = observer.tag.isStaticTag())) {
-                observer.onEvent(output)
+                observer.notify(defaultExecutor, output)
             }
         }
     }

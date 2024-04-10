@@ -16,6 +16,7 @@
 package io.matthewnelson.kmp.tor.runtime.ctrl
 
 import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
+import io.matthewnelson.kmp.tor.runtime.core.OnEvent
 import io.matthewnelson.kmp.tor.runtime.core.TorEvent
 import io.matthewnelson.kmp.tor.runtime.core.UncaughtException
 import kotlin.test.*
@@ -23,7 +24,7 @@ import kotlin.test.*
 @OptIn(InternalKmpTorApi::class)
 class AbstractTorEventProcessorUnitTest {
 
-    private class TestProcessor: AbstractTorEventProcessor("static", emptySet()) {
+    private class TestProcessor: AbstractTorEventProcessor("static", emptySet(), OnEvent.Executor.Unconfined) {
         override val handler: UncaughtException.Handler = UncaughtException.Handler.THROW
         val size: Int get() = registered()
         fun notify(event: TorEvent, output: String) { event.notifyObservers(output) }
@@ -111,7 +112,7 @@ class AbstractTorEventProcessorUnitTest {
 
     @Test
     fun givenBlankTag_whenObserver_thenTagIsNull() {
-        assertNull(TorEvent.Observer("  ", TorEvent.CIRC) { }.tag)
+        assertNull(TorEvent.Observer(TorEvent.CIRC, "  ", null) { }.tag)
     }
 
     @Test

@@ -19,6 +19,7 @@ import io.matthewnelson.immutable.collections.immutableSetOf
 import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
 import io.matthewnelson.kmp.tor.runtime.core.OnEvent
 import io.matthewnelson.kmp.tor.runtime.core.TorEvent
+import io.matthewnelson.kmp.tor.runtime.core.TorEvent.Observer
 import io.matthewnelson.kmp.tor.runtime.core.UncaughtException
 import kotlin.jvm.JvmField
 import kotlin.jvm.JvmName
@@ -66,7 +67,7 @@ public sealed class RuntimeEvent<R: Any> private constructor(
 
     /**
      * Create an observer for the given [RuntimeEvent]
-     * to register via [Processor.add]
+     * to register via [Processor.add].
      *
      * e.g. (Kotlin)
      *
@@ -80,7 +81,7 @@ public sealed class RuntimeEvent<R: Any> private constructor(
      *         System.out.println(output);
      *     });
      *
-     * @param [onEvent] the callback to pass the event output to
+     * @param [onEvent] The callback to pass the event output to
      * */
     public fun observer(
         onEvent: OnEvent<R>,
@@ -88,37 +89,94 @@ public sealed class RuntimeEvent<R: Any> private constructor(
 
     /**
      * Create an observer for the given [RuntimeEvent]
-     * to register via [Processor.add]
+     * to register via [Processor.add].
+     *
+     * This is useful for lifecycle aware components, all of which
+     * can be removed with a single call using the [tag] upon
+     * component destruction.
      *
      * e.g. (Kotlin)
      *
-     *     RuntimeEvent.DEBUG.observer { output ->
+     *     RuntimeEvent.DEBUG.observer("my service") { output ->
      *         println(output)
      *     }
      *
      * e.g. (Java)
      *
-     *     RuntimeEvent.DEBUG.INSTANCE.observer(output -> {
+     *     RuntimeEvent.DEBUG.INSTANCE.observer("my service", output -> {
      *         System.out.println(output);
      *     });
      *
      * @param [tag] Any non-blank string value
-     * @param [onEvent] the callback to pass the event output to
+     * @param [onEvent] The callback to pass the event output to
      * */
     public fun observer(
         tag: String,
         onEvent: OnEvent<R>,
-    ): Observer<R> = Observer(tag, this, onEvent)
+    ): Observer<R> = Observer(this, tag, null, onEvent)
 
-    public class Observer<R: Any>(
+    /**
+     * Create an observer for the given [RuntimeEvent], [tag] and
+     * [OnEvent.Executor] to register via [Processor.add].
+     *
+     * e.g. (Kotlin)
+     *
+     *     RuntimeEvent.DEBUG.observer(null, OnEvent.Executor.Main) { output ->
+     *         println(output)
+     *     }
+     *
+     * e.g. (Java)
+     *
+     *     RuntimeEvent.DEBUG.INSTANCE.observer(
+     *         null,
+     *         OnEvent.Executor.Main.INSTANCE,
+     *         output -> {
+     *             System.out.println(output);
+     *         }
+     *     );
+     *
+     * @param [tag] Any non-blank string value
+     * @param [executor] A custom executor for this observer which
+     *   will be used instead of the default one passed to
+     *   [Observer.notify].
+     * @param [onEvent] The callback to pass the event output to
+     * */
+    public fun observer(
         tag: String?,
+        executor: OnEvent.Executor,
+        onEvent: OnEvent<R>,
+    ): Observer<R> = Observer(this, tag, executor, onEvent)
+
+    /**
+     * Model to be registered with a [Processor] for being notified
+     * via callback invocation with [RuntimeEvent] output information.
+     * */
+    public class Observer<R: Any> public constructor(
+        /**
+         * The [RuntimeEvent] this is observing
+         * */
         @JvmField
         public val event: RuntimeEvent<R>,
-        @JvmField
-        public val onEvent: OnEvent<R>,
+        tag: String?,
+        private val executor: OnEvent.Executor?,
+        private val onEvent: OnEvent<R>,
     ) {
+
+        /**
+         * An identifier string
+         * */
         @JvmField
         public val tag: String? = tag?.ifBlank { null }
+
+        /**
+         * Invokes [OnEvent] for the given [event] string
+         *
+         * @param [default] the default [OnEvent.Executor] to fall
+         *   back to if [executor] was not defined for this observer.
+         * */
+        public fun notify(default: OnEvent.Executor, event: R) {
+            (executor ?: default).execute { onEvent(event) }
+        }
 
         public override fun toString(): String = toString(isStatic = false)
 
@@ -129,6 +187,17 @@ public sealed class RuntimeEvent<R: Any> private constructor(
             append(tag.toString())
             append(",event=")
             append(event.name)
+
+            when (executor) {
+                null -> "null"
+                OnEvent.Executor.Main,
+                OnEvent.Executor.Unconfined -> executor.toString()
+                else -> "Custom"
+            }.let {
+                append(",executor=")
+                append(it)
+            }
+
             append("]@")
             append(hashCode())
         }

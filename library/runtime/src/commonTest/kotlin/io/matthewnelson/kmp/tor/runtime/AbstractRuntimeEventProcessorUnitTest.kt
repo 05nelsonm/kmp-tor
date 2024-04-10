@@ -15,6 +15,7 @@
  **/
 package io.matthewnelson.kmp.tor.runtime
 
+import io.matthewnelson.kmp.tor.runtime.core.OnEvent
 import io.matthewnelson.kmp.tor.runtime.core.TorEvent
 import io.matthewnelson.kmp.tor.runtime.core.UncaughtException
 import io.matthewnelson.kmp.tor.runtime.internal.AbstractRuntimeEventProcessor
@@ -26,7 +27,7 @@ class AbstractRuntimeEventProcessorUnitTest {
         private const val STATIC_TAG = "TAG_STATIC_1234"
     }
 
-    private class TestProcessor(): AbstractRuntimeEventProcessor(STATIC_TAG, emptySet(), emptySet()) {
+    private class TestProcessor(): AbstractRuntimeEventProcessor(STATIC_TAG, emptySet(), OnEvent.Executor.Unconfined, emptySet()) {
         var _debug: Boolean = true
         override val debug: Boolean get() = _debug
         val size: Int get() = registered()
@@ -115,7 +116,7 @@ class AbstractRuntimeEventProcessorUnitTest {
 
     @Test
     fun givenBlankTag_whenObserver_thenTagIsNull() {
-        assertNull(RuntimeEvent.Observer("  ", RuntimeEvent.LOG.DEBUG) { }.tag)
+        assertNull(RuntimeEvent.Observer(RuntimeEvent.LOG.DEBUG, "  ", null) { }.tag)
     }
 
     @Test

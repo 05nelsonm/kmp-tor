@@ -102,6 +102,12 @@ public interface TorRuntime:
         public var networkObserver: NetworkObserver = NetworkObserver.NOOP
 
         /**
+         *
+         * */
+        @JvmField
+        public var defaultEventExecutor: OnEvent.Executor = OnEvent.Executor.Unconfined
+
+        /**
          * Configure the [TorConfig] at each startup. Multiple [block] may
          * be set, each of which will be applied to the [TorConfig.Builder]
          * before starting tor.
@@ -197,6 +203,7 @@ public interface TorRuntime:
                         config = b.config.toImmutableSet(),
                         requiredTorEvents = b.requiredTorEvents.toImmutableSet(),
                         staticTorEventObservers = b.staticTorEventObservers.toImmutableSet(),
+                        defaultExecutor = b.defaultEventExecutor,
                         staticRuntimeEventObservers = b.staticRuntimeEventObservers.toImmutableSet(),
                     )
                 }
