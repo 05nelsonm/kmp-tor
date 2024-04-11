@@ -34,7 +34,7 @@ class PortUtilJsUnitTest: PortUtilBaseTest() {
         port: Int,
     ): AutoCloseable {
         val server = net_createServer { it.destroy(); Unit }
-        server.onError { err -> fail(err.toString()) }
+        server.onError { err -> fail("$err") }
         val options = js("{}")
         options["port"] = port
         options["host"] = ipAddress.value

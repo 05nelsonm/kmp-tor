@@ -40,7 +40,9 @@ import kotlin.time.TimeSource
 // @Throws(IOException::class, CancellationException::class)
 public actual suspend fun Port.isAvailableAsync(
     host: LocalHost,
-): Boolean = host.resolve().isPortAvailable(value, timeout = 100.milliseconds)
+): Boolean = host.resolve()
+    .isPortAvailableOrNull(value, timeout = (3 * 42).milliseconds)
+    ?: false
 
 /**
  * Finds an available TCP port on [LocalHost] starting with the current
@@ -64,41 +66,26 @@ public actual suspend fun Port.Proxy.findAvailableAsync(
     val ipAddress = host.resolve()
 
     val ctx = currentCoroutineContext()
-    val maxTimeouts = 5
-    var timeouts = 0
-    while (ctx.isActive && i.hasNext() && timeouts < maxTimeouts) {
-        try {
-            val isAvailable = ipAddress.isPortAvailable(i.next())
-            timeouts = 0
-            if (!isAvailable) continue
-        } catch (_: IOException) {
-            timeouts++
-            continue
-        }
+    while (ctx.isActive && i.hasNext()) {
+        val isAvailable = ipAddress.isPortAvailableOrNull(i.next())
+        if (isAvailable != true) continue
 
         return i.toPortProxy()
     }
 
-    throw ctx.cancellationExceptionOr {
-        if (timeouts >= maxTimeouts) {
-            IOException("$maxTimeouts successive timeouts occurred when checking availability")
-        } else {
-            i.unavailableException(ipAddress)
-        }
-    }
+    throw ctx.cancellationExceptionOr { i.unavailableException(ipAddress) }
 }
 
-// @Throws(IOException::class, CancellationException::class)
-private suspend fun IPAddress.isPortAvailable(
+// @Throws(CancellationException::class)
+private suspend fun IPAddress.isPortAvailableOrNull(
     port: Int,
     timeout: Duration = 42.milliseconds
-): Boolean {
+): Boolean? {
     val timeMark = TimeSource.Monotonic.markNow()
     val ctx = currentCoroutineContext()
     val latch = Job(ctx[Job])
     val ipAddress = value
 
-    var error: IOException? = null
     var isAvailable: Boolean? = null
 
     try {
@@ -106,12 +93,8 @@ private suspend fun IPAddress.isPortAvailable(
 
         latch.invokeOnCompletion { server.close() }
 
-        server.onError { err ->
-            if ((err.code as String) == "EADDRINUSE") {
-                isAvailable = false
-            } else {
-                error = IOException(err.toString())
-            }
+        server.onError {
+            isAvailable = false
             latch.complete()
         }
 
@@ -125,23 +108,17 @@ private suspend fun IPAddress.isPortAvailable(
             latch.complete()
         }
 
-        withContext(NonCancellable) {
-            while (
-                ctx.isActive
-                && latch.isActive
-                && isAvailable == null
-                && error == null
-            ) {
-                delay(5.milliseconds)
-                if (timeMark.elapsedNow() > timeout) break
-            }
+        while (
+            ctx.isActive
+            && latch.isActive
+            && isAvailable == null
+        ) {
+            delay(5.milliseconds)
+            if (timeMark.elapsedNow() > timeout) break
         }
     } finally {
-        latch.cancel()
+        latch.complete()
     }
 
-    isAvailable?.let { return it }
-    throw ctx.cancellationExceptionOr {
-        error ?: IOException("Failed to determine availability of ${canonicalHostname()}:$port")
-    }
+    return isAvailable
 }
