@@ -19,13 +19,17 @@ import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
 import io.matthewnelson.kmp.tor.runtime.core.OnEvent
 import io.matthewnelson.kmp.tor.runtime.core.TorEvent
 import io.matthewnelson.kmp.tor.runtime.core.UncaughtException
+import kotlinx.coroutines.*
+import kotlinx.coroutines.test.runTest
 import kotlin.test.*
 
 @OptIn(InternalKmpTorApi::class)
 class AbstractTorEventProcessorUnitTest {
 
-    private class TestProcessor: AbstractTorEventProcessor("static", emptySet(), OnEvent.Executor.Unconfined) {
-        override val handler: UncaughtException.Handler = UncaughtException.Handler.THROW
+    private class TestProcessor(
+        handler: UncaughtException.Handler = UncaughtException.Handler.THROW
+    ): AbstractTorEventProcessor("static", emptySet(), OnEvent.Executor.Unconfined) {
+        override val handler = HandlerWithContext(handler)
         val size: Int get() = registered()
         fun notify(event: TorEvent, output: String) { event.notifyObservers(output) }
         fun destroy() { onDestroy() }
@@ -184,5 +188,29 @@ class AbstractTorEventProcessorUnitTest {
         assertFalse(iterator.hasNext())
         assertFailsWith<NoSuchElementException> { iterator.next() }
         assertFailsWith<IllegalStateException> { iterator.remove() }
+    }
+
+    @Test
+    fun givenHandler_whenPassedAsCoroutineContext_thenObserverNameContextIsPassed() = runTest {
+        val exceptions = mutableListOf<UncaughtException>()
+        val processor = TestProcessor(handler = { exceptions.add(it) })
+
+        val expectedTag = "Expected Tag"
+        var invocationEvent = 0
+        val latch = Job()
+        processor.subscribe(TorEvent.BW.observer(
+            tag = expectedTag,
+            executor = { handler, _ ->
+                @OptIn(DelicateCoroutinesApi::class)
+                GlobalScope.launch(handler) { throw IllegalStateException() }
+                    .invokeOnCompletion { latch.cancel() }
+            },
+            onEvent = { invocationEvent++ }
+        ))
+        processor.notify(TorEvent.BW, "")
+        latch.join()
+        assertEquals(1, exceptions.size)
+        assertEquals(0, invocationEvent)
+        assertTrue(exceptions.first().context.contains(expectedTag))
     }
 }

@@ -20,6 +20,9 @@ import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
 import io.matthewnelson.kmp.tor.runtime.core.OnEvent
 import io.matthewnelson.kmp.tor.runtime.core.TorEvent
 import io.matthewnelson.kmp.tor.runtime.core.UncaughtException
+import kotlinx.coroutines.CoroutineExceptionHandler
+import kotlin.coroutines.CoroutineContext
+import kotlin.coroutines.EmptyCoroutineContext
 import kotlin.jvm.JvmField
 import kotlin.jvm.JvmName
 import kotlin.jvm.JvmStatic
@@ -176,7 +179,19 @@ public sealed class RuntimeEvent<R: Any> private constructor(
          *   back to if [executor] was not defined for this observer.
          * */
         public fun notify(default: OnEvent.Executor, event: R) {
-            (executor ?: default).execute { onEvent(event) }
+            notify(EmptyCoroutineContext, default, event)
+        }
+
+        /**
+         * Invokes [OnEvent] for the given [event] string
+         *
+         * @param [handler] Optional ability to pass [UncaughtException.Handler]
+         *   wrapped as [CoroutineExceptionHandler]
+         * @param [default] the default [OnEvent.Executor] to fall
+         *   back to if [executor] was not defined for this observer.
+         * */
+        public fun notify(handler: CoroutineContext, default: OnEvent.Executor, event: R) {
+            (executor ?: default).execute(handler) { onEvent(event) }
         }
 
         public final override fun toString(): String = toString(isStatic = false)
@@ -186,7 +201,7 @@ public sealed class RuntimeEvent<R: Any> private constructor(
 
             append("RuntimeEvent.Observer[tag=")
             append(tag.toString())
-            append(",event=")
+            append(", event=")
             append(event.name)
 
             when (executor) {
@@ -195,7 +210,7 @@ public sealed class RuntimeEvent<R: Any> private constructor(
                 OnEvent.Executor.Unconfined -> executor.toString()
                 else -> "Custom"
             }.let {
-                append(",executor=")
+                append(", executor=")
                 append(it)
             }
 

@@ -33,7 +33,7 @@ internal abstract class AbstractTorCmdQueue internal constructor(
     staticTag: String?,
     initialObservers: Set<TorEvent.Observer>,
     defaultExecutor: OnEvent.Executor,
-    protected final override val handler: UncaughtException.Handler,
+    handler: UncaughtException.Handler,
 ):  AbstractTorEventProcessor(staticTag, initialObservers, defaultExecutor),
     Destroyable,
     TorCmd.Privileged.Processor
@@ -45,6 +45,7 @@ internal abstract class AbstractTorCmdQueue internal constructor(
     @Volatile
     @Suppress("PropertyName")
     protected open var LOG: Debugger? = null
+    protected final override val handler: HandlerWithContext = HandlerWithContext(handler)
 
     public final override fun isDestroyed(): Boolean = destroyed
 

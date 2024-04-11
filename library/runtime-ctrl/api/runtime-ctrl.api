@@ -4,7 +4,7 @@ public abstract class io/matthewnelson/kmp/tor/runtime/ctrl/AbstractTorEventProc
 	protected final fun destroyed ()Z
 	protected fun getDebug ()Z
 	protected final fun getDefaultExecutor ()Lio/matthewnelson/kmp/tor/runtime/core/OnEvent$Executor;
-	protected abstract fun getHandler ()Lio/matthewnelson/kmp/tor/runtime/core/UncaughtException$Handler;
+	protected abstract fun getHandler ()Lio/matthewnelson/kmp/tor/runtime/ctrl/AbstractTorEventProcessor$HandlerWithContext;
 	protected final fun isStaticTag (Ljava/lang/String;)Z
 	protected final fun notifyObservers (Lio/matthewnelson/kmp/tor/runtime/core/TorEvent;Ljava/lang/String;)V
 	protected fun onDestroy ()Z
@@ -19,6 +19,24 @@ public abstract class io/matthewnelson/kmp/tor/runtime/ctrl/AbstractTorEventProc
 }
 
 protected final class io/matthewnelson/kmp/tor/runtime/ctrl/AbstractTorEventProcessor$Companion {
+}
+
+protected final class io/matthewnelson/kmp/tor/runtime/ctrl/AbstractTorEventProcessor$HandlerWithContext : kotlin/coroutines/AbstractCoroutineContextElement, io/matthewnelson/kmp/tor/runtime/core/UncaughtException$Handler, kotlinx/coroutines/CoroutineExceptionHandler {
+	public final field delegate Lio/matthewnelson/kmp/tor/runtime/core/UncaughtException$Handler;
+	public fun <init> (Lio/matthewnelson/kmp/tor/runtime/core/UncaughtException$Handler;)V
+	public fun handleException (Lkotlin/coroutines/CoroutineContext;Ljava/lang/Throwable;)V
+	public fun invoke (Lio/matthewnelson/kmp/tor/runtime/core/UncaughtException;)V
+	public synthetic fun invoke (Ljava/lang/Object;)V
+}
+
+protected final class io/matthewnelson/kmp/tor/runtime/ctrl/AbstractTorEventProcessor$ObserverNameContext : kotlin/coroutines/AbstractCoroutineContextElement {
+	public static final field Key Lio/matthewnelson/kmp/tor/runtime/ctrl/AbstractTorEventProcessor$ObserverNameContext$Key;
+	public final field context Ljava/lang/String;
+	public fun <init> (Ljava/lang/String;)V
+	public final fun toString ()Ljava/lang/String;
+}
+
+public final class io/matthewnelson/kmp/tor/runtime/ctrl/AbstractTorEventProcessor$ObserverNameContext$Key : kotlin/coroutines/CoroutineContext$Key {
 }
 
 public final class io/matthewnelson/kmp/tor/runtime/ctrl/TempTorCmdQueue : io/matthewnelson/kmp/tor/runtime/core/Destroyable, io/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$Unprivileged$Processor {

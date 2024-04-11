@@ -141,7 +141,7 @@ internal class RealTorCtrl private constructor(
                 LOG = null
             }
         } finally {
-            (handler as CloseableExceptionHandler).close()
+            (handler.delegate as CloseableExceptionHandler).close()
         }
 
         return true

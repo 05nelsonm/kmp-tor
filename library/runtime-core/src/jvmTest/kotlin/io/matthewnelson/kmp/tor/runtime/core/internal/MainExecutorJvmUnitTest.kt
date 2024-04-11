@@ -16,6 +16,7 @@
 package io.matthewnelson.kmp.tor.runtime.core.internal
 
 import io.matthewnelson.kmp.tor.runtime.core.OnEvent
+import kotlin.coroutines.EmptyCoroutineContext
 import kotlin.test.Test
 import kotlin.test.assertFailsWith
 
@@ -24,7 +25,7 @@ class MainExecutorJvmUnitTest {
     @Test
     fun givenExecute_whenNoDispatchersMain_thenThrowsException() {
         assertFailsWith<IllegalStateException> {
-            OnEvent.Executor.Main.execute {  }
+            OnEvent.Executor.Main.execute(EmptyCoroutineContext) {  }
         }
     }
 }

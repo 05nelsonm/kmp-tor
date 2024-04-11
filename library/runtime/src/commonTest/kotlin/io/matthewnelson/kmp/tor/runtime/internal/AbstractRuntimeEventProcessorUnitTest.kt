@@ -13,12 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-package io.matthewnelson.kmp.tor.runtime
+package io.matthewnelson.kmp.tor.runtime.internal
 
+import io.matthewnelson.kmp.tor.runtime.RuntimeEvent
 import io.matthewnelson.kmp.tor.runtime.core.OnEvent
 import io.matthewnelson.kmp.tor.runtime.core.TorEvent
 import io.matthewnelson.kmp.tor.runtime.core.UncaughtException
-import io.matthewnelson.kmp.tor.runtime.internal.AbstractRuntimeEventProcessor
+import kotlinx.coroutines.DelicateCoroutinesApi
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.test.runTest
 import kotlin.test.*
 
 class AbstractRuntimeEventProcessorUnitTest {
@@ -207,5 +212,30 @@ class AbstractRuntimeEventProcessorUnitTest {
         processor._debug = true
         processor.notify(observer.event, "")
         assertEquals(2, invocations)
+    }
+
+    @Test
+    fun givenHandler_whenPassedAsCoroutineContext_thenObserverNameContextIsPassed() = runTest {
+        val exceptions = mutableListOf<Throwable>()
+
+        val expectedTag = "Expected Tag"
+        var invocationEvent = 0
+        val latch = Job()
+        processor.subscribe(RuntimeEvent.LOG.ERROR.observer { exceptions.add(it); fail() })
+        processor.subscribe(RuntimeEvent.LOG.DEBUG.observer(
+            tag = expectedTag,
+            executor = { handler, _ ->
+                @OptIn(DelicateCoroutinesApi::class)
+                GlobalScope.launch(handler) { throw IllegalStateException() }
+                    .invokeOnCompletion { latch.cancel() }
+            },
+            onEvent = { invocationEvent++ }
+        ))
+        processor.notify(RuntimeEvent.LOG.DEBUG, "")
+        latch.join()
+        assertEquals(1, exceptions.size)
+        assertEquals(0, invocationEvent)
+        assertIs<UncaughtException>(exceptions.first())
+        assertTrue(exceptions.first().message!!.contains(expectedTag))
     }
 }

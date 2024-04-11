@@ -169,8 +169,20 @@ public interface TorRuntime:
         public fun staticObserver(
             event: TorEvent,
             onEvent: OnEvent<String>,
+        ): Builder = staticObserver(event, null, onEvent)
+
+        /**
+         * Add [TorEvent.Observer] which will never be removed from [TorRuntime].
+         *
+         * Useful for logging purposes.
+         * */
+        @KmpTorDsl
+        public fun staticObserver(
+            event: TorEvent,
+            executor: OnEvent.Executor?,
+            onEvent: OnEvent<String>,
         ): Builder {
-            val observer = event.observer(environment.staticObserverTag, onEvent)
+            val observer = TorEvent.Observer(event, environment.staticObserverTag, executor, onEvent)
             staticTorEventObservers.add(observer)
             return this
         }
@@ -184,8 +196,20 @@ public interface TorRuntime:
         public fun <R: Any> staticObserver(
             event: RuntimeEvent<R>,
             onEvent: OnEvent<R>,
+        ): Builder = staticObserver(event, null, onEvent)
+
+        /**
+         * Add [RuntimeEvent.Observer] which will never be removed from [TorRuntime].
+         *
+         * Useful for logging purposes.
+         * */
+        @KmpTorDsl
+        public fun <R: Any> staticObserver(
+            event: RuntimeEvent<R>,
+            executor: OnEvent.Executor?,
+            onEvent: OnEvent<R>,
         ): Builder {
-            val observer = event.observer(environment.staticObserverTag, onEvent)
+            val observer = RuntimeEvent.Observer(event, environment.staticObserverTag, executor, onEvent)
             staticRuntimeEventObservers.add(observer)
             return this
         }

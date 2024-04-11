@@ -17,6 +17,9 @@
 
 package io.matthewnelson.kmp.tor.runtime.core
 
+import kotlinx.coroutines.CoroutineExceptionHandler
+import kotlin.coroutines.CoroutineContext
+import kotlin.coroutines.EmptyCoroutineContext
 import kotlin.jvm.JvmField
 
 /**
@@ -299,8 +302,21 @@ public enum class TorEvent {
          *   back to if [executor] was not defined for this observer.
          * */
         public fun notify(default: OnEvent.Executor, event: String) {
-            (executor ?: default).execute { onEvent(event) }
+            notify(EmptyCoroutineContext, default, event)
         }
+
+        /**
+         * Invokes [OnEvent] for the given [event] string
+         *
+         * @param [handler] Optional ability to pass [UncaughtException.Handler]
+         *   wrapped as [CoroutineExceptionHandler]
+         * @param [default] the default [OnEvent.Executor] to fall
+         *   back to if [executor] was not defined for this observer.
+         * */
+        public fun notify(handler: CoroutineContext, default: OnEvent.Executor, event: String) {
+            (executor ?: default).execute(handler) { onEvent(event) }
+        }
+
 
         public final override fun toString(): String = toString(isStatic = false)
 
@@ -309,7 +325,7 @@ public enum class TorEvent {
 
             append("TorEvent.Observer[tag=")
             append(tag.toString())
-            append(",event=")
+            append(", event=")
             append(event.name)
 
             when (executor) {
@@ -318,7 +334,7 @@ public enum class TorEvent {
                 OnEvent.Executor.Unconfined -> executor.toString()
                 else -> "Custom"
             }.let {
-                append(",executor=")
+                append(", executor=")
                 append(it)
             }
 
