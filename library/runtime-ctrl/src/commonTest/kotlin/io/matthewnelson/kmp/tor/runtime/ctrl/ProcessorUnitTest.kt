@@ -18,11 +18,14 @@ package io.matthewnelson.kmp.tor.runtime.ctrl
 import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
 import io.matthewnelson.kmp.tor.core.resource.SynchronizedObject
 import io.matthewnelson.kmp.tor.core.resource.synchronized
+import io.matthewnelson.kmp.tor.runtime.core.OnFailure
+import io.matthewnelson.kmp.tor.runtime.core.OnSuccess
 import io.matthewnelson.kmp.tor.runtime.core.TorEvent
 import io.matthewnelson.kmp.tor.runtime.core.UncaughtException
 import io.matthewnelson.kmp.tor.runtime.core.address.LocalHost
 import io.matthewnelson.kmp.tor.runtime.core.address.Port.Proxy.Companion.toPortProxy
 import io.matthewnelson.kmp.tor.runtime.core.address.ProxyAddress
+import io.matthewnelson.kmp.tor.runtime.core.ctrl.Reply
 import io.matthewnelson.kmp.tor.runtime.core.ctrl.TorCmd
 import io.matthewnelson.kmp.tor.runtime.core.util.executeAsync
 import io.matthewnelson.kmp.tor.runtime.core.util.findAvailableAsync
@@ -57,9 +60,11 @@ class ProcessorUnitTest {
         try {
             val ctrl = factory.connectAsync(address)
 
-            ctrl.enqueue(TorCmd.Authenticate(TestUtils.AUTH_PASS), {}, { invocationSuccess++ })
-            ctrl.enqueue(TorCmd.SetEvents(TorEvent.entries), {}, { invocationSuccess++ })
-            ctrl.enqueue(TorCmd.Signal.Heartbeat, {}, { invocationSuccess++ })
+            val onFailure = OnFailure { threw = it }
+            val onSuccess = OnSuccess<Reply.Success.OK> { invocationSuccess++ }
+            ctrl.enqueue(TorCmd.Authenticate(TestUtils.AUTH_PASS), onFailure, onSuccess)
+            ctrl.enqueue(TorCmd.SetEvents(TorEvent.entries), onFailure, onSuccess)
+            ctrl.enqueue(TorCmd.Signal.Heartbeat, onFailure, onSuccess)
 
             // Suspends test until non-suspending complete
             ctrl.executeAsync(TorCmd.Signal.Dump)
@@ -74,7 +79,7 @@ class ProcessorUnitTest {
             process.destroy()
         }
 
-        withContext(Dispatchers.Default) { delay(250.milliseconds) }
+        withContext(Dispatchers.Default) { delay(25.milliseconds) }
 
         threw?.let { throw it }
 

@@ -54,9 +54,16 @@ abstract class PortUtilBaseTest {
 
     @Test
     fun givenFindAvailable_whenCoroutineCancelled_thenHandlesCancellationProperly() = runTest(timeout = 120.seconds) {
+        if (isNodeJs) {
+            // Only needed to test blocking code to ensure
+            // context is checked to trigger cancellation
+            println("Skipping...")
+            return@runTest
+        }
+
         val port = Port.Proxy.MIN.toPortProxy()
         val host = LocalHost.IPv4
-        val limit = if (isNodeJs) 250 else 750
+        val limit = 750
         val i = port.iterator(limit)
 
         var count = 0
