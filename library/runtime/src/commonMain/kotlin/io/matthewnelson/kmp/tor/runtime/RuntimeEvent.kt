@@ -17,7 +17,7 @@ package io.matthewnelson.kmp.tor.runtime
 
 import io.matthewnelson.immutable.collections.immutableSetOf
 import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
-import io.matthewnelson.kmp.tor.runtime.core.Callback
+import io.matthewnelson.kmp.tor.runtime.core.OnEvent
 import io.matthewnelson.kmp.tor.runtime.core.TorEvent
 import io.matthewnelson.kmp.tor.runtime.core.UncaughtException
 import kotlin.jvm.JvmField
@@ -66,7 +66,7 @@ public sealed class RuntimeEvent<R: Any> private constructor(
 
     /**
      * Create an observer for the given [RuntimeEvent]
-     * to register via [Processor.add]
+     * to register via [Processor.subscribe].
      *
      * e.g. (Kotlin)
      *
@@ -80,47 +80,106 @@ public sealed class RuntimeEvent<R: Any> private constructor(
      *         System.out.println(output);
      *     });
      *
-     * @param [callback] the callback to pass the event output to
+     * @param [onEvent] The callback to pass the event output to
      * */
     public fun observer(
-        callback: Callback<R>,
-    ): Observer<R> = observer("", callback)
+        onEvent: OnEvent<R>,
+    ): Observer<R> = observer("", onEvent)
 
     /**
      * Create an observer for the given [RuntimeEvent]
-     * to register via [Processor.add]
+     * to register via [Processor.subscribe].
+     *
+     * This is useful for lifecycle aware components, all of which
+     * can be removed with a single call using the [tag] upon
+     * component destruction.
      *
      * e.g. (Kotlin)
      *
-     *     RuntimeEvent.DEBUG.observer { output ->
+     *     RuntimeEvent.DEBUG.observer("my service") { output ->
      *         println(output)
      *     }
      *
      * e.g. (Java)
      *
-     *     RuntimeEvent.DEBUG.INSTANCE.observer(output -> {
+     *     RuntimeEvent.DEBUG.INSTANCE.observer("my service", output -> {
      *         System.out.println(output);
      *     });
      *
      * @param [tag] Any non-blank string value
-     * @param [callback] the callback to pass the event output to
+     * @param [onEvent] The callback to pass the event output to
      * */
     public fun observer(
         tag: String,
-        callback: Callback<R>,
-    ): Observer<R> = Observer(tag, this, callback)
+        onEvent: OnEvent<R>,
+    ): Observer<R> = Observer(this, tag, null, onEvent)
 
-    public class Observer<R: Any>(
+    /**
+     * Create an observer for the given [RuntimeEvent], [tag] and
+     * [OnEvent.Executor] to register via [Processor.subscribe].
+     *
+     * e.g. (Kotlin)
+     *
+     *     RuntimeEvent.DEBUG.observer(null, OnEvent.Executor.Main) { output ->
+     *         println(output)
+     *     }
+     *
+     * e.g. (Java)
+     *
+     *     RuntimeEvent.DEBUG.INSTANCE.observer(
+     *         null,
+     *         OnEvent.Executor.Main.INSTANCE,
+     *         output -> {
+     *             System.out.println(output);
+     *         }
+     *     );
+     *
+     * @param [tag] Any non-blank string value
+     * @param [executor] A custom executor for this observer which
+     *   will be used instead of the default one passed to
+     *   [Observer.notify].
+     * @param [onEvent] The callback to pass the event output to
+     * */
+    public fun observer(
         tag: String?,
+        executor: OnEvent.Executor,
+        onEvent: OnEvent<R>,
+    ): Observer<R> = Observer(this, tag, executor, onEvent)
+
+    /**
+     * Model to be registered with a [Processor] for being notified
+     * via callback invocation with [RuntimeEvent] output information.
+     * */
+    public open class Observer<R: Any>(
+        /**
+         * The [RuntimeEvent] this is observing
+         * */
         @JvmField
         public val event: RuntimeEvent<R>,
+        tag: String?,
         @JvmField
-        public val callback: Callback<R>,
+        protected val executor: OnEvent.Executor?,
+        @JvmField
+        protected val onEvent: OnEvent<R>,
     ) {
+
+        /**
+         * An identifier string
+         * */
         @JvmField
         public val tag: String? = tag?.ifBlank { null }
 
-        public override fun toString(): String = toString(isStatic = false)
+        /**
+         * Invokes [OnEvent] for the given [event] string
+         *
+         * @param [default] the default [OnEvent.Executor] to fall
+         *   back to if [executor] was not defined for this observer.
+         * */
+        public fun notify(default: OnEvent.Executor, event: R) {
+            (executor ?: default).execute { onEvent(event) }
+        }
+
+        public final override fun toString(): String = toString(isStatic = false)
 
         public fun toString(isStatic: Boolean): String = buildString {
             val tag = if (tag != null && isStatic) "STATIC" else tag
@@ -129,6 +188,17 @@ public sealed class RuntimeEvent<R: Any> private constructor(
             append(tag.toString())
             append(",event=")
             append(event.name)
+
+            when (executor) {
+                null -> "null"
+                OnEvent.Executor.Main,
+                OnEvent.Executor.Unconfined -> executor.toString()
+                else -> "Custom"
+            }.let {
+                append(",executor=")
+                append(it)
+            }
+
             append("]@")
             append(hashCode())
         }
@@ -142,32 +212,32 @@ public sealed class RuntimeEvent<R: Any> private constructor(
         /**
          * Add a single [Observer].
          * */
-        public fun add(observer: Observer<*>)
+        public fun subscribe(observer: Observer<*>)
 
         /**
          * Add multiple [Observer].
          * */
-        public fun add(vararg observers: Observer<*>)
+        public fun subscribe(vararg observers: Observer<*>)
 
         /**
          * Remove a single [Observer].
          * */
-        public fun remove(observer: Observer<*>)
+        public fun unsubscribe(observer: Observer<*>)
 
         /**
          * Remove multiple [Observer].
          * */
-        public fun remove(vararg observers: Observer<*>)
+        public fun unsubscribe(vararg observers: Observer<*>)
 
         /**
          * Remove all [Observer] of a single [RuntimeEvent]
          * */
-        public fun removeAll(event: RuntimeEvent<*>)
+        public fun unsubscribeAll(event: RuntimeEvent<*>)
 
         /**
          * Remove all [Observer] of multiple [RuntimeEvent]
          * */
-        public fun removeAll(vararg events: RuntimeEvent<*>)
+        public fun unsubscribeAll(vararg events: RuntimeEvent<*>)
 
         /**
          * Remove all [Observer] with the given [tag].
@@ -176,7 +246,7 @@ public sealed class RuntimeEvent<R: Any> private constructor(
          * and [TorEvent.Processor], [TorEvent.Observer] with
          * the given [tag] will also be removed.
          * */
-        public fun removeAll(tag: String)
+        public fun unsubscribeAll(tag: String)
 
         /**
          * Remove all non-static [Observer] that are currently

@@ -32,8 +32,9 @@ import kotlin.jvm.JvmSynthetic
 internal abstract class AbstractTorCmdQueue internal constructor(
     staticTag: String?,
     initialObservers: Set<TorEvent.Observer>,
+    defaultExecutor: OnEvent.Executor,
     protected final override val handler: UncaughtException.Handler,
-):  AbstractTorEventProcessor(staticTag, initialObservers),
+):  AbstractTorEventProcessor(staticTag, initialObservers, defaultExecutor),
     Destroyable,
     TorCmd.Privileged.Processor
 {
@@ -193,8 +194,8 @@ internal abstract class AbstractTorCmdQueue internal constructor(
         }
     }
 
-    public final override fun removeAll(tag: String) {
-        super.removeAll(tag)
+    public final override fun unsubscribeAll(tag: String) {
+        super.unsubscribeAll(tag)
     }
 
     public final override fun clearObservers() {

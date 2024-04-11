@@ -18,6 +18,7 @@ package io.matthewnelson.kmp.tor.runtime.ctrl
 import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
 import io.matthewnelson.kmp.tor.core.resource.SynchronizedObject
 import io.matthewnelson.kmp.tor.core.resource.synchronized
+import io.matthewnelson.kmp.tor.runtime.core.OnEvent
 import io.matthewnelson.kmp.tor.runtime.core.TorEvent
 import io.matthewnelson.kmp.tor.runtime.core.UncaughtException
 import io.matthewnelson.kmp.tor.runtime.core.UncaughtException.Handler.Companion.tryCatch
@@ -34,6 +35,7 @@ public abstract class AbstractTorEventProcessor
 protected constructor(
     staticTag: String?,
     initialObservers: Set<TorEvent.Observer>,
+    protected val defaultExecutor: OnEvent.Executor
 ): TorEvent.Processor {
 
     @Volatile
@@ -51,25 +53,25 @@ protected constructor(
         observers.addAll(initialObservers)
     }
 
-    public final override fun add(observer: TorEvent.Observer) {
+    public final override fun subscribe(observer: TorEvent.Observer) {
         withObservers { add(observer) }
     }
 
-    public final override fun add(vararg observers: TorEvent.Observer) {
+    public final override fun subscribe(vararg observers: TorEvent.Observer) {
         if (observers.isEmpty()) return
         withObservers { observers.forEach { add(it) } }
     }
 
-    public final override fun remove(observer: TorEvent.Observer) {
+    public final override fun unsubscribe(observer: TorEvent.Observer) {
         withObservers { remove(observer) }
     }
 
-    public final override fun remove(vararg observers: TorEvent.Observer) {
+    public final override fun unsubscribe(vararg observers: TorEvent.Observer) {
         if (observers.isEmpty()) return
         withObservers { observers.forEach { remove(it) } }
     }
 
-    public final override fun removeAll(event: TorEvent) {
+    public final override fun unsubscribeAll(event: TorEvent) {
         withObservers {
             val iterator = iterator()
             while (iterator.hasNext()) {
@@ -83,7 +85,7 @@ protected constructor(
         }
     }
 
-    public final override fun removeAll(vararg events: TorEvent) {
+    public final override fun unsubscribeAll(vararg events: TorEvent) {
         if (events.isEmpty()) return
         withObservers {
             val iterator = iterator()
@@ -98,7 +100,7 @@ protected constructor(
         }
     }
 
-    public override fun removeAll(tag: String) {
+    public override fun unsubscribeAll(tag: String) {
         if (tag.isStaticTag()) return
         withObservers {
             val iterator = iterator()
@@ -131,7 +133,7 @@ protected constructor(
             mapNotNull { if (it.event == event) it else null }
         }?.forEach { observer ->
             handler.tryCatch(observer.toString(isStatic = observer.tag.isStaticTag())) {
-                observer.callback(output)
+                observer.notify(defaultExecutor, output)
             }
         }
     }

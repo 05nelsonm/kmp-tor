@@ -102,6 +102,22 @@ public interface TorRuntime:
         public var networkObserver: NetworkObserver = NetworkObserver.NOOP
 
         /**
+         * Declare a default [OnEvent.Executor] to utilize when dispatching
+         * [TorEvent] and [RuntimeEvent] to registered observers (if the observer
+         * does not provide its own). This can be overridden on a per-observer
+         * basis when creating them, given the needs of that observer and how it
+         * is being used and/or implemented.
+         *
+         * **NOTE:** This should be a singleton with **no** contextual or
+         * non-singleton references outside the [OnEvent.Executor.execute]
+         * lambda.
+         *
+         * Default: [OnEvent.Executor.Unconfined]
+         * */
+        @JvmField
+        public var defaultEventExecutor: OnEvent.Executor = OnEvent.Executor.Unconfined
+
+        /**
          * Configure the [TorConfig] at each startup. Multiple [block] may
          * be set, each of which will be applied to the [TorConfig.Builder]
          * before starting tor.
@@ -152,9 +168,9 @@ public interface TorRuntime:
         @KmpTorDsl
         public fun staticObserver(
             event: TorEvent,
-            callback: Callback<String>,
+            onEvent: OnEvent<String>,
         ): Builder {
-            val observer = event.observer(environment.staticObserverTag, callback)
+            val observer = event.observer(environment.staticObserverTag, onEvent)
             staticTorEventObservers.add(observer)
             return this
         }
@@ -167,9 +183,9 @@ public interface TorRuntime:
         @KmpTorDsl
         public fun <R: Any> staticObserver(
             event: RuntimeEvent<R>,
-            callback: Callback<R>,
+            onEvent: OnEvent<R>,
         ): Builder {
-            val observer = event.observer(environment.staticObserverTag, callback)
+            val observer = event.observer(environment.staticObserverTag, onEvent)
             staticRuntimeEventObservers.add(observer)
             return this
         }
@@ -197,6 +213,7 @@ public interface TorRuntime:
                         config = b.config.toImmutableSet(),
                         requiredTorEvents = b.requiredTorEvents.toImmutableSet(),
                         staticTorEventObservers = b.staticTorEventObservers.toImmutableSet(),
+                        defaultExecutor = b.defaultEventExecutor,
                         staticRuntimeEventObservers = b.staticRuntimeEventObservers.toImmutableSet(),
                     )
                 }

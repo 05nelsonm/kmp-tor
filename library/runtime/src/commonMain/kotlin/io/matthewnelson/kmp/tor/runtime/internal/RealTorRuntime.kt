@@ -32,10 +32,14 @@ internal class RealTorRuntime private constructor(
     private val networkObserver: NetworkObserver,
     private val requiredTorEvents: Set<TorEvent>,
     staticTorEventObservers: Set<TorEvent.Observer>,
+    defaultExecutor: OnEvent.Executor,
     staticRuntimeEventObservers: Set<RuntimeEvent.Observer<*>>,
-):  AbstractRuntimeEventProcessor(environment.staticObserverTag, staticRuntimeEventObservers, staticTorEventObservers),
-    TorRuntime
-{
+): AbstractRuntimeEventProcessor(
+    environment.staticObserverTag,
+    staticRuntimeEventObservers,
+    defaultExecutor,
+    staticTorEventObservers,
+), TorRuntime {
 
     protected override val debug: Boolean get() = environment.debug
 
@@ -67,6 +71,7 @@ internal class RealTorRuntime private constructor(
             config: Set<ConfigBuilderCallback>,
             requiredTorEvents: Set<TorEvent>,
             staticTorEventObservers: Set<TorEvent.Observer>,
+            defaultExecutor: OnEvent.Executor,
             staticRuntimeEventObservers: Set<RuntimeEvent.Observer<*>>,
         ): TorRuntime {
 
@@ -75,6 +80,7 @@ internal class RealTorRuntime private constructor(
                     environment,
                     requiredTorEvents,
                     staticTorEventObservers,
+                    defaultExecutor,
                     staticRuntimeEventObservers,
                 )
             }
@@ -87,6 +93,7 @@ internal class RealTorRuntime private constructor(
                 networkObserver,
                 requiredTorEvents,
                 staticTorEventObservers,
+                defaultExecutor,
                 staticRuntimeEventObservers,
             )
         }
@@ -104,10 +111,12 @@ internal class RealTorRuntime private constructor(
         override val environment: TorRuntime.Environment,
         requiredTorEvents: Set<TorEvent>,
         staticTorEventObservers: Set<TorEvent.Observer>,
+        defaultExecutor: OnEvent.Executor,
         staticRuntimeEventObservers: Set<RuntimeEvent.Observer<*>>,
     ): AbstractRuntimeEventProcessor(
         environment.staticObserverTag,
         staticRuntimeEventObservers,
+        defaultExecutor,
         staticTorEventObservers
     ), TorRuntime.ServiceFactory {
 
@@ -155,6 +164,7 @@ internal class RealTorRuntime private constructor(
             observer ?: NetworkObserver.NOOP,
             requiredTorEvents,
             staticTorEventObservers,
+            OnEvent.Executor.Unconfined,
             staticRuntimeEventObservers,
         )
     }

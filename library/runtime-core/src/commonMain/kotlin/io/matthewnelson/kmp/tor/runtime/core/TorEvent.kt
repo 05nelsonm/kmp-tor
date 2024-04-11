@@ -189,7 +189,7 @@ public enum class TorEvent {
 
     /**
      * Create an observer for the given [TorEvent]
-     * to register via [Processor.add]
+     * to register via [Processor.subscribe]
      *
      * e.g. (Kotlin)
      *
@@ -203,15 +203,15 @@ public enum class TorEvent {
      *         updateNotification(formatBandwidth(output));
      *     });
      *
-     * @param [callback] the callback to pass the event text to
+     * @param [onEvent] The callback to pass the event text to
      * */
     public fun observer(
-        callback: Callback<String>,
-    ): Observer = observer("", callback)
+        onEvent: OnEvent<String>,
+    ): Observer = observer("", onEvent)
 
     /**
      * Create an observer for the given [TorEvent] and [tag]
-     * to register via [Processor.add]
+     * to register via [Processor.subscribe]
      *
      * This is useful for lifecycle aware components, all of which
      * can be removed with a single call using the [tag] upon
@@ -230,24 +230,79 @@ public enum class TorEvent {
      *     });
      *
      * @param [tag] Any non-blank string value
-     * @param [callback] the callback to pass the event text to
+     * @param [onEvent] The callback to pass the event text to
      * */
     public fun observer(
         tag: String,
-        callback: Callback<String>,
-    ): Observer = Observer(tag,this, callback)
+        onEvent: OnEvent<String>,
+    ): Observer = Observer(this, tag, null, onEvent)
 
-    public class Observer(
+    /**
+     * Create an observer for the given [TorEvent], [tag] and
+     * [OnEvent.Executor] to register via [Processor.subscribe].
+     *
+     * This is useful for lifecycle aware components, all of which
+     * can be removed with a single call using the [tag] upon
+     * component destruction.
+     *
+     * e.g. (Kotlin)
+     *
+     *     TorEvent.BW.observer(null, OnEvent.Executor.Main) { output ->
+     *         updateNotification(output.formatBandwidth())
+     *     }
+     *
+     * e.g. (Java)
+     *
+     *     TorEvent.BW.observer(null, OnEvent.Executor.Main.INSTANCE, output -> {
+     *         updateNotification(formatBandwidth(output));
+     *     });
+     *
+     * @param [tag] Any non-blank string value
+     * @param [executor] A custom executor for this observer which
+     *   will be used instead of the default one passed to
+     *   [Observer.notify].
+     * @param [onEvent] The callback to pass the event text to
+     * */
+    public fun observer(
         tag: String?,
+        executor: OnEvent.Executor,
+        onEvent: OnEvent<String>,
+    ): Observer = Observer(this, tag, executor, onEvent)
+
+    /**
+     * Model to be registered with a [Processor] for being notified
+     * via callback invocation with [TorEvent] output information.
+     * */
+    public open class Observer(
+        /**
+         * The [TorEvent] this is observing
+         * */
         @JvmField
         public val event: TorEvent,
+        tag: String?,
         @JvmField
-        public val callback: Callback<String>,
+        protected val executor: OnEvent.Executor?,
+        @JvmField
+        protected val onEvent: OnEvent<String>,
     ) {
+
+        /**
+         * An identifier string
+         * */
         @JvmField
         public val tag: String? = tag?.ifBlank { null }
 
-        override fun toString(): String = toString(isStatic = false)
+        /**
+         * Invokes [OnEvent] for the given [event] string
+         *
+         * @param [default] the default [OnEvent.Executor] to fall
+         *   back to if [executor] was not defined for this observer.
+         * */
+        public fun notify(default: OnEvent.Executor, event: String) {
+            (executor ?: default).execute { onEvent(event) }
+        }
+
+        public final override fun toString(): String = toString(isStatic = false)
 
         public fun toString(isStatic: Boolean): String = buildString {
             val tag = if (tag != null && isStatic) "STATIC" else tag
@@ -256,6 +311,17 @@ public enum class TorEvent {
             append(tag.toString())
             append(",event=")
             append(event.name)
+
+            when (executor) {
+                null -> "null"
+                OnEvent.Executor.Main,
+                OnEvent.Executor.Unconfined -> executor.toString()
+                else -> "Custom"
+            }.let {
+                append(",executor=")
+                append(it)
+            }
+
             append("]@")
             append(hashCode())
         }
@@ -269,37 +335,37 @@ public enum class TorEvent {
         /**
          * Add a single [Observer].
          * */
-        public fun add(observer: Observer)
+        public fun subscribe(observer: Observer)
 
         /**
          * Add multiple [Observer].
          * */
-        public fun add(vararg observers: Observer)
+        public fun subscribe(vararg observers: Observer)
 
         /**
          * Remove a single [Observer].
          * */
-        public fun remove(observer: Observer)
+        public fun unsubscribe(observer: Observer)
 
         /**
          * Remove multiple [Observer].
          * */
-        public fun remove(vararg observers: Observer)
+        public fun unsubscribe(vararg observers: Observer)
 
         /**
          * Remove all [Observer] of a single [TorEvent]
          * */
-        public fun removeAll(event: TorEvent)
+        public fun unsubscribeAll(event: TorEvent)
 
         /**
          * Remove all [Observer] of multiple [TorEvent]
          * */
-        public fun removeAll(vararg events: TorEvent)
+        public fun unsubscribeAll(vararg events: TorEvent)
 
         /**
          * Remove all [Observer] with the given [tag]
          * */
-        public fun removeAll(tag: String)
+        public fun unsubscribeAll(tag: String)
 
         /**
          * Remove all non-static [Observer] that are currently

@@ -4,10 +4,6 @@ public final class io/matthewnelson/kmp/tor/runtime/core/BlocksKt {
 	public static final fun apply (Ljava/lang/Object;Ljava/lang/Object;Lio/matthewnelson/kmp/tor/runtime/core/ThisBlock$WithIt;)Ljava/lang/Object;
 }
 
-public abstract interface class io/matthewnelson/kmp/tor/runtime/core/Callback {
-	public abstract fun invoke (Ljava/lang/Object;)V
-}
-
 public abstract interface class io/matthewnelson/kmp/tor/runtime/core/Destroyable {
 	public static final field Companion Lio/matthewnelson/kmp/tor/runtime/core/Destroyable$Companion;
 	public static fun checkDestroy (Lio/matthewnelson/kmp/tor/runtime/core/Destroyable;)V
@@ -30,6 +26,25 @@ public final class io/matthewnelson/kmp/tor/runtime/core/Disposable$Companion {
 
 public abstract interface class io/matthewnelson/kmp/tor/runtime/core/ItBlock {
 	public abstract fun invoke (Ljava/lang/Object;)V
+}
+
+public abstract interface class io/matthewnelson/kmp/tor/runtime/core/OnEvent : io/matthewnelson/kmp/tor/runtime/core/ItBlock {
+}
+
+public abstract interface class io/matthewnelson/kmp/tor/runtime/core/OnEvent$Executor {
+	public abstract fun execute (Lio/matthewnelson/kmp/tor/runtime/core/ItBlock;)V
+}
+
+public final class io/matthewnelson/kmp/tor/runtime/core/OnEvent$Executor$Main : io/matthewnelson/kmp/tor/runtime/core/OnEvent$Executor {
+	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/core/OnEvent$Executor$Main;
+	public fun execute (Lio/matthewnelson/kmp/tor/runtime/core/ItBlock;)V
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/matthewnelson/kmp/tor/runtime/core/OnEvent$Executor$Unconfined : io/matthewnelson/kmp/tor/runtime/core/OnEvent$Executor {
+	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/core/OnEvent$Executor$Unconfined;
+	public fun execute (Lio/matthewnelson/kmp/tor/runtime/core/ItBlock;)V
+	public fun toString ()Ljava/lang/String;
 }
 
 public abstract class io/matthewnelson/kmp/tor/runtime/core/QueuedJob {
@@ -598,30 +613,33 @@ public final class io/matthewnelson/kmp/tor/runtime/core/TorEvent : java/lang/En
 	public static final field TRANSPORT_LAUNCHED Lio/matthewnelson/kmp/tor/runtime/core/TorEvent;
 	public static final field WARN Lio/matthewnelson/kmp/tor/runtime/core/TorEvent;
 	public static fun getEntries ()Lkotlin/enums/EnumEntries;
-	public final fun observer (Lio/matthewnelson/kmp/tor/runtime/core/Callback;)Lio/matthewnelson/kmp/tor/runtime/core/TorEvent$Observer;
-	public final fun observer (Ljava/lang/String;Lio/matthewnelson/kmp/tor/runtime/core/Callback;)Lio/matthewnelson/kmp/tor/runtime/core/TorEvent$Observer;
+	public final fun observer (Lio/matthewnelson/kmp/tor/runtime/core/OnEvent;)Lio/matthewnelson/kmp/tor/runtime/core/TorEvent$Observer;
+	public final fun observer (Ljava/lang/String;Lio/matthewnelson/kmp/tor/runtime/core/OnEvent$Executor;Lio/matthewnelson/kmp/tor/runtime/core/OnEvent;)Lio/matthewnelson/kmp/tor/runtime/core/TorEvent$Observer;
+	public final fun observer (Ljava/lang/String;Lio/matthewnelson/kmp/tor/runtime/core/OnEvent;)Lio/matthewnelson/kmp/tor/runtime/core/TorEvent$Observer;
 	public static fun valueOf (Ljava/lang/String;)Lio/matthewnelson/kmp/tor/runtime/core/TorEvent;
 	public static fun values ()[Lio/matthewnelson/kmp/tor/runtime/core/TorEvent;
 }
 
-public final class io/matthewnelson/kmp/tor/runtime/core/TorEvent$Observer {
-	public final field callback Lio/matthewnelson/kmp/tor/runtime/core/Callback;
+public class io/matthewnelson/kmp/tor/runtime/core/TorEvent$Observer {
 	public final field event Lio/matthewnelson/kmp/tor/runtime/core/TorEvent;
+	protected final field executor Lio/matthewnelson/kmp/tor/runtime/core/OnEvent$Executor;
+	protected final field onEvent Lio/matthewnelson/kmp/tor/runtime/core/OnEvent;
 	public final field tag Ljava/lang/String;
-	public fun <init> (Ljava/lang/String;Lio/matthewnelson/kmp/tor/runtime/core/TorEvent;Lio/matthewnelson/kmp/tor/runtime/core/Callback;)V
-	public fun toString ()Ljava/lang/String;
+	public fun <init> (Lio/matthewnelson/kmp/tor/runtime/core/TorEvent;Ljava/lang/String;Lio/matthewnelson/kmp/tor/runtime/core/OnEvent$Executor;Lio/matthewnelson/kmp/tor/runtime/core/OnEvent;)V
+	public final fun notify (Lio/matthewnelson/kmp/tor/runtime/core/OnEvent$Executor;Ljava/lang/String;)V
+	public final fun toString ()Ljava/lang/String;
 	public final fun toString (Z)Ljava/lang/String;
 }
 
 public abstract interface class io/matthewnelson/kmp/tor/runtime/core/TorEvent$Processor {
-	public abstract fun add (Lio/matthewnelson/kmp/tor/runtime/core/TorEvent$Observer;)V
-	public abstract fun add ([Lio/matthewnelson/kmp/tor/runtime/core/TorEvent$Observer;)V
 	public abstract fun clearObservers ()V
-	public abstract fun remove (Lio/matthewnelson/kmp/tor/runtime/core/TorEvent$Observer;)V
-	public abstract fun remove ([Lio/matthewnelson/kmp/tor/runtime/core/TorEvent$Observer;)V
-	public abstract fun removeAll (Lio/matthewnelson/kmp/tor/runtime/core/TorEvent;)V
-	public abstract fun removeAll (Ljava/lang/String;)V
-	public abstract fun removeAll ([Lio/matthewnelson/kmp/tor/runtime/core/TorEvent;)V
+	public abstract fun subscribe (Lio/matthewnelson/kmp/tor/runtime/core/TorEvent$Observer;)V
+	public abstract fun subscribe ([Lio/matthewnelson/kmp/tor/runtime/core/TorEvent$Observer;)V
+	public abstract fun unsubscribe (Lio/matthewnelson/kmp/tor/runtime/core/TorEvent$Observer;)V
+	public abstract fun unsubscribe ([Lio/matthewnelson/kmp/tor/runtime/core/TorEvent$Observer;)V
+	public abstract fun unsubscribeAll (Lio/matthewnelson/kmp/tor/runtime/core/TorEvent;)V
+	public abstract fun unsubscribeAll (Ljava/lang/String;)V
+	public abstract fun unsubscribeAll ([Lio/matthewnelson/kmp/tor/runtime/core/TorEvent;)V
 }
 
 public final class io/matthewnelson/kmp/tor/runtime/core/UncaughtException : java/lang/Exception {

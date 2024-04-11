@@ -15,6 +15,7 @@
  **/
 package io.matthewnelson.kmp.tor.runtime
 
+import io.matthewnelson.kmp.tor.runtime.core.OnEvent
 import io.matthewnelson.kmp.tor.runtime.core.TorEvent
 import io.matthewnelson.kmp.tor.runtime.core.UncaughtException
 import io.matthewnelson.kmp.tor.runtime.internal.AbstractRuntimeEventProcessor
@@ -26,7 +27,7 @@ class AbstractRuntimeEventProcessorUnitTest {
         private const val STATIC_TAG = "TAG_STATIC_1234"
     }
 
-    private class TestProcessor(): AbstractRuntimeEventProcessor(STATIC_TAG, emptySet(), emptySet()) {
+    private class TestProcessor(): AbstractRuntimeEventProcessor(STATIC_TAG, emptySet(), OnEvent.Executor.Unconfined, emptySet()) {
         var _debug: Boolean = true
         override val debug: Boolean get() = _debug
         val size: Int get() = registered()
@@ -40,11 +41,11 @@ class AbstractRuntimeEventProcessorUnitTest {
     @Test
     fun givenObserver_whenAddRemove_thenIsAsExpected() {
         val observer = RuntimeEvent.LOG.DEBUG.observer {}
-        processor.add(observer)
+        processor.subscribe(observer)
         assertEquals(1, processor.size)
-        processor.add(observer)
+        processor.subscribe(observer)
         assertEquals(1, processor.size)
-        processor.remove(observer)
+        processor.unsubscribe(observer)
         assertEquals(0, processor.size)
     }
 
@@ -56,9 +57,9 @@ class AbstractRuntimeEventProcessorUnitTest {
             // the processor's lock, this would lock up
             // b/c removal also obtains the lock to modify
             // the Set
-            processor.remove(observer!!)
+            processor.unsubscribe(observer!!)
         }
-        processor.add(observer)
+        processor.subscribe(observer)
         assertEquals(1, processor.size)
         processor.notify(observer.event, "")
         assertEquals(0, processor.size)
@@ -70,10 +71,10 @@ class AbstractRuntimeEventProcessorUnitTest {
         val o1 = RuntimeEvent.LOG.DEBUG.observer { invocations++ }
         val o2 = RuntimeEvent.LOG.INFO.observer {}
         val o3 = RuntimeEvent.LOG.INFO.observer {}
-        processor.add(o1, o2, o3, o3)
+        processor.subscribe(o1, o2, o3, o3)
         assertEquals(3, processor.size)
 
-        processor.removeAll(RuntimeEvent.LOG.INFO)
+        processor.unsubscribeAll(RuntimeEvent.LOG.INFO)
         assertEquals(1, processor.size)
 
         processor.notify(RuntimeEvent.LOG.DEBUG, "out")
@@ -86,10 +87,10 @@ class AbstractRuntimeEventProcessorUnitTest {
         val o1 = RuntimeEvent.LOG.DEBUG.observer { invocations++ }
         val o2 = RuntimeEvent.LOG.INFO.observer {}
         val o3 = RuntimeEvent.LOG.INFO.observer {}
-        processor.add(o1, o2, o3)
+        processor.subscribe(o1, o2, o3)
         assertEquals(3, processor.size)
 
-        processor.remove(o2, o3)
+        processor.unsubscribe(o2, o3)
         assertEquals(1, processor.size)
 
         processor.notify(RuntimeEvent.LOG.DEBUG, "out")
@@ -102,10 +103,10 @@ class AbstractRuntimeEventProcessorUnitTest {
         val o1 = RuntimeEvent.LOG.DEBUG.observer("test1") { invocations++ }
         val o2 = RuntimeEvent.LOG.INFO.observer("test2") {}
         val o3 = RuntimeEvent.LOG.WARN.observer("test2") {}
-        processor.add(o1, o1, o2, o2, o3, o3)
+        processor.subscribe(o1, o1, o2, o2, o3, o3)
         assertEquals(3, processor.size)
 
-        processor.removeAll("test2")
+        processor.unsubscribeAll("test2")
         assertEquals(1, processor.size)
 
         // Is the proper tagged observer removed
@@ -115,32 +116,32 @@ class AbstractRuntimeEventProcessorUnitTest {
 
     @Test
     fun givenBlankTag_whenObserver_thenTagIsNull() {
-        assertNull(RuntimeEvent.Observer("  ", RuntimeEvent.LOG.DEBUG) { }.tag)
+        assertNull(RuntimeEvent.Observer(RuntimeEvent.LOG.DEBUG, "  ", null) { }.tag)
     }
 
     @Test
     fun givenStaticTag_whenRemove_thenDoesNothing() {
-        processor.add(RuntimeEvent.LOG.DEBUG.observer(STATIC_TAG) {})
+        processor.subscribe(RuntimeEvent.LOG.DEBUG.observer(STATIC_TAG) {})
 
         val nonStaticObserver = RuntimeEvent.LOG.DEBUG.observer("non-static") {}
-        processor.add(nonStaticObserver)
+        processor.subscribe(nonStaticObserver)
 
         // should do nothing
-        processor.removeAll(STATIC_TAG)
+        processor.unsubscribeAll(STATIC_TAG)
         assertEquals(2, processor.size)
 
         // Should only remove the non-static observer
-        processor.removeAll(RuntimeEvent.LOG.DEBUG)
+        processor.unsubscribeAll(RuntimeEvent.LOG.DEBUG)
         assertEquals(1, processor.size)
 
         // Should only remove the non-static observer
-        processor.add(nonStaticObserver)
+        processor.subscribe(nonStaticObserver)
         assertEquals(2, processor.size)
-        processor.removeAll(RuntimeEvent.LOG.DEBUG, RuntimeEvent.LOG.WARN)
+        processor.unsubscribeAll(RuntimeEvent.LOG.DEBUG, RuntimeEvent.LOG.WARN)
         assertEquals(1, processor.size)
 
         // Should not remove the static observer
-        processor.add(nonStaticObserver)
+        processor.subscribe(nonStaticObserver)
         assertEquals(2, processor.size)
         processor.clearObservers()
         assertEquals(1, processor.size)
@@ -149,8 +150,8 @@ class AbstractRuntimeEventProcessorUnitTest {
     @Test
     fun givenStaticObservers_whenOnDestroy_thenEvictsAll() {
         val observer = RuntimeEvent.LOG.DEBUG.observer(STATIC_TAG) {}
-        processor.add(observer)
-        processor.add(TorEvent.BW.observer(STATIC_TAG) {})
+        processor.subscribe(observer)
+        processor.subscribe(TorEvent.BW.observer(STATIC_TAG) {})
 
         processor.clearObservers()
         assertEquals(2, processor.size)
@@ -159,17 +160,17 @@ class AbstractRuntimeEventProcessorUnitTest {
         processor.destroy()
         assertEquals(0, processor.size)
 
-        processor.add(observer)
+        processor.subscribe(observer)
         assertEquals(0, processor.size)
     }
 
     @Test
     fun givenUncaughtException_whenRedirectedToLogError_thenIsAsExpected() {
-        processor.add(RuntimeEvent.LOG.DEBUG.observer(STATIC_TAG) { throw IllegalStateException() })
-        processor.add(TorEvent.INFO.observer(STATIC_TAG) { throw IllegalStateException() })
+        processor.subscribe(RuntimeEvent.LOG.DEBUG.observer(STATIC_TAG) { throw IllegalStateException() })
+        processor.subscribe(TorEvent.INFO.observer(STATIC_TAG) { throw IllegalStateException() })
 
         var invocations = 0
-        processor.add(RuntimeEvent.LOG.ERROR.observer { t ->
+        processor.subscribe(RuntimeEvent.LOG.ERROR.observer { t ->
             invocations++
             assertIs<UncaughtException>(t)
             assertIs<IllegalStateException>(t.cause)
@@ -194,7 +195,7 @@ class AbstractRuntimeEventProcessorUnitTest {
     fun givenDebug_whenToggled_thenDispatchesAsExpected() {
         var invocations = 0
         val observer = RuntimeEvent.LOG.DEBUG.observer { invocations++ }
-        processor.add(observer)
+        processor.subscribe(observer)
 
         processor.notify(observer.event, "")
         assertEquals(1, invocations)

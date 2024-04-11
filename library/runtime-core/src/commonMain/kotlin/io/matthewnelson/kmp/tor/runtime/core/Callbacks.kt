@@ -15,6 +15,9 @@
  **/
 package io.matthewnelson.kmp.tor.runtime.core
 
+import io.matthewnelson.kmp.tor.runtime.core.internal.ExecutorMainInternal
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.MainCoroutineDispatcher
 import kotlin.jvm.JvmField
 
 /**
@@ -44,12 +47,74 @@ public typealias OnSuccess<T> = ItBlock<T>
 public typealias OnFailure = ItBlock<Throwable>
 
 /**
- * A callback for dispatching things.
+ * A callback for dispatching events.
+ *
+ * @see [OnEvent.Executor]
  * */
-public fun interface Callback<in It: Any> {
-    public operator fun invoke(it: It)
+public fun interface OnEvent<in It: Any>: ItBlock<It> {
 
-    // TODO: DispatchMain Issue #349
+    /**
+     * `kmp-tor` utilizes several different background threads for
+     * which events are generated on, then dispatches them to registered
+     * observers' [OnEvent] callbacks. The [Executor] API allows for
+     * fine-tuning the context in which that dispatching occurs on
+     * several customizable levels.
+     *
+     * Both [io.matthewnelson.kmp.tor.runtime.RuntimeEvent] and [TorEvent]
+     * observer APIs allow declaration of a specific [Executor] to be used
+     * for the individual observer. If no [Executor] is specified, then the
+     * [io.matthewnelson.kmp.tor.runtime.RuntimeEvent.Processor] and
+     * [TorEvent.Processor] implementations fallback to using whatever
+     * [Executor] was declared when they were created. This means that an
+     * [Executor] can be set for default behavior of how events get dispatched
+     * based off of the needs of the application, and then be selectively
+     * overridden on a per-observer basis when necessary for that particular
+     * implementation.
+     *
+     * @see [Executor.Main]
+     * @see [Executor.Unconfined]
+     * */
+    public fun interface Executor {
+
+        /**
+         * Execute [block] in desired context.
+         *
+         * @param [block] to be invoked in desired context.
+         * */
+        public fun execute(block: ItBlock<Unit>)
+
+        /**
+         * Utilizes [Dispatchers.Main] under the hood to transition events
+         * dispatched from a background thread, to the UI thread. If
+         * [MainCoroutineDispatcher.immediate] is available, that is always
+         * preferred.
+         *
+         * **NOTE:** On `Node.js` this invokes [ItBlock] immediately as the
+         * `kmp-tor` implementation is entirely asynchronous.
+         *
+         * **WARNING:** Jvm/Android requires the respective coroutines UI
+         * dependency `kotlinx-coroutines-{android/javafx/swing}`
+         *
+         * **WARNING:** Non-Darwin native targets do not have [Dispatchers.Main]
+         * resulting in an exception when [execute] is invoked.
+         * */
+        public object Main: Executor by ExecutorMainInternal {
+            override fun toString(): String = "OnEvent.Executor.Main"
+        }
+
+        /**
+         * Executes immediately on whatever thread the event originated.
+         *
+         * Observers utilizing [Unconfined] must have a thread-safe implementation
+         * of [OnEvent] callbacks whenever referencing things outside the
+         * confines of its lambda.
+         * */
+        public object Unconfined: Executor {
+            override fun execute(block: ItBlock<Unit>) { block(Unit) }
+
+            override fun toString(): String = "OnEvent.Executor.Unconfined"
+        }
+    }
 }
 
 /**
