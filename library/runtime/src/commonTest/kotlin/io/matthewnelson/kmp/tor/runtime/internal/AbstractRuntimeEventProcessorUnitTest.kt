@@ -237,6 +237,5 @@ class AbstractRuntimeEventProcessorUnitTest {
         assertEquals(0, invocationEvent)
         assertIs<UncaughtException>(exceptions.first())
         assertTrue(exceptions.first().message!!.contains(expectedTag))
-        exceptions.first().printStackTrace()
     }
 }
