@@ -37,7 +37,7 @@ internal abstract class AbstractRuntimeEventProcessor(
 
     private val observers = LinkedHashSet<RuntimeEvent.Observer<*>>(initialObservers.size + 1, 1.0F)
     private val lock = SynchronizedObject()
-    protected final override val handler: UncaughtException.Handler = UncaughtException.Handler { t ->
+    protected final override val handler = HandlerWithContext { t ->
         RuntimeEvent.LOG.ERROR.notifyObservers(t)
     }
 
@@ -119,13 +119,15 @@ internal abstract class AbstractRuntimeEventProcessor(
         super.clearObservers()
     }
 
+    private val handlerIgnore = HandlerWithContext(UncaughtException.Handler.IGNORE)
+
     protected fun <R: Any> RuntimeEvent<R>.notifyObservers(output: R) {
         val event = this
 
         if (event is RuntimeEvent.LOG.DEBUG && !debug) return
 
         val handler = if (event is RuntimeEvent.LOG.ERROR) {
-            UncaughtException.Handler.IGNORE
+            handlerIgnore
         } else {
             handler
         }
@@ -134,9 +136,12 @@ internal abstract class AbstractRuntimeEventProcessor(
             if (isEmpty()) return@withObservers null
             mapNotNull { if (it.event == event) it else null }
         }?.forEach { observer ->
-            handler.tryCatch(observer.toString(isStatic = observer.tag.isStaticTag())) {
+            val ctx = ObserverNameContext(observer.toString(isStatic = observer.tag.isStaticTag()))
+
+            handler.tryCatch(ctx) {
                 @Suppress("UNCHECKED_CAST")
-                (observer as RuntimeEvent.Observer<R>).notify(defaultExecutor, output)
+                (observer as RuntimeEvent.Observer<R>)
+                    .notify(handler + ctx, defaultExecutor, output)
             }
         }
     }

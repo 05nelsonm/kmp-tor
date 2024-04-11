@@ -21,12 +21,13 @@ import io.matthewnelson.kmp.tor.runtime.core.ItBlock
 import io.matthewnelson.kmp.tor.runtime.core.OnEvent
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Runnable
+import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
 
 internal actual object ExecutorMainInternal: OnEvent.Executor {
 
-    actual override fun execute(block: ItBlock<Unit>) {
-        Main.dispatch(EmptyCoroutineContext, Runnable { block(Unit) })
+    actual override fun execute(handler: CoroutineContext, block: ItBlock<Unit>) {
+        Main.dispatch(handler, Runnable { block(Unit) })
     }
 
     private val Main by lazy {

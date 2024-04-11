@@ -22,7 +22,12 @@ import io.matthewnelson.kmp.tor.runtime.core.OnEvent
 import io.matthewnelson.kmp.tor.runtime.core.TorEvent
 import io.matthewnelson.kmp.tor.runtime.core.UncaughtException
 import io.matthewnelson.kmp.tor.runtime.core.UncaughtException.Handler.Companion.tryCatch
+import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlin.concurrent.Volatile
+import kotlin.coroutines.AbstractCoroutineContextElement
+import kotlin.coroutines.CoroutineContext
+import kotlin.coroutines.cancellation.CancellationException
+import kotlin.jvm.JvmField
 import kotlin.jvm.JvmName
 import kotlin.jvm.JvmStatic
 
@@ -47,7 +52,7 @@ protected constructor(
     @get:JvmName("destroyed")
     protected val destroyed: Boolean get() = _destroyed
     protected open val debug: Boolean = true
-    protected abstract val handler: UncaughtException.Handler
+    protected abstract val handler: HandlerWithContext
 
     init {
         observers.addAll(initialObservers)
@@ -132,8 +137,10 @@ protected constructor(
             if (isEmpty()) return@withObservers null
             mapNotNull { if (it.event == event) it else null }
         }?.forEach { observer ->
-            handler.tryCatch(observer.toString(isStatic = observer.tag.isStaticTag())) {
-                observer.notify(defaultExecutor, output)
+            val ctx = ObserverNameContext(observer.toString(isStatic = observer.tag.isStaticTag()))
+
+            handler.tryCatch(ctx) {
+                observer.notify(handler + ctx, defaultExecutor, output)
             }
         }
     }
@@ -152,7 +159,7 @@ protected constructor(
         return wasDestroyed
     }
 
-    private fun <T: Any?> withObservers(
+    private fun <T : Any?> withObservers(
         block: MutableSet<TorEvent.Observer>.() -> T,
     ): T {
         if (_destroyed) return block(noOpMutableSet())
@@ -169,11 +176,41 @@ protected constructor(
         @JvmStatic
         @InternalKmpTorApi
         @Suppress("UNCHECKED_CAST")
-        protected fun <T: Any> noOpMutableSet(): MutableSet<T> = NoOpMutableSet as MutableSet<T>
+        protected fun <T : Any> noOpMutableSet(): MutableSet<T> = NoOpMutableSet as MutableSet<T>
     }
 
     // testing
     protected open fun registered(): Int = synchronized(lock) { observers.size }
+
+    // Handler that also implements CoroutineExceptionHandler
+    protected class HandlerWithContext(
+        @JvmField
+        public val delegate: UncaughtException.Handler
+    ) : AbstractCoroutineContextElement(CoroutineExceptionHandler),
+        UncaughtException.Handler by delegate,
+        CoroutineExceptionHandler
+    {
+
+        override fun handleException(context: CoroutineContext, exception: Throwable) {
+            if (exception is CancellationException) return
+            if (exception is UncaughtException) {
+                invoke(exception)
+            } else {
+                val ctx = context[ObserverNameContext]?.context ?: "EventProcessor"
+                tryCatch(ctx) { throw exception }
+            }
+        }
+    }
+
+    // For passing observer name as context
+    protected class ObserverNameContext(
+        @JvmField
+        public val context: String,
+    ): AbstractCoroutineContextElement(ObserverNameContext) {
+        public companion object Key: CoroutineContext.Key<ObserverNameContext>
+
+        final override fun toString(): String = context
+    }
 }
 
 private object NoOpMutableSet: MutableSet<Any> {

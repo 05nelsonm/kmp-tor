@@ -18,6 +18,7 @@ package io.matthewnelson.kmp.tor.runtime.mobile
 import io.matthewnelson.kmp.tor.runtime.core.OnEvent
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.test.runTest
+import kotlin.coroutines.EmptyCoroutineContext
 import kotlin.test.Test
 import kotlin.test.assertTrue
 
@@ -26,7 +27,7 @@ class OnEventExecutorMainTest {
     @Test
     fun givenAndroid_whenExecutorMain_thenUsesDispatchersImmediate() = runTest {
         val job = Job()
-        OnEvent.Executor.Main.execute { job.complete() }
+        OnEvent.Executor.Main.execute(EmptyCoroutineContext) { job.complete() }
         job.join()
         assertTrue(job.isCompleted)
     }

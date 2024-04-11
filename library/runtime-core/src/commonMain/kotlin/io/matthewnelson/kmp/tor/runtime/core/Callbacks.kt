@@ -18,6 +18,7 @@ package io.matthewnelson.kmp.tor.runtime.core
 import io.matthewnelson.kmp.tor.runtime.core.internal.ExecutorMainInternal
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.MainCoroutineDispatcher
+import kotlin.coroutines.CoroutineContext
 import kotlin.jvm.JvmField
 
 /**
@@ -26,7 +27,7 @@ import kotlin.jvm.JvmField
  *
  * **NOTE:** Exceptions should not be thrown
  * within the [OnSuccess] lambda. If [OnSuccess] is
- * being utilized with TorRuntime APIs, it will be
+ * being utilized with `TorRuntime` APIs, it will be
  * treated as an [UncaughtException] and dispatched
  * to [io.matthewnelson.kmp.tor.runtime.RuntimeEvent.LOG.ERROR]
  * observers.
@@ -39,7 +40,7 @@ public typealias OnSuccess<T> = ItBlock<T>
  *
  * **NOTE:** The exception should not be re-thrown
  * within the [OnFailure] lambda. If [OnFailure] is
- * being utilized with TorRuntime APIs, it will be
+ * being utilized with `TorRuntime` APIs, it will be
  * treated as an [UncaughtException] and dispatched
  * to [io.matthewnelson.kmp.tor.runtime.RuntimeEvent.LOG.ERROR]
  * observers.
@@ -48,6 +49,14 @@ public typealias OnFailure = ItBlock<Throwable>
 
 /**
  * A callback for dispatching events.
+ *
+ * Implementations of [OnEvent] should not throw exception,
+ * be fast, and non-blocking.
+ *
+ * **NOTE:** If [OnEvent] is being utilized with `TorRuntime`
+ * APIs, it will be treated as an [UncaughtException] and dispatched
+ * to [io.matthewnelson.kmp.tor.runtime.RuntimeEvent.LOG.ERROR]
+ * observers.
  *
  * @see [OnEvent.Executor]
  * */
@@ -79,9 +88,11 @@ public fun interface OnEvent<in It: Any>: ItBlock<It> {
         /**
          * Execute [block] in desired context.
          *
+         * @param [handler] The [UncaughtException.Handler] wrapped as
+         *   [CoroutineContext] element to pipe exceptions.
          * @param [block] to be invoked in desired context.
          * */
-        public fun execute(block: ItBlock<Unit>)
+        public fun execute(handler: CoroutineContext, block: ItBlock<Unit>)
 
         /**
          * Utilizes [Dispatchers.Main] under the hood to transition events
@@ -110,7 +121,7 @@ public fun interface OnEvent<in It: Any>: ItBlock<It> {
          * confines of its lambda.
          * */
         public object Unconfined: Executor {
-            override fun execute(block: ItBlock<Unit>) { block(Unit) }
+            override fun execute(handler: CoroutineContext, block: ItBlock<Unit>) { block(Unit) }
 
             override fun toString(): String = "OnEvent.Executor.Unconfined"
         }

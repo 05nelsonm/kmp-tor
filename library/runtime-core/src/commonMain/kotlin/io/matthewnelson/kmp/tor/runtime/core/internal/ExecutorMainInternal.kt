@@ -22,5 +22,5 @@ import io.matthewnelson.kmp.tor.runtime.core.OnEvent
 import kotlin.coroutines.CoroutineContext
 
 internal expect object ExecutorMainInternal: OnEvent.Executor {
-    override fun execute(block: ItBlock<Unit>)
+    override fun execute(handler: CoroutineContext, block: ItBlock<Unit>)
 }
