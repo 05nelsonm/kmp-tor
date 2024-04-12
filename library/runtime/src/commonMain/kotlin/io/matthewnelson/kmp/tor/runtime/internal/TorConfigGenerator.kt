@@ -13,13 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-package io.matthewnelson.kmp.tor.runtime
+package io.matthewnelson.kmp.tor.runtime.internal
 
 import io.matthewnelson.kmp.file.IOException
-import io.matthewnelson.kmp.file.resolve
-import io.matthewnelson.kmp.tor.core.api.ResourceInstaller
 import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
+import io.matthewnelson.kmp.tor.runtime.ConfigBuilderCallback
+import io.matthewnelson.kmp.tor.runtime.ConfigBuilderCallback.Companion.putDefaults
 import io.matthewnelson.kmp.tor.runtime.RuntimeEvent.*
+import io.matthewnelson.kmp.tor.runtime.TorRuntime
 import io.matthewnelson.kmp.tor.runtime.core.TorConfig
 import io.matthewnelson.kmp.tor.runtime.core.TorConfig.*
 import io.matthewnelson.kmp.tor.runtime.core.address.IPAddress
@@ -29,9 +30,6 @@ import io.matthewnelson.kmp.tor.runtime.core.address.Port.Proxy.Companion.toPort
 import io.matthewnelson.kmp.tor.runtime.core.address.ProxyAddress.Companion.toProxyAddressOrNull
 import io.matthewnelson.kmp.tor.runtime.core.apply
 import io.matthewnelson.kmp.tor.runtime.core.builder.ExtendedTorConfigBuilder
-import io.matthewnelson.kmp.tor.runtime.core.builder.UnixSocketBuilder
-import io.matthewnelson.kmp.tor.runtime.core.util.isAvailableAsync
-import kotlin.jvm.JvmSynthetic
 
 /**
  * Generates a minimum viable [TorConfig] using the provided settings from
@@ -41,7 +39,7 @@ import kotlin.jvm.JvmSynthetic
  * prior to each tor daemon start.
  * */
 @OptIn(InternalKmpTorApi::class)
-public class TorConfigGenerator private constructor(
+internal class TorConfigGenerator internal constructor(
     private val environment: TorRuntime.Environment,
     private val omitGeoIPFileSettings: Boolean,
     private val config: Set<ConfigBuilderCallback>,
@@ -54,7 +52,7 @@ public class TorConfigGenerator private constructor(
 
     private fun createConfig(n: Notifier): TorConfig = TorConfig.Builder {
         n.notify(LOG.DEBUG, "Installing tor resources (if needed)")
-        val pathsTor = environment.torResource.install()
+        val paths = environment.torResource.install()
 
         try {
             n.notify(LOG.DEBUG, "Refreshing localhost IP address cache")
@@ -64,65 +62,7 @@ public class TorConfigGenerator private constructor(
         // Apply library consumers' configuration(s)
         config.forEach { block -> apply(environment, block) }
 
-        putDefaults(pathsTor)
-    }
-
-    private fun Builder.putDefaults(pathsTor: ResourceInstaller.Paths.Tor) {
-        // Dirs/Files
-        if (!omitGeoIPFileSettings) {
-            put(GeoIPFile) { file = pathsTor.geoip }
-            put(GeoIPv6File) { file = pathsTor.geoip6 }
-        }
-
-        putIfAbsent(DataDirectory) {
-            directory = environment.workDir
-                .resolve(DataDirectory.DEFAULT_NAME)
-        }
-        putIfAbsent(CacheDirectory) {
-            directory = environment.cacheDir
-        }
-        putIfAbsent(ControlPortWriteToFile) {
-            file = environment.workDir
-                .resolve(ControlPortWriteToFile.DEFAULT_NAME)
-        }
-
-        // Authentication
-        if (
-            !(this as ExtendedTorConfigBuilder).contains(CookieAuthFile)
-            // && !contains(HashedControlPassword)
-        ) {
-            put(CookieAuthFile) {
-                file = environment.workDir
-                    .resolve(CookieAuthFile.DEFAULT_NAME)
-            }
-        }
-
-        // Ports
-        if (!contains(__SocksPort)) {
-            // Add default socks port so that port availability check
-            // can reassign it to auto if needed
-            put(__SocksPort) { asPort { /* default: 9050 */ } }
-        }
-
-        if (!contains(__ControlPort)) {
-            put(__ControlPort) {
-                try {
-                    // Prefer using Unix Domain Sockets where possible
-                    asUnixSocket {
-                        file = environment.workDir
-                            .resolve(UnixSocketBuilder.DEFAULT_NAME_CTRL)
-                    }
-                } catch (_: UnsupportedOperationException) {
-                    // fallback to TCP if unavailable on the system
-                    asPort { auto() }
-                }
-            }
-        }
-
-        // Required for TorRuntime
-        put(DisableNetwork) { disable = true }
-        put(RunAsDaemon) { enable = false }
-        put(__OwningControllerProcess) { /* default */ }
+        putDefaults(environment, omitGeoIPFileSettings, paths)
     }
 
     private suspend fun TorConfig.validateTCPPorts(n: Notifier): TorConfig {
@@ -163,21 +103,5 @@ public class TorConfigGenerator private constructor(
                 put(new)
             }
         }
-    }
-
-    internal companion object {
-
-        @JvmSynthetic
-        internal fun of(
-            environment: TorRuntime.Environment,
-            omitGeoIPFileSettings: Boolean,
-            config: Set<ConfigBuilderCallback>,
-            isPortAvailable: suspend (LocalHost, Port) -> Boolean = { h, p -> p.isAvailableAsync(h) },
-        ): TorConfigGenerator = TorConfigGenerator(
-            environment,
-            omitGeoIPFileSettings,
-            config,
-            isPortAvailable
-        )
     }
 }

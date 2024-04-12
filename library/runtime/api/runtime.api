@@ -1,4 +1,8 @@
 public abstract interface class io/matthewnelson/kmp/tor/runtime/ConfigBuilderCallback : io/matthewnelson/kmp/tor/runtime/core/ThisBlock$WithIt {
+	public static final field Companion Lio/matthewnelson/kmp/tor/runtime/ConfigBuilderCallback$Companion;
+}
+
+public final class io/matthewnelson/kmp/tor/runtime/ConfigBuilderCallback$Companion {
 }
 
 public abstract class io/matthewnelson/kmp/tor/runtime/NetworkObserver {
@@ -103,10 +107,6 @@ public abstract interface class io/matthewnelson/kmp/tor/runtime/RuntimeEvent$Pr
 	public abstract fun unsubscribeAll (Lio/matthewnelson/kmp/tor/runtime/RuntimeEvent;)V
 	public abstract fun unsubscribeAll (Ljava/lang/String;)V
 	public abstract fun unsubscribeAll ([Lio/matthewnelson/kmp/tor/runtime/RuntimeEvent;)V
-}
-
-public final class io/matthewnelson/kmp/tor/runtime/TorConfigGenerator {
-	public synthetic fun <init> (Lio/matthewnelson/kmp/tor/runtime/TorRuntime$Environment;ZLjava/util/Set;Lkotlin/jvm/functions/Function3;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
 }
 
 public abstract interface class io/matthewnelson/kmp/tor/runtime/TorRuntime : io/matthewnelson/kmp/tor/runtime/RuntimeAction$Processor, io/matthewnelson/kmp/tor/runtime/RuntimeEvent$Processor, io/matthewnelson/kmp/tor/runtime/core/TorEvent$Processor, io/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$Unprivileged$Processor {

@@ -28,7 +28,7 @@ class TorRuntimeEnvironmentUnitTest {
 
     @Test
     fun givenSameWorkDir_whenEnvironmentBuilder_thenReturnsSameInstance() {
-        val work = "".toFile().absoluteFile
+        val work = "".toFile().absoluteFile.resolve("env-test")
         val torResource = object : ResourceInstaller<ResourceInstaller.Paths.Tor>(work) {
             override fun install(): Paths.Tor { fail() }
         }
