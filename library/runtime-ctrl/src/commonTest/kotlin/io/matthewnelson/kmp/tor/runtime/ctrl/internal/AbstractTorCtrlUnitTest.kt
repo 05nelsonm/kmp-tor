@@ -26,7 +26,7 @@ class AbstractTorCtrlUnitTest {
 
     internal class TestCtrl(
         handler: UncaughtException.Handler = UncaughtException.Handler.THROW
-    ): AbstractTorCtrl(null, emptySet(), OnEvent.Executor.Unconfined, handler) {
+    ): AbstractTorCtrl(null, emptySet(), OnEvent.Executor.Immediate, handler) {
         override fun startProcessor() {
             // TODO("Not yet implemented")
         }

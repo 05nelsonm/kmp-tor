@@ -35,14 +35,14 @@ public abstract interface class io/matthewnelson/kmp/tor/runtime/core/OnEvent$Ex
 	public abstract fun execute (Lkotlin/coroutines/CoroutineContext;Lio/matthewnelson/kmp/tor/runtime/core/ItBlock;)V
 }
 
-public final class io/matthewnelson/kmp/tor/runtime/core/OnEvent$Executor$Main : io/matthewnelson/kmp/tor/runtime/core/OnEvent$Executor {
-	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/core/OnEvent$Executor$Main;
+public final class io/matthewnelson/kmp/tor/runtime/core/OnEvent$Executor$Immediate : io/matthewnelson/kmp/tor/runtime/core/OnEvent$Executor {
+	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/core/OnEvent$Executor$Immediate;
 	public fun execute (Lkotlin/coroutines/CoroutineContext;Lio/matthewnelson/kmp/tor/runtime/core/ItBlock;)V
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/matthewnelson/kmp/tor/runtime/core/OnEvent$Executor$Unconfined : io/matthewnelson/kmp/tor/runtime/core/OnEvent$Executor {
-	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/core/OnEvent$Executor$Unconfined;
+public final class io/matthewnelson/kmp/tor/runtime/core/OnEvent$Executor$Main : io/matthewnelson/kmp/tor/runtime/core/OnEvent$Executor {
+	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/core/OnEvent$Executor$Main;
 	public fun execute (Lkotlin/coroutines/CoroutineContext;Lio/matthewnelson/kmp/tor/runtime/core/ItBlock;)V
 	public fun toString ()Ljava/lang/String;
 }

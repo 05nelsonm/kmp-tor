@@ -331,7 +331,7 @@ public enum class TorEvent {
             when (executor) {
                 null -> "null"
                 OnEvent.Executor.Main,
-                OnEvent.Executor.Unconfined -> executor.toString()
+                OnEvent.Executor.Immediate -> executor.toString()
                 else -> "Custom"
             }.let {
                 append(", executor=")

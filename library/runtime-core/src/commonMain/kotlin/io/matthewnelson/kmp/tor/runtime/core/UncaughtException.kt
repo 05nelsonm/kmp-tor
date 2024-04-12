@@ -26,7 +26,7 @@ import kotlin.jvm.JvmSynthetic
 /**
  * A special exception to indicate something went terribly wrong somewhere.
  *
- * @see [io.matthewnelson.kmp.tor.runtime.RuntimeEvent.LOG.ERROR]
+ * @see [io.matthewnelson.kmp.tor.runtime.RuntimeEvent.ERROR]
  * */
 public class UncaughtException private constructor(
     override val message: String,
@@ -89,7 +89,7 @@ public class UncaughtException private constructor(
              * @param [context] Contextual information about where/what [block] is
              *   to include in the [UncaughtException]
              * @param [block] the thing to do that may or may not throw exception.
-             * @see [io.matthewnelson.kmp.tor.runtime.RuntimeEvent.LOG.ERROR]
+             * @see [io.matthewnelson.kmp.tor.runtime.RuntimeEvent.ERROR]
              * @see [withSuppression]
              * @throws [IllegalStateException] if [SuppressedHandler.isActive] is false
              * @throws [UncaughtException] if handler is null or [Handler.invoke] is
@@ -108,7 +108,7 @@ public class UncaughtException private constructor(
                         UncaughtException("context: $context", t)
                     }
 
-                    if (this != null) invoke(e) else THROW(e)
+                    (this ?: THROW)(e)
                 }
             }
 
@@ -183,7 +183,7 @@ public class UncaughtException private constructor(
 
                 val result = block(suppressed)
                 isActive = false
-                threw?.let { if (delegate != null) delegate(it) else THROW(it) }
+                threw?.let { (delegate ?: THROW)(it) }
                 return result
             }
 

@@ -15,6 +15,7 @@
  **/
 package io.matthewnelson.kmp.tor.runtime
 
+import kotlin.reflect.KClass
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
@@ -23,7 +24,15 @@ class RuntimeEventEntriesUnitTest {
 
     @Test
     fun givenEvents_whenEntries_thenContainsAllSealedSubclasses() {
-        val subclasses = RuntimeEvent::class.sealedSubclasses
+        val subclasses = mutableListOf<KClass<*>>()
+        for (clazz in RuntimeEvent::class.sealedSubclasses) {
+            if (clazz.isSealed) {
+                subclasses.addAll(clazz.sealedSubclasses)
+            } else {
+                subclasses.add(clazz)
+            }
+        }
+
         val entries = RuntimeEvent.entries.map { it::class }
 
         assertEquals(subclasses.size, entries.size)

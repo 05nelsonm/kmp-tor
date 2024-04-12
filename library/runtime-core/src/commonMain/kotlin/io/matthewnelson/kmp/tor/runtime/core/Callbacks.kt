@@ -29,7 +29,7 @@ import kotlin.jvm.JvmField
  * within the [OnSuccess] lambda. If [OnSuccess] is
  * being utilized with `TorRuntime` APIs, it will be
  * treated as an [UncaughtException] and dispatched
- * to [io.matthewnelson.kmp.tor.runtime.RuntimeEvent.LOG.ERROR]
+ * to [io.matthewnelson.kmp.tor.runtime.RuntimeEvent.ERROR]
  * observers.
  * */
 public typealias OnSuccess<T> = ItBlock<T>
@@ -42,7 +42,7 @@ public typealias OnSuccess<T> = ItBlock<T>
  * within the [OnFailure] lambda. If [OnFailure] is
  * being utilized with `TorRuntime` APIs, it will be
  * treated as an [UncaughtException] and dispatched
- * to [io.matthewnelson.kmp.tor.runtime.RuntimeEvent.LOG.ERROR]
+ * to [io.matthewnelson.kmp.tor.runtime.RuntimeEvent.ERROR]
  * observers.
  * */
 public typealias OnFailure = ItBlock<Throwable>
@@ -55,7 +55,7 @@ public typealias OnFailure = ItBlock<Throwable>
  *
  * **NOTE:** If [OnEvent] is being utilized with `TorRuntime`
  * APIs, it will be treated as an [UncaughtException] and dispatched
- * to [io.matthewnelson.kmp.tor.runtime.RuntimeEvent.LOG.ERROR]
+ * to [io.matthewnelson.kmp.tor.runtime.RuntimeEvent.ERROR]
  * observers.
  *
  * @see [OnEvent.Executor]
@@ -80,8 +80,11 @@ public fun interface OnEvent<in It: Any>: ItBlock<It> {
      * overridden on a per-observer basis when necessary for that particular
      * implementation.
      *
+     * **NOTE:** [execute] should **NOT** be called externally. It is designed
+     * strictly for `kmp-tor` to notify observers with new events.
+     *
      * @see [Executor.Main]
-     * @see [Executor.Unconfined]
+     * @see [Executor.Immediate]
      * */
     public fun interface Executor {
 
@@ -114,13 +117,14 @@ public fun interface OnEvent<in It: Any>: ItBlock<It> {
         }
 
         /**
-         * Executes immediately on whatever thread the event originated.
+         * Invokes block immediately on whatever thread [execute] has been called
+         * from.
          *
-         * Observers utilizing [Unconfined] must have a thread-safe implementation
+         * Observers utilizing [Immediate] must have a thread-safe implementation
          * of [OnEvent] callbacks whenever referencing things outside the
          * confines of its lambda.
          * */
-        public object Unconfined: Executor {
+        public object Immediate: Executor {
             override fun execute(handler: CoroutineContext, block: ItBlock<Unit>) { block(Unit) }
 
             override fun toString(): String = "OnEvent.Executor.Unconfined"

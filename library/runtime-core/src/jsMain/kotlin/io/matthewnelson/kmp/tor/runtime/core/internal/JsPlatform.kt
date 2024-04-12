@@ -25,7 +25,7 @@ import io.matthewnelson.kmp.tor.core.resource.OSInfo
 import io.matthewnelson.kmp.tor.runtime.core.OnEvent
 
 @Suppress("ACTUAL_WITHOUT_EXPECT")
-internal actual typealias ExecutorMainInternal = OnEvent.Executor.Unconfined
+internal actual typealias ExecutorMainInternal = OnEvent.Executor.Immediate
 
 @OptIn(InternalKmpTorApi::class)
 internal actual val UnixSocketsNotSupportedMessage: String? by lazy {
