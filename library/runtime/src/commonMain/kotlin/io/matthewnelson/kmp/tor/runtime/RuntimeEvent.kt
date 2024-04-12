@@ -39,30 +39,44 @@ public sealed class RuntimeEvent<R: Any> private constructor(
     public val name: String,
 ) {
 
-    public data object LOG {
+    /**
+     * Errors encountered by [TorRuntime].
+     *
+     * All exceptions encountered when notifying other non-[ERROR]
+     * observers (including [TorEvent] observers) are piped to [ERROR]
+     * observers as [UncaughtException].
+     *
+     * **NOTE:** Any exceptions thrown by [ERROR] observers are re-thrown
+     * as [UncaughtException] (if not already one).
+     *
+     * **NOTE:** If the error is an [UncaughtException] and no observers
+     * for [ERROR] are registered with [TorRuntime], the [UncaughtException]
+     * will be thrown. It is critical that an [ERROR] observer be registered
+     * either via [TorRuntime.Builder.staticObserver], or immediately after
+     * [TorRuntime] is instantiated via [TorRuntime.subscribe].
+     * */
+    public data object ERROR: RuntimeEvent<Throwable>("ERROR")
+
+    public sealed class LOG private constructor(name: String): RuntimeEvent<String>(name) {
 
         /**
          * Debug level logging. Events will only be dispatched
          * when [TorRuntime.Environment.debug] is set to `true`.
+         *
+         * **NOTE:** Debug logs may reveal sensitive information
+         * and should not be enabled in production!
          * */
-        public data object DEBUG: RuntimeEvent<String>("LOG_DEBUG")
-
-        /**
-         * Error level logging. Note that all [UncaughtException]
-         * are redirected to [ERROR] observers. All exceptions
-         * thrown by [ERROR] observers are suppressed.
-         * */
-        public data object ERROR: RuntimeEvent<Throwable>("LOG_ERROR")
+        public data object DEBUG: LOG("LOG_DEBUG")
 
         /**
          * Info level logging.
          * */
-        public data object INFO: RuntimeEvent<String>("LOG_INFO")
+        public data object INFO: LOG("LOG_INFO")
 
         /**
          * Warn level logging. These are non-fatal errors.
          * */
-        public data object WARN: RuntimeEvent<String>("LOG_WARN")
+        public data object WARN: LOG("LOG_WARN")
     }
 
     // TODO: Other events
@@ -173,7 +187,7 @@ public sealed class RuntimeEvent<R: Any> private constructor(
         public val tag: String? = tag?.ifBlank { null }
 
         /**
-         * Invokes [OnEvent] for the given [event] string
+         * Invokes [OnEvent] for the given [event]
          *
          * @param [default] the default [OnEvent.Executor] to fall
          *   back to if [executor] was not defined for this observer.
@@ -183,7 +197,7 @@ public sealed class RuntimeEvent<R: Any> private constructor(
         }
 
         /**
-         * Invokes [OnEvent] for the given [event] string
+         * Invokes [OnEvent] for the given [event]
          *
          * @param [handler] Optional ability to pass [UncaughtException.Handler]
          *   wrapped as [CoroutineExceptionHandler]
@@ -207,7 +221,7 @@ public sealed class RuntimeEvent<R: Any> private constructor(
             when (executor) {
                 null -> "null"
                 OnEvent.Executor.Main,
-                OnEvent.Executor.Unconfined -> executor.toString()
+                OnEvent.Executor.Immediate -> executor.toString()
                 else -> "Custom"
             }.let {
                 append(", executor=")
@@ -294,8 +308,8 @@ public sealed class RuntimeEvent<R: Any> private constructor(
         @get:JvmName("entries")
         public val entries: Set<RuntimeEvent<*>> by lazy {
             immutableSetOf(
+                ERROR,
                 LOG.DEBUG,
-                LOG.ERROR,
                 LOG.INFO,
                 LOG.WARN,
             )

@@ -16,6 +16,7 @@
 package io.matthewnelson.kmp.tor.runtime.ctrl.internal
 
 import io.matthewnelson.kmp.tor.runtime.core.ItBlock
+import io.matthewnelson.kmp.tor.runtime.core.UncaughtException
 import kotlin.jvm.JvmInline
 import kotlin.jvm.JvmSynthetic
 
@@ -41,10 +42,19 @@ internal value class Debugger private constructor(private val callback: Callback
         private val prefix: String,
         private val block: ItBlock<String>,
     ): ItBlock<String> {
+
         override fun invoke(it: String) {
             try {
                 block("$prefix $it")
-            } catch (_: Throwable) {}
+            } catch (t: Throwable) {
+                if (t !is UncaughtException) return
+                // If the debug log is being piped to
+                // TorRuntime RuntimeEvent.LOG.DEBUG
+                // and that observer throws exception,
+                // we want to ensure that it throws in
+                // order to pipe to RuntimeEvent.ERROR
+                throw t
+            }
         }
     }
 }

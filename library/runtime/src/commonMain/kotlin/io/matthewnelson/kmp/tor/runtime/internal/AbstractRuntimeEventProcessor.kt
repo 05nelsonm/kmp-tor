@@ -37,9 +37,9 @@ internal abstract class AbstractRuntimeEventProcessor(
 
     private val observers = LinkedHashSet<RuntimeEvent.Observer<*>>(initialObservers.size + 1, 1.0F)
     private val lock = SynchronizedObject()
-    protected final override val handler = HandlerWithContext { t ->
-        RuntimeEvent.LOG.ERROR.notifyObservers(t)
-    }
+    protected final override val handler = HandlerWithContext { t -> RuntimeEvent.ERROR.notifyObservers(t) }
+    // Used for RuntimeEvent.ERROR ONLY
+    private val handlerERROR = HandlerWithContext(UncaughtException.Handler.THROW)
 
     init {
         observers.addAll(initialObservers)
@@ -119,24 +119,33 @@ internal abstract class AbstractRuntimeEventProcessor(
         super.clearObservers()
     }
 
-    private val handlerIgnore = HandlerWithContext(UncaughtException.Handler.IGNORE)
-
     protected fun <R: Any> RuntimeEvent<R>.notifyObservers(output: R) {
         val event = this
 
         if (event is RuntimeEvent.LOG.DEBUG && !debug) return
 
-        val handler = if (event is RuntimeEvent.LOG.ERROR) {
-            handlerIgnore
+        val observers = withObservers {
+            if (isEmpty()) return@withObservers null
+            mapNotNull { if (it.event == event) it else null }
+        }
+
+        if (observers.isNullOrEmpty()) {
+            // Throw UncaughtException if no ERROR observers present.
+            if (event is RuntimeEvent.ERROR && output is UncaughtException) {
+                throw output
+            }
+
+            return
+        }
+
+        val handler = if (event is RuntimeEvent.ERROR) {
+            handlerERROR
         } else {
             handler
         }
 
-        withObservers {
-            if (isEmpty()) return@withObservers null
-            mapNotNull { if (it.event == event) it else null }
-        }?.forEach { observer ->
-            val ctx = ObserverNameContext(observer.toString(isStatic = observer.tag.isStaticTag()))
+        observers.forEach { observer ->
+            val ctx = ObserverContext(observer.toString(isStatic = observer.tag.isStaticTag()))
 
             handler.tryCatch(ctx) {
                 @Suppress("UNCHECKED_CAST")

@@ -22,11 +22,9 @@ import io.matthewnelson.kmp.file.IOException
 import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
 import io.matthewnelson.kmp.tor.runtime.core.*
 import io.matthewnelson.kmp.tor.runtime.core.UncaughtException
-import io.matthewnelson.kmp.tor.runtime.core.UncaughtException.Handler.Companion.requireInstanceIsNotSuppressed
 import io.matthewnelson.kmp.tor.runtime.core.address.ProxyAddress
 import io.matthewnelson.kmp.tor.runtime.core.ctrl.TorCmd
 import kotlin.coroutines.cancellation.CancellationException
-import kotlin.jvm.JvmOverloads
 
 /**
  * A Tor control connection
@@ -89,7 +87,7 @@ public expect interface TorCtrl: Destroyable, TorEvent.Processor, TorCmd.Privile
      * @param [defaultExecutor] The default [OnEvent.Executor] to fall back to
      *   when calling [TorEvent.Observer.notify] if it does not have its own.
      * @param [debugger] A callback for debugging info. **MUST** be thread
-     *   safe. Any exceptions it throws will be swallowed.
+     *   safe. Any non-[UncaughtException] it throws will be swallowed.
      * @param [handler] The [UncaughtException.Handler] to pipe bad behavior
      *   to. It **MUST** be thread-safe for Jvm & Native implementations.
      * @throws [IllegalArgumentException] if [handler] is an instance
@@ -100,7 +98,7 @@ public expect interface TorCtrl: Destroyable, TorEvent.Processor, TorCmd.Privile
     public constructor(
         staticTag: String? = null,
         initialObservers: Set<TorEvent.Observer> = emptySet(),
-        defaultExecutor: OnEvent.Executor = OnEvent.Executor.Unconfined,
+        defaultExecutor: OnEvent.Executor = OnEvent.Executor.Immediate,
         debugger: ItBlock<String>? = null,
         handler: UncaughtException.Handler,
     ) {

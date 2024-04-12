@@ -27,7 +27,7 @@ class ExecutorUnitTest {
     }
 
     @Test
-    fun givenUnconfined_whenToString_thenIsAsExpected() {
-        assertEquals("OnEvent.Executor.Unconfined", OnEvent.Executor.Unconfined.toString())
+    fun givenImmediate_whenToString_thenIsAsExpected() {
+        assertEquals("OnEvent.Executor.Immediate", OnEvent.Executor.Immediate.toString())
     }
 }

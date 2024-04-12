@@ -99,7 +99,7 @@ public actual interface TorCtrl : Destroyable, TorEvent.Processor, TorCmd.Privil
      * @param [defaultExecutor] The default [OnEvent.Executor] to fall back to
      *   when calling [TorEvent.Observer.notify] if it does not have its own.
      * @param [debugger] A callback for debugging info. **MUST** be thread
-     *   safe. Any exceptions it throws will be swallowed.
+     *   safe. Any non-[UncaughtException] it throws will be swallowed.
      * @param [handler] The [UncaughtException.Handler] to pipe bad behavior
      *   to. It **MUST** be thread-safe.
      * @throws [IllegalArgumentException] if [handler] is an instance

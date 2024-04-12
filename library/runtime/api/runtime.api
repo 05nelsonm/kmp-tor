@@ -54,32 +54,29 @@ public final class io/matthewnelson/kmp/tor/runtime/RuntimeEvent$Companion {
 	public final fun valueOfOrNull (Ljava/lang/String;)Lio/matthewnelson/kmp/tor/runtime/RuntimeEvent;
 }
 
-public final class io/matthewnelson/kmp/tor/runtime/RuntimeEvent$LOG {
-	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/RuntimeEvent$LOG;
+public final class io/matthewnelson/kmp/tor/runtime/RuntimeEvent$ERROR : io/matthewnelson/kmp/tor/runtime/RuntimeEvent {
+	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/RuntimeEvent$ERROR;
 	public fun equals (Ljava/lang/Object;)Z
 	public fun hashCode ()I
-	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/matthewnelson/kmp/tor/runtime/RuntimeEvent$LOG$DEBUG : io/matthewnelson/kmp/tor/runtime/RuntimeEvent {
+public abstract class io/matthewnelson/kmp/tor/runtime/RuntimeEvent$LOG : io/matthewnelson/kmp/tor/runtime/RuntimeEvent {
+	public synthetic fun <init> (Ljava/lang/String;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
+}
+
+public final class io/matthewnelson/kmp/tor/runtime/RuntimeEvent$LOG$DEBUG : io/matthewnelson/kmp/tor/runtime/RuntimeEvent$LOG {
 	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/RuntimeEvent$LOG$DEBUG;
 	public fun equals (Ljava/lang/Object;)Z
 	public fun hashCode ()I
 }
 
-public final class io/matthewnelson/kmp/tor/runtime/RuntimeEvent$LOG$ERROR : io/matthewnelson/kmp/tor/runtime/RuntimeEvent {
-	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/RuntimeEvent$LOG$ERROR;
-	public fun equals (Ljava/lang/Object;)Z
-	public fun hashCode ()I
-}
-
-public final class io/matthewnelson/kmp/tor/runtime/RuntimeEvent$LOG$INFO : io/matthewnelson/kmp/tor/runtime/RuntimeEvent {
+public final class io/matthewnelson/kmp/tor/runtime/RuntimeEvent$LOG$INFO : io/matthewnelson/kmp/tor/runtime/RuntimeEvent$LOG {
 	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/RuntimeEvent$LOG$INFO;
 	public fun equals (Ljava/lang/Object;)Z
 	public fun hashCode ()I
 }
 
-public final class io/matthewnelson/kmp/tor/runtime/RuntimeEvent$LOG$WARN : io/matthewnelson/kmp/tor/runtime/RuntimeEvent {
+public final class io/matthewnelson/kmp/tor/runtime/RuntimeEvent$LOG$WARN : io/matthewnelson/kmp/tor/runtime/RuntimeEvent$LOG {
 	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/RuntimeEvent$LOG$WARN;
 	public fun equals (Ljava/lang/Object;)Z
 	public fun hashCode ()I

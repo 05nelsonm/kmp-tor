@@ -26,7 +26,7 @@ class AbstractTorCmdQueueUnitTest {
 
     private class TestQueue(
         handler: UncaughtException.Handler = UncaughtException.Handler.THROW,
-    ): AbstractTorCmdQueue(null, emptySet(), OnEvent.Executor.Unconfined, handler) {
+    ): AbstractTorCmdQueue(null, emptySet(), OnEvent.Executor.Immediate, handler) {
 
         var invocationStart = 0
             private set

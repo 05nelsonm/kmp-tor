@@ -112,10 +112,10 @@ public interface TorRuntime:
          * non-singleton references outside the [OnEvent.Executor.execute]
          * lambda.
          *
-         * Default: [OnEvent.Executor.Unconfined]
+         * Default: [OnEvent.Executor.Immediate]
          * */
         @JvmField
-        public var defaultEventExecutor: OnEvent.Executor = OnEvent.Executor.Unconfined
+        public var defaultEventExecutor: OnEvent.Executor = OnEvent.Executor.Immediate
 
         /**
          * Configure the [TorConfig] at each startup. Multiple [block] may
@@ -273,6 +273,9 @@ public interface TorRuntime:
          * **NOTE:** This does not alter control connection event listeners
          * via [TorCmd.SetEvents]. Add [TorEvent.DEBUG] via
          * [TorRuntime.Builder.required] if debug logs from tor are needed.
+         *
+         * **NOTE:** Debug logs may reveal sensitive information
+         * and should not be enabled in production!
          * */
         @JvmField
         @Volatile

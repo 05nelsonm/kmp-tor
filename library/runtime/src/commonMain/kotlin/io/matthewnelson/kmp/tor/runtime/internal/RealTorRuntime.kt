@@ -144,10 +144,8 @@ internal class RealTorRuntime private constructor(
 
             RuntimeEvent.entries.forEach { event ->
                 val observer = when (event) {
-                    is RuntimeEvent.LOG.DEBUG -> event.observer(tag) { event.notifyObservers(it) }
-                    is RuntimeEvent.LOG.ERROR -> event.observer(tag) { event.notifyObservers(it) }
-                    is RuntimeEvent.LOG.INFO -> event.observer(tag) { event.notifyObservers(it) }
-                    is RuntimeEvent.LOG.WARN -> event.observer(tag) { event.notifyObservers(it) }
+                    is RuntimeEvent.LOG -> event.observer(tag) { event.notifyObservers(it) }
+                    is RuntimeEvent.ERROR -> event.observer(tag) { event.notifyObservers(it) }
                 }
                 add(observer)
             }
@@ -164,7 +162,7 @@ internal class RealTorRuntime private constructor(
             observer ?: NetworkObserver.NOOP,
             requiredTorEvents,
             staticTorEventObservers,
-            OnEvent.Executor.Unconfined,
+            OnEvent.Executor.Immediate,
             staticRuntimeEventObservers,
         )
     }

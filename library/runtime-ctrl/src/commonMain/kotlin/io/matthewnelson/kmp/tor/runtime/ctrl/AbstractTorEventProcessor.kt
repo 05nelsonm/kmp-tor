@@ -137,7 +137,7 @@ protected constructor(
             if (isEmpty()) return@withObservers null
             mapNotNull { if (it.event == event) it else null }
         }?.forEach { observer ->
-            val ctx = ObserverNameContext(observer.toString(isStatic = observer.tag.isStaticTag()))
+            val ctx = ObserverContext(observer.toString(isStatic = observer.tag.isStaticTag()))
 
             handler.tryCatch(ctx) {
                 observer.notify(handler + ctx, defaultExecutor, output)
@@ -196,18 +196,18 @@ protected constructor(
             if (exception is UncaughtException) {
                 invoke(exception)
             } else {
-                val ctx = context[ObserverNameContext]?.context ?: "EventProcessor"
+                val ctx = context[ObserverContext]?.context ?: context.toString()
                 tryCatch(ctx) { throw exception }
             }
         }
     }
 
     // For passing observer name as context
-    protected class ObserverNameContext(
+    protected class ObserverContext(
         @JvmField
         public val context: String,
-    ): AbstractCoroutineContextElement(ObserverNameContext) {
-        public companion object Key: CoroutineContext.Key<ObserverNameContext>
+    ): AbstractCoroutineContextElement(ObserverContext) {
+        public companion object Key: CoroutineContext.Key<ObserverContext>
 
         final override fun toString(): String = context
     }

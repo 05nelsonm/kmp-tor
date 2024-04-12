@@ -32,7 +32,7 @@ class AbstractRuntimeEventProcessorUnitTest {
         private const val STATIC_TAG = "TAG_STATIC_1234"
     }
 
-    private class TestProcessor(): AbstractRuntimeEventProcessor(STATIC_TAG, emptySet(), OnEvent.Executor.Unconfined, emptySet()) {
+    private class TestProcessor(): AbstractRuntimeEventProcessor(STATIC_TAG, emptySet(), OnEvent.Executor.Immediate, emptySet()) {
         var _debug: Boolean = true
         override val debug: Boolean get() = _debug
         val size: Int get() = registered()
@@ -175,7 +175,7 @@ class AbstractRuntimeEventProcessorUnitTest {
         processor.subscribe(TorEvent.INFO.observer(STATIC_TAG) { throw IllegalStateException() })
 
         var invocations = 0
-        processor.subscribe(RuntimeEvent.LOG.ERROR.observer { t ->
+        processor.subscribe(RuntimeEvent.ERROR.observer { t ->
             invocations++
             assertIs<UncaughtException>(t)
             assertIs<IllegalStateException>(t.cause)
@@ -184,9 +184,6 @@ class AbstractRuntimeEventProcessorUnitTest {
             // as context) does not leak the static tag value.
             assertFalse(t.message.contains(STATIC_TAG))
             assertTrue(t.message.contains("tag=STATIC"))
-
-            // should be swallowed
-            throw t
         })
 
         processor.notify(RuntimeEvent.LOG.DEBUG, "something")
@@ -221,7 +218,7 @@ class AbstractRuntimeEventProcessorUnitTest {
         val expectedTag = "Expected Tag"
         var invocationEvent = 0
         val latch = Job()
-        processor.subscribe(RuntimeEvent.LOG.ERROR.observer { exceptions.add(it); fail() })
+        processor.subscribe(RuntimeEvent.ERROR.observer { exceptions.add(it) })
         processor.subscribe(RuntimeEvent.LOG.DEBUG.observer(
             tag = expectedTag,
             executor = { handler, _ ->
@@ -237,5 +234,12 @@ class AbstractRuntimeEventProcessorUnitTest {
         assertEquals(0, invocationEvent)
         assertIs<UncaughtException>(exceptions.first())
         assertTrue(exceptions.first().message!!.contains(expectedTag))
+    }
+
+    @Test
+    fun givenNoErrorObserver_whenUncaughtException_thenThrows() {
+        processor.subscribe(RuntimeEvent.LOG.DEBUG.observer { throw IllegalStateException() })
+
+        assertFailsWith<UncaughtException> { processor.notify(RuntimeEvent.LOG.DEBUG, "") }
     }
 }
