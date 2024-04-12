@@ -127,7 +127,7 @@ public fun interface OnEvent<in It: Any>: ItBlock<It> {
         public object Immediate: Executor {
             override fun execute(handler: CoroutineContext, block: ItBlock<Unit>) { block(Unit) }
 
-            override fun toString(): String = "OnEvent.Executor.Unconfined"
+            override fun toString(): String = "OnEvent.Executor.Immediate"
         }
     }
 }
