@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-package io.matthewnelson.kmp.tor.runtime
+package io.matthewnelson.kmp.tor.runtime.internal
 
 import io.matthewnelson.kmp.file.absoluteFile
 import io.matthewnelson.kmp.file.resolve
@@ -21,6 +21,9 @@ import io.matthewnelson.kmp.file.toFile
 import io.matthewnelson.kmp.tor.core.api.ResourceInstaller
 import io.matthewnelson.kmp.tor.core.api.ResourceInstaller.Paths
 import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
+import io.matthewnelson.kmp.tor.runtime.ConfigBuilderCallback
+import io.matthewnelson.kmp.tor.runtime.RuntimeEvent
+import io.matthewnelson.kmp.tor.runtime.TorRuntime
 import io.matthewnelson.kmp.tor.runtime.core.TorConfig
 import io.matthewnelson.kmp.tor.runtime.core.TorConfig.Setting.Companion.filterByKeyword
 import io.matthewnelson.kmp.tor.runtime.core.address.LocalHost
@@ -34,7 +37,7 @@ import kotlin.test.assertTrue
 @OptIn(InternalKmpTorApi::class)
 class TorConfigGeneratorUnitTest {
 
-    private val environment = "".toFile().absoluteFile.let { workDir ->
+    private val environment = "".toFile().absoluteFile.resolve("config-test").let { workDir ->
         TorRuntime.Environment.Builder(workDir, workDir.resolve("cache")) { installationDir ->
             object : ResourceInstaller<Paths.Tor>(installationDir) {
                 private val paths = Paths.Tor(
@@ -122,7 +125,7 @@ class TorConfigGeneratorUnitTest {
         omitGeoIPFileSettings: Boolean = false,
         config: Set<ConfigBuilderCallback> = emptySet(),
         isPortAvailable: suspend (LocalHost, Port) -> Boolean = { _, _ -> true },
-    ): TorConfigGenerator = TorConfigGenerator.of(
+    ): TorConfigGenerator = TorConfigGenerator(
         environment,
         omitGeoIPFileSettings,
         config,

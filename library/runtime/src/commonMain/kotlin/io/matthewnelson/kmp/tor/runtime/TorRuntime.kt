@@ -130,7 +130,7 @@ public interface TorRuntime:
          * of [RuntimeAction.StartDaemon] or [RuntimeAction.RestartDaemon].
          *
          * **NOTE:** This can be omitted as a minimum viable configuration
-         * is always created. See [TorConfigGenerator.putDefaults] for what
+         * is always created. See [ConfigBuilderCallback.putDefaults] for what
          * settings are automatically applied.
          *
          * **NOTE:** [block] should not contain any external contextual
