@@ -31,6 +31,7 @@ import kotlin.concurrent.Volatile
 import kotlin.coroutines.cancellation.CancellationException
 import kotlin.jvm.JvmSynthetic
 import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.TimeSource
 
 @OptIn(InternalKmpTorApi::class)
 internal class RealTorCtrl private constructor(
@@ -153,6 +154,8 @@ internal class RealTorCtrl private constructor(
     init {
         scope.launch {
             LOG.d { "Starting Read" }
+            val start = TimeSource.Monotonic.markNow()
+
             try {
                 connection.startRead(parser)
             } catch (_: IllegalStateException) {
@@ -165,8 +168,13 @@ internal class RealTorCtrl private constructor(
                 parser.parse(null)
             }
 
-            // Slight delay before invoking onDestroy
-            delay(50.milliseconds)
+            // Ensure there is a minimum of 50ms of runtime before
+            // stopping coroutine, thus invoking onCompletion, thus
+            // invoking onDestroy
+            val elapsed = start.elapsedNow()
+            if (elapsed < 50.milliseconds) {
+                delay(50.milliseconds - elapsed)
+            }
         }.invokeOnCompletion {
             LOG.d { "Stopped Reading" }
             onDestroy()

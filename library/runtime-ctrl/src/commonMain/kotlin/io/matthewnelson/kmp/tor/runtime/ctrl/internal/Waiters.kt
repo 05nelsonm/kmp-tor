@@ -27,7 +27,7 @@ import kotlin.time.Duration.Companion.milliseconds
 
 internal class Waiters(private val LOG: () -> Debugger?): Destroyable {
 
-    private val rLock = ReentrantLock()
+    private val lock = ReentrantLock()
     private val waiters = ArrayList<Waiter>(1)
     @Volatile
     private var _isDestroyed: Boolean = false
@@ -37,7 +37,7 @@ internal class Waiters(private val LOG: () -> Debugger?): Destroyable {
     override fun destroy() {
         if (_isDestroyed) return
 
-        rLock.withLock {
+        lock.withLock {
             if (_isDestroyed) return@withLock
             _isDestroyed = true
 
@@ -52,7 +52,7 @@ internal class Waiters(private val LOG: () -> Debugger?): Destroyable {
     internal fun respondNext(replies: ArrayList<Reply>) {
         checkDestroy()
 
-        val waiter = rLock.withLock {
+        val waiter = lock.withLock {
             checkDestroy()
             waiters.removeFirstOrNull()
         }
@@ -71,7 +71,7 @@ internal class Waiters(private val LOG: () -> Debugger?): Destroyable {
     ): Wait {
         checkDestroy()
 
-        val waiter = rLock.withLockAsync {
+        val waiter = lock.withLockAsync {
             checkDestroy()
             writeCmd()
             val w = Waiter()
@@ -92,7 +92,7 @@ internal class Waiters(private val LOG: () -> Debugger?): Destroyable {
 
         override suspend operator fun invoke(): ArrayList<Reply> {
             while (true) {
-                delay(1.milliseconds)
+                delay(5.milliseconds)
                 response?.let { return it }
             }
         }
