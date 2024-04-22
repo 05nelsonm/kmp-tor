@@ -205,6 +205,7 @@ public actual interface TorCtrl : Destroyable, TorEvent.Processor, TorCmd.Privil
                 connect(dispatcher)
             } catch (t: Throwable) {
                 dispatcher.close()
+                if (t is CancellationException) throw t
                 throw t.wrapIOException()
             }
 
