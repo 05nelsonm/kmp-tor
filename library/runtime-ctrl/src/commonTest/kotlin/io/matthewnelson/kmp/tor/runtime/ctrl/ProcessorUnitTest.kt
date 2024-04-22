@@ -61,30 +61,33 @@ class ProcessorUnitTest {
             val ctrl = factory.connectAsync(address)
 
             val onFailure = OnFailure { threw = it }
-            val onSuccess = OnSuccess<Reply.Success.OK> { invocationSuccess++ }
+            val onSuccess = OnSuccess<Reply.Success.OK> { synchronized(lock) { invocationSuccess++ } }
+
             ctrl.enqueue(TorCmd.Authenticate(TestUtils.AUTH_PASS), onFailure, onSuccess)
             ctrl.enqueue(TorCmd.SetEvents(TorEvent.entries), onFailure, onSuccess)
+            ctrl.enqueue(TorCmd.Signal.Heartbeat, onFailure, onSuccess)
+            ctrl.enqueue(TorCmd.Signal.Heartbeat, onFailure, onSuccess)
             ctrl.enqueue(TorCmd.Signal.Heartbeat, onFailure, onSuccess)
 
             // Suspends test until non-suspending complete
             ctrl.executeAsync(TorCmd.Signal.Dump)
-            invocationSuccess++
+            synchronized(lock) { invocationSuccess++ }
 
             // Ensure that another processor coroutine started
             ctrl.executeAsync(TorCmd.Signal.ClearDnsCache)
-            invocationSuccess++
+            synchronized(lock) { invocationSuccess++ }
         } catch (t: Throwable) {
             threw = t
         } finally {
             process.destroy()
         }
 
-        withContext(Dispatchers.Default) { delay(25.milliseconds) }
+        withContext(Dispatchers.Default) { delay(50.milliseconds) }
 
         threw?.let { throw it }
 
         // All commands for our test executed successfully
-        assertEquals(5, invocationSuccess++)
+        assertEquals(7, invocationSuccess)
 
         // Ensure that given our flurry of commands, a single processor
         // coroutine was started to handle them all.
