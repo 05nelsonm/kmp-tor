@@ -44,8 +44,8 @@ internal class NativeCtrlConnection internal constructor(
     @Throws(CancellationException::class, IllegalStateException::class)
     override suspend fun startRead(parser: CtrlConnection.Parser) {
         synchronized(lock) {
-            if (_isClosed) throw IllegalStateException("Connection is closed")
-            if (_isReading) throw IllegalStateException("Already reading input")
+            check(!_isClosed) { "Connection is closed" }
+            check(!_isReading) { "Already reading input" }
             _isReading = true
         }
 
@@ -81,11 +81,10 @@ internal class NativeCtrlConnection internal constructor(
             command.usePinned { pinned ->
                 var written = 0
                 while (written < command.size) {
-                    val write = send(
+                    val write = write(
                         descriptor,
-                        pinned.addressOf(0),
-                        command.size.convert(),
-                        0,
+                        pinned.addressOf(written),
+                        (command.size - written).convert(),
                     ).toInt()
 
                     if (write == 0) break
