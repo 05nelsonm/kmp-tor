@@ -24,6 +24,11 @@ import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
 import io.matthewnelson.kmp.tor.core.resource.OSInfo
 import io.matthewnelson.kmp.tor.runtime.core.Disposable
 import io.matthewnelson.kmp.tor.runtime.core.address.ProxyAddress
+import io.matthewnelson.kmp.tor.runtime.ctrl.TorCtrl
+import kotlinx.coroutines.CloseableCoroutineDispatcher
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.asCoroutineDispatcher
+import kotlinx.coroutines.newFixedThreadPoolContext
 import java.io.InputStream
 import java.io.OutputStream
 import java.lang.reflect.Constructor
@@ -37,7 +42,21 @@ import java.nio.channels.Channels
 import java.nio.channels.ReadableByteChannel
 import java.nio.channels.SocketChannel
 import java.nio.channels.WritableByteChannel
+import java.util.concurrent.Executors
+import java.util.concurrent.atomic.AtomicInteger
 import kotlin.concurrent.Volatile
+
+@OptIn(ExperimentalCoroutinesApi::class)
+internal actual fun TorCtrl.Factory.newTorCtrlDispatcher(): CloseableCoroutineDispatcher {
+    val threadNo = AtomicInteger()
+    val executor = Executors.newFixedThreadPool(2) { runnable ->
+        val t = Thread(runnable, "TorCtrl-${threadNo.incrementAndGet()}")
+        t.isDaemon = true
+        t.priority = Thread.MAX_PRIORITY
+        t
+    }
+    return executor.asCoroutineDispatcher()
+}
 
 @Throws(Throwable::class)
 internal actual fun ProxyAddress.connect(): CtrlConnection {

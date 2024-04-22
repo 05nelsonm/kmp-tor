@@ -21,8 +21,17 @@ import io.matthewnelson.kmp.file.IOException
 import io.matthewnelson.kmp.file.errnoToIOException
 import io.matthewnelson.kmp.tor.runtime.core.address.IPAddress
 import io.matthewnelson.kmp.tor.runtime.core.address.ProxyAddress
+import io.matthewnelson.kmp.tor.runtime.ctrl.TorCtrl
 import kotlinx.cinterop.*
+import kotlinx.coroutines.CloseableCoroutineDispatcher
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.newFixedThreadPoolContext
 import platform.posix.*
+
+@OptIn(ExperimentalCoroutinesApi::class)
+internal actual fun TorCtrl.Factory.newTorCtrlDispatcher(): CloseableCoroutineDispatcher {
+    return newFixedThreadPoolContext(2, "TorCtrl")
+}
 
 @Throws(Throwable::class)
 @OptIn(ExperimentalForeignApi::class, UnsafeNumber::class)
