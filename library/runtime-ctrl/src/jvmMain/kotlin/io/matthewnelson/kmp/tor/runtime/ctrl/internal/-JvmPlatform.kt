@@ -43,7 +43,7 @@ import kotlin.concurrent.Volatile
 internal actual fun ProxyAddress.connect(): CtrlConnection {
     val socket = Socket(Proxy.NO_PROXY)
 
-    try {
+    val (input, output) = try {
         // Android may throw exception here if
         // not called from bg thread b/c of
         // InetAddress resolution
@@ -53,6 +53,11 @@ internal actual fun ProxyAddress.connect(): CtrlConnection {
         )
 
         socket.connect(address)
+
+        val i = socket.getInputStream()
+        val o = socket.getOutputStream()
+
+        i to o
     } catch (t: Throwable) {
         try {
             socket.close()
@@ -63,16 +68,18 @@ internal actual fun ProxyAddress.connect(): CtrlConnection {
         throw t
     }
 
-    val input = socket.getInputStream()
-    val output = socket.getOutputStream()
-
-    return Disposable {
-        socket.close()
-    }.toCtrlConnection(input, output)
+    return Disposable(socket::close).toCtrlConnection(input, output)
 }
 
 @Throws(Throwable::class)
-internal actual fun File.connect(): CtrlConnection = with(UnixSocketReflect) { connect() }
+internal actual fun File.connect(): CtrlConnection = with(UnixSocketReflect) {
+    @OptIn(InternalKmpTorApi::class)
+    if (OSInfo.INSTANCE.isAndroidRuntime()) {
+        connectAndroid()
+    } else {
+        connectJvm()
+    }
+}
 
 // Need to wrap close in Disposable b/c LocalSocket does
 // not implement Closeable on Android API 16 and below.
@@ -91,8 +98,8 @@ private fun Disposable.toCtrlConnection(
     @OptIn(InternalProcessApi::class)
     override suspend fun startRead(parser: CtrlConnection.Parser) {
         synchronized(this) {
-            if (_isClosed) throw IllegalStateException("Connection is closed")
-            if (_isReading) throw IllegalStateException("Already reading input")
+            check(!_isClosed) { "Connection is closed" }
+            check(!_isReading) { "Already reading input" }
             _isReading = true
         }
 
@@ -137,22 +144,17 @@ private fun Disposable.toCtrlConnection(
 private object UnixSocketReflect {
 
     @Throws(Throwable::class)
-    fun File.connect(): CtrlConnection {
-        @OptIn(InternalKmpTorApi::class)
-        return if (OSInfo.INSTANCE.isAndroidRuntime()) {
-            connectAndroid()
-        } else {
-            connectJvm()
-        }
-    }
-
-    @Throws(Throwable::class)
-    private fun File.connectAndroid(): CtrlConnection {
+    fun File.connectAndroid(): CtrlConnection {
         val address = A_CONSTRUCTOR_ADDRESS.newInstance(path, A_NAMESPACE_FILESYSTEM)
         val socket = A_CONSTRUCTOR_SOCKET.newInstance()
 
-        try {
+        val (input, output) = try {
             A_METHOD_CONNECT.invoke(socket, address)
+
+            val i = A_METHOD_INPUT_STREAM.invoke(socket) as InputStream
+            val o = A_METHOD_OUTPUT_STREAM.invoke(socket) as OutputStream
+
+            i to o
         } catch (t: Throwable) {
             try {
                 A_METHOD_CLOSE.invoke(socket)
@@ -162,9 +164,6 @@ private object UnixSocketReflect {
 
             throw t
         }
-
-        val input = A_METHOD_INPUT_STREAM.invoke(socket) as InputStream
-        val output = A_METHOD_OUTPUT_STREAM.invoke(socket) as OutputStream
 
         return Disposable {
             try {
@@ -222,16 +221,26 @@ private object UnixSocketReflect {
     }
 
     @Throws(Throwable::class)
-    private fun File.connectJvm(): CtrlConnection {
+    fun File.connectJvm(): CtrlConnection {
         val address = J_METHOD_ADDRESS_OF.invoke(null, path) as SocketAddress
-
         val channel = NonSelectableByteChannel.open(address)
-        val input = Channels.newInputStream(channel)
-        val output = Channels.newOutputStream(channel)
 
-        return Disposable {
-            channel.close()
-        }.toCtrlConnection(input, output)
+        val (input, output) = try {
+            val i = Channels.newInputStream(channel)
+            val o = Channels.newOutputStream(channel)
+
+            i to o
+        } catch (t: Throwable) {
+            try {
+                channel.close()
+            } catch (tt: Throwable) {
+                t.addSuppressed(tt)
+            }
+
+            throw t
+        }
+
+        return Disposable(channel::close).toCtrlConnection(input, output)
     }
 
     private val J_METHOD_ADDRESS_OF: Method by lazy {

@@ -198,6 +198,7 @@ public actual interface TorCtrl : Destroyable, TorEvent.Processor, TorCmd.Privil
                 callsInPlace(connect, InvocationKind.EXACTLY_ONCE)
             }
 
+            // TODO: CloseableCoroutineDispatcher ???
             val dispatcher = Dispatchers.IO
 
             val connection = try {

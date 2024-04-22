@@ -214,8 +214,8 @@ public actual interface TorCtrl : Destroyable, TorEvent.Processor, TorCmd.Privil
             val connection = object : CtrlConnection {
                 // @Throws(CancellationException::class, IllegalStateException::class)
                 override suspend fun startRead(parser: CtrlConnection.Parser) {
-                    if (socket.destroyed) throw IllegalStateException("Socket is destroyed")
-                    if (connParser != null) throw IllegalStateException("Already reading input")
+                    check(!socket.destroyed) { "Socket is destroyed" }
+                    check(connParser == null) { "Already reading input" }
 
                     val latch = Job(currentCoroutineContext().job)
                     connParser = Pair(parser, latch)
