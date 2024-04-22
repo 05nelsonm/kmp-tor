@@ -19,6 +19,7 @@ import io.matthewnelson.kmp.file.IOException
 import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
 import io.matthewnelson.kmp.tor.core.resource.SynchronizedObject
 import io.matthewnelson.kmp.tor.core.resource.synchronized
+import io.matthewnelson.kmp.tor.runtime.core.Disposable
 import io.matthewnelson.kmp.tor.runtime.core.TorEvent
 import io.matthewnelson.kmp.tor.runtime.core.UncaughtException.Handler.Companion.tryCatch
 import io.matthewnelson.kmp.tor.runtime.core.UncaughtException.Handler.Companion.withSuppression
@@ -35,6 +36,7 @@ import kotlin.time.Duration.Companion.milliseconds
 internal class RealTorCtrl private constructor(
     factory: TorCtrl.Factory,
     dispatcher: CoroutineDispatcher,
+    private val disposeDispatcher: Disposable,
     private val connection: CtrlConnection,
 ): AbstractTorCtrl(
     factory.staticTag,
@@ -142,6 +144,7 @@ internal class RealTorCtrl private constructor(
             }
         } finally {
             (handler.delegate as CloseableExceptionHandler).close()
+            disposeDispatcher.invoke()
         }
 
         return true
@@ -276,10 +279,12 @@ internal class RealTorCtrl private constructor(
         internal fun of(
             factory: TorCtrl.Factory,
             dispatcher: CoroutineDispatcher,
+            disposeDispatcher: Disposable,
             connection: CtrlConnection,
         ): RealTorCtrl = RealTorCtrl(
             factory,
             dispatcher,
+            disposeDispatcher,
             connection,
         )
     }

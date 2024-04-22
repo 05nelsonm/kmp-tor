@@ -17,6 +17,12 @@ package io.matthewnelson.kmp.tor.runtime.ctrl.internal
 
 import io.matthewnelson.kmp.file.File
 import io.matthewnelson.kmp.tor.runtime.core.address.ProxyAddress
+import io.matthewnelson.kmp.tor.runtime.ctrl.TorCtrl
+import kotlinx.coroutines.CloseableCoroutineDispatcher
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+
+@OptIn(ExperimentalCoroutinesApi::class)
+internal expect fun TorCtrl.Factory.newTorCtrlDispatcher(): CloseableCoroutineDispatcher
 
 @Throws(Throwable::class)
 internal expect fun ProxyAddress.connect(): CtrlConnection

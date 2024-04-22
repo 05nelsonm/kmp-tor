@@ -271,7 +271,7 @@ public actual interface TorCtrl : Destroyable, TorEvent.Processor, TorCmd.Privil
                 override fun close() { socket.destroy() }
             }
 
-            val ctrl = RealTorCtrl.of(this, Dispatchers.Main, connection)
+            val ctrl = RealTorCtrl.of(this, Dispatchers.Main, Disposable.NOOP, connection)
 
             try {
                 // A slight delay is needed before returning in order

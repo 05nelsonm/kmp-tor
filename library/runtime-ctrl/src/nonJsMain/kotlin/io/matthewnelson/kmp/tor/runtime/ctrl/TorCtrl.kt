@@ -27,6 +27,7 @@ import io.matthewnelson.kmp.tor.runtime.core.*
 import io.matthewnelson.kmp.tor.runtime.core.UncaughtException.Handler.Companion.requireInstanceIsNotSuppressed
 import io.matthewnelson.kmp.tor.runtime.core.address.ProxyAddress
 import io.matthewnelson.kmp.tor.runtime.core.ctrl.TorCmd
+import io.matthewnelson.kmp.tor.runtime.ctrl.internal.*
 import io.matthewnelson.kmp.tor.runtime.ctrl.internal.CtrlConnection
 import io.matthewnelson.kmp.tor.runtime.ctrl.internal.RealTorCtrl
 import io.matthewnelson.kmp.tor.runtime.ctrl.internal.checkUnixSockedSupport
@@ -190,7 +191,7 @@ public actual interface TorCtrl : Destroyable, TorEvent.Processor, TorCmd.Privil
 
         @Throws(IOException::class)
         @Suppress("NOTHING_TO_INLINE")
-        @OptIn(ExperimentalContracts::class)
+        @OptIn(ExperimentalContracts::class, ExperimentalCoroutinesApi::class)
         private inline fun connect(
             connect: (context: CoroutineContext) -> CtrlConnection,
         ): TorCtrl {
@@ -198,16 +199,17 @@ public actual interface TorCtrl : Destroyable, TorEvent.Processor, TorCmd.Privil
                 callsInPlace(connect, InvocationKind.EXACTLY_ONCE)
             }
 
-            // TODO: CloseableCoroutineDispatcher ???
-            val dispatcher = Dispatchers.IO
+            val dispatcher = newTorCtrlDispatcher()
 
             val connection = try {
                 connect(dispatcher)
             } catch (t: Throwable) {
+                dispatcher.close()
+                if (t is CancellationException) throw t
                 throw t.wrapIOException()
             }
 
-            return RealTorCtrl.of(this, dispatcher, connection)
+            return RealTorCtrl.of(this, dispatcher, Disposable(dispatcher::close), connection)
         }
 
         /**
