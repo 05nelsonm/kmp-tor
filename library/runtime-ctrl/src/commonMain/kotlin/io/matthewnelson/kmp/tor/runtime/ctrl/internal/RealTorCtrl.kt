@@ -171,10 +171,7 @@ internal class RealTorCtrl private constructor(
             // Ensure there is a minimum of 50ms of runtime before
             // stopping coroutine, thus invoking onCompletion, thus
             // invoking onDestroy
-            val elapsed = start.elapsedNow()
-            if (elapsed < 50.milliseconds) {
-                delay(50.milliseconds - elapsed)
-            }
+            delay(50.milliseconds - start.elapsedNow())
         }.invokeOnCompletion {
             LOG.d { "Stopped Reading" }
             onDestroy()

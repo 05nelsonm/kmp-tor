@@ -29,9 +29,11 @@ import io.matthewnelson.kmp.tor.runtime.TorRuntime.Companion.Builder
 import io.matthewnelson.kmp.tor.runtime.TorRuntime.Environment.Companion.Builder
 import io.matthewnelson.kmp.tor.runtime.core.*
 import io.matthewnelson.kmp.tor.runtime.core.ctrl.TorCmd
+import io.matthewnelson.kmp.tor.runtime.core.util.isAvailableAsync
 import io.matthewnelson.kmp.tor.runtime.internal.InstanceKeeper
 import io.matthewnelson.kmp.tor.runtime.internal.RealTorRuntime
 import io.matthewnelson.kmp.tor.runtime.internal.RealTorRuntime.Companion.checkInstance
+import io.matthewnelson.kmp.tor.runtime.internal.TorConfigGenerator
 import kotlinx.coroutines.Job
 import org.kotlincrypto.SecRandomCopyException
 import org.kotlincrypto.SecureRandom
@@ -55,6 +57,9 @@ public interface TorRuntime:
     RuntimeEvent.Processor
 {
 
+    /**
+     * Returns the current [Environment] for this [TorRuntime] instance.
+     * */
     public fun environment(): Environment
 
     public companion object {
@@ -95,8 +100,13 @@ public interface TorRuntime:
         public var omitGeoIPFileSettings: Boolean = false
 
         /**
-         * This setting is ignored if utilizing the `kmp-tor-mobile` dependency
-         * as it has its own implementation which will be utilized.
+         * Configure a [NetworkObserver] for this [TorRuntime] instance.
+         *
+         * **NOTE:** This should be a singleton with **no** contextual or
+         * non-singleton references (such as Android Activity Context).
+         *
+         * **NOTE:** If utilizing the `kmp-tor-mobile` dependency, its
+         * own observer implementation will be favored over this setting.
          * */
         @JvmField
         public var networkObserver: NetworkObserver = NetworkObserver.NOOP
@@ -219,28 +229,28 @@ public interface TorRuntime:
             @JvmSynthetic
             internal fun build(
                 environment: Environment,
-                block: ThisBlock<Builder>?,
+                block: ThisBlock<Builder>,
             ): TorRuntime {
-                val b = Builder(environment)
-                // Apply block outside getOrCreateInstance call to
-                // prevent double instance creation
-                if (block != null) b.apply(block)
+                val b = Builder(environment).apply(block)
 
-                return getOrCreateInstance(environment.id) {
+                return getOrCreateInstance(key = environment.id, block = {
 
-                    // TODO: Use TorConfigGenerator.of
-
-                    RealTorRuntime.of(
+                    val generator = TorConfigGenerator(
                         environment = environment,
-                        networkObserver = b.networkObserver,
                         omitGeoIPFileSettings = b.omitGeoIPFileSettings,
                         config = b.config.toImmutableSet(),
+                        isPortAvailable = { host, port -> port.isAvailableAsync(host) },
+                    )
+
+                    RealTorRuntime.of(
+                        generator = generator,
+                        networkObserver = b.networkObserver,
                         requiredTorEvents = b.requiredTorEvents.toImmutableSet(),
                         staticTorEventObservers = b.staticTorEventObservers.toImmutableSet(),
                         defaultExecutor = b.defaultEventExecutor,
                         staticRuntimeEventObservers = b.staticRuntimeEventObservers.toImmutableSet(),
                     )
-                }
+                })
             }
         }
     }
@@ -282,7 +292,8 @@ public interface TorRuntime:
         public var debug: Boolean = false
 
         /**
-         * SHA-256 hash of the [workDir] path.
+         * The SHA-256 hash of the [workDir] path, providing a unique identity
+         * for this [Environment], specific to the local filesystem.
          * */
         @get:JvmName("id")
         public val id: String by lazy {
@@ -316,6 +327,7 @@ public interface TorRuntime:
              * @param [cacheDir] tor's cache directory (e.g. `$HOME/.my_application/cache/torservice`)
              * @param [installer] lambda for creating [ResourceInstaller] using
              *   the default [Builder.installationDir]
+             * @see [io.matthewnelson.kmp.tor.runtime.mobile.createTorRuntimeEnvironment]
              * */
             @JvmStatic
             public fun Builder(
@@ -395,7 +407,7 @@ public interface TorRuntime:
                     if (block != null) b.apply(block)
                     val torResource = installer(b.installationDir.absoluteFile.normalize())
 
-                    return getOrCreateInstance(key = b.workDir) {
+                    return getOrCreateInstance(key = b.workDir, block = {
                         Environment(
                             workDir = b.workDir,
                             cacheDir = b.cacheDir,
@@ -403,7 +415,7 @@ public interface TorRuntime:
                             torrcDefaultsFile = b.torrcDefaultsFile.absoluteFile.normalize(),
                             torResource = torResource,
                         )
-                    }
+                    })
                 }
             }
         }
@@ -429,6 +441,7 @@ public interface TorRuntime:
 
         public fun create(
             lifecycleHook: Job,
+            requiredEvents: Set<TorEvent>,
             observer: NetworkObserver?,
         ): TorRuntime
 

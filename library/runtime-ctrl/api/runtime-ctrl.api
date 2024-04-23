@@ -33,7 +33,7 @@ protected final class io/matthewnelson/kmp/tor/runtime/ctrl/AbstractTorEventProc
 	public static final field Key Lio/matthewnelson/kmp/tor/runtime/ctrl/AbstractTorEventProcessor$ObserverContext$Key;
 	public final field context Ljava/lang/String;
 	public fun <init> (Ljava/lang/String;)V
-	public final fun toString ()Ljava/lang/String;
+	public fun toString ()Ljava/lang/String;
 }
 
 public final class io/matthewnelson/kmp/tor/runtime/ctrl/AbstractTorEventProcessor$ObserverContext$Key : kotlin/coroutines/CoroutineContext$Key {

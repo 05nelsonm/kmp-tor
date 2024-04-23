@@ -208,8 +208,7 @@ protected constructor(
         public val context: String,
     ): AbstractCoroutineContextElement(ObserverContext) {
         public companion object Key: CoroutineContext.Key<ObserverContext>
-
-        final override fun toString(): String = context
+        public override fun toString(): String = context
     }
 }
 
