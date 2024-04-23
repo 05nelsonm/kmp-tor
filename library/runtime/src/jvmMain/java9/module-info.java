@@ -10,4 +10,5 @@ module io.matthewnelson.kmp.tor.runtime {
     requires org.kotlincrypto.hash.sha2;
 
     exports io.matthewnelson.kmp.tor.runtime;
+    exports io.matthewnelson.kmp.tor.runtime.util;
 }
