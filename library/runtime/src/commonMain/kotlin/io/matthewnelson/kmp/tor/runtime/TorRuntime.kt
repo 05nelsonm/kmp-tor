@@ -118,7 +118,7 @@ public interface TorRuntime:
         public var defaultEventExecutor: OnEvent.Executor = OnEvent.Executor.Immediate
 
         /**
-         * Configure the [TorConfig] at each startup. Multiple [block] may
+         * Apply settings to the [TorConfig] at each startup. Multiple [block] may
          * be set, each of which will be applied to the [TorConfig.Builder]
          * before starting tor.
          *

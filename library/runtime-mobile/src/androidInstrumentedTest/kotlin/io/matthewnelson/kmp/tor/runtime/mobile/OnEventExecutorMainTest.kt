@@ -15,6 +15,7 @@
  **/
 package io.matthewnelson.kmp.tor.runtime.mobile
 
+import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
 import io.matthewnelson.kmp.tor.runtime.core.OnEvent
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.test.runTest
@@ -27,6 +28,7 @@ class OnEventExecutorMainTest {
     @Test
     fun givenAndroid_whenExecutorMain_thenUsesDispatchersImmediate() = runTest {
         val job = Job()
+        @OptIn(InternalKmpTorApi::class)
         OnEvent.Executor.Main.execute(EmptyCoroutineContext) { job.complete() }
         job.join()
         assertTrue(job.isCompleted)
