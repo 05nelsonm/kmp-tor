@@ -97,8 +97,8 @@ public abstract class NetworkObserver {
     protected fun notify(connectivity: Connectivity) {
         @OptIn(InternalKmpTorApi::class)
         synchronized(lock) {
-            observers.forEach { it(connectivity) }
-        }
+            observers.toSet()
+        }.forEach { it(connectivity) }
     }
 
     public enum class Connectivity {

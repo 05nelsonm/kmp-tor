@@ -17,10 +17,13 @@
 
 package io.matthewnelson.kmp.tor.runtime.core.internal
 
+import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
 import io.matthewnelson.kmp.tor.runtime.core.ItBlock
 import io.matthewnelson.kmp.tor.runtime.core.OnEvent
 import kotlin.coroutines.CoroutineContext
 
 internal expect object ExecutorMainInternal: OnEvent.Executor {
+
+    @InternalKmpTorApi
     override fun execute(handler: CoroutineContext, block: ItBlock<Unit>)
 }

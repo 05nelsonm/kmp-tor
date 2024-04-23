@@ -15,6 +15,7 @@
  **/
 package io.matthewnelson.kmp.tor.runtime.core.internal
 
+import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
 import io.matthewnelson.kmp.tor.runtime.core.OnEvent
 import kotlin.coroutines.EmptyCoroutineContext
 import kotlin.test.Test
@@ -25,6 +26,7 @@ class MainExecutorJvmUnitTest {
     @Test
     fun givenExecute_whenNoDispatchersMain_thenThrowsException() {
         assertFailsWith<IllegalStateException> {
+            @OptIn(InternalKmpTorApi::class)
             OnEvent.Executor.Main.execute(EmptyCoroutineContext) {  }
         }
     }

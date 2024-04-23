@@ -17,6 +17,7 @@
 
 package io.matthewnelson.kmp.tor.runtime.core
 
+import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
@@ -314,6 +315,7 @@ public enum class TorEvent {
          *   back to if [executor] was not defined for this observer.
          * */
         public fun notify(handler: CoroutineContext, default: OnEvent.Executor, event: String) {
+            @OptIn(InternalKmpTorApi::class)
             (executor ?: default).execute(handler) { onEvent(event) }
         }
 

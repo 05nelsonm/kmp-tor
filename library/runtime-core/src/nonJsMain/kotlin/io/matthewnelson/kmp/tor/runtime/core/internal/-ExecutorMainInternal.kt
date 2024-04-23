@@ -17,6 +17,7 @@
 
 package io.matthewnelson.kmp.tor.runtime.core.internal
 
+import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
 import io.matthewnelson.kmp.tor.runtime.core.ItBlock
 import io.matthewnelson.kmp.tor.runtime.core.OnEvent
 import kotlinx.coroutines.Dispatchers
@@ -25,10 +26,6 @@ import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
 
 internal actual object ExecutorMainInternal: OnEvent.Executor {
-
-    actual override fun execute(handler: CoroutineContext, block: ItBlock<Unit>) {
-        Main.dispatch(handler, Runnable { block(Unit) })
-    }
 
     private val Main by lazy {
         // Will throw if Missing
@@ -39,5 +36,10 @@ internal actual object ExecutorMainInternal: OnEvent.Executor {
         } catch (_: UnsupportedOperationException) {
             Dispatchers.Main
         }
+    }
+
+    @InternalKmpTorApi
+    actual override fun execute(handler: CoroutineContext, block: ItBlock<Unit>) {
+        Main.dispatch(handler, Runnable { block(Unit) })
     }
 }

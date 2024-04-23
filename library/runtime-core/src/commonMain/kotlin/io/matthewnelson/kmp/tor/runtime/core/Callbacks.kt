@@ -15,6 +15,7 @@
  **/
 package io.matthewnelson.kmp.tor.runtime.core
 
+import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
 import io.matthewnelson.kmp.tor.runtime.core.internal.ExecutorMainInternal
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.MainCoroutineDispatcher
@@ -53,8 +54,8 @@ public typealias OnFailure = ItBlock<Throwable>
  * Implementations of [OnEvent] should not throw exception,
  * be fast, and non-blocking.
  *
- * **NOTE:** If [OnEvent] is being utilized with `TorRuntime`
- * APIs, it will be treated as an [UncaughtException] and dispatched
+ * **NOTE:** If [OnEvent] is being utilized with `TorRuntime` APIs,
+ * exceptions will be treated as an [UncaughtException] and dispatched
  * to [io.matthewnelson.kmp.tor.runtime.RuntimeEvent.ERROR]
  * observers.
  *
@@ -77,11 +78,8 @@ public fun interface OnEvent<in It: Any>: ItBlock<It> {
      * [Executor] was declared when they were created. This means that an
      * [Executor] can be set for default behavior of how events get dispatched
      * based off of the needs of the application, and then be selectively
-     * overridden on a per-observer basis when necessary for that particular
-     * implementation.
-     *
-     * **NOTE:** [execute] should **NOT** be called externally. It is designed
-     * strictly for `kmp-tor` to notify observers with new events.
+     * overridden on a per-observer basis, when necessary, for the needs of
+     * that observer and how it is used and/or implemented.
      *
      * @see [Executor.Main]
      * @see [Executor.Immediate]
@@ -91,10 +89,22 @@ public fun interface OnEvent<in It: Any>: ItBlock<It> {
         /**
          * Execute [block] in desired context.
          *
+         * **NOTE: This is an internal API and should not be called from general
+         * code; it is strictly for `kmp-tor` event observers. Custom implementations
+         * of [Executor] should be for usage with `kmp-tor` only**
+         *
+         * The [UncaughtException.Handler] can be retrieved through use of keys
+         * and casting, if needed.
+         *
+         * e.g.
+         *
+         *     handler[CoroutineExceptionHandler] as? UncaughtException.Handler
+         *
          * @param [handler] The [UncaughtException.Handler] wrapped as
          *   [CoroutineContext] element to pipe exceptions.
          * @param [block] to be invoked in desired context.
          * */
+        @InternalKmpTorApi
         public fun execute(handler: CoroutineContext, block: ItBlock<Unit>)
 
         /**
@@ -120,11 +130,16 @@ public fun interface OnEvent<in It: Any>: ItBlock<It> {
          * Invokes block immediately on whatever thread [execute] has been called
          * from.
          *
+         * **NOTE:** [execute] does not form an event loop and may result in a
+         * StackOverflowError. It should not be called from general code.
+         *
          * Observers utilizing [Immediate] must have a thread-safe implementation
          * of [OnEvent] callbacks whenever referencing things outside the
          * confines of its lambda.
          * */
         public object Immediate: Executor {
+
+            @InternalKmpTorApi
             override fun execute(handler: CoroutineContext, block: ItBlock<Unit>) { block(Unit) }
 
             override fun toString(): String = "OnEvent.Executor.Immediate"
@@ -134,7 +149,7 @@ public fun interface OnEvent<in It: Any>: ItBlock<It> {
 
 /**
  * A callback to return to callers to "undo", or
- * "dispose" something.
+ * "dispose" of something.
  * */
 public fun interface Disposable {
     public operator fun invoke()

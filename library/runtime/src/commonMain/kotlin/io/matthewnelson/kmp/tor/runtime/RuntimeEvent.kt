@@ -205,6 +205,7 @@ public sealed class RuntimeEvent<R: Any> private constructor(
          *   back to if [executor] was not defined for this observer.
          * */
         public fun notify(handler: CoroutineContext, default: OnEvent.Executor, event: R) {
+            @OptIn(InternalKmpTorApi::class)
             (executor ?: default).execute(handler) { onEvent(event) }
         }
 
