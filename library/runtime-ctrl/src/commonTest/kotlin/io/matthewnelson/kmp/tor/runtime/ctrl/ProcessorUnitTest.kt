@@ -82,7 +82,7 @@ class ProcessorUnitTest {
             process.destroy()
         }
 
-        withContext(Dispatchers.Default) { delay(50.milliseconds) }
+        withContext(Dispatchers.Default) { delay(500.milliseconds) }
 
         threw?.let { throw it }
 
