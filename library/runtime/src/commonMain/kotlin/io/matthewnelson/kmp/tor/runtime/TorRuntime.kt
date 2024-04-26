@@ -34,7 +34,6 @@ import io.matthewnelson.kmp.tor.runtime.internal.InstanceKeeper
 import io.matthewnelson.kmp.tor.runtime.internal.RealTorRuntime
 import io.matthewnelson.kmp.tor.runtime.internal.RealTorRuntime.Companion.checkInstance
 import io.matthewnelson.kmp.tor.runtime.internal.TorConfigGenerator
-import kotlinx.coroutines.Job
 import org.kotlincrypto.SecRandomCopyException
 import org.kotlincrypto.SecureRandom
 import org.kotlincrypto.hash.sha2.SHA256
@@ -85,8 +84,8 @@ public interface TorRuntime:
 
         private val config = mutableSetOf<ConfigBuilderCallback>()
         private val requiredTorEvents = mutableSetOf(TorEvent.CONF_CHANGED, TorEvent.NOTICE)
-        private val staticTorEventObservers = mutableSetOf<TorEvent.Observer>()
-        private val staticRuntimeEventObservers = mutableSetOf<RuntimeEvent.Observer<*>>()
+        private val observersTorEvent = mutableSetOf<TorEvent.Observer>()
+        private val observersRuntimeEvent = mutableSetOf<RuntimeEvent.Observer<*>>()
 
         /**
          * If true, [Paths.Tor.geoip] and [Paths.Tor.geoip6] will **not** be
@@ -171,15 +170,17 @@ public interface TorRuntime:
         }
 
         /**
-         * Add [TorEvent.Observer] which will never be removed from [TorRuntime].
+         * Add [TorEvent.Observer] which is non-static (can be removed at any time).
          *
-         * Useful for logging purposes.
+         * @see [observerStatic]
          * */
         @KmpTorDsl
-        public fun staticObserver(
-            event: TorEvent,
-            onEvent: OnEvent<String>,
-        ): Builder = staticObserver(event, null, onEvent)
+        public fun observer(
+            observer: TorEvent.Observer,
+        ): Builder {
+            observersTorEvent.add(observer)
+            return this
+        }
 
         /**
          * Add [TorEvent.Observer] which will never be removed from [TorRuntime].
@@ -187,13 +188,33 @@ public interface TorRuntime:
          * Useful for logging purposes.
          * */
         @KmpTorDsl
-        public fun staticObserver(
+        public fun observerStatic(
+            event: TorEvent,
+            onEvent: OnEvent<String>,
+        ): Builder = observerStatic(event, null, onEvent)
+
+        /**
+         * Add [TorEvent.Observer] which will never be removed from [TorRuntime].
+         *
+         * Useful for logging purposes.
+         * */
+        @KmpTorDsl
+        public fun observerStatic(
             event: TorEvent,
             executor: OnEvent.Executor?,
             onEvent: OnEvent<String>,
+        ): Builder = observer(TorEvent.Observer(event, environment.staticTag, executor, onEvent))
+
+        /**
+         * Add [RuntimeEvent.Observer] which is non-static (can be removed at any time).
+         *
+         * @see [observerStatic]
+         * */
+        @KmpTorDsl
+        public fun <R: Any> observer(
+            observer: RuntimeEvent.Observer<R>,
         ): Builder {
-            val observer = TorEvent.Observer(event, environment.staticObserverTag, executor, onEvent)
-            staticTorEventObservers.add(observer)
+            observersRuntimeEvent.add(observer)
             return this
         }
 
@@ -203,10 +224,10 @@ public interface TorRuntime:
          * Useful for logging purposes.
          * */
         @KmpTorDsl
-        public fun <R: Any> staticObserver(
+        public fun <R: Any> observerStatic(
             event: RuntimeEvent<R>,
             onEvent: OnEvent<R>,
-        ): Builder = staticObserver(event, null, onEvent)
+        ): Builder = observerStatic(event, null, onEvent)
 
         /**
          * Add [RuntimeEvent.Observer] which will never be removed from [TorRuntime].
@@ -214,15 +235,11 @@ public interface TorRuntime:
          * Useful for logging purposes.
          * */
         @KmpTorDsl
-        public fun <R: Any> staticObserver(
+        public fun <R: Any> observerStatic(
             event: RuntimeEvent<R>,
             executor: OnEvent.Executor?,
             onEvent: OnEvent<R>,
-        ): Builder {
-            val observer = RuntimeEvent.Observer(event, environment.staticObserverTag, executor, onEvent)
-            staticRuntimeEventObservers.add(observer)
-            return this
-        }
+        ): Builder = observer(RuntimeEvent.Observer(event, environment.staticTag, executor, onEvent))
 
         internal companion object: InstanceKeeper<String, TorRuntime>() {
 
@@ -246,9 +263,9 @@ public interface TorRuntime:
                         generator = generator,
                         networkObserver = b.networkObserver,
                         requiredTorEvents = b.requiredTorEvents.toImmutableSet(),
-                        staticTorEventObservers = b.staticTorEventObservers.toImmutableSet(),
+                        observersTorEvent = b.observersTorEvent.toImmutableSet(),
                         defaultExecutor = b.defaultEventExecutor,
-                        staticRuntimeEventObservers = b.staticRuntimeEventObservers.toImmutableSet(),
+                        observersRuntimeEvent = b.observersRuntimeEvent.toImmutableSet(),
                     )
                 })
             }
@@ -421,7 +438,7 @@ public interface TorRuntime:
         }
 
         @get:JvmSynthetic
-        internal val staticObserverTag: String by lazy {
+        internal val staticTag: String by lazy {
             try {
                 SecureRandom().nextBytesOf(16)
             } catch (_: SecRandomCopyException) {
@@ -439,8 +456,10 @@ public interface TorRuntime:
 
         public val environment: Environment
 
-        public fun create(
-            lifecycleHook: Job,
+        public fun newLifecycle(): Lifecycle
+
+        public fun newRuntime(
+            lifecycle: Lifecycle,
             requiredEvents: Set<TorEvent>,
             observer: NetworkObserver?,
         ): TorRuntime

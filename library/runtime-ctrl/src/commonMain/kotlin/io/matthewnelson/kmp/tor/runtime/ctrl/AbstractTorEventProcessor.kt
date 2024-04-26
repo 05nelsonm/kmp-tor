@@ -39,14 +39,14 @@ public abstract class AbstractTorEventProcessor
 @InternalKmpTorApi
 protected constructor(
     staticTag: String?,
-    initialObservers: Set<TorEvent.Observer>,
+    observers: Set<TorEvent.Observer>,
     protected val defaultExecutor: OnEvent.Executor
 ): TorEvent.Processor {
 
     @Volatile
     private var _destroyed: Boolean = false
     private val lock = SynchronizedObject()
-    private val observers = LinkedHashSet<TorEvent.Observer>(initialObservers.size + 1, 1.0F)
+    private val observers = LinkedHashSet<TorEvent.Observer>(observers.size + 1, 1.0F)
     private val staticTag: String? = staticTag?.ifBlank { null }
 
     @get:JvmName("destroyed")
@@ -55,7 +55,7 @@ protected constructor(
     protected abstract val handler: HandlerWithContext
 
     init {
-        observers.addAll(initialObservers)
+        this.observers.addAll(observers)
     }
 
     public final override fun subscribe(observer: TorEvent.Observer) {

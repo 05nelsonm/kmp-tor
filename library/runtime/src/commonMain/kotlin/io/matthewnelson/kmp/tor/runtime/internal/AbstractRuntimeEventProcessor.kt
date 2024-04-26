@@ -26,23 +26,23 @@ import io.matthewnelson.kmp.tor.runtime.core.UncaughtException
 import io.matthewnelson.kmp.tor.runtime.core.UncaughtException.Handler.Companion.tryCatch
 
 @OptIn(InternalKmpTorApi::class)
-internal abstract class AbstractRuntimeEventProcessor(
+internal abstract class AbstractRuntimeEventProcessor internal constructor(
     staticTag: String?,
-    initialObservers: Set<RuntimeEvent.Observer<*>>,
+    observersRuntimeEvent: Set<RuntimeEvent.Observer<*>>,
     defaultExecutor: OnEvent.Executor,
-    initialTorEventObservers: Set<TorEvent.Observer>,
-):  AbstractTorEventProcessor(staticTag, initialTorEventObservers, defaultExecutor),
+    observersTorEvent: Set<TorEvent.Observer>,
+):  AbstractTorEventProcessor(staticTag, observersTorEvent, defaultExecutor),
     RuntimeEvent.Processor
 {
 
-    private val observers = LinkedHashSet<RuntimeEvent.Observer<*>>(initialObservers.size + 1, 1.0F)
+    private val observers = LinkedHashSet<RuntimeEvent.Observer<*>>(observersRuntimeEvent.size + 1, 1.0F)
     private val lock = SynchronizedObject()
     protected final override val handler = HandlerWithContext { t -> RuntimeEvent.ERROR.notifyObservers(t) }
     // Used for RuntimeEvent.ERROR ONLY
     private val handlerERROR = HandlerWithContext(UncaughtException.Handler.THROW)
 
     init {
-        observers.addAll(initialObservers)
+        observers.addAll(observersRuntimeEvent)
     }
 
     public final override fun subscribe(observer: RuntimeEvent.Observer<*>) {

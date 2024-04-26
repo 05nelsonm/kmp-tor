@@ -19,6 +19,7 @@ import android.content.Context
 import android.content.Intent
 import androidx.startup.AppInitializer
 import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
+import io.matthewnelson.kmp.tor.runtime.Lifecycle
 import io.matthewnelson.kmp.tor.runtime.RuntimeEvent
 import io.matthewnelson.kmp.tor.runtime.RuntimeAction
 import io.matthewnelson.kmp.tor.runtime.TorRuntime
@@ -51,6 +52,10 @@ internal class TorService internal constructor(): AbstractTorService() {
 
         override fun environment(): TorRuntime.Environment = factory.environment
 
+        init {
+            factory.notify(RuntimeEvent.LIFECYCLE, Lifecycle.Event.OnCreate(this))
+        }
+
         companion object {
 
             @JvmStatic
@@ -67,9 +72,9 @@ internal class TorService internal constructor(): AbstractTorService() {
             }
         }
 
-        override fun unsubscribeAll(tag: String) { factory.unsubscribeAll(tag) }
-        override fun unsubscribeAll(vararg events: RuntimeEvent<*>) { factory.unsubscribeAll(*events) }
-        override fun clearObservers() { factory.clearObservers() }
+        public override fun unsubscribeAll(tag: String) { factory.unsubscribeAll(tag) }
+        public override fun unsubscribeAll(vararg events: RuntimeEvent<*>) { factory.unsubscribeAll(*events) }
+        public override fun clearObservers() { factory.clearObservers() }
     }
 
     internal class Initializer internal constructor(): androidx.startup.Initializer<Initializer.Companion> {

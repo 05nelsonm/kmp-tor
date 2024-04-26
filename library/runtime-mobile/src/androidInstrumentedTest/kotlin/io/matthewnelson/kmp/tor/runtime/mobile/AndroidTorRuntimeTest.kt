@@ -19,6 +19,8 @@ import android.app.Application
 import androidx.test.core.app.ApplicationProvider
 import io.matthewnelson.kmp.tor.core.api.ResourceInstaller
 import io.matthewnelson.kmp.tor.core.api.ResourceInstaller.Paths
+import io.matthewnelson.kmp.tor.runtime.Lifecycle
+import io.matthewnelson.kmp.tor.runtime.RuntimeEvent
 import io.matthewnelson.kmp.tor.runtime.TorRuntime
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -36,8 +38,14 @@ class AndroidTorRuntimeTest {
             }
         }
 
-        val runtime = TorRuntime.Builder(environment) {}
+        val lces = mutableListOf<Lifecycle.Event>()
+        val runtime = TorRuntime.Builder(environment) {
+            observerStatic(RuntimeEvent.LIFECYCLE) { lces.add(it) }
+        }
 
         assertEquals("AndroidTorRuntime", runtime::class.simpleName)
+        val lce = lces.filter { it.clazz == "AndroidTorRuntime" }
+        assertEquals(1, lce.size)
+        assertEquals(Lifecycle.Event.Name.OnCreate, lce.first().name)
     }
 }

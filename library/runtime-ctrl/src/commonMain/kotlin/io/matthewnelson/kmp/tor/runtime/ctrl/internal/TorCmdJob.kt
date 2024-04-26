@@ -46,7 +46,7 @@ internal class TorCmdJob<Success: Any> private constructor(
     internal fun completion(response: Success) {
         onCompletion(response, withLock = {
             val onSuccess = _onSuccess
-            this._onSuccess = null
+            _onSuccess = null
             onSuccess
         })
     }

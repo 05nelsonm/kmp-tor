@@ -19,30 +19,30 @@ import io.matthewnelson.immutable.collections.toImmutableSet
 import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
 import io.matthewnelson.kmp.tor.runtime.*
 import io.matthewnelson.kmp.tor.runtime.core.*
+import io.matthewnelson.kmp.tor.runtime.Lifecycle
 import io.matthewnelson.kmp.tor.runtime.core.ctrl.TorCmd
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.NonCancellable
 import kotlin.jvm.JvmSynthetic
 
 @OptIn(InternalKmpTorApi::class)
 internal class RealTorRuntime private constructor(
     private val generator: TorConfigGenerator,
-    private val lifecycleHook: Job,
     private val networkObserver: NetworkObserver,
     private val requiredTorEvents: Set<TorEvent>,
-    staticTorEventObservers: Set<TorEvent.Observer>,
+    observersTorEvent: Set<TorEvent.Observer>,
     defaultExecutor: OnEvent.Executor,
-    staticRuntimeEventObservers: Set<RuntimeEvent.Observer<*>>,
+    observersRuntimeEvent: Set<RuntimeEvent.Observer<*>>,
 ): AbstractRuntimeEventProcessor(
-    generator.environment.staticObserverTag,
-    staticRuntimeEventObservers,
+    generator.environment.staticTag,
+    observersRuntimeEvent,
     defaultExecutor,
-    staticTorEventObservers,
+    observersTorEvent,
 ), TorRuntime {
 
     protected override val debug: Boolean get() = generator.environment.debug
 
-    public override fun enqueue(
+    public override fun environment(): TorRuntime.Environment = generator.environment
+
+    public final override fun enqueue(
         action: RuntimeAction,
         onFailure: OnFailure,
         onSuccess: OnSuccess<Unit>,
@@ -50,7 +50,8 @@ internal class RealTorRuntime private constructor(
         TODO("Not yet implemented")
     }
 
-    public override fun <Response : Any> enqueue(
+    @Throws(IllegalStateException::class)
+    public final override fun <Response : Any> enqueue(
         cmd: TorCmd.Unprivileged<Response>,
         onFailure: OnFailure,
         onSuccess: OnSuccess<Response>
@@ -58,7 +59,14 @@ internal class RealTorRuntime private constructor(
         TODO("Not yet implemented")
     }
 
-    public override fun environment(): TorRuntime.Environment = generator.environment
+    init {
+        RuntimeEvent.LIFECYCLE.notifyObservers(Lifecycle.Event.OnCreate(this))
+    }
+
+    protected override fun onDestroy(): Boolean {
+        val wasDestroyed = super.onDestroy()
+        return wasDestroyed
+    }
 
     internal companion object {
 
@@ -67,19 +75,19 @@ internal class RealTorRuntime private constructor(
             generator: TorConfigGenerator,
             networkObserver: NetworkObserver,
             requiredTorEvents: Set<TorEvent>,
-            staticTorEventObservers: Set<TorEvent.Observer>,
+            observersTorEvent: Set<TorEvent.Observer>,
             defaultExecutor: OnEvent.Executor,
-            staticRuntimeEventObservers: Set<RuntimeEvent.Observer<*>>,
+            observersRuntimeEvent: Set<RuntimeEvent.Observer<*>>,
         ): TorRuntime {
 
             val runtime = TorRuntime.ServiceFactory.serviceRuntimeOrNull(block = {
-                ServiceFactory(
+                RealServiceFactory(
                     generator,
                     networkObserver,
                     requiredTorEvents,
-                    staticTorEventObservers,
+                    observersTorEvent,
                     defaultExecutor,
-                    staticRuntimeEventObservers,
+                    observersRuntimeEvent,
                 )
             })
 
@@ -87,44 +95,43 @@ internal class RealTorRuntime private constructor(
 
             return RealTorRuntime(
                 generator,
-                NonCancellable,
                 networkObserver,
                 requiredTorEvents,
-                staticTorEventObservers,
+                observersTorEvent,
                 defaultExecutor,
-                staticRuntimeEventObservers,
+                observersRuntimeEvent,
             )
         }
 
         @JvmSynthetic
         @Throws(IllegalStateException::class)
         internal fun TorRuntime.ServiceFactory.checkInstance() {
-            check(this is ServiceFactory) {
+            check(this is RealServiceFactory) {
                 "factory instance must be RealTorRuntime.ServiceFactory"
             }
         }
     }
 
-    private class ServiceFactory(
+    private class RealServiceFactory(
         private val generator: TorConfigGenerator,
         private val builderObserver: NetworkObserver,
         private val builderRequiredEvents: Set<TorEvent>,
-        staticTorEventObservers: Set<TorEvent.Observer>,
+        observersTorEvent: Set<TorEvent.Observer>,
         defaultExecutor: OnEvent.Executor,
-        staticRuntimeEventObservers: Set<RuntimeEvent.Observer<*>>,
+        observersRuntimeEvent: Set<RuntimeEvent.Observer<*>>,
     ): AbstractRuntimeEventProcessor(
-        generator.environment.staticObserverTag,
-        staticRuntimeEventObservers,
+        generator.environment.staticTag,
+        observersRuntimeEvent,
         defaultExecutor,
-        staticTorEventObservers
+        observersTorEvent
     ), TorRuntime.ServiceFactory {
 
         public override val environment: TorRuntime.Environment get() = generator.environment
         protected override val debug: Boolean get() = environment.debug
 
         // Pipe all events to observers registered with Factory
-        private val staticTorEventObservers = buildSet {
-            val static = environment.staticObserverTag
+        private val observersTorEvent = buildSet {
+            val static = environment.staticTag
 
             TorEvent.entries.forEach { event ->
                 val observer = event.observer(static) { event.notifyObservers(it) }
@@ -133,12 +140,13 @@ internal class RealTorRuntime private constructor(
         }.toImmutableSet()
 
         // Pipe all events to observers registered with Factory
-        private val staticRuntimeEventObservers = buildSet {
-            val static = environment.staticObserverTag
+        private val observersRuntimeEvent = buildSet {
+            val static = environment.staticTag
 
             RuntimeEvent.entries.forEach { event ->
                 val observer = when (event) {
                     is RuntimeEvent.ERROR -> event.observer(static) { event.notifyObservers(it) }
+                    is RuntimeEvent.LIFECYCLE -> event.observer(static) { event.notifyObservers(it) }
                     is RuntimeEvent.LOG -> event.observer(static) { event.notifyObservers(it) }
                 }
                 add(observer)
@@ -147,21 +155,31 @@ internal class RealTorRuntime private constructor(
 
         public override fun <R : Any> notify(event: RuntimeEvent<R>, output: R) { event.notifyObservers(output) }
 
-        public override fun create(
-            lifecycleHook: Job,
+        public override fun newLifecycle(): Lifecycle = Lifecycle.of(handler)
+
+        public override fun newRuntime(
+            lifecycle: Lifecycle,
             requiredEvents: Set<TorEvent>,
             observer: NetworkObserver?,
         ): TorRuntime = RealTorRuntime(
             generator,
-            lifecycleHook,
             observer ?: builderObserver,
             (builderRequiredEvents + requiredEvents).toImmutableSet(),
-            staticTorEventObservers,
+            observersTorEvent,
 
             // Want to utilize Immediate here as all events will be
             // piped to the observers registered to the ServiceFactory.
             OnEvent.Executor.Immediate,
-            staticRuntimeEventObservers,
-        )
+            observersRuntimeEvent,
+        ).also { runtime ->
+            lifecycle.invokeOnCompletion {
+                runtime.onDestroy()
+                RuntimeEvent.LIFECYCLE.notifyObservers(Lifecycle.Event.OnDestroy(runtime))
+            }
+        }
+
+        init {
+            RuntimeEvent.LIFECYCLE.notifyObservers(Lifecycle.Event.OnCreate(this))
+        }
     }
 }
