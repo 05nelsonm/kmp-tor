@@ -42,7 +42,10 @@ class PortUtilJsUnitTest: PortUtilBaseTest() {
         server.listen(options) {}
         withContext(Dispatchers.Default) { delay(10.milliseconds) }
         return object : AutoCloseable {
-            override fun close() { server.close() }
+            override fun close() {
+                server.close()
+                server.unref()
+            }
         }
     }
 }

@@ -91,9 +91,12 @@ private suspend fun IPAddress.isPortAvailableOrNull(
     var isAvailable: Boolean? = null
 
     try {
-        val server = net_createServer { it.destroy(); Unit }
+        val server = net_createServer { it.destroy(); it.unref();  Unit }
 
-        latch.invokeOnCompletion { server.close() }
+        latch.invokeOnCompletion {
+            server.close()
+            server.unref()
+        }
 
         server.onError {
             isAvailable = false

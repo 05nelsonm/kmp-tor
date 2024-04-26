@@ -271,7 +271,7 @@ public actual interface TorCtrl : Destroyable, TorEvent.Processor, TorCmd.Privil
                 }
 
                 // @Throws(IOException::class)
-                override fun close() { socket.destroy() }
+                override fun close() { socket.destroy(); socket.unref() }
             }
 
             val ctrl = RealTorCtrl.of(this, Dispatchers.Main, Disposable.NOOP, connection)

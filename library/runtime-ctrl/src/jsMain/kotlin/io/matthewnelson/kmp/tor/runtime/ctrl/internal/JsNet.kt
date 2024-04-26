@@ -43,4 +43,5 @@ internal external class net_Socket: events_EventEmitter {
 
     internal fun destroy()
     internal val destroyed: Boolean
+    internal fun unref(): net_Socket
 }
