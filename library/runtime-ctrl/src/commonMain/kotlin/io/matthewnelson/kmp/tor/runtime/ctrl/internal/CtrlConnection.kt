@@ -22,6 +22,8 @@ import kotlin.coroutines.cancellation.CancellationException
 
 internal interface CtrlConnection {
 
+    val isReading: Boolean
+
     @Throws(CancellationException::class, IllegalStateException::class)
     suspend fun startRead(parser: Parser)
 

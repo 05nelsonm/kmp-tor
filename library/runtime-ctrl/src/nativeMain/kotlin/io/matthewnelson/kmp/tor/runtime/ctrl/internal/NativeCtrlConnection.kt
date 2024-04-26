@@ -40,6 +40,8 @@ internal class NativeCtrlConnection internal constructor(
     private var _isReading: Boolean = false
     private val lock = SynchronizedObject()
 
+    override val isReading: Boolean get() = _isReading
+
     @OptIn(InternalProcessApi::class)
     @Throws(CancellationException::class, IllegalStateException::class)
     override suspend fun startRead(parser: CtrlConnection.Parser) {
@@ -52,6 +54,7 @@ internal class NativeCtrlConnection internal constructor(
         val feed = ReadBuffer.lineOutputFeed(parser::parse)
         val buf = ReadBuffer.allocate()
 
+        var interrupted = 0
         while (true) {
             val read = buf.buf.usePinned { pinned ->
                 read(
@@ -61,8 +64,10 @@ internal class NativeCtrlConnection internal constructor(
                 ).toInt()
             }
 
+            if (read == -1 && errno == EINTR && !_isClosed && interrupted++ < 3) continue
             if (read <= 0) break
 
+            interrupted = 0
             feed.onData(buf, read)
         }
 
@@ -80,6 +85,7 @@ internal class NativeCtrlConnection internal constructor(
 
             command.usePinned { pinned ->
                 var written = 0
+                var interrupted = 0
                 while (written < command.size) {
                     val write = write(
                         descriptor,
@@ -89,6 +95,8 @@ internal class NativeCtrlConnection internal constructor(
 
                     if (write == 0) break
                     if (write == -1) {
+                        val errno = errno
+                        if (errno == EINTR && interrupted++ < 3) continue
                         throw errnoToIOException(errno)
                     }
 

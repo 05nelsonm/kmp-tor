@@ -18,6 +18,7 @@ package io.matthewnelson.kmp.tor.runtime
 import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
 import io.matthewnelson.kmp.tor.core.resource.SynchronizedObject
 import io.matthewnelson.kmp.tor.core.resource.synchronized
+import io.matthewnelson.kmp.tor.runtime.core.OnEvent
 import io.matthewnelson.kmp.tor.runtime.core.TorConfig
 import kotlin.jvm.JvmField
 import kotlin.jvm.JvmSynthetic
@@ -37,14 +38,10 @@ public abstract class NetworkObserver {
 
     @OptIn(InternalKmpTorApi::class)
     private val lock = SynchronizedObject()
-    private val observers = LinkedHashSet<Observer>(1, 1.0F)
-
-    internal fun interface Observer {
-        operator fun invoke(connectivity: Connectivity)
-    }
+    private val observers = LinkedHashSet<OnEvent<Connectivity>>(1, 1.0F)
 
     @JvmSynthetic
-    internal open fun subscribe(observer: Observer) {
+    internal open fun subscribe(observer: OnEvent<Connectivity>) {
         @OptIn(InternalKmpTorApi::class)
         val initialAttach = synchronized(lock) {
             val wasEmpty = observers.isEmpty()
@@ -59,7 +56,7 @@ public abstract class NetworkObserver {
     }
 
     @JvmSynthetic
-    internal open fun unsubscribe(observer: Observer) {
+    internal open fun unsubscribe(observer: OnEvent<Connectivity>) {
         @OptIn(InternalKmpTorApi::class)
         val lastRemoved = synchronized(lock) {
             observers.remove(observer) && observers.isEmpty()
@@ -113,8 +110,8 @@ public abstract class NetworkObserver {
          * */
         @JvmField
         public val NOOP: NetworkObserver = object : NetworkObserver() {
-            override fun subscribe(observer: Observer) {}
-            override fun unsubscribe(observer: Observer) {}
+            override fun subscribe(observer: OnEvent<Connectivity>) {}
+            override fun unsubscribe(observer: OnEvent<Connectivity>) {}
             override fun isNetworkConnected(): Boolean = true
         }
     }

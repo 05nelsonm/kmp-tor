@@ -89,7 +89,7 @@ public actual interface TorCtrl : Destroyable, TorEvent.Processor, TorCmd.Privil
      * @see [connectAsync]
      * @param [staticTag] Special string that will exclude [TorEvent.Observer]
      *   with the same tag from removal until destroyed.
-     * @param [initialObservers] Some initial observers to start with, static
+     * @param [observers] Some initial observers to start with, static
      *   or not.
      * @param [defaultExecutor] The default [OnEvent.Executor] to fall back to
      *   when calling [TorEvent.Observer.notify] if it does not have its own.
@@ -105,7 +105,7 @@ public actual interface TorCtrl : Destroyable, TorEvent.Processor, TorCmd.Privil
 //    @Throws(IllegalArgumentException::class)
     public actual constructor(
         internal actual val staticTag: String?,
-        internal actual val initialObservers: Set<TorEvent.Observer>,
+        internal actual val observers: Set<TorEvent.Observer>,
         internal actual val defaultExecutor: OnEvent.Executor,
         internal actual val debugger: ItBlock<String>?,
         internal actual val handler: UncaughtException.Handler,
@@ -212,10 +212,13 @@ public actual interface TorCtrl : Destroyable, TorEvent.Processor, TorCmd.Privil
             }
 
             val connection = object : CtrlConnection {
+
+                override val isReading: Boolean get() = connParser != null
+
                 // @Throws(CancellationException::class, IllegalStateException::class)
                 override suspend fun startRead(parser: CtrlConnection.Parser) {
                     check(!socket.destroyed) { "Socket is destroyed" }
-                    check(connParser == null) { "Already reading input" }
+                    check(!isReading) { "Already reading input" }
 
                     val latch = Job(currentCoroutineContext().job)
                     connParser = Pair(parser, latch)
@@ -268,19 +271,20 @@ public actual interface TorCtrl : Destroyable, TorEvent.Processor, TorCmd.Privil
                 }
 
                 // @Throws(IOException::class)
-                override fun close() { socket.destroy() }
+                override fun close() { socket.destroy(); socket.unref() }
             }
 
             val ctrl = RealTorCtrl.of(this, Dispatchers.Main, Disposable.NOOP, connection)
 
-            try {
-                // A slight delay is needed before returning in order
-                // to ensure that the coroutine starts before able
-                // to call destroy on it.
-                delay(42.milliseconds)
-            } catch (t: Throwable) {
-                ctrl.destroy()
-                throw t
+            // A slight delay is needed before returning in order
+            // to ensure that the coroutine starts before able
+            // to call destroy on it.
+            withContext(NonCancellable) {
+                while (!ctrl.isReading) {
+                    delay(5.milliseconds)
+                }
+
+                delay(5.milliseconds)
             }
 
             return ctrl

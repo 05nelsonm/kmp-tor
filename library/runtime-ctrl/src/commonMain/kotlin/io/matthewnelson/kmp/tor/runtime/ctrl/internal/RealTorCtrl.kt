@@ -41,7 +41,7 @@ internal class RealTorCtrl private constructor(
     private val connection: CtrlConnection,
 ): AbstractTorCtrl(
     factory.staticTag,
-    factory.initialObservers,
+    factory.observers,
     factory.defaultExecutor,
     CloseableExceptionHandler(factory.handler),
 ) {
@@ -64,6 +64,11 @@ internal class RealTorCtrl private constructor(
 
     private val waiters = Waiters { LOG }
     private val processor = Processor()
+
+    internal val isReading: Boolean get() {
+        if (isDestroyed()) return true
+        return connection.isReading
+    }
 
     private val parser = object : CtrlConnection.Parser() {
         internal override fun parse(line: String?) {
@@ -171,10 +176,7 @@ internal class RealTorCtrl private constructor(
             // Ensure there is a minimum of 50ms of runtime before
             // stopping coroutine, thus invoking onCompletion, thus
             // invoking onDestroy
-            val elapsed = start.elapsedNow()
-            if (elapsed < 50.milliseconds) {
-                delay(50.milliseconds - elapsed)
-            }
+            delay(50.milliseconds - start.elapsedNow())
         }.invokeOnCompletion {
             LOG.d { "Stopped Reading" }
             onDestroy()

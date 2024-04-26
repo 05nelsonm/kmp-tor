@@ -32,4 +32,5 @@ internal external fun net_createServer(connectionListener: (socket: dynamic) -> 
 internal external class net_Server: events_EventEmitter {
     fun close()
     fun listen(options: dynamic, callback: () -> Unit)
+    fun unref(): net_Server
 }

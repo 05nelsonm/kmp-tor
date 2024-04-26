@@ -51,14 +51,22 @@ class ProcessorUnitTest {
             handler = UncaughtException.Handler.THROW,
         )
         val host = LocalHost.IPv4.resolve()
-        val port = 10055.toPortProxy().findAvailableAsync(1_000, LocalHost.IPv4)
+        val port = 9355.toPortProxy().findAvailableAsync(1_000, LocalHost.IPv4)
         val address = ProxyAddress(host, port)
+
+        withContext(Dispatchers.Default) { delay(350.milliseconds) }
+
         val process = TestUtils.startTor(address.toString())
 
         var threw: Throwable? = null
         var invocationSuccess = 0
         try {
-            val ctrl = factory.connectAsync(address)
+            val ctrl = try {
+                factory.connectAsync(address)
+            } catch (_: Throwable) {
+                withContext(Dispatchers.Default) { delay(350.milliseconds) }
+                factory.connectAsync(address)
+            }
 
             val onFailure = OnFailure { threw = it }
             val onSuccess = OnSuccess<Reply.Success.OK> { synchronized(lock) { invocationSuccess++ } }
@@ -82,7 +90,7 @@ class ProcessorUnitTest {
             process.destroy()
         }
 
-        withContext(Dispatchers.Default) { delay(50.milliseconds) }
+        withContext(Dispatchers.Default) { delay(350.milliseconds) }
 
         threw?.let { throw it }
 

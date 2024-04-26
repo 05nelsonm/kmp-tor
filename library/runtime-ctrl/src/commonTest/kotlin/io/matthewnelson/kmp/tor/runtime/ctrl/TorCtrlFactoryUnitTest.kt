@@ -61,8 +61,6 @@ class TorCtrlFactoryUnitTest {
             .resolve("data")
             .resolve("ctrl.sock")
 
-        uds.delete()
-
         val ctrlArg = try {
             TorConfig.__ControlPort.Builder {
                 asUnixSocket { file = uds }
@@ -73,10 +71,15 @@ class TorCtrlFactoryUnitTest {
         }
 
         val p = TestUtils.startTor(ctrlArg)
+        val factory = TorCtrl.Factory(handler = UncaughtException.Handler.THROW)
 
         val ctrl = try {
-            TorCtrl.Factory(handler = UncaughtException.Handler.THROW)
-                .connectAsync(uds)
+            try {
+                factory.connectAsync(uds)
+            } catch (_: Throwable) {
+                withContext(Dispatchers.Default) { delay(350.milliseconds) }
+                factory.connectAsync(uds)
+            }
         } finally {
             p.destroy()
         }
@@ -108,13 +111,19 @@ class TorCtrlFactoryUnitTest {
 
         val process = TestUtils.startTor(ctrlPortArg = address.toString())
 
-        val ctrl = factory.connectAsync(address)
+        val ctrl = try {
+            factory.connectAsync(address)
+        } catch (_: Throwable) {
+            withContext(Dispatchers.Default) { delay(350.milliseconds) }
+            factory.connectAsync(address)
+        }
+
         var invocationDestroy = 0
         ctrl.invokeOnDestroy { invocationDestroy++ }
 
         block(process, ctrl)
 
-        withContext(Dispatchers.Default) { delay(500.milliseconds) }
+        withContext(Dispatchers.Default) { delay(350.milliseconds) }
 
         assertEquals(1, invocationDestroy)
 

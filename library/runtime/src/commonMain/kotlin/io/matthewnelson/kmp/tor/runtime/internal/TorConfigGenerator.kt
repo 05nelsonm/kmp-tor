@@ -16,6 +16,7 @@
 package io.matthewnelson.kmp.tor.runtime.internal
 
 import io.matthewnelson.kmp.file.IOException
+import io.matthewnelson.kmp.tor.core.api.ResourceInstaller
 import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
 import io.matthewnelson.kmp.tor.runtime.ConfigBuilderCallback
 import io.matthewnelson.kmp.tor.runtime.ConfigBuilderCallback.Companion.putDefaults
@@ -40,20 +41,27 @@ import io.matthewnelson.kmp.tor.runtime.core.builder.ExtendedTorConfigBuilder
  * */
 @OptIn(InternalKmpTorApi::class)
 internal class TorConfigGenerator internal constructor(
-    private val environment: TorRuntime.Environment,
+    internal val environment: TorRuntime.Environment,
     private val omitGeoIPFileSettings: Boolean,
     private val config: Set<ConfigBuilderCallback>,
     private val isPortAvailable: suspend (LocalHost, Port) -> Boolean,
 ) {
 
     @Throws(Exception::class)
-    internal suspend fun generate(n: Notifier): TorConfig = createConfig(n)
-        .validateTCPPorts(n)
-
-    private fun createConfig(n: Notifier): TorConfig = TorConfig.Builder {
+    internal suspend fun generate(
+        n: Notifier,
+    ): Pair<TorConfig, ResourceInstaller.Paths.Tor> {
         n.notify(LOG.DEBUG, "Installing tor resources (if needed)")
         val paths = environment.torResource.install()
 
+        val config = createConfig(paths, n).validateTCPPorts(n)
+        return config to paths
+    }
+
+    private fun createConfig(
+        paths: ResourceInstaller.Paths.Tor,
+        n: Notifier,
+    ): TorConfig = TorConfig.Builder {
         try {
             n.notify(LOG.DEBUG, "Refreshing localhost IP address cache")
             LocalHost.refreshCache()
@@ -65,7 +73,9 @@ internal class TorConfigGenerator internal constructor(
         putDefaults(environment, omitGeoIPFileSettings, paths)
     }
 
-    private suspend fun TorConfig.validateTCPPorts(n: Notifier): TorConfig {
+    private suspend fun TorConfig.validateTCPPorts(
+        n: Notifier,
+    ): TorConfig {
         val ports = filterByAttribute<Keyword.Attribute.Port>().filter { setting ->
             setting[Extra.AllowReassign] == true
         }
@@ -80,9 +90,9 @@ internal class TorConfigGenerator internal constructor(
                         is IPAddress.V6 -> LocalHost.IPv6
                     }
 
-                    Pair(host, pAddress.port)
+                    host to pAddress.port
                 } else {
-                    Pair(LocalHost.IPv4, setting.argument.toPortProxy())
+                    LocalHost.IPv4 to setting.argument.toPortProxy()
                 }
             }
 
@@ -92,7 +102,7 @@ internal class TorConfigGenerator internal constructor(
                 LOG.WARN,
                 "UNAVAILABLE_PORT[${setting.keyword}] ${setting.argument} reassigned to 'auto'"
             )
-            Pair(setting, reassigned)
+            setting to reassigned
         }
 
         if (reassignments.isEmpty()) return this

@@ -112,6 +112,8 @@ private fun Disposable.toCtrlConnection(
     @Volatile
     private var _isReading: Boolean = false
 
+    override val isReading: Boolean get() = _isReading
+
     @Throws(IllegalStateException::class)
     @OptIn(InternalProcessApi::class)
     override suspend fun startRead(parser: CtrlConnection.Parser) {

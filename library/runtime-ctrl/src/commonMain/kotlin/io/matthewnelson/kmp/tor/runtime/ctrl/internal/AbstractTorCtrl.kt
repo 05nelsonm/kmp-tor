@@ -28,10 +28,10 @@ import kotlin.concurrent.Volatile
 @OptIn(InternalKmpTorApi::class)
 internal abstract class AbstractTorCtrl internal constructor(
     staticTag: String?,
-    initialObservers: Set<TorEvent.Observer>,
+    observers: Set<TorEvent.Observer>,
     defaultExecutor: OnEvent.Executor,
     handler: UncaughtException.Handler,
-):  AbstractTorCmdQueue(staticTag, initialObservers, defaultExecutor, handler),
+):  AbstractTorCmdQueue(staticTag, observers, defaultExecutor, handler),
     TorCtrl
 {
 

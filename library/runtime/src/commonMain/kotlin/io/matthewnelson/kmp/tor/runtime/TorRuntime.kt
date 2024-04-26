@@ -29,10 +29,11 @@ import io.matthewnelson.kmp.tor.runtime.TorRuntime.Companion.Builder
 import io.matthewnelson.kmp.tor.runtime.TorRuntime.Environment.Companion.Builder
 import io.matthewnelson.kmp.tor.runtime.core.*
 import io.matthewnelson.kmp.tor.runtime.core.ctrl.TorCmd
+import io.matthewnelson.kmp.tor.runtime.core.util.isAvailableAsync
 import io.matthewnelson.kmp.tor.runtime.internal.InstanceKeeper
 import io.matthewnelson.kmp.tor.runtime.internal.RealTorRuntime
 import io.matthewnelson.kmp.tor.runtime.internal.RealTorRuntime.Companion.checkInstance
-import kotlinx.coroutines.Job
+import io.matthewnelson.kmp.tor.runtime.internal.TorConfigGenerator
 import org.kotlincrypto.SecRandomCopyException
 import org.kotlincrypto.SecureRandom
 import org.kotlincrypto.hash.sha2.SHA256
@@ -55,6 +56,9 @@ public interface TorRuntime:
     RuntimeEvent.Processor
 {
 
+    /**
+     * Returns the current [Environment] for this [TorRuntime] instance.
+     * */
     public fun environment(): Environment
 
     public companion object {
@@ -80,8 +84,8 @@ public interface TorRuntime:
 
         private val config = mutableSetOf<ConfigBuilderCallback>()
         private val requiredTorEvents = mutableSetOf(TorEvent.CONF_CHANGED, TorEvent.NOTICE)
-        private val staticTorEventObservers = mutableSetOf<TorEvent.Observer>()
-        private val staticRuntimeEventObservers = mutableSetOf<RuntimeEvent.Observer<*>>()
+        private val observersTorEvent = mutableSetOf<TorEvent.Observer>()
+        private val observersRuntimeEvent = mutableSetOf<RuntimeEvent.Observer<*>>()
 
         /**
          * If true, [Paths.Tor.geoip] and [Paths.Tor.geoip6] will **not** be
@@ -95,8 +99,13 @@ public interface TorRuntime:
         public var omitGeoIPFileSettings: Boolean = false
 
         /**
-         * This setting is ignored if utilizing the `kmp-tor-mobile` dependency
-         * as it has its own implementation which will be utilized.
+         * Configure a [NetworkObserver] for this [TorRuntime] instance.
+         *
+         * **NOTE:** This should be a singleton with **no** contextual or
+         * non-singleton references (such as Android Activity Context).
+         *
+         * **NOTE:** If utilizing the `kmp-tor-mobile` dependency, its
+         * own observer implementation will be favored over this setting.
          * */
         @JvmField
         public var networkObserver: NetworkObserver = NetworkObserver.NOOP
@@ -161,15 +170,17 @@ public interface TorRuntime:
         }
 
         /**
-         * Add [TorEvent.Observer] which will never be removed from [TorRuntime].
+         * Add [TorEvent.Observer] which is non-static (can be removed at any time).
          *
-         * Useful for logging purposes.
+         * @see [observerStatic]
          * */
         @KmpTorDsl
-        public fun staticObserver(
-            event: TorEvent,
-            onEvent: OnEvent<String>,
-        ): Builder = staticObserver(event, null, onEvent)
+        public fun observer(
+            observer: TorEvent.Observer,
+        ): Builder {
+            observersTorEvent.add(observer)
+            return this
+        }
 
         /**
          * Add [TorEvent.Observer] which will never be removed from [TorRuntime].
@@ -177,13 +188,33 @@ public interface TorRuntime:
          * Useful for logging purposes.
          * */
         @KmpTorDsl
-        public fun staticObserver(
+        public fun observerStatic(
+            event: TorEvent,
+            onEvent: OnEvent<String>,
+        ): Builder = observerStatic(event, null, onEvent)
+
+        /**
+         * Add [TorEvent.Observer] which will never be removed from [TorRuntime].
+         *
+         * Useful for logging purposes.
+         * */
+        @KmpTorDsl
+        public fun observerStatic(
             event: TorEvent,
             executor: OnEvent.Executor?,
             onEvent: OnEvent<String>,
+        ): Builder = observer(TorEvent.Observer(event, environment.staticTag, executor, onEvent))
+
+        /**
+         * Add [RuntimeEvent.Observer] which is non-static (can be removed at any time).
+         *
+         * @see [observerStatic]
+         * */
+        @KmpTorDsl
+        public fun <R: Any> observer(
+            observer: RuntimeEvent.Observer<R>,
         ): Builder {
-            val observer = TorEvent.Observer(event, environment.staticObserverTag, executor, onEvent)
-            staticTorEventObservers.add(observer)
+            observersRuntimeEvent.add(observer)
             return this
         }
 
@@ -193,10 +224,10 @@ public interface TorRuntime:
          * Useful for logging purposes.
          * */
         @KmpTorDsl
-        public fun <R: Any> staticObserver(
+        public fun <R: Any> observerStatic(
             event: RuntimeEvent<R>,
             onEvent: OnEvent<R>,
-        ): Builder = staticObserver(event, null, onEvent)
+        ): Builder = observerStatic(event, null, onEvent)
 
         /**
          * Add [RuntimeEvent.Observer] which will never be removed from [TorRuntime].
@@ -204,43 +235,39 @@ public interface TorRuntime:
          * Useful for logging purposes.
          * */
         @KmpTorDsl
-        public fun <R: Any> staticObserver(
+        public fun <R: Any> observerStatic(
             event: RuntimeEvent<R>,
             executor: OnEvent.Executor?,
             onEvent: OnEvent<R>,
-        ): Builder {
-            val observer = RuntimeEvent.Observer(event, environment.staticObserverTag, executor, onEvent)
-            staticRuntimeEventObservers.add(observer)
-            return this
-        }
+        ): Builder = observer(RuntimeEvent.Observer(event, environment.staticTag, executor, onEvent))
 
         internal companion object: InstanceKeeper<String, TorRuntime>() {
 
             @JvmSynthetic
             internal fun build(
                 environment: Environment,
-                block: ThisBlock<Builder>?,
+                block: ThisBlock<Builder>,
             ): TorRuntime {
-                val b = Builder(environment)
-                // Apply block outside getOrCreateInstance call to
-                // prevent double instance creation
-                if (block != null) b.apply(block)
+                val b = Builder(environment).apply(block)
 
-                return getOrCreateInstance(environment.id) {
+                return getOrCreateInstance(key = environment.id, block = {
 
-                    // TODO: Use TorConfigGenerator.of
-
-                    RealTorRuntime.of(
+                    val generator = TorConfigGenerator(
                         environment = environment,
-                        networkObserver = b.networkObserver,
                         omitGeoIPFileSettings = b.omitGeoIPFileSettings,
                         config = b.config.toImmutableSet(),
-                        requiredTorEvents = b.requiredTorEvents.toImmutableSet(),
-                        staticTorEventObservers = b.staticTorEventObservers.toImmutableSet(),
-                        defaultExecutor = b.defaultEventExecutor,
-                        staticRuntimeEventObservers = b.staticRuntimeEventObservers.toImmutableSet(),
+                        isPortAvailable = { host, port -> port.isAvailableAsync(host) },
                     )
-                }
+
+                    RealTorRuntime.of(
+                        generator = generator,
+                        networkObserver = b.networkObserver,
+                        requiredTorEvents = b.requiredTorEvents.toImmutableSet(),
+                        observersTorEvent = b.observersTorEvent.toImmutableSet(),
+                        defaultExecutor = b.defaultEventExecutor,
+                        observersRuntimeEvent = b.observersRuntimeEvent.toImmutableSet(),
+                    )
+                })
             }
         }
     }
@@ -282,7 +309,8 @@ public interface TorRuntime:
         public var debug: Boolean = false
 
         /**
-         * SHA-256 hash of the [workDir] path.
+         * The SHA-256 hash of the [workDir] path, providing a unique identity
+         * for this [Environment], specific to the local filesystem.
          * */
         @get:JvmName("id")
         public val id: String by lazy {
@@ -316,6 +344,7 @@ public interface TorRuntime:
              * @param [cacheDir] tor's cache directory (e.g. `$HOME/.my_application/cache/torservice`)
              * @param [installer] lambda for creating [ResourceInstaller] using
              *   the default [Builder.installationDir]
+             * @see [io.matthewnelson.kmp.tor.runtime.mobile.createTorRuntimeEnvironment]
              * */
             @JvmStatic
             public fun Builder(
@@ -395,7 +424,7 @@ public interface TorRuntime:
                     if (block != null) b.apply(block)
                     val torResource = installer(b.installationDir.absoluteFile.normalize())
 
-                    return getOrCreateInstance(key = b.workDir) {
+                    return getOrCreateInstance(key = b.workDir, block = {
                         Environment(
                             workDir = b.workDir,
                             cacheDir = b.cacheDir,
@@ -403,13 +432,13 @@ public interface TorRuntime:
                             torrcDefaultsFile = b.torrcDefaultsFile.absoluteFile.normalize(),
                             torResource = torResource,
                         )
-                    }
+                    })
                 }
             }
         }
 
         @get:JvmSynthetic
-        internal val staticObserverTag: String by lazy {
+        internal val staticTag: String by lazy {
             try {
                 SecureRandom().nextBytesOf(16)
             } catch (_: SecRandomCopyException) {
@@ -427,8 +456,11 @@ public interface TorRuntime:
 
         public val environment: Environment
 
-        public fun create(
-            lifecycleHook: Job,
+        public fun newLifecycle(): Lifecycle
+
+        public fun newRuntime(
+            lifecycle: Lifecycle,
+            requiredEvents: Set<TorEvent>,
             observer: NetworkObserver?,
         ): TorRuntime
 

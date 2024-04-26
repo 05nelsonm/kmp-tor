@@ -33,6 +33,9 @@ import kotlin.jvm.JvmStatic
  * @see [Observer]
  * @see [observer]
  * @see [Processor]
+ * @see [entries]
+ * @see [valueOf]
+ * @see [valueOfOrNull]
  * */
 public sealed class RuntimeEvent<R: Any> private constructor(
     @JvmField
@@ -52,10 +55,15 @@ public sealed class RuntimeEvent<R: Any> private constructor(
      * **NOTE:** If the error is an [UncaughtException] and no observers
      * for [ERROR] are registered with [TorRuntime], the [UncaughtException]
      * will be thrown. It is critical that an [ERROR] observer be registered
-     * either via [TorRuntime.Builder.staticObserver], or immediately after
+     * either via [TorRuntime.Builder.observerStatic], or immediately after
      * [TorRuntime] is instantiated via [TorRuntime.subscribe].
      * */
     public data object ERROR: RuntimeEvent<Throwable>("ERROR")
+
+    /**
+     * Events pertaining to an object's lifecycle.
+     * */
+    public data object LIFECYCLE: RuntimeEvent<Lifecycle.Event>("LIFECYCLE")
 
     public sealed class LOG private constructor(name: String): RuntimeEvent<String>(name) {
 
@@ -78,8 +86,6 @@ public sealed class RuntimeEvent<R: Any> private constructor(
          * */
         public data object WARN: LOG("LOG_WARN")
     }
-
-    // TODO: Other events
 
     /**
      * Create an observer for the given [RuntimeEvent]
@@ -310,6 +316,7 @@ public sealed class RuntimeEvent<R: Any> private constructor(
         public val entries: Set<RuntimeEvent<*>> by lazy {
             immutableSetOf(
                 ERROR,
+                LIFECYCLE,
                 LOG.DEBUG,
                 LOG.INFO,
                 LOG.WARN,

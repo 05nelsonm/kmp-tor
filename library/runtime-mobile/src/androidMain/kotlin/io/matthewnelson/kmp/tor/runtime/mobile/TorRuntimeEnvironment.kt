@@ -29,8 +29,8 @@ import io.matthewnelson.kmp.tor.runtime.core.ThisBlock
  * to acquire default tor directory locations within the application's data
  * directory to create [TorRuntime.Environment].
  *
- * workDir: app_torservice
- * cacheDir: cache/torservice
+ * - workDir: app_torservice
+ * - cacheDir: cache/torservice
  * */
 @JvmName("Builder")
 public fun Context.createTorRuntimeEnvironment(
@@ -42,8 +42,8 @@ public fun Context.createTorRuntimeEnvironment(
  * to acquire default tor directory locations within the application's data
  * directory to create [TorRuntime.Environment].
  *
- * workDir: app_torservice
- * cacheDir: cache/torservice
+ * - workDir: app_torservice
+ * - cacheDir: cache/torservice
  * */
 @JvmName("Builder")
 public fun Context.createTorRuntimeEnvironment(
@@ -56,8 +56,8 @@ public fun Context.createTorRuntimeEnvironment(
  * to acquire tor directory locations within the application's data directory
  * for specified [dirName] to create [TorRuntime.Environment] with.
  *
- * workDir: app_[dirName]
- * cacheDir: cache/[dirName]
+ * - workDir: app_[dirName]
+ * - cacheDir: cache/[dirName]
  * */
 @JvmName("Builder")
 public fun Context.createTorRuntimeEnvironment(
@@ -70,8 +70,8 @@ public fun Context.createTorRuntimeEnvironment(
  * to acquire tor directory locations within the application's data directory
  * for specified [dirName] to create [TorRuntime.Environment] with.
  *
- * workDir: app_[dirName]
- * cacheDir: cache/[dirName]
+ * - workDir: app_[dirName]
+ * - cacheDir: cache/[dirName]
  * */
 @JvmName("Builder")
 public fun Context.createTorRuntimeEnvironment(

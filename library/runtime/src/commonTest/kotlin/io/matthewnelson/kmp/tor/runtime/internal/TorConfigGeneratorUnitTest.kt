@@ -57,14 +57,14 @@ class TorConfigGeneratorUnitTest {
 
     @Test
     fun givenGeoipOmission_whenGenerate_thenDoesNotContainSettings() = runTest {
-        val settings = newGenerator(omitGeoIPFileSettings = true).generate(notifier).settings
+        val settings = newGenerator(omitGeoIPFileSettings = true).generate(notifier).first.settings
         assertEquals(0, settings.filterByKeyword<TorConfig.GeoIPFile.Companion>().size)
         assertEquals(0, settings.filterByKeyword<TorConfig.GeoIPv6File.Companion>().size)
     }
 
     @Test
     fun givenGeoipNoOmission_whenGenerate_thenContainsSettings() = runTest {
-        with(newGenerator(omitGeoIPFileSettings = false).generate(notifier)) {
+        with(newGenerator(omitGeoIPFileSettings = false).generate(notifier).first) {
             assertContains(TorConfig.GeoIPFile)
             assertContains(TorConfig.GeoIPv6File)
         }
@@ -85,7 +85,7 @@ class TorConfigGeneratorUnitTest {
 
     @Test
     fun givenNoConfig_whenGenerate_thenMinimumSettingsApplied() = runTest {
-        with(newGenerator().generate(notifier)) {
+        with(newGenerator().generate(notifier).first) {
             assertContains(TorConfig.DataDirectory)
             assertContains(TorConfig.CacheDirectory)
             assertContains(TorConfig.ControlPortWriteToFile)
@@ -108,7 +108,7 @@ class TorConfigGeneratorUnitTest {
                 }
             ),
             isPortAvailable = { _, _ -> false }
-        ).generate(notifier).settings
+        ).generate(notifier).first.settings
 
         val socks = settings.filterByKeyword<TorConfig.__SocksPort.Companion>().first()
         assertEquals("auto", socks.argument)

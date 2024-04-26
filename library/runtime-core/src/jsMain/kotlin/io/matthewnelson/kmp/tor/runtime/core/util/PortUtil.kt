@@ -18,6 +18,7 @@
 package io.matthewnelson.kmp.tor.runtime.core.util
 
 import io.matthewnelson.kmp.file.IOException
+import io.matthewnelson.kmp.process.InternalProcessApi
 import io.matthewnelson.kmp.tor.runtime.core.address.IPAddress
 import io.matthewnelson.kmp.tor.runtime.core.address.LocalHost
 import io.matthewnelson.kmp.tor.runtime.core.address.Port
@@ -84,18 +85,27 @@ private suspend fun IPAddress.isPortAvailableOrNull(
     val timeMark = TimeSource.Monotonic.markNow()
     val ctx = currentCoroutineContext()
     val latch = Job(ctx[Job])
+    val closure = Job(ctx[Job])
     val ipAddress = value
 
     var isAvailable: Boolean? = null
 
     try {
-        val server = net_createServer { it.destroy(); Unit }
+        val server = net_createServer { it.destroy(); it.unref();  Unit }
 
-        latch.invokeOnCompletion { server.close() }
+        latch.invokeOnCompletion {
+            server.close()
+            server.unref()
+        }
 
         server.onError {
             isAvailable = false
             latch.complete()
+        }
+
+        @OptIn(InternalProcessApi::class)
+        server.on("close") {
+            closure.complete()
         }
 
         val options = js("{}")
@@ -118,6 +128,20 @@ private suspend fun IPAddress.isPortAvailableOrNull(
         }
     } finally {
         latch.complete()
+    }
+
+    if (isAvailable == true) {
+        // Await for server to close before returning true
+        val closureMark = TimeSource.Monotonic.markNow()
+
+        while (closure.isActive) {
+            delay(5.milliseconds)
+            if (closureMark.elapsedNow() < timeout) continue
+            closure.complete()
+            return null
+        }
+    } else {
+        closure.complete()
     }
 
     return isAvailable

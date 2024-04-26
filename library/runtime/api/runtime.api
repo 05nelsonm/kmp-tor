@@ -5,6 +5,62 @@ public abstract interface class io/matthewnelson/kmp/tor/runtime/ConfigBuilderCa
 public final class io/matthewnelson/kmp/tor/runtime/ConfigBuilderCallback$Companion {
 }
 
+public final class io/matthewnelson/kmp/tor/runtime/Lifecycle : io/matthewnelson/kmp/tor/runtime/core/Destroyable {
+	public synthetic fun <init> (Lio/matthewnelson/kmp/tor/runtime/core/UncaughtException$Handler;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public fun destroy ()V
+	public final fun invokeOnCompletion (Lio/matthewnelson/kmp/tor/runtime/core/ItBlock;)Lio/matthewnelson/kmp/tor/runtime/core/Disposable;
+	public fun isDestroyed ()Z
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/matthewnelson/kmp/tor/runtime/Lifecycle$Event {
+	public static final field Companion Lio/matthewnelson/kmp/tor/runtime/Lifecycle$Event$Companion;
+	public final field clazz Ljava/lang/String;
+	public final field hash I
+	public final field name Lio/matthewnelson/kmp/tor/runtime/Lifecycle$Event$Name;
+	public synthetic fun <init> (Ljava/lang/Object;Lio/matthewnelson/kmp/tor/runtime/Lifecycle$Event$Name;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public static final fun OnBind (Ljava/lang/Object;)Lio/matthewnelson/kmp/tor/runtime/Lifecycle$Event;
+	public static final fun OnCreate (Ljava/lang/Object;)Lio/matthewnelson/kmp/tor/runtime/Lifecycle$Event;
+	public static final fun OnDestroy (Ljava/lang/Object;)Lio/matthewnelson/kmp/tor/runtime/Lifecycle$Event;
+	public static final fun OnRemoved (Ljava/lang/Object;)Lio/matthewnelson/kmp/tor/runtime/Lifecycle$Event;
+	public static final fun OnReturned (Ljava/lang/Object;)Lio/matthewnelson/kmp/tor/runtime/Lifecycle$Event;
+	public static final fun OnStart (Ljava/lang/Object;)Lio/matthewnelson/kmp/tor/runtime/Lifecycle$Event;
+	public static final fun OnSubscribed (Ljava/lang/Object;)Lio/matthewnelson/kmp/tor/runtime/Lifecycle$Event;
+	public static final fun OnUnsubscribed (Ljava/lang/Object;)Lio/matthewnelson/kmp/tor/runtime/Lifecycle$Event;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/matthewnelson/kmp/tor/runtime/Lifecycle$Event$Companion {
+	public final fun OnBind (Ljava/lang/Object;)Lio/matthewnelson/kmp/tor/runtime/Lifecycle$Event;
+	public final fun OnCreate (Ljava/lang/Object;)Lio/matthewnelson/kmp/tor/runtime/Lifecycle$Event;
+	public final fun OnDestroy (Ljava/lang/Object;)Lio/matthewnelson/kmp/tor/runtime/Lifecycle$Event;
+	public final fun OnRemoved (Ljava/lang/Object;)Lio/matthewnelson/kmp/tor/runtime/Lifecycle$Event;
+	public final fun OnReturned (Ljava/lang/Object;)Lio/matthewnelson/kmp/tor/runtime/Lifecycle$Event;
+	public final fun OnStart (Ljava/lang/Object;)Lio/matthewnelson/kmp/tor/runtime/Lifecycle$Event;
+	public final fun OnSubscribed (Ljava/lang/Object;)Lio/matthewnelson/kmp/tor/runtime/Lifecycle$Event;
+	public final fun OnUnsubscribed (Ljava/lang/Object;)Lio/matthewnelson/kmp/tor/runtime/Lifecycle$Event;
+}
+
+public final class io/matthewnelson/kmp/tor/runtime/Lifecycle$Event$Name {
+	public static final field Companion Lio/matthewnelson/kmp/tor/runtime/Lifecycle$Event$Name$Companion;
+	public static final field OnBind Lio/matthewnelson/kmp/tor/runtime/Lifecycle$Event$Name;
+	public static final field OnCreate Lio/matthewnelson/kmp/tor/runtime/Lifecycle$Event$Name;
+	public static final field OnDestroy Lio/matthewnelson/kmp/tor/runtime/Lifecycle$Event$Name;
+	public static final field OnRemoved Lio/matthewnelson/kmp/tor/runtime/Lifecycle$Event$Name;
+	public static final field OnReturned Lio/matthewnelson/kmp/tor/runtime/Lifecycle$Event$Name;
+	public static final field OnStart Lio/matthewnelson/kmp/tor/runtime/Lifecycle$Event$Name;
+	public static final field OnSubscribed Lio/matthewnelson/kmp/tor/runtime/Lifecycle$Event$Name;
+	public static final field OnUnsubscribed Lio/matthewnelson/kmp/tor/runtime/Lifecycle$Event$Name;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/matthewnelson/kmp/tor/runtime/Lifecycle$Event$Name$Companion {
+}
+
 public abstract class io/matthewnelson/kmp/tor/runtime/NetworkObserver {
 	public static final field Companion Lio/matthewnelson/kmp/tor/runtime/NetworkObserver$Companion;
 	public static final field NOOP Lio/matthewnelson/kmp/tor/runtime/NetworkObserver;
@@ -60,6 +116,12 @@ public final class io/matthewnelson/kmp/tor/runtime/RuntimeEvent$Companion {
 
 public final class io/matthewnelson/kmp/tor/runtime/RuntimeEvent$ERROR : io/matthewnelson/kmp/tor/runtime/RuntimeEvent {
 	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/RuntimeEvent$ERROR;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun hashCode ()I
+}
+
+public final class io/matthewnelson/kmp/tor/runtime/RuntimeEvent$LIFECYCLE : io/matthewnelson/kmp/tor/runtime/RuntimeEvent {
+	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/RuntimeEvent$LIFECYCLE;
 	public fun equals (Ljava/lang/Object;)Z
 	public fun hashCode ()I
 }
@@ -121,11 +183,13 @@ public final class io/matthewnelson/kmp/tor/runtime/TorRuntime$Builder {
 	public field omitGeoIPFileSettings Z
 	public synthetic fun <init> (Lio/matthewnelson/kmp/tor/runtime/TorRuntime$Environment;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
 	public final fun config (Lio/matthewnelson/kmp/tor/runtime/ConfigBuilderCallback;)Lio/matthewnelson/kmp/tor/runtime/TorRuntime$Builder;
+	public final fun observer (Lio/matthewnelson/kmp/tor/runtime/RuntimeEvent$Observer;)Lio/matthewnelson/kmp/tor/runtime/TorRuntime$Builder;
+	public final fun observer (Lio/matthewnelson/kmp/tor/runtime/core/TorEvent$Observer;)Lio/matthewnelson/kmp/tor/runtime/TorRuntime$Builder;
+	public final fun observerStatic (Lio/matthewnelson/kmp/tor/runtime/RuntimeEvent;Lio/matthewnelson/kmp/tor/runtime/core/OnEvent$Executor;Lio/matthewnelson/kmp/tor/runtime/core/OnEvent;)Lio/matthewnelson/kmp/tor/runtime/TorRuntime$Builder;
+	public final fun observerStatic (Lio/matthewnelson/kmp/tor/runtime/RuntimeEvent;Lio/matthewnelson/kmp/tor/runtime/core/OnEvent;)Lio/matthewnelson/kmp/tor/runtime/TorRuntime$Builder;
+	public final fun observerStatic (Lio/matthewnelson/kmp/tor/runtime/core/TorEvent;Lio/matthewnelson/kmp/tor/runtime/core/OnEvent$Executor;Lio/matthewnelson/kmp/tor/runtime/core/OnEvent;)Lio/matthewnelson/kmp/tor/runtime/TorRuntime$Builder;
+	public final fun observerStatic (Lio/matthewnelson/kmp/tor/runtime/core/TorEvent;Lio/matthewnelson/kmp/tor/runtime/core/OnEvent;)Lio/matthewnelson/kmp/tor/runtime/TorRuntime$Builder;
 	public final fun required (Lio/matthewnelson/kmp/tor/runtime/core/TorEvent;)Lio/matthewnelson/kmp/tor/runtime/TorRuntime$Builder;
-	public final fun staticObserver (Lio/matthewnelson/kmp/tor/runtime/RuntimeEvent;Lio/matthewnelson/kmp/tor/runtime/core/OnEvent$Executor;Lio/matthewnelson/kmp/tor/runtime/core/OnEvent;)Lio/matthewnelson/kmp/tor/runtime/TorRuntime$Builder;
-	public final fun staticObserver (Lio/matthewnelson/kmp/tor/runtime/RuntimeEvent;Lio/matthewnelson/kmp/tor/runtime/core/OnEvent;)Lio/matthewnelson/kmp/tor/runtime/TorRuntime$Builder;
-	public final fun staticObserver (Lio/matthewnelson/kmp/tor/runtime/core/TorEvent;Lio/matthewnelson/kmp/tor/runtime/core/OnEvent$Executor;Lio/matthewnelson/kmp/tor/runtime/core/OnEvent;)Lio/matthewnelson/kmp/tor/runtime/TorRuntime$Builder;
-	public final fun staticObserver (Lio/matthewnelson/kmp/tor/runtime/core/TorEvent;Lio/matthewnelson/kmp/tor/runtime/core/OnEvent;)Lio/matthewnelson/kmp/tor/runtime/TorRuntime$Builder;
 }
 
 public final class io/matthewnelson/kmp/tor/runtime/TorRuntime$Companion {
