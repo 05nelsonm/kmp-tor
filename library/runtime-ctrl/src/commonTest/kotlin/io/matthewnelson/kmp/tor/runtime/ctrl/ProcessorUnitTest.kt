@@ -53,6 +53,9 @@ class ProcessorUnitTest {
         val host = LocalHost.IPv4.resolve()
         val port = 9355.toPortProxy().findAvailableAsync(1_000, LocalHost.IPv4)
         val address = ProxyAddress(host, port)
+
+        withContext(Dispatchers.Default) { delay(350.milliseconds) }
+
         val process = TestUtils.startTor(address.toString())
 
         var threw: Throwable? = null
