@@ -277,7 +277,13 @@ public actual interface TorCtrl : Destroyable, TorEvent.Processor, TorCmd.Privil
                 // A slight delay is needed before returning in order
                 // to ensure that the coroutine starts before able
                 // to call destroy on it.
-                delay(42.milliseconds)
+                val mark = TimeSource.Monotonic.markNow()
+
+                while (true) {
+                    delay(5.milliseconds)
+                    if (mark.elapsedNow() < 42.milliseconds) continue
+                    break
+                }
             } catch (t: Throwable) {
                 ctrl.destroy()
                 throw t
