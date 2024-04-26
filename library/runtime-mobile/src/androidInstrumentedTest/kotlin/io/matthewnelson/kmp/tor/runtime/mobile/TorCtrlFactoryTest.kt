@@ -44,17 +44,11 @@ class TorCtrlFactoryTest {
             .resolve("data")
             .resolve("ctrl.sock")
 
-        uds.delete()
-
         val ctrlArg = TorConfig.__ControlPort.Builder {
             asUnixSocket { file = uds }
         }.argument
 
         val p = startTor(ctrlArg)
-
-        withContext(Dispatchers.Default) {
-            delay(250.milliseconds)
-        }
 
         val ctrl = try {
             TorCtrl.Factory(handler = UncaughtException.Handler.THROW).connectAsync(uds)
@@ -62,9 +56,7 @@ class TorCtrlFactoryTest {
             p.destroy()
         }
 
-        withContext(Dispatchers.Default) {
-            delay(250.milliseconds)
-        }
+        withContext(Dispatchers.Default) { delay(350.milliseconds) }
 
         assertTrue(ctrl.isDestroyed())
     }
@@ -74,6 +66,9 @@ class TorCtrlFactoryTest {
         val homeDir = INSTALLER.installationDir
         val dataDir = homeDir.resolve("data")
         val cacheDir = homeDir.resolve("cache")
+
+        withContext(Dispatchers.Default) { delay(350.milliseconds) }
+
         val p = Process.Builder(paths.tor)
             .args("--DataDirectory")
             .args(dataDir.also { it.mkdirs() }.path)
@@ -98,11 +93,16 @@ class TorCtrlFactoryTest {
             .destroySignal(Signal.SIGTERM)
             .environment("HOME", homeDir.path)
             .stdin(Stdio.Null)
-            .stdout(Stdio.Null)
-            .stderr(Stdio.Null)
+            .stdout(Stdio.Pipe)
+            .stderr(Stdio.Pipe)
             .spawn()
 
+        p.stdoutFeed { println("TOR_OUT: $it") }.stderrFeed { println("TOR_ERR: $it") }
+
         currentCoroutineContext().job.invokeOnCompletion { p.destroy() }
+
+        withContext(Dispatchers.Default) { delay(350.milliseconds) }
+
         return p
     }
 

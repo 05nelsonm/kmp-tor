@@ -61,8 +61,6 @@ class TorCtrlFactoryUnitTest {
             .resolve("data")
             .resolve("ctrl.sock")
 
-        uds.delete()
-
         val ctrlArg = try {
             TorConfig.__ControlPort.Builder {
                 asUnixSocket { file = uds }
@@ -114,7 +112,7 @@ class TorCtrlFactoryUnitTest {
 
         block(process, ctrl)
 
-        withContext(Dispatchers.Default) { delay(500.milliseconds) }
+        withContext(Dispatchers.Default) { delay(350.milliseconds) }
 
         assertEquals(1, invocationDestroy)
 

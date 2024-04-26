@@ -51,7 +51,7 @@ class ProcessorUnitTest {
             handler = UncaughtException.Handler.THROW,
         )
         val host = LocalHost.IPv4.resolve()
-        val port = 10055.toPortProxy().findAvailableAsync(1_000, LocalHost.IPv4)
+        val port = 9355.toPortProxy().findAvailableAsync(1_000, LocalHost.IPv4)
         val address = ProxyAddress(host, port)
         val process = TestUtils.startTor(address.toString())
 
@@ -82,7 +82,7 @@ class ProcessorUnitTest {
             process.destroy()
         }
 
-        withContext(Dispatchers.Default) { delay(500.milliseconds) }
+        withContext(Dispatchers.Default) { delay(350.milliseconds) }
 
         threw?.let { throw it }
 

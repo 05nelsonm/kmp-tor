@@ -41,7 +41,7 @@ public object TestUtils {
         val dataDir = homeDir.resolve("data")
         val cacheDir = homeDir.resolve("cache")
 
-        withContext(Dispatchers.Default) { delay(350.milliseconds) }
+        withContext(Dispatchers.Default) { delay(500.milliseconds) }
 
         val p = Process.Builder(paths.tor)
             .args("--DataDirectory")
@@ -69,13 +69,15 @@ public object TestUtils {
             .destroySignal(Signal.SIGTERM)
             .environment("HOME", homeDir.path)
             .stdin(Stdio.Null)
-            .stdout(Stdio.Null)
-            .stderr(Stdio.Null)
+            .stdout(Stdio.Pipe)
+            .stderr(Stdio.Pipe)
             .spawn()
+
+        p.stdoutFeed { println("TOR_OUT: $it") }.stderrFeed { println("TOR_ERR: $it") }
 
         currentCoroutineContext().job.invokeOnCompletion { p.destroy() }
 
-        withContext(Dispatchers.Default) { delay(350.milliseconds) }
+        withContext(Dispatchers.Default) { delay(500.milliseconds) }
 
         return p
     }
