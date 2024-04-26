@@ -88,7 +88,7 @@ class TorCtrlFactoryTest {
             .args("1")
             .args("--RunAsDaemon")
             .args("0")
-            .args("__OwningControllerProcess")
+            .args("--__OwningControllerProcess")
             .args(Process.Current.pid().toString())
             .destroySignal(Signal.SIGTERM)
             .environment("HOME", homeDir.path)
