@@ -129,7 +129,14 @@ private suspend fun IPAddress.isPortAvailableOrNull(
 
     if (isAvailable == true) {
         // Await for server to close before returning true
-        closure.join()
+        val closureMark = TimeSource.Monotonic.markNow()
+
+        while (closure.isActive) {
+            delay(5.milliseconds)
+            if (closureMark.elapsedNow() < timeout) continue
+            closure.complete()
+            return null
+        }
     } else {
         closure.complete()
     }
