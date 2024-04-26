@@ -58,7 +58,12 @@ class ProcessorUnitTest {
         var threw: Throwable? = null
         var invocationSuccess = 0
         try {
-            val ctrl = factory.connectAsync(address)
+            val ctrl = try {
+                factory.connectAsync(address)
+            } catch (_: Throwable) {
+                withContext(Dispatchers.Default) { delay(350.milliseconds) }
+                factory.connectAsync(address)
+            }
 
             val onFailure = OnFailure { threw = it }
             val onSuccess = OnSuccess<Reply.Success.OK> { synchronized(lock) { invocationSuccess++ } }
