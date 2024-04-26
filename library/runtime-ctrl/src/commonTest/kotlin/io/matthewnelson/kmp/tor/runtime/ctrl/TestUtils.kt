@@ -69,11 +69,9 @@ public object TestUtils {
             .destroySignal(Signal.SIGTERM)
             .environment("HOME", homeDir.path)
             .stdin(Stdio.Null)
-            .stdout(Stdio.Pipe)
-            .stderr(Stdio.Pipe)
+            .stdout(Stdio.Inherit)
+            .stderr(Stdio.Inherit)
             .spawn()
-
-        p.stdoutFeed { println("TOR_OUT: $it") }.stderrFeed { println("TOR_ERR: $it") }
 
         currentCoroutineContext().job.invokeOnCompletion { p.destroy() }
 
