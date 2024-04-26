@@ -41,6 +41,7 @@ abstract class PortUtilBaseTest {
         val (socket, port) = LocalHost.IPv4.holdServerSocket()
         assertFalse(port.isAvailableAsync(LocalHost.IPv4))
         socket.close()
+        if (isNodeJs) withContext(Dispatchers.Default) { delay(150.milliseconds) }
         assertTrue(port.isAvailableAsync(LocalHost.IPv4))
     }
 
@@ -49,6 +50,7 @@ abstract class PortUtilBaseTest {
         val (socket, port) = LocalHost.IPv6.holdServerSocket()
         assertFalse(port.isAvailableAsync(LocalHost.IPv6))
         socket.close()
+        if (isNodeJs) withContext(Dispatchers.Default) { delay(150.milliseconds) }
         assertTrue(port.isAvailableAsync(LocalHost.IPv6))
     }
 
