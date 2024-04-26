@@ -41,7 +41,7 @@ internal class RealTorCtrl private constructor(
     private val connection: CtrlConnection,
 ): AbstractTorCtrl(
     factory.staticTag,
-    factory.initialObservers,
+    factory.observers,
     factory.defaultExecutor,
     CloseableExceptionHandler(factory.handler),
 ) {

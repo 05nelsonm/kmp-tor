@@ -31,10 +31,10 @@ import kotlin.jvm.JvmSynthetic
 @OptIn(InternalKmpTorApi::class)
 internal abstract class AbstractTorCmdQueue internal constructor(
     staticTag: String?,
-    initialObservers: Set<TorEvent.Observer>,
+    observers: Set<TorEvent.Observer>,
     defaultExecutor: OnEvent.Executor,
     handler: UncaughtException.Handler,
-):  AbstractTorEventProcessor(staticTag, initialObservers, defaultExecutor),
+):  AbstractTorEventProcessor(staticTag, observers, defaultExecutor),
     Destroyable,
     TorCmd.Privileged.Processor
 {

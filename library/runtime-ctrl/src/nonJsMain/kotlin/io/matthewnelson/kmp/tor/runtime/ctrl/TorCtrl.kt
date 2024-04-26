@@ -40,6 +40,7 @@ import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.cancellation.CancellationException
 import kotlin.jvm.JvmOverloads
 import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.TimeSource
 
 /**
  * A Tor control connection
@@ -95,7 +96,7 @@ public actual interface TorCtrl : Destroyable, TorEvent.Processor, TorCmd.Privil
      * @see [connectAsync]
      * @param [staticTag] Special string that will exclude [TorEvent.Observer]
      *   with the same tag from removal until destroyed
-     * @param [initialObservers] Some initial observers to start with, static
+     * @param [observers] Some initial observers to start with, static
      *   or not.
      * @param [defaultExecutor] The default [OnEvent.Executor] to fall back to
      *   when calling [TorEvent.Observer.notify] if it does not have its own.
@@ -111,7 +112,7 @@ public actual interface TorCtrl : Destroyable, TorEvent.Processor, TorCmd.Privil
     @Throws(IllegalArgumentException::class)
     public actual constructor(
         internal actual val staticTag: String?,
-        internal actual val initialObservers: Set<TorEvent.Observer>,
+        internal actual val observers: Set<TorEvent.Observer>,
         internal actual val defaultExecutor: OnEvent.Executor,
         internal actual val debugger: ItBlock<String>?,
         internal actual val handler: UncaughtException.Handler,
@@ -226,11 +227,15 @@ public actual interface TorCtrl : Destroyable, TorEvent.Processor, TorCmd.Privil
 
             val ctrl = block()
 
-            try {
-                Blocking.threadSleep(25.milliseconds)
-            } catch (e: InterruptedException) {
-                ctrl.destroy()
-                throw IOException("Interrupted", e)
+            val mark = TimeSource.Monotonic.markNow()
+
+            while (true) {
+                try {
+                    Blocking.threadSleep(5.milliseconds)
+                } catch (_: InterruptedException) {}
+
+                if (mark.elapsedNow() < 25.milliseconds) continue
+                break
             }
 
             return ctrl
@@ -250,11 +255,14 @@ public actual interface TorCtrl : Destroyable, TorEvent.Processor, TorCmd.Privil
 
             val ctrl = block()
 
-            try {
-                delay(25.milliseconds)
-            } catch (e: CancellationException) {
-                ctrl.destroy()
-                throw e
+            withContext(NonCancellable) {
+                val mark = TimeSource.Monotonic.markNow()
+
+                while (true) {
+                    delay(5.milliseconds)
+                    if (mark.elapsedNow() < 25.milliseconds) continue
+                    break
+                }
             }
 
             return ctrl

@@ -33,6 +33,7 @@ import io.matthewnelson.kmp.tor.runtime.ctrl.internal.checkUnixSockedSupport
 import io.matthewnelson.kmp.tor.runtime.ctrl.internal.net_createConnection
 import kotlinx.coroutines.*
 import org.khronos.webgl.Uint8Array
+import kotlin.coroutines.cancellation.CancellationException
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.TimeSource
 
@@ -89,7 +90,7 @@ public actual interface TorCtrl : Destroyable, TorEvent.Processor, TorCmd.Privil
      * @see [connectAsync]
      * @param [staticTag] Special string that will exclude [TorEvent.Observer]
      *   with the same tag from removal until destroyed.
-     * @param [initialObservers] Some initial observers to start with, static
+     * @param [observers] Some initial observers to start with, static
      *   or not.
      * @param [defaultExecutor] The default [OnEvent.Executor] to fall back to
      *   when calling [TorEvent.Observer.notify] if it does not have its own.
@@ -105,7 +106,7 @@ public actual interface TorCtrl : Destroyable, TorEvent.Processor, TorCmd.Privil
 //    @Throws(IllegalArgumentException::class)
     public actual constructor(
         internal actual val staticTag: String?,
-        internal actual val initialObservers: Set<TorEvent.Observer>,
+        internal actual val observers: Set<TorEvent.Observer>,
         internal actual val defaultExecutor: OnEvent.Executor,
         internal actual val debugger: ItBlock<String>?,
         internal actual val handler: UncaughtException.Handler,
@@ -273,20 +274,17 @@ public actual interface TorCtrl : Destroyable, TorEvent.Processor, TorCmd.Privil
 
             val ctrl = RealTorCtrl.of(this, Dispatchers.Main, Disposable.NOOP, connection)
 
-            try {
-                // A slight delay is needed before returning in order
-                // to ensure that the coroutine starts before able
-                // to call destroy on it.
+            // A slight delay is needed before returning in order
+            // to ensure that the coroutine starts before able
+            // to call destroy on it.
+            withContext(NonCancellable) {
                 val mark = TimeSource.Monotonic.markNow()
 
                 while (true) {
                     delay(5.milliseconds)
-                    if (mark.elapsedNow() < 42.milliseconds) continue
+                    if (mark.elapsedNow() < 25.milliseconds) continue
                     break
                 }
-            } catch (t: Throwable) {
-                ctrl.destroy()
-                throw t
             }
 
             return ctrl
