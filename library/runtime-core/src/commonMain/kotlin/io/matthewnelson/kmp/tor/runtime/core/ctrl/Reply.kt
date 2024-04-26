@@ -98,7 +98,8 @@ public open class Reply private constructor(
             }
 
             // Asynchronous Event Notification (TorEvent)
-            private val OK_650: Reply = Reply("650", OK.message)
+            // lazy b/c referencing Success.OK
+            private val OK_650: Reply by lazy { Reply("650", OK.message) }
         }
     }
 
