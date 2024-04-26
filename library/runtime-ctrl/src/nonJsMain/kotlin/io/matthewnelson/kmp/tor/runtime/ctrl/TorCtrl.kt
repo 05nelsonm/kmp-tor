@@ -40,7 +40,6 @@ import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.cancellation.CancellationException
 import kotlin.jvm.JvmOverloads
 import kotlin.time.Duration.Companion.milliseconds
-import kotlin.time.TimeSource
 
 /**
  * A Tor control connection
@@ -195,7 +194,7 @@ public actual interface TorCtrl : Destroyable, TorEvent.Processor, TorCmd.Privil
         @OptIn(ExperimentalContracts::class, ExperimentalCoroutinesApi::class)
         private inline fun connect(
             connect: (context: CoroutineContext) -> CtrlConnection,
-        ): TorCtrl {
+        ): RealTorCtrl {
             contract {
                 callsInPlace(connect, InvocationKind.EXACTLY_ONCE)
             }
@@ -220,23 +219,22 @@ public actual interface TorCtrl : Destroyable, TorEvent.Processor, TorCmd.Privil
          * */
         @Suppress("NOTHING_TO_INLINE")
         @OptIn(ExperimentalContracts::class)
-        private inline fun withDelayedReturn(block: () -> TorCtrl): TorCtrl {
+        private inline fun withDelayedReturn(block: () -> RealTorCtrl): TorCtrl {
             contract {
                 callsInPlace(block, InvocationKind.EXACTLY_ONCE)
             }
 
             val ctrl = block()
 
-            val mark = TimeSource.Monotonic.markNow()
-
-            while (true) {
+            while (!ctrl.isReading) {
                 try {
                     Blocking.threadSleep(5.milliseconds)
                 } catch (_: InterruptedException) {}
-
-                if (mark.elapsedNow() < 25.milliseconds) continue
-                break
             }
+
+            try {
+                Blocking.threadSleep(5.milliseconds)
+            } catch (_: InterruptedException) {}
 
             return ctrl
         }
@@ -248,7 +246,7 @@ public actual interface TorCtrl : Destroyable, TorEvent.Processor, TorCmd.Privil
          * */
         @Suppress("NOTHING_TO_INLINE")
         @OptIn(ExperimentalContracts::class)
-        private suspend inline fun withDelayedReturnAsync(block: () -> TorCtrl): TorCtrl {
+        private suspend inline fun withDelayedReturnAsync(block: () -> RealTorCtrl): TorCtrl {
             contract {
                 callsInPlace(block, InvocationKind.EXACTLY_ONCE)
             }
@@ -256,13 +254,11 @@ public actual interface TorCtrl : Destroyable, TorEvent.Processor, TorCmd.Privil
             val ctrl = block()
 
             withContext(NonCancellable) {
-                val mark = TimeSource.Monotonic.markNow()
-
-                while (true) {
+                while (!ctrl.isReading) {
                     delay(5.milliseconds)
-                    if (mark.elapsedNow() < 25.milliseconds) continue
-                    break
                 }
+
+                delay(5.milliseconds)
             }
 
             return ctrl

@@ -40,6 +40,8 @@ internal class NativeCtrlConnection internal constructor(
     private var _isReading: Boolean = false
     private val lock = SynchronizedObject()
 
+    override val isReading: Boolean get() = _isReading
+
     @OptIn(InternalProcessApi::class)
     @Throws(CancellationException::class, IllegalStateException::class)
     override suspend fun startRead(parser: CtrlConnection.Parser) {

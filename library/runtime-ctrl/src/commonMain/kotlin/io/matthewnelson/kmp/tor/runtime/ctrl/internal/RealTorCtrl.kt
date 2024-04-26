@@ -65,6 +65,11 @@ internal class RealTorCtrl private constructor(
     private val waiters = Waiters { LOG }
     private val processor = Processor()
 
+    internal val isReading: Boolean get() {
+        if (isDestroyed()) return true
+        return connection.isReading
+    }
+
     private val parser = object : CtrlConnection.Parser() {
         internal override fun parse(line: String?) {
             if (line == null) {

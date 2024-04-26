@@ -33,7 +33,6 @@ import io.matthewnelson.kmp.tor.runtime.ctrl.internal.checkUnixSockedSupport
 import io.matthewnelson.kmp.tor.runtime.ctrl.internal.net_createConnection
 import kotlinx.coroutines.*
 import org.khronos.webgl.Uint8Array
-import kotlin.coroutines.cancellation.CancellationException
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.TimeSource
 
@@ -213,10 +212,13 @@ public actual interface TorCtrl : Destroyable, TorEvent.Processor, TorCmd.Privil
             }
 
             val connection = object : CtrlConnection {
+
+                override val isReading: Boolean get() = connParser != null
+
                 // @Throws(CancellationException::class, IllegalStateException::class)
                 override suspend fun startRead(parser: CtrlConnection.Parser) {
                     check(!socket.destroyed) { "Socket is destroyed" }
-                    check(connParser == null) { "Already reading input" }
+                    check(!isReading) { "Already reading input" }
 
                     val latch = Job(currentCoroutineContext().job)
                     connParser = Pair(parser, latch)
@@ -278,13 +280,11 @@ public actual interface TorCtrl : Destroyable, TorEvent.Processor, TorCmd.Privil
             // to ensure that the coroutine starts before able
             // to call destroy on it.
             withContext(NonCancellable) {
-                val mark = TimeSource.Monotonic.markNow()
-
-                while (true) {
+                while (!ctrl.isReading) {
                     delay(5.milliseconds)
-                    if (mark.elapsedNow() < 25.milliseconds) continue
-                    break
                 }
+
+                delay(5.milliseconds)
             }
 
             return ctrl
