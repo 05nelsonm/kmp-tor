@@ -19,6 +19,7 @@ package io.matthewnelson.kmp.tor.runtime
 
 import io.matthewnelson.encoding.base16.Base16
 import io.matthewnelson.encoding.core.Encoder.Companion.encodeToString
+import io.matthewnelson.encoding.core.use
 import io.matthewnelson.immutable.collections.toImmutableSet
 import io.matthewnelson.kmp.file.*
 import io.matthewnelson.kmp.tor.core.api.ResourceInstaller
@@ -241,7 +242,7 @@ public interface TorRuntime:
             onEvent: OnEvent<R>,
         ): Builder = observer(RuntimeEvent.Observer(event, environment.staticTag, executor, onEvent))
 
-        internal companion object: InstanceKeeper<String, TorRuntime>() {
+        internal companion object: InstanceKeeper<File, TorRuntime>() {
 
             @JvmSynthetic
             internal fun build(
@@ -250,7 +251,7 @@ public interface TorRuntime:
             ): TorRuntime {
                 val b = Builder(environment).apply(block)
 
-                return getOrCreateInstance(key = environment.id, block = {
+                return getOrCreateInstance(key = environment.workDir, block = {
 
                     val generator = TorConfigGenerator(
                         environment = environment,
@@ -309,13 +310,27 @@ public interface TorRuntime:
         public var debug: Boolean = false
 
         /**
-         * The SHA-256 hash of the [workDir] path, providing a unique identity
-         * for this [Environment], specific to the local filesystem.
+         * A 24 character id based on the [workDir] path making it
+         * locally identifiable based on the device's filesystem.
+         *
+         * It is the product of the SHA-256 hash of the path, whereby the
+         * first middle and last 4 bytes (12 bytes total) are Base16 (hex)
+         * encoded.
          * */
         @get:JvmName("id")
         public val id: String by lazy {
-            val bytes = workDir.path.encodeToByteArray()
-            SHA256().digest(bytes).encodeToString(Base16)
+            val bytes = SHA256().apply {
+                update(workDir.path.encodeToByteArray())
+            }.digest()
+
+            val s = StringBuilder(24)
+            Base16.newEncoderFeed { char -> s.append(char) }.use { feed ->
+                for (i in 0..3) { feed.consume(bytes[i]) }
+                for (i in 13..16) { feed.consume(bytes[i]) }
+                for (i in 28..31) { feed.consume(bytes[i]) }
+            }
+
+            s.toString()
         }
 
         public companion object {
