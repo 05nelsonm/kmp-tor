@@ -22,11 +22,17 @@ protected final class io/matthewnelson/kmp/tor/runtime/ctrl/AbstractTorEventProc
 }
 
 protected final class io/matthewnelson/kmp/tor/runtime/ctrl/AbstractTorEventProcessor$HandlerWithContext : kotlin/coroutines/AbstractCoroutineContextElement, io/matthewnelson/kmp/tor/runtime/core/UncaughtException$Handler, kotlinx/coroutines/CoroutineExceptionHandler {
+	public static final field Companion Lio/matthewnelson/kmp/tor/runtime/ctrl/AbstractTorEventProcessor$HandlerWithContext$Companion;
 	public final field delegate Lio/matthewnelson/kmp/tor/runtime/core/UncaughtException$Handler;
-	public fun <init> (Lio/matthewnelson/kmp/tor/runtime/core/UncaughtException$Handler;)V
+	public synthetic fun <init> (Lio/matthewnelson/kmp/tor/runtime/core/UncaughtException$Handler;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
 	public fun handleException (Lkotlin/coroutines/CoroutineContext;Ljava/lang/Throwable;)V
 	public fun invoke (Lio/matthewnelson/kmp/tor/runtime/core/UncaughtException;)V
 	public synthetic fun invoke (Ljava/lang/Object;)V
+	public static final fun of (Lio/matthewnelson/kmp/tor/runtime/core/UncaughtException$Handler;)Lio/matthewnelson/kmp/tor/runtime/ctrl/AbstractTorEventProcessor$HandlerWithContext;
+}
+
+public final class io/matthewnelson/kmp/tor/runtime/ctrl/AbstractTorEventProcessor$HandlerWithContext$Companion {
+	public final fun of (Lio/matthewnelson/kmp/tor/runtime/core/UncaughtException$Handler;)Lio/matthewnelson/kmp/tor/runtime/ctrl/AbstractTorEventProcessor$HandlerWithContext;
 }
 
 protected final class io/matthewnelson/kmp/tor/runtime/ctrl/AbstractTorEventProcessor$ObserverContext : kotlin/coroutines/AbstractCoroutineContextElement {

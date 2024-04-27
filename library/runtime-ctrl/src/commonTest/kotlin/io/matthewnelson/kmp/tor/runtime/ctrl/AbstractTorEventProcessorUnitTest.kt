@@ -29,7 +29,7 @@ class AbstractTorEventProcessorUnitTest {
     private class TestProcessor(
         handler: UncaughtException.Handler = UncaughtException.Handler.THROW
     ): AbstractTorEventProcessor("static", emptySet(), OnEvent.Executor.Immediate) {
-        override val handler = HandlerWithContext(handler)
+        override val handler = HandlerWithContext.of(handler)
         val size: Int get() = registered()
         fun notify(event: TorEvent, output: String) { event.notifyObservers(output) }
         fun destroy() { onDestroy() }

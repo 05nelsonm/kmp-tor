@@ -183,7 +183,7 @@ protected constructor(
     protected open fun registered(): Int = synchronized(lock) { observers.size }
 
     // Handler that also implements CoroutineExceptionHandler
-    protected class HandlerWithContext(
+    protected class HandlerWithContext private constructor(
         @JvmField
         public val delegate: UncaughtException.Handler
     ) : AbstractCoroutineContextElement(CoroutineExceptionHandler),
@@ -198,6 +198,15 @@ protected constructor(
             } else {
                 val ctx = context[ObserverContext]?.context ?: context.toString()
                 tryCatch(ctx) { throw exception }
+            }
+        }
+
+        public companion object {
+
+            @JvmStatic
+            public fun of(handler: UncaughtException.Handler): HandlerWithContext {
+                if (handler is HandlerWithContext) return handler
+                return HandlerWithContext(handler)
             }
         }
     }

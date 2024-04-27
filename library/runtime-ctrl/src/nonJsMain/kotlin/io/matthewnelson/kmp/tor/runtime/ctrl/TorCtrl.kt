@@ -226,7 +226,7 @@ public actual interface TorCtrl : Destroyable, TorEvent.Processor, TorCmd.Privil
 
             val ctrl = block()
 
-            while (!ctrl.isReading) {
+            while (!ctrl.isReady) {
                 try {
                     Blocking.threadSleep(5.milliseconds)
                 } catch (_: InterruptedException) {}
@@ -254,7 +254,7 @@ public actual interface TorCtrl : Destroyable, TorEvent.Processor, TorCmd.Privil
             val ctrl = block()
 
             withContext(NonCancellable) {
-                while (!ctrl.isReading) {
+                while (!ctrl.isReady) {
                     delay(5.milliseconds)
                 }
 

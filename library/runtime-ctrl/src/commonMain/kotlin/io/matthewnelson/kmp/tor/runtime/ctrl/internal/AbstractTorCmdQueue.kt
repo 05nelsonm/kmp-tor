@@ -45,7 +45,7 @@ internal abstract class AbstractTorCmdQueue internal constructor(
     @Volatile
     @Suppress("PropertyName")
     protected open var LOG: Debugger? = null
-    protected final override val handler: HandlerWithContext = HandlerWithContext(handler)
+    protected final override val handler: HandlerWithContext = HandlerWithContext.of(handler)
 
     public final override fun isDestroyed(): Boolean = destroyed
 

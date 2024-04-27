@@ -280,7 +280,7 @@ public actual interface TorCtrl : Destroyable, TorEvent.Processor, TorCmd.Privil
             // to ensure that the coroutine starts before able
             // to call destroy on it.
             withContext(NonCancellable) {
-                while (!ctrl.isReading) {
+                while (!ctrl.isReady) {
                     delay(5.milliseconds)
                 }
 

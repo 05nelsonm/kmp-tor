@@ -21,7 +21,7 @@ import kotlin.jvm.JvmInline
 import kotlin.jvm.JvmSynthetic
 
 @JvmInline
-internal value class Debugger private constructor(private val callback: Callback) {
+internal value class Debugger private constructor(private val notify: Notify) {
 
     internal companion object {
 
@@ -29,25 +29,25 @@ internal value class Debugger private constructor(private val callback: Callback
         internal fun of(
             prefix: Any,
             block: ItBlock<String>
-        ): Debugger = Debugger(Callback(prefix.toString(), block))
+        ): Debugger = Debugger(Notify(prefix.toString(), block))
 
-        internal fun Debugger?.d(text: () -> String) {
+        internal fun Debugger?.d(lazyText: () -> String) {
             if (this == null) return
-            val t = text()
-            callback(t)
+            notify(lazyText())
         }
     }
 
-    private class Callback(
+    private class Notify(
         private val prefix: String,
-        private val block: ItBlock<String>,
+        private val delegate: ItBlock<String>,
     ): ItBlock<String> {
 
         override fun invoke(it: String) {
             try {
-                block("$prefix $it")
+                delegate("$prefix $it")
             } catch (t: Throwable) {
                 if (t !is UncaughtException) return
+
                 // If the debug log is being piped to
                 // TorRuntime RuntimeEvent.LOG.DEBUG
                 // and that observer throws exception,

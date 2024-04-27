@@ -21,6 +21,7 @@ import io.matthewnelson.kmp.tor.core.resource.SynchronizedObject
 import io.matthewnelson.kmp.tor.core.resource.synchronized
 import io.matthewnelson.kmp.tor.runtime.core.Disposable
 import io.matthewnelson.kmp.tor.runtime.core.TorEvent
+import io.matthewnelson.kmp.tor.runtime.core.UncaughtException
 import io.matthewnelson.kmp.tor.runtime.core.UncaughtException.Handler.Companion.tryCatch
 import io.matthewnelson.kmp.tor.runtime.core.UncaughtException.Handler.Companion.withSuppression
 import io.matthewnelson.kmp.tor.runtime.core.ctrl.Reply
@@ -43,17 +44,21 @@ internal class RealTorCtrl private constructor(
     factory.staticTag,
     factory.observers,
     factory.defaultExecutor,
-    CloseableExceptionHandler(factory.handler),
+    if (factory.handler is HandlerWithContext) {
+        factory.handler
+    } else {
+        CloseableExceptionHandler(factory.handler)
+    },
 ) {
 
     @Volatile
     protected override var LOG = factory.debugger?.let { Debugger.of(this, it) }
 
     private val scope = CoroutineScope(context =
-        // TODO: Handler?
         CoroutineName(toString())
         + SupervisorJob()
         + dispatcher
+        + handler
     )
 
     @Volatile
@@ -65,7 +70,9 @@ internal class RealTorCtrl private constructor(
     private val waiters = Waiters { LOG }
     private val processor = Processor()
 
-    internal val isReading: Boolean get() {
+    // TorCtrl.Factory.connect waits for this to
+    // turn true before returning the instance
+    internal val isReady: Boolean get() {
         if (isDestroyed()) return true
         return connection.isReading
     }
@@ -136,23 +143,31 @@ internal class RealTorCtrl private constructor(
         scope.cancel()
         LOG.d { "Scope Cancelled" }
 
+        var threw: Throwable? = null
+
         try {
             handler.withSuppression {
                 val context = "RealTorCtrl.onDestroy"
 
                 tryCatch(context) { super.onDestroy() }
 
-                _closeException?.let { ex ->
-                    tryCatch(context) { throw ex }
+                _closeException?.let { t ->
+                    tryCatch(context) { throw t }
                 }
-
-                LOG = null
             }
-        } finally {
-            (handler.delegate as CloseableExceptionHandler).close()
+        } catch (t: Throwable) {
+            threw = t
+        }
+
+        (handler.delegate as? CloseableExceptionHandler)?.close()
+
+        if (disposeDispatcher != Disposable.NOOP) {
+            LOG.d { "Closing Dispatchers" }
             disposeDispatcher.invoke()
         }
 
+        LOG = null
+        threw?.let { throw it }
         return true
     }
 
