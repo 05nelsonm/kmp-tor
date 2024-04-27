@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-@file:JvmName("RuntimeActionUtil")
+@file:JvmName("ActionUtil")
 @file:Suppress("KotlinRedundantDiagnosticSuppress")
 
 package io.matthewnelson.kmp.tor.runtime.util

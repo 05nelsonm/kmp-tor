@@ -242,7 +242,7 @@ public final class io/matthewnelson/kmp/tor/runtime/TorRuntime$Environment$Compa
 	public final fun Builder (Ljava/io/File;Ljava/io/File;Lkotlin/jvm/functions/Function1;Lio/matthewnelson/kmp/tor/runtime/core/ThisBlock;)Lio/matthewnelson/kmp/tor/runtime/TorRuntime$Environment;
 }
 
-public final class io/matthewnelson/kmp/tor/runtime/util/RuntimeActionUtil {
+public final class io/matthewnelson/kmp/tor/runtime/util/ActionUtil {
 	public static final fun executeAsync (Lio/matthewnelson/kmp/tor/runtime/RuntimeAction$Processor;Lio/matthewnelson/kmp/tor/runtime/RuntimeAction;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public static final fun executeSync (Lio/matthewnelson/kmp/tor/runtime/RuntimeAction$Processor;Lio/matthewnelson/kmp/tor/runtime/RuntimeAction;)Lio/matthewnelson/kmp/tor/runtime/RuntimeAction$Processor;
 	public static final fun executeSync (Lio/matthewnelson/kmp/tor/runtime/RuntimeAction$Processor;Lio/matthewnelson/kmp/tor/runtime/RuntimeAction;Lkotlin/jvm/functions/Function0;)Lio/matthewnelson/kmp/tor/runtime/RuntimeAction$Processor;
