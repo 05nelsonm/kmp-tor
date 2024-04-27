@@ -28,6 +28,7 @@ import io.matthewnelson.kmp.tor.runtime.RuntimeEvent.Notifier.Companion.d
 import io.matthewnelson.kmp.tor.runtime.core.ctrl.TorCmd
 import io.matthewnelson.kmp.tor.runtime.ctrl.TorCtrl
 import kotlinx.coroutines.*
+import kotlin.jvm.JvmStatic
 import kotlin.jvm.JvmSynthetic
 
 @OptIn(InternalKmpTorApi::class)
@@ -35,7 +36,8 @@ internal class RealTorRuntime private constructor(
     private val generator: TorConfigGenerator,
     private val networkObserver: NetworkObserver,
     private val requiredTorEvents: Set<TorEvent>,
-    serviceHandler: HandlerWithContext?,
+    serviceFactoryHandler: HandlerWithContext?,
+    serviceFactoryDebugger: ItBlock<String>?,
     dispatcher: CoroutineDispatcher,
     observersTorEvent: Set<TorEvent.Observer>,
     defaultExecutor: OnEvent.Executor,
@@ -52,7 +54,8 @@ internal class RealTorRuntime private constructor(
 
     protected override val debug: Boolean get() = environment().debug
     public override fun environment(): TorRuntime.Environment = generator.environment
-    protected override val handler: HandlerWithContext = serviceHandler ?: super.handler
+    protected override val handler: HandlerWithContext = serviceFactoryHandler ?: super.handler
+
     private val lock = SynchronizedObject()
 
     private val scope = CoroutineScope(context =
@@ -62,47 +65,29 @@ internal class RealTorRuntime private constructor(
         + handler
     )
 
-    private val factory = TorCtrl.Factory(
-        staticTag = environment().staticTag,
-        observers = TorEvent.entries.let { events ->
-            val tag = environment().staticTag
-            val set = LinkedHashSet<TorEvent.Observer>(events.size)
-
-            events.forEach { event ->
-                val observer = when (event) {
-                    TorEvent.CONF_CHANGED -> ConfChangedObserver()
-                    TorEvent.NOTICE -> NoticeObserver()
-                    else -> event.observer(tag) { event.notifyObservers(it) }
-                }
-
-                set.add(observer)
-            }
-
-            set.toImmutableSet()
-        },
-        defaultExecutor = OnEvent.Executor.Immediate,
-        debugger = ItBlock { log ->
-            if (!debug) return@ItBlock
-
-            val i = log.indexOf('@')
-
-            val output = if (i == -1) {
-                log
-            } else {
-                log.substring(0, i) + "[fid=" + fid + ']' + log.substring(i)
-            }
-
-            LOG.DEBUG.notifyObservers(output)
-        },
-        handler = handler,
-    )
-
     @Suppress("PrivatePropertyName")
     private val NOTIFIER = object : Notifier {
         public override fun <R : Any> notify(event: RuntimeEvent<R>, output: R) {
             event.notifyObservers(output)
         }
     }
+
+    private val factory = TorCtrl.Factory(
+        staticTag = environment().staticTag,
+        observers = TorEvent.entries.let { events ->
+            val tag = environment().staticTag
+            events.mapTo(LinkedHashSet(events.size, 1.0f)) { event ->
+                when (event) {
+                    TorEvent.CONF_CHANGED -> ConfChangedObserver()
+                    TorEvent.NOTICE -> NoticeObserver()
+                    else -> event.observer(tag) { event.notifyObservers(it) }
+                }
+            }.toImmutableSet()
+        },
+        defaultExecutor = OnEvent.Executor.Immediate,
+        debugger = serviceFactoryDebugger ?: NOTIFIER.newCtrlDebugger(environment()),
+        handler = handler,
+    )
 
     private val connectivity = ConnectivityObserver()
 
@@ -156,6 +141,7 @@ internal class RealTorRuntime private constructor(
             networkObserver,
             requiredTorEvents,
             null,
+            null,
             generator.environment.newRuntimeDispatcher(),
             observersTorEvent,
             defaultExecutor,
@@ -166,6 +152,22 @@ internal class RealTorRuntime private constructor(
         @Throws(IllegalStateException::class)
         internal fun TorRuntime.ServiceFactory.checkInstance() {
             check(this is RealServiceFactory) { "instance must be RealServiceFactory" }
+        }
+
+        @JvmStatic
+        private fun Notifier.newCtrlDebugger(
+            environment: TorRuntime.Environment,
+        ) = ItBlock<String> { log ->
+            if (!environment.debug) return@ItBlock
+
+            val i = log.indexOf('@')
+            val output = if (i == -1) {
+                log
+            } else {
+                log.substring(0, i) + "[fid=" + environment.fid + ']' + log.substring(i)
+            }
+
+            notify(LOG.DEBUG, output)
         }
     }
 
@@ -180,14 +182,12 @@ internal class RealTorRuntime private constructor(
         public override fun toString(): String = toFIDString()
     }
 
-    private inner class ConfChangedObserver private constructor(event: TorEvent): TorEvent.Observer(
-        event = event,
+    private inner class ConfChangedObserver: TorEvent.Observer(
+        event = TorEvent.CONF_CHANGED,
         tag = environment().staticTag,
         executor = null,
         onEvent = OnEvent.noOp(),
     ) {
-        public constructor(): this(TorEvent.CONF_CHANGED)
-
         protected override fun notify(data: String) {
             // TODO: parse data
 
@@ -195,14 +195,12 @@ internal class RealTorRuntime private constructor(
         }
     }
 
-    private inner class NoticeObserver private constructor(event: TorEvent): TorEvent.Observer(
-        event = event,
+    private inner class NoticeObserver: TorEvent.Observer(
+        event = TorEvent.NOTICE,
         tag = environment().staticTag,
         executor = null,
         onEvent = OnEvent.noOp(),
     ) {
-        public constructor(): this(TorEvent.NOTICE)
-
         protected override fun notify(data: String) {
             // TODO: parse data
 
@@ -232,35 +230,31 @@ internal class RealTorRuntime private constructor(
         public override fun environment(): TorRuntime.Environment = generator.environment
 
         // Pipe all events to observers registered with Factory
-        private val observersTorEvent = buildSet {
+        private val observersTorEvent = TorEvent.entries.let { events ->
             val tag = environment().staticTag
-
-            TorEvent.entries.forEach { event ->
-                val observer = event.observer(tag) { event.notifyObservers(it) }
-                add(observer)
-            }
-        }.toImmutableSet()
+            events.mapTo(LinkedHashSet(events.size, 1.0f)) { event ->
+                event.observer(tag) { event.notifyObservers(it) }
+            }.toImmutableSet()
+        }
 
         // Pipe all events to observers registered with Factory
-        private val observersRuntimeEvent = buildSet {
+        private val observersRuntimeEvent = RuntimeEvent.entries.let { events ->
             val tag = environment().staticTag
-
-            RuntimeEvent.entries.forEach { event ->
-                val observer = when (event) {
+            events.mapTo(LinkedHashSet(events.size, 1.0f)) { event ->
+                when (event) {
                     is ERROR -> event.observer(tag) { event.notifyObservers(it) }
                     is LIFECYCLE -> event.observer(tag) { event.notifyObservers(it) }
                     is LOG -> event.observer(tag) { event.notifyObservers(it) }
                 }
-                add(observer)
-            }
-        }.toImmutableSet()
+            }.toImmutableSet()
+        }
 
         public override fun <R : Any> notify(event: RuntimeEvent<R>, output: R) { event.notifyObservers(output) }
 
         public override fun newRuntime(
             serviceEvents: Set<TorEvent>,
             serviceObserver: NetworkObserver?,
-        ): Pair<TorRuntime, Lifecycle> {
+        ): Lifecycle.DestroyableRuntime {
             val lifecycle = Lifecycle.of(handler)
 
             val runtime = RealTorRuntime(
@@ -268,6 +262,7 @@ internal class RealTorRuntime private constructor(
                 serviceObserver ?: builderObserver,
                 (builderRequiredEvents + serviceEvents).toImmutableSet(),
                 handler,
+                newCtrlDebugger(environment()),
                 dispatcher,
                 observersTorEvent,
 
@@ -278,7 +273,6 @@ internal class RealTorRuntime private constructor(
             )
 
             lifecycle.invokeOnCompletion {
-                // Clear all observers immediately
                 runtime.onDestroy()
                 runtime.scope.cancel()
                 d(runtime, "Scope Cancelled")
@@ -287,7 +281,7 @@ internal class RealTorRuntime private constructor(
                 lce(Lifecycle.Event.OnDestroy(runtime))
             }
 
-            return runtime to lifecycle
+            return Lifecycle.DestroyableRuntime.of(lifecycle, runtime)
         }
 
         init {

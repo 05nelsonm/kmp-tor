@@ -456,7 +456,7 @@ public interface TorRuntime:
         public fun newRuntime(
             serviceEvents: Set<TorEvent>,
             serviceObserver: NetworkObserver?,
-        ): Pair<TorRuntime, Lifecycle>
+        ): Lifecycle.DestroyableRuntime
 
         @InternalKmpTorApi
         public companion object {

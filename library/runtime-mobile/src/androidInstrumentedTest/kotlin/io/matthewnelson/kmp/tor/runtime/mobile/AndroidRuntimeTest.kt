@@ -26,7 +26,7 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.fail
 
-class AndroidTorRuntimeTest {
+class AndroidRuntimeTest {
 
     private val app = ApplicationProvider.getApplicationContext<Application>()
 

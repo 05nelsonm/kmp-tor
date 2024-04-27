@@ -15,7 +15,9 @@
  **/
 package io.matthewnelson.kmp.tor.runtime
 
+import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
 import io.matthewnelson.kmp.tor.runtime.core.*
+import io.matthewnelson.kmp.tor.runtime.internal.RealTorRuntime
 import kotlin.jvm.JvmField
 import kotlin.jvm.JvmStatic
 import kotlin.jvm.JvmSynthetic
@@ -189,6 +191,23 @@ public class Lifecycle: Destroyable {
 
         private companion object {
             private val ON_FAILURE: OnFailure = OnFailure {}
+        }
+    }
+
+    @InternalKmpTorApi
+    public class DestroyableRuntime private constructor(
+        @JvmField
+        public val lifecycle: Lifecycle,
+        runtime: RealTorRuntime,
+    ): TorRuntime by runtime, Destroyable by lifecycle {
+
+        internal companion object {
+
+            @JvmSynthetic
+            internal fun of(
+                lifecycle: Lifecycle,
+                runtime: RealTorRuntime,
+            ): DestroyableRuntime = DestroyableRuntime(lifecycle, runtime)
         }
     }
 }

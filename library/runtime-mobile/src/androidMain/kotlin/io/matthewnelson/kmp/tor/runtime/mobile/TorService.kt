@@ -42,7 +42,7 @@ internal class TorService internal constructor(): AbstractTorService() {
             ?: throw IllegalStateException("TorService.Initializer must be initialized")
 
         // TODO: Start service + bind + inject factory
-        private val instance by lazy { factory.newRuntime(emptySet(), null) }
+        private val runtime by lazy { factory.newRuntime(emptySet(), null) }
 
         public override fun environment(): TorRuntime.Environment = factory.environment()
 
@@ -50,13 +50,13 @@ internal class TorService internal constructor(): AbstractTorService() {
             action: RuntimeAction,
             onFailure: OnFailure,
             onSuccess: OnSuccess<Unit>,
-        ): QueuedJob = instance.first.enqueue(action, onFailure, onSuccess)
+        ): QueuedJob = runtime.enqueue(action, onFailure, onSuccess)
 
         public override fun <Response : Any> enqueue(
             cmd: TorCmd.Unprivileged<Response>,
             onFailure: OnFailure,
             onSuccess: OnSuccess<Response>,
-        ): QueuedJob = instance.first.enqueue(cmd, onFailure, onSuccess)
+        ): QueuedJob = runtime.enqueue(cmd, onFailure, onSuccess)
 
         init {
             factory.lce(Lifecycle.Event.OnCreate(this))
