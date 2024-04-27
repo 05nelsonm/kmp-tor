@@ -313,14 +313,15 @@ public interface TorRuntime:
          * A 24 character id based on the [workDir] path making it
          * locally identifiable based on the device's filesystem.
          *
-         * It is the product of the SHA-256 hash of the path, whereby the
-         * first middle and last 4 bytes (12 bytes total) are Base16 (hex)
-         * encoded.
+         * It is the product of a double SHA-256 hash of the path,
+         * whereby the first middle and last 4 bytes (12 bytes total)
+         * are Base16 (hex) encoded.
          * */
         @get:JvmName("id")
         public val id: String by lazy {
             val bytes = SHA256().apply {
-                update(workDir.path.encodeToByteArray())
+                val hash = digest(workDir.path.encodeToByteArray())
+                update(hash)
             }.digest()
 
             val s = StringBuilder(24)
@@ -460,6 +461,10 @@ public interface TorRuntime:
                 Random.Default.nextBytes(16)
             }.encodeToString(Base16)
         }
+
+        public override fun equals(other: Any?): Boolean = other is Environment && other.id == id
+        public override fun hashCode(): Int = 17 * 31 + id.hashCode()
+        public override fun toString(): String = "Environment[id=$id]"
     }
 
     @InternalKmpTorApi
@@ -471,13 +476,10 @@ public interface TorRuntime:
 
         public val environment: Environment
 
-        public fun newLifecycle(): Lifecycle
-
         public fun newRuntime(
-            lifecycle: Lifecycle,
-            requiredEvents: Set<TorEvent>,
-            observer: NetworkObserver?,
-        ): TorRuntime
+            serviceEvents: Set<TorEvent>,
+            serviceObserver: NetworkObserver?,
+        ): Pair<TorRuntime, Lifecycle>
 
         @InternalKmpTorApi
         public companion object {

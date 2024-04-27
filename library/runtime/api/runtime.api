@@ -207,7 +207,10 @@ public final class io/matthewnelson/kmp/tor/runtime/TorRuntime$Environment {
 	public synthetic fun <init> (Ljava/io/File;Ljava/io/File;Ljava/io/File;Ljava/io/File;Lio/matthewnelson/kmp/tor/core/api/ResourceInstaller;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
 	public static final fun Builder (Ljava/io/File;Ljava/io/File;Lkotlin/jvm/functions/Function1;)Lio/matthewnelson/kmp/tor/runtime/TorRuntime$Environment;
 	public static final fun Builder (Ljava/io/File;Ljava/io/File;Lkotlin/jvm/functions/Function1;Lio/matthewnelson/kmp/tor/runtime/core/ThisBlock;)Lio/matthewnelson/kmp/tor/runtime/TorRuntime$Environment;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun hashCode ()I
 	public final fun id ()Ljava/lang/String;
+	public fun toString ()Ljava/lang/String;
 }
 
 public final class io/matthewnelson/kmp/tor/runtime/TorRuntime$Environment$Builder {

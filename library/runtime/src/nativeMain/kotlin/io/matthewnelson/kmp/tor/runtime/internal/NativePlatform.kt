@@ -17,11 +17,14 @@
 
 package io.matthewnelson.kmp.tor.runtime.internal
 
-import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
 import io.matthewnelson.kmp.tor.runtime.TorRuntime
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.DelicateCoroutinesApi
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.newSingleThreadContext
 
-@OptIn(InternalKmpTorApi::class)
-@Throws(IllegalStateException::class)
-internal actual fun RealTorRuntime.Companion.newServiceRuntimeOrNull(
-    factory: () -> TorRuntime.ServiceFactory,
-): TorRuntime? = null
+@Suppress("NOTHING_TO_INLINE")
+internal actual inline fun TorRuntime.Environment.newRuntimeDispatcher(): CoroutineDispatcher {
+    @OptIn(DelicateCoroutinesApi::class, ExperimentalCoroutinesApi::class)
+    return newSingleThreadContext("Tor-$id")
+}

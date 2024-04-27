@@ -15,6 +15,7 @@
  **/
 package io.matthewnelson.kmp.tor.runtime.mobile
 
+import android.app.Application
 import android.content.Context
 import android.content.Intent
 import androidx.startup.AppInitializer
@@ -22,54 +23,53 @@ import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
 import io.matthewnelson.kmp.tor.runtime.Lifecycle
 import io.matthewnelson.kmp.tor.runtime.RuntimeEvent
 import io.matthewnelson.kmp.tor.runtime.RuntimeAction
+import io.matthewnelson.kmp.tor.runtime.RuntimeEvent.Notifier.Companion.lce
 import io.matthewnelson.kmp.tor.runtime.TorRuntime
 import io.matthewnelson.kmp.tor.runtime.core.*
 import io.matthewnelson.kmp.tor.runtime.core.ctrl.TorCmd
 
+@Suppress("unused")
 internal class TorService internal constructor(): AbstractTorService() {
 
     @OptIn(InternalKmpTorApi::class)
     private class AndroidTorRuntime private constructor(
         private val factory: TorRuntime.ServiceFactory,
-        private val newIntent: () -> Intent,
     ): TorRuntime, TorEvent.Processor by factory, RuntimeEvent.Processor by factory {
 
-        override fun enqueue(
+        init { TorRuntime.ServiceFactory.checkInstance(factory) }
+
+        private val app: () -> Application = TorService.app
+            ?: throw IllegalStateException("TorService.Initializer must be initialized")
+
+        // TODO: Start service + bind + inject factory
+        private val instance by lazy { factory.newRuntime(emptySet(), null) }
+
+        public override fun environment(): TorRuntime.Environment = factory.environment
+
+        public override fun enqueue(
             action: RuntimeAction,
             onFailure: OnFailure,
             onSuccess: OnSuccess<Unit>,
-        ): QueuedJob {
-            TODO("Not yet implemented")
-        }
+        ): QueuedJob = instance.first.enqueue(action, onFailure, onSuccess)
 
-        override fun <Response : Any> enqueue(
+        public override fun <Response : Any> enqueue(
             cmd: TorCmd.Unprivileged<Response>,
             onFailure: OnFailure,
             onSuccess: OnSuccess<Response>,
-        ): QueuedJob {
-            TODO("Not yet implemented")
-        }
-
-        override fun environment(): TorRuntime.Environment = factory.environment
+        ): QueuedJob = instance.first.enqueue(cmd, onFailure, onSuccess)
 
         init {
-            factory.notify(RuntimeEvent.LIFECYCLE, Lifecycle.Event.OnCreate(this))
+            factory.lce(Lifecycle.Event.OnCreate(this))
         }
+
+        public override fun toString(): String = "AndroidTorRuntime[id=${environment().id}]@${hashCode()}"
 
         companion object {
 
             @JvmStatic
             @OptIn(InternalKmpTorApi::class)
             @Throws(IllegalStateException::class)
-            fun create(factory: TorRuntime.ServiceFactory): TorRuntime {
-                TorRuntime.ServiceFactory.checkInstance(factory)
-
-                val newIntent = newIntent
-
-                check(newIntent != null) { "TorService.Initializer must be initialized" }
-
-                return AndroidTorRuntime(factory, newIntent)
-            }
+            fun create(factory: TorRuntime.ServiceFactory): TorRuntime = AndroidTorRuntime(factory)
         }
 
         public override fun unsubscribeAll(tag: String) { factory.unsubscribeAll(tag) }
@@ -95,8 +95,8 @@ internal class TorService internal constructor(): AbstractTorService() {
                     under InitializationProvider in your AndroidManifest.xml
                 """.trimIndent()
             }
-            val appContext = context.applicationContext
-            newIntent = { Intent(appContext, TorService::class.java) }
+            val app = context.applicationContext as Application
+            TorService.app = { app }
             return Companion
         }
 
@@ -115,11 +115,11 @@ internal class TorService internal constructor(): AbstractTorService() {
         internal companion object {
 
             @JvmSynthetic
-            internal fun isInitialized(): Boolean = newIntent != null
+            internal fun isInitialized(): Boolean = app != null
         }
     }
 
     private companion object {
-        private var newIntent: (() -> Intent)? = null
+        private var app: (() -> Application)? = null
     }
 }

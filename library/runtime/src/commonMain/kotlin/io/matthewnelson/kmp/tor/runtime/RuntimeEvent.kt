@@ -13,6 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
+@file:Suppress("KotlinRedundantDiagnosticSuppress")
+
 package io.matthewnelson.kmp.tor.runtime
 
 import io.matthewnelson.immutable.collections.immutableSetOf
@@ -295,6 +297,8 @@ public sealed class RuntimeEvent<R: Any> private constructor(
         public fun clearObservers()
     }
 
+    final override fun toString(): String = name
+
     public companion object {
 
         @JvmStatic
@@ -327,7 +331,31 @@ public sealed class RuntimeEvent<R: Any> private constructor(
     @InternalKmpTorApi
     public interface Notifier {
         public fun <R: Any> notify(event: RuntimeEvent<R>, output: R)
-    }
 
-    final override fun toString(): String = name
+        @InternalKmpTorApi
+        public companion object {
+
+            @JvmStatic
+            @Suppress("NOTHING_TO_INLINE")
+            public inline fun <E: LOG> Notifier.log(event: E, from: Any, log: String) {
+                notify(event, "$from $log")
+            }
+
+            @JvmStatic
+            @Suppress("NOTHING_TO_INLINE")
+            public inline fun Notifier.d(from: Any, log: String) { log(LOG.DEBUG, from, log) }
+
+            @JvmStatic
+            @Suppress("NOTHING_TO_INLINE")
+            public inline fun Notifier.i(from: Any, log: String) { log(LOG.INFO, from, log) }
+
+            @JvmStatic
+            @Suppress("NOTHING_TO_INLINE")
+            public inline fun Notifier.w(from: Any, log: String) { log(LOG.WARN, from, log) }
+
+            @JvmStatic
+            @Suppress("NOTHING_TO_INLINE")
+            public inline fun Notifier.lce(event: Lifecycle.Event) { notify(LIFECYCLE, event) }
+        }
+    }
 }

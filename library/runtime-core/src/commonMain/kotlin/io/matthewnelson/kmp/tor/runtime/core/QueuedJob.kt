@@ -364,7 +364,10 @@ protected constructor(
         }
     }
 
-    final override fun toString(): String = toString(_state)
+    public final override fun toString(): String = toString(_state)
 
-    private fun toString(state: State): String = "QueuedJob[name=$name, state=$state]@${hashCode()}"
+    private fun toString(state: State): String {
+        val clazz = this::class.simpleName ?: "QueuedJob"
+        return "$clazz[name=$name, state=$state]@${hashCode()}"
+    }
 }

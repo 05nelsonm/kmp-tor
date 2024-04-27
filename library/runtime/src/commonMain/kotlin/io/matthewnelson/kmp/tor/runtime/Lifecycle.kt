@@ -20,9 +20,7 @@ import kotlin.jvm.JvmField
 import kotlin.jvm.JvmStatic
 import kotlin.jvm.JvmSynthetic
 
-public class Lifecycle private constructor(
-    private val handler: UncaughtException.Handler
-): Destroyable {
+public class Lifecycle: Destroyable {
 
     /**
      * An event pertaining to an object's lifecycle.
@@ -120,31 +118,44 @@ public class Lifecycle private constructor(
         }
     }
 
-    private val job = Job()
+    /* INTERNAL USAGE FOR TorRuntime.ServiceFactory */
 
-    override fun isDestroyed(): Boolean = job.isCompleting || !job.isActive
+    private val job: LifecycleJob
 
-    override fun destroy() { job.complete() }
+    @Suppress("ConvertSecondaryConstructorToPrimary")
+    private constructor(handler: UncaughtException.Handler): super() {
+        job = LifecycleJob(handler)
+    }
+
+    public override fun isDestroyed(): Boolean = job.isCompleting || !job.isActive
+
+    public override fun destroy() { job.complete() }
 
     public fun invokeOnCompletion(
         handle: ItBlock<Unit>,
     ): Disposable = job.invokeOnCompletion { handle(Unit) }
 
-    private inner class Job: QueuedJob("LIFECYCLE", ON_FAILURE, handler) {
+    public override fun toString(): String = job.toString()
+
+    internal companion object {
+
+        // throws if handler is an instance of UncaughtException.SuppressedHandler
+        @JvmSynthetic
+        @Throws(IllegalArgumentException::class)
+        internal fun of(handler: UncaughtException.Handler): Lifecycle = Lifecycle(handler)
+    }
+
+    private class LifecycleJob(
+        handler: UncaughtException.Handler,
+    ): QueuedJob("TorRuntime", ON_FAILURE, handler) {
 
         // non-cancellable
         init { onExecuting() }
 
         fun complete() { onCompletion(Unit) { null } }
+
+        private companion object {
+            private val ON_FAILURE: OnFailure = OnFailure {}
+        }
     }
-
-    internal companion object {
-
-        @JvmSynthetic
-        internal fun of(handler: UncaughtException.Handler): Lifecycle = Lifecycle(handler)
-
-        private val ON_FAILURE: OnFailure = OnFailure {}
-    }
-
-    public override fun toString(): String = "Lifecycle[isDestroyed=${isDestroyed()}]@${hashCode()}"
 }

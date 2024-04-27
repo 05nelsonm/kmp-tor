@@ -13,6 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
+@file:Suppress("LocalVariableName")
+
 package io.matthewnelson.kmp.tor.runtime.internal
 
 import io.matthewnelson.kmp.file.IOException
@@ -21,6 +23,8 @@ import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
 import io.matthewnelson.kmp.tor.runtime.ConfigBuilderCallback
 import io.matthewnelson.kmp.tor.runtime.ConfigBuilderCallback.Companion.putDefaults
 import io.matthewnelson.kmp.tor.runtime.RuntimeEvent.*
+import io.matthewnelson.kmp.tor.runtime.RuntimeEvent.Notifier.Companion.d
+import io.matthewnelson.kmp.tor.runtime.RuntimeEvent.Notifier.Companion.w
 import io.matthewnelson.kmp.tor.runtime.TorRuntime
 import io.matthewnelson.kmp.tor.runtime.core.TorConfig
 import io.matthewnelson.kmp.tor.runtime.core.TorConfig.*
@@ -49,23 +53,25 @@ internal class TorConfigGenerator internal constructor(
 
     @Throws(Exception::class)
     internal suspend fun generate(
-        n: Notifier,
+        NOTIFIER: Notifier,
     ): Pair<TorConfig, ResourceInstaller.Paths.Tor> {
-        n.notify(LOG.DEBUG, "Installing tor resources (if needed)")
+        NOTIFIER.d(this, "Installing tor resources (if needed)")
         val paths = environment.torResource.install()
 
-        val config = createConfig(paths, n).validateTCPPorts(n)
+        val config = createConfig(paths, NOTIFIER).validateTCPPorts(NOTIFIER)
         return config to paths
     }
 
     private fun createConfig(
         paths: ResourceInstaller.Paths.Tor,
-        n: Notifier,
+        NOTIFIER: Notifier,
     ): TorConfig = TorConfig.Builder {
         try {
-            n.notify(LOG.DEBUG, "Refreshing localhost IP address cache")
+            NOTIFIER.d(this@TorConfigGenerator, "Refreshing localhost IP address cache")
             LocalHost.refreshCache()
-        } catch (_: IOException) {}
+        } catch (_: IOException) {
+            NOTIFIER.w(this@TorConfigGenerator, "localhost IP address refresh failed")
+        }
 
         // Apply library consumers' configuration(s)
         config.forEach { block -> apply(environment, block) }
@@ -74,7 +80,7 @@ internal class TorConfigGenerator internal constructor(
     }
 
     private suspend fun TorConfig.validateTCPPorts(
-        n: Notifier,
+        NOTIFIER: Notifier,
     ): TorConfig {
         val ports = filterByAttribute<Keyword.Attribute.Port>().filter { setting ->
             setting[Extra.AllowReassign] == true
@@ -98,9 +104,9 @@ internal class TorConfigGenerator internal constructor(
 
             if (isPortAvailable(host, port)) return@mapNotNull null
             val reassigned = setting.reassignTCPPortAutoOrNull() ?: return@mapNotNull null
-            n.notify(
-                LOG.WARN,
-                "UNAVAILABLE_PORT[${setting.keyword}] ${setting.argument} reassigned to 'auto'"
+            NOTIFIER.w(
+                this@TorConfigGenerator,
+                "UNAVAILABLE_PORT[${setting.keyword}] ${setting.argument} reassigned to 'auto'",
             )
             setting to reassigned
         }
@@ -114,4 +120,6 @@ internal class TorConfigGenerator internal constructor(
             }
         }
     }
+
+    public override fun toString(): String = "TorConfigGenerator[id=${environment.id}]"
 }

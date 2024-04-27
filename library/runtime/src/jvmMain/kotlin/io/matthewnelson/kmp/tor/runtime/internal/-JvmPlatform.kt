@@ -20,19 +20,32 @@ package io.matthewnelson.kmp.tor.runtime.internal
 import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
 import io.matthewnelson.kmp.tor.core.resource.OSInfo
 import io.matthewnelson.kmp.tor.runtime.TorRuntime
+import kotlinx.coroutines.*
+import java.lang.reflect.Method
+import java.util.concurrent.Executors
+import java.util.concurrent.atomic.AtomicLong
+
+@Suppress("NOTHING_TO_INLINE")
+internal actual inline fun TorRuntime.Environment.newRuntimeDispatcher(): CoroutineDispatcher {
+    val threadNo = AtomicLong()
+    val executor = Executors.newSingleThreadExecutor { runnable ->
+        val t = Thread(runnable, "Tor-$id-${threadNo.incrementAndGet()}")
+        t.isDaemon = true
+        t.priority = Thread.MAX_PRIORITY
+        t
+    }
+    return executor.asCoroutineDispatcher()
+}
 
 @JvmSynthetic
 @OptIn(InternalKmpTorApi::class)
 @Throws(IllegalStateException::class)
-internal actual fun TorRuntime.ServiceFactory.Companion.serviceRuntimeOrNull(
-    block: () -> TorRuntime.ServiceFactory,
-): TorRuntime? {
-    val create = AndroidTorRuntimeCreate ?: return null
-    return create.invoke(null, block()) as TorRuntime
-}
+internal actual fun RealTorRuntime.Companion.newServiceRuntimeOrNull(
+    factory: () -> TorRuntime.ServiceFactory,
+): TorRuntime? = AndroidTorRuntimeCreate?.let { it.invoke(null, factory()) as TorRuntime }
 
 @OptIn(InternalKmpTorApi::class)
-private val AndroidTorRuntimeCreate by lazy {
+private val AndroidTorRuntimeCreate: Method? by lazy {
     if (!OSInfo.INSTANCE.isAndroidRuntime()) return@lazy null
 
     try {
