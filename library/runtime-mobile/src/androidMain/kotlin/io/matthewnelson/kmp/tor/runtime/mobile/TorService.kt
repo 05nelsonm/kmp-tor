@@ -17,14 +17,10 @@ package io.matthewnelson.kmp.tor.runtime.mobile
 
 import android.app.Application
 import android.content.Context
-import android.content.Intent
 import androidx.startup.AppInitializer
 import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
-import io.matthewnelson.kmp.tor.runtime.Lifecycle
-import io.matthewnelson.kmp.tor.runtime.RuntimeEvent
-import io.matthewnelson.kmp.tor.runtime.RuntimeAction
+import io.matthewnelson.kmp.tor.runtime.*
 import io.matthewnelson.kmp.tor.runtime.RuntimeEvent.Notifier.Companion.lce
-import io.matthewnelson.kmp.tor.runtime.TorRuntime
 import io.matthewnelson.kmp.tor.runtime.core.*
 import io.matthewnelson.kmp.tor.runtime.core.ctrl.TorCmd
 
@@ -34,7 +30,11 @@ internal class TorService internal constructor(): AbstractTorService() {
     @OptIn(InternalKmpTorApi::class)
     private class AndroidTorRuntime private constructor(
         private val factory: TorRuntime.ServiceFactory,
-    ): TorRuntime, TorEvent.Processor by factory, RuntimeEvent.Processor by factory {
+    ) : TorRuntime,
+        TorEvent.Processor by factory,
+        RuntimeEvent.Processor by factory,
+        FileID by factory
+    {
 
         init { TorRuntime.ServiceFactory.checkInstance(factory) }
 
@@ -62,7 +62,7 @@ internal class TorService internal constructor(): AbstractTorService() {
             factory.lce(Lifecycle.Event.OnCreate(this))
         }
 
-        public override fun toString(): String = "AndroidTorRuntime[id=${environment().id}]@${hashCode()}"
+        public override fun toString(): String = "AndroidTorRuntime[id=$fid]@${hashCode()}"
 
         companion object {
 

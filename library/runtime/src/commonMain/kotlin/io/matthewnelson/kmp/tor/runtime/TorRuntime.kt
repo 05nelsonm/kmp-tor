@@ -19,13 +19,13 @@ package io.matthewnelson.kmp.tor.runtime
 
 import io.matthewnelson.encoding.base16.Base16
 import io.matthewnelson.encoding.core.Encoder.Companion.encodeToString
-import io.matthewnelson.encoding.core.use
 import io.matthewnelson.immutable.collections.toImmutableSet
 import io.matthewnelson.kmp.file.*
 import io.matthewnelson.kmp.tor.core.api.ResourceInstaller
 import io.matthewnelson.kmp.tor.core.api.ResourceInstaller.Paths
 import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
 import io.matthewnelson.kmp.tor.core.api.annotation.KmpTorDsl
+import io.matthewnelson.kmp.tor.runtime.FileID.Companion.toFIDString
 import io.matthewnelson.kmp.tor.runtime.TorRuntime.Companion.Builder
 import io.matthewnelson.kmp.tor.runtime.TorRuntime.Environment.Companion.Builder
 import io.matthewnelson.kmp.tor.runtime.core.*
@@ -37,10 +37,8 @@ import io.matthewnelson.kmp.tor.runtime.internal.RealTorRuntime.Companion.checkI
 import io.matthewnelson.kmp.tor.runtime.internal.TorConfigGenerator
 import org.kotlincrypto.SecRandomCopyException
 import org.kotlincrypto.SecureRandom
-import org.kotlincrypto.hash.sha2.SHA256
 import kotlin.concurrent.Volatile
 import kotlin.jvm.JvmField
-import kotlin.jvm.JvmName
 import kotlin.jvm.JvmStatic
 import kotlin.jvm.JvmSynthetic
 import kotlin.random.Random
@@ -51,6 +49,7 @@ import kotlin.random.Random
  * @see [Companion.Builder]
  * */
 public interface TorRuntime:
+    FileID,
     TorCmd.Unprivileged.Processor,
     TorEvent.Processor,
     RuntimeAction.Processor,
@@ -292,7 +291,7 @@ public interface TorRuntime:
         public val torrcDefaultsFile: File,
         @JvmField
         public val torResource: ResourceInstaller<Paths.Tor>,
-    ) {
+    ): FileID {
 
         /**
          * Toggle to dispatch [RuntimeEvent.LOG.DEBUG] and [TorEvent.DEBUG]
@@ -309,30 +308,7 @@ public interface TorRuntime:
         @Volatile
         public var debug: Boolean = false
 
-        /**
-         * A 24 character id based on the [workDir] path making it
-         * locally identifiable based on the device's filesystem.
-         *
-         * It is the product of a double SHA-256 hash of the path,
-         * whereby the first middle and last 4 bytes (12 bytes total)
-         * are Base16 (hex) encoded.
-         * */
-        @get:JvmName("id")
-        public val id: String by lazy {
-            val bytes = SHA256().apply {
-                val hash = digest(workDir.path.encodeToByteArray())
-                update(hash)
-            }.digest()
-
-            val s = StringBuilder(24)
-            Base16.newEncoderFeed { char -> s.append(char) }.use { feed ->
-                for (i in 0..3) { feed.consume(bytes[i]) }
-                for (i in 13..16) { feed.consume(bytes[i]) }
-                for (i in 28..31) { feed.consume(bytes[i]) }
-            }
-
-            s.toString()
-        }
+        public override val fid: String by lazy { FileID.createFID(workDir) }
 
         public companion object {
 
@@ -462,16 +438,17 @@ public interface TorRuntime:
             }.encodeToString(Base16)
         }
 
-        public override fun equals(other: Any?): Boolean = other is Environment && other.id == id
-        public override fun hashCode(): Int = 17 * 31 + id.hashCode()
-        public override fun toString(): String = "Environment[id=$id]"
+        public override fun equals(other: Any?): Boolean = other is Environment && other.fid == fid
+        public override fun hashCode(): Int = 17 * 31 + fid.hashCode()
+        public override fun toString(): String = toFIDString(includeHashCode = false)
     }
 
     @InternalKmpTorApi
     public interface ServiceFactory:
         TorEvent.Processor,
         RuntimeEvent.Processor,
-        RuntimeEvent.Notifier
+        RuntimeEvent.Notifier,
+        FileID
     {
 
         public val environment: Environment

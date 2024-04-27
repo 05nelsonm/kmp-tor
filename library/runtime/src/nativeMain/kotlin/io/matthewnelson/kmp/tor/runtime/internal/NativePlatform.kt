@@ -26,5 +26,5 @@ import kotlinx.coroutines.newSingleThreadContext
 @Suppress("NOTHING_TO_INLINE")
 internal actual inline fun TorRuntime.Environment.newRuntimeDispatcher(): CoroutineDispatcher {
     @OptIn(DelicateCoroutinesApi::class, ExperimentalCoroutinesApi::class)
-    return newSingleThreadContext("Tor-$id")
+    return newSingleThreadContext("Tor-$fid")
 }

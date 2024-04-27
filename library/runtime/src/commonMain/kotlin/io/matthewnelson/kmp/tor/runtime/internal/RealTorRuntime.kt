@@ -19,6 +19,7 @@ import io.matthewnelson.immutable.collections.toImmutableSet
 import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
 import io.matthewnelson.kmp.tor.core.resource.SynchronizedObject
 import io.matthewnelson.kmp.tor.runtime.*
+import io.matthewnelson.kmp.tor.runtime.FileID.Companion.toFIDString
 import io.matthewnelson.kmp.tor.runtime.core.*
 import io.matthewnelson.kmp.tor.runtime.Lifecycle
 import io.matthewnelson.kmp.tor.runtime.RuntimeEvent.*
@@ -34,6 +35,7 @@ internal class RealTorRuntime private constructor(
     private val generator: TorConfigGenerator,
     private val networkObserver: NetworkObserver,
     private val requiredTorEvents: Set<TorEvent>,
+    serviceHandler: HandlerWithContext?,
     dispatcher: CoroutineDispatcher,
     observersTorEvent: Set<TorEvent.Observer>,
     defaultExecutor: OnEvent.Executor,
@@ -44,14 +46,17 @@ internal class RealTorRuntime private constructor(
     observersRuntimeEvent,
     defaultExecutor,
     observersTorEvent,
-), TorRuntime {
+), FileID by generator,
+   TorRuntime
+{
 
     protected override val debug: Boolean get() = generator.environment.debug
     public override fun environment(): TorRuntime.Environment = generator.environment
+    protected override val handler: HandlerWithContext = serviceHandler ?: super.handler
     private val lock = SynchronizedObject()
 
     private val scope = CoroutineScope(context =
-        CoroutineName("TorRuntime@${hashCode()}")
+        CoroutineName(toString())
         + SupervisorJob()
         + dispatcher
         + handler
@@ -90,9 +95,7 @@ internal class RealTorRuntime private constructor(
             val output = if (i == -1) {
                 log
             } else {
-                log.substring(0, i) +
-                "[id=${environment().id}]" +
-                log.substring(i)
+                log.substring(0, i) + "[fid=" + fid + ']' + log.substring(i)
             }
 
             LOG.DEBUG.notifyObservers(output)
@@ -132,31 +135,7 @@ internal class RealTorRuntime private constructor(
         NOTIFIER.lce(Lifecycle.Event.OnSubscribed(connectivity))
     }
 
-    // Only ever invoked from RealServiceFactory
-    protected override fun onDestroy(): Boolean {
-        if (!scope.isActive) return false
-
-        scope.cancel()
-        NOTIFIER.d(this, "Scope Cancelled")
-
-        try {
-            networkObserver.unsubscribe(connectivity)
-            NOTIFIER.lce(Lifecycle.Event.OnUnsubscribed(connectivity))
-
-            // TODO: Destroy connection
-            // TODO: Cancel ActionJobs
-        } finally {
-            NOTIFIER.lce(Lifecycle.Event.OnDestroy(this))
-
-            // Must come last as RuntimeEvent.ERROR needs to be present
-            // to pipe UncaughtException, otherwise it will throw
-            super.onDestroy()
-        }
-
-        return true
-    }
-
-    public override fun toString(): String = "RealTorRuntime[id=${environment().id}]@${hashCode()}"
+    public override fun toString(): String = toFIDString()
 
     internal companion object {
 
@@ -182,6 +161,7 @@ internal class RealTorRuntime private constructor(
             generator,
             networkObserver,
             requiredTorEvents,
+            null,
             generator.environment.newRuntimeDispatcher(),
             observersTorEvent,
             defaultExecutor,
@@ -195,7 +175,7 @@ internal class RealTorRuntime private constructor(
         }
     }
 
-    private inner class ConnectivityObserver: OnEvent<NetworkObserver.Connectivity> {
+    private inner class ConnectivityObserver: OnEvent<NetworkObserver.Connectivity>, FileID by this {
 
         override fun invoke(it: NetworkObserver.Connectivity) {
             // TODO
@@ -203,7 +183,7 @@ internal class RealTorRuntime private constructor(
 
         override fun equals(other: Any?): Boolean = other is ConnectivityObserver && other.hashCode() == hashCode()
         override fun hashCode(): Int = this@RealTorRuntime.hashCode()
-        override fun toString(): String = "ConnectivityObserver[id=${environment().id}]@${hashCode()}"
+        override fun toString(): String = toFIDString()
     }
 
     private class RealServiceFactory(
@@ -219,7 +199,9 @@ internal class RealTorRuntime private constructor(
         observersRuntimeEvent,
         defaultExecutor,
         observersTorEvent
-    ), TorRuntime.ServiceFactory {
+    ), TorRuntime.ServiceFactory,
+       FileID by generator
+    {
 
         protected override val debug: Boolean get() = generator.environment.debug
         private val dispatcher by lazy { generator.environment.newRuntimeDispatcher() }
@@ -261,6 +243,7 @@ internal class RealTorRuntime private constructor(
                 generator,
                 serviceObserver ?: builderObserver,
                 (builderRequiredEvents + serviceEvents).toImmutableSet(),
+                handler,
                 dispatcher,
                 observersTorEvent,
 
@@ -271,7 +254,13 @@ internal class RealTorRuntime private constructor(
             )
 
             lifecycle.invokeOnCompletion {
+                // Clear all observers immediately
                 runtime.onDestroy()
+                runtime.scope.cancel()
+                d(runtime, "Scope Cancelled")
+                runtime.networkObserver.unsubscribe(runtime.connectivity)
+                lce(Lifecycle.Event.OnUnsubscribed(runtime.connectivity))
+                lce(Lifecycle.Event.OnDestroy(runtime))
             }
 
             return runtime to lifecycle

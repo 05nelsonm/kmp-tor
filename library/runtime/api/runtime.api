@@ -5,6 +5,21 @@ public abstract interface class io/matthewnelson/kmp/tor/runtime/ConfigBuilderCa
 public final class io/matthewnelson/kmp/tor/runtime/ConfigBuilderCallback$Companion {
 }
 
+public abstract interface class io/matthewnelson/kmp/tor/runtime/FileID {
+	public static final field Companion Lio/matthewnelson/kmp/tor/runtime/FileID$Companion;
+	public static fun createFID (Ljava/io/File;)Ljava/lang/String;
+	public abstract fun getFid ()Ljava/lang/String;
+	public static fun toFIDString (Lio/matthewnelson/kmp/tor/runtime/FileID;)Ljava/lang/String;
+	public static fun toFIDString (Lio/matthewnelson/kmp/tor/runtime/FileID;Z)Ljava/lang/String;
+}
+
+public final class io/matthewnelson/kmp/tor/runtime/FileID$Companion {
+	public final fun createFID (Ljava/io/File;)Ljava/lang/String;
+	public final fun toFIDString (Lio/matthewnelson/kmp/tor/runtime/FileID;)Ljava/lang/String;
+	public final fun toFIDString (Lio/matthewnelson/kmp/tor/runtime/FileID;Z)Ljava/lang/String;
+	public static synthetic fun toFIDString$default (Lio/matthewnelson/kmp/tor/runtime/FileID$Companion;Lio/matthewnelson/kmp/tor/runtime/FileID;ZILjava/lang/Object;)Ljava/lang/String;
+}
+
 public final class io/matthewnelson/kmp/tor/runtime/Lifecycle : io/matthewnelson/kmp/tor/runtime/core/Destroyable {
 	public synthetic fun <init> (Lio/matthewnelson/kmp/tor/runtime/core/UncaughtException$Handler;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
 	public fun destroy ()V
@@ -16,6 +31,7 @@ public final class io/matthewnelson/kmp/tor/runtime/Lifecycle : io/matthewnelson
 public final class io/matthewnelson/kmp/tor/runtime/Lifecycle$Event {
 	public static final field Companion Lio/matthewnelson/kmp/tor/runtime/Lifecycle$Event$Companion;
 	public final field clazz Ljava/lang/String;
+	public final field fid Ljava/lang/String;
 	public final field hash I
 	public final field name Lio/matthewnelson/kmp/tor/runtime/Lifecycle$Event$Name;
 	public synthetic fun <init> (Ljava/lang/Object;Lio/matthewnelson/kmp/tor/runtime/Lifecycle$Event$Name;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
@@ -171,7 +187,7 @@ public abstract interface class io/matthewnelson/kmp/tor/runtime/RuntimeEvent$Pr
 	public abstract fun unsubscribeAll ([Lio/matthewnelson/kmp/tor/runtime/RuntimeEvent;)V
 }
 
-public abstract interface class io/matthewnelson/kmp/tor/runtime/TorRuntime : io/matthewnelson/kmp/tor/runtime/RuntimeAction$Processor, io/matthewnelson/kmp/tor/runtime/RuntimeEvent$Processor, io/matthewnelson/kmp/tor/runtime/core/TorEvent$Processor, io/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$Unprivileged$Processor {
+public abstract interface class io/matthewnelson/kmp/tor/runtime/TorRuntime : io/matthewnelson/kmp/tor/runtime/FileID, io/matthewnelson/kmp/tor/runtime/RuntimeAction$Processor, io/matthewnelson/kmp/tor/runtime/RuntimeEvent$Processor, io/matthewnelson/kmp/tor/runtime/core/TorEvent$Processor, io/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$Unprivileged$Processor {
 	public static final field Companion Lio/matthewnelson/kmp/tor/runtime/TorRuntime$Companion;
 	public static fun Builder (Lio/matthewnelson/kmp/tor/runtime/TorRuntime$Environment;Lio/matthewnelson/kmp/tor/runtime/core/ThisBlock;)Lio/matthewnelson/kmp/tor/runtime/TorRuntime;
 	public abstract fun environment ()Lio/matthewnelson/kmp/tor/runtime/TorRuntime$Environment;
@@ -196,7 +212,7 @@ public final class io/matthewnelson/kmp/tor/runtime/TorRuntime$Companion {
 	public final fun Builder (Lio/matthewnelson/kmp/tor/runtime/TorRuntime$Environment;Lio/matthewnelson/kmp/tor/runtime/core/ThisBlock;)Lio/matthewnelson/kmp/tor/runtime/TorRuntime;
 }
 
-public final class io/matthewnelson/kmp/tor/runtime/TorRuntime$Environment {
+public final class io/matthewnelson/kmp/tor/runtime/TorRuntime$Environment : io/matthewnelson/kmp/tor/runtime/FileID {
 	public static final field Companion Lio/matthewnelson/kmp/tor/runtime/TorRuntime$Environment$Companion;
 	public final field cacheDir Ljava/io/File;
 	public field debug Z
@@ -208,8 +224,8 @@ public final class io/matthewnelson/kmp/tor/runtime/TorRuntime$Environment {
 	public static final fun Builder (Ljava/io/File;Ljava/io/File;Lkotlin/jvm/functions/Function1;)Lio/matthewnelson/kmp/tor/runtime/TorRuntime$Environment;
 	public static final fun Builder (Ljava/io/File;Ljava/io/File;Lkotlin/jvm/functions/Function1;Lio/matthewnelson/kmp/tor/runtime/core/ThisBlock;)Lio/matthewnelson/kmp/tor/runtime/TorRuntime$Environment;
 	public fun equals (Ljava/lang/Object;)Z
+	public fun getFid ()Ljava/lang/String;
 	public fun hashCode ()I
-	public final fun id ()Ljava/lang/String;
 	public fun toString ()Ljava/lang/String;
 }
 

@@ -22,6 +22,8 @@ import io.matthewnelson.kmp.tor.core.api.ResourceInstaller
 import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
 import io.matthewnelson.kmp.tor.runtime.ConfigBuilderCallback
 import io.matthewnelson.kmp.tor.runtime.ConfigBuilderCallback.Companion.putDefaults
+import io.matthewnelson.kmp.tor.runtime.FileID
+import io.matthewnelson.kmp.tor.runtime.FileID.Companion.toFIDString
 import io.matthewnelson.kmp.tor.runtime.RuntimeEvent.*
 import io.matthewnelson.kmp.tor.runtime.RuntimeEvent.Notifier.Companion.d
 import io.matthewnelson.kmp.tor.runtime.RuntimeEvent.Notifier.Companion.w
@@ -49,7 +51,7 @@ internal class TorConfigGenerator internal constructor(
     private val omitGeoIPFileSettings: Boolean,
     private val config: Set<ConfigBuilderCallback>,
     private val isPortAvailable: suspend (LocalHost, Port) -> Boolean,
-) {
+): FileID by environment {
 
     @Throws(Exception::class)
     internal suspend fun generate(
@@ -121,5 +123,5 @@ internal class TorConfigGenerator internal constructor(
         }
     }
 
-    public override fun toString(): String = "TorConfigGenerator[id=${environment.id}]"
+    public override fun toString(): String = toFIDString(includeHashCode = false)
 }

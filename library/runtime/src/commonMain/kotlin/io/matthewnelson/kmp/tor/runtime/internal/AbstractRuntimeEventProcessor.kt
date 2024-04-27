@@ -37,7 +37,7 @@ internal abstract class AbstractRuntimeEventProcessor internal constructor(
 
     private val observers = LinkedHashSet<RuntimeEvent.Observer<*>>(observersRuntimeEvent.size + 1, 1.0F)
     private val lock = SynchronizedObject()
-    protected final override val handler = HandlerWithContext.of { t -> RuntimeEvent.ERROR.notifyObservers(t) }
+    protected override val handler = HandlerWithContext.of { t -> RuntimeEvent.ERROR.notifyObservers(t) }
     // Used for RuntimeEvent.ERROR ONLY
     private val handlerERROR = HandlerWithContext.of(UncaughtException.Handler.THROW)
 

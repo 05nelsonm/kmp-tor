@@ -29,7 +29,7 @@ import java.util.concurrent.atomic.AtomicLong
 internal actual inline fun TorRuntime.Environment.newRuntimeDispatcher(): CoroutineDispatcher {
     val threadNo = AtomicLong()
     val executor = Executors.newSingleThreadExecutor { runnable ->
-        val t = Thread(runnable, "Tor-$id-${threadNo.incrementAndGet()}")
+        val t = Thread(runnable, "Tor-$fid-${threadNo.incrementAndGet()}")
         t.isDaemon = true
         t.priority = Thread.MAX_PRIORITY
         t

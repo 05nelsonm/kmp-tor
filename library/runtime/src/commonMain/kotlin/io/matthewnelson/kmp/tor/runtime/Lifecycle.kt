@@ -28,15 +28,41 @@ public class Lifecycle: Destroyable {
      * @see [RuntimeEvent.LIFECYCLE]
      * */
     public class Event private constructor(
+
+        /**
+         * The class name
+         * */
         @JvmField
         public val clazz: String,
+
+        /**
+         * If the object was an identifiable instance of [FileID]
+         * */
+        @JvmField
+        public val fid: String?,
+
+        /**
+         * The object hash code
+         * */
         @JvmField
         public val hash: Int,
+
+        /**
+         * The event name
+         * */
         @JvmField
         public val name: Name,
     ) {
 
-        private constructor(obj: Any, name: Name): this(obj::class.simpleName ?: "Unknown", obj.hashCode(), name)
+        private constructor(
+            obj: Any,
+            name: Name
+        ): this(
+            obj::class.simpleName ?: "Unknown",
+            (obj as? FileID)?.fid,
+            obj.hashCode(),
+            name,
+        )
 
         @Suppress("FunctionName")
         public companion object {
@@ -95,6 +121,7 @@ public class Lifecycle: Destroyable {
         override fun equals(other: Any?): Boolean {
             return  other is Event
                     && other.clazz == clazz
+                    && other.fid == fid
                     && other.hash == hash
                     && other.name == name
         }
@@ -102,6 +129,7 @@ public class Lifecycle: Destroyable {
         override fun hashCode(): Int {
             var result = 17
             result = result * 31 + clazz.hashCode()
+            result = result * 31 + fid.hashCode()
             result = result * 31 + hash
             result = result * 31 + name.hashCode()
             return result
@@ -110,6 +138,11 @@ public class Lifecycle: Destroyable {
         override fun toString(): String = buildString {
             append("Lifecycle.Event[class=")
             append(clazz)
+            if (fid != null) {
+                append("[fid=")
+                append(fid)
+                append(']')
+            }
             append('@')
             append(hash)
             append(", name=")
