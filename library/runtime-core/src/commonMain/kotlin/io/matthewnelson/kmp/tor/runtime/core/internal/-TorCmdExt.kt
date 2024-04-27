@@ -28,25 +28,19 @@ import kotlin.coroutines.resumeWithException
 internal suspend inline fun <Success: Any> TorCmd.Privileged.Processor.commonExecuteAsync(
     cmd: TorCmd.Privileged<Success>,
 ): Success = suspendCancellableCoroutine { continuation ->
-    var job: QueuedJob? = null
-
-    try {
-        job = enqueue(
-            cmd = cmd,
-            onFailure = { t ->
-                continuation.resumeWithException(t)
-            },
-            onSuccess = { result ->
-                continuation.resume(result)
-            },
-        )
-    } catch (e: IllegalStateException) {
-        continuation.resumeWithException(e)
-    }
+    val job = enqueue(
+        cmd = cmd,
+        onFailure = { t ->
+            continuation.resumeWithException(t)
+        },
+        onSuccess = { result ->
+            continuation.resume(result)
+        },
+    )
 
     continuation.invokeOnCancellation { t ->
         val e = if (t is CancellationException) t else CancellationException(t)
-        job?.cancel(e)
+        job.cancel(e)
     }
 }
 
@@ -54,24 +48,18 @@ internal suspend inline fun <Success: Any> TorCmd.Privileged.Processor.commonExe
 internal suspend inline fun <Success: Any> TorCmd.Unprivileged.Processor.commonExecuteAsync(
     cmd: TorCmd.Unprivileged<Success>,
 ): Success = suspendCancellableCoroutine { continuation ->
-    var job: QueuedJob? = null
-
-    try {
-        job = enqueue(
-            cmd = cmd,
-            onFailure = { t ->
-                continuation.resumeWithException(t)
-            },
-            onSuccess = { result ->
-                continuation.resume(result)
-            },
-        )
-    } catch (e: IllegalStateException) {
-        continuation.resumeWithException(e)
-    }
+    val job = enqueue(
+        cmd = cmd,
+        onFailure = { t ->
+            continuation.resumeWithException(t)
+        },
+        onSuccess = { result ->
+            continuation.resume(result)
+        },
+    )
 
     continuation.invokeOnCancellation { t ->
         val e = if (t is CancellationException) t else CancellationException(t)
-        job?.cancel(e)
+        job.cancel(e)
     }
 }

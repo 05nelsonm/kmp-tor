@@ -19,6 +19,8 @@ import io.matthewnelson.kmp.file.IOException
 import io.matthewnelson.kmp.tor.runtime.core.*
 import io.matthewnelson.kmp.tor.runtime.core.ctrl.TorCmd
 import io.matthewnelson.kmp.tor.runtime.core.ctrl.Reply
+import io.matthewnelson.kmp.tor.runtime.core.util.executeAsync
+import kotlinx.coroutines.test.runTest
 import kotlin.coroutines.cancellation.CancellationException
 import kotlin.test.*
 
@@ -143,9 +145,7 @@ class AbstractTorCmdQueueUnitTest {
             invocationFailure++
             assertIs<CancellationException>(it)
 
-            assertFailsWith<IllegalStateException> {
-                queue.enqueue(TorCmd.Signal.Dump, {}, {})
-            }
+            assertIsNot<TorCmdJob<Reply.Success.OK>>(queue.enqueue(TorCmd.Signal.Dump, {}, {}))
 
             // Verify exception suppression functionality such that
             // all the things still execute and then propagate single
@@ -177,7 +177,7 @@ class AbstractTorCmdQueueUnitTest {
 
         try {
             queue.destroy()
-            fail()
+            fail("queue.destroy did not throw exception")
         } catch (e: UncaughtException) {
             // pass
             assertIs<IOException>(e.cause)
@@ -199,8 +199,22 @@ class AbstractTorCmdQueueUnitTest {
         assertEquals(0, invocationSuccess)
 
         // Unprivileged
-        assertFailsWith<IllegalStateException> { queue.enqueue(TorCmd.Signal.Dump, onFailure, onSuccess) }
+        assertIsNot<TorCmdJob<Reply.Success.OK>>(queue.enqueue(TorCmd.Signal.Dump, { assertIs<IllegalStateException>(it) }, onSuccess))
         // Privileged
-        assertFailsWith<IllegalStateException> { queue.enqueue(TorCmd.Signal.Halt, onFailure, onSuccess) }
+        assertIsNot<TorCmdJob<Reply.Success.OK>>(queue.enqueue(TorCmd.Signal.Halt, { assertIs<IllegalStateException>(it) }, onSuccess))
+    }
+
+    @Test
+    fun givenDestroyed_whenAsync_thenCompletesImmediately() = runTest {
+        val queue = TestQueue()
+        queue.destroy()
+
+        try {
+            queue.executeAsync(TorCmd.Signal.Dump)
+            fail("")
+        } catch (e: IllegalStateException) {
+            // pass
+            assertTrue(e.message?.contains("isDestroyed[true]") == true)
+        }
     }
 }

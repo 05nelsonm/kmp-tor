@@ -99,7 +99,6 @@ internal class RealTorRuntime private constructor(
         TODO("Not yet implemented")
     }
 
-    @Throws(IllegalStateException::class)
     public final override fun <Response : Any> enqueue(
         cmd: TorCmd.Unprivileged<Response>,
         onFailure: OnFailure,

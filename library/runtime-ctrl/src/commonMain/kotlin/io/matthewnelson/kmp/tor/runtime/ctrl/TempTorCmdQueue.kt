@@ -25,6 +25,7 @@ import io.matthewnelson.kmp.tor.runtime.core.ctrl.TorCmd
 import io.matthewnelson.kmp.tor.runtime.ctrl.internal.AbstractTorCtrl
 import io.matthewnelson.kmp.tor.runtime.ctrl.internal.TorCmdJob
 import io.matthewnelson.kmp.tor.runtime.ctrl.internal.cancelAndClearAll
+import io.matthewnelson.kmp.tor.runtime.ctrl.internal.toDestroyedErrorJob
 import kotlin.concurrent.Volatile
 import kotlin.coroutines.cancellation.CancellationException
 import kotlin.jvm.JvmName
@@ -89,20 +90,20 @@ public class TempTorCmdQueue private constructor(
         queue.cancelAndClearAll(cause, handler)
     }
 
-    @Throws(IllegalStateException::class)
     public override fun <Success : Any> enqueue(
         cmd: TorCmd.Unprivileged<Success>,
         onFailure: OnFailure,
         onSuccess: OnSuccess<Success>,
     ): QueuedJob = connection?.enqueue(cmd, onFailure, onSuccess) ?: synchronized(lock) {
         var job = connection?.enqueue(cmd, onFailure, onSuccess)
-        if (job != null) return@synchronized job
 
-        checkDestroy()
-        job = TorCmdJob.of(cmd, onSuccess, onFailure, handler)
-        queue.add(job)
+        if (job == null && !isDestroyed()) {
+            job = TorCmdJob.of(cmd, onSuccess, onFailure, handler)
+            queue.add(job)
+        }
+
         job
-    }
+    } ?: cmd.toDestroyedErrorJob(onFailure, handler)
 
     internal companion object {
 

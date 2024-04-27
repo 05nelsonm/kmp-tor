@@ -26,6 +26,7 @@ import kotlin.concurrent.Volatile
 import kotlin.coroutines.cancellation.CancellationException
 import kotlin.jvm.JvmField
 import kotlin.jvm.JvmName
+import kotlin.jvm.JvmStatic
 
 /**
  * Base abstraction for single-use model that tracks the state
@@ -369,5 +370,24 @@ protected constructor(
     private fun toString(state: State): String {
         val clazz = this::class.simpleName ?: "QueuedJob"
         return "$clazz[name=$name, state=$state]@${hashCode()}"
+    }
+
+    @InternalKmpTorApi
+    public companion object {
+
+        @JvmStatic
+        @InternalKmpTorApi
+        @Throws(IllegalStateException::class)
+        public fun OnFailure.toImmediateErrorJob(
+            name: String,
+            cause: Throwable,
+            handler: UncaughtException.Handler,
+        ): QueuedJob = object: QueuedJob(
+            name,
+            this@toImmediateErrorJob,
+            handler,
+        ) {
+            init { onError(cause) {} }
+        }
     }
 }

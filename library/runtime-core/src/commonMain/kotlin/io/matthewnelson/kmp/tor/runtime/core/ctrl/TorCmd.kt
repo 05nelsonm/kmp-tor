@@ -493,10 +493,7 @@ public sealed class TorCmd<Success: Any> private constructor(
              * @see [OnSuccess]
              * @see [io.matthewnelson.kmp.tor.runtime.core.util.executeSync]
              * @see [io.matthewnelson.kmp.tor.runtime.core.util.executeAsync]
-             * @throws [IllegalStateException] if tor has not been started, or
-             *   the [Processor] is destroyed.
              * */
-            @Throws(IllegalStateException::class)
             public fun <Success: Any> enqueue(
                 cmd: Privileged<Success>,
                 onFailure: OnFailure,
@@ -531,10 +528,7 @@ public sealed class TorCmd<Success: Any> private constructor(
              * @see [OnSuccess]
              * @see [io.matthewnelson.kmp.tor.runtime.core.util.executeSync]
              * @see [io.matthewnelson.kmp.tor.runtime.core.util.executeAsync]
-             * @throws [IllegalStateException] if tor has not been started, or
-             *   the [Processor] is destroyed.
              * */
-            @Throws(IllegalStateException::class)
             public fun <Success: Any> enqueue(
                 cmd: Unprivileged<Success>,
                 onFailure: OnFailure,
