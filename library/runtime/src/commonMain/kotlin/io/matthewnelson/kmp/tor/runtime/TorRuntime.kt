@@ -451,7 +451,7 @@ public interface TorRuntime:
         FileID
     {
 
-        public val environment: Environment
+        public fun environment(): Environment
 
         public fun newRuntime(
             serviceEvents: Set<TorEvent>,

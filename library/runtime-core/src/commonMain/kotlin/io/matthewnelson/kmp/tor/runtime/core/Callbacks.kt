@@ -21,6 +21,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.MainCoroutineDispatcher
 import kotlin.coroutines.CoroutineContext
 import kotlin.jvm.JvmField
+import kotlin.jvm.JvmStatic
 
 /**
  * An alias of [ItBlock] indicating a callback for
@@ -59,9 +60,21 @@ public typealias OnFailure = ItBlock<Throwable>
  * to [io.matthewnelson.kmp.tor.runtime.RuntimeEvent.ERROR]
  * observers.
  *
+ * @see [OnEvent.noOp]
  * @see [OnEvent.Executor]
  * */
 public fun interface OnEvent<in It: Any>: ItBlock<It> {
+
+    public companion object {
+
+        /**
+         * A non-operational, static instance of [OnEvent]. Useful
+         * for classes that inherit from an observer and override
+         * protected notify function.
+         * */
+        @JvmStatic
+        public fun <T: Any> noOp(): OnEvent<T> = NOOP
+    }
 
     /**
      * `kmp-tor` utilizes several different background threads for
@@ -144,6 +157,11 @@ public fun interface OnEvent<in It: Any>: ItBlock<It> {
 
             override fun toString(): String = "OnEvent.Executor.Immediate"
         }
+    }
+
+    private data object NOOP: OnEvent<Any> {
+        override fun invoke(it: Any) {}
+        override fun toString(): String = "OnEvent.NOOP"
     }
 }
 

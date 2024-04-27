@@ -50,7 +50,7 @@ internal class RealTorRuntime private constructor(
    TorRuntime
 {
 
-    protected override val debug: Boolean get() = generator.environment.debug
+    protected override val debug: Boolean get() = environment().debug
     public override fun environment(): TorRuntime.Environment = generator.environment
     protected override val handler: HandlerWithContext = serviceHandler ?: super.handler
     private val lock = SynchronizedObject()
@@ -70,14 +70,8 @@ internal class RealTorRuntime private constructor(
 
             events.forEach { event ->
                 val observer = when (event) {
-                    TorEvent.CONF_CHANGED -> event.observer(tag) { output ->
-                        // TODO
-                        event.notifyObservers(output)
-                    }
-                    TorEvent.NOTICE -> event.observer(tag) { output ->
-                        // TODO
-                        event.notifyObservers(output)
-                    }
+                    TorEvent.CONF_CHANGED -> ConfChangedObserver()
+                    TorEvent.NOTICE -> NoticeObserver()
                     else -> event.observer(tag) { event.notifyObservers(it) }
                 }
 
@@ -105,7 +99,7 @@ internal class RealTorRuntime private constructor(
 
     @Suppress("PrivatePropertyName")
     private val NOTIFIER = object : Notifier {
-        override fun <R : Any> notify(event: RuntimeEvent<R>, output: R) {
+        public override fun <R : Any> notify(event: RuntimeEvent<R>, output: R) {
             event.notifyObservers(output)
         }
     }
@@ -177,13 +171,43 @@ internal class RealTorRuntime private constructor(
 
     private inner class ConnectivityObserver: OnEvent<NetworkObserver.Connectivity>, FileID by this {
 
-        override fun invoke(it: NetworkObserver.Connectivity) {
+        public override fun invoke(it: NetworkObserver.Connectivity) {
             // TODO
         }
 
-        override fun equals(other: Any?): Boolean = other is ConnectivityObserver && other.hashCode() == hashCode()
-        override fun hashCode(): Int = this@RealTorRuntime.hashCode()
-        override fun toString(): String = toFIDString()
+        public override fun equals(other: Any?): Boolean = other is ConnectivityObserver && other.hashCode() == hashCode()
+        public override fun hashCode(): Int = this@RealTorRuntime.hashCode()
+        public override fun toString(): String = toFIDString()
+    }
+
+    private inner class ConfChangedObserver private constructor(event: TorEvent): TorEvent.Observer(
+        event = event,
+        tag = environment().staticTag,
+        executor = null,
+        onEvent = OnEvent.noOp(),
+    ) {
+        public constructor(): this(TorEvent.CONF_CHANGED)
+
+        protected override fun notify(data: String) {
+            // TODO: parse data
+
+            event.notifyObservers(data)
+        }
+    }
+
+    private inner class NoticeObserver private constructor(event: TorEvent): TorEvent.Observer(
+        event = event,
+        tag = environment().staticTag,
+        executor = null,
+        onEvent = OnEvent.noOp(),
+    ) {
+        public constructor(): this(TorEvent.NOTICE)
+
+        protected override fun notify(data: String) {
+            // TODO: parse data
+
+            event.notifyObservers(data)
+        }
     }
 
     private class RealServiceFactory(
@@ -203,13 +227,13 @@ internal class RealTorRuntime private constructor(
        FileID by generator
     {
 
-        protected override val debug: Boolean get() = generator.environment.debug
-        private val dispatcher by lazy { generator.environment.newRuntimeDispatcher() }
-        public override val environment: TorRuntime.Environment get() = generator.environment
+        protected override val debug: Boolean get() = environment().debug
+        private val dispatcher by lazy { environment().newRuntimeDispatcher() }
+        public override fun environment(): TorRuntime.Environment = generator.environment
 
         // Pipe all events to observers registered with Factory
         private val observersTorEvent = buildSet {
-            val tag = environment.staticTag
+            val tag = environment().staticTag
 
             TorEvent.entries.forEach { event ->
                 val observer = event.observer(tag) { event.notifyObservers(it) }
@@ -219,7 +243,7 @@ internal class RealTorRuntime private constructor(
 
         // Pipe all events to observers registered with Factory
         private val observersRuntimeEvent = buildSet {
-            val tag = environment.staticTag
+            val tag = environment().staticTag
 
             RuntimeEvent.entries.forEach { event ->
                 val observer = when (event) {

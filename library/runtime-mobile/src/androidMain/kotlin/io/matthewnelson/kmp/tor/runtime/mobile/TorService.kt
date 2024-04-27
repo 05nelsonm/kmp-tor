@@ -44,7 +44,7 @@ internal class TorService internal constructor(): AbstractTorService() {
         // TODO: Start service + bind + inject factory
         private val instance by lazy { factory.newRuntime(emptySet(), null) }
 
-        public override fun environment(): TorRuntime.Environment = factory.environment
+        public override fun environment(): TorRuntime.Environment = factory.environment()
 
         public override fun enqueue(
             action: RuntimeAction,

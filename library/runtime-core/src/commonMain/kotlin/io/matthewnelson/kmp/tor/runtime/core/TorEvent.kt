@@ -284,10 +284,8 @@ public enum class TorEvent {
         @JvmField
         public val event: TorEvent,
         tag: String?,
-        @JvmField
-        protected val executor: OnEvent.Executor?,
-        @JvmField
-        protected val onEvent: OnEvent<String>,
+        private val executor: OnEvent.Executor?,
+        private val onEvent: OnEvent<String>,
     ) {
 
         /**
@@ -297,26 +295,35 @@ public enum class TorEvent {
         public val tag: String? = tag?.ifBlank { null }
 
         /**
-         * Invokes [OnEvent] for the given [event] string
+         * Optional override for inheritors to do things before
+         * invoking actual [OnEvent] callback within the confines
+         * of the [OnEvent.Executor] context.
+         *
+         * @see [OnEvent.noOp]
+         * */
+        protected open fun notify(data: String) { onEvent(data) }
+
+        /**
+         * Invokes [OnEvent] for the given [data] string
          *
          * @param [default] the default [OnEvent.Executor] to fall
          *   back to if [executor] was not defined for this observer.
          * */
-        public fun notify(default: OnEvent.Executor, event: String) {
-            notify(EmptyCoroutineContext, default, event)
+        public fun notify(default: OnEvent.Executor, data: String) {
+            notify(EmptyCoroutineContext, default, data)
         }
 
         /**
-         * Invokes [OnEvent] for the given [event] string
+         * Invokes [OnEvent] for the given [data] string
          *
          * @param [handler] Optional ability to pass [UncaughtException.Handler]
          *   wrapped as [CoroutineExceptionHandler]
          * @param [default] the default [OnEvent.Executor] to fall
          *   back to if [executor] was not defined for this observer.
          * */
-        public fun notify(handler: CoroutineContext, default: OnEvent.Executor, event: String) {
+        public fun notify(handler: CoroutineContext, default: OnEvent.Executor, data: String) {
             @OptIn(InternalKmpTorApi::class)
-            (executor ?: default).execute(handler) { onEvent(event) }
+            (executor ?: default).execute(handler) { notify(data) }
         }
 
 

@@ -182,10 +182,8 @@ public sealed class RuntimeEvent<R: Any> private constructor(
         @JvmField
         public val event: RuntimeEvent<R>,
         tag: String?,
-        @JvmField
-        protected val executor: OnEvent.Executor?,
-        @JvmField
-        protected val onEvent: OnEvent<R>,
+        private val executor: OnEvent.Executor?,
+        private val onEvent: OnEvent<R>,
     ) {
 
         /**
@@ -195,26 +193,35 @@ public sealed class RuntimeEvent<R: Any> private constructor(
         public val tag: String? = tag?.ifBlank { null }
 
         /**
-         * Invokes [OnEvent] for the given [event]
+         * Optional override for inheritors to do things before
+         * invoking actual [OnEvent] callback within the confines
+         * of the [OnEvent.Executor] context.
+         *
+         * @see [OnEvent.noOp]
+         * */
+        protected open fun notify(data: R) { onEvent(data) }
+
+        /**
+         * Invokes [OnEvent] for the given [data]
          *
          * @param [default] the default [OnEvent.Executor] to fall
          *   back to if [executor] was not defined for this observer.
          * */
-        public fun notify(default: OnEvent.Executor, event: R) {
-            notify(EmptyCoroutineContext, default, event)
+        public fun notify(default: OnEvent.Executor, data: R) {
+            notify(EmptyCoroutineContext, default, data)
         }
 
         /**
-         * Invokes [OnEvent] for the given [event]
+         * Invokes [OnEvent] for the given [data]
          *
          * @param [handler] Optional ability to pass [UncaughtException.Handler]
          *   wrapped as [CoroutineExceptionHandler]
          * @param [default] the default [OnEvent.Executor] to fall
          *   back to if [executor] was not defined for this observer.
          * */
-        public fun notify(handler: CoroutineContext, default: OnEvent.Executor, event: R) {
+        public fun notify(handler: CoroutineContext, default: OnEvent.Executor, data: R) {
             @OptIn(InternalKmpTorApi::class)
-            (executor ?: default).execute(handler) { onEvent(event) }
+            (executor ?: default).execute(handler) { notify(data) }
         }
 
         public final override fun toString(): String = toString(isStatic = false)
