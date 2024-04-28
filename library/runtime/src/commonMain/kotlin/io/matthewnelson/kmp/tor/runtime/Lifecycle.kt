@@ -158,17 +158,13 @@ public class Lifecycle: Destroyable {
     private val job: LifecycleJob
 
     @Suppress("ConvertSecondaryConstructorToPrimary")
-    private constructor(handler: UncaughtException.Handler): super() {
+    private constructor(handler: UncaughtException.Handler) {
         job = LifecycleJob(handler)
     }
 
     public override fun isDestroyed(): Boolean = job.isCompleting || !job.isActive
-
     public override fun destroy() { job.complete() }
-
-    public fun invokeOnCompletion(
-        handle: ItBlock<Unit>,
-    ): Disposable = job.invokeOnCompletion { handle(Unit) }
+    public fun invokeOnCompletion(handle: ItBlock<Any?>): Disposable = job.invokeOnCompletion(handle)
 
     public override fun toString(): String = job.toString()
 
@@ -187,7 +183,7 @@ public class Lifecycle: Destroyable {
         // non-cancellable
         init { onExecuting() }
 
-        fun complete() { onCompletion(Unit) { null } }
+        fun complete() { onCompletion(Unit, null) }
 
         private companion object {
             private val ON_FAILURE: OnFailure = OnFailure {}

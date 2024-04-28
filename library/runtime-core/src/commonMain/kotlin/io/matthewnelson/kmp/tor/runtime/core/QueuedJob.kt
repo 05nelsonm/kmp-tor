@@ -254,12 +254,8 @@ protected constructor(
      * [OnSuccess] returned by [withLock] with provided
      * [response]. Does nothing if the job is already completed
      * or [isCompleting] is true.
-     *
-     * **NOTE:** [withLock] lambda should not call any other
-     * functions which acquire the lock such as [cancel], [onError],
-     * or [invokeOnCompletion]. It **MUST NOT** throw exception.
      * */
-    protected fun <T: Any> onCompletion(response: T, withLock: () -> OnSuccess<T>?) {
+    protected fun <T: Any> onCompletion(response: T, withLock: (() -> OnSuccess<T>?)?) {
         if (_isCompleting || !isActive) return
 
         var onSuccess: OnSuccess<T>? = null
@@ -271,7 +267,7 @@ protected constructor(
             // if implementation calls again it will
             // not lock up.
             _isCompleting = true
-            onSuccess = withLock()
+            onSuccess = withLock?.invoke()
             true
         }
 
@@ -290,12 +286,8 @@ protected constructor(
      * If [cause] is [CancellationException], [cancellationException] will
      * be set and [State.Cancelled] will be utilized for the completion
      * state.
-     *
-     * **NOTE:** [withLock] lambda should not call any other
-     * functions which obtain the lock such as [cancel], [onCompletion],
-     * or [invokeOnCompletion].
      * */
-    protected fun onError(cause: Throwable, withLock: ItBlock<Unit>) {
+    protected fun onError(cause: Throwable, withLock: ItBlock<Unit>?) {
         if (_isCompleting || !isActive) return
 
         val isCancellation = cause is CancellationException
@@ -310,7 +302,7 @@ protected constructor(
             // if implementation calls again it will
             // not lock up.
             _isCompleting = true
-            withLock(Unit)
+            withLock?.invoke(Unit)
             true
         }
 
@@ -333,7 +325,7 @@ protected constructor(
 
         when (this) {
             Enqueued,
-            Executing -> throw IllegalArgumentException("$this cannot call doFinal")
+            Executing -> throw IllegalArgumentException("$this cannot be utilized with doFinal")
             Cancelled,
             Success,
             Error -> {}
@@ -387,7 +379,7 @@ protected constructor(
             this@toImmediateErrorJob,
             handler,
         ) {
-            init { onError(cause) {} }
+            init { onError(cause, null) }
         }
     }
 }

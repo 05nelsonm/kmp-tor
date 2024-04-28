@@ -293,7 +293,7 @@ class QueuedJobUnitTest {
             cancellation(cause)
         }
 
-        public fun error(cause: Throwable) { onError(cause) {} }
+        public fun error(cause: Throwable) { onError(cause, null) }
         @Throws(IllegalStateException::class)
         public fun executing() { onExecuting() }
         public fun completion() { onCompletion(Unit, withLock = { onSuccess }) }
