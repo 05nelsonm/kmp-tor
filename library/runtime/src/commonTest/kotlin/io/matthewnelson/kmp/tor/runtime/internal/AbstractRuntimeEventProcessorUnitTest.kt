@@ -32,7 +32,9 @@ class AbstractRuntimeEventProcessorUnitTest {
         private const val STATIC_TAG = "TAG_STATIC_1234"
     }
 
-    private class TestProcessor(): AbstractRuntimeEventProcessor(STATIC_TAG, emptySet(), OnEvent.Executor.Immediate, emptySet()) {
+    private class TestProcessor(
+        override val isService: Boolean = false,
+    ): AbstractRuntimeEventProcessor(STATIC_TAG, emptySet(), OnEvent.Executor.Immediate, emptySet()) {
         var _debug: Boolean = true
         override val debug: Boolean get() = _debug
         val size: Int get() = registered()
@@ -241,5 +243,28 @@ class AbstractRuntimeEventProcessorUnitTest {
         processor.subscribe(RuntimeEvent.LOG.DEBUG.observer { throw IllegalStateException() })
 
         assertFailsWith<UncaughtException> { processor.notify(RuntimeEvent.LOG.DEBUG, "") }
+    }
+
+    @Test
+    fun givenIsService_whenDestroyed_thenStaticObserversNotRemoved() {
+        var invocationDebug = 0
+        val processor = TestProcessor(isService = true)
+        processor.subscribe(RuntimeEvent.LOG.DEBUG.observer {})
+        processor.subscribe(RuntimeEvent.LOG.DEBUG.observer(STATIC_TAG) { invocationDebug++ })
+        processor.subscribe(TorEvent.INFO.observer {})
+        assertEquals(3, processor.size)
+        processor.destroy()
+
+        // All non-static observers removed
+        assertEquals(1, processor.size)
+
+        // Attempts to add new observers ignored
+        processor.subscribe(RuntimeEvent.LOG.DEBUG.observer {})
+        assertEquals(1, processor.size)
+
+        // notify still works
+        assertEquals(0, invocationDebug)
+        processor.notify(RuntimeEvent.LOG.DEBUG, "")
+        assertEquals(1, invocationDebug)
     }
 }

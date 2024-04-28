@@ -20,17 +20,18 @@ import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
 import io.matthewnelson.kmp.tor.core.resource.SynchronizedObject
 import io.matthewnelson.kmp.tor.core.resource.synchronized
 import io.matthewnelson.kmp.tor.runtime.*
+import io.matthewnelson.kmp.tor.runtime.FileID.Companion.fidEllipses
 import io.matthewnelson.kmp.tor.runtime.FileID.Companion.toFIDString
 import io.matthewnelson.kmp.tor.runtime.core.*
 import io.matthewnelson.kmp.tor.runtime.Lifecycle
 import io.matthewnelson.kmp.tor.runtime.RuntimeEvent.*
 import io.matthewnelson.kmp.tor.runtime.RuntimeEvent.Notifier.Companion.lce
 import io.matthewnelson.kmp.tor.runtime.RuntimeEvent.Notifier.Companion.d
+import io.matthewnelson.kmp.tor.runtime.RuntimeEvent.Notifier.Companion.w
 import io.matthewnelson.kmp.tor.runtime.core.ctrl.TorCmd
 import io.matthewnelson.kmp.tor.runtime.ctrl.TorCtrl
 import kotlinx.coroutines.*
 import kotlin.concurrent.Volatile
-import kotlin.jvm.JvmStatic
 import kotlin.jvm.JvmSynthetic
 
 @OptIn(InternalKmpTorApi::class)
@@ -39,7 +40,6 @@ internal class RealTorRuntime private constructor(
     private val networkObserver: NetworkObserver,
     private val requiredTorEvents: Set<TorEvent>,
     serviceFactoryHandler: HandlerWithContext?,
-    serviceFactoryDebugger: ItBlock<String>?,
     dispatcher: CoroutineDispatcher,
     observersTorEvent: Set<TorEvent.Observer>,
     defaultExecutor: OnEvent.Executor,
@@ -54,9 +54,9 @@ internal class RealTorRuntime private constructor(
    TorRuntime
 {
 
-    private val isService = serviceFactoryHandler != null
     protected override val debug: Boolean get() = environment().debug
     public override fun environment(): TorRuntime.Environment = generator.environment
+    protected override val isService: Boolean = serviceFactoryHandler != null
     protected override val handler: HandlerWithContext = serviceFactoryHandler ?: super.handler
 
     private val lock = SynchronizedObject()
@@ -88,7 +88,18 @@ internal class RealTorRuntime private constructor(
             }.toImmutableSet()
         },
         defaultExecutor = OnEvent.Executor.Immediate,
-        debugger = serviceFactoryDebugger ?: NOTIFIER.newCtrlDebugger(environment()),
+        debugger = ItBlock { log ->
+            if (!debug) return@ItBlock
+
+            val i = log.indexOf('@')
+            val output = if (i == -1) {
+                log
+            } else {
+                log.substring(0, i) + "[fid=" + fidEllipses + ']' + log.substring(i)
+            }
+
+            LOG.DEBUG.notifyObservers(output)
+        },
         handler = handler,
     )
 
@@ -118,6 +129,21 @@ internal class RealTorRuntime private constructor(
 
     public override fun toString(): String = toFIDString(includeHashCode = isService)
 
+    protected override fun onDestroy(): Boolean {
+        if (!isService) {
+            LOG.WARN.notifyObservers("onDestroy called but isService is false")
+            return false
+        }
+
+        if (!super.onDestroy()) return false
+        scope.cancel()
+        NOTIFIER.d(this, "Scope Cancelled")
+        networkObserver.unsubscribe(connectivity)
+        NOTIFIER.lce(Lifecycle.Event.OnUnsubscribed(connectivity))
+        NOTIFIER.lce(Lifecycle.Event.OnDestroy(this))
+        return true
+    }
+
     internal companion object {
 
         @JvmSynthetic
@@ -143,7 +169,6 @@ internal class RealTorRuntime private constructor(
             networkObserver,
             requiredTorEvents,
             null,
-            null,
             generator.environment.newRuntimeDispatcher(),
             observersTorEvent,
             defaultExecutor,
@@ -154,22 +179,6 @@ internal class RealTorRuntime private constructor(
         @Throws(IllegalStateException::class)
         internal fun TorRuntime.ServiceFactory.checkInstance() {
             check(this is RealServiceFactory) { "instance must be RealServiceFactory" }
-        }
-
-        @JvmStatic
-        private fun Notifier.newCtrlDebugger(
-            environment: TorRuntime.Environment,
-        ) = ItBlock<String> { log ->
-            if (!environment.debug) return@ItBlock
-
-            val i = log.indexOf('@')
-            val output = if (i == -1) {
-                log
-            } else {
-                log.substring(0, i) + "[fid=" + environment.fid + ']' + log.substring(i)
-            }
-
-            notify(LOG.DEBUG, output)
         }
     }
 
@@ -268,7 +277,6 @@ internal class RealTorRuntime private constructor(
                 serviceObserver ?: builderObserver,
                 (builderRequiredEvents + serviceEvents).toImmutableSet(),
                 handler,
-                newCtrlDebugger(environment()),
                 dispatcher,
                 observersTorEvent,
 
@@ -285,11 +293,6 @@ internal class RealTorRuntime private constructor(
             destroyable.invokeOnCompletion {
                 _runtime = null
                 runtime.onDestroy()
-                runtime.scope.cancel()
-                d(runtime, "Scope Cancelled")
-                runtime.networkObserver.unsubscribe(runtime.connectivity)
-                lce(Lifecycle.Event.OnUnsubscribed(runtime.connectivity))
-                lce(Lifecycle.Event.OnDestroy(runtime))
                 lce(Lifecycle.Event.OnDestroy(destroyable))
             }
 

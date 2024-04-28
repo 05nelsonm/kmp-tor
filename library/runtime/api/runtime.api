@@ -29,6 +29,34 @@ public final class io/matthewnelson/kmp/tor/runtime/Lifecycle : io/matthewnelson
 	public fun toString ()Ljava/lang/String;
 }
 
+public final class io/matthewnelson/kmp/tor/runtime/Lifecycle$DestroyableTorRuntime : io/matthewnelson/kmp/tor/runtime/TorRuntime, io/matthewnelson/kmp/tor/runtime/core/Destroyable {
+	public synthetic fun <init> (Lio/matthewnelson/kmp/tor/runtime/Lifecycle;Lio/matthewnelson/kmp/tor/runtime/internal/RealTorRuntime;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public fun clearObservers ()V
+	public fun destroy ()V
+	public fun enqueue (Lio/matthewnelson/kmp/tor/runtime/RuntimeAction;Lio/matthewnelson/kmp/tor/runtime/core/ItBlock;Lio/matthewnelson/kmp/tor/runtime/core/ItBlock;)Lio/matthewnelson/kmp/tor/runtime/core/QueuedJob;
+	public fun enqueue (Lio/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$Unprivileged;Lio/matthewnelson/kmp/tor/runtime/core/ItBlock;Lio/matthewnelson/kmp/tor/runtime/core/ItBlock;)Lio/matthewnelson/kmp/tor/runtime/core/QueuedJob;
+	public fun environment ()Lio/matthewnelson/kmp/tor/runtime/TorRuntime$Environment;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun getFid ()Ljava/lang/String;
+	public fun hashCode ()I
+	public final fun invokeOnCompletion (Lio/matthewnelson/kmp/tor/runtime/core/ItBlock;)Lio/matthewnelson/kmp/tor/runtime/core/Disposable;
+	public fun isDestroyed ()Z
+	public fun subscribe (Lio/matthewnelson/kmp/tor/runtime/RuntimeEvent$Observer;)V
+	public fun subscribe (Lio/matthewnelson/kmp/tor/runtime/core/TorEvent$Observer;)V
+	public fun subscribe ([Lio/matthewnelson/kmp/tor/runtime/RuntimeEvent$Observer;)V
+	public fun subscribe ([Lio/matthewnelson/kmp/tor/runtime/core/TorEvent$Observer;)V
+	public fun toString ()Ljava/lang/String;
+	public fun unsubscribe (Lio/matthewnelson/kmp/tor/runtime/RuntimeEvent$Observer;)V
+	public fun unsubscribe (Lio/matthewnelson/kmp/tor/runtime/core/TorEvent$Observer;)V
+	public fun unsubscribe ([Lio/matthewnelson/kmp/tor/runtime/RuntimeEvent$Observer;)V
+	public fun unsubscribe ([Lio/matthewnelson/kmp/tor/runtime/core/TorEvent$Observer;)V
+	public fun unsubscribeAll (Lio/matthewnelson/kmp/tor/runtime/RuntimeEvent;)V
+	public fun unsubscribeAll (Lio/matthewnelson/kmp/tor/runtime/core/TorEvent;)V
+	public fun unsubscribeAll (Ljava/lang/String;)V
+	public fun unsubscribeAll ([Lio/matthewnelson/kmp/tor/runtime/RuntimeEvent;)V
+	public fun unsubscribeAll ([Lio/matthewnelson/kmp/tor/runtime/core/TorEvent;)V
+}
+
 public final class io/matthewnelson/kmp/tor/runtime/Lifecycle$Event {
 	public static final field Companion Lio/matthewnelson/kmp/tor/runtime/Lifecycle$Event$Companion;
 	public final field clazz Ljava/lang/String;

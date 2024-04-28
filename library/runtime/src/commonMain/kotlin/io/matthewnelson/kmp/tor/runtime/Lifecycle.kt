@@ -15,7 +15,6 @@
  **/
 package io.matthewnelson.kmp.tor.runtime
 
-import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
 import io.matthewnelson.kmp.tor.runtime.FileID.Companion.fidEllipses
 import io.matthewnelson.kmp.tor.runtime.FileID.Companion.toFIDString
 import io.matthewnelson.kmp.tor.runtime.core.*
@@ -158,7 +157,6 @@ public class Lifecycle: Destroyable {
         }
     }
 
-    @InternalKmpTorApi
     public class DestroyableTorRuntime private constructor(
         private val lifecycle: Lifecycle,
         private val runtime: RealTorRuntime,

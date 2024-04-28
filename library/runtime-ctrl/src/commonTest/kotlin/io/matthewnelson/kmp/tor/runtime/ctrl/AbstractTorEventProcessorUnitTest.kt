@@ -26,9 +26,14 @@ import kotlin.test.*
 @OptIn(InternalKmpTorApi::class)
 class AbstractTorEventProcessorUnitTest {
 
+    private companion object {
+        private const val STATIC_TAG = "TAG_STATIC_1234"
+    }
+
     private class TestProcessor(
+        override val isService: Boolean = false,
         handler: UncaughtException.Handler = UncaughtException.Handler.THROW
-    ): AbstractTorEventProcessor("static", emptySet(), OnEvent.Executor.Immediate) {
+    ): AbstractTorEventProcessor(STATIC_TAG, emptySet(), OnEvent.Executor.Immediate) {
         override val handler = HandlerWithContext.of(handler)
         val size: Int get() = registered()
         fun notify(event: TorEvent, output: String) { event.notifyObservers(output) }
@@ -121,13 +126,13 @@ class AbstractTorEventProcessorUnitTest {
 
     @Test
     fun givenStaticTag_whenRemove_thenDoesNothing() {
-        processor.subscribe(TorEvent.BW.observer("static") {})
+        processor.subscribe(TorEvent.BW.observer(STATIC_TAG) {})
 
         val nonStaticObserver = TorEvent.BW.observer("non-static") {}
         processor.subscribe(nonStaticObserver)
 
         // should do nothing
-        processor.unsubscribeAll("static")
+        processor.unsubscribeAll(STATIC_TAG)
         assertEquals(2, processor.size)
 
         // Should only remove the non-static observer
@@ -149,7 +154,7 @@ class AbstractTorEventProcessorUnitTest {
 
     @Test
     fun givenStaticObservers_whenOnDestroy_thenEvictsAll() {
-        val observer = TorEvent.BW.observer("static") {}
+        val observer = TorEvent.BW.observer(STATIC_TAG) {}
         processor.subscribe(observer)
         assertEquals(1, processor.size)
 
@@ -212,5 +217,27 @@ class AbstractTorEventProcessorUnitTest {
         assertEquals(1, exceptions.size)
         assertEquals(0, invocationEvent)
         assertTrue(exceptions.first().context.contains(expectedTag))
+    }
+
+    @Test
+    fun givenIsService_whenDestroyed_thenStaticObserversNotRemoved() {
+        var invocationBW = 0
+        val processor = TestProcessor(isService = true)
+        processor.subscribe(TorEvent.BW.observer {})
+        processor.subscribe(TorEvent.BW.observer(STATIC_TAG) { invocationBW++ })
+        assertEquals(2, processor.size)
+        processor.destroy()
+
+        // All non-static observers removed
+        assertEquals(1, processor.size)
+
+        // Attempts to add new observers ignored
+        processor.subscribe(TorEvent.BW.observer {})
+        assertEquals(1, processor.size)
+
+        // notify still works
+        assertEquals(0, invocationBW)
+        processor.notify(TorEvent.BW, "")
+        assertEquals(1, invocationBW)
     }
 }

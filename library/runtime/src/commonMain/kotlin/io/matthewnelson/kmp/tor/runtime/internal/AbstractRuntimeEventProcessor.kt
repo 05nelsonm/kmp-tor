@@ -124,7 +124,7 @@ internal abstract class AbstractRuntimeEventProcessor internal constructor(
 
         if (event is RuntimeEvent.LOG.DEBUG && !debug) return
 
-        val observers = withObservers {
+        val observers = withObservers(isNotify = true) {
             if (isEmpty()) return@withObservers null
             mapNotNull { if (it.event == event) it else null }
         }
@@ -157,17 +157,25 @@ internal abstract class AbstractRuntimeEventProcessor internal constructor(
 
     protected override fun onDestroy(): Boolean {
         if (!super.onDestroy()) return false
-        synchronized(lock) { observers.clear() }
+        synchronized(lock) {
+            val iterator = observers.iterator()
+            while (iterator.hasNext()) {
+                val observer = iterator.next()
+                if (isService && observer.tag.isStaticTag()) continue
+                iterator.remove()
+            }
+        }
         return true
     }
 
     private fun <T: Any?> withObservers(
+        isNotify: Boolean = false,
         block: MutableSet<RuntimeEvent.Observer<*>>.() -> T,
     ): T {
-        if (destroyed) return block(noOpMutableSet())
+        if (destroyed && !isNotify) return block(noOpMutableSet())
 
         return synchronized(lock) {
-            block(if (destroyed) noOpMutableSet() else observers)
+            block(if (destroyed && !isNotify) noOpMutableSet() else observers)
         }
     }
 
