@@ -16,6 +16,7 @@
 package io.matthewnelson.kmp.tor.runtime
 
 import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
+import io.matthewnelson.kmp.tor.runtime.FileID.Companion.toFIDString
 import io.matthewnelson.kmp.tor.runtime.core.*
 import io.matthewnelson.kmp.tor.runtime.internal.RealTorRuntime
 import kotlin.jvm.JvmField
@@ -32,7 +33,7 @@ public class Lifecycle: Destroyable {
     public class Event private constructor(
 
         /**
-         * The class name
+         * The object class name
          * */
         @JvmField
         public val clazz: String,
@@ -153,6 +154,32 @@ public class Lifecycle: Destroyable {
         }
     }
 
+    @InternalKmpTorApi
+    public class DestroyableTorRuntime private constructor(
+        private val lifecycle: Lifecycle,
+        private val runtime: RealTorRuntime,
+    ): TorRuntime by runtime, Destroyable by lifecycle {
+
+        public fun invokeOnCompletion(
+            handle: ItBlock<Any?>,
+        ): Disposable = lifecycle.job.invokeOnCompletion(handle)
+
+        public override fun equals(other: Any?): Boolean = other is DestroyableTorRuntime && other.runtime == runtime
+        public override fun hashCode(): Int = runtime.hashCode()
+        public override fun toString(): String = toFIDString()
+
+        internal companion object {
+
+            // throws if handler is instance of UncaughtException.SuppressedHandler
+            @JvmSynthetic
+            @Throws(IllegalArgumentException::class)
+            internal fun of(
+                handler: UncaughtException.Handler,
+                runtime: RealTorRuntime,
+            ): DestroyableTorRuntime = DestroyableTorRuntime(Lifecycle(handler), runtime)
+        }
+    }
+
     /* INTERNAL USAGE FOR TorRuntime.ServiceFactory */
 
     private val job: LifecycleJob
@@ -164,17 +191,8 @@ public class Lifecycle: Destroyable {
 
     public override fun isDestroyed(): Boolean = job.isCompleting || !job.isActive
     public override fun destroy() { job.complete() }
-    public fun invokeOnCompletion(handle: ItBlock<Any?>): Disposable = job.invokeOnCompletion(handle)
 
     public override fun toString(): String = job.toString()
-
-    internal companion object {
-
-        // throws if handler is an instance of UncaughtException.SuppressedHandler
-        @JvmSynthetic
-        @Throws(IllegalArgumentException::class)
-        internal fun of(handler: UncaughtException.Handler): Lifecycle = Lifecycle(handler)
-    }
 
     private class LifecycleJob(
         handler: UncaughtException.Handler,
@@ -187,23 +205,6 @@ public class Lifecycle: Destroyable {
 
         private companion object {
             private val ON_FAILURE: OnFailure = OnFailure {}
-        }
-    }
-
-    @InternalKmpTorApi
-    public class DestroyableTorRuntime private constructor(
-        @JvmField
-        public val lifecycle: Lifecycle,
-        runtime: RealTorRuntime,
-    ): TorRuntime by runtime, Destroyable by lifecycle {
-
-        internal companion object {
-
-            @JvmSynthetic
-            internal fun of(
-                lifecycle: Lifecycle,
-                runtime: RealTorRuntime,
-            ): DestroyableTorRuntime = DestroyableTorRuntime(lifecycle, runtime)
         }
     }
 }

@@ -18,6 +18,7 @@ package io.matthewnelson.kmp.tor.runtime.internal
 import io.matthewnelson.immutable.collections.toImmutableSet
 import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
 import io.matthewnelson.kmp.tor.core.resource.SynchronizedObject
+import io.matthewnelson.kmp.tor.core.resource.synchronized
 import io.matthewnelson.kmp.tor.runtime.*
 import io.matthewnelson.kmp.tor.runtime.FileID.Companion.toFIDString
 import io.matthewnelson.kmp.tor.runtime.core.*
@@ -28,6 +29,7 @@ import io.matthewnelson.kmp.tor.runtime.RuntimeEvent.Notifier.Companion.d
 import io.matthewnelson.kmp.tor.runtime.core.ctrl.TorCmd
 import io.matthewnelson.kmp.tor.runtime.ctrl.TorCtrl
 import kotlinx.coroutines.*
+import kotlin.concurrent.Volatile
 import kotlin.jvm.JvmStatic
 import kotlin.jvm.JvmSynthetic
 
@@ -52,6 +54,7 @@ internal class RealTorRuntime private constructor(
    TorRuntime
 {
 
+    private val isService = serviceFactoryHandler != null
     protected override val debug: Boolean get() = environment().debug
     public override fun environment(): TorRuntime.Environment = generator.environment
     protected override val handler: HandlerWithContext = serviceFactoryHandler ?: super.handler
@@ -91,7 +94,7 @@ internal class RealTorRuntime private constructor(
 
     private val connectivity = ConnectivityObserver()
 
-    public final override fun enqueue(
+    public override fun enqueue(
         action: RuntimeAction,
         onFailure: OnFailure,
         onSuccess: OnSuccess<Unit>,
@@ -99,7 +102,7 @@ internal class RealTorRuntime private constructor(
         TODO("Not yet implemented")
     }
 
-    public final override fun <Response : Any> enqueue(
+    public override fun <Response : Any> enqueue(
         cmd: TorCmd.Unprivileged<Response>,
         onFailure: OnFailure,
         onSuccess: OnSuccess<Response>
@@ -113,7 +116,7 @@ internal class RealTorRuntime private constructor(
         NOTIFIER.lce(Lifecycle.Event.OnSubscribed(connectivity))
     }
 
-    public override fun toString(): String = toFIDString()
+    public override fun toString(): String = toFIDString(includeHashCode = isService)
 
     internal companion object {
 
@@ -178,7 +181,7 @@ internal class RealTorRuntime private constructor(
 
         public override fun equals(other: Any?): Boolean = other is ConnectivityObserver && other.hashCode() == hashCode()
         public override fun hashCode(): Int = this@RealTorRuntime.hashCode()
-        public override fun toString(): String = toFIDString()
+        public override fun toString(): String = toFIDString(includeHashCode = isService)
     }
 
     private inner class ConfChangedObserver: TorEvent.Observer(
@@ -224,6 +227,10 @@ internal class RealTorRuntime private constructor(
        FileID by generator
     {
 
+        @Volatile
+        private var _runtime: Lifecycle.DestroyableTorRuntime? = null
+        private val lock = SynchronizedObject()
+
         protected override val debug: Boolean get() = environment().debug
         private val dispatcher by lazy { environment().newRuntimeDispatcher() }
         public override fun environment(): TorRuntime.Environment = generator.environment
@@ -253,8 +260,8 @@ internal class RealTorRuntime private constructor(
         public override fun newRuntime(
             serviceEvents: Set<TorEvent>,
             serviceObserver: NetworkObserver?,
-        ): Lifecycle.DestroyableTorRuntime {
-            val lifecycle = Lifecycle.of(handler)
+        ): Lifecycle.DestroyableTorRuntime = synchronized(lock) {
+            _runtime?.destroy()
 
             val runtime = RealTorRuntime(
                 generator,
@@ -271,7 +278,10 @@ internal class RealTorRuntime private constructor(
                 observersRuntimeEvent,
             )
 
-            lifecycle.invokeOnCompletion {
+            val destroyable = Lifecycle.DestroyableTorRuntime.of(handler, runtime)
+
+            destroyable.invokeOnCompletion {
+                _runtime = null
                 runtime.onDestroy()
                 runtime.scope.cancel()
                 d(runtime, "Scope Cancelled")
@@ -280,7 +290,7 @@ internal class RealTorRuntime private constructor(
                 lce(Lifecycle.Event.OnDestroy(runtime))
             }
 
-            return Lifecycle.DestroyableTorRuntime.of(lifecycle, runtime)
+            return destroyable.also { _runtime = it }
         }
 
         init {

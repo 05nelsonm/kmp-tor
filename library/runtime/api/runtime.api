@@ -23,7 +23,6 @@ public final class io/matthewnelson/kmp/tor/runtime/FileID$Companion {
 public final class io/matthewnelson/kmp/tor/runtime/Lifecycle : io/matthewnelson/kmp/tor/runtime/core/Destroyable {
 	public synthetic fun <init> (Lio/matthewnelson/kmp/tor/runtime/core/UncaughtException$Handler;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
 	public fun destroy ()V
-	public final fun invokeOnCompletion (Lio/matthewnelson/kmp/tor/runtime/core/ItBlock;)Lio/matthewnelson/kmp/tor/runtime/core/Disposable;
 	public fun isDestroyed ()Z
 	public fun toString ()Ljava/lang/String;
 }
