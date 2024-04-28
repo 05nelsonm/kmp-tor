@@ -16,9 +16,12 @@
 package io.matthewnelson.kmp.tor.runtime.core
 
 import io.matthewnelson.kmp.file.IOException
+import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
+import io.matthewnelson.kmp.tor.runtime.core.QueuedJob.Companion.toImmediateErrorJob
 import kotlin.coroutines.cancellation.CancellationException
 import kotlin.test.*
 
+@OptIn(InternalKmpTorApi::class)
 class QueuedJobUnitTest {
 
     @Test
@@ -280,6 +283,17 @@ class QueuedJobUnitTest {
         // completion).
         assertFailsWith<UncaughtException>{ job.invokeOnCompletion { fail() } }
         assertEquals(1, exceptions.size)
+    }
+
+    @Test
+    fun givenImmediateErrorJob_whenCreated_thenOnFailureInvokedImmediately() {
+        var invocationFailure = 0
+        val job = OnFailure {
+            invocationFailure++
+            assertIs<IllegalStateException>(it)
+        }.toImmediateErrorJob("", IllegalStateException(""), UncaughtException.Handler.THROW)
+        assertEquals(1, invocationFailure)
+        assertEquals(QueuedJob.State.Error, job.state)
     }
 
     public class TestJob(

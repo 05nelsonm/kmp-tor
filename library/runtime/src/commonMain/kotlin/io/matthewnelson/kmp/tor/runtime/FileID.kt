@@ -30,6 +30,8 @@ public interface FileID {
      * An ID string which is based off of a file path.
      *
      * @see [createFID]
+     * @see [fidEllipses]
+     * @see [toFIDString]
      * */
     public val fid: String
 
