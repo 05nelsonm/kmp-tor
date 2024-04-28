@@ -191,7 +191,7 @@ public class Lifecycle: Destroyable {
     }
 
     @InternalKmpTorApi
-    public class DestroyableRuntime private constructor(
+    public class DestroyableTorRuntime private constructor(
         @JvmField
         public val lifecycle: Lifecycle,
         runtime: RealTorRuntime,
@@ -203,7 +203,7 @@ public class Lifecycle: Destroyable {
             internal fun of(
                 lifecycle: Lifecycle,
                 runtime: RealTorRuntime,
-            ): DestroyableRuntime = DestroyableRuntime(lifecycle, runtime)
+            ): DestroyableTorRuntime = DestroyableTorRuntime(lifecycle, runtime)
         }
     }
 }

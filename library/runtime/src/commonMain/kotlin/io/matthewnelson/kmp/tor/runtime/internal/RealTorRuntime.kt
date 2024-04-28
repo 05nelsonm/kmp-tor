@@ -253,7 +253,7 @@ internal class RealTorRuntime private constructor(
         public override fun newRuntime(
             serviceEvents: Set<TorEvent>,
             serviceObserver: NetworkObserver?,
-        ): Lifecycle.DestroyableRuntime {
+        ): Lifecycle.DestroyableTorRuntime {
             val lifecycle = Lifecycle.of(handler)
 
             val runtime = RealTorRuntime(
@@ -280,7 +280,7 @@ internal class RealTorRuntime private constructor(
                 lce(Lifecycle.Event.OnDestroy(runtime))
             }
 
-            return Lifecycle.DestroyableRuntime.of(lifecycle, runtime)
+            return Lifecycle.DestroyableTorRuntime.of(lifecycle, runtime)
         }
 
         init {

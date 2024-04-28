@@ -25,7 +25,7 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.fail
 
-class AndroidDestroyableRuntimeUnitTest {
+class AndroidRuntimeUnitTest {
 
     @Test
     fun givenTorRuntime_whenNotAndroidRuntime_thenIsNotAndroidTorRuntime() {
