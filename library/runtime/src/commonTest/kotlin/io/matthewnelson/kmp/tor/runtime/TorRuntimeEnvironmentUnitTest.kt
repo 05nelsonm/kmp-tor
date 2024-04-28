@@ -36,7 +36,7 @@ class TorRuntimeEnvironmentUnitTest {
         val env1 = TorRuntime.Environment.Builder(work, work.resolve("cache")) { torResource }
         val env2 = TorRuntime.Environment.Builder(work, work.resolve("cache2")) { torResource }
         assertEquals(env1, env2)
-        assertEquals(24, env1.fid.length)
+        assertEquals(64, env1.fid.length)
 
         val env3 = TorRuntime.Environment.Builder(work.resolve("work"), work.resolve("cache")) { torResource }
         assertNotEquals(env1, env3)

@@ -16,10 +16,11 @@
 package io.matthewnelson.kmp.tor.runtime
 
 import io.matthewnelson.encoding.base16.Base16
-import io.matthewnelson.encoding.core.use
+import io.matthewnelson.encoding.core.Encoder.Companion.encodeToString
 import io.matthewnelson.kmp.file.*
 import io.matthewnelson.kmp.tor.runtime.core.apply
 import org.kotlincrypto.hash.sha2.SHA256
+import kotlin.jvm.JvmName
 import kotlin.jvm.JvmOverloads
 import kotlin.jvm.JvmStatic
 
@@ -35,40 +36,53 @@ public interface FileID {
     public companion object {
 
         /**
-         * Creates a 24 character id based on a file path.
+         * Creates an ID based off of the provided file's [canonicalPath].
          *
-         * It is the product of a double SHA-256 hash of the path,
-         * whereby the first middle and last 4 bytes (12 bytes total)
-         * are Base16 (hex) encoded.
+         * The resulting string is the product of the path's UTF-8 encoded
+         * bytes double hashed using SHA-256, and then Base16 (hex) encoded.
+         *
+         * @see [fidEllipses]
+         * @see [toFIDString]
          * */
         @JvmStatic
-        public fun createFID(file: File): String {
-            val h2 = SHA256().apply {
-                val pathBytes = try {
-                    file.canonicalPath()
-                } catch (_: Throwable) {
-                    file.absoluteFile.normalize().path
-                }.encodeToByteArray()
+        public fun createFID(file: File): String = SHA256().apply {
+            val pathBytes = try {
+                file.canonicalPath()
+            } catch (_: Throwable) {
+                file.absoluteFile.normalize().path
+            }.encodeToByteArray()
 
-                val h1 = digest(pathBytes)
-                update(h1)
-            }.digest()
+            val h1 = digest(pathBytes)
+            update(h1)
+        }.digest().encodeToString(Base16)
 
-            val s = StringBuilder(24)
-            Base16.newEncoderFeed { char -> s.append(char) }.use { feed ->
-                for (i in 0..3) { feed.consume(h2[i]) }
-                for (i in 13..16) { feed.consume(h2[i]) }
-                for (i in 28..31) { feed.consume(h2[i]) }
-            }
-
-            return s.toString()
-        }
-
+        /**
+         * Helper for overriding a class's [toString] function.
+         *
+         * e.g.
+         *
+         *     println(myFileIDClass)
+         *     // MyFileIDClass[fid=ABCD...1234]@178263541
+         * */
         @JvmStatic
         @JvmOverloads
         public fun FileID.toFIDString(includeHashCode: Boolean = true): String {
             val name = this::class.simpleName ?: "Unknown"
-            return name + "[fid=" + fid + ']' + if (includeHashCode) '@' + hashCode() else ""
+            return name + "[fid=" + fidEllipses + ']' + if (includeHashCode) '@' + hashCode() else ""
+        }
+
+        /**
+         * Returns the first and last 4 characters of the [fid]
+         * concatenated together with an ellipses between.
+         *
+         * If the [fid] length is less than 9 (implementor did not
+         * utilize [createFID]), then the [fid] itself is returned.
+         * */
+        @get:JvmStatic
+        @get:JvmName("fidEllipses")
+        public val FileID.fidEllipses: String get() {
+            if (fid.length <= 8) return fid
+            return fid.take(4) + '…' + fid.takeLast(4)
         }
     }
 }

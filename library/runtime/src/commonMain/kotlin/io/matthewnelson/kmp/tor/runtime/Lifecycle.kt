@@ -16,6 +16,7 @@
 package io.matthewnelson.kmp.tor.runtime
 
 import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
+import io.matthewnelson.kmp.tor.runtime.FileID.Companion.fidEllipses
 import io.matthewnelson.kmp.tor.runtime.FileID.Companion.toFIDString
 import io.matthewnelson.kmp.tor.runtime.core.*
 import io.matthewnelson.kmp.tor.runtime.internal.RealTorRuntime
@@ -39,7 +40,10 @@ public class Lifecycle: Destroyable {
         public val clazz: String,
 
         /**
-         * If the object was an identifiable instance of [FileID]
+         * The object [FileID.fidEllipses].
+         *
+         * If the object was not an instance of [FileID], the
+         * value will be null.
          * */
         @JvmField
         public val fid: String?,
@@ -51,7 +55,7 @@ public class Lifecycle: Destroyable {
         public val hash: Int,
 
         /**
-         * The event name
+         * The name of the event
          * */
         @JvmField
         public val name: Name,
@@ -62,7 +66,7 @@ public class Lifecycle: Destroyable {
             name: Name
         ): this(
             obj::class.simpleName ?: "Unknown",
-            (obj as? FileID)?.fid,
+            (obj as? FileID)?.fidEllipses,
             obj.hashCode(),
             name,
         )

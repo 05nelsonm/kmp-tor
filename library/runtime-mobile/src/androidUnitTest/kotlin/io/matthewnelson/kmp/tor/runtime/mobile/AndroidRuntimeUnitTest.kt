@@ -23,6 +23,7 @@ import io.matthewnelson.kmp.tor.runtime.RuntimeEvent
 import io.matthewnelson.kmp.tor.runtime.TorRuntime
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFalse
 import kotlin.test.fail
 
 class AndroidRuntimeUnitTest {
@@ -44,5 +45,8 @@ class AndroidRuntimeUnitTest {
         val lce = lces.filter { it.clazz == "RealTorRuntime" }
         assertEquals(1, lce.size)
         assertEquals(Lifecycle.Event.Name.OnCreate, lce.first().name)
+
+        // Not a service, so should not print the hashCode
+        assertFalse(runtime.toString().contains('@'))
     }
 }

@@ -22,8 +22,10 @@ import io.matthewnelson.kmp.tor.core.api.ResourceInstaller.Paths
 import io.matthewnelson.kmp.tor.runtime.Lifecycle
 import io.matthewnelson.kmp.tor.runtime.RuntimeEvent
 import io.matthewnelson.kmp.tor.runtime.TorRuntime
+import io.matthewnelson.kmp.tor.runtime.util.startDaemonSync
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFalse
 import kotlin.test.fail
 
 class AndroidRuntimeTest {
@@ -40,12 +42,19 @@ class AndroidRuntimeTest {
 
         val lces = mutableListOf<Lifecycle.Event>()
         val runtime = TorRuntime.Builder(environment) {
-            observerStatic(RuntimeEvent.LIFECYCLE) { lces.add(it) }
+            observerStatic(RuntimeEvent.LIFECYCLE) { println(it); lces.add(it) }
         }
 
         assertEquals("AndroidTorRuntime", runtime::class.simpleName)
         val lce = lces.filter { it.clazz == "AndroidTorRuntime" }
         assertEquals(1, lce.size)
         assertEquals(Lifecycle.Event.Name.OnCreate, lce.first().name)
+
+        try {
+            runtime.startDaemonSync()
+        } catch (_: Throwable) {}
+
+        // Not a service, so should not print the hashCode
+        assertFalse(runtime.toString().contains('@'))
     }
 }

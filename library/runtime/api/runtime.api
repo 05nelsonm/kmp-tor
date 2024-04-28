@@ -8,6 +8,7 @@ public final class io/matthewnelson/kmp/tor/runtime/ConfigBuilderCallback$Compan
 public abstract interface class io/matthewnelson/kmp/tor/runtime/FileID {
 	public static final field Companion Lio/matthewnelson/kmp/tor/runtime/FileID$Companion;
 	public static fun createFID (Ljava/io/File;)Ljava/lang/String;
+	public static fun fidEllipses (Lio/matthewnelson/kmp/tor/runtime/FileID;)Ljava/lang/String;
 	public abstract fun getFid ()Ljava/lang/String;
 	public static fun toFIDString (Lio/matthewnelson/kmp/tor/runtime/FileID;)Ljava/lang/String;
 	public static fun toFIDString (Lio/matthewnelson/kmp/tor/runtime/FileID;Z)Ljava/lang/String;
@@ -15,6 +16,7 @@ public abstract interface class io/matthewnelson/kmp/tor/runtime/FileID {
 
 public final class io/matthewnelson/kmp/tor/runtime/FileID$Companion {
 	public final fun createFID (Ljava/io/File;)Ljava/lang/String;
+	public final fun fidEllipses (Lio/matthewnelson/kmp/tor/runtime/FileID;)Ljava/lang/String;
 	public final fun toFIDString (Lio/matthewnelson/kmp/tor/runtime/FileID;)Ljava/lang/String;
 	public final fun toFIDString (Lio/matthewnelson/kmp/tor/runtime/FileID;Z)Ljava/lang/String;
 	public static synthetic fun toFIDString$default (Lio/matthewnelson/kmp/tor/runtime/FileID$Companion;Lio/matthewnelson/kmp/tor/runtime/FileID;ZILjava/lang/Object;)Ljava/lang/String;

@@ -20,6 +20,7 @@ import android.content.Context
 import androidx.startup.AppInitializer
 import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
 import io.matthewnelson.kmp.tor.runtime.*
+import io.matthewnelson.kmp.tor.runtime.FileID.Companion.toFIDString
 import io.matthewnelson.kmp.tor.runtime.RuntimeEvent.Notifier.Companion.lce
 import io.matthewnelson.kmp.tor.runtime.core.*
 import io.matthewnelson.kmp.tor.runtime.core.ctrl.TorCmd
@@ -62,7 +63,7 @@ internal class TorService internal constructor(): AbstractTorService() {
             factory.lce(Lifecycle.Event.OnCreate(this))
         }
 
-        public override fun toString(): String = "AndroidTorRuntime[id=$fid]@${hashCode()}"
+        public override fun toString(): String = toFIDString(includeHashCode = false)
 
         companion object {
 

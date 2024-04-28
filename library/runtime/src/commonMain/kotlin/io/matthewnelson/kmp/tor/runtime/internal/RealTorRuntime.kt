@@ -280,6 +280,8 @@ internal class RealTorRuntime private constructor(
 
             val destroyable = Lifecycle.DestroyableTorRuntime.of(handler, runtime)
 
+            lce(Lifecycle.Event.OnCreate(destroyable))
+
             destroyable.invokeOnCompletion {
                 _runtime = null
                 runtime.onDestroy()
@@ -288,6 +290,7 @@ internal class RealTorRuntime private constructor(
                 runtime.networkObserver.unsubscribe(runtime.connectivity)
                 lce(Lifecycle.Event.OnUnsubscribed(runtime.connectivity))
                 lce(Lifecycle.Event.OnDestroy(runtime))
+                lce(Lifecycle.Event.OnDestroy(destroyable))
             }
 
             return destroyable.also { _runtime = it }
