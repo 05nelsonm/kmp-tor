@@ -67,6 +67,7 @@ kmpConfiguration {
             sourceSetMain {
                 dependencies {
                     api(project(":library:runtime"))
+                    implementation(libs.kmp.tor.core.resource)
                 }
             }
             sourceSetTest {

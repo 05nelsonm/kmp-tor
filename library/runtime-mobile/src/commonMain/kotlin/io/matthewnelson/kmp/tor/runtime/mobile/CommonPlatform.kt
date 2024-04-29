@@ -13,15 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-@file:Suppress("KotlinRedundantDiagnosticSuppress")
+package io.matthewnelson.kmp.tor.runtime.mobile
 
-package io.matthewnelson.kmp.tor.runtime.internal
-
-import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
+import io.matthewnelson.kmp.tor.core.api.annotation.ExperimentalKmpTorApi
 import io.matthewnelson.kmp.tor.runtime.TorRuntime
 
-@OptIn(InternalKmpTorApi::class)
-@Throws(IllegalStateException::class)
-internal actual fun RealTorRuntime.Companion.newServiceRuntimeOrNull(
-    factory: () -> TorRuntime.ServiceFactory,
-): TorRuntime? = null
+@ExperimentalKmpTorApi
+public expect fun torServiceFactoryLoaderOrNull(): TorRuntime.ServiceFactory.Loader?

@@ -78,11 +78,11 @@ public class Lifecycle: Destroyable {
             @JvmStatic
             public fun OnDestroy(obj: Any): Event = Event(obj, Name.OnDestroy)
 
-            // Android TorService LCEs
+            // TorRuntime.ServiceFactory LCEs
             @JvmStatic
             public fun OnBind(obj: Any): Event = Event(obj, Name.OnBind)
             @JvmStatic
-            public fun OnStart(obj: Any): Event = Event(obj, Name.OnStart)
+            public fun OnUnbind(obj: Any): Event = Event(obj, Name.OnUnbind)
             @JvmStatic
             public fun OnRemoved(obj: Any): Event = Event(obj, Name.OnRemoved)
             @JvmStatic
@@ -103,9 +103,11 @@ public class Lifecycle: Destroyable {
                 @JvmField
                 public val OnDestroy: Name = Name("onDestroy")
 
-                // Android TorService LCEs
+                // TorRuntime.ServiceFactory LCEs
                 @JvmField
                 public val OnBind: Name = Name("onBind")
+                @JvmField
+                public val OnUnbind: Name = Name("onUnbind")
                 @JvmField
                 public val OnStart: Name = Name("onStart")
                 @JvmField
@@ -157,6 +159,13 @@ public class Lifecycle: Destroyable {
         }
     }
 
+    /**
+     * A wrapper around [TorRuntime] which adds ability to destroy the
+     * instance. Is only available if using [TorRuntime.ServiceFactory].
+     *
+     * **NOTE:** This instance utilizes [OnEvent.Executor.Immediate] and
+     * not whatever was declared for [TorRuntime.Builder.defaultEventExecutor].
+     * */
     public class DestroyableTorRuntime private constructor(
         private val lifecycle: Lifecycle,
         private val runtime: RealTorRuntime,
@@ -172,13 +181,13 @@ public class Lifecycle: Destroyable {
 
         internal companion object {
 
-            // throws if handler is instance of UncaughtException.SuppressedHandler
             @JvmSynthetic
-            @Throws(IllegalArgumentException::class)
             internal fun of(
-                handler: UncaughtException.Handler,
                 runtime: RealTorRuntime,
-            ): DestroyableTorRuntime = DestroyableTorRuntime(Lifecycle(handler), runtime)
+            ): DestroyableTorRuntime = DestroyableTorRuntime(
+                Lifecycle(runtime.handler()),
+                runtime,
+            )
         }
     }
 

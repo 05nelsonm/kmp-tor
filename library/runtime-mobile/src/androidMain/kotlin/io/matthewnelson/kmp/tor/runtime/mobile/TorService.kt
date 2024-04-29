@@ -17,72 +17,32 @@ package io.matthewnelson.kmp.tor.runtime.mobile
 
 import android.app.Application
 import android.content.Context
+import android.content.Intent
 import androidx.startup.AppInitializer
-import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
+import io.matthewnelson.kmp.tor.core.api.annotation.ExperimentalKmpTorApi
 import io.matthewnelson.kmp.tor.runtime.*
-import io.matthewnelson.kmp.tor.runtime.FileID.Companion.toFIDString
-import io.matthewnelson.kmp.tor.runtime.RuntimeEvent.Notifier.Companion.lce
-import io.matthewnelson.kmp.tor.runtime.core.*
-import io.matthewnelson.kmp.tor.runtime.core.ctrl.TorCmd
 
-@Suppress("unused")
+@OptIn(ExperimentalKmpTorApi::class)
 internal class TorService internal constructor(): AbstractTorService() {
 
-    @OptIn(InternalKmpTorApi::class)
-    private class AndroidTorRuntime private constructor(
-        private val factory: TorRuntime.ServiceFactory,
-    ) : TorRuntime,
-        TorEvent.Processor by factory,
-        RuntimeEvent.Processor by factory,
-        FileID by factory
-    {
+    private class AndroidServiceFactory(
+        private val app: Application,
+        initializer: Initializer,
+    ): TorRuntime.ServiceFactory(initializer) {
 
-        init { TorRuntime.ServiceFactory.checkInstance(factory) }
+        private val connection = Connection(binder)
 
-        private val app: () -> Application = TorService.app
-            ?: throw IllegalStateException("TorService.Initializer must be initialized")
-
-        // TODO: Start service + bind + inject factory
-        private val runtime by lazy { factory.newRuntime(emptySet(), null) }
-
-        public override fun environment(): TorRuntime.Environment = factory.environment()
-
-        public override fun enqueue(
-            action: RuntimeAction,
-            onFailure: OnFailure,
-            onSuccess: OnSuccess<Unit>,
-        ): QueuedJob = runtime.enqueue(action, onFailure, onSuccess)
-
-        public override fun <Response : Any> enqueue(
-            cmd: TorCmd.Unprivileged<Response>,
-            onFailure: OnFailure,
-            onSuccess: OnSuccess<Response>,
-        ): QueuedJob = runtime.enqueue(cmd, onFailure, onSuccess)
-
-        init {
-            factory.lce(Lifecycle.Event.OnCreate(this))
+        @Throws(RuntimeException::class)
+        protected override fun startService() {
+            val i = Intent(app, TorService::class.java)
+            app.startService(i)
+            app.bindService(i, connection, Context.BIND_AUTO_CREATE)
         }
-
-        public override fun toString(): String = toFIDString(includeHashCode = false)
-
-        companion object {
-
-            @JvmStatic
-            @OptIn(InternalKmpTorApi::class)
-            @Throws(IllegalStateException::class)
-            fun create(factory: TorRuntime.ServiceFactory): TorRuntime = AndroidTorRuntime(factory)
-        }
-
-        public override fun unsubscribeAll(tag: String) { factory.unsubscribeAll(tag) }
-        public override fun unsubscribeAll(vararg events: RuntimeEvent<*>) { factory.unsubscribeAll(*events) }
-        public override fun clearObservers() { factory.clearObservers() }
     }
 
     internal class Initializer internal constructor(): androidx.startup.Initializer<Initializer.Companion> {
 
         override fun create(context: Context): Companion {
-            if (isInitialized()) return Companion
-
             val initializer = AppInitializer.getInstance(context)
             check(initializer.isEagerlyInitialized(javaClass)) {
                 val classPath = "io.matthewnelson.kmp.tor.runtime.mobile.TorService$" + "Initializer"
@@ -96,8 +56,7 @@ internal class TorService internal constructor(): AbstractTorService() {
                     under InitializationProvider in your AndroidManifest.xml
                 """.trimIndent()
             }
-            val app = context.applicationContext as Application
-            TorService.app = { app }
+            app = context.applicationContext as Application
             return Companion
         }
 
@@ -120,7 +79,19 @@ internal class TorService internal constructor(): AbstractTorService() {
         }
     }
 
-    private companion object {
-        private var app: (() -> Application)? = null
+    internal companion object {
+
+        private var app: Application? = null
+
+        @JvmSynthetic
+        internal fun loaderOrNull(): TorRuntime.ServiceFactory.Loader? {
+            val app = app ?: return null
+
+            return object : TorRuntime.ServiceFactory.Loader() {
+                override fun loadProtected(
+                    initializer: TorRuntime.ServiceFactory.Initializer,
+                ): TorRuntime.ServiceFactory = AndroidServiceFactory(app, initializer)
+            }
+        }
     }
 }

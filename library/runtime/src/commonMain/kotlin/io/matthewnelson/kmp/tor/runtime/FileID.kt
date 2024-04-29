@@ -64,7 +64,7 @@ public interface FileID {
          * e.g.
          *
          *     println(myFileIDClass)
-         *     // MyFileIDClass[fid=ABCD...1234]@178263541
+         *     // MyFileIDClass[fid=ABCD…1234]@178263541
          * */
         @JvmStatic
         @JvmOverloads

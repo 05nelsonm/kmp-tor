@@ -13,23 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-@file:Suppress("KotlinRedundantDiagnosticSuppress")
+package io.matthewnelson.kmp.tor.runtime.mobile
 
-package io.matthewnelson.kmp.tor.runtime.internal
-
+import io.matthewnelson.kmp.tor.core.api.annotation.ExperimentalKmpTorApi
 import io.matthewnelson.kmp.tor.runtime.TorRuntime
-import kotlinx.coroutines.*
-import java.util.concurrent.Executors
-import java.util.concurrent.atomic.AtomicLong
 
-@Suppress("NOTHING_TO_INLINE")
-internal actual inline fun TorRuntime.Environment.newRuntimeDispatcher(): CoroutineDispatcher {
-    val threadNo = AtomicLong()
-    val executor = Executors.newSingleThreadExecutor { runnable ->
-        val t = Thread(runnable, "Tor-$fid-${threadNo.incrementAndGet()}")
-        t.isDaemon = true
-        t.priority = Thread.MAX_PRIORITY
-        t
-    }
-    return executor.asCoroutineDispatcher()
-}
+@ExperimentalKmpTorApi
+public actual fun torServiceFactoryLoaderOrNull(): TorRuntime.ServiceFactory.Loader? = null

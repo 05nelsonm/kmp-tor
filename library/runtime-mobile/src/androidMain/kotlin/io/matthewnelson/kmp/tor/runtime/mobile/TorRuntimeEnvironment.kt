@@ -21,8 +21,10 @@ import android.content.Context
 import io.matthewnelson.kmp.file.File
 import io.matthewnelson.kmp.tor.core.api.ResourceInstaller
 import io.matthewnelson.kmp.tor.core.api.ResourceInstaller.Paths
+import io.matthewnelson.kmp.tor.core.api.annotation.ExperimentalKmpTorApi
 import io.matthewnelson.kmp.tor.runtime.TorRuntime
 import io.matthewnelson.kmp.tor.runtime.core.ThisBlock
+import io.matthewnelson.kmp.tor.runtime.core.apply
 
 /**
  * Android extension which utilizes [Context.getDir] and [Context.getCacheDir]
@@ -82,5 +84,13 @@ public fun Context.createTorRuntimeEnvironment(
     workDir = getDir(dirName.ifBlank { "torservice" }, Context.MODE_PRIVATE),
     cacheDir = cacheDir.resolve(dirName.ifBlank { "torservice" }),
     installer = installer,
-    block = block
-)
+) {
+    // Will not be null b/c TorService.Initializer
+    // should be there if consumer is utilizing this
+    // function which has Context available.
+    @Suppress("UnnecessaryOptInAnnotation")
+    @OptIn(ExperimentalKmpTorApi::class)
+    serviceFactoryLoader = torServiceFactoryLoaderOrNull()
+
+    this.apply(block)
+}

@@ -1,3 +1,7 @@
+public final class io/matthewnelson/kmp/tor/runtime/mobile/AndroidPlatformKt {
+	public static final fun torServiceFactoryLoaderOrNull ()Lio/matthewnelson/kmp/tor/runtime/TorRuntime$ServiceFactory$Loader;
+}
+
 public final class io/matthewnelson/kmp/tor/runtime/mobile/TorRuntimeEnvironment {
 	public static final fun Builder (Landroid/content/Context;Ljava/lang/String;Lkotlin/jvm/functions/Function1;)Lio/matthewnelson/kmp/tor/runtime/TorRuntime$Environment;
 	public static final fun Builder (Landroid/content/Context;Ljava/lang/String;Lkotlin/jvm/functions/Function1;Lio/matthewnelson/kmp/tor/runtime/core/ThisBlock;)Lio/matthewnelson/kmp/tor/runtime/TorRuntime$Environment;

@@ -17,7 +17,6 @@
 
 package io.matthewnelson.kmp.tor.runtime.internal
 
-import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
 import io.matthewnelson.kmp.tor.runtime.RuntimeAction
 import io.matthewnelson.kmp.tor.runtime.TorRuntime
 import kotlinx.coroutines.CoroutineDispatcher
@@ -28,12 +27,6 @@ import kotlin.coroutines.resumeWithException
 
 @Suppress("NOTHING_TO_INLINE")
 internal expect inline fun TorRuntime.Environment.newRuntimeDispatcher(): CoroutineDispatcher
-
-@OptIn(InternalKmpTorApi::class)
-@Throws(IllegalStateException::class)
-internal expect fun RealTorRuntime.Companion.newServiceRuntimeOrNull(
-    factory: () -> TorRuntime.ServiceFactory,
-): TorRuntime?
 
 @Throws(Throwable::class)
 @Suppress("NOTHING_TO_INLINE")

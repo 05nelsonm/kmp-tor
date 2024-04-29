@@ -335,11 +335,14 @@ public sealed class RuntimeEvent<R: Any> private constructor(
         }
     }
 
-    @InternalKmpTorApi
+    /**
+     * Helper for selectively exposing the ability to notify observers
+     * externally of the [TorRuntime] implementation.
+     * */
     public interface Notifier {
+
         public fun <R: Any> notify(event: RuntimeEvent<R>, output: R)
 
-        @InternalKmpTorApi
         public companion object {
 
             @JvmStatic
@@ -359,6 +362,10 @@ public sealed class RuntimeEvent<R: Any> private constructor(
             @JvmStatic
             @Suppress("NOTHING_TO_INLINE")
             public inline fun Notifier.w(from: Any, log: String) { log(LOG.WARN, from, log) }
+
+            @JvmStatic
+            @Suppress("NOTHING_TO_INLINE")
+            public inline fun Notifier.e(cause: Throwable) { notify(ERROR, cause) }
 
             @JvmStatic
             @Suppress("NOTHING_TO_INLINE")
