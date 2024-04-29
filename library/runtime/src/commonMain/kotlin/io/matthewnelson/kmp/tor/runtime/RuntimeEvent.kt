@@ -63,6 +63,25 @@ public sealed class RuntimeEvent<R: Any> private constructor(
     public data object ERROR: RuntimeEvent<Throwable>("ERROR")
 
     /**
+     * The current [Action] that is being executed by [TorRuntime].
+     *
+     * Useful for reacting to specific jobs via attachment of an
+     * [ActionJob.invokeOnCompletion] handler.
+     *
+     * e.g.
+     *
+     *     EXECUTE.observer { job ->
+     *         if (job.action != Action.StopDaemon) return@observer
+     *         job.invokeOnCompletion {
+     *             if (job.isSuccess) {
+     *                 // do something
+     *             }
+     *         }
+     *     }
+     * */
+    public data object EXECUTE: RuntimeEvent<ActionJob>("EXECUTE")
+
+    /**
      * Events pertaining to an object's lifecycle.
      * */
     public data object LIFECYCLE: RuntimeEvent<Lifecycle.Event>("LIFECYCLE")
@@ -327,6 +346,7 @@ public sealed class RuntimeEvent<R: Any> private constructor(
         public val entries: Set<RuntimeEvent<*>> by lazy {
             immutableSetOf(
                 ERROR,
+                EXECUTE,
                 LIFECYCLE,
                 LOG.DEBUG,
                 LOG.INFO,

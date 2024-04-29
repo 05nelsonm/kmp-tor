@@ -17,7 +17,7 @@
 
 package io.matthewnelson.kmp.tor.runtime.util
 
-import io.matthewnelson.kmp.tor.runtime.RuntimeAction
+import io.matthewnelson.kmp.tor.runtime.Action
 import io.matthewnelson.kmp.tor.runtime.internal.commonExecuteAsync
 
 /**
@@ -29,36 +29,36 @@ import io.matthewnelson.kmp.tor.runtime.internal.commonExecuteAsync
  * @see [restartDaemonAsync]
  * */
 //@Throws(Throwable::class)
-public actual suspend fun <T: RuntimeAction.Processor> T.executeAsync(
-    action: RuntimeAction,
+public actual suspend fun <T: Action.Processor> T.executeAsync(
+    action: Action,
 ): T = commonExecuteAsync(action)
 
 /**
  * Starts the tor daemon, suspending the current coroutine
  * until completion or cancellation/error.
  *
- * @see [RuntimeAction.StartDaemon]
+ * @see [Action.StartDaemon]
  * */
 //@Throws(Throwable::class)
-public actual suspend inline fun <T: RuntimeAction.Processor> T.startDaemonAsync(): T =
-    executeAsync(RuntimeAction.StartDaemon)
+public actual suspend inline fun <T: Action.Processor> T.startDaemonAsync(): T =
+    executeAsync(Action.StartDaemon)
 
 /**
  * Stops the tor daemon, suspending the current coroutine
  * until completion or cancellation/error.
  *
- * @see [RuntimeAction.StopDaemon]
+ * @see [Action.StopDaemon]
  * */
 //@Throws(Throwable::class)
-public actual suspend inline fun <T: RuntimeAction.Processor> T.stopDaemonAsync(): T =
-    executeAsync(RuntimeAction.StopDaemon)
+public actual suspend inline fun <T: Action.Processor> T.stopDaemonAsync(): T =
+    executeAsync(Action.StopDaemon)
 
 /**
  * Stops and then starts the tor daemon, suspending the
  * current coroutine until completion or cancellation/error.
  *
- * @see [RuntimeAction.RestartDaemon]
+ * @see [Action.RestartDaemon]
  * */
 //@Throws(Throwable::class)
-public actual suspend inline fun <T: RuntimeAction.Processor> T.restartDaemonAsync(): T =
-    executeAsync(RuntimeAction.RestartDaemon)
+public actual suspend inline fun <T: Action.Processor> T.restartDaemonAsync(): T =
+    executeAsync(Action.RestartDaemon)

@@ -19,7 +19,7 @@
 package io.matthewnelson.kmp.tor.runtime.util
 
 import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
-import io.matthewnelson.kmp.tor.runtime.RuntimeAction
+import io.matthewnelson.kmp.tor.runtime.Action
 import io.matthewnelson.kmp.tor.runtime.core.util.awaitSync
 import io.matthewnelson.kmp.tor.runtime.internal.commonExecuteAsync
 import kotlin.coroutines.cancellation.CancellationException
@@ -36,8 +36,8 @@ import kotlin.jvm.JvmOverloads
  * @see [executeSync]
  * */
 @Throws(Throwable::class)
-public actual suspend fun <T: RuntimeAction.Processor> T.executeAsync(
-    action: RuntimeAction,
+public actual suspend fun <T: Action.Processor> T.executeAsync(
+    action: Action,
 ): T = commonExecuteAsync(action)
 
 /**
@@ -59,8 +59,8 @@ public actual suspend fun <T: RuntimeAction.Processor> T.executeAsync(
  * */
 @JvmOverloads
 @Throws(Throwable::class)
-public fun <T: RuntimeAction.Processor> T.executeSync(
-    action: RuntimeAction,
+public fun <T: Action.Processor> T.executeSync(
+    action: Action,
     cancellation: (() -> CancellationException?)? = null,
 ): T {
     var failure: Throwable? = null
@@ -82,34 +82,34 @@ public fun <T: RuntimeAction.Processor> T.executeSync(
  * Starts the tor daemon, suspending the current coroutine
  * until completion or cancellation/error.
  *
- * @see [RuntimeAction.StartDaemon]
+ * @see [Action.StartDaemon]
  * @see [startDaemonSync]
  * */
 @Throws(Throwable::class)
-public actual suspend inline fun <T: RuntimeAction.Processor> T.startDaemonAsync(): T =
-    executeAsync(RuntimeAction.StartDaemon)
+public actual suspend inline fun <T: Action.Processor> T.startDaemonAsync(): T =
+    executeAsync(Action.StartDaemon)
 
 /**
  * Stops the tor daemon, suspending the current coroutine
  * until completion or cancellation/error.
  *
- * @see [RuntimeAction.StopDaemon]
+ * @see [Action.StopDaemon]
  * @see [stopDaemonSync]
  * */
 @Throws(Throwable::class)
-public actual suspend inline fun <T: RuntimeAction.Processor> T.stopDaemonAsync(): T =
-    executeAsync(RuntimeAction.StopDaemon)
+public actual suspend inline fun <T: Action.Processor> T.stopDaemonAsync(): T =
+    executeAsync(Action.StopDaemon)
 
 /**
  * Stops and then starts the tor daemon, suspending the
  * current coroutine until completion or cancellation/error.
  *
- * @see [RuntimeAction.RestartDaemon]
+ * @see [Action.RestartDaemon]
  * @see [restartDaemonSync]
  * */
 @Throws(Throwable::class)
-public actual suspend inline fun <T: RuntimeAction.Processor> T.restartDaemonAsync(): T =
-    executeAsync(RuntimeAction.RestartDaemon)
+public actual suspend inline fun <T: Action.Processor> T.restartDaemonAsync(): T =
+    executeAsync(Action.RestartDaemon)
 
 /**
  * Starts the tor daemon, blocking the current thread
@@ -118,7 +118,7 @@ public actual suspend inline fun <T: RuntimeAction.Processor> T.restartDaemonAsy
  * **NOTE:** This is a blocking call and should be invoked from
  * a background thread.
  *
- * @see [RuntimeAction.StartDaemon]
+ * @see [Action.StartDaemon]
  * @see [awaitSync]
  * @see [startDaemonAsync]
  * @param [cancellation] optional callback which is invoked
@@ -129,9 +129,9 @@ public actual suspend inline fun <T: RuntimeAction.Processor> T.restartDaemonAsy
 @JvmOverloads
 @Throws(Throwable::class)
 @Suppress("NOTHING_TO_INLINE")
-public inline fun <T: RuntimeAction.Processor> T.startDaemonSync(
+public inline fun <T: Action.Processor> T.startDaemonSync(
     noinline cancellation: (() -> CancellationException?)? = null,
-): T = executeSync(RuntimeAction.StartDaemon, cancellation)
+): T = executeSync(Action.StartDaemon, cancellation)
 
 /**
  * Stops the tor daemon, blocking the current thread
@@ -140,7 +140,7 @@ public inline fun <T: RuntimeAction.Processor> T.startDaemonSync(
  * **NOTE:** This is a blocking call and should be invoked from
  * a background thread.
  *
- * @see [RuntimeAction.StopDaemon]
+ * @see [Action.StopDaemon]
  * @see [awaitSync]
  * @see [stopDaemonAsync]
  * @param [cancellation] optional callback which is invoked
@@ -151,9 +151,9 @@ public inline fun <T: RuntimeAction.Processor> T.startDaemonSync(
 @JvmOverloads
 @Throws(Throwable::class)
 @Suppress("NOTHING_TO_INLINE")
-public inline fun <T: RuntimeAction.Processor> T.stopDaemonSync(
+public inline fun <T: Action.Processor> T.stopDaemonSync(
     noinline cancellation: (() -> CancellationException?)? = null,
-): T = executeSync(RuntimeAction.StopDaemon, cancellation)
+): T = executeSync(Action.StopDaemon, cancellation)
 
 /**
  * Stops and then starts the tor daemon, blocking the
@@ -162,7 +162,7 @@ public inline fun <T: RuntimeAction.Processor> T.stopDaemonSync(
  * **NOTE:** This is a blocking call and should be invoked from
  * a background thread.
  *
- * @see [RuntimeAction.RestartDaemon]
+ * @see [Action.RestartDaemon]
  * @see [awaitSync]
  * @see [restartDaemonAsync]
  * @param [cancellation] optional callback which is invoked
@@ -173,6 +173,6 @@ public inline fun <T: RuntimeAction.Processor> T.stopDaemonSync(
 @JvmOverloads
 @Throws(Throwable::class)
 @Suppress("NOTHING_TO_INLINE")
-public inline fun <T: RuntimeAction.Processor> T.restartDaemonSync(
+public inline fun <T: Action.Processor> T.restartDaemonSync(
     noinline cancellation: (() -> CancellationException?)? = null,
-): T = executeSync(RuntimeAction.RestartDaemon, cancellation)
+): T = executeSync(Action.RestartDaemon, cancellation)

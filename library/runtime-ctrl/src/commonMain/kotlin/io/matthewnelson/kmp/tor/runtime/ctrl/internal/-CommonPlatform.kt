@@ -19,7 +19,6 @@ package io.matthewnelson.kmp.tor.runtime.ctrl.internal
 
 import io.matthewnelson.kmp.file.File
 import io.matthewnelson.kmp.file.FileNotFoundException
-import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
 import io.matthewnelson.kmp.tor.runtime.core.OnFailure
 import io.matthewnelson.kmp.tor.runtime.core.QueuedJob
 import io.matthewnelson.kmp.tor.runtime.core.QueuedJob.Companion.toImmediateErrorJob
@@ -62,7 +61,6 @@ internal fun <T: QueuedJob> MutableList<T>.cancelAndClearAll(
 }
 
 @Suppress("NOTHING_TO_INLINE")
-@OptIn(InternalKmpTorApi::class)
 internal inline fun TorCmd<*>.toDestroyedErrorJob(
     onFailure: OnFailure,
     handler: UncaughtException.Handler,

@@ -1,3 +1,21 @@
+public final class io/matthewnelson/kmp/tor/runtime/Action : java/lang/Enum {
+	public static final field RestartDaemon Lio/matthewnelson/kmp/tor/runtime/Action;
+	public static final field StartDaemon Lio/matthewnelson/kmp/tor/runtime/Action;
+	public static final field StopDaemon Lio/matthewnelson/kmp/tor/runtime/Action;
+	public static fun getEntries ()Lkotlin/enums/EnumEntries;
+	public static fun valueOf (Ljava/lang/String;)Lio/matthewnelson/kmp/tor/runtime/Action;
+	public static fun values ()[Lio/matthewnelson/kmp/tor/runtime/Action;
+}
+
+public abstract interface class io/matthewnelson/kmp/tor/runtime/Action$Processor {
+	public abstract fun enqueue (Lio/matthewnelson/kmp/tor/runtime/Action;Lio/matthewnelson/kmp/tor/runtime/core/ItBlock;Lio/matthewnelson/kmp/tor/runtime/core/ItBlock;)Lio/matthewnelson/kmp/tor/runtime/core/QueuedJob;
+}
+
+public abstract class io/matthewnelson/kmp/tor/runtime/ActionJob : io/matthewnelson/kmp/tor/runtime/core/QueuedJob {
+	public final field action Lio/matthewnelson/kmp/tor/runtime/Action;
+	public synthetic fun <init> (Lio/matthewnelson/kmp/tor/runtime/Action;Lio/matthewnelson/kmp/tor/runtime/core/ItBlock;Lio/matthewnelson/kmp/tor/runtime/core/UncaughtException$Handler;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
+}
+
 public abstract interface class io/matthewnelson/kmp/tor/runtime/ConfigBuilderCallback : io/matthewnelson/kmp/tor/runtime/core/ThisBlock$WithIt {
 	public static final field Companion Lio/matthewnelson/kmp/tor/runtime/ConfigBuilderCallback$Companion;
 }
@@ -33,7 +51,7 @@ public final class io/matthewnelson/kmp/tor/runtime/Lifecycle$DestroyableTorRunt
 	public synthetic fun <init> (Lio/matthewnelson/kmp/tor/runtime/Lifecycle;Lio/matthewnelson/kmp/tor/runtime/internal/RealTorRuntime;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
 	public fun clearObservers ()V
 	public fun destroy ()V
-	public fun enqueue (Lio/matthewnelson/kmp/tor/runtime/RuntimeAction;Lio/matthewnelson/kmp/tor/runtime/core/ItBlock;Lio/matthewnelson/kmp/tor/runtime/core/ItBlock;)Lio/matthewnelson/kmp/tor/runtime/core/QueuedJob;
+	public fun enqueue (Lio/matthewnelson/kmp/tor/runtime/Action;Lio/matthewnelson/kmp/tor/runtime/core/ItBlock;Lio/matthewnelson/kmp/tor/runtime/core/ItBlock;)Lio/matthewnelson/kmp/tor/runtime/core/QueuedJob;
 	public fun enqueue (Lio/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$Unprivileged;Lio/matthewnelson/kmp/tor/runtime/core/ItBlock;Lio/matthewnelson/kmp/tor/runtime/core/ItBlock;)Lio/matthewnelson/kmp/tor/runtime/core/QueuedJob;
 	public fun environment ()Lio/matthewnelson/kmp/tor/runtime/TorRuntime$Environment;
 	public fun equals (Ljava/lang/Object;)Z
@@ -128,19 +146,6 @@ public final class io/matthewnelson/kmp/tor/runtime/NetworkObserver$Connectivity
 	public static fun values ()[Lio/matthewnelson/kmp/tor/runtime/NetworkObserver$Connectivity;
 }
 
-public final class io/matthewnelson/kmp/tor/runtime/RuntimeAction : java/lang/Enum {
-	public static final field RestartDaemon Lio/matthewnelson/kmp/tor/runtime/RuntimeAction;
-	public static final field StartDaemon Lio/matthewnelson/kmp/tor/runtime/RuntimeAction;
-	public static final field StopDaemon Lio/matthewnelson/kmp/tor/runtime/RuntimeAction;
-	public static fun getEntries ()Lkotlin/enums/EnumEntries;
-	public static fun valueOf (Ljava/lang/String;)Lio/matthewnelson/kmp/tor/runtime/RuntimeAction;
-	public static fun values ()[Lio/matthewnelson/kmp/tor/runtime/RuntimeAction;
-}
-
-public abstract interface class io/matthewnelson/kmp/tor/runtime/RuntimeAction$Processor {
-	public abstract fun enqueue (Lio/matthewnelson/kmp/tor/runtime/RuntimeAction;Lio/matthewnelson/kmp/tor/runtime/core/ItBlock;Lio/matthewnelson/kmp/tor/runtime/core/ItBlock;)Lio/matthewnelson/kmp/tor/runtime/core/QueuedJob;
-}
-
 public abstract class io/matthewnelson/kmp/tor/runtime/RuntimeEvent {
 	public static final field Companion Lio/matthewnelson/kmp/tor/runtime/RuntimeEvent$Companion;
 	public final field name Ljava/lang/String;
@@ -162,6 +167,12 @@ public final class io/matthewnelson/kmp/tor/runtime/RuntimeEvent$Companion {
 
 public final class io/matthewnelson/kmp/tor/runtime/RuntimeEvent$ERROR : io/matthewnelson/kmp/tor/runtime/RuntimeEvent {
 	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/RuntimeEvent$ERROR;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun hashCode ()I
+}
+
+public final class io/matthewnelson/kmp/tor/runtime/RuntimeEvent$EXECUTE : io/matthewnelson/kmp/tor/runtime/RuntimeEvent {
+	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/RuntimeEvent$EXECUTE;
 	public fun equals (Ljava/lang/Object;)Z
 	public fun hashCode ()I
 }
@@ -236,7 +247,7 @@ public abstract interface class io/matthewnelson/kmp/tor/runtime/RuntimeEvent$Pr
 	public abstract fun unsubscribeAll ([Lio/matthewnelson/kmp/tor/runtime/RuntimeEvent;)V
 }
 
-public abstract interface class io/matthewnelson/kmp/tor/runtime/TorRuntime : io/matthewnelson/kmp/tor/runtime/FileID, io/matthewnelson/kmp/tor/runtime/RuntimeAction$Processor, io/matthewnelson/kmp/tor/runtime/RuntimeEvent$Processor, io/matthewnelson/kmp/tor/runtime/core/TorEvent$Processor, io/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$Unprivileged$Processor {
+public abstract interface class io/matthewnelson/kmp/tor/runtime/TorRuntime : io/matthewnelson/kmp/tor/runtime/Action$Processor, io/matthewnelson/kmp/tor/runtime/FileID, io/matthewnelson/kmp/tor/runtime/RuntimeEvent$Processor, io/matthewnelson/kmp/tor/runtime/core/TorEvent$Processor, io/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$Unprivileged$Processor {
 	public static final field Companion Lio/matthewnelson/kmp/tor/runtime/TorRuntime$Companion;
 	public static fun Builder (Lio/matthewnelson/kmp/tor/runtime/TorRuntime$Environment;Lio/matthewnelson/kmp/tor/runtime/core/ThisBlock;)Lio/matthewnelson/kmp/tor/runtime/TorRuntime;
 	public abstract fun environment ()Lio/matthewnelson/kmp/tor/runtime/TorRuntime$Environment;
@@ -297,7 +308,7 @@ public abstract class io/matthewnelson/kmp/tor/runtime/TorRuntime$ServiceFactory
 	protected final field binder Lio/matthewnelson/kmp/tor/runtime/TorRuntime$ServiceFactory$Binder;
 	protected fun <init> (Lio/matthewnelson/kmp/tor/runtime/TorRuntime$ServiceFactory$Initializer;)V
 	public final fun clearObservers ()V
-	public final fun enqueue (Lio/matthewnelson/kmp/tor/runtime/RuntimeAction;Lio/matthewnelson/kmp/tor/runtime/core/ItBlock;Lio/matthewnelson/kmp/tor/runtime/core/ItBlock;)Lio/matthewnelson/kmp/tor/runtime/core/QueuedJob;
+	public final fun enqueue (Lio/matthewnelson/kmp/tor/runtime/Action;Lio/matthewnelson/kmp/tor/runtime/core/ItBlock;Lio/matthewnelson/kmp/tor/runtime/core/ItBlock;)Lio/matthewnelson/kmp/tor/runtime/core/QueuedJob;
 	public final fun enqueue (Lio/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$Unprivileged;Lio/matthewnelson/kmp/tor/runtime/core/ItBlock;Lio/matthewnelson/kmp/tor/runtime/core/ItBlock;)Lio/matthewnelson/kmp/tor/runtime/core/QueuedJob;
 	public final fun environment ()Lio/matthewnelson/kmp/tor/runtime/TorRuntime$Environment;
 	public final fun equals (Ljava/lang/Object;)Z
@@ -334,21 +345,21 @@ public abstract class io/matthewnelson/kmp/tor/runtime/TorRuntime$ServiceFactory
 }
 
 public final class io/matthewnelson/kmp/tor/runtime/util/ActionUtil {
-	public static final fun executeAsync (Lio/matthewnelson/kmp/tor/runtime/RuntimeAction$Processor;Lio/matthewnelson/kmp/tor/runtime/RuntimeAction;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public static final fun executeSync (Lio/matthewnelson/kmp/tor/runtime/RuntimeAction$Processor;Lio/matthewnelson/kmp/tor/runtime/RuntimeAction;)Lio/matthewnelson/kmp/tor/runtime/RuntimeAction$Processor;
-	public static final fun executeSync (Lio/matthewnelson/kmp/tor/runtime/RuntimeAction$Processor;Lio/matthewnelson/kmp/tor/runtime/RuntimeAction;Lkotlin/jvm/functions/Function0;)Lio/matthewnelson/kmp/tor/runtime/RuntimeAction$Processor;
-	public static synthetic fun executeSync$default (Lio/matthewnelson/kmp/tor/runtime/RuntimeAction$Processor;Lio/matthewnelson/kmp/tor/runtime/RuntimeAction;Lkotlin/jvm/functions/Function0;ILjava/lang/Object;)Lio/matthewnelson/kmp/tor/runtime/RuntimeAction$Processor;
-	public static final fun restartDaemonAsync (Lio/matthewnelson/kmp/tor/runtime/RuntimeAction$Processor;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public static final fun restartDaemonSync (Lio/matthewnelson/kmp/tor/runtime/RuntimeAction$Processor;)Lio/matthewnelson/kmp/tor/runtime/RuntimeAction$Processor;
-	public static final fun restartDaemonSync (Lio/matthewnelson/kmp/tor/runtime/RuntimeAction$Processor;Lkotlin/jvm/functions/Function0;)Lio/matthewnelson/kmp/tor/runtime/RuntimeAction$Processor;
-	public static synthetic fun restartDaemonSync$default (Lio/matthewnelson/kmp/tor/runtime/RuntimeAction$Processor;Lkotlin/jvm/functions/Function0;ILjava/lang/Object;)Lio/matthewnelson/kmp/tor/runtime/RuntimeAction$Processor;
-	public static final fun startDaemonAsync (Lio/matthewnelson/kmp/tor/runtime/RuntimeAction$Processor;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public static final fun startDaemonSync (Lio/matthewnelson/kmp/tor/runtime/RuntimeAction$Processor;)Lio/matthewnelson/kmp/tor/runtime/RuntimeAction$Processor;
-	public static final fun startDaemonSync (Lio/matthewnelson/kmp/tor/runtime/RuntimeAction$Processor;Lkotlin/jvm/functions/Function0;)Lio/matthewnelson/kmp/tor/runtime/RuntimeAction$Processor;
-	public static synthetic fun startDaemonSync$default (Lio/matthewnelson/kmp/tor/runtime/RuntimeAction$Processor;Lkotlin/jvm/functions/Function0;ILjava/lang/Object;)Lio/matthewnelson/kmp/tor/runtime/RuntimeAction$Processor;
-	public static final fun stopDaemonAsync (Lio/matthewnelson/kmp/tor/runtime/RuntimeAction$Processor;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public static final fun stopDaemonSync (Lio/matthewnelson/kmp/tor/runtime/RuntimeAction$Processor;)Lio/matthewnelson/kmp/tor/runtime/RuntimeAction$Processor;
-	public static final fun stopDaemonSync (Lio/matthewnelson/kmp/tor/runtime/RuntimeAction$Processor;Lkotlin/jvm/functions/Function0;)Lio/matthewnelson/kmp/tor/runtime/RuntimeAction$Processor;
-	public static synthetic fun stopDaemonSync$default (Lio/matthewnelson/kmp/tor/runtime/RuntimeAction$Processor;Lkotlin/jvm/functions/Function0;ILjava/lang/Object;)Lio/matthewnelson/kmp/tor/runtime/RuntimeAction$Processor;
+	public static final fun executeAsync (Lio/matthewnelson/kmp/tor/runtime/Action$Processor;Lio/matthewnelson/kmp/tor/runtime/Action;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static final fun executeSync (Lio/matthewnelson/kmp/tor/runtime/Action$Processor;Lio/matthewnelson/kmp/tor/runtime/Action;)Lio/matthewnelson/kmp/tor/runtime/Action$Processor;
+	public static final fun executeSync (Lio/matthewnelson/kmp/tor/runtime/Action$Processor;Lio/matthewnelson/kmp/tor/runtime/Action;Lkotlin/jvm/functions/Function0;)Lio/matthewnelson/kmp/tor/runtime/Action$Processor;
+	public static synthetic fun executeSync$default (Lio/matthewnelson/kmp/tor/runtime/Action$Processor;Lio/matthewnelson/kmp/tor/runtime/Action;Lkotlin/jvm/functions/Function0;ILjava/lang/Object;)Lio/matthewnelson/kmp/tor/runtime/Action$Processor;
+	public static final fun restartDaemonAsync (Lio/matthewnelson/kmp/tor/runtime/Action$Processor;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static final fun restartDaemonSync (Lio/matthewnelson/kmp/tor/runtime/Action$Processor;)Lio/matthewnelson/kmp/tor/runtime/Action$Processor;
+	public static final fun restartDaemonSync (Lio/matthewnelson/kmp/tor/runtime/Action$Processor;Lkotlin/jvm/functions/Function0;)Lio/matthewnelson/kmp/tor/runtime/Action$Processor;
+	public static synthetic fun restartDaemonSync$default (Lio/matthewnelson/kmp/tor/runtime/Action$Processor;Lkotlin/jvm/functions/Function0;ILjava/lang/Object;)Lio/matthewnelson/kmp/tor/runtime/Action$Processor;
+	public static final fun startDaemonAsync (Lio/matthewnelson/kmp/tor/runtime/Action$Processor;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static final fun startDaemonSync (Lio/matthewnelson/kmp/tor/runtime/Action$Processor;)Lio/matthewnelson/kmp/tor/runtime/Action$Processor;
+	public static final fun startDaemonSync (Lio/matthewnelson/kmp/tor/runtime/Action$Processor;Lkotlin/jvm/functions/Function0;)Lio/matthewnelson/kmp/tor/runtime/Action$Processor;
+	public static synthetic fun startDaemonSync$default (Lio/matthewnelson/kmp/tor/runtime/Action$Processor;Lkotlin/jvm/functions/Function0;ILjava/lang/Object;)Lio/matthewnelson/kmp/tor/runtime/Action$Processor;
+	public static final fun stopDaemonAsync (Lio/matthewnelson/kmp/tor/runtime/Action$Processor;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static final fun stopDaemonSync (Lio/matthewnelson/kmp/tor/runtime/Action$Processor;)Lio/matthewnelson/kmp/tor/runtime/Action$Processor;
+	public static final fun stopDaemonSync (Lio/matthewnelson/kmp/tor/runtime/Action$Processor;Lkotlin/jvm/functions/Function0;)Lio/matthewnelson/kmp/tor/runtime/Action$Processor;
+	public static synthetic fun stopDaemonSync$default (Lio/matthewnelson/kmp/tor/runtime/Action$Processor;Lkotlin/jvm/functions/Function0;ILjava/lang/Object;)Lio/matthewnelson/kmp/tor/runtime/Action$Processor;
 }
 

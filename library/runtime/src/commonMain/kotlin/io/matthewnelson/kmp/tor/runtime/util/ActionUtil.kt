@@ -15,7 +15,7 @@
  **/
 package io.matthewnelson.kmp.tor.runtime.util
 
-import io.matthewnelson.kmp.tor.runtime.RuntimeAction
+import io.matthewnelson.kmp.tor.runtime.Action
 
 /**
  * Enqueues the [action], suspending the current coroutine
@@ -27,36 +27,36 @@ import io.matthewnelson.kmp.tor.runtime.RuntimeAction
  * @see [io.matthewnelson.kmp.tor.runtime.util.executeSync]
  * */
 @Throws(Throwable::class)
-public expect suspend fun <T: RuntimeAction.Processor> T.executeAsync(
-    action: RuntimeAction,
+public expect suspend fun <T: Action.Processor> T.executeAsync(
+    action: Action,
 ): T
 
 /**
  * Starts the tor daemon, suspending the current coroutine
  * until completion or cancellation/error.
  *
- * @see [RuntimeAction.StartDaemon]
+ * @see [Action.StartDaemon]
  * @see [io.matthewnelson.kmp.tor.runtime.util.startDaemonSync]
  * */
 @Throws(Throwable::class)
-public expect suspend inline fun <T: RuntimeAction.Processor> T.startDaemonAsync(): T
+public expect suspend inline fun <T: Action.Processor> T.startDaemonAsync(): T
 
 /**
  * Stops the tor daemon, suspending the current coroutine
  * until completion or cancellation/error.
  *
- * @see [RuntimeAction.StopDaemon]
+ * @see [Action.StopDaemon]
  * @see [io.matthewnelson.kmp.tor.runtime.util.stopDaemonSync]
  * */
 @Throws(Throwable::class)
-public expect suspend inline fun <T: RuntimeAction.Processor> T.stopDaemonAsync(): T
+public expect suspend inline fun <T: Action.Processor> T.stopDaemonAsync(): T
 
 /**
  * Stops and then starts the tor daemon, suspending the
  * current coroutine until completion or cancellation/error.
  *
- * @see [RuntimeAction.RestartDaemon]
+ * @see [Action.RestartDaemon]
  * @see [io.matthewnelson.kmp.tor.runtime.util.restartDaemonSync]
  * */
 @Throws(Throwable::class)
-public expect suspend inline fun <T: RuntimeAction.Processor> T.restartDaemonAsync(): T
+public expect suspend inline fun <T: Action.Processor> T.restartDaemonAsync(): T

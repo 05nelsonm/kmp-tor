@@ -19,7 +19,7 @@ import io.matthewnelson.kmp.tor.runtime.core.*
 import io.matthewnelson.kmp.tor.runtime.core.ctrl.TorCmd
 import kotlin.coroutines.cancellation.CancellationException
 
-public enum class RuntimeAction {
+public enum class Action {
 
     /**
      * Starts the tor daemon.
@@ -63,7 +63,7 @@ public enum class RuntimeAction {
     RestartDaemon;
 
     /**
-     * Base interface for implementations that process [RuntimeAction].
+     * Base interface for implementations that process [Action].
      *
      * **NOTE:** Implementors **MUST** process the action on a different
      * thread than what [enqueue] is called from for Jvm & Native.
@@ -71,7 +71,7 @@ public enum class RuntimeAction {
     public interface Processor {
 
         /**
-         * Enqueues the [RuntimeAction] for execution.
+         * Enqueues the [Action] for execution.
          *
          * **NOTE:** If the returned [QueuedJob] gets cancelled,
          * [onFailure] will be invoked with [CancellationException].
@@ -83,7 +83,7 @@ public enum class RuntimeAction {
          * @see [io.matthewnelson.kmp.tor.runtime.util.executeSync]
          * */
         public fun enqueue(
-            action: RuntimeAction,
+            action: Action,
             onFailure: OnFailure,
             onSuccess: OnSuccess<Unit>,
         ): QueuedJob

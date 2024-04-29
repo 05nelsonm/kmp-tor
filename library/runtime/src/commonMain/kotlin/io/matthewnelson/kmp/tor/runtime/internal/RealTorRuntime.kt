@@ -113,7 +113,7 @@ internal class RealTorRuntime private constructor(
 
     // TODO
     public override fun enqueue(
-        action: RuntimeAction,
+        action: Action,
         onFailure: OnFailure,
         onSuccess: OnSuccess<Unit>,
     ): QueuedJob = onFailure.toImmediateErrorJob(action.name, NotImplementedError(), handler)
@@ -260,7 +260,7 @@ internal class RealTorRuntime private constructor(
         @JvmSynthetic
         internal fun enqueue(
             startService: () -> Unit,
-            action: RuntimeAction,
+            action: Action,
             onFailure: OnFailure,
             onSuccess: OnSuccess<Unit>,
         ): QueuedJob = onFailure.toImmediateErrorJob(action.name, NotImplementedError(), handler)
@@ -286,6 +286,7 @@ internal class RealTorRuntime private constructor(
                 events.mapTo(LinkedHashSet(events.size, 1.0f)) { event ->
                     when (event) {
                         is ERROR -> event.observer(tag) { event.notifyObservers(it) }
+                        is EXECUTE -> event.observer(tag) { event.notifyObservers(it) }
                         is LIFECYCLE -> event.observer(tag) { event.notifyObservers(it) }
                         is LOG -> event.observer(tag) { event.notifyObservers(it) }
                     }

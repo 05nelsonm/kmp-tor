@@ -55,7 +55,7 @@ public interface TorRuntime:
     FileID,
     TorCmd.Unprivileged.Processor,
     TorEvent.Processor,
-    RuntimeAction.Processor,
+    Action.Processor,
     RuntimeEvent.Processor
 {
 
@@ -139,7 +139,7 @@ public interface TorRuntime:
          * that are not currently supported to the [Environment.torrcFile]).
          *
          * Any exception thrown within [block] will be propagated to the caller
-         * of [RuntimeAction.StartDaemon] or [RuntimeAction.RestartDaemon].
+         * of [Action.StartDaemon] or [Action.RestartDaemon].
          *
          * **NOTE:** This can be omitted as a minimum viable configuration
          * is always created. See [ConfigBuilderCallback.putDefaults] for what
@@ -562,7 +562,7 @@ public interface TorRuntime:
         ): QueuedJob = ctrl.enqueue(cmd, onFailure, onSuccess)
 
         public final override fun enqueue(
-            action: RuntimeAction,
+            action: Action,
             onFailure: OnFailure,
             onSuccess: OnSuccess<Unit>,
         ): QueuedJob = ctrl.enqueue(::startService, action, onFailure, onSuccess)

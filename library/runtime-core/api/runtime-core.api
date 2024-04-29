@@ -51,19 +51,30 @@ public final class io/matthewnelson/kmp/tor/runtime/core/OnEvent$Executor$Main :
 }
 
 public abstract class io/matthewnelson/kmp/tor/runtime/core/QueuedJob {
+	public static final field Companion Lio/matthewnelson/kmp/tor/runtime/core/QueuedJob$Companion;
 	public final field name Ljava/lang/String;
 	protected fun <init> (Ljava/lang/String;Lio/matthewnelson/kmp/tor/runtime/core/ItBlock;Lio/matthewnelson/kmp/tor/runtime/core/UncaughtException$Handler;)V
 	public final fun cancel (Ljava/util/concurrent/CancellationException;)Z
 	public final fun cancellationException ()Ljava/util/concurrent/CancellationException;
 	public final fun invokeOnCompletion (Lio/matthewnelson/kmp/tor/runtime/core/ItBlock;)Lio/matthewnelson/kmp/tor/runtime/core/Disposable;
 	public final fun isActive ()Z
+	public final fun isCancelled ()Z
 	public final fun isCompleting ()Z
+	public final fun isError ()Z
+	public final fun isSuccess ()Z
 	protected fun onCancellation (Ljava/util/concurrent/CancellationException;)V
-	protected final fun onCompletion (Ljava/lang/Object;Lkotlin/jvm/functions/Function0;)V
-	protected final fun onError (Ljava/lang/Throwable;Lio/matthewnelson/kmp/tor/runtime/core/ItBlock;)V
+	protected final fun onCompletion (Ljava/lang/Object;Lkotlin/jvm/functions/Function0;)Z
+	protected final fun onError (Ljava/lang/Throwable;Lio/matthewnelson/kmp/tor/runtime/core/ItBlock;)Z
 	protected final fun onExecuting ()V
 	public final fun state ()Lio/matthewnelson/kmp/tor/runtime/core/QueuedJob$State;
+	public static final fun toImmediateErrorJob (Lio/matthewnelson/kmp/tor/runtime/core/ItBlock;Ljava/lang/String;Ljava/lang/Throwable;Lio/matthewnelson/kmp/tor/runtime/core/UncaughtException$Handler;)Lio/matthewnelson/kmp/tor/runtime/core/QueuedJob;
+	public static final fun toImmediateSuccessJob (Lio/matthewnelson/kmp/tor/runtime/core/ItBlock;Ljava/lang/String;Ljava/lang/Object;Lio/matthewnelson/kmp/tor/runtime/core/UncaughtException$Handler;)Lio/matthewnelson/kmp/tor/runtime/core/QueuedJob;
 	public final fun toString ()Ljava/lang/String;
+}
+
+public final class io/matthewnelson/kmp/tor/runtime/core/QueuedJob$Companion {
+	public final fun toImmediateErrorJob (Lio/matthewnelson/kmp/tor/runtime/core/ItBlock;Ljava/lang/String;Ljava/lang/Throwable;Lio/matthewnelson/kmp/tor/runtime/core/UncaughtException$Handler;)Lio/matthewnelson/kmp/tor/runtime/core/QueuedJob;
+	public final fun toImmediateSuccessJob (Lio/matthewnelson/kmp/tor/runtime/core/ItBlock;Ljava/lang/String;Ljava/lang/Object;Lio/matthewnelson/kmp/tor/runtime/core/UncaughtException$Handler;)Lio/matthewnelson/kmp/tor/runtime/core/QueuedJob;
 }
 
 public final class io/matthewnelson/kmp/tor/runtime/core/QueuedJob$State : java/lang/Enum {
