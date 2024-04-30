@@ -13,15 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-@file:Suppress("EXPECT_ACTUAL_CLASSIFIERS_ARE_IN_BETA_WARNING")
+@file:Suppress("EXPECT_ACTUAL_CLASSIFIERS_ARE_IN_BETA_WARNING", "ACTUAL_ANNOTATIONS_NOT_MATCH_EXPECT")
 
 package io.matthewnelson.kmp.tor.runtime
 
 import io.matthewnelson.kmp.tor.runtime.core.*
 import io.matthewnelson.kmp.tor.runtime.core.ctrl.TorCmd
+import io.matthewnelson.kmp.tor.runtime.internal.commonExecuteAsync
 import kotlin.coroutines.cancellation.CancellationException
 
-public expect enum class Action {
+public actual enum class Action {
 
     /**
      * Starts the tor daemon.
@@ -70,7 +71,7 @@ public expect enum class Action {
      * **NOTE:** Implementors **MUST** process the action on a different
      * thread than what [enqueue] is called from for Jvm & Native.
      * */
-    public interface Processor {
+    public actual interface Processor {
 
         /**
          * Enqueues the [Action] for execution.
@@ -82,16 +83,15 @@ public expect enum class Action {
          * @see [OnFailure]
          * @see [OnSuccess]
          * @see [executeAsync]
-         * @see [io.matthewnelson.kmp.tor.runtime.Action.Companion.executeSync]
          * */
-        public fun enqueue(
+        public actual fun enqueue(
             action: Action,
             onFailure: OnFailure,
             onSuccess: OnSuccess<Unit>,
         ): QueuedJob
     }
 
-    public companion object {
+    public actual companion object {
 
         /**
          * Enqueues the [action], suspending the current coroutine
@@ -100,39 +100,35 @@ public expect enum class Action {
          * @see [startDaemonAsync]
          * @see [stopDaemonAsync]
          * @see [restartDaemonAsync]
-         * @see [io.matthewnelson.kmp.tor.runtime.Action.Companion.executeSync]
          * */
-        @Throws(Throwable::class)
-        public suspend fun <T: Processor> T.executeAsync(action: Action): T
+        //@Throws(Throwable::class)
+        public actual suspend fun <T: Processor> T.executeAsync(action: Action): T = commonExecuteAsync(action)
 
         /**
          * Starts the tor daemon, suspending the current coroutine
          * until completion or cancellation/error.
          *
          * @see [Action.StartDaemon]
-         * @see [io.matthewnelson.kmp.tor.runtime.Action.Companion.startDaemonSync]
          * */
-        @Throws(Throwable::class)
-        public suspend inline fun <T: Processor> T.startDaemonAsync(): T
+        //@Throws(Throwable::class)
+        public actual suspend inline fun <T: Processor> T.startDaemonAsync(): T = executeAsync(StartDaemon)
 
         /**
          * Stops the tor daemon, suspending the current coroutine
          * until completion or cancellation/error.
          *
          * @see [Action.StopDaemon]
-         * @see [io.matthewnelson.kmp.tor.runtime.Action.Companion.stopDaemonSync]
          * */
-        @Throws(Throwable::class)
-        public suspend inline fun <T: Processor> T.stopDaemonAsync(): T
+        //@Throws(Throwable::class)
+        public actual suspend inline fun <T: Processor> T.stopDaemonAsync(): T = executeAsync(StopDaemon)
 
         /**
          * Stops and then starts the tor daemon, suspending the
          * current coroutine until completion or cancellation/error.
          *
          * @see [Action.RestartDaemon]
-         * @see [io.matthewnelson.kmp.tor.runtime.Action.Companion.restartDaemonSync]
          * */
-        @Throws(Throwable::class)
-        public suspend inline fun <T: Processor> T.restartDaemonAsync(): T
+        //@Throws(Throwable::class)
+        public actual suspend inline fun <T: Processor> T.restartDaemonAsync(): T = executeAsync(RestartDaemon)
     }
 }

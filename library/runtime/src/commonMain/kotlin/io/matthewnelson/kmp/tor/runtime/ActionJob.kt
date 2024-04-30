@@ -19,6 +19,7 @@ import io.matthewnelson.kmp.tor.runtime.core.*
 import kotlin.concurrent.Volatile
 import kotlin.coroutines.cancellation.CancellationException
 import kotlin.jvm.JvmField
+import kotlin.jvm.JvmName
 import kotlin.jvm.JvmSynthetic
 
 public abstract class ActionJob private constructor(
@@ -27,6 +28,13 @@ public abstract class ActionJob private constructor(
     onFailure: OnFailure,
     handler: UncaughtException.Handler,
 ): QueuedJob(action.name, onFailure, handler) {
+
+    @get:JvmName("isStart")
+    public val isStart: Boolean get() = this as Sealed is Start
+    @get:JvmName("isStop")
+    public val isStop: Boolean get() = this as Sealed is Stop
+    @get:JvmName("isRestart")
+    public val isRestart: Boolean get() = this as Sealed is Restart
 
     internal abstract class Start internal constructor(
         onSuccess: OnSuccess<Unit>,

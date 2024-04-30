@@ -270,7 +270,7 @@ internal class RealTorRuntime private constructor(
             @Volatile
             private var _instance: Lifecycle.DestroyableTorRuntime? = null
             val instance: Lifecycle.DestroyableTorRuntime? get() = _instance
-            private val lock = SynchronizedObject()
+            private val bLock = SynchronizedObject()
 
             // Pipe all events to observers registered with Factory
             private val observersTorEvent = TorEvent.entries.let { events ->
@@ -299,7 +299,7 @@ internal class RealTorRuntime private constructor(
                 serviceObserversTorEvent: Set<TorEvent.Observer>,
                 @Suppress("RemoveRedundantQualifierName")
                 serviceObserversRuntimeEvent: Set<RuntimeEvent.Observer<*>>,
-            ): Lifecycle.DestroyableTorRuntime = synchronized(lock) {
+            ): Lifecycle.DestroyableTorRuntime = synchronized(bLock) {
 
                 // invokeOnCompletion handler should set instance to null,
                 // so this means the instance was never destroyed before

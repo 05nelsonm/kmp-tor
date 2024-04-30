@@ -47,7 +47,7 @@ import kotlin.jvm.JvmSynthetic
 import kotlin.random.Random
 
 /**
- * Base interface for managing and interacting with tor.
+ * Base interface for managing and interacting with a single tor process.
  *
  * @see [Companion.Builder]
  * */
