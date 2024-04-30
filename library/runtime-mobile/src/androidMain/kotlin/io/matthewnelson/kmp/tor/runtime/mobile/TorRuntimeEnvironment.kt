@@ -90,7 +90,7 @@ public fun Context.createTorRuntimeEnvironment(
     // function which has Context available.
     @Suppress("UnnecessaryOptInAnnotation")
     @OptIn(ExperimentalKmpTorApi::class)
-    serviceFactoryLoader = torServiceFactoryLoaderOrNull()
+    serviceFactoryLoader = TorService.loaderOrNull()
 
     this.apply(block)
 }

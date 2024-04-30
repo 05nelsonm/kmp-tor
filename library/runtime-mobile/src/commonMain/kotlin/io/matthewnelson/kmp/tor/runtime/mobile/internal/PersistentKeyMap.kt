@@ -23,7 +23,7 @@ import io.matthewnelson.kmp.tor.core.resource.SynchronizedObject
 import io.matthewnelson.kmp.tor.core.resource.synchronized
 
 @OptIn(InternalKmpTorApi::class)
-internal class PersistentKeyMap<K: Any, V: Any> {
+internal class PersistentKeyMap<K: Any, V: Any> internal constructor() {
 
     private val lock = SynchronizedObject()
 
