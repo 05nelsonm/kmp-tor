@@ -104,14 +104,11 @@ public fun interface OnEvent<in It: Any>: ItBlock<It> {
          *
          * **NOTE: This is an internal API and should not be called from general
          * code; it is strictly for `kmp-tor` event observers. Custom implementations
-         * of [Executor] should be for usage with `kmp-tor` only**
+         * of [Executor] should be for usage with `kmp-tor` only, and not invoke
+         * [execute]**
          *
-         * The [UncaughtException.Handler] can be retrieved through use of keys
-         * and casting, if needed.
-         *
-         * e.g.
-         *
-         *     handler[CoroutineExceptionHandler] as? UncaughtException.Handler
+         * The [UncaughtException.Handler] can be retrieved from [CoroutineContext] by
+         * [UncaughtException.Handler.uncaughtExceptionHandlerOrNull] if needed.
          *
          * @param [handler] The [UncaughtException.Handler] wrapped as
          *   [CoroutineContext] element to pipe exceptions.

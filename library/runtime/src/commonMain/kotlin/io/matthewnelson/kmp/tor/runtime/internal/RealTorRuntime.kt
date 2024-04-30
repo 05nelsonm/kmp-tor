@@ -59,7 +59,7 @@ internal class RealTorRuntime private constructor(
     private var lifecycle: Destroyable? = null
     protected override val debug: Boolean get() = environment().debug
     public override fun environment(): TorRuntime.Environment = generator.environment
-    protected override val isService: Boolean get() = lifecycle != null
+    protected override val isService: Boolean = serviceFactoryHandler != null
     protected override val handler: HandlerWithContext = serviceFactoryHandler ?: super.handler
 
     @JvmSynthetic
@@ -160,7 +160,7 @@ internal class RealTorRuntime private constructor(
             defaultExecutor: OnEvent.Executor,
             observersRuntimeEvent: Set<RuntimeEvent.Observer<*>>,
         ): TorRuntime = generator.environment.serviceFactoryLoader()?.let { loader ->
-            val factory = ServiceCtrl.of(
+            val ctrl = ServiceCtrl.of(
                 generator,
                 networkObserver,
                 requiredTorEvents,
@@ -169,11 +169,11 @@ internal class RealTorRuntime private constructor(
                 observersRuntimeEvent,
             )
 
-            val runtime = loader.load(TorRuntime.ServiceFactory.Initializer.of(factory))
+            val factory = loader.load(TorRuntime.ServiceFactory.Initializer.of(ctrl))
 
-            factory.binder().lce(Lifecycle.Event.OnCreate(runtime))
+            ctrl.binder().lce(Lifecycle.Event.OnCreate(factory))
 
-            runtime
+            factory
         } ?: RealTorRuntime(
             generator,
             networkObserver,

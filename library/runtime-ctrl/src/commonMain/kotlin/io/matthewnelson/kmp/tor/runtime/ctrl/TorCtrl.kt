@@ -90,12 +90,8 @@ public expect interface TorCtrl: Destroyable, TorEvent.Processor, TorCmd.Privile
      *   safe. Any non-[UncaughtException] it throws will be swallowed.
      * @param [handler] The [UncaughtException.Handler] to pipe bad behavior
      *   to. It **MUST** be thread-safe for Jvm & Native implementations.
-     * @throws [IllegalArgumentException] if [handler] is an instance
-     *   of [UncaughtException.SuppressedHandler] (a leaked reference)
      * */
-    public class Factory
-    @Throws(IllegalArgumentException::class)
-    public constructor(
+    public class Factory(
         staticTag: String? = null,
         observers: Set<TorEvent.Observer> = emptySet(),
         defaultExecutor: OnEvent.Executor = OnEvent.Executor.Immediate,

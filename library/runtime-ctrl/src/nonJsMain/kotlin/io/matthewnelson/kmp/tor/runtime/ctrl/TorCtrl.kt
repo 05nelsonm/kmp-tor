@@ -24,14 +24,9 @@ import io.matthewnelson.kmp.file.wrapIOException
 import io.matthewnelson.kmp.process.Blocking
 import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
 import io.matthewnelson.kmp.tor.runtime.core.*
-import io.matthewnelson.kmp.tor.runtime.core.UncaughtException.Handler.Companion.requireInstanceIsNotSuppressed
 import io.matthewnelson.kmp.tor.runtime.core.address.ProxyAddress
 import io.matthewnelson.kmp.tor.runtime.core.ctrl.TorCmd
 import io.matthewnelson.kmp.tor.runtime.ctrl.internal.*
-import io.matthewnelson.kmp.tor.runtime.ctrl.internal.CtrlConnection
-import io.matthewnelson.kmp.tor.runtime.ctrl.internal.RealTorCtrl
-import io.matthewnelson.kmp.tor.runtime.ctrl.internal.checkUnixSockedSupport
-import io.matthewnelson.kmp.tor.runtime.ctrl.internal.connect
 import kotlinx.coroutines.*
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.InvocationKind
@@ -103,12 +98,9 @@ public actual interface TorCtrl : Destroyable, TorEvent.Processor, TorCmd.Privil
      *   safe. Any non-[UncaughtException] it throws will be swallowed.
      * @param [handler] The [UncaughtException.Handler] to pipe bad behavior
      *   to. It **MUST** be thread-safe.
-     * @throws [IllegalArgumentException] if [handler] is an instance
-     *   of [UncaughtException.SuppressedHandler] (a leaked reference)
      * */
     public actual class Factory
     @JvmOverloads
-    @Throws(IllegalArgumentException::class)
     public actual constructor(
         internal actual val staticTag: String?,
         internal actual val observers: Set<TorEvent.Observer>,
@@ -116,8 +108,6 @@ public actual interface TorCtrl : Destroyable, TorEvent.Processor, TorCmd.Privil
         internal actual val debugger: ItBlock<String>?,
         internal actual val handler: UncaughtException.Handler,
     ) {
-
-        init { handler.requireInstanceIsNotSuppressed() }
 
         /**
          * Connects to a tor control listener via TCP port.

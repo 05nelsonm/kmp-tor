@@ -19,9 +19,9 @@ import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
 import io.matthewnelson.kmp.tor.core.resource.SynchronizedObject
 import io.matthewnelson.kmp.tor.core.resource.synchronized
 import io.matthewnelson.kmp.tor.runtime.core.QueuedJob.State.*
-import io.matthewnelson.kmp.tor.runtime.core.UncaughtException.Handler.Companion.requireInstanceIsNotSuppressed
 import io.matthewnelson.kmp.tor.runtime.core.UncaughtException.Handler.Companion.tryCatch
 import io.matthewnelson.kmp.tor.runtime.core.UncaughtException.Handler.Companion.withSuppression
+import io.matthewnelson.kmp.tor.runtime.core.UncaughtException.SuppressedHandler
 import kotlin.concurrent.Volatile
 import kotlin.coroutines.cancellation.CancellationException
 import kotlin.jvm.JvmField
@@ -35,13 +35,8 @@ import kotlin.jvm.JvmStatic
  * discarded.
  *
  * Heavily inspired by [kotlinx.coroutines.Job]
- *
- * @throws [IllegalArgumentException] if handler is a leaked
- *   reference of [UncaughtException.SuppressedHandler]
  * */
-public abstract class QueuedJob
-@Throws(IllegalArgumentException::class)
-protected constructor(
+public abstract class QueuedJob protected constructor(
     @JvmField
     public val name: String,
     // TODO:
@@ -51,8 +46,6 @@ protected constructor(
     handler: UncaughtException.Handler,
 ) {
 
-    init { handler.requireInstanceIsNotSuppressed() }
-
     @Volatile
     private var _cancellationException: CancellationException? = null
     @Volatile
@@ -60,7 +53,7 @@ protected constructor(
     @Volatile
     private var _isCompleting: Boolean = false
     @Volatile
-    private var _handler: UncaughtException.Handler? = handler
+    private var _handler: UncaughtException.Handler? = if (handler is SuppressedHandler) handler.root() else handler
     @Volatile
     private var _onFailure: OnFailure? = onFailure
     @Volatile
@@ -410,12 +403,8 @@ protected constructor(
         /**
          * Creates a [QueuedJob] which immediately invokes
          * [OnFailure] with the provided [cause].
-         *
-         * @throws [IllegalArgumentException] if handler is an
-         *   instance of [UncaughtException.SuppressedHandler]
          * */
         @JvmStatic
-        @Throws(IllegalArgumentException::class)
         public fun OnFailure.toImmediateErrorJob(
             name: String,
             cause: Throwable,
@@ -431,12 +420,8 @@ protected constructor(
         /**
          * Creates a [QueuedJob] which immediately invokes
          * [OnSuccess] with the provided [response].
-         *
-         * @throws [IllegalArgumentException] if handler is an
-         *   instance of [UncaughtException.SuppressedHandler]
          * */
         @JvmStatic
-        @Throws(IllegalArgumentException::class)
         public fun <T: Any> OnSuccess<T>.toImmediateSuccessJob(
             name: String,
             response: T,

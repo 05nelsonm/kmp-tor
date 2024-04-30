@@ -116,7 +116,7 @@ internal sealed class AbstractTorService: Service() {
         private val binder get() = conn.binder
 
         // Want to lazily instantiate so that the PersistentKeyMap
-        // entry is created
+        // entry is created before we start calling things.
         val runtime: Lifecycle.DestroyableTorRuntime by lazy {
             binder.onBind(
                 serviceEvents = emptySet(),
@@ -126,24 +126,14 @@ internal sealed class AbstractTorService: Service() {
             ).apply {
                 invokeOnCompletion {
                     holders.remove(binder)
-
+                }
+                invokeOnCompletion {
                     if (isDestroyed) return@invokeOnCompletion
-
-                    try {
-                        application.unbindService(conn)
-                    } catch (e: Throwable) {
-                        binder.e(e)
-                    }
-
-                    //
-
-                    if (!holders.isEmpty()) return@invokeOnCompletion
-
-                    try {
-                        application.stopService(Intent(application, TorService::class.java))
-                    } catch (e: Throwable) {
-                        binder.e(e)
-                    }
+                    application.unbindService(conn)
+                }
+                invokeOnCompletion {
+                    if (!isDestroyed && !holders.isEmpty()) return@invokeOnCompletion
+                    application.stopService(Intent(application, TorService::class.java))
                 }
             }
         }
