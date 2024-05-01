@@ -15,21 +15,15 @@
  **/
 package io.matthewnelson.kmp.tor.runtime.internal
 
-import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
-import io.matthewnelson.kmp.tor.core.resource.SynchronizedObject
-import io.matthewnelson.kmp.tor.core.resource.synchronized
+import io.matthewnelson.kmp.tor.runtime.NetworkObserver
+import io.matthewnelson.kmp.tor.runtime.core.OnEvent
+import kotlinx.coroutines.CoroutineScope
 
-@OptIn(InternalKmpTorApi::class)
-internal abstract class InstanceKeeper<K: Any, V: Any> internal constructor(
-    initialCapacity: Int = 1,
-    loadFactor: Float = 1.0F,
-) {
+internal abstract class AbstractConnectivityObserver(
+    private val scope: CoroutineScope
+): OnEvent<NetworkObserver.Connectivity> {
 
-    private val lock = SynchronizedObject()
-    private val instances = LinkedHashMap<K, V>(initialCapacity, loadFactor)
-
-    protected fun getOrCreateInstance(
-        key: K,
-        block: () -> V,
-    ): V = synchronized(lock) { instances[key] ?: block().also { instances[key] = it } }
+    final override fun invoke(it: NetworkObserver.Connectivity) {
+        // TODO
+    }
 }

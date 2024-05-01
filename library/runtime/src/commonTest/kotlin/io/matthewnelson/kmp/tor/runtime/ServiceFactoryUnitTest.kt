@@ -15,10 +15,10 @@
  **/
 package io.matthewnelson.kmp.tor.runtime
 
-import io.matthewnelson.kmp.file.resolve
 import io.matthewnelson.kmp.file.toFile
 import io.matthewnelson.kmp.tor.core.api.ResourceInstaller
 import io.matthewnelson.kmp.tor.core.api.annotation.ExperimentalKmpTorApi
+import io.matthewnelson.kmp.tor.runtime.core.TorEvent
 import kotlin.test.*
 
 @OptIn(ExperimentalKmpTorApi::class)
@@ -27,9 +27,10 @@ class ServiceFactoryUnitTest {
     private class TestFactory(
         val initializer: Initializer
     ): TorRuntime.ServiceFactory(initializer) {
-        override fun startService() {
-            // TODO
-        }
+
+        val testBinder get() = binder
+
+        override fun startService() { throw RuntimeException("Not Implemented") }
     }
 
     private val env = TorRuntime.Environment.Builder(
@@ -59,4 +60,22 @@ class ServiceFactoryUnitTest {
             TestFactory(factory.initializer)
         }
     }
+
+    @Test
+    fun givenBinder_whenBindAndOtherInstanceIsNotDestroyed_thenDestroysPriorInstance() {
+        val factory = TorRuntime.Builder(env) {} as TestFactory
+        var invocationWarn = 0
+        factory.subscribe(RuntimeEvent.LOG.WARN.observer { invocationWarn++ })
+        val runtime = factory.testBinder.bind()
+        factory.testBinder.bind().destroy()
+        assertTrue(runtime.isDestroyed())
+        assertEquals(1, invocationWarn)
+    }
+
+    private fun TorRuntime.ServiceFactory.Binder.bind(
+        events: Set<TorEvent> = emptySet(),
+        network: NetworkObserver? = null,
+        torEvent: Set<TorEvent.Observer> = emptySet(),
+        runtimeEvent: Set<RuntimeEvent.Observer<*>> = emptySet(),
+    ): Lifecycle.DestroyableTorRuntime = onBind(events, network, torEvent, runtimeEvent)
 }

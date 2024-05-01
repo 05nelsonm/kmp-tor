@@ -30,11 +30,11 @@ public abstract class ActionJob private constructor(
 ): QueuedJob(action.name, onFailure, handler) {
 
     @get:JvmName("isStart")
-    public val isStart: Boolean get() = this as Sealed is Start
+    public val isStart: Boolean get() = this is Start
     @get:JvmName("isStop")
-    public val isStop: Boolean get() = this as Sealed is Stop
+    public val isStop: Boolean get() = this is Stop
     @get:JvmName("isRestart")
-    public val isRestart: Boolean get() = this as Sealed is Restart
+    public val isRestart: Boolean get() = this is Restart
 
     internal abstract class Start internal constructor(
         onSuccess: OnSuccess<Unit>,

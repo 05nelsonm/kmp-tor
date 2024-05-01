@@ -39,9 +39,6 @@ import kotlin.jvm.JvmStatic
 public abstract class QueuedJob protected constructor(
     @JvmField
     public val name: String,
-    // TODO:
-    //  @JvmField
-    //  public val canCancelWhileExecuting: Boolean
     onFailure: OnFailure,
     handler: UncaughtException.Handler,
 ) {
@@ -69,7 +66,7 @@ public abstract class QueuedJob protected constructor(
 
     /**
      * An intermediate "state" indicating that completion,
-     * either by success or error/cancellation is underway.
+     * either by success or error/cancellation, is underway.
      *
      * Will be set back to false after all [invokeOnCompletion]
      * handles have been run.
@@ -405,6 +402,7 @@ public abstract class QueuedJob protected constructor(
          * [OnFailure] with the provided [cause].
          * */
         @JvmStatic
+        @JvmName("immediateErrorJob")
         public fun OnFailure.toImmediateErrorJob(
             name: String,
             cause: Throwable,
@@ -422,6 +420,7 @@ public abstract class QueuedJob protected constructor(
          * [OnSuccess] with the provided [response].
          * */
         @JvmStatic
+        @JvmName("immediateSuccessJob")
         public fun <T: Any> OnSuccess<T>.toImmediateSuccessJob(
             name: String,
             response: T,

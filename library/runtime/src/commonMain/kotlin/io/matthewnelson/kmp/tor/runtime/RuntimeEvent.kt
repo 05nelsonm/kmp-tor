@@ -71,7 +71,7 @@ public sealed class RuntimeEvent<R: Any> private constructor(
      * e.g.
      *
      *     EXECUTE.observer { job ->
-     *         if (job.action != Action.StopDaemon) return@observer
+     *         if (!job.isStop) return@observer
      *         job.invokeOnCompletion {
      *             if (job.isSuccess) {
      *                 // do something
@@ -107,6 +107,14 @@ public sealed class RuntimeEvent<R: Any> private constructor(
          * */
         public data object WARN: LOG("LOG_WARN")
     }
+
+    // TODO: NEWNYM
+    //  Because TorCmd.Signal.NewNym returns Reply.Success.OK
+    //  but can be rate limited, TorRuntime should intercept
+    //  any enqueued NewNym jobs and, upon successful completion
+    //  setup an TorEvent.NOTICE observer to catch the rate limit
+    //  dispatch. If after 50ms (or something) nothing comes, dispatch
+    //  success.
 
     /**
      * Create an observer for the given [RuntimeEvent]

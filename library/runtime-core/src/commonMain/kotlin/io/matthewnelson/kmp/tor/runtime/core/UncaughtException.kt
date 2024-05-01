@@ -189,12 +189,14 @@ public class UncaughtException private constructor(
 
             /**
              * Retrieves the [Handler] from [CoroutineContext] if present.
+             *
+             * @see [OnEvent.Executor.execute]
              * */
             @JvmStatic
-            @JvmName("getOrNull")
+            @JvmName("fromCoroutineContextOrNull")
             public fun CoroutineContext.uncaughtExceptionHandlerOrNull(): Handler? {
-                val h = get(CoroutineExceptionHandler) ?: return null
-                return h as? Handler
+                val handler = get(CoroutineExceptionHandler) ?: return null
+                return handler as? Handler
             }
         }
     }
