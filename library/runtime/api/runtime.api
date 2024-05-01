@@ -62,17 +62,17 @@ public abstract interface class io/matthewnelson/kmp/tor/runtime/FileID {
 	public static final field Companion Lio/matthewnelson/kmp/tor/runtime/FileID$Companion;
 	public static fun createFID (Ljava/io/File;)Ljava/lang/String;
 	public static fun fidEllipses (Lio/matthewnelson/kmp/tor/runtime/FileID;)Ljava/lang/String;
+	public static fun fidString (Lio/matthewnelson/kmp/tor/runtime/FileID;)Ljava/lang/String;
+	public static fun fidString (Lio/matthewnelson/kmp/tor/runtime/FileID;Z)Ljava/lang/String;
 	public abstract fun getFid ()Ljava/lang/String;
-	public static fun toFIDString (Lio/matthewnelson/kmp/tor/runtime/FileID;)Ljava/lang/String;
-	public static fun toFIDString (Lio/matthewnelson/kmp/tor/runtime/FileID;Z)Ljava/lang/String;
 }
 
 public final class io/matthewnelson/kmp/tor/runtime/FileID$Companion {
 	public final fun createFID (Ljava/io/File;)Ljava/lang/String;
 	public final fun fidEllipses (Lio/matthewnelson/kmp/tor/runtime/FileID;)Ljava/lang/String;
-	public final fun toFIDString (Lio/matthewnelson/kmp/tor/runtime/FileID;)Ljava/lang/String;
-	public final fun toFIDString (Lio/matthewnelson/kmp/tor/runtime/FileID;Z)Ljava/lang/String;
-	public static synthetic fun toFIDString$default (Lio/matthewnelson/kmp/tor/runtime/FileID$Companion;Lio/matthewnelson/kmp/tor/runtime/FileID;ZILjava/lang/Object;)Ljava/lang/String;
+	public final fun fidString (Lio/matthewnelson/kmp/tor/runtime/FileID;)Ljava/lang/String;
+	public final fun fidString (Lio/matthewnelson/kmp/tor/runtime/FileID;Z)Ljava/lang/String;
+	public static synthetic fun fidString$default (Lio/matthewnelson/kmp/tor/runtime/FileID$Companion;Lio/matthewnelson/kmp/tor/runtime/FileID;ZILjava/lang/Object;)Ljava/lang/String;
 }
 
 public final class io/matthewnelson/kmp/tor/runtime/Lifecycle : io/matthewnelson/kmp/tor/runtime/core/Destroyable {
@@ -180,23 +180,22 @@ public final class io/matthewnelson/kmp/tor/runtime/NetworkObserver$Connectivity
 	public static fun values ()[Lio/matthewnelson/kmp/tor/runtime/NetworkObserver$Connectivity;
 }
 
-public abstract class io/matthewnelson/kmp/tor/runtime/RuntimeEvent {
+public abstract class io/matthewnelson/kmp/tor/runtime/RuntimeEvent : io/matthewnelson/kmp/tor/runtime/core/Event {
 	public static final field Companion Lio/matthewnelson/kmp/tor/runtime/RuntimeEvent$Companion;
-	public final field name Ljava/lang/String;
 	public synthetic fun <init> (Ljava/lang/String;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
-	public static final fun entries ()Ljava/util/Set;
-	public final fun observer (Lio/matthewnelson/kmp/tor/runtime/core/OnEvent;)Lio/matthewnelson/kmp/tor/runtime/RuntimeEvent$Observer;
-	public final fun observer (Ljava/lang/String;Lio/matthewnelson/kmp/tor/runtime/core/OnEvent$Executor;Lio/matthewnelson/kmp/tor/runtime/core/OnEvent;)Lio/matthewnelson/kmp/tor/runtime/RuntimeEvent$Observer;
-	public final fun observer (Ljava/lang/String;Lio/matthewnelson/kmp/tor/runtime/core/OnEvent;)Lio/matthewnelson/kmp/tor/runtime/RuntimeEvent$Observer;
-	public final fun toString ()Ljava/lang/String;
-	public static final fun valueOf (Ljava/lang/String;)Lio/matthewnelson/kmp/tor/runtime/RuntimeEvent;
-	public static final fun valueOfOrNull (Ljava/lang/String;)Lio/matthewnelson/kmp/tor/runtime/RuntimeEvent;
+	public static fun entries ()Ljava/util/Set;
+	protected fun factory (Lio/matthewnelson/kmp/tor/runtime/RuntimeEvent;Ljava/lang/String;Lio/matthewnelson/kmp/tor/runtime/core/OnEvent$Executor;Lio/matthewnelson/kmp/tor/runtime/core/OnEvent;)Lio/matthewnelson/kmp/tor/runtime/RuntimeEvent$Observer;
+	public synthetic fun factory (Lio/matthewnelson/kmp/tor/runtime/core/Event;Ljava/lang/String;Lio/matthewnelson/kmp/tor/runtime/core/OnEvent$Executor;Lio/matthewnelson/kmp/tor/runtime/core/OnEvent;)Lio/matthewnelson/kmp/tor/runtime/core/Event$Observer;
+	public static fun valueOf (Ljava/lang/String;)Lio/matthewnelson/kmp/tor/runtime/RuntimeEvent;
+	public static fun valueOfOrNull (Ljava/lang/String;)Lio/matthewnelson/kmp/tor/runtime/RuntimeEvent;
 }
 
-public final class io/matthewnelson/kmp/tor/runtime/RuntimeEvent$Companion {
-	public final fun entries ()Ljava/util/Set;
-	public final fun valueOf (Ljava/lang/String;)Lio/matthewnelson/kmp/tor/runtime/RuntimeEvent;
-	public final fun valueOfOrNull (Ljava/lang/String;)Lio/matthewnelson/kmp/tor/runtime/RuntimeEvent;
+public final class io/matthewnelson/kmp/tor/runtime/RuntimeEvent$Companion : io/matthewnelson/kmp/tor/runtime/core/Event$Entries {
+	public fun entries ()Ljava/util/Set;
+	public fun valueOf (Ljava/lang/String;)Lio/matthewnelson/kmp/tor/runtime/RuntimeEvent;
+	public synthetic fun valueOf (Ljava/lang/String;)Lio/matthewnelson/kmp/tor/runtime/core/Event;
+	public fun valueOfOrNull (Ljava/lang/String;)Lio/matthewnelson/kmp/tor/runtime/RuntimeEvent;
+	public synthetic fun valueOfOrNull (Ljava/lang/String;)Lio/matthewnelson/kmp/tor/runtime/core/Event;
 }
 
 public final class io/matthewnelson/kmp/tor/runtime/RuntimeEvent$ERROR : io/matthewnelson/kmp/tor/runtime/RuntimeEvent {
@@ -259,15 +258,8 @@ public final class io/matthewnelson/kmp/tor/runtime/RuntimeEvent$Notifier$Compan
 	public final fun w (Lio/matthewnelson/kmp/tor/runtime/RuntimeEvent$Notifier;Ljava/lang/Object;Ljava/lang/String;)V
 }
 
-public class io/matthewnelson/kmp/tor/runtime/RuntimeEvent$Observer {
-	public final field event Lio/matthewnelson/kmp/tor/runtime/RuntimeEvent;
-	public final field tag Ljava/lang/String;
+public class io/matthewnelson/kmp/tor/runtime/RuntimeEvent$Observer : io/matthewnelson/kmp/tor/runtime/core/Event$Observer {
 	public fun <init> (Lio/matthewnelson/kmp/tor/runtime/RuntimeEvent;Ljava/lang/String;Lio/matthewnelson/kmp/tor/runtime/core/OnEvent$Executor;Lio/matthewnelson/kmp/tor/runtime/core/OnEvent;)V
-	public final fun notify (Lio/matthewnelson/kmp/tor/runtime/core/OnEvent$Executor;Ljava/lang/Object;)V
-	protected fun notify (Ljava/lang/Object;)V
-	public final fun notify (Lkotlin/coroutines/CoroutineContext;Lio/matthewnelson/kmp/tor/runtime/core/OnEvent$Executor;Ljava/lang/Object;)V
-	public final fun toString ()Ljava/lang/String;
-	public final fun toString (Z)Ljava/lang/String;
 }
 
 public abstract interface class io/matthewnelson/kmp/tor/runtime/RuntimeEvent$Processor {

@@ -13,19 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-package io.matthewnelson.kmp.tor.runtime
+package io.matthewnelson.kmp.tor.runtime.core
 
 import kotlin.reflect.KClass
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
-class RuntimeEventEntriesUnitTest {
+class TorEventEntriesUnitTest {
 
     @Test
     fun givenEvents_whenEntries_thenContainsAllSealedSubclasses() {
         val subclasses = mutableListOf<KClass<*>>()
-        for (clazz in RuntimeEvent::class.sealedSubclasses) {
+        for (clazz in TorEvent::class.sealedSubclasses) {
             if (clazz.isSealed) {
                 subclasses.addAll(clazz.sealedSubclasses)
             } else {
@@ -33,12 +33,12 @@ class RuntimeEventEntriesUnitTest {
             }
         }
 
-        val entries = RuntimeEvent.entries().map { it::class }
+        val entries = TorEvent.entries().map { it::class }
 
         assertEquals(subclasses.size, entries.size)
 
         for (subclass in subclasses) {
-            assertTrue(entries.contains(subclass))
+            assertTrue((entries.contains(subclass)))
         }
     }
 }

@@ -68,6 +68,7 @@ public interface FileID {
          * */
         @JvmStatic
         @JvmOverloads
+        @JvmName("fidString")
         public fun FileID.toFIDString(includeHashCode: Boolean = true): String {
             val name = this::class.simpleName ?: "Unknown"
             return name + "[fid=" + fidEllipses + ']' + if (includeHashCode) '@' + hashCode() else ""

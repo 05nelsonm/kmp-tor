@@ -99,13 +99,11 @@ public class UncaughtException private constructor(
                 try {
                     block(Unit)
                 } catch (t: Throwable) {
-                    val e = if (t is UncaughtException) {
+                    threw = if (t is UncaughtException) {
                         t
                     } else {
                         UncaughtException("context: $context", t)
                     }
-
-                    threw = e
                 }
 
                 threw?.let { (this ?: THROW)(it) }
@@ -167,15 +165,20 @@ public class UncaughtException private constructor(
             public fun <T: Any?> Handler?.withSuppression(
                 block: SuppressedHandler.() -> T
             ): T {
-                val delegate = if (this is SuppressedHandler && !isActive) root() else this ?: THROW
+                val handler = if (this is SuppressedHandler && !isActive) {
+                    root()
+                } else {
+                    this ?: THROW
+                }
 
                 var threw: UncaughtException? = null
                 var isActive = true
 
-                val suppressed = if (delegate is SuppressedHandler) {
-                    delegate
+                val suppressed = if (handler is SuppressedHandler) {
+                    // Was still active (nested withSuppression invocations)
+                    handler
                 } else {
-                    SuppressedHandler.of(isActive = { isActive }, root = delegate) { t ->
+                    SuppressedHandler.of(isActive = { isActive }, root = handler) { t ->
                         val result: Unit? = threw?.addSuppressed(t)
                         if (result == null) threw = t
                     }
@@ -183,7 +186,7 @@ public class UncaughtException private constructor(
 
                 val result = block(suppressed)
                 isActive = false
-                threw?.let { delegate(it) }
+                threw?.let { handler(it) }
                 return result
             }
 
@@ -206,10 +209,6 @@ public class UncaughtException private constructor(
      * lambda which propagates all exceptions caught by [Handler.tryCatch]
      * into a single, root exception (the first thrown), with all
      * subsequent exceptions added via [Throwable.addSuppressed].
-     *
-     * **NOTE:** Utilization outside [Handler.withSuppression] lambda
-     * will result in [IllegalStateException] being thrown by
-     * [Handler.tryCatch] and [invoke].
      * */
     public class SuppressedHandler private constructor(
         private val _isActive: () -> Boolean,

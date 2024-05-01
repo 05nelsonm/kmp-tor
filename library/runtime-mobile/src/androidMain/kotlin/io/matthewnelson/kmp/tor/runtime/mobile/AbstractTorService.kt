@@ -27,6 +27,7 @@ import io.matthewnelson.kmp.tor.core.api.annotation.ExperimentalKmpTorApi
 import io.matthewnelson.kmp.tor.runtime.Lifecycle
 import io.matthewnelson.kmp.tor.runtime.RuntimeEvent.Notifier.Companion.e
 import io.matthewnelson.kmp.tor.runtime.RuntimeEvent.Notifier.Companion.lce
+import io.matthewnelson.kmp.tor.runtime.RuntimeEvent.Notifier.Companion.w
 import io.matthewnelson.kmp.tor.runtime.mobile.internal.PersistentKeyMap
 import io.matthewnelson.kmp.tor.runtime.TorRuntime.ServiceFactory.Binder as TorBinder
 
@@ -44,7 +45,7 @@ internal sealed class AbstractTorService: Service() {
                 return
             }
             if (holders[conn.binder] != null) {
-                conn.binder.e(IllegalStateException("${conn.binder} is already bound. TorRuntime has not been destroyed, but bind service was called"))
+                conn.binder.w(conn.binder, "TorRuntime has not been destroyed, but onServiceConnected was called")
                 return
             }
             val holder = Holder(conn)
@@ -132,7 +133,8 @@ internal sealed class AbstractTorService: Service() {
                     application.unbindService(conn)
                 }
                 invokeOnCompletion {
-                    if (!isDestroyed && !holders.isEmpty()) return@invokeOnCompletion
+                    if (isDestroyed) return@invokeOnCompletion
+                    if (!holders.isEmpty()) return@invokeOnCompletion
                     application.stopService(Intent(application, TorService::class.java))
                 }
             }

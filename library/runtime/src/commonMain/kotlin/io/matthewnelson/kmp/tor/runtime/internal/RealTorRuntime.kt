@@ -84,12 +84,12 @@ internal class RealTorRuntime private constructor(
 
     private val factory = TorCtrl.Factory(
         staticTag = environment().staticTag(),
-        observers = TorEvent.entries.let { events ->
+        observers = TorEvent.entries().let { events ->
             val tag = environment().staticTag()
             events.mapTo(LinkedHashSet(events.size, 1.0f)) { event ->
                 when (event) {
-                    TorEvent.CONF_CHANGED -> ConfChangedObserver()
-                    TorEvent.NOTICE -> NoticeObserver()
+                    is TorEvent.CONF_CHANGED -> ConfChangedObserver()
+                    is TorEvent.NOTICE -> NoticeObserver()
                     else -> event.observer(tag) { event.notifyObservers(it) }
                 }
             }
@@ -268,7 +268,7 @@ internal class RealTorRuntime private constructor(
             private val bLock = SynchronizedObject()
 
             // Pipe all events to observers registered with Factory
-            private val observersTorEvent = TorEvent.entries.let { events ->
+            private val observersTorEvent = TorEvent.entries().let { events ->
                 val tag = environment().staticTag()
                 events.mapTo(LinkedHashSet(events.size, 1.0f)) { event ->
                     event.observer(tag) { event.notifyObservers(it) }
@@ -276,7 +276,7 @@ internal class RealTorRuntime private constructor(
             }
 
             // Pipe all events to observers registered with Factory
-            private val observersRuntimeEvent = RuntimeEvent.entries.let { events ->
+            private val observersRuntimeEvent = RuntimeEvent.entries().let { events ->
                 val tag = environment().staticTag()
                 events.mapTo(LinkedHashSet(events.size, 1.0f)) { event ->
                     when (event) {
