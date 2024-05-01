@@ -18,42 +18,31 @@ package io.matthewnelson.kmp.tor.runtime.internal
 import io.matthewnelson.kmp.tor.runtime.core.OnEvent
 import io.matthewnelson.kmp.tor.runtime.core.TorEvent
 
-internal abstract class TorEventObserver private constructor(
+internal abstract class TorCtrlObserver private constructor(
     event: TorEvent,
     staticTag: String,
-    private val notifyObservers: TorEvent.(data: String) -> Unit,
 ): TorEvent.Observer(
     event,
     staticTag,
-    null,
+    OnEvent.Executor.Immediate,
     OnEvent.noOp(),
 ) {
 
-    protected override fun notify(data: String) {
-        notifyObservers(event, data)
-    }
-
-    internal abstract class ConfChanged internal constructor(
+    internal open class ConfChanged internal constructor(
         staticTag: String,
-        notifyObservers: TorEvent.(data: String) -> Unit,
-    ): TorEventObserver(TorEvent.CONF_CHANGED, staticTag, notifyObservers) {
+    ): TorCtrlObserver(TorEvent.CONF_CHANGED, staticTag) {
 
-        protected final override fun notify(data: String) {
+        protected override fun notify(data: String) {
             // TODO: parse data
-
-            super.notify(data)
         }
     }
 
-    internal abstract class Notice internal constructor(
+    internal open class Notice internal constructor(
         staticTag: String,
-        notifyObservers: TorEvent.(data: String) -> Unit,
-    ): TorEventObserver(TorEvent.NOTICE, staticTag, notifyObservers) {
+    ): TorCtrlObserver(TorEvent.NOTICE, staticTag) {
 
-        protected final override fun notify(data: String) {
+        protected override fun notify(data: String) {
             // TODO: parse data
-
-            super.notify(data)
         }
     }
 }

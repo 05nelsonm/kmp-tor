@@ -17,6 +17,7 @@
 
 package io.matthewnelson.kmp.tor.runtime.ctrl
 
+import io.matthewnelson.immutable.collections.toImmutableSet
 import io.matthewnelson.kmp.file.File
 import io.matthewnelson.kmp.file.IOException
 import io.matthewnelson.kmp.file.InterruptedException
@@ -103,11 +104,13 @@ public actual interface TorCtrl : Destroyable, TorEvent.Processor, TorCmd.Privil
     @JvmOverloads
     public actual constructor(
         internal actual val staticTag: String?,
-        internal actual val observers: Set<TorEvent.Observer>,
+        observers: Set<TorEvent.Observer>,
         internal actual val defaultExecutor: OnEvent.Executor,
         internal actual val debugger: ItBlock<String>?,
         internal actual val handler: UncaughtException.Handler,
     ) {
+
+        internal actual val observers: Set<TorEvent.Observer> = observers.toImmutableSet()
 
         /**
          * Connects to a tor control listener via TCP port.

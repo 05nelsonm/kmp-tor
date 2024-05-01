@@ -17,6 +17,7 @@
 
 package io.matthewnelson.kmp.tor.runtime.ctrl
 
+import io.matthewnelson.immutable.collections.toImmutableSet
 import io.matthewnelson.kmp.file.*
 import io.matthewnelson.kmp.process.InternalProcessApi
 import io.matthewnelson.kmp.process.ReadBuffer
@@ -92,14 +93,15 @@ public actual interface TorCtrl : Destroyable, TorEvent.Processor, TorCmd.Privil
      *   safe. Any non-[UncaughtException] it throws will be swallowed.
      * @param [handler] The [UncaughtException.Handler] to pipe bad behavior to.
      * */
-    @OptIn(InternalKmpTorApi::class)
     public actual class Factory public actual constructor(
         internal actual val staticTag: String?,
-        internal actual val observers: Set<TorEvent.Observer>,
+        observers: Set<TorEvent.Observer>,
         internal actual val defaultExecutor: OnEvent.Executor,
         internal actual val debugger: ItBlock<String>?,
         internal actual val handler: UncaughtException.Handler,
     ) {
+
+        internal actual val observers: Set<TorEvent.Observer> = observers.toImmutableSet()
 
         /**
          * Connects to a tor control listener via TCP port.

@@ -19,7 +19,6 @@ package io.matthewnelson.kmp.tor.runtime
 
 import io.matthewnelson.encoding.base16.Base16
 import io.matthewnelson.encoding.core.Encoder.Companion.encodeToString
-import io.matthewnelson.immutable.collections.toImmutableSet
 import io.matthewnelson.kmp.file.*
 import io.matthewnelson.kmp.tor.core.api.ResourceInstaller
 import io.matthewnelson.kmp.tor.core.api.ResourceInstaller.Paths
@@ -258,17 +257,17 @@ public interface TorRuntime:
                     val generator = TorConfigGenerator(
                         environment = environment,
                         omitGeoIPFileSettings = b.omitGeoIPFileSettings,
-                        config = b.config.toImmutableSet(),
+                        config = b.config,
                         isPortAvailable = { host, port -> port.isAvailableAsync(host) },
                     )
 
                     RealTorRuntime.of(
                         generator = generator,
                         networkObserver = b.networkObserver,
-                        requiredTorEvents = b.requiredTorEvents.toImmutableSet(),
-                        observersTorEvent = b.observersTorEvent.toImmutableSet(),
+                        requiredTorEvents = b.requiredTorEvents,
+                        observersTorEvent = b.observersTorEvent,
                         defaultExecutor = b.defaultEventExecutor,
-                        observersRuntimeEvent = b.observersRuntimeEvent.toImmutableSet(),
+                        observersRuntimeEvent = b.observersRuntimeEvent,
                     )
                 })
             }
@@ -524,7 +523,7 @@ public interface TorRuntime:
             @OptIn(InternalKmpTorApi::class)
             @Throws(IllegalStateException::class)
             internal fun get(): ServiceCtrl = synchronized(lock) {
-                check(!_isInitialized) { "TorRuntime.Service.Initializer can only be utilized once" }
+                check(!_isInitialized) { "TorRuntime.ServiceFactory.Initializer can only be used once" }
                 _isInitialized = true
                 ctrl
             }
@@ -549,11 +548,11 @@ public interface TorRuntime:
         @JvmField
         protected val binder: Binder = ctrl.binder()
 
-        public final override val fid: String = ctrl.fid
-        public final override fun environment(): Environment = ctrl.environment()
-
         @Throws(RuntimeException::class)
         protected abstract fun startService()
+
+        public final override val fid: String = ctrl.fid
+        public final override fun environment(): Environment = ctrl.environment()
 
         public final override fun <Success : Any> enqueue(
             cmd: TorCmd.Unprivileged<Success>,

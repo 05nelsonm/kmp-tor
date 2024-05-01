@@ -19,8 +19,8 @@ import io.matthewnelson.kmp.tor.runtime.NetworkObserver
 import io.matthewnelson.kmp.tor.runtime.core.OnEvent
 import kotlinx.coroutines.CoroutineScope
 
-internal abstract class AbstractConnectivityObserver(
-    private val scope: CoroutineScope
+internal abstract class AbstractConnectivityObserver internal constructor(
+    private val scope: CoroutineScope,
 ): OnEvent<NetworkObserver.Connectivity> {
 
     final override fun invoke(it: NetworkObserver.Connectivity) {

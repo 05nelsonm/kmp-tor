@@ -17,6 +17,7 @@
 
 package io.matthewnelson.kmp.tor.runtime.internal
 
+import io.matthewnelson.immutable.collections.toImmutableSet
 import io.matthewnelson.kmp.file.IOException
 import io.matthewnelson.kmp.tor.core.api.ResourceInstaller
 import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
@@ -49,9 +50,11 @@ import io.matthewnelson.kmp.tor.runtime.core.builder.ExtendedTorConfigBuilder
 internal class TorConfigGenerator internal constructor(
     internal val environment: TorRuntime.Environment,
     private val omitGeoIPFileSettings: Boolean,
-    private val config: Set<ConfigBuilderCallback>,
+    config: Set<ConfigBuilderCallback>,
     private val isPortAvailable: suspend (LocalHost, Port) -> Boolean,
 ): FileID by environment {
+
+    private val config = config.toImmutableSet()
 
     @Throws(Exception::class)
     internal suspend fun generate(

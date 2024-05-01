@@ -40,7 +40,7 @@ import kotlin.jvm.JvmSynthetic
 internal class RealTorRuntime private constructor(
     private val generator: TorConfigGenerator,
     private val networkObserver: NetworkObserver,
-    private val requiredTorEvents: Set<TorEvent>,
+    requiredTorEvents: Set<TorEvent>,
     serviceFactoryHandler: HandlerWithContext?,
     dispatcher: CoroutineDispatcher,
     observersTorEvent: Set<TorEvent.Observer>,
@@ -61,6 +61,7 @@ internal class RealTorRuntime private constructor(
     public override fun environment(): TorRuntime.Environment = generator.environment
     protected override val isService: Boolean = serviceFactoryHandler != null
     protected override val handler: HandlerWithContext = serviceFactoryHandler ?: super.handler
+    private val requiredTorEvents = requiredTorEvents.toImmutableSet()
 
     @JvmSynthetic
     internal fun handler(): UncaughtException.Handler = handler
@@ -91,7 +92,7 @@ internal class RealTorRuntime private constructor(
                     TorEvent.NOTICE -> NoticeObserver()
                     else -> event.observer(tag) { event.notifyObservers(it) }
                 }
-            }.toImmutableSet()
+            }
         },
         defaultExecutor = OnEvent.Executor.Immediate,
         debugger = ItBlock { log ->
@@ -173,7 +174,8 @@ internal class RealTorRuntime private constructor(
                 observersRuntimeEvent,
             )
 
-            val factory = loader.load(TorRuntime.ServiceFactory.Initializer.of(ctrl))
+            val initializer = TorRuntime.ServiceFactory.Initializer.of(ctrl)
+            val factory = loader.load(initializer)
 
             ctrl.binder().lce(Lifecycle.Event.OnCreate(factory))
 
@@ -196,20 +198,24 @@ internal class RealTorRuntime private constructor(
         public override fun toString(): String = toFIDString(includeHashCode = isService)
     }
 
-    private inner class ConfChangedObserver: TorEventObserver.ConfChanged(
-        staticTag = environment().staticTag(),
-        notifyObservers = { notifyObservers(it) },
-    )
+    private inner class ConfChangedObserver: TorCtrlObserver.ConfChanged(environment().staticTag()) {
+        protected override fun notify(data: String) {
+            super.notify(data)
+            event.notifyObservers(data)
+        }
+    }
 
-    private inner class NoticeObserver: TorEventObserver.Notice(
-        staticTag = environment().staticTag(),
-        notifyObservers = { notifyObservers(it) },
-    )
+    private inner class NoticeObserver: TorCtrlObserver.Notice(environment().staticTag()) {
+        protected override fun notify(data: String) {
+            super.notify(data)
+            event.notifyObservers(data)
+        }
+    }
 
     internal class ServiceCtrl private constructor(
         private val generator: TorConfigGenerator,
         private val builderObserver: NetworkObserver,
-        private val builderRequiredEvents: Set<TorEvent>,
+        builderRequiredEvents: Set<TorEvent>,
         observersTorEvent: Set<TorEvent.Observer>,
         defaultExecutor: OnEvent.Executor,
         @Suppress("RemoveRedundantQualifierName")
@@ -223,6 +229,7 @@ internal class RealTorRuntime private constructor(
        TorCmd.Unprivileged.Processor
     {
 
+        private val builderRequiredEvents = builderRequiredEvents.toImmutableSet()
         protected override val debug: Boolean get() = environment().debug
         // Using lazy in case TorRuntime.ServiceFactory.Loader throws
         // upon initialization of a bad implementation, we do not want
@@ -299,13 +306,13 @@ internal class RealTorRuntime private constructor(
                 val runtime = RealTorRuntime(
                     generator,
                     serviceObserverNetwork ?: builderObserver,
-                    (serviceEvents + builderRequiredEvents).toImmutableSet(),
+                    (serviceEvents + builderRequiredEvents),
                     handler,
                     dispatcher,
 
                     // Put services observers first so that they are notified
                     // BEFORE static observers redirect to ServiceCtrl observers.
-                    (serviceObserversTorEvent + observersTorEvent).toImmutableSet(),
+                    (serviceObserversTorEvent + observersTorEvent),
 
                     // Want to utilize Immediate here as all events will be
                     // piped to the observers registered to the ServiceFactory.
@@ -313,7 +320,7 @@ internal class RealTorRuntime private constructor(
 
                     // Put services observers first so that they are notified
                     // BEFORE static observers redirect to ServiceCtrl observers.
-                    (serviceObserversRuntimeEvent + observersRuntimeEvent).toImmutableSet(),
+                    (serviceObserversRuntimeEvent + observersRuntimeEvent),
                 )
 
                 val destroyable = Lifecycle.DestroyableTorRuntime.of(runtime)
