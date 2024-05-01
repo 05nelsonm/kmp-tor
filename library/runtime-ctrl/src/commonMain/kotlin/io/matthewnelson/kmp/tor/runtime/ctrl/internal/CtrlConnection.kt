@@ -119,7 +119,7 @@ internal interface CtrlConnection {
 
         protected abstract fun ArrayList<Reply>.respond()
 
-        protected abstract fun TorEvent.notify(output: String)
+        protected abstract fun TorEvent.notify(data: String)
 
         protected abstract fun onError(details: String)
 
@@ -161,13 +161,13 @@ internal interface CtrlConnection {
             }
 
             val count = sb.count()
-            val output = sb.toString()
+            val data = sb.toString()
 
             // fill before de-referencing
             sb.clear()
             repeat(count) { sb.append(' ') }
 
-            event.notify(output)
+            event.notify(data)
         }
 
         private class Job(line: String) {

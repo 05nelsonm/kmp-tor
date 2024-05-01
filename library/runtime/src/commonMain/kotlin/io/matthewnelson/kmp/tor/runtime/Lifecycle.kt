@@ -109,8 +109,6 @@ public class Lifecycle: Destroyable {
                 @JvmField
                 public val OnUnbind: Name = Name("onUnbind")
                 @JvmField
-                public val OnStart: Name = Name("onStart")
-                @JvmField
                 public val OnRemoved: Name = Name("onRemoved")
                 @JvmField
                 public val OnReturned: Name = Name("onReturned")

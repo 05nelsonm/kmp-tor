@@ -326,7 +326,6 @@ public enum class TorEvent {
             (executor ?: default).execute(handler) { notify(data) }
         }
 
-
         public final override fun toString(): String = toString(isStatic = false)
 
         public fun toString(isStatic: Boolean): String = buildString {

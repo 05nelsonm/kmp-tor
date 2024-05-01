@@ -77,8 +77,8 @@ internal class RealTorRuntime private constructor(
 
     @Suppress("PrivatePropertyName")
     private val NOTIFIER = object : Notifier {
-        public override fun <R : Any> notify(event: RuntimeEvent<R>, output: R) {
-            event.notifyObservers(output)
+        public override fun <Data: Any, E: RuntimeEvent<Data>> notify(event: E, data: Data) {
+            event.notifyObservers(data)
         }
     }
 
@@ -231,10 +231,12 @@ internal class RealTorRuntime private constructor(
 
         private val builderRequiredEvents = builderRequiredEvents.toImmutableSet()
         protected override val debug: Boolean get() = environment().debug
+
         // Using lazy in case TorRuntime.ServiceFactory.Loader throws
         // upon initialization of a bad implementation, we do not want
         // to create an unused dispatcher for Jvm & Native
         private val dispatcher by lazy { environment().newRuntimeDispatcher() }
+
         private val _binder = ServiceBinder()
 
         @JvmSynthetic
@@ -342,7 +344,7 @@ internal class RealTorRuntime private constructor(
                 return destroyable
             }
 
-            override fun <R : Any> notify(event: RuntimeEvent<R>, output: R) { event.notifyObservers(output) }
+            override fun <Data: Any, E: RuntimeEvent<Data>> notify(event: E, data: Data) { event.notifyObservers(data) }
 
             override fun equals(other: Any?): Boolean = other is ServiceBinder && other.hashCode() == hashCode()
             override fun hashCode(): Int = this@ServiceCtrl.hashCode()

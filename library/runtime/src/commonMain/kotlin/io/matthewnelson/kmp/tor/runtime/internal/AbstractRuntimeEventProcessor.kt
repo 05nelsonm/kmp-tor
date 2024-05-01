@@ -119,7 +119,7 @@ internal abstract class AbstractRuntimeEventProcessor internal constructor(
         super.clearObservers()
     }
 
-    protected fun <R: Any> RuntimeEvent<R>.notifyObservers(output: R) {
+    protected fun <Data: Any> RuntimeEvent<Data>.notifyObservers(data: Data) {
         val event = this
 
         if (event is RuntimeEvent.LOG.DEBUG && !debug) return
@@ -131,8 +131,8 @@ internal abstract class AbstractRuntimeEventProcessor internal constructor(
 
         if (observers.isNullOrEmpty()) {
             // Throw UncaughtException if no ERROR observers present.
-            if (event is RuntimeEvent.ERROR && output is UncaughtException) {
-                throw output
+            if (event is RuntimeEvent.ERROR && data is UncaughtException) {
+                throw data
             }
 
             return
@@ -149,8 +149,8 @@ internal abstract class AbstractRuntimeEventProcessor internal constructor(
 
             handler.tryCatch(ctx) {
                 @Suppress("UNCHECKED_CAST")
-                (observer as RuntimeEvent.Observer<R>)
-                    .notify(handler + ctx, defaultExecutor, output)
+                (observer as RuntimeEvent.Observer<Data>)
+                    .notify(handler + ctx, defaultExecutor, data)
             }
         }
     }

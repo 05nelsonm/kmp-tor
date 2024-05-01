@@ -21,7 +21,6 @@ import io.matthewnelson.kmp.tor.core.resource.SynchronizedObject
 import io.matthewnelson.kmp.tor.core.resource.synchronized
 import io.matthewnelson.kmp.tor.runtime.core.Disposable
 import io.matthewnelson.kmp.tor.runtime.core.TorEvent
-import io.matthewnelson.kmp.tor.runtime.core.UncaughtException
 import io.matthewnelson.kmp.tor.runtime.core.UncaughtException.Handler.Companion.tryCatch
 import io.matthewnelson.kmp.tor.runtime.core.UncaughtException.Handler.Companion.withSuppression
 import io.matthewnelson.kmp.tor.runtime.core.ctrl.Reply
@@ -94,8 +93,8 @@ internal class RealTorCtrl private constructor(
             LOG.d { details }
         }
 
-        override fun TorEvent.notify(output: String) {
-            notifyObservers(output)
+        override fun TorEvent.notify(data: String) {
+            notifyObservers(data)
         }
 
         override fun ArrayList<Reply>.respond() {

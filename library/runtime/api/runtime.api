@@ -148,7 +148,6 @@ public final class io/matthewnelson/kmp/tor/runtime/Lifecycle$Event$Name {
 	public static final field OnDestroy Lio/matthewnelson/kmp/tor/runtime/Lifecycle$Event$Name;
 	public static final field OnRemoved Lio/matthewnelson/kmp/tor/runtime/Lifecycle$Event$Name;
 	public static final field OnReturned Lio/matthewnelson/kmp/tor/runtime/Lifecycle$Event$Name;
-	public static final field OnStart Lio/matthewnelson/kmp/tor/runtime/Lifecycle$Event$Name;
 	public static final field OnSubscribed Lio/matthewnelson/kmp/tor/runtime/Lifecycle$Event$Name;
 	public static final field OnUnbind Lio/matthewnelson/kmp/tor/runtime/Lifecycle$Event$Name;
 	public static final field OnUnsubscribed Lio/matthewnelson/kmp/tor/runtime/Lifecycle$Event$Name;

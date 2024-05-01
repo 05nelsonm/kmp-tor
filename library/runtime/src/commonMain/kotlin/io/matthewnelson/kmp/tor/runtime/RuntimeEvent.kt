@@ -39,7 +39,7 @@ import kotlin.jvm.JvmStatic
  * @see [valueOf]
  * @see [valueOfOrNull]
  * */
-public sealed class RuntimeEvent<R: Any> private constructor(
+public sealed class RuntimeEvent<Data: Any> private constructor(
     @JvmField
     public val name: String,
 ) {
@@ -135,8 +135,8 @@ public sealed class RuntimeEvent<R: Any> private constructor(
      * @param [onEvent] The callback to pass the event output to
      * */
     public fun observer(
-        onEvent: OnEvent<R>,
-    ): Observer<R> = observer("", onEvent)
+        onEvent: OnEvent<Data>,
+    ): Observer<Data> = observer("", onEvent)
 
     /**
      * Create an observer for the given [RuntimeEvent]
@@ -163,8 +163,8 @@ public sealed class RuntimeEvent<R: Any> private constructor(
      * */
     public fun observer(
         tag: String,
-        onEvent: OnEvent<R>,
-    ): Observer<R> = Observer(this, tag, null, onEvent)
+        onEvent: OnEvent<Data>,
+    ): Observer<Data> = Observer(this, tag, null, onEvent)
 
     /**
      * Create an observer for the given [RuntimeEvent], [tag] and
@@ -195,22 +195,22 @@ public sealed class RuntimeEvent<R: Any> private constructor(
     public fun observer(
         tag: String?,
         executor: OnEvent.Executor,
-        onEvent: OnEvent<R>,
-    ): Observer<R> = Observer(this, tag, executor, onEvent)
+        onEvent: OnEvent<Data>,
+    ): Observer<Data> = Observer(this, tag, executor, onEvent)
 
     /**
      * Model to be registered with a [Processor] for being notified
      * via callback invocation with [RuntimeEvent] output information.
      * */
-    public open class Observer<R: Any>(
+    public open class Observer<Data: Any>(
         /**
          * The [RuntimeEvent] this is observing
          * */
         @JvmField
-        public val event: RuntimeEvent<R>,
+        public val event: RuntimeEvent<Data>,
         tag: String?,
         private val executor: OnEvent.Executor?,
-        private val onEvent: OnEvent<R>,
+        private val onEvent: OnEvent<Data>,
     ) {
 
         /**
@@ -226,7 +226,7 @@ public sealed class RuntimeEvent<R: Any> private constructor(
          *
          * @see [OnEvent.noOp]
          * */
-        protected open fun notify(data: R) { onEvent(data) }
+        protected open fun notify(data: Data) { onEvent(data) }
 
         /**
          * Invokes [OnEvent] for the given [data]
@@ -234,7 +234,7 @@ public sealed class RuntimeEvent<R: Any> private constructor(
          * @param [default] the default [OnEvent.Executor] to fall
          *   back to if [executor] was not defined for this observer.
          * */
-        public fun notify(default: OnEvent.Executor, data: R) {
+        public fun notify(default: OnEvent.Executor, data: Data) {
             notify(EmptyCoroutineContext, default, data)
         }
 
@@ -246,7 +246,7 @@ public sealed class RuntimeEvent<R: Any> private constructor(
          * @param [default] the default [OnEvent.Executor] to fall
          *   back to if [executor] was not defined for this observer.
          * */
-        public fun notify(handler: CoroutineContext, default: OnEvent.Executor, data: R) {
+        public fun notify(handler: CoroutineContext, default: OnEvent.Executor, data: Data) {
             @OptIn(InternalKmpTorApi::class)
             (executor ?: default).execute(handler) { notify(data) }
         }
@@ -369,7 +369,7 @@ public sealed class RuntimeEvent<R: Any> private constructor(
      * */
     public interface Notifier {
 
-        public fun <R: Any> notify(event: RuntimeEvent<R>, output: R)
+        public fun <Data: Any, E: RuntimeEvent<Data>> notify(event: E, data: Data)
 
         public companion object {
 

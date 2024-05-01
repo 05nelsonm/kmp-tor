@@ -129,7 +129,7 @@ protected constructor(
         }
     }
 
-    protected fun TorEvent.notifyObservers(output: String) {
+    protected fun TorEvent.notifyObservers(data: String) {
         val event = this
 
         if (event == TorEvent.DEBUG && !debug) return
@@ -141,7 +141,7 @@ protected constructor(
             val ctx = ObserverContext(observer.toString(isStatic = observer.tag.isStaticTag()))
 
             handler.tryCatch(ctx) {
-                observer.notify(handler + ctx, defaultExecutor, output)
+                observer.notify(handler + ctx, defaultExecutor, data)
             }
         }
     }
