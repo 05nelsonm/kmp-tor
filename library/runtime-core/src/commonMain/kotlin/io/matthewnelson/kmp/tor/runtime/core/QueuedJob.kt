@@ -186,12 +186,18 @@ public abstract class QueuedJob protected constructor(
 
         if (!wasAdded) return Disposable.noOp()
 
+        var isDisposed = false
+
         return Disposable {
             if (!isActive) return@Disposable
+            if (isDisposed) return@Disposable
 
             @OptIn(InternalKmpTorApi::class)
             synchronized(lock) {
+                if (isDisposed) return@synchronized
+
                 _completionCallbacks?.remove(handle)
+                isDisposed = true
             }
         }
     }
