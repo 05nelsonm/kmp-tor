@@ -274,7 +274,7 @@ public abstract class QueuedJob protected constructor(
      * @return true if it executed successfully, false if the job
      *   was already completed.
      * */
-    protected fun <T: Any> onCompletion(response: T, withLock: (() -> OnSuccess<T>?)?): Boolean {
+    protected fun <T: Any?> onCompletion(response: T, withLock: (() -> OnSuccess<T>?)?): Boolean {
         if (_isCompleting || !isActive) return false
 
         var onSuccess: OnSuccess<T>? = null
@@ -421,7 +421,7 @@ public abstract class QueuedJob protected constructor(
          * */
         @JvmStatic
         @JvmName("immediateSuccessJob")
-        public fun <T: Any> OnSuccess<T>.toImmediateSuccessJob(
+        public fun <T: Any?> OnSuccess<T>.toImmediateSuccessJob(
             name: String,
             response: T,
             handler: UncaughtException.Handler,
