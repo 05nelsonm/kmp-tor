@@ -85,12 +85,11 @@ public fun Context.createTorRuntimeEnvironment(
     cacheDir = cacheDir.resolve(dirName.ifBlank { "torservice" }),
     installer = installer,
 ) {
+    this.apply(block)
+
     // Will not be null b/c TorService.Initializer
     // should be there if consumer is utilizing this
     // function which has Context available.
-    @Suppress("UnnecessaryOptInAnnotation")
     @OptIn(ExperimentalKmpTorApi::class)
     serviceFactoryLoader = TorService.loaderOrNull()
-
-    this.apply(block)
 }
