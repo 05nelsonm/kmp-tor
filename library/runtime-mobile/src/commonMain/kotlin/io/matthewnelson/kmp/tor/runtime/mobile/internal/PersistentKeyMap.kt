@@ -43,14 +43,6 @@ internal class PersistentKeyMap<K: Any, V: Any> internal constructor() {
 
     internal fun clear() { withLock { map.clear() } }
 
-    internal fun isEmpty(): Boolean = withLock {
-        for (v in map.values) {
-            if (v != null) return@withLock false
-        }
-
-        return@withLock true
-    }
-
     internal fun remove(key: K): V? = withLock {
         val value = map[key] ?: return@withLock null
         map[key] = null

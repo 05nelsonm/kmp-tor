@@ -124,6 +124,7 @@ public final class io/matthewnelson/kmp/tor/runtime/Lifecycle$Event {
 	public static final fun OnDestroy (Ljava/lang/Object;)Lio/matthewnelson/kmp/tor/runtime/Lifecycle$Event;
 	public static final fun OnRemoved (Ljava/lang/Object;)Lio/matthewnelson/kmp/tor/runtime/Lifecycle$Event;
 	public static final fun OnReturned (Ljava/lang/Object;)Lio/matthewnelson/kmp/tor/runtime/Lifecycle$Event;
+	public static final fun OnStart (Ljava/lang/Object;)Lio/matthewnelson/kmp/tor/runtime/Lifecycle$Event;
 	public static final fun OnSubscribed (Ljava/lang/Object;)Lio/matthewnelson/kmp/tor/runtime/Lifecycle$Event;
 	public static final fun OnUnbind (Ljava/lang/Object;)Lio/matthewnelson/kmp/tor/runtime/Lifecycle$Event;
 	public static final fun OnUnsubscribed (Ljava/lang/Object;)Lio/matthewnelson/kmp/tor/runtime/Lifecycle$Event;
@@ -138,6 +139,7 @@ public final class io/matthewnelson/kmp/tor/runtime/Lifecycle$Event$Companion {
 	public final fun OnDestroy (Ljava/lang/Object;)Lio/matthewnelson/kmp/tor/runtime/Lifecycle$Event;
 	public final fun OnRemoved (Ljava/lang/Object;)Lio/matthewnelson/kmp/tor/runtime/Lifecycle$Event;
 	public final fun OnReturned (Ljava/lang/Object;)Lio/matthewnelson/kmp/tor/runtime/Lifecycle$Event;
+	public final fun OnStart (Ljava/lang/Object;)Lio/matthewnelson/kmp/tor/runtime/Lifecycle$Event;
 	public final fun OnSubscribed (Ljava/lang/Object;)Lio/matthewnelson/kmp/tor/runtime/Lifecycle$Event;
 	public final fun OnUnbind (Ljava/lang/Object;)Lio/matthewnelson/kmp/tor/runtime/Lifecycle$Event;
 	public final fun OnUnsubscribed (Ljava/lang/Object;)Lio/matthewnelson/kmp/tor/runtime/Lifecycle$Event;
@@ -150,6 +152,7 @@ public final class io/matthewnelson/kmp/tor/runtime/Lifecycle$Event$Name {
 	public static final field OnDestroy Lio/matthewnelson/kmp/tor/runtime/Lifecycle$Event$Name;
 	public static final field OnRemoved Lio/matthewnelson/kmp/tor/runtime/Lifecycle$Event$Name;
 	public static final field OnReturned Lio/matthewnelson/kmp/tor/runtime/Lifecycle$Event$Name;
+	public static final field OnStart Lio/matthewnelson/kmp/tor/runtime/Lifecycle$Event$Name;
 	public static final field OnSubscribed Lio/matthewnelson/kmp/tor/runtime/Lifecycle$Event$Name;
 	public static final field OnUnbind Lio/matthewnelson/kmp/tor/runtime/Lifecycle$Event$Name;
 	public static final field OnUnsubscribed Lio/matthewnelson/kmp/tor/runtime/Lifecycle$Event$Name;

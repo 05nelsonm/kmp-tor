@@ -80,6 +80,8 @@ public class Lifecycle: Destroyable {
 
             // TorRuntime.ServiceFactory LCEs
             @JvmStatic
+            public fun OnStart(obj: Any): Event = Event(obj, Name.OnStart)
+            @JvmStatic
             public fun OnBind(obj: Any): Event = Event(obj, Name.OnBind)
             @JvmStatic
             public fun OnUnbind(obj: Any): Event = Event(obj, Name.OnUnbind)
@@ -104,6 +106,8 @@ public class Lifecycle: Destroyable {
                 public val OnDestroy: Name = Name("onDestroy")
 
                 // TorRuntime.ServiceFactory LCEs
+                @JvmField
+                public val OnStart: Name = Name("onStart")
                 @JvmField
                 public val OnBind: Name = Name("onBind")
                 @JvmField

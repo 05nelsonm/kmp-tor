@@ -28,7 +28,7 @@ import kotlin.jvm.JvmField
  *
  * e.g.
  *
- *     public sealed class MyEvent(
+ *     public sealed class MyEvent private constructor(
  *         name: String,
  *     ): Event<String, MyEvent, MyEvent.Observer>(name) {
  *

@@ -46,15 +46,15 @@ internal sealed class AbstractTorService: Service() {
                 conn.binder.e(IllegalStateException("$service cannot be bound to. isDestroyed[true]"))
                 return
             }
-            if (holders[conn.binder] != null) {
-                conn.binder.w(conn.binder, "TorRuntime has not been destroyed, but onServiceConnected was called")
+            holders[conn.binder]?.let { holder ->
+                conn.binder.w(service, "${holder.runtime} is still active, but onServiceConnected was called")
                 return
             }
 
             // This is the first bind for this TorService instance
             if (holders.sizeKeys == 0) {
                 conn.binder.lce(Lifecycle.Event.OnCreate(service))
-                conn.binder.lce(Lifecycle.Event.OnBind(service))
+                conn.binder.lce(Lifecycle.Event.OnStart(service))
             }
 
             val holder = Holder(conn)
@@ -91,17 +91,6 @@ internal sealed class AbstractTorService: Service() {
         return START_NOT_STICKY
     }
 
-//    public final override fun onUnbind(intent: Intent?): Boolean {
-//        val result = super.onUnbind(intent)
-//        println("$this - onUnbind(intent: $intent")
-//        return result
-//    }
-//
-//    public final override fun onRebind(intent: Intent?) {
-//        super.onRebind(intent)
-//        println("$this - onRebind(intent: $intent")
-//    }
-
     public final override fun onTaskRemoved(rootIntent: Intent?) {
         super.onTaskRemoved(rootIntent)
         holders.keys.forEach { binder ->
@@ -117,10 +106,11 @@ internal sealed class AbstractTorService: Service() {
             holder?.runtime?.destroy()
             binder
         }.forEach { binder ->
+            // Notify all instances that we're finally destroyed
             binder.lce(Lifecycle.Event.OnDestroy(this))
         }
 
-        // Remove all keys
+        // Clean up
         holders.clear()
     }
 
@@ -142,14 +132,21 @@ internal sealed class AbstractTorService: Service() {
                 }
                 invokeOnDestroy {
                     if (_isDestroyed) return@invokeOnDestroy
-                    application.unbindService(conn)
+                    unbindService(conn)
+                    binder.lce(Lifecycle.Event.OnUnbind(this@AbstractTorService))
                 }
                 invokeOnDestroy {
                     if (_isDestroyed) return@invokeOnDestroy
-                    if (!holders.isEmpty()) return@invokeOnDestroy
-                    application.stopService(Intent(application, TorService::class.java))
+                    if (holders.sizeValues != 0) return@invokeOnDestroy
+
+                    // Last instance destroyed. Kill it.
+                    stopSelf()
                 }
             }
+        }
+
+        init {
+            binder.lce(Lifecycle.Event.OnBind(this@AbstractTorService))
         }
     }
 
