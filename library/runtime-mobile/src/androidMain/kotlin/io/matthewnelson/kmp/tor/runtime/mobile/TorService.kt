@@ -42,7 +42,7 @@ internal class TorService internal constructor(): AbstractTorService() {
 
     internal class Initializer internal constructor(): androidx.startup.Initializer<Initializer.Companion> {
 
-        override fun create(context: Context): Companion {
+        public override fun create(context: Context): Companion {
             val initializer = AppInitializer.getInstance(context)
             check(initializer.isEagerlyInitialized(javaClass)) {
                 val classPath = "io.matthewnelson.kmp.tor.runtime.mobile.TorService$" + "Initializer"
@@ -60,7 +60,7 @@ internal class TorService internal constructor(): AbstractTorService() {
             return Companion
         }
 
-        override fun dependencies(): List<Class<androidx.startup.Initializer<*>>> {
+        public override fun dependencies(): List<Class<androidx.startup.Initializer<*>>> {
             return try {
                 val clazz = Class
                     .forName("io.matthewnelson.kmp.tor.core.lib.locator.KmpTorLibLocator\$Initializer")

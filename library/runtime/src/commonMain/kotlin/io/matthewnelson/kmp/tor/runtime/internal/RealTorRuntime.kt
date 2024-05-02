@@ -57,15 +57,10 @@ internal class RealTorRuntime private constructor(
 {
 
     private var lifecycle: Destroyable? = null
-    protected override val debug: Boolean get() = environment().debug
-    public override fun environment(): TorRuntime.Environment = generator.environment
+    protected override val debug: Boolean get() = generator.environment.debug
     protected override val isService: Boolean = serviceFactoryHandler != null
     protected override val handler: HandlerWithContext = serviceFactoryHandler ?: super.handler
     private val requiredTorEvents = requiredTorEvents.toImmutableSet()
-
-    @JvmSynthetic
-    internal fun handler(): UncaughtException.Handler = handler
-
     private val lock = SynchronizedObject()
 
     private val scope = CoroutineScope(context =
@@ -75,6 +70,8 @@ internal class RealTorRuntime private constructor(
         + handler
     )
 
+    private val connectivity = ConnectivityObserver()
+
     @Suppress("PrivatePropertyName")
     private val NOTIFIER = object : Notifier {
         public override fun <Data: Any, E: RuntimeEvent<Data>> notify(event: E, data: Data) {
@@ -83,9 +80,9 @@ internal class RealTorRuntime private constructor(
     }
 
     private val factory = TorCtrl.Factory(
-        staticTag = environment().staticTag(),
+        staticTag = generator.environment.staticTag(),
         observers = TorEvent.entries().let { events ->
-            val tag = environment().staticTag()
+            val tag = generator.environment.staticTag()
             events.mapTo(LinkedHashSet(events.size, 1.0f)) { event ->
                 when (event) {
                     is TorEvent.CONF_CHANGED -> ConfChangedObserver()
@@ -98,19 +95,23 @@ internal class RealTorRuntime private constructor(
         debugger = ItBlock { log ->
             if (!debug) return@ItBlock
 
+            // Debug logs are all formatted as TorCtrl@<hashCode> <log>
             val i = log.indexOf('@')
-            val output = if (i == -1) {
+            val formatted = if (i == -1) {
                 log
             } else {
                 log.substring(0, i) + "[fid=" + fidEllipses + ']' + log.substring(i)
             }
 
-            LOG.DEBUG.notifyObservers(output)
+            LOG.DEBUG.notifyObservers(formatted)
         },
         handler = handler,
     )
 
-    private val connectivity = ConnectivityObserver()
+    @JvmSynthetic
+    internal fun handler(): UncaughtException.Handler = handler
+
+    public override fun environment(): TorRuntime.Environment = generator.environment
 
     // TODO
     public override fun enqueue(
@@ -125,16 +126,6 @@ internal class RealTorRuntime private constructor(
         onFailure: OnFailure,
         onSuccess: OnSuccess<Response>
     ): QueuedJob = onFailure.toImmediateErrorJob(cmd.keyword, NotImplementedError(), handler)
-
-    init {
-        NOTIFIER.lce(Lifecycle.Event.OnCreate(this))
-        if (networkObserver != NetworkObserver.noOp()) {
-            networkObserver.subscribe(connectivity)
-            NOTIFIER.lce(Lifecycle.Event.OnSubscribed(connectivity))
-        }
-    }
-
-    public override fun toString(): String = toFIDString(includeHashCode = isService)
 
     protected override fun onDestroy(): Boolean {
         if (!isService) {
@@ -151,6 +142,37 @@ internal class RealTorRuntime private constructor(
         }
         NOTIFIER.lce(Lifecycle.Event.OnDestroy(this))
         return true
+    }
+
+    public override fun toString(): String = toFIDString(includeHashCode = isService)
+
+    init {
+        NOTIFIER.lce(Lifecycle.Event.OnCreate(this))
+
+        if (networkObserver != NetworkObserver.noOp()) {
+            networkObserver.subscribe(connectivity)
+            NOTIFIER.lce(Lifecycle.Event.OnSubscribed(connectivity))
+        }
+    }
+
+    private inner class ConnectivityObserver: AbstractConnectivityObserver(scope), FileID by this {
+        public override fun equals(other: Any?): Boolean = other is ConnectivityObserver && other.hashCode() == hashCode()
+        public override fun hashCode(): Int = this@RealTorRuntime.hashCode()
+        public override fun toString(): String = this.toFIDString(includeHashCode = isService)
+    }
+
+    private inner class ConfChangedObserver: TorCtrlObserver.ConfChanged(generator.environment.staticTag()) {
+        protected override fun notify(data: String) {
+            super.notify(data)
+            event.notifyObservers(data)
+        }
+    }
+
+    private inner class NoticeObserver: TorCtrlObserver.Notice(generator.environment.staticTag()) {
+        protected override fun notify(data: String) {
+            super.notify(data)
+            event.notifyObservers(data)
+        }
     }
 
     internal companion object {
@@ -192,26 +214,6 @@ internal class RealTorRuntime private constructor(
         )
     }
 
-    private inner class ConnectivityObserver: AbstractConnectivityObserver(scope), FileID by this {
-        public override fun equals(other: Any?): Boolean = other is ConnectivityObserver && other.hashCode() == hashCode()
-        public override fun hashCode(): Int = this@RealTorRuntime.hashCode()
-        public override fun toString(): String = toFIDString(includeHashCode = isService)
-    }
-
-    private inner class ConfChangedObserver: TorCtrlObserver.ConfChanged(environment().staticTag()) {
-        protected override fun notify(data: String) {
-            super.notify(data)
-            event.notifyObservers(data)
-        }
-    }
-
-    private inner class NoticeObserver: TorCtrlObserver.Notice(environment().staticTag()) {
-        protected override fun notify(data: String) {
-            super.notify(data)
-            event.notifyObservers(data)
-        }
-    }
-
     internal class ServiceCtrl private constructor(
         private val generator: TorConfigGenerator,
         private val builderObserver: NetworkObserver,
@@ -230,7 +232,7 @@ internal class RealTorRuntime private constructor(
     {
 
         private val builderRequiredEvents = builderRequiredEvents.toImmutableSet()
-        protected override val debug: Boolean get() = environment().debug
+        protected override val debug: Boolean get() = generator.environment.debug
 
         // Using lazy in case TorRuntime.ServiceFactory.Loader throws
         // upon initialization of a bad implementation, we do not want
@@ -269,16 +271,16 @@ internal class RealTorRuntime private constructor(
 
             // Pipe all events to observers registered with Factory
             private val observersTorEvent = TorEvent.entries().let { events ->
-                val tag = environment().staticTag()
-                events.mapTo(LinkedHashSet(events.size, 1.0f)) { event ->
+                val tag = generator.environment.staticTag()
+                events.mapTo(LinkedHashSet(events.size + 1, 1.0f)) { event ->
                     event.observer(tag) { event.notifyObservers(it) }
                 }.toImmutableSet()
             }
 
             // Pipe all events to observers registered with Factory
             private val observersRuntimeEvent = RuntimeEvent.entries().let { events ->
-                val tag = environment().staticTag()
-                events.mapTo(LinkedHashSet(events.size, 1.0f)) { event ->
+                val tag = generator.environment.staticTag()
+                events.mapTo(LinkedHashSet(events.size + 1, 1.0f)) { event ->
                     when (event) {
                         is ERROR -> event.observer(tag) { event.notifyObservers(it) }
                         is EXECUTE -> event.observer(tag) { event.notifyObservers(it) }
@@ -344,11 +346,11 @@ internal class RealTorRuntime private constructor(
                 return destroyable
             }
 
-            override fun <Data: Any, E: RuntimeEvent<Data>> notify(event: E, data: Data) { event.notifyObservers(data) }
+            public override fun <Data: Any, E: RuntimeEvent<Data>> notify(event: E, data: Data) { event.notifyObservers(data) }
 
-            override fun equals(other: Any?): Boolean = other is ServiceBinder && other.hashCode() == hashCode()
-            override fun hashCode(): Int = this@ServiceCtrl.hashCode()
-            override fun toString(): String = toFIDString(includeHashCode = false)
+            public override fun equals(other: Any?): Boolean = other is ServiceBinder && other.hashCode() == hashCode()
+            public override fun hashCode(): Int = this@ServiceCtrl.hashCode()
+            public override fun toString(): String = toFIDString(includeHashCode = false)
         }
 
         init {

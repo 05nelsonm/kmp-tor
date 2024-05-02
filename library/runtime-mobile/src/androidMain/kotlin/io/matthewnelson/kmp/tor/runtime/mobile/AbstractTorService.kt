@@ -57,16 +57,16 @@ internal sealed class AbstractTorService: Service() {
     }
 
     private abstract class Binder: AndroidBinder() {
-        abstract fun inject(conn: Connection)
+        public abstract fun inject(conn: Connection)
     }
 
     protected class Connection(val binder: TorBinder): ServiceConnection {
-        override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
+        public override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
             if (service !is Binder) return
             service.inject(this)
         }
 
-        override fun onServiceDisconnected(name: ComponentName?) {}
+        public override fun onServiceDisconnected(name: ComponentName?) {}
     }
 
     public final override fun onBind(intent: Intent?): IBinder {
