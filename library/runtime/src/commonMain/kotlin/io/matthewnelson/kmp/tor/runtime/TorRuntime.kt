@@ -110,7 +110,7 @@ public interface TorRuntime:
          * own observer implementation will be favored over this setting.
          * */
         @JvmField
-        public var networkObserver: NetworkObserver = NetworkObserver.NOOP
+        public var networkObserver: NetworkObserver = NetworkObserver.noOp()
 
         /**
          * Declare a default [OnEvent.Executor] to utilize when dispatching

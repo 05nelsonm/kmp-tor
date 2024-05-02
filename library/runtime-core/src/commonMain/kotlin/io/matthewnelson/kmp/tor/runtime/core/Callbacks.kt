@@ -20,7 +20,6 @@ import io.matthewnelson.kmp.tor.runtime.core.internal.ExecutorMainInternal
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.MainCoroutineDispatcher
 import kotlin.coroutines.CoroutineContext
-import kotlin.jvm.JvmField
 import kotlin.jvm.JvmStatic
 
 /**
@@ -34,7 +33,22 @@ import kotlin.jvm.JvmStatic
  * to [io.matthewnelson.kmp.tor.runtime.RuntimeEvent.ERROR]
  * observers.
  * */
-public fun interface OnSuccess<in T: Any?>: ItBlock<T>
+public fun interface OnSuccess<in T: Any?>: ItBlock<T> {
+
+    public companion object {
+
+        /**
+         * A non-operational static instance of [OnSuccess].
+         * */
+        @JvmStatic
+        public fun <T: Any?> noOp(): OnSuccess<T> = NOOP
+    }
+
+    private data object NOOP: OnSuccess<Any?> {
+        override fun invoke(it: Any?) {}
+        override fun toString(): String = "OnSuccess.NOOP"
+    }
+}
 
 /**
  * An alias of [ItBlock] indicating a callback for
@@ -47,7 +61,22 @@ public fun interface OnSuccess<in T: Any?>: ItBlock<T>
  * to [io.matthewnelson.kmp.tor.runtime.RuntimeEvent.ERROR]
  * observers.
  * */
-public fun interface OnFailure: ItBlock<Throwable>
+public fun interface OnFailure: ItBlock<Throwable> {
+
+    public companion object {
+
+        /**
+         * A non-operational static instance of [OnFailure].
+         * */
+        @JvmStatic
+        public fun noOp(): OnFailure = NOOP
+    }
+
+    private data object NOOP: OnFailure {
+        override fun invoke(it: Throwable) {}
+        override fun toString(): String = "OnFailure.NOOP"
+    }
+}
 
 /**
  * A callback for dispatching events.
@@ -68,7 +97,7 @@ public fun interface OnEvent<in It: Any>: ItBlock<It> {
     public companion object {
 
         /**
-         * A non-operational, static instance of [OnEvent]. Useful
+         * A non-operational static instance of [OnEvent]. Useful
          * for classes that inherit from an [Event.Observer] and override
          * protected notify function.
          * */
@@ -172,9 +201,14 @@ public fun interface Disposable {
     public companion object {
 
         /**
-         * A non-operational implementation of [Disposable]
+         * A non-operational static instance of [Disposable]
          * */
-        @JvmField
-        public val NOOP: Disposable = Disposable {}
+        @JvmStatic
+        public fun noOp(): Disposable = NOOP
+    }
+
+    private data object NOOP: Disposable {
+        override fun invoke() {}
+        override fun toString(): String = "Disposable.NOOP"
     }
 }

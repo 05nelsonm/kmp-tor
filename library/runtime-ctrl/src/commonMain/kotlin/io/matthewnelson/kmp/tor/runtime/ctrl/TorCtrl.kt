@@ -51,11 +51,11 @@ public expect interface TorCtrl: Destroyable, TorEvent.Processor, TorCmd.Privile
 
     /**
      * Register a [handle] to be invoked when this [TorCtrl] instance
-     * is destroyed. If [handle] is already registered, [Disposable.NOOP]
+     * is destroyed. If [handle] is already registered, [Disposable.noOp]
      * is returned.
      *
      * If [TorCtrl] is already destroyed, [handle] is invoked immediately
-     * and [Disposable.NOOP] is returned.
+     * and [Disposable.noOp] is returned.
      *
      * [handle] should **NOT** throw exception. In the event that
      * it does, it will be delegated to [Factory.handler]. If [TorCtrl]

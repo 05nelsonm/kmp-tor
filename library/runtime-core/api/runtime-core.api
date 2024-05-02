@@ -17,11 +17,12 @@ public final class io/matthewnelson/kmp/tor/runtime/core/Destroyable$Companion {
 
 public abstract interface class io/matthewnelson/kmp/tor/runtime/core/Disposable {
 	public static final field Companion Lio/matthewnelson/kmp/tor/runtime/core/Disposable$Companion;
-	public static final field NOOP Lio/matthewnelson/kmp/tor/runtime/core/Disposable;
 	public abstract fun invoke ()V
+	public static fun noOp ()Lio/matthewnelson/kmp/tor/runtime/core/Disposable;
 }
 
 public final class io/matthewnelson/kmp/tor/runtime/core/Disposable$Companion {
+	public final fun noOp ()Lio/matthewnelson/kmp/tor/runtime/core/Disposable;
 }
 
 public abstract class io/matthewnelson/kmp/tor/runtime/core/Event {
@@ -80,9 +81,21 @@ public final class io/matthewnelson/kmp/tor/runtime/core/OnEvent$Executor$Main :
 }
 
 public abstract interface class io/matthewnelson/kmp/tor/runtime/core/OnFailure : io/matthewnelson/kmp/tor/runtime/core/ItBlock {
+	public static final field Companion Lio/matthewnelson/kmp/tor/runtime/core/OnFailure$Companion;
+	public static fun noOp ()Lio/matthewnelson/kmp/tor/runtime/core/OnFailure;
+}
+
+public final class io/matthewnelson/kmp/tor/runtime/core/OnFailure$Companion {
+	public final fun noOp ()Lio/matthewnelson/kmp/tor/runtime/core/OnFailure;
 }
 
 public abstract interface class io/matthewnelson/kmp/tor/runtime/core/OnSuccess : io/matthewnelson/kmp/tor/runtime/core/ItBlock {
+	public static final field Companion Lio/matthewnelson/kmp/tor/runtime/core/OnSuccess$Companion;
+	public static fun noOp ()Lio/matthewnelson/kmp/tor/runtime/core/OnSuccess;
+}
+
+public final class io/matthewnelson/kmp/tor/runtime/core/OnSuccess$Companion {
+	public final fun noOp ()Lio/matthewnelson/kmp/tor/runtime/core/OnSuccess;
 }
 
 public abstract class io/matthewnelson/kmp/tor/runtime/core/QueuedJob {

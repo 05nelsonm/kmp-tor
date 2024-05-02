@@ -160,7 +160,7 @@ internal class RealTorCtrl private constructor(
 
         (handler.delegate as? CloseableExceptionHandler)?.close()
 
-        if (disposeDispatcher != Disposable.NOOP) {
+        if (disposeDispatcher != Disposable.noOp()) {
             LOG.d { "Closing Dispatchers" }
             disposeDispatcher.invoke()
         }

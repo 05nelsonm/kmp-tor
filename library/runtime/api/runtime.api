@@ -161,15 +161,16 @@ public final class io/matthewnelson/kmp/tor/runtime/Lifecycle$Event$Name$Compani
 
 public abstract class io/matthewnelson/kmp/tor/runtime/NetworkObserver {
 	public static final field Companion Lio/matthewnelson/kmp/tor/runtime/NetworkObserver$Companion;
-	public static final field NOOP Lio/matthewnelson/kmp/tor/runtime/NetworkObserver;
 	public fun <init> ()V
 	public abstract fun isNetworkConnected ()Z
+	public static final fun noOp ()Lio/matthewnelson/kmp/tor/runtime/NetworkObserver;
 	protected final fun notify (Lio/matthewnelson/kmp/tor/runtime/NetworkObserver$Connectivity;)V
 	protected fun onObserversEmpty ()V
 	protected fun onObserversNotEmpty ()V
 }
 
 public final class io/matthewnelson/kmp/tor/runtime/NetworkObserver$Companion {
+	public final fun noOp ()Lio/matthewnelson/kmp/tor/runtime/NetworkObserver;
 }
 
 public final class io/matthewnelson/kmp/tor/runtime/NetworkObserver$Connectivity : java/lang/Enum {
@@ -184,7 +185,7 @@ public abstract class io/matthewnelson/kmp/tor/runtime/RuntimeEvent : io/matthew
 	public static final field Companion Lio/matthewnelson/kmp/tor/runtime/RuntimeEvent$Companion;
 	public synthetic fun <init> (Ljava/lang/String;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
 	public static fun entries ()Ljava/util/Set;
-	protected fun factory (Lio/matthewnelson/kmp/tor/runtime/RuntimeEvent;Ljava/lang/String;Lio/matthewnelson/kmp/tor/runtime/core/OnEvent$Executor;Lio/matthewnelson/kmp/tor/runtime/core/OnEvent;)Lio/matthewnelson/kmp/tor/runtime/RuntimeEvent$Observer;
+	protected final fun factory (Lio/matthewnelson/kmp/tor/runtime/RuntimeEvent;Ljava/lang/String;Lio/matthewnelson/kmp/tor/runtime/core/OnEvent$Executor;Lio/matthewnelson/kmp/tor/runtime/core/OnEvent;)Lio/matthewnelson/kmp/tor/runtime/RuntimeEvent$Observer;
 	public synthetic fun factory (Lio/matthewnelson/kmp/tor/runtime/core/Event;Ljava/lang/String;Lio/matthewnelson/kmp/tor/runtime/core/OnEvent$Executor;Lio/matthewnelson/kmp/tor/runtime/core/OnEvent;)Lio/matthewnelson/kmp/tor/runtime/core/Event$Observer;
 	public static fun valueOf (Ljava/lang/String;)Lio/matthewnelson/kmp/tor/runtime/RuntimeEvent;
 	public static fun valueOfOrNull (Ljava/lang/String;)Lio/matthewnelson/kmp/tor/runtime/RuntimeEvent;

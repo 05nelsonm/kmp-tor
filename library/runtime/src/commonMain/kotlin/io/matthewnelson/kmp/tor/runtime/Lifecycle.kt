@@ -205,15 +205,11 @@ public class Lifecycle: Destroyable {
 
     private class LifecycleJob(
         handler: UncaughtException.Handler,
-    ): QueuedJob("TorRuntime", ON_FAILURE, handler) {
+    ): QueuedJob("TorRuntime", OnFailure.noOp(), handler) {
 
         // non-cancellable
         init { onExecuting() }
 
         fun complete() { onCompletion(Unit, null) }
-
-        private companion object {
-            private val ON_FAILURE: OnFailure = OnFailure {}
-        }
     }
 }

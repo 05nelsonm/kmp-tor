@@ -142,7 +142,7 @@ class QueuedJobUnitTest {
                     // Should be caught by handler
                     fail()
                 }
-                assertNotEquals(Disposable.NOOP, disposable)
+                assertNotEquals(Disposable.noOp(), disposable)
 
                 // isCompleting is true right here so the following
                 // invocations should all be ignored, b/c some

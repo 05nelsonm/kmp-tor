@@ -47,10 +47,10 @@ internal abstract class AbstractTorCtrl internal constructor(
         if (wasAdded == null) {
             // invoke immediately. Do not leak destroyed handler.
             handle.invokeDestroyed(UncaughtException.Handler.THROW, true)
-            return Disposable.NOOP
+            return Disposable.noOp()
         }
 
-        if (!wasAdded) return Disposable.NOOP
+        if (!wasAdded) return Disposable.noOp()
 
         return Disposable {
             if (isDestroyed()) return@Disposable

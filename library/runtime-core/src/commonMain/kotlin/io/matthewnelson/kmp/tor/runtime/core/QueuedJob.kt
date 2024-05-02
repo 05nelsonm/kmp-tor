@@ -147,11 +147,11 @@ public abstract class QueuedJob protected constructor(
     /**
      * Register a [handle] to be invoked when this [QueuedJob]
      * completes, either successfully or by cancellation/error.
-     * If [handle] is already registered, [Disposable.NOOP] is
+     * If [handle] is already registered, [Disposable.noOp] is
      * returned.
      *
      * If the job has already completed, [handle] is invoked
-     * immediately and [Disposable.NOOP] is returned.
+     * immediately and [Disposable.noOp] is returned.
      *
      * If the job completed by cancellation, [handle] will
      * be invoked with a [CancellationException] argument to
@@ -181,10 +181,10 @@ public abstract class QueuedJob protected constructor(
             UncaughtException.Handler.THROW.tryCatch(toString()) {
                 handle(_cancellationException)
             }
-            return Disposable.NOOP
+            return Disposable.noOp()
         }
 
-        if (!wasAdded) return Disposable.NOOP
+        if (!wasAdded) return Disposable.noOp()
 
         return Disposable {
             if (!isActive) return@Disposable
@@ -427,12 +427,10 @@ public abstract class QueuedJob protected constructor(
             handler: UncaughtException.Handler,
         ): QueuedJob = object : QueuedJob(
             name,
-            ON_FAILURE,
+            OnFailure.noOp(),
             handler
         ) {
             init { onCompletion(response) { this@toImmediateSuccessJob } }
         }
-
-        private val ON_FAILURE = OnFailure {}
     }
 }

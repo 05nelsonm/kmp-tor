@@ -56,7 +56,7 @@ class AbstractTorCtrlUnitTest {
             // check that destroy callbacks variable has
             // been de-referenced and cannot add anymore
             var immediate = false
-            assertEquals(Disposable.NOOP, ctrl.invokeOnDestroy { immediate = true })
+            assertEquals(Disposable.noOp(), ctrl.invokeOnDestroy { immediate = true })
             assertTrue(immediate)
 
             // multiple exceptions suppressed into single
@@ -106,10 +106,10 @@ class AbstractTorCtrlUnitTest {
         var invocationDestroy = 0
         val cb = ItBlock<TorCtrl> { invocationDestroy++ }
         val d1 = ctrl.invokeOnDestroy(cb)
-        assertNotEquals(Disposable.NOOP, d1)
+        assertNotEquals(Disposable.noOp(), d1)
 
         val d2 = ctrl.invokeOnDestroy(cb)
-        assertEquals(Disposable.NOOP, d2)
+        assertEquals(Disposable.noOp(), d2)
 
         ctrl.destroy()
         assertEquals(1, invocationDestroy)
