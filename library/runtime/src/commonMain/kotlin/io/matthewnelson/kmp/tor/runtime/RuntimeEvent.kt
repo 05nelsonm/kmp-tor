@@ -222,21 +222,21 @@ public sealed class RuntimeEvent<Data: Any> private constructor(
 
             @JvmStatic
             @Suppress("NOTHING_TO_INLINE")
-            public inline fun <E: LOG> Notifier.log(event: E, from: Any, log: String) {
-                notify(event, "$from $log")
+            public inline fun <E: LOG> Notifier.log(event: E, from: Any?, log: String) {
+                notify(event, (from?.toString()?.ifBlank { null }?.let { "$it " } ?: "") + log)
             }
 
             @JvmStatic
             @Suppress("NOTHING_TO_INLINE")
-            public inline fun Notifier.d(from: Any, log: String) { log(LOG.DEBUG, from, log) }
+            public inline fun Notifier.d(from: Any?, log: String) { log(LOG.DEBUG, from, log) }
 
             @JvmStatic
             @Suppress("NOTHING_TO_INLINE")
-            public inline fun Notifier.i(from: Any, log: String) { log(LOG.INFO, from, log) }
+            public inline fun Notifier.i(from: Any?, log: String) { log(LOG.INFO, from, log) }
 
             @JvmStatic
             @Suppress("NOTHING_TO_INLINE")
-            public inline fun Notifier.w(from: Any, log: String) { log(LOG.WARN, from, log) }
+            public inline fun Notifier.w(from: Any?, log: String) { log(LOG.WARN, from, log) }
 
             @JvmStatic
             @Suppress("NOTHING_TO_INLINE")
