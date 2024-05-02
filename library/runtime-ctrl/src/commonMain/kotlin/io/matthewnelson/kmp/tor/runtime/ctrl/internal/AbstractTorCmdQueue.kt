@@ -126,9 +126,7 @@ internal abstract class AbstractTorCmdQueue internal constructor(
 
     protected abstract fun startProcessor()
 
-    protected fun dequeueNextOrNull(
-        handler: UncaughtException.Handler = this.handler,
-    ): TorCmdJob<*>? {
+    protected fun dequeueNextOrNull(): TorCmdJob<*>? {
         if (isDestroyed()) return null
         doCancellations(handler)
 

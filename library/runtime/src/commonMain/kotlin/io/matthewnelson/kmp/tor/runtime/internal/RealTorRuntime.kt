@@ -237,7 +237,7 @@ internal class RealTorRuntime private constructor(
         // Using lazy in case TorRuntime.ServiceFactory.Loader throws
         // upon initialization of a bad implementation, we do not want
         // to create an unused dispatcher for Jvm & Native
-        private val dispatcher by lazy { environment().newRuntimeDispatcher() }
+        private val dispatcher by lazy { generator.environment.newRuntimeDispatcher() }
 
         private val _binder = ServiceBinder()
 
@@ -332,14 +332,14 @@ internal class RealTorRuntime private constructor(
                 _instance = destroyable
                 lce(Lifecycle.Event.OnCreate(destroyable))
 
-                destroyable.invokeOnCompletion {
+                destroyable.invokeOnDestroy {
                     _instance = null
                     runtime.onDestroy()
                 }
-                destroyable.invokeOnCompletion {
+                destroyable.invokeOnDestroy {
                     lce(Lifecycle.Event.OnDestroy(destroyable))
                 }
-                destroyable.invokeOnCompletion {
+                destroyable.invokeOnDestroy {
                     lce(Lifecycle.Event.OnUnbind(this))
                 }
 

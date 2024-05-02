@@ -624,6 +624,6 @@ public interface TorRuntime:
 
         public final override fun equals(other: Any?): Boolean = other is ServiceFactory && other.ctrl == ctrl
         public final override fun hashCode(): Int = ctrl.hashCode()
-        public final override fun toString(): String = toFIDString(includeHashCode = false)
+        public final override fun toString(): String = toFIDString(defaultClassName = "ServiceFactory", includeHashCode = false)
     }
 }

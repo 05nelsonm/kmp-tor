@@ -35,19 +35,28 @@ import io.matthewnelson.kmp.tor.runtime.TorRuntime.ServiceFactory.Binder as TorB
 internal sealed class AbstractTorService: Service() {
 
     @Volatile
-    private var isDestroyed: Boolean = false
+    private var _isDestroyed: Boolean = false
     private val holders = PersistentKeyMap<TorBinder, Holder>()
 
     private val binder = object : Binder() {
         override fun inject(conn: Connection) {
-            if (isDestroyed) {
-                conn.binder.e(IllegalStateException("${this@AbstractTorService} cannot be bound to. isDestroyed[true]"))
+            val service = this@AbstractTorService
+
+            if (_isDestroyed) {
+                conn.binder.e(IllegalStateException("$service cannot be bound to. isDestroyed[true]"))
                 return
             }
             if (holders[conn.binder] != null) {
                 conn.binder.w(conn.binder, "TorRuntime has not been destroyed, but onServiceConnected was called")
                 return
             }
+
+            // This is the first bind for this TorService instance
+            if (holders.sizeKeys == 0) {
+                conn.binder.lce(Lifecycle.Event.OnCreate(service))
+                conn.binder.lce(Lifecycle.Event.OnBind(service))
+            }
+
             val holder = Holder(conn)
             holders[conn.binder] = holder
 
@@ -101,10 +110,13 @@ internal sealed class AbstractTorService: Service() {
     }
 
     public final override fun onDestroy() {
-        isDestroyed = true
+        _isDestroyed = true
         super.onDestroy()
-        holders.entries.forEach { (binder, holder) ->
+
+        holders.entries.map { (binder, holder) ->
             holder?.runtime?.destroy()
+            binder
+        }.forEach { binder ->
             binder.lce(Lifecycle.Event.OnDestroy(this))
         }
 
@@ -118,23 +130,23 @@ internal sealed class AbstractTorService: Service() {
 
         // Want to lazily instantiate so that the PersistentKeyMap
         // entry is created before we start calling things.
-        val runtime: Lifecycle.DestroyableTorRuntime by lazy {
+        public val runtime: Lifecycle.DestroyableTorRuntime by lazy {
             binder.onBind(
                 serviceEvents = emptySet(),
                 serviceObserverNetwork = null,
                 serviceObserversTorEvent = emptySet(),
                 serviceObserversRuntimeEvent = emptySet(),
             ).apply {
-                invokeOnCompletion {
+                invokeOnDestroy {
                     holders.remove(binder)
                 }
-                invokeOnCompletion {
-                    if (isDestroyed) return@invokeOnCompletion
+                invokeOnDestroy {
+                    if (_isDestroyed) return@invokeOnDestroy
                     application.unbindService(conn)
                 }
-                invokeOnCompletion {
-                    if (isDestroyed) return@invokeOnCompletion
-                    if (!holders.isEmpty()) return@invokeOnCompletion
+                invokeOnDestroy {
+                    if (_isDestroyed) return@invokeOnDestroy
+                    if (!holders.isEmpty()) return@invokeOnDestroy
                     application.stopService(Intent(application, TorService::class.java))
                 }
             }

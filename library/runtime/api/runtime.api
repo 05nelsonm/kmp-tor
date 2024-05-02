@@ -63,7 +63,8 @@ public abstract interface class io/matthewnelson/kmp/tor/runtime/FileID {
 	public static fun createFID (Ljava/io/File;)Ljava/lang/String;
 	public static fun fidEllipses (Lio/matthewnelson/kmp/tor/runtime/FileID;)Ljava/lang/String;
 	public static fun fidString (Lio/matthewnelson/kmp/tor/runtime/FileID;)Ljava/lang/String;
-	public static fun fidString (Lio/matthewnelson/kmp/tor/runtime/FileID;Z)Ljava/lang/String;
+	public static fun fidString (Lio/matthewnelson/kmp/tor/runtime/FileID;Ljava/lang/String;)Ljava/lang/String;
+	public static fun fidString (Lio/matthewnelson/kmp/tor/runtime/FileID;Ljava/lang/String;Z)Ljava/lang/String;
 	public abstract fun getFid ()Ljava/lang/String;
 }
 
@@ -71,8 +72,9 @@ public final class io/matthewnelson/kmp/tor/runtime/FileID$Companion {
 	public final fun createFID (Ljava/io/File;)Ljava/lang/String;
 	public final fun fidEllipses (Lio/matthewnelson/kmp/tor/runtime/FileID;)Ljava/lang/String;
 	public final fun fidString (Lio/matthewnelson/kmp/tor/runtime/FileID;)Ljava/lang/String;
-	public final fun fidString (Lio/matthewnelson/kmp/tor/runtime/FileID;Z)Ljava/lang/String;
-	public static synthetic fun fidString$default (Lio/matthewnelson/kmp/tor/runtime/FileID$Companion;Lio/matthewnelson/kmp/tor/runtime/FileID;ZILjava/lang/Object;)Ljava/lang/String;
+	public final fun fidString (Lio/matthewnelson/kmp/tor/runtime/FileID;Ljava/lang/String;)Ljava/lang/String;
+	public final fun fidString (Lio/matthewnelson/kmp/tor/runtime/FileID;Ljava/lang/String;Z)Ljava/lang/String;
+	public static synthetic fun fidString$default (Lio/matthewnelson/kmp/tor/runtime/FileID$Companion;Lio/matthewnelson/kmp/tor/runtime/FileID;Ljava/lang/String;ZILjava/lang/Object;)Ljava/lang/String;
 }
 
 public final class io/matthewnelson/kmp/tor/runtime/Lifecycle : io/matthewnelson/kmp/tor/runtime/core/Destroyable {
@@ -92,7 +94,7 @@ public final class io/matthewnelson/kmp/tor/runtime/Lifecycle$DestroyableTorRunt
 	public fun equals (Ljava/lang/Object;)Z
 	public fun getFid ()Ljava/lang/String;
 	public fun hashCode ()I
-	public final fun invokeOnCompletion (Lio/matthewnelson/kmp/tor/runtime/core/ItBlock;)Lio/matthewnelson/kmp/tor/runtime/core/Disposable;
+	public final fun invokeOnDestroy (Lio/matthewnelson/kmp/tor/runtime/core/ItBlock;)Lio/matthewnelson/kmp/tor/runtime/core/Disposable;
 	public fun isDestroyed ()Z
 	public fun subscribe (Lio/matthewnelson/kmp/tor/runtime/RuntimeEvent$Observer;)V
 	public fun subscribe (Lio/matthewnelson/kmp/tor/runtime/core/TorEvent$Observer;)V

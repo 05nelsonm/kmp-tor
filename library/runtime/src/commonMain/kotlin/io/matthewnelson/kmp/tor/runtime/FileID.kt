@@ -65,12 +65,21 @@ public interface FileID {
          *
          *     println(myFileIDClass)
          *     // MyFileIDClass[fid=ABCD…1234]@178263541
+         *
+         * @param [defaultClassName] If the implementing class does
+         *   not have a simple name (e.g. an Anonymous object),
+         *   this will be utilized. Default: Unknown.
+         * @param [includeHashCode] true to append the implementing
+         *   class' [hashCode], false to omit it. Default: true.
          * */
         @JvmStatic
         @JvmOverloads
         @JvmName("fidString")
-        public fun FileID.toFIDString(includeHashCode: Boolean = true): String {
-            val name = this::class.simpleName ?: "Unknown"
+        public fun FileID.toFIDString(
+            defaultClassName: String = "Unknown",
+            includeHashCode: Boolean = true,
+        ): String {
+            val name = this::class.simpleName ?: defaultClassName
             return name + "[fid=" + fidEllipses + ']' + if (includeHashCode) '@' + hashCode() else ""
         }
 

@@ -158,18 +158,28 @@ public class Lifecycle: Destroyable {
     }
 
     /**
-     * A wrapper around [TorRuntime] which adds ability to destroy the
-     * instance. Is only available if using [TorRuntime.ServiceFactory].
+     * A wrapper around the [TorRuntime] implementation which adds
+     * the ability to destroy the instance. Is only available if
+     * using the [TorRuntime.ServiceFactory] API.
      *
-     * **NOTE:** This instance utilizes [OnEvent.Executor.Immediate] and
-     * not whatever was declared for [TorRuntime.Builder.defaultEventExecutor].
+     * **NOTE:** Any observers subscribed to this instance will use
+     * [OnEvent.Executor.Immediate] as their default, and not what was
+     * defined for [TorRuntime.Builder.defaultEventExecutor]. If this
+     * is undesirable, define an [OnEvent.Executor] for your service
+     * implementation's observer(s) individually.
      * */
     public class DestroyableTorRuntime private constructor(
         private val lifecycle: Lifecycle,
         private val runtime: RealTorRuntime,
     ): TorRuntime by runtime, Destroyable by lifecycle {
 
-        public fun invokeOnCompletion(
+        /**
+         * Attaches a callback handle to the lifecycle which
+         * will be invoked when [destroy] is called.
+         *
+         * @see [QueuedJob.invokeOnCompletion]
+         * */
+        public fun invokeOnDestroy(
             handle: ItBlock<Any?>,
         ): Disposable = lifecycle.job.invokeOnCompletion(handle)
 
