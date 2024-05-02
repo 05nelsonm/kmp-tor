@@ -80,7 +80,7 @@ import kotlin.jvm.JvmField
  * @see [io.matthewnelson.kmp.tor.runtime.core.TorEvent]
  * @see [io.matthewnelson.kmp.tor.runtime.RuntimeEvent]
  * */
-public abstract class Event<Data: Any, E: Event<Data, E, O>, O: Event.Observer<Data, E>> protected constructor(
+public abstract class Event<Data: Any?, E: Event<Data, E, O>, O: Event.Observer<Data, E>> protected constructor(
     @JvmField
     public val name: String,
 ) {
@@ -181,7 +181,7 @@ public abstract class Event<Data: Any, E: Event<Data, E, O>, O: Event.Observer<D
      *   the Event processor implementation will be utilized.
      * @param [onEvent] The callback to pass event data to.
      * */
-    public abstract class Observer<Data: Any, E: Event<Data, E, *>> protected constructor(
+    public abstract class Observer<Data: Any?, E: Event<Data, E, *>> protected constructor(
         @JvmField
         public val event: E,
         tag: String?,

@@ -70,7 +70,7 @@ internal class RealTorRuntime private constructor(
         + handler
     )
 
-    private val connectivity = ConnectivityObserver()
+    private val connectivity = if (networkObserver == NetworkObserver.noOp()) null else ConnectivityObserver()
 
     @Suppress("PrivatePropertyName")
     private val NOTIFIER = object : Notifier {
@@ -136,9 +136,9 @@ internal class RealTorRuntime private constructor(
         if (!super.onDestroy()) return false
         scope.cancel()
         NOTIFIER.d(this, "Scope Cancelled")
-        if (networkObserver != NetworkObserver.noOp()) {
-            networkObserver.unsubscribe(connectivity)
-            NOTIFIER.lce(Lifecycle.Event.OnUnsubscribed(connectivity))
+        connectivity?.let { observer ->
+            networkObserver.unsubscribe(observer)
+            NOTIFIER.lce(Lifecycle.Event.OnUnsubscribed(observer))
         }
         NOTIFIER.lce(Lifecycle.Event.OnDestroy(this))
         return true
@@ -149,9 +149,9 @@ internal class RealTorRuntime private constructor(
     init {
         NOTIFIER.lce(Lifecycle.Event.OnCreate(this))
 
-        if (networkObserver != NetworkObserver.noOp()) {
-            networkObserver.subscribe(connectivity)
-            NOTIFIER.lce(Lifecycle.Event.OnSubscribed(connectivity))
+        connectivity?.let { observer ->
+            networkObserver.subscribe(observer)
+            NOTIFIER.lce(Lifecycle.Event.OnSubscribed(observer))
         }
     }
 

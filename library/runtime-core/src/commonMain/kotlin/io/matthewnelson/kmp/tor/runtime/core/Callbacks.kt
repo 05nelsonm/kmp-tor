@@ -79,20 +79,19 @@ public fun interface OnFailure: ItBlock<Throwable> {
 }
 
 /**
- * A callback for dispatching events.
+ * A callback for dispatching event data.
  *
  * Implementations of [OnEvent] should not throw exception,
  * be fast, and non-blocking.
  *
  * **NOTE:** If [OnEvent] is being utilized with `TorRuntime` APIs,
  * exceptions will be treated as an [UncaughtException] and dispatched
- * to [io.matthewnelson.kmp.tor.runtime.RuntimeEvent.ERROR]
- * observers.
+ * to [io.matthewnelson.kmp.tor.runtime.RuntimeEvent.ERROR].
  *
  * @see [OnEvent.noOp]
  * @see [OnEvent.Executor]
  * */
-public fun interface OnEvent<in It: Any>: ItBlock<It> {
+public fun interface OnEvent<in Data: Any?>: ItBlock<Data> {
 
     public companion object {
 
@@ -102,7 +101,7 @@ public fun interface OnEvent<in It: Any>: ItBlock<It> {
          * protected notify function.
          * */
         @JvmStatic
-        public fun <T: Any> noOp(): OnEvent<T> = NOOP
+        public fun <Data: Any?> noOp(): OnEvent<Data> = NOOP
     }
 
     /**
@@ -185,8 +184,8 @@ public fun interface OnEvent<in It: Any>: ItBlock<It> {
         }
     }
 
-    private data object NOOP: OnEvent<Any> {
-        override fun invoke(it: Any) {}
+    private data object NOOP: OnEvent<Any?> {
+        override fun invoke(it: Any?) {}
         override fun toString(): String = "OnEvent.NOOP"
     }
 }
