@@ -51,7 +51,7 @@ public final class io/matthewnelson/kmp/tor/runtime/ctrl/TempTorCmdQueue : io/ma
 	public final fun attach (Lio/matthewnelson/kmp/tor/runtime/ctrl/TorCtrl;)V
 	public final fun connection ()Lio/matthewnelson/kmp/tor/runtime/ctrl/TorCtrl;
 	public fun destroy ()V
-	public fun enqueue (Lio/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$Unprivileged;Lio/matthewnelson/kmp/tor/runtime/core/ItBlock;Lio/matthewnelson/kmp/tor/runtime/core/ItBlock;)Lio/matthewnelson/kmp/tor/runtime/core/QueuedJob;
+	public fun enqueue (Lio/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$Unprivileged;Lio/matthewnelson/kmp/tor/runtime/core/OnFailure;Lio/matthewnelson/kmp/tor/runtime/core/OnSuccess;)Lio/matthewnelson/kmp/tor/runtime/core/QueuedJob;
 	public fun isDestroyed ()Z
 }
 

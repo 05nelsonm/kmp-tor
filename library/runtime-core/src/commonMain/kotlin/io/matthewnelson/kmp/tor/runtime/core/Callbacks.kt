@@ -34,7 +34,7 @@ import kotlin.jvm.JvmStatic
  * to [io.matthewnelson.kmp.tor.runtime.RuntimeEvent.ERROR]
  * observers.
  * */
-public typealias OnSuccess<T> = ItBlock<T>
+public fun interface OnSuccess<in T: Any?>: ItBlock<T>
 
 /**
  * An alias of [ItBlock] indicating a callback for
@@ -47,7 +47,7 @@ public typealias OnSuccess<T> = ItBlock<T>
  * to [io.matthewnelson.kmp.tor.runtime.RuntimeEvent.ERROR]
  * observers.
  * */
-public typealias OnFailure = ItBlock<Throwable>
+public fun interface OnFailure: ItBlock<Throwable>
 
 /**
  * A callback for dispatching events.
@@ -69,7 +69,7 @@ public fun interface OnEvent<in It: Any>: ItBlock<It> {
 
         /**
          * A non-operational, static instance of [OnEvent]. Useful
-         * for classes that inherit from an observer and override
+         * for classes that inherit from an [Event.Observer] and override
          * protected notify function.
          * */
         @JvmStatic

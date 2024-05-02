@@ -248,7 +248,7 @@ public sealed class RuntimeEvent<Data: Any> private constructor(
         }
     }
 
-    protected override fun factory(
+    protected final override fun factory(
         event: RuntimeEvent<Data>,
         tag: String?,
         executor: OnEvent.Executor?,

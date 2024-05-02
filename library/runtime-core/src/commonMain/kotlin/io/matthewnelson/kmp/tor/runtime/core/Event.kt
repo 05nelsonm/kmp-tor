@@ -173,6 +173,13 @@ public abstract class Event<Data: Any, E: Event<Data, E, O>, O: Event.Observer<D
 
     /**
      * Base abstraction for creating event observer types.
+     *
+     * @param [event] The event being observed.
+     * @param [tag] A string to help grouping/identifying observer(s).
+     * @param [executor] The thread context in which onEvent will be
+     *   invoked in. If null, the default passed to [notify] from
+     *   the Event processor implementation will be utilized.
+     * @param [onEvent] The callback to pass event data to.
      * */
     public abstract class Observer<Data: Any, E: Event<Data, E, *>> protected constructor(
         @JvmField
@@ -225,6 +232,10 @@ public abstract class Event<Data: Any, E: Event<Data, E, O>, O: Event.Observer<D
 
         public final override fun toString(): String = toString(isStatic = false)
 
+        /**
+         * Helper for processor implementations as to not expose a
+         * static tag externally.
+         * */
         public fun toString(isStatic: Boolean): String = buildString {
             val tag = if (tag != null && isStatic) "STATIC" else tag
 
@@ -248,6 +259,10 @@ public abstract class Event<Data: Any, E: Event<Data, E, O>, O: Event.Observer<D
         }
     }
 
+    /**
+     * Protected factory function for creating instances
+     * of the [Event.Observer] implementation.
+     * */
     protected abstract fun factory(
         event: E,
         tag: String?,
@@ -261,6 +276,9 @@ public abstract class Event<Data: Any, E: Event<Data, E, O>, O: Event.Observer<D
      * Functions are `protected` to selectively expose what is necessary
      * by overriding and changing visibility to `public` along with
      * the @JvmStatic annotation.
+     *
+     * @param [numEvents] The number of event types to use as an initial
+     *   capacity value for the LinkedHashSet used for [lazyEntries].
      * */
     public abstract class Entries<E: Event<*, *, *>> protected constructor(numEvents: Int) {
 
