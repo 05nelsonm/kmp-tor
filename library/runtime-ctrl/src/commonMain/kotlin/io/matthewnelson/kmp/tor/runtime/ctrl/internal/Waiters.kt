@@ -18,7 +18,7 @@
 package io.matthewnelson.kmp.tor.runtime.ctrl.internal
 
 import io.matthewnelson.kmp.tor.runtime.core.Destroyable
-import io.matthewnelson.kmp.tor.runtime.core.Destroyable.Companion.checkDestroy
+import io.matthewnelson.kmp.tor.runtime.core.Destroyable.Companion.checkIsNotDestroyed
 import io.matthewnelson.kmp.tor.runtime.core.ctrl.Reply
 import io.matthewnelson.kmp.tor.runtime.ctrl.internal.Debugger.Companion.d
 import kotlinx.coroutines.delay
@@ -50,10 +50,10 @@ internal class Waiters(private val LOG: () -> Debugger?): Destroyable {
 
     @Throws(IllegalStateException::class)
     internal fun respondNext(replies: ArrayList<Reply>) {
-        checkDestroy()
+        checkIsNotDestroyed()
 
         val waiter = lock.withLock {
-            checkDestroy()
+            checkIsNotDestroyed()
             waiters.removeFirstOrNull()
         }
 
@@ -69,10 +69,10 @@ internal class Waiters(private val LOG: () -> Debugger?): Destroyable {
     internal suspend fun create(
         writeCmd: suspend () -> Unit,
     ): Wait {
-        checkDestroy()
+        checkIsNotDestroyed()
 
         val waiter = lock.withLockAsync {
-            checkDestroy()
+            checkIsNotDestroyed()
             writeCmd()
             val w = Waiter()
             waiters.add(w)

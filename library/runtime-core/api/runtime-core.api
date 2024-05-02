@@ -6,13 +6,13 @@ public final class io/matthewnelson/kmp/tor/runtime/core/BlocksKt {
 
 public abstract interface class io/matthewnelson/kmp/tor/runtime/core/Destroyable {
 	public static final field Companion Lio/matthewnelson/kmp/tor/runtime/core/Destroyable$Companion;
-	public static fun checkDestroy (Lio/matthewnelson/kmp/tor/runtime/core/Destroyable;)V
+	public static fun checkIsNotDestroyed (Lio/matthewnelson/kmp/tor/runtime/core/Destroyable;)V
 	public abstract fun destroy ()V
 	public abstract fun isDestroyed ()Z
 }
 
 public final class io/matthewnelson/kmp/tor/runtime/core/Destroyable$Companion {
-	public final fun checkDestroy (Lio/matthewnelson/kmp/tor/runtime/core/Destroyable;)V
+	public final fun checkIsNotDestroyed (Lio/matthewnelson/kmp/tor/runtime/core/Destroyable;)V
 }
 
 public abstract interface class io/matthewnelson/kmp/tor/runtime/core/Disposable {

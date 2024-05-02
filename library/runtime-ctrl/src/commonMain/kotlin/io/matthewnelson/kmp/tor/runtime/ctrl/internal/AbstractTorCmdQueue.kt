@@ -19,7 +19,7 @@ import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
 import io.matthewnelson.kmp.tor.core.resource.SynchronizedObject
 import io.matthewnelson.kmp.tor.core.resource.synchronized
 import io.matthewnelson.kmp.tor.runtime.core.*
-import io.matthewnelson.kmp.tor.runtime.core.Destroyable.Companion.checkDestroy
+import io.matthewnelson.kmp.tor.runtime.core.Destroyable.Companion.checkIsNotDestroyed
 import io.matthewnelson.kmp.tor.runtime.core.UncaughtException.Handler.Companion.withSuppression
 import io.matthewnelson.kmp.tor.runtime.core.ctrl.TorCmd
 import io.matthewnelson.kmp.tor.runtime.ctrl.AbstractTorEventProcessor
@@ -64,13 +64,13 @@ internal abstract class AbstractTorCmdQueue internal constructor(
     @JvmSynthetic
     @Throws(IllegalStateException::class)
     internal fun transferAllUnprivileged(queue: ArrayList<TorCmdJob<*>>) {
-        checkDestroy()
+        checkIsNotDestroyed()
         if (queue.isEmpty()) return
 
         var start = false
 
         synchronized(lock) {
-            checkDestroy()
+            checkIsNotDestroyed()
 
             val i = queue.iterator()
             while (i.hasNext()) {

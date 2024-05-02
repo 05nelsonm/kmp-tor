@@ -24,11 +24,16 @@ public interface Destroyable {
 
     public companion object {
 
+        /**
+         * Checks if a [Destroyable] instance has been destroyed or not.
+         *
+         * @throws [IllegalStateException] If [isDestroyed] is true.
+         * */
         @JvmStatic
         @Throws(IllegalStateException::class)
-        public fun Destroyable.checkDestroy() {
+        public fun Destroyable.checkIsNotDestroyed() {
             if (!isDestroyed()) return
-            val name = this::class.simpleName ?: "UnknownClass"
+            val name = this::class.simpleName ?: "Unknown"
             throw IllegalStateException("$name.isDestroyed[true]")
         }
     }

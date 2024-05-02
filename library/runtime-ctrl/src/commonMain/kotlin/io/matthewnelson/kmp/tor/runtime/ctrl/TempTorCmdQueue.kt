@@ -19,7 +19,7 @@ import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
 import io.matthewnelson.kmp.tor.core.resource.SynchronizedObject
 import io.matthewnelson.kmp.tor.core.resource.synchronized
 import io.matthewnelson.kmp.tor.runtime.core.*
-import io.matthewnelson.kmp.tor.runtime.core.Destroyable.Companion.checkDestroy
+import io.matthewnelson.kmp.tor.runtime.core.Destroyable.Companion.checkIsNotDestroyed
 import io.matthewnelson.kmp.tor.runtime.core.ctrl.TorCmd
 import io.matthewnelson.kmp.tor.runtime.ctrl.internal.*
 import kotlin.concurrent.Volatile
@@ -56,12 +56,12 @@ public class TempTorCmdQueue private constructor(
 
     @Throws(IllegalArgumentException::class, IllegalStateException::class)
     public fun attach(connection: TorCtrl) {
-        checkDestroy()
+        checkIsNotDestroyed()
         require(connection is AbstractTorCtrl) { "TorCtrl must implement ${AbstractTorCtrl::class.simpleName}" }
 
         synchronized(lock) {
             check(_connection == null) { "TorCtrl is already attached" }
-            checkDestroy()
+            checkIsNotDestroyed()
             connection.transferAllUnprivileged(queue)
             _connection = connection
         }
