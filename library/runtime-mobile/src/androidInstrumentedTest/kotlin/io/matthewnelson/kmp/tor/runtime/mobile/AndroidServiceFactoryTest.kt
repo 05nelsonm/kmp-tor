@@ -45,7 +45,7 @@ class AndroidServiceFactoryTest {
         }
 
         assertEquals("AndroidServiceFactory", factory::class.simpleName)
-        val lce = lces.filter { it.clazz == "AndroidServiceFactory" }
+        val lce = lces.filter { it.className == "AndroidServiceFactory" }
         assertEquals(1, lce.size)
         assertEquals(Lifecycle.Event.Name.OnCreate, lce.first().name)
 

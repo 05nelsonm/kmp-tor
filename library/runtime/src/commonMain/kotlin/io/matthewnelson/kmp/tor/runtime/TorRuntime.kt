@@ -35,7 +35,7 @@ import io.matthewnelson.kmp.tor.runtime.core.ctrl.TorCmd
 import io.matthewnelson.kmp.tor.runtime.core.util.isAvailableAsync
 import io.matthewnelson.kmp.tor.runtime.internal.InstanceKeeper
 import io.matthewnelson.kmp.tor.runtime.internal.RealTorRuntime
-import io.matthewnelson.kmp.tor.runtime.internal.RealTorRuntime.ServiceCtrl
+import io.matthewnelson.kmp.tor.runtime.internal.ServiceFactoryCtrl
 import io.matthewnelson.kmp.tor.runtime.internal.TorConfigGenerator
 import org.kotlincrypto.SecRandomCopyException
 import org.kotlincrypto.SecureRandom
@@ -485,14 +485,7 @@ public interface TorRuntime:
      * @see [Lifecycle.DestroyableTorRuntime]
      * */
     @ExperimentalKmpTorApi
-    public abstract class ServiceFactory private constructor(private val ctrl: ServiceCtrl): TorRuntime {
-
-        /**
-         * Will throw [IllegalStateException] if [Initializer] is being utilized
-         * more than once.
-         * */
-        @Throws(IllegalStateException::class)
-        protected constructor(initializer: Initializer): this(initializer.get())
+    public abstract class ServiceFactory protected constructor(initializer: Initializer): TorRuntime {
 
         /**
          * Helper for loading the implementation of [ServiceFactory].
@@ -512,7 +505,9 @@ public interface TorRuntime:
          * result in [IllegalStateException] as the [ServiceFactory] implementation
          * is a held as a singleton for the given [Environment] it belongs to.
          * */
-        public class Initializer private constructor(private val ctrl: ServiceCtrl) {
+        public class Initializer private constructor(
+            private val ctrl: (startService: () -> Unit) -> ServiceFactoryCtrl,
+        ) {
 
             @Volatile
             private var _isInitialized: Boolean = false
@@ -522,16 +517,23 @@ public interface TorRuntime:
             @JvmSynthetic
             @OptIn(InternalKmpTorApi::class)
             @Throws(IllegalStateException::class)
-            internal fun get(): ServiceCtrl = synchronized(lock) {
-                check(!_isInitialized) { "TorRuntime.ServiceFactory.Initializer can only be used once" }
+            internal fun initialize(
+                startService: () -> Unit,
+            ): ServiceFactoryCtrl = synchronized(lock) {
+                check(!_isInitialized) {
+                    "TorRuntime.ServiceFactory.Initializer can only be initialized once"
+                }
+
                 _isInitialized = true
-                ctrl
+                ctrl(startService)
             }
 
             internal companion object {
 
                 @JvmSynthetic
-                internal fun of(ctrl: ServiceCtrl): Initializer = Initializer(ctrl)
+                internal fun of(
+                    ctrl: (startService: () -> Unit) -> ServiceFactoryCtrl,
+                ): Initializer = Initializer(ctrl)
             }
         }
 
@@ -545,11 +547,13 @@ public interface TorRuntime:
             ): Lifecycle.DestroyableTorRuntime
         }
 
-        @JvmField
-        protected val binder: Binder = ctrl.binder()
-
         @Throws(RuntimeException::class)
         protected abstract fun startService()
+
+        private val ctrl: ServiceFactoryCtrl = initializer.initialize(::startService)
+
+        @JvmField
+        protected val binder: Binder = ctrl.binder
 
         public final override val fid: String = ctrl.fid
         public final override fun environment(): Environment = ctrl.environment()
@@ -564,7 +568,7 @@ public interface TorRuntime:
             action: Action,
             onFailure: OnFailure,
             onSuccess: OnSuccess<Unit>,
-        ): QueuedJob = ctrl.enqueue(::startService, action, onFailure, onSuccess)
+        ): QueuedJob = ctrl.enqueue(action, onFailure, onSuccess)
 
         public final override fun subscribe(observer: TorEvent.Observer) {
             ctrl.subscribe(observer)

@@ -47,13 +47,13 @@ internal class RealTorRuntime private constructor(
     defaultExecutor: OnEvent.Executor,
     @Suppress("RemoveRedundantQualifierName")
     observersRuntimeEvent: Set<RuntimeEvent.Observer<*>>,
-): AbstractRuntimeEventProcessor(
+):  AbstractRuntimeEventProcessor(
     generator.environment.staticTag(),
     observersRuntimeEvent,
     defaultExecutor,
     observersTorEvent,
-), FileID by generator,
-   TorRuntime
+),  FileID by generator,
+    TorRuntime
 {
 
     private var lifecycle: Destroyable? = null
@@ -129,7 +129,7 @@ internal class RealTorRuntime private constructor(
 
     protected override fun onDestroy(): Boolean {
         if (!isService) {
-            LOG.WARN.notifyObservers("onDestroy called but isService is false")
+            NOTIFIER.w(this, "onDestroy called but isService is false")
             return false
         }
 
@@ -187,19 +187,23 @@ internal class RealTorRuntime private constructor(
             defaultExecutor: OnEvent.Executor,
             observersRuntimeEvent: Set<RuntimeEvent.Observer<*>>,
         ): TorRuntime = generator.environment.serviceFactoryLoader()?.let { loader ->
-            val ctrl = ServiceCtrl.of(
-                generator,
-                networkObserver,
-                requiredTorEvents,
-                observersTorEvent,
-                defaultExecutor,
-                observersRuntimeEvent,
-            )
+            var n: Notifier? = null
 
-            val initializer = TorRuntime.ServiceFactory.Initializer.of(ctrl)
+            val initializer = TorRuntime.ServiceFactory.Initializer.of { startService ->
+                RealServiceFactoryCtrl(
+                    generator,
+                    networkObserver,
+                    requiredTorEvents,
+                    observersTorEvent,
+                    defaultExecutor,
+                    observersRuntimeEvent,
+                    startService,
+                ).also { n = it }
+            }
+
             val factory = loader.load(initializer)
 
-            ctrl.binder().lce(Lifecycle.Event.OnCreate(factory))
+            n?.lce(Lifecycle.Event.OnCreate(factory))
 
             factory
         } ?: RealTorRuntime(
@@ -214,7 +218,7 @@ internal class RealTorRuntime private constructor(
         )
     }
 
-    internal class ServiceCtrl private constructor(
+    private class RealServiceFactoryCtrl(
         private val generator: TorConfigGenerator,
         private val builderObserver: NetworkObserver,
         builderRequiredEvents: Set<TorEvent>,
@@ -222,13 +226,15 @@ internal class RealTorRuntime private constructor(
         defaultExecutor: OnEvent.Executor,
         @Suppress("RemoveRedundantQualifierName")
         observersRuntimeEvent: Set<RuntimeEvent.Observer<*>>,
-    ): AbstractRuntimeEventProcessor(
+        private val startService: () -> Unit,
+    ):  AbstractRuntimeEventProcessor(
         generator.environment.staticTag(),
         observersRuntimeEvent,
         defaultExecutor,
         observersTorEvent
-    ), FileID by generator,
-       TorCmd.Unprivileged.Processor
+    ),  ServiceFactoryCtrl,
+        FileID by generator,
+        Notifier
     {
 
         private val builderRequiredEvents = builderRequiredEvents.toImmutableSet()
@@ -239,12 +245,9 @@ internal class RealTorRuntime private constructor(
         // to create an unused dispatcher for Jvm & Native
         private val dispatcher by lazy { generator.environment.newRuntimeDispatcher() }
 
-        private val _binder = ServiceBinder()
+        override val binder: ServiceCtrlBinder = ServiceCtrlBinder()
 
-        @JvmSynthetic
-        internal fun binder(): TorRuntime.ServiceFactory.Binder = _binder
-        @JvmSynthetic
-        internal fun environment(): TorRuntime.Environment = generator.environment
+        public override fun environment(): TorRuntime.Environment = generator.environment
 
         // TODO
         public override fun <Success : Any> enqueue(
@@ -254,15 +257,17 @@ internal class RealTorRuntime private constructor(
         ): QueuedJob = onFailure.toImmediateErrorJob(cmd.keyword, NotImplementedError(), handler)
 
         // TODO
-        @JvmSynthetic
-        internal fun enqueue(
-            startService: () -> Unit,
+        public override fun enqueue(
             action: Action,
             onFailure: OnFailure,
             onSuccess: OnSuccess<Unit>,
         ): QueuedJob = onFailure.toImmediateErrorJob(action.name, NotImplementedError(), handler)
 
-        private inner class ServiceBinder: TorRuntime.ServiceFactory.Binder, FileID by this {
+        public override fun <Data: Any, E: RuntimeEvent<Data>> notify(event: E, data: Data) {
+            event.notifyObservers(data)
+        }
+
+        private inner class ServiceCtrlBinder: TorRuntime.ServiceFactory.Binder, FileID by this, Notifier by this {
 
             @Volatile
             private var _instance: Lifecycle.DestroyableTorRuntime? = null
@@ -346,36 +351,13 @@ internal class RealTorRuntime private constructor(
                 return destroyable
             }
 
-            public override fun <Data: Any, E: RuntimeEvent<Data>> notify(event: E, data: Data) { event.notifyObservers(data) }
-
-            public override fun equals(other: Any?): Boolean = other is ServiceBinder && other.hashCode() == hashCode()
-            public override fun hashCode(): Int = this@ServiceCtrl.hashCode()
+            public override fun equals(other: Any?): Boolean = other is ServiceCtrlBinder && other.hashCode() == hashCode()
+            public override fun hashCode(): Int = this@RealServiceFactoryCtrl.hashCode()
             public override fun toString(): String = toFIDString(includeHashCode = false)
         }
 
         init {
-            binder().lce(Lifecycle.Event.OnCreate(this))
-        }
-
-        internal companion object {
-
-            @JvmSynthetic
-            internal fun of(
-                generator: TorConfigGenerator,
-                builderObserver: NetworkObserver,
-                builderRequiredEvents: Set<TorEvent>,
-                observersTorEvent: Set<TorEvent.Observer>,
-                defaultExecutor: OnEvent.Executor,
-                @Suppress("RemoveRedundantQualifierName")
-                observersRuntimeEvent: Set<RuntimeEvent.Observer<*>>,
-            ): ServiceCtrl = ServiceCtrl(
-                generator,
-                builderObserver,
-                builderRequiredEvents,
-                observersTorEvent,
-                defaultExecutor,
-                observersRuntimeEvent,
-            )
+            lce(Lifecycle.Event.OnCreate(this))
         }
     }
 }

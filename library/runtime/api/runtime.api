@@ -114,7 +114,7 @@ public final class io/matthewnelson/kmp/tor/runtime/Lifecycle$DestroyableTorRunt
 
 public final class io/matthewnelson/kmp/tor/runtime/Lifecycle$Event {
 	public static final field Companion Lio/matthewnelson/kmp/tor/runtime/Lifecycle$Event$Companion;
-	public final field clazz Ljava/lang/String;
+	public final field className Ljava/lang/String;
 	public final field fid Ljava/lang/String;
 	public final field hash I
 	public final field name Lio/matthewnelson/kmp/tor/runtime/Lifecycle$Event$Name;
@@ -368,7 +368,7 @@ public abstract interface class io/matthewnelson/kmp/tor/runtime/TorRuntime$Serv
 }
 
 public final class io/matthewnelson/kmp/tor/runtime/TorRuntime$ServiceFactory$Initializer {
-	public synthetic fun <init> (Lio/matthewnelson/kmp/tor/runtime/internal/RealTorRuntime$ServiceCtrl;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public synthetic fun <init> (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
 }
 
 public abstract class io/matthewnelson/kmp/tor/runtime/TorRuntime$ServiceFactory$Loader {

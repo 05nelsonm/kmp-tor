@@ -18,7 +18,9 @@ package io.matthewnelson.kmp.tor.runtime
 import io.matthewnelson.kmp.file.toFile
 import io.matthewnelson.kmp.tor.core.api.ResourceInstaller
 import io.matthewnelson.kmp.tor.core.api.annotation.ExperimentalKmpTorApi
+import io.matthewnelson.kmp.tor.runtime.FileID.Companion.fidEllipses
 import io.matthewnelson.kmp.tor.runtime.core.TorEvent
+import io.matthewnelson.kmp.tor.runtime.internal.RealTorRuntime
 import kotlin.test.*
 
 @OptIn(ExperimentalKmpTorApi::class)
@@ -49,8 +51,21 @@ class ServiceFactoryUnitTest {
 
     @Test
     fun givenEnvironment_whenServiceFactoryLoader_thenCreatesServiceFactory() {
-        val runtime = TorRuntime.Builder(env) {}
+        val lces = mutableListOf<Lifecycle.Event>()
+        val runtime = TorRuntime.Builder(env) {
+            observer(RuntimeEvent.LIFECYCLE.observer { lces.add(it) })
+        }
+
         assertIs<TestFactory>(runtime)
+        assertEquals(2, lces.size)
+        assertEquals("RealServiceFactoryCtrl", lces.first().className)
+        assertEquals(TestFactory::class.simpleName, lces.last().className)
+
+        lces.forEach { lce ->
+            assertEquals(Lifecycle.Event.Name.OnCreate, lce.name)
+            assertEquals(runtime.fidEllipses, lce.fid)
+            assertEquals(runtime.hashCode(), lce.hash)
+        }
     }
 
     @Test

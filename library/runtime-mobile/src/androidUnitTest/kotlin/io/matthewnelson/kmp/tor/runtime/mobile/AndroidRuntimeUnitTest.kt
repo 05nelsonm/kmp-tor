@@ -42,7 +42,7 @@ class AndroidRuntimeUnitTest {
         }
 
         assertEquals("RealTorRuntime", runtime::class.simpleName)
-        val lce = lces.filter { it.clazz == "RealTorRuntime" }
+        val lce = lces.filter { it.className == "RealTorRuntime" }
         assertEquals(1, lce.size)
         assertEquals(Lifecycle.Event.Name.OnCreate, lce.first().name)
 

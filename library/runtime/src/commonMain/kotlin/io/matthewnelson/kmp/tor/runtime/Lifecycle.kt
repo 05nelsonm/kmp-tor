@@ -36,10 +36,10 @@ public class Lifecycle: Destroyable {
          * The object class name
          * */
         @JvmField
-        public val clazz: String,
+        public val className: String,
 
         /**
-         * The object [FileID.fidEllipses].
+         * The object [fidEllipses].
          *
          * If the object was not an instance of [FileID], the
          * value will be null.
@@ -48,7 +48,7 @@ public class Lifecycle: Destroyable {
         public val fid: String?,
 
         /**
-         * The object hash code
+         * The object hashCode
          * */
         @JvmField
         public val hash: Int,
@@ -130,7 +130,7 @@ public class Lifecycle: Destroyable {
 
         override fun equals(other: Any?): Boolean {
             return  other is Event
-                    && other.clazz == clazz
+                    && other.className == className
                     && other.fid == fid
                     && other.hash == hash
                     && other.name == name
@@ -138,7 +138,7 @@ public class Lifecycle: Destroyable {
 
         override fun hashCode(): Int {
             var result = 17
-            result = result * 31 + clazz.hashCode()
+            result = result * 31 + className.hashCode()
             result = result * 31 + fid.hashCode()
             result = result * 31 + hash
             result = result * 31 + name.hashCode()
@@ -146,8 +146,8 @@ public class Lifecycle: Destroyable {
         }
 
         override fun toString(): String = buildString {
-            append("Lifecycle.Event[class=")
-            append(clazz)
+            append("Lifecycle.Event[obj=")
+            append(className)
             if (fid != null) {
                 append("[fid=")
                 append(fid)
