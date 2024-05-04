@@ -30,25 +30,43 @@ public abstract class ActionJob private constructor(
 ): QueuedJob(action.name, onFailure, handler) {
 
     @get:JvmName("isStart")
-    public val isStart: Boolean get() = this is Start
+    public val isStart: Boolean get() = this is StartJob
     @get:JvmName("isStop")
-    public val isStop: Boolean get() = this is Stop
+    public val isStop: Boolean get() = this is StopJob
     @get:JvmName("isRestart")
-    public val isRestart: Boolean get() = this is Restart
+    public val isRestart: Boolean get() = this is RestartJob
 
-    internal open class Start internal constructor(
+    internal class StartJob internal constructor(
         onSuccess: OnSuccess<Unit>,
         onFailure: OnFailure,
         handler: UncaughtException.Handler,
-    ): Sealed(Action.StartDaemon, onSuccess, onFailure, handler)
+        private val isStartService: Boolean = false,
+    ): Sealed(Action.StartDaemon, onSuccess, onFailure, handler) {
 
-    internal open class Stop internal constructor(
+        @JvmSynthetic
+        @Throws(IllegalStateException::class)
+        internal override fun executing() {
+            // When RealTorRuntime goes to dequeue it, this will
+            // prevent it from throwing IllegalStateException such
+            // that it can be completed.
+            if (isStartService) return
+
+            super.executing()
+        }
+
+        init {
+            // non-cancellable
+            if (isStartService) onExecuting()
+        }
+    }
+
+    internal class StopJob internal constructor(
         onSuccess: OnSuccess<Unit>,
         onFailure: OnFailure,
         handler: UncaughtException.Handler,
     ): Sealed(Action.StopDaemon, onSuccess, onFailure, handler)
 
-    internal open class Restart internal constructor(
+    internal class RestartJob internal constructor(
         onSuccess: OnSuccess<Unit>,
         onFailure: OnFailure,
         handler: UncaughtException.Handler,
@@ -64,42 +82,24 @@ public abstract class ActionJob private constructor(
         @Volatile
         private var _onSuccess: OnSuccess<Unit>? = onSuccess
 
-        protected override fun onCancellation(cause: CancellationException?) { _onSuccess = null }
+        protected final override fun onCancellation(cause: CancellationException?) { _onSuccess = null }
 
         @JvmSynthetic
         @Throws(IllegalStateException::class)
         internal open fun executing() { onExecuting() }
 
         @JvmSynthetic
-        internal open fun error(cause: Throwable): Boolean {
+        internal fun error(cause: Throwable): Boolean {
             return onError(cause, withLock = { _onSuccess = null })
         }
 
         @JvmSynthetic
-        internal open fun completion(): Boolean {
+        internal fun completion(): Boolean {
             return onCompletion(Unit, withLock = {
                 val onSuccess = _onSuccess
                 _onSuccess = null
                 onSuccess
             })
-        }
-
-        internal companion object {
-
-            @JvmSynthetic
-            internal fun of(
-                action: Action,
-                onSuccess: OnSuccess<Unit>,
-                onFailure: OnFailure,
-                handler: UncaughtException.Handler,
-            ): Sealed = when (action) {
-                Action.StartDaemon -> Start(onSuccess, onFailure, handler)
-                Action.StopDaemon -> Stop(onSuccess, onFailure, handler)
-                Action.RestartDaemon -> Restart(onSuccess, onFailure, handler)
-
-                // A result of expect/actual. Will never occur
-                else -> error("Action is not supported")
-            }
         }
     }
 }
