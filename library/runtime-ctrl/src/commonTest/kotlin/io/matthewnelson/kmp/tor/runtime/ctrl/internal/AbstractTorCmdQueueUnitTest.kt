@@ -16,6 +16,7 @@
 package io.matthewnelson.kmp.tor.runtime.ctrl.internal
 
 import io.matthewnelson.kmp.file.IOException
+import io.matthewnelson.kmp.file.InterruptedException
 import io.matthewnelson.kmp.tor.runtime.core.*
 import io.matthewnelson.kmp.tor.runtime.core.ctrl.TorCmd
 import io.matthewnelson.kmp.tor.runtime.core.ctrl.Reply
@@ -51,7 +52,7 @@ class AbstractTorCmdQueueUnitTest {
     }
 
     @Test
-    fun givenShutdownOrHalt_whenOtherCommands_thenAllAreCancelled() {
+    fun givenShutdownOrHalt_whenOtherCommands_thenAllAreInterrupted() {
         listOf(
             TorCmd.Signal.Halt,
             TorCmd.Signal.Shutdown,
@@ -90,9 +91,9 @@ class AbstractTorCmdQueueUnitTest {
             assertEquals(1, invocationSuccess)
             assertEquals(QueuedJob.State.Success, signalJob.state)
 
-            // cancellations are performed when dequeueNextOrNull is called
+            // Interruptions are performed when dequeueNextOrNull is called
             // which, in the test, is when processAll is invoked
-            jobs.forEach { job -> assertEquals(QueuedJob.State.Cancelled, job.state) }
+            jobs.forEach { job -> assertEquals(QueuedJob.State.Error, job.state) }
             assertEquals(jobs.size, invocationFailure)
         }
     }
@@ -143,7 +144,7 @@ class AbstractTorCmdQueueUnitTest {
 
         val onFailure = OnFailure {
             invocationFailure++
-            assertIs<CancellationException>(it)
+            assertIs<InterruptedException>(it)
 
             assertIsNot<TorCmdJob<Reply.Success.OK>>(queue.enqueue(TorCmd.Signal.Dump, {}, {}))
 

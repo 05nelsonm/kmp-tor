@@ -15,6 +15,7 @@
  **/
 package io.matthewnelson.kmp.tor.runtime.ctrl
 
+import io.matthewnelson.kmp.file.InterruptedException
 import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
 import io.matthewnelson.kmp.tor.core.resource.SynchronizedObject
 import io.matthewnelson.kmp.tor.core.resource.synchronized
@@ -82,8 +83,7 @@ public class TempTorCmdQueue private constructor(
         }
 
         if (!cancelAll) return
-        val cause = CancellationException("${this::class.simpleName}.onDestroy")
-        queue.cancelAndClearAll(cause, handler)
+        queue.interruptAndClearAll(message = "${this::class.simpleName}.onDestroy", handler)
     }
 
     public override fun <Success: Any> enqueue(

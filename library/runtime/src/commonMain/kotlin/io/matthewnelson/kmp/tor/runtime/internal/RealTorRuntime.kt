@@ -297,7 +297,7 @@ internal class RealTorRuntime private constructor(
                 var job: ActionJob.Sealed? = null
 
                 while (!destroyed && queueAction.isNotEmpty()) {
-                    // FILO
+                    // LIFO
                     job = queueAction.removeLast()
 
                     try {

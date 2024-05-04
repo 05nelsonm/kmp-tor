@@ -16,6 +16,7 @@
 package io.matthewnelson.kmp.tor.runtime.ctrl.internal
 
 import io.matthewnelson.kmp.file.IOException
+import io.matthewnelson.kmp.file.InterruptedException
 import io.matthewnelson.kmp.tor.runtime.core.*
 import io.matthewnelson.kmp.tor.runtime.core.ctrl.TorCmd
 import io.matthewnelson.kmp.tor.runtime.ctrl.TorCtrl
@@ -35,7 +36,7 @@ class AbstractTorCtrlUnitTest {
     }
 
     @Test
-    fun given_when_then() {
+    fun givenOnDestroy_whenMultipleExceptions_thenAreSuppressed() {
         var invocationHandler = 0
         val handler = UncaughtException.Handler {
             invocationHandler++
@@ -50,8 +51,8 @@ class AbstractTorCtrlUnitTest {
             invocationDestroy++
             assertTrue(it.isDestroyed())
 
-            // cancellation should occur before completion handles
-            assertEquals(QueuedJob.State.Cancelled, job.state)
+            // interrupt should occur before completion handles
+            assertEquals(QueuedJob.State.Error, job.state)
 
             // check that destroy callbacks variable has
             // been de-referenced and cannot add anymore
@@ -68,7 +69,7 @@ class AbstractTorCtrlUnitTest {
             ctrl.destroy()
         } catch (e: UncaughtException) {
             // pass
-            assertIs<CancellationException>(e.cause)
+            assertIs<InterruptedException>(e.cause)
 
             val suppressed = e.suppressedExceptions
             assertEquals(1, suppressed.size)

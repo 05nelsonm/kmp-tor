@@ -25,7 +25,6 @@ import io.matthewnelson.kmp.tor.runtime.core.ctrl.TorCmd
 import io.matthewnelson.kmp.tor.runtime.ctrl.AbstractTorEventProcessor
 import io.matthewnelson.kmp.tor.runtime.ctrl.internal.Debugger.Companion.d
 import kotlin.concurrent.Volatile
-import kotlin.coroutines.cancellation.CancellationException
 import kotlin.jvm.JvmSynthetic
 
 @OptIn(InternalKmpTorApi::class)
@@ -40,7 +39,7 @@ internal abstract class AbstractTorCmdQueue internal constructor(
 {
 
     private val lock = SynchronizedObject()
-    private val queueCancellation = ArrayList<ItBlock<UncaughtException.Handler>>(1)
+    private val queueInterrupt = ArrayList<ItBlock<UncaughtException.Handler>>(1)
     private val queueExecute = ArrayList<TorCmdJob<*>>(1)
     @Volatile
     @Suppress("PropertyName")
@@ -106,11 +105,10 @@ internal abstract class AbstractTorCmdQueue internal constructor(
             }?.let { signal ->
                 if (queueExecute.isEmpty()) return@let
 
-                val cancellations = ArrayList(queueExecute)
-                val cause = CancellationException("${cmd.keyword} $signal")
+                val interrupts = ArrayList(queueExecute)
 
-                queueCancellation.add(ItBlock { handler ->
-                    cancellations.cancelAndClearAll(cause, handler)
+                queueInterrupt.add(ItBlock { handler ->
+                    interrupts.interruptAndClearAll(message = "${cmd.keyword} $signal", handler)
                 })
 
                 queueExecute.clear()
@@ -156,8 +154,6 @@ internal abstract class AbstractTorCmdQueue internal constructor(
         val wasDestroyed = super.onDestroy()
 
         if (wasDestroyed) {
-            val cause = CancellationException("AbstractTorCmdQueue.onDestroy")
-
             handler.withSuppression {
                 doCancellations(this)
 
@@ -170,8 +166,8 @@ internal abstract class AbstractTorCmdQueue internal constructor(
                     // before cancelling them.
                     ArrayList(queueExecute).also { queueExecute.clear() }
                 }?.also {
-                    LOG.d { "Cancelling QueuedJobs" }
-                }?.cancelAndClearAll(cause, this)
+                    LOG.d { "Interrupting QueuedJobs" }
+                }?.interruptAndClearAll(message = "${this::class.simpleName}.onDestroy", this)
             }
         }
 
@@ -179,16 +175,18 @@ internal abstract class AbstractTorCmdQueue internal constructor(
     }
 
     private fun doCancellations(handler: UncaughtException.Handler) {
-        val cancellations = synchronized(lock) {
-            if (queueCancellation.isEmpty()) return@synchronized null
-            ArrayList(queueCancellation).also { queueCancellation.clear() }
+        val interrupts = synchronized(lock) {
+            if (queueInterrupt.isEmpty()) return@synchronized null
+            ArrayList(queueInterrupt).also { queueInterrupt.clear() }
         } ?: return
 
         LOG.d { "Cancelling QueuedJobs" }
         handler.withSuppression {
-            while (cancellations.isNotEmpty()) {
-                val cancellation = cancellations.removeFirst()
-                cancellation(this)
+            val suppressed = this
+
+            while (interrupts.isNotEmpty()) {
+                val interrupt = interrupts.removeFirst()
+                interrupt(suppressed)
             }
         }
     }
