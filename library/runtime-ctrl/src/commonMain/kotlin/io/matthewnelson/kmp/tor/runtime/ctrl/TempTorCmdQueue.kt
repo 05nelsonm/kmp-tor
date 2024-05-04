@@ -86,7 +86,7 @@ public class TempTorCmdQueue private constructor(
         queue.cancelAndClearAll(cause, handler)
     }
 
-    public override fun <Success : Any> enqueue(
+    public override fun <Success: Any> enqueue(
         cmd: TorCmd.Unprivileged<Success>,
         onFailure: OnFailure,
         onSuccess: OnSuccess<Success>,

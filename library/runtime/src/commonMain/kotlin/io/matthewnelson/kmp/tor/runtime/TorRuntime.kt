@@ -561,7 +561,7 @@ public interface TorRuntime:
         public final override val fid: String = ctrl.fid
         public final override fun environment(): Environment = ctrl.environment()
 
-        public final override fun <Success : Any> enqueue(
+        public final override fun <Success: Any> enqueue(
             cmd: TorCmd.Unprivileged<Success>,
             onFailure: OnFailure,
             onSuccess: OnSuccess<Success>,

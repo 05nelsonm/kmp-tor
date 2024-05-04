@@ -80,21 +80,19 @@ internal class RealTorRuntime private constructor(
     protected override val isService: Boolean = serviceFactoryHandler != null
     protected override val handler: HandlerWithContext = serviceFactoryHandler ?: super.handler
 
-    private val scope = CoroutineScope(context =
-        CoroutineName(toString())
-        + SupervisorJob()
-        + dispatcher
-        + handler
-    )
-
-    private val connectivity = if (networkObserver == NetworkObserver.noOp()) null else ConnectivityObserver()
-
     @Suppress("PrivatePropertyName")
     private val NOTIFIER = object : Notifier {
         public override fun <Data: Any, E: RuntimeEvent<Data>> notify(event: E, data: Data) {
             event.notifyObservers(data)
         }
     }
+
+    private val scope = CoroutineScope(context =
+        CoroutineName(toString())
+        + SupervisorJob()
+        + dispatcher
+        + handler
+    )
 
     private val factory = TorCtrl.Factory(
         staticTag = generator.environment.staticTag(),
@@ -125,6 +123,8 @@ internal class RealTorRuntime private constructor(
         handler = handler,
     )
 
+    private val connectivity = if (networkObserver == NetworkObserver.noOp()) null else ConnectivityObserver()
+
     @JvmSynthetic
     internal fun handler(): UncaughtException.Handler = handler
 
@@ -138,7 +138,7 @@ internal class RealTorRuntime private constructor(
     ): QueuedJob = onFailure.toImmediateErrorJob(action.name, NotImplementedError(), handler)
 
     // TODO
-    public override fun <Response : Any> enqueue(
+    public override fun <Response: Any> enqueue(
         cmd: TorCmd.Unprivileged<Response>,
         onFailure: OnFailure,
         onSuccess: OnSuccess<Response>
@@ -172,6 +172,13 @@ internal class RealTorRuntime private constructor(
         }
     }
 
+    private inner class ActionProcessor {
+
+        fun startProcessor() {
+            // TODO
+        }
+    }
+
     private inner class ConnectivityObserver: AbstractConnectivityObserver(scope), FileID by this {
         public override fun equals(other: Any?): Boolean = other is ConnectivityObserver && other.hashCode() == hashCode()
         public override fun hashCode(): Int = this@RealTorRuntime.hashCode()
@@ -189,13 +196,6 @@ internal class RealTorRuntime private constructor(
         protected override fun notify(data: String) {
             super.notify(data)
             event.notifyObservers(data)
-        }
-    }
-
-    private inner class ActionProcessor {
-
-        fun startProcessor() {
-            // TODO
         }
     }
 
@@ -334,8 +334,13 @@ internal class RealTorRuntime private constructor(
                 } else {
                     // Waiting to bind. Add to temporary queue. Once
                     // transferred, RealTorCtrl will handle it.
+                    val tempJob = if (action == Action.StopDaemon) {
+                        ActionJob.Stop(onSuccess, onFailure, handler)
+                    } else {
+                        // No RestartDaemon while first starting.
+                        ActionJob.Start(onSuccess, onFailure, handler)
+                    }
 
-                    val tempJob = ActionJob.Sealed.of(action, onSuccess, onFailure, handler)
                     actionQueue.add(tempJob)
                     tempJob
                 }
@@ -346,7 +351,7 @@ internal class RealTorRuntime private constructor(
             return job
         }
 
-        public override fun <Success : Any> enqueue(
+        public override fun <Success: Any> enqueue(
             cmd: TorCmd.Unprivileged<Success>,
             onFailure: OnFailure,
             onSuccess: OnSuccess<Success>,
@@ -363,6 +368,9 @@ internal class RealTorRuntime private constructor(
                 // No instance, nor is there an ActionJob
                 // in the queue. Start has not been called.
                 if (actionQueue.isEmpty()) return@synchronized null
+
+                // TODO: Need to intercept cmd (e.g. if SetEvents)
+                //  See Issue #371
 
                 // Waiting to bind. Create a temporary job to transfer
                 // to RealTorRuntime when bind is called.

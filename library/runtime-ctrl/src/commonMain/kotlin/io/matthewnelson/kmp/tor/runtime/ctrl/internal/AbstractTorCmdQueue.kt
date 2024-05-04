@@ -49,13 +49,13 @@ internal abstract class AbstractTorCmdQueue internal constructor(
 
     public final override fun isDestroyed(): Boolean = destroyed
 
-    public final override fun <Success : Any> enqueue(
+    public final override fun <Success: Any> enqueue(
         cmd: TorCmd.Privileged<Success>,
         onFailure: OnFailure,
         onSuccess: OnSuccess<Success>,
     ): QueuedJob = enqueueImpl(cmd, onFailure, onSuccess)
 
-    public final override fun <Success : Any> enqueue(
+    public final override fun <Success: Any> enqueue(
         cmd: TorCmd.Unprivileged<Success>,
         onFailure: OnFailure,
         onSuccess: OnSuccess<Success>,
