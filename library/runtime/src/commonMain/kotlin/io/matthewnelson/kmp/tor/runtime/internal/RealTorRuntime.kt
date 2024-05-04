@@ -16,6 +16,7 @@
 package io.matthewnelson.kmp.tor.runtime.internal
 
 import io.matthewnelson.immutable.collections.toImmutableSet
+import io.matthewnelson.kmp.file.InterruptedException
 import io.matthewnelson.kmp.tor.core.api.annotation.ExperimentalKmpTorApi
 import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
 import io.matthewnelson.kmp.tor.core.resource.SynchronizedObject
@@ -30,11 +31,15 @@ import io.matthewnelson.kmp.tor.runtime.RuntimeEvent.Notifier.Companion.lce
 import io.matthewnelson.kmp.tor.runtime.RuntimeEvent.Notifier.Companion.d
 import io.matthewnelson.kmp.tor.runtime.RuntimeEvent.Notifier.Companion.w
 import io.matthewnelson.kmp.tor.runtime.core.QueuedJob.Companion.toImmediateErrorJob
+import io.matthewnelson.kmp.tor.runtime.core.UncaughtException.Handler.Companion.tryCatch
+import io.matthewnelson.kmp.tor.runtime.core.UncaughtException.Handler.Companion.withSuppression
 import io.matthewnelson.kmp.tor.runtime.core.ctrl.TorCmd
+import io.matthewnelson.kmp.tor.runtime.ctrl.TempTorCmdQueue
 import io.matthewnelson.kmp.tor.runtime.ctrl.TorCtrl
 import kotlinx.coroutines.*
 import kotlin.concurrent.Volatile
 import kotlin.jvm.JvmSynthetic
+import kotlin.time.Duration.Companion.milliseconds
 
 @OptIn(ExperimentalKmpTorApi::class, InternalKmpTorApi::class)
 internal class RealTorRuntime private constructor(
@@ -56,12 +61,18 @@ internal class RealTorRuntime private constructor(
     TorRuntime
 {
 
-    private var lifecycle: Destroyable? = null
+    @Volatile
+    private var _lifecycle: Destroyable? = null
+    @Volatile
+    private var _cmdQueue: TempTorCmdQueue? = null
+    private val actionQueue = ArrayList<ActionJob.Sealed>(10)
+    private val actionProcessor = ActionProcessor()
+    private val lock = SynchronizedObject()
+
+    private val requiredTorEvents = requiredTorEvents.toImmutableSet()
     protected override val debug: Boolean get() = generator.environment.debug
     protected override val isService: Boolean = serviceFactoryHandler != null
     protected override val handler: HandlerWithContext = serviceFactoryHandler ?: super.handler
-    private val requiredTorEvents = requiredTorEvents.toImmutableSet()
-    private val lock = SynchronizedObject()
 
     private val scope = CoroutineScope(context =
         CoroutineName(toString())
@@ -175,6 +186,13 @@ internal class RealTorRuntime private constructor(
         }
     }
 
+    private inner class ActionProcessor {
+
+        fun startProcessor() {
+            // TODO
+        }
+    }
+
     internal companion object {
 
         @JvmSynthetic
@@ -237,6 +255,15 @@ internal class RealTorRuntime private constructor(
         Notifier
     {
 
+        @Volatile
+        private var _instance: Lifecycle.DestroyableTorRuntime? = null
+        @Volatile
+        private var _startServiceJob: Job? = null
+        @Volatile
+        private var _cmdQueue: TempTorCmdQueue? = null
+        private val actionQueue = ArrayList<ActionJob.Sealed>(1)
+        private val lock = SynchronizedObject()
+
         private val builderRequiredEvents = builderRequiredEvents.toImmutableSet()
         protected override val debug: Boolean get() = generator.environment.debug
 
@@ -249,32 +276,171 @@ internal class RealTorRuntime private constructor(
 
         public override fun environment(): TorRuntime.Environment = generator.environment
 
-        // TODO
-        public override fun <Success : Any> enqueue(
-            cmd: TorCmd.Unprivileged<Success>,
-            onFailure: OnFailure,
-            onSuccess: OnSuccess<Success>,
-        ): QueuedJob = onFailure.toImmediateErrorJob(cmd.keyword, NotImplementedError(), handler)
-
-        // TODO
         public override fun enqueue(
             action: Action,
             onFailure: OnFailure,
             onSuccess: OnSuccess<Unit>,
-        ): QueuedJob = onFailure.toImmediateErrorJob(action.name, NotImplementedError(), handler)
+        ): QueuedJob {
+            _instance
+                ?.enqueue(action, onFailure, onSuccess)
+                ?.let { return it }
+
+            var execute: (() -> Unit)? = null
+
+            val job = synchronized(lock) {
+                _instance
+                    ?.enqueue(action, onFailure, onSuccess)
+                    ?.let { return@synchronized it }
+
+                if (actionQueue.isEmpty()) {
+                    // First call to enqueue for starting the service
+
+                    if (action == Action.StopDaemon) {
+                        val stop = ActionJob.Stop(onSuccess, onFailure, handler)
+
+                        // We're already stopped, complete successfully,
+                        // but do so outside the synchronized lambda before
+                        // returning the job
+                        execute = { stop.completion() }
+
+                        stop
+                    } else {
+                        // Whether it's Restart or Start action, always use Start
+                        // for the first ActionJob (restart will do nothing...)
+                        val start = object : ActionJob.Start(onSuccess, onFailure, handler) {
+
+                            // So does not throw IllegalStateException
+                            // when transferred to RealTorRuntime for
+                            // execution.
+                            override fun executing() {}
+
+                            // non-cancellable
+                            init { super.executing() }
+                        }
+
+                        actionQueue.add(start)
+
+                        // Start the service
+                        execute = ::executeStartService
+
+                        start
+                    }
+                } else {
+                    // Waiting to bind. Add to temporary queue. Once
+                    // transferred, RealTorCtrl will handle it.
+
+                    val tempJob = ActionJob.Sealed.of(action, onSuccess, onFailure, handler)
+                    actionQueue.add(tempJob)
+                    tempJob
+                }
+            }
+
+            execute?.invoke()
+
+            return job
+        }
+
+        public override fun <Success : Any> enqueue(
+            cmd: TorCmd.Unprivileged<Success>,
+            onFailure: OnFailure,
+            onSuccess: OnSuccess<Success>,
+        ): QueuedJob {
+            _instance
+                ?.enqueue(cmd, onFailure, onSuccess)
+                ?.let { return it }
+
+            val job = synchronized(lock) {
+                _instance
+                    ?.enqueue(cmd, onFailure, onSuccess)
+                    ?.let { return@synchronized it }
+
+                // No instance, nor is there an ActionJob
+                // in the queue. Start has not been called.
+                if (actionQueue.isEmpty()) return@synchronized null
+
+                // Waiting to bind. Create a temporary job to transfer
+                // to RealTorRuntime when bind is called.
+                val queue = _cmdQueue ?: TorCtrl.Factory(handler = handler)
+                    .tempQueue()
+                    .also { _cmdQueue = it }
+
+                queue.enqueue(cmd, onFailure, onSuccess)
+            }
+
+            return job ?: onFailure.toImmediateErrorJob(
+                cmd.keyword,
+                IllegalStateException("Tor is not started"),
+                handler
+            )
+        }
 
         public override fun <Data: Any, E: RuntimeEvent<Data>> notify(event: E, data: Data) {
             event.notifyObservers(data)
         }
 
+        private fun executeStartService() {
+            val name = CoroutineName("StartService[fid=$fidEllipses]")
+
+            _startServiceJob = CoroutineScope(name + dispatcher + handler).launch {
+                var failure: Throwable? = null
+
+                try {
+                    startService()
+                } catch (t: RuntimeException) {
+                    failure = t
+                }
+
+                // Wait for 500ms
+                var i = 0
+                while (failure == null && _instance == null) {
+                    delay(100.milliseconds)
+                    if (i++ < 5) continue
+                    if (_instance != null) break
+                    failure = InterruptedException("startService timed out after 500ms")
+                }
+
+                // Has been started
+                if (failure == null) return@launch
+
+                val cancellations = synchronized(lock) cancel@ {
+                    // onBind occurred, do nothing
+                    if (actionQueue.isEmpty()) return@cancel emptyList()
+
+                    val disposables = ArrayList<Disposable>(actionQueue.size + 1)
+
+                    // Cancel all ActionJob
+                    while (actionQueue.isNotEmpty()) {
+                        when (val job = actionQueue.removeFirst()) {
+                            is ActionJob.Restart,
+                            is ActionJob.Start -> Disposable { job.error(failure) }
+                            is ActionJob.Stop -> Disposable { job.completion() }
+                        }.let { disposables.add(it) }
+                    }
+
+                    // Cancel all TorCmdJob
+                    _cmdQueue?.let { queue ->
+                        disposables.add(Disposable { queue.destroy() })
+                        _cmdQueue = null
+                    }
+
+                    disposables
+                }
+
+                if (cancellations.isEmpty()) return@launch
+
+                handler.withSuppression {
+                    val context = name.name + " timed out"
+
+                    cancellations.forEach { disposable ->
+                        tryCatch(context) { disposable.invoke() }
+                    }
+                }
+            }
+        }
+
         private inner class ServiceCtrlBinder: TorRuntime.ServiceFactory.Binder, FileID by this, Notifier by this {
 
-            @Volatile
-            private var _instance: Lifecycle.DestroyableTorRuntime? = null
-            val instance: Lifecycle.DestroyableTorRuntime? get() = _instance
-            private val bLock = SynchronizedObject()
-
-            // Pipe all events to observers registered with Factory
+            // Pipe all events to observers registered with ServiceFactoryCtrl
             private val observersTorEvent = TorEvent.entries().let { events ->
                 val tag = generator.environment.staticTag()
                 events.mapTo(LinkedHashSet(events.size + 1, 1.0f)) { event ->
@@ -282,7 +448,7 @@ internal class RealTorRuntime private constructor(
                 }.toImmutableSet()
             }
 
-            // Pipe all events to observers registered with Factory
+            // Pipe all events to observers registered with ServiceFactoryCtrl
             private val observersRuntimeEvent = RuntimeEvent.entries().let { events ->
                 val tag = generator.environment.staticTag()
                 events.mapTo(LinkedHashSet(events.size + 1, 1.0f)) { event ->
@@ -301,16 +467,20 @@ internal class RealTorRuntime private constructor(
                 serviceObserversTorEvent: Set<TorEvent.Observer>,
                 @Suppress("RemoveRedundantQualifierName")
                 serviceObserversRuntimeEvent: Set<RuntimeEvent.Observer<*>>,
-            ): Lifecycle.DestroyableTorRuntime = synchronized(bLock) {
+            ): Lifecycle.DestroyableTorRuntime = synchronized(lock) {
+                // Do not want to invoke any callbacks
+                // within synchronized lambda.
+                val execute = ArrayList<Disposable>(3)
 
-                // invokeOnCompletion handler should set instance to null,
-                // so this means the instance was never destroyed before
-                // calling onBind again
-                if (_instance?.destroy() != null) {
-                    w(this, "onBind was called before previous instance was destroyed")
+                _instance?.let { instance ->
+                    execute.add(Disposable {
+                        instance.destroy()
+                        w(this, "onBind was called before previous instance was destroyed")
+                    })
+                    _instance = null
                 }
 
-                lce(Lifecycle.Event.OnBind(this))
+                _startServiceJob?.cancel()
 
                 val runtime = RealTorRuntime(
                     generator,
@@ -333,12 +503,29 @@ internal class RealTorRuntime private constructor(
                 )
 
                 val destroyable = Lifecycle.DestroyableTorRuntime.of(runtime)
-                runtime.lifecycle = destroyable
+
+                runtime._lifecycle = destroyable
+                runtime.actionQueue.addAll(actionQueue)
+                runtime._cmdQueue = _cmdQueue
+
+                actionQueue.clear()
+                _cmdQueue = null
                 _instance = destroyable
-                lce(Lifecycle.Event.OnCreate(destroyable))
+
+                execute.add(Disposable {
+                    lce(Lifecycle.Event.OnCreate(destroyable))
+                    lce(Lifecycle.Event.OnBind(this))
+                })
 
                 destroyable.invokeOnDestroy {
-                    _instance = null
+                    if (_instance == destroyable) {
+                        synchronized(lock) {
+                            if (_instance == destroyable) {
+                                _instance = null
+                            }
+                        }
+                    }
+
                     runtime.onDestroy()
                 }
                 destroyable.invokeOnDestroy {
@@ -348,7 +535,14 @@ internal class RealTorRuntime private constructor(
                     lce(Lifecycle.Event.OnUnbind(this))
                 }
 
-                return destroyable
+                execute.add(Disposable {
+                    runtime.actionProcessor.startProcessor()
+                })
+
+                execute to destroyable
+            }.let { (execute, destroyable) ->
+                execute.forEach { it() }
+                destroyable
             }
 
             public override fun equals(other: Any?): Boolean = other is ServiceCtrlBinder && other.hashCode() == hashCode()

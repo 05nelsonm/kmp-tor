@@ -47,6 +47,9 @@ internal sealed class AbstractTorService: Service() {
                 return
             }
             holders[conn.binder]?.let { holder ->
+                // It's currently being destroyed
+                if (holder.runtime.isDestroyed()) return@let
+
                 conn.binder.w(service, "${holder.runtime} is still active, but onServiceConnected was called")
                 return
             }
@@ -128,10 +131,9 @@ internal sealed class AbstractTorService: Service() {
                 serviceObserversRuntimeEvent = emptySet(),
             ).apply {
                 invokeOnDestroy {
-                    holders.remove(binder)
-                }
-                invokeOnDestroy {
-                    if (_isDestroyed) return@invokeOnDestroy
+                    val wasRemoved = holders.removeInstance(binder, this@Holder)
+                    if (!wasRemoved || _isDestroyed) return@invokeOnDestroy
+
                     unbindService(conn)
                     binder.lce(Lifecycle.Event.OnUnbind(this@AbstractTorService))
                 }

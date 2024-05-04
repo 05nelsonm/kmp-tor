@@ -22,6 +22,7 @@ import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
 import io.matthewnelson.kmp.tor.core.resource.SynchronizedObject
 import io.matthewnelson.kmp.tor.core.resource.synchronized
 
+// TODO: SynchronizedMap
 @OptIn(InternalKmpTorApi::class)
 internal class PersistentKeyMap<K: Any, V: Any> internal constructor() {
 
@@ -43,10 +44,11 @@ internal class PersistentKeyMap<K: Any, V: Any> internal constructor() {
 
     internal fun clear() { withLock { map.clear() } }
 
-    internal fun remove(key: K): V? = withLock {
-        val value = map[key] ?: return@withLock null
+    internal fun removeInstance(key: K, instance: V): Boolean = withLock {
+        val value = map[key] ?: return@withLock false
+        if (value != instance) return@withLock false
         map[key] = null
-        value
+        true
     }
 
     private inline fun <T: Any?> withLock(block: () -> T): T = synchronized(lock, block)

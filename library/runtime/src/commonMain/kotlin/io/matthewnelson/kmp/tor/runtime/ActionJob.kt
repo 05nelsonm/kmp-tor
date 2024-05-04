@@ -36,19 +36,19 @@ public abstract class ActionJob private constructor(
     @get:JvmName("isRestart")
     public val isRestart: Boolean get() = this is Restart
 
-    internal abstract class Start internal constructor(
+    internal open class Start internal constructor(
         onSuccess: OnSuccess<Unit>,
         onFailure: OnFailure,
         handler: UncaughtException.Handler,
     ): Sealed(Action.StartDaemon, onSuccess, onFailure, handler)
 
-    internal abstract class Stop internal constructor(
+    internal open class Stop internal constructor(
         onSuccess: OnSuccess<Unit>,
         onFailure: OnFailure,
         handler: UncaughtException.Handler,
     ): Sealed(Action.StopDaemon, onSuccess, onFailure, handler)
 
-    internal abstract class Restart internal constructor(
+    internal open class Restart internal constructor(
         onSuccess: OnSuccess<Unit>,
         onFailure: OnFailure,
         handler: UncaughtException.Handler,
@@ -68,7 +68,7 @@ public abstract class ActionJob private constructor(
 
         @JvmSynthetic
         @Throws(IllegalStateException::class)
-        internal fun executing() { onExecuting() }
+        internal open fun executing() { onExecuting() }
 
         @JvmSynthetic
         internal open fun error(cause: Throwable): Boolean {
@@ -82,6 +82,24 @@ public abstract class ActionJob private constructor(
                 _onSuccess = null
                 onSuccess
             })
+        }
+
+        internal companion object {
+
+            @JvmSynthetic
+            internal fun of(
+                action: Action,
+                onSuccess: OnSuccess<Unit>,
+                onFailure: OnFailure,
+                handler: UncaughtException.Handler,
+            ): Sealed = when (action) {
+                Action.StartDaemon -> Start(onSuccess, onFailure, handler)
+                Action.StopDaemon -> Stop(onSuccess, onFailure, handler)
+                Action.RestartDaemon -> Restart(onSuccess, onFailure, handler)
+
+                // A result of expect/actual. Will never occur
+                else -> error("Action is not supported")
+            }
         }
     }
 }
