@@ -85,7 +85,7 @@ public interface TorRuntime:
     public class Builder private constructor(private val environment: Environment) {
 
         private val config = mutableSetOf<ConfigBuilderCallback>()
-        private val requiredTorEvents = mutableSetOf(TorEvent.CONF_CHANGED, TorEvent.NOTICE)
+        private val requiredTorEvents = mutableSetOf<TorEvent>()
         private val observersTorEvent = mutableSetOf<TorEvent.Observer>()
         private val observersRuntimeEvent = mutableSetOf<RuntimeEvent.Observer<*>>()
 
@@ -162,6 +162,9 @@ public interface TorRuntime:
          *
          * Any subsequent calls for [TorCmd.SetEvents] during runtime will
          * be intercepted and modified to include all required [TorEvent].
+         *
+         * **NOTE:** [TorEvent.CONF_CHANGED] and [TorEvent.NOTICE] are always
+         * present and do not need to be added here.
          * */
         @KmpTorDsl
         public fun required(

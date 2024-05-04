@@ -65,11 +65,17 @@ internal class RealTorRuntime private constructor(
     private var _lifecycle: Destroyable? = null
     @Volatile
     private var _cmdQueue: TempTorCmdQueue? = null
+
     private val actionQueue = ArrayList<ActionJob.Sealed>(10)
     private val actionProcessor = ActionProcessor()
     private val lock = SynchronizedObject()
 
-    private val requiredTorEvents = requiredTorEvents.toImmutableSet()
+    private val requiredTorEvents = LinkedHashSet<TorEvent>(3 + requiredTorEvents.size, 1.0f).apply {
+        add(TorEvent.CONF_CHANGED)
+        add(TorEvent.NOTICE)
+        addAll(requiredTorEvents)
+    }.toImmutableSet()
+
     protected override val debug: Boolean get() = generator.environment.debug
     protected override val isService: Boolean = serviceFactoryHandler != null
     protected override val handler: HandlerWithContext = serviceFactoryHandler ?: super.handler
