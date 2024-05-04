@@ -30,7 +30,7 @@ import kotlin.coroutines.cancellation.CancellationException
  * A Tor control connection
  *
  * Issuance of [TorCmd.Signal.Halt] or [TorCmd.Signal.Shutdown] will
- * cancel all enqueued jobs (if any) and then automatically [destroy]
+ * interrupt all enqueued jobs (if any) and then automatically [destroy]
  * itself when the underlying connection closes itself.
  *
  * @see [Factory]
@@ -39,7 +39,7 @@ public expect interface TorCtrl: Destroyable, TorEvent.Processor, TorCmd.Privile
 
     /**
      * Immediately disconnects from the control listener resulting
-     * in cancellation of all [QueuedJob], and invocation of all
+     * in interruption of all [QueuedJob], and invocation of all
      * handles registered via [invokeOnDestroy].
      *
      * If [TorCmd.Ownership.Take] was issued for this connection,

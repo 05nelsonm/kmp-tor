@@ -148,7 +148,7 @@ internal class RealTorRuntime private constructor(
             )
         }
 
-        val job = synchronized(enqueueLock) {
+        return synchronized(enqueueLock) {
             if (destroyed) return@synchronized null
 
             when (action) {
@@ -177,12 +177,11 @@ internal class RealTorRuntime private constructor(
                     errorMsg = "Action[name=${action.name}] is not supported"
                     null
                 }
-            }?.also { actionStack.push(it) }
-        }
-
-        if (job != null) actionProcessor.start()
-
-        return job ?: onFailure.toImmediateErrorJob(
+            }?.also { job ->
+                actionProcessor.start()
+                actionStack.push(job)
+            }
+        } ?: onFailure.toImmediateErrorJob(
             action.name,
             IllegalStateException(errorMsg),
             handler,
@@ -266,7 +265,7 @@ internal class RealTorRuntime private constructor(
 
             while (isActive) {
                 val job = synchronized(processorLock) {
-                    val next = popNextOrNull()
+                    val next = popAll()
 
                     if (next == null) _processorJob = null
                     next
@@ -283,6 +282,8 @@ internal class RealTorRuntime private constructor(
                         is ActionJob.StopJob -> job.execute()
                     }
                 } catch (t: Throwable) {
+                    // TODO: convert CancellationException attributed
+                    //  to scope cancellation to InterruptedException?
                     job.error(t)
                 }
 
@@ -290,48 +291,98 @@ internal class RealTorRuntime private constructor(
             }
         }
 
-        private fun popNextOrNull(): ActionJob.Sealed? = synchronized(processorLock) {
-            if (destroyed) return@synchronized null
+        private fun popAll(): ActionJob.Sealed? {
+            if (destroyed) return null
 
-            return synchronized(enqueueLock) pop@ {
-                var job: ActionJob.Sealed? = null
+            val (interrupts, execute) = synchronized(enqueueLock) {
+
+                var execute: ActionJob.Sealed? = null
+                val interrupts = ArrayList<Disposable>((actionStack.size - 1).coerceAtLeast(1))
 
                 while (!destroyed && actionStack.isNotEmpty()) {
                     // LIFO
-                    job = actionStack.pop()
+                    val popped = actionStack.pop()
 
-                    try {
-                        job.executing()
-                        break
-                    } catch (_: IllegalStateException) {
-                        job = null
+                    if (execute == null) {
+                        try {
+                            popped.executing()
+                            execute = popped
+                        } catch (_: IllegalStateException) {
+                            // cancelled
+                        }
+                        continue
                     }
+
+                    if (popped.isCompleting || !popped.isActive) continue
+
+                    // Last job is executed, while all others are grouped
+                    // such that the appropriate completion is had for each
+                    // depending on what it is compared to what is being executed.
+                    //
+                    // e.g. StopJob being executed, all StartJob & RestartJob should
+                    //      be immediately interrupted.
+                    when (execute) {
+                        is ActionJob.RestartJob,
+                        is ActionJob.StartJob -> execute.configureStartedCompletion(popped)
+                        is ActionJob.StopJob -> execute.configureStoppedCompletion(popped)
+                    }.let { interrupts.add(it) }
                 }
 
-                when (job) {
-                    null -> {}
-                    is ActionJob.StartJob -> job.applyCompletionHandle()
-                    is ActionJob.StopJob -> job.applyCompletionHandle()
-                    is ActionJob.RestartJob -> job.applyCompletionHandle()
+                interrupts to execute
+            }
+
+            interrupts.forEach { it() }
+
+            return execute
+        }
+
+        private fun ActionJob.Sealed.configureStartedCompletion(popped: ActionJob.Sealed): Disposable = when (popped) {
+            is ActionJob.StartJob,
+            is ActionJob.RestartJob -> {
+                val executing = this
+
+                executing.invokeOnCompletion {
+                    executing.onErrorCause?.let { cause ->
+                        popped.error(cause)
+                        return@invokeOnCompletion
+                    }
+
+                    popped.completion()
                 }
 
-                job
+                Disposable.noOp()
+            }
+
+            // StartJob being executed, interrupt all StopJob
+            is ActionJob.StopJob -> {
+                Disposable {
+                    popped.error(InterruptedException("Interrupted by $this"))
+                }
             }
         }
 
-        // Must be applied within queueLock synchronized lambda
-        private fun ActionJob.StartJob.applyCompletionHandle() {
-            // TODO
-        }
+        private fun ActionJob.StopJob.configureStoppedCompletion(popped: ActionJob.Sealed): Disposable = when (popped) {
+            // StopJob being executed, interrupt all Start/Restart jobs
+            is ActionJob.RestartJob,
+            is ActionJob.StartJob -> {
+                Disposable {
+                    popped.error(InterruptedException("Interrupted by $this"))
+                }
+            }
+            is ActionJob.StopJob -> {
+                val executing = this
 
-        // Must be applied within queueLock synchronized lambda
-        private fun ActionJob.StopJob.applyCompletionHandle() {
-            // TODO
-        }
+                executing.invokeOnCompletion {
+                    executing.onErrorCause?.let { cause ->
+                        popped.error(cause)
+                        return@invokeOnCompletion
+                    }
 
-        // Must be applied within queueLock synchronized lambda
-        private fun ActionJob.RestartJob.applyCompletionHandle() {
-            // TODO
+                    popped.completion()
+                }
+
+                Disposable.noOp()
+            }
         }
 
         private suspend fun ActionJob.StartJob.execute() {
@@ -481,7 +532,7 @@ internal class RealTorRuntime private constructor(
                     } else {
                         // Whether it's Restart or Start action, always use Start
                         // for the first ActionJob (restart will do nothing...)
-                        val start = ActionJob.StartJob(onSuccess, onFailure, handler, isStartService = true)
+                        val start = ActionJob.StartJob(onSuccess, onFailure, handler, immediateExecute = true)
 
                         actionStack.push(start)
 

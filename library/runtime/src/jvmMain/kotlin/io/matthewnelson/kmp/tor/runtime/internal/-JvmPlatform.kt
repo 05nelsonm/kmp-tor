@@ -17,6 +17,7 @@
 
 package io.matthewnelson.kmp.tor.runtime.internal
 
+import io.matthewnelson.kmp.tor.runtime.FileID.Companion.fidEllipses
 import io.matthewnelson.kmp.tor.runtime.TorRuntime
 import kotlinx.coroutines.*
 import java.util.concurrent.Executors
@@ -25,8 +26,9 @@ import java.util.concurrent.atomic.AtomicLong
 @Suppress("NOTHING_TO_INLINE")
 internal actual inline fun TorRuntime.Environment.newRuntimeDispatcher(): CoroutineDispatcher {
     val threadNo = AtomicLong()
+    val name = "Tor[$fidEllipses]"
     val executor = Executors.newSingleThreadExecutor { runnable ->
-        val t = Thread(runnable, "Tor-$fid-${threadNo.incrementAndGet()}")
+        val t = Thread(runnable, "$name-${threadNo.incrementAndGet()}")
         t.isDaemon = true
         t.priority = Thread.MAX_PRIORITY
         t

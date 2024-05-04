@@ -40,23 +40,23 @@ public abstract class ActionJob private constructor(
         onSuccess: OnSuccess<Unit>,
         onFailure: OnFailure,
         handler: UncaughtException.Handler,
-        private val isStartService: Boolean = false,
+        private val immediateExecute: Boolean = false,
     ): Sealed(Action.StartDaemon, onSuccess, onFailure, handler) {
 
         @JvmSynthetic
         @Throws(IllegalStateException::class)
         internal override fun executing() {
-            // When RealTorRuntime goes to dequeue it, this will
-            // prevent it from throwing IllegalStateException such
-            // that it can be completed.
-            if (isStartService) return
+            // When RealTorRuntime goes to pop it off the stack, this
+            // will prevent it from throwing IllegalStateException such
+            // that it can be executed && completed (for startService).
+            if (immediateExecute) return
 
             super.executing()
         }
 
         init {
             // non-cancellable
-            if (isStartService) onExecuting()
+            if (immediateExecute) onExecuting()
         }
     }
 
@@ -81,6 +81,9 @@ public abstract class ActionJob private constructor(
 
         @Volatile
         private var _onSuccess: OnSuccess<Unit>? = onSuccess
+        @Volatile
+        private var _onErrorCause: Throwable? = null
+        internal val onErrorCause: Throwable? get() = _onErrorCause
 
         protected final override fun onCancellation(cause: CancellationException?) { _onSuccess = null }
 
@@ -90,7 +93,10 @@ public abstract class ActionJob private constructor(
 
         @JvmSynthetic
         internal fun error(cause: Throwable): Boolean {
-            return onError(cause, withLock = { _onSuccess = null })
+            return onError(cause, withLock = {
+                _onErrorCause = cause
+                _onSuccess = null
+            })
         }
 
         @JvmSynthetic
