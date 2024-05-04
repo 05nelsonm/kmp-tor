@@ -531,7 +531,8 @@ internal class RealTorRuntime private constructor(
                 if (actionQueue.isEmpty()) return@synchronized null
 
                 // Waiting to bind. Create a temporary job to transfer
-                // to RealTorRuntime when bind is called.
+                // to RealTorRuntime when bind is finally called or
+                // timeout occurs.
                 val queue = _cmdQueue ?: TorCtrl.Factory(handler = handler)
                     .tempQueue()
                     .also { _cmdQueue = it }

@@ -60,6 +60,9 @@ public abstract class QueuedJob protected constructor(
 
     /**
      * If [cancel] was invoked successfully, this **will not** be null.
+     *
+     * If [onError] was invoked with a cause of [CancellationException],
+     * this will also be set to indicate as such.
      * */
     @get:JvmName("cancellationException")
     public val cancellationException: CancellationException? get() = _cancellationException
@@ -129,17 +132,17 @@ public abstract class QueuedJob protected constructor(
         Executing,
 
         /**
-         * If the job completed by cancellation.
+         * If the job completed by cancellation via [cancel].
          * */
         Cancelled,
 
         /**
-         * If the job completed successfully.
+         * If the job completed successfully via [onCompletion].
          * */
         Success,
 
         /**
-         * If the job completed exceptionally.
+         * If the job completed exceptionally via [onError].
          * */
         Error,
     }
@@ -311,8 +314,7 @@ public abstract class QueuedJob protected constructor(
      * completed.
      *
      * If [cause] is [CancellationException], [cancellationException]
-     * will be set and [State.Cancelled] will be utilized for the
-     * completion state.
+     * will be set.
      *
      * Implementations **must not** call [invokeOnCompletion] from within
      * the [withLock] lambda. It will result in a deadlock.
@@ -341,7 +343,7 @@ public abstract class QueuedJob protected constructor(
 
         if (!complete) return false
 
-        (if (isCancellation) Cancelled else Error).doFinal {
+        Error.doFinal {
             try {
                 _onFailure?.let { it(cause) }
             } finally {

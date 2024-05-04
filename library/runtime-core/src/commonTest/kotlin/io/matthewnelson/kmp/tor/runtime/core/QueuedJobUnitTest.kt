@@ -68,7 +68,7 @@ class QueuedJobUnitTest {
     }
 
     @Test
-    fun givenError_whenCancellationException_thenCancels() {
+    fun givenError_whenCancellationException_thenCancelsWhileStateError() {
         var invocationCancel = 0
         var invocationCompletion = 0
         var invocationFailure = 0
@@ -89,7 +89,7 @@ class QueuedJobUnitTest {
         job.executing()
         assertFalse(job.cancel(null))
         job.error(CancellationException())
-        assertEquals(QueuedJob.State.Cancelled, job.state)
+        assertEquals(QueuedJob.State.Error, job.state)
         assertNotNull(job.cancellationException)
         assertEquals(1, invocationCancel)
         assertEquals(1, invocationCompletion)
