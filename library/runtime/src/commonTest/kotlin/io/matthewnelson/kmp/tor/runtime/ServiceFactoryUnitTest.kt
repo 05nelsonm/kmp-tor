@@ -41,9 +41,9 @@ class ServiceFactoryUnitTest {
         }
     }
 
-    private val env = TorRuntime.Environment.Builder(
-        "factory_unit_test/work".toFile(),
-        "factory_unit_test/cache".toFile(),
+    private fun env(rootDir: String) = TorRuntime.Environment.Builder(
+        "$rootDir/work".toFile(),
+        "$rootDir/cache".toFile(),
         installer = { dir -> TorResources(dir) },
     ) {
         serviceFactoryLoader = object : TorRuntime.ServiceFactory.Loader() {
@@ -56,7 +56,7 @@ class ServiceFactoryUnitTest {
     @Test
     fun givenEnvironment_whenServiceFactoryLoader_thenCreatesServiceFactory() {
         val lces = mutableListOf<Lifecycle.Event>()
-        val runtime = TorRuntime.Builder(env) {
+        val runtime = TorRuntime.Builder(env("test_create")) {
             observer(RuntimeEvent.LIFECYCLE.observer { lces.add(it) })
         }
 
@@ -74,7 +74,7 @@ class ServiceFactoryUnitTest {
 
     @Test
     fun givenInitializer_whenUsedMoreThanOnce_thenThrowsException() {
-        val factory = TorRuntime.Builder(env) {} as TestFactory
+        val factory = TorRuntime.Builder(env("test_is_instance")) {} as TestFactory
         assertFailsWith<IllegalStateException> {
             TestFactory(factory.initializer)
         }
@@ -82,7 +82,7 @@ class ServiceFactoryUnitTest {
 
     @Test
     fun givenBinder_whenBindAndOtherInstanceIsNotDestroyed_thenDestroysPriorInstance() {
-        val factory = TorRuntime.Builder(env) {} as TestFactory
+        val factory = TorRuntime.Builder(env("test_multi_bind_destroy")) {} as TestFactory
         val warnings = mutableListOf<String>()
         factory.subscribe(RuntimeEvent.LOG.WARN.observer { warnings.add(it) })
         val runtime1 = factory.testBinder.bind()
