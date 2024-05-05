@@ -211,3 +211,24 @@ public fun interface Disposable {
         override fun toString(): String = "Disposable.NOOP"
     }
 }
+
+/**
+ * A callback for executing something
+ * */
+public fun interface Executable {
+    public fun execute()
+
+    public companion object {
+
+        /**
+         * A non-operational static instance of [Executable]
+         * */
+        @JvmStatic
+        public fun noOp(): Executable = NOOP
+    }
+
+    private data object NOOP: Executable {
+        override fun execute() {}
+        override fun toString(): String = "Executable.NOOP"
+    }
+}

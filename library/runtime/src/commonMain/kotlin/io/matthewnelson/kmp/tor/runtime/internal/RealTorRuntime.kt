@@ -121,7 +121,7 @@ internal class RealTorRuntime private constructor(
             val formatted = if (i == -1) {
                 log
             } else {
-                log.substring(0, i) + "[fid=" + fidEllipses + ']' + log.substring(i)
+                log.substring(0, i) + "[fid=$fidEllipses]" + log.substring(i)
             }
 
             LOG.DEBUG.notifyObservers(formatted)
@@ -162,7 +162,9 @@ internal class RealTorRuntime private constructor(
                     }
                     start
                 }
-                Action.StopDaemon -> ActionJob.StopJob(onSuccess, onFailure, handler)
+                Action.StopDaemon -> {
+                    ActionJob.StopJob(onSuccess, onFailure, handler)
+                }
                 Action.RestartDaemon -> {
                     val restart = ActionJob.RestartJob(onSuccess, onFailure, handler)
                     if (_cmdQueue == null) {
@@ -253,7 +255,7 @@ internal class RealTorRuntime private constructor(
             if (job is ActionJob.StopJob) {
                 job.completion()
             } else {
-                job.error(CancellationException("$this.isDestroyed[true]"))
+                job.error(CancellationException(destroyedErrMsg))
             }
         }
 
@@ -297,10 +299,10 @@ internal class RealTorRuntime private constructor(
 
             while (isActive) {
                 val job = synchronized(processorLock) {
-                    val popped = popAll()
+                    val job = processStack()
 
-                    if (popped == null) _processorJob = null
-                    popped
+                    if (job == null) _processorJob = null
+                    job
                 }
 
                 if (job == null) break
@@ -327,13 +329,13 @@ internal class RealTorRuntime private constructor(
             }
         }
 
-        private fun popAll(): ActionJob.Sealed? {
+        private fun processStack(): ActionJob.Sealed? {
             if (destroyed) return null
 
-            val (disposables, execute) = synchronized(enqueueLock) {
+            val (executables, execute) = synchronized(enqueueLock) {
 
                 var execute: ActionJob.Sealed? = null
-                val disposables = ArrayList<Disposable>((actionStack.size - 1).coerceAtLeast(1))
+                val executables = ArrayList<Executable>((actionStack.size - 1).coerceAtLeast(1))
 
                 while (actionStack.isNotEmpty()) {
                     // LIFO
@@ -362,7 +364,7 @@ internal class RealTorRuntime private constructor(
                         is ActionJob.RestartJob,
                         is ActionJob.StartJob -> execute.configureStartedCompletion(popped)
                         is ActionJob.StopJob -> execute.configureStoppedCompletion(popped)
-                    }.let { disposables.add(it) }
+                    }.let { executables.add(it) }
                 }
 
                 var isOldQueueAttached = false
@@ -428,15 +430,15 @@ internal class RealTorRuntime private constructor(
                 }
 
                 if (isOldQueueAttached) {
-                    disposables.add(Disposable {
+                    executables.add(Executable {
                         NOTIFIER.d(this@ActionProcessor, "Old TorCtrl queue was attached to $execute")
                     })
                 }
 
-                disposables to execute
+                executables to execute
             }
 
-            disposables.forEach { it.dispose() }
+            executables.forEach { it.execute() }
 
             return execute
         }
@@ -446,7 +448,7 @@ internal class RealTorRuntime private constructor(
         //
         // - Attach all previously queued StartJob or RestartJob to the job executing.
         // - Interrupt all StopJob
-        private fun ActionJob.Sealed.configureStartedCompletion(popped: ActionJob.Sealed): Disposable = when (popped) {
+        private fun ActionJob.Sealed.configureStartedCompletion(popped: ActionJob.Sealed): Executable = when (popped) {
             is ActionJob.StartJob,
             is ActionJob.RestartJob -> {
                 val executing = this
@@ -460,12 +462,12 @@ internal class RealTorRuntime private constructor(
                     popped.completion()
                 }
 
-                Disposable {
+                Executable {
                     NOTIFIER.d(this@ActionProcessor, "Attaching $popped as a child to $executing")
                 }
             }
             is ActionJob.StopJob -> {
-                Disposable {
+                Executable {
                     NOTIFIER.d(this@ActionProcessor, "$popped was interrupted by $this")
                     popped.error(InterruptedException("Interrupted by $this"))
                 }
@@ -476,10 +478,10 @@ internal class RealTorRuntime private constructor(
         //
         // - Attach all previously queued StopJob to the job executing.
         // - Interrupt all StartJob & RestartJob
-        private fun ActionJob.StopJob.configureStoppedCompletion(popped: ActionJob.Sealed): Disposable = when (popped) {
+        private fun ActionJob.StopJob.configureStoppedCompletion(popped: ActionJob.Sealed): Executable = when (popped) {
             is ActionJob.RestartJob,
             is ActionJob.StartJob -> {
-                Disposable {
+                Executable {
                     NOTIFIER.d(this@ActionProcessor, "$popped was interrupted by $this")
                     popped.error(InterruptedException("Interrupted by $this"))
                 }
@@ -496,7 +498,7 @@ internal class RealTorRuntime private constructor(
                     popped.completion()
                 }
 
-                Disposable {
+                Executable {
                     NOTIFIER.d(this@ActionProcessor, "Attaching $popped as a child to $executing")
                 }
             }
@@ -567,7 +569,7 @@ internal class RealTorRuntime private constructor(
                 throw if (this is ActionJob.StopJob) {
                     SuccessCancellationException()
                 } else {
-                    CancellationException("${this@RealTorRuntime}.isDestroyed[true]")
+                    CancellationException(destroyedErrMsg)
                 }
             }
 
@@ -824,18 +826,18 @@ internal class RealTorRuntime private constructor(
                 // Has been started
                 if (failure == null) return@launch
 
-                val disposables = synchronized(lock) cancel@ {
+                val executables = synchronized(lock) cancel@ {
                     // onBind occurred, do nothing
                     if (actionStack.isEmpty()) return@cancel emptyList()
 
-                    val disposables = ArrayList<Disposable>(actionStack.size + 3)
+                    val executables = ArrayList<Executable>(actionStack.size + 3)
 
                     // Interrupt or complete all ActionJob
-                    actionStack.mapTo(disposables) { job ->
+                    actionStack.mapTo(executables) { job ->
                         when (job) {
                             is ActionJob.RestartJob,
-                            is ActionJob.StartJob -> Disposable { job.error(failure) }
-                            is ActionJob.StopJob -> Disposable { job.completion() }
+                            is ActionJob.StartJob -> Executable { job.error(failure) }
+                            is ActionJob.StopJob -> Executable { job.completion() }
                         }
                     }
                     actionStack.clear()
@@ -843,23 +845,23 @@ internal class RealTorRuntime private constructor(
                     // Interrupt all TorCmdJob
                     _cmdQueue?.let { queue ->
                         _cmdQueue = null
-                        disposables.add(Disposable { queue.connection?.destroy() })
-                        disposables.add(Disposable { queue.destroy() })
+                        executables.add(Executable { queue.connection?.destroy() })
+                        executables.add(Executable { queue.destroy() })
                     }
 
-                    disposables
+                    executables
                 }
 
                 // onBind was called and stack + queue were transferred
-                if (disposables.isEmpty()) return@launch
+                if (executables.isEmpty()) return@launch
 
                 w(this@RealServiceFactoryCtrl, "Failed to start service. Interrupting QueuedJobs.")
 
                 handler.withSuppression {
                     val context = name.name + " timed out"
 
-                    disposables.forEach { disposable ->
-                        tryCatch(context) { disposable.dispose() }
+                    executables.forEach { executable ->
+                        tryCatch(context) { executable.execute() }
                     }
                 }
             }
@@ -904,11 +906,11 @@ internal class RealTorRuntime private constructor(
             ): Lifecycle.DestroyableTorRuntime = synchronized(lock) {
                 // Do not want to invoke any callbacks
                 // within synchronized lambda.
-                val execute = ArrayList<Disposable>(3)
+                val executables = ArrayList<Executable>(3)
 
                 _instance?.let { instance ->
                     _instance = null
-                    execute.add(Disposable {
+                    executables.add(Executable {
                         instance.destroy()
                         w(this, "onBind was called before previous instance was destroyed")
                     })
@@ -950,7 +952,7 @@ internal class RealTorRuntime private constructor(
                 _cmdQueue = null
                 _instance = destroyable
 
-                execute.add(Disposable {
+                executables.add(Executable {
                     lce(Lifecycle.Event.OnCreate(destroyable))
                     lce(Lifecycle.Event.OnBind(this))
                 })
@@ -974,7 +976,7 @@ internal class RealTorRuntime private constructor(
                 }
 
                 if (runtime.actionStack.isEmpty()) {
-                    execute.add(Disposable {
+                    executables.add(Executable {
                         // Want to use enqueue here b/c will set up its
                         // TorCtrl command queue and all that as well.
                         val job = runtime.enqueue(
@@ -994,14 +996,15 @@ internal class RealTorRuntime private constructor(
                     })
                 } else {
                     // Stack was transferred
-                    execute.add(Disposable {
+                    executables.add(Executable {
                         runtime.actionProcessor.start()
                     })
                 }
 
-                execute to destroyable
-            }.let { (execute, destroyable) ->
-                execute.forEach { it.dispose() }
+                executables to destroyable
+            }.let { (executables, destroyable) ->
+                executables.forEach { it.execute() }
+
                 destroyable
             }
 
