@@ -16,6 +16,7 @@
 package io.matthewnelson.kmp.tor.runtime
 
 import io.matthewnelson.kmp.tor.runtime.core.*
+import io.matthewnelson.kmp.tor.runtime.ctrl.TempTorCmdQueue
 import kotlin.concurrent.Volatile
 import kotlin.coroutines.cancellation.CancellationException
 import kotlin.jvm.JvmField
@@ -83,13 +84,35 @@ public abstract class ActionJob private constructor(
         private var _onSuccess: OnSuccess<Unit>? = onSuccess
         @Volatile
         private var _onErrorCause: Throwable? = null
+        @Volatile
+        private var _oldCmdQueue: TempTorCmdQueue? = null
+        @get:JvmSynthetic
         internal val onErrorCause: Throwable? get() = _onErrorCause
+        @get:JvmSynthetic
+        internal val oldCmdQueue: TempTorCmdQueue? get() = _oldCmdQueue
 
         protected final override fun onCancellation(cause: CancellationException?) { _onSuccess = null }
 
         @JvmSynthetic
         @Throws(IllegalStateException::class)
         internal open fun executing() { onExecuting() }
+
+        @JvmSynthetic
+        @Throws(IllegalArgumentException::class, IllegalStateException::class)
+        internal fun attachOldQueue(queue: TempTorCmdQueue) {
+            require(this !is StartJob) { "An old queue cannot be attached to $this" }
+            check(state == State.Executing) { "Job state must be ${State.Executing}" }
+            check(_oldCmdQueue == null) { "A queue is already attached" }
+
+            _oldCmdQueue = queue
+
+            // ensure it is destroyed no matter what
+            invokeOnCompletion {
+                _oldCmdQueue = null
+                queue.connection?.destroy()
+                queue.destroy()
+            }
+        }
 
         @JvmSynthetic
         internal fun error(cause: Throwable): Boolean {

@@ -61,7 +61,7 @@ public class TempTorCmdQueue private constructor(
         require(connection is AbstractTorCtrl) { "TorCtrl must implement ${AbstractTorCtrl::class.simpleName}" }
 
         synchronized(lock) {
-            check(_connection == null) { "TorCtrl is already attached" }
+            check(_connection == null) { "$_connection is already attached" }
             checkIsNotDestroyed()
             connection.transferAllUnprivileged(queue)
             _connection = connection

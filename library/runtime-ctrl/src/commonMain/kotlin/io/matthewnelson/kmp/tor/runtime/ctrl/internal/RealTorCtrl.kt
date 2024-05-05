@@ -57,7 +57,6 @@ internal class RealTorCtrl private constructor(
         CoroutineName(toString())
         + SupervisorJob()
         + dispatcher
-        + handler
     )
 
     @Volatile
