@@ -176,7 +176,7 @@ class ServiceFactoryUnitTest {
         assertFalse(containsOnCreate)
         cmdJob.cancel(null)
 
-        withContext(Dispatchers.Default) { delay(bindDelay * 1.5) }
+        withContext(Dispatchers.Default) { delay(bindDelay + 250.milliseconds) }
 
         println(actionJob)
         assertIs<InterruptedException>(actionJob.onErrorCause)
