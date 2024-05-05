@@ -50,6 +50,8 @@ internal sealed class AbstractTorService: Service() {
             }
 
             holders.withLock {
+                val executables = ArrayList<Executable>(1)
+
                 get(conn.binder)?.let { holder ->
                     // It's being destroyed right now, but its completion
                     // callback has not removed itself from the holders
@@ -59,11 +61,16 @@ internal sealed class AbstractTorService: Service() {
                     // disconnect.
                     if (holder.runtime.isDestroyed()) return@let
 
-                    conn.binder.w(service, "${holder.runtime} is still active, but onServiceConnected was called")
-                    return@withLock emptyList()
+                    executables.add(Executable {
+                        conn.binder.w(
+                            service,
+                            "${holder.runtime} is still active, but onServiceConnected was called"
+                        )
+                    })
+                    return@withLock executables
                 }
 
-                val executables = ArrayList<Executable>(1)
+
 
                 // This is the first bind for this TorService instance
                 if (size == 0) {
@@ -77,9 +84,7 @@ internal sealed class AbstractTorService: Service() {
                 put(conn.binder, holder)
 
                 // Initialize lazy value
-                executables.add(Executable {
-                    holder.runtime
-                })
+                executables.add(Executable { holder.runtime })
 
                 executables
             }.forEach { it.execute() }
