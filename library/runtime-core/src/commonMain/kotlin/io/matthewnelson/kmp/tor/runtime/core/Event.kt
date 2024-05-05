@@ -278,7 +278,7 @@ public abstract class Event<Data: Any?, E: Event<Data, E, O>, O: Event.Observer<
      * the @JvmStatic annotation.
      *
      * @param [numEvents] The number of event types to use as an initial
-     *   capacity value for the LinkedHashSet used for [lazyEntries].
+     *   capacity value for the LinkedHashSet supplied to [lazyEntries].
      * */
     public abstract class Entries<E: Event<*, *, *>> protected constructor(numEvents: Int) {
 

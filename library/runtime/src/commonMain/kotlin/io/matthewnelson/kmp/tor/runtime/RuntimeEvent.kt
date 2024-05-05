@@ -29,7 +29,6 @@ import kotlin.jvm.JvmStatic
  *         t.printStackTrace()
  *     }
  *
- *
  * @see [Observer]
  * @see [Event.observer]
  * @see [Processor]

@@ -80,7 +80,8 @@ public interface FileID {
             includeHashCode: Boolean = true,
         ): String {
             val name = this::class.simpleName ?: defaultClassName
-            return name + "[fid=" + fidEllipses + ']' + if (includeHashCode) '@' + hashCode() else ""
+            val hash = if (includeHashCode) "@${hashCode()}" else ""
+            return "$name[fid=$fidEllipses]$hash"
         }
 
         /**

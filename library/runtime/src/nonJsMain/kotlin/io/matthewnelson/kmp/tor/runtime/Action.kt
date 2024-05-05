@@ -32,8 +32,7 @@ public actual enum class Action {
      * Starts the tor daemon.
      *
      * If tor is running, the [QueuedJob] returned by
-     * [Processor.enqueue] will complete immediately with
-     * success.
+     * [Processor.enqueue] will complete with success.
      *
      * **NOTE:** Tor's startup process is broken out
      * into five (5) phases:
@@ -55,8 +54,7 @@ public actual enum class Action {
      * queued and awaiting execution will be cancelled.
      *
      * If tor is not running, the [QueuedJob] returned
-     * by [Processor.enqueue] will complete immediately with
-     * success.
+     * by [Processor.enqueue] will complete with success.
      * */
     StopDaemon,
 
