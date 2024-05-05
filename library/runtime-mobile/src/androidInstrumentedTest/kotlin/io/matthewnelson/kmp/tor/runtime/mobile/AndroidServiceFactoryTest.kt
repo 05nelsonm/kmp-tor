@@ -33,7 +33,7 @@ class AndroidServiceFactoryTest {
 
     @Test
     fun givenTorRuntime_whenAndroidRuntime_thenIsAndroidServiceFactory() {
-        val environment = app.createTorRuntimeEnvironment { dir -> TorResources(dir) }
+        val environment = app.createTorRuntimeEnvironment(dirName = "test_instance") { dir -> TorResources(dir) }
 
         val lces = mutableListOf<Lifecycle.Event>()
         val factory = TorRuntime.Builder(environment) {
@@ -51,7 +51,7 @@ class AndroidServiceFactoryTest {
 
     @Test
     fun givenTorService_whenRuntimeDestroyed_thenServiceIsDestroyed() {
-        val environment = app.createTorRuntimeEnvironment { dir -> TorResources(dir) }
+        val environment = app.createTorRuntimeEnvironment(dirName = "test_single") { dir -> TorResources(dir) }
         environment.debug = true
 
         val lces = mutableListOf<Lifecycle.Event>()
@@ -71,8 +71,8 @@ class AndroidServiceFactoryTest {
 
     @Test
     fun givenTorService_whenMultipleRuntime_thenServiceIsDestroyedWhenLastRuntimeDestroyed() {
-        val env1 = app.createTorRuntimeEnvironment { dir -> TorResources(dir) }
-        val env2 = app.createTorRuntimeEnvironment(dirName = "torservice2") { dir -> TorResources(dir) }
+        val env1 = app.createTorRuntimeEnvironment(dirName = "test_multi1") { dir -> TorResources(dir) }
+        val env2 = app.createTorRuntimeEnvironment(dirName = "test_multi2") { dir -> TorResources(dir) }
         env1.debug = true
         env2.debug = true
 

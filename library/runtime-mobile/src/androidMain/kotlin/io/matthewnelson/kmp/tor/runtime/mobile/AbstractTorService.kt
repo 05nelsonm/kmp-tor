@@ -23,12 +23,14 @@ import android.content.Intent
 import android.content.ServiceConnection
 import android.os.Binder as AndroidBinder
 import android.os.IBinder
+import io.matthewnelson.immutable.collections.toImmutableSet
 import io.matthewnelson.kmp.tor.core.api.annotation.ExperimentalKmpTorApi
 import io.matthewnelson.kmp.tor.runtime.Lifecycle
 import io.matthewnelson.kmp.tor.runtime.RuntimeEvent.Notifier.Companion.e
 import io.matthewnelson.kmp.tor.runtime.RuntimeEvent.Notifier.Companion.lce
 import io.matthewnelson.kmp.tor.runtime.RuntimeEvent.Notifier.Companion.w
-import io.matthewnelson.kmp.tor.runtime.mobile.internal.PersistentKeyMap
+import io.matthewnelson.kmp.tor.runtime.core.Executable
+import io.matthewnelson.kmp.tor.runtime.mobile.internal.SynchronizedInstance
 import io.matthewnelson.kmp.tor.runtime.TorRuntime.ServiceFactory.Binder as TorBinder
 
 @OptIn(ExperimentalKmpTorApi::class)
@@ -36,7 +38,7 @@ internal sealed class AbstractTorService: Service() {
 
     @Volatile
     private var _isDestroyed: Boolean = false
-    private val holders = PersistentKeyMap<TorBinder, Holder>()
+    private val holders = SynchronizedInstance(LinkedHashMap<TorBinder, Holder?>(1, 1.0f))
 
     private val binder = object : Binder() {
         override fun inject(conn: Connection) {
@@ -46,25 +48,41 @@ internal sealed class AbstractTorService: Service() {
                 conn.binder.e(IllegalStateException("$service cannot be bound to. isDestroyed[true]"))
                 return
             }
-            holders[conn.binder]?.let { holder ->
-                // It's currently being destroyed
-                if (holder.runtime.isDestroyed()) return@let
 
-                conn.binder.w(service, "${holder.runtime} is still active, but onServiceConnected was called")
-                return
-            }
+            holders.withLock {
+                get(conn.binder)?.let { holder ->
+                    // It's being destroyed right now, but its completion
+                    // callback has not removed itself from the holders
+                    // yet (we're holding the lock right now). Want to
+                    // continue here so that it will fail to remove
+                    // itself (because it's not there) and will not
+                    // disconnect.
+                    if (holder.runtime.isDestroyed()) return@let
 
-            // This is the first bind for this TorService instance
-            if (holders.sizeKeys == 0) {
-                conn.binder.lce(Lifecycle.Event.OnCreate(service))
-                conn.binder.lce(Lifecycle.Event.OnStart(service))
-            }
+                    conn.binder.w(service, "${holder.runtime} is still active, but onServiceConnected was called")
+                    return@withLock emptyList()
+                }
 
-            val holder = Holder(conn)
-            holders[conn.binder] = holder
+                val executables = ArrayList<Executable>(1)
 
-            // Initialize lazy value
-            holder.runtime
+                // This is the first bind for this TorService instance
+                if (size == 0) {
+                    executables.add(Executable {
+                        conn.binder.lce(Lifecycle.Event.OnCreate(service))
+                        conn.binder.lce(Lifecycle.Event.OnStart(service))
+                    })
+                }
+
+                val holder = Holder(conn)
+                put(conn.binder, holder)
+
+                // Initialize lazy value
+                executables.add(Executable {
+                    holder.runtime
+                })
+
+                executables
+            }.forEach { it.execute() }
         }
     }
 
@@ -96,16 +114,20 @@ internal sealed class AbstractTorService: Service() {
 
     public final override fun onTaskRemoved(rootIntent: Intent?) {
         super.onTaskRemoved(rootIntent)
-        holders.keys.forEach { binder ->
-            binder.lce(Lifecycle.Event.OnRemoved(application))
-        }
+        holders.withLock {
+            keys.map { binder ->
+                Executable {
+                    binder.lce(Lifecycle.Event.OnRemoved(application))
+                }
+            }
+        }.forEach { it.execute() }
     }
 
     public final override fun onDestroy() {
         _isDestroyed = true
         super.onDestroy()
 
-        holders.entries.map { (binder, holder) ->
+        holders.withLock { entries.toImmutableSet() }.map { (binder, holder) ->
             holder?.runtime?.destroy()
             binder
         }.forEach { binder ->
@@ -114,7 +136,7 @@ internal sealed class AbstractTorService: Service() {
         }
 
         // Clean up
-        holders.clear()
+        holders.withLock { clear() }
     }
 
     private inner class Holder(private val conn: Connection) {
@@ -131,7 +153,16 @@ internal sealed class AbstractTorService: Service() {
                 serviceObserversRuntimeEvent = emptySet(),
             ).apply {
                 invokeOnDestroy {
-                    val wasRemoved = holders.removeInstance(binder, this@Holder)
+                    val wasRemoved = holders.withLock {
+                        val isThis = get(binder) == this@Holder
+
+                        // Leave the singleton binder, but de-reference
+                        // this holder with the destroyed runtime.
+                        if (isThis) put(binder, null)
+
+                        isThis
+                    }
+
                     if (!wasRemoved || _isDestroyed) return@invokeOnDestroy
 
                     application.unbindService(conn)
@@ -139,7 +170,9 @@ internal sealed class AbstractTorService: Service() {
                 }
                 invokeOnDestroy {
                     if (_isDestroyed) return@invokeOnDestroy
-                    if (holders.sizeValues != 0) return@invokeOnDestroy
+
+                    val isLastInstance = holders.withLock { count { it.value != null } } == 0
+                    if (!isLastInstance) return@invokeOnDestroy
 
                     // Last instance destroyed. Kill it.
                     application.stopService(Intent(application, TorService::class.java))
