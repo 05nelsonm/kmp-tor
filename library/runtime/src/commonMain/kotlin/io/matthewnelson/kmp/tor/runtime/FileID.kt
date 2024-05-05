@@ -78,10 +78,17 @@ public interface FileID {
         public fun FileID.toFIDString(
             defaultClassName: String = "Unknown",
             includeHashCode: Boolean = true,
-        ): String {
-            val name = this::class.simpleName ?: defaultClassName
-            val hash = if (includeHashCode) "@${hashCode()}" else ""
-            return "$name[fid=$fidEllipses]$hash"
+        ): String = buildString {
+            val clazz = this@toFIDString
+
+            append(clazz::class.simpleName ?: defaultClassName)
+            append("[fid=")
+            append(fidEllipses)
+            append(']')
+            if (includeHashCode) {
+                append('@')
+                append(clazz.hashCode())
+            }
         }
 
         /**

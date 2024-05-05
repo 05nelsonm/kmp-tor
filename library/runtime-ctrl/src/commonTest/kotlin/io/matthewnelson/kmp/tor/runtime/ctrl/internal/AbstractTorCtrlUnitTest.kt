@@ -20,7 +20,6 @@ import io.matthewnelson.kmp.file.InterruptedException
 import io.matthewnelson.kmp.tor.runtime.core.*
 import io.matthewnelson.kmp.tor.runtime.core.ctrl.TorCmd
 import io.matthewnelson.kmp.tor.runtime.ctrl.TorCtrl
-import kotlin.coroutines.cancellation.CancellationException
 import kotlin.test.*
 
 class AbstractTorCtrlUnitTest {
@@ -95,7 +94,7 @@ class AbstractTorCtrlUnitTest {
 
         var invocationDestroy = 0
         ctrl.invokeOnDestroy { invocationDestroy++ }
-        ctrl.invokeOnDestroy { invocationDestroy++ }.invoke()
+        ctrl.invokeOnDestroy { invocationDestroy++ }.dispose()
         ctrl.destroy()
         assertEquals(1, invocationDestroy)
     }
@@ -117,6 +116,6 @@ class AbstractTorCtrlUnitTest {
 
         // posterity, nothing should happen like
         // exceptions or anything...
-        d1.invoke()
+        d1.dispose()
     }
 }

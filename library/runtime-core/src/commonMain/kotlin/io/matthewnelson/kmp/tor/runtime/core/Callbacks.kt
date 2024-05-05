@@ -195,7 +195,7 @@ public fun interface OnEvent<in Data: Any?>: ItBlock<Data> {
  * "dispose" of something.
  * */
 public fun interface Disposable {
-    public operator fun invoke()
+    public fun dispose()
 
     public companion object {
 
@@ -207,7 +207,7 @@ public fun interface Disposable {
     }
 
     private data object NOOP: Disposable {
-        override fun invoke() {}
+        override fun dispose() {}
         override fun toString(): String = "Disposable.NOOP"
     }
 }

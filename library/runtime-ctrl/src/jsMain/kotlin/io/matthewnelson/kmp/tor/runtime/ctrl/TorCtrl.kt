@@ -188,7 +188,7 @@ public actual interface TorCtrl : Destroyable, TorEvent.Processor, TorCmd.Privil
 
                         if (mark.elapsedNow() < 42.milliseconds) continue
 
-                        errorDisposable.invoke()
+                        errorDisposable.dispose()
                         socket.destroy()
                         threw = IOException("Timed out while attempting to connect")
                         break
@@ -198,7 +198,7 @@ public actual interface TorCtrl : Destroyable, TorEvent.Processor, TorCmd.Privil
                 threw?.let { throw it }
 
                 socket.onError { /* ignore */ }
-                errorDisposable.invoke()
+                errorDisposable.dispose()
                 socket
             }
 

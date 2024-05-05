@@ -17,7 +17,7 @@ public final class io/matthewnelson/kmp/tor/runtime/core/Destroyable$Companion {
 
 public abstract interface class io/matthewnelson/kmp/tor/runtime/core/Disposable {
 	public static final field Companion Lio/matthewnelson/kmp/tor/runtime/core/Disposable$Companion;
-	public abstract fun invoke ()V
+	public abstract fun dispose ()V
 	public static fun noOp ()Lio/matthewnelson/kmp/tor/runtime/core/Disposable;
 }
 

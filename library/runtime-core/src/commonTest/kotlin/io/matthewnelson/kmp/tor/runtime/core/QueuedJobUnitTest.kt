@@ -184,7 +184,7 @@ class QueuedJobUnitTest {
         val job = TestJob()
         job.invokeOnCompletion { invocations++ }
         val disposable = job.invokeOnCompletion { invocations++ }
-        disposable()
+        disposable.dispose()
         job.cancel(null)
         assertEquals(1, invocations)
     }
@@ -249,8 +249,8 @@ class QueuedJobUnitTest {
         job.invokeOnCompletion(cb)
 
         // Should return Disposable.NOOP
-        job.invokeOnCompletion(cb)()
-        job.invokeOnCompletion(cb)()
+        job.invokeOnCompletion(cb).dispose()
+        job.invokeOnCompletion(cb).dispose()
 
         job.error(Throwable())
         assertEquals(1, invocationCompletion)

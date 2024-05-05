@@ -134,7 +134,7 @@ internal sealed class AbstractTorService: Service() {
                     val wasRemoved = holders.removeInstance(binder, this@Holder)
                     if (!wasRemoved || _isDestroyed) return@invokeOnDestroy
 
-                    unbindService(conn)
+                    application.unbindService(conn)
                     binder.lce(Lifecycle.Event.OnUnbind(this@AbstractTorService))
                 }
                 invokeOnDestroy {
@@ -142,7 +142,7 @@ internal sealed class AbstractTorService: Service() {
                     if (holders.sizeValues != 0) return@invokeOnDestroy
 
                     // Last instance destroyed. Kill it.
-                    stopSelf()
+                    application.stopService(Intent(application, TorService::class.java))
                 }
             }
         }

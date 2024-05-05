@@ -16,11 +16,10 @@
 package io.matthewnelson.kmp.tor.runtime
 
 import io.matthewnelson.kmp.file.toFile
-import io.matthewnelson.kmp.tor.core.api.ResourceInstaller
 import io.matthewnelson.kmp.tor.core.api.annotation.ExperimentalKmpTorApi
+import io.matthewnelson.kmp.tor.resource.tor.TorResources
 import io.matthewnelson.kmp.tor.runtime.FileID.Companion.fidEllipses
 import io.matthewnelson.kmp.tor.runtime.core.TorEvent
-import io.matthewnelson.kmp.tor.runtime.internal.RealTorRuntime
 import kotlin.test.*
 
 @OptIn(ExperimentalKmpTorApi::class)
@@ -32,15 +31,20 @@ class ServiceFactoryUnitTest {
 
         val testBinder get() = binder
 
-        override fun startService() { throw RuntimeException("Not Implemented") }
+        override fun startService() {
+            binder.onBind(
+                emptySet(),
+                null,
+                emptySet(),
+                emptySet(),
+            )
+        }
     }
 
     private val env = TorRuntime.Environment.Builder(
         "factory_unit_test/work".toFile(),
         "factory_unit_test/cache".toFile(),
-        installer = { dir -> object : ResourceInstaller<ResourceInstaller.Paths.Tor>(dir) {
-            override fun install(): Paths.Tor { fail() }
-        } }
+        installer = { dir -> TorResources(dir) },
     ) {
         serviceFactoryLoader = object : TorRuntime.ServiceFactory.Loader() {
             override fun loadProtected(initializer: TorRuntime.ServiceFactory.Initializer): TorRuntime.ServiceFactory {
@@ -79,12 +83,17 @@ class ServiceFactoryUnitTest {
     @Test
     fun givenBinder_whenBindAndOtherInstanceIsNotDestroyed_thenDestroysPriorInstance() {
         val factory = TorRuntime.Builder(env) {} as TestFactory
-        var invocationWarn = 0
-        factory.subscribe(RuntimeEvent.LOG.WARN.observer { invocationWarn++ })
-        val runtime = factory.testBinder.bind()
-        factory.testBinder.bind().destroy()
-        assertTrue(runtime.isDestroyed())
-        assertEquals(1, invocationWarn)
+        val warnings = mutableListOf<String>()
+        factory.subscribe(RuntimeEvent.LOG.WARN.observer { warnings.add(it) })
+        val runtime1 = factory.testBinder.bind()
+        val runtime2 = factory.testBinder.bind()
+        assertTrue(runtime1.isDestroyed())
+
+        val warning = warnings.filter {
+            it.contains("onBind was called before previous instance was destroyed")
+        }
+        assertEquals(1, warning.size)
+        runtime2.destroy()
     }
 
     private fun TorRuntime.ServiceFactory.Binder.bind(

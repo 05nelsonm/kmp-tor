@@ -161,7 +161,7 @@ internal class RealTorCtrl private constructor(
 
         if (disposeDispatcher != Disposable.noOp()) {
             LOG.d { "Closing Dispatchers" }
-            disposeDispatcher.invoke()
+            disposeDispatcher.dispose()
         }
 
         LOG = null
