@@ -19,9 +19,11 @@ import io.matthewnelson.encoding.base16.Base16
 import io.matthewnelson.encoding.core.Encoder.Companion.encodeToString
 import io.matthewnelson.immutable.collections.immutableSetOf
 import io.matthewnelson.immutable.collections.toImmutableSet
+import io.matthewnelson.kmp.file.InterruptedException
 import io.matthewnelson.kmp.tor.runtime.core.*
 import io.matthewnelson.kmp.tor.runtime.core.address.IPAddress
 import io.matthewnelson.kmp.tor.runtime.core.address.OnionAddress
+import io.matthewnelson.kmp.tor.runtime.core.ctrl.TorCmd.Unprivileged.Processor
 import io.matthewnelson.kmp.tor.runtime.core.key.AddressKey
 import io.matthewnelson.kmp.tor.runtime.core.key.ED25519_V3
 import kotlin.coroutines.cancellation.CancellationException
@@ -485,7 +487,13 @@ public sealed class TorCmd<Success: Any> private constructor(
              * Adds the [cmd] to the queue.
              *
              * **NOTE:** If the returned [QueuedJob] gets cancelled,
-             * [onFailure] will be invoked with [CancellationException].
+             * [onFailure] will be invoked with [CancellationException]
+             * indicating normal behavior.
+             *
+             * **NOTE:** If the returned [QueuedJob] get interrupted,
+             * [onFailure] will be invoked with [InterruptedException].
+             * This can occur when the [Processor] implementation is
+             * shutdown and the job is awaiting execution.
              *
              * @return [QueuedJob]
              * @see [Reply.Error]
@@ -521,7 +529,13 @@ public sealed class TorCmd<Success: Any> private constructor(
              * Adds the [cmd] to the queue.
              *
              * **NOTE:** If the returned [QueuedJob] gets cancelled,
-             * [onFailure] will be invoked with [CancellationException].
+             * [onFailure] will be invoked with [CancellationException]
+             * indicating normal behavior.
+             *
+             * **NOTE:** If the returned [QueuedJob] get interrupted,
+             * [onFailure] will be invoked with [InterruptedException].
+             * This can occur when the [Processor] implementation is
+             * shutdown and the job is awaiting execution.
              *
              * @return [QueuedJob]
              * @see [OnFailure]

@@ -17,6 +17,7 @@
 
 package io.matthewnelson.kmp.tor.runtime
 
+import io.matthewnelson.kmp.file.InterruptedException
 import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
 import io.matthewnelson.kmp.tor.runtime.core.*
 import io.matthewnelson.kmp.tor.runtime.core.ctrl.TorCmd
@@ -79,7 +80,23 @@ public actual enum class Action {
          * Enqueues the [Action] for execution.
          *
          * **NOTE:** If the returned [QueuedJob] gets cancelled,
-         * [onFailure] will be invoked with [CancellationException].
+         * [onFailure] will be invoked with [CancellationException]
+         * indicating normal behavior.
+         *
+         * **NOTE:** If the returned [QueuedJob] get interrupted,
+         * [onFailure] will be invoked with [InterruptedException].
+         * For example, if [StartDaemon] is enqueued and immediately
+         * after, [StopDaemon] is enqueued too. [StopDaemon] will be
+         * at the top of the stack by the time the processor starts.
+         * The [StopDaemon] job will be executed, and all [StartDaemon]
+         * or [RestartDaemon] jobs beneath will be interrupted. If there
+         * are multiple [StopDaemon] jobs also enqueued, those jobs will
+         * be attached as children to the executing [StopDaemon] job and
+         * complete successfully alongside it. The converse scenario where
+         * [StartDaemon] or [RestartDaemon] is being executed, is the same
+         * whereby [StopDaemon] jobs are all interrupted, and [StartDaemon]
+         * or [RestartDaemon] jobs are attached as children, completing
+         * alongside the job that is executing.
          *
          * @return [QueuedJob]
          * @see [OnFailure]
@@ -100,6 +117,7 @@ public actual enum class Action {
          * Enqueues the [action], suspending the current coroutine
          * until completion or cancellation/error.
          *
+         * @see [Processor.enqueue]
          * @see [startDaemonAsync]
          * @see [stopDaemonAsync]
          * @see [restartDaemonAsync]
@@ -116,6 +134,7 @@ public actual enum class Action {
          * **NOTE:** This is a blocking call and should be invoked from
          * a background thread.
          *
+         * @see [Processor.enqueue]
          * @see [startDaemonSync]
          * @see [stopDaemonSync]
          * @see [restartDaemonSync]
@@ -152,6 +171,7 @@ public actual enum class Action {
          * Starts the tor daemon, suspending the current coroutine
          * until completion or cancellation/error.
          *
+         * @see [Processor.enqueue]
          * @see [Action.StartDaemon]
          * @see [startDaemonSync]
          * */
@@ -166,6 +186,7 @@ public actual enum class Action {
          * **NOTE:** This is a blocking call and should be invoked from
          * a background thread.
          *
+         * @see [Processor.enqueue]
          * @see [Action.StartDaemon]
          * @see [awaitSync]
          * @see [startDaemonAsync]
@@ -186,6 +207,7 @@ public actual enum class Action {
          * Stops the tor daemon, suspending the current coroutine
          * until completion or cancellation/error.
          *
+         * @see [Processor.enqueue]
          * @see [Action.StopDaemon]
          * @see [stopDaemonSync]
          * */
@@ -200,6 +222,7 @@ public actual enum class Action {
          * **NOTE:** This is a blocking call and should be invoked from
          * a background thread.
          *
+         * @see [Processor.enqueue]
          * @see [Action.StopDaemon]
          * @see [awaitSync]
          * @see [stopDaemonAsync]
@@ -220,6 +243,7 @@ public actual enum class Action {
          * Stops and then starts the tor daemon, suspending the
          * current coroutine until completion or cancellation/error.
          *
+         * @see [Processor.enqueue]
          * @see [Action.RestartDaemon]
          * @see [restartDaemonSync]
          * */
@@ -234,6 +258,7 @@ public actual enum class Action {
          * **NOTE:** This is a blocking call and should be invoked from
          * a background thread.
          *
+         * @see [Processor.enqueue]
          * @see [Action.RestartDaemon]
          * @see [awaitSync]
          * @see [restartDaemonAsync]

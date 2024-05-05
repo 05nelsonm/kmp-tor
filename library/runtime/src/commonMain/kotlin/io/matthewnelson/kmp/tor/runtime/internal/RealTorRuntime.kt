@@ -255,7 +255,7 @@ internal class RealTorRuntime private constructor(
             if (job is ActionJob.StopJob) {
                 job.completion()
             } else {
-                job.error(CancellationException(destroyedErrMsg))
+                job.error(InterruptedException(destroyedErrMsg))
             }
         }
 
@@ -565,7 +565,7 @@ internal class RealTorRuntime private constructor(
                 throw if (this is ActionJob.StopJob) {
                     SuccessCancellationException()
                 } else {
-                    CancellationException(destroyedErrMsg)
+                    InterruptedException(destroyedErrMsg)
                 }
             }
 
