@@ -42,6 +42,7 @@ import kotlin.concurrent.Volatile
 import kotlin.coroutines.cancellation.CancellationException
 import kotlin.jvm.JvmSynthetic
 import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.TimeSource
 
 @OptIn(ExperimentalKmpTorApi::class, InternalKmpTorApi::class)
 internal class RealTorRuntime private constructor(
@@ -802,30 +803,32 @@ internal class RealTorRuntime private constructor(
             val name = CoroutineName("StartService[fid=$fidEllipses]")
 
             val job = CoroutineScope(name + dispatcher).launch {
-                var failure: Throwable? = null
+                @Suppress("LocalVariableName")
+                var _failure: Throwable? = null
 
                 try {
                     startService()
                 } catch (t: RuntimeException) {
-                    failure = t
+                    _failure = t
                 }
 
                 // Wait for 500ms
-                var i = 0
-                while (failure == null && _instance == null) {
-                    delay(100.milliseconds)
-                    if (i++ < 5) continue
-                    if (_instance != null) break
-                    failure = InterruptedException("${name.name} timed out after 500ms")
+                TimeSource.Monotonic.markNow().let { mark ->
+                    // Node.js uses Dispatchers.Main so the test coroutine
+                    // library will not wait an actual 500ms. Make it so
+                    // there's a 500ms delay no matter what.
+                    while (_failure == null && _instance == null) {
+                        delay(100.milliseconds)
+                        if (mark.elapsedNow() < 500.milliseconds) continue
+                        if (_instance != null) break
+                        _failure = InterruptedException("${name.name} timed out after 500ms")
+                    }
                 }
 
                 // Has been started
-                if (failure == null) return@launch
+                val failure = _failure ?: return@launch
 
                 val executables = synchronized(lock) cancel@ {
-                    // onBind occurred, do nothing
-                    if (actionStack.isEmpty()) return@cancel emptyList()
-
                     val executables = ArrayList<Executable>(actionStack.size + 3)
 
                     // Interrupt or complete all ActionJob
