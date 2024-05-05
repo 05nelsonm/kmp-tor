@@ -82,8 +82,9 @@ public expect interface TorCtrl: Destroyable, TorEvent.Processor, TorCmd.Privile
      * @see [io.matthewnelson.kmp.tor.runtime.ctrl.TorCtrl.Factory.connect]
      * @param [staticTag] Special string that will exclude [TorEvent.Observer]
      *   with the same tag from removal until destroyed
-     * @param [observers] Some initial observers to start with, static
-     *   or not.
+     * @param [observers] Some initial observers to start with, static or not.
+     * @param [interceptors] Intercepts to hook into executing jobs & modify
+     *   the [TorCmd] (if needed).
      * @param [defaultExecutor] The default [OnEvent.Executor] to fall back to
      *   when calling [TorEvent.Observer.notify] if it does not have its own.
      * @param [debugger] A callback for debugging info. **MUST** be thread
@@ -94,6 +95,7 @@ public expect interface TorCtrl: Destroyable, TorEvent.Processor, TorCmd.Privile
     public class Factory(
         staticTag: String? = null,
         observers: Set<TorEvent.Observer> = emptySet(),
+        interceptors: Set<TorCmdInterceptor<*>> = emptySet(),
         defaultExecutor: OnEvent.Executor = OnEvent.Executor.Immediate,
         debugger: ItBlock<String>? = null,
         handler: UncaughtException.Handler,
@@ -101,6 +103,7 @@ public expect interface TorCtrl: Destroyable, TorEvent.Processor, TorCmd.Privile
 
         internal val staticTag: String?
         internal val observers: Set<TorEvent.Observer>
+        internal val interceptors: Set<TorCmdInterceptor<*>>
         internal val defaultExecutor: OnEvent.Executor
         internal val handler: UncaughtException.Handler
         internal val debugger: ItBlock<String>?

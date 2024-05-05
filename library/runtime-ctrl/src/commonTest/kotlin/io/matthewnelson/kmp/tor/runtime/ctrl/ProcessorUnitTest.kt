@@ -18,10 +18,7 @@ package io.matthewnelson.kmp.tor.runtime.ctrl
 import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
 import io.matthewnelson.kmp.tor.core.resource.SynchronizedObject
 import io.matthewnelson.kmp.tor.core.resource.synchronized
-import io.matthewnelson.kmp.tor.runtime.core.OnFailure
-import io.matthewnelson.kmp.tor.runtime.core.OnSuccess
-import io.matthewnelson.kmp.tor.runtime.core.TorEvent
-import io.matthewnelson.kmp.tor.runtime.core.UncaughtException
+import io.matthewnelson.kmp.tor.runtime.core.*
 import io.matthewnelson.kmp.tor.runtime.core.address.LocalHost
 import io.matthewnelson.kmp.tor.runtime.core.address.Port.Proxy.Companion.toPortProxy
 import io.matthewnelson.kmp.tor.runtime.core.address.ProxyAddress
@@ -46,7 +43,12 @@ class ProcessorUnitTest {
         val debugLogs = mutableListOf<String>()
         val lock = SynchronizedObject()
 
+        var invocationIntercept = 0
         val factory = TorCtrl.Factory(
+            interceptors = setOf(TorCmdInterceptor.intercept<TorCmd.Signal.Heartbeat> { _, cmd ->
+                synchronized(lock) { invocationIntercept++ }
+                cmd
+            }),
             debugger = { synchronized(lock) { debugLogs.add(it) } },
             handler = UncaughtException.Handler.THROW,
         )
@@ -96,6 +98,7 @@ class ProcessorUnitTest {
 
         // All commands for our test executed successfully
         assertEquals(7, invocationSuccess)
+        assertEquals(3, invocationIntercept)
 
         // Ensure that given our flurry of commands, a single processor
         // coroutine was started to handle them all.

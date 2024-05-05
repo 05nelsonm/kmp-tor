@@ -92,8 +92,9 @@ public actual interface TorCtrl : Destroyable, TorEvent.Processor, TorCmd.Privil
      * @see [connectAsync]
      * @param [staticTag] Special string that will exclude [TorEvent.Observer]
      *   with the same tag from removal until destroyed
-     * @param [observers] Some initial observers to start with, static
-     *   or not.
+     * @param [observers] Some initial observers to start with, static or not.
+     * @param [interceptors] Intercepts to hook into executing jobs & modify
+     *   the [TorCmd] (if needed).
      * @param [defaultExecutor] The default [OnEvent.Executor] to fall back to
      *   when calling [TorEvent.Observer.notify] if it does not have its own.
      * @param [debugger] A callback for debugging info. **MUST** be thread
@@ -106,12 +107,14 @@ public actual interface TorCtrl : Destroyable, TorEvent.Processor, TorCmd.Privil
     public actual constructor(
         internal actual val staticTag: String?,
         observers: Set<TorEvent.Observer>,
+        interceptors: Set<TorCmdInterceptor<*>>,
         internal actual val defaultExecutor: OnEvent.Executor,
         internal actual val debugger: ItBlock<String>?,
         internal actual val handler: UncaughtException.Handler,
     ) {
 
         internal actual val observers: Set<TorEvent.Observer> = observers.toImmutableSet()
+        internal actual val interceptors: Set<TorCmdInterceptor<*>> = interceptors.toImmutableSet()
 
         /**
          * Connects to a tor control listener via TCP port.
