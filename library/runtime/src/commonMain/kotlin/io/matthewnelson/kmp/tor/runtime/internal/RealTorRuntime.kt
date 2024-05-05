@@ -369,17 +369,6 @@ internal class RealTorRuntime private constructor(
 
                 var isOldQueueAttached = false
 
-                if (execute is ActionJob.StartJob) {
-                    val lifecycle = _lifecycle
-                    if (lifecycle != null) {
-                        execute.invokeOnCompletion {
-                            if (execute.isError) {
-                                lifecycle.destroy()
-                            }
-                        }
-                    }
-                }
-
                 if (execute is ActionJob.StopJob) {
                     val oldQueue = _cmdQueue
                     _cmdQueue = null
@@ -413,18 +402,26 @@ internal class RealTorRuntime private constructor(
                                 return@invokeOnCompletion
                             }
 
-                            val destroy = synchronized(enqueueLock) destroy@ {
-                                val q = _cmdQueue
-                                if (q != newQueue) return@destroy false
-                                // TODO: Check actionStack for another job???
-                                _cmdQueue = null
-                                true
+                            synchronized(enqueueLock) destroy@ {
+                                if (_cmdQueue == newQueue) {
+                                    _cmdQueue = null
+                                }
                             }
-
-                            if (!destroy) return@invokeOnCompletion
 
                             newQueue.connection?.destroy()
                             newQueue.destroy()
+                        }
+                    }
+                }
+
+                // Ensure that, in the event of a failure when starting, onDestroy
+                // is called in the event we are acting as a service.
+                if (execute is ActionJob.StartJob || execute is ActionJob.RestartJob) {
+                    val lifecycle = _lifecycle
+                    if (lifecycle != null) {
+                        execute.invokeOnCompletion {
+                            if (execute.isSuccess) return@invokeOnCompletion
+                            lifecycle.destroy()
                         }
                     }
                 }
@@ -520,31 +517,30 @@ internal class RealTorRuntime private constructor(
             require(this !is ActionJob.StartJob) { "doStop cannot be called for $this" }
             ensureActive()
 
-            if (this is ActionJob.StopJob) {
-                val lifecycle = _lifecycle
-                if (lifecycle != null) {
-                    NOTIFIER.d(this@ActionProcessor, "Lifecycle present (Service). Destroying immediately.")
+            val lifecycle = _lifecycle
+            if (this is ActionJob.StopJob && lifecycle != null) {
+                NOTIFIER.d(this@ActionProcessor, "Lifecycle present (Service). Destroying immediately.")
 
-                    oldCmdQueue?.connection?.destroy()
-                    oldCmdQueue?.destroy()
-                    lifecycle.destroy()
-                    return
-                }
+                oldCmdQueue?.connection?.destroy()
+                oldCmdQueue?.destroy()
+                lifecycle.destroy()
+                return
             }
 
             val oldQueue = oldCmdQueue
 
             if (oldQueue == null) {
-                NOTIFIER.d(this@ActionProcessor, "No TorCtrl queue present. Already shutdown.")
+                NOTIFIER.d(this@ActionProcessor, "TorCtrl queue not present. Already shutdown.")
                 return
             }
 
             val connection = oldQueue.connection
 
             if (connection == null) {
-                // Interrupt any temporarily queued jobs.
+                // Interrupt any temporarily queued jobs. If this is RestartJob,
+                // it will only attach a queue if there's a connection present.
                 oldQueue.destroy()
-                NOTIFIER.d(this@ActionProcessor, "No TorCtrl connection present. Already shutdown.")
+                NOTIFIER.d(this@ActionProcessor, "TorCtrl connection not present. Already shutdown.")
                 return
             }
 
