@@ -18,6 +18,8 @@ package io.matthewnelson.kmp.tor.runtime.core
 import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
 import io.matthewnelson.kmp.tor.core.resource.SynchronizedObject
 import io.matthewnelson.kmp.tor.core.resource.synchronized
+import kotlinx.coroutines.CoroutineExceptionHandler
+import kotlin.coroutines.CoroutineContext
 import kotlin.jvm.JvmField
 import kotlin.jvm.JvmName
 import kotlin.jvm.JvmStatic
@@ -82,34 +84,29 @@ public class UncaughtException private constructor(
              * **NOTE:** If [Handler] is null, [block] is still invoked and the
              * [UncaughtException] is thrown.
              *
-             * **NOTE:** [IllegalStateException] is thrown if handler is a leaked
-             * reference of [withSuppression] (i.e. [withSuppression] was used and
-             * the [SuppressedHandler] is being utilized **after** lambda closure).
-             *
              * @param [context] Contextual information about where/what [block] is
              *   to include in the [UncaughtException]
              * @param [block] the thing to do that may or may not throw exception.
              * @see [io.matthewnelson.kmp.tor.runtime.RuntimeEvent.ERROR]
              * @see [withSuppression]
-             * @throws [IllegalStateException] if [SuppressedHandler.isActive] is false
              * @throws [UncaughtException] if handler is null or [Handler.invoke] is
              *   set up to throw the exception
              * */
             @JvmStatic
             public fun Handler?.tryCatch(context: Any, block: ItBlock<Unit>) {
-                (this as? SuppressedHandler)?.checkIsActive()
+                var threw: UncaughtException? = null
 
                 try {
                     block(Unit)
                 } catch (t: Throwable) {
-                    val e = if (t is UncaughtException) {
+                    threw = if (t is UncaughtException) {
                         t
                     } else {
                         UncaughtException("context: $context", t)
                     }
-
-                    (this ?: THROW)(e)
                 }
+
+                threw?.let { (this ?: THROW)(it) }
             }
 
             /**
@@ -119,10 +116,10 @@ public class UncaughtException private constructor(
              * which is then propagated to the current handler (if
              * there even was an [UncaughtException]).
              *
-             * [SuppressedHandler] used in [block] will throw an
-             * [IllegalStateException] if it is referenced outside
-             * of [withSuppression] lambda, so do not hold onto the
-             * reference, treat as a disposable resource.
+             * If [SuppressedHandler] reference is leaked outside
+             * the [withSuppression] lambda, the [UncaughtException]
+             * will be passed back to the originating non-suppressed
+             * [Handler].
              *
              * Nested calls of [withSuppression] will use the root
              * [SuppressedHandler], so all [tryCatch] invocations
@@ -168,14 +165,20 @@ public class UncaughtException private constructor(
             public fun <T: Any?> Handler?.withSuppression(
                 block: SuppressedHandler.() -> T
             ): T {
-                val delegate = this
+                val handler = if (this is SuppressedHandler && !isActive) {
+                    root()
+                } else {
+                    this ?: THROW
+                }
+
                 var threw: UncaughtException? = null
                 var isActive = true
 
-                val suppressed = if (delegate is SuppressedHandler) {
-                    delegate
+                val suppressed = if (handler is SuppressedHandler) {
+                    // Was still active (nested withSuppression invocations)
+                    handler
                 } else {
-                    SuppressedHandler.of(isActive = { isActive }) { t ->
+                    SuppressedHandler.of(isActive = { isActive }, root = handler) { t ->
                         val result: Unit? = threw?.addSuppressed(t)
                         if (result == null) threw = t
                     }
@@ -183,20 +186,20 @@ public class UncaughtException private constructor(
 
                 val result = block(suppressed)
                 isActive = false
-                threw?.let { (delegate ?: THROW)(it) }
+                threw?.let { handler(it) }
                 return result
             }
 
             /**
-             * Helper for API builders utilizing [Handler] that checks
-             * if the instance is not a leaked reference of [SuppressedHandler]
+             * Retrieves the [Handler] from [CoroutineContext] if present.
+             *
+             * @see [OnEvent.Executor.execute]
              * */
             @JvmStatic
-            @Throws(IllegalArgumentException::class)
-            public fun Handler.requireInstanceIsNotSuppressed() {
-                require(this !is SuppressedHandler) {
-                    "handler is an instance of SuppressedHandler (leaked reference)"
-                }
+            @JvmName("fromCoroutineContextOrNull")
+            public fun CoroutineContext.uncaughtExceptionHandlerOrNull(): Handler? {
+                val handler = get(CoroutineExceptionHandler) ?: return null
+                return handler as? Handler
             }
         }
     }
@@ -206,14 +209,11 @@ public class UncaughtException private constructor(
      * lambda which propagates all exceptions caught by [Handler.tryCatch]
      * into a single, root exception (the first thrown), with all
      * subsequent exceptions added via [Throwable.addSuppressed].
-     *
-     * **NOTE:** Utilization outside [Handler.withSuppression] lambda
-     * will result in [IllegalStateException] being thrown by
-     * [Handler.tryCatch] and [invoke].
      * */
     public class SuppressedHandler private constructor(
         private val _isActive: () -> Boolean,
-        private val handler: Handler
+        private val _root: Handler,
+        private val suppressed: Handler,
     ): Handler {
 
         /**
@@ -221,36 +221,41 @@ public class UncaughtException private constructor(
          * */
         @get:JvmName("isActive")
         public val isActive: Boolean get() = _isActive()
+
         @OptIn(InternalKmpTorApi::class)
         private val lock = SynchronizedObject()
 
         override fun invoke(it: UncaughtException) {
-            checkIsActive(it)
+            if (!isActive) return _root(it)
 
             // Prevent potential ConcurrentModificationException
             // if being utilized in multithreaded manner.
             @OptIn(InternalKmpTorApi::class)
-            synchronized(lock) { handler(it) }
+            val useRoot = synchronized(lock) {
+                if (!isActive) return@synchronized true
+                suppressed(it)
+                false
+            }
+
+            if (!useRoot) return
+            _root(it)
         }
 
         @JvmSynthetic
-        @Throws(IllegalStateException::class)
-        internal fun checkIsActive(cause: UncaughtException? = null) {
-            if (isActive) return
-
-            val msg = "$this cannot be referenced outside of withSuppression block"
-            throw IllegalStateException(msg, cause)
-        }
+        internal fun root(): Handler = _root
 
         internal companion object {
 
             @JvmSynthetic
+            @Throws(IllegalArgumentException::class)
             internal fun of(
                 isActive: () -> Boolean,
-                handler: Handler
+                root: Handler,
+                suppressed: Handler,
             ): SuppressedHandler {
-                if (handler is SuppressedHandler) return handler
-                return SuppressedHandler(isActive, handler)
+                require(root !is SuppressedHandler) { "root handler cannot be an instance of SuppressedHandler" }
+                require(suppressed !is SuppressedHandler) { "suppressed cannot be an instance of SuppressedHandler" }
+                return SuppressedHandler(isActive, root, suppressed)
             }
         }
     }

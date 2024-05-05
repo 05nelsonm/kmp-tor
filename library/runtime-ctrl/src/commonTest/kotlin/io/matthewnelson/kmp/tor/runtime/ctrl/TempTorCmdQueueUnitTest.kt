@@ -13,13 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-package io.matthewnelson.kmp.tor.runtime.ctrl.internal
+package io.matthewnelson.kmp.tor.runtime.ctrl
 
+import io.matthewnelson.kmp.file.InterruptedException
 import io.matthewnelson.kmp.tor.runtime.core.QueuedJob
 import io.matthewnelson.kmp.tor.runtime.core.UncaughtException
+import io.matthewnelson.kmp.tor.runtime.core.ctrl.Reply
 import io.matthewnelson.kmp.tor.runtime.core.ctrl.TorCmd
-import io.matthewnelson.kmp.tor.runtime.ctrl.TempTorCmdQueue
 import io.matthewnelson.kmp.tor.runtime.ctrl.internal.AbstractTorCtrlUnitTest.TestCtrl
+import io.matthewnelson.kmp.tor.runtime.ctrl.internal.TorCmdJob
 import kotlin.test.*
 
 class TempTorCmdQueueUnitTest {
@@ -74,14 +76,14 @@ class TempTorCmdQueueUnitTest {
         // connection is not destroyed.
         val job = queue.enqueue(TorCmd.Signal.Dump, {}, {})
         ctrl.destroy()
-        assertEquals(QueuedJob.State.Cancelled, job.state)
+        assertEquals(QueuedJob.State.Error, job.state)
     }
 
     @Test
-    fun givenQueuedJobs_whenNoAttached_thenCancelsOnDestroy() {
-        val job = queue.enqueue(TorCmd.Signal.Dump, {}, {})
+    fun givenQueuedJobs_whenNoAttached_thenInterruptsOnDestroy() {
+        val job = queue.enqueue(TorCmd.Signal.Dump, { t -> assertIs<InterruptedException>(t) }, {})
         queue.destroy()
-        assertEquals(QueuedJob.State.Cancelled, job.state)
+        assertEquals(QueuedJob.State.Error, job.state)
         assertTrue(queue.isDestroyed())
     }
 
@@ -89,5 +91,11 @@ class TempTorCmdQueueUnitTest {
     fun givenDestroyed_whenAttach_thenThrowsIllegalStateException() {
         queue.destroy()
         assertFailsWith<IllegalStateException> { queue.attach(ctrl) }
+    }
+
+    @Test
+    fun givenDestroyed_whenEnqueueNoAttached_thenReturnsErrorJob() {
+        queue.destroy()
+        assertIsNot<TorCmdJob<Reply.Success.OK>>(queue.enqueue(TorCmd.Signal.Dump, {}, {}))
     }
 }

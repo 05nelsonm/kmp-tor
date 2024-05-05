@@ -13,337 +13,207 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-@file:Suppress("SpellCheckingInspection")
+@file:Suppress("SpellCheckingInspection", "ClassName")
 
 package io.matthewnelson.kmp.tor.runtime.core
 
-import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
-import kotlinx.coroutines.CoroutineExceptionHandler
-import kotlin.coroutines.CoroutineContext
-import kotlin.coroutines.EmptyCoroutineContext
-import kotlin.jvm.JvmField
+import kotlin.jvm.JvmStatic
 
 /**
  * [Asynchronous Events](https://torproject.gitlab.io/torspec/control-spec/#asynchronous-events)
  *
+ * e.g.
+ *
+ *     val circObserver = TorEvent.CIRC.observer { data ->
+ *         println(data)
+ *     }
+ *
  * @see [Observer]
- * @see [observer]
+ * @see [Event.observer]
  * @see [Processor]
+ * @see [TorEvent.Companion]
  * */
-public enum class TorEvent {
+public sealed class TorEvent private constructor(
+    name: String,
+): Event<String, TorEvent, TorEvent.Observer>(name) {
 
     /**
      * [Circuit Status Changed](https://torproject.gitlab.io/torspec/control-spec/#circuit-status-changed)
      * */
-    CIRC,
+    public data object CIRC: TorEvent("CIRC")
 
     /**
      * [Stream Status Changed](https://torproject.gitlab.io/torspec/control-spec/#stream-status-changed)
      * */
-    STREAM,
+    public data object STREAM: TorEvent("STREAM")
 
     /**
      * [OR Connection Status Changed](https://torproject.gitlab.io/torspec/control-spec/#or-connection-status-changed)
      * */
-    ORCONN,
+    public data object ORCONN: TorEvent("ORCONN")
 
     /**
      * [Bandwidth Used In The Last Second](https://torproject.gitlab.io/torspec/control-spec/#bandwidth-used-in-the-last-second)
      * */
-    BW,
+    public data object BW: TorEvent("BW")
 
     /**
      * [Log Messages](https://torproject.gitlab.io/torspec/control-spec/#log-messages)
      * */
-    DEBUG,
+    public data object DEBUG: TorEvent("DEBUG")
     /**
      * [Log Messages](https://torproject.gitlab.io/torspec/control-spec/#log-messages)
      * */
-    INFO,
+    public data object INFO: TorEvent("INFO")
     /**
      * [Log Messages](https://torproject.gitlab.io/torspec/control-spec/#log-messages)
      * */
-    NOTICE,
+    public data object NOTICE: TorEvent("NOTICE")
     /**
      * [Log Messages](https://torproject.gitlab.io/torspec/control-spec/#log-messages)
      * */
-    WARN,
+    public data object WARN: TorEvent("WARN")
     /**
      * [Log Messages](https://torproject.gitlab.io/torspec/control-spec/#log-messages)
      * */
-    ERR,
+    public data object ERR: TorEvent("ERR")
 
     /**
      * [New Descriptors Available](https://torproject.gitlab.io/torspec/control-spec/#new-descriptors-available)
      * */
-    NEWDESC,
+    public data object NEWDESC: TorEvent("NEWDESC")
 
     /**
      * [New Address Mapping](https://torproject.gitlab.io/torspec/control-spec/#new-address-mapping)
      * */
-    ADDRMAP,
+    public data object ADDRMAP: TorEvent("ADDRMAP")
 
     /**
      * [Our Descriptor Changed](https://torproject.gitlab.io/torspec/control-spec/#our-descriptor-changed)
      * */
-    DESCCHANGED,
+    public data object DESCCHANGED: TorEvent("DESCCHANGED")
 
     /**
      * [Status Events](https://torproject.gitlab.io/torspec/control-spec/#status-events)
      * */
-    STATUS_GENERAL,
+    public data object STATUS_GENERAL: TorEvent("STATUS_GENERAL")
     /**
      * [Status Events](https://torproject.gitlab.io/torspec/control-spec/#status-events)
      * */
-    STATUS_CLIENT,
+    public data object STATUS_CLIENT: TorEvent("STATUS_CLIENT")
     /**
      * [Status Events](https://torproject.gitlab.io/torspec/control-spec/#status-events)
      * */
-    STATUS_SERVER,
+    public data object STATUS_SERVER: TorEvent("STATUS_SERVER")
 
     /**
      * [Our Set Of Guard Nodes Changed](https://torproject.gitlab.io/torspec/control-spec/#our-set-of-guard-nodes-has-changed)
      * */
-    GUARD,
+    public data object GUARD: TorEvent("GUARD")
 
     /**
      * [Network Status Changed](https://torproject.gitlab.io/torspec/control-spec/#network-status-has-changed)
      * */
-    NS,
+    public data object NS: TorEvent("NS")
 
     /**
      * [Bandwidth Used On An Application Stream](https://torproject.gitlab.io/torspec/control-spec/#bandwidth-used-on-an-application-stream)
      * */
-    STREAM_BW,
+    public data object STREAM_BW: TorEvent("STREAM_BW")
 
     /**
      * [Per-country Client Stats](https://torproject.gitlab.io/torspec/control-spec/#per-country-client-stats)
      * */
-    CLIENTS_SEEN,
+    public data object CLIENTS_SEEN: TorEvent("CLIENTS_SEEN")
 
     /**
      * [New Consensus Network Status Arrived](https://torproject.gitlab.io/torspec/control-spec/#new-consensus-networkstatus-has-arrived)
      * */
-    NEWCONSENSUS,
+    public data object NEWCONSENSUS: TorEvent("NEWCONSENSUS")
 
     /**
      * [New Circuit Build Time Has Been Set](https://torproject.gitlab.io/torspec/control-spec/#new-circuit-buildtime-has-been-set)
      * */
-    BUILDTIMEOUT_SET,
+    public data object BUILDTIMEOUT_SET: TorEvent("BUILDTIMEOUT_SET")
 
     /**
      * [Signal Received](https://torproject.gitlab.io/torspec/control-spec/#signal-received)
      * */
-    SIGNAL,
+    public data object SIGNAL: TorEvent("SIGNAL")
 
     /**
      * [Configuration Changed](https://torproject.gitlab.io/torspec/control-spec/#configuration-changed)
      * */
-    CONF_CHANGED,
+    public data object CONF_CHANGED: TorEvent("CONF_CHANGED")
 
     /**
      * [Circuit Status Changed Slightly](https://torproject.gitlab.io/torspec/control-spec/#circuit-status-changed-slightly)
      * */
-    CIRC_MINOR,
+    public data object CIRC_MINOR: TorEvent("CIRC_MINOR")
 
     /**
      * [Pluggable Transport Launched](https://torproject.gitlab.io/torspec/control-spec/#pluggable-transport-launched)
      * */
-    TRANSPORT_LAUNCHED,
+    public data object TRANSPORT_LAUNCHED: TorEvent("TRANSPORT_LAUNCHED")
 
     /**
      * [Bandwidth Used On An OR Dir Or Exit Connection](https://torproject.gitlab.io/torspec/control-spec/#bandwidth-used-on-an-or-or-dir-or-exit-connection)
      * */
-    CONN_BW,
+    public data object CONN_BW: TorEvent("CONN_BW")
 
     /**
      * [Bandwidth Used By All Streams Attached To A Circuit](https://torproject.gitlab.io/torspec/control-spec/#bandwidth-used-by-all-streams-attached-to-a-circuit)
      * */
-    CIRC_BW,
+    public data object CIRC_BW: TorEvent("CIRC_BW")
 
     /**
      * [Per-circuit Cell Stats](https://torproject.gitlab.io/torspec/control-spec/#per-circuit-cell-stats)
      * */
-    CELL_STATS,
+    public data object CELL_STATS: TorEvent("CELL_STATS")
 
     /**
      * [HiddenService Descriptors](https://torproject.gitlab.io/torspec/control-spec/#hiddenservice-descriptors)
      * */
-    HS_DESC,
+    public data object HS_DESC: TorEvent("HS_DESC")
 
     /**
      * [HiddenService Descriptors Content](https://torproject.gitlab.io/torspec/control-spec/#hiddenservice-descriptors-content)
      * */
-    HS_DESC_CONTENT,
+    public data object HS_DESC_CONTENT: TorEvent("HS_DESC_CONTENT")
 
     /**
      * [Network Liveness Changed](https://torproject.gitlab.io/torspec/control-spec/#network-liveness-has-changed)
      * */
-    NETWORK_LIVENESS;
+    public data object NETWORK_LIVENESS: TorEvent("NETWORK_LIVENESS")
 
 //    /**
 //     * [Pluggable Transport Logs](https://torproject.gitlab.io/torspec/control-spec/#pluggable-transport-logs)
 //     * */
-//    PT_LOG,
+//    public data object PT_LOG: TorEvent("PT_LOG")
 //
 //    /**
 //     * [Pluggable Transport Status](https://torproject.gitlab.io/torspec/control-spec/#pluggable-transport-status)
 //     * */
-//    PT_STATUS,
-
-    /**
-     * Create an observer for the given [TorEvent]
-     * to register via [Processor.subscribe]
-     *
-     * e.g. (Kotlin)
-     *
-     *     TorEvent.BW.observer { output ->
-     *         updateNotification(output.formatBandwidth())
-     *     }
-     *
-     * e.g. (Java)
-     *
-     *     TorEvent.BW.observer(output -> {
-     *         updateNotification(formatBandwidth(output));
-     *     });
-     *
-     * @param [onEvent] The callback to pass the event text to
-     * */
-    public fun observer(
-        onEvent: OnEvent<String>,
-    ): Observer = observer("", onEvent)
-
-    /**
-     * Create an observer for the given [TorEvent] and [tag]
-     * to register via [Processor.subscribe]
-     *
-     * This is useful for lifecycle aware components, all of which
-     * can be removed with a single call using the [tag] upon
-     * component destruction.
-     *
-     * e.g. (Kotlin)
-     *
-     *     TorEvent.BW.observer("my service") { output ->
-     *         updateNotification(output.formatBandwidth())
-     *     }
-     *
-     * e.g. (Java)
-     *
-     *     TorEvent.BW.observer("my service", output -> {
-     *         updateNotification(formatBandwidth(output));
-     *     });
-     *
-     * @param [tag] Any non-blank string value
-     * @param [onEvent] The callback to pass the event text to
-     * */
-    public fun observer(
-        tag: String,
-        onEvent: OnEvent<String>,
-    ): Observer = Observer(this, tag, null, onEvent)
-
-    /**
-     * Create an observer for the given [TorEvent], [tag] and
-     * [OnEvent.Executor] to register via [Processor.subscribe].
-     *
-     * This is useful for lifecycle aware components, all of which
-     * can be removed with a single call using the [tag] upon
-     * component destruction.
-     *
-     * e.g. (Kotlin)
-     *
-     *     TorEvent.BW.observer(null, OnEvent.Executor.Main) { output ->
-     *         updateNotification(output.formatBandwidth())
-     *     }
-     *
-     * e.g. (Java)
-     *
-     *     TorEvent.BW.observer(null, OnEvent.Executor.Main.INSTANCE, output -> {
-     *         updateNotification(formatBandwidth(output));
-     *     });
-     *
-     * @param [tag] Any non-blank string value
-     * @param [executor] A custom executor for this observer which
-     *   will be used instead of the default one passed to
-     *   [Observer.notify].
-     * @param [onEvent] The callback to pass the event text to
-     * */
-    public fun observer(
-        tag: String?,
-        executor: OnEvent.Executor,
-        onEvent: OnEvent<String>,
-    ): Observer = Observer(this, tag, executor, onEvent)
+//    public data object PT_STATUS: TorEvent("PT_STATUS")
 
     /**
      * Model to be registered with a [Processor] for being notified
-     * via callback invocation with [TorEvent] output information.
+     * via [OnEvent] invocation with [TorEvent] data.
+     *
+     * @see [Event.Observer]
+     * @see [Processor]
      * */
     public open class Observer(
-        /**
-         * The [TorEvent] this is observing
-         * */
-        @JvmField
-        public val event: TorEvent,
+        event: TorEvent,
         tag: String?,
-        @JvmField
-        protected val executor: OnEvent.Executor?,
-        @JvmField
-        protected val onEvent: OnEvent<String>,
-    ) {
-
-        /**
-         * An identifier string
-         * */
-        @JvmField
-        public val tag: String? = tag?.ifBlank { null }
-
-        /**
-         * Invokes [OnEvent] for the given [event] string
-         *
-         * @param [default] the default [OnEvent.Executor] to fall
-         *   back to if [executor] was not defined for this observer.
-         * */
-        public fun notify(default: OnEvent.Executor, event: String) {
-            notify(EmptyCoroutineContext, default, event)
-        }
-
-        /**
-         * Invokes [OnEvent] for the given [event] string
-         *
-         * @param [handler] Optional ability to pass [UncaughtException.Handler]
-         *   wrapped as [CoroutineExceptionHandler]
-         * @param [default] the default [OnEvent.Executor] to fall
-         *   back to if [executor] was not defined for this observer.
-         * */
-        public fun notify(handler: CoroutineContext, default: OnEvent.Executor, event: String) {
-            @OptIn(InternalKmpTorApi::class)
-            (executor ?: default).execute(handler) { onEvent(event) }
-        }
-
-
-        public final override fun toString(): String = toString(isStatic = false)
-
-        public fun toString(isStatic: Boolean): String = buildString {
-            val tag = if (tag != null && isStatic) "STATIC" else tag
-
-            append("TorEvent.Observer[tag=")
-            append(tag.toString())
-            append(", event=")
-            append(event.name)
-
-            when (executor) {
-                null -> "null"
-                OnEvent.Executor.Main,
-                OnEvent.Executor.Immediate -> executor.toString()
-                else -> "Custom"
-            }.let {
-                append(", executor=")
-                append(it)
-            }
-
-            append("]@")
-            append(hashCode())
-        }
-    }
+        executor: OnEvent.Executor?,
+        onEvent: OnEvent<String>,
+    ): Event.Observer<String, TorEvent>(
+        event,
+        tag,
+        executor,
+        onEvent,
+    )
 
     /**
      * Base interface for implementations that process [TorEvent].
@@ -371,24 +241,71 @@ public enum class TorEvent {
         public fun unsubscribe(vararg observers: Observer)
 
         /**
-         * Remove all [Observer] of a single [TorEvent]
+         * Remove all [Observer] of a single [TorEvent].
          * */
         public fun unsubscribeAll(event: TorEvent)
 
         /**
-         * Remove all [Observer] of multiple [TorEvent]
+         * Remove all [Observer] of multiple [TorEvent].
          * */
         public fun unsubscribeAll(vararg events: TorEvent)
 
         /**
-         * Remove all [Observer] with the given [tag]
+         * Remove all [Observer] with the given [tag].
+         *
+         * If the implementin class extends both [Processor]
+         * and [io.matthewnelson.kmp.tor.runtime.RuntimeEvent.Processor],
+         * all [io.matthewnelson.kmp.tor.runtime.RuntimeEvent.Observer]
+         * with the given [tag] will also be removed.
          * */
         public fun unsubscribeAll(tag: String)
 
         /**
          * Remove all non-static [Observer] that are currently
          * registered.
+         *
+         * If the implementin class extends both [Processor]
+         * and [io.matthewnelson.kmp.tor.runtime.RuntimeEvent.Processor],
+         * all [io.matthewnelson.kmp.tor.runtime.RuntimeEvent.Observer]
+         * will also be removed.
          * */
         public fun clearObservers()
     }
+
+    public companion object: Entries<TorEvent>(numEvents = 31) {
+
+        @JvmStatic
+        @Throws(IllegalArgumentException::class)
+        public override fun valueOf(name: String): TorEvent {
+            return super.valueOf(name)
+        }
+
+        @JvmStatic
+        public override fun valueOfOrNull(name: String): TorEvent? {
+            return super.valueOfOrNull(name)
+        }
+
+        @JvmStatic
+        public override fun entries(): Set<TorEvent> {
+            return super.entries()
+        }
+
+        protected override val lazyEntries: ThisBlock<LinkedHashSet<TorEvent>> = ThisBlock {
+            add(CIRC); add(STREAM); add(ORCONN); add(BW);
+            add(DEBUG); add(INFO); add(NOTICE); add(WARN);
+            add(ERR); add(NEWDESC); add(ADDRMAP); add(DESCCHANGED);
+            add(STATUS_GENERAL); add(STATUS_CLIENT); add(STATUS_SERVER); add(GUARD);
+            add(NS); add(STREAM_BW); add(CLIENTS_SEEN); add(NEWCONSENSUS);
+            add(BUILDTIMEOUT_SET); add(SIGNAL); add(CONF_CHANGED); add(CIRC_MINOR);
+            add(TRANSPORT_LAUNCHED); add(CONN_BW); add(CIRC_BW); add(CELL_STATS);
+            add(HS_DESC); add(HS_DESC_CONTENT); add(NETWORK_LIVENESS);
+        }
+    }
+
+    protected final override fun factory(
+        event: TorEvent,
+        tag: String?,
+        executor: OnEvent.Executor?,
+        onEvent: OnEvent<String>,
+    ): Observer = Observer(event, tag, executor, onEvent)
 }

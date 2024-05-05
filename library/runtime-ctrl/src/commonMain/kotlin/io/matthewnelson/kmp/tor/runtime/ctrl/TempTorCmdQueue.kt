@@ -15,16 +15,14 @@
  **/
 package io.matthewnelson.kmp.tor.runtime.ctrl
 
+import io.matthewnelson.kmp.file.InterruptedException
 import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
 import io.matthewnelson.kmp.tor.core.resource.SynchronizedObject
 import io.matthewnelson.kmp.tor.core.resource.synchronized
 import io.matthewnelson.kmp.tor.runtime.core.*
-import io.matthewnelson.kmp.tor.runtime.core.Destroyable.Companion.checkDestroy
-import io.matthewnelson.kmp.tor.runtime.core.UncaughtException.Handler.Companion.requireInstanceIsNotSuppressed
+import io.matthewnelson.kmp.tor.runtime.core.Destroyable.Companion.checkIsNotDestroyed
 import io.matthewnelson.kmp.tor.runtime.core.ctrl.TorCmd
-import io.matthewnelson.kmp.tor.runtime.ctrl.internal.AbstractTorCtrl
-import io.matthewnelson.kmp.tor.runtime.ctrl.internal.TorCmdJob
-import io.matthewnelson.kmp.tor.runtime.ctrl.internal.cancelAndClearAll
+import io.matthewnelson.kmp.tor.runtime.ctrl.internal.*
 import kotlin.concurrent.Volatile
 import kotlin.coroutines.cancellation.CancellationException
 import kotlin.jvm.JvmName
@@ -59,12 +57,12 @@ public class TempTorCmdQueue private constructor(
 
     @Throws(IllegalArgumentException::class, IllegalStateException::class)
     public fun attach(connection: TorCtrl) {
-        checkDestroy()
+        checkIsNotDestroyed()
         require(connection is AbstractTorCtrl) { "TorCtrl must implement ${AbstractTorCtrl::class.simpleName}" }
 
         synchronized(lock) {
-            check(_connection == null) { "TorCtrl is already attached" }
-            checkDestroy()
+            check(_connection == null) { "$_connection is already attached" }
+            checkIsNotDestroyed()
             connection.transferAllUnprivileged(queue)
             _connection = connection
         }
@@ -85,34 +83,29 @@ public class TempTorCmdQueue private constructor(
         }
 
         if (!cancelAll) return
-        val cause = CancellationException("${this::class.simpleName}.onDestroy")
-        queue.cancelAndClearAll(cause, handler)
+        queue.interruptAndClearAll(message = "${this::class.simpleName}.onDestroy", handler)
     }
 
-    @Throws(IllegalStateException::class)
-    public override fun <Success : Any> enqueue(
+    public override fun <Success: Any> enqueue(
         cmd: TorCmd.Unprivileged<Success>,
         onFailure: OnFailure,
         onSuccess: OnSuccess<Success>,
     ): QueuedJob = connection?.enqueue(cmd, onFailure, onSuccess) ?: synchronized(lock) {
         var job = connection?.enqueue(cmd, onFailure, onSuccess)
-        if (job != null) return@synchronized job
 
-        checkDestroy()
-        job = TorCmdJob.of(cmd, onSuccess, onFailure, handler)
-        queue.add(job)
+        if (job == null && !isDestroyed()) {
+            job = TorCmdJob.of(cmd, onSuccess, onFailure, handler)
+            queue.add(job)
+        }
+
         job
-    }
+    } ?: cmd.toDestroyedErrorJob(onFailure, handler)
 
     internal companion object {
 
         @JvmSynthetic
-        @Throws(IllegalArgumentException::class)
         internal fun of(
             handler: UncaughtException.Handler
-        ): TempTorCmdQueue {
-            handler.requireInstanceIsNotSuppressed()
-            return TempTorCmdQueue(handler)
-        }
+        ): TempTorCmdQueue = TempTorCmdQueue(handler)
     }
 }

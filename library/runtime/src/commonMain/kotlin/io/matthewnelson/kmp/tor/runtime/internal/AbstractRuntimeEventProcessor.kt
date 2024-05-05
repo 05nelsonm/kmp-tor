@@ -37,9 +37,9 @@ internal abstract class AbstractRuntimeEventProcessor internal constructor(
 
     private val observers = LinkedHashSet<RuntimeEvent.Observer<*>>(observersRuntimeEvent.size + 1, 1.0F)
     private val lock = SynchronizedObject()
-    protected final override val handler = HandlerWithContext { t -> RuntimeEvent.ERROR.notifyObservers(t) }
+    protected override val handler = HandlerWithContext.of { t -> RuntimeEvent.ERROR.notifyObservers(t) }
     // Used for RuntimeEvent.ERROR ONLY
-    private val handlerERROR = HandlerWithContext(UncaughtException.Handler.THROW)
+    private val handlerERROR = HandlerWithContext.of(UncaughtException.Handler.THROW)
 
     init {
         observers.addAll(observersRuntimeEvent)
@@ -119,20 +119,20 @@ internal abstract class AbstractRuntimeEventProcessor internal constructor(
         super.clearObservers()
     }
 
-    protected fun <R: Any> RuntimeEvent<R>.notifyObservers(output: R) {
+    protected fun <Data: Any> RuntimeEvent<Data>.notifyObservers(data: Data) {
         val event = this
 
         if (event is RuntimeEvent.LOG.DEBUG && !debug) return
 
-        val observers = withObservers {
+        val observers = withObservers(isNotify = true) {
             if (isEmpty()) return@withObservers null
             mapNotNull { if (it.event == event) it else null }
         }
 
         if (observers.isNullOrEmpty()) {
             // Throw UncaughtException if no ERROR observers present.
-            if (event is RuntimeEvent.ERROR && output is UncaughtException) {
-                throw output
+            if (event is RuntimeEvent.ERROR && data is UncaughtException) {
+                throw data
             }
 
             return
@@ -149,25 +149,33 @@ internal abstract class AbstractRuntimeEventProcessor internal constructor(
 
             handler.tryCatch(ctx) {
                 @Suppress("UNCHECKED_CAST")
-                (observer as RuntimeEvent.Observer<R>)
-                    .notify(handler + ctx, defaultExecutor, output)
+                (observer as RuntimeEvent.Observer<Data>)
+                    .notify(handler + ctx, defaultExecutor, data)
             }
         }
     }
 
     protected override fun onDestroy(): Boolean {
-        val wasDestroyed = super.onDestroy()
-        if (wasDestroyed) synchronized(lock) { observers.clear() }
-        return wasDestroyed
+        if (!super.onDestroy()) return false
+        synchronized(lock) {
+            val iterator = observers.iterator()
+            while (iterator.hasNext()) {
+                val observer = iterator.next()
+                if (isService && observer.tag.isStaticTag()) continue
+                iterator.remove()
+            }
+        }
+        return true
     }
 
     private fun <T: Any?> withObservers(
+        isNotify: Boolean = false,
         block: MutableSet<RuntimeEvent.Observer<*>>.() -> T,
     ): T {
-        if (destroyed) return block(noOpMutableSet())
+        if (destroyed && !isNotify) return block(noOpMutableSet())
 
         return synchronized(lock) {
-            block(if (destroyed) noOpMutableSet() else observers)
+            block(if (destroyed && !isNotify) noOpMutableSet() else observers)
         }
     }
 

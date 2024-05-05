@@ -30,7 +30,7 @@ import kotlin.coroutines.cancellation.CancellationException
  * A Tor control connection
  *
  * Issuance of [TorCmd.Signal.Halt] or [TorCmd.Signal.Shutdown] will
- * cancel all enqueued jobs (if any) and then automatically [destroy]
+ * interrupt all enqueued jobs (if any) and then automatically [destroy]
  * itself when the underlying connection closes itself.
  *
  * @see [Factory]
@@ -39,7 +39,7 @@ public expect interface TorCtrl: Destroyable, TorEvent.Processor, TorCmd.Privile
 
     /**
      * Immediately disconnects from the control listener resulting
-     * in cancellation of all [QueuedJob], and invocation of all
+     * in interruption of all [QueuedJob], and invocation of all
      * handles registered via [invokeOnDestroy].
      *
      * If [TorCmd.Ownership.Take] was issued for this connection,
@@ -51,11 +51,11 @@ public expect interface TorCtrl: Destroyable, TorEvent.Processor, TorCmd.Privile
 
     /**
      * Register a [handle] to be invoked when this [TorCtrl] instance
-     * is destroyed. If [handle] is already registered, [Disposable.NOOP]
+     * is destroyed. If [handle] is already registered, [Disposable.noOp]
      * is returned.
      *
      * If [TorCtrl] is already destroyed, [handle] is invoked immediately
-     * and [Disposable.NOOP] is returned.
+     * and [Disposable.noOp] is returned.
      *
      * [handle] should **NOT** throw exception. In the event that
      * it does, it will be delegated to [Factory.handler]. If [TorCtrl]
@@ -90,12 +90,8 @@ public expect interface TorCtrl: Destroyable, TorEvent.Processor, TorCmd.Privile
      *   safe. Any non-[UncaughtException] it throws will be swallowed.
      * @param [handler] The [UncaughtException.Handler] to pipe bad behavior
      *   to. It **MUST** be thread-safe for Jvm & Native implementations.
-     * @throws [IllegalArgumentException] if [handler] is an instance
-     *   of [UncaughtException.SuppressedHandler] (a leaked reference)
      * */
-    public class Factory
-    @Throws(IllegalArgumentException::class)
-    public constructor(
+    public class Factory(
         staticTag: String? = null,
         observers: Set<TorEvent.Observer> = emptySet(),
         defaultExecutor: OnEvent.Executor = OnEvent.Executor.Immediate,

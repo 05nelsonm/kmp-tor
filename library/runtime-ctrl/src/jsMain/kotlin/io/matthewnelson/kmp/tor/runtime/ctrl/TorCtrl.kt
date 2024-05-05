@@ -17,20 +17,16 @@
 
 package io.matthewnelson.kmp.tor.runtime.ctrl
 
+import io.matthewnelson.immutable.collections.toImmutableSet
 import io.matthewnelson.kmp.file.*
 import io.matthewnelson.kmp.process.InternalProcessApi
 import io.matthewnelson.kmp.process.ReadBuffer
 import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
 import io.matthewnelson.kmp.tor.runtime.core.*
-import io.matthewnelson.kmp.tor.runtime.core.UncaughtException.Handler.Companion.requireInstanceIsNotSuppressed
 import io.matthewnelson.kmp.tor.runtime.core.address.IPAddress
 import io.matthewnelson.kmp.tor.runtime.core.address.ProxyAddress
 import io.matthewnelson.kmp.tor.runtime.core.ctrl.TorCmd
 import io.matthewnelson.kmp.tor.runtime.ctrl.internal.*
-import io.matthewnelson.kmp.tor.runtime.ctrl.internal.CtrlConnection
-import io.matthewnelson.kmp.tor.runtime.ctrl.internal.RealTorCtrl
-import io.matthewnelson.kmp.tor.runtime.ctrl.internal.checkUnixSockedSupport
-import io.matthewnelson.kmp.tor.runtime.ctrl.internal.net_createConnection
 import kotlinx.coroutines.*
 import org.khronos.webgl.Uint8Array
 import kotlin.time.Duration.Companion.milliseconds
@@ -40,15 +36,16 @@ import kotlin.time.TimeSource
  * A Tor control connection
  *
  * Issuance of [TorCmd.Signal.Halt] or [TorCmd.Signal.Shutdown] will
- * cancel all enqueued jobs (if any) and then automatically [destroy]
+ * interrupt all enqueued jobs (if any) and then automatically [destroy]
  * itself when the underlying connection closes itself.
  *
  * @see [Factory]
  * */
 public actual interface TorCtrl : Destroyable, TorEvent.Processor, TorCmd.Privileged.Processor {
+
     /**
      * Immediately disconnects from the control listener resulting
-     * in cancellation of all [QueuedJob], and invocation of all
+     * in interruption of all [QueuedJob], and invocation of all
      * handles registered via [invokeOnDestroy].
      *
      * If [TorCmd.Ownership.Take] was issued for this connection,
@@ -60,11 +57,11 @@ public actual interface TorCtrl : Destroyable, TorEvent.Processor, TorCmd.Privil
 
     /**
      * Register a [handle] to be invoked when this [TorCtrl] instance
-     * is destroyed. If [handle] is already registered, [Disposable.NOOP]
+     * is destroyed. If [handle] is already registered, [Disposable.noOp]
      * is returned.
      *
      * If [TorCtrl] is already destroyed, [handle] is invoked immediately
-     * and [Disposable.NOOP] is returned.
+     * and [Disposable.noOp] is returned.
      *
      * [handle] should **NOT** throw exception. In the event that
      * it does, it will be delegated to [Factory.handler]. If [TorCtrl]
@@ -95,23 +92,17 @@ public actual interface TorCtrl : Destroyable, TorEvent.Processor, TorCmd.Privil
      *   when calling [TorEvent.Observer.notify] if it does not have its own.
      * @param [debugger] A callback for debugging info. **MUST** be thread
      *   safe. Any non-[UncaughtException] it throws will be swallowed.
-     * @param [handler] The [UncaughtException.Handler] to pipe bad behavior
-     *   to.
-     * @throws [IllegalArgumentException] if [handler] is an instance
-     *   of [UncaughtException.SuppressedHandler] (a leaked reference)
+     * @param [handler] The [UncaughtException.Handler] to pipe bad behavior to.
      * */
-    @OptIn(InternalKmpTorApi::class)
-    public actual class Factory
-//    @Throws(IllegalArgumentException::class)
-    public actual constructor(
+    public actual class Factory public actual constructor(
         internal actual val staticTag: String?,
-        internal actual val observers: Set<TorEvent.Observer>,
+        observers: Set<TorEvent.Observer>,
         internal actual val defaultExecutor: OnEvent.Executor,
         internal actual val debugger: ItBlock<String>?,
         internal actual val handler: UncaughtException.Handler,
     ) {
 
-        init { handler.requireInstanceIsNotSuppressed() }
+        internal actual val observers: Set<TorEvent.Observer> = observers.toImmutableSet()
 
         /**
          * Connects to a tor control listener via TCP port.
@@ -197,7 +188,7 @@ public actual interface TorCtrl : Destroyable, TorEvent.Processor, TorCmd.Privil
 
                         if (mark.elapsedNow() < 42.milliseconds) continue
 
-                        errorDisposable.invoke()
+                        errorDisposable.dispose()
                         socket.destroy()
                         threw = IOException("Timed out while attempting to connect")
                         break
@@ -207,7 +198,7 @@ public actual interface TorCtrl : Destroyable, TorEvent.Processor, TorCmd.Privil
                 threw?.let { throw it }
 
                 socket.onError { /* ignore */ }
-                errorDisposable.invoke()
+                errorDisposable.dispose()
                 socket
             }
 
@@ -274,13 +265,13 @@ public actual interface TorCtrl : Destroyable, TorEvent.Processor, TorCmd.Privil
                 override fun close() { socket.destroy(); socket.unref() }
             }
 
-            val ctrl = RealTorCtrl.of(this, Dispatchers.Main, Disposable.NOOP, connection)
+            val ctrl = RealTorCtrl.of(this, Dispatchers.Main, Disposable.noOp(), connection)
 
             // A slight delay is needed before returning in order
             // to ensure that the coroutine starts before able
             // to call destroy on it.
             withContext(NonCancellable) {
-                while (!ctrl.isReading) {
+                while (!ctrl.isReady) {
                     delay(5.milliseconds)
                 }
 

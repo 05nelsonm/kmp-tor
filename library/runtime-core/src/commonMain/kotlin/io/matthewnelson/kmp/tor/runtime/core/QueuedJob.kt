@@ -19,13 +19,14 @@ import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
 import io.matthewnelson.kmp.tor.core.resource.SynchronizedObject
 import io.matthewnelson.kmp.tor.core.resource.synchronized
 import io.matthewnelson.kmp.tor.runtime.core.QueuedJob.State.*
-import io.matthewnelson.kmp.tor.runtime.core.UncaughtException.Handler.Companion.requireInstanceIsNotSuppressed
 import io.matthewnelson.kmp.tor.runtime.core.UncaughtException.Handler.Companion.tryCatch
 import io.matthewnelson.kmp.tor.runtime.core.UncaughtException.Handler.Companion.withSuppression
+import io.matthewnelson.kmp.tor.runtime.core.UncaughtException.SuppressedHandler
 import kotlin.concurrent.Volatile
 import kotlin.coroutines.cancellation.CancellationException
 import kotlin.jvm.JvmField
 import kotlin.jvm.JvmName
+import kotlin.jvm.JvmStatic
 
 /**
  * Base abstraction for single-use model that tracks the state
@@ -34,23 +35,13 @@ import kotlin.jvm.JvmName
  * discarded.
  *
  * Heavily inspired by [kotlinx.coroutines.Job]
- *
- * @throws [IllegalArgumentException] if handler is a leaked
- *   reference of [UncaughtException.SuppressedHandler]
  * */
-public abstract class QueuedJob
-@Throws(IllegalArgumentException::class)
-protected constructor(
+public abstract class QueuedJob protected constructor(
     @JvmField
     public val name: String,
-    // TODO:
-    //  @JvmField
-    //  public val canCancelWhileExecuting: Boolean
     onFailure: OnFailure,
     handler: UncaughtException.Handler,
 ) {
-
-    init { handler.requireInstanceIsNotSuppressed() }
 
     @Volatile
     private var _cancellationException: CancellationException? = null
@@ -59,7 +50,7 @@ protected constructor(
     @Volatile
     private var _isCompleting: Boolean = false
     @Volatile
-    private var _handler: UncaughtException.Handler? = handler
+    private var _handler: UncaughtException.Handler? = if (handler is SuppressedHandler) handler.root() else handler
     @Volatile
     private var _onFailure: OnFailure? = onFailure
     @Volatile
@@ -69,13 +60,16 @@ protected constructor(
 
     /**
      * If [cancel] was invoked successfully, this **will not** be null.
+     *
+     * If [onError] was invoked with a cause of [CancellationException],
+     * this will also be set to indicate as such.
      * */
     @get:JvmName("cancellationException")
     public val cancellationException: CancellationException? get() = _cancellationException
 
     /**
      * An intermediate "state" indicating that completion,
-     * either by success or error/cancellation is underway.
+     * either by success or error/cancellation, is underway.
      *
      * Will be set back to false after all [invokeOnCompletion]
      * handles have been run.
@@ -83,6 +77,30 @@ protected constructor(
     @get:JvmName("isCompleting")
     public val isCompleting: Boolean get() = _isCompleting
 
+    /**
+     * If [state] is [State.Cancelled]
+     * */
+    @get:JvmName("isCancelled")
+    public val isCancelled: Boolean get() = _state == Cancelled
+
+    /**
+     * If [state] is [State.Error]
+     * */
+    @get:JvmName("isError")
+    public val isError: Boolean get() = _state == Error
+
+    /**
+     * If [state] is [State.Success]
+     * */
+    @get:JvmName("isSuccess")
+    public val isSuccess: Boolean get() = _state == Success
+
+    /**
+     * Checks if the job is in a completion state or not.
+     *
+     * @return true when [state] is [Enqueued] or [Executing]
+     *   otherwise false
+     * */
     @get:JvmName("isActive")
     public val isActive: Boolean get() = when (_state) {
         Cancelled,
@@ -114,17 +132,17 @@ protected constructor(
         Executing,
 
         /**
-         * If the job completed by cancellation.
+         * If the job completed by cancellation via [cancel].
          * */
         Cancelled,
 
         /**
-         * If the job completed successfully.
+         * If the job completed successfully via [onCompletion].
          * */
         Success,
 
         /**
-         * If the job completed exceptionally.
+         * If the job completed exceptionally via [onError].
          * */
         Error,
     }
@@ -132,11 +150,11 @@ protected constructor(
     /**
      * Register a [handle] to be invoked when this [QueuedJob]
      * completes, either successfully or by cancellation/error.
-     * If [handle] is already registered, [Disposable.NOOP] is
+     * If [handle] is already registered, [Disposable.noOp] is
      * returned.
      *
      * If the job has already completed, [handle] is invoked
-     * immediately and [Disposable.NOOP] is returned.
+     * immediately and [Disposable.noOp] is returned.
      *
      * If the job completed by cancellation, [handle] will
      * be invoked with a [CancellationException] argument to
@@ -166,17 +184,23 @@ protected constructor(
             UncaughtException.Handler.THROW.tryCatch(toString()) {
                 handle(_cancellationException)
             }
-            return Disposable.NOOP
+            return Disposable.noOp()
         }
 
-        if (!wasAdded) return Disposable.NOOP
+        if (!wasAdded) return Disposable.noOp()
+
+        var isDisposed = false
 
         return Disposable {
             if (!isActive) return@Disposable
+            if (isDisposed) return@Disposable
 
             @OptIn(InternalKmpTorApi::class)
             synchronized(lock) {
+                if (isDisposed) return@synchronized
+
                 _completionCallbacks?.remove(handle)
+                isDisposed = true
             }
         }
     }
@@ -249,17 +273,18 @@ protected constructor(
     }
 
     /**
-     * Sets the job state to [State.Success] and invokes
-     * [OnSuccess] returned by [withLock] with provided
-     * [response]. Does nothing if the job is already completed
-     * or [isCompleting] is true.
+     * Sets the job state to [State.Success] and invokes [OnSuccess]
+     * returned by [withLock] with provided [response]. Does nothing
+     * if the job is already completed or [isCompleting] is true.
      *
-     * **NOTE:** [withLock] lambda should not call any other
-     * functions which acquire the lock such as [cancel], [onError],
-     * or [invokeOnCompletion]. It **MUST NOT** throw exception.
+     * Implementations **must not** call [invokeOnCompletion] from within
+     * the [withLock] lambda. It will result in a deadlock.
+     *
+     * @return true if it executed successfully, false if the job
+     *   was already completed.
      * */
-    protected fun <T: Any> onCompletion(response: T, withLock: () -> OnSuccess<T>?) {
-        if (_isCompleting || !isActive) return
+    protected fun <T: Any?> onCompletion(response: T, withLock: (() -> OnSuccess<T>?)?): Boolean {
+        if (_isCompleting || !isActive) return false
 
         var onSuccess: OnSuccess<T>? = null
 
@@ -270,32 +295,35 @@ protected constructor(
             // if implementation calls again it will
             // not lock up.
             _isCompleting = true
-            onSuccess = withLock()
+            onSuccess = withLock?.invoke()
             true
         }
 
-        if (!complete) return
+        if (!complete) return false
 
         Success.doFinal {
             onSuccess?.let { it(response) }
         }
+
+        return true
     }
 
     /**
-     * Sets the job state to [State.Error] and invokes [_onFailure]
+     * Sets the job state to [State.Error] and invokes [OnFailure]
      * with provided [cause]. Does nothing if the job is already
      * completed.
      *
-     * If [cause] is [CancellationException], [cancellationException] will
-     * be set and [State.Cancelled] will be utilized for the completion
-     * state.
+     * If [cause] is [CancellationException], [cancellationException]
+     * will be set.
      *
-     * **NOTE:** [withLock] lambda should not call any other
-     * functions which obtain the lock such as [cancel], [onCompletion],
-     * or [invokeOnCompletion].
+     * Implementations **must not** call [invokeOnCompletion] from within
+     * the [withLock] lambda. It will result in a deadlock.
+     *
+     * @return true if it executed successfully, false if the job
+     *   was already completed.
      * */
-    protected fun onError(cause: Throwable, withLock: ItBlock<Unit>) {
-        if (_isCompleting || !isActive) return
+    protected fun onError(cause: Throwable, withLock: ItBlock<Unit>?): Boolean {
+        if (_isCompleting || !isActive) return false
 
         val isCancellation = cause is CancellationException
 
@@ -309,13 +337,13 @@ protected constructor(
             // if implementation calls again it will
             // not lock up.
             _isCompleting = true
-            withLock(Unit)
+            withLock?.invoke(Unit)
             true
         }
 
-        if (!complete) return
+        if (!complete) return false
 
-        (if (isCancellation) Cancelled else Error).doFinal {
+        Error.doFinal {
             try {
                 _onFailure?.let { it(cause) }
             } finally {
@@ -324,6 +352,8 @@ protected constructor(
                 }
             }
         }
+
+        return true
     }
 
     private fun State.doFinal(action: () -> Unit) {
@@ -332,7 +362,7 @@ protected constructor(
 
         when (this) {
             Enqueued,
-            Executing -> throw IllegalArgumentException("$this cannot call doFinal")
+            Executing -> throw IllegalArgumentException("$this cannot be utilized with doFinal")
             Cancelled,
             Success,
             Error -> {}
@@ -351,6 +381,8 @@ protected constructor(
                 _handler = null
                 _onFailure = null
 
+                // Must invoke outside synchronized
+                // lambda to prevent deadlock
                 val callbacks = _completionCallbacks
                 _completionCallbacks = null
                 callbacks
@@ -364,7 +396,49 @@ protected constructor(
         }
     }
 
-    final override fun toString(): String = toString(_state)
+    public final override fun toString(): String = toString(_state)
 
-    private fun toString(state: State): String = "QueuedJob[name=$name, state=$state]@${hashCode()}"
+    private fun toString(state: State): String {
+        val clazz = this::class.simpleName ?: "QueuedJob"
+        return "$clazz[name=$name, state=$state]@${hashCode()}"
+    }
+
+    public companion object {
+
+        /**
+         * Creates a [QueuedJob] which immediately invokes
+         * [OnFailure] with the provided [cause].
+         * */
+        @JvmStatic
+        @JvmName("immediateErrorJob")
+        public fun OnFailure.toImmediateErrorJob(
+            name: String,
+            cause: Throwable,
+            handler: UncaughtException.Handler,
+        ): QueuedJob = object : QueuedJob(
+            name,
+            this@toImmediateErrorJob,
+            handler,
+        ) {
+            init { onError(cause, null) }
+        }
+
+        /**
+         * Creates a [QueuedJob] which immediately invokes
+         * [OnSuccess] with the provided [response].
+         * */
+        @JvmStatic
+        @JvmName("immediateSuccessJob")
+        public fun <T: Any?> OnSuccess<T>.toImmediateSuccessJob(
+            name: String,
+            response: T,
+            handler: UncaughtException.Handler,
+        ): QueuedJob = object : QueuedJob(
+            name,
+            OnFailure.noOp(),
+            handler
+        ) {
+            init { onCompletion(response) { this@toImmediateSuccessJob } }
+        }
+    }
 }

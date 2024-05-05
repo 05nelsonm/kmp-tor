@@ -25,7 +25,7 @@ class CtrlConnectionParserUnitTest {
     @Test
     fun givenEvent_whenMultiLine_thenIsAsExpected() {
         val p = TestParser(
-            onNotify = { event, output ->
+            onNotify = { event, data ->
                 assertEquals(TorEvent.NEWCONSENSUS, event)
 
                 assertEquals(
@@ -34,7 +34,7 @@ class CtrlConnectionParserUnitTest {
                         l2
                         l3
                     """.trimIndent(),
-                    output,
+                    data,
                 )
             }
         )
@@ -52,7 +52,7 @@ class CtrlConnectionParserUnitTest {
     @Test
     fun givenEvent_whenMultiResponse_thenIsAsExpected() {
         val p = TestParser(
-            onNotify = { event, output ->
+            onNotify = { event, data ->
                 assertEquals(TorEvent.CONF_CHANGED, event)
 
                 assertEquals(
@@ -60,7 +60,7 @@ class CtrlConnectionParserUnitTest {
                         SocksPort=9055
                         DNSPort=1080
                     """.trimIndent(),
-                    output
+                    data
                 )
             }
         )
@@ -76,7 +76,7 @@ class CtrlConnectionParserUnitTest {
     @Test
     fun givenEvent_whenMultiResponseNotEndOK_thenIsAsExpected() {
         val p = TestParser(
-            onNotify = { event, output ->
+            onNotify = { event, data ->
                 assertEquals(TorEvent.CIRC, event)
 
                 assertEquals(
@@ -85,7 +85,7 @@ class CtrlConnectionParserUnitTest {
                     EXTRAMAGIC=99
                     ANONYMITY=high
                 """.trimIndent(),
-                    output
+                    data
                 )
             }
         )
@@ -101,9 +101,9 @@ class CtrlConnectionParserUnitTest {
     fun givenEvent_whenSingleLine_thenIsAsExpected() {
         val expected = "1000 EXTENDED moria1,moria2"
         val p = TestParser(
-            onNotify = { event, output ->
+            onNotify = { event, data ->
                 assertEquals(TorEvent.CIRC, event)
-                assertEquals(expected, output)
+                assertEquals(expected, data)
             }
         )
 
@@ -167,7 +167,7 @@ class CtrlConnectionParserUnitTest {
 
     private class TestParser(
         private val onError: (details: String) -> Unit = {},
-        private val onNotify: (event: TorEvent, output: String) -> Unit = { _, _ ->},
+        private val onNotify: (event: TorEvent, data: String) -> Unit = { _, _ ->},
         private val onRespond: (replies: ArrayList<Reply>) -> Unit = {},
     ): CtrlConnection.Parser() {
 
@@ -183,9 +183,9 @@ class CtrlConnectionParserUnitTest {
             onError.invoke(details)
         }
 
-        override fun TorEvent.notify(output: String) {
+        override fun TorEvent.notify(data: String) {
             invocationNotify++
-            onNotify.invoke(this, output)
+            onNotify.invoke(this, data)
         }
 
         override fun ArrayList<Reply>.respond() {

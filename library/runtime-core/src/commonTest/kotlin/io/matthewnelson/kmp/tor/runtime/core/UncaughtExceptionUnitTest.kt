@@ -44,23 +44,4 @@ class UncaughtExceptionUnitTest {
         assertEquals(1, exceptions.size)
         assertEquals(2, exceptions.first().suppressedExceptions.size)
     }
-
-    @Test
-    fun givenSuppression_whenLeakedOutsideLambda_thenThrowsIllegalStateException() {
-        val exceptions = mutableListOf<UncaughtException>()
-        val suppressed = UncaughtException.Handler { exceptions.add(it) }.withSuppression {
-            repeat(3) { i -> tryCatch(i) { throw IllegalStateException("i") } }
-            this
-        }
-
-        assertIs<UncaughtException.SuppressedHandler>(suppressed)
-
-        assertFailsWith<IllegalStateException> {
-            suppressed(exceptions.firstOrNull()!!)
-        }
-
-        assertFailsWith<IllegalStateException> {
-            suppressed.tryCatch("") {}
-        }
-    }
 }

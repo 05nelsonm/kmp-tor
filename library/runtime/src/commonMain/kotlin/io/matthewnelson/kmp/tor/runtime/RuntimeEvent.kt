@@ -13,34 +13,30 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
+@file:Suppress("KotlinRedundantDiagnosticSuppress")
+
 package io.matthewnelson.kmp.tor.runtime
 
-import io.matthewnelson.immutable.collections.immutableSetOf
-import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
-import io.matthewnelson.kmp.tor.runtime.core.OnEvent
-import io.matthewnelson.kmp.tor.runtime.core.TorEvent
-import io.matthewnelson.kmp.tor.runtime.core.UncaughtException
-import kotlinx.coroutines.CoroutineExceptionHandler
-import kotlin.coroutines.CoroutineContext
-import kotlin.coroutines.EmptyCoroutineContext
-import kotlin.jvm.JvmField
-import kotlin.jvm.JvmName
+import io.matthewnelson.kmp.tor.runtime.core.*
 import kotlin.jvm.JvmStatic
 
 /**
  * Events specific to [TorRuntime]
  *
+ * e.g.
+ *
+ *     val errorObserver = RuntimeEvent.LOG.ERROR.observer { t ->
+ *         t.printStackTrace()
+ *     }
+ *
  * @see [Observer]
- * @see [observer]
+ * @see [Event.observer]
  * @see [Processor]
- * @see [entries]
- * @see [valueOf]
- * @see [valueOfOrNull]
+ * @see [RuntimeEvent.Companion]
  * */
-public sealed class RuntimeEvent<R: Any> private constructor(
-    @JvmField
-    public val name: String,
-) {
+public sealed class RuntimeEvent<Data: Any> private constructor(
+    name: String
+): Event<Data, RuntimeEvent<Data>, RuntimeEvent.Observer<Data>>(name) {
 
     /**
      * Errors encountered by [TorRuntime].
@@ -50,15 +46,35 @@ public sealed class RuntimeEvent<R: Any> private constructor(
      * observers as [UncaughtException].
      *
      * **NOTE:** Any exceptions thrown by [ERROR] observers are re-thrown
-     * as [UncaughtException] (if not already one).
+     * as [UncaughtException] (if not already one). This will likely crash
+     * the program.
      *
      * **NOTE:** If the error is an [UncaughtException] and no observers
      * for [ERROR] are registered with [TorRuntime], the [UncaughtException]
-     * will be thrown. It is critical that an [ERROR] observer be registered
-     * either via [TorRuntime.Builder.observerStatic], or immediately after
-     * [TorRuntime] is instantiated via [TorRuntime.subscribe].
+     * will be thrown (and likely crash the program). It is critical that an
+     * [ERROR] observer be registered either via [TorRuntime.Builder.observerStatic],
+     * or immediately after [TorRuntime] is instantiated via [TorRuntime.subscribe].
      * */
     public data object ERROR: RuntimeEvent<Throwable>("ERROR")
+
+    /**
+     * The current [Action] that is being executed by [TorRuntime].
+     *
+     * Useful for reacting to specific jobs via attachment of an
+     * [ActionJob.invokeOnCompletion] handler.
+     *
+     * e.g.
+     *
+     *     EXECUTE.observer { job ->
+     *         if (!job.isStop) return@observer
+     *         job.invokeOnCompletion {
+     *             if (job.isSuccess) {
+     *                 // do something
+     *             }
+     *         }
+     *     }
+     * */
+    public data object EXECUTE: RuntimeEvent<ActionJob>("EXECUTE")
 
     /**
      * Events pertaining to an object's lifecycle.
@@ -87,158 +103,32 @@ public sealed class RuntimeEvent<R: Any> private constructor(
         public data object WARN: LOG("LOG_WARN")
     }
 
-    /**
-     * Create an observer for the given [RuntimeEvent]
-     * to register via [Processor.subscribe].
-     *
-     * e.g. (Kotlin)
-     *
-     *     RuntimeEvent.DEBUG.observer { output ->
-     *         println(output)
-     *     }
-     *
-     * e.g. (Java)
-     *
-     *     RuntimeEvent.DEBUG.INSTANCE.observer(output -> {
-     *         System.out.println(output);
-     *     });
-     *
-     * @param [onEvent] The callback to pass the event output to
-     * */
-    public fun observer(
-        onEvent: OnEvent<R>,
-    ): Observer<R> = observer("", onEvent)
-
-    /**
-     * Create an observer for the given [RuntimeEvent]
-     * to register via [Processor.subscribe].
-     *
-     * This is useful for lifecycle aware components, all of which
-     * can be removed with a single call using the [tag] upon
-     * component destruction.
-     *
-     * e.g. (Kotlin)
-     *
-     *     RuntimeEvent.DEBUG.observer("my service") { output ->
-     *         println(output)
-     *     }
-     *
-     * e.g. (Java)
-     *
-     *     RuntimeEvent.DEBUG.INSTANCE.observer("my service", output -> {
-     *         System.out.println(output);
-     *     });
-     *
-     * @param [tag] Any non-blank string value
-     * @param [onEvent] The callback to pass the event output to
-     * */
-    public fun observer(
-        tag: String,
-        onEvent: OnEvent<R>,
-    ): Observer<R> = Observer(this, tag, null, onEvent)
-
-    /**
-     * Create an observer for the given [RuntimeEvent], [tag] and
-     * [OnEvent.Executor] to register via [Processor.subscribe].
-     *
-     * e.g. (Kotlin)
-     *
-     *     RuntimeEvent.DEBUG.observer(null, OnEvent.Executor.Main) { output ->
-     *         println(output)
-     *     }
-     *
-     * e.g. (Java)
-     *
-     *     RuntimeEvent.DEBUG.INSTANCE.observer(
-     *         null,
-     *         OnEvent.Executor.Main.INSTANCE,
-     *         output -> {
-     *             System.out.println(output);
-     *         }
-     *     );
-     *
-     * @param [tag] Any non-blank string value
-     * @param [executor] A custom executor for this observer which
-     *   will be used instead of the default one passed to
-     *   [Observer.notify].
-     * @param [onEvent] The callback to pass the event output to
-     * */
-    public fun observer(
-        tag: String?,
-        executor: OnEvent.Executor,
-        onEvent: OnEvent<R>,
-    ): Observer<R> = Observer(this, tag, executor, onEvent)
+    // TODO: NEWNYM
+    //  Because TorCmd.Signal.NewNym returns Reply.Success.OK
+    //  but can be rate limited, TorRuntime should intercept
+    //  any enqueued NewNym jobs and, upon successful completion
+    //  setup an TorEvent.NOTICE observer to catch the rate limit
+    //  dispatch. If after 50ms (or something) nothing comes, dispatch
+    //  success.
 
     /**
      * Model to be registered with a [Processor] for being notified
-     * via callback invocation with [RuntimeEvent] output information.
+     * via [OnEvent] invocation with [RuntimeEvent] data.
+     *
+     * @see [Event.Observer]
+     * @see [Processor]
      * */
-    public open class Observer<R: Any>(
-        /**
-         * The [RuntimeEvent] this is observing
-         * */
-        @JvmField
-        public val event: RuntimeEvent<R>,
+    public open class Observer<Data: Any>(
+        event: RuntimeEvent<Data>,
         tag: String?,
-        @JvmField
-        protected val executor: OnEvent.Executor?,
-        @JvmField
-        protected val onEvent: OnEvent<R>,
-    ) {
-
-        /**
-         * An identifier string
-         * */
-        @JvmField
-        public val tag: String? = tag?.ifBlank { null }
-
-        /**
-         * Invokes [OnEvent] for the given [event]
-         *
-         * @param [default] the default [OnEvent.Executor] to fall
-         *   back to if [executor] was not defined for this observer.
-         * */
-        public fun notify(default: OnEvent.Executor, event: R) {
-            notify(EmptyCoroutineContext, default, event)
-        }
-
-        /**
-         * Invokes [OnEvent] for the given [event]
-         *
-         * @param [handler] Optional ability to pass [UncaughtException.Handler]
-         *   wrapped as [CoroutineExceptionHandler]
-         * @param [default] the default [OnEvent.Executor] to fall
-         *   back to if [executor] was not defined for this observer.
-         * */
-        public fun notify(handler: CoroutineContext, default: OnEvent.Executor, event: R) {
-            @OptIn(InternalKmpTorApi::class)
-            (executor ?: default).execute(handler) { onEvent(event) }
-        }
-
-        public final override fun toString(): String = toString(isStatic = false)
-
-        public fun toString(isStatic: Boolean): String = buildString {
-            val tag = if (tag != null && isStatic) "STATIC" else tag
-
-            append("RuntimeEvent.Observer[tag=")
-            append(tag.toString())
-            append(", event=")
-            append(event.name)
-
-            when (executor) {
-                null -> "null"
-                OnEvent.Executor.Main,
-                OnEvent.Executor.Immediate -> executor.toString()
-                else -> "Custom"
-            }.let {
-                append(", executor=")
-                append(it)
-            }
-
-            append("]@")
-            append(hashCode())
-        }
-    }
+        executor: OnEvent.Executor?,
+        onEvent: OnEvent<Data>,
+    ): Event.Observer<Data, RuntimeEvent<Data>>(
+        event,
+        tag,
+        executor,
+        onEvent,
+    )
 
     /**
      * Base interface for implementations that process [RuntimeEvent].
@@ -266,12 +156,12 @@ public sealed class RuntimeEvent<R: Any> private constructor(
         public fun unsubscribe(vararg observers: Observer<*>)
 
         /**
-         * Remove all [Observer] of a single [RuntimeEvent]
+         * Remove all [Observer] of a single [RuntimeEvent].
          * */
         public fun unsubscribeAll(event: RuntimeEvent<*>)
 
         /**
-         * Remove all [Observer] of multiple [RuntimeEvent]
+         * Remove all [Observer] of multiple [RuntimeEvent].
          * */
         public fun unsubscribeAll(vararg events: RuntimeEvent<*>)
 
@@ -279,7 +169,7 @@ public sealed class RuntimeEvent<R: Any> private constructor(
          * Remove all [Observer] with the given [tag].
          *
          * If the implementing class extends both [Processor]
-         * and [TorEvent.Processor], [TorEvent.Observer] with
+         * and [TorEvent.Processor], all [TorEvent.Observer] with
          * the given [tag] will also be removed.
          * */
         public fun unsubscribeAll(tag: String)
@@ -295,39 +185,72 @@ public sealed class RuntimeEvent<R: Any> private constructor(
         public fun clearObservers()
     }
 
-    public companion object {
+    public companion object: Entries<RuntimeEvent<*>>(numEvents = 6) {
 
         @JvmStatic
         @Throws(IllegalArgumentException::class)
-        public fun valueOf(name: String): RuntimeEvent<*> {
-            return valueOfOrNull(name)
-                ?: throw IllegalArgumentException("Unknown RuntimeEvent.name[$name]")
+        public override fun valueOf(name: String): RuntimeEvent<*> {
+            return super.valueOf(name)
         }
 
         @JvmStatic
-        public fun valueOfOrNull(name: String): RuntimeEvent<*>? {
-            return entries.firstOrNull { event ->
-                event.name.equals(name, ignoreCase = true)
-            }
+        public override fun valueOfOrNull(name: String): RuntimeEvent<*>? {
+            return super.valueOfOrNull(name)
         }
 
-        @get:JvmStatic
-        @get:JvmName("entries")
-        public val entries: Set<RuntimeEvent<*>> by lazy {
-            immutableSetOf(
-                ERROR,
-                LIFECYCLE,
-                LOG.DEBUG,
-                LOG.INFO,
-                LOG.WARN,
-            )
+        @JvmStatic
+        public override fun entries(): Set<RuntimeEvent<*>> {
+            return super.entries()
+        }
+
+        protected override val lazyEntries: ThisBlock<LinkedHashSet<RuntimeEvent<*>>> = ThisBlock {
+            add(ERROR); add(EXECUTE); add(LIFECYCLE); add(LOG.DEBUG);
+            add(LOG.INFO); add(LOG.WARN);
         }
     }
 
-    @InternalKmpTorApi
+    /**
+     * Helper for selectively exposing the ability to notify observers
+     * externally of the [TorRuntime] implementation.
+     * */
     public interface Notifier {
-        public fun <R: Any> notify(event: RuntimeEvent<R>, output: R)
+
+        public fun <Data: Any, E: RuntimeEvent<Data>> notify(event: E, data: Data)
+
+        public companion object {
+
+            @JvmStatic
+            @Suppress("NOTHING_TO_INLINE")
+            public inline fun <E: LOG> Notifier.log(event: E, from: Any?, log: String) {
+                notify(event, (from?.toString()?.ifBlank { null }?.let { "$it " } ?: "") + log)
+            }
+
+            @JvmStatic
+            @Suppress("NOTHING_TO_INLINE")
+            public inline fun Notifier.d(from: Any?, log: String) { log(LOG.DEBUG, from, log) }
+
+            @JvmStatic
+            @Suppress("NOTHING_TO_INLINE")
+            public inline fun Notifier.i(from: Any?, log: String) { log(LOG.INFO, from, log) }
+
+            @JvmStatic
+            @Suppress("NOTHING_TO_INLINE")
+            public inline fun Notifier.w(from: Any?, log: String) { log(LOG.WARN, from, log) }
+
+            @JvmStatic
+            @Suppress("NOTHING_TO_INLINE")
+            public inline fun Notifier.e(cause: Throwable) { notify(ERROR, cause) }
+
+            @JvmStatic
+            @Suppress("NOTHING_TO_INLINE")
+            public inline fun Notifier.lce(event: Lifecycle.Event) { notify(LIFECYCLE, event) }
+        }
     }
 
-    final override fun toString(): String = name
+    protected final override fun factory(
+        event: RuntimeEvent<Data>,
+        tag: String?,
+        executor: OnEvent.Executor?,
+        onEvent: OnEvent<Data>,
+    ): Observer<Data> = Observer(event, tag, executor, onEvent)
 }

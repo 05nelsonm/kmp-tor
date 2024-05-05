@@ -72,7 +72,7 @@ class ProcessorUnitTest {
             val onSuccess = OnSuccess<Reply.Success.OK> { synchronized(lock) { invocationSuccess++ } }
 
             ctrl.enqueue(TorCmd.Authenticate(TestUtils.AUTH_PASS), onFailure, onSuccess)
-            ctrl.enqueue(TorCmd.SetEvents(TorEvent.entries), onFailure, onSuccess)
+            ctrl.enqueue(TorCmd.SetEvents(TorEvent.entries()), onFailure, onSuccess)
             ctrl.enqueue(TorCmd.Signal.Heartbeat, onFailure, onSuccess)
             ctrl.enqueue(TorCmd.Signal.Heartbeat, onFailure, onSuccess)
             ctrl.enqueue(TorCmd.Signal.Heartbeat, onFailure, onSuccess)

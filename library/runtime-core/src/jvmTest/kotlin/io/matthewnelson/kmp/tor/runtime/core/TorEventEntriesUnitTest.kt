@@ -13,29 +13,32 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-package io.matthewnelson.kmp.tor.runtime
+package io.matthewnelson.kmp.tor.runtime.core
 
-import io.matthewnelson.kmp.tor.runtime.core.UncaughtException
+import kotlin.reflect.KClass
 import kotlin.test.Test
 import kotlin.test.assertEquals
-import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
-class LifecycleUnitTest {
+class TorEventEntriesUnitTest {
 
     @Test
-    fun givenDestroy_whenIsCompleting_thenIsDestroyedTrue() {
-        val lifecycle = Lifecycle.of(UncaughtException.Handler.THROW)
-
-        var invocationCompletion = 0
-        lifecycle.invokeOnCompletion {
-            invocationCompletion++
-            assertTrue(lifecycle.isDestroyed())
+    fun givenEvents_whenEntries_thenContainsAllSealedSubclasses() {
+        val subclasses = mutableListOf<KClass<*>>()
+        for (clazz in TorEvent::class.sealedSubclasses) {
+            if (clazz.isSealed) {
+                subclasses.addAll(clazz.sealedSubclasses)
+            } else {
+                subclasses.add(clazz)
+            }
         }
 
-        assertFalse(lifecycle.isDestroyed())
-        lifecycle.destroy()
-        assertTrue(lifecycle.isDestroyed())
-        assertEquals(1, invocationCompletion)
+        val entries = TorEvent.entries().map { it::class }
+
+        assertEquals(subclasses.size, entries.size)
+
+        for (subclass in subclasses) {
+            assertTrue((entries.contains(subclass)))
+        }
     }
 }

@@ -17,24 +17,21 @@
 
 package io.matthewnelson.kmp.tor.runtime.internal
 
-import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
-import io.matthewnelson.kmp.tor.runtime.RuntimeAction
+import io.matthewnelson.kmp.tor.runtime.Action
 import io.matthewnelson.kmp.tor.runtime.TorRuntime
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlin.coroutines.cancellation.CancellationException
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 
-@OptIn(InternalKmpTorApi::class)
-@Throws(IllegalStateException::class)
-internal expect fun TorRuntime.ServiceFactory.Companion.serviceRuntimeOrNull(
-    block: () -> TorRuntime.ServiceFactory,
-): TorRuntime?
+@Suppress("NOTHING_TO_INLINE")
+internal expect inline fun TorRuntime.Environment.newRuntimeDispatcher(): CoroutineDispatcher
 
 @Throws(Throwable::class)
 @Suppress("NOTHING_TO_INLINE")
-internal suspend inline fun <T: RuntimeAction.Processor> T.commonExecuteAsync(
-    action: RuntimeAction,
+internal suspend inline fun <T: Action.Processor> T.commonExecuteAsync(
+    action: Action,
 ): T = suspendCancellableCoroutine { continuation ->
     val job = enqueue(
         action = action,

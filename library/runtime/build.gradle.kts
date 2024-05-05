@@ -43,6 +43,7 @@ kmpConfiguration {
 
             sourceSetTest {
                 dependencies {
+                    implementation(libs.kmp.tor.resource.tor)
                     implementation(libs.kotlinx.coroutines.test)
                 }
             }

@@ -20,7 +20,7 @@ import io.matthewnelson.kmp.tor.core.resource.SynchronizedObject
 import io.matthewnelson.kmp.tor.core.resource.synchronized
 import io.matthewnelson.kmp.tor.runtime.core.OnEvent
 import io.matthewnelson.kmp.tor.runtime.core.TorConfig
-import kotlin.jvm.JvmField
+import kotlin.jvm.JvmStatic
 import kotlin.jvm.JvmSynthetic
 
 /**
@@ -31,7 +31,7 @@ import kotlin.jvm.JvmSynthetic
  * [NetworkObserver].
  *
  * @see [notify]
- * @see [NOOP]
+ * @see [noOp]
  * @see [TorRuntime.Builder.networkObserver]
  * */
 public abstract class NetworkObserver {
@@ -106,13 +106,17 @@ public abstract class NetworkObserver {
     public companion object {
 
         /**
-         * A non-operational [NetworkObserver]
+         * A non-operational static instance [NetworkObserver] where
+         * [isNetworkConnected] always returns `true`
          * */
-        @JvmField
-        public val NOOP: NetworkObserver = object : NetworkObserver() {
-            override fun subscribe(observer: OnEvent<Connectivity>) {}
-            override fun unsubscribe(observer: OnEvent<Connectivity>) {}
-            override fun isNetworkConnected(): Boolean = true
-        }
+        @JvmStatic
+        public fun noOp(): NetworkObserver = NOOP
+    }
+
+    private data object NOOP: NetworkObserver() {
+        internal override fun subscribe(observer: OnEvent<Connectivity>) {}
+        internal override fun unsubscribe(observer: OnEvent<Connectivity>) {}
+        public override fun isNetworkConnected(): Boolean = true
+        public override fun toString(): String = "NetworkObserver.NOOP"
     }
 }

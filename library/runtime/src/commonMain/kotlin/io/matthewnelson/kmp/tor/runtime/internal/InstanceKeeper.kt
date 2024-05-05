@@ -20,18 +20,16 @@ import io.matthewnelson.kmp.tor.core.resource.SynchronizedObject
 import io.matthewnelson.kmp.tor.core.resource.synchronized
 
 @OptIn(InternalKmpTorApi::class)
-internal abstract class InstanceKeeper<K, V> internal constructor(
+internal abstract class InstanceKeeper<K: Any, V: Any> internal constructor(
     initialCapacity: Int = 1,
     loadFactor: Float = 1.0F,
-): SynchronizedObject() {
+) {
 
+    private val lock = SynchronizedObject()
     private val instances = LinkedHashMap<K, V>(initialCapacity, loadFactor)
 
     protected fun getOrCreateInstance(
         key: K,
         block: () -> V,
-    ): V = synchronized(this@InstanceKeeper) {
-        instances[key] ?: block()
-            .also { instances[key] = it }
-    }
+    ): V = synchronized(lock) { instances[key] ?: block().also { instances[key] = it } }
 }

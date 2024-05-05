@@ -156,7 +156,7 @@ private fun Disposable.toCtrlConnection(
         synchronized(this) {
             if (_isClosed) return
             _isClosed = true
-            this@toCtrlConnection.invoke()
+            this@toCtrlConnection.dispose()
         }
     }
 }

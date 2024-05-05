@@ -19,11 +19,15 @@ package io.matthewnelson.kmp.tor.runtime.ctrl.internal
 
 import io.matthewnelson.kmp.file.File
 import io.matthewnelson.kmp.file.FileNotFoundException
+import io.matthewnelson.kmp.file.InterruptedException
+import io.matthewnelson.kmp.tor.runtime.core.OnFailure
 import io.matthewnelson.kmp.tor.runtime.core.QueuedJob
+import io.matthewnelson.kmp.tor.runtime.core.QueuedJob.Companion.toImmediateErrorJob
 import io.matthewnelson.kmp.tor.runtime.core.TorConfig
 import io.matthewnelson.kmp.tor.runtime.core.UncaughtException
 import io.matthewnelson.kmp.tor.runtime.core.UncaughtException.Handler.Companion.tryCatch
 import io.matthewnelson.kmp.tor.runtime.core.UncaughtException.Handler.Companion.withSuppression
+import io.matthewnelson.kmp.tor.runtime.core.ctrl.TorCmd
 import kotlin.coroutines.cancellation.CancellationException
 
 @Suppress("NOTHING_TO_INLINE")
@@ -43,8 +47,8 @@ internal inline fun File.checkUnixSockedSupport() {
 // a local instance of MutableList containing the jobs to cancel.
 // as to not encounter ConcurrentModificationException.
 @Throws(ConcurrentModificationException::class)
-internal fun <T: QueuedJob> MutableList<T>.cancelAndClearAll(
-    cause: CancellationException?,
+internal fun <T: TorCmdJob<*>> MutableList<T>.interruptAndClearAll(
+    message: String,
     handler: UncaughtException.Handler,
 ) {
     if (isEmpty()) return
@@ -52,7 +56,17 @@ internal fun <T: QueuedJob> MutableList<T>.cancelAndClearAll(
     handler.withSuppression {
         while (isNotEmpty()) {
             val job = removeFirst()
-            tryCatch(job) { job.cancel(cause) }
+            tryCatch(job) { job.error(InterruptedException(message)) }
         }
     }
 }
+
+@Suppress("NOTHING_TO_INLINE")
+internal inline fun TorCmd<*>.toDestroyedErrorJob(
+    onFailure: OnFailure,
+    handler: UncaughtException.Handler,
+): QueuedJob = onFailure.toImmediateErrorJob(
+    keyword,
+    IllegalStateException("TorCtrl.isDestroyed[true]"),
+    handler
+)

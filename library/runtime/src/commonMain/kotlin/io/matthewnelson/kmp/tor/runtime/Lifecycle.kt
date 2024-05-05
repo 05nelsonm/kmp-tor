@@ -15,14 +15,15 @@
  **/
 package io.matthewnelson.kmp.tor.runtime
 
+import io.matthewnelson.kmp.tor.runtime.FileID.Companion.fidEllipses
+import io.matthewnelson.kmp.tor.runtime.FileID.Companion.toFIDString
 import io.matthewnelson.kmp.tor.runtime.core.*
+import io.matthewnelson.kmp.tor.runtime.internal.RealTorRuntime
 import kotlin.jvm.JvmField
 import kotlin.jvm.JvmStatic
 import kotlin.jvm.JvmSynthetic
 
-public class Lifecycle private constructor(
-    private val handler: UncaughtException.Handler
-): Destroyable {
+public class Lifecycle: Destroyable {
 
     /**
      * An event pertaining to an object's lifecycle.
@@ -30,15 +31,44 @@ public class Lifecycle private constructor(
      * @see [RuntimeEvent.LIFECYCLE]
      * */
     public class Event private constructor(
+
+        /**
+         * The object class name
+         * */
         @JvmField
-        public val clazz: String,
+        public val className: String,
+
+        /**
+         * The object [fidEllipses].
+         *
+         * If the object was not an instance of [FileID], the
+         * value will be null.
+         * */
+        @JvmField
+        public val fid: String?,
+
+        /**
+         * The object hashCode
+         * */
         @JvmField
         public val hash: Int,
+
+        /**
+         * The name of the event
+         * */
         @JvmField
         public val name: Name,
     ) {
 
-        private constructor(obj: Any, name: Name): this(obj::class.simpleName ?: "Unknown", obj.hashCode(), name)
+        private constructor(
+            obj: Any,
+            name: Name
+        ): this(
+            obj::class.simpleName ?: "Unknown",
+            (obj as? FileID)?.fidEllipses,
+            obj.hashCode(),
+            name,
+        )
 
         @Suppress("FunctionName")
         public companion object {
@@ -48,11 +78,13 @@ public class Lifecycle private constructor(
             @JvmStatic
             public fun OnDestroy(obj: Any): Event = Event(obj, Name.OnDestroy)
 
-            // Android TorService LCEs
+            // TorRuntime.ServiceFactory LCEs
+            @JvmStatic
+            public fun OnStart(obj: Any): Event = Event(obj, Name.OnStart)
             @JvmStatic
             public fun OnBind(obj: Any): Event = Event(obj, Name.OnBind)
             @JvmStatic
-            public fun OnStart(obj: Any): Event = Event(obj, Name.OnStart)
+            public fun OnUnbind(obj: Any): Event = Event(obj, Name.OnUnbind)
             @JvmStatic
             public fun OnRemoved(obj: Any): Event = Event(obj, Name.OnRemoved)
             @JvmStatic
@@ -73,11 +105,13 @@ public class Lifecycle private constructor(
                 @JvmField
                 public val OnDestroy: Name = Name("onDestroy")
 
-                // Android TorService LCEs
+                // TorRuntime.ServiceFactory LCEs
+                @JvmField
+                public val OnStart: Name = Name("onStart")
                 @JvmField
                 public val OnBind: Name = Name("onBind")
                 @JvmField
-                public val OnStart: Name = Name("onStart")
+                public val OnUnbind: Name = Name("onUnbind")
                 @JvmField
                 public val OnRemoved: Name = Name("onRemoved")
                 @JvmField
@@ -96,22 +130,29 @@ public class Lifecycle private constructor(
 
         override fun equals(other: Any?): Boolean {
             return  other is Event
-                    && other.clazz == clazz
+                    && other.className == className
+                    && other.fid == fid
                     && other.hash == hash
                     && other.name == name
         }
 
         override fun hashCode(): Int {
             var result = 17
-            result = result * 31 + clazz.hashCode()
+            result = result * 31 + className.hashCode()
+            result = result * 31 + fid.hashCode()
             result = result * 31 + hash
             result = result * 31 + name.hashCode()
             return result
         }
 
         override fun toString(): String = buildString {
-            append("Lifecycle.Event[class=")
-            append(clazz)
+            append("Lifecycle.Event[obj=")
+            append(className)
+            if (fid != null) {
+                append("[fid=")
+                append(fid)
+                append(']')
+            }
             append('@')
             append(hash)
             append(", name=")
@@ -120,31 +161,69 @@ public class Lifecycle private constructor(
         }
     }
 
-    private val job = Job()
+    /**
+     * A wrapper around the [TorRuntime] implementation which adds
+     * the ability to destroy the instance. Is only available if
+     * using the [TorRuntime.ServiceFactory] API.
+     *
+     * **NOTE:** Any observers subscribed to this instance will use
+     * [OnEvent.Executor.Immediate] as their default, and not what was
+     * defined for [TorRuntime.Builder.defaultEventExecutor]. If this
+     * is undesirable, define an [OnEvent.Executor] for your service
+     * implementation's observer(s) individually.
+     * */
+    public class DestroyableTorRuntime private constructor(
+        private val lifecycle: Lifecycle,
+        private val runtime: RealTorRuntime,
+    ): TorRuntime by runtime, Destroyable by lifecycle {
 
-    override fun isDestroyed(): Boolean = job.isCompleting || !job.isActive
+        /**
+         * Attaches a callback handle to the lifecycle which
+         * will be invoked when [destroy] is called.
+         *
+         * @see [QueuedJob.invokeOnCompletion]
+         * */
+        public fun invokeOnDestroy(
+            handle: ItBlock<Any?>,
+        ): Disposable = lifecycle.job.invokeOnCompletion(handle)
 
-    override fun destroy() { job.complete() }
+        public override fun equals(other: Any?): Boolean = other is DestroyableTorRuntime && other.runtime == runtime
+        public override fun hashCode(): Int = runtime.hashCode()
+        public override fun toString(): String = toFIDString()
 
-    public fun invokeOnCompletion(
-        handle: ItBlock<Unit>,
-    ): Disposable = job.invokeOnCompletion { handle(Unit) }
+        internal companion object {
 
-    private inner class Job: QueuedJob("LIFECYCLE", ON_FAILURE, handler) {
+            @JvmSynthetic
+            internal fun of(
+                runtime: RealTorRuntime,
+            ): DestroyableTorRuntime = DestroyableTorRuntime(
+                Lifecycle(runtime.handler()),
+                runtime,
+            )
+        }
+    }
+
+    /* INTERNAL USAGE FOR TorRuntime.ServiceFactory */
+
+    private val job: LifecycleJob
+
+    @Suppress("ConvertSecondaryConstructorToPrimary")
+    private constructor(handler: UncaughtException.Handler) {
+        job = LifecycleJob(handler)
+    }
+
+    public override fun isDestroyed(): Boolean = job.isCompleting || !job.isActive
+    public override fun destroy() { job.complete() }
+
+    public override fun toString(): String = job.toString()
+
+    private class LifecycleJob(
+        handler: UncaughtException.Handler,
+    ): QueuedJob("TorRuntime", OnFailure.noOp(), handler) {
 
         // non-cancellable
         init { onExecuting() }
 
-        fun complete() { onCompletion(Unit) { null } }
+        fun complete() { onCompletion(Unit, null) }
     }
-
-    internal companion object {
-
-        @JvmSynthetic
-        internal fun of(handler: UncaughtException.Handler): Lifecycle = Lifecycle(handler)
-
-        private val ON_FAILURE: OnFailure = OnFailure {}
-    }
-
-    public override fun toString(): String = "Lifecycle[isDestroyed=${isDestroyed()}]@${hashCode()}"
 }

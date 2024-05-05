@@ -17,6 +17,7 @@
 
 package io.matthewnelson.kmp.tor.runtime.ctrl
 
+import io.matthewnelson.immutable.collections.toImmutableSet
 import io.matthewnelson.kmp.file.File
 import io.matthewnelson.kmp.file.IOException
 import io.matthewnelson.kmp.file.InterruptedException
@@ -24,14 +25,9 @@ import io.matthewnelson.kmp.file.wrapIOException
 import io.matthewnelson.kmp.process.Blocking
 import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
 import io.matthewnelson.kmp.tor.runtime.core.*
-import io.matthewnelson.kmp.tor.runtime.core.UncaughtException.Handler.Companion.requireInstanceIsNotSuppressed
 import io.matthewnelson.kmp.tor.runtime.core.address.ProxyAddress
 import io.matthewnelson.kmp.tor.runtime.core.ctrl.TorCmd
 import io.matthewnelson.kmp.tor.runtime.ctrl.internal.*
-import io.matthewnelson.kmp.tor.runtime.ctrl.internal.CtrlConnection
-import io.matthewnelson.kmp.tor.runtime.ctrl.internal.RealTorCtrl
-import io.matthewnelson.kmp.tor.runtime.ctrl.internal.checkUnixSockedSupport
-import io.matthewnelson.kmp.tor.runtime.ctrl.internal.connect
 import kotlinx.coroutines.*
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.InvocationKind
@@ -45,15 +41,16 @@ import kotlin.time.Duration.Companion.milliseconds
  * A Tor control connection
  *
  * Issuance of [TorCmd.Signal.Halt] or [TorCmd.Signal.Shutdown] will
- * cancel all enqueued jobs (if any) and then automatically [destroy]
+ * interrupt all enqueued jobs (if any) and then automatically [destroy]
  * itself when the underlying connection closes itself.
  *
  * @see [Factory]
  * */
 public actual interface TorCtrl : Destroyable, TorEvent.Processor, TorCmd.Privileged.Processor {
+
     /**
      * Immediately disconnects from the control listener resulting
-     * in cancellation of all [QueuedJob], and invocation of all
+     * in interruption of all [QueuedJob], and invocation of all
      * handles registered via [invokeOnDestroy].
      *
      * If [TorCmd.Ownership.Take] was issued for this connection,
@@ -65,11 +62,11 @@ public actual interface TorCtrl : Destroyable, TorEvent.Processor, TorCmd.Privil
 
     /**
      * Register a [handle] to be invoked when this [TorCtrl] instance
-     * is destroyed. If [handle] is already registered, [Disposable.NOOP]
+     * is destroyed. If [handle] is already registered, [Disposable.noOp]
      * is returned.
      *
      * If [TorCtrl] is already destroyed, [handle] is invoked immediately
-     * and [Disposable.NOOP] is returned.
+     * and [Disposable.noOp] is returned.
      *
      * [handle] should **NOT** throw exception. In the event that
      * it does, it will be delegated to [Factory.handler]. If [TorCtrl]
@@ -103,21 +100,18 @@ public actual interface TorCtrl : Destroyable, TorEvent.Processor, TorCmd.Privil
      *   safe. Any non-[UncaughtException] it throws will be swallowed.
      * @param [handler] The [UncaughtException.Handler] to pipe bad behavior
      *   to. It **MUST** be thread-safe.
-     * @throws [IllegalArgumentException] if [handler] is an instance
-     *   of [UncaughtException.SuppressedHandler] (a leaked reference)
      * */
     public actual class Factory
     @JvmOverloads
-    @Throws(IllegalArgumentException::class)
     public actual constructor(
         internal actual val staticTag: String?,
-        internal actual val observers: Set<TorEvent.Observer>,
+        observers: Set<TorEvent.Observer>,
         internal actual val defaultExecutor: OnEvent.Executor,
         internal actual val debugger: ItBlock<String>?,
         internal actual val handler: UncaughtException.Handler,
     ) {
 
-        init { handler.requireInstanceIsNotSuppressed() }
+        internal actual val observers: Set<TorEvent.Observer> = observers.toImmutableSet()
 
         /**
          * Connects to a tor control listener via TCP port.
@@ -226,7 +220,7 @@ public actual interface TorCtrl : Destroyable, TorEvent.Processor, TorCmd.Privil
 
             val ctrl = block()
 
-            while (!ctrl.isReading) {
+            while (!ctrl.isReady) {
                 try {
                     Blocking.threadSleep(5.milliseconds)
                 } catch (_: InterruptedException) {}
@@ -254,7 +248,7 @@ public actual interface TorCtrl : Destroyable, TorEvent.Processor, TorCmd.Privil
             val ctrl = block()
 
             withContext(NonCancellable) {
-                while (!ctrl.isReading) {
+                while (!ctrl.isReady) {
                     delay(5.milliseconds)
                 }
 

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-@file:JvmName("TorCmdUtil")
+@file:JvmName("CmdUtil")
 
 package io.matthewnelson.kmp.tor.runtime.core.util
 

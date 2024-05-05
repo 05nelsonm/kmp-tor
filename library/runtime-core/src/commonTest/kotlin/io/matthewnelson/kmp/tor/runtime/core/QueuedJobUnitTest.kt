@@ -16,6 +16,7 @@
 package io.matthewnelson.kmp.tor.runtime.core
 
 import io.matthewnelson.kmp.file.IOException
+import io.matthewnelson.kmp.tor.runtime.core.QueuedJob.Companion.toImmediateErrorJob
 import kotlin.coroutines.cancellation.CancellationException
 import kotlin.test.*
 
@@ -67,7 +68,7 @@ class QueuedJobUnitTest {
     }
 
     @Test
-    fun givenError_whenCancellationException_thenCancels() {
+    fun givenError_whenCancellationException_thenCancelsWhileStateError() {
         var invocationCancel = 0
         var invocationCompletion = 0
         var invocationFailure = 0
@@ -88,7 +89,7 @@ class QueuedJobUnitTest {
         job.executing()
         assertFalse(job.cancel(null))
         job.error(CancellationException())
-        assertEquals(QueuedJob.State.Cancelled, job.state)
+        assertEquals(QueuedJob.State.Error, job.state)
         assertNotNull(job.cancellationException)
         assertEquals(1, invocationCancel)
         assertEquals(1, invocationCompletion)
@@ -141,7 +142,7 @@ class QueuedJobUnitTest {
                     // Should be caught by handler
                     fail()
                 }
-                assertNotEquals(Disposable.NOOP, disposable)
+                assertNotEquals(Disposable.noOp(), disposable)
 
                 // isCompleting is true right here so the following
                 // invocations should all be ignored, b/c some
@@ -183,7 +184,7 @@ class QueuedJobUnitTest {
         val job = TestJob()
         job.invokeOnCompletion { invocations++ }
         val disposable = job.invokeOnCompletion { invocations++ }
-        disposable()
+        disposable.dispose()
         job.cancel(null)
         assertEquals(1, invocations)
     }
@@ -248,8 +249,8 @@ class QueuedJobUnitTest {
         job.invokeOnCompletion(cb)
 
         // Should return Disposable.NOOP
-        job.invokeOnCompletion(cb)()
-        job.invokeOnCompletion(cb)()
+        job.invokeOnCompletion(cb).dispose()
+        job.invokeOnCompletion(cb).dispose()
 
         job.error(Throwable())
         assertEquals(1, invocationCompletion)
@@ -282,6 +283,17 @@ class QueuedJobUnitTest {
         assertEquals(1, exceptions.size)
     }
 
+    @Test
+    fun givenImmediateErrorJob_whenCreated_thenOnFailureInvokedImmediately() {
+        var invocationFailure = 0
+        val job = OnFailure {
+            invocationFailure++
+            assertIs<IllegalStateException>(it)
+        }.toImmediateErrorJob("", IllegalStateException(""), UncaughtException.Handler.THROW)
+        assertEquals(1, invocationFailure)
+        assertEquals(QueuedJob.State.Error, job.state)
+    }
+
     public class TestJob(
         name: String = "",
         private val cancellation: (cause: CancellationException?) -> Unit = {},
@@ -293,7 +305,7 @@ class QueuedJobUnitTest {
             cancellation(cause)
         }
 
-        public fun error(cause: Throwable) { onError(cause) {} }
+        public fun error(cause: Throwable) { onError(cause, null) }
         @Throws(IllegalStateException::class)
         public fun executing() { onExecuting() }
         public fun completion() { onCompletion(Unit, withLock = { onSuccess }) }

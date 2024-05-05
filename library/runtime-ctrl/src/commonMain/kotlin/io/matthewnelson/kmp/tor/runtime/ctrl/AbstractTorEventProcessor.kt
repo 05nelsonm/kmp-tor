@@ -52,6 +52,7 @@ protected constructor(
     @get:JvmName("destroyed")
     protected val destroyed: Boolean get() = _destroyed
     protected open val debug: Boolean = true
+    protected open val isService: Boolean = false
     protected abstract val handler: HandlerWithContext
 
     init {
@@ -128,19 +129,19 @@ protected constructor(
         }
     }
 
-    protected fun TorEvent.notifyObservers(output: String) {
+    protected fun TorEvent.notifyObservers(data: String) {
         val event = this
 
         if (event == TorEvent.DEBUG && !debug) return
 
-        withObservers {
+        withObservers(isNotify = true) {
             if (isEmpty()) return@withObservers null
             mapNotNull { if (it.event == event) it else null }
         }?.forEach { observer ->
             val ctx = ObserverContext(observer.toString(isStatic = observer.tag.isStaticTag()))
 
             handler.tryCatch(ctx) {
-                observer.notify(handler + ctx, defaultExecutor, output)
+                observer.notify(handler + ctx, defaultExecutor, data)
             }
         }
     }
@@ -151,7 +152,12 @@ protected constructor(
         val wasDestroyed = withObservers {
             if (_destroyed) return@withObservers false
 
-            clear()
+            val iterator = iterator()
+            while (iterator.hasNext()) {
+                val observer = iterator.next()
+                if (isService && observer.tag.isStaticTag()) continue
+                iterator.remove()
+            }
             _destroyed = true
             true
         }
@@ -160,12 +166,13 @@ protected constructor(
     }
 
     private fun <T : Any?> withObservers(
+        isNotify: Boolean = false,
         block: MutableSet<TorEvent.Observer>.() -> T,
     ): T {
-        if (_destroyed) return block(noOpMutableSet())
+        if (_destroyed && !isNotify) return block(noOpMutableSet())
 
         return synchronized(lock) {
-            block(if (_destroyed) noOpMutableSet() else observers)
+            block(if (_destroyed && !isNotify) noOpMutableSet() else observers)
         }
     }
 
@@ -183,7 +190,7 @@ protected constructor(
     protected open fun registered(): Int = synchronized(lock) { observers.size }
 
     // Handler that also implements CoroutineExceptionHandler
-    protected class HandlerWithContext(
+    protected class HandlerWithContext private constructor(
         @JvmField
         public val delegate: UncaughtException.Handler
     ) : AbstractCoroutineContextElement(CoroutineExceptionHandler),
@@ -198,6 +205,15 @@ protected constructor(
             } else {
                 val ctx = context[ObserverContext]?.context ?: context.toString()
                 tryCatch(ctx) { throw exception }
+            }
+        }
+
+        public companion object {
+
+            @JvmStatic
+            public fun of(handler: UncaughtException.Handler): HandlerWithContext {
+                if (handler is HandlerWithContext) return handler
+                return HandlerWithContext(handler)
             }
         }
     }

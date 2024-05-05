@@ -19,12 +19,15 @@ package io.matthewnelson.kmp.tor.runtime
 
 import io.matthewnelson.encoding.base16.Base16
 import io.matthewnelson.encoding.core.Encoder.Companion.encodeToString
-import io.matthewnelson.immutable.collections.toImmutableSet
 import io.matthewnelson.kmp.file.*
 import io.matthewnelson.kmp.tor.core.api.ResourceInstaller
 import io.matthewnelson.kmp.tor.core.api.ResourceInstaller.Paths
+import io.matthewnelson.kmp.tor.core.api.annotation.ExperimentalKmpTorApi
 import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
 import io.matthewnelson.kmp.tor.core.api.annotation.KmpTorDsl
+import io.matthewnelson.kmp.tor.core.resource.SynchronizedObject
+import io.matthewnelson.kmp.tor.core.resource.synchronized
+import io.matthewnelson.kmp.tor.runtime.FileID.Companion.toFIDString
 import io.matthewnelson.kmp.tor.runtime.TorRuntime.Companion.Builder
 import io.matthewnelson.kmp.tor.runtime.TorRuntime.Environment.Companion.Builder
 import io.matthewnelson.kmp.tor.runtime.core.*
@@ -32,27 +35,26 @@ import io.matthewnelson.kmp.tor.runtime.core.ctrl.TorCmd
 import io.matthewnelson.kmp.tor.runtime.core.util.isAvailableAsync
 import io.matthewnelson.kmp.tor.runtime.internal.InstanceKeeper
 import io.matthewnelson.kmp.tor.runtime.internal.RealTorRuntime
-import io.matthewnelson.kmp.tor.runtime.internal.RealTorRuntime.Companion.checkInstance
+import io.matthewnelson.kmp.tor.runtime.internal.ServiceFactoryCtrl
 import io.matthewnelson.kmp.tor.runtime.internal.TorConfigGenerator
 import org.kotlincrypto.SecRandomCopyException
 import org.kotlincrypto.SecureRandom
-import org.kotlincrypto.hash.sha2.SHA256
 import kotlin.concurrent.Volatile
 import kotlin.jvm.JvmField
-import kotlin.jvm.JvmName
 import kotlin.jvm.JvmStatic
 import kotlin.jvm.JvmSynthetic
 import kotlin.random.Random
 
 /**
- * Base interface for managing and interacting with tor.
+ * Base interface for managing and interacting with a single tor process.
  *
  * @see [Companion.Builder]
  * */
 public interface TorRuntime:
+    FileID,
     TorCmd.Unprivileged.Processor,
     TorEvent.Processor,
-    RuntimeAction.Processor,
+    Action.Processor,
     RuntimeEvent.Processor
 {
 
@@ -83,7 +85,7 @@ public interface TorRuntime:
     public class Builder private constructor(private val environment: Environment) {
 
         private val config = mutableSetOf<ConfigBuilderCallback>()
-        private val requiredTorEvents = mutableSetOf(TorEvent.CONF_CHANGED, TorEvent.NOTICE)
+        private val requiredTorEvents = mutableSetOf<TorEvent>()
         private val observersTorEvent = mutableSetOf<TorEvent.Observer>()
         private val observersRuntimeEvent = mutableSetOf<RuntimeEvent.Observer<*>>()
 
@@ -108,7 +110,7 @@ public interface TorRuntime:
          * own observer implementation will be favored over this setting.
          * */
         @JvmField
-        public var networkObserver: NetworkObserver = NetworkObserver.NOOP
+        public var networkObserver: NetworkObserver = NetworkObserver.noOp()
 
         /**
          * Declare a default [OnEvent.Executor] to utilize when dispatching
@@ -136,7 +138,7 @@ public interface TorRuntime:
          * that are not currently supported to the [Environment.torrcFile]).
          *
          * Any exception thrown within [block] will be propagated to the caller
-         * of [RuntimeAction.StartDaemon] or [RuntimeAction.RestartDaemon].
+         * of [Action.StartDaemon] or [Action.RestartDaemon].
          *
          * **NOTE:** This can be omitted as a minimum viable configuration
          * is always created. See [ConfigBuilderCallback.putDefaults] for what
@@ -160,6 +162,9 @@ public interface TorRuntime:
          *
          * Any subsequent calls for [TorCmd.SetEvents] during runtime will
          * be intercepted and modified to include all required [TorEvent].
+         *
+         * **NOTE:** [TorEvent.CONF_CHANGED] and [TorEvent.NOTICE] are always
+         * present and do not need to be added here.
          * */
         @KmpTorDsl
         public fun required(
@@ -203,7 +208,7 @@ public interface TorRuntime:
             event: TorEvent,
             executor: OnEvent.Executor?,
             onEvent: OnEvent<String>,
-        ): Builder = observer(TorEvent.Observer(event, environment.staticTag, executor, onEvent))
+        ): Builder = observer(TorEvent.Observer(event, environment.staticTag(), executor, onEvent))
 
         /**
          * Add [RuntimeEvent.Observer] which is non-static (can be removed at any time).
@@ -239,7 +244,7 @@ public interface TorRuntime:
             event: RuntimeEvent<R>,
             executor: OnEvent.Executor?,
             onEvent: OnEvent<R>,
-        ): Builder = observer(RuntimeEvent.Observer(event, environment.staticTag, executor, onEvent))
+        ): Builder = observer(RuntimeEvent.Observer(event, environment.staticTag(), executor, onEvent))
 
         internal companion object: InstanceKeeper<String, TorRuntime>() {
 
@@ -250,22 +255,22 @@ public interface TorRuntime:
             ): TorRuntime {
                 val b = Builder(environment).apply(block)
 
-                return getOrCreateInstance(key = environment.id, block = {
+                return getOrCreateInstance(key = environment.fid, block = {
 
                     val generator = TorConfigGenerator(
                         environment = environment,
                         omitGeoIPFileSettings = b.omitGeoIPFileSettings,
-                        config = b.config.toImmutableSet(),
+                        config = b.config,
                         isPortAvailable = { host, port -> port.isAvailableAsync(host) },
                     )
 
                     RealTorRuntime.of(
                         generator = generator,
                         networkObserver = b.networkObserver,
-                        requiredTorEvents = b.requiredTorEvents.toImmutableSet(),
-                        observersTorEvent = b.observersTorEvent.toImmutableSet(),
+                        requiredTorEvents = b.requiredTorEvents,
+                        observersTorEvent = b.observersTorEvent,
                         defaultExecutor = b.defaultEventExecutor,
-                        observersRuntimeEvent = b.observersRuntimeEvent.toImmutableSet(),
+                        observersRuntimeEvent = b.observersRuntimeEvent,
                     )
                 })
             }
@@ -291,7 +296,9 @@ public interface TorRuntime:
         public val torrcDefaultsFile: File,
         @JvmField
         public val torResource: ResourceInstaller<Paths.Tor>,
-    ) {
+        @OptIn(ExperimentalKmpTorApi::class)
+        private val _serviceFactoryLoader: ServiceFactory.Loader?,
+    ): FileID {
 
         /**
          * Toggle to dispatch [RuntimeEvent.LOG.DEBUG] and [TorEvent.DEBUG]
@@ -301,22 +308,14 @@ public interface TorRuntime:
          * via [TorCmd.SetEvents]. Add [TorEvent.DEBUG] via
          * [TorRuntime.Builder.required] if debug logs from tor are needed.
          *
-         * **NOTE:** Debug logs may reveal sensitive information
-         * and should not be enabled in production!
+         * **NOTE:** Debug logs may reveal sensitive information and should
+         * not be enabled in production!
          * */
         @JvmField
         @Volatile
         public var debug: Boolean = false
 
-        /**
-         * The SHA-256 hash of the [workDir] path, providing a unique identity
-         * for this [Environment], specific to the local filesystem.
-         * */
-        @get:JvmName("id")
-        public val id: String by lazy {
-            val bytes = workDir.path.encodeToByteArray()
-            SHA256().digest(bytes).encodeToString(Base16)
-        }
+        public override val fid: String by lazy { FileID.createFID(workDir) }
 
         public companion object {
 
@@ -343,7 +342,7 @@ public interface TorRuntime:
              * @param [workDir] tor's working directory (e.g. `$HOME/.my_application/torservice`)
              * @param [cacheDir] tor's cache directory (e.g. `$HOME/.my_application/cache/torservice`)
              * @param [installer] lambda for creating [ResourceInstaller] using
-             *   the default [Builder.installationDir]
+             *   the default [Builder.installationDir] (which is [workDir])
              * @see [io.matthewnelson.kmp.tor.runtime.mobile.createTorRuntimeEnvironment]
              * */
             @JvmStatic
@@ -376,7 +375,7 @@ public interface TorRuntime:
              * @param [workDir] tor's working directory (e.g. `$HOME/.my_application/torservice`)
              * @param [cacheDir] tor's cache directory (e.g. `$HOME/.my_application/cache/torservice`)
              * @param [installer] lambda for creating [ResourceInstaller] using
-             *   the default [Builder.installationDir]
+             *   the configured [Builder.installationDir]
              * @param [block] optional lambda for modifying default parameters.
              * @see [io.matthewnelson.kmp.tor.runtime.mobile.createTorRuntimeEnvironment]
              * */
@@ -399,15 +398,38 @@ public interface TorRuntime:
 
             /**
              * The directory for which **all** resources will be installed
+             *
+             * Default: [workDir]
              * */
             @JvmField
             public var installationDir: File = workDir
 
+            /**
+             * Location of the torrc file
+             *
+             * Default: [workDir]/torrc
+             * */
             @JvmField
             public var torrcFile: File = workDir.resolve("torrc")
 
+            /**
+             * Location of the torrc-defaults file
+             *
+             * Default: [workDir]/torrc-defaults
+             * */
             @JvmField
             public var torrcDefaultsFile: File = workDir.resolve("torrc-defaults")
+
+            /**
+             * Experimental support for running tor as a service. Currently
+             * only Android support is available via the `runtime-mobile`
+             * dependency. This setting is automatically configured if using
+             * `runtime-mobile` dependency and utilizing the extended builder
+             * functions [io.matthewnelson.kmp.tor.runtime.mobile.createTorRuntimeEnvironment]
+             * */
+            @JvmField
+            @ExperimentalKmpTorApi
+            public var serviceFactoryLoader: ServiceFactory.Loader? = null
 
             internal companion object: InstanceKeeper<File, Environment>() {
 
@@ -425,52 +447,190 @@ public interface TorRuntime:
                     val torResource = installer(b.installationDir.absoluteFile.normalize())
 
                     return getOrCreateInstance(key = b.workDir, block = {
+                        @OptIn(ExperimentalKmpTorApi::class)
                         Environment(
                             workDir = b.workDir,
                             cacheDir = b.cacheDir,
                             torrcFile = b.torrcFile.absoluteFile.normalize(),
                             torrcDefaultsFile = b.torrcDefaultsFile.absoluteFile.normalize(),
                             torResource = torResource,
+                            _serviceFactoryLoader = b.serviceFactoryLoader,
                         )
                     })
                 }
             }
         }
 
-        @get:JvmSynthetic
-        internal val staticTag: String by lazy {
+        private val _staticTag: String by lazy {
             try {
                 SecureRandom().nextBytesOf(16)
             } catch (_: SecRandomCopyException) {
                 Random.Default.nextBytes(16)
             }.encodeToString(Base16)
         }
+
+        @JvmSynthetic
+        internal fun staticTag(): String = _staticTag
+
+        @JvmSynthetic
+        @OptIn(ExperimentalKmpTorApi::class)
+        internal fun serviceFactoryLoader(): ServiceFactory.Loader? = _serviceFactoryLoader
+
+        public override fun equals(other: Any?): Boolean = other is Environment && other.fid == fid
+        public override fun hashCode(): Int = 17 * 31 + fid.hashCode()
+        public override fun toString(): String = toFIDString(includeHashCode = false)
     }
 
-    @InternalKmpTorApi
-    public interface ServiceFactory:
-        TorEvent.Processor,
-        RuntimeEvent.Processor,
-        RuntimeEvent.Notifier
-    {
+    /**
+     * An instance of [TorRuntime] which produces [Lifecycle.DestroyableTorRuntime]
+     * that is intended to be run within a service object.
+     *
+     * @see [Lifecycle.DestroyableTorRuntime]
+     * */
+    @ExperimentalKmpTorApi
+    public abstract class ServiceFactory protected constructor(initializer: Initializer): TorRuntime {
 
-        public val environment: Environment
+        /**
+         * Helper for loading the implementation of [ServiceFactory].
+         *
+         * @see [Environment.Builder.serviceFactoryLoader]
+         * */
+        public abstract class Loader {
 
-        public fun newLifecycle(): Lifecycle
+            protected abstract fun loadProtected(initializer: Initializer): ServiceFactory
 
-        public fun newRuntime(
-            lifecycle: Lifecycle,
-            requiredEvents: Set<TorEvent>,
-            observer: NetworkObserver?,
-        ): TorRuntime
-
-        @InternalKmpTorApi
-        public companion object {
-
-            @JvmStatic
-            @InternalKmpTorApi
-            @Throws(IllegalStateException::class)
-            public fun checkInstance(factory: ServiceFactory) { factory.checkInstance() }
+            @JvmSynthetic
+            internal fun load(initializer: Initializer): ServiceFactory = loadProtected(initializer)
         }
+
+        /**
+         * Single use class for initializing [ServiceFactory]. Multiples uses will
+         * result in [IllegalStateException] as the [ServiceFactory] implementation
+         * is a held as a singleton for the given [Environment] it belongs to.
+         * */
+        public class Initializer private constructor(
+            private val ctrl: (startService: () -> Unit) -> ServiceFactoryCtrl,
+        ) {
+
+            @Volatile
+            private var _isInitialized: Boolean = false
+            @OptIn(InternalKmpTorApi::class)
+            private val lock = SynchronizedObject()
+
+            @JvmSynthetic
+            @OptIn(InternalKmpTorApi::class)
+            @Throws(IllegalStateException::class)
+            internal fun initialize(
+                startService: () -> Unit,
+            ): ServiceFactoryCtrl = synchronized(lock) {
+                check(!_isInitialized) {
+                    "TorRuntime.ServiceFactory.Initializer can only be initialized once"
+                }
+
+                _isInitialized = true
+                ctrl(startService)
+            }
+
+            internal companion object {
+
+                @JvmSynthetic
+                internal fun of(
+                    ctrl: (startService: () -> Unit) -> ServiceFactoryCtrl,
+                ): Initializer = Initializer(ctrl)
+            }
+        }
+
+        public interface Binder: RuntimeEvent.Notifier, FileID {
+
+            public fun onBind(
+                serviceEvents: Set<TorEvent>,
+                serviceObserverNetwork: NetworkObserver?,
+                serviceObserversTorEvent: Set<TorEvent.Observer>,
+                serviceObserversRuntimeEvent: Set<RuntimeEvent.Observer<*>>,
+            ): Lifecycle.DestroyableTorRuntime
+        }
+
+        @Throws(RuntimeException::class)
+        protected abstract fun startService()
+
+        private val ctrl: ServiceFactoryCtrl = initializer.initialize(::startService)
+
+        @JvmField
+        protected val binder: Binder = ctrl.binder
+
+        public final override val fid: String = ctrl.fid
+        public final override fun environment(): Environment = ctrl.environment()
+
+        public final override fun <Success: Any> enqueue(
+            cmd: TorCmd.Unprivileged<Success>,
+            onFailure: OnFailure,
+            onSuccess: OnSuccess<Success>,
+        ): QueuedJob = ctrl.enqueue(cmd, onFailure, onSuccess)
+
+        public final override fun enqueue(
+            action: Action,
+            onFailure: OnFailure,
+            onSuccess: OnSuccess<Unit>,
+        ): QueuedJob = ctrl.enqueue(action, onFailure, onSuccess)
+
+        public final override fun subscribe(observer: TorEvent.Observer) {
+            ctrl.subscribe(observer)
+        }
+
+        public final override fun subscribe(vararg observers: TorEvent.Observer) {
+            ctrl.subscribe(*observers)
+        }
+
+        public final override fun subscribe(observer: RuntimeEvent.Observer<*>) {
+            ctrl.subscribe(observer)
+        }
+
+        public final override fun subscribe(vararg observers: RuntimeEvent.Observer<*>) {
+            ctrl.subscribe(*observers)
+        }
+
+        public final override fun unsubscribe(observer: TorEvent.Observer) {
+            ctrl.unsubscribe(observer)
+        }
+
+        public final override fun unsubscribe(vararg observers: TorEvent.Observer) {
+            ctrl.unsubscribe(*observers)
+        }
+
+        public final override fun unsubscribe(observer: RuntimeEvent.Observer<*>) {
+            ctrl.unsubscribe(observer)
+        }
+
+        public final override fun unsubscribe(vararg observers: RuntimeEvent.Observer<*>) {
+            ctrl.unsubscribe(*observers)
+        }
+
+        public final override fun unsubscribeAll(event: TorEvent) {
+            ctrl.unsubscribeAll(event)
+        }
+
+        public final override fun unsubscribeAll(vararg events: TorEvent) {
+            ctrl.unsubscribeAll(*events)
+        }
+
+        public final override fun unsubscribeAll(tag: String) {
+            ctrl.unsubscribeAll(tag)
+        }
+
+        public final override fun unsubscribeAll(event: RuntimeEvent<*>) {
+            ctrl.unsubscribeAll(event)
+        }
+
+        public final override fun unsubscribeAll(vararg events: RuntimeEvent<*>) {
+            ctrl.unsubscribeAll(*events)
+        }
+
+        public final override fun clearObservers() {
+            ctrl.clearObservers()
+        }
+
+        public final override fun equals(other: Any?): Boolean = other is ServiceFactory && other.ctrl == ctrl
+        public final override fun hashCode(): Int = ctrl.hashCode()
+        public final override fun toString(): String = toFIDString(defaultClassName = "ServiceFactory", includeHashCode = false)
     }
 }

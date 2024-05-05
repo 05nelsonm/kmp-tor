@@ -20,7 +20,7 @@ import io.matthewnelson.kmp.tor.runtime.core.internal.ExecutorMainInternal
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.MainCoroutineDispatcher
 import kotlin.coroutines.CoroutineContext
-import kotlin.jvm.JvmField
+import kotlin.jvm.JvmStatic
 
 /**
  * An alias of [ItBlock] indicating a callback for
@@ -33,7 +33,22 @@ import kotlin.jvm.JvmField
  * to [io.matthewnelson.kmp.tor.runtime.RuntimeEvent.ERROR]
  * observers.
  * */
-public typealias OnSuccess<T> = ItBlock<T>
+public fun interface OnSuccess<in T: Any?>: ItBlock<T> {
+
+    public companion object {
+
+        /**
+         * A non-operational static instance of [OnSuccess].
+         * */
+        @JvmStatic
+        public fun <T: Any?> noOp(): OnSuccess<T> = NOOP
+    }
+
+    private data object NOOP: OnSuccess<Any?> {
+        override fun invoke(it: Any?) {}
+        override fun toString(): String = "OnSuccess.NOOP"
+    }
+}
 
 /**
  * An alias of [ItBlock] indicating a callback for
@@ -46,22 +61,48 @@ public typealias OnSuccess<T> = ItBlock<T>
  * to [io.matthewnelson.kmp.tor.runtime.RuntimeEvent.ERROR]
  * observers.
  * */
-public typealias OnFailure = ItBlock<Throwable>
+public fun interface OnFailure: ItBlock<Throwable> {
+
+    public companion object {
+
+        /**
+         * A non-operational static instance of [OnFailure].
+         * */
+        @JvmStatic
+        public fun noOp(): OnFailure = NOOP
+    }
+
+    private data object NOOP: OnFailure {
+        override fun invoke(it: Throwable) {}
+        override fun toString(): String = "OnFailure.NOOP"
+    }
+}
 
 /**
- * A callback for dispatching events.
+ * A callback for dispatching event data.
  *
  * Implementations of [OnEvent] should not throw exception,
  * be fast, and non-blocking.
  *
  * **NOTE:** If [OnEvent] is being utilized with `TorRuntime` APIs,
  * exceptions will be treated as an [UncaughtException] and dispatched
- * to [io.matthewnelson.kmp.tor.runtime.RuntimeEvent.ERROR]
- * observers.
+ * to [io.matthewnelson.kmp.tor.runtime.RuntimeEvent.ERROR].
  *
+ * @see [OnEvent.noOp]
  * @see [OnEvent.Executor]
  * */
-public fun interface OnEvent<in It: Any>: ItBlock<It> {
+public fun interface OnEvent<in Data: Any?>: ItBlock<Data> {
+
+    public companion object {
+
+        /**
+         * A non-operational static instance of [OnEvent]. Useful
+         * for classes that inherit from an [Event.Observer] and override
+         * protected notify function.
+         * */
+        @JvmStatic
+        public fun <Data: Any?> noOp(): OnEvent<Data> = NOOP
+    }
 
     /**
      * `kmp-tor` utilizes several different background threads for
@@ -91,14 +132,11 @@ public fun interface OnEvent<in It: Any>: ItBlock<It> {
          *
          * **NOTE: This is an internal API and should not be called from general
          * code; it is strictly for `kmp-tor` event observers. Custom implementations
-         * of [Executor] should be for usage with `kmp-tor` only**
+         * of [Executor] should be for usage with `kmp-tor` only, and not invoke
+         * [execute]**
          *
-         * The [UncaughtException.Handler] can be retrieved through use of keys
-         * and casting, if needed.
-         *
-         * e.g.
-         *
-         *     handler[CoroutineExceptionHandler] as? UncaughtException.Handler
+         * The [UncaughtException.Handler] can be retrieved from [CoroutineContext] by
+         * [UncaughtException.Handler.uncaughtExceptionHandlerOrNull] if needed.
          *
          * @param [handler] The [UncaughtException.Handler] wrapped as
          *   [CoroutineContext] element to pipe exceptions.
@@ -145,6 +183,11 @@ public fun interface OnEvent<in It: Any>: ItBlock<It> {
             override fun toString(): String = "OnEvent.Executor.Immediate"
         }
     }
+
+    private data object NOOP: OnEvent<Any?> {
+        override fun invoke(it: Any?) {}
+        override fun toString(): String = "OnEvent.NOOP"
+    }
 }
 
 /**
@@ -152,14 +195,40 @@ public fun interface OnEvent<in It: Any>: ItBlock<It> {
  * "dispose" of something.
  * */
 public fun interface Disposable {
-    public operator fun invoke()
+    public fun dispose()
 
     public companion object {
 
         /**
-         * A non-operational implementation of [Disposable]
+         * A non-operational static instance of [Disposable]
          * */
-        @JvmField
-        public val NOOP: Disposable = Disposable {}
+        @JvmStatic
+        public fun noOp(): Disposable = NOOP
+    }
+
+    private data object NOOP: Disposable {
+        override fun dispose() {}
+        override fun toString(): String = "Disposable.NOOP"
+    }
+}
+
+/**
+ * A callback for executing something
+ * */
+public fun interface Executable {
+    public fun execute()
+
+    public companion object {
+
+        /**
+         * A non-operational static instance of [Executable]
+         * */
+        @JvmStatic
+        public fun noOp(): Executable = NOOP
+    }
+
+    private data object NOOP: Executable {
+        override fun execute() {}
+        override fun toString(): String = "Executable.NOOP"
     }
 }

@@ -33,7 +33,7 @@ class RuntimeEventEntriesUnitTest {
             }
         }
 
-        val entries = RuntimeEvent.entries.map { it::class }
+        val entries = RuntimeEvent.entries().map { it::class }
 
         assertEquals(subclasses.size, entries.size)
 

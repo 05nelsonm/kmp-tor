@@ -52,7 +52,7 @@ class TorConfigGeneratorUnitTest {
     }
 
     private val notifier = object : RuntimeEvent.Notifier {
-        override fun <R : Any> notify(event: RuntimeEvent<R>, output: R) {}
+        override fun <Data: Any, E: RuntimeEvent<Data>> notify(event: E, data: Data) {}
     }
 
     @Test

@@ -17,11 +17,11 @@
 
 package io.matthewnelson.kmp.tor.runtime.internal
 
-import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
-import io.matthewnelson.kmp.tor.runtime.TorRuntime
+internal typealias Stack<T> = ArrayList<T>
 
-@OptIn(InternalKmpTorApi::class)
-@Throws(IllegalStateException::class)
-internal actual fun TorRuntime.ServiceFactory.Companion.serviceRuntimeOrNull(
-    block: () -> TorRuntime.ServiceFactory,
-): TorRuntime? = null
+@Suppress("NOTHING_TO_INLINE")
+internal inline fun <T: Any> Stack<T>.push(element: T): Boolean = add(element)
+
+@Suppress("NOTHING_TO_INLINE")
+@Throws(NoSuchElementException::class)
+internal inline fun <T: Any> Stack<T>.pop(): T = removeLast()
