@@ -230,6 +230,13 @@ class ServiceFactoryUnitTest {
         assertFailsWith<IllegalStateException> { factory.executeAsync(TorCmd.Signal.Dump) }
     }
 
+    @Test
+    fun givenActionStop_whenAlreadyStopped_thenIsImmediateSuccess() {
+        val factory = TorRuntime.Builder(env("test_stop_immediate")) {}
+        val job = factory.enqueue(Action.StopDaemon, {}, {})
+        assertEquals(QueuedJob.State.Success, job.state)
+    }
+
     private fun TorRuntime.ServiceFactory.Binder.bind(
         events: Set<TorEvent> = emptySet(),
         network: NetworkObserver? = null,
