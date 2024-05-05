@@ -695,13 +695,18 @@ internal class RealTorRuntime private constructor(
                 ?.let { return it }
 
             var execute: (() -> Unit)? = null
+            var job: QueuedJob? = null
 
-            val job = synchronized(lock) {
-                _instance
-                    ?.enqueue(action, onFailure, onSuccess)
-                    ?.let { return@synchronized it }
+            val instance: Lifecycle.DestroyableTorRuntime? = synchronized(lock) {
+                // If there's an instance available after obtaining the
+                // lock use that instead.
+                //
+                // Want to enqueue outside the lock lambda b/c it could
+                // invoke things immediately and such.
+                _instance?.let { return@synchronized it }
 
-                if (actionStack.isEmpty()) {
+
+                val nonNullJob: QueuedJob = if (actionStack.isEmpty()) {
                     // First call to enqueue for starting the service
 
                     if (action == Action.StopDaemon) {
@@ -738,11 +743,19 @@ internal class RealTorRuntime private constructor(
                     actionStack.push(tempJob)
                     tempJob
                 }
+
+                job = nonNullJob
+
+                null
+            }
+
+            if (instance != null) {
+                job = instance.enqueue(action, onFailure, onSuccess)
             }
 
             execute?.invoke()
 
-            return job
+            return job!!
         }
 
         public override fun <Success: Any> enqueue(
