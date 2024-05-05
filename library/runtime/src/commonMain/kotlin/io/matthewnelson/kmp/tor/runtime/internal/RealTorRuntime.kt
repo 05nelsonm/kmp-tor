@@ -801,7 +801,7 @@ internal class RealTorRuntime private constructor(
         private fun executeStartService() {
             val name = CoroutineName("StartService[fid=$fidEllipses]")
 
-            val job = CoroutineScope(name + dispatcher + handler).launch {
+            val job = CoroutineScope(name + dispatcher).launch {
                 var failure: Throwable? = null
 
                 try {
