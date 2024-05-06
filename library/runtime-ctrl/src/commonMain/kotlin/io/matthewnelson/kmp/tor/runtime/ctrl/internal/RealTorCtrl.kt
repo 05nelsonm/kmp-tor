@@ -16,6 +16,7 @@
 package io.matthewnelson.kmp.tor.runtime.ctrl.internal
 
 import io.matthewnelson.kmp.file.IOException
+import io.matthewnelson.kmp.file.InterruptedException
 import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
 import io.matthewnelson.kmp.tor.core.resource.SynchronizedObject
 import io.matthewnelson.kmp.tor.core.resource.synchronized
@@ -247,8 +248,8 @@ internal class RealTorCtrl private constructor(
                     })
                 } catch (t: Throwable) {
                     var e: Throwable = t
-                    if (t is IllegalStateException && waiters.isDestroyed()) {
-                        e = CancellationException(t)
+                    if (t is IllegalStateException) {
+                        e = InterruptedException(t.message)
                     }
                     cmdJob.error(e)
                     continue

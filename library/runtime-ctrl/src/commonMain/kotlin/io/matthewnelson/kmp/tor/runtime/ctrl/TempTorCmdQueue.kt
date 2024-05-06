@@ -15,7 +15,6 @@
  **/
 package io.matthewnelson.kmp.tor.runtime.ctrl
 
-import io.matthewnelson.kmp.file.InterruptedException
 import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
 import io.matthewnelson.kmp.tor.core.resource.SynchronizedObject
 import io.matthewnelson.kmp.tor.core.resource.synchronized
@@ -24,7 +23,6 @@ import io.matthewnelson.kmp.tor.runtime.core.Destroyable.Companion.checkIsNotDes
 import io.matthewnelson.kmp.tor.runtime.core.ctrl.TorCmd
 import io.matthewnelson.kmp.tor.runtime.ctrl.internal.*
 import kotlin.concurrent.Volatile
-import kotlin.coroutines.cancellation.CancellationException
 import kotlin.jvm.JvmName
 import kotlin.jvm.JvmSynthetic
 
@@ -76,13 +74,13 @@ public class TempTorCmdQueue private constructor(
     public override fun destroy() {
         if (_destroyed) return
 
-        val cancelAll = synchronized(lock) {
+        val interrupt = synchronized(lock) {
             if (_destroyed) return@synchronized false
             _destroyed = true
             true
         }
 
-        if (!cancelAll) return
+        if (!interrupt) return
         queue.interruptAndClearAll(message = "${this::class.simpleName}.onDestroy", handler)
     }
 
@@ -90,16 +88,31 @@ public class TempTorCmdQueue private constructor(
         cmd: TorCmd.Unprivileged<Success>,
         onFailure: OnFailure,
         onSuccess: OnSuccess<Success>,
-    ): QueuedJob = connection?.enqueue(cmd, onFailure, onSuccess) ?: synchronized(lock) {
-        var job = connection?.enqueue(cmd, onFailure, onSuccess)
+    ): QueuedJob {
+        _connection
+            ?.enqueue(cmd, onFailure, onSuccess)
+            ?.let { return it }
 
-        if (job == null && !isDestroyed()) {
-            job = TorCmdJob.of(cmd, onSuccess, onFailure, handler)
-            queue.add(job)
+        var job: QueuedJob? = null
+
+        val instance: TorCtrl? = synchronized(lock) {
+            _connection?.let { return@synchronized it }
+
+            if (!isDestroyed()) {
+                val nonNullJob = TorCmdJob.of(cmd, onSuccess, onFailure, handler)
+                queue.add(nonNullJob)
+                job = nonNullJob
+            }
+
+            null
         }
 
-        job
-    } ?: cmd.toDestroyedErrorJob(onFailure, handler)
+        if (instance != null) {
+            job = instance.enqueue(cmd, onFailure, onSuccess)
+        }
+
+        return job ?: cmd.toDestroyedErrorJob(onFailure, handler)
+    }
 
     internal companion object {
 
