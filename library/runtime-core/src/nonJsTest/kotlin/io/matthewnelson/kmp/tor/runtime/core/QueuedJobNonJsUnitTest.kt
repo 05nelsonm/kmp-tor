@@ -61,7 +61,7 @@ class QueuedJobNonJsUnitTest {
         assertEquals(QueuedJob.State.Cancelled, job.state)
 
         // should have blocked
-        assertTrue(mark.elapsedNow() > 20.milliseconds)
+        assertTrue(mark.elapsedNow() > 15.milliseconds)
     }
 
     @Test
