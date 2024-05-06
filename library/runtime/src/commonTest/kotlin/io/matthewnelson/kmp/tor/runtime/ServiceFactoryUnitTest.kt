@@ -16,14 +16,12 @@
 package io.matthewnelson.kmp.tor.runtime
 
 import io.matthewnelson.kmp.file.InterruptedException
-import io.matthewnelson.kmp.file.toFile
+import io.matthewnelson.kmp.file.SysTempDir
+import io.matthewnelson.kmp.file.resolve
 import io.matthewnelson.kmp.tor.core.api.annotation.ExperimentalKmpTorApi
 import io.matthewnelson.kmp.tor.resource.tor.TorResources
-import io.matthewnelson.kmp.tor.runtime.Action.Companion.executeAsync
-import io.matthewnelson.kmp.tor.runtime.Action.Companion.stopDaemonAsync
 import io.matthewnelson.kmp.tor.runtime.FileID.Companion.fidEllipses
 import io.matthewnelson.kmp.tor.runtime.core.OnFailure
-import io.matthewnelson.kmp.tor.runtime.core.OnSuccess
 import io.matthewnelson.kmp.tor.runtime.core.QueuedJob
 import io.matthewnelson.kmp.tor.runtime.core.TorEvent
 import io.matthewnelson.kmp.tor.runtime.core.ctrl.TorCmd
@@ -59,12 +57,12 @@ class ServiceFactoryUnitTest {
     }
 
     private fun env(
-        rootDir: String,
+        testDir: String,
         start: ((TorRuntime.ServiceFactory.Binder) -> Unit)? = null,
         block: TorRuntime.Environment.Builder.() -> Unit = {},
     ) = TorRuntime.Environment.Builder(
-        "$rootDir/work".toFile(),
-        "$rootDir/cache".toFile(),
+        SysTempDir.resolve("kmp_tor_test/$testDir/work"),
+        SysTempDir.resolve("kmp_tor_test/$testDir/cache"),
         installer = { dir -> TorResources(dir) },
     ) {
         serviceFactoryLoader = object : TorRuntime.ServiceFactory.Loader() {
@@ -79,7 +77,7 @@ class ServiceFactoryUnitTest {
     @Test
     fun givenEnvironment_whenServiceFactoryLoader_thenCreatesServiceFactory() {
         val lces = mutableListOf<Lifecycle.Event>()
-        val runtime = TorRuntime.Builder(env("test_create")) {
+        val runtime = TorRuntime.Builder(env("sf_create")) {
             observer(RuntimeEvent.LIFECYCLE.observer { lces.add(it) })
         }
 
@@ -97,7 +95,7 @@ class ServiceFactoryUnitTest {
 
     @Test
     fun givenInitializer_whenUsedMoreThanOnce_thenThrowsException() {
-        val factory = TorRuntime.Builder(env("test_is_instance")) {} as TestFactory
+        val factory = TorRuntime.Builder(env("sf_is_instance")) {} as TestFactory
         assertFailsWith<IllegalStateException> {
             TestFactory(factory.initializer)
         }
@@ -105,7 +103,7 @@ class ServiceFactoryUnitTest {
 
     @Test
     fun givenBinder_whenBindAndOtherInstanceIsNotDestroyed_thenDestroysPriorInstance() {
-        val factory = TorRuntime.Builder(env("test_multi_bind_destroy")) {} as TestFactory
+        val factory = TorRuntime.Builder(env("sf_multi_bind_destroy")) {} as TestFactory
         val warnings = mutableListOf<String>()
         factory.subscribe(RuntimeEvent.LOG.WARN.observer { warnings.add(it) })
         val runtime1 = factory.testBinder.bind()
@@ -121,7 +119,7 @@ class ServiceFactoryUnitTest {
 
     @Test
     fun givenNoStart_whenBindWithoutEnqueue_thenAutoEnqueuesStartJob() = runTest {
-        val factory = TorRuntime.Builder(env("test_enqueue_start")) {} as TestFactory
+        val factory = TorRuntime.Builder(env("sf_enqueue_start")) {} as TestFactory
 
         val executes = mutableListOf<ActionJob>()
         factory.subscribe(RuntimeEvent.EXECUTE.observer { executes.add(it) })
@@ -136,7 +134,7 @@ class ServiceFactoryUnitTest {
 
     @Test
     fun givenNoStart_whenTorCmd_thenThrowsException() = runTest {
-        val factory = TorRuntime.Builder(env("test_enqueue_cmd_fail")) {} as TestFactory
+        val factory = TorRuntime.Builder(env("sf_enqueue_cmd_fail")) {} as TestFactory
         assertFailsWith<IllegalStateException> { factory.executeAsync(TorCmd.Signal.Dump) }
     }
 
@@ -145,7 +143,7 @@ class ServiceFactoryUnitTest {
         val lces = mutableListOf<Lifecycle.Event>()
         val bindDelay = 50.milliseconds
 
-        val factory = env("test_enqueue_success", start = { binder ->
+        val factory = env("sf_enqueue_success", start = { binder ->
             launch(Dispatchers.Default) {
                 println("LAUNCHED")
                 // Simulate a delayed launch
@@ -193,7 +191,7 @@ class ServiceFactoryUnitTest {
 
     @Test
     fun givenBindTimeout_whenManyJobs_thenAllAreCompletedAsExpected() = runTest {
-        val factory = env("test_timeout_interrupt", start = { /* do nothing */ }).let { env ->
+        val factory = env("sf_timeout_interrupt", start = { /* do nothing */ }).let { env ->
             TorRuntime.Builder(env) {}
         }
 
@@ -211,7 +209,7 @@ class ServiceFactoryUnitTest {
         )
 
         // Timeout is 500ms, so have to wait until after that.
-        withContext(Dispatchers.Default) { delay(750.milliseconds) }
+        withContext(Dispatchers.Default) { delay(1_000.milliseconds) }
 
         for (job in jobs) {
             val expected = if (job is ActionJob.StopJob) {
@@ -232,7 +230,7 @@ class ServiceFactoryUnitTest {
 
     @Test
     fun givenActionStop_whenAlreadyStopped_thenIsImmediateSuccess() {
-        val factory = TorRuntime.Builder(env("test_stop_immediate")) {}
+        val factory = TorRuntime.Builder(env("sf_stop_immediate")) {}
         val job = factory.enqueue(Action.StopDaemon, {}, {})
         assertEquals(QueuedJob.State.Success, job.state)
     }

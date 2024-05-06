@@ -22,8 +22,10 @@ import io.matthewnelson.kmp.process.Process
 import io.matthewnelson.kmp.process.Signal
 import io.matthewnelson.kmp.process.Stdio
 import io.matthewnelson.kmp.tor.resource.tor.TorResources
+import io.matthewnelson.kmp.tor.runtime.core.TorConfig
 import kotlinx.coroutines.*
 import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.TimeSource
 
 public object TestUtils {
 
@@ -40,14 +42,17 @@ public object TestUtils {
         val homeDir = INSTALLER.installationDir
         val dataDir = homeDir.resolve("data")
         val cacheDir = homeDir.resolve("cache")
+        val ctrlPortFile = dataDir.resolve("ctrl.txt")
 
-        withContext(Dispatchers.Default) { delay(500.milliseconds) }
+        withContext(Dispatchers.Default) { delay(750.milliseconds) }
 
         val p = Process.Builder(paths.tor)
             .args("--DataDirectory")
             .args(dataDir.also { it.mkdirs() }.path)
             .args("--CacheDirectory")
             .args(cacheDir.also { it.mkdirs() }.path)
+            .args("--ControlPortWriteToFile")
+            .args(ctrlPortFile.path)
             .args("--GeoIPFile")
             .args(paths.geoip.path)
             .args("--GeoIPv6File")
@@ -73,11 +78,30 @@ public object TestUtils {
             .stderr(Stdio.Inherit)
             .spawn()
 
-        currentCoroutineContext().job.invokeOnCompletion { p.destroy() }
+        TorConfig.ControlPortWriteToFile
 
-        withContext(Dispatchers.Default) { delay(500.milliseconds) }
+        currentCoroutineContext().job.invokeOnCompletion {
+            p.destroy()
+            ctrlPortFile.delete()
+        }
 
-        return p
+        return withContext(Dispatchers.Default) {
+            val mark = TimeSource.Monotonic.markNow()
+
+            var exists = false
+            while (!exists && mark.elapsedNow() < 2_000.milliseconds) {
+                delay(25.milliseconds)
+                exists = ctrlPortFile.exists()
+            }
+
+            if (!exists) {
+                p.destroy()
+                throw IllegalStateException("ControlPortFile timed out after 2s")
+            }
+
+            println("ControlPortFile found after ${mark.elapsedNow().inWholeMilliseconds}ms")
+            p
+        }
     }
 
     public val INSTALLER by lazy {

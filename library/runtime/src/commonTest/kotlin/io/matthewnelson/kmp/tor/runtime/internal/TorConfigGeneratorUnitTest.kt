@@ -37,8 +37,11 @@ import kotlin.test.assertTrue
 @OptIn(InternalKmpTorApi::class)
 class TorConfigGeneratorUnitTest {
 
-    private val environment = "".toFile().absoluteFile.resolve("config-test").let { workDir ->
-        TorRuntime.Environment.Builder(workDir, workDir.resolve("cache")) { installationDir ->
+    private val environment = "".toFile().absoluteFile.resolve("config-test").let { rootDir ->
+        TorRuntime.Environment.Builder(
+            rootDir.resolve("work"),
+            rootDir.resolve("cache"),
+        ) { installationDir ->
             object : ResourceInstaller<Paths.Tor>(installationDir) {
                 private val paths = Paths.Tor(
                     geoip = installationDir.resolve("geoip"),

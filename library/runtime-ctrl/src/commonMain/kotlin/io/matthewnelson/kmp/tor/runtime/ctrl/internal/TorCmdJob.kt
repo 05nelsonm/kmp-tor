@@ -21,7 +21,9 @@ import kotlin.concurrent.Volatile
 import kotlin.coroutines.cancellation.CancellationException
 import kotlin.jvm.JvmSynthetic
 
+@PublishedApi
 internal class TorCmdJob<Success: Any> private constructor(
+    @PublishedApi
     internal val cmd: TorCmd<Success>,
     onSuccess: OnSuccess<Success>,
     onFailure: OnFailure,

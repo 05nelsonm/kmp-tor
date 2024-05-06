@@ -16,6 +16,7 @@
 package io.matthewnelson.kmp.tor.runtime.ctrl.internal
 
 import io.matthewnelson.kmp.file.IOException
+import io.matthewnelson.kmp.file.InterruptedException
 import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
 import io.matthewnelson.kmp.tor.core.resource.SynchronizedObject
 import io.matthewnelson.kmp.tor.core.resource.synchronized
@@ -24,6 +25,8 @@ import io.matthewnelson.kmp.tor.runtime.core.TorEvent
 import io.matthewnelson.kmp.tor.runtime.core.UncaughtException.Handler.Companion.tryCatch
 import io.matthewnelson.kmp.tor.runtime.core.UncaughtException.Handler.Companion.withSuppression
 import io.matthewnelson.kmp.tor.runtime.core.ctrl.Reply
+import io.matthewnelson.kmp.tor.runtime.core.ctrl.TorCmd
+import io.matthewnelson.kmp.tor.runtime.ctrl.TorCmdInterceptor
 import io.matthewnelson.kmp.tor.runtime.ctrl.TorCtrl
 import io.matthewnelson.kmp.tor.runtime.ctrl.internal.Debugger.Companion.d
 import kotlinx.coroutines.*
@@ -66,7 +69,7 @@ internal class RealTorCtrl private constructor(
     private val lock = SynchronizedObject()
 
     private val waiters = Waiters { LOG }
-    private val processor = Processor()
+    private val processor = Processor(factory.interceptors)
 
     // TorCtrl.Factory.connect waits for this to
     // turn true before returning the instance
@@ -196,7 +199,7 @@ internal class RealTorCtrl private constructor(
         }
     }
 
-    private inner class Processor {
+    private inner class Processor(private val interceptors: Set<TorCmdInterceptor<*>>) {
 
         @Volatile
         private var processorJob: Job? = null
@@ -226,13 +229,16 @@ internal class RealTorCtrl private constructor(
                 if (cmdJob == null) break
 
                 val command = try {
-                    cmdJob.cmd.encodeToByteArray(LOG)
-                } catch (e: NotImplementedError) {
-                    // TODO
-                    cmdJob.error(e)
-                    continue
-                } catch (e: IllegalArgumentException) {
-                    cmdJob.error(e)
+                    var intercepted: TorCmd<*>? = null
+
+                    for (interceptor in interceptors) {
+                        val result = interceptor.invoke(cmdJob) ?: continue
+                        intercepted = result
+                    }
+
+                    (intercepted ?: cmdJob.cmd).encodeToByteArray(LOG)
+                } catch (t: Throwable) {
+                    cmdJob.error(t)
                     continue
                 }
 
@@ -242,8 +248,8 @@ internal class RealTorCtrl private constructor(
                     })
                 } catch (t: Throwable) {
                     var e: Throwable = t
-                    if (t is IllegalStateException && waiters.isDestroyed()) {
-                        e = CancellationException(t)
+                    if (t is IllegalStateException) {
+                        e = InterruptedException(t.message)
                     }
                     cmdJob.error(e)
                     continue

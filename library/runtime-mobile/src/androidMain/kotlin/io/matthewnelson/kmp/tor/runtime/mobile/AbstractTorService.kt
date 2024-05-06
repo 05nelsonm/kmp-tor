@@ -44,21 +44,24 @@ internal sealed class AbstractTorService: Service() {
         override fun inject(conn: Connection) {
             val service = this@AbstractTorService
 
-            if (_isDestroyed) {
-                conn.binder.e(IllegalStateException("$service cannot be bound to. isDestroyed[true]"))
-                return
-            }
-
             holders.withLock {
                 val executables = ArrayList<Executable>(1)
 
+                if (_isDestroyed) {
+                    executables.add(Executable {
+                        conn.binder.e(IllegalStateException("$service cannot be bound to. isDestroyed[true]"))
+                    })
+                    return@withLock executables
+                }
+
                 get(conn.binder)?.let { holder ->
                     // It's being destroyed right now, but its completion
-                    // callback has not removed itself from the holders
-                    // yet (we're holding the lock right now). Want to
-                    // continue here so that it will fail to remove
-                    // itself (because it's not there) and will not
-                    // disconnect.
+                    // callback has not de-referenced itself from holders
+                    // for this connection yet (we're holding the lock right
+                    // now).
+                    //
+                    // Want to continue here so that it will fail to remove
+                    // itself (because it's not there) and will not disconnect.
                     if (holder.runtime.isDestroyed()) return@let
 
                     executables.add(Executable {
@@ -69,8 +72,6 @@ internal sealed class AbstractTorService: Service() {
                     })
                     return@withLock executables
                 }
-
-
 
                 // This is the first bind for this TorService instance
                 if (size == 0) {
@@ -148,8 +149,8 @@ internal sealed class AbstractTorService: Service() {
 
         private val binder get() = conn.binder
 
-        // Want to lazily instantiate so that the PersistentKeyMap
-        // entry is created before we start calling things.
+        // Want to lazily instantiate so that the holders map
+        // entry can be created before we start calling things.
         public val runtime: Lifecycle.DestroyableTorRuntime by lazy {
             binder.onBind(
                 serviceEvents = emptySet(),
@@ -158,20 +159,22 @@ internal sealed class AbstractTorService: Service() {
                 serviceObserversRuntimeEvent = emptySet(),
             ).apply {
                 invokeOnDestroy {
-                    val wasRemoved = holders.withLock {
+                    holders.withLock {
                         val isThis = get(binder) == this@Holder
+
+                        if (!isThis) return@withLock null
 
                         // Leave the singleton binder, but de-reference
                         // this holder with the destroyed runtime.
-                        if (isThis) put(binder, null)
+                        put(binder, null)
 
-                        isThis
-                    }
+                        if (_isDestroyed) return@withLock null
 
-                    if (!wasRemoved || _isDestroyed) return@invokeOnDestroy
-
-                    application.unbindService(conn)
-                    binder.lce(Lifecycle.Event.OnUnbind(this@AbstractTorService))
+                        application.unbindService(conn)
+                        Executable {
+                            binder.lce(Lifecycle.Event.OnUnbind(this@AbstractTorService))
+                        }
+                    }?.execute()
                 }
                 invokeOnDestroy {
                     if (_isDestroyed) return@invokeOnDestroy
