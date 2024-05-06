@@ -22,12 +22,17 @@ import io.matthewnelson.kmp.process.Process
 import io.matthewnelson.kmp.process.Signal
 import io.matthewnelson.kmp.process.Stdio
 import io.matthewnelson.kmp.tor.resource.tor.TorResources
+import io.matthewnelson.kmp.tor.runtime.core.ItBlock
 import io.matthewnelson.kmp.tor.runtime.core.TorConfig
 import io.matthewnelson.kmp.tor.runtime.core.UncaughtException
+import io.matthewnelson.kmp.tor.runtime.core.ctrl.TorCmd
+import io.matthewnelson.kmp.tor.runtime.core.util.executeAsync
+import io.matthewnelson.kmp.tor.runtime.ctrl.TorCmdInterceptor
 import io.matthewnelson.kmp.tor.runtime.ctrl.TorCtrl
 import kotlinx.coroutines.*
 import kotlinx.coroutines.test.runTest
 import kotlin.test.Test
+import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 import kotlin.time.Duration.Companion.milliseconds
 
@@ -50,8 +55,25 @@ class TorCtrlFactoryTest {
 
         val p = startTor(ctrlArg)
 
+        var invocationIntercept = 0
         val ctrl = try {
-            TorCtrl.Factory(handler = UncaughtException.Handler.THROW).connectAsync(uds)
+            TorCtrl.Factory(
+                interceptors = setOf(
+                    TorCmdInterceptor.intercept<TorCmd.Authenticate> { _, cmd ->
+                        invocationIntercept++
+                        cmd
+                    }
+                ),
+                debugger = { println(it) },
+                handler = UncaughtException.Handler.THROW,
+            ).connectAsync(uds)
+        } catch (t: Throwable) {
+            p.destroy()
+            throw t
+        }
+
+        try {
+            ctrl.executeAsync(TorCmd.Authenticate())
         } finally {
             p.destroy()
         }
@@ -59,6 +81,7 @@ class TorCtrlFactoryTest {
         withContext(Dispatchers.Default) { delay(350.milliseconds) }
 
         assertTrue(ctrl.isDestroyed())
+        assertEquals(1, invocationIntercept)
     }
 
     private suspend fun startTor(ctrlPortArg: String): Process {
