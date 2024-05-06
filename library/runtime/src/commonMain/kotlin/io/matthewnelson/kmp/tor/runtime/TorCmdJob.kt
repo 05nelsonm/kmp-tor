@@ -23,19 +23,18 @@ import kotlin.jvm.JvmSynthetic
 import kotlin.reflect.KClass
 
 /**
- * A wrapper around the jobs returned by
- * [TorCmd.Unprivileged.Processor] and
- * [TorCmd.Privileged.Processor] to inform
- * observers with.
+ * A wrapper around the jobs returned by [TorCmd.Unprivileged.Processor] and
+ * [TorCmd.Privileged.Processor] to inform observers that they are being
+ * executed.
  *
- * Job is non-cancelling, created just prior
- * to when the actual [TorCmd] contents are to be
- * written to the control connection.
+ * The job is non-cancelling, created just prior to when the actual [TorCmd]
+ * contents are to be written to the control connection.
  *
- * Useful for seeing what is happening and, if needed,
- * attaching [invokeOnCompletion] handlers.
+ * This is useful for seeing what is happening and, if needed, attaching
+ * [invokeOnCompletion] handlers for reactionary purposes.
  *
  * @see [RuntimeEvent.EXECUTE.CMD]
+ * @param [cmd] The [TorCmd] class being executed.
  * */
 public class TorCmdJob private constructor(
     @JvmField

@@ -29,6 +29,7 @@ import io.matthewnelson.kmp.tor.runtime.Lifecycle
 import io.matthewnelson.kmp.tor.runtime.RuntimeEvent.*
 import io.matthewnelson.kmp.tor.runtime.RuntimeEvent.Notifier.Companion.lce
 import io.matthewnelson.kmp.tor.runtime.RuntimeEvent.Notifier.Companion.d
+import io.matthewnelson.kmp.tor.runtime.RuntimeEvent.Notifier.Companion.i
 import io.matthewnelson.kmp.tor.runtime.RuntimeEvent.Notifier.Companion.w
 import io.matthewnelson.kmp.tor.runtime.core.QueuedJob.Companion.toImmediateErrorJob
 import io.matthewnelson.kmp.tor.runtime.core.UncaughtException.Handler.Companion.tryCatch
@@ -414,15 +415,11 @@ internal class RealTorRuntime private constructor(
                             if (execute.isSuccess) return@invokeOnCompletion
                             // Restart failed.
 
-                            if (destroyed) {
-                                newQueue.connection?.destroy()
-                                newQueue.destroy()
-                                return@invokeOnCompletion
-                            }
-
-                            synchronized(enqueueLock) destroy@ {
-                                if (_cmdQueue == newQueue) {
-                                    _cmdQueue = null
+                            if (_cmdQueue == newQueue) {
+                                synchronized(enqueueLock) {
+                                    if (_cmdQueue == newQueue) {
+                                        _cmdQueue = null
+                                    }
                                 }
                             }
 
@@ -438,8 +435,9 @@ internal class RealTorRuntime private constructor(
                     val lifecycle = _lifecycle
                     if (lifecycle != null) {
                         execute.invokeOnCompletion {
-                            if (execute.isSuccess) return@invokeOnCompletion
-                            lifecycle.destroy()
+                            if (execute.isError) {
+                                lifecycle.destroy()
+                            }
                         }
                     }
                 }
@@ -537,7 +535,7 @@ internal class RealTorRuntime private constructor(
 
             val lifecycle = _lifecycle
             if (this is ActionJob.StopJob && lifecycle != null) {
-                NOTIFIER.d(this@ActionProcessor, "Lifecycle present (Service). Destroying immediately.")
+                NOTIFIER.i(this@ActionProcessor, "Lifecycle is present (Service). Destroying immediately.")
 
                 oldCmdQueue?.connection?.destroy()
                 oldCmdQueue?.destroy()
@@ -555,10 +553,11 @@ internal class RealTorRuntime private constructor(
             val connection = oldQueue.connection
 
             if (connection == null) {
+                NOTIFIER.d(this@ActionProcessor, "TorCtrl connection not present. Already shutdown.")
+
                 // Interrupt any temporarily queued jobs. If this is RestartJob,
                 // it will only attach a queue if there's a connection present.
                 oldQueue.destroy()
-                NOTIFIER.d(this@ActionProcessor, "TorCtrl connection not present. Already shutdown.")
                 return
             }
 
@@ -579,7 +578,7 @@ internal class RealTorRuntime private constructor(
 
         private suspend fun ActionJob.Sealed.ensureActive() {
             if (!currentCoroutineContext().isActive) {
-                // Scope cancelled
+                // Scope cancelled (onDestroy was called)
                 throw if (this is ActionJob.StopJob) {
                     SuccessCancellationException()
                 } else {
@@ -941,8 +940,8 @@ internal class RealTorRuntime private constructor(
                 _instance?.let { instance ->
                     _instance = null
                     executables.add(Executable {
-                        instance.destroy()
                         w(this, "onBind was called before previous instance was destroyed")
+                        instance.destroy()
                     })
                 }
 
@@ -978,10 +977,6 @@ internal class RealTorRuntime private constructor(
                     runtime._cmdQueue = runtime.factory.tempQueue()
                 }
 
-                actionStack.clear()
-                _cmdQueue = null
-                _instance = destroyable
-
                 executables.add(Executable {
                     lce(Lifecycle.Event.OnCreate(destroyable))
                     lce(Lifecycle.Event.OnBind(this))
@@ -1006,22 +1001,22 @@ internal class RealTorRuntime private constructor(
                 }
 
                 if (runtime.actionStack.isEmpty()) {
+                    // Want to use enqueue here b/c will set up its
+                    // TorCtrl command queue and all that as well.
+                    val job = runtime.enqueue(
+                        Action.StartDaemon,
+                        OnFailure { t ->
+                            if (t is CancellationException) return@OnFailure
+                            if (t is InterruptedException) return@OnFailure
+
+                            // Pipe error to RuntimeEvent.ERROR
+                            // observers or crash.
+                            throw t
+                        },
+                        OnSuccess.noOp(),
+                    )
+
                     executables.add(Executable {
-                        // Want to use enqueue here b/c will set up its
-                        // TorCtrl command queue and all that as well.
-                        val job = runtime.enqueue(
-                            Action.StartDaemon,
-                            OnFailure { t ->
-                                if (t is CancellationException) return@OnFailure
-                                if (t is InterruptedException) return@OnFailure
-
-                                // Pipe error to RuntimeEvent.ERROR
-                                // observers or crash.
-                                throw t
-                            },
-                            OnSuccess.noOp(),
-                        )
-
                         w(this, "Stack was empty (onBind called externally). Enqueued $job")
                     })
                 } else {
@@ -1030,6 +1025,10 @@ internal class RealTorRuntime private constructor(
                         runtime.actionProcessor.start()
                     })
                 }
+
+                _instance = destroyable
+                _cmdQueue = null
+                actionStack.clear()
 
                 executables to destroyable
             }.let { (executables, destroyable) ->
