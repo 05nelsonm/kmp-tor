@@ -211,7 +211,7 @@ class ServiceFactoryUnitTest {
         )
 
         // Timeout is 500ms, so have to wait until after that.
-        withContext(Dispatchers.Default) { delay(750.milliseconds) }
+        withContext(Dispatchers.Default) { delay(1_000.milliseconds) }
 
         for (job in jobs) {
             val expected = if (job is ActionJob.StopJob) {
