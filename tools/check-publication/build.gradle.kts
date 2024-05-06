@@ -39,7 +39,7 @@ kmpConfiguration {
         androidLibrary {
             sourceSetMain {
                 dependencies {
-                    implementation("$group:runtime-mobile:$version")
+                    implementation("$group:runtime-service:$version")
                 }
             }
         }
@@ -56,7 +56,7 @@ kmpConfiguration {
 
         kotlin {
             sourceSets.findByName("iosMain")?.dependencies {
-                implementation("$group:runtime-mobile:$version")
+                implementation("$group:runtime-service:$version")
             }
         }
     }
