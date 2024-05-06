@@ -16,7 +16,6 @@
 package io.matthewnelson.kmp.tor.runtime.ctrl
 
 import io.matthewnelson.kmp.tor.runtime.core.QueuedJob
-import io.matthewnelson.kmp.tor.runtime.core.TorEvent
 import io.matthewnelson.kmp.tor.runtime.core.ctrl.TorCmd
 import io.matthewnelson.kmp.tor.runtime.ctrl.internal.TorCmdJob
 import kotlin.jvm.JvmStatic
@@ -85,11 +84,5 @@ public class TorCmdInterceptor<C: TorCmd<*>> private constructor(
         internal fun <C: TorCmd<*>> of(
             intercept: (job: TorCmdJob<*>) -> C?,
         ): TorCmdInterceptor<C> = TorCmdInterceptor(intercept)
-    }
-}
-
-private fun ll(e: Set<TorEvent>) {
-    (e + TorEvent.NOTICE).let {
-
     }
 }

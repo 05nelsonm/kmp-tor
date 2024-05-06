@@ -36,6 +36,7 @@ import io.matthewnelson.kmp.tor.runtime.core.UncaughtException.Handler.Companion
 import io.matthewnelson.kmp.tor.runtime.core.ctrl.TorCmd
 import io.matthewnelson.kmp.tor.runtime.core.util.executeAsync
 import io.matthewnelson.kmp.tor.runtime.ctrl.TempTorCmdQueue
+import io.matthewnelson.kmp.tor.runtime.ctrl.TorCmdInterceptor
 import io.matthewnelson.kmp.tor.runtime.ctrl.TorCtrl
 import kotlinx.coroutines.*
 import kotlin.concurrent.Volatile
@@ -110,9 +111,22 @@ internal class RealTorRuntime private constructor(
                 }
             }
         },
-        // TODO: Need to intercept cmd (e.g. if SetEvents)
-        //  See Issue #371
-        //  interceptors = setOf(),
+        interceptors = setOf(
+            TorCmdInterceptor.intercept<TorCmd.SetEvents> { _, cmd ->
+                if (cmd.events.containsAll(requiredTorEvents)) {
+                    cmd
+                } else {
+                    TorCmd.SetEvents(cmd.events + requiredTorEvents)
+                }
+            },
+            TorCmdInterceptor.intercept<TorCmd.Signal.NewNym> { job, cmd ->
+                job.invokeOnCompletion {
+                    if (job.isError) return@invokeOnCompletion
+                    // TODO: Listen for TorEvent.NOTICE rate-limit
+                }
+                cmd
+            }
+        ),
         defaultExecutor = OnEvent.Executor.Immediate,
         debugger = ItBlock { log ->
             if (!debug) return@ItBlock
