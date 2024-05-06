@@ -159,20 +159,22 @@ internal sealed class AbstractTorService: Service() {
                 serviceObserversRuntimeEvent = emptySet(),
             ).apply {
                 invokeOnDestroy {
-                    val wasRemoved = holders.withLock {
+                    holders.withLock {
                         val isThis = get(binder) == this@Holder
+
+                        if (!isThis) return@withLock null
 
                         // Leave the singleton binder, but de-reference
                         // this holder with the destroyed runtime.
-                        if (isThis) put(binder, null)
+                        put(binder, null)
 
-                        isThis
-                    }
+                        if (_isDestroyed) return@withLock null
 
-                    if (!wasRemoved || _isDestroyed) return@invokeOnDestroy
-
-                    application.unbindService(conn)
-                    binder.lce(Lifecycle.Event.OnUnbind(this@AbstractTorService))
+                        application.unbindService(conn)
+                        Executable {
+                            binder.lce(Lifecycle.Event.OnUnbind(this@AbstractTorService))
+                        }
+                    }?.execute()
                 }
                 invokeOnDestroy {
                     if (_isDestroyed) return@invokeOnDestroy
