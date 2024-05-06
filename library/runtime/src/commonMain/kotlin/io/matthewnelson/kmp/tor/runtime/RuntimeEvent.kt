@@ -18,6 +18,7 @@
 package io.matthewnelson.kmp.tor.runtime
 
 import io.matthewnelson.kmp.tor.runtime.core.*
+import io.matthewnelson.kmp.tor.runtime.core.ctrl.TorCmd
 import kotlin.jvm.JvmStatic
 
 /**
@@ -25,7 +26,7 @@ import kotlin.jvm.JvmStatic
  *
  * e.g.
  *
- *     val errorObserver = RuntimeEvent.LOG.ERROR.observer { t ->
+ *     val errorObserver = RuntimeEvent.ERROR.observer { t ->
  *         t.printStackTrace()
  *     }
  *
@@ -57,24 +58,46 @@ public sealed class RuntimeEvent<Data: Any> private constructor(
      * */
     public data object ERROR: RuntimeEvent<Throwable>("ERROR")
 
-    /**
-     * The current [Action] that is being executed by [TorRuntime].
-     *
-     * Useful for reacting to specific jobs via attachment of an
-     * [ActionJob.invokeOnCompletion] handler.
-     *
-     * e.g.
-     *
-     *     EXECUTE.observer { job ->
-     *         if (!job.isStop) return@observer
-     *         job.invokeOnCompletion {
-     *             if (job.isSuccess) {
-     *                 // do something
-     *             }
-     *         }
-     *     }
-     * */
-    public data object EXECUTE: RuntimeEvent<ActionJob>("EXECUTE")
+    public data object EXECUTE {
+
+        /**
+         * The current [Action] that is being executed by [TorRuntime].
+         *
+         * Useful for reacting to specific jobs via attachment of an
+         * [ActionJob.invokeOnCompletion] handler.
+         *
+         * e.g.
+         *
+         *     EXECUTE.ACTION.observer { job ->
+         *         if (!job.isStop) return@observer
+         *         job.invokeOnCompletion {
+         *             if (job.isSuccess) {
+         *                 // do something
+         *             }
+         *         }
+         *     }
+         * */
+        public data object ACTION: RuntimeEvent<ActionJob>("EXECUTE_ACTION")
+
+        /**
+         * The current [TorCmd] that is being executed by [TorRuntime].
+         *
+         * Useful for reacting to specific jobs via attachment of an
+         * [TorCmdJob.invokeOnCompletion] handler.
+         *
+         * e.g.
+         *
+         *     EXECUTE.CMD.observer { job ->
+         *         if (job.cmd != TorCmd.Onion.Add::class) return@observer
+         *         job.invokeOnCompletion {
+         *             if (job.isSuccess) {
+         *                 // do something
+         *             }
+         *         }
+         *     }
+         * */
+        public data object CMD: RuntimeEvent<TorCmdJob>("EXECUTE_CMD")
+    }
 
     /**
      * Events pertaining to an object's lifecycle.
@@ -204,8 +227,8 @@ public sealed class RuntimeEvent<Data: Any> private constructor(
         }
 
         protected override val lazyEntries: ThisBlock<LinkedHashSet<RuntimeEvent<*>>> = ThisBlock {
-            add(ERROR); add(EXECUTE); add(LIFECYCLE); add(LOG.DEBUG);
-            add(LOG.INFO); add(LOG.WARN);
+            add(ERROR); add(EXECUTE.ACTION); add(EXECUTE.CMD); add(LIFECYCLE);
+            add(LOG.DEBUG); add(LOG.INFO); add(LOG.WARN);
         }
     }
 

@@ -122,7 +122,7 @@ class ServiceFactoryUnitTest {
         val factory = TorRuntime.Builder(env("sf_enqueue_start")) {} as TestFactory
 
         val executes = mutableListOf<ActionJob>()
-        factory.subscribe(RuntimeEvent.EXECUTE.observer { executes.add(it) })
+        factory.subscribe(RuntimeEvent.EXECUTE.ACTION.observer { executes.add(it) })
 
         val runtime = factory.testBinder.bind()
 
