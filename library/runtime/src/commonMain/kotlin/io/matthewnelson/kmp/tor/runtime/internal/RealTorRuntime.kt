@@ -125,7 +125,10 @@ internal class RealTorRuntime private constructor(
                     // TODO: Listen for TorEvent.NOTICE rate-limit
                 }
                 cmd
-            }
+            },
+            TorCmdJob.interceptor { job ->
+                EXECUTE.CMD.notifyObservers(job)
+            },
         ),
         defaultExecutor = OnEvent.Executor.Immediate,
         debugger = ItBlock { log ->
@@ -322,7 +325,7 @@ internal class RealTorRuntime private constructor(
 
                 if (job == null) break
 
-                EXECUTE.notifyObservers(job)
+                EXECUTE.ACTION.notifyObservers(job)
 
                 try {
                     when (job) {
@@ -916,7 +919,8 @@ internal class RealTorRuntime private constructor(
                 events.mapTo(LinkedHashSet(events.size + 1, 1.0f)) { event ->
                     when (event) {
                         is ERROR -> event.observer(tag) { event.notifyObservers(it) }
-                        is EXECUTE -> event.observer(tag) { event.notifyObservers(it) }
+                        is EXECUTE.ACTION -> event.observer(tag) { event.notifyObservers(it) }
+                        is EXECUTE.CMD -> event.observer(tag) { event.notifyObservers(it) }
                         is LIFECYCLE -> event.observer(tag) { event.notifyObservers(it) }
                         is LOG -> event.observer(tag) { event.notifyObservers(it) }
                     }
