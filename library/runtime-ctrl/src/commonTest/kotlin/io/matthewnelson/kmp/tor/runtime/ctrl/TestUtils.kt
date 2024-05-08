@@ -22,7 +22,6 @@ import io.matthewnelson.kmp.process.Process
 import io.matthewnelson.kmp.process.Signal
 import io.matthewnelson.kmp.process.Stdio
 import io.matthewnelson.kmp.tor.resource.tor.TorResources
-import io.matthewnelson.kmp.tor.runtime.core.TorConfig
 import kotlinx.coroutines.*
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.TimeSource
@@ -77,8 +76,6 @@ public object TestUtils {
             .stdout(Stdio.Inherit)
             .stderr(Stdio.Inherit)
             .spawn()
-
-        TorConfig.ControlPortWriteToFile
 
         currentCoroutineContext().job.invokeOnCompletion {
             p.destroy()

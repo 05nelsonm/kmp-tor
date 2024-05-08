@@ -263,6 +263,21 @@ public class TorConfig private constructor(
                 return false
             }
 
+            override fun cookieAuthentication(): Setting? {
+                return settings.filterByKeyword<CookieAuthentication.Companion>()
+                    .firstOrNull()
+            }
+
+            override fun cookieAuthFile(): Setting? {
+                return settings.filterByKeyword<CookieAuthFile.Companion>()
+                    .firstOrNull()
+            }
+
+            override fun dataDirectory(): Setting? {
+                return settings.filterByKeyword<DataDirectory.Companion>()
+                    .firstOrNull()
+            }
+
             override fun remove(setting: Setting) {
                 settings.remove(setting)
             }

@@ -21,5 +21,8 @@ import io.matthewnelson.kmp.tor.runtime.core.TorConfig
 @InternalKmpTorApi
 public interface ExtendedTorConfigBuilder {
     public fun contains(keyword: TorConfig.Keyword): Boolean
+    public fun cookieAuthentication(): TorConfig.Setting?
+    public fun cookieAuthFile(): TorConfig.Setting?
+    public fun dataDirectory(): TorConfig.Setting?
     public fun remove(setting: TorConfig.Setting)
 }

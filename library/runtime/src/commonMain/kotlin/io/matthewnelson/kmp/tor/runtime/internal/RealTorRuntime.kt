@@ -127,9 +127,9 @@ internal class RealTorRuntime private constructor(
                 }
                 cmd
             },
-            TorCmdJob.interceptor { job ->
+            TorCmdJob.interceptor(notify = { job ->
                 EXECUTE.CMD.notifyObservers(job)
-            },
+            }),
         ),
         defaultExecutor = OnEvent.Executor.Immediate,
         debugger = ItBlock { log ->

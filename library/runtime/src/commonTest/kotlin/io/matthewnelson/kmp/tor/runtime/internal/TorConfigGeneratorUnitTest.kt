@@ -16,6 +16,7 @@
 package io.matthewnelson.kmp.tor.runtime.internal
 
 import io.matthewnelson.kmp.file.absoluteFile
+import io.matthewnelson.kmp.file.path
 import io.matthewnelson.kmp.file.resolve
 import io.matthewnelson.kmp.file.toFile
 import io.matthewnelson.kmp.tor.core.api.ResourceInstaller
@@ -32,6 +33,7 @@ import io.matthewnelson.kmp.tor.runtime.core.address.Port.Proxy.Companion.toPort
 import kotlinx.coroutines.test.runTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
 @OptIn(InternalKmpTorApi::class)
@@ -117,6 +119,95 @@ class TorConfigGeneratorUnitTest {
         assertEquals("auto", socks.argument)
         val dns = settings.filterByKeyword<TorConfig.__DNSPort.Companion>().first()
         assertEquals("auto", dns.argument)
+    }
+
+    @Test
+    fun givenCookieAuthenticationEnabled_whenNoCookieAuthFile_thenAddsDefault() = runTest {
+        val config = newGenerator(
+            config = setOf(
+                ConfigBuilderCallback {
+                    put(TorConfig.CookieAuthentication) { enable = true }
+                }
+            )
+        ).generate(notifier).first
+
+        config.assertContains(TorConfig.CookieAuthFile)
+    }
+
+    @Test
+    fun givenCookieAuthenticationEnabled_whenCookieAuthFile_thenDoesNotModify() = runTest {
+        val expected = environment.workDir.resolve("data")
+            .resolve(TorConfig.CookieAuthFile.DEFAULT_NAME + "_something")
+
+        val setting = newGenerator(
+            config = setOf(
+                ConfigBuilderCallback {
+                    put(TorConfig.CookieAuthentication) { enable = true }
+                    put(TorConfig.CookieAuthFile) {
+                        file = expected
+                    }
+                }
+            )
+        ).generate(notifier)
+            .first
+            .settings
+            .filterByKeyword<TorConfig.CookieAuthFile.Companion>()
+            .first()
+
+        assertEquals(expected.path, setting.argument)
+    }
+
+    @Test
+    fun givenCookieAuthenticationDisabled_whenCookieAuthFile_thenRemoves() = runTest {
+        val expected = environment.workDir.resolve("data")
+            .resolve(TorConfig.CookieAuthFile.DEFAULT_NAME + "_something")
+
+        val setting = newGenerator(
+            config = setOf(
+                ConfigBuilderCallback {
+                    put(TorConfig.CookieAuthentication) { enable = false }
+                    put(TorConfig.CookieAuthFile) {
+                        file = expected
+                    }
+                }
+            )
+        ).generate(notifier)
+            .first
+            .settings
+            .filterByKeyword<TorConfig.CookieAuthFile.Companion>()
+            .firstOrNull()
+
+        assertNull(setting)
+    }
+
+    @Test
+    fun givenAuthentication_whenNothingDeclared_thenAddsCookieAuthenticationDefaults() = runTest {
+        val config = newGenerator().generate(notifier).first
+
+        config.assertContains(TorConfig.CookieAuthentication)
+        config.assertContains(TorConfig.CookieAuthFile)
+    }
+
+    @Test
+    fun givenAuthCookieFile_whenNoCookieAuthentication_thenEnablesIt() = runTest {
+        val setting = newGenerator(
+            config = setOf(
+                ConfigBuilderCallback {
+                    put(TorConfig.CookieAuthFile) {
+                        file = environment.workDir
+                            .resolve("data")
+                            .resolve(TorConfig.CookieAuthFile.DEFAULT_NAME)
+                    }
+                }
+            )
+        ).generate(notifier)
+            .first
+            .settings
+            .filterByKeyword<TorConfig.CookieAuthentication.Companion>()
+            .first()
+
+        assertEquals("1", setting.argument)
+        assertEquals(TorConfig.CookieAuthentication.Companion, setting.keyword)
     }
 
     @Suppress("UNUSED_PARAMETER")
