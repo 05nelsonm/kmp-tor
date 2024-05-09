@@ -64,10 +64,14 @@ internal fun TorCmd<*>.signalNameOrNull(): String? = when (this) {
 @Suppress("NOTHING_TO_INLINE")
 private inline fun TorCmd.Authenticate.encode(LOG: Debugger?): ByteArray {
     return StringBuilder(keyword).apply {
-        if (hex.isNotEmpty()) {
+        val redacted = if (hex.isNotEmpty()) {
             SP().append(hex)
+            " [REDACTED]"
+        } else {
+            ""
         }
-        LOG.d { ">> ${toString()}" }
+
+        LOG.d { ">> $keyword$redacted" }
         CRLF()
     }.encodeToByteArray(fill = true)
 }
