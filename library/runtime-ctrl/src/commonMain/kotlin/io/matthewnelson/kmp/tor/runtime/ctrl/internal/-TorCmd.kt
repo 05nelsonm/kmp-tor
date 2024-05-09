@@ -29,16 +29,36 @@ internal fun TorCmd<*>.encodeToByteArray(LOG: Debugger?): ByteArray = when (this
     is TorCmd.Ownership.Take -> encode(LOG)
     is TorCmd.Resolve -> encode(LOG)
     is TorCmd.SetEvents -> encode(LOG)
-    is TorCmd.Signal.Reload -> encode(LOG)
-    is TorCmd.Signal.Dump -> encode(LOG)
-    is TorCmd.Signal.Debug -> encode(LOG)
-    is TorCmd.Signal.NewNym -> encode(LOG)
-    is TorCmd.Signal.ClearDnsCache -> encode(LOG)
-    is TorCmd.Signal.Heartbeat -> encode(LOG)
-    is TorCmd.Signal.Active -> encode(LOG)
-    is TorCmd.Signal.Dormant -> encode(LOG)
-    is TorCmd.Signal.Shutdown -> encode(LOG)
-    is TorCmd.Signal.Halt -> encode(LOG)
+    is TorCmd.Signal.Reload -> encodeSignal(LOG)
+    is TorCmd.Signal.Dump -> encodeSignal(LOG)
+    is TorCmd.Signal.Debug -> encodeSignal(LOG)
+    is TorCmd.Signal.NewNym -> encodeSignal(LOG)
+    is TorCmd.Signal.ClearDnsCache -> encodeSignal(LOG)
+    is TorCmd.Signal.Heartbeat -> encodeSignal(LOG)
+    is TorCmd.Signal.Active -> encodeSignal(LOG)
+    is TorCmd.Signal.Dormant -> encodeSignal(LOG)
+    is TorCmd.Signal.Shutdown -> encodeSignal(LOG)
+    is TorCmd.Signal.Halt -> encodeSignal(LOG)
+}
+
+internal fun TorCmd<*>.signalNameOrNull(): String? = when (this) {
+    is TorCmd.Signal.Reload -> "RELOAD"
+    is TorCmd.Signal.Dump -> "DUMP"
+    is TorCmd.Signal.Debug -> "DEBUG"
+    is TorCmd.Signal.NewNym -> "NEWNYM"
+    is TorCmd.Signal.ClearDnsCache -> "CLEARDNSCACHE"
+    is TorCmd.Signal.Heartbeat -> "HEARTBEAT"
+    is TorCmd.Signal.Active -> "ACTIVE"
+    is TorCmd.Signal.Dormant -> "DORMANT"
+    is TorCmd.Signal.Shutdown -> "SHUTDOWN"
+    is TorCmd.Signal.Halt -> "HALT"
+    else -> {
+        if (keyword == TorCmd.Signal.Dump.keyword) {
+            this::class.simpleName?.uppercase()
+        } else {
+            null
+        }
+    }
 }
 
 @Suppress("NOTHING_TO_INLINE")
@@ -293,59 +313,13 @@ private inline fun TorCmd.SetEvents.encode(LOG: Debugger?): ByteArray {
 }
 
 @Suppress("NOTHING_TO_INLINE")
-private inline fun TorCmd.Signal.Reload.encode(LOG: Debugger?): ByteArray {
-    return TorCmd.Signal.encode("RELOAD", LOG)
-}
+@Throws(IllegalArgumentException::class)
+private inline fun TorCmd<*>.encodeSignal(LOG: Debugger?): ByteArray {
+    val name = signalNameOrNull()
+        ?: throw IllegalArgumentException("${this::class} is not a SIGNAL command")
 
-@Suppress("NOTHING_TO_INLINE")
-private inline fun TorCmd.Signal.Dump.encode(LOG: Debugger?): ByteArray {
-    return TorCmd.Signal.encode("DUMP", LOG)
-}
-
-@Suppress("NOTHING_TO_INLINE")
-private inline fun TorCmd.Signal.Debug.encode(LOG: Debugger?): ByteArray {
-    return TorCmd.Signal.encode("DEBUG", LOG)
-}
-
-@Suppress("NOTHING_TO_INLINE")
-private inline fun TorCmd.Signal.NewNym.encode(LOG: Debugger?): ByteArray {
-    return TorCmd.Signal.encode("NEWNYM", LOG)
-}
-
-@Suppress("NOTHING_TO_INLINE")
-private inline fun TorCmd.Signal.ClearDnsCache.encode(LOG: Debugger?): ByteArray {
-    return TorCmd.Signal.encode("CLEARDNSCACHE", LOG)
-}
-
-@Suppress("NOTHING_TO_INLINE")
-private inline fun TorCmd.Signal.Heartbeat.encode(LOG: Debugger?): ByteArray {
-    return TorCmd.Signal.encode("HEARTBEAT", LOG)
-}
-
-@Suppress("NOTHING_TO_INLINE")
-private inline fun TorCmd.Signal.Active.encode(LOG: Debugger?): ByteArray {
-    return TorCmd.Signal.encode("ACTIVE", LOG)
-}
-
-@Suppress("NOTHING_TO_INLINE")
-private inline fun TorCmd.Signal.Dormant.encode(LOG: Debugger?): ByteArray {
-    return TorCmd.Signal.encode("DORMANT", LOG)
-}
-
-@Suppress("NOTHING_TO_INLINE")
-private inline fun TorCmd.Signal.Shutdown.encode(LOG: Debugger?): ByteArray {
-    return TorCmd.Signal.encode("SHUTDOWN", LOG)
-}
-
-@Suppress("NOTHING_TO_INLINE")
-private inline fun TorCmd.Signal.Halt.encode(LOG: Debugger?): ByteArray {
-    return TorCmd.Signal.encode("HALT", LOG)
-}
-
-@Suppress("NOTHING_TO_INLINE")
-private inline fun TorCmd.Signal.encode(signal: String, LOG: Debugger?): ByteArray {
     return StringBuilder("SIGNAL").apply {
-        SP().append(signal)
+        SP().append(name)
         LOG.d { ">> ${toString()}" }
         CRLF()
     }.encodeToByteArray()

@@ -28,7 +28,13 @@ internal class TorCmdJob<Success: Any> private constructor(
     onSuccess: OnSuccess<Success>,
     onFailure: OnFailure,
     handler: UncaughtException.Handler,
-): QueuedJob(cmd.keyword, onFailure, handler) {
+): QueuedJob(
+    cmd.signalNameOrNull()?.let { name ->
+        "${cmd.keyword}{$name}"
+    } ?: cmd.keyword,
+    onFailure,
+    handler,
+) {
 
     @Volatile
     private var _onSuccess: OnSuccess<Success>? = onSuccess
