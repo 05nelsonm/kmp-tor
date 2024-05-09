@@ -465,7 +465,7 @@ internal class RealTorRuntime private constructor(
 
                 if (isOldQueueAttached) {
                     executables.add(Executable {
-                        NOTIFIER.d(this@ActionProcessor, "Old TorCtrl queue was attached to $execute")
+                        NOTIFIER.d(this@ActionProcessor, "TorCtrl queue attached to $execute")
                     })
                 }
 
@@ -566,9 +566,7 @@ internal class RealTorRuntime private constructor(
                     NOTIFIER.lce(Lifecycle.Event.OnDestroy(instance))
                 }
 
-                val processHandle = processJob.invokeOnCompletion {
-                    ctrl.destroy()
-                }
+                val processHandle = processJob.invokeOnCompletion { ctrl.destroy() }
 
                 NOTIFIER.lce(Lifecycle.Event.OnCreate(ctrl))
 
@@ -688,49 +686,6 @@ internal class RealTorRuntime private constructor(
             super.notify(data)
             event.notifyObservers(data)
         }
-    }
-
-    internal companion object {
-
-        @JvmSynthetic
-        @Suppress("RemoveRedundantQualifierName")
-        internal fun of(
-            generator: TorConfigGenerator,
-            networkObserver: NetworkObserver,
-            requiredTorEvents: Set<TorEvent>,
-            observersTorEvent: Set<TorEvent.Observer>,
-            defaultExecutor: OnEvent.Executor,
-            observersRuntimeEvent: Set<RuntimeEvent.Observer<*>>,
-        ): TorRuntime = generator.environment.serviceFactoryLoader()?.let { loader ->
-            var n: Notifier? = null
-
-            val initializer = TorRuntime.ServiceFactory.Initializer.of { startService ->
-                RealServiceFactoryCtrl(
-                    generator,
-                    networkObserver,
-                    requiredTorEvents,
-                    observersTorEvent,
-                    defaultExecutor,
-                    observersRuntimeEvent,
-                    startService,
-                ).also { n = it }
-            }
-
-            val factory = loader.load(initializer)
-
-            n?.lce(Lifecycle.Event.OnCreate(factory))
-
-            factory
-        } ?: RealTorRuntime(
-            generator,
-            networkObserver,
-            requiredTorEvents,
-            null,
-            generator.environment.newRuntimeDispatcher(),
-            observersTorEvent,
-            defaultExecutor,
-            observersRuntimeEvent,
-        )
     }
 
     private class RealServiceFactoryCtrl(
@@ -1119,5 +1074,48 @@ internal class RealTorRuntime private constructor(
         init {
             lce(Lifecycle.Event.OnCreate(this))
         }
+    }
+
+    internal companion object {
+
+        @JvmSynthetic
+        @Suppress("RemoveRedundantQualifierName")
+        internal fun of(
+            generator: TorConfigGenerator,
+            networkObserver: NetworkObserver,
+            requiredTorEvents: Set<TorEvent>,
+            observersTorEvent: Set<TorEvent.Observer>,
+            defaultExecutor: OnEvent.Executor,
+            observersRuntimeEvent: Set<RuntimeEvent.Observer<*>>,
+        ): TorRuntime = generator.environment.serviceFactoryLoader()?.let { loader ->
+            var n: Notifier? = null
+
+            val initializer = TorRuntime.ServiceFactory.Initializer.of { startService ->
+                RealServiceFactoryCtrl(
+                    generator,
+                    networkObserver,
+                    requiredTorEvents,
+                    observersTorEvent,
+                    defaultExecutor,
+                    observersRuntimeEvent,
+                    startService,
+                ).also { n = it }
+            }
+
+            val factory = loader.load(initializer)
+
+            n?.lce(Lifecycle.Event.OnCreate(factory))
+
+            factory
+        } ?: RealTorRuntime(
+            generator,
+            networkObserver,
+            requiredTorEvents,
+            null,
+            generator.environment.newRuntimeDispatcher(),
+            observersTorEvent,
+            defaultExecutor,
+            observersRuntimeEvent,
+        )
     }
 }

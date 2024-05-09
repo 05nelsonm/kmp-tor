@@ -67,13 +67,6 @@ internal class TorProcess private constructor(
 
         val (config, paths) = generator.generate(NOTIFIER)
 
-        // Is **always** present for generated config.
-        val ctrlPortFile = config
-            .filterByKeyword<TorConfig.ControlPortWriteToFile.Companion>()
-            .first()
-            .argument
-            .toFile()
-
         val startArgs = config.createStartArgs(generator.environment)
 
         // Want to use the path here and not the file b/c
@@ -148,65 +141,8 @@ internal class TorProcess private constructor(
             latch.complete()
         }
 
-        val connection = try {
-            val lines = ctrlPortFile
-                .awaitExists(5.seconds)
-                .readUtf8()
-                .lines()
-                .mapNotNull { it.ifBlank { null } }
-
-            NOTIFIER.d(this, "ControlFile$lines")
-
-            run {
-                val addresses = ArrayList<String>(1)
-
-                for (line in lines) {
-                    val argument = line.substringAfter('=', "")
-                    if (argument.isBlank()) continue
-
-                    // UNIX_PORT=/tmp/kmp_tor_ctrl/data/ctrl.sock
-                    if (line.startsWith("UNIX_PORT")) {
-                        val file = argument.toFile()
-                        if (!file.exists()) continue
-
-                        // Prefer UnixDomainSocket if present
-                        return@run CtrlArguments.Connection(file)
-                    }
-
-                    // PORT=127.0.0.1:9055
-                    if (line.startsWith("PORT")) {
-                        addresses.add(argument)
-                    }
-                }
-
-                // No UnixDomainSocket, fallback to first TCP address
-                for (address in addresses) {
-                    val proxyAddress = address.toProxyAddressOrNull() ?: continue
-                    return@run CtrlArguments.Connection(proxyAddress)
-                }
-
-                throw IOException("Failed to acquire control connection address from file[$ctrlPortFile]")
-            }
-        } catch (t: Throwable) {
-            processJob.cancel()
-            throw t
-        }
-
-        val authenticate: TorCmd.Authenticate = try {
-            // TODO: HashedControlPassword Issue #1
-
-            config.filterByKeyword<TorConfig.CookieAuthFile.Companion>()
-                .firstOrNull()
-                ?.argument
-                ?.toFile()
-                ?.awaitExists(1.seconds)
-                ?.readBytes()
-                ?.let { bytes -> TorCmd.Authenticate(cookie = bytes)  }
-        } catch (t: Throwable) {
-            processJob.cancel()
-            throw t
-        } ?: TorCmd.Authenticate() // Unauthenticated
-
+        val connection = config.awaitCtrlConnection(processJob)
+        val authenticate = config.awaitAuthentication(processJob)
         val configLoad = TorCmd.Config.Load(startArgs.loadText)
 
         val arguments = CtrlArguments(
@@ -257,28 +193,6 @@ internal class TorProcess private constructor(
         if (wasNotified) {
             NOTIFIER.i(this@TorProcess, "Resuming start")
         }
-    }
-
-    @Throws(CancellationException::class, IOException::class)
-    private suspend fun File.awaitExists(timeout: Duration): File {
-        require(timeout >= 500.milliseconds) { "timeout must be greater than or equal to 500ms" }
-
-        val now = TimeSource.Monotonic.markNow()
-
-        var notified = false
-        while (true) {
-            if (exists()) return this
-
-            if (!notified) {
-                NOTIFIER.d(this@TorProcess, "Waiting for tor to write to $name")
-                notified = true
-            }
-
-            delay(10.milliseconds)
-            if (now.elapsedNow() > timeout) break
-        }
-
-        throw IOException("Timed out after ${timeout.inWholeMilliseconds}ms waiting for tor to write to file[$this]")
     }
 
     private fun StartArgs.processStart(
@@ -352,6 +266,99 @@ internal class TorProcess private constructor(
             p.destroy()
             NOTIFIER.lce(Lifecycle.Event.OnDestroy(this@TorProcess))
         }
+    }
+
+    private suspend fun TorConfig.awaitCtrlConnection(
+        processJob: Job,
+    ): CtrlArguments.Connection = try {
+
+        val ctrlPortFile = filterByKeyword<TorConfig.ControlPortWriteToFile.Companion>()
+            .first()
+            .argument
+            .toFile()
+
+        // Is **always** present for generated config.
+        val lines = ctrlPortFile
+            .awaitExists(5.seconds)
+            .readUtf8()
+            .lines()
+            .mapNotNull { it.ifBlank { null } }
+
+        NOTIFIER.d(this@TorProcess, "ControlFile$lines")
+
+        run {
+            val addresses = ArrayList<String>(1)
+
+            for (line in lines) {
+                val argument = line.substringAfter('=', "")
+                if (argument.isBlank()) continue
+
+                // UNIX_PORT=/tmp/kmp_tor_ctrl/data/ctrl.sock
+                if (line.startsWith("UNIX_PORT")) {
+                    val file = argument.toFile()
+                    if (!file.exists()) continue
+
+                    // Prefer UnixDomainSocket if present
+                    return@run CtrlArguments.Connection(file)
+                }
+
+                // PORT=127.0.0.1:9055
+                if (line.startsWith("PORT")) {
+                    addresses.add(argument)
+                }
+            }
+
+            // No UnixDomainSocket, fallback to first TCP address
+            for (address in addresses) {
+                val proxyAddress = address.toProxyAddressOrNull() ?: continue
+                return@run CtrlArguments.Connection(proxyAddress)
+            }
+
+            throw IOException("Failed to acquire control connection address from file[$ctrlPortFile]")
+        }
+    } catch (t: Throwable) {
+        processJob.cancel()
+        throw t
+    }
+
+    private suspend fun TorConfig.awaitAuthentication(
+        processJob: Job,
+    ): TorCmd.Authenticate = try {
+        // TODO: HashedControlPassword Issue #1
+
+        filterByKeyword<TorConfig.CookieAuthFile.Companion>()
+            .firstOrNull()
+            ?.argument
+            ?.toFile()
+            ?.awaitExists(1.seconds)
+            ?.readBytes()
+            ?.let { bytes -> TorCmd.Authenticate(cookie = bytes)  }
+
+    } catch (t: Throwable) {
+        processJob.cancel()
+        throw t
+    } ?: TorCmd.Authenticate() // Unauthenticated
+
+    @Throws(CancellationException::class, IOException::class)
+    private suspend fun File.awaitExists(timeout: Duration): File {
+        require(timeout >= 500.milliseconds) { "timeout must be greater than or equal to 500ms" }
+
+        val now = TimeSource.Monotonic.markNow()
+
+        var notified = false
+        while (true) {
+            if (exists()) return this
+
+            if (!notified) {
+                NOTIFIER.d(this@TorProcess, "Waiting for tor to write to $name")
+                notified = true
+            }
+
+            delay(10.milliseconds)
+            if (now.elapsedNow() > timeout) break
+        }
+
+        throw IOException("Timed out after ${timeout.inWholeMilliseconds}ms waiting for tor to write to file[$this]")
     }
 
     private fun Output.toInvalidConfigurationException(): IOException {
