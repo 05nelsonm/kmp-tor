@@ -60,34 +60,10 @@ internal class TorProcess private constructor(
 ): FileID by generator {
 
     @Throws(Throwable::class)
-    private suspend fun start(): CtrlArguments = state.lock.withLock {
-        state.processJob?.cancelAndJoin()
-
-        // Just to be 100% sure other process (if there was one)
-        // runs its finally block to set stopMark.
-        delay(5.milliseconds)
-
-        state.stopMark?.let { lastStop ->
-            // Need to ensure there is at least 350ms
-            // between last stop, and tor start
-            var wasNotified = false
-
-            while (true) {
-                val duration = 350.milliseconds - lastStop.elapsedNow()
-                if (duration < 1.milliseconds) break
-
-                if (!wasNotified) {
-                    wasNotified = true
-                    NOTIFIER.i(this, "Waiting ${duration.inWholeMilliseconds}ms for previous process to clean up.")
-                }
-
-                delay(duration)
-            }
-
-            if (wasNotified) {
-                NOTIFIER.i(this, "Resuming start")
-            }
-        }
+    private suspend fun <T: Any?> start(
+        connect: suspend CtrlArguments.() -> T
+    ): T = state.lock.withLock {
+        state.cancelAndJoinOtherProcess()
 
         val (config, paths) = generator.generate(NOTIFIER)
 
@@ -109,15 +85,13 @@ internal class TorProcess private constructor(
         Process.Builder(paths.tor.path)
             .args("--verify-config")
             .args(startArgs.cmdLine)
-            .output()
-            .let { output ->
+            .output().let { output ->
                 val validMsg = "Configuration was valid"
-                if (output.stdout.contains(validMsg)) {
+                if (output.stdout.contains(validMsg, ignoreCase = true)) {
                     NOTIFIER.i(this, validMsg)
-                    return@let
+                } else {
+                    throw output.toInvalidConfigurationException()
                 }
-
-                throw output.toInvalidConfigurationException()
             }
 
         NOTIFIER.i(
@@ -235,12 +209,54 @@ internal class TorProcess private constructor(
 
         val configLoad = TorCmd.Config.Load(startArgs.loadText)
 
-        CtrlArguments(
+        val arguments = CtrlArguments(
             processJob,
             authenticate,
             configLoad,
             connection,
         )
+
+        val result = try {
+            connect(arguments)
+        } catch (t: Throwable) {
+            processJob.cancel()
+            throw t
+        }
+
+        result
+    }
+
+    private suspend fun FIDState.cancelAndJoinOtherProcess() {
+        val job = processJob ?: return
+
+        // Ensures that if the process was active that we yield
+        // briefly such that the try/finally block can set its
+        // stopMark.
+        val ensureFinally = (if (job.isActive) 5 else -1).milliseconds
+
+        job.cancelAndJoin()
+        delay(ensureFinally)
+
+        // Need to ensure there is at least 350ms between last
+        // process' stop, and this process' start for TorProcess
+        val lastStop = stopMark ?: return
+
+        var wasNotified = false
+        while (true) {
+            val duration = 350.milliseconds - lastStop.elapsedNow()
+            if (duration < 1.milliseconds) break
+
+            if (!wasNotified) {
+                wasNotified = true
+                NOTIFIER.i(this@TorProcess, "Waiting ${duration.inWholeMilliseconds}ms for previous process to clean up.")
+            }
+
+            delay(duration)
+        }
+
+        if (wasNotified) {
+            NOTIFIER.i(this@TorProcess, "Resuming start")
+        }
     }
 
     @Throws(CancellationException::class, IOException::class)
@@ -499,21 +515,12 @@ internal class TorProcess private constructor(
         ): T {
             val state = getOrCreateInstance(generator.fid) { FIDState() } as FIDState
 
-            val arguments = TorProcess(
+            return TorProcess(
                 generator,
                 NOTIFIER,
                 scope,
                 state,
-            ).start()
-
-            val result = try {
-                connect(arguments)
-            } catch (t: Throwable) {
-                arguments.processJob.cancel()
-                throw t
-            }
-
-            return result
+            ).start(connect)
         }
 
         private class FIDState {
