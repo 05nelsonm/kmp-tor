@@ -18,6 +18,8 @@ package io.matthewnelson.kmp.tor.runtime
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import io.matthewnelson.kmp.tor.runtime.core.OnEvent
+import kotlin.test.assertFalse
+import kotlin.test.assertTrue
 
 class NetworkObserverUnitTest {
 
@@ -48,14 +50,14 @@ class NetworkObserverUnitTest {
         assertEquals(0, networkObserver.onObserversCount)
         val o1 = OnEvent<NetworkObserver.Connectivity> {}
         val o2 = OnEvent<NetworkObserver.Connectivity> {}
-        networkObserver.subscribe(o1)
-        networkObserver.subscribe(o2)
+        assertTrue(networkObserver.subscribe(o1))
+        assertTrue(networkObserver.subscribe(o2))
         assertEquals(1, networkObserver.onObserversCount)
-        networkObserver.unsubscribe(o1)
+        assertTrue(networkObserver.unsubscribe(o1))
         assertEquals(1, networkObserver.onObserversCount)
-        networkObserver.unsubscribe(o1)
+        assertFalse(networkObserver.unsubscribe(o1))
         assertEquals(1, networkObserver.onObserversCount)
-        networkObserver.unsubscribe(o2)
+        assertTrue(networkObserver.unsubscribe(o2))
         assertEquals(0, networkObserver.onObserversCount)
     }
 
@@ -70,11 +72,11 @@ class NetworkObserverUnitTest {
     fun givenObserver_whenAddMultipleTimes_thenOnlyRegisteredOnce() {
         var invocations = 0
         val o1 = OnEvent<NetworkObserver.Connectivity> { invocations++ }
-        networkObserver.subscribe(o1)
-        networkObserver.subscribe(o1)
+        assertTrue(networkObserver.subscribe(o1))
+        assertFalse(networkObserver.subscribe(o1))
         networkObserver.notifyInvoke()
         assertEquals(1, invocations)
-        networkObserver.unsubscribe(o1)
+        assertTrue(networkObserver.unsubscribe(o1))
         networkObserver.notifyInvoke()
         assertEquals(1, invocations)
     }
