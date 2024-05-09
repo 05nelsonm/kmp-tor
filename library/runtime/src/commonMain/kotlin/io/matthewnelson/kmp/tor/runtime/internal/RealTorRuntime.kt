@@ -305,22 +305,48 @@ internal class RealTorRuntime private constructor(
         private suspend fun CoroutineScope.loop() {
             NOTIFIER.d(this@ActionProcessor, "Processing Jobs")
 
+            var retries = 0
+
+            // 500ms
+            val retryLimit = 10 * 5
+            val retryDelayTime = 10.milliseconds
+
             while (isActive) {
-                val job = synchronized(processorLock) {
+                val (job, retry) = synchronized(processorLock) {
                     val job = processStack()
 
-                    if (job == null) _processorJob = null
-                    job
+                    val retry = if (job == null && retries++ >= retryLimit) {
+                        _processorJob = null
+                        false
+                    } else {
+                        true
+                    }
+
+                    job to retry
                 }
 
-                if (job == null) break
+                if (job == null) {
+                    if (retry) {
+//                        NOTIFIER.d(this@ActionProcessor, "Retry[${retries}]")
+                        delay(retryDelayTime)
+                        continue
+                    }
+
+                    break
+                } else {
+                    retries = 0
+                }
 
                 EXECUTE.ACTION.notifyObservers(job)
 
                 try {
                     when (job) {
-                        is ActionJob.StartJob -> job.doStart()
-                        is ActionJob.StopJob -> job.doStop()
+                        is ActionJob.StartJob -> {
+                            job.doStart()
+                        }
+                        is ActionJob.StopJob -> {
+                            job.doStop()
+                        }
                         is ActionJob.RestartJob -> {
                             job.doStop()
                             job.doStart()
@@ -344,9 +370,12 @@ internal class RealTorRuntime private constructor(
             if (destroyed) return null
 
             val (executables, execute) = synchronized(enqueueLock) {
+                if (actionStack.isEmpty()) {
+                    return@synchronized emptyList<Executable>() to null
+                }
 
                 var execute: ActionJob.Sealed? = null
-                val executables = ArrayList<Executable>((actionStack.size - 1).coerceAtLeast(1))
+                val executables = ArrayList<Executable>((actionStack.size - 1))
 
                 while (actionStack.isNotEmpty()) {
                     // LIFO
