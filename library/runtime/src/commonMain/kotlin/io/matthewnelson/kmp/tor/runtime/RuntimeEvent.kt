@@ -19,7 +19,9 @@ package io.matthewnelson.kmp.tor.runtime
 
 import io.matthewnelson.kmp.tor.runtime.core.*
 import io.matthewnelson.kmp.tor.runtime.core.ctrl.TorCmd
+import io.matthewnelson.kmp.tor.runtime.internal.TorProcess
 import kotlin.jvm.JvmStatic
+import kotlin.jvm.JvmSynthetic
 
 /**
  * Events specific to [TorRuntime]
@@ -277,6 +279,10 @@ public sealed class RuntimeEvent<Data: Any> private constructor(
             @JvmStatic
             @Suppress("NOTHING_TO_INLINE")
             public inline fun Notifier.w(from: Any?, log: String) { log(LOG.WARN, from, log) }
+
+            @JvmSynthetic
+            @Suppress("NOTHING_TO_INLINE")
+            internal inline fun Notifier.p(from: TorProcess, log: String) { log(LOG.PROCESS, from, log) }
 
             @JvmStatic
             @Suppress("NOTHING_TO_INLINE")

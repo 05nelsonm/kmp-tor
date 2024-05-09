@@ -15,13 +15,30 @@
  **/
 package io.matthewnelson.kmp.tor.runtime.internal
 
+import io.matthewnelson.kmp.tor.runtime.Lifecycle
 import io.matthewnelson.kmp.tor.runtime.NetworkObserver
+import io.matthewnelson.kmp.tor.runtime.RuntimeEvent
+import io.matthewnelson.kmp.tor.runtime.RuntimeEvent.Notifier.Companion.lce
 import io.matthewnelson.kmp.tor.runtime.core.OnEvent
+import io.matthewnelson.kmp.tor.runtime.core.ctrl.TorCmd
 import kotlinx.coroutines.CoroutineScope
 
 internal abstract class AbstractConnectivityObserver internal constructor(
+    private val processor: TorCmd.Unprivileged.Processor,
+    private val networkObserver: NetworkObserver,
+    private val NOTIFIER: RuntimeEvent.Notifier,
     private val scope: CoroutineScope,
 ): OnEvent<NetworkObserver.Connectivity> {
+
+    internal fun subscribe() {
+        if (!networkObserver.subscribe(this)) return
+        NOTIFIER.lce(Lifecycle.Event.OnSubscribed(this))
+    }
+
+    internal fun unsubscribe() {
+        if (!networkObserver.unsubscribe(this)) return
+        NOTIFIER.lce(Lifecycle.Event.OnUnsubscribed(this))
+    }
 
     final override fun invoke(it: NetworkObserver.Connectivity) {
         // TODO

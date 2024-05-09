@@ -31,6 +31,7 @@ import io.matthewnelson.kmp.tor.runtime.RuntimeEvent.Notifier.Companion.lce
 import io.matthewnelson.kmp.tor.runtime.RuntimeEvent.Notifier.Companion.d
 import io.matthewnelson.kmp.tor.runtime.RuntimeEvent.Notifier.Companion.i
 import io.matthewnelson.kmp.tor.runtime.RuntimeEvent.Notifier.Companion.w
+import io.matthewnelson.kmp.tor.runtime.core.Destroyable.Companion.checkIsNotDestroyed
 import io.matthewnelson.kmp.tor.runtime.core.QueuedJob.Companion.toImmediateErrorJob
 import io.matthewnelson.kmp.tor.runtime.core.UncaughtException.Handler.Companion.tryCatch
 import io.matthewnelson.kmp.tor.runtime.core.UncaughtException.Handler.Companion.withSuppression
@@ -148,8 +149,6 @@ internal class RealTorRuntime private constructor(
         handler = handler,
     )
 
-    private val connectivity = if (networkObserver == NetworkObserver.noOp()) null else ConnectivityObserver()
-
     @JvmSynthetic
     internal fun handler(): UncaughtException.Handler = handler
 
@@ -253,7 +252,7 @@ internal class RealTorRuntime private constructor(
         scope.cancel()
         NOTIFIER.d(this, "Scope Cancelled")
 
-        val (stack, queue) = synchronized(enqueueLock) {
+        val (stack, cmdQueue) = synchronized(enqueueLock) {
             val stack = actionStack.toList()
             actionStack.clear()
 
@@ -263,8 +262,8 @@ internal class RealTorRuntime private constructor(
             stack to queue
         }
 
-        queue?.connection?.destroy()
-        queue?.destroy()
+        cmdQueue?.connection?.destroy()
+        cmdQueue?.destroy()
 
         if (stack.isNotEmpty()) {
             NOTIFIER.d(this, "Interrupting/Completing ActionJobs")
@@ -278,11 +277,6 @@ internal class RealTorRuntime private constructor(
             }
         }
 
-        connectivity?.let { observer ->
-            networkObserver.unsubscribe(observer)
-            NOTIFIER.lce(Lifecycle.Event.OnUnsubscribed(observer))
-        }
-
         NOTIFIER.lce(Lifecycle.Event.OnDestroy(this))
         return true
     }
@@ -291,11 +285,6 @@ internal class RealTorRuntime private constructor(
 
     init {
         NOTIFIER.lce(Lifecycle.Event.OnCreate(this))
-
-        connectivity?.let { observer ->
-            networkObserver.subscribe(observer)
-            NOTIFIER.lce(Lifecycle.Event.OnSubscribed(observer))
-        }
     }
 
     private inner class ActionProcessor: FileID by this {
@@ -332,7 +321,10 @@ internal class RealTorRuntime private constructor(
                     when (job) {
                         is ActionJob.StartJob -> job.doStart()
                         is ActionJob.StopJob -> job.doStop()
-                        is ActionJob.RestartJob -> job.doRestart()
+                        is ActionJob.RestartJob -> {
+                            job.doStop()
+                            job.doStart()
+                        }
                     }
                 } catch (t: Throwable) {
                     if (t !is SuccessCancellationException) {
@@ -521,12 +513,58 @@ internal class RealTorRuntime private constructor(
             require(this !is ActionJob.StopJob) { "doStart cannot be called for $this" }
             ensureActive()
 
-            delay(500.milliseconds)
-            // TODO
+            val cmdQueue = _cmdQueue
+            check(cmdQueue != null) { "cmdQueue cannot be null" }
+            cmdQueue.checkIsNotDestroyed()
+            check(cmdQueue.connection == null) { "cmdQueue already has a connection attach" }
 
-            // If there is a lifecycle, attach a handler to destroy the connection.
-            // Also attach a handler on the control connection to dispose of the
-            // lifecycle handler when it is destroyed.
+            TorProcess.start(generator, NOTIFIER, scope, connect = {
+                val ctrl = connection.openWith(factory)
+                val observer = ConnectivityObserver(ctrl)
+
+                ctrl.invokeOnDestroy { instance ->
+                    processJob.cancel()
+
+                    if (_cmdQueue?.connection == instance) {
+                        synchronized(enqueueLock) {
+                            if (_cmdQueue?.connection == instance) {
+                                _cmdQueue = null
+                            }
+                        }
+                    }
+
+                    observer.unsubscribe()
+                    NOTIFIER.lce(Lifecycle.Event.OnDestroy(instance))
+                }
+
+                val processHandle = processJob.invokeOnCompletion {
+                    ctrl.destroy()
+                }
+
+                NOTIFIER.lce(Lifecycle.Event.OnCreate(ctrl))
+
+                ctrl.executeAsync(authenticate)
+                ctrl.executeAsync(TorCmd.Ownership.Take)
+                ctrl.executeAsync(configLoad)
+                ctrl.executeAsync(TorCmd.SetEvents(requiredTorEvents))
+
+                observer.subscribe()
+
+                ctrl.executeAsync(TorCmd.Config.Reset(keywords = buildSet {
+                    if (networkObserver.isNetworkConnected()) {
+                        add(TorConfig.DisableNetwork)
+                    } else {
+                        // TODO: Do better
+                        NOTIFIER.w(this@RealTorRuntime, "No Network Connectivity. Waiting...")
+                    }
+
+                    add(TorConfig.__OwningControllerProcess)
+                }))
+
+                cmdQueue.attach(ctrl)
+
+                processHandle.dispose()
+            })
         }
 
         private suspend fun ActionJob.Sealed.doStop() {
@@ -571,11 +609,6 @@ internal class RealTorRuntime private constructor(
             }
         }
 
-        private suspend fun ActionJob.RestartJob.doRestart() {
-            doStop()
-            doStart()
-        }
-
         private suspend fun ActionJob.Sealed.ensureActive() {
             if (!currentCoroutineContext().isActive) {
                 // Scope cancelled (onDestroy was called)
@@ -598,10 +631,20 @@ internal class RealTorRuntime private constructor(
         public override fun toString(): String = this.toFIDString(includeHashCode = isService)
     }
 
-    private inner class ConnectivityObserver: AbstractConnectivityObserver(scope), FileID by this {
+    private inner class ConnectivityObserver(
+        ctrl: TorCtrl
+    ): AbstractConnectivityObserver(
+        ctrl,
+        networkObserver,
+        NOTIFIER,
+        scope,
+    ), FileID by this {
+
+        private val _hashCode = ctrl.hashCode()
+
         public override fun equals(other: Any?): Boolean = other is ConnectivityObserver && other.hashCode() == hashCode()
-        public override fun hashCode(): Int = this@RealTorRuntime.hashCode()
-        public override fun toString(): String = this.toFIDString(includeHashCode = isService)
+        public override fun hashCode(): Int = _hashCode
+        public override fun toString(): String = this.toFIDString()
     }
 
     private inner class ConfChangedObserver: TorCtrlObserver.ConfChanged(generator.environment.staticTag()) {
