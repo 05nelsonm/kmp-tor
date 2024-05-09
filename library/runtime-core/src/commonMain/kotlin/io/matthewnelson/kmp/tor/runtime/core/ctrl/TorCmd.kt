@@ -127,10 +127,23 @@ public sealed class TorCmd<Success: Any> private constructor(
          *
          * [docs](https://torproject.gitlab.io/torspec/control-spec/#loadconf)
          * */
-        public class Load(
+        public class Load(configText: String): Privileged<Reply.Success.OK>("LOADCONF") {
+
             @JvmField
-            public val configText: String,
-        ): Privileged<Reply.Success.OK>("LOADCONF")
+            public val configText: String = buildString {
+                val lines = configText.lines()
+                var isFirst = true
+                for (line in lines) {
+                    if (line.isBlank()) continue
+                    if (line.startsWith('#')) continue
+
+                    if (!isFirst) appendLine()
+
+                    append(line)
+                    isFirst = false
+                }
+            }
+        }
 
         /**
          * "RESETCONF"
