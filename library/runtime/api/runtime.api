@@ -251,6 +251,12 @@ public final class io/matthewnelson/kmp/tor/runtime/RuntimeEvent$LOG$INFO : io/m
 	public fun hashCode ()I
 }
 
+public final class io/matthewnelson/kmp/tor/runtime/RuntimeEvent$LOG$PROCESS : io/matthewnelson/kmp/tor/runtime/RuntimeEvent$LOG {
+	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/RuntimeEvent$LOG$PROCESS;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun hashCode ()I
+}
+
 public final class io/matthewnelson/kmp/tor/runtime/RuntimeEvent$LOG$WARN : io/matthewnelson/kmp/tor/runtime/RuntimeEvent$LOG {
 	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/RuntimeEvent$LOG$WARN;
 	public fun equals (Ljava/lang/Object;)Z
