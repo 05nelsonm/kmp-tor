@@ -19,7 +19,6 @@ package io.matthewnelson.kmp.tor.runtime.internal
 
 import io.matthewnelson.immutable.collections.toImmutableList
 import io.matthewnelson.kmp.file.*
-import io.matthewnelson.kmp.process.Output
 import io.matthewnelson.kmp.process.Process
 import io.matthewnelson.kmp.process.Signal
 import io.matthewnelson.kmp.process.Stdio
@@ -474,41 +473,6 @@ internal class TorProcess private constructor(
             delay(remainder)
             remainder = duration - startMark.elapsedNow()
         }
-    }
-
-    private fun Output.toInvalidConfigurationException(): IllegalArgumentException {
-        val message = buildString {
-            appendLine("Invalid Configuration: [")
-            append("    stdout: [")
-            stdout.takeIf { it.isNotBlank() }?.let { stdout ->
-                for (line in stdout.lines()) {
-                    appendLine()
-                    append("        ")
-                    append(line)
-                }
-                appendLine()
-                appendLine("    ]")
-            } ?: appendLine(']')
-
-            append("    stderr: [")
-            stderr.takeIf { it.isNotBlank() }?.let { stderr ->
-                for (line in stderr.lines()) {
-                    appendLine()
-                    append("        ")
-                    append(line)
-                }
-                appendLine()
-                append("    ]")
-            } ?: append(']')
-
-            appendLine()
-            append("    processError: ")
-            append(processError)
-            appendLine()
-            append(']')
-        }
-
-        return IllegalArgumentException(message)
     }
 
     public override fun toString(): String = toFIDString(includeHashCode = true)
