@@ -700,15 +700,6 @@ internal class RealTorRuntime private constructor(
         }
     }
 
-    // DO NOT SUBSCRIBE... Used by NOTIFIER to redirect and parse
-    // notices before sending data off to subscribed observers
-    private inner class ProcessLogObserver: ObserverLogProcess() {
-        public override fun notify(data: String) {
-            super.notify(data)
-            event.notifyObservers(data)
-        }
-    }
-
     private class RealServiceFactoryCtrl(
         private val generator: TorConfigGenerator,
         private val builderObserver: NetworkObserver,
