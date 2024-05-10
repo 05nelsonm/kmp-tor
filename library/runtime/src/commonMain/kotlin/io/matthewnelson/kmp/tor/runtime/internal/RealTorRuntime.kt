@@ -539,6 +539,7 @@ internal class RealTorRuntime private constructor(
                 val ctrl = connection.openWith(factory)
                 val observer = ConnectivityObserver(ctrl)
 
+                val lceCtrl = RealTorCtrl(ctrl)
                 ctrl.invokeOnDestroy { instance ->
                     processJob.cancel()
 
@@ -551,12 +552,12 @@ internal class RealTorRuntime private constructor(
                     }
 
                     observer.unsubscribe()
-                    NOTIFIER.lce(Lifecycle.Event.OnDestroy(instance))
+                    NOTIFIER.lce(Lifecycle.Event.OnDestroy(lceCtrl))
                 }
 
                 val processHandle = processJob.invokeOnCompletion { ctrl.destroy() }
 
-                NOTIFIER.lce(Lifecycle.Event.OnCreate(ctrl))
+                NOTIFIER.lce(Lifecycle.Event.OnCreate(lceCtrl))
 
                 ctrl.executeAsync(authenticate)
                 ctrl.executeAsync(TorCmd.Ownership.Take)
@@ -640,6 +641,15 @@ internal class RealTorRuntime private constructor(
         }
 
         private inner class SuccessCancellationException: CancellationException()
+
+        // For Lifecycle.Events notification only
+        private inner class RealTorCtrl(ctrl: TorCtrl): FileID by this {
+            private val _hashCode = ctrl.hashCode()
+
+            override fun equals(other: Any?): Boolean = other is RealTorCtrl && other.hashCode() == hashCode()
+            override fun hashCode(): Int = _hashCode
+            override fun toString(): String = this.toFIDString()
+        }
 
         public override fun equals(other: Any?): Boolean = other is ActionProcessor && other.hashCode() == hashCode()
         public override fun hashCode(): Int = this@RealTorRuntime.hashCode()
