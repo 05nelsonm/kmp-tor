@@ -78,9 +78,8 @@ internal class RealTorRuntime private constructor(
 
     private val destroyedErrMsg by lazy { "$this.isDestroyed[true]" }
 
-    private val requiredTorEvents = LinkedHashSet<TorEvent>(3 + requiredTorEvents.size, 1.0f).apply {
+    private val requiredTorEvents = LinkedHashSet<TorEvent>(2 + requiredTorEvents.size, 1.0f).apply {
         add(TorEvent.CONF_CHANGED)
-        add(TorEvent.NOTICE)
         addAll(requiredTorEvents)
     }.toImmutableSet()
 
@@ -88,18 +87,14 @@ internal class RealTorRuntime private constructor(
     protected override val isService: Boolean = serviceFactoryHandler != null
     protected override val handler: HandlerWithContext = serviceFactoryHandler ?: super.handler
 
-    @Suppress("PrivatePropertyName")
-    private val NOTIFIER = object : Notifier {
-        public override fun <Data: Any, E: RuntimeEvent<Data>> notify(event: E, data: Data) {
-            event.notifyObservers(data)
-        }
-    }
-
     private val scope = CoroutineScope(context =
         CoroutineName(toString())
         + SupervisorJob()
         + dispatcher
     )
+
+    @Suppress("PrivatePropertyName")
+    private val NOTIFIER = Notifier()
 
     private val factory = TorCtrl.Factory(
         staticTag = generator.environment.staticTag(),
@@ -108,7 +103,6 @@ internal class RealTorRuntime private constructor(
             events.mapTo(LinkedHashSet(events.size, 1.0f)) { event ->
                 when (event) {
                     is TorEvent.CONF_CHANGED -> ConfChangedObserver()
-                    is TorEvent.NOTICE -> NoticeObserver()
                     else -> event.observer(tag) { event.notifyObservers(it) }
                 }
             }
@@ -121,13 +115,7 @@ internal class RealTorRuntime private constructor(
                     TorCmd.SetEvents(cmd.events + requiredTorEvents)
                 }
             },
-            TorCmdInterceptor.intercept<TorCmd.Signal.NewNym> { job, cmd ->
-                job.invokeOnCompletion {
-                    if (job.isError) return@invokeOnCompletion
-                    // TODO: Listen for TorEvent.NOTICE rate-limit
-                }
-                cmd
-            },
+            NOTIFIER.newNymInterceptor,
             TorCmdJob.interceptor(notify = { job ->
                 EXECUTE.CMD.notifyObservers(job)
             }),
@@ -658,9 +646,30 @@ internal class RealTorRuntime private constructor(
         public override fun toString(): String = this.toFIDString(includeHashCode = isService)
     }
 
+    private inner class Notifier: RuntimeEvent.Notifier {
+
+        private val processObserver = ProcessLogObserver()
+        val newNymInterceptor get() = processObserver.newNymInterceptor
+
+        public override fun <Data : Any, E : RuntimeEvent<Data>> notify(event: E, data: Data) {
+            if (event is LOG.PROCESS && data is String) {
+                processObserver.notify(data)
+            } else {
+                event.notifyObservers(data)
+            }
+        }
+
+        private inner class ProcessLogObserver: ObserverLogProcess() {
+            public override fun notify(data: String) {
+                super.notify(data)
+                event.notifyObservers(data)
+            }
+        }
+    }
+
     private inner class ConnectivityObserver(
         ctrl: TorCtrl
-    ): AbstractConnectivityObserver(
+    ): ObserverConnectivity(
         ctrl,
         networkObserver,
         NOTIFIER,
@@ -674,15 +683,17 @@ internal class RealTorRuntime private constructor(
         public override fun toString(): String = this.toFIDString()
     }
 
-    private inner class ConfChangedObserver: TorCtrlObserver.ConfChanged(generator.environment.staticTag()) {
+    private inner class ConfChangedObserver: ObserverConfChanged(generator.environment.staticTag()) {
         protected override fun notify(data: String) {
             super.notify(data)
             event.notifyObservers(data)
         }
     }
 
-    private inner class NoticeObserver: TorCtrlObserver.Notice(generator.environment.staticTag()) {
-        protected override fun notify(data: String) {
+    // DO NOT SUBSCRIBE... Used by NOTIFIER to redirect and parse
+    // notices before sending data off to subscribed observers
+    private inner class ProcessLogObserver: ObserverLogProcess() {
+        public override fun notify(data: String) {
             super.notify(data)
             event.notifyObservers(data)
         }
@@ -704,7 +715,7 @@ internal class RealTorRuntime private constructor(
         observersTorEvent
     ),  ServiceFactoryCtrl,
         FileID by generator,
-        Notifier
+        RuntimeEvent.Notifier
     {
 
         @Volatile
@@ -929,7 +940,11 @@ internal class RealTorRuntime private constructor(
             }
         }
 
-        private inner class ServiceCtrlBinder: TorRuntime.ServiceFactory.Binder, FileID by this, Notifier by this {
+        private inner class ServiceCtrlBinder:
+            TorRuntime.ServiceFactory.Binder,
+            FileID by this,
+            RuntimeEvent.Notifier by this
+        {
 
             // Pipe all events to observers registered with ServiceFactoryCtrl
             private val observersTorEvent = TorEvent.entries().let { events ->
@@ -1088,7 +1103,7 @@ internal class RealTorRuntime private constructor(
             defaultExecutor: OnEvent.Executor,
             observersRuntimeEvent: Set<RuntimeEvent.Observer<*>>,
         ): TorRuntime = generator.environment.serviceFactoryLoader()?.let { loader ->
-            var n: Notifier? = null
+            var n: RuntimeEvent.Notifier? = null
 
             val initializer = TorRuntime.ServiceFactory.Initializer.of { startService ->
                 RealServiceFactoryCtrl(

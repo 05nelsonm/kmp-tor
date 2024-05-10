@@ -163,8 +163,9 @@ public interface TorRuntime:
          * Any subsequent calls for [TorCmd.SetEvents] during runtime will
          * be intercepted and modified to include all required [TorEvent].
          *
-         * **NOTE:** [TorEvent.CONF_CHANGED] and [TorEvent.NOTICE] are always
-         * present and do not need to be added here.
+         * **NOTE:** [TorEvent.CONF_CHANGED] will always present as it is
+         * required for the [TorRuntime] implementation. It does not need to
+         * be added here.
          * */
         @KmpTorDsl
         public fun required(

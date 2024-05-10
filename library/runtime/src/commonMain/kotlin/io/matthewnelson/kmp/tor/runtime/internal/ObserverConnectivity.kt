@@ -13,6 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
+@file:Suppress("PrivatePropertyName")
+
 package io.matthewnelson.kmp.tor.runtime.internal
 
 import io.matthewnelson.kmp.tor.runtime.Lifecycle
@@ -23,7 +25,7 @@ import io.matthewnelson.kmp.tor.runtime.core.OnEvent
 import io.matthewnelson.kmp.tor.runtime.core.ctrl.TorCmd
 import kotlinx.coroutines.CoroutineScope
 
-internal abstract class AbstractConnectivityObserver internal constructor(
+internal open class ObserverConnectivity internal constructor(
     private val processor: TorCmd.Unprivileged.Processor,
     private val networkObserver: NetworkObserver,
     private val NOTIFIER: RuntimeEvent.Notifier,
