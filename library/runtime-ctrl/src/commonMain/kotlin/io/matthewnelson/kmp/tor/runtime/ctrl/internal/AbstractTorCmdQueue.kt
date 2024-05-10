@@ -203,5 +203,7 @@ internal abstract class AbstractTorCmdQueue internal constructor(
         return super.registered()
     }
 
-    final override fun toString(): String = "TorCtrl@${hashCode()}"
+    private val name by lazy { this::class.simpleName ?: "TorCtrl" }
+
+    final override fun toString(): String = "$name@${hashCode()}"
 }

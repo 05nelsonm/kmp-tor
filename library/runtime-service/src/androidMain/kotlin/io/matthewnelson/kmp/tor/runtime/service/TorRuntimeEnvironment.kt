@@ -36,7 +36,7 @@ import io.matthewnelson.kmp.tor.runtime.core.apply
  * */
 @JvmName("Builder")
 public fun Context.createTorRuntimeEnvironment(
-    installer: (installationDir: File) -> ResourceInstaller<Paths.Tor>,
+    installer: (installationDirectory: File) -> ResourceInstaller<Paths.Tor>,
 ): TorRuntime.Environment = createTorRuntimeEnvironment("torservice", installer)
 
 /**
@@ -49,7 +49,7 @@ public fun Context.createTorRuntimeEnvironment(
  * */
 @JvmName("Builder")
 public fun Context.createTorRuntimeEnvironment(
-    installer: (installationDir: File) -> ResourceInstaller<Paths.Tor>,
+    installer: (installationDirectory: File) -> ResourceInstaller<Paths.Tor>,
     block: ThisBlock<TorRuntime.Environment.Builder>,
 ): TorRuntime.Environment = createTorRuntimeEnvironment("torservice", installer, block)
 
@@ -64,7 +64,7 @@ public fun Context.createTorRuntimeEnvironment(
 @JvmName("Builder")
 public fun Context.createTorRuntimeEnvironment(
     dirName: String,
-    installer: (installationDir: File) -> ResourceInstaller<Paths.Tor>,
+    installer: (installationDirectory: File) -> ResourceInstaller<Paths.Tor>,
 ): TorRuntime.Environment = createTorRuntimeEnvironment(dirName, installer) {}
 
 /**
@@ -78,11 +78,11 @@ public fun Context.createTorRuntimeEnvironment(
 @JvmName("Builder")
 public fun Context.createTorRuntimeEnvironment(
     dirName: String,
-    installer: (installationDir: File) -> ResourceInstaller<Paths.Tor>,
+    installer: (installationDirectory: File) -> ResourceInstaller<Paths.Tor>,
     block: ThisBlock<TorRuntime.Environment.Builder>,
 ): TorRuntime.Environment = TorRuntime.Environment.Builder(
-    workDir = getDir(dirName.ifBlank { "torservice" }, Context.MODE_PRIVATE),
-    cacheDir = cacheDir.resolve(dirName.ifBlank { "torservice" }),
+    workDirectory = getDir(dirName.ifBlank { "torservice" }, Context.MODE_PRIVATE),
+    cacheDirectory = cacheDir.resolve(dirName.ifBlank { "torservice" }),
     installer = installer,
 ) {
     this.apply(block)

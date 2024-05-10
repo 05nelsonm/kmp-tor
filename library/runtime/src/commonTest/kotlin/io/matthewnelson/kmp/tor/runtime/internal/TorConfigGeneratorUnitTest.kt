@@ -136,7 +136,7 @@ class TorConfigGeneratorUnitTest {
 
     @Test
     fun givenCookieAuthenticationEnabled_whenCookieAuthFile_thenDoesNotModify() = runTest {
-        val expected = environment.workDir.resolve("data")
+        val expected = environment.workDirectory.resolve("data")
             .resolve(TorConfig.CookieAuthFile.DEFAULT_NAME + "_something")
 
         val setting = newGenerator(
@@ -159,7 +159,7 @@ class TorConfigGeneratorUnitTest {
 
     @Test
     fun givenCookieAuthenticationDisabled_whenCookieAuthFile_thenRemoves() = runTest {
-        val expected = environment.workDir.resolve("data")
+        val expected = environment.workDirectory.resolve("data")
             .resolve(TorConfig.CookieAuthFile.DEFAULT_NAME + "_something")
 
         val setting = newGenerator(
@@ -194,7 +194,7 @@ class TorConfigGeneratorUnitTest {
             config = setOf(
                 ConfigBuilderCallback {
                     put(TorConfig.CookieAuthFile) {
-                        file = environment.workDir
+                        file = environment.workDirectory
                             .resolve("data")
                             .resolve(TorConfig.CookieAuthFile.DEFAULT_NAME)
                     }

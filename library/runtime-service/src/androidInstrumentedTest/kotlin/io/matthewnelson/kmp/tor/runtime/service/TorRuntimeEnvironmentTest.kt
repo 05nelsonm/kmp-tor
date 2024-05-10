@@ -34,8 +34,8 @@ class TorRuntimeEnvironmentTest {
             }
         }
 
-        assertEquals("app_torservice", environment.workDir.name)
-        assertEquals("torservice", environment.cacheDir.name)
+        assertEquals("app_torservice", environment.workDirectory.name)
+        assertEquals("torservice", environment.cacheDirectory.name)
     }
 
     @Test
@@ -49,8 +49,8 @@ class TorRuntimeEnvironmentTest {
             block = {},
         )
 
-        assertEquals("app_torservice", environment.workDir.name)
-        assertEquals("torservice", environment.cacheDir.name)
+        assertEquals("app_torservice", environment.workDirectory.name)
+        assertEquals("torservice", environment.cacheDirectory.name)
     }
 
     @Test
@@ -61,7 +61,7 @@ class TorRuntimeEnvironmentTest {
             }
         }
 
-        assertEquals("app_torservice", environment.workDir.name)
-        assertEquals("torservice", environment.cacheDir.name)
+        assertEquals("app_torservice", environment.workDirectory.name)
+        assertEquals("torservice", environment.cacheDirectory.name)
     }
 }

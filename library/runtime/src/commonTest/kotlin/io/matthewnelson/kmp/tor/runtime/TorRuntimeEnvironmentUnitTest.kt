@@ -58,7 +58,7 @@ class TorRuntimeEnvironmentUnitTest {
             }
         }
 
-        assertEquals(innerOuterWork.resolve("inner"), envInner?.cacheDir)
-        assertEquals(innerOuterWork.resolve("inner"), envOuter.cacheDir)
+        assertEquals(innerOuterWork.resolve("inner"), envInner?.cacheDirectory)
+        assertEquals(innerOuterWork.resolve("inner"), envOuter.cacheDirectory)
     }
 }

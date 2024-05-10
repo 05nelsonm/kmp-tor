@@ -124,7 +124,7 @@ internal class RealTorRuntime private constructor(
         debugger = ItBlock { log ->
             if (!debug) return@ItBlock
 
-            // Debug logs are all formatted as TorCtrl@<hashCode> <log>
+            // Debug logs are all formatted as RealTorCtrl@<hashCode> <log>
             val i = log.indexOf('@')
             val formatted = if (i == -1) {
                 log

@@ -55,17 +55,17 @@ public fun interface ConfigBuilderCallback: ThisBlock.WithIt<TorConfig.Builder, 
             val dataDir = (this as ExtendedTorConfigBuilder)
                 .dataDirectory()
                 ?: TorConfig.DataDirectory.Builder {
-                    directory = environment.workDir
+                    directory = environment.workDirectory
                         .resolve(TorConfig.DataDirectory.DEFAULT_NAME)
                 }!!
 
             putIfAbsent(dataDir)
 
             putIfAbsent(TorConfig.CacheDirectory) {
-                directory = environment.cacheDir
+                directory = environment.cacheDirectory
             }
             putIfAbsent(TorConfig.ControlPortWriteToFile) {
-                file = environment.workDir
+                file = environment.workDirectory
                     .resolve(TorConfig.ControlPortWriteToFile.DEFAULT_NAME)
             }
 
@@ -134,7 +134,7 @@ public fun interface ConfigBuilderCallback: ThisBlock.WithIt<TorConfig.Builder, 
                         // Prefer using Unix Domain Sockets whenever possible
                         // because of things like Airplane Mode.
                         asUnixSocket {
-                            file = environment.workDir
+                            file = environment.workDirectory
                                 .resolve(UnixSocketBuilder.DEFAULT_NAME_CTRL)
                         }
                     } catch (_: UnsupportedOperationException) {
