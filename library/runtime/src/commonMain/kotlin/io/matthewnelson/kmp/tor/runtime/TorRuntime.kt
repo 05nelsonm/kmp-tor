@@ -565,13 +565,13 @@ public interface TorRuntime:
             cmd: TorCmd.Unprivileged<Success>,
             onFailure: OnFailure,
             onSuccess: OnSuccess<Success>,
-        ): QueuedJob = ctrl.enqueue(cmd, onFailure, onSuccess)
+        ): EnqueuedJob = ctrl.enqueue(cmd, onFailure, onSuccess)
 
         public final override fun enqueue(
             action: Action,
             onFailure: OnFailure,
             onSuccess: OnSuccess<Unit>,
-        ): QueuedJob = ctrl.enqueue(action, onFailure, onSuccess)
+        ): EnqueuedJob = ctrl.enqueue(action, onFailure, onSuccess)
 
         public final override fun subscribe(observer: TorEvent.Observer) {
             ctrl.subscribe(observer)

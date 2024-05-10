@@ -18,7 +18,7 @@ package io.matthewnelson.kmp.tor.runtime.core
 import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
 import io.matthewnelson.kmp.tor.core.resource.SynchronizedObject
 import io.matthewnelson.kmp.tor.core.resource.synchronized
-import io.matthewnelson.kmp.tor.runtime.core.QueuedJob.State.*
+import io.matthewnelson.kmp.tor.runtime.core.EnqueuedJob.State.*
 import io.matthewnelson.kmp.tor.runtime.core.UncaughtException.Handler.Companion.tryCatch
 import io.matthewnelson.kmp.tor.runtime.core.UncaughtException.Handler.Companion.withSuppression
 import io.matthewnelson.kmp.tor.runtime.core.UncaughtException.SuppressedHandler
@@ -31,12 +31,12 @@ import kotlin.jvm.JvmStatic
 /**
  * Base abstraction for single-use model that tracks the state
  * of a queue-able job. Once completed, either successfully or
- * by cancellation/error, the [QueuedJob] is dead and should be
+ * by cancellation/error, the [EnqueuedJob] is dead and should be
  * discarded.
  *
  * Heavily inspired by [kotlinx.coroutines.Job]
  * */
-public abstract class QueuedJob protected constructor(
+public abstract class EnqueuedJob protected constructor(
     @JvmField
     public val name: String,
     onFailure: OnFailure,
@@ -148,7 +148,7 @@ public abstract class QueuedJob protected constructor(
     }
 
     /**
-     * Register a [handle] to be invoked when this [QueuedJob]
+     * Register a [handle] to be invoked when this [EnqueuedJob]
      * completes, either successfully or by cancellation/error.
      * If [handle] is already registered, [Disposable.noOp] is
      * returned.
@@ -243,7 +243,7 @@ public abstract class QueuedJob protected constructor(
     }
 
     /**
-     * Notifies the implementation that the [QueuedJob]
+     * Notifies the implementation that the [EnqueuedJob]
      * has been cancelled in order to perform cleanup, if
      * necessary.
      *
@@ -253,7 +253,7 @@ public abstract class QueuedJob protected constructor(
 
     /**
      * Moves the state from [Enqueued] to [Executing], indicating
-     * that the caller has "taken ownership" of the [QueuedJob].
+     * that the caller has "taken ownership" of the [EnqueuedJob].
      *
      * If a different caller attempts to invoke [onExecuting] again,
      * an exception is raised to prevent duplicate executions.
@@ -399,14 +399,14 @@ public abstract class QueuedJob protected constructor(
     public final override fun toString(): String = toString(_state)
 
     private fun toString(state: State): String {
-        val clazz = this::class.simpleName ?: "QueuedJob"
+        val clazz = this::class.simpleName ?: "EnqueuedJob"
         return "$clazz[name=$name, state=$state]@${hashCode()}"
     }
 
     public companion object {
 
         /**
-         * Creates a [QueuedJob] which immediately invokes
+         * Creates a [EnqueuedJob] which immediately invokes
          * [OnFailure] with the provided [cause].
          * */
         @JvmStatic
@@ -415,7 +415,7 @@ public abstract class QueuedJob protected constructor(
             name: String,
             cause: Throwable,
             handler: UncaughtException.Handler,
-        ): QueuedJob = object : QueuedJob(
+        ): EnqueuedJob = object : EnqueuedJob(
             name,
             this@toImmediateErrorJob,
             handler,
@@ -424,7 +424,7 @@ public abstract class QueuedJob protected constructor(
         }
 
         /**
-         * Creates a [QueuedJob] which immediately invokes
+         * Creates a [EnqueuedJob] which immediately invokes
          * [OnSuccess] with the provided [response].
          * */
         @JvmStatic
@@ -433,7 +433,7 @@ public abstract class QueuedJob protected constructor(
             name: String,
             response: T,
             handler: UncaughtException.Handler,
-        ): QueuedJob = object : QueuedJob(
+        ): EnqueuedJob = object : EnqueuedJob(
             name,
             OnFailure.noOp(),
             handler

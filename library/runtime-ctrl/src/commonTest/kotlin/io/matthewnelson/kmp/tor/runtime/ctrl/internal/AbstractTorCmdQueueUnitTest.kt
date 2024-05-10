@@ -22,7 +22,6 @@ import io.matthewnelson.kmp.tor.runtime.core.ctrl.TorCmd
 import io.matthewnelson.kmp.tor.runtime.core.ctrl.Reply
 import io.matthewnelson.kmp.tor.runtime.core.util.executeAsync
 import kotlinx.coroutines.test.runTest
-import kotlin.coroutines.cancellation.CancellationException
 import kotlin.test.*
 
 class AbstractTorCmdQueueUnitTest {
@@ -44,7 +43,7 @@ class AbstractTorCmdQueueUnitTest {
             var job: TorCmdJob<Reply.Success.OK>? = dequeueNext()
 
             while (job != null) {
-                assertEquals(QueuedJob.State.Executing, job.state)
+                assertEquals(EnqueuedJob.State.Executing, job.state)
                 job.completion(Reply.Success.OK)
                 job = dequeueNext()
             }
@@ -64,7 +63,7 @@ class AbstractTorCmdQueueUnitTest {
             val onFailure = OnFailure { invocationFailure++ }
             val onSuccess = OnSuccess<Reply.Success.OK> { invocationSuccess++ }
 
-            val jobs = mutableListOf<QueuedJob>()
+            val jobs = mutableListOf<EnqueuedJob>()
 
             repeat(5) {
                 val job = queue.enqueue(
@@ -75,7 +74,7 @@ class AbstractTorCmdQueueUnitTest {
                 jobs.add(job)
             }
 
-            jobs.forEach { job -> assertEquals(QueuedJob.State.Enqueued, job.state) }
+            jobs.forEach { job -> assertEquals(EnqueuedJob.State.Enqueued, job.state) }
 
             assertEquals(jobs.size, queue.invocationStart)
 
@@ -84,16 +83,16 @@ class AbstractTorCmdQueueUnitTest {
             assertEquals(jobs.size + 1, queue.invocationStart)
 
             // Should not have cancelled yet b/c test processor is not a thing
-            jobs.forEach { job -> assertEquals(QueuedJob.State.Enqueued, job.state) }
+            jobs.forEach { job -> assertEquals(EnqueuedJob.State.Enqueued, job.state) }
             assertEquals(0, invocationFailure)
 
             queue.processAll()
             assertEquals(1, invocationSuccess)
-            assertEquals(QueuedJob.State.Success, signalJob.state)
+            assertEquals(EnqueuedJob.State.Success, signalJob.state)
 
             // Interruptions are performed when dequeueNextOrNull is called
             // which, in the test, is when processAll is invoked
-            jobs.forEach { job -> assertEquals(QueuedJob.State.Error, job.state) }
+            jobs.forEach { job -> assertEquals(EnqueuedJob.State.Error, job.state) }
             assertEquals(jobs.size, invocationFailure)
         }
     }
@@ -137,7 +136,7 @@ class AbstractTorCmdQueueUnitTest {
     }
 
     @Test
-    fun givenOnDestroy_whenQueuedJobs_thenAllAreCancelled() {
+    fun givenOnDestroy_whenJobs_thenAllAreCancelled() {
         val queue = TestQueue()
         var invocationSuccess = 0
         var invocationFailure = 0

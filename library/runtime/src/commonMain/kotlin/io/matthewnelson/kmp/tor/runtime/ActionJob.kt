@@ -28,7 +28,7 @@ public abstract class ActionJob private constructor(
     public val action: Action,
     onFailure: OnFailure,
     handler: UncaughtException.Handler,
-): QueuedJob(action.name, onFailure, handler) {
+): EnqueuedJob(action.name, onFailure, handler) {
 
     @get:JvmName("isStart")
     public val isStart: Boolean get() = this is StartJob

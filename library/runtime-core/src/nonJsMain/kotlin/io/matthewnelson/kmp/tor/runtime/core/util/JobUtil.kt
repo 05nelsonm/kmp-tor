@@ -22,7 +22,7 @@ import io.matthewnelson.kmp.process.Blocking
 import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
 import io.matthewnelson.kmp.tor.runtime.core.OnFailure
 import io.matthewnelson.kmp.tor.runtime.core.OnSuccess
-import io.matthewnelson.kmp.tor.runtime.core.QueuedJob
+import io.matthewnelson.kmp.tor.runtime.core.EnqueuedJob
 import kotlin.coroutines.cancellation.CancellationException
 import kotlin.jvm.JvmName
 import kotlin.time.Duration.Companion.milliseconds
@@ -32,10 +32,10 @@ import kotlin.time.Duration.Companion.milliseconds
  * synchronous APIs.
  *
  * In the event that the caller thread is interrupted,
- * [QueuedJob.cancel] will be attempted. If successful,
+ * [EnqueuedJob.cancel] will be attempted. If successful,
  * the [CancellationException] will be thrown. If
  * unsuccessful, the [InterruptedException] is ignored
- * as the [QueuedJob] is in a non-cancellable state.
+ * as the [EnqueuedJob] is in a non-cancellable state.
  *
  * [success] should **NOT** throw exception, and
  * should return the result of [OnSuccess].
@@ -46,8 +46,8 @@ import kotlin.time.Duration.Companion.milliseconds
  * [cancellation] callback (if non-null) is available
  * to check things between while loop execution. A return
  * value of null indicates "do not cancel". A return value of
- * [CancellationException] will pass it to [QueuedJob.cancel].
- * If unable to cancel the [QueuedJob] because it is in a
+ * [CancellationException] will pass it to [EnqueuedJob.cancel].
+ * If unable to cancel the [EnqueuedJob] because it is in a
  * non-cancellable state, no further invocations of
  * [cancellation] will be had.
  *
@@ -55,7 +55,7 @@ import kotlin.time.Duration.Companion.milliseconds
  * */
 @InternalKmpTorApi
 @Throws(Throwable::class)
-public fun <Response: Any> QueuedJob.awaitSync(
+public fun <Response: Any> EnqueuedJob.awaitSync(
     success: () -> Response?,
     failure: () -> Throwable?,
     cancellation: (() -> CancellationException?)?,
@@ -97,7 +97,7 @@ public fun <Response: Any> QueuedJob.awaitSync(
         cancel(cause)
     }
 
-    if (state == QueuedJob.State.Success) {
+    if (state == EnqueuedJob.State.Success) {
         success()?.let { return it }
         throw IllegalStateException("$this completed successfully, but no response was recovered by awaitSync.success()")
     }

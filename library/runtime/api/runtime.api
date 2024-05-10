@@ -40,10 +40,10 @@ public final class io/matthewnelson/kmp/tor/runtime/Action$Companion {
 }
 
 public abstract interface class io/matthewnelson/kmp/tor/runtime/Action$Processor {
-	public abstract fun enqueue (Lio/matthewnelson/kmp/tor/runtime/Action;Lio/matthewnelson/kmp/tor/runtime/core/OnFailure;Lio/matthewnelson/kmp/tor/runtime/core/OnSuccess;)Lio/matthewnelson/kmp/tor/runtime/core/QueuedJob;
+	public abstract fun enqueue (Lio/matthewnelson/kmp/tor/runtime/Action;Lio/matthewnelson/kmp/tor/runtime/core/OnFailure;Lio/matthewnelson/kmp/tor/runtime/core/OnSuccess;)Lio/matthewnelson/kmp/tor/runtime/core/EnqueuedJob;
 }
 
-public abstract class io/matthewnelson/kmp/tor/runtime/ActionJob : io/matthewnelson/kmp/tor/runtime/core/QueuedJob {
+public abstract class io/matthewnelson/kmp/tor/runtime/ActionJob : io/matthewnelson/kmp/tor/runtime/core/EnqueuedJob {
 	public final field action Lio/matthewnelson/kmp/tor/runtime/Action;
 	public synthetic fun <init> (Lio/matthewnelson/kmp/tor/runtime/Action;Lio/matthewnelson/kmp/tor/runtime/core/OnFailure;Lio/matthewnelson/kmp/tor/runtime/core/UncaughtException$Handler;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
 	public final fun isRestart ()Z
@@ -88,8 +88,8 @@ public final class io/matthewnelson/kmp/tor/runtime/Lifecycle$DestroyableTorRunt
 	public synthetic fun <init> (Lio/matthewnelson/kmp/tor/runtime/Lifecycle;Lio/matthewnelson/kmp/tor/runtime/internal/RealTorRuntime;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
 	public fun clearObservers ()V
 	public fun destroy ()V
-	public fun enqueue (Lio/matthewnelson/kmp/tor/runtime/Action;Lio/matthewnelson/kmp/tor/runtime/core/OnFailure;Lio/matthewnelson/kmp/tor/runtime/core/OnSuccess;)Lio/matthewnelson/kmp/tor/runtime/core/QueuedJob;
-	public fun enqueue (Lio/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$Unprivileged;Lio/matthewnelson/kmp/tor/runtime/core/OnFailure;Lio/matthewnelson/kmp/tor/runtime/core/OnSuccess;)Lio/matthewnelson/kmp/tor/runtime/core/QueuedJob;
+	public fun enqueue (Lio/matthewnelson/kmp/tor/runtime/Action;Lio/matthewnelson/kmp/tor/runtime/core/OnFailure;Lio/matthewnelson/kmp/tor/runtime/core/OnSuccess;)Lio/matthewnelson/kmp/tor/runtime/core/EnqueuedJob;
+	public fun enqueue (Lio/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$Unprivileged;Lio/matthewnelson/kmp/tor/runtime/core/OnFailure;Lio/matthewnelson/kmp/tor/runtime/core/OnSuccess;)Lio/matthewnelson/kmp/tor/runtime/core/EnqueuedJob;
 	public fun environment ()Lio/matthewnelson/kmp/tor/runtime/TorRuntime$Environment;
 	public fun equals (Ljava/lang/Object;)Z
 	public fun getFid ()Ljava/lang/String;
@@ -298,9 +298,9 @@ public abstract interface class io/matthewnelson/kmp/tor/runtime/RuntimeEvent$Pr
 	public abstract fun unsubscribeAll ([Lio/matthewnelson/kmp/tor/runtime/RuntimeEvent;)V
 }
 
-public final class io/matthewnelson/kmp/tor/runtime/TorCmdJob : io/matthewnelson/kmp/tor/runtime/core/QueuedJob {
+public final class io/matthewnelson/kmp/tor/runtime/TorCmdJob : io/matthewnelson/kmp/tor/runtime/core/EnqueuedJob {
 	public final field cmd Lkotlin/reflect/KClass;
-	public synthetic fun <init> (Lkotlin/reflect/KClass;Lio/matthewnelson/kmp/tor/runtime/core/QueuedJob;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public synthetic fun <init> (Lkotlin/reflect/KClass;Lio/matthewnelson/kmp/tor/runtime/core/EnqueuedJob;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
 	public fun equals (Ljava/lang/Object;)Z
 	public fun hashCode ()I
 }
@@ -366,8 +366,8 @@ public abstract class io/matthewnelson/kmp/tor/runtime/TorRuntime$ServiceFactory
 	protected final field binder Lio/matthewnelson/kmp/tor/runtime/TorRuntime$ServiceFactory$Binder;
 	protected fun <init> (Lio/matthewnelson/kmp/tor/runtime/TorRuntime$ServiceFactory$Initializer;)V
 	public final fun clearObservers ()V
-	public final fun enqueue (Lio/matthewnelson/kmp/tor/runtime/Action;Lio/matthewnelson/kmp/tor/runtime/core/OnFailure;Lio/matthewnelson/kmp/tor/runtime/core/OnSuccess;)Lio/matthewnelson/kmp/tor/runtime/core/QueuedJob;
-	public final fun enqueue (Lio/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$Unprivileged;Lio/matthewnelson/kmp/tor/runtime/core/OnFailure;Lio/matthewnelson/kmp/tor/runtime/core/OnSuccess;)Lio/matthewnelson/kmp/tor/runtime/core/QueuedJob;
+	public final fun enqueue (Lio/matthewnelson/kmp/tor/runtime/Action;Lio/matthewnelson/kmp/tor/runtime/core/OnFailure;Lio/matthewnelson/kmp/tor/runtime/core/OnSuccess;)Lio/matthewnelson/kmp/tor/runtime/core/EnqueuedJob;
+	public final fun enqueue (Lio/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$Unprivileged;Lio/matthewnelson/kmp/tor/runtime/core/OnFailure;Lio/matthewnelson/kmp/tor/runtime/core/OnSuccess;)Lio/matthewnelson/kmp/tor/runtime/core/EnqueuedJob;
 	public final fun environment ()Lio/matthewnelson/kmp/tor/runtime/TorRuntime$Environment;
 	public final fun equals (Ljava/lang/Object;)Z
 	public final fun getFid ()Ljava/lang/String;

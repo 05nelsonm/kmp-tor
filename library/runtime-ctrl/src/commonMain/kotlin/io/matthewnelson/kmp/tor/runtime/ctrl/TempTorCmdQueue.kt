@@ -88,12 +88,12 @@ public class TempTorCmdQueue private constructor(
         cmd: TorCmd.Unprivileged<Success>,
         onFailure: OnFailure,
         onSuccess: OnSuccess<Success>,
-    ): QueuedJob {
+    ): EnqueuedJob {
         _connection
             ?.enqueue(cmd, onFailure, onSuccess)
             ?.let { return it }
 
-        var job: QueuedJob? = null
+        var job: EnqueuedJob? = null
 
         val instance: TorCtrl? = synchronized(lock) {
             _connection?.let { return@synchronized it }

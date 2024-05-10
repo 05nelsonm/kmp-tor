@@ -16,15 +16,15 @@
 package io.matthewnelson.kmp.tor.runtime.core
 
 import io.matthewnelson.kmp.file.IOException
-import io.matthewnelson.kmp.tor.runtime.core.QueuedJob.Companion.toImmediateErrorJob
+import io.matthewnelson.kmp.tor.runtime.core.EnqueuedJob.Companion.toImmediateErrorJob
 import kotlin.coroutines.cancellation.CancellationException
 import kotlin.test.*
 
-class QueuedJobUnitTest {
+class EnqueuedJobUnitTest {
 
     @Test
     fun givenInstantiation_whenInitialState_thenIsEnqueued() {
-        assertEquals(QueuedJob.State.Enqueued, TestJob().state)
+        assertEquals(EnqueuedJob.State.Enqueued, TestJob().state)
     }
 
     @Test
@@ -47,7 +47,7 @@ class QueuedJobUnitTest {
         assertTrue(job.cancel(null))
         assertEquals(1, invocationCancel)
         assertEquals(1, invocationFail)
-        assertEquals(QueuedJob.State.Cancelled, job.state)
+        assertEquals(EnqueuedJob.State.Cancelled, job.state)
         assertFalse(job.isActive)
 
         assertFalse(job.cancel(CancellationException()))
@@ -89,7 +89,7 @@ class QueuedJobUnitTest {
         job.executing()
         assertFalse(job.cancel(null))
         job.error(CancellationException())
-        assertEquals(QueuedJob.State.Error, job.state)
+        assertEquals(EnqueuedJob.State.Error, job.state)
         assertNotNull(job.cancellationException)
         assertEquals(1, invocationCancel)
         assertEquals(1, invocationCompletion)
@@ -101,15 +101,15 @@ class QueuedJobUnitTest {
         val job = TestJob()
 
         job.executing()
-        assertEquals(QueuedJob.State.Executing, job.state)
+        assertEquals(EnqueuedJob.State.Executing, job.state)
         assertTrue(job.isActive)
 
         job.cancel(null)
-        assertEquals(QueuedJob.State.Executing, job.state)
+        assertEquals(EnqueuedJob.State.Executing, job.state)
         assertTrue(job.isActive)
 
         job.completion()
-        assertEquals(QueuedJob.State.Success, job.state)
+        assertEquals(EnqueuedJob.State.Success, job.state)
         assertFalse(job.isActive)
     }
 
@@ -129,7 +129,7 @@ class QueuedJobUnitTest {
             },
             onSuccess = {
                 invocationSuccess++
-                assertNotEquals(QueuedJob.State.Success, job!!.state)
+                assertNotEquals(EnqueuedJob.State.Success, job!!.state)
                 assertTrue(job!!.isActive)
                 assertTrue(job!!.isCompleting)
 
@@ -175,7 +175,7 @@ class QueuedJobUnitTest {
         assertEquals(1, exceptions.size)
         assertIs<IOException>(exceptions.first().cause)
 
-        assertEquals(QueuedJob.State.Success, job.state)
+        assertEquals(EnqueuedJob.State.Success, job.state)
     }
 
     @Test
@@ -291,7 +291,7 @@ class QueuedJobUnitTest {
             assertIs<IllegalStateException>(it)
         }.toImmediateErrorJob("", IllegalStateException(""), UncaughtException.Handler.THROW)
         assertEquals(1, invocationFailure)
-        assertEquals(QueuedJob.State.Error, job.state)
+        assertEquals(EnqueuedJob.State.Error, job.state)
     }
 
     public class TestJob(
@@ -300,7 +300,7 @@ class QueuedJobUnitTest {
         onFailure: OnFailure = OnFailure {},
         private val onSuccess: OnSuccess<Unit>? = null,
         handler: UncaughtException.Handler = UncaughtException.Handler.THROW,
-    ): QueuedJob(name, onFailure, handler) {
+    ): EnqueuedJob(name, onFailure, handler) {
         override fun onCancellation(cause: CancellationException?) {
             cancellation(cause)
         }

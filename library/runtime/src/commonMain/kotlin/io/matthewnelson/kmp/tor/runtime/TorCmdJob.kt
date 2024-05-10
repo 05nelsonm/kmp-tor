@@ -39,8 +39,8 @@ import kotlin.reflect.KClass
 public class TorCmdJob private constructor(
     @JvmField
     public val cmd: KClass<out TorCmd<*>>,
-    private val delegate: QueuedJob,
-): QueuedJob(delegate.name, OnFailure.noOp(), UncaughtException.Handler.THROW) {
+    private val delegate: EnqueuedJob,
+): EnqueuedJob(delegate.name, OnFailure.noOp(), UncaughtException.Handler.THROW) {
 
     init {
         onExecuting()

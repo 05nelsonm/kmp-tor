@@ -23,7 +23,6 @@ import io.matthewnelson.kmp.file.InterruptedException
 import io.matthewnelson.kmp.tor.runtime.core.*
 import io.matthewnelson.kmp.tor.runtime.core.address.IPAddress
 import io.matthewnelson.kmp.tor.runtime.core.address.OnionAddress
-import io.matthewnelson.kmp.tor.runtime.core.ctrl.TorCmd.Unprivileged.Processor
 import io.matthewnelson.kmp.tor.runtime.core.key.AddressKey
 import io.matthewnelson.kmp.tor.runtime.core.key.ED25519_V3
 import kotlin.coroutines.cancellation.CancellationException
@@ -499,16 +498,16 @@ public sealed class TorCmd<Success: Any> private constructor(
             /**
              * Adds the [cmd] to the queue.
              *
-             * **NOTE:** If the returned [QueuedJob] gets cancelled,
+             * **NOTE:** If the returned [EnqueuedJob] gets cancelled,
              * [onFailure] will be invoked with [CancellationException]
              * indicating normal behavior.
              *
-             * **NOTE:** If the returned [QueuedJob] get interrupted,
+             * **NOTE:** If the returned [EnqueuedJob] get interrupted,
              * [onFailure] will be invoked with [InterruptedException].
              * This can occur when the [Processor] implementation is
              * shutdown and the job is awaiting execution.
              *
-             * @return [QueuedJob]
+             * @return [EnqueuedJob]
              * @see [Reply.Error]
              * @see [OnFailure]
              * @see [OnSuccess]
@@ -519,7 +518,7 @@ public sealed class TorCmd<Success: Any> private constructor(
                 cmd: Privileged<Success>,
                 onFailure: OnFailure,
                 onSuccess: OnSuccess<Success>,
-            ): QueuedJob
+            ): EnqueuedJob
         }
     }
 
@@ -541,16 +540,16 @@ public sealed class TorCmd<Success: Any> private constructor(
             /**
              * Adds the [cmd] to the queue.
              *
-             * **NOTE:** If the returned [QueuedJob] gets cancelled,
+             * **NOTE:** If the returned [EnqueuedJob] gets cancelled,
              * [onFailure] will be invoked with [CancellationException]
              * indicating normal behavior.
              *
-             * **NOTE:** If the returned [QueuedJob] get interrupted,
+             * **NOTE:** If the returned [EnqueuedJob] get interrupted,
              * [onFailure] will be invoked with [InterruptedException].
              * This can occur when the [Processor] implementation is
              * shutdown and the job is awaiting execution.
              *
-             * @return [QueuedJob]
+             * @return [EnqueuedJob]
              * @see [OnFailure]
              * @see [OnSuccess]
              * @see [io.matthewnelson.kmp.tor.runtime.core.util.executeSync]
@@ -560,7 +559,7 @@ public sealed class TorCmd<Success: Any> private constructor(
                 cmd: Unprivileged<Success>,
                 onFailure: OnFailure,
                 onSuccess: OnSuccess<Success>,
-            ): QueuedJob
+            ): EnqueuedJob
         }
     }
 

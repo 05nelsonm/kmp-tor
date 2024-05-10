@@ -52,13 +52,13 @@ internal abstract class AbstractTorCmdQueue internal constructor(
         cmd: TorCmd.Privileged<Success>,
         onFailure: OnFailure,
         onSuccess: OnSuccess<Success>,
-    ): QueuedJob = enqueueImpl(cmd, onFailure, onSuccess)
+    ): EnqueuedJob = enqueueImpl(cmd, onFailure, onSuccess)
 
     public final override fun <Success: Any> enqueue(
         cmd: TorCmd.Unprivileged<Success>,
         onFailure: OnFailure,
         onSuccess: OnSuccess<Success>,
-    ): QueuedJob = enqueueImpl(cmd, onFailure, onSuccess)
+    ): EnqueuedJob = enqueueImpl(cmd, onFailure, onSuccess)
 
     @JvmSynthetic
     @Throws(IllegalStateException::class)
@@ -90,7 +90,7 @@ internal abstract class AbstractTorCmdQueue internal constructor(
         cmd: TorCmd<Success>,
         onFailure: OnFailure,
         onSuccess: OnSuccess<Success>
-    ): QueuedJob {
+    ): EnqueuedJob {
         if (isDestroyed()) {
             return cmd.toDestroyedErrorJob(onFailure, handler)
         }
@@ -166,7 +166,7 @@ internal abstract class AbstractTorCmdQueue internal constructor(
                     // before cancelling them.
                     ArrayList(queueExecute).also { queueExecute.clear() }
                 }?.also {
-                    LOG.d { "Interrupting QueuedJobs" }
+                    LOG.d { "Interrupting EnqueuedJobs" }
                 }?.interruptAndClearAll(message = "${this::class.simpleName}.onDestroy", this)
             }
         }
@@ -180,7 +180,7 @@ internal abstract class AbstractTorCmdQueue internal constructor(
             ArrayList(queueInterrupt).also { queueInterrupt.clear() }
         } ?: return
 
-        LOG.d { "Cancelling QueuedJobs" }
+        LOG.d { "Cancelling EnqueuedJobs" }
         handler.withSuppression {
             val suppressed = this
 

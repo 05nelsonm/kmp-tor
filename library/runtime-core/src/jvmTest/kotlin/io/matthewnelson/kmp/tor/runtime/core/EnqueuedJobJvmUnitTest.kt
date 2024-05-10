@@ -16,7 +16,7 @@
 package io.matthewnelson.kmp.tor.runtime.core
 
 import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
-import io.matthewnelson.kmp.tor.runtime.core.QueuedJobUnitTest.TestJob
+import io.matthewnelson.kmp.tor.runtime.core.EnqueuedJobUnitTest.TestJob
 import io.matthewnelson.kmp.tor.runtime.core.util.awaitSync
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
@@ -27,7 +27,7 @@ import kotlin.test.*
 import kotlin.time.Duration.Companion.milliseconds
 
 @OptIn(InternalKmpTorApi::class)
-class QueuedJobJvmUnitTest {
+class EnqueuedJobJvmUnitTest {
 
     @Test
     fun givenAwaitSync_whenThreadInterrupted_thenJobIsCancelledIfAble() = runTest {
@@ -60,7 +60,7 @@ class QueuedJobJvmUnitTest {
         assertIs<CancellationException>(threw)
         assertIs<InterruptedException>(threw!!.cause)
         assertEquals(1, invocationFailure)
-        assertEquals(QueuedJob.State.Cancelled, job.state)
+        assertEquals(EnqueuedJob.State.Cancelled, job.state)
     }
 
     @Test

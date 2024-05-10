@@ -32,7 +32,7 @@ import io.matthewnelson.kmp.tor.runtime.RuntimeEvent.Notifier.Companion.d
 import io.matthewnelson.kmp.tor.runtime.RuntimeEvent.Notifier.Companion.i
 import io.matthewnelson.kmp.tor.runtime.RuntimeEvent.Notifier.Companion.w
 import io.matthewnelson.kmp.tor.runtime.core.Destroyable.Companion.checkIsNotDestroyed
-import io.matthewnelson.kmp.tor.runtime.core.QueuedJob.Companion.toImmediateErrorJob
+import io.matthewnelson.kmp.tor.runtime.core.EnqueuedJob.Companion.toImmediateErrorJob
 import io.matthewnelson.kmp.tor.runtime.core.UncaughtException.Handler.Companion.tryCatch
 import io.matthewnelson.kmp.tor.runtime.core.UncaughtException.Handler.Companion.withSuppression
 import io.matthewnelson.kmp.tor.runtime.core.ctrl.TorCmd
@@ -158,7 +158,7 @@ internal class RealTorRuntime private constructor(
         action: Action,
         onFailure: OnFailure,
         onSuccess: OnSuccess<Unit>,
-    ): QueuedJob {
+    ): EnqueuedJob {
         var errorMsg = destroyedErrMsg
 
         if (destroyed) {
@@ -217,7 +217,7 @@ internal class RealTorRuntime private constructor(
         cmd: TorCmd.Unprivileged<Response>,
         onFailure: OnFailure,
         onSuccess: OnSuccess<Response>
-    ): QueuedJob {
+    ): EnqueuedJob {
         var errorMsg = destroyedErrMsg
 
         if (destroyed) {
@@ -732,13 +732,13 @@ internal class RealTorRuntime private constructor(
             action: Action,
             onFailure: OnFailure,
             onSuccess: OnSuccess<Unit>,
-        ): QueuedJob {
+        ): EnqueuedJob {
             _instance
                 ?.enqueue(action, onFailure, onSuccess)
                 ?.let { return it }
 
             var execute: (() -> Unit)? = null
-            var job: QueuedJob? = null
+            var job: EnqueuedJob? = null
 
             val instance: Lifecycle.DestroyableTorRuntime? = synchronized(lock) {
                 // If there's an instance available after obtaining the
@@ -749,7 +749,7 @@ internal class RealTorRuntime private constructor(
                 _instance?.let { return@synchronized it }
 
 
-                val nonNullJob: QueuedJob = if (actionStack.isEmpty()) {
+                val nonNullJob: EnqueuedJob = if (actionStack.isEmpty()) {
                     // First call to enqueue for starting the service
 
                     if (action == Action.StopDaemon) {
@@ -805,12 +805,12 @@ internal class RealTorRuntime private constructor(
             cmd: TorCmd.Unprivileged<Success>,
             onFailure: OnFailure,
             onSuccess: OnSuccess<Success>,
-        ): QueuedJob {
+        ): EnqueuedJob {
             _instance
                 ?.enqueue(cmd, onFailure, onSuccess)
                 ?.let { return it }
 
-            var job: QueuedJob? = null
+            var job: EnqueuedJob? = null
 
             val instance: Lifecycle.DestroyableTorRuntime? = synchronized(lock) {
                 // If there's an instance available after obtaining the
@@ -910,7 +910,7 @@ internal class RealTorRuntime private constructor(
                 // onBind was called and stack + queue were transferred
                 if (executables.isEmpty()) return@launch
 
-                w(this@RealServiceFactoryCtrl, "Failed to start service. Interrupting QueuedJobs.")
+                w(this@RealServiceFactoryCtrl, "Failed to start service. Interrupting EnqueuedJobs.")
 
                 handler.withSuppression {
                     val context = name.name + " timed out"

@@ -21,8 +21,8 @@ import io.matthewnelson.kmp.file.resolve
 import io.matthewnelson.kmp.tor.core.api.annotation.ExperimentalKmpTorApi
 import io.matthewnelson.kmp.tor.resource.tor.TorResources
 import io.matthewnelson.kmp.tor.runtime.FileID.Companion.fidEllipses
+import io.matthewnelson.kmp.tor.runtime.core.EnqueuedJob
 import io.matthewnelson.kmp.tor.runtime.core.OnFailure
-import io.matthewnelson.kmp.tor.runtime.core.QueuedJob
 import io.matthewnelson.kmp.tor.runtime.core.TorEvent
 import io.matthewnelson.kmp.tor.runtime.core.ctrl.TorCmd
 import io.matthewnelson.kmp.tor.runtime.core.util.executeAsync
@@ -155,7 +155,7 @@ class ServiceFactoryUnitTest {
         } } as TestFactory
 
         val actionJob = factory.enqueue(Action.StartDaemon, {}, {}) as ActionJob.StartJob
-        assertEquals(QueuedJob.State.Executing, actionJob.state)
+        assertEquals(EnqueuedJob.State.Executing, actionJob.state)
 
         val cmdJob = factory.enqueue(TorCmd.Signal.Dump, { assertIs<CancellationException>(it) }, {})
         factory.enqueue(Action.StopDaemon, {}, {})
@@ -213,9 +213,9 @@ class ServiceFactoryUnitTest {
 
         for (job in jobs) {
             val expected = if (job is ActionJob.StopJob) {
-                QueuedJob.State.Success
+                EnqueuedJob.State.Success
             } else {
-                QueuedJob.State.Error
+                EnqueuedJob.State.Error
             }
 
             assertEquals(expected, job.state)
@@ -232,7 +232,7 @@ class ServiceFactoryUnitTest {
     fun givenActionStop_whenAlreadyStopped_thenIsImmediateSuccess() {
         val factory = TorRuntime.Builder(env("sf_stop_immediate")) {}
         val job = factory.enqueue(Action.StopDaemon, {}, {})
-        assertEquals(QueuedJob.State.Success, job.state)
+        assertEquals(EnqueuedJob.State.Success, job.state)
     }
 
     private fun TorRuntime.ServiceFactory.Binder.bind(

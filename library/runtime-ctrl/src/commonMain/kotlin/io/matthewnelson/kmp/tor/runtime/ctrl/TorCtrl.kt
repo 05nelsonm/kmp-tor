@@ -39,7 +39,7 @@ public expect interface TorCtrl: Destroyable, TorEvent.Processor, TorCmd.Privile
 
     /**
      * Immediately disconnects from the control listener resulting
-     * in interruption of all [QueuedJob], and invocation of all
+     * in interruption of all [EnqueuedJob], and invocation of all
      * handles registered via [invokeOnDestroy].
      *
      * If [TorCmd.Ownership.Take] was issued for this connection,
