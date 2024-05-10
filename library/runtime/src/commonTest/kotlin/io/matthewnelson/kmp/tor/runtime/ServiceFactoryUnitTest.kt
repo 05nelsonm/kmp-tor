@@ -322,10 +322,17 @@ class ServiceFactoryUnitTest {
 
         // Should cause --verify-config check to fail
         failureScenario = ConfigBuilderCallback { environment ->
-            environment.torrcFile.writeUtf8("DnsPort -1")
+            environment.torrcFile.writeUtf8("DNSPort -1")
         }
 
-        assertFailsWith<IllegalArgumentException> { factory.startDaemonAsync() }
+        assertFailsWith<IllegalArgumentException> {
+            try {
+                factory.startDaemonAsync()
+            } catch (t: Throwable) {
+//                t.printStackTrace()
+                throw t
+            }
+        }
         assertLCEs()
 
         // Now ensure that any queued TorCmd are also interrupted when start fails

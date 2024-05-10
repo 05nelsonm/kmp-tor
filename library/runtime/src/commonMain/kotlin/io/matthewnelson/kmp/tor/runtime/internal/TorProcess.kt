@@ -79,26 +79,12 @@ internal class TorProcess private constructor(
             throw t
         }
 
-        // Want to use the path here and not the file b/c
-        // kmp-tor user could be using runtime to control
-        // a system installed tor and pass "tor".toFile()
-        // which is not absolute and, as such, Process will
-        // search for the tor program via PATH environment
-        // variable.
-        Process.Builder(command = paths.tor.path)
-            .args("--verify-config")
-            .args(startArgs.cmdLine)
-            .output{
-                timeoutMillis = 500
-            }.let { output ->
-                val validMsg = "Configuration was valid"
-                if (output.stdout.contains(validMsg, ignoreCase = true)) {
-                    NOTIFIER.i(this, validMsg)
-                } else {
-                    NOTIFIER.lce(Lifecycle.Event.OnDestroy(this))
-                    throw output.toInvalidConfigurationException()
-                }
-            }
+        try {
+            startArgs.verifyConfig(paths)
+        } catch (t: Throwable) {
+            NOTIFIER.lce(Lifecycle.Event.OnDestroy(this))
+            throw t
+        }
 
         NOTIFIER.i(
             this,
@@ -161,6 +147,103 @@ internal class TorProcess private constructor(
         if (wasNotified) {
             NOTIFIER.i(this@TorProcess, "Resuming start")
         }
+    }
+
+    @Throws(Throwable::class)
+    private suspend fun StartArgs.verifyConfig(paths: ResourceInstaller.Paths.Tor) {
+        val sbStdout = StringBuilder()
+        val sbStderr = StringBuilder()
+        val timeout = 1_500.milliseconds
+
+        val (process, exitCode) = Process.Builder(command = paths.tor.path)
+            .args("--verify-config")
+            .args(cmdLine)
+            .environment("HOME", generator.environment.workDirectory.path)
+            .stdin(Stdio.Null)
+            .stdout(Stdio.Pipe)
+            .stderr(Stdio.Pipe)
+            .destroySignal(Signal.SIGTERM)
+            .spawn { process ->
+
+                process.stdoutFeed { line ->
+                    if (line == null) return@stdoutFeed
+                    if (sbStdout.isNotEmpty()) {
+                        sbStdout.appendLine()
+                    }
+                    sbStdout.append(line)
+                }.stderrFeed { line ->
+                    if (line == null) return@stderrFeed
+                    if (sbStderr.isNotEmpty()) {
+                        sbStderr.appendLine()
+                    }
+                    sbStderr.append(line)
+                }
+
+                timedDelay(150.milliseconds)
+
+                // Timeout after 1.5s
+                val exitCode = process.waitForAsync(timeout)
+
+                timedDelay(50.milliseconds)
+
+                process to exitCode
+            } // << destroy called
+
+        val finalExitCode = process
+            .stdoutWaiter()
+            .awaitStopAsync()
+            .stderrWaiter()
+            .awaitStopAsync()
+            .waitForAsync()
+
+        val stdout = sbStdout.toString()
+        val stderr = sbStderr.toString()
+
+        val validMsg = "Configuration was valid"
+        if (stdout.contains(validMsg, ignoreCase = true)) {
+            NOTIFIER.i(this@TorProcess, validMsg)
+            return
+        }
+
+        buildString {
+            appendLine("Configuration Was Invalid: [")
+            append("    stdout: [")
+            stdout.takeIf { it.isNotBlank() }?.let { stdout ->
+                for (line in stdout.lines()) {
+                    appendLine()
+                    append("        ")
+                    append(line)
+                }
+                appendLine()
+                appendLine("    ]")
+            } ?: appendLine(']')
+
+            append("    stderr: [")
+            stderr.takeIf { it.isNotBlank() }?.let { stderr ->
+                for (line in stderr.lines()) {
+                    appendLine()
+                    append("        ")
+                    append(line)
+                }
+                appendLine()
+                append("    ]")
+            } ?: append(']')
+
+            appendLine()
+            append("    exitCode: ")
+            append(exitCode ?: finalExitCode)
+
+            appendLine()
+            append("    processError: ")
+
+            if (exitCode == null) {
+                append("Timed out after ${timeout.inWholeMilliseconds}ms")
+            } else {
+                append("null")
+            }
+            appendLine()
+            append(']')
+        }.let { message -> throw IllegalArgumentException(message) }
     }
 
     @Throws(Throwable::class)
@@ -378,6 +461,19 @@ internal class TorProcess private constructor(
         }
 
         throw IOException("Timed out after ${timeout.inWholeMilliseconds}ms waiting for tor to write to file[$this]")
+    }
+
+    // No matter the Delay implementation (Coroutines Test library)
+    // Will delay the specified duration using a TimeSource.
+    private suspend fun timedDelay(duration: Duration) {
+        if (duration <= 0.milliseconds) return
+
+        val startMark = TimeSource.Monotonic.markNow()
+        var remainder = duration
+        while (remainder > 1.milliseconds) {
+            delay(remainder)
+            remainder = duration - startMark.elapsedNow()
+        }
     }
 
     private fun Output.toInvalidConfigurationException(): IllegalArgumentException {
