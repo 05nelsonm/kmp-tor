@@ -118,6 +118,12 @@ internal class TorProcess private constructor(
         result
     }
 
+    @Throws(IOException::class)
+    private fun FIDState.ensureActive() {
+        if (processJob?.isActive == true) return
+        throw IOException("Process exited early... Check logs.")
+    }
+
     private suspend fun FIDState.cancelAndJoinOtherProcess() {
         val job = processJob ?: return
 
@@ -477,7 +483,7 @@ internal class TorProcess private constructor(
             .firstOrNull()
             ?.argument
             ?.toFile()
-            ?.awaitExists(10.seconds)
+            ?.awaitExists(2.seconds)
             ?.readBytes()
             ?.let { bytes -> TorCmd.Authenticate(cookie = bytes)  }
 
@@ -502,6 +508,7 @@ internal class TorProcess private constructor(
             }
 
             delay(10.milliseconds)
+            state.ensureActive()
             if (startMark.elapsedNow() > timeout) break
         }
 
