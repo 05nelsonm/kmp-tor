@@ -21,7 +21,6 @@ import io.matthewnelson.kmp.tor.core.api.ResourceInstaller
 import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
 import io.matthewnelson.kmp.tor.runtime.core.ThisBlock
 import io.matthewnelson.kmp.tor.runtime.core.TorConfig
-import io.matthewnelson.kmp.tor.runtime.core.address.Port.Proxy.Companion.toPortProxy
 import io.matthewnelson.kmp.tor.runtime.core.builder.ExtendedTorConfigBuilder
 import io.matthewnelson.kmp.tor.runtime.core.builder.UnixSocketBuilder
 import kotlin.jvm.JvmSynthetic
@@ -120,12 +119,7 @@ public fun interface ConfigBuilderCallback: ThisBlock.WithIt<TorConfig.Builder, 
             if (!contains(TorConfig.__SocksPort)) {
                 // Add default socks port so that port availability check
                 // can reassign it to auto if needed
-                put(TorConfig.__SocksPort) {
-                    asPort {
-                        port(9050.toPortProxy())
-                        reassignable(allow = true)
-                    }
-                }
+                put(TorConfig.__SocksPort) { /* default 9050 */ }
             }
 
             if (!contains(TorConfig.__ControlPort)) {

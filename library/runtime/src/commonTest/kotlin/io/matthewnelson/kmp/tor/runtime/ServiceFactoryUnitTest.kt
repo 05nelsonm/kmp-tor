@@ -23,6 +23,9 @@ import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
 import io.matthewnelson.kmp.tor.core.resource.SynchronizedObject
 import io.matthewnelson.kmp.tor.core.resource.synchronized
 import io.matthewnelson.kmp.tor.resource.tor.TorResources
+import io.matthewnelson.kmp.tor.runtime.Action.Companion.restartDaemonAsync
+import io.matthewnelson.kmp.tor.runtime.Action.Companion.startDaemonAsync
+import io.matthewnelson.kmp.tor.runtime.Action.Companion.stopDaemonAsync
 import io.matthewnelson.kmp.tor.runtime.TestUtils.assertContains
 import io.matthewnelson.kmp.tor.runtime.TestUtils.assertDoesNotContain
 import io.matthewnelson.kmp.tor.runtime.TestUtils.ensureStoppedOnTestCompletion
@@ -229,6 +232,52 @@ class ServiceFactoryUnitTest {
         }
         val job = factory.enqueue(Action.StopDaemon, {}, {})
         assertEquals(EnqueuedJob.State.Success, job.state)
+    }
+
+    @Test
+    fun givenActionRestart_whenAlreadyStarted_thenIsNotDestroyed() = runTest {
+        val lces = mutableListOf<Lifecycle.Event>()
+        val lock = SynchronizedObject()
+
+        val factory = TorRuntime.Builder(env("sf_restart")) {
+            observerStatic(RuntimeEvent.LIFECYCLE) {
+//                println(it)
+                synchronized(lock) { lces.add(it) }
+            }
+            config(TestUtils.socksAuto)
+        }.ensureStoppedOnTestCompletion()
+
+        factory.startDaemonAsync()
+
+        synchronized(lock) {
+            lces.assertContains("RealTorRuntime", Lifecycle.Event.Name.OnCreate, fid = factory)
+            lces.assertContains("DestroyableTorRuntime", Lifecycle.Event.Name.OnCreate, fid = factory)
+            lces.assertContains("TorProcess", Lifecycle.Event.Name.OnCreate, fid = factory)
+            lces.assertContains("TorProcess", Lifecycle.Event.Name.OnStart, fid = factory)
+            lces.assertContains("RealTorCtrl", Lifecycle.Event.Name.OnCreate, fid = factory)
+
+            lces.assertDoesNotContain("TorProcess", Lifecycle.Event.Name.OnDestroy, fid = factory)
+            lces.assertDoesNotContain("RealTorCtrl", Lifecycle.Event.Name.OnDestroy, fid = factory)
+            lces.clear()
+        }
+
+        factory.restartDaemonAsync()
+
+        synchronized(lock) {
+            lces.assertContains("TorProcess", Lifecycle.Event.Name.OnDestroy, fid = factory)
+            lces.assertContains("RealTorCtrl", Lifecycle.Event.Name.OnDestroy, fid = factory)
+
+            lces.assertDoesNotContain("RealTorRuntime", Lifecycle.Event.Name.OnDestroy, fid = factory)
+            lces.assertDoesNotContain("DestroyableTorRuntime", Lifecycle.Event.Name.OnDestroy, fid = factory)
+            lces.clear()
+        }
+
+        factory.stopDaemonAsync()
+
+        synchronized(lock) {
+            lces.assertContains("RealTorRuntime", Lifecycle.Event.Name.OnDestroy, fid = factory)
+            lces.assertContains("DestroyableTorRuntime", Lifecycle.Event.Name.OnDestroy, fid = factory)
+        }
     }
 
     private fun TorRuntime.ServiceFactory.Binder.bind(

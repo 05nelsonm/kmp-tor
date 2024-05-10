@@ -65,9 +65,19 @@ internal class TorProcess private constructor(
     ): T = state.lock.withLock {
         state.cancelAndJoinOtherProcess()
 
-        val (config, paths) = generator.generate(NOTIFIER)
+        val (config, paths) = try {
+            generator.generate(NOTIFIER)
+        } catch (t: Throwable) {
+            NOTIFIER.lce(Lifecycle.Event.OnDestroy(this))
+            throw t
+        }
 
-        val startArgs = config.createStartArgs(generator.environment)
+        val startArgs = try {
+            config.createStartArgs(generator.environment)
+        } catch (t: Throwable) {
+            NOTIFIER.lce(Lifecycle.Event.OnDestroy(this))
+            throw t
+        }
 
         // Want to use the path here and not the file b/c
         // kmp-tor user could be using runtime to control
@@ -85,6 +95,7 @@ internal class TorProcess private constructor(
                 if (output.stdout.contains(validMsg, ignoreCase = true)) {
                     NOTIFIER.i(this, validMsg)
                 } else {
+                    NOTIFIER.lce(Lifecycle.Event.OnDestroy(this))
                     throw output.toInvalidConfigurationException()
                 }
             }
@@ -173,6 +184,7 @@ internal class TorProcess private constructor(
                     .destroySignal(Signal.SIGTERM)
                     .spawn()
             } catch (e: IOException) {
+                NOTIFIER.lce(Lifecycle.Event.OnDestroy(this))
                 latch.completeExceptionally(e)
                 return@launch
             }
