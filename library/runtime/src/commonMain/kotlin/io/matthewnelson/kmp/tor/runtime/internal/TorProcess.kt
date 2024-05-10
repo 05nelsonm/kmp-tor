@@ -152,7 +152,7 @@ internal class TorProcess private constructor(
     private suspend fun StartArgs.verifyConfig(paths: ResourceInstaller.Paths.Tor) {
         val sbStdout = StringBuilder()
         val sbStderr = StringBuilder()
-        val timeout = 1_500.milliseconds
+        val timeout = 1_250.milliseconds
 
         val (process, exitCode) = Process.Builder(command = paths.tor.path)
             .args("--verify-config")
@@ -180,7 +180,6 @@ internal class TorProcess private constructor(
 
                 timedDelay(150.milliseconds)
 
-                // Timeout after 1.5s
                 val exitCode = process.waitForAsync(timeout)
 
                 timedDelay(50.milliseconds)
@@ -201,6 +200,15 @@ internal class TorProcess private constructor(
         val validMsg = "Configuration was valid"
         if (stdout.contains(validMsg, ignoreCase = true)) {
             NOTIFIER.i(this@TorProcess, validMsg)
+            return
+        }
+
+        if (stdout.isBlank() && exitCode == null) {
+            NOTIFIER.w(
+                this@TorProcess,
+                "--verify-config timed out after ${timeout.inWholeMilliseconds}ms."
+                + " Continuing without config verification..."
+            )
             return
         }
 
