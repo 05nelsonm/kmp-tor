@@ -19,10 +19,15 @@ import io.matthewnelson.kmp.file.InterruptedException
 import io.matthewnelson.kmp.file.SysTempDir
 import io.matthewnelson.kmp.file.resolve
 import io.matthewnelson.kmp.tor.core.api.annotation.ExperimentalKmpTorApi
+import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
+import io.matthewnelson.kmp.tor.core.resource.SynchronizedObject
+import io.matthewnelson.kmp.tor.core.resource.synchronized
 import io.matthewnelson.kmp.tor.resource.tor.TorResources
-import io.matthewnelson.kmp.tor.runtime.FileID.Companion.fidEllipses
-import io.matthewnelson.kmp.tor.runtime.core.EnqueuedJob
+import io.matthewnelson.kmp.tor.runtime.TestUtils.assertContains
+import io.matthewnelson.kmp.tor.runtime.TestUtils.assertDoesNotContain
+import io.matthewnelson.kmp.tor.runtime.TestUtils.ensureStoppedOnTestCompletion
 import io.matthewnelson.kmp.tor.runtime.core.OnFailure
+import io.matthewnelson.kmp.tor.runtime.core.EnqueuedJob
 import io.matthewnelson.kmp.tor.runtime.core.TorEvent
 import io.matthewnelson.kmp.tor.runtime.core.ctrl.TorCmd
 import io.matthewnelson.kmp.tor.runtime.core.util.executeAsync
@@ -32,7 +37,7 @@ import kotlin.coroutines.cancellation.CancellationException
 import kotlin.test.*
 import kotlin.time.Duration.Companion.milliseconds
 
-@OptIn(ExperimentalKmpTorApi::class)
+@OptIn(ExperimentalKmpTorApi::class, InternalKmpTorApi::class)
 class ServiceFactoryUnitTest {
 
     private class TestFactory(
@@ -75,84 +80,89 @@ class ServiceFactoryUnitTest {
     }
 
     @Test
-    fun givenEnvironment_whenServiceFactoryLoader_thenCreatesServiceFactory() {
+    fun givenEnvironment_whenServiceFactoryLoader_thenCreatesServiceFactory() = runTest {
         val lces = mutableListOf<Lifecycle.Event>()
         val runtime = TorRuntime.Builder(env("sf_create")) {
             observer(RuntimeEvent.LIFECYCLE.observer { lces.add(it) })
-        }
+            config(TestUtils.socksAuto)
+        }.ensureStoppedOnTestCompletion()
 
         assertIs<TestFactory>(runtime)
         assertEquals(2, lces.size)
-        assertEquals("RealServiceFactoryCtrl", lces.first().className)
-        assertEquals(TestFactory::class.simpleName, lces.last().className)
-
-        lces.forEach { lce ->
-            assertEquals(Lifecycle.Event.Name.OnCreate, lce.name)
-            assertEquals(runtime.fidEllipses, lce.fid)
-            assertEquals(runtime.hashCode(), lce.hash)
-        }
+        lces.assertContains("RealServiceFactoryCtrl", Lifecycle.Event.Name.OnCreate, fid = runtime)
+        lces.assertContains(TestFactory::class.simpleName!!, Lifecycle.Event.Name.OnCreate, fid = runtime)
     }
 
     @Test
     fun givenInitializer_whenUsedMoreThanOnce_thenThrowsException() {
-        val factory = TorRuntime.Builder(env("sf_is_instance")) {} as TestFactory
+        val factory = TorRuntime.Builder(env("sf_is_instance")) {
+            config(TestUtils.socksAuto)
+        } as TestFactory
         assertFailsWith<IllegalStateException> {
             TestFactory(factory.initializer)
         }
     }
 
     @Test
-    fun givenBinder_whenBindAndOtherInstanceIsNotDestroyed_thenDestroysPriorInstance() {
-        val factory = TorRuntime.Builder(env("sf_multi_bind_destroy")) {} as TestFactory
+    fun givenBinder_whenBindAndOtherInstanceIsNotDestroyed_thenDestroysPriorInstance() = runTest {
+        val factory = TorRuntime.Builder(env("sf_multi_bind_destroy")) {
+            config(TestUtils.socksAuto)
+        }.ensureStoppedOnTestCompletion() as TestFactory
+
         val warnings = mutableListOf<String>()
         factory.subscribe(RuntimeEvent.LOG.WARN.observer { warnings.add(it) })
-        val runtime1 = factory.testBinder.bind()
-        val runtime2 = factory.testBinder.bind()
+        val runtime1 = factory.testBinder.bind().ensureStoppedOnTestCompletion()
+        factory.testBinder.bind().ensureStoppedOnTestCompletion()
         assertTrue(runtime1.isDestroyed())
 
         val warning = warnings.filter {
             it.contains("onBind was called before previous instance was destroyed")
         }
         assertEquals(1, warning.size)
-        runtime2.destroy()
     }
 
     @Test
     fun givenNoStart_whenBindWithoutEnqueue_thenAutoEnqueuesStartJob() = runTest {
-        val factory = TorRuntime.Builder(env("sf_enqueue_start")) {} as TestFactory
+        val factory = TorRuntime.Builder(env("sf_enqueue_start")) {
+            config(TestUtils.socksAuto)
+        }.ensureStoppedOnTestCompletion() as TestFactory
 
         val executes = mutableListOf<ActionJob>()
         factory.subscribe(RuntimeEvent.EXECUTE.ACTION.observer { executes.add(it) })
-
-        val runtime = factory.testBinder.bind()
+        factory.testBinder.bind().ensureStoppedOnTestCompletion()
 
         withContext(Dispatchers.Default) { delay(250.milliseconds) }
         assertEquals(1, executes.size)
         assertIs<ActionJob.StartJob>(executes.first())
-        runtime.destroy()
     }
 
     @Test
     fun givenNoStart_whenTorCmd_thenThrowsException() = runTest {
-        val factory = TorRuntime.Builder(env("sf_enqueue_cmd_fail")) {} as TestFactory
+        val factory = TorRuntime.Builder(env("sf_enqueue_cmd_fail")) {
+            config(TestUtils.socksAuto)
+        } as TestFactory
         assertFailsWith<IllegalStateException> { factory.executeAsync(TorCmd.Signal.Dump) }
     }
 
     @Test
     fun givenAwaitingStart_whenTorCmd_thenAddsToServiceFactorCtrlQueue() = runTest {
         val lces = mutableListOf<Lifecycle.Event>()
+        val lock = SynchronizedObject()
         val bindDelay = 50.milliseconds
 
         val factory = env("sf_enqueue_success", start = { binder ->
             launch(Dispatchers.Default) {
-                println("LAUNCHED")
+//                println("LAUNCHED")
                 // Simulate a delayed launch
                 delay(bindDelay)
                 binder.bind()
             }
         }).let { env -> TorRuntime.Builder(env) {
-            observerStatic(RuntimeEvent.LIFECYCLE) { lces.add(it) }
-        } } as TestFactory
+            observerStatic(RuntimeEvent.LIFECYCLE) {
+                synchronized(lock) { lces.add(it) }
+            }
+            config(TestUtils.socksAuto)
+        } }.ensureStoppedOnTestCompletion() as TestFactory
 
         val actionJob = factory.enqueue(Action.StartDaemon, {}, {}) as ActionJob.StartJob
         assertEquals(EnqueuedJob.State.Executing, actionJob.state)
@@ -160,40 +170,24 @@ class ServiceFactoryUnitTest {
         val cmdJob = factory.enqueue(TorCmd.Signal.Dump, { assertIs<CancellationException>(it) }, {})
         factory.enqueue(Action.StopDaemon, {}, {})
 
-        var containsOnCreate = false
-        for (lce in lces) {
-            if (lce.className != "RealTorRuntime") continue
-            if (lce.name != Lifecycle.Event.Name.OnCreate) continue
-            containsOnCreate = true
-        }
-
-        // RealTorRuntime was not created yet, which
-        // means the cmdJob was successfully created
-        // by RealServiceFactoryCtrl b/c start was
-        // in the stack.
-        assertFalse(containsOnCreate)
+        lces.assertDoesNotContain("RealTorRuntime", Lifecycle.Event.Name.OnCreate)
         cmdJob.cancel(null)
 
         withContext(Dispatchers.Default) { delay(bindDelay + 250.milliseconds) }
 
-        println(actionJob)
         assertIs<InterruptedException>(actionJob.onErrorCause)
 
-        var containsOnDestroy = false
-        for (lce in lces) {
-            if (lce.className != "RealTorRuntime") continue
-            if (lce.name != Lifecycle.Event.Name.OnDestroy) continue
-            containsOnDestroy = true
-        }
-
-        assertTrue(containsOnDestroy)
+        lces.assertContains("RealTorRuntime", Lifecycle.Event.Name.OnCreate)
+        lces.assertContains("RealTorRuntime", Lifecycle.Event.Name.OnDestroy)
     }
 
     @Test
     fun givenBindTimeout_whenManyJobs_thenAllAreCompletedAsExpected() = runTest {
         val factory = env("sf_timeout_interrupt", start = { /* do nothing */ }).let { env ->
-            TorRuntime.Builder(env) {}
-        }
+            TorRuntime.Builder(env) {
+                config(TestUtils.socksAuto)
+            }
+        }.ensureStoppedOnTestCompletion()
 
         val onFailure = OnFailure { assertIs<InterruptedException>(it) }
 
@@ -230,7 +224,9 @@ class ServiceFactoryUnitTest {
 
     @Test
     fun givenActionStop_whenAlreadyStopped_thenIsImmediateSuccess() {
-        val factory = TorRuntime.Builder(env("sf_stop_immediate")) {}
+        val factory = TorRuntime.Builder(env("sf_stop_immediate")) {
+            config(TestUtils.socksAuto)
+        }
         val job = factory.enqueue(Action.StopDaemon, {}, {})
         assertEquals(EnqueuedJob.State.Success, job.state)
     }
