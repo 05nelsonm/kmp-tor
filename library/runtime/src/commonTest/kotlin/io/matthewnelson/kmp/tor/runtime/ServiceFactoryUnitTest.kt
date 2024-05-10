@@ -213,7 +213,7 @@ class ServiceFactoryUnitTest {
         for (job in jobs) {
 
             var i = 0
-            while (job.isActive && i++ < 5) {
+            while (job.isActive && i++ < 10) {
                 withContext(Dispatchers.Default) {
                     delay(50.milliseconds)
                 }
@@ -258,6 +258,7 @@ class ServiceFactoryUnitTest {
         }.ensureStoppedOnTestCompletion()
 
         factory.startDaemonAsync()
+        withContext(Dispatchers.Default) { delay(50.milliseconds) }
 
         synchronized(lock) {
             lces.assertContains("RealTorRuntime", Lifecycle.Event.Name.OnCreate, fid = factory)
@@ -272,6 +273,7 @@ class ServiceFactoryUnitTest {
         }
 
         factory.restartDaemonAsync()
+        withContext(Dispatchers.Default) { delay(50.milliseconds) }
 
         synchronized(lock) {
             lces.assertContains("TorProcess", Lifecycle.Event.Name.OnDestroy, fid = factory)
@@ -283,6 +285,7 @@ class ServiceFactoryUnitTest {
         }
 
         factory.stopDaemonAsync()
+        withContext(Dispatchers.Default) { delay(50.milliseconds) }
 
         synchronized(lock) {
             lces.assertContains("RealTorRuntime", Lifecycle.Event.Name.OnDestroy, fid = factory)

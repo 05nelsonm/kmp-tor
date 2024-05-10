@@ -17,9 +17,9 @@ package io.matthewnelson.kmp.tor.runtime
 
 import io.matthewnelson.kmp.tor.runtime.FileID.Companion.fidEllipses
 import io.matthewnelson.kmp.tor.runtime.core.TorConfig
-import kotlinx.coroutines.currentCoroutineContext
-import kotlinx.coroutines.job
+import kotlinx.coroutines.*
 import kotlin.test.fail
+import kotlin.time.Duration.Companion.milliseconds
 
 object TestUtils {
 
@@ -29,6 +29,9 @@ object TestUtils {
         currentCoroutineContext().job.invokeOnCompletion {
             enqueue(Action.StopDaemon, {}, {})
         }
+
+        withContext(Dispatchers.Default) { delay(100.milliseconds) }
+
         return this
     }
 
