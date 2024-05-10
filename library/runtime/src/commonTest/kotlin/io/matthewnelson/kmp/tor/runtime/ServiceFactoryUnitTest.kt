@@ -18,6 +18,7 @@ package io.matthewnelson.kmp.tor.runtime
 import io.matthewnelson.kmp.file.InterruptedException
 import io.matthewnelson.kmp.file.SysTempDir
 import io.matthewnelson.kmp.file.resolve
+import io.matthewnelson.kmp.file.writeUtf8
 import io.matthewnelson.kmp.tor.core.api.annotation.ExperimentalKmpTorApi
 import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
 import io.matthewnelson.kmp.tor.core.resource.SynchronizedObject
@@ -32,6 +33,7 @@ import io.matthewnelson.kmp.tor.runtime.TestUtils.ensureStoppedOnTestCompletion
 import io.matthewnelson.kmp.tor.runtime.core.OnFailure
 import io.matthewnelson.kmp.tor.runtime.core.EnqueuedJob
 import io.matthewnelson.kmp.tor.runtime.core.TorEvent
+import io.matthewnelson.kmp.tor.runtime.core.apply
 import io.matthewnelson.kmp.tor.runtime.core.ctrl.TorCmd
 import io.matthewnelson.kmp.tor.runtime.core.util.executeAsync
 import kotlinx.coroutines.*
@@ -278,6 +280,68 @@ class ServiceFactoryUnitTest {
             lces.assertContains("RealTorRuntime", Lifecycle.Event.Name.OnDestroy, fid = factory)
             lces.assertContains("DestroyableTorRuntime", Lifecycle.Event.Name.OnDestroy, fid = factory)
         }
+    }
+
+    @Test
+    fun givenActionStart_whenFailures_thenFailsAsExpected() = runTest {
+        val lces = mutableListOf<Lifecycle.Event>()
+        val lock = SynchronizedObject()
+
+        var failureScenario = ConfigBuilderCallback { throw AssertionError() }
+
+        val factory = TorRuntime.Builder(env("sf_process_fail")) {
+            observerStatic(RuntimeEvent.LIFECYCLE) {
+//                println(it)
+                synchronized(lock) { lces.add(it) }
+            }
+            config(TestUtils.socksAuto)
+            config { environment ->
+                apply(environment, failureScenario)
+            }
+        }.ensureStoppedOnTestCompletion()
+
+        factory.environment().torrcFile.delete()
+
+        suspend fun assertLCEs() {
+            withContext(Dispatchers.Default) { delay(50.milliseconds) }
+
+            synchronized(lock) {
+                lces.assertContains("RealTorRuntime", Lifecycle.Event.Name.OnDestroy)
+                lces.assertContains("DestroyableTorRuntime", Lifecycle.Event.Name.OnDestroy)
+                lces.assertContains("TorProcess", Lifecycle.Event.Name.OnCreate)
+                lces.assertContains("TorProcess", Lifecycle.Event.Name.OnDestroy)
+
+                lces.assertDoesNotContain("TorProcess", Lifecycle.Event.Name.OnStart)
+                lces.clear()
+            }
+        }
+
+        // Should cause TorConfigGenerator.generate to fail
+        assertFailsWith<AssertionError> { factory.startDaemonAsync() }
+        assertLCEs()
+
+        // Should cause --verify-config check to fail
+        failureScenario = ConfigBuilderCallback { environment ->
+            environment.torrcFile.writeUtf8("DnsPort -1")
+        }
+
+        assertFailsWith<IllegalArgumentException> { factory.startDaemonAsync() }
+        assertLCEs()
+
+        // Now ensure that any queued TorCmd are also interrupted when start fails
+        val startAction = factory.enqueue(Action.StartDaemon, {}, {}) as ActionJob.StartJob
+        val cmdAction = factory.enqueue(TorCmd.Signal.NewNym, {}, {})
+
+        withContext(Dispatchers.Default) {
+            while (startAction.isActive) {
+                delay(10.milliseconds)
+            }
+        }
+
+        assertLCEs()
+        assertTrue(startAction.isError)
+        assertTrue(cmdAction.isError)
+        assertIs<IllegalArgumentException>(startAction.onErrorCause)
     }
 
     private fun TorRuntime.ServiceFactory.Binder.bind(

@@ -537,9 +537,11 @@ internal class RealTorRuntime private constructor(
 
             TorProcess.start(generator, NOTIFIER, scope, connect = {
                 val ctrl = connection.openWith(factory)
-                val observer = ConnectivityObserver(ctrl)
 
                 val lceCtrl = RealTorCtrl(ctrl)
+                NOTIFIER.lce(Lifecycle.Event.OnCreate(lceCtrl))
+                val observer = ConnectivityObserver(ctrl)
+
                 ctrl.invokeOnDestroy { instance ->
                     processJob.cancel()
 
@@ -556,8 +558,6 @@ internal class RealTorRuntime private constructor(
                 }
 
                 val processHandle = processJob.invokeOnCompletion { ctrl.destroy() }
-
-                NOTIFIER.lce(Lifecycle.Event.OnCreate(lceCtrl))
 
                 ctrl.executeAsync(authenticate)
                 ctrl.executeAsync(TorCmd.Ownership.Take)
