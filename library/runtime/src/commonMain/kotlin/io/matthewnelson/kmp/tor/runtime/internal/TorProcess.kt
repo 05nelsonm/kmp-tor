@@ -135,7 +135,7 @@ internal class TorProcess private constructor(
 
         var wasNotified = false
         while (true) {
-            val duration = 350.milliseconds - lastStop.elapsedNow()
+            val duration = 500.milliseconds - lastStop.elapsedNow()
             if (duration < 1.milliseconds) break
 
             if (!wasNotified) {
@@ -425,7 +425,7 @@ internal class TorProcess private constructor(
             .toFile()
 
         val lines = ctrlPortFile
-            .awaitExists(5.seconds)
+            .awaitExists(10.seconds)
             .readUtf8()
             .lines()
             .mapNotNull { it.ifBlank { null } }
@@ -477,7 +477,7 @@ internal class TorProcess private constructor(
             .firstOrNull()
             ?.argument
             ?.toFile()
-            ?.awaitExists(1.seconds)
+            ?.awaitExists(10.seconds)
             ?.readBytes()
             ?.let { bytes -> TorCmd.Authenticate(cookie = bytes)  }
 

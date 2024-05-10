@@ -211,6 +211,14 @@ class ServiceFactoryUnitTest {
         withContext(Dispatchers.Default) { delay(1_000.milliseconds) }
 
         for (job in jobs) {
+
+            var i = 0
+            while (job.isActive && i++ < 5) {
+                withContext(Dispatchers.Default) {
+                    delay(50.milliseconds)
+                }
+            }
+
             val expected = if (job is ActionJob.StopJob) {
                 EnqueuedJob.State.Success
             } else {
