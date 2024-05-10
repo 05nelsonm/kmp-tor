@@ -23,6 +23,9 @@ import io.matthewnelson.kmp.process.Process
 import io.matthewnelson.kmp.process.Signal
 import io.matthewnelson.kmp.process.Stdio
 import io.matthewnelson.kmp.tor.core.api.ResourceInstaller
+import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
+import io.matthewnelson.kmp.tor.core.resource.SynchronizedObject
+import io.matthewnelson.kmp.tor.core.resource.synchronized
 import io.matthewnelson.kmp.tor.runtime.FileID
 import io.matthewnelson.kmp.tor.runtime.FileID.Companion.toFIDString
 import io.matthewnelson.kmp.tor.runtime.Lifecycle
@@ -261,6 +264,7 @@ internal class TorProcess private constructor(
         // before returning.
         val latch = Job()
 
+        @OptIn(InternalKmpTorApi::class)
         val processJob = scope.launch {
             val p: Process = try {
                 Process.Builder(command = paths.tor.path)
@@ -282,13 +286,13 @@ internal class TorProcess private constructor(
             NOTIFIER.lce(Lifecycle.Event.OnStart(this@TorProcess))
             NOTIFIER.i(this@TorProcess, p.toString())
 
-            var startupFailure: IOException? = null
+            var _lock: SynchronizedObject? = SynchronizedObject()
+            var _stdout: ArrayList<String>? = ArrayList(30)
 
             p.stdoutFeed { line ->
                 if (line == null) return@stdoutFeed
 
-                // TODO: Scan first lines of output for common errors
-                //  such as another instance running, or invalid config.
+                _lock?.let { synchronized(it) { _stdout?.add(line) } }
 
                 NOTIFIER.p(this@TorProcess, line)
             }.stderrFeed { line ->
@@ -307,16 +311,50 @@ internal class TorProcess private constructor(
                     p.waitForAsync(250.milliseconds)
                 }
 
-                run {
-                    val fail = startupFailure
+                val (containsErr, stdout) = run {
+                    val stdout = _stdout!!
+                    val lock = _lock!!
+                    _lock = null
+                    _stdout = null
+                    var containsErr = false
 
-                    if (fail != null) {
-                        latch.completeExceptionally(fail)
-                        return@run
+                    val out = synchronized(lock) {
+                        buildString {
+                            append("stdout: [")
+                            if (stdout.isEmpty()) {
+                                append(']')
+                                return@buildString
+                            }
+
+                            for (line in stdout) {
+                                if (line.contains(" [err] ")) {
+                                    containsErr = true
+                                }
+
+                                appendLine()
+                                append("    ")
+                                append(line)
+                            }
+
+                            appendLine()
+                            append(']')
+                        }
                     }
 
-                    if (exitCode != null) {
-                        latch.completeExceptionally(IOException("Tor exited with code $exitCode"))
+                    containsErr to out
+                }
+
+                run {
+                    if (exitCode != null || containsErr) {
+                        latch.completeExceptionally(IOException(
+                            "Process failure\n"
+                            + if (exitCode != null) {
+                                "exitCode: $exitCode\n"
+                            } else {
+                                ""
+                            }
+                            + stdout
+                        ))
                         return@run
                     }
 
