@@ -15,15 +15,19 @@
  **/
 package io.matthewnelson.kmp.tor.runtime.internal
 
-import io.matthewnelson.kmp.tor.runtime.NetworkObserver
 import io.matthewnelson.kmp.tor.runtime.core.OnEvent
-import kotlinx.coroutines.CoroutineScope
+import io.matthewnelson.kmp.tor.runtime.core.TorEvent
 
-internal abstract class AbstractConnectivityObserver internal constructor(
-    private val scope: CoroutineScope,
-): OnEvent<NetworkObserver.Connectivity> {
+internal open class ObserverConfChanged internal constructor(
+    staticTag: String,
+): TorEvent.Observer(
+    TorEvent.CONF_CHANGED,
+    staticTag,
+    OnEvent.Executor.Immediate,
+    OnEvent.noOp(),
+) {
 
-    final override fun invoke(it: NetworkObserver.Connectivity) {
-        // TODO
+    protected override fun notify(data: String) {
+        // TODO: parse data
     }
 }

@@ -21,14 +21,13 @@ import io.matthewnelson.kmp.file.File
 import io.matthewnelson.kmp.file.FileNotFoundException
 import io.matthewnelson.kmp.file.InterruptedException
 import io.matthewnelson.kmp.tor.runtime.core.OnFailure
-import io.matthewnelson.kmp.tor.runtime.core.QueuedJob
-import io.matthewnelson.kmp.tor.runtime.core.QueuedJob.Companion.toImmediateErrorJob
+import io.matthewnelson.kmp.tor.runtime.core.EnqueuedJob
+import io.matthewnelson.kmp.tor.runtime.core.EnqueuedJob.Companion.toImmediateErrorJob
 import io.matthewnelson.kmp.tor.runtime.core.TorConfig
 import io.matthewnelson.kmp.tor.runtime.core.UncaughtException
 import io.matthewnelson.kmp.tor.runtime.core.UncaughtException.Handler.Companion.tryCatch
 import io.matthewnelson.kmp.tor.runtime.core.UncaughtException.Handler.Companion.withSuppression
 import io.matthewnelson.kmp.tor.runtime.core.ctrl.TorCmd
-import kotlin.coroutines.cancellation.CancellationException
 
 @Suppress("NOTHING_TO_INLINE")
 @Throws(FileNotFoundException::class, UnsupportedOperationException::class)
@@ -65,7 +64,7 @@ internal fun <T: TorCmdJob<*>> MutableList<T>.interruptAndClearAll(
 internal inline fun TorCmd<*>.toDestroyedErrorJob(
     onFailure: OnFailure,
     handler: UncaughtException.Handler,
-): QueuedJob = onFailure.toImmediateErrorJob(
+): EnqueuedJob = onFailure.toImmediateErrorJob(
     keyword,
     IllegalStateException("TorCtrl.isDestroyed[true]"),
     handler

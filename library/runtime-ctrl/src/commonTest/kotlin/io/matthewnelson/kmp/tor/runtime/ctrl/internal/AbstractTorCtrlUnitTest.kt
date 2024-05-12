@@ -51,7 +51,7 @@ class AbstractTorCtrlUnitTest {
             assertTrue(it.isDestroyed())
 
             // interrupt should occur before completion handles
-            assertEquals(QueuedJob.State.Error, job.state)
+            assertEquals(EnqueuedJob.State.Error, job.state)
 
             // check that destroy callbacks variable has
             // been de-referenced and cannot add anymore

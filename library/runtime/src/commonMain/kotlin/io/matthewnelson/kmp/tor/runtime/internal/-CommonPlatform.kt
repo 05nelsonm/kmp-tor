@@ -17,6 +17,7 @@
 
 package io.matthewnelson.kmp.tor.runtime.internal
 
+import io.matthewnelson.kmp.file.File
 import io.matthewnelson.kmp.tor.runtime.Action
 import io.matthewnelson.kmp.tor.runtime.TorRuntime
 import kotlinx.coroutines.CoroutineDispatcher
@@ -27,6 +28,12 @@ import kotlin.coroutines.resumeWithException
 
 @Suppress("NOTHING_TO_INLINE")
 internal expect inline fun TorRuntime.Environment.newRuntimeDispatcher(): CoroutineDispatcher
+
+@Throws(Throwable::class)
+internal expect fun File.setDirectoryPermissions()
+
+@Throws(Throwable::class)
+internal expect fun File.setFilePermissions()
 
 @Throws(Throwable::class)
 @Suppress("NOTHING_TO_INLINE")

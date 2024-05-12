@@ -20,7 +20,6 @@ package io.matthewnelson.kmp.tor.runtime
 import io.matthewnelson.kmp.file.InterruptedException
 import io.matthewnelson.kmp.tor.runtime.core.*
 import io.matthewnelson.kmp.tor.runtime.core.ctrl.TorCmd
-import io.matthewnelson.kmp.tor.runtime.core.ctrl.TorCmd.Privileged.Processor
 import kotlin.coroutines.cancellation.CancellationException
 
 public expect enum class Action {
@@ -28,7 +27,7 @@ public expect enum class Action {
     /**
      * Starts the tor daemon.
      *
-     * If tor is running, the [QueuedJob] returned by
+     * If tor is running, the [EnqueuedJob] returned by
      * [Processor.enqueue] will complete with success.
      *
      * **NOTE:** Tor's startup process is broken out
@@ -50,7 +49,7 @@ public expect enum class Action {
      * Stops the tor daemon. All [TorCmd] that are
      * queued and awaiting execution will be cancelled.
      *
-     * If tor is not running, the [QueuedJob] returned
+     * If tor is not running, the [EnqueuedJob] returned
      * by [Processor.enqueue] will complete with success.
      * */
     StopDaemon,
@@ -75,11 +74,11 @@ public expect enum class Action {
         /**
          * Enqueues the [Action] for execution.
          *
-         * **NOTE:** If the returned [QueuedJob] gets cancelled,
+         * **NOTE:** If the returned [EnqueuedJob] gets cancelled,
          * [onFailure] will be invoked with [CancellationException]
          * indicating normal behavior.
          *
-         * **NOTE:** If the returned [QueuedJob] get interrupted,
+         * **NOTE:** If the returned [EnqueuedJob] get interrupted,
          * [onFailure] will be invoked with [InterruptedException].
          * For example, if [StartDaemon] is enqueued and immediately
          * after, [StopDaemon] is enqueued too. [StopDaemon] will be
@@ -94,7 +93,7 @@ public expect enum class Action {
          * or [RestartDaemon] jobs are attached as children, completing
          * alongside the job that is executing.
          *
-         * @return [QueuedJob]
+         * @return [EnqueuedJob]
          * @see [OnFailure]
          * @see [OnSuccess]
          * @see [executeAsync]
@@ -104,7 +103,7 @@ public expect enum class Action {
             action: Action,
             onFailure: OnFailure,
             onSuccess: OnSuccess<Unit>,
-        ): QueuedJob
+        ): EnqueuedJob
     }
 
     public companion object {

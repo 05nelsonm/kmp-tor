@@ -15,27 +15,32 @@
  **/
 package io.matthewnelson.kmp.tor.runtime.core
 
+import io.matthewnelson.kmp.file.InterruptedException
 import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
-import io.matthewnelson.kmp.tor.runtime.core.QueuedJobUnitTest.TestJob
+import io.matthewnelson.kmp.tor.runtime.core.EnqueuedJobUnitTest.TestJob
 import io.matthewnelson.kmp.tor.runtime.core.util.awaitSync
-import kotlinx.coroutines.CancellationException
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
+import kotlinx.coroutines.*
 import kotlinx.coroutines.test.runTest
-import kotlinx.coroutines.withContext
+import java.lang.Runnable
+import java.util.concurrent.TimeoutException
 import kotlin.test.*
 import kotlin.time.Duration.Companion.milliseconds
 
 @OptIn(InternalKmpTorApi::class)
-class QueuedJobJvmUnitTest {
+class EnqueuedJobJvmUnitTest {
 
     @Test
     fun givenAwaitSync_whenThreadInterrupted_thenJobIsCancelledIfAble() = runTest {
         var invocationFailure = 0
+        var failure: Throwable? = null
         val job = TestJob(onFailure = {
             invocationFailure++
-            assertIs<CancellationException>(it)
+            failure = it
         })
+
+        currentCoroutineContext().job.invokeOnCompletion {
+            job.error(TimeoutException())
+        }
 
         var threw: Throwable? = null
 
@@ -43,7 +48,7 @@ class QueuedJobJvmUnitTest {
             try {
                 job.awaitSync<Unit>(
                     success = { null },
-                    failure = { null },
+                    failure = { failure },
                     cancellation = null,
                 )
             } catch (t: Throwable) {
@@ -52,15 +57,19 @@ class QueuedJobJvmUnitTest {
         }.execute()
 
         withContext(Dispatchers.IO) {
-            delay(25.milliseconds)
-            thread.interrupt()
             delay(50.milliseconds)
+            thread.interrupt()
         }
+
+        withContext(Dispatchers.Default) {
+            delay(100.milliseconds)
+        }
+
+        assertEquals(1, invocationFailure)
+        assertEquals(EnqueuedJob.State.Cancelled, job.state)
 
         assertIs<CancellationException>(threw)
         assertIs<InterruptedException>(threw!!.cause)
-        assertEquals(1, invocationFailure)
-        assertEquals(QueuedJob.State.Cancelled, job.state)
     }
 
     @Test
@@ -95,8 +104,15 @@ class QueuedJobJvmUnitTest {
         withContext(Dispatchers.IO) {
             delay(25.milliseconds)
             thread.interrupt()
+        }
+
+        withContext(Dispatchers.IO) {
             delay(50.milliseconds)
             job.completion()
+            delay(50.milliseconds)
+        }
+
+        withContext(Dispatchers.IO) {
             delay(50.milliseconds)
         }
 

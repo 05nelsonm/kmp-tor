@@ -13,16 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-package io.matthewnelson.kmp.tor.runtime.core.builder
+package io.matthewnelson.kmp.tor.runtime.internal
 
-import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
-import io.matthewnelson.kmp.tor.runtime.core.TorConfig
+import io.matthewnelson.kmp.file.File
 
-@InternalKmpTorApi
-public interface ExtendedTorConfigBuilder {
-    public fun contains(keyword: TorConfig.Keyword): Boolean
-    public fun cookieAuthentication(): TorConfig.Setting?
-    public fun cookieAuthFile(): TorConfig.Setting?
-    public fun dataDirectory(): TorConfig.Setting?
-    public fun remove(setting: TorConfig.Setting)
-}
+@Throws(Throwable::class)
+internal actual fun File.setDirectoryPermissions() { chmod("700") }
+
+@Throws(Throwable::class)
+internal actual fun File.setFilePermissions() { chmod("600") }

@@ -16,11 +16,11 @@
 package io.matthewnelson.kmp.tor.runtime
 
 import io.matthewnelson.kmp.file.resolve
+import io.matthewnelson.kmp.file.toFile
 import io.matthewnelson.kmp.tor.core.api.ResourceInstaller
 import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
 import io.matthewnelson.kmp.tor.runtime.core.ThisBlock
 import io.matthewnelson.kmp.tor.runtime.core.TorConfig
-import io.matthewnelson.kmp.tor.runtime.core.address.Port.Proxy.Companion.toPortProxy
 import io.matthewnelson.kmp.tor.runtime.core.builder.ExtendedTorConfigBuilder
 import io.matthewnelson.kmp.tor.runtime.core.builder.UnixSocketBuilder
 import kotlin.jvm.JvmSynthetic
@@ -51,15 +51,20 @@ public fun interface ConfigBuilderCallback: ThisBlock.WithIt<TorConfig.Builder, 
                 put(TorConfig.GeoIPv6File) { file = paths.geoip6 }
             }
 
-            putIfAbsent(TorConfig.DataDirectory) {
-                directory = environment.workDir
-                    .resolve(TorConfig.DataDirectory.DEFAULT_NAME)
-            }
+            val dataDir = (this as ExtendedTorConfigBuilder)
+                .dataDirectory()
+                ?: TorConfig.DataDirectory.Builder {
+                    directory = environment.workDirectory
+                        .resolve(TorConfig.DataDirectory.DEFAULT_NAME)
+                }!!
+
+            putIfAbsent(dataDir)
+
             putIfAbsent(TorConfig.CacheDirectory) {
-                directory = environment.cacheDir
+                directory = environment.cacheDirectory
             }
             putIfAbsent(TorConfig.ControlPortWriteToFile) {
-                file = environment.workDir
+                file = environment.workDirectory
                     .resolve(TorConfig.ControlPortWriteToFile.DEFAULT_NAME)
             }
 
@@ -70,13 +75,42 @@ public fun interface ConfigBuilderCallback: ThisBlock.WithIt<TorConfig.Builder, 
             // over while still providing choice by only adding if not declared.
             putIfAbsent(TorConfig.DormantCanceledByStartup) { cancel = true }
 
-            // Authentication
+            // CookieAuthentication & CookieAuthFile
+            when (cookieAuthentication()?.argument) {
+                "1" -> {
+                    // If CookieAuthentication is enabled, ensure CookieAuthFile is
+                    // declared (default location or not).
+                    putIfAbsent(TorConfig.CookieAuthFile) {
+                        file = dataDir.argument.toFile()
+                            .resolve(TorConfig.CookieAuthFile.DEFAULT_NAME)
+                    }
+                }
+                "0" -> {
+                    // If specifically disabled, ensure CookieAuthFile is NOT present
+                    // to simplify process startup arguments.
+                    cookieAuthFile()?.let { remove(it) }
+                }
+                // Not present
+                else -> {
+                    if (cookieAuthFile() != null) {
+                        // If CookieAuthFile has been declared, enable it.
+                        put(TorConfig.CookieAuthentication) { enable = true }
+                    }
+                }
+            }
+
+            // If no authentication methods are declared, add CookieAuthentication
+            //
+            // This gives the option for consumers to disable authentication by
+            // defining `put(TorConfig.CookieAuthentication) { enable = false }`
+            // which will then roll unauthenticated (highly ill-advised).
             if (
-                !(this as ExtendedTorConfigBuilder).contains(TorConfig.CookieAuthFile)
-            // && !contains(TorConfig.HashedControlPassword)
+                !contains(TorConfig.CookieAuthentication)
+//                && !contains(TorConfig.HashedControlPassword)
             ) {
-                put(TorConfig.CookieAuthFile) {
-                    file = environment.workDir
+                put(TorConfig.CookieAuthentication) { enable = true }
+                putIfAbsent(TorConfig.CookieAuthFile) {
+                    file = dataDir.argument.toFile()
                         .resolve(TorConfig.CookieAuthFile.DEFAULT_NAME)
                 }
             }
@@ -85,12 +119,7 @@ public fun interface ConfigBuilderCallback: ThisBlock.WithIt<TorConfig.Builder, 
             if (!contains(TorConfig.__SocksPort)) {
                 // Add default socks port so that port availability check
                 // can reassign it to auto if needed
-                put(TorConfig.__SocksPort) {
-                    asPort {
-                        port(9050.toPortProxy())
-                        reassignable(allow = true)
-                    }
-                }
+                put(TorConfig.__SocksPort) { /* default 9050 */ }
             }
 
             if (!contains(TorConfig.__ControlPort)) {
@@ -99,7 +128,7 @@ public fun interface ConfigBuilderCallback: ThisBlock.WithIt<TorConfig.Builder, 
                         // Prefer using Unix Domain Sockets whenever possible
                         // because of things like Airplane Mode.
                         asUnixSocket {
-                            file = environment.workDir
+                            file = environment.workDirectory
                                 .resolve(UnixSocketBuilder.DEFAULT_NAME_CTRL)
                         }
                     } catch (_: UnsupportedOperationException) {

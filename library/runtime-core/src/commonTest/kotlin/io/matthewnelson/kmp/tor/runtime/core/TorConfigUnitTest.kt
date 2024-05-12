@@ -103,33 +103,4 @@ class TorConfigUnitTest {
         assertEquals("auto", settings2.filterByKeyword<TorConfig.__SocksPort.Companion>().first().argument)
         assertEquals("0", settings2.filterByKeyword<TorConfig.__HTTPTunnelPort.Companion>().first().argument)
     }
-
-    @Test
-    fun givenExtendedConfig_whenCastAs_thenWorksAsExpected() {
-        val dns = TorConfig.__DNSPort.Builder { port(1080.toPortProxy()) }
-
-        TorConfig.Builder {
-
-            put(dns)
-            put(TorConfig.__SocksPort) { asPort { disable() } }
-            put(TorConfig.HiddenServiceDir) {
-                directory = "".toFile()
-                version { HSv(3) }
-                port {
-                    virtual = 80.toPort()
-                    targetAsPort { target = 443.toPort() }
-                }
-            }
-
-            // contains
-            assertTrue((this as ExtendedTorConfigBuilder).contains(TorConfig.__SocksPort))
-            assertTrue(contains(TorConfig.HiddenServiceMaxStreams))
-            assertFalse(contains(TorConfig.__ControlPort))
-
-            // remove
-            assertTrue(contains(dns.keyword))
-            remove(dns)
-            assertFalse(contains(dns.keyword))
-        }
-    }
 }

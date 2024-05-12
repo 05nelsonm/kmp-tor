@@ -137,7 +137,7 @@ internal class RealTorCtrl private constructor(
         // Waiters must be destroyed BEFORE cancelling
         // scope (if they haven't already been b/c of EOS).
         // This is to ensure that all currently waiting
-        // replies get cancelled, and no more QueuedJob
+        // replies get cancelled, and no more EnqueuedJob
         // will be executed.
         waiters.destroy()
 

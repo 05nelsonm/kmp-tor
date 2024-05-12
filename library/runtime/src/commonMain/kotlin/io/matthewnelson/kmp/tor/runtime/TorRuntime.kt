@@ -163,8 +163,9 @@ public interface TorRuntime:
          * Any subsequent calls for [TorCmd.SetEvents] during runtime will
          * be intercepted and modified to include all required [TorEvent].
          *
-         * **NOTE:** [TorEvent.CONF_CHANGED] and [TorEvent.NOTICE] are always
-         * present and do not need to be added here.
+         * **NOTE:** [TorEvent.CONF_CHANGED] will always present as it is
+         * required for the [TorRuntime] implementation. It does not need to
+         * be added here.
          * */
         @KmpTorDsl
         public fun required(
@@ -287,9 +288,9 @@ public interface TorRuntime:
      * */
     public class Environment private constructor(
         @JvmField
-        public val workDir: File,
+        public val workDirectory: File,
         @JvmField
-        public val cacheDir: File,
+        public val cacheDirectory: File,
         @JvmField
         public val torrcFile: File,
         @JvmField
@@ -315,110 +316,116 @@ public interface TorRuntime:
         @Volatile
         public var debug: Boolean = false
 
-        public override val fid: String by lazy { FileID.createFID(workDir) }
+        public override val fid: String by lazy { FileID.createFID(workDirectory) }
 
         public companion object {
 
             /**
-             * Opener for creating a [Environment] instance.
+             * Opener for creating an [Environment] instance.
              *
              * If an [Environment] has already been created for the provided
-             * [workDir], that [Environment] instance will be returned.
+             * [workDirectory], that [Environment] instance will be returned.
              *
-             * [workDir] should be specified within your application's home
-             * directory (e.g. `$HOME/.my_application/torservice`)
+             * [workDirectory] should be specified within your application's home
+             * directory (e.g. `$HOME/.my_application/torservice`). This will
+             * be utilized as the tor process' `HOME` environment variable.
              *
-             * [cacheDir] should be specified within your application's cache
-             * directory (e.g. `$HOME/.my_application/cache/torservice`)
+             * [cacheDirectory] should be specified within your application's cache
+             * directory (e.g. `$HOME/.my_application/cache/torservice`).
              *
-             * It is advisable to keep the dirname for [workDir] and [cacheDir]
+             * It is advisable to keep the dirname for [workDirectory] and [cacheDirectory]
              * identical (e.g. `torservice`), especially when creating multiple
              * instances of [Environment].
              *
-             * When running multiple instances, declaring the same [cacheDir] as
-             * another [Environment] will result in a bad day. No checks are
-             * performed for this clash.
+             * **WARNING:** When running multiple instances ot [TorRuntime],
+             * declaring the same [cacheDirectory] as another [Environment] will result
+             * in a bad day. No checks are performed for this clash.
              *
-             * @param [workDir] tor's working directory (e.g. `$HOME/.my_application/torservice`)
-             * @param [cacheDir] tor's cache directory (e.g. `$HOME/.my_application/cache/torservice`)
-             * @param [installer] lambda for creating [ResourceInstaller] using
-             *   the default [Builder.installationDir] (which is [workDir])
+             * @param [workDirectory] tor's working directory (e.g. `$HOME/.my_application/torservice`)
+             *   This will be utilized as the tor process' `HOME` environment variable.
+             * @param [cacheDirectory] tor's cache directory (e.g. `$HOME/.my_application/cache/torservice`).
+             * @param [installer] lambda for creating [ResourceInstaller] using the configured
+             *   [Builder.installationDirectory]. See [kmp-tor-resource](https://github.com/05nelsonm/kmp-tor-resource)
              * @see [io.matthewnelson.kmp.tor.runtime.service.createTorRuntimeEnvironment]
              * */
             @JvmStatic
             public fun Builder(
-                workDir: File,
-                cacheDir: File,
-                installer: (installationDir: File) -> ResourceInstaller<Paths.Tor>,
-            ): Environment = Builder.build(workDir, cacheDir, installer, null)
+                workDirectory: File,
+                cacheDirectory: File,
+                installer: (installationDirectory: File) -> ResourceInstaller<Paths.Tor>,
+            ): Environment = Builder.build(workDirectory, cacheDirectory, installer, null)
 
             /**
-             * Opener for creating a [Environment] instance.
+             * Opener for creating an [Environment] instance.
              *
              * If an [Environment] has already been created for the provided
-             * [workDir], that [Environment] instance will be returned.
+             * [workDirectory], that [Environment] instance will be returned.
              *
-             * [workDir] should be specified within your application's home
-             * directory (e.g. `$HOME/.my_application/torservice`)
+             * [workDirectory] should be specified within your application's home
+             * directory (e.g. `$HOME/.my_application/torservice`). This will
+             * be utilized as the tor process' `HOME` environment variable.
              *
-             * [cacheDir] should be specified within your application's cache
-             * directory (e.g. `$HOME/.my_application/cache/torservice`)
+             * [cacheDirectory] should be specified within your application's cache
+             * directory (e.g. `$HOME/.my_application/cache/torservice`).
              *
-             * It is advisable to keep the dirname for [workDir] and [cacheDir]
+             * It is advisable to keep the dirname for [workDirectory] and [cacheDirectory]
              * identical (e.g. `torservice`), especially when creating multiple
              * instances of [Environment].
              *
-             * When running multiple instances, declaring the same [cacheDir] as
-             * another [Environment] will result in a bad day. No checks are
-             * performed for this clash.
+             * **WARNING:** When running multiple instances ot [TorRuntime],
+             * declaring the same [cacheDirectory] as another [Environment] will result
+             * in a bad day. No checks are performed for this clash.
              *
-             * @param [workDir] tor's working directory (e.g. `$HOME/.my_application/torservice`)
-             * @param [cacheDir] tor's cache directory (e.g. `$HOME/.my_application/cache/torservice`)
-             * @param [installer] lambda for creating [ResourceInstaller] using
-             *   the configured [Builder.installationDir]
+             * @param [workDirectory] tor's working directory (e.g. `$HOME/.my_application/torservice`)
+             *   This will be utilized as the tor process' `HOME` environment variable.
+             * @param [cacheDirectory] tor's cache directory (e.g. `$HOME/.my_application/cache/torservice`).
+             * @param [installer] lambda for creating [ResourceInstaller] using the configured
+             *   [Builder.installationDirectory]. See [kmp-tor-resource](https://github.com/05nelsonm/kmp-tor-resource)
              * @param [block] optional lambda for modifying default parameters.
              * @see [io.matthewnelson.kmp.tor.runtime.service.createTorRuntimeEnvironment]
              * */
             @JvmStatic
             public fun Builder(
-                workDir: File,
-                cacheDir: File,
-                installer: (installationDir: File) -> ResourceInstaller<Paths.Tor>,
+                workDirectory: File,
+                cacheDirectory: File,
+                installer: (installationDirectory: File) -> ResourceInstaller<Paths.Tor>,
                 block: ThisBlock<Builder>,
-            ): Environment = Builder.build(workDir, cacheDir, installer, block)
+            ): Environment = Builder.build(workDirectory, cacheDirectory, installer, block)
         }
 
         @KmpTorDsl
         public class Builder private constructor(
             @JvmField
-            public val workDir: File,
+            public val workDirectory: File,
             @JvmField
-            public val cacheDir: File,
+            public val cacheDirectory: File,
         ) {
 
             /**
              * The directory for which **all** resources will be installed
              *
-             * Default: [workDir]
+             * Default: [workDirectory]
              * */
             @JvmField
-            public var installationDir: File = workDir
+            public var installationDirectory: File = workDirectory
 
             /**
-             * Location of the torrc file
+             * Location of the torrc file. If it does not exist at runtime,
+             * a blank one will be created.
              *
-             * Default: [workDir]/torrc
+             * Default: [workDirectory]/torrc
              * */
             @JvmField
-            public var torrcFile: File = workDir.resolve("torrc")
+            public var torrcFile: File = workDirectory.resolve("torrc")
 
             /**
-             * Location of the torrc-defaults file
+             * Location of the torrc-defaults file. If it does not exist at runtime,
+             * a blank one will be created.
              *
-             * Default: [workDir]/torrc-defaults
+             * Default: [workDirectory]/torrc-defaults
              * */
             @JvmField
-            public var torrcDefaultsFile: File = workDir.resolve("torrc-defaults")
+            public var torrcDefaultsFile: File = workDirectory.resolve("torrc-defaults")
 
             /**
              * Experimental support for running tor as a service. Currently
@@ -435,22 +442,22 @@ public interface TorRuntime:
 
                 @JvmSynthetic
                 internal fun build(
-                    workDir: File,
-                    cacheDir: File,
-                    installer: (installationDir: File) -> ResourceInstaller<Paths.Tor>,
+                    workDirectory: File,
+                    cacheDirectory: File,
+                    installer: (installationDirectory: File) -> ResourceInstaller<Paths.Tor>,
                     block: ThisBlock<Builder>?,
                 ): Environment {
-                    val b = Builder(workDir.absoluteFile.normalize(), cacheDir.absoluteFile.normalize())
+                    val b = Builder(workDirectory.absoluteFile.normalize(), cacheDirectory.absoluteFile.normalize())
                     // Apply block outside getOrCreateInstance call to
                     // prevent double instance creation
                     if (block != null) b.apply(block)
-                    val torResource = installer(b.installationDir.absoluteFile.normalize())
+                    val torResource = installer(b.installationDirectory.absoluteFile.normalize())
 
-                    return getOrCreateInstance(key = b.workDir, block = {
+                    return getOrCreateInstance(key = b.workDirectory, block = {
                         @OptIn(ExperimentalKmpTorApi::class)
                         Environment(
-                            workDir = b.workDir,
-                            cacheDir = b.cacheDir,
+                            workDirectory = b.workDirectory,
+                            cacheDirectory = b.cacheDirectory,
                             torrcFile = b.torrcFile.absoluteFile.normalize(),
                             torrcDefaultsFile = b.torrcDefaultsFile.absoluteFile.normalize(),
                             torResource = torResource,
@@ -565,13 +572,13 @@ public interface TorRuntime:
             cmd: TorCmd.Unprivileged<Success>,
             onFailure: OnFailure,
             onSuccess: OnSuccess<Success>,
-        ): QueuedJob = ctrl.enqueue(cmd, onFailure, onSuccess)
+        ): EnqueuedJob = ctrl.enqueue(cmd, onFailure, onSuccess)
 
         public final override fun enqueue(
             action: Action,
             onFailure: OnFailure,
             onSuccess: OnSuccess<Unit>,
-        ): QueuedJob = ctrl.enqueue(action, onFailure, onSuccess)
+        ): EnqueuedJob = ctrl.enqueue(action, onFailure, onSuccess)
 
         public final override fun subscribe(observer: TorEvent.Observer) {
             ctrl.subscribe(observer)

@@ -17,6 +17,7 @@
 
 package io.matthewnelson.kmp.tor.runtime.internal
 
+import io.matthewnelson.kmp.file.File
 import io.matthewnelson.kmp.tor.runtime.FileID.Companion.fidEllipses
 import io.matthewnelson.kmp.tor.runtime.TorRuntime
 import kotlinx.coroutines.*
@@ -34,4 +35,25 @@ internal actual inline fun TorRuntime.Environment.newRuntimeDispatcher(): Corout
         t
     }
     return executor.asCoroutineDispatcher()
+}
+
+@Throws(Throwable::class)
+internal actual fun File.setDirectoryPermissions() {
+    setReadable(false, /* ownerOnly */ false)
+    setWritable(false, /* ownerOnly */ false)
+    setExecutable(false, /* ownerOnly */ false)
+
+    setReadable(true, /* ownerOnly */ true)
+    setWritable(true, /* ownerOnly */ true)
+    setExecutable(true, /* ownerOnly */ true)
+}
+
+@Throws(Throwable::class)
+internal actual fun File.setFilePermissions() {
+    setReadable(false, /* ownerOnly */ false)
+    setWritable(false, /* ownerOnly */ false)
+    setExecutable(false, /* ownerOnly */ false)
+
+    setReadable(true, /* ownerOnly */ true)
+    setWritable(true, /* ownerOnly */ true)
 }

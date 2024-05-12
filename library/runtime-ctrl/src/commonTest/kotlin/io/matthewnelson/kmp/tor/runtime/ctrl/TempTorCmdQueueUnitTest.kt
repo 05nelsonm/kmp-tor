@@ -16,7 +16,7 @@
 package io.matthewnelson.kmp.tor.runtime.ctrl
 
 import io.matthewnelson.kmp.file.InterruptedException
-import io.matthewnelson.kmp.tor.runtime.core.QueuedJob
+import io.matthewnelson.kmp.tor.runtime.core.EnqueuedJob
 import io.matthewnelson.kmp.tor.runtime.core.UncaughtException
 import io.matthewnelson.kmp.tor.runtime.core.ctrl.Reply
 import io.matthewnelson.kmp.tor.runtime.core.ctrl.TorCmd
@@ -76,14 +76,14 @@ class TempTorCmdQueueUnitTest {
         // connection is not destroyed.
         val job = queue.enqueue(TorCmd.Signal.Dump, {}, {})
         ctrl.destroy()
-        assertEquals(QueuedJob.State.Error, job.state)
+        assertEquals(EnqueuedJob.State.Error, job.state)
     }
 
     @Test
     fun givenQueuedJobs_whenNoAttached_thenInterruptsOnDestroy() {
         val job = queue.enqueue(TorCmd.Signal.Dump, { t -> assertIs<InterruptedException>(t) }, {})
         queue.destroy()
-        assertEquals(QueuedJob.State.Error, job.state)
+        assertEquals(EnqueuedJob.State.Error, job.state)
         assertTrue(queue.isDestroyed())
     }
 

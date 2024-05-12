@@ -181,7 +181,7 @@ public class Lifecycle: Destroyable {
          * Attaches a callback handle to the lifecycle which
          * will be invoked when [destroy] is called.
          *
-         * @see [QueuedJob.invokeOnCompletion]
+         * @see [EnqueuedJob.invokeOnCompletion]
          * */
         public fun invokeOnDestroy(
             handle: ItBlock<Any?>,
@@ -219,7 +219,7 @@ public class Lifecycle: Destroyable {
 
     private class LifecycleJob(
         handler: UncaughtException.Handler,
-    ): QueuedJob("TorRuntime", OnFailure.noOp(), handler) {
+    ): EnqueuedJob("TorRuntime", OnFailure.noOp(), handler) {
 
         // non-cancellable
         init { onExecuting() }

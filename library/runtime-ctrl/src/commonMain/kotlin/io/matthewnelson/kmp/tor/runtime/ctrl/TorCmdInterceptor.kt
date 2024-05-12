@@ -15,15 +15,15 @@
  **/
 package io.matthewnelson.kmp.tor.runtime.ctrl
 
-import io.matthewnelson.kmp.tor.runtime.core.QueuedJob
+import io.matthewnelson.kmp.tor.runtime.core.EnqueuedJob
 import io.matthewnelson.kmp.tor.runtime.core.ctrl.TorCmd
 import io.matthewnelson.kmp.tor.runtime.ctrl.internal.TorCmdJob
 import kotlin.jvm.JvmStatic
 import kotlin.jvm.JvmSynthetic
 
 /**
- * Intercept the currently executing [QueuedJob] and its associated
- * [TorCmd] in order to apply [QueuedJob.invokeOnCompletion] handles,
+ * Intercept the currently executing [EnqueuedJob] and its associated
+ * [TorCmd] in order to apply [EnqueuedJob.invokeOnCompletion] handles,
  * or modify the command's arguments.
  *
  * If no modifications are needed for the [TorCmd], the originating
@@ -54,7 +54,7 @@ public class TorCmdInterceptor<C: TorCmd<*>> private constructor(
 
     @JvmSynthetic
     internal fun invoke(job: TorCmdJob<*>): TorCmd<*>? {
-        if (job.state != QueuedJob.State.Executing) return null
+        if (job.state != EnqueuedJob.State.Executing) return null
 
         val result = _intercept(job) ?: return null
         if (result == job.cmd) return null
@@ -73,7 +73,7 @@ public class TorCmdInterceptor<C: TorCmd<*>> private constructor(
          * */
         @JvmStatic
         public inline fun <reified C: TorCmd<*>> intercept(
-            crossinline intercept: (job: QueuedJob, cmd: C) -> C
+            crossinline intercept: (job: EnqueuedJob, cmd: C) -> C
         ): TorCmdInterceptor<C> = of { job ->
             if (job.cmd !is C) return@of null
             intercept(job, job.cmd)

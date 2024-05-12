@@ -34,39 +34,43 @@ import kotlin.jvm.JvmSynthetic
  * @see [noOp]
  * @see [TorRuntime.Builder.networkObserver]
  * */
+@OptIn(InternalKmpTorApi::class)
 public abstract class NetworkObserver {
 
-    @OptIn(InternalKmpTorApi::class)
     private val lock = SynchronizedObject()
     private val observers = LinkedHashSet<OnEvent<Connectivity>>(1, 1.0F)
 
     @JvmSynthetic
-    internal open fun subscribe(observer: OnEvent<Connectivity>) {
-        @OptIn(InternalKmpTorApi::class)
-        val initialAttach = synchronized(lock) {
+    internal open fun subscribe(observer: OnEvent<Connectivity>): Boolean {
+        val (initialAttach, wasAdded) = synchronized(lock) {
             val wasEmpty = observers.isEmpty()
-            observers.add(observer) && wasEmpty
+            val wasAdded = observers.add(observer)
+            (wasAdded && wasEmpty) to wasAdded
         }
 
-        if (!initialAttach) return
+        if (initialAttach) {
+            try {
+                onObserversNotEmpty()
+            } catch (_: Throwable) {}
+        }
 
-        try {
-            onObserversNotEmpty()
-        } catch (_: Throwable) {}
+        return wasAdded
     }
 
     @JvmSynthetic
-    internal open fun unsubscribe(observer: OnEvent<Connectivity>) {
-        @OptIn(InternalKmpTorApi::class)
-        val lastRemoved = synchronized(lock) {
-            observers.remove(observer) && observers.isEmpty()
+    internal open fun unsubscribe(observer: OnEvent<Connectivity>): Boolean {
+        val (lastRemoved, wasRemoved) = synchronized(lock) {
+            val wasRemoved = observers.remove(observer)
+            (wasRemoved && observers.isEmpty()) to wasRemoved
         }
 
-        if (!lastRemoved) return
+        if (lastRemoved) {
+            try {
+                onObserversEmpty()
+            } catch (_: Throwable) {}
+        }
 
-        try {
-            onObserversEmpty()
-        } catch (_: Throwable) {}
+        return wasRemoved
     }
 
     /**
@@ -114,8 +118,8 @@ public abstract class NetworkObserver {
     }
 
     private data object NOOP: NetworkObserver() {
-        internal override fun subscribe(observer: OnEvent<Connectivity>) {}
-        internal override fun unsubscribe(observer: OnEvent<Connectivity>) {}
+        internal override fun subscribe(observer: OnEvent<Connectivity>): Boolean = false
+        internal override fun unsubscribe(observer: OnEvent<Connectivity>): Boolean = false
         public override fun isNetworkConnected(): Boolean = true
         public override fun toString(): String = "NetworkObserver.NOOP"
     }

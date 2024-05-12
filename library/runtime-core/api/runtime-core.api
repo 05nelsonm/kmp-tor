@@ -25,6 +25,44 @@ public final class io/matthewnelson/kmp/tor/runtime/core/Disposable$Companion {
 	public final fun noOp ()Lio/matthewnelson/kmp/tor/runtime/core/Disposable;
 }
 
+public abstract class io/matthewnelson/kmp/tor/runtime/core/EnqueuedJob {
+	public static final field Companion Lio/matthewnelson/kmp/tor/runtime/core/EnqueuedJob$Companion;
+	public final field name Ljava/lang/String;
+	protected fun <init> (Ljava/lang/String;Lio/matthewnelson/kmp/tor/runtime/core/OnFailure;Lio/matthewnelson/kmp/tor/runtime/core/UncaughtException$Handler;)V
+	public final fun cancel (Ljava/util/concurrent/CancellationException;)Z
+	public final fun cancellationException ()Ljava/util/concurrent/CancellationException;
+	public static final fun immediateErrorJob (Lio/matthewnelson/kmp/tor/runtime/core/OnFailure;Ljava/lang/String;Ljava/lang/Throwable;Lio/matthewnelson/kmp/tor/runtime/core/UncaughtException$Handler;)Lio/matthewnelson/kmp/tor/runtime/core/EnqueuedJob;
+	public static final fun immediateSuccessJob (Lio/matthewnelson/kmp/tor/runtime/core/OnSuccess;Ljava/lang/String;Ljava/lang/Object;Lio/matthewnelson/kmp/tor/runtime/core/UncaughtException$Handler;)Lio/matthewnelson/kmp/tor/runtime/core/EnqueuedJob;
+	public final fun invokeOnCompletion (Lio/matthewnelson/kmp/tor/runtime/core/ItBlock;)Lio/matthewnelson/kmp/tor/runtime/core/Disposable;
+	public final fun isActive ()Z
+	public final fun isCancelled ()Z
+	public final fun isCompleting ()Z
+	public final fun isError ()Z
+	public final fun isSuccess ()Z
+	protected fun onCancellation (Ljava/util/concurrent/CancellationException;)V
+	protected final fun onCompletion (Ljava/lang/Object;Lkotlin/jvm/functions/Function0;)Z
+	protected final fun onError (Ljava/lang/Throwable;Lio/matthewnelson/kmp/tor/runtime/core/ItBlock;)Z
+	protected final fun onExecuting ()V
+	public final fun state ()Lio/matthewnelson/kmp/tor/runtime/core/EnqueuedJob$State;
+	public final fun toString ()Ljava/lang/String;
+}
+
+public final class io/matthewnelson/kmp/tor/runtime/core/EnqueuedJob$Companion {
+	public final fun immediateErrorJob (Lio/matthewnelson/kmp/tor/runtime/core/OnFailure;Ljava/lang/String;Ljava/lang/Throwable;Lio/matthewnelson/kmp/tor/runtime/core/UncaughtException$Handler;)Lio/matthewnelson/kmp/tor/runtime/core/EnqueuedJob;
+	public final fun immediateSuccessJob (Lio/matthewnelson/kmp/tor/runtime/core/OnSuccess;Ljava/lang/String;Ljava/lang/Object;Lio/matthewnelson/kmp/tor/runtime/core/UncaughtException$Handler;)Lio/matthewnelson/kmp/tor/runtime/core/EnqueuedJob;
+}
+
+public final class io/matthewnelson/kmp/tor/runtime/core/EnqueuedJob$State : java/lang/Enum {
+	public static final field Cancelled Lio/matthewnelson/kmp/tor/runtime/core/EnqueuedJob$State;
+	public static final field Enqueued Lio/matthewnelson/kmp/tor/runtime/core/EnqueuedJob$State;
+	public static final field Error Lio/matthewnelson/kmp/tor/runtime/core/EnqueuedJob$State;
+	public static final field Executing Lio/matthewnelson/kmp/tor/runtime/core/EnqueuedJob$State;
+	public static final field Success Lio/matthewnelson/kmp/tor/runtime/core/EnqueuedJob$State;
+	public static fun getEntries ()Lkotlin/enums/EnumEntries;
+	public static fun valueOf (Ljava/lang/String;)Lio/matthewnelson/kmp/tor/runtime/core/EnqueuedJob$State;
+	public static fun values ()[Lio/matthewnelson/kmp/tor/runtime/core/EnqueuedJob$State;
+}
+
 public abstract class io/matthewnelson/kmp/tor/runtime/core/Event {
 	public final field name Ljava/lang/String;
 	protected fun <init> (Ljava/lang/String;)V
@@ -106,44 +144,6 @@ public abstract interface class io/matthewnelson/kmp/tor/runtime/core/OnSuccess 
 
 public final class io/matthewnelson/kmp/tor/runtime/core/OnSuccess$Companion {
 	public final fun noOp ()Lio/matthewnelson/kmp/tor/runtime/core/OnSuccess;
-}
-
-public abstract class io/matthewnelson/kmp/tor/runtime/core/QueuedJob {
-	public static final field Companion Lio/matthewnelson/kmp/tor/runtime/core/QueuedJob$Companion;
-	public final field name Ljava/lang/String;
-	protected fun <init> (Ljava/lang/String;Lio/matthewnelson/kmp/tor/runtime/core/OnFailure;Lio/matthewnelson/kmp/tor/runtime/core/UncaughtException$Handler;)V
-	public final fun cancel (Ljava/util/concurrent/CancellationException;)Z
-	public final fun cancellationException ()Ljava/util/concurrent/CancellationException;
-	public static final fun immediateErrorJob (Lio/matthewnelson/kmp/tor/runtime/core/OnFailure;Ljava/lang/String;Ljava/lang/Throwable;Lio/matthewnelson/kmp/tor/runtime/core/UncaughtException$Handler;)Lio/matthewnelson/kmp/tor/runtime/core/QueuedJob;
-	public static final fun immediateSuccessJob (Lio/matthewnelson/kmp/tor/runtime/core/OnSuccess;Ljava/lang/String;Ljava/lang/Object;Lio/matthewnelson/kmp/tor/runtime/core/UncaughtException$Handler;)Lio/matthewnelson/kmp/tor/runtime/core/QueuedJob;
-	public final fun invokeOnCompletion (Lio/matthewnelson/kmp/tor/runtime/core/ItBlock;)Lio/matthewnelson/kmp/tor/runtime/core/Disposable;
-	public final fun isActive ()Z
-	public final fun isCancelled ()Z
-	public final fun isCompleting ()Z
-	public final fun isError ()Z
-	public final fun isSuccess ()Z
-	protected fun onCancellation (Ljava/util/concurrent/CancellationException;)V
-	protected final fun onCompletion (Ljava/lang/Object;Lkotlin/jvm/functions/Function0;)Z
-	protected final fun onError (Ljava/lang/Throwable;Lio/matthewnelson/kmp/tor/runtime/core/ItBlock;)Z
-	protected final fun onExecuting ()V
-	public final fun state ()Lio/matthewnelson/kmp/tor/runtime/core/QueuedJob$State;
-	public final fun toString ()Ljava/lang/String;
-}
-
-public final class io/matthewnelson/kmp/tor/runtime/core/QueuedJob$Companion {
-	public final fun immediateErrorJob (Lio/matthewnelson/kmp/tor/runtime/core/OnFailure;Ljava/lang/String;Ljava/lang/Throwable;Lio/matthewnelson/kmp/tor/runtime/core/UncaughtException$Handler;)Lio/matthewnelson/kmp/tor/runtime/core/QueuedJob;
-	public final fun immediateSuccessJob (Lio/matthewnelson/kmp/tor/runtime/core/OnSuccess;Ljava/lang/String;Ljava/lang/Object;Lio/matthewnelson/kmp/tor/runtime/core/UncaughtException$Handler;)Lio/matthewnelson/kmp/tor/runtime/core/QueuedJob;
-}
-
-public final class io/matthewnelson/kmp/tor/runtime/core/QueuedJob$State : java/lang/Enum {
-	public static final field Cancelled Lio/matthewnelson/kmp/tor/runtime/core/QueuedJob$State;
-	public static final field Enqueued Lio/matthewnelson/kmp/tor/runtime/core/QueuedJob$State;
-	public static final field Error Lio/matthewnelson/kmp/tor/runtime/core/QueuedJob$State;
-	public static final field Executing Lio/matthewnelson/kmp/tor/runtime/core/QueuedJob$State;
-	public static final field Success Lio/matthewnelson/kmp/tor/runtime/core/QueuedJob$State;
-	public static fun getEntries ()Lkotlin/enums/EnumEntries;
-	public static fun valueOf (Ljava/lang/String;)Lio/matthewnelson/kmp/tor/runtime/core/QueuedJob$State;
-	public static fun values ()[Lio/matthewnelson/kmp/tor/runtime/core/QueuedJob$State;
 }
 
 public abstract interface class io/matthewnelson/kmp/tor/runtime/core/ThisBlock {
@@ -1370,7 +1370,7 @@ public abstract class io/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$Privileg
 }
 
 public abstract interface class io/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$Privileged$Processor : io/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$Unprivileged$Processor {
-	public abstract fun enqueue (Lio/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$Privileged;Lio/matthewnelson/kmp/tor/runtime/core/OnFailure;Lio/matthewnelson/kmp/tor/runtime/core/OnSuccess;)Lio/matthewnelson/kmp/tor/runtime/core/QueuedJob;
+	public abstract fun enqueue (Lio/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$Privileged;Lio/matthewnelson/kmp/tor/runtime/core/OnFailure;Lio/matthewnelson/kmp/tor/runtime/core/OnSuccess;)Lio/matthewnelson/kmp/tor/runtime/core/EnqueuedJob;
 }
 
 public final class io/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$Resolve : io/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$Unprivileged {
@@ -1460,7 +1460,7 @@ public abstract class io/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$Unprivil
 }
 
 public abstract interface class io/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$Unprivileged$Processor {
-	public abstract fun enqueue (Lio/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$Unprivileged;Lio/matthewnelson/kmp/tor/runtime/core/OnFailure;Lio/matthewnelson/kmp/tor/runtime/core/OnSuccess;)Lio/matthewnelson/kmp/tor/runtime/core/QueuedJob;
+	public abstract fun enqueue (Lio/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$Unprivileged;Lio/matthewnelson/kmp/tor/runtime/core/OnFailure;Lio/matthewnelson/kmp/tor/runtime/core/OnSuccess;)Lio/matthewnelson/kmp/tor/runtime/core/EnqueuedJob;
 }
 
 public final class io/matthewnelson/kmp/tor/runtime/core/key/AddressKey {

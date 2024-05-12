@@ -18,7 +18,7 @@ package io.matthewnelson.kmp.tor.runtime
 import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
 import io.matthewnelson.kmp.tor.runtime.core.OnFailure
 import io.matthewnelson.kmp.tor.runtime.core.OnSuccess
-import io.matthewnelson.kmp.tor.runtime.core.QueuedJob
+import io.matthewnelson.kmp.tor.runtime.core.EnqueuedJob
 import io.matthewnelson.kmp.tor.runtime.core.UncaughtException
 import io.matthewnelson.kmp.tor.runtime.ctrl.TorCtrl
 import kotlin.test.*
@@ -32,7 +32,7 @@ class ActionJobUnitTest {
     @Test
     fun givenStart_whenImmediate_thenIsExecuting() {
         val job = ActionJob.StartJob(OnSuccess.noOp(), OnFailure.noOp(), handler, immediateExecute = true)
-        assertEquals(QueuedJob.State.Executing, job.state)
+        assertEquals(EnqueuedJob.State.Executing, job.state)
 
         // Should not throw exception when invoked again (by RealTorRuntime)
         job.executing()

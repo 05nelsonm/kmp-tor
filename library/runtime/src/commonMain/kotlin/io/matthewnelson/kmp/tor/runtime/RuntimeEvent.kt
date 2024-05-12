@@ -19,7 +19,9 @@ package io.matthewnelson.kmp.tor.runtime
 
 import io.matthewnelson.kmp.tor.runtime.core.*
 import io.matthewnelson.kmp.tor.runtime.core.ctrl.TorCmd
+import io.matthewnelson.kmp.tor.runtime.internal.TorProcess
 import kotlin.jvm.JvmStatic
+import kotlin.jvm.JvmSynthetic
 
 /**
  * Events specific to [TorRuntime]
@@ -122,8 +124,26 @@ public sealed class RuntimeEvent<Data: Any> private constructor(
 
         /**
          * Warn level logging. These are non-fatal errors.
+         *
+         * **NOTE:** Stderr output from the tor process
+         * is redirected here.
+         *
+         * e.g.
+         *
+         *     // TorProcess[fid=ABCD…1234]@178263541 log
          * */
         public data object WARN: LOG("LOG_WARN")
+
+        /**
+         * All stdout from the tor process.
+         *
+         * Each invocation of [OnEvent] **will** be a single line,
+         * as that is how the `kmp-process` library is designed.
+         *
+         * **NOTE:** Any stderr output from the tor process is
+         * redirected to [LOG.WARN].
+         * */
+        public data object PROCESS: LOG("LOG_PROCESS")
     }
 
     // TODO: NEWNYM
@@ -228,7 +248,7 @@ public sealed class RuntimeEvent<Data: Any> private constructor(
 
         protected override val lazyEntries: ThisBlock<LinkedHashSet<RuntimeEvent<*>>> = ThisBlock {
             add(ERROR); add(EXECUTE.ACTION); add(EXECUTE.CMD); add(LIFECYCLE);
-            add(LOG.DEBUG); add(LOG.INFO); add(LOG.WARN);
+            add(LOG.DEBUG); add(LOG.INFO); add(LOG.WARN); add(LOG.PROCESS);
         }
     }
 
@@ -259,6 +279,10 @@ public sealed class RuntimeEvent<Data: Any> private constructor(
             @JvmStatic
             @Suppress("NOTHING_TO_INLINE")
             public inline fun Notifier.w(from: Any?, log: String) { log(LOG.WARN, from, log) }
+
+            @JvmSynthetic
+            @Suppress("NOTHING_TO_INLINE")
+            internal inline fun Notifier.p(from: TorProcess, log: String) { log(LOG.PROCESS, from, log) }
 
             @JvmStatic
             @Suppress("NOTHING_TO_INLINE")
