@@ -17,6 +17,7 @@ package io.matthewnelson.kmp.tor.runtime.service
 
 import android.app.Application
 import androidx.test.core.app.ApplicationProvider
+import io.matthewnelson.kmp.process.Blocking
 import io.matthewnelson.kmp.tor.resource.tor.TorResources
 import io.matthewnelson.kmp.tor.runtime.Action
 import io.matthewnelson.kmp.tor.runtime.Action.Companion.startDaemonSync
@@ -25,6 +26,7 @@ import io.matthewnelson.kmp.tor.runtime.Lifecycle
 import io.matthewnelson.kmp.tor.runtime.RuntimeEvent
 import io.matthewnelson.kmp.tor.runtime.TorRuntime
 import kotlin.test.*
+import kotlin.time.Duration.Companion.milliseconds
 
 class AndroidServiceFactoryTest {
 
@@ -64,6 +66,8 @@ class AndroidServiceFactoryTest {
 
         try {
             factory.startDaemonSync().stopDaemonSync()
+
+            Blocking.threadSleep(50.milliseconds)
 
             synchronized(lces) {
                 lces.assertContains("TorService", Lifecycle.Event.Name.OnUnbind)
@@ -105,18 +109,32 @@ class AndroidServiceFactoryTest {
             factory2.startDaemonSync()
 
             factory1.stopDaemonSync()
-            lces1.assertContains("RealTorRuntime", Lifecycle.Event.Name.OnDestroy)
-            lces1.assertContains("TorService", Lifecycle.Event.Name.OnUnbind)
 
-            lces1.assertDoesNotContain("TorService", Lifecycle.Event.Name.OnDestroy)
-            lces2.assertDoesNotContain("TorService", Lifecycle.Event.Name.OnDestroy)
+            Blocking.threadSleep(50.milliseconds)
+
+            synchronized(lces1) {
+                lces1.assertContains("RealTorRuntime", Lifecycle.Event.Name.OnDestroy)
+                lces1.assertContains("TorService", Lifecycle.Event.Name.OnUnbind)
+
+                lces1.assertDoesNotContain("TorService", Lifecycle.Event.Name.OnDestroy)
+            }
+            synchronized(lces2) {
+                lces2.assertDoesNotContain("TorService", Lifecycle.Event.Name.OnDestroy)
+            }
 
             factory2.stopDaemonSync()
-            lces1.assertContains("TorService", Lifecycle.Event.Name.OnDestroy)
 
-            lces2.assertContains("RealTorRuntime", Lifecycle.Event.Name.OnDestroy)
-            lces2.assertContains("TorService", Lifecycle.Event.Name.OnUnbind)
-            lces2.assertContains("TorService", Lifecycle.Event.Name.OnDestroy)
+            Blocking.threadSleep(50.milliseconds)
+
+            synchronized(lces1) {
+                lces1.assertContains("TorService", Lifecycle.Event.Name.OnDestroy)
+            }
+
+            synchronized(lces2) {
+                lces2.assertContains("RealTorRuntime", Lifecycle.Event.Name.OnDestroy)
+                lces2.assertContains("TorService", Lifecycle.Event.Name.OnUnbind)
+                lces2.assertContains("TorService", Lifecycle.Event.Name.OnDestroy)
+            }
         } catch (t: Throwable) {
             factory1.enqueue(Action.StopDaemon, {}, {})
             factory2.enqueue(Action.StopDaemon, {}, {})
