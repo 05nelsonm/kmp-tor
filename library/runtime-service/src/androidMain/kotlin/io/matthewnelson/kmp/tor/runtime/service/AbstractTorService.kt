@@ -85,7 +85,10 @@ internal sealed class AbstractTorService: Service() {
                 put(conn.binder, holder)
 
                 // Initialize lazy value
-                executables.add(Executable { holder.runtime })
+                executables.add(Executable {
+                    conn.binder.lce(Lifecycle.Event.OnBind(service))
+                    holder.runtime
+                })
 
                 executables
             }.forEach { it.execute() }
@@ -186,10 +189,6 @@ internal sealed class AbstractTorService: Service() {
                     application.stopService(Intent(application, TorService::class.java))
                 }
             }
-        }
-
-        init {
-            binder.lce(Lifecycle.Event.OnBind(this@AbstractTorService))
         }
     }
 

@@ -16,6 +16,7 @@
 package io.matthewnelson.kmp.tor.runtime.service
 
 import android.app.Application
+import android.os.Build
 import androidx.test.core.app.ApplicationProvider
 import io.matthewnelson.kmp.process.Blocking
 import io.matthewnelson.kmp.tor.resource.tor.TorResources
@@ -52,6 +53,11 @@ class AndroidServiceFactoryTest {
 
     @Test
     fun givenTorService_whenRuntimeDestroyed_thenServiceIsDestroyed() {
+        if (Build.VERSION.SDK_INT < 21) {
+            println("Skipping...")
+            return
+        }
+
         val environment = app.createTorRuntimeEnvironment(dirName = "sf_single") { dir -> TorResources(dir) }
         environment.debug = true
 
@@ -81,6 +87,11 @@ class AndroidServiceFactoryTest {
 
     @Test
     fun givenTorService_whenMultipleRuntime_thenServiceIsDestroyedWhenLastRuntimeDestroyed() {
+        if (Build.VERSION.SDK_INT < 21) {
+            println("Skipping...")
+            return
+        }
+
         val env1 = app.createTorRuntimeEnvironment(dirName = "sf_multi1") { dir -> TorResources(dir) }
         val env2 = app.createTorRuntimeEnvironment(dirName = "sf_multi2") { dir -> TorResources(dir) }
         env1.debug = true
