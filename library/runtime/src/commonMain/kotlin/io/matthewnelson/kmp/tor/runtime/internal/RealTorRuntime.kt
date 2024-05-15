@@ -186,13 +186,12 @@ internal class RealTorRuntime private constructor(
                 }
             }
 
-            if (job != null) {
-                actionStack.push(job)
-                actionProcessor.start()
-            }
+            if (job != null) actionStack.push(job)
 
             job
         }
+
+        if (job != null) actionProcessor.start()
 
         return job ?: onFailure.toImmediateErrorJob(
             action.name,
