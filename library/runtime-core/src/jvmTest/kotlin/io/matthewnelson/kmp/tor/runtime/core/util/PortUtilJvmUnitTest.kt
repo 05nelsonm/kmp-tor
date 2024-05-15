@@ -21,11 +21,10 @@ import io.matthewnelson.kmp.tor.runtime.core.address.IPAddress
 import io.matthewnelson.kmp.tor.runtime.core.internal.ServerSocketProducer.Companion.toServerSocketProducer
 
 @OptIn(ExperimentalStdlibApi::class)
-class PortUtilNonJsUnitTest: PortUtilBaseTest() {
+class PortUtilJvmUnitTest: PortUtilBaseTest() {
 
     override suspend fun openServerSocket(
         ipAddress: IPAddress,
-        port: Int,
-    ): AutoCloseable = ipAddress.toServerSocketProducer()
-        .open(port)
+        port: Int
+    ): AutoCloseable = ipAddress.toServerSocketProducer().open(port)
 }

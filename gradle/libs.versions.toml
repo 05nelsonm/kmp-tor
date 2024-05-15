@@ -15,6 +15,7 @@ kmp-process = "0.1.0-alpha03"
 kmp-tor-core = "2.0.0-alpha10"
 kmp-tor-resource = "408.10.0-SNAPSHOT"
 kotlinx-coroutines = "1.8.0"
+ktor = "2.3.11"
 
 [libraries]
 androidx-startup-runtime = { module = "androidx.startup:startup-runtime", version.ref = "androidx-startup" }
@@ -40,6 +41,7 @@ kotlinx-coroutines-android = { module = "org.jetbrains.kotlinx:kotlinx-coroutine
 kotlinx-coroutines-javafx = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-javafx", version.ref = "kotlinx-coroutines" }
 kotlinx-coroutines-swing = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-swing", version.ref = "kotlinx-coroutines" }
 kotlinx-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "kotlinx-coroutines" }
+ktor-network = { module = "io.ktor:ktor-network", version.ref = "ktor" }
 
 [plugins]
 android-app = { id = "com.android.application", version.ref = "gradle-android" }

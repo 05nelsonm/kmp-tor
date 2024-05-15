@@ -63,6 +63,11 @@ kmpConfiguration {
                         implementation(kotlincrypto.endians.endians)
                     }
                 }
+                val nativeTest = findByName("nativeTest")?.apply {
+                    dependencies {
+                        implementation(libs.ktor.network)
+                    }
+                }
 
                 if (jvmMain != null || nativeMain != null) {
                     val nonJsMain = maybeCreate("nonJsMain")
@@ -74,7 +79,7 @@ kmpConfiguration {
                     jvmMain?.apply { dependsOn(nonJsMain) }
                     findByName("jvmTest")?.apply { dependsOn(nonJsTest) }
                     nativeMain?.apply { dependsOn(nonJsMain) }
-                    findByName("nativeTest")?.apply { dependsOn(nonJsTest) }
+                    nativeTest?.apply { dependsOn(nonJsTest) }
                 }
             }
         }
