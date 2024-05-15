@@ -16,14 +16,11 @@
 package io.matthewnelson.kmp.tor.runtime
 
 import io.matthewnelson.kmp.tor.runtime.FileID.Companion.fidEllipses
-import io.matthewnelson.kmp.tor.runtime.core.TorConfig
 import kotlinx.coroutines.*
 import kotlin.test.fail
 import kotlin.time.Duration.Companion.milliseconds
 
 object TestUtils {
-
-    val socksAuto = ConfigBuilderCallback { put(TorConfig.__SocksPort) { asPort { auto() } } }
 
     suspend fun <T: Action.Processor> T.ensureStoppedOnTestCompletion(): T {
         currentCoroutineContext().job.invokeOnCompletion {

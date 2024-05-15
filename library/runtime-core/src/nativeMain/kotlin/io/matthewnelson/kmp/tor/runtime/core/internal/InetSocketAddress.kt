@@ -21,39 +21,52 @@ import io.matthewnelson.kmp.file.IOException
 import io.matthewnelson.kmp.file.errnoToIOException
 import io.matthewnelson.kmp.tor.runtime.core.address.IPAddress
 import kotlinx.cinterop.*
+import org.kotlincrypto.endians.BigEndian.Companion.toBigEndian
 import platform.posix.*
+import kotlin.experimental.ExperimentalNativeApi
 
 @OptIn(UnsafeNumber::class)
-internal sealed class InetAddress private constructor(internal val family: sa_family_t) {
+internal sealed class InetSocketAddress private constructor(
+    internal val family: sa_family_t,
+    internal val port: Int,
+) {
 
     internal class V4 internal constructor(
         family: sa_family_t,
+        port: Int,
         internal val address: in_addr_t,
-    ): InetAddress(family)
+    ): InetSocketAddress(family, port)
 
     internal class V6 internal constructor(
         family: sa_family_t,
+        port: Int,
         internal val flowInfo: uint32_t,
         internal val scopeId: uint32_t,
-    ): InetAddress(family)
+    ): InetSocketAddress(family, port)
 
     internal companion object {
 
         @Throws(IOException::class)
         @OptIn(ExperimentalForeignApi::class)
-        internal fun IPAddress.toInetAddress(): InetAddress = memScoped {
+        internal fun IPAddress.toInetSocketAddress(port: Int): InetSocketAddress = memScoped {
             val hint: CValue<addrinfo> = cValue {
-                ai_family = when (this@toInetAddress) {
+                ai_family = when (this@toInetSocketAddress) {
                     is IPAddress.V4 -> AF_INET
                     is IPAddress.V6 -> AF_INET6
                 }
                 ai_socktype = SOCK_STREAM
+
+                // This is only utilized for converting localhost
+                // IP address to the addrinfo struct, so AI_NUMERICHOST
+                // will mitigate any actual lookup performed by the
+                // host machine.
                 ai_flags = AI_NUMERICHOST
+
                 ai_protocol = 0
             }
 
             val result = alloc<CPointerVar<addrinfo>>()
-            if (getaddrinfo(value, null, hint, result.ptr) != 0) {
+            if (getaddrinfo(value, port.toString(), hint, result.ptr) != 0) {
                 throw errnoToIOException(errno)
             }
 
@@ -64,16 +77,27 @@ internal sealed class InetAddress private constructor(internal val family: sa_fa
                 ?.pointed
                 ?: throw IOException("Failed to retrieve sockaddr for ${canonicalHostname()}")
 
-            when (this@toInetAddress) {
+            when (this@toInetSocketAddress) {
                 is IPAddress.V4 -> {
                     val a = addr.reinterpret<sockaddr_in>()
-                    V4(addr.sa_family, a.sin_addr.s_addr)
+                    V4(a.sin_family, a.sin_port.toSinPort().toInt(), a.sin_addr.s_addr)
                 }
                 is IPAddress.V6 -> {
                     val a = addr.reinterpret<sockaddr_in6>()
-                    V6(addr.sa_family, a.sin6_flowinfo, a.sin6_scope_id)
+                    V6(a.sin6_family, a.sin6_port.toSinPort().toInt(), a.sin6_flowinfo, a.sin6_scope_id)
                 }
             }
+        }
+
+        private fun UShort.toSinPort(): UShort {
+            @OptIn(ExperimentalNativeApi::class)
+            if (!Platform.isLittleEndian) return this
+
+            return toShort()
+                .toBigEndian()
+                .toLittleEndian()
+                .toShort()
+                .toUShort()
         }
     }
 }
