@@ -431,7 +431,7 @@ internal class TorProcess private constructor(
             .toFile()
 
         val lines = ctrlPortFile
-            .awaitExists(3.seconds)
+            .awaitRead(3.seconds)
             .decodeToString()
             .lines()
             .mapNotNull { it.ifBlank { null } }
@@ -483,7 +483,7 @@ internal class TorProcess private constructor(
             .firstOrNull()
             ?.argument
             ?.toFile()
-            ?.awaitExists(1.seconds)
+            ?.awaitRead(1.seconds)
             ?.let { bytes -> TorCmd.Authenticate(cookie = bytes)  }
 
     } catch (t: Throwable) {
@@ -492,7 +492,7 @@ internal class TorProcess private constructor(
     } ?: TorCmd.Authenticate() // Unauthenticated
 
     @Throws(CancellationException::class, IOException::class)
-    private suspend fun File.awaitExists(timeout: Duration): ByteArray {
+    private suspend fun File.awaitRead(timeout: Duration): ByteArray {
         require(timeout >= 500.milliseconds) { "timeout must be greater than or equal to 500ms" }
 
         val startMark = TimeSource.Monotonic.markNow()
