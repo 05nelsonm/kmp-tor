@@ -16,7 +16,9 @@
 package io.matthewnelson.kmp.tor.runtime.service
 
 import android.app.Application
+import android.os.Build
 import androidx.test.core.app.ApplicationProvider
+import io.matthewnelson.kmp.process.Blocking
 import io.matthewnelson.kmp.tor.resource.tor.TorResources
 import io.matthewnelson.kmp.tor.runtime.Action
 import io.matthewnelson.kmp.tor.runtime.Action.Companion.startDaemonSync
@@ -25,6 +27,7 @@ import io.matthewnelson.kmp.tor.runtime.Lifecycle
 import io.matthewnelson.kmp.tor.runtime.RuntimeEvent
 import io.matthewnelson.kmp.tor.runtime.TorRuntime
 import kotlin.test.*
+import kotlin.time.Duration.Companion.milliseconds
 
 class AndroidServiceFactoryTest {
 
@@ -50,6 +53,11 @@ class AndroidServiceFactoryTest {
 
     @Test
     fun givenTorService_whenRuntimeDestroyed_thenServiceIsDestroyed() {
+        if (Build.VERSION.SDK_INT < 21) {
+            println("Skipping...")
+            return
+        }
+
         val environment = app.createTorRuntimeEnvironment(dirName = "sf_single") { dir -> TorResources(dir) }
         environment.debug = true
 
@@ -65,6 +73,8 @@ class AndroidServiceFactoryTest {
         try {
             factory.startDaemonSync().stopDaemonSync()
 
+            Blocking.threadSleep(50.milliseconds)
+
             synchronized(lces) {
                 lces.assertContains("TorService", Lifecycle.Event.Name.OnUnbind)
                 lces.assertContains("TorService", Lifecycle.Event.Name.OnDestroy)
@@ -77,6 +87,11 @@ class AndroidServiceFactoryTest {
 
     @Test
     fun givenTorService_whenMultipleRuntime_thenServiceIsDestroyedWhenLastRuntimeDestroyed() {
+        if (Build.VERSION.SDK_INT < 21) {
+            println("Skipping...")
+            return
+        }
+
         val env1 = app.createTorRuntimeEnvironment(dirName = "sf_multi1") { dir -> TorResources(dir) }
         val env2 = app.createTorRuntimeEnvironment(dirName = "sf_multi2") { dir -> TorResources(dir) }
         env1.debug = true
@@ -105,18 +120,32 @@ class AndroidServiceFactoryTest {
             factory2.startDaemonSync()
 
             factory1.stopDaemonSync()
-            lces1.assertContains("RealTorRuntime", Lifecycle.Event.Name.OnDestroy)
-            lces1.assertContains("TorService", Lifecycle.Event.Name.OnUnbind)
 
-            lces1.assertDoesNotContain("TorService", Lifecycle.Event.Name.OnDestroy)
-            lces2.assertDoesNotContain("TorService", Lifecycle.Event.Name.OnDestroy)
+            Blocking.threadSleep(50.milliseconds)
+
+            synchronized(lces1) {
+                lces1.assertContains("RealTorRuntime", Lifecycle.Event.Name.OnDestroy)
+                lces1.assertContains("TorService", Lifecycle.Event.Name.OnUnbind)
+
+                lces1.assertDoesNotContain("TorService", Lifecycle.Event.Name.OnDestroy)
+            }
+            synchronized(lces2) {
+                lces2.assertDoesNotContain("TorService", Lifecycle.Event.Name.OnDestroy)
+            }
 
             factory2.stopDaemonSync()
-            lces1.assertContains("TorService", Lifecycle.Event.Name.OnDestroy)
 
-            lces2.assertContains("RealTorRuntime", Lifecycle.Event.Name.OnDestroy)
-            lces2.assertContains("TorService", Lifecycle.Event.Name.OnUnbind)
-            lces2.assertContains("TorService", Lifecycle.Event.Name.OnDestroy)
+            Blocking.threadSleep(50.milliseconds)
+
+            synchronized(lces1) {
+                lces1.assertContains("TorService", Lifecycle.Event.Name.OnDestroy)
+            }
+
+            synchronized(lces2) {
+                lces2.assertContains("RealTorRuntime", Lifecycle.Event.Name.OnDestroy)
+                lces2.assertContains("TorService", Lifecycle.Event.Name.OnUnbind)
+                lces2.assertContains("TorService", Lifecycle.Event.Name.OnDestroy)
+            }
         } catch (t: Throwable) {
             factory1.enqueue(Action.StopDaemon, {}, {})
             factory2.enqueue(Action.StopDaemon, {}, {})

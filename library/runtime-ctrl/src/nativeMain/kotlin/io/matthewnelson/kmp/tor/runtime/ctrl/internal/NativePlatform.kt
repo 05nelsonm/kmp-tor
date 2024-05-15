@@ -44,7 +44,7 @@ internal actual fun ProxyAddress.connect(): CtrlConnection = memScoped {
     val hint: CValue<addrinfo> = cValue {
         ai_family = family
         ai_socktype = SOCK_STREAM
-        ai_flags = AI_PASSIVE or AI_NUMERICSERV
+        ai_flags = AI_NUMERICHOST
         ai_protocol = 0
     }
     val result = alloc<CPointerVar<addrinfo>>()

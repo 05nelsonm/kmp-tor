@@ -24,7 +24,7 @@ package io.matthewnelson.kmp.tor.runtime.core.internal
 import io.matthewnelson.kmp.file.IOException
 import io.matthewnelson.kmp.file.errnoToIOException
 import io.matthewnelson.kmp.tor.runtime.core.address.IPAddress
-import io.matthewnelson.kmp.tor.runtime.core.internal.InetAddress.Companion.toInetAddress
+import io.matthewnelson.kmp.tor.runtime.core.internal.InetSocketAddress.Companion.toInetSocketAddress
 import kotlinx.cinterop.*
 import org.kotlincrypto.endians.BigEndian.Companion.toBigEndian
 import platform.posix.*
@@ -37,7 +37,7 @@ internal actual value class ServerSocketProducer private actual constructor(
 
     @Throws(Exception::class)
     internal actual fun open(port: Int): AutoCloseable = memScoped {
-        val address = value as InetAddress
+        val address = (value as IPAddress).toInetSocketAddress(port)
 
         val descriptor = socket(address.family.convert(), SOCK_STREAM, 0)
         if (descriptor < 0) {
@@ -53,7 +53,7 @@ internal actual value class ServerSocketProducer private actual constructor(
         }
 
         // Enable address re-use
-        alloc<IntVar> { this.value = 1 }.let { reuseAddress ->
+        alloc<IntVar> { this.value = 0 }.let { reuseAddress ->
             setsockopt(descriptor, SOL_SOCKET, SO_REUSEADDR, reuseAddress.ptr, sizeOf<IntVar>().convert())
         }
         // Disable port re-use
@@ -68,7 +68,7 @@ internal actual value class ServerSocketProducer private actual constructor(
             throw IllegalStateException(message)
         }
 
-        address.doBind(port) { pointer, size ->
+        address.doBind { pointer, size ->
             if (bind(descriptor, pointer, size) != 0) {
                 val errno = errno
                 closeableDescriptor.use {}
@@ -98,22 +98,19 @@ internal actual value class ServerSocketProducer private actual constructor(
 
         @Throws(IOException::class)
         internal actual fun IPAddress.toServerSocketProducer(): ServerSocketProducer {
-            return ServerSocketProducer(toInetAddress())
+            return ServerSocketProducer(this)
         }
 
-        private fun InetAddress.doBind(
-            port: Int,
-            block: (CPointer<sockaddr>, socklen_t) -> Unit
-        ) {
+        private fun InetSocketAddress.doBind(block: (CPointer<sockaddr>, socklen_t) -> Unit) {
             when (this) {
-                is InetAddress.V4 -> cValue<sockaddr_in> {
+                is InetSocketAddress.V4 -> cValue<sockaddr_in> {
                     sin_family = family
                     sin_addr.s_addr = address
                     sin_port = port.toSinPort()
 
                     block(ptr.reinterpret(), sizeOf<sockaddr_in>().convert())
                 }
-                is InetAddress.V6 -> cValue<sockaddr_in6> {
+                is InetSocketAddress.V6 -> cValue<sockaddr_in6> {
                     sin6_family = family
                     sin6_flowinfo = flowInfo
                     sin6_port = port.toSinPort()

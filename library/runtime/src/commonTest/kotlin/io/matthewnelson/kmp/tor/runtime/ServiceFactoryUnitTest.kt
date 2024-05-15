@@ -89,7 +89,6 @@ class ServiceFactoryUnitTest {
         val lces = mutableListOf<Lifecycle.Event>()
         val runtime = TorRuntime.Builder(env("sf_create")) {
             observer(RuntimeEvent.LIFECYCLE.observer { lces.add(it) })
-            config(TestUtils.socksAuto)
         }.ensureStoppedOnTestCompletion()
 
         assertIs<TestFactory>(runtime)
@@ -100,9 +99,7 @@ class ServiceFactoryUnitTest {
 
     @Test
     fun givenInitializer_whenUsedMoreThanOnce_thenThrowsException() {
-        val factory = TorRuntime.Builder(env("sf_is_instance")) {
-            config(TestUtils.socksAuto)
-        } as TestFactory
+        val factory = TorRuntime.Builder(env("sf_is_instance")) {} as TestFactory
         assertFailsWith<IllegalStateException> {
             TestFactory(factory.initializer)
         }
@@ -110,9 +107,8 @@ class ServiceFactoryUnitTest {
 
     @Test
     fun givenBinder_whenBindAndOtherInstanceIsNotDestroyed_thenDestroysPriorInstance() = runTest {
-        val factory = TorRuntime.Builder(env("sf_multi_bind_destroy")) {
-            config(TestUtils.socksAuto)
-        }.ensureStoppedOnTestCompletion() as TestFactory
+        val factory = TorRuntime.Builder(env("sf_multi_bind_destroy")) {}
+            .ensureStoppedOnTestCompletion() as TestFactory
 
         val warnings = mutableListOf<String>()
         factory.subscribe(RuntimeEvent.LOG.WARN.observer { warnings.add(it) })
@@ -128,9 +124,8 @@ class ServiceFactoryUnitTest {
 
     @Test
     fun givenNoStart_whenBindWithoutEnqueue_thenAutoEnqueuesStartJob() = runTest {
-        val factory = TorRuntime.Builder(env("sf_enqueue_start")) {
-            config(TestUtils.socksAuto)
-        }.ensureStoppedOnTestCompletion() as TestFactory
+        val factory = TorRuntime.Builder(env("sf_enqueue_start")) {}
+            .ensureStoppedOnTestCompletion() as TestFactory
 
         val executes = mutableListOf<ActionJob>()
         factory.subscribe(RuntimeEvent.EXECUTE.ACTION.observer { executes.add(it) })
@@ -143,9 +138,7 @@ class ServiceFactoryUnitTest {
 
     @Test
     fun givenNoStart_whenTorCmd_thenThrowsException() = runTest {
-        val factory = TorRuntime.Builder(env("sf_enqueue_cmd_fail")) {
-            config(TestUtils.socksAuto)
-        } as TestFactory
+        val factory = TorRuntime.Builder(env("sf_enqueue_cmd_fail")) {} as TestFactory
         assertFailsWith<IllegalStateException> { factory.executeAsync(TorCmd.Signal.Dump) }
     }
 
@@ -166,7 +159,6 @@ class ServiceFactoryUnitTest {
             observerStatic(RuntimeEvent.LIFECYCLE) {
                 synchronized(lock) { lces.add(it) }
             }
-            config(TestUtils.socksAuto)
         } }.ensureStoppedOnTestCompletion() as TestFactory
 
         val actionJob = factory.enqueue(Action.StartDaemon, {}, {}) as ActionJob.StartJob
@@ -189,9 +181,7 @@ class ServiceFactoryUnitTest {
     @Test
     fun givenBindTimeout_whenManyJobs_thenAllAreCompletedAsExpected() = runTest {
         val factory = env("sf_timeout_interrupt", start = { /* do nothing */ }).let { env ->
-            TorRuntime.Builder(env) {
-                config(TestUtils.socksAuto)
-            }
+            TorRuntime.Builder(env) {}
         }.ensureStoppedOnTestCompletion()
 
         val onFailure = OnFailure { assertIs<InterruptedException>(it) }
@@ -237,9 +227,7 @@ class ServiceFactoryUnitTest {
 
     @Test
     fun givenActionStop_whenAlreadyStopped_thenIsImmediateSuccess() {
-        val factory = TorRuntime.Builder(env("sf_stop_immediate")) {
-            config(TestUtils.socksAuto)
-        }
+        val factory = TorRuntime.Builder(env("sf_stop_immediate")) {}
         val job = factory.enqueue(Action.StopDaemon, {}, {})
         assertEquals(EnqueuedJob.State.Success, job.state)
     }
@@ -254,7 +242,6 @@ class ServiceFactoryUnitTest {
 //                println(it)
                 synchronized(lock) { lces.add(it) }
             }
-            config(TestUtils.socksAuto)
         }.ensureStoppedOnTestCompletion()
 
         factory.startDaemonAsync()
@@ -305,7 +292,6 @@ class ServiceFactoryUnitTest {
 //                println(it)
                 synchronized(lock) { lces.add(it) }
             }
-            config(TestUtils.socksAuto)
             config { environment ->
                 apply(environment, failureScenario)
             }

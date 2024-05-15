@@ -186,13 +186,12 @@ internal class RealTorRuntime private constructor(
                 }
             }
 
-            if (job != null) {
-                actionStack.push(job)
-                actionProcessor.start()
-            }
+            if (job != null) actionStack.push(job)
 
             job
         }
+
+        if (job != null) actionProcessor.start()
 
         return job ?: onFailure.toImmediateErrorJob(
             action.name,
@@ -293,37 +292,19 @@ internal class RealTorRuntime private constructor(
         private suspend fun CoroutineScope.loop() {
             NOTIFIER.d(this@ActionProcessor, "Processing Jobs")
 
-            var retries = 0
-
-            // 500ms
-            val retryLimit = 10 * 5
-            val retryDelayTime = 10.milliseconds
-
             while (isActive) {
-                val (job, retry) = synchronized(processorLock) {
-                    val job = processStack()
+                val (executables, job) = synchronized(processorLock) {
+                    val result = processStack()
 
-                    val retry = if (job == null && retries++ >= retryLimit) {
-                        _processorJob = null
-                        false
-                    } else {
-                        true
-                    }
+                    val job = result.second
+                    if (job == null) _processorJob = null
 
-                    job to retry
+                    result
                 }
 
-                if (job == null) {
-                    if (retry) {
-//                        NOTIFIER.d(this@ActionProcessor, "Retry[${retries}]")
-                        delay(retryDelayTime)
-                        continue
-                    }
+                executables.forEach { it.execute() }
 
-                    break
-                } else {
-                    retries = 0
-                }
+                if (job == null) break
 
                 EXECUTE.ACTION.notifyObservers(job)
 
@@ -354,11 +335,11 @@ internal class RealTorRuntime private constructor(
             }
         }
 
-        private fun processStack(): ActionJob.Sealed? {
-            if (destroyed) return null
+        private fun processStack(): Pair<List<Executable>, ActionJob.Sealed?> {
+            if (destroyed) return emptyList<Executable>() to null
 
-            val (executables, execute) = synchronized(enqueueLock) {
-                if (actionStack.isEmpty()) {
+            return synchronized(enqueueLock) {
+                if (destroyed || actionStack.isEmpty()) {
                     return@synchronized emptyList<Executable>() to null
                 }
 
@@ -459,10 +440,6 @@ internal class RealTorRuntime private constructor(
 
                 executables to execute
             }
-
-            executables.forEach { it.execute() }
-
-            return execute
         }
 
         // Executing ActionJob's final state is that of Started (so either
