@@ -15,6 +15,7 @@
  **/
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
 import org.jetbrains.kotlin.konan.target.Family
+import org.jetbrains.kotlin.konan.target.HostManager
 
 plugins {
     id("configuration")
@@ -72,11 +73,13 @@ kmpConfiguration {
 fun List<KotlinNativeTarget>.unCInterop(
     cInteropDir: File,
 ): List<KotlinNativeTarget> {
-    forEach { target ->
-        if (target.konanTarget.family != Family.IOS) return@forEach
+    if (HostManager.hostIsMac) {
+        forEach { target ->
+            if (target.konanTarget.family != Family.IOS) return@forEach
 
-        target.compilations["main"].cinterops.create("un").apply {
-            defFile = cInteropDir.resolve("un.def")
+            target.compilations["main"].cinterops.create("un").apply {
+                defFile = cInteropDir.resolve("un.def")
+            }
         }
     }
 
