@@ -21,10 +21,14 @@ import io.matthewnelson.kmp.file.File
 import io.matthewnelson.kmp.tor.runtime.Action
 import io.matthewnelson.kmp.tor.runtime.TorRuntime
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlin.coroutines.cancellation.CancellationException
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.TimeSource
 
 @Suppress("NOTHING_TO_INLINE")
 internal expect inline fun TorRuntime.Environment.newRuntimeDispatcher(): CoroutineDispatcher
@@ -53,5 +57,20 @@ internal suspend inline fun <T: Action.Processor> T.commonExecuteAsync(
     continuation.invokeOnCancellation { t ->
         val e = if (t is CancellationException) t else CancellationException(t)
         job.cancel(e)
+    }
+}
+
+
+
+// No matter the Delay implementation (Coroutines Test library)
+// Will delay the specified duration using a TimeSource.
+internal suspend fun timedDelay(duration: Duration) {
+    if (duration <= 0.milliseconds) return
+
+    val startMark = TimeSource.Monotonic.markNow()
+    var remainder = duration
+    while (remainder > 1.milliseconds) {
+        delay(remainder)
+        remainder = duration - startMark.elapsedNow()
     }
 }

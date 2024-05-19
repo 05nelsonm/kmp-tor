@@ -59,7 +59,7 @@ internal class TorProcess private constructor(
     private val NOTIFIER: RuntimeEvent.Notifier,
     private val scope: CoroutineScope,
     private val state: FIDState,
-): FileID by generator {
+): FileID by generator.environment {
 
     @Throws(Throwable::class)
     private suspend fun <T: Any?> start(
@@ -161,7 +161,7 @@ internal class TorProcess private constructor(
     private suspend fun StartArgs.verifyConfig(paths: ResourceInstaller.Paths.Tor) {
         val sbStdout = StringBuilder()
         val sbStderr = StringBuilder()
-        val timeout = 1_250.milliseconds
+        val timeout = 500.milliseconds
 
         val (process, exitCode) = Process.Builder(command = paths.tor.path)
             .args("--verify-config")
@@ -189,14 +189,14 @@ internal class TorProcess private constructor(
 
                 timedDelay(150.milliseconds)
 
-                val exitCode = process.waitForAsync(timeout)
+                val exitCode = process.waitForAsync(timeout - 200.milliseconds)
 
                 timedDelay(50.milliseconds)
 
                 process to exitCode
             } // << destroy called
 
-        val finalExitCode = process
+        val exitCodeFinal = process
             .stdoutWaiter()
             .awaitStopAsync()
             .stderrWaiter()
@@ -247,7 +247,7 @@ internal class TorProcess private constructor(
 
             appendLine()
             append("    exitCode: ")
-            append(exitCode ?: finalExitCode)
+            append(exitCode ?: exitCodeFinal)
 
             appendLine()
             append("    processError: ")
@@ -518,19 +518,6 @@ internal class TorProcess private constructor(
         }
 
         throw IOException("Timed out after ${timeout.inWholeMilliseconds}ms waiting for tor to write to file[$this]")
-    }
-
-    // No matter the Delay implementation (Coroutines Test library)
-    // Will delay the specified duration using a TimeSource.
-    private suspend fun timedDelay(duration: Duration) {
-        if (duration <= 0.milliseconds) return
-
-        val startMark = TimeSource.Monotonic.markNow()
-        var remainder = duration
-        while (remainder > 1.milliseconds) {
-            delay(remainder)
-            remainder = duration - startMark.elapsedNow()
-        }
     }
 
     public override fun toString(): String = toFIDString(includeHashCode = true)
