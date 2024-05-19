@@ -161,29 +161,31 @@ internal class TorProcess private constructor(
                     .destroySignal(Signal.SIGTERM)
                     .spawn()
             } catch (e: IOException) {
-                NOTIFIER.lce(Lifecycle.Event.OnDestroy(this))
                 feed.error = e
                 return@launch
             }
 
-            NOTIFIER.lce(Lifecycle.Event.OnStart(this@TorProcess))
-            NOTIFIER.i(this@TorProcess, p.toString())
-
-            p.stdoutFeed(feed).stderrFeed { line ->
-                if (line == null) return@stderrFeed
-                NOTIFIER.w(this@TorProcess, line)
-            }
-
             try {
+                NOTIFIER.lce(Lifecycle.Event.OnStart(this@TorProcess))
+                NOTIFIER.i(this@TorProcess, p.toString())
+
+                p.stdoutFeed(feed).stderrFeed { line ->
+                    if (line == null) return@stderrFeed
+                    NOTIFIER.w(this@TorProcess, line)
+                }
+
                 p.waitForAsync()
             } finally {
-                state.stopMark = TimeSource.Monotonic.markNow()
                 p.destroy()
-                NOTIFIER.lce(Lifecycle.Event.OnDestroy(this@TorProcess))
             }
         }
 
         state.processJob = processJob
+
+        processJob.invokeOnCompletion {
+            state.stopMark = TimeSource.Monotonic.markNow()
+            NOTIFIER.lce(Lifecycle.Event.OnDestroy(this@TorProcess))
+        }
 
         withContext(NonCancellable) {
             timedDelay(250.milliseconds)
