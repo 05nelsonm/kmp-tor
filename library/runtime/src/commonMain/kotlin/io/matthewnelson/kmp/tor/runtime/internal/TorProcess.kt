@@ -88,18 +88,19 @@ internal class TorProcess private constructor(
         )
 
         val (feed, processJob) = startArgs.spawnProcess(paths)
-        val connection = config.awaitCtrlConnection(feed, processJob)
-        val authenticate = config.awaitAuthentication(feed, processJob)
-        val configLoad = TorCmd.Config.Load(startArgs.loadText)
-
-        val arguments = CtrlArguments(
-            processJob,
-            authenticate,
-            configLoad,
-            connection,
-        )
 
         val result = try {
+            val connection = config.awaitCtrlConnection(feed)
+            val authenticate = config.awaitAuthentication(feed)
+            val configLoad = TorCmd.Config.Load(startArgs.loadText)
+
+            val arguments = CtrlArguments(
+                processJob,
+                authenticate,
+                configLoad,
+                connection,
+            )
+
             connect(arguments)
         } catch (t: Throwable) {
             processJob.cancel()
@@ -126,7 +127,7 @@ internal class TorProcess private constructor(
 
         var wasNotified = false
         while (true) {
-            val duration = 500.milliseconds - lastStop.elapsedNow()
+            val duration = 350.milliseconds - lastStop.elapsedNow()
             if (duration < 1.milliseconds) break
 
             if (!wasNotified) {
@@ -146,61 +147,62 @@ internal class TorProcess private constructor(
     private suspend fun StartArgs.spawnProcess(
         paths: ResourceInstaller.Paths.Tor
     ): Pair<StdoutFeed, Job> {
+        val process = try {
+            Process.Builder(command = paths.tor.path)
+                .args(cmdLine)
+                // TODO: Add to TorRuntime.Environment ability to pass
+                //  process environment arguments.
+                .environment("HOME", generator.environment.workDirectory.path)
+                .stdin(Stdio.Null)
+                .stdout(Stdio.Pipe)
+                .stderr(Stdio.Pipe)
+                .destroySignal(Signal.SIGTERM)
+                .spawn()
+        } catch (e: IOException) {
+            NOTIFIER.lce(Lifecycle.Event.OnDestroy(this@TorProcess))
+            throw e
+        }
+
+        NOTIFIER.lce(Lifecycle.Event.OnStart(this@TorProcess))
+        NOTIFIER.i(this@TorProcess, process.toString())
+
         val feed = StdoutFeed()
 
-        val processJob = scope.launch {
-            val p: Process = try {
-                Process.Builder(command = paths.tor.path)
-                    .args(cmdLine)
-                    // TODO: Add to TorRuntime.Environment ability to pass
-                    //  process environment arguments.
-                    .environment("HOME", generator.environment.workDirectory.path)
-                    .stdin(Stdio.Null)
-                    .stdout(Stdio.Pipe)
-                    .stderr(Stdio.Pipe)
-                    .destroySignal(Signal.SIGTERM)
-                    .spawn()
-            } catch (e: IOException) {
-                feed.error = e
-                return@launch
-            }
-
-            try {
-                NOTIFIER.lce(Lifecycle.Event.OnStart(this@TorProcess))
-                NOTIFIER.i(this@TorProcess, p.toString())
-
-                p.stdoutFeed(feed).stderrFeed { line ->
-                    if (line == null) return@stderrFeed
-                    NOTIFIER.w(this@TorProcess, line)
-                }
-
-                p.waitForAsync()
-            } finally {
-                p.destroy()
-            }
+        process.stdoutFeed(feed).stderrFeed { line ->
+            if (line == null) return@stderrFeed
+            NOTIFIER.w(this@TorProcess, line)
         }
+
+        withContext(NonCancellable) {
+            if (process.waitForAsync(250.milliseconds) == null) return@withContext
+
+            // Process exited early. Ensure OutputFeeds
+            // have been flushed before destroying
+            timedDelay(50.milliseconds)
+
+            process.destroy()
+
+            process.stdoutWaiter()
+                .awaitStopAsync()
+                .stderrWaiter()
+                .awaitStopAsync()
+        }
+
+        val processJob = scope.launch { process.waitForAsync() }
 
         state.processJob = processJob
 
         processJob.invokeOnCompletion {
             state.stopMark = TimeSource.Monotonic.markNow()
+            process.destroy()
             NOTIFIER.lce(Lifecycle.Event.OnDestroy(this@TorProcess))
         }
-
-        withContext(NonCancellable) {
-            timedDelay(250.milliseconds)
-        }
-
-        feed.error?.let { err -> throw err }
 
         return feed to processJob
     }
 
     @Throws(Throwable::class)
-    private suspend fun TorConfig.awaitCtrlConnection(
-        feed: StdoutFeed,
-        processJob: Job,
-    ): CtrlArguments.Connection = try {
+    private suspend fun TorConfig.awaitCtrlConnection(feed: StdoutFeed): CtrlArguments.Connection {
         // Is **always** present in generated config.
         val ctrlPortFile = filterByKeyword<TorConfig.ControlPortWriteToFile.Companion>()
             .first()
@@ -215,59 +217,48 @@ internal class TorProcess private constructor(
 
         NOTIFIER.d(this@TorProcess, "ControlFile$lines")
 
-        run {
-            val addresses = ArrayList<String>(1)
+        val addresses = ArrayList<String>(1)
 
-            for (line in lines) {
-                val argument = line.substringAfter('=', "")
-                if (argument.isBlank()) continue
+        for (line in lines) {
+            val argument = line.substringAfter('=', "")
+            if (argument.isBlank()) continue
 
-                // UNIX_PORT=/tmp/kmp_tor_ctrl/data/ctrl.sock
-                if (line.startsWith("UNIX_PORT")) {
-                    val file = argument.toFile()
-                    if (!file.exists()) continue
+            // UNIX_PORT=/tmp/kmp_tor_ctrl/data/ctrl.sock
+            if (line.startsWith("UNIX_PORT")) {
+                val file = argument.toFile()
+                if (!file.exists()) continue
 
-                    // Prefer UnixDomainSocket if present
-                    return@run CtrlArguments.Connection(file)
-                }
-
-                // PORT=127.0.0.1:9055
-                if (line.startsWith("PORT")) {
-                    addresses.add(argument)
-                }
+                // Prefer UnixDomainSocket if present
+                return CtrlArguments.Connection(file)
             }
 
-            // No UnixDomainSocket, fallback to first TCP address
-            for (address in addresses) {
-                val proxyAddress = address.toProxyAddressOrNull() ?: continue
-                return@run CtrlArguments.Connection(proxyAddress)
+            // PORT=127.0.0.1:9055
+            if (line.startsWith("PORT")) {
+                addresses.add(argument)
             }
-
-            throw IOException("Failed to acquire control connection address from file[$ctrlPortFile]")
         }
-    } catch (t: Throwable) {
-        processJob.cancel()
-        throw t
+
+        // No UnixDomainSocket, fallback to first TCP address
+        for (address in addresses) {
+            val proxyAddress = address.toProxyAddressOrNull() ?: continue
+            return CtrlArguments.Connection(proxyAddress)
+        }
+
+        throw IOException("Failed to acquire control connection address from file[$ctrlPortFile]")
     }
 
     @Throws(Throwable::class)
-    private suspend fun TorConfig.awaitAuthentication(
-        feed: StdoutFeed,
-        processJob: Job,
-    ): TorCmd.Authenticate = try {
+    private suspend fun TorConfig.awaitAuthentication(feed: StdoutFeed): TorCmd.Authenticate {
         // TODO: HashedControlPassword Issue #1
 
-        filterByKeyword<TorConfig.CookieAuthFile.Companion>()
+        return filterByKeyword<TorConfig.CookieAuthFile.Companion>()
             .firstOrNull()
             ?.argument
             ?.toFile()
             ?.awaitRead(feed, 1.seconds)
             ?.let { bytes -> TorCmd.Authenticate(cookie = bytes)  }
-
-    } catch (t: Throwable) {
-        processJob.cancel()
-        throw t
-    } ?: TorCmd.Authenticate() // Unauthenticated
+            ?: TorCmd.Authenticate() // Unauthenticated
+    }
 
     @Throws(CancellationException::class, IOException::class)
     private suspend fun File.awaitRead(
@@ -275,6 +266,7 @@ internal class TorProcess private constructor(
         timeout: Duration,
     ): ByteArray {
         require(timeout >= 500.milliseconds) { "timeout must be greater than or equal to 500ms" }
+        feed.checkError()
 
         val startMark = TimeSource.Monotonic.markNow()
 
@@ -294,9 +286,7 @@ internal class TorProcess private constructor(
             }
 
             timedDelay(25.milliseconds)
-
-            feed.error?.let { err -> throw err }
-            state.processJob?.ensureActive()
+            feed.checkError()
 
             if (startMark.elapsedNow() > timeout) break
         }
@@ -313,7 +303,7 @@ internal class TorProcess private constructor(
         private val sb = StringBuilder()
 
         @Volatile
-        var error: IOException? = null
+        private var error: IOException? = null
 
         override fun onOutput(line: String?) {
             if (line == null) return
@@ -329,6 +319,9 @@ internal class TorProcess private constructor(
 
             NOTIFIER.p(this@TorProcess, line)
         }
+
+        @Throws(IOException::class)
+        fun checkError() { error?.let { err -> throw err } }
 
         private fun String.parseForError() {
             when {
