@@ -123,13 +123,13 @@ internal class TorProcess private constructor(
         job.cancelAndJoin()
         delay(ensureFinally)
 
-        // Need to ensure there is at least 350ms between last
+        // Need to ensure there is at least 500ms between last
         // process' stop, and this process' start for TorProcess
         val lastStop = stopMark ?: return
 
         var wasNotified = false
         while (true) {
-            val duration = 350.milliseconds - lastStop.elapsedNow()
+            val duration = 500.milliseconds - lastStop.elapsedNow()
             if (duration < 1.milliseconds) break
 
             if (!wasNotified) {
@@ -146,9 +146,7 @@ internal class TorProcess private constructor(
     }
 
     @Throws(Throwable::class)
-    private suspend fun StartArgs.spawnProcess(
-        paths: ResourceInstaller.Paths.Tor
-    ): Pair<StdoutFeed, Job> {
+    private suspend fun StartArgs.spawnProcess(paths: ResourceInstaller.Paths.Tor): Pair<StdoutFeed, Job> {
         val process = try {
             Process.Builder(command = paths.tor.path)
                 .args(cmdLine)
