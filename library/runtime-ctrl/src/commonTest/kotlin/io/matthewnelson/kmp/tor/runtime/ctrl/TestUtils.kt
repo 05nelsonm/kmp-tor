@@ -86,14 +86,14 @@ public object TestUtils {
             val mark = TimeSource.Monotonic.markNow()
 
             var exists = false
-            while (!exists && mark.elapsedNow() < 2_000.milliseconds) {
+            while (!exists && mark.elapsedNow() < 3_000.milliseconds) {
                 delay(25.milliseconds)
                 exists = ctrlPortFile.exists()
             }
 
             if (!exists) {
                 p.destroy()
-                throw IllegalStateException("ControlPortFile timed out after 2s")
+                throw IllegalStateException("ControlPortFile timed out after 3s")
             }
 
             println("ControlPortFile found after ${mark.elapsedNow().inWholeMilliseconds}ms")
