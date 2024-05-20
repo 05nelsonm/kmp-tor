@@ -60,10 +60,14 @@ internal class TorProcess private constructor(
 ): FileID by generator.environment {
 
     @Throws(Throwable::class)
-    private suspend fun <T: Any?> start(
-        connect: suspend CtrlArguments.() -> T
-    ): T = state.lock.withLock {
-        state.cancelAndJoinOtherProcess()
+    private suspend fun <T: Any?> start(connect: suspend CtrlArguments.() -> T): T = state.lock.withLock {
+        try {
+            NOTIFIER.lce(Lifecycle.Event.OnCreate(this))
+            state.cancelAndJoinOtherProcess()
+        } catch (t: Throwable) {
+            NOTIFIER.lce(Lifecycle.Event.OnDestroy(this))
+            throw t
+        }
 
         val (config, paths) = try {
             generator.generate(NOTIFIER)
@@ -465,10 +469,6 @@ internal class TorProcess private constructor(
                 return factory.connectAsync(tcp!!)
             }
         }
-    }
-
-    init {
-        NOTIFIER.lce(Lifecycle.Event.OnCreate(this))
     }
 
     internal companion object: InstanceKeeper<String, Any>() {
