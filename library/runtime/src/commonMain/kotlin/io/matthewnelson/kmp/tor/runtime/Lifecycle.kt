@@ -76,24 +76,26 @@ public class Lifecycle: Destroyable {
             @JvmStatic
             public fun OnCreate(obj: Any): Event = Event(obj, Name.OnCreate)
             @JvmStatic
-            public fun OnDestroy(obj: Any): Event = Event(obj, Name.OnDestroy)
-
-            // TorRuntime.ServiceFactory LCEs
-            @JvmStatic
             public fun OnStart(obj: Any): Event = Event(obj, Name.OnStart)
             @JvmStatic
-            public fun OnBind(obj: Any): Event = Event(obj, Name.OnBind)
-            @JvmStatic
-            public fun OnUnbind(obj: Any): Event = Event(obj, Name.OnUnbind)
-            @JvmStatic
-            public fun OnRemoved(obj: Any): Event = Event(obj, Name.OnRemoved)
-            @JvmStatic
-            public fun OnReturned(obj: Any): Event = Event(obj, Name.OnReturned)
+            public fun OnDestroy(obj: Any): Event = Event(obj, Name.OnDestroy)
 
             @JvmStatic
             public fun OnSubscribed(obj: Any): Event = Event(obj, Name.OnSubscribed)
             @JvmStatic
             public fun OnUnsubscribed(obj: Any): Event = Event(obj, Name.OnUnsubscribed)
+
+            // TorRuntime.ServiceFactory LCEs
+            @JvmStatic
+            public fun OnBind(obj: Any): Event = Event(obj, Name.OnBind)
+            @JvmStatic
+            public fun OnUnbind(obj: Any): Event = Event(obj, Name.OnUnbind)
+
+            // Android TorService LCEs
+            @JvmStatic
+            public fun OnRemoved(obj: Any): Event = Event(obj, Name.OnRemoved)
+            @JvmStatic
+            public fun OnReturned(obj: Any): Event = Event(obj, Name.OnReturned)
         }
 
         public class Name private constructor(private val value: String) {
@@ -103,24 +105,26 @@ public class Lifecycle: Destroyable {
                 @JvmField
                 public val OnCreate: Name = Name("onCreate")
                 @JvmField
-                public val OnDestroy: Name = Name("onDestroy")
-
-                // TorRuntime.ServiceFactory LCEs
-                @JvmField
                 public val OnStart: Name = Name("onStart")
                 @JvmField
-                public val OnBind: Name = Name("onBind")
-                @JvmField
-                public val OnUnbind: Name = Name("onUnbind")
-                @JvmField
-                public val OnRemoved: Name = Name("onRemoved")
-                @JvmField
-                public val OnReturned: Name = Name("onReturned")
+                public val OnDestroy: Name = Name("onDestroy")
 
                 @JvmField
                 public val OnSubscribed: Name = Name("onSubscribed")
                 @JvmField
                 public val OnUnsubscribed: Name = Name("onUnsubscribed")
+
+                // TorRuntime.ServiceFactory LCEs
+                @JvmField
+                public val OnBind: Name = Name("onBind")
+                @JvmField
+                public val OnUnbind: Name = Name("onUnbind")
+
+                // Android TorService LCEs
+                @JvmField
+                public val OnRemoved: Name = Name("onRemoved")
+                @JvmField
+                public val OnReturned: Name = Name("onReturned")
             }
 
             override fun equals(other: Any?): Boolean = other is Name && other.value == value

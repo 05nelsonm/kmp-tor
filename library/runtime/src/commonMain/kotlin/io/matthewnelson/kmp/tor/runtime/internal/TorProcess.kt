@@ -325,7 +325,7 @@ internal class TorProcess private constructor(
 
         private fun String.parseForError() {
             when {
-                contains(" [err] ") -> {}
+                contains(PROCESS_ERR) || contains(PROCESS_OTHER) -> {}
                 else -> return
             }
 
@@ -482,5 +482,8 @@ internal class TorProcess private constructor(
             @Volatile
             var stopMark: TimeSource.Monotonic.ValueTimeMark? = null
         }
+
+        private const val PROCESS_ERR: String = " [err] "
+        private const val PROCESS_OTHER: String = " [warn] It looks like another Tor process is running with the same data directory."
     }
 }
