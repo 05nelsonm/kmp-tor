@@ -17,13 +17,24 @@
 
 package io.matthewnelson.kmp.tor.runtime.internal
 
+import io.matthewnelson.kmp.file.InterruptedException
 import io.matthewnelson.kmp.tor.runtime.Lifecycle
 import io.matthewnelson.kmp.tor.runtime.NetworkObserver
 import io.matthewnelson.kmp.tor.runtime.RuntimeEvent
+import io.matthewnelson.kmp.tor.runtime.RuntimeEvent.Notifier.Companion.e
 import io.matthewnelson.kmp.tor.runtime.RuntimeEvent.Notifier.Companion.lce
+import io.matthewnelson.kmp.tor.runtime.core.Destroyable
 import io.matthewnelson.kmp.tor.runtime.core.OnEvent
+import io.matthewnelson.kmp.tor.runtime.core.TorConfig
 import io.matthewnelson.kmp.tor.runtime.core.ctrl.TorCmd
+import io.matthewnelson.kmp.tor.runtime.core.util.executeAsync
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import kotlin.concurrent.Volatile
+import kotlin.coroutines.cancellation.CancellationException
+import kotlin.time.Duration.Companion.milliseconds
 
 internal open class ObserverConnectivity internal constructor(
     private val processor: TorCmd.Unprivileged.Processor,
@@ -32,6 +43,9 @@ internal open class ObserverConnectivity internal constructor(
     private val scope: CoroutineScope,
 ): OnEvent<NetworkObserver.Connectivity> {
 
+    @Volatile
+    private var _job: Job? = null
+
     internal fun subscribe() {
         if (!networkObserver.subscribe(this)) return
         NOTIFIER.lce(Lifecycle.Event.OnSubscribed(this))
@@ -39,10 +53,35 @@ internal open class ObserverConnectivity internal constructor(
 
     internal fun unsubscribe() {
         if (!networkObserver.unsubscribe(this)) return
+        _job?.cancel()
         NOTIFIER.lce(Lifecycle.Event.OnUnsubscribed(this))
     }
 
-    final override fun invoke(it: NetworkObserver.Connectivity) {
-        // TODO
+    public final override fun invoke(it: NetworkObserver.Connectivity) {
+        if (processor is Destroyable && processor.isDestroyed()) return
+
+        // NetworkObserver.notify is synchronized already
+
+        _job?.cancel()
+        _job = scope.launch {
+            timedDelay(300.milliseconds)
+
+            if (processor is Destroyable && processor.isDestroyed()) return@launch
+
+            val setting = TorConfig.DisableNetwork.Builder {
+                disable = when (it) {
+                    NetworkObserver.Connectivity.Connected -> false
+                    NetworkObserver.Connectivity.Disconnected -> true
+                }
+            }
+
+            try {
+                processor.executeAsync(TorCmd.Config.Set(setting))
+            } catch (t: Throwable) {
+                if (t is CancellationException) throw t
+                if (t is InterruptedException) return@launch
+                NOTIFIER.e(t)
+            }
+        }
     }
 }

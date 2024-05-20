@@ -15,10 +15,7 @@
  **/
 package io.matthewnelson.kmp.tor.runtime
 
-import io.matthewnelson.kmp.file.InterruptedException
-import io.matthewnelson.kmp.file.SysTempDir
-import io.matthewnelson.kmp.file.resolve
-import io.matthewnelson.kmp.file.writeUtf8
+import io.matthewnelson.kmp.file.*
 import io.matthewnelson.kmp.tor.core.api.annotation.ExperimentalKmpTorApi
 import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
 import io.matthewnelson.kmp.tor.core.resource.SynchronizedObject
@@ -307,8 +304,6 @@ class ServiceFactoryUnitTest {
                 lces.assertContains("DestroyableTorRuntime", Lifecycle.Event.Name.OnDestroy)
                 lces.assertContains("TorProcess", Lifecycle.Event.Name.OnCreate)
                 lces.assertContains("TorProcess", Lifecycle.Event.Name.OnDestroy)
-
-                lces.assertDoesNotContain("TorProcess", Lifecycle.Event.Name.OnStart)
                 lces.clear()
             }
         }
@@ -322,7 +317,7 @@ class ServiceFactoryUnitTest {
             environment.torrcFile.writeUtf8("DNSPort -1")
         }
 
-        assertFailsWith<IllegalArgumentException> {
+        assertFailsWith<IOException> {
             try {
                 factory.startDaemonAsync()
             } catch (t: Throwable) {
@@ -345,7 +340,7 @@ class ServiceFactoryUnitTest {
         assertLCEs()
         assertTrue(startAction.isError)
         assertTrue(cmdAction.isError)
-        assertIs<IllegalArgumentException>(startAction.onErrorCause)
+        assertIs<IOException>(startAction.onErrorCause)
     }
 
     private fun TorRuntime.ServiceFactory.Binder.bind(
