@@ -60,10 +60,14 @@ internal class TorProcess private constructor(
 ): FileID by generator.environment {
 
     @Throws(Throwable::class)
-    private suspend fun <T: Any?> start(
-        connect: suspend CtrlArguments.() -> T
-    ): T = state.lock.withLock {
-        state.cancelAndJoinOtherProcess()
+    private suspend fun <T: Any?> start(connect: suspend CtrlArguments.() -> T): T = state.lock.withLock {
+        try {
+            NOTIFIER.lce(Lifecycle.Event.OnCreate(this))
+            state.cancelAndJoinOtherProcess()
+        } catch (t: Throwable) {
+            NOTIFIER.lce(Lifecycle.Event.OnDestroy(this))
+            throw t
+        }
 
         val (config, paths) = try {
             generator.generate(NOTIFIER)
@@ -107,6 +111,8 @@ internal class TorProcess private constructor(
             throw t
         }
 
+        feed.done()
+
         result
     }
 
@@ -121,13 +127,13 @@ internal class TorProcess private constructor(
         job.cancelAndJoin()
         delay(ensureFinally)
 
-        // Need to ensure there is at least 350ms between last
+        // Need to ensure there is at least 500ms between last
         // process' stop, and this process' start for TorProcess
         val lastStop = stopMark ?: return
 
         var wasNotified = false
         while (true) {
-            val duration = 350.milliseconds - lastStop.elapsedNow()
+            val duration = 500.milliseconds - lastStop.elapsedNow()
             if (duration < 1.milliseconds) break
 
             if (!wasNotified) {
@@ -144,9 +150,7 @@ internal class TorProcess private constructor(
     }
 
     @Throws(Throwable::class)
-    private suspend fun StartArgs.spawnProcess(
-        paths: ResourceInstaller.Paths.Tor
-    ): Pair<StdoutFeed, Job> {
+    private suspend fun StartArgs.spawnProcess(paths: ResourceInstaller.Paths.Tor): Pair<StdoutFeed, Job> {
         val process = try {
             Process.Builder(command = paths.tor.path)
                 .args(cmdLine)
@@ -176,8 +180,7 @@ internal class TorProcess private constructor(
         withContext(NonCancellable) {
             if (process.waitForAsync(250.milliseconds) == null) return@withContext
 
-            // Process exited early. Ensure OutputFeeds
-            // have been flushed before destroying
+            // Process exited early. Ensure OutputFeeds flush before destroying
             timedDelay(50.milliseconds)
 
             process.destroy()
@@ -296,11 +299,20 @@ internal class TorProcess private constructor(
 
     public override fun toString(): String = toFIDString(includeHashCode = true)
 
+    // Helper for catching tor startup errors while waiting
+    // for other startup steps to be completed. Tor will fail
+    // to start and indicate so via stdout within the first
+    // 10-20 lines of output.
+    //
+    // This will parse those lines and generate an IOException
+    // which can be thrown while polling files that tor writes
+    // data to (control port & cookie authentication).
     private inner class StdoutFeed: OutputFeed {
 
         @Volatile
         private var lines = 0
-        private val sb = StringBuilder()
+        @Volatile
+        private var sb = StringBuilder()
 
         @Volatile
         private var error: IOException? = null
@@ -323,11 +335,23 @@ internal class TorProcess private constructor(
         @Throws(IOException::class)
         fun checkError() { error?.let { err -> throw err } }
 
+        fun done() {
+            // Will inhibit from adding any more lines
+            lines = 50
+
+            // clear and de-reference
+            val sb = sb
+            this.sb = StringBuilder(/* capacity =*/ 1)
+
+            try {
+                val count = sb.count()
+                sb.clear()
+                repeat(count) { sb.append(' ') }
+            } catch (_: Throwable) {}
+        }
+
         private fun String.parseForError() {
-            when {
-                contains(" [err] ") -> {}
-                else -> return
-            }
+            if (!contains(PROCESS_ERR) && !contains(PROCESS_OTHER)) return
 
             val message = sb.toString()
 
@@ -447,10 +471,6 @@ internal class TorProcess private constructor(
         }
     }
 
-    init {
-        NOTIFIER.lce(Lifecycle.Event.OnCreate(this))
-    }
-
     internal companion object: InstanceKeeper<String, Any>() {
 
         @JvmSynthetic
@@ -482,5 +502,8 @@ internal class TorProcess private constructor(
             @Volatile
             var stopMark: TimeSource.Monotonic.ValueTimeMark? = null
         }
+
+        private const val PROCESS_ERR: String = " [err] "
+        private const val PROCESS_OTHER: String = " [warn] It looks like another Tor process is running with the same data directory."
     }
 }
