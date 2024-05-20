@@ -107,6 +107,8 @@ internal class TorProcess private constructor(
             throw t
         }
 
+        feed.done()
+
         result
     }
 
@@ -176,8 +178,7 @@ internal class TorProcess private constructor(
         withContext(NonCancellable) {
             if (process.waitForAsync(250.milliseconds) == null) return@withContext
 
-            // Process exited early. Ensure OutputFeeds
-            // have been flushed before destroying
+            // Process exited early. Ensure OutputFeeds flush before destroying
             timedDelay(50.milliseconds)
 
             process.destroy()
@@ -296,11 +297,20 @@ internal class TorProcess private constructor(
 
     public override fun toString(): String = toFIDString(includeHashCode = true)
 
+    // Helper for catching tor startup errors while waiting
+    // for other startup steps to be completed. Tor will fail
+    // to start and indicate so via stdout within the first
+    // 10-20 lines of output.
+    //
+    // This will parse those lines and generate an IOException
+    // which can be thrown while polling files that tor writes
+    // data to (control port & cookie authentication).
     private inner class StdoutFeed: OutputFeed {
 
         @Volatile
         private var lines = 0
-        private val sb = StringBuilder()
+        @Volatile
+        private var sb = StringBuilder()
 
         @Volatile
         private var error: IOException? = null
@@ -323,11 +333,23 @@ internal class TorProcess private constructor(
         @Throws(IOException::class)
         fun checkError() { error?.let { err -> throw err } }
 
+        fun done() {
+            // Will inhibit from adding any more lines
+            lines = 50
+
+            // clear and de-reference
+            val sb = sb
+            this.sb = StringBuilder(/* capacity =*/ 1)
+
+            try {
+                val count = sb.count()
+                sb.clear()
+                repeat(count) { sb.append(' ') }
+            } catch (_: Throwable) {}
+        }
+
         private fun String.parseForError() {
-            when {
-                contains(PROCESS_ERR) || contains(PROCESS_OTHER) -> {}
-                else -> return
-            }
+            if (!contains(PROCESS_ERR) && !contains(PROCESS_OTHER)) return
 
             val message = sb.toString()
 
