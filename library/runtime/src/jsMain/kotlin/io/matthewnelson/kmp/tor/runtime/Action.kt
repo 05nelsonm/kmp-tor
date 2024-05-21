@@ -18,12 +18,14 @@
 package io.matthewnelson.kmp.tor.runtime
 
 import io.matthewnelson.kmp.file.InterruptedException
+import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
 import io.matthewnelson.kmp.tor.runtime.core.*
 import io.matthewnelson.kmp.tor.runtime.core.ctrl.TorCmd
-import io.matthewnelson.kmp.tor.runtime.internal.commonExecuteAsync
+import io.matthewnelson.kmp.tor.runtime.core.util.awaitAsync
 import kotlin.coroutines.cancellation.CancellationException
 
-public actual enum class Action {
+@OptIn(InternalKmpTorApi::class)
+public actual enum class Action: EnqueuedJob.Argument {
 
     /**
      * Starts the tor daemon.
@@ -118,7 +120,11 @@ public actual enum class Action {
          * @see [restartDaemonAsync]
          * */
         //@Throws(Throwable::class)
-        public actual suspend fun <T: Processor> T.executeAsync(action: Action): T = commonExecuteAsync(action)
+        public actual suspend fun <T: Processor> T.executeAsync(action: Action): T {
+            @Suppress("DEPRECATION")
+            action.awaitAsync(this::enqueue)
+            return this
+        }
 
         /**
          * Starts the tor daemon, suspending the current coroutine
