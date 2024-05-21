@@ -63,18 +63,16 @@ class ProcessorUnitTest {
         var threw: Throwable? = null
         var invocationSuccess = 0
         try {
-            val ctrl = try {
-                factory.connectAsync(address)
-            } catch (_: Throwable) {
-                withContext(Dispatchers.Default) { delay(350.milliseconds) }
-                factory.connectAsync(address)
-            }
+            val ctrl = factory.connectAsync(address)
 
             val onFailure = OnFailure { threw = it }
             val onSuccess = OnSuccess<Reply.Success.OK> { synchronized(lock) { invocationSuccess++ } }
 
             ctrl.enqueue(TorCmd.Authenticate(TestUtils.AUTH_PASS), onFailure, onSuccess)
             ctrl.enqueue(TorCmd.SetEvents(TorEvent.entries()), onFailure, onSuccess)
+            ctrl.enqueue(TorCmd.Signal.Heartbeat, onFailure, onSuccess)
+            ctrl.enqueue(TorCmd.Signal.Heartbeat, onFailure, onSuccess)
+            ctrl.enqueue(TorCmd.Signal.Heartbeat, onFailure, onSuccess)
             ctrl.enqueue(TorCmd.Signal.Heartbeat, onFailure, onSuccess)
             ctrl.enqueue(TorCmd.Signal.Heartbeat, onFailure, onSuccess)
             ctrl.enqueue(TorCmd.Signal.Heartbeat, onFailure, onSuccess)
@@ -100,22 +98,19 @@ class ProcessorUnitTest {
         threw?.let { throw it }
 
         // All commands for our test executed successfully
-        assertEquals(10, invocationSuccess)
-        assertEquals(6, invocationIntercept)
+        assertEquals(13, invocationSuccess)
+        assertEquals(9, invocationIntercept)
 
         // Ensure that given our flurry of commands, a single processor
         // coroutine was started to handle them all.
         synchronized(lock) {
-            val processorStarts = debugLogs.mapNotNull {
-//                println(it)
-                if (it.contains("Processor Started")) it else null
-            }
+            val processorStarts = debugLogs.count { it.contains("Processor Started") }
 
             // Simply need to know if the processor handled multiple
             // commands when they were available, and other startProcessor
             // calls were ignored (b/c was already looping). Cannot utilize
             // a hard number because test will be flaky.
-            assertTrue(processorStarts.size < invocationSuccess)
+            assertTrue(processorStarts < invocationSuccess)
         }
     }
 }
