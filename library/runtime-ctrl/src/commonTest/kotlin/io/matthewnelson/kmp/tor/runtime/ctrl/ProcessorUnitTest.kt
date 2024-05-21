@@ -78,6 +78,9 @@ class ProcessorUnitTest {
             ctrl.enqueue(TorCmd.Signal.Heartbeat, onFailure, onSuccess)
             ctrl.enqueue(TorCmd.Signal.Heartbeat, onFailure, onSuccess)
             ctrl.enqueue(TorCmd.Signal.Heartbeat, onFailure, onSuccess)
+            ctrl.enqueue(TorCmd.Signal.Heartbeat, onFailure, onSuccess)
+            ctrl.enqueue(TorCmd.Signal.Heartbeat, onFailure, onSuccess)
+            ctrl.enqueue(TorCmd.Signal.Heartbeat, onFailure, onSuccess)
 
             // Suspends test until non-suspending complete
             ctrl.executeAsync(TorCmd.Signal.Dump)
@@ -97,8 +100,8 @@ class ProcessorUnitTest {
         threw?.let { throw it }
 
         // All commands for our test executed successfully
-        assertEquals(7, invocationSuccess)
-        assertEquals(3, invocationIntercept)
+        assertEquals(10, invocationSuccess)
+        assertEquals(6, invocationIntercept)
 
         // Ensure that given our flurry of commands, a single processor
         // coroutine was started to handle them all.
