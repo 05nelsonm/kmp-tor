@@ -513,12 +513,9 @@ internal class RealTorRuntime private constructor(
             check(cmdQueue != null) { "cmdQueue cannot be null" }
             cmdQueue.checkIsNotDestroyed()
 
-            cmdQueue.connection.let { connection ->
-                // Awaiting startup. Proceed
-                if (connection == null) return@let
-
+            cmdQueue.connection?.let { ctrl ->
                 // Should never be the case, but...
-                connection.checkIsNotDestroyed()
+                ctrl.checkIsNotDestroyed()
 
                 // Already started
                 NOTIFIER.d(this@ActionProcessor, "TorCtrl connection present. Already started.")
