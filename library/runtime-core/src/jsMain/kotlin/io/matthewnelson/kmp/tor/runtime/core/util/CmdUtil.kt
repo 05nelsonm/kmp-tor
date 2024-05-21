@@ -17,8 +17,8 @@
 
 package io.matthewnelson.kmp.tor.runtime.core.util
 
+import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
 import io.matthewnelson.kmp.tor.runtime.core.ctrl.TorCmd
-import io.matthewnelson.kmp.tor.runtime.core.internal.commonExecuteAsync
 
 /**
  * Enqueues the [cmd], suspending the current coroutine until completion
@@ -29,7 +29,11 @@ import io.matthewnelson.kmp.tor.runtime.core.internal.commonExecuteAsync
 // @Throws(Throwable::class)
 public actual suspend fun <Success: Any> TorCmd.Privileged.Processor.executeAsync(
     cmd: TorCmd.Privileged<Success>,
-): Success = commonExecuteAsync(cmd)
+): Success {
+    @Suppress("DEPRECATION")
+    @OptIn(InternalKmpTorApi::class)
+    return cmd.awaitAsync(this::enqueue)
+}
 
 /**
  * Enqueues the [cmd], suspending the current coroutine until completion
@@ -40,4 +44,8 @@ public actual suspend fun <Success: Any> TorCmd.Privileged.Processor.executeAsyn
 // @Throws(Throwable::class)
 public actual suspend fun <Success: Any> TorCmd.Unprivileged.Processor.executeAsync(
     cmd: TorCmd.Unprivileged<Success>,
-): Success = commonExecuteAsync(cmd)
+): Success {
+    @Suppress("DEPRECATION")
+    @OptIn(InternalKmpTorApi::class)
+    return cmd.awaitAsync(this::enqueue)
+}
