@@ -514,7 +514,7 @@ public sealed class TorCmd<Success: Any> private constructor(
              * @see [OnFailure]
              * @see [OnSuccess]
              * @see [io.matthewnelson.kmp.tor.runtime.core.util.executeSync]
-             * @see [io.matthewnelson.kmp.tor.runtime.core.util.awaitAsync]
+             * @see [io.matthewnelson.kmp.tor.runtime.core.util.executeAsync]
              * */
             public fun <Success: Any> enqueue(
                 cmd: Privileged<Success>,
@@ -555,7 +555,7 @@ public sealed class TorCmd<Success: Any> private constructor(
              * @see [OnFailure]
              * @see [OnSuccess]
              * @see [io.matthewnelson.kmp.tor.runtime.core.util.executeSync]
-             * @see [io.matthewnelson.kmp.tor.runtime.core.util.awaitAsync]
+             * @see [io.matthewnelson.kmp.tor.runtime.core.util.executeAsync]
              * */
             public fun <Success: Any> enqueue(
                 cmd: Unprivileged<Success>,
