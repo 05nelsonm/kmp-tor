@@ -256,12 +256,24 @@ class ServiceFactoryUnitTest {
             lces.clear()
         }
 
+        // Should already be started and do nothing
+        factory.startDaemonAsync()
+        withContext(Dispatchers.Default) { delay(50.milliseconds) }
+
+        synchronized(lock) { assertTrue(lces.isEmpty()) }
+
         factory.restartDaemonAsync()
         withContext(Dispatchers.Default) { delay(50.milliseconds) }
 
         synchronized(lock) {
+            // Old process stopped
             lces.assertContains("TorProcess", Lifecycle.Event.Name.OnDestroy, fid = factory)
             lces.assertContains("RealTorCtrl", Lifecycle.Event.Name.OnDestroy, fid = factory)
+
+            // New process started
+            lces.assertContains("TorProcess", Lifecycle.Event.Name.OnCreate, fid = factory)
+            lces.assertContains("TorProcess", Lifecycle.Event.Name.OnStart, fid = factory)
+            lces.assertContains("RealTorCtrl", Lifecycle.Event.Name.OnCreate, fid = factory)
 
             lces.assertDoesNotContain("RealTorRuntime", Lifecycle.Event.Name.OnDestroy, fid = factory)
             lces.assertDoesNotContain("DestroyableTorRuntime", Lifecycle.Event.Name.OnDestroy, fid = factory)

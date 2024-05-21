@@ -508,9 +508,19 @@ internal class RealTorRuntime private constructor(
             ensureActive()
 
             val cmdQueue = _cmdQueue
+
+            // Should never be the case, but...
             check(cmdQueue != null) { "cmdQueue cannot be null" }
             cmdQueue.checkIsNotDestroyed()
-            check(cmdQueue.connection == null) { "cmdQueue already has a connection attach" }
+
+            cmdQueue.connection?.let { ctrl ->
+                // Should never be the case, but...
+                ctrl.checkIsNotDestroyed()
+
+                // Already started
+                NOTIFIER.d(this@ActionProcessor, "TorCtrl connection present. Already started.")
+                return
+            }
 
             TorProcess.start(generator, NOTIFIER, scope, connect = {
                 val ctrl = connection.openWith(factory)

@@ -47,7 +47,7 @@ internal fun TorCmdJob<*>.respond(replies: ArrayList<Reply>) {
     }
 
     if (success == null) {
-        error(replies.toError())
+        error(replies.toError(name))
         return
     }
 

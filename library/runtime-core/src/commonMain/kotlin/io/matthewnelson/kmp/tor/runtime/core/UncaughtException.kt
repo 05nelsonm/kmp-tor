@@ -31,8 +31,8 @@ import kotlin.jvm.JvmSynthetic
  * @see [io.matthewnelson.kmp.tor.runtime.RuntimeEvent.ERROR]
  * */
 public class UncaughtException private constructor(
-    override val message: String,
-    override val cause: Throwable,
+    public override val message: String,
+    public override val cause: Throwable,
 ): Exception(message, cause) {
 
     /**

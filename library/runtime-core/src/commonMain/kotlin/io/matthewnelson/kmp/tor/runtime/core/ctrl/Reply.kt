@@ -112,16 +112,29 @@ public open class Reply private constructor(
      *
      * @see [toError]
      * */
-    public class Error private constructor(replies: List<Reply>): RuntimeException() {
+    public class Error private constructor(
+        @JvmField
+        public val jobName: String,
+        replies: List<Reply>
+    ): RuntimeException() {
 
         @JvmField
         public val replies: List<Reply> = replies.toImmutableList()
 
-        override val message: String by lazy { _message }
+        public override val message: String = buildString {
+            append("jobName: ")
+            append(jobName)
+            appendLine()
 
-        @Suppress("NOTHING_TO_INLINE", "KotlinRedundantDiagnosticSuppress")
-        private inline val _message: String get() = buildString {
-            replies.joinTo(this, separator = "\n")
+            append("replies: [")
+            for (reply in this@Error.replies) {
+                appendLine()
+                append("    ")
+                append(reply)
+            }
+
+            appendLine()
+            append(']')
         }
 
         public companion object {
@@ -129,25 +142,25 @@ public open class Reply private constructor(
             @JvmStatic
             @JvmName("get")
             @Throws(IllegalArgumentException::class)
-            public fun List<Reply>.toError(): Error {
+            public fun List<Reply>.toError(jobName: String): Error {
                 require(isNotEmpty()) { "replies cannot be empty" }
-                return Error(this)
+                return Error(jobName, this)
             }
         }
     }
 
-    override fun equals(other: Any?): Boolean {
+    public final override fun equals(other: Any?): Boolean {
         return  other is Reply
                 && other.status == status
                 && other.message == message
     }
 
-    override fun hashCode(): Int {
+    public final override fun hashCode(): Int {
         var result = 17
         result = result * 31 + status.hashCode()
         result = result * 31 + message.hashCode()
         return result
     }
 
-    override fun toString(): String = "$status $message"
+    public final override fun toString(): String = "$status $message"
 }
