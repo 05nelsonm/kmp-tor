@@ -21,13 +21,14 @@ import io.matthewnelson.kmp.file.InterruptedException
 import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
 import io.matthewnelson.kmp.tor.runtime.core.*
 import io.matthewnelson.kmp.tor.runtime.core.ctrl.TorCmd
+import io.matthewnelson.kmp.tor.runtime.core.util.awaitAsync
 import io.matthewnelson.kmp.tor.runtime.core.util.awaitSync
-import io.matthewnelson.kmp.tor.runtime.internal.commonExecuteAsync
 import kotlin.coroutines.cancellation.CancellationException
 import kotlin.jvm.JvmOverloads
 import kotlin.jvm.JvmStatic
 
-public actual enum class Action {
+@OptIn(InternalKmpTorApi::class)
+public actual enum class Action: EnqueuedJob.Argument {
 
     /**
      * Starts the tor daemon.
@@ -125,7 +126,11 @@ public actual enum class Action {
          * */
         @JvmStatic
         @Throws(Throwable::class)
-        public actual suspend fun <T: Processor> T.executeAsync(action: Action): T = commonExecuteAsync(action)
+        public actual suspend fun <T: Processor> T.executeAsync(action: Action): T {
+            @Suppress("DEPRECATION")
+            action.awaitAsync(this::enqueue)
+            return this
+        }
 
         /**
          * Enqueues the [action], blocking the current thread
@@ -138,7 +143,6 @@ public actual enum class Action {
          * @see [startDaemonSync]
          * @see [stopDaemonSync]
          * @see [restartDaemonSync]
-         * @see [awaitSync]
          * @see [executeAsync]
          * @param [cancellation] optional callback which is invoked
          *   after every thread sleep (so, multiple times) in order
@@ -152,19 +156,9 @@ public actual enum class Action {
             action: Action,
             cancellation: (() -> CancellationException?)? = null,
         ): T {
-            var failure: Throwable? = null
-            var success: T? = null
-
-            @OptIn(InternalKmpTorApi::class)
-            return enqueue(
-                action = action,
-                onFailure = { failure = it },
-                onSuccess = { success = this },
-            ).awaitSync(
-                success = { success },
-                failure = { failure },
-                cancellation = cancellation,
-            )
+            @Suppress("DEPRECATION")
+            action.awaitSync(this::enqueue, cancellation)
+            return this
         }
 
         /**
@@ -188,7 +182,6 @@ public actual enum class Action {
          *
          * @see [Processor.enqueue]
          * @see [Action.StartDaemon]
-         * @see [awaitSync]
          * @see [startDaemonAsync]
          * @param [cancellation] optional callback which is invoked
          *   after every thread sleep (so, multiple times) in order
@@ -224,7 +217,6 @@ public actual enum class Action {
          *
          * @see [Processor.enqueue]
          * @see [Action.StopDaemon]
-         * @see [awaitSync]
          * @see [stopDaemonAsync]
          * @param [cancellation] optional callback which is invoked
          *   after every thread sleep (so, multiple times) in order
@@ -260,7 +252,6 @@ public actual enum class Action {
          *
          * @see [Processor.enqueue]
          * @see [Action.RestartDaemon]
-         * @see [awaitSync]
          * @see [restartDaemonAsync]
          * @param [cancellation] optional callback which is invoked
          *   after every thread sleep (so, multiple times) in order

@@ -23,43 +23,62 @@ import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
 import io.matthewnelson.kmp.tor.runtime.core.OnFailure
 import io.matthewnelson.kmp.tor.runtime.core.OnSuccess
 import io.matthewnelson.kmp.tor.runtime.core.EnqueuedJob
+import io.matthewnelson.kmp.tor.runtime.core.internal.commonAwaitAsync
+import kotlin.contracts.ExperimentalContracts
+import kotlin.contracts.InvocationKind
+import kotlin.contracts.contract
 import kotlin.coroutines.cancellation.CancellationException
 import kotlin.jvm.JvmName
 import kotlin.time.Duration.Companion.milliseconds
 
-/**
- * Helper for building higher order, functional,
- * synchronous APIs.
- *
- * In the event that the caller thread is interrupted,
- * [EnqueuedJob.cancel] will be attempted. If successful,
- * the [CancellationException] will be thrown. If
- * unsuccessful, the [InterruptedException] is ignored
- * as the [EnqueuedJob] is in a non-cancellable state.
- *
- * [success] should **NOT** throw exception, and
- * should return the result of [OnSuccess].
- *
- * [failure] should **NOT** throw exception, and
- * should return the result of [OnFailure].
- *
- * [cancellation] callback (if non-null) is available
- * to check things between while loop execution. A return
- * value of null indicates "do not cancel". A return value of
- * [CancellationException] will pass it to [EnqueuedJob.cancel].
- * If unable to cancel the [EnqueuedJob] because it is in a
- * non-cancellable state, no further invocations of
- * [cancellation] will be had.
- *
- * @example [executeSync]
- * */
 @InternalKmpTorApi
 @Throws(Throwable::class)
-public fun <Response: Any> EnqueuedJob.awaitSync(
-    success: () -> Response?,
+@OptIn(ExperimentalContracts::class)
+@Deprecated("Not meant for public usage")
+public actual suspend inline fun <Arg: EnqueuedJob.Argument, Success: Any> Arg.awaitAsync(
+    enqueue: (arg: Arg, onFailure: OnFailure, onSuccess: OnSuccess<Success>) -> EnqueuedJob,
+): Success {
+    contract {
+        callsInPlace(enqueue, InvocationKind.AT_MOST_ONCE)
+    }
+
+    return commonAwaitAsync(enqueue)
+}
+
+@InternalKmpTorApi
+@Throws(Throwable::class)
+@OptIn(ExperimentalContracts::class)
+@Deprecated("Not meant for public usage")
+public inline fun <Arg: EnqueuedJob.Argument, Success: Any> Arg.awaitSync(
+    enqueue: (arg: Arg, onFailure: OnFailure, onSuccess: OnSuccess<Success>) -> EnqueuedJob,
+    noinline cancellation: (() -> CancellationException?)?,
+): Success {
+    contract {
+        callsInPlace(enqueue, InvocationKind.EXACTLY_ONCE)
+    }
+
+    var failure: Throwable? = null
+    var success: Success? = null
+
+    return enqueue(
+        this,
+        OnFailure { f -> failure = f },
+        OnSuccess { s -> success = s },
+    ).awaitSync(
+        success = { success },
+        failure = { failure },
+        cancellation = cancellation,
+    )
+}
+
+@PublishedApi
+@InternalKmpTorApi
+@Throws(Throwable::class)
+internal inline fun <Success: Any> EnqueuedJob.awaitSync(
+    success: () -> Success?,
     failure: () -> Throwable?,
-    cancellation: (() -> CancellationException?)?,
-): Response {
+    noinline cancellation: (() -> CancellationException?)?,
+): Success {
     var callback = cancellation
 
     while (isActive) {
@@ -97,12 +116,12 @@ public fun <Response: Any> EnqueuedJob.awaitSync(
         cancel(cause)
     }
 
-    if (state == EnqueuedJob.State.Success) {
+    if (isSuccess) {
         success()?.let { return it }
-        throw IllegalStateException("$this completed successfully, but no response was recovered by awaitSync.success()")
+        throw IllegalStateException("$this completed successfully, but no response was recovered")
     }
 
     throw cancellationException
         ?: failure()
-        ?: IllegalStateException("$this completed exceptionally, but no cause was recovered by awaitSync.failure()")
+        ?: IllegalStateException("$this completed exceptionally, but no cause was recovered")
 }

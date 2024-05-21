@@ -20,6 +20,7 @@ import io.matthewnelson.encoding.core.Encoder.Companion.encodeToString
 import io.matthewnelson.immutable.collections.immutableSetOf
 import io.matthewnelson.immutable.collections.toImmutableSet
 import io.matthewnelson.kmp.file.InterruptedException
+import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
 import io.matthewnelson.kmp.tor.runtime.core.*
 import io.matthewnelson.kmp.tor.runtime.core.address.IPAddress
 import io.matthewnelson.kmp.tor.runtime.core.address.OnionAddress
@@ -42,10 +43,11 @@ import kotlin.jvm.JvmField
  * @see [Privileged.Processor]
  * @see [Unprivileged.Processor]
  * */
+@OptIn(InternalKmpTorApi::class)
 public sealed class TorCmd<Success: Any> private constructor(
     @JvmField
     public val keyword: String,
-) {
+): EnqueuedJob.Argument {
 
     /**
      * "AUTHENTICATE"

@@ -1,4 +1,4 @@
-public final class io/matthewnelson/kmp/tor/runtime/Action : java/lang/Enum {
+public final class io/matthewnelson/kmp/tor/runtime/Action : java/lang/Enum, io/matthewnelson/kmp/tor/runtime/core/EnqueuedJob$Argument {
 	public static final field Companion Lio/matthewnelson/kmp/tor/runtime/Action$Companion;
 	public static final field RestartDaemon Lio/matthewnelson/kmp/tor/runtime/Action;
 	public static final field StartDaemon Lio/matthewnelson/kmp/tor/runtime/Action;

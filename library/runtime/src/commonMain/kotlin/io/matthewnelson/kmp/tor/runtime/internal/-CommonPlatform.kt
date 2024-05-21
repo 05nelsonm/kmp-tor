@@ -18,14 +18,9 @@
 package io.matthewnelson.kmp.tor.runtime.internal
 
 import io.matthewnelson.kmp.file.File
-import io.matthewnelson.kmp.tor.runtime.Action
 import io.matthewnelson.kmp.tor.runtime.TorRuntime
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.suspendCancellableCoroutine
-import kotlin.coroutines.cancellation.CancellationException
-import kotlin.coroutines.resume
-import kotlin.coroutines.resumeWithException
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.TimeSource
@@ -38,29 +33,6 @@ internal expect fun File.setDirectoryPermissions()
 
 @Throws(Throwable::class)
 internal expect fun File.setFilePermissions()
-
-@Throws(Throwable::class)
-@Suppress("NOTHING_TO_INLINE")
-internal suspend inline fun <T: Action.Processor> T.commonExecuteAsync(
-    action: Action,
-): T = suspendCancellableCoroutine { continuation ->
-    val job = enqueue(
-        action = action,
-        onFailure = { t ->
-            continuation.resumeWithException(t)
-        },
-        onSuccess = {
-            continuation.resume(this)
-        }
-    )
-
-    continuation.invokeOnCancellation { t ->
-        val e = if (t is CancellationException) t else CancellationException(t)
-        job.cancel(e)
-    }
-}
-
-
 
 // No matter the Delay implementation (Coroutines Test library)
 // Will delay the specified duration using a TimeSource.

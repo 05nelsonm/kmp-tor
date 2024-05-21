@@ -441,4 +441,17 @@ public abstract class EnqueuedJob protected constructor(
             init { onCompletion(response) { this@toImmediateSuccessJob } }
         }
     }
+
+    /**
+     * Helper for creating argument based processor agnostic
+     * extension functions for Async/Sync APIs.
+     *
+     * @see [io.matthewnelson.kmp.tor.runtime.Action.Processor]
+     * @see [io.matthewnelson.kmp.tor.runtime.core.ctrl.TorCmd.Privileged.Processor]
+     * @see [io.matthewnelson.kmp.tor.runtime.core.ctrl.TorCmd.Unprivileged.Processor]
+     * @see [io.matthewnelson.kmp.tor.runtime.core.util.awaitAsync]
+     * @see [io.matthewnelson.kmp.tor.runtime.core.util.awaitSync]
+     * */
+    @InternalKmpTorApi
+    public interface Argument
 }

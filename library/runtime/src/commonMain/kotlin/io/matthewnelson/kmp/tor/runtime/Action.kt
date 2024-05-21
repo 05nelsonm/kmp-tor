@@ -18,11 +18,13 @@
 package io.matthewnelson.kmp.tor.runtime
 
 import io.matthewnelson.kmp.file.InterruptedException
+import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
 import io.matthewnelson.kmp.tor.runtime.core.*
 import io.matthewnelson.kmp.tor.runtime.core.ctrl.TorCmd
 import kotlin.coroutines.cancellation.CancellationException
 
-public expect enum class Action {
+@OptIn(InternalKmpTorApi::class)
+public expect enum class Action: EnqueuedJob.Argument {
 
     /**
      * Starts the tor daemon.
