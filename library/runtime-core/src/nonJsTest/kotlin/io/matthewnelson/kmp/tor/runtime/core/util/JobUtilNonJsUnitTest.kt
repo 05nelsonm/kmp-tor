@@ -29,6 +29,7 @@ import kotlin.test.*
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.TimeSource
 
+@Suppress("DEPRECATION_ERROR")
 @OptIn(InternalKmpTorApi::class)
 class JobUtilNonJsUnitTest {
 

@@ -26,6 +26,7 @@ import java.util.concurrent.TimeoutException
 import kotlin.test.*
 import kotlin.time.Duration.Companion.milliseconds
 
+@Suppress("DEPRECATION_ERROR")
 @OptIn(InternalKmpTorApi::class)
 class JobUtilJvmUnitTest {
 

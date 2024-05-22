@@ -30,7 +30,7 @@ import io.matthewnelson.kmp.tor.runtime.core.ctrl.TorCmd
 public actual suspend fun <Success: Any> TorCmd.Privileged.Processor.executeAsync(
     cmd: TorCmd.Privileged<Success>,
 ): Success {
-    @Suppress("DEPRECATION")
+    @Suppress("DEPRECATION_ERROR")
     @OptIn(InternalKmpTorApi::class)
     return cmd.awaitAsync(this::enqueue)
 }
@@ -45,7 +45,7 @@ public actual suspend fun <Success: Any> TorCmd.Privileged.Processor.executeAsyn
 public actual suspend fun <Success: Any> TorCmd.Unprivileged.Processor.executeAsync(
     cmd: TorCmd.Unprivileged<Success>,
 ): Success {
-    @Suppress("DEPRECATION")
+    @Suppress("DEPRECATION_ERROR")
     @OptIn(InternalKmpTorApi::class)
     return cmd.awaitAsync(this::enqueue)
 }

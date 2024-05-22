@@ -24,7 +24,7 @@ import kotlinx.coroutines.test.runTest
 import kotlin.test.*
 import kotlin.time.Duration.Companion.milliseconds
 
-@Suppress("DEPRECATION")
+@Suppress("DEPRECATION_ERROR")
 @OptIn(InternalKmpTorApi::class)
 class JobUtilUnitTest {
 

@@ -122,7 +122,7 @@ public actual enum class Action: EnqueuedJob.Argument {
          * */
         //@Throws(Throwable::class)
         public actual suspend fun <T: Processor> T.executeAsync(action: Action): T {
-            @Suppress("DEPRECATION")
+            @Suppress("DEPRECATION_ERROR")
             action.awaitAsync(this::enqueue)
             return this
         }
