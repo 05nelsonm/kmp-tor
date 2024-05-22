@@ -46,7 +46,6 @@ internal suspend inline fun <Arg: EnqueuedJob.Argument, Success: Any> Arg.common
 
     val cancellable = Job(currentCoroutineContext()[Job])
     cancellable.ensureActive()
-    val nonCancellable = Job()
 
     var failure: Throwable? = null
     var success: Success? = null
@@ -57,10 +56,7 @@ internal suspend inline fun <Arg: EnqueuedJob.Argument, Success: Any> Arg.common
         OnSuccess { s -> success = s },
     )
 
-    job.invokeOnCompletion {
-        cancellable.complete()
-        nonCancellable.complete()
-    }
+    job.invokeOnCompletion { cancellable.complete() }
 
     try {
         cancellable.join()
@@ -69,8 +65,12 @@ internal suspend inline fun <Arg: EnqueuedJob.Argument, Success: Any> Arg.common
         job.cancel(e)
     }
 
-    // Wait for EnqueuedJob completion
-    withContext(NonCancellable) { nonCancellable.join() }
+    // EnqueuedJob.cancel was unsuccessful. Wait for completion.
+    if (job.isActive) {
+        val nonCancellable = Job()
+        job.invokeOnCompletion { nonCancellable.complete() }
+        withContext(NonCancellable) { nonCancellable.join() }
+    }
 
     if (job.isSuccess) {
         success?.let { return it }
