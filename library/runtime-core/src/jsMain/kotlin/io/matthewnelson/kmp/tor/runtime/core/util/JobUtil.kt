@@ -29,7 +29,7 @@ import kotlin.contracts.contract
 @InternalKmpTorApi
 //@Throws(Throwable::class)
 @OptIn(ExperimentalContracts::class)
-@Deprecated("Not meant for public usage")
+@Deprecated("Not meant for public usage", level = DeprecationLevel.ERROR)
 public actual suspend inline fun <Arg: EnqueuedJob.Argument, Success: Any> Arg.awaitAsync(
     enqueue: (arg: Arg, onFailure: OnFailure, onSuccess: OnSuccess<Success>) -> EnqueuedJob,
 ): Success {

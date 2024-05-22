@@ -34,7 +34,7 @@ import kotlin.jvm.JvmOverloads
 public actual suspend fun <Success: Any> TorCmd.Privileged.Processor.executeAsync(
     cmd: TorCmd.Privileged<Success>,
 ): Success {
-    @Suppress("DEPRECATION")
+    @Suppress("DEPRECATION_ERROR")
     @OptIn(InternalKmpTorApi::class)
     return cmd.awaitAsync(this::enqueue)
 }
@@ -50,7 +50,7 @@ public actual suspend fun <Success: Any> TorCmd.Privileged.Processor.executeAsyn
 public actual suspend fun <Success: Any> TorCmd.Unprivileged.Processor.executeAsync(
     cmd: TorCmd.Unprivileged<Success>,
 ): Success {
-    @Suppress("DEPRECATION")
+    @Suppress("DEPRECATION_ERROR")
     @OptIn(InternalKmpTorApi::class)
     return cmd.awaitAsync(this::enqueue)
 }
@@ -75,7 +75,7 @@ public fun <Success: Any> TorCmd.Privileged.Processor.executeSync(
     cmd: TorCmd.Privileged<Success>,
     cancellation: (() -> CancellationException?)? = null,
 ): Success {
-    @Suppress("DEPRECATION")
+    @Suppress("DEPRECATION_ERROR")
     @OptIn(InternalKmpTorApi::class)
     return cmd.awaitSync(this::enqueue, cancellation)
 }
@@ -100,7 +100,7 @@ public fun <Success: Any> TorCmd.Unprivileged.Processor.executeSync(
     cmd: TorCmd.Unprivileged<Success>,
     cancellation: (() -> CancellationException?)? = null,
 ): Success {
-    @Suppress("DEPRECATION")
+    @Suppress("DEPRECATION_ERROR")
     @OptIn(InternalKmpTorApi::class)
     return cmd.awaitSync(this::enqueue, cancellation)
 }

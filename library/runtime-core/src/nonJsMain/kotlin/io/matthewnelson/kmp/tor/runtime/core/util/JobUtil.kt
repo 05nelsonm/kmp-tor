@@ -34,7 +34,7 @@ import kotlin.time.Duration.Companion.milliseconds
 @InternalKmpTorApi
 @Throws(Throwable::class)
 @OptIn(ExperimentalContracts::class)
-@Deprecated("Not meant for public usage")
+@Deprecated("Not meant for public usage", level = DeprecationLevel.ERROR)
 public actual suspend inline fun <Arg: EnqueuedJob.Argument, Success: Any> Arg.awaitAsync(
     enqueue: (arg: Arg, onFailure: OnFailure, onSuccess: OnSuccess<Success>) -> EnqueuedJob,
 ): Success {
@@ -48,7 +48,7 @@ public actual suspend inline fun <Arg: EnqueuedJob.Argument, Success: Any> Arg.a
 @InternalKmpTorApi
 @Throws(Throwable::class)
 @OptIn(ExperimentalContracts::class)
-@Deprecated("Not meant for public usage")
+@Deprecated("Not meant for public usage", level = DeprecationLevel.ERROR)
 public inline fun <Arg: EnqueuedJob.Argument, Success: Any> Arg.awaitSync(
     enqueue: (arg: Arg, onFailure: OnFailure, onSuccess: OnSuccess<Success>) -> EnqueuedJob,
     noinline cancellation: (() -> CancellationException?)?,
@@ -60,6 +60,7 @@ public inline fun <Arg: EnqueuedJob.Argument, Success: Any> Arg.awaitSync(
     var failure: Throwable? = null
     var success: Success? = null
 
+    @Suppress("DEPRECATION_ERROR")
     return enqueue(
         this,
         OnFailure { f -> failure = f },
@@ -74,6 +75,7 @@ public inline fun <Arg: EnqueuedJob.Argument, Success: Any> Arg.awaitSync(
 @PublishedApi
 @InternalKmpTorApi
 @Throws(Throwable::class)
+@Deprecated("Not meant for public usage", level = DeprecationLevel.ERROR)
 internal inline fun <Success: Any> EnqueuedJob.awaitSync(
     success: () -> Success?,
     failure: () -> Throwable?,

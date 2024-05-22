@@ -128,7 +128,7 @@ public actual enum class Action: EnqueuedJob.Argument {
         @JvmStatic
         @Throws(Throwable::class)
         public actual suspend fun <T: Processor> T.executeAsync(action: Action): T {
-            @Suppress("DEPRECATION")
+            @Suppress("DEPRECATION_ERROR")
             action.awaitAsync(this::enqueue)
             return this
         }
@@ -157,7 +157,7 @@ public actual enum class Action: EnqueuedJob.Argument {
             action: Action,
             cancellation: (() -> CancellationException?)? = null,
         ): T {
-            @Suppress("DEPRECATION")
+            @Suppress("DEPRECATION_ERROR")
             action.awaitSync(this::enqueue, cancellation)
             return this
         }

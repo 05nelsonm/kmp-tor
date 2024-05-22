@@ -44,10 +44,8 @@ internal suspend inline fun <Arg: EnqueuedJob.Argument, Success: Any> Arg.common
         callsInPlace(enqueue, InvocationKind.AT_MOST_ONCE)
     }
 
-    val coroutineJob = currentCoroutineContext()[Job]
-    coroutineJob?.ensureActive()
-
-    val latch = Job()
+    val cancellable = Job(currentCoroutineContext()[Job])
+    cancellable.ensureActive()
 
     var failure: Throwable? = null
     var success: Success? = null
@@ -58,23 +56,21 @@ internal suspend inline fun <Arg: EnqueuedJob.Argument, Success: Any> Arg.common
         OnSuccess { s -> success = s },
     )
 
-    val handle = coroutineJob?.invokeOnCompletion { t ->
-        val e = if (t is CancellationException) {
-            t
-        } else {
-            CancellationException(t)
-        }
+    job.invokeOnCompletion { cancellable.complete() }
 
-        // Try to cancel the EnqueuedJob
+    try {
+        cancellable.join()
+    } catch (e: CancellationException) {
+        // Try cancelling EnqueuedJob
         job.cancel(e)
     }
 
-    job.invokeOnCompletion {
-        handle?.dispose()
-        latch.complete()
+    // EnqueuedJob.cancel was unsuccessful. Wait for completion.
+    if (job.isActive) {
+        val nonCancellable = Job()
+        job.invokeOnCompletion { nonCancellable.complete() }
+        withContext(NonCancellable) { nonCancellable.join() }
     }
-
-    withContext(NonCancellable) { latch.join() }
 
     if (job.isSuccess) {
         success?.let { return it }

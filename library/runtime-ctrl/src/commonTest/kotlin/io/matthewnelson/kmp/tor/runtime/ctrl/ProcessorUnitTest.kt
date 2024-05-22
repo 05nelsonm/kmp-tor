@@ -40,16 +40,25 @@ class ProcessorUnitTest {
 
     @Test
     fun givenCommands_whenMultiple_thenSingleProcessorUtilized() = runTest {
-        val debugLogs = mutableListOf<String>()
-        val lock = SynchronizedObject()
+        val lockStarts = SynchronizedObject()
+        val lockIntercept = SynchronizedObject()
+        val lockSuccess = SynchronizedObject()
 
+        var processorStarts = 0
         var invocationIntercept = 0
+        var invocationSuccess = 0
+
         val factory = TorCtrl.Factory(
             interceptors = setOf(TorCmdInterceptor.intercept<TorCmd.Signal.Heartbeat> { _, cmd ->
-                synchronized(lock) { invocationIntercept++ }
+                synchronized(lockIntercept) { invocationIntercept++ }
                 cmd
             }),
-            debugger = { synchronized(lock) { debugLogs.add(it) } },
+            debugger = { log ->
+//                println(log)
+                if (log.contains("Processor Started")) {
+                    synchronized(lockStarts) { processorStarts++ }
+                }
+            },
             handler = UncaughtException.Handler.THROW,
         )
         val host = LocalHost.IPv4.resolve()
@@ -61,32 +70,27 @@ class ProcessorUnitTest {
         val process = TestUtils.startTor(address.toString())
 
         var threw: Throwable? = null
-        var invocationSuccess = 0
+
         try {
             val ctrl = factory.connectAsync(address)
 
             val onFailure = OnFailure { threw = it }
-            val onSuccess = OnSuccess<Reply.Success.OK> { synchronized(lock) { invocationSuccess++ } }
+            val onSuccess = OnSuccess<Reply.Success.OK> { synchronized(lockSuccess) { invocationSuccess++ } }
 
             ctrl.enqueue(TorCmd.Authenticate(TestUtils.AUTH_PASS), onFailure, onSuccess)
             ctrl.enqueue(TorCmd.SetEvents(TorEvent.entries()), onFailure, onSuccess)
-            ctrl.enqueue(TorCmd.Signal.Heartbeat, onFailure, onSuccess)
-            ctrl.enqueue(TorCmd.Signal.Heartbeat, onFailure, onSuccess)
-            ctrl.enqueue(TorCmd.Signal.Heartbeat, onFailure, onSuccess)
-            ctrl.enqueue(TorCmd.Signal.Heartbeat, onFailure, onSuccess)
-            ctrl.enqueue(TorCmd.Signal.Heartbeat, onFailure, onSuccess)
-            ctrl.enqueue(TorCmd.Signal.Heartbeat, onFailure, onSuccess)
-            ctrl.enqueue(TorCmd.Signal.Heartbeat, onFailure, onSuccess)
-            ctrl.enqueue(TorCmd.Signal.Heartbeat, onFailure, onSuccess)
-            ctrl.enqueue(TorCmd.Signal.Heartbeat, onFailure, onSuccess)
+
+            repeat(100) {
+                ctrl.enqueue(TorCmd.Signal.Heartbeat, onFailure, onSuccess)
+            }
 
             // Suspends test until non-suspending complete
             ctrl.executeAsync(TorCmd.Signal.Dump)
-            synchronized(lock) { invocationSuccess++ }
+            synchronized(lockSuccess) { invocationSuccess++ }
 
             // Ensure that another processor coroutine started
             ctrl.executeAsync(TorCmd.Signal.ClearDnsCache)
-            synchronized(lock) { invocationSuccess++ }
+            synchronized(lockSuccess) { invocationSuccess++ }
         } catch (t: Throwable) {
             threw = t
         } finally {
@@ -98,19 +102,22 @@ class ProcessorUnitTest {
         threw?.let { throw it }
 
         // All commands for our test executed successfully
-        assertEquals(13, invocationSuccess)
-        assertEquals(9, invocationIntercept)
+        assertEquals(104, invocationSuccess)
+        assertEquals(100, invocationIntercept)
 
         // Ensure that given our flurry of commands, a single processor
         // coroutine was started to handle them all.
-        synchronized(lock) {
-            val processorStarts = debugLogs.count { it.contains("Processor Started") }
+        synchronized(lockStarts) {
+            synchronized(lockSuccess) {
+                // Test logic is sound
+                assertTrue(processorStarts > 0)
 
-            // Simply need to know if the processor handled multiple
-            // commands when they were available, and other startProcessor
-            // calls were ignored (b/c was already looping). Cannot utilize
-            // a hard number because test will be flaky.
-            assertTrue(processorStarts < invocationSuccess)
+                // Simply need to know if the processor handled multiple
+                // commands when they were available, and other startProcessor
+                // calls were ignored (b/c was already looping). Cannot utilize
+                // a hard number because test will be flaky.
+                assertTrue(processorStarts < invocationSuccess)
+            }
         }
     }
 }

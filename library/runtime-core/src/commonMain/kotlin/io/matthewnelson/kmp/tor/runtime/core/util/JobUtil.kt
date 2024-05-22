@@ -22,7 +22,7 @@ import io.matthewnelson.kmp.tor.runtime.core.OnSuccess
 
 @InternalKmpTorApi
 @Throws(Throwable::class)
-@Deprecated("Not meant for public usage")
+@Deprecated("Not meant for public usage", level = DeprecationLevel.ERROR)
 public expect suspend inline fun <Arg: EnqueuedJob.Argument, Success: Any> Arg.awaitAsync(
     enqueue: (arg: Arg, onFailure: OnFailure, onSuccess: OnSuccess<Success>) -> EnqueuedJob,
 ): Success
