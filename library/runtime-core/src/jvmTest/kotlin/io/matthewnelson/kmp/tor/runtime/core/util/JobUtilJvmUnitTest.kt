@@ -13,12 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-package io.matthewnelson.kmp.tor.runtime.core
+package io.matthewnelson.kmp.tor.runtime.core.util
 
 import io.matthewnelson.kmp.file.InterruptedException
 import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
+import io.matthewnelson.kmp.tor.runtime.core.EnqueuedJob
 import io.matthewnelson.kmp.tor.runtime.core.EnqueuedJobUnitTest.TestJob
-import io.matthewnelson.kmp.tor.runtime.core.util.awaitSync
 import kotlinx.coroutines.*
 import kotlinx.coroutines.test.runTest
 import java.lang.Runnable
@@ -27,7 +27,7 @@ import kotlin.test.*
 import kotlin.time.Duration.Companion.milliseconds
 
 @OptIn(InternalKmpTorApi::class)
-class EnqueuedJobJvmUnitTest {
+class JobUtilJvmUnitTest {
 
     @Test
     fun givenAwaitSync_whenThreadInterrupted_thenJobIsCancelledIfAble() = runTest {
