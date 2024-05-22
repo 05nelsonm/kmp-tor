@@ -239,6 +239,7 @@ class ServiceFactoryUnitTest {
 //                println(it)
                 synchronized(lock) { lces.add(it) }
             }
+            observerStatic(RuntimeEvent.LOG.PROCESS) { println(it) }
         }.ensureStoppedOnTestCompletion()
 
         factory.startDaemonAsync()
@@ -301,6 +302,7 @@ class ServiceFactoryUnitTest {
 //                println(it)
                 synchronized(lock) { lces.add(it) }
             }
+            observerStatic(RuntimeEvent.LOG.PROCESS) { println(it) }
             config { environment ->
                 apply(environment, failureScenario)
             }

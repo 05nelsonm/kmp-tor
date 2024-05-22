@@ -18,15 +18,15 @@
 package io.matthewnelson.kmp.tor.runtime.ctrl.internal
 
 import io.matthewnelson.immutable.collections.toImmutableMap
+import io.matthewnelson.kmp.file.InterruptedException
 import io.matthewnelson.kmp.tor.runtime.core.ctrl.Reply
 import io.matthewnelson.kmp.tor.runtime.core.ctrl.Reply.Error.Companion.toError
 import io.matthewnelson.kmp.tor.runtime.core.ctrl.TorCmd
-import kotlin.coroutines.cancellation.CancellationException
 
 internal fun TorCmdJob<*>.respond(replies: ArrayList<Reply>) {
     // waiters were destroyed while awaiting server response (i.e. EOS)
     if (replies.isEmpty()) {
-        error(CancellationException("CtrlConnection Stream Ended"))
+        error(InterruptedException("CtrlConnection Stream Ended"))
         return
     }
 
