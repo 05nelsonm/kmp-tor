@@ -504,7 +504,7 @@ public sealed class TorCmd<Success: Any> private constructor(
              * [onFailure] will be invoked with [CancellationException]
              * indicating normal behavior.
              *
-             * **NOTE:** If the returned [EnqueuedJob] get interrupted,
+             * **NOTE:** If the returned [EnqueuedJob] gets interrupted,
              * [onFailure] will be invoked with [InterruptedException].
              * This can occur when the [Processor] implementation is
              * shutdown and the job is awaiting execution.
@@ -546,7 +546,7 @@ public sealed class TorCmd<Success: Any> private constructor(
              * [onFailure] will be invoked with [CancellationException]
              * indicating normal behavior.
              *
-             * **NOTE:** If the returned [EnqueuedJob] get interrupted,
+             * **NOTE:** If the returned [EnqueuedJob] gets interrupted,
              * [onFailure] will be invoked with [InterruptedException].
              * This can occur when the [Processor] implementation is
              * shutdown and the job is awaiting execution.

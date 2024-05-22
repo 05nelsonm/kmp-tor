@@ -29,8 +29,8 @@ public expect enum class Action: EnqueuedJob.Argument {
     /**
      * Starts the tor daemon.
      *
-     * If tor is running, the [EnqueuedJob] returned by
-     * [Processor.enqueue] will complete with success.
+     * If tor is already running, the [EnqueuedJob] returned
+     * by [Processor.enqueue] will complete with success.
      *
      * **NOTE:** Tor's startup process is broken out
      * into five (5) phases:
@@ -49,7 +49,7 @@ public expect enum class Action: EnqueuedJob.Argument {
 
     /**
      * Stops the tor daemon. All [TorCmd] that are
-     * queued and awaiting execution will be cancelled.
+     * enqueued and awaiting execution will be interrupted.
      *
      * If tor is not running, the [EnqueuedJob] returned
      * by [Processor.enqueue] will complete with success.
@@ -57,9 +57,9 @@ public expect enum class Action: EnqueuedJob.Argument {
     StopDaemon,
 
     /**
-     * Stops, and then starts the tor daemon. All [TorCmd]
-     * that are queued and awaiting execution will be
-     * cancelled.
+     * Stops, then starts the tor daemon. All [TorCmd]
+     * that are enqueued and awaiting execution will be
+     * interrupted.
      *
      * If tor is not running, it will be started via [StartDaemon].
      * */
@@ -80,7 +80,7 @@ public expect enum class Action: EnqueuedJob.Argument {
          * [onFailure] will be invoked with [CancellationException]
          * indicating normal behavior.
          *
-         * **NOTE:** If the returned [EnqueuedJob] get interrupted,
+         * **NOTE:** If the returned [EnqueuedJob] gets interrupted,
          * [onFailure] will be invoked with [InterruptedException].
          * For example, if [StartDaemon] is enqueued and immediately
          * after, [StopDaemon] is enqueued too. [StopDaemon] will be
@@ -89,11 +89,12 @@ public expect enum class Action: EnqueuedJob.Argument {
          * or [RestartDaemon] jobs beneath will be interrupted. If there
          * are multiple [StopDaemon] jobs also enqueued, those jobs will
          * be attached as children to the executing [StopDaemon] job and
-         * complete successfully alongside it. The converse scenario where
-         * [StartDaemon] or [RestartDaemon] is being executed, is the same
-         * whereby [StopDaemon] jobs are all interrupted, and [StartDaemon]
-         * or [RestartDaemon] jobs are attached as children, completing
-         * alongside the job that is executing.
+         * complete successfully alongside the job being executed. The
+         * converse scenario where [StartDaemon] or [RestartDaemon] is
+         * being executed, is the same whereby [StopDaemon] jobs are all
+         * interrupted, and [StartDaemon] or [RestartDaemon] jobs are
+         * attached as children, completing alongside the job that is
+         * executing.
          *
          * @return [EnqueuedJob]
          * @see [OnFailure]

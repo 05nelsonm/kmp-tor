@@ -248,6 +248,7 @@ internal class RealTorCtrl private constructor(
                     })
                 } catch (t: Throwable) {
                     var e: Throwable = t
+                    // CancellationException or destroyed
                     if (t is IllegalStateException) {
                         e = InterruptedException(t.message)
                     }
@@ -279,7 +280,8 @@ internal class RealTorCtrl private constructor(
 
                     cmdJob.respond(replies)
                 } catch (e: CancellationException) {
-                    cmdJob.error(e)
+                    // scope was cancelled
+                    cmdJob.error(InterruptedException("CtrlConnection Stream Ended"))
                     throw e
                 } catch (e: NotImplementedError) {
                     // TODO
@@ -291,10 +293,10 @@ internal class RealTorCtrl private constructor(
                 // Will only occur if scope has been cancelled
                 // and the coroutine never fired. This ensures
                 // that the job will always be completed.
-                val e = if (t is CancellationException) {
+                val e = if (t is InterruptedException) {
                     t
                 } else {
-                    CancellationException("CtrlConnection Stream Ended", t)
+                    InterruptedException("CtrlConnection Stream Ended")
                 }
 
                 cmdJob.error(e)
