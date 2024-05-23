@@ -27,7 +27,7 @@ import kotlin.jvm.JvmStatic
 internal abstract class TorStateManager internal constructor(fid: FileID?) {
 
     @Volatile
-    private var _state: TorState = TorState(
+    private var _state: TorState = TorState.of(
         daemon = TorState.Daemon.Off,
         network = TorState.Network.Disabled,
         fid = fid,

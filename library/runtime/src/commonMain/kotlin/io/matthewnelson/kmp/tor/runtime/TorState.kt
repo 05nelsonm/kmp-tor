@@ -18,6 +18,7 @@ package io.matthewnelson.kmp.tor.runtime
 import io.matthewnelson.kmp.tor.runtime.FileID.Companion.fidEllipses
 import io.matthewnelson.kmp.tor.runtime.core.TorConfig
 import kotlin.jvm.JvmField
+import kotlin.jvm.JvmSynthetic
 
 /**
  * Holder for [TorRuntime] state.
@@ -29,11 +30,10 @@ public class TorState private constructor(
     public val daemon: Daemon,
     @JvmField
     public val network: Network,
-    private val fid: String,
+    private val fid: String?,
 ) {
 
     public constructor(daemon: Daemon, network: Network): this(daemon, network, null)
-    internal constructor(daemon: Daemon, network: Network, fid: FileID?): this(daemon, network, fid?.fidEllipses ?: "")
 
     public operator fun component1(): Daemon = daemon
     public operator fun component2(): Network = network
@@ -145,7 +145,7 @@ public class TorState private constructor(
 
     public override fun toString(): String = buildString {
         append("TorState[")
-        if (fid.isNotBlank()) {
+        if (!fid.isNullOrBlank()) {
             append("fid=")
             append(fid)
             append(", ")
@@ -170,5 +170,19 @@ public class TorState private constructor(
         }.let { append(it) }
 
         append(']')
+    }
+
+    internal companion object {
+
+        @JvmSynthetic
+        internal fun of(
+            daemon: Daemon,
+            network: Network,
+            fid: FileID?,
+        ): TorState = TorState(
+            daemon,
+            network,
+            fid?.fidEllipses,
+        )
     }
 }

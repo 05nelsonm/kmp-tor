@@ -760,7 +760,7 @@ internal class RealTorRuntime private constructor(
                     TorState.Daemon.Off
                 }
 
-                TorState(
+                TorState.of(
                     daemon = daemon,
                     network = TorState.Network.Disabled,
                     fid = this,
