@@ -214,10 +214,12 @@ internal class RealTorCtrl private constructor(
             }
         }
 
-        private suspend fun CoroutineScope.loop() {
+        private suspend fun loop() {
             LOG.d { "Processor Started" }
 
-            while (isActive && !waiters.isDestroyed()) {
+            while (!waiters.isDestroyed()) {
+                yield()
+
                 val cmdJob = synchronized(processorLock) {
                     if (waiters.isDestroyed()) return@synchronized null
 

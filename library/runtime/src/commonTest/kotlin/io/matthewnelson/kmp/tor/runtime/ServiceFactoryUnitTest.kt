@@ -20,17 +20,14 @@ import io.matthewnelson.kmp.tor.core.api.annotation.ExperimentalKmpTorApi
 import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
 import io.matthewnelson.kmp.tor.core.resource.SynchronizedObject
 import io.matthewnelson.kmp.tor.core.resource.synchronized
-import io.matthewnelson.kmp.tor.resource.tor.TorResources
 import io.matthewnelson.kmp.tor.runtime.Action.Companion.restartDaemonAsync
 import io.matthewnelson.kmp.tor.runtime.Action.Companion.startDaemonAsync
 import io.matthewnelson.kmp.tor.runtime.Action.Companion.stopDaemonAsync
 import io.matthewnelson.kmp.tor.runtime.TestUtils.assertContains
 import io.matthewnelson.kmp.tor.runtime.TestUtils.assertDoesNotContain
 import io.matthewnelson.kmp.tor.runtime.TestUtils.ensureStoppedOnTestCompletion
-import io.matthewnelson.kmp.tor.runtime.core.OnFailure
-import io.matthewnelson.kmp.tor.runtime.core.EnqueuedJob
-import io.matthewnelson.kmp.tor.runtime.core.TorEvent
-import io.matthewnelson.kmp.tor.runtime.core.apply
+import io.matthewnelson.kmp.tor.runtime.TestUtils.testEnv
+import io.matthewnelson.kmp.tor.runtime.core.*
 import io.matthewnelson.kmp.tor.runtime.core.ctrl.TorCmd
 import io.matthewnelson.kmp.tor.runtime.core.util.executeAsync
 import kotlinx.coroutines.*
@@ -64,21 +61,17 @@ class ServiceFactoryUnitTest {
     }
 
     private fun env(
-        testDir: String,
+        dirName: String,
         start: ((TorRuntime.ServiceFactory.Binder) -> Unit)? = null,
-        block: TorRuntime.Environment.Builder.() -> Unit = {},
-    ) = TorRuntime.Environment.Builder(
-        SysTempDir.resolve("kmp_tor_test/$testDir/work"),
-        SysTempDir.resolve("kmp_tor_test/$testDir/cache"),
-        installer = { dir -> TorResources(dir) },
-    ) {
+        block: ThisBlock<TorRuntime.Environment.Builder> = ThisBlock {},
+    ): TorRuntime.Environment = testEnv(dirName) {
         serviceFactoryLoader = object : TorRuntime.ServiceFactory.Loader() {
             override fun loadProtected(initializer: TorRuntime.ServiceFactory.Initializer): TorRuntime.ServiceFactory {
                 return TestFactory(initializer, start)
             }
         }
 
-        block(this)
+        apply(block)
     }
 
     @Test
