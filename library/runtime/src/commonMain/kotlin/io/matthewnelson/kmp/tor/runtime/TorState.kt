@@ -38,16 +38,8 @@ public class TorState private constructor(
     public operator fun component1(): Daemon = daemon
     public operator fun component2(): Network = network
 
-    public fun copy(daemon: Daemon): TorState {
-        if (daemon == this.daemon) return this
-        return TorState(daemon, network, fid)
-    }
-
-    public fun copy(network: Network): TorState {
-        if (network == this.network) return this
-        return TorState(daemon, network, fid)
-    }
-
+    public fun copy(daemon: Daemon): TorState = copy(daemon, network)
+    public fun copy(network: Network): TorState = copy(daemon, network)
     public fun copy(daemon: Daemon, network: Network): TorState {
         if (daemon == this.daemon && network == this.network) return this
         return TorState(daemon, network, fid)
