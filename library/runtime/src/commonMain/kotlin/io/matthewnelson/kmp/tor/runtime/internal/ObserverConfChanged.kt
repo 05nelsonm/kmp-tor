@@ -15,10 +15,13 @@
  **/
 package io.matthewnelson.kmp.tor.runtime.internal
 
+import io.matthewnelson.kmp.tor.runtime.TorState
 import io.matthewnelson.kmp.tor.runtime.core.OnEvent
+import io.matthewnelson.kmp.tor.runtime.core.TorConfig
 import io.matthewnelson.kmp.tor.runtime.core.TorEvent
 
 internal open class ObserverConfChanged internal constructor(
+    private val manager: TorStateManager,
     staticTag: String,
 ): TorEvent.Observer(
     TorEvent.CONF_CHANGED,
@@ -28,6 +31,19 @@ internal open class ObserverConfChanged internal constructor(
 ) {
 
     protected override fun notify(data: String) {
-        // TODO: parse data
+        for (line in data.lines()) { line.parse() }
+    }
+
+    private fun String.parse() = when {
+        startsWith(TorConfig.DisableNetwork.name, ignoreCase = true) -> {
+            val network = if (substringAfter('=') == "0") {
+                TorState.Network.Enabled
+            } else {
+                TorState.Network.Disabled
+            }
+
+            manager.update(network = network)
+        }
+        else -> {}
     }
 }

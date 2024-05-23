@@ -93,6 +93,8 @@ internal class RealTorRuntime private constructor(
         + dispatcher
     )
 
+    private val manager = StateManager()
+
     @Suppress("PrivatePropertyName")
     private val NOTIFIER = Notifier()
 
@@ -141,6 +143,8 @@ internal class RealTorRuntime private constructor(
     internal fun handler(): UncaughtException.Handler = handler
 
     public override fun environment(): TorRuntime.Environment = generator.environment
+
+    public override fun state(): TorState = manager.state
 
     public override fun enqueue(
         action: Action,
@@ -248,6 +252,8 @@ internal class RealTorRuntime private constructor(
 
         cmdQueue?.connection?.destroy()
         cmdQueue?.destroy()
+
+        manager.update(TorState.Daemon.Off, TorState.Network.Disabled)
 
         if (stack.isNotEmpty()) {
             NOTIFIER.d(this, "Interrupting/Completing ActionJobs")
@@ -526,7 +532,7 @@ internal class RealTorRuntime private constructor(
                 return
             }
 
-            TorProcess.start(generator, NOTIFIER, scope, connect = {
+            TorProcess.start(generator, NOTIFIER, scope, manager, connect = {
                 val ctrl = connection.openWith(factory)
 
                 val lceCtrl = RealTorCtrl(ctrl)
@@ -581,7 +587,7 @@ internal class RealTorRuntime private constructor(
             val lifecycle = _lifecycle
             if (this is ActionJob.StopJob && lifecycle != null) {
                 NOTIFIER.i(this@ActionProcessor, "Lifecycle is present (Service). Destroying immediately.")
-
+                manager.update(daemon = TorState.Daemon.Stopping)
                 oldCmdQueue?.connection?.destroy()
                 oldCmdQueue?.destroy()
                 lifecycle.destroy()
@@ -605,6 +611,8 @@ internal class RealTorRuntime private constructor(
                 oldQueue.destroy()
                 return
             }
+
+            manager.update(daemon = TorState.Daemon.Stopping)
 
             try {
                 // Try a clean shutdown which will destroy itself
@@ -660,7 +668,7 @@ internal class RealTorRuntime private constructor(
             }
         }
 
-        private inner class ProcessLogObserver: ObserverLogProcess() {
+        private inner class ProcessLogObserver: ObserverLogProcess(manager) {
             public override fun notify(data: String) {
                 super.notify(data)
                 event.notifyObservers(data)
@@ -684,10 +692,17 @@ internal class RealTorRuntime private constructor(
         public override fun toString(): String = this.toFIDString()
     }
 
-    private inner class ConfChangedObserver: ObserverConfChanged(generator.environment.staticTag()) {
+    private inner class ConfChangedObserver: ObserverConfChanged(manager, generator.environment.staticTag()) {
         protected override fun notify(data: String) {
             super.notify(data)
             event.notifyObservers(data)
+        }
+    }
+
+    private inner class StateManager: TorStateManager(generator.environment) {
+        protected override fun notify(old: TorState, new: TorState) {
+            // TODO
+            STATE.notifyObservers(new)
         }
     }
 
@@ -727,9 +742,25 @@ internal class RealTorRuntime private constructor(
         // to create an unused dispatcher for Jvm & Native
         private val dispatcher by lazy { generator.environment.newRuntimeDispatcher() }
 
-        override val binder: ServiceCtrlBinder = ServiceCtrlBinder()
+        public override val binder: ServiceCtrlBinder = ServiceCtrlBinder()
 
         public override fun environment(): TorRuntime.Environment = generator.environment
+
+        public override fun state(): TorState = _instance?.state() ?: synchronized(lock) {
+            _instance?.state() ?: run {
+                val daemon = if (_startServiceJob?.isActive == true) {
+                    TorState.Daemon.Starting
+                } else {
+                    TorState.Daemon.Off
+                }
+
+                TorState(
+                    daemon = daemon,
+                    network = TorState.Network.Disabled,
+                    fid = this,
+                )
+            }
+        }
 
         public override fun enqueue(
             action: Action,
@@ -865,6 +896,12 @@ internal class RealTorRuntime private constructor(
                 @Suppress("LocalVariableName")
                 var _failure: Throwable? = null
 
+                STATE.notifyObservers(TorState(
+                    daemon = TorState.Daemon.Starting,
+                    network = TorState.Network.Disabled,
+                    fid = this@RealServiceFactoryCtrl,
+                ))
+
                 try {
                     startService()
                 } catch (t: RuntimeException) {
@@ -915,13 +952,26 @@ internal class RealTorRuntime private constructor(
 
                 w(this@RealServiceFactoryCtrl, "Failed to start service. Interrupting EnqueuedJobs.")
 
+                STATE.notifyObservers(TorState(
+                    daemon = TorState.Daemon.Stopping,
+                    network = TorState.Network.Disabled,
+                    fid = this@RealServiceFactoryCtrl,
+                ))
+
                 handler.withSuppression {
+
                     val context = name.name + " timed out"
 
                     executables.forEach { executable ->
                         tryCatch(context) { executable.execute() }
                     }
                 }
+
+                STATE.notifyObservers(TorState(
+                    daemon = TorState.Daemon.Off,
+                    network = TorState.Network.Disabled,
+                    fid = this@RealServiceFactoryCtrl,
+                ))
             }
 
             _startServiceJob = job
