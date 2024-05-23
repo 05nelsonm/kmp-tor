@@ -15,12 +15,26 @@
  **/
 package io.matthewnelson.kmp.tor.runtime
 
+import io.matthewnelson.kmp.file.SysTempDir
+import io.matthewnelson.kmp.file.resolve
+import io.matthewnelson.kmp.tor.resource.tor.TorResources
 import io.matthewnelson.kmp.tor.runtime.FileID.Companion.fidEllipses
+import io.matthewnelson.kmp.tor.runtime.core.ThisBlock
 import kotlinx.coroutines.*
 import kotlin.test.fail
 import kotlin.time.Duration.Companion.milliseconds
 
 object TestUtils {
+
+    fun testEnv(
+        dirName: String,
+        block: ThisBlock<TorRuntime.Environment.Builder> = ThisBlock {}
+    ): TorRuntime.Environment = TorRuntime.Environment.Builder(
+        workDirectory = SysTempDir.resolve("kmp_tor_test/$dirName/work"),
+        cacheDirectory = SysTempDir.resolve("kmp_tor_test/$dirName/cache"),
+        installer = { dir -> TorResources(dir) },
+        block = block
+    )
 
     suspend fun <T: Action.Processor> T.ensureStoppedOnTestCompletion(): T {
         currentCoroutineContext().job.invokeOnCompletion {

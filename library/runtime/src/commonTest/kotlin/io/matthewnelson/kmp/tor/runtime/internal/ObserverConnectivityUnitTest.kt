@@ -15,13 +15,11 @@
  **/
 package io.matthewnelson.kmp.tor.runtime.internal
 
-import io.matthewnelson.kmp.file.SysTempDir
-import io.matthewnelson.kmp.file.resolve
-import io.matthewnelson.kmp.tor.resource.tor.TorResources
 import io.matthewnelson.kmp.tor.runtime.Action.Companion.startDaemonAsync
 import io.matthewnelson.kmp.tor.runtime.NetworkObserver
 import io.matthewnelson.kmp.tor.runtime.RuntimeEvent
 import io.matthewnelson.kmp.tor.runtime.TestUtils.ensureStoppedOnTestCompletion
+import io.matthewnelson.kmp.tor.runtime.TestUtils.testEnv
 import io.matthewnelson.kmp.tor.runtime.TorCmdJob
 import io.matthewnelson.kmp.tor.runtime.TorRuntime
 import kotlinx.coroutines.Dispatchers
@@ -45,17 +43,6 @@ class ObserverConnectivityUnitTest {
         fun update(conn: Connectivity) { notify(conn) }
     }
 
-    private fun env(
-        testDir: String,
-        block: TorRuntime.Environment.Builder.() -> Unit = {},
-    ) = TorRuntime.Environment.Builder(
-        SysTempDir.resolve("kmp_tor_test/$testDir/work"),
-        SysTempDir.resolve("kmp_tor_test/$testDir/cache"),
-        installer = { dir -> TorResources(dir) },
-    ) {
-        block(this)
-    }
-
     @Test
     fun givenConnectivityChanges_whenMultiple_thenOnlyLastIsUsed() = runTest {
         val observer = TestNetworkObserver()
@@ -64,7 +51,7 @@ class ObserverConnectivityUnitTest {
         val cmds = mutableListOf<TorCmdJob>()
         val warnings = mutableListOf<String>()
 
-        val runtime = TorRuntime.Builder(env("obs_conn_no_net")) {
+        val runtime = TorRuntime.Builder(testEnv("obs_conn_no_net")) {
             networkObserver = observer
 //            observerStatic(RuntimeEvent.LOG.DEBUG) { println(it) }
 //            observerStatic(RuntimeEvent.LOG.PROCESS) { println(it) }

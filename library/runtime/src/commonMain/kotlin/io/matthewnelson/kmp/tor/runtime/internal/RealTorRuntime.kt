@@ -161,28 +161,21 @@ internal class RealTorRuntime private constructor(
             if (destroyed) return@synchronized null
 
             val job = when (action) {
-                Action.StartDaemon -> {
-                    val start = ActionJob.StartJob(onSuccess, onFailure, handler)
-                    if (_cmdQueue == null) {
-                        _cmdQueue = factory.tempQueue()
-                    }
-                    start
-                }
-                Action.StopDaemon -> {
-                    ActionJob.StopJob(onSuccess, onFailure, handler)
-                }
-                Action.RestartDaemon -> {
-                    val restart = ActionJob.RestartJob(onSuccess, onFailure, handler)
-                    if (_cmdQueue == null) {
-                        _cmdQueue = factory.tempQueue()
-                    }
-                    restart
-                }
+                Action.StartDaemon -> ActionJob.StartJob(onSuccess, onFailure, handler)
+                Action.StopDaemon -> ActionJob.StopJob(onSuccess, onFailure, handler)
+                Action.RestartDaemon -> ActionJob.RestartJob(onSuccess, onFailure, handler)
 
                 // A result of expect/actual. Will never occur.
                 else -> {
                     errorMsg = "Action[name=${action.name}] is not supported"
                     null
+                }
+            }
+
+            if (job is ActionJob.StartJob || job is ActionJob.RestartJob) {
+                if (_cmdQueue?.isDestroyed() != false) {
+                    // queue is null or destroyed
+                    _cmdQueue = factory.tempQueue()
                 }
             }
 
@@ -219,7 +212,11 @@ internal class RealTorRuntime private constructor(
             if (destroyed) return@synchronized null
 
             errorMsg = "Tor is stopped or stopping"
-            _cmdQueue
+            if (_cmdQueue?.isDestroyed() == false) {
+                _cmdQueue
+            } else {
+                null
+            }
         }
 
         return cmdQueue?.enqueue(cmd, onFailure, onSuccess) ?: onFailure.toImmediateErrorJob(
@@ -387,6 +384,37 @@ internal class RealTorRuntime private constructor(
                     }
                 }
 
+                if (execute is ActionJob.StartJob || execute is ActionJob.RestartJob) {
+                    // If null or destroyed, ensure there is fresh queue.
+                    if (_cmdQueue?.isDestroyed() != false) {
+                        _cmdQueue = factory.tempQueue()
+                    }
+
+                    // If startup fails, ensure state is correct
+                    execute.invokeOnCompletion {
+                        if (execute.isSuccess) return@invokeOnCompletion
+                        if (destroyed) return@invokeOnCompletion
+
+                        synchronized(enqueueLock) {
+                            if (!destroyed && actionStack.isEmpty()) {
+                                // loop again
+                                val stop = ActionJob.StopJob(
+                                    onSuccess = {},
+                                    onFailure = {},
+                                    handler = handler,
+                                )
+                                actionStack.push(stop)
+
+                                Executable {
+                                    NOTIFIER.w(this, "Startup failed. No other actions found. Enqueued $stop")
+                                }
+                            } else {
+                                null
+                            }
+                        }?.execute()
+                    }
+                }
+
                 if (execute is ActionJob.RestartJob) {
                     val oldQueue = _cmdQueue
 
@@ -399,36 +427,6 @@ internal class RealTorRuntime private constructor(
                         _cmdQueue = newQueue
                         execute.attachOldQueue(oldQueue)
                         isOldQueueAttached = true
-
-                        // If restart fails. Need to destroy the new queue
-                        execute.invokeOnCompletion {
-                            if (execute.isSuccess) return@invokeOnCompletion
-                            // Restart failed.
-
-                            if (_cmdQueue == newQueue) {
-                                synchronized(enqueueLock) {
-                                    if (_cmdQueue == newQueue) {
-                                        _cmdQueue = null
-                                    }
-                                }
-                            }
-
-                            newQueue.connection?.destroy()
-                            newQueue.destroy()
-                        }
-                    }
-                }
-
-                // Ensure that, in the event of a failure when starting, onDestroy
-                // is called in the event we are acting as a service.
-                if (execute is ActionJob.StartJob || execute is ActionJob.RestartJob) {
-                    val lifecycle = _lifecycle
-                    if (lifecycle != null) {
-                        execute.invokeOnCompletion {
-                            if (execute.isError) {
-                                lifecycle.destroy()
-                            }
-                        }
                     }
                 }
 
@@ -436,6 +434,10 @@ internal class RealTorRuntime private constructor(
                     executables.add(Executable {
                         NOTIFIER.d(this@ActionProcessor, "TorCtrl queue attached to $execute")
                     })
+                }
+
+                if (execute == null) {
+                    // TODO: Check state
                 }
 
                 executables to execute
