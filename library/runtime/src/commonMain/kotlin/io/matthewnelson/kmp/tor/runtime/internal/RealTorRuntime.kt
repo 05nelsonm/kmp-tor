@@ -593,7 +593,7 @@ internal class RealTorRuntime private constructor(
             val lifecycle = _lifecycle
             if (this is ActionJob.StopJob && lifecycle != null) {
                 NOTIFIER.i(this@ActionProcessor, "Lifecycle is present (Service). Destroying immediately.")
-                manager.update(daemon = TorState.Daemon.Stopping)
+                manager.update(TorState.Daemon.Stopping)
                 oldCmdQueue?.connection?.destroy()
                 oldCmdQueue?.destroy()
                 lifecycle.destroy()
@@ -618,7 +618,7 @@ internal class RealTorRuntime private constructor(
                 return
             }
 
-            manager.update(daemon = TorState.Daemon.Stopping)
+            manager.update(TorState.Daemon.Stopping)
 
             try {
                 // Try a clean shutdown which will destroy itself

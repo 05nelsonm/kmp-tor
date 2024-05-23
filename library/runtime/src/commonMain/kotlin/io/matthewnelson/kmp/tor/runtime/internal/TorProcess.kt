@@ -105,6 +105,7 @@ internal class TorProcess private constructor(
 
             connect(arguments)
         } catch (t: Throwable) {
+            manager.update(TorState.Daemon.Stopping)
             processJob.cancel()
             throw t
         }
@@ -327,11 +328,7 @@ internal class TorProcess private constructor(
         }
 
         @Throws(IOException::class)
-        fun checkError() {
-            val error = error ?: return
-            manager.update(TorState.Daemon.Stopping)
-            throw error
-        }
+        fun checkError() { error?.let { err -> throw err } }
 
         fun done() {
             // Will inhibit from adding any more lines

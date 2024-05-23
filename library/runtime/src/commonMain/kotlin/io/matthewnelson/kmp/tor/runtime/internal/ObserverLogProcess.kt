@@ -55,7 +55,7 @@ internal open class ObserverLogProcess internal constructor(
                 .toByteOrNull()
 
             if (pct != null) {
-                manager.update(daemon = TorState.Daemon.On(pct))
+                manager.update(TorState.Daemon.On(pct))
             }
 
             Unit
