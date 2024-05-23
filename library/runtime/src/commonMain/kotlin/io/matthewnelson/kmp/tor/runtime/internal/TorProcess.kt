@@ -162,7 +162,6 @@ internal class TorProcess private constructor(
 
         NOTIFIER.lce(Lifecycle.Event.OnStart(this@TorProcess))
         NOTIFIER.i(this@TorProcess, process.toString())
-        manager.update(TorState.Daemon.On(0), TorState.Network.Disabled)
 
         val feed = StdoutFeed()
 
@@ -328,7 +327,11 @@ internal class TorProcess private constructor(
         }
 
         @Throws(IOException::class)
-        fun checkError() { error?.let { err -> throw err } }
+        fun checkError() {
+            val error = error ?: return
+            manager.update(TorState.Daemon.Stopping)
+            throw error
+        }
 
         fun done() {
             // Will inhibit from adding any more lines

@@ -902,12 +902,6 @@ internal class RealTorRuntime private constructor(
                 @Suppress("LocalVariableName")
                 var _failure: Throwable? = null
 
-                STATE.notifyObservers(TorState(
-                    daemon = TorState.Daemon.Starting,
-                    network = TorState.Network.Disabled,
-                    fid = this@RealServiceFactoryCtrl,
-                ))
-
                 try {
                     startService()
                 } catch (t: RuntimeException) {
@@ -958,12 +952,6 @@ internal class RealTorRuntime private constructor(
 
                 w(this@RealServiceFactoryCtrl, "Failed to start service. Interrupting EnqueuedJobs.")
 
-                STATE.notifyObservers(TorState(
-                    daemon = TorState.Daemon.Stopping,
-                    network = TorState.Network.Disabled,
-                    fid = this@RealServiceFactoryCtrl,
-                ))
-
                 handler.withSuppression {
 
                     val context = name.name + " timed out"
@@ -972,12 +960,6 @@ internal class RealTorRuntime private constructor(
                         tryCatch(context) { executable.execute() }
                     }
                 }
-
-                STATE.notifyObservers(TorState(
-                    daemon = TorState.Daemon.Off,
-                    network = TorState.Network.Disabled,
-                    fid = this@RealServiceFactoryCtrl,
-                ))
             }
 
             _startServiceJob = job
