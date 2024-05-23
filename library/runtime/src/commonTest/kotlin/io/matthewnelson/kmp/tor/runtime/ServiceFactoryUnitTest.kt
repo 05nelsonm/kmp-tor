@@ -299,7 +299,10 @@ class ServiceFactoryUnitTest {
 //                println(it)
                 synchronized(lock) { lces.add(it) }
             }
+//            observerStatic(RuntimeEvent.LOG.INFO) { println(it) }
+//            observerStatic(RuntimeEvent.LOG.WARN) { println(it) }
             observerStatic(RuntimeEvent.LOG.PROCESS) { println(it) }
+//            observerStatic(RuntimeEvent.STATE) { println(it) }
             config { environment ->
                 apply(environment, failureScenario)
             }

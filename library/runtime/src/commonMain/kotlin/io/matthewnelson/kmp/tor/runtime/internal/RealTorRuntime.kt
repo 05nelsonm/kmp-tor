@@ -445,7 +445,13 @@ internal class RealTorRuntime private constructor(
                 }
 
                 if (execute == null) {
-                    // TODO: Check state
+                    // Stack is empty. Ensure state is correct before we get stopped
+                    if (_cmdQueue?.connection?.isDestroyed() != false) {
+                        // Is null or destroyed (no active control connection)
+                        executables.add(Executable {
+                            manager.update(TorState.Daemon.Off, TorState.Network.Disabled)
+                        })
+                    }
                 }
 
                 executables to execute
