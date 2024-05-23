@@ -63,6 +63,11 @@ public interface TorRuntime:
      * */
     public fun environment(): Environment
 
+    /**
+     * Returns the current [TorState] for this [TorRuntime] instance.
+     * */
+    public fun state(): TorState
+
     public companion object {
 
         /**
@@ -567,6 +572,7 @@ public interface TorRuntime:
 
         public final override val fid: String = ctrl.fid
         public final override fun environment(): Environment = ctrl.environment()
+        public final override fun state(): TorState = ctrl.state()
 
         public final override fun <Success: Any> enqueue(
             cmd: TorCmd.Unprivileged<Success>,

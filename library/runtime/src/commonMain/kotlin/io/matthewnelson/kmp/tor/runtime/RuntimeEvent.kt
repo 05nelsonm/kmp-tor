@@ -78,6 +78,8 @@ public sealed class RuntimeEvent<Data: Any> private constructor(
          *             }
          *         }
          *     }
+         *
+         * @see [ActionJob]
          * */
         public data object ACTION: RuntimeEvent<ActionJob>("EXECUTE_ACTION")
 
@@ -97,12 +99,16 @@ public sealed class RuntimeEvent<Data: Any> private constructor(
          *             }
          *         }
          *     }
+         *
+         * @see [TorCmdJob]
          * */
         public data object CMD: RuntimeEvent<TorCmdJob>("EXECUTE_CMD")
     }
 
     /**
      * Events pertaining to an object's lifecycle.
+     *
+     * @see [Lifecycle.Event]
      * */
     public data object LIFECYCLE: RuntimeEvent<Lifecycle.Event>("LIFECYCLE")
 
@@ -138,9 +144,10 @@ public sealed class RuntimeEvent<Data: Any> private constructor(
          * All stdout from the tor process.
          *
          * Each invocation of [OnEvent] **will** be a single line,
-         * as that is how the `kmp-process` library is designed.
+         * as that is how the [kmp-process](https://github.com/05nelsonm/kmp-process)
+         * library is designed.
          *
-         * **NOTE:** Any stderr output from the tor process is
+         * **NOTE:** All stderr output from the tor process is
          * redirected to [LOG.WARN].
          * */
         public data object PROCESS: LOG("LOG_PROCESS")
@@ -153,6 +160,13 @@ public sealed class RuntimeEvent<Data: Any> private constructor(
     //  setup an TorEvent.NOTICE observer to catch the rate limit
     //  dispatch. If after 50ms (or something) nothing comes, dispatch
     //  success.
+
+    /**
+     * Events pertaining to the current state of [TorRuntime].
+     *
+     * @see [TorState]
+     * */
+    public data object STATE: RuntimeEvent<TorState>("STATE")
 
     /**
      * Model to be registered with a [Processor] for being notified
@@ -228,7 +242,7 @@ public sealed class RuntimeEvent<Data: Any> private constructor(
         public fun clearObservers()
     }
 
-    public companion object: Entries<RuntimeEvent<*>>(numEvents = 6) {
+    public companion object: Entries<RuntimeEvent<*>>(numEvents = 9) {
 
         @JvmStatic
         @Throws(IllegalArgumentException::class)
@@ -247,8 +261,10 @@ public sealed class RuntimeEvent<Data: Any> private constructor(
         }
 
         protected override val lazyEntries: ThisBlock<LinkedHashSet<RuntimeEvent<*>>> = ThisBlock {
+            // NOTE: Update numEvents when adding an event
             add(ERROR); add(EXECUTE.ACTION); add(EXECUTE.CMD); add(LIFECYCLE);
             add(LOG.DEBUG); add(LOG.INFO); add(LOG.WARN); add(LOG.PROCESS);
+            add(STATE);
         }
     }
 

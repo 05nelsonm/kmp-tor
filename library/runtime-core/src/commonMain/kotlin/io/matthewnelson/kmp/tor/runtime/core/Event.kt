@@ -66,7 +66,10 @@ import kotlin.jvm.JvmField
  *             }
  *
  *             protected override val lazyEntries: ThisBlock<LinkedHashSet<MyEvent>> =
- *                 ThisBlock { add(THIS); add(THAT); }
+ *                 ThisBlock {
+ *                     // NOTE: Update numEvents when adding an event
+ *                     add(THIS); add(THAT);
+ *                 }
  *         }
  *
  *         protected final override fun factory(
@@ -167,6 +170,19 @@ public abstract class Event<Data: Any?, E: Event<Data, E, O>, O: Event.Observer<
     ): O {
         @Suppress("UNCHECKED_CAST")
         return factory(this as E, tag, executor, onEvent)
+    }
+
+    public final override fun equals(other: Any?): Boolean {
+        if (other !is Event<*, *, *>) return false
+        if (other::class != this::class) return false
+        return other.name == name
+    }
+
+    public final override fun hashCode(): Int {
+        var result = 17
+        result = result * 31 + this::class.hashCode()
+        result = result * 31 + name.hashCode()
+        return result
     }
 
     public final override fun toString(): String = name
@@ -282,7 +298,7 @@ public abstract class Event<Data: Any?, E: Event<Data, E, O>, O: Event.Observer<
      * */
     public abstract class Entries<E: Event<*, *, *>> protected constructor(numEvents: Int) {
 
-        private val immutableEntries by lazy {
+        private val _entries by lazy {
             LinkedHashSet<E>((numEvents + 1).coerceAtLeast(1), 1.0f)
                 .apply(lazyEntries)
                 .toImmutableSet()
@@ -293,10 +309,10 @@ public abstract class Event<Data: Any?, E: Event<Data, E, O>, O: Event.Observer<
             ?: throw IllegalArgumentException("Unknown event for name[$name]")
 
         protected open fun valueOfOrNull(name: String): E? {
-            return immutableEntries.firstOrNull { it.name == name }
+            return _entries.firstOrNull { it.name == name }
         }
 
-        protected open fun entries(): Set<E> = immutableEntries
+        protected open fun entries(): Set<E> = _entries
 
         /**
          * For inheritors of [Entries] to implement.

@@ -291,6 +291,7 @@ public sealed class TorEvent private constructor(
         }
 
         protected override val lazyEntries: ThisBlock<LinkedHashSet<TorEvent>> = ThisBlock {
+            // NOTE: Update numEvents when adding an event
             add(CIRC); add(STREAM); add(ORCONN); add(BW);
             add(DEBUG); add(INFO); add(NOTICE); add(WARN);
             add(ERR); add(NEWDESC); add(ADDRMAP); add(DESCCHANGED);

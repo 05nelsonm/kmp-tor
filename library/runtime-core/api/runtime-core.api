@@ -66,7 +66,9 @@ public final class io/matthewnelson/kmp/tor/runtime/core/EnqueuedJob$State : jav
 public abstract class io/matthewnelson/kmp/tor/runtime/core/Event {
 	public final field name Ljava/lang/String;
 	protected fun <init> (Ljava/lang/String;)V
+	public final fun equals (Ljava/lang/Object;)Z
 	protected abstract fun factory (Lio/matthewnelson/kmp/tor/runtime/core/Event;Ljava/lang/String;Lio/matthewnelson/kmp/tor/runtime/core/OnEvent$Executor;Lio/matthewnelson/kmp/tor/runtime/core/OnEvent;)Lio/matthewnelson/kmp/tor/runtime/core/Event$Observer;
+	public final fun hashCode ()I
 	public final fun observer (Lio/matthewnelson/kmp/tor/runtime/core/OnEvent;)Lio/matthewnelson/kmp/tor/runtime/core/Event$Observer;
 	public final fun observer (Ljava/lang/String;Lio/matthewnelson/kmp/tor/runtime/core/OnEvent$Executor;Lio/matthewnelson/kmp/tor/runtime/core/OnEvent;)Lio/matthewnelson/kmp/tor/runtime/core/Event$Observer;
 	public final fun observer (Ljava/lang/String;Lio/matthewnelson/kmp/tor/runtime/core/OnEvent;)Lio/matthewnelson/kmp/tor/runtime/core/Event$Observer;
@@ -664,62 +666,42 @@ public abstract class io/matthewnelson/kmp/tor/runtime/core/TorEvent : io/matthe
 
 public final class io/matthewnelson/kmp/tor/runtime/core/TorEvent$ADDRMAP : io/matthewnelson/kmp/tor/runtime/core/TorEvent {
 	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/core/TorEvent$ADDRMAP;
-	public fun equals (Ljava/lang/Object;)Z
-	public fun hashCode ()I
 }
 
 public final class io/matthewnelson/kmp/tor/runtime/core/TorEvent$BUILDTIMEOUT_SET : io/matthewnelson/kmp/tor/runtime/core/TorEvent {
 	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/core/TorEvent$BUILDTIMEOUT_SET;
-	public fun equals (Ljava/lang/Object;)Z
-	public fun hashCode ()I
 }
 
 public final class io/matthewnelson/kmp/tor/runtime/core/TorEvent$BW : io/matthewnelson/kmp/tor/runtime/core/TorEvent {
 	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/core/TorEvent$BW;
-	public fun equals (Ljava/lang/Object;)Z
-	public fun hashCode ()I
 }
 
 public final class io/matthewnelson/kmp/tor/runtime/core/TorEvent$CELL_STATS : io/matthewnelson/kmp/tor/runtime/core/TorEvent {
 	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/core/TorEvent$CELL_STATS;
-	public fun equals (Ljava/lang/Object;)Z
-	public fun hashCode ()I
 }
 
 public final class io/matthewnelson/kmp/tor/runtime/core/TorEvent$CIRC : io/matthewnelson/kmp/tor/runtime/core/TorEvent {
 	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/core/TorEvent$CIRC;
-	public fun equals (Ljava/lang/Object;)Z
-	public fun hashCode ()I
 }
 
 public final class io/matthewnelson/kmp/tor/runtime/core/TorEvent$CIRC_BW : io/matthewnelson/kmp/tor/runtime/core/TorEvent {
 	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/core/TorEvent$CIRC_BW;
-	public fun equals (Ljava/lang/Object;)Z
-	public fun hashCode ()I
 }
 
 public final class io/matthewnelson/kmp/tor/runtime/core/TorEvent$CIRC_MINOR : io/matthewnelson/kmp/tor/runtime/core/TorEvent {
 	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/core/TorEvent$CIRC_MINOR;
-	public fun equals (Ljava/lang/Object;)Z
-	public fun hashCode ()I
 }
 
 public final class io/matthewnelson/kmp/tor/runtime/core/TorEvent$CLIENTS_SEEN : io/matthewnelson/kmp/tor/runtime/core/TorEvent {
 	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/core/TorEvent$CLIENTS_SEEN;
-	public fun equals (Ljava/lang/Object;)Z
-	public fun hashCode ()I
 }
 
 public final class io/matthewnelson/kmp/tor/runtime/core/TorEvent$CONF_CHANGED : io/matthewnelson/kmp/tor/runtime/core/TorEvent {
 	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/core/TorEvent$CONF_CHANGED;
-	public fun equals (Ljava/lang/Object;)Z
-	public fun hashCode ()I
 }
 
 public final class io/matthewnelson/kmp/tor/runtime/core/TorEvent$CONN_BW : io/matthewnelson/kmp/tor/runtime/core/TorEvent {
 	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/core/TorEvent$CONN_BW;
-	public fun equals (Ljava/lang/Object;)Z
-	public fun hashCode ()I
 }
 
 public final class io/matthewnelson/kmp/tor/runtime/core/TorEvent$Companion : io/matthewnelson/kmp/tor/runtime/core/Event$Entries {
@@ -732,80 +714,54 @@ public final class io/matthewnelson/kmp/tor/runtime/core/TorEvent$Companion : io
 
 public final class io/matthewnelson/kmp/tor/runtime/core/TorEvent$DEBUG : io/matthewnelson/kmp/tor/runtime/core/TorEvent {
 	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/core/TorEvent$DEBUG;
-	public fun equals (Ljava/lang/Object;)Z
-	public fun hashCode ()I
 }
 
 public final class io/matthewnelson/kmp/tor/runtime/core/TorEvent$DESCCHANGED : io/matthewnelson/kmp/tor/runtime/core/TorEvent {
 	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/core/TorEvent$DESCCHANGED;
-	public fun equals (Ljava/lang/Object;)Z
-	public fun hashCode ()I
 }
 
 public final class io/matthewnelson/kmp/tor/runtime/core/TorEvent$ERR : io/matthewnelson/kmp/tor/runtime/core/TorEvent {
 	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/core/TorEvent$ERR;
-	public fun equals (Ljava/lang/Object;)Z
-	public fun hashCode ()I
 }
 
 public final class io/matthewnelson/kmp/tor/runtime/core/TorEvent$GUARD : io/matthewnelson/kmp/tor/runtime/core/TorEvent {
 	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/core/TorEvent$GUARD;
-	public fun equals (Ljava/lang/Object;)Z
-	public fun hashCode ()I
 }
 
 public final class io/matthewnelson/kmp/tor/runtime/core/TorEvent$HS_DESC : io/matthewnelson/kmp/tor/runtime/core/TorEvent {
 	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/core/TorEvent$HS_DESC;
-	public fun equals (Ljava/lang/Object;)Z
-	public fun hashCode ()I
 }
 
 public final class io/matthewnelson/kmp/tor/runtime/core/TorEvent$HS_DESC_CONTENT : io/matthewnelson/kmp/tor/runtime/core/TorEvent {
 	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/core/TorEvent$HS_DESC_CONTENT;
-	public fun equals (Ljava/lang/Object;)Z
-	public fun hashCode ()I
 }
 
 public final class io/matthewnelson/kmp/tor/runtime/core/TorEvent$INFO : io/matthewnelson/kmp/tor/runtime/core/TorEvent {
 	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/core/TorEvent$INFO;
-	public fun equals (Ljava/lang/Object;)Z
-	public fun hashCode ()I
 }
 
 public final class io/matthewnelson/kmp/tor/runtime/core/TorEvent$NETWORK_LIVENESS : io/matthewnelson/kmp/tor/runtime/core/TorEvent {
 	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/core/TorEvent$NETWORK_LIVENESS;
-	public fun equals (Ljava/lang/Object;)Z
-	public fun hashCode ()I
 }
 
 public final class io/matthewnelson/kmp/tor/runtime/core/TorEvent$NEWCONSENSUS : io/matthewnelson/kmp/tor/runtime/core/TorEvent {
 	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/core/TorEvent$NEWCONSENSUS;
-	public fun equals (Ljava/lang/Object;)Z
-	public fun hashCode ()I
 }
 
 public final class io/matthewnelson/kmp/tor/runtime/core/TorEvent$NEWDESC : io/matthewnelson/kmp/tor/runtime/core/TorEvent {
 	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/core/TorEvent$NEWDESC;
-	public fun equals (Ljava/lang/Object;)Z
-	public fun hashCode ()I
 }
 
 public final class io/matthewnelson/kmp/tor/runtime/core/TorEvent$NOTICE : io/matthewnelson/kmp/tor/runtime/core/TorEvent {
 	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/core/TorEvent$NOTICE;
-	public fun equals (Ljava/lang/Object;)Z
-	public fun hashCode ()I
 }
 
 public final class io/matthewnelson/kmp/tor/runtime/core/TorEvent$NS : io/matthewnelson/kmp/tor/runtime/core/TorEvent {
 	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/core/TorEvent$NS;
-	public fun equals (Ljava/lang/Object;)Z
-	public fun hashCode ()I
 }
 
 public final class io/matthewnelson/kmp/tor/runtime/core/TorEvent$ORCONN : io/matthewnelson/kmp/tor/runtime/core/TorEvent {
 	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/core/TorEvent$ORCONN;
-	public fun equals (Ljava/lang/Object;)Z
-	public fun hashCode ()I
 }
 
 public class io/matthewnelson/kmp/tor/runtime/core/TorEvent$Observer : io/matthewnelson/kmp/tor/runtime/core/Event$Observer {
@@ -825,50 +781,34 @@ public abstract interface class io/matthewnelson/kmp/tor/runtime/core/TorEvent$P
 
 public final class io/matthewnelson/kmp/tor/runtime/core/TorEvent$SIGNAL : io/matthewnelson/kmp/tor/runtime/core/TorEvent {
 	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/core/TorEvent$SIGNAL;
-	public fun equals (Ljava/lang/Object;)Z
-	public fun hashCode ()I
 }
 
 public final class io/matthewnelson/kmp/tor/runtime/core/TorEvent$STATUS_CLIENT : io/matthewnelson/kmp/tor/runtime/core/TorEvent {
 	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/core/TorEvent$STATUS_CLIENT;
-	public fun equals (Ljava/lang/Object;)Z
-	public fun hashCode ()I
 }
 
 public final class io/matthewnelson/kmp/tor/runtime/core/TorEvent$STATUS_GENERAL : io/matthewnelson/kmp/tor/runtime/core/TorEvent {
 	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/core/TorEvent$STATUS_GENERAL;
-	public fun equals (Ljava/lang/Object;)Z
-	public fun hashCode ()I
 }
 
 public final class io/matthewnelson/kmp/tor/runtime/core/TorEvent$STATUS_SERVER : io/matthewnelson/kmp/tor/runtime/core/TorEvent {
 	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/core/TorEvent$STATUS_SERVER;
-	public fun equals (Ljava/lang/Object;)Z
-	public fun hashCode ()I
 }
 
 public final class io/matthewnelson/kmp/tor/runtime/core/TorEvent$STREAM : io/matthewnelson/kmp/tor/runtime/core/TorEvent {
 	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/core/TorEvent$STREAM;
-	public fun equals (Ljava/lang/Object;)Z
-	public fun hashCode ()I
 }
 
 public final class io/matthewnelson/kmp/tor/runtime/core/TorEvent$STREAM_BW : io/matthewnelson/kmp/tor/runtime/core/TorEvent {
 	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/core/TorEvent$STREAM_BW;
-	public fun equals (Ljava/lang/Object;)Z
-	public fun hashCode ()I
 }
 
 public final class io/matthewnelson/kmp/tor/runtime/core/TorEvent$TRANSPORT_LAUNCHED : io/matthewnelson/kmp/tor/runtime/core/TorEvent {
 	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/core/TorEvent$TRANSPORT_LAUNCHED;
-	public fun equals (Ljava/lang/Object;)Z
-	public fun hashCode ()I
 }
 
 public final class io/matthewnelson/kmp/tor/runtime/core/TorEvent$WARN : io/matthewnelson/kmp/tor/runtime/core/TorEvent {
 	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/core/TorEvent$WARN;
-	public fun equals (Ljava/lang/Object;)Z
-	public fun hashCode ()I
 }
 
 public final class io/matthewnelson/kmp/tor/runtime/core/UncaughtException : java/lang/Exception {

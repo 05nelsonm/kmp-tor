@@ -93,6 +93,8 @@ internal class RealTorRuntime private constructor(
         + dispatcher
     )
 
+    private val manager = StateManager()
+
     @Suppress("PrivatePropertyName")
     private val NOTIFIER = Notifier()
 
@@ -141,6 +143,8 @@ internal class RealTorRuntime private constructor(
     internal fun handler(): UncaughtException.Handler = handler
 
     public override fun environment(): TorRuntime.Environment = generator.environment
+
+    public override fun state(): TorState = manager.state
 
     public override fun enqueue(
         action: Action,
@@ -249,6 +253,8 @@ internal class RealTorRuntime private constructor(
         cmdQueue?.connection?.destroy()
         cmdQueue?.destroy()
 
+        manager.update(TorState.Daemon.Off, TorState.Network.Disabled)
+
         if (stack.isNotEmpty()) {
             NOTIFIER.d(this, "Interrupting/Completing ActionJobs")
         }
@@ -338,12 +344,12 @@ internal class RealTorRuntime private constructor(
             if (destroyed) return emptyList<Executable>() to null
 
             return synchronized(enqueueLock) {
-                if (destroyed || actionStack.isEmpty()) {
+                if (destroyed) {
                     return@synchronized emptyList<Executable>() to null
                 }
 
                 var execute: ActionJob.Sealed? = null
-                val executables = ArrayList<Executable>((actionStack.size - 1))
+                val executables = ArrayList<Executable>((actionStack.size - 1).coerceAtLeast(0))
 
                 while (actionStack.isNotEmpty()) {
                     // LIFO
@@ -439,7 +445,14 @@ internal class RealTorRuntime private constructor(
                 }
 
                 if (execute == null) {
-                    // TODO: Check state
+                    // Stack was empty. Processor is about to stop.
+                    // Ensure state is correct before we get stopped
+                    if (_cmdQueue?.connection?.isDestroyed() != false) {
+                        // Is null or destroyed (no active control connection)
+                        executables.add(Executable {
+                            manager.update(TorState.Daemon.Off, TorState.Network.Disabled)
+                        })
+                    }
                 }
 
                 executables to execute
@@ -526,7 +539,7 @@ internal class RealTorRuntime private constructor(
                 return
             }
 
-            TorProcess.start(generator, NOTIFIER, scope, connect = {
+            TorProcess.start(generator, NOTIFIER, scope, manager, connect = {
                 val ctrl = connection.openWith(factory)
 
                 val lceCtrl = RealTorCtrl(ctrl)
@@ -581,7 +594,7 @@ internal class RealTorRuntime private constructor(
             val lifecycle = _lifecycle
             if (this is ActionJob.StopJob && lifecycle != null) {
                 NOTIFIER.i(this@ActionProcessor, "Lifecycle is present (Service). Destroying immediately.")
-
+                manager.update(TorState.Daemon.Stopping)
                 oldCmdQueue?.connection?.destroy()
                 oldCmdQueue?.destroy()
                 lifecycle.destroy()
@@ -605,6 +618,8 @@ internal class RealTorRuntime private constructor(
                 oldQueue.destroy()
                 return
             }
+
+            manager.update(TorState.Daemon.Stopping)
 
             try {
                 // Try a clean shutdown which will destroy itself
@@ -660,7 +675,7 @@ internal class RealTorRuntime private constructor(
             }
         }
 
-        private inner class ProcessLogObserver: ObserverLogProcess() {
+        private inner class ProcessLogObserver: ObserverLogProcess(manager) {
             public override fun notify(data: String) {
                 super.notify(data)
                 event.notifyObservers(data)
@@ -684,10 +699,17 @@ internal class RealTorRuntime private constructor(
         public override fun toString(): String = this.toFIDString()
     }
 
-    private inner class ConfChangedObserver: ObserverConfChanged(generator.environment.staticTag()) {
+    private inner class ConfChangedObserver: ObserverConfChanged(manager, generator.environment.staticTag()) {
         protected override fun notify(data: String) {
             super.notify(data)
             event.notifyObservers(data)
+        }
+    }
+
+    private inner class StateManager: TorStateManager(generator.environment) {
+        protected override fun notify(old: TorState, new: TorState) {
+            // TODO
+            STATE.notifyObservers(new)
         }
     }
 
@@ -727,9 +749,25 @@ internal class RealTorRuntime private constructor(
         // to create an unused dispatcher for Jvm & Native
         private val dispatcher by lazy { generator.environment.newRuntimeDispatcher() }
 
-        override val binder: ServiceCtrlBinder = ServiceCtrlBinder()
+        public override val binder: ServiceCtrlBinder = ServiceCtrlBinder()
 
         public override fun environment(): TorRuntime.Environment = generator.environment
+
+        public override fun state(): TorState = _instance?.state() ?: synchronized(lock) {
+            _instance?.state() ?: run {
+                val daemon = if (_startServiceJob?.isActive == true) {
+                    TorState.Daemon.Starting
+                } else {
+                    TorState.Daemon.Off
+                }
+
+                TorState.of(
+                    daemon = daemon,
+                    network = TorState.Network.Disabled,
+                    fid = this,
+                )
+            }
+        }
 
         public override fun enqueue(
             action: Action,
@@ -916,6 +954,7 @@ internal class RealTorRuntime private constructor(
                 w(this@RealServiceFactoryCtrl, "Failed to start service. Interrupting EnqueuedJobs.")
 
                 handler.withSuppression {
+
                     val context = name.name + " timed out"
 
                     executables.forEach { executable ->
@@ -956,6 +995,7 @@ internal class RealTorRuntime private constructor(
                         is EXECUTE.CMD -> event.observer(tag) { event.notifyObservers(it) }
                         is LIFECYCLE -> event.observer(tag) { event.notifyObservers(it) }
                         is LOG -> event.observer(tag) { event.notifyObservers(it) }
+                        is STATE -> event.observer(tag) { event.notifyObservers(it) }
                     }
                 }.toImmutableSet()
             }

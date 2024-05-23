@@ -53,13 +53,14 @@ class ObserverConnectivityUnitTest {
 
         val runtime = TorRuntime.Builder(testEnv("obs_conn_no_net")) {
             networkObserver = observer
-//            observerStatic(RuntimeEvent.LOG.DEBUG) { println(it) }
-//            observerStatic(RuntimeEvent.LOG.PROCESS) { println(it) }
             observerStatic(RuntimeEvent.LOG.WARN) { warnings.add(it) }
             observerStatic(RuntimeEvent.EXECUTE.CMD) { cmds.add(it) }
-        }.ensureStoppedOnTestCompletion()
 
-        runtime.environment().debug = true
+//            observerStatic(RuntimeEvent.LOG.DEBUG) { println(it) }
+//            observerStatic(RuntimeEvent.LOG.PROCESS) { println(it) }
+//            observerStatic(RuntimeEvent.LIFECYCLE) { println(it) }
+//            observerStatic(RuntimeEvent.STATE) { println(it) }
+        }.ensureStoppedOnTestCompletion()
 
         runtime.startDaemonAsync()
 

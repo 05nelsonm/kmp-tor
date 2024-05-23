@@ -16,11 +16,14 @@
 package io.matthewnelson.kmp.tor.runtime.internal
 
 import io.matthewnelson.kmp.tor.runtime.RuntimeEvent
+import io.matthewnelson.kmp.tor.runtime.TorState
 import io.matthewnelson.kmp.tor.runtime.core.OnEvent
 import io.matthewnelson.kmp.tor.runtime.core.ctrl.TorCmd
 import io.matthewnelson.kmp.tor.runtime.ctrl.TorCmdInterceptor
 
-internal open class ObserverLogProcess internal constructor(): RuntimeEvent.Observer<String>(
+internal open class ObserverLogProcess internal constructor(
+    private val manager: TorStateManager,
+): RuntimeEvent.Observer<String>(
     RuntimeEvent.LOG.PROCESS,
     null,
     OnEvent.Executor.Immediate,
@@ -38,11 +41,26 @@ internal open class ObserverLogProcess internal constructor(): RuntimeEvent.Obse
     }
 
     protected override fun notify(data: String) {
-        val notice = data
+        data
             .substringAfter(NOTICE, "")
-            .ifBlank { null } ?: return
+            .ifBlank { null }
+            ?.parse()
+    }
 
-        // TODO: parse data
+    private fun String.parse() = when {
+        // [notice] Bootstrapped 0% (
+        startsWith("Bootstrapped ") -> {
+            val pct = substringAfter("Bootstrapped ")
+                .substringBefore("%")
+                .toByteOrNull()
+
+            if (pct != null) {
+                manager.update(TorState.Daemon.On(pct))
+            }
+
+            Unit
+        }
+        else -> {}
     }
 
     private companion object {

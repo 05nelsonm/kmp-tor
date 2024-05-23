@@ -49,6 +49,7 @@ class TorRuntimeUnitTest {
 //            observerStatic(RuntimeEvent.LOG.INFO) { println(it) }
 //            observerStatic(RuntimeEvent.LOG.WARN) { println(it) }
 //            observerStatic(RuntimeEvent.LOG.PROCESS) { println(it) }
+//            observerStatic(RuntimeEvent.STATE) { println(it) }
 
             config { environment ->
                 environment.torrcFile.writeUtf8("""
@@ -57,8 +58,6 @@ class TorRuntimeUnitTest {
                 """.trimIndent())
             }
         }
-
-        runtime.environment().debug = true
 
         listOf(
             Action.StartDaemon,

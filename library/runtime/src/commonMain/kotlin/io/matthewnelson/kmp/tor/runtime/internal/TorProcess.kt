@@ -24,16 +24,13 @@ import io.matthewnelson.kmp.process.Process
 import io.matthewnelson.kmp.process.Signal
 import io.matthewnelson.kmp.process.Stdio
 import io.matthewnelson.kmp.tor.core.api.ResourceInstaller
-import io.matthewnelson.kmp.tor.runtime.FileID
+import io.matthewnelson.kmp.tor.runtime.*
 import io.matthewnelson.kmp.tor.runtime.FileID.Companion.toFIDString
-import io.matthewnelson.kmp.tor.runtime.Lifecycle
-import io.matthewnelson.kmp.tor.runtime.RuntimeEvent
 import io.matthewnelson.kmp.tor.runtime.RuntimeEvent.Notifier.Companion.d
 import io.matthewnelson.kmp.tor.runtime.RuntimeEvent.Notifier.Companion.i
 import io.matthewnelson.kmp.tor.runtime.RuntimeEvent.Notifier.Companion.lce
 import io.matthewnelson.kmp.tor.runtime.RuntimeEvent.Notifier.Companion.p
 import io.matthewnelson.kmp.tor.runtime.RuntimeEvent.Notifier.Companion.w
-import io.matthewnelson.kmp.tor.runtime.TorRuntime
 import io.matthewnelson.kmp.tor.runtime.core.TorConfig
 import io.matthewnelson.kmp.tor.runtime.core.address.ProxyAddress
 import io.matthewnelson.kmp.tor.runtime.core.address.ProxyAddress.Companion.toProxyAddressOrNull
@@ -57,6 +54,7 @@ internal class TorProcess private constructor(
     private val NOTIFIER: RuntimeEvent.Notifier,
     private val scope: CoroutineScope,
     private val state: FIDState,
+    private val manager: TorStateManager,
 ): FileID by generator.environment {
 
     @Throws(Throwable::class)
@@ -107,6 +105,7 @@ internal class TorProcess private constructor(
 
             connect(arguments)
         } catch (t: Throwable) {
+            manager.update(TorState.Daemon.Stopping)
             processJob.cancel()
             throw t
         }
@@ -117,15 +116,10 @@ internal class TorProcess private constructor(
     }
 
     private suspend fun FIDState.cancelAndJoinOtherProcess() {
-        val job = processJob ?: return
+        processJob?.cancelAndJoin()
+        yield()
 
-        // Ensures that if the process was active that we yield
-        // briefly such that the try/finally block can set its
-        // stopMark.
-        val ensureFinally = (if (job.isActive) 5 else -1).milliseconds
-
-        job.cancelAndJoin()
-        delay(ensureFinally)
+        manager.update(TorState.Daemon.Starting, TorState.Network.Disabled)
 
         // Need to ensure there is at least 500ms between last
         // process' stop, and this process' start for TorProcess
@@ -199,6 +193,7 @@ internal class TorProcess private constructor(
             state.stopMark = TimeSource.Monotonic.markNow()
             process.destroy()
             NOTIFIER.lce(Lifecycle.Event.OnDestroy(this@TorProcess))
+            manager.update(TorState.Daemon.Off, TorState.Network.Disabled)
         }
 
         return feed to processJob
@@ -479,6 +474,7 @@ internal class TorProcess private constructor(
             generator: TorConfigGenerator,
             NOTIFIER: RuntimeEvent.Notifier,
             scope: CoroutineScope,
+            manager: TorStateManager,
             connect: suspend CtrlArguments.() -> T,
         ): T {
             val state = getOrCreateInstance(generator.environment.fid) { FIDState() }
@@ -488,6 +484,7 @@ internal class TorProcess private constructor(
                 NOTIFIER,
                 scope,
                 state as FIDState,
+                manager,
             )
 
             return process.start(connect)

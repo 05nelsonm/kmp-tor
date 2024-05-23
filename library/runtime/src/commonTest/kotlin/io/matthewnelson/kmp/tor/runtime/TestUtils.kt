@@ -34,7 +34,7 @@ object TestUtils {
         cacheDirectory = SysTempDir.resolve("kmp_tor_test/$dirName/cache"),
         installer = { dir -> TorResources(dir) },
         block = block
-    )
+    ).also { it.debug = true }
 
     suspend fun <T: Action.Processor> T.ensureStoppedOnTestCompletion(): T {
         currentCoroutineContext().job.invokeOnCompletion {
