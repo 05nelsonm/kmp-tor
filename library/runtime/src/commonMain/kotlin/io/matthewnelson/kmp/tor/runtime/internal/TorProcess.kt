@@ -117,15 +117,9 @@ internal class TorProcess private constructor(
     }
 
     private suspend fun FIDState.cancelAndJoinOtherProcess() {
-        val job = processJob ?: return
-
-        // Ensures that if the process was active that we yield
-        // briefly such that the try/finally block can set its
-        // stopMark.
-        val ensureFinally = (if (job.isActive) 5 else -1).milliseconds
-
-        job.cancelAndJoin()
-        delay(ensureFinally)
+        processJob?.cancelAndJoin()
+        yield()
+        // TODO: Update TorState to Starting
 
         // Need to ensure there is at least 500ms between last
         // process' stop, and this process' start for TorProcess

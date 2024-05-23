@@ -96,6 +96,7 @@ public final class io/matthewnelson/kmp/tor/runtime/Lifecycle$DestroyableTorRunt
 	public fun hashCode ()I
 	public final fun invokeOnDestroy (Lio/matthewnelson/kmp/tor/runtime/core/ItBlock;)Lio/matthewnelson/kmp/tor/runtime/core/Disposable;
 	public fun isDestroyed ()Z
+	public fun state ()Lio/matthewnelson/kmp/tor/runtime/TorState;
 	public fun subscribe (Lio/matthewnelson/kmp/tor/runtime/RuntimeEvent$Observer;)V
 	public fun subscribe (Lio/matthewnelson/kmp/tor/runtime/core/TorEvent$Observer;)V
 	public fun subscribe ([Lio/matthewnelson/kmp/tor/runtime/RuntimeEvent$Observer;)V
@@ -206,8 +207,6 @@ public final class io/matthewnelson/kmp/tor/runtime/RuntimeEvent$Companion : io/
 
 public final class io/matthewnelson/kmp/tor/runtime/RuntimeEvent$ERROR : io/matthewnelson/kmp/tor/runtime/RuntimeEvent {
 	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/RuntimeEvent$ERROR;
-	public fun equals (Ljava/lang/Object;)Z
-	public fun hashCode ()I
 }
 
 public final class io/matthewnelson/kmp/tor/runtime/RuntimeEvent$EXECUTE {
@@ -219,20 +218,14 @@ public final class io/matthewnelson/kmp/tor/runtime/RuntimeEvent$EXECUTE {
 
 public final class io/matthewnelson/kmp/tor/runtime/RuntimeEvent$EXECUTE$ACTION : io/matthewnelson/kmp/tor/runtime/RuntimeEvent {
 	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/RuntimeEvent$EXECUTE$ACTION;
-	public fun equals (Ljava/lang/Object;)Z
-	public fun hashCode ()I
 }
 
 public final class io/matthewnelson/kmp/tor/runtime/RuntimeEvent$EXECUTE$CMD : io/matthewnelson/kmp/tor/runtime/RuntimeEvent {
 	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/RuntimeEvent$EXECUTE$CMD;
-	public fun equals (Ljava/lang/Object;)Z
-	public fun hashCode ()I
 }
 
 public final class io/matthewnelson/kmp/tor/runtime/RuntimeEvent$LIFECYCLE : io/matthewnelson/kmp/tor/runtime/RuntimeEvent {
 	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/RuntimeEvent$LIFECYCLE;
-	public fun equals (Ljava/lang/Object;)Z
-	public fun hashCode ()I
 }
 
 public abstract class io/matthewnelson/kmp/tor/runtime/RuntimeEvent$LOG : io/matthewnelson/kmp/tor/runtime/RuntimeEvent {
@@ -241,26 +234,18 @@ public abstract class io/matthewnelson/kmp/tor/runtime/RuntimeEvent$LOG : io/mat
 
 public final class io/matthewnelson/kmp/tor/runtime/RuntimeEvent$LOG$DEBUG : io/matthewnelson/kmp/tor/runtime/RuntimeEvent$LOG {
 	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/RuntimeEvent$LOG$DEBUG;
-	public fun equals (Ljava/lang/Object;)Z
-	public fun hashCode ()I
 }
 
 public final class io/matthewnelson/kmp/tor/runtime/RuntimeEvent$LOG$INFO : io/matthewnelson/kmp/tor/runtime/RuntimeEvent$LOG {
 	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/RuntimeEvent$LOG$INFO;
-	public fun equals (Ljava/lang/Object;)Z
-	public fun hashCode ()I
 }
 
 public final class io/matthewnelson/kmp/tor/runtime/RuntimeEvent$LOG$PROCESS : io/matthewnelson/kmp/tor/runtime/RuntimeEvent$LOG {
 	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/RuntimeEvent$LOG$PROCESS;
-	public fun equals (Ljava/lang/Object;)Z
-	public fun hashCode ()I
 }
 
 public final class io/matthewnelson/kmp/tor/runtime/RuntimeEvent$LOG$WARN : io/matthewnelson/kmp/tor/runtime/RuntimeEvent$LOG {
 	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/RuntimeEvent$LOG$WARN;
-	public fun equals (Ljava/lang/Object;)Z
-	public fun hashCode ()I
 }
 
 public abstract interface class io/matthewnelson/kmp/tor/runtime/RuntimeEvent$Notifier {
@@ -298,6 +283,10 @@ public abstract interface class io/matthewnelson/kmp/tor/runtime/RuntimeEvent$Pr
 	public abstract fun unsubscribeAll ([Lio/matthewnelson/kmp/tor/runtime/RuntimeEvent;)V
 }
 
+public final class io/matthewnelson/kmp/tor/runtime/RuntimeEvent$STATE : io/matthewnelson/kmp/tor/runtime/RuntimeEvent {
+	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/RuntimeEvent$STATE;
+}
+
 public final class io/matthewnelson/kmp/tor/runtime/TorCmdJob : io/matthewnelson/kmp/tor/runtime/core/EnqueuedJob {
 	public final field cmd Lkotlin/reflect/KClass;
 	public synthetic fun <init> (Lkotlin/reflect/KClass;Lio/matthewnelson/kmp/tor/runtime/core/EnqueuedJob;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
@@ -309,6 +298,7 @@ public abstract interface class io/matthewnelson/kmp/tor/runtime/TorRuntime : io
 	public static final field Companion Lio/matthewnelson/kmp/tor/runtime/TorRuntime$Companion;
 	public static fun Builder (Lio/matthewnelson/kmp/tor/runtime/TorRuntime$Environment;Lio/matthewnelson/kmp/tor/runtime/core/ThisBlock;)Lio/matthewnelson/kmp/tor/runtime/TorRuntime;
 	public abstract fun environment ()Lio/matthewnelson/kmp/tor/runtime/TorRuntime$Environment;
+	public abstract fun state ()Lio/matthewnelson/kmp/tor/runtime/TorState;
 }
 
 public final class io/matthewnelson/kmp/tor/runtime/TorRuntime$Builder {
@@ -373,6 +363,7 @@ public abstract class io/matthewnelson/kmp/tor/runtime/TorRuntime$ServiceFactory
 	public final fun getFid ()Ljava/lang/String;
 	public final fun hashCode ()I
 	protected abstract fun startService ()V
+	public final fun state ()Lio/matthewnelson/kmp/tor/runtime/TorState;
 	public final fun subscribe (Lio/matthewnelson/kmp/tor/runtime/RuntimeEvent$Observer;)V
 	public final fun subscribe (Lio/matthewnelson/kmp/tor/runtime/core/TorEvent$Observer;)V
 	public final fun subscribe ([Lio/matthewnelson/kmp/tor/runtime/RuntimeEvent$Observer;)V
@@ -400,5 +391,72 @@ public final class io/matthewnelson/kmp/tor/runtime/TorRuntime$ServiceFactory$In
 public abstract class io/matthewnelson/kmp/tor/runtime/TorRuntime$ServiceFactory$Loader {
 	public fun <init> ()V
 	protected abstract fun loadProtected (Lio/matthewnelson/kmp/tor/runtime/TorRuntime$ServiceFactory$Initializer;)Lio/matthewnelson/kmp/tor/runtime/TorRuntime$ServiceFactory;
+}
+
+public final class io/matthewnelson/kmp/tor/runtime/TorState {
+	public final field daemon Lio/matthewnelson/kmp/tor/runtime/TorState$Daemon;
+	public final field isNetworkDisabled Z
+	public final field isNetworkEnabled Z
+	public final field isOff Z
+	public final field isOn Z
+	public final field isStarting Z
+	public final field isStopping Z
+	public final field network Lio/matthewnelson/kmp/tor/runtime/TorState$Network;
+	public fun <init> (Lio/matthewnelson/kmp/tor/runtime/TorState$Daemon;Lio/matthewnelson/kmp/tor/runtime/TorState$Network;)V
+	public final fun component1 ()Lio/matthewnelson/kmp/tor/runtime/TorState$Daemon;
+	public final fun component2 ()Lio/matthewnelson/kmp/tor/runtime/TorState$Network;
+	public final fun copy (Lio/matthewnelson/kmp/tor/runtime/TorState$Daemon;)Lio/matthewnelson/kmp/tor/runtime/TorState;
+	public final fun copy (Lio/matthewnelson/kmp/tor/runtime/TorState$Daemon;Lio/matthewnelson/kmp/tor/runtime/TorState$Network;)Lio/matthewnelson/kmp/tor/runtime/TorState;
+	public final fun copy (Lio/matthewnelson/kmp/tor/runtime/TorState$Network;)Lio/matthewnelson/kmp/tor/runtime/TorState;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public abstract class io/matthewnelson/kmp/tor/runtime/TorState$Daemon {
+	public final field bootstrap B
+	public final field isBootstrapped Z
+	public synthetic fun <init> (BLkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun toString ()Ljava/lang/String;
+}
+
+public final class io/matthewnelson/kmp/tor/runtime/TorState$Daemon$Off : io/matthewnelson/kmp/tor/runtime/TorState$Daemon {
+	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/TorState$Daemon$Off;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun hashCode ()I
+}
+
+public final class io/matthewnelson/kmp/tor/runtime/TorState$Daemon$On : io/matthewnelson/kmp/tor/runtime/TorState$Daemon {
+	public fun <init> (B)V
+	public fun equals (Ljava/lang/Object;)Z
+	public fun hashCode ()I
+}
+
+public final class io/matthewnelson/kmp/tor/runtime/TorState$Daemon$Starting : io/matthewnelson/kmp/tor/runtime/TorState$Daemon {
+	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/TorState$Daemon$Starting;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun hashCode ()I
+}
+
+public final class io/matthewnelson/kmp/tor/runtime/TorState$Daemon$Stopping : io/matthewnelson/kmp/tor/runtime/TorState$Daemon {
+	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/TorState$Daemon$Stopping;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun hashCode ()I
+}
+
+public abstract class io/matthewnelson/kmp/tor/runtime/TorState$Network {
+	public final fun toString ()Ljava/lang/String;
+}
+
+public final class io/matthewnelson/kmp/tor/runtime/TorState$Network$Disabled : io/matthewnelson/kmp/tor/runtime/TorState$Network {
+	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/TorState$Network$Disabled;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun hashCode ()I
+}
+
+public final class io/matthewnelson/kmp/tor/runtime/TorState$Network$Enabled : io/matthewnelson/kmp/tor/runtime/TorState$Network {
+	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/TorState$Network$Enabled;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun hashCode ()I
 }
 

@@ -59,8 +59,6 @@ class ObserverConnectivityUnitTest {
             observerStatic(RuntimeEvent.EXECUTE.CMD) { cmds.add(it) }
         }.ensureStoppedOnTestCompletion()
 
-        runtime.environment().debug = true
-
         runtime.startDaemonAsync()
 
         var contains = false

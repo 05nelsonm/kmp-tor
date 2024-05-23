@@ -956,6 +956,7 @@ internal class RealTorRuntime private constructor(
                         is EXECUTE.CMD -> event.observer(tag) { event.notifyObservers(it) }
                         is LIFECYCLE -> event.observer(tag) { event.notifyObservers(it) }
                         is LOG -> event.observer(tag) { event.notifyObservers(it) }
+                        is STATE -> event.observer(tag) { event.notifyObservers(it) }
                     }
                 }.toImmutableSet()
             }
