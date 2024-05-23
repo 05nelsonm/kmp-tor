@@ -344,12 +344,12 @@ internal class RealTorRuntime private constructor(
             if (destroyed) return emptyList<Executable>() to null
 
             return synchronized(enqueueLock) {
-                if (destroyed || actionStack.isEmpty()) {
+                if (destroyed) {
                     return@synchronized emptyList<Executable>() to null
                 }
 
                 var execute: ActionJob.Sealed? = null
-                val executables = ArrayList<Executable>((actionStack.size - 1))
+                val executables = ArrayList<Executable>((actionStack.size - 1).coerceAtLeast(0))
 
                 while (actionStack.isNotEmpty()) {
                     // LIFO
@@ -445,7 +445,8 @@ internal class RealTorRuntime private constructor(
                 }
 
                 if (execute == null) {
-                    // Stack is empty. Ensure state is correct before we get stopped
+                    // Stack was empty. Processor is about to stop.
+                    // Ensure state is correct before we get stopped
                     if (_cmdQueue?.connection?.isDestroyed() != false) {
                         // Is null or destroyed (no active control connection)
                         executables.add(Executable {
