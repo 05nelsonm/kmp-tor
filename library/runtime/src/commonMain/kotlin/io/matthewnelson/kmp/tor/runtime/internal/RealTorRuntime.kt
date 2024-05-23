@@ -286,10 +286,12 @@ internal class RealTorRuntime private constructor(
             }
         }
 
-        private suspend fun CoroutineScope.loop() {
+        private suspend fun loop() {
             NOTIFIER.d(this@ActionProcessor, "Processing Jobs")
 
-            while (isActive) {
+            while (true) {
+                yield()
+
                 val (executables, job) = synchronized(processorLock) {
                     val result = processStack()
 
