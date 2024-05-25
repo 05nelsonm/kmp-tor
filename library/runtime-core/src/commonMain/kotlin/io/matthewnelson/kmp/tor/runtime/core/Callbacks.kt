@@ -110,7 +110,7 @@ public fun interface OnEvent<in Data: Any?>: ItBlock<Data> {
 
     /**
      * `kmp-tor` utilizes several different background threads for
-     * which events are generated on, then dispatches them to registered
+     * which events are generated on, then dispatches them to subscribed
      * observers' [OnEvent] callbacks. The [Executor] API allows for
      * fine-tuning the context in which that dispatching occurs on
      * several customizable levels.
@@ -156,7 +156,8 @@ public fun interface OnEvent<in Data: Any?>: ItBlock<Data> {
          * preferred.
          *
          * **NOTE:** On `Node.js` this invokes [Executable] immediately as the
-         * `kmp-tor` implementation is entirely asynchronous.
+         * `kmp-tor` implementation is entirely asynchronous and runs on the
+         * main thread.
          *
          * **WARNING:** Jvm/Android requires the respective coroutines UI
          * dependency `kotlinx-coroutines-{android/javafx/swing}`

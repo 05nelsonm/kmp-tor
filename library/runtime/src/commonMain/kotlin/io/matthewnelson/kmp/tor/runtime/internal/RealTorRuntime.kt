@@ -732,14 +732,13 @@ internal class RealTorRuntime private constructor(
         private val builderObserver: NetworkObserver,
         builderRequiredEvents: Set<TorEvent>,
         observersTorEvent: Set<TorEvent.Observer>,
-        defaultExecutor: OnEvent.Executor,
         @Suppress("RemoveRedundantQualifierName")
         observersRuntimeEvent: Set<RuntimeEvent.Observer<*>>,
         private val startService: () -> Unit,
     ):  AbstractRuntimeEventProcessor(
         generator.environment.staticTag(),
         observersRuntimeEvent,
-        defaultExecutor,
+        generator.environment.defaultExecutor(),
         observersTorEvent
     ),  ServiceFactoryCtrl,
         FileID by generator.environment,
@@ -1154,7 +1153,6 @@ internal class RealTorRuntime private constructor(
             networkObserver: NetworkObserver,
             requiredTorEvents: Set<TorEvent>,
             observersTorEvent: Set<TorEvent.Observer>,
-            defaultExecutor: OnEvent.Executor,
             observersRuntimeEvent: Set<RuntimeEvent.Observer<*>>,
         ): TorRuntime = generator.environment.serviceFactoryLoader()?.let { loader ->
             var n: RuntimeEvent.Notifier? = null
@@ -1165,7 +1163,6 @@ internal class RealTorRuntime private constructor(
                     networkObserver,
                     requiredTorEvents,
                     observersTorEvent,
-                    defaultExecutor,
                     observersRuntimeEvent,
                     startService,
                 ).also { n = it }
@@ -1183,7 +1180,7 @@ internal class RealTorRuntime private constructor(
             null,
             generator.environment.newRuntimeDispatcher(),
             observersTorEvent,
-            defaultExecutor,
+            generator.environment.defaultExecutor(),
             observersRuntimeEvent,
         )
     }

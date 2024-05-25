@@ -176,9 +176,9 @@ public class Lifecycle: Destroyable {
      *
      * **NOTE:** Any observers subscribed to this instance will use
      * [OnEvent.Executor.Immediate] as their default, and not what was
-     * defined for [TorRuntime.Builder.defaultEventExecutor]. If this
-     * is undesirable, define an [OnEvent.Executor] for your service
-     * implementation's observer(s) individually.
+     * defined for [TorRuntime.Environment.Builder.defaultEventExecutor].
+     * If this is undesirable, define an [OnEvent.Executor] for your
+     * service implementation's observer(s) individually.
      * */
     public class DestroyableTorRuntime private constructor(
         private val lifecycle: Lifecycle,

@@ -128,22 +128,6 @@ public interface TorRuntime:
         public var networkObserver: NetworkObserver = NetworkObserver.noOp()
 
         /**
-         * Declare a default [OnEvent.Executor] to utilize when dispatching
-         * [TorEvent] and [RuntimeEvent] to registered observers (if the observer
-         * does not provide its own). This can be overridden on a per-observer
-         * basis when creating them, given the needs of that observer and how it
-         * is being used and/or implemented.
-         *
-         * **NOTE:** This should be a singleton with **no** contextual or
-         * non-singleton references outside the [OnEvent.Executor.execute]
-         * lambda.
-         *
-         * Default: [OnEvent.Executor.Immediate]
-         * */
-        @JvmField
-        public var defaultEventExecutor: OnEvent.Executor = OnEvent.Executor.Immediate
-
-        /**
          * Apply settings to the [TorConfig] at each startup. Multiple [block] may
          * be set, each of which will be applied to the [TorConfig.Builder]
          * before starting tor.
@@ -285,7 +269,6 @@ public interface TorRuntime:
                         networkObserver = b.networkObserver,
                         requiredTorEvents = b.requiredTorEvents,
                         observersTorEvent = b.observersTorEvent,
-                        defaultExecutor = b.defaultEventExecutor,
                         observersRuntimeEvent = b.observersRuntimeEvent,
                     )
                 })
@@ -312,6 +295,8 @@ public interface TorRuntime:
         public val torrcDefaultsFile: File,
         @JvmField
         public val torResource: ResourceInstaller<Paths.Tor>,
+
+        private val _defaultExecutor: OnEvent.Executor,
         @OptIn(ExperimentalKmpTorApi::class)
         private val _serviceFactoryLoader: ServiceFactory.Loader?,
     ): FileID {
@@ -417,6 +402,24 @@ public interface TorRuntime:
         ) {
 
             /**
+             * Declare a default [OnEvent.Executor] to utilize when dispatching
+             * [TorEvent] and [RuntimeEvent] to registered observers (if the observer
+             * does not provide its own). This can be overridden on a per-observer
+             * basis when creating them, given the needs of that observer and how it
+             * is being used and/or implemented.
+             *
+             * **NOTE:** This should be a singleton with **no** contextual or
+             * non-singleton references outside the [OnEvent.Executor.execute]
+             * lambda.
+             *
+             * Default: [OnEvent.Executor.Immediate]
+             *
+             * @see [OnEvent.Executor]
+             * */
+            @JvmField
+            public var defaultEventExecutor: OnEvent.Executor = OnEvent.Executor.Immediate
+
+            /**
              * The directory for which **all** resources will be installed
              *
              * Default: [workDirectory]
@@ -476,6 +479,7 @@ public interface TorRuntime:
                             torrcFile = b.torrcFile.absoluteFile.normalize(),
                             torrcDefaultsFile = b.torrcDefaultsFile.absoluteFile.normalize(),
                             torResource = torResource,
+                            _defaultExecutor = b.defaultEventExecutor,
                             _serviceFactoryLoader = b.serviceFactoryLoader,
                         )
                     })
@@ -493,6 +497,9 @@ public interface TorRuntime:
 
         @JvmSynthetic
         internal fun staticTag(): String = _staticTag
+
+        @JvmSynthetic
+        internal fun defaultExecutor(): OnEvent.Executor = _defaultExecutor
 
         @JvmSynthetic
         @OptIn(ExperimentalKmpTorApi::class)
