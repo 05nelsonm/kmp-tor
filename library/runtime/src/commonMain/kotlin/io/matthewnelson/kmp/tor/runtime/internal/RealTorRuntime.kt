@@ -578,7 +578,6 @@ internal class RealTorRuntime private constructor(
                     if (networkObserver.isNetworkConnected()) {
                         add(TorConfig.DisableNetwork)
                     } else {
-                        // TODO: Do better
                         NOTIFIER.w(this@RealTorRuntime, "No Network Connectivity. Waiting...")
                     }
 

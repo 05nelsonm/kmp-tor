@@ -39,31 +39,30 @@ internal open class ObserverConfChanged internal constructor(
 
         for (line in data.lines()) { when {
             // DisableNetwork=0
-            // DisableNetwork
-            line.startsWith(TorConfig.DisableNetwork.name, ignoreCase = true) ->
-                {
-                    network = if (line.substringAfter('=') == "0") {
-                        TorState.Network.Enabled
-                    } else {
-                        TorState.Network.Disabled
-                    }
+            // DisableNetwork=1
+            // DisableNetwork  << Implied 1
+            line.startsWith(TorConfig.DisableNetwork.name, ignoreCase = true) -> {
+                network = if (line.substringAfter('=') == "0") {
+                    TorState.Network.Enabled
+                } else {
+                    TorState.Network.Disabled
                 }
+            }
 
             // __SocksPort=unix:"/tmp/kmp_tor_test/obs_conn_no_net/work/socks2.sock" OnionTrafficOnly GroupWritable
             // SocksPort=unix:"/tmp/kmp_tor_test/obs_conn_no_net/work/socks3.sock"
-            line.startsWith(UNIX_SOCKS_EPHEMERAL, ignoreCase = true)
-            || line.startsWith(UNIX_SOCKS, ignoreCase = true) ->
-                {
-                    val path = line.substringAfter(UNIX_PREFIX, "")
-                        .substringBeforeLast('"', "")
+            line.startsWith("__SocksPort$UNIX", ignoreCase = true)
+            || line.startsWith("SocksPort$UNIX", ignoreCase = true) -> {
+                val path = line.substringAfter(UNIX, "")
+                    .substringBeforeLast('"', "")
 
-                    if (path.isNotBlank()) {
-                        if (socksUnix == null) {
-                            socksUnix = LinkedHashSet(1, 1.0f)
-                        }
-                        socksUnix.add(path.toFile())
+                if (path.isNotBlank()) {
+                    if (socksUnix == null) {
+                        socksUnix = LinkedHashSet(1, 1.0f)
                     }
+                    socksUnix.add(path.toFile())
                 }
+            }
         } }
 
         if (network != null) {
@@ -76,8 +75,6 @@ internal open class ObserverConfChanged internal constructor(
     }
 
     private companion object {
-        private const val UNIX_PREFIX = "=unix:\""
-        private const val UNIX_SOCKS = "SocksPort$UNIX_PREFIX"
-        private const val UNIX_SOCKS_EPHEMERAL = "__$UNIX_SOCKS"
+        private const val UNIX = "=unix:\""
     }
 }
