@@ -26,6 +26,9 @@ import io.matthewnelson.kmp.tor.runtime.Action.Companion.stopDaemonSync
 import io.matthewnelson.kmp.tor.runtime.Lifecycle
 import io.matthewnelson.kmp.tor.runtime.RuntimeEvent
 import io.matthewnelson.kmp.tor.runtime.TorRuntime
+import io.matthewnelson.kmp.tor.runtime.core.OnEvent
+import io.matthewnelson.kmp.tor.runtime.core.UncaughtException
+import kotlin.coroutines.cancellation.CancellationException
 import kotlin.test.*
 import kotlin.time.Duration.Companion.milliseconds
 
@@ -61,6 +64,8 @@ class AndroidServiceFactoryTest {
         val environment = app.createTorRuntimeEnvironment(dirName = "sf_single") { dir -> TorResources(dir) }
         environment.debug = true
 
+        var assertionErrorInvocation = 0
+        var hasThrown = 0
         val lces = mutableListOf<Lifecycle.Event>()
         val factory = TorRuntime.Builder(environment) {
             observerStatic(RuntimeEvent.LIFECYCLE) {
@@ -68,6 +73,23 @@ class AndroidServiceFactoryTest {
                 synchronized(lces) { lces.add(it) }
             }
 //            observerStatic(RuntimeEvent.LOG.DEBUG) { println(it) }
+            observerStatic(RuntimeEvent.ERROR) { t ->
+                if (t is UncaughtException) {
+                    if (t.cause is AssertionError) {
+                        assertionErrorInvocation++
+                        return@observerStatic
+                    }
+                    throw t
+                }
+            }
+            observerStatic(RuntimeEvent.STATE, OnEvent.Executor.Main) { state ->
+                // Should not cause crash
+                when (hasThrown++) {
+                    0 -> throw AssertionError("TESTING")
+                    1 -> throw CancellationException("TESTING")
+                    else -> println(state)
+                }
+            }
         }
 
         try {
@@ -79,6 +101,8 @@ class AndroidServiceFactoryTest {
                 lces.assertContains("TorService", Lifecycle.Event.Name.OnUnbind)
                 lces.assertContains("TorService", Lifecycle.Event.Name.OnDestroy)
             }
+
+            assertEquals(1, assertionErrorInvocation)
         } catch (t: Throwable) {
             factory.enqueue(Action.StopDaemon, {}, {})
             throw t

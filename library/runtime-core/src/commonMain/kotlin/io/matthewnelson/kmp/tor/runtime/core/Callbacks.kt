@@ -132,7 +132,7 @@ public fun interface OnEvent<in Data: Any?>: ItBlock<Data> {
     public fun interface Executor {
 
         /**
-         * Execute [block] in desired context.
+         * Execute [executable] in desired context.
          *
          * **NOTE: This is an internal API and should not be called from general
          * code; it is strictly for `kmp-tor` event observers. Custom implementations
@@ -144,10 +144,10 @@ public fun interface OnEvent<in Data: Any?>: ItBlock<Data> {
          *
          * @param [handler] The [UncaughtException.Handler] wrapped as
          *   [CoroutineContext] element to pipe exceptions.
-         * @param [block] to be invoked in desired context.
+         * @param [executable] to be invoked in desired context.
          * */
         @InternalKmpTorApi
-        public fun execute(handler: CoroutineContext, block: ItBlock<Unit>)
+        public fun execute(handler: CoroutineContext, executable: Executable)
 
         /**
          * Utilizes [Dispatchers.Main] under the hood to transition events
@@ -155,7 +155,7 @@ public fun interface OnEvent<in Data: Any?>: ItBlock<Data> {
          * [MainCoroutineDispatcher.immediate] is available, that is always
          * preferred.
          *
-         * **NOTE:** On `Node.js` this invokes [ItBlock] immediately as the
+         * **NOTE:** On `Node.js` this invokes [Executable] immediately as the
          * `kmp-tor` implementation is entirely asynchronous.
          *
          * **WARNING:** Jvm/Android requires the respective coroutines UI
@@ -182,7 +182,7 @@ public fun interface OnEvent<in Data: Any?>: ItBlock<Data> {
         public object Immediate: Executor {
 
             @InternalKmpTorApi
-            override fun execute(handler: CoroutineContext, block: ItBlock<Unit>) { block(Unit) }
+            override fun execute(handler: CoroutineContext, executable: Executable) { executable.execute() }
 
             override fun toString(): String = "OnEvent.Executor.Immediate"
         }

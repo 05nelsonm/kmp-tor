@@ -242,8 +242,19 @@ public abstract class Event<Data: Any?, E: Event<Data, E, O>, O: Event.Observer<
          *   if no executor was not defined for this observer.
          * */
         public fun notify(handler: CoroutineContext, default: OnEvent.Executor, data: Data) {
+            val executor = executor ?: default
+
+            val executable = when (executor) {
+                is OnEvent.Executor.Main,
+                is OnEvent.Executor.Immediate -> Executable { notify(data) }
+
+                // Externally created OnEvent.Executor not within our control.
+                // Ensure this only can be triggered once.
+                else -> Executable.Once.of(concurrent = true) { notify(data) }
+            }
+
             @OptIn(InternalKmpTorApi::class)
-            (executor ?: default).execute(handler) { notify(data) }
+            executor.execute(handler, executable)
         }
 
         public final override fun toString(): String = toString(isStatic = false)
