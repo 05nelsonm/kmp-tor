@@ -184,7 +184,6 @@ public fun interface OnEvent<in Data: Any?>: ItBlock<Data> {
 
             @InternalKmpTorApi
             override fun execute(handler: CoroutineContext, executable: Executable) { executable.execute() }
-
             override fun toString(): String = "OnEvent.Executor.Immediate"
         }
     }

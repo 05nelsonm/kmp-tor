@@ -245,16 +245,23 @@ public abstract class Event<Data: Any?, E: Event<Data, E, O>, O: Event.Observer<
             val executor = executor ?: default
 
             val executable = when (executor) {
-                is OnEvent.Executor.Main,
-                is OnEvent.Executor.Immediate -> Executable { notify(data) }
+                is OnEvent.Executor.Main -> Executable { notify(data) }
+
+                // Mitigate object creation and just execute directly
+                // instead of needlessly calling executor.execute.
+                is OnEvent.Executor.Immediate -> null
 
                 // Externally created OnEvent.Executor not within our control.
-                // Ensure this only can be triggered once.
+                // Ensure this only can be executed once.
                 else -> Executable.Once.of(concurrent = true) { notify(data) }
             }
 
-            @OptIn(InternalKmpTorApi::class)
-            executor.execute(handler, executable)
+            if (executable == null) {
+                notify(data)
+            } else {
+                @OptIn(InternalKmpTorApi::class)
+                executor.execute(handler, executable)
+            }
         }
 
         public final override fun toString(): String = toString(isStatic = false)
