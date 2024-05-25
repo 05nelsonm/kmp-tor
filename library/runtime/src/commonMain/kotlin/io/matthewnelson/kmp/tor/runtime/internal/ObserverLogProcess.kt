@@ -15,13 +15,14 @@
  **/
 package io.matthewnelson.kmp.tor.runtime.internal
 
+import io.matthewnelson.kmp.tor.runtime.TorListeners
 import io.matthewnelson.kmp.tor.runtime.TorState
 import io.matthewnelson.kmp.tor.runtime.core.EnqueuedJob
 import io.matthewnelson.kmp.tor.runtime.core.ctrl.TorCmd
 import io.matthewnelson.kmp.tor.runtime.ctrl.TorCmdInterceptor
 
 internal open class ObserverLogProcess internal constructor(
-    private val manager: TorState.Manager,
+    private val manager: TorListeners.Manager,
 ) {
 
     // Is registered via RealTorRuntime.factory
@@ -45,6 +46,8 @@ internal open class ObserverLogProcess internal constructor(
         with(notice) {
             when {
                 startsWith(BOOTSTRAPPED) -> parseBootstrapped()
+                startsWith(CLOSING) -> parseListenerClosing()
+                startsWith(OPENED) -> parseListenerOpened()
             }
         }
     }
@@ -59,9 +62,48 @@ internal open class ObserverLogProcess internal constructor(
         manager.update(TorState.Daemon.On(pct))
     }
 
+    // [notice] Closing no-longer-configured DNS listener on 127.0.0.1:53085
+    // [notice] Closing no-longer-configured HTTP tunnel listener on 127.0.0.1:48932
+    // [notice] Closing no-longer-configured Socks listener on 127.0.0.1:9150
+    // [notice] Closing no-longer-configured Transparent pf/netfilter listener on 127.0.0.1:45963
+    //
+    // UnixDomainSocket
+    // [notice] Closing no-longer-configured Socks listener on ???:0
+    private fun String.parseListenerClosing() {
+        val type = substringAfter(NO_LONGER_CONFIGURED, "")
+            .substringBefore(' ', "")
+            .trim()
+        val address = substringAfter(LISTENER_ON, "")
+            .trim()
+
+        manager.update(type, address, wasClosed = true)
+    }
+
+    // [notice] Opened DNS listener connection (ready) on 127.0.0.1:34841
+    // [notice] Opened HTTP tunnel listener connection (ready) on 127.0.0.1:46779
+    // [notice] Opened Socks listener connection (ready) on 127.0.0.1:36237
+    // [notice] Opened Socks listener connection (ready) on /tmp/kmp_tor_test/sf_restart/work/socks.sock
+    // [notice] Opened Transparent pf/netfilter listener connection (ready) on 127.0.0.1:37527
+    private fun String.parseListenerOpened() {
+        val type = substringAfter(OPENED, "")
+            .substringBefore(' ', "")
+            .trim()
+        val address = substringAfter(CONN_READY_ON, "")
+            .trim()
+
+        manager.update(type, address, wasClosed = false)
+    }
+
     private companion object {
         private const val NOTICE = " [notice] "
 
         private const val BOOTSTRAPPED = "Bootstrapped "
+
+        private const val CLOSING = "Closing "
+        private const val NO_LONGER_CONFIGURED = " no-longer-configured "
+        private const val LISTENER_ON = " listener on "
+
+        private const val OPENED = "Opened "
+        private const val CONN_READY_ON = " listener connection (ready) on "
     }
 }

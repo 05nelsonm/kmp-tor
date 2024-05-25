@@ -41,6 +41,7 @@ import kotlin.time.Duration.Companion.milliseconds
  * Holder for [TorRuntime] listener addresses.
  *
  * @see [TorRuntime.listeners]
+ * @see [RuntimeEvent.LISTENERS]
  * */
 public class TorListeners private constructor(
     dns: Set<IPSocketAddress>,

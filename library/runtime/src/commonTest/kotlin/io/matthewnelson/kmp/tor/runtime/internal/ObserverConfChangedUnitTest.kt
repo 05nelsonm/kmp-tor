@@ -15,21 +15,16 @@
  **/
 package io.matthewnelson.kmp.tor.runtime.internal
 
+import io.matthewnelson.kmp.tor.runtime.test.TestTorListenersManager
 import io.matthewnelson.kmp.tor.runtime.TorState
 import kotlin.test.*
 
 class ObserverConfChangedUnitTest {
 
-    private class TestTorStateManager: TorState.Manager {
-        val states = mutableListOf<Pair<TorState.Daemon?, TorState.Network?>>()
-        override fun update(daemon: TorState.Daemon?, network: TorState.Network?) {
-            states.add(daemon to network)
-        }
-    }
     private class TestConfChangedObserver private constructor(
-        val manager: TestTorStateManager,
+        val manager: TestTorListenersManager,
     ): ObserverConfChanged(manager, "") {
-        constructor(): this(TestTorStateManager())
+        constructor(): this(TestTorListenersManager())
         public override fun notify(data: String) { super.notify(data) }
     }
 

@@ -15,22 +15,16 @@
  **/
 package io.matthewnelson.kmp.tor.runtime.internal
 
+import io.matthewnelson.kmp.tor.runtime.test.TestTorListenersManager
 import io.matthewnelson.kmp.tor.runtime.TorState
 import kotlin.test.*
 
 class ObserverLogProcessUnitTest {
 
-    private class TestTorStateManager: TorState.Manager {
-        val states = mutableListOf<Pair<TorState.Daemon?, TorState.Network?>>()
-        override fun update(daemon: TorState.Daemon?, network: TorState.Network?) {
-            states.add(daemon to network)
-        }
-    }
-
     private class TestLogProcessObserver private constructor(
-        val manager: TestTorStateManager,
+        val manager: TestTorListenersManager,
     ): ObserverLogProcess(manager) {
-        constructor(): this(TestTorStateManager())
+        constructor(): this(TestTorListenersManager())
         public override fun notify(line: String) { super.notify(line) }
     }
 
@@ -58,6 +52,51 @@ class ObserverLogProcessUnitTest {
             assertNull(network)
             assertIs<TorState.Daemon.On>(daemon)
             assertEquals(expected.toByte(), daemon.bootstrap)
+        }
+    }
+
+    @Test
+    fun givenCloseListener_whenParsed_thenUpdatesTorListenersManager() {
+        val values = listOf(
+            Pair("DNS", "127.0.0.1:53085") to "TorProcess[fid=A3C2…6595]@1414604497 May 24 18:10:05.000 [notice] Closing no-longer-configured DNS listener on 127.0.0.1:53085",
+            Pair("HTTP", "127.0.0.1:48932") to "TorProcess[fid=A3C2…6595]@1414604497 May 24 18:10:05.000 [notice] Closing no-longer-configured HTTP tunnel listener on 127.0.0.1:48932",
+            Pair("Socks", "127.0.0.1:9150") to "TorProcess[fid=A3C2…6595]@1414604497 May 24 18:10:05.000 [notice] Closing no-longer-configured Socks listener on 127.0.0.1:9150",
+            Pair("Transparent", "127.0.0.1:45963") to "TorProcess[fid=A3C2…6595]@1414604497 May 24 18:10:05.000 [notice] Closing no-longer-configured Transparent pf/netfilter listener on 127.0.0.1:45963",
+            Pair("Socks", "???:0") to "TorProcess[fid=A3C2…6595]@1414604497 May 24 18:10:05.000 [notice] Closing no-longer-configured Socks listener on ???:0",
+        )
+
+        values.forEach { (_, line) -> observer.notify(line) }
+
+        assertEquals(values.size, observer.manager.listeners.size)
+        values.forEachIndexed { i, (expected, _) ->
+            val (expectedType, expectedAddress) = expected
+            val (type, address, wasClosed) = observer.manager.listeners[i]
+
+            assertEquals(expectedType, type)
+            assertEquals(expectedAddress, address)
+            assertTrue(wasClosed)
+        }
+    }
+    @Test
+    fun givenOpenListener_whenParsed_thenUpdatesTorListenersManager() {
+        val values = listOf(
+            Pair("DNS", "127.0.0.1:53085") to "TorProcess[fid=A3C2…6595]@1414604497 May 24 18:10:05.000 [notice] Opened DNS listener connection (ready) on 127.0.0.1:53085",
+            Pair("HTTP", "127.0.0.1:48932") to "TorProcess[fid=A3C2…6595]@1414604497 May 24 18:10:05.000 [notice] Opened HTTP tunnel listener connection (ready) on 127.0.0.1:48932",
+            Pair("Socks", "127.0.0.1:9150") to "TorProcess[fid=A3C2…6595]@1414604497 May 24 18:10:05.000 [notice] Opened Socks listener connection (ready) on 127.0.0.1:9150",
+            Pair("Transparent", "127.0.0.1:45963") to "TorProcess[fid=A3C2…6595]@1414604497 May 24 18:10:05.000 [notice] Opened Transparent pf/netfilter listener connection (ready) on 127.0.0.1:45963",
+            Pair("Socks", "/tmp/kmp_tor_test/sf_restart/work/socks.sock") to "TorProcess[fid=A3C2…6595]@1414604497 May 24 18:10:05.000 [notice] Opened Socks listener connection (ready) on /tmp/kmp_tor_test/sf_restart/work/socks.sock",
+        )
+
+        values.forEach { (_, line) -> observer.notify(line) }
+
+        assertEquals(values.size, observer.manager.listeners.size)
+        values.forEachIndexed { i, (expected, _) ->
+            val (expectedType, expectedAddress) = expected
+            val (type, address, wasClosed) = observer.manager.listeners[i]
+
+            assertEquals(expectedType, type)
+            assertEquals(expectedAddress, address)
+            assertFalse(wasClosed)
         }
     }
 }
