@@ -78,6 +78,8 @@ public class Lifecycle: Destroyable {
             @JvmStatic
             public fun OnStart(obj: Any): Event = Event(obj, Name.OnStart)
             @JvmStatic
+            public fun OnStop(obj: Any): Event = Event(obj, Name.OnStop)
+            @JvmStatic
             public fun OnDestroy(obj: Any): Event = Event(obj, Name.OnDestroy)
 
             @JvmStatic
@@ -106,6 +108,8 @@ public class Lifecycle: Destroyable {
                 public val OnCreate: Name = Name("onCreate")
                 @JvmField
                 public val OnStart: Name = Name("onStart")
+                @JvmField
+                public val OnStop: Name = Name("onStop")
                 @JvmField
                 public val OnDestroy: Name = Name("onDestroy")
 
