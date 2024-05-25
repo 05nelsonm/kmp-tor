@@ -96,6 +96,7 @@ public final class io/matthewnelson/kmp/tor/runtime/Lifecycle$DestroyableTorRunt
 	public fun hashCode ()I
 	public final fun invokeOnDestroy (Lio/matthewnelson/kmp/tor/runtime/core/ItBlock;)Lio/matthewnelson/kmp/tor/runtime/core/Disposable;
 	public fun isDestroyed ()Z
+	public fun listeners ()Lio/matthewnelson/kmp/tor/runtime/TorListeners;
 	public fun state ()Lio/matthewnelson/kmp/tor/runtime/TorState;
 	public fun subscribe (Lio/matthewnelson/kmp/tor/runtime/RuntimeEvent$Observer;)V
 	public fun subscribe (Lio/matthewnelson/kmp/tor/runtime/core/TorEvent$Observer;)V
@@ -231,6 +232,10 @@ public final class io/matthewnelson/kmp/tor/runtime/RuntimeEvent$LIFECYCLE : io/
 	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/RuntimeEvent$LIFECYCLE;
 }
 
+public final class io/matthewnelson/kmp/tor/runtime/RuntimeEvent$LISTENERS : io/matthewnelson/kmp/tor/runtime/RuntimeEvent {
+	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/RuntimeEvent$LISTENERS;
+}
+
 public abstract class io/matthewnelson/kmp/tor/runtime/RuntimeEvent$LOG : io/matthewnelson/kmp/tor/runtime/RuntimeEvent {
 	public synthetic fun <init> (Ljava/lang/String;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
 }
@@ -333,6 +338,7 @@ public abstract interface class io/matthewnelson/kmp/tor/runtime/TorRuntime : io
 	public static final field Companion Lio/matthewnelson/kmp/tor/runtime/TorRuntime$Companion;
 	public static fun Builder (Lio/matthewnelson/kmp/tor/runtime/TorRuntime$Environment;Lio/matthewnelson/kmp/tor/runtime/core/ThisBlock;)Lio/matthewnelson/kmp/tor/runtime/TorRuntime;
 	public abstract fun environment ()Lio/matthewnelson/kmp/tor/runtime/TorRuntime$Environment;
+	public abstract fun listeners ()Lio/matthewnelson/kmp/tor/runtime/TorListeners;
 	public abstract fun state ()Lio/matthewnelson/kmp/tor/runtime/TorState;
 }
 
@@ -397,6 +403,7 @@ public abstract class io/matthewnelson/kmp/tor/runtime/TorRuntime$ServiceFactory
 	public final fun equals (Ljava/lang/Object;)Z
 	public final fun getFid ()Ljava/lang/String;
 	public final fun hashCode ()I
+	public final fun listeners ()Lio/matthewnelson/kmp/tor/runtime/TorListeners;
 	protected abstract fun startService ()V
 	public final fun state ()Lio/matthewnelson/kmp/tor/runtime/TorState;
 	public final fun subscribe (Lio/matthewnelson/kmp/tor/runtime/RuntimeEvent$Observer;)V

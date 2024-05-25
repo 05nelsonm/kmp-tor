@@ -112,6 +112,23 @@ public sealed class RuntimeEvent<Data: Any> private constructor(
      * */
     public data object LIFECYCLE: RuntimeEvent<Lifecycle.Event>("LIFECYCLE")
 
+    /**
+     * Events pertaining to listeners which tor has opened.
+     *
+     * Observers are notified with [TorListeners] once tor bootstraps
+     * to the network. Subsequently, if a listener is opened or closed
+     * (e.g. a configuration change), observers will be notified with
+     * the updated information.
+     *
+     * When tor is stopped or the network disabled, observers will
+     * be notified with [TorListeners] whereby [TorListeners.isEmpty] is
+     * true (all listeners are closed or closing).
+     *
+     * @see [TorListeners]
+     * @see [TorRuntime.listeners]
+     * */
+    public data object LISTENERS: RuntimeEvent<TorListeners>("LISTENERS")
+
     public sealed class LOG private constructor(name: String): RuntimeEvent<String>(name) {
 
         /**
@@ -242,7 +259,7 @@ public sealed class RuntimeEvent<Data: Any> private constructor(
         public fun clearObservers()
     }
 
-    public companion object: Entries<RuntimeEvent<*>>(numEvents = 9) {
+    public companion object: Entries<RuntimeEvent<*>>(numEvents = 10) {
 
         @JvmStatic
         @Throws(IllegalArgumentException::class)
@@ -263,8 +280,8 @@ public sealed class RuntimeEvent<Data: Any> private constructor(
         protected override val lazyEntries: ThisBlock<LinkedHashSet<RuntimeEvent<*>>> = ThisBlock {
             // NOTE: Update numEvents when adding an event
             add(ERROR); add(EXECUTE.ACTION); add(EXECUTE.CMD); add(LIFECYCLE);
-            add(LOG.DEBUG); add(LOG.INFO); add(LOG.WARN); add(LOG.PROCESS);
-            add(STATE);
+            add(LISTENERS); add(LOG.DEBUG); add(LOG.INFO); add(LOG.WARN);
+            add(LOG.PROCESS); add(STATE);
         }
     }
 

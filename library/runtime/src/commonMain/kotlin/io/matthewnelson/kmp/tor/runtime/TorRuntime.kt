@@ -64,6 +64,16 @@ public interface TorRuntime:
     public fun environment(): Environment
 
     /**
+     * Returns the current active [TorListeners] for this [TorRuntime]
+     * instance.
+     *
+     * If tor is **not** 100% bootstrapped with network enabled,
+     * [TorListeners.isEmpty] will always be true for the returned
+     * instance of [TorListeners].
+     * */
+    public fun listeners(): TorListeners
+
+    /**
      * Returns the current [TorState] for this [TorRuntime] instance.
      * */
     public fun state(): TorState
@@ -572,6 +582,7 @@ public interface TorRuntime:
 
         public final override val fid: String = ctrl.fid
         public final override fun environment(): Environment = ctrl.environment()
+        public final override fun listeners(): TorListeners = ctrl.listeners()
         public final override fun state(): TorState = ctrl.state()
 
         public final override fun <Success: Any> enqueue(

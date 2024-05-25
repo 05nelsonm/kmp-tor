@@ -93,7 +93,7 @@ internal class RealTorRuntime private constructor(
         + dispatcher
     )
 
-    private val manager = StateManager()
+    private val manager = StateManager(scope)
 
     @Suppress("PrivatePropertyName")
     private val NOTIFIER = Notifier(manager)
@@ -143,7 +143,7 @@ internal class RealTorRuntime private constructor(
     internal fun handler(): UncaughtException.Handler = handler
 
     public override fun environment(): TorRuntime.Environment = generator.environment
-
+    public override fun listeners(): TorListeners = manager.listenersOrEmpty
     public override fun state(): TorState = manager.state
 
     public override fun enqueue(
@@ -686,7 +686,7 @@ internal class RealTorRuntime private constructor(
     }
 
     private inner class Notifier(
-        private val manager: TorState.Manager,
+        private val manager: TorListeners.Manager
     ): RuntimeEvent.Notifier {
 
         private val processObserver = ProcessLogObserver()
@@ -709,7 +709,7 @@ internal class RealTorRuntime private constructor(
     }
 
     private inner class ConfChangedObserver(
-        manager: TorState.Manager,
+        manager: TorListeners.Manager,
     ): ObserverConfChanged(manager, generator.environment.staticTag()) {
         protected override fun notify(data: String) {
             super.notify(data)
@@ -717,10 +717,14 @@ internal class RealTorRuntime private constructor(
         }
     }
 
-    private inner class StateManager: TorState.AbstractManager(generator.environment) {
-        protected override fun notify(old: TorState, new: TorState) {
-            // TODO
-            STATE.notifyObservers(new)
+    private inner class StateManager(
+        scope: CoroutineScope,
+    ): TorListeners.AbstractManager(scope, generator.environment) {
+        protected override fun notify(listeners: TorListeners) {
+            LISTENERS.notifyObservers(listeners)
+        }
+        protected override fun notify(state: TorState) {
+            STATE.notifyObservers(state)
         }
     }
 
@@ -752,6 +756,9 @@ internal class RealTorRuntime private constructor(
         private val actionStack = Stack<ActionJob.Sealed>(1)
         private val lock = SynchronizedObject()
 
+        @Suppress("PrivatePropertyName")
+        private val EMPTY = TorListeners.of(fid = generator.environment)
+
         private val builderRequiredEvents = builderRequiredEvents.toImmutableSet()
         protected override val debug: Boolean get() = generator.environment.debug
 
@@ -763,6 +770,10 @@ internal class RealTorRuntime private constructor(
         public override val binder: ServiceCtrlBinder = ServiceCtrlBinder()
 
         public override fun environment(): TorRuntime.Environment = generator.environment
+
+        public override fun listeners(): TorListeners = _instance?.listeners() ?: synchronized(lock) {
+            _instance?.listeners() ?: EMPTY
+        }
 
         public override fun state(): TorState = _instance?.state() ?: synchronized(lock) {
             _instance?.state() ?: run {
@@ -1005,6 +1016,7 @@ internal class RealTorRuntime private constructor(
                         is EXECUTE.ACTION -> event.observer(tag) { event.notifyObservers(it) }
                         is EXECUTE.CMD -> event.observer(tag) { event.notifyObservers(it) }
                         is LIFECYCLE -> event.observer(tag) { event.notifyObservers(it) }
+                        is LISTENERS -> event.observer(tag) { event.notifyObservers(it) }
                         is LOG -> event.observer(tag) { event.notifyObservers(it) }
                         is STATE -> event.observer(tag) { event.notifyObservers(it) }
                     }

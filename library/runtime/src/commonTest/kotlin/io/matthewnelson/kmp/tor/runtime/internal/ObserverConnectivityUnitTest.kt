@@ -55,6 +55,7 @@ class ObserverConnectivityUnitTest {
             observerStatic(RuntimeEvent.EXECUTE.CMD) { cmds.add(it) }
 
 //            observerStatic(RuntimeEvent.LIFECYCLE) { println(it) }
+//            observerStatic(RuntimeEvent.LISTENERS) { println(it) }
 //            observerStatic(RuntimeEvent.LOG.DEBUG) { println(it) }
 //            observerStatic(RuntimeEvent.LOG.INFO) { println(it) }
 //            observerStatic(RuntimeEvent.LOG.WARN) { println(it) }
