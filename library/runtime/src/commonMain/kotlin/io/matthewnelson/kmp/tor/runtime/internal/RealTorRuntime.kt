@@ -63,7 +63,7 @@ internal class RealTorRuntime private constructor(
     observersRuntimeEvent,
     defaultExecutor,
     observersTorEvent,
-),  FileID by generator,
+),  FileID by generator.environment,
     TorRuntime
 {
 
@@ -93,10 +93,10 @@ internal class RealTorRuntime private constructor(
         + dispatcher
     )
 
-    private val manager = StateManager()
+    private val manager = TorStateManager()
 
     @Suppress("PrivatePropertyName")
-    private val NOTIFIER = Notifier()
+    private val NOTIFIER = Notifier(manager)
 
     private val factory = TorCtrl.Factory(
         staticTag = generator.environment.staticTag(),
@@ -104,7 +104,7 @@ internal class RealTorRuntime private constructor(
             val tag = generator.environment.staticTag()
             events.mapTo(LinkedHashSet(events.size, 1.0f)) { event ->
                 when (event) {
-                    is TorEvent.CONF_CHANGED -> ConfChangedObserver()
+                    is TorEvent.CONF_CHANGED -> ConfChangedObserver(manager)
                     else -> event.observer(tag) { event.notifyObservers(it) }
                 }
             }
@@ -277,7 +277,7 @@ internal class RealTorRuntime private constructor(
         NOTIFIER.lce(Lifecycle.Event.OnCreate(this))
     }
 
-    private inner class ActionProcessor: FileID by this {
+    private inner class ActionProcessor: FileID by generator.environment {
 
         @Volatile
         private var _processorJob: Job? = null
@@ -539,12 +539,12 @@ internal class RealTorRuntime private constructor(
                 return
             }
 
-            TorProcess.start(generator, NOTIFIER, scope, manager, connect = {
+            TorProcess.start(generator, manager, NOTIFIER, scope, connect = {
                 val ctrl = connection.openWith(factory)
 
                 val lceCtrl = RealTorCtrl(ctrl)
                 NOTIFIER.lce(Lifecycle.Event.OnCreate(lceCtrl))
-                val observer = ConnectivityObserver(ctrl)
+                val observer = ConnectivityObserver(ctrl, NOTIFIER, scope)
 
                 ctrl.invokeOnDestroy { instance ->
                     processJob.cancel()
@@ -646,10 +646,29 @@ internal class RealTorRuntime private constructor(
             }
         }
 
+        private inner class ConnectivityObserver(
+            ctrl: TorCtrl,
+            @Suppress("LocalVariableName")
+            NOTIFIER: RuntimeEvent.Notifier,
+            scope: CoroutineScope,
+        ): ObserverConnectivity(
+            ctrl,
+            networkObserver,
+            NOTIFIER,
+            scope,
+        ), FileID by generator.environment {
+
+            private val _hashCode = ctrl.hashCode()
+
+            public override fun equals(other: Any?): Boolean = other is ConnectivityObserver && other.hashCode() == hashCode()
+            public override fun hashCode(): Int = _hashCode
+            public override fun toString(): String = this.toFIDString()
+        }
+
         private inner class SuccessCancellationException: CancellationException()
 
         // For Lifecycle.Events notification only
-        private inner class RealTorCtrl(ctrl: TorCtrl): FileID by this {
+        private inner class RealTorCtrl(ctrl: TorCtrl): FileID by generator.environment {
             private val _hashCode = ctrl.hashCode()
 
             override fun equals(other: Any?): Boolean = other is RealTorCtrl && other.hashCode() == hashCode()
@@ -662,7 +681,9 @@ internal class RealTorRuntime private constructor(
         public override fun toString(): String = this.toFIDString(includeHashCode = isService)
     }
 
-    private inner class Notifier: RuntimeEvent.Notifier {
+    private inner class Notifier(
+        private val manager: TorState.Manager,
+    ): RuntimeEvent.Notifier {
 
         private val processObserver = ProcessLogObserver()
         val newNymInterceptor get() = processObserver.newNymInterceptor
@@ -683,30 +704,16 @@ internal class RealTorRuntime private constructor(
         }
     }
 
-    private inner class ConnectivityObserver(
-        ctrl: TorCtrl
-    ): ObserverConnectivity(
-        ctrl,
-        networkObserver,
-        NOTIFIER,
-        scope,
-    ), FileID by this {
-
-        private val _hashCode = ctrl.hashCode()
-
-        public override fun equals(other: Any?): Boolean = other is ConnectivityObserver && other.hashCode() == hashCode()
-        public override fun hashCode(): Int = _hashCode
-        public override fun toString(): String = this.toFIDString()
-    }
-
-    private inner class ConfChangedObserver: ObserverConfChanged(manager, generator.environment.staticTag()) {
+    private inner class ConfChangedObserver(
+        manager: TorState.Manager,
+    ): ObserverConfChanged(manager, generator.environment.staticTag()) {
         protected override fun notify(data: String) {
             super.notify(data)
             event.notifyObservers(data)
         }
     }
 
-    private inner class StateManager: TorStateManager(generator.environment) {
+    private inner class TorStateManager: TorState.Manager(generator.environment) {
         protected override fun notify(old: TorState, new: TorState) {
             // TODO
             STATE.notifyObservers(new)
@@ -728,7 +735,7 @@ internal class RealTorRuntime private constructor(
         defaultExecutor,
         observersTorEvent
     ),  ServiceFactoryCtrl,
-        FileID by generator,
+        FileID by generator.environment,
         RuntimeEvent.Notifier
     {
 
@@ -973,7 +980,7 @@ internal class RealTorRuntime private constructor(
 
         private inner class ServiceCtrlBinder:
             TorRuntime.ServiceFactory.Binder,
-            FileID by this,
+            FileID by generator.environment,
             RuntimeEvent.Notifier by this
         {
 

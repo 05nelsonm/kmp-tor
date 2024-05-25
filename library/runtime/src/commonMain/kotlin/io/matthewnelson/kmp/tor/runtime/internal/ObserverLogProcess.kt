@@ -22,7 +22,7 @@ import io.matthewnelson.kmp.tor.runtime.core.ctrl.TorCmd
 import io.matthewnelson.kmp.tor.runtime.ctrl.TorCmdInterceptor
 
 internal open class ObserverLogProcess internal constructor(
-    private val manager: TorStateManager,
+    private val manager: TorState.Manager,
 ): RuntimeEvent.Observer<String>(
     RuntimeEvent.LOG.PROCESS,
     null,

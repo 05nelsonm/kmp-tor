@@ -51,10 +51,10 @@ import kotlin.time.TimeSource
 
 internal class TorProcess private constructor(
     private val generator: TorConfigGenerator,
+    private val manager: TorState.Manager,
     private val NOTIFIER: RuntimeEvent.Notifier,
     private val scope: CoroutineScope,
     private val state: FIDState,
-    private val manager: TorStateManager,
 ): FileID by generator.environment {
 
     @Throws(Throwable::class)
@@ -472,19 +472,19 @@ internal class TorProcess private constructor(
         @Throws(Throwable::class)
         internal suspend fun <T: Any?> start(
             generator: TorConfigGenerator,
+            manager: TorState.Manager,
             NOTIFIER: RuntimeEvent.Notifier,
             scope: CoroutineScope,
-            manager: TorStateManager,
             connect: suspend CtrlArguments.() -> T,
         ): T {
             val state = getOrCreateInstance(generator.environment.fid) { FIDState() }
 
             val process = TorProcess(
                 generator,
+                manager,
                 NOTIFIER,
                 scope,
                 state as FIDState,
-                manager,
             )
 
             return process.start(connect)

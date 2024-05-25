@@ -15,9 +15,14 @@
  **/
 package io.matthewnelson.kmp.tor.runtime
 
+import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
+import io.matthewnelson.kmp.tor.core.resource.SynchronizedObject
+import io.matthewnelson.kmp.tor.core.resource.synchronized
 import io.matthewnelson.kmp.tor.runtime.FileID.Companion.fidEllipses
 import io.matthewnelson.kmp.tor.runtime.core.TorConfig
+import kotlin.concurrent.Volatile
 import kotlin.jvm.JvmField
+import kotlin.jvm.JvmStatic
 import kotlin.jvm.JvmSynthetic
 
 /**
@@ -176,5 +181,68 @@ public class TorState private constructor(
             network,
             fid?.fidEllipses,
         )
+    }
+
+    @OptIn(InternalKmpTorApi::class)
+    internal abstract class Manager internal constructor(fid: FileID?) {
+
+        @Volatile
+        private var _state: TorState = of(
+            daemon = Daemon.Off,
+            network = Network.Disabled,
+            fid = fid,
+        )
+        internal val state: TorState get() = _state
+
+        private val lock = SynchronizedObject()
+
+        protected abstract fun notify(old: TorState, new: TorState)
+
+        internal fun update(daemon: Daemon? = null, network: Network? = null) {
+            if (daemon == null && network == null) return
+
+            val notify = synchronized(lock) {
+                val old = _state
+                val new = old.copy(daemon ?: old.daemon, network ?: old.network)
+                val n = Notify.of(old, new) ?: return@synchronized null
+                _state = n.new
+                n
+            } ?: return
+
+            notify(notify.old, notify.new)
+        }
+
+        private class Notify private constructor(val old: TorState, val new: TorState) {
+
+            companion object {
+
+                @JvmStatic
+                fun of(old: TorState, new: TorState): Notify? {
+                    // No changes
+                    if (old == new) return null
+
+                    // on -> off
+                    // on -> stopping
+                    // on -> on
+                    if (old.isOn && new.isStarting) return null
+
+                    // off -> starting
+                    // off -> off
+                    if (old.isOff && new.isOn) return null
+                    if (old.isOff && new.isStopping) return null
+
+                    // stopping -> off
+                    // stopping -> starting
+                    // stopping -> stopping
+                    if (old.isStopping && new.isOn) return null
+
+                    // starting -> on
+                    // starting -> off
+                    // starting -> stopping
+                    // starting -> starting
+                    return Notify(old, new)
+                }
+            }
+        }
     }
 }

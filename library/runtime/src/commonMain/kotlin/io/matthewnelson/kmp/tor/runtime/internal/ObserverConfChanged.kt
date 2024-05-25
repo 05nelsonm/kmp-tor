@@ -21,7 +21,7 @@ import io.matthewnelson.kmp.tor.runtime.core.TorConfig
 import io.matthewnelson.kmp.tor.runtime.core.TorEvent
 
 internal open class ObserverConfChanged internal constructor(
-    private val manager: TorStateManager,
+    private val manager: TorState.Manager,
     staticTag: String,
 ): TorEvent.Observer(
     TorEvent.CONF_CHANGED,
