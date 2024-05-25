@@ -15,7 +15,7 @@
  **/
 package io.matthewnelson.kmp.tor.runtime.core
 
-import io.matthewnelson.kmp.tor.runtime.core.address.Port.Proxy.Companion.toPortProxy
+import io.matthewnelson.kmp.tor.runtime.core.address.Port.Ephemeral.Companion.toPortEphemeral
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNull
@@ -37,7 +37,7 @@ class ControlPortUnitTest {
     fun givenTCPPortConfiguration_whenReassignFalse_thenNoExtras() {
         val setting = TorConfig.__ControlPort.Builder {
             asPort {
-                port(9055.toPortProxy())
+                port(9055.toPortEphemeral())
                 reassignable(allow = false)
             }
         }
@@ -49,7 +49,7 @@ class ControlPortUnitTest {
     fun givenTCPPortConfiguration_whenReassignTrue_thenExtras() {
         val setting = TorConfig.__ControlPort.Builder {
             asPort {
-                port(9055.toPortProxy())
+                port(9055.toPortEphemeral())
                 reassignable(allow = true)
             }
         }

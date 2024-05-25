@@ -23,7 +23,7 @@ import io.matthewnelson.kmp.tor.runtime.core.address.IPAddress
 import io.matthewnelson.kmp.tor.runtime.core.address.LocalHost
 import io.matthewnelson.kmp.tor.runtime.core.address.Port
 import io.matthewnelson.kmp.tor.runtime.core.internal.*
-import io.matthewnelson.kmp.tor.runtime.core.internal.PortProxyIterator.Companion.iterator
+import io.matthewnelson.kmp.tor.runtime.core.internal.PortEphemeralIterator.Companion.iterator
 import io.matthewnelson.kmp.tor.runtime.core.internal.net_createServer
 import io.matthewnelson.kmp.tor.runtime.core.internal.onError
 import kotlinx.coroutines.*
@@ -47,10 +47,10 @@ public actual suspend fun Port.isAvailableAsync(
 
 /**
  * Finds an available TCP port on [LocalHost] starting with the current
- * [Port.Proxy.value] and iterating up [limit] times.
+ * [Port.Ephemeral.value] and iterating up [limit] times.
  *
- * If [Port.Proxy.MAX] is exceeded while iterating through ports and [limit]
- * has not been exhausted, the remaining checks will start from [Port.Proxy.MIN].
+ * If [Port.Ephemeral.MAX] is exceeded while iterating through ports and [limit]
+ * has not been exhausted, the remaining checks will start from [Port.Ephemeral.MIN].
  *
  * @param [host] either [LocalHost.IPv4] or [LocalHost.IPv6]
  * @param [limit] the number of ports to scan. min: 1, max: 1_000
@@ -59,10 +59,10 @@ public actual suspend fun Port.isAvailableAsync(
  * @throws [CancellationException] if underlying coroutine was cancelled
  * */
 // @Throws(IOException::class, CancellationException::class)
-public actual suspend fun Port.Proxy.findAvailableAsync(
+public actual suspend fun Port.Ephemeral.findAvailableAsync(
     limit: Int,
     host: LocalHost,
-): Port.Proxy {
+): Port.Ephemeral {
     val i = iterator(limit)
     val ipAddress = host.resolve()
 
@@ -71,7 +71,7 @@ public actual suspend fun Port.Proxy.findAvailableAsync(
         val isAvailable = ipAddress.isPortAvailableOrNull(i.next())
         if (isAvailable != true) continue
 
-        return i.toPortProxy()
+        return i.toPortEphemeral()
     }
 
     throw ctx.cancellationExceptionOr { i.unavailableException(ipAddress) }

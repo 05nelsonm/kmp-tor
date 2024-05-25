@@ -21,7 +21,7 @@ import io.matthewnelson.kmp.file.toFile
 import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
 import io.matthewnelson.kmp.tor.runtime.core.TorConfig
 import io.matthewnelson.kmp.tor.runtime.core.address.Port.Companion.toPort
-import io.matthewnelson.kmp.tor.runtime.core.address.Port.Proxy.Companion.toPortProxy
+import io.matthewnelson.kmp.tor.runtime.core.address.Port.Ephemeral.Companion.toPortEphemeral
 import io.matthewnelson.kmp.tor.runtime.core.internal.toByte
 import kotlin.test.*
 
@@ -30,7 +30,7 @@ class ExtendedTorConfigUnitTest {
 
     @Test
     fun givenExtendedConfig_whenCastAs_thenWorksAsExpected() {
-        val dns = TorConfig.__DNSPort.Builder { port(1080.toPortProxy()) }
+        val dns = TorConfig.__DNSPort.Builder { port(1080.toPortEphemeral()) }
 
         TorConfig.Builder {
 

@@ -77,9 +77,9 @@ public final class io/matthewnelson/kmp/tor/runtime/ctrl/TorCtrl$Factory {
 	public synthetic fun <init> (Ljava/lang/String;Ljava/util/Set;Ljava/util/Set;Lio/matthewnelson/kmp/tor/runtime/core/OnEvent$Executor;Lio/matthewnelson/kmp/tor/runtime/core/ItBlock;Lio/matthewnelson/kmp/tor/runtime/core/UncaughtException$Handler;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
 	public fun <init> (Ljava/lang/String;Ljava/util/Set;Ljava/util/Set;Lio/matthewnelson/kmp/tor/runtime/core/OnEvent$Executor;Lio/matthewnelson/kmp/tor/runtime/core/UncaughtException$Handler;)V
 	public fun <init> (Ljava/lang/String;Ljava/util/Set;Ljava/util/Set;Lio/matthewnelson/kmp/tor/runtime/core/UncaughtException$Handler;)V
-	public final fun connect (Lio/matthewnelson/kmp/tor/runtime/core/address/ProxyAddress;)Lio/matthewnelson/kmp/tor/runtime/ctrl/TorCtrl;
+	public final fun connect (Lio/matthewnelson/kmp/tor/runtime/core/address/IPSocketAddress;)Lio/matthewnelson/kmp/tor/runtime/ctrl/TorCtrl;
 	public final fun connect (Ljava/io/File;)Lio/matthewnelson/kmp/tor/runtime/ctrl/TorCtrl;
-	public final fun connectAsync (Lio/matthewnelson/kmp/tor/runtime/core/address/ProxyAddress;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public final fun connectAsync (Lio/matthewnelson/kmp/tor/runtime/core/address/IPSocketAddress;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public final fun connectAsync (Ljava/io/File;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 }
 

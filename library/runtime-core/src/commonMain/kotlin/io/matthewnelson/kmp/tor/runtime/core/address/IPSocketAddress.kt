@@ -22,9 +22,9 @@ import kotlin.jvm.JvmName
 import kotlin.jvm.JvmStatic
 
 /**
- * Holder for a single proxy address' parts
+ * Holder for a inet socket address' parts
  * */
-public class ProxyAddress(
+public class IPSocketAddress(
     @JvmField
     public val address: IPAddress,
     @JvmField
@@ -36,25 +36,46 @@ public class ProxyAddress(
 
     public override fun canonicalHostname(): String = address.canonicalHostname()
 
-    public fun copy(address: IPAddress): ProxyAddress = ProxyAddress(address, port)
-    public fun copy(port: Port): ProxyAddress = ProxyAddress(address, port)
+    public fun copy(address: IPAddress): IPSocketAddress = copy(address, port)
+    public fun copy(port: Port): IPSocketAddress = copy(address, port)
+    public fun copy(address: IPAddress, port: Port): IPSocketAddress {
+        if (address == this.address && port == this.port) return this
+        return IPSocketAddress(address, port)
+    }
 
     public companion object {
 
+        /**
+         * Parses a String for its IPv4 or IPv6 address and port.
+         *
+         * String can be either a URL containing the IP address and port, or the
+         * IP address and port itself.
+         *
+         * @return [IPSocketAddress]
+         * @throws [IllegalArgumentException] If not a valid IP address and port.
+         * */
         @JvmStatic
         @JvmName("get")
         @Throws(IllegalArgumentException::class)
-        public fun String.toProxyAddress(): ProxyAddress {
-            return toProxyAddressOrNull()
-                ?: throw IllegalArgumentException("$this is not a valid IP address & port")
+        public fun String.toIPSocketAddress(): IPSocketAddress {
+            return toIPSocketAddressOrNull()
+                ?: throw IllegalArgumentException("$this does not contain a valid IP address & port")
         }
 
+        /**
+         * Parses a String for its IPv4 or IPv6 address and port.
+         *
+         * String can be either a URL containing the IP address and port, or the
+         * IP address and port itself.
+         *
+         * @return [IPSocketAddress] or null
+         * */
         @JvmStatic
         @JvmName("getOrNull")
-        public fun String.toProxyAddressOrNull(): ProxyAddress? {
+        public fun String.toIPSocketAddressOrNull(): IPSocketAddress? {
             val address = toIPAddressOrNull() ?: return null
             val port = toPortOrNull() ?: return null
-            return ProxyAddress(address, port)
+            return IPSocketAddress(address, port)
         }
     }
 }

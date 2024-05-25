@@ -17,15 +17,11 @@ package io.matthewnelson.kmp.tor.runtime.core
 
 import io.matthewnelson.kmp.file.toFile
 import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
-import io.matthewnelson.kmp.tor.runtime.core.address.Port.Proxy.Companion.toPortProxy
+import io.matthewnelson.kmp.tor.runtime.core.address.Port.Ephemeral.Companion.toPortEphemeral
 import io.matthewnelson.kmp.tor.runtime.core.TorConfig.Setting.Companion.filterByKeyword
-import io.matthewnelson.kmp.tor.runtime.core.address.Port.Companion.toPort
-import io.matthewnelson.kmp.tor.runtime.core.builder.ExtendedTorConfigBuilder
 import io.matthewnelson.kmp.tor.runtime.core.internal.toByte
 import kotlin.test.Test
 import kotlin.test.assertEquals
-import kotlin.test.assertFalse
-import kotlin.test.assertTrue
 
 @OptIn(InternalKmpTorApi::class)
 class TorConfigUnitTest {
@@ -36,7 +32,7 @@ class TorConfigUnitTest {
             put(TorConfig.__ControlPort) { /* defaults to auto */ }
             put(TorConfig.__SocksPort) { asPort { auto() } }
             put(TorConfig.__SocksPort) { asPort { disable() } }
-            put(TorConfig.__SocksPort) { asPort { port(9055.toPortProxy()) } }
+            put(TorConfig.__SocksPort) { asPort { port(9055.toPortEphemeral()) } }
 
             try {
                 // Should also be removed if SocksPort is set to disabled
@@ -46,7 +42,7 @@ class TorConfigUnitTest {
             }
 
             put(TorConfig.__DNSPort) { auto() }
-            put(TorConfig.__DNSPort) { port(1080.toPortProxy()) }
+            put(TorConfig.__DNSPort) { port(1080.toPortEphemeral()) }
         }.settings
 
         assertEquals(1, settings.filterByKeyword<TorConfig.__ControlPort.Companion>().size)
@@ -82,7 +78,7 @@ class TorConfigUnitTest {
     @Test
     fun givenInheritingConfig_whenContainsDisabledPorts_thenAreRemovedAtFirstOverride() {
         val other = TorConfig.Builder {
-            put(TorConfig.__SocksPort) { asPort { port(9055.toPortProxy()) } }
+            put(TorConfig.__SocksPort) { asPort { port(9055.toPortEphemeral()) } }
             put(TorConfig.__SocksPort) { asPort { disable() } }
             put(TorConfig.__HTTPTunnelPort) { disable() }
             put(TorConfig.__DNSPort) { auto() }

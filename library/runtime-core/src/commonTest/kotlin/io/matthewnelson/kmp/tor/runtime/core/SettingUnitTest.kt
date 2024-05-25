@@ -20,7 +20,7 @@ import io.matthewnelson.kmp.file.resolve
 import io.matthewnelson.kmp.file.toFile
 import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
 import io.matthewnelson.kmp.tor.runtime.core.address.Port.Companion.toPort
-import io.matthewnelson.kmp.tor.runtime.core.address.Port.Proxy.Companion.toPortProxy
+import io.matthewnelson.kmp.tor.runtime.core.address.Port.Ephemeral.Companion.toPortEphemeral
 import kotlin.test.*
 
 @OptIn(InternalKmpTorApi::class)
@@ -61,7 +61,7 @@ class SettingUnitTest {
 
     @Test
     fun givenEqualsHash_whenDifferentPortTypesSamePort_thenAreSame() {
-        val port = 5555.toPortProxy()
+        val port = 5555.toPortEphemeral()
         val a = TorConfig.__DNSPort.Builder { port(port) }
         val b = TorConfig.__SocksPort.Builder { asPort { port(port) } }
 

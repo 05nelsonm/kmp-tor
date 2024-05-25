@@ -23,7 +23,7 @@ import io.matthewnelson.kmp.process.ReadBuffer
 import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
 import io.matthewnelson.kmp.tor.core.resource.OSInfo
 import io.matthewnelson.kmp.tor.runtime.core.Disposable
-import io.matthewnelson.kmp.tor.runtime.core.address.ProxyAddress
+import io.matthewnelson.kmp.tor.runtime.core.address.IPSocketAddress
 import io.matthewnelson.kmp.tor.runtime.ctrl.TorCtrl
 import kotlinx.coroutines.CloseableCoroutineDispatcher
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -58,7 +58,7 @@ internal actual fun TorCtrl.Factory.newTorCtrlDispatcher(): CloseableCoroutineDi
 }
 
 @Throws(Throwable::class)
-internal actual fun ProxyAddress.connect(): CtrlConnection {
+internal actual fun IPSocketAddress.connect(): CtrlConnection {
     val socket = Socket(Proxy.NO_PROXY)
 
     val (input, output) = try {

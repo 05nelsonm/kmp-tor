@@ -21,9 +21,9 @@ import kotlin.jvm.JvmField
  * Base abstraction for all address types
  *
  * @see [IPAddress]
+ * @see [IPSocketAddress]
  * @see [LocalHost]
  * @see [OnionAddress]
- * @see [ProxyAddress]
  * */
 public sealed class Address(
     @JvmField
@@ -47,17 +47,17 @@ public sealed class Address(
      *     )
      *     // [::1]
      *
+     *     println("http://127.0.0.1:8081/path"
+     *         .toIPSocketAddress()
+     *         .canonicalHostName()
+     *     )
+     *     // 127.0.0.1
+     *
      *     println("http://2gzyxa5ihm7nsggfxnu52rck2vv4rvmdlkiu3zzui5du4xyclen53wid.onion"
      *         .toOnionAddressV3()
      *         .canonicalHostname()
      *     )
      *     // 2gzyxa5ihm7nsggfxnu52rck2vv4rvmdlkiu3zzui5du4xyclen53wid.onion
-     *
-     *     println("http://127.0.0.1:8081/path"
-     *         .toProxyAddress()
-     *         .canonicalHostName()
-     *     )
-     *     // 127.0.0.1
      * */
     public abstract fun canonicalHostname(): String
 

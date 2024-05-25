@@ -20,7 +20,7 @@ package io.matthewnelson.kmp.tor.runtime.ctrl.internal
 import io.matthewnelson.kmp.file.IOException
 import io.matthewnelson.kmp.file.errnoToIOException
 import io.matthewnelson.kmp.tor.runtime.core.address.IPAddress
-import io.matthewnelson.kmp.tor.runtime.core.address.ProxyAddress
+import io.matthewnelson.kmp.tor.runtime.core.address.IPSocketAddress
 import io.matthewnelson.kmp.tor.runtime.ctrl.TorCtrl
 import kotlinx.cinterop.*
 import kotlinx.coroutines.CloseableCoroutineDispatcher
@@ -35,7 +35,7 @@ internal actual fun TorCtrl.Factory.newTorCtrlDispatcher(): CloseableCoroutineDi
 
 @Throws(Throwable::class)
 @OptIn(ExperimentalForeignApi::class, UnsafeNumber::class)
-internal actual fun ProxyAddress.connect(): CtrlConnection = memScoped {
+internal actual fun IPSocketAddress.connect(): CtrlConnection = memScoped {
     val (family, len) = when (address) {
         is IPAddress.V4 -> AF_INET to sizeOf<sockaddr_in>()
         is IPAddress.V6 -> AF_INET6 to sizeOf<sockaddr_in6>()

@@ -20,8 +20,8 @@ import io.matthewnelson.kmp.tor.core.resource.SynchronizedObject
 import io.matthewnelson.kmp.tor.core.resource.synchronized
 import io.matthewnelson.kmp.tor.runtime.core.*
 import io.matthewnelson.kmp.tor.runtime.core.address.LocalHost
-import io.matthewnelson.kmp.tor.runtime.core.address.Port.Proxy.Companion.toPortProxy
-import io.matthewnelson.kmp.tor.runtime.core.address.ProxyAddress
+import io.matthewnelson.kmp.tor.runtime.core.address.Port.Ephemeral.Companion.toPortEphemeral
+import io.matthewnelson.kmp.tor.runtime.core.address.IPSocketAddress
 import io.matthewnelson.kmp.tor.runtime.core.ctrl.Reply
 import io.matthewnelson.kmp.tor.runtime.core.ctrl.TorCmd
 import io.matthewnelson.kmp.tor.runtime.core.util.executeAsync
@@ -62,8 +62,8 @@ class ProcessorUnitTest {
             handler = UncaughtException.Handler.THROW,
         )
         val host = LocalHost.IPv4.resolve()
-        val port = 9355.toPortProxy().findAvailableAsync(1_000, LocalHost.IPv4)
-        val address = ProxyAddress(host, port)
+        val port = 9355.toPortEphemeral().findAvailableAsync(1_000, LocalHost.IPv4)
+        val address = IPSocketAddress(host, port)
 
         withContext(Dispatchers.Default) { delay(350.milliseconds) }
 

@@ -102,7 +102,7 @@ public class TorConfig private constructor(
      *         // Via the Setting.Factory
      *         put(TorConfig.__SocksPort) {
      *             asPort {
-     *                 port(9050.toPortProxy())
+     *                 port(9050.toPortEphemeral())
      *             }
      *         }
      *     }
@@ -120,7 +120,7 @@ public class TorConfig private constructor(
      *         // Via the Setting.Factory
      *         b.put(TorConfig.__SocksPort.Companion, f -> {
      *             f.asPort(p -> {
-     *                 p.port(Port.Proxy.get(9050));
+     *                 p.port(Port.Ephemeral.get(9050));
      *             });
      *         });
      *     });
@@ -379,7 +379,7 @@ public class TorConfig private constructor(
         }
 
         @KmpTorDsl
-        public override fun port(port: Port.Proxy): __DNSPort {
+        public override fun port(port: Port.Ephemeral): __DNSPort {
             argument = port.toString()
             return this
         }
@@ -444,7 +444,7 @@ public class TorConfig private constructor(
         }
 
         @KmpTorDsl
-        public override fun port(port: Port.Proxy): __HTTPTunnelPort {
+        public override fun port(port: Port.Ephemeral): __HTTPTunnelPort {
             argument = port.toString()
             return this
         }
@@ -618,7 +618,7 @@ public class TorConfig private constructor(
         }
 
         @KmpTorDsl
-        public override fun port(port: Port.Proxy): __TransPort {
+        public override fun port(port: Port.Ephemeral): __TransPort {
             if (!IsUnixLikeHost) return this
             this.port = port.toString()
             return this

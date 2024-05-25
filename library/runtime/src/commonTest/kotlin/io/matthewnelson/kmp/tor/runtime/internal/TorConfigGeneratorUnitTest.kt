@@ -29,7 +29,7 @@ import io.matthewnelson.kmp.tor.runtime.core.TorConfig
 import io.matthewnelson.kmp.tor.runtime.core.TorConfig.Setting.Companion.filterByKeyword
 import io.matthewnelson.kmp.tor.runtime.core.address.LocalHost
 import io.matthewnelson.kmp.tor.runtime.core.address.Port
-import io.matthewnelson.kmp.tor.runtime.core.address.Port.Proxy.Companion.toPortProxy
+import io.matthewnelson.kmp.tor.runtime.core.address.Port.Ephemeral.Companion.toPortEphemeral
 import kotlinx.coroutines.test.runTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -109,7 +109,7 @@ class TorConfigGeneratorUnitTest {
         val settings = newGenerator(
             config = setOf(
                 ConfigBuilderCallback {
-                    put(TorConfig.__DNSPort) { port(1080.toPortProxy()) }
+                    put(TorConfig.__DNSPort) { port(1080.toPortEphemeral()) }
                 }
             ),
             isPortAvailable = { _, _ -> false }

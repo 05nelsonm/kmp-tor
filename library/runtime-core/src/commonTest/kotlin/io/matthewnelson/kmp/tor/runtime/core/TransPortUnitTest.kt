@@ -15,7 +15,7 @@
  **/
 package io.matthewnelson.kmp.tor.runtime.core
 
-import io.matthewnelson.kmp.tor.runtime.core.address.Port.Proxy.Companion.toPortProxy
+import io.matthewnelson.kmp.tor.runtime.core.address.Port.Ephemeral.Companion.toPortEphemeral
 import io.matthewnelson.kmp.tor.runtime.core.internal.IsUnixLikeHost
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -26,7 +26,7 @@ class TransPortUnitTest {
     @Test
     fun givenHostMachine_whenConfigured_thenAllowsIfSupported() {
         val setting = TorConfig.__TransPort.Builder {
-            port(1080.toPortProxy())
+            port(1080.toPortEphemeral())
         }
 
         val argument = setting.argument

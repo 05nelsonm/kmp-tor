@@ -32,8 +32,8 @@ import io.matthewnelson.kmp.tor.runtime.RuntimeEvent.Notifier.Companion.lce
 import io.matthewnelson.kmp.tor.runtime.RuntimeEvent.Notifier.Companion.p
 import io.matthewnelson.kmp.tor.runtime.RuntimeEvent.Notifier.Companion.w
 import io.matthewnelson.kmp.tor.runtime.core.TorConfig
-import io.matthewnelson.kmp.tor.runtime.core.address.ProxyAddress
-import io.matthewnelson.kmp.tor.runtime.core.address.ProxyAddress.Companion.toProxyAddressOrNull
+import io.matthewnelson.kmp.tor.runtime.core.address.IPSocketAddress
+import io.matthewnelson.kmp.tor.runtime.core.address.IPSocketAddress.Companion.toIPSocketAddressOrNull
 import io.matthewnelson.kmp.tor.runtime.core.apply
 import io.matthewnelson.kmp.tor.runtime.core.ctrl.TorCmd
 import io.matthewnelson.kmp.tor.runtime.ctrl.TorCtrl
@@ -238,8 +238,8 @@ internal class TorProcess private constructor(
 
         // No UnixDomainSocket, fallback to first TCP address
         for (address in addresses) {
-            val proxyAddress = address.toProxyAddressOrNull() ?: continue
-            return CtrlArguments.Connection(proxyAddress)
+            val socketAddress = address.toIPSocketAddressOrNull() ?: continue
+            return CtrlArguments.Connection(socketAddress)
         }
 
         throw IOException("Failed to acquire control connection address from file[$ctrlPortFile]")
@@ -451,11 +451,11 @@ internal class TorProcess private constructor(
     ) {
 
         internal class Connection private constructor(
-            private val tcp: ProxyAddress?,
+            private val tcp: IPSocketAddress?,
             private val uds: File?,
         ) {
 
-            constructor(tcp: ProxyAddress): this(tcp, null)
+            constructor(tcp: IPSocketAddress): this(tcp, null)
             constructor(uds: File): this(null, uds)
 
             @Throws(CancellationException::class, IOException::class)

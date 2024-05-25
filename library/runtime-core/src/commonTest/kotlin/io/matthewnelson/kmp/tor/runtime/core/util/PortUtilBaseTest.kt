@@ -18,8 +18,8 @@ package io.matthewnelson.kmp.tor.runtime.core.util
 import io.matthewnelson.kmp.tor.runtime.core.address.IPAddress
 import io.matthewnelson.kmp.tor.runtime.core.address.LocalHost
 import io.matthewnelson.kmp.tor.runtime.core.address.Port
-import io.matthewnelson.kmp.tor.runtime.core.address.Port.Proxy.Companion.toPortProxy
-import io.matthewnelson.kmp.tor.runtime.core.internal.PortProxyIterator.Companion.iterator
+import io.matthewnelson.kmp.tor.runtime.core.address.Port.Ephemeral.Companion.toPortEphemeral
+import io.matthewnelson.kmp.tor.runtime.core.internal.PortEphemeralIterator.Companion.iterator
 import kotlinx.coroutines.*
 import kotlinx.coroutines.test.runTest
 import kotlin.test.*
@@ -63,7 +63,7 @@ abstract class PortUtilBaseTest {
             return@runTest
         }
 
-        val port = Port.Proxy.MIN.toPortProxy()
+        val port = Port.Ephemeral.MIN.toPortEphemeral()
         val host = LocalHost.IPv4
         val limit = 750
         val i = port.iterator(limit)
@@ -72,7 +72,7 @@ abstract class PortUtilBaseTest {
         // Make next ports unavailable to force findAvailable
         // to loop through all the values of PortProxyIterator
         while (i.hasNext()) {
-            val next = i.next().toPortProxy()
+            val next = i.next().toPortEphemeral()
             if (!next.isAvailableAsync(host)) continue
             host.holdServerSocket(next)
             count++
@@ -80,7 +80,7 @@ abstract class PortUtilBaseTest {
 
         assertTrue(count > 0)
 
-        var result: Port.Proxy? = null
+        var result: Port.Ephemeral? = null
         var throwable: Throwable? = null
         val job = launch(CoroutineExceptionHandler { _, t -> throwable = t }) {
             result = port.findAvailableAsync(limit + 50, host)
@@ -113,18 +113,18 @@ abstract class PortUtilBaseTest {
     }
 
     private suspend fun LocalHost.holdServerSocket(
-        port: Port.Proxy? = null
-    ): Pair<AutoCloseable, Port.Proxy> {
-        val portProxy = port ?: Port.Proxy.MIN
-            .toPortProxy()
+        port: Port.Ephemeral? = null
+    ): Pair<AutoCloseable, Port.Ephemeral> {
+        val portEphemeral = port ?: Port.Ephemeral.MIN
+            .toPortEphemeral()
             .findAvailableAsync(1_000, this)
 
-        val socket = openServerSocket(resolve(), portProxy.value)
+        val socket = openServerSocket(resolve(), portEphemeral.value)
         currentCoroutineContext().job.invokeOnCompletion {
             try {
                 socket.close()
             } catch (_: Throwable) {}
         }
-        return socket to portProxy
+        return socket to portEphemeral
     }
 }

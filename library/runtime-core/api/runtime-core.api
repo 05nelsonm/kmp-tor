@@ -587,8 +587,8 @@ public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$__DNSPort : i
 	public synthetic fun disable ()Ljava/lang/Object;
 	public fun isolationFlags (Lio/matthewnelson/kmp/tor/runtime/core/ThisBlock;)Lio/matthewnelson/kmp/tor/runtime/core/TorConfig$__DNSPort;
 	public synthetic fun isolationFlags (Lio/matthewnelson/kmp/tor/runtime/core/ThisBlock;)Ljava/lang/Object;
-	public fun port (Lio/matthewnelson/kmp/tor/runtime/core/address/Port$Proxy;)Lio/matthewnelson/kmp/tor/runtime/core/TorConfig$__DNSPort;
-	public synthetic fun port (Lio/matthewnelson/kmp/tor/runtime/core/address/Port$Proxy;)Ljava/lang/Object;
+	public fun port (Lio/matthewnelson/kmp/tor/runtime/core/address/Port$Ephemeral;)Lio/matthewnelson/kmp/tor/runtime/core/TorConfig$__DNSPort;
+	public synthetic fun port (Lio/matthewnelson/kmp/tor/runtime/core/address/Port$Ephemeral;)Ljava/lang/Object;
 	public fun reassignable (Z)Lio/matthewnelson/kmp/tor/runtime/core/TorConfig$__DNSPort;
 	public synthetic fun reassignable (Z)Ljava/lang/Object;
 }
@@ -604,8 +604,8 @@ public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$__HTTPTunnelP
 	public synthetic fun disable ()Ljava/lang/Object;
 	public fun isolationFlags (Lio/matthewnelson/kmp/tor/runtime/core/ThisBlock;)Lio/matthewnelson/kmp/tor/runtime/core/TorConfig$__HTTPTunnelPort;
 	public synthetic fun isolationFlags (Lio/matthewnelson/kmp/tor/runtime/core/ThisBlock;)Ljava/lang/Object;
-	public fun port (Lio/matthewnelson/kmp/tor/runtime/core/address/Port$Proxy;)Lio/matthewnelson/kmp/tor/runtime/core/TorConfig$__HTTPTunnelPort;
-	public synthetic fun port (Lio/matthewnelson/kmp/tor/runtime/core/address/Port$Proxy;)Ljava/lang/Object;
+	public fun port (Lio/matthewnelson/kmp/tor/runtime/core/address/Port$Ephemeral;)Lio/matthewnelson/kmp/tor/runtime/core/TorConfig$__HTTPTunnelPort;
+	public synthetic fun port (Lio/matthewnelson/kmp/tor/runtime/core/address/Port$Ephemeral;)Ljava/lang/Object;
 	public fun reassignable (Z)Lio/matthewnelson/kmp/tor/runtime/core/TorConfig$__HTTPTunnelPort;
 	public synthetic fun reassignable (Z)Ljava/lang/Object;
 }
@@ -645,8 +645,8 @@ public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$__TransPort :
 	public synthetic fun disable ()Ljava/lang/Object;
 	public fun isolationFlags (Lio/matthewnelson/kmp/tor/runtime/core/ThisBlock;)Lio/matthewnelson/kmp/tor/runtime/core/TorConfig$__TransPort;
 	public synthetic fun isolationFlags (Lio/matthewnelson/kmp/tor/runtime/core/ThisBlock;)Ljava/lang/Object;
-	public fun port (Lio/matthewnelson/kmp/tor/runtime/core/address/Port$Proxy;)Lio/matthewnelson/kmp/tor/runtime/core/TorConfig$__TransPort;
-	public synthetic fun port (Lio/matthewnelson/kmp/tor/runtime/core/address/Port$Proxy;)Ljava/lang/Object;
+	public fun port (Lio/matthewnelson/kmp/tor/runtime/core/address/Port$Ephemeral;)Lio/matthewnelson/kmp/tor/runtime/core/TorConfig$__TransPort;
+	public synthetic fun port (Lio/matthewnelson/kmp/tor/runtime/core/address/Port$Ephemeral;)Ljava/lang/Object;
 	public fun reassignable (Z)Lio/matthewnelson/kmp/tor/runtime/core/TorConfig$__TransPort;
 	public synthetic fun reassignable (Z)Ljava/lang/Object;
 }
@@ -890,6 +890,26 @@ public final class io/matthewnelson/kmp/tor/runtime/core/address/IPAddress$V6$Co
 	public final fun getOrNull (Ljava/lang/String;)Lio/matthewnelson/kmp/tor/runtime/core/address/IPAddress$V6;
 }
 
+public final class io/matthewnelson/kmp/tor/runtime/core/address/IPSocketAddress : io/matthewnelson/kmp/tor/runtime/core/address/Address {
+	public static final field Companion Lio/matthewnelson/kmp/tor/runtime/core/address/IPSocketAddress$Companion;
+	public final field address Lio/matthewnelson/kmp/tor/runtime/core/address/IPAddress;
+	public final field port Lio/matthewnelson/kmp/tor/runtime/core/address/Port;
+	public fun <init> (Lio/matthewnelson/kmp/tor/runtime/core/address/IPAddress;Lio/matthewnelson/kmp/tor/runtime/core/address/Port;)V
+	public fun canonicalHostname ()Ljava/lang/String;
+	public final fun component1 ()Lio/matthewnelson/kmp/tor/runtime/core/address/IPAddress;
+	public final fun component2 ()Lio/matthewnelson/kmp/tor/runtime/core/address/Port;
+	public final fun copy (Lio/matthewnelson/kmp/tor/runtime/core/address/IPAddress;)Lio/matthewnelson/kmp/tor/runtime/core/address/IPSocketAddress;
+	public final fun copy (Lio/matthewnelson/kmp/tor/runtime/core/address/IPAddress;Lio/matthewnelson/kmp/tor/runtime/core/address/Port;)Lio/matthewnelson/kmp/tor/runtime/core/address/IPSocketAddress;
+	public final fun copy (Lio/matthewnelson/kmp/tor/runtime/core/address/Port;)Lio/matthewnelson/kmp/tor/runtime/core/address/IPSocketAddress;
+	public static final fun get (Ljava/lang/String;)Lio/matthewnelson/kmp/tor/runtime/core/address/IPSocketAddress;
+	public static final fun getOrNull (Ljava/lang/String;)Lio/matthewnelson/kmp/tor/runtime/core/address/IPSocketAddress;
+}
+
+public final class io/matthewnelson/kmp/tor/runtime/core/address/IPSocketAddress$Companion {
+	public final fun get (Ljava/lang/String;)Lio/matthewnelson/kmp/tor/runtime/core/address/IPSocketAddress;
+	public final fun getOrNull (Ljava/lang/String;)Lio/matthewnelson/kmp/tor/runtime/core/address/IPSocketAddress;
+}
+
 public abstract class io/matthewnelson/kmp/tor/runtime/core/address/LocalHost : io/matthewnelson/kmp/tor/runtime/core/address/Address {
 	public static final field Companion Lio/matthewnelson/kmp/tor/runtime/core/address/LocalHost$Companion;
 	public final fun canonicalHostname ()Ljava/lang/String;
@@ -975,41 +995,22 @@ public final class io/matthewnelson/kmp/tor/runtime/core/address/Port$Companion 
 	public final fun getOrNull (Ljava/lang/String;)Lio/matthewnelson/kmp/tor/runtime/core/address/Port;
 }
 
-public final class io/matthewnelson/kmp/tor/runtime/core/address/Port$Proxy : io/matthewnelson/kmp/tor/runtime/core/address/Port {
-	public static final field Companion Lio/matthewnelson/kmp/tor/runtime/core/address/Port$Proxy$Companion;
+public final class io/matthewnelson/kmp/tor/runtime/core/address/Port$Ephemeral : io/matthewnelson/kmp/tor/runtime/core/address/Port {
+	public static final field Companion Lio/matthewnelson/kmp/tor/runtime/core/address/Port$Ephemeral$Companion;
 	public static final field MAX I
 	public static final field MIN I
 	public synthetic fun <init> (ILkotlin/jvm/internal/DefaultConstructorMarker;)V
-	public static final fun get (I)Lio/matthewnelson/kmp/tor/runtime/core/address/Port$Proxy;
-	public static final fun get (Ljava/lang/String;)Lio/matthewnelson/kmp/tor/runtime/core/address/Port$Proxy;
-	public static final fun getOrNull (I)Lio/matthewnelson/kmp/tor/runtime/core/address/Port$Proxy;
-	public static final fun getOrNull (Ljava/lang/String;)Lio/matthewnelson/kmp/tor/runtime/core/address/Port$Proxy;
+	public static final fun get (I)Lio/matthewnelson/kmp/tor/runtime/core/address/Port$Ephemeral;
+	public static final fun get (Ljava/lang/String;)Lio/matthewnelson/kmp/tor/runtime/core/address/Port$Ephemeral;
+	public static final fun getOrNull (I)Lio/matthewnelson/kmp/tor/runtime/core/address/Port$Ephemeral;
+	public static final fun getOrNull (Ljava/lang/String;)Lio/matthewnelson/kmp/tor/runtime/core/address/Port$Ephemeral;
 }
 
-public final class io/matthewnelson/kmp/tor/runtime/core/address/Port$Proxy$Companion {
-	public final fun get (I)Lio/matthewnelson/kmp/tor/runtime/core/address/Port$Proxy;
-	public final fun get (Ljava/lang/String;)Lio/matthewnelson/kmp/tor/runtime/core/address/Port$Proxy;
-	public final fun getOrNull (I)Lio/matthewnelson/kmp/tor/runtime/core/address/Port$Proxy;
-	public final fun getOrNull (Ljava/lang/String;)Lio/matthewnelson/kmp/tor/runtime/core/address/Port$Proxy;
-}
-
-public final class io/matthewnelson/kmp/tor/runtime/core/address/ProxyAddress : io/matthewnelson/kmp/tor/runtime/core/address/Address {
-	public static final field Companion Lio/matthewnelson/kmp/tor/runtime/core/address/ProxyAddress$Companion;
-	public final field address Lio/matthewnelson/kmp/tor/runtime/core/address/IPAddress;
-	public final field port Lio/matthewnelson/kmp/tor/runtime/core/address/Port;
-	public fun <init> (Lio/matthewnelson/kmp/tor/runtime/core/address/IPAddress;Lio/matthewnelson/kmp/tor/runtime/core/address/Port;)V
-	public fun canonicalHostname ()Ljava/lang/String;
-	public final fun component1 ()Lio/matthewnelson/kmp/tor/runtime/core/address/IPAddress;
-	public final fun component2 ()Lio/matthewnelson/kmp/tor/runtime/core/address/Port;
-	public final fun copy (Lio/matthewnelson/kmp/tor/runtime/core/address/IPAddress;)Lio/matthewnelson/kmp/tor/runtime/core/address/ProxyAddress;
-	public final fun copy (Lio/matthewnelson/kmp/tor/runtime/core/address/Port;)Lio/matthewnelson/kmp/tor/runtime/core/address/ProxyAddress;
-	public static final fun get (Ljava/lang/String;)Lio/matthewnelson/kmp/tor/runtime/core/address/ProxyAddress;
-	public static final fun getOrNull (Ljava/lang/String;)Lio/matthewnelson/kmp/tor/runtime/core/address/ProxyAddress;
-}
-
-public final class io/matthewnelson/kmp/tor/runtime/core/address/ProxyAddress$Companion {
-	public final fun get (Ljava/lang/String;)Lio/matthewnelson/kmp/tor/runtime/core/address/ProxyAddress;
-	public final fun getOrNull (Ljava/lang/String;)Lio/matthewnelson/kmp/tor/runtime/core/address/ProxyAddress;
+public final class io/matthewnelson/kmp/tor/runtime/core/address/Port$Ephemeral$Companion {
+	public final fun get (I)Lio/matthewnelson/kmp/tor/runtime/core/address/Port$Ephemeral;
+	public final fun get (Ljava/lang/String;)Lio/matthewnelson/kmp/tor/runtime/core/address/Port$Ephemeral;
+	public final fun getOrNull (I)Lio/matthewnelson/kmp/tor/runtime/core/address/Port$Ephemeral;
+	public final fun getOrNull (Ljava/lang/String;)Lio/matthewnelson/kmp/tor/runtime/core/address/Port$Ephemeral;
 }
 
 public final class io/matthewnelson/kmp/tor/runtime/core/builder/IsolationFlagBuilder {
@@ -1045,8 +1046,8 @@ public abstract class io/matthewnelson/kmp/tor/runtime/core/builder/TCPPortBuild
 public final class io/matthewnelson/kmp/tor/runtime/core/builder/TCPPortBuilder$Control : io/matthewnelson/kmp/tor/runtime/core/builder/TCPPortBuilder, io/matthewnelson/kmp/tor/runtime/core/builder/TCPPortBuilder$DSLAuto, io/matthewnelson/kmp/tor/runtime/core/builder/TCPPortBuilder$DSLPort {
 	public fun auto ()Lio/matthewnelson/kmp/tor/runtime/core/builder/TCPPortBuilder$Control;
 	public synthetic fun auto ()Ljava/lang/Object;
-	public fun port (Lio/matthewnelson/kmp/tor/runtime/core/address/Port$Proxy;)Lio/matthewnelson/kmp/tor/runtime/core/builder/TCPPortBuilder$Control;
-	public synthetic fun port (Lio/matthewnelson/kmp/tor/runtime/core/address/Port$Proxy;)Ljava/lang/Object;
+	public fun port (Lio/matthewnelson/kmp/tor/runtime/core/address/Port$Ephemeral;)Lio/matthewnelson/kmp/tor/runtime/core/builder/TCPPortBuilder$Control;
+	public synthetic fun port (Lio/matthewnelson/kmp/tor/runtime/core/address/Port$Ephemeral;)Ljava/lang/Object;
 	public fun reassignable (Z)Lio/matthewnelson/kmp/tor/runtime/core/builder/TCPPortBuilder$Control;
 	public synthetic fun reassignable (Z)Ljava/lang/Object;
 }
@@ -1060,8 +1061,8 @@ public final class io/matthewnelson/kmp/tor/runtime/core/builder/TCPPortBuilder$
 	public synthetic fun auto ()Ljava/lang/Object;
 	public fun disable ()Lio/matthewnelson/kmp/tor/runtime/core/builder/TCPPortBuilder$Socks;
 	public synthetic fun disable ()Ljava/lang/Object;
-	public fun port (Lio/matthewnelson/kmp/tor/runtime/core/address/Port$Proxy;)Lio/matthewnelson/kmp/tor/runtime/core/builder/TCPPortBuilder$Socks;
-	public synthetic fun port (Lio/matthewnelson/kmp/tor/runtime/core/address/Port$Proxy;)Ljava/lang/Object;
+	public fun port (Lio/matthewnelson/kmp/tor/runtime/core/address/Port$Ephemeral;)Lio/matthewnelson/kmp/tor/runtime/core/builder/TCPPortBuilder$Socks;
+	public synthetic fun port (Lio/matthewnelson/kmp/tor/runtime/core/address/Port$Ephemeral;)Ljava/lang/Object;
 	public fun reassignable (Z)Lio/matthewnelson/kmp/tor/runtime/core/builder/TCPPortBuilder$Socks;
 	public synthetic fun reassignable (Z)Ljava/lang/Object;
 }
@@ -1588,8 +1589,8 @@ public final class io/matthewnelson/kmp/tor/runtime/core/util/CmdUtil {
 }
 
 public final class io/matthewnelson/kmp/tor/runtime/core/util/PortUtil {
-	public static final fun findAvailableAsync (Lio/matthewnelson/kmp/tor/runtime/core/address/Port$Proxy;ILio/matthewnelson/kmp/tor/runtime/core/address/LocalHost;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public static final fun findAvailableSync (Lio/matthewnelson/kmp/tor/runtime/core/address/Port$Proxy;ILio/matthewnelson/kmp/tor/runtime/core/address/LocalHost;)Lio/matthewnelson/kmp/tor/runtime/core/address/Port$Proxy;
+	public static final fun findAvailableAsync (Lio/matthewnelson/kmp/tor/runtime/core/address/Port$Ephemeral;ILio/matthewnelson/kmp/tor/runtime/core/address/LocalHost;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static final fun findAvailableSync (Lio/matthewnelson/kmp/tor/runtime/core/address/Port$Ephemeral;ILio/matthewnelson/kmp/tor/runtime/core/address/LocalHost;)Lio/matthewnelson/kmp/tor/runtime/core/address/Port$Ephemeral;
 	public static final fun isAvailableAsync (Lio/matthewnelson/kmp/tor/runtime/core/address/Port;Lio/matthewnelson/kmp/tor/runtime/core/address/LocalHost;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public static final fun isAvailableSync (Lio/matthewnelson/kmp/tor/runtime/core/address/Port;Lio/matthewnelson/kmp/tor/runtime/core/address/LocalHost;)Z
 }
