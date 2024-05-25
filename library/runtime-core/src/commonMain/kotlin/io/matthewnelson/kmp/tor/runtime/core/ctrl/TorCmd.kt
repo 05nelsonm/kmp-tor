@@ -408,7 +408,7 @@ public sealed class TorCmd<Success: Any> private constructor(
         public constructor(
             address: IPAddress.V4,
             reverse: Boolean,
-        ): this(address.canonicalHostname(), reverse)
+        ): this(address.canonicalHostName(), reverse)
     }
 
     /**

@@ -29,12 +29,12 @@ public class IPSocketAddress(
     public val address: IPAddress,
     @JvmField
     public val port: Port,
-): Address(address.canonicalHostname() + ':' + port) {
+): Address(address.canonicalHostName() + ':' + port) {
 
     public operator fun component1(): IPAddress = address
     public operator fun component2(): Port = port
 
-    public override fun canonicalHostname(): String = address.canonicalHostname()
+    public override fun canonicalHostName(): String = address.canonicalHostName()
 
     public fun copy(address: IPAddress): IPSocketAddress = copy(address, port)
     public fun copy(port: Port): IPSocketAddress = copy(address, port)

@@ -34,7 +34,7 @@ import kotlin.jvm.JvmStatic
  * */
 public sealed class OnionAddress private constructor(value: String): Address(value) {
 
-    public final override fun canonicalHostname(): String = "$value.onion"
+    public final override fun canonicalHostName(): String = "$value.onion"
     public abstract fun decode(): ByteArray
     public abstract fun asPublicKey(): AddressKey.Public
 

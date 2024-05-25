@@ -1690,7 +1690,7 @@ public class TorConfig private constructor(
             build = {
                 var bits = bits
                 if (bits !in 0..16) bits = 10
-                build(address.canonicalHostname() + '/' + bits)!!
+                build(address.canonicalHostName() + '/' + bits)!!
             },
         ) {
             private val DEFAULT = "127.192.0.0".toIPAddressV4()
@@ -1724,7 +1724,7 @@ public class TorConfig private constructor(
             build = {
                 var bits = bits
                 if (bits !in 0..104) bits = 10
-                build(address.canonicalHostname() + '/' + bits)!!
+                build(address.canonicalHostName() + '/' + bits)!!
             },
         ) {
             private val DEFAULT = "FE80::".toIPAddressV6()

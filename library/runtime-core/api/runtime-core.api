@@ -859,7 +859,7 @@ public final class io/matthewnelson/kmp/tor/runtime/core/UncaughtException$Suppr
 public abstract class io/matthewnelson/kmp/tor/runtime/core/address/Address : java/lang/Comparable {
 	public final field value Ljava/lang/String;
 	public synthetic fun <init> (Ljava/lang/String;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
-	public abstract fun canonicalHostname ()Ljava/lang/String;
+	public abstract fun canonicalHostName ()Ljava/lang/String;
 	public final fun compareTo (Lio/matthewnelson/kmp/tor/runtime/core/address/Address;)I
 	public synthetic fun compareTo (Ljava/lang/Object;)I
 	public final fun equals (Ljava/lang/Object;)Z
@@ -882,7 +882,7 @@ public final class io/matthewnelson/kmp/tor/runtime/core/address/IPAddress$Compa
 public final class io/matthewnelson/kmp/tor/runtime/core/address/IPAddress$V4 : io/matthewnelson/kmp/tor/runtime/core/address/IPAddress {
 	public static final field Companion Lio/matthewnelson/kmp/tor/runtime/core/address/IPAddress$V4$Companion;
 	public synthetic fun <init> (Ljava/lang/String;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
-	public fun canonicalHostname ()Ljava/lang/String;
+	public fun canonicalHostName ()Ljava/lang/String;
 	public static final fun get (Ljava/lang/String;)Lio/matthewnelson/kmp/tor/runtime/core/address/IPAddress$V4;
 	public static final fun getOrNull (Ljava/lang/String;)Lio/matthewnelson/kmp/tor/runtime/core/address/IPAddress$V4;
 }
@@ -895,7 +895,7 @@ public final class io/matthewnelson/kmp/tor/runtime/core/address/IPAddress$V4$Co
 public final class io/matthewnelson/kmp/tor/runtime/core/address/IPAddress$V6 : io/matthewnelson/kmp/tor/runtime/core/address/IPAddress {
 	public static final field Companion Lio/matthewnelson/kmp/tor/runtime/core/address/IPAddress$V6$Companion;
 	public synthetic fun <init> (Ljava/lang/String;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
-	public fun canonicalHostname ()Ljava/lang/String;
+	public fun canonicalHostName ()Ljava/lang/String;
 	public static final fun get (Ljava/lang/String;)Lio/matthewnelson/kmp/tor/runtime/core/address/IPAddress$V6;
 	public static final fun getOrNull (Ljava/lang/String;)Lio/matthewnelson/kmp/tor/runtime/core/address/IPAddress$V6;
 }
@@ -910,7 +910,7 @@ public final class io/matthewnelson/kmp/tor/runtime/core/address/IPSocketAddress
 	public final field address Lio/matthewnelson/kmp/tor/runtime/core/address/IPAddress;
 	public final field port Lio/matthewnelson/kmp/tor/runtime/core/address/Port;
 	public fun <init> (Lio/matthewnelson/kmp/tor/runtime/core/address/IPAddress;Lio/matthewnelson/kmp/tor/runtime/core/address/Port;)V
-	public fun canonicalHostname ()Ljava/lang/String;
+	public fun canonicalHostName ()Ljava/lang/String;
 	public final fun component1 ()Lio/matthewnelson/kmp/tor/runtime/core/address/IPAddress;
 	public final fun component2 ()Lio/matthewnelson/kmp/tor/runtime/core/address/Port;
 	public final fun copy (Lio/matthewnelson/kmp/tor/runtime/core/address/IPAddress;)Lio/matthewnelson/kmp/tor/runtime/core/address/IPSocketAddress;
@@ -927,7 +927,7 @@ public final class io/matthewnelson/kmp/tor/runtime/core/address/IPSocketAddress
 
 public abstract class io/matthewnelson/kmp/tor/runtime/core/address/LocalHost : io/matthewnelson/kmp/tor/runtime/core/address/Address {
 	public static final field Companion Lio/matthewnelson/kmp/tor/runtime/core/address/LocalHost$Companion;
-	public final fun canonicalHostname ()Ljava/lang/String;
+	public final fun canonicalHostName ()Ljava/lang/String;
 	public abstract fun resolve ()Lio/matthewnelson/kmp/tor/runtime/core/address/IPAddress;
 }
 
@@ -952,7 +952,7 @@ public abstract class io/matthewnelson/kmp/tor/runtime/core/address/OnionAddress
 	public static final field Companion Lio/matthewnelson/kmp/tor/runtime/core/address/OnionAddress$Companion;
 	public synthetic fun <init> (Ljava/lang/String;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
 	public abstract fun asPublicKey ()Lio/matthewnelson/kmp/tor/runtime/core/key/AddressKey$Public;
-	public final fun canonicalHostname ()Ljava/lang/String;
+	public final fun canonicalHostName ()Ljava/lang/String;
 	public abstract fun decode ()[B
 	public static final fun get (Ljava/lang/String;)Lio/matthewnelson/kmp/tor/runtime/core/address/OnionAddress;
 	public static final fun get ([B)Lio/matthewnelson/kmp/tor/runtime/core/address/OnionAddress;

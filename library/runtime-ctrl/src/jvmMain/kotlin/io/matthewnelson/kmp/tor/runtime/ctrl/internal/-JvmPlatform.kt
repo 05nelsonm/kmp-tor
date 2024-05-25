@@ -66,7 +66,7 @@ internal actual fun IPSocketAddress.connect(): CtrlConnection {
         // not called from bg thread b/c of
         // InetAddress resolution
         val address = InetSocketAddress(
-            address.canonicalHostname(),
+            address.canonicalHostName(),
             port.value,
         )
 

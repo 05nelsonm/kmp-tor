@@ -44,7 +44,7 @@ class IPAddressV6UnitTest {
         val address = rawAddress.toIPAddressV6()
 
         val expected = "[$rawAddress]"
-        val actual = address.canonicalHostname()
+        val actual = address.canonicalHostName()
         assertEquals(expected, actual)
     }
 
@@ -58,7 +58,7 @@ class IPAddressV6UnitTest {
     @Test
     fun givenIPAddressV6Url_whenFromString_thenReturnsSuccess() {
         val expected = "35f4:c60a:8296:4c90:79ad:3939:69d9:ba10".toIPAddressV6()
-        val actual = "https://username:password@${expected.canonicalHostname()}:9822/some/path".toIPAddressV6()
+        val actual = "https://username:password@${expected.canonicalHostName()}:9822/some/path".toIPAddressV6()
         assertEquals(expected, actual)
     }
 

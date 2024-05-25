@@ -65,7 +65,7 @@ public sealed class LocalHost private constructor(): Address("localhost") {
         internal override fun fromCache(): IPAddress.V6? = Cache.getOrNull()?.firstOrNull()
     }
 
-    public final override fun canonicalHostname(): String = value
+    public final override fun canonicalHostName(): String = value
 
     private class Cache private constructor(private val addresses: Set<IPAddress>) {
 

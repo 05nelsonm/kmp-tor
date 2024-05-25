@@ -56,7 +56,7 @@ internal class PortEphemeralIterator private constructor(
             "(${port.value} - ${Port.Ephemeral.MAX}) and (${Port.Ephemeral.MIN} - $bottom)"
         }
 
-        return IOException("Failed to find available port for ${ipAddress.canonicalHostname()} $ranges")
+        return IOException("Failed to find available port for ${ipAddress.canonicalHostName()} $ranges")
     }
 
     internal companion object {
