@@ -80,10 +80,11 @@ public class TorListeners private constructor(
     public val trans: Set<IPSocketAddress> = trans.toImmutableSet()
 
     /**
-     * Helper to check if there are any listeners available.
+     * Helper to check if there are any listeners available for
+     * all types (dns, http, socks, socksUnix, trans).
      *
-     * @return true is no listeners are available, false if there
-     *   is at least 1 listener available.
+     * @return true is no listeners are available for any types,
+     *   false if there is at least 1 listener available.
      * */
     @get:JvmName("isEmpty")
     public val isEmpty: Boolean get() = dns.isEmpty()
@@ -98,7 +99,7 @@ public class TorListeners private constructor(
     public operator fun component4(): Set<File> = socksUnix
     public operator fun component5(): Set<IPSocketAddress> = trans
 
-    @JvmOverloads
+    // JvmOverloads is worthless here b/c of type erasure
     public fun copy(
         dns: Set<IPSocketAddress> = this.dns,
         http: Set<IPSocketAddress> = this.http,
@@ -125,6 +126,36 @@ public class TorListeners private constructor(
             fid = fid,
         )
     }
+
+    /**
+     * Copies the current [TorListeners], replacing the
+     * [TorListeners.dns] value with [dns].
+     * */
+    public fun copyDns(dns: Set<IPSocketAddress>): TorListeners = copy(dns = dns)
+
+    /**
+     * Copies the current [TorListeners], replacing the
+     * [TorListeners.http] value with [http].
+     * */
+    public fun copyHttp(http: Set<IPSocketAddress>): TorListeners = copy(http = http)
+
+    /**
+     * Copies the current [TorListeners], replacing the
+     * [TorListeners.socks] value with [socks].
+     * */
+    public fun copySocks(socks: Set<IPSocketAddress>): TorListeners = copy(socks = socks)
+
+    /**
+     * Copies the current [TorListeners], replacing the
+     * [TorListeners.socksUnix] value with [socksUnix].
+     * */
+    public fun copySocksUnix(socksUnix: Set<File>): TorListeners = copy(socksUnix = socksUnix)
+
+    /**
+     * Copies the current [TorListeners], replacing the
+     * [TorListeners.trans] value with [trans].
+     * */
+    public fun copyTrans(trans: Set<IPSocketAddress>): TorListeners = copy(trans = trans)
 
     internal companion object {
 
