@@ -19,6 +19,7 @@ package io.matthewnelson.kmp.tor.runtime
 
 import io.matthewnelson.immutable.collections.toImmutableSet
 import io.matthewnelson.kmp.file.File
+import io.matthewnelson.kmp.file.toFile
 import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
 import io.matthewnelson.kmp.tor.core.resource.SynchronizedObject
 import io.matthewnelson.kmp.tor.core.resource.synchronized
@@ -226,6 +227,7 @@ public class TorListeners private constructor(
     }
 
     internal interface Manager: TorState.Manager {
+        fun oUnixListenerConfChange(type: String, new: Set<File>)
         fun update(type: String, address: String, wasClosed: Boolean)
     }
 
@@ -257,39 +259,52 @@ public class TorListeners private constructor(
         protected abstract fun notify(listeners: TorListeners)
         protected abstract fun notify(state: TorState)
 
-        override fun update(type: String, address: String, wasClosed: Boolean) {
+        final override fun oUnixListenerConfChange(type: String, new: Set<File>) {
+            if (new.isEmpty()) return
+
+            val t = when (val t = Type.valueOfOrNull(type)) {
+                is Type.SOCKS -> t
+                else -> null
+            } ?: return
+
+            // TODO
+        }
+
+        final override fun update(type: String, address: String, wasClosed: Boolean) {
             if (type.isBlank() || address.isBlank()) return
             val t = Type.valueOfOrNull(type) ?: return
 
-            synchronized(lock) {
-                val new = if (wasClosed) {
-                    t.onClose(address)
-                } else {
-                    t.onOpen(address)
-                }
+            synchronized(lock) { updateNoLock(t, address, wasClosed) }
+        }
 
-                if (new == null || new == _listeners) {
-                    return@synchronized
-                }
+        private fun updateNoLock(type: Type, address: String, wasClosed: Boolean) {
+            val new = if (wasClosed) {
+                type.onClose(address)
+            } else {
+                type.onOpen(address)
+            }
 
-                _listeners = new
+            if (new == null || new == _listeners) {
+                return
+            }
 
-                with(state) {
-                    if (!daemon.isBootstrapped || isNetworkDisabled) {
-                        return@synchronized
-                    }
-                }
+            _listeners = new
 
-                // Tor was running and there was a config change that
-                // opened or closed listeners across multiple [notice]
-                // lines.
-                //
-                // Wait for all of them come in before notifying.
-                _notifyJob?.cancel()
-                _notifyJob = scope.launch {
-                    timedDelay(notifyDelay)
-                    notify(new)
+            with(state) {
+                if (!daemon.isBootstrapped || isNetworkDisabled) {
+                    return
                 }
+            }
+
+            // Tor was running and there was a config change that
+            // opened or closed listeners across multiple [notice]
+            // lines.
+            //
+            // Wait for all of them come in before notifying.
+            _notifyJob?.cancel()
+            _notifyJob = scope.launch {
+                timedDelay(notifyDelay)
+                notify(new)
             }
         }
 
@@ -341,9 +356,9 @@ public class TorListeners private constructor(
                     // TODO: ConfChanged
                     null
                 }
-                '/' -> {
-                    // TODO
-                    null
+                '/' ->  with(_listeners) {
+                    (socksUnix to Copy.Unix { copy(socksUnix = it) })
+                        .update(address.toFile(), wasClosed = true)
                 }
                 else -> {
                     address.toIPSocketAddressOrNull()
@@ -361,9 +376,9 @@ public class TorListeners private constructor(
             }
             is Type.SOCKS -> when (address.firstOrNull()) {
                 null -> null
-                '/' -> {
-                    // TODO
-                    null
+                '/' -> with(_listeners) {
+                    (socksUnix to Copy.Unix { copy(socksUnix = it) })
+                        .update(address.toFile(), wasClosed = false)
                 }
                 else -> {
                     address.toIPSocketAddressOrNull()

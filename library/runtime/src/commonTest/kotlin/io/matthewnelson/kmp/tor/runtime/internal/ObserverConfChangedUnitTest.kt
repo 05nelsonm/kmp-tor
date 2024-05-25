@@ -13,8 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
+@file:Suppress("UnnecessaryVariable")
+
 package io.matthewnelson.kmp.tor.runtime.internal
 
+import io.matthewnelson.kmp.file.toFile
 import io.matthewnelson.kmp.tor.runtime.test.TestTorListenersManager
 import io.matthewnelson.kmp.tor.runtime.TorState
 import kotlin.test.*
@@ -59,5 +62,25 @@ class ObserverConfChangedUnitTest {
             assertNull(daemon)
             assertEquals(expected, network)
         }
+    }
+
+    @Test
+    fun givenSocksPort_whenParsed_thenUpdatesTorListenersManager() {
+        val expected1 = "/tmp/kmp_tor_test/obs_conn_no_net/work/socks2.sock".toFile()
+        val expected2 = expected1
+        val expected3 = "/tmp/kmp_tor_test/obs_conn_no_net/work/socks3.sock".toFile()
+
+        observer.notify("""
+            __SocksPort=unix:"$expected1" OnionTrafficOnly GroupWritable
+        """.trimIndent())
+
+        observer.notify("""
+            __SocksPort=unix:"$expected2" OnionTrafficOnly
+            SocksPort=unix:"$expected3"
+        """.trimIndent())
+
+        assertEquals(2, observer.manager.unixConf.size)
+        assertEquals("Socks" to setOf(expected1), observer.manager.unixConf[0])
+        assertEquals("Socks" to setOf(expected2, expected3), observer.manager.unixConf[1])
     }
 }

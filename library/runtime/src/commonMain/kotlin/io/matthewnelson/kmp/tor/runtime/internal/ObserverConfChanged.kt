@@ -15,13 +15,16 @@
  **/
 package io.matthewnelson.kmp.tor.runtime.internal
 
+import io.matthewnelson.kmp.file.File
+import io.matthewnelson.kmp.file.toFile
+import io.matthewnelson.kmp.tor.runtime.TorListeners
 import io.matthewnelson.kmp.tor.runtime.TorState
 import io.matthewnelson.kmp.tor.runtime.core.OnEvent
 import io.matthewnelson.kmp.tor.runtime.core.TorConfig
 import io.matthewnelson.kmp.tor.runtime.core.TorEvent
 
 internal open class ObserverConfChanged internal constructor(
-    private val manager: TorState.Manager,
+    private val manager: TorListeners.Manager,
     staticTag: String,
 ): TorEvent.Observer(
     TorEvent.CONF_CHANGED,
@@ -32,21 +35,49 @@ internal open class ObserverConfChanged internal constructor(
 
     protected override fun notify(data: String) {
         var network: TorState.Network? = null
+        var socksUnix: LinkedHashSet<File>? = null
 
         for (line in data.lines()) { when {
             // DisableNetwork=0
             // DisableNetwork
-            line.startsWith(TorConfig.DisableNetwork.name, ignoreCase = true) -> {
-                network = if (line.substringAfter('=') == "0") {
-                    TorState.Network.Enabled
-                } else {
-                    TorState.Network.Disabled
+            line.startsWith(TorConfig.DisableNetwork.name, ignoreCase = true) ->
+                {
+                    network = if (line.substringAfter('=') == "0") {
+                        TorState.Network.Enabled
+                    } else {
+                        TorState.Network.Disabled
+                    }
                 }
-            }
+
+            // __SocksPort=unix:"/tmp/kmp_tor_test/obs_conn_no_net/work/socks2.sock" OnionTrafficOnly GroupWritable
+            // SocksPort=unix:"/tmp/kmp_tor_test/obs_conn_no_net/work/socks3.sock"
+            line.startsWith(UNIX_SOCKS_EPHEMERAL, ignoreCase = true)
+            || line.startsWith(UNIX_SOCKS, ignoreCase = true) ->
+                {
+                    val path = line.substringAfter(UNIX_PREFIX, "")
+                        .substringBeforeLast('"', "")
+
+                    if (path.isNotBlank()) {
+                        if (socksUnix == null) {
+                            socksUnix = LinkedHashSet(1, 1.0f)
+                        }
+                        socksUnix.add(path.toFile())
+                    }
+                }
         } }
 
         if (network != null) {
             manager.update(network = network)
         }
+
+        if (socksUnix != null) {
+            manager.oUnixListenerConfChange("Socks", socksUnix)
+        }
+    }
+
+    private companion object {
+        private const val UNIX_PREFIX = "=unix:\""
+        private const val UNIX_SOCKS = "SocksPort$UNIX_PREFIX"
+        private const val UNIX_SOCKS_EPHEMERAL = "__$UNIX_SOCKS"
     }
 }

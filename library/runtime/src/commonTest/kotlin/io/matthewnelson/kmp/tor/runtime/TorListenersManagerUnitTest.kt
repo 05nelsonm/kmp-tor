@@ -109,17 +109,20 @@ class TorListenersManagerUnitTest {
         assertEquals(1, manager.listeners.socks.size)
     }
 
-//    @Test
-//    fun givenOpen_whenSocksUnix_thenUpdates() = runListenerTest { manager ->
-//        manager.update("Socks", "/unix/path", wasClosed = false)
-//        assertEquals(1, manager.listeners.socks.size)
-//
-//        manager.update("Socks", "non/absolute/path", wasClosed = false)
-//        assertEquals(1, manager.listeners.socks.size)
-//
-//        manager.update("Socks", "C:\\non_unix\\path", wasClosed = false)
-//        assertEquals(1, manager.listeners.socks.size)
-//    }
+    @Test
+    fun givenOpen_whenSocksUnix_thenUpdates() = runListenerTest { manager ->
+        manager.update("Socks", "/unix/path", wasClosed = false)
+        assertEquals(1, manager.listeners.socksUnix.size)
+
+        manager.update("Socks", "non/absolute/path", wasClosed = false)
+        assertEquals(1, manager.listeners.socksUnix.size)
+
+        manager.update("Socks", "C:\\non_unix\\path", wasClosed = false)
+        assertEquals(1, manager.listeners.socksUnix.size)
+
+        manager.update("Socks", "/unix/path", wasClosed = true)
+        assertTrue(manager.listeners.isEmpty)
+    }
 
     @Test
     fun givenOpen_whenTransparent_thenUpdates() = runListenerTest { manager ->

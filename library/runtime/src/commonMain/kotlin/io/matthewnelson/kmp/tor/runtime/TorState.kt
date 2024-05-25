@@ -203,7 +203,7 @@ public class TorState private constructor(
 
         protected abstract fun notify(old: TorState, new: TorState)
 
-        override fun update(daemon: Daemon?, network: Network?) {
+        final override fun update(daemon: Daemon?, network: Network?) {
             if (daemon == null && network == null) return
 
             @Suppress("LocalVariableName")
