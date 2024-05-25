@@ -186,7 +186,7 @@ internal class TorProcess private constructor(
                 NOTIFIER.lce(Lifecycle.Event.OnStop(this@TorProcess))
                 NOTIFIER.lce(Lifecycle.Event.OnDestroy(this@TorProcess))
             } finally {
-                manager.update(TorState.Daemon.Off, TorState.Network.Disabled)
+                manager.update(TorState.Daemon.Off)
             }
         })
 

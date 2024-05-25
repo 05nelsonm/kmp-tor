@@ -13,12 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-package io.matthewnelson.kmp.tor.runtime
+package io.matthewnelson.kmp.tor.runtime.test
 
 import io.matthewnelson.kmp.file.SysTempDir
 import io.matthewnelson.kmp.file.resolve
 import io.matthewnelson.kmp.tor.resource.tor.TorResources
+import io.matthewnelson.kmp.tor.runtime.Action
+import io.matthewnelson.kmp.tor.runtime.FileID
 import io.matthewnelson.kmp.tor.runtime.FileID.Companion.fidEllipses
+import io.matthewnelson.kmp.tor.runtime.Lifecycle
+import io.matthewnelson.kmp.tor.runtime.TorRuntime
 import io.matthewnelson.kmp.tor.runtime.core.ThisBlock
 import kotlinx.coroutines.*
 import kotlin.test.fail

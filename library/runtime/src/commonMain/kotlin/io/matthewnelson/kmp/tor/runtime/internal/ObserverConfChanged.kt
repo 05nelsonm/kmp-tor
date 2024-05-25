@@ -31,19 +31,22 @@ internal open class ObserverConfChanged internal constructor(
 ) {
 
     protected override fun notify(data: String) {
-        for (line in data.lines()) { line.parse() }
-    }
+        var network: TorState.Network? = null
 
-    private fun String.parse() = when {
-        startsWith(TorConfig.DisableNetwork.name, ignoreCase = true) -> {
-            val network = if (substringAfter('=') == "0") {
-                TorState.Network.Enabled
-            } else {
-                TorState.Network.Disabled
+        for (line in data.lines()) { when {
+            // DisableNetwork=0
+            // DisableNetwork
+            line.startsWith(TorConfig.DisableNetwork.name, ignoreCase = true) -> {
+                network = if (line.substringAfter('=') == "0") {
+                    TorState.Network.Enabled
+                } else {
+                    TorState.Network.Disabled
+                }
             }
+        } }
 
+        if (network != null) {
             manager.update(network = network)
         }
-        else -> {}
     }
 }

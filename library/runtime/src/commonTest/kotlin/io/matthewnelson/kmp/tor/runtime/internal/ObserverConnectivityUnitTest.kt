@@ -15,13 +15,10 @@
  **/
 package io.matthewnelson.kmp.tor.runtime.internal
 
+import io.matthewnelson.kmp.tor.runtime.*
 import io.matthewnelson.kmp.tor.runtime.Action.Companion.startDaemonAsync
-import io.matthewnelson.kmp.tor.runtime.NetworkObserver
-import io.matthewnelson.kmp.tor.runtime.RuntimeEvent
-import io.matthewnelson.kmp.tor.runtime.TestUtils.ensureStoppedOnTestCompletion
-import io.matthewnelson.kmp.tor.runtime.TestUtils.testEnv
-import io.matthewnelson.kmp.tor.runtime.TorCmdJob
-import io.matthewnelson.kmp.tor.runtime.TorRuntime
+import io.matthewnelson.kmp.tor.runtime.test.TestUtils.ensureStoppedOnTestCompletion
+import io.matthewnelson.kmp.tor.runtime.test.TestUtils.testEnv
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.test.runTest
@@ -29,6 +26,7 @@ import kotlinx.coroutines.withContext
 import kotlin.concurrent.Volatile
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 import kotlin.time.Duration.Companion.milliseconds
 
@@ -56,9 +54,11 @@ class ObserverConnectivityUnitTest {
             observerStatic(RuntimeEvent.LOG.WARN) { warnings.add(it) }
             observerStatic(RuntimeEvent.EXECUTE.CMD) { cmds.add(it) }
 
-//            observerStatic(RuntimeEvent.LOG.DEBUG) { println(it) }
-//            observerStatic(RuntimeEvent.LOG.PROCESS) { println(it) }
 //            observerStatic(RuntimeEvent.LIFECYCLE) { println(it) }
+//            observerStatic(RuntimeEvent.LOG.DEBUG) { println(it) }
+//            observerStatic(RuntimeEvent.LOG.INFO) { println(it) }
+//            observerStatic(RuntimeEvent.LOG.WARN) { println(it) }
+//            observerStatic(RuntimeEvent.LOG.PROCESS) { println(it) }
 //            observerStatic(RuntimeEvent.STATE) { println(it) }
         }.ensureStoppedOnTestCompletion()
 
@@ -72,6 +72,7 @@ class ObserverConnectivityUnitTest {
             }
         }
         assertTrue(contains, "StartDaemon enabled network when connectivity was false")
+        assertFalse(runtime.state().isNetworkEnabled)
 
         observer.isConnected = true
 
@@ -93,5 +94,6 @@ class ObserverConnectivityUnitTest {
         withContext(Dispatchers.Default) { delay(500.milliseconds) }
 
         assertEquals(1, cmds.count { it.name == "SETCONF" })
+        assertTrue(runtime.state().isNetworkEnabled)
     }
 }

@@ -28,6 +28,7 @@ import kotlin.jvm.JvmSynthetic
 /**
  * Holder for [TorRuntime] state.
  *
+ * @see [TorRuntime.state]
  * @see [RuntimeEvent.STATE]
  * */
 public class TorState private constructor(
@@ -183,8 +184,12 @@ public class TorState private constructor(
         )
     }
 
+    internal interface Manager {
+        fun update(daemon: Daemon? = null, network: Network? = null)
+    }
+
     @OptIn(InternalKmpTorApi::class)
-    internal abstract class Manager internal constructor(fid: FileID?) {
+    internal abstract class AbstractManager internal constructor(fid: FileID?): Manager {
 
         @Volatile
         private var _state: TorState = of(
@@ -198,26 +203,33 @@ public class TorState private constructor(
 
         protected abstract fun notify(old: TorState, new: TorState)
 
-        internal fun update(daemon: Daemon? = null, network: Network? = null) {
+        override fun update(daemon: Daemon?, network: Network?) {
             if (daemon == null && network == null) return
 
-            val notify = synchronized(lock) {
+            @Suppress("LocalVariableName")
+            val diff = synchronized(lock) {
                 val old = _state
-                val new = old.copy(daemon ?: old.daemon, network ?: old.network)
-                val n = Notify.of(old, new) ?: return@synchronized null
-                _state = n.new
-                n
+
+                val _daemon = daemon ?: old.daemon
+                val _network = if (_daemon is Daemon.Off) {
+                    Network.Disabled
+                } else {
+                    network ?: old.network
+                }
+
+                val new = old.copy(_daemon, _network)
+                Diff.of(old, new)?.also { _state = new }
             } ?: return
 
-            notify(notify.old, notify.new)
+            notify(diff.old, diff.new)
         }
 
-        private class Notify private constructor(val old: TorState, val new: TorState) {
+        private class Diff private constructor(val old: TorState, val new: TorState) {
 
             companion object {
 
                 @JvmStatic
-                fun of(old: TorState, new: TorState): Notify? {
+                fun of(old: TorState, new: TorState): Diff? {
                     // No changes
                     if (old == new) return null
 
@@ -240,7 +252,7 @@ public class TorState private constructor(
                     // starting -> off
                     // starting -> stopping
                     // starting -> starting
-                    return Notify(old, new)
+                    return Diff(old, new)
                 }
             }
         }

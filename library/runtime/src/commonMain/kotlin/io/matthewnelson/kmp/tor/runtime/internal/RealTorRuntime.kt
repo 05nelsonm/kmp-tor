@@ -93,7 +93,7 @@ internal class RealTorRuntime private constructor(
         + dispatcher
     )
 
-    private val manager = TorStateManager()
+    private val manager = StateManager()
 
     @Suppress("PrivatePropertyName")
     private val NOTIFIER = Notifier(manager)
@@ -253,7 +253,7 @@ internal class RealTorRuntime private constructor(
         cmdQueue?.connection?.destroy()
         cmdQueue?.destroy()
 
-        manager.update(TorState.Daemon.Off, TorState.Network.Disabled)
+        manager.update(TorState.Daemon.Off)
 
         if (stack.isNotEmpty()) {
             NOTIFIER.d(this, "Interrupting/Completing ActionJobs")
@@ -340,16 +340,16 @@ internal class RealTorRuntime private constructor(
             }
         }
 
-        private fun processStack(): Pair<List<Executable>, ActionJob.Sealed?> {
-            if (destroyed) return emptyList<Executable>() to null
+        private fun processStack(): Pair<List<Executable.Once>, ActionJob.Sealed?> {
+            if (destroyed) return emptyList<Executable.Once>() to null
 
             return synchronized(enqueueLock) {
                 if (destroyed) {
-                    return@synchronized emptyList<Executable>() to null
+                    return@synchronized emptyList<Executable.Once>() to null
                 }
 
                 var execute: ActionJob.Sealed? = null
-                val executables = ArrayList<Executable>((actionStack.size - 1).coerceAtLeast(0))
+                val executables = ArrayList<Executable.Once>((actionStack.size - 1).coerceAtLeast(0))
 
                 while (actionStack.isNotEmpty()) {
                     // LIFO
@@ -439,7 +439,7 @@ internal class RealTorRuntime private constructor(
                 }
 
                 if (isOldQueueAttached) {
-                    executables.add(Executable {
+                    executables.add(Executable.Once.of {
                         NOTIFIER.d(this@ActionProcessor, "TorCtrl queue attached to $execute")
                     })
                 }
@@ -449,8 +449,8 @@ internal class RealTorRuntime private constructor(
                     // Ensure state is correct before we get stopped
                     if (_cmdQueue?.connection?.isDestroyed() != false) {
                         // Is null or destroyed (no active control connection)
-                        executables.add(Executable {
-                            manager.update(TorState.Daemon.Off, TorState.Network.Disabled)
+                        executables.add(Executable.Once.of {
+                            manager.update(TorState.Daemon.Off)
                         })
                     }
                 }
@@ -464,7 +464,9 @@ internal class RealTorRuntime private constructor(
         //
         // - Attach all previously queued StartJob or RestartJob to the job executing.
         // - Interrupt all StopJob
-        private fun ActionJob.Sealed.configureStartedCompletion(popped: ActionJob.Sealed): Executable = when (popped) {
+        private fun ActionJob.Sealed.configureStartedCompletion(
+            popped: ActionJob.Sealed,
+        ): Executable.Once = when (popped) {
             is ActionJob.StartJob,
             is ActionJob.RestartJob -> {
                 val executing = this
@@ -478,12 +480,12 @@ internal class RealTorRuntime private constructor(
                     popped.completion()
                 }
 
-                Executable {
+                Executable.Once.of {
                     NOTIFIER.d(this@ActionProcessor, "Attaching $popped as a child to $executing")
                 }
             }
             is ActionJob.StopJob -> {
-                Executable {
+                Executable.Once.of {
                     NOTIFIER.d(this@ActionProcessor, "$popped was interrupted by $this")
                     popped.error(InterruptedException("Interrupted by $this"))
                 }
@@ -494,10 +496,12 @@ internal class RealTorRuntime private constructor(
         //
         // - Attach all previously queued StopJob to the job executing.
         // - Interrupt all StartJob & RestartJob
-        private fun ActionJob.StopJob.configureStoppedCompletion(popped: ActionJob.Sealed): Executable = when (popped) {
+        private fun ActionJob.StopJob.configureStoppedCompletion(
+            popped: ActionJob.Sealed,
+        ): Executable.Once = when (popped) {
             is ActionJob.RestartJob,
             is ActionJob.StartJob -> {
-                Executable {
+                Executable.Once.of {
                     NOTIFIER.d(this@ActionProcessor, "$popped was interrupted by $this")
                     popped.error(InterruptedException("Interrupted by $this"))
                 }
@@ -514,7 +518,7 @@ internal class RealTorRuntime private constructor(
                     popped.completion()
                 }
 
-                Executable {
+                Executable.Once.of {
                     NOTIFIER.d(this@ActionProcessor, "Attaching $popped as a child to $executing")
                 }
             }
@@ -697,9 +701,9 @@ internal class RealTorRuntime private constructor(
         }
 
         private inner class ProcessLogObserver: ObserverLogProcess(manager) {
-            public override fun notify(data: String) {
-                super.notify(data)
-                event.notifyObservers(data)
+            public override fun notify(line: String) {
+                super.notify(line)
+                LOG.PROCESS.notifyObservers(line)
             }
         }
     }
@@ -713,7 +717,7 @@ internal class RealTorRuntime private constructor(
         }
     }
 
-    private inner class TorStateManager: TorState.Manager(generator.environment) {
+    private inner class StateManager: TorState.AbstractManager(generator.environment) {
         protected override fun notify(old: TorState, new: TorState) {
             // TODO
             STATE.notifyObservers(new)

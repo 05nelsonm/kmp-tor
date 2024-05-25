@@ -15,55 +15,53 @@
  **/
 package io.matthewnelson.kmp.tor.runtime.internal
 
-import io.matthewnelson.kmp.tor.runtime.RuntimeEvent
 import io.matthewnelson.kmp.tor.runtime.TorState
-import io.matthewnelson.kmp.tor.runtime.core.OnEvent
+import io.matthewnelson.kmp.tor.runtime.core.EnqueuedJob
 import io.matthewnelson.kmp.tor.runtime.core.ctrl.TorCmd
 import io.matthewnelson.kmp.tor.runtime.ctrl.TorCmdInterceptor
 
 internal open class ObserverLogProcess internal constructor(
     private val manager: TorState.Manager,
-): RuntimeEvent.Observer<String>(
-    RuntimeEvent.LOG.PROCESS,
-    null,
-    OnEvent.Executor.Immediate,
-    OnEvent.noOp(),
 ) {
 
     // Is registered via RealTorRuntime.factory
     internal val newNymInterceptor = TorCmdInterceptor.intercept<TorCmd.Signal.NewNym> { job, cmd ->
-        job.invokeOnCompletion {
-            if (job.isError) return@invokeOnCompletion
-            // TODO: Listen for rate-limit notice
-        }
-
+        job.onNewNymJob()
         cmd
     }
 
-    protected override fun notify(data: String) {
-        data
-            .substringAfter(NOTICE, "")
-            .ifBlank { null }
-            ?.parse()
+    protected fun EnqueuedJob.onNewNymJob() {
+        invokeOnCompletion {
+            if (isError) return@invokeOnCompletion
+            // TODO: Listen for rate-limit notice
+        }
     }
 
-    private fun String.parse() = when {
-        // [notice] Bootstrapped 0% (
-        startsWith("Bootstrapped ") -> {
-            val pct = substringAfter("Bootstrapped ")
-                .substringBefore("%")
-                .toByteOrNull()
+    protected open fun notify(line: String) {
+        val notice = line
+            .substringAfter(NOTICE, "")
+            .ifBlank { return }
 
-            if (pct != null) {
-                manager.update(TorState.Daemon.On(pct))
+        with(notice) {
+            when {
+                startsWith(BOOTSTRAPPED) -> parseBootstrapped()
             }
-
-            Unit
         }
-        else -> {}
+    }
+
+    // [notice] Bootstrapped 0%
+    private fun String.parseBootstrapped() {
+        val pct = substringAfter(BOOTSTRAPPED, "")
+            .substringBefore('%', "")
+            .toByteOrNull()
+            ?: return
+
+        manager.update(TorState.Daemon.On(pct))
     }
 
     private companion object {
         private const val NOTICE = " [notice] "
+
+        private const val BOOTSTRAPPED = "Bootstrapped "
     }
 }

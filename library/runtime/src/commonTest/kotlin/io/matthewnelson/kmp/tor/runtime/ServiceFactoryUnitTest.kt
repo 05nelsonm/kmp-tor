@@ -23,10 +23,10 @@ import io.matthewnelson.kmp.tor.core.resource.synchronized
 import io.matthewnelson.kmp.tor.runtime.Action.Companion.restartDaemonAsync
 import io.matthewnelson.kmp.tor.runtime.Action.Companion.startDaemonAsync
 import io.matthewnelson.kmp.tor.runtime.Action.Companion.stopDaemonAsync
-import io.matthewnelson.kmp.tor.runtime.TestUtils.assertContains
-import io.matthewnelson.kmp.tor.runtime.TestUtils.assertDoesNotContain
-import io.matthewnelson.kmp.tor.runtime.TestUtils.ensureStoppedOnTestCompletion
-import io.matthewnelson.kmp.tor.runtime.TestUtils.testEnv
+import io.matthewnelson.kmp.tor.runtime.test.TestUtils.assertContains
+import io.matthewnelson.kmp.tor.runtime.test.TestUtils.assertDoesNotContain
+import io.matthewnelson.kmp.tor.runtime.test.TestUtils.ensureStoppedOnTestCompletion
+import io.matthewnelson.kmp.tor.runtime.test.TestUtils.testEnv
 import io.matthewnelson.kmp.tor.runtime.core.*
 import io.matthewnelson.kmp.tor.runtime.core.ctrl.TorCmd
 import io.matthewnelson.kmp.tor.runtime.core.util.executeAsync
@@ -229,9 +229,10 @@ class ServiceFactoryUnitTest {
 
         val factory = TorRuntime.Builder(env("sf_restart")) {
             observerStatic(RuntimeEvent.LIFECYCLE) {
-//                println(it)
                 synchronized(lock) { lces.add(it) }
             }
+
+//            observerStatic(RuntimeEvent.LIFECYCLE) { println(it) }
 //            observerStatic(RuntimeEvent.LOG.DEBUG) { println(it) }
 //            observerStatic(RuntimeEvent.LOG.INFO) { println(it) }
 //            observerStatic(RuntimeEvent.LOG.WARN) { println(it) }
@@ -296,13 +297,15 @@ class ServiceFactoryUnitTest {
 
         val factory = TorRuntime.Builder(env("sf_process_fail")) {
             observerStatic(RuntimeEvent.LIFECYCLE) {
-//                println(it)
                 synchronized(lock) { lces.add(it) }
             }
+
+//            observerStatic(RuntimeEvent.LIFECYCLE) { println(it) }
+//            observerStatic(RuntimeEvent.LOG.DEBUG) { println(it) }
 //            observerStatic(RuntimeEvent.LOG.INFO) { println(it) }
 //            observerStatic(RuntimeEvent.LOG.WARN) { println(it) }
             observerStatic(RuntimeEvent.LOG.PROCESS) { println(it) }
-//            observerStatic(RuntimeEvent.STATE) { println(it) }
+            observerStatic(RuntimeEvent.STATE) { println(it) }
             config { environment ->
                 apply(environment, failureScenario)
             }
