@@ -38,7 +38,7 @@ class TorListenersManagerUnitTest {
     private class TestTorListenersManager(
         scope: TestScope,
         notifyDelay: Duration,
-    ): TorListeners.AbstractManager(scope, null) {
+    ): TorListeners.AbstractManager(scope, null, notifyDelay) {
 
         val notifyListeners = mutableListOf<TorListeners>()
         val notifyState = mutableListOf<TorState>()
@@ -207,7 +207,7 @@ class TorListenersManagerUnitTest {
         manager.update("DNS", address.value, wasClosed = false)
 
         // notifyJob was not launched b/c not bootstrapped
-        withContext(Dispatchers.Default) { delay(150.milliseconds) }
+        withContext(Dispatchers.Default) { delay(25.milliseconds) }
         assertEquals(0, manager.notifyListeners.size)
 
         manager.update(TorState.Daemon.On(100))
@@ -215,17 +215,21 @@ class TorListenersManagerUnitTest {
 
         manager.update("Socks", address.value, wasClosed = false)
         assertFalse(manager.listeners.socks.isEmpty())
+        // Should be delayed for a moment and not have
+        // dispatched the change immediately.
         assertEquals(1, manager.notifyListeners.size)
 
-        withContext(Dispatchers.Default) { delay(150.milliseconds) }
+        withContext(Dispatchers.Default) { delay(25.milliseconds) }
         assertEquals(2, manager.notifyListeners.size)
 
         manager.update("Socks", address.value, wasClosed = true)
         manager.update("Transparent", address.value, wasClosed = false)
+        assertEquals(2, manager.notifyListeners.size)
 
         // job for dispatching Socks closure should have been cancelled
         // by Transparent open update.
-        withContext(Dispatchers.Default) { delay(150.milliseconds) }
+        withContext(Dispatchers.Default) { delay(25.milliseconds) }
         assertEquals(3, manager.notifyListeners.size)
+        assertTrue(manager.notifyListeners.last().socks.isEmpty())
     }
 }
