@@ -117,6 +117,8 @@ internal class RealTorRuntime private constructor(
                     TorCmd.SetEvents(cmd.events + requiredTorEvents)
                 }
             },
+            manager.interceptorConfigSet,
+            manager.interceptorConfigReset,
             NOTIFIER.interceptorNewNym,
             TorCmdJob.interceptor(notify = { job ->
                 EXECUTE.CMD.notifyObservers(job)

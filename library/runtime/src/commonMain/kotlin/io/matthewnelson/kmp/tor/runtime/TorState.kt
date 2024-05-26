@@ -19,7 +19,10 @@ import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
 import io.matthewnelson.kmp.tor.core.resource.SynchronizedObject
 import io.matthewnelson.kmp.tor.core.resource.synchronized
 import io.matthewnelson.kmp.tor.runtime.FileID.Companion.fidEllipses
+import io.matthewnelson.kmp.tor.runtime.core.EnqueuedJob
 import io.matthewnelson.kmp.tor.runtime.core.TorConfig
+import io.matthewnelson.kmp.tor.runtime.core.ctrl.TorCmd
+import io.matthewnelson.kmp.tor.runtime.ctrl.TorCmdInterceptor
 import kotlin.concurrent.Volatile
 import kotlin.jvm.JvmField
 import kotlin.jvm.JvmStatic
@@ -198,8 +201,16 @@ public class TorState private constructor(
             fid = fid,
         )
         internal val state: TorState get() = _state
-
         private val lock = SynchronizedObject()
+
+        internal val interceptorConfigReset = TorCmdInterceptor.intercept<TorCmd.Config.Reset> { job, cmd ->
+            onConfigChangeJob(cmd, job)
+            cmd
+        }
+        internal val interceptorConfigSet = TorCmdInterceptor.intercept<TorCmd.Config.Set> { job, cmd ->
+            onConfigChangeJob(cmd, job)
+            cmd
+        }
 
         protected abstract fun notify(old: TorState, new: TorState)
 
@@ -222,6 +233,24 @@ public class TorState private constructor(
             } ?: return
 
             notify(diff.old, diff.new)
+        }
+
+        protected open fun onConfigChangeJob(cmd: TorCmd.Config.Reset, job: EnqueuedJob) {
+            job.invokeOnCompletion {
+                if (job.isSuccess) return@invokeOnCompletion
+                // TODO: error handling for disable network
+                //  which will not dispatch the CONF_CHANGED
+                //  event so we can update it.
+            }
+        }
+
+        protected open fun onConfigChangeJob(cmd: TorCmd.Config.Set, job: EnqueuedJob) {
+            job.invokeOnCompletion {
+                if (job.isSuccess) return@invokeOnCompletion
+                // TODO: error handling for disable network
+                //  which will not dispatch the CONF_CHANGED
+                //  event so we can update it.
+            }
         }
 
         private class Diff private constructor(val old: TorState, val new: TorState) {
