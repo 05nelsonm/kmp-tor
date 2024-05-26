@@ -17,7 +17,6 @@
 
 package io.matthewnelson.kmp.tor.runtime.internal
 
-import io.matthewnelson.kmp.file.toFile
 import io.matthewnelson.kmp.tor.runtime.test.TestTorListenersManager
 import io.matthewnelson.kmp.tor.runtime.TorState
 import kotlin.test.*
@@ -66,21 +65,23 @@ class ObserverConfChangedUnitTest {
 
     @Test
     fun givenSocksPort_whenParsed_thenUpdatesTorListenersManager() {
-        val expected1 = "/tmp/kmp_tor_test/obs_conn_no_net/work/socks2.sock".toFile()
-        val expected2 = expected1
-        val expected3 = "/tmp/kmp_tor_test/obs_conn_no_net/work/socks3.sock".toFile()
+        val expected1 = "unix:\"/tmp/kmp_tor_test/obs_conn_no_net/work/socks1.sock\" OnionTrafficOnly GroupWritable"
+        val expected2 = "unix:\"/tmp/kmp_tor_test/obs_conn_no_net/work/socks2.sock\" OnionTrafficOnly"
+        val expected3 = "unix:/tmp/kmp_tor_test/obs_conn_no_net/work/socks3.sock"
+        val expected4 = "9050"
+
+        observer.notify("__SocksPort=$expected1")
 
         observer.notify("""
-            __SocksPort=unix:"$expected1" OnionTrafficOnly GroupWritable
+            __SocksPort=$expected2
+            SocksPort=$expected3
         """.trimIndent())
 
-        observer.notify("""
-            __SocksPort=unix:"$expected2" OnionTrafficOnly
-            SocksPort=unix:"$expected3"
-        """.trimIndent())
+        observer.notify("SocksPort=$expected4")
 
-        assertEquals(2, observer.manager.unixConf.size)
+        assertEquals(3, observer.manager.unixConf.size)
         assertEquals("Socks" to setOf(expected1), observer.manager.unixConf[0])
         assertEquals("Socks" to setOf(expected2, expected3), observer.manager.unixConf[1])
+        assertEquals("Socks" to setOf(expected4), observer.manager.unixConf[2])
     }
 }

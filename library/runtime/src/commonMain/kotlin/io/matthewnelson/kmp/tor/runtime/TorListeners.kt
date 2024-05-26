@@ -19,13 +19,18 @@ package io.matthewnelson.kmp.tor.runtime
 
 import io.matthewnelson.immutable.collections.toImmutableSet
 import io.matthewnelson.kmp.file.File
+import io.matthewnelson.kmp.file.path
 import io.matthewnelson.kmp.file.toFile
 import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
 import io.matthewnelson.kmp.tor.core.resource.SynchronizedObject
 import io.matthewnelson.kmp.tor.core.resource.synchronized
 import io.matthewnelson.kmp.tor.runtime.FileID.Companion.fidEllipses
+import io.matthewnelson.kmp.tor.runtime.core.*
+import io.matthewnelson.kmp.tor.runtime.core.TorConfig.Setting.Companion.filterByKeyword
 import io.matthewnelson.kmp.tor.runtime.core.address.IPSocketAddress
 import io.matthewnelson.kmp.tor.runtime.core.address.IPSocketAddress.Companion.toIPSocketAddressOrNull
+import io.matthewnelson.kmp.tor.runtime.core.ctrl.TorCmd
+import io.matthewnelson.kmp.tor.runtime.ctrl.TorCmdInterceptor
 import io.matthewnelson.kmp.tor.runtime.internal.timedDelay
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
@@ -227,7 +232,7 @@ public class TorListeners private constructor(
     }
 
     internal interface Manager: TorState.Manager {
-        fun oUnixListenerConfChange(type: String, new: Set<File>)
+        fun onListenerConfChange(type: String, changes: Set<String>)
         fun update(type: String, address: String, wasClosed: Boolean)
     }
 
@@ -256,24 +261,32 @@ public class TorListeners private constructor(
             }
         }
 
+        internal val interceptorConfigReset = TorCmdInterceptor.intercept<TorCmd.Config.Reset> { job, cmd ->
+            onConfigChangeJob(cmd, job)
+            cmd
+        }
+        internal val interceptorConfigSet = TorCmdInterceptor.intercept<TorCmd.Config.Set> { job, cmd ->
+            onConfigChangeJob(cmd, job)
+            cmd
+        }
+
         protected abstract fun notify(listeners: TorListeners)
         protected abstract fun notify(state: TorState)
 
-        final override fun oUnixListenerConfChange(type: String, new: Set<File>) {
-            if (new.isEmpty()) return
+        final override fun onListenerConfChange(type: String, changes: Set<String>) {
+            val executable = when (Type.valueOfOrNull(type)) {
+                is Type.SOCKS -> Executable {
+                    Type.SOCKS.diffUnixListeners(_listeners.socksUnix, changes)
+                }
+                else -> return
+            }
 
-            val t = when (val t = Type.valueOfOrNull(type)) {
-                is Type.SOCKS -> t
-                else -> null
-            } ?: return
-
-            // TODO
+            synchronized(lock) { executable.execute() }
         }
 
         final override fun update(type: String, address: String, wasClosed: Boolean) {
-            if (type.isBlank() || address.isBlank()) return
+            if (address.isBlank()) return
             val t = Type.valueOfOrNull(type) ?: return
-
             synchronized(lock) { updateNoLock(t, address, wasClosed) }
         }
 
@@ -322,14 +335,17 @@ public class TorListeners private constructor(
                         return@with EMPTY
                     }
 
-                    // disabled -> enabled
-                    if (old.isNetworkDisabled && new.isNetworkEnabled) {
-                        return@with this
-                    }
+                    if (new.isNetworkEnabled) {
 
-                    // (NOT bootstrapped -> bootstrapped) + network
-                    if (!old.daemon.isBootstrapped && new.isNetworkEnabled) {
-                        return@with this
+                        // disabled -> enabled
+                        if (old.isNetworkDisabled) {
+                            return@with this
+                        }
+
+                        // NOT bootstrapped -> bootstrapped
+                        if (!old.daemon.isBootstrapped) {
+                            return@with this
+                        }
                     }
                 }
 
@@ -348,12 +364,21 @@ public class TorListeners private constructor(
             is Type.HTTP,
             is Type.TRANSPARENT -> {
                 address.toIPSocketAddressOrNull()
-                    ?.onClose(this)
+                    ?.update(type = this, wasClosed = true)
             }
             is Type.SOCKS -> when (address.firstOrNull()) {
                 null -> null
-                '?'-> {
-                    // TODO: ConfChanged
+                '?'-> { // ???:0
+                    // tor dispatched a NOTICE indicating that it was closing a
+                    // unix listener.
+                    //
+                    // If it is attributed to the network being disabled, nothing
+                    // to worry about b/c it will be cleared when the state change
+                    // comes through in just a moment.
+                    //
+                    // If it is attributed to a CONF_CHANGED event containing SocksPort
+                    // modifications, that will be dispatched **JUST** after this one
+                    // and diffUnixListeners will handle it.
                     null
                 }
                 '/' ->  with(_listeners) {
@@ -362,7 +387,7 @@ public class TorListeners private constructor(
                 }
                 else -> {
                     address.toIPSocketAddressOrNull()
-                        ?.onClose(this)
+                        ?.update(type = this, wasClosed = true)
                 }
             }
         }
@@ -372,7 +397,7 @@ public class TorListeners private constructor(
             is Type.HTTP,
             is Type.TRANSPARENT -> {
                 address.toIPSocketAddressOrNull()
-                    ?.onOpen(this)
+                    ?.update(type = this, wasClosed = false)
             }
             is Type.SOCKS -> when (address.firstOrNull()) {
                 null -> null
@@ -382,18 +407,15 @@ public class TorListeners private constructor(
                 }
                 else -> {
                     address.toIPSocketAddressOrNull()
-                        ?.onOpen(this)
+                        ?.update(type = this, wasClosed = false)
                 }
             }
         }
 
-        private fun IPSocketAddress.onClose(
-            type: Type
-        ) = _listeners.update(type, this, wasClosed = true)
-
-        private fun IPSocketAddress.onOpen(
-            type: Type
-        ) = _listeners.update(type, this, wasClosed = false)
+        private fun IPSocketAddress.update(
+            type: Type,
+            wasClosed: Boolean,
+        ) = _listeners.update(type, address = this, wasClosed)
 
         private fun TorListeners.update(
             type: Type,
@@ -405,51 +427,142 @@ public class TorListeners private constructor(
             is Type.SOCKS -> socks to Copy.Address { copy(socks = it) }
             is Type.TRANSPARENT -> trans to Copy.Address { copy(trans = it) }
         }.update(address, wasClosed)
-    }
 
-    private fun <T: Any> Pair<Set<T>, Copy<T>>.update(
-        address: T,
-        wasClosed: Boolean,
-    ): TorListeners? {
-        val (current, copy) = this
+        private fun <T: Any> Pair<Set<T>, Copy<T>>.update(
+            address: T,
+            wasClosed: Boolean,
+        ): TorListeners? {
+            val (current, copy) = this
 
-        val contains = current.contains(address)
-        if (wasClosed && !contains) return null
-        if (!wasClosed && contains) return null
+            val contains = current.contains(address)
+            if (wasClosed && !contains) return null
+            if (!wasClosed && contains) return null
 
-        val mutable = current.toMutableSet()
+            val mutable = current.toMutableSet()
 
-        if (wasClosed) {
-            mutable.remove(address)
-        } else {
-            mutable.add(address)
+            if (wasClosed) {
+                mutable.remove(address)
+            } else {
+                mutable.add(address)
+            }
+
+            return copy.invoke(mutable)
         }
 
-        return copy.invoke(mutable)
-    }
+        protected open fun onConfigChangeJob(cmd: TorCmd.Config.Reset, job: EnqueuedJob) {
+            job.invokeOnErrorRecovery(recovery = {
+                if (cmd.keywords.contains(TorConfig.__SocksPort)) {
+                    // SocksPort was set to default. tor will still
+                    // close all other socks listeners that may be
+                    // open, but will not dispatch the CONF_CHANGED
+                    // event.
+                    onListenerConfChange("Socks", setOf("9050"))
+                }
+            })
+        }
 
-    private sealed interface Copy<T: Any> {
-        fun invoke(new: MutableSet<T>): TorListeners
+        protected open fun onConfigChangeJob(cmd: TorCmd.Config.Set, job: EnqueuedJob) {
+            job.invokeOnErrorRecovery(recovery = {
+                val changes = cmd.settings
+                    .filterByKeyword<TorConfig.__SocksPort.Companion>()
+                    .takeIf { it.isNotEmpty() }
+                    ?.let { settings ->
+                        settings.mapTo(LinkedHashSet(settings.size, 1.0F)) { setting ->
+                            setting.toString().substringAfter(' ')
+                        }
+                    }
 
-        fun interface Address: Copy<IPSocketAddress>
-        fun interface Unix: Copy<File>
-    }
+                if (changes != null) {
+                    onListenerConfChange("Socks", changes)
+                }
+            })
+        }
 
-    private sealed class Type {
+        private fun EnqueuedJob.invokeOnErrorRecovery(recovery: Executable) {
+            invokeOnCompletion {
+                // CONF_CHANGE event will be dispatched.
+                if (isSuccess) return@invokeOnCompletion
 
-        data object DNS: Type()
-        data object HTTP: Type()
-        data object SOCKS: Type()
-        data object TRANSPARENT: Type()
+                // There was an error. Tor will not dispatch a CONF_CHANGED
+                // even, but it will still close other listeners that may be
+                // open.
 
-        companion object {
+                // No need to go further if there are no unix listeners open
+                // that need diffing. Any that may have been opened by this
+                // failed job will be "partially-constructed" and tor dispatches
+                // a NOTICE closing them which contains the full file path and
+                // occurs before replying with the Reply.Error for this job.
+                val isRecoveryNeeded = with(listeners) {
+                    socksUnix.isNotEmpty()
+                }
 
-            fun valueOfOrNull(name: String): Type? = when (name.uppercase()) {
-                "DNS" -> DNS
-                "HTTP" -> HTTP
-                "SOCKS" -> SOCKS
-                "TRANSPARENT" -> TRANSPARENT
-                else -> null
+                if (isRecoveryNeeded) {
+                    recovery.execute()
+                }
+            }
+        }
+
+        private fun Type.diffUnixListeners(listeners: Set<File>, changes: Set<String>) {
+            when (this) {
+                Type.SOCKS -> {}
+                else -> return
+            }
+
+            with(state) {
+                if (!(isOn || isStarting)) return
+                if (isNetworkDisabled) return
+            }
+            if (listeners.isEmpty()) return
+
+            val diffs = LinkedHashMap<File, Boolean>(listeners.size, 1.0F)
+
+            listeners.forEach { file ->
+                var wasClosed = true
+
+                for (change in changes) {
+                    // Change could be a TCP port or socket address, a
+                    // quoted or unquoted path prefixed with "unix:", contain
+                    // optionals appended to it, etc.
+                    //
+                    // The simplest way to check which unix listeners have
+                    // been closed is to see if any of the changes contain
+                    // the absolute path string. If it does, then it was NOT
+                    // closed.
+                    if (change.contains(file.path)) {
+                        wasClosed = false
+                        break
+                    }
+                }
+
+                diffs[file] = wasClosed
+            }
+
+            diffs.forEach { (file, wasClosed) -> updateNoLock(type = this, file.path, wasClosed) }
+        }
+
+        private sealed interface Copy<T: Any> {
+            fun invoke(new: MutableSet<T>): TorListeners
+
+            fun interface Address: Copy<IPSocketAddress>
+            fun interface Unix: Copy<File>
+        }
+
+        private sealed class Type {
+
+            data object DNS: Type()
+            data object HTTP: Type()
+            data object SOCKS: Type()
+            data object TRANSPARENT: Type()
+
+            companion object {
+
+                fun valueOfOrNull(name: String): Type? = when (name.uppercase()) {
+                    "DNS" -> DNS
+                    "HTTP" -> HTTP
+                    "SOCKS" -> SOCKS
+                    "TRANSPARENT" -> TRANSPARENT
+                    else -> null
+                }
             }
         }
     }

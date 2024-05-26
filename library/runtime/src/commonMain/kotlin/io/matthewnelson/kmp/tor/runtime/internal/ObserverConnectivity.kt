@@ -66,8 +66,6 @@ internal open class ObserverConnectivity internal constructor(
         _job = scope.launch {
             timedDelay(executeDelay)
 
-            if (processor is Destroyable && processor.isDestroyed()) return@launch
-
             val disabled = when (it) {
                 NetworkObserver.Connectivity.Connected -> false
                 NetworkObserver.Connectivity.Disconnected -> true
@@ -82,6 +80,8 @@ internal open class ObserverConnectivity internal constructor(
 
             val ctx = currentCoroutineContext()
             while (ctx.isActive && retry < 3) {
+                if (processor is Destroyable && processor.isDestroyed()) return@launch
+
                 if (retry > 0) {
                     NOTIFIER.w(
                         this@ObserverConnectivity,

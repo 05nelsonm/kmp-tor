@@ -15,8 +15,6 @@
  **/
 package io.matthewnelson.kmp.tor.runtime.internal
 
-import io.matthewnelson.kmp.file.File
-import io.matthewnelson.kmp.file.toFile
 import io.matthewnelson.kmp.tor.runtime.TorListeners
 import io.matthewnelson.kmp.tor.runtime.TorState
 import io.matthewnelson.kmp.tor.runtime.core.OnEvent
@@ -35,7 +33,7 @@ internal open class ObserverConfChanged internal constructor(
 
     protected override fun notify(data: String) {
         var network: TorState.Network? = null
-        var socksUnix: LinkedHashSet<File>? = null
+        var socks: LinkedHashSet<String>? = null
 
         for (line in data.lines()) { when {
             // DisableNetwork=0
@@ -51,17 +49,17 @@ internal open class ObserverConfChanged internal constructor(
 
             // __SocksPort=unix:"/tmp/kmp_tor_test/obs_conn_no_net/work/socks2.sock" OnionTrafficOnly GroupWritable
             // SocksPort=unix:"/tmp/kmp_tor_test/obs_conn_no_net/work/socks3.sock"
-            line.startsWith("__SocksPort$UNIX", ignoreCase = true)
-            || line.startsWith("SocksPort$UNIX", ignoreCase = true) -> {
-                val path = line.substringAfter(UNIX, "")
-                    .substringBeforeLast('"', "")
-
-                if (path.isNotBlank()) {
-                    if (socksUnix == null) {
-                        socksUnix = LinkedHashSet(1, 1.0f)
-                    }
-                    socksUnix.add(path.toFile())
+            // SocksPort=unix:/tmp/kmp_tor_test/obs_conn_no_net/work/socks4.sock
+            // __SocksPort=9055
+            // SocksPort=127.0.0.1:9056 OnionTrafficOnly
+            // SocksPort=[::1]:9055
+            line.startsWith(SOCKS_PORT_EPHEMERAL, ignoreCase = true)
+            || line.startsWith(SOCKS_PORT, ignoreCase = true) -> {
+                if (socks == null) {
+                    socks = LinkedHashSet(1, 1.0F)
                 }
+
+                socks.add(line.substringAfter(SOCKS_PORT, ""))
             }
         } }
 
@@ -69,12 +67,13 @@ internal open class ObserverConfChanged internal constructor(
             manager.update(network = network)
         }
 
-        if (socksUnix != null) {
-            manager.oUnixListenerConfChange("Socks", socksUnix)
+        if (socks != null) {
+            manager.onListenerConfChange("Socks", socks)
         }
     }
 
     private companion object {
-        private const val UNIX = "=unix:\""
+        private const val SOCKS_PORT = "SocksPort="
+        private const val SOCKS_PORT_EPHEMERAL = "__$SOCKS_PORT"
     }
 }

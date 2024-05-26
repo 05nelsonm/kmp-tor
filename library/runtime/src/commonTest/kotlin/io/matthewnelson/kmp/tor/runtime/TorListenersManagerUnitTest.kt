@@ -204,7 +204,9 @@ class TorListenersManagerUnitTest {
     }
 
     @Test
-    fun givenBootstrappedAndNetwork_whenUpdated_thenNotifyIsDelayed() = runListenerTest(notifyDelay = 5.milliseconds) { manager ->
+    fun givenBootstrappedAndNetwork_whenUpdated_thenNotifyIsDelayed() = runListenerTest(
+        notifyDelay = 5.milliseconds,
+    ) { manager ->
         manager.update(TorState.Daemon.Starting)
         manager.update(TorState.Daemon.On(5), TorState.Network.Enabled)
         manager.update("DNS", address.value, wasClosed = false)

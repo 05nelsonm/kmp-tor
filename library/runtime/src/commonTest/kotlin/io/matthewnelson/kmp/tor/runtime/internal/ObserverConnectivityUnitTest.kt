@@ -187,6 +187,7 @@ class ObserverConnectivityUnitTest {
             observerStatic(RuntimeEvent.LOG.WARN) { warnings.add(it) }
             observerStatic(RuntimeEvent.EXECUTE.CMD) { cmds.add(it) }
 
+//            observerStatic(RuntimeEvent.ERROR) { it.printStackTrace() }
 //            observerStatic(RuntimeEvent.LIFECYCLE) { println(it) }
 //            observerStatic(RuntimeEvent.LISTENERS) { println(it) }
 //            observerStatic(RuntimeEvent.LOG.DEBUG) { println(it) }

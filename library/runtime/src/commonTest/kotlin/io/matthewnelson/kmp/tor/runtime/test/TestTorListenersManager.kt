@@ -15,7 +15,6 @@
  **/
 package io.matthewnelson.kmp.tor.runtime.test
 
-import io.matthewnelson.kmp.file.File
 import io.matthewnelson.kmp.tor.runtime.TorListeners
 import io.matthewnelson.kmp.tor.runtime.TorState
 
@@ -23,9 +22,9 @@ internal class TestTorListenersManager: TorListeners.Manager {
 
     val states = mutableListOf<Pair<TorState.Daemon?, TorState.Network?>>()
     val listeners = mutableListOf<Triple<String, String, Boolean>>()
-    val unixConf = mutableListOf<Pair<String, Set<File>>>()
-    override fun oUnixListenerConfChange(type: String, new: Set<File>) {
-        unixConf.add(type to new)
+    val unixConf = mutableListOf<Pair<String, Set<String>>>()
+    override fun onListenerConfChange(type: String, changes: Set<String>) {
+        unixConf.add(type to changes)
     }
     override fun update(daemon: TorState.Daemon?, network: TorState.Network?) {
         states.add(daemon to network)
