@@ -63,6 +63,7 @@ class ObserverLogProcessUnitTest {
             Pair("Socks", "127.0.0.1:9150") to "TorProcess[fid=A3C2…6595]@1414604497 May 24 18:10:05.000 [notice] Closing no-longer-configured Socks listener on 127.0.0.1:9150",
             Pair("Transparent", "127.0.0.1:45963") to "TorProcess[fid=A3C2…6595]@1414604497 May 24 18:10:05.000 [notice] Closing no-longer-configured Transparent pf/netfilter listener on 127.0.0.1:45963",
             Pair("Socks", "???:0") to "TorProcess[fid=A3C2…6595]@1414604497 May 24 18:10:05.000 [notice] Closing no-longer-configured Socks listener on ???:0",
+            Pair("Socks", "/tmp/kmp_tor_test/obs_conn_no_net/work/socks5.sock") to "TorProcess[fid=A3C2…6595]@1414604497 May 24 18:10:05.000 [notice] Closing partially-constructed Socks listener connection (ready) on /tmp/kmp_tor_test/obs_conn_no_net/work/socks5.sock",
         )
 
         values.forEach { (_, line) -> observer.notify(line) }
@@ -77,6 +78,7 @@ class ObserverLogProcessUnitTest {
             assertTrue(wasClosed)
         }
     }
+
     @Test
     fun givenOpenListener_whenParsed_thenUpdatesTorListenersManager() {
         val values = listOf(

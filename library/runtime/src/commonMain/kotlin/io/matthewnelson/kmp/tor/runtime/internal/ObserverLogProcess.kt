@@ -26,7 +26,7 @@ internal open class ObserverLogProcess internal constructor(
 ) {
 
     // Is registered via RealTorRuntime.factory
-    internal val newNymInterceptor = TorCmdInterceptor.intercept<TorCmd.Signal.NewNym> { job, cmd ->
+    internal val interceptorNewNym = TorCmdInterceptor.intercept<TorCmd.Signal.NewNym> { job, cmd ->
         job.onNewNymJob()
         cmd
     }
@@ -66,15 +66,21 @@ internal open class ObserverLogProcess internal constructor(
     // [notice] Closing no-longer-configured HTTP tunnel listener on 127.0.0.1:48932
     // [notice] Closing no-longer-configured Socks listener on 127.0.0.1:9150
     // [notice] Closing no-longer-configured Transparent pf/netfilter listener on 127.0.0.1:45963
+    // [notice] Closing partially-constructed Socks listener connection (ready) on /tmp/kmp_tor_test/obs_conn_no_net/work/socks5.sock
     //
     // UnixDomainSocket
     // [notice] Closing no-longer-configured Socks listener on ???:0
     private fun String.parseListenerClosing() {
-        val type = substringAfter(NO_LONGER_CONFIGURED, "")
+        val type = substringAfter(CLOSING, "")
+            .substringAfter(' ', "")
             .substringBefore(' ', "")
             .trim()
-        val address = substringAfter(LISTENER_ON, "")
-            .trim()
+
+        val address = if (contains(CONN_READY_ON)) {
+            CONN_READY_ON
+        } else {
+            LISTENER_ON
+        }.let { substringAfter(it, "").trim() }
 
         manager.update(type, address, wasClosed = true)
     }
@@ -100,10 +106,9 @@ internal open class ObserverLogProcess internal constructor(
         private const val BOOTSTRAPPED = "Bootstrapped "
 
         private const val CLOSING = "Closing "
-        private const val NO_LONGER_CONFIGURED = " no-longer-configured "
-        private const val LISTENER_ON = " listener on "
-
         private const val OPENED = "Opened "
+
         private const val CONN_READY_ON = " listener connection (ready) on "
+        private const val LISTENER_ON = " listener on "
     }
 }

@@ -117,7 +117,7 @@ internal class RealTorRuntime private constructor(
                     TorCmd.SetEvents(cmd.events + requiredTorEvents)
                 }
             },
-            NOTIFIER.newNymInterceptor,
+            NOTIFIER.interceptorNewNym,
             TorCmdJob.interceptor(notify = { job ->
                 EXECUTE.CMD.notifyObservers(job)
             }),
@@ -689,7 +689,7 @@ internal class RealTorRuntime private constructor(
     ): RuntimeEvent.Notifier {
 
         private val processObserver = ProcessLogObserver()
-        val newNymInterceptor get() = processObserver.newNymInterceptor
+        val interceptorNewNym get() = processObserver.interceptorNewNym
 
         public override fun <Data : Any, E : RuntimeEvent<Data>> notify(event: E, data: Data) {
             if (event is LOG.PROCESS && data is String) {
