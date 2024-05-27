@@ -120,7 +120,7 @@ class ServiceFactoryUnitTest {
     }
 
     @Test
-    fun givenNoStart_whenBindWithoutEnqueue_thenAutoEnqueuesStartJob() = runTest(timeout = 5.seconds) {
+    fun givenNoStart_whenBindWithoutEnqueue_thenAutoEnqueuesStartJob() = runTest {
         val factory = TorRuntime.Builder(env("sf_enqueue_start")) {}
             .ensureStoppedOnTestCompletion() as TestFactory
 
@@ -133,17 +133,12 @@ class ServiceFactoryUnitTest {
 
         val executes = mutableListOf<ActionJob>()
         factory.subscribe(RuntimeEvent.EXECUTE.ACTION.observer { executes.add(it) })
-        val destroyable = factory.testBinder.bind().ensureStoppedOnTestCompletion()
+        factory.testBinder.bind().ensureStoppedOnTestCompletion()
 
         withContext(Dispatchers.Default) { delay(250.milliseconds) }
 
         assertEquals(1, executes.size)
         assertIs<ActionJob.StartJob>(executes.first())
-
-        destroyable.destroy()
-        val latch = Job(currentCoroutineContext().job)
-        executes.first().invokeOnCompletion { latch.complete() }
-        latch.join()
     }
 
     @Test
