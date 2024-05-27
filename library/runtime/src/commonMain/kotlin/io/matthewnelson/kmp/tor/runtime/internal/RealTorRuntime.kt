@@ -377,9 +377,8 @@ internal class RealTorRuntime private constructor(
                     // should be interrupted & all StopJobs complete alongside the
                     // one executing.
                     when (execute) {
-                        is ActionJob.RestartJob,
-                        is ActionJob.StartJob -> execute.configureStartedCompletion(popped)
-                        is ActionJob.StopJob -> execute.configureStoppedCompletion(popped)
+                        is ActionJob.Started -> execute.configureCompletionFor(popped)
+                        is ActionJob.StopJob -> execute.configureCompletionFor(popped)
                     }.let { executables.add(it) }
                 }
 
@@ -394,7 +393,7 @@ internal class RealTorRuntime private constructor(
                     }
                 }
 
-                if (execute is ActionJob.StartJob || execute is ActionJob.RestartJob) {
+                if (execute is ActionJob.Started) {
                     // If null or destroyed, ensure there is fresh queue.
                     if (_cmdQueue?.isDestroyed() != false) {
                         _cmdQueue = factory.tempQueue()
@@ -466,7 +465,7 @@ internal class RealTorRuntime private constructor(
         //
         // - Attach all previously queued StartJob or RestartJob to the job executing.
         // - Interrupt all StopJob
-        private fun ActionJob.Sealed.configureStartedCompletion(
+        private fun ActionJob.Started.configureCompletionFor(
             popped: ActionJob.Sealed,
         ): Executable.Once = when (popped) {
             is ActionJob.StartJob,
@@ -498,7 +497,7 @@ internal class RealTorRuntime private constructor(
         //
         // - Attach all previously queued StopJob to the job executing.
         // - Interrupt all StartJob & RestartJob
-        private fun ActionJob.StopJob.configureStoppedCompletion(
+        private fun ActionJob.StopJob.configureCompletionFor(
             popped: ActionJob.Sealed,
         ): Executable.Once = when (popped) {
             is ActionJob.RestartJob,
