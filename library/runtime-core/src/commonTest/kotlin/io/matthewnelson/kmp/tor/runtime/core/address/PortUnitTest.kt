@@ -31,7 +31,7 @@ class PortUnitTest {
     }
 
     @Test
-    fun givenMinToMax_whenToPortProxy_thenIsSuccessful() {
+    fun givenMinToMax_whenToPortEphemeral_thenIsSuccessful() {
         (Port.Ephemeral.MIN..Port.Ephemeral.MAX).forEach { port -> port.toPortEphemeral() }
     }
 
@@ -41,7 +41,7 @@ class PortUnitTest {
     }
 
     @Test
-    fun givenMinMinus1_whenToPortProxy_thenIsNull() {
+    fun givenMinMinus1_whenToPortEphemeral_thenIsNull() {
         assertNull((Port.Ephemeral.MIN - 1).toPortEphemeralOrNull())
     }
 
@@ -51,7 +51,7 @@ class PortUnitTest {
     }
 
     @Test
-    fun givenMaxPlus1_whenToPortProxy_thenIsNull() {
+    fun givenMaxPlus1_whenToPortEphemeral_thenIsNull() {
         assertNull((Port.Ephemeral.MAX + 1).toPortEphemeralOrNull())
     }
 
@@ -61,12 +61,12 @@ class PortUnitTest {
     }
 
     @Test
-    fun givenURLWithPort_whenToPortProxy_thenIsSuccessful() {
+    fun givenURLWithPort_whenToPortEphemeral_thenIsSuccessful() {
         "http://something.com:8080/some/path".toPortEphemeral()
     }
 
     @Test
-    fun givenInt_whenPortProxyPossible_thenToPortReturnsPortProxy() {
+    fun givenInt_whenPortEphemeralPossible_thenToPortReturnsPortEphemeral() {
         assertIs<Port.Ephemeral>(1024.toPort())
         assertIs<Port.Ephemeral>("http://some.com:1025/path".toPort())
     }

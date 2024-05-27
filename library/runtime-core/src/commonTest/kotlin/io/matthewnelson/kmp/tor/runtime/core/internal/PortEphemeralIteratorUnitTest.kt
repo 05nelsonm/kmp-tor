@@ -23,7 +23,7 @@ import kotlin.test.*
 class PortEphemeralIteratorUnitTest {
 
     @Test
-    fun givenPortProxy_whenIterator_thenWorksAsExpected() {
+    fun givenPortEphemeral_whenIterator_thenWorksAsExpected() {
         var i = Port.Ephemeral.MIN.toPortEphemeral().iterator(2)
         assertTrue(i.hasNext())
         assertEquals(1024, i.toPortEphemeral().value)
