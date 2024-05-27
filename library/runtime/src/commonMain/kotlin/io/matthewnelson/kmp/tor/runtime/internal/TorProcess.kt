@@ -316,7 +316,9 @@ internal class TorProcess private constructor(
 
         var notified = false
         while (true) {
-            if (exists()) {
+            // Ensure that stdout is flowing, otherwise may still need to
+            // wait for tor to clean up old files.
+            if (feed.lines > 5 && exists()) {
 
                 val content = readBytes()
                 if (content.size > 5) {
@@ -357,15 +359,14 @@ internal class TorProcess private constructor(
         private var _sb = StringBuilder()
         @Volatile
         private var _error: IOException? = null
-        @Volatile
-        private var _hasOutput = false
 
         private val maxTimeNoOutput = 1_500.milliseconds
         private val startMark = TimeSource.Monotonic.markNow()
 
+        val lines: Int get() = _lines
+
         override fun onOutput(line: String?) {
             if (_error == null && _lines < 30) {
-                _hasOutput = true
                 _lines++
                 if (_sb.isNotEmpty()) {
                     _sb.appendLine()
@@ -382,7 +383,7 @@ internal class TorProcess private constructor(
         fun checkError() {
             _error?.let { err -> throw err }
 
-            if (_hasOutput) return
+            if (_lines > 0) return
 
             val runtime = startMark.elapsedNow()
             if (runtime < maxTimeNoOutput) return
