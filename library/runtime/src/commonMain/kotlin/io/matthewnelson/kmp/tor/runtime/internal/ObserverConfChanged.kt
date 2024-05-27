@@ -53,13 +53,13 @@ internal open class ObserverConfChanged internal constructor(
             // __SocksPort=9055
             // SocksPort=127.0.0.1:9056 OnionTrafficOnly
             // SocksPort=[::1]:9055
-            line.startsWith(SOCKS_PORT_EPHEMERAL, ignoreCase = true)
-            || line.startsWith(SOCKS_PORT, ignoreCase = true) -> {
+            line.startsWith("__SocksPort=", ignoreCase = true)
+            || line.startsWith("SocksPort=", ignoreCase = true) -> {
                 if (socks == null) {
                     socks = LinkedHashSet(1, 1.0F)
                 }
 
-                socks.add(line.substringAfter(SOCKS_PORT, ""))
+                socks.add(line.substringAfter('='))
             }
         } }
 
@@ -70,10 +70,5 @@ internal open class ObserverConfChanged internal constructor(
         if (socks != null) {
             manager.onListenerConfChange("Socks", socks)
         }
-    }
-
-    private companion object {
-        private const val SOCKS_PORT = "SocksPort="
-        private const val SOCKS_PORT_EPHEMERAL = "__$SOCKS_PORT"
     }
 }
