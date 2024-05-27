@@ -25,7 +25,7 @@ import io.matthewnelson.kmp.file.wrapIOException
 import io.matthewnelson.kmp.process.Blocking
 import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
 import io.matthewnelson.kmp.tor.runtime.core.*
-import io.matthewnelson.kmp.tor.runtime.core.address.ProxyAddress
+import io.matthewnelson.kmp.tor.runtime.core.address.IPSocketAddress
 import io.matthewnelson.kmp.tor.runtime.core.ctrl.TorCmd
 import io.matthewnelson.kmp.tor.runtime.ctrl.internal.*
 import kotlinx.coroutines.*
@@ -117,12 +117,12 @@ public actual interface TorCtrl : Destroyable, TorEvent.Processor, TorCmd.Privil
         internal actual val interceptors: Set<TorCmdInterceptor<*>> = interceptors.toImmutableSet()
 
         /**
-         * Connects to a tor control listener via TCP port.
+         * Connects to a tor control listener via TCP socket.
          *
          * @throws [IOException] If connection attempt fails
          * */
         @Throws(CancellationException::class, IOException::class)
-        public actual suspend fun connectAsync(address: ProxyAddress): TorCtrl {
+        public actual suspend fun connectAsync(address: IPSocketAddress): TorCtrl {
             return withDelayedReturnAsync {
                 connect { context ->
                     withContext(context) {
@@ -161,7 +161,7 @@ public actual interface TorCtrl : Destroyable, TorEvent.Processor, TorCmd.Privil
          * @throws [IOException] If connection attempt fails
          * */
         @Throws(IOException::class)
-        public fun connect(address: ProxyAddress): TorCtrl {
+        public fun connect(address: IPSocketAddress): TorCtrl {
             return withDelayedReturn {
                 connect { address.connect() }
             }

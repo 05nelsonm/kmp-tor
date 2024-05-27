@@ -15,13 +15,14 @@
  **/
 package io.matthewnelson.kmp.tor.runtime.internal
 
+import io.matthewnelson.kmp.tor.runtime.TorListeners
 import io.matthewnelson.kmp.tor.runtime.TorState
 import io.matthewnelson.kmp.tor.runtime.core.OnEvent
 import io.matthewnelson.kmp.tor.runtime.core.TorConfig
 import io.matthewnelson.kmp.tor.runtime.core.TorEvent
 
 internal open class ObserverConfChanged internal constructor(
-    private val manager: TorStateManager,
+    private val manager: TorListeners.Manager,
     staticTag: String,
 ): TorEvent.Observer(
     TorEvent.CONF_CHANGED,
@@ -31,19 +32,43 @@ internal open class ObserverConfChanged internal constructor(
 ) {
 
     protected override fun notify(data: String) {
-        for (line in data.lines()) { line.parse() }
-    }
+        var network: TorState.Network? = null
+        var socks: LinkedHashSet<String>? = null
 
-    private fun String.parse() = when {
-        startsWith(TorConfig.DisableNetwork.name, ignoreCase = true) -> {
-            val network = if (substringAfter('=') == "0") {
-                TorState.Network.Enabled
-            } else {
-                TorState.Network.Disabled
+        for (line in data.lines()) { when {
+            // DisableNetwork=0
+            // DisableNetwork=1
+            // DisableNetwork  << Implied 1
+            line.startsWith(TorConfig.DisableNetwork.name, ignoreCase = true) -> {
+                network = if (line.substringAfter('=') == "0") {
+                    TorState.Network.Enabled
+                } else {
+                    TorState.Network.Disabled
+                }
             }
 
+            // __SocksPort=unix:"/tmp/kmp_tor_test/obs_conn_no_net/work/socks2.sock" OnionTrafficOnly GroupWritable
+            // SocksPort=unix:"/tmp/kmp_tor_test/obs_conn_no_net/work/socks3.sock"
+            // SocksPort=unix:/tmp/kmp_tor_test/obs_conn_no_net/work/socks4.sock
+            // __SocksPort=9055
+            // SocksPort=127.0.0.1:9056 OnionTrafficOnly
+            // SocksPort=[::1]:9055
+            line.startsWith("__SocksPort=", ignoreCase = true)
+            || line.startsWith("SocksPort=", ignoreCase = true) -> {
+                if (socks == null) {
+                    socks = LinkedHashSet(1, 1.0F)
+                }
+
+                socks.add(line.substringAfter('='))
+            }
+        } }
+
+        if (network != null) {
             manager.update(network = network)
         }
-        else -> {}
+
+        if (socks != null) {
+            manager.onListenerConfChange("Socks", socks)
+        }
     }
 }

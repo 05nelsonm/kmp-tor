@@ -56,14 +56,14 @@ class IPAddressV4UnitTest {
     @Test
     fun givenIPAddressV4_whenCanonicalized_thenReturnsUnderlyingValue() {
         val expected = "127.0.0.1"
-        val actual = expected.toIPAddressV4().canonicalHostname()
+        val actual = expected.toIPAddressV4().canonicalHostName()
         assertEquals(expected, actual)
     }
 
     @Test
     fun givenIPAddressV4Url_whenFromString_thenReturnsSuccess() {
         val expected = "192.168.7.111".toIPAddressV4()
-        val actual = "https://username:password@${expected.canonicalHostname()}:9822/some/path".toIPAddressV4()
+        val actual = "https://username:password@${expected.canonicalHostName()}:9822/some/path".toIPAddressV4()
         assertEquals(expected, actual)
     }
 

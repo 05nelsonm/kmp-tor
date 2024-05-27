@@ -34,8 +34,8 @@ import io.matthewnelson.kmp.tor.runtime.core.TorConfig.*
 import io.matthewnelson.kmp.tor.runtime.core.address.IPAddress
 import io.matthewnelson.kmp.tor.runtime.core.address.LocalHost
 import io.matthewnelson.kmp.tor.runtime.core.address.Port
-import io.matthewnelson.kmp.tor.runtime.core.address.Port.Proxy.Companion.toPortProxy
-import io.matthewnelson.kmp.tor.runtime.core.address.ProxyAddress.Companion.toProxyAddressOrNull
+import io.matthewnelson.kmp.tor.runtime.core.address.Port.Ephemeral.Companion.toPortEphemeral
+import io.matthewnelson.kmp.tor.runtime.core.address.IPSocketAddress.Companion.toIPSocketAddressOrNull
 import io.matthewnelson.kmp.tor.runtime.core.apply
 import io.matthewnelson.kmp.tor.runtime.core.builder.ExtendedTorConfigBuilder
 
@@ -94,7 +94,7 @@ internal class TorConfigGenerator internal constructor(
         if (ports.isEmpty()) return this
 
         val reassignments = ports.mapNotNull { setting ->
-            val (host, port) = setting.argument.toProxyAddressOrNull().let { pAddress ->
+            val (host, port) = setting.argument.toIPSocketAddressOrNull().let { pAddress ->
                 if (pAddress != null) {
                     val host = when (pAddress.address) {
                         is IPAddress.V4 -> LocalHost.IPv4
@@ -103,7 +103,7 @@ internal class TorConfigGenerator internal constructor(
 
                     host to pAddress.port
                 } else {
-                    LocalHost.IPv4 to setting.argument.toPortProxy()
+                    LocalHost.IPv4 to setting.argument.toPortEphemeral()
                 }
             }
 

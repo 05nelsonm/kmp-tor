@@ -23,16 +23,16 @@ import io.matthewnelson.kmp.tor.runtime.NetworkObserver
 import io.matthewnelson.kmp.tor.runtime.RuntimeEvent
 import io.matthewnelson.kmp.tor.runtime.RuntimeEvent.Notifier.Companion.e
 import io.matthewnelson.kmp.tor.runtime.RuntimeEvent.Notifier.Companion.lce
+import io.matthewnelson.kmp.tor.runtime.RuntimeEvent.Notifier.Companion.w
 import io.matthewnelson.kmp.tor.runtime.core.Destroyable
 import io.matthewnelson.kmp.tor.runtime.core.OnEvent
 import io.matthewnelson.kmp.tor.runtime.core.TorConfig
 import io.matthewnelson.kmp.tor.runtime.core.ctrl.TorCmd
 import io.matthewnelson.kmp.tor.runtime.core.util.executeAsync
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 import kotlin.concurrent.Volatile
 import kotlin.coroutines.cancellation.CancellationException
+import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 
 internal open class ObserverConnectivity internal constructor(
@@ -40,6 +40,7 @@ internal open class ObserverConnectivity internal constructor(
     private val networkObserver: NetworkObserver,
     private val NOTIFIER: RuntimeEvent.Notifier,
     private val scope: CoroutineScope,
+    private val executeDelay: Duration = 300.milliseconds,
 ): OnEvent<NetworkObserver.Connectivity> {
 
     @Volatile
@@ -63,24 +64,50 @@ internal open class ObserverConnectivity internal constructor(
 
         _job?.cancel()
         _job = scope.launch {
-            timedDelay(300.milliseconds)
+            timedDelay(executeDelay)
 
-            if (processor is Destroyable && processor.isDestroyed()) return@launch
+            val disabled = when (it) {
+                NetworkObserver.Connectivity.Connected -> false
+                NetworkObserver.Connectivity.Disconnected -> true
+            }
 
-            val setting = TorConfig.DisableNetwork.Builder {
-                disable = when (it) {
-                    NetworkObserver.Connectivity.Connected -> false
-                    NetworkObserver.Connectivity.Disconnected -> true
+            val cmd = TorConfig.DisableNetwork.Builder {
+                disable = disabled
+            }.let { TorCmd.Config.Set(it) }
+
+            var retry = 0
+            var threw: Throwable? = null
+
+            val ctx = currentCoroutineContext()
+            while (ctx.isActive && retry < 3) {
+                if (processor is Destroyable && processor.isDestroyed()) return@launch
+
+                if (retry > 0) {
+                    NOTIFIER.w(
+                        this@ObserverConnectivity,
+                        "Failed to set DisableNetwork[disable=$disabled]."
+                        + " Retrying[attempt=$retry]."
+                    )
+                }
+
+                try {
+                    processor.executeAsync(cmd)
+                    threw = null
+                    break
+                } catch (t: Throwable) {
+                    if (t is CancellationException) throw t
+                    if (t is InterruptedException) return@launch
+
+                    if (threw != null) {
+                        t.addSuppressed(threw)
+                    }
+                    threw = t
+
+                    retry++
                 }
             }
 
-            try {
-                processor.executeAsync(TorCmd.Config.Set(setting))
-            } catch (t: Throwable) {
-                if (t is CancellationException) throw t
-                if (t is InterruptedException) return@launch
-                NOTIFIER.e(t)
-            }
+            threw?.let { t -> NOTIFIER.e(t) }
         }
     }
 }

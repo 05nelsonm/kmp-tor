@@ -16,31 +16,31 @@
 package io.matthewnelson.kmp.tor.runtime.core.internal
 
 import io.matthewnelson.kmp.tor.runtime.core.address.Port
-import io.matthewnelson.kmp.tor.runtime.core.address.Port.Proxy.Companion.toPortProxy
-import io.matthewnelson.kmp.tor.runtime.core.internal.PortProxyIterator.Companion.iterator
+import io.matthewnelson.kmp.tor.runtime.core.address.Port.Ephemeral.Companion.toPortEphemeral
+import io.matthewnelson.kmp.tor.runtime.core.internal.PortEphemeralIterator.Companion.iterator
 import kotlin.test.*
 
-class PortProxyIteratorUnitTest {
+class PortEphemeralIteratorUnitTest {
 
     @Test
-    fun givenPortProxy_whenIterator_thenWorksAsExpected() {
-        var i = Port.Proxy.MIN.toPortProxy().iterator(2)
+    fun givenPortEphemeral_whenIterator_thenWorksAsExpected() {
+        var i = Port.Ephemeral.MIN.toPortEphemeral().iterator(2)
         assertTrue(i.hasNext())
-        assertEquals(1024, i.toPortProxy().value)
+        assertEquals(1024, i.toPortEphemeral().value)
         i.next()
-        assertEquals(1024, i.toPortProxy().value)
+        assertEquals(1024, i.toPortEphemeral().value)
         assertTrue(i.hasNext())
         i.next()
-        assertEquals(1025, i.toPortProxy().value)
+        assertEquals(1025, i.toPortEphemeral().value)
         assertFalse(i.hasNext())
         assertFailsWith<NoSuchElementException> { i.next() }
 
-        val p = Port.Proxy.MAX.toPortProxy()
+        val p = Port.Ephemeral.MAX.toPortEphemeral()
         i = p.iterator(2)
-        assertEquals(Port.Proxy.MAX, i.next())
-        assertEquals(Port.Proxy.MAX, i.toPortProxy().value)
-        assertEquals(Port.Proxy.MIN, i.next())
-        assertEquals(Port.Proxy.MIN, i.toPortProxy().value)
+        assertEquals(Port.Ephemeral.MAX, i.next())
+        assertEquals(Port.Ephemeral.MAX, i.toPortEphemeral().value)
+        assertEquals(Port.Ephemeral.MIN, i.next())
+        assertEquals(Port.Ephemeral.MIN, i.toPortEphemeral().value)
         assertFalse(i.hasNext())
 
         assertFailsWith<IllegalArgumentException> { p.iterator(0) }

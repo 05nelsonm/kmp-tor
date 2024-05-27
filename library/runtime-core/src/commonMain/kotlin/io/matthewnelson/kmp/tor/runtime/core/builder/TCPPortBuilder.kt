@@ -50,7 +50,7 @@ public sealed class TCPPortBuilder private constructor() {
         }
 
         @KmpTorDsl
-        public override fun port(port: Port.Proxy): Control {
+        public override fun port(port: Port.Ephemeral): Control {
             argument = port.toString()
             return this
         }
@@ -98,7 +98,7 @@ public sealed class TCPPortBuilder private constructor() {
         }
 
         @KmpTorDsl
-        public override fun port(port: Port.Proxy): Socks {
+        public override fun port(port: Port.Ephemeral): Socks {
             argument = port.toString()
             return this
         }
@@ -185,7 +185,7 @@ public sealed class TCPPortBuilder private constructor() {
          * Specify a port
          * */
         @KmpTorDsl
-        public fun port(port: Port.Proxy): R
+        public fun port(port: Port.Ephemeral): R
     }
 
     @InternalKmpTorApi

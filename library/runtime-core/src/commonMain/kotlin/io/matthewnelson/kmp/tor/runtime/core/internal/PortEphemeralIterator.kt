@@ -18,11 +18,11 @@ package io.matthewnelson.kmp.tor.runtime.core.internal
 import io.matthewnelson.kmp.file.IOException
 import io.matthewnelson.kmp.tor.runtime.core.address.IPAddress
 import io.matthewnelson.kmp.tor.runtime.core.address.Port
-import io.matthewnelson.kmp.tor.runtime.core.address.Port.Proxy.Companion.toPortProxy
+import io.matthewnelson.kmp.tor.runtime.core.address.Port.Ephemeral.Companion.toPortEphemeral
 import kotlin.jvm.JvmSynthetic
 
-internal class PortProxyIterator private constructor(
-    private val port: Port.Proxy,
+internal class PortEphemeralIterator private constructor(
+    private val port: Port.Ephemeral,
     private var limit: Int,
 ): Iterator<Int> {
 
@@ -40,31 +40,31 @@ internal class PortProxyIterator private constructor(
         if (!hasNext()) throw NoSuchElementException()
         val p = nextPort
         lastPort = p
-        nextPort = if (p == Port.Proxy.MAX) Port.Proxy.MIN else p + 1
+        nextPort = if (p == Port.Ephemeral.MAX) Port.Ephemeral.MIN else p + 1
         limit--
         return p
     }
 
-    internal fun toPortProxy(): Port.Proxy = lastPort?.toPortProxy() ?: port
+    internal fun toPortEphemeral(): Port.Ephemeral = lastPort?.toPortEphemeral() ?: port
 
     internal fun unavailableException(ipAddress: IPAddress): IOException {
         val top = port.value + start - limit - 1
-        val ranges = if (top <= Port.Proxy.MAX) {
+        val ranges = if (top <= Port.Ephemeral.MAX) {
             "(${port.value} - $top)"
         } else {
-            val bottom = top - Port.Proxy.MAX + Port.Proxy.MIN
-            "(${port.value} - ${Port.Proxy.MAX}) and (${Port.Proxy.MIN} - $bottom)"
+            val bottom = top - Port.Ephemeral.MAX + Port.Ephemeral.MIN
+            "(${port.value} - ${Port.Ephemeral.MAX}) and (${Port.Ephemeral.MIN} - $bottom)"
         }
 
-        return IOException("Failed to find available port for ${ipAddress.canonicalHostname()} $ranges")
+        return IOException("Failed to find available port for ${ipAddress.canonicalHostName()} $ranges")
     }
 
     internal companion object {
 
         @JvmSynthetic
         @Throws(IllegalArgumentException::class)
-        internal fun Port.Proxy.iterator(
+        internal fun Port.Ephemeral.iterator(
             limit: Int,
-        ): PortProxyIterator = PortProxyIterator(this, limit)
+        ): PortEphemeralIterator = PortEphemeralIterator(this, limit)
     }
 }

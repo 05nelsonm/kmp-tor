@@ -31,9 +31,10 @@ import io.matthewnelson.kmp.tor.runtime.RuntimeEvent.Notifier.Companion.i
 import io.matthewnelson.kmp.tor.runtime.RuntimeEvent.Notifier.Companion.lce
 import io.matthewnelson.kmp.tor.runtime.RuntimeEvent.Notifier.Companion.p
 import io.matthewnelson.kmp.tor.runtime.RuntimeEvent.Notifier.Companion.w
+import io.matthewnelson.kmp.tor.runtime.core.Executable
 import io.matthewnelson.kmp.tor.runtime.core.TorConfig
-import io.matthewnelson.kmp.tor.runtime.core.address.ProxyAddress
-import io.matthewnelson.kmp.tor.runtime.core.address.ProxyAddress.Companion.toProxyAddressOrNull
+import io.matthewnelson.kmp.tor.runtime.core.address.IPSocketAddress
+import io.matthewnelson.kmp.tor.runtime.core.address.IPSocketAddress.Companion.toIPSocketAddressOrNull
 import io.matthewnelson.kmp.tor.runtime.core.apply
 import io.matthewnelson.kmp.tor.runtime.core.ctrl.TorCmd
 import io.matthewnelson.kmp.tor.runtime.ctrl.TorCtrl
@@ -51,10 +52,10 @@ import kotlin.time.TimeSource
 
 internal class TorProcess private constructor(
     private val generator: TorConfigGenerator,
+    private val manager: TorState.Manager,
     private val NOTIFIER: RuntimeEvent.Notifier,
     private val scope: CoroutineScope,
     private val state: FIDState,
-    private val manager: TorStateManager,
 ): FileID by generator.environment {
 
     @Throws(Throwable::class)
@@ -171,30 +172,57 @@ internal class TorProcess private constructor(
             NOTIFIER.w(this@TorProcess, line)
         }
 
-        withContext(NonCancellable) {
-            if (process.waitForAsync(250.milliseconds) == null) return@withContext
-
-            // Process exited early. Ensure OutputFeeds flush before destroying
-            timedDelay(50.milliseconds)
-
+        // If scope is cancelled when we go to launch
+        // the coroutine to await process exit, it won't
+        // trigger the try/finally block. So, this single
+        // execution callback allows to ensure it is
+        // executed either within the non-cancelled job,
+        // or via invokeOnCompletion handler.
+        val finally = Executable.Once.of(concurrent = true, executable = {
+            state.stopMark = TimeSource.Monotonic.markNow()
             process.destroy()
 
-            process.stdoutWaiter()
-                .awaitStopAsync()
-                .stderrWaiter()
-                .awaitStopAsync()
+            try {
+                NOTIFIER.lce(Lifecycle.Event.OnStop(this@TorProcess))
+                NOTIFIER.lce(Lifecycle.Event.OnDestroy(this@TorProcess))
+            } finally {
+                manager.update(TorState.Daemon.Off)
+            }
+        })
+
+        withContext(NonCancellable) {
+            val exitCode = process.waitForAsync(250.milliseconds) ?: return@withContext
+
+            // exitCode non-null. Process exited early.
+            NOTIFIER.w(this@TorProcess, "Process exited early with code[$exitCode]")
+
+            try {
+                // Ensure OutputFeed are flushed before destroy is called
+                timedDelay(50.milliseconds)
+
+                // Need to destroy before awaiting stdout/stderr
+                process.destroy()
+
+                process.stdoutWaiter()
+                    .awaitStopAsync()
+                    .stderrWaiter()
+                    .awaitStopAsync()
+            } finally {
+                finally.execute()
+            }
         }
 
-        val processJob = scope.launch { process.waitForAsync() }
+        val processJob = scope.launch {
+            try {
+                process.waitForAsync()
+            } finally {
+                finally.execute()
+            }
+        }
 
         state.processJob = processJob
 
-        processJob.invokeOnCompletion {
-            state.stopMark = TimeSource.Monotonic.markNow()
-            process.destroy()
-            NOTIFIER.lce(Lifecycle.Event.OnDestroy(this@TorProcess))
-            manager.update(TorState.Daemon.Off, TorState.Network.Disabled)
-        }
+        processJob.invokeOnCompletion { finally.execute() }
 
         return feed to processJob
     }
@@ -238,8 +266,8 @@ internal class TorProcess private constructor(
 
         // No UnixDomainSocket, fallback to first TCP address
         for (address in addresses) {
-            val proxyAddress = address.toProxyAddressOrNull() ?: continue
-            return CtrlArguments.Connection(proxyAddress)
+            val socketAddress = address.toIPSocketAddressOrNull() ?: continue
+            return CtrlArguments.Connection(socketAddress)
         }
 
         throw IOException("Failed to acquire control connection address from file[$ctrlPortFile]")
@@ -451,11 +479,11 @@ internal class TorProcess private constructor(
     ) {
 
         internal class Connection private constructor(
-            private val tcp: ProxyAddress?,
+            private val tcp: IPSocketAddress?,
             private val uds: File?,
         ) {
 
-            constructor(tcp: ProxyAddress): this(tcp, null)
+            constructor(tcp: IPSocketAddress): this(tcp, null)
             constructor(uds: File): this(null, uds)
 
             @Throws(CancellationException::class, IOException::class)
@@ -472,19 +500,19 @@ internal class TorProcess private constructor(
         @Throws(Throwable::class)
         internal suspend fun <T: Any?> start(
             generator: TorConfigGenerator,
+            manager: TorState.Manager,
             NOTIFIER: RuntimeEvent.Notifier,
             scope: CoroutineScope,
-            manager: TorStateManager,
             connect: suspend CtrlArguments.() -> T,
         ): T {
             val state = getOrCreateInstance(generator.environment.fid) { FIDState() }
 
             val process = TorProcess(
                 generator,
+                manager,
                 NOTIFIER,
                 scope,
                 state as FIDState,
-                manager,
             )
 
             return process.start(connect)

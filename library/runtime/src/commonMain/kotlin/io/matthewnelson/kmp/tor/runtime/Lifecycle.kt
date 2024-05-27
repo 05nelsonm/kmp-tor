@@ -78,6 +78,8 @@ public class Lifecycle: Destroyable {
             @JvmStatic
             public fun OnStart(obj: Any): Event = Event(obj, Name.OnStart)
             @JvmStatic
+            public fun OnStop(obj: Any): Event = Event(obj, Name.OnStop)
+            @JvmStatic
             public fun OnDestroy(obj: Any): Event = Event(obj, Name.OnDestroy)
 
             @JvmStatic
@@ -106,6 +108,8 @@ public class Lifecycle: Destroyable {
                 public val OnCreate: Name = Name("onCreate")
                 @JvmField
                 public val OnStart: Name = Name("onStart")
+                @JvmField
+                public val OnStop: Name = Name("onStop")
                 @JvmField
                 public val OnDestroy: Name = Name("onDestroy")
 
@@ -172,9 +176,9 @@ public class Lifecycle: Destroyable {
      *
      * **NOTE:** Any observers subscribed to this instance will use
      * [OnEvent.Executor.Immediate] as their default, and not what was
-     * defined for [TorRuntime.Builder.defaultEventExecutor]. If this
-     * is undesirable, define an [OnEvent.Executor] for your service
-     * implementation's observer(s) individually.
+     * defined for [TorRuntime.Environment.Builder.defaultEventExecutor].
+     * If this is undesirable, define an [OnEvent.Executor] for your
+     * service implementation's observer(s) individually.
      * */
     public class DestroyableTorRuntime private constructor(
         private val lifecycle: Lifecycle,

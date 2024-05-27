@@ -15,16 +15,16 @@
  **/
 package io.matthewnelson.kmp.tor.runtime.core.address
 
-import io.matthewnelson.kmp.tor.runtime.core.address.Port.Proxy.Companion.toPortProxyOrNull
+import io.matthewnelson.kmp.tor.runtime.core.address.Port.Ephemeral.Companion.toPortEphemeralOrNull
 import io.matthewnelson.kmp.tor.runtime.core.internal.findHostnameAndPortFromURL
 import kotlin.jvm.JvmField
 import kotlin.jvm.JvmName
 import kotlin.jvm.JvmStatic
 
 /**
- * Holder for a port between 0 and 65535 (inclusive)
+ * Holder for a port between 0 and 65535 (inclusive).
  *
- * @see [Proxy]
+ * @see [Ephemeral]
  * @see [io.matthewnelson.kmp.tor.runtime.core.util.isAvailableAsync]
  * @see [io.matthewnelson.kmp.tor.runtime.core.util.isAvailableSync]
  * */
@@ -66,8 +66,8 @@ public open class Port private constructor(
         @JvmStatic
         @JvmName("getOrNull")
         public fun Int.toPortOrNull(): Port? {
-            // Try Port.Proxy first (more constrained)
-            toPortProxyOrNull()?.let { return it }
+            // Try Port.Ephemeral first (more constrained)
+            toPortEphemeralOrNull()?.let { return it }
             if (this !in MIN..MAX) return null
             return Port(this)
         }
@@ -96,13 +96,15 @@ public open class Port private constructor(
 
     /**
      * A [Port] with a more constrained range of 1024 and 65535 (inclusive)
+     * in accordance with that specified in
+     * [RFC 6056 section 3.2](https://datatracker.ietf.org/doc/html/rfc6056#section-3.2)
      *
      * @see [io.matthewnelson.kmp.tor.runtime.core.util.isAvailableAsync]
      * @see [io.matthewnelson.kmp.tor.runtime.core.util.isAvailableSync]
      * @see [io.matthewnelson.kmp.tor.runtime.core.util.findAvailableAsync]
      * @see [io.matthewnelson.kmp.tor.runtime.core.util.findAvailableSync]
      * */
-    public class Proxy private constructor(value: Int): Port(value) {
+    public class Ephemeral private constructor(value: Int): Port(value) {
 
         public companion object {
 
@@ -112,9 +114,9 @@ public open class Port private constructor(
             @JvmStatic
             @JvmName("get")
             @Throws(IllegalArgumentException::class)
-            public fun Int.toPortProxy(): Proxy {
-                return toPortProxyOrNull()
-                    ?: throw IllegalArgumentException("$this is not a valid proxy port")
+            public fun Int.toPortEphemeral(): Ephemeral {
+                return toPortEphemeralOrNull()
+                    ?: throw IllegalArgumentException("$this is not a valid ephemeral port")
             }
 
             /**
@@ -123,22 +125,22 @@ public open class Port private constructor(
              * String can be either a URL containing the port, or the
              * port itself.
              *
-             * @return [Port.Proxy]
+             * @return [Port.Ephemeral]
              * @throws [IllegalArgumentException] if no port is found
              * */
             @JvmStatic
             @JvmName("get")
             @Throws(IllegalArgumentException::class)
-            public fun String.toPortProxy(): Proxy {
-                return toPortProxyOrNull()
-                    ?: throw IllegalArgumentException("$this does not contain a valid proxy port")
+            public fun String.toPortEphemeral(): Ephemeral {
+                return toPortEphemeralOrNull()
+                    ?: throw IllegalArgumentException("$this does not contain a valid ephemeral port")
             }
 
             @JvmStatic
             @JvmName("getOrNull")
-            public fun Int.toPortProxyOrNull(): Proxy? {
+            public fun Int.toPortEphemeralOrNull(): Ephemeral? {
                 if (this !in MIN..MAX) return null
-                return Proxy(this)
+                return Ephemeral(this)
             }
 
             /**
@@ -147,13 +149,13 @@ public open class Port private constructor(
              * String can be either a URL containing the port, or the
              * port itself.
              *
-             * @return [Port.Proxy] or null
+             * @return [Port.Ephemeral] or null
              * */
             @JvmStatic
             @JvmName("getOrNull")
-            public fun String.toPortProxyOrNull(): Proxy? {
+            public fun String.toPortEphemeralOrNull(): Ephemeral? {
                 val port = toPortOrNull()
-                if (port is Proxy) return port
+                if (port is Ephemeral) return port
                 return null
             }
         }

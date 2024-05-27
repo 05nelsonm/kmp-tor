@@ -15,41 +15,41 @@
  **/
 package io.matthewnelson.kmp.tor.runtime.core.address
 
-import io.matthewnelson.kmp.tor.runtime.core.address.ProxyAddress.Companion.toProxyAddress
-import io.matthewnelson.kmp.tor.runtime.core.address.ProxyAddress.Companion.toProxyAddressOrNull
+import io.matthewnelson.kmp.tor.runtime.core.address.IPSocketAddress.Companion.toIPSocketAddress
+import io.matthewnelson.kmp.tor.runtime.core.address.IPSocketAddress.Companion.toIPSocketAddressOrNull
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNull
 
-class ProxyAddressUnitTest {
+class IPSocketAddressUnitTest {
 
     @Test
-    fun givenIPAddressV4WithPort_whenProxyAddress_thenToStringIsAsExpected() {
+    fun givenIPAddressV4WithPort_whenIPSocketAddress_thenToStringIsAsExpected() {
         val expected = "127.0.0.1:9050"
-        val actual = expected.toProxyAddress().toString()
+        val actual = expected.toIPSocketAddress().toString()
         assertEquals(expected, actual)
     }
 
     @Test
-    fun givenIPAddressV4WithoutPort_whenProxyAddress_thenToStringIsAsExpected() {
-        assertNull("127.0.0.1".toProxyAddressOrNull())
+    fun givenIPAddressV4WithoutPort_whenIPSocketAddress_thenToStringIsAsExpected() {
+        assertNull("127.0.0.1".toIPSocketAddressOrNull())
     }
 
     @Test
-    fun givenIPAddressV6WithPort_whenProxyAddress_thenToStringIsAsExpected() {
+    fun givenIPAddressV6WithPort_whenIPSocketAddress_thenToStringIsAsExpected() {
         val expected = "[35f4:c60a:8296:4c90:79ad:3939:69d9:ba10]:9050"
-        val actual = expected.toProxyAddress().toString()
+        val actual = expected.toIPSocketAddress().toString()
         assertEquals(expected, actual)
     }
 
     @Test
-    fun givenIPAddressV6WithoutPort_whenProxyAddress_thenToStringIsAsExpected() {
-        assertNull("[35f4:c60a:8296:4c90:79ad:3939:69d9:ba10]".toProxyAddressOrNull())
+    fun givenIPAddressV6WithoutPort_whenIPSocketAddress_thenToStringIsAsExpected() {
+        assertNull("[35f4:c60a:8296:4c90:79ad:3939:69d9:ba10]".toIPSocketAddressOrNull())
     }
     @Test
-    fun givenURL_whenProxyAddress_thenToStringIsAsExpected() {
+    fun givenURL_whenIPSocketAddress_thenToStringIsAsExpected() {
         val expected = "192.168.10.100:8080"
-        val actual = "http://$expected/some/path.html".toProxyAddress().toString()
+        val actual = "http://$expected/some/path.html".toIPSocketAddress().toString()
         assertEquals(expected, actual)
     }
 }

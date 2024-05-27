@@ -24,8 +24,8 @@ import io.matthewnelson.kmp.tor.runtime.core.TorConfig
 import io.matthewnelson.kmp.tor.runtime.core.UncaughtException
 import io.matthewnelson.kmp.tor.runtime.core.address.LocalHost
 import io.matthewnelson.kmp.tor.runtime.core.address.Port
-import io.matthewnelson.kmp.tor.runtime.core.address.Port.Proxy.Companion.toPortProxy
-import io.matthewnelson.kmp.tor.runtime.core.address.ProxyAddress
+import io.matthewnelson.kmp.tor.runtime.core.address.Port.Ephemeral.Companion.toPortEphemeral
+import io.matthewnelson.kmp.tor.runtime.core.address.IPSocketAddress
 import io.matthewnelson.kmp.tor.runtime.core.util.findAvailableAsync
 import kotlinx.coroutines.*
 import kotlinx.coroutines.test.runTest
@@ -40,17 +40,17 @@ class TorCtrlFactoryUnitTest {
 
     @Test
     fun givenIPv4_whenConnect_thenIsSuccessful() = runTest {
-        LocalHost.IPv4.runTCPTest(9055.toPortProxy())
+        LocalHost.IPv4.runTCPTest(9055.toPortEphemeral())
     }
 
     @Test
     fun givenIPv6_whenConnect_thenIsSuccessful() = runTest {
-        LocalHost.IPv6.runTCPTest(9155.toPortProxy())
+        LocalHost.IPv6.runTCPTest(9155.toPortEphemeral())
     }
 
     @Test
     fun givenConnection_whenTorStops_thenDestroysItself() = runTest {
-        LocalHost.IPv4.runTCPTest(9255.toPortProxy()) { process, _ ->
+        LocalHost.IPv4.runTCPTest(9255.toPortEphemeral()) { process, _ ->
             process.destroy()
         }
     }
@@ -90,7 +90,7 @@ class TorCtrlFactoryUnitTest {
     }
 
     private suspend fun LocalHost.runTCPTest(
-        startPort: Port.Proxy,
+        startPort: Port.Ephemeral,
         block: suspend (process: Process, ctrl: TorCtrl) -> Unit = { process, ctrl ->
             // default test behavior is to disconnect ctrl listener first
             ctrl.destroy()
@@ -107,7 +107,7 @@ class TorCtrlFactoryUnitTest {
         val host = resolve()
         val port = startPort.findAvailableAsync(100, this)
 
-        val address = ProxyAddress(host, port)
+        val address = IPSocketAddress(host, port)
 
         val process = TestUtils.startTor(ctrlPortArg = address.toString())
 

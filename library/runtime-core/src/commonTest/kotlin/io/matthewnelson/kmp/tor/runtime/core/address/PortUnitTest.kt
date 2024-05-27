@@ -17,8 +17,8 @@ package io.matthewnelson.kmp.tor.runtime.core.address
 
 import io.matthewnelson.kmp.tor.runtime.core.address.Port.Companion.toPort
 import io.matthewnelson.kmp.tor.runtime.core.address.Port.Companion.toPortOrNull
-import io.matthewnelson.kmp.tor.runtime.core.address.Port.Proxy.Companion.toPortProxy
-import io.matthewnelson.kmp.tor.runtime.core.address.Port.Proxy.Companion.toPortProxyOrNull
+import io.matthewnelson.kmp.tor.runtime.core.address.Port.Ephemeral.Companion.toPortEphemeral
+import io.matthewnelson.kmp.tor.runtime.core.address.Port.Ephemeral.Companion.toPortEphemeralOrNull
 import kotlin.test.Test
 import kotlin.test.assertIs
 import kotlin.test.assertNull
@@ -31,8 +31,8 @@ class PortUnitTest {
     }
 
     @Test
-    fun givenMinToMax_whenToPortProxy_thenIsSuccessful() {
-        (Port.Proxy.MIN..Port.Proxy.MAX).forEach { port -> port.toPortProxy() }
+    fun givenMinToMax_whenToPortEphemeral_thenIsSuccessful() {
+        (Port.Ephemeral.MIN..Port.Ephemeral.MAX).forEach { port -> port.toPortEphemeral() }
     }
 
     @Test
@@ -41,8 +41,8 @@ class PortUnitTest {
     }
 
     @Test
-    fun givenMinMinus1_whenToPortProxy_thenIsNull() {
-        assertNull((Port.Proxy.MIN - 1).toPortProxyOrNull())
+    fun givenMinMinus1_whenToPortEphemeral_thenIsNull() {
+        assertNull((Port.Ephemeral.MIN - 1).toPortEphemeralOrNull())
     }
 
     @Test
@@ -51,8 +51,8 @@ class PortUnitTest {
     }
 
     @Test
-    fun givenMaxPlus1_whenToPortProxy_thenIsNull() {
-        assertNull((Port.Proxy.MAX + 1).toPortProxyOrNull())
+    fun givenMaxPlus1_whenToPortEphemeral_thenIsNull() {
+        assertNull((Port.Ephemeral.MAX + 1).toPortEphemeralOrNull())
     }
 
     @Test
@@ -61,13 +61,13 @@ class PortUnitTest {
     }
 
     @Test
-    fun givenURLWithPort_whenToPortProxy_thenIsSuccessful() {
-        "http://something.com:8080/some/path".toPortProxy()
+    fun givenURLWithPort_whenToPortEphemeral_thenIsSuccessful() {
+        "http://something.com:8080/some/path".toPortEphemeral()
     }
 
     @Test
-    fun givenInt_whenPortProxyPossible_thenToPortReturnsPortProxy() {
-        assertIs<Port.Proxy>(1024.toPort())
-        assertIs<Port.Proxy>("http://some.com:1025/path".toPort())
+    fun givenInt_whenPortEphemeralPossible_thenToPortReturnsPortEphemeral() {
+        assertIs<Port.Ephemeral>(1024.toPort())
+        assertIs<Port.Ephemeral>("http://some.com:1025/path".toPort())
     }
 }

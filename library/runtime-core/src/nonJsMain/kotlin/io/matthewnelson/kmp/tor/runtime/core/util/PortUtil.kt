@@ -22,7 +22,7 @@ import io.matthewnelson.kmp.file.wrapIOException
 import io.matthewnelson.kmp.tor.runtime.core.address.LocalHost
 import io.matthewnelson.kmp.tor.runtime.core.address.Port
 import io.matthewnelson.kmp.tor.runtime.core.internal.ServerSocketProducer.Companion.toServerSocketProducer
-import io.matthewnelson.kmp.tor.runtime.core.internal.PortProxyIterator.Companion.iterator
+import io.matthewnelson.kmp.tor.runtime.core.internal.PortEphemeralIterator.Companion.iterator
 import io.matthewnelson.kmp.tor.runtime.core.internal.cancellationExceptionOr
 import io.matthewnelson.kmp.tor.runtime.core.internal.isPortAvailable
 import kotlinx.coroutines.*
@@ -47,10 +47,10 @@ public actual suspend fun Port.isAvailableAsync(
 
 /**
  * Finds an available TCP port on [LocalHost] starting with the current
- * [Port.Proxy.value] and iterating up [limit] times.
+ * [Port.Ephemeral.value] and iterating up [limit] times.
  *
- * If [Port.Proxy.MAX] is exceeded while iterating through ports and [limit]
- * has not been exhausted, the remaining checks will start from [Port.Proxy.MIN].
+ * If [Port.Ephemeral.MAX] is exceeded while iterating through ports and [limit]
+ * has not been exhausted, the remaining checks will start from [Port.Ephemeral.MIN].
  *
  * @param [host] either [LocalHost.IPv4] or [LocalHost.IPv6]
  * @param [limit] the number of ports to scan. min: 1, max: 1_000
@@ -60,10 +60,10 @@ public actual suspend fun Port.isAvailableAsync(
  * @throws [CancellationException] if underlying coroutine was cancelled
  * */
 @Throws(IOException::class, CancellationException::class)
-public actual suspend fun Port.Proxy.findAvailableAsync(
+public actual suspend fun Port.Ephemeral.findAvailableAsync(
     limit: Int,
     host: LocalHost,
-): Port.Proxy = withContext(Dispatchers.IO) {
+): Port.Ephemeral = withContext(Dispatchers.IO) {
     findAvailableSync(limit, host, currentCoroutineContext())
 }
 
@@ -86,10 +86,10 @@ public fun Port.isAvailableSync(
 
 /**
  * Finds an available TCP port on [LocalHost] starting with the current
- * [Port.Proxy.value] and iterating up [limit] times.
+ * [Port.Ephemeral.value] and iterating up [limit] times.
  *
- * If [Port.Proxy.MAX] is exceeded while iterating through ports and [limit]
- * has not been exhausted, the remaining checks will start from [Port.Proxy.MIN].
+ * If [Port.Ephemeral.MAX] is exceeded while iterating through ports and [limit]
+ * has not been exhausted, the remaining checks will start from [Port.Ephemeral.MIN].
  *
  * **NOTE:** This is a blocking call and should be invoked from
  * a background thread.
@@ -101,29 +101,29 @@ public fun Port.isAvailableSync(
  * @throws [IOException] if the check fails (e.g. calling from Main thread on Android)
  * */
 @Throws(IOException::class)
-public fun Port.Proxy.findAvailableSync(
+public fun Port.Ephemeral.findAvailableSync(
     limit: Int,
     host: LocalHost,
-): Port.Proxy = findAvailableSync(limit, host, null)
+): Port.Ephemeral = findAvailableSync(limit, host, null)
 
 @Throws(IOException::class, CancellationException::class)
-private fun Port.Proxy.findAvailableSync(
+private fun Port.Ephemeral.findAvailableSync(
     limit: Int,
     host: LocalHost,
     context: CoroutineContext?,
-): Port.Proxy {
-    val i = iterator(limit)
+): Port.Ephemeral {
+    val iterator = iterator(limit)
     val ipAddress = host.resolve()
-    val inetAddress = ipAddress.toServerSocketProducer()
+    val serverSocketProducer = ipAddress.toServerSocketProducer()
 
     try {
-        while (context?.isActive != false && i.hasNext()) {
-            if (!inetAddress.isPortAvailable(i.next())) continue
-            return i.toPortProxy()
+        while (context?.isActive != false && iterator.hasNext()) {
+            if (!serverSocketProducer.isPortAvailable(iterator.next())) continue
+            return iterator.toPortEphemeral()
         }
     } catch (t: Throwable) {
         throw context.cancellationExceptionOr { t.wrapIOException() }
     }
 
-    throw context.cancellationExceptionOr { i.unavailableException(ipAddress) }
+    throw context.cancellationExceptionOr { iterator.unavailableException(ipAddress) }
 }

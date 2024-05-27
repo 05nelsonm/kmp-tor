@@ -75,7 +75,7 @@ internal sealed class InetSocketAddress private constructor(
             val addr = result.pointed
                 ?.ai_addr
                 ?.pointed
-                ?: throw IOException("Failed to retrieve sockaddr for ${canonicalHostname()}")
+                ?: throw IOException("Failed to retrieve sockaddr for ${canonicalHostName()}")
 
             when (this@toInetSocketAddress) {
                 is IPAddress.V4 -> {

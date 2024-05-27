@@ -64,6 +64,16 @@ public interface TorRuntime:
     public fun environment(): Environment
 
     /**
+     * Returns the current active [TorListeners] for this [TorRuntime]
+     * instance.
+     *
+     * If tor is **not** 100% bootstrapped with network enabled,
+     * [TorListeners.isEmpty] will always be true for the returned
+     * instance of [TorListeners].
+     * */
+    public fun listeners(): TorListeners
+
+    /**
      * Returns the current [TorState] for this [TorRuntime] instance.
      * */
     public fun state(): TorState
@@ -116,22 +126,6 @@ public interface TorRuntime:
          * */
         @JvmField
         public var networkObserver: NetworkObserver = NetworkObserver.noOp()
-
-        /**
-         * Declare a default [OnEvent.Executor] to utilize when dispatching
-         * [TorEvent] and [RuntimeEvent] to registered observers (if the observer
-         * does not provide its own). This can be overridden on a per-observer
-         * basis when creating them, given the needs of that observer and how it
-         * is being used and/or implemented.
-         *
-         * **NOTE:** This should be a singleton with **no** contextual or
-         * non-singleton references outside the [OnEvent.Executor.execute]
-         * lambda.
-         *
-         * Default: [OnEvent.Executor.Immediate]
-         * */
-        @JvmField
-        public var defaultEventExecutor: OnEvent.Executor = OnEvent.Executor.Immediate
 
         /**
          * Apply settings to the [TorConfig] at each startup. Multiple [block] may
@@ -275,7 +269,6 @@ public interface TorRuntime:
                         networkObserver = b.networkObserver,
                         requiredTorEvents = b.requiredTorEvents,
                         observersTorEvent = b.observersTorEvent,
-                        defaultExecutor = b.defaultEventExecutor,
                         observersRuntimeEvent = b.observersRuntimeEvent,
                     )
                 })
@@ -302,6 +295,8 @@ public interface TorRuntime:
         public val torrcDefaultsFile: File,
         @JvmField
         public val torResource: ResourceInstaller<Paths.Tor>,
+
+        private val _defaultExecutor: OnEvent.Executor,
         @OptIn(ExperimentalKmpTorApi::class)
         private val _serviceFactoryLoader: ServiceFactory.Loader?,
     ): FileID {
@@ -407,6 +402,24 @@ public interface TorRuntime:
         ) {
 
             /**
+             * Declare a default [OnEvent.Executor] to utilize when dispatching
+             * [TorEvent] and [RuntimeEvent] to registered observers (if the observer
+             * does not provide its own). This can be overridden on a per-observer
+             * basis when creating them, given the needs of that observer and how it
+             * is being used and/or implemented.
+             *
+             * **NOTE:** This should be a singleton with **no** contextual or
+             * non-singleton references outside the [OnEvent.Executor.execute]
+             * lambda.
+             *
+             * Default: [OnEvent.Executor.Immediate]
+             *
+             * @see [OnEvent.Executor]
+             * */
+            @JvmField
+            public var defaultEventExecutor: OnEvent.Executor = OnEvent.Executor.Immediate
+
+            /**
              * The directory for which **all** resources will be installed
              *
              * Default: [workDirectory]
@@ -466,6 +479,7 @@ public interface TorRuntime:
                             torrcFile = b.torrcFile.absoluteFile.normalize(),
                             torrcDefaultsFile = b.torrcDefaultsFile.absoluteFile.normalize(),
                             torResource = torResource,
+                            _defaultExecutor = b.defaultEventExecutor,
                             _serviceFactoryLoader = b.serviceFactoryLoader,
                         )
                     })
@@ -483,6 +497,9 @@ public interface TorRuntime:
 
         @JvmSynthetic
         internal fun staticTag(): String = _staticTag
+
+        @JvmSynthetic
+        internal fun defaultExecutor(): OnEvent.Executor = _defaultExecutor
 
         @JvmSynthetic
         @OptIn(ExperimentalKmpTorApi::class)
@@ -572,6 +589,7 @@ public interface TorRuntime:
 
         public final override val fid: String = ctrl.fid
         public final override fun environment(): Environment = ctrl.environment()
+        public final override fun listeners(): TorListeners = ctrl.listeners()
         public final override fun state(): TorState = ctrl.state()
 
         public final override fun <Success: Any> enqueue(

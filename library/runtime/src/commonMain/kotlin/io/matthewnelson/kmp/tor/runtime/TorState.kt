@@ -15,14 +15,20 @@
  **/
 package io.matthewnelson.kmp.tor.runtime
 
+import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
+import io.matthewnelson.kmp.tor.core.resource.SynchronizedObject
+import io.matthewnelson.kmp.tor.core.resource.synchronized
 import io.matthewnelson.kmp.tor.runtime.FileID.Companion.fidEllipses
 import io.matthewnelson.kmp.tor.runtime.core.TorConfig
+import kotlin.concurrent.Volatile
 import kotlin.jvm.JvmField
+import kotlin.jvm.JvmStatic
 import kotlin.jvm.JvmSynthetic
 
 /**
  * Holder for [TorRuntime] state.
  *
+ * @see [TorRuntime.state]
  * @see [RuntimeEvent.STATE]
  * */
 public class TorState private constructor(
@@ -34,16 +40,6 @@ public class TorState private constructor(
 ) {
 
     public constructor(daemon: Daemon, network: Network): this(daemon, network, null)
-
-    public operator fun component1(): Daemon = daemon
-    public operator fun component2(): Network = network
-
-    public fun copy(daemon: Daemon): TorState = copy(daemon, network)
-    public fun copy(network: Network): TorState = copy(daemon, network)
-    public fun copy(daemon: Daemon, network: Network): TorState {
-        if (daemon == this.daemon && network == this.network) return this
-        return TorState(daemon, network, fid)
-    }
 
     @JvmField
     public val isOff: Boolean = daemon is Daemon.Off
@@ -58,6 +54,16 @@ public class TorState private constructor(
     public val isNetworkDisabled: Boolean = network is Network.Disabled
     @JvmField
     public val isNetworkEnabled: Boolean = network is Network.Enabled
+
+    public operator fun component1(): Daemon = daemon
+    public operator fun component2(): Network = network
+
+    public fun copy(daemon: Daemon): TorState = copy(daemon, network)
+    public fun copy(network: Network): TorState = copy(daemon, network)
+    public fun copy(daemon: Daemon, network: Network): TorState {
+        if (daemon == this.daemon && network == this.network) return this
+        return TorState(daemon, network, fid)
+    }
 
     /**
      * State of the tor process
@@ -176,5 +182,78 @@ public class TorState private constructor(
             network,
             fid?.fidEllipses,
         )
+    }
+
+    internal interface Manager {
+        fun update(daemon: Daemon? = null, network: Network? = null)
+    }
+
+    @OptIn(InternalKmpTorApi::class)
+    internal abstract class AbstractManager internal constructor(fid: FileID?): Manager {
+
+        @Volatile
+        private var _state: TorState = of(
+            daemon = Daemon.Off,
+            network = Network.Disabled,
+            fid = fid,
+        )
+        internal val state: TorState get() = _state
+        private val lock = SynchronizedObject()
+
+        protected abstract fun notify(old: TorState, new: TorState)
+
+        final override fun update(daemon: Daemon?, network: Network?) {
+            if (daemon == null && network == null) return
+
+            @Suppress("LocalVariableName")
+            val diff = synchronized(lock) {
+                val old = _state
+
+                val _daemon = daemon ?: old.daemon
+                val _network = if (_daemon is Daemon.Off) {
+                    Network.Disabled
+                } else {
+                    network ?: old.network
+                }
+
+                val new = old.copy(_daemon, _network)
+                Diff.of(old, new)?.also { _state = new }
+            } ?: return
+
+            notify(diff.old, diff.new)
+        }
+
+        private class Diff private constructor(val old: TorState, val new: TorState) {
+
+            companion object {
+
+                @JvmStatic
+                fun of(old: TorState, new: TorState): Diff? {
+                    // No changes
+                    if (old == new) return null
+
+                    // on -> off
+                    // on -> stopping
+                    // on -> on
+                    if (old.isOn && new.isStarting) return null
+
+                    // off -> starting
+                    // off -> off
+                    if (old.isOff && new.isOn) return null
+                    if (old.isOff && new.isStopping) return null
+
+                    // stopping -> off
+                    // stopping -> starting
+                    // stopping -> stopping
+                    if (old.isStopping && new.isOn) return null
+
+                    // starting -> on
+                    // starting -> off
+                    // starting -> stopping
+                    // starting -> starting
+                    return Diff(old, new)
+                }
+            }
+        }
     }
 }

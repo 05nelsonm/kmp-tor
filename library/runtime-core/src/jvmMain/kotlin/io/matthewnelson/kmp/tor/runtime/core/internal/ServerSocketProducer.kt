@@ -41,7 +41,7 @@ internal actual value class ServerSocketProducer private actual constructor(
             val jInetAddress = try {
                 // TODO: Issue #336
                 //  Use get by address
-                java.net.InetAddress.getByName(canonicalHostname())
+                java.net.InetAddress.getByName(canonicalHostName())
             } catch (t: Throwable) {
                 throw t.wrapIOException()
             }

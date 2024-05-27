@@ -16,10 +16,14 @@
 package io.matthewnelson.kmp.tor.runtime.core
 
 import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
+import io.matthewnelson.kmp.tor.core.resource.SynchronizedObject
+import io.matthewnelson.kmp.tor.core.resource.synchronized
 import io.matthewnelson.kmp.tor.runtime.core.internal.ExecutorMainInternal
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.MainCoroutineDispatcher
+import kotlin.concurrent.Volatile
 import kotlin.coroutines.CoroutineContext
+import kotlin.jvm.JvmName
 import kotlin.jvm.JvmStatic
 
 /**
@@ -106,7 +110,7 @@ public fun interface OnEvent<in Data: Any?>: ItBlock<Data> {
 
     /**
      * `kmp-tor` utilizes several different background threads for
-     * which events are generated on, then dispatches them to registered
+     * which events are generated on, then dispatches them to subscribed
      * observers' [OnEvent] callbacks. The [Executor] API allows for
      * fine-tuning the context in which that dispatching occurs on
      * several customizable levels.
@@ -128,7 +132,7 @@ public fun interface OnEvent<in Data: Any?>: ItBlock<Data> {
     public fun interface Executor {
 
         /**
-         * Execute [block] in desired context.
+         * Execute [executable] in desired context.
          *
          * **NOTE: This is an internal API and should not be called from general
          * code; it is strictly for `kmp-tor` event observers. Custom implementations
@@ -140,10 +144,10 @@ public fun interface OnEvent<in Data: Any?>: ItBlock<Data> {
          *
          * @param [handler] The [UncaughtException.Handler] wrapped as
          *   [CoroutineContext] element to pipe exceptions.
-         * @param [block] to be invoked in desired context.
+         * @param [executable] to be invoked in desired context.
          * */
         @InternalKmpTorApi
-        public fun execute(handler: CoroutineContext, block: ItBlock<Unit>)
+        public fun execute(handler: CoroutineContext, executable: Executable)
 
         /**
          * Utilizes [Dispatchers.Main] under the hood to transition events
@@ -151,8 +155,9 @@ public fun interface OnEvent<in Data: Any?>: ItBlock<Data> {
          * [MainCoroutineDispatcher.immediate] is available, that is always
          * preferred.
          *
-         * **NOTE:** On `Node.js` this invokes [ItBlock] immediately as the
-         * `kmp-tor` implementation is entirely asynchronous.
+         * **NOTE:** On `Node.js` this invokes [Executable] immediately as the
+         * `kmp-tor` implementation is entirely asynchronous and runs on the
+         * main thread.
          *
          * **WARNING:** Jvm/Android requires the respective coroutines UI
          * dependency `kotlinx-coroutines-{android/javafx/swing}`
@@ -178,8 +183,7 @@ public fun interface OnEvent<in Data: Any?>: ItBlock<Data> {
         public object Immediate: Executor {
 
             @InternalKmpTorApi
-            override fun execute(handler: CoroutineContext, block: ItBlock<Unit>) { block(Unit) }
-
+            override fun execute(handler: CoroutineContext, executable: Executable) { executable.execute() }
             override fun toString(): String = "OnEvent.Executor.Immediate"
         }
     }
@@ -214,6 +218,9 @@ public fun interface Disposable {
 
 /**
  * A callback for executing something
+ *
+ * @see [noOp]
+ * @see [Once]
  * */
 public fun interface Executable {
     public fun execute()
@@ -225,6 +232,79 @@ public fun interface Executable {
          * */
         @JvmStatic
         public fun noOp(): Executable = NOOP
+    }
+
+    /**
+     * Helper for creating single-shot [Executable], with
+     * built-in support for thread-safe execution (if needed).
+     *
+     * Successive invocations of [execute] are ignored.
+     *
+     * @see [of]
+     * */
+    public class Once private constructor(
+        private val delegate: Executable,
+        concurrent: Boolean,
+    ): Executable {
+
+        @Volatile
+        private var _hasExecuted: Boolean = false
+        @get:JvmName("hasExecuted")
+        public val hasExecuted: Boolean get() = _hasExecuted
+
+        @OptIn(InternalKmpTorApi::class)
+        private val lock = if (concurrent) SynchronizedObject() else null
+
+        public override fun execute() {
+            if (_hasExecuted) return
+
+            @OptIn(InternalKmpTorApi::class)
+            if (lock != null) {
+                synchronized(lock) {
+                    if (_hasExecuted) return@synchronized null
+                    _hasExecuted = true
+                    delegate
+                }
+            } else {
+                _hasExecuted = true
+                delegate
+            }?.execute()
+        }
+
+        public companion object {
+
+            /**
+             * Returns an instance of [Executable.Once] that is **not** thread-safe.
+             *
+             * @throws [IllegalArgumentException] if [executable] is an instance
+             *   of [Once] or [noOp]
+             * */
+            @JvmStatic
+            @Throws(IllegalArgumentException::class)
+            public fun of (executable: Executable): Once = of(false, executable)
+
+            /**
+             * Returns an instance of [Executable.Once].
+             *
+             * @param [concurrent] true for thread-safe, false not thread-safe
+             * @throws [IllegalArgumentException] if [executable] is an instance
+             *   of [Once] or [noOp]
+             * */
+            @JvmStatic
+            @Throws(IllegalArgumentException::class)
+            public fun of(concurrent: Boolean, executable: Executable): Once {
+                require(executable !is Once) {
+                    "executable cannot already be an instance of Execute.Once"
+                }
+                require(executable !is NOOP) {
+                    "executable cannot already be an instance of Execute.NOOP"
+                }
+
+                return Once(executable, concurrent = concurrent)
+            }
+        }
+
+        public override fun toString(): String = "Execute.Once@${hashCode()}"
     }
 
     private data object NOOP: Executable {

@@ -18,28 +18,35 @@
 package io.matthewnelson.kmp.tor.runtime.core.internal
 
 import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
-import io.matthewnelson.kmp.tor.runtime.core.ItBlock
+import io.matthewnelson.kmp.tor.runtime.core.Executable
 import io.matthewnelson.kmp.tor.runtime.core.OnEvent
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Runnable
+import kotlinx.coroutines.*
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
 
 internal actual object ExecutorMainInternal: OnEvent.Executor {
 
-    private val Main by lazy {
-        // Will throw if Missing
-        Dispatchers.Main.isDispatchNeeded(EmptyCoroutineContext)
+    private val SCOPE by lazy {
+        val main = run {
+            // Will throw if Missing
+            Dispatchers.Main.isDispatchNeeded(EmptyCoroutineContext)
 
-        try {
-            Dispatchers.Main.immediate
-        } catch (_: UnsupportedOperationException) {
-            Dispatchers.Main
+            try {
+                Dispatchers.Main.immediate
+            } catch (_: UnsupportedOperationException) {
+                Dispatchers.Main
+            }
         }
+
+        CoroutineScope(context =
+            CoroutineName("OnEvent.Executor.Main")
+            + SupervisorJob()
+            + main
+        )
     }
 
     @InternalKmpTorApi
-    actual override fun execute(handler: CoroutineContext, block: ItBlock<Unit>) {
-        Main.dispatch(handler, Runnable { block(Unit) })
+    actual override fun execute(handler: CoroutineContext, executable: Executable) {
+        SCOPE.launch(handler) { executable.execute() }
     }
 }

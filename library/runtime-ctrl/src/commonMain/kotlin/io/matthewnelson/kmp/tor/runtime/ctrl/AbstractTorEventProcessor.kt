@@ -199,12 +199,13 @@ protected constructor(
     {
 
         override fun handleException(context: CoroutineContext, exception: Throwable) {
-            if (exception is CancellationException) return
-            if (exception is UncaughtException) {
-                invoke(exception)
-            } else {
-                val ctx = context[ObserverContext]?.context ?: context.toString()
-                tryCatch(ctx) { throw exception }
+            when (exception) {
+                is CancellationException -> throw exception
+                is UncaughtException -> invoke(exception)
+                else -> {
+                    val ctx = context[ObserverContext]?.context ?: context.toString()
+                    tryCatch(ctx) { throw exception }
+                }
             }
         }
 

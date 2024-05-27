@@ -15,21 +15,23 @@
  **/
 package io.matthewnelson.kmp.tor.runtime.internal
 
+import io.matthewnelson.kmp.file.InterruptedException
+import io.matthewnelson.kmp.tor.runtime.*
 import io.matthewnelson.kmp.tor.runtime.Action.Companion.startDaemonAsync
-import io.matthewnelson.kmp.tor.runtime.NetworkObserver
-import io.matthewnelson.kmp.tor.runtime.RuntimeEvent
-import io.matthewnelson.kmp.tor.runtime.TestUtils.ensureStoppedOnTestCompletion
-import io.matthewnelson.kmp.tor.runtime.TestUtils.testEnv
-import io.matthewnelson.kmp.tor.runtime.TorCmdJob
-import io.matthewnelson.kmp.tor.runtime.TorRuntime
+import io.matthewnelson.kmp.tor.runtime.core.*
+import io.matthewnelson.kmp.tor.runtime.core.EnqueuedJob.Companion.toImmediateErrorJob
+import io.matthewnelson.kmp.tor.runtime.core.EnqueuedJob.Companion.toImmediateSuccessJob
+import io.matthewnelson.kmp.tor.runtime.core.ctrl.Reply
+import io.matthewnelson.kmp.tor.runtime.core.ctrl.TorCmd
+import io.matthewnelson.kmp.tor.runtime.test.TestUtils.ensureStoppedOnTestCompletion
+import io.matthewnelson.kmp.tor.runtime.test.TestUtils.testEnv
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.withContext
 import kotlin.concurrent.Volatile
-import kotlin.test.Test
-import kotlin.test.assertEquals
-import kotlin.test.assertTrue
+import kotlin.coroutines.cancellation.CancellationException
+import kotlin.test.*
 import kotlin.time.Duration.Companion.milliseconds
 
 class ObserverConnectivityUnitTest {
@@ -41,6 +43,135 @@ class ObserverConnectivityUnitTest {
 
         override fun isNetworkConnected(): Boolean = isConnected
         fun update(conn: Connectivity) { notify(conn) }
+    }
+
+    @Test
+    fun givenConnectivityChange_whenFailure_thenRetriesAsExpected() = runTest {
+        var attempt = 0
+        var successAfter = 0
+        var enqueued = 0
+        val notified = mutableListOf<RuntimeEvent<*>>()
+        var errorCause: Throwable? = null
+
+        val observer = ObserverConnectivity(
+            processor = object : TorCmd.Unprivileged.Processor {
+                override fun <Success : Any> enqueue(
+                    cmd: TorCmd.Unprivileged<Success>,
+                    onFailure: OnFailure,
+                    onSuccess: OnSuccess<Success>
+                ): EnqueuedJob {
+                    assertIs<TorCmd.Config.Set>(cmd)
+
+                    enqueued++
+                    errorCause?.let { cause ->
+                        return onFailure.toImmediateErrorJob(
+                            cmd.keyword,
+                            cause,
+                            UncaughtException.Handler.THROW
+                        )
+                    }
+
+                    return if (attempt++ < successAfter) {
+                        onFailure.toImmediateErrorJob(
+                            cmd.keyword,
+                            AssertionError(),
+                            UncaughtException.Handler.THROW,
+                        )
+                    } else {
+                        @Suppress("UNCHECKED_CAST")
+                        onSuccess.toImmediateSuccessJob(
+                            cmd.keyword,
+                            Reply.Success.OK as Success,
+                            UncaughtException.Handler.THROW
+                        )
+                    }
+                }
+            },
+            networkObserver = NetworkObserver.noOp(),
+            NOTIFIER = object : RuntimeEvent.Notifier {
+                override fun <Data : Any, E : RuntimeEvent<Data>> notify(event: E, data: Data) {
+                    when (event) {
+                        is RuntimeEvent.ERROR,
+                        is RuntimeEvent.LOG.WARN -> {
+                            notified.add(event)
+                        }
+                        else -> AssertionError("Unsupported RuntimeEvent[$event]")
+                    }
+                }
+            },
+            scope = this,
+            executeDelay = 5.milliseconds,
+        )
+
+        // Success on 1st attempt
+        attempt = 0
+        enqueued = 0
+        successAfter = 0
+        notified.clear()
+
+        observer.invoke(NetworkObserver.Connectivity.Connected)
+        withContext(Dispatchers.Default) { delay(50.milliseconds) }
+        assertEquals(1, enqueued)
+        assertEquals(0, notified.size)
+
+        // Success on 2nd attempt
+        attempt = 0
+        enqueued = 0
+        successAfter = 1
+        notified.clear()
+        observer.invoke(NetworkObserver.Connectivity.Connected)
+
+        withContext(Dispatchers.Default) { delay(50.milliseconds) }
+        assertEquals(2, enqueued)
+        assertEquals(1, notified.size)
+        assertIs<RuntimeEvent.LOG.WARN>(notified[0])
+
+        // Success on 3rd attempt
+        attempt = 0
+        enqueued = 0
+        successAfter = 2
+        notified.clear()
+        observer.invoke(NetworkObserver.Connectivity.Connected)
+
+        withContext(Dispatchers.Default) { delay(50.milliseconds) }
+        assertEquals(3, enqueued)
+        assertEquals(2, notified.size)
+        assertIs<RuntimeEvent.LOG.WARN>(notified[0])
+        assertIs<RuntimeEvent.LOG.WARN>(notified[1])
+
+        // Failure after 3rd attempt
+        attempt = 0
+        enqueued = 0
+        successAfter = 3
+        notified.clear()
+        observer.invoke(NetworkObserver.Connectivity.Connected)
+
+        withContext(Dispatchers.Default) { delay(50.milliseconds) }
+        assertEquals(3, enqueued)
+        assertEquals(3, notified.size)
+        assertIs<RuntimeEvent.LOG.WARN>(notified[0])
+        assertIs<RuntimeEvent.LOG.WARN>(notified[1])
+        assertIs<RuntimeEvent.ERROR>(notified[2])
+
+        // Cancellation when InterruptedException
+        attempt = 0
+        enqueued = 0
+        successAfter = 5
+        errorCause = InterruptedException()
+        notified.clear()
+        observer.invoke(NetworkObserver.Connectivity.Connected)
+
+        withContext(Dispatchers.Default) { delay(50.milliseconds) }
+        assertEquals(1, enqueued)
+        assertEquals(0, notified.size)
+
+        // Cancellation when CancellationException
+        errorCause = CancellationException()
+        observer.invoke(NetworkObserver.Connectivity.Connected)
+
+        withContext(Dispatchers.Default) { delay(50.milliseconds) }
+        assertEquals(2, enqueued)
+        assertEquals(0, notified.size)
     }
 
     @Test
@@ -56,9 +187,13 @@ class ObserverConnectivityUnitTest {
             observerStatic(RuntimeEvent.LOG.WARN) { warnings.add(it) }
             observerStatic(RuntimeEvent.EXECUTE.CMD) { cmds.add(it) }
 
-//            observerStatic(RuntimeEvent.LOG.DEBUG) { println(it) }
-//            observerStatic(RuntimeEvent.LOG.PROCESS) { println(it) }
+//            observerStatic(RuntimeEvent.ERROR) { it.printStackTrace() }
 //            observerStatic(RuntimeEvent.LIFECYCLE) { println(it) }
+//            observerStatic(RuntimeEvent.LISTENERS) { println(it) }
+//            observerStatic(RuntimeEvent.LOG.DEBUG) { println(it) }
+//            observerStatic(RuntimeEvent.LOG.INFO) { println(it) }
+//            observerStatic(RuntimeEvent.LOG.WARN) { println(it) }
+//            observerStatic(RuntimeEvent.LOG.PROCESS) { println(it) }
 //            observerStatic(RuntimeEvent.STATE) { println(it) }
         }.ensureStoppedOnTestCompletion()
 
@@ -72,6 +207,7 @@ class ObserverConnectivityUnitTest {
             }
         }
         assertTrue(contains, "StartDaemon enabled network when connectivity was false")
+        assertFalse(runtime.state().isNetworkEnabled)
 
         observer.isConnected = true
 
@@ -93,5 +229,6 @@ class ObserverConnectivityUnitTest {
         withContext(Dispatchers.Default) { delay(500.milliseconds) }
 
         assertEquals(1, cmds.count { it.name == "SETCONF" })
+        assertTrue(runtime.state().isNetworkEnabled)
     }
 }

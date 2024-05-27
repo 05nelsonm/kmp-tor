@@ -21,9 +21,9 @@ import kotlin.jvm.JvmField
  * Base abstraction for all address types
  *
  * @see [IPAddress]
+ * @see [IPSocketAddress]
  * @see [LocalHost]
  * @see [OnionAddress]
- * @see [ProxyAddress]
  * */
 public sealed class Address(
     @JvmField
@@ -37,29 +37,29 @@ public sealed class Address(
      *
      *     println("127.0.0.1"
      *         .toIPAddressV4()
-     *         .canonicalHostname()
+     *         .canonicalHostName()
      *     )
      *     // 127.0.0.1
      *
      *     println("::1"
      *         .toIPAddressV6()
-     *         .canonicalHostname()
+     *         .canonicalHostName()
      *     )
      *     // [::1]
      *
-     *     println("http://2gzyxa5ihm7nsggfxnu52rck2vv4rvmdlkiu3zzui5du4xyclen53wid.onion"
-     *         .toOnionAddressV3()
-     *         .canonicalHostname()
-     *     )
-     *     // 2gzyxa5ihm7nsggfxnu52rck2vv4rvmdlkiu3zzui5du4xyclen53wid.onion
-     *
      *     println("http://127.0.0.1:8081/path"
-     *         .toProxyAddress()
+     *         .toIPSocketAddress()
      *         .canonicalHostName()
      *     )
      *     // 127.0.0.1
+     *
+     *     println("http://2gzyxa5ihm7nsggfxnu52rck2vv4rvmdlkiu3zzui5du4xyclen53wid.onion"
+     *         .toOnionAddressV3()
+     *         .canonicalHostName()
+     *     )
+     *     // 2gzyxa5ihm7nsggfxnu52rck2vv4rvmdlkiu3zzui5du4xyclen53wid.onion
      * */
-    public abstract fun canonicalHostname(): String
+    public abstract fun canonicalHostName(): String
 
     public final override fun compareTo(other: Address): Int = value.compareTo(other.value)
 

@@ -63,7 +63,7 @@ internal class RealTorRuntime private constructor(
     observersRuntimeEvent,
     defaultExecutor,
     observersTorEvent,
-),  FileID by generator,
+),  FileID by generator.environment,
     TorRuntime
 {
 
@@ -93,10 +93,10 @@ internal class RealTorRuntime private constructor(
         + dispatcher
     )
 
-    private val manager = StateManager()
+    private val manager = StateManager(scope)
 
     @Suppress("PrivatePropertyName")
-    private val NOTIFIER = Notifier()
+    private val NOTIFIER = Notifier(manager)
 
     private val factory = TorCtrl.Factory(
         staticTag = generator.environment.staticTag(),
@@ -104,7 +104,7 @@ internal class RealTorRuntime private constructor(
             val tag = generator.environment.staticTag()
             events.mapTo(LinkedHashSet(events.size, 1.0f)) { event ->
                 when (event) {
-                    is TorEvent.CONF_CHANGED -> ConfChangedObserver()
+                    is TorEvent.CONF_CHANGED -> ConfChangedObserver(manager)
                     else -> event.observer(tag) { event.notifyObservers(it) }
                 }
             }
@@ -117,7 +117,9 @@ internal class RealTorRuntime private constructor(
                     TorCmd.SetEvents(cmd.events + requiredTorEvents)
                 }
             },
-            NOTIFIER.newNymInterceptor,
+            manager.interceptorConfigSet,
+            manager.interceptorConfigReset,
+            NOTIFIER.interceptorNewNym,
             TorCmdJob.interceptor(notify = { job ->
                 EXECUTE.CMD.notifyObservers(job)
             }),
@@ -143,7 +145,7 @@ internal class RealTorRuntime private constructor(
     internal fun handler(): UncaughtException.Handler = handler
 
     public override fun environment(): TorRuntime.Environment = generator.environment
-
+    public override fun listeners(): TorListeners = manager.listenersOrEmpty
     public override fun state(): TorState = manager.state
 
     public override fun enqueue(
@@ -253,7 +255,7 @@ internal class RealTorRuntime private constructor(
         cmdQueue?.connection?.destroy()
         cmdQueue?.destroy()
 
-        manager.update(TorState.Daemon.Off, TorState.Network.Disabled)
+        manager.update(TorState.Daemon.Off)
 
         if (stack.isNotEmpty()) {
             NOTIFIER.d(this, "Interrupting/Completing ActionJobs")
@@ -277,7 +279,7 @@ internal class RealTorRuntime private constructor(
         NOTIFIER.lce(Lifecycle.Event.OnCreate(this))
     }
 
-    private inner class ActionProcessor: FileID by this {
+    private inner class ActionProcessor: FileID by generator.environment {
 
         @Volatile
         private var _processorJob: Job? = null
@@ -340,16 +342,16 @@ internal class RealTorRuntime private constructor(
             }
         }
 
-        private fun processStack(): Pair<List<Executable>, ActionJob.Sealed?> {
-            if (destroyed) return emptyList<Executable>() to null
+        private fun processStack(): Pair<List<Executable.Once>, ActionJob.Sealed?> {
+            if (destroyed) return emptyList<Executable.Once>() to null
 
             return synchronized(enqueueLock) {
                 if (destroyed) {
-                    return@synchronized emptyList<Executable>() to null
+                    return@synchronized emptyList<Executable.Once>() to null
                 }
 
                 var execute: ActionJob.Sealed? = null
-                val executables = ArrayList<Executable>((actionStack.size - 1).coerceAtLeast(0))
+                val executables = ArrayList<Executable.Once>((actionStack.size - 1).coerceAtLeast(0))
 
                 while (actionStack.isNotEmpty()) {
                     // LIFO
@@ -439,7 +441,7 @@ internal class RealTorRuntime private constructor(
                 }
 
                 if (isOldQueueAttached) {
-                    executables.add(Executable {
+                    executables.add(Executable.Once.of {
                         NOTIFIER.d(this@ActionProcessor, "TorCtrl queue attached to $execute")
                     })
                 }
@@ -449,8 +451,8 @@ internal class RealTorRuntime private constructor(
                     // Ensure state is correct before we get stopped
                     if (_cmdQueue?.connection?.isDestroyed() != false) {
                         // Is null or destroyed (no active control connection)
-                        executables.add(Executable {
-                            manager.update(TorState.Daemon.Off, TorState.Network.Disabled)
+                        executables.add(Executable.Once.of {
+                            manager.update(TorState.Daemon.Off)
                         })
                     }
                 }
@@ -464,7 +466,9 @@ internal class RealTorRuntime private constructor(
         //
         // - Attach all previously queued StartJob or RestartJob to the job executing.
         // - Interrupt all StopJob
-        private fun ActionJob.Sealed.configureStartedCompletion(popped: ActionJob.Sealed): Executable = when (popped) {
+        private fun ActionJob.Sealed.configureStartedCompletion(
+            popped: ActionJob.Sealed,
+        ): Executable.Once = when (popped) {
             is ActionJob.StartJob,
             is ActionJob.RestartJob -> {
                 val executing = this
@@ -478,12 +482,12 @@ internal class RealTorRuntime private constructor(
                     popped.completion()
                 }
 
-                Executable {
+                Executable.Once.of {
                     NOTIFIER.d(this@ActionProcessor, "Attaching $popped as a child to $executing")
                 }
             }
             is ActionJob.StopJob -> {
-                Executable {
+                Executable.Once.of {
                     NOTIFIER.d(this@ActionProcessor, "$popped was interrupted by $this")
                     popped.error(InterruptedException("Interrupted by $this"))
                 }
@@ -494,10 +498,12 @@ internal class RealTorRuntime private constructor(
         //
         // - Attach all previously queued StopJob to the job executing.
         // - Interrupt all StartJob & RestartJob
-        private fun ActionJob.StopJob.configureStoppedCompletion(popped: ActionJob.Sealed): Executable = when (popped) {
+        private fun ActionJob.StopJob.configureStoppedCompletion(
+            popped: ActionJob.Sealed,
+        ): Executable.Once = when (popped) {
             is ActionJob.RestartJob,
             is ActionJob.StartJob -> {
-                Executable {
+                Executable.Once.of {
                     NOTIFIER.d(this@ActionProcessor, "$popped was interrupted by $this")
                     popped.error(InterruptedException("Interrupted by $this"))
                 }
@@ -514,7 +520,7 @@ internal class RealTorRuntime private constructor(
                     popped.completion()
                 }
 
-                Executable {
+                Executable.Once.of {
                     NOTIFIER.d(this@ActionProcessor, "Attaching $popped as a child to $executing")
                 }
             }
@@ -539,12 +545,12 @@ internal class RealTorRuntime private constructor(
                 return
             }
 
-            TorProcess.start(generator, NOTIFIER, scope, manager, connect = {
+            TorProcess.start(generator, manager, NOTIFIER, scope, connect = {
                 val ctrl = connection.openWith(factory)
 
                 val lceCtrl = RealTorCtrl(ctrl)
                 NOTIFIER.lce(Lifecycle.Event.OnCreate(lceCtrl))
-                val observer = ConnectivityObserver(ctrl)
+                val observer = ConnectivityObserver(ctrl, NOTIFIER, scope)
 
                 ctrl.invokeOnDestroy { instance ->
                     processJob.cancel()
@@ -574,7 +580,6 @@ internal class RealTorRuntime private constructor(
                     if (networkObserver.isNetworkConnected()) {
                         add(TorConfig.DisableNetwork)
                     } else {
-                        // TODO: Do better
                         NOTIFIER.w(this@RealTorRuntime, "No Network Connectivity. Waiting...")
                     }
 
@@ -646,10 +651,29 @@ internal class RealTorRuntime private constructor(
             }
         }
 
+        private inner class ConnectivityObserver(
+            ctrl: TorCtrl,
+            @Suppress("LocalVariableName")
+            NOTIFIER: RuntimeEvent.Notifier,
+            scope: CoroutineScope,
+        ): ObserverConnectivity(
+            ctrl,
+            networkObserver,
+            NOTIFIER,
+            scope,
+        ), FileID by generator.environment {
+
+            private val _hashCode = ctrl.hashCode()
+
+            public override fun equals(other: Any?): Boolean = other is ConnectivityObserver && other.hashCode() == hashCode()
+            public override fun hashCode(): Int = _hashCode
+            public override fun toString(): String = this.toFIDString()
+        }
+
         private inner class SuccessCancellationException: CancellationException()
 
         // For Lifecycle.Events notification only
-        private inner class RealTorCtrl(ctrl: TorCtrl): FileID by this {
+        private inner class RealTorCtrl(ctrl: TorCtrl): FileID by generator.environment {
             private val _hashCode = ctrl.hashCode()
 
             override fun equals(other: Any?): Boolean = other is RealTorCtrl && other.hashCode() == hashCode()
@@ -662,10 +686,12 @@ internal class RealTorRuntime private constructor(
         public override fun toString(): String = this.toFIDString(includeHashCode = isService)
     }
 
-    private inner class Notifier: RuntimeEvent.Notifier {
+    private inner class Notifier(
+        private val manager: TorListeners.Manager
+    ): RuntimeEvent.Notifier {
 
         private val processObserver = ProcessLogObserver()
-        val newNymInterceptor get() = processObserver.newNymInterceptor
+        val interceptorNewNym get() = processObserver.interceptorNewNym
 
         public override fun <Data : Any, E : RuntimeEvent<Data>> notify(event: E, data: Data) {
             if (event is LOG.PROCESS && data is String) {
@@ -676,40 +702,30 @@ internal class RealTorRuntime private constructor(
         }
 
         private inner class ProcessLogObserver: ObserverLogProcess(manager) {
-            public override fun notify(data: String) {
-                super.notify(data)
-                event.notifyObservers(data)
+            public override fun notify(line: String) {
+                super.notify(line)
+                LOG.PROCESS.notifyObservers(line)
             }
         }
     }
 
-    private inner class ConnectivityObserver(
-        ctrl: TorCtrl
-    ): ObserverConnectivity(
-        ctrl,
-        networkObserver,
-        NOTIFIER,
-        scope,
-    ), FileID by this {
-
-        private val _hashCode = ctrl.hashCode()
-
-        public override fun equals(other: Any?): Boolean = other is ConnectivityObserver && other.hashCode() == hashCode()
-        public override fun hashCode(): Int = _hashCode
-        public override fun toString(): String = this.toFIDString()
-    }
-
-    private inner class ConfChangedObserver: ObserverConfChanged(manager, generator.environment.staticTag()) {
+    private inner class ConfChangedObserver(
+        manager: TorListeners.Manager,
+    ): ObserverConfChanged(manager, generator.environment.staticTag()) {
         protected override fun notify(data: String) {
             super.notify(data)
             event.notifyObservers(data)
         }
     }
 
-    private inner class StateManager: TorStateManager(generator.environment) {
-        protected override fun notify(old: TorState, new: TorState) {
-            // TODO
-            STATE.notifyObservers(new)
+    private inner class StateManager(
+        scope: CoroutineScope,
+    ): TorListeners.AbstractManager(scope, generator.environment) {
+        protected override fun notify(listeners: TorListeners) {
+            LISTENERS.notifyObservers(listeners)
+        }
+        protected override fun notify(state: TorState) {
+            STATE.notifyObservers(state)
         }
     }
 
@@ -718,17 +734,16 @@ internal class RealTorRuntime private constructor(
         private val builderObserver: NetworkObserver,
         builderRequiredEvents: Set<TorEvent>,
         observersTorEvent: Set<TorEvent.Observer>,
-        defaultExecutor: OnEvent.Executor,
         @Suppress("RemoveRedundantQualifierName")
         observersRuntimeEvent: Set<RuntimeEvent.Observer<*>>,
         private val startService: () -> Unit,
     ):  AbstractRuntimeEventProcessor(
         generator.environment.staticTag(),
         observersRuntimeEvent,
-        defaultExecutor,
+        generator.environment.defaultExecutor(),
         observersTorEvent
     ),  ServiceFactoryCtrl,
-        FileID by generator,
+        FileID by generator.environment,
         RuntimeEvent.Notifier
     {
 
@@ -741,6 +756,9 @@ internal class RealTorRuntime private constructor(
         private val actionStack = Stack<ActionJob.Sealed>(1)
         private val lock = SynchronizedObject()
 
+        @Suppress("PrivatePropertyName")
+        private val EMPTY = TorListeners.of(fid = generator.environment)
+
         private val builderRequiredEvents = builderRequiredEvents.toImmutableSet()
         protected override val debug: Boolean get() = generator.environment.debug
 
@@ -752,6 +770,10 @@ internal class RealTorRuntime private constructor(
         public override val binder: ServiceCtrlBinder = ServiceCtrlBinder()
 
         public override fun environment(): TorRuntime.Environment = generator.environment
+
+        public override fun listeners(): TorListeners = _instance?.listeners() ?: synchronized(lock) {
+            _instance?.listeners() ?: EMPTY
+        }
 
         public override fun state(): TorState = _instance?.state() ?: synchronized(lock) {
             _instance?.state() ?: run {
@@ -973,7 +995,7 @@ internal class RealTorRuntime private constructor(
 
         private inner class ServiceCtrlBinder:
             TorRuntime.ServiceFactory.Binder,
-            FileID by this,
+            FileID by generator.environment,
             RuntimeEvent.Notifier by this
         {
 
@@ -994,6 +1016,7 @@ internal class RealTorRuntime private constructor(
                         is EXECUTE.ACTION -> event.observer(tag) { event.notifyObservers(it) }
                         is EXECUTE.CMD -> event.observer(tag) { event.notifyObservers(it) }
                         is LIFECYCLE -> event.observer(tag) { event.notifyObservers(it) }
+                        is LISTENERS -> event.observer(tag) { event.notifyObservers(it) }
                         is LOG -> event.observer(tag) { event.notifyObservers(it) }
                         is STATE -> event.observer(tag) { event.notifyObservers(it) }
                     }
@@ -1132,7 +1155,6 @@ internal class RealTorRuntime private constructor(
             networkObserver: NetworkObserver,
             requiredTorEvents: Set<TorEvent>,
             observersTorEvent: Set<TorEvent.Observer>,
-            defaultExecutor: OnEvent.Executor,
             observersRuntimeEvent: Set<RuntimeEvent.Observer<*>>,
         ): TorRuntime = generator.environment.serviceFactoryLoader()?.let { loader ->
             var n: RuntimeEvent.Notifier? = null
@@ -1143,7 +1165,6 @@ internal class RealTorRuntime private constructor(
                     networkObserver,
                     requiredTorEvents,
                     observersTorEvent,
-                    defaultExecutor,
                     observersRuntimeEvent,
                     startService,
                 ).also { n = it }
@@ -1161,7 +1182,7 @@ internal class RealTorRuntime private constructor(
             null,
             generator.environment.newRuntimeDispatcher(),
             observersTorEvent,
-            defaultExecutor,
+            generator.environment.defaultExecutor(),
             observersRuntimeEvent,
         )
     }

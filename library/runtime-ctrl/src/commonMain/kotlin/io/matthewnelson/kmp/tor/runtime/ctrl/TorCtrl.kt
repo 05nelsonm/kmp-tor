@@ -22,7 +22,7 @@ import io.matthewnelson.kmp.file.IOException
 import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
 import io.matthewnelson.kmp.tor.runtime.core.*
 import io.matthewnelson.kmp.tor.runtime.core.UncaughtException
-import io.matthewnelson.kmp.tor.runtime.core.address.ProxyAddress
+import io.matthewnelson.kmp.tor.runtime.core.address.IPSocketAddress
 import io.matthewnelson.kmp.tor.runtime.core.ctrl.TorCmd
 import kotlin.coroutines.cancellation.CancellationException
 
@@ -109,12 +109,12 @@ public expect interface TorCtrl: Destroyable, TorEvent.Processor, TorCmd.Privile
         internal val debugger: ItBlock<String>?
 
         /**
-         * Connects to a tor control listener via TCP port.
+         * Connects to a tor control listener via TCP socket.
          *
          * @throws [IOException] If connection attempt fails
          * */
         @Throws(CancellationException::class, IOException::class)
-        public suspend fun connectAsync(address: ProxyAddress): TorCtrl
+        public suspend fun connectAsync(address: IPSocketAddress): TorCtrl
 
         /**
          * Connects to a tor control listener via UnixDomainSocket.
