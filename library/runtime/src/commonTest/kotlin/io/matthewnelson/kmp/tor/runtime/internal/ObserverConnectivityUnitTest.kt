@@ -17,7 +17,9 @@ package io.matthewnelson.kmp.tor.runtime.internal
 
 import io.matthewnelson.kmp.file.InterruptedException
 import io.matthewnelson.kmp.tor.runtime.*
+import io.matthewnelson.kmp.tor.runtime.Action.Companion.restartDaemonAsync
 import io.matthewnelson.kmp.tor.runtime.Action.Companion.startDaemonAsync
+import io.matthewnelson.kmp.tor.runtime.Action.Companion.stopDaemonAsync
 import io.matthewnelson.kmp.tor.runtime.core.*
 import io.matthewnelson.kmp.tor.runtime.core.EnqueuedJob.Companion.toImmediateErrorJob
 import io.matthewnelson.kmp.tor.runtime.core.EnqueuedJob.Companion.toImmediateSuccessJob
@@ -188,11 +190,14 @@ class ObserverConnectivityUnitTest {
             observerStatic(RuntimeEvent.EXECUTE.CMD) { cmds.add(it) }
 
 //            observerStatic(RuntimeEvent.ERROR) { it.printStackTrace() }
+//            observerStatic(RuntimeEvent.EXECUTE.ACTION) { println(it) }
+//            observerStatic(RuntimeEvent.EXECUTE.CMD) { it.printStackTrace() }
 //            observerStatic(RuntimeEvent.LIFECYCLE) { println(it) }
 //            observerStatic(RuntimeEvent.LISTENERS) { println(it) }
 //            observerStatic(RuntimeEvent.LOG.DEBUG) { println(it) }
 //            observerStatic(RuntimeEvent.LOG.INFO) { println(it) }
 //            observerStatic(RuntimeEvent.LOG.WARN) { println(it) }
+//            observerStatic(RuntimeEvent.PROCESS.READY) { println(it) }
 //            observerStatic(RuntimeEvent.PROCESS.STDOUT) { println(it) }
 //            observerStatic(RuntimeEvent.PROCESS.STDERR) { println(it) }
 //            observerStatic(RuntimeEvent.STATE) { println(it) }

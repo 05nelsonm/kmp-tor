@@ -20,7 +20,7 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 
-class OwningControllerProcessTest {
+class OwningControllerDaemonTest {
 
     @Test
     fun givenSetting_whenDefault_thenIsAsExpected() {

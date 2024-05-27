@@ -293,18 +293,14 @@ public fun interface Executable {
             @JvmStatic
             @Throws(IllegalArgumentException::class)
             public fun of(concurrent: Boolean, executable: Executable): Once {
-                require(executable !is Once) {
-                    "executable cannot already be an instance of Execute.Once"
-                }
-                require(executable !is NOOP) {
-                    "executable cannot already be an instance of Execute.NOOP"
-                }
+                require(executable !is Once) { "executable cannot be an instance of Executable.Once" }
+                require(executable !is NOOP) { "executable cannot be an instance of Executable.NOOP" }
 
                 return Once(executable, concurrent = concurrent)
             }
         }
 
-        public override fun toString(): String = "Execute.Once@${hashCode()}"
+        public override fun toString(): String = "Executable.Once@${hashCode()}"
     }
 
     private data object NOOP: Executable {

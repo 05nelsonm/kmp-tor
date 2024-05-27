@@ -49,6 +49,7 @@ class TorListenersManagerUnitTest {
         override fun notify(state: TorState) {
             notifyState.add(state)
         }
+        override fun notifyReady() {}
     }
 
     private fun runListenerTest(
