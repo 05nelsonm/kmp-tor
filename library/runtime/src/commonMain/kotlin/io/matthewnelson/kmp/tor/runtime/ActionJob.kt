@@ -42,7 +42,7 @@ public abstract class ActionJob private constructor(
         onFailure: OnFailure,
         handler: UncaughtException.Handler,
         private val immediateExecute: Boolean = false,
-    ): Sealed(Action.StartDaemon, onSuccess, onFailure, handler) {
+    ): Started(Action.StartDaemon, onSuccess, onFailure, handler) {
 
         @JvmSynthetic
         @Throws(IllegalStateException::class)
@@ -71,7 +71,14 @@ public abstract class ActionJob private constructor(
         onSuccess: OnSuccess<Unit>,
         onFailure: OnFailure,
         handler: UncaughtException.Handler,
-    ): Sealed(Action.RestartDaemon, onSuccess, onFailure, handler)
+    ): Started(Action.RestartDaemon, onSuccess, onFailure, handler)
+
+    internal sealed class Started(
+        action: Action,
+        onSuccess: OnSuccess<Unit>,
+        onFailure: OnFailure,
+        handler: UncaughtException.Handler,
+    ): Sealed(action, onSuccess, onFailure, handler)
 
     internal sealed class Sealed(
         action: Action,
