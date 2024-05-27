@@ -691,28 +691,29 @@ internal class RealTorRuntime private constructor(
 
         public override fun equals(other: Any?): Boolean = other is ActionProcessor && other.hashCode() == hashCode()
         public override fun hashCode(): Int = this@RealTorRuntime.hashCode()
-        public override fun toString(): String = this.toFIDString(includeHashCode = isService)
+        private val _toString by lazy { this.toFIDString(includeHashCode = isService) }
+        public override fun toString(): String = _toString
     }
 
     private inner class Notifier(
         private val manager: TorListeners.Manager
     ): RuntimeEvent.Notifier {
 
-        private val processObserver = ProcessLogObserver()
-        val interceptorNewNym get() = processObserver.interceptorNewNym
+        private val processStdout = ProcessStdoutObserver()
+        val interceptorNewNym get() = processStdout.interceptorNewNym
 
         public override fun <Data : Any, E : RuntimeEvent<Data>> notify(event: E, data: Data) {
-            if (event is LOG.PROCESS && data is String) {
-                processObserver.notify(data)
+            if (event is PROCESS.STDOUT && data is String) {
+                processStdout.notify(data)
             } else {
                 event.notifyObservers(data)
             }
         }
 
-        private inner class ProcessLogObserver: ObserverLogProcess(manager) {
+        private inner class ProcessStdoutObserver: ObserverProcessStdout(manager) {
             public override fun notify(line: String) {
                 super.notify(line)
-                LOG.PROCESS.notifyObservers(line)
+                PROCESS.STDOUT.notifyObservers(line)
             }
         }
     }
@@ -1026,6 +1027,7 @@ internal class RealTorRuntime private constructor(
                         is LIFECYCLE -> event.observer(tag) { event.notifyObservers(it) }
                         is LISTENERS -> event.observer(tag) { event.notifyObservers(it) }
                         is LOG -> event.observer(tag) { event.notifyObservers(it) }
+                        is PROCESS -> event.observer(tag) { event.notifyObservers(it) }
                         is STATE -> event.observer(tag) { event.notifyObservers(it) }
                     }
                 }.toImmutableSet()

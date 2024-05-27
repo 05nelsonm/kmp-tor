@@ -253,7 +253,8 @@ class ServiceFactoryUnitTest {
 //            observerStatic(RuntimeEvent.LOG.DEBUG) { println(it) }
 //            observerStatic(RuntimeEvent.LOG.INFO) { println(it) }
 //            observerStatic(RuntimeEvent.LOG.WARN) { println(it) }
-//            observerStatic(RuntimeEvent.LOG.PROCESS) { println(it) }
+//            observerStatic(RuntimeEvent.PROCESS.STDOUT) { println(it) }
+            observerStatic(RuntimeEvent.PROCESS.STDERR) { println(it) }
 //            observerStatic(RuntimeEvent.STATE) { println(it) }
         }.ensureStoppedOnTestCompletion()
 
@@ -322,7 +323,8 @@ class ServiceFactoryUnitTest {
 //            observerStatic(RuntimeEvent.LOG.DEBUG) { println(it) }
 //            observerStatic(RuntimeEvent.LOG.INFO) { println(it) }
 //            observerStatic(RuntimeEvent.LOG.WARN) { println(it) }
-            observerStatic(RuntimeEvent.LOG.PROCESS) { println(it) }
+//            observerStatic(RuntimeEvent.PROCESS.STDOUT) { println(it) }
+            observerStatic(RuntimeEvent.PROCESS.STDERR) { println(it) }
             observerStatic(RuntimeEvent.STATE) { println(it) }
             config { environment ->
                 apply(environment, failureScenario)
@@ -366,11 +368,9 @@ class ServiceFactoryUnitTest {
         val startAction = factory.enqueue(Action.StartDaemon, {}, {}) as ActionJob.StartJob
         val cmdAction = factory.enqueue(TorCmd.Signal.NewNym, {}, {})
 
-        withContext(Dispatchers.Default) {
-            while (startAction.isActive) {
-                delay(10.milliseconds)
-            }
-        }
+        val latch = Job(currentCoroutineContext().job)
+        startAction.invokeOnCompletion { latch.complete() }
+        latch.join()
 
         assertLCEs()
         assertTrue(startAction.isError)

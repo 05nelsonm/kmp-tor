@@ -29,7 +29,8 @@ import io.matthewnelson.kmp.tor.runtime.FileID.Companion.toFIDString
 import io.matthewnelson.kmp.tor.runtime.RuntimeEvent.Notifier.Companion.d
 import io.matthewnelson.kmp.tor.runtime.RuntimeEvent.Notifier.Companion.i
 import io.matthewnelson.kmp.tor.runtime.RuntimeEvent.Notifier.Companion.lce
-import io.matthewnelson.kmp.tor.runtime.RuntimeEvent.Notifier.Companion.p
+import io.matthewnelson.kmp.tor.runtime.RuntimeEvent.Notifier.Companion.stderr
+import io.matthewnelson.kmp.tor.runtime.RuntimeEvent.Notifier.Companion.stdout
 import io.matthewnelson.kmp.tor.runtime.RuntimeEvent.Notifier.Companion.w
 import io.matthewnelson.kmp.tor.runtime.core.Executable
 import io.matthewnelson.kmp.tor.runtime.core.TorConfig
@@ -134,7 +135,7 @@ internal class TorProcess private constructor(
         val lastStop = stopMark ?: return
 
         val delayTime = 500.milliseconds
-        val delayIncrement = 25.milliseconds
+        val delayIncrement = 50.milliseconds
         val start = TimeSource.Monotonic.markNow()
         var remainder = delayTime - lastStop.elapsedNow()
         var wasNotified = false
@@ -183,7 +184,7 @@ internal class TorProcess private constructor(
 
         process.stdoutFeed(feed).stderrFeed { line ->
             if (line == null) return@stderrFeed
-            NOTIFIER.w(this@TorProcess, line)
+            NOTIFIER.stderr(this@TorProcess, line)
         }
 
         // If scope is cancelled when we go to launch
@@ -318,7 +319,7 @@ internal class TorProcess private constructor(
             if (exists()) {
 
                 val content = readBytes()
-                if (content.size > 1) {
+                if (content.size > 5) {
                     return content
                 }
             }
@@ -328,7 +329,7 @@ internal class TorProcess private constructor(
                 NOTIFIER.d(this@TorProcess, "Waiting for tor to write to $name")
             }
 
-            timedDelay(25.milliseconds)
+            timedDelay(50.milliseconds)
             feed.checkError()
             checkInterrupt()
 
@@ -374,7 +375,7 @@ internal class TorProcess private constructor(
             }
 
             if (line == null) return
-            NOTIFIER.p(this@TorProcess, line)
+            NOTIFIER.stdout(this@TorProcess, line)
         }
 
         @Throws(IOException::class)
