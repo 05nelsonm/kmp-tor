@@ -19,6 +19,7 @@ package io.matthewnelson.kmp.tor.runtime
 
 import io.matthewnelson.encoding.base16.Base16
 import io.matthewnelson.encoding.core.Encoder.Companion.encodeToString
+import io.matthewnelson.immutable.collections.toImmutableMap
 import io.matthewnelson.kmp.file.*
 import io.matthewnelson.kmp.tor.core.api.ResourceInstaller
 import io.matthewnelson.kmp.tor.core.api.ResourceInstaller.Paths
@@ -295,6 +296,8 @@ public interface TorRuntime:
         public val torrcDefaultsFile: File,
         @JvmField
         public val torResource: ResourceInstaller<Paths.Tor>,
+        @JvmField
+        public val processEnv: Map<String, String>,
 
         private val _defaultExecutor: OnEvent.Executor,
         @OptIn(ExperimentalKmpTorApi::class)
@@ -446,6 +449,15 @@ public interface TorRuntime:
             public var torrcDefaultsFile: File = workDirectory.resolve("torrc-defaults")
 
             /**
+             * Customization of environment variables for the tor process.
+             *
+             * **NOTE:** The `HOME` environment variable is **always** set to [workDirectory].
+             * */
+            @JvmField
+            @ExperimentalKmpTorApi
+            public val processEnv: LinkedHashMap<String, String> = LinkedHashMap(1, 1.0F)
+
+            /**
              * Experimental support for running tor as a service. Currently
              * only Android support is available via the `runtime-service`
              * dependency. This setting is automatically configured if using
@@ -471,14 +483,17 @@ public interface TorRuntime:
                     if (block != null) b.apply(block)
                     val torResource = installer(b.installationDirectory.absoluteFile.normalize())
 
+                    @OptIn(ExperimentalKmpTorApi::class)
                     return getOrCreateInstance(key = b.workDirectory, block = {
-                        @OptIn(ExperimentalKmpTorApi::class)
+                        b.processEnv["HOME"] = b.workDirectory.path
+
                         Environment(
                             workDirectory = b.workDirectory,
                             cacheDirectory = b.cacheDirectory,
                             torrcFile = b.torrcFile.absoluteFile.normalize(),
                             torrcDefaultsFile = b.torrcDefaultsFile.absoluteFile.normalize(),
                             torResource = torResource,
+                            processEnv = b.processEnv.toImmutableMap(),
                             _defaultExecutor = b.defaultEventExecutor,
                             _serviceFactoryLoader = b.serviceFactoryLoader,
                         )
