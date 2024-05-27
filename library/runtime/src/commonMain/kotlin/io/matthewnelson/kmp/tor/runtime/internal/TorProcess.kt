@@ -56,6 +56,7 @@ internal class TorProcess private constructor(
     private val NOTIFIER: RuntimeEvent.Notifier,
     private val scope: CoroutineScope,
     private val state: FIDState,
+    private val checkInterrupt: () -> Unit,
 ): FileID by generator.environment {
 
     @Throws(Throwable::class)
@@ -69,6 +70,7 @@ internal class TorProcess private constructor(
         }
 
         val (config, paths) = try {
+            checkInterrupt()
             generator.generate(NOTIFIER)
         } catch (t: Throwable) {
             NOTIFIER.lce(Lifecycle.Event.OnDestroy(this))
@@ -76,6 +78,7 @@ internal class TorProcess private constructor(
         }
 
         val startArgs = try {
+            checkInterrupt()
             config.createStartArgs(generator.environment)
         } catch (t: Throwable) {
             NOTIFIER.lce(Lifecycle.Event.OnDestroy(this))
@@ -94,7 +97,9 @@ internal class TorProcess private constructor(
 
         val result = try {
             val connection = config.awaitCtrlConnection(feed)
+            checkInterrupt()
             val authenticate = config.awaitAuthentication(feed)
+            checkInterrupt()
             val configLoad = TorCmd.Config.Load(startArgs.loadText)
 
             val arguments = CtrlArguments(
@@ -104,6 +109,7 @@ internal class TorProcess private constructor(
                 connection,
             )
 
+            checkInterrupt()
             connect(arguments)
         } catch (t: Throwable) {
             manager.update(TorState.Daemon.Stopping)
@@ -119,6 +125,7 @@ internal class TorProcess private constructor(
     private suspend fun FIDState.cancelAndJoinOtherProcess() {
         processJob?.cancelAndJoin()
         yield()
+        checkInterrupt()
 
         manager.update(TorState.Daemon.Starting, TorState.Network.Disabled)
 
@@ -126,17 +133,21 @@ internal class TorProcess private constructor(
         // process' stop, and this process' start for TorProcess
         val lastStop = stopMark ?: return
 
+        val delayTime = 500.milliseconds
+        val delayIncrement = 25.milliseconds
+        var remainder = delayTime - lastStop.elapsedNow()
         var wasNotified = false
-        while (true) {
-            val duration = 500.milliseconds - lastStop.elapsedNow()
-            if (duration < 1.milliseconds) break
+
+        while (remainder > 0.milliseconds) {
 
             if (!wasNotified) {
                 wasNotified = true
-                NOTIFIER.i(this@TorProcess, "Waiting ${duration.inWholeMilliseconds}ms for previous process to clean up.")
+                NOTIFIER.i(this@TorProcess, "Waiting ${remainder.inWholeMilliseconds}ms for previous process to clean up.")
             }
 
-            delay(duration)
+            delay(if (remainder < delayIncrement) remainder else delayIncrement)
+            checkInterrupt()
+            remainder = delayTime - lastStop.elapsedNow()
         }
 
         if (wasNotified) {
@@ -147,6 +158,8 @@ internal class TorProcess private constructor(
     @Throws(Throwable::class)
     private suspend fun StartArgs.spawnProcess(paths: ResourceInstaller.Paths.Tor): Pair<StdoutFeed, Job> {
         val process = try {
+            checkInterrupt()
+
             Process.Builder(command = paths.tor.path)
                 .args(cmdLine)
                 // TODO: Add to TorRuntime.Environment ability to pass
@@ -178,13 +191,12 @@ internal class TorProcess private constructor(
         // execution callback allows to ensure it is
         // executed either within the non-cancelled job,
         // or via invokeOnCompletion handler.
-        val finally = Executable.Once.of(concurrent = true, executable = {
+        val completion = Executable.Once.of(concurrent = true, executable = {
             state.stopMark = TimeSource.Monotonic.markNow()
             process.destroy()
 
             try {
                 NOTIFIER.lce(Lifecycle.Event.OnStop(this@TorProcess))
-                NOTIFIER.lce(Lifecycle.Event.OnDestroy(this@TorProcess))
             } finally {
                 manager.update(TorState.Daemon.Off)
             }
@@ -208,7 +220,7 @@ internal class TorProcess private constructor(
                     .stderrWaiter()
                     .awaitStopAsync()
             } finally {
-                finally.execute()
+                completion.execute()
             }
         }
 
@@ -216,13 +228,16 @@ internal class TorProcess private constructor(
             try {
                 process.waitForAsync()
             } finally {
-                finally.execute()
+                completion.execute()
             }
         }
 
         state.processJob = processJob
 
-        processJob.invokeOnCompletion { finally.execute() }
+        processJob.invokeOnCompletion {
+            completion.execute()
+            NOTIFIER.lce(Lifecycle.Event.OnDestroy(this@TorProcess))
+        }
 
         return feed to processJob
     }
@@ -293,6 +308,7 @@ internal class TorProcess private constructor(
     ): ByteArray {
         require(timeout >= 500.milliseconds) { "timeout must be greater than or equal to 500ms" }
         feed.checkError()
+        checkInterrupt()
 
         val startMark = TimeSource.Monotonic.markNow()
 
@@ -313,6 +329,7 @@ internal class TorProcess private constructor(
 
             timedDelay(25.milliseconds)
             feed.checkError()
+            checkInterrupt()
 
             if (startMark.elapsedNow() > timeout) break
         }
@@ -333,38 +350,54 @@ internal class TorProcess private constructor(
     private inner class StdoutFeed: OutputFeed {
 
         @Volatile
-        private var lines = 0
+        private var _lines = 0
         @Volatile
-        private var sb = StringBuilder()
+        private var _sb = StringBuilder()
+        @Volatile
+        private var _error: IOException? = null
+        @Volatile
+        private var _hasOutput = false
 
-        @Volatile
-        private var error: IOException? = null
+        private val maxTimeNoOutput = 1_500.milliseconds
+        private val startMark = TimeSource.Monotonic.markNow()
 
         override fun onOutput(line: String?) {
-            if (line == null) return
-
-            if (error == null && lines < 30) {
-                lines++
-                if (sb.isNotEmpty()) {
-                    sb.appendLine()
+            if (_error == null && _lines < 30) {
+                _hasOutput = true
+                _lines++
+                if (_sb.isNotEmpty()) {
+                    _sb.appendLine()
                 }
-                sb.append(line)
+                _sb.append(line ?: "Process Exited Unexpectedly...")
                 line.parseForError()
             }
 
+            if (line == null) return
             NOTIFIER.p(this@TorProcess, line)
         }
 
         @Throws(IOException::class)
-        fun checkError() { error?.let { err -> throw err } }
+        fun checkError() {
+            _error?.let { err -> throw err }
+
+            if (_hasOutput) return
+
+            val runtime = startMark.elapsedNow()
+            if (runtime < maxTimeNoOutput) return
+            throw IOException(
+                "Process failure."
+                + " ${this@TorProcess} has been running for ${runtime.inWholeMilliseconds}ms"
+                + " without any stdout output"
+            )
+        }
 
         fun done() {
             // Will inhibit from adding any more lines
-            lines = 50
+            _lines = 50
 
             // clear and de-reference
-            val sb = sb
-            this.sb = StringBuilder(/* capacity =*/ 1)
+            val sb = _sb
+            this._sb = StringBuilder(/* capacity =*/ 1)
 
             try {
                 val count = sb.count()
@@ -373,16 +406,17 @@ internal class TorProcess private constructor(
             } catch (_: Throwable) {}
         }
 
-        private fun String.parseForError() {
-            if (!contains(PROCESS_ERR) && !contains(PROCESS_OTHER)) return
+        private fun String?.parseForError() {
+            if (this != null && !contains(PROCESS_ERR) && !contains(PROCESS_OTHER)) return
+            // If line is null, process has stopped
 
-            val message = sb.toString()
+            val message = _sb.toString()
 
-            val count = sb.count()
-            sb.clear()
-            repeat(count) { sb.append(' ') }
+            val count = _sb.count()
+            _sb.clear()
+            repeat(count) { _sb.append(' ') }
 
-            error = IOException("Process failure\n$message")
+            _error = IOException("Process Failure\n$message")
         }
     }
 
@@ -503,6 +537,7 @@ internal class TorProcess private constructor(
             manager: TorState.Manager,
             NOTIFIER: RuntimeEvent.Notifier,
             scope: CoroutineScope,
+            checkInterrupt: () -> Unit,
             connect: suspend CtrlArguments.() -> T,
         ): T {
             val state = getOrCreateInstance(generator.environment.fid) { FIDState() }
@@ -513,6 +548,7 @@ internal class TorProcess private constructor(
                 NOTIFIER,
                 scope,
                 state as FIDState,
+                checkInterrupt,
             )
 
             return process.start(connect)

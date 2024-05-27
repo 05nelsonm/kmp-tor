@@ -15,6 +15,7 @@
  **/
 package io.matthewnelson.kmp.tor.runtime
 
+import io.matthewnelson.kmp.file.InterruptedException
 import io.matthewnelson.kmp.tor.runtime.core.*
 import io.matthewnelson.kmp.tor.runtime.ctrl.TempTorCmdQueue
 import kotlin.concurrent.Volatile
@@ -78,7 +79,27 @@ public abstract class ActionJob private constructor(
         onSuccess: OnSuccess<Unit>,
         onFailure: OnFailure,
         handler: UncaughtException.Handler,
-    ): Sealed(action, onSuccess, onFailure, handler)
+    ): Sealed(action, onSuccess, onFailure, handler) {
+
+        @Volatile
+        private var _interrupt: InterruptedException? = null
+
+        @JvmSynthetic
+        internal fun interruptBy(enqueuedJob: StopJob) {
+            if (_interrupt != null) return
+            if (isCompleting || state != State.Executing) return
+            if (enqueuedJob.state != State.Enqueued) return
+            _interrupt = InterruptedException("$this was interrupted by $enqueuedJob")
+        }
+
+        @JvmSynthetic
+        @Throws(InterruptedException::class)
+        internal fun checkInterrupt() { _interrupt?.let { t -> throw t } }
+
+        init {
+            invokeOnCompletion { _interrupt = null }
+        }
+    }
 
     internal sealed class Sealed(
         action: Action,

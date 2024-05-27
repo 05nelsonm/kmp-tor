@@ -190,7 +190,7 @@ internal class RealTorRuntime private constructor(
             job
         }
 
-        if (job != null) actionProcessor.start()
+        if (job != null) actionProcessor.start(job)
 
         return job ?: onFailure.toImmediateErrorJob(
             action.name,
@@ -283,11 +283,21 @@ internal class RealTorRuntime private constructor(
 
         @Volatile
         private var _processorJob: Job? = null
+        @Volatile
+        private var _executingJob: ActionJob.Sealed? = null
         private val processorLock = SynchronizedObject()
 
-        internal fun start() {
+        internal fun start(enqueuedJob: ActionJob.Sealed?) {
             synchronized(processorLock) {
                 if (destroyed) return@synchronized
+
+                run {
+                    if (enqueuedJob !is ActionJob.StopJob) return@run
+                    val executingJob = _executingJob ?: return@run
+                    if (executingJob !is ActionJob.Started) return@run
+                    executingJob.interruptBy(enqueuedJob)
+                }
+
                 if (_processorJob?.isActive == true) return@synchronized
 
                 _processorJob = scope.launch { loop() }
@@ -308,6 +318,7 @@ internal class RealTorRuntime private constructor(
 
                     val job = result.second
                     if (job == null) _processorJob = null
+                    _executingJob = job
 
                     result
                 }
@@ -518,9 +529,9 @@ internal class RealTorRuntime private constructor(
             }
         }
 
-        private suspend fun ActionJob.Sealed.doStart() {
-            require(this !is ActionJob.StopJob) { "doStart cannot be called for $this" }
+        private suspend fun ActionJob.Started.doStart() {
             ensureActive()
+            checkInterrupt()
 
             val cmdQueue = _cmdQueue
 
@@ -537,7 +548,7 @@ internal class RealTorRuntime private constructor(
                 return
             }
 
-            TorProcess.start(generator, manager, NOTIFIER, scope, connect = {
+            TorProcess.start(generator, manager, NOTIFIER, scope, ::checkInterrupt, connect = {
                 val ctrl = connection.openWith(factory)
 
                 val lceCtrl = RealTorCtrl(ctrl)
@@ -559,13 +570,18 @@ internal class RealTorRuntime private constructor(
                     NOTIFIER.lce(Lifecycle.Event.OnDestroy(lceCtrl))
                 }
 
-                val processHandle = processJob.invokeOnCompletion { ctrl.destroy() }
+                val processJobCompletionHandle = processJob.invokeOnCompletion { ctrl.destroy() }
 
+                checkInterrupt()
                 ctrl.executeAsync(authenticate)
+                checkInterrupt()
                 ctrl.executeAsync(TorCmd.Ownership.Take)
+                checkInterrupt()
                 ctrl.executeAsync(configLoad)
+                checkInterrupt()
                 ctrl.executeAsync(TorCmd.SetEvents(requiredTorEvents))
 
+                checkInterrupt()
                 observer.subscribe()
 
                 ctrl.executeAsync(TorCmd.Config.Reset(keywords = buildSet {
@@ -578,9 +594,9 @@ internal class RealTorRuntime private constructor(
                     add(TorConfig.__OwningControllerProcess)
                 }))
 
+                checkInterrupt()
                 cmdQueue.attach(ctrl)
-
-                processHandle.dispose()
+                processJobCompletionHandle.dispose()
             })
         }
 
@@ -1111,7 +1127,7 @@ internal class RealTorRuntime private constructor(
                 } else {
                     // Stack was transferred
                     executables.add(Executable {
-                        runtime.actionProcessor.start()
+                        runtime.actionProcessor.start(null)
                     })
                 }
 
