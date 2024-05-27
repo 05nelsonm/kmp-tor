@@ -370,11 +370,12 @@ public final class io/matthewnelson/kmp/tor/runtime/TorRuntime$Environment : io/
 	public static final field Companion Lio/matthewnelson/kmp/tor/runtime/TorRuntime$Environment$Companion;
 	public final field cacheDirectory Ljava/io/File;
 	public field debug Z
+	public final field processEnv Ljava/util/Map;
 	public final field torResource Lio/matthewnelson/kmp/tor/core/api/ResourceInstaller;
 	public final field torrcDefaultsFile Ljava/io/File;
 	public final field torrcFile Ljava/io/File;
 	public final field workDirectory Ljava/io/File;
-	public synthetic fun <init> (Ljava/io/File;Ljava/io/File;Ljava/io/File;Ljava/io/File;Lio/matthewnelson/kmp/tor/core/api/ResourceInstaller;Lio/matthewnelson/kmp/tor/runtime/core/OnEvent$Executor;Lio/matthewnelson/kmp/tor/runtime/TorRuntime$ServiceFactory$Loader;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public synthetic fun <init> (Ljava/io/File;Ljava/io/File;Ljava/io/File;Ljava/io/File;Lio/matthewnelson/kmp/tor/core/api/ResourceInstaller;Ljava/util/Map;Lio/matthewnelson/kmp/tor/runtime/core/OnEvent$Executor;Lio/matthewnelson/kmp/tor/runtime/TorRuntime$ServiceFactory$Loader;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
 	public static final fun Builder (Ljava/io/File;Ljava/io/File;Lkotlin/jvm/functions/Function1;)Lio/matthewnelson/kmp/tor/runtime/TorRuntime$Environment;
 	public static final fun Builder (Ljava/io/File;Ljava/io/File;Lkotlin/jvm/functions/Function1;Lio/matthewnelson/kmp/tor/runtime/core/ThisBlock;)Lio/matthewnelson/kmp/tor/runtime/TorRuntime$Environment;
 	public fun equals (Ljava/lang/Object;)Z
@@ -387,6 +388,7 @@ public final class io/matthewnelson/kmp/tor/runtime/TorRuntime$Environment$Build
 	public final field cacheDirectory Ljava/io/File;
 	public field defaultEventExecutor Lio/matthewnelson/kmp/tor/runtime/core/OnEvent$Executor;
 	public field installationDirectory Ljava/io/File;
+	public final field processEnv Ljava/util/LinkedHashMap;
 	public field serviceFactoryLoader Lio/matthewnelson/kmp/tor/runtime/TorRuntime$ServiceFactory$Loader;
 	public field torrcDefaultsFile Ljava/io/File;
 	public field torrcFile Ljava/io/File;

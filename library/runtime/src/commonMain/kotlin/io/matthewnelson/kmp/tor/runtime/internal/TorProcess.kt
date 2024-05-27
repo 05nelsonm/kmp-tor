@@ -46,6 +46,7 @@ import kotlinx.coroutines.sync.withLock
 import kotlin.concurrent.Volatile
 import kotlin.coroutines.cancellation.CancellationException
 import kotlin.jvm.JvmSynthetic
+import kotlin.time.ComparableTimeMark
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
@@ -59,6 +60,8 @@ internal class TorProcess private constructor(
     private val state: FIDState,
     private val checkInterrupt: () -> Unit,
 ): FileID by generator.environment {
+
+    private val _toString by lazy { toFIDString(includeHashCode = true) }
 
     @Throws(Throwable::class)
     private suspend fun <T: Any?> start(connect: suspend CtrlArguments.() -> T): T = state.lock.withLock {
@@ -164,23 +167,21 @@ internal class TorProcess private constructor(
 
             Process.Builder(command = paths.tor.path)
                 .args(cmdLine)
-                // TODO: Add to TorRuntime.Environment ability to pass
-                //  process environment arguments.
-                .environment("HOME", generator.environment.workDirectory.path)
+                .environment { putAll(generator.environment.processEnv) }
                 .stdin(Stdio.Null)
                 .stdout(Stdio.Pipe)
                 .stderr(Stdio.Pipe)
                 .destroySignal(Signal.SIGTERM)
                 .spawn()
-        } catch (e: IOException) {
+        } catch (t: Throwable) {
             NOTIFIER.lce(Lifecycle.Event.OnDestroy(this@TorProcess))
-            throw e
+            throw t
         }
 
         NOTIFIER.lce(Lifecycle.Event.OnStart(this@TorProcess))
         NOTIFIER.i(this@TorProcess, process.toString())
 
-        val feed = StdoutFeed()
+        val feed = StdoutFeed(process.startTime)
 
         process.stdoutFeed(feed).stderrFeed { line ->
             if (line == null) return@stderrFeed
@@ -341,7 +342,7 @@ internal class TorProcess private constructor(
         throw IOException("Timed out after ${timeout.inWholeMilliseconds}ms waiting for tor to write to file[$this]")
     }
 
-    public override fun toString(): String = toFIDString(includeHashCode = true)
+    public override fun toString(): String = _toString
 
     // Helper for catching tor startup errors while waiting
     // for other startup steps to be completed. Tor will fail
@@ -351,7 +352,7 @@ internal class TorProcess private constructor(
     // This will parse those lines and generate an IOException
     // which can be thrown while polling files that tor writes
     // data to (control port & cookie authentication).
-    private inner class StdoutFeed: OutputFeed {
+    private inner class StdoutFeed(private val startTime: ComparableTimeMark): OutputFeed {
 
         @Volatile
         private var _lines = 0
@@ -361,14 +362,17 @@ internal class TorProcess private constructor(
         private var _error: IOException? = null
 
         private val maxTimeNoOutput = 1_500.milliseconds
-        private val startMark = TimeSource.Monotonic.markNow()
 
         val lines: Int get() = _lines
 
         override fun onOutput(line: String?) {
             if (_error == null && _lines < 30) {
                 _lines++
-                if (_sb.isNotEmpty()) {
+                if (_sb.isEmpty()) {
+                    // First line of output
+                    val time = startTime.elapsedNow().inWholeMilliseconds
+                    NOTIFIER.i(this@TorProcess, "took ${time}ms before dispatching its first stdout line")
+                } else {
                     _sb.appendLine()
                 }
                 _sb.append(line ?: "Process Exited Unexpectedly...")
@@ -385,7 +389,7 @@ internal class TorProcess private constructor(
 
             if (_lines > 0) return
 
-            val runtime = startMark.elapsedNow()
+            val runtime = startTime.elapsedNow()
             if (runtime < maxTimeNoOutput) return
             throw IOException(
                 "Process failure."

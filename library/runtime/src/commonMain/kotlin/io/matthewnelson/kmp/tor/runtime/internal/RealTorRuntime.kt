@@ -329,7 +329,15 @@ internal class RealTorRuntime private constructor(
 
                 if (job is ActionJob.Started) {
                     job.invokeOnCompletion {
-                        previousStartedActionFailed = job.isError
+                        val cause = job.onErrorCause ?: return@invokeOnCompletion
+
+                        previousStartedActionFailed = true
+
+                        if (cause !is InterruptedException) return@invokeOnCompletion
+                        val message = cause.message ?: return@invokeOnCompletion
+                        if (!message.contains(" was interrupted by StopJob")) return@invokeOnCompletion
+
+                        NOTIFIER.d(this, message)
                     }
                 }
 
