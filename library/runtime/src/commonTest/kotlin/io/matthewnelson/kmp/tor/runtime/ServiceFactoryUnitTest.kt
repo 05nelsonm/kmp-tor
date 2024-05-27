@@ -168,14 +168,15 @@ class ServiceFactoryUnitTest {
 
         val actionJob = factory.enqueue(Action.StartDaemon, {}, {}) as ActionJob.StartJob
         assertEquals(EnqueuedJob.State.Executing, actionJob.state)
+        lces.assertDoesNotContain("RealTorRuntime", Lifecycle.Event.Name.OnCreate)
 
         val cmdJob = factory.enqueue(TorCmd.Signal.Dump, { assertIs<CancellationException>(it) }, {})
-        factory.enqueue(Action.StopDaemon, {}, {})
-
-        lces.assertDoesNotContain("RealTorRuntime", Lifecycle.Event.Name.OnCreate)
+        val stopJob = factory.enqueue(Action.StopDaemon, {}, {})
         cmdJob.cancel(null)
 
-        withContext(Dispatchers.Default) { delay(bindDelay + 250.milliseconds) }
+        val latch = Job(currentCoroutineContext().job)
+        stopJob.invokeOnCompletion { latch.complete() }
+        latch.join()
 
         assertIs<InterruptedException>(actionJob.onErrorCause)
 

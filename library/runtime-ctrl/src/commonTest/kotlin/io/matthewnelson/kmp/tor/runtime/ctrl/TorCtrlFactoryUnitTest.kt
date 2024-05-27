@@ -118,12 +118,16 @@ class TorCtrlFactoryUnitTest {
             factory.connectAsync(address)
         }
 
+        val latch = Job(currentCoroutineContext().job)
         var invocationDestroy = 0
-        ctrl.invokeOnDestroy { invocationDestroy++ }
+        ctrl.invokeOnDestroy {
+            invocationDestroy++
+            latch.complete()
+        }
 
         block(process, ctrl)
 
-        withContext(Dispatchers.Default) { delay(350.milliseconds) }
+        latch.join()
 
         assertEquals(1, invocationDestroy)
 

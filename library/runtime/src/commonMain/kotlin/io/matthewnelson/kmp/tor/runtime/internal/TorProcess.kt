@@ -135,6 +135,7 @@ internal class TorProcess private constructor(
 
         val delayTime = 500.milliseconds
         val delayIncrement = 25.milliseconds
+        val start = TimeSource.Monotonic.markNow()
         var remainder = delayTime - lastStop.elapsedNow()
         var wasNotified = false
 
@@ -151,7 +152,7 @@ internal class TorProcess private constructor(
         }
 
         if (wasNotified) {
-            NOTIFIER.i(this@TorProcess, "Resuming start")
+            NOTIFIER.i(this@TorProcess, "Resuming startup after waiting ~${start.elapsedNow().inWholeMilliseconds}ms")
         }
     }
 
