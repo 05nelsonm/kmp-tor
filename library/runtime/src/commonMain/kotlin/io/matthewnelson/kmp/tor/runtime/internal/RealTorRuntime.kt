@@ -297,11 +297,14 @@ internal class RealTorRuntime private constructor(
         private suspend fun loop() {
             NOTIFIER.d(this@ActionProcessor, "Processing Jobs")
 
+            var previousStartedActionFailed = false
+
             while (true) {
                 yield()
 
                 val (executables, job) = synchronized(processorLock) {
-                    val result = processStack()
+                    val result = processStack(previousStartedActionFailed)
+                    previousStartedActionFailed = false
 
                     val job = result.second
                     if (job == null) _processorJob = null
@@ -312,6 +315,12 @@ internal class RealTorRuntime private constructor(
                 executables.forEach { it.execute() }
 
                 if (job == null) break
+
+                if (job is ActionJob.Started) {
+                    job.invokeOnCompletion {
+                        previousStartedActionFailed = job.isError
+                    }
+                }
 
                 EXECUTE.ACTION.notifyObservers(job)
 
@@ -342,7 +351,7 @@ internal class RealTorRuntime private constructor(
             }
         }
 
-        private fun processStack(): Pair<List<Executable.Once>, ActionJob.Sealed?> {
+        private fun processStack(previousStartedActionFailed: Boolean): Pair<List<Executable.Once>, ActionJob.Sealed?> {
             if (destroyed) return emptyList<Executable.Once>() to null
 
             return synchronized(enqueueLock) {
@@ -382,6 +391,14 @@ internal class RealTorRuntime private constructor(
                     }.let { executables.add(it) }
                 }
 
+                // No executable actions were on the stack, and the prior
+                // action (StartJob or RestartJob) had failed. Execute
+                // StopJob before letting the ActionProcessor stop looping.
+                if (execute == null && previousStartedActionFailed) {
+                    execute = ActionJob.StopJob({}, {}, handler)
+                        .also { it.executing() }
+                }
+
                 var isOldQueueAttached = false
 
                 if (execute is ActionJob.StopJob) {
@@ -397,30 +414,6 @@ internal class RealTorRuntime private constructor(
                     // If null or destroyed, ensure there is fresh queue.
                     if (_cmdQueue?.isDestroyed() != false) {
                         _cmdQueue = factory.tempQueue()
-                    }
-
-                    // If startup fails, ensure state is correct
-                    execute.invokeOnCompletion {
-                        if (execute.isSuccess) return@invokeOnCompletion
-                        if (destroyed) return@invokeOnCompletion
-
-                        synchronized(enqueueLock) {
-                            if (!destroyed && actionStack.isEmpty()) {
-                                // loop again
-                                val stop = ActionJob.StopJob(
-                                    onSuccess = {},
-                                    onFailure = {},
-                                    handler = handler,
-                                )
-                                actionStack.push(stop)
-
-                                Executable {
-                                    NOTIFIER.w(this, "Startup failed. No other actions found. Enqueued $stop")
-                                }
-                            } else {
-                                null
-                            }
-                        }?.execute()
                     }
                 }
 
