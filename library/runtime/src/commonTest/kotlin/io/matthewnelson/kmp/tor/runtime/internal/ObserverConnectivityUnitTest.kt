@@ -17,9 +17,7 @@ package io.matthewnelson.kmp.tor.runtime.internal
 
 import io.matthewnelson.kmp.file.InterruptedException
 import io.matthewnelson.kmp.tor.runtime.*
-import io.matthewnelson.kmp.tor.runtime.Action.Companion.restartDaemonAsync
 import io.matthewnelson.kmp.tor.runtime.Action.Companion.startDaemonAsync
-import io.matthewnelson.kmp.tor.runtime.Action.Companion.stopDaemonAsync
 import io.matthewnelson.kmp.tor.runtime.core.*
 import io.matthewnelson.kmp.tor.runtime.core.EnqueuedJob.Companion.toImmediateErrorJob
 import io.matthewnelson.kmp.tor.runtime.core.EnqueuedJob.Companion.toImmediateSuccessJob

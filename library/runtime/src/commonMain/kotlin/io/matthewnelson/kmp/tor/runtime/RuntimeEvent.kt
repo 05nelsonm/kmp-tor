@@ -412,7 +412,7 @@ public sealed class RuntimeEvent<Data: Any> private constructor(
         public fun clearObservers()
     }
 
-    public companion object: Entries<RuntimeEvent<*>>(numEvents = 11) {
+    public companion object: Entries<RuntimeEvent<*>>(numEvents = 12) {
 
         @JvmStatic
         @Throws(IllegalArgumentException::class)
