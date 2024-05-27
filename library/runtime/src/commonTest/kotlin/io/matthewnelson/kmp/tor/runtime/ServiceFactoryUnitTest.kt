@@ -168,14 +168,15 @@ class ServiceFactoryUnitTest {
 
         val actionJob = factory.enqueue(Action.StartDaemon, {}, {}) as ActionJob.StartJob
         assertEquals(EnqueuedJob.State.Executing, actionJob.state)
+        lces.assertDoesNotContain("RealTorRuntime", Lifecycle.Event.Name.OnCreate)
 
         val cmdJob = factory.enqueue(TorCmd.Signal.Dump, { assertIs<CancellationException>(it) }, {})
-        factory.enqueue(Action.StopDaemon, {}, {})
-
-        lces.assertDoesNotContain("RealTorRuntime", Lifecycle.Event.Name.OnCreate)
+        val stopJob = factory.enqueue(Action.StopDaemon, {}, {})
         cmdJob.cancel(null)
 
-        withContext(Dispatchers.Default) { delay(bindDelay + 250.milliseconds) }
+        val latch = Job(currentCoroutineContext().job)
+        stopJob.invokeOnCompletion { latch.complete() }
+        latch.join()
 
         assertIs<InterruptedException>(actionJob.onErrorCause)
 
@@ -252,7 +253,8 @@ class ServiceFactoryUnitTest {
 //            observerStatic(RuntimeEvent.LOG.DEBUG) { println(it) }
 //            observerStatic(RuntimeEvent.LOG.INFO) { println(it) }
 //            observerStatic(RuntimeEvent.LOG.WARN) { println(it) }
-//            observerStatic(RuntimeEvent.LOG.PROCESS) { println(it) }
+//            observerStatic(RuntimeEvent.PROCESS.STDOUT) { println(it) }
+            observerStatic(RuntimeEvent.PROCESS.STDERR) { println(it) }
 //            observerStatic(RuntimeEvent.STATE) { println(it) }
         }.ensureStoppedOnTestCompletion()
 
@@ -321,7 +323,8 @@ class ServiceFactoryUnitTest {
 //            observerStatic(RuntimeEvent.LOG.DEBUG) { println(it) }
 //            observerStatic(RuntimeEvent.LOG.INFO) { println(it) }
 //            observerStatic(RuntimeEvent.LOG.WARN) { println(it) }
-            observerStatic(RuntimeEvent.LOG.PROCESS) { println(it) }
+//            observerStatic(RuntimeEvent.PROCESS.STDOUT) { println(it) }
+            observerStatic(RuntimeEvent.PROCESS.STDERR) { println(it) }
             observerStatic(RuntimeEvent.STATE) { println(it) }
             config { environment ->
                 apply(environment, failureScenario)
@@ -365,11 +368,9 @@ class ServiceFactoryUnitTest {
         val startAction = factory.enqueue(Action.StartDaemon, {}, {}) as ActionJob.StartJob
         val cmdAction = factory.enqueue(TorCmd.Signal.NewNym, {}, {})
 
-        withContext(Dispatchers.Default) {
-            while (startAction.isActive) {
-                delay(10.milliseconds)
-            }
-        }
+        val latch = Job(currentCoroutineContext().job)
+        startAction.invokeOnCompletion { latch.complete() }
+        latch.join()
 
         assertLCEs()
         assertTrue(startAction.isError)

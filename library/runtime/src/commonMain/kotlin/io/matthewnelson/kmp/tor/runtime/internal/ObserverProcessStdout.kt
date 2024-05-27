@@ -21,7 +21,7 @@ import io.matthewnelson.kmp.tor.runtime.core.EnqueuedJob
 import io.matthewnelson.kmp.tor.runtime.core.ctrl.TorCmd
 import io.matthewnelson.kmp.tor.runtime.ctrl.TorCmdInterceptor
 
-internal open class ObserverLogProcess internal constructor(
+internal open class ObserverProcessStdout internal constructor(
     private val manager: TorListeners.Manager,
 ) {
 

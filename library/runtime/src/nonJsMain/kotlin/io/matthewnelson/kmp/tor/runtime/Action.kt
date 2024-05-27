@@ -48,6 +48,9 @@ public actual enum class Action: EnqueuedJob.Argument {
      *  5. **Bootstrap**: Tor bootstraps itself with the network.
      *
      * This action completes after phase 4.
+     *
+     * Execution of [Action.StartDaemon] can be interrupted by
+     * enqueueing [Action.StopDaemon].
      * */
     StartDaemon,
 
@@ -66,6 +69,9 @@ public actual enum class Action: EnqueuedJob.Argument {
      * interrupted.
      *
      * If tor is not running, it will be started via [StartDaemon].
+     *
+     * Execution of [Action.RestartDaemon] can be interrupted by
+     * enqueueing [Action.StopDaemon].
      * */
     RestartDaemon;
 

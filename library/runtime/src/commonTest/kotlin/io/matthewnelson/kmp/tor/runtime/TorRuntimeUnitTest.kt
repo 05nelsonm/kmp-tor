@@ -16,10 +16,12 @@
 package io.matthewnelson.kmp.tor.runtime
 
 import io.matthewnelson.kmp.file.IOException
+import io.matthewnelson.kmp.file.InterruptedException
 import io.matthewnelson.kmp.file.writeUtf8
 import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
 import io.matthewnelson.kmp.tor.core.resource.SynchronizedObject
 import io.matthewnelson.kmp.tor.core.resource.synchronized
+import io.matthewnelson.kmp.tor.runtime.Action.Companion.startDaemonAsync
 import io.matthewnelson.kmp.tor.runtime.core.EnqueuedJob
 import io.matthewnelson.kmp.tor.runtime.test.TestUtils.testEnv
 import io.matthewnelson.kmp.tor.runtime.core.ctrl.TorCmd
@@ -28,6 +30,7 @@ import io.matthewnelson.kmp.tor.runtime.test.TestUtils.ensureStoppedOnTestComple
 import kotlinx.coroutines.*
 import kotlinx.coroutines.test.runTest
 import kotlin.coroutines.cancellation.CancellationException
+import kotlin.reflect.KClass
 import kotlin.test.*
 import kotlin.time.Duration.Companion.milliseconds
 
@@ -49,7 +52,8 @@ class TorRuntimeUnitTest {
 //            observerStatic(RuntimeEvent.LOG.DEBUG) { println(it) }
 //            observerStatic(RuntimeEvent.LOG.INFO) { println(it) }
 //            observerStatic(RuntimeEvent.LOG.WARN) { println(it) }
-//            observerStatic(RuntimeEvent.LOG.PROCESS) { println(it) }
+//            observerStatic(RuntimeEvent.PROCESS.STDOUT) { println(it) }
+            observerStatic(RuntimeEvent.PROCESS.STDERR) { println(it) }
 //            observerStatic(RuntimeEvent.STATE) { println(it) }
 
             config { environment ->
@@ -59,6 +63,12 @@ class TorRuntimeUnitTest {
                 """.trimIndent())
             }
         }.ensureStoppedOnTestCompletion()
+
+        suspend fun EnqueuedJob.await() {
+            val latch = Job(currentCoroutineContext().job)
+            invokeOnCompletion { latch.complete() }
+            latch.join()
+        }
 
         listOf(
             Action.StartDaemon,
@@ -96,12 +106,6 @@ class TorRuntimeUnitTest {
                 onSuccess = { fail("tor should have failed to start...") },
             )
 
-            suspend fun EnqueuedJob.await() {
-                val latch = Job(currentCoroutineContext().job)
-                invokeOnCompletion { latch.complete() }
-                latch.join()
-            }
-
             job.await()
             failureJob!!.await()
 
@@ -123,6 +127,94 @@ class TorRuntimeUnitTest {
             } catch (e: IllegalStateException) {
                 assertEquals("Tor is stopped or stopping", e.message)
             }
+        }
+    }
+
+    @Test
+    fun givenStartup_whenActionStopEnqueued_thenIsInterrupted() = runTest {
+        val runtime = TorRuntime.Builder(testEnv("rt_interrupt")) {
+//            observerStatic(RuntimeEvent.EXECUTE.ACTION) { println(it) }
+//            observerStatic(RuntimeEvent.EXECUTE.CMD) { println(it) }
+//            observerStatic(RuntimeEvent.LIFECYCLE) { println(it) }
+//            observerStatic(RuntimeEvent.LISTENERS) { println(it) }
+//            observerStatic(RuntimeEvent.LOG.DEBUG) { println(it) }
+//            observerStatic(RuntimeEvent.LOG.INFO) { println(it) }
+//            observerStatic(RuntimeEvent.LOG.WARN) { println(it) }
+//            observerStatic(RuntimeEvent.PROCESS.STDOUT) { println(it) }
+            observerStatic(RuntimeEvent.PROCESS.STDERR) { println(it) }
+//            observerStatic(RuntimeEvent.STATE) { println(it) }
+        }
+
+        currentCoroutineContext().job.invokeOnCompletion { runtime.clearObservers() }
+        runtime.ensureStoppedOnTestCompletion()
+
+        var interruptJob: EnqueuedJob? = null
+        suspend fun awaitInterruptJob() {
+            val j = interruptJob ?: return
+            val latch = Job(currentCoroutineContext().job)
+            j.invokeOnCompletion { latch.complete() }
+            latch.join()
+        }
+
+        run {
+            val observerACTION = RuntimeEvent.EXECUTE.ACTION.observer { job ->
+                if (job.isStop) return@observer
+                interruptJob = runtime.enqueue(Action.StopDaemon, {}, {})
+            }
+            runtime.subscribe(observerACTION)
+
+            assertFailsWith<InterruptedException> { runtime.startDaemonAsync() }
+            awaitInterruptJob()
+            assertTrue(runtime.state().isOff)
+
+            runtime.unsubscribe(observerACTION)
+        }
+
+        run {
+            var eventClassName: String? = null
+            var eventName: Lifecycle.Event.Name? = null
+            val observerLCE = RuntimeEvent.LIFECYCLE.observer { event ->
+                if (event.name != eventName) return@observer
+                if (event.className != eventClassName) return@observer
+                interruptJob = runtime.enqueue(Action.StopDaemon, {}, {})
+            }
+            runtime.subscribe(observerLCE)
+
+            listOf(
+                "TorProcess" to Lifecycle.Event.Name.OnStart,
+                "RealTorCtrl" to Lifecycle.Event.Name.OnCreate,
+            ).forEach { (clazz, event) ->
+                eventClassName = clazz
+                eventName = event
+
+                assertFailsWith<InterruptedException> { runtime.startDaemonAsync() }
+                awaitInterruptJob()
+                assertTrue(runtime.state().isOff)
+            }
+            runtime.unsubscribe(observerLCE)
+        }
+
+        run {
+            var cmdClass: KClass<out TorCmd<*>>? = null
+            val observerCMD = RuntimeEvent.EXECUTE.CMD.observer { job ->
+                if (job.cmd != cmdClass) return@observer
+                interruptJob = runtime.enqueue(Action.StopDaemon, {}, {})
+            }
+            runtime.subscribe(observerCMD)
+
+            listOf(
+                TorCmd.Authenticate::class,
+                TorCmd.Ownership.Take::class,
+                TorCmd.Config.Load::class,
+                TorCmd.SetEvents::class,
+                TorCmd.Config.Reset::class,
+            ).forEach { cmd ->
+                cmdClass = cmd
+                assertFailsWith<InterruptedException> { runtime.startDaemonAsync() }
+                awaitInterruptJob()
+                assertTrue(runtime.state().isOff)
+            }
+            runtime.unsubscribe(observerCMD)
         }
     }
 }

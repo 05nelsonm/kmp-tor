@@ -19,16 +19,16 @@ import io.matthewnelson.kmp.tor.runtime.test.TestTorListenersManager
 import io.matthewnelson.kmp.tor.runtime.TorState
 import kotlin.test.*
 
-class ObserverLogProcessUnitTest {
+class ObserverProcessStdoutUnitTest {
 
-    private class TestLogProcessObserver private constructor(
+    private class TestProcessStdoutObserver private constructor(
         val manager: TestTorListenersManager,
-    ): ObserverLogProcess(manager) {
+    ): ObserverProcessStdout(manager) {
         constructor(): this(TestTorListenersManager())
         public override fun notify(line: String) { super.notify(line) }
     }
 
-    private val observer = TestLogProcessObserver()
+    private val observer = TestProcessStdoutObserver()
 
     @Test
     fun givenBootstrapped_whenParsed_thenUpdatesTorStateManager() {

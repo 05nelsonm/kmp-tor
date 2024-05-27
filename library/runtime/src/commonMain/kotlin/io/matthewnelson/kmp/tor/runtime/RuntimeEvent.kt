@@ -17,6 +17,8 @@
 
 package io.matthewnelson.kmp.tor.runtime
 
+import io.matthewnelson.kmp.process.Process
+import io.matthewnelson.kmp.process.Stdio
 import io.matthewnelson.kmp.tor.runtime.core.*
 import io.matthewnelson.kmp.tor.runtime.core.ctrl.TorCmd
 import io.matthewnelson.kmp.tor.runtime.internal.TorProcess
@@ -156,18 +158,6 @@ public sealed class RuntimeEvent<Data: Any> private constructor(
          *     // TorProcess[fid=ABCD…1234]@178263541 log
          * */
         public data object WARN: LOG("LOG_WARN")
-
-        /**
-         * All stdout from the tor process.
-         *
-         * Each invocation of [OnEvent] **will** be a single line,
-         * as that is how the [kmp-process](https://github.com/05nelsonm/kmp-process)
-         * library is designed.
-         *
-         * **NOTE:** All stderr output from the tor process is
-         * redirected to [LOG.WARN].
-         * */
-        public data object PROCESS: LOG("LOG_PROCESS")
     }
 
     // TODO: NEWNYM
@@ -177,6 +167,25 @@ public sealed class RuntimeEvent<Data: Any> private constructor(
     //  setup an TorEvent.NOTICE observer to catch the rate limit
     //  dispatch. If after 50ms (or something) nothing comes, dispatch
     //  success.
+
+    /**
+     * Process output. Each invocation of [OnEvent] for both [STDOUT] and
+     * [STDERR] will **always** be a single line, as that is how the
+     * [kmp-process](https://github.com/05nelsonm/kmp-process) library is
+     * designed.
+     * */
+    public sealed class PROCESS private constructor(name: String): RuntimeEvent<String>(name) {
+
+        /**
+         * Lines output from tor's [Process] [Stdio.Config.stdout] stream.
+         * */
+        public data object STDOUT: PROCESS("PROCESS_STDOUT")
+
+        /**
+         * Lines output by tor's [Process] [Stdio.Config.stderr] stream.
+         * */
+        public data object STDERR: PROCESS("PROCESS_STDERR")
+    }
 
     /**
      * Events pertaining to the current state of [TorRuntime].
@@ -259,7 +268,7 @@ public sealed class RuntimeEvent<Data: Any> private constructor(
         public fun clearObservers()
     }
 
-    public companion object: Entries<RuntimeEvent<*>>(numEvents = 10) {
+    public companion object: Entries<RuntimeEvent<*>>(numEvents = 11) {
 
         @JvmStatic
         @Throws(IllegalArgumentException::class)
@@ -281,7 +290,7 @@ public sealed class RuntimeEvent<Data: Any> private constructor(
             // NOTE: Update numEvents when adding an event
             add(ERROR); add(EXECUTE.ACTION); add(EXECUTE.CMD); add(LIFECYCLE);
             add(LISTENERS); add(LOG.DEBUG); add(LOG.INFO); add(LOG.WARN);
-            add(LOG.PROCESS); add(STATE);
+            add(PROCESS.STDOUT); add(PROCESS.STDERR); add(STATE);
         }
     }
 
@@ -295,35 +304,66 @@ public sealed class RuntimeEvent<Data: Any> private constructor(
 
         public companion object {
 
+            /**
+             * [LOG.DEBUG] level logging. Will prefix [log] with [from]
+             * string value and a space (' '), if [from] is non-null.
+             * */
             @JvmStatic
-            @Suppress("NOTHING_TO_INLINE")
-            public inline fun <E: LOG> Notifier.log(event: E, from: Any?, log: String) {
-                notify(event, (from?.toString()?.ifBlank { null }?.let { "$it " } ?: "") + log)
+            public fun Notifier.d(from: Any?, log: String) {
+                notify(LOG.DEBUG, from.appendLog(log))
             }
 
+            /**
+             * [LOG.INFO] level logging. Will prefix [log] with [from]
+             * string value and a space (' '), if [from] is non-null.
+             * */
             @JvmStatic
-            @Suppress("NOTHING_TO_INLINE")
-            public inline fun Notifier.d(from: Any?, log: String) { log(LOG.DEBUG, from, log) }
+            public fun Notifier.i(from: Any?, log: String) {
+                notify(LOG.INFO, from.appendLog(log))
+            }
 
+            /**
+             * [LOG.WARN] level logging. Will prefix [log] with [from]
+             * string value and a space (' '), if [from] is non-null.
+             * */
             @JvmStatic
-            @Suppress("NOTHING_TO_INLINE")
-            public inline fun Notifier.i(from: Any?, log: String) { log(LOG.INFO, from, log) }
+            public fun Notifier.w(from: Any?, log: String) {
+                notify(LOG.WARN, from.appendLog(log))
+            }
 
+            /**
+             * [ERROR] level logging.
+             * */
             @JvmStatic
-            @Suppress("NOTHING_TO_INLINE")
-            public inline fun Notifier.w(from: Any?, log: String) { log(LOG.WARN, from, log) }
+            public fun Notifier.e(cause: Throwable) {
+                notify(ERROR, cause)
+            }
+
+            /**
+             * [LIFECYCLE] event logging.
+             * */
+            @JvmStatic
+            public fun Notifier.lce(event: Lifecycle.Event) {
+                notify(LIFECYCLE, event)
+            }
 
             @JvmSynthetic
-            @Suppress("NOTHING_TO_INLINE")
-            internal inline fun Notifier.p(from: TorProcess, log: String) { log(LOG.PROCESS, from, log) }
+            internal fun Notifier.stdout(from: TorProcess, line: String) {
+                notify(PROCESS.STDOUT, from.appendLog(line))
+            }
 
-            @JvmStatic
-            @Suppress("NOTHING_TO_INLINE")
-            public inline fun Notifier.e(cause: Throwable) { notify(ERROR, cause) }
+            @JvmSynthetic
+            internal fun Notifier.stderr(from: TorProcess, line: String) {
+                notify(PROCESS.STDERR, from.appendLog(line))
+            }
 
-            @JvmStatic
             @Suppress("NOTHING_TO_INLINE")
-            public inline fun Notifier.lce(event: Lifecycle.Event) { notify(LIFECYCLE, event) }
+            private inline fun Any?.appendLog(log: String): String {
+                return this?.toString()
+                    ?.ifBlank { null }
+                    ?.let { "$it $log" }
+                    ?: log
+            }
         }
     }
 

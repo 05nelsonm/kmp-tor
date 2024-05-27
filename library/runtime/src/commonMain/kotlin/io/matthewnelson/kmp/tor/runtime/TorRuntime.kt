@@ -662,6 +662,7 @@ public interface TorRuntime:
 
         public final override fun equals(other: Any?): Boolean = other is ServiceFactory && other.ctrl == ctrl
         public final override fun hashCode(): Int = ctrl.hashCode()
-        public final override fun toString(): String = toFIDString(defaultClassName = "ServiceFactory", includeHashCode = false)
+        private val _toString by lazy { toFIDString(defaultClassName = "ServiceFactory", includeHashCode = false) }
+        public final override fun toString(): String = _toString
     }
 }
