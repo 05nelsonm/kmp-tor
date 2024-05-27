@@ -258,18 +258,15 @@ public abstract interface class io/matthewnelson/kmp/tor/runtime/RuntimeEvent$No
 	public static fun e (Lio/matthewnelson/kmp/tor/runtime/RuntimeEvent$Notifier;Ljava/lang/Throwable;)V
 	public static fun i (Lio/matthewnelson/kmp/tor/runtime/RuntimeEvent$Notifier;Ljava/lang/Object;Ljava/lang/String;)V
 	public static fun lce (Lio/matthewnelson/kmp/tor/runtime/RuntimeEvent$Notifier;Lio/matthewnelson/kmp/tor/runtime/Lifecycle$Event;)V
-	public static fun log (Lio/matthewnelson/kmp/tor/runtime/RuntimeEvent$Notifier;Lio/matthewnelson/kmp/tor/runtime/RuntimeEvent$LOG;Ljava/lang/Object;Ljava/lang/String;)V
 	public abstract fun notify (Lio/matthewnelson/kmp/tor/runtime/RuntimeEvent;Ljava/lang/Object;)V
 	public static fun w (Lio/matthewnelson/kmp/tor/runtime/RuntimeEvent$Notifier;Ljava/lang/Object;Ljava/lang/String;)V
 }
 
 public final class io/matthewnelson/kmp/tor/runtime/RuntimeEvent$Notifier$Companion {
-	public final fun appendLog (Ljava/lang/Object;Ljava/lang/String;)Ljava/lang/String;
 	public final fun d (Lio/matthewnelson/kmp/tor/runtime/RuntimeEvent$Notifier;Ljava/lang/Object;Ljava/lang/String;)V
 	public final fun e (Lio/matthewnelson/kmp/tor/runtime/RuntimeEvent$Notifier;Ljava/lang/Throwable;)V
 	public final fun i (Lio/matthewnelson/kmp/tor/runtime/RuntimeEvent$Notifier;Ljava/lang/Object;Ljava/lang/String;)V
 	public final fun lce (Lio/matthewnelson/kmp/tor/runtime/RuntimeEvent$Notifier;Lio/matthewnelson/kmp/tor/runtime/Lifecycle$Event;)V
-	public final fun log (Lio/matthewnelson/kmp/tor/runtime/RuntimeEvent$Notifier;Lio/matthewnelson/kmp/tor/runtime/RuntimeEvent$LOG;Ljava/lang/Object;Ljava/lang/String;)V
 	public final fun w (Lio/matthewnelson/kmp/tor/runtime/RuntimeEvent$Notifier;Ljava/lang/Object;Ljava/lang/String;)V
 }
 
