@@ -35,6 +35,7 @@ import kotlinx.coroutines.test.runTest
 import kotlin.coroutines.cancellation.CancellationException
 import kotlin.test.*
 import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Duration.Companion.seconds
 
 @OptIn(ExperimentalKmpTorApi::class, InternalKmpTorApi::class)
 class ServiceFactoryUnitTest {
@@ -90,9 +91,7 @@ class ServiceFactoryUnitTest {
     @Test
     fun givenInitializer_whenUsedMoreThanOnce_thenThrowsException() {
         val factory = TorRuntime.Builder(env("sf_is_instance")) {} as TestFactory
-        assertFailsWith<IllegalStateException> {
-            TestFactory(factory.initializer)
-        }
+        assertFailsWith<IllegalStateException> { TestFactory(factory.initializer) }
     }
 
     @Test
@@ -100,10 +99,18 @@ class ServiceFactoryUnitTest {
         val factory = TorRuntime.Builder(env("sf_multi_bind_destroy")) {}
             .ensureStoppedOnTestCompletion() as TestFactory
 
+        // If tor failed to start for some reason with the second bind
+        // b/c we did not use enqueue via the factory ourselves, then
+        // ActionJob.StartJob was enqueued for us from onBind, but we
+        // do not care about that here, just checking if the 2nd onBind
+        // call destroyed the first RealTorRuntime instance or not.
+        factory.subscribe(RuntimeEvent.ERROR.observer { t -> t.printStackTrace() })
+
         val warnings = mutableListOf<String>()
         factory.subscribe(RuntimeEvent.LOG.WARN.observer { warnings.add(it) })
         val runtime1 = factory.testBinder.bind().ensureStoppedOnTestCompletion()
-        factory.testBinder.bind().ensureStoppedOnTestCompletion()
+        factory.testBinder.bind().destroy()
+
         assertTrue(runtime1.isDestroyed())
 
         val warning = warnings.filter {
@@ -113,17 +120,30 @@ class ServiceFactoryUnitTest {
     }
 
     @Test
-    fun givenNoStart_whenBindWithoutEnqueue_thenAutoEnqueuesStartJob() = runTest {
+    fun givenNoStart_whenBindWithoutEnqueue_thenAutoEnqueuesStartJob() = runTest(timeout = 5.seconds) {
         val factory = TorRuntime.Builder(env("sf_enqueue_start")) {}
             .ensureStoppedOnTestCompletion() as TestFactory
 
+        // If tor failed to start for some reason with the second bind
+        // b/c we did not use enqueue via the factory ourselves, then
+        // ActionJob.StartJob was enqueued for us from onBind, but we
+        // do not care about that here, just checking if the 2nd onBind
+        // call destroyed the first RealTorRuntime instance or not.
+        factory.subscribe(RuntimeEvent.ERROR.observer { t -> t.printStackTrace() })
+
         val executes = mutableListOf<ActionJob>()
         factory.subscribe(RuntimeEvent.EXECUTE.ACTION.observer { executes.add(it) })
-        factory.testBinder.bind().ensureStoppedOnTestCompletion()
+        val destroyable = factory.testBinder.bind().ensureStoppedOnTestCompletion()
 
         withContext(Dispatchers.Default) { delay(250.milliseconds) }
+
         assertEquals(1, executes.size)
         assertIs<ActionJob.StartJob>(executes.first())
+
+        destroyable.destroy()
+        val latch = Job(currentCoroutineContext().job)
+        executes.first().invokeOnCompletion { latch.complete() }
+        latch.join()
     }
 
     @Test
