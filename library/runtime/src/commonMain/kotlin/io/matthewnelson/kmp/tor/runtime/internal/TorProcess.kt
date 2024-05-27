@@ -61,6 +61,8 @@ internal class TorProcess private constructor(
     private val checkInterrupt: () -> Unit,
 ): FileID by generator.environment {
 
+    private val _toString by lazy { toFIDString(includeHashCode = true) }
+
     @Throws(Throwable::class)
     private suspend fun <T: Any?> start(connect: suspend CtrlArguments.() -> T): T = state.lock.withLock {
         try {
@@ -340,7 +342,7 @@ internal class TorProcess private constructor(
         throw IOException("Timed out after ${timeout.inWholeMilliseconds}ms waiting for tor to write to file[$this]")
     }
 
-    public override fun toString(): String = toFIDString(includeHashCode = true)
+    public override fun toString(): String = _toString
 
     // Helper for catching tor startup errors while waiting
     // for other startup steps to be completed. Tor will fail
