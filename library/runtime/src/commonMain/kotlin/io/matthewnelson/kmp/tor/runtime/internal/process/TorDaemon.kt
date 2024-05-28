@@ -154,7 +154,7 @@ internal class TorDaemon private constructor(
         var remainder = delayTime - lastStop.elapsedNow()
         var wasNotified = false
 
-        while (remainder > 0.milliseconds) {
+        while (remainder > Duration.ZERO) {
 
             if (!wasNotified) {
                 wasNotified = true
@@ -167,7 +167,8 @@ internal class TorDaemon private constructor(
         }
 
         if (wasNotified) {
-            NOTIFIER.i(this@TorDaemon, "Resuming startup after waiting ~${start.elapsedNow().inWholeMilliseconds}ms")
+            val elapsed = start.elapsedNow().inWholeMilliseconds
+            NOTIFIER.i(this@TorDaemon, "Resuming startup after waiting ~${elapsed}ms")
         }
     }
 
@@ -201,20 +202,22 @@ internal class TorDaemon private constructor(
         })
 
         run {
-            val notify = Executable.Once.of {
+            var notify: Executable.Once?
+            notify = Executable.Once.of(executable = {
+                notify = null
                 val time = process.startTime.elapsedNow().inWholeMilliseconds
 
                 NOTIFIER.i(
                     this@TorDaemon,
                     "took ${time}ms before dispatching its first stdout line"
                 )
-            }
+            })
 
             process.stdoutFeed(
                 startupFeed.stdout,
                 OutputFeed { line ->
                     if (line == null) return@OutputFeed
-                    notify.execute()
+                    notify?.execute()
                     NOTIFIER.stdout(this@TorDaemon, line)
                 }
             ).stderrFeed(
