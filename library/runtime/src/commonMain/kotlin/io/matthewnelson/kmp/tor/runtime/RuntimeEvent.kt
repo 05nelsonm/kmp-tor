@@ -21,7 +21,7 @@ import io.matthewnelson.kmp.process.Process
 import io.matthewnelson.kmp.process.Stdio
 import io.matthewnelson.kmp.tor.runtime.core.*
 import io.matthewnelson.kmp.tor.runtime.core.ctrl.TorCmd
-import io.matthewnelson.kmp.tor.runtime.internal.TorProcess
+import io.matthewnelson.kmp.tor.runtime.internal.process.TorDaemon
 import kotlin.jvm.JvmStatic
 import kotlin.jvm.JvmSynthetic
 
@@ -128,20 +128,20 @@ public sealed class RuntimeEvent<Data: Any> private constructor(
      *
      *     Lifecycle.Event[obj=RealTorRuntime[fid=6E96…6985]@1625090026, name=onCreate]
      *     StartJob[name=StartDaemon, state=Executing]@1652817137
-     *     Lifecycle.Event[obj=TorProcess[fid=6E96…6985]@158078174, name=onCreate]
-     *     Lifecycle.Event[obj=TorProcess[fid=6E96…6985]@158078174, name=onStart]
+     *     Lifecycle.Event[obj=TorDaemon[fid=6E96…6985]@158078174, name=onCreate]
+     *     Lifecycle.Event[obj=TorDaemon[fid=6E96…6985]@158078174, name=onStart]
      *     Lifecycle.Event[obj=RealTorCtrl[fid=6E96…6985]@1682130731, name=onCreate]
      *     RestartJob[name=RestartDaemon, state=Executing]@1830373812
-     *     Lifecycle.Event[obj=TorProcess[fid=6E96…6985]@85303615, name=onCreate]
-     *     Lifecycle.Event[obj=TorProcess[fid=6E96…6985]@158078174, name=onStop]
-     *     Lifecycle.Event[obj=TorProcess[fid=6E96…6985]@158078174, name=onDestroy]
+     *     Lifecycle.Event[obj=TorDaemon[fid=6E96…6985]@85303615, name=onCreate]
+     *     Lifecycle.Event[obj=TorDaemon[fid=6E96…6985]@158078174, name=onStop]
+     *     Lifecycle.Event[obj=TorDaemon[fid=6E96…6985]@158078174, name=onDestroy]
      *     Lifecycle.Event[obj=RealTorCtrl[fid=6E96…6985]@1682130731, name=onDestroy]
-     *     Lifecycle.Event[obj=TorProcess[fid=6E96…6985]@85303615, name=onStart]
+     *     Lifecycle.Event[obj=TorDaemon[fid=6E96…6985]@85303615, name=onStart]
      *     Lifecycle.Event[obj=RealTorCtrl[fid=6E96…6985]@1241844104, name=onCreate]
      *     StopJob[name=StopDaemon, state=Executing]@560446930
      *     Lifecycle.Event[obj=RealTorCtrl[fid=6E96…6985]@1241844104, name=onDestroy]
-     *     Lifecycle.Event[obj=TorProcess[fid=6E96…6985]@85303615, name=onStop]
-     *     Lifecycle.Event[obj=TorProcess[fid=6E96…6985]@85303615, name=onDestroy]
+     *     Lifecycle.Event[obj=TorDaemon[fid=6E96…6985]@85303615, name=onStop]
+     *     Lifecycle.Event[obj=TorDaemon[fid=6E96…6985]@85303615, name=onDestroy]
      *
      * @see [Lifecycle.Event]
      * */
@@ -492,12 +492,12 @@ public sealed class RuntimeEvent<Data: Any> private constructor(
             }
 
             @JvmSynthetic
-            internal fun Notifier.stdout(from: TorProcess, line: String) {
+            internal fun Notifier.stdout(from: TorDaemon, line: String) {
                 notify(PROCESS.STDOUT, from.appendLog(line))
             }
 
             @JvmSynthetic
-            internal fun Notifier.stderr(from: TorProcess, line: String) {
+            internal fun Notifier.stderr(from: TorDaemon, line: String) {
                 notify(PROCESS.STDERR, from.appendLog(line))
             }
 

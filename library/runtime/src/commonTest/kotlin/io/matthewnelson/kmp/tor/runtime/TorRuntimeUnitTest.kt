@@ -181,7 +181,7 @@ class TorRuntimeUnitTest {
             runtime.subscribe(observerLCE)
 
             listOf(
-                "TorProcess" to Lifecycle.Event.Name.OnStart,
+                "TorDaemon" to Lifecycle.Event.Name.OnStart,
                 "RealTorCtrl" to Lifecycle.Event.Name.OnCreate,
             ).forEach { (clazz, event) ->
                 eventClassName = clazz

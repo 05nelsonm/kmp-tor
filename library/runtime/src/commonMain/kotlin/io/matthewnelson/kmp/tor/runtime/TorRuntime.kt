@@ -457,6 +457,11 @@ public interface TorRuntime:
             @ExperimentalKmpTorApi
             public val processEnv: LinkedHashMap<String, String> = LinkedHashMap(1, 1.0F)
 
+            init {
+                @OptIn(ExperimentalKmpTorApi::class)
+                processEnv["HOME"] = workDirectory.path
+            }
+
             /**
              * Experimental support for running tor as a service. Currently
              * only Android support is available via the `runtime-service`
@@ -485,6 +490,8 @@ public interface TorRuntime:
 
                     @OptIn(ExperimentalKmpTorApi::class)
                     return getOrCreateInstance(key = b.workDirectory, block = {
+
+                        // Always reset, just in case it was overridden
                         b.processEnv["HOME"] = b.workDirectory.path
 
                         Environment(

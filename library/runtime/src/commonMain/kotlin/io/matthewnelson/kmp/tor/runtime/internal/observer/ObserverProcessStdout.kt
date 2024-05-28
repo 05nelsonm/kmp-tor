@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-package io.matthewnelson.kmp.tor.runtime.internal
+package io.matthewnelson.kmp.tor.runtime.internal.observer
 
 import io.matthewnelson.kmp.tor.runtime.TorListeners
 import io.matthewnelson.kmp.tor.runtime.TorState

@@ -15,7 +15,7 @@
  **/
 @file:Suppress("PrivatePropertyName", "LocalVariableName")
 
-package io.matthewnelson.kmp.tor.runtime.internal
+package io.matthewnelson.kmp.tor.runtime.internal.process
 
 import io.matthewnelson.immutable.collections.toImmutableList
 import io.matthewnelson.kmp.file.*
@@ -31,7 +31,6 @@ import io.matthewnelson.kmp.tor.runtime.RuntimeEvent.Notifier.Companion.i
 import io.matthewnelson.kmp.tor.runtime.RuntimeEvent.Notifier.Companion.lce
 import io.matthewnelson.kmp.tor.runtime.RuntimeEvent.Notifier.Companion.stderr
 import io.matthewnelson.kmp.tor.runtime.RuntimeEvent.Notifier.Companion.stdout
-import io.matthewnelson.kmp.tor.runtime.RuntimeEvent.Notifier.Companion.w
 import io.matthewnelson.kmp.tor.runtime.core.Executable
 import io.matthewnelson.kmp.tor.runtime.core.TorConfig
 import io.matthewnelson.kmp.tor.runtime.core.address.IPSocketAddress
@@ -39,20 +38,24 @@ import io.matthewnelson.kmp.tor.runtime.core.address.IPSocketAddress.Companion.t
 import io.matthewnelson.kmp.tor.runtime.core.apply
 import io.matthewnelson.kmp.tor.runtime.core.ctrl.TorCmd
 import io.matthewnelson.kmp.tor.runtime.ctrl.TorCtrl
-import io.matthewnelson.kmp.tor.runtime.internal.TorProcess.StartArgs.Companion.createStartArgs
+import io.matthewnelson.kmp.tor.runtime.internal.*
+import io.matthewnelson.kmp.tor.runtime.internal.InstanceKeeper
+import io.matthewnelson.kmp.tor.runtime.internal.TorConfigGenerator
+import io.matthewnelson.kmp.tor.runtime.internal.process.TorDaemon.StartArgs.Companion.createStartArgs
+import io.matthewnelson.kmp.tor.runtime.internal.setDirectoryPermissions
+import io.matthewnelson.kmp.tor.runtime.internal.timedDelay
 import kotlinx.coroutines.*
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlin.concurrent.Volatile
 import kotlin.coroutines.cancellation.CancellationException
 import kotlin.jvm.JvmSynthetic
-import kotlin.time.ComparableTimeMark
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.TimeSource
 
-internal class TorProcess private constructor(
+internal class TorDaemon private constructor(
     private val generator: TorConfigGenerator,
     private val manager: TorState.Manager,
     private val NOTIFIER: RuntimeEvent.Notifier,
@@ -114,12 +117,22 @@ internal class TorProcess private constructor(
             checkInterrupt()
             connect(arguments)
         } catch (t: Throwable) {
+            when (t) {
+                is CancellationException,
+                is InterruptedException,
+                is ProcessStartException -> {}
+                else -> {
+                    val e = feed.createError("Connect failure")
+                    t.addSuppressed(e)
+                }
+            }
+
             manager.update(TorState.Daemon.Stopping)
             processJob.cancel()
             throw t
+        } finally {
+            feed.close()
         }
-
-        feed.done()
 
         result
     }
@@ -132,10 +145,10 @@ internal class TorProcess private constructor(
         manager.update(TorState.Daemon.Starting, TorState.Network.Disabled)
 
         // Need to ensure there is at least 500ms between last
-        // process' stop, and this process' start for TorProcess
+        // process' stop, and this process' start for TorDaemon
         val lastStop = stopMark ?: return
 
-        val delayTime = 1_000.milliseconds
+        val delayTime = 500.milliseconds
         val delayIncrement = 100.milliseconds
         val start = TimeSource.Monotonic.markNow()
         var remainder = delayTime - lastStop.elapsedNow()
@@ -145,7 +158,7 @@ internal class TorProcess private constructor(
 
             if (!wasNotified) {
                 wasNotified = true
-                NOTIFIER.i(this@TorProcess, "Waiting ${remainder.inWholeMilliseconds}ms for previous process to clean up.")
+                NOTIFIER.i(this@TorDaemon, "Waiting ${remainder.inWholeMilliseconds}ms for previous process to clean up.")
             }
 
             delay(if (remainder < delayIncrement) remainder else delayIncrement)
@@ -154,12 +167,12 @@ internal class TorProcess private constructor(
         }
 
         if (wasNotified) {
-            NOTIFIER.i(this@TorProcess, "Resuming startup after waiting ~${start.elapsedNow().inWholeMilliseconds}ms")
+            NOTIFIER.i(this@TorDaemon, "Resuming startup after waiting ~${start.elapsedNow().inWholeMilliseconds}ms")
         }
     }
 
     @Throws(Throwable::class)
-    private fun StartArgs.spawnProcess(paths: ResourceInstaller.Paths.Tor): Pair<StdoutFeed, Job> {
+    private fun StartArgs.spawnProcess(paths: ResourceInstaller.Paths.Tor): Pair<StartupFeedParser, Job> {
         val process = try {
             checkInterrupt()
 
@@ -172,18 +185,45 @@ internal class TorProcess private constructor(
                 .destroySignal(Signal.SIGTERM)
                 .spawn()
         } catch (t: Throwable) {
-            NOTIFIER.lce(Lifecycle.Event.OnDestroy(this@TorProcess))
+            NOTIFIER.lce(Lifecycle.Event.OnDestroy(this@TorDaemon))
             throw t
         }
 
-        NOTIFIER.lce(Lifecycle.Event.OnStart(this@TorProcess))
-        NOTIFIER.i(this@TorProcess, process.toString())
+        NOTIFIER.lce(Lifecycle.Event.OnStart(this@TorDaemon))
+        NOTIFIER.i(this@TorDaemon, process.toString())
 
-        val feed = StdoutFeed(process.startTime)
+        val startupFeed = StartupFeedParser(exitCode = {
+            try {
+                process.exitCode()
+            } catch (_: IllegalStateException) {
+                null
+            }
+        })
 
-        process.stdoutFeed(feed).stderrFeed { line ->
-            if (line == null) return@stderrFeed
-            NOTIFIER.stderr(this@TorProcess, line)
+        run {
+            val notify = Executable.Once.of {
+                val time = process.startTime.elapsedNow().inWholeMilliseconds
+
+                NOTIFIER.i(
+                    this@TorDaemon,
+                    "took ${time}ms before dispatching its first stdout line"
+                )
+            }
+
+            process.stdoutFeed(
+                startupFeed.stdout,
+                OutputFeed { line ->
+                    if (line == null) return@OutputFeed
+                    notify.execute()
+                    NOTIFIER.stdout(this@TorDaemon, line)
+                }
+            ).stderrFeed(
+                startupFeed.stderr,
+                OutputFeed { line ->
+                    if (line == null) return@OutputFeed
+                    NOTIFIER.stderr(this@TorDaemon, line)
+                }
+            )
         }
 
         // If scope is cancelled when we go to launch
@@ -197,7 +237,7 @@ internal class TorProcess private constructor(
             process.destroy()
 
             try {
-                NOTIFIER.lce(Lifecycle.Event.OnStop(this@TorProcess))
+                NOTIFIER.lce(Lifecycle.Event.OnStop(this@TorDaemon))
             } finally {
                 manager.update(TorState.Daemon.Off)
             }
@@ -206,6 +246,13 @@ internal class TorProcess private constructor(
         val processJob = scope.launch {
             try {
                 process.waitForAsync()
+
+                // Process has exited. If we have not completed the
+                // startup, give OutputFeed a moment to fully flush
+                // before Process.destroy() is called.
+                if (!startupFeed.isClosed) {
+                    timedDelay(50.milliseconds)
+                }
             } finally {
                 completion.execute()
             }
@@ -215,14 +262,16 @@ internal class TorProcess private constructor(
 
         processJob.invokeOnCompletion {
             completion.execute()
-            NOTIFIER.lce(Lifecycle.Event.OnDestroy(this@TorProcess))
+            NOTIFIER.lce(Lifecycle.Event.OnDestroy(this@TorDaemon))
         }
 
-        return feed to processJob
+        return startupFeed to processJob
     }
 
     @Throws(Throwable::class)
-    private suspend fun TorConfig.awaitCtrlConnection(feed: StdoutFeed): CtrlArguments.Connection {
+    private suspend fun TorConfig.awaitCtrlConnection(
+        feed: StartupFeedParser,
+    ): CtrlArguments.Connection {
         // Is **always** present in generated config.
         val ctrlPortFile = filterByKeyword<TorConfig.ControlPortWriteToFile.Companion>()
             .first()
@@ -235,7 +284,7 @@ internal class TorProcess private constructor(
             .lines()
             .mapNotNull { it.ifBlank { null } }
 
-        NOTIFIER.d(this@TorProcess, "ControlFile$lines")
+        NOTIFIER.d(this@TorDaemon, "ControlFile$lines")
 
         val addresses = ArrayList<String>(1)
 
@@ -264,11 +313,13 @@ internal class TorProcess private constructor(
             return CtrlArguments.Connection(socketAddress)
         }
 
-        throw IOException("Failed to acquire control connection address from file[$ctrlPortFile]")
+        throw feed.createError("Failed to acquire control connection info from file[$ctrlPortFile]")
     }
 
     @Throws(Throwable::class)
-    private suspend fun TorConfig.awaitAuthentication(feed: StdoutFeed): TorCmd.Authenticate {
+    private suspend fun TorConfig.awaitAuthentication(
+        feed: StartupFeedParser,
+    ): TorCmd.Authenticate {
         // TODO: HashedControlPassword Issue #1
 
         return filterByKeyword<TorConfig.CookieAuthFile.Companion>()
@@ -282,7 +333,7 @@ internal class TorProcess private constructor(
 
     @Throws(CancellationException::class, IOException::class)
     private suspend fun File.awaitRead(
-        feed: StdoutFeed,
+        feed: StartupFeedParser,
         timeout: Duration,
     ): ByteArray {
         require(timeout >= 500.milliseconds) { "timeout must be greater than or equal to 500ms" }
@@ -312,16 +363,17 @@ internal class TorProcess private constructor(
 
             if (!notified) {
                 notified = true
-                NOTIFIER.d(this@TorProcess, "Waiting for tor to write to $name")
+                NOTIFIER.d(this@TorDaemon, "Waiting for tor to write to $name")
             }
 
             timedDelay(50.milliseconds)
             feed.checkError()
-            checkInterrupt()
 
             if (throwInactiveNext) {
-                throw IOException("Process exited early...")
+                throw feed.createError("Process exited early...")
             }
+
+            checkInterrupt()
 
             if (state.processJob?.isActive != true) {
                 // Want to give Process time to close down resources
@@ -333,92 +385,10 @@ internal class TorProcess private constructor(
             if (startMark.elapsedNow() > timeout) break
         }
 
-        throw IOException("Timed out after ${timeout.inWholeMilliseconds}ms waiting for tor to write to file[$this]")
+        throw feed.createError("Timed out after ${timeout.inWholeMilliseconds}ms waiting for tor to write to file[$this]")
     }
 
     public override fun toString(): String = _toString
-
-    // Helper for catching tor startup errors while waiting
-    // for other startup steps to be completed. Tor will fail
-    // to start and indicate so via stdout within the first
-    // 10-20 lines of output.
-    //
-    // This will parse those lines and generate an IOException
-    // which can be thrown while polling files that tor writes
-    // data to (control port & cookie authentication).
-    private inner class StdoutFeed(private val startTime: ComparableTimeMark): OutputFeed {
-
-        @Volatile
-        private var _lines = 0
-        @Volatile
-        private var _sb = StringBuilder()
-        @Volatile
-        private var _error: IOException? = null
-        @Volatile
-        private var _isReady: Boolean = false
-        val isReady: Boolean get() = _isReady
-
-        override fun onOutput(line: String?) {
-            if (_error == null && _lines < 50) {
-                if (line != null) {
-                    _lines++
-                    if (line.contains(PROCESS_CTRL_CONN)) {
-                        _isReady = true
-                    }
-                }
-
-                if (_sb.isEmpty()) {
-                    if (line != null) {
-                        // First line of output
-                        val time = startTime.elapsedNow().inWholeMilliseconds
-                        NOTIFIER.i(
-                            this@TorProcess,
-                            "took ${time}ms before dispatching its first stdout line"
-                        )
-                    }
-                } else {
-                    _sb.appendLine()
-                }
-
-                _sb.append(line ?: "Process Exited Unexpectedly...")
-                line.parseForError()
-            }
-
-            if (line == null) return
-            NOTIFIER.stdout(this@TorProcess, line)
-        }
-
-        @Throws(IOException::class)
-        fun checkError() { _error?.let { err -> throw err } }
-
-        fun done() {
-            // Will inhibit from adding any more lines
-            _lines = 1000
-
-            // clear and de-reference
-            val sb = _sb
-            this._sb = StringBuilder(/* capacity =*/ 1)
-
-            try {
-                val count = sb.count()
-                sb.clear()
-                repeat(count) { sb.append(' ') }
-            } catch (_: Throwable) {}
-        }
-
-        private fun String?.parseForError() {
-            if (this != null && !contains(PROCESS_ERR) && !contains(PROCESS_OTHER)) return
-            // If line is null, process has stopped
-
-            val message = _sb.toString()
-
-            val count = _sb.count()
-            _sb.clear()
-            repeat(count) { _sb.append(' ') }
-
-            _error = IOException("Process Failure\n$message")
-        }
-    }
 
     private class StartArgs private constructor(val cmdLine: List<String>, val loadText: String) {
 
@@ -542,7 +512,7 @@ internal class TorProcess private constructor(
         ): T {
             val state = getOrCreateInstance(generator.environment.fid) { FIDState() }
 
-            val process = TorProcess(
+            val process = TorDaemon(
                 generator,
                 manager,
                 NOTIFIER,
