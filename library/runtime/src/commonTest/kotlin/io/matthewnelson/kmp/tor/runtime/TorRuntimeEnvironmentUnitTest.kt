@@ -15,30 +15,31 @@
  **/
 package io.matthewnelson.kmp.tor.runtime
 
-import io.matthewnelson.kmp.file.absoluteFile
-import io.matthewnelson.kmp.file.resolve
-import io.matthewnelson.kmp.file.toFile
+import io.matthewnelson.kmp.file.*
 import io.matthewnelson.kmp.tor.core.api.ResourceInstaller
+import io.matthewnelson.kmp.tor.core.api.annotation.ExperimentalKmpTorApi
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotEquals
 import kotlin.test.fail
 
+@OptIn(ExperimentalKmpTorApi::class)
 class TorRuntimeEnvironmentUnitTest {
+
+    private fun torResource(dir: File) = object : ResourceInstaller<ResourceInstaller.Paths.Tor>(dir) {
+        override fun install(): Paths.Tor { fail() }
+    }
 
     @Test
     fun givenSameWorkDir_whenEnvironmentBuilder_thenReturnsSameInstance() {
-        val work = "".toFile().absoluteFile.resolve("env-test")
-        val torResource = object : ResourceInstaller<ResourceInstaller.Paths.Tor>(work) {
-            override fun install(): Paths.Tor { fail() }
-        }
+        val work = "".toFile().absoluteFile.resolve("env_instance")
 
-        val env1 = TorRuntime.Environment.Builder(work, work.resolve("cache")) { torResource }
-        val env2 = TorRuntime.Environment.Builder(work, work.resolve("cache2")) { torResource }
+        val env1 = TorRuntime.Environment.Builder(work, work.resolve("cache")) { torResource(it) }
+        val env2 = TorRuntime.Environment.Builder(work, work.resolve("cache2")) { torResource(it) }
         assertEquals(env1, env2)
         assertEquals(64, env1.fid.length)
 
-        val env3 = TorRuntime.Environment.Builder(work.resolve("work"), work.resolve("cache")) { torResource }
+        val env3 = TorRuntime.Environment.Builder(work.resolve("work"), work.resolve("cache")) { torResource(it) }
         assertNotEquals(env1, env3)
 
         val innerOuterWork = work.resolve("lambda")
@@ -46,13 +47,13 @@ class TorRuntimeEnvironmentUnitTest {
         val envOuter = TorRuntime.Environment.Builder(
             innerOuterWork,
             innerOuterWork.resolve("outer"),
-            { torResource },
+            { torResource(it) },
         ) {
             // Should be the expected instance
             envInner = TorRuntime.Environment.Builder(
                 innerOuterWork,
                 innerOuterWork.resolve("inner"),
-                { torResource },
+                { torResource(it) },
             ) {
 
             }
@@ -60,5 +61,14 @@ class TorRuntimeEnvironmentUnitTest {
 
         assertEquals(innerOuterWork.resolve("inner"), envInner?.cacheDirectory)
         assertEquals(innerOuterWork.resolve("inner"), envOuter.cacheDirectory)
+    }
+
+    @Test
+    fun givenProcessEnv_whenHOME_thenIsAlwaysWorkDirectory() {
+        val workDir = "".toFile().absoluteFile.resolve("env_processENV")
+        val env = TorRuntime.Environment.Builder(workDir, workDir.resolve("cache"), { torResource(it) }) {
+            processEnv["HOME"] = "something"
+        }
+        assertEquals(env.processEnv["HOME"], workDir.path)
     }
 }
