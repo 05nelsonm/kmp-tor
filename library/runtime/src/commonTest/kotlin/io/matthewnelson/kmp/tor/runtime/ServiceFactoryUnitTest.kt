@@ -264,11 +264,11 @@ class ServiceFactoryUnitTest {
         synchronized(lock) {
             lces.assertContains("RealTorRuntime", Lifecycle.Event.Name.OnCreate, fid = factory)
             lces.assertContains("DestroyableTorRuntime", Lifecycle.Event.Name.OnCreate, fid = factory)
-            lces.assertContains("TorProcess", Lifecycle.Event.Name.OnCreate, fid = factory)
-            lces.assertContains("TorProcess", Lifecycle.Event.Name.OnStart, fid = factory)
+            lces.assertContains("TorDaemon", Lifecycle.Event.Name.OnCreate, fid = factory)
+            lces.assertContains("TorDaemon", Lifecycle.Event.Name.OnStart, fid = factory)
             lces.assertContains("RealTorCtrl", Lifecycle.Event.Name.OnCreate, fid = factory)
 
-            lces.assertDoesNotContain("TorProcess", Lifecycle.Event.Name.OnDestroy, fid = factory)
+            lces.assertDoesNotContain("TorDaemon", Lifecycle.Event.Name.OnDestroy, fid = factory)
             lces.assertDoesNotContain("RealTorCtrl", Lifecycle.Event.Name.OnDestroy, fid = factory)
             lces.clear()
         }
@@ -284,12 +284,12 @@ class ServiceFactoryUnitTest {
 
         synchronized(lock) {
             // Old process stopped
-            lces.assertContains("TorProcess", Lifecycle.Event.Name.OnDestroy, fid = factory)
+            lces.assertContains("TorDaemon", Lifecycle.Event.Name.OnDestroy, fid = factory)
             lces.assertContains("RealTorCtrl", Lifecycle.Event.Name.OnDestroy, fid = factory)
 
             // New process started
-            lces.assertContains("TorProcess", Lifecycle.Event.Name.OnCreate, fid = factory)
-            lces.assertContains("TorProcess", Lifecycle.Event.Name.OnStart, fid = factory)
+            lces.assertContains("TorDaemon", Lifecycle.Event.Name.OnCreate, fid = factory)
+            lces.assertContains("TorDaemon", Lifecycle.Event.Name.OnStart, fid = factory)
             lces.assertContains("RealTorCtrl", Lifecycle.Event.Name.OnCreate, fid = factory)
 
             lces.assertDoesNotContain("RealTorRuntime", Lifecycle.Event.Name.OnDestroy, fid = factory)
@@ -339,8 +339,8 @@ class ServiceFactoryUnitTest {
             synchronized(lock) {
                 lces.assertContains("RealTorRuntime", Lifecycle.Event.Name.OnDestroy)
                 lces.assertContains("DestroyableTorRuntime", Lifecycle.Event.Name.OnDestroy)
-                lces.assertContains("TorProcess", Lifecycle.Event.Name.OnCreate)
-                lces.assertContains("TorProcess", Lifecycle.Event.Name.OnDestroy)
+                lces.assertContains("TorDaemon", Lifecycle.Event.Name.OnCreate)
+                lces.assertContains("TorDaemon", Lifecycle.Event.Name.OnDestroy)
                 lces.clear()
             }
         }

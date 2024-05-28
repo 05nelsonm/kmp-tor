@@ -15,7 +15,7 @@
  **/
 @file:Suppress("PrivatePropertyName", "LocalVariableName")
 
-package io.matthewnelson.kmp.tor.runtime.internal
+package io.matthewnelson.kmp.tor.runtime.internal.process
 
 import io.matthewnelson.immutable.collections.toImmutableList
 import io.matthewnelson.kmp.file.*
@@ -31,7 +31,6 @@ import io.matthewnelson.kmp.tor.runtime.RuntimeEvent.Notifier.Companion.i
 import io.matthewnelson.kmp.tor.runtime.RuntimeEvent.Notifier.Companion.lce
 import io.matthewnelson.kmp.tor.runtime.RuntimeEvent.Notifier.Companion.stderr
 import io.matthewnelson.kmp.tor.runtime.RuntimeEvent.Notifier.Companion.stdout
-import io.matthewnelson.kmp.tor.runtime.RuntimeEvent.Notifier.Companion.w
 import io.matthewnelson.kmp.tor.runtime.core.Executable
 import io.matthewnelson.kmp.tor.runtime.core.TorConfig
 import io.matthewnelson.kmp.tor.runtime.core.address.IPSocketAddress
@@ -39,7 +38,12 @@ import io.matthewnelson.kmp.tor.runtime.core.address.IPSocketAddress.Companion.t
 import io.matthewnelson.kmp.tor.runtime.core.apply
 import io.matthewnelson.kmp.tor.runtime.core.ctrl.TorCmd
 import io.matthewnelson.kmp.tor.runtime.ctrl.TorCtrl
-import io.matthewnelson.kmp.tor.runtime.internal.TorProcess.StartArgs.Companion.createStartArgs
+import io.matthewnelson.kmp.tor.runtime.internal.*
+import io.matthewnelson.kmp.tor.runtime.internal.InstanceKeeper
+import io.matthewnelson.kmp.tor.runtime.internal.TorConfigGenerator
+import io.matthewnelson.kmp.tor.runtime.internal.process.TorDaemon.StartArgs.Companion.createStartArgs
+import io.matthewnelson.kmp.tor.runtime.internal.setDirectoryPermissions
+import io.matthewnelson.kmp.tor.runtime.internal.timedDelay
 import kotlinx.coroutines.*
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
@@ -52,7 +56,7 @@ import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.TimeSource
 
-internal class TorProcess private constructor(
+internal class TorDaemon private constructor(
     private val generator: TorConfigGenerator,
     private val manager: TorState.Manager,
     private val NOTIFIER: RuntimeEvent.Notifier,
@@ -132,7 +136,7 @@ internal class TorProcess private constructor(
         manager.update(TorState.Daemon.Starting, TorState.Network.Disabled)
 
         // Need to ensure there is at least 500ms between last
-        // process' stop, and this process' start for TorProcess
+        // process' stop, and this process' start for TorDaemon
         val lastStop = stopMark ?: return
 
         val delayTime = 1_000.milliseconds
@@ -145,7 +149,7 @@ internal class TorProcess private constructor(
 
             if (!wasNotified) {
                 wasNotified = true
-                NOTIFIER.i(this@TorProcess, "Waiting ${remainder.inWholeMilliseconds}ms for previous process to clean up.")
+                NOTIFIER.i(this@TorDaemon, "Waiting ${remainder.inWholeMilliseconds}ms for previous process to clean up.")
             }
 
             delay(if (remainder < delayIncrement) remainder else delayIncrement)
@@ -154,7 +158,7 @@ internal class TorProcess private constructor(
         }
 
         if (wasNotified) {
-            NOTIFIER.i(this@TorProcess, "Resuming startup after waiting ~${start.elapsedNow().inWholeMilliseconds}ms")
+            NOTIFIER.i(this@TorDaemon, "Resuming startup after waiting ~${start.elapsedNow().inWholeMilliseconds}ms")
         }
     }
 
@@ -172,18 +176,18 @@ internal class TorProcess private constructor(
                 .destroySignal(Signal.SIGTERM)
                 .spawn()
         } catch (t: Throwable) {
-            NOTIFIER.lce(Lifecycle.Event.OnDestroy(this@TorProcess))
+            NOTIFIER.lce(Lifecycle.Event.OnDestroy(this@TorDaemon))
             throw t
         }
 
-        NOTIFIER.lce(Lifecycle.Event.OnStart(this@TorProcess))
-        NOTIFIER.i(this@TorProcess, process.toString())
+        NOTIFIER.lce(Lifecycle.Event.OnStart(this@TorDaemon))
+        NOTIFIER.i(this@TorDaemon, process.toString())
 
         val feed = StdoutFeed(process.startTime)
 
         process.stdoutFeed(feed).stderrFeed { line ->
             if (line == null) return@stderrFeed
-            NOTIFIER.stderr(this@TorProcess, line)
+            NOTIFIER.stderr(this@TorDaemon, line)
         }
 
         // If scope is cancelled when we go to launch
@@ -197,7 +201,7 @@ internal class TorProcess private constructor(
             process.destroy()
 
             try {
-                NOTIFIER.lce(Lifecycle.Event.OnStop(this@TorProcess))
+                NOTIFIER.lce(Lifecycle.Event.OnStop(this@TorDaemon))
             } finally {
                 manager.update(TorState.Daemon.Off)
             }
@@ -215,7 +219,7 @@ internal class TorProcess private constructor(
 
         processJob.invokeOnCompletion {
             completion.execute()
-            NOTIFIER.lce(Lifecycle.Event.OnDestroy(this@TorProcess))
+            NOTIFIER.lce(Lifecycle.Event.OnDestroy(this@TorDaemon))
         }
 
         return feed to processJob
@@ -235,7 +239,7 @@ internal class TorProcess private constructor(
             .lines()
             .mapNotNull { it.ifBlank { null } }
 
-        NOTIFIER.d(this@TorProcess, "ControlFile$lines")
+        NOTIFIER.d(this@TorDaemon, "ControlFile$lines")
 
         val addresses = ArrayList<String>(1)
 
@@ -312,7 +316,7 @@ internal class TorProcess private constructor(
 
             if (!notified) {
                 notified = true
-                NOTIFIER.d(this@TorProcess, "Waiting for tor to write to $name")
+                NOTIFIER.d(this@TorDaemon, "Waiting for tor to write to $name")
             }
 
             timedDelay(50.milliseconds)
@@ -372,7 +376,7 @@ internal class TorProcess private constructor(
                         // First line of output
                         val time = startTime.elapsedNow().inWholeMilliseconds
                         NOTIFIER.i(
-                            this@TorProcess,
+                            this@TorDaemon,
                             "took ${time}ms before dispatching its first stdout line"
                         )
                     }
@@ -385,7 +389,7 @@ internal class TorProcess private constructor(
             }
 
             if (line == null) return
-            NOTIFIER.stdout(this@TorProcess, line)
+            NOTIFIER.stdout(this@TorDaemon, line)
         }
 
         @Throws(IOException::class)
@@ -542,7 +546,7 @@ internal class TorProcess private constructor(
         ): T {
             val state = getOrCreateInstance(generator.environment.fid) { FIDState() }
 
-            val process = TorProcess(
+            val process = TorDaemon(
                 generator,
                 manager,
                 NOTIFIER,
