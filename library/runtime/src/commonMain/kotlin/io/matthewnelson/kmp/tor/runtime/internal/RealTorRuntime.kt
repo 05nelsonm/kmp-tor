@@ -40,6 +40,9 @@ import io.matthewnelson.kmp.tor.runtime.core.util.executeAsync
 import io.matthewnelson.kmp.tor.runtime.ctrl.TempTorCmdQueue
 import io.matthewnelson.kmp.tor.runtime.ctrl.TorCmdInterceptor
 import io.matthewnelson.kmp.tor.runtime.ctrl.TorCtrl
+import io.matthewnelson.kmp.tor.runtime.internal.observer.ObserverConfChanged
+import io.matthewnelson.kmp.tor.runtime.internal.observer.ObserverConnectivity
+import io.matthewnelson.kmp.tor.runtime.internal.observer.ObserverProcessStdout
 import kotlinx.coroutines.*
 import kotlin.concurrent.Volatile
 import kotlin.coroutines.cancellation.CancellationException

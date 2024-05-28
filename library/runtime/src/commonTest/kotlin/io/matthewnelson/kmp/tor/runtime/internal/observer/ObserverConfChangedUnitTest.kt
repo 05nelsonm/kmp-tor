@@ -15,7 +15,7 @@
  **/
 @file:Suppress("UnnecessaryVariable")
 
-package io.matthewnelson.kmp.tor.runtime.internal
+package io.matthewnelson.kmp.tor.runtime.internal.observer
 
 import io.matthewnelson.kmp.tor.runtime.test.TestTorListenersManager
 import io.matthewnelson.kmp.tor.runtime.TorState
