@@ -197,16 +197,21 @@ public class TorState private constructor(
             network = Network.Disabled,
             fid = fid,
         )
-        internal val state: TorState get() = _state
+        @Volatile
+        private var _hasNotifiedReady: Boolean = false
         private val lock = SynchronizedObject()
 
-        protected abstract fun notify(old: TorState, new: TorState)
+        internal val state: TorState get() = _state
 
+        protected abstract fun notify(old: TorState, new: TorState)
+        protected abstract fun notifyReady()
+
+        @Suppress("LocalVariableName")
         final override fun update(daemon: Daemon?, network: Network?) {
             if (daemon == null && network == null) return
 
-            @Suppress("LocalVariableName")
-            val diff = synchronized(lock) {
+
+            val (diff, notifyReady) = synchronized(lock) {
                 val old = _state
 
                 val _daemon = daemon ?: old.daemon
@@ -217,10 +222,32 @@ public class TorState private constructor(
                 }
 
                 val new = old.copy(_daemon, _network)
-                Diff.of(old, new)?.also { _state = new }
+                val diff = Diff.of(old, new) ?: return@synchronized null
+
+                _state = diff.new
+
+                val notifyReady = if (_hasNotifiedReady) {
+                    if (!new.daemon.isBootstrapped) {
+                        // Reset
+                        _hasNotifiedReady = false
+                    }
+                    false
+                } else {
+                    if (new.daemon.isBootstrapped && new.isNetworkEnabled) {
+                        _hasNotifiedReady = true
+                        true
+                    } else {
+                        false
+                    }
+                }
+
+                diff to notifyReady
             } ?: return
 
             notify(diff.old, diff.new)
+
+            if (!notifyReady) return
+            notifyReady()
         }
 
         private class Diff private constructor(val old: TorState, val new: TorState) {

@@ -24,11 +24,16 @@ class TorStateManagerUnitTest {
 
     private class TestTorStateManager: TorState.AbstractManager(null) {
 
+        val notifyReadies = mutableListOf<Unit>()
         val notifies = mutableListOf<Pair<TorState, TorState>>()
 
         protected override fun notify(old: TorState, new: TorState) {
             assertNotEquals(old, new)
             notifies.add(old to new)
+        }
+
+        protected override fun notifyReady() {
+            notifyReadies.add(Unit)
         }
     }
 
@@ -102,5 +107,35 @@ class TorStateManagerUnitTest {
         manager.update(TorState.Daemon.On(0))
         assertEquals(2, manager.notifies.size)
         assertIs<TorState.Daemon.Stopping>(manager.state.daemon)
+    }
+
+    @Test
+    fun givenBootstrapped_whenNetworkEnabled_thenNotifiesReady() {
+        manager.update(TorState.Daemon.Starting)
+        manager.update(TorState.Daemon.On(100))
+        assertEquals(0, manager.notifyReadies.size)
+
+        // bootstrapped + network enabled
+        manager.update(network = TorState.Network.Enabled)
+        assertEquals(1, manager.notifyReadies.size)
+
+        // toggling network does nothing
+        manager.update(network = TorState.Network.Disabled)
+        assertEquals(1, manager.notifyReadies.size)
+        manager.update(network = TorState.Network.Enabled)
+        assertEquals(1, manager.notifyReadies.size)
+
+        // will not happen in real life, but trigger again to see it was "reset"
+        manager.update(TorState.Daemon.On(95), TorState.Network.Disabled)
+        assertEquals(1, manager.notifyReadies.size)
+        manager.update(TorState.Daemon.On(100), TorState.Network.Enabled)
+        assertEquals(2, manager.notifyReadies.size)
+
+        manager.update(TorState.Daemon.On(95), TorState.Network.Disabled)
+        assertEquals(2, manager.notifyReadies.size)
+        manager.update(TorState.Daemon.On(100))
+        assertEquals(2, manager.notifyReadies.size)
+        manager.update(network = TorState.Network.Enabled)
+        assertEquals(3, manager.notifyReadies.size)
     }
 }

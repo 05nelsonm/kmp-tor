@@ -305,9 +305,10 @@ internal class RealTorRuntime private constructor(
         }
 
         private suspend fun loop() {
-            NOTIFIER.d(this@ActionProcessor, "Processing Jobs")
+            NOTIFIER.d(this, "Processing Jobs")
 
             var previousStartedActionFailed = false
+            var notifyInterrupted: Executable? = null
 
             while (true) {
                 yield()
@@ -321,6 +322,12 @@ internal class RealTorRuntime private constructor(
                     _executingJob = job
 
                     result
+                }
+
+                if (notifyInterrupted != null) {
+                    val executable = notifyInterrupted
+                    notifyInterrupted = null
+                    executable.execute()
                 }
 
                 executables.forEach { it.execute() }
@@ -337,7 +344,10 @@ internal class RealTorRuntime private constructor(
                         val message = cause.message ?: return@invokeOnCompletion
                         if (!message.contains(" was interrupted by StopJob")) return@invokeOnCompletion
 
-                        NOTIFIER.d(this, message)
+                        // Move out of completion handle and execute on next loop.
+                        notifyInterrupted = Executable {
+                            NOTIFIER.d(this, message)
+                        }
                     }
                 }
 
@@ -374,9 +384,7 @@ internal class RealTorRuntime private constructor(
             if (destroyed) return emptyList<Executable.Once>() to null
 
             return synchronized(enqueueLock) {
-                if (destroyed) {
-                    return@synchronized emptyList<Executable.Once>() to null
-                }
+                if (destroyed) return@synchronized emptyList<Executable.Once>() to null
 
                 var execute: ActionJob.Sealed? = null
                 val executables = ArrayList<Executable.Once>((actionStack.size - 1).coerceAtLeast(0))
@@ -738,11 +746,17 @@ internal class RealTorRuntime private constructor(
     private inner class StateManager(
         scope: CoroutineScope,
     ): TorListeners.AbstractManager(scope, generator.environment) {
+
+        private val isReady by lazy { "Tor[fid=$fidEllipses] IS READY" }
+
         protected override fun notify(listeners: TorListeners) {
             LISTENERS.notifyObservers(listeners)
         }
         protected override fun notify(state: TorState) {
             STATE.notifyObservers(state)
+        }
+        protected override fun notifyReady() {
+            PROCESS.READY.notifyObservers(isReady)
         }
     }
 

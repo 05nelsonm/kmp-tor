@@ -188,11 +188,14 @@ class ObserverConnectivityUnitTest {
             observerStatic(RuntimeEvent.EXECUTE.CMD) { cmds.add(it) }
 
 //            observerStatic(RuntimeEvent.ERROR) { it.printStackTrace() }
+//            observerStatic(RuntimeEvent.EXECUTE.ACTION) { println(it) }
+//            observerStatic(RuntimeEvent.EXECUTE.CMD) { it.printStackTrace() }
 //            observerStatic(RuntimeEvent.LIFECYCLE) { println(it) }
 //            observerStatic(RuntimeEvent.LISTENERS) { println(it) }
 //            observerStatic(RuntimeEvent.LOG.DEBUG) { println(it) }
 //            observerStatic(RuntimeEvent.LOG.INFO) { println(it) }
 //            observerStatic(RuntimeEvent.LOG.WARN) { println(it) }
+//            observerStatic(RuntimeEvent.PROCESS.READY) { println(it) }
 //            observerStatic(RuntimeEvent.PROCESS.STDOUT) { println(it) }
 //            observerStatic(RuntimeEvent.PROCESS.STDERR) { println(it) }
 //            observerStatic(RuntimeEvent.STATE) { println(it) }
@@ -200,14 +203,7 @@ class ObserverConnectivityUnitTest {
 
         runtime.startDaemonAsync()
 
-        var contains = false
-        for (warning in warnings) {
-            if (warning.contains("No Network Connectivity. Waiting...")) {
-                contains = true
-                break
-            }
-        }
-        assertTrue(contains, "StartDaemon enabled network when connectivity was false")
+        assertEquals(1, warnings.count { it.contains("No Network Connectivity") })
         assertFalse(runtime.state().isNetworkEnabled)
 
         observer.isConnected = true
