@@ -101,9 +101,7 @@ internal class TorProcess private constructor(
 
         val result = try {
             val connection = config.awaitCtrlConnection(feed)
-            checkInterrupt()
             val authenticate = config.awaitAuthentication(feed)
-            checkInterrupt()
             val configLoad = TorCmd.Config.Load(startArgs.loadText)
 
             val arguments = CtrlArguments(
@@ -137,8 +135,8 @@ internal class TorProcess private constructor(
         // process' stop, and this process' start for TorProcess
         val lastStop = stopMark ?: return
 
-        val delayTime = 500.milliseconds
-        val delayIncrement = 50.milliseconds
+        val delayTime = 1_000.milliseconds
+        val delayIncrement = 100.milliseconds
         val start = TimeSource.Monotonic.markNow()
         var remainder = delayTime - lastStop.elapsedNow()
         var wasNotified = false
@@ -161,7 +159,7 @@ internal class TorProcess private constructor(
     }
 
     @Throws(Throwable::class)
-    private suspend fun StartArgs.spawnProcess(paths: ResourceInstaller.Paths.Tor): Pair<StdoutFeed, Job> {
+    private fun StartArgs.spawnProcess(paths: ResourceInstaller.Paths.Tor): Pair<StdoutFeed, Job> {
         val process = try {
             checkInterrupt()
 
@@ -205,28 +203,6 @@ internal class TorProcess private constructor(
             }
         })
 
-        withContext(NonCancellable) {
-            val exitCode = process.waitForAsync(250.milliseconds) ?: return@withContext
-
-            // exitCode non-null. Process exited early.
-            NOTIFIER.w(this@TorProcess, "Process exited early with code[$exitCode]")
-
-            try {
-                // Ensure OutputFeed are flushed before destroy is called
-                timedDelay(50.milliseconds)
-
-                // Need to destroy before awaiting stdout/stderr
-                process.destroy()
-
-                process.stdoutWaiter()
-                    .awaitStopAsync()
-                    .stderrWaiter()
-                    .awaitStopAsync()
-            } finally {
-                completion.execute()
-            }
-        }
-
         val processJob = scope.launch {
             try {
                 process.waitForAsync()
@@ -254,7 +230,7 @@ internal class TorProcess private constructor(
             .toFile()
 
         val lines = ctrlPortFile
-            .awaitRead(feed, 3.seconds)
+            .awaitRead(feed, 10.seconds)
             .decodeToString()
             .lines()
             .mapNotNull { it.ifBlank { null } }
@@ -316,13 +292,20 @@ internal class TorProcess private constructor(
         val startMark = TimeSource.Monotonic.markNow()
 
         var notified = false
+        var throwInactiveNext = false
         while (true) {
-            // Ensure that stdout is flowing, otherwise may still need to
-            // wait for tor to clean up old files.
-            if (feed.lines > 5 && exists()) {
+            // Ensure that stdout is flowing, otherwise wait until it is.
+            if (feed.lines > 1) {
 
-                val content = readBytes()
-                if (content.size > 5) {
+                val content = try {
+                    readBytes()
+                } catch (_: IOException) {
+                    null
+                }
+
+                // It's either ctrl port file or cookie auth, so
+                // be longer than PORT=
+                if (content != null && content.size > 5) {
                     return content
                 }
             }
@@ -335,6 +318,17 @@ internal class TorProcess private constructor(
             timedDelay(50.milliseconds)
             feed.checkError()
             checkInterrupt()
+
+            if (throwInactiveNext) {
+                throw IOException("Process exited early...")
+            }
+
+            if (state.processJob?.isActive != true) {
+                // Want to give Process time to close down resources
+                // and dispatch null line, which will result in the
+                // OutputFeed generating an error. Give it another 50ms.
+                throwInactiveNext = true
+            }
 
             if (startMark.elapsedNow() > timeout) break
         }
@@ -361,20 +355,25 @@ internal class TorProcess private constructor(
         @Volatile
         private var _error: IOException? = null
 
-        private val maxTimeNoOutput = 1_500.milliseconds
-
         val lines: Int get() = _lines
 
         override fun onOutput(line: String?) {
-            if (_error == null && _lines < 30) {
-                _lines++
+            if (_error == null && _lines < 50) {
+                if (line != null) _lines++
+
                 if (_sb.isEmpty()) {
-                    // First line of output
-                    val time = startTime.elapsedNow().inWholeMilliseconds
-                    NOTIFIER.i(this@TorProcess, "took ${time}ms before dispatching its first stdout line")
+                    if (line != null) {
+                        // First line of output
+                        val time = startTime.elapsedNow().inWholeMilliseconds
+                        NOTIFIER.i(
+                            this@TorProcess,
+                            "took ${time}ms before dispatching its first stdout line"
+                        )
+                    }
                 } else {
                     _sb.appendLine()
                 }
+
                 _sb.append(line ?: "Process Exited Unexpectedly...")
                 line.parseForError()
             }
@@ -384,23 +383,11 @@ internal class TorProcess private constructor(
         }
 
         @Throws(IOException::class)
-        fun checkError() {
-            _error?.let { err -> throw err }
-
-            if (_lines > 0) return
-
-            val runtime = startTime.elapsedNow()
-            if (runtime < maxTimeNoOutput) return
-            throw IOException(
-                "Process failure."
-                + " ${this@TorProcess} has been running for ${runtime.inWholeMilliseconds}ms"
-                + " without any stdout output"
-            )
-        }
+        fun checkError() { _error?.let { err -> throw err } }
 
         fun done() {
             // Will inhibit from adding any more lines
-            _lines = 50
+            _lines = 1000
 
             // clear and de-reference
             val sb = _sb
