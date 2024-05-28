@@ -77,8 +77,8 @@ internal class StartupFeedParser(private val lineLimit: Int = 50, private val ex
         sb.appendLine(
             line,
             generateError =
-                line.contains(CHECK_ERR)
-                || line.contains(CHECK_ANOTHER)
+                line.contains(CHECK_ERR, ignoreCase = true)
+                || line.contains(CHECK_ANOTHER, ignoreCase = true)
         )
     }
 

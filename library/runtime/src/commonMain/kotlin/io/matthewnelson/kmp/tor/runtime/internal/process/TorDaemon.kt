@@ -148,7 +148,7 @@ internal class TorDaemon private constructor(
         // process' stop, and this process' start for TorDaemon
         val lastStop = stopMark ?: return
 
-        val delayTime = 1_000.milliseconds
+        val delayTime = 500.milliseconds
         val delayIncrement = 100.milliseconds
         val start = TimeSource.Monotonic.markNow()
         var remainder = delayTime - lastStop.elapsedNow()
