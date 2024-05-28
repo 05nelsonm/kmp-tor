@@ -203,14 +203,7 @@ class ObserverConnectivityUnitTest {
 
         runtime.startDaemonAsync()
 
-        var contains = false
-        for (warning in warnings) {
-            if (warning.contains("No Network Connectivity. Waiting...")) {
-                contains = true
-                break
-            }
-        }
-        assertTrue(contains, "StartDaemon enabled network when connectivity was false")
+        assertEquals(1, warnings.count { it.contains("No Network Connectivity") })
         assertFalse(runtime.state().isNetworkEnabled)
 
         observer.isConnected = true

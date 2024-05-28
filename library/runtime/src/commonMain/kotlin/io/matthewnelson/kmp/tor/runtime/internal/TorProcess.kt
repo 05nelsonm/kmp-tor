@@ -295,7 +295,7 @@ internal class TorProcess private constructor(
         var throwInactiveNext = false
         while (true) {
             // Ensure that stdout is flowing, otherwise wait until it is.
-            if (feed.lines > 1) {
+            if (feed.isReady) {
 
                 val content = try {
                     readBytes()
@@ -354,12 +354,18 @@ internal class TorProcess private constructor(
         private var _sb = StringBuilder()
         @Volatile
         private var _error: IOException? = null
-
-        val lines: Int get() = _lines
+        @Volatile
+        private var _isReady: Boolean = false
+        val isReady: Boolean get() = _isReady
 
         override fun onOutput(line: String?) {
             if (_error == null && _lines < 50) {
-                if (line != null) _lines++
+                if (line != null) {
+                    _lines++
+                    if (line.contains(PROCESS_CTRL_CONN)) {
+                        _isReady = true
+                    }
+                }
 
                 if (_sb.isEmpty()) {
                     if (line != null) {
@@ -558,6 +564,7 @@ internal class TorProcess private constructor(
             var stopMark: TimeSource.Monotonic.ValueTimeMark? = null
         }
 
+        private const val PROCESS_CTRL_CONN: String = " [notice] Opened Control listener connection (ready) on "
         private const val PROCESS_ERR: String = " [err] "
         private const val PROCESS_OTHER: String = " [warn] It looks like another Tor process is running with the same data directory."
     }
