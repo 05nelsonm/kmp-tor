@@ -397,7 +397,7 @@ internal class TorDaemon private constructor(
             if (startMark.elapsedNow() > timeout) break
         }
 
-        throw feed.createError("Timed out after ${timeout.inWholeMilliseconds}ms waiting for tor to write to file[$this]")
+        throw feed.createError("Timed out after ${timeout.inWholeMilliseconds}ms waiting for tor to write to file[$name]")
     }
 
     public override fun toString(): String = _toString
