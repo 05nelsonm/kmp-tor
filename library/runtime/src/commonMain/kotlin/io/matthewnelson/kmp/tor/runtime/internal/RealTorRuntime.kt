@@ -551,7 +551,7 @@ internal class RealTorRuntime private constructor(
 
         private suspend fun ActionJob.Started.doStart() {
             ensureActive()
-            checkInterrupt()
+            checkCancellationOrInterrupt()
 
             val cmdQueue = _cmdQueue
 
@@ -568,7 +568,7 @@ internal class RealTorRuntime private constructor(
                 return
             }
 
-            TorDaemon.start(generator, manager, NOTIFIER, scope, ::checkInterrupt, connect = {
+            TorDaemon.start(generator, manager, NOTIFIER, scope, ::checkCancellationOrInterrupt, connect = {
                 val ctrl = connection.openWith(factory)
 
                 val lceCtrl = RealTorCtrl(ctrl)
@@ -592,16 +592,16 @@ internal class RealTorRuntime private constructor(
 
                 val processJobCompletionHandle = processJob.invokeOnCompletion { ctrl.destroy() }
 
-                checkInterrupt()
+                checkCancellationOrInterrupt()
                 ctrl.executeAsync(authenticate)
-                checkInterrupt()
+                checkCancellationOrInterrupt()
                 ctrl.executeAsync(TorCmd.Ownership.Take)
-                checkInterrupt()
+                checkCancellationOrInterrupt()
                 ctrl.executeAsync(configLoad)
-                checkInterrupt()
+                checkCancellationOrInterrupt()
                 ctrl.executeAsync(TorCmd.SetEvents(requiredTorEvents))
 
-                checkInterrupt()
+                checkCancellationOrInterrupt()
                 observer.subscribe()
 
                 ctrl.executeAsync(TorCmd.Config.Reset(keywords = buildSet {
@@ -614,7 +614,7 @@ internal class RealTorRuntime private constructor(
                     add(TorConfig.__OwningControllerProcess)
                 }))
 
-                checkInterrupt()
+                checkCancellationOrInterrupt()
                 cmdQueue.attach(ctrl)
                 processJobCompletionHandle.dispose()
             })

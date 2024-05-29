@@ -22,7 +22,6 @@ import io.matthewnelson.kmp.tor.runtime.TorRuntime
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.delay
 import kotlin.time.Duration
-import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.TimeSource
 
 @Suppress("NOTHING_TO_INLINE")
@@ -37,12 +36,13 @@ internal expect fun File.setFilePermissions()
 // No matter the Delay implementation (Coroutines Test library)
 // Will delay the specified duration using a TimeSource.
 internal suspend fun timedDelay(duration: Duration) {
-    if (duration <= 0.milliseconds) return
+    if (duration <= Duration.ZERO) return
 
-    val startMark = TimeSource.Monotonic.markNow()
     var remainder = duration
-    while (remainder > 1.milliseconds) {
+    val start = TimeSource.Monotonic.markNow()
+
+    while (remainder > Duration.ZERO) {
         delay(remainder)
-        remainder = duration - startMark.elapsedNow()
+        remainder = duration - start.elapsedNow()
     }
 }

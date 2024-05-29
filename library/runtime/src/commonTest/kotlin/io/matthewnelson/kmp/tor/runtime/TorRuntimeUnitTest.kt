@@ -131,7 +131,7 @@ class TorRuntimeUnitTest {
     }
 
     @Test
-    fun givenStartup_whenActionStopEnqueued_thenIsInterrupted() = runTest {
+    fun givenStartedAction_whenCancelledOrInterrupted_thenStops() = runTest {
         val runtime = TorRuntime.Builder(testEnv("rt_interrupt")) {
 //            observerStatic(RuntimeEvent.EXECUTE.ACTION) { println(it) }
 //            observerStatic(RuntimeEvent.EXECUTE.CMD) { println(it) }
@@ -148,6 +148,7 @@ class TorRuntimeUnitTest {
         currentCoroutineContext().job.invokeOnCompletion { runtime.clearObservers() }
         runtime.ensureStoppedOnTestCompletion()
 
+        var cancellableJob: Job? = null
         var interruptJob: EnqueuedJob? = null
         suspend fun awaitInterruptJob() {
             val j = interruptJob ?: return
@@ -156,9 +157,28 @@ class TorRuntimeUnitTest {
             latch.join()
         }
 
+        suspend fun assertCancellable() {
+            val j = Job(currentCoroutineContext().job)
+            cancellableJob = j
+            assertFailsWith<CancellationException> {
+                withContext(j) {
+                    runtime.startDaemonAsync()
+                }
+            }
+            withContext(Dispatchers.Default) { delay(100.milliseconds) }
+            assertTrue(runtime.state().isOff)
+        }
+
         run {
             val observerACTION = RuntimeEvent.EXECUTE.ACTION.observer { job ->
                 if (job.isStop) return@observer
+                cancellableJob?.let {
+                    if (it.isActive) {
+                        it.cancel()
+                        return@observer
+                    }
+                }
+
                 interruptJob = runtime.enqueue(Action.StopDaemon, {}, {})
             }
             runtime.subscribe(observerACTION)
@@ -166,6 +186,8 @@ class TorRuntimeUnitTest {
             assertFailsWith<InterruptedException> { runtime.startDaemonAsync() }
             awaitInterruptJob()
             assertTrue(runtime.state().isOff)
+
+            assertCancellable()
 
             runtime.unsubscribe(observerACTION)
         }
@@ -176,6 +198,12 @@ class TorRuntimeUnitTest {
             val observerLCE = RuntimeEvent.LIFECYCLE.observer { event ->
                 if (event.name != eventName) return@observer
                 if (event.className != eventClassName) return@observer
+                cancellableJob?.let {
+                    if (it.isActive) {
+                        it.cancel()
+                        return@observer
+                    }
+                }
                 interruptJob = runtime.enqueue(Action.StopDaemon, {}, {})
             }
             runtime.subscribe(observerLCE)
@@ -190,6 +218,8 @@ class TorRuntimeUnitTest {
                 assertFailsWith<InterruptedException> { runtime.startDaemonAsync() }
                 awaitInterruptJob()
                 assertTrue(runtime.state().isOff)
+
+                assertCancellable()
             }
             runtime.unsubscribe(observerLCE)
         }
@@ -198,6 +228,12 @@ class TorRuntimeUnitTest {
             var cmdClass: KClass<out TorCmd<*>>? = null
             val observerCMD = RuntimeEvent.EXECUTE.CMD.observer { job ->
                 if (job.cmd != cmdClass) return@observer
+                cancellableJob?.let {
+                    if (it.isActive) {
+                        it.cancel()
+                        return@observer
+                    }
+                }
                 interruptJob = runtime.enqueue(Action.StopDaemon, {}, {})
             }
             runtime.subscribe(observerCMD)
@@ -213,6 +249,8 @@ class TorRuntimeUnitTest {
                 assertFailsWith<InterruptedException> { runtime.startDaemonAsync() }
                 awaitInterruptJob()
                 assertTrue(runtime.state().isOff)
+
+                assertCancellable()
             }
             runtime.unsubscribe(observerCMD)
         }

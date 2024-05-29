@@ -112,6 +112,98 @@ class JobUtilUnitTest {
     }
 
     @Test
+    fun givenAwaitAsync_whenJobExecuting_thenIsCancellableIfPolicyAllows() = runTest {
+        var testJob: EnqueuedJobUnitTest.TestJob? = null
+
+        var coroutineCompletion: Unit? = null
+        var coroutineError: Throwable? = null
+        var coroutineInvocationCompletion = false
+
+        var testJobInvocationCompletion = false
+
+        val testLatch = Job(currentCoroutineContext().job)
+
+        val coroutine = launch(CoroutineExceptionHandler { _, t -> coroutineError = t }) {
+            coroutineCompletion = TestArgument.awaitAsync { _, onFailure, onSuccess ->
+                EnqueuedJobUnitTest.TestJob(
+                    onFailure = onFailure,
+                    onSuccess = onSuccess,
+                    cancellationPolicy = EnqueuedJob.CancellationPolicy(
+                        allowAttempts = true,
+                        substituteOnErrorWithAttempt = true,
+                    )
+                )
+                    .also { testJob = it }
+            }
+
+            // Keep alive to check assertions
+            withContext(NonCancellable) { testLatch.join() }
+        }
+
+        coroutine.invokeOnCompletion {
+            coroutineInvocationCompletion = true
+        }
+
+        withContext(Dispatchers.Default) {
+            while (testJob == null) {
+                delay(5.milliseconds)
+            }
+        }
+
+        // non-cancellable
+        testJob!!.executing()
+
+        testJob!!.invokeOnCompletion { cancellation ->
+            testJobInvocationCompletion = true
+            assertNotNull(cancellation)
+        }
+
+        // begin coroutine cancellation
+        coroutine.cancel()
+
+        withContext(Dispatchers.Default) { delay(25.milliseconds) }
+
+        try {
+            assertTrue(testJob!!.isActive)
+            assertFalse(testJob!!.isCompleting)
+            assertFalse(coroutineInvocationCompletion)
+            assertFalse(testJobInvocationCompletion)
+            assertNotNull(testJob!!.attempt())
+        } catch (t: Throwable) {
+            testLatch.cancel()
+            throw t
+        } finally {
+            withContext(NonCancellable + Dispatchers.Default) {
+                testJob!!.error(InterruptedException())
+            }
+        }
+
+        withContext(Dispatchers.Default) { delay(25.milliseconds) }
+
+        try {
+            assertFalse(testJob!!.isActive)
+            assertTrue(testJobInvocationCompletion)
+
+            // All invoke on completion callbacks were all run
+            assertFalse(testJob!!.isCompleting)
+
+            // Coroutine should be cancelled
+            assertTrue(coroutineInvocationCompletion)
+            assertNull(coroutineError)
+
+            // awaitAsync was cancelled
+            assertNull(coroutineCompletion)
+            // testLatch is still active (did not run b/c
+            // cancellation was thrown)
+            assertTrue(testLatch.isActive)
+        } finally {
+            testLatch.complete()
+        }
+
+        coroutine.join()
+    }
+
+    @Test
     fun givenAwaitAsync_whenJobNotExecuting_thenIsCancelledWhenCoroutineIsCancelled() = runTest {
         var testJob: EnqueuedJobUnitTest.TestJob? = null
 

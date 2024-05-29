@@ -16,6 +16,7 @@
 package io.matthewnelson.kmp.tor.runtime.core
 
 import io.matthewnelson.kmp.file.IOException
+import io.matthewnelson.kmp.file.InterruptedException
 import io.matthewnelson.kmp.tor.runtime.core.EnqueuedJob.Companion.toImmediateErrorJob
 import kotlin.coroutines.cancellation.CancellationException
 import kotlin.test.*
@@ -90,7 +91,7 @@ class EnqueuedJobUnitTest {
         assertFalse(job.cancel(null))
         job.error(CancellationException())
         assertEquals(EnqueuedJob.State.Error, job.state)
-        assertNotNull(job.cancellationException)
+        assertNotNull(job.cancellationException())
         assertEquals(1, invocationCancel)
         assertEquals(1, invocationCompletion)
         assertEquals(1, invocationFailure)
@@ -288,18 +289,86 @@ class EnqueuedJobUnitTest {
         var invocationFailure = 0
         val job = OnFailure {
             invocationFailure++
-            assertIs<IllegalStateException>(it)
-        }.toImmediateErrorJob("", IllegalStateException(""), UncaughtException.Handler.THROW)
+            assertIs<InterruptedException>(it)
+        }.toImmediateErrorJob("", InterruptedException(""), UncaughtException.Handler.THROW)
         assertEquals(1, invocationFailure)
         assertEquals(EnqueuedJob.State.Error, job.state)
+    }
+
+    @Test
+    fun givenAllowCancellationAccessibleFalse_whenExecuting_thenOnlyInternalCancelSignalsCancellation() {
+        val job = TestJob(cancellationPolicy = EnqueuedJob.CancellationPolicy(allowAttempts = true))
+        job.executing()
+        job.cancel(null)
+        assertNull(job.attempt())
+        job.cancel(null, signalAttempt = true)
+        assertNotNull(job.attempt())
+    }
+
+    @Test
+    fun givenAllowCancellationAccessibleTrue_whenExecuting_thenPublicCancelSignalsCancellation() {
+        val job = TestJob(
+            cancellationPolicy = EnqueuedJob.CancellationPolicy(
+                allowAttempts = true,
+                accessibilityOpen = true,
+            )
+        )
+
+        job.executing()
+        job.cancel(null)
+        assertNotNull(job.attempt())
+    }
+
+    @Test
+    fun givenAllowCancellationSubstituteOnErrorTrue_whenOnFailure_thenCauseReplacedByCancellationAttempt() {
+        var invocationFailure = 0
+        val job = TestJob(
+            onFailure = { t ->
+                invocationFailure++
+                assertIs<CancellationException>(t)
+            },
+            cancellationPolicy = EnqueuedJob.CancellationPolicy(
+                allowAttempts = true,
+                accessibilityOpen = true,
+                substituteOnErrorWithAttempt = true,
+            ),
+        )
+
+        job.executing()
+        job.cancel(null)
+        job.error(InterruptedException())
+        assertEquals(1, invocationFailure)
+    }
+
+    @Test
+    fun givenAllowCancellationSubstituteOnErrorFalse_whenOnFailure_thenCauseIsNotReplacedByCancellationAttempt() {
+        var invocationFailure = 0
+        val job = TestJob(
+            onFailure = { t ->
+                invocationFailure++
+                assertIs<InterruptedException>(t)
+            },
+            cancellationPolicy = EnqueuedJob.CancellationPolicy(
+                allowAttempts = true,
+                accessibilityOpen = true,
+                substituteOnErrorWithAttempt = false,
+            ),
+        )
+
+        job.executing()
+        job.cancel(null)
+        assertNotNull(job.attempt())
+        job.error(InterruptedException())
+        assertEquals(1, invocationFailure)
     }
 
     public class TestJob(
         name: String = "",
         private val cancellation: (cause: CancellationException?) -> Unit = {},
-        onFailure: OnFailure = OnFailure {},
+        onFailure: OnFailure = OnFailure.noOp(),
         private val onSuccess: OnSuccess<Unit>? = null,
         handler: UncaughtException.Handler = UncaughtException.Handler.THROW,
+        override val cancellationPolicy: CancellationPolicy = CancellationPolicy.DEFAULT,
     ): EnqueuedJob(name, onFailure, handler) {
         override fun onCancellation(cause: CancellationException?) {
             cancellation(cause)
@@ -309,5 +378,6 @@ class EnqueuedJobUnitTest {
         @Throws(IllegalStateException::class)
         public fun executing() { onExecuting() }
         public fun completion() { onCompletion(Unit, withLock = { onSuccess }) }
+        public fun attempt(): CancellationException? = cancellationAttempt()
     }
 }

@@ -22,11 +22,10 @@ import io.matthewnelson.kmp.tor.runtime.core.EnqueuedJob.State.*
 import io.matthewnelson.kmp.tor.runtime.core.UncaughtException.Handler.Companion.tryCatch
 import io.matthewnelson.kmp.tor.runtime.core.UncaughtException.Handler.Companion.withSuppression
 import io.matthewnelson.kmp.tor.runtime.core.UncaughtException.SuppressedHandler
+import io.matthewnelson.kmp.tor.runtime.core.util.awaitAsync
 import kotlin.concurrent.Volatile
 import kotlin.coroutines.cancellation.CancellationException
-import kotlin.jvm.JvmField
-import kotlin.jvm.JvmName
-import kotlin.jvm.JvmStatic
+import kotlin.jvm.*
 
 /**
  * Base abstraction for single-use model that tracks the state
@@ -44,6 +43,8 @@ public abstract class EnqueuedJob protected constructor(
 ) {
 
     @Volatile
+    private var _cancellationAttempt: CancellationException? = null
+    @Volatile
     private var _cancellationException: CancellationException? = null
     @Volatile
     private var _completionCallbacks: LinkedHashSet<ItBlock<CancellationException?>>? = LinkedHashSet(1, 1.0f)
@@ -59,13 +60,11 @@ public abstract class EnqueuedJob protected constructor(
     private val lock = SynchronizedObject()
 
     /**
-     * If [cancel] was invoked successfully, this **will not** be null.
+     * The [CancellationPolicy] of this job.
      *
-     * If [onError] was invoked with a cause of [CancellationException],
-     * this will also be set to indicate as such.
+     * @see [CancellationPolicy]
      * */
-    @get:JvmName("cancellationException")
-    public val cancellationException: CancellationException? get() = _cancellationException
+    public open val cancellationPolicy: CancellationPolicy = CancellationPolicy.DEFAULT
 
     /**
      * An intermediate "state" indicating that completion,
@@ -115,37 +114,6 @@ public abstract class EnqueuedJob protected constructor(
      * */
     @get:JvmName("state")
     public val state: State get() = _state
-
-    public enum class State {
-
-        /**
-         * The initial state.
-         * */
-        Enqueued,
-
-        /**
-         * Point of no return where the job has been de-queued
-         * and is being executed. Cancellation does nothing and
-         * the next state transition will either be [onCompletion]
-         * or [onError].
-         * */
-        Executing,
-
-        /**
-         * If the job completed by cancellation via [cancel].
-         * */
-        Cancelled,
-
-        /**
-         * If the job completed successfully via [onCompletion].
-         * */
-        Success,
-
-        /**
-         * If the job completed exceptionally via [onError].
-         * */
-        Error,
-    }
 
     /**
      * Register a [handle] to be invoked when this [EnqueuedJob]
@@ -212,34 +180,147 @@ public abstract class EnqueuedJob protected constructor(
      * [State.Enqueued] or [isCompleting] is true.
      *
      * If cancelled, [cancellationException] will be set,
-     * [_onFailure] will be invoked with [CancellationException]
+     * [onFailure] will be invoked with [CancellationException]
      * to indicate cancellation, and all [invokeOnCompletion]
      * callbacks will be run.
      *
      * @return true if cancellation was successful
      * */
     public fun cancel(cause: CancellationException?): Boolean {
-        if (_isCompleting || _state != Enqueued) return false
+        return cancel(cause, signalAttempt = cancellationPolicy.accessibilityOpen)
+    }
 
-        @OptIn(InternalKmpTorApi::class)
-        val complete = synchronized(lock) {
-            if (_isCompleting || _state != Enqueued) return@synchronized false
-            _cancellationException = cause ?: CancellationException(toString(Cancelled))
-            _isCompleting = true
-            true
+    public enum class State {
+
+        /**
+         * The initial state.
+         * */
+        Enqueued,
+
+        /**
+         * Point of no return where the job has been de-queued
+         * and is being executed. Cancellation will defer to the
+         * job's [cancellationPolicy]. The next state transition
+         * will be to either [Success] or [Error].
+         * */
+        Executing,
+
+        /**
+         * If the job completed by cancellation via [cancel].
+         * */
+        Cancelled,
+
+        /**
+         * If the job completed successfully via [onCompletion].
+         * */
+        Success,
+
+        /**
+         * If the job completed exceptionally via [onError].
+         *
+         * **NOTE:** Even if [onFailure] was invoked with
+         * [CancellationException], [onError] will still
+         * set [state] to this to indicate that the job
+         * was [Executing].
+         * */
+        Error,
+    }
+
+    /**
+     * Dynamic configuration for implementors of [EnqueuedJob]
+     * in order to modify how it wants to handle cancellation
+     * while in a state of [Executing].
+     *
+     * @see [DEFAULT]
+     * */
+    public data class CancellationPolicy
+    @JvmOverloads
+    public constructor(
+
+        /**
+         * If `true`, [cancellationAttempt] may be set while the
+         * job is in a state of [Executing] in order to signal
+         * that cancellation is desired.
+         *
+         * Default: `false`
+         *
+         * @see [cancellationAttempt]
+         * */
+        @JvmField
+        public val allowAttempts: Boolean = false,
+
+        /**
+         * If `true`, allows the public [cancel] function the ability
+         * to set [cancellationAttempt] while the job is in a state
+         * of [Executing] (i.e. anyone with access to the [EnqueuedJob]
+         * instance).
+         *
+         * If `false`, the public [cancel] function will **not** be
+         * allowed to signal for cancellation. This constrains the
+         * functionality to users of the [awaitAsync] and
+         * [io.matthewnelson.kmp.tor.runtime.core.util.awaitSync]
+         * APIs (i.e. `executeAsync` and `executeSync` extension
+         * functions).
+         *
+         * This has no effect if [allowAttempts] is set to `false`.
+         *
+         * Default: `false`
+         * */
+        @JvmField
+        public val accessibilityOpen: Boolean = false,
+
+        /**
+         * If `true`, calls to [onError] will have their cause replaced
+         * with [cancellationAttempt] if it is set.
+         *
+         * This has no effect if [allowAttempts] is set to `false`.
+         *
+         * Default: `true`
+         * */
+        @JvmField
+        public val substituteOnErrorWithAttempt: Boolean = true,
+    ) {
+
+        /**
+         * If this [CancellationPolicy] instance is equal to [DEFAULT]
+         * */
+        @JvmField
+        public val isDefault: Boolean = this == DEFAULT
+
+        public companion object {
+
+            /**
+             * The default [CancellationPolicy] of all [EnqueuedJob]
+             * implementations that do not override [cancellationPolicy].
+             *
+             *  - [allowAttempts] `false`
+             *  - [accessibilityOpen] `false`
+             *  - [substituteOnErrorWithAttempt] `true`
+             * */
+            @JvmField
+            public val DEFAULT: CancellationPolicy = CancellationPolicy()
         }
+    }
 
-        if (!complete) return false
-
-        Cancelled.doFinal {
-            try {
-                _onFailure?.let { it(_cancellationException!!) }
-            } finally {
-                onCancellation(cause)
-            }
-        }
-
-        return true
+    /**
+     * If [cancel] was called while the [EnqueuedJob] is in a
+     * non-cancellable state (i.e. [Executing]), and the
+     * implementing class has declared a [CancellationPolicy]
+     * allowing for it, this will be set in order to signal
+     * for cancellation.
+     *
+     * It is the implementation's prerogative to check this
+     * during execution of the job and cancel itself if able.
+     *
+     * This will **only** return non-null while the [EnqueuedJob]
+     * is in the [Executing] state, [isCompleting] is `false`, and
+     * [CancellationPolicy.allowAttempts] is set to `true`.
+     *
+     * @see [CancellationPolicy]
+     * */
+    protected fun cancellationAttempt(): CancellationException? {
+        if (_isCompleting || _state != Executing) return null
+        return _cancellationAttempt
     }
 
     /**
@@ -275,13 +356,13 @@ public abstract class EnqueuedJob protected constructor(
     /**
      * Sets the job state to [State.Success] and invokes [OnSuccess]
      * returned by [withLock] with provided [response]. Does nothing
-     * if the job is already completed or [isCompleting] is true.
+     * if the job is completed or completing.
      *
      * Implementations **must not** call [invokeOnCompletion] from within
      * the [withLock] lambda. It will result in a deadlock.
      *
-     * @return true if it executed successfully, false if the job
-     *   was already completed.
+     * @return `true` if it executed successfully, `false` if the job
+     *   is completed or completing.
      * */
     protected fun <T: Any?> onCompletion(response: T, withLock: (() -> OnSuccess<T>?)?): Boolean {
         if (_isCompleting || !isActive) return false
@@ -310,46 +391,100 @@ public abstract class EnqueuedJob protected constructor(
 
     /**
      * Sets the job state to [State.Error] and invokes [OnFailure]
-     * with provided [cause]. Does nothing if the job is already
-     * completed.
+     * with provided [cause]. Does nothing if the job is completed or
+     * completing.
      *
-     * If [cause] is [CancellationException], [cancellationException]
-     * will be set.
+     * [withLock] will be invoked with the final [Throwable] for which
+     * [onFailure] will be called with. It may not be the same as
+     * [cause], depending on the [cancellationPolicy] set.
      *
      * Implementations **must not** call [invokeOnCompletion] from within
      * the [withLock] lambda. It will result in a deadlock.
      *
-     * @return true if it executed successfully, false if the job
-     *   was already completed.
+     * @return `true` if it executed successfully, `false` if the job
+     *   is completed or completing.
      * */
-    protected fun onError(cause: Throwable, withLock: ItBlock<Unit>?): Boolean {
+    protected fun onError(cause: Throwable, withLock: ItBlock<Throwable>?): Boolean {
         if (_isCompleting || !isActive) return false
 
-        val isCancellation = cause is CancellationException
-
         @OptIn(InternalKmpTorApi::class)
-        val complete = synchronized(lock) {
-            if (_isCompleting || !isActive) return@synchronized false
+        val completion = synchronized(lock) {
+            if (_isCompleting || !isActive) return@synchronized null
+
+            val c = if (cancellationPolicy.substituteOnErrorWithAttempt) {
+                _cancellationAttempt ?: cause
+            } else {
+                cause
+            }
+
+            val isCancellation = c is CancellationException
+
             if (isCancellation) {
-                _cancellationException = cause as CancellationException
+                _cancellationException = c as CancellationException
             }
             // Set before invoking withLock so that
             // if implementation calls again it will
             // not lock up.
             _isCompleting = true
-            withLock?.invoke(Unit)
-            true
+            withLock?.invoke(c)
+
+            Executable {
+                Error.doFinal {
+                    try {
+                        _onFailure?.let { it(c) }
+                    } finally {
+                        if (isCancellation) {
+                            onCancellation(_cancellationException)
+                        }
+                    }
+                }
+            }
         }
 
-        if (!complete) return false
+        if (completion == null) return false
 
-        Error.doFinal {
-            try {
-                _onFailure?.let { it(cause) }
-            } finally {
-                if (isCancellation) {
-                    onCancellation(_cancellationException)
+        completion.execute()
+        return true
+    }
+
+    @JvmSynthetic
+    internal fun cancellationException(): CancellationException? = _cancellationException
+
+    /*
+     * This is strictly for the await APIs that back executeSync and executeAsync.
+     * The `runtime` dependency having RuntimeEvent.EXECUTE events, as well as the
+     * `runtime-ctrl` dependency having the TorCmdIntercept API means that someone
+     * other than the call originator for that job could signal cancellation while
+     * it is executing.
+     * */
+    @JvmSynthetic
+    internal fun cancel(cause: CancellationException?, signalAttempt: Boolean): Boolean {
+        if (_isCompleting || !isActive) return false
+
+        @OptIn(InternalKmpTorApi::class)
+        val completion = synchronized(lock) {
+            if (_isCompleting || !isActive) return@synchronized null
+
+            if (_state == Executing) {
+                if (cancellationPolicy.allowAttempts && signalAttempt) {
+                    _cancellationAttempt = cause ?: CancellationException(toString(Cancelled))
                 }
+                return@synchronized null
+            }
+
+            val c = cause ?: CancellationException(toString(Cancelled))
+            _cancellationException = c
+            _isCompleting = true
+            c
+        }
+
+        if (completion == null) return false
+
+        Cancelled.doFinal {
+            try {
+                _onFailure?.let { it(completion) }
+            } finally {
+                onCancellation(cause)
             }
         }
 
@@ -378,6 +513,7 @@ public abstract class EnqueuedJob protected constructor(
                 _state = this@doFinal
 
                 // de-reference all the things
+                _cancellationAttempt = null
                 _handler = null
                 _onFailure = null
 
@@ -420,7 +556,10 @@ public abstract class EnqueuedJob protected constructor(
             this@toImmediateErrorJob,
             handler,
         ) {
-            init { onError(cause, null) }
+            init {
+                onExecuting()
+                onError(cause, null)
+            }
         }
 
         /**
@@ -438,7 +577,10 @@ public abstract class EnqueuedJob protected constructor(
             OnFailure.noOp(),
             handler
         ) {
-            init { onCompletion(response) { this@toImmediateSuccessJob } }
+            init {
+                onExecuting()
+                onCompletion(response) { this@toImmediateSuccessJob }
+            }
         }
     }
 

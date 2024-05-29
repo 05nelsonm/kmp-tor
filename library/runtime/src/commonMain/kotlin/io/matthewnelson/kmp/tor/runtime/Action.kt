@@ -121,6 +121,22 @@ public expect enum class Action: EnqueuedJob.Argument {
          * Enqueues the [action], suspending the current coroutine
          * until completion or cancellation/error.
          *
+         * **NOTE:** If [Action] is [StartDaemon] or [RestartDaemon],
+         * the [EnqueuedJob.CancellationPolicy] allows for handling of
+         * [kotlinx.coroutines.Job] cancellation while the action is
+         * being executed (normally a non-cancellable state). In the
+         * event the underlying [kotlinx.coroutines.Job] for the caller
+         * of [executeAsync] gets cancelled during execution,
+         * [TorRuntime] will check for and cancel itself as soon as
+         * possible. If this is undesirable, wrap your call with a
+         * [kotlinx.coroutines.NonCancellable] job.
+         *
+         * e.g.
+         *
+         *     withContext(NonCancellable) {
+         *         runtime.executeAsync(Action.StartDaemon)
+         *     }
+         *
          * @see [Processor.enqueue]
          * @see [startDaemonAsync]
          * @see [stopDaemonAsync]
@@ -136,6 +152,7 @@ public expect enum class Action: EnqueuedJob.Argument {
          *
          * @see [Processor.enqueue]
          * @see [Action.StartDaemon]
+         * @see [executeAsync]
          * @see [io.matthewnelson.kmp.tor.runtime.Action.Companion.startDaemonSync]
          * */
         @Throws(Throwable::class)
@@ -147,6 +164,7 @@ public expect enum class Action: EnqueuedJob.Argument {
          *
          * @see [Processor.enqueue]
          * @see [Action.StopDaemon]
+         * @see [executeAsync]
          * @see [io.matthewnelson.kmp.tor.runtime.Action.Companion.stopDaemonSync]
          * */
         @Throws(Throwable::class)
@@ -158,6 +176,7 @@ public expect enum class Action: EnqueuedJob.Argument {
          *
          * @see [Processor.enqueue]
          * @see [Action.RestartDaemon]
+         * @see [executeAsync]
          * @see [io.matthewnelson.kmp.tor.runtime.Action.Companion.restartDaemonSync]
          * */
         @Throws(Throwable::class)

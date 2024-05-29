@@ -121,6 +121,22 @@ public actual enum class Action: EnqueuedJob.Argument {
          * Enqueues the [action], suspending the current coroutine
          * until completion or cancellation/error.
          *
+         * **NOTE:** If [Action] is [StartDaemon] or [RestartDaemon],
+         * the [EnqueuedJob.CancellationPolicy] allows for handling of
+         * [kotlinx.coroutines.Job] cancellation while the action is
+         * being executed (normally a non-cancellable state). In the
+         * event the underlying [kotlinx.coroutines.Job] for the caller
+         * of [executeAsync] gets cancelled during execution,
+         * [TorRuntime] will check for and cancel itself as soon as
+         * possible. If this is undesirable, wrap your call with a
+         * [kotlinx.coroutines.NonCancellable] job.
+         *
+         * e.g.
+         *
+         *     withContext(NonCancellable) {
+         *         runtime.executeAsync(Action.StartDaemon)
+         *     }
+         *
          * @see [Processor.enqueue]
          * @see [startDaemonAsync]
          * @see [stopDaemonAsync]
@@ -138,6 +154,7 @@ public actual enum class Action: EnqueuedJob.Argument {
          * until completion or cancellation/error.
          *
          * @see [Processor.enqueue]
+         * @see [executeAsync]
          * @see [Action.StartDaemon]
          * */
         //@Throws(Throwable::class)
@@ -148,6 +165,7 @@ public actual enum class Action: EnqueuedJob.Argument {
          * until completion or cancellation/error.
          *
          * @see [Processor.enqueue]
+         * @see [executeAsync]
          * @see [Action.StopDaemon]
          * */
         //@Throws(Throwable::class)
@@ -158,6 +176,7 @@ public actual enum class Action: EnqueuedJob.Argument {
          * current coroutine until completion or cancellation/error.
          *
          * @see [Processor.enqueue]
+         * @see [executeAsync]
          * @see [Action.RestartDaemon]
          * */
         //@Throws(Throwable::class)

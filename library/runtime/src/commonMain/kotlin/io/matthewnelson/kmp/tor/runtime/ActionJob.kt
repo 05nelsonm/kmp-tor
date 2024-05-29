@@ -83,6 +83,7 @@ public abstract class ActionJob private constructor(
 
         @Volatile
         private var _interrupt: InterruptedException? = null
+        public final override val cancellationPolicy = CANCELLATION_POLICY
 
         @JvmSynthetic
         internal fun interruptBy(enqueuedJob: StopJob) {
@@ -93,11 +94,19 @@ public abstract class ActionJob private constructor(
         }
 
         @JvmSynthetic
-        @Throws(InterruptedException::class)
-        internal fun checkInterrupt() { _interrupt?.let { t -> throw t } }
+        @Throws(CancellationException::class, InterruptedException::class)
+        internal fun checkCancellationOrInterrupt() {
+            cancellationAttempt()?.let { t -> throw t }
+            if (isCompleting || !isActive) return
+            _interrupt?.let { t -> throw t }
+        }
 
         init {
             invokeOnCompletion { _interrupt = null }
+        }
+
+        private companion object {
+            private val CANCELLATION_POLICY = CancellationPolicy(allowAttempts = true)
         }
     }
 
@@ -144,8 +153,8 @@ public abstract class ActionJob private constructor(
 
         @JvmSynthetic
         internal fun error(cause: Throwable): Boolean {
-            return onError(cause, withLock = {
-                _onErrorCause = cause
+            return onError(cause, withLock = { t ->
+                _onErrorCause = t
                 _onSuccess = null
             })
         }

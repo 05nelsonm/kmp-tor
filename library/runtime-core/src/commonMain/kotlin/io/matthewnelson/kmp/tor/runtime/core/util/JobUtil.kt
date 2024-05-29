@@ -20,9 +20,19 @@ import io.matthewnelson.kmp.tor.runtime.core.EnqueuedJob
 import io.matthewnelson.kmp.tor.runtime.core.OnFailure
 import io.matthewnelson.kmp.tor.runtime.core.OnSuccess
 
+/**
+ * Helper for creating APIs that wrap an [EnqueuedJob] with
+ * asynchronous execution functionality.
+ *
+ * **NOTE:** This is an internal API not meant for public consumption.
+ *
+ * @see [io.matthewnelson.kmp.tor.runtime.core.util.awaitSync]
+ * @see [io.matthewnelson.kmp.tor.runtime.core.util.executeAsync]
+ * @see [io.matthewnelson.kmp.tor.runtime.Action.Companion.executeAsync]
+ * */
 @InternalKmpTorApi
 @Throws(Throwable::class)
-@Deprecated("Not meant for public usage", level = DeprecationLevel.ERROR)
-public expect suspend inline fun <Arg: EnqueuedJob.Argument, Success: Any> Arg.awaitAsync(
+@Deprecated("Not meant for public use", level = DeprecationLevel.ERROR)
+public expect suspend fun <Arg: EnqueuedJob.Argument, Success: Any> Arg.awaitAsync(
     enqueue: (arg: Arg, onFailure: OnFailure, onSuccess: OnSuccess<Success>) -> EnqueuedJob,
 ): Success

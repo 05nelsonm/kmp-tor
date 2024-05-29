@@ -16,7 +16,6 @@
 package io.matthewnelson.kmp.tor.runtime.core.util
 
 import io.matthewnelson.kmp.file.InterruptedException
-import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
 import io.matthewnelson.kmp.tor.runtime.core.EnqueuedJob
 import io.matthewnelson.kmp.tor.runtime.core.EnqueuedJobUnitTest.TestJob
 import kotlinx.coroutines.*
@@ -26,8 +25,6 @@ import java.util.concurrent.TimeoutException
 import kotlin.test.*
 import kotlin.time.Duration.Companion.milliseconds
 
-@Suppress("DEPRECATION_ERROR")
-@OptIn(InternalKmpTorApi::class)
 class JobUtilJvmUnitTest {
 
     @Test
