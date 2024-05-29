@@ -226,6 +226,7 @@ public final class io/matthewnelson/kmp/tor/runtime/RuntimeEvent$EXECUTE$ACTION 
 
 public final class io/matthewnelson/kmp/tor/runtime/RuntimeEvent$EXECUTE$CMD : io/matthewnelson/kmp/tor/runtime/RuntimeEvent {
 	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/RuntimeEvent$EXECUTE$CMD;
+	public static final fun observeNewNym (Lio/matthewnelson/kmp/tor/runtime/RuntimeEvent$Processor;Ljava/lang/String;Lio/matthewnelson/kmp/tor/runtime/core/OnEvent$Executor;Lio/matthewnelson/kmp/tor/runtime/core/OnEvent;)Lio/matthewnelson/kmp/tor/runtime/core/Disposable;
 }
 
 public final class io/matthewnelson/kmp/tor/runtime/RuntimeEvent$LIFECYCLE : io/matthewnelson/kmp/tor/runtime/RuntimeEvent {
@@ -307,7 +308,7 @@ public final class io/matthewnelson/kmp/tor/runtime/RuntimeEvent$STATE : io/matt
 
 public final class io/matthewnelson/kmp/tor/runtime/TorCmdJob : io/matthewnelson/kmp/tor/runtime/core/EnqueuedJob {
 	public final field cmd Lkotlin/reflect/KClass;
-	public synthetic fun <init> (Lkotlin/reflect/KClass;Lio/matthewnelson/kmp/tor/runtime/core/EnqueuedJob;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public synthetic fun <init> (Lkotlin/reflect/KClass;Lio/matthewnelson/kmp/tor/runtime/core/EnqueuedJob;Lkotlin/coroutines/CoroutineContext;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
 	public fun equals (Ljava/lang/Object;)Z
 	public fun hashCode ()I
 }

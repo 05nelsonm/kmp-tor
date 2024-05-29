@@ -442,7 +442,12 @@ public sealed class TorCmd<Success: Any> private constructor(
         public data object Reload: Unprivileged<Reply.Success.OK>("SIGNAL")
         public data object Dump: Unprivileged<Reply.Success.OK>("SIGNAL")
         public data object Debug: Unprivileged<Reply.Success.OK>("SIGNAL")
+
+        /**
+         * See [io.matthewnelson.kmp.tor.runtime.RuntimeEvent.EXECUTE.CMD.observeNewNym]
+         * */
         public data object NewNym: Unprivileged<Reply.Success.OK>("SIGNAL")
+
         public data object ClearDnsCache: Unprivileged<Reply.Success.OK>("SIGNAL")
         public data object Heartbeat: Unprivileged<Reply.Success.OK>("SIGNAL")
         public data object Active: Unprivileged<Reply.Success.OK>("SIGNAL")
