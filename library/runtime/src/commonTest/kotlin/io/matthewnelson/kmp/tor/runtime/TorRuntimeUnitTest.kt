@@ -270,6 +270,7 @@ class TorRuntimeUnitTest {
         runtime.executeAsync(TorCmd.Signal.NewNym)
         runtime.executeAsync(TorCmd.Signal.NewNym)
         runtime.executeAsync(TorCmd.Signal.NewNym)
+        runtime.stopDaemonAsync()
 
         assertEquals(4, notices.size)
         assertNull(notices[0]) // SUCCESS
