@@ -260,9 +260,10 @@ class TorRuntimeUnitTest {
         currentCoroutineContext().job.invokeOnCompletion { runtime.clearObservers() }
         runtime.ensureStoppedOnTestCompletion()
 
+        val lock = SynchronizedObject()
         val notices = mutableListOf<String?>()
         runtime.observeNewNym(null, null) { limited ->
-            notices.add(limited)
+            synchronized(lock) { notices.add(limited) }
         }
 
         runtime.startDaemonAsync()
