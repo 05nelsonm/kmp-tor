@@ -33,8 +33,8 @@ jobs:
         uses: actions/cache@v1
         with:
           path: ~/.konan
-          key: ${{ runner.os }}-konan-${{ hashFiles('**/*.gradle.kts') }}-${{ hashFiles('gradle/libs.versions.toml') }}
-          restore-keys: ${{ runner.os }}-konan-
+          key: ${{ runner.os }}-java${{ matrix.java-version }}-konan-${{ hashFiles('**/*.gradle.kts') }}-${{ hashFiles('gradle/libs.versions.toml') }}
+          restore-keys: ${{ runner.os }}-java${{ matrix.java-version }}-konan-
 
       - name: Setup Caches [ Gradle Caches ]
         uses: actions/cache@v1
