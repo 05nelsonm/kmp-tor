@@ -61,23 +61,25 @@ internal class TorDaemon private constructor(
     private val NOTIFIER: RuntimeEvent.Notifier,
     private val scope: CoroutineScope,
     private val state: FIDState,
-    private val checkInterrupt: () -> Unit,
 ): FileID by generator.environment {
 
     private val _toString by lazy { toFIDString(includeHashCode = true) }
 
     @Throws(Throwable::class)
-    private suspend fun <T: Any?> start(connect: suspend CtrlArguments.() -> T): T = state.lock.withLock {
+    private suspend fun <T: Any?> start(
+        checkCancellationOrInterrupt: () -> Unit,
+        connect: suspend CtrlArguments.() -> T
+    ): T = state.lock.withLock {
         try {
             NOTIFIER.lce(Lifecycle.Event.OnCreate(this))
-            state.cancelAndJoinOtherProcess()
+            state.cancelAndJoinOtherProcess(checkCancellationOrInterrupt)
         } catch (t: Throwable) {
             NOTIFIER.lce(Lifecycle.Event.OnDestroy(this))
             throw t
         }
 
         val (config, paths) = try {
-            checkInterrupt()
+            checkCancellationOrInterrupt()
             generator.generate(NOTIFIER)
         } catch (t: Throwable) {
             NOTIFIER.lce(Lifecycle.Event.OnDestroy(this))
@@ -85,7 +87,7 @@ internal class TorDaemon private constructor(
         }
 
         val startArgs = try {
-            checkInterrupt()
+            checkCancellationOrInterrupt()
             config.createStartArgs(generator.environment)
         } catch (t: Throwable) {
             NOTIFIER.lce(Lifecycle.Event.OnDestroy(this))
@@ -100,11 +102,11 @@ internal class TorDaemon private constructor(
             + "\n------------------------------------------------------------------------"
         )
 
-        val (feed, processJob) = startArgs.spawnProcess(paths)
+        val (feed, processJob) = startArgs.spawnProcess(paths, checkCancellationOrInterrupt)
 
         val result = try {
-            val connection = config.awaitCtrlConnection(feed)
-            val authenticate = config.awaitAuthentication(feed)
+            val connection = config.awaitCtrlConnection(feed, checkCancellationOrInterrupt)
+            val authenticate = config.awaitAuthentication(feed, checkCancellationOrInterrupt)
             val configLoad = TorCmd.Config.Load(startArgs.loadText)
 
             val arguments = CtrlArguments(
@@ -114,7 +116,7 @@ internal class TorDaemon private constructor(
                 connection,
             )
 
-            checkInterrupt()
+            checkCancellationOrInterrupt()
             connect(arguments)
         } catch (t: Throwable) {
             when (t) {
@@ -137,10 +139,11 @@ internal class TorDaemon private constructor(
         result
     }
 
-    private suspend fun FIDState.cancelAndJoinOtherProcess() {
+    @Throws(CancellationException::class, InterruptedException::class, IOException::class)
+    private suspend fun FIDState.cancelAndJoinOtherProcess(checkCancellationOrInterrupt: () -> Unit) {
         processJob?.cancelAndJoin()
         yield()
-        checkInterrupt()
+        checkCancellationOrInterrupt()
 
         manager.update(TorState.Daemon.Starting, TorState.Network.Disabled)
 
@@ -162,7 +165,7 @@ internal class TorDaemon private constructor(
             }
 
             delay(if (remainder < delayIncrement) remainder else delayIncrement)
-            checkInterrupt()
+            checkCancellationOrInterrupt()
             remainder = delayTime - lastStop.elapsedNow()
         }
 
@@ -172,10 +175,13 @@ internal class TorDaemon private constructor(
         }
     }
 
-    @Throws(Throwable::class)
-    private fun StartArgs.spawnProcess(paths: ResourceInstaller.Paths.Tor): Pair<StartupFeedParser, Job> {
+    @Throws(CancellationException::class, InterruptedException::class, IOException::class)
+    private fun StartArgs.spawnProcess(
+        paths: ResourceInstaller.Paths.Tor,
+        checkCancellationOrInterrupt: () -> Unit,
+    ): Pair<StartupFeedParser, Job> {
         val process = try {
-            checkInterrupt()
+            checkCancellationOrInterrupt()
 
             Process.Builder(command = paths.tor.path)
                 .args(cmdLine)
@@ -271,9 +277,10 @@ internal class TorDaemon private constructor(
         return startupFeed to processJob
     }
 
-    @Throws(Throwable::class)
+    @Throws(CancellationException::class, InterruptedException::class, IOException::class)
     private suspend fun TorConfig.awaitCtrlConnection(
         feed: StartupFeedParser,
+        checkCancellationOrInterrupt: () -> Unit,
     ): CtrlArguments.Connection {
         // Is **always** present in generated config.
         val ctrlPortFile = filterByKeyword<TorConfig.ControlPortWriteToFile.Companion>()
@@ -282,7 +289,7 @@ internal class TorDaemon private constructor(
             .toFile()
 
         val lines = ctrlPortFile
-            .awaitRead(feed, 10.seconds)
+            .awaitRead(feed, 10.seconds, checkCancellationOrInterrupt)
             .decodeToString()
             .lines()
             .mapNotNull { it.ifBlank { null } }
@@ -319,9 +326,10 @@ internal class TorDaemon private constructor(
         throw feed.createError("Failed to acquire control connection info from file[$ctrlPortFile]")
     }
 
-    @Throws(Throwable::class)
+    @Throws(CancellationException::class, InterruptedException::class, IOException::class)
     private suspend fun TorConfig.awaitAuthentication(
         feed: StartupFeedParser,
+        checkCancellationOrInterrupt: () -> Unit,
     ): TorCmd.Authenticate {
         // TODO: HashedControlPassword Issue #1
 
@@ -329,19 +337,20 @@ internal class TorDaemon private constructor(
             .firstOrNull()
             ?.argument
             ?.toFile()
-            ?.awaitRead(feed, 1.seconds)
+            ?.awaitRead(feed, 1.seconds, checkCancellationOrInterrupt)
             ?.let { bytes -> TorCmd.Authenticate(cookie = bytes)  }
             ?: TorCmd.Authenticate() // Unauthenticated
     }
 
-    @Throws(CancellationException::class, IOException::class)
+    @Throws(CancellationException::class, InterruptedException::class, IOException::class)
     private suspend fun File.awaitRead(
         feed: StartupFeedParser,
         timeout: Duration,
+        checkCancellationOrInterrupt: () -> Unit,
     ): ByteArray {
         require(timeout >= 500.milliseconds) { "timeout must be greater than or equal to 500ms" }
         feed.checkError()
-        checkInterrupt()
+        checkCancellationOrInterrupt()
 
         val startMark = TimeSource.Monotonic.markNow()
 
@@ -376,7 +385,7 @@ internal class TorDaemon private constructor(
                 throw feed.createError("Process exited early...")
             }
 
-            checkInterrupt()
+            checkCancellationOrInterrupt()
 
             if (state.processJob?.isActive != true) {
                 // Want to give Process time to close down resources
@@ -510,7 +519,7 @@ internal class TorDaemon private constructor(
             manager: TorState.Manager,
             NOTIFIER: RuntimeEvent.Notifier,
             scope: CoroutineScope,
-            checkInterrupt: () -> Unit,
+            checkCancellationOrInterrupt: () -> Unit,
             connect: suspend CtrlArguments.() -> T,
         ): T {
             val state = getOrCreateInstance(generator.environment.fid) { FIDState() }
@@ -521,10 +530,9 @@ internal class TorDaemon private constructor(
                 NOTIFIER,
                 scope,
                 state as FIDState,
-                checkInterrupt,
             )
 
-            return process.start(connect)
+            return process.start(checkCancellationOrInterrupt, connect)
         }
 
         private class FIDState {

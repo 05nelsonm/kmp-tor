@@ -27,7 +27,7 @@ import kotlin.reflect.KClass
  * [TorCmd.Privileged.Processor] to inform observers that they are being
  * executed.
  *
- * The job is non-cancelling, created just prior to when the actual [TorCmd]
+ * The job is non-cancellable, created just prior to when the actual [TorCmd]
  * contents are to be written to the control connection.
  *
  * This is useful for seeing what is happening and, if needed, attaching
@@ -40,7 +40,17 @@ public class TorCmdJob private constructor(
     @JvmField
     public val cmd: KClass<out TorCmd<*>>,
     private val delegate: EnqueuedJob,
-): EnqueuedJob(delegate.name, OnFailure.noOp(), UncaughtException.Handler.THROW) {
+): EnqueuedJob(
+    delegate.name,
+    OnFailure.noOp(),
+    // If invokeOnCompletion handles attached to this
+    // job throw exception, want to throw the exception
+    // in order to pipe everything to the delegate's
+    // handler (which is utilizing the one from
+    // RealTorRuntime, as declared in its TorCtrl.Factory
+    // instance).
+    UncaughtException.Handler.THROW,
+) {
 
     init {
         onExecuting()
