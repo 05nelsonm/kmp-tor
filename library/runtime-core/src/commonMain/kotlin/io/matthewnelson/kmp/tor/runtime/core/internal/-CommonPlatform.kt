@@ -33,7 +33,6 @@ internal expect val IsAndroidHost: Boolean
 
 internal expect val IsDarwinMobile: Boolean
 
-@PublishedApi
 @InternalKmpTorApi
 @Throws(Throwable::class)
 @OptIn(ExperimentalContracts::class)
@@ -62,7 +61,7 @@ internal suspend inline fun <Arg: EnqueuedJob.Argument, Success: Any> Arg.common
         cancellable.join()
     } catch (e: CancellationException) {
         // Try cancelling EnqueuedJob
-        job.cancel(e)
+        job.cancel(e, signalAttempt = true)
     }
 
     // EnqueuedJob.cancel was unsuccessful. Wait for completion.
@@ -77,7 +76,7 @@ internal suspend inline fun <Arg: EnqueuedJob.Argument, Success: Any> Arg.common
         throw IllegalStateException("$job completed successfully, but no response was recovered")
     }
 
-    throw job.cancellationException
+    throw job.cancellationException()
         ?: failure
         ?: IllegalStateException("$job completed exceptionally, but no cause was recovered")
 }

@@ -31,11 +31,21 @@ import kotlin.coroutines.cancellation.CancellationException
 import kotlin.jvm.JvmName
 import kotlin.time.Duration.Companion.milliseconds
 
+/**
+ * Helper for creating APIs that wrap an [EnqueuedJob] with
+ * asynchronous execution functionality.
+ *
+ * **NOTE:** This is an internal API not meant for public consumption.
+ *
+ * @see [io.matthewnelson.kmp.tor.runtime.core.util.awaitSync]
+ * @see [io.matthewnelson.kmp.tor.runtime.core.util.executeAsync]
+ * @see [io.matthewnelson.kmp.tor.runtime.Action.Companion.executeAsync]
+ * */
 @InternalKmpTorApi
 @Throws(Throwable::class)
 @OptIn(ExperimentalContracts::class)
-@Deprecated("Not meant for public usage", level = DeprecationLevel.ERROR)
-public actual suspend inline fun <Arg: EnqueuedJob.Argument, Success: Any> Arg.awaitAsync(
+@Deprecated("Not meant for public use", level = DeprecationLevel.ERROR)
+public actual suspend fun <Arg: EnqueuedJob.Argument, Success: Any> Arg.awaitAsync(
     enqueue: (arg: Arg, onFailure: OnFailure, onSuccess: OnSuccess<Success>) -> EnqueuedJob,
 ): Success {
     contract {
@@ -45,13 +55,26 @@ public actual suspend inline fun <Arg: EnqueuedJob.Argument, Success: Any> Arg.a
     return commonAwaitAsync(enqueue)
 }
 
+/**
+ * Helper for creating APIs that wrap an [EnqueuedJob] with
+ * synchronous execution functionality.
+ *
+ * **NOTE:** This is a blocking call and should be invoked from
+ * a background thread.
+ *
+ * **NOTE:** This is an internal API not meant for public consumption.
+ *
+ * @see [io.matthewnelson.kmp.tor.runtime.core.util.awaitAsync]
+ * @see [io.matthewnelson.kmp.tor.runtime.core.util.executeSync]
+ * @see [io.matthewnelson.kmp.tor.runtime.Action.Companion.executeSync]
+ * */
 @InternalKmpTorApi
 @Throws(Throwable::class)
 @OptIn(ExperimentalContracts::class)
-@Deprecated("Not meant for public usage", level = DeprecationLevel.ERROR)
-public inline fun <Arg: EnqueuedJob.Argument, Success: Any> Arg.awaitSync(
+@Deprecated("Not meant for public use", level = DeprecationLevel.ERROR)
+public fun <Arg: EnqueuedJob.Argument, Success: Any> Arg.awaitSync(
     enqueue: (arg: Arg, onFailure: OnFailure, onSuccess: OnSuccess<Success>) -> EnqueuedJob,
-    noinline cancellation: (() -> CancellationException?)?,
+    cancellation: (() -> CancellationException?)?,
 ): Success {
     contract {
         callsInPlace(enqueue, InvocationKind.EXACTLY_ONCE)
@@ -60,7 +83,6 @@ public inline fun <Arg: EnqueuedJob.Argument, Success: Any> Arg.awaitSync(
     var failure: Throwable? = null
     var success: Success? = null
 
-    @Suppress("DEPRECATION_ERROR")
     return enqueue(
         this,
         OnFailure { f -> failure = f },
@@ -72,10 +94,7 @@ public inline fun <Arg: EnqueuedJob.Argument, Success: Any> Arg.awaitSync(
     )
 }
 
-@PublishedApi
-@InternalKmpTorApi
 @Throws(Throwable::class)
-@Deprecated("Not meant for public usage", level = DeprecationLevel.ERROR)
 internal inline fun <Success: Any> EnqueuedJob.awaitSync(
     success: () -> Success?,
     failure: () -> Throwable?,
@@ -83,15 +102,21 @@ internal inline fun <Success: Any> EnqueuedJob.awaitSync(
 ): Success {
     var callback = cancellation
 
+    val duration = 10.milliseconds
+
     while (isActive) {
         success()?.let { return it }
         failure()?.let { throw it }
 
         try {
-            Blocking.threadSleep(10.milliseconds)
+            Blocking.threadSleep(duration)
         } catch (e: InterruptedException) {
             // Try to cancel
-            if (cancel(CancellationException("Interrupted", e))) break
+            val wasCancelled = cancel(
+                cause = CancellationException("Interrupted", e),
+                signalAttempt = true,
+            )
+            if (wasCancelled) break
 
             // non-cancellable state. continue.
         }
@@ -106,7 +131,7 @@ internal inline fun <Success: Any> EnqueuedJob.awaitSync(
             if (t is CancellationException) {
                 t
             } else {
-                CancellationException("awaitSync.cancellation threw exception", t)
+                CancellationException("awaitSync.cancellation() threw exception", t)
             }
         }
 
@@ -115,7 +140,7 @@ internal inline fun <Success: Any> EnqueuedJob.awaitSync(
         // is in State.Executing), will just continue to loop
         // until execution completes.
         callback = null
-        cancel(cause)
+        cancel(cause, signalAttempt = true)
     }
 
     if (isSuccess) {
@@ -123,7 +148,7 @@ internal inline fun <Success: Any> EnqueuedJob.awaitSync(
         throw IllegalStateException("$this completed successfully, but no response was recovered")
     }
 
-    throw cancellationException
+    throw cancellationException()
         ?: failure()
         ?: IllegalStateException("$this completed exceptionally, but no cause was recovered")
 }

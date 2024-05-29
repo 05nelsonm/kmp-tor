@@ -26,11 +26,20 @@ import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
 
+/**
+ * Helper for creating APIs that wrap an [EnqueuedJob] with
+ * asynchronous execution functionality.
+ *
+ * **NOTE:** This is an internal API not meant for public consumption.
+ *
+ * @see [io.matthewnelson.kmp.tor.runtime.core.util.executeAsync]
+ * @see [io.matthewnelson.kmp.tor.runtime.Action.Companion.executeAsync]
+ * */
 @InternalKmpTorApi
 //@Throws(Throwable::class)
 @OptIn(ExperimentalContracts::class)
-@Deprecated("Not meant for public usage", level = DeprecationLevel.ERROR)
-public actual suspend inline fun <Arg: EnqueuedJob.Argument, Success: Any> Arg.awaitAsync(
+@Deprecated("Not meant for public use", level = DeprecationLevel.ERROR)
+public actual suspend fun <Arg: EnqueuedJob.Argument, Success: Any> Arg.awaitAsync(
     enqueue: (arg: Arg, onFailure: OnFailure, onSuccess: OnSuccess<Success>) -> EnqueuedJob,
 ): Success {
     contract {
