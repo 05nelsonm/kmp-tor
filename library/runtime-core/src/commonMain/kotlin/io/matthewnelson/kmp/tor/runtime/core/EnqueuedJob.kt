@@ -259,7 +259,7 @@ public abstract class EnqueuedJob protected constructor(
          * allowed to signal for cancellation. This constrains the
          * functionality to users of the [awaitAsync] and
          * [io.matthewnelson.kmp.tor.runtime.core.util.awaitSync]
-         * APIs (i.e. `executeAsync` and `executeAsync` extension
+         * APIs (i.e. `executeAsync` and `executeSync` extension
          * functions).
          *
          * This has no effect if [allowAttempts] is set to `false`.
