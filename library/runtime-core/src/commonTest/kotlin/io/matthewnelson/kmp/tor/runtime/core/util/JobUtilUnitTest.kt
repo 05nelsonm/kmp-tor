@@ -128,10 +128,12 @@ class JobUtilUnitTest {
                 EnqueuedJobUnitTest.TestJob(
                     onFailure = onFailure,
                     onSuccess = onSuccess,
-                    cancellationPolicy = EnqueuedJob.CancellationPolicy(
-                        allowAttempts = true,
-                        substituteOnErrorWithAttempt = true,
-                    )
+                    executionPolicy = EnqueuedJob.ExecutionPolicy.Builder {
+                        cancellation {
+                            allowAttempts = true
+                            substituteErrorWithAttempt = true
+                        }
+                    }
                 )
                     .also { testJob = it }
             }

@@ -126,7 +126,7 @@ public actual enum class Action: EnqueuedJob.Argument {
          * until completion or cancellation/error.
          *
          * **NOTE:** If [Action] is [StartDaemon] or [RestartDaemon],
-         * the [EnqueuedJob.CancellationPolicy] allows for handling of
+         * the [EnqueuedJob.ExecutionPolicy] allows for handling of
          * [kotlinx.coroutines.Job] cancellation while the action is
          * being executed (normally a non-cancellable state). In the
          * event the underlying [kotlinx.coroutines.Job] for the caller
@@ -160,7 +160,7 @@ public actual enum class Action: EnqueuedJob.Argument {
          * until completion or cancellation/error.
          *
          * **NOTE:** If [Action] is [StartDaemon] or [RestartDaemon],
-         * the [EnqueuedJob.CancellationPolicy] allows for handling of
+         * the [EnqueuedJob.ExecutionPolicy] allows for handling of
          * cancellation while the action is being executed (normally
          * a non-cancellable state). In the event the [cancellation]
          * callback returns [CancellationException], [TorRuntime] will

@@ -13,11 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
+@file:Suppress("KotlinRedundantDiagnosticSuppress", "FunctionName")
+
 package io.matthewnelson.kmp.tor.runtime.core
 
 import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
+import io.matthewnelson.kmp.tor.core.api.annotation.KmpTorDsl
 import io.matthewnelson.kmp.tor.core.resource.SynchronizedObject
 import io.matthewnelson.kmp.tor.core.resource.synchronized
+import io.matthewnelson.kmp.tor.runtime.core.EnqueuedJob.ExecutionPolicy.Cancellation
 import io.matthewnelson.kmp.tor.runtime.core.EnqueuedJob.State.*
 import io.matthewnelson.kmp.tor.runtime.core.UncaughtException.Handler.Companion.tryCatch
 import io.matthewnelson.kmp.tor.runtime.core.UncaughtException.Handler.Companion.withSuppression
@@ -60,11 +64,11 @@ public abstract class EnqueuedJob protected constructor(
     private val lock = SynchronizedObject()
 
     /**
-     * The [CancellationPolicy] of this job.
+     * The [ExecutionPolicy] of this job.
      *
-     * @see [CancellationPolicy]
+     * @see [ExecutionPolicy]
      * */
-    public open val cancellationPolicy: CancellationPolicy = CancellationPolicy.DEFAULT
+    public open val executionPolicy: ExecutionPolicy = ExecutionPolicy.DEFAULT
 
     /**
      * An intermediate "state" indicating that completion,
@@ -187,7 +191,52 @@ public abstract class EnqueuedJob protected constructor(
      * @return true if cancellation was successful
      * */
     public fun cancel(cause: CancellationException?): Boolean {
-        return cancel(cause, signalAttempt = cancellationPolicy.accessibilityOpen)
+        return cancel(cause, signalAttempt = executionPolicy.cancellation.accessibilityOpen)
+    }
+
+    public companion object {
+
+        /**
+         * Creates a [EnqueuedJob] which immediately invokes
+         * [OnFailure] with the provided [cause].
+         * */
+        @JvmStatic
+        @JvmName("immediateErrorJob")
+        public fun OnFailure.toImmediateErrorJob(
+            name: String,
+            cause: Throwable,
+            handler: UncaughtException.Handler,
+        ): EnqueuedJob = object : EnqueuedJob(
+            name,
+            this@toImmediateErrorJob,
+            handler,
+        ) {
+            init {
+                onExecuting()
+                onError(cause, null)
+            }
+        }
+
+        /**
+         * Creates a [EnqueuedJob] which immediately invokes
+         * [OnSuccess] with the provided [response].
+         * */
+        @JvmStatic
+        @JvmName("immediateSuccessJob")
+        public fun <T: Any?> OnSuccess<T>.toImmediateSuccessJob(
+            name: String,
+            response: T,
+            handler: UncaughtException.Handler,
+        ): EnqueuedJob = object : EnqueuedJob(
+            name,
+            OnFailure.noOp(),
+            handler
+        ) {
+            init {
+                onExecuting()
+                onCompletion(response) { this@toImmediateSuccessJob }
+            }
+        }
     }
 
     public enum class State {
@@ -200,7 +249,7 @@ public abstract class EnqueuedJob protected constructor(
         /**
          * Point of no return where the job has been de-queued
          * and is being executed. Cancellation will defer to the
-         * job's [cancellationPolicy]. The next state transition
+         * job's [executionPolicy]. The next state transition
          * will be to either [Success] or [Error].
          * */
         Executing,
@@ -228,84 +277,220 @@ public abstract class EnqueuedJob protected constructor(
 
     /**
      * Dynamic configuration for implementors of [EnqueuedJob]
-     * in order to modify how it wants to handle cancellation
+     * in order to modify how it wants to handle interactions
      * while in a state of [Executing].
      *
-     * @see [DEFAULT]
+     * @see [ExecutionPolicy.DEFAULT]
+     * @see [Companion.Builder]
+     * @see [Cancellation]
      * */
-    public data class CancellationPolicy
-    @JvmOverloads
-    public constructor(
-
-        /**
-         * If `true`, [cancellationAttempt] may be set while the
-         * job is in a state of [Executing] in order to signal
-         * that cancellation is desired.
-         *
-         * Default: `false`
-         *
-         * @see [cancellationAttempt]
-         * */
+    public class ExecutionPolicy private constructor(
         @JvmField
-        public val allowAttempts: Boolean = false,
-
-        /**
-         * If `true`, allows the public [cancel] function the ability
-         * to set [cancellationAttempt] while the job is in a state
-         * of [Executing] (i.e. anyone with access to the [EnqueuedJob]
-         * instance).
-         *
-         * If `false`, the public [cancel] function will **not** be
-         * allowed to signal for cancellation. This constrains the
-         * functionality to users of the [awaitAsync] and
-         * [io.matthewnelson.kmp.tor.runtime.core.util.awaitSync]
-         * APIs (i.e. `executeAsync` and `executeSync` extension
-         * functions).
-         *
-         * This has no effect if [allowAttempts] is set to `false`.
-         *
-         * Default: `false`
-         * */
-        @JvmField
-        public val accessibilityOpen: Boolean = false,
-
-        /**
-         * If `true`, calls to [onError] will have their cause replaced
-         * with [cancellationAttempt] if it is set.
-         *
-         * This has no effect if [allowAttempts] is set to `false`.
-         *
-         * Default: `true`
-         * */
-        @JvmField
-        public val substituteOnErrorWithAttempt: Boolean = true,
+        public val cancellation: Cancellation,
     ) {
 
         /**
-         * If this [CancellationPolicy] instance is equal to [DEFAULT]
+         * If this [ExecutionPolicy] configuration is equal to
+         * [ExecutionPolicy.DEFAULT]
          * */
-        @JvmField
-        public val isDefault: Boolean = this == DEFAULT
+        @get:JvmName("isDefault")
+        public val isDefault: Boolean get() = this == DEFAULT
 
         public companion object {
 
             /**
-             * The default [CancellationPolicy] of all [EnqueuedJob]
-             * implementations that do not override [cancellationPolicy].
+             * The default [ExecutionPolicy] of all [EnqueuedJob]
+             * implementations that do not override [executionPolicy].
              *
-             *  - [allowAttempts] `false`
-             *  - [accessibilityOpen] `false`
-             *  - [substituteOnErrorWithAttempt] `true`
+             *  - [cancellation] = [Cancellation.DEFAULT]
              * */
             @JvmField
-            public val DEFAULT: CancellationPolicy = CancellationPolicy()
+            public val DEFAULT: ExecutionPolicy = ExecutionPolicy(
+                cancellation = Cancellation.DEFAULT,
+            )
+
+            /**
+             * Opener for creating a new [ExecutionPolicy] configuration.
+             * */
+            @JvmStatic
+            public fun Builder(
+                block: ThisBlock<Builder>,
+            ): ExecutionPolicy = Builder.get().apply(block).build()
         }
+
+        /**
+         * TODO
+         *
+         * @see [Cancellation.DEFAULT]
+         * */
+        public class Cancellation private constructor(
+
+            /**
+             * If `true`, [cancellationAttempt] may be set while the job is
+             * in a state of [Executing] in order to signal that cancellation
+             * is desired.
+             *
+             * @see [cancellationAttempt]
+             * */
+            @JvmField
+            public val allowAttempts: Boolean,
+
+            /**
+             * If `true`, allows the public [cancel] function the ability
+             * to set [cancellationAttempt] while the job is in a state
+             * of [Executing] (i.e. anyone with access to the [EnqueuedJob]
+             * instance may signal for cancellation).
+             *
+             * If `false`, the public [cancel] function will **not** be
+             * allowed to signal for cancellation. This constrains the
+             * functionality to users of the [awaitAsync] and
+             * [io.matthewnelson.kmp.tor.runtime.core.util.awaitSync]
+             * APIs (i.e. only the callers of `executeAsync` and
+             * `executeSync` extension functions may signal for cancellation).
+             *
+             * This has no effect if [allowAttempts] is set to `false`.
+             * */
+            @JvmField
+            public val accessibilityOpen: Boolean,
+
+            /**
+             * If `true`, calls to [onError] will have their cause replaced
+             * with [cancellationAttempt] if it is set.
+             *
+             * This has no effect if [allowAttempts] is set to `false`.
+             * */
+            @JvmField
+            public val substituteErrorWithAttempt: Boolean,
+        ) {
+
+            /**
+             * If this [ExecutionPolicy.Cancellation] configuration is equal
+             * to [Cancellation.DEFAULT]
+             * */
+            @get:JvmName("isDefault")
+            public val isDefault: Boolean get() = this == DEFAULT
+
+            public companion object {
+
+                /**
+                 * The default [ExecutionPolicy.Cancellation] settings.
+                 *
+                 *  - [allowAttempts] = `false`
+                 *  - [accessibilityOpen] = `false`
+                 *  - [substituteErrorWithAttempt] = `true`
+                 * */
+                @JvmField
+                public val DEFAULT: Cancellation = Cancellation(
+                    allowAttempts = false,
+                    accessibilityOpen = false,
+                    substituteErrorWithAttempt = true,
+                )
+            }
+
+            @KmpTorDsl
+            public class Builder private constructor() {
+
+                /**
+                 * Default: `false`
+                 *
+                 * @see [Cancellation.allowAttempts]
+                 * */
+                @JvmField
+                public var allowAttempts: Boolean = DEFAULT.allowAttempts
+
+                /**
+                 * Default: `false`
+                 *
+                 * @see [Cancellation.accessibilityOpen]
+                 * */
+                @JvmField
+                public var accessibilityOpen: Boolean = DEFAULT.accessibilityOpen
+
+                /**
+                 * Default: `true`
+                 *
+                 * @see [Cancellation.substituteErrorWithAttempt]
+                 * */
+                @JvmField
+                public var substituteErrorWithAttempt: Boolean = DEFAULT.substituteErrorWithAttempt
+
+                @JvmSynthetic
+                internal fun build(): Cancellation {
+                    val allow = allowAttempts
+                    val accessibility = accessibilityOpen
+                    val substitute = substituteErrorWithAttempt
+
+                    if (
+                        allow == DEFAULT.allowAttempts
+                        && accessibility == DEFAULT.accessibilityOpen
+                        && substitute == DEFAULT.substituteErrorWithAttempt
+                    ) {
+                        return DEFAULT
+                    }
+
+                    return Cancellation(
+                        allowAttempts = allow,
+                        accessibilityOpen = accessibility,
+                        substituteErrorWithAttempt = substitute,
+                    )
+                }
+
+                internal companion object {
+                    @JvmSynthetic
+                    internal fun get(): Builder = Builder()
+                }
+            }
+
+            public override fun equals(other: Any?): Boolean = privateEquals(other)
+            public override fun hashCode(): Int = privateHashCode()
+            public override fun toString(): String = privateToString()
+        }
+
+        /**
+         * Builder class for configuring a new [ExecutionPolicy]
+         *
+         * @see [ExecutionPolicy.Companion.Builder]
+         * */
+        @KmpTorDsl
+        public class Builder private constructor() {
+
+            private val _cancellation = Cancellation.Builder.get()
+
+            @KmpTorDsl
+            public fun cancellation(
+                block: ThisBlock<Cancellation.Builder>,
+            ): Builder = apply { _cancellation.apply(block) }
+
+            @JvmSynthetic
+            internal fun build(): ExecutionPolicy {
+                val cancellation = _cancellation.build()
+
+                if (
+                    cancellation == DEFAULT.cancellation
+                ) {
+                    return DEFAULT
+                }
+
+                return ExecutionPolicy(
+                    cancellation = cancellation,
+                )
+            }
+
+            internal companion object {
+                @JvmSynthetic
+                internal fun get(): Builder = Builder()
+            }
+        }
+
+        public override fun equals(other: Any?): Boolean = privateEquals(other)
+        public override fun hashCode(): Int = privateHashCode()
+        public override fun toString(): String = privateToString()
     }
 
     /**
      * If [cancel] was called while the [EnqueuedJob] is in a
      * non-cancellable state (i.e. [Executing]), and the
-     * implementing class has declared a [CancellationPolicy]
+     * implementing class has declared a [ExecutionPolicy]
      * allowing for it, this will be set in order to signal
      * for cancellation.
      *
@@ -314,9 +499,9 @@ public abstract class EnqueuedJob protected constructor(
      *
      * This will **only** return non-null while the [EnqueuedJob]
      * is in the [Executing] state, [isCompleting] is `false`, and
-     * [CancellationPolicy.allowAttempts] is set to `true`.
+     * [ExecutionPolicy.Cancellation.allowAttempts] is set to `true`.
      *
-     * @see [CancellationPolicy]
+     * @see [ExecutionPolicy]
      * */
     protected fun cancellationAttempt(): CancellationException? {
         if (_isCompleting || _state != Executing) return null
@@ -396,7 +581,7 @@ public abstract class EnqueuedJob protected constructor(
      *
      * [withLock] will be invoked with the final [Throwable] for which
      * [onFailure] will be called with. It may not be the same as
-     * [cause], depending on the [cancellationPolicy] set.
+     * [cause], depending on the [executionPolicy] set.
      *
      * Implementations **must not** call [invokeOnCompletion] from within
      * the [withLock] lambda. It will result in a deadlock.
@@ -411,7 +596,7 @@ public abstract class EnqueuedJob protected constructor(
         val completion = synchronized(lock) {
             if (_isCompleting || !isActive) return@synchronized null
 
-            val c = if (cancellationPolicy.substituteOnErrorWithAttempt) {
+            val c = if (executionPolicy.cancellation.substituteErrorWithAttempt) {
                 _cancellationAttempt ?: cause
             } else {
                 cause
@@ -466,7 +651,7 @@ public abstract class EnqueuedJob protected constructor(
             if (_isCompleting || !isActive) return@synchronized null
 
             if (_state == Executing) {
-                if (cancellationPolicy.allowAttempts && signalAttempt) {
+                if (executionPolicy.cancellation.allowAttempts && signalAttempt) {
                     _cancellationAttempt = cause ?: CancellationException(toString(Cancelled))
                 }
                 return@synchronized null
@@ -539,51 +724,6 @@ public abstract class EnqueuedJob protected constructor(
         return "$clazz[name=$name, state=$state]@${hashCode()}"
     }
 
-    public companion object {
-
-        /**
-         * Creates a [EnqueuedJob] which immediately invokes
-         * [OnFailure] with the provided [cause].
-         * */
-        @JvmStatic
-        @JvmName("immediateErrorJob")
-        public fun OnFailure.toImmediateErrorJob(
-            name: String,
-            cause: Throwable,
-            handler: UncaughtException.Handler,
-        ): EnqueuedJob = object : EnqueuedJob(
-            name,
-            this@toImmediateErrorJob,
-            handler,
-        ) {
-            init {
-                onExecuting()
-                onError(cause, null)
-            }
-        }
-
-        /**
-         * Creates a [EnqueuedJob] which immediately invokes
-         * [OnSuccess] with the provided [response].
-         * */
-        @JvmStatic
-        @JvmName("immediateSuccessJob")
-        public fun <T: Any?> OnSuccess<T>.toImmediateSuccessJob(
-            name: String,
-            response: T,
-            handler: UncaughtException.Handler,
-        ): EnqueuedJob = object : EnqueuedJob(
-            name,
-            OnFailure.noOp(),
-            handler
-        ) {
-            init {
-                onExecuting()
-                onCompletion(response) { this@toImmediateSuccessJob }
-            }
-        }
-    }
-
     /**
      * Helper for creating argument based processor agnostic
      * extension functions for Async/Sync APIs.
@@ -596,4 +736,65 @@ public abstract class EnqueuedJob protected constructor(
      * */
     @InternalKmpTorApi
     public interface Argument
+}
+
+@Suppress("NOTHING_TO_INLINE")
+private inline fun EnqueuedJob.ExecutionPolicy.privateEquals(
+    other: Any?,
+): Boolean {
+    return other is EnqueuedJob.ExecutionPolicy
+    && other.cancellation == cancellation
+}
+
+@Suppress("NOTHING_TO_INLINE")
+private inline fun EnqueuedJob.ExecutionPolicy.privateHashCode(): Int {
+    var result = 17
+    result = result * 42 + cancellation.hashCode()
+    return result
+}
+
+@Suppress("NOTHING_TO_INLINE")
+private inline fun EnqueuedJob.ExecutionPolicy.privateToString(): String = buildString {
+    appendLine("ExecutionPolicy: [")
+    append("    cancellation: [")
+
+    val lines = cancellation.toString().lines()
+    for (i in 1..lines.lastIndex) {
+        appendLine()
+        append("    ")
+        append(lines[i])
+    }
+    appendLine()
+    append(']')
+}
+
+@Suppress("NOTHING_TO_INLINE")
+private inline fun Cancellation.privateEquals(
+    other: Any?,
+): Boolean {
+    return other is Cancellation
+    && other.allowAttempts == allowAttempts
+    && other.accessibilityOpen == accessibilityOpen
+    && other.substituteErrorWithAttempt == substituteErrorWithAttempt
+}
+
+@Suppress("NOTHING_TO_INLINE")
+private inline fun Cancellation.privateHashCode(): Int {
+    var result = 17
+    result = result * 42 + allowAttempts.hashCode()
+    result = result * 42 + accessibilityOpen.hashCode()
+    result = result * 42 + substituteErrorWithAttempt.hashCode()
+    return result
+}
+
+@Suppress("NOTHING_TO_INLINE")
+private inline fun Cancellation.privateToString(): String = buildString {
+    appendLine("ExecutionPolicy.Cancellation: [")
+    append("    allowAttempts: ")
+    appendLine(allowAttempts)
+    append("    accessibilityOpen: ")
+    appendLine(accessibilityOpen)
+    append("    substituteErrorWithAttempt: ")
+    appendLine(substituteErrorWithAttempt)
+    append(']')
 }

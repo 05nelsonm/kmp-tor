@@ -83,7 +83,7 @@ public abstract class ActionJob private constructor(
 
         @Volatile
         private var _interrupt: InterruptedException? = null
-        public final override val cancellationPolicy = CANCELLATION_POLICY
+        public final override val executionPolicy = EXECUTION_POLICY
 
         @JvmSynthetic
         internal fun interruptBy(enqueuedJob: StopJob) {
@@ -106,7 +106,11 @@ public abstract class ActionJob private constructor(
         }
 
         private companion object {
-            private val CANCELLATION_POLICY = CancellationPolicy(allowAttempts = true)
+            private val EXECUTION_POLICY = ExecutionPolicy.Builder {
+                cancellation {
+                    allowAttempts = true
+                }
+            }
         }
     }
 
