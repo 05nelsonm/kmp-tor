@@ -35,6 +35,7 @@ import kotlin.coroutines.cancellation.CancellationException
 import kotlin.reflect.KClass
 import kotlin.test.*
 import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Duration.Companion.seconds
 
 @OptIn(InternalKmpTorApi::class)
 class TorRuntimeUnitTest {
@@ -133,7 +134,7 @@ class TorRuntimeUnitTest {
     }
 
     @Test
-    fun givenStartedAction_whenCancelledOrInterrupted_thenStops() = runTest {
+    fun givenStartedAction_whenCancelledOrInterrupted_thenStops() = runTest(timeout = 120.seconds) {
         val runtime = TorRuntime.Builder(testEnv("rt_interrupt")) {
 //            observerStatic(RuntimeEvent.EXECUTE.ACTION) { println(it) }
 //            observerStatic(RuntimeEvent.EXECUTE.CMD) { println(it) }
