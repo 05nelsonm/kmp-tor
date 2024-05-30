@@ -31,6 +31,7 @@ import io.matthewnelson.kmp.tor.runtime.RuntimeEvent.Notifier.Companion.i
 import io.matthewnelson.kmp.tor.runtime.RuntimeEvent.Notifier.Companion.lce
 import io.matthewnelson.kmp.tor.runtime.RuntimeEvent.Notifier.Companion.stderr
 import io.matthewnelson.kmp.tor.runtime.RuntimeEvent.Notifier.Companion.stdout
+import io.matthewnelson.kmp.tor.runtime.RuntimeEvent.Notifier.Companion.w
 import io.matthewnelson.kmp.tor.runtime.core.Executable
 import io.matthewnelson.kmp.tor.runtime.core.TorConfig
 import io.matthewnelson.kmp.tor.runtime.core.address.IPSocketAddress
@@ -289,7 +290,7 @@ internal class TorDaemon private constructor(
             .toFile()
 
         val lines = ctrlPortFile
-            .awaitRead(feed, 4_500.milliseconds, checkCancellationOrInterrupt)
+            .awaitRead(feed, 10.seconds, checkCancellationOrInterrupt)
             .decodeToString()
             .lines()
             .mapNotNull { it.ifBlank { null } }
@@ -397,7 +398,7 @@ internal class TorDaemon private constructor(
             if (startMark.elapsedNow() > timeout) break
         }
 
-        throw feed.createError("Timed out after ${timeout.inWholeMilliseconds}ms waiting for tor to write to file[$name]")
+        throw feed.createError("$TIMED_OUT after ${timeout.inWholeMilliseconds}ms waiting for tor to write to file[$name]")
     }
 
     public override fun toString(): String = _toString
@@ -514,7 +515,7 @@ internal class TorDaemon private constructor(
 
         @JvmSynthetic
         @Throws(Throwable::class)
-        internal suspend fun <T: Any?> start(
+        internal suspend fun <T: Any> start(
             generator: TorConfigGenerator,
             manager: TorState.Manager,
             NOTIFIER: RuntimeEvent.Notifier,
@@ -524,7 +525,7 @@ internal class TorDaemon private constructor(
         ): T {
             val state = getOrCreateInstance(generator.environment.fid) { FIDState() }
 
-            val process = TorDaemon(
+            val daemon = TorDaemon(
                 generator,
                 manager,
                 NOTIFIER,
@@ -532,7 +533,35 @@ internal class TorDaemon private constructor(
                 state as FIDState,
             )
 
-            return process.start(checkCancellationOrInterrupt, connect)
+            val result: T? = try {
+                daemon.start(checkCancellationOrInterrupt, connect)
+            } catch (e: ProcessStartException) {
+                // Can happen on iOS b/c of their shit implementation
+                // of posix_spawn where it will fail but still creates a
+                // zombie process.
+                if (
+                    e.message.contains("cause: $TIMED_OUT")
+                    && e.message.contains("stdout: []")
+                ) {
+                    null
+                } else {
+                    throw e
+                }
+            }
+
+            if (result != null) return result
+
+            NOTIFIER.w(daemon, "ZOMBIE PROCESS! Retrying...")
+
+            val daemonRetry = TorDaemon(
+                generator,
+                manager,
+                NOTIFIER,
+                scope,
+                state,
+            )
+
+            return daemonRetry.start(checkCancellationOrInterrupt, connect)
         }
 
         private class FIDState {
@@ -545,8 +574,6 @@ internal class TorDaemon private constructor(
             var stopMark: TimeSource.Monotonic.ValueTimeMark? = null
         }
 
-        private const val PROCESS_CTRL_CONN: String = " [notice] Opened Control listener connection (ready) on "
-        private const val PROCESS_ERR: String = " [err] "
-        private const val PROCESS_OTHER: String = " [warn] It looks like another Tor process is running with the same data directory."
+        private const val TIMED_OUT = "Timed out after"
     }
 }
