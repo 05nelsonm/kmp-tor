@@ -126,7 +126,7 @@ public sealed class RuntimeEvent<Data: Any> private constructor(
 
             /**
              * Subscribes with provided [Processor] a [CMD] observer
-             * which will intercept execution of [TorCmd.Signal.NewNym]
+             * which will intercept execution of all [TorCmd.Signal.NewNym]
              * jobs in order to transform tor's generic server response
              * of [Reply.Success.OK].
              *
@@ -158,14 +158,25 @@ public sealed class RuntimeEvent<Data: Any> private constructor(
              *         myTorRuntime.startDaemonAsync()
              *         myTorRuntime.executeAsync(TorCmd.Signal.NewNym)
              *         myTorRuntime.executeAsync(TorCmd.Signal.NewNym)
+             *         myTorRuntime.executeAsync(TorCmd.Signal.NewNym)
+             *         myTorRuntime.executeAsync(TorCmd.Signal.NewNym)
              *     } finally {
              *         disposable.dispose()
              *     }
              *
              *     // You've changed Tor identities!
              *     // Rate limiting NEWNYM request: delaying by 10 second(s)
+             *     // Rate limiting NEWNYM request: delaying by 10 second(s)
+             *     // Rate limiting NEWNYM request: delaying by 10 second(s)
              *
              * @return [Disposable] to unsubscribe the observer
+             * @param [tag] A string to help grouping/identifying observer(s)
+             * @param [executor] The thread context in which [onEvent] will be
+             *   invoked in. If `null` and [Processor] is an instance of
+             *   [TorRuntime], it will use whatever was declared via
+             *   [TorRuntime.Environment.Builder.defaultEventExecutor]. Otherwise,
+             *   [OnEvent.Executor.Immediate] will be used.
+             * @param [onEvent] The callback to pass the data to.
              * */
             @JvmStatic
             public fun Processor.observeSignalNewNym(
