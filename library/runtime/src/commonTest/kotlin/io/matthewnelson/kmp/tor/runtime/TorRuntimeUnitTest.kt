@@ -23,7 +23,7 @@ import io.matthewnelson.kmp.tor.core.resource.SynchronizedObject
 import io.matthewnelson.kmp.tor.core.resource.synchronized
 import io.matthewnelson.kmp.tor.runtime.Action.Companion.startDaemonAsync
 import io.matthewnelson.kmp.tor.runtime.Action.Companion.stopDaemonAsync
-import io.matthewnelson.kmp.tor.runtime.RuntimeEvent.EXECUTE.CMD.observeNewNym
+import io.matthewnelson.kmp.tor.runtime.RuntimeEvent.EXECUTE.CMD.observeSignalNewNym
 import io.matthewnelson.kmp.tor.runtime.core.EnqueuedJob
 import io.matthewnelson.kmp.tor.runtime.test.TestUtils.testEnv
 import io.matthewnelson.kmp.tor.runtime.core.ctrl.TorCmd
@@ -262,7 +262,7 @@ class TorRuntimeUnitTest {
 
         val lock = SynchronizedObject()
         val notices = mutableListOf<String?>()
-        runtime.observeNewNym(null, null) { limited ->
+        runtime.observeSignalNewNym(null, null) { limited ->
             synchronized(lock) { notices.add(limited) }
         }
 

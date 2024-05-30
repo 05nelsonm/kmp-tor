@@ -49,7 +49,7 @@ internal inline fun <T: Processor, Data: Any?> T.newTorCmdObserver(
     }
 }
 
-internal fun <T: Processor> observeSignalNewNym(
+internal fun <T: Processor> observeSignalNewNymInternal(
     tag: String?,
     executor: OnEvent.Executor,
     onEvent: OnEvent<String?>,

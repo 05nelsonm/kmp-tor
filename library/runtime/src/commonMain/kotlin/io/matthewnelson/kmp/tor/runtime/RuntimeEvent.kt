@@ -23,7 +23,7 @@ import io.matthewnelson.kmp.tor.runtime.core.*
 import io.matthewnelson.kmp.tor.runtime.core.ctrl.Reply
 import io.matthewnelson.kmp.tor.runtime.core.ctrl.TorCmd
 import io.matthewnelson.kmp.tor.runtime.internal.observer.newTorCmdObserver
-import io.matthewnelson.kmp.tor.runtime.internal.observer.observeSignalNewNym
+import io.matthewnelson.kmp.tor.runtime.internal.observer.observeSignalNewNymInternal
 import io.matthewnelson.kmp.tor.runtime.internal.process.TorDaemon
 import kotlin.jvm.JvmStatic
 import kotlin.jvm.JvmSynthetic
@@ -72,8 +72,8 @@ public sealed class RuntimeEvent<Data: Any> private constructor(
      * the program.
      *
      * **NOTE:** If the error is an [UncaughtException] and no observers
-     * for [ERROR] are registered with [TorRuntime], the [UncaughtException]
-     * will be thrown (and likely crash the program). It is critical that an
+     * for [ERROR] are subscribed with the [TorRuntime], the [UncaughtException]
+     * will be thrown and likely crash the program. It is **critical** that an
      * [ERROR] observer be registered either via [TorRuntime.Builder.observerStatic],
      * or immediately after [TorRuntime] is instantiated via [TorRuntime.subscribe].
      * */
@@ -120,7 +120,7 @@ public sealed class RuntimeEvent<Data: Any> private constructor(
          *     }
          *
          * @see [TorCmdJob]
-         * @see [observeNewNym]
+         * @see [observeSignalNewNym]
          * */
         public data object CMD: RuntimeEvent<TorCmdJob>("EXECUTE_CMD") {
 
@@ -147,19 +147,28 @@ public sealed class RuntimeEvent<Data: Any> private constructor(
              *
              * e.g.
              *
-             *     val disposable = myTorRuntime.observeNewNym(
+             *     val disposable = myTorRuntime.observeSignalNewNym(
              *         "my tag",
              *         null,
              *     ) { rateLimiting ->
              *         println(rateLimiting ?: "You've changed Tor identities!")
              *     }
              *
+             *     try {
+             *         myTorRuntime.startDaemonAsync()
+             *         myTorRuntime.executeAsync(TorCmd.Signal.NewNym)
+             *         myTorRuntime.executeAsync(TorCmd.Signal.NewNym)
+             *     } finally {
+             *         disposable.dispose()
+             *     }
+             *
+             *     // You've changed Tor identities!
              *     // Rate limiting NEWNYM request: delaying by 10 second(s)
              *
              * @return [Disposable] to unsubscribe the observer
              * */
             @JvmStatic
-            public fun Processor.observeNewNym(
+            public fun Processor.observeSignalNewNym(
                 tag: String?,
                 executor: OnEvent.Executor?,
                 onEvent: OnEvent<String?>,
@@ -167,7 +176,7 @@ public sealed class RuntimeEvent<Data: Any> private constructor(
                 tag,
                 executor,
                 onEvent,
-                ::observeSignalNewNym,
+                ::observeSignalNewNymInternal,
             )
         }
     }
