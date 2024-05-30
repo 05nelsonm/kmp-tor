@@ -29,7 +29,7 @@ internal inline fun <T: Processor, Data: Any?> T.newTorCmdObserver(
     tag: String?,
     executor: OnEvent.Executor?,
     onEvent: OnEvent<Data>,
-    factory: (String?, OnEvent.Executor, OnEvent<Data>, (() -> T)) -> Observer<TorCmdJob>
+    factory: (T, String?, OnEvent.Executor, OnEvent<Data>) -> Observer<TorCmdJob>
 ): Disposable {
     val exec = executor ?: if (this is TorRuntime) {
         environment().defaultExecutor()
@@ -37,45 +37,52 @@ internal inline fun <T: Processor, Data: Any?> T.newTorCmdObserver(
         OnEvent.Executor.Immediate
     }
 
-    val observer = factory(tag, exec, onEvent) { this }
+    val observer = factory(this, tag, exec, onEvent)
 
     subscribe(observer)
 
-    var disposed = false
+    var isDisposed = false
     return Disposable {
-        if (disposed) return@Disposable
-        disposed = true
+        if (isDisposed) return@Disposable
+        isDisposed = true
         unsubscribe(observer)
     }
 }
 
 internal fun <T: Processor> observeSignalNewNymInternal(
+    processor: T,
     tag: String?,
     executor: OnEvent.Executor,
     onEvent: OnEvent<String?>,
-    processor: (() -> T),
-): Observer<TorCmdJob> = EXECUTE.CMD.observer(tag, OnEvent.Executor.Immediate) { job ->
-    if (job.cmd != TorCmd.Signal.NewNym::class) return@observer
-
-    val p = processor.invoke()
+): Observer<TorCmdJob> {
 
     var rateLimited: String? = null
-    val stdout = PROCESS.STDOUT.observer(tag, OnEvent.Executor.Immediate) stdout@ { line ->
+    val stdout = PROCESS.STDOUT.observer(tag, OnEvent.Executor.Immediate) stdout@{ line ->
         val contains = line.contains("[notice] Rate limiting ", ignoreCase = true)
         if (!contains) return@stdout
         rateLimited = line.substringAfter(" [notice] ")
     }
 
-    p.subscribe(stdout)
-    job.invokeOnCompletion {
-        p.unsubscribe(stdout)
-        if (job.isError) return@invokeOnCompletion
+    val clazzNewNym = TorCmd.Signal.NewNym::class
+    return EXECUTE.CMD.observer(tag, OnEvent.Executor.Immediate) { job ->
+        if (job.cmd != clazzNewNym) return@observer
 
-        onEvent.notify(
-            job.handlerContext(),
-            rateLimited,
-            executor,
-        )
+        processor.subscribe(stdout)
+
+        job.invokeOnCompletion {
+            @Suppress("LocalVariableName")
+            val _rateLimited = rateLimited
+            rateLimited = null
+            processor.unsubscribe(stdout)
+
+            if (job.isError) return@invokeOnCompletion
+
+            onEvent.notify(
+                job.handlerContext(),
+                _rateLimited,
+                executor,
+            )
+        }
     }
 }
 
@@ -86,12 +93,8 @@ private inline fun <Data: Any?> OnEvent<Data>.notify(
 ) {
     val executable = when (executor) {
         is OnEvent.Executor.Immediate -> null
-        is OnEvent.Executor.Main -> Executable {
-            invoke(data)
-        }
-        else -> Executable.Once.of(concurrent = true) {
-            invoke(data)
-        }
+        is OnEvent.Executor.Main -> Executable { invoke(data) }
+        else -> Executable.Once.of(concurrent = true) { invoke(data) }
     }
 
     if (executable == null) {
