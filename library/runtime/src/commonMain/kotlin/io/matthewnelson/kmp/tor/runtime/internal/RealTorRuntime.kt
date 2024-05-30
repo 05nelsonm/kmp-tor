@@ -123,8 +123,7 @@ internal class RealTorRuntime private constructor(
             },
             manager.interceptorConfigSet,
             manager.interceptorConfigReset,
-            NOTIFIER.interceptorNewNym,
-            TorCmdJob.interceptor(notify = { job ->
+            TorCmdJob.interceptor(handler, notify = { job ->
                 EXECUTE.CMD.notifyObservers(job)
             }),
         ),
@@ -720,7 +719,6 @@ internal class RealTorRuntime private constructor(
     ): RuntimeEvent.Notifier {
 
         private val processStdout = ProcessStdoutObserver()
-        val interceptorNewNym get() = processStdout.interceptorNewNym
 
         public override fun <Data : Any, E : RuntimeEvent<Data>> notify(event: E, data: Data) {
             if (event is PROCESS.STDOUT && data is String) {

@@ -18,6 +18,7 @@ package io.matthewnelson.kmp.tor.runtime
 import io.matthewnelson.kmp.tor.runtime.core.*
 import io.matthewnelson.kmp.tor.runtime.core.ctrl.TorCmd
 import io.matthewnelson.kmp.tor.runtime.ctrl.TorCmdInterceptor
+import kotlin.coroutines.CoroutineContext
 import kotlin.jvm.JvmField
 import kotlin.jvm.JvmSynthetic
 import kotlin.reflect.KClass
@@ -40,6 +41,7 @@ public class TorCmdJob private constructor(
     @JvmField
     public val cmd: KClass<out TorCmd<*>>,
     private val delegate: EnqueuedJob,
+    private val _handler: CoroutineContext,
 ): EnqueuedJob(
     delegate.name,
     OnFailure.noOp(),
@@ -68,13 +70,17 @@ public class TorCmdJob private constructor(
     public override fun equals(other: Any?): Boolean = other is TorCmdJob && other.delegate == delegate
     public override fun hashCode(): Int = delegate.hashCode()
 
+    @JvmSynthetic
+    internal fun handlerContext(): CoroutineContext = _handler
+
     internal companion object {
 
         @JvmSynthetic
         internal fun interceptor(
+            handler: CoroutineContext,
             notify: (job: TorCmdJob) -> Unit,
         ): TorCmdInterceptor<TorCmd<*>> = TorCmdInterceptor.intercept<TorCmd<*>> { job, cmd ->
-            notify(TorCmdJob(cmd::class, job))
+            notify(TorCmdJob(cmd::class, job, handler))
             cmd
         }
 

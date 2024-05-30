@@ -20,7 +20,10 @@ package io.matthewnelson.kmp.tor.runtime
 import io.matthewnelson.kmp.process.Process
 import io.matthewnelson.kmp.process.Stdio
 import io.matthewnelson.kmp.tor.runtime.core.*
+import io.matthewnelson.kmp.tor.runtime.core.ctrl.Reply
 import io.matthewnelson.kmp.tor.runtime.core.ctrl.TorCmd
+import io.matthewnelson.kmp.tor.runtime.internal.observer.newTorCmdObserver
+import io.matthewnelson.kmp.tor.runtime.internal.observer.observeSignalNewNymInternal
 import io.matthewnelson.kmp.tor.runtime.internal.process.TorDaemon
 import kotlin.jvm.JvmStatic
 import kotlin.jvm.JvmSynthetic
@@ -69,8 +72,8 @@ public sealed class RuntimeEvent<Data: Any> private constructor(
      * the program.
      *
      * **NOTE:** If the error is an [UncaughtException] and no observers
-     * for [ERROR] are registered with [TorRuntime], the [UncaughtException]
-     * will be thrown (and likely crash the program). It is critical that an
+     * for [ERROR] are subscribed with the [TorRuntime], the [UncaughtException]
+     * will be thrown and likely crash the program. It is **critical** that an
      * [ERROR] observer be registered either via [TorRuntime.Builder.observerStatic],
      * or immediately after [TorRuntime] is instantiated via [TorRuntime.subscribe].
      * */
@@ -117,8 +120,76 @@ public sealed class RuntimeEvent<Data: Any> private constructor(
          *     }
          *
          * @see [TorCmdJob]
+         * @see [observeSignalNewNym]
          * */
-        public data object CMD: RuntimeEvent<TorCmdJob>("EXECUTE_CMD")
+        public data object CMD: RuntimeEvent<TorCmdJob>("EXECUTE_CMD") {
+
+            /**
+             * Subscribes with provided [Processor] a [CMD] observer
+             * which will intercept execution of all [TorCmd.Signal.NewNym]
+             * jobs in order to transform tor's generic server response
+             * of [Reply.Success.OK].
+             *
+             * The generic server response only indicates that tor has
+             * accepted the command. Anything tor does as a result of
+             * that command is (typically) dispatched as [TorEvent.NOTICE].
+             *
+             * Specific to [TorCmd.Signal.NewNym], if tor accepted the
+             * signal, it may or may not dispatch a [TorEvent.NOTICE]
+             * indicating that it was rate-limited. This observer handles
+             * that transformation and notifies the provided [onEvent]
+             * callback whenever there is a successful execution of
+             * [TorCmd.Signal.NewNym] with either:
+             *
+             *  - `null` indicating tor accepted the signal and did **not**
+             *    rate-limit it.
+             *  - The rate-limit notice itself.
+             *
+             * e.g.
+             *
+             *     val disposable = myTorRuntime.observeSignalNewNym(
+             *         "my tag",
+             *         null,
+             *     ) { rateLimiting ->
+             *         println(rateLimiting ?: "You've changed Tor identities!")
+             *     }
+             *
+             *     try {
+             *         myTorRuntime.startDaemonAsync()
+             *         myTorRuntime.executeAsync(TorCmd.Signal.NewNym)
+             *         myTorRuntime.executeAsync(TorCmd.Signal.NewNym)
+             *         myTorRuntime.executeAsync(TorCmd.Signal.NewNym)
+             *         myTorRuntime.executeAsync(TorCmd.Signal.NewNym)
+             *     } finally {
+             *         disposable.dispose()
+             *     }
+             *
+             *     // You've changed Tor identities!
+             *     // Rate limiting NEWNYM request: delaying by 10 second(s)
+             *     // Rate limiting NEWNYM request: delaying by 10 second(s)
+             *     // Rate limiting NEWNYM request: delaying by 10 second(s)
+             *
+             * @return [Disposable] to unsubscribe the observer
+             * @param [tag] A string to help grouping/identifying observer(s)
+             * @param [executor] The thread context in which [onEvent] will be
+             *   invoked in. If `null` and [Processor] is an instance of
+             *   [TorRuntime], it will use whatever was declared via
+             *   [TorRuntime.Environment.Builder.defaultEventExecutor]. Otherwise,
+             *   [OnEvent.Executor.Immediate] will be used.
+             * @param [onEvent] The callback to pass the data to.
+             * */
+            @JvmStatic
+            public fun Processor.observeSignalNewNym(
+                tag: String?,
+                executor: OnEvent.Executor?,
+                onEvent: OnEvent<String?>,
+            ): Disposable = newTorCmdObserver(
+                tag,
+                executor,
+                onEvent,
+                ::observeSignalNewNymInternal,
+            )
+        }
     }
 
     /**
@@ -211,14 +282,6 @@ public sealed class RuntimeEvent<Data: Any> private constructor(
          * */
         public data object WARN: LOG("LOG_WARN")
     }
-
-    // TODO: NEWNYM
-    //  Because TorCmd.Signal.NewNym returns Reply.Success.OK
-    //  but can be rate limited, TorRuntime should intercept
-    //  any enqueued NewNym jobs and, upon successful completion
-    //  setup an TorEvent.NOTICE observer to catch the rate limit
-    //  dispatch. If after 50ms (or something) nothing comes, dispatch
-    //  success.
 
     /**
      * Events pertaining to the tor process.

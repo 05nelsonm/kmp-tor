@@ -17,26 +17,10 @@ package io.matthewnelson.kmp.tor.runtime.internal.observer
 
 import io.matthewnelson.kmp.tor.runtime.TorListeners
 import io.matthewnelson.kmp.tor.runtime.TorState
-import io.matthewnelson.kmp.tor.runtime.core.EnqueuedJob
-import io.matthewnelson.kmp.tor.runtime.core.ctrl.TorCmd
-import io.matthewnelson.kmp.tor.runtime.ctrl.TorCmdInterceptor
 
 internal open class ObserverProcessStdout internal constructor(
     private val manager: TorListeners.Manager,
 ) {
-
-    // Is registered via RealTorRuntime.factory
-    internal val interceptorNewNym = TorCmdInterceptor.intercept<TorCmd.Signal.NewNym> { job, cmd ->
-        job.onNewNymJob()
-        cmd
-    }
-
-    protected fun EnqueuedJob.onNewNymJob() {
-        invokeOnCompletion {
-            if (isError) return@invokeOnCompletion
-            // TODO: Listen for rate-limit notice
-        }
-    }
 
     protected open fun notify(line: String) {
         val notice = line
