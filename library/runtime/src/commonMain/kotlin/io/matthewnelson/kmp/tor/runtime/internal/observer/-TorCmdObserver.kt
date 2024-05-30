@@ -56,7 +56,8 @@ internal fun <T: Processor> observeSignalNewNymInternal(
     tag: String?,
     executor: OnEvent.Executor,
     onEvent: OnEvent<String?>,
-): Observer<TorCmdJob> {
+): Observer<TorCmdJob> = EXECUTE.CMD.observer(tag, OnEvent.Executor.Immediate) { job ->
+    if (job.cmd != TorCmd.Signal.NewNym::class) return@observer
 
     var rateLimited: String? = null
     val stdout = PROCESS.STDOUT.observer(tag, OnEvent.Executor.Immediate) stdout@{ line ->
@@ -65,21 +66,12 @@ internal fun <T: Processor> observeSignalNewNymInternal(
         rateLimited = line.substringAfter(" [notice] ")
     }
 
-    val clazzNewNym = TorCmd.Signal.NewNym::class
-    return EXECUTE.CMD.observer(tag, OnEvent.Executor.Immediate) { job ->
-        if (job.cmd != clazzNewNym) return@observer
+    processor.subscribe(stdout)
 
-        processor.subscribe(stdout)
-
-        job.invokeOnCompletion {
-            @Suppress("LocalVariableName")
-            val _rateLimited = rateLimited
-            rateLimited = null
-            processor.unsubscribe(stdout)
-
-            if (job.isError) return@invokeOnCompletion
-            onEvent.notify(executor, job.handlerContext(), _rateLimited)
-        }
+    job.invokeOnCompletion {
+        processor.unsubscribe(stdout)
+        if (job.isError) return@invokeOnCompletion
+        onEvent.notify(executor, job.handlerContext(), rateLimited)
     }
 }
 
