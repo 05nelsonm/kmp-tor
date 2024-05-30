@@ -255,6 +255,7 @@ class ServiceFactoryUnitTest {
 //            observerStatic(RuntimeEvent.LOG.WARN) { println(it) }
 //            observerStatic(RuntimeEvent.PROCESS.STDOUT) { println(it) }
             observerStatic(RuntimeEvent.PROCESS.STDERR) { println(it) }
+//            observerStatic(RuntimeEvent.PROCESS.READY) { println(it) }
 //            observerStatic(RuntimeEvent.STATE) { println(it) }
         }.ensureStoppedOnTestCompletion()
 

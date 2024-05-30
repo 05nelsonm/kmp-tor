@@ -13,6 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
+@file:Suppress("KotlinRedundantDiagnosticSuppress")
+
 package io.matthewnelson.kmp.tor.runtime.internal.observer
 
 import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
@@ -76,20 +78,16 @@ internal fun <T: Processor> observeSignalNewNymInternal(
             processor.unsubscribe(stdout)
 
             if (job.isError) return@invokeOnCompletion
-
-            onEvent.notify(
-                job.handlerContext(),
-                _rateLimited,
-                executor,
-            )
+            onEvent.notify(executor, job.handlerContext(), _rateLimited)
         }
     }
 }
 
+@Suppress("NOTHING_TO_INLINE")
 private inline fun <Data: Any?> OnEvent<Data>.notify(
+    executor: OnEvent.Executor,
     handler: CoroutineContext,
     data: Data,
-    executor: OnEvent.Executor,
 ) {
     val executable = when (executor) {
         is OnEvent.Executor.Immediate -> null

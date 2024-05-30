@@ -199,7 +199,7 @@ internal class TorDaemon private constructor(
         NOTIFIER.lce(Lifecycle.Event.OnStart(this@TorDaemon))
         NOTIFIER.i(this@TorDaemon, process.toString())
 
-        val startupFeed = StartupFeedParser(exitCode = {
+        val startupFeed = StartupFeedParser(exitCodeOrNull = {
             try {
                 process.exitCode()
             } catch (_: IllegalStateException) {
@@ -289,7 +289,7 @@ internal class TorDaemon private constructor(
             .toFile()
 
         val lines = ctrlPortFile
-            .awaitRead(feed, 10.seconds, checkCancellationOrInterrupt)
+            .awaitRead(feed, 4_500.milliseconds, checkCancellationOrInterrupt)
             .decodeToString()
             .lines()
             .mapNotNull { it.ifBlank { null } }
@@ -323,7 +323,7 @@ internal class TorDaemon private constructor(
             return CtrlArguments.Connection(socketAddress)
         }
 
-        throw feed.createError("Failed to acquire control connection info from file[$ctrlPortFile]")
+        throw feed.createError("Failed to acquire control connection info from file[${ctrlPortFile.name}]")
     }
 
     @Throws(CancellationException::class, InterruptedException::class, IOException::class)

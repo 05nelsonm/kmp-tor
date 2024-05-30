@@ -710,8 +710,7 @@ internal class RealTorRuntime private constructor(
 
         public override fun equals(other: Any?): Boolean = other is ActionProcessor && other.hashCode() == hashCode()
         public override fun hashCode(): Int = this@RealTorRuntime.hashCode()
-        private val _toString by lazy { this.toFIDString(includeHashCode = isService) }
-        public override fun toString(): String = _toString
+        public override fun toString(): String = this.toFIDString(includeHashCode = isService)
     }
 
     private inner class Notifier(
@@ -1026,8 +1025,9 @@ internal class RealTorRuntime private constructor(
             }
         }
 
-        private inner class ServiceCtrlBinder:
-            TorRuntime.ServiceFactory.Binder,
+        private inner class ServiceCtrlBinder(
+
+        ):  TorRuntime.ServiceFactory.Binder,
             FileID by generator.environment,
             RuntimeEvent.Notifier by this
         {
