@@ -34,9 +34,9 @@ import io.matthewnelson.kmp.tor.runtime.TorRuntime.Environment.Companion.Builder
 import io.matthewnelson.kmp.tor.runtime.core.*
 import io.matthewnelson.kmp.tor.runtime.core.ctrl.TorCmd
 import io.matthewnelson.kmp.tor.runtime.core.util.isAvailableAsync
+import io.matthewnelson.kmp.tor.runtime.internal.*
 import io.matthewnelson.kmp.tor.runtime.internal.InstanceKeeper
 import io.matthewnelson.kmp.tor.runtime.internal.RealTorRuntime
-import io.matthewnelson.kmp.tor.runtime.internal.ServiceFactoryCtrl
 import io.matthewnelson.kmp.tor.runtime.internal.TorConfigGenerator
 import org.kotlincrypto.SecRandomCopyException
 import org.kotlincrypto.SecureRandom
@@ -47,16 +47,17 @@ import kotlin.jvm.JvmSynthetic
 import kotlin.random.Random
 
 /**
- * Base interface for managing and interacting with a single tor process.
+ * Base interface for implementations that manage interaction with
+ * a single tor daemon (backed by a stand-alone process instance).
  *
  * @see [Companion.Builder]
  * */
-public interface TorRuntime:
-    FileID,
-    TorCmd.Unprivileged.Processor,
-    TorEvent.Processor,
+public sealed interface TorRuntime:
     Action.Processor,
-    RuntimeEvent.Processor
+    FileID,
+    RuntimeEvent.Processor,
+    TorCmd.Unprivileged.Processor,
+    TorEvent.Processor
 {
 
     /**
@@ -290,6 +291,10 @@ public interface TorRuntime:
      *
      * Specified directories/files are utilized by [TorRuntime.Builder.config]
      * to create a minimum viable [TorConfig].
+     *
+     * The [Environment] API is mostly based around configuration options that
+     * are, or could be, platform-specific. This means less platform-specific
+     * code, and more `commonMain` code.
      *
      * @see [Companion.Builder]
      * */
