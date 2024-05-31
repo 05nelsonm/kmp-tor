@@ -13,31 +13,34 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-package io.matthewnelson.kmp.tor.runtime.internal
+package io.matthewnelson.kmp.tor.runtime
 
-import io.matthewnelson.kmp.tor.core.api.annotation.ExperimentalKmpTorApi
-import io.matthewnelson.kmp.tor.runtime.AbstractTorRuntime
-import io.matthewnelson.kmp.tor.runtime.RuntimeEvent
-import io.matthewnelson.kmp.tor.runtime.TorRuntime
 import io.matthewnelson.kmp.tor.runtime.core.OnEvent
 import io.matthewnelson.kmp.tor.runtime.core.TorEvent
+import io.matthewnelson.kmp.tor.runtime.internal.AbstractRuntimeEventProcessor
 import kotlin.jvm.JvmSynthetic
 
-@ExperimentalKmpTorApi
-internal sealed class ServiceFactoryCtrl(
+// TorRuntime is sealed, so.
+internal abstract class AbstractTorRuntime protected constructor(
     staticTag: String?,
     observersRuntimeEvent: Set<RuntimeEvent.Observer<*>>,
     defaultExecutor: OnEvent.Executor,
     observersTorEvent: Set<TorEvent.Observer>,
     syntheticAccess: Any,
-): AbstractTorRuntime(
+):  AbstractRuntimeEventProcessor(
     staticTag,
     observersRuntimeEvent,
     defaultExecutor,
     observersTorEvent,
-    syntheticAccess,
-) {
+),  TorRuntime {
 
-    @get:JvmSynthetic
-    internal abstract val binder: TorRuntime.ServiceFactory.Binder
+    protected companion object {
+
+        @JvmSynthetic
+        internal val INIT = Any()
+    }
+
+    init {
+        check(syntheticAccess == INIT) { "AbstractTorRuntime cannot be extended. Use TorRuntime.Builder." }
+    }
 }

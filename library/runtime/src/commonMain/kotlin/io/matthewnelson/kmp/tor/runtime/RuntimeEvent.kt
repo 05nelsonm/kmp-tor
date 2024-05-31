@@ -297,7 +297,7 @@ public sealed class RuntimeEvent<Data: Any> private constructor(
          * a **single** time per process startup completion. If the currently
          * running process is stopped via [Action.StopDaemon] or
          * [Action.RestartDaemon], [READY] observers will be notified again
-         * in the same manner for the new process instance.
+         * in the same manner when the next process start completion occurs.
          *
          * This is useful for triggering single execution events.
          *
@@ -355,6 +355,8 @@ public sealed class RuntimeEvent<Data: Any> private constructor(
          *         trans: []
          *     ]
          *     TorState[fid=6E96…6985, daemon=Off, network=Disabled]
+         *
+         * @see [TorRuntime.isReady]
          * */
         public data object READY: PROCESS("PROCESS_READY")
 
@@ -396,6 +398,7 @@ public sealed class RuntimeEvent<Data: Any> private constructor(
      *     ]
      *
      * @see [TorState]
+     * @see [TorRuntime.state]
      * */
     public data object STATE: RuntimeEvent<TorState>("STATE")
 

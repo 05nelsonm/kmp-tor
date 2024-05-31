@@ -13,6 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
+@file:Suppress("PrivatePropertyName")
+
 package io.matthewnelson.kmp.tor.runtime.internal
 
 import io.matthewnelson.immutable.collections.toImmutableSet
@@ -62,13 +64,13 @@ internal class RealTorRuntime private constructor(
     defaultExecutor: OnEvent.Executor,
     @Suppress("RemoveRedundantQualifierName")
     observersRuntimeEvent: Set<RuntimeEvent.Observer<*>>,
-):  AbstractRuntimeEventProcessor(
+):  AbstractTorRuntime(
     generator.environment.staticTag(),
     observersRuntimeEvent,
     defaultExecutor,
     observersTorEvent,
-),  FileID by generator.environment,
-    TorRuntime
+    INIT,
+),  FileID by generator.environment
 {
 
     @Volatile
@@ -99,7 +101,6 @@ internal class RealTorRuntime private constructor(
 
     private val manager = StateManager(scope)
 
-    @Suppress("PrivatePropertyName")
     private val NOTIFIER = Notifier(manager)
 
     private val factory = TorCtrl.Factory(
@@ -770,13 +771,13 @@ internal class RealTorRuntime private constructor(
         @Suppress("RemoveRedundantQualifierName")
         observersRuntimeEvent: Set<RuntimeEvent.Observer<*>>,
         private val startService: () -> Unit,
-    ):  AbstractRuntimeEventProcessor(
+    ):  ServiceFactoryCtrl(
         generator.environment.staticTag(),
         observersRuntimeEvent,
         generator.environment.defaultExecutor(),
-        observersTorEvent
-    ),  ServiceFactoryCtrl,
-        FileID by generator.environment,
+        observersTorEvent,
+        INIT,
+    ),  FileID by generator.environment,
         RuntimeEvent.Notifier
     {
 
@@ -789,8 +790,9 @@ internal class RealTorRuntime private constructor(
         private val actionStack = Stack<ActionJob.Sealed>(1)
         private val lock = SynchronizedObject()
 
-        @Suppress("PrivatePropertyName")
         private val EMPTY = TorListeners.of(fid = generator.environment)
+        private val STATE_OFF = TorState.of(TorState.Daemon.Off, TorState.Network.Disabled, fid = generator.environment)
+        private val STATE_STARTING = STATE_OFF.copy(daemon = TorState.Daemon.Starting)
 
         private val builderRequiredEvents = builderRequiredEvents.toImmutableSet()
         protected override val debug: Boolean get() = generator.environment.debug
@@ -800,24 +802,14 @@ internal class RealTorRuntime private constructor(
         // to create an unused dispatcher for Jvm & Native
         private val dispatcher by lazy { generator.environment.newRuntimeDispatcher() }
 
-        public override val binder: ServiceCtrlBinder = ServiceCtrlBinder()
+        @get:JvmSynthetic
+        internal override val binder: ServiceCtrlBinder = ServiceCtrlBinder()
 
         public override fun environment(): TorRuntime.Environment = generator.environment
         public override fun isReady(): Boolean = _instance?.isReady() ?: false
         public override fun listeners(): TorListeners = _instance?.listeners() ?: EMPTY
-        public override fun state(): TorState = _instance?.state() ?:  run {
-            val daemon = if (_startServiceJob?.isActive == true) {
-                TorState.Daemon.Starting
-            } else {
-                TorState.Daemon.Off
-            }
-
-            TorState.of(
-                daemon = daemon,
-                network = TorState.Network.Disabled,
-                fid = this,
-            )
-        }
+        public override fun state(): TorState = _instance?.state()
+            ?: if (_startServiceJob?.isActive == true) STATE_STARTING else STATE_OFF
 
         public override fun enqueue(
             action: Action,
@@ -1021,9 +1013,8 @@ internal class RealTorRuntime private constructor(
             }
         }
 
-        private inner class ServiceCtrlBinder(
-
-        ):  TorRuntime.ServiceFactory.Binder,
+        private inner class ServiceCtrlBinder:
+            TorRuntime.ServiceFactory.Binder,
             FileID by generator.environment,
             RuntimeEvent.Notifier by this
         {
