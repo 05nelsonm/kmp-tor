@@ -212,22 +212,16 @@ public class TorListeners private constructor(
         }
 
         appendLine(": [")
-
         append("    dns: [")
         appendListeners(dns)
-
         append("    http: [")
         appendListeners(http)
-
         append("    socks: [")
         appendListeners(socks)
-
         append("    socksUnix: [")
         appendListeners(socksUnix)
-
         append("    trans: [")
         appendListeners(trans)
-
         append(']')
     }
 
@@ -492,7 +486,7 @@ public class TorListeners private constructor(
                 // failed job will be "partially-constructed" and tor dispatches
                 // a NOTICE closing them which contains the full file path and
                 // occurs before replying with the Reply.Error for this job.
-                val isRecoveryNeeded = with(listeners) {
+                val isRecoveryNeeded = with(_listeners) {
                     socksUnix.isNotEmpty()
                 }
 

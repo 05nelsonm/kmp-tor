@@ -22,7 +22,7 @@ import io.matthewnelson.kmp.tor.core.resource.synchronized
 import kotlin.concurrent.Volatile
 
 @OptIn(InternalKmpTorApi::class)
-internal class StartupFeedParser(private val lineLimit: Int = 50, private val exitCode: () -> Int?) {
+internal class StartupFeedParser(private val lineLimit: Int = 50, private val exitCodeOrNull: () -> Int?) {
 
     @Volatile
     private var _isReady: Boolean = false
@@ -121,7 +121,7 @@ internal class StartupFeedParser(private val lineLimit: Int = 50, private val ex
         // Generate error
         val stdout = _stdout?.toString() ?: ""
         val stderr = _stderr?.toString() ?: ""
-        val code = exitCode()?.toString() ?: "not exited"
+        val exitCode = exitCodeOrNull()?.toString() ?: "not exited"
 
         // append to current StringBuilder after calling
         // toString on both (above) so that if another
@@ -134,7 +134,7 @@ internal class StartupFeedParser(private val lineLimit: Int = 50, private val ex
         val message = StringBuilder(stdout.length + stderr.length + 100)
             .appendLine("Process Failure: [")
             .append("    exitCode: ")
-            .appendLine(code)
+            .appendLine(exitCode)
             .append("    cause: ")
             .appendLine(line)
             .append("    stdout: [")

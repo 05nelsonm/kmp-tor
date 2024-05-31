@@ -43,8 +43,10 @@ internal suspend inline fun <Arg: EnqueuedJob.Argument, Success: Any> Arg.common
         callsInPlace(enqueue, InvocationKind.AT_MOST_ONCE)
     }
 
-    val cancellable = Job(currentCoroutineContext()[Job])
-    cancellable.ensureActive()
+    val cancellable = currentCoroutineContext()[Job].let { parent ->
+        parent?.ensureActive()
+        Job(parent)
+    }
 
     var failure: Throwable? = null
     var success: Success? = null

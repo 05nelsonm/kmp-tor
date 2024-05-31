@@ -132,16 +132,15 @@ public sealed class TorCmd<Success: Any> private constructor(
 
             @JvmField
             public val configText: String = buildString {
-                val lines = configText.lines()
-                var isFirst = true
-                for (line in lines) {
-                    if (line.isBlank()) continue
-                    if (line.startsWith('#')) continue
+                for (line in configText.lines()) {
+                    val isCommentOrBlank = run {
+                        val i = line.indexOfFirst { !it.isWhitespace() }
+                        if (i == -1) true else line[i] == '#'
+                    }
 
-                    if (!isFirst) appendLine()
-
+                    if (isCommentOrBlank) continue
+                    if (isNotEmpty()) appendLine()
                     append(line)
-                    isFirst = false
                 }
             }
         }

@@ -297,7 +297,11 @@ class EnqueuedJobUnitTest {
 
     @Test
     fun givenAllowCancellationAccessibleFalse_whenExecuting_thenOnlyInternalCancelSignalsCancellation() {
-        val job = TestJob(cancellationPolicy = EnqueuedJob.CancellationPolicy(allowAttempts = true))
+        val job = TestJob(
+            executionPolicy = EnqueuedJob.ExecutionPolicy.Builder {
+                cancellation { allowAttempts = true }
+            },
+        )
         job.executing()
         job.cancel(null)
         assertNull(job.attempt())
@@ -308,10 +312,12 @@ class EnqueuedJobUnitTest {
     @Test
     fun givenAllowCancellationAccessibleTrue_whenExecuting_thenPublicCancelSignalsCancellation() {
         val job = TestJob(
-            cancellationPolicy = EnqueuedJob.CancellationPolicy(
-                allowAttempts = true,
-                accessibilityOpen = true,
-            )
+            executionPolicy = EnqueuedJob.ExecutionPolicy.Builder {
+                cancellation {
+                    allowAttempts = true
+                    accessibilityOpen = true
+                }
+            },
         )
 
         job.executing()
@@ -327,11 +333,13 @@ class EnqueuedJobUnitTest {
                 invocationFailure++
                 assertIs<CancellationException>(t)
             },
-            cancellationPolicy = EnqueuedJob.CancellationPolicy(
-                allowAttempts = true,
-                accessibilityOpen = true,
-                substituteOnErrorWithAttempt = true,
-            ),
+            executionPolicy = EnqueuedJob.ExecutionPolicy.Builder {
+                cancellation {
+                    allowAttempts = true
+                    accessibilityOpen = true
+                    substituteErrorWithAttempt = true
+                }
+            },
         )
 
         job.executing()
@@ -348,11 +356,13 @@ class EnqueuedJobUnitTest {
                 invocationFailure++
                 assertIs<InterruptedException>(t)
             },
-            cancellationPolicy = EnqueuedJob.CancellationPolicy(
-                allowAttempts = true,
-                accessibilityOpen = true,
-                substituteOnErrorWithAttempt = false,
-            ),
+            executionPolicy = EnqueuedJob.ExecutionPolicy.Builder {
+                cancellation {
+                    allowAttempts = true
+                    accessibilityOpen = true
+                    substituteErrorWithAttempt = false
+                }
+            },
         )
 
         job.executing()
@@ -362,13 +372,41 @@ class EnqueuedJobUnitTest {
         assertEquals(1, invocationFailure)
     }
 
+    @Test
+    fun givenExecutionPolicy_whenToString_thenIsAsExpected() {
+        val expected = """
+            ExecutionPolicy: [
+                cancellation: [
+                    allowAttempts: false
+                    accessibilityOpen: false
+                    substituteErrorWithAttempt: true
+                ]
+            ]
+        """.trimIndent()
+
+        assertEquals(expected, EnqueuedJob.ExecutionPolicy.DEFAULT.toString())
+    }
+
+    @Test
+    fun givenExecutionPolicyCancellation_whenToString_thenIsAsExpected() {
+        val expected = """
+            ExecutionPolicy.Cancellation: [
+                allowAttempts: false
+                accessibilityOpen: false
+                substituteErrorWithAttempt: true
+            ]
+        """.trimIndent()
+
+        assertEquals(expected, EnqueuedJob.ExecutionPolicy.Cancellation.DEFAULT.toString())
+    }
+
     public class TestJob(
         name: String = "",
         private val cancellation: (cause: CancellationException?) -> Unit = {},
         onFailure: OnFailure = OnFailure.noOp(),
         private val onSuccess: OnSuccess<Unit>? = null,
         handler: UncaughtException.Handler = UncaughtException.Handler.THROW,
-        override val cancellationPolicy: CancellationPolicy = CancellationPolicy.DEFAULT,
+        override val executionPolicy: ExecutionPolicy = ExecutionPolicy.DEFAULT,
     ): EnqueuedJob(name, onFailure, handler) {
         override fun onCancellation(cause: CancellationException?) {
             cancellation(cause)

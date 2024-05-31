@@ -125,7 +125,7 @@ public sealed class RuntimeEvent<Data: Any> private constructor(
         public data object CMD: RuntimeEvent<TorCmdJob>("EXECUTE_CMD") {
 
             /**
-             * Subscribes with provided [Processor] a [CMD] observer
+             * Subscribes with provided [TorRuntime] a [CMD] observer
              * which will intercept execution of all [TorCmd.Signal.NewNym]
              * jobs in order to transform tor's generic server response
              * of [Reply.Success.OK].
@@ -138,12 +138,11 @@ public sealed class RuntimeEvent<Data: Any> private constructor(
              * signal, it may or may not dispatch a [TorEvent.NOTICE]
              * indicating that it was rate-limited. This observer handles
              * that transformation and notifies the provided [onEvent]
-             * callback whenever there is a successful execution of
-             * [TorCmd.Signal.NewNym] with either:
+             * callback whenever there is a successful execution of a
+             * [TorCmd.Signal.NewNym] job with either:
              *
-             *  - `null` indicating tor accepted the signal and did **not**
-             *    rate-limit it.
-             *  - The rate-limit notice itself.
+             *  - null: tor accepted the signal without rate-limiting.
+             *  - non-null: the rate-limiting notice.
              *
              * e.g.
              *
@@ -172,14 +171,12 @@ public sealed class RuntimeEvent<Data: Any> private constructor(
              * @return [Disposable] to unsubscribe the observer
              * @param [tag] A string to help grouping/identifying observer(s)
              * @param [executor] The thread context in which [onEvent] will be
-             *   invoked in. If `null` and [Processor] is an instance of
-             *   [TorRuntime], it will use whatever was declared via
-             *   [TorRuntime.Environment.Builder.defaultEventExecutor]. Otherwise,
-             *   [OnEvent.Executor.Immediate] will be used.
+             *   invoked in. If `null` whatever was declared via
+             *   [TorRuntime.Environment.Builder.defaultEventExecutor] is used.
              * @param [onEvent] The callback to pass the data to.
              * */
             @JvmStatic
-            public fun Processor.observeSignalNewNym(
+            public fun TorRuntime.observeSignalNewNym(
                 tag: String?,
                 executor: OnEvent.Executor?,
                 onEvent: OnEvent<String?>,
