@@ -148,6 +148,7 @@ internal class RealTorRuntime private constructor(
     internal fun handler(): UncaughtException.Handler = handler
 
     public override fun environment(): TorRuntime.Environment = generator.environment
+    public override fun isReady(): Boolean = manager.isReady
     public override fun listeners(): TorListeners = manager.listenersOrEmpty
     public override fun state(): TorState = manager.state
 
@@ -748,7 +749,7 @@ internal class RealTorRuntime private constructor(
         scope: CoroutineScope,
     ): TorListeners.AbstractManager(scope, generator.environment) {
 
-        private val isReady by lazy { "Tor[fid=$fidEllipses] IS READY" }
+        val isReadyString by lazy { "Tor[fid=$fidEllipses] IS READY" }
 
         protected override fun notify(listeners: TorListeners) {
             LISTENERS.notifyObservers(listeners)
@@ -757,7 +758,7 @@ internal class RealTorRuntime private constructor(
             STATE.notifyObservers(state)
         }
         protected override fun notifyReady() {
-            PROCESS.READY.notifyObservers(isReady)
+            PROCESS.READY.notifyObservers(isReadyString)
         }
     }
 
@@ -802,25 +803,20 @@ internal class RealTorRuntime private constructor(
         public override val binder: ServiceCtrlBinder = ServiceCtrlBinder()
 
         public override fun environment(): TorRuntime.Environment = generator.environment
-
-        public override fun listeners(): TorListeners = _instance?.listeners() ?: synchronized(lock) {
-            _instance?.listeners() ?: EMPTY
-        }
-
-        public override fun state(): TorState = _instance?.state() ?: synchronized(lock) {
-            _instance?.state() ?: run {
-                val daemon = if (_startServiceJob?.isActive == true) {
-                    TorState.Daemon.Starting
-                } else {
-                    TorState.Daemon.Off
-                }
-
-                TorState.of(
-                    daemon = daemon,
-                    network = TorState.Network.Disabled,
-                    fid = this,
-                )
+        public override fun isReady(): Boolean = _instance?.isReady() ?: false
+        public override fun listeners(): TorListeners = _instance?.listeners() ?: EMPTY
+        public override fun state(): TorState = _instance?.state() ?:  run {
+            val daemon = if (_startServiceJob?.isActive == true) {
+                TorState.Daemon.Starting
+            } else {
+                TorState.Daemon.Off
             }
+
+            TorState.of(
+                daemon = daemon,
+                network = TorState.Network.Disabled,
+                fid = this,
+            )
         }
 
         public override fun enqueue(

@@ -198,10 +198,11 @@ public class TorState private constructor(
             fid = fid,
         )
         @Volatile
-        private var _hasNotifiedReady: Boolean = false
+        private var _isReady: Boolean = false
         private val lock = SynchronizedObject()
 
         internal val state: TorState get() = _state
+        internal val isReady: Boolean get() = _isReady
 
         protected abstract fun notify(old: TorState, new: TorState)
         protected abstract fun notifyReady()
@@ -226,15 +227,15 @@ public class TorState private constructor(
 
                 _state = diff.new
 
-                val notifyReady = if (_hasNotifiedReady) {
+                val notifyReady = if (_isReady) {
                     if (!new.daemon.isBootstrapped) {
                         // Reset
-                        _hasNotifiedReady = false
+                        _isReady = false
                     }
                     false
                 } else {
                     if (new.daemon.isBootstrapped && new.isNetworkEnabled) {
-                        _hasNotifiedReady = true
+                        _isReady = true
                         true
                     } else {
                         false

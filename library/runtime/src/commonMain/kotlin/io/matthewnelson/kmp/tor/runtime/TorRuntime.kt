@@ -65,7 +65,15 @@ public interface TorRuntime:
     public fun environment(): Environment
 
     /**
-     * Returns the current active [TorListeners] for this [TorRuntime]
+     * Checks if the tor process backing [TorRuntime] (if it is running)
+     * has completed starting up.
+     *
+     * @see [RuntimeEvent.PROCESS.READY]
+     * */
+    public fun isReady(): Boolean
+
+    /**
+     * Returns the current [TorListeners] of this [TorRuntime]
      * instance.
      *
      * If tor is **not** 100% bootstrapped with network enabled,
@@ -75,7 +83,7 @@ public interface TorRuntime:
     public fun listeners(): TorListeners
 
     /**
-     * Returns the current [TorState] for this [TorRuntime] instance.
+     * Returns the current [TorState] of this [TorRuntime] instance.
      * */
     public fun state(): TorState
 
@@ -611,6 +619,7 @@ public interface TorRuntime:
 
         public final override val fid: String = ctrl.fid
         public final override fun environment(): Environment = ctrl.environment()
+        public final override fun isReady(): Boolean = ctrl.isReady()
         public final override fun listeners(): TorListeners = ctrl.listeners()
         public final override fun state(): TorState = ctrl.state()
 

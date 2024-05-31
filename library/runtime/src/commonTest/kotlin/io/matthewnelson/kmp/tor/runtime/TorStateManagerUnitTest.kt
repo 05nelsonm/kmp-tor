@@ -15,10 +15,7 @@
  **/
 package io.matthewnelson.kmp.tor.runtime
 
-import kotlin.test.Test
-import kotlin.test.assertEquals
-import kotlin.test.assertIs
-import kotlin.test.assertNotEquals
+import kotlin.test.*
 
 class TorStateManagerUnitTest {
 
@@ -114,28 +111,37 @@ class TorStateManagerUnitTest {
         manager.update(TorState.Daemon.Starting)
         manager.update(TorState.Daemon.On(100))
         assertEquals(0, manager.notifyReadies.size)
+        assertFalse(manager.isReady)
 
         // bootstrapped + network enabled
         manager.update(network = TorState.Network.Enabled)
         assertEquals(1, manager.notifyReadies.size)
+        assertTrue(manager.isReady)
 
         // toggling network does nothing
         manager.update(network = TorState.Network.Disabled)
         assertEquals(1, manager.notifyReadies.size)
+        assertTrue(manager.isReady)
         manager.update(network = TorState.Network.Enabled)
         assertEquals(1, manager.notifyReadies.size)
+        assertTrue(manager.isReady)
 
         // will not happen in real life, but trigger again to see it was "reset"
         manager.update(TorState.Daemon.On(95), TorState.Network.Disabled)
         assertEquals(1, manager.notifyReadies.size)
+        assertFalse(manager.isReady)
         manager.update(TorState.Daemon.On(100), TorState.Network.Enabled)
         assertEquals(2, manager.notifyReadies.size)
+        assertTrue(manager.isReady)
 
         manager.update(TorState.Daemon.On(95), TorState.Network.Disabled)
         assertEquals(2, manager.notifyReadies.size)
+        assertFalse(manager.isReady)
         manager.update(TorState.Daemon.On(100))
         assertEquals(2, manager.notifyReadies.size)
+        assertFalse(manager.isReady)
         manager.update(network = TorState.Network.Enabled)
         assertEquals(3, manager.notifyReadies.size)
+        assertTrue(manager.isReady)
     }
 }
