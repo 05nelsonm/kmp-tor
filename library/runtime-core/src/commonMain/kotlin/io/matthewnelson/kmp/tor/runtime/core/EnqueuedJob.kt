@@ -178,17 +178,17 @@ public abstract class EnqueuedJob protected constructor(
     }
 
     /**
-     * Cancels the job.
+     * Cancel the job.
      *
-     * Does nothing if [state] is anything other than
-     * [State.Enqueued] or [isCompleting] is true.
+     * If the job's [state] is [Executing], cancellation will
+     * defer to the job's [ExecutionPolicy.Cancellation].
      *
      * If cancelled, [cancellationException] will be set,
      * [onFailure] will be invoked with [CancellationException]
      * to indicate cancellation, and all [invokeOnCompletion]
      * callbacks will be run.
      *
-     * @return true if cancellation was successful
+     * @return true if cancellation was successful.
      * */
     public fun cancel(cause: CancellationException?): Boolean {
         return cancel(cause, signalAttempt = executionPolicy.cancellation.accessibilityOpen)
@@ -249,7 +249,7 @@ public abstract class EnqueuedJob protected constructor(
         /**
          * Point of no return where the job has been de-queued
          * and is being executed. Cancellation will defer to the
-         * job's [executionPolicy]. The next state transition
+         * job's [ExecutionPolicy]. The next state transition
          * will be to either [Success] or [Error].
          * */
         Executing,
@@ -319,7 +319,7 @@ public abstract class EnqueuedJob protected constructor(
         }
 
         /**
-         * TODO
+         * How the job handles cancellation while in a state of [Executing]
          *
          * @see [Cancellation.DEFAULT]
          * */

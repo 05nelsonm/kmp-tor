@@ -292,11 +292,12 @@ public sealed class RuntimeEvent<Data: Any> private constructor(
     public sealed class PROCESS private constructor(name: String): RuntimeEvent<String>(name) {
 
         /**
-         * Indicates that the tor process has completed bootstrapping, and
-         * the network is enabled. All [READY] observers will be notified a
-         * **single** time per process start completion. When [Action.StopDaemon]
-         * or [Action.RestartDaemon] executed, [READY] observers will be notified
-         * again in the same manner for the new process instance.
+         * Indicates that the tor process has completed bootstrapping and
+         * the network is enabled. All [READY] observers will be notified
+         * a **single** time per process startup completion. If the currently
+         * running process is stopped via [Action.StopDaemon] or
+         * [Action.RestartDaemon], [READY] observers will be notified again
+         * in the same manner for the new process instance.
          *
          * This is useful for triggering single execution events.
          *
