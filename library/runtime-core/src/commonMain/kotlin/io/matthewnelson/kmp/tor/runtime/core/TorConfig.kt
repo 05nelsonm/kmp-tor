@@ -335,6 +335,7 @@ public class TorConfig private constructor(
 
         public companion object: Setting.Factory<__ControlPort, Setting>(
             name = "__ControlPort",
+            default = "0",
             attributes = immutableSetOf(Attribute.Port, Attribute.UnixSocket),
             isCmdLineArg = true,
             isUnique = false,
@@ -362,7 +363,7 @@ public class TorConfig private constructor(
         IsolationFlagBuilder.DSL<__DNSPort>
     {
 
-        private var argument: String = "0"
+        private var argument: String = default
         private var allowReassign: Boolean = true
         private val isolationFlags = mutableSetOf<String>()
 
@@ -400,6 +401,7 @@ public class TorConfig private constructor(
 
         public companion object: Setting.Factory<__DNSPort, Setting>(
             name = "__DNSPort",
+            default = "0",
             attributes = immutableSetOf(Attribute.Port),
             isCmdLineArg = false,
             isUnique = false,
@@ -427,7 +429,7 @@ public class TorConfig private constructor(
         IsolationFlagBuilder.DSL<__HTTPTunnelPort>
     {
 
-        private var argument: String = "0"
+        private var argument: String = default
         private var allowReassign: Boolean = true
         private val isolationFlags = mutableSetOf<String>()
 
@@ -465,6 +467,7 @@ public class TorConfig private constructor(
 
         public companion object: Setting.Factory<__HTTPTunnelPort, Setting>(
             name = "__HTTPTunnelPort",
+            default = "0",
             attributes = immutableSetOf(Attribute.Port),
             isCmdLineArg = false,
             isUnique = false,
@@ -491,6 +494,7 @@ public class TorConfig private constructor(
 
         public companion object: Setting.Factory<__OwningControllerProcess, Setting>(
             name = "__OwningControllerProcess",
+            default = "",
             attributes = emptySet(),
             isCmdLineArg = true,
             isUnique = true,
@@ -513,7 +517,7 @@ public class TorConfig private constructor(
         UnixSocketBuilder.DSL<__SocksPort>
     {
 
-        private var argument: String = "9050"
+        private var argument: String = default
         private var allowReassign = true
         private val socksFlags = mutableSetOf<String>()
         private val unixFlags = mutableSetOf<String>()
@@ -565,6 +569,7 @@ public class TorConfig private constructor(
 
         public companion object: Setting.Factory<__SocksPort, Setting>(
             name = "__SocksPort",
+            default = "9050",
             attributes = immutableSetOf(Attribute.Port, Attribute.UnixSocket),
             isCmdLineArg = false,
             isUnique = false,
@@ -599,7 +604,7 @@ public class TorConfig private constructor(
         IsolationFlagBuilder.DSL<__TransPort>
     {
 
-        private var port: String = "0"
+        private var port: String = default
         private var allowReassign: Boolean = true
         private val isolationFlags = mutableSetOf<String>()
 
@@ -641,6 +646,7 @@ public class TorConfig private constructor(
 
         public companion object: Setting.Factory<__TransPort, Setting>(
             name = "__TransPort",
+            default = "0",
             attributes = immutableSetOf(Attribute.Port),
             isCmdLineArg = false,
             isUnique = false,
@@ -669,6 +675,7 @@ public class TorConfig private constructor(
 
         public companion object: Setting.Factory<AutomapHostsOnResolve, Setting>(
             name = "AutomapHostsOnResolve",
+            default = false.toByte().toString(),
             attributes = emptySet(),
             isCmdLineArg = false,
             isUnique = true,
@@ -740,13 +747,14 @@ public class TorConfig private constructor(
 
         public companion object: Setting.Factory<AutomapHostsSuffixes, Setting>(
             name = "AutomapHostsSuffixes",
+            default = ".onion,.exit",
             attributes = emptySet(),
             isCmdLineArg = false,
             isUnique = true,
             factory = { AutomapHostsSuffixes() },
             build = {
                 var result = suffixes.joinToString(separator = ",")
-                if (result.isBlank()) result = ".exit,.onion"
+                if (result.isBlank()) result = Companion.default
                 build(result)!!
             },
         )
@@ -765,6 +773,7 @@ public class TorConfig private constructor(
 
         public companion object: Setting.Factory<CacheDirectory, Setting?>(
             name = "CacheDirectory",
+            default = "",
             attributes = immutableSetOf(Attribute.Directory),
             isCmdLineArg = true,
             isUnique = true,
@@ -786,6 +795,7 @@ public class TorConfig private constructor(
 
         public companion object: Setting.Factory<ClientOnionAuthDir, Setting?>(
             name = "ClientOnionAuthDir",
+            default = "",
             attributes = immutableSetOf(Attribute.Directory),
             isCmdLineArg = true,
             isUnique = true,
@@ -807,7 +817,7 @@ public class TorConfig private constructor(
         keyword = Companion,
     ) {
 
-        private var argument: String = AUTO
+        private var argument: String = default
 
         @KmpTorDsl
         public fun auto(): ConnectionPadding {
@@ -823,6 +833,7 @@ public class TorConfig private constructor(
 
         public companion object: Setting.Factory<ConnectionPadding, Setting>(
             name = "ConnectionPadding",
+            default = AUTO,
             attributes = emptySet(),
             isCmdLineArg = false,
             isUnique = true,
@@ -844,6 +855,7 @@ public class TorConfig private constructor(
 
         public companion object: Setting.Factory<ControlPortWriteToFile, Setting?>(
             name = "ControlPortWriteToFile",
+            default = "",
             attributes = immutableSetOf(Attribute.File),
             isCmdLineArg = true,
             isUnique = true,
@@ -870,6 +882,7 @@ public class TorConfig private constructor(
 
         public companion object: Setting.Factory<CookieAuthentication, Setting>(
             name = "CookieAuthentication",
+            default = false.toByte().toString(),
             attributes = emptySet(),
             isCmdLineArg = true,
             isUnique = true,
@@ -891,6 +904,7 @@ public class TorConfig private constructor(
 
         public companion object: Setting.Factory<CookieAuthFile, Setting?>(
             name = "CookieAuthFile",
+            default = "",
             attributes = immutableSetOf(Attribute.File),
             isCmdLineArg = true,
             isUnique = true,
@@ -917,6 +931,7 @@ public class TorConfig private constructor(
 
         public companion object: Setting.Factory<DataDirectory, Setting?>(
             name = "DataDirectory",
+            default = "",
             attributes = immutableSetOf(Attribute.Directory),
             isCmdLineArg = true,
             isUnique = true,
@@ -943,6 +958,7 @@ public class TorConfig private constructor(
 
         public companion object: Setting.Factory<DisableNetwork, Setting>(
             name = "DisableNetwork",
+            default = false.toByte().toString(),
             attributes = emptySet(),
             isCmdLineArg = true,
             isUnique = true,
@@ -964,6 +980,7 @@ public class TorConfig private constructor(
 
         public companion object: Setting.Factory<DormantCanceledByStartup, Setting>(
             name = "DormantCanceledByStartup",
+            default = false.toByte().toString(),
             attributes = emptySet(),
             isCmdLineArg = true,
             isUnique = true,
@@ -980,7 +997,7 @@ public class TorConfig private constructor(
         keyword = Companion,
     ) {
 
-        private var timeout: String = "24 hours"
+        private var timeout: String = default
 
         @KmpTorDsl
         public fun minutes(n: Int): DormantClientTimeout {
@@ -1009,6 +1026,7 @@ public class TorConfig private constructor(
 
         public companion object: Setting.Factory<DormantClientTimeout, Setting>(
             name = "DormantClientTimeout",
+            default = "24 hours",
             attributes = emptySet(),
             isCmdLineArg = false,
             isUnique = true,
@@ -1030,6 +1048,7 @@ public class TorConfig private constructor(
 
         public companion object: Setting.Factory<DormantOnFirstStartup, Setting>(
             name = "DormantOnFirstStartup",
+            default = false.toByte().toString(),
             attributes = emptySet(),
             isCmdLineArg = true,
             isUnique = true,
@@ -1051,6 +1070,7 @@ public class TorConfig private constructor(
 
         public companion object: Setting.Factory<DormantTimeoutDisabledByIdleStreams, Setting>(
             name = "DormantTimeoutDisabledByIdleStreams",
+            default = false.toByte().toString(),
             attributes = emptySet(),
             isCmdLineArg = false,
             isUnique = true,
@@ -1067,7 +1087,7 @@ public class TorConfig private constructor(
         keyword = Companion,
     ) {
 
-        private var argument: String = AUTO
+        private var argument: String = default
 
         @KmpTorDsl
         public fun auto(): GeoIPExcludeUnknown {
@@ -1083,6 +1103,7 @@ public class TorConfig private constructor(
 
         public companion object: Setting.Factory<GeoIPExcludeUnknown, Setting>(
             name = "GeoIPExcludeUnknown",
+            default = AUTO,
             attributes = emptySet(),
             isCmdLineArg = false,
             isUnique = true,
@@ -1104,6 +1125,7 @@ public class TorConfig private constructor(
 
         public companion object: Setting.Factory<GeoIPFile, Setting?>(
             name = "GeoIPFile",
+            default = "",
             attributes = immutableSetOf(Attribute.File),
             isCmdLineArg = true,
             isUnique = true,
@@ -1125,6 +1147,7 @@ public class TorConfig private constructor(
 
         public companion object: Setting.Factory<GeoIPv6File, Setting?>(
             name = "GeoIPv6File",
+            default = "",
             attributes = immutableSetOf(Attribute.File),
             isCmdLineArg = true,
             isUnique = true,
@@ -1250,6 +1273,7 @@ public class TorConfig private constructor(
 
         public companion object: Setting.Factory<HiddenServiceDir, Setting?>(
             name = "HiddenServiceDir",
+            default = "",
             attributes = immutableSetOf(Attribute.Directory, Attribute.HiddenService),
             isCmdLineArg = false,
             isUnique = false,
@@ -1333,6 +1357,7 @@ public class TorConfig private constructor(
 
         public companion object: Keyword(
             name = "HiddenServicePort",
+            default = "",
             attributes = immutableSetOf(Attribute.HiddenService, Attribute.Port, Attribute.UnixSocket),
             isCmdLineArg = false,
             isUnique = false,
@@ -1384,6 +1409,7 @@ public class TorConfig private constructor(
 
         public companion object: Keyword(
             name = "HiddenServiceVersion",
+            default = "3",
             attributes = immutableSetOf(Attribute.HiddenService),
             isCmdLineArg = false,
             isUnique = false,
@@ -1409,6 +1435,7 @@ public class TorConfig private constructor(
 
         public companion object: Keyword(
             name = "HiddenServiceAllowUnknownPorts",
+            default = false.toByte().toString(),
             attributes = immutableSetOf(Attribute.HiddenService),
             isCmdLineArg = false,
             isUnique = false,
@@ -1450,6 +1477,7 @@ public class TorConfig private constructor(
 
         public companion object: Keyword(
             name = "HiddenServiceMaxStreams",
+            default = "0",
             attributes = immutableSetOf(Attribute.HiddenService),
             isCmdLineArg = false,
             isUnique = false,
@@ -1475,6 +1503,7 @@ public class TorConfig private constructor(
 
         public companion object: Keyword(
             name = "HiddenServiceMaxStreamsCloseCircuit",
+            default = false.toByte().toString(),
             attributes = immutableSetOf(Attribute.HiddenService),
             isCmdLineArg = false,
             isUnique = false,
@@ -1500,6 +1529,7 @@ public class TorConfig private constructor(
 
         public companion object: Keyword(
             name = "HiddenServiceDirGroupReadable",
+            default = false.toByte().toString(),
             attributes = immutableSetOf(Attribute.HiddenService),
             isCmdLineArg = false,
             isUnique = false,
@@ -1543,6 +1573,7 @@ public class TorConfig private constructor(
 
         public companion object: Keyword(
             name = "HiddenServiceNumIntroductionPoints",
+            default = "3",
             attributes = immutableSetOf(Attribute.HiddenService),
             isCmdLineArg = false,
             isUnique = false,
@@ -1569,6 +1600,7 @@ public class TorConfig private constructor(
 
         public companion object: Setting.Factory<RunAsDaemon, Setting>(
             name = "RunAsDaemon",
+            default = false.toByte().toString(),
             attributes = emptySet(),
             isCmdLineArg = true,
             isUnique = true,
@@ -1601,6 +1633,7 @@ public class TorConfig private constructor(
 
         public companion object: Setting.Factory<SyslogIdentityTag, Setting?>(
             name = "SyslogIdentityTag",
+            default = "",
             attributes = immutableSetOf(Attribute.Logging),
             isCmdLineArg = true,
             isUnique = true,
@@ -1636,6 +1669,7 @@ public class TorConfig private constructor(
     public class AndroidIdentityTag private constructor() {
         public companion object: Keyword(
             name = "AndroidIdentityTag",
+            default = "",
             attributes = immutableSetOf(Attribute.Logging),
             isCmdLineArg = true,
             isUnique = true
@@ -1662,6 +1696,7 @@ public class TorConfig private constructor(
 
         public companion object: Setting.Factory<VirtualAddrNetworkIPv4, Setting>(
             name = "VirtualAddrNetworkIPv4",
+            default = "127.192.0.0/10",
             attributes = emptySet(),
             isCmdLineArg = false,
             isUnique = true,
@@ -1672,7 +1707,7 @@ public class TorConfig private constructor(
                 build(address.canonicalHostName() + '/' + bits)!!
             },
         ) {
-            private val DEFAULT = "127.192.0.0".toIPAddressV4()
+            private val DEFAULT by lazy { default.toIPAddressV4() }
         }
     }
 
@@ -1696,6 +1731,7 @@ public class TorConfig private constructor(
 
         public companion object: Setting.Factory<VirtualAddrNetworkIPv6, Setting>(
             name = "VirtualAddrNetworkIPv6",
+            default = "[FE80::]/10",
             attributes = emptySet(),
             isCmdLineArg = false,
             isUnique = true,
@@ -1706,7 +1742,7 @@ public class TorConfig private constructor(
                 build(address.canonicalHostName() + '/' + bits)!!
             },
         ) {
-            private val DEFAULT = "FE80::".toIPAddressV6()
+            private val DEFAULT by lazy { default.toIPAddressV6() }
         }
     }
 
@@ -1901,12 +1937,13 @@ public class TorConfig private constructor(
          * */
         public sealed class Factory<out B: Builder, out S: Setting?>(
             name: String,
+            default: String,
             attributes: Set<Attribute>,
             isCmdLineArg: Boolean,
             isUnique: Boolean,
             private val factory: () -> B,
             private val build: B.() -> S,
-        ): Keyword(name, attributes, isCmdLineArg, isUnique) {
+        ): Keyword(name, default, attributes, isCmdLineArg, isUnique) {
 
             public fun Builder(block: ThisBlock<B>): S = build(factory().apply(block))
         }
@@ -2032,6 +2069,7 @@ public class TorConfig private constructor(
      * @see [Setting.filterByAttribute]
      *
      * @param [name] The string value (e.g. `RunAsDaemon`)
+     * @param [default] Tor's default value for this Keyword
      * @param [attributes] Attributes specific to the Keyword (used for filtering)
      * @param [isCmdLineArg] KmpTor specific flag used to determine
      *   if the argument should be utilized in the start arguments passed
@@ -2043,6 +2081,8 @@ public class TorConfig private constructor(
     public sealed class Keyword(
         @JvmField
         public val name: String,
+        @JvmField
+        public val default: String,
         @JvmField
         public val attributes: Set<Attribute>,
         @JvmField

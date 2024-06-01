@@ -82,7 +82,7 @@ public sealed class TCPPortBuilder private constructor() {
         DSLDisable<Socks>,
         DSLPort<Socks>
     {
-        private var argument: String = "9050"
+        private var argument: String = TorConfig.__SocksPort.default
         private var allowReassign: Boolean = true
 
         @KmpTorDsl

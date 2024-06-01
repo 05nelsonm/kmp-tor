@@ -18,12 +18,36 @@ package io.matthewnelson.kmp.tor.runtime.core.ctrl
 import io.matthewnelson.kmp.tor.runtime.core.TorConfig
 import kotlin.jvm.JvmField
 
+/**
+ * Holder for tor configuration entries.
+ *
+ * @see [TorCmd.Config.Get]
+ * */
 public data class ConfigEntry(
+
+    /**
+     * The [TorConfig] keyword for this entry.
+     * */
     @JvmField
     public val key: TorConfig.Keyword,
+
+    /**
+     * The value tor is using for this [key], as returned by its
+     * control connection.
+     *
+     * If empty, then tor's set value for the given [key] is the
+     * default value, as defined by [TorConfig.Keyword.default].
+     * */
     @JvmField
     public val value: String,
 ) {
 
-    public override fun toString(): String = "ConfigEntry[key=$key, value=$value]"
+    /**
+     * If this [ConfigEntry] is using tor's default value for the
+     * given [key].
+     * */
+    @JvmField
+    public val isDefault: Boolean = if (value.isEmpty()) true else value == key.default
+
+    public override fun toString(): String = "ConfigEntry[key=$key, value=$value, isDefault=$isDefault]"
 }

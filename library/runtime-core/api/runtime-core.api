@@ -480,10 +480,11 @@ public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$HiddenService
 
 public abstract class io/matthewnelson/kmp/tor/runtime/core/TorConfig$Keyword : java/lang/CharSequence, java/lang/Comparable {
 	public final field attributes Ljava/util/Set;
+	public final field default Ljava/lang/String;
 	public final field isCmdLineArg Z
 	public final field isUnique Z
 	public final field name Ljava/lang/String;
-	public synthetic fun <init> (Ljava/lang/String;Ljava/util/Set;ZZLkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public synthetic fun <init> (Ljava/lang/String;Ljava/lang/String;Ljava/util/Set;ZZLkotlin/jvm/internal/DefaultConstructorMarker;)V
 	public final fun charAt (I)C
 	public final fun compareTo (Lio/matthewnelson/kmp/tor/runtime/core/TorConfig$Keyword;)I
 	public synthetic fun compareTo (Ljava/lang/Object;)I
@@ -586,7 +587,7 @@ public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$Setting$Compa
 }
 
 public abstract class io/matthewnelson/kmp/tor/runtime/core/TorConfig$Setting$Factory : io/matthewnelson/kmp/tor/runtime/core/TorConfig$Keyword {
-	public synthetic fun <init> (Ljava/lang/String;Ljava/util/Set;ZZLkotlin/jvm/functions/Function0;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public synthetic fun <init> (Ljava/lang/String;Ljava/lang/String;Ljava/util/Set;ZZLkotlin/jvm/functions/Function0;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
 	public final fun Builder (Lio/matthewnelson/kmp/tor/runtime/core/ThisBlock;)Lio/matthewnelson/kmp/tor/runtime/core/TorConfig$Setting;
 }
 
@@ -1147,6 +1148,7 @@ public final class io/matthewnelson/kmp/tor/runtime/core/ctrl/ClientAuthEntry {
 }
 
 public final class io/matthewnelson/kmp/tor/runtime/core/ctrl/ConfigEntry {
+	public final field isDefault Z
 	public final field key Lio/matthewnelson/kmp/tor/runtime/core/TorConfig$Keyword;
 	public final field value Ljava/lang/String;
 	public fun <init> (Lio/matthewnelson/kmp/tor/runtime/core/TorConfig$Keyword;Ljava/lang/String;)V

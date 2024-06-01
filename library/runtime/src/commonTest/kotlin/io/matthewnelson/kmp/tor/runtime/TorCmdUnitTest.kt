@@ -37,7 +37,7 @@ class TorCmdUnitTest {
     @Test
     fun givenConfigGet_whenKeyword_thenIsRecognizedByTor() = runTest {
         val runtime = TorRuntime.Builder(testEnv("cmd_getconf_test")) {
-            observerStatic(RuntimeEvent.LOG.DEBUG) { println(it) }
+//            observerStatic(RuntimeEvent.LOG.DEBUG) { println(it) }
         }.ensureStoppedOnTestCompletion()
 
         runtime.startDaemonAsync()
@@ -50,6 +50,7 @@ class TorCmdUnitTest {
         }
         val onSuccess = OnSuccess<List<ConfigEntry>> { entries ->
             assertEquals(1, entries.size)
+            println(entries.first())
         }
 
         KEYWORDS.forEach { kw ->
