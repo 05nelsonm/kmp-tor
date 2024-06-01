@@ -36,7 +36,7 @@ import io.matthewnelson.kmp.tor.runtime.core.builder.*
 import io.matthewnelson.kmp.tor.runtime.core.ctrl.TorCmd
 import io.matthewnelson.kmp.tor.runtime.core.internal.IsAndroidHost
 import io.matthewnelson.kmp.tor.runtime.core.internal.IsUnixLikeHost
-import io.matthewnelson.kmp.tor.runtime.core.internal.toByte
+import io.matthewnelson.kmp.tor.runtime.core.internal.byte
 import kotlin.jvm.JvmField
 import kotlin.jvm.JvmName
 import kotlin.jvm.JvmStatic
@@ -688,12 +688,12 @@ public class TorConfig private constructor(
 
         public companion object: Setting.Factory<AutomapHostsOnResolve, Setting>(
             name = "AutomapHostsOnResolve",
-            default = false.toByte().toString(),
+            default = false.byte.toString(),
             attributes = emptySet(),
             isCmdLineArg = false,
             isUnique = true,
             factory = { AutomapHostsOnResolve() },
-            build = { build(enable.toByte().toString())!! },
+            build = { build(enable.byte.toString())!! },
         )
     }
 
@@ -840,7 +840,7 @@ public class TorConfig private constructor(
 
         @KmpTorDsl
         public fun enable(enable: Boolean): ConnectionPadding {
-            argument = enable.toByte().toString()
+            argument = enable.byte.toString()
             return this
         }
 
@@ -868,12 +868,12 @@ public class TorConfig private constructor(
 
         public companion object: Setting.Factory<ReducedConnectionPadding, Setting>(
             name = "ReducedConnectionPadding",
-            default = false.toByte().toString(),
+            default = false.byte.toString(),
             attributes = emptySet(),
             isCmdLineArg = false,
             isUnique = true,
             factory = { ReducedConnectionPadding() },
-            build = { build(enable.toByte().toString())!! },
+            build = { build(enable.byte.toString())!! },
         )
     }
 
@@ -917,12 +917,12 @@ public class TorConfig private constructor(
 
         public companion object: Setting.Factory<CookieAuthentication, Setting>(
             name = "CookieAuthentication",
-            default = false.toByte().toString(),
+            default = false.byte.toString(),
             attributes = emptySet(),
             isCmdLineArg = true,
             isUnique = true,
             factory = { CookieAuthentication() },
-            build = { build(enable.toByte().toString())!! },
+            build = { build(enable.byte.toString())!! },
         )
     }
 
@@ -993,12 +993,12 @@ public class TorConfig private constructor(
 
         public companion object: Setting.Factory<DisableNetwork, Setting>(
             name = "DisableNetwork",
-            default = false.toByte().toString(),
+            default = false.byte.toString(),
             attributes = emptySet(),
             isCmdLineArg = true,
             isUnique = true,
             factory = { DisableNetwork() },
-            build = { build(disable.toByte().toString())!! },
+            build = { build(disable.byte.toString())!! },
         )
     }
 
@@ -1015,12 +1015,12 @@ public class TorConfig private constructor(
 
         public companion object: Setting.Factory<DormantCanceledByStartup, Setting>(
             name = "DormantCanceledByStartup",
-            default = false.toByte().toString(),
+            default = false.byte.toString(),
             attributes = emptySet(),
             isCmdLineArg = true,
             isUnique = true,
             factory = { DormantCanceledByStartup() },
-            build = { build(cancel.toByte().toString())!! },
+            build = { build(cancel.byte.toString())!! },
         )
     }
 
@@ -1083,12 +1083,12 @@ public class TorConfig private constructor(
 
         public companion object: Setting.Factory<DormantOnFirstStartup, Setting>(
             name = "DormantOnFirstStartup",
-            default = false.toByte().toString(),
+            default = false.byte.toString(),
             attributes = emptySet(),
             isCmdLineArg = true,
             isUnique = true,
             factory = { DormantOnFirstStartup() },
-            build = { build(enable.toByte().toString())!! },
+            build = { build(enable.byte.toString())!! },
         )
     }
 
@@ -1105,12 +1105,12 @@ public class TorConfig private constructor(
 
         public companion object: Setting.Factory<DormantTimeoutDisabledByIdleStreams, Setting>(
             name = "DormantTimeoutDisabledByIdleStreams",
-            default = true.toByte().toString(),
+            default = true.byte.toString(),
             attributes = emptySet(),
             isCmdLineArg = false,
             isUnique = true,
             factory = { DormantTimeoutDisabledByIdleStreams() },
-            build = { build(enable.toByte().toString())!! },
+            build = { build(enable.byte.toString())!! },
         )
     }
 
@@ -1132,7 +1132,7 @@ public class TorConfig private constructor(
 
         @KmpTorDsl
         public fun exclude(exclude: Boolean): GeoIPExcludeUnknown {
-            argument = exclude.toByte().toString()
+            argument = exclude.byte.toString()
             return this
         }
 
@@ -1466,11 +1466,11 @@ public class TorConfig private constructor(
         @JvmField
         public var allow: Boolean = false
 
-        private fun build(): LineItem = toLineItem(allow.toByte().toString())!!
+        private fun build(): LineItem = toLineItem(allow.byte.toString())!!
 
         public companion object: Keyword(
             name = "HiddenServiceAllowUnknownPorts",
-            default = false.toByte().toString(),
+            default = false.byte.toString(),
             attributes = immutableSetOf(Attribute.HiddenService),
             isCmdLineArg = false,
             isUnique = false,
@@ -1534,11 +1534,11 @@ public class TorConfig private constructor(
         @JvmField
         public var close: Boolean = false
 
-        private fun build(): LineItem = toLineItem(close.toByte().toString())!!
+        private fun build(): LineItem = toLineItem(close.byte.toString())!!
 
         public companion object: Keyword(
             name = "HiddenServiceMaxStreamsCloseCircuit",
-            default = false.toByte().toString(),
+            default = false.byte.toString(),
             attributes = immutableSetOf(Attribute.HiddenService),
             isCmdLineArg = false,
             isUnique = false,
@@ -1560,11 +1560,11 @@ public class TorConfig private constructor(
         @JvmField
         public var readable: Boolean = false
 
-        private fun build(): LineItem = toLineItem(readable.toByte().toString())!!
+        private fun build(): LineItem = toLineItem(readable.byte.toString())!!
 
         public companion object: Keyword(
             name = "HiddenServiceDirGroupReadable",
-            default = false.toByte().toString(),
+            default = false.byte.toString(),
             attributes = immutableSetOf(Attribute.HiddenService),
             isCmdLineArg = false,
             isUnique = false,
@@ -1635,12 +1635,12 @@ public class TorConfig private constructor(
 
         public companion object: Setting.Factory<RunAsDaemon, Setting>(
             name = "RunAsDaemon",
-            default = false.toByte().toString(),
+            default = false.byte.toString(),
             attributes = emptySet(),
             isCmdLineArg = true,
             isUnique = true,
             factory = { RunAsDaemon() },
-            build = { build(enable.toByte().toString())!! },
+            build = { build(enable.byte.toString())!! },
         )
     }
 
@@ -2128,7 +2128,7 @@ public class TorConfig private constructor(
     ) {
         public companion object: Keyword(
             name = "ExtORPortCookieAuthFileGroupReadable",
-            default = false.toByte().toString(),
+            default = false.byte.toString(),
             attributes = emptySet(),
             isCmdLineArg = false,
             isUnique = false,
@@ -2164,7 +2164,7 @@ public class TorConfig private constructor(
     ) {
         public companion object: Keyword(
             name = "ConstrainedSockets",
-            default = false.toByte().toString(),
+            default = false.byte.toString(),
             attributes = emptySet(),
             isCmdLineArg = false,
             isUnique = false,
@@ -2218,7 +2218,7 @@ public class TorConfig private constructor(
     ) {
         public companion object: Keyword(
             name = "ControlSocketsGroupWritable",
-            default = false.toByte().toString(),
+            default = false.byte.toString(),
             attributes = emptySet(),
             isCmdLineArg = false,
             isUnique = false,
@@ -2254,7 +2254,7 @@ public class TorConfig private constructor(
     ) {
         public companion object: Keyword(
             name = "CookieAuthFileGroupReadable",
-            default = false.toByte().toString(),
+            default = false.byte.toString(),
             attributes = emptySet(),
             isCmdLineArg = false,
             isUnique = false,
@@ -2272,7 +2272,7 @@ public class TorConfig private constructor(
     ) {
         public companion object: Keyword(
             name = "ControlPortFileGroupReadable",
-            default = false.toByte().toString(),
+            default = false.byte.toString(),
             attributes = emptySet(),
             isCmdLineArg = false,
             isUnique = false,
@@ -2290,7 +2290,7 @@ public class TorConfig private constructor(
     ) {
         public companion object: Keyword(
             name = "DataDirectoryGroupReadable",
-            default = false.toByte().toString(),
+            default = false.byte.toString(),
             attributes = emptySet(),
             isCmdLineArg = false,
             isUnique = false,
@@ -2344,7 +2344,7 @@ public class TorConfig private constructor(
     ) {
         public companion object: Keyword(
             name = "UseDefaultFallbackDirs",
-            default = true.toByte().toString(),
+            default = true.byte.toString(),
             attributes = emptySet(),
             isCmdLineArg = false,
             isUnique = false,
@@ -2416,7 +2416,7 @@ public class TorConfig private constructor(
     ) {
         public companion object: Keyword(
             name = "DisableAllSwap",
-            default = false.toByte().toString(),
+            default = false.byte.toString(),
             attributes = emptySet(),
             isCmdLineArg = false,
             isUnique = false,
@@ -2434,7 +2434,7 @@ public class TorConfig private constructor(
     ) {
         public companion object: Keyword(
             name = "DisableDebuggerAttachment",
-            default = true.toByte().toString(),
+            default = true.byte.toString(),
             attributes = emptySet(),
             isCmdLineArg = false,
             isUnique = false,
@@ -2452,7 +2452,7 @@ public class TorConfig private constructor(
     ) {
         public companion object: Keyword(
             name = "FetchDirInfoEarly",
-            default = false.toByte().toString(),
+            default = false.byte.toString(),
             attributes = emptySet(),
             isCmdLineArg = false,
             isUnique = false,
@@ -2470,7 +2470,7 @@ public class TorConfig private constructor(
     ) {
         public companion object: Keyword(
             name = "FetchDirInfoExtraEarly",
-            default = false.toByte().toString(),
+            default = false.byte.toString(),
             attributes = emptySet(),
             isCmdLineArg = false,
             isUnique = false,
@@ -2488,7 +2488,7 @@ public class TorConfig private constructor(
     ) {
         public companion object: Keyword(
             name = "FetchHidServDescriptors",
-            default = true.toByte().toString(),
+            default = true.byte.toString(),
             attributes = emptySet(),
             isCmdLineArg = false,
             isUnique = false,
@@ -2506,7 +2506,7 @@ public class TorConfig private constructor(
     ) {
         public companion object: Keyword(
             name = "FetchServerDescriptors",
-            default = true.toByte().toString(),
+            default = true.byte.toString(),
             attributes = emptySet(),
             isCmdLineArg = false,
             isUnique = false,
@@ -2524,7 +2524,7 @@ public class TorConfig private constructor(
     ) {
         public companion object: Keyword(
             name = "FetchUselessDescriptors",
-            default = false.toByte().toString(),
+            default = false.byte.toString(),
             attributes = emptySet(),
             isCmdLineArg = false,
             isUnique = false,
@@ -2578,7 +2578,7 @@ public class TorConfig private constructor(
     ) {
         public companion object: Keyword(
             name = "Sandbox",
-            default = false.toByte().toString(),
+            default = false.byte.toString(),
             attributes = emptySet(),
             isCmdLineArg = false,
             isUnique = false,
@@ -2650,7 +2650,7 @@ public class TorConfig private constructor(
     ) {
         public companion object: Keyword(
             name = "UnixSocksGroupWritable",
-            default = false.toByte().toString(),
+            default = false.byte.toString(),
             attributes = emptySet(),
             isCmdLineArg = false,
             isUnique = false,
@@ -2704,7 +2704,7 @@ public class TorConfig private constructor(
     ) {
         public companion object: Keyword(
             name = "LogMessageDomains",
-            default = false.toByte().toString(),
+            default = false.byte.toString(),
             attributes = emptySet(),
             isCmdLineArg = false,
             isUnique = false,
@@ -2812,7 +2812,7 @@ public class TorConfig private constructor(
     ) {
         public companion object: Keyword(
             name = "ProtocolWarnings",
-            default = false.toByte().toString(),
+            default = false.byte.toString(),
             attributes = emptySet(),
             isCmdLineArg = false,
             isUnique = false,
@@ -2848,7 +2848,7 @@ public class TorConfig private constructor(
     ) {
         public companion object: Keyword(
             name = "TruncateLogFile",
-            default = false.toByte().toString(),
+            default = false.byte.toString(),
             attributes = emptySet(),
             isCmdLineArg = false,
             isUnique = false,
@@ -2920,7 +2920,7 @@ public class TorConfig private constructor(
     ) {
         public companion object: Keyword(
             name = "HardwareAccel",
-            default = false.toByte().toString(),
+            default = false.byte.toString(),
             attributes = emptySet(),
             isCmdLineArg = false,
             isUnique = false,
@@ -2974,7 +2974,7 @@ public class TorConfig private constructor(
     ) {
         public companion object: Keyword(
             name = "AvoidDiskWrites",
-            default = false.toByte().toString(),
+            default = false.byte.toString(),
             attributes = emptySet(),
             isCmdLineArg = false,
             isUnique = false,
@@ -3010,7 +3010,7 @@ public class TorConfig private constructor(
     ) {
         public companion object: Keyword(
             name = "CountPrivateBandwidth",
-            default = false.toByte().toString(),
+            default = false.byte.toString(),
             attributes = emptySet(),
             isCmdLineArg = false,
             isUnique = false,
@@ -3046,7 +3046,7 @@ public class TorConfig private constructor(
     ) {
         public companion object: Keyword(
             name = "NoExec",
-            default = false.toByte().toString(),
+            default = false.byte.toString(),
             attributes = emptySet(),
             isCmdLineArg = false,
             isUnique = false,
@@ -3140,7 +3140,7 @@ public class TorConfig private constructor(
     ) {
         public companion object: Keyword(
             name = "LearnCircuitBuildTimeout",
-            default = true.toByte().toString(),
+            default = true.byte.toString(),
             attributes = emptySet(),
             isCmdLineArg = false,
             isUnique = false,
@@ -3212,7 +3212,7 @@ public class TorConfig private constructor(
     ) {
         public companion object: Keyword(
             name = "ClientOnly",
-            default = false.toByte().toString(),
+            default = false.byte.toString(),
             attributes = emptySet(),
             isCmdLineArg = false,
             isUnique = false,
@@ -3320,7 +3320,7 @@ public class TorConfig private constructor(
     ) {
         public companion object: Keyword(
             name = "StrictNodes",
-            default = false.toByte().toString(),
+            default = false.byte.toString(),
             attributes = emptySet(),
             isCmdLineArg = false,
             isUnique = false,
@@ -3338,7 +3338,7 @@ public class TorConfig private constructor(
     ) {
         public companion object: Keyword(
             name = "FascistFirewall",
-            default = false.toByte().toString(),
+            default = false.byte.toString(),
             attributes = emptySet(),
             isCmdLineArg = false,
             isUnique = false,
@@ -3518,7 +3518,7 @@ public class TorConfig private constructor(
     ) {
         public companion object: Keyword(
             name = "EnforceDistinctSubnets",
-            default = true.toByte().toString(),
+            default = true.byte.toString(),
             attributes = emptySet(),
             isCmdLineArg = false,
             isUnique = false,
@@ -3626,7 +3626,7 @@ public class TorConfig private constructor(
     ) {
         public companion object: Keyword(
             name = "UpdateBridgesFromAuthority",
-            default = false.toByte().toString(),
+            default = false.byte.toString(),
             attributes = emptySet(),
             isCmdLineArg = false,
             isUnique = false,
@@ -3644,7 +3644,7 @@ public class TorConfig private constructor(
     ) {
         public companion object: Keyword(
             name = "UseBridges",
-            default = false.toByte().toString(),
+            default = false.byte.toString(),
             attributes = emptySet(),
             isCmdLineArg = false,
             isUnique = false,
@@ -3662,7 +3662,7 @@ public class TorConfig private constructor(
     ) {
         public companion object: Keyword(
             name = "UseEntryGuards",
-            default = true.toByte().toString(),
+            default = true.byte.toString(),
             attributes = emptySet(),
             isCmdLineArg = false,
             isUnique = false,
@@ -3788,7 +3788,7 @@ public class TorConfig private constructor(
     ) {
         public companion object: Keyword(
             name = "SafeSocks",
-            default = false.toByte().toString(),
+            default = false.byte.toString(),
             attributes = emptySet(),
             isCmdLineArg = false,
             isUnique = false,
@@ -3806,7 +3806,7 @@ public class TorConfig private constructor(
     ) {
         public companion object: Keyword(
             name = "TestSocks",
-            default = false.toByte().toString(),
+            default = false.byte.toString(),
             attributes = emptySet(),
             isCmdLineArg = false,
             isUnique = false,
@@ -3824,7 +3824,7 @@ public class TorConfig private constructor(
     ) {
         public companion object: Keyword(
             name = "AllowNonRFC953Hostnames",
-            default = false.toByte().toString(),
+            default = false.byte.toString(),
             attributes = emptySet(),
             isCmdLineArg = false,
             isUnique = false,
@@ -3860,7 +3860,7 @@ public class TorConfig private constructor(
     ) {
         public companion object: Keyword(
             name = "ClientDNSRejectInternalAddresses",
-            default = true.toByte().toString(),
+            default = true.byte.toString(),
             attributes = emptySet(),
             isCmdLineArg = false,
             isUnique = false,
@@ -3878,7 +3878,7 @@ public class TorConfig private constructor(
     ) {
         public companion object: Keyword(
             name = "ClientRejectInternalAddresses",
-            default = true.toByte().toString(),
+            default = true.byte.toString(),
             attributes = emptySet(),
             isCmdLineArg = false,
             isUnique = false,
@@ -3896,7 +3896,7 @@ public class TorConfig private constructor(
     ) {
         public companion object: Keyword(
             name = "DownloadExtraInfo",
-            default = false.toByte().toString(),
+            default = false.byte.toString(),
             attributes = emptySet(),
             isCmdLineArg = false,
             isUnique = false,
@@ -4058,7 +4058,7 @@ public class TorConfig private constructor(
     ) {
         public companion object: Keyword(
             name = "ClientUseIPv4",
-            default = true.toByte().toString(),
+            default = true.byte.toString(),
             attributes = emptySet(),
             isCmdLineArg = false,
             isUnique = false,
@@ -4076,7 +4076,7 @@ public class TorConfig private constructor(
     ) {
         public companion object: Keyword(
             name = "ClientUseIPv6",
-            default = false.toByte().toString(),
+            default = false.byte.toString(),
             attributes = emptySet(),
             isCmdLineArg = false,
             isUnique = false,
@@ -4112,7 +4112,7 @@ public class TorConfig private constructor(
     ) {
         public companion object: Keyword(
             name = "ClientAutoIPv6ORPort",
-            default = false.toByte().toString(),
+            default = false.byte.toString(),
             attributes = emptySet(),
             isCmdLineArg = false,
             isUnique = false,
@@ -4242,7 +4242,7 @@ public class TorConfig private constructor(
     ) {
         public companion object: Keyword(
             name = "AssumeReachable",
-            default = false.toByte().toString(),
+            default = false.byte.toString(),
             attributes = emptySet(),
             isCmdLineArg = false,
             isUnique = false,
@@ -4260,7 +4260,7 @@ public class TorConfig private constructor(
     ) {
         public companion object: Keyword(
             name = "BridgeRelay",
-            default = false.toByte().toString(),
+            default = false.byte.toString(),
             attributes = emptySet(),
             isCmdLineArg = false,
             isUnique = false,
@@ -4350,7 +4350,7 @@ public class TorConfig private constructor(
     ) {
         public companion object: Keyword(
             name = "ExitPolicyRejectPrivate",
-            default = true.toByte().toString(),
+            default = true.byte.toString(),
             attributes = emptySet(),
             isCmdLineArg = false,
             isUnique = false,
@@ -4368,7 +4368,7 @@ public class TorConfig private constructor(
     ) {
         public companion object: Keyword(
             name = "ExitPolicyRejectLocalInterfaces",
-            default = false.toByte().toString(),
+            default = false.byte.toString(),
             attributes = emptySet(),
             isCmdLineArg = false,
             isUnique = false,
@@ -4386,7 +4386,7 @@ public class TorConfig private constructor(
     ) {
         public companion object: Keyword(
             name = "ReducedExitPolicy",
-            default = false.toByte().toString(),
+            default = false.byte.toString(),
             attributes = emptySet(),
             isCmdLineArg = false,
             isUnique = false,
@@ -4404,7 +4404,7 @@ public class TorConfig private constructor(
     ) {
         public companion object: Keyword(
             name = "IPv6Exit",
-            default = false.toByte().toString(),
+            default = false.byte.toString(),
             attributes = emptySet(),
             isCmdLineArg = false,
             isUnique = false,
@@ -4584,7 +4584,7 @@ public class TorConfig private constructor(
     ) {
         public companion object: Keyword(
             name = "MainloopStats",
-            default = false.toByte().toString(),
+            default = false.byte.toString(),
             attributes = emptySet(),
             isCmdLineArg = false,
             isUnique = false,
@@ -4692,7 +4692,7 @@ public class TorConfig private constructor(
     ) {
         public companion object: Keyword(
             name = "ServerDNSAllowBrokenConfig",
-            default = true.toByte().toString(),
+            default = true.byte.toString(),
             attributes = emptySet(),
             isCmdLineArg = false,
             isUnique = false,
@@ -4710,7 +4710,7 @@ public class TorConfig private constructor(
     ) {
         public companion object: Keyword(
             name = "ServerDNSSearchDomains",
-            default = false.toByte().toString(),
+            default = false.byte.toString(),
             attributes = emptySet(),
             isCmdLineArg = false,
             isUnique = false,
@@ -4728,7 +4728,7 @@ public class TorConfig private constructor(
     ) {
         public companion object: Keyword(
             name = "ServerDNSDetectHijacking",
-            default = true.toByte().toString(),
+            default = true.byte.toString(),
             attributes = emptySet(),
             isCmdLineArg = false,
             isUnique = false,
@@ -4764,7 +4764,7 @@ public class TorConfig private constructor(
     ) {
         public companion object: Keyword(
             name = "ServerDNSAllowNonRFC953Hostnames",
-            default = false.toByte().toString(),
+            default = false.byte.toString(),
             attributes = emptySet(),
             isCmdLineArg = false,
             isUnique = false,
@@ -4782,7 +4782,7 @@ public class TorConfig private constructor(
     ) {
         public companion object: Keyword(
             name = "BridgeRecordUsageByCountry",
-            default = true.toByte().toString(),
+            default = true.byte.toString(),
             attributes = emptySet(),
             isCmdLineArg = false,
             isUnique = false,
@@ -4800,7 +4800,7 @@ public class TorConfig private constructor(
     ) {
         public companion object: Keyword(
             name = "ServerDNSRandomizeCase",
-            default = true.toByte().toString(),
+            default = true.byte.toString(),
             attributes = emptySet(),
             isCmdLineArg = false,
             isUnique = false,
@@ -4818,7 +4818,7 @@ public class TorConfig private constructor(
     ) {
         public companion object: Keyword(
             name = "CellStatistics",
-            default = false.toByte().toString(),
+            default = false.byte.toString(),
             attributes = emptySet(),
             isCmdLineArg = false,
             isUnique = false,
@@ -4836,7 +4836,7 @@ public class TorConfig private constructor(
     ) {
         public companion object: Keyword(
             name = "PaddingStatistics",
-            default = true.toByte().toString(),
+            default = true.byte.toString(),
             attributes = emptySet(),
             isCmdLineArg = false,
             isUnique = false,
@@ -4854,7 +4854,7 @@ public class TorConfig private constructor(
     ) {
         public companion object: Keyword(
             name = "DirReqStatistics",
-            default = true.toByte().toString(),
+            default = true.byte.toString(),
             attributes = emptySet(),
             isCmdLineArg = false,
             isUnique = false,
@@ -4872,7 +4872,7 @@ public class TorConfig private constructor(
     ) {
         public companion object: Keyword(
             name = "EntryStatistics",
-            default = false.toByte().toString(),
+            default = false.byte.toString(),
             attributes = emptySet(),
             isCmdLineArg = false,
             isUnique = false,
@@ -4890,7 +4890,7 @@ public class TorConfig private constructor(
     ) {
         public companion object: Keyword(
             name = "ExitPortStatistics",
-            default = false.toByte().toString(),
+            default = false.byte.toString(),
             attributes = emptySet(),
             isCmdLineArg = false,
             isUnique = false,
@@ -4908,7 +4908,7 @@ public class TorConfig private constructor(
     ) {
         public companion object: Keyword(
             name = "ConnDirectionStatistics",
-            default = false.toByte().toString(),
+            default = false.byte.toString(),
             attributes = emptySet(),
             isCmdLineArg = false,
             isUnique = false,
@@ -4926,7 +4926,7 @@ public class TorConfig private constructor(
     ) {
         public companion object: Keyword(
             name = "HiddenServiceStatistics",
-            default = true.toByte().toString(),
+            default = true.byte.toString(),
             attributes = emptySet(),
             isCmdLineArg = false,
             isUnique = false,
@@ -4944,7 +4944,7 @@ public class TorConfig private constructor(
     ) {
         public companion object: Keyword(
             name = "ExtraInfoStatistics",
-            default = true.toByte().toString(),
+            default = true.byte.toString(),
             attributes = emptySet(),
             isCmdLineArg = false,
             isUnique = false,
@@ -4962,7 +4962,7 @@ public class TorConfig private constructor(
     ) {
         public companion object: Keyword(
             name = "ExtendAllowPrivateAddresses",
-            default = false.toByte().toString(),
+            default = false.byte.toString(),
             attributes = emptySet(),
             isCmdLineArg = false,
             isUnique = false,
@@ -4998,7 +4998,7 @@ public class TorConfig private constructor(
     ) {
         public companion object: Keyword(
             name = "DisableOOSCheck",
-            default = true.toByte().toString(),
+            default = true.byte.toString(),
             attributes = emptySet(),
             isCmdLineArg = false,
             isUnique = false,
@@ -5034,7 +5034,7 @@ public class TorConfig private constructor(
     ) {
         public companion object: Keyword(
             name = "OfflineMasterKey",
-            default = false.toByte().toString(),
+            default = false.byte.toString(),
             attributes = emptySet(),
             isCmdLineArg = false,
             isUnique = false,
@@ -5164,7 +5164,7 @@ public class TorConfig private constructor(
     ) {
         public companion object: Keyword(
             name = "DirCache",
-            default = true.toByte().toString(),
+            default = true.byte.toString(),
             attributes = emptySet(),
             isCmdLineArg = false,
             isUnique = false,
@@ -5388,7 +5388,7 @@ public class TorConfig private constructor(
     ) {
         public companion object: Keyword(
             name = "AuthoritativeDirectory",
-            default = false.toByte().toString(),
+            default = false.byte.toString(),
             attributes = emptySet(),
             isCmdLineArg = false,
             isUnique = false,
@@ -5406,7 +5406,7 @@ public class TorConfig private constructor(
     ) {
         public companion object: Keyword(
             name = "V3AuthoritativeDirectory",
-            default = false.toByte().toString(),
+            default = false.byte.toString(),
             attributes = emptySet(),
             isCmdLineArg = false,
             isUnique = false,
@@ -5424,7 +5424,7 @@ public class TorConfig private constructor(
     ) {
         public companion object: Keyword(
             name = "VersioningAuthoritativeDirectory",
-            default = false.toByte().toString(),
+            default = false.byte.toString(),
             attributes = emptySet(),
             isCmdLineArg = false,
             isUnique = false,
@@ -5496,7 +5496,7 @@ public class TorConfig private constructor(
     ) {
         public companion object: Keyword(
             name = "BridgeAuthoritativeDir",
-            default = false.toByte().toString(),
+            default = false.byte.toString(),
             attributes = emptySet(),
             isCmdLineArg = false,
             isUnique = false,
@@ -5568,7 +5568,7 @@ public class TorConfig private constructor(
     ) {
         public companion object: Keyword(
             name = "DirAllowPrivateAddresses",
-            default = false.toByte().toString(),
+            default = false.byte.toString(),
             attributes = emptySet(),
             isCmdLineArg = false,
             isUnique = false,
@@ -5658,7 +5658,7 @@ public class TorConfig private constructor(
     ) {
         public companion object: Keyword(
             name = "AuthDirListBadExits",
-            default = false.toByte().toString(),
+            default = false.byte.toString(),
             attributes = emptySet(),
             isCmdLineArg = false,
             isUnique = false,
@@ -5730,7 +5730,7 @@ public class TorConfig private constructor(
     ) {
         public companion object: Keyword(
             name = "AuthDirPinKeys",
-            default = true.toByte().toString(),
+            default = true.byte.toString(),
             attributes = emptySet(),
             isCmdLineArg = false,
             isUnique = false,
@@ -5748,7 +5748,7 @@ public class TorConfig private constructor(
     ) {
         public companion object: Keyword(
             name = "AuthDirSharedRandomness",
-            default = true.toByte().toString(),
+            default = true.byte.toString(),
             attributes = emptySet(),
             isCmdLineArg = false,
             isUnique = false,
@@ -5766,7 +5766,7 @@ public class TorConfig private constructor(
     ) {
         public companion object: Keyword(
             name = "AuthDirTestEd25519LinkKeys",
-            default = true.toByte().toString(),
+            default = true.byte.toString(),
             attributes = emptySet(),
             isCmdLineArg = false,
             isUnique = false,
@@ -5892,7 +5892,7 @@ public class TorConfig private constructor(
     ) {
         public companion object: Keyword(
             name = "V3AuthUseLegacyKey",
-            default = false.toByte().toString(),
+            default = false.byte.toString(),
             attributes = emptySet(),
             isCmdLineArg = false,
             isUnique = false,
@@ -5910,7 +5910,7 @@ public class TorConfig private constructor(
     ) {
         public companion object: Keyword(
             name = "AuthDirHasIPv6Connectivity",
-            default = false.toByte().toString(),
+            default = false.byte.toString(),
             attributes = emptySet(),
             isCmdLineArg = false,
             isUnique = false,
@@ -5950,7 +5950,7 @@ public class TorConfig private constructor(
     ) {
         public companion object: Keyword(
             name = "PublishHidServDescriptors",
-            default = true.toByte().toString(),
+            default = true.byte.toString(),
             attributes = emptySet(),
             isCmdLineArg = false,
             isUnique = false,
@@ -6004,7 +6004,7 @@ public class TorConfig private constructor(
     ) {
         public companion object: Keyword(
             name = "HiddenServiceSingleHopMode",
-            default = false.toByte().toString(),
+            default = false.byte.toString(),
             attributes = emptySet(),
             isCmdLineArg = false,
             isUnique = false,
@@ -6022,7 +6022,7 @@ public class TorConfig private constructor(
     ) {
         public companion object: Keyword(
             name = "HiddenServiceNonAnonymousMode",
-            default = false.toByte().toString(),
+            default = false.byte.toString(),
             attributes = emptySet(),
             isCmdLineArg = false,
             isUnique = false,
@@ -6044,7 +6044,7 @@ public class TorConfig private constructor(
     ) {
         public companion object: Keyword(
             name = "TestingTorNetwork",
-            default = false.toByte().toString(),
+            default = false.byte.toString(),
             attributes = emptySet(),
             isCmdLineArg = false,
             isUnique = false,
@@ -6350,7 +6350,7 @@ public class TorConfig private constructor(
     ) {
         public companion object: Keyword(
             name = "TestingDirAuthVoteExitIsStrict",
-            default = false.toByte().toString(),
+            default = false.byte.toString(),
             attributes = emptySet(),
             isCmdLineArg = false,
             isUnique = false,
@@ -6386,7 +6386,7 @@ public class TorConfig private constructor(
     ) {
         public companion object: Keyword(
             name = "TestingDirAuthVoteGuardIsStrict",
-            default = false.toByte().toString(),
+            default = false.byte.toString(),
             attributes = emptySet(),
             isCmdLineArg = false,
             isUnique = false,
@@ -6422,7 +6422,7 @@ public class TorConfig private constructor(
     ) {
         public companion object: Keyword(
             name = "TestingDirAuthVoteHSDirIsStrict",
-            default = false.toByte().toString(),
+            default = false.byte.toString(),
             attributes = emptySet(),
             isCmdLineArg = false,
             isUnique = false,
@@ -6440,7 +6440,7 @@ public class TorConfig private constructor(
     ) {
         public companion object: Keyword(
             name = "TestingEnableConnBwEvent",
-            default = false.toByte().toString(),
+            default = false.byte.toString(),
             attributes = emptySet(),
             isCmdLineArg = false,
             isUnique = false,
@@ -6458,7 +6458,7 @@ public class TorConfig private constructor(
     ) {
         public companion object: Keyword(
             name = "TestingEnableCellStatsEvent",
-            default = false.toByte().toString(),
+            default = false.byte.toString(),
             attributes = emptySet(),
             isCmdLineArg = false,
             isUnique = false,

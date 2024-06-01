@@ -16,14 +16,12 @@
 package io.matthewnelson.kmp.tor.runtime.core
 
 import io.matthewnelson.kmp.file.toFile
-import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
 import io.matthewnelson.kmp.tor.runtime.core.address.Port.Ephemeral.Companion.toPortEphemeral
 import io.matthewnelson.kmp.tor.runtime.core.TorConfig.Setting.Companion.filterByKeyword
-import io.matthewnelson.kmp.tor.runtime.core.internal.toByte
+import io.matthewnelson.kmp.tor.runtime.core.internal.byte
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
-@OptIn(InternalKmpTorApi::class)
 class TorConfigUnitTest {
 
     @Test
@@ -61,7 +59,7 @@ class TorConfigUnitTest {
         }.settings
 
         assertEquals(1, settings.size)
-        assertEquals(false.toByte().toString(), settings.first().argument)
+        assertEquals(false.byte.toString(), settings.first().argument)
     }
 
     @Test
@@ -72,7 +70,7 @@ class TorConfigUnitTest {
         }.settings
 
         assertEquals(1, settings.size)
-        assertEquals(true.toByte().toString(), settings.first().argument)
+        assertEquals(true.byte.toString(), settings.first().argument)
     }
 
     @Test

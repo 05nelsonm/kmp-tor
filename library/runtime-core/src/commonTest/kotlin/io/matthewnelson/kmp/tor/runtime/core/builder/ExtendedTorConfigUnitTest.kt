@@ -22,7 +22,7 @@ import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
 import io.matthewnelson.kmp.tor.runtime.core.TorConfig
 import io.matthewnelson.kmp.tor.runtime.core.address.Port.Companion.toPort
 import io.matthewnelson.kmp.tor.runtime.core.address.Port.Ephemeral.Companion.toPortEphemeral
-import io.matthewnelson.kmp.tor.runtime.core.internal.toByte
+import io.matthewnelson.kmp.tor.runtime.core.internal.byte
 import kotlin.test.*
 
 @OptIn(InternalKmpTorApi::class)
@@ -83,7 +83,7 @@ class ExtendedTorConfigUnitTest {
             auth = cookieAuthentication()
             assertNotNull(auth)
             assertEquals(TorConfig.CookieAuthentication.Companion, auth.keyword)
-            assertEquals(true.toByte().toString(), auth.argument)
+            assertEquals(true.byte.toString(), auth.argument)
         }
     }
 
@@ -100,7 +100,7 @@ class ExtendedTorConfigUnitTest {
             auth = cookieAuthentication()
             assertNotNull(auth)
             assertEquals(TorConfig.CookieAuthentication.Companion, auth.keyword)
-            assertEquals(true.toByte().toString(), auth.argument)
+            assertEquals(true.byte.toString(), auth.argument)
         }
     }
 }
