@@ -33,6 +33,7 @@ import io.matthewnelson.kmp.tor.runtime.core.TorConfig.LineItem.Companion.toLine
 import io.matthewnelson.kmp.tor.runtime.core.TorConfig.Setting.Companion.filterByAttribute
 import io.matthewnelson.kmp.tor.runtime.core.TorConfig.Setting.Companion.filterByKeyword
 import io.matthewnelson.kmp.tor.runtime.core.builder.*
+import io.matthewnelson.kmp.tor.runtime.core.ctrl.TorCmd
 import io.matthewnelson.kmp.tor.runtime.core.internal.IsAndroidHost
 import io.matthewnelson.kmp.tor.runtime.core.internal.IsUnixLikeHost
 import io.matthewnelson.kmp.tor.runtime.core.internal.toByte
@@ -40,9 +41,21 @@ import kotlin.jvm.JvmField
 import kotlin.jvm.JvmName
 import kotlin.jvm.JvmStatic
 import kotlin.jvm.JvmSynthetic
+import kotlin.math.pow
+import kotlin.time.Duration.Companion.days
+import kotlin.time.Duration.Companion.hours
+import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Duration.Companion.minutes
+import kotlin.time.Duration.Companion.seconds
 
 /**
- * Holder for a configuration
+ * Holder for a configuration.
+ *
+ * **NOTE:** All [Keyword] as defined in the
+ * [tor-manual](https://2019.www.torproject.org/docs/tor-manual.html.en)
+ * are declared within [TorConfig] as subclasses. Many of them do not
+ * have their builders implemented, but are available for use with
+ * [TorCmd.Config.Get] queries.
  *
  * @see [Builder]
  * @see [Companion.Builder]
@@ -843,6 +856,28 @@ public class TorConfig private constructor(
     }
 
     /**
+     * [ReducedConnectionPadding](https://2019.www.torproject.org/docs/tor-manual.html.en#ReducedConnectionPadding)
+     * */
+    @KmpTorDsl
+    public class ReducedConnectionPadding private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+
+        @JvmField
+        public var enable: Boolean = false
+
+        public companion object: Setting.Factory<ReducedConnectionPadding, Setting>(
+            name = "ReducedConnectionPadding",
+            default = false.toByte().toString(),
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = true,
+            factory = { ReducedConnectionPadding() },
+            build = { build(enable.toByte().toString())!! },
+        )
+    }
+
+    /**
      * [ControlPortWriteToFile](https://2019.www.torproject.org/docs/tor-manual.html.en#ControlPortWriteToFile)
      * */
     @KmpTorDsl
@@ -1026,7 +1061,7 @@ public class TorConfig private constructor(
 
         public companion object: Setting.Factory<DormantClientTimeout, Setting>(
             name = "DormantClientTimeout",
-            default = (24 * 60 * 60).toString(),
+            default = 24.hours.inWholeSeconds.toString(),
             attributes = emptySet(),
             isCmdLineArg = false,
             isUnique = true,
@@ -1756,6 +1791,8 @@ public class TorConfig private constructor(
 
     /**
      * See ephemeral setting [__ControlPort].
+     *
+     * TODO: Implement
      * */
     @KmpTorDsl
     public class ControlPort private constructor(): Setting.Builder(
@@ -1772,6 +1809,8 @@ public class TorConfig private constructor(
 
     /**
      * See ephemeral setting [__DNSPort].
+     *
+     * TODO: Implement
      * */
     @KmpTorDsl
     public class DNSPort private constructor(): Setting.Builder(
@@ -1788,6 +1827,8 @@ public class TorConfig private constructor(
 
     /**
      * See ephemeral setting [__HTTPTunnelPort].
+     *
+     * TODO: Implement
      * */
     @KmpTorDsl
     public class HTTPTunnelPort private constructor(): Setting.Builder(
@@ -1804,6 +1845,8 @@ public class TorConfig private constructor(
 
     /**
      * See ephemeral setting [__SocksPort].
+     *
+     * TODO: Implement
      * */
     @KmpTorDsl
     public class SocksPort private constructor(): Setting.Builder(
@@ -1820,6 +1863,8 @@ public class TorConfig private constructor(
 
     /**
      * See ephemeral setting [__TransPort].
+     *
+     * TODO: Implement
      * */
     @KmpTorDsl
     public class TransPort private constructor(): Setting.Builder(
@@ -1831,6 +1876,4848 @@ public class TorConfig private constructor(
             attributes = __TransPort.attributes,
             isCmdLineArg = __TransPort.isCmdLineArg,
             isUnique = __TransPort.isUnique,
+        )
+    }
+
+    ///////////////////////
+    //  GENERAL OPTIONS  //
+    ///////////////////////
+
+    /**
+     * [BandwidthRate](https://2019.www.torproject.org/docs/tor-manual.html.en#BandwidthRate)
+     *
+     * TODO: Implement
+     * */
+    @KmpTorDsl
+    public class BandwidthRate private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "BandwidthRate",
+            default = (2.0F.pow(30)).toInt().toString(), // 1 GByte
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [BandwidthBurst](https://2019.www.torproject.org/docs/tor-manual.html.en#BandwidthBurst)
+     *
+     * TODO: Implement
+     * */
+    @KmpTorDsl
+    public class BandwidthBurst private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "BandwidthBurst",
+            default = (2.0F.pow(30)).toInt().toString(), // 1 GByte
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [MaxAdvertisedBandwidth](https://2019.www.torproject.org/docs/tor-manual.html.en#MaxAdvertisedBandwidth)
+     *
+     * TODO: Implement
+     * */
+    @KmpTorDsl
+    public class MaxAdvertisedBandwidth private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "MaxAdvertisedBandwidth",
+            default = (2.0F.pow(30)).toInt().toString(), // 1 GByte
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [RelayBandwidthRate](https://2019.www.torproject.org/docs/tor-manual.html.en#RelayBandwidthRate)
+     *
+     * TODO: Implement
+     * */
+    @KmpTorDsl
+    public class RelayBandwidthRate private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "RelayBandwidthRate",
+            default = "0",
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [RelayBandwidthBurst](https://2019.www.torproject.org/docs/tor-manual.html.en#RelayBandwidthBurst)
+     *
+     * TODO: Implement
+     * */
+    @KmpTorDsl
+    public class RelayBandwidthBurst private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "RelayBandwidthBurst",
+            default = "0",
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [PerConnBWRate](https://2019.www.torproject.org/docs/tor-manual.html.en#PerConnBWRate)
+     *
+     * TODO: Implement
+     * */
+    @KmpTorDsl
+    public class PerConnBWRate private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "PerConnBWRate",
+            default = "0",
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [PerConnBWBurst](https://2019.www.torproject.org/docs/tor-manual.html.en#PerConnBWBurst)
+     *
+     * TODO: Implement
+     * */
+    @KmpTorDsl
+    public class PerConnBWBurst private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "PerConnBWBurst",
+            default = "0",
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [ClientTransportPlugin](https://2019.www.torproject.org/docs/tor-manual.html.en#ClientTransportPlugin)
+     *
+     * TODO: Implement
+     * */
+    @KmpTorDsl
+    public class ClientTransportPlugin private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "ClientTransportPlugin",
+            default = "",
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [ServerTransportPlugin](https://2019.www.torproject.org/docs/tor-manual.html.en#ServerTransportPlugin)
+     *
+     * TODO: Implement
+     * */
+    @KmpTorDsl
+    public class ServerTransportPlugin private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "ServerTransportPlugin",
+            default = "",
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [ServerTransportListenAddr](https://2019.www.torproject.org/docs/tor-manual.html.en#ServerTransportListenAddr)
+     *
+     * TODO: Implement
+     * */
+    @KmpTorDsl
+    public class ServerTransportListenAddr private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "ServerTransportListenAddr",
+            default = "",
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [ServerTransportOptions](https://2019.www.torproject.org/docs/tor-manual.html.en#ServerTransportOptions)
+     *
+     * TODO: Implement
+     * */
+    @KmpTorDsl
+    public class ServerTransportOptions private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "ServerTransportOptions",
+            default = "",
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [ExtORPort](https://2019.www.torproject.org/docs/tor-manual.html.en#ExtORPort)
+     *
+     * TODO: Implement
+     * */
+    @KmpTorDsl
+    public class ExtORPort private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "ExtORPort",
+            default = "",
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [ExtORPortCookieAuthFile](https://2019.www.torproject.org/docs/tor-manual.html.en#ExtORPortCookieAuthFile)
+     *
+     * TODO: Implement
+     * */
+    @KmpTorDsl
+    public class ExtORPortCookieAuthFile private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "ExtORPortCookieAuthFile",
+            default = "",
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [ExtORPortCookieAuthFileGroupReadable](https://2019.www.torproject.org/docs/tor-manual.html.en#ExtORPortCookieAuthFileGroupReadable)
+     *
+     * TODO: Implement
+     * */
+    @KmpTorDsl
+    public class ExtORPortCookieAuthFileGroupReadable private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "ExtORPortCookieAuthFileGroupReadable",
+            default = false.toByte().toString(),
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [ConnLimit](https://2019.www.torproject.org/docs/tor-manual.html.en#ConnLimit)
+     *
+     * TODO: Implement
+     * */
+    @KmpTorDsl
+    public class ConnLimit private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "ConnLimit",
+            default = "1000",
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [ConstrainedSockets](https://2019.www.torproject.org/docs/tor-manual.html.en#ConstrainedSockets)
+     *
+     * TODO: Implement
+     * */
+    @KmpTorDsl
+    public class ConstrainedSockets private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "ConstrainedSockets",
+            default = false.toByte().toString(),
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [ConstrainedSockSize](https://2019.www.torproject.org/docs/tor-manual.html.en#ConstrainedSockSize)
+     *
+     * TODO: Implement
+     * */
+    @KmpTorDsl
+    public class ConstrainedSockSize private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "ConstrainedSockSize",
+            default = (2.0F.pow(13)).toInt().toString(), // 8192 bytes
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [ControlSocket](https://2019.www.torproject.org/docs/tor-manual.html.en#ControlSocket)
+     *
+     * TODO: Implement
+     * */
+    @KmpTorDsl
+    public class ControlSocket private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "ControlSocket",
+            default = "0",
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [ControlSocketsGroupWritable](https://2019.www.torproject.org/docs/tor-manual.html.en#ControlSocketsGroupWritable)
+     *
+     * TODO: Implement
+     * */
+    @KmpTorDsl
+    public class ControlSocketsGroupWritable private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "ControlSocketsGroupWritable",
+            default = false.toByte().toString(),
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [HashedControlPassword](https://2019.www.torproject.org/docs/tor-manual.html.en#HashedControlPassword)
+     *
+     * TODO: Implement
+     * */
+    @KmpTorDsl
+    public class HashedControlPassword private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "HashedControlPassword",
+            default = "",
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [CookieAuthFileGroupReadable](https://2019.www.torproject.org/docs/tor-manual.html.en#CookieAuthFileGroupReadable)
+     *
+     * TODO: Implement
+     * */
+    @KmpTorDsl
+    public class CookieAuthFileGroupReadable private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "CookieAuthFileGroupReadable",
+            default = false.toByte().toString(),
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [ControlPortFileGroupReadable](https://2019.www.torproject.org/docs/tor-manual.html.en#ControlPortFileGroupReadable)
+     *
+     * TODO: Implement
+     * */
+    @KmpTorDsl
+    public class ControlPortFileGroupReadable private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "ControlPortFileGroupReadable",
+            default = false.toByte().toString(),
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [DataDirectoryGroupReadable](https://2019.www.torproject.org/docs/tor-manual.html.en#DataDirectoryGroupReadable)
+     *
+     * TODO: Implement
+     * */
+    @KmpTorDsl
+    public class DataDirectoryGroupReadable private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "DataDirectoryGroupReadable",
+            default = false.toByte().toString(),
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [CacheDirectoryGroupReadable](https://2019.www.torproject.org/docs/tor-manual.html.en#CacheDirectoryGroupReadable)
+     *
+     * TODO: Implement
+     * */
+    @KmpTorDsl
+    public class CacheDirectoryGroupReadable private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "CacheDirectoryGroupReadable",
+            default = AUTO,
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [FallbackDir](https://2019.www.torproject.org/docs/tor-manual.html.en#FallbackDir)
+     *
+     * TODO: Implement
+     * */
+    @KmpTorDsl
+    public class FallbackDir private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "FallbackDir",
+            default = "",
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [UseDefaultFallbackDirs](https://2019.www.torproject.org/docs/tor-manual.html.en#UseDefaultFallbackDirs)
+     *
+     * TODO: Implement
+     * */
+    @KmpTorDsl
+    public class UseDefaultFallbackDirs private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "UseDefaultFallbackDirs",
+            default = true.toByte().toString(),
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [DirAuthority](https://2019.www.torproject.org/docs/tor-manual.html.en#DirAuthority)
+     *
+     * TODO: Implement
+     * */
+    @KmpTorDsl
+    public class DirAuthority private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "DirAuthority",
+            default = "",
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [DirAuthorityFallbackRate](https://2019.www.torproject.org/docs/tor-manual.html.en#DirAuthorityFallbackRate)
+     *
+     * TODO: Implement
+     * */
+    @KmpTorDsl
+    public class DirAuthorityFallbackRate private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "DirAuthorityFallbackRate",
+            default = "0.100000",
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [AlternateBridgeAuthority](https://2019.www.torproject.org/docs/tor-manual.html.en#AlternateBridgeAuthority)
+     *
+     * TODO: Implement
+     * */
+    @KmpTorDsl
+    public class AlternateBridgeAuthority private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "AlternateBridgeAuthority",
+            default = "",
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [DisableAllSwap](https://2019.www.torproject.org/docs/tor-manual.html.en#DisableAllSwap)
+     *
+     * TODO: Implement
+     * */
+    @KmpTorDsl
+    public class DisableAllSwap private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "DisableAllSwap",
+            default = false.toByte().toString(),
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [DisableDebuggerAttachment](https://2019.www.torproject.org/docs/tor-manual.html.en#DisableDebuggerAttachment)
+     *
+     * TODO: Implement
+     * */
+    @KmpTorDsl
+    public class DisableDebuggerAttachment private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "DisableDebuggerAttachment",
+            default = true.toByte().toString(),
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [FetchDirInfoEarly](https://2019.www.torproject.org/docs/tor-manual.html.en#FetchDirInfoEarly)
+     *
+     * TODO: Implement
+     * */
+    @KmpTorDsl
+    public class FetchDirInfoEarly private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "FetchDirInfoEarly",
+            default = false.toByte().toString(),
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [FetchDirInfoExtraEarly](https://2019.www.torproject.org/docs/tor-manual.html.en#FetchDirInfoExtraEarly)
+     *
+     * TODO: Implement
+     * */
+    @KmpTorDsl
+    public class FetchDirInfoExtraEarly private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "FetchDirInfoExtraEarly",
+            default = false.toByte().toString(),
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [FetchHidServDescriptors](https://2019.www.torproject.org/docs/tor-manual.html.en#FetchHidServDescriptors)
+     *
+     * TODO: Implement
+     * */
+    @KmpTorDsl
+    public class FetchHidServDescriptors private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "FetchHidServDescriptors",
+            default = true.toByte().toString(),
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [FetchServerDescriptors](https://2019.www.torproject.org/docs/tor-manual.html.en#FetchServerDescriptors)
+     *
+     * TODO: Implement
+     * */
+    @KmpTorDsl
+    public class FetchServerDescriptors private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "FetchServerDescriptors",
+            default = true.toByte().toString(),
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [FetchUselessDescriptors](https://2019.www.torproject.org/docs/tor-manual.html.en#FetchUselessDescriptors)
+     *
+     * TODO: Implement
+     * */
+    @KmpTorDsl
+    public class FetchUselessDescriptors private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "FetchUselessDescriptors",
+            default = false.toByte().toString(),
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [HTTPSProxy](https://2019.www.torproject.org/docs/tor-manual.html.en#HTTPSProxy)
+     *
+     * TODO: Implement
+     * */
+    @KmpTorDsl
+    public class HTTPSProxy private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "HTTPSProxy",
+            default = "",
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [HTTPSProxyAuthenticator](https://2019.www.torproject.org/docs/tor-manual.html.en#HTTPSProxyAuthenticator)
+     *
+     * TODO: Implement
+     * */
+    @KmpTorDsl
+    public class HTTPSProxyAuthenticator private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "HTTPSProxyAuthenticator",
+            default = "",
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [Sandbox](https://2019.www.torproject.org/docs/tor-manual.html.en#Sandbox)
+     *
+     * TODO: Implement
+     * */
+    @KmpTorDsl
+    public class Sandbox private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "Sandbox",
+            default = false.toByte().toString(),
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [Socks4Proxy](https://2019.www.torproject.org/docs/tor-manual.html.en#Socks4Proxy)
+     *
+     * TODO: Implement
+     * */
+    @KmpTorDsl
+    public class Socks4Proxy private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "Socks4Proxy",
+            default = "",
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [Socks5Proxy](https://2019.www.torproject.org/docs/tor-manual.html.en#Socks5Proxy)
+     *
+     * TODO: Implement
+     * */
+    @KmpTorDsl
+    public class Socks5Proxy private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "Socks5Proxy",
+            default = "",
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [Socks5ProxyPassword](https://2019.www.torproject.org/docs/tor-manual.html.en#Socks5ProxyPassword)
+     *
+     * TODO: Implement
+     * */
+    @KmpTorDsl
+    public class Socks5ProxyPassword private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "Socks5ProxyPassword",
+            default = "",
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [UnixSocksGroupWritable](https://2019.www.torproject.org/docs/tor-manual.html.en#UnixSocksGroupWritable)
+     *
+     * TODO: Implement
+     * */
+    @KmpTorDsl
+    public class UnixSocksGroupWritable private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "UnixSocksGroupWritable",
+            default = false.toByte().toString(),
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [KeepalivePeriod](https://2019.www.torproject.org/docs/tor-manual.html.en#KeepalivePeriod)
+     *
+     * TODO: Implement
+     * */
+    @KmpTorDsl
+    public class KeepalivePeriod private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "KeepalivePeriod",
+            default = 5.minutes.inWholeSeconds.toString(),
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [Log](https://2019.www.torproject.org/docs/tor-manual.html.en#Log)
+     *
+     * TODO: Implement
+     * */
+    @KmpTorDsl
+    public class Log private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "Log",
+            default = "",
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [LogMessageDomains](https://2019.www.torproject.org/docs/tor-manual.html.en#LogMessageDomains)
+     *
+     * TODO: Implement
+     * */
+    @KmpTorDsl
+    public class LogMessageDomains private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "LogMessageDomains",
+            default = false.toByte().toString(),
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [MaxUnparseableDescSizeToLog](https://2019.www.torproject.org/docs/tor-manual.html.en#MaxUnparseableDescSizeToLog)
+     *
+     * TODO: Implement
+     * */
+    @KmpTorDsl
+    public class MaxUnparseableDescSizeToLog private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "MaxUnparseableDescSizeToLog",
+            default = (2.0F.pow(20) * 10).toInt().toString(), // 10 MB
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [OutboundBindAddress](https://2019.www.torproject.org/docs/tor-manual.html.en#OutboundBindAddress)
+     *
+     * TODO: Implement
+     * */
+    @KmpTorDsl
+    public class OutboundBindAddress private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "OutboundBindAddress",
+            default = "",
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [OutboundBindAddressOR](https://2019.www.torproject.org/docs/tor-manual.html.en#OutboundBindAddressOR)
+     *
+     * TODO: Implement
+     * */
+    @KmpTorDsl
+    public class OutboundBindAddressOR private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "OutboundBindAddressOR",
+            default = "",
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [OutboundBindAddressExit](https://2019.www.torproject.org/docs/tor-manual.html.en#OutboundBindAddressExit)
+     *
+     * TODO: Implement
+     * */
+    @KmpTorDsl
+    public class OutboundBindAddressExit private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "OutboundBindAddressExit",
+            default = "",
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [PidFile](https://2019.www.torproject.org/docs/tor-manual.html.en#PidFile)
+     *
+     * TODO: Implement
+     * */
+    @KmpTorDsl
+    public class PidFile private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "PidFile",
+            default = "",
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [ProtocolWarnings](https://2019.www.torproject.org/docs/tor-manual.html.en#ProtocolWarnings)
+     *
+     * TODO: Implement
+     * */
+    @KmpTorDsl
+    public class ProtocolWarnings private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "ProtocolWarnings",
+            default = false.toByte().toString(),
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [LogTimeGranularity](https://2019.www.torproject.org/docs/tor-manual.html.en#LogTimeGranularity)
+     *
+     * TODO: Implement
+     * */
+    @KmpTorDsl
+    public class LogTimeGranularity private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "LogTimeGranularity",
+            default = 1.seconds.inWholeMilliseconds.toString(),
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [TruncateLogFile](https://2019.www.torproject.org/docs/tor-manual.html.en#TruncateLogFile)
+     *
+     * TODO: Implement
+     * */
+    @KmpTorDsl
+    public class TruncateLogFile private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "TruncateLogFile",
+            default = false.toByte().toString(),
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [SafeLogging](https://2019.www.torproject.org/docs/tor-manual.html.en#SafeLogging)
+     *
+     * TODO: Implement
+     * */
+    @KmpTorDsl
+    public class SafeLogging private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "SafeLogging",
+            default = "1",
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [User](https://2019.www.torproject.org/docs/tor-manual.html.en#User)
+     *
+     * TODO: Implement
+     * */
+    @KmpTorDsl
+    public class User private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "User",
+            default = "",
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [KeepBindCapabilities](https://2019.www.torproject.org/docs/tor-manual.html.en#KeepBindCapabilities)
+     *
+     * TODO: Implement
+     * */
+    @KmpTorDsl
+    public class KeepBindCapabilities private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "KeepBindCapabilities",
+            default = AUTO,
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [HardwareAccel](https://2019.www.torproject.org/docs/tor-manual.html.en#HardwareAccel)
+     *
+     * TODO: Implement
+     * */
+    @KmpTorDsl
+    public class HardwareAccel private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "HardwareAccel",
+            default = false.toByte().toString(),
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [AccelName](https://2019.www.torproject.org/docs/tor-manual.html.en#AccelName)
+     *
+     * TODO: Implement
+     * */
+    @KmpTorDsl
+    public class AccelName private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "AccelName",
+            default = "",
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [AccelDir](https://2019.www.torproject.org/docs/tor-manual.html.en#AccelDir)
+     *
+     * TODO: Implement
+     * */
+    @KmpTorDsl
+    public class AccelDir private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "AccelDir",
+            default = "",
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [AvoidDiskWrites](https://2019.www.torproject.org/docs/tor-manual.html.en#AvoidDiskWrites)
+     *
+     * TODO: Implement
+     * */
+    @KmpTorDsl
+    public class AvoidDiskWrites private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "AvoidDiskWrites",
+            default = false.toByte().toString(),
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [CircuitPriorityHalflife](https://2019.www.torproject.org/docs/tor-manual.html.en#CircuitPriorityHalflife)
+     *
+     * TODO: Implement
+     * */
+    @KmpTorDsl
+    public class CircuitPriorityHalflife private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "CircuitPriorityHalflife",
+            default = "-1.000000",
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [CountPrivateBandwidth](https://2019.www.torproject.org/docs/tor-manual.html.en#CountPrivateBandwidth)
+     *
+     * TODO: Implement
+     * */
+    @KmpTorDsl
+    public class CountPrivateBandwidth private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "CountPrivateBandwidth",
+            default = false.toByte().toString(),
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [ExtendByEd25519ID](https://2019.www.torproject.org/docs/tor-manual.html.en#ExtendByEd25519ID)
+     *
+     * TODO: Implement
+     * */
+    @KmpTorDsl
+    public class ExtendByEd25519ID private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "ExtendByEd25519ID",
+            default = AUTO,
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [NoExec](https://2019.www.torproject.org/docs/tor-manual.html.en#NoExec)
+     *
+     * TODO: Implement
+     * */
+    @KmpTorDsl
+    public class NoExec private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "NoExec",
+            default = false.toByte().toString(),
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [Schedulers](https://2019.www.torproject.org/docs/tor-manual.html.en#Schedulers)
+     *
+     * TODO: Implement
+     * */
+    @KmpTorDsl
+    public class Schedulers private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "Schedulers",
+            default = "KIST,KISTLite,Vanilla",
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [KISTSchedRunInterval](https://2019.www.torproject.org/docs/tor-manual.html.en#KISTSchedRunInterval)
+     *
+     * TODO: Implement
+     * */
+    @KmpTorDsl
+    public class KISTSchedRunInterval private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "KISTSchedRunInterval",
+            default = "0",
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [KISTSockBufSizeFactor](https://2019.www.torproject.org/docs/tor-manual.html.en#KISTSockBufSizeFactor)
+     *
+     * TODO: Implement
+     * */
+    @KmpTorDsl
+    public class KISTSockBufSizeFactor private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "KISTSockBufSizeFactor",
+            default = "1.000000",
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    //////////////////////
+    //  CLIENT OPTIONS  //
+    //////////////////////
+
+    /**
+     * [Bridge](https://2019.www.torproject.org/docs/tor-manual.html.en#Bridge)
+     *
+     * TODO: Implement
+     * */
+    @KmpTorDsl
+    public class Bridge private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "Bridge",
+            default = "",
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [LearnCircuitBuildTimeout](https://2019.www.torproject.org/docs/tor-manual.html.en#LearnCircuitBuildTimeout)
+     *
+     * TODO: Implement
+     * */
+    @KmpTorDsl
+    public class LearnCircuitBuildTimeout private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "LearnCircuitBuildTimeout",
+            default = true.toByte().toString(),
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [CircuitBuildTimeout](https://2019.www.torproject.org/docs/tor-manual.html.en#CircuitBuildTimeout)
+     *
+     * TODO: Implement
+     * */
+    @KmpTorDsl
+    public class CircuitBuildTimeout private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "CircuitBuildTimeout",
+            default = 60.seconds.inWholeSeconds.toString(),
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [CircuitsAvailableTimeout](https://2019.www.torproject.org/docs/tor-manual.html.en#CircuitsAvailableTimeout)
+     *
+     * TODO: Implement
+     * */
+    @KmpTorDsl
+    public class CircuitsAvailableTimeout private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "CircuitsAvailableTimeout",
+            default = 30.minutes.inWholeSeconds.toString(),
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [CircuitStreamTimeout](https://2019.www.torproject.org/docs/tor-manual.html.en#CircuitStreamTimeout)
+     *
+     * TODO: Implement
+     * */
+    @KmpTorDsl
+    public class CircuitStreamTimeout private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "CircuitStreamTimeout",
+            default = "0",
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [ClientOnly](https://2019.www.torproject.org/docs/tor-manual.html.en#ClientOnly)
+     *
+     * TODO: Implement
+     * */
+    @KmpTorDsl
+    public class ClientOnly private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "ClientOnly",
+            default = false.toByte().toString(),
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [ExcludeNodes](https://2019.www.torproject.org/docs/tor-manual.html.en#ExcludeNodes)
+     *
+     * TODO: Implement
+     * */
+    @KmpTorDsl
+    public class ExcludeNodes private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "ExcludeNodes",
+            default = "",
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [ExcludeExitNodes](https://2019.www.torproject.org/docs/tor-manual.html.en#ExcludeExitNodes)
+     *
+     * TODO: Implement
+     * */
+    @KmpTorDsl
+    public class ExcludeExitNodes private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "ExcludeExitNodes",
+            default = "",
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [ExitNodes](https://2019.www.torproject.org/docs/tor-manual.html.en#ExitNodes)
+     *
+     * TODO: Implement
+     * */
+    @KmpTorDsl
+    public class ExitNodes private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "ExitNodes",
+            default = "",
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [MiddleNodes](https://2019.www.torproject.org/docs/tor-manual.html.en#MiddleNodes)
+     *
+     * TODO: Implement
+     * */
+    @KmpTorDsl
+    public class MiddleNodes private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "MiddleNodes",
+            default = "",
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [EntryNodes](https://2019.www.torproject.org/docs/tor-manual.html.en#EntryNodes)
+     *
+     * TODO: Implement
+     * */
+    @KmpTorDsl
+    public class EntryNodes private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "EntryNodes",
+            default = "",
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [StrictNodes](https://2019.www.torproject.org/docs/tor-manual.html.en#StrictNodes)
+     *
+     * TODO: Implement
+     * */
+    @KmpTorDsl
+    public class StrictNodes private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "StrictNodes",
+            default = false.toByte().toString(),
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [FascistFirewall](https://2019.www.torproject.org/docs/tor-manual.html.en#FascistFirewall)
+     *
+     * TODO: Implement
+     * */
+    @KmpTorDsl
+    public class FascistFirewall private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "FascistFirewall",
+            default = false.toByte().toString(),
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [ReachableAddresses](https://2019.www.torproject.org/docs/tor-manual.html.en#ReachableAddresses)
+     *
+     * TODO: Implement
+     * */
+    @KmpTorDsl
+    public class ReachableAddresses private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "ReachableAddresses",
+            default = "accept *:*",
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [ReachableORAddresses](https://2019.www.torproject.org/docs/tor-manual.html.en#ReachableORAddresses)
+     *
+     * TODO: Implement
+     * */
+    @KmpTorDsl
+    public class ReachableORAddresses private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "ReachableORAddresses",
+            default = "",
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [HidServAuth](https://2019.www.torproject.org/docs/tor-manual.html.en#HidServAuth)
+     *
+     * TODO: Implement
+     * */
+    @KmpTorDsl
+    public class HidServAuth private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "HidServAuth",
+            default = "",
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [LongLivedPorts](https://2019.www.torproject.org/docs/tor-manual.html.en#LongLivedPorts)
+     *
+     * TODO: Implement
+     * */
+    @KmpTorDsl
+    public class LongLivedPorts private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "LongLivedPorts",
+            default = "21,22,706,1863,5050,5190,5222,5223,6523,6667,6697,8300",
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [MapAddress](https://2019.www.torproject.org/docs/tor-manual.html.en#MapAddress)
+     *
+     * TODO: Implement
+     * */
+    @KmpTorDsl
+    public class MapAddress private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "MapAddress",
+            default = "",
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [NewCircuitPeriod](https://2019.www.torproject.org/docs/tor-manual.html.en#NewCircuitPeriod)
+     *
+     * TODO: Implement
+     * */
+    @KmpTorDsl
+    public class NewCircuitPeriod private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "NewCircuitPeriod",
+            default = "30",
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [MaxCircuitDirtiness](https://2019.www.torproject.org/docs/tor-manual.html.en#MaxCircuitDirtiness)
+     *
+     * TODO: Implement
+     * */
+    @KmpTorDsl
+    public class MaxCircuitDirtiness private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "MaxCircuitDirtiness",
+            default = 10.minutes.inWholeSeconds.toString(),
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [MaxClientCircuitsPending](https://2019.www.torproject.org/docs/tor-manual.html.en#MaxClientCircuitsPending)
+     *
+     * TODO: Implement
+     * */
+    @KmpTorDsl
+    public class MaxClientCircuitsPending private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "MaxClientCircuitsPending",
+            default = "32",
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [NodeFamily](https://2019.www.torproject.org/docs/tor-manual.html.en#NodeFamily)
+     *
+     * TODO: Implement
+     * */
+    @KmpTorDsl
+    public class NodeFamily private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "NodeFamily",
+            default = "",
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [EnforceDistinctSubnets](https://2019.www.torproject.org/docs/tor-manual.html.en#EnforceDistinctSubnets)
+     *
+     * TODO: Implement
+     * */
+    @KmpTorDsl
+    public class EnforceDistinctSubnets private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "EnforceDistinctSubnets",
+            default = true.toByte().toString(),
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [SocksPolicy](https://2019.www.torproject.org/docs/tor-manual.html.en#SocksPolicy)
+     *
+     * TODO: Implement
+     * */
+    @KmpTorDsl
+    public class SocksPolicy private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "SocksPolicy",
+            default = "",
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [SocksTimeout](https://2019.www.torproject.org/docs/tor-manual.html.en#SocksTimeout)
+     *
+     * TODO: Implement
+     * */
+    @KmpTorDsl
+    public class SocksTimeout private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "SocksTimeout",
+            default = 2.minutes.inWholeSeconds.toString(),
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [TokenBucketRefillInterval](https://2019.www.torproject.org/docs/tor-manual.html.en#TokenBucketRefillInterval)
+     *
+     * TODO: Implement
+     * */
+    @KmpTorDsl
+    public class TokenBucketRefillInterval private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "TokenBucketRefillInterval",
+            default = 100.milliseconds.inWholeMilliseconds.toString(),
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [TrackHostExits](https://2019.www.torproject.org/docs/tor-manual.html.en#TrackHostExits)
+     *
+     * TODO: Implement
+     * */
+    @KmpTorDsl
+    public class TrackHostExits private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "TrackHostExits",
+            default = "",
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [TrackHostExitsExpire](https://2019.www.torproject.org/docs/tor-manual.html.en#TrackHostExitsExpire)
+     *
+     * TODO: Implement
+     * */
+    @KmpTorDsl
+    public class TrackHostExitsExpire private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "TrackHostExitsExpire",
+            default = 30.minutes.inWholeSeconds.toString(),
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [UpdateBridgesFromAuthority](https://2019.www.torproject.org/docs/tor-manual.html.en#UpdateBridgesFromAuthority)
+     *
+     * TODO: Implement
+     * */
+    @KmpTorDsl
+    public class UpdateBridgesFromAuthority private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "UpdateBridgesFromAuthority",
+            default = false.toByte().toString(),
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [UseBridges](https://2019.www.torproject.org/docs/tor-manual.html.en#UseBridges)
+     *
+     * TODO: Implement
+     * */
+    @KmpTorDsl
+    public class UseBridges private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "UseBridges",
+            default = false.toByte().toString(),
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [UseEntryGuards](https://2019.www.torproject.org/docs/tor-manual.html.en#UseEntryGuards)
+     *
+     * TODO: Implement
+     * */
+    @KmpTorDsl
+    public class UseEntryGuards private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "UseEntryGuards",
+            default = true.toByte().toString(),
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [GuardfractionFile](https://2019.www.torproject.org/docs/tor-manual.html.en#GuardfractionFile)
+     *
+     * TODO: Implement
+     * */
+    @KmpTorDsl
+    public class GuardfractionFile private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "GuardfractionFile",
+            default = "",
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [UseGuardFraction](https://2019.www.torproject.org/docs/tor-manual.html.en#UseGuardFraction)
+     *
+     * TODO: Implement
+     * */
+    @KmpTorDsl
+    public class UseGuardFraction private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "UseGuardFraction",
+            default = AUTO,
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [NumEntryGuards](https://2019.www.torproject.org/docs/tor-manual.html.en#NumEntryGuards)
+     *
+     * TODO: Implement
+     * */
+    @KmpTorDsl
+    public class NumEntryGuards private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "NumEntryGuards",
+            default = "0",
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [NumPrimaryGuards](https://2019.www.torproject.org/docs/tor-manual.html.en#NumPrimaryGuards)
+     *
+     * TODO: Implement
+     * */
+    @KmpTorDsl
+    public class NumPrimaryGuards private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "NumPrimaryGuards",
+            default = "0",
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [NumDirectoryGuards](https://2019.www.torproject.org/docs/tor-manual.html.en#NumDirectoryGuards)
+     *
+     * TODO: Implement
+     * */
+    @KmpTorDsl
+    public class NumDirectoryGuards private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "NumDirectoryGuards",
+            default = "0",
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [GuardLifetime](https://2019.www.torproject.org/docs/tor-manual.html.en#GuardLifetime)
+     *
+     * TODO: Implement
+     * */
+    @KmpTorDsl
+    public class GuardLifetime private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "GuardLifetime",
+            default = "0",
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [SafeSocks](https://2019.www.torproject.org/docs/tor-manual.html.en#SafeSocks)
+     *
+     * TODO: Implement
+     * */
+    @KmpTorDsl
+    public class SafeSocks private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "SafeSocks",
+            default = false.toByte().toString(),
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [TestSocks](https://2019.www.torproject.org/docs/tor-manual.html.en#TestSocks)
+     *
+     * TODO: Implement
+     * */
+    @KmpTorDsl
+    public class TestSocks private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "TestSocks",
+            default = false.toByte().toString(),
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [AllowNonRFC953Hostnames](https://2019.www.torproject.org/docs/tor-manual.html.en#AllowNonRFC953Hostnames)
+     *
+     * TODO: Implement
+     * */
+    @KmpTorDsl
+    public class AllowNonRFC953Hostnames private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "AllowNonRFC953Hostnames",
+            default = false.toByte().toString(),
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [TransProxyType](https://2019.www.torproject.org/docs/tor-manual.html.en#TransProxyType)
+     *
+     * TODO: Implement
+     * */
+    @KmpTorDsl
+    public class TransProxyType private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "TransProxyType",
+            default = "default",
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [ClientDNSRejectInternalAddresses](https://2019.www.torproject.org/docs/tor-manual.html.en#ClientDNSRejectInternalAddresses)
+     *
+     * TODO: Implement
+     * */
+    @KmpTorDsl
+    public class ClientDNSRejectInternalAddresses private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "ClientDNSRejectInternalAddresses",
+            default = true.toByte().toString(),
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [ClientRejectInternalAddresses](https://2019.www.torproject.org/docs/tor-manual.html.en#ClientRejectInternalAddresses)
+     *
+     * TODO: Implement
+     * */
+    @KmpTorDsl
+    public class ClientRejectInternalAddresses private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "ClientRejectInternalAddresses",
+            default = true.toByte().toString(),
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [DownloadExtraInfo](https://2019.www.torproject.org/docs/tor-manual.html.en#DownloadExtraInfo)
+     *
+     * TODO: Implement
+     * */
+    @KmpTorDsl
+    public class DownloadExtraInfo private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "DownloadExtraInfo",
+            default = false.toByte().toString(),
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [WarnPlaintextPorts](https://2019.www.torproject.org/docs/tor-manual.html.en#WarnPlaintextPorts)
+     *
+     * TODO: Implement
+     * */
+    @KmpTorDsl
+    public class WarnPlaintextPorts private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "WarnPlaintextPorts",
+            default = "23,109,110,143",
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [RejectPlaintextPorts](https://2019.www.torproject.org/docs/tor-manual.html.en#RejectPlaintextPorts)
+     *
+     * TODO: Implement
+     * */
+    @KmpTorDsl
+    public class RejectPlaintextPorts private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "RejectPlaintextPorts",
+            default = "",
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [OptimisticData](https://2019.www.torproject.org/docs/tor-manual.html.en#OptimisticData)
+     *
+     * TODO: Implement
+     * */
+    @KmpTorDsl
+    public class OptimisticData private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "OptimisticData",
+            default = AUTO,
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [HSLayer2Nodes](https://2019.www.torproject.org/docs/tor-manual.html.en#HSLayer2Nodes)
+     *
+     * TODO: Implement
+     * */
+    @KmpTorDsl
+    public class HSLayer2Nodes private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "HSLayer2Nodes",
+            default = "",
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [HSLayer3Nodes](https://2019.www.torproject.org/docs/tor-manual.html.en#HSLayer3Nodes)
+     *
+     * TODO: Implement
+     * */
+    @KmpTorDsl
+    public class HSLayer3Nodes private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "HSLayer3Nodes",
+            default = "",
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [UseMicrodescriptors](https://2019.www.torproject.org/docs/tor-manual.html.en#UseMicrodescriptors)
+     *
+     * TODO: Implement
+     * */
+    @KmpTorDsl
+    public class UseMicrodescriptors private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "UseMicrodescriptors",
+            default = AUTO,
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [PathBiasScaleThreshold](https://2019.www.torproject.org/docs/tor-manual.html.en#PathBiasScaleThreshold)
+     *
+     * TODO: Implement
+     * */
+    @KmpTorDsl
+    public class PathBiasScaleThreshold private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "PathBiasScaleThreshold",
+            default = "-1",
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [PathBiasScaleUseThreshold](https://2019.www.torproject.org/docs/tor-manual.html.en#PathBiasScaleUseThreshold)
+     *
+     * TODO: Implement
+     * */
+    @KmpTorDsl
+    public class PathBiasScaleUseThreshold private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "PathBiasScaleUseThreshold",
+            default = "-1",
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [ClientUseIPv4](https://2019.www.torproject.org/docs/tor-manual.html.en#ClientUseIPv4)
+     *
+     * TODO: Implement
+     * */
+    @KmpTorDsl
+    public class ClientUseIPv4 private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "ClientUseIPv4",
+            default = true.toByte().toString(),
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [ClientUseIPv6](https://2019.www.torproject.org/docs/tor-manual.html.en#ClientUseIPv6)
+     *
+     * TODO: Implement
+     * */
+    @KmpTorDsl
+    public class ClientUseIPv6 private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "ClientUseIPv6",
+            default = false.toByte().toString(),
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [ClientPreferIPv6ORPort](https://2019.www.torproject.org/docs/tor-manual.html.en#ClientPreferIPv6ORPort)
+     *
+     * TODO: Implement
+     * */
+    @KmpTorDsl
+    public class ClientPreferIPv6ORPort private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "ClientPreferIPv6ORPort",
+            default = AUTO,
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [ClientAutoIPv6ORPort](https://2019.www.torproject.org/docs/tor-manual.html.en#ClientAutoIPv6ORPort)
+     *
+     * TODO: Implement
+     * */
+    @KmpTorDsl
+    public class ClientAutoIPv6ORPort private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "ClientAutoIPv6ORPort",
+            default = false.toByte().toString(),
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [PathsNeededToBuildCircuits](https://2019.www.torproject.org/docs/tor-manual.html.en#PathsNeededToBuildCircuits)
+     *
+     * TODO: Implement
+     * */
+    @KmpTorDsl
+    public class PathsNeededToBuildCircuits private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "PathsNeededToBuildCircuits",
+            default = "-1.000000",
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [ClientBootstrapConsensusAuthorityDownloadInitialDelay](https://2019.www.torproject.org/docs/tor-manual.html.en#ClientBootstrapConsensusAuthorityDownloadInitialDelay)
+     *
+     * TODO: Implement
+     * */
+    @KmpTorDsl
+    public class ClientBootstrapConsensusAuthorityDownloadInitialDelay private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "ClientBootstrapConsensusAuthorityDownloadInitialDelay",
+            default = "6",
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [ClientBootstrapConsensusFallbackDownloadInitialDelay](https://2019.www.torproject.org/docs/tor-manual.html.en#ClientBootstrapConsensusFallbackDownloadInitialDelay)
+     *
+     * TODO: Implement
+     * */
+    @KmpTorDsl
+    public class ClientBootstrapConsensusFallbackDownloadInitialDelay private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "ClientBootstrapConsensusFallbackDownloadInitialDelay",
+            default = "0",
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [ClientBootstrapConsensusAuthorityOnlyDownloadInitialDelay](https://2019.www.torproject.org/docs/tor-manual.html.en#ClientBootstrapConsensusAuthorityOnlyDownloadInitialDelay)
+     *
+     * TODO: Implement
+     * */
+    @KmpTorDsl
+    public class ClientBootstrapConsensusAuthorityOnlyDownloadInitialDelay private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "ClientBootstrapConsensusAuthorityOnlyDownloadInitialDelay",
+            default = "0",
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [ClientBootstrapConsensusMaxInProgressTries](https://2019.www.torproject.org/docs/tor-manual.html.en#ClientBootstrapConsensusMaxInProgressTries)
+     *
+     * TODO: Implement
+     * */
+    @KmpTorDsl
+    public class ClientBootstrapConsensusMaxInProgressTries private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "ClientBootstrapConsensusMaxInProgressTries",
+            default = "3",
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    //////////////////////
+    //  SERVER OPTIONS  //
+    //////////////////////
+
+    /**
+     * [Address](https://2019.www.torproject.org/docs/tor-manual.html.en#Address)
+     *
+     * TODO: Implement
+     * */
+    @KmpTorDsl
+    public class Address private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "Address",
+            default = "",
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [AssumeReachable](https://2019.www.torproject.org/docs/tor-manual.html.en#AssumeReachable)
+     *
+     * TODO: Implement
+     * */
+    @KmpTorDsl
+    public class AssumeReachable private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "AssumeReachable",
+            default = false.toByte().toString(),
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [BridgeRelay](https://2019.www.torproject.org/docs/tor-manual.html.en#BridgeRelay)
+     *
+     * TODO: Implement
+     * */
+    @KmpTorDsl
+    public class BridgeRelay private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "BridgeRelay",
+            default = false.toByte().toString(),
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [BridgeDistribution](https://2019.www.torproject.org/docs/tor-manual.html.en#BridgeDistribution)
+     *
+     * TODO: Implement
+     * */
+    @KmpTorDsl
+    public class BridgeDistribution private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "BridgeDistribution",
+            default = "",
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [ContactInfo](https://2019.www.torproject.org/docs/tor-manual.html.en#ContactInfo)
+     *
+     * TODO: Implement
+     * */
+    @KmpTorDsl
+    public class ContactInfo private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "ContactInfo",
+            default = "",
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [ExitRelay](https://2019.www.torproject.org/docs/tor-manual.html.en#ExitRelay)
+     *
+     * TODO: Implement
+     * */
+    @KmpTorDsl
+    public class ExitRelay private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "ExitRelay",
+            default = AUTO,
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [ExitPolicy](https://2019.www.torproject.org/docs/tor-manual.html.en#ExitPolicy)
+     *
+     * TODO: Implement
+     * */
+    @KmpTorDsl
+    public class ExitPolicy private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "ExitPolicy",
+            default = "",
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [ExitPolicyRejectPrivate](https://2019.www.torproject.org/docs/tor-manual.html.en#ExitPolicyRejectPrivate)
+     *
+     * TODO: Implement
+     * */
+    @KmpTorDsl
+    public class ExitPolicyRejectPrivate private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "ExitPolicyRejectPrivate",
+            default = true.toByte().toString(),
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [ExitPolicyRejectLocalInterfaces](https://2019.www.torproject.org/docs/tor-manual.html.en#ExitPolicyRejectLocalInterfaces)
+     *
+     * TODO: Implement
+     * */
+    @KmpTorDsl
+    public class ExitPolicyRejectLocalInterfaces private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "ExitPolicyRejectLocalInterfaces",
+            default = false.toByte().toString(),
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [ReducedExitPolicy](https://2019.www.torproject.org/docs/tor-manual.html.en#ReducedExitPolicy)
+     *
+     * TODO: Implement
+     * */
+    @KmpTorDsl
+    public class ReducedExitPolicy private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "ReducedExitPolicy",
+            default = false.toByte().toString(),
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [IPv6Exit](https://2019.www.torproject.org/docs/tor-manual.html.en#IPv6Exit)
+     *
+     * TODO: Implement
+     * */
+    @KmpTorDsl
+    public class IPv6Exit private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "IPv6Exit",
+            default = false.toByte().toString(),
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [MaxOnionQueueDelay](https://2019.www.torproject.org/docs/tor-manual.html.en#MaxOnionQueueDelay)
+     *
+     * TODO: Implement
+     * */
+    @KmpTorDsl
+    public class MaxOnionQueueDelay private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "MaxOnionQueueDelay",
+            default = 1_750.milliseconds.inWholeMilliseconds.toString(),
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [MyFamily](https://2019.www.torproject.org/docs/tor-manual.html.en#MyFamily)
+     *
+     * TODO: Implement
+     * */
+    @KmpTorDsl
+    public class MyFamily private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "MyFamily",
+            default = "",
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [Nickname](https://2019.www.torproject.org/docs/tor-manual.html.en#Nickname)
+     *
+     * TODO: Implement
+     * */
+    @KmpTorDsl
+    public class Nickname private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "Nickname",
+            default = "",
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [NumCPUs](https://2019.www.torproject.org/docs/tor-manual.html.en#NumCPUs)
+     *
+     * TODO: Implement
+     * */
+    @KmpTorDsl
+    public class NumCPUs private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "NumCPUs",
+            default = "0",
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [ORPort](https://2019.www.torproject.org/docs/tor-manual.html.en#ORPort)
+     *
+     * TODO: Implement
+     * */
+    @KmpTorDsl
+    public class ORPort private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "ORPort",
+            default = "0",
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [PublishServerDescriptor](https://2019.www.torproject.org/docs/tor-manual.html.en#PublishServerDescriptor)
+     *
+     * TODO: Implement
+     * */
+    @KmpTorDsl
+    public class PublishServerDescriptor private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "PublishServerDescriptor",
+            default = "1",
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [ShutdownWaitLength](https://2019.www.torproject.org/docs/tor-manual.html.en#ShutdownWaitLength)
+     *
+     * TODO: Implement
+     * */
+    @KmpTorDsl
+    public class ShutdownWaitLength private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "ShutdownWaitLength",
+            default = 30.seconds.inWholeSeconds.toString(),
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [SSLKeyLifetime](https://2019.www.torproject.org/docs/tor-manual.html.en#SSLKeyLifetime)
+     *
+     * TODO: Implement
+     * */
+    @KmpTorDsl
+    public class SSLKeyLifetime private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "SSLKeyLifetime",
+            default = "0",
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [HeartbeatPeriod](https://2019.www.torproject.org/docs/tor-manual.html.en#HeartbeatPeriod)
+     *
+     * TODO: Implement
+     * */
+    @KmpTorDsl
+    public class HeartbeatPeriod private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "HeartbeatPeriod",
+            default = 6.hours.inWholeSeconds.toString(),
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [MainloopStats](https://2019.www.torproject.org/docs/tor-manual.html.en#MainloopStats)
+     *
+     * TODO: Implement
+     * */
+    @KmpTorDsl
+    public class MainloopStats private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "MainloopStats",
+            default = false.toByte().toString(),
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [AccountingMax](https://2019.www.torproject.org/docs/tor-manual.html.en#AccountingMax)
+     *
+     * TODO: Implement
+     * */
+    @KmpTorDsl
+    public class AccountingMax private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "AccountingMax",
+            default = "0",
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [AccountingRule](https://2019.www.torproject.org/docs/tor-manual.html.en#AccountingRule)
+     *
+     * TODO: Implement
+     * */
+    @KmpTorDsl
+    public class AccountingRule private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "AccountingRule",
+            default = "max",
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [AccountingStart](https://2019.www.torproject.org/docs/tor-manual.html.en#AccountingStart)
+     *
+     * TODO: Implement
+     * */
+    @KmpTorDsl
+    public class AccountingStart private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "AccountingStart",
+            default = "month 1 0:00",
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [RefuseUnknownExits](https://2019.www.torproject.org/docs/tor-manual.html.en#RefuseUnknownExits)
+     *
+     * TODO: Implement
+     * */
+    @KmpTorDsl
+    public class RefuseUnknownExits private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "RefuseUnknownExits",
+            default = AUTO,
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [ServerDNSResolvConfFile](https://2019.www.torproject.org/docs/tor-manual.html.en#ServerDNSResolvConfFile)
+     *
+     * TODO: Implement
+     * */
+    @KmpTorDsl
+    public class ServerDNSResolvConfFile private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "ServerDNSResolvConfFile",
+            default = "",
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [ServerDNSAllowBrokenConfig](https://2019.www.torproject.org/docs/tor-manual.html.en#ServerDNSAllowBrokenConfig)
+     *
+     * TODO: Implement
+     * */
+    @KmpTorDsl
+    public class ServerDNSAllowBrokenConfig private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "ServerDNSAllowBrokenConfig",
+            default = true.toByte().toString(),
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [ServerDNSSearchDomains](https://2019.www.torproject.org/docs/tor-manual.html.en#ServerDNSSearchDomains)
+     *
+     * TODO: Implement
+     * */
+    @KmpTorDsl
+    public class ServerDNSSearchDomains private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "ServerDNSSearchDomains",
+            default = false.toByte().toString(),
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [ServerDNSDetectHijacking](https://2019.www.torproject.org/docs/tor-manual.html.en#ServerDNSDetectHijacking)
+     *
+     * TODO: Implement
+     * */
+    @KmpTorDsl
+    public class ServerDNSDetectHijacking private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "ServerDNSDetectHijacking",
+            default = true.toByte().toString(),
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [ServerDNSTestAddresses](https://2019.www.torproject.org/docs/tor-manual.html.en#ServerDNSTestAddresses)
+     *
+     * TODO: Implement
+     * */
+    @KmpTorDsl
+    public class ServerDNSTestAddresses private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "ServerDNSTestAddresses",
+            default = "www.google.com,www.mit.edu,www.yahoo.com,www.slashdot.org",
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [ServerDNSAllowNonRFC953Hostnames](https://2019.www.torproject.org/docs/tor-manual.html.en#ServerDNSAllowNonRFC953Hostnames)
+     *
+     * TODO: Implement
+     * */
+    @KmpTorDsl
+    public class ServerDNSAllowNonRFC953Hostnames private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "ServerDNSAllowNonRFC953Hostnames",
+            default = false.toByte().toString(),
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [BridgeRecordUsageByCountry](https://2019.www.torproject.org/docs/tor-manual.html.en#BridgeRecordUsageByCountry)
+     *
+     * TODO: Implement
+     * */
+    @KmpTorDsl
+    public class BridgeRecordUsageByCountry private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "BridgeRecordUsageByCountry",
+            default = true.toByte().toString(),
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [ServerDNSRandomizeCase](https://2019.www.torproject.org/docs/tor-manual.html.en#ServerDNSRandomizeCase)
+     *
+     * TODO: Implement
+     * */
+    @KmpTorDsl
+    public class ServerDNSRandomizeCase private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "ServerDNSRandomizeCase",
+            default = true.toByte().toString(),
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [CellStatistics](https://2019.www.torproject.org/docs/tor-manual.html.en#CellStatistics)
+     *
+     * TODO: Implement
+     * */
+    @KmpTorDsl
+    public class CellStatistics private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "CellStatistics",
+            default = false.toByte().toString(),
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [PaddingStatistics](https://2019.www.torproject.org/docs/tor-manual.html.en#PaddingStatistics)
+     *
+     * TODO: Implement
+     * */
+    @KmpTorDsl
+    public class PaddingStatistics private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "PaddingStatistics",
+            default = true.toByte().toString(),
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [DirReqStatistics](https://2019.www.torproject.org/docs/tor-manual.html.en#DirReqStatistics)
+     *
+     * TODO: Implement
+     * */
+    @KmpTorDsl
+    public class DirReqStatistics private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "DirReqStatistics",
+            default = true.toByte().toString(),
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [EntryStatistics](https://2019.www.torproject.org/docs/tor-manual.html.en#EntryStatistics)
+     *
+     * TODO: Implement
+     * */
+    @KmpTorDsl
+    public class EntryStatistics private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "EntryStatistics",
+            default = false.toByte().toString(),
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [ExitPortStatistics](https://2019.www.torproject.org/docs/tor-manual.html.en#ExitPortStatistics)
+     *
+     * TODO: Implement
+     * */
+    @KmpTorDsl
+    public class ExitPortStatistics private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "ExitPortStatistics",
+            default = false.toByte().toString(),
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [ConnDirectionStatistics](https://2019.www.torproject.org/docs/tor-manual.html.en#ConnDirectionStatistics)
+     *
+     * TODO: Implement
+     * */
+    @KmpTorDsl
+    public class ConnDirectionStatistics private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "ConnDirectionStatistics",
+            default = false.toByte().toString(),
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [HiddenServiceStatistics](https://2019.www.torproject.org/docs/tor-manual.html.en#HiddenServiceStatistics)
+     *
+     * TODO: Implement
+     * */
+    @KmpTorDsl
+    public class HiddenServiceStatistics private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "HiddenServiceStatistics",
+            default = true.toByte().toString(),
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [ExtraInfoStatistics](https://2019.www.torproject.org/docs/tor-manual.html.en#ExtraInfoStatistics)
+     *
+     * TODO: Implement
+     * */
+    @KmpTorDsl
+    public class ExtraInfoStatistics private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "ExtraInfoStatistics",
+            default = true.toByte().toString(),
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [ExtendAllowPrivateAddresses](https://2019.www.torproject.org/docs/tor-manual.html.en#ExtendAllowPrivateAddresses)
+     *
+     * TODO: Implement
+     * */
+    @KmpTorDsl
+    public class ExtendAllowPrivateAddresses private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "ExtendAllowPrivateAddresses",
+            default = false.toByte().toString(),
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [MaxMemInQueues](https://2019.www.torproject.org/docs/tor-manual.html.en#MaxMemInQueues)
+     *
+     * TODO: Implement
+     * */
+    @KmpTorDsl
+    public class MaxMemInQueues private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "MaxMemInQueues",
+            default = "0",
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [DisableOOSCheck](https://2019.www.torproject.org/docs/tor-manual.html.en#DisableOOSCheck)
+     *
+     * TODO: Implement
+     * */
+    @KmpTorDsl
+    public class DisableOOSCheck private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "DisableOOSCheck",
+            default = true.toByte().toString(),
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [SigningKeyLifetime](https://2019.www.torproject.org/docs/tor-manual.html.en#SigningKeyLifetime)
+     *
+     * TODO: Implement
+     * */
+    @KmpTorDsl
+    public class SigningKeyLifetime private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "SigningKeyLifetime",
+            default = 30.days.inWholeSeconds.toString(),
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [OfflineMasterKey](https://2019.www.torproject.org/docs/tor-manual.html.en#OfflineMasterKey)
+     *
+     * TODO: Implement
+     * */
+    @KmpTorDsl
+    public class OfflineMasterKey private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "OfflineMasterKey",
+            default = false.toByte().toString(),
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [KeyDirectory](https://2019.www.torproject.org/docs/tor-manual.html.en#KeyDirectory)
+     *
+     * TODO: Implement
+     * */
+    @KmpTorDsl
+    public class KeyDirectory private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "KeyDirectory",
+            default = "",
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [KeyDirectoryGroupReadable](https://2019.www.torproject.org/docs/tor-manual.html.en#KeyDirectoryGroupReadable)
+     *
+     * TODO: Implement
+     * */
+    @KmpTorDsl
+    public class KeyDirectoryGroupReadable private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "KeyDirectoryGroupReadable",
+            default = AUTO,
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [RephistTrackTime](https://2019.www.torproject.org/docs/tor-manual.html.en#RephistTrackTime)
+     *
+     * TODO: Implement
+     * */
+    @KmpTorDsl
+    public class RephistTrackTime private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "RephistTrackTime",
+            default = 24.hours.inWholeSeconds.toString(),
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    ////////////////////////////////
+    //  DIRECTORY SERVER OPTIONS  //
+    ////////////////////////////////
+
+    /**
+     * [DirPortFrontPage](https://2019.www.torproject.org/docs/tor-manual.html.en#DirPortFrontPage)
+     *
+     * TODO: Implement
+     * */
+    @KmpTorDsl
+    public class DirPortFrontPage private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "DirPortFrontPage",
+            default = "",
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [DirPort](https://2019.www.torproject.org/docs/tor-manual.html.en#DirPort)
+     *
+     * TODO: Implement
+     * */
+    @KmpTorDsl
+    public class DirPort private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "DirPort",
+            default = "0",
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [DirPolicy](https://2019.www.torproject.org/docs/tor-manual.html.en#DirPolicy)
+     *
+     * TODO: Implement
+     * */
+    @KmpTorDsl
+    public class DirPolicy private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "DirPolicy",
+            default = "",
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [DirCache](https://2019.www.torproject.org/docs/tor-manual.html.en#DirCache)
+     *
+     * TODO: Implement
+     * */
+    @KmpTorDsl
+    public class DirCache private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "DirCache",
+            default = true.toByte().toString(),
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [MaxConsensusAgeForDiffs](https://2019.www.torproject.org/docs/tor-manual.html.en#MaxConsensusAgeForDiffs)
+     *
+     * TODO: Implement
+     * */
+    @KmpTorDsl
+    public class MaxConsensusAgeForDiffs private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "MaxConsensusAgeForDiffs",
+            default = "0",
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    ////////////////////////////////////////////
+    //  DENIAL OF SERVICE MITIGATION OPTIONS  //
+    ////////////////////////////////////////////
+
+    /**
+     * [DoSCircuitCreationEnabled](https://2019.www.torproject.org/docs/tor-manual.html.en#DoSCircuitCreationEnabled)
+     *
+     * TODO: Implement
+     * */
+    @KmpTorDsl
+    public class DoSCircuitCreationEnabled private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "DoSCircuitCreationEnabled",
+            default = AUTO,
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [DoSCircuitCreationMinConnections](https://2019.www.torproject.org/docs/tor-manual.html.en#DoSCircuitCreationMinConnections)
+     *
+     * TODO: Implement
+     * */
+    @KmpTorDsl
+    public class DoSCircuitCreationMinConnections private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "DoSCircuitCreationMinConnections",
+            default = "0",
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [DoSCircuitCreationRate](https://2019.www.torproject.org/docs/tor-manual.html.en#DoSCircuitCreationRate)
+     *
+     * TODO: Implement
+     * */
+    @KmpTorDsl
+    public class DoSCircuitCreationRate private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "DoSCircuitCreationRate",
+            default = "0",
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [DoSCircuitCreationBurst](https://2019.www.torproject.org/docs/tor-manual.html.en#DoSCircuitCreationBurst)
+     *
+     * TODO: Implement
+     * */
+    @KmpTorDsl
+    public class DoSCircuitCreationBurst private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "DoSCircuitCreationBurst",
+            default = "0",
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [DoSCircuitCreationDefenseType](https://2019.www.torproject.org/docs/tor-manual.html.en#DoSCircuitCreationDefenseType)
+     *
+     * TODO: Implement
+     * */
+    @KmpTorDsl
+    public class DoSCircuitCreationDefenseType private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "DoSCircuitCreationDefenseType",
+            default = "0",
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [DoSCircuitCreationDefenseTimePeriod](https://2019.www.torproject.org/docs/tor-manual.html.en#DoSCircuitCreationDefenseTimePeriod)
+     *
+     * TODO: Implement
+     * */
+    @KmpTorDsl
+    public class DoSCircuitCreationDefenseTimePeriod private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "DoSCircuitCreationDefenseTimePeriod",
+            default = "0",
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [DoSConnectionEnabled](https://2019.www.torproject.org/docs/tor-manual.html.en#DoSConnectionEnabled)
+     *
+     * TODO: Implement
+     * */
+    @KmpTorDsl
+    public class DoSConnectionEnabled private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "DoSConnectionEnabled",
+            default = AUTO,
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [DoSConnectionMaxConcurrentCount](https://2019.www.torproject.org/docs/tor-manual.html.en#DoSConnectionMaxConcurrentCount)
+     *
+     * TODO: Implement
+     * */
+    @KmpTorDsl
+    public class DoSConnectionMaxConcurrentCount private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "DoSConnectionMaxConcurrentCount",
+            default = "0",
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [DoSConnectionDefenseType](https://2019.www.torproject.org/docs/tor-manual.html.en#DoSConnectionDefenseType)
+     *
+     * TODO: Implement
+     * */
+    @KmpTorDsl
+    public class DoSConnectionDefenseType private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "DoSConnectionDefenseType",
+            default = "0",
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [DoSRefuseSingleHopClientRendezvous](https://2019.www.torproject.org/docs/tor-manual.html.en#DoSRefuseSingleHopClientRendezvous)
+     *
+     * TODO: Implement
+     * */
+    @KmpTorDsl
+    public class DoSRefuseSingleHopClientRendezvous private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "DoSRefuseSingleHopClientRendezvous",
+            default = AUTO,
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    //////////////////////////////////////////
+    //  DIRECTORY AUTHORITY SERVER OPTIONS  //
+    //////////////////////////////////////////
+
+    /**
+     * [AuthoritativeDirectory](https://2019.www.torproject.org/docs/tor-manual.html.en#AuthoritativeDirectory)
+     *
+     * TODO: Implement
+     * */
+    @KmpTorDsl
+    public class AuthoritativeDirectory private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "AuthoritativeDirectory",
+            default = false.toByte().toString(),
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [V3AuthoritativeDirectory](https://2019.www.torproject.org/docs/tor-manual.html.en#V3AuthoritativeDirectory)
+     *
+     * TODO: Implement
+     * */
+    @KmpTorDsl
+    public class V3AuthoritativeDirectory private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "V3AuthoritativeDirectory",
+            default = false.toByte().toString(),
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [VersioningAuthoritativeDirectory](https://2019.www.torproject.org/docs/tor-manual.html.en#VersioningAuthoritativeDirectory)
+     *
+     * TODO: Implement
+     * */
+    @KmpTorDsl
+    public class VersioningAuthoritativeDirectory private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "VersioningAuthoritativeDirectory",
+            default = false.toByte().toString(),
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [RecommendedVersions](https://2019.www.torproject.org/docs/tor-manual.html.en#RecommendedVersions)
+     *
+     * TODO: Implement
+     * */
+    @KmpTorDsl
+    public class RecommendedVersions private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "RecommendedVersions",
+            default = "",
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [RecommendedPackages](https://2019.www.torproject.org/docs/tor-manual.html.en#RecommendedPackages)
+     *
+     * TODO: Implement
+     * */
+    @KmpTorDsl
+    public class RecommendedPackages private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "RecommendedPackages",
+            default = "",
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [RecommendedClientVersions](https://2019.www.torproject.org/docs/tor-manual.html.en#RecommendedClientVersions)
+     *
+     * TODO: Implement
+     * */
+    @KmpTorDsl
+    public class RecommendedClientVersions private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "RecommendedClientVersions",
+            default = "",
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [BridgeAuthoritativeDir](https://2019.www.torproject.org/docs/tor-manual.html.en#BridgeAuthoritativeDir)
+     *
+     * TODO: Implement
+     * */
+    @KmpTorDsl
+    public class BridgeAuthoritativeDir private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "BridgeAuthoritativeDir",
+            default = false.toByte().toString(),
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [MinUptimeHidServDirectoryV2](https://2019.www.torproject.org/docs/tor-manual.html.en#MinUptimeHidServDirectoryV2)
+     *
+     * TODO: Implement
+     * */
+    @KmpTorDsl
+    public class MinUptimeHidServDirectoryV2 private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "MinUptimeHidServDirectoryV2",
+            default = 4.days.inWholeSeconds.toString(),
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [RecommendedServerVersions](https://2019.www.torproject.org/docs/tor-manual.html.en#RecommendedServerVersions)
+     *
+     * TODO: Implement
+     * */
+    @KmpTorDsl
+    public class RecommendedServerVersions private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "RecommendedServerVersions",
+            default = "",
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [ConsensusParams](https://2019.www.torproject.org/docs/tor-manual.html.en#ConsensusParams)
+     *
+     * TODO: Implement
+     * */
+    @KmpTorDsl
+    public class ConsensusParams private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "ConsensusParams",
+            default = "",
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [DirAllowPrivateAddresses](https://2019.www.torproject.org/docs/tor-manual.html.en#DirAllowPrivateAddresses)
+     *
+     * TODO: Implement
+     * */
+    @KmpTorDsl
+    public class DirAllowPrivateAddresses private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "DirAllowPrivateAddresses",
+            default = false.toByte().toString(),
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [AuthDirBadExit](https://2019.www.torproject.org/docs/tor-manual.html.en#AuthDirBadExit)
+     *
+     * TODO: Implement
+     * */
+    @KmpTorDsl
+    public class AuthDirBadExit private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "AuthDirBadExit",
+            default = "",
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [AuthDirInvalid](https://2019.www.torproject.org/docs/tor-manual.html.en#AuthDirInvalid)
+     *
+     * TODO: Implement
+     * */
+    @KmpTorDsl
+    public class AuthDirInvalid private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "AuthDirInvalid",
+            default = "",
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [AuthDirReject](https://2019.www.torproject.org/docs/tor-manual.html.en#AuthDirReject)
+     *
+     * TODO: Implement
+     * */
+    @KmpTorDsl
+    public class AuthDirReject private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "AuthDirReject",
+            default = "",
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [AuthDirRejectCCs](https://2019.www.torproject.org/docs/tor-manual.html.en#AuthDirRejectCCs)
+     *
+     * TODO: Implement
+     * */
+    @KmpTorDsl
+    public class AuthDirRejectCCs private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "AuthDirRejectCCs",
+            default = "",
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [AuthDirListBadExits](https://2019.www.torproject.org/docs/tor-manual.html.en#AuthDirListBadExits)
+     *
+     * TODO: Implement
+     * */
+    @KmpTorDsl
+    public class AuthDirListBadExits private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "AuthDirListBadExits",
+            default = false.toByte().toString(),
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [AuthDirMaxServersPerAddr](https://2019.www.torproject.org/docs/tor-manual.html.en#AuthDirMaxServersPerAddr)
+     *
+     * TODO: Implement
+     * */
+    @KmpTorDsl
+    public class AuthDirMaxServersPerAddr private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "AuthDirMaxServersPerAddr",
+            default = "2",
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [AuthDirFastGuarantee](https://2019.www.torproject.org/docs/tor-manual.html.en#AuthDirFastGuarantee)
+     *
+     * TODO: Implement
+     * */
+    @KmpTorDsl
+    public class AuthDirFastGuarantee private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "AuthDirFastGuarantee",
+            default = ((2.0F.pow(10)) * 100).toInt().toString(), // 100 KBytes
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [AuthDirGuardBWGuarantee](https://2019.www.torproject.org/docs/tor-manual.html.en#AuthDirGuardBWGuarantee)
+     *
+     * TODO: Implement
+     * */
+    @KmpTorDsl
+    public class AuthDirGuardBWGuarantee private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "AuthDirGuardBWGuarantee",
+            default = (2.0F.pow(21)).toInt().toString(), // 2MBytes
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [AuthDirPinKeys](https://2019.www.torproject.org/docs/tor-manual.html.en#AuthDirPinKeys)
+     *
+     * TODO: Implement
+     * */
+    @KmpTorDsl
+    public class AuthDirPinKeys private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "AuthDirPinKeys",
+            default = true.toByte().toString(),
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [AuthDirSharedRandomness](https://2019.www.torproject.org/docs/tor-manual.html.en#AuthDirSharedRandomness)
+     *
+     * TODO: Implement
+     * */
+    @KmpTorDsl
+    public class AuthDirSharedRandomness private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "AuthDirSharedRandomness",
+            default = true.toByte().toString(),
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [AuthDirTestEd25519LinkKeys](https://2019.www.torproject.org/docs/tor-manual.html.en#AuthDirTestEd25519LinkKeys)
+     *
+     * TODO: Implement
+     * */
+    @KmpTorDsl
+    public class AuthDirTestEd25519LinkKeys private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "AuthDirTestEd25519LinkKeys",
+            default = true.toByte().toString(),
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [BridgePassword](https://2019.www.torproject.org/docs/tor-manual.html.en#BridgePassword)
+     *
+     * TODO: Implement
+     * */
+    @KmpTorDsl
+    public class BridgePassword private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "BridgePassword",
+            default = "",
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [V3AuthVotingInterval](https://2019.www.torproject.org/docs/tor-manual.html.en#V3AuthVotingInterval)
+     *
+     * TODO: Implement
+     * */
+    @KmpTorDsl
+    public class V3AuthVotingInterval private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "V3AuthVotingInterval",
+            default = 1.hours.inWholeSeconds.toString(),
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [V3AuthVoteDelay](https://2019.www.torproject.org/docs/tor-manual.html.en#V3AuthVoteDelay)
+     *
+     * TODO: Implement
+     * */
+    @KmpTorDsl
+    public class V3AuthVoteDelay private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "V3AuthVoteDelay",
+            default = 5.minutes.inWholeSeconds.toString(),
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [V3AuthDistDelay](https://2019.www.torproject.org/docs/tor-manual.html.en#V3AuthDistDelay)
+     *
+     * TODO: Implement
+     * */
+    @KmpTorDsl
+    public class V3AuthDistDelay private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "V3AuthDistDelay",
+            default = 5.minutes.inWholeSeconds.toString(),
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [V3AuthNIntervalsValid](https://2019.www.torproject.org/docs/tor-manual.html.en#V3AuthNIntervalsValid)
+     *
+     * TODO: Implement
+     * */
+    @KmpTorDsl
+    public class V3AuthNIntervalsValid private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "V3AuthNIntervalsValid",
+            default = "3",
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [V3BandwidthsFile](https://2019.www.torproject.org/docs/tor-manual.html.en#V3BandwidthsFile)
+     *
+     * TODO: Implement
+     * */
+    @KmpTorDsl
+    public class V3BandwidthsFile private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "V3BandwidthsFile",
+            default = "",
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [V3AuthUseLegacyKey](https://2019.www.torproject.org/docs/tor-manual.html.en#V3AuthUseLegacyKey)
+     *
+     * TODO: Implement
+     * */
+    @KmpTorDsl
+    public class V3AuthUseLegacyKey private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "V3AuthUseLegacyKey",
+            default = false.toByte().toString(),
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [AuthDirHasIPv6Connectivity](https://2019.www.torproject.org/docs/tor-manual.html.en#AuthDirHasIPv6Connectivity)
+     *
+     * TODO: Implement
+     * */
+    @KmpTorDsl
+    public class AuthDirHasIPv6Connectivity private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "AuthDirHasIPv6Connectivity",
+            default = false.toByte().toString(),
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [MinMeasuredBWsForAuthToIgnoreAdvertised](https://2019.www.torproject.org/docs/tor-manual.html.en#MinMeasuredBWsForAuthToIgnoreAdvertised)
+     *
+     * TODO: Implement
+     * */
+    @KmpTorDsl
+    public class MinMeasuredBWsForAuthToIgnoreAdvertised private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "MinMeasuredBWsForAuthToIgnoreAdvertised",
+            default = "500",
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    //////////////////////////////
+    //  HIDDEN SERVICE OPTIONS  //
+    //////////////////////////////
+
+    /**
+     * [PublishHidServDescriptors](https://2019.www.torproject.org/docs/tor-manual.html.en#PublishHidServDescriptors)
+     *
+     * TODO: Implement
+     * */
+    @KmpTorDsl
+    public class PublishHidServDescriptors private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "PublishHidServDescriptors",
+            default = true.toByte().toString(),
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [HiddenServiceAuthorizeClient](https://2019.www.torproject.org/docs/tor-manual.html.en#HiddenServiceAuthorizeClient)
+     *
+     * TODO: Implement
+     * */
+    @KmpTorDsl
+    public class HiddenServiceAuthorizeClient private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "HiddenServiceAuthorizeClient",
+            default = "",
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [HiddenServiceExportCircuitID](https://2019.www.torproject.org/docs/tor-manual.html.en#HiddenServiceExportCircuitID)
+     *
+     * TODO: Implement
+     * */
+    @KmpTorDsl
+    public class HiddenServiceExportCircuitID private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "HiddenServiceExportCircuitID",
+            default = "",
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [HiddenServiceSingleHopMode](https://2019.www.torproject.org/docs/tor-manual.html.en#HiddenServiceSingleHopMode)
+     *
+     * TODO: Implement
+     * */
+    @KmpTorDsl
+    public class HiddenServiceSingleHopMode private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "HiddenServiceSingleHopMode",
+            default = false.toByte().toString(),
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [HiddenServiceNonAnonymousMode](https://2019.www.torproject.org/docs/tor-manual.html.en#HiddenServiceNonAnonymousMode)
+     *
+     * TODO: Implement
+     * */
+    @KmpTorDsl
+    public class HiddenServiceNonAnonymousMode private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "HiddenServiceNonAnonymousMode",
+            default = false.toByte().toString(),
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    ///////////////////////////////
+    //  TESTING NETWORK OPTIONS  //
+    ///////////////////////////////
+
+    /**
+     * [TestingTorNetwork](https://2019.www.torproject.org/docs/tor-manual.html.en#TestingTorNetwork)
+     *
+     * TODO: Implement
+     * */
+    @KmpTorDsl
+    public class TestingTorNetwork private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "TestingTorNetwork",
+            default = false.toByte().toString(),
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [TestingV3AuthInitialVotingInterval](https://2019.www.torproject.org/docs/tor-manual.html.en#TestingV3AuthInitialVotingInterval)
+     *
+     * TODO: Implement
+     * */
+    @KmpTorDsl
+    public class TestingV3AuthInitialVotingInterval private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "TestingV3AuthInitialVotingInterval",
+            default = 30.minutes.inWholeSeconds.toString(),
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [TestingV3AuthInitialVoteDelay](https://2019.www.torproject.org/docs/tor-manual.html.en#TestingV3AuthInitialVoteDelay)
+     *
+     * TODO: Implement
+     * */
+    @KmpTorDsl
+    public class TestingV3AuthInitialVoteDelay private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "TestingV3AuthInitialVoteDelay",
+            default = 5.minutes.inWholeSeconds.toString(),
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [TestingV3AuthInitialDistDelay](https://2019.www.torproject.org/docs/tor-manual.html.en#TestingV3AuthInitialDistDelay)
+     *
+     * TODO: Implement
+     * */
+    @KmpTorDsl
+    public class TestingV3AuthInitialDistDelay private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "TestingV3AuthInitialDistDelay",
+            default = 5.minutes.inWholeSeconds.toString(),
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [TestingV3AuthVotingStartOffset](https://2019.www.torproject.org/docs/tor-manual.html.en#TestingV3AuthVotingStartOffset)
+     *
+     * TODO: Implement
+     * */
+    @KmpTorDsl
+    public class TestingV3AuthVotingStartOffset private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "TestingV3AuthVotingStartOffset",
+            default = "0",
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [TestingAuthDirTimeToLearnReachability](https://2019.www.torproject.org/docs/tor-manual.html.en#TestingAuthDirTimeToLearnReachability)
+     *
+     * TODO: Implement
+     * */
+    @KmpTorDsl
+    public class TestingAuthDirTimeToLearnReachability private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "TestingAuthDirTimeToLearnReachability",
+            default = 30.minutes.inWholeSeconds.toString(),
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [TestingEstimatedDescriptorPropagationTime](https://2019.www.torproject.org/docs/tor-manual.html.en#TestingEstimatedDescriptorPropagationTime)
+     *
+     * TODO: Implement
+     * */
+    @KmpTorDsl
+    public class TestingEstimatedDescriptorPropagationTime private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "TestingEstimatedDescriptorPropagationTime",
+            default = 10.minutes.inWholeSeconds.toString(),
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [TestingMinFastFlagThreshold](https://2019.www.torproject.org/docs/tor-manual.html.en#TestingMinFastFlagThreshold)
+     *
+     * TODO: Implement
+     * */
+    @KmpTorDsl
+    public class TestingMinFastFlagThreshold private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "TestingMinFastFlagThreshold",
+            default = "0",
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [TestingServerDownloadInitialDelay](https://2019.www.torproject.org/docs/tor-manual.html.en#TestingServerDownloadInitialDelay)
+     *
+     * TODO: Implement
+     * */
+    @KmpTorDsl
+    public class TestingServerDownloadInitialDelay private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "TestingServerDownloadInitialDelay",
+            default = "0",
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [TestingClientDownloadInitialDelay](https://2019.www.torproject.org/docs/tor-manual.html.en#TestingClientDownloadInitialDelay)
+     *
+     * TODO: Implement
+     * */
+    @KmpTorDsl
+    public class TestingClientDownloadInitialDelay private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "TestingClientDownloadInitialDelay",
+            default = "0",
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [TestingServerConsensusDownloadInitialDelay](https://2019.www.torproject.org/docs/tor-manual.html.en#TestingServerConsensusDownloadInitialDelay)
+     *
+     * TODO: Implement
+     * */
+    @KmpTorDsl
+    public class TestingServerConsensusDownloadInitialDelay private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "TestingServerConsensusDownloadInitialDelay",
+            default = "0",
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [TestingClientConsensusDownloadInitialDelay](https://2019.www.torproject.org/docs/tor-manual.html.en#TestingClientConsensusDownloadInitialDelay)
+     *
+     * TODO: Implement
+     * */
+    @KmpTorDsl
+    public class TestingClientConsensusDownloadInitialDelay private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "TestingClientConsensusDownloadInitialDelay",
+            default = "0",
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [TestingBridgeDownloadInitialDelay](https://2019.www.torproject.org/docs/tor-manual.html.en#TestingBridgeDownloadInitialDelay)
+     *
+     * TODO: Implement
+     * */
+    @KmpTorDsl
+    public class TestingBridgeDownloadInitialDelay private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "TestingBridgeDownloadInitialDelay",
+            default = 3.hours.inWholeSeconds.toString(),
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [TestingBridgeBootstrapDownloadInitialDelay](https://2019.www.torproject.org/docs/tor-manual.html.en#TestingBridgeBootstrapDownloadInitialDelay)
+     *
+     * TODO: Implement
+     * */
+    @KmpTorDsl
+    public class TestingBridgeBootstrapDownloadInitialDelay private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "TestingBridgeBootstrapDownloadInitialDelay",
+            default = "0",
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [TestingClientMaxIntervalWithoutRequest](https://2019.www.torproject.org/docs/tor-manual.html.en#TestingClientMaxIntervalWithoutRequest)
+     *
+     * TODO: Implement
+     * */
+    @KmpTorDsl
+    public class TestingClientMaxIntervalWithoutRequest private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "TestingClientMaxIntervalWithoutRequest",
+            default = 10.minutes.inWholeSeconds.toString(),
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [TestingDirConnectionMaxStall](https://2019.www.torproject.org/docs/tor-manual.html.en#TestingDirConnectionMaxStall)
+     *
+     * TODO: Implement
+     * */
+    @KmpTorDsl
+    public class TestingDirConnectionMaxStall private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "TestingDirConnectionMaxStall",
+            default = 5.minutes.inWholeSeconds.toString(),
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [TestingDirAuthVoteExit](https://2019.www.torproject.org/docs/tor-manual.html.en#TestingDirAuthVoteExit)
+     *
+     * TODO: Implement
+     * */
+    @KmpTorDsl
+    public class TestingDirAuthVoteExit private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "TestingDirAuthVoteExit",
+            default = "",
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [TestingDirAuthVoteExitIsStrict](https://2019.www.torproject.org/docs/tor-manual.html.en#TestingDirAuthVoteExitIsStrict)
+     *
+     * TODO: Implement
+     * */
+    @KmpTorDsl
+    public class TestingDirAuthVoteExitIsStrict private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "TestingDirAuthVoteExitIsStrict",
+            default = false.toByte().toString(),
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [TestingDirAuthVoteGuard](https://2019.www.torproject.org/docs/tor-manual.html.en#TestingDirAuthVoteGuard)
+     *
+     * TODO: Implement
+     * */
+    @KmpTorDsl
+    public class TestingDirAuthVoteGuard private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "TestingDirAuthVoteGuard",
+            default = "",
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [TestingDirAuthVoteGuardIsStrict](https://2019.www.torproject.org/docs/tor-manual.html.en#TestingDirAuthVoteGuardIsStrict)
+     *
+     * TODO: Implement
+     * */
+    @KmpTorDsl
+    public class TestingDirAuthVoteGuardIsStrict private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "TestingDirAuthVoteGuardIsStrict",
+            default = false.toByte().toString(),
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [TestingDirAuthVoteHSDir](https://2019.www.torproject.org/docs/tor-manual.html.en#TestingDirAuthVoteHSDir)
+     *
+     * TODO: Implement
+     * */
+    @KmpTorDsl
+    public class TestingDirAuthVoteHSDir private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "TestingDirAuthVoteHSDir",
+            default = "",
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [TestingDirAuthVoteHSDirIsStrict](https://2019.www.torproject.org/docs/tor-manual.html.en#TestingDirAuthVoteHSDirIsStrict)
+     *
+     * TODO: Implement
+     * */
+    @KmpTorDsl
+    public class TestingDirAuthVoteHSDirIsStrict private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "TestingDirAuthVoteHSDirIsStrict",
+            default = false.toByte().toString(),
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [TestingEnableConnBwEvent](https://2019.www.torproject.org/docs/tor-manual.html.en#TestingEnableConnBwEvent)
+     *
+     * TODO: Implement
+     * */
+    @KmpTorDsl
+    public class TestingEnableConnBwEvent private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "TestingEnableConnBwEvent",
+            default = false.toByte().toString(),
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [TestingEnableCellStatsEvent](https://2019.www.torproject.org/docs/tor-manual.html.en#TestingEnableCellStatsEvent)
+     *
+     * TODO: Implement
+     * */
+    @KmpTorDsl
+    public class TestingEnableCellStatsEvent private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "TestingEnableCellStatsEvent",
+            default = false.toByte().toString(),
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [TestingMinExitFlagThreshold](https://2019.www.torproject.org/docs/tor-manual.html.en#TestingMinExitFlagThreshold)
+     *
+     * TODO: Implement
+     * */
+    @KmpTorDsl
+    public class TestingMinExitFlagThreshold private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "TestingMinExitFlagThreshold",
+            default = "0",
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [TestingLinkCertLifetime](https://2019.www.torproject.org/docs/tor-manual.html.en#TestingLinkCertLifetime)
+     *
+     * TODO: Implement
+     * */
+    @KmpTorDsl
+    public class TestingLinkCertLifetime private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "TestingLinkCertLifetime",
+            default = 2.days.inWholeSeconds.toString(),
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [TestingAuthKeyLifetime](https://2019.www.torproject.org/docs/tor-manual.html.en#TestingAuthKeyLifetime)
+     *
+     * TODO: Implement
+     * */
+    @KmpTorDsl
+    public class TestingAuthKeyLifetime private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "TestingAuthKeyLifetime",
+            default = 2.days.inWholeSeconds.toString(),
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [TestingSigningKeySlop](https://2019.www.torproject.org/docs/tor-manual.html.en#TestingSigningKeySlop)
+     *
+     * TODO: Implement
+     * */
+    @KmpTorDsl
+    public class TestingSigningKeySlop private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "TestingSigningKeySlop",
+            default = 1.days.inWholeSeconds.toString(),
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    //////////////////////////////
+    //  NON_PERSISTENT OPTIONS  //
+    //////////////////////////////
+
+    /**
+     * [__DirPort](https://2019.www.torproject.org/docs/tor-manual.html.en#DirPort)
+     *
+     * TODO: Implement
+     * */
+    @KmpTorDsl
+    public class __DirPort private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "__DirPort",
+            default = "",
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [__ExtORPort](https://2019.www.torproject.org/docs/tor-manual.html.en#ExtORPort)
+     *
+     * TODO: Implement
+     * */
+    @KmpTorDsl
+    public class __ExtORPort private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "__ExtORPort",
+            default = "",
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [__ORPort](https://2019.www.torproject.org/docs/tor-manual.html.en#ORPort)
+     *
+     * TODO: Implement
+     * */
+    @KmpTorDsl
+    public class __ORPort private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "__ORPort",
+            default = "",
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [__AllDirActionsPrivate](https://2019.www.torproject.org/docs/tor-manual.html.en#AllDirActionsPrivate)
+     *
+     * TODO: Implement
+     * */
+    @KmpTorDsl
+    public class __AllDirActionsPrivate private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "__AllDirActionsPrivate",
+            default = "",
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [__DisablePredictedCircuits](https://2019.www.torproject.org/docs/tor-manual.html.en#DisablePredictedCircuits)
+     *
+     * TODO: Implement
+     * */
+    @KmpTorDsl
+    public class __DisablePredictedCircuits private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "__DisablePredictedCircuits",
+            default = "",
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [__LeaveStreamsUnattached](https://2019.www.torproject.org/docs/tor-manual.html.en#LeaveStreamsUnattached)
+     *
+     * TODO: Implement
+     * */
+    @KmpTorDsl
+    public class __LeaveStreamsUnattached private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "__LeaveStreamsUnattached",
+            default = "",
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [__HashedControlSessionPassword](https://2019.www.torproject.org/docs/tor-manual.html.en#HashedControlSessionPassword)
+     *
+     * TODO: Implement
+     * */
+    @KmpTorDsl
+    public class __HashedControlSessionPassword private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "__HashedControlSessionPassword",
+            default = "",
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [__ReloadTorrcOnSIGHUP](https://2019.www.torproject.org/docs/tor-manual.html.en#__ReloadTorrcOnSIGHUP)
+     *
+     * TODO: Implement
+     * */
+    @KmpTorDsl
+    public class __ReloadTorrcOnSIGHUP private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "__ReloadTorrcOnSIGHUP",
+            default = "",
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [__OwningControllerFD](https://2019.www.torproject.org/docs/tor-manual.html.en#__OwningControllerFD)
+     *
+     * TODO: Implement
+     * */
+    @KmpTorDsl
+    public class __OwningControllerFD private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "__OwningControllerFD",
+            default = "",
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [__DisableSignalHandlers](https://2019.www.torproject.org/docs/tor-manual.html.en#__DisableSignalHandlers)
+     *
+     * TODO: Implement
+     * */
+    @KmpTorDsl
+    public class __DisableSignalHandlers private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "__DisableSignalHandlers",
+            default = "",
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
         )
     }
 

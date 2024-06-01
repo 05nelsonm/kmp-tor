@@ -25,6 +25,7 @@ import io.matthewnelson.kmp.tor.runtime.core.TorConfig
 import io.matthewnelson.kmp.tor.runtime.core.ctrl.ConfigEntry
 import io.matthewnelson.kmp.tor.runtime.core.ctrl.TorCmd
 import io.matthewnelson.kmp.tor.runtime.core.util.executeAsync
+import io.matthewnelson.kmp.tor.runtime.test.TestUtils
 import io.matthewnelson.kmp.tor.runtime.test.TestUtils.ensureStoppedOnTestCompletion
 import io.matthewnelson.kmp.tor.runtime.test.TestUtils.testEnv
 import kotlinx.coroutines.test.runTest
@@ -53,13 +54,13 @@ class TorCmdUnitTest {
 //            println(entries.first())
         }
 
-        KEYWORDS.forEach { kw ->
+        TestUtils.KEYWORDS.forEach { kw ->
             runtime.enqueue(TorCmd.Config.Get(kw), onFailure, onSuccess)
         }
 
         // Will suspend test until all previously enqueued jobs complete.
         // This also ensures that multi-keyword requests are functional.
-        val result = runtime.executeAsync(TorCmd.Config.Get(
+        val resultMulti = runtime.executeAsync(TorCmd.Config.Get(
             TorConfig.ConnectionPadding,
             TorConfig.DataDirectory,
         ))
@@ -78,57 +79,6 @@ class TorCmdUnitTest {
             e?.let { err -> throw err }
         }
 
-        assertEquals(2, result.size)
-    }
-
-    private companion object {
-
-        val KEYWORDS by lazy { setOf(
-
-            // Implemented settings
-            TorConfig.__ControlPort,
-            TorConfig.__DNSPort,
-            TorConfig.__HTTPTunnelPort,
-            TorConfig.__OwningControllerProcess,
-            TorConfig.__SocksPort,
-            TorConfig.__TransPort,
-            TorConfig.AutomapHostsOnResolve,
-            TorConfig.AutomapHostsSuffixes,
-            TorConfig.CacheDirectory,
-            TorConfig.ClientOnionAuthDir,
-            TorConfig.ConnectionPadding,
-            TorConfig.ControlPortWriteToFile,
-            TorConfig.CookieAuthentication,
-            TorConfig.CookieAuthFile,
-            TorConfig.DataDirectory,
-            TorConfig.DisableNetwork,
-            TorConfig.DormantCanceledByStartup,
-            TorConfig.DormantClientTimeout,
-            TorConfig.DormantOnFirstStartup,
-            TorConfig.DormantTimeoutDisabledByIdleStreams,
-            TorConfig.GeoIPExcludeUnknown,
-            TorConfig.GeoIPFile,
-            TorConfig.GeoIPv6File,
-            TorConfig.HiddenServiceDir,
-            TorConfig.HiddenServicePort,
-            TorConfig.HiddenServiceVersion,
-            TorConfig.HiddenServiceAllowUnknownPorts,
-            TorConfig.HiddenServiceMaxStreams,
-            TorConfig.HiddenServiceMaxStreamsCloseCircuit,
-            TorConfig.HiddenServiceDirGroupReadable,
-            TorConfig.HiddenServiceNumIntroductionPoints,
-            TorConfig.RunAsDaemon,
-            TorConfig.SyslogIdentityTag,
-            TorConfig.AndroidIdentityTag,
-            TorConfig.VirtualAddrNetworkIPv4,
-            TorConfig.VirtualAddrNetworkIPv6,
-
-            // Not implemented settings
-            TorConfig.ControlPort,
-            TorConfig.DNSPort,
-            TorConfig.HTTPTunnelPort,
-            TorConfig.SocksPort,
-            TorConfig.TransPort,
-        ) }
+        assertEquals(2, resultMulti.size)
     }
 }
