@@ -192,17 +192,13 @@ public class TorState private constructor(
     internal abstract class AbstractManager internal constructor(fid: FileID?): Manager {
 
         @Volatile
-        private var _state: TorState = of(
-            daemon = Daemon.Off,
-            network = Network.Disabled,
-            fid = fid,
-        )
-        @Volatile
         private var _isReady: Boolean = false
+        @Volatile
+        private var _state: TorState = of(Daemon.Off, Network.Disabled, fid = fid)
         private val lock = SynchronizedObject()
 
-        internal val state: TorState get() = _state
         internal val isReady: Boolean get() = _isReady
+        internal val state: TorState get() = _state
 
         protected abstract fun notify(old: TorState, new: TorState)
         protected abstract fun notifyReady()
@@ -225,7 +221,7 @@ public class TorState private constructor(
                 val new = old.copy(_daemon, _network)
                 val diff = Diff.of(old, new) ?: return@synchronized null
 
-                _state = diff.new
+                _state = new
 
                 val notifyReady = if (_isReady) {
                     if (!new.daemon.isBootstrapped) {

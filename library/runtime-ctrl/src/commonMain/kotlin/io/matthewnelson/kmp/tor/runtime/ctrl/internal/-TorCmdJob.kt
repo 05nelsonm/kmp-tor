@@ -17,8 +17,10 @@
 
 package io.matthewnelson.kmp.tor.runtime.ctrl.internal
 
+import io.matthewnelson.immutable.collections.toImmutableList
 import io.matthewnelson.immutable.collections.toImmutableMap
 import io.matthewnelson.kmp.file.InterruptedException
+import io.matthewnelson.kmp.tor.runtime.core.ctrl.ConfigEntry
 import io.matthewnelson.kmp.tor.runtime.core.ctrl.Reply
 import io.matthewnelson.kmp.tor.runtime.core.ctrl.Reply.Error.Companion.toError
 import io.matthewnelson.kmp.tor.runtime.core.ctrl.TorCmd
@@ -84,9 +86,25 @@ internal fun TorCmdJob<*>.respond(replies: ArrayList<Reply>) {
     }
 }
 
-@Suppress("NOTHING_TO_INLINE")
-private inline fun TorCmd.Config.Get.complete(job: TorCmdJob<*>, replies: ArrayList<Reply.Success>) {
-    TODO()
+private fun TorCmd.Config.Get.complete(job: TorCmdJob<*>, replies: ArrayList<Reply.Success>) {
+    val entries = ArrayList<ConfigEntry>(replies.size)
+
+    for (reply in replies) {
+        if (reply is Reply.Success.OK) continue
+
+        val kvp = reply.message
+        val i = kvp.indexOf('=')
+
+        val entry = if (i == -1) {
+            ConfigEntry(kvp)
+        } else {
+            ConfigEntry(kvp.substring(0, i), kvp.substring(i + 1))
+        }
+
+        entries.add(entry)
+    }
+
+    job.unsafeCast<List<ConfigEntry>>().completion(entries.toImmutableList())
 }
 
 @Suppress("NOTHING_TO_INLINE")
@@ -108,17 +126,17 @@ private inline fun TorCmd.Info.Get.complete(job: TorCmdJob<*>, replies: ArrayLis
 
 @Suppress("NOTHING_TO_INLINE")
 private inline fun TorCmd.MapAddress.complete(job: TorCmdJob<*>, replies: ArrayList<Reply.Success>) {
-    TODO()
+    TODO("Issue #418")
 }
 
 @Suppress("NOTHING_TO_INLINE")
 private inline fun TorCmd.Onion.Add.complete(job: TorCmdJob<*>, replies: ArrayList<Reply.Success>) {
-    TODO()
+    TODO("Issue #419")
 }
 
 @Suppress("NOTHING_TO_INLINE")
 private inline fun TorCmd.OnionClientAuth.View.complete(job: TorCmdJob<*>, replies: ArrayList<Reply.Success>) {
-    TODO()
+    TODO("Issue #421")
 }
 
 @Suppress("NOTHING_TO_INLINE")

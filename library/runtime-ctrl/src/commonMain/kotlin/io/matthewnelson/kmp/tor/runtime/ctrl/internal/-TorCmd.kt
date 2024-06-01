@@ -61,8 +61,7 @@ internal fun TorCmd<*>.signalNameOrNull(): String? = when (this) {
     }
 }
 
-@Suppress("NOTHING_TO_INLINE")
-private inline fun TorCmd.Authenticate.encode(LOG: Debugger?): ByteArray {
+private fun TorCmd.Authenticate.encode(LOG: Debugger?): ByteArray {
     return StringBuilder(keyword).apply {
         val redacted = if (hex.isNotEmpty()) {
             SP().append(hex)
@@ -76,9 +75,8 @@ private inline fun TorCmd.Authenticate.encode(LOG: Debugger?): ByteArray {
     }.encodeToByteArray(fill = true)
 }
 
-@Suppress("NOTHING_TO_INLINE")
 @Throws(IllegalArgumentException::class)
-private inline fun TorCmd.Config.Get.encode(LOG: Debugger?): ByteArray {
+private fun TorCmd.Config.Get.encode(LOG: Debugger?): ByteArray {
     require(keywords.isNotEmpty()) { "A minimum of 1 keyword is required" }
 
     return StringBuilder(keyword).apply {
@@ -90,9 +88,8 @@ private inline fun TorCmd.Config.Get.encode(LOG: Debugger?): ByteArray {
     }.encodeToByteArray()
 }
 
-@Suppress("NOTHING_TO_INLINE")
 @Throws(IllegalArgumentException::class)
-private inline fun TorCmd.Config.Load.encode(LOG: Debugger?): ByteArray {
+private fun TorCmd.Config.Load.encode(LOG: Debugger?): ByteArray {
     require(configText.isNotBlank()) { "configText cannot be blank" }
 
     return StringBuilder().apply {
@@ -114,9 +111,8 @@ private inline fun TorCmd.Config.Load.encode(LOG: Debugger?): ByteArray {
     }.encodeToByteArray(fill = true)
 }
 
-@Suppress("NOTHING_TO_INLINE")
 @Throws(IllegalArgumentException::class)
-private inline fun TorCmd.Config.Reset.encode(LOG: Debugger?): ByteArray {
+private fun TorCmd.Config.Reset.encode(LOG: Debugger?): ByteArray {
     require(keywords.isNotEmpty()) { "A minimum of 1 keyword is required" }
 
     return StringBuilder(keyword).apply {
@@ -128,8 +124,7 @@ private inline fun TorCmd.Config.Reset.encode(LOG: Debugger?): ByteArray {
     }.encodeToByteArray()
 }
 
-@Suppress("NOTHING_TO_INLINE")
-private inline fun TorCmd.Config.Save.encode(LOG: Debugger?): ByteArray {
+private fun TorCmd.Config.Save.encode(LOG: Debugger?): ByteArray {
     return StringBuilder(keyword).apply {
         if (force) {
             SP().append("FORCE")
@@ -139,9 +134,8 @@ private inline fun TorCmd.Config.Save.encode(LOG: Debugger?): ByteArray {
     }.encodeToByteArray()
 }
 
-@Suppress("NOTHING_TO_INLINE")
 @Throws(IllegalArgumentException::class)
-private inline fun TorCmd.Config.Set.encode(LOG: Debugger?): ByteArray {
+private fun TorCmd.Config.Set.encode(LOG: Debugger?): ByteArray {
     require(settings.isNotEmpty()) { "A minimum of 1 setting is required" }
 
     return StringBuilder(keyword).apply {
@@ -182,17 +176,15 @@ private inline fun TorCmd.Config.Set.encode(LOG: Debugger?): ByteArray {
     }.encodeToByteArray(fill = true)
 }
 
-@Suppress("NOTHING_TO_INLINE")
-private inline fun TorCmd.DropGuards.encode(LOG: Debugger?): ByteArray {
+private fun TorCmd.DropGuards.encode(LOG: Debugger?): ByteArray {
     return StringBuilder(keyword).apply {
         LOG.d { ">> ${toString()}" }
         CRLF()
     }.encodeToByteArray()
 }
 
-@Suppress("NOTHING_TO_INLINE")
 @Throws(IllegalArgumentException::class)
-private inline fun TorCmd.Hs.Fetch.encode(LOG: Debugger?): ByteArray {
+private fun TorCmd.Hs.Fetch.encode(LOG: Debugger?): ByteArray {
     return StringBuilder(keyword).apply {
         SP().append(address)
 
@@ -208,9 +200,8 @@ private inline fun TorCmd.Hs.Fetch.encode(LOG: Debugger?): ByteArray {
     }.encodeToByteArray()
 }
 
-@Suppress("NOTHING_TO_INLINE")
 @Throws(IllegalArgumentException::class)
-private inline fun TorCmd.Info.Get.encode(LOG: Debugger?): ByteArray {
+private fun TorCmd.Info.Get.encode(LOG: Debugger?): ByteArray {
     require(keywords.isNotEmpty()) { "A minimum of 1 keyword is required" }
 
     return StringBuilder(keyword).apply {
@@ -226,21 +217,18 @@ private inline fun TorCmd.Info.Get.encode(LOG: Debugger?): ByteArray {
     }.encodeToByteArray()
 }
 
-@Suppress("NOTHING_TO_INLINE")
 @Throws(IllegalArgumentException::class)
-private inline fun TorCmd.MapAddress.encode(LOG: Debugger?): ByteArray {
+private fun TorCmd.MapAddress.encode(LOG: Debugger?): ByteArray {
     require(mappings.isNotEmpty()) { "A minimum of 1 mapping is required" }
 
-    TODO()
+    TODO("Issue #418")
 }
 
-@Suppress("NOTHING_TO_INLINE")
-private inline fun TorCmd.Onion.Add.encode(LOG: Debugger?): ByteArray {
-    TODO()
+private fun TorCmd.Onion.Add.encode(LOG: Debugger?): ByteArray {
+    TODO("Issue #419")
 }
 
-@Suppress("NOTHING_TO_INLINE")
-private inline fun TorCmd.Onion.Delete.encode(LOG: Debugger?): ByteArray {
+private fun TorCmd.Onion.Delete.encode(LOG: Debugger?): ByteArray {
     return StringBuilder(keyword).apply {
         SP().append(address)
         LOG.d { ">> ${toString()}" }
@@ -248,13 +236,11 @@ private inline fun TorCmd.Onion.Delete.encode(LOG: Debugger?): ByteArray {
     }.encodeToByteArray()
 }
 
-@Suppress("NOTHING_TO_INLINE")
-private inline fun TorCmd.OnionClientAuth.Add.encode(LOG: Debugger?): ByteArray {
-    TODO()
+private fun TorCmd.OnionClientAuth.Add.encode(LOG: Debugger?): ByteArray {
+    TODO("Issue #420")
 }
 
-@Suppress("NOTHING_TO_INLINE")
-private inline fun TorCmd.OnionClientAuth.Remove.encode(LOG: Debugger?): ByteArray {
+private fun TorCmd.OnionClientAuth.Remove.encode(LOG: Debugger?): ByteArray {
     return StringBuilder(keyword).apply {
         SP().append(address)
         LOG.d { ">> ${toString()}" }
@@ -262,8 +248,7 @@ private inline fun TorCmd.OnionClientAuth.Remove.encode(LOG: Debugger?): ByteArr
     }.encodeToByteArray()
 }
 
-@Suppress("NOTHING_TO_INLINE")
-private inline fun TorCmd.OnionClientAuth.View.encode(LOG: Debugger?): ByteArray {
+private fun TorCmd.OnionClientAuth.View.encode(LOG: Debugger?): ByteArray {
     return StringBuilder(keyword).apply {
         if (address != null) {
             SP().append(address)
@@ -273,25 +258,22 @@ private inline fun TorCmd.OnionClientAuth.View.encode(LOG: Debugger?): ByteArray
     }.encodeToByteArray()
 }
 
-@Suppress("NOTHING_TO_INLINE")
-private inline fun TorCmd.Ownership.Drop.encode(LOG: Debugger?): ByteArray {
+private fun TorCmd.Ownership.Drop.encode(LOG: Debugger?): ByteArray {
     return StringBuilder(keyword).apply {
         LOG.d { ">> ${toString()}" }
         CRLF()
     }.encodeToByteArray()
 }
 
-@Suppress("NOTHING_TO_INLINE")
-private inline fun TorCmd.Ownership.Take.encode(LOG: Debugger?): ByteArray {
+private fun TorCmd.Ownership.Take.encode(LOG: Debugger?): ByteArray {
     return StringBuilder(keyword).apply {
         LOG.d { ">> ${toString()}" }
         CRLF()
     }.encodeToByteArray()
 }
 
-@Suppress("NOTHING_TO_INLINE")
 @Throws(IllegalArgumentException::class)
-private inline fun TorCmd.Resolve.encode(LOG: Debugger?): ByteArray {
+private fun TorCmd.Resolve.encode(LOG: Debugger?): ByteArray {
     require(hostname.isNotEmpty()) { "hostname cannot be empty" }
     require(!hostname.hasWhitespace()) { "hostname cannot contain whitespace" }
 
@@ -305,8 +287,7 @@ private inline fun TorCmd.Resolve.encode(LOG: Debugger?): ByteArray {
     }.encodeToByteArray()
 }
 
-@Suppress("NOTHING_TO_INLINE")
-private inline fun TorCmd.SetEvents.encode(LOG: Debugger?): ByteArray {
+private fun TorCmd.SetEvents.encode(LOG: Debugger?): ByteArray {
     return StringBuilder(keyword).apply {
         for (event in events) {
             SP().append(event.name)
@@ -316,9 +297,8 @@ private inline fun TorCmd.SetEvents.encode(LOG: Debugger?): ByteArray {
     }.encodeToByteArray()
 }
 
-@Suppress("NOTHING_TO_INLINE")
 @Throws(IllegalArgumentException::class)
-private inline fun TorCmd<*>.encodeSignal(LOG: Debugger?): ByteArray {
+private fun TorCmd<*>.encodeSignal(LOG: Debugger?): ByteArray {
     val name = signalNameOrNull()
         ?: throw IllegalArgumentException("${this::class} is not a SIGNAL command")
 
@@ -349,11 +329,4 @@ private inline fun StringBuilder.encodeToByteArray(fill: Boolean = false): ByteA
 }
 
 @Suppress("NOTHING_TO_INLINE")
-private inline fun String.hasWhitespace(): Boolean {
-    for (c in this) {
-        if (!c.isWhitespace()) continue
-        return true
-    }
-
-    return false
-}
+private inline fun String.hasWhitespace(): Boolean = indexOfFirst { it.isWhitespace() } != -1

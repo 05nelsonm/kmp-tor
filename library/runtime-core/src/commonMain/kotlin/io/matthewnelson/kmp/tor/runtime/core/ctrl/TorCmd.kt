@@ -299,7 +299,7 @@ public sealed class TorCmd<Success: Any> private constructor(
          * [docs](https://torproject.gitlab.io/torspec/control-spec/#add_onion)
          * */
         public class Add private constructor(
-            // TODO: Builder
+            // TODO: Issue #419
         ): Unprivileged<HiddenServiceEntry>("ADD_ONION")
 
         /**
@@ -324,7 +324,7 @@ public sealed class TorCmd<Success: Any> private constructor(
          * [docs](https://torproject.gitlab.io/torspec/control-spec/#onion_client_auth_add)
          * */
         public class Add private constructor(
-            // TODO
+            // TODO: Issue #420
         ): Unprivileged<Reply.Success>("ONION_CLIENT_AUTH_ADD")
 
         /**
@@ -443,7 +443,7 @@ public sealed class TorCmd<Success: Any> private constructor(
         public data object Debug: Unprivileged<Reply.Success.OK>("SIGNAL")
 
         /**
-         * See [io.matthewnelson.kmp.tor.runtime.RuntimeEvent.EXECUTE.CMD.observeNewNym]
+         * See [io.matthewnelson.kmp.tor.runtime.RuntimeEvent.EXECUTE.CMD.observeSignalNewNym]
          * */
         public data object NewNym: Unprivileged<Reply.Success.OK>("SIGNAL")
 

@@ -290,14 +290,6 @@ public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$ConnectionPad
 public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$ConnectionPadding$Companion : io/matthewnelson/kmp/tor/runtime/core/TorConfig$Setting$Factory {
 }
 
-public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$ConnectionPaddingReduced : io/matthewnelson/kmp/tor/runtime/core/TorConfig$Setting$Builder {
-	public static final field Companion Lio/matthewnelson/kmp/tor/runtime/core/TorConfig$ConnectionPaddingReduced$Companion;
-	public field enable Z
-}
-
-public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$ConnectionPaddingReduced$Companion : io/matthewnelson/kmp/tor/runtime/core/TorConfig$Setting$Factory {
-}
-
 public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$ControlPortWriteToFile : io/matthewnelson/kmp/tor/runtime/core/TorConfig$Setting$Builder {
 	public static final field Companion Lio/matthewnelson/kmp/tor/runtime/core/TorConfig$ControlPortWriteToFile$Companion;
 	public static final field DEFAULT_NAME Ljava/lang/String;
@@ -1155,7 +1147,17 @@ public final class io/matthewnelson/kmp/tor/runtime/core/ctrl/ClientAuthEntry {
 }
 
 public final class io/matthewnelson/kmp/tor/runtime/core/ctrl/ConfigEntry {
-	public fun <init> ()V
+	public final field key Ljava/lang/String;
+	public final field value Ljava/lang/String;
+	public fun <init> (Ljava/lang/String;)V
+	public fun <init> (Ljava/lang/String;Ljava/lang/String;)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun component2 ()Ljava/lang/String;
+	public final fun copy (Ljava/lang/String;Ljava/lang/String;)Lio/matthewnelson/kmp/tor/runtime/core/ctrl/ConfigEntry;
+	public static synthetic fun copy$default (Lio/matthewnelson/kmp/tor/runtime/core/ctrl/ConfigEntry;Ljava/lang/String;Ljava/lang/String;ILjava/lang/Object;)Lio/matthewnelson/kmp/tor/runtime/core/ctrl/ConfigEntry;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
 }
 
 public final class io/matthewnelson/kmp/tor/runtime/core/ctrl/HiddenServiceEntry {

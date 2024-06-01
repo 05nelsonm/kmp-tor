@@ -286,7 +286,7 @@ internal class RealTorCtrl private constructor(
                     cmdJob.error(InterruptedException("CtrlConnection Stream Ended"))
                     throw e
                 } catch (e: NotImplementedError) {
-                    // TODO
+                    // TODO: Issue #421
                     cmdJob.error(e)
                 }
             }.invokeOnCompletion { t ->

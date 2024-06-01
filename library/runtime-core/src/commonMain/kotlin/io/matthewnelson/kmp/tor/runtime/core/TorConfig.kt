@@ -832,27 +832,6 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [ConnectionPaddingReduced](https://2019.www.torproject.org/docs/tor-manual.html.en#ConnectionPaddingReduced)
-     * */
-    @KmpTorDsl
-    public class ConnectionPaddingReduced private constructor(): Setting.Builder(
-        keyword = Companion,
-    ) {
-
-        @JvmField
-        public var enable: Boolean = false
-
-        public companion object: Setting.Factory<ConnectionPaddingReduced, Setting>(
-            name = "ConnectionPaddingReduced",
-            attributes = emptySet(),
-            isCmdLineArg = false,
-            isUnique = true,
-            factory = { ConnectionPaddingReduced() },
-            build = { build(enable.toByte().toString())!! },
-        )
-    }
-
-    /**
      * [ControlPortWriteToFile](https://2019.www.torproject.org/docs/tor-manual.html.en#ControlPortWriteToFile)
      * */
     @KmpTorDsl

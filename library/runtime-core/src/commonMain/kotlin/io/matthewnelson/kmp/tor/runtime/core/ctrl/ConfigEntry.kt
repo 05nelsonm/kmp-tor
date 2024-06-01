@@ -15,7 +15,16 @@
  **/
 package io.matthewnelson.kmp.tor.runtime.core.ctrl
 
-public class ConfigEntry {
+import kotlin.jvm.JvmField
 
-    // TODO
+public data class ConfigEntry(
+    @JvmField
+    public val key: String,
+    @JvmField
+    public val value: String,
+) {
+
+    public constructor(key: String): this(key, "")
+
+    public override fun toString(): String = "ConfigEntry[key=$key, value=$value]"
 }
