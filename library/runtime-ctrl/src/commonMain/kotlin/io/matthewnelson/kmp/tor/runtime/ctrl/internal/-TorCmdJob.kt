@@ -95,13 +95,23 @@ private fun TorCmd.Config.Get.complete(job: TorCmdJob<*>, replies: ArrayList<Rep
         val kvp = reply.message
         val i = kvp.indexOf('=')
 
-        val entry = if (i == -1) {
-            ConfigEntry(kvp)
+        val key = run {
+            val key = if (i == -1) {
+                kvp
+            } else {
+                kvp.substring(0, i)
+            }
+
+            keywords.firstOrNull { it.name == key }
+        } ?: continue
+
+        val value = if (i == -1) {
+            ""
         } else {
-            ConfigEntry(kvp.substring(0, i), kvp.substring(i + 1))
+            kvp.substring(i + 1)
         }
 
-        entries.add(entry)
+        entries.add(ConfigEntry(key, value))
     }
 
     job.unsafeCast<List<ConfigEntry>>().completion(entries.toImmutableList())

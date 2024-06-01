@@ -15,16 +15,15 @@
  **/
 package io.matthewnelson.kmp.tor.runtime.core.ctrl
 
+import io.matthewnelson.kmp.tor.runtime.core.TorConfig
 import kotlin.jvm.JvmField
 
 public data class ConfigEntry(
     @JvmField
-    public val key: String,
+    public val key: TorConfig.Keyword,
     @JvmField
     public val value: String,
 ) {
-
-    public constructor(key: String): this(key, "")
 
     public override fun toString(): String = "ConfigEntry[key=$key, value=$value]"
 }

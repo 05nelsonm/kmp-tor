@@ -37,7 +37,7 @@ class TorCmdUnitTest {
     @Test
     fun givenConfigGet_whenKeyword_thenIsRecognizedByTor() = runTest {
         val runtime = TorRuntime.Builder(testEnv("cmd_getconf_test")) {
-//            observerStatic(RuntimeEvent.LOG.DEBUG) { println(it) }
+            observerStatic(RuntimeEvent.LOG.DEBUG) { println(it) }
         }.ensureStoppedOnTestCompletion()
 
         runtime.startDaemonAsync()
@@ -45,13 +45,19 @@ class TorCmdUnitTest {
         val failures = mutableListOf<Throwable>()
         val lock = SynchronizedObject()
 
-        val onFailure = OnFailure { synchronized(lock) { failures.add(it) } }
-
-        KEYWORDS.forEach { kw ->
-            runtime.enqueue(TorCmd.Config.Get(kw), onFailure, OnSuccess.noOp())
+        val onFailure = OnFailure { t ->
+            synchronized(lock) { failures.add(t) }
+        }
+        val onSuccess = OnSuccess<List<ConfigEntry>> { entries ->
+            assertEquals(1, entries.size)
         }
 
-        // will suspend test until all previously enqueued jobs complete
+        KEYWORDS.forEach { kw ->
+            runtime.enqueue(TorCmd.Config.Get(kw), onFailure, onSuccess)
+        }
+
+        // Will suspend test until all previously enqueued jobs complete.
+        // This also ensures that multi-keyword requests are functional.
         val result = runtime.executeAsync(TorCmd.Config.Get(
             TorConfig.ConnectionPadding,
             TorConfig.DataDirectory,

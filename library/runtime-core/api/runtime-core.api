@@ -1147,14 +1147,13 @@ public final class io/matthewnelson/kmp/tor/runtime/core/ctrl/ClientAuthEntry {
 }
 
 public final class io/matthewnelson/kmp/tor/runtime/core/ctrl/ConfigEntry {
-	public final field key Ljava/lang/String;
+	public final field key Lio/matthewnelson/kmp/tor/runtime/core/TorConfig$Keyword;
 	public final field value Ljava/lang/String;
-	public fun <init> (Ljava/lang/String;)V
-	public fun <init> (Ljava/lang/String;Ljava/lang/String;)V
-	public final fun component1 ()Ljava/lang/String;
+	public fun <init> (Lio/matthewnelson/kmp/tor/runtime/core/TorConfig$Keyword;Ljava/lang/String;)V
+	public final fun component1 ()Lio/matthewnelson/kmp/tor/runtime/core/TorConfig$Keyword;
 	public final fun component2 ()Ljava/lang/String;
-	public final fun copy (Ljava/lang/String;Ljava/lang/String;)Lio/matthewnelson/kmp/tor/runtime/core/ctrl/ConfigEntry;
-	public static synthetic fun copy$default (Lio/matthewnelson/kmp/tor/runtime/core/ctrl/ConfigEntry;Ljava/lang/String;Ljava/lang/String;ILjava/lang/Object;)Lio/matthewnelson/kmp/tor/runtime/core/ctrl/ConfigEntry;
+	public final fun copy (Lio/matthewnelson/kmp/tor/runtime/core/TorConfig$Keyword;Ljava/lang/String;)Lio/matthewnelson/kmp/tor/runtime/core/ctrl/ConfigEntry;
+	public static synthetic fun copy$default (Lio/matthewnelson/kmp/tor/runtime/core/ctrl/ConfigEntry;Lio/matthewnelson/kmp/tor/runtime/core/TorConfig$Keyword;Ljava/lang/String;ILjava/lang/Object;)Lio/matthewnelson/kmp/tor/runtime/core/ctrl/ConfigEntry;
 	public fun equals (Ljava/lang/Object;)Z
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
