@@ -1184,8 +1184,8 @@ public final class io/matthewnelson/kmp/tor/runtime/core/ctrl/ClientAuthEntry {
 
 public final class io/matthewnelson/kmp/tor/runtime/core/ctrl/ConfigEntry {
 	public final field isDefault Z
-	public final field key Lio/matthewnelson/kmp/tor/runtime/core/TorConfig$Keyword;
-	public final field value Ljava/lang/String;
+	public final field keyword Lio/matthewnelson/kmp/tor/runtime/core/TorConfig$Keyword;
+	public final field setting Ljava/lang/String;
 	public fun <init> (Lio/matthewnelson/kmp/tor/runtime/core/TorConfig$Keyword;Ljava/lang/String;)V
 	public final fun component1 ()Lio/matthewnelson/kmp/tor/runtime/core/TorConfig$Keyword;
 	public final fun component2 ()Ljava/lang/String;

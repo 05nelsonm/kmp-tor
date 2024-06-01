@@ -29,24 +29,33 @@ public data class ConfigEntry(
      * The [TorConfig] keyword for this entry.
      * */
     @JvmField
-    public val key: TorConfig.Keyword,
+    public val keyword: TorConfig.Keyword,
 
     /**
-     * The value tor is using for this [key], as returned by its
+     * The value tor is using for this [keyword], as returned by its
      * control connection.
      *
-     * If empty, then tor's set value for the given [key] is the
+     * If empty, then tor's set value for the given [keyword] is the
      * default value, as defined by [TorConfig.Keyword.default].
      * */
     @JvmField
-    public val value: String,
+    public val setting: String,
 ) {
 
     /**
-     * If tor is using the default value for the given [key] for this entry.
+     * If tor is using the default value for the given [keyword] for this entry.
      * */
     @JvmField
-    public val isDefault: Boolean = if (value.isEmpty()) true else value == key.default
+    public val isDefault: Boolean = if (setting.isEmpty()) true else setting == keyword.default
 
-    public override fun toString(): String = "ConfigEntry[key=$key, value=$value, isDefault=$isDefault]"
+    public override fun toString(): String = buildString {
+        appendLine("ConfigEntry: [")
+        append("    keyword: ")
+        appendLine(keyword)
+        append("    setting: ")
+        appendLine(setting)
+        append("    isDefault: ")
+        appendLine(isDefault)
+        append(']')
+    }
 }

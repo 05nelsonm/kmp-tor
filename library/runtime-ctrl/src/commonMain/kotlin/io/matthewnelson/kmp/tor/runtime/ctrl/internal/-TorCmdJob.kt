@@ -107,13 +107,13 @@ private fun TorCmd.Config.Get.complete(job: TorCmdJob<*>, replies: ArrayList<Rep
             keywords.first { it.name.equals(key, ignoreCase = true) }
         }
 
-        val value = if (i == -1) {
+        val setting = if (i == -1) {
             ""
         } else {
             kvp.substring(i + 1)
         }
 
-        entries.add(ConfigEntry(keyword, value))
+        entries.add(ConfigEntry(keyword, setting))
     }
 
     job.unsafeCast<List<ConfigEntry>>().completion(entries.toImmutableList())

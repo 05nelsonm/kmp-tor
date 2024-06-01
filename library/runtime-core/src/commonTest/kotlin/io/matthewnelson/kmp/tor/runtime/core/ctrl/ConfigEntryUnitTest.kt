@@ -32,6 +32,6 @@ class ConfigEntryUnitTest {
     fun givenEntry_whenValueIsNotEmpty_thenChecksKeywordDefault() {
         val entry = ConfigEntry(TorConfig.__SocksPort, TorConfig.__SocksPort.default)
         assertTrue(entry.isDefault)
-        assertFalse(entry.copy(value = "9055").isDefault)
+        assertFalse(entry.copy(setting = "9055").isDefault)
     }
 }
