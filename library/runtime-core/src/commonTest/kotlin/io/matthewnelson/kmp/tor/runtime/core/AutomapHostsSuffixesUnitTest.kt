@@ -59,7 +59,7 @@ class AutomapHostsSuffixesUnitTest {
     @Test
     fun givenEmptySuffixes_whenBuild_thenUsesDefault() {
         val setting = TorConfig.AutomapHostsSuffixes.Builder {}
-        assertEquals(".exit,.onion", setting.argument)
+        assertEquals(".onion,.exit", setting.argument)
     }
 
     @Test

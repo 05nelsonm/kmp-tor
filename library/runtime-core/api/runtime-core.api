@@ -290,6 +290,13 @@ public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$ConnectionPad
 public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$ConnectionPadding$Companion : io/matthewnelson/kmp/tor/runtime/core/TorConfig$Setting$Factory {
 }
 
+public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$ControlPort : io/matthewnelson/kmp/tor/runtime/core/TorConfig$Setting$Builder {
+	public static final field Companion Lio/matthewnelson/kmp/tor/runtime/core/TorConfig$ControlPort$Companion;
+}
+
+public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$ControlPort$Companion : io/matthewnelson/kmp/tor/runtime/core/TorConfig$Keyword {
+}
+
 public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$ControlPortWriteToFile : io/matthewnelson/kmp/tor/runtime/core/TorConfig$Setting$Builder {
 	public static final field Companion Lio/matthewnelson/kmp/tor/runtime/core/TorConfig$ControlPortWriteToFile$Companion;
 	public static final field DEFAULT_NAME Ljava/lang/String;
@@ -314,6 +321,13 @@ public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$CookieAuthent
 }
 
 public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$CookieAuthentication$Companion : io/matthewnelson/kmp/tor/runtime/core/TorConfig$Setting$Factory {
+}
+
+public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$DNSPort : io/matthewnelson/kmp/tor/runtime/core/TorConfig$Setting$Builder {
+	public static final field Companion Lio/matthewnelson/kmp/tor/runtime/core/TorConfig$DNSPort$Companion;
+}
+
+public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$DNSPort$Companion : io/matthewnelson/kmp/tor/runtime/core/TorConfig$Keyword {
 }
 
 public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$DataDirectory : io/matthewnelson/kmp/tor/runtime/core/TorConfig$Setting$Builder {
@@ -401,6 +415,13 @@ public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$GeoIPv6File :
 }
 
 public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$GeoIPv6File$Companion : io/matthewnelson/kmp/tor/runtime/core/TorConfig$Setting$Factory {
+}
+
+public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$HTTPTunnelPort : io/matthewnelson/kmp/tor/runtime/core/TorConfig$Setting$Builder {
+	public static final field Companion Lio/matthewnelson/kmp/tor/runtime/core/TorConfig$HTTPTunnelPort$Companion;
+}
+
+public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$HTTPTunnelPort$Companion : io/matthewnelson/kmp/tor/runtime/core/TorConfig$Keyword {
 }
 
 public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$HiddenServiceAllowUnknownPorts {
@@ -591,12 +612,26 @@ public abstract class io/matthewnelson/kmp/tor/runtime/core/TorConfig$Setting$Fa
 	public final fun Builder (Lio/matthewnelson/kmp/tor/runtime/core/ThisBlock;)Lio/matthewnelson/kmp/tor/runtime/core/TorConfig$Setting;
 }
 
+public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$SocksPort : io/matthewnelson/kmp/tor/runtime/core/TorConfig$Setting$Builder {
+	public static final field Companion Lio/matthewnelson/kmp/tor/runtime/core/TorConfig$SocksPort$Companion;
+}
+
+public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$SocksPort$Companion : io/matthewnelson/kmp/tor/runtime/core/TorConfig$Keyword {
+}
+
 public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$SyslogIdentityTag : io/matthewnelson/kmp/tor/runtime/core/TorConfig$Setting$Builder {
 	public static final field Companion Lio/matthewnelson/kmp/tor/runtime/core/TorConfig$SyslogIdentityTag$Companion;
 	public field tag Ljava/lang/String;
 }
 
 public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$SyslogIdentityTag$Companion : io/matthewnelson/kmp/tor/runtime/core/TorConfig$Setting$Factory {
+}
+
+public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$TransPort : io/matthewnelson/kmp/tor/runtime/core/TorConfig$Setting$Builder {
+	public static final field Companion Lio/matthewnelson/kmp/tor/runtime/core/TorConfig$TransPort$Companion;
+}
+
+public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$TransPort$Companion : io/matthewnelson/kmp/tor/runtime/core/TorConfig$Keyword {
 }
 
 public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$VirtualAddrNetworkIPv4 : io/matthewnelson/kmp/tor/runtime/core/TorConfig$Setting$Builder {

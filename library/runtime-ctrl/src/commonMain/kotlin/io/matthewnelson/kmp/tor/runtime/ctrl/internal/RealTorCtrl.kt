@@ -282,11 +282,13 @@ internal class RealTorCtrl private constructor(
 
                     cmdJob.respond(replies)
                 } catch (e: CancellationException) {
-                    // scope was cancelled
+                    // scope was cancelled while waiting
                     cmdJob.error(InterruptedException("CtrlConnection Stream Ended"))
                     throw e
                 } catch (e: NotImplementedError) {
                     // TODO: Issue #421
+                    cmdJob.error(e)
+                } catch (e: NoSuchElementException) {
                     cmdJob.error(e)
                 }
             }.invokeOnCompletion { t ->

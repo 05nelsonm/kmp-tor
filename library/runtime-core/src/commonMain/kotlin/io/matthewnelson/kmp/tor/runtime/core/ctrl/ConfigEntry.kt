@@ -43,8 +43,7 @@ public data class ConfigEntry(
 ) {
 
     /**
-     * If this [ConfigEntry] is using tor's default value for the
-     * given [key].
+     * If tor is using the default value for the given [key] for this entry.
      * */
     @JvmField
     public val isDefault: Boolean = if (value.isEmpty()) true else value == key.default

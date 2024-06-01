@@ -997,7 +997,7 @@ public class TorConfig private constructor(
         keyword = Companion,
     ) {
 
-        private var timeout: String = default
+        private var timeout: String = "24 hours"
 
         @KmpTorDsl
         public fun minutes(n: Int): DormantClientTimeout {
@@ -1026,7 +1026,7 @@ public class TorConfig private constructor(
 
         public companion object: Setting.Factory<DormantClientTimeout, Setting>(
             name = "DormantClientTimeout",
-            default = "24 hours",
+            default = (24 * 60 * 60).toString(),
             attributes = emptySet(),
             isCmdLineArg = false,
             isUnique = true,
@@ -1070,7 +1070,7 @@ public class TorConfig private constructor(
 
         public companion object: Setting.Factory<DormantTimeoutDisabledByIdleStreams, Setting>(
             name = "DormantTimeoutDisabledByIdleStreams",
-            default = false.toByte().toString(),
+            default = true.toByte().toString(),
             attributes = emptySet(),
             isCmdLineArg = false,
             isUnique = true,
@@ -1744,6 +1744,94 @@ public class TorConfig private constructor(
         ) {
             private val DEFAULT by lazy { default.toIPAddressV6() }
         }
+    }
+
+    ////////////////////////////////////////
+    ////////////////////////////////////////
+    ////                                ////
+    ////    Not implemented settings    ////
+    ////                                ////
+    ////////////////////////////////////////
+    ////////////////////////////////////////
+
+    /**
+     * See ephemeral setting [__ControlPort].
+     * */
+    @KmpTorDsl
+    public class ControlPort private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = __ControlPort.name.drop(2),
+            default = __ControlPort.default,
+            attributes = __ControlPort.attributes,
+            isCmdLineArg = __ControlPort.isCmdLineArg,
+            isUnique = __ControlPort.isUnique,
+        )
+    }
+
+    /**
+     * See ephemeral setting [__DNSPort].
+     * */
+    @KmpTorDsl
+    public class DNSPort private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = __DNSPort.name.drop(2),
+            default = __DNSPort.default,
+            attributes = __DNSPort.attributes,
+            isCmdLineArg = __DNSPort.isCmdLineArg,
+            isUnique = __DNSPort.isUnique,
+        )
+    }
+
+    /**
+     * See ephemeral setting [__HTTPTunnelPort].
+     * */
+    @KmpTorDsl
+    public class HTTPTunnelPort private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = __HTTPTunnelPort.name.drop(2),
+            default = __HTTPTunnelPort.default,
+            attributes = __HTTPTunnelPort.attributes,
+            isCmdLineArg = __HTTPTunnelPort.isCmdLineArg,
+            isUnique = __HTTPTunnelPort.isUnique,
+        )
+    }
+
+    /**
+     * See ephemeral setting [__SocksPort].
+     * */
+    @KmpTorDsl
+    public class SocksPort private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = __SocksPort.name.drop(2),
+            default = __SocksPort.default,
+            attributes = __SocksPort.attributes,
+            isCmdLineArg = __SocksPort.isCmdLineArg,
+            isUnique = __SocksPort.isUnique,
+        )
+    }
+
+    /**
+     * See ephemeral setting [__TransPort].
+     * */
+    @KmpTorDsl
+    public class TransPort private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = __TransPort.name.drop(2),
+            default = __TransPort.default,
+            attributes = __TransPort.attributes,
+            isCmdLineArg = __TransPort.isCmdLineArg,
+            isUnique = __TransPort.isUnique,
+        )
     }
 
     /**

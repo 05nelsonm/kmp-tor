@@ -25,6 +25,7 @@ import io.matthewnelson.kmp.tor.runtime.core.ctrl.Reply
 import io.matthewnelson.kmp.tor.runtime.core.ctrl.Reply.Error.Companion.toError
 import io.matthewnelson.kmp.tor.runtime.core.ctrl.TorCmd
 
+@Throws(NoSuchElementException::class)
 internal fun TorCmdJob<*>.respond(replies: ArrayList<Reply>) {
     // waiters were destroyed while awaiting server response (i.e. EOS)
     if (replies.isEmpty()) {
@@ -86,6 +87,7 @@ internal fun TorCmdJob<*>.respond(replies: ArrayList<Reply>) {
     }
 }
 
+@Throws(NoSuchElementException::class)
 private fun TorCmd.Config.Get.complete(job: TorCmdJob<*>, replies: ArrayList<Reply.Success>) {
     val entries = ArrayList<ConfigEntry>(replies.size)
 
@@ -95,15 +97,15 @@ private fun TorCmd.Config.Get.complete(job: TorCmdJob<*>, replies: ArrayList<Rep
         val kvp = reply.message
         val i = kvp.indexOf('=')
 
-        val key = run {
+        val keyword = run {
             val key = if (i == -1) {
                 kvp
             } else {
                 kvp.substring(0, i)
             }
 
-            keywords.firstOrNull { it.name == key }
-        } ?: continue
+            keywords.first { it.name.equals(key, ignoreCase = true) }
+        }
 
         val value = if (i == -1) {
             ""
@@ -111,7 +113,7 @@ private fun TorCmd.Config.Get.complete(job: TorCmdJob<*>, replies: ArrayList<Rep
             kvp.substring(i + 1)
         }
 
-        entries.add(ConfigEntry(key, value))
+        entries.add(ConfigEntry(keyword, value))
     }
 
     job.unsafeCast<List<ConfigEntry>>().completion(entries.toImmutableList())

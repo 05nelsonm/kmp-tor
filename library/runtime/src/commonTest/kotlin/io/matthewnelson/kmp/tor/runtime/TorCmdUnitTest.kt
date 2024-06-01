@@ -50,7 +50,7 @@ class TorCmdUnitTest {
         }
         val onSuccess = OnSuccess<List<ConfigEntry>> { entries ->
             assertEquals(1, entries.size)
-            println(entries.first())
+//            println(entries.first())
         }
 
         KEYWORDS.forEach { kw ->
@@ -83,7 +83,9 @@ class TorCmdUnitTest {
 
     private companion object {
 
-        val KEYWORDS = listOf(
+        val KEYWORDS by lazy { setOf(
+
+            // Implemented settings
             TorConfig.__ControlPort,
             TorConfig.__DNSPort,
             TorConfig.__HTTPTunnelPort,
@@ -120,6 +122,13 @@ class TorCmdUnitTest {
             TorConfig.AndroidIdentityTag,
             TorConfig.VirtualAddrNetworkIPv4,
             TorConfig.VirtualAddrNetworkIPv6,
-        )
+
+            // Not implemented settings
+            TorConfig.ControlPort,
+            TorConfig.DNSPort,
+            TorConfig.HTTPTunnelPort,
+            TorConfig.SocksPort,
+            TorConfig.TransPort,
+        ) }
     }
 }
