@@ -20,7 +20,6 @@ import io.matthewnelson.kmp.tor.runtime.core.TorConfig
 import io.matthewnelson.kmp.tor.runtime.test.TestUtils
 import io.matthewnelson.kmp.tor.runtime.test.TestUtils.testEnv
 import kotlin.test.Test
-import kotlin.test.fail
 
 class TorConfigKeywordsUnitTest {
 
@@ -43,7 +42,7 @@ class TorConfigKeywordsUnitTest {
         val optionsCurrent = run {
             val output = Process.Builder(paths.tor.toString())
                 .args("--list-torrc-options")
-                .output()
+                .output { timeoutMillis = 1_000 }
 
             if (
                 output.stdout.isEmpty()
@@ -66,7 +65,7 @@ class TorConfigKeywordsUnitTest {
         val optionsDeprecated = run {
             val output = Process.Builder(paths.tor.toString())
                 .args("--list-deprecated-options")
-                .output()
+                .output { timeoutMillis = 1_000 }
 
             if (
                 output.stdout.isEmpty()
