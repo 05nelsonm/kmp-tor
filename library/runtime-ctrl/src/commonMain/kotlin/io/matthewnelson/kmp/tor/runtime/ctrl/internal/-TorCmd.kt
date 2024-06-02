@@ -29,7 +29,6 @@ internal fun TorCmd<*>.encodeToByteArray(LOG: Debugger?): ByteArray = when (this
     is TorCmd.Ownership.Take -> encode(LOG)
     is TorCmd.Resolve -> encode(LOG)
     is TorCmd.SetEvents -> encode(LOG)
-    is TorCmd.Signal.Reload -> encodeSignal(LOG)
     is TorCmd.Signal.Dump -> encodeSignal(LOG)
     is TorCmd.Signal.Debug -> encodeSignal(LOG)
     is TorCmd.Signal.NewNym -> encodeSignal(LOG)
@@ -37,12 +36,12 @@ internal fun TorCmd<*>.encodeToByteArray(LOG: Debugger?): ByteArray = when (this
     is TorCmd.Signal.Heartbeat -> encodeSignal(LOG)
     is TorCmd.Signal.Active -> encodeSignal(LOG)
     is TorCmd.Signal.Dormant -> encodeSignal(LOG)
+    is TorCmd.Signal.Reload -> encodeSignal(LOG)
     is TorCmd.Signal.Shutdown -> encodeSignal(LOG)
     is TorCmd.Signal.Halt -> encodeSignal(LOG)
 }
 
 internal fun TorCmd<*>.signalNameOrNull(): String? = when (this) {
-    is TorCmd.Signal.Reload -> "RELOAD"
     is TorCmd.Signal.Dump -> "DUMP"
     is TorCmd.Signal.Debug -> "DEBUG"
     is TorCmd.Signal.NewNym -> "NEWNYM"
@@ -50,6 +49,7 @@ internal fun TorCmd<*>.signalNameOrNull(): String? = when (this) {
     is TorCmd.Signal.Heartbeat -> "HEARTBEAT"
     is TorCmd.Signal.Active -> "ACTIVE"
     is TorCmd.Signal.Dormant -> "DORMANT"
+    is TorCmd.Signal.Reload -> "RELOAD"
     is TorCmd.Signal.Shutdown -> "SHUTDOWN"
     is TorCmd.Signal.Halt -> "HALT"
     else -> {

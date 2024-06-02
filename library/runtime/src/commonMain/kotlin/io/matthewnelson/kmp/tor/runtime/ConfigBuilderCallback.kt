@@ -142,7 +142,7 @@ public fun interface ConfigBuilderCallback: ThisBlock.WithIt<TorConfig.Builder, 
             put(TorConfig.DisableNetwork) { disable = true }
             put(TorConfig.RunAsDaemon) { enable = false }
             put(TorConfig.__OwningControllerProcess) { /* default */ }
+            put(TorConfig.__ReloadTorrcOnSIGHUP) { reload = false }
         }
     }
-
 }

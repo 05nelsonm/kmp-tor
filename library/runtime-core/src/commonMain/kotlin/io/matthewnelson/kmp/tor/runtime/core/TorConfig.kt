@@ -676,6 +676,28 @@ public class TorConfig private constructor(
     }
 
     /**
+     * [__ReloadTorrcOnSIGHUP](https://spec.torproject.org/control-spec/implementation-notes.html?highlight=__#special-config-options)
+     * */
+    @KmpTorDsl
+    public class __ReloadTorrcOnSIGHUP private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+
+        @JvmField
+        public var reload: Boolean = true
+
+        public companion object: Setting.Factory<__ReloadTorrcOnSIGHUP, Setting>(
+            name = "__ReloadTorrcOnSIGHUP",
+            default = true.byte.toString(),
+            attributes = emptySet(),
+            isCmdLineArg = true,
+            isUnique = true,
+            factory = { __ReloadTorrcOnSIGHUP() },
+            build = { build(reload.byte.toString())!! },
+        )
+    }
+
+    /**
      * [CacheDirectory](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#CacheDirectory)
      * */
     @KmpTorDsl
@@ -1994,21 +2016,7 @@ public class TorConfig private constructor(
         )
     }
 
-    /**
-     * [__ReloadTorrcOnSIGHUP](https://spec.torproject.org/control-spec/implementation-notes.html?highlight=__#special-config-options)
-     * */
-    @KmpTorDsl
-    public class __ReloadTorrcOnSIGHUP private constructor(): Setting.Builder(
-        keyword = Companion,
-    ) {
-        public companion object: Keyword(
-            name = "__ReloadTorrcOnSIGHUP",
-            default = true.byte.toString(),
-            attributes = emptySet(),
-            isCmdLineArg = true,
-            isUnique = true,
-        )
-    }
+    // (IMPLEMENTED) __ReloadTorrcOnSIGHUP
 
     /**
      * [__SbwsExit](https://spec.torproject.org/control-spec/implementation-notes.html?highlight=__#special-config-options)

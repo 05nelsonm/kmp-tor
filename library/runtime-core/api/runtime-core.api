@@ -2915,9 +2915,10 @@ public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$__OwningContr
 
 public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$__ReloadTorrcOnSIGHUP : io/matthewnelson/kmp/tor/runtime/core/TorConfig$Setting$Builder {
 	public static final field Companion Lio/matthewnelson/kmp/tor/runtime/core/TorConfig$__ReloadTorrcOnSIGHUP$Companion;
+	public field reload Z
 }
 
-public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$__ReloadTorrcOnSIGHUP$Companion : io/matthewnelson/kmp/tor/runtime/core/TorConfig$Keyword {
+public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$__ReloadTorrcOnSIGHUP$Companion : io/matthewnelson/kmp/tor/runtime/core/TorConfig$Setting$Factory {
 }
 
 public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$__SbwsExit : io/matthewnelson/kmp/tor/runtime/core/TorConfig$Setting$Builder {
@@ -3498,7 +3499,7 @@ public final class io/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$Config$Rese
 	public fun <init> ([Lio/matthewnelson/kmp/tor/runtime/core/TorConfig$Keyword;)V
 }
 
-public final class io/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$Config$Save : io/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$Unprivileged {
+public final class io/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$Config$Save : io/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$Privileged {
 	public final field force Z
 	public fun <init> ()V
 	public fun <init> (Z)V
