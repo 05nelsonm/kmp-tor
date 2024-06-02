@@ -1799,7 +1799,7 @@ public class TorConfig private constructor(
         public companion object: Keyword(
             name = "__DirPort",
             default = "0",
-            attributes = emptySet(),
+            attributes = immutableSetOf(Attribute.Port),
             isCmdLineArg = false,
             isUnique = false,
         )
@@ -1819,7 +1819,7 @@ public class TorConfig private constructor(
         public companion object: Keyword(
             name = "__ExtORPort",
             default = "",
-            attributes = emptySet(),
+            attributes = immutableSetOf(Attribute.Port),
             isCmdLineArg = false,
             isUnique = false,
         )
@@ -1837,7 +1837,7 @@ public class TorConfig private constructor(
         public companion object: Keyword(
             name = "__MetricsPort",
             default = "",
-            attributes = emptySet(),
+            attributes = immutableSetOf(Attribute.Port),
             isCmdLineArg = false,
             isUnique = false,
         )
@@ -1855,7 +1855,7 @@ public class TorConfig private constructor(
         public companion object: Keyword(
             name = "__NATDPort",
             default = "0",
-            attributes = emptySet(),
+            attributes = immutableSetOf(Attribute.Port),
             isCmdLineArg = false,
             isUnique = false,
         )
@@ -1873,7 +1873,7 @@ public class TorConfig private constructor(
         public companion object: Keyword(
             name = "__ORPort",
             default = "0",
-            attributes = emptySet(),
+            attributes = immutableSetOf(Attribute.Port),
             isCmdLineArg = false,
             isUnique = false,
         )
@@ -2040,7 +2040,7 @@ public class TorConfig private constructor(
         public companion object: Keyword(
             name = "AccelDir",
             default = "",
-            attributes = emptySet(),
+            attributes = immutableSetOf(Attribute.Directory),
             isCmdLineArg = false,
             isUnique = false,
         )
@@ -2316,7 +2316,7 @@ public class TorConfig private constructor(
         public companion object: Keyword(
             name = "ControlSocket",
             default = "0",
-            attributes = emptySet(),
+            attributes = immutableSetOf(Attribute.UnixSocket),
             isCmdLineArg = false,
             isUnique = false,
         )
@@ -2499,7 +2499,7 @@ public class TorConfig private constructor(
         public companion object: Keyword(
             name = "ExtORPortCookieAuthFile",
             default = "",
-            attributes = emptySet(),
+            attributes = immutableSetOf(Attribute.File),
             isCmdLineArg = false,
             isUnique = false,
         )
@@ -2726,7 +2726,7 @@ public class TorConfig private constructor(
         public companion object: Keyword(
             name = "Log",
             default = "",
-            attributes = emptySet(),
+            attributes = immutableSetOf(Attribute.Logging),
             isCmdLineArg = false,
             isUnique = false,
         )
@@ -2742,7 +2742,7 @@ public class TorConfig private constructor(
         public companion object: Keyword(
             name = "LogMessageDomains",
             default = false.byte.toString(),
-            attributes = emptySet(),
+            attributes = immutableSetOf(Attribute.Logging),
             isCmdLineArg = false,
             isUnique = false,
         )
@@ -2758,7 +2758,7 @@ public class TorConfig private constructor(
         public companion object: Keyword(
             name = "LogTimeGranularity",
             default = 1.seconds.inWholeMilliseconds.toString(),
-            attributes = emptySet(),
+            attributes = immutableSetOf(Attribute.Logging),
             isCmdLineArg = false,
             isUnique = false,
         )
@@ -2952,7 +2952,7 @@ public class TorConfig private constructor(
         public companion object: Keyword(
             name = "PidFile",
             default = "",
-            attributes = emptySet(),
+            attributes = immutableSetOf(Attribute.File),
             isCmdLineArg = false,
             isUnique = false,
         )
@@ -3034,7 +3034,7 @@ public class TorConfig private constructor(
         public companion object: Keyword(
             name = "SafeLogging",
             default = "1",
-            attributes = emptySet(),
+            attributes = immutableSetOf(Attribute.Logging),
             isCmdLineArg = false,
             isUnique = false,
         )
@@ -3196,7 +3196,7 @@ public class TorConfig private constructor(
         public companion object: Keyword(
             name = "TruncateLogFile",
             default = false.byte.toString(),
-            attributes = emptySet(),
+            attributes = immutableSetOf(Attribute.Logging),
             isCmdLineArg = false,
             isUnique = false,
         )
@@ -4793,7 +4793,7 @@ public class TorConfig private constructor(
         public companion object: Keyword(
             name = "KeyDirectory",
             default = "",
-            attributes = emptySet(),
+            attributes = immutableSetOf(Attribute.Directory),
             isCmdLineArg = false,
             isUnique = false,
         )
@@ -5065,7 +5065,7 @@ public class TorConfig private constructor(
         public companion object: Keyword(
             name = "ServerDNSResolvConfFile",
             default = "",
-            attributes = emptySet(),
+            attributes = immutableSetOf(Attribute.File),
             isCmdLineArg = false,
             isUnique = false,
         )
@@ -5882,7 +5882,7 @@ public class TorConfig private constructor(
     ) {
         public companion object: Keyword(
             name = "AuthDirGuardBWGuarantee",
-            default = (2.0F.pow(21)).toInt().toString(), // 2MBytes
+            default = (2.0F.pow(20) * 2).toInt().toString(), // 2MBytes
             attributes = emptySet(),
             isCmdLineArg = false,
             isUnique = false,
@@ -6284,7 +6284,7 @@ public class TorConfig private constructor(
         public companion object: Keyword(
             name = "GuardfractionFile",
             default = "",
-            attributes = emptySet(),
+            attributes = immutableSetOf(Attribute.File),
             isCmdLineArg = false,
             isUnique = false,
         )
@@ -6460,7 +6460,7 @@ public class TorConfig private constructor(
         public companion object: Keyword(
             name = "V3BandwidthsFile",
             default = "",
-            attributes = emptySet(),
+            attributes = immutableSetOf(Attribute.File),
             isCmdLineArg = false,
             isUnique = false,
         )
