@@ -526,13 +526,6 @@ public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$CircuitsAvail
 public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$CircuitsAvailableTimeout$Companion : io/matthewnelson/kmp/tor/runtime/core/TorConfig$Keyword {
 }
 
-public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$ClientAutoIPv6ORPort : io/matthewnelson/kmp/tor/runtime/core/TorConfig$Setting$Builder {
-	public static final field Companion Lio/matthewnelson/kmp/tor/runtime/core/TorConfig$ClientAutoIPv6ORPort$Companion;
-}
-
-public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$ClientAutoIPv6ORPort$Companion : io/matthewnelson/kmp/tor/runtime/core/TorConfig$Keyword {
-}
-
 public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$ClientBootstrapConsensusAuthorityDownloadInitialDelay : io/matthewnelson/kmp/tor/runtime/core/TorConfig$Setting$Builder {
 	public static final field Companion Lio/matthewnelson/kmp/tor/runtime/core/TorConfig$ClientBootstrapConsensusAuthorityDownloadInitialDelay$Companion;
 }
@@ -1236,26 +1229,12 @@ public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$HeartbeatPeri
 public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$HeartbeatPeriod$Companion : io/matthewnelson/kmp/tor/runtime/core/TorConfig$Keyword {
 }
 
-public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$HidServAuth : io/matthewnelson/kmp/tor/runtime/core/TorConfig$Setting$Builder {
-	public static final field Companion Lio/matthewnelson/kmp/tor/runtime/core/TorConfig$HidServAuth$Companion;
-}
-
-public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$HidServAuth$Companion : io/matthewnelson/kmp/tor/runtime/core/TorConfig$Keyword {
-}
-
 public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$HiddenServiceAllowUnknownPorts {
 	public static final field Companion Lio/matthewnelson/kmp/tor/runtime/core/TorConfig$HiddenServiceAllowUnknownPorts$Companion;
 	public field allow Z
 }
 
 public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$HiddenServiceAllowUnknownPorts$Companion : io/matthewnelson/kmp/tor/runtime/core/TorConfig$Keyword {
-}
-
-public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$HiddenServiceAuthorizeClient : io/matthewnelson/kmp/tor/runtime/core/TorConfig$Setting$Builder {
-	public static final field Companion Lio/matthewnelson/kmp/tor/runtime/core/TorConfig$HiddenServiceAuthorizeClient$Companion;
-}
-
-public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$HiddenServiceAuthorizeClient$Companion : io/matthewnelson/kmp/tor/runtime/core/TorConfig$Keyword {
 }
 
 public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$HiddenServiceDir : io/matthewnelson/kmp/tor/runtime/core/TorConfig$Setting$Builder {
@@ -1673,13 +1652,6 @@ public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$OfflineMaster
 public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$OfflineMasterKey$Companion : io/matthewnelson/kmp/tor/runtime/core/TorConfig$Keyword {
 }
 
-public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$OptimisticData : io/matthewnelson/kmp/tor/runtime/core/TorConfig$Setting$Builder {
-	public static final field Companion Lio/matthewnelson/kmp/tor/runtime/core/TorConfig$OptimisticData$Companion;
-}
-
-public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$OptimisticData$Companion : io/matthewnelson/kmp/tor/runtime/core/TorConfig$Keyword {
-}
-
 public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$OutboundBindAddress : io/matthewnelson/kmp/tor/runtime/core/TorConfig$Setting$Builder {
 	public static final field Companion Lio/matthewnelson/kmp/tor/runtime/core/TorConfig$OutboundBindAddress$Companion;
 }
@@ -1790,13 +1762,6 @@ public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$RecommendedCl
 }
 
 public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$RecommendedClientVersions$Companion : io/matthewnelson/kmp/tor/runtime/core/TorConfig$Keyword {
-}
-
-public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$RecommendedPackages : io/matthewnelson/kmp/tor/runtime/core/TorConfig$Setting$Builder {
-	public static final field Companion Lio/matthewnelson/kmp/tor/runtime/core/TorConfig$RecommendedPackages$Companion;
-}
-
-public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$RecommendedPackages$Companion : io/matthewnelson/kmp/tor/runtime/core/TorConfig$Keyword {
 }
 
 public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$RecommendedServerVersions : io/matthewnelson/kmp/tor/runtime/core/TorConfig$Setting$Builder {
@@ -2194,13 +2159,6 @@ public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$TestingEnable
 }
 
 public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$TestingEnableConnBwEvent$Companion : io/matthewnelson/kmp/tor/runtime/core/TorConfig$Keyword {
-}
-
-public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$TestingEstimatedDescriptorPropagationTime : io/matthewnelson/kmp/tor/runtime/core/TorConfig$Setting$Builder {
-	public static final field Companion Lio/matthewnelson/kmp/tor/runtime/core/TorConfig$TestingEstimatedDescriptorPropagationTime$Companion;
-}
-
-public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$TestingEstimatedDescriptorPropagationTime$Companion : io/matthewnelson/kmp/tor/runtime/core/TorConfig$Keyword {
 }
 
 public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$TestingLinkCertLifetime : io/matthewnelson/kmp/tor/runtime/core/TorConfig$Setting$Builder {

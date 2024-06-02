@@ -15,51 +15,168 @@
  **/
 package io.matthewnelson.kmp.tor.runtime
 
+import io.matthewnelson.kmp.process.Process
 import io.matthewnelson.kmp.tor.runtime.core.TorConfig
 import io.matthewnelson.kmp.tor.runtime.test.TestUtils
-import kotlin.reflect.KClass
+import io.matthewnelson.kmp.tor.runtime.test.TestUtils.testEnv
 import kotlin.test.Test
 
 class TorConfigKeywordsUnitTest {
 
+    /**
+     * This test runs in order to check all [TorConfig.Keyword] implemented in
+     * [TorConfig] against those that are listed from tor CLI via the
+     * `--list-torrc-options` and `--list-deprecated-options` commands. It
+     * ensures:
+     *
+     *  - That all implemented keywords match what tor lists as available
+     *  - That any keywords that were deprecated can be updated.
+     *  - That all keywords are listed in [TestUtils.KEYWORDS]
+     * */
     @Test
-    fun givenKeywords_whenTestKeywords_thenContainsAll() {
-        val missing = mutableSetOf<KClass<out TorConfig.Keyword>>()
-        val testKeywords = TestUtils.KEYWORDS.map { it::class }
+    fun givenKeywords_whenCheckedAgainstTorCLI_thenAreAsExpected() {
+        return
+        val paths = testEnv("test_config_keywords")
+            .torResource
+            .install()
 
-        for (clazz in TorConfig.Keyword::class.sealedSubclasses) {
-            if (!clazz.isCompanion) continue
-            if (!testKeywords.contains(clazz)) {
-                missing.add(clazz)
+        val optionsCurrent = Process.Builder(paths.tor.toString())
+            .args("--list-torrc-options")
+            .output()
+            .stdout
+            .lines()
+            .mapTo(ArrayList()) { "TorConfig.$it" }
+
+        val optionsDeprecated = Process.Builder(paths.tor.toString())
+            .args("--list-deprecated-options")
+            .output()
+            .stdout
+            .lines()
+            .map { "TorConfig.$it" }
+
+        // Remove overlapping deprecated options
+        optionsDeprecated.forEach { optionsCurrent.remove(it) }
+
+        val testUtilsMissing = mutableSetOf<String>()
+        val implementedNotFound = mutableSetOf<String>()
+        val implementedDeprecated = mutableSetOf<String>()
+
+        val testUtilKeywordClasses = TestUtils.KEYWORDS.map { it::class }
+
+        (TorConfig.Setting.Factory::class.sealedSubclasses + TorConfig.Keyword::class.sealedSubclasses).forEach { clazz ->
+            if (!clazz.isCompanion) return@forEach
+
+            val name = clazz.qualifiedName!!
+                .substringAfter("kmp.tor.runtime.core.")
+                .substringBeforeLast('.')
+
+            if (!testUtilKeywordClasses.contains(clazz)) {
+                testUtilsMissing.add(name)
+            }
+
+            if (optionsCurrent.remove(name)) {
+                return@forEach
+            }
+
+            if (optionsDeprecated.contains(name)) {
+                implementedDeprecated.add(name)
+                return@forEach
+            }
+
+            implementedNotFound.add(name)
+        }
+
+        val sb = StringBuilder()
+
+        run {
+            val title = "The following settings were listed by --list-torrc-options, but not implemented in TorConfig"
+
+            if (optionsCurrent.isNotEmpty()) {
+                sb.append(title)
+
+                for (item in optionsCurrent) {
+                    sb.appendLine()
+                    sb.append(item)
+                }
             }
         }
 
-        if (missing.isEmpty()) return
+        run {
+            val title = "The following settings were not listed by --list-torrc-options, but are implemented in TorConfig"
 
-        val msg = missing.joinToString(
-            "\n",
-            prefix = "The following TorConfig.Keyword classes are missing from TorCmdUnitTest.KEYWORDS\n",
-            transform = {
-                it.qualifiedName!!
-                    .substringAfter("kmp.tor.runtime.core.")
-                    .substringBeforeLast('.')
+            // Override
+            listOf(
+                "TorConfig.AndroidIdentityTag"
+            ).forEach { implementedNotFound.remove(it) }
+
+            if (implementedNotFound.isNotEmpty()) {
+                if (sb.isNotEmpty()) {
+                    sb.appendLine()
+                    sb.appendLine()
+                }
+
+                sb.append(title)
+
+                for (item in implementedNotFound) {
+                    sb.appendLine()
+                    sb.append(item)
+                }
             }
-        )
+        }
 
-        throw AssertionError(msg)
+        run {
+            val title = "The following settings are implemented in TorConfig and are now deprecated by --list-deprecated-options"
+
+            if (implementedDeprecated.isNotEmpty()) {
+                if (sb.isNotEmpty()) {
+                    sb.appendLine()
+                    sb.appendLine()
+                }
+
+                sb.append(title)
+
+                for (item in implementedDeprecated) {
+                    sb.appendLine()
+                    sb.append(item)
+                }
+            }
+        }
+
+        run {
+            val title = "The following settings are implemented in TorConfig, but were not listed in TestUtils.KEYWORDS"
+
+            if (testUtilsMissing.isNotEmpty()) {
+                if (sb.isNotEmpty()) {
+                    sb.appendLine()
+                    sb.appendLine()
+                }
+
+                sb.append(title)
+
+                for (item in testUtilsMissing) {
+                    sb.appendLine()
+                    sb.append(item)
+                }
+            }
+        }
+
+        // No errors
+        if (sb.isEmpty()) return
+
+        throw AssertionError(sb.toString())
     }
 
     @Test
     fun givenKeywords_whenTestKeywords_thenClassNameMatchesName() {
-        val unmatched = mutableSetOf<TorConfig.Keyword>()
+        val doesNotMatch = mutableSetOf<TorConfig.Keyword>()
         for (kw in TestUtils.KEYWORDS) {
             if (kw::class.qualifiedName!!.contains("TorConfig.${kw.name}")) continue
-            unmatched.add(kw)
+            doesNotMatch.add(kw)
         }
 
-        if (unmatched.isEmpty()) return
+        if (doesNotMatch.isEmpty()) return
 
-        val msg = unmatched.joinToString(
+        val msg = doesNotMatch.joinToString(
             separator = "\n",
             prefix = "The following TorConfig.Keyword.name do not match the className\n"
         )

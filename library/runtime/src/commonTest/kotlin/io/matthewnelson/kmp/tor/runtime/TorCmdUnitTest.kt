@@ -36,7 +36,7 @@ import kotlin.test.assertEquals
 class TorCmdUnitTest {
 
     @Test
-    fun givenConfigGet_whenKeyword_thenIsRecognizedByTor() = runTest {
+    fun givenConfigGet_whenKeyword_thenIsRecognizedByController() = runTest {
         val runtime = TorRuntime.Builder(testEnv("cmd_getconf_test")) {
 //            observerStatic(RuntimeEvent.LOG.DEBUG) { println(it) }
         }.ensureStoppedOnTestCompletion()

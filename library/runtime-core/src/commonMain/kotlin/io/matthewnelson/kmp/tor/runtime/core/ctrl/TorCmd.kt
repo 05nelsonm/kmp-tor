@@ -30,7 +30,8 @@ import kotlin.coroutines.cancellation.CancellationException
 import kotlin.jvm.JvmField
 
 /**
- * Commands to interact with tor via its control connection.
+ * Commands to interact with tor via its control connection, as
+ * described in [control-spec](https://spec.torproject.org/control-spec/index.html).
  *
  * Commands are separated into 2 categories, [Privileged] and
  * [Unprivileged]. This is unique to `kmp-tor` only, not tor.
@@ -52,7 +53,7 @@ public sealed class TorCmd<Success: Any> private constructor(
     /**
      * "AUTHENTICATE"
      *
-     * [docs](https://torproject.gitlab.io/torspec/control-spec/#authenticate)
+     * [docs](https://spec.torproject.org/control-spec/commands.html#authenticate)
      * */
     public class Authenticate: Privileged<Reply.Success.OK> {
 
@@ -74,7 +75,7 @@ public sealed class TorCmd<Success: Any> private constructor(
 //    /**
 //     * "AUTHCHALLENGE"
 //     *
-//     * [docs](https://torproject.gitlab.io/torspec/control-spec/#authchallenge)
+//     * [docs](https://spec.torproject.org/control-spec/commands.html#authchallenge)
 //     * */
 //    public class ChallengeAuth: Privileged<Reply.Success.OK>("AUTHCHALLENGE")
 
@@ -83,21 +84,21 @@ public sealed class TorCmd<Success: Any> private constructor(
 //        /**
 //         * "CLOSECIRCUIT"
 //         *
-//         * [docs](https://torproject.gitlab.io/torspec/control-spec/#closecircuit)
+//         * [docs](https://spec.torproject.org/control-spec/commands.html#closecircuit)
 //         * */
 //        public class Close: Unprivileged<Reply.Success.OK>("CLOSECIRCUIT")
 //
 //        /**
 //         * "EXTENDCIRCUIT"
 //         *
-//         * [docs](https://torproject.gitlab.io/torspec/control-spec/#extendcircuit)
+//         * [docs](https://spec.torproject.org/control-spec/commands.html#extendcircuit)
 //         * */
 //        public class Extend: Unprivileged<String>("EXTENDCIRCUIT")
 //
 //        /**
 //         * "SETCIRCUITPURPOSE"
 //         *
-//         * [docs](https://torproject.gitlab.io/torspec/control-spec/#setcircuitpurpose)
+//         * [docs](https://spec.torproject.org/control-spec/commands.html#setcircuitpurpose)
 //         * */
 //        public class SetPurpose: Unprivileged<Reply.Success.OK>("SETCIRCUITPURPOSE")
 //    }
@@ -107,7 +108,7 @@ public sealed class TorCmd<Success: Any> private constructor(
         /**
          * "GETCONF"
          *
-         * [docs](https://torproject.gitlab.io/torspec/control-spec/#getconf)
+         * [docs](https://spec.torproject.org/control-spec/commands.html#getconf)
          * */
         public class Get: Unprivileged<List<ConfigEntry>> {
 
@@ -126,7 +127,7 @@ public sealed class TorCmd<Success: Any> private constructor(
         /**
          * "+LOADCONF"
          *
-         * [docs](https://torproject.gitlab.io/torspec/control-spec/#loadconf)
+         * [docs](https://spec.torproject.org/control-spec/commands.html#loadconf)
          * */
         public class Load(configText: String): Privileged<Reply.Success.OK>("LOADCONF") {
 
@@ -148,7 +149,7 @@ public sealed class TorCmd<Success: Any> private constructor(
         /**
          * "RESETCONF"
          *
-         * [docs](https://torproject.gitlab.io/torspec/control-spec/#resetconf)
+         * [docs](https://spec.torproject.org/control-spec/commands.html#resetconf)
          * */
         public class Reset: Unprivileged<Reply.Success.OK> {
 
@@ -167,7 +168,7 @@ public sealed class TorCmd<Success: Any> private constructor(
         /**
          * "SAVECONF"
          *
-         * [docs](https://torproject.gitlab.io/torspec/control-spec/#saveconf)
+         * [docs](https://spec.torproject.org/control-spec/commands.html#saveconf)
          * */
         public class Save(
             @JvmField
@@ -181,7 +182,7 @@ public sealed class TorCmd<Success: Any> private constructor(
         /**
          * "SETCONF"
          *
-         * [docs](https://torproject.gitlab.io/torspec/control-spec/#setconf)
+         * [docs](https://spec.torproject.org/control-spec/commands.html#setconf)
          * */
         public class Set: Unprivileged<Reply.Success.OK> {
 
@@ -201,7 +202,7 @@ public sealed class TorCmd<Success: Any> private constructor(
     /**
      * "DROPGUARDS"
      *
-     * [docs](https://torproject.gitlab.io/torspec/control-spec/#dropguards)
+     * [docs](https://spec.torproject.org/control-spec/commands.html#dropguards)
      * */
     public data object DropGuards: Unprivileged<Reply.Success.OK>("DROPGUARDS")
 
@@ -210,7 +211,7 @@ public sealed class TorCmd<Success: Any> private constructor(
         /**
          * "HSFETCH"
          *
-         * [docs](https://torproject.gitlab.io/torspec/control-spec/#hsfetch)
+         * [docs](https://spec.torproject.org/control-spec/commands.html#hsfetch)
          * */
         public class Fetch: Unprivileged<Reply.Success.OK> {
 
@@ -238,7 +239,7 @@ public sealed class TorCmd<Success: Any> private constructor(
 //        /**
 //         * "+HSPOST"
 //         *
-//         * [docs](https://torproject.gitlab.io/torspec/control-spec/#hspost)
+//         * [docs](https://spec.torproject.org/control-spec/commands.html#hspost)
 //         * */
 //        public class Post: Unprivileged<Reply.Success.OK>("HSPOST")
     }
@@ -248,7 +249,7 @@ public sealed class TorCmd<Success: Any> private constructor(
         /**
          * "GETINFO"
          *
-         * [docs](https://torproject.gitlab.io/torspec/control-spec/#getinfo)
+         * [docs](https://spec.torproject.org/control-spec/commands.html#getinfo)
          * */
         public class Get: Unprivileged<Map<String, String>> {
 
@@ -267,7 +268,7 @@ public sealed class TorCmd<Success: Any> private constructor(
 //        /**
 //         * "PROTOCOLINFO"
 //         *
-//         * [docs](https://torproject.gitlab.io/torspec/control-spec/#protocolinfo)
+//         * [docs](https://spec.torproject.org/control-spec/commands.html#protocolinfo)
 //         * */
 //        public class Protocol: Privileged<Map<String, String>>("PROTOCOLINFO")
     }
@@ -275,7 +276,7 @@ public sealed class TorCmd<Success: Any> private constructor(
     /**
      * "MAPADDRESS"
      *
-     * [docs](https://torproject.gitlab.io/torspec/control-spec/#mapaddress)
+     * [docs](https://spec.torproject.org/control-spec/commands.html#mapaddress)
      * */
     public class MapAddress: Unprivileged<Set<AddressMapping.Result>> {
 
@@ -296,7 +297,7 @@ public sealed class TorCmd<Success: Any> private constructor(
         /**
          * "ADD_ONION"
          *
-         * [docs](https://torproject.gitlab.io/torspec/control-spec/#add_onion)
+         * [docs](https://spec.torproject.org/control-spec/commands.html#add_onion)
          * */
         public class Add private constructor(
             // TODO: Issue #419
@@ -305,7 +306,7 @@ public sealed class TorCmd<Success: Any> private constructor(
         /**
          * "DEL_ONION"
          *
-         * [docs](https://torproject.gitlab.io/torspec/control-spec/#del_onion)
+         * [docs](https://spec.torproject.org/control-spec/commands.html#del_onion)
          * */
         public class Delete(
             @JvmField
@@ -321,7 +322,7 @@ public sealed class TorCmd<Success: Any> private constructor(
         /**
          * "ONION_CLIENT_AUTH_ADD"
          *
-         * [docs](https://torproject.gitlab.io/torspec/control-spec/#onion_client_auth_add)
+         * [docs](https://spec.torproject.org/control-spec/commands.html#onion_client_auth_add)
          * */
         public class Add private constructor(
             // TODO: Issue #420
@@ -330,7 +331,7 @@ public sealed class TorCmd<Success: Any> private constructor(
         /**
          * "ONION_CLIENT_AUTH_REMOVE"
          *
-         * [docs](https://torproject.gitlab.io/torspec/control-spec/#onion_client_auth_remove)
+         * [docs](https://spec.torproject.org/control-spec/commands.html#onion_client_auth_remove)
          * */
         public class Remove private constructor(
             @JvmField
@@ -345,7 +346,7 @@ public sealed class TorCmd<Success: Any> private constructor(
         /**
          * "ONION_CLIENT_AUTH_VIEW"
          *
-         * [docs](https://torproject.gitlab.io/torspec/control-spec/#onion_client_auth_view)
+         * [docs](https://spec.torproject.org/control-spec/commands.html#onion_client_auth_view)
          * */
         public class View: Unprivileged<List<ClientAuthEntry>> {
 
@@ -373,14 +374,14 @@ public sealed class TorCmd<Success: Any> private constructor(
         /**
          * "DROPOWNERSHIP"
          *
-         * [docs](https://torproject.gitlab.io/torspec/control-spec/#dropownership)
+         * [docs](https://spec.torproject.org/control-spec/commands.html#dropownership)
          * */
         public data object Drop: Privileged<Reply.Success.OK>("DROPOWNERSHIP")
 
         /**
          * "TAKEOWNERSHIP"
          *
-         * [docs](https://torproject.gitlab.io/torspec/control-spec/#takeownership)
+         * [docs](https://spec.torproject.org/control-spec/commands.html#takeownership)
          * */
         public data object Take: Privileged<Reply.Success.OK>("TAKEOWNERSHIP")
     }
@@ -388,14 +389,14 @@ public sealed class TorCmd<Success: Any> private constructor(
 //    /**
 //     * "+POSTDESCRIPTOR"
 //     *
-//     * [docs](https://torproject.gitlab.io/torspec/control-spec/#postdescriptor)
+//     * [docs](https://spec.torproject.org/control-spec/commands.html#postdescriptor)
 //     * */
 //    public class PostDescriptor: Unprivileged<String>("POSTDESCRIPTOR")
 
     /**
      * "RESOLVE"
      *
-     * [docs](https://torproject.gitlab.io/torspec/control-spec/#resolve)
+     * [docs](https://spec.torproject.org/control-spec/commands.html#resolve)
      * */
     public class Resolve(
         @JvmField
@@ -413,7 +414,7 @@ public sealed class TorCmd<Success: Any> private constructor(
     /**
      * "SETEVENTS"
      *
-     * [docs](https://torproject.gitlab.io/torspec/control-spec/#setevents)
+     * [docs](https://spec.torproject.org/control-spec/commands.html#setevents)
      * */
     public class SetEvents: Unprivileged<Reply.Success.OK> {
 
@@ -434,7 +435,7 @@ public sealed class TorCmd<Success: Any> private constructor(
     /**
      * "SIGNAL"
      *
-     * [docs](https://torproject.gitlab.io/torspec/control-spec/#signal)
+     * [docs](https://spec.torproject.org/control-spec/commands.html#signal)
      * */
     public data object Signal {
 
@@ -461,21 +462,21 @@ public sealed class TorCmd<Success: Any> private constructor(
 //        /**
 //         * "ATTACHSTREAM"
 //         *
-//         * [ATTACHSTREAM](https://torproject.gitlab.io/torspec/control-spec/#attachstream)
+//         * [ATTACHSTREAM](https://spec.torproject.org/control-spec/commands.html#attachstream)
 //         * */
 //        public class Attach: Unprivileged<Reply.Success.OK>("ATTACHSTREAM")
 //
 //        /**
 //         * "CLOSESTREAM"
 //         *
-//         * [CLOSESTREAM](https://torproject.gitlab.io/torspec/control-spec/#closestream)
+//         * [CLOSESTREAM](https://spec.torproject.org/control-spec/commands.html#closestream)
 //         * */
 //        public class Close: Unprivileged<Reply.Success.OK>("CLOSESTREAM")
 //
 //        /**
 //         * "REDIRECTSTREAM"
 //         *
-//         * [REDIRECTSTREAM](https://torproject.gitlab.io/torspec/control-spec/#redirectstream)
+//         * [REDIRECTSTREAM](https://spec.torproject.org/control-spec/commands.html#redirectstream)
 //         * */
 //        public class Redirect: Unprivileged<Reply.Success.OK>("REDIRECTSTREAM")
 //    }
@@ -483,7 +484,7 @@ public sealed class TorCmd<Success: Any> private constructor(
 //    /**
 //     * "USEFEATURE"
 //     *
-//     * [USEFEATURE](https://torproject.gitlab.io/torspec/control-spec/#usefeature)
+//     * [USEFEATURE](https://spec.torproject.org/control-spec/commands.html#usefeature)
 //     * */
 //    public class UseFeature: Unprivileged<Reply.Success.OK>("USEFEATURE")
 
