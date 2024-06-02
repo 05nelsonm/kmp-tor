@@ -267,6 +267,13 @@ public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$Address : io/
 public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$Address$Companion : io/matthewnelson/kmp/tor/runtime/core/TorConfig$Keyword {
 }
 
+public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$AddressDisableIPv6 : io/matthewnelson/kmp/tor/runtime/core/TorConfig$Setting$Builder {
+	public static final field Companion Lio/matthewnelson/kmp/tor/runtime/core/TorConfig$AddressDisableIPv6$Companion;
+}
+
+public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$AddressDisableIPv6$Companion : io/matthewnelson/kmp/tor/runtime/core/TorConfig$Keyword {
+}
+
 public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$AllowNonRFC953Hostnames : io/matthewnelson/kmp/tor/runtime/core/TorConfig$Setting$Builder {
 	public static final field Companion Lio/matthewnelson/kmp/tor/runtime/core/TorConfig$AllowNonRFC953Hostnames$Companion;
 }
@@ -279,6 +286,13 @@ public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$AlternateBrid
 }
 
 public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$AlternateBridgeAuthority$Companion : io/matthewnelson/kmp/tor/runtime/core/TorConfig$Keyword {
+}
+
+public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$AlternateDirAuthority : io/matthewnelson/kmp/tor/runtime/core/TorConfig$Setting$Builder {
+	public static final field Companion Lio/matthewnelson/kmp/tor/runtime/core/TorConfig$AlternateDirAuthority$Companion;
+}
+
+public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$AlternateDirAuthority$Companion : io/matthewnelson/kmp/tor/runtime/core/TorConfig$Keyword {
 }
 
 public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$AndroidIdentityTag {
@@ -295,11 +309,25 @@ public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$AssumeReachab
 public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$AssumeReachable$Companion : io/matthewnelson/kmp/tor/runtime/core/TorConfig$Keyword {
 }
 
+public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$AssumeReachableIPv6 : io/matthewnelson/kmp/tor/runtime/core/TorConfig$Setting$Builder {
+	public static final field Companion Lio/matthewnelson/kmp/tor/runtime/core/TorConfig$AssumeReachableIPv6$Companion;
+}
+
+public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$AssumeReachableIPv6$Companion : io/matthewnelson/kmp/tor/runtime/core/TorConfig$Keyword {
+}
+
 public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$AuthDirBadExit : io/matthewnelson/kmp/tor/runtime/core/TorConfig$Setting$Builder {
 	public static final field Companion Lio/matthewnelson/kmp/tor/runtime/core/TorConfig$AuthDirBadExit$Companion;
 }
 
 public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$AuthDirBadExit$Companion : io/matthewnelson/kmp/tor/runtime/core/TorConfig$Keyword {
+}
+
+public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$AuthDirBadExitCCs : io/matthewnelson/kmp/tor/runtime/core/TorConfig$Setting$Builder {
+	public static final field Companion Lio/matthewnelson/kmp/tor/runtime/core/TorConfig$AuthDirBadExitCCs$Companion;
+}
+
+public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$AuthDirBadExitCCs$Companion : io/matthewnelson/kmp/tor/runtime/core/TorConfig$Keyword {
 }
 
 public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$AuthDirFastGuarantee : io/matthewnelson/kmp/tor/runtime/core/TorConfig$Setting$Builder {
@@ -330,6 +358,13 @@ public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$AuthDirInvali
 public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$AuthDirInvalid$Companion : io/matthewnelson/kmp/tor/runtime/core/TorConfig$Keyword {
 }
 
+public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$AuthDirInvalidCCs : io/matthewnelson/kmp/tor/runtime/core/TorConfig$Setting$Builder {
+	public static final field Companion Lio/matthewnelson/kmp/tor/runtime/core/TorConfig$AuthDirInvalidCCs$Companion;
+}
+
+public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$AuthDirInvalidCCs$Companion : io/matthewnelson/kmp/tor/runtime/core/TorConfig$Keyword {
+}
+
 public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$AuthDirListBadExits : io/matthewnelson/kmp/tor/runtime/core/TorConfig$Setting$Builder {
 	public static final field Companion Lio/matthewnelson/kmp/tor/runtime/core/TorConfig$AuthDirListBadExits$Companion;
 }
@@ -337,11 +372,32 @@ public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$AuthDirListBa
 public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$AuthDirListBadExits$Companion : io/matthewnelson/kmp/tor/runtime/core/TorConfig$Keyword {
 }
 
+public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$AuthDirListMiddleOnly : io/matthewnelson/kmp/tor/runtime/core/TorConfig$Setting$Builder {
+	public static final field Companion Lio/matthewnelson/kmp/tor/runtime/core/TorConfig$AuthDirListMiddleOnly$Companion;
+}
+
+public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$AuthDirListMiddleOnly$Companion : io/matthewnelson/kmp/tor/runtime/core/TorConfig$Keyword {
+}
+
 public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$AuthDirMaxServersPerAddr : io/matthewnelson/kmp/tor/runtime/core/TorConfig$Setting$Builder {
 	public static final field Companion Lio/matthewnelson/kmp/tor/runtime/core/TorConfig$AuthDirMaxServersPerAddr$Companion;
 }
 
 public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$AuthDirMaxServersPerAddr$Companion : io/matthewnelson/kmp/tor/runtime/core/TorConfig$Keyword {
+}
+
+public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$AuthDirMiddleOnly : io/matthewnelson/kmp/tor/runtime/core/TorConfig$Setting$Builder {
+	public static final field Companion Lio/matthewnelson/kmp/tor/runtime/core/TorConfig$AuthDirMiddleOnly$Companion;
+}
+
+public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$AuthDirMiddleOnly$Companion : io/matthewnelson/kmp/tor/runtime/core/TorConfig$Keyword {
+}
+
+public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$AuthDirMiddleOnlyCCs : io/matthewnelson/kmp/tor/runtime/core/TorConfig$Setting$Builder {
+	public static final field Companion Lio/matthewnelson/kmp/tor/runtime/core/TorConfig$AuthDirMiddleOnlyCCs$Companion;
+}
+
+public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$AuthDirMiddleOnlyCCs$Companion : io/matthewnelson/kmp/tor/runtime/core/TorConfig$Keyword {
 }
 
 public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$AuthDirPinKeys : io/matthewnelson/kmp/tor/runtime/core/TorConfig$Setting$Builder {
@@ -365,6 +421,13 @@ public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$AuthDirReject
 public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$AuthDirRejectCCs$Companion : io/matthewnelson/kmp/tor/runtime/core/TorConfig$Keyword {
 }
 
+public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$AuthDirRejectRequestsUnderLoad : io/matthewnelson/kmp/tor/runtime/core/TorConfig$Setting$Builder {
+	public static final field Companion Lio/matthewnelson/kmp/tor/runtime/core/TorConfig$AuthDirRejectRequestsUnderLoad$Companion;
+}
+
+public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$AuthDirRejectRequestsUnderLoad$Companion : io/matthewnelson/kmp/tor/runtime/core/TorConfig$Keyword {
+}
+
 public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$AuthDirSharedRandomness : io/matthewnelson/kmp/tor/runtime/core/TorConfig$Setting$Builder {
 	public static final field Companion Lio/matthewnelson/kmp/tor/runtime/core/TorConfig$AuthDirSharedRandomness$Companion;
 }
@@ -377,6 +440,55 @@ public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$AuthDirTestEd
 }
 
 public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$AuthDirTestEd25519LinkKeys$Companion : io/matthewnelson/kmp/tor/runtime/core/TorConfig$Keyword {
+}
+
+public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$AuthDirTestReachability : io/matthewnelson/kmp/tor/runtime/core/TorConfig$Setting$Builder {
+	public static final field Companion Lio/matthewnelson/kmp/tor/runtime/core/TorConfig$AuthDirTestReachability$Companion;
+}
+
+public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$AuthDirTestReachability$Companion : io/matthewnelson/kmp/tor/runtime/core/TorConfig$Keyword {
+}
+
+public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$AuthDirVoteGuard : io/matthewnelson/kmp/tor/runtime/core/TorConfig$Setting$Builder {
+	public static final field Companion Lio/matthewnelson/kmp/tor/runtime/core/TorConfig$AuthDirVoteGuard$Companion;
+}
+
+public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$AuthDirVoteGuard$Companion : io/matthewnelson/kmp/tor/runtime/core/TorConfig$Keyword {
+}
+
+public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$AuthDirVoteGuardBwThresholdFraction : io/matthewnelson/kmp/tor/runtime/core/TorConfig$Setting$Builder {
+	public static final field Companion Lio/matthewnelson/kmp/tor/runtime/core/TorConfig$AuthDirVoteGuardBwThresholdFraction$Companion;
+}
+
+public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$AuthDirVoteGuardBwThresholdFraction$Companion : io/matthewnelson/kmp/tor/runtime/core/TorConfig$Keyword {
+}
+
+public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$AuthDirVoteGuardGuaranteeTimeKnown : io/matthewnelson/kmp/tor/runtime/core/TorConfig$Setting$Builder {
+	public static final field Companion Lio/matthewnelson/kmp/tor/runtime/core/TorConfig$AuthDirVoteGuardGuaranteeTimeKnown$Companion;
+}
+
+public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$AuthDirVoteGuardGuaranteeTimeKnown$Companion : io/matthewnelson/kmp/tor/runtime/core/TorConfig$Keyword {
+}
+
+public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$AuthDirVoteGuardGuaranteeWFU : io/matthewnelson/kmp/tor/runtime/core/TorConfig$Setting$Builder {
+	public static final field Companion Lio/matthewnelson/kmp/tor/runtime/core/TorConfig$AuthDirVoteGuardGuaranteeWFU$Companion;
+}
+
+public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$AuthDirVoteGuardGuaranteeWFU$Companion : io/matthewnelson/kmp/tor/runtime/core/TorConfig$Keyword {
+}
+
+public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$AuthDirVoteStableGuaranteeMTBF : io/matthewnelson/kmp/tor/runtime/core/TorConfig$Setting$Builder {
+	public static final field Companion Lio/matthewnelson/kmp/tor/runtime/core/TorConfig$AuthDirVoteStableGuaranteeMTBF$Companion;
+}
+
+public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$AuthDirVoteStableGuaranteeMTBF$Companion : io/matthewnelson/kmp/tor/runtime/core/TorConfig$Keyword {
+}
+
+public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$AuthDirVoteStableGuaranteeMinUptime : io/matthewnelson/kmp/tor/runtime/core/TorConfig$Setting$Builder {
+	public static final field Companion Lio/matthewnelson/kmp/tor/runtime/core/TorConfig$AuthDirVoteStableGuaranteeMinUptime$Companion;
+}
+
+public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$AuthDirVoteStableGuaranteeMinUptime$Companion : io/matthewnelson/kmp/tor/runtime/core/TorConfig$Keyword {
 }
 
 public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$AuthoritativeDirectory : io/matthewnelson/kmp/tor/runtime/core/TorConfig$Setting$Builder {
@@ -505,6 +617,13 @@ public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$CircuitBuildT
 public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$CircuitBuildTimeout$Companion : io/matthewnelson/kmp/tor/runtime/core/TorConfig$Keyword {
 }
 
+public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$CircuitPadding : io/matthewnelson/kmp/tor/runtime/core/TorConfig$Setting$Builder {
+	public static final field Companion Lio/matthewnelson/kmp/tor/runtime/core/TorConfig$CircuitPadding$Companion;
+}
+
+public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$CircuitPadding$Companion : io/matthewnelson/kmp/tor/runtime/core/TorConfig$Keyword {
+}
+
 public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$CircuitPriorityHalflife : io/matthewnelson/kmp/tor/runtime/core/TorConfig$Setting$Builder {
 	public static final field Companion Lio/matthewnelson/kmp/tor/runtime/core/TorConfig$CircuitPriorityHalflife$Companion;
 }
@@ -615,6 +734,27 @@ public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$ClientUseIPv6
 public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$Companion {
 	public final fun Builder (Lio/matthewnelson/kmp/tor/runtime/core/ThisBlock;)Lio/matthewnelson/kmp/tor/runtime/core/TorConfig;
 	public final fun Builder (Lio/matthewnelson/kmp/tor/runtime/core/TorConfig;Lio/matthewnelson/kmp/tor/runtime/core/ThisBlock;)Lio/matthewnelson/kmp/tor/runtime/core/TorConfig;
+}
+
+public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$CompiledProofOfWorkHash : io/matthewnelson/kmp/tor/runtime/core/TorConfig$Setting$Builder {
+	public static final field Companion Lio/matthewnelson/kmp/tor/runtime/core/TorConfig$CompiledProofOfWorkHash$Companion;
+}
+
+public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$CompiledProofOfWorkHash$Companion : io/matthewnelson/kmp/tor/runtime/core/TorConfig$Keyword {
+}
+
+public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$ConfluxClientUX : io/matthewnelson/kmp/tor/runtime/core/TorConfig$Setting$Builder {
+	public static final field Companion Lio/matthewnelson/kmp/tor/runtime/core/TorConfig$ConfluxClientUX$Companion;
+}
+
+public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$ConfluxClientUX$Companion : io/matthewnelson/kmp/tor/runtime/core/TorConfig$Keyword {
+}
+
+public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$ConfluxEnabled : io/matthewnelson/kmp/tor/runtime/core/TorConfig$Setting$Builder {
+	public static final field Companion Lio/matthewnelson/kmp/tor/runtime/core/TorConfig$ConfluxEnabled$Companion;
+}
+
+public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$ConfluxEnabled$Companion : io/matthewnelson/kmp/tor/runtime/core/TorConfig$Keyword {
 }
 
 public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$ConnDirectionStatistics : io/matthewnelson/kmp/tor/runtime/core/TorConfig$Setting$Builder {
@@ -886,6 +1026,27 @@ public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$DoSCircuitCre
 public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$DoSCircuitCreationRate$Companion : io/matthewnelson/kmp/tor/runtime/core/TorConfig$Keyword {
 }
 
+public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$DoSConnectionConnectBurst : io/matthewnelson/kmp/tor/runtime/core/TorConfig$Setting$Builder {
+	public static final field Companion Lio/matthewnelson/kmp/tor/runtime/core/TorConfig$DoSConnectionConnectBurst$Companion;
+}
+
+public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$DoSConnectionConnectBurst$Companion : io/matthewnelson/kmp/tor/runtime/core/TorConfig$Keyword {
+}
+
+public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$DoSConnectionConnectDefenseTimePeriod : io/matthewnelson/kmp/tor/runtime/core/TorConfig$Setting$Builder {
+	public static final field Companion Lio/matthewnelson/kmp/tor/runtime/core/TorConfig$DoSConnectionConnectDefenseTimePeriod$Companion;
+}
+
+public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$DoSConnectionConnectDefenseTimePeriod$Companion : io/matthewnelson/kmp/tor/runtime/core/TorConfig$Keyword {
+}
+
+public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$DoSConnectionConnectRate : io/matthewnelson/kmp/tor/runtime/core/TorConfig$Setting$Builder {
+	public static final field Companion Lio/matthewnelson/kmp/tor/runtime/core/TorConfig$DoSConnectionConnectRate$Companion;
+}
+
+public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$DoSConnectionConnectRate$Companion : io/matthewnelson/kmp/tor/runtime/core/TorConfig$Keyword {
+}
+
 public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$DoSConnectionDefenseType : io/matthewnelson/kmp/tor/runtime/core/TorConfig$Setting$Builder {
 	public static final field Companion Lio/matthewnelson/kmp/tor/runtime/core/TorConfig$DoSConnectionDefenseType$Companion;
 }
@@ -947,6 +1108,13 @@ public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$DormantTimeou
 }
 
 public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$DormantTimeoutDisabledByIdleStreams$Companion : io/matthewnelson/kmp/tor/runtime/core/TorConfig$Setting$Factory {
+}
+
+public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$DormantTimeoutEnabled : io/matthewnelson/kmp/tor/runtime/core/TorConfig$Setting$Builder {
+	public static final field Companion Lio/matthewnelson/kmp/tor/runtime/core/TorConfig$DormantTimeoutEnabled$Companion;
+}
+
+public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$DormantTimeoutEnabled$Companion : io/matthewnelson/kmp/tor/runtime/core/TorConfig$Keyword {
 }
 
 public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$DownloadExtraInfo : io/matthewnelson/kmp/tor/runtime/core/TorConfig$Setting$Builder {
@@ -1134,6 +1302,13 @@ public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$FetchUselessD
 public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$FetchUselessDescriptors$Companion : io/matthewnelson/kmp/tor/runtime/core/TorConfig$Keyword {
 }
 
+public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$FirewallPorts : io/matthewnelson/kmp/tor/runtime/core/TorConfig$Setting$Builder {
+	public static final field Companion Lio/matthewnelson/kmp/tor/runtime/core/TorConfig$FirewallPorts$Companion;
+}
+
+public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$FirewallPorts$Companion : io/matthewnelson/kmp/tor/runtime/core/TorConfig$Keyword {
+}
+
 public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$GeoIPExcludeUnknown : io/matthewnelson/kmp/tor/runtime/core/TorConfig$Setting$Builder {
 	public static final field Companion Lio/matthewnelson/kmp/tor/runtime/core/TorConfig$GeoIPExcludeUnknown$Companion;
 	public final fun auto ()Lio/matthewnelson/kmp/tor/runtime/core/TorConfig$GeoIPExcludeUnknown;
@@ -1261,6 +1436,27 @@ public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$HiddenService
 public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$HiddenServiceDirGroupReadable$Companion : io/matthewnelson/kmp/tor/runtime/core/TorConfig$Keyword {
 }
 
+public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$HiddenServiceEnableIntroDoSBurstPerSec : io/matthewnelson/kmp/tor/runtime/core/TorConfig$Setting$Builder {
+	public static final field Companion Lio/matthewnelson/kmp/tor/runtime/core/TorConfig$HiddenServiceEnableIntroDoSBurstPerSec$Companion;
+}
+
+public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$HiddenServiceEnableIntroDoSBurstPerSec$Companion : io/matthewnelson/kmp/tor/runtime/core/TorConfig$Keyword {
+}
+
+public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$HiddenServiceEnableIntroDoSDefense : io/matthewnelson/kmp/tor/runtime/core/TorConfig$Setting$Builder {
+	public static final field Companion Lio/matthewnelson/kmp/tor/runtime/core/TorConfig$HiddenServiceEnableIntroDoSDefense$Companion;
+}
+
+public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$HiddenServiceEnableIntroDoSDefense$Companion : io/matthewnelson/kmp/tor/runtime/core/TorConfig$Keyword {
+}
+
+public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$HiddenServiceEnableIntroDoSRatePerSec : io/matthewnelson/kmp/tor/runtime/core/TorConfig$Setting$Builder {
+	public static final field Companion Lio/matthewnelson/kmp/tor/runtime/core/TorConfig$HiddenServiceEnableIntroDoSRatePerSec$Companion;
+}
+
+public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$HiddenServiceEnableIntroDoSRatePerSec$Companion : io/matthewnelson/kmp/tor/runtime/core/TorConfig$Keyword {
+}
+
 public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$HiddenServiceExportCircuitID : io/matthewnelson/kmp/tor/runtime/core/TorConfig$Setting$Builder {
 	public static final field Companion Lio/matthewnelson/kmp/tor/runtime/core/TorConfig$HiddenServiceExportCircuitID$Companion;
 }
@@ -1298,6 +1494,34 @@ public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$HiddenService
 }
 
 public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$HiddenServiceNumIntroductionPoints$Companion : io/matthewnelson/kmp/tor/runtime/core/TorConfig$Keyword {
+}
+
+public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$HiddenServiceOnionBalanceInstance : io/matthewnelson/kmp/tor/runtime/core/TorConfig$Setting$Builder {
+	public static final field Companion Lio/matthewnelson/kmp/tor/runtime/core/TorConfig$HiddenServiceOnionBalanceInstance$Companion;
+}
+
+public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$HiddenServiceOnionBalanceInstance$Companion : io/matthewnelson/kmp/tor/runtime/core/TorConfig$Keyword {
+}
+
+public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$HiddenServicePoWDefensesEnabled : io/matthewnelson/kmp/tor/runtime/core/TorConfig$Setting$Builder {
+	public static final field Companion Lio/matthewnelson/kmp/tor/runtime/core/TorConfig$HiddenServicePoWDefensesEnabled$Companion;
+}
+
+public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$HiddenServicePoWDefensesEnabled$Companion : io/matthewnelson/kmp/tor/runtime/core/TorConfig$Keyword {
+}
+
+public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$HiddenServicePoWQueueBurst : io/matthewnelson/kmp/tor/runtime/core/TorConfig$Setting$Builder {
+	public static final field Companion Lio/matthewnelson/kmp/tor/runtime/core/TorConfig$HiddenServicePoWQueueBurst$Companion;
+}
+
+public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$HiddenServicePoWQueueBurst$Companion : io/matthewnelson/kmp/tor/runtime/core/TorConfig$Keyword {
+}
+
+public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$HiddenServicePoWQueueRate : io/matthewnelson/kmp/tor/runtime/core/TorConfig$Setting$Builder {
+	public static final field Companion Lio/matthewnelson/kmp/tor/runtime/core/TorConfig$HiddenServicePoWQueueRate$Companion;
+}
+
+public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$HiddenServicePoWQueueRate$Companion : io/matthewnelson/kmp/tor/runtime/core/TorConfig$Keyword {
 }
 
 public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$HiddenServicePort {
@@ -1554,6 +1778,20 @@ public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$MaxUnparseabl
 public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$MaxUnparseableDescSizeToLog$Companion : io/matthewnelson/kmp/tor/runtime/core/TorConfig$Keyword {
 }
 
+public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$MetricsPort : io/matthewnelson/kmp/tor/runtime/core/TorConfig$Setting$Builder {
+	public static final field Companion Lio/matthewnelson/kmp/tor/runtime/core/TorConfig$MetricsPort$Companion;
+}
+
+public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$MetricsPort$Companion : io/matthewnelson/kmp/tor/runtime/core/TorConfig$Keyword {
+}
+
+public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$MetricsPortPolicy : io/matthewnelson/kmp/tor/runtime/core/TorConfig$Setting$Builder {
+	public static final field Companion Lio/matthewnelson/kmp/tor/runtime/core/TorConfig$MetricsPortPolicy$Companion;
+}
+
+public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$MetricsPortPolicy$Companion : io/matthewnelson/kmp/tor/runtime/core/TorConfig$Keyword {
+}
+
 public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$MiddleNodes : io/matthewnelson/kmp/tor/runtime/core/TorConfig$Setting$Builder {
 	public static final field Companion Lio/matthewnelson/kmp/tor/runtime/core/TorConfig$MiddleNodes$Companion;
 }
@@ -1580,6 +1818,13 @@ public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$MyFamily : io
 }
 
 public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$MyFamily$Companion : io/matthewnelson/kmp/tor/runtime/core/TorConfig$Keyword {
+}
+
+public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$NATDPort : io/matthewnelson/kmp/tor/runtime/core/TorConfig$Setting$Builder {
+	public static final field Companion Lio/matthewnelson/kmp/tor/runtime/core/TorConfig$NATDPort$Companion;
+}
+
+public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$NATDPort$Companion : io/matthewnelson/kmp/tor/runtime/core/TorConfig$Keyword {
 }
 
 public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$NewCircuitPeriod : io/matthewnelson/kmp/tor/runtime/core/TorConfig$Setting$Builder {
@@ -1673,11 +1918,67 @@ public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$OutboundBindA
 public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$OutboundBindAddressOR$Companion : io/matthewnelson/kmp/tor/runtime/core/TorConfig$Keyword {
 }
 
+public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$OutboundBindAddressPT : io/matthewnelson/kmp/tor/runtime/core/TorConfig$Setting$Builder {
+	public static final field Companion Lio/matthewnelson/kmp/tor/runtime/core/TorConfig$OutboundBindAddressPT$Companion;
+}
+
+public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$OutboundBindAddressPT$Companion : io/matthewnelson/kmp/tor/runtime/core/TorConfig$Keyword {
+}
+
+public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$OverloadStatistics : io/matthewnelson/kmp/tor/runtime/core/TorConfig$Setting$Builder {
+	public static final field Companion Lio/matthewnelson/kmp/tor/runtime/core/TorConfig$OverloadStatistics$Companion;
+}
+
+public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$OverloadStatistics$Companion : io/matthewnelson/kmp/tor/runtime/core/TorConfig$Keyword {
+}
+
 public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$PaddingStatistics : io/matthewnelson/kmp/tor/runtime/core/TorConfig$Setting$Builder {
 	public static final field Companion Lio/matthewnelson/kmp/tor/runtime/core/TorConfig$PaddingStatistics$Companion;
 }
 
 public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$PaddingStatistics$Companion : io/matthewnelson/kmp/tor/runtime/core/TorConfig$Keyword {
+}
+
+public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$PathBiasCircThreshold : io/matthewnelson/kmp/tor/runtime/core/TorConfig$Setting$Builder {
+	public static final field Companion Lio/matthewnelson/kmp/tor/runtime/core/TorConfig$PathBiasCircThreshold$Companion;
+}
+
+public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$PathBiasCircThreshold$Companion : io/matthewnelson/kmp/tor/runtime/core/TorConfig$Keyword {
+}
+
+public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$PathBiasDropGuards : io/matthewnelson/kmp/tor/runtime/core/TorConfig$Setting$Builder {
+	public static final field Companion Lio/matthewnelson/kmp/tor/runtime/core/TorConfig$PathBiasDropGuards$Companion;
+}
+
+public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$PathBiasDropGuards$Companion : io/matthewnelson/kmp/tor/runtime/core/TorConfig$Keyword {
+}
+
+public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$PathBiasExtremeRate : io/matthewnelson/kmp/tor/runtime/core/TorConfig$Setting$Builder {
+	public static final field Companion Lio/matthewnelson/kmp/tor/runtime/core/TorConfig$PathBiasExtremeRate$Companion;
+}
+
+public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$PathBiasExtremeRate$Companion : io/matthewnelson/kmp/tor/runtime/core/TorConfig$Keyword {
+}
+
+public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$PathBiasExtremeUseRate : io/matthewnelson/kmp/tor/runtime/core/TorConfig$Setting$Builder {
+	public static final field Companion Lio/matthewnelson/kmp/tor/runtime/core/TorConfig$PathBiasExtremeUseRate$Companion;
+}
+
+public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$PathBiasExtremeUseRate$Companion : io/matthewnelson/kmp/tor/runtime/core/TorConfig$Keyword {
+}
+
+public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$PathBiasNoticeRate : io/matthewnelson/kmp/tor/runtime/core/TorConfig$Setting$Builder {
+	public static final field Companion Lio/matthewnelson/kmp/tor/runtime/core/TorConfig$PathBiasNoticeRate$Companion;
+}
+
+public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$PathBiasNoticeRate$Companion : io/matthewnelson/kmp/tor/runtime/core/TorConfig$Keyword {
+}
+
+public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$PathBiasNoticeUseRate : io/matthewnelson/kmp/tor/runtime/core/TorConfig$Setting$Builder {
+	public static final field Companion Lio/matthewnelson/kmp/tor/runtime/core/TorConfig$PathBiasNoticeUseRate$Companion;
+}
+
+public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$PathBiasNoticeUseRate$Companion : io/matthewnelson/kmp/tor/runtime/core/TorConfig$Keyword {
 }
 
 public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$PathBiasScaleThreshold : io/matthewnelson/kmp/tor/runtime/core/TorConfig$Setting$Builder {
@@ -1692,6 +1993,20 @@ public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$PathBiasScale
 }
 
 public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$PathBiasScaleUseThreshold$Companion : io/matthewnelson/kmp/tor/runtime/core/TorConfig$Keyword {
+}
+
+public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$PathBiasUseThreshold : io/matthewnelson/kmp/tor/runtime/core/TorConfig$Setting$Builder {
+	public static final field Companion Lio/matthewnelson/kmp/tor/runtime/core/TorConfig$PathBiasUseThreshold$Companion;
+}
+
+public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$PathBiasUseThreshold$Companion : io/matthewnelson/kmp/tor/runtime/core/TorConfig$Keyword {
+}
+
+public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$PathBiasWarnRate : io/matthewnelson/kmp/tor/runtime/core/TorConfig$Setting$Builder {
+	public static final field Companion Lio/matthewnelson/kmp/tor/runtime/core/TorConfig$PathBiasWarnRate$Companion;
+}
+
+public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$PathBiasWarnRate$Companion : io/matthewnelson/kmp/tor/runtime/core/TorConfig$Keyword {
 }
 
 public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$PathsNeededToBuildCircuits : io/matthewnelson/kmp/tor/runtime/core/TorConfig$Setting$Builder {
@@ -1776,6 +2091,13 @@ public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$RecommendedVe
 }
 
 public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$RecommendedVersions$Companion : io/matthewnelson/kmp/tor/runtime/core/TorConfig$Keyword {
+}
+
+public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$ReducedCircuitPadding : io/matthewnelson/kmp/tor/runtime/core/TorConfig$Setting$Builder {
+	public static final field Companion Lio/matthewnelson/kmp/tor/runtime/core/TorConfig$ReducedCircuitPadding$Companion;
+}
+
+public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$ReducedCircuitPadding$Companion : io/matthewnelson/kmp/tor/runtime/core/TorConfig$Keyword {
 }
 
 public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$ReducedConnectionPadding : io/matthewnelson/kmp/tor/runtime/core/TorConfig$Setting$Builder {
@@ -2006,6 +2328,13 @@ public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$Socks5ProxyPa
 public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$Socks5ProxyPassword$Companion : io/matthewnelson/kmp/tor/runtime/core/TorConfig$Keyword {
 }
 
+public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$Socks5ProxyUsername : io/matthewnelson/kmp/tor/runtime/core/TorConfig$Setting$Builder {
+	public static final field Companion Lio/matthewnelson/kmp/tor/runtime/core/TorConfig$Socks5ProxyUsername$Companion;
+}
+
+public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$Socks5ProxyUsername$Companion : io/matthewnelson/kmp/tor/runtime/core/TorConfig$Keyword {
+}
+
 public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$SocksPolicy : io/matthewnelson/kmp/tor/runtime/core/TorConfig$Setting$Builder {
 	public static final field Companion Lio/matthewnelson/kmp/tor/runtime/core/TorConfig$SocksPolicy$Companion;
 }
@@ -2042,6 +2371,13 @@ public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$SyslogIdentit
 public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$SyslogIdentityTag$Companion : io/matthewnelson/kmp/tor/runtime/core/TorConfig$Setting$Factory {
 }
 
+public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$TCPProxy : io/matthewnelson/kmp/tor/runtime/core/TorConfig$Setting$Builder {
+	public static final field Companion Lio/matthewnelson/kmp/tor/runtime/core/TorConfig$TCPProxy$Companion;
+}
+
+public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$TCPProxy$Companion : io/matthewnelson/kmp/tor/runtime/core/TorConfig$Keyword {
+}
+
 public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$TestSocks : io/matthewnelson/kmp/tor/runtime/core/TorConfig$Setting$Builder {
 	public static final field Companion Lio/matthewnelson/kmp/tor/runtime/core/TorConfig$TestSocks$Companion;
 }
@@ -2061,6 +2397,13 @@ public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$TestingAuthKe
 }
 
 public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$TestingAuthKeyLifetime$Companion : io/matthewnelson/kmp/tor/runtime/core/TorConfig$Keyword {
+}
+
+public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$TestingAuthKeySlop : io/matthewnelson/kmp/tor/runtime/core/TorConfig$Setting$Builder {
+	public static final field Companion Lio/matthewnelson/kmp/tor/runtime/core/TorConfig$TestingAuthKeySlop$Companion;
+}
+
+public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$TestingAuthKeySlop$Companion : io/matthewnelson/kmp/tor/runtime/core/TorConfig$Keyword {
 }
 
 public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$TestingBridgeBootstrapDownloadInitialDelay : io/matthewnelson/kmp/tor/runtime/core/TorConfig$Setting$Builder {
@@ -2168,6 +2511,13 @@ public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$TestingLinkCe
 public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$TestingLinkCertLifetime$Companion : io/matthewnelson/kmp/tor/runtime/core/TorConfig$Keyword {
 }
 
+public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$TestingLinkKeySlop : io/matthewnelson/kmp/tor/runtime/core/TorConfig$Setting$Builder {
+	public static final field Companion Lio/matthewnelson/kmp/tor/runtime/core/TorConfig$TestingLinkKeySlop$Companion;
+}
+
+public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$TestingLinkKeySlop$Companion : io/matthewnelson/kmp/tor/runtime/core/TorConfig$Keyword {
+}
+
 public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$TestingMinExitFlagThreshold : io/matthewnelson/kmp/tor/runtime/core/TorConfig$Setting$Builder {
 	public static final field Companion Lio/matthewnelson/kmp/tor/runtime/core/TorConfig$TestingMinExitFlagThreshold$Companion;
 }
@@ -2180,6 +2530,13 @@ public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$TestingMinFas
 }
 
 public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$TestingMinFastFlagThreshold$Companion : io/matthewnelson/kmp/tor/runtime/core/TorConfig$Keyword {
+}
+
+public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$TestingMinTimeToReportBandwidth : io/matthewnelson/kmp/tor/runtime/core/TorConfig$Setting$Builder {
+	public static final field Companion Lio/matthewnelson/kmp/tor/runtime/core/TorConfig$TestingMinTimeToReportBandwidth$Companion;
+}
+
+public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$TestingMinTimeToReportBandwidth$Companion : io/matthewnelson/kmp/tor/runtime/core/TorConfig$Keyword {
 }
 
 public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$TestingServerConsensusDownloadInitialDelay : io/matthewnelson/kmp/tor/runtime/core/TorConfig$Setting$Builder {
@@ -2385,6 +2742,13 @@ public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$V3BandwidthsF
 public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$V3BandwidthsFile$Companion : io/matthewnelson/kmp/tor/runtime/core/TorConfig$Keyword {
 }
 
+public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$VanguardsLiteEnabled : io/matthewnelson/kmp/tor/runtime/core/TorConfig$Setting$Builder {
+	public static final field Companion Lio/matthewnelson/kmp/tor/runtime/core/TorConfig$VanguardsLiteEnabled$Companion;
+}
+
+public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$VanguardsLiteEnabled$Companion : io/matthewnelson/kmp/tor/runtime/core/TorConfig$Keyword {
+}
+
 public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$VersioningAuthoritativeDirectory : io/matthewnelson/kmp/tor/runtime/core/TorConfig$Setting$Builder {
 	public static final field Companion Lio/matthewnelson/kmp/tor/runtime/core/TorConfig$VersioningAuthoritativeDirectory$Companion;
 }
@@ -2422,6 +2786,13 @@ public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$__AllDirActio
 }
 
 public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$__AllDirActionsPrivate$Companion : io/matthewnelson/kmp/tor/runtime/core/TorConfig$Keyword {
+}
+
+public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$__AlwaysCongestionControl : io/matthewnelson/kmp/tor/runtime/core/TorConfig$Setting$Builder {
+	public static final field Companion Lio/matthewnelson/kmp/tor/runtime/core/TorConfig$__AlwaysCongestionControl$Companion;
+}
+
+public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$__AlwaysCongestionControl$Companion : io/matthewnelson/kmp/tor/runtime/core/TorConfig$Keyword {
 }
 
 public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$__ControlPort : io/matthewnelson/kmp/tor/runtime/core/TorConfig$Setting$Builder, io/matthewnelson/kmp/tor/runtime/core/builder/TCPPortBuilder$DSL, io/matthewnelson/kmp/tor/runtime/core/builder/UnixFlagBuilder$DSL, io/matthewnelson/kmp/tor/runtime/core/builder/UnixSocketBuilder$DSL {
@@ -2513,6 +2884,20 @@ public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$__LeaveStream
 public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$__LeaveStreamsUnattached$Companion : io/matthewnelson/kmp/tor/runtime/core/TorConfig$Keyword {
 }
 
+public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$__MetricsPort : io/matthewnelson/kmp/tor/runtime/core/TorConfig$Setting$Builder {
+	public static final field Companion Lio/matthewnelson/kmp/tor/runtime/core/TorConfig$__MetricsPort$Companion;
+}
+
+public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$__MetricsPort$Companion : io/matthewnelson/kmp/tor/runtime/core/TorConfig$Keyword {
+}
+
+public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$__NATDPort : io/matthewnelson/kmp/tor/runtime/core/TorConfig$Setting$Builder {
+	public static final field Companion Lio/matthewnelson/kmp/tor/runtime/core/TorConfig$__NATDPort$Companion;
+}
+
+public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$__NATDPort$Companion : io/matthewnelson/kmp/tor/runtime/core/TorConfig$Keyword {
+}
+
 public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$__ORPort : io/matthewnelson/kmp/tor/runtime/core/TorConfig$Setting$Builder {
 	public static final field Companion Lio/matthewnelson/kmp/tor/runtime/core/TorConfig$__ORPort$Companion;
 }
@@ -2540,6 +2925,13 @@ public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$__ReloadTorrc
 }
 
 public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$__ReloadTorrcOnSIGHUP$Companion : io/matthewnelson/kmp/tor/runtime/core/TorConfig$Keyword {
+}
+
+public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$__SbwsExit : io/matthewnelson/kmp/tor/runtime/core/TorConfig$Setting$Builder {
+	public static final field Companion Lio/matthewnelson/kmp/tor/runtime/core/TorConfig$__SbwsExit$Companion;
+}
+
+public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$__SbwsExit$Companion : io/matthewnelson/kmp/tor/runtime/core/TorConfig$Keyword {
 }
 
 public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$__SocksPort : io/matthewnelson/kmp/tor/runtime/core/TorConfig$Setting$Builder, io/matthewnelson/kmp/tor/runtime/core/builder/IsolationFlagBuilder$DSL, io/matthewnelson/kmp/tor/runtime/core/builder/TCPPortBuilder$DSL, io/matthewnelson/kmp/tor/runtime/core/builder/UnixFlagBuilder$DSL, io/matthewnelson/kmp/tor/runtime/core/builder/UnixSocketBuilder$DSL {

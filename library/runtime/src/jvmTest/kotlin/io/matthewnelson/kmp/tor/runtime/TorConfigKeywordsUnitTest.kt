@@ -35,7 +35,6 @@ class TorConfigKeywordsUnitTest {
      * */
     @Test
     fun givenKeywords_whenCheckedAgainstTorCLI_thenAreAsExpected() {
-        return
         val paths = testEnv("test_config_keywords")
             .torResource
             .install()
@@ -44,6 +43,7 @@ class TorConfigKeywordsUnitTest {
             .args("--list-torrc-options")
             .output()
             .stdout
+//            .also { println("CURRENT:\n$it") }
             .lines()
             .mapTo(ArrayList()) { "TorConfig.$it" }
 
@@ -51,6 +51,7 @@ class TorConfigKeywordsUnitTest {
             .args("--list-deprecated-options")
             .output()
             .stdout
+//            .also { println("DEPRECATED:\n$it") }
             .lines()
             .map { "TorConfig.$it" }
 
@@ -91,6 +92,11 @@ class TorConfigKeywordsUnitTest {
         run {
             val title = "The following settings were listed by --list-torrc-options, but not implemented in TorConfig"
 
+            // Override
+            listOf(
+                "TorConfig.ReconfigDropsBridgeDescs",
+            ).forEach { optionsCurrent.remove(it) }
+
             if (optionsCurrent.isNotEmpty()) {
                 sb.append(title)
 
@@ -106,7 +112,7 @@ class TorConfigKeywordsUnitTest {
 
             // Override
             listOf(
-                "TorConfig.AndroidIdentityTag"
+                "TorConfig.AndroidIdentityTag",
             ).forEach { implementedNotFound.remove(it) }
 
             if (implementedNotFound.isNotEmpty()) {

@@ -1495,7 +1495,7 @@ public class TorConfig private constructor(
 
         private var targetArgument: String? = null
 
-        // TODO: Check if can be 0
+        // TODO: Check if can be 0 (Issue #419)
         /**
          * Configures the virtual port that this HiddenServicePort
          * declaration will listen on.
@@ -1825,8 +1825,41 @@ public class TorConfig private constructor(
         )
     }
 
-    // TODO: __MetricsPort
-    // TODO: __NATDPort
+    /**
+     * [MetricsPort](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#MetricsPort)
+     *
+     * [Non-Persistent Options](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#non-persistent-options)
+     * */
+    @KmpTorDsl
+    public class __MetricsPort private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "__MetricsPort",
+            default = "",
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [NATDPort](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#NATDPort)
+     *
+     * [Non-Persistent Options](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#non-persistent-options)
+     * */
+    @KmpTorDsl
+    public class __NATDPort private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "__NATDPort",
+            default = "0",
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
 
     /**
      * [ORPort](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#ORPort)
@@ -1865,7 +1898,21 @@ public class TorConfig private constructor(
         )
     }
 
-    // TODO: __AlwaysCongestionControl
+    /**
+     * [__AlwaysCongestionControl](https://spec.torproject.org/control-spec/implementation-notes.html?highlight=__#special-config-options)
+     * */
+    @KmpTorDsl
+    public class __AlwaysCongestionControl private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "__AlwaysCongestionControl",
+            default = false.byte.toString(),
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
 
     /**
      * [__DisablePredictedCircuits](https://spec.torproject.org/control-spec/implementation-notes.html?highlight=__#special-config-options)
@@ -1876,6 +1923,22 @@ public class TorConfig private constructor(
     ) {
         public companion object: Keyword(
             name = "__DisablePredictedCircuits",
+            default = false.byte.toString(),
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [__DisableSignalHandlers](https://spec.torproject.org/control-spec/implementation-notes.html?highlight=__#special-config-options)
+     * */
+    @KmpTorDsl
+    public class __DisableSignalHandlers private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "__DisableSignalHandlers",
             default = false.byte.toString(),
             attributes = emptySet(),
             isCmdLineArg = false,
@@ -1916,24 +1979,6 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [__ReloadTorrcOnSIGHUP](https://spec.torproject.org/control-spec/implementation-notes.html?highlight=__#special-config-options)
-     * */
-    @KmpTorDsl
-    public class __ReloadTorrcOnSIGHUP private constructor(): Setting.Builder(
-        keyword = Companion,
-    ) {
-        public companion object: Keyword(
-            name = "__ReloadTorrcOnSIGHUP",
-            default = true.byte.toString(),
-            attributes = emptySet(),
-            isCmdLineArg = false,
-            isUnique = false,
-        )
-    }
-
-    // TODO: __SbwsExit
-
-    /**
      * [__OwningControllerFD](https://spec.torproject.org/control-spec/implementation-notes.html?highlight=__#special-config-options)
      * */
     @KmpTorDsl
@@ -1950,14 +1995,30 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [__DisableSignalHandlers](https://spec.torproject.org/control-spec/implementation-notes.html?highlight=__#special-config-options)
+     * [__ReloadTorrcOnSIGHUP](https://spec.torproject.org/control-spec/implementation-notes.html?highlight=__#special-config-options)
      * */
     @KmpTorDsl
-    public class __DisableSignalHandlers private constructor(): Setting.Builder(
+    public class __ReloadTorrcOnSIGHUP private constructor(): Setting.Builder(
         keyword = Companion,
     ) {
         public companion object: Keyword(
-            name = "__DisableSignalHandlers",
+            name = "__ReloadTorrcOnSIGHUP",
+            default = true.byte.toString(),
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [__SbwsExit](https://spec.torproject.org/control-spec/implementation-notes.html?highlight=__#special-config-options)
+     * */
+    @KmpTorDsl
+    public class __SbwsExit private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "__SbwsExit",
             default = false.byte.toString(),
             attributes = emptySet(),
             isCmdLineArg = false,
@@ -2017,7 +2078,21 @@ public class TorConfig private constructor(
         )
     }
 
-    // TODO: AlternateDirAuthority
+    /**
+     * [AlternateDirAuthority](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#AlternateDirAuthority)
+     * */
+    @KmpTorDsl
+    public class AlternateDirAuthority private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "AlternateDirAuthority",
+            default = "",
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
 
     /**
      * [AvoidDiskWrites](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#AvoidDiskWrites)
@@ -2117,8 +2192,37 @@ public class TorConfig private constructor(
         )
     }
 
-    // TODO: ConfluxEnabled
-    // TODO: ConfluxClientUX
+    /**
+     * [ConfluxEnabled](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#ConfluxEnabled)
+     * */
+    @KmpTorDsl
+    public class ConfluxEnabled private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "ConfluxEnabled",
+            default = AUTO,
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [ConfluxClientUX](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#ConfluxClientUX)
+     * */
+    @KmpTorDsl
+    public class ConfluxClientUX private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "ConfluxClientUX",
+            default = "throughput",
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
 
     /**
      * [ConnLimit](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#ConnLimit)
@@ -2377,11 +2481,11 @@ public class TorConfig private constructor(
         keyword = Companion,
     ) {
         public companion object: Keyword(
-            name = "ExtORPort",
-            default = "",
-            attributes = emptySet(),
-            isCmdLineArg = false,
-            isUnique = false,
+            name = __ExtORPort.name.drop(2),
+            default = __ExtORPort.default,
+            attributes = __ExtORPort.attributes,
+            isCmdLineArg = __ExtORPort.isCmdLineArg,
+            isUnique = __ExtORPort.isUnique,
         )
     }
 
@@ -2692,8 +2796,37 @@ public class TorConfig private constructor(
         )
     }
 
-    // TODO: MetricsPort
-    // TODO: MetricsPortPolicy
+    /**
+     * [MetricsPort](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#MetricsPort)
+     * */
+    @KmpTorDsl
+    public class MetricsPort private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = __MetricsPort.name.drop(2),
+            default = __MetricsPort.default,
+            attributes = __MetricsPort.attributes,
+            isCmdLineArg = __MetricsPort.isCmdLineArg,
+            isUnique = __MetricsPort.isUnique,
+        )
+    }
+
+    /**
+     * [MetricsPortPolicy](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#MetricsPortPolicy)
+     * */
+    @KmpTorDsl
+    public class MetricsPortPolicy private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "MetricsPortPolicy",
+            default = "",
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
 
     /**
      * [NoExec](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#NoExec)
@@ -2793,7 +2926,21 @@ public class TorConfig private constructor(
         )
     }
 
-    // TODO: OutboundBindAddressPT
+    /**
+     * [OutboundBindAddressPT](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#OutboundBindAddressPT)
+     * */
+    @KmpTorDsl
+    public class OutboundBindAddressPT private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "OutboundBindAddressPT",
+            default = "",
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
 
     /**
      * [PidFile](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#PidFile)
@@ -2989,7 +3136,21 @@ public class TorConfig private constructor(
         )
     }
 
-    // TODO: Socks5ProxyUsername
+    /**
+     * [Socks5ProxyUsername](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#Socks5ProxyUsername)
+     * */
+    @KmpTorDsl
+    public class Socks5ProxyUsername private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "Socks5ProxyUsername",
+            default = "",
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
 
     /**
      * [Socks5ProxyPassword](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#Socks5ProxyPassword)
@@ -3008,7 +3169,22 @@ public class TorConfig private constructor(
     }
 
     // (IMPLEMENTED) SyslogIdentityTag
-    // TODO: TCPProxy
+
+    /**
+     * [TCPProxy](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#TCPProxy)
+     * */
+    @KmpTorDsl
+    public class TCPProxy private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "TCPProxy",
+            default = "",
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
 
     /**
      * [TruncateLogFile](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#TruncateLogFile)
@@ -3113,8 +3289,37 @@ public class TorConfig private constructor(
         )
     }
 
-    // TODO: CircuitPadding
-    // TODO: ReducedCircuitPadding
+    /**
+     * [CircuitPadding](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#CircuitPadding)
+     * */
+    @KmpTorDsl
+    public class CircuitPadding private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "CircuitPadding",
+            default = true.byte.toString(),
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [ReducedCircuitPadding](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#ReducedCircuitPadding)
+     * */
+    @KmpTorDsl
+    public class ReducedCircuitPadding private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "ReducedCircuitPadding",
+            default = false.byte.toString(),
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
 
     /**
      * [ClientBootstrapConsensusAuthorityDownloadInitialDelay](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#ClientBootstrapConsensusAuthorityDownloadInitialDelay)
@@ -3214,7 +3419,7 @@ public class TorConfig private constructor(
         )
     }
 
-    // TODO: ClientPreferIPv6DirPort
+    // (DEPRECATED) ClientPreferIPv6DirPort
 
     /**
      * [ClientPreferIPv6ORPort](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#ClientPreferIPv6ORPort)
@@ -3273,7 +3478,7 @@ public class TorConfig private constructor(
     ) {
         public companion object: Keyword(
             name = "ClientUseIPv6",
-            default = false.byte.toString(),
+            default = true.byte.toString(),
             attributes = emptySet(),
             isCmdLineArg = false,
             isUnique = false,
@@ -3347,7 +3552,21 @@ public class TorConfig private constructor(
         )
     }
 
-    // TODO: FirewallPorts
+    /**
+     * [FirewallPorts](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#FirewallPorts)
+     * */
+    @KmpTorDsl
+    public class FirewallPorts private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "FirewallPorts",
+            default = "80,443",
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
 
     /**
      * See ephemeral setting [__HTTPTunnelPort].
@@ -3429,7 +3648,21 @@ public class TorConfig private constructor(
         )
     }
 
-    // TODO: NATDPort
+    /**
+     * [NATDPort](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#NATDPort)
+     * */
+    @KmpTorDsl
+    public class NATDPort private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = __NATDPort.name.drop(2),
+            default = __NATDPort.default,
+            attributes = __NATDPort.attributes,
+            isCmdLineArg = __NATDPort.isCmdLineArg,
+            isUnique = __NATDPort.isUnique,
+        )
+    }
 
     /**
      * [NewCircuitPeriod](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#NewCircuitPeriod)
@@ -3447,11 +3680,85 @@ public class TorConfig private constructor(
         )
     }
 
-    // TODO: PathBiasCircThreshold
-    // TODO: PathBiasDropGuards
-    // TODO: PathBiasExtremeRate
-    // TODO: PathBiasNoticeRate
-    // TODO: PathBiasWarnRate
+    /**
+     * [PathBiasCircThreshold](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#PathBiasCircThreshold)
+     * */
+    @KmpTorDsl
+    public class PathBiasCircThreshold private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "PathBiasCircThreshold",
+            default = "-1",
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [PathBiasDropGuards](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#PathBiasDropGuards)
+     * */
+    @KmpTorDsl
+    public class PathBiasDropGuards private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "PathBiasDropGuards",
+            default = "0",
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [PathBiasExtremeRate](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#PathBiasExtremeRate)
+     * */
+    @KmpTorDsl
+    public class PathBiasExtremeRate private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "PathBiasExtremeRate",
+            default = "-1.000000",
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [PathBiasNoticeRate](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#PathBiasNoticeRate)
+     * */
+    @KmpTorDsl
+    public class PathBiasNoticeRate private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "PathBiasNoticeRate",
+            default = "-1.000000",
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [PathBiasWarnRate](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#PathBiasWarnRate)
+     * */
+    @KmpTorDsl
+    public class PathBiasWarnRate private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "PathBiasWarnRate",
+            default = "-1.000000",
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
 
     /**
      * [PathBiasScaleThreshold](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#PathBiasScaleThreshold)
@@ -3469,9 +3776,53 @@ public class TorConfig private constructor(
         )
     }
 
-    // TODO: PathBiasUseThreshold
-    // TODO: PathBiasNoticeUseRate
-    // TODO: PathBiasExtremeUseRate
+    /**
+     * [PathBiasUseThreshold](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#PathBiasUseThreshold)
+     * */
+    @KmpTorDsl
+    public class PathBiasUseThreshold private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "PathBiasUseThreshold",
+            default = "-1",
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [PathBiasNoticeUseRate](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#PathBiasNoticeUseRate)
+     * */
+    @KmpTorDsl
+    public class PathBiasNoticeUseRate private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "PathBiasNoticeUseRate",
+            default = "-1.000000",
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [PathBiasExtremeUseRate](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#PathBiasExtremeUseRate)
+     * */
+    @KmpTorDsl
+    public class PathBiasExtremeUseRate private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "PathBiasExtremeUseRate",
+            default = "-1.000000",
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
 
     /**
      * [PathBiasScaleUseThreshold](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#PathBiasScaleUseThreshold)
@@ -3521,7 +3872,7 @@ public class TorConfig private constructor(
         )
     }
 
-    // TODO: ReachableDirAddresses
+    // (DEPRECATED) ReachableDirAddresses
 
     /**
      * [ReachableORAddresses](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#ReachableORAddresses)
@@ -3843,7 +4194,21 @@ public class TorConfig private constructor(
         )
     }
 
-    // TODO: VanguardsLiteEnabled
+    /**
+     * [VanguardsLiteEnabled](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#VanguardsLiteEnabled)
+     * */
+    @KmpTorDsl
+    public class VanguardsLiteEnabled private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "VanguardsLiteEnabled",
+            default = AUTO,
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
 
     /**
      * [UseMicrodescriptors](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#UseMicrodescriptors)
@@ -3956,7 +4321,22 @@ public class TorConfig private constructor(
     // (IMPLEMENTED) DormantClientTimeout
     // (IMPLEMENTED) DormantOnFirstStartup
     // (IMPLEMENTED) DormantTimeoutDisabledByIdleStreams
-    // TODO: DormantTimeoutEnabled
+
+    /**
+     * [DormantTimeoutEnabled](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#DormantTimeoutEnabled)
+     * */
+    @KmpTorDsl
+    public class DormantTimeoutEnabled private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "DormantTimeoutEnabled",
+            default = true.byte.toString(),
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
 
     ////////////////////////////
     // NODE SELECTION OPTIONS //
@@ -4176,7 +4556,21 @@ public class TorConfig private constructor(
         )
     }
 
-    // TODO: AddressDisableIPv6
+    /**
+     * [AddressDisableIPv6](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#AddressDisableIPv6)
+     * */
+    @KmpTorDsl
+    public class AddressDisableIPv6 private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "AddressDisableIPv6",
+            default = false.byte.toString(),
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
 
     /**
      * [AssumeReachable](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#AssumeReachable)
@@ -4194,7 +4588,21 @@ public class TorConfig private constructor(
         )
     }
 
-    // TODO: AssumeReachableIPv6
+    /**
+     * [AssumeReachableIPv6](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#AssumeReachableIPv6)
+     * */
+    @KmpTorDsl
+    public class AssumeReachableIPv6 private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "AssumeReachableIPv6",
+            default = AUTO,
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
 
     /**
      * [BridgeRelay](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#BridgeRelay)
@@ -4527,11 +4935,11 @@ public class TorConfig private constructor(
         keyword = Companion,
     ) {
         public companion object: Keyword(
-            name = "ORPort",
-            default = "0",
-            attributes = emptySet(),
-            isCmdLineArg = false,
-            isUnique = false,
+            name = __ORPort.name.drop(2),
+            default = __ORPort.default,
+            attributes = __ORPort.attributes,
+            isCmdLineArg = __ORPort.isCmdLineArg,
+            isUnique = __ORPort.isUnique,
         )
     }
 
@@ -4923,7 +5331,21 @@ public class TorConfig private constructor(
         )
     }
 
-    // TODO: OverloadStatistics
+    /**
+     * [OverloadStatistics](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#OverloadStatistics)
+     * */
+    @KmpTorDsl
+    public class OverloadStatistics private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "OverloadStatistics",
+            default = true.byte.toString(),
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
 
     /**
      * [PaddingStatistics](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#PaddingStatistics)
@@ -4985,11 +5407,11 @@ public class TorConfig private constructor(
         keyword = Companion,
     ) {
         public companion object: Keyword(
-            name = "DirPort",
-            default = "0",
-            attributes = emptySet(),
-            isCmdLineArg = false,
-            isUnique = false,
+            name = __DirPort.name.drop(2),
+            default = __DirPort.default,
+            attributes = __DirPort.attributes,
+            isCmdLineArg = __DirPort.isCmdLineArg,
+            isUnique = __DirPort.isUnique,
         )
     }
 
@@ -5173,9 +5595,53 @@ public class TorConfig private constructor(
         )
     }
 
-    // TODO: DoSConnectionConnectRate
-    // TODO: DoSConnectionConnectBurst
-    // TODO: DoSConnectionConnectDefenseTimePeriod
+    /**
+     * [DoSConnectionConnectRate](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#DoSConnectionConnectRate)
+     * */
+    @KmpTorDsl
+    public class DoSConnectionConnectRate private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "DoSConnectionConnectRate",
+            default = "0",
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [DoSConnectionConnectBurst](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#DoSConnectionConnectBurst)
+     * */
+    @KmpTorDsl
+    public class DoSConnectionConnectBurst private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "DoSConnectionConnectBurst",
+            default = "0",
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [DoSConnectionConnectDefenseTimePeriod](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#DoSConnectionConnectDefenseTimePeriod)
+     * */
+    @KmpTorDsl
+    public class DoSConnectionConnectDefenseTimePeriod private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "DoSConnectionConnectDefenseTimePeriod",
+            default = "0",
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
 
     /**
      * [DoSRefuseSingleHopClientRendezvous](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#DoSRefuseSingleHopClientRendezvous)
@@ -5193,13 +5659,118 @@ public class TorConfig private constructor(
         )
     }
 
-    // TODO: HiddenServiceEnableIntroDoSDefense
-    // TODO: HiddenServiceEnableIntroDoSBurstPerSec
-    // TODO: HiddenServiceEnableIntroDoSRatePerSec
-    // TODO: HiddenServicePoWDefensesEnabled
-    // TODO: HiddenServicePoWQueueRate
-    // TODO: HiddenServicePoWQueueBurst
-    // TODO: CompiledProofOfWorkHash
+    /**
+     * [HiddenServiceEnableIntroDoSDefense](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#HiddenServiceEnableIntroDoSDefense)
+     * */
+    @KmpTorDsl
+    public class HiddenServiceEnableIntroDoSDefense private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "HiddenServiceEnableIntroDoSDefense",
+            default = false.byte.toString(),
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [HiddenServiceEnableIntroDoSBurstPerSec](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#HiddenServiceEnableIntroDoSBurstPerSec)
+     * */
+    @KmpTorDsl
+    public class HiddenServiceEnableIntroDoSBurstPerSec private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "HiddenServiceEnableIntroDoSBurstPerSec",
+            default = "200",
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [HiddenServiceEnableIntroDoSRatePerSec](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#HiddenServiceEnableIntroDoSRatePerSec)
+     * */
+    @KmpTorDsl
+    public class HiddenServiceEnableIntroDoSRatePerSec private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "HiddenServiceEnableIntroDoSRatePerSec",
+            default = "25",
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [HiddenServicePoWDefensesEnabled](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#HiddenServicePoWDefensesEnabled)
+     * */
+    @KmpTorDsl
+    public class HiddenServicePoWDefensesEnabled private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "HiddenServicePoWDefensesEnabled",
+            default = false.byte.toString(),
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [HiddenServicePoWQueueRate](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#HiddenServicePoWQueueRate)
+     * */
+    @KmpTorDsl
+    public class HiddenServicePoWQueueRate private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "HiddenServicePoWQueueRate",
+            default = "250",
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [HiddenServicePoWQueueBurst](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#HiddenServicePoWQueueBurst)
+     * */
+    @KmpTorDsl
+    public class HiddenServicePoWQueueBurst private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "HiddenServicePoWQueueBurst",
+            default = "2500",
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [CompiledProofOfWorkHash](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#CompiledProofOfWorkHash)
+     * */
+    @KmpTorDsl
+    public class CompiledProofOfWorkHash private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "CompiledProofOfWorkHash",
+            default = AUTO,
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
 
     //////////////////////////////////////////
     //  DIRECTORY AUTHORITY SERVER OPTIONS  //
@@ -5269,7 +5840,22 @@ public class TorConfig private constructor(
         )
     }
 
-    // TODO: AuthDirMiddleOnly
+    /**
+     * [AuthDirMiddleOnly](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#AuthDirMiddleOnly)
+     * */
+    @KmpTorDsl
+    public class AuthDirMiddleOnly private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "AuthDirMiddleOnly",
+            default = "",
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
 
     /**
      * [AuthDirFastGuarantee](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#AuthDirFastGuarantee)
@@ -5351,7 +5937,21 @@ public class TorConfig private constructor(
         )
     }
 
-    // TODO: AuthDirListMiddleOnly
+    /**
+     * [AuthDirListMiddleOnly](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#AuthDirListMiddleOnly)
+     * */
+    @KmpTorDsl
+    public class AuthDirListMiddleOnly private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "AuthDirListMiddleOnly",
+            default = false.byte.toString(),
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
 
     /**
      * [AuthDirMaxServersPerAddr](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#AuthDirMaxServersPerAddr)
@@ -5401,10 +6001,70 @@ public class TorConfig private constructor(
         )
     }
 
-    // TODO: AuthDirRejectRequestsUnderLoad
-    // TODO: AuthDirBadExitCCs
-    // TODO: AuthDirInvalidCCs
-    // TODO: AuthDirMiddleOnlyCCs
+    /**
+     * [AuthDirRejectRequestsUnderLoad](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#AuthDirRejectRequestsUnderLoad)
+     * */
+    @KmpTorDsl
+    public class AuthDirRejectRequestsUnderLoad private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "AuthDirRejectRequestsUnderLoad",
+            default = true.byte.toString(),
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [AuthDirBadExitCCs](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#AuthDirBadExitCCs)
+     * */
+    @KmpTorDsl
+    public class AuthDirBadExitCCs private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "AuthDirBadExitCCs",
+            default = "",
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [AuthDirInvalidCCs](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#AuthDirInvalidCCs)
+     * */
+    @KmpTorDsl
+    public class AuthDirInvalidCCs private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "AuthDirInvalidCCs",
+            default = "",
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [AuthDirMiddleOnlyCCs](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#AuthDirMiddleOnlyCCs)
+     * */
+    @KmpTorDsl
+    public class AuthDirMiddleOnlyCCs private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "AuthDirMiddleOnlyCCs",
+            default = "",
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
 
     /**
      * [AuthDirRejectCCs](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#AuthDirRejectCCs)
@@ -5454,13 +6114,117 @@ public class TorConfig private constructor(
         )
     }
 
-    // TODO: AuthDirTestReachability
-    // TODO: AuthDirVoteGuard
-    // TODO: AuthDirVoteGuardBwThresholdFraction
-    // TODO: AuthDirVoteGuardGuaranteeTimeKnown
-    // TODO: AuthDirVoteGuardGuaranteeWFU
-    // TODO: AuthDirVoteStableGuaranteeMinUptime
-    // TODO: AuthDirVoteStableGuaranteeMTBF
+    /**
+     * [AuthDirTestReachability](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#AuthDirTestReachability)
+     * */
+    @KmpTorDsl
+    public class AuthDirTestReachability private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "AuthDirTestReachability",
+            default = true.byte.toString(),
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [AuthDirVoteGuard](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#AuthDirVoteGuard)
+     * */
+    @KmpTorDsl
+    public class AuthDirVoteGuard private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "AuthDirVoteGuard",
+            default = "",
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [AuthDirVoteGuardBwThresholdFraction](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#AuthDirVoteGuardBwThresholdFraction)
+     * */
+    @KmpTorDsl
+    public class AuthDirVoteGuardBwThresholdFraction private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "AuthDirVoteGuardBwThresholdFraction",
+            default = "0.750000",
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [AuthDirVoteGuardGuaranteeTimeKnown](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#AuthDirVoteGuardGuaranteeTimeKnown)
+     * */
+    @KmpTorDsl
+    public class AuthDirVoteGuardGuaranteeTimeKnown private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "AuthDirVoteGuardGuaranteeTimeKnown",
+            default = 8.days.inWholeSeconds.toString(),
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [AuthDirVoteGuardGuaranteeWFU](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#AuthDirVoteGuardGuaranteeWFU)
+     * */
+    @KmpTorDsl
+    public class AuthDirVoteGuardGuaranteeWFU private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "AuthDirVoteGuardGuaranteeWFU",
+            default = "0.980000",
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [AuthDirVoteStableGuaranteeMinUptime](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#AuthDirVoteStableGuaranteeMinUptime)
+     * */
+    @KmpTorDsl
+    public class AuthDirVoteStableGuaranteeMinUptime private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "AuthDirVoteStableGuaranteeMinUptime",
+            default = 30.days.inWholeSeconds.toString(),
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
+    /**
+     * [AuthDirVoteStableGuaranteeMTBF](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#AuthDirVoteStableGuaranteeMTBF)
+     * */
+    @KmpTorDsl
+    public class AuthDirVoteStableGuaranteeMTBF private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "AuthDirVoteStableGuaranteeMTBF",
+            default = 5.days.inWholeSeconds.toString(),
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
 
     /**
      * [BridgePassword](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#BridgePassword)
@@ -5742,7 +6506,22 @@ public class TorConfig private constructor(
         )
     }
 
-    // TODO: HiddenServiceOnionBalanceInstance
+    /**
+     * [HiddenServiceOnionBalanceInstance](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#HiddenServiceOnionBalanceInstance)
+     * */
+    @KmpTorDsl
+    public class HiddenServiceOnionBalanceInstance private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "HiddenServiceOnionBalanceInstance",
+            default = false.byte.toString(),
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
+
     // (IMPLEMENTED) HiddenServiceMaxStreams
     // (IMPLEMENTED) HiddenServiceMaxStreamsCloseCircuit
     // (IMPLEMENTED) HiddenServiceNumIntroductionPoints
@@ -5849,7 +6628,21 @@ public class TorConfig private constructor(
         )
     }
 
-    // TODO: TestingAuthKeySlop
+    /**
+     * [TestingAuthKeySlop](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#TestingAuthKeySlop)
+     * */
+    @KmpTorDsl
+    public class TestingAuthKeySlop private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "TestingAuthKeySlop",
+            default = 3.hours.inWholeSeconds.toString(),
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
 
     /**
      * [TestingBridgeBootstrapDownloadInitialDelay](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#TestingBridgeBootstrapDownloadInitialDelay)
@@ -6091,7 +6884,21 @@ public class TorConfig private constructor(
         )
     }
 
-    // TODO: TestingLinkKeySlop
+    /**
+     * [TestingLinkKeySlop](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#TestingLinkKeySlop)
+     * */
+    @KmpTorDsl
+    public class TestingLinkKeySlop private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "TestingLinkKeySlop",
+            default = 3.hours.inWholeSeconds.toString(),
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
 
     /**
      * [TestingMinExitFlagThreshold](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#TestingMinExitFlagThreshold)
@@ -6125,7 +6932,21 @@ public class TorConfig private constructor(
         )
     }
 
-    // TODO: TestingMinTimeToReportBandwidth
+    /**
+     * [TestingMinTimeToReportBandwidth](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#TestingMinTimeToReportBandwidth)
+     * */
+    @KmpTorDsl
+    public class TestingMinTimeToReportBandwidth private constructor(): Setting.Builder(
+        keyword = Companion,
+    ) {
+        public companion object: Keyword(
+            name = "TestingMinTimeToReportBandwidth",
+            default = 1.days.inWholeSeconds.toString(),
+            attributes = emptySet(),
+            isCmdLineArg = false,
+            isUnique = false,
+        )
+    }
 
     /**
      * [TestingServerConsensusDownloadInitialDelay](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#TestingServerConsensusDownloadInitialDelay)
