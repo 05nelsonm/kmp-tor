@@ -21,7 +21,6 @@ import io.matthewnelson.kmp.file.resolve
 import io.matthewnelson.kmp.file.toFile
 import io.matthewnelson.kmp.tor.core.api.ResourceInstaller
 import io.matthewnelson.kmp.tor.core.api.ResourceInstaller.Paths
-import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
 import io.matthewnelson.kmp.tor.runtime.ConfigBuilderCallback
 import io.matthewnelson.kmp.tor.runtime.RuntimeEvent
 import io.matthewnelson.kmp.tor.runtime.TorRuntime
@@ -36,7 +35,6 @@ import kotlin.test.assertEquals
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
-@OptIn(InternalKmpTorApi::class)
 class TorConfigGeneratorUnitTest {
 
     private val environment = "".toFile().absoluteFile.resolve("config-test").let { rootDir ->
@@ -100,6 +98,7 @@ class TorConfigGeneratorUnitTest {
             assertContains(TorConfig.DisableNetwork)
             assertContains(TorConfig.RunAsDaemon)
             assertContains(TorConfig.__OwningControllerProcess)
+            assertContains(TorConfig.__ReloadTorrcOnSIGHUP)
         }
     }
 
