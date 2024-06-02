@@ -17,12 +17,15 @@
 
 package io.matthewnelson.kmp.tor.runtime.ctrl.internal
 
+import io.matthewnelson.immutable.collections.toImmutableList
 import io.matthewnelson.immutable.collections.toImmutableMap
 import io.matthewnelson.kmp.file.InterruptedException
+import io.matthewnelson.kmp.tor.runtime.core.ctrl.ConfigEntry
 import io.matthewnelson.kmp.tor.runtime.core.ctrl.Reply
 import io.matthewnelson.kmp.tor.runtime.core.ctrl.Reply.Error.Companion.toError
 import io.matthewnelson.kmp.tor.runtime.core.ctrl.TorCmd
 
+@Throws(NoSuchElementException::class)
 internal fun TorCmdJob<*>.respond(replies: ArrayList<Reply>) {
     // waiters were destroyed while awaiting server response (i.e. EOS)
     if (replies.isEmpty()) {
@@ -84,9 +87,36 @@ internal fun TorCmdJob<*>.respond(replies: ArrayList<Reply>) {
     }
 }
 
-@Suppress("NOTHING_TO_INLINE")
-private inline fun TorCmd.Config.Get.complete(job: TorCmdJob<*>, replies: ArrayList<Reply.Success>) {
-    TODO()
+@Throws(NoSuchElementException::class)
+private fun TorCmd.Config.Get.complete(job: TorCmdJob<*>, replies: ArrayList<Reply.Success>) {
+    val entries = ArrayList<ConfigEntry>(replies.size)
+
+    for (reply in replies) {
+        if (reply is Reply.Success.OK) continue
+
+        val kvp = reply.message
+        val i = kvp.indexOf('=')
+
+        val keyword = run {
+            val key = if (i == -1) {
+                kvp
+            } else {
+                kvp.substring(0, i)
+            }
+
+            keywords.first { it.name.equals(key, ignoreCase = true) }
+        }
+
+        val setting = if (i == -1) {
+            ""
+        } else {
+            kvp.substring(i + 1)
+        }
+
+        entries.add(ConfigEntry(keyword, setting))
+    }
+
+    job.unsafeCast<List<ConfigEntry>>().completion(entries.toImmutableList())
 }
 
 @Suppress("NOTHING_TO_INLINE")
@@ -108,17 +138,17 @@ private inline fun TorCmd.Info.Get.complete(job: TorCmdJob<*>, replies: ArrayLis
 
 @Suppress("NOTHING_TO_INLINE")
 private inline fun TorCmd.MapAddress.complete(job: TorCmdJob<*>, replies: ArrayList<Reply.Success>) {
-    TODO()
+    TODO("Issue #418")
 }
 
 @Suppress("NOTHING_TO_INLINE")
 private inline fun TorCmd.Onion.Add.complete(job: TorCmdJob<*>, replies: ArrayList<Reply.Success>) {
-    TODO()
+    TODO("Issue #419")
 }
 
 @Suppress("NOTHING_TO_INLINE")
 private inline fun TorCmd.OnionClientAuth.View.complete(job: TorCmdJob<*>, replies: ArrayList<Reply.Success>) {
-    TODO()
+    TODO("Issue #421")
 }
 
 @Suppress("NOTHING_TO_INLINE")

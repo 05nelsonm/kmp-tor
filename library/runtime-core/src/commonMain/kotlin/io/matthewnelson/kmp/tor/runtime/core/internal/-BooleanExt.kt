@@ -18,4 +18,4 @@
 package io.matthewnelson.kmp.tor.runtime.core.internal
 
 @Suppress("NOTHING_TO_INLINE")
-internal inline fun Boolean.toByte(): Byte = if (this) 1 else 0
+internal inline val Boolean.byte: Byte get() = if (this) 1 else 0
