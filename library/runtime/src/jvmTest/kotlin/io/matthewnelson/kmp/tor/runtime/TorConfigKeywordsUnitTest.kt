@@ -20,6 +20,7 @@ import io.matthewnelson.kmp.tor.runtime.core.TorConfig
 import io.matthewnelson.kmp.tor.runtime.test.TestUtils
 import io.matthewnelson.kmp.tor.runtime.test.TestUtils.testEnv
 import kotlin.test.Test
+import kotlin.test.fail
 
 class TorConfigKeywordsUnitTest {
 
@@ -39,21 +40,51 @@ class TorConfigKeywordsUnitTest {
             .torResource
             .install()
 
-        val optionsCurrent = Process.Builder(paths.tor.toString())
-            .args("--list-torrc-options")
-            .output()
-            .stdout
-//            .also { println("CURRENT:\n$it") }
-            .lines()
-            .mapTo(ArrayList()) { "TorConfig.$it" }
+        val optionsCurrent = run {
+            val output = Process.Builder(paths.tor.toString())
+                .args("--list-torrc-options")
+                .output()
 
-        val optionsDeprecated = Process.Builder(paths.tor.toString())
-            .args("--list-deprecated-options")
-            .output()
-            .stdout
-//            .also { println("DEPRECATED:\n$it") }
-            .lines()
-            .map { "TorConfig.$it" }
+            if (
+                output.stdout.isEmpty()
+                || output.stderr.isNotEmpty()
+                || output.processError != null
+            ) {
+                val msg = buildString {
+                    appendLine(output.stdout)
+                    appendLine(output.stderr)
+                    appendLine(output.toString())
+                }
+                throw AssertionError(msg)
+            }
+
+//            println("CURRENT:\n${output.stdout}")
+
+            output.stdout.lines().mapTo(ArrayList()) { "TorConfig.$it" }
+        }
+
+        val optionsDeprecated = run {
+            val output = Process.Builder(paths.tor.toString())
+                .args("--list-deprecated-options")
+                .output()
+
+            if (
+                output.stdout.isEmpty()
+                || output.stderr.isNotEmpty()
+                || output.processError != null
+            ) {
+                val msg = buildString {
+                    appendLine(output.stdout)
+                    appendLine(output.stderr)
+                    appendLine(output.toString())
+                }
+                throw AssertionError(msg)
+            }
+
+//            println("DEPRECATED:\n${output.stdout}")
+
+            output.stdout.lines().map { "TorConfig.$it" }
+        }
 
         // Remove overlapping deprecated options
         optionsDeprecated.forEach { optionsCurrent.remove(it) }
@@ -98,13 +129,12 @@ class TorConfigKeywordsUnitTest {
                 "TorConfig.ReconfigDropsBridgeDescs",
             ).forEach { optionsCurrent.remove(it) }
 
-            if (optionsCurrent.isNotEmpty()) {
-                sb.append(title)
+            if (optionsCurrent.isEmpty()) return@run
 
-                for (item in optionsCurrent) {
-                    sb.appendLine()
-                    sb.append(item)
-                }
+            sb.append(title)
+            for (item in optionsCurrent) {
+                sb.appendLine()
+                sb.append(item)
             }
         }
 
@@ -116,54 +146,48 @@ class TorConfigKeywordsUnitTest {
                 "TorConfig.AndroidIdentityTag",
             ).forEach { implementedNotFound.remove(it) }
 
-            if (implementedNotFound.isNotEmpty()) {
-                if (sb.isNotEmpty()) {
-                    sb.appendLine()
-                    sb.appendLine()
-                }
+            if (implementedNotFound.isEmpty()) return@run
 
-                sb.append(title)
-
-                for (item in implementedNotFound) {
-                    sb.appendLine()
-                    sb.append(item)
-                }
+            if (sb.isNotEmpty()) {
+                sb.appendLine()
+                sb.appendLine()
+            }
+            sb.append(title)
+            for (item in implementedNotFound) {
+                sb.appendLine()
+                sb.append(item)
             }
         }
 
         run {
             val title = "The following settings are implemented in TorConfig and are now deprecated by --list-deprecated-options"
 
-            if (implementedDeprecated.isNotEmpty()) {
-                if (sb.isNotEmpty()) {
-                    sb.appendLine()
-                    sb.appendLine()
-                }
+            if (implementedDeprecated.isEmpty())  return@run
 
-                sb.append(title)
-
-                for (item in implementedDeprecated) {
-                    sb.appendLine()
-                    sb.append(item)
-                }
+            if (sb.isNotEmpty()) {
+                sb.appendLine()
+                sb.appendLine()
+            }
+            sb.append(title)
+            for (item in implementedDeprecated) {
+                sb.appendLine()
+                sb.append(item)
             }
         }
 
         run {
             val title = "The following settings are implemented in TorConfig, but were not listed in TestUtils.KEYWORDS"
 
-            if (testUtilsMissing.isNotEmpty()) {
-                if (sb.isNotEmpty()) {
-                    sb.appendLine()
-                    sb.appendLine()
-                }
+            if (testUtilsMissing.isEmpty()) return@run
 
-                sb.append(title)
-
-                for (item in testUtilsMissing) {
-                    sb.appendLine()
-                    sb.append(item)
-                }
+            if (sb.isNotEmpty()) {
+                sb.appendLine()
+                sb.appendLine()
+            }
+            sb.append(title)
+            for (item in testUtilsMissing) {
+                sb.appendLine()
+                sb.append(item)
             }
         }
 
