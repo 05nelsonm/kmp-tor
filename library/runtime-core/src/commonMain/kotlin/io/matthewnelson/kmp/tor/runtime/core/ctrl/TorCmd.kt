@@ -173,7 +173,7 @@ public sealed class TorCmd<Success: Any> private constructor(
         public class Save(
             @JvmField
             public val force: Boolean,
-        ): Unprivileged<Reply.Success.OK>("SAVECONF") {
+        ): Privileged<Reply.Success.OK>("SAVECONF") {
 
             /** Default of [force] = `false` */
             public constructor(): this(force = false)
@@ -439,7 +439,6 @@ public sealed class TorCmd<Success: Any> private constructor(
      * */
     public data object Signal {
 
-        public data object Reload: Unprivileged<Reply.Success.OK>("SIGNAL")
         public data object Dump: Unprivileged<Reply.Success.OK>("SIGNAL")
         public data object Debug: Unprivileged<Reply.Success.OK>("SIGNAL")
 
@@ -453,6 +452,7 @@ public sealed class TorCmd<Success: Any> private constructor(
         public data object Active: Unprivileged<Reply.Success.OK>("SIGNAL")
         public data object Dormant: Unprivileged<Reply.Success.OK>("SIGNAL")
 
+        public data object Reload: Unprivileged<Reply.Success.OK>("SIGNAL")
         public data object Shutdown: Privileged<Reply.Success.OK>("SIGNAL")
         public data object Halt: Privileged<Reply.Success.OK>("SIGNAL")
     }

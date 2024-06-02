@@ -74,7 +74,6 @@ internal fun TorCmdJob<*>.respond(replies: ArrayList<Reply>) {
         is TorCmd.Ownership.Take -> completeOK()
         is TorCmd.Resolve -> completeOK()
         is TorCmd.SetEvents -> completeOK()
-        is TorCmd.Signal.Reload -> completeOK()
         is TorCmd.Signal.Dump -> completeOK()
         is TorCmd.Signal.Debug -> completeOK()
         is TorCmd.Signal.NewNym -> completeOK()
@@ -82,6 +81,7 @@ internal fun TorCmdJob<*>.respond(replies: ArrayList<Reply>) {
         is TorCmd.Signal.Heartbeat -> completeOK()
         is TorCmd.Signal.Active -> completeOK()
         is TorCmd.Signal.Dormant -> completeOK()
+        is TorCmd.Signal.Reload -> completeOK()
         is TorCmd.Signal.Shutdown -> completeOK()
         is TorCmd.Signal.Halt -> completeOK()
     }

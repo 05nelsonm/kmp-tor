@@ -3498,7 +3498,7 @@ public final class io/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$Config$Rese
 	public fun <init> ([Lio/matthewnelson/kmp/tor/runtime/core/TorConfig$Keyword;)V
 }
 
-public final class io/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$Config$Save : io/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$Unprivileged {
+public final class io/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$Config$Save : io/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$Privileged {
 	public final field force Z
 	public fun <init> ()V
 	public fun <init> (Z)V
