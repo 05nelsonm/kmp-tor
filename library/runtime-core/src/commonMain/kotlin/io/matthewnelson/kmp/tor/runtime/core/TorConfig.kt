@@ -1176,7 +1176,7 @@ public class TorConfig private constructor(
             name = "DormantCanceledByStartup",
             default = false.byte.toString(),
             attributes = emptySet(),
-            isCmdLineArg = true,
+            isCmdLineArg = false,
             isUnique = true,
             factory = { DormantCanceledByStartup() },
             build = { build(cancel.byte.toString())!! },
@@ -1244,7 +1244,7 @@ public class TorConfig private constructor(
             name = "DormantOnFirstStartup",
             default = false.byte.toString(),
             attributes = emptySet(),
-            isCmdLineArg = true,
+            isCmdLineArg = false,
             isUnique = true,
             factory = { DormantOnFirstStartup() },
             build = { build(enable.byte.toString())!! },
@@ -1893,8 +1893,8 @@ public class TorConfig private constructor(
             name = "__AllDirActionsPrivate",
             default = false.byte.toString(),
             attributes = emptySet(),
-            isCmdLineArg = false,
-            isUnique = false,
+            isCmdLineArg = true,
+            isUnique = true,
         )
     }
 
@@ -1909,8 +1909,8 @@ public class TorConfig private constructor(
             name = "__AlwaysCongestionControl",
             default = false.byte.toString(),
             attributes = emptySet(),
-            isCmdLineArg = false,
-            isUnique = false,
+            isCmdLineArg = true,
+            isUnique = true,
         )
     }
 
@@ -1925,8 +1925,8 @@ public class TorConfig private constructor(
             name = "__DisablePredictedCircuits",
             default = false.byte.toString(),
             attributes = emptySet(),
-            isCmdLineArg = false,
-            isUnique = false,
+            isCmdLineArg = true,
+            isUnique = true,
         )
     }
 
@@ -1941,8 +1941,8 @@ public class TorConfig private constructor(
             name = "__DisableSignalHandlers",
             default = false.byte.toString(),
             attributes = emptySet(),
-            isCmdLineArg = false,
-            isUnique = false,
+            isCmdLineArg = true,
+            isUnique = true,
         )
     }
 
@@ -1957,8 +1957,8 @@ public class TorConfig private constructor(
             name = "__LeaveStreamsUnattached",
             default = false.byte.toString(),
             attributes = emptySet(),
-            isCmdLineArg = false,
-            isUnique = false,
+            isCmdLineArg = true,
+            isUnique = true,
         )
     }
 
@@ -1973,7 +1973,7 @@ public class TorConfig private constructor(
             name = "__HashedControlSessionPassword",
             default = "",
             attributes = emptySet(),
-            isCmdLineArg = false,
+            isCmdLineArg = true,
             isUnique = false,
         )
     }
@@ -1989,8 +1989,8 @@ public class TorConfig private constructor(
             name = "__OwningControllerFD",
             default = "-1",
             attributes = emptySet(),
-            isCmdLineArg = false,
-            isUnique = false,
+            isCmdLineArg = true,
+            isUnique = true,
         )
     }
 
@@ -2005,8 +2005,8 @@ public class TorConfig private constructor(
             name = "__ReloadTorrcOnSIGHUP",
             default = true.byte.toString(),
             attributes = emptySet(),
-            isCmdLineArg = false,
-            isUnique = false,
+            isCmdLineArg = true,
+            isUnique = true,
         )
     }
 
@@ -2021,8 +2021,8 @@ public class TorConfig private constructor(
             name = "__SbwsExit",
             default = false.byte.toString(),
             attributes = emptySet(),
-            isCmdLineArg = false,
-            isUnique = false,
+            isCmdLineArg = true,
+            isUnique = true,
         )
     }
 
@@ -2041,8 +2041,8 @@ public class TorConfig private constructor(
             name = "AccelDir",
             default = "",
             attributes = immutableSetOf(Attribute.Directory),
-            isCmdLineArg = false,
-            isUnique = false,
+            isCmdLineArg = true,
+            isUnique = true,
         )
     }
 
@@ -2057,8 +2057,8 @@ public class TorConfig private constructor(
             name = "AccelName",
             default = "",
             attributes = emptySet(),
-            isCmdLineArg = false,
-            isUnique = false,
+            isCmdLineArg = true,
+            isUnique = true,
         )
     }
 
@@ -2106,7 +2106,7 @@ public class TorConfig private constructor(
             default = false.byte.toString(),
             attributes = emptySet(),
             isCmdLineArg = false,
-            isUnique = false,
+            isUnique = true,
         )
     }
 
@@ -2122,7 +2122,7 @@ public class TorConfig private constructor(
             default = (2.0F.pow(30)).toInt().toString(), // 1 GByte
             attributes = emptySet(),
             isCmdLineArg = false,
-            isUnique = false,
+            isUnique = true,
         )
     }
 
@@ -2138,7 +2138,7 @@ public class TorConfig private constructor(
             default = (2.0F.pow(30)).toInt().toString(), // 1 GByte
             attributes = emptySet(),
             isCmdLineArg = false,
-            isUnique = false,
+            isUnique = true,
         )
     }
 
@@ -2155,8 +2155,8 @@ public class TorConfig private constructor(
             name = "CacheDirectoryGroupReadable",
             default = AUTO,
             attributes = emptySet(),
-            isCmdLineArg = false,
-            isUnique = false,
+            isCmdLineArg = true,
+            isUnique = true,
         )
     }
 
@@ -2172,7 +2172,7 @@ public class TorConfig private constructor(
             default = "-1.000000",
             attributes = emptySet(),
             isCmdLineArg = false,
-            isUnique = false,
+            isUnique = true,
         )
     }
 
@@ -2204,7 +2204,7 @@ public class TorConfig private constructor(
             default = AUTO,
             attributes = emptySet(),
             isCmdLineArg = false,
-            isUnique = false,
+            isUnique = true,
         )
     }
 
@@ -2220,7 +2220,7 @@ public class TorConfig private constructor(
             default = "throughput",
             attributes = emptySet(),
             isCmdLineArg = false,
-            isUnique = false,
+            isUnique = true,
         )
     }
 
@@ -2236,7 +2236,7 @@ public class TorConfig private constructor(
             default = "1000",
             attributes = emptySet(),
             isCmdLineArg = false,
-            isUnique = false,
+            isUnique = true,
         )
     }
 
@@ -2252,7 +2252,7 @@ public class TorConfig private constructor(
             default = false.byte.toString(),
             attributes = emptySet(),
             isCmdLineArg = false,
-            isUnique = false,
+            isUnique = true,
         )
     }
 
@@ -2268,7 +2268,7 @@ public class TorConfig private constructor(
             default = (2.0F.pow(13)).toInt().toString(), // 8192 bytes
             attributes = emptySet(),
             isCmdLineArg = false,
-            isUnique = false,
+            isUnique = true,
         )
     }
 
@@ -2299,8 +2299,8 @@ public class TorConfig private constructor(
             name = "ControlPortFileGroupReadable",
             default = false.byte.toString(),
             attributes = emptySet(),
-            isCmdLineArg = false,
-            isUnique = false,
+            isCmdLineArg = true,
+            isUnique = true,
         )
     }
 
@@ -2317,8 +2317,8 @@ public class TorConfig private constructor(
             name = "ControlSocket",
             default = "0",
             attributes = immutableSetOf(Attribute.UnixSocket),
-            isCmdLineArg = false,
-            isUnique = false,
+            isCmdLineArg = true,
+            isUnique = true,
         )
     }
 
@@ -2333,8 +2333,8 @@ public class TorConfig private constructor(
             name = "ControlSocketsGroupWritable",
             default = false.byte.toString(),
             attributes = emptySet(),
-            isCmdLineArg = false,
-            isUnique = false,
+            isCmdLineArg = true,
+            isUnique = true,
         )
     }
 
@@ -2352,8 +2352,8 @@ public class TorConfig private constructor(
             name = "CookieAuthFileGroupReadable",
             default = false.byte.toString(),
             attributes = emptySet(),
-            isCmdLineArg = false,
-            isUnique = false,
+            isCmdLineArg = true,
+            isUnique = true,
         )
     }
 
@@ -2369,7 +2369,7 @@ public class TorConfig private constructor(
             default = false.byte.toString(),
             attributes = emptySet(),
             isCmdLineArg = false,
-            isUnique = false,
+            isUnique = true,
         )
     }
 
@@ -2386,8 +2386,8 @@ public class TorConfig private constructor(
             name = "DataDirectoryGroupReadable",
             default = false.byte.toString(),
             attributes = emptySet(),
-            isCmdLineArg = false,
-            isUnique = false,
+            isCmdLineArg = true,
+            isUnique = true,
         )
     }
 
@@ -2419,7 +2419,7 @@ public class TorConfig private constructor(
             default = "0.100000",
             attributes = emptySet(),
             isCmdLineArg = false,
-            isUnique = false,
+            isUnique = true,
         )
     }
 
@@ -2435,7 +2435,7 @@ public class TorConfig private constructor(
             default = false.byte.toString(),
             attributes = emptySet(),
             isCmdLineArg = false,
-            isUnique = false,
+            isUnique = true,
         )
     }
 
@@ -2450,8 +2450,8 @@ public class TorConfig private constructor(
             name = "DisableDebuggerAttachment",
             default = true.byte.toString(),
             attributes = emptySet(),
-            isCmdLineArg = false,
-            isUnique = false,
+            isCmdLineArg = true,
+            isUnique = true,
         )
     }
 
@@ -2469,7 +2469,7 @@ public class TorConfig private constructor(
             default = AUTO,
             attributes = emptySet(),
             isCmdLineArg = false,
-            isUnique = false,
+            isUnique = true,
         )
     }
 
@@ -2500,8 +2500,8 @@ public class TorConfig private constructor(
             name = "ExtORPortCookieAuthFile",
             default = "",
             attributes = immutableSetOf(Attribute.File),
-            isCmdLineArg = false,
-            isUnique = false,
+            isCmdLineArg = true,
+            isUnique = true,
         )
     }
 
@@ -2516,8 +2516,8 @@ public class TorConfig private constructor(
             name = "ExtORPortCookieAuthFileGroupReadable",
             default = false.byte.toString(),
             attributes = emptySet(),
-            isCmdLineArg = false,
-            isUnique = false,
+            isCmdLineArg = true,
+            isUnique = true,
         )
     }
 
@@ -2533,7 +2533,7 @@ public class TorConfig private constructor(
             default = "",
             attributes = emptySet(),
             isCmdLineArg = false,
-            isUnique = false,
+            isUnique = true,
         )
     }
 
@@ -2549,7 +2549,7 @@ public class TorConfig private constructor(
             default = false.byte.toString(),
             attributes = emptySet(),
             isCmdLineArg = false,
-            isUnique = false,
+            isUnique = true,
         )
     }
 
@@ -2565,7 +2565,7 @@ public class TorConfig private constructor(
             default = false.byte.toString(),
             attributes = emptySet(),
             isCmdLineArg = false,
-            isUnique = false,
+            isUnique = true,
         )
     }
 
@@ -2581,7 +2581,7 @@ public class TorConfig private constructor(
             default = true.byte.toString(),
             attributes = emptySet(),
             isCmdLineArg = false,
-            isUnique = false,
+            isUnique = true,
         )
     }
 
@@ -2597,7 +2597,7 @@ public class TorConfig private constructor(
             default = true.byte.toString(),
             attributes = emptySet(),
             isCmdLineArg = false,
-            isUnique = false,
+            isUnique = true,
         )
     }
 
@@ -2613,7 +2613,7 @@ public class TorConfig private constructor(
             default = false.byte.toString(),
             attributes = emptySet(),
             isCmdLineArg = false,
-            isUnique = false,
+            isUnique = true,
         )
     }
 
@@ -2628,8 +2628,8 @@ public class TorConfig private constructor(
             name = "HardwareAccel",
             default = false.byte.toString(),
             attributes = emptySet(),
-            isCmdLineArg = false,
-            isUnique = false,
+            isCmdLineArg = true,
+            isUnique = true,
         )
     }
 
@@ -2644,7 +2644,7 @@ public class TorConfig private constructor(
             name = "HashedControlPassword",
             default = "",
             attributes = emptySet(),
-            isCmdLineArg = false,
+            isCmdLineArg = true,
             isUnique = false,
         )
     }
@@ -2664,7 +2664,7 @@ public class TorConfig private constructor(
             default = "",
             attributes = emptySet(),
             isCmdLineArg = false,
-            isUnique = false,
+            isUnique = true,
         )
     }
 
@@ -2680,7 +2680,7 @@ public class TorConfig private constructor(
             default = "",
             attributes = emptySet(),
             isCmdLineArg = false,
-            isUnique = false,
+            isUnique = true,
         )
     }
 
@@ -2696,7 +2696,7 @@ public class TorConfig private constructor(
             default = 5.minutes.inWholeSeconds.toString(),
             attributes = emptySet(),
             isCmdLineArg = false,
-            isUnique = false,
+            isUnique = true,
         )
     }
 
@@ -2711,8 +2711,8 @@ public class TorConfig private constructor(
             name = "KeepBindCapabilities",
             default = AUTO,
             attributes = emptySet(),
-            isCmdLineArg = false,
-            isUnique = false,
+            isCmdLineArg = true,
+            isUnique = true,
         )
     }
 
@@ -2744,7 +2744,7 @@ public class TorConfig private constructor(
             default = false.byte.toString(),
             attributes = immutableSetOf(Attribute.Logging),
             isCmdLineArg = false,
-            isUnique = false,
+            isUnique = true,
         )
     }
 
@@ -2760,7 +2760,7 @@ public class TorConfig private constructor(
             default = 1.seconds.inWholeMilliseconds.toString(),
             attributes = immutableSetOf(Attribute.Logging),
             isCmdLineArg = false,
-            isUnique = false,
+            isUnique = true,
         )
     }
 
@@ -2776,7 +2776,7 @@ public class TorConfig private constructor(
             default = (2.0F.pow(30)).toInt().toString(), // 1 GByte
             attributes = emptySet(),
             isCmdLineArg = false,
-            isUnique = false,
+            isUnique = true,
         )
     }
 
@@ -2792,7 +2792,7 @@ public class TorConfig private constructor(
             default = (2.0F.pow(20) * 10).toInt().toString(), // 10 MB
             attributes = emptySet(),
             isCmdLineArg = false,
-            isUnique = false,
+            isUnique = true,
         )
     }
 
@@ -2824,7 +2824,7 @@ public class TorConfig private constructor(
             default = "",
             attributes = emptySet(),
             isCmdLineArg = false,
-            isUnique = false,
+            isUnique = true,
         )
     }
 
@@ -2839,8 +2839,8 @@ public class TorConfig private constructor(
             name = "NoExec",
             default = false.byte.toString(),
             attributes = emptySet(),
-            isCmdLineArg = false,
-            isUnique = false,
+            isCmdLineArg = true,
+            isUnique = true,
         )
     }
 
@@ -2851,12 +2851,14 @@ public class TorConfig private constructor(
     public class OutboundBindAddress private constructor(): Setting.Builder(
         keyword = Companion,
     ) {
+        // Can be utilized 2 times max. IPv4 & IPv6
+
         public companion object: Keyword(
             name = "OutboundBindAddress",
             default = "",
             attributes = emptySet(),
             isCmdLineArg = false,
-            isUnique = false,
+            isUnique = true,
         )
     }
 
@@ -2867,12 +2869,14 @@ public class TorConfig private constructor(
     public class OutboundBindAddressExit private constructor(): Setting.Builder(
         keyword = Companion,
     ) {
+        // Can be utilized 2 times max. IPv4 & IPv6
+
         public companion object: Keyword(
             name = "OutboundBindAddressExit",
             default = "",
             attributes = emptySet(),
             isCmdLineArg = false,
-            isUnique = false,
+            isUnique = true,
         )
     }
 
@@ -2883,12 +2887,14 @@ public class TorConfig private constructor(
     public class OutboundBindAddressOR private constructor(): Setting.Builder(
         keyword = Companion,
     ) {
+        // Can be utilized 2 times max. IPv4 & IPv6
+
         public companion object: Keyword(
             name = "OutboundBindAddressOR",
             default = "",
             attributes = emptySet(),
             isCmdLineArg = false,
-            isUnique = false,
+            isUnique = true,
         )
     }
 
@@ -2906,7 +2912,7 @@ public class TorConfig private constructor(
             default = "0",
             attributes = emptySet(),
             isCmdLineArg = false,
-            isUnique = false,
+            isUnique = true,
         )
     }
 
@@ -2922,7 +2928,7 @@ public class TorConfig private constructor(
             default = "0",
             attributes = emptySet(),
             isCmdLineArg = false,
-            isUnique = false,
+            isUnique = true,
         )
     }
 
@@ -2933,12 +2939,14 @@ public class TorConfig private constructor(
     public class OutboundBindAddressPT private constructor(): Setting.Builder(
         keyword = Companion,
     ) {
+        // Can be utilized 2 times max. IPv4 & IPv6
+
         public companion object: Keyword(
             name = "OutboundBindAddressPT",
             default = "",
             attributes = emptySet(),
             isCmdLineArg = false,
-            isUnique = false,
+            isUnique = true,
         )
     }
 
@@ -2953,8 +2961,8 @@ public class TorConfig private constructor(
             name = "PidFile",
             default = "",
             attributes = immutableSetOf(Attribute.File),
-            isCmdLineArg = false,
-            isUnique = false,
+            isCmdLineArg = true,
+            isUnique = true,
         )
     }
 
@@ -2970,7 +2978,7 @@ public class TorConfig private constructor(
             default = false.byte.toString(),
             attributes = emptySet(),
             isCmdLineArg = false,
-            isUnique = false,
+            isUnique = true,
         )
     }
 
@@ -2986,7 +2994,7 @@ public class TorConfig private constructor(
             default = "0",
             attributes = emptySet(),
             isCmdLineArg = false,
-            isUnique = false,
+            isUnique = true,
         )
     }
 
@@ -3002,7 +3010,7 @@ public class TorConfig private constructor(
             default = "0",
             attributes = emptySet(),
             isCmdLineArg = false,
-            isUnique = false,
+            isUnique = true,
         )
     }
 
@@ -3018,7 +3026,7 @@ public class TorConfig private constructor(
             default = 24.hours.inWholeSeconds.toString(),
             attributes = emptySet(),
             isCmdLineArg = false,
-            isUnique = false,
+            isUnique = true,
         )
     }
 
@@ -3036,7 +3044,7 @@ public class TorConfig private constructor(
             default = "1",
             attributes = immutableSetOf(Attribute.Logging),
             isCmdLineArg = false,
-            isUnique = false,
+            isUnique = true,
         )
     }
 
@@ -3051,8 +3059,8 @@ public class TorConfig private constructor(
             name = "Sandbox",
             default = false.byte.toString(),
             attributes = emptySet(),
-            isCmdLineArg = false,
-            isUnique = false,
+            isCmdLineArg = true,
+            isUnique = true,
         )
     }
 
@@ -3068,7 +3076,7 @@ public class TorConfig private constructor(
             default = "KIST,KISTLite,Vanilla",
             attributes = emptySet(),
             isCmdLineArg = false,
-            isUnique = false,
+            isUnique = true,
         )
     }
 
@@ -3084,7 +3092,7 @@ public class TorConfig private constructor(
             default = "0",
             attributes = emptySet(),
             isCmdLineArg = false,
-            isUnique = false,
+            isUnique = true,
         )
     }
 
@@ -3100,7 +3108,7 @@ public class TorConfig private constructor(
             default = "1.000000",
             attributes = emptySet(),
             isCmdLineArg = false,
-            isUnique = false,
+            isUnique = true,
         )
     }
 
@@ -3116,7 +3124,7 @@ public class TorConfig private constructor(
             default = "",
             attributes = emptySet(),
             isCmdLineArg = false,
-            isUnique = false,
+            isUnique = true,
         )
     }
 
@@ -3132,7 +3140,7 @@ public class TorConfig private constructor(
             default = "",
             attributes = emptySet(),
             isCmdLineArg = false,
-            isUnique = false,
+            isUnique = true,
         )
     }
 
@@ -3148,7 +3156,7 @@ public class TorConfig private constructor(
             default = "",
             attributes = emptySet(),
             isCmdLineArg = false,
-            isUnique = false,
+            isUnique = true,
         )
     }
 
@@ -3164,7 +3172,7 @@ public class TorConfig private constructor(
             default = "",
             attributes = emptySet(),
             isCmdLineArg = false,
-            isUnique = false,
+            isUnique = true,
         )
     }
 
@@ -3182,7 +3190,7 @@ public class TorConfig private constructor(
             default = "",
             attributes = emptySet(),
             isCmdLineArg = false,
-            isUnique = false,
+            isUnique = true,
         )
     }
 
@@ -3198,7 +3206,7 @@ public class TorConfig private constructor(
             default = false.byte.toString(),
             attributes = immutableSetOf(Attribute.Logging),
             isCmdLineArg = false,
-            isUnique = false,
+            isUnique = true,
         )
     }
 
@@ -3213,8 +3221,8 @@ public class TorConfig private constructor(
             name = "UnixSocksGroupWritable",
             default = false.byte.toString(),
             attributes = emptySet(),
-            isCmdLineArg = false,
-            isUnique = false,
+            isCmdLineArg = true,
+            isUnique = true,
         )
     }
 
@@ -3230,7 +3238,7 @@ public class TorConfig private constructor(
             default = true.byte.toString(),
             attributes = emptySet(),
             isCmdLineArg = false,
-            isUnique = false,
+            isUnique = true,
         )
     }
 
@@ -3245,8 +3253,8 @@ public class TorConfig private constructor(
             name = "User",
             default = "",
             attributes = emptySet(),
-            isCmdLineArg = false,
-            isUnique = false,
+            isCmdLineArg = true,
+            isUnique = true,
         )
     }
 
@@ -3266,7 +3274,7 @@ public class TorConfig private constructor(
             default = false.byte.toString(),
             attributes = emptySet(),
             isCmdLineArg = false,
-            isUnique = false,
+            isUnique = true,
         )
     }
 
@@ -3300,8 +3308,8 @@ public class TorConfig private constructor(
             name = "CircuitPadding",
             default = true.byte.toString(),
             attributes = emptySet(),
-            isCmdLineArg = false,
-            isUnique = false,
+            isCmdLineArg = true,
+            isUnique = true,
         )
     }
 
@@ -3317,7 +3325,7 @@ public class TorConfig private constructor(
             default = false.byte.toString(),
             attributes = emptySet(),
             isCmdLineArg = false,
-            isUnique = false,
+            isUnique = true,
         )
     }
 
@@ -3333,7 +3341,7 @@ public class TorConfig private constructor(
             default = "6",
             attributes = emptySet(),
             isCmdLineArg = false,
-            isUnique = false,
+            isUnique = true,
         )
     }
 
@@ -3349,7 +3357,7 @@ public class TorConfig private constructor(
             default = "0",
             attributes = emptySet(),
             isCmdLineArg = false,
-            isUnique = false,
+            isUnique = true,
         )
     }
 
@@ -3365,7 +3373,7 @@ public class TorConfig private constructor(
             default = "0",
             attributes = emptySet(),
             isCmdLineArg = false,
-            isUnique = false,
+            isUnique = true,
         )
     }
 
@@ -3381,7 +3389,7 @@ public class TorConfig private constructor(
             default = "3",
             attributes = emptySet(),
             isCmdLineArg = false,
-            isUnique = false,
+            isUnique = true,
         )
     }
 
@@ -3397,7 +3405,7 @@ public class TorConfig private constructor(
             default = true.byte.toString(),
             attributes = emptySet(),
             isCmdLineArg = false,
-            isUnique = false,
+            isUnique = true,
         )
     }
 
@@ -3415,7 +3423,7 @@ public class TorConfig private constructor(
             default = false.byte.toString(),
             attributes = emptySet(),
             isCmdLineArg = false,
-            isUnique = false,
+            isUnique = true,
         )
     }
 
@@ -3433,7 +3441,7 @@ public class TorConfig private constructor(
             default = AUTO,
             attributes = emptySet(),
             isCmdLineArg = false,
-            isUnique = false,
+            isUnique = true,
         )
     }
 
@@ -3449,7 +3457,7 @@ public class TorConfig private constructor(
             default = true.byte.toString(),
             attributes = emptySet(),
             isCmdLineArg = false,
-            isUnique = false,
+            isUnique = true,
         )
     }
 
@@ -3465,7 +3473,7 @@ public class TorConfig private constructor(
             default = true.byte.toString(),
             attributes = emptySet(),
             isCmdLineArg = false,
-            isUnique = false,
+            isUnique = true,
         )
     }
 
@@ -3481,7 +3489,7 @@ public class TorConfig private constructor(
             default = true.byte.toString(),
             attributes = emptySet(),
             isCmdLineArg = false,
-            isUnique = false,
+            isUnique = true,
         )
     }
 
@@ -3516,7 +3524,7 @@ public class TorConfig private constructor(
             default = false.byte.toString(),
             attributes = emptySet(),
             isCmdLineArg = false,
-            isUnique = false,
+            isUnique = true,
         )
     }
 
@@ -3532,7 +3540,7 @@ public class TorConfig private constructor(
             default = true.byte.toString(),
             attributes = emptySet(),
             isCmdLineArg = false,
-            isUnique = false,
+            isUnique = true,
         )
     }
 
@@ -3548,25 +3556,11 @@ public class TorConfig private constructor(
             default = false.byte.toString(),
             attributes = emptySet(),
             isCmdLineArg = false,
-            isUnique = false,
+            isUnique = true,
         )
     }
 
-    /**
-     * [FirewallPorts](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#FirewallPorts)
-     * */
-    @KmpTorDsl
-    public class FirewallPorts private constructor(): Setting.Builder(
-        keyword = Companion,
-    ) {
-        public companion object: Keyword(
-            name = "FirewallPorts",
-            default = "80,443",
-            attributes = emptySet(),
-            isCmdLineArg = false,
-            isUnique = false,
-        )
-    }
+    // (DEPRECATED) FirewallPorts
 
     /**
      * See ephemeral setting [__HTTPTunnelPort].
@@ -3596,7 +3590,7 @@ public class TorConfig private constructor(
             default = "21,22,706,1863,5050,5190,5222,5223,6523,6667,6697,8300",
             attributes = emptySet(),
             isCmdLineArg = false,
-            isUnique = false,
+            isUnique = true,
         )
     }
 
@@ -3628,7 +3622,7 @@ public class TorConfig private constructor(
             default = 10.minutes.inWholeSeconds.toString(),
             attributes = emptySet(),
             isCmdLineArg = false,
-            isUnique = false,
+            isUnique = true,
         )
     }
 
@@ -3644,7 +3638,7 @@ public class TorConfig private constructor(
             default = "32",
             attributes = emptySet(),
             isCmdLineArg = false,
-            isUnique = false,
+            isUnique = true,
         )
     }
 
@@ -3676,7 +3670,7 @@ public class TorConfig private constructor(
             default = "30",
             attributes = emptySet(),
             isCmdLineArg = false,
-            isUnique = false,
+            isUnique = true,
         )
     }
 
@@ -3692,7 +3686,7 @@ public class TorConfig private constructor(
             default = "-1",
             attributes = emptySet(),
             isCmdLineArg = false,
-            isUnique = false,
+            isUnique = true,
         )
     }
 
@@ -3708,7 +3702,7 @@ public class TorConfig private constructor(
             default = "0",
             attributes = emptySet(),
             isCmdLineArg = false,
-            isUnique = false,
+            isUnique = true,
         )
     }
 
@@ -3724,7 +3718,7 @@ public class TorConfig private constructor(
             default = "-1.000000",
             attributes = emptySet(),
             isCmdLineArg = false,
-            isUnique = false,
+            isUnique = true,
         )
     }
 
@@ -3740,7 +3734,7 @@ public class TorConfig private constructor(
             default = "-1.000000",
             attributes = emptySet(),
             isCmdLineArg = false,
-            isUnique = false,
+            isUnique = true,
         )
     }
 
@@ -3756,7 +3750,7 @@ public class TorConfig private constructor(
             default = "-1.000000",
             attributes = emptySet(),
             isCmdLineArg = false,
-            isUnique = false,
+            isUnique = true,
         )
     }
 
@@ -3772,7 +3766,7 @@ public class TorConfig private constructor(
             default = "-1",
             attributes = emptySet(),
             isCmdLineArg = false,
-            isUnique = false,
+            isUnique = true,
         )
     }
 
@@ -3788,7 +3782,7 @@ public class TorConfig private constructor(
             default = "-1",
             attributes = emptySet(),
             isCmdLineArg = false,
-            isUnique = false,
+            isUnique = true,
         )
     }
 
@@ -3804,7 +3798,7 @@ public class TorConfig private constructor(
             default = "-1.000000",
             attributes = emptySet(),
             isCmdLineArg = false,
-            isUnique = false,
+            isUnique = true,
         )
     }
 
@@ -3820,7 +3814,7 @@ public class TorConfig private constructor(
             default = "-1.000000",
             attributes = emptySet(),
             isCmdLineArg = false,
-            isUnique = false,
+            isUnique = true,
         )
     }
 
@@ -3836,7 +3830,7 @@ public class TorConfig private constructor(
             default = "-1",
             attributes = emptySet(),
             isCmdLineArg = false,
-            isUnique = false,
+            isUnique = true,
         )
     }
 
@@ -3852,7 +3846,7 @@ public class TorConfig private constructor(
             default = "-1.000000",
             attributes = emptySet(),
             isCmdLineArg = false,
-            isUnique = false,
+            isUnique = true,
         )
     }
 
@@ -3868,7 +3862,7 @@ public class TorConfig private constructor(
             default = "accept *:*",
             attributes = emptySet(),
             isCmdLineArg = false,
-            isUnique = false,
+            isUnique = true,
         )
     }
 
@@ -3886,7 +3880,7 @@ public class TorConfig private constructor(
             default = "",
             attributes = emptySet(),
             isCmdLineArg = false,
-            isUnique = false,
+            isUnique = true,
         )
     }
 
@@ -3902,7 +3896,7 @@ public class TorConfig private constructor(
             default = false.byte.toString(),
             attributes = emptySet(),
             isCmdLineArg = false,
-            isUnique = false,
+            isUnique = true,
         )
     }
 
@@ -3918,7 +3912,7 @@ public class TorConfig private constructor(
             default = false.byte.toString(),
             attributes = emptySet(),
             isCmdLineArg = false,
-            isUnique = false,
+            isUnique = true,
         )
     }
 
@@ -3934,7 +3928,7 @@ public class TorConfig private constructor(
             default = "23,109,110,143",
             attributes = emptySet(),
             isCmdLineArg = false,
-            isUnique = false,
+            isUnique = true,
         )
     }
 
@@ -3950,7 +3944,7 @@ public class TorConfig private constructor(
             default = "",
             attributes = emptySet(),
             isCmdLineArg = false,
-            isUnique = false,
+            isUnique = true,
         )
     }
 
@@ -3966,7 +3960,7 @@ public class TorConfig private constructor(
             default = "",
             attributes = emptySet(),
             isCmdLineArg = false,
-            isUnique = false,
+            isUnique = true,
         )
     }
 
@@ -3997,8 +3991,8 @@ public class TorConfig private constructor(
             name = "TokenBucketRefillInterval",
             default = 100.milliseconds.inWholeMilliseconds.toString(),
             attributes = emptySet(),
-            isCmdLineArg = false,
-            isUnique = false,
+            isCmdLineArg = true,
+            isUnique = true,
         )
     }
 
@@ -4014,7 +4008,7 @@ public class TorConfig private constructor(
             default = "",
             attributes = emptySet(),
             isCmdLineArg = false,
-            isUnique = false,
+            isUnique = true,
         )
     }
 
@@ -4030,7 +4024,7 @@ public class TorConfig private constructor(
             default = 30.minutes.inWholeSeconds.toString(),
             attributes = emptySet(),
             isCmdLineArg = false,
-            isUnique = false,
+            isUnique = true,
         )
     }
 
@@ -4062,7 +4056,7 @@ public class TorConfig private constructor(
             default = "default",
             attributes = emptySet(),
             isCmdLineArg = false,
-            isUnique = false,
+            isUnique = true,
         )
     }
 
@@ -4078,7 +4072,7 @@ public class TorConfig private constructor(
             default = false.byte.toString(),
             attributes = emptySet(),
             isCmdLineArg = false,
-            isUnique = false,
+            isUnique = true,
         )
     }
 
@@ -4094,7 +4088,7 @@ public class TorConfig private constructor(
             default = false.byte.toString(),
             attributes = emptySet(),
             isCmdLineArg = false,
-            isUnique = false,
+            isUnique = true,
         )
     }
 
@@ -4110,7 +4104,7 @@ public class TorConfig private constructor(
             default = true.byte.toString(),
             attributes = emptySet(),
             isCmdLineArg = false,
-            isUnique = false,
+            isUnique = true,
         )
     }
 
@@ -4126,7 +4120,7 @@ public class TorConfig private constructor(
             default = AUTO,
             attributes = emptySet(),
             isCmdLineArg = false,
-            isUnique = false,
+            isUnique = true,
         )
     }
 
@@ -4142,7 +4136,7 @@ public class TorConfig private constructor(
             default = "0",
             attributes = emptySet(),
             isCmdLineArg = false,
-            isUnique = false,
+            isUnique = true,
         )
     }
 
@@ -4158,7 +4152,7 @@ public class TorConfig private constructor(
             default = "0",
             attributes = emptySet(),
             isCmdLineArg = false,
-            isUnique = false,
+            isUnique = true,
         )
     }
 
@@ -4174,7 +4168,7 @@ public class TorConfig private constructor(
             default = "0",
             attributes = emptySet(),
             isCmdLineArg = false,
-            isUnique = false,
+            isUnique = true,
         )
     }
 
@@ -4190,7 +4184,7 @@ public class TorConfig private constructor(
             default = "0",
             attributes = emptySet(),
             isCmdLineArg = false,
-            isUnique = false,
+            isUnique = true,
         )
     }
 
@@ -4206,7 +4200,7 @@ public class TorConfig private constructor(
             default = AUTO,
             attributes = emptySet(),
             isCmdLineArg = false,
-            isUnique = false,
+            isUnique = true,
         )
     }
 
@@ -4222,7 +4216,7 @@ public class TorConfig private constructor(
             default = AUTO,
             attributes = emptySet(),
             isCmdLineArg = false,
-            isUnique = false,
+            isUnique = true,
         )
     }
 
@@ -4245,7 +4239,7 @@ public class TorConfig private constructor(
             default = 30.minutes.inWholeSeconds.toString(),
             attributes = emptySet(),
             isCmdLineArg = false,
-            isUnique = false,
+            isUnique = true,
         )
     }
 
@@ -4261,7 +4255,7 @@ public class TorConfig private constructor(
             default = true.byte.toString(),
             attributes = emptySet(),
             isCmdLineArg = false,
-            isUnique = false,
+            isUnique = true,
         )
     }
 
@@ -4277,7 +4271,7 @@ public class TorConfig private constructor(
             default = 60.seconds.inWholeSeconds.toString(),
             attributes = emptySet(),
             isCmdLineArg = false,
-            isUnique = false,
+            isUnique = true,
         )
     }
 
@@ -4293,7 +4287,7 @@ public class TorConfig private constructor(
             default = "0",
             attributes = emptySet(),
             isCmdLineArg = false,
-            isUnique = false,
+            isUnique = true,
         )
     }
 
@@ -4309,7 +4303,7 @@ public class TorConfig private constructor(
             default = 2.minutes.inWholeSeconds.toString(),
             attributes = emptySet(),
             isCmdLineArg = false,
-            isUnique = false,
+            isUnique = true,
         )
     }
 
@@ -4334,7 +4328,7 @@ public class TorConfig private constructor(
             default = true.byte.toString(),
             attributes = emptySet(),
             isCmdLineArg = false,
-            isUnique = false,
+            isUnique = true,
         )
     }
 
@@ -4484,7 +4478,7 @@ public class TorConfig private constructor(
             default = false.byte.toString(),
             attributes = emptySet(),
             isCmdLineArg = false,
-            isUnique = false,
+            isUnique = true,
         )
     }
 
@@ -4504,7 +4498,7 @@ public class TorConfig private constructor(
             default = "0",
             attributes = emptySet(),
             isCmdLineArg = false,
-            isUnique = false,
+            isUnique = true,
         )
     }
 
@@ -4520,7 +4514,7 @@ public class TorConfig private constructor(
             default = "max",
             attributes = emptySet(),
             isCmdLineArg = false,
-            isUnique = false,
+            isUnique = true,
         )
     }
 
@@ -4536,7 +4530,7 @@ public class TorConfig private constructor(
             default = "month 1 0:00",
             attributes = emptySet(),
             isCmdLineArg = false,
-            isUnique = false,
+            isUnique = true,
         )
     }
 
@@ -4552,7 +4546,7 @@ public class TorConfig private constructor(
             default = "",
             attributes = emptySet(),
             isCmdLineArg = false,
-            isUnique = false,
+            isUnique = true,
         )
     }
 
@@ -4568,7 +4562,7 @@ public class TorConfig private constructor(
             default = false.byte.toString(),
             attributes = emptySet(),
             isCmdLineArg = false,
-            isUnique = false,
+            isUnique = true,
         )
     }
 
@@ -4584,7 +4578,7 @@ public class TorConfig private constructor(
             default = false.byte.toString(),
             attributes = emptySet(),
             isCmdLineArg = false,
-            isUnique = false,
+            isUnique = true,
         )
     }
 
@@ -4600,7 +4594,7 @@ public class TorConfig private constructor(
             default = AUTO,
             attributes = emptySet(),
             isCmdLineArg = false,
-            isUnique = false,
+            isUnique = true,
         )
     }
 
@@ -4616,7 +4610,7 @@ public class TorConfig private constructor(
             default = false.byte.toString(),
             attributes = emptySet(),
             isCmdLineArg = false,
-            isUnique = false,
+            isUnique = true,
         )
     }
 
@@ -4632,7 +4626,7 @@ public class TorConfig private constructor(
             default = "",
             attributes = emptySet(),
             isCmdLineArg = false,
-            isUnique = false,
+            isUnique = true,
         )
     }
 
@@ -4648,7 +4642,7 @@ public class TorConfig private constructor(
             default = "",
             attributes = emptySet(),
             isCmdLineArg = false,
-            isUnique = false,
+            isUnique = true,
         )
     }
 
@@ -4664,7 +4658,7 @@ public class TorConfig private constructor(
             default = true.byte.toString(),
             attributes = emptySet(),
             isCmdLineArg = false,
-            isUnique = false,
+            isUnique = true,
         )
     }
 
@@ -4696,7 +4690,7 @@ public class TorConfig private constructor(
             default = false.byte.toString(),
             attributes = emptySet(),
             isCmdLineArg = false,
-            isUnique = false,
+            isUnique = true,
         )
     }
 
@@ -4712,7 +4706,7 @@ public class TorConfig private constructor(
             default = true.byte.toString(),
             attributes = emptySet(),
             isCmdLineArg = false,
-            isUnique = false,
+            isUnique = true,
         )
     }
 
@@ -4728,7 +4722,7 @@ public class TorConfig private constructor(
             default = AUTO,
             attributes = emptySet(),
             isCmdLineArg = false,
-            isUnique = false,
+            isUnique = true,
         )
     }
 
@@ -4744,7 +4738,7 @@ public class TorConfig private constructor(
             default = false.byte.toString(),
             attributes = emptySet(),
             isCmdLineArg = false,
-            isUnique = false,
+            isUnique = true,
         )
     }
 
@@ -4763,7 +4757,7 @@ public class TorConfig private constructor(
             default = 6.hours.inWholeSeconds.toString(),
             attributes = emptySet(),
             isCmdLineArg = false,
-            isUnique = false,
+            isUnique = true,
         )
     }
 
@@ -4779,7 +4773,7 @@ public class TorConfig private constructor(
             default = false.byte.toString(),
             attributes = emptySet(),
             isCmdLineArg = false,
-            isUnique = false,
+            isUnique = true,
         )
     }
 
@@ -4794,8 +4788,8 @@ public class TorConfig private constructor(
             name = "KeyDirectory",
             default = "",
             attributes = immutableSetOf(Attribute.Directory),
-            isCmdLineArg = false,
-            isUnique = false,
+            isCmdLineArg = true,
+            isUnique = true,
         )
     }
 
@@ -4810,8 +4804,8 @@ public class TorConfig private constructor(
             name = "KeyDirectoryGroupReadable",
             default = AUTO,
             attributes = emptySet(),
-            isCmdLineArg = false,
-            isUnique = false,
+            isCmdLineArg = true,
+            isUnique = true,
         )
     }
 
@@ -4827,7 +4821,7 @@ public class TorConfig private constructor(
             default = false.byte.toString(),
             attributes = emptySet(),
             isCmdLineArg = false,
-            isUnique = false,
+            isUnique = true,
         )
     }
 
@@ -4843,7 +4837,7 @@ public class TorConfig private constructor(
             default = "0",
             attributes = emptySet(),
             isCmdLineArg = false,
-            isUnique = false,
+            isUnique = true,
         )
     }
 
@@ -4859,7 +4853,7 @@ public class TorConfig private constructor(
             default = 1_750.milliseconds.inWholeMilliseconds.toString(),
             attributes = emptySet(),
             isCmdLineArg = false,
-            isUnique = false,
+            isUnique = true,
         )
     }
 
@@ -4891,7 +4885,7 @@ public class TorConfig private constructor(
             default = "",
             attributes = emptySet(),
             isCmdLineArg = false,
-            isUnique = false,
+            isUnique = true,
         )
     }
 
@@ -4907,7 +4901,7 @@ public class TorConfig private constructor(
             default = "0",
             attributes = emptySet(),
             isCmdLineArg = false,
-            isUnique = false,
+            isUnique = true,
         )
     }
 
@@ -4923,7 +4917,7 @@ public class TorConfig private constructor(
             default = false.byte.toString(),
             attributes = emptySet(),
             isCmdLineArg = false,
-            isUnique = false,
+            isUnique = true,
         )
     }
 
@@ -4955,7 +4949,7 @@ public class TorConfig private constructor(
             default = "1",
             attributes = emptySet(),
             isCmdLineArg = false,
-            isUnique = false,
+            isUnique = true,
         )
     }
 
@@ -4971,7 +4965,7 @@ public class TorConfig private constructor(
             default = false.byte.toString(),
             attributes = emptySet(),
             isCmdLineArg = false,
-            isUnique = false,
+            isUnique = true,
         )
     }
 
@@ -4987,7 +4981,7 @@ public class TorConfig private constructor(
             default = AUTO,
             attributes = emptySet(),
             isCmdLineArg = false,
-            isUnique = false,
+            isUnique = true,
         )
     }
 
@@ -5003,7 +4997,7 @@ public class TorConfig private constructor(
             default = true.byte.toString(),
             attributes = emptySet(),
             isCmdLineArg = false,
-            isUnique = false,
+            isUnique = true,
         )
     }
 
@@ -5019,7 +5013,7 @@ public class TorConfig private constructor(
             default = false.byte.toString(),
             attributes = emptySet(),
             isCmdLineArg = false,
-            isUnique = false,
+            isUnique = true,
         )
     }
 
@@ -5035,7 +5029,7 @@ public class TorConfig private constructor(
             default = true.byte.toString(),
             attributes = emptySet(),
             isCmdLineArg = false,
-            isUnique = false,
+            isUnique = true,
         )
     }
 
@@ -5051,7 +5045,7 @@ public class TorConfig private constructor(
             default = true.byte.toString(),
             attributes = emptySet(),
             isCmdLineArg = false,
-            isUnique = false,
+            isUnique = true,
         )
     }
 
@@ -5067,7 +5061,7 @@ public class TorConfig private constructor(
             default = "",
             attributes = immutableSetOf(Attribute.File),
             isCmdLineArg = false,
-            isUnique = false,
+            isUnique = true,
         )
     }
 
@@ -5083,7 +5077,7 @@ public class TorConfig private constructor(
             default = false.byte.toString(),
             attributes = emptySet(),
             isCmdLineArg = false,
-            isUnique = false,
+            isUnique = true,
         )
     }
 
@@ -5099,7 +5093,7 @@ public class TorConfig private constructor(
             default = "www.google.com,www.mit.edu,www.yahoo.com,www.slashdot.org",
             attributes = emptySet(),
             isCmdLineArg = false,
-            isUnique = false,
+            isUnique = true,
         )
     }
 
@@ -5115,7 +5109,7 @@ public class TorConfig private constructor(
             default = "",
             attributes = emptySet(),
             isCmdLineArg = false,
-            isUnique = false,
+            isUnique = true,
         )
     }
 
@@ -5131,7 +5125,7 @@ public class TorConfig private constructor(
             default = "",
             attributes = emptySet(),
             isCmdLineArg = false,
-            isUnique = false,
+            isUnique = true,
         )
     }
 
@@ -5147,7 +5141,7 @@ public class TorConfig private constructor(
             default = "",
             attributes = emptySet(),
             isCmdLineArg = false,
-            isUnique = false,
+            isUnique = true,
         )
     }
 
@@ -5163,7 +5157,7 @@ public class TorConfig private constructor(
             default = 30.seconds.inWholeSeconds.toString(),
             attributes = emptySet(),
             isCmdLineArg = false,
-            isUnique = false,
+            isUnique = true,
         )
     }
 
@@ -5179,7 +5173,7 @@ public class TorConfig private constructor(
             default = 30.days.inWholeSeconds.toString(),
             attributes = emptySet(),
             isCmdLineArg = false,
-            isUnique = false,
+            isUnique = true,
         )
     }
 
@@ -5195,7 +5189,7 @@ public class TorConfig private constructor(
             default = "0",
             attributes = emptySet(),
             isCmdLineArg = false,
-            isUnique = false,
+            isUnique = true,
         )
     }
 
@@ -5215,7 +5209,7 @@ public class TorConfig private constructor(
             default = true.byte.toString(),
             attributes = emptySet(),
             isCmdLineArg = false,
-            isUnique = false,
+            isUnique = true,
         )
     }
 
@@ -5231,7 +5225,7 @@ public class TorConfig private constructor(
             default = false.byte.toString(),
             attributes = emptySet(),
             isCmdLineArg = false,
-            isUnique = false,
+            isUnique = true,
         )
     }
 
@@ -5247,7 +5241,7 @@ public class TorConfig private constructor(
             default = false.byte.toString(),
             attributes = emptySet(),
             isCmdLineArg = false,
-            isUnique = false,
+            isUnique = true,
         )
     }
 
@@ -5263,7 +5257,7 @@ public class TorConfig private constructor(
             default = true.byte.toString(),
             attributes = emptySet(),
             isCmdLineArg = false,
-            isUnique = false,
+            isUnique = true,
         )
     }
 
@@ -5279,7 +5273,7 @@ public class TorConfig private constructor(
             default = false.byte.toString(),
             attributes = emptySet(),
             isCmdLineArg = false,
-            isUnique = false,
+            isUnique = true,
         )
     }
 
@@ -5295,7 +5289,7 @@ public class TorConfig private constructor(
             default = false.byte.toString(),
             attributes = emptySet(),
             isCmdLineArg = false,
-            isUnique = false,
+            isUnique = true,
         )
     }
 
@@ -5311,7 +5305,7 @@ public class TorConfig private constructor(
             default = true.byte.toString(),
             attributes = emptySet(),
             isCmdLineArg = false,
-            isUnique = false,
+            isUnique = true,
         )
     }
 
@@ -5327,7 +5321,7 @@ public class TorConfig private constructor(
             default = true.byte.toString(),
             attributes = emptySet(),
             isCmdLineArg = false,
-            isUnique = false,
+            isUnique = true,
         )
     }
 
@@ -5343,7 +5337,7 @@ public class TorConfig private constructor(
             default = true.byte.toString(),
             attributes = emptySet(),
             isCmdLineArg = false,
-            isUnique = false,
+            isUnique = true,
         )
     }
 
@@ -5359,7 +5353,7 @@ public class TorConfig private constructor(
             default = true.byte.toString(),
             attributes = emptySet(),
             isCmdLineArg = false,
-            isUnique = false,
+            isUnique = true,
         )
     }
 
@@ -5379,7 +5373,7 @@ public class TorConfig private constructor(
             default = true.byte.toString(),
             attributes = emptySet(),
             isCmdLineArg = false,
-            isUnique = false,
+            isUnique = true,
         )
     }
 
@@ -5395,7 +5389,7 @@ public class TorConfig private constructor(
             default = "",
             attributes = emptySet(),
             isCmdLineArg = false,
-            isUnique = false,
+            isUnique = true,
         )
     }
 
@@ -5425,9 +5419,9 @@ public class TorConfig private constructor(
         public companion object: Keyword(
             name = "DirPortFrontPage",
             default = "",
-            attributes = emptySet(),
+            attributes = immutableSetOf(Attribute.File),
             isCmdLineArg = false,
-            isUnique = false,
+            isUnique = true,
         )
     }
 
@@ -5443,7 +5437,7 @@ public class TorConfig private constructor(
             default = "0",
             attributes = emptySet(),
             isCmdLineArg = false,
-            isUnique = false,
+            isUnique = true,
         )
     }
 
@@ -5463,7 +5457,7 @@ public class TorConfig private constructor(
             default = AUTO,
             attributes = emptySet(),
             isCmdLineArg = false,
-            isUnique = false,
+            isUnique = true,
         )
     }
 
@@ -5479,7 +5473,7 @@ public class TorConfig private constructor(
             default = "0",
             attributes = emptySet(),
             isCmdLineArg = false,
-            isUnique = false,
+            isUnique = true,
         )
     }
 
@@ -5495,7 +5489,7 @@ public class TorConfig private constructor(
             default = "0",
             attributes = emptySet(),
             isCmdLineArg = false,
-            isUnique = false,
+            isUnique = true,
         )
     }
 
@@ -5511,7 +5505,7 @@ public class TorConfig private constructor(
             default = "0",
             attributes = emptySet(),
             isCmdLineArg = false,
-            isUnique = false,
+            isUnique = true,
         )
     }
 
@@ -5527,7 +5521,7 @@ public class TorConfig private constructor(
             default = "0",
             attributes = emptySet(),
             isCmdLineArg = false,
-            isUnique = false,
+            isUnique = true,
         )
     }
 
@@ -5543,7 +5537,7 @@ public class TorConfig private constructor(
             default = "0",
             attributes = emptySet(),
             isCmdLineArg = false,
-            isUnique = false,
+            isUnique = true,
         )
     }
 
@@ -5559,7 +5553,7 @@ public class TorConfig private constructor(
             default = AUTO,
             attributes = emptySet(),
             isCmdLineArg = false,
-            isUnique = false,
+            isUnique = true,
         )
     }
 
@@ -5575,7 +5569,7 @@ public class TorConfig private constructor(
             default = "0",
             attributes = emptySet(),
             isCmdLineArg = false,
-            isUnique = false,
+            isUnique = true,
         )
     }
 
@@ -5591,7 +5585,7 @@ public class TorConfig private constructor(
             default = "0",
             attributes = emptySet(),
             isCmdLineArg = false,
-            isUnique = false,
+            isUnique = true,
         )
     }
 
@@ -5607,7 +5601,7 @@ public class TorConfig private constructor(
             default = "0",
             attributes = emptySet(),
             isCmdLineArg = false,
-            isUnique = false,
+            isUnique = true,
         )
     }
 
@@ -5623,7 +5617,7 @@ public class TorConfig private constructor(
             default = "0",
             attributes = emptySet(),
             isCmdLineArg = false,
-            isUnique = false,
+            isUnique = true,
         )
     }
 
@@ -5639,7 +5633,7 @@ public class TorConfig private constructor(
             default = "0",
             attributes = emptySet(),
             isCmdLineArg = false,
-            isUnique = false,
+            isUnique = true,
         )
     }
 
@@ -5655,7 +5649,7 @@ public class TorConfig private constructor(
             default = AUTO,
             attributes = emptySet(),
             isCmdLineArg = false,
-            isUnique = false,
+            isUnique = true,
         )
     }
 
@@ -5788,7 +5782,7 @@ public class TorConfig private constructor(
             default = false.byte.toString(),
             attributes = emptySet(),
             isCmdLineArg = false,
-            isUnique = false,
+            isUnique = true,
         )
     }
 
@@ -5804,7 +5798,7 @@ public class TorConfig private constructor(
             default = false.byte.toString(),
             attributes = emptySet(),
             isCmdLineArg = false,
-            isUnique = false,
+            isUnique = true,
         )
     }
 
@@ -5820,7 +5814,7 @@ public class TorConfig private constructor(
             default = false.byte.toString(),
             attributes = emptySet(),
             isCmdLineArg = false,
-            isUnique = false,
+            isUnique = true,
         )
     }
 
@@ -5836,7 +5830,7 @@ public class TorConfig private constructor(
             default = "",
             attributes = emptySet(),
             isCmdLineArg = false,
-            isUnique = false,
+            isUnique = true,
         )
     }
 
@@ -5852,7 +5846,7 @@ public class TorConfig private constructor(
             default = "",
             attributes = emptySet(),
             isCmdLineArg = false,
-            isUnique = false,
+            isUnique = true,
         )
     }
 
@@ -5869,7 +5863,7 @@ public class TorConfig private constructor(
             default = ((2.0F.pow(10)) * 100).toInt().toString(), // 100 KBytes
             attributes = emptySet(),
             isCmdLineArg = false,
-            isUnique = false,
+            isUnique = true,
         )
     }
 
@@ -5885,7 +5879,7 @@ public class TorConfig private constructor(
             default = (2.0F.pow(20) * 2).toInt().toString(), // 2MBytes
             attributes = emptySet(),
             isCmdLineArg = false,
-            isUnique = false,
+            isUnique = true,
         )
     }
 
@@ -5901,7 +5895,7 @@ public class TorConfig private constructor(
             default = false.byte.toString(),
             attributes = emptySet(),
             isCmdLineArg = false,
-            isUnique = false,
+            isUnique = true,
         )
     }
 
@@ -5917,7 +5911,7 @@ public class TorConfig private constructor(
             default = "",
             attributes = emptySet(),
             isCmdLineArg = false,
-            isUnique = false,
+            isUnique = true,
         )
     }
 
@@ -5933,7 +5927,7 @@ public class TorConfig private constructor(
             default = false.byte.toString(),
             attributes = emptySet(),
             isCmdLineArg = false,
-            isUnique = false,
+            isUnique = true,
         )
     }
 
@@ -5949,7 +5943,7 @@ public class TorConfig private constructor(
             default = false.byte.toString(),
             attributes = emptySet(),
             isCmdLineArg = false,
-            isUnique = false,
+            isUnique = true,
         )
     }
 
@@ -5965,7 +5959,7 @@ public class TorConfig private constructor(
             default = "2",
             attributes = emptySet(),
             isCmdLineArg = false,
-            isUnique = false,
+            isUnique = true,
         )
     }
 
@@ -5981,7 +5975,7 @@ public class TorConfig private constructor(
             default = true.byte.toString(),
             attributes = emptySet(),
             isCmdLineArg = false,
-            isUnique = false,
+            isUnique = true,
         )
     }
 
@@ -5997,7 +5991,7 @@ public class TorConfig private constructor(
             default = "",
             attributes = emptySet(),
             isCmdLineArg = false,
-            isUnique = false,
+            isUnique = true,
         )
     }
 
@@ -6013,7 +6007,7 @@ public class TorConfig private constructor(
             default = true.byte.toString(),
             attributes = emptySet(),
             isCmdLineArg = false,
-            isUnique = false,
+            isUnique = true,
         )
     }
 
@@ -6029,7 +6023,7 @@ public class TorConfig private constructor(
             default = "",
             attributes = emptySet(),
             isCmdLineArg = false,
-            isUnique = false,
+            isUnique = true,
         )
     }
 
@@ -6045,7 +6039,7 @@ public class TorConfig private constructor(
             default = "",
             attributes = emptySet(),
             isCmdLineArg = false,
-            isUnique = false,
+            isUnique = true,
         )
     }
 
@@ -6061,7 +6055,7 @@ public class TorConfig private constructor(
             default = "",
             attributes = emptySet(),
             isCmdLineArg = false,
-            isUnique = false,
+            isUnique = true,
         )
     }
 
@@ -6078,7 +6072,7 @@ public class TorConfig private constructor(
             default = "",
             attributes = emptySet(),
             isCmdLineArg = false,
-            isUnique = false,
+            isUnique = true,
         )
     }
 
@@ -6094,7 +6088,7 @@ public class TorConfig private constructor(
             default = true.byte.toString(),
             attributes = emptySet(),
             isCmdLineArg = false,
-            isUnique = false,
+            isUnique = true,
         )
     }
 
@@ -6110,7 +6104,7 @@ public class TorConfig private constructor(
             default = true.byte.toString(),
             attributes = emptySet(),
             isCmdLineArg = false,
-            isUnique = false,
+            isUnique = true,
         )
     }
 
@@ -6126,7 +6120,7 @@ public class TorConfig private constructor(
             default = true.byte.toString(),
             attributes = emptySet(),
             isCmdLineArg = false,
-            isUnique = false,
+            isUnique = true,
         )
     }
 
@@ -6142,7 +6136,7 @@ public class TorConfig private constructor(
             default = "",
             attributes = emptySet(),
             isCmdLineArg = false,
-            isUnique = false,
+            isUnique = true,
         )
     }
 
@@ -6158,7 +6152,7 @@ public class TorConfig private constructor(
             default = "0.750000",
             attributes = emptySet(),
             isCmdLineArg = false,
-            isUnique = false,
+            isUnique = true,
         )
     }
 
@@ -6174,7 +6168,7 @@ public class TorConfig private constructor(
             default = 8.days.inWholeSeconds.toString(),
             attributes = emptySet(),
             isCmdLineArg = false,
-            isUnique = false,
+            isUnique = true,
         )
     }
 
@@ -6190,7 +6184,7 @@ public class TorConfig private constructor(
             default = "0.980000",
             attributes = emptySet(),
             isCmdLineArg = false,
-            isUnique = false,
+            isUnique = true,
         )
     }
 
@@ -6206,7 +6200,7 @@ public class TorConfig private constructor(
             default = 30.days.inWholeSeconds.toString(),
             attributes = emptySet(),
             isCmdLineArg = false,
-            isUnique = false,
+            isUnique = true,
         )
     }
 
@@ -6222,7 +6216,7 @@ public class TorConfig private constructor(
             default = 5.days.inWholeSeconds.toString(),
             attributes = emptySet(),
             isCmdLineArg = false,
-            isUnique = false,
+            isUnique = true,
         )
     }
 
@@ -6238,7 +6232,7 @@ public class TorConfig private constructor(
             default = "",
             attributes = emptySet(),
             isCmdLineArg = false,
-            isUnique = false,
+            isUnique = true,
         )
     }
 
@@ -6270,7 +6264,7 @@ public class TorConfig private constructor(
             default = false.byte.toString(),
             attributes = emptySet(),
             isCmdLineArg = false,
-            isUnique = false,
+            isUnique = true,
         )
     }
 
@@ -6286,7 +6280,7 @@ public class TorConfig private constructor(
             default = "",
             attributes = immutableSetOf(Attribute.File),
             isCmdLineArg = false,
-            isUnique = false,
+            isUnique = true,
         )
     }
 
@@ -6302,7 +6296,7 @@ public class TorConfig private constructor(
             default = "500",
             attributes = emptySet(),
             isCmdLineArg = false,
-            isUnique = false,
+            isUnique = true,
         )
     }
 
@@ -6318,7 +6312,7 @@ public class TorConfig private constructor(
             default = 96.hours.inWholeSeconds.toString(),
             attributes = emptySet(),
             isCmdLineArg = false,
-            isUnique = false,
+            isUnique = true,
         )
     }
 
@@ -6334,7 +6328,7 @@ public class TorConfig private constructor(
             default = "",
             attributes = emptySet(),
             isCmdLineArg = false,
-            isUnique = false,
+            isUnique = true,
         )
     }
 
@@ -6350,7 +6344,7 @@ public class TorConfig private constructor(
             default = "",
             attributes = emptySet(),
             isCmdLineArg = false,
-            isUnique = false,
+            isUnique = true,
         )
     }
 
@@ -6366,7 +6360,7 @@ public class TorConfig private constructor(
             default = "",
             attributes = emptySet(),
             isCmdLineArg = false,
-            isUnique = false,
+            isUnique = true,
         )
     }
 
@@ -6382,7 +6376,7 @@ public class TorConfig private constructor(
             default = 5.minutes.inWholeSeconds.toString(),
             attributes = emptySet(),
             isCmdLineArg = false,
-            isUnique = false,
+            isUnique = true,
         )
     }
 
@@ -6398,7 +6392,7 @@ public class TorConfig private constructor(
             default = "3",
             attributes = emptySet(),
             isCmdLineArg = false,
-            isUnique = false,
+            isUnique = true,
         )
     }
 
@@ -6414,7 +6408,7 @@ public class TorConfig private constructor(
             default = false.byte.toString(),
             attributes = emptySet(),
             isCmdLineArg = false,
-            isUnique = false,
+            isUnique = true,
         )
     }
 
@@ -6430,7 +6424,7 @@ public class TorConfig private constructor(
             default = 5.minutes.inWholeSeconds.toString(),
             attributes = emptySet(),
             isCmdLineArg = false,
-            isUnique = false,
+            isUnique = true,
         )
     }
 
@@ -6446,7 +6440,7 @@ public class TorConfig private constructor(
             default = 1.hours.inWholeSeconds.toString(),
             attributes = emptySet(),
             isCmdLineArg = false,
-            isUnique = false,
+            isUnique = true,
         )
     }
 
@@ -6462,7 +6456,7 @@ public class TorConfig private constructor(
             default = "",
             attributes = immutableSetOf(Attribute.File),
             isCmdLineArg = false,
-            isUnique = false,
+            isUnique = true,
         )
     }
 
@@ -6478,7 +6472,7 @@ public class TorConfig private constructor(
             default = false.byte.toString(),
             attributes = emptySet(),
             isCmdLineArg = false,
-            isUnique = false,
+            isUnique = true,
         )
     }
 
@@ -6591,8 +6585,8 @@ public class TorConfig private constructor(
             name = "TestingTorNetwork",
             default = false.byte.toString(),
             attributes = emptySet(),
-            isCmdLineArg = false,
-            isUnique = false,
+            isCmdLineArg = true,
+            isUnique = true,
         )
     }
 
@@ -6608,7 +6602,7 @@ public class TorConfig private constructor(
             default = 30.minutes.inWholeSeconds.toString(),
             attributes = emptySet(),
             isCmdLineArg = false,
-            isUnique = false,
+            isUnique = true,
         )
     }
 
@@ -6624,7 +6618,7 @@ public class TorConfig private constructor(
             default = 2.days.inWholeSeconds.toString(),
             attributes = emptySet(),
             isCmdLineArg = false,
-            isUnique = false,
+            isUnique = true,
         )
     }
 
@@ -6640,7 +6634,7 @@ public class TorConfig private constructor(
             default = 3.hours.inWholeSeconds.toString(),
             attributes = emptySet(),
             isCmdLineArg = false,
-            isUnique = false,
+            isUnique = true,
         )
     }
 
@@ -6656,7 +6650,7 @@ public class TorConfig private constructor(
             default = "0",
             attributes = emptySet(),
             isCmdLineArg = false,
-            isUnique = false,
+            isUnique = true,
         )
     }
 
@@ -6672,7 +6666,7 @@ public class TorConfig private constructor(
             default = 3.hours.inWholeSeconds.toString(),
             attributes = emptySet(),
             isCmdLineArg = false,
-            isUnique = false,
+            isUnique = true,
         )
     }
 
@@ -6688,7 +6682,7 @@ public class TorConfig private constructor(
             default = "0",
             attributes = emptySet(),
             isCmdLineArg = false,
-            isUnique = false,
+            isUnique = true,
         )
     }
 
@@ -6704,7 +6698,7 @@ public class TorConfig private constructor(
             default = "0",
             attributes = emptySet(),
             isCmdLineArg = false,
-            isUnique = false,
+            isUnique = true,
         )
     }
 
@@ -6720,7 +6714,7 @@ public class TorConfig private constructor(
             default = 10.minutes.inWholeSeconds.toString(),
             attributes = emptySet(),
             isCmdLineArg = false,
-            isUnique = false,
+            isUnique = true,
         )
     }
 
@@ -6736,7 +6730,7 @@ public class TorConfig private constructor(
             default = "",
             attributes = emptySet(),
             isCmdLineArg = false,
-            isUnique = false,
+            isUnique = true,
         )
     }
 
@@ -6752,7 +6746,7 @@ public class TorConfig private constructor(
             default = false.byte.toString(),
             attributes = emptySet(),
             isCmdLineArg = false,
-            isUnique = false,
+            isUnique = true,
         )
     }
 
@@ -6768,7 +6762,7 @@ public class TorConfig private constructor(
             default = "",
             attributes = emptySet(),
             isCmdLineArg = false,
-            isUnique = false,
+            isUnique = true,
         )
     }
 
@@ -6784,7 +6778,7 @@ public class TorConfig private constructor(
             default = false.byte.toString(),
             attributes = emptySet(),
             isCmdLineArg = false,
-            isUnique = false,
+            isUnique = true,
         )
     }
 
@@ -6800,7 +6794,7 @@ public class TorConfig private constructor(
             default = "",
             attributes = emptySet(),
             isCmdLineArg = false,
-            isUnique = false,
+            isUnique = true,
         )
     }
 
@@ -6816,7 +6810,7 @@ public class TorConfig private constructor(
             default = false.byte.toString(),
             attributes = emptySet(),
             isCmdLineArg = false,
-            isUnique = false,
+            isUnique = true,
         )
     }
 
@@ -6832,7 +6826,7 @@ public class TorConfig private constructor(
             default = 5.minutes.inWholeSeconds.toString(),
             attributes = emptySet(),
             isCmdLineArg = false,
-            isUnique = false,
+            isUnique = true,
         )
     }
 
@@ -6848,7 +6842,7 @@ public class TorConfig private constructor(
             default = false.byte.toString(),
             attributes = emptySet(),
             isCmdLineArg = false,
-            isUnique = false,
+            isUnique = true,
         )
     }
 
@@ -6864,7 +6858,7 @@ public class TorConfig private constructor(
             default = false.byte.toString(),
             attributes = emptySet(),
             isCmdLineArg = false,
-            isUnique = false,
+            isUnique = true,
         )
     }
 
@@ -6880,7 +6874,7 @@ public class TorConfig private constructor(
             default = 2.days.inWholeSeconds.toString(),
             attributes = emptySet(),
             isCmdLineArg = false,
-            isUnique = false,
+            isUnique = true,
         )
     }
 
@@ -6896,7 +6890,7 @@ public class TorConfig private constructor(
             default = 3.hours.inWholeSeconds.toString(),
             attributes = emptySet(),
             isCmdLineArg = false,
-            isUnique = false,
+            isUnique = true,
         )
     }
 
@@ -6912,7 +6906,7 @@ public class TorConfig private constructor(
             default = "0",
             attributes = emptySet(),
             isCmdLineArg = false,
-            isUnique = false,
+            isUnique = true,
         )
     }
 
@@ -6928,7 +6922,7 @@ public class TorConfig private constructor(
             default = "0",
             attributes = emptySet(),
             isCmdLineArg = false,
-            isUnique = false,
+            isUnique = true,
         )
     }
 
@@ -6944,7 +6938,7 @@ public class TorConfig private constructor(
             default = 1.days.inWholeSeconds.toString(),
             attributes = emptySet(),
             isCmdLineArg = false,
-            isUnique = false,
+            isUnique = true,
         )
     }
 
@@ -6960,7 +6954,7 @@ public class TorConfig private constructor(
             default = "0",
             attributes = emptySet(),
             isCmdLineArg = false,
-            isUnique = false,
+            isUnique = true,
         )
     }
 
@@ -6976,7 +6970,7 @@ public class TorConfig private constructor(
             default = "0",
             attributes = emptySet(),
             isCmdLineArg = false,
-            isUnique = false,
+            isUnique = true,
         )
     }
 
@@ -6992,7 +6986,7 @@ public class TorConfig private constructor(
             default = 1.days.inWholeSeconds.toString(),
             attributes = emptySet(),
             isCmdLineArg = false,
-            isUnique = false,
+            isUnique = true,
         )
     }
 
@@ -7008,7 +7002,7 @@ public class TorConfig private constructor(
             default = 5.minutes.inWholeSeconds.toString(),
             attributes = emptySet(),
             isCmdLineArg = false,
-            isUnique = false,
+            isUnique = true,
         )
     }
 
@@ -7024,7 +7018,7 @@ public class TorConfig private constructor(
             default = 5.minutes.inWholeSeconds.toString(),
             attributes = emptySet(),
             isCmdLineArg = false,
-            isUnique = false,
+            isUnique = true,
         )
     }
 
@@ -7040,7 +7034,7 @@ public class TorConfig private constructor(
             default = 30.minutes.inWholeSeconds.toString(),
             attributes = emptySet(),
             isCmdLineArg = false,
-            isUnique = false,
+            isUnique = true,
         )
     }
 
@@ -7056,7 +7050,7 @@ public class TorConfig private constructor(
             default = "0",
             attributes = emptySet(),
             isCmdLineArg = false,
-            isUnique = false,
+            isUnique = true,
         )
     }
 

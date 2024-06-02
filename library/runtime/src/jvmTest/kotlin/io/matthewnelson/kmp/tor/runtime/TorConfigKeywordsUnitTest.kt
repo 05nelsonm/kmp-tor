@@ -94,6 +94,7 @@ class TorConfigKeywordsUnitTest {
 
             // Override
             listOf(
+                "TorConfig.FirewallPorts",              // deprecated
                 "TorConfig.ReconfigDropsBridgeDescs",
             ).forEach { optionsCurrent.remove(it) }
 

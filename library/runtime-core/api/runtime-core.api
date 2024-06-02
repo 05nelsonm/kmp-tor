@@ -1302,13 +1302,6 @@ public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$FetchUselessD
 public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$FetchUselessDescriptors$Companion : io/matthewnelson/kmp/tor/runtime/core/TorConfig$Keyword {
 }
 
-public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$FirewallPorts : io/matthewnelson/kmp/tor/runtime/core/TorConfig$Setting$Builder {
-	public static final field Companion Lio/matthewnelson/kmp/tor/runtime/core/TorConfig$FirewallPorts$Companion;
-}
-
-public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$FirewallPorts$Companion : io/matthewnelson/kmp/tor/runtime/core/TorConfig$Keyword {
-}
-
 public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$GeoIPExcludeUnknown : io/matthewnelson/kmp/tor/runtime/core/TorConfig$Setting$Builder {
 	public static final field Companion Lio/matthewnelson/kmp/tor/runtime/core/TorConfig$GeoIPExcludeUnknown$Companion;
 	public final fun auto ()Lio/matthewnelson/kmp/tor/runtime/core/TorConfig$GeoIPExcludeUnknown;

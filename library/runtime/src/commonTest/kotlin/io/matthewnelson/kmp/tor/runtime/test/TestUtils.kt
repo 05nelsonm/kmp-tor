@@ -247,7 +247,6 @@ object TestUtils {
         TorConfig.FetchHidServDescriptors,
         TorConfig.FetchServerDescriptors,
         TorConfig.FetchUselessDescriptors,
-        TorConfig.FirewallPorts,
         TorConfig.GuardLifetime,
         TorConfig.GuardfractionFile,
         TorConfig.HSLayer2Nodes,
