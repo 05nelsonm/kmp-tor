@@ -30,9 +30,6 @@ internal expect inline fun TorRuntime.Environment.newRuntimeDispatcher(): Corout
 @Throws(Throwable::class)
 internal expect fun File.setDirectoryPermissions()
 
-@Throws(Throwable::class)
-internal expect fun File.setFilePermissions()
-
 // No matter the Delay implementation (Coroutines Test library)
 // Will delay the specified duration using a TimeSource.
 internal suspend fun timedDelay(duration: Duration) {

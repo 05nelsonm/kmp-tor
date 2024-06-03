@@ -47,13 +47,3 @@ internal actual fun File.setDirectoryPermissions() {
     setWritable(true, /* ownerOnly */ true)
     setExecutable(true, /* ownerOnly */ true)
 }
-
-@Throws(Throwable::class)
-internal actual fun File.setFilePermissions() {
-    setReadable(false, /* ownerOnly */ false)
-    setWritable(false, /* ownerOnly */ false)
-    setExecutable(false, /* ownerOnly */ false)
-
-    setReadable(true, /* ownerOnly */ true)
-    setWritable(true, /* ownerOnly */ true)
-}

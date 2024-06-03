@@ -143,8 +143,7 @@ public sealed interface TorRuntime:
          * before starting tor.
          *
          * [block] is always invoked from a background thread on Jvm & Native,
-         * so it is safe to perform IO within the lambda (e.g. writing settings
-         * that are not currently supported to the [Environment.torrcFile]).
+         * so it is safe to perform IO within the lambda.
          *
          * Any exception thrown within [block] will be propagated to the caller
          * of [Action.StartDaemon] or [Action.RestartDaemon].
@@ -304,10 +303,6 @@ public sealed interface TorRuntime:
         @JvmField
         public val cacheDirectory: File,
         @JvmField
-        public val torrcFile: File,
-        @JvmField
-        public val torrcDefaultsFile: File,
-        @JvmField
         public val torResource: ResourceInstaller<Paths.Tor>,
         @JvmField
         public val processEnv: Map<String, String>,
@@ -444,24 +439,6 @@ public sealed interface TorRuntime:
             public var installationDirectory: File = workDirectory
 
             /**
-             * Location of the torrc file. If it does not exist at runtime,
-             * a blank one will be created.
-             *
-             * Default: [workDirectory]/torrc
-             * */
-            @JvmField
-            public var torrcFile: File = workDirectory.resolve("torrc")
-
-            /**
-             * Location of the torrc-defaults file. If it does not exist at runtime,
-             * a blank one will be created.
-             *
-             * Default: [workDirectory]/torrc-defaults
-             * */
-            @JvmField
-            public var torrcDefaultsFile: File = workDirectory.resolve("torrc-defaults")
-
-            /**
              * Customization of environment variables for the tor process.
              *
              * **NOTE:** The `HOME` environment variable is **always** set to [workDirectory].
@@ -510,8 +487,6 @@ public sealed interface TorRuntime:
                         Environment(
                             workDirectory = b.workDirectory,
                             cacheDirectory = b.cacheDirectory,
-                            torrcFile = b.torrcFile.absoluteFile.normalize(),
-                            torrcDefaultsFile = b.torrcDefaultsFile.absoluteFile.normalize(),
                             torResource = torResource,
                             processEnv = b.processEnv.toImmutableMap(),
                             _defaultExecutor = b.defaultEventExecutor,

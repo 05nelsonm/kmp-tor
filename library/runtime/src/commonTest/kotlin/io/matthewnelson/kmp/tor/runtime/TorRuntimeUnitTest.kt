@@ -17,6 +17,7 @@ package io.matthewnelson.kmp.tor.runtime
 
 import io.matthewnelson.kmp.file.IOException
 import io.matthewnelson.kmp.file.InterruptedException
+import io.matthewnelson.kmp.file.resolve
 import io.matthewnelson.kmp.file.writeUtf8
 import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
 import io.matthewnelson.kmp.tor.core.resource.SynchronizedObject
@@ -59,11 +60,8 @@ class TorRuntimeUnitTest {
             observerStatic(RuntimeEvent.PROCESS.STDERR) { println(it) }
 //            observerStatic(RuntimeEvent.STATE) { println(it) }
 
-            config { environment ->
-                environment.torrcFile.writeUtf8("""
-                    # Startup fail simulation
-                    DNSPort -1
-                """.trimIndent())
+            config {
+                throw IOException()
             }
         }.ensureStoppedOnTestCompletion()
 
@@ -141,9 +139,9 @@ class TorRuntimeUnitTest {
 //            observerStatic(RuntimeEvent.LIFECYCLE) { println(it) }
 //            observerStatic(RuntimeEvent.LISTENERS) { println(it) }
 //            observerStatic(RuntimeEvent.LOG.DEBUG) { println(it) }
-//            observerStatic(RuntimeEvent.LOG.INFO) { println(it) }
+            observerStatic(RuntimeEvent.LOG.INFO) { println(it) }
 //            observerStatic(RuntimeEvent.LOG.WARN) { println(it) }
-//            observerStatic(RuntimeEvent.PROCESS.STDOUT) { println(it) }
+            observerStatic(RuntimeEvent.PROCESS.STDOUT) { println(it) }
             observerStatic(RuntimeEvent.PROCESS.STDERR) { println(it) }
 //            observerStatic(RuntimeEvent.STATE) { println(it) }
         }
@@ -264,9 +262,18 @@ class TorRuntimeUnitTest {
 //            observerStatic(RuntimeEvent.LOG.DEBUG) { println(it) }
 //            observerStatic(RuntimeEvent.LOG.INFO) { println(it) }
 //            observerStatic(RuntimeEvent.LOG.WARN) { println(it) }
-//            observerStatic(RuntimeEvent.PROCESS.STDOUT) { println(it) }
+            observerStatic(RuntimeEvent.PROCESS.STDOUT) { println(it) }
             observerStatic(RuntimeEvent.PROCESS.STDERR) { println(it) }
 //            observerStatic(RuntimeEvent.STATE) { println(it) }
+            config { environment ->
+                val work = environment.workDirectory
+                work.mkdirs()
+                val torrc = work.resolve(".torrc")
+                val torrcD = work.resolve("torrc-defaults")
+                torrc.writeUtf8("ORPort 9088")
+                torrc.delete()
+                torrcD.writeUtf8("DNSPort - 1")
+            }
         }
 
         currentCoroutineContext().job.invokeOnCompletion { runtime.clearObservers() }

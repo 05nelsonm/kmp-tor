@@ -39,7 +39,6 @@ import io.matthewnelson.kmp.tor.runtime.core.address.IPSocketAddress.Companion.t
 import io.matthewnelson.kmp.tor.runtime.core.apply
 import io.matthewnelson.kmp.tor.runtime.core.ctrl.TorCmd
 import io.matthewnelson.kmp.tor.runtime.ctrl.TorCtrl
-import io.matthewnelson.kmp.tor.runtime.internal.*
 import io.matthewnelson.kmp.tor.runtime.internal.InstanceKeeper
 import io.matthewnelson.kmp.tor.runtime.internal.TorConfigGenerator
 import io.matthewnelson.kmp.tor.runtime.internal.process.TorDaemon.StartArgs.Companion.createStartArgs
@@ -409,21 +408,13 @@ internal class TorDaemon private constructor(
             @Throws(IOException::class)
             fun TorConfig.createStartArgs(env: TorRuntime.Environment): StartArgs {
                 val cmdLine = mutableListOf<String>().apply {
-                    add("-f")
-                    add(env.torrcFile.path)
-                    add("--defaults-torrc")
-                    add(env.torrcDefaultsFile.path)
-                    add("--ignore-missing-torrc")
+                    add("--torrc-file")
+                    add("-") // stdin (i.e. /dev/null)
                 }
 
-                val createDirs = mutableSetOf<File>().apply {
+                val directories = mutableSetOf<File>().apply {
                     add(env.workDirectory)
                     add(env.cacheDirectory)
-                }
-
-                val createFiles = mutableSetOf<File>().apply {
-                    add(env.torrcFile)
-                    add(env.torrcDefaultsFile)
                 }
 
                 for (setting in settings) {
@@ -444,46 +435,25 @@ internal class TorDaemon private constructor(
                         }
 
                         if (lineItem.keyword.attributes.contains(TorConfig.Keyword.Attribute.Directory)) {
-                            createDirs.add(lineItem.argument.toFile())
+                            directories.add(lineItem.argument.toFile())
                         }
                     }
                 }
 
-                createDirs.prepareFilesystem(areDirectories = true)
-                createFiles.prepareFilesystem(areDirectories = false)
-
-                // TODO: Incorporate torrc & torrc-defaults
-                val loadText = "# TorConfig.Builder\n" + toString()
-
-                return StartArgs(cmdLine.toImmutableList(), TorCmd.Config.Load(loadText))
-            }
-
-            @Throws(IOException::class)
-            private fun Set<File>.prepareFilesystem(areDirectories: Boolean) = forEach { file ->
-                if (areDirectories) {
-                    if (!file.exists() && !file.mkdirs()) {
-                        throw IOException("Failed to create directory[$file]")
+                directories.forEach { directory ->
+                    if (!directory.exists() && !directory.mkdirs()) {
+                        throw IOException("Failed to create directory[$directory]")
                     }
 
                     try {
-                        file.setDirectoryPermissions()
+                        directory.setDirectoryPermissions()
                     } catch (t: Throwable) {
-                        throw t.wrapIOException { "Failed to set permissions for directory[$file]" }
-                    }
-                } else {
-                    if (!file.exists()) {
-                        file.writeBytes(EMPTY_BYTES)
-                    }
-
-                    try {
-                        file.setFilePermissions()
-                    } catch (t: Throwable) {
-                        throw t.wrapIOException { "Failed to set permissions for file[$file]" }
+                        throw t.wrapIOException { "Failed to set permissions for directory[$directory]" }
                     }
                 }
-            }
 
-            private val EMPTY_BYTES = ByteArray(0)
+                return StartArgs(cmdLine.toImmutableList(), TorCmd.Config.Load(toString()))
+            }
         }
     }
 

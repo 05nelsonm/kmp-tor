@@ -19,6 +19,3 @@ import io.matthewnelson.kmp.file.File
 
 @Throws(Throwable::class)
 internal actual fun File.setDirectoryPermissions() { chmod("700") }
-
-@Throws(Throwable::class)
-internal actual fun File.setFilePermissions() { chmod("600") }
