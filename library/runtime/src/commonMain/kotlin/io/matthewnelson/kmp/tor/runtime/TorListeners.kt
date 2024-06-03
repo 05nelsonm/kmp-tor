@@ -50,8 +50,13 @@ import kotlin.time.Duration.Companion.milliseconds
  * @see [RuntimeEvent.LISTENERS]
  * */
 public class TorListeners private constructor(
+    dir: Set<IPSocketAddress>,
     dns: Set<IPSocketAddress>,
     http: Set<IPSocketAddress>,
+    metrics: Set<IPSocketAddress>,
+    natd: Set<IPSocketAddress>,
+    or: Set<IPSocketAddress>,
+    orExt: Set<IPSocketAddress>,
     socks: Set<IPSocketAddress>,
     socksUnix: Set<File>,
     trans: Set<IPSocketAddress>,
@@ -60,28 +65,89 @@ public class TorListeners private constructor(
 
     @JvmOverloads
     public constructor(
+        dir: Set<IPSocketAddress> = emptySet(),
         dns: Set<IPSocketAddress> = emptySet(),
         http: Set<IPSocketAddress> = emptySet(),
+        metrics: Set<IPSocketAddress> = emptySet(),
+        natd: Set<IPSocketAddress> = emptySet(),
+        or: Set<IPSocketAddress> = emptySet(),
+        orExt: Set<IPSocketAddress> = emptySet(),
         socks: Set<IPSocketAddress> = emptySet(),
         socksUnix: Set<File> = emptySet(),
         trans: Set<IPSocketAddress> = emptySet(),
     ): this(
+        dir = dir,
         dns = dns,
         http = http,
+        metrics = metrics,
+        natd = natd,
+        or = or,
+        orExt = orExt,
         socks = socks,
         socksUnix = socksUnix,
         trans = trans,
         fid = null,
     )
 
+    /**
+     * Listeners defined by [TorConfig.__DirPort].
+     * */
+    @JvmField
+    public val dir: Set<IPSocketAddress> = dir.toImmutableSet()
+
+    /**
+     * Listeners defined by [TorConfig.__DNSPort].
+     * */
     @JvmField
     public val dns: Set<IPSocketAddress> = dns.toImmutableSet()
+
+    /**
+     * Listeners defined by [TorConfig.__HTTPTunnelPort].
+     * */
     @JvmField
     public val http: Set<IPSocketAddress> = http.toImmutableSet()
+
+    /**
+     * Listeners defined by [TorConfig.__MetricsPort].
+     * */
+    @JvmField
+    public val metrics: Set<IPSocketAddress> = metrics.toImmutableSet()
+
+    /**
+     * Listeners defined by [TorConfig.__NATDPort].
+     * */
+    @JvmField
+    public val natd: Set<IPSocketAddress> = natd.toImmutableSet()
+
+    /**
+     * Listeners defined by [TorConfig.__ORPort].
+     * */
+    @JvmField
+    public val or: Set<IPSocketAddress> = or.toImmutableSet()
+
+    /**
+     * Listeners defined by [TorConfig.__ExtORPort].
+     * */
+    @JvmField
+    public val orExt: Set<IPSocketAddress> = orExt.toImmutableSet()
+
+    /**
+     * Listeners defined by [TorConfig.__SocksPort] configured
+     * to use a TCP port.
+     * */
     @JvmField
     public val socks: Set<IPSocketAddress> = socks.toImmutableSet()
+
+    /**
+     * Listeners defined by [TorConfig.__SocksPort] configured
+     * to use a unix socket.
+     * */
     @JvmField
     public val socksUnix: Set<File> = socksUnix.toImmutableSet()
+
+    /**
+     * Listeners defined by [TorConfig.__TransPort].
+     * */
     @JvmField
     public val trans: Set<IPSocketAddress> = trans.toImmutableSet()
 
@@ -93,29 +159,37 @@ public class TorListeners private constructor(
      *   false if there is at least 1 listener available.
      * */
     @get:JvmName("isEmpty")
-    public val isEmpty: Boolean get() = dns.isEmpty()
+    public val isEmpty: Boolean get() = dir.isEmpty()
+        && dns.isEmpty()
         && http.isEmpty()
+        && metrics.isEmpty()
+        && natd.isEmpty()
+        && or.isEmpty()
+        && orExt.isEmpty()
         && socks.isEmpty()
         && socksUnix.isEmpty()
         && trans.isEmpty()
 
-    public operator fun component1(): Set<IPSocketAddress> = dns
-    public operator fun component2(): Set<IPSocketAddress> = http
-    public operator fun component3(): Set<IPSocketAddress> = socks
-    public operator fun component4(): Set<File> = socksUnix
-    public operator fun component5(): Set<IPSocketAddress> = trans
-
-    // JvmOverloads is worthless here b/c of type erasure
     public fun copy(
+        dir: Set<IPSocketAddress> = this.dir,
         dns: Set<IPSocketAddress> = this.dns,
         http: Set<IPSocketAddress> = this.http,
+        metrics: Set<IPSocketAddress> = this.metrics,
+        natd: Set<IPSocketAddress> = this.natd,
+        or: Set<IPSocketAddress> = this.or,
+        orExt: Set<IPSocketAddress> = this.orExt,
         socks: Set<IPSocketAddress> = this.socks,
         socksUnix: Set<File> = this.socksUnix,
         trans: Set<IPSocketAddress> = this.trans,
     ): TorListeners {
         if (
-            dns == this.dns
+            dir == this.dir
+            && dns == this.dns
             && http == this.http
+            && metrics == this.metrics
+            && natd == this.natd
+            && or == this.or
+            && orExt == this.orExt
             && socks == this.socks
             && socksUnix == this.socksUnix
             && trans == this.trans
@@ -124,8 +198,13 @@ public class TorListeners private constructor(
         }
 
         return TorListeners(
+            dir = dir,
             dns = dns,
             http = http,
+            metrics = metrics,
+            natd = natd,
+            or = or,
+            orExt = orExt,
             socks = socks,
             socksUnix = socksUnix,
             trans = trans,
@@ -133,49 +212,29 @@ public class TorListeners private constructor(
         )
     }
 
-    /**
-     * Copies the current [TorListeners], replacing the
-     * [TorListeners.dns] value with [dns].
-     * */
-    public fun copyDns(dns: Set<IPSocketAddress>): TorListeners = copy(dns = dns)
-
-    /**
-     * Copies the current [TorListeners], replacing the
-     * [TorListeners.http] value with [http].
-     * */
-    public fun copyHttp(http: Set<IPSocketAddress>): TorListeners = copy(http = http)
-
-    /**
-     * Copies the current [TorListeners], replacing the
-     * [TorListeners.socks] value with [socks].
-     * */
-    public fun copySocks(socks: Set<IPSocketAddress>): TorListeners = copy(socks = socks)
-
-    /**
-     * Copies the current [TorListeners], replacing the
-     * [TorListeners.socksUnix] value with [socksUnix].
-     * */
-    public fun copySocksUnix(socksUnix: Set<File>): TorListeners = copy(socksUnix = socksUnix)
-
-    /**
-     * Copies the current [TorListeners], replacing the
-     * [TorListeners.trans] value with [trans].
-     * */
-    public fun copyTrans(trans: Set<IPSocketAddress>): TorListeners = copy(trans = trans)
-
     internal companion object {
 
         @JvmSynthetic
         internal fun of(
+            dir: Set<IPSocketAddress> = emptySet(),
             dns: Set<IPSocketAddress> = emptySet(),
             http: Set<IPSocketAddress> = emptySet(),
+            metrics: Set<IPSocketAddress> = emptySet(),
+            natd: Set<IPSocketAddress> = emptySet(),
+            or: Set<IPSocketAddress> = emptySet(),
+            orExt: Set<IPSocketAddress> = emptySet(),
             socks: Set<IPSocketAddress> = emptySet(),
             socksUnix: Set<File> = emptySet(),
             trans: Set<IPSocketAddress> = emptySet(),
             fid: FileID?,
         ): TorListeners = TorListeners(
+            dir = dir,
             dns = dns,
             http = http,
+            metrics = metrics,
+            natd = natd,
+            or = or,
+            orExt = orExt,
             socks = socks,
             socksUnix = socksUnix,
             trans = trans,
@@ -185,8 +244,13 @@ public class TorListeners private constructor(
 
     public override fun equals(other: Any?): Boolean {
         return  other is TorListeners
+                && other.dir == dir
                 && other.dns == dns
                 && other.http == http
+                && other.metrics == metrics
+                && other.natd == natd
+                && other.or == or
+                && other.orExt == orExt
                 && other.socks == socks
                 && other.socksUnix == socksUnix
                 && other.trans == trans
@@ -194,8 +258,13 @@ public class TorListeners private constructor(
 
     public override fun hashCode(): Int {
         var result = 15
+        result = result * 31 + dir.hashCode()
         result = result * 31 + dns.hashCode()
         result = result * 31 + http.hashCode()
+        result = result * 31 + metrics.hashCode()
+        result = result * 31 + natd.hashCode()
+        result = result * 31 + or.hashCode()
+        result = result * 31 + orExt.hashCode()
         result = result * 31 + socks.hashCode()
         result = result * 31 + socksUnix.hashCode()
         result = result * 31 + trans.hashCode()
@@ -212,10 +281,20 @@ public class TorListeners private constructor(
         }
 
         appendLine(": [")
+        append("    dir: [")
+        appendListeners(dir)
         append("    dns: [")
         appendListeners(dns)
         append("    http: [")
         appendListeners(http)
+        append("    metrics: [")
+        appendListeners(metrics)
+        append("    natd: [")
+        appendListeners(natd)
+        append("    or: [")
+        appendListeners(or)
+        append("    orExt: [")
+        appendListeners(orExt)
         append("    socks: [")
         appendListeners(socks)
         append("    socksUnix: [")
@@ -354,9 +433,14 @@ public class TorListeners private constructor(
         }
 
         private fun Type.onClose(address: String) = when (this) {
+            is Type.DIR,
             is Type.DNS,
             is Type.HTTP,
-            is Type.TRANSPARENT -> {
+            is Type.METRICS,
+            is Type.NATD,
+            is Type.OR,
+            is Type.OREXT,
+            is Type.TRANS -> {
                 address.toIPSocketAddressOrNull()
                     ?.update(type = this, wasClosed = true)
             }
@@ -387,9 +471,14 @@ public class TorListeners private constructor(
         }
 
         private fun Type.onOpen(address: String) = when (this) {
+            is Type.DIR,
             is Type.DNS,
             is Type.HTTP,
-            is Type.TRANSPARENT -> {
+            is Type.METRICS,
+            is Type.NATD,
+            is Type.OR,
+            is Type.OREXT,
+            is Type.TRANS -> {
                 address.toIPSocketAddressOrNull()
                     ?.update(type = this, wasClosed = false)
             }
@@ -416,10 +505,15 @@ public class TorListeners private constructor(
             address: IPSocketAddress,
             wasClosed: Boolean,
         ) = when (type) {
+            is Type.DIR -> dir to Copy.Address { copy(dir = it) }
             is Type.DNS -> dns to Copy.Address { copy(dns = it) }
             is Type.HTTP -> http to Copy.Address { copy(http = it) }
+            is Type.METRICS -> metrics to Copy.Address { copy(metrics = it) }
+            is Type.NATD -> natd to Copy.Address { copy(natd = it) }
+            is Type.OR -> or to Copy.Address { copy(or = it) }
+            is Type.OREXT -> orExt to Copy.Address { copy(orExt = it) }
             is Type.SOCKS -> socks to Copy.Address { copy(socks = it) }
-            is Type.TRANSPARENT -> trans to Copy.Address { copy(trans = it) }
+            is Type.TRANS -> trans to Copy.Address { copy(trans = it) }
         }.update(address, wasClosed)
 
         private fun <T: Any> Pair<Set<T>, Copy<T>>.update(
@@ -445,7 +539,10 @@ public class TorListeners private constructor(
 
         protected open fun onConfigChangeJob(cmd: TorCmd.Config.Reset, job: EnqueuedJob) {
             job.invokeOnErrorRecovery(recovery = {
-                if (cmd.keywords.contains(TorConfig.__SocksPort)) {
+                if (
+                    cmd.keywords.contains(TorConfig.__SocksPort)
+                    || cmd.keywords.contains(TorConfig.SocksPort)
+                ) {
                     // SocksPort was set to default. tor will still
                     // close all other socks listeners that may be
                     // open, but will not dispatch the CONF_CHANGED
@@ -457,10 +554,11 @@ public class TorListeners private constructor(
 
         protected open fun onConfigChangeJob(cmd: TorCmd.Config.Set, job: EnqueuedJob) {
             job.invokeOnErrorRecovery(recovery = {
-                val changes = cmd.settings
-                    .filterByKeyword<TorConfig.__SocksPort.Companion>()
-                    .takeIf { it.isNotEmpty() }
-                    ?.let { settings ->
+                val changes = run {
+                    val eSocks = cmd.settings.filterByKeyword<TorConfig.__SocksPort.Companion>()
+                    val socks = cmd.settings.filterByKeyword<TorConfig.SocksPort.Companion>()
+                    eSocks + socks
+                }.takeIf { it.isNotEmpty() }?.let { settings ->
                         settings.mapTo(LinkedHashSet(settings.size, 1.0F)) { setting ->
                             setting.toString().substringAfter(' ')
                         }
@@ -543,18 +641,28 @@ public class TorListeners private constructor(
 
         private sealed class Type {
 
+            data object DIR: Type()
             data object DNS: Type()
             data object HTTP: Type()
+            data object METRICS: Type()
+            data object NATD: Type()
+            data object OR: Type()
+            data object OREXT: Type()
             data object SOCKS: Type()
-            data object TRANSPARENT: Type()
+            data object TRANS: Type()
 
             companion object {
 
                 fun valueOfOrNull(name: String): Type? = when (name.uppercase()) {
+                    "DIRECTORY" -> DIR
                     "DNS" -> DNS
-                    "HTTP" -> HTTP
+                    "HTTP TUNNEL" -> HTTP
+                    "METRICS" -> METRICS
+                    "TRANSPARENT NATD" -> NATD
+                    "OR" -> OR
+                    "EXTENDED OR" -> OREXT
                     "SOCKS" -> SOCKS
-                    "TRANSPARENT" -> TRANSPARENT
+                    "TRANSPARENT PF/NETFILTER" -> TRANS
                     else -> null
                 }
             }

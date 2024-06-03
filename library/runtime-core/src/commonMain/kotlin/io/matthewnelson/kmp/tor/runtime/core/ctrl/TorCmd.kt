@@ -452,7 +452,7 @@ public sealed class TorCmd<Success: Any> private constructor(
         public data object Active: Unprivileged<Reply.Success.OK>("SIGNAL")
         public data object Dormant: Unprivileged<Reply.Success.OK>("SIGNAL")
 
-        public data object Reload: Unprivileged<Reply.Success.OK>("SIGNAL")
+        public data object Reload: Privileged<Reply.Success.OK>("SIGNAL")
         public data object Shutdown: Privileged<Reply.Success.OK>("SIGNAL")
         public data object Halt: Privileged<Reply.Success.OK>("SIGNAL")
     }

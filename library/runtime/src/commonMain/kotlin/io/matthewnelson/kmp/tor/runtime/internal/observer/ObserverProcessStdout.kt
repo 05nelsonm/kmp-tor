@@ -55,16 +55,18 @@ internal open class ObserverProcessStdout internal constructor(
     // UnixDomainSocket
     // [notice] Closing no-longer-configured Socks listener on ???:0
     private fun String.parseListenerClosing() {
-        val type = substringAfter(CLOSING, "")
+        val trimmed = substringAfter(CLOSING, "")
             .substringAfter(' ', "")
-            .substringBefore(' ', "")
-            .trim()
+            .ifEmpty { return }
 
-        val address = if (contains(CONN_READY_ON)) {
-            CONN_READY_ON
-        } else {
-            LISTENER_ON
-        }.let { substringAfter(it, "").trim() }
+        val type = trimmed
+            .substringBefore(" listener ", "")
+            .ifEmpty { return }
+
+        val address = trimmed
+            .substringAfter(CONN_READY_ON, "")
+            .ifEmpty { trimmed.substringAfter(LISTENER_ON, "") }
+            .ifEmpty { return }
 
         manager.update(type, address, wasClosed = true)
     }
@@ -74,12 +76,18 @@ internal open class ObserverProcessStdout internal constructor(
     // [notice] Opened Socks listener connection (ready) on 127.0.0.1:36237
     // [notice] Opened Socks listener connection (ready) on /tmp/kmp_tor_test/sf_restart/work/socks.sock
     // [notice] Opened Transparent pf/netfilter listener connection (ready) on 127.0.0.1:37527
+    // [notice] Opened Transparent natd listener connection (ready) on 127.0.0.1:9060
+    // [notice] Opened Metrics listener connection (ready) on 127.0.0.1:9059
+    // [notice] Opened OR listener connection (ready) on 0.0.0.0:9061
+    // [notice] Opened Extended OR listener connection (ready) on 127.0.0.1:9058
+    // [notice] Opened Directory listener connection (ready) on 0.0.0.0:9057
     private fun String.parseListenerOpened() {
-        val type = substringAfter(OPENED, "")
-            .substringBefore(' ', "")
-            .trim()
-        val address = substringAfter(CONN_READY_ON, "")
-            .trim()
+        val iOpened = indexOf(OPENED)
+        val iReady = indexOf(CONN_READY_ON)
+        if (iOpened == -1 || iReady == -1) return
+
+        val type = substring(iOpened + OPENED.length, iReady)
+        val address = substring(iReady + CONN_READY_ON.length, length)
 
         manager.update(type, address, wasClosed = false)
     }
