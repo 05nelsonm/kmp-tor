@@ -129,22 +129,10 @@ public sealed class TorCmd<Success: Any> private constructor(
          *
          * [docs](https://spec.torproject.org/control-spec/commands.html#loadconf)
          * */
-        public class Load(configText: String): Privileged<Reply.Success.OK>("LOADCONF") {
-
+        public class Load(
             @JvmField
-            public val configText: String = buildString {
-                for (line in configText.lines()) {
-                    val isCommentOrBlank = run {
-                        val i = line.indexOfFirst { !it.isWhitespace() }
-                        if (i == -1) true else line[i] == '#'
-                    }
-
-                    if (isCommentOrBlank) continue
-                    if (isNotEmpty()) appendLine()
-                    append(line)
-                }
-            }
-        }
+            public val configText: String,
+        ): Privileged<Reply.Success.OK>("LOADCONF")
 
         /**
          * "RESETCONF"

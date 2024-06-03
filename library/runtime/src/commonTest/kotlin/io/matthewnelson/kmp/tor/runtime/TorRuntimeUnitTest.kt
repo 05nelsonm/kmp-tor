@@ -256,7 +256,18 @@ class TorRuntimeUnitTest {
 
     @Test
     fun givenRuntime_whenExecuteCmdObserver_thenWorksAsExpected() = runTest {
-        val runtime = TorRuntime.Builder(testEnv("rt_cmd_observer")) {}
+        val runtime = TorRuntime.Builder(testEnv("rt_cmd_observer")) {
+//            observerStatic(RuntimeEvent.EXECUTE.ACTION) { println(it) }
+//            observerStatic(RuntimeEvent.EXECUTE.CMD) { println(it) }
+//            observerStatic(RuntimeEvent.LIFECYCLE) { println(it) }
+//            observerStatic(RuntimeEvent.LISTENERS) { println(it) }
+//            observerStatic(RuntimeEvent.LOG.DEBUG) { println(it) }
+//            observerStatic(RuntimeEvent.LOG.INFO) { println(it) }
+//            observerStatic(RuntimeEvent.LOG.WARN) { println(it) }
+//            observerStatic(RuntimeEvent.PROCESS.STDOUT) { println(it) }
+            observerStatic(RuntimeEvent.PROCESS.STDERR) { println(it) }
+//            observerStatic(RuntimeEvent.STATE) { println(it) }
+        }
 
         currentCoroutineContext().job.invokeOnCompletion { runtime.clearObservers() }
         runtime.ensureStoppedOnTestCompletion()
