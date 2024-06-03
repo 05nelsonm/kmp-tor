@@ -3507,6 +3507,7 @@ public final class io/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$Config$Save
 
 public final class io/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$Config$Set : io/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$Unprivileged {
 	public final field settings Ljava/util/Set;
+	public fun <init> (Lio/matthewnelson/kmp/tor/runtime/core/ThisBlock;)V
 	public fun <init> (Lio/matthewnelson/kmp/tor/runtime/core/TorConfig$Setting;)V
 	public fun <init> (Ljava/util/Collection;)V
 	public fun <init> ([Lio/matthewnelson/kmp/tor/runtime/core/TorConfig$Setting;)V

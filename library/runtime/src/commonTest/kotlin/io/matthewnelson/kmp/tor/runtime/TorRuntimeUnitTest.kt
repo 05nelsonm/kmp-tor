@@ -17,8 +17,6 @@ package io.matthewnelson.kmp.tor.runtime
 
 import io.matthewnelson.kmp.file.IOException
 import io.matthewnelson.kmp.file.InterruptedException
-import io.matthewnelson.kmp.file.resolve
-import io.matthewnelson.kmp.file.writeUtf8
 import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
 import io.matthewnelson.kmp.tor.core.resource.SynchronizedObject
 import io.matthewnelson.kmp.tor.core.resource.synchronized
