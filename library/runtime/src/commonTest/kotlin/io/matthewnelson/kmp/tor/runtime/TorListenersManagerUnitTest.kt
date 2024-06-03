@@ -93,6 +93,12 @@ class TorListenersManagerUnitTest {
     }
 
     @Test
+    fun givenOpen_whenDirectory_thenUpdates() = runListenerTest { manager ->
+        manager.update("Directory", address.value, wasClosed = false)
+        assertEquals(1, manager.listeners.dir.size)
+    }
+
+    @Test
     fun givenOpen_whenDNS_thenUpdates() = runListenerTest { manager ->
         manager.update("DNS", address.value, wasClosed = false)
         assertEquals(1, manager.listeners.dns.size)
@@ -100,8 +106,26 @@ class TorListenersManagerUnitTest {
 
     @Test
     fun givenOpen_whenHTTP_thenUpdates() = runListenerTest { manager ->
-        manager.update("HTTP", address.value, wasClosed = false)
+        manager.update("HTTP tunnel", address.value, wasClosed = false)
         assertEquals(1, manager.listeners.http.size)
+    }
+
+    @Test
+    fun givenOpen_whenMetrics_thenUpdates() = runListenerTest { manager ->
+        manager.update("Metrics", address.value, wasClosed = false)
+        assertEquals(1, manager.listeners.metrics.size)
+    }
+
+    @Test
+    fun givenOpen_whenOR_thenUpdates() = runListenerTest { manager ->
+        manager.update("OR", address.value, wasClosed = false)
+        assertEquals(1, manager.listeners.or.size)
+    }
+
+    @Test
+    fun givenOpen_whenExtendedOR_thenUpdates() = runListenerTest { manager ->
+        manager.update("Extended OR", address.value, wasClosed = false)
+        assertEquals(1, manager.listeners.orExt.size)
     }
 
     @Test
@@ -126,8 +150,8 @@ class TorListenersManagerUnitTest {
     }
 
     @Test
-    fun givenOpen_whenTransparent_thenUpdates() = runListenerTest { manager ->
-        manager.update("Transparent", address.value, wasClosed = false)
+    fun givenOpen_whenTrans_thenUpdates() = runListenerTest { manager ->
+        manager.update("Transparent pf/netfilter", address.value, wasClosed = false)
         assertEquals(1, manager.listeners.trans.size)
     }
 
@@ -140,7 +164,17 @@ class TorListenersManagerUnitTest {
 
     @Test
     fun givenClose_whenAddressPresent_thenUpdates() = runListenerTest { manager ->
-        val types = listOf("DNS", "HTTP", "Socks", "Transparent")
+        val types = listOf(
+            "Directory",
+            "DNS",
+            "HTTP tunnel",
+            "Socks",
+            "Metrics",
+            "OR",
+            "Extended OR",
+            "Transparent natd",
+            "Transparent pf/netfilter"
+        )
 
         types.forEach { type ->
             manager.update(type, address.value, wasClosed = false)
@@ -155,7 +189,17 @@ class TorListenersManagerUnitTest {
 
     @Test
     fun givenClose_whenAddressNotPresent_thenDoesNotRemove() = runListenerTest { manager ->
-        val types = listOf("DNS", "HTTP", "Socks", "Transparent")
+        val types = listOf(
+            "Directory",
+            "DNS",
+            "HTTP tunnel",
+            "Socks",
+            "Metrics",
+            "OR",
+            "Extended OR",
+            "Transparent natd",
+            "Transparent pf/netfilter"
+        )
 
         types.forEach { type ->
             manager.update(type, address.value, wasClosed = false)
@@ -229,7 +273,7 @@ class TorListenersManagerUnitTest {
         assertEquals(2, manager.notifyListeners.size)
 
         manager.update("Socks", address.value, wasClosed = true)
-        manager.update("Transparent", address.value, wasClosed = false)
+        manager.update("Transparent pf/netfilter", address.value, wasClosed = false)
         assertEquals(2, manager.notifyListeners.size)
 
         // job for dispatching Socks closure should have been cancelled

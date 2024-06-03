@@ -315,8 +315,13 @@ public final class io/matthewnelson/kmp/tor/runtime/TorCmdJob : io/matthewnelson
 }
 
 public final class io/matthewnelson/kmp/tor/runtime/TorListeners {
+	public final field dir Ljava/util/Set;
 	public final field dns Ljava/util/Set;
 	public final field http Ljava/util/Set;
+	public final field metrics Ljava/util/Set;
+	public final field natd Ljava/util/Set;
+	public final field or Ljava/util/Set;
+	public final field orExt Ljava/util/Set;
 	public final field socks Ljava/util/Set;
 	public final field socksUnix Ljava/util/Set;
 	public final field trans Ljava/util/Set;
@@ -326,20 +331,15 @@ public final class io/matthewnelson/kmp/tor/runtime/TorListeners {
 	public fun <init> (Ljava/util/Set;Ljava/util/Set;Ljava/util/Set;)V
 	public fun <init> (Ljava/util/Set;Ljava/util/Set;Ljava/util/Set;Ljava/util/Set;)V
 	public fun <init> (Ljava/util/Set;Ljava/util/Set;Ljava/util/Set;Ljava/util/Set;Ljava/util/Set;)V
-	public synthetic fun <init> (Ljava/util/Set;Ljava/util/Set;Ljava/util/Set;Ljava/util/Set;Ljava/util/Set;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
-	public synthetic fun <init> (Ljava/util/Set;Ljava/util/Set;Ljava/util/Set;Ljava/util/Set;Ljava/util/Set;Ljava/lang/String;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
-	public final fun component1 ()Ljava/util/Set;
-	public final fun component2 ()Ljava/util/Set;
-	public final fun component3 ()Ljava/util/Set;
-	public final fun component4 ()Ljava/util/Set;
-	public final fun component5 ()Ljava/util/Set;
-	public final fun copy (Ljava/util/Set;Ljava/util/Set;Ljava/util/Set;Ljava/util/Set;Ljava/util/Set;)Lio/matthewnelson/kmp/tor/runtime/TorListeners;
-	public static synthetic fun copy$default (Lio/matthewnelson/kmp/tor/runtime/TorListeners;Ljava/util/Set;Ljava/util/Set;Ljava/util/Set;Ljava/util/Set;Ljava/util/Set;ILjava/lang/Object;)Lio/matthewnelson/kmp/tor/runtime/TorListeners;
-	public final fun copyDns (Ljava/util/Set;)Lio/matthewnelson/kmp/tor/runtime/TorListeners;
-	public final fun copyHttp (Ljava/util/Set;)Lio/matthewnelson/kmp/tor/runtime/TorListeners;
-	public final fun copySocks (Ljava/util/Set;)Lio/matthewnelson/kmp/tor/runtime/TorListeners;
-	public final fun copySocksUnix (Ljava/util/Set;)Lio/matthewnelson/kmp/tor/runtime/TorListeners;
-	public final fun copyTrans (Ljava/util/Set;)Lio/matthewnelson/kmp/tor/runtime/TorListeners;
+	public fun <init> (Ljava/util/Set;Ljava/util/Set;Ljava/util/Set;Ljava/util/Set;Ljava/util/Set;Ljava/util/Set;)V
+	public fun <init> (Ljava/util/Set;Ljava/util/Set;Ljava/util/Set;Ljava/util/Set;Ljava/util/Set;Ljava/util/Set;Ljava/util/Set;)V
+	public fun <init> (Ljava/util/Set;Ljava/util/Set;Ljava/util/Set;Ljava/util/Set;Ljava/util/Set;Ljava/util/Set;Ljava/util/Set;Ljava/util/Set;)V
+	public fun <init> (Ljava/util/Set;Ljava/util/Set;Ljava/util/Set;Ljava/util/Set;Ljava/util/Set;Ljava/util/Set;Ljava/util/Set;Ljava/util/Set;Ljava/util/Set;)V
+	public fun <init> (Ljava/util/Set;Ljava/util/Set;Ljava/util/Set;Ljava/util/Set;Ljava/util/Set;Ljava/util/Set;Ljava/util/Set;Ljava/util/Set;Ljava/util/Set;Ljava/util/Set;)V
+	public synthetic fun <init> (Ljava/util/Set;Ljava/util/Set;Ljava/util/Set;Ljava/util/Set;Ljava/util/Set;Ljava/util/Set;Ljava/util/Set;Ljava/util/Set;Ljava/util/Set;Ljava/util/Set;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public synthetic fun <init> (Ljava/util/Set;Ljava/util/Set;Ljava/util/Set;Ljava/util/Set;Ljava/util/Set;Ljava/util/Set;Ljava/util/Set;Ljava/util/Set;Ljava/util/Set;Ljava/util/Set;Ljava/lang/String;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun copy (Ljava/util/Set;Ljava/util/Set;Ljava/util/Set;Ljava/util/Set;Ljava/util/Set;Ljava/util/Set;Ljava/util/Set;Ljava/util/Set;Ljava/util/Set;Ljava/util/Set;)Lio/matthewnelson/kmp/tor/runtime/TorListeners;
+	public static synthetic fun copy$default (Lio/matthewnelson/kmp/tor/runtime/TorListeners;Ljava/util/Set;Ljava/util/Set;Ljava/util/Set;Ljava/util/Set;Ljava/util/Set;Ljava/util/Set;Ljava/util/Set;Ljava/util/Set;Ljava/util/Set;Ljava/util/Set;ILjava/lang/Object;)Lio/matthewnelson/kmp/tor/runtime/TorListeners;
 	public fun equals (Ljava/lang/Object;)Z
 	public fun hashCode ()I
 	public final fun isEmpty ()Z

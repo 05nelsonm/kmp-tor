@@ -58,10 +58,15 @@ class ObserverProcessStdoutUnitTest {
     @Test
     fun givenCloseListener_whenParsed_thenUpdatesTorListenersManager() {
         val values = listOf(
+            Pair("Directory", "127.0.0.1:53085") to "TorDaemon[fid=A3C2…6595]@1414604497 May 24 18:10:05.000 [notice] Closing no-longer-configured Directory listener on 127.0.0.1:53085",
             Pair("DNS", "127.0.0.1:53085") to "TorDaemon[fid=A3C2…6595]@1414604497 May 24 18:10:05.000 [notice] Closing no-longer-configured DNS listener on 127.0.0.1:53085",
-            Pair("HTTP", "127.0.0.1:48932") to "TorDaemon[fid=A3C2…6595]@1414604497 May 24 18:10:05.000 [notice] Closing no-longer-configured HTTP tunnel listener on 127.0.0.1:48932",
+            Pair("HTTP tunnel", "127.0.0.1:48932") to "TorDaemon[fid=A3C2…6595]@1414604497 May 24 18:10:05.000 [notice] Closing no-longer-configured HTTP tunnel listener on 127.0.0.1:48932",
+            Pair("Metrics", "127.0.0.1:9150") to "TorDaemon[fid=A3C2…6595]@1414604497 May 24 18:10:05.000 [notice] Closing no-longer-configured Metrics listener on 127.0.0.1:9150",
+            Pair("OR", "127.0.0.1:9150") to "TorDaemon[fid=A3C2…6595]@1414604497 May 24 18:10:05.000 [notice] Closing no-longer-configured OR listener on 127.0.0.1:9150",
+            Pair("Extended OR", "127.0.0.1:9150") to "TorDaemon[fid=A3C2…6595]@1414604497 May 24 18:10:05.000 [notice] Closing no-longer-configured Extended OR listener on 127.0.0.1:9150",
             Pair("Socks", "127.0.0.1:9150") to "TorDaemon[fid=A3C2…6595]@1414604497 May 24 18:10:05.000 [notice] Closing no-longer-configured Socks listener on 127.0.0.1:9150",
-            Pair("Transparent", "127.0.0.1:45963") to "TorDaemon[fid=A3C2…6595]@1414604497 May 24 18:10:05.000 [notice] Closing no-longer-configured Transparent pf/netfilter listener on 127.0.0.1:45963",
+            Pair("Transparent natd", "127.0.0.1:45963") to "TorDaemon[fid=A3C2…6595]@1414604497 May 24 18:10:05.000 [notice] Closing no-longer-configured Transparent natd listener on 127.0.0.1:45963",
+            Pair("Transparent pf/netfilter", "127.0.0.1:45963") to "TorDaemon[fid=A3C2…6595]@1414604497 May 24 18:10:05.000 [notice] Closing no-longer-configured Transparent pf/netfilter listener on 127.0.0.1:45963",
             Pair("Socks", "???:0") to "TorDaemon[fid=A3C2…6595]@1414604497 May 24 18:10:05.000 [notice] Closing no-longer-configured Socks listener on ???:0",
             Pair("Socks", "/tmp/kmp_tor_test/obs_conn_no_net/work/socks5.sock") to "TorDaemon[fid=A3C2…6595]@1414604497 May 24 18:10:05.000 [notice] Closing partially-constructed Socks listener connection (ready) on /tmp/kmp_tor_test/obs_conn_no_net/work/socks5.sock",
         )
@@ -82,10 +87,15 @@ class ObserverProcessStdoutUnitTest {
     @Test
     fun givenOpenListener_whenParsed_thenUpdatesTorListenersManager() {
         val values = listOf(
+            Pair("Directory", "127.0.0.1:53085") to "TorDaemon[fid=A3C2…6595]@1414604497 May 24 18:10:05.000 [notice] Opened Directory listener connection (ready) on 127.0.0.1:53085",
             Pair("DNS", "127.0.0.1:53085") to "TorDaemon[fid=A3C2…6595]@1414604497 May 24 18:10:05.000 [notice] Opened DNS listener connection (ready) on 127.0.0.1:53085",
-            Pair("HTTP", "127.0.0.1:48932") to "TorDaemon[fid=A3C2…6595]@1414604497 May 24 18:10:05.000 [notice] Opened HTTP tunnel listener connection (ready) on 127.0.0.1:48932",
+            Pair("HTTP tunnel", "127.0.0.1:48932") to "TorDaemon[fid=A3C2…6595]@1414604497 May 24 18:10:05.000 [notice] Opened HTTP tunnel listener connection (ready) on 127.0.0.1:48932",
+            Pair("Metrics", "127.0.0.1:9150") to "TorDaemon[fid=A3C2…6595]@1414604497 May 24 18:10:05.000 [notice] Opened Metrics listener connection (ready) on 127.0.0.1:9150",
+            Pair("OR", "127.0.0.1:9150") to "TorDaemon[fid=A3C2…6595]@1414604497 May 24 18:10:05.000 [notice] Opened OR listener connection (ready) on 127.0.0.1:9150",
+            Pair("Extended OR", "127.0.0.1:9150") to "TorDaemon[fid=A3C2…6595]@1414604497 May 24 18:10:05.000 [notice] Opened Extended OR listener connection (ready) on 127.0.0.1:9150",
             Pair("Socks", "127.0.0.1:9150") to "TorDaemon[fid=A3C2…6595]@1414604497 May 24 18:10:05.000 [notice] Opened Socks listener connection (ready) on 127.0.0.1:9150",
-            Pair("Transparent", "127.0.0.1:45963") to "TorDaemon[fid=A3C2…6595]@1414604497 May 24 18:10:05.000 [notice] Opened Transparent pf/netfilter listener connection (ready) on 127.0.0.1:45963",
+            Pair("Transparent natd", "127.0.0.1:45963") to "TorDaemon[fid=A3C2…6595]@1414604497 May 24 18:10:05.000 [notice] Opened Transparent natd listener connection (ready) on 127.0.0.1:45963",
+            Pair("Transparent pf/netfilter", "127.0.0.1:45963") to "TorDaemon[fid=A3C2…6595]@1414604497 May 24 18:10:05.000 [notice] Opened Transparent pf/netfilter listener connection (ready) on 127.0.0.1:45963",
             Pair("Socks", "/tmp/kmp_tor_test/sf_restart/work/socks.sock") to "TorDaemon[fid=A3C2…6595]@1414604497 May 24 18:10:05.000 [notice] Opened Socks listener connection (ready) on /tmp/kmp_tor_test/sf_restart/work/socks.sock",
         )
 

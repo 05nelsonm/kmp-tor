@@ -232,8 +232,13 @@ public sealed class RuntimeEvent<Data: Any> private constructor(
      *     TorState[fid=6E96…6985, daemon=On{95%}, network=Enabled]
      *     TorState[fid=6E96…6985, daemon=On{100%}, network=Enabled]
      *     TorListeners[fid=6E96…6985]: [
+     *         dir: []
      *         dns: []
      *         http: []
+     *         metrics: []
+     *         natd: []
+     *         or: []
+     *         orExt: []
      *         socks: [
      *             127.0.0.1:35607
      *         ]
@@ -243,8 +248,13 @@ public sealed class RuntimeEvent<Data: Any> private constructor(
      *     Tor[fid=6E96…6985] IS READY
      *     TorState[fid=6E96…6985, daemon=On{100%}, network=Disabled]
      *     TorListeners[fid=6E96…6985]: [
+     *         dir: []
      *         dns: []
      *         http: []
+     *         metrics: []
+     *         natd: []
+     *         or: []
+     *         orExt: []
      *         socks: []
      *         socksUnix: []
      *         trans: []
@@ -319,8 +329,13 @@ public sealed class RuntimeEvent<Data: Any> private constructor(
          *     TorState[fid=6E96…6985, daemon=On{95%}, network=Enabled]
          *     TorState[fid=6E96…6985, daemon=On{100%}, network=Enabled]
          *     TorListeners[fid=6E96…6985]: [
+         *         dir: []
          *         dns: []
          *         http: []
+         *         metrics: []
+         *         natd: []
+         *         or: []
+         *         orExt: []
          *         socks: [
          *             127.0.0.1:35607
          *         ]
@@ -330,16 +345,26 @@ public sealed class RuntimeEvent<Data: Any> private constructor(
          *     Tor[fid=6E96…6985] IS READY
          *     TorState[fid=6E96…6985, daemon=On{100%}, network=Disabled]
          *     TorListeners[fid=6E96…6985]: [
+         *         dir: []
          *         dns: []
          *         http: []
+         *         metrics: []
+         *         natd: []
+         *         or: []
+         *         orExt: []
          *         socks: []
          *         socksUnix: []
          *         trans: []
          *     ]
          *     TorState[fid=6E96…6985, daemon=On{100%}, network=Enabled]
          *     TorListeners[fid=6E96…6985]: [
+         *         dir: []
          *         dns: []
          *         http: []
+         *         metrics: []
+         *         natd: []
+         *         or: []
+         *         orExt: []
          *         socks: [
          *             127.0.0.1:38255
          *         ]
@@ -348,8 +373,13 @@ public sealed class RuntimeEvent<Data: Any> private constructor(
          *     ]
          *     TorState[fid=6E96…6985, daemon=Stopping, network=Enabled]
          *     TorListeners[fid=6E96…6985]: [
+         *         dir: []
          *         dns: []
          *         http: []
+         *         metrics: []
+         *         natd: []
+         *         or: []
+         *         orExt: []
          *         socks: []
          *         socksUnix: []
          *         trans: []
@@ -379,8 +409,13 @@ public sealed class RuntimeEvent<Data: Any> private constructor(
      *     TorState[fid=6E96…6985, daemon=On{95%}, network=Enabled]
      *     TorState[fid=6E96…6985, daemon=On{100%}, network=Enabled]
      *     TorListeners[fid=6E96…6985]: [
+     *         dir: []
      *         dns: []
      *         http: []
+     *         metrics: []
+     *         natd: []
+     *         or: []
+     *         orExt: []
      *         socks: [
      *             127.0.0.1:35607
      *         ]
@@ -390,8 +425,13 @@ public sealed class RuntimeEvent<Data: Any> private constructor(
      *     Tor[fid=6E96…6985] IS READY
      *     TorState[fid=6E96…6985, daemon=On{100%}, network=Disabled]
      *     TorListeners[fid=6E96…6985]: [
+     *         dir: []
      *         dns: []
      *         http: []
+     *         metrics: []
+     *         natd: []
+     *         or: []
+     *         orExt: []
      *         socks: []
      *         socksUnix: []
      *         trans: []
