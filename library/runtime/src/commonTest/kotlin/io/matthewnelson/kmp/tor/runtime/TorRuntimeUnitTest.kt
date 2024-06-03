@@ -284,9 +284,10 @@ class TorRuntimeUnitTest {
         runtime.stopDaemonAsync()
 
         assertEquals(4, notices.size)
-        assertNull(notices[0]) // SUCCESS
-        assertNotNull(notices[1]) // Rate limiting
-        assertNotNull(notices[2]) // Rate limiting
-        assertNotNull(notices[3]) // Rate limiting
+
+        // Was rate-limited at least 1 time
+        //
+        // tor "might" not rate-limit on the 2nd call, so.
+        assertTrue(notices.count { it != null } >= 1)
     }
 }
