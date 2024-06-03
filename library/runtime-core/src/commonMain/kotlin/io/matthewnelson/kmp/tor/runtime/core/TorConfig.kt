@@ -254,7 +254,7 @@ public class TorConfig private constructor(
                     settings.removeAll(toRemove.toSet())
                 }
 
-                return TorConfig(settings.toImmutableSet())
+                return TorConfig(settings.sortedBy { it.keyword }.toImmutableSet())
             }
         }
 
