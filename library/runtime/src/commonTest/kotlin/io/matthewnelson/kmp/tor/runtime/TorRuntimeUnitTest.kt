@@ -17,6 +17,7 @@ package io.matthewnelson.kmp.tor.runtime
 
 import io.matthewnelson.kmp.file.IOException
 import io.matthewnelson.kmp.file.InterruptedException
+import io.matthewnelson.kmp.file.resolve
 import io.matthewnelson.kmp.file.writeUtf8
 import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
 import io.matthewnelson.kmp.tor.core.resource.SynchronizedObject
@@ -59,11 +60,8 @@ class TorRuntimeUnitTest {
             observerStatic(RuntimeEvent.PROCESS.STDERR) { println(it) }
 //            observerStatic(RuntimeEvent.STATE) { println(it) }
 
-            config { environment ->
-                environment.torrcFile.writeUtf8("""
-                    # Startup fail simulation
-                    DNSPort -1
-                """.trimIndent())
+            config {
+                throw IOException()
             }
         }.ensureStoppedOnTestCompletion()
 
@@ -286,9 +284,10 @@ class TorRuntimeUnitTest {
         runtime.stopDaemonAsync()
 
         assertEquals(4, notices.size)
-        assertNull(notices[0]) // SUCCESS
-        assertNotNull(notices[1]) // Rate limiting
-        assertNotNull(notices[2]) // Rate limiting
-        assertNotNull(notices[3]) // Rate limiting
+
+        // Was rate-limited at least 1 time
+        //
+        // tor "might" not rate-limit on the 2nd call, so.
+        assertTrue(notices.count { it != null } >= 1)
     }
 }

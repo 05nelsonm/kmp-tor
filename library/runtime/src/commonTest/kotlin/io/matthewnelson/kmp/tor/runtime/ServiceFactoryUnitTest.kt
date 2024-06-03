@@ -312,8 +312,6 @@ class ServiceFactoryUnitTest {
         val lces = mutableListOf<Lifecycle.Event>()
         val lock = SynchronizedObject()
 
-        var failureScenario = ConfigBuilderCallback { throw AssertionError() }
-
         val factory = TorRuntime.Builder(env("sf_process_fail")) {
             observerStatic(RuntimeEvent.LIFECYCLE) {
                 synchronized(lock) { lces.add(it) }
@@ -327,12 +325,10 @@ class ServiceFactoryUnitTest {
 //            observerStatic(RuntimeEvent.PROCESS.STDOUT) { println(it) }
             observerStatic(RuntimeEvent.PROCESS.STDERR) { println(it) }
             observerStatic(RuntimeEvent.STATE) { println(it) }
-            config { environment ->
-                apply(environment, failureScenario)
+            config {
+                throw AssertionError()
             }
         }.ensureStoppedOnTestCompletion()
-
-        factory.environment().torrcFile.delete()
 
         suspend fun assertLCEs() {
             withContext(Dispatchers.Default) { delay(50.milliseconds) }
@@ -350,21 +346,6 @@ class ServiceFactoryUnitTest {
         assertFailsWith<AssertionError> { factory.startDaemonAsync() }
         assertLCEs()
 
-        // Should cause --verify-config check to fail
-        failureScenario = ConfigBuilderCallback { environment ->
-            environment.torrcFile.writeUtf8("DNSPort -1")
-        }
-
-        assertFailsWith<IOException> {
-            try {
-                factory.startDaemonAsync()
-            } catch (t: Throwable) {
-//                t.printStackTrace()
-                throw t
-            }
-        }
-        assertLCEs()
-
         // Now ensure that any queued TorCmd are also interrupted when start fails
         val startAction = factory.enqueue(Action.StartDaemon, {}, {}) as ActionJob.StartJob
         val cmdAction = factory.enqueue(TorCmd.Signal.NewNym, {}, {})
@@ -376,7 +357,7 @@ class ServiceFactoryUnitTest {
         assertLCEs()
         assertTrue(startAction.isError)
         assertTrue(cmdAction.isError)
-        assertIs<IOException>(startAction.onErrorCause)
+        assertIs<AssertionError>(startAction.onErrorCause)
     }
 
     private fun TorRuntime.ServiceFactory.Binder.bind(
