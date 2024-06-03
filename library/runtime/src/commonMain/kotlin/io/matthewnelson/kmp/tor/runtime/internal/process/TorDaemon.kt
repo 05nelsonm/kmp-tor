@@ -99,7 +99,7 @@ internal class TorDaemon private constructor(
             this,
             "Starting Tor with the following settings:\n"
             + "------------------------------------------------------------------------\n"
-            + startArgs.loadText
+            + startArgs.load.configText
             + "\n------------------------------------------------------------------------"
         )
 
@@ -108,12 +108,11 @@ internal class TorDaemon private constructor(
         val result = try {
             val connection = config.awaitCtrlConnection(feed, checkCancellationOrInterrupt)
             val authenticate = config.awaitAuthentication(feed, checkCancellationOrInterrupt)
-            val configLoad = TorCmd.Config.Load(startArgs.loadText)
 
             val arguments = CtrlArguments(
                 processJob,
                 authenticate,
-                configLoad,
+                startArgs.load,
                 connection,
             )
 
@@ -403,7 +402,7 @@ internal class TorDaemon private constructor(
 
     public override fun toString(): String = _toString
 
-    private class StartArgs private constructor(val cmdLine: List<String>, val loadText: String) {
+    private class StartArgs private constructor(val cmdLine: List<String>, val load: TorCmd.Config.Load) {
 
         companion object {
 
@@ -454,9 +453,9 @@ internal class TorDaemon private constructor(
                 createFiles.prepareFilesystem(areDirectories = false)
 
                 // TODO: Incorporate torrc & torrc-defaults
-                val loadText = toString()
+                val loadText = "# TorConfig.Builder\n" + toString()
 
-                return StartArgs(cmdLine.toImmutableList(), loadText)
+                return StartArgs(cmdLine.toImmutableList(), TorCmd.Config.Load(loadText))
             }
 
             @Throws(IOException::class)

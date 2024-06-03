@@ -90,20 +90,31 @@ private fun TorCmd.Config.Get.encode(LOG: Debugger?): ByteArray {
 
 @Throws(IllegalArgumentException::class)
 private fun TorCmd.Config.Load.encode(LOG: Debugger?): ByteArray {
-    require(configText.isNotBlank()) { "configText cannot be blank" }
-
     return StringBuilder().apply {
         append('+').append(keyword)
-        LOG.d { ">> ${toString()}" }
-        CRLF()
-        configText.lines().joinTo(
-            buffer = this,
-            separator = "\n",
-            transform = { line ->
-                LOG.d { ">> $line" }
-                line
+
+        var hasLine = false
+        for (line in configText.lines()) {
+            val isCommentOrBlank = run {
+                val i = line.indexOfFirst { !it.isWhitespace() }
+                if (i == -1) true else line[i] == '#'
             }
-        )
+            if (isCommentOrBlank) continue
+
+            if (!hasLine) {
+                hasLine = true
+                LOG.d { ">> ${toString()}" }
+                CRLF()
+            } else {
+                appendLine()
+            }
+
+            append(line)
+            LOG.d { ">> $line" }
+        }
+
+        require(hasLine) { "configText must contain at least 1 setting" }
+
         CRLF()
         LOG.d { ">> ." }
         append('.')
