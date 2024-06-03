@@ -3699,7 +3699,7 @@ public final class io/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$Signal$NewN
 	public fun hashCode ()I
 }
 
-public final class io/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$Signal$Reload : io/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$Unprivileged {
+public final class io/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$Signal$Reload : io/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$Privileged {
 	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$Signal$Reload;
 	public fun equals (Ljava/lang/Object;)Z
 	public fun hashCode ()I
