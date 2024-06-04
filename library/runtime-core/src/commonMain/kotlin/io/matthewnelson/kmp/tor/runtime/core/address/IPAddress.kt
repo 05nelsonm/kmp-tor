@@ -20,6 +20,7 @@ import io.matthewnelson.kmp.tor.runtime.core.address.IPAddress.V6.Companion.toIP
 import io.matthewnelson.kmp.tor.runtime.core.internal.findHostnameAndPortFromURL
 import kotlin.jvm.JvmName
 import kotlin.jvm.JvmStatic
+import kotlin.jvm.JvmSynthetic
 
 /**
  * Base abstraction for denoting a String value as an ip address
@@ -67,8 +68,17 @@ public sealed class IPAddress private constructor(value: String): Address(value)
     /**
      * Holder for an IPv4 address
      * */
-    public class V4 private constructor(value: String): IPAddress(value) {
+    public open class V4 private constructor(
+        private val bytes: ByteArray,
+        value: String?,
+    ): IPAddress(value ?: bytes.joinToString(".", transform = { it.toUByte().toString() })) {
 
+        /**
+         * `0.0.0.0`
+         * */
+        public object AnyHost: V4(BYTES_ANY_HOST, null)
+
+        public fun address(): ByteArray = bytes.copyOf()
         public override fun canonicalHostName(): String = value
 
         public companion object {
@@ -80,7 +90,7 @@ public sealed class IPAddress private constructor(value: String): Address(value)
              * IPv4 address itself.
              *
              * @return [IPAddress.V4]
-             * @throws [IllegalArgumentException] if no IPv4 address is found
+             * @throws [IllegalArgumentException] if no IPv4 address is found.
              * */
             @JvmStatic
             @JvmName("get")
@@ -91,12 +101,26 @@ public sealed class IPAddress private constructor(value: String): Address(value)
             }
 
             /**
+             * Convert bytes to an IPv4 address.
+             *
+             * @return [IPAddress.V4]
+             * @throws [IllegalArgumentException] if array size is not 4.
+             * */
+            @JvmStatic
+            @JvmName("get")
+            @Throws(IllegalArgumentException::class)
+            public fun ByteArray.toIPAddressV4(): V4 {
+                return toIPAddressV4OrNull()
+                    ?: throw IllegalArgumentException("Array must be 4 bytes in length")
+            }
+
+            /**
              * Parses a String for its IPv4 address.
              *
              * String can be either a URL containing the IPv4 address, or the
              * IPv4 address itself.
              *
-             * @return [IPAddress.V4] or null
+             * @return [IPAddress.V4] or null if no IPv4 address is found.
              * */
             @JvmStatic
             @JvmName("getOrNull")
@@ -104,22 +128,59 @@ public sealed class IPAddress private constructor(value: String): Address(value)
                 val stripped = findHostnameAndPortFromURL()
                     .substringBeforeLast(':')
 
-                if (!stripped.matches(REGEX)) return null
-                return V4(stripped)
+                if (stripped == AnyHost.value) return AnyHost
+                if (stripped == Loopback.value) return Loopback
+
+                val splits = stripped.split('.')
+                if (splits.size != 4) return null
+
+                val bytes = try {
+                    ByteArray(4) { i -> splits[i].toUByte().toByte() }
+                } catch (_: NumberFormatException) {
+                    return null
+                }
+
+                return V4(bytes, stripped)
             }
 
-            // https://ihateregex.io/expr/ip/
-            @Suppress("RegExpSimplifiable")
-            private val REGEX: Regex = Regex(pattern =
-                "(" +
-                "\\b25[0-5]|" +
-                "\\b2[0-4][0-9]|" +
-                "\\b[01]?[0-9][0-9]?)(\\.(25[0-5]|" +
-                "2[0-4][0-9]|" +
-                "[01]?[0-9][0-9]?)" +
-                "){3}"
-            )
+            /**
+             * Convert bytes to an IPv4 address.
+             *
+             * @return [IPAddress.V4] or null if array size is not 4.
+             * */
+            @JvmStatic
+            @JvmName("getOrNull")
+            public fun ByteArray.toIPAddressV4OrNull(): V4? {
+                if (size != 4) return null
+
+                var anyhost = true
+                var loopback = true
+                for (i in 0..3) {
+                    if (anyhost && this[i] != BYTES_ANY_HOST[i]) {
+                        anyhost = false
+                    }
+                    if (loopback && this[i] != BYTES_LOOPBACK[i]) {
+                        loopback = false
+                    }
+                    if (!anyhost && !loopback) break
+                }
+
+                if (anyhost) return AnyHost
+                if (loopback) return Loopback
+
+                return V4(copyOf(), null)
+            }
+
+            // Testing
+            @JvmSynthetic
+            internal fun V4.isLoopback(): Boolean = this is Loopback
+
+            private val BYTES_ANY_HOST = ByteArray(4) { 0 }
+            private val BYTES_LOOPBACK = byteArrayOf(127, 0, 0, 1)
         }
+
+        // Typical IPv4 loopback address of 127.0.0.1
+        private object Loopback: V4(BYTES_LOOPBACK, null)
     }
 
     /**

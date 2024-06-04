@@ -3171,17 +3171,26 @@ public final class io/matthewnelson/kmp/tor/runtime/core/address/IPAddress$Compa
 	public final fun getOrNull (Ljava/lang/String;)Lio/matthewnelson/kmp/tor/runtime/core/address/IPAddress;
 }
 
-public final class io/matthewnelson/kmp/tor/runtime/core/address/IPAddress$V4 : io/matthewnelson/kmp/tor/runtime/core/address/IPAddress {
+public class io/matthewnelson/kmp/tor/runtime/core/address/IPAddress$V4 : io/matthewnelson/kmp/tor/runtime/core/address/IPAddress {
 	public static final field Companion Lio/matthewnelson/kmp/tor/runtime/core/address/IPAddress$V4$Companion;
-	public synthetic fun <init> (Ljava/lang/String;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public synthetic fun <init> ([BLjava/lang/String;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun address ()[B
 	public fun canonicalHostName ()Ljava/lang/String;
 	public static final fun get (Ljava/lang/String;)Lio/matthewnelson/kmp/tor/runtime/core/address/IPAddress$V4;
+	public static final fun get ([B)Lio/matthewnelson/kmp/tor/runtime/core/address/IPAddress$V4;
 	public static final fun getOrNull (Ljava/lang/String;)Lio/matthewnelson/kmp/tor/runtime/core/address/IPAddress$V4;
+	public static final fun getOrNull ([B)Lio/matthewnelson/kmp/tor/runtime/core/address/IPAddress$V4;
+}
+
+public final class io/matthewnelson/kmp/tor/runtime/core/address/IPAddress$V4$AnyHost : io/matthewnelson/kmp/tor/runtime/core/address/IPAddress$V4 {
+	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/core/address/IPAddress$V4$AnyHost;
 }
 
 public final class io/matthewnelson/kmp/tor/runtime/core/address/IPAddress$V4$Companion {
 	public final fun get (Ljava/lang/String;)Lio/matthewnelson/kmp/tor/runtime/core/address/IPAddress$V4;
+	public final fun get ([B)Lio/matthewnelson/kmp/tor/runtime/core/address/IPAddress$V4;
 	public final fun getOrNull (Ljava/lang/String;)Lio/matthewnelson/kmp/tor/runtime/core/address/IPAddress$V4;
+	public final fun getOrNull ([B)Lio/matthewnelson/kmp/tor/runtime/core/address/IPAddress$V4;
 }
 
 public final class io/matthewnelson/kmp/tor/runtime/core/address/IPAddress$V6 : io/matthewnelson/kmp/tor/runtime/core/address/IPAddress {
