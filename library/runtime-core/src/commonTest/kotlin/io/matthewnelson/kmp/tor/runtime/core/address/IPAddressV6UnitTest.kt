@@ -78,11 +78,13 @@ class IPAddressV6UnitTest {
         val TEST_ADDRESSES_IPV6 = """
             ::
             ::0
+            ::0000000
             ::1
             ::55:1
             55::
             22::1
             22:5:dd::
+            00000000::1
             a01e:67d4:f5ac:1d66:8a17:ddc5:8a4a:190f
             203c:ea38:5e8:ca41:1730:15c0:511d:88a7
             e965:925e:3fb3:dd18:ff9:9836:67c5:a8b5

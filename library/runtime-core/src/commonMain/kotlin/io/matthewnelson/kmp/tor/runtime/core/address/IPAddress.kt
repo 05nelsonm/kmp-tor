@@ -40,8 +40,8 @@ public sealed class IPAddress private constructor(
 ): Address(value) {
 
     /**
-     * Returns the raw bytes for this [IPAddress]. Will either be
-     * 4 bytes for [V4], or 16 bytes for [V6].
+     * Returns the raw bytes for this [IPAddress] in network byte order.
+     * Will either be 4 or 16 bytes in length ([V4] or [V6] respectively).
      * */
     public fun address(): ByteArray = bytes.copyOf()
 
@@ -65,7 +65,7 @@ public sealed class IPAddress private constructor(
         }
 
         /**
-         * Converts bytes to an IPv4 or IPv6 address.
+         * Converts network ordered bytes to an IPv4 or IPv6 address.
          *
          * @return [IPAddress]
          * @throws [IllegalArgumentException] if array size is not 4 or 16.
@@ -94,7 +94,7 @@ public sealed class IPAddress private constructor(
         }
 
         /**
-         * Converts bytes to an IPv4 or IPv6 address.
+         * Converts network ordered bytes to an IPv4 or IPv6 address.
          *
          * @return [IPAddress] or null if array size is not 4 or 16.
          * */
@@ -142,7 +142,7 @@ public sealed class IPAddress private constructor(
             }
 
             /**
-             * Convert bytes to an IPv4 address.
+             * Convert network ordered bytes to an IPv4 address.
              *
              * @return [IPAddress.V4]
              * @throws [IllegalArgumentException] if array size is not 4.
@@ -170,7 +170,7 @@ public sealed class IPAddress private constructor(
             }
 
             /**
-             * Convert bytes to an IPv4 address.
+             * Convert network ordered bytes to an IPv4 address.
              *
              * @return [IPAddress.V4] or null if array size is not 4.
              * */
@@ -179,20 +179,20 @@ public sealed class IPAddress private constructor(
             public fun ByteArray.toIPAddressV4OrNull(): V4? {
                 if (size != 4) return null
 
-                var anyhost = true
+                var anyHost = true
                 var loopback = true
                 for (i in indices) {
                     val b = this[i]
-                    if (anyhost && b != AnyHost.bytes[i]) {
-                        anyhost = false
+                    if (anyHost && b != AnyHost.bytes[i]) {
+                        anyHost = false
                     }
                     if (loopback && b != Loopback.bytes[i]) {
                         loopback = false
                     }
-                    if (!anyhost && !loopback) break
+                    if (!anyHost && !loopback) break
                 }
 
-                if (anyhost) return AnyHost
+                if (anyHost) return AnyHost
                 if (loopback) return Loopback
 
                 val hostAddress = buildString(capacity = 3 + (3 * 4)) {
@@ -311,7 +311,7 @@ public sealed class IPAddress private constructor(
             }
 
             /**
-             * Convert bytes to an IPv6 address.
+             * Convert network ordered bytes to an IPv6 address.
              *
              * @param [scope] The network interface name or index number, or null.
              * @return [IPAddress.V6]
@@ -341,7 +341,7 @@ public sealed class IPAddress private constructor(
             }
 
             /**
-             * Convert bytes to an IPv6 address.
+             * Convert network ordered bytes to an IPv6 address.
              *
              * @param [scope] The network interface name or index number, or null.
              * @return [IPAddress.V6] or null if array size is not 16, or if
@@ -479,8 +479,7 @@ public sealed class IPAddress private constructor(
                 // 8 non-empty blocks. Decode.
                 try {
                     BASE_16.newDecoderFeed { byte -> bytes[iB++] = byte }.use { feed ->
-                        for (i in blocks8.indices) {
-                            val block = blocks8[i]
+                        for (block in blocks8) {
                             val iNonZero = block.indexOfFirst { it != '0' }
 
                             // zero block
@@ -497,7 +496,7 @@ public sealed class IPAddress private constructor(
                             // If less than 4 characters, prefix with `0`
                             repeat(4 - len) { feed.consume('0') }
 
-                            repeat(len) { r -> feed.consume(block[r + iNonZero]) }
+                            repeat(len) { i -> feed.consume(block[i + iNonZero]) }
                         }
                     }
                 } catch (_: EncodingException) {}
@@ -515,31 +514,31 @@ public sealed class IPAddress private constructor(
                 require(size == 16) { "Array must be 16 bytes in length" }
                 val bytes = if (copy) copyOf() else this
 
-                var anyhost = true
+                var anyHost = true
                 var loopback = true
                 for (i in indices) {
                     val b = bytes[i]
-                    if (anyhost && b != AnyHost.bytes[i]) {
-                        anyhost = false
+                    if (anyHost && b != AnyHost.bytes[i]) {
+                        anyHost = false
                     }
                     if (loopback && b != Loopback.bytes[i]) {
                         loopback = false
                     }
-                    if (!anyhost && !loopback) break
+                    if (!anyHost && !loopback) break
                 }
 
-                if (anyhost) return AnyHost.of(scope)
+                if (anyHost) return AnyHost.of(scope)
                 if (loopback) return Loopback.of(scope)
 
                 scope?.isValidScopeOrErrorMessage()?.let { msg ->
                     throw IllegalArgumentException(msg)
                 }
 
-                val sb = StringBuilder()
+                val sb = StringBuilder((4 * 8) + 7)
 
-                var iC = 0
+                var count = 0
                 BASE_16.newEncoderFeed(out = Encoder.OutFeed { char ->
-                    val isBlockEnd = ++iC % 4 == 0
+                    val isBlockEnd = ++count % 4 == 0
 
                     // Trim leading 0 chars from each block.
                     if (char == '0' && !isBlockEnd) {
@@ -549,13 +548,9 @@ public sealed class IPAddress private constructor(
 
                     sb.append(char)
 
-                    if (isBlockEnd && iC < 32) sb.append(':')
+                    if (isBlockEnd && count < 32) sb.append(':')
                 }).use { feed ->
-                    repeat(size / 2) { n ->
-                        val i = n * 2
-                        feed.consume(bytes[i])
-                        feed.consume(bytes[i + 1])
-                    }
+                    bytes.forEach { byte -> feed.consume(byte) }
                 }
 
                 return V6(scope, bytes, sb.toString())
