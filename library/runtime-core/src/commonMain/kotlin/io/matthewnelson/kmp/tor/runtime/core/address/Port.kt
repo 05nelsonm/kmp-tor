@@ -16,10 +16,12 @@
 package io.matthewnelson.kmp.tor.runtime.core.address
 
 import io.matthewnelson.kmp.tor.runtime.core.address.Port.Ephemeral.Companion.toPortEphemeralOrNull
-import io.matthewnelson.kmp.tor.runtime.core.internal.findHostnameAndPortFromURL
+import io.matthewnelson.kmp.tor.runtime.core.internal.HostAndPort
+import io.matthewnelson.kmp.tor.runtime.core.internal.HostAndPort.Companion.findHostnameAndPortFromURL
 import kotlin.jvm.JvmField
 import kotlin.jvm.JvmName
 import kotlin.jvm.JvmStatic
+import kotlin.jvm.JvmSynthetic
 
 /**
  * Holder for a port between 0 and 65535 (inclusive).
@@ -84,11 +86,38 @@ public open class Port private constructor(
         @JvmName("getOrNull")
         public fun String.toPortOrNull(): Port? {
             // Try quick win first
-            toIntOrNull()?.let { port -> return port.toPortOrNull() }
+            toIntOrNull()?.let { return it.toPortOrNull() }
+            return findHostnameAndPortFromURL().toPortOrNull()
+        }
 
-            // Try parsing as URL
-            return findHostnameAndPortFromURL()
-                .substringAfterLast(':')
+        @JvmSynthetic
+        internal fun HostAndPort.toPortOrNull(): Port? {
+            var iLastColon = -1
+
+            val checkIPv6 = run {
+                var numColons = 0
+                for (i in value.indices.reversed()) {
+                    val c = value[i]
+                    if (c != ':') continue
+                    if (iLastColon == -1) iLastColon = i
+                    numColons++
+                    if (numColons > 1) break
+                }
+
+                numColons > 1
+            }
+
+            if (iLastColon == -1) return null
+
+            if (checkIPv6) {
+                // Ensure bracketed
+                if (!value.startsWith('[')) return null
+                val c = value.elementAtOrNull(iLastColon - 1)
+                if (c != ']') return null
+            }
+
+            return value
+                .substring(iLastColon + 1)
                 .toIntOrNull()
                 ?.toPortOrNull()
         }

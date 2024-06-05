@@ -65,8 +65,6 @@ public sealed class LocalHost private constructor(): Address("localhost") {
         internal override fun fromCache(): IPAddress.V6? = Cache.getOrNull()?.firstOrNull()
     }
 
-    public final override fun canonicalHostName(): String = value
-
     private class Cache private constructor(private val addresses: Set<IPAddress>) {
 
         private val timeMark = TimeSource.Monotonic.markNow()
@@ -111,9 +109,9 @@ public sealed class LocalHost private constructor(): Address("localhost") {
                 tryParsingIfConfig(addresses)
                 tryParsingEtcHosts(addresses)
 
-                if (addresses.isEmpty()) {
-                    throw IOException("No IP addresses found for localhost")
-                }
+                // Lastly, add well-known loopback addresses as a fallback.
+                addresses.add(IPAddress.V4.loopback())
+                addresses.add(IPAddress.V6.loopback())
 
                 _cache = Cache(addresses.toImmutableSet())
                 return addresses

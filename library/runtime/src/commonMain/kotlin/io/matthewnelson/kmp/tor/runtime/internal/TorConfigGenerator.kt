@@ -71,12 +71,8 @@ internal class TorConfigGenerator internal constructor(
         paths: ResourceInstaller.Paths.Tor,
         NOTIFIER: Notifier,
     ): TorConfig = TorConfig.Builder {
-        try {
-            NOTIFIER.d(this@TorConfigGenerator, "Refreshing localhost IP address cache")
-            LocalHost.refreshCache()
-        } catch (_: IOException) {
-            NOTIFIER.w(this@TorConfigGenerator, "localhost IP address refresh failed")
-        }
+        NOTIFIER.d(this@TorConfigGenerator, "Refreshing localhost IP address cache")
+        LocalHost.refreshCache()
 
         // Apply library consumers' configuration(s)
         config.forEach { block -> apply(environment, block) }

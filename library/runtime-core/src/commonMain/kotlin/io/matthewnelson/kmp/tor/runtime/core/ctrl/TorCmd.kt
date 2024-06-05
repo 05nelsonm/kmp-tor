@@ -177,6 +177,8 @@ public sealed class TorCmd<Success: Any> private constructor(
             @JvmField
             public val settings: kotlin.collections.Set<TorConfig.Setting>
 
+            public constructor(block: ThisBlock<TorConfig.Builder>): this(TorConfig.Builder(block).settings)
+
             public constructor(setting: TorConfig.Setting): this(immutableSetOf(setting))
 
             public constructor(vararg settings: TorConfig.Setting): this(immutableSetOf(*settings))

@@ -19,13 +19,17 @@ import io.matthewnelson.encoding.base32.Base32
 import io.matthewnelson.encoding.base32.Base32Default
 import io.matthewnelson.encoding.core.Decoder.Companion.decodeToByteArray
 import io.matthewnelson.encoding.core.Encoder.Companion.encodeToString
+import io.matthewnelson.kmp.tor.runtime.core.address.OnionAddress.OnionString.Companion.toOnionString
 import io.matthewnelson.kmp.tor.runtime.core.address.OnionAddress.V3.Companion.toOnionAddressV3OrNull
-import io.matthewnelson.kmp.tor.runtime.core.internal.findHostnameAndPortFromURL
+import io.matthewnelson.kmp.tor.runtime.core.internal.HostAndPort
+import io.matthewnelson.kmp.tor.runtime.core.internal.HostAndPort.Companion.findHostnameAndPortFromURL
 import io.matthewnelson.kmp.tor.runtime.core.internal.stripBaseEncoding
 import io.matthewnelson.kmp.tor.runtime.core.key.AddressKey
 import io.matthewnelson.kmp.tor.runtime.core.key.ED25519_V3
+import kotlin.jvm.JvmInline
 import kotlin.jvm.JvmName
 import kotlin.jvm.JvmStatic
+import kotlin.jvm.JvmSynthetic
 
 /**
  * Base abstraction for denoting a String value as a `.onion` address
@@ -34,7 +38,6 @@ import kotlin.jvm.JvmStatic
  * */
 public sealed class OnionAddress private constructor(value: String): Address(value) {
 
-    public final override fun canonicalHostName(): String = "$value.onion"
     public abstract fun decode(): ByteArray
     public abstract fun asPublicKey(): AddressKey.Public
 
@@ -88,7 +91,7 @@ public sealed class OnionAddress private constructor(value: String): Address(val
         @JvmStatic
         @JvmName("getOrNull")
         public fun String.toOnionAddressOrNull(): OnionAddress? {
-            return toOnionAddressV3OrNull()
+            return findHostnameAndPortFromURL().toOnionAddressOrNull()
         }
 
         /**
@@ -102,6 +105,12 @@ public sealed class OnionAddress private constructor(value: String): Address(val
         @JvmName("getOrNull")
         public fun ByteArray.toOnionAddressOrNull(): OnionAddress? {
             return toOnionAddressV3OrNull()
+        }
+
+        @JvmSynthetic
+        internal fun HostAndPort.toOnionAddressOrNull(): OnionAddress? {
+            val onion = toOnionString()
+            return onion.toOnionAddressV3OrNull()
         }
     }
 
@@ -161,12 +170,7 @@ public sealed class OnionAddress private constructor(value: String): Address(val
             @JvmStatic
             @JvmName("getOrNull")
             public fun String.toOnionAddressV3OrNull(): V3? {
-                val stripped = findOnionAddressFromURL()
-                    .lowercase()
-                    .stripBaseEncoding()
-
-                if (!stripped.matches(REGEX)) return null
-                return V3(stripped)
+                return findHostnameAndPortFromURL().toOnionAddressV3OrNull()
             }
 
             /**
@@ -187,16 +191,38 @@ public sealed class OnionAddress private constructor(value: String): Address(val
                 return V3(encoded)
             }
 
+            @JvmSynthetic
+            internal fun HostAndPort.toOnionAddressV3OrNull(): V3? {
+                return toOnionString().toOnionAddressV3OrNull()
+            }
+
+            @JvmSynthetic
+            internal fun OnionString.toOnionAddressV3OrNull(): V3? {
+                if (!value.matches(REGEX)) return null
+                return V3(value)
+            }
+
             internal const val BYTE_SIZE: Int = 35
             private val REGEX: Regex = "[${Base32.Default.CHARS_LOWER}]{56}".toRegex()
         }
     }
-}
 
-@Suppress("NOTHING_TO_INLINE", "KotlinRedundantDiagnosticSuppress")
-private inline fun String.findOnionAddressFromURL(): String {
-    return findHostnameAndPortFromURL()
-        .substringBefore(':') // port
-        .substringBeforeLast(".onion")
-        .substringAfterLast('.') // subdomains
+    @JvmInline
+    internal value class OnionString private constructor(internal val value: String) {
+
+        internal companion object {
+
+            @JvmSynthetic
+            internal fun HostAndPort.toOnionString(): OnionString {
+                val stripped = value
+                    .substringBefore(':') // port
+                    .substringBeforeLast(".onion")
+                    .substringAfterLast('.') // subdomains()
+                    .lowercase()
+                    .stripBaseEncoding()
+
+                return OnionString(stripped)
+            }
+        }
+    }
 }

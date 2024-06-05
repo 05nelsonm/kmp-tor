@@ -15,27 +15,30 @@
  **/
 package io.matthewnelson.kmp.tor.runtime.core.address
 
+import io.matthewnelson.kmp.tor.runtime.core.address.IPAddress.V4.Companion.isLoopback
 import io.matthewnelson.kmp.tor.runtime.core.address.IPAddress.V4.Companion.toIPAddressV4
 import io.matthewnelson.kmp.tor.runtime.core.address.IPAddress.V4.Companion.toIPAddressV4OrNull
-import kotlin.test.Test
-import kotlin.test.assertEquals
-import kotlin.test.assertNull
+import kotlin.test.*
 
 class IPAddressV4UnitTest {
 
     @Test
-    fun givenIPAddressV4_whenLowestValue_thenIsSuccessful() {
-        "0.0.0.0".toIPAddressV4()
+    fun givenIPAddressV4_whenAnyHost_thenIsInstance() {
+        assertIs<IPAddress.V4.AnyHost>("0.0.0.0".toIPAddressV4())
+        assertIs<IPAddress.V4.AnyHost>(ByteArray(4).toIPAddressV4())
     }
 
     @Test
-    fun givenIPAddressV4_whenTypicalLoopback_thenIsSuccessful() {
-        "127.0.0.1".toIPAddressV4()
+    fun givenIPAddressV4_whenTypicalLoopback_thenIsInstance() {
+        assertTrue("127.0.0.1".toIPAddressV4().isLoopback())
+        assertTrue(byteArrayOf(127, 0, 0, 1).toIPAddressV4().isLoopback())
     }
 
     @Test
     fun givenIPAddressV4_whenHighestValue_thenIsSuccessful() {
-        "255.255.255.255".toIPAddressV4()
+        val expected = "255.255.255.255"
+        val actual = expected.toIPAddressV4()
+        assertEquals(expected, actual.value)
     }
 
     @Test
