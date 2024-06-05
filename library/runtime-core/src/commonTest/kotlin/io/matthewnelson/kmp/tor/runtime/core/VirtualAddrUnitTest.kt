@@ -37,16 +37,17 @@ class VirtualAddrUnitTest {
 
     @Test
     fun givenIPv6_whenBitsMisconfigured_thenUsesDefault() {
+        val address = "[fe80:0:0:0:0:0:0:0]"
         var argument = TorConfig.VirtualAddrNetworkIPv6.Builder { bits = 104 }.argument
-        assertEquals("[FE80::]/104", argument)
+        assertEquals("$address/104", argument)
 
         argument = TorConfig.VirtualAddrNetworkIPv6.Builder { bits = 0 }.argument
-        assertEquals("[FE80::]/0", argument)
+        assertEquals("$address/0", argument)
 
         argument = TorConfig.VirtualAddrNetworkIPv6.Builder { bits = 105 }.argument
-        assertEquals("[FE80::]/10", argument)
+        assertEquals("$address/10", argument)
 
         argument = TorConfig.VirtualAddrNetworkIPv6.Builder { bits = -1 }.argument
-        assertEquals("[FE80::]/10", argument)
+        assertEquals("$address/10", argument)
     }
 }

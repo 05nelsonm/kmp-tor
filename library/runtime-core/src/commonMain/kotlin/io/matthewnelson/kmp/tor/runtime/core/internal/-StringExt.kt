@@ -40,13 +40,6 @@ internal inline fun String.stripBaseEncoding(): String {
 }
 
 @Suppress("NOTHING_TO_INLINE")
-internal inline fun String.findHostnameAndPortFromURL(): String {
-    return substringAfter("://") // scheme
-        .substringAfter('@') // username:password
-        .substringBefore('/') // path
-}
-
-@Suppress("NOTHING_TO_INLINE")
 internal inline fun String.tryDecodeOrNull(
     expectedSize: Int,
     decoders: List<Decoder<*>> = listOf(

@@ -15,20 +15,32 @@
  **/
 package io.matthewnelson.kmp.tor.runtime.core.address
 
+import io.matthewnelson.kmp.tor.runtime.core.address.IPAddress.V6.Companion.isLoopback
 import io.matthewnelson.kmp.tor.runtime.core.address.IPAddress.V6.Companion.toIPAddressV6
-import kotlin.test.Test
-import kotlin.test.assertEquals
+import kotlin.test.*
 
 class IPAddressV6UnitTest {
 
     @Test
-    fun givenIPAddressV6_whenLowestValue_thenIsSuccessful() {
-        "::0".toIPAddressV6()
+    fun givenIPAddressV6_whenAnyHost_thenIsInstance() {
+        assertIs<IPAddress.V6.AnyHost.NoScope>("::".toIPAddressV6())
+        assertIs<IPAddress.V6.AnyHost.NoScope>("::0".toIPAddressV6())
+
+        val ah = "::%1".toIPAddressV6()
+        assertIsNot<IPAddress.V6.AnyHost.NoScope>(ah)
+        assertIs<IPAddress.V6.AnyHost>(ah)
     }
 
     @Test
-    fun givenIPAddressV6_whenTypicalLoopback_thenIsSuccessful() {
-        "::1".toIPAddressV6()
+    fun givenIPAddressV6_whenTypicalLoopback_thenIsInstance() {
+        val noScope = "::1".toIPAddressV6()
+        assertTrue(noScope.isLoopback())
+        assertNull(noScope.scope)
+
+        val scope = "::1%1".toIPAddressV6()
+        assertTrue(scope.isLoopback())
+        assertNotNull(scope.scope)
+        assertNotEquals(noScope, scope)
     }
 
     @Test
@@ -64,6 +76,13 @@ class IPAddressV6UnitTest {
 
     companion object {
         val TEST_ADDRESSES_IPV6 = """
+            ::
+            ::0
+            ::1
+            ::55:1
+            55::
+            22::1
+            22:5:dd::
             a01e:67d4:f5ac:1d66:8a17:ddc5:8a4a:190f
             203c:ea38:5e8:ca41:1730:15c0:511d:88a7
             e965:925e:3fb3:dd18:ff9:9836:67c5:a8b5

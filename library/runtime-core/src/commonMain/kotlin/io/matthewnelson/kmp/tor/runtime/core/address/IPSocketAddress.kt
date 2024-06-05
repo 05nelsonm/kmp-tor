@@ -17,6 +17,7 @@ package io.matthewnelson.kmp.tor.runtime.core.address
 
 import io.matthewnelson.kmp.tor.runtime.core.address.IPAddress.Companion.toIPAddressOrNull
 import io.matthewnelson.kmp.tor.runtime.core.address.Port.Companion.toPortOrNull
+import io.matthewnelson.kmp.tor.runtime.core.internal.HostAndPort.Companion.findHostnameAndPortFromURL
 import kotlin.jvm.JvmField
 import kotlin.jvm.JvmName
 import kotlin.jvm.JvmStatic
@@ -33,8 +34,6 @@ public class IPSocketAddress(
 
     public operator fun component1(): IPAddress = address
     public operator fun component2(): Port = port
-
-    public override fun canonicalHostName(): String = address.canonicalHostName()
 
     public fun copy(address: IPAddress): IPSocketAddress = copy(address, port)
     public fun copy(port: Port): IPSocketAddress = copy(address, port)
@@ -73,8 +72,9 @@ public class IPSocketAddress(
         @JvmStatic
         @JvmName("getOrNull")
         public fun String.toIPSocketAddressOrNull(): IPSocketAddress? {
-            val address = toIPAddressOrNull() ?: return null
-            val port = toPortOrNull() ?: return null
+            val stripped = findHostnameAndPortFromURL()
+            val address = stripped.toIPAddressOrNull() ?: return null
+            val port = stripped.toPortOrNull() ?: return null
             return IPSocketAddress(address, port)
         }
     }

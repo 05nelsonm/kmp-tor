@@ -59,7 +59,13 @@ public sealed class Address(
      *     )
      *     // 2gzyxa5ihm7nsggfxnu52rck2vv4rvmdlkiu3zzui5du4xyclen53wid.onion
      * */
-    public abstract fun canonicalHostName(): String
+    public fun canonicalHostName(): String = when (this) {
+        is IPAddress.V4 -> value
+        is IPAddress.V6 -> "[$value]"
+        is IPSocketAddress -> address.canonicalHostName()
+        is LocalHost -> value
+        is OnionAddress -> "$value.onion"
+    }
 
     public final override fun compareTo(other: Address): Int = value.compareTo(other.value)
 
