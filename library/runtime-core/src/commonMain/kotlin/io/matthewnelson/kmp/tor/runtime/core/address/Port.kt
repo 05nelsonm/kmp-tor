@@ -84,11 +84,35 @@ public open class Port private constructor(
         @JvmName("getOrNull")
         public fun String.toPortOrNull(): Port? {
             // Try quick win first
-            toIntOrNull()?.let { port -> return port.toPortOrNull() }
+            toIntOrNull()?.let { return it.toPortOrNull() }
 
-            // Try parsing as URL
-            return findHostnameAndPortFromURL()
-                .substringAfterLast(':')
+            val stripped = findHostnameAndPortFromURL()
+            var iLastColon = -1
+
+            val checkIPv6 = run {
+                var numColons = 0
+                for (i in stripped.indices.reversed()) {
+                    val c = stripped[i]
+                    if (c != ':') continue
+                    if (iLastColon == -1) iLastColon = i
+                    numColons++
+                    if (numColons > 1) break
+                }
+
+                numColons > 1
+            }
+
+            if (iLastColon == -1) return null
+
+            if (checkIPv6) {
+                // Ensure bracketed
+                if (!stripped.startsWith('[')) return null
+                val c = stripped.elementAtOrNull(iLastColon - 1)
+                if (c != ']') return null
+            }
+
+            return stripped
+                .substring(iLastColon + 1)
                 .toIntOrNull()
                 ?.toPortOrNull()
         }

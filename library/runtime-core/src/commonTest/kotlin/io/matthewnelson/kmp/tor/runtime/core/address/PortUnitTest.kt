@@ -19,9 +19,7 @@ import io.matthewnelson.kmp.tor.runtime.core.address.Port.Companion.toPort
 import io.matthewnelson.kmp.tor.runtime.core.address.Port.Companion.toPortOrNull
 import io.matthewnelson.kmp.tor.runtime.core.address.Port.Ephemeral.Companion.toPortEphemeral
 import io.matthewnelson.kmp.tor.runtime.core.address.Port.Ephemeral.Companion.toPortEphemeralOrNull
-import kotlin.test.Test
-import kotlin.test.assertIs
-import kotlin.test.assertNull
+import kotlin.test.*
 
 class PortUnitTest {
 
@@ -57,17 +55,30 @@ class PortUnitTest {
 
     @Test
     fun givenURLWithPort_whenToPort_thenIsSuccessful() {
-        "http://something.com:80".toPort()
+        assertEquals(80, "http://something.com:80".toPort().value)
     }
 
     @Test
     fun givenURLWithPort_whenToPortEphemeral_thenIsSuccessful() {
-        "http://something.com:8080/some/path".toPortEphemeral()
+        assertEquals(8080, "http://something.com:8080/some/path".toPortEphemeral().value)
+    }
+
+    @Test
+    fun givenIPv6Address_whenToPort_thenChecksForBrackets() {
+        assertNull("::8080".toPortOrNull())
+        assertNull("[::8080]:".toPortOrNull())
+
+        // 2 or more colons, but invalid brackets
+        assertNull(":]:8080".toPortOrNull())
+        assertNull("::]:8080".toPortOrNull())
+        assertNull("[::8080".toPortOrNull())
+
+        assertEquals(8080, "[::]:8080".toPort().value)
     }
 
     @Test
     fun givenInt_whenPortEphemeralPossible_thenToPortReturnsPortEphemeral() {
         assertIs<Port.Ephemeral>(1024.toPort())
-        assertIs<Port.Ephemeral>("http://some.com:1025/path".toPort())
+        assertIs<Port.Ephemeral>("http://something.com:1025/path".toPort())
     }
 }
