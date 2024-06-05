@@ -19,9 +19,7 @@ import io.matthewnelson.encoding.base16.Base16
 import io.matthewnelson.encoding.core.Encoder
 import io.matthewnelson.encoding.core.EncodingException
 import io.matthewnelson.encoding.core.use
-import io.matthewnelson.kmp.tor.runtime.core.address.IPAddress.V4.Companion.toIPAddressV4
 import io.matthewnelson.kmp.tor.runtime.core.address.IPAddress.V4.Companion.toIPAddressV4OrNull
-import io.matthewnelson.kmp.tor.runtime.core.address.IPAddress.V6.Companion.toIPAddressV6
 import io.matthewnelson.kmp.tor.runtime.core.address.IPAddress.V6.Companion.toIPAddressV6OrNull
 import io.matthewnelson.kmp.tor.runtime.core.internal.HostAndPort
 import io.matthewnelson.kmp.tor.runtime.core.internal.HostAndPort.Companion.findHostnameAndPortFromURL
@@ -73,10 +71,9 @@ public sealed class IPAddress private constructor(
         @JvmStatic
         @JvmName("get")
         @Throws(IllegalArgumentException::class)
-        public fun ByteArray.toIPAddress(): IPAddress = when (size) {
-            4 -> toIPAddressV4()
-            16 -> toIPAddressV6()
-            else -> throw IllegalArgumentException("Invalid array size[$size]")
+        public fun ByteArray.toIPAddress(): IPAddress {
+            return toIPAddressOrNull()
+                ?: throw IllegalArgumentException("Invalid array size[$size]")
         }
 
         /**
@@ -100,10 +97,8 @@ public sealed class IPAddress private constructor(
          * */
         @JvmStatic
         @JvmName("getOrNull")
-        public fun ByteArray.toIPAddressOrNull(): IPAddress? = try {
-            toIPAddress()
-        } catch (_: IllegalArgumentException) {
-            null
+        public fun ByteArray.toIPAddressOrNull(): IPAddress? {
+            return toIPAddressV4OrNull() ?: toIPAddressV6OrNull()
         }
 
         @JvmSynthetic
