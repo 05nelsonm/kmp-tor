@@ -212,9 +212,9 @@ internal class RealTorRuntime private constructor(
         var errorMsg = destroyedErrMsg
 
         if (destroyed) {
-            return onFailure.toImmediateErrorJob(
-                cmd.keyword,
-                IllegalStateException(errorMsg),
+            return cmd.toImmediateIllegalStateJob(
+                onFailure,
+                errorMsg,
                 handler,
             )
         }
@@ -230,9 +230,9 @@ internal class RealTorRuntime private constructor(
             }
         }
 
-        return cmdQueue?.enqueue(cmd, onFailure, onSuccess) ?: onFailure.toImmediateErrorJob(
-            cmd.keyword,
-            IllegalStateException(errorMsg),
+        return cmdQueue?.enqueue(cmd, onFailure, onSuccess) ?: cmd.toImmediateIllegalStateJob(
+            onFailure,
+            errorMsg,
             handler,
         )
     }
@@ -927,9 +927,9 @@ internal class RealTorRuntime private constructor(
                 job = instance.enqueue(cmd, onFailure, onSuccess)
             }
 
-            return job ?: onFailure.toImmediateErrorJob(
-                cmd.keyword,
-                IllegalStateException("Tor is not started"),
+            return job ?: cmd.toImmediateIllegalStateJob(
+                onFailure,
+                "Tor is not started",
                 handler
             )
         }

@@ -21,11 +21,17 @@ import io.matthewnelson.immutable.collections.toImmutableList
 import io.matthewnelson.immutable.collections.toImmutableMap
 import io.matthewnelson.immutable.collections.toImmutableSet
 import io.matthewnelson.kmp.file.InterruptedException
+import io.matthewnelson.kmp.tor.runtime.core.address.OnionAddress
+import io.matthewnelson.kmp.tor.runtime.core.address.OnionAddress.Companion.toOnionAddressOrNull
 import io.matthewnelson.kmp.tor.runtime.core.ctrl.AddressMapping
 import io.matthewnelson.kmp.tor.runtime.core.ctrl.ConfigEntry
 import io.matthewnelson.kmp.tor.runtime.core.ctrl.Reply
 import io.matthewnelson.kmp.tor.runtime.core.ctrl.Reply.Error.Companion.toError
 import io.matthewnelson.kmp.tor.runtime.core.ctrl.TorCmd
+import io.matthewnelson.kmp.tor.runtime.core.key.AddressKey
+import io.matthewnelson.kmp.tor.runtime.core.key.ED25519_V3
+import io.matthewnelson.kmp.tor.runtime.core.key.ED25519_V3.PrivateKey.Companion.toED25519_V3PrivateKeyOrNull
+import io.matthewnelson.kmp.tor.runtime.core.key.ED25519_V3.PublicKey.Companion.toED25519_V3PublicKeyOrNull
 
 @Throws(NoSuchElementException::class)
 internal fun TorCmdJob<*>.respond(replies: ArrayList<Reply>) {
@@ -123,38 +129,55 @@ private fun TorCmd.Config.Get.complete(job: TorCmdJob<*>, replies: ArrayList<Rep
 
 private fun TorCmd.Info.Get.complete(job: TorCmdJob<*>, replies: ArrayList<Reply.Success>) {
     val map = LinkedHashMap<String, String>(keywords.size, 1.0f)
-
-    for (reply in replies) {
-        if (reply.isOK) continue
-
-        val kvp = reply.message
-        val i = kvp.indexOf('=')
-        if (i == -1) continue
-
-        map[kvp.substring(0, i)] = kvp.substring(i + 1)
-    }
-
+    replies.forEachKvp { key, value -> map[key] = value }
     job.unsafeCast<Map<String, String>>().completion(map.toImmutableMap())
 }
 
 private fun TorCmd.MapAddress.complete(job: TorCmdJob<*>, replies: ArrayList<Reply.Success>) {
     val set = LinkedHashSet<AddressMapping.Result>(mappings.size, 1.0f)
-
-    for (reply in replies) {
-        if (reply.isOK) continue
-
-        val kvp = reply.message
-        val i = kvp.indexOf('=')
-        if (i == -1) continue
-
-        val result = AddressMapping.Result(kvp.substring(0, i), kvp.substring(i + 1))
-        set.add(result)
-    }
-
+    replies.forEachKvp { key, value -> set.add(AddressMapping.Result(key, value)) }
     job.unsafeCast<Set<AddressMapping.Result>>().completion(set.toImmutableSet())
 }
 
+@Throws(NoSuchElementException::class)
 private fun TorCmd.Onion.Add.complete(job: TorCmdJob<*>, replies: ArrayList<Reply.Success>) {
+    var privateKey: AddressKey.Private? = null
+    var publicKey: AddressKey.Public? = null
+
+    // 250-ServiceID=sampleonion4t2pqglbny66wpovyvao3ylc23eileodtevc4b75ikpad
+    // 250-PrivateKey=ED25519-V3:[Blob Redacted]
+    replies.forEachKvp { key, value ->
+        when (key.lowercase()) {
+            "serviceid" -> {
+                when (type) {
+                    is ED25519_V3 -> {
+                        publicKey = value.toED25519_V3PublicKeyOrNull()
+                    }
+                }
+            }
+            "privatekey" -> {
+                val i = value.indexOf(':')
+                if (i == -1) return@forEachKvp
+                val keyString = value.substring(i + 1)
+
+                when (type) {
+                    ED25519_V3 -> {
+                        privateKey = keyString.toED25519_V3PrivateKeyOrNull()
+                    }
+                }
+            }
+        }
+    }
+
+    if (publicKey == null) {
+        throw NoSuchElementException("$type.PublicKey not found")
+    }
+
+    if (privateKey == null && !flags.contains("DiscardPK")) {
+        throw NoSuchElementException("$type.PrivateKey not found and flag DiscardPK was not expressed")
+    }
+
+
     TODO("Issue #419")
 }
 
@@ -174,3 +197,18 @@ private inline fun TorCmdJob<*>.completeSuccess(success: ArrayList<Reply.Success
 
 @Suppress("NOTHING_TO_INLINE", "UNCHECKED_CAST")
 private inline fun <T: Any> TorCmdJob<*>.unsafeCast(): TorCmdJob<T> = this as TorCmdJob<T>
+
+@Suppress("NOTHING_TO_INLINE")
+private inline fun ArrayList<Reply.Success>.forEachKvp(
+    block: (key: String, value: String) -> Unit,
+) {
+    for (reply in this) {
+        if (reply.isOK) continue
+
+        val kvp = reply.message
+        val i = kvp.indexOf('=')
+        if (i == -1) continue
+
+        block(kvp.substring(0, i), kvp.substring(i + 1))
+    }
+}

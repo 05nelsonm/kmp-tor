@@ -17,6 +17,7 @@ package io.matthewnelson.kmp.tor.runtime.core.key
 
 import io.matthewnelson.encoding.core.Encoder.Companion.encodeToString
 import io.matthewnelson.kmp.tor.runtime.core.address.OnionAddress
+import kotlin.jvm.JvmSynthetic
 
 /**
  * Type definition of [Key.Public] and [Key.Private] specific to
@@ -50,7 +51,13 @@ public class AddressKey private constructor() {
     /**
      * Holder for an [OnionAddress] private key
      * */
-    public sealed class Private(key: ByteArray): Key.Private(key)
+    public sealed class Private(key: ByteArray): Key.Private(key) {
+
+        @JvmSynthetic
+        internal fun type(): KeyType.Address<*, *> = when (this) {
+            is ED25519_V3.PrivateKey -> ED25519_V3
+        }
+    }
 
     init {
         throw IllegalStateException("AddressKey cannot be instantiated")

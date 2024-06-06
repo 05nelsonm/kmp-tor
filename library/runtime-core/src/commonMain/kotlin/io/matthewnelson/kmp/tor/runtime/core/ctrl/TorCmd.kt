@@ -24,8 +24,12 @@ import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
 import io.matthewnelson.kmp.tor.runtime.core.*
 import io.matthewnelson.kmp.tor.runtime.core.address.IPAddress
 import io.matthewnelson.kmp.tor.runtime.core.address.OnionAddress
+import io.matthewnelson.kmp.tor.runtime.core.builder.OnionAddBuilder
+import io.matthewnelson.kmp.tor.runtime.core.builder.OnionAddBuilder.Existing.Companion.configure
+import io.matthewnelson.kmp.tor.runtime.core.builder.OnionAddBuilder.New.Companion.configure
 import io.matthewnelson.kmp.tor.runtime.core.key.AddressKey
 import io.matthewnelson.kmp.tor.runtime.core.key.ED25519_V3
+import io.matthewnelson.kmp.tor.runtime.core.key.KeyType
 import kotlin.coroutines.cancellation.CancellationException
 import kotlin.jvm.JvmField
 
@@ -289,9 +293,45 @@ public sealed class TorCmd<Success: Any> private constructor(
          *
          * [docs](https://spec.torproject.org/control-spec/commands.html#add_onion)
          * */
-        public class Add private constructor(
-            // TODO: Issue #419
-        ): Unprivileged<HiddenServiceEntry>("ADD_ONION")
+        public sealed class Add private constructor(
+            @JvmField
+            public val type: KeyType.Address<*, *>,
+            arguments: OnionAddBuilder.Arguments,
+        ): Unprivileged<HiddenServiceEntry>("ADD_ONION") {
+
+            @JvmField
+            public val flags: Set<String> = arguments.flags
+            @JvmField
+            public val maxStreams: TorConfig.LineItem? = arguments.maxStreams
+            @JvmField
+            public val ports: Set<TorConfig.LineItem> = arguments.ports
+
+            public class New private constructor(
+                type: KeyType.Address<*, *>,
+                arguments: OnionAddBuilder.Arguments,
+            ): Add(type, arguments) {
+
+                public constructor(
+                    type: KeyType.Address<*, *>,
+                    block: ThisBlock<OnionAddBuilder.New>,
+                ): this(type, type.configure(block))
+            }
+
+            public class Existing private constructor(
+                @JvmField
+                public val key: AddressKey.Private,
+                arguments: OnionAddBuilder.Arguments,
+            ): Add(key.type(), arguments) {
+
+                public constructor(
+                    key: AddressKey.Private,
+                    block: ThisBlock<OnionAddBuilder.Existing>,
+                ): this(key, key.configure(block))
+
+                @JvmField
+                public val destroyKeyOnJobCompletion: Boolean = arguments.destroyKey
+            }
+        }
 
         /**
          * "DEL_ONION"

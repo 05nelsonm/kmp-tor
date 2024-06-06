@@ -7,7 +7,7 @@ import io.matthewnelson.kmp.tor.runtime.core.TorConfig.Keyword.Attribute
 import io.matthewnelson.kmp.tor.runtime.core.ctrl.TorCmd
 import io.matthewnelson.kmp.tor.runtime.ctrl.internal.Debugger.Companion.d
 
-@Throws(IllegalArgumentException::class)
+@Throws(IllegalArgumentException::class, IllegalStateException::class)
 internal fun TorCmd<*>.encodeToByteArray(LOG: Debugger?): ByteArray = when (this) {
     is TorCmd.Authenticate -> encode(LOG)
     is TorCmd.Config.Get -> encode(LOG)
@@ -250,8 +250,59 @@ private fun TorCmd.MapAddress.encode(LOG: Debugger?): ByteArray {
     }.encodeToByteArray()
 }
 
+@Throws(IllegalArgumentException::class, IllegalStateException::class)
 private fun TorCmd.Onion.Add.encode(LOG: Debugger?): ByteArray {
-    TODO("Issue #419")
+    require(ports.isNotEmpty()) { "At minimum of 1 port is required" }
+
+    return StringBuilder(keyword).apply {
+        SP()
+
+        val redact = when (this@encode) {
+            is TorCmd.Onion.Add.Existing -> {
+                val b64Key = key.base64()
+                append(key.algorithm()).append(':').append(b64Key)
+                b64Key
+            }
+            is TorCmd.Onion.Add.New -> {
+                append("NEW").append(':').append(type.algorithm())
+                null
+            }
+        }
+
+        if (flags.isNotEmpty()) {
+            SP().append("Flags=")
+            flags.joinTo(this, ",")
+        }
+
+        maxStreams?.let { maxStreams ->
+            SP().append("MaxStreams=").append(maxStreams.argument)
+        }
+
+        for (port in ports) {
+            SP().append("Port=")
+
+            val i = port.argument.indexOf(' ')
+            val virtual = port.argument.substring(0, i)
+            var target = port.argument.substring(i + 1)
+
+            if (target.startsWith("unix:")) {
+                target = target.replace("\"", "\\\"")
+            }
+
+            append(virtual).append(',').append(target)
+        }
+
+        LOG.d {
+            var log = toString()
+            if (redact != null) {
+                log = log.replace(redact, "[REDACTED]")
+            }
+
+            ">> $log"
+        }
+
+        CRLF()
+    }.encodeToByteArray(fill = true)
 }
 
 private fun TorCmd.Onion.Delete.encode(LOG: Debugger?): ByteArray {

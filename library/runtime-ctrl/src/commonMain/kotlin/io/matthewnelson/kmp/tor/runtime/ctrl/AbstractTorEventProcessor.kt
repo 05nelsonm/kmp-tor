@@ -18,10 +18,10 @@ package io.matthewnelson.kmp.tor.runtime.ctrl
 import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
 import io.matthewnelson.kmp.tor.core.resource.SynchronizedObject
 import io.matthewnelson.kmp.tor.core.resource.synchronized
-import io.matthewnelson.kmp.tor.runtime.core.OnEvent
-import io.matthewnelson.kmp.tor.runtime.core.TorEvent
-import io.matthewnelson.kmp.tor.runtime.core.UncaughtException
+import io.matthewnelson.kmp.tor.runtime.core.*
 import io.matthewnelson.kmp.tor.runtime.core.UncaughtException.Handler.Companion.tryCatch
+import io.matthewnelson.kmp.tor.runtime.core.ctrl.TorCmd
+import io.matthewnelson.kmp.tor.runtime.ctrl.internal.toDestroyedErrorJob
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlin.concurrent.Volatile
 import kotlin.coroutines.AbstractCoroutineContextElement
@@ -184,6 +184,14 @@ protected constructor(
         @InternalKmpTorApi
         @Suppress("UNCHECKED_CAST")
         protected fun <T : Any> noOpMutableSet(): MutableSet<T> = NoOpMutableSet as MutableSet<T>
+
+        @JvmStatic
+        @InternalKmpTorApi
+        protected fun TorCmd<*>.toImmediateIllegalStateJob(
+            onFailure: OnFailure,
+            message: String,
+            handler: UncaughtException.Handler,
+        ): EnqueuedJob = toDestroyedErrorJob(onFailure, handler, message)
     }
 
     // testing

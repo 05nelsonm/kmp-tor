@@ -16,6 +16,7 @@
 package io.matthewnelson.kmp.tor.runtime.core.key
 
 import io.matthewnelson.encoding.core.Encoder.Companion.encodeToString
+import io.matthewnelson.kmp.tor.runtime.core.Destroyable.Companion.destroyedException
 import io.matthewnelson.kmp.tor.runtime.core.address.OnionAddress
 
 /**
@@ -27,8 +28,6 @@ import io.matthewnelson.kmp.tor.runtime.core.address.OnionAddress
 public class AuthKey private constructor() {
 
     public sealed class Public(private val key: ByteArray): Key.Public() {
-
-        // TODO: writeDescriptorToFile
 
         public final override fun encoded(): ByteArray = key.copyOf()
 
@@ -60,8 +59,6 @@ public class AuthKey private constructor() {
 
     public sealed class Private(key: ByteArray): Key.Private(key) {
 
-        // TODO: writeDescriptorToFile
-
         @Throws(IllegalArgumentException::class, IllegalStateException::class)
         public fun descriptorBase32(
             address: OnionAddress,
@@ -75,7 +72,7 @@ public class AuthKey private constructor() {
             if (result != null) return result
 
             if (publicKey.isCompatible()) {
-                throw IllegalStateException("isDestroyed[${isDestroyed()}]")
+                throw destroyedException()
             }
 
             throw IllegalArgumentException("${publicKey.algorithm()}.PublicKey is not compatible with ${algorithm()}.PrivateKey")
@@ -107,7 +104,7 @@ public class AuthKey private constructor() {
             if (result != null) return result
 
             if (publicKey.isCompatible()) {
-                throw IllegalStateException("isDestroyed[${isDestroyed()}]")
+                throw destroyedException()
             }
 
             throw IllegalArgumentException("${publicKey.algorithm()}.PublicKey is not compatible with ${algorithm()}.PrivateKey")

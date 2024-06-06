@@ -29,6 +29,11 @@ import kotlin.jvm.JvmSynthetic
  * If no modifications are needed for the [TorCmd], the originating
  * [TorCmd] should be returned.
  *
+ * **NOTE:** The following [TorCmd] **cannot** be replaced:
+ *  - [TorCmd.Onion.Add.Existing]
+ *  - [TorCmd.Onion.Add.New]
+ *  - [TorCmd.Onion.Delete]
+ *
  * e.g.
  *
  *     TorCmdInterceptor.intercept<TorCmd.SetEvents> { job, cmd ->
@@ -57,6 +62,10 @@ public class TorCmdInterceptor<C: TorCmd<*>> private constructor(
         if (job.state != EnqueuedJob.State.Executing) return null
 
         val result = _intercept(job) ?: return null
+
+        if (job.cmd is TorCmd.Onion.Add) return null
+        if (job.cmd is TorCmd.Onion.Delete) return null
+
         if (result == job.cmd) return null
         if (result::class != job.cmd::class) return null
 

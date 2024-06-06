@@ -26,6 +26,7 @@ import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
 import io.matthewnelson.kmp.tor.core.resource.SynchronizedObject
 import io.matthewnelson.kmp.tor.core.resource.synchronized
 import io.matthewnelson.kmp.tor.runtime.core.Destroyable
+import io.matthewnelson.kmp.tor.runtime.core.Destroyable.Companion.destroyedException
 import kotlin.concurrent.Volatile
 
 public actual sealed class Key private actual constructor(): java.security.Key {
@@ -74,14 +75,14 @@ public actual sealed class Key private actual constructor(): java.security.Key {
         public actual final override fun encoded(): ByteArray? = withKeyOrNull { it.copyOf() }
 
         @Throws(IllegalStateException::class)
-        public actual fun encodedOrThrow(): ByteArray = encoded() ?: throw IllegalStateException("isDestroyed[$_destroyed]")
+        public actual fun encodedOrThrow(): ByteArray = encoded() ?: throw destroyedException()
 
         @Throws(IllegalStateException::class)
-        public actual fun base16(): String = base16OrNull() ?: throw IllegalStateException("isDestroyed[$_destroyed]")
+        public actual fun base16(): String = base16OrNull() ?: throw destroyedException()
         @Throws(IllegalStateException::class)
-        public actual fun base32(): String = base32OrNull() ?: throw IllegalStateException("isDestroyed[$_destroyed]")
+        public actual fun base32(): String = base32OrNull() ?: throw destroyedException()
         @Throws(IllegalStateException::class)
-        public actual fun base64(): String = base64OrNull() ?: throw IllegalStateException("isDestroyed[$_destroyed]")
+        public actual fun base64(): String = base64OrNull() ?: throw destroyedException()
 
         public actual fun base16OrNull(): String? = withKeyOrNull { it.encodeToString(BASE_16) }
         public actual fun base32OrNull(): String? = withKeyOrNull { it.encodeToString(BASE_32) }

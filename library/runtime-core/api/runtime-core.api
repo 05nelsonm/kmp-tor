@@ -8,11 +8,13 @@ public abstract interface class io/matthewnelson/kmp/tor/runtime/core/Destroyabl
 	public static final field Companion Lio/matthewnelson/kmp/tor/runtime/core/Destroyable$Companion;
 	public static fun checkIsNotDestroyed (Lio/matthewnelson/kmp/tor/runtime/core/Destroyable;)V
 	public abstract fun destroy ()V
+	public static fun destroyedException (Lio/matthewnelson/kmp/tor/runtime/core/Destroyable;)Ljava/lang/IllegalStateException;
 	public abstract fun isDestroyed ()Z
 }
 
 public final class io/matthewnelson/kmp/tor/runtime/core/Destroyable$Companion {
 	public final fun checkIsNotDestroyed (Lio/matthewnelson/kmp/tor/runtime/core/Destroyable;)V
+	public final fun destroyedException (Lio/matthewnelson/kmp/tor/runtime/core/Destroyable;)Ljava/lang/IllegalStateException;
 }
 
 public abstract interface class io/matthewnelson/kmp/tor/runtime/core/Disposable {
@@ -3360,6 +3362,25 @@ public final class io/matthewnelson/kmp/tor/runtime/core/builder/IsolationFlagBu
 	public final fun SessionGroup (I)Lio/matthewnelson/kmp/tor/runtime/core/builder/IsolationFlagBuilder;
 }
 
+public abstract class io/matthewnelson/kmp/tor/runtime/core/builder/OnionAddBuilder {
+	protected static final field Companion Lio/matthewnelson/kmp/tor/runtime/core/builder/OnionAddBuilder$Companion;
+	public field Detach Z
+	public field MaxStreamsCloseCircuit Z
+	public field NonAnonymous Z
+	public final fun maxStreams (Lio/matthewnelson/kmp/tor/runtime/core/ThisBlock;)Lio/matthewnelson/kmp/tor/runtime/core/builder/OnionAddBuilder;
+	public final fun port (Lio/matthewnelson/kmp/tor/runtime/core/ThisBlock;)Lio/matthewnelson/kmp/tor/runtime/core/builder/OnionAddBuilder;
+}
+
+protected final class io/matthewnelson/kmp/tor/runtime/core/builder/OnionAddBuilder$Companion {
+}
+
+public final class io/matthewnelson/kmp/tor/runtime/core/builder/OnionAddBuilder$Existing : io/matthewnelson/kmp/tor/runtime/core/builder/OnionAddBuilder {
+	public field destroyKeyOnJobCompletion Z
+}
+
+public final class io/matthewnelson/kmp/tor/runtime/core/builder/OnionAddBuilder$New : io/matthewnelson/kmp/tor/runtime/core/builder/OnionAddBuilder {
+}
+
 public final class io/matthewnelson/kmp/tor/runtime/core/builder/SocksFlagBuilder {
 	public field CacheDNS Ljava/lang/Boolean;
 	public field CacheIPv4DNS Ljava/lang/Boolean;
@@ -3637,7 +3658,22 @@ public final class io/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$Onion {
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$Onion$Add : io/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$Unprivileged {
+public abstract class io/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$Onion$Add : io/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$Unprivileged {
+	public final field flags Ljava/util/Set;
+	public final field maxStreams Lio/matthewnelson/kmp/tor/runtime/core/TorConfig$LineItem;
+	public final field ports Ljava/util/Set;
+	public final field type Lio/matthewnelson/kmp/tor/runtime/core/key/KeyType$Address;
+	public synthetic fun <init> (Lio/matthewnelson/kmp/tor/runtime/core/key/KeyType$Address;Lio/matthewnelson/kmp/tor/runtime/core/builder/OnionAddBuilder$Arguments;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
+}
+
+public final class io/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$Onion$Add$Existing : io/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$Onion$Add {
+	public final field destroyKeyOnJobCompletion Z
+	public final field key Lio/matthewnelson/kmp/tor/runtime/core/key/AddressKey$Private;
+	public fun <init> (Lio/matthewnelson/kmp/tor/runtime/core/key/AddressKey$Private;Lio/matthewnelson/kmp/tor/runtime/core/ThisBlock;)V
+}
+
+public final class io/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$Onion$Add$New : io/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$Onion$Add {
+	public fun <init> (Lio/matthewnelson/kmp/tor/runtime/core/key/KeyType$Address;Lio/matthewnelson/kmp/tor/runtime/core/ThisBlock;)V
 }
 
 public final class io/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$Onion$Delete : io/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$Unprivileged {
