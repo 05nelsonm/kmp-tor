@@ -19,9 +19,18 @@ import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
 import io.matthewnelson.kmp.tor.core.resource.SynchronizedObject
 import io.matthewnelson.kmp.tor.core.resource.synchronized
 import io.matthewnelson.kmp.tor.runtime.Action.Companion.startDaemonAsync
+import io.matthewnelson.kmp.tor.runtime.Action.Companion.stopDaemonAsync
 import io.matthewnelson.kmp.tor.runtime.core.OnFailure
 import io.matthewnelson.kmp.tor.runtime.core.OnSuccess
 import io.matthewnelson.kmp.tor.runtime.core.TorConfig
+import io.matthewnelson.kmp.tor.runtime.core.TorEvent
+import io.matthewnelson.kmp.tor.runtime.core.address.IPAddress
+import io.matthewnelson.kmp.tor.runtime.core.address.IPAddress.V4.Companion.toIPAddressV4OrNull
+import io.matthewnelson.kmp.tor.runtime.core.address.IPAddress.V6.Companion.toIPAddressV6OrNull
+import io.matthewnelson.kmp.tor.runtime.core.ctrl.AddressMapping.Companion.mappingToAnyHost
+import io.matthewnelson.kmp.tor.runtime.core.ctrl.AddressMapping.Companion.mappingToAnyHostIPv4
+import io.matthewnelson.kmp.tor.runtime.core.ctrl.AddressMapping.Companion.mappingToAnyHostIPv6
+import io.matthewnelson.kmp.tor.runtime.core.ctrl.AddressMapping.Companion.unmappingFrom
 import io.matthewnelson.kmp.tor.runtime.core.ctrl.ConfigEntry
 import io.matthewnelson.kmp.tor.runtime.core.ctrl.TorCmd
 import io.matthewnelson.kmp.tor.runtime.core.util.executeAsync
@@ -29,8 +38,7 @@ import io.matthewnelson.kmp.tor.runtime.test.TestUtils
 import io.matthewnelson.kmp.tor.runtime.test.TestUtils.ensureStoppedOnTestCompletion
 import io.matthewnelson.kmp.tor.runtime.test.TestUtils.testEnv
 import kotlinx.coroutines.test.runTest
-import kotlin.test.Test
-import kotlin.test.assertEquals
+import kotlin.test.*
 
 @OptIn(InternalKmpTorApi::class)
 class TorCmdUnitTest {
@@ -80,5 +88,68 @@ class TorCmdUnitTest {
         }
 
         assertEquals(2, resultMulti.size)
+    }
+
+    @Test
+    fun givenMapAddress_whenMapping_thenIsAsExpected() = runTest {
+        val runtime = TorRuntime.Builder(testEnv("cmd_mapaddress_test")) {
+            required(TorEvent.ADDRMAP)
+//            observerStatic(RuntimeEvent.LOG.DEBUG) { println(it) }
+//            observerStatic(RuntimeEvent.PROCESS.STDOUT) { println(it) }
+        }.ensureStoppedOnTestCompletion()
+
+        runtime.startDaemonAsync()
+
+        val expected = "torproject.org"
+
+        val results = runtime.executeAsync(
+            TorCmd.MapAddress(
+                expected.mappingToAnyHost(),
+                expected.mappingToAnyHostIPv4(),
+                expected.mappingToAnyHostIPv6(),
+            ),
+        )
+
+        listOf<(from: String) -> Unit>(
+            { from ->
+                assertTrue(from.endsWith(".virtual"))
+            },
+            { from ->
+                val a = from.toIPAddressV4OrNull()
+                assertNotNull(a)
+                assertIsNot<IPAddress.V4.AnyHost>(a)
+            },
+            { from ->
+                val a = from.toIPAddressV6OrNull()
+                assertNotNull(a)
+                assertIsNot<IPAddress.V6.AnyHost>(a)
+            }
+        ).forEachIndexed { index, assertFrom ->
+            val result = results.elementAt(index)
+            assertEquals(expected, result.to)
+            assertFrom(result.from)
+            assertFalse(result.isUnmapping)
+        }
+
+        runtime.executeAsync(
+            TorCmd.Info.Get("address-mappings/control")
+        ).let { mappings ->
+            assertEquals(results.size, mappings.entries.first().value.lines().size)
+        }
+
+        runtime.executeAsync(
+            TorCmd.MapAddress(results.map { result -> result.toUnmapping() })
+        ).forEach { result ->
+            assertTrue(result.isUnmapping)
+        }
+
+        runtime.executeAsync(
+            TorCmd.Info.Get("address-mappings/control")
+        ).let { mappings ->
+            // Should all have been un mapped
+            assertTrue(mappings.entries.first().value.isEmpty())
+        }
+
+        runtime.stopDaemonAsync()
     }
 }

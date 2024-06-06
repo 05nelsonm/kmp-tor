@@ -17,9 +17,25 @@ package io.matthewnelson.kmp.tor.runtime.core.address
 
 import io.matthewnelson.kmp.tor.runtime.core.address.IPAddress.V6.Companion.isLoopback
 import io.matthewnelson.kmp.tor.runtime.core.address.IPAddress.V6.Companion.toIPAddressV6
+import io.matthewnelson.kmp.tor.runtime.core.address.IPAddress.V6.Companion.toIPAddressV6OrNull
 import kotlin.test.*
 
 class IPAddressV6UnitTest {
+
+    @Test
+    fun givenBlock_whenInvalidLength_thenReturnsNull() {
+        val valid = "::1000"
+        assertNotNull(valid.toIPAddressV6OrNull())
+        assertNull("${valid}${valid.last()}".toIPAddressV6OrNull())
+    }
+
+    @Test
+    fun givenEnclosingBrackets_whenEitherOrNotBoth_thenReturnsNull() {
+        val valid = "[1::1]"
+        assertNotNull(valid.toIPAddressV6OrNull())
+        assertNull(valid.drop(1).toIPAddressV6OrNull())
+        assertNull(valid.dropLast(1).toIPAddressV6OrNull())
+    }
 
     @Test
     fun givenIPAddressV6_whenAnyHost_thenIsInstance() {
@@ -33,14 +49,14 @@ class IPAddressV6UnitTest {
 
     @Test
     fun givenIPAddressV6_whenTypicalLoopback_thenIsInstance() {
-        val noScope = "::1".toIPAddressV6()
-        assertTrue(noScope.isLoopback())
-        assertNull(noScope.scope)
+        val notScoped = "::1".toIPAddressV6()
+        assertTrue(notScoped.isLoopback())
+        assertNull(notScoped.scope)
 
-        val scope = "::1%1".toIPAddressV6()
-        assertTrue(scope.isLoopback())
-        assertNotNull(scope.scope)
-        assertNotEquals(noScope, scope)
+        val yesScoped = "::1%1".toIPAddressV6()
+        assertTrue(yesScoped.isLoopback())
+        assertNotNull(yesScoped.scope)
+        assertNotEquals(notScoped, yesScoped)
     }
 
     @Test

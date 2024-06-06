@@ -109,13 +109,15 @@ public sealed class IPAddress private constructor(
 
     /**
      * Holder for an IPv4 address
+     *
+     * @see [AnyHost]
      * */
     public open class V4 private constructor(bytes: ByteArray, value: String): IPAddress(bytes, value) {
 
         /**
-         * `0.0.0.0`
+         * Static instance for `0.0.0.0`
          * */
-        public object AnyHost: V4(ByteArray(4) { 0 }, "0.0.0.0")
+        public object AnyHost: V4(ByteArray(4), "0.0.0.0")
 
         public companion object {
 
@@ -238,6 +240,7 @@ public sealed class IPAddress private constructor(
      *
      * @param [scope] The network interface name or index
      *   number, or null if no scope was expressed.
+     * @see [AnyHost]
      * */
     public open class V6 private constructor(
         @JvmField
@@ -247,7 +250,7 @@ public sealed class IPAddress private constructor(
     ): IPAddress(bytes, value + if (scope == null) "" else "%$scope") {
 
         /**
-         * `::0`
+         * Holder for `::0`
          *
          * @see [of]
          * @see [NoScope]
@@ -263,7 +266,7 @@ public sealed class IPAddress private constructor(
              * */
             public companion object NoScope: AnyHost(
                 scope = null,
-                bytes = ByteArray(16) { 0 },
+                bytes = ByteArray(16),
                 value = "0:0:0:0:0:0:0:0"
             ) {
 
@@ -358,20 +361,21 @@ public sealed class IPAddress private constructor(
 
                 // Square brackets
                 run {
-                    val iClosing = stripped.indexOfLast { it == ']' }
-                    val startBracket = stripped.startsWith('[')
+                    val hasOpenBracket = stripped.startsWith('[')
+                    val iClosingBracket = stripped.indexOfLast { it == ']' }
 
-                    // No start bracket, yes closing bracket. Invalid.
-                    if (!startBracket && iClosing != -1) return null
-
-                    if (iClosing == -1) {
+                    if (iClosingBracket == -1) {
                         // Yes start bracket, no closing bracket. Invalid.
-                        if (startBracket) return null
+                        if (hasOpenBracket) return null
 
                         // No start bracket, no closing bracket. Valid.
+                        // stripped = stripped
                     } else {
+                        // No start bracket, yes closing bracket. Invalid
+                        if (!hasOpenBracket) return null
+
                         // Yes start bracket, yes closing bracket. Strip.
-                        stripped = stripped.substring(1, iClosing)
+                        stripped = stripped.substring(1, iClosingBracket)
                     }
                 }
 
@@ -382,8 +386,10 @@ public sealed class IPAddress private constructor(
                     @Suppress("LocalVariableName")
                     val _scope = stripped.substring(iPct + 1)
 
+                    val msg = _scope.isValidScopeOrErrorMessage()
+
                     // Interface name or index number bad. Invalid.
-                    if (_scope.isValidScopeOrErrorMessage() != null) return null
+                    if (msg != null) return null
 
                     stripped = stripped.substring(0, iPct)
                     _scope
@@ -397,33 +403,36 @@ public sealed class IPAddress private constructor(
                     else -> null
                 }?.let { return it }
 
-                val blocks8: List<String> = stripped.split(':', limit = 10).let { split ->
-                    // min (3)         to max (9)
-                    // *:: or ::*      to ::*:*:*:*:*:*:* or *:*:*:*:*:*:*::
-                    if (split.size !in 3..9) return@let emptyList()
+                val blocks8: List<String> = stripped.split(':', limit = 10).let { splits ->
+                    // min (3)       to  max (9)
+                    // *::  or  ::*  to  ::*:*:*:*:*:*:*  or  *:*:*:*:*:*:*::
+                    if (splits.size !in 3..9) return@let emptyList()
 
                     var iExpand = -1
 
                     val blocks: MutableList<String> = run {
-                        val emptyFirst = split.first().isEmpty()
-                        val emptyLast = split.last().isEmpty()
+                        // Will be empty if started with `:`
+                        val emptyFirst = splits.first().isEmpty()
+                        // Will be empty if ended with `:`
+                        val emptyLast = splits.last().isEmpty()
 
                         // Started and ended with `:`, but `::` was eliminated. Invalid.
                         if (emptyFirst && emptyLast) return@let emptyList()
 
                         @Suppress("LocalVariableName")
-                        val _blocks = (split as? MutableList<String>) ?: split.toMutableList()
+                        val _blocks = (splits as? MutableList<String>) ?: splits.toMutableList()
 
-                        // Replace first/last empty block with `0`
+                        // Replace first or last empty block with `0` so that
+                        // parsing for `::` results in the proper iExpand check.
                         if (emptyFirst) {
-                            // Must start with ::, otherwise invalid.
+                            // Must start with `::`, otherwise invalid.
                             iExpand = 1
                             _blocks.removeFirst()
                             _blocks.add(0, "0")
                         }
                         if (emptyLast) {
-                            // Must end with ::, otherwise invalid.
-                            iExpand = split.lastIndex - 1
+                            // Must end with `::`, otherwise invalid.
+                            iExpand = splits.lastIndex - 1
                             _blocks.removeLast()
                             _blocks.add("0")
                         }
@@ -449,18 +458,16 @@ public sealed class IPAddress private constructor(
                     // No expression of `::`
                     if (iExpand == -1) return@let blocks
 
-                    // Have single `::` expression. Deal with it.
-
-                    // Indicates that first or last block was
-                    // empty at start and replaced with `0` + had
-                    // iExpanded set to the expected index, but
-                    // parsing all blocks did not observe any empty
-                    // blocks at all.
-                    //
-                    // So, started or ended with single `:` instead
-                    // of expected `::`. Invalid.
+                    // If the first or last block was empty at (started or
+                    // ended with `:`) those blocks were replaced with `0`
+                    // and iExpanded was set to the expected index. If when
+                    // all blocks were checked for emptiness resulted in none
+                    // being found, then the expected iExpand value was not
+                    // confirmed. This indicates that it started with single
+                    // `:` instead of expected `::`. Invalid.
                     if (!hasEmptyBlock) return@let emptyList()
 
+                    // Have single `::` expression. Deal with it.
                     blocks.removeAt(iExpand)
                     while (blocks.size < 8) { blocks.add(iExpand, "0") }
                     blocks
@@ -468,12 +475,12 @@ public sealed class IPAddress private constructor(
 
                 if (blocks8.size != 8) return null
 
+                // 8 non-empty blocks. Decode.
                 var iB = 0
                 val bytes = ByteArray(16)
 
-                // 8 non-empty blocks. Decode.
                 try {
-                    BASE_16.newDecoderFeed { byte -> bytes[iB++] = byte }.use { feed ->
+                    BASE_16.newDecoderFeed(out = { byte -> bytes[iB++] = byte }).use { feed ->
                         for (block in blocks8) {
                             val iNonZero = block.indexOfFirst { it != '0' }
 
@@ -573,6 +580,7 @@ public sealed class IPAddress private constructor(
             private val BASE_16 = Base16 { strict(); encodeToLowercase = true }
         }
 
+        // Typical IPv4 loopback address of `::1`
         private open class Loopback private constructor(
             scope: String?,
             bytes: ByteArray,
@@ -581,7 +589,7 @@ public sealed class IPAddress private constructor(
 
             companion object NoScope: Loopback(
                 scope = null,
-                bytes = ByteArray(16) { i -> if (i == 15) 1 else 0 },
+                bytes = ByteArray(16).apply { this[15] = 1 },
                 value = "0:0:0:0:0:0:0:1",
             ) {
 

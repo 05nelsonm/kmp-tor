@@ -102,6 +102,6 @@ public object TestUtils {
     }
 
     public val INSTALLER by lazy {
-        TorResources(installationDir = SysTempDir.resolve("kmp_tor_ctrl"))
+        TorResources(SysTempDir.resolve("kmp_tor_ctrl"))
     }
 }

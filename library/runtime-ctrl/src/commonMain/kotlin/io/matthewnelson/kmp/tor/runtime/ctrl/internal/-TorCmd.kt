@@ -3,7 +3,6 @@
 package io.matthewnelson.kmp.tor.runtime.ctrl.internal
 
 import io.matthewnelson.kmp.file.SysDirSep
-import io.matthewnelson.kmp.tor.runtime.core.TorConfig
 import io.matthewnelson.kmp.tor.runtime.core.TorConfig.Keyword.Attribute
 import io.matthewnelson.kmp.tor.runtime.core.ctrl.TorCmd
 import io.matthewnelson.kmp.tor.runtime.ctrl.internal.Debugger.Companion.d
@@ -199,9 +198,10 @@ private fun TorCmd.Hs.Fetch.encode(LOG: Debugger?): ByteArray {
     return StringBuilder(keyword).apply {
         SP().append(address)
 
-        for (server in servers) {
-            require(server.isNotEmpty()) { "servers cannot contain empty values" }
-            require(!server.hasWhitespace()) { "server values cannot contain whitespace" }
+        servers.forEach { server ->
+            require(!server.isEmptyOrHasWhitespace()) {
+                "server[$server] cannot be empty or contain whitespace"
+            }
 
             SP().append("SERVER=").append(server)
         }
@@ -216,9 +216,10 @@ private fun TorCmd.Info.Get.encode(LOG: Debugger?): ByteArray {
     require(keywords.isNotEmpty()) { "A minimum of 1 keyword is required" }
 
     return StringBuilder(keyword).apply {
-        for (word in keywords) {
-            require(word.isNotEmpty()) { "keywords cannot contain empty values" }
-            require(!word.hasWhitespace()) { "keyword values cannot contain whitespace" }
+        keywords.forEach { word ->
+            require(!word.isEmptyOrHasWhitespace()) {
+                "keyword[$word] cannot be empty or contain whitespace"
+            }
 
             SP().append(word)
         }
@@ -232,7 +233,21 @@ private fun TorCmd.Info.Get.encode(LOG: Debugger?): ByteArray {
 private fun TorCmd.MapAddress.encode(LOG: Debugger?): ByteArray {
     require(mappings.isNotEmpty()) { "A minimum of 1 mapping is required" }
 
-    TODO("Issue #418")
+    return StringBuilder(keyword).apply {
+        mappings.forEach { mapping ->
+            require(!mapping.from.isEmptyOrHasWhitespace()) {
+                "AddressMapping.from[${mapping.from}] cannot be empty or contain whitespace"
+            }
+            require(!mapping.to.isEmptyOrHasWhitespace()) {
+                "AddressMapping.to[${mapping.to}] cannot be empty or contain whitespace"
+            }
+
+            SP().append(mapping.from).append('=').append(mapping.to)
+        }
+
+        LOG.d { ">> ${toString()}" }
+        CRLF()
+    }.encodeToByteArray()
 }
 
 private fun TorCmd.Onion.Add.encode(LOG: Debugger?): ByteArray {
@@ -286,7 +301,7 @@ private fun TorCmd.Ownership.Take.encode(LOG: Debugger?): ByteArray {
 @Throws(IllegalArgumentException::class)
 private fun TorCmd.Resolve.encode(LOG: Debugger?): ByteArray {
     require(hostname.isNotEmpty()) { "hostname cannot be empty" }
-    require(!hostname.hasWhitespace()) { "hostname cannot contain whitespace" }
+    require(!hostname.isEmptyOrHasWhitespace()) { "hostname cannot contain whitespace" }
 
     return StringBuilder(keyword).apply {
         if (reverse) {
@@ -300,7 +315,7 @@ private fun TorCmd.Resolve.encode(LOG: Debugger?): ByteArray {
 
 private fun TorCmd.SetEvents.encode(LOG: Debugger?): ByteArray {
     return StringBuilder(keyword).apply {
-        for (event in events) {
+        events.forEach { event ->
             SP().append(event.name)
         }
         LOG.d { ">> ${toString()}" }
@@ -340,4 +355,4 @@ private inline fun StringBuilder.encodeToByteArray(fill: Boolean = false): ByteA
 }
 
 @Suppress("NOTHING_TO_INLINE")
-private inline fun String.hasWhitespace(): Boolean = indexOfFirst { it.isWhitespace() } != -1
+private inline fun String.isEmptyOrHasWhitespace(): Boolean = indexOfFirst { it.isWhitespace() } != -1

@@ -19,7 +19,9 @@ package io.matthewnelson.kmp.tor.runtime.ctrl.internal
 
 import io.matthewnelson.immutable.collections.toImmutableList
 import io.matthewnelson.immutable.collections.toImmutableMap
+import io.matthewnelson.immutable.collections.toImmutableSet
 import io.matthewnelson.kmp.file.InterruptedException
+import io.matthewnelson.kmp.tor.runtime.core.ctrl.AddressMapping
 import io.matthewnelson.kmp.tor.runtime.core.ctrl.ConfigEntry
 import io.matthewnelson.kmp.tor.runtime.core.ctrl.Reply
 import io.matthewnelson.kmp.tor.runtime.core.ctrl.Reply.Error.Companion.toError
@@ -92,7 +94,7 @@ private fun TorCmd.Config.Get.complete(job: TorCmdJob<*>, replies: ArrayList<Rep
     val entries = ArrayList<ConfigEntry>(replies.size)
 
     for (reply in replies) {
-        if (reply is Reply.Success.OK) continue
+        if (reply.isOK) continue
 
         val kvp = reply.message
         val i = kvp.indexOf('=')
@@ -119,12 +121,11 @@ private fun TorCmd.Config.Get.complete(job: TorCmdJob<*>, replies: ArrayList<Rep
     job.unsafeCast<List<ConfigEntry>>().completion(entries.toImmutableList())
 }
 
-@Suppress("NOTHING_TO_INLINE")
-private inline fun TorCmd.Info.Get.complete(job: TorCmdJob<*>, replies: ArrayList<Reply.Success>) {
+private fun TorCmd.Info.Get.complete(job: TorCmdJob<*>, replies: ArrayList<Reply.Success>) {
     val map = LinkedHashMap<String, String>(keywords.size, 1.0f)
 
     for (reply in replies) {
-        if (reply is Reply.Success.OK) continue
+        if (reply.isOK) continue
 
         val kvp = reply.message
         val i = kvp.indexOf('=')
@@ -136,18 +137,28 @@ private inline fun TorCmd.Info.Get.complete(job: TorCmdJob<*>, replies: ArrayLis
     job.unsafeCast<Map<String, String>>().completion(map.toImmutableMap())
 }
 
-@Suppress("NOTHING_TO_INLINE")
-private inline fun TorCmd.MapAddress.complete(job: TorCmdJob<*>, replies: ArrayList<Reply.Success>) {
-    TODO("Issue #418")
+private fun TorCmd.MapAddress.complete(job: TorCmdJob<*>, replies: ArrayList<Reply.Success>) {
+    val set = LinkedHashSet<AddressMapping.Result>(mappings.size, 1.0f)
+
+    for (reply in replies) {
+        if (reply.isOK) continue
+
+        val kvp = reply.message
+        val i = kvp.indexOf('=')
+        if (i == -1) continue
+
+        val result = AddressMapping.Result(kvp.substring(0, i), kvp.substring(i + 1))
+        set.add(result)
+    }
+
+    job.unsafeCast<Set<AddressMapping.Result>>().completion(set.toImmutableSet())
 }
 
-@Suppress("NOTHING_TO_INLINE")
-private inline fun TorCmd.Onion.Add.complete(job: TorCmdJob<*>, replies: ArrayList<Reply.Success>) {
+private fun TorCmd.Onion.Add.complete(job: TorCmdJob<*>, replies: ArrayList<Reply.Success>) {
     TODO("Issue #419")
 }
 
-@Suppress("NOTHING_TO_INLINE")
-private inline fun TorCmd.OnionClientAuth.View.complete(job: TorCmdJob<*>, replies: ArrayList<Reply.Success>) {
+private fun TorCmd.OnionClientAuth.View.complete(job: TorCmdJob<*>, replies: ArrayList<Reply.Success>) {
     TODO("Issue #421")
 }
 
