@@ -138,7 +138,7 @@ class TorCmdUnitTest {
         }
 
         runtime.executeAsync(
-            TorCmd.MapAddress(results.map { result -> result.from.unmappingFrom() })
+            TorCmd.MapAddress(results.map { result -> result.toUnmapping() })
         ).forEach { result ->
             assertTrue(result.isUnmapping)
         }

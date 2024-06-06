@@ -27,15 +27,62 @@ import kotlin.jvm.JvmStatic
 /**
  * Holder for address mapping requests.
  *
+ * e.g.
+ *
+ *     val results = runtime.executeAsync(
+ *         TorCmd.MapAddress(
+ *             "torproject.org".mappingToAnyHost(),
+ *             "torproject.org".mappingToAnyHostIPv4(),
+ *             "torproject.org".mappingToAnyHostIPv6(),
+ *         )
+ *     )
+ *
+ *     val unmappings = results.map { result ->
+ *         println(result)
+ *         result.toUnmapping()
+ *     }
+ *
+ *     // AddressMapping.Result: [
+ *     //     from: wsvidzeicnyrlruo.virtual
+ *     //     to: torproject.org
+ *     //     isUnmapping: false
+ *     // ]
+ *     // AddressMapping.Result: [
+ *     //     from: 127.240.73.168
+ *     //     to: torproject.org
+ *     //     isUnmapping: false
+ *     // ]
+ *     // AddressMapping.Result: [
+ *     //     from: [fe85:2bcd:7057:b3f9:ffb2:be48:1e7b:884]
+ *     //     to: torproject.org
+ *     //     isUnmapping: false
+ *     // ]
+ *
+ *     runtime.executeAsync(
+ *         TorCmd.Info.Get("address-mappings/control")
+ *     ).let { mappings -> println(mappings.values.first()) }
+ *
+ *     // wsvidzeicnyrlruo.virtual torproject.org NEVER
+ *     // 127.240.73.168 torproject.org NEVER
+ *     // [fe85:2bcd:7057:b3f9:ffb2:be48:1e7b:884] torproject.org NEVER
+ *
+ *     runtime.executeAsync(TorCmd.MapAddress(unmappings))
+ *
+ *     runtime.executeAsync(
+ *         TorCmd.Info.Get("address-mappings/control")
+ *     ).let { mappings -> println(mappings) }
+ *
+ *     // {address-mappings/control=}
+ *
  * @see [TorCmd.MapAddress]
  * @see [AddressMapping.Result]
  * */
 public class AddressMapping(from: String, to: String) {
 
-    public constructor(from: IPAddress, to: IPAddress): this(from.value, to.value)
-    public constructor(from: IPAddress, to: String): this(from.value, to)
-    public constructor(from: String, to: IPAddress): this(from, to.value)
-    public constructor(from: IPAddress, to: OnionAddress): this(from.value, to.canonicalHostName())
+    public constructor(from: IPAddress, to: IPAddress): this(from.canonicalHostName(), to.canonicalHostName())
+    public constructor(from: IPAddress, to: String): this(from.canonicalHostName(), to)
+    public constructor(from: String, to: IPAddress): this(from, to.canonicalHostName())
+    public constructor(from: IPAddress, to: OnionAddress): this(from.canonicalHostName(), to.canonicalHostName())
 
     /**
      * The "original", or "old", address that will be mapped to [to].
@@ -183,6 +230,13 @@ public class AddressMapping(from: String, to: String) {
          * */
         @JvmField
         public val isUnmapping: Boolean = from == to
+
+        /**
+         * Creates a new [AddressMapping] request using [from].
+         *
+         * @see [unmappingFrom]
+         * */
+        public fun toUnmapping(): AddressMapping = from.unmappingFrom()
 
         public override fun equals(other: Any?): Boolean {
             return  other is Result

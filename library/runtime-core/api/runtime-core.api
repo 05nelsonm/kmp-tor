@@ -3466,6 +3466,7 @@ public final class io/matthewnelson/kmp/tor/runtime/core/ctrl/AddressMapping$Res
 	public fun equals (Ljava/lang/Object;)Z
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
+	public final fun toUnmapping ()Lio/matthewnelson/kmp/tor/runtime/core/ctrl/AddressMapping;
 }
 
 public final class io/matthewnelson/kmp/tor/runtime/core/ctrl/ClientAuthEntry {
