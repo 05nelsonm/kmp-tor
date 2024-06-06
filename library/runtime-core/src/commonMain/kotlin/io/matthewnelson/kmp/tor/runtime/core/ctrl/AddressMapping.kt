@@ -13,14 +13,238 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
+@file:Suppress("JoinDeclarationAndAssignment")
+
 package io.matthewnelson.kmp.tor.runtime.core.ctrl
 
-public class AddressMapping {
+import io.matthewnelson.kmp.tor.runtime.core.address.IPAddress
+import io.matthewnelson.kmp.tor.runtime.core.address.OnionAddress
+import kotlin.jvm.JvmField
+import kotlin.jvm.JvmName
+import kotlin.jvm.JvmOverloads
+import kotlin.jvm.JvmStatic
 
-    // TODO
+/**
+ * Holder for address mapping requests.
+ *
+ * @see [TorCmd.MapAddress]
+ * @see [AddressMapping.Result]
+ * */
+public class AddressMapping(from: String, to: String) {
 
-    public class Result {
+    public constructor(from: IPAddress, to: IPAddress): this(from.value, to.value)
+    public constructor(from: IPAddress, to: String): this(from.value, to)
+    public constructor(from: String, to: IPAddress): this(from, to.value)
+    public constructor(from: IPAddress, to: OnionAddress): this(from.value, to.canonicalHostName())
 
-        // TODO
+    /**
+     * The "original", or "old", address that will be mapped to [to].
+     * */
+    @JvmField
+    public val from: String
+
+    /**
+     * The "replacement", or "new", address that [from] will be mapped to.
+     * */
+    @JvmField
+    public val to: String
+
+    public operator fun component1(): String = from
+    public operator fun component2(): String = to
+
+    @JvmOverloads
+    public fun copy(
+        from: String = this.from,
+        to: String = this.to,
+    ): AddressMapping {
+        if (from == this.from && to == this.to) return this
+        return AddressMapping(from, to)
+    }
+
+    public companion object {
+
+        /**
+         * Creates a [AddressMapping] that instructs tor to generate
+         * a random host value (e.g. 4lr2xdqckbl4nttj.virtual) and
+         * map the provided string (host name) to it.
+         *
+         * If the string (host name) is already mapped, tor will return
+         * that mapping for [AddressMapping.Result].
+         * */
+        @JvmStatic
+        @JvmName("anyHostTo")
+        public fun String.mappingToAnyHost(): AddressMapping {
+            return AddressMapping(".", this)
+        }
+
+        /**
+         * Creates a [AddressMapping] that instructs tor to generate
+         * a virtual [IPAddress.V4] address and map the provided string
+         * (host name) to it.
+         *
+         * If the string (host name) is already mapped, tor will return
+         * that mapping for [AddressMapping.Result].
+         * */
+        @JvmStatic
+        @JvmName("anyHostIPv4To")
+        public fun String.mappingToAnyHostIPv4(): AddressMapping {
+            return AddressMapping(IPAddress.V4.AnyHost, this)
+        }
+
+        /**
+         * Creates a [AddressMapping] that instructs tor to generate
+         * a virtual [IPAddress.V4] address and map the provided
+         * [OnionAddress] to it.
+         *
+         * If the [OnionAddress] is already mapped, tor will return
+         * that mapping for [AddressMapping.Result].
+         * */
+        @JvmStatic
+        @JvmName("anyHostIPv4To")
+        public fun OnionAddress.mappingToAnyHostIPv4(): AddressMapping {
+            return AddressMapping(IPAddress.V4.AnyHost, this)
+        }
+
+        /**
+         * Creates a [AddressMapping] that instructs tor to generate
+         * a virtual [IPAddress.V6] address and map the provided string
+         * (host name) to it.
+         *
+         * If the string (host name) is already mapped, tor will return
+         * that mapping for [AddressMapping.Result].
+         * */
+        @JvmStatic
+        @JvmName("anyHostIPv6To")
+        public fun String.mappingToAnyHostIPv6(): AddressMapping {
+            return AddressMapping(IPAddress.V6.AnyHost.NoScope, this)
+        }
+
+        /**
+         * Creates a [AddressMapping] that instructs tor to generate
+         * a virtual [IPAddress.V4] address and map the provided
+         * [OnionAddress] to it.
+         *
+         * If the [OnionAddress] is already mapped, tor will return
+         * that mapping for [AddressMapping.Result].
+         * */
+        @JvmStatic
+        @JvmName("anyHostIPv6To")
+        public fun OnionAddress.mappingToAnyHostIPv6(): AddressMapping {
+            return AddressMapping(IPAddress.V6.AnyHost.NoScope, this)
+        }
+
+        /**
+         * Creates a [AddressMapping] that instruct tor to unmap any
+         * addresses associated with the provided string (host name).
+         * */
+        @JvmStatic
+        @JvmName("unmapFrom")
+        public fun String.unmappingFrom(): AddressMapping {
+            return AddressMapping(this, this)
+        }
+
+        /**
+         * Creates a [AddressMapping] that instruct tor to unmap any
+         * addresses associated with the provided [IPAddress].
+         * */
+        @JvmStatic
+        @JvmName("unmapFrom")
+        public fun IPAddress.unmappingFrom(): AddressMapping {
+            return AddressMapping(this, this)
+        }
+    }
+
+    /**
+     * Holder for response from [TorCmd.MapAddress]
+     * */
+    public class Result(
+
+        /**
+         * The "original", or "old", address that
+         * has been mapped to [to].
+         * */
+        @JvmField
+        public val from: String,
+
+        /**
+         * The "replacement", or "new", address that
+         * [from] has been mapped to.
+         * */
+        @JvmField
+        public val to: String,
+    ) {
+
+        /**
+         * Indicates that this [Result] was an "unmapping"
+         * of the address (i.e. tor removed the mapping from
+         * its indices).
+         *
+         * @see [unmappingFrom]
+         * */
+        @JvmField
+        public val isUnmapping: Boolean = from == to
+
+        public override fun equals(other: Any?): Boolean {
+            return  other is Result
+                    && other.from == from
+                    && other.to == to
+        }
+
+        public override fun hashCode(): Int {
+            var result = 17
+            result = result * 42 + from.hashCode()
+            result = result * 42 + to.hashCode()
+            return result
+        }
+
+        public override fun toString(): String = buildString {
+            appendLine("AddressMapping.Result: [")
+            append("    from: ")
+            appendLine(from)
+            append("    to: ")
+            appendLine(to)
+            append("    isUnmapping: ")
+            appendLine(isUnmapping)
+            append(']')
+        }
+    }
+
+    init {
+        this.from = when (from) {
+            // For mapping to IPv6 any host, tor expects
+            // unbracketed `::` and nothing else.
+            //
+            // Because constructor allows for IPAddress,
+            // and the implementation for IPAddress.V6
+            // **always** expands addresses to 8 blocks,
+            // this swaps it out for the expected `::`
+            // any host value.
+            "::",
+            "::0",
+            IPAddress.V6.AnyHost.value,
+            "[::]",
+            "[::0]",
+            IPAddress.V6.AnyHost.canonicalHostName() -> "::"
+            else -> from
+        }
+
+        this.to = to
+    }
+
+    public override fun equals(other: Any?): Boolean {
+        return  other is AddressMapping
+                && other.from == from
+                && other.to == to
+    }
+
+    public override fun hashCode(): Int {
+        var result = 15
+        result = result * 42 + from.hashCode()
+        result = result * 42 + to.hashCode()
+        return result
+    }
+
+    public override fun toString(): String {
+        return "AddressMapping[from=$from, to=$to]"
     }
 }

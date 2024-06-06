@@ -31,13 +31,19 @@ import kotlin.time.Duration.Companion.milliseconds
 
 object TestUtils {
 
+    private val TMP_TEST_DIR = SysTempDir.resolve("kmp_tor_test")
+
+    private val INSTALLER by lazy {
+        TorResources(TMP_TEST_DIR.resolve("resources"))
+    }
+
     fun testEnv(
         dirName: String,
         block: ThisBlock<TorRuntime.Environment.Builder> = ThisBlock {}
     ): TorRuntime.Environment = TorRuntime.Environment.Builder(
-        workDirectory = SysTempDir.resolve("kmp_tor_test/$dirName/work"),
-        cacheDirectory = SysTempDir.resolve("kmp_tor_test/$dirName/cache"),
-        installer = { dir -> TorResources(dir) },
+        workDirectory = TMP_TEST_DIR.resolve("$dirName/work"),
+        cacheDirectory = TMP_TEST_DIR.resolve("$dirName/cache"),
+        installer = { INSTALLER },
         block = block
     ).also { it.debug = true }
 
