@@ -17,6 +17,7 @@ package io.matthewnelson.kmp.tor.runtime.core.key
 
 import io.matthewnelson.encoding.core.Encoder.Companion.encodeToString
 import io.matthewnelson.kmp.tor.runtime.core.address.OnionAddress
+import kotlin.jvm.JvmSynthetic
 
 /**
  * Type definition of [Key.Public] and [Key.Private] specific to
@@ -42,15 +43,18 @@ public class AddressKey private constructor() {
         public final override fun base64(): String = encoded().encodeToString(BASE_64)
 
         public final override fun compareTo(other: AddressKey.Public): Int = onionAddress.compareTo(other.onionAddress)
-
-        public final override fun equals(other: Any?): Boolean = other is AddressKey.Public && other.onionAddress == onionAddress
-        public final override fun hashCode(): Int = 17 * 31 + onionAddress.hashCode()
     }
 
     /**
      * Holder for an [OnionAddress] private key
      * */
-    public sealed class Private(key: ByteArray): Key.Private(key)
+    public sealed class Private(key: ByteArray): Key.Private(key) {
+
+        @JvmSynthetic
+        internal fun type(): KeyType.Address<*, *> = when (this) {
+            is ED25519_V3.PrivateKey -> ED25519_V3
+        }
+    }
 
     init {
         throw IllegalStateException("AddressKey cannot be instantiated")

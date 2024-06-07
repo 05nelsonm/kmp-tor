@@ -16,6 +16,7 @@
 package io.matthewnelson.kmp.tor.runtime.core.key
 
 import io.matthewnelson.encoding.core.Encoder.Companion.encodeToString
+import io.matthewnelson.kmp.tor.runtime.core.Destroyable.Companion.destroyedException
 import io.matthewnelson.kmp.tor.runtime.core.address.OnionAddress
 
 /**
@@ -28,8 +29,6 @@ public class AuthKey private constructor() {
 
     public sealed class Public(private val key: ByteArray): Key.Public() {
 
-        // TODO: writeDescriptorToFile
-
         public final override fun encoded(): ByteArray = key.copyOf()
 
         public final override fun base16(): String = key.encodeToString(BASE_16)
@@ -38,29 +37,9 @@ public class AuthKey private constructor() {
 
         public fun descriptorBase32(): String = toDescriptor("descriptor", base32())
         public fun descriptorBase64(): String = toDescriptor("descriptor", base64())
-
-        public final override fun equals(other: Any?): Boolean {
-            if (other !is AuthKey.Public) return false
-            if (other::class != this::class) return false
-            if (other.algorithm() != algorithm()) return false
-            if (other.key.size != key.size) return false
-
-            var isEqual = true
-            for (i in key.indices) {
-                if (other.key[i] != key[i]) {
-                    isEqual = false
-                }
-            }
-
-            return isEqual
-        }
-
-        public final override fun hashCode(): Int = 17 * 31 + key.toList().hashCode()
     }
 
     public sealed class Private(key: ByteArray): Key.Private(key) {
-
-        // TODO: writeDescriptorToFile
 
         @Throws(IllegalArgumentException::class, IllegalStateException::class)
         public fun descriptorBase32(
@@ -75,7 +54,7 @@ public class AuthKey private constructor() {
             if (result != null) return result
 
             if (publicKey.isCompatible()) {
-                throw IllegalStateException("isDestroyed[${isDestroyed()}]")
+                throw destroyedException()
             }
 
             throw IllegalArgumentException("${publicKey.algorithm()}.PublicKey is not compatible with ${algorithm()}.PrivateKey")
@@ -107,7 +86,7 @@ public class AuthKey private constructor() {
             if (result != null) return result
 
             if (publicKey.isCompatible()) {
-                throw IllegalStateException("isDestroyed[${isDestroyed()}]")
+                throw destroyedException()
             }
 
             throw IllegalArgumentException("${publicKey.algorithm()}.PublicKey is not compatible with ${algorithm()}.PrivateKey")

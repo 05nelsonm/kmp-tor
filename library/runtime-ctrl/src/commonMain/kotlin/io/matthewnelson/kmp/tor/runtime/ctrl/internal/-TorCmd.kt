@@ -7,7 +7,7 @@ import io.matthewnelson.kmp.tor.runtime.core.TorConfig.Keyword.Attribute
 import io.matthewnelson.kmp.tor.runtime.core.ctrl.TorCmd
 import io.matthewnelson.kmp.tor.runtime.ctrl.internal.Debugger.Companion.d
 
-@Throws(IllegalArgumentException::class)
+@Throws(IllegalArgumentException::class, IllegalStateException::class)
 internal fun TorCmd<*>.encodeToByteArray(LOG: Debugger?): ByteArray = when (this) {
     is TorCmd.Authenticate -> encode(LOG)
     is TorCmd.Config.Get -> encode(LOG)
@@ -250,8 +250,71 @@ private fun TorCmd.MapAddress.encode(LOG: Debugger?): ByteArray {
     }.encodeToByteArray()
 }
 
+@Throws(IllegalArgumentException::class, IllegalStateException::class)
 private fun TorCmd.Onion.Add.encode(LOG: Debugger?): ByteArray {
-    TODO("Issue #419")
+    require(ports.isNotEmpty()) { "At minimum of 1 port is required" }
+    val privateKey = key?.base64()
+
+    return StringBuilder(keyword).apply {
+        SP()
+
+        if (privateKey != null) {
+            append(keyType.algorithm()).append(':').append(privateKey)
+        } else {
+            append("NEW").append(':').append(keyType.algorithm())
+        }
+
+        if (flags.isNotEmpty()) {
+            SP().append("Flags=")
+            flags.joinTo(this, ",")
+        }
+
+        maxStreams?.let { maxStreams ->
+            SP().append("MaxStreams=").append(maxStreams.argument)
+        }
+
+        for (port in ports) {
+            SP().append("Port=")
+
+            val i = port.argument.indexOf(' ')
+            val virtual = port.argument.substring(0, i)
+            var target = port.argument.substring(i + 1)
+
+            append(virtual).append(',')
+
+            val prefixUnix = "unix:"
+            if (target.startsWith(prefixUnix)) {
+                append(prefixUnix)
+
+                // Need to remove path quotes
+                //
+                // NOTE: If path has a space in it, controller fails
+                //  as it cannot parse. There is no ability to quote
+                //  the unix:"/pa th/to/hs.sock" like usual...
+                //
+                //  https://github.com/05nelsonm/kmp-tor/issues/207#issuecomment-1166722564
+                //  https://gitlab.torproject.org/tpo/core/tor/-/issues/40633
+                target = target.substring(prefixUnix.length + 1, target.length - 1)
+            }
+
+            append(target)
+        }
+
+        for (auth in clientAuth) {
+            SP().append("ClientAuthV3=").append(auth.base32())
+        }
+
+        LOG.d {
+            var log = toString()
+            if (privateKey != null) {
+                log = log.replace(privateKey, "[REDACTED]")
+            }
+
+            ">> $log"
+        }
+
+        CRLF()
+    }.encodeToByteArray(fill = true)
 }
 
 private fun TorCmd.Onion.Delete.encode(LOG: Debugger?): ByteArray {

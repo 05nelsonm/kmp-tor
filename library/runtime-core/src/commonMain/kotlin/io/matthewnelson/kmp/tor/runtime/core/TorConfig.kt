@@ -1565,12 +1565,6 @@ public class TorConfig private constructor(
             return this
         }
 
-        private fun build(): LineItem? {
-            val virtual = virtual ?: return null
-            val target = targetArgument ?: virtual.toString()
-            return toLineItem("$virtual $target")
-        }
-
         public companion object: Keyword(
             name = "HiddenServicePort",
             default = "",
@@ -1582,7 +1576,12 @@ public class TorConfig private constructor(
             @JvmSynthetic
             internal fun build(
                 block: ThisBlock<HiddenServicePort>
-            ): LineItem? = HiddenServicePort().apply(block).build()
+            ): LineItem? {
+                val b = HiddenServicePort().apply(block)
+                val virtual = b.virtual ?: return null
+                val target = b.targetArgument ?: virtual.toString()
+                return toLineItem("$virtual $target")
+            }
         }
     }
 
@@ -1621,8 +1620,6 @@ public class TorConfig private constructor(
             return this
         }
 
-        private fun build(): LineItem? = toLineItem(argument?.toString())
-
         public companion object: Keyword(
             name = "HiddenServiceVersion",
             default = "3",
@@ -1634,7 +1631,10 @@ public class TorConfig private constructor(
             @JvmSynthetic
             internal fun build(
                 block: ThisBlock<HiddenServiceVersion>,
-            ): LineItem? = HiddenServiceVersion().apply(block).build()
+            ): LineItem? {
+                val b = HiddenServiceVersion().apply(block)
+                return toLineItem(b.argument?.toString())
+            }
         }
     }
 
@@ -1647,8 +1647,6 @@ public class TorConfig private constructor(
         @JvmField
         public var allow: Boolean = false
 
-        private fun build(): LineItem = toLineItem(allow.byte.toString())!!
-
         public companion object: Keyword(
             name = "HiddenServiceAllowUnknownPorts",
             default = false.byte.toString(),
@@ -1660,7 +1658,10 @@ public class TorConfig private constructor(
             @JvmSynthetic
             internal fun build(
                 block: ThisBlock<HiddenServiceAllowUnknownPorts>,
-            ): LineItem = HiddenServiceAllowUnknownPorts().apply(block).build()
+            ): LineItem {
+                val b = HiddenServiceAllowUnknownPorts().apply(block)
+                return toLineItem(b.allow.byte.toString())!!
+            }
         }
     }
 
@@ -1677,12 +1678,6 @@ public class TorConfig private constructor(
         @JvmField
         public var maximum: Int = 0
 
-        private fun build(): LineItem {
-            var maximum = maximum
-            if (maximum !in Port.MIN..Port.MAX) maximum = 0
-            return toLineItem(maximum.toString())!!
-        }
-
         public companion object: Keyword(
             name = "HiddenServiceMaxStreams",
             default = "0",
@@ -1694,7 +1689,12 @@ public class TorConfig private constructor(
             @JvmSynthetic
             internal fun build(
                 block: ThisBlock<HiddenServiceMaxStreams>,
-            ): LineItem = HiddenServiceMaxStreams().apply(block).build()
+            ): LineItem {
+                val b = HiddenServiceMaxStreams().apply(block)
+                var maximum = b.maximum
+                if (maximum !in Port.MIN..Port.MAX) maximum = 0
+                return toLineItem(maximum.toString())!!
+            }
         }
     }
 
@@ -1707,8 +1707,6 @@ public class TorConfig private constructor(
         @JvmField
         public var close: Boolean = false
 
-        private fun build(): LineItem = toLineItem(close.byte.toString())!!
-
         public companion object: Keyword(
             name = "HiddenServiceMaxStreamsCloseCircuit",
             default = false.byte.toString(),
@@ -1720,7 +1718,10 @@ public class TorConfig private constructor(
             @JvmSynthetic
             internal fun build(
                 block: ThisBlock<HiddenServiceMaxStreamsCloseCircuit>,
-            ): LineItem = HiddenServiceMaxStreamsCloseCircuit().apply(block).build()
+            ): LineItem {
+                val b = HiddenServiceMaxStreamsCloseCircuit().apply(block)
+                return toLineItem(b.close.byte.toString())!!
+            }
         }
     }
 
@@ -1733,8 +1734,6 @@ public class TorConfig private constructor(
         @JvmField
         public var readable: Boolean = false
 
-        private fun build(): LineItem = toLineItem(readable.byte.toString())!!
-
         public companion object: Keyword(
             name = "HiddenServiceDirGroupReadable",
             default = false.byte.toString(),
@@ -1746,7 +1745,10 @@ public class TorConfig private constructor(
             @JvmSynthetic
             internal fun build(
                 block: ThisBlock<HiddenServiceDirGroupReadable>,
-            ): LineItem = HiddenServiceDirGroupReadable().apply(block).build()
+            ): LineItem {
+                val b = HiddenServiceDirGroupReadable().apply(block)
+                return toLineItem(b.readable.byte.toString())!!
+            }
         }
     }
 
@@ -6541,8 +6543,8 @@ public class TorConfig private constructor(
             name = "HiddenServiceSingleHopMode",
             default = false.byte.toString(),
             attributes = emptySet(),
-            isCmdLineArg = false,
-            isUnique = false,
+            isCmdLineArg = true,
+            isUnique = true,
         )
     }
 
@@ -6557,8 +6559,8 @@ public class TorConfig private constructor(
             name = "HiddenServiceNonAnonymousMode",
             default = false.byte.toString(),
             attributes = emptySet(),
-            isCmdLineArg = false,
-            isUnique = false,
+            isCmdLineArg = true,
+            isUnique = true,
         )
     }
 
@@ -6573,8 +6575,8 @@ public class TorConfig private constructor(
             name = "PublishHidServDescriptors",
             default = true.byte.toString(),
             attributes = emptySet(),
-            isCmdLineArg = false,
-            isUnique = false,
+            isCmdLineArg = true,
+            isUnique = true,
         )
     }
 

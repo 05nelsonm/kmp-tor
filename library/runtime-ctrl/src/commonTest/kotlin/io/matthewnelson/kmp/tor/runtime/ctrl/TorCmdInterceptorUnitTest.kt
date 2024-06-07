@@ -19,12 +19,13 @@ import io.matthewnelson.kmp.tor.runtime.core.OnFailure
 import io.matthewnelson.kmp.tor.runtime.core.OnSuccess
 import io.matthewnelson.kmp.tor.runtime.core.TorEvent
 import io.matthewnelson.kmp.tor.runtime.core.UncaughtException
+import io.matthewnelson.kmp.tor.runtime.core.address.Port.Companion.toPort
 import io.matthewnelson.kmp.tor.runtime.core.ctrl.TorCmd
+import io.matthewnelson.kmp.tor.runtime.core.key.ED25519_V3
+import io.matthewnelson.kmp.tor.runtime.core.key.ED25519_V3.PrivateKey.Companion.toED25519_V3PrivateKey
+import io.matthewnelson.kmp.tor.runtime.core.key.ED25519_V3.PublicKey.Companion.toED25519_V3PublicKey
 import io.matthewnelson.kmp.tor.runtime.ctrl.internal.TorCmdJob
-import kotlin.test.Test
-import kotlin.test.assertEquals
-import kotlin.test.assertNotNull
-import kotlin.test.assertNull
+import kotlin.test.*
 
 class TorCmdInterceptorUnitTest {
 
@@ -104,6 +105,44 @@ class TorCmdInterceptorUnitTest {
 
         assertNotNull(interceptor.invoke(job))
         assertEquals(2, invocationIntercept)
+    }
+
+    @Test
+    fun givenBlacklistedCmd_whenReplacementAttempted_thenIsIgnored() {
+        var invocationOnionAdd = false
+        var invocationOnionDelete = false
+
+        val interceptor = TorCmdInterceptor.intercept<TorCmd<*>> { _, cmd ->
+            when (cmd) {
+                is TorCmd.Onion.Add -> TorCmd.Onion.Add(
+                    key = ByteArray(64) { it.toByte() }.toED25519_V3PrivateKey()
+                ) {
+                    port { virtual = 80.toPort() }
+                }.also { invocationOnionAdd = true }
+                is TorCmd.Onion.Delete -> TorCmd.Onion.Delete(
+                    key = ByteArray(35) { it.toByte() }.toED25519_V3PublicKey()
+                ).also { invocationOnionDelete = true }
+                else -> cmd
+            }
+        }
+
+        val jobAdd = newJob(
+            TorCmd.Onion.Add(ED25519_V3) {
+                port { virtual = 80.toPort() }
+            }
+        )
+
+        assertNull(interceptor.invoke(jobAdd))
+        assertTrue(invocationOnionAdd)
+
+        val jobDelete = newJob(
+            TorCmd.Onion.Delete(
+                key = ByteArray(35) { (it + 2).toByte() }.toED25519_V3PublicKey()
+            )
+        )
+
+        assertNull(interceptor.invoke(jobDelete))
+        assertTrue(invocationOnionDelete)
     }
 
     private fun newJob(

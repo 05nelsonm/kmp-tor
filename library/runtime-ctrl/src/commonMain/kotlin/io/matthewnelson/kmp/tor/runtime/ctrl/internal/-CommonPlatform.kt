@@ -64,8 +64,30 @@ internal fun <T: TorCmdJob<*>> MutableList<T>.interruptAndClearAll(
 internal inline fun TorCmd<*>.toDestroyedErrorJob(
     onFailure: OnFailure,
     handler: UncaughtException.Handler,
+    message: String = "TorCtrl.isDestroyed[true]",
 ): EnqueuedJob = onFailure.toImmediateErrorJob(
-    keyword,
-    IllegalStateException("TorCtrl.isDestroyed[true]"),
+    toJobName(),
+    IllegalStateException(message),
     handler
-)
+).invokeOnCompletionForCmd(this)
+
+@Suppress("NOTHING_TO_INLINE")
+internal inline fun TorCmd<*>.toJobName(): String {
+    val signal = signalNameOrNull() ?: return keyword
+    return "$keyword{$signal}"
+}
+
+@Suppress("NOTHING_TO_INLINE")
+internal inline fun <Job: EnqueuedJob> Job.invokeOnCompletionForCmd(
+    cmd: TorCmd<*>,
+): Job {
+    if (cmd is TorCmd.Onion.Add) {
+        val key = cmd.key
+
+        if (key != null && cmd.destroyKeyOnJobCompletion) {
+            invokeOnCompletion { key.destroy() }
+        }
+    }
+
+    return this
+}

@@ -24,8 +24,12 @@ import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
 import io.matthewnelson.kmp.tor.runtime.core.*
 import io.matthewnelson.kmp.tor.runtime.core.address.IPAddress
 import io.matthewnelson.kmp.tor.runtime.core.address.OnionAddress
+import io.matthewnelson.kmp.tor.runtime.core.builder.OnionAddBuilder
+import io.matthewnelson.kmp.tor.runtime.core.builder.OnionAddBuilder.Companion.configure
 import io.matthewnelson.kmp.tor.runtime.core.key.AddressKey
+import io.matthewnelson.kmp.tor.runtime.core.key.AuthKey
 import io.matthewnelson.kmp.tor.runtime.core.key.ED25519_V3
+import io.matthewnelson.kmp.tor.runtime.core.key.KeyType
 import kotlin.coroutines.cancellation.CancellationException
 import kotlin.jvm.JvmField
 
@@ -289,9 +293,103 @@ public sealed class TorCmd<Success: Any> private constructor(
          *
          * [docs](https://spec.torproject.org/control-spec/commands.html#add_onion)
          * */
-        public class Add private constructor(
-            // TODO: Issue #419
-        ): Unprivileged<HiddenServiceEntry>("ADD_ONION")
+        public class Add: Unprivileged<HiddenServiceEntry> {
+
+            @JvmField
+            public val keyType: KeyType.Address<*, *>
+            @JvmField
+            public val key: AddressKey.Private?
+            @JvmField
+            public val clientAuth: Set<AuthKey.Public>
+            @JvmField
+            public val flags: Set<String>
+            @JvmField
+            public val maxStreams: TorConfig.LineItem?
+            @JvmField
+            public val ports: Set<TorConfig.LineItem>
+            @JvmField
+            public val destroyKeyOnJobCompletion: Boolean
+
+            /**
+             * Creates an [Onion.Add] command that will instruct tor
+             * to create a new HiddenService of type [keyType].
+             *
+             * e.g.
+             *
+             *     TorCmd.Onion.Add(ED25519_V3) {
+             *         port { virtual = 80.toPort() }
+             *     }
+             *
+             * @see [OnionAddBuilder]
+             * @see [ED25519_V3]
+             * */
+            public constructor(
+                keyType: KeyType.Address<*, *>,
+                block: ThisBlock<OnionAddBuilder>,
+            ): this(null, false, keyType.configure(block))
+
+            /**
+             * Creates an [Onion.Add] command that will instruct tor
+             * to add a HiddenService to its runtime for the provided
+             * [key].
+             *
+             * **NOTE:** Default of [destroyKeyOnJobCompletion] = `true`
+             *
+             * e.g.
+             *
+             *     TorCmd.Onion.Add("[Blob Redacted]".toED25519_V3PrivateKey()) {
+             *         flags { DiscardPK = true }
+             *         port { virtual = 80.toPort() }
+             *     }
+             *
+             * @see [OnionAddBuilder]
+             * @see [ED25519_V3.PrivateKey]
+             * */
+            public constructor(
+                key: AddressKey.Private,
+                block: ThisBlock<OnionAddBuilder>,
+            ): this(key, true, block)
+
+            /**
+             * Creates an [Onion.Add] command that will instruct tor
+             * to add a HiddenService to its runtime for the provided
+             * [key].
+             *
+             * e.g.
+             *
+             *     TorCmd.Onion.Add(
+             *         key = "[Blob Redacted]".toED25519_V3PrivateKey(),
+             *         destroyKeyOnJobCompletion = false,
+             *     ) {
+             *         port { virtual = 80.toPort() }
+             *     }
+             *
+             * @param [destroyKeyOnJobCompletion] If `true`, when the [EnqueuedJob]
+             *   completes (either by success or cancellation/error) for this
+             *   command, the provided [key] will be destroyed automatically.
+             * @see [OnionAddBuilder]
+             * @see [ED25519_V3.PrivateKey]
+             * */
+            public constructor(
+                key: AddressKey.Private,
+                destroyKeyOnJobCompletion: Boolean,
+                block: ThisBlock<OnionAddBuilder>,
+            ): this(key, destroyKeyOnJobCompletion, key.type().configure(block))
+
+            private constructor(
+                key: AddressKey.Private?,
+                destroyKeyOnJobCompletion: Boolean,
+                arguments: OnionAddBuilder.Arguments,
+            ): super("ADD_ONION") {
+                this.keyType = arguments.keyType
+                this.key = key
+                this.clientAuth = arguments.clientAuth
+                this.flags = arguments.flags
+                this.maxStreams = arguments.maxStreams
+                this.ports = arguments.ports
+                this.destroyKeyOnJobCompletion = destroyKeyOnJobCompletion
+            }
+        }
 
         /**
          * "DEL_ONION"

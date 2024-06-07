@@ -84,7 +84,13 @@ internal class RealTorCtrl private constructor(
                 LOG.d { "End Of Stream" }
                 waiters.destroy()
             } else {
-                LOG.d { "<< $line" }
+                LOG.d {
+                     "<< " + if (line.startsWith("250-PrivateKey=")) {
+                        line.replaceAfter(':', "[REDACTED]")
+                    } else {
+                        line
+                    }
+                }
             }
 
             super.parse(line)

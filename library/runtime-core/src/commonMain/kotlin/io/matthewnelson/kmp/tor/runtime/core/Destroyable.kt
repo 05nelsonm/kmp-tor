@@ -15,6 +15,8 @@
  **/
 package io.matthewnelson.kmp.tor.runtime.core
 
+import io.matthewnelson.kmp.tor.runtime.core.Destroyable.Companion.checkIsNotDestroyed
+import kotlin.jvm.JvmOverloads
 import kotlin.jvm.JvmStatic
 
 public interface Destroyable {
@@ -33,8 +35,37 @@ public interface Destroyable {
         @Throws(IllegalStateException::class)
         public fun Destroyable.checkIsNotDestroyed() {
             if (!isDestroyed()) return
-            val name = this::class.simpleName ?: "Unknown"
-            throw IllegalStateException("$name.isDestroyed[true]")
+            throw destroyedException()
+        }
+
+        /**
+         * Creates an [IllegalStateException] with a default message of
+         *
+         *     {this::class.simpleName}.isDestroyed[true]
+         *
+         * If `simpleName` returns null (e.g. Anonymous Object), then a
+         * default of `UnknownClass` will be used.
+         *
+         * @param [namePrefix] if not empty, message will be prefixed with
+         *   the declared [namePrefix] and a `.` character.
+         * */
+        @JvmStatic
+        @JvmOverloads
+        public fun Destroyable.destroyedException(
+            namePrefix: String = "",
+        ): IllegalStateException {
+            var name = this::class.simpleName ?: ""
+            name = if (name.isEmpty()) {
+                "UnknownClass"
+            } else {
+                if (namePrefix.isNotEmpty()) {
+                    "$namePrefix.$name"
+                } else {
+                    name
+                }
+            }
+
+            return IllegalStateException("$name.isDestroyed[true]")
         }
     }
 }

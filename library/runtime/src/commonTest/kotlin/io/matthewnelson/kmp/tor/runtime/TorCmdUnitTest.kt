@@ -15,6 +15,7 @@
  **/
 package io.matthewnelson.kmp.tor.runtime
 
+import io.matthewnelson.kmp.file.resolve
 import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
 import io.matthewnelson.kmp.tor.core.resource.SynchronizedObject
 import io.matthewnelson.kmp.tor.core.resource.synchronized
@@ -27,14 +28,17 @@ import io.matthewnelson.kmp.tor.runtime.core.TorEvent
 import io.matthewnelson.kmp.tor.runtime.core.address.IPAddress
 import io.matthewnelson.kmp.tor.runtime.core.address.IPAddress.V4.Companion.toIPAddressV4OrNull
 import io.matthewnelson.kmp.tor.runtime.core.address.IPAddress.V6.Companion.toIPAddressV6OrNull
+import io.matthewnelson.kmp.tor.runtime.core.address.Port.Companion.toPort
 import io.matthewnelson.kmp.tor.runtime.core.ctrl.AddressMapping.Companion.mappingToAnyHost
 import io.matthewnelson.kmp.tor.runtime.core.ctrl.AddressMapping.Companion.mappingToAnyHostIPv4
 import io.matthewnelson.kmp.tor.runtime.core.ctrl.AddressMapping.Companion.mappingToAnyHostIPv6
-import io.matthewnelson.kmp.tor.runtime.core.ctrl.AddressMapping.Companion.unmappingFrom
 import io.matthewnelson.kmp.tor.runtime.core.ctrl.ConfigEntry
 import io.matthewnelson.kmp.tor.runtime.core.ctrl.TorCmd
+import io.matthewnelson.kmp.tor.runtime.core.key.ED25519_V3
+import io.matthewnelson.kmp.tor.runtime.core.key.ED25519_V3.PrivateKey.Companion.toED25519_V3PrivateKeyOrNull
 import io.matthewnelson.kmp.tor.runtime.core.util.executeAsync
 import io.matthewnelson.kmp.tor.runtime.test.TestUtils
+import io.matthewnelson.kmp.tor.runtime.test.TestUtils.clientAuthTestKeyPairs
 import io.matthewnelson.kmp.tor.runtime.test.TestUtils.ensureStoppedOnTestCompletion
 import io.matthewnelson.kmp.tor.runtime.test.TestUtils.testEnv
 import kotlinx.coroutines.test.runTest
@@ -148,6 +152,86 @@ class TorCmdUnitTest {
         ).let { mappings ->
             // Should all have been un mapped
             assertTrue(mappings.entries.first().value.isEmpty())
+        }
+
+        runtime.stopDaemonAsync()
+    }
+
+    @Test
+    fun givenOnion_whenAddAndDelete_thenIsAsExpected() = runTest {
+        val authKeys = clientAuthTestKeyPairs()
+
+        var containsRedacted = false
+        val runtime = TorRuntime.Builder(testEnv("cmd_onion_add")) {
+            observerStatic(RuntimeEvent.LOG.DEBUG) { line ->
+                if (line.endsWith("<< 250-PrivateKey=ED25519-V3:[REDACTED]")) {
+                    containsRedacted = true
+                }
+//                println(line)
+            }
+        }.ensureStoppedOnTestCompletion()
+
+        runtime.startDaemonAsync()
+
+        val entry1 = runtime.executeAsync(TorCmd.Onion.Add(ED25519_V3) {
+            port {
+                virtual = 80.toPort()
+
+                try {
+                    targetAsUnixSocket {
+                        file = runtime.environment().workDirectory
+                            .resolve("test_hs.sock")
+                    }
+                } catch (_: UnsupportedOperationException) {}
+            }
+            port { virtual = 443.toPort() }
+        })
+
+        // DiscardPK not expressed
+        assertNotNull(entry1.privateKey)
+        // Also confirms TorCtrl parser received the
+        // line `250-PrivateKey=`
+        assertTrue(containsRedacted)
+
+        // Reset and remove HS
+        containsRedacted = false
+        runtime.executeAsync(TorCmd.Onion.Delete(entry1.publicKey))
+
+        assertEquals(false, entry1.privateKey?.isDestroyed())
+        val keyCopy = entry1.privateKey?.encoded()?.toED25519_V3PrivateKeyOrNull()
+        assertNotNull(keyCopy)
+
+        val entry2 = runtime.executeAsync(TorCmd.Onion.Add(entry1.privateKey!!) {
+            port { virtual = 80.toPort() }
+            flags { DiscardPK = true }
+        })
+
+        // TorCmd.Onion.Add.destroy
+        assertEquals(true, entry1.privateKey?.isDestroyed())
+
+        // DiscardPK set. Should not have returned PrivateKey
+        assertNull(entry2.privateKey)
+        assertFalse(containsRedacted)
+
+        runtime.executeAsync(TorCmd.Onion.Delete(entry1.publicKey))
+
+        val entry3 = runtime.executeAsync(TorCmd.Onion.Add(
+            key = keyCopy,
+            destroyKeyOnJobCompletion = false,
+        ) {
+            for (keys in authKeys) {
+                clientAuth(keys.first)
+            }
+            port { virtual = 80.toPort() }
+            flags { DiscardPK = true }
+        })
+
+        assertFalse(keyCopy.isDestroyed())
+        assertFalse(containsRedacted)
+
+        assertEquals(authKeys.size, entry3.clientAuth.size)
+        authKeys.forEach { (public, _) ->
+            assertTrue(entry3.clientAuth.contains(public))
         }
 
         runtime.stopDaemonAsync()

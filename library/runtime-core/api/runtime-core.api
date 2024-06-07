@@ -8,11 +8,16 @@ public abstract interface class io/matthewnelson/kmp/tor/runtime/core/Destroyabl
 	public static final field Companion Lio/matthewnelson/kmp/tor/runtime/core/Destroyable$Companion;
 	public static fun checkIsNotDestroyed (Lio/matthewnelson/kmp/tor/runtime/core/Destroyable;)V
 	public abstract fun destroy ()V
+	public static fun destroyedException (Lio/matthewnelson/kmp/tor/runtime/core/Destroyable;)Ljava/lang/IllegalStateException;
+	public static fun destroyedException (Lio/matthewnelson/kmp/tor/runtime/core/Destroyable;Ljava/lang/String;)Ljava/lang/IllegalStateException;
 	public abstract fun isDestroyed ()Z
 }
 
 public final class io/matthewnelson/kmp/tor/runtime/core/Destroyable$Companion {
 	public final fun checkIsNotDestroyed (Lio/matthewnelson/kmp/tor/runtime/core/Destroyable;)V
+	public final fun destroyedException (Lio/matthewnelson/kmp/tor/runtime/core/Destroyable;)Ljava/lang/IllegalStateException;
+	public final fun destroyedException (Lio/matthewnelson/kmp/tor/runtime/core/Destroyable;Ljava/lang/String;)Ljava/lang/IllegalStateException;
+	public static synthetic fun destroyedException$default (Lio/matthewnelson/kmp/tor/runtime/core/Destroyable$Companion;Lio/matthewnelson/kmp/tor/runtime/core/Destroyable;Ljava/lang/String;ILjava/lang/Object;)Ljava/lang/IllegalStateException;
 }
 
 public abstract interface class io/matthewnelson/kmp/tor/runtime/core/Disposable {
@@ -3360,6 +3365,19 @@ public final class io/matthewnelson/kmp/tor/runtime/core/builder/IsolationFlagBu
 	public final fun SessionGroup (I)Lio/matthewnelson/kmp/tor/runtime/core/builder/IsolationFlagBuilder;
 }
 
+public final class io/matthewnelson/kmp/tor/runtime/core/builder/OnionAddBuilder {
+	public final fun clientAuth (Lio/matthewnelson/kmp/tor/runtime/core/key/AuthKey$Public;)Lio/matthewnelson/kmp/tor/runtime/core/builder/OnionAddBuilder;
+	public final fun flags (Lio/matthewnelson/kmp/tor/runtime/core/ThisBlock;)Lio/matthewnelson/kmp/tor/runtime/core/builder/OnionAddBuilder;
+	public final fun maxStreams (Lio/matthewnelson/kmp/tor/runtime/core/ThisBlock;)Lio/matthewnelson/kmp/tor/runtime/core/builder/OnionAddBuilder;
+	public final fun port (Lio/matthewnelson/kmp/tor/runtime/core/ThisBlock;)Lio/matthewnelson/kmp/tor/runtime/core/builder/OnionAddBuilder;
+}
+
+public final class io/matthewnelson/kmp/tor/runtime/core/builder/OnionAddBuilder$FlagBuilder {
+	public field Detach Ljava/lang/Boolean;
+	public field DiscardPK Ljava/lang/Boolean;
+	public field MaxStreamsCloseCircuit Ljava/lang/Boolean;
+}
+
 public final class io/matthewnelson/kmp/tor/runtime/core/builder/SocksFlagBuilder {
 	public field CacheDNS Ljava/lang/Boolean;
 	public field CacheIPv4DNS Ljava/lang/Boolean;
@@ -3488,7 +3506,19 @@ public final class io/matthewnelson/kmp/tor/runtime/core/ctrl/ConfigEntry {
 }
 
 public final class io/matthewnelson/kmp/tor/runtime/core/ctrl/HiddenServiceEntry {
-	public fun <init> ()V
+	public static final field Companion Lio/matthewnelson/kmp/tor/runtime/core/ctrl/HiddenServiceEntry$Companion;
+	public final field clientAuth Ljava/util/Set;
+	public final field privateKey Lio/matthewnelson/kmp/tor/runtime/core/key/AddressKey$Private;
+	public final field publicKey Lio/matthewnelson/kmp/tor/runtime/core/key/AddressKey$Public;
+	public synthetic fun <init> (Lio/matthewnelson/kmp/tor/runtime/core/key/AddressKey$Public;Lio/matthewnelson/kmp/tor/runtime/core/key/AddressKey$Private;Ljava/util/Set;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public fun equals (Ljava/lang/Object;)Z
+	public fun hashCode ()I
+	public static final fun of (Lio/matthewnelson/kmp/tor/runtime/core/key/AddressKey$Public;Lio/matthewnelson/kmp/tor/runtime/core/key/AddressKey$Private;Ljava/util/Set;)Lio/matthewnelson/kmp/tor/runtime/core/ctrl/HiddenServiceEntry;
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/matthewnelson/kmp/tor/runtime/core/ctrl/HiddenServiceEntry$Companion {
+	public final fun of (Lio/matthewnelson/kmp/tor/runtime/core/key/AddressKey$Public;Lio/matthewnelson/kmp/tor/runtime/core/key/AddressKey$Private;Ljava/util/Set;)Lio/matthewnelson/kmp/tor/runtime/core/ctrl/HiddenServiceEntry;
 }
 
 public class io/matthewnelson/kmp/tor/runtime/core/ctrl/Reply {
@@ -3638,6 +3668,16 @@ public final class io/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$Onion {
 }
 
 public final class io/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$Onion$Add : io/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$Unprivileged {
+	public final field clientAuth Ljava/util/Set;
+	public final field destroyKeyOnJobCompletion Z
+	public final field flags Ljava/util/Set;
+	public final field key Lio/matthewnelson/kmp/tor/runtime/core/key/AddressKey$Private;
+	public final field keyType Lio/matthewnelson/kmp/tor/runtime/core/key/KeyType$Address;
+	public final field maxStreams Lio/matthewnelson/kmp/tor/runtime/core/TorConfig$LineItem;
+	public final field ports Ljava/util/Set;
+	public fun <init> (Lio/matthewnelson/kmp/tor/runtime/core/key/AddressKey$Private;Lio/matthewnelson/kmp/tor/runtime/core/ThisBlock;)V
+	public fun <init> (Lio/matthewnelson/kmp/tor/runtime/core/key/AddressKey$Private;ZLio/matthewnelson/kmp/tor/runtime/core/ThisBlock;)V
+	public fun <init> (Lio/matthewnelson/kmp/tor/runtime/core/key/KeyType$Address;Lio/matthewnelson/kmp/tor/runtime/core/ThisBlock;)V
 }
 
 public final class io/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$Onion$Delete : io/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$Unprivileged {
@@ -3806,8 +3846,6 @@ public abstract class io/matthewnelson/kmp/tor/runtime/core/key/AddressKey$Publi
 	public final fun compareTo (Lio/matthewnelson/kmp/tor/runtime/core/key/AddressKey$Public;)I
 	public synthetic fun compareTo (Ljava/lang/Object;)I
 	public final fun encoded ()[B
-	public final fun equals (Ljava/lang/Object;)Z
-	public final fun hashCode ()I
 }
 
 public final class io/matthewnelson/kmp/tor/runtime/core/key/AuthKey {
@@ -3834,8 +3872,6 @@ public abstract class io/matthewnelson/kmp/tor/runtime/core/key/AuthKey$Public :
 	public final fun descriptorBase32 ()Ljava/lang/String;
 	public final fun descriptorBase64 ()Ljava/lang/String;
 	public final fun encoded ()[B
-	public final fun equals (Ljava/lang/Object;)Z
-	public final fun hashCode ()I
 }
 
 public final class io/matthewnelson/kmp/tor/runtime/core/key/ED25519_V3 : io/matthewnelson/kmp/tor/runtime/core/key/KeyType$Address {
@@ -3882,7 +3918,10 @@ public final class io/matthewnelson/kmp/tor/runtime/core/key/ED25519_V3$PublicKe
 public abstract class io/matthewnelson/kmp/tor/runtime/core/key/Key : java/security/Key {
 	protected static final field Companion Lio/matthewnelson/kmp/tor/runtime/core/key/Key$Companion;
 	public abstract fun algorithm ()Ljava/lang/String;
-	public abstract fun encoded ()[B
+	public abstract fun base16OrNull ()Ljava/lang/String;
+	public abstract fun base32OrNull ()Ljava/lang/String;
+	public abstract fun base64OrNull ()Ljava/lang/String;
+	public abstract fun encodedOrNull ()[B
 	public final fun getAlgorithm ()Ljava/lang/String;
 	public final fun getEncoded ()[B
 	public final fun getFormat ()Ljava/lang/String;
@@ -3901,7 +3940,9 @@ public abstract class io/matthewnelson/kmp/tor/runtime/core/key/Key$Private : io
 	public final fun base64OrNull ()Ljava/lang/String;
 	public final fun destroy ()V
 	public final fun encoded ()[B
-	public final fun encodedOrThrow ()[B
+	public final fun encodedOrNull ()[B
+	public final fun equals (Ljava/lang/Object;)Z
+	public final fun hashCode ()I
 	public final fun isDestroyed ()Z
 	public final fun toString ()Ljava/lang/String;
 	protected final fun withKeyOrNull (Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
@@ -3909,9 +3950,15 @@ public abstract class io/matthewnelson/kmp/tor/runtime/core/key/Key$Private : io
 
 public abstract class io/matthewnelson/kmp/tor/runtime/core/key/Key$Public : io/matthewnelson/kmp/tor/runtime/core/key/Key, java/security/PublicKey {
 	public abstract fun base16 ()Ljava/lang/String;
+	public final fun base16OrNull ()Ljava/lang/String;
 	public abstract fun base32 ()Ljava/lang/String;
+	public final fun base32OrNull ()Ljava/lang/String;
 	public abstract fun base64 ()Ljava/lang/String;
+	public final fun base64OrNull ()Ljava/lang/String;
 	public abstract fun encoded ()[B
+	public final fun encodedOrNull ()[B
+	public final fun equals (Ljava/lang/Object;)Z
+	public final fun hashCode ()I
 	public final fun toString ()Ljava/lang/String;
 }
 

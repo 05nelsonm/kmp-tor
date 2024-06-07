@@ -75,11 +75,11 @@ abstract class KeyBaseUnitTest(protected val expectedAlgorithm: String) {
 
     @Test
     fun givenPrivateKey_whenEncoded_thenReturnedBytesAreACopy() {
-        val bytes = privateKey.encodedOrThrow()
+        val bytes = privateKey.encoded()
         bytes.fill(5)
 
         try {
-            assertContentEquals(privateKey.encodedOrThrow(), bytes)
+            assertContentEquals(privateKey.encoded(), bytes)
             throw IllegalStateException()
         } catch (_: AssertionError) {
             // pass
@@ -97,7 +97,7 @@ abstract class KeyBaseUnitTest(protected val expectedAlgorithm: String) {
 
     @Test
     fun givenPrivateKey_whenEncodings_thenAreAsExpected() {
-        val bytes = privateKey.encoded()!!
+        val bytes = privateKey.encoded()
 
         assertEquals(bytes.encodeToString(Base16()), privateKey.base16())
         assertEquals(bytes.encodeToString(Base32Default { padEncoded = false }), privateKey.base32())
@@ -112,11 +112,24 @@ abstract class KeyBaseUnitTest(protected val expectedAlgorithm: String) {
         assertNull(privateKey.base16OrNull())
         assertNull(privateKey.base32OrNull())
         assertNull(privateKey.base64OrNull())
-        assertNull(privateKey.encoded())
+        assertNull(privateKey.encodedOrNull())
 
-        assertFailsWith<IllegalStateException> { privateKey.base16() }
-        assertFailsWith<IllegalStateException> { privateKey.base32() }
-        assertFailsWith<IllegalStateException> { privateKey.base64() }
+        fun assertDestroyed(block: Key.Private.() -> Unit) {
+            try {
+                block(privateKey)
+                fail()
+            } catch (e: IllegalStateException) {
+                val message = e.message
+                assertNotNull(message)
+                assertTrue(message.startsWith(privateKey.algorithm()))
+                assertTrue(message.endsWith("isDestroyed[true]"))
+            }
+        }
+
+        assertDestroyed { encoded() }
+        assertDestroyed { base16() }
+        assertDestroyed { base32() }
+        assertDestroyed { base64() }
 
         // Does not throw b/c that'd be awful
         privateKey.toString()
@@ -124,13 +137,15 @@ abstract class KeyBaseUnitTest(protected val expectedAlgorithm: String) {
 
     @Test
     fun givenPublicKey_whenToString_thenFormatIsAsExpected() {
-        val expected = expectedAlgorithm + ".PublicKey[" + publicKey.base32() + "]@" + publicKey.hashCode()
+        val expected = expectedAlgorithm + ".PublicKey[" + publicKey.base32() + "]"
         assertEquals(expected, publicKey.toString())
     }
 
     @Test
     fun givenPrivateKey_whenToString_thenFormatIsAsExpected() {
-        val expected = expectedAlgorithm + ".PrivateKey[REDACTED]@" + privateKey.hashCode()
+        val expected = expectedAlgorithm + ".PrivateKey[isDestroyed=false]@" + privateKey.hashCode()
         assertEquals(expected, privateKey.toString())
+        privateKey.destroy()
+        assertTrue(privateKey.toString().contains("[isDestroyed=true]"))
     }
 }

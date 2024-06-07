@@ -29,9 +29,7 @@ internal class TorCmdJob<Success: Any> private constructor(
     onFailure: OnFailure,
     handler: UncaughtException.Handler,
 ): EnqueuedJob(
-    cmd.signalNameOrNull()?.let { name ->
-        "${cmd.keyword}{$name}"
-    } ?: cmd.keyword,
+    cmd.toJobName(),
     onFailure,
     handler,
 ) {
@@ -57,6 +55,10 @@ internal class TorCmdJob<Success: Any> private constructor(
             _onSuccess = null
             onSuccess
         })
+    }
+
+    init {
+        invokeOnCompletionForCmd(cmd)
     }
 
     internal companion object {
