@@ -27,6 +27,7 @@ import io.matthewnelson.kmp.tor.runtime.core.address.OnionAddress
 import io.matthewnelson.kmp.tor.runtime.core.builder.OnionAddBuilder
 import io.matthewnelson.kmp.tor.runtime.core.builder.OnionAddBuilder.Companion.configure
 import io.matthewnelson.kmp.tor.runtime.core.key.AddressKey
+import io.matthewnelson.kmp.tor.runtime.core.key.AuthKey
 import io.matthewnelson.kmp.tor.runtime.core.key.ED25519_V3
 import io.matthewnelson.kmp.tor.runtime.core.key.KeyType
 import kotlin.coroutines.cancellation.CancellationException
@@ -299,6 +300,8 @@ public sealed class TorCmd<Success: Any> private constructor(
             @JvmField
             public val key: AddressKey.Private?
             @JvmField
+            public val clientAuth: Set<AuthKey.Public>
+            @JvmField
             public val flags: Set<String>
             @JvmField
             public val maxStreams: TorConfig.LineItem?
@@ -380,6 +383,7 @@ public sealed class TorCmd<Success: Any> private constructor(
             ): super("ADD_ONION") {
                 this.keyType = arguments.keyType
                 this.key = key
+                this.clientAuth = arguments.clientAuth
                 this.flags = arguments.flags
                 this.maxStreams = arguments.maxStreams
                 this.ports = arguments.ports

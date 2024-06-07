@@ -26,7 +26,9 @@ import io.matthewnelson.kmp.tor.runtime.core.TorConfig.HiddenServicePort
 import io.matthewnelson.kmp.tor.runtime.core.apply
 import io.matthewnelson.kmp.tor.runtime.core.ctrl.HiddenServiceEntry
 import io.matthewnelson.kmp.tor.runtime.core.ctrl.TorCmd
+import io.matthewnelson.kmp.tor.runtime.core.key.AuthKey
 import io.matthewnelson.kmp.tor.runtime.core.key.KeyType
+import io.matthewnelson.kmp.tor.runtime.core.key.X25519
 import kotlin.jvm.JvmField
 import kotlin.jvm.JvmSynthetic
 
@@ -91,9 +93,10 @@ import kotlin.jvm.JvmSynthetic
 @KmpTorDsl
 public class OnionAddBuilder private constructor() {
 
+    private val clientAuth = mutableSetOf<AuthKey.Public>()
+    private val flags = mutableSetOf<String>()
     private var maxStreams: TorConfig.LineItem? = null
     private val ports = mutableSetOf<TorConfig.LineItem>()
-    private val flags = mutableSetOf<String>()
 
     @KmpTorDsl
     public fun port(
@@ -101,6 +104,18 @@ public class OnionAddBuilder private constructor() {
     ): OnionAddBuilder {
         val port = HiddenServicePort.build(block)
         if (port != null) ports.add(port)
+        return this
+    }
+
+    @KmpTorDsl
+    public fun clientAuth(
+        key: AuthKey.Public,
+    ): OnionAddBuilder {
+        when (key) {
+            is X25519.PublicKey -> "V3Auth"
+        }.let { flags.add(it) }
+
+        clientAuth.add(key)
         return this
     }
 
@@ -181,17 +196,26 @@ public class OnionAddBuilder private constructor() {
             block: ThisBlock<OnionAddBuilder>,
         ): Arguments {
             val b = OnionAddBuilder().apply(block)
-            return Arguments(this, b.flags, b.ports, b.maxStreams)
+
+            return Arguments(
+                keyType = this,
+                clientAuth = b.clientAuth,
+                flags = b.flags,
+                ports = b.ports,
+                maxStreams = b.maxStreams,
+            )
         }
     }
 
     internal class Arguments internal constructor(
         internal val keyType: KeyType.Address<*, *>,
-        flags: Set<String>,
+        clientAuth: Set<AuthKey.Public>,
+        flags: MutableSet<String>,
         ports: Set<TorConfig.LineItem>,
         internal val maxStreams: TorConfig.LineItem?,
     ) {
 
+        internal val clientAuth = clientAuth.toImmutableSet()
         internal val flags = flags.toImmutableSet()
         internal val ports = ports.toImmutableSet()
     }

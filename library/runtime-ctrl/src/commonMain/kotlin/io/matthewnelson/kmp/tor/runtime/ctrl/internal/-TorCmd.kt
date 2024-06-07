@@ -300,6 +300,10 @@ private fun TorCmd.Onion.Add.encode(LOG: Debugger?): ByteArray {
             append(target)
         }
 
+        for (auth in clientAuth) {
+            SP().append("ClientAuthV3=").append(auth.base32())
+        }
+
         LOG.d {
             var log = toString()
             if (privateKey != null) {

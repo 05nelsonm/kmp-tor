@@ -24,9 +24,11 @@ import io.matthewnelson.kmp.file.InterruptedException
 import io.matthewnelson.kmp.tor.runtime.core.ctrl.*
 import io.matthewnelson.kmp.tor.runtime.core.ctrl.Reply.Error.Companion.toError
 import io.matthewnelson.kmp.tor.runtime.core.key.AddressKey
+import io.matthewnelson.kmp.tor.runtime.core.key.AuthKey
 import io.matthewnelson.kmp.tor.runtime.core.key.ED25519_V3
 import io.matthewnelson.kmp.tor.runtime.core.key.ED25519_V3.PrivateKey.Companion.toED25519_V3PrivateKeyOrNull
 import io.matthewnelson.kmp.tor.runtime.core.key.ED25519_V3.PublicKey.Companion.toED25519_V3PublicKeyOrNull
+import io.matthewnelson.kmp.tor.runtime.core.key.X25519.PublicKey.Companion.toX25519PublicKeyOrNull
 
 @Throws(NoSuchElementException::class)
 internal fun TorCmdJob<*>.respond(replies: ArrayList<Reply>) {
@@ -117,6 +119,7 @@ private fun TorCmd.Onion.Add.complete(job: TorCmdJob<*>, replies: ArrayList<Repl
     @Suppress("LocalVariableName")
     var _publicKey: AddressKey.Public? = null
     var privateKey: AddressKey.Private? = null
+    val auth = LinkedHashSet<AuthKey.Public>(clientAuth.size, 1.0F)
 
     // 250-ServiceID=sampleonion4t2pqglbny66wpovyvao3ylc23eileodtevc4b75ikpad
     // 250-PrivateKey=ED25519-V3:[Blob Redacted]
@@ -138,12 +141,17 @@ private fun TorCmd.Onion.Add.complete(job: TorCmdJob<*>, replies: ArrayList<Repl
                     is ED25519_V3 -> keyString.toED25519_V3PrivateKeyOrNull()
                 }?.let { privateKey = it }
             }
+            "clientauthv3" -> {
+                // Will be a headache when another key type is added.
+                val authKey = value.toX25519PublicKeyOrNull() ?: return@forEachKvp
+                auth.add(authKey)
+            }
         }
     }
 
     val publicKey = _publicKey ?: throw NoSuchElementException("$keyType.PublicKey was not found in replies")
 
-    val entry = HiddenServiceEntry.of(publicKey, privateKey)
+    val entry = HiddenServiceEntry.of(publicKey, privateKey, auth)
     job.unsafeCast<HiddenServiceEntry>().completion(entry)
 }
 

@@ -38,6 +38,7 @@ import io.matthewnelson.kmp.tor.runtime.core.key.ED25519_V3
 import io.matthewnelson.kmp.tor.runtime.core.key.ED25519_V3.PrivateKey.Companion.toED25519_V3PrivateKeyOrNull
 import io.matthewnelson.kmp.tor.runtime.core.util.executeAsync
 import io.matthewnelson.kmp.tor.runtime.test.TestUtils
+import io.matthewnelson.kmp.tor.runtime.test.TestUtils.clientAuthTestKeyPairs
 import io.matthewnelson.kmp.tor.runtime.test.TestUtils.ensureStoppedOnTestCompletion
 import io.matthewnelson.kmp.tor.runtime.test.TestUtils.testEnv
 import kotlinx.coroutines.test.runTest
@@ -158,13 +159,15 @@ class TorCmdUnitTest {
 
     @Test
     fun givenOnion_whenAddAndDelete_thenIsAsExpected() = runTest {
+        val authKeys = clientAuthTestKeyPairs()
+
         var containsRedacted = false
         val runtime = TorRuntime.Builder(testEnv("cmd_onion_add")) {
             observerStatic(RuntimeEvent.LOG.DEBUG) { line ->
                 if (line.endsWith("<< 250-PrivateKey=ED25519-V3:[REDACTED]")) {
                     containsRedacted = true
                 }
-                println(line)
+//                println(line)
             }
         }.ensureStoppedOnTestCompletion()
 
@@ -212,16 +215,24 @@ class TorCmdUnitTest {
 
         runtime.executeAsync(TorCmd.Onion.Delete(entry1.publicKey))
 
-        runtime.executeAsync(TorCmd.Onion.Add(
+        val entry3 = runtime.executeAsync(TorCmd.Onion.Add(
             key = keyCopy,
             destroyKeyOnJobCompletion = false,
         ) {
+            for (keys in authKeys) {
+                clientAuth(keys.first)
+            }
             port { virtual = 80.toPort() }
             flags { DiscardPK = true }
         })
 
         assertFalse(keyCopy.isDestroyed())
         assertFalse(containsRedacted)
+
+        assertEquals(authKeys.size, entry3.clientAuth.size)
+        authKeys.forEach { (public, _) ->
+            assertTrue(entry3.clientAuth.contains(public))
+        }
 
         runtime.stopDaemonAsync()
     }

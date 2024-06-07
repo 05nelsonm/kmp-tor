@@ -15,7 +15,9 @@
  **/
 package io.matthewnelson.kmp.tor.runtime.core.ctrl
 
+import io.matthewnelson.immutable.collections.toImmutableSet
 import io.matthewnelson.kmp.tor.runtime.core.key.AddressKey
+import io.matthewnelson.kmp.tor.runtime.core.key.AuthKey
 import kotlin.jvm.JvmField
 import kotlin.jvm.JvmStatic
 
@@ -31,7 +33,11 @@ public class HiddenServiceEntry private constructor(
     public val publicKey: AddressKey.Public,
     @JvmField
     public val privateKey: AddressKey.Private?,
+    clientAuth: Set<AuthKey.Public>,
 ) {
+
+    @JvmField
+    public val clientAuth: Set<AuthKey.Public> = clientAuth.toImmutableSet()
 
     public companion object {
 
@@ -45,9 +51,10 @@ public class HiddenServiceEntry private constructor(
         public fun of(
             publicKey: AddressKey.Public,
             privateKey: AddressKey.Private?,
+            clientAuth: Set<AuthKey.Public>,
         ): HiddenServiceEntry {
             if (privateKey == null) {
-                return HiddenServiceEntry(publicKey, privateKey)
+                return HiddenServiceEntry(publicKey, privateKey, clientAuth)
             }
 
             val aPublic = publicKey.algorithm()
@@ -57,7 +64,7 @@ public class HiddenServiceEntry private constructor(
                 "Incompatible key types. PublicKey[$aPublic]. PrivateKey[$aPrivate]"
             }
 
-            return HiddenServiceEntry(publicKey, privateKey)
+            return HiddenServiceEntry(publicKey, privateKey, clientAuth)
         }
     }
 
@@ -65,13 +72,14 @@ public class HiddenServiceEntry private constructor(
         return  other is HiddenServiceEntry
                 && other.publicKey == publicKey
                 && other.privateKey == privateKey
+                && other.clientAuth == clientAuth
     }
 
     public override fun hashCode(): Int {
         var result = 21
-        result = result * 42 + publicKey.algorithm().hashCode()
         result = result * 42 + publicKey.hashCode()
         result = result * 42 + privateKey.hashCode()
+        result = result * 42 + clientAuth.hashCode()
         return result
     }
 
@@ -81,6 +89,21 @@ public class HiddenServiceEntry private constructor(
         appendLine(publicKey)
         append("    privateKey: ")
         appendLine(privateKey.toString())
+
+        append("    clientAuth: [")
+        if (clientAuth.isEmpty()) {
+            append(']')
+        } else {
+            for (key in clientAuth) {
+                appendLine()
+                append("        ")
+                append(key)
+            }
+            appendLine()
+            append("    ]")
+        }
+
+        appendLine()
         append(']')
     }
 }

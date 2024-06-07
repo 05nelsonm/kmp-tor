@@ -3366,6 +3366,7 @@ public final class io/matthewnelson/kmp/tor/runtime/core/builder/IsolationFlagBu
 }
 
 public final class io/matthewnelson/kmp/tor/runtime/core/builder/OnionAddBuilder {
+	public final fun clientAuth (Lio/matthewnelson/kmp/tor/runtime/core/key/AuthKey$Public;)Lio/matthewnelson/kmp/tor/runtime/core/builder/OnionAddBuilder;
 	public final fun flags (Lio/matthewnelson/kmp/tor/runtime/core/ThisBlock;)Lio/matthewnelson/kmp/tor/runtime/core/builder/OnionAddBuilder;
 	public final fun maxStreams (Lio/matthewnelson/kmp/tor/runtime/core/ThisBlock;)Lio/matthewnelson/kmp/tor/runtime/core/builder/OnionAddBuilder;
 	public final fun port (Lio/matthewnelson/kmp/tor/runtime/core/ThisBlock;)Lio/matthewnelson/kmp/tor/runtime/core/builder/OnionAddBuilder;
@@ -3506,17 +3507,18 @@ public final class io/matthewnelson/kmp/tor/runtime/core/ctrl/ConfigEntry {
 
 public final class io/matthewnelson/kmp/tor/runtime/core/ctrl/HiddenServiceEntry {
 	public static final field Companion Lio/matthewnelson/kmp/tor/runtime/core/ctrl/HiddenServiceEntry$Companion;
+	public final field clientAuth Ljava/util/Set;
 	public final field privateKey Lio/matthewnelson/kmp/tor/runtime/core/key/AddressKey$Private;
 	public final field publicKey Lio/matthewnelson/kmp/tor/runtime/core/key/AddressKey$Public;
-	public synthetic fun <init> (Lio/matthewnelson/kmp/tor/runtime/core/key/AddressKey$Public;Lio/matthewnelson/kmp/tor/runtime/core/key/AddressKey$Private;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public synthetic fun <init> (Lio/matthewnelson/kmp/tor/runtime/core/key/AddressKey$Public;Lio/matthewnelson/kmp/tor/runtime/core/key/AddressKey$Private;Ljava/util/Set;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
 	public fun equals (Ljava/lang/Object;)Z
 	public fun hashCode ()I
-	public static final fun of (Lio/matthewnelson/kmp/tor/runtime/core/key/AddressKey$Public;Lio/matthewnelson/kmp/tor/runtime/core/key/AddressKey$Private;)Lio/matthewnelson/kmp/tor/runtime/core/ctrl/HiddenServiceEntry;
+	public static final fun of (Lio/matthewnelson/kmp/tor/runtime/core/key/AddressKey$Public;Lio/matthewnelson/kmp/tor/runtime/core/key/AddressKey$Private;Ljava/util/Set;)Lio/matthewnelson/kmp/tor/runtime/core/ctrl/HiddenServiceEntry;
 	public fun toString ()Ljava/lang/String;
 }
 
 public final class io/matthewnelson/kmp/tor/runtime/core/ctrl/HiddenServiceEntry$Companion {
-	public final fun of (Lio/matthewnelson/kmp/tor/runtime/core/key/AddressKey$Public;Lio/matthewnelson/kmp/tor/runtime/core/key/AddressKey$Private;)Lio/matthewnelson/kmp/tor/runtime/core/ctrl/HiddenServiceEntry;
+	public final fun of (Lio/matthewnelson/kmp/tor/runtime/core/key/AddressKey$Public;Lio/matthewnelson/kmp/tor/runtime/core/key/AddressKey$Private;Ljava/util/Set;)Lio/matthewnelson/kmp/tor/runtime/core/ctrl/HiddenServiceEntry;
 }
 
 public class io/matthewnelson/kmp/tor/runtime/core/ctrl/Reply {
@@ -3666,6 +3668,7 @@ public final class io/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$Onion {
 }
 
 public final class io/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$Onion$Add : io/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$Unprivileged {
+	public final field clientAuth Ljava/util/Set;
 	public final field destroyKeyOnJobCompletion Z
 	public final field flags Ljava/util/Set;
 	public final field key Lio/matthewnelson/kmp/tor/runtime/core/key/AddressKey$Private;
