@@ -75,6 +75,7 @@ class X25519UnitTest: AuthKeyBaseUnitTest<X25519.PublicKey, X25519.PrivateKey>(
     }
 
     companion object {
+        // Do not use outside testing purposes. These are exposed keys.
         const val PRIVATE_KEY_B16 = "70663288D322A66BBEB1D6C60FE0A3207A8C99643A4FD321150A8CBECB476B63"
         const val PRIVATE_KEY_B32 = "OBTDFCGTEKTGXPVR23DA7YFDEB5IZGLEHJH5GIIVBKGL5S2HNNRQ"
         const val PRIVATE_KEY_B64 = "cGYyiNMipmu+sdbGD+CjIHqMmWQ6T9MhFQqMvstHa2M"

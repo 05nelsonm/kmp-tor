@@ -32,20 +32,29 @@ import kotlin.concurrent.Volatile
 public actual sealed class Key private actual constructor(): java.security.Key {
 
     public actual abstract fun algorithm(): String
-    public actual abstract fun encoded(): ByteArray?
 
-    final override fun getAlgorithm(): String = algorithm()
-    final override fun getEncoded(): ByteArray? = encoded()
+    public actual abstract fun encodedOrNull(): ByteArray?
+    public actual abstract fun base16OrNull(): String?
+    public actual abstract fun base32OrNull(): String?
+    public actual abstract fun base64OrNull(): String?
+
+    public final override fun getAlgorithm(): String = algorithm()
+    public final override fun getEncoded(): ByteArray? = encodedOrNull()
+
     // For now keys are always raw but could be bumped up
     // to commonMain if need be
-    final override fun getFormat(): String = "RAW"
+    public final override fun getFormat(): String = "RAW"
 
     public actual sealed class Public actual constructor(): Key(), java.security.PublicKey {
-        public actual abstract override fun encoded(): ByteArray
-
+        public actual abstract fun encoded(): ByteArray
         public actual abstract fun base16(): String
         public actual abstract fun base32(): String
         public actual abstract fun base64(): String
+
+        public actual final override fun encodedOrNull(): ByteArray = encoded()
+        public actual final override fun base16OrNull(): String = base16()
+        public actual final override fun base32OrNull(): String = base32()
+        public actual final override fun base64OrNull(): String = base64()
 
         private val _toString by lazy { "${algorithm()}.PublicKey[${base32()}]" }
         public actual final override fun equals(other: Any?): Boolean = other is Public && other.toString() == toString()
@@ -75,11 +84,8 @@ public actual sealed class Key private actual constructor(): java.security.Key {
 
         public actual final override fun isDestroyed(): Boolean = _destroyed
 
-        public actual final override fun encoded(): ByteArray? = withKeyOrNull { it.copyOf() }
-
         @Throws(IllegalStateException::class)
-        public actual fun encodedOrThrow(): ByteArray = encoded() ?: throw destroyedException(algorithm())
-
+        public actual fun encoded(): ByteArray = encodedOrNull() ?: throw destroyedException(algorithm())
         @Throws(IllegalStateException::class)
         public actual fun base16(): String = base16OrNull() ?: throw destroyedException(algorithm())
         @Throws(IllegalStateException::class)
@@ -87,9 +93,10 @@ public actual sealed class Key private actual constructor(): java.security.Key {
         @Throws(IllegalStateException::class)
         public actual fun base64(): String = base64OrNull() ?: throw destroyedException(algorithm())
 
-        public actual fun base16OrNull(): String? = withKeyOrNull { it.encodeToString(BASE_16) }
-        public actual fun base32OrNull(): String? = withKeyOrNull { it.encodeToString(BASE_32) }
-        public actual fun base64OrNull(): String? = withKeyOrNull { it.encodeToString(BASE_64) }
+        public actual final override fun encodedOrNull(): ByteArray? = withKeyOrNull { it.copyOf() }
+        public actual final override fun base16OrNull(): String? = withKeyOrNull { it.encodeToString(BASE_16) }
+        public actual final override fun base32OrNull(): String? = withKeyOrNull { it.encodeToString(BASE_32) }
+        public actual final override fun base64OrNull(): String? = withKeyOrNull { it.encodeToString(BASE_64) }
 
         @OptIn(InternalKmpTorApi::class)
         protected actual fun <T : Any> withKeyOrNull(

@@ -3918,7 +3918,10 @@ public final class io/matthewnelson/kmp/tor/runtime/core/key/ED25519_V3$PublicKe
 public abstract class io/matthewnelson/kmp/tor/runtime/core/key/Key : java/security/Key {
 	protected static final field Companion Lio/matthewnelson/kmp/tor/runtime/core/key/Key$Companion;
 	public abstract fun algorithm ()Ljava/lang/String;
-	public abstract fun encoded ()[B
+	public abstract fun base16OrNull ()Ljava/lang/String;
+	public abstract fun base32OrNull ()Ljava/lang/String;
+	public abstract fun base64OrNull ()Ljava/lang/String;
+	public abstract fun encodedOrNull ()[B
 	public final fun getAlgorithm ()Ljava/lang/String;
 	public final fun getEncoded ()[B
 	public final fun getFormat ()Ljava/lang/String;
@@ -3937,7 +3940,7 @@ public abstract class io/matthewnelson/kmp/tor/runtime/core/key/Key$Private : io
 	public final fun base64OrNull ()Ljava/lang/String;
 	public final fun destroy ()V
 	public final fun encoded ()[B
-	public final fun encodedOrThrow ()[B
+	public final fun encodedOrNull ()[B
 	public final fun equals (Ljava/lang/Object;)Z
 	public final fun hashCode ()I
 	public final fun isDestroyed ()Z
@@ -3947,9 +3950,13 @@ public abstract class io/matthewnelson/kmp/tor/runtime/core/key/Key$Private : io
 
 public abstract class io/matthewnelson/kmp/tor/runtime/core/key/Key$Public : io/matthewnelson/kmp/tor/runtime/core/key/Key, java/security/PublicKey {
 	public abstract fun base16 ()Ljava/lang/String;
+	public final fun base16OrNull ()Ljava/lang/String;
 	public abstract fun base32 ()Ljava/lang/String;
+	public final fun base32OrNull ()Ljava/lang/String;
 	public abstract fun base64 ()Ljava/lang/String;
+	public final fun base64OrNull ()Ljava/lang/String;
 	public abstract fun encoded ()[B
+	public final fun encodedOrNull ()[B
 	public final fun equals (Ljava/lang/Object;)Z
 	public final fun hashCode ()I
 	public final fun toString ()Ljava/lang/String;

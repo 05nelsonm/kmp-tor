@@ -75,11 +75,11 @@ abstract class KeyBaseUnitTest(protected val expectedAlgorithm: String) {
 
     @Test
     fun givenPrivateKey_whenEncoded_thenReturnedBytesAreACopy() {
-        val bytes = privateKey.encodedOrThrow()
+        val bytes = privateKey.encoded()
         bytes.fill(5)
 
         try {
-            assertContentEquals(privateKey.encodedOrThrow(), bytes)
+            assertContentEquals(privateKey.encoded(), bytes)
             throw IllegalStateException()
         } catch (_: AssertionError) {
             // pass
@@ -97,7 +97,7 @@ abstract class KeyBaseUnitTest(protected val expectedAlgorithm: String) {
 
     @Test
     fun givenPrivateKey_whenEncodings_thenAreAsExpected() {
-        val bytes = privateKey.encoded()!!
+        val bytes = privateKey.encoded()
 
         assertEquals(bytes.encodeToString(Base16()), privateKey.base16())
         assertEquals(bytes.encodeToString(Base32Default { padEncoded = false }), privateKey.base32())
@@ -112,7 +112,7 @@ abstract class KeyBaseUnitTest(protected val expectedAlgorithm: String) {
         assertNull(privateKey.base16OrNull())
         assertNull(privateKey.base32OrNull())
         assertNull(privateKey.base64OrNull())
-        assertNull(privateKey.encoded())
+        assertNull(privateKey.encodedOrNull())
 
         fun assertDestroyed(block: Key.Private.() -> Unit) {
             try {
@@ -126,7 +126,7 @@ abstract class KeyBaseUnitTest(protected val expectedAlgorithm: String) {
             }
         }
 
-        assertDestroyed { encodedOrThrow() }
+        assertDestroyed { encoded() }
         assertDestroyed { base16() }
         assertDestroyed { base32() }
         assertDestroyed { base64() }

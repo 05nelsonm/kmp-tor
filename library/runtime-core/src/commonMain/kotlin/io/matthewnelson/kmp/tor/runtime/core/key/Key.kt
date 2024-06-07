@@ -28,14 +28,22 @@ import io.matthewnelson.kmp.tor.runtime.core.Destroyable
 public expect sealed class Key private constructor() {
 
     public abstract fun algorithm(): String
-    public abstract fun encoded(): ByteArray?
+
+    public abstract fun encodedOrNull(): ByteArray?
+    public abstract fun base16OrNull(): String?
+    public abstract fun base32OrNull(): String?
+    public abstract fun base64OrNull(): String?
 
     public sealed class Public(): Key {
-        public abstract override fun encoded(): ByteArray
-
+        public abstract fun encoded(): ByteArray
         public abstract fun base16(): String
         public abstract fun base32(): String
         public abstract fun base64(): String
+
+        public final override fun encodedOrNull(): ByteArray
+        public final override fun base16OrNull(): String
+        public final override fun base32OrNull(): String
+        public final override fun base64OrNull(): String
 
         public final override fun equals(other: Any?): Boolean
         public final override fun hashCode(): Int
@@ -45,11 +53,9 @@ public expect sealed class Key private constructor() {
     public sealed class Private(key: ByteArray): Key, Destroyable {
         public final override fun destroy()
         public final override fun isDestroyed(): Boolean
-        public final override fun encoded(): ByteArray?
 
         @Throws(IllegalStateException::class)
-        public fun encodedOrThrow(): ByteArray
-
+        public fun encoded(): ByteArray
         @Throws(IllegalStateException::class)
         public fun base16(): String
         @Throws(IllegalStateException::class)
@@ -57,9 +63,10 @@ public expect sealed class Key private constructor() {
         @Throws(IllegalStateException::class)
         public fun base64(): String
 
-        public fun base16OrNull(): String?
-        public fun base32OrNull(): String?
-        public fun base64OrNull(): String?
+        public final override fun encodedOrNull(): ByteArray?
+        public final override fun base16OrNull(): String?
+        public final override fun base32OrNull(): String?
+        public final override fun base64OrNull(): String?
 
         protected fun <T: Any> withKeyOrNull(block: (key: ByteArray) -> T): T?
 
