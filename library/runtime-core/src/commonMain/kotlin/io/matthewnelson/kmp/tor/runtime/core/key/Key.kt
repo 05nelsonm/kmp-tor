@@ -37,6 +37,8 @@ public expect sealed class Key private constructor() {
         public abstract fun base32(): String
         public abstract fun base64(): String
 
+        public final override fun equals(other: Any?): Boolean
+        public final override fun hashCode(): Int
         public final override fun toString(): String
     }
 
@@ -61,6 +63,8 @@ public expect sealed class Key private constructor() {
 
         protected fun <T: Any> withKeyOrNull(block: (key: ByteArray) -> T): T?
 
+        public final override fun equals(other: Any?): Boolean
+        public final override fun hashCode(): Int
         public final override fun toString(): String
     }
 

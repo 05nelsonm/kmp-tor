@@ -43,9 +43,6 @@ public class AddressKey private constructor() {
         public final override fun base64(): String = encoded().encodeToString(BASE_64)
 
         public final override fun compareTo(other: AddressKey.Public): Int = onionAddress.compareTo(other.onionAddress)
-
-        public final override fun equals(other: Any?): Boolean = other is AddressKey.Public && other.onionAddress == onionAddress
-        public final override fun hashCode(): Int = 17 * 31 + onionAddress.hashCode()
     }
 
     /**

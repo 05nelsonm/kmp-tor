@@ -37,24 +37,6 @@ public class AuthKey private constructor() {
 
         public fun descriptorBase32(): String = toDescriptor("descriptor", base32())
         public fun descriptorBase64(): String = toDescriptor("descriptor", base64())
-
-        public final override fun equals(other: Any?): Boolean {
-            if (other !is AuthKey.Public) return false
-            if (other::class != this::class) return false
-            if (other.algorithm() != algorithm()) return false
-            if (other.key.size != key.size) return false
-
-            var isEqual = true
-            for (i in key.indices) {
-                if (other.key[i] != key[i]) {
-                    isEqual = false
-                }
-            }
-
-            return isEqual
-        }
-
-        public final override fun hashCode(): Int = 17 * 31 + key.toList().hashCode()
     }
 
     public sealed class Private(key: ByteArray): Key.Private(key) {
