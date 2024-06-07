@@ -41,7 +41,8 @@ public actual sealed class Key private actual constructor() {
         public actual abstract fun base32(): String
         public actual abstract fun base64(): String
 
-        public actual final override fun toString(): String = "${algorithm()}.PublicKey[${base32()}]"
+        private val _toString by lazy { "${algorithm()}.PublicKey[${base32()}]" }
+        public actual final override fun toString(): String = _toString
     }
 
     public actual sealed class Private actual constructor(
