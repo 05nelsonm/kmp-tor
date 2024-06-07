@@ -123,7 +123,7 @@ private fun TorCmd.Onion.Add.complete(job: TorCmdJob<*>, replies: ArrayList<Repl
 
     // 250-ServiceID=sampleonion4t2pqglbny66wpovyvao3ylc23eileodtevc4b75ikpad
     // 250-PrivateKey=ED25519-V3:[Blob Redacted]
-    // 250-ClientAuthV3=[Blob Redacted] // TODO
+    // 250-ClientAuthV3=[Blob Redacted]
     replies.forEachKvp { key, value ->
         when (key.lowercase()) {
             "serviceid" -> {

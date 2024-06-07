@@ -153,8 +153,6 @@ public class OnionAddBuilder private constructor() {
         public var MaxStreamsCloseCircuit: Boolean? = null
 //        @JvmField
 //        public var NonAnonymous: Boolean? = null
-//        @JvmField
-//        public var V3Auth: Boolean? = null
 
         internal companion object {
 
@@ -179,10 +177,6 @@ public class OnionAddBuilder private constructor() {
                 }
 //                b.NonAnonymous?.let {
 //                    val flag = "NonAnonymous"
-//                    if (it) flags.add(flag) else flags.remove(flag)
-//                }
-//                b.V3Auth?.let {
-//                    val flag = "V3Auth"
 //                    if (it) flags.add(flag) else flags.remove(flag)
 //                }
             }
@@ -210,7 +204,7 @@ public class OnionAddBuilder private constructor() {
     internal class Arguments internal constructor(
         internal val keyType: KeyType.Address<*, *>,
         clientAuth: Set<AuthKey.Public>,
-        flags: MutableSet<String>,
+        flags: Set<String>,
         ports: Set<TorConfig.LineItem>,
         internal val maxStreams: TorConfig.LineItem?,
     ) {

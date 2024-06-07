@@ -31,7 +31,6 @@ import kotlin.jvm.JvmSynthetic
  *
  * **NOTE:** The following [TorCmd] **cannot** be replaced:
  *  - [TorCmd.Onion.Add]
- *  - [TorCmd.Onion.Add]
  *  - [TorCmd.Onion.Delete]
  *
  * e.g.
