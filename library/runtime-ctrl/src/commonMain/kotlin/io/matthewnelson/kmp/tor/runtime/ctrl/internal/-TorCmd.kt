@@ -253,20 +253,15 @@ private fun TorCmd.MapAddress.encode(LOG: Debugger?): ByteArray {
 @Throws(IllegalArgumentException::class, IllegalStateException::class)
 private fun TorCmd.Onion.Add.encode(LOG: Debugger?): ByteArray {
     require(ports.isNotEmpty()) { "At minimum of 1 port is required" }
+    val privateKey = key?.base64()
 
     return StringBuilder(keyword).apply {
         SP()
 
-        val redact = when (this@encode) {
-            is TorCmd.Onion.Add.Existing -> {
-                val b64Key = key.base64()
-                append(key.algorithm()).append(':').append(b64Key)
-                b64Key
-            }
-            is TorCmd.Onion.Add.New -> {
-                append("NEW").append(':').append(type.algorithm())
-                null
-            }
+        if (privateKey != null) {
+            append(keyType.algorithm()).append(':').append(privateKey)
+        } else {
+            append("NEW").append(':').append(keyType.algorithm())
         }
 
         if (flags.isNotEmpty()) {
@@ -285,17 +280,30 @@ private fun TorCmd.Onion.Add.encode(LOG: Debugger?): ByteArray {
             val virtual = port.argument.substring(0, i)
             var target = port.argument.substring(i + 1)
 
-            if (target.startsWith("unix:")) {
-                target = target.replace("\"", "\\\"")
+            append(virtual).append(',')
+
+            val prefixUnix = "unix:"
+            if (target.startsWith(prefixUnix)) {
+                append(prefixUnix)
+
+                // Need to remove path quotes
+                //
+                // NOTE: If path has a space in it, controller fails
+                //  as it cannot parse. There is no ability to quote
+                //  the unix:"/pa th/to/hs.sock" like usual...
+                //
+                //  https://github.com/05nelsonm/kmp-tor/issues/207#issuecomment-1166722564
+                //  https://gitlab.torproject.org/tpo/core/tor/-/issues/40633
+                target = target.substring(prefixUnix.length + 1, target.length - 1)
             }
 
-            append(virtual).append(',').append(target)
+            append(target)
         }
 
         LOG.d {
             var log = toString()
-            if (redact != null) {
-                log = log.replace(redact, "[REDACTED]")
+            if (privateKey != null) {
+                log = log.replace(privateKey, "[REDACTED]")
             }
 
             ">> $log"

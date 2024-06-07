@@ -6543,8 +6543,8 @@ public class TorConfig private constructor(
             name = "HiddenServiceSingleHopMode",
             default = false.byte.toString(),
             attributes = emptySet(),
-            isCmdLineArg = false,
-            isUnique = false,
+            isCmdLineArg = true,
+            isUnique = true,
         )
     }
 
@@ -6559,8 +6559,8 @@ public class TorConfig private constructor(
             name = "HiddenServiceNonAnonymousMode",
             default = false.byte.toString(),
             attributes = emptySet(),
-            isCmdLineArg = false,
-            isUnique = false,
+            isCmdLineArg = true,
+            isUnique = true,
         )
     }
 
@@ -6575,8 +6575,8 @@ public class TorConfig private constructor(
             name = "PublishHidServDescriptors",
             default = true.byte.toString(),
             attributes = emptySet(),
-            isCmdLineArg = false,
-            isUnique = false,
+            isCmdLineArg = true,
+            isUnique = true,
         )
     }
 

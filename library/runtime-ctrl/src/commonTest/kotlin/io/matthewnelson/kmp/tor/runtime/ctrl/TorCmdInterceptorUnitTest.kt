@@ -17,7 +17,6 @@ package io.matthewnelson.kmp.tor.runtime.ctrl
 
 import io.matthewnelson.kmp.tor.runtime.core.OnFailure
 import io.matthewnelson.kmp.tor.runtime.core.OnSuccess
-import io.matthewnelson.kmp.tor.runtime.core.ThisBlock
 import io.matthewnelson.kmp.tor.runtime.core.TorEvent
 import io.matthewnelson.kmp.tor.runtime.core.UncaughtException
 import io.matthewnelson.kmp.tor.runtime.core.address.Port.Companion.toPort
@@ -25,7 +24,6 @@ import io.matthewnelson.kmp.tor.runtime.core.ctrl.TorCmd
 import io.matthewnelson.kmp.tor.runtime.core.key.ED25519_V3
 import io.matthewnelson.kmp.tor.runtime.core.key.ED25519_V3.PrivateKey.Companion.toED25519_V3PrivateKey
 import io.matthewnelson.kmp.tor.runtime.core.key.ED25519_V3.PublicKey.Companion.toED25519_V3PublicKey
-import io.matthewnelson.kmp.tor.runtime.core.key.X25519
 import io.matthewnelson.kmp.tor.runtime.ctrl.internal.TorCmdJob
 import kotlin.test.*
 
@@ -111,22 +109,16 @@ class TorCmdInterceptorUnitTest {
 
     @Test
     fun givenBlacklistedCmd_whenReplacementAttempted_thenIsIgnored() {
-        var invocationOnionAddExisting = false
-        var invocationOnionAddNew = false
+        var invocationOnionAdd = false
         var invocationOnionDelete = false
 
         val interceptor = TorCmdInterceptor.intercept<TorCmd<*>> { _, cmd ->
             when (cmd) {
-                is TorCmd.Onion.Add.Existing -> TorCmd.Onion.Add.Existing(
+                is TorCmd.Onion.Add -> TorCmd.Onion.Add(
                     key = ByteArray(64) { it.toByte() }.toED25519_V3PrivateKey()
                 ) {
                     port { virtual = 80.toPort() }
-                }.also { invocationOnionAddExisting = true }
-                is TorCmd.Onion.Add.New -> TorCmd.Onion.Add.New(
-                    type = ED25519_V3
-                ) {
-                    port { virtual = 80.toPort() }
-                }.also { invocationOnionAddNew = true }
+                }.also { invocationOnionAdd = true }
                 is TorCmd.Onion.Delete -> TorCmd.Onion.Delete(
                     key = ByteArray(35) { it.toByte() }.toED25519_V3PublicKey()
                 ).also { invocationOnionDelete = true }
@@ -134,27 +126,14 @@ class TorCmdInterceptorUnitTest {
             }
         }
 
-        val jobExisting = newJob(
-            TorCmd.Onion.Add.Existing(
-                key = ByteArray(64) { (it + 2).toByte() }.toED25519_V3PrivateKey()
-            ) {
-                port { virtual = 80.toPort() }
-            },
-        )
-
-        assertNull(interceptor.invoke(jobExisting))
-        assertTrue(invocationOnionAddExisting)
-
-        val jobNew = newJob(
-            TorCmd.Onion.Add.New(
-                type = ED25519_V3
-            ) {
+        val jobAdd = newJob(
+            TorCmd.Onion.Add(ED25519_V3) {
                 port { virtual = 80.toPort() }
             }
         )
 
-        assertNull(interceptor.invoke(jobNew))
-        assertTrue(invocationOnionAddNew)
+        assertNull(interceptor.invoke(jobAdd))
+        assertTrue(invocationOnionAdd)
 
         val jobDelete = newJob(
             TorCmd.Onion.Delete(

@@ -114,9 +114,22 @@ abstract class KeyBaseUnitTest(protected val expectedAlgorithm: String) {
         assertNull(privateKey.base64OrNull())
         assertNull(privateKey.encoded())
 
-        assertFailsWith<IllegalStateException> { privateKey.base16() }
-        assertFailsWith<IllegalStateException> { privateKey.base32() }
-        assertFailsWith<IllegalStateException> { privateKey.base64() }
+        fun assertDestroyed(block: Key.Private.() -> Unit) {
+            try {
+                block(privateKey)
+                fail()
+            } catch (e: IllegalStateException) {
+                val message = e.message
+                assertNotNull(message)
+                assertTrue(message.startsWith(privateKey.algorithm()))
+                assertTrue(message.endsWith("isDestroyed[true]"))
+            }
+        }
+
+        assertDestroyed { encodedOrThrow() }
+        assertDestroyed { base16() }
+        assertDestroyed { base32() }
+        assertDestroyed { base64() }
 
         // Does not throw b/c that'd be awful
         privateKey.toString()
@@ -124,13 +137,15 @@ abstract class KeyBaseUnitTest(protected val expectedAlgorithm: String) {
 
     @Test
     fun givenPublicKey_whenToString_thenFormatIsAsExpected() {
-        val expected = expectedAlgorithm + ".PublicKey[" + publicKey.base32() + "]@" + publicKey.hashCode()
+        val expected = expectedAlgorithm + ".PublicKey[" + publicKey.base32() + "]"
         assertEquals(expected, publicKey.toString())
     }
 
     @Test
     fun givenPrivateKey_whenToString_thenFormatIsAsExpected() {
-        val expected = expectedAlgorithm + ".PrivateKey[REDACTED]@" + privateKey.hashCode()
+        val expected = expectedAlgorithm + ".PrivateKey[isDestroyed=false]@" + privateKey.hashCode()
         assertEquals(expected, privateKey.toString())
+        privateKey.destroy()
+        assertTrue(privateKey.toString().contains("[isDestroyed=true]"))
     }
 }

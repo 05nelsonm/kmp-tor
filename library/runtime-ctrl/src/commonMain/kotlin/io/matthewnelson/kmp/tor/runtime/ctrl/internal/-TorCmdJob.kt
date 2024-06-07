@@ -21,13 +21,8 @@ import io.matthewnelson.immutable.collections.toImmutableList
 import io.matthewnelson.immutable.collections.toImmutableMap
 import io.matthewnelson.immutable.collections.toImmutableSet
 import io.matthewnelson.kmp.file.InterruptedException
-import io.matthewnelson.kmp.tor.runtime.core.address.OnionAddress
-import io.matthewnelson.kmp.tor.runtime.core.address.OnionAddress.Companion.toOnionAddressOrNull
-import io.matthewnelson.kmp.tor.runtime.core.ctrl.AddressMapping
-import io.matthewnelson.kmp.tor.runtime.core.ctrl.ConfigEntry
-import io.matthewnelson.kmp.tor.runtime.core.ctrl.Reply
+import io.matthewnelson.kmp.tor.runtime.core.ctrl.*
 import io.matthewnelson.kmp.tor.runtime.core.ctrl.Reply.Error.Companion.toError
-import io.matthewnelson.kmp.tor.runtime.core.ctrl.TorCmd
 import io.matthewnelson.kmp.tor.runtime.core.key.AddressKey
 import io.matthewnelson.kmp.tor.runtime.core.key.ED25519_V3
 import io.matthewnelson.kmp.tor.runtime.core.key.ED25519_V3.PrivateKey.Companion.toED25519_V3PrivateKeyOrNull
@@ -98,32 +93,10 @@ internal fun TorCmdJob<*>.respond(replies: ArrayList<Reply>) {
 @Throws(NoSuchElementException::class)
 private fun TorCmd.Config.Get.complete(job: TorCmdJob<*>, replies: ArrayList<Reply.Success>) {
     val entries = ArrayList<ConfigEntry>(replies.size)
-
-    for (reply in replies) {
-        if (reply.isOK) continue
-
-        val kvp = reply.message
-        val i = kvp.indexOf('=')
-
-        val keyword = run {
-            val key = if (i == -1) {
-                kvp
-            } else {
-                kvp.substring(0, i)
-            }
-
-            keywords.first { it.name.equals(key, ignoreCase = true) }
-        }
-
-        val setting = if (i == -1) {
-            ""
-        } else {
-            kvp.substring(i + 1)
-        }
-
+    replies.forEachKvp { key, setting ->
+        val keyword = keywords.first { it.name.equals(key, ignoreCase = true) }
         entries.add(ConfigEntry(keyword, setting))
     }
-
     job.unsafeCast<List<ConfigEntry>>().completion(entries.toImmutableList())
 }
 
@@ -141,44 +114,37 @@ private fun TorCmd.MapAddress.complete(job: TorCmdJob<*>, replies: ArrayList<Rep
 
 @Throws(NoSuchElementException::class)
 private fun TorCmd.Onion.Add.complete(job: TorCmdJob<*>, replies: ArrayList<Reply.Success>) {
+    @Suppress("LocalVariableName")
+    var _publicKey: AddressKey.Public? = null
     var privateKey: AddressKey.Private? = null
-    var publicKey: AddressKey.Public? = null
 
     // 250-ServiceID=sampleonion4t2pqglbny66wpovyvao3ylc23eileodtevc4b75ikpad
     // 250-PrivateKey=ED25519-V3:[Blob Redacted]
+    // 250-ClientAuthV3=[Blob Redacted] // TODO
     replies.forEachKvp { key, value ->
         when (key.lowercase()) {
             "serviceid" -> {
-                when (type) {
-                    is ED25519_V3 -> {
-                        publicKey = value.toED25519_V3PublicKeyOrNull()
-                    }
-                }
+                when (keyType) {
+                    is ED25519_V3 -> value.toED25519_V3PublicKeyOrNull()
+                }?.let { _publicKey = it }
             }
             "privatekey" -> {
                 val i = value.indexOf(':')
                 if (i == -1) return@forEachKvp
+
                 val keyString = value.substring(i + 1)
 
-                when (type) {
-                    ED25519_V3 -> {
-                        privateKey = keyString.toED25519_V3PrivateKeyOrNull()
-                    }
-                }
+                when (keyType) {
+                    is ED25519_V3 -> keyString.toED25519_V3PrivateKeyOrNull()
+                }?.let { privateKey = it }
             }
         }
     }
 
-    if (publicKey == null) {
-        throw NoSuchElementException("$type.PublicKey not found")
-    }
+    val publicKey = _publicKey ?: throw NoSuchElementException("$keyType.PublicKey was not found in replies")
 
-    if (privateKey == null && !flags.contains("DiscardPK")) {
-        throw NoSuchElementException("$type.PrivateKey not found and flag DiscardPK was not expressed")
-    }
-
-
-    TODO("Issue #419")
+    val entry = HiddenServiceEntry.of(publicKey, privateKey)
+    job.unsafeCast<HiddenServiceEntry>().completion(entry)
 }
 
 private fun TorCmd.OnionClientAuth.View.complete(job: TorCmdJob<*>, replies: ArrayList<Reply.Success>) {
@@ -207,8 +173,11 @@ private inline fun ArrayList<Reply.Success>.forEachKvp(
 
         val kvp = reply.message
         val i = kvp.indexOf('=')
-        if (i == -1) continue
 
-        block(kvp.substring(0, i), kvp.substring(i + 1))
+        if (i == -1) {
+            block(kvp, "")
+        } else {
+            block(kvp.substring(0, i), kvp.substring(i + 1))
+        }
     }
 }

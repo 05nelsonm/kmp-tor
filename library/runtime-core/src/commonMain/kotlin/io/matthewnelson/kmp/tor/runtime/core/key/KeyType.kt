@@ -22,7 +22,5 @@ public sealed class KeyType<T: Key.Public, V: Key.Private> private constructor()
     public sealed class Address<T: AddressKey.Public, V: AddressKey.Private>: KeyType<T, V>()
     public sealed class Auth<T: AuthKey.Public, V: AuthKey.Private>: KeyType<T, V>()
 
-    // TODO: Factory functions
-
     public final override fun toString(): String = algorithm()
 }

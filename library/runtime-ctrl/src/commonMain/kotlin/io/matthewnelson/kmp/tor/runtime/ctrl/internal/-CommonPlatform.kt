@@ -81,11 +81,11 @@ internal inline fun TorCmd<*>.toJobName(): String {
 internal inline fun <Job: EnqueuedJob> Job.invokeOnCompletionForCmd(
     cmd: TorCmd<*>,
 ): Job {
-    if (cmd is TorCmd.Onion.Add.Existing) {
-        if (cmd.destroyKeyOnJobCompletion) {
-            invokeOnCompletion {
-                cmd.key.destroy()
-            }
+    if (cmd is TorCmd.Onion.Add) {
+        val key = cmd.key
+
+        if (key != null && cmd.destroyKeyOnJobCompletion) {
+            invokeOnCompletion { key.destroy() }
         }
     }
 

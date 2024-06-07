@@ -30,8 +30,8 @@ import kotlin.jvm.JvmSynthetic
  * [TorCmd] should be returned.
  *
  * **NOTE:** The following [TorCmd] **cannot** be replaced:
- *  - [TorCmd.Onion.Add.Existing]
- *  - [TorCmd.Onion.Add.New]
+ *  - [TorCmd.Onion.Add]
+ *  - [TorCmd.Onion.Add]
  *  - [TorCmd.Onion.Delete]
  *
  * e.g.

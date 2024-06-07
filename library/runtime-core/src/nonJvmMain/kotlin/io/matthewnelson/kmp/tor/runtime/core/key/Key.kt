@@ -41,7 +41,7 @@ public actual sealed class Key private actual constructor() {
         public actual abstract fun base32(): String
         public actual abstract fun base64(): String
 
-        public actual final override fun toString(): String = "${algorithm()}.PublicKey[${base32()}]@${hashCode()}"
+        public actual final override fun toString(): String = "${algorithm()}.PublicKey[${base32()}]"
     }
 
     public actual sealed class Private actual constructor(
@@ -69,14 +69,14 @@ public actual sealed class Key private actual constructor() {
         public actual final override fun encoded(): ByteArray? = withKeyOrNull { it.copyOf() }
 
         @Throws(IllegalStateException::class)
-        public actual fun encodedOrThrow(): ByteArray = encoded() ?: throw destroyedException()
+        public actual fun encodedOrThrow(): ByteArray = encoded() ?: throw destroyedException(algorithm())
 
         @Throws(IllegalStateException::class)
-        public actual fun base16(): String = base16OrNull() ?: throw destroyedException()
+        public actual fun base16(): String = base16OrNull() ?: throw destroyedException(algorithm())
         @Throws(IllegalStateException::class)
-        public actual fun base32(): String = base32OrNull() ?: throw destroyedException()
+        public actual fun base32(): String = base32OrNull() ?: throw destroyedException(algorithm())
         @Throws(IllegalStateException::class)
-        public actual fun base64(): String = base64OrNull() ?: throw destroyedException()
+        public actual fun base64(): String = base64OrNull() ?: throw destroyedException(algorithm())
 
         public actual fun base16OrNull(): String? = withKeyOrNull { it.encodeToString(BASE_16) }
         public actual fun base32OrNull(): String? = withKeyOrNull { it.encodeToString(BASE_32) }
@@ -85,12 +85,16 @@ public actual sealed class Key private actual constructor() {
         @OptIn(InternalKmpTorApi::class)
         protected actual fun <T : Any> withKeyOrNull(
             block: (key: ByteArray) -> T
-        ): T? = synchronized(lock) {
-            if (_destroyed) return@synchronized null
-            block(key)
+        ): T? {
+            if (_destroyed) return null
+
+            return synchronized(lock) {
+                if (_destroyed) return@synchronized null
+                block(key)
+            }
         }
 
-        public actual final override fun toString(): String = "${algorithm()}.PrivateKey[REDACTED]@${hashCode()}"
+        public actual final override fun toString(): String = "${algorithm()}.PrivateKey[isDestroyed=$_destroyed]@${hashCode()}"
     }
 
     protected actual companion object {
