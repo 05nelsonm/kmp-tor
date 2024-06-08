@@ -325,7 +325,7 @@ private fun TorCmd.Onion.Delete.encode(LOG: Debugger?): ByteArray {
     }.encodeToByteArray()
 }
 
-@Throws(IllegalArgumentException::class, IllegalStateException::class)
+@Throws(IllegalArgumentException::class)
 private fun TorCmd.OnionClientAuth.Add.encode(LOG: Debugger?): ByteArray {
     require(clientName?.isEmptyOrHasWhitespace() != true) {
         "clientName[$clientName] cannot be empty or contain whitespace"
