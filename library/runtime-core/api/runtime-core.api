@@ -3699,12 +3699,12 @@ public final class io/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$OnionClient
 
 public final class io/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$OnionClientAuth$Add : io/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$Unprivileged {
 	public final field address Lio/matthewnelson/kmp/tor/runtime/core/address/OnionAddress;
-	public final field authKey Lio/matthewnelson/kmp/tor/runtime/core/key/AuthKey$Public;
+	public final field authKey Lio/matthewnelson/kmp/tor/runtime/core/key/AuthKey$Private;
 	public final field clientName Ljava/lang/String;
 	public final field flags Ljava/util/Set;
-	public fun <init> (Lio/matthewnelson/kmp/tor/runtime/core/address/OnionAddress$V3;Lio/matthewnelson/kmp/tor/runtime/core/key/X25519$PublicKey;)V
-	public fun <init> (Lio/matthewnelson/kmp/tor/runtime/core/address/OnionAddress$V3;Lio/matthewnelson/kmp/tor/runtime/core/key/X25519$PublicKey;Ljava/lang/String;)V
-	public fun <init> (Lio/matthewnelson/kmp/tor/runtime/core/address/OnionAddress$V3;Lio/matthewnelson/kmp/tor/runtime/core/key/X25519$PublicKey;Ljava/lang/String;Lio/matthewnelson/kmp/tor/runtime/core/ThisBlock;)V
+	public fun <init> (Lio/matthewnelson/kmp/tor/runtime/core/address/OnionAddress$V3;Lio/matthewnelson/kmp/tor/runtime/core/key/X25519$PrivateKey;)V
+	public fun <init> (Lio/matthewnelson/kmp/tor/runtime/core/address/OnionAddress$V3;Lio/matthewnelson/kmp/tor/runtime/core/key/X25519$PrivateKey;Ljava/lang/String;)V
+	public fun <init> (Lio/matthewnelson/kmp/tor/runtime/core/address/OnionAddress$V3;Lio/matthewnelson/kmp/tor/runtime/core/key/X25519$PrivateKey;Ljava/lang/String;Lio/matthewnelson/kmp/tor/runtime/core/ThisBlock;)V
 }
 
 public final class io/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$OnionClientAuth$Remove : io/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$Unprivileged {

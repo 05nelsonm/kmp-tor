@@ -431,7 +431,7 @@ public sealed class TorCmd<Success: Any> private constructor(
             @JvmField
             public val address: OnionAddress
             @JvmField
-            public val authKey: AuthKey.Public
+            public val authKey: AuthKey.Private
             @JvmField
             public val clientName: String?
             @JvmField
@@ -439,25 +439,25 @@ public sealed class TorCmd<Success: Any> private constructor(
 
             public constructor(
                 address: OnionAddress.V3,
-                authKey: X25519.PublicKey,
+                authKey: X25519.PrivateKey,
             ): this(address, authKey, null, emptySet())
 
             public constructor(
                 address: OnionAddress.V3,
-                authKey: X25519.PublicKey,
+                authKey: X25519.PrivateKey,
                 clientName: String,
             ): this(address, authKey, clientName, emptySet())
 
             public constructor(
                 address: OnionAddress.V3,
-                authKey: X25519.PublicKey,
+                authKey: X25519.PrivateKey,
                 clientName: String?,
                 block: ThisBlock<OnionClientAuthAddFlagBuilder>,
             ): this(address, authKey, clientName, OnionClientAuthAddFlagBuilder.build(block))
 
             private constructor(
                 address: OnionAddress,
-                authKey: AuthKey.Public,
+                authKey: AuthKey.Private,
                 clientName: String?,
                 flags: Set<String>,
             ): super("ONION_CLIENT_AUTH_ADD") {

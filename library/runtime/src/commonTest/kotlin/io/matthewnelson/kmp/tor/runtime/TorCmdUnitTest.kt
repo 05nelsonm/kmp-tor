@@ -243,8 +243,14 @@ class TorCmdUnitTest {
     fun givenOnionClientAuth_whenAdd_thenIsAsExpected() = runTest {
         val authKeys = clientAuthTestKeyPairs()
 
+        var containsRedacted = false
         val runtime = TorRuntime.Builder(testEnv("cmd_oca_add")) {
-//            observerStatic(RuntimeEvent.LOG.DEBUG) { println(it) }
+            observerStatic(RuntimeEvent.LOG.DEBUG) { line ->
+                if (line.contains("x25519:[REDACTED]")) {
+                    containsRedacted = true
+                }
+//                println(line)
+            }
         }.ensureStoppedOnTestCompletion()
 
         runtime.startDaemonAsync()
@@ -252,6 +258,10 @@ class TorCmdUnitTest {
         val entry = runtime.executeAsync(TorCmd.Onion.Add(ED25519_V3) {
             port { virtual = 80.toPort() }
             flags { DiscardPK = true }
+            for (auth in authKeys) {
+                // PublicKey
+                clientAuth(auth.first)
+            }
         })
 
         listOf<Pair<String?, (Reply.Success) -> Unit>>(
@@ -263,14 +273,18 @@ class TorCmdUnitTest {
                 assertIsNot<Reply.Success.OK>(reply)
             }
         ).forEach { (clientName, assertion) ->
+            containsRedacted = false
+
             val result = runtime.executeAsync(
                 TorCmd.OnionClientAuth.Add(
                     entry.publicKey.address() as OnionAddress.V3,
-                    authKeys.first().first,
+                    // PrivateKey
+                    authKeys.first().second,
                     clientName
                 ) {}
             )
 
+            assertTrue(containsRedacted)
             assertion(result)
         }
 
@@ -278,7 +292,8 @@ class TorCmdUnitTest {
             runtime.executeAsync(
                 TorCmd.OnionClientAuth.Add(
                     entry.publicKey.address() as OnionAddress.V3,
-                    authKeys.last().first,
+                    // PrivateKey
+                    authKeys.last().second,
                     null,
                 ) {
                     // Should produce error b/c no directory.

@@ -79,9 +79,9 @@ import kotlin.jvm.JvmStatic
  * */
 public class AddressMapping(from: String, to: String) {
 
-    public constructor(from: IPAddress, to: IPAddress): this(from.canonicalHostName(), to.canonicalHostName())
-    public constructor(from: IPAddress, to: String): this(from.canonicalHostName(), to)
     public constructor(from: String, to: IPAddress): this(from, to.canonicalHostName())
+    public constructor(from: IPAddress, to: String): this(from.canonicalHostName(), to)
+    public constructor(from: IPAddress, to: IPAddress): this(from.canonicalHostName(), to.canonicalHostName())
     public constructor(from: IPAddress, to: OnionAddress): this(from.canonicalHostName(), to.canonicalHostName())
 
     /**
@@ -112,7 +112,7 @@ public class AddressMapping(from: String, to: String) {
 
         /**
          * Creates a [AddressMapping] that instructs tor to generate
-         * a random host value (e.g. 4lr2xdqckbl4nttj.virtual) and
+         * a random host value (e.g. `4lr2xdqckbl4nttj.virtual`) and
          * map the provided string (host name) to it.
          *
          * If the string (host name) is already mapped, tor will return

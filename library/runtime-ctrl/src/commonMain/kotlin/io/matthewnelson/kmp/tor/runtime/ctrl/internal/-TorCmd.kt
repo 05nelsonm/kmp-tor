@@ -325,22 +325,27 @@ private fun TorCmd.Onion.Delete.encode(LOG: Debugger?): ByteArray {
     }.encodeToByteArray()
 }
 
-@Throws(IllegalArgumentException::class)
+@Throws(IllegalArgumentException::class, IllegalStateException::class)
 private fun TorCmd.OnionClientAuth.Add.encode(LOG: Debugger?): ByteArray {
     require(clientName?.isEmptyOrHasWhitespace() != true) {
         "clientName[$clientName] cannot be empty or contain whitespace"
     }
 
+    val privateKey = authKey.base64()
+
     return StringBuilder(keyword).apply {
         SP().append(address)
-        SP().append(authKey.algorithm()).append(':').append(authKey.base64())
+        SP().append(authKey.algorithm()).append(':').append(privateKey)
         clientName?.let { name -> SP().append("ClientName=").append(name) }
         if (flags.isNotEmpty()) {
             SP().append("Flags=")
             flags.joinTo(this, ",")
         }
 
-        LOG.d { ">> ${toString()}" }
+        LOG.d {
+            val log = toString().replace(privateKey, "[REDACTED]")
+            ">> $log"
+        }
 
         CRLF()
     }.encodeToByteArray(fill = true)
