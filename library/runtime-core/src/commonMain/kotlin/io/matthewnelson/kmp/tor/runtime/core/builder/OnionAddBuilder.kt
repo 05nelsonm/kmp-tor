@@ -74,7 +74,7 @@ import kotlin.jvm.JvmSynthetic
  *     // entry.privateKey will not be null because `DiscardPK`
  *     // flag was not defined when created above.
  *     runtime.executeAsync(TorCmd.Onion.Add(
- *         key = entry.privateKey!!,
+ *         addressKey = entry.privateKey!!,
  *         destroyKeyOnJobCompletion = true,
  *     ) {
  *         port {
@@ -86,6 +86,7 @@ import kotlin.jvm.JvmSynthetic
  *         }
  *     })
  *
+ * @see [TorCmd.Onion.Add]
  * @see [HiddenServiceEntry]
  * @see [TorConfig.HiddenServiceMaxStreams]
  * @see [TorConfig.HiddenServicePort]
@@ -93,10 +94,10 @@ import kotlin.jvm.JvmSynthetic
 @KmpTorDsl
 public class OnionAddBuilder private constructor() {
 
-    private val clientAuth = mutableSetOf<AuthKey.Public>()
-    private val flags = mutableSetOf<String>()
+    private val clientAuth = LinkedHashSet<AuthKey.Public>(1, 1.0f)
+    private val flags = LinkedHashSet<String>(1, 1.0f)
     private var maxStreams: TorConfig.LineItem? = null
-    private val ports = mutableSetOf<TorConfig.LineItem>()
+    private val ports = LinkedHashSet<TorConfig.LineItem>(1, 1.0f)
 
     @KmpTorDsl
     public fun port(
@@ -109,12 +110,9 @@ public class OnionAddBuilder private constructor() {
 
     @KmpTorDsl
     public fun clientAuth(
-        key: AuthKey.Public,
+        key: X25519.PublicKey,
     ): OnionAddBuilder {
-        when (key) {
-            is X25519.PublicKey -> "V3Auth"
-        }.let { flags.add(it) }
-
+        flags.add("V3Auth")
         clientAuth.add(key)
         return this
     }

@@ -21,18 +21,18 @@ import io.matthewnelson.kmp.tor.core.resource.SynchronizedObject
 import io.matthewnelson.kmp.tor.core.resource.synchronized
 import io.matthewnelson.kmp.tor.runtime.Action.Companion.startDaemonAsync
 import io.matthewnelson.kmp.tor.runtime.Action.Companion.stopDaemonAsync
-import io.matthewnelson.kmp.tor.runtime.core.OnFailure
-import io.matthewnelson.kmp.tor.runtime.core.OnSuccess
-import io.matthewnelson.kmp.tor.runtime.core.TorConfig
-import io.matthewnelson.kmp.tor.runtime.core.TorEvent
+import io.matthewnelson.kmp.tor.runtime.core.*
 import io.matthewnelson.kmp.tor.runtime.core.address.IPAddress
 import io.matthewnelson.kmp.tor.runtime.core.address.IPAddress.V4.Companion.toIPAddressV4OrNull
 import io.matthewnelson.kmp.tor.runtime.core.address.IPAddress.V6.Companion.toIPAddressV6OrNull
+import io.matthewnelson.kmp.tor.runtime.core.address.OnionAddress
 import io.matthewnelson.kmp.tor.runtime.core.address.Port.Companion.toPort
+import io.matthewnelson.kmp.tor.runtime.core.builder.OnionClientAuthAddBuilder
 import io.matthewnelson.kmp.tor.runtime.core.ctrl.AddressMapping.Companion.mappingToAnyHost
 import io.matthewnelson.kmp.tor.runtime.core.ctrl.AddressMapping.Companion.mappingToAnyHostIPv4
 import io.matthewnelson.kmp.tor.runtime.core.ctrl.AddressMapping.Companion.mappingToAnyHostIPv6
 import io.matthewnelson.kmp.tor.runtime.core.ctrl.ConfigEntry
+import io.matthewnelson.kmp.tor.runtime.core.ctrl.Reply
 import io.matthewnelson.kmp.tor.runtime.core.ctrl.TorCmd
 import io.matthewnelson.kmp.tor.runtime.core.key.ED25519_V3
 import io.matthewnelson.kmp.tor.runtime.core.key.ED25519_V3.PrivateKey.Companion.toED25519_V3PrivateKeyOrNull
@@ -216,7 +216,7 @@ class TorCmdUnitTest {
         runtime.executeAsync(TorCmd.Onion.Delete(entry1.publicKey))
 
         val entry3 = runtime.executeAsync(TorCmd.Onion.Add(
-            key = keyCopy,
+            addressKey = keyCopy,
             destroyKeyOnJobCompletion = false,
         ) {
             for (keys in authKeys) {
@@ -233,6 +233,82 @@ class TorCmdUnitTest {
         authKeys.forEach { (public, _) ->
             assertTrue(entry3.clientAuth.contains(public))
         }
+
+        runtime.stopDaemonAsync()
+    }
+
+    @Test
+    fun givenOnionClientAuth_whenAdd_thenIsAsExpected() = runTest {
+        val authKeys = clientAuthTestKeyPairs()
+
+        var containsRedacted = false
+        val runtime = TorRuntime.Builder(testEnv("cmd_oca_add")) {
+            observerStatic(RuntimeEvent.LOG.DEBUG) { line ->
+                if (line.contains("x25519:[REDACTED]")) {
+                    containsRedacted = true
+                }
+                println(line)
+            }
+        }.ensureStoppedOnTestCompletion()
+
+        runtime.startDaemonAsync()
+
+        val entry = runtime.executeAsync(TorCmd.Onion.Add(ED25519_V3) {
+            port { virtual = 80.toPort() }
+            flags { DiscardPK = true }
+            for (auth in authKeys) {
+                // PublicKey
+                clientAuth(auth.first)
+            }
+        })
+
+        listOf<Pair<String?, (Reply.Success) -> Unit>>(
+            "" to { reply ->
+                assertIs<Reply.Success.OK>(reply)
+            },
+            "123456789012346" to { reply ->
+                // 251 Client for onion existed and replaced
+                assertIsNot<Reply.Success.OK>(reply)
+            },
+            null to { reply ->
+                // 251 Client for onion existed and replaced
+                assertIsNot<Reply.Success.OK>(reply)
+            }
+        ).forEach { (nickname, assertion) ->
+            containsRedacted = false
+
+            val result = runtime.executeAsync(
+                TorCmd.OnionClientAuth.Add(
+                    entry.publicKey.address() as OnionAddress.V3,
+                    // PrivateKey
+                    authKeys.first().second,
+                ) { clientName = nickname }
+            )
+
+            assertTrue(containsRedacted)
+            assertion(result)
+        }
+
+        listOf<ThisBlock<OnionClientAuthAddBuilder>>(
+            // Should produce error because no auth dir
+            // specified in config.
+            ThisBlock { flags { Permanent = true } },
+            ThisBlock { clientName = "12345678901234567" },
+        ).forEach { block ->
+            assertFailsWith<Reply.Error> {
+                runtime.executeAsync(
+                    TorCmd.OnionClientAuth.Add(
+                        entry.publicKey.address() as OnionAddress.V3,
+                        authKeys.last().second,
+                        block
+                    )
+                )
+            }
+        }
+
+        runtime.executeAsync(TorCmd.OnionClientAuth.Remove(
+            entry.publicKey as ED25519_V3.PublicKey
+        )).let { result -> assertIs<Reply.Success.OK>(result) }
 
         runtime.stopDaemonAsync()
     }

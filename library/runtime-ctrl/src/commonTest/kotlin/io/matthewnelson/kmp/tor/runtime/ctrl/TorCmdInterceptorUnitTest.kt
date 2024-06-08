@@ -115,12 +115,13 @@ class TorCmdInterceptorUnitTest {
         val interceptor = TorCmdInterceptor.intercept<TorCmd<*>> { _, cmd ->
             when (cmd) {
                 is TorCmd.Onion.Add -> TorCmd.Onion.Add(
-                    key = ByteArray(64) { it.toByte() }.toED25519_V3PrivateKey()
+                    ByteArray(64) { it.toByte() }.toED25519_V3PrivateKey()
                 ) {
                     port { virtual = 80.toPort() }
                 }.also { invocationOnionAdd = true }
+
                 is TorCmd.Onion.Delete -> TorCmd.Onion.Delete(
-                    key = ByteArray(35) { it.toByte() }.toED25519_V3PublicKey()
+                    addressKey = ByteArray(35) { it.toByte() }.toED25519_V3PublicKey()
                 ).also { invocationOnionDelete = true }
                 else -> cmd
             }
@@ -137,7 +138,7 @@ class TorCmdInterceptorUnitTest {
 
         val jobDelete = newJob(
             TorCmd.Onion.Delete(
-                key = ByteArray(35) { (it + 2).toByte() }.toED25519_V3PublicKey()
+                addressKey = ByteArray(35) { (it + 2).toByte() }.toED25519_V3PublicKey()
             )
         )
 

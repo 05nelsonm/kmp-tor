@@ -3366,7 +3366,7 @@ public final class io/matthewnelson/kmp/tor/runtime/core/builder/IsolationFlagBu
 }
 
 public final class io/matthewnelson/kmp/tor/runtime/core/builder/OnionAddBuilder {
-	public final fun clientAuth (Lio/matthewnelson/kmp/tor/runtime/core/key/AuthKey$Public;)Lio/matthewnelson/kmp/tor/runtime/core/builder/OnionAddBuilder;
+	public final fun clientAuth (Lio/matthewnelson/kmp/tor/runtime/core/key/X25519$PublicKey;)Lio/matthewnelson/kmp/tor/runtime/core/builder/OnionAddBuilder;
 	public final fun flags (Lio/matthewnelson/kmp/tor/runtime/core/ThisBlock;)Lio/matthewnelson/kmp/tor/runtime/core/builder/OnionAddBuilder;
 	public final fun maxStreams (Lio/matthewnelson/kmp/tor/runtime/core/ThisBlock;)Lio/matthewnelson/kmp/tor/runtime/core/builder/OnionAddBuilder;
 	public final fun port (Lio/matthewnelson/kmp/tor/runtime/core/ThisBlock;)Lio/matthewnelson/kmp/tor/runtime/core/builder/OnionAddBuilder;
@@ -3376,6 +3376,15 @@ public final class io/matthewnelson/kmp/tor/runtime/core/builder/OnionAddBuilder
 	public field Detach Ljava/lang/Boolean;
 	public field DiscardPK Ljava/lang/Boolean;
 	public field MaxStreamsCloseCircuit Ljava/lang/Boolean;
+}
+
+public final class io/matthewnelson/kmp/tor/runtime/core/builder/OnionClientAuthAddBuilder {
+	public field clientName Ljava/lang/String;
+	public final fun flags (Lio/matthewnelson/kmp/tor/runtime/core/ThisBlock;)Lio/matthewnelson/kmp/tor/runtime/core/builder/OnionClientAuthAddBuilder;
+}
+
+public final class io/matthewnelson/kmp/tor/runtime/core/builder/OnionClientAuthAddBuilder$FlagBuilder {
+	public field Permanent Ljava/lang/Boolean;
 }
 
 public final class io/matthewnelson/kmp/tor/runtime/core/builder/SocksFlagBuilder {
@@ -3668,10 +3677,10 @@ public final class io/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$Onion {
 }
 
 public final class io/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$Onion$Add : io/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$Unprivileged {
+	public final field addressKey Lio/matthewnelson/kmp/tor/runtime/core/key/AddressKey$Private;
 	public final field clientAuth Ljava/util/Set;
 	public final field destroyKeyOnJobCompletion Z
 	public final field flags Ljava/util/Set;
-	public final field key Lio/matthewnelson/kmp/tor/runtime/core/key/AddressKey$Private;
 	public final field keyType Lio/matthewnelson/kmp/tor/runtime/core/key/KeyType$Address;
 	public final field maxStreams Lio/matthewnelson/kmp/tor/runtime/core/TorConfig$LineItem;
 	public final field ports Ljava/util/Set;
@@ -3694,6 +3703,12 @@ public final class io/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$OnionClient
 }
 
 public final class io/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$OnionClientAuth$Add : io/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$Unprivileged {
+	public final field address Lio/matthewnelson/kmp/tor/runtime/core/address/OnionAddress;
+	public final field authKey Lio/matthewnelson/kmp/tor/runtime/core/key/AuthKey$Private;
+	public final field clientName Ljava/lang/String;
+	public final field flags Ljava/util/Set;
+	public fun <init> (Lio/matthewnelson/kmp/tor/runtime/core/address/OnionAddress$V3;Lio/matthewnelson/kmp/tor/runtime/core/key/X25519$PrivateKey;)V
+	public fun <init> (Lio/matthewnelson/kmp/tor/runtime/core/address/OnionAddress$V3;Lio/matthewnelson/kmp/tor/runtime/core/key/X25519$PrivateKey;Lio/matthewnelson/kmp/tor/runtime/core/ThisBlock;)V
 }
 
 public final class io/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$OnionClientAuth$Remove : io/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$Unprivileged {

@@ -82,7 +82,7 @@ internal inline fun <Job: EnqueuedJob> Job.invokeOnCompletionForCmd(
     cmd: TorCmd<*>,
 ): Job {
     if (cmd is TorCmd.Onion.Add) {
-        val key = cmd.key
+        val key = cmd.addressKey
 
         if (key != null && cmd.destroyKeyOnJobCompletion) {
             invokeOnCompletion { key.destroy() }
