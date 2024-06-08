@@ -144,10 +144,10 @@ public class TorConfig private constructor(
     public open class Builder private constructor(other: TorConfig?) {
 
         @JvmField
-        protected val settings: MutableSet<Setting> = mutableSetOf()
+        protected val settings: MutableSet<Setting> = LinkedHashSet(1, 1.0f)
         // For dealing with inherited disabled port
         @JvmField
-        protected val inheritedDisabledPorts: MutableSet<Setting> = mutableSetOf()
+        protected val inheritedDisabledPorts: MutableSet<Setting> = LinkedHashSet(1, 1.0f)
 
         /**
          * Add an already configured [Setting].
@@ -210,7 +210,7 @@ public class TorConfig private constructor(
 
         init {
             if (other != null) {
-                val disabledPorts = mutableSetOf<Setting>()
+                val disabledPorts = LinkedHashSet<Setting>(1, 1.0f)
 
                 other.settings.forEach { setting ->
                     if (
@@ -316,7 +316,7 @@ public class TorConfig private constructor(
 
         private var argument: String = AUTO
         private var allowReassign = true
-        private val unixFlags = mutableSetOf<String>()
+        private val unixFlags = LinkedHashSet<String>(1, 1.0f)
 
         @KmpTorDsl
         public override fun asPort(
@@ -378,7 +378,7 @@ public class TorConfig private constructor(
 
         private var argument: String = default
         private var allowReassign: Boolean = true
-        private val isolationFlags = mutableSetOf<String>()
+        private val isolationFlags = LinkedHashSet<String>(1, 1.0f)
 
         @KmpTorDsl
         public override fun auto(): __DNSPort {
@@ -444,7 +444,7 @@ public class TorConfig private constructor(
 
         private var argument: String = default
         private var allowReassign: Boolean = true
-        private val isolationFlags = mutableSetOf<String>()
+        private val isolationFlags = LinkedHashSet<String>(1, 1.0f)
 
         @KmpTorDsl
         public override fun auto(): __HTTPTunnelPort {
@@ -510,9 +510,9 @@ public class TorConfig private constructor(
 
         private var argument: String = default
         private var allowReassign = true
-        private val socksFlags = mutableSetOf<String>()
-        private val unixFlags = mutableSetOf<String>()
-        private val isolationFlags = mutableSetOf<String>()
+        private val socksFlags = LinkedHashSet<String>(1, 1.0f)
+        private val unixFlags = LinkedHashSet<String>(1, 1.0f)
+        private val isolationFlags = LinkedHashSet<String>(1, 1.0f)
 
         @KmpTorDsl
         public override fun asPort(
@@ -597,7 +597,7 @@ public class TorConfig private constructor(
 
         private var port: String = default
         private var allowReassign: Boolean = true
-        private val isolationFlags = mutableSetOf<String>()
+        private val isolationFlags = LinkedHashSet<String>(1, 1.0f)
 
         @KmpTorDsl
         public override fun auto(): __TransPort {
@@ -963,7 +963,7 @@ public class TorConfig private constructor(
         keyword = Companion,
     ) {
 
-        private val suffixes = mutableSetOf<String>()
+        private val suffixes = LinkedHashSet<String>(1, 1.0f)
 
         /**
          * Add a single suffix (e.g. ".exit")
@@ -1396,7 +1396,7 @@ public class TorConfig private constructor(
         keyword = Companion,
     ) {
 
-        private val ports = mutableSetOf<LineItem>()
+        private val ports = LinkedHashSet<LineItem>(1, 1.0f)
         private var version: LineItem? = null
         private var allowUnknownPorts: LineItem = DEFAULT_ALLOW_UNKNOWN_PORTS
 //        private var exportCircuitID: LineItem = DEFAULT_EXPORT_CIRCUIT_ID

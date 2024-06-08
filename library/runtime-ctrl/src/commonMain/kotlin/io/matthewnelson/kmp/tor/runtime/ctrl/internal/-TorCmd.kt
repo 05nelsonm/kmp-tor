@@ -236,10 +236,10 @@ private fun TorCmd.MapAddress.encode(LOG: Debugger?): ByteArray {
     return StringBuilder(keyword).apply {
         mappings.forEach { mapping ->
             require(!mapping.from.isEmptyOrHasWhitespace()) {
-                "AddressMapping.from[${mapping.from}] cannot be empty or contain whitespace"
+                "from[${mapping.from}] cannot be empty or contain whitespace"
             }
             require(!mapping.to.isEmptyOrHasWhitespace()) {
-                "AddressMapping.to[${mapping.to}] cannot be empty or contain whitespace"
+                "to[${mapping.to}] cannot be empty or contain whitespace"
             }
 
             SP().append(mapping.from).append('=').append(mapping.to)
@@ -253,7 +253,7 @@ private fun TorCmd.MapAddress.encode(LOG: Debugger?): ByteArray {
 @Throws(IllegalArgumentException::class, IllegalStateException::class)
 private fun TorCmd.Onion.Add.encode(LOG: Debugger?): ByteArray {
     require(ports.isNotEmpty()) { "At minimum of 1 port is required" }
-    val privateKey = key?.base64()
+    val privateKey = addressKey?.base64()
 
     return StringBuilder(keyword).apply {
         SP()
@@ -325,8 +325,25 @@ private fun TorCmd.Onion.Delete.encode(LOG: Debugger?): ByteArray {
     }.encodeToByteArray()
 }
 
+@Throws(IllegalArgumentException::class, IllegalStateException::class)
 private fun TorCmd.OnionClientAuth.Add.encode(LOG: Debugger?): ByteArray {
-    TODO("Issue #420")
+    require(clientName?.isEmptyOrHasWhitespace() != true) {
+        "clientName[$clientName] cannot be empty or contain whitespace"
+    }
+
+    return StringBuilder(keyword).apply {
+        SP().append(address)
+        SP().append(authKey.algorithm()).append(':').append(authKey.base64())
+        clientName?.let { name -> SP().append("ClientName=").append(name) }
+        if (flags.isNotEmpty()) {
+            SP().append("Flags=")
+            flags.joinTo(this, ",")
+        }
+
+        LOG.d { ">> ${toString()}" }
+
+        CRLF()
+    }.encodeToByteArray(fill = true)
 }
 
 private fun TorCmd.OnionClientAuth.Remove.encode(LOG: Debugger?): ByteArray {

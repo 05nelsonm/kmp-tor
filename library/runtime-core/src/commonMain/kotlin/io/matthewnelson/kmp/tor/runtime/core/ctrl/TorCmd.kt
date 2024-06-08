@@ -26,10 +26,8 @@ import io.matthewnelson.kmp.tor.runtime.core.address.IPAddress
 import io.matthewnelson.kmp.tor.runtime.core.address.OnionAddress
 import io.matthewnelson.kmp.tor.runtime.core.builder.OnionAddBuilder
 import io.matthewnelson.kmp.tor.runtime.core.builder.OnionAddBuilder.Companion.configure
-import io.matthewnelson.kmp.tor.runtime.core.key.AddressKey
-import io.matthewnelson.kmp.tor.runtime.core.key.AuthKey
-import io.matthewnelson.kmp.tor.runtime.core.key.ED25519_V3
-import io.matthewnelson.kmp.tor.runtime.core.key.KeyType
+import io.matthewnelson.kmp.tor.runtime.core.builder.OnionClientAuthAddFlagBuilder
+import io.matthewnelson.kmp.tor.runtime.core.key.*
 import kotlin.coroutines.cancellation.CancellationException
 import kotlin.jvm.JvmField
 
@@ -120,9 +118,7 @@ public sealed class TorCmd<Success: Any> private constructor(
             public val keywords: kotlin.collections.Set<TorConfig.Keyword>
 
             public constructor(keyword: TorConfig.Keyword): this(immutableSetOf(keyword))
-
             public constructor(vararg keywords: TorConfig.Keyword): this(immutableSetOf(*keywords))
-
             public constructor(keywords: Collection<TorConfig.Keyword>): super("GETCONF") {
                 this.keywords = keywords.toImmutableSet()
             }
@@ -149,9 +145,7 @@ public sealed class TorCmd<Success: Any> private constructor(
             public val keywords: kotlin.collections.Set<TorConfig.Keyword>
 
             public constructor(keyword: TorConfig.Keyword): this(immutableSetOf(keyword))
-
             public constructor(vararg keywords: TorConfig.Keyword): this(immutableSetOf(*keywords))
-
             public constructor(keywords: Collection<TorConfig.Keyword>): super("RESETCONF") {
                 this.keywords = keywords.toImmutableSet()
             }
@@ -162,13 +156,16 @@ public sealed class TorCmd<Success: Any> private constructor(
          *
          * [docs](https://spec.torproject.org/control-spec/commands.html#saveconf)
          * */
-        public class Save(
+        public class Save: Privileged<Reply.Success.OK> {
+
             @JvmField
-            public val force: Boolean,
-        ): Privileged<Reply.Success.OK>("SAVECONF") {
+            public val force: Boolean
 
             /** Default of [force] = `false` */
             public constructor(): this(force = false)
+            public constructor(force: Boolean): super("SAVECONF") {
+                this.force = force
+            }
         }
 
         /**
@@ -182,11 +179,8 @@ public sealed class TorCmd<Success: Any> private constructor(
             public val settings: kotlin.collections.Set<TorConfig.Setting>
 
             public constructor(block: ThisBlock<TorConfig.Builder>): this(TorConfig.Builder(block).settings)
-
             public constructor(setting: TorConfig.Setting): this(immutableSetOf(setting))
-
             public constructor(vararg settings: TorConfig.Setting): this(immutableSetOf(*settings))
-
             public constructor(settings: Collection<TorConfig.Setting>): super("SETCONF") {
                 this.settings = settings.toImmutableSet()
             }
@@ -214,17 +208,38 @@ public sealed class TorCmd<Success: Any> private constructor(
             @JvmField
             public val servers: Set<String>
 
-            public constructor(key: AddressKey.Public): this(key.address())
+            public constructor(addressKey: AddressKey.Public): this(addressKey.address())
             public constructor(address: OnionAddress): this(address, emptySet())
 
-            public constructor(key: AddressKey.Public, server: String): this(key.address(), server)
-            public constructor(address: OnionAddress, server: String): this(address, immutableSetOf(server))
+            public constructor(
+                addressKey: AddressKey.Public,
+                server: String,
+            ): this(addressKey.address(), server)
 
-            public constructor(key: AddressKey.Public, vararg servers: String): this(key, immutableSetOf(*servers))
-            public constructor(address: OnionAddress, vararg servers: String): this(address, immutableSetOf(*servers))
+            public constructor(
+                address: OnionAddress,
+                server: String,
+            ): this(address, immutableSetOf(server))
 
-            public constructor(key: AddressKey.Public, servers: Collection<String>): this(key.address(), servers)
-            public constructor(address: OnionAddress, servers: Collection<String>): super("HSFETCH") {
+            public constructor(
+                addressKey: AddressKey.Public,
+                vararg servers: String,
+            ): this(addressKey, immutableSetOf(*servers))
+
+            public constructor(
+                address: OnionAddress,
+                vararg servers: String,
+            ): this(address, immutableSetOf(*servers))
+
+            public constructor(
+                addressKey: AddressKey.Public,
+                servers: Collection<String>,
+            ): this(addressKey.address(), servers)
+
+            public constructor(
+                address: OnionAddress,
+                servers: Collection<String>,
+            ): super("HSFETCH") {
                 this.address = address
                 this.servers = servers.toImmutableSet()
             }
@@ -251,9 +266,7 @@ public sealed class TorCmd<Success: Any> private constructor(
             public val keywords: Set<String>
 
             public constructor(keyword: String): this(immutableSetOf(keyword))
-
             public constructor(vararg keywords: String): this(immutableSetOf(*keywords))
-
             public constructor(keywords: Collection<String>): super("GETINFO") {
                 this.keywords = keywords.toImmutableSet()
             }
@@ -278,9 +291,7 @@ public sealed class TorCmd<Success: Any> private constructor(
         public val mappings: Set<AddressMapping>
 
         public constructor(mapping: AddressMapping): this(immutableSetOf(mapping))
-
         public constructor(vararg mappings: AddressMapping): this(immutableSetOf(*mappings))
-
         public constructor(mappings: Collection<AddressMapping>): super("MAPADDRESS") {
             this.mappings = mappings.toImmutableSet()
         }
@@ -298,7 +309,7 @@ public sealed class TorCmd<Success: Any> private constructor(
             @JvmField
             public val keyType: KeyType.Address<*, *>
             @JvmField
-            public val key: AddressKey.Private?
+            public val addressKey: AddressKey.Private?
             @JvmField
             public val clientAuth: Set<AuthKey.Public>
             @JvmField
@@ -331,7 +342,7 @@ public sealed class TorCmd<Success: Any> private constructor(
             /**
              * Creates an [Onion.Add] command that will instruct tor
              * to add a HiddenService to its runtime for the provided
-             * [key].
+             * [addressKey].
              *
              * **NOTE:** Default of [destroyKeyOnJobCompletion] = `true`
              *
@@ -346,19 +357,19 @@ public sealed class TorCmd<Success: Any> private constructor(
              * @see [ED25519_V3.PrivateKey]
              * */
             public constructor(
-                key: AddressKey.Private,
+                addressKey: AddressKey.Private,
                 block: ThisBlock<OnionAddBuilder>,
-            ): this(key, true, block)
+            ): this(addressKey, true, block)
 
             /**
              * Creates an [Onion.Add] command that will instruct tor
              * to add a HiddenService to its runtime for the provided
-             * [key].
+             * [addressKey].
              *
              * e.g.
              *
              *     TorCmd.Onion.Add(
-             *         key = "[Blob Redacted]".toED25519_V3PrivateKey(),
+             *         addressKey = "[Blob Redacted]".toED25519_V3PrivateKey(),
              *         destroyKeyOnJobCompletion = false,
              *     ) {
              *         port { virtual = 80.toPort() }
@@ -366,23 +377,23 @@ public sealed class TorCmd<Success: Any> private constructor(
              *
              * @param [destroyKeyOnJobCompletion] If `true`, when the [EnqueuedJob]
              *   completes (either by success or cancellation/error) for this
-             *   command, the provided [key] will be destroyed automatically.
+             *   command, the provided [addressKey] will be destroyed automatically.
              * @see [OnionAddBuilder]
              * @see [ED25519_V3.PrivateKey]
              * */
             public constructor(
-                key: AddressKey.Private,
+                addressKey: AddressKey.Private,
                 destroyKeyOnJobCompletion: Boolean,
                 block: ThisBlock<OnionAddBuilder>,
-            ): this(key, destroyKeyOnJobCompletion, key.type().configure(block))
+            ): this(addressKey, destroyKeyOnJobCompletion, addressKey.type().configure(block))
 
             private constructor(
-                key: AddressKey.Private?,
+                addressKey: AddressKey.Private?,
                 destroyKeyOnJobCompletion: Boolean,
                 arguments: OnionAddBuilder.Arguments,
             ): super("ADD_ONION") {
                 this.keyType = arguments.keyType
-                this.key = key
+                this.addressKey = addressKey
                 this.clientAuth = arguments.clientAuth
                 this.flags = arguments.flags
                 this.maxStreams = arguments.maxStreams
@@ -396,12 +407,15 @@ public sealed class TorCmd<Success: Any> private constructor(
          *
          * [docs](https://spec.torproject.org/control-spec/commands.html#del_onion)
          * */
-        public class Delete(
-            @JvmField
-            public val address: OnionAddress,
-        ): Unprivileged<Reply.Success>("DEL_ONION") {
+        public class Delete: Unprivileged<Reply.Success> {
 
-            public constructor(key: AddressKey.Public): this(key.address())
+            @JvmField
+            public val address: OnionAddress
+
+            public constructor(addressKey: AddressKey.Public): this(addressKey.address())
+            public constructor(address: OnionAddress): super("DEL_ONION") {
+                this.address = address
+            }
         }
     }
 
@@ -412,23 +426,63 @@ public sealed class TorCmd<Success: Any> private constructor(
          *
          * [docs](https://spec.torproject.org/control-spec/commands.html#onion_client_auth_add)
          * */
-        public class Add private constructor(
-            // TODO: Issue #420
-        ): Unprivileged<Reply.Success>("ONION_CLIENT_AUTH_ADD")
+        public class Add: Unprivileged<Reply.Success> {
+
+            @JvmField
+            public val address: OnionAddress
+            @JvmField
+            public val authKey: AuthKey.Public
+            @JvmField
+            public val clientName: String?
+            @JvmField
+            public val flags: Set<String>
+
+            public constructor(
+                address: OnionAddress.V3,
+                authKey: X25519.PublicKey,
+            ): this(address, authKey, null, emptySet())
+
+            public constructor(
+                address: OnionAddress.V3,
+                authKey: X25519.PublicKey,
+                clientName: String,
+            ): this(address, authKey, clientName, emptySet())
+
+            public constructor(
+                address: OnionAddress.V3,
+                authKey: X25519.PublicKey,
+                clientName: String?,
+                block: ThisBlock<OnionClientAuthAddFlagBuilder>,
+            ): this(address, authKey, clientName, OnionClientAuthAddFlagBuilder.build(block))
+
+            private constructor(
+                address: OnionAddress,
+                authKey: AuthKey.Public,
+                clientName: String?,
+                flags: Set<String>,
+            ): super("ONION_CLIENT_AUTH_ADD") {
+                this.address = address
+                this.authKey = authKey
+                this.clientName = clientName
+                this.flags = flags
+            }
+        }
 
         /**
          * "ONION_CLIENT_AUTH_REMOVE"
          *
          * [docs](https://spec.torproject.org/control-spec/commands.html#onion_client_auth_remove)
          * */
-        public class Remove private constructor(
+        public class Remove: Unprivileged<Reply.Success> {
+
             @JvmField
-            public val address: OnionAddress,
-        ): Unprivileged<Reply.Success>("ONION_CLIENT_AUTH_REMOVE") {
+            public val address: OnionAddress
 
             public constructor(key: ED25519_V3.PublicKey): this(key.address())
-
             public constructor(address: OnionAddress.V3): this(address as OnionAddress)
+            private constructor(address: OnionAddress): super("ONION_CLIENT_AUTH_REMOVE") {
+                this.address = address
+            }
         }
 
         /**
@@ -442,9 +496,7 @@ public sealed class TorCmd<Success: Any> private constructor(
             public val address: OnionAddress?
 
             public constructor(key: ED25519_V3.PublicKey): this(key.address())
-
             public constructor(address: OnionAddress.V3): this(address as OnionAddress)
-
             private constructor(address: OnionAddress?): super("ONION_CLIENT_AUTH_VIEW") {
                 this.address = address
             }
@@ -486,17 +538,18 @@ public sealed class TorCmd<Success: Any> private constructor(
      *
      * [docs](https://spec.torproject.org/control-spec/commands.html#resolve)
      * */
-    public class Resolve(
-        @JvmField
-        public val hostname: String,
-        @JvmField
-        public val reverse: Boolean,
-    ): Unprivileged<Reply.Success.OK>("RESOLVE") {
+    public class Resolve: Unprivileged<Reply.Success.OK> {
 
-        public constructor(
-            address: IPAddress.V4,
-            reverse: Boolean,
-        ): this(address.canonicalHostName(), reverse)
+        @JvmField
+        public val hostname: String
+        @JvmField
+        public val reverse: Boolean
+
+        public constructor(address: IPAddress.V4, reverse: Boolean): this(address.canonicalHostName(), reverse)
+        public constructor(hostname: String, reverse: Boolean): super("RESOLVE") {
+            this.hostname = hostname
+            this.reverse = reverse
+        }
     }
 
     /**
@@ -510,11 +563,8 @@ public sealed class TorCmd<Success: Any> private constructor(
         public val events: Set<TorEvent>
 
         public constructor(): this(emptySet())
-
         public constructor(event: TorEvent): this(immutableSetOf(event))
-
         public constructor(vararg events: TorEvent): this(immutableSetOf(*events))
-
         public constructor(events: Collection<TorEvent>): super("SETEVENTS") {
             this.events = events.toImmutableSet()
         }
