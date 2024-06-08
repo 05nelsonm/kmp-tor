@@ -21,15 +21,13 @@ import io.matthewnelson.kmp.tor.core.resource.SynchronizedObject
 import io.matthewnelson.kmp.tor.core.resource.synchronized
 import io.matthewnelson.kmp.tor.runtime.Action.Companion.startDaemonAsync
 import io.matthewnelson.kmp.tor.runtime.Action.Companion.stopDaemonAsync
-import io.matthewnelson.kmp.tor.runtime.core.OnFailure
-import io.matthewnelson.kmp.tor.runtime.core.OnSuccess
-import io.matthewnelson.kmp.tor.runtime.core.TorConfig
-import io.matthewnelson.kmp.tor.runtime.core.TorEvent
+import io.matthewnelson.kmp.tor.runtime.core.*
 import io.matthewnelson.kmp.tor.runtime.core.address.IPAddress
 import io.matthewnelson.kmp.tor.runtime.core.address.IPAddress.V4.Companion.toIPAddressV4OrNull
 import io.matthewnelson.kmp.tor.runtime.core.address.IPAddress.V6.Companion.toIPAddressV6OrNull
 import io.matthewnelson.kmp.tor.runtime.core.address.OnionAddress
 import io.matthewnelson.kmp.tor.runtime.core.address.Port.Companion.toPort
+import io.matthewnelson.kmp.tor.runtime.core.builder.OnionClientAuthAddBuilder
 import io.matthewnelson.kmp.tor.runtime.core.ctrl.AddressMapping.Companion.mappingToAnyHost
 import io.matthewnelson.kmp.tor.runtime.core.ctrl.AddressMapping.Companion.mappingToAnyHostIPv4
 import io.matthewnelson.kmp.tor.runtime.core.ctrl.AddressMapping.Companion.mappingToAnyHostIPv6
@@ -249,7 +247,7 @@ class TorCmdUnitTest {
                 if (line.contains("x25519:[REDACTED]")) {
                     containsRedacted = true
                 }
-//                println(line)
+                println(line)
             }
         }.ensureStoppedOnTestCompletion()
 
@@ -265,14 +263,18 @@ class TorCmdUnitTest {
         })
 
         listOf<Pair<String?, (Reply.Success) -> Unit>>(
-            "bob" to { reply ->
+            "" to { reply ->
                 assertIs<Reply.Success.OK>(reply)
+            },
+            "123456789012346" to { reply ->
+                // 251 Client for onion existed and replaced
+                assertIsNot<Reply.Success.OK>(reply)
             },
             null to { reply ->
                 // 251 Client for onion existed and replaced
                 assertIsNot<Reply.Success.OK>(reply)
             }
-        ).forEach { (clientName, assertion) ->
+        ).forEach { (nickname, assertion) ->
             containsRedacted = false
 
             val result = runtime.executeAsync(
@@ -280,26 +282,28 @@ class TorCmdUnitTest {
                     entry.publicKey.address() as OnionAddress.V3,
                     // PrivateKey
                     authKeys.first().second,
-                    clientName
-                ) {}
+                ) { clientName = nickname }
             )
 
             assertTrue(containsRedacted)
             assertion(result)
         }
 
-        assertFailsWith<Reply.Error> {
-            runtime.executeAsync(
-                TorCmd.OnionClientAuth.Add(
-                    entry.publicKey.address() as OnionAddress.V3,
-                    // PrivateKey
-                    authKeys.last().second,
-                    null,
-                ) {
-                    // Should produce error b/c no directory.
-                    Permanent = true
-                }
-            )
+        listOf<ThisBlock<OnionClientAuthAddBuilder>>(
+            // Should produce error because no auth dir
+            // specified in config.
+            ThisBlock { flags { Permanent = true } },
+            ThisBlock { clientName = "12345678901234567" },
+        ).forEach { block ->
+            assertFailsWith<Reply.Error> {
+                runtime.executeAsync(
+                    TorCmd.OnionClientAuth.Add(
+                        entry.publicKey.address() as OnionAddress.V3,
+                        authKeys.last().second,
+                        block
+                    )
+                )
+            }
         }
 
         runtime.executeAsync(TorCmd.OnionClientAuth.Remove(

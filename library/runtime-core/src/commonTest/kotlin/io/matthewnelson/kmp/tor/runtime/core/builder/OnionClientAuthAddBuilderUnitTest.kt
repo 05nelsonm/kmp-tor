@@ -18,11 +18,12 @@ package io.matthewnelson.kmp.tor.runtime.core.builder
 import kotlin.test.Test
 import kotlin.test.assertTrue
 
-class OnionClientAuthAddFlagBuilderUnitTest {
+class OnionClientAuthAddBuilderUnitTest {
 
     @Test
     fun givenFlags_whenEnabled_thenArePresent() {
-        val flags = OnionClientAuthAddFlagBuilder.build {
+        val flags = mutableSetOf<String>()
+        OnionClientAuthAddBuilder.FlagBuilder.configure(flags) {
             Permanent = true
         }
 

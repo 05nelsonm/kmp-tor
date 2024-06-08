@@ -26,7 +26,7 @@ import io.matthewnelson.kmp.tor.runtime.core.address.IPAddress
 import io.matthewnelson.kmp.tor.runtime.core.address.OnionAddress
 import io.matthewnelson.kmp.tor.runtime.core.builder.OnionAddBuilder
 import io.matthewnelson.kmp.tor.runtime.core.builder.OnionAddBuilder.Companion.configure
-import io.matthewnelson.kmp.tor.runtime.core.builder.OnionClientAuthAddFlagBuilder
+import io.matthewnelson.kmp.tor.runtime.core.builder.OnionClientAuthAddBuilder
 import io.matthewnelson.kmp.tor.runtime.core.key.*
 import kotlin.coroutines.cancellation.CancellationException
 import kotlin.jvm.JvmField
@@ -440,31 +440,23 @@ public sealed class TorCmd<Success: Any> private constructor(
             public constructor(
                 address: OnionAddress.V3,
                 authKey: X25519.PrivateKey,
-            ): this(address, authKey, null, emptySet())
+            ): this(address, authKey, OnionClientAuthAddBuilder.Arguments.EMPTY)
 
             public constructor(
                 address: OnionAddress.V3,
                 authKey: X25519.PrivateKey,
-                clientName: String,
-            ): this(address, authKey, clientName, emptySet())
-
-            public constructor(
-                address: OnionAddress.V3,
-                authKey: X25519.PrivateKey,
-                clientName: String?,
-                block: ThisBlock<OnionClientAuthAddFlagBuilder>,
-            ): this(address, authKey, clientName, OnionClientAuthAddFlagBuilder.build(block))
+                block: ThisBlock<OnionClientAuthAddBuilder>,
+            ): this(address, authKey, OnionClientAuthAddBuilder.configure(block))
 
             private constructor(
                 address: OnionAddress,
                 authKey: AuthKey.Private,
-                clientName: String?,
-                flags: Set<String>,
+                arguments: OnionClientAuthAddBuilder.Arguments,
             ): super("ONION_CLIENT_AUTH_ADD") {
                 this.address = address
                 this.authKey = authKey
-                this.clientName = clientName
-                this.flags = flags
+                this.clientName = arguments.clientName
+                this.flags = arguments.flags
             }
         }
 
