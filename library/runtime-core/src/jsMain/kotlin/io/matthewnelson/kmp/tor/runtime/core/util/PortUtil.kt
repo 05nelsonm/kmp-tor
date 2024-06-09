@@ -35,10 +35,7 @@ import kotlin.time.TimeSource
  * Checks if the TCP port is available on [LocalHost] or not.
  *
  * @param [host] either [LocalHost.IPv4] or [LocalHost.IPv6]
- * @throws [IOException] if [LocalHost.resolve] fails
- * @throws [CancellationException] if underlying coroutine was cancelled
  * */
-// @Throws(IOException::class, CancellationException::class)
 public actual suspend fun Port.isAvailableAsync(
     host: LocalHost,
 ): Boolean = host.resolve()
@@ -55,7 +52,7 @@ public actual suspend fun Port.isAvailableAsync(
  * @param [host] either [LocalHost.IPv4] or [LocalHost.IPv6]
  * @param [limit] the number of ports to scan. min: 1, max: 1_000
  * @throws [IllegalArgumentException] if [limit] is not between 1 and 1_000 (inclusive)
- * @throws [IOException] if [LocalHost.resolve] fails, or no ports are available
+ * @throws [IOException] if no ports are available
  * @throws [CancellationException] if underlying coroutine was cancelled
  * */
 // @Throws(IOException::class, CancellationException::class)

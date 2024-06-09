@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-@file:JvmName("JobUtil")
+@file:JvmName("EnqueuedJobUtil")
 
 package io.matthewnelson.kmp.tor.runtime.core.util
 

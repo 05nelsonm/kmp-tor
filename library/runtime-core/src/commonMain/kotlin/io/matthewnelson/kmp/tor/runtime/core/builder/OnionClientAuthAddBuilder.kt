@@ -114,7 +114,7 @@ public class OnionClientAuthAddBuilder private constructor() {
 
         internal companion object {
 
-            internal val EMPTY = Arguments(null, true, emptySet())
+            internal val DEFAULT = Arguments(null, true, emptySet())
         }
     }
 }
