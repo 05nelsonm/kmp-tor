@@ -207,11 +207,7 @@ public actual interface TorCtrl : Destroyable, TorEvent.Processor, TorCmd.Privil
                 throw t.wrapIOException()
             }
 
-            var disposed = false
-            val disposable = Disposable {
-                if (disposed) return@Disposable
-                disposed = true
-
+            val executable = Executable.Once.of(concurrent = true) {
                 @OptIn(DelicateCoroutinesApi::class)
                 GlobalScope.launch(CLOSE_DISPATCHER) {
                     delay(250.milliseconds)
@@ -219,7 +215,7 @@ public actual interface TorCtrl : Destroyable, TorEvent.Processor, TorCmd.Privil
                 }
             }
 
-            return RealTorCtrl.of(this, dispatcher, disposable, connection)
+            return RealTorCtrl.of(this, dispatcher, executable, connection)
         }
 
         /**
