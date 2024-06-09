@@ -215,10 +215,10 @@ class TorCmdUnitTest {
 
         runtime.executeAsync(TorCmd.Onion.Delete(entry1.publicKey))
 
-        val entry3 = runtime.executeAsync(TorCmd.Onion.Add(
-            addressKey = keyCopy,
-            destroyKeyOnJobCompletion = false,
-        ) {
+        val entry3 = runtime.executeAsync(TorCmd.Onion.Add(keyCopy) {
+
+            destroyKeyOnJobCompletion = false
+
             for (keys in authKeys) {
                 clientAuth(keys.first)
             }
@@ -247,7 +247,7 @@ class TorCmdUnitTest {
                 if (line.contains("x25519:[REDACTED]")) {
                     containsRedacted = true
                 }
-                println(line)
+//                println(line)
             }
         }.ensureStoppedOnTestCompletion()
 
@@ -282,7 +282,10 @@ class TorCmdUnitTest {
                     entry.publicKey.address() as OnionAddress.V3,
                     // PrivateKey
                     authKeys.first().second,
-                ) { clientName = nickname }
+                ) {
+                    clientName = nickname
+                    destroyKeyOnJobCompletion = false
+                }
             )
 
             assertTrue(containsRedacted)
@@ -300,8 +303,10 @@ class TorCmdUnitTest {
                     TorCmd.OnionClientAuth.Add(
                         entry.publicKey.address() as OnionAddress.V3,
                         authKeys.last().second,
-                        block
-                    )
+                    ) {
+                        destroyKeyOnJobCompletion = false
+                        this.apply(block)
+                    }
                 )
             }
         }

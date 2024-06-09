@@ -19,9 +19,11 @@ package io.matthewnelson.kmp.tor.runtime.core.builder
 
 import io.matthewnelson.immutable.collections.toImmutableSet
 import io.matthewnelson.kmp.tor.core.api.annotation.KmpTorDsl
+import io.matthewnelson.kmp.tor.runtime.core.EnqueuedJob
 import io.matthewnelson.kmp.tor.runtime.core.ThisBlock
 import io.matthewnelson.kmp.tor.runtime.core.apply
 import io.matthewnelson.kmp.tor.runtime.core.ctrl.TorCmd
+import io.matthewnelson.kmp.tor.runtime.core.key.AuthKey
 import kotlin.jvm.JvmField
 import kotlin.jvm.JvmSynthetic
 
@@ -36,6 +38,17 @@ public class OnionClientAuthAddBuilder private constructor() {
      * */
     @JvmField
     public var clientName: String? = null
+
+    /**
+     * When true, an [EnqueuedJob.invokeOnCompletion] handler is
+     * automatically set which calls [AuthKey.Private.destroy]
+     * once the job completes, either successfully or by
+     * cancellation/error.
+     *
+     * Default = `true`
+     * */
+    @JvmField
+    public var destroyKeyOnJobCompletion: Boolean = true
 
     @KmpTorDsl
     public fun flags(
@@ -74,6 +87,7 @@ public class OnionClientAuthAddBuilder private constructor() {
             }
         }
     }
+
     internal companion object {
 
         @JvmSynthetic
@@ -82,12 +96,17 @@ public class OnionClientAuthAddBuilder private constructor() {
         ): Arguments {
             val b = OnionClientAuthAddBuilder().apply(block)
 
-            return Arguments(b.clientName, b.flags)
+            return Arguments(
+                clientName = b.clientName,
+                destroyKeyOnJobCompletion = b.destroyKeyOnJobCompletion,
+                flags = b.flags,
+            )
         }
     }
 
     internal class Arguments internal constructor(
         internal val clientName: String?,
+        internal val destroyKeyOnJobCompletion: Boolean,
         flags: Set<String>,
     ) {
 
@@ -95,7 +114,7 @@ public class OnionClientAuthAddBuilder private constructor() {
 
         internal companion object {
 
-            internal val EMPTY = Arguments(null, emptySet())
+            internal val EMPTY = Arguments(null, true, emptySet())
         }
     }
 }

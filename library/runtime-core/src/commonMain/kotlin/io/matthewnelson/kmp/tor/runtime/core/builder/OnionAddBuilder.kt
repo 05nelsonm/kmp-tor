@@ -19,6 +19,7 @@ package io.matthewnelson.kmp.tor.runtime.core.builder
 
 import io.matthewnelson.immutable.collections.toImmutableSet
 import io.matthewnelson.kmp.tor.core.api.annotation.KmpTorDsl
+import io.matthewnelson.kmp.tor.runtime.core.EnqueuedJob
 import io.matthewnelson.kmp.tor.runtime.core.ThisBlock
 import io.matthewnelson.kmp.tor.runtime.core.TorConfig
 import io.matthewnelson.kmp.tor.runtime.core.TorConfig.HiddenServiceMaxStreams
@@ -26,6 +27,7 @@ import io.matthewnelson.kmp.tor.runtime.core.TorConfig.HiddenServicePort
 import io.matthewnelson.kmp.tor.runtime.core.apply
 import io.matthewnelson.kmp.tor.runtime.core.ctrl.HiddenServiceEntry
 import io.matthewnelson.kmp.tor.runtime.core.ctrl.TorCmd
+import io.matthewnelson.kmp.tor.runtime.core.key.AddressKey
 import io.matthewnelson.kmp.tor.runtime.core.key.AuthKey
 import io.matthewnelson.kmp.tor.runtime.core.key.KeyType
 import io.matthewnelson.kmp.tor.runtime.core.key.X25519
@@ -37,7 +39,7 @@ import kotlin.jvm.JvmSynthetic
  *
  * Tor's implementation of the ADD_ONION control command
  * is extremely overloaded with several "gotchas". This
- * attempts to alleviate those problems.
+ * attempts to alleviate some pain points.
  *
  * **NOTE:** A minimum of 1 [port] **must** be declared for
  * the call to succeed (i.e. [HiddenServicePort.virtual] must
@@ -60,6 +62,8 @@ import kotlin.jvm.JvmSynthetic
  *                         .resolve("test_hs.sock")
  *                 }
  *             } catch (_: UnsupportedOperationException) {
+ *                 // Fallback to TCP if on system w/o
+ *                 // UnixSocket support.
  *                 targetAsPort { target = 8443.toPort() }
  *             }
  *         }
@@ -73,10 +77,7 @@ import kotlin.jvm.JvmSynthetic
  *     //
  *     // entry.privateKey will not be null because `DiscardPK`
  *     // flag was not defined when created above.
- *     runtime.executeAsync(TorCmd.Onion.Add(
- *         addressKey = entry.privateKey!!,
- *         destroyKeyOnJobCompletion = true,
- *     ) {
+ *     runtime.executeAsync(TorCmd.Onion.Add(entry.privateKey!!) {
  *         port {
  *             virtual = 80.toPort()
  *             targetAsPort { target = 8080.toPort() }
@@ -98,6 +99,21 @@ public class OnionAddBuilder private constructor() {
     private val flags = LinkedHashSet<String>(1, 1.0f)
     private var maxStreams: TorConfig.LineItem? = null
     private val ports = LinkedHashSet<TorConfig.LineItem>(1, 1.0f)
+
+    /**
+     * When true, an [EnqueuedJob.invokeOnCompletion] handler is
+     * automatically set which calls [AddressKey.Private.destroy]
+     * once the job completes, either successfully or by
+     * cancellation/error.
+     *
+     * Default = `true`
+     *
+     * This setting has no effect if [TorCmd.Onion.Add] is being
+     * instantiated using [KeyType.Address] for new HiddenService
+     * creation, as there will be no [AddressKey.Private] present.
+     * */
+    @JvmField
+    public var destroyKeyOnJobCompletion: Boolean = true
 
     @KmpTorDsl
     public fun port(
@@ -190,21 +206,23 @@ public class OnionAddBuilder private constructor() {
             val b = OnionAddBuilder().apply(block)
 
             return Arguments(
-                keyType = this,
                 clientAuth = b.clientAuth,
+                destroyKeyOnJobCompletion = b.destroyKeyOnJobCompletion,
                 flags = b.flags,
-                ports = b.ports,
+                keyType = this,
                 maxStreams = b.maxStreams,
+                ports = b.ports,
             )
         }
     }
 
     internal class Arguments internal constructor(
-        internal val keyType: KeyType.Address<*, *>,
         clientAuth: Set<AuthKey.Public>,
+        internal val destroyKeyOnJobCompletion: Boolean,
         flags: Set<String>,
-        ports: Set<TorConfig.LineItem>,
+        internal val keyType: KeyType.Address<*, *>,
         internal val maxStreams: TorConfig.LineItem?,
+        ports: Set<TorConfig.LineItem>,
     ) {
 
         internal val clientAuth = clientAuth.toImmutableSet()
