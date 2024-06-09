@@ -80,14 +80,19 @@ internal inline fun TorCmd<*>.toJobName(): String {
 @Suppress("NOTHING_TO_INLINE")
 internal inline fun <Job: EnqueuedJob> Job.invokeOnCompletionForCmd(
     cmd: TorCmd<*>,
-): Job {
-    if (cmd is TorCmd.Onion.Add) {
+): Job = when (cmd) {
+    is TorCmd.Onion.Add -> {
         val key = cmd.addressKey
-
         if (key != null && cmd.destroyKeyOnJobCompletion) {
             invokeOnCompletion { key.destroy() }
         }
+        this
     }
-
-    return this
+    is TorCmd.OnionClientAuth.Add -> {
+        if (cmd.destroyKeyOnJobCompletion) {
+            invokeOnCompletion { cmd.authKey.destroy() }
+        }
+        this
+    }
+    else -> this
 }

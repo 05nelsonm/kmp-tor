@@ -3366,6 +3366,7 @@ public final class io/matthewnelson/kmp/tor/runtime/core/builder/IsolationFlagBu
 }
 
 public final class io/matthewnelson/kmp/tor/runtime/core/builder/OnionAddBuilder {
+	public field destroyKeyOnJobCompletion Z
 	public final fun clientAuth (Lio/matthewnelson/kmp/tor/runtime/core/key/X25519$PublicKey;)Lio/matthewnelson/kmp/tor/runtime/core/builder/OnionAddBuilder;
 	public final fun flags (Lio/matthewnelson/kmp/tor/runtime/core/ThisBlock;)Lio/matthewnelson/kmp/tor/runtime/core/builder/OnionAddBuilder;
 	public final fun maxStreams (Lio/matthewnelson/kmp/tor/runtime/core/ThisBlock;)Lio/matthewnelson/kmp/tor/runtime/core/builder/OnionAddBuilder;
@@ -3380,6 +3381,7 @@ public final class io/matthewnelson/kmp/tor/runtime/core/builder/OnionAddBuilder
 
 public final class io/matthewnelson/kmp/tor/runtime/core/builder/OnionClientAuthAddBuilder {
 	public field clientName Ljava/lang/String;
+	public field destroyKeyOnJobCompletion Z
 	public final fun flags (Lio/matthewnelson/kmp/tor/runtime/core/ThisBlock;)Lio/matthewnelson/kmp/tor/runtime/core/builder/OnionClientAuthAddBuilder;
 }
 
@@ -3685,7 +3687,6 @@ public final class io/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$Onion$Add :
 	public final field maxStreams Lio/matthewnelson/kmp/tor/runtime/core/TorConfig$LineItem;
 	public final field ports Ljava/util/Set;
 	public fun <init> (Lio/matthewnelson/kmp/tor/runtime/core/key/AddressKey$Private;Lio/matthewnelson/kmp/tor/runtime/core/ThisBlock;)V
-	public fun <init> (Lio/matthewnelson/kmp/tor/runtime/core/key/AddressKey$Private;ZLio/matthewnelson/kmp/tor/runtime/core/ThisBlock;)V
 	public fun <init> (Lio/matthewnelson/kmp/tor/runtime/core/key/KeyType$Address;Lio/matthewnelson/kmp/tor/runtime/core/ThisBlock;)V
 }
 
@@ -3706,6 +3707,7 @@ public final class io/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$OnionClient
 	public final field address Lio/matthewnelson/kmp/tor/runtime/core/address/OnionAddress;
 	public final field authKey Lio/matthewnelson/kmp/tor/runtime/core/key/AuthKey$Private;
 	public final field clientName Ljava/lang/String;
+	public final field destroyKeyOnJobCompletion Z
 	public final field flags Ljava/util/Set;
 	public fun <init> (Lio/matthewnelson/kmp/tor/runtime/core/address/OnionAddress$V3;Lio/matthewnelson/kmp/tor/runtime/core/key/X25519$PrivateKey;)V
 	public fun <init> (Lio/matthewnelson/kmp/tor/runtime/core/address/OnionAddress$V3;Lio/matthewnelson/kmp/tor/runtime/core/key/X25519$PrivateKey;Lio/matthewnelson/kmp/tor/runtime/core/ThisBlock;)V
