@@ -208,8 +208,9 @@ public sealed class TorCmd<Success: Any> private constructor(
             @JvmField
             public val servers: Set<String>
 
-            public constructor(addressKey: AddressKey.Public): this(addressKey.address())
-            public constructor(address: OnionAddress): this(address, emptySet())
+            public constructor(
+                addressKey: AddressKey.Public,
+            ): this(addressKey.address())
 
             public constructor(
                 addressKey: AddressKey.Public,
@@ -217,24 +218,28 @@ public sealed class TorCmd<Success: Any> private constructor(
             ): this(addressKey.address(), server)
 
             public constructor(
-                address: OnionAddress,
-                server: String,
-            ): this(address, immutableSetOf(server))
-
-            public constructor(
                 addressKey: AddressKey.Public,
                 vararg servers: String,
             ): this(addressKey, immutableSetOf(*servers))
 
             public constructor(
-                address: OnionAddress,
-                vararg servers: String,
-            ): this(address, immutableSetOf(*servers))
-
-            public constructor(
                 addressKey: AddressKey.Public,
                 servers: Collection<String>,
             ): this(addressKey.address(), servers)
+
+            public constructor(
+                address: OnionAddress,
+            ): this(address, emptySet())
+
+            public constructor(
+                address: OnionAddress,
+                server: String,
+            ): this(address, immutableSetOf(server))
+
+            public constructor(
+                address: OnionAddress,
+                vararg servers: String,
+            ): this(address, immutableSetOf(*servers))
 
             public constructor(
                 address: OnionAddress,
@@ -369,7 +374,11 @@ public sealed class TorCmd<Success: Any> private constructor(
                 this.flags = arguments.flags
                 this.maxStreams = arguments.maxStreams
                 this.ports = arguments.ports
-                this.destroyKeyOnJobCompletion = arguments.destroyKeyOnJobCompletion
+                this.destroyKeyOnJobCompletion = if (addressKey == null) {
+                    false
+                } else {
+                    arguments.destroyKeyOnJobCompletion
+                }
             }
         }
 
@@ -413,7 +422,7 @@ public sealed class TorCmd<Success: Any> private constructor(
             public constructor(
                 address: OnionAddress.V3,
                 authKey: X25519.PrivateKey,
-            ): this(address, authKey, OnionClientAuthAddBuilder.Arguments.EMPTY)
+            ): this(address, authKey, OnionClientAuthAddBuilder.Arguments.DEFAULT)
 
             public constructor(
                 address: OnionAddress.V3,
@@ -444,7 +453,7 @@ public sealed class TorCmd<Success: Any> private constructor(
             @JvmField
             public val address: OnionAddress
 
-            public constructor(key: ED25519_V3.PublicKey): this(key.address())
+            public constructor(addressKey: ED25519_V3.PublicKey): this(addressKey.address())
             public constructor(address: OnionAddress.V3): this(address as OnionAddress)
             private constructor(address: OnionAddress): super("ONION_CLIENT_AUTH_REMOVE") {
                 this.address = address
@@ -461,7 +470,7 @@ public sealed class TorCmd<Success: Any> private constructor(
             @JvmField
             public val address: OnionAddress?
 
-            public constructor(key: ED25519_V3.PublicKey): this(key.address())
+            public constructor(addressKey: ED25519_V3.PublicKey): this(addressKey.address())
             public constructor(address: OnionAddress.V3): this(address as OnionAddress)
             private constructor(address: OnionAddress?): super("ONION_CLIENT_AUTH_VIEW") {
                 this.address = address

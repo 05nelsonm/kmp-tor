@@ -27,10 +27,7 @@ import io.matthewnelson.kmp.tor.runtime.core.TorConfig.HiddenServicePort
 import io.matthewnelson.kmp.tor.runtime.core.apply
 import io.matthewnelson.kmp.tor.runtime.core.ctrl.HiddenServiceEntry
 import io.matthewnelson.kmp.tor.runtime.core.ctrl.TorCmd
-import io.matthewnelson.kmp.tor.runtime.core.key.AddressKey
-import io.matthewnelson.kmp.tor.runtime.core.key.AuthKey
-import io.matthewnelson.kmp.tor.runtime.core.key.KeyType
-import io.matthewnelson.kmp.tor.runtime.core.key.X25519
+import io.matthewnelson.kmp.tor.runtime.core.key.*
 import kotlin.jvm.JvmField
 import kotlin.jvm.JvmSynthetic
 
@@ -93,7 +90,7 @@ import kotlin.jvm.JvmSynthetic
  * @see [TorConfig.HiddenServicePort]
  * */
 @KmpTorDsl
-public class OnionAddBuilder private constructor() {
+public class OnionAddBuilder private constructor(private val keyType: KeyType.Address<*, *>) {
 
     private val clientAuth = LinkedHashSet<AuthKey.Public>(1, 1.0f)
     private val flags = LinkedHashSet<String>(1, 1.0f)
@@ -128,6 +125,7 @@ public class OnionAddBuilder private constructor() {
     public fun clientAuth(
         key: X25519.PublicKey,
     ): OnionAddBuilder {
+        if (keyType !is ED25519_V3) return this
         flags.add("V3Auth")
         clientAuth.add(key)
         return this
@@ -203,7 +201,7 @@ public class OnionAddBuilder private constructor() {
         internal fun KeyType.Address<*, *>.configure(
             block: ThisBlock<OnionAddBuilder>,
         ): Arguments {
-            val b = OnionAddBuilder().apply(block)
+            val b = OnionAddBuilder(this).apply(block)
 
             return Arguments(
                 clientAuth = b.clientAuth,

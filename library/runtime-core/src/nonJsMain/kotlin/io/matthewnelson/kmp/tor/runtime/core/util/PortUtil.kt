@@ -35,10 +35,7 @@ import kotlin.jvm.JvmName
  *
  * @param [host] either [LocalHost.IPv4] or [LocalHost.IPv6]
  * @see [isAvailableSync]
- * @throws [IOException] if [LocalHost.resolve] fails
- * @throws [CancellationException] if underlying coroutine was cancelled
  * */
-@Throws(IOException::class, CancellationException::class)
 public actual suspend fun Port.isAvailableAsync(
     host: LocalHost,
 ): Boolean = withContext(Dispatchers.IO) {
@@ -56,7 +53,7 @@ public actual suspend fun Port.isAvailableAsync(
  * @param [limit] the number of ports to scan. min: 1, max: 1_000
  * @see [findAvailableSync]
  * @throws [IllegalArgumentException] if [limit] is not between 1 and 1_000 (inclusive)
- * @throws [IOException] if [LocalHost.resolve] fails, or no ports are available
+ * @throws [IOException] if no ports are available
  * @throws [CancellationException] if underlying coroutine was cancelled
  * */
 @Throws(IOException::class, CancellationException::class)

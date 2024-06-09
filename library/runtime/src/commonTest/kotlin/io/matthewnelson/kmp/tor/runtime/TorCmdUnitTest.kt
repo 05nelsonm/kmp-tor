@@ -41,8 +41,12 @@ import io.matthewnelson.kmp.tor.runtime.test.TestUtils
 import io.matthewnelson.kmp.tor.runtime.test.TestUtils.clientAuthTestKeyPairs
 import io.matthewnelson.kmp.tor.runtime.test.TestUtils.ensureStoppedOnTestCompletion
 import io.matthewnelson.kmp.tor.runtime.test.TestUtils.testEnv
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.test.runTest
+import kotlinx.coroutines.withContext
 import kotlin.test.*
+import kotlin.time.Duration.Companion.milliseconds
 
 @OptIn(InternalKmpTorApi::class)
 class TorCmdUnitTest {
@@ -153,8 +157,6 @@ class TorCmdUnitTest {
             // Should all have been un mapped
             assertTrue(mappings.entries.first().value.isEmpty())
         }
-
-        runtime.stopDaemonAsync()
     }
 
     @Test
@@ -233,8 +235,6 @@ class TorCmdUnitTest {
         authKeys.forEach { (public, _) ->
             assertTrue(entry3.clientAuth.contains(public))
         }
-
-        runtime.stopDaemonAsync()
     }
 
     @Test
@@ -314,7 +314,5 @@ class TorCmdUnitTest {
         runtime.executeAsync(TorCmd.OnionClientAuth.Remove(
             entry.publicKey as ED25519_V3.PublicKey
         )).let { result -> assertIs<Reply.Success.OK>(result) }
-
-        runtime.stopDaemonAsync()
     }
 }

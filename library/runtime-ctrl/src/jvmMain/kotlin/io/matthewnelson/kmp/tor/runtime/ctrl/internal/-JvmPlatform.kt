@@ -24,6 +24,7 @@ import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
 import io.matthewnelson.kmp.tor.core.resource.OSInfo
 import io.matthewnelson.kmp.tor.runtime.core.Disposable
 import io.matthewnelson.kmp.tor.runtime.core.address.IPSocketAddress
+import io.matthewnelson.kmp.tor.runtime.core.util.toInetAddress
 import io.matthewnelson.kmp.tor.runtime.ctrl.TorCtrl
 import kotlinx.coroutines.CloseableCoroutineDispatcher
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -62,14 +63,8 @@ internal actual fun IPSocketAddress.connect(): CtrlConnection {
     val socket = Socket(Proxy.NO_PROXY)
 
     val (input, output) = try {
-        // Android may throw exception here if
-        // not called from bg thread b/c of
-        // InetAddress resolution
-        val address = InetSocketAddress(
-            address.canonicalHostName(),
-            port.value,
-        )
-
+        val inet = address.toInetAddress()
+        val address = InetSocketAddress(inet, port.value)
         socket.connect(address)
 
         val i = socket.getInputStream()
