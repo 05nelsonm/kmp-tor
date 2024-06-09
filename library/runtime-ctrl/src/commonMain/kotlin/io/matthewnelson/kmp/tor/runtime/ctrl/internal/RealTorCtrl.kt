@@ -21,6 +21,7 @@ import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
 import io.matthewnelson.kmp.tor.core.resource.SynchronizedObject
 import io.matthewnelson.kmp.tor.core.resource.synchronized
 import io.matthewnelson.kmp.tor.runtime.core.Disposable
+import io.matthewnelson.kmp.tor.runtime.core.Executable
 import io.matthewnelson.kmp.tor.runtime.core.TorEvent
 import io.matthewnelson.kmp.tor.runtime.core.UncaughtException.Handler.Companion.tryCatch
 import io.matthewnelson.kmp.tor.runtime.core.UncaughtException.Handler.Companion.withSuppression
@@ -40,7 +41,7 @@ import kotlin.time.TimeSource
 internal class RealTorCtrl private constructor(
     factory: TorCtrl.Factory,
     dispatcher: CoroutineDispatcher,
-    private val disposeDispatcher: Disposable,
+    private val closeDispatcher: Executable,
     private val connection: CtrlConnection,
 ): AbstractTorCtrl(
     factory.staticTag,
@@ -168,13 +169,17 @@ internal class RealTorCtrl private constructor(
 
         (handler.delegate as? CloseableExceptionHandler)?.close()
 
-        if (disposeDispatcher != Disposable.noOp()) {
+        if (closeDispatcher != Executable.noOp()) {
             LOG.d { "Closing Dispatchers" }
-            disposeDispatcher.dispose()
+            closeDispatcher.execute()
         }
 
         LOG = null
+
+        // Will crash things if the provided TorCtrl.Factory.handler
+        // threw the UncaughtException instead of dealing with it.
         threw?.let { throw it }
+
         return true
     }
 
@@ -320,12 +325,12 @@ internal class RealTorCtrl private constructor(
         internal fun of(
             factory: TorCtrl.Factory,
             dispatcher: CoroutineDispatcher,
-            disposeDispatcher: Disposable,
+            closeDispatcher: Executable,
             connection: CtrlConnection,
         ): RealTorCtrl = RealTorCtrl(
             factory,
             dispatcher,
-            disposeDispatcher,
+            closeDispatcher,
             connection,
         )
     }
