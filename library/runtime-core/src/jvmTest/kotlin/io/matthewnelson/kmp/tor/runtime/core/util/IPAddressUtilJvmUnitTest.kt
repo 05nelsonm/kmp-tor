@@ -15,9 +15,11 @@
  **/
 package io.matthewnelson.kmp.tor.runtime.core.util
 
+import io.matthewnelson.kmp.file.SysDirSep
 import io.matthewnelson.kmp.tor.runtime.core.address.IPAddress
 import io.matthewnelson.kmp.tor.runtime.core.address.IPAddress.V6.Companion.toIPAddressV6
 import io.matthewnelson.kmp.tor.runtime.core.address.LocalHost
+import io.matthewnelson.kmp.tor.runtime.core.internal.IsUnixLikeHost
 import java.net.Inet6Address
 import java.net.NetworkInterface
 import kotlin.test.*
@@ -55,8 +57,10 @@ class IPAddressUtilJvmUnitTest {
         assertNotNull(localHostScoped.scope)
         assertNull(localHostScoped.scope?.toIntOrNull())
 
-        val inetLocalHost = localHostScoped.toInet6Address()
-        assertTrue(inetLocalHost.scopeId > 0)
-        assertEquals(inetLocalHost.scopeId.toString(), inetLocalHost.toIPAddressV6().scope)
+        if (IsUnixLikeHost) {
+            val inetLocalHost = localHostScoped.toInet6Address()
+            assertTrue(inetLocalHost.scopeId > 0)
+            assertEquals(inetLocalHost.scopeId.toString(), inetLocalHost.toIPAddressV6().scope)
+        }
     }
 }

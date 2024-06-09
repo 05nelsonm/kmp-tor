@@ -25,7 +25,7 @@ import java.util.concurrent.TimeoutException
 import kotlin.test.*
 import kotlin.time.Duration.Companion.milliseconds
 
-class EnqueuedJobUtilKtJvmUnitTest {
+class EnqueuedJobUtilJvmUnitTest {
 
     @Test
     fun givenAwaitSync_whenThreadInterrupted_thenJobIsCancelledIfAble() = runTest {
