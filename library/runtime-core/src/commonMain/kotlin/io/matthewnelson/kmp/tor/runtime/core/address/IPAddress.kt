@@ -30,6 +30,8 @@ import kotlin.jvm.*
  *
  * @see [V4]
  * @see [V6]
+ * @see [io.matthewnelson.kmp.tor.runtime.core.util.toInetAddress]
+ * @see [io.matthewnelson.kmp.tor.runtime.core.util.toIPAddress]
  * */
 public sealed class IPAddress private constructor(
     @JvmField
@@ -111,6 +113,8 @@ public sealed class IPAddress private constructor(
      * Holder for an IPv4 address
      *
      * @see [AnyHost]
+     * @see [io.matthewnelson.kmp.tor.runtime.core.util.toInet4Address]
+     * @see [io.matthewnelson.kmp.tor.runtime.core.util.toIPAddressV4]
      * */
     public open class V4 private constructor(bytes: ByteArray, value: String): IPAddress(bytes, value) {
 
@@ -147,10 +151,7 @@ public sealed class IPAddress private constructor(
             @JvmStatic
             @JvmName("get")
             @Throws(IllegalArgumentException::class)
-            public fun ByteArray.toIPAddressV4(): V4 {
-                return toIPAddressV4OrNull()
-                    ?: throw IllegalArgumentException("Array must be 4 bytes in length")
-            }
+            public fun ByteArray.toIPAddressV4(): V4 = toIPAddressV4(copy = true)
 
             /**
              * Parses a String for its IPv4 address.
@@ -173,13 +174,22 @@ public sealed class IPAddress private constructor(
              * */
             @JvmStatic
             @JvmName("getOrNull")
-            public fun ByteArray.toIPAddressV4OrNull(): V4? {
-                if (size != 4) return null
+            public fun ByteArray.toIPAddressV4OrNull(): V4? = try {
+                toIPAddressV4(copy = true)
+            } catch (_: IllegalArgumentException) {
+                null
+            }
+
+            @JvmSynthetic
+            @Throws(IllegalArgumentException::class)
+            internal fun ByteArray.toIPAddressV4(copy: Boolean): V4 {
+                require(size == 4) { "Array must be 4 bytes in length" }
+                val bytes = if (copy) copyOf() else this
 
                 var anyHost = true
                 var loopback = true
                 for (i in indices) {
-                    val b = this[i]
+                    val b = bytes[i]
                     if (anyHost && b != AnyHost.bytes[i]) {
                         anyHost = false
                     }
@@ -193,10 +203,10 @@ public sealed class IPAddress private constructor(
                 if (loopback) return Loopback
 
                 val hostAddress = buildString(capacity = 3 + (3 * 4)) {
-                    joinTo(this, ".") { it.toUByte().toString() }
+                    bytes.joinTo(this, ".") { it.toUByte().toString() }
                 }
 
-                return V4(copyOf(), hostAddress)
+                return V4(bytes, hostAddress)
             }
 
             @JvmSynthetic
@@ -241,6 +251,8 @@ public sealed class IPAddress private constructor(
      * @param [scope] The network interface name or index
      *   number, or null if no scope was expressed.
      * @see [AnyHost]
+     * @see [io.matthewnelson.kmp.tor.runtime.core.util.toInet6Address]
+     * @see [io.matthewnelson.kmp.tor.runtime.core.util.toIPAddressV6]
      * */
     public open class V6 private constructor(
         @JvmField
@@ -511,8 +523,9 @@ public sealed class IPAddress private constructor(
                 return bytes.toIPAddressV6(scope, copy = false)
             }
 
+            @JvmSynthetic
             @Throws(IllegalArgumentException::class)
-            private fun ByteArray.toIPAddressV6(scope: String?, copy: Boolean): V6 {
+            internal fun ByteArray.toIPAddressV6(scope: String?, copy: Boolean): V6 {
                 require(size == 16) { "Array must be 16 bytes in length" }
                 val bytes = if (copy) copyOf() else this
 
@@ -603,4 +616,7 @@ public sealed class IPAddress private constructor(
             }
         }
     }
+
+    @JvmSynthetic
+    internal fun addressInternal(): ByteArray = bytes
 }

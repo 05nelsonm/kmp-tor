@@ -4030,6 +4030,15 @@ public final class io/matthewnelson/kmp/tor/runtime/core/key/X25519$PublicKey$Co
 	public final fun getOrNull ([B)Lio/matthewnelson/kmp/tor/runtime/core/key/X25519$PublicKey;
 }
 
+public final class io/matthewnelson/kmp/tor/runtime/core/util/IPAddressUtil {
+	public static final fun inet4AddressOf (Lio/matthewnelson/kmp/tor/runtime/core/address/IPAddress$V4;)Ljava/net/Inet4Address;
+	public static final fun inet6AddressOf (Lio/matthewnelson/kmp/tor/runtime/core/address/IPAddress$V6;)Ljava/net/Inet6Address;
+	public static final fun inetAddressOf (Lio/matthewnelson/kmp/tor/runtime/core/address/IPAddress;)Ljava/net/InetAddress;
+	public static final fun ipAddressOf (Ljava/net/InetAddress;)Lio/matthewnelson/kmp/tor/runtime/core/address/IPAddress;
+	public static final fun ipAddressV4Of (Ljava/net/Inet4Address;)Lio/matthewnelson/kmp/tor/runtime/core/address/IPAddress$V4;
+	public static final fun ipAddressV6Of (Ljava/net/Inet6Address;)Lio/matthewnelson/kmp/tor/runtime/core/address/IPAddress$V6;
+}
+
 public final class io/matthewnelson/kmp/tor/runtime/core/util/PortUtil {
 	public static final fun findAvailableAsync (Lio/matthewnelson/kmp/tor/runtime/core/address/Port$Ephemeral;ILio/matthewnelson/kmp/tor/runtime/core/address/LocalHost;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public static final fun findAvailableSync (Lio/matthewnelson/kmp/tor/runtime/core/address/Port$Ephemeral;ILio/matthewnelson/kmp/tor/runtime/core/address/LocalHost;)Lio/matthewnelson/kmp/tor/runtime/core/address/Port$Ephemeral;

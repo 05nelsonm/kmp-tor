@@ -18,8 +18,9 @@
 package io.matthewnelson.kmp.tor.runtime.core.internal
 
 import io.matthewnelson.kmp.file.IOException
-import io.matthewnelson.kmp.file.wrapIOException
 import io.matthewnelson.kmp.tor.runtime.core.address.IPAddress
+import io.matthewnelson.kmp.tor.runtime.core.util.toInetAddress
+import java.net.InetAddress
 import java.net.ServerSocket
 
 @JvmInline
@@ -30,7 +31,7 @@ internal actual value class ServerSocketProducer private actual constructor(
     @Throws(Exception::class)
     @OptIn(ExperimentalStdlibApi::class)
     internal actual fun open(port: Int): AutoCloseable {
-        return ServerSocket(port, 1, value as java.net.InetAddress)
+        return ServerSocket(port, /* backlog */ 1, value as InetAddress)
     }
 
     internal actual companion object {
@@ -38,15 +39,8 @@ internal actual value class ServerSocketProducer private actual constructor(
         @JvmSynthetic
         @Throws(IOException::class)
         internal actual fun IPAddress.toServerSocketProducer(): ServerSocketProducer {
-            val jInetAddress = try {
-                // TODO: Issue #336
-                //  Use get by address
-                java.net.InetAddress.getByName(canonicalHostName())
-            } catch (t: Throwable) {
-                throw t.wrapIOException()
-            }
-
-            return ServerSocketProducer(jInetAddress)
+            val inet = toInetAddress()
+            return ServerSocketProducer(inet)
         }
     }
 }
