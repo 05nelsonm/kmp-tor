@@ -157,6 +157,8 @@ class TorCmdUnitTest {
             // Should all have been un mapped
             assertTrue(mappings.entries.first().value.isEmpty())
         }
+
+        runtime.stopDaemonAsync()
     }
 
     @Test

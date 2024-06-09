@@ -174,7 +174,11 @@ internal class RealTorCtrl private constructor(
         }
 
         LOG = null
+
+        // Will crash things if the provided TorCtrl.Factory.handler
+        // threw the UncaughtException instead of dealing with it.
         threw?.let { throw it }
+
         return true
     }
 

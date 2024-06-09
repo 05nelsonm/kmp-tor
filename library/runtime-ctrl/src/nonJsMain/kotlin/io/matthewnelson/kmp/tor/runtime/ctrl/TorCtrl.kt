@@ -33,6 +33,7 @@ import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
 import kotlin.coroutines.CoroutineContext
+import kotlin.coroutines.EmptyCoroutineContext
 import kotlin.coroutines.cancellation.CancellationException
 import kotlin.jvm.JvmOverloads
 import kotlin.time.Duration.Companion.milliseconds
@@ -206,7 +207,19 @@ public actual interface TorCtrl : Destroyable, TorEvent.Processor, TorCmd.Privil
                 throw t.wrapIOException()
             }
 
-            return RealTorCtrl.of(this, dispatcher, Disposable(dispatcher::close), connection)
+            var disposed = false
+            val disposable = Disposable {
+                if (disposed) return@Disposable
+                disposed = true
+
+                @OptIn(DelicateCoroutinesApi::class)
+                GlobalScope.launch(CLOSE_DISPATCHER) {
+                    delay(250.milliseconds)
+                    dispatcher.close()
+                }
+            }
+
+            return RealTorCtrl.of(this, dispatcher, disposable, connection)
         }
 
         /**
@@ -263,5 +276,17 @@ public actual interface TorCtrl : Destroyable, TorEvent.Processor, TorCmd.Privil
 
         @InternalKmpTorApi
         public actual fun tempQueue(): TempTorCmdQueue = TempTorCmdQueue.of(handler)
+
+        private companion object {
+
+            private val CLOSE_DISPATCHER by lazy {
+                try {
+                    Dispatchers.Main.isDispatchNeeded(EmptyCoroutineContext)
+                    Dispatchers.Main
+                } catch (_: Throwable) {
+                    Dispatchers.IO
+                }
+            }
+        }
     }
 }
