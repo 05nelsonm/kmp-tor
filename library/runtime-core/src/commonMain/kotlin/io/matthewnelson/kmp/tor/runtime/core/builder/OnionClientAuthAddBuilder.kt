@@ -21,6 +21,7 @@ import io.matthewnelson.immutable.collections.toImmutableSet
 import io.matthewnelson.kmp.tor.core.api.annotation.KmpTorDsl
 import io.matthewnelson.kmp.tor.runtime.core.EnqueuedJob
 import io.matthewnelson.kmp.tor.runtime.core.ThisBlock
+import io.matthewnelson.kmp.tor.runtime.core.TorConfig
 import io.matthewnelson.kmp.tor.runtime.core.apply
 import io.matthewnelson.kmp.tor.runtime.core.ctrl.TorCmd
 import io.matthewnelson.kmp.tor.runtime.core.key.AuthKey
@@ -34,7 +35,7 @@ public class OnionClientAuthAddBuilder private constructor() {
 
     /**
      * Cannot exceed 16 characters in length and must not contain
-     * whitespace, otherwise tor will reject it.
+     * whitespace, otherwise tor will reject the request.
      * */
     @JvmField
     public var clientName: String? = null
@@ -68,6 +69,10 @@ public class OnionClientAuthAddBuilder private constructor() {
     @KmpTorDsl
     public class FlagBuilder private constructor() {
 
+        /**
+         * Declaring `true` requires that [TorConfig.ClientOnionAuthDir]
+         * be defined, otherwise tor will reject the request.
+         * */
         @JvmField
         public var Permanent: Boolean? = null
 

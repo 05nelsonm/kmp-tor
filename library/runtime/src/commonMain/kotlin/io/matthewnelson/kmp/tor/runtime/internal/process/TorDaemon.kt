@@ -441,9 +441,19 @@ internal class TorDaemon private constructor(
                 }
 
                 directories.forEach { directory ->
-                    if (!directory.exists() && !directory.mkdirs()) {
-                        throw IOException("Failed to create directory[$directory]")
+                    var setPermissions = false
+
+                    if (!directory.exists()) {
+                        if (directory.mkdirs()) {
+                            setPermissions = true
+                        } else {
+                            throw IOException("Failed to create directory[$directory]")
+                        }
                     }
+
+                    // Only set permissions for newly created directories
+                    // as to not modify anything that already exists.
+                    if (!setPermissions) return@forEach
 
                     try {
                         directory.setDirectoryPermissions()

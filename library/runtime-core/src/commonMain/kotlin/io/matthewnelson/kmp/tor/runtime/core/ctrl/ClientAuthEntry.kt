@@ -15,7 +15,92 @@
  **/
 package io.matthewnelson.kmp.tor.runtime.core.ctrl
 
-public class ClientAuthEntry {
+import io.matthewnelson.immutable.collections.toImmutableSet
+import io.matthewnelson.kmp.tor.runtime.core.address.OnionAddress
+import io.matthewnelson.kmp.tor.runtime.core.key.AuthKey
+import io.matthewnelson.kmp.tor.runtime.core.key.KeyType
+import io.matthewnelson.kmp.tor.runtime.core.key.X25519
+import kotlin.jvm.JvmField
+import kotlin.jvm.JvmStatic
 
-    // TODO
+public class ClientAuthEntry private constructor(
+    @JvmField
+    public val address: OnionAddress,
+    @JvmField
+    public val privateKey: AuthKey.Private,
+    @JvmField
+    public val clientName: String?,
+    @JvmField
+    public val flags: Set<String>,
+) {
+
+    public companion object {
+
+        @JvmStatic
+        @Throws(IllegalArgumentException::class)
+        public fun of(
+            address: OnionAddress,
+            privateKey: AuthKey.Private,
+            clientName: String?,
+            flags: Set<String>,
+        ): ClientAuthEntry {
+            val addressKey = address.asPublicKey()
+
+            require(privateKey.isCompatibleWith(addressKey)) {
+                "Incompatible key types." +
+                " AddressKey.Public[${addressKey.algorithm()}]." +
+                " AuthKey.Private[${privateKey.algorithm()}]"
+            }
+
+            return ClientAuthEntry(
+                address = address,
+                privateKey = privateKey,
+                clientName = clientName,
+                flags = flags.toImmutableSet(),
+            )
+        }
+    }
+
+    public override fun equals(other: Any?): Boolean {
+        return  other is ClientAuthEntry
+                && other.address == address
+                && other.privateKey == privateKey
+                && other.clientName == clientName
+                && other.flags == flags
+    }
+
+    public override fun hashCode(): Int {
+        var result = 20
+        result = result * 42 + address.hashCode()
+        result = result * 42 + privateKey.hashCode()
+        result = result * 42 + clientName.hashCode()
+        result = result * 42 + flags.hashCode()
+        return result
+    }
+
+    public override fun toString(): String = buildString {
+        appendLine("ClientAuthEntry: [")
+        append("    address: ")
+        appendLine(address)
+        append("    privateKey: ")
+        appendLine(privateKey)
+        append("    clientName: ")
+        appendLine(clientName)
+
+        append("    flags: [")
+        if (flags.isEmpty()) {
+            append(']')
+        } else {
+            for (flag in flags) {
+                appendLine()
+                append("        ")
+                append(flag)
+            }
+            appendLine()
+            append("    ]")
+        }
+
+        appendLine()
+        append(']')
+    }
 }

@@ -13,8 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
+@file:Suppress("VARIABLE_WITH_REDUNDANT_INITIALIZER")
+
 package io.matthewnelson.kmp.tor.runtime
 
+import io.matthewnelson.immutable.collections.toImmutableList
 import io.matthewnelson.kmp.file.resolve
 import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
 import io.matthewnelson.kmp.tor.core.resource.SynchronizedObject
@@ -32,6 +35,7 @@ import io.matthewnelson.kmp.tor.runtime.core.ctrl.AddressMapping.Companion.mappi
 import io.matthewnelson.kmp.tor.runtime.core.ctrl.AddressMapping.Companion.mappingToAnyHostIPv4
 import io.matthewnelson.kmp.tor.runtime.core.ctrl.AddressMapping.Companion.mappingToAnyHostIPv6
 import io.matthewnelson.kmp.tor.runtime.core.ctrl.ConfigEntry
+import io.matthewnelson.kmp.tor.runtime.core.ctrl.HiddenServiceEntry
 import io.matthewnelson.kmp.tor.runtime.core.ctrl.Reply
 import io.matthewnelson.kmp.tor.runtime.core.ctrl.TorCmd
 import io.matthewnelson.kmp.tor.runtime.core.key.ED25519_V3
@@ -41,12 +45,8 @@ import io.matthewnelson.kmp.tor.runtime.test.TestUtils
 import io.matthewnelson.kmp.tor.runtime.test.TestUtils.clientAuthTestKeyPairs
 import io.matthewnelson.kmp.tor.runtime.test.TestUtils.ensureStoppedOnTestCompletion
 import io.matthewnelson.kmp.tor.runtime.test.TestUtils.testEnv
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.test.runTest
-import kotlinx.coroutines.withContext
 import kotlin.test.*
-import kotlin.time.Duration.Companion.milliseconds
 
 @OptIn(InternalKmpTorApi::class)
 class TorCmdUnitTest {
@@ -316,5 +316,97 @@ class TorCmdUnitTest {
         runtime.executeAsync(TorCmd.OnionClientAuth.Remove(
             entry.publicKey as ED25519_V3.PublicKey
         )).let { result -> assertIs<Reply.Success.OK>(result) }
+    }
+
+    @Test
+    fun givenOnionClientAuth_whenView_thenIsAsExpected() = runTest {
+        val authKeys = clientAuthTestKeyPairs()
+
+        val runtime = TorRuntime.Builder(testEnv("cmd_onion_view")) {
+//            observerStatic(RuntimeEvent.LOG.DEBUG) { println(it) }
+            config { environment ->
+                put(TorConfig.ClientOnionAuthDir) {
+                    directory = environment.workDirectory
+                        .resolve(TorConfig.ClientOnionAuthDir.DEFAULT_NAME)
+                }
+            }
+        }.ensureStoppedOnTestCompletion()
+
+        runtime.startDaemonAsync()
+
+        val entries = mutableListOf<HiddenServiceEntry>().let { list ->
+            val cmd = TorCmd.Onion.Add(ED25519_V3) {
+                port { virtual = 80.toPort() }
+                flags { DiscardPK = true }
+            }
+
+            repeat(authKeys.size) {
+                val entry = runtime.executeAsync(cmd)
+                runtime.executeAsync(TorCmd.Onion.Delete(entry.publicKey))
+                list.add(entry)
+            }
+
+            list.toImmutableList()
+        }
+
+        assertTrue(authKeys.isNotEmpty())
+        assertEquals(authKeys.size, entries.size)
+
+        val addCommands = entries.mapIndexed { index, entry ->
+            TorCmd.OnionClientAuth.Add(
+                entry.publicKey.address() as OnionAddress.V3,
+                authKeys.elementAt(index).second,
+            ) {
+                if (index == 0) return@Add
+
+                clientName = "test$index"
+
+                if (index == 2) {
+                    flags { Permanent = true }
+                }
+            }
+        }
+
+        addCommands.forEach { cmd -> runtime.executeAsync(cmd) }
+
+        runtime.executeAsync(
+            TorCmd.OnionClientAuth.View(
+                entries.first().publicKey as ED25519_V3.PublicKey,
+            )
+        ).let { result -> assertEquals(1, result.size) }
+
+        val all = runtime.executeAsync(TorCmd.OnionClientAuth.View.All)
+        all.forEach { println(it) }
+
+        val filtered = entries.map { it.publicKey.address() }.let { addresses ->
+            // Could contain more entries from the filesystem, so need to
+            // filter for those ONLY added for the hidden services for
+            // this test.
+            val filtered = all.filter { addresses.contains(it.address) }
+            assertEquals(addresses.size, filtered.size)
+            filtered
+        }
+
+        for (cmd in addCommands) {
+            val authEntry = filtered.first { it.address == cmd.address }
+            assertEquals(cmd.clientName, authEntry.clientName)
+            assertEquals(cmd.flags, authEntry.flags)
+        }
+
+        // Remove all to check empty return
+        all.forEach { entry ->
+            val address = entry.address as OnionAddress.V3
+            runtime.executeAsync(TorCmd.OnionClientAuth.Remove(address))
+        }
+
+        runtime.executeAsync(TorCmd.OnionClientAuth.View.All).let { result ->
+            assertEquals(0, result.size)
+        }
+
+        runtime.executeAsync(TorCmd.OnionClientAuth.View(
+            entries.first().publicKey as ED25519_V3.PublicKey
+        )).let { result -> assertEquals(0, result.size)  }
+
+        runtime.stopDaemonAsync()
     }
 }

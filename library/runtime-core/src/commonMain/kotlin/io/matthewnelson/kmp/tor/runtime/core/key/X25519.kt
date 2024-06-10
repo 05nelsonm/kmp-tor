@@ -18,6 +18,7 @@ package io.matthewnelson.kmp.tor.runtime.core.key
 import io.matthewnelson.kmp.tor.runtime.core.internal.tryDecodeOrNull
 import kotlin.jvm.JvmName
 import kotlin.jvm.JvmStatic
+import kotlin.jvm.JvmSynthetic
 
 public object X25519: KeyType.Auth<X25519.PublicKey, X25519.PrivateKey>() {
 
@@ -154,7 +155,10 @@ public object X25519: KeyType.Auth<X25519.PublicKey, X25519.PrivateKey>() {
             }
         }
 
-        protected override fun AddressKey.Public.isCompatible(): Boolean = when (this) {
+        @JvmSynthetic
+        internal override fun isCompatibleWith(
+            addressKey: AddressKey.Public
+        ): Boolean = when (addressKey) {
             is ED25519_V3.PublicKey -> true
         }
     }

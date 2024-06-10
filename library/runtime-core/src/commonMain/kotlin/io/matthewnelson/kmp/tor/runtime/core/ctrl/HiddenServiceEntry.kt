@@ -33,11 +33,9 @@ public class HiddenServiceEntry private constructor(
     public val publicKey: AddressKey.Public,
     @JvmField
     public val privateKey: AddressKey.Private?,
-    clientAuth: Set<AuthKey.Public>,
-) {
-
     @JvmField
-    public val clientAuth: Set<AuthKey.Public> = clientAuth.toImmutableSet()
+    public val clientAuth: Set<AuthKey.Public>,
+) {
 
     public companion object {
 
@@ -61,10 +59,16 @@ public class HiddenServiceEntry private constructor(
             val aPrivate = privateKey.algorithm()
 
             require(aPublic == aPrivate) {
-                "Incompatible key types. PublicKey[$aPublic]. PrivateKey[$aPrivate]"
+                "Incompatible key types. " +
+                "AddressKey.PublicKey[$aPublic]. " +
+                "AddressKey.PrivateKey[$aPrivate]"
             }
 
-            return HiddenServiceEntry(publicKey, privateKey, clientAuth)
+            return HiddenServiceEntry(
+                publicKey = publicKey,
+                privateKey = privateKey,
+                clientAuth = clientAuth.toImmutableSet(),
+            )
         }
     }
 

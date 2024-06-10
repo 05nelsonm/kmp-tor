@@ -18,6 +18,7 @@ package io.matthewnelson.kmp.tor.runtime.core.key
 import io.matthewnelson.encoding.core.Encoder.Companion.encodeToString
 import io.matthewnelson.kmp.tor.runtime.core.Destroyable.Companion.destroyedException
 import io.matthewnelson.kmp.tor.runtime.core.address.OnionAddress
+import kotlin.jvm.JvmSynthetic
 
 /**
  * Type definition of [Key.Public] and [Key.Private] specific to
@@ -53,7 +54,7 @@ public class AuthKey private constructor() {
             val result = descriptorBase32OrNull(publicKey)
             if (result != null) return result
 
-            if (publicKey.isCompatible()) {
+            if (isCompatibleWith(publicKey)) {
                 throw destroyedException()
             }
 
@@ -67,7 +68,7 @@ public class AuthKey private constructor() {
         public fun descriptorBase32OrNull(
             publicKey: AddressKey.Public,
         ): String? {
-            if (!publicKey.isCompatible()) return null
+            if (!isCompatibleWith(publicKey)) return null
 
             val encoded = base32OrNull() ?: return null
             return toDescriptor(publicKey.address().value, encoded)
@@ -85,7 +86,7 @@ public class AuthKey private constructor() {
             val result = descriptorBase64OrNull(publicKey)
             if (result != null) return result
 
-            if (publicKey.isCompatible()) {
+            if (isCompatibleWith(publicKey)) {
                 throw destroyedException()
             }
 
@@ -99,13 +100,14 @@ public class AuthKey private constructor() {
         public fun descriptorBase64OrNull(
             publicKey: AddressKey.Public,
         ): String? {
-            if (!publicKey.isCompatible()) return null
+            if (!isCompatibleWith(publicKey)) return null
 
             val encoded = base64OrNull() ?: return null
             return toDescriptor(publicKey.address().value, encoded)
         }
 
-        protected abstract fun AddressKey.Public.isCompatible(): Boolean
+        @JvmSynthetic
+        internal abstract fun isCompatibleWith(addressKey: AddressKey.Public): Boolean
     }
 
     init {
