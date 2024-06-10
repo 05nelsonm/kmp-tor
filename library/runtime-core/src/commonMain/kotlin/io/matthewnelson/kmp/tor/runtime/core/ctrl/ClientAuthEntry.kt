@@ -18,8 +18,6 @@ package io.matthewnelson.kmp.tor.runtime.core.ctrl
 import io.matthewnelson.immutable.collections.toImmutableSet
 import io.matthewnelson.kmp.tor.runtime.core.address.OnionAddress
 import io.matthewnelson.kmp.tor.runtime.core.key.AuthKey
-import io.matthewnelson.kmp.tor.runtime.core.key.KeyType
-import io.matthewnelson.kmp.tor.runtime.core.key.X25519
 import kotlin.jvm.JvmField
 import kotlin.jvm.JvmStatic
 
