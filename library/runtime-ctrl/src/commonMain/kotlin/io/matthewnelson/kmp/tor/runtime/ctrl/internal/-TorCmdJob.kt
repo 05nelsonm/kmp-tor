@@ -21,6 +21,7 @@ import io.matthewnelson.immutable.collections.toImmutableList
 import io.matthewnelson.immutable.collections.toImmutableMap
 import io.matthewnelson.immutable.collections.toImmutableSet
 import io.matthewnelson.kmp.file.InterruptedException
+import io.matthewnelson.kmp.tor.runtime.core.address.OnionAddress.Companion.toOnionAddressOrNull
 import io.matthewnelson.kmp.tor.runtime.core.ctrl.*
 import io.matthewnelson.kmp.tor.runtime.core.ctrl.Reply.Error.Companion.toError
 import io.matthewnelson.kmp.tor.runtime.core.key.AddressKey
@@ -28,9 +29,11 @@ import io.matthewnelson.kmp.tor.runtime.core.key.AuthKey
 import io.matthewnelson.kmp.tor.runtime.core.key.ED25519_V3
 import io.matthewnelson.kmp.tor.runtime.core.key.ED25519_V3.PrivateKey.Companion.toED25519_V3PrivateKeyOrNull
 import io.matthewnelson.kmp.tor.runtime.core.key.ED25519_V3.PublicKey.Companion.toED25519_V3PublicKeyOrNull
+import io.matthewnelson.kmp.tor.runtime.core.key.X25519
+import io.matthewnelson.kmp.tor.runtime.core.key.X25519.PrivateKey.Companion.toX25519PrivateKeyOrNull
 import io.matthewnelson.kmp.tor.runtime.core.key.X25519.PublicKey.Companion.toX25519PublicKeyOrNull
 
-@Throws(NoSuchElementException::class)
+@Throws(IllegalArgumentException::class, NoSuchElementException::class)
 internal fun TorCmdJob<*>.respond(replies: ArrayList<Reply>) {
     // waiters were destroyed while awaiting server response (i.e. EOS)
     if (replies.isEmpty()) {
@@ -114,16 +117,16 @@ private fun TorCmd.MapAddress.complete(job: TorCmdJob<*>, replies: ArrayList<Rep
     job.unsafeCast<Set<AddressMapping.Result>>().completion(set.toImmutableSet())
 }
 
-@Throws(NoSuchElementException::class)
+@Throws(IllegalArgumentException::class, NoSuchElementException::class)
 private fun TorCmd.Onion.Add.complete(job: TorCmdJob<*>, replies: ArrayList<Reply.Success>) {
     @Suppress("LocalVariableName")
     var _publicKey: AddressKey.Public? = null
     var privateKey: AddressKey.Private? = null
     val auth = LinkedHashSet<AuthKey.Public>(clientAuth.size, 1.0F)
 
-    // 250-ServiceID=sampleonion4t2pqglbny66wpovyvao3ylc23eileodtevc4b75ikpad
-    // 250-PrivateKey=ED25519-V3:[Blob Redacted]
-    // 250-ClientAuthV3=[Blob Redacted]
+    // 250 ServiceID=sampleonion4t2pqglbny66wpovyvao3ylc23eileodtevc4b75ikpad
+    // 250 PrivateKey=ED25519-V3:[Blob Redacted]
+    // 250 ClientAuthV3=[Blob Redacted]
     replies.forEachKvp { key, value ->
         when (key.lowercase()) {
             "serviceid" -> {
@@ -149,14 +152,79 @@ private fun TorCmd.Onion.Add.complete(job: TorCmdJob<*>, replies: ArrayList<Repl
         }
     }
 
-    val publicKey = _publicKey ?: throw NoSuchElementException("$keyType.PublicKey was not found in replies")
+    val publicKey = _publicKey
+        ?: throw NoSuchElementException("${keyType.algorithm()}.PublicKey was not found in replies")
 
     val entry = HiddenServiceEntry.of(publicKey, privateKey, auth)
     job.unsafeCast<HiddenServiceEntry>().completion(entry)
 }
 
+@Throws(IllegalArgumentException::class, NoSuchElementException::class)
 private fun TorCmd.OnionClientAuth.View.complete(job: TorCmdJob<*>, replies: ArrayList<Reply.Success>) {
-    TODO("Issue #421")
+    // 250 CLIENT {onion address} {algorithm}:[Blob Redacted] Flags=Permanent ClientName=test0
+    // 250 CLIENT {onion address} {algorithm}:[Blob Redacted] ClientName=test1
+    // 250 CLIENT {onion address} {algorithm}:[Blob Redacted]
+    val list = ArrayList<ClientAuthEntry>(replies.size)
+
+    for (reply in replies) {
+        if (reply.isOK) continue
+
+        val splits = reply.message.substringAfter("CLIENT ", "").let { after ->
+            if (after.isEmpty()) return@let null
+            after.split(' ')
+        }
+
+        if (splits.isNullOrEmpty()) continue
+
+        val address = splits.elementAtOrNull(0)?.toOnionAddressOrNull()
+        val privateKey = splits.elementAtOrNull(1)?.let { keyString ->
+            val i = keyString.indexOf(':')
+            if (i == -1) return@let null
+
+            when (keyString.substring(0, i)) {
+                X25519.algorithm() -> keyString.substring(i + 1).toX25519PrivateKeyOrNull()
+                else -> null
+            }
+        }
+
+        if (address == null) {
+            throw NoSuchElementException("address was not found in replies")
+        }
+        if (privateKey == null) {
+            throw NoSuchElementException("private key was not found in replies")
+        }
+
+        var clientName: String? = null
+        var flags: List<String>? = null
+
+        if (splits.size > 2) {
+            for (i in 2 until splits.size) {
+                val split = splits[i]
+                val iEquals = split.indexOf('=')
+                if (iEquals == -1) continue
+
+                when (split.substring(0, iEquals).lowercase()) {
+                    "flags" -> {
+                        flags = split.substring(iEquals + 1).split(',')
+                    }
+                    "clientname" -> {
+                        clientName = split.substring(iEquals + 1)
+                    }
+                }
+            }
+        }
+
+        val entry = ClientAuthEntry.of(
+            address = address,
+            privateKey = privateKey,
+            clientName = clientName,
+            flags = flags?.toImmutableSet() ?: emptySet()
+        )
+
+        list.add(entry)
+    }
+
+    job.unsafeCast<List<ClientAuthEntry>>().completion(list.toImmutableList())
 }
 
 @Suppress("NOTHING_TO_INLINE")

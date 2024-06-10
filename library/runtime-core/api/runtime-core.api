@@ -3500,7 +3500,20 @@ public final class io/matthewnelson/kmp/tor/runtime/core/ctrl/AddressMapping$Res
 }
 
 public final class io/matthewnelson/kmp/tor/runtime/core/ctrl/ClientAuthEntry {
-	public fun <init> ()V
+	public static final field Companion Lio/matthewnelson/kmp/tor/runtime/core/ctrl/ClientAuthEntry$Companion;
+	public final field address Lio/matthewnelson/kmp/tor/runtime/core/address/OnionAddress;
+	public final field clientName Ljava/lang/String;
+	public final field flags Ljava/util/Set;
+	public final field privateKey Lio/matthewnelson/kmp/tor/runtime/core/key/AuthKey$Private;
+	public synthetic fun <init> (Lio/matthewnelson/kmp/tor/runtime/core/address/OnionAddress;Lio/matthewnelson/kmp/tor/runtime/core/key/AuthKey$Private;Ljava/lang/String;Ljava/util/Set;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public fun equals (Ljava/lang/Object;)Z
+	public fun hashCode ()I
+	public static final fun of (Lio/matthewnelson/kmp/tor/runtime/core/address/OnionAddress;Lio/matthewnelson/kmp/tor/runtime/core/key/AuthKey$Private;Ljava/lang/String;Ljava/util/Set;)Lio/matthewnelson/kmp/tor/runtime/core/ctrl/ClientAuthEntry;
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/matthewnelson/kmp/tor/runtime/core/ctrl/ClientAuthEntry$Companion {
+	public final fun of (Lio/matthewnelson/kmp/tor/runtime/core/address/OnionAddress;Lio/matthewnelson/kmp/tor/runtime/core/key/AuthKey$Private;Ljava/lang/String;Ljava/util/Set;)Lio/matthewnelson/kmp/tor/runtime/core/ctrl/ClientAuthEntry;
 }
 
 public final class io/matthewnelson/kmp/tor/runtime/core/ctrl/ConfigEntry {
@@ -3721,7 +3734,7 @@ public final class io/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$OnionClient
 }
 
 public final class io/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$OnionClientAuth$View : io/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$Unprivileged {
-	public static final field ALL Lio/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$OnionClientAuth$View;
+	public static final field All Lio/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$OnionClientAuth$View;
 	public static final field Companion Lio/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$OnionClientAuth$View$Companion;
 	public final field address Lio/matthewnelson/kmp/tor/runtime/core/address/OnionAddress;
 	public fun <init> (Lio/matthewnelson/kmp/tor/runtime/core/address/OnionAddress$V3;)V
@@ -3879,7 +3892,6 @@ public abstract class io/matthewnelson/kmp/tor/runtime/core/key/AuthKey$Private 
 	public final fun descriptorBase64 (Lio/matthewnelson/kmp/tor/runtime/core/key/AddressKey$Public;)Ljava/lang/String;
 	public final fun descriptorBase64OrNull (Lio/matthewnelson/kmp/tor/runtime/core/address/OnionAddress;)Ljava/lang/String;
 	public final fun descriptorBase64OrNull (Lio/matthewnelson/kmp/tor/runtime/core/key/AddressKey$Public;)Ljava/lang/String;
-	protected abstract fun isCompatible (Lio/matthewnelson/kmp/tor/runtime/core/key/AddressKey$Public;)Z
 }
 
 public abstract class io/matthewnelson/kmp/tor/runtime/core/key/AuthKey$Public : io/matthewnelson/kmp/tor/runtime/core/key/Key$Public {

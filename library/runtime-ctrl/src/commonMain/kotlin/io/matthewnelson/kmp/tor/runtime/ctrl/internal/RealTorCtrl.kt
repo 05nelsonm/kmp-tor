@@ -20,7 +20,6 @@ import io.matthewnelson.kmp.file.InterruptedException
 import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
 import io.matthewnelson.kmp.tor.core.resource.SynchronizedObject
 import io.matthewnelson.kmp.tor.core.resource.synchronized
-import io.matthewnelson.kmp.tor.runtime.core.Disposable
 import io.matthewnelson.kmp.tor.runtime.core.Executable
 import io.matthewnelson.kmp.tor.runtime.core.TorEvent
 import io.matthewnelson.kmp.tor.runtime.core.UncaughtException.Handler.Companion.tryCatch
@@ -85,13 +84,7 @@ internal class RealTorCtrl private constructor(
                 LOG.d { "End Of Stream" }
                 waiters.destroy()
             } else {
-                LOG.d {
-                     "<< " + if (line.startsWith("250-PrivateKey=")) {
-                        line.replaceAfter(':', "[REDACTED]")
-                    } else {
-                        line
-                    }
-                }
+                LOG.d { line.toLogLine() }
             }
 
             super.parse(line)
@@ -108,6 +101,40 @@ internal class RealTorCtrl private constructor(
 
         override fun ArrayList<Reply>.respond() {
             waiters.respondNext(this)
+        }
+
+        private fun String.toLogLine(): String {
+            var log = this
+
+            when {
+                // ADD_ONION NEW:ED25519-V3
+                // 250-ServiceID=...
+                // 250-PrivateKey=ED25519-V3:[REDACTED]
+                log.startsWith("250-PrivateKey=") -> {
+                    log = log.replaceAfter(':', "[REDACTED]")
+                }
+
+                // 250-CLIENT {onion address} x25519:[REDACTED]
+                // 250-CLIENT {onion address} x25519:[REDACTED] Flags=...
+                log.startsWith("250-CLIENT ") -> {
+                    val iKey = log.indexOf(':')
+
+                    if (iKey != -1) {
+                        var iKeyEnd = iKey
+
+                        while (iKeyEnd < log.length) {
+                            if (log[iKeyEnd].isWhitespace()) break
+                            iKeyEnd++
+                        }
+
+                        if (iKey != iKeyEnd) {
+                            log = log.replaceRange(iKey + 1, iKeyEnd, "[REDACTED]")
+                        }
+                    }
+                }
+            }
+
+            return "<< $log"
         }
     }
 
@@ -288,18 +315,17 @@ internal class RealTorCtrl private constructor(
             val cmdJob = this
 
             scope.launch {
-                try {
-                    val replies = wait()
-
-                    cmdJob.respond(replies)
+                val replies = try {
+                    wait.invoke()
                 } catch (e: CancellationException) {
                     // scope was cancelled while waiting
                     cmdJob.error(InterruptedException("CtrlConnection Stream Ended"))
-                    throw e
-                } catch (e: NotImplementedError) {
-                    // TODO: Issue #421
-                    cmdJob.error(e)
-                } catch (e: NoSuchElementException) {
+                    return@launch
+                }
+
+                try {
+                    cmdJob.respond(replies)
+                } catch (e: RuntimeException) {
                     cmdJob.error(e)
                 }
             }.invokeOnCompletion { t ->

@@ -16,6 +16,7 @@
 package io.matthewnelson.kmp.tor.runtime.test
 
 import io.matthewnelson.immutable.collections.immutableSetOf
+import io.matthewnelson.immutable.collections.toImmutableSet
 import io.matthewnelson.kmp.file.SysTempDir
 import io.matthewnelson.kmp.file.resolve
 import io.matthewnelson.kmp.tor.resource.tor.TorResources
@@ -64,7 +65,7 @@ object TestUtils {
     fun clientAuthTestKeyPairs(): Set<Pair<X25519.PublicKey, X25519.PrivateKey>> {
         return CLIENT_AUTH_TEST_KEYS.mapTo(LinkedHashSet(3, 1.0f)) { (pub, prv) ->
             pub.toX25519PublicKey() to prv.toX25519PrivateKey()
-        }
+        }.toImmutableSet()
     }
 
     fun List<Lifecycle.Event>.assertDoesNotContain(
