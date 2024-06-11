@@ -28,6 +28,25 @@ import kotlin.jvm.*
 /**
  * Base abstraction for denoting an ip address
  *
+ * e.g.
+ *
+ *     "192.168.0.1".toIPAddress()
+ *     "http://127.0.0.1:8080".toIPAddress()
+ *     "::1".toIPAddress()
+ *     "[::1]".toIPAddress()
+ *     "http://[::1]:8080".toIPAddress()
+ *     "https://uName:pass word@[::1]:8443/some/path".toIPAddress()
+ *
+ *     ByteArray(4).toIPAddressV4().let { address ->
+ *         assertIs<IPAddress.V4.AnyHost>(address)
+ *     }
+ *     ByteArray(16).toIPAddressV6(scope = "1").let { address ->
+ *         assertIs<IPAddress.V6.AnyHost>(address)
+ *         assertIsNot<IPAddress.V6.AnyHost.NoScope>(address)
+ *         println(address)
+ *         // 0:0:0:0:0:0:0:0%1
+ *     }
+ *
  * @see [V4]
  * @see [V6]
  * @see [io.matthewnelson.kmp.tor.runtime.core.util.toInetAddress]
@@ -151,7 +170,9 @@ public sealed class IPAddress private constructor(
             @JvmStatic
             @JvmName("get")
             @Throws(IllegalArgumentException::class)
-            public fun ByteArray.toIPAddressV4(): V4 = toIPAddressV4(copy = true)
+            public fun ByteArray.toIPAddressV4(): V4 {
+                return toIPAddressV4(copy = true)
+            }
 
             /**
              * Parses a String for its IPv4 address.

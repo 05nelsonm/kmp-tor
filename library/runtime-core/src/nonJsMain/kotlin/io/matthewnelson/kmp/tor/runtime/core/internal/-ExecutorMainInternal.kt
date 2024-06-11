@@ -26,8 +26,8 @@ import kotlin.coroutines.EmptyCoroutineContext
 
 internal actual object ExecutorMainInternal: OnEvent.Executor {
 
-    private val SCOPE by lazy {
-        val main = run {
+    private val MainScope by lazy {
+        val mainDispatcher = run {
             // Will throw if Missing
             Dispatchers.Main.isDispatchNeeded(EmptyCoroutineContext)
 
@@ -41,12 +41,12 @@ internal actual object ExecutorMainInternal: OnEvent.Executor {
         CoroutineScope(context =
             CoroutineName("OnEvent.Executor.Main")
             + SupervisorJob()
-            + main
+            + mainDispatcher
         )
     }
 
     @InternalKmpTorApi
     actual override fun execute(handler: CoroutineContext, executable: Executable) {
-        SCOPE.launch(handler) { executable.execute() }
+        MainScope.launch(handler) { executable.execute() }
     }
 }

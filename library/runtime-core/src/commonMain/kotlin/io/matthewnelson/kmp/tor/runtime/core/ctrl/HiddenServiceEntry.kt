@@ -33,9 +33,11 @@ public class HiddenServiceEntry private constructor(
     public val publicKey: AddressKey.Public,
     @JvmField
     public val privateKey: AddressKey.Private?,
-    @JvmField
-    public val clientAuth: Set<AuthKey.Public>,
+    clientAuth: Set<AuthKey.Public>,
 ) {
+
+    @JvmField
+    public val clientAuth: Set<AuthKey.Public> = clientAuth.toImmutableSet()
 
     public companion object {
 
@@ -67,7 +69,7 @@ public class HiddenServiceEntry private constructor(
             return HiddenServiceEntry(
                 publicKey = publicKey,
                 privateKey = privateKey,
-                clientAuth = clientAuth.toImmutableSet(),
+                clientAuth = clientAuth,
             )
         }
     }

@@ -24,6 +24,12 @@ import kotlin.jvm.JvmStatic
 
 /**
  * Holder for a inet socket address' parts
+ *
+ * e.g.
+ *
+ *     "127.0.0.1:8080".toIPSocketAddress()
+ *     "[::1]:8080".toIPSocketAddress()
+ *     IPSocketAddress(IPAddress.V4.AnyHost, 8080.toPort())
  * */
 public class IPSocketAddress(
     @JvmField

@@ -32,6 +32,9 @@ import kotlin.jvm.JvmStatic
  * @see [Event.observer]
  * @see [Processor]
  * @see [TorEvent.Companion]
+ * @see [valueOf]
+ * @see [valueOfOrNull]
+ * @see [entries]
  * */
 public sealed class TorEvent private constructor(
     name: String,

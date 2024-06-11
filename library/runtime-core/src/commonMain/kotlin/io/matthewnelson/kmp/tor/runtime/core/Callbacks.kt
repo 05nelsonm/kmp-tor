@@ -23,6 +23,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.MainCoroutineDispatcher
 import kotlin.concurrent.Volatile
 import kotlin.coroutines.CoroutineContext
+import kotlin.coroutines.EmptyCoroutineContext
 import kotlin.jvm.JvmName
 import kotlin.jvm.JvmStatic
 
@@ -166,7 +167,25 @@ public fun interface OnEvent<in Data: Any?>: ItBlock<Data> {
          * resulting in an exception when [execute] is invoked.
          * */
         public object Main: Executor by ExecutorMainInternal {
-            override fun toString(): String = "OnEvent.Executor.Main"
+
+            /**
+             * Helper for checking if [Dispatchers.Main] [MainCoroutineDispatcher]
+             * that backs this [Executor] is available or not.
+             *
+             * If false, [Executor.Main] usage will result in exception when events
+             * are dispatched and **should not** be utilized.
+             * */
+            @get:JvmName("isAvailable")
+            public val isAvailable: Boolean by lazy {
+                try {
+                    Dispatchers.Main.isDispatchNeeded(EmptyCoroutineContext)
+                    true
+                } catch (_: Throwable) {
+                    false
+                }
+            }
+
+            public override fun toString(): String = "OnEvent.Executor.Main"
         }
 
         /**
@@ -183,8 +202,8 @@ public fun interface OnEvent<in Data: Any?>: ItBlock<Data> {
         public object Immediate: Executor {
 
             @InternalKmpTorApi
-            override fun execute(handler: CoroutineContext, executable: Executable) { executable.execute() }
-            override fun toString(): String = "OnEvent.Executor.Immediate"
+            public override fun execute(handler: CoroutineContext, executable: Executable) { executable.execute() }
+            public override fun toString(): String = "OnEvent.Executor.Immediate"
         }
     }
 

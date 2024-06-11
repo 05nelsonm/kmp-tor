@@ -34,6 +34,14 @@ import kotlin.jvm.JvmSynthetic
 /**
  * Base abstraction for denoting a String value as a `.onion` address
  *
+ * e.g.
+ *
+ *     val string = "2gzyxa5ihm7nsggfxnu52rck2vv4rvmdlkiu3zzui5du4xyclen53wid"
+ *
+ *     string.toOnionAddress()
+ *     "http://${string}.onion:8080/some/path".toOnionAddress()
+ *     "http://subdomain.${string}.onion:8080/some/path".toOnionAddress()
+ *
  * @see [V3]
  * */
 public sealed class OnionAddress private constructor(value: String): Address(value) {
@@ -119,7 +127,7 @@ public sealed class OnionAddress private constructor(value: String): Address(val
      * appended.
      *
      * This is only a preliminary check for character and length correctness.
-     * Public key validity is not checked.
+     * Public key validity is **not** checked.
      * */
     public class V3 private constructor(value: String): OnionAddress(value) {
 

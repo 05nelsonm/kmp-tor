@@ -29,7 +29,7 @@ import kotlin.time.TimeSource
 
 /**
  * The host machine's loopback [IPv4] and [IPv6] addresses,
- * typically 127.0.0.1 and ::1, respectively.
+ * typically `127.0.0.1` and `::1`, respectively.
  *
  * Results from system sources are cached for 5s to inhibit
  * unnecessary repeated calls.
@@ -37,12 +37,13 @@ import kotlin.time.TimeSource
 public sealed class LocalHost private constructor(): Address("localhost") {
 
     /**
-     * Resolves "localhost" to an [IPAddress] via system calls
+     * Resolves `localhost` to an [IPAddress] via system calls
      *
      * **NOTE:** This is a blocking call and should be invoked from
      * a background thread.
      *
-     * @throws [IOException] if there were any errors (e.g. calling from Main thread on Android)
+     * @throws [IOException] if there were any errors (e.g. calling
+     *   from Main thread on Android)
      * */
     @Throws(IOException::class)
     public abstract fun resolve(): IPAddress

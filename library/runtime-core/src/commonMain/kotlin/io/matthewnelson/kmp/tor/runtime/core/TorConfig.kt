@@ -55,7 +55,7 @@ import kotlin.time.Duration.Companion.seconds
  * [tor-manual](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc)
  * are declared within [TorConfig] as subclasses. Many of them do not
  * have their builders implemented, but are available for use with
- * [TorCmd.Config.Get] queries.
+ * [TorCmd.Config.Get] and [TorCmd.Config.Reset] queries.
  *
  * @see [Builder]
  * @see [Companion.Builder]

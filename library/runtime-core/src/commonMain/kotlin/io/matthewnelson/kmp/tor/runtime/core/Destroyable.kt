@@ -15,7 +15,6 @@
  **/
 package io.matthewnelson.kmp.tor.runtime.core
 
-import io.matthewnelson.kmp.tor.runtime.core.Destroyable.Companion.checkIsNotDestroyed
 import kotlin.jvm.JvmOverloads
 import kotlin.jvm.JvmStatic
 

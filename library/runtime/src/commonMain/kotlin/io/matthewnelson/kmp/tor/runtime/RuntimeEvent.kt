@@ -17,8 +17,6 @@
 
 package io.matthewnelson.kmp.tor.runtime
 
-import io.matthewnelson.kmp.process.Process
-import io.matthewnelson.kmp.process.Stdio
 import io.matthewnelson.kmp.tor.runtime.core.*
 import io.matthewnelson.kmp.tor.runtime.core.ctrl.Reply
 import io.matthewnelson.kmp.tor.runtime.core.ctrl.TorCmd
@@ -55,6 +53,9 @@ import kotlin.jvm.JvmSynthetic
  * @see [Event.observer]
  * @see [Processor]
  * @see [RuntimeEvent.Companion]
+ * @see [valueOf]
+ * @see [valueOfOrNull]
+ * @see [entries]
  * */
 public sealed class RuntimeEvent<Data: Any> private constructor(
     name: String
@@ -391,12 +392,12 @@ public sealed class RuntimeEvent<Data: Any> private constructor(
         public data object READY: PROCESS("PROCESS_READY")
 
         /**
-         * Lines output from tor's [Process] [Stdio.Config.stdout] stream.
+         * Lines from the tor process' standard output stream.
          * */
         public data object STDOUT: PROCESS("PROCESS_STDOUT")
 
         /**
-         * Lines output by tor's [Process] [Stdio.Config.stderr] stream.
+         * Lines form the tor process' error output stream.
          * */
         public data object STDERR: PROCESS("PROCESS_STDERR")
     }
