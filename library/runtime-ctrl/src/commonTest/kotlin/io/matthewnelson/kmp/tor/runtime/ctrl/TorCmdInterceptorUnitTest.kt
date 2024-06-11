@@ -91,7 +91,7 @@ class TorCmdInterceptorUnitTest {
     @Test
     fun givenIntercept_whenCommandTheSameInstance_thenReturnsNull() {
         var invocationIntercept = 0
-        val interceptor = TorCmdInterceptor.intercept<TorCmd.Authenticate> { job, cmd ->
+        val interceptor = TorCmdInterceptor.intercept<TorCmd.Authenticate> { _, cmd ->
             if (invocationIntercept++ == 1) {
                 TorCmd.Authenticate()
             } else {
