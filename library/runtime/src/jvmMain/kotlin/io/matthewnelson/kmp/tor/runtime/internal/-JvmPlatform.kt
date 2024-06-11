@@ -17,7 +17,12 @@
 
 package io.matthewnelson.kmp.tor.runtime.internal
 
+import io.matthewnelson.kmp.file.ANDROID
 import io.matthewnelson.kmp.file.File
+import io.matthewnelson.kmp.file.SysDirSep
+import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
+import io.matthewnelson.kmp.tor.core.resource.OSHost
+import io.matthewnelson.kmp.tor.core.resource.OSInfo
 import io.matthewnelson.kmp.tor.runtime.FileID.Companion.fidEllipses
 import io.matthewnelson.kmp.tor.runtime.TorRuntime
 import kotlinx.coroutines.*
@@ -39,11 +44,32 @@ internal actual inline fun TorRuntime.Environment.newRuntimeDispatcher(): Corout
 
 @Throws(Throwable::class)
 internal actual fun File.setDirectoryPermissions() {
-    setReadable(false, /* ownerOnly */ false)
-    setWritable(false, /* ownerOnly */ false)
-    setExecutable(false, /* ownerOnly */ false)
+    @OptIn(InternalKmpTorApi::class)
+    if (OSInfo.INSTANCE.osHost is OSHost.Windows) return
+    if (SysDirSep == '\\') return
 
-    setReadable(true, /* ownerOnly */ true)
-    setWritable(true, /* ownerOnly */ true)
-    setExecutable(true, /* ownerOnly */ true)
+    val hasNioPath = ANDROID.SDK_INT?.let { it >= 26 } ?: true
+
+    if (!hasNioPath) {
+        setReadable(false, /* ownerOnly */ false)
+        setWritable(false, /* ownerOnly */ false)
+        setExecutable(false, /* ownerOnly */ false)
+
+        setReadable(true, /* ownerOnly */ true)
+        setWritable(true, /* ownerOnly */ true)
+        setExecutable(true, /* ownerOnly */ true)
+        return
+    }
+
+    try {
+        @Suppress("NewApi")
+        java.nio.file.Files.setPosixFilePermissions(
+            kotlin.io.path.Path(path),
+            mutableSetOf(
+                java.nio.file.attribute.PosixFilePermission.OWNER_READ,
+                java.nio.file.attribute.PosixFilePermission.OWNER_WRITE,
+                java.nio.file.attribute.PosixFilePermission.OWNER_EXECUTE,
+            )
+        )
+    } catch (_: UnsupportedOperationException) {}
 }
