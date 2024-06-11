@@ -26,9 +26,6 @@ import io.matthewnelson.kmp.tor.runtime.core.TorConfig
 import kotlin.jvm.JvmField
 import kotlin.jvm.JvmSynthetic
 
-// TODO: allowPortReassignment
-//  not here, but in :runtime configuration DSL
-
 @OptIn(InternalKmpTorApi::class)
 public sealed class TCPPortBuilder private constructor() {
 

@@ -21,6 +21,9 @@ import io.matthewnelson.kmp.tor.runtime.core.key.AuthKey
 import kotlin.jvm.JvmField
 import kotlin.jvm.JvmStatic
 
+/**
+ * Holder for results from [TorCmd.OnionClientAuth.View]
+ * */
 public class ClientAuthEntry private constructor(
     @JvmField
     public val address: OnionAddress,
@@ -28,12 +31,19 @@ public class ClientAuthEntry private constructor(
     public val privateKey: AuthKey.Private,
     @JvmField
     public val clientName: String?,
-    @JvmField
-    public val flags: Set<String>,
+    flags: Set<String>,
 ) {
+
+    @JvmField
+    public val flags: Set<String> = flags.toImmutableSet()
 
     public companion object {
 
+        /**
+         * Creates a new [ClientAuthEntry] for provided key(s).
+         *
+         * @throws [IllegalArgumentException] if key types are incompatible.
+         * */
         @JvmStatic
         @Throws(IllegalArgumentException::class)
         public fun of(
@@ -54,7 +64,7 @@ public class ClientAuthEntry private constructor(
                 address = address,
                 privateKey = privateKey,
                 clientName = clientName,
-                flags = flags.toImmutableSet(),
+                flags = flags,
             )
         }
     }

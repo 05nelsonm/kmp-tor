@@ -32,17 +32,17 @@ class TorRuntimeEnvironmentUnitTest {
 
     @Test
     fun givenSameWorkDir_whenEnvironmentBuilder_thenReturnsSameInstance() {
-        val work = "".toFile().absoluteFile.resolve("env_instance")
+        val rootDir = "".toFile().absoluteFile.resolve("env_instance")
 
-        val env1 = TorRuntime.Environment.Builder(work, work.resolve("cache")) { torResource(it) }
-        val env2 = TorRuntime.Environment.Builder(work, work.resolve("cache2")) { torResource(it) }
+        val env1 = TorRuntime.Environment.Builder(rootDir.resolve("work"), rootDir.resolve("cache")) { torResource(it) }
+        val env2 = TorRuntime.Environment.Builder(rootDir.resolve("work"), rootDir.resolve("cache2")) { torResource(it) }
         assertEquals(env1, env2)
         assertEquals(64, env1.fid.length)
 
-        val env3 = TorRuntime.Environment.Builder(work.resolve("work"), work.resolve("cache")) { torResource(it) }
+        val env3 = TorRuntime.Environment.Builder(rootDir.resolve("work3"), rootDir.resolve("cache3")) { torResource(it) }
         assertNotEquals(env1, env3)
 
-        val innerOuterWork = work.resolve("lambda")
+        val innerOuterWork = rootDir.resolve("lambda")
         var envInner: TorRuntime.Environment? = null
         val envOuter = TorRuntime.Environment.Builder(
             innerOuterWork,

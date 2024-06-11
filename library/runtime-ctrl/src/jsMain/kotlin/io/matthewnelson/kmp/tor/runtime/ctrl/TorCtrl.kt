@@ -29,6 +29,7 @@ import io.matthewnelson.kmp.tor.runtime.core.ctrl.TorCmd
 import io.matthewnelson.kmp.tor.runtime.ctrl.internal.*
 import kotlinx.coroutines.*
 import org.khronos.webgl.Uint8Array
+import kotlin.coroutines.cancellation.CancellationException
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.TimeSource
 
@@ -183,19 +184,31 @@ public actual interface TorCtrl : Destroyable, TorEvent.Processor, TorCmd.Privil
                         feed.onData(readBuf, jsBuf.length.toInt())
                     }
 
-                withContext(NonCancellable) {
+                try {
+                    val durationDelay = 10.milliseconds
+                    val durationTimeout = if (SysDirSep == '\\') {
+                        // Windows may need a little more time...
+                        500.milliseconds
+                    } else {
+                        250.milliseconds
+                    }
+
                     val mark = TimeSource.Monotonic.markNow()
 
                     while (!isConnected && threw == null) {
-                        delay(5.milliseconds)
+                        delay(durationDelay)
 
-                        if (mark.elapsedNow() < 42.milliseconds) continue
+                        if (mark.elapsedNow() < durationTimeout) continue
 
                         errorDisposable.dispose()
                         socket.destroy()
                         threw = IOException("Timed out while attempting to connect")
                         break
                     }
+                } catch (e: CancellationException) {
+                    errorDisposable.dispose()
+                    socket.destroy()
+                    throw e
                 }
 
                 threw?.let { throw it }

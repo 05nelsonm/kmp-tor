@@ -375,7 +375,7 @@ class TorCmdUnitTest {
             )
         ).let { result -> assertEquals(1, result.size) }
 
-        val all = runtime.executeAsync(TorCmd.OnionClientAuth.View.All)
+        val all = runtime.executeAsync(TorCmd.OnionClientAuth.View.ALL)
         all.forEach { println(it) }
 
         val filtered = entries.map { it.publicKey.address() }.let { addresses ->
@@ -399,7 +399,7 @@ class TorCmdUnitTest {
             runtime.executeAsync(TorCmd.OnionClientAuth.Remove(address))
         }
 
-        runtime.executeAsync(TorCmd.OnionClientAuth.View.All).let { result ->
+        runtime.executeAsync(TorCmd.OnionClientAuth.View.ALL).let { result ->
             assertEquals(0, result.size)
         }
 

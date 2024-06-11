@@ -24,7 +24,12 @@ import kotlin.jvm.JvmStatic
 import kotlin.jvm.JvmSynthetic
 
 /**
- * Holder for a port between 0 and 65535 (inclusive).
+ * Holder for a port between `0` and `65535` (inclusive).
+ *
+ * e.g.
+ *
+ *     443.toPort()
+ *     8443.toPortEphemeral()
  *
  * @see [Ephemeral]
  * @see [io.matthewnelson.kmp.tor.runtime.core.util.isAvailableAsync]

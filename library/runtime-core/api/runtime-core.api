@@ -190,6 +190,7 @@ public final class io/matthewnelson/kmp/tor/runtime/core/OnEvent$Executor$Immedi
 
 public final class io/matthewnelson/kmp/tor/runtime/core/OnEvent$Executor$Main : io/matthewnelson/kmp/tor/runtime/core/OnEvent$Executor {
 	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/core/OnEvent$Executor$Main;
+	public final fun isAvailable ()Z
 	public fun toString ()Ljava/lang/String;
 }
 
@@ -3734,7 +3735,7 @@ public final class io/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$OnionClient
 }
 
 public final class io/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$OnionClientAuth$View : io/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$Unprivileged {
-	public static final field All Lio/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$OnionClientAuth$View;
+	public static final field ALL Lio/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$OnionClientAuth$View;
 	public static final field Companion Lio/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$OnionClientAuth$View$Companion;
 	public final field address Lio/matthewnelson/kmp/tor/runtime/core/address/OnionAddress;
 	public fun <init> (Lio/matthewnelson/kmp/tor/runtime/core/address/OnionAddress$V3;)V

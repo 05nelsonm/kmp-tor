@@ -479,7 +479,7 @@ public sealed class TorCmd<Success: Any> private constructor(
             public companion object {
 
                 @JvmField
-                public val All: View = View(address = null)
+                public val ALL: View = View(address = null)
             }
         }
     }

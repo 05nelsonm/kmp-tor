@@ -18,7 +18,7 @@ package io.matthewnelson.kmp.tor.runtime.core.address
 import kotlin.jvm.JvmField
 
 /**
- * Base abstraction for all address types
+ * Base abstraction for all address types in `kmp-tor`
  *
  * @see [IPAddress]
  * @see [IPSocketAddress]
@@ -31,33 +31,44 @@ public sealed class Address(
 ): Comparable<Address> {
 
     /**
-     * Returns the [value] in its canonicalized hostname form
+     * Returns [value] in its canonicalized hostname form
      *
      * e.g.
      *
-     *     println("127.0.0.1"
+     *     "127.0.0.1"
      *         .toIPAddressV4()
      *         .canonicalHostName()
-     *     )
+     *         .let { println(it) }
      *     // 127.0.0.1
      *
-     *     println("::1"
+     *     "::1"
      *         .toIPAddressV6()
      *         .canonicalHostName()
-     *     )
-     *     // [::1]
+     *         .let { println(it) }
+     *     // [0:0:0:0:0:0:0:1]
      *
-     *     println("http://127.0.0.1:8081/path"
+     *     "http://127.0.0.1:8081/path"
      *         .toIPSocketAddress()
      *         .canonicalHostName()
-     *     )
+     *         .let { println(it) }
      *     // 127.0.0.1
      *
-     *     println("http://2gzyxa5ihm7nsggfxnu52rck2vv4rvmdlkiu3zzui5du4xyclen53wid.onion"
+     *     "http://[::1%1]:8081/path"
+     *         .toIPSocketAddress()
+     *         .canonicalHostName()
+     *         .let { println(it) }
+     *     // [0:0:0:0:0:0:0:1%1]
+     *
+     *     "2gzyxa5ihm7nsggfxnu52rck2vv4rvmdlkiu3zzui5du4xyclen53wid"
      *         .toOnionAddressV3()
      *         .canonicalHostName()
-     *     )
+     *         .let { println(it) }
      *     // 2gzyxa5ihm7nsggfxnu52rck2vv4rvmdlkiu3zzui5du4xyclen53wid.onion
+     *
+     *     LocalHost.IPv4
+     *         .canonicalHostName()
+     *         .let { println(it) }
+     *     // localhost
      * */
     public fun canonicalHostName(): String = when (this) {
         is IPAddress.V4 -> value
