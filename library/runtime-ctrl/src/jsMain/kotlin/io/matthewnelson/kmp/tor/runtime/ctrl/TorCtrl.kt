@@ -186,10 +186,13 @@ public actual interface TorCtrl : Destroyable, TorEvent.Processor, TorCmd.Privil
                 withContext(NonCancellable) {
                     val mark = TimeSource.Monotonic.markNow()
 
-                    while (!isConnected && threw == null) {
-                        delay(5.milliseconds)
+                    val durationTimeout = (42 * 3).milliseconds
+                    val durationDelay = 5.milliseconds
 
-                        if (mark.elapsedNow() < 42.milliseconds) continue
+                    while (!isConnected && threw == null) {
+                        delay(durationDelay)
+
+                        if (mark.elapsedNow() < durationTimeout) continue
 
                         errorDisposable.dispose()
                         socket.destroy()
