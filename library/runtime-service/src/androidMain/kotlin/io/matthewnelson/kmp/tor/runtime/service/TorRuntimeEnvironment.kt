@@ -31,6 +31,9 @@ import io.matthewnelson.kmp.tor.runtime.core.apply
  * to acquire default tor directory locations within the application's data
  * directory to create [TorRuntime.Environment].
  *
+ * **NOTE:** [TorRuntime.Environment.Builder.serviceFactoryLoader] is set
+ * automatically and tor will run inside an [android.app.Service].
+ *
  * - workDir: app_torservice
  * - cacheDir: cache/torservice
  * */
@@ -43,6 +46,9 @@ public fun Context.createTorRuntimeEnvironment(
  * Android extension which utilizes [Context.getDir] and [Context.getCacheDir]
  * to acquire default tor directory locations within the application's data
  * directory to create [TorRuntime.Environment].
+ *
+ * **NOTE:** [TorRuntime.Environment.Builder.serviceFactoryLoader] is set
+ * automatically and tor will run inside an [android.app.Service].
  *
  * - workDir: app_torservice
  * - cacheDir: cache/torservice
@@ -58,6 +64,9 @@ public fun Context.createTorRuntimeEnvironment(
  * to acquire tor directory locations within the application's data directory
  * for specified [dirName] to create [TorRuntime.Environment] with.
  *
+ * **NOTE:** [TorRuntime.Environment.Builder.serviceFactoryLoader] is set
+ * automatically and tor will run inside an [android.app.Service].
+ *
  * - workDir: app_[dirName]
  * - cacheDir: cache/[dirName]
  * */
@@ -71,6 +80,9 @@ public fun Context.createTorRuntimeEnvironment(
  * Android extension which utilizes [Context.getDir] and [Context.getCacheDir]
  * to acquire tor directory locations within the application's data directory
  * for specified [dirName] to create [TorRuntime.Environment] with.
+ *
+ * **NOTE:** [TorRuntime.Environment.Builder.serviceFactoryLoader] is set
+ * automatically and tor will run inside an [android.app.Service].
  *
  * - workDir: app_[dirName]
  * - cacheDir: cache/[dirName]

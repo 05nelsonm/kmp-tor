@@ -352,10 +352,8 @@ public sealed interface TorRuntime:
              * **NOTE:** If the same directory is utilized for both [workDirectory]
              * and [cacheDirectory], tor may fail to start; they **must** be different.
              *
-             * **NOTE:** If multiple [Environment] are being created, they **must**
-             * have different [workDirectory] and [cacheDirectory]. If an [Environment]
-             * has already been created that uses the declared [workDirectory] or
-             * [cacheDirectory], that [Environment] instance will be returned instead.
+             * **NOTE:** If an [Environment] already exists for the provided [workDirectory]
+             * **or** [cacheDirectory], that instance will be returned.
              *
              * @param [workDirectory] tor's working directory (e.g. `$HOME/.my_application/torservice`)
              *   This will be utilized as the tor process' `HOME` environment variable.
@@ -388,10 +386,8 @@ public sealed interface TorRuntime:
              * **NOTE:** If the same directory is utilized for both [workDirectory]
              * and [cacheDirectory], tor may fail to start; they **must** be different.
              *
-             * **NOTE:** If multiple [Environment] are being created, they **must**
-             * have different [workDirectory] and [cacheDirectory]. If an [Environment]
-             * has already been created that uses the declared [workDirectory] or
-             * [cacheDirectory], that [Environment] instance will be returned instead.
+             * **NOTE:** If an [Environment] already exists for the provided [workDirectory]
+             * **or** [cacheDirectory], that instance will be returned.
              *
              * @param [workDirectory] tor's working directory (e.g. `$HOME/.my_application/torservice`)
              *   This will be utilized as the tor process' `HOME` environment variable.
