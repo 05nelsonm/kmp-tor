@@ -80,11 +80,15 @@ public sealed interface TorRuntime:
      * If tor is **not** 100% bootstrapped with network enabled,
      * [TorListeners.isEmpty] will always be true for the returned
      * instance of [TorListeners].
+     *
+     * @see [RuntimeEvent.LISTENERS]
      * */
     public fun listeners(): TorListeners
 
     /**
      * Returns the current [TorState] of this [TorRuntime] instance.
+     *
+     * @see [RuntimeEvent.STATE]
      * */
     public fun state(): TorState
 
@@ -334,9 +338,6 @@ public sealed interface TorRuntime:
             /**
              * Opener for creating an [Environment] instance.
              *
-             * If an [Environment] has already been created for the provided
-             * [workDirectory], that [Environment] instance will be returned.
-             *
              * [workDirectory] should be specified within your application's home
              * directory (e.g. `$HOME/.my_application/torservice`). This will
              * be utilized as the tor process' `HOME` environment variable.
@@ -348,9 +349,13 @@ public sealed interface TorRuntime:
              * identical (e.g. `torservice`), especially when creating multiple
              * instances of [Environment].
              *
-             * **WARNING:** When running multiple instances ot [TorRuntime],
-             * declaring the same [cacheDirectory] as another [Environment] will result
-             * in a bad day. No checks are performed for this clash.
+             * **NOTE:** If the same directory is utilized for both [workDirectory]
+             * and [cacheDirectory], tor may fail to start; they **must** be different.
+             *
+             * **NOTE:** If multiple [Environment] are being created, they **must**
+             * have different [workDirectory] and [cacheDirectory]. If an [Environment]
+             * has already been created that uses the declared [workDirectory] or
+             * [cacheDirectory], that [Environment] instance will be returned instead.
              *
              * @param [workDirectory] tor's working directory (e.g. `$HOME/.my_application/torservice`)
              *   This will be utilized as the tor process' `HOME` environment variable.
@@ -369,9 +374,6 @@ public sealed interface TorRuntime:
             /**
              * Opener for creating an [Environment] instance.
              *
-             * If an [Environment] has already been created for the provided
-             * [workDirectory], that [Environment] instance will be returned.
-             *
              * [workDirectory] should be specified within your application's home
              * directory (e.g. `$HOME/.my_application/torservice`). This will
              * be utilized as the tor process' `HOME` environment variable.
@@ -383,9 +385,13 @@ public sealed interface TorRuntime:
              * identical (e.g. `torservice`), especially when creating multiple
              * instances of [Environment].
              *
-             * **WARNING:** When running multiple instances ot [TorRuntime],
-             * declaring the same [cacheDirectory] as another [Environment] will result
-             * in a bad day. No checks are performed for this clash.
+             * **NOTE:** If the same directory is utilized for both [workDirectory]
+             * and [cacheDirectory], tor may fail to start; they **must** be different.
+             *
+             * **NOTE:** If multiple [Environment] are being created, they **must**
+             * have different [workDirectory] and [cacheDirectory]. If an [Environment]
+             * has already been created that uses the declared [workDirectory] or
+             * [cacheDirectory], that [Environment] instance will be returned instead.
              *
              * @param [workDirectory] tor's working directory (e.g. `$HOME/.my_application/torservice`)
              *   This will be utilized as the tor process' `HOME` environment variable.
@@ -463,7 +469,7 @@ public sealed interface TorRuntime:
             @ExperimentalKmpTorApi
             public var serviceFactoryLoader: ServiceFactory.Loader? = null
 
-            internal companion object: InstanceKeeper<File, Environment>() {
+            internal companion object: InstanceKeeper<EnvironmentKey, Environment>() {
 
                 @JvmSynthetic
                 internal fun build(
@@ -478,8 +484,10 @@ public sealed interface TorRuntime:
                     if (block != null) b.apply(block)
                     val torResource = installer(b.installationDirectory.absoluteFile.normalize())
 
+                    val key = EnvironmentKey(b.workDirectory, b.cacheDirectory)
+
                     @OptIn(ExperimentalKmpTorApi::class)
-                    return getOrCreateInstance(key = b.workDirectory, block = {
+                    return getOrCreateInstance(key = key, block = {
 
                         // Always reset, just in case it was overridden
                         b.processEnv["HOME"] = b.workDirectory.path
