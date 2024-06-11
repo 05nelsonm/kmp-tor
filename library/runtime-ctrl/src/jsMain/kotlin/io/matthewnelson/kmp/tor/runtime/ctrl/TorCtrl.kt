@@ -185,8 +185,13 @@ public actual interface TorCtrl : Destroyable, TorEvent.Processor, TorCmd.Privil
                     }
 
                 try {
-                    val durationTimeout = (42 * 3).milliseconds
-                    val durationDelay = 5.milliseconds
+                    val durationDelay = 10.milliseconds
+                    val durationTimeout = if (SysDirSep == '\\') {
+                        // Windows may need a little more time...
+                        500.milliseconds
+                    } else {
+                        250.milliseconds
+                    }
 
                     val mark = TimeSource.Monotonic.markNow()
 
