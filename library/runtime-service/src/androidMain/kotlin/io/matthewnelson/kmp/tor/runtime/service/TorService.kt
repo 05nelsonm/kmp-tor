@@ -18,19 +18,22 @@ package io.matthewnelson.kmp.tor.runtime.service
 import android.app.Application
 import android.content.Context
 import android.content.Intent
+import android.content.res.Resources
 import androidx.startup.AppInitializer
 import io.matthewnelson.kmp.tor.core.api.annotation.ExperimentalKmpTorApi
 import io.matthewnelson.kmp.tor.runtime.*
+import io.matthewnelson.kmp.tor.runtime.service.internal.RealTorServiceConfig
 
 @OptIn(ExperimentalKmpTorApi::class)
 internal class TorService internal constructor(): AbstractTorService() {
 
     private class AndroidServiceFactory(
         private val app: Application,
+        config: RealTorServiceConfig,
         initializer: Initializer,
     ): TorRuntime.ServiceFactory(initializer) {
 
-        private val connection = Connection(binder)
+        private val connection = Connection(binder, config)
 
         @Throws(RuntimeException::class)
         protected override fun startService() {
@@ -84,13 +87,17 @@ internal class TorService internal constructor(): AbstractTorService() {
         private var app: Application? = null
 
         @JvmSynthetic
+        @Throws(Resources.NotFoundException::class)
         internal fun loaderOrNull(): TorRuntime.ServiceFactory.Loader? {
             val app = app ?: return null
+            val config = RealTorServiceConfig.of(app)
 
             return object : TorRuntime.ServiceFactory.Loader() {
                 override fun loadProtected(
                     initializer: TorRuntime.ServiceFactory.Initializer,
-                ): TorRuntime.ServiceFactory = AndroidServiceFactory(app, initializer)
+                ): TorRuntime.ServiceFactory {
+                    return AndroidServiceFactory(app, config, initializer)
+                }
             }
         }
     }
