@@ -5,3 +5,31 @@ public final class io/matthewnelson/kmp/tor/runtime/service/TorRuntimeEnvironmen
 	public static final fun Builder (Landroid/content/Context;Lkotlin/jvm/functions/Function1;Lio/matthewnelson/kmp/tor/runtime/core/ThisBlock;)Lio/matthewnelson/kmp/tor/runtime/TorRuntime$Environment;
 }
 
+public abstract class io/matthewnelson/kmp/tor/runtime/service/TorServiceConfig {
+	public static final field Companion Lio/matthewnelson/kmp/tor/runtime/service/TorServiceConfig$Companion;
+	public final field channelDescription Ljava/lang/String;
+	public final field channelId Ljava/lang/String;
+	public final field channelName Ljava/lang/String;
+	public final field channelShowBadge Z
+	public final field colorWhenBootstrappedFalse I
+	public final field colorWhenBootstrappedTrue I
+	public final field enableActionRestart Z
+	public final field enableActionStop Z
+	public final field enableForeground Z
+	public final field iconDataXfer I
+	public final field iconError I
+	public final field iconNetworkDisabled I
+	public final field iconNetworkEnabled I
+	public final field ifForegroundExitProcessOnDestroyWhenTaskRemoved Z
+	public final field notificationId I
+	public final field stopServiceOnTaskRemoved Z
+	public final field visibility I
+	public final fun equals (Ljava/lang/Object;)Z
+	public final fun hashCode ()I
+	public final fun toString ()Ljava/lang/String;
+}
+
+public final class io/matthewnelson/kmp/tor/runtime/service/TorServiceConfig$Companion {
+	public final fun getMetaData (Landroid/content/Context;)Lio/matthewnelson/kmp/tor/runtime/service/TorServiceConfig;
+}
+
