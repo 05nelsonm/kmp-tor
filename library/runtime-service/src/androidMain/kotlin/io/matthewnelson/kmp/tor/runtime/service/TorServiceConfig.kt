@@ -152,9 +152,9 @@ public abstract class TorServiceConfig internal constructor(
         appendLine(colorWhenBootstrappedFalse)
         append("    visibility: ")
         appendLine(visibility)
-        append("    enableRestartAction: ")
+        append("    enableActionRestart: ")
         appendLine(enableActionRestart)
-        append("    enableStopAction: ")
+        append("    enableActionStop: ")
         appendLine(enableActionStop)
         append(']')
     }
