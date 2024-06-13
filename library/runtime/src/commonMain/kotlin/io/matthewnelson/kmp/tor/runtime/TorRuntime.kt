@@ -433,9 +433,15 @@ public sealed interface TorRuntime:
             public var defaultEventExecutor: OnEvent.Executor = OnEvent.Executor.Immediate
 
             /**
-             * The directory for which **all** resources will be installed
+             * The directory for which **all** resources will be installed.
              *
              * Default: [workDirectory]
+             *
+             * **NOTE:** If the same [installationDirectory] is defined for
+             * multiple [Environment] instances, the same [ResourceInstaller]
+             * instance will be utilized across those [Environment]. This helps
+             * mitigate unnecessary resource extraction when running multiple
+             * instances of [TorRuntime].
              * */
             @JvmField
             public var installationDirectory: File = workDirectory
@@ -478,12 +484,20 @@ public sealed interface TorRuntime:
                     // Apply block outside getOrCreateInstance call to
                     // prevent double instance creation
                     if (block != null) b.apply(block)
-                    val torResource = installer(b.installationDirectory.absoluteFile.normalize())
+                    var torResource = installer(b.installationDirectory.absoluteFile.normalize())
 
                     val key = EnvironmentKey(b.workDirectory, b.cacheDirectory)
 
                     @OptIn(ExperimentalKmpTorApi::class)
-                    return getOrCreateInstance(key = key, block = {
+                    return getOrCreateInstance(key = key, block = { instances ->
+
+                        for (other in instances) {
+                            val otherTorResource = other.second.torResource
+                            if (otherTorResource.installationDir == torResource.installationDir) {
+                                torResource = otherTorResource
+                                break
+                            }
+                        }
 
                         // Always reset, just in case it was overridden
                         b.processEnv["HOME"] = b.workDirectory.path
