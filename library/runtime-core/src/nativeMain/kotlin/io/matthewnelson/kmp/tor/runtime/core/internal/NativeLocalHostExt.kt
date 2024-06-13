@@ -17,7 +17,6 @@
 
 package io.matthewnelson.kmp.tor.runtime.core.internal
 
-import io.matthewnelson.kmp.file.errnoToIOException
 import io.matthewnelson.kmp.tor.runtime.core.address.IPAddress
 import io.matthewnelson.kmp.tor.runtime.core.address.IPAddress.V4.Companion.toIPAddressV4OrNull
 import io.matthewnelson.kmp.tor.runtime.core.address.IPAddress.V6.Companion.toIPAddressV6OrNull
@@ -37,9 +36,10 @@ internal actual fun LocalHost.Companion.tryPlatformResolve(set: LinkedHashSet<IP
         }
 
         val result = alloc<CPointerVar<addrinfo>>()
+        defer { freeaddrinfo(result.value) }
 
         if (getaddrinfo("localhost", null, hint, result.ptr) != 0) {
-            throw errnoToIOException(errno)
+            return@memScoped
         }
 
         var info: addrinfo? = result.pointed
@@ -52,8 +52,6 @@ internal actual fun LocalHost.Companion.tryPlatformResolve(set: LinkedHashSet<IP
 
             info = info.ai_next?.pointed
         }
-
-        freeaddrinfo(result.value)
     }
 }
 
