@@ -71,4 +71,26 @@ class TorRuntimeEnvironmentUnitTest {
         }
         assertEquals(env.processEnv["HOME"], workDir.path)
     }
+
+    @Test
+    fun givenMultipleEnvironments_whenSameInstallationDir_thenUsesSameResourceInstaller() {
+        val rootDir = "".toFile().absoluteFile.resolve("env_installer")
+        val env1 = TorRuntime.Environment.Builder(
+            rootDir.resolve("work1"),
+            rootDir.resolve("cache1"),
+            installer = { torResource(it) }
+        ) {
+            installationDirectory = rootDir
+        }
+        val env2 = TorRuntime.Environment.Builder(
+            rootDir.resolve("work2"),
+            rootDir.resolve("cache2"),
+            installer = { torResource(it) }
+        ) {
+            installationDirectory = rootDir
+        }
+
+        assertNotEquals(env1, env2)
+        assertEquals(env1.torResource, env2.torResource)
+    }
 }
