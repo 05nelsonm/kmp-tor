@@ -49,7 +49,6 @@ import io.matthewnelson.kmp.tor.runtime.core.builder.ExtendedTorConfigBuilder
 @OptIn(InternalKmpTorApi::class)
 internal class TorConfigGenerator internal constructor(
     internal val environment: TorRuntime.Environment,
-    private val omitGeoIPFileSettings: Boolean,
     config: Set<ConfigBuilderCallback>,
     private val isPortAvailable: suspend (LocalHost, Port) -> Boolean,
 ): FileID by environment {
@@ -81,7 +80,7 @@ internal class TorConfigGenerator internal constructor(
         // Apply library consumers' configuration(s)
         config.forEach { block -> apply(environment, block) }
 
-        putDefaults(environment, omitGeoIPFileSettings, paths)
+        putDefaults(environment, paths)
     }
 
     private suspend fun TorConfig.validateTCPPorts(
