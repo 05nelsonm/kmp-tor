@@ -119,17 +119,6 @@ public sealed interface TorRuntime:
         private val observersRuntimeEvent = mutableSetOf<RuntimeEvent.Observer<*>>()
 
         /**
-         * If true, [Paths.Tor.geoip] and [Paths.Tor.geoip6] will **not** be
-         * automatically added to your [TorConfig].
-         *
-         * Useful if using [TorRuntime] with a system installation of tor (such
-         * as a Docker container) instead of
-         * [kmp-tor-resource](https://github.com/05nelsonm/kmp-tor-resource)
-         * */
-        @JvmField
-        public var omitGeoIPFileSettings: Boolean = false
-
-        /**
          * Configure a [NetworkObserver] for this [TorRuntime] instance.
          *
          * **NOTE:** This should be a singleton with **no** contextual or
@@ -272,7 +261,6 @@ public sealed interface TorRuntime:
 
                     val generator = TorConfigGenerator(
                         environment = environment,
-                        omitGeoIPFileSettings = b.omitGeoIPFileSettings,
                         config = b.config,
                         isPortAvailable = { host, port -> port.isAvailableAsync(host) },
                     )
@@ -306,6 +294,8 @@ public sealed interface TorRuntime:
         public val workDirectory: File,
         @JvmField
         public val cacheDirectory: File,
+        @JvmField
+        public val omitGeoIPFileSettings: Boolean,
         @JvmField
         public val torResource: ResourceInstaller<Paths.Tor>,
         @JvmField
@@ -415,15 +405,17 @@ public sealed interface TorRuntime:
         ) {
 
             /**
-             * Declare a default [OnEvent.Executor] to utilize when dispatching
-             * [TorEvent] and [RuntimeEvent] to registered observers (if the observer
-             * does not provide its own). This can be overridden on a per-observer
-             * basis when creating them, given the needs of that observer and how it
-             * is being used and/or implemented.
+             * Declare a default [OnEvent.Executor] to utilize when notifying
+             * subscribed [TorEvent] and [RuntimeEvent] observers (if the
+             * observer did not declare its own).
              *
-             * **NOTE:** This should be a singleton with **no** contextual or
-             * non-singleton references outside the [OnEvent.Executor.execute]
-             * lambda.
+             * This default can be overridden on a per-observer basis when
+             * creating them, given the needs of that observer and how it is
+             * being used and/or implemented.
+             *
+             * **NOTE:** [OnEvent.Executor] should be a singleton with **no**
+             * contextual or non-singleton references outside the
+             * [OnEvent.Executor.execute] lambda.
              *
              * Default: [OnEvent.Executor.Immediate]
              *
@@ -431,6 +423,19 @@ public sealed interface TorRuntime:
              * */
             @JvmField
             public var defaultEventExecutor: OnEvent.Executor = OnEvent.Executor.Immediate
+
+            /**
+             * If true, [TorConfig.GeoIPFile] and [TorConfig.GeoIPv6File] will **not**
+             * be automatically added via [TorRuntime.Builder.config] using paths
+             * returned from [ResourceInstaller.install].
+             *
+             * This is useful if an alternative installation of tor is being used from
+             * [kmp-tor-resource](https://github.com/05nelsonm/kmp-tor-resource).
+             *
+             * Default: `false`
+             * */
+            @JvmField
+            public var omitGeoIPFileSettings: Boolean = false
 
             /**
              * The directory for which **all** resources will be installed.
@@ -505,6 +510,7 @@ public sealed interface TorRuntime:
                         Environment(
                             workDirectory = b.workDirectory,
                             cacheDirectory = b.cacheDirectory,
+                            omitGeoIPFileSettings = b.omitGeoIPFileSettings,
                             torResource = torResource,
                             processEnv = b.processEnv.toImmutableMap(),
                             _defaultExecutor = b.defaultEventExecutor,

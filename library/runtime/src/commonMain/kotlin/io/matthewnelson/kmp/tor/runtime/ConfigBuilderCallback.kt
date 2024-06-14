@@ -28,6 +28,15 @@ import kotlin.jvm.JvmSynthetic
 /**
  * A Callback for configuring [TorConfig.Builder].
  *
+ * e.g.
+ *
+ *     ConfigBuilderCallback { environment ->
+ *         put(TorConfig.ClientOnionAuthDir) {
+ *             directory = environment.workDirectory
+ *                 .resolve(TorConfig.ClientOnionAuthDir.DEFAULT_NAME)
+ *         }
+ *     }
+ *
  * @see [TorRuntime.Builder.config]
  * */
 public fun interface ConfigBuilderCallback: ThisBlock.WithIt<TorConfig.Builder, TorRuntime.Environment> {
@@ -42,11 +51,10 @@ public fun interface ConfigBuilderCallback: ThisBlock.WithIt<TorConfig.Builder, 
         @OptIn(InternalKmpTorApi::class)
         internal fun TorConfig.Builder.putDefaults(
             environment: TorRuntime.Environment,
-            omitGeoIPFileSettings: Boolean,
             paths: ResourceInstaller.Paths.Tor,
         ) {
             // Dirs/Files
-            if (!omitGeoIPFileSettings) {
+            if (!environment.omitGeoIPFileSettings) {
                 put(TorConfig.GeoIPFile) { file = paths.geoip }
                 put(TorConfig.GeoIPv6File) { file = paths.geoip6 }
             }

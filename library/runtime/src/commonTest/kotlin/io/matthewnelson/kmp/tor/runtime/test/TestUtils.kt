@@ -17,8 +17,11 @@ package io.matthewnelson.kmp.tor.runtime.test
 
 import io.matthewnelson.immutable.collections.immutableSetOf
 import io.matthewnelson.immutable.collections.toImmutableSet
+import io.matthewnelson.kmp.file.File
 import io.matthewnelson.kmp.file.SysTempDir
 import io.matthewnelson.kmp.file.resolve
+import io.matthewnelson.kmp.tor.core.api.ResourceInstaller
+import io.matthewnelson.kmp.tor.core.api.ResourceInstaller.Paths
 import io.matthewnelson.kmp.tor.resource.tor.TorResources
 import io.matthewnelson.kmp.tor.runtime.Action
 import io.matthewnelson.kmp.tor.runtime.FileID
@@ -44,11 +47,12 @@ object TestUtils {
 
     fun testEnv(
         dirName: String,
+        installer: (File) -> ResourceInstaller<Paths.Tor> = { INSTALLER },
         block: ThisBlock<TorRuntime.Environment.Builder> = ThisBlock {}
     ): TorRuntime.Environment = TorRuntime.Environment.Builder(
         workDirectory = TMP_TEST_DIR.resolve("$dirName/work"),
         cacheDirectory = TMP_TEST_DIR.resolve("$dirName/cache"),
-        installer = { INSTALLER },
+        installer = installer,
         block = block
     ).also { it.debug = true }
 

@@ -15,10 +15,9 @@
  **/
 package io.matthewnelson.kmp.tor.runtime.internal
 
-import io.matthewnelson.kmp.file.absoluteFile
+import io.matthewnelson.kmp.file.File
 import io.matthewnelson.kmp.file.path
 import io.matthewnelson.kmp.file.resolve
-import io.matthewnelson.kmp.file.toFile
 import io.matthewnelson.kmp.tor.core.api.ResourceInstaller
 import io.matthewnelson.kmp.tor.core.api.ResourceInstaller.Paths
 import io.matthewnelson.kmp.tor.runtime.ConfigBuilderCallback
@@ -29,6 +28,7 @@ import io.matthewnelson.kmp.tor.runtime.core.TorConfig.Setting.Companion.filterB
 import io.matthewnelson.kmp.tor.runtime.core.address.LocalHost
 import io.matthewnelson.kmp.tor.runtime.core.address.Port
 import io.matthewnelson.kmp.tor.runtime.core.address.Port.Ephemeral.Companion.toPortEphemeral
+import io.matthewnelson.kmp.tor.runtime.test.TestUtils.testEnv
 import kotlinx.coroutines.test.runTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -37,22 +37,17 @@ import kotlin.test.assertTrue
 
 class TorConfigGeneratorUnitTest {
 
-    private val environment = "".toFile().absoluteFile.resolve("config-test").let { rootDir ->
-        TorRuntime.Environment.Builder(
-            rootDir.resolve("work"),
-            rootDir.resolve("cache"),
-        ) { installationDir ->
-            object : ResourceInstaller<Paths.Tor>(installationDir) {
-                private val paths = Paths.Tor(
-                    geoip = installationDir.resolve("geoip"),
-                    geoip6 = installationDir.resolve("geoip6"),
-                    tor = installationDir.resolve("tor")
-                )
+    private fun installer(installationDir: File) = object : ResourceInstaller<Paths.Tor>(installationDir) {
+        private val paths = Paths.Tor(
+            geoip = installationDir.resolve("geoip"),
+            geoip6 = installationDir.resolve("geoip6"),
+            tor = installationDir.resolve("tor")
+        )
 
-                override fun install(): Paths.Tor = paths
-            }
-        }
+        override fun install(): Paths.Tor = paths
     }
+
+    private val environment = testEnv("config_test", ::installer)
 
     private val notifier = object : RuntimeEvent.Notifier {
         override fun <Data: Any, E: RuntimeEvent<Data>> notify(event: E, data: Data) {}
@@ -60,14 +55,15 @@ class TorConfigGeneratorUnitTest {
 
     @Test
     fun givenGeoipOmission_whenGenerate_thenDoesNotContainSettings() = runTest {
-        val settings = newGenerator(omitGeoIPFileSettings = true).generate(notifier).first.settings
+        val environment = testEnv("config_test_omit_geoip", ::installer) { omitGeoIPFileSettings = true }
+        val settings = newGenerator(environment).generate(notifier).first.settings
         assertEquals(0, settings.filterByKeyword<TorConfig.GeoIPFile.Companion>().size)
         assertEquals(0, settings.filterByKeyword<TorConfig.GeoIPv6File.Companion>().size)
     }
 
     @Test
     fun givenGeoipNoOmission_whenGenerate_thenContainsSettings() = runTest {
-        with(newGenerator(omitGeoIPFileSettings = false).generate(notifier).first) {
+        with(newGenerator().generate(notifier).first) {
             assertContains(TorConfig.GeoIPFile)
             assertContains(TorConfig.GeoIPv6File)
         }
@@ -215,12 +211,11 @@ class TorConfigGeneratorUnitTest {
     }
 
     private fun newGenerator(
-        omitGeoIPFileSettings: Boolean = false,
+        environment: TorRuntime.Environment = this.environment,
         config: Set<ConfigBuilderCallback> = emptySet(),
         isPortAvailable: suspend (LocalHost, Port) -> Boolean = { _, _ -> true },
     ): TorConfigGenerator = TorConfigGenerator(
         environment,
-        omitGeoIPFileSettings,
         config,
         isPortAvailable
     )
