@@ -28,6 +28,15 @@ import kotlin.jvm.JvmSynthetic
 /**
  * A Callback for configuring [TorConfig.Builder].
  *
+ * e.g.
+ *
+ *     ConfigBuilderCallback { environment ->
+ *         put(TorConfig.ClientOnionAuthDir) {
+ *             directory = environment.workDirectory
+ *                 .resolve(TorConfig.ClientOnionAuthDir.DEFAULT_NAME)
+ *         }
+ *     }
+ *
  * @see [TorRuntime.Builder.config]
  * */
 public fun interface ConfigBuilderCallback: ThisBlock.WithIt<TorConfig.Builder, TorRuntime.Environment> {

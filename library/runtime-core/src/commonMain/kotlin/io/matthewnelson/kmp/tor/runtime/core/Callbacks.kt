@@ -110,8 +110,8 @@ public fun interface OnEvent<in Data: Any?>: ItBlock<Data> {
     }
 
     /**
-     * `kmp-tor` utilizes several different background threads for
-     * which events are generated on, then dispatches them to subscribed
+     * `kmp-tor` utilizes several different background threads for Jvm &
+     * Native which events are generated on, then dispatches them to subscribed
      * observers' [OnEvent] callbacks. The [Executor] API allows for
      * fine-tuning the context in which that dispatching occurs on
      * several customizable levels.
@@ -161,7 +161,7 @@ public fun interface OnEvent<in Data: Any?>: ItBlock<Data> {
          * main thread.
          *
          * **WARNING:** Jvm/Android requires the respective coroutines UI
-         * dependency `kotlinx-coroutines-{android/javafx/swing}`
+         * dependency `kotlinx-coroutines-{android/javafx/swing}`. See [isAvailable].
          *
          * **WARNING:** Non-Darwin native targets do not have [Dispatchers.Main]
          * resulting in an exception when [execute] is invoked.
@@ -172,7 +172,7 @@ public fun interface OnEvent<in Data: Any?>: ItBlock<Data> {
              * Helper for checking if [Dispatchers.Main] [MainCoroutineDispatcher]
              * that backs this [Executor] is available or not.
              *
-             * If false, [Executor.Main] usage will result in exception when events
+             * If false, [Executor.Main.execute] will result in an exception when events
              * are dispatched and **should not** be utilized.
              * */
             @get:JvmName("isAvailable")
