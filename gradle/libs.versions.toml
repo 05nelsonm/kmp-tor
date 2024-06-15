@@ -5,16 +5,16 @@ androidx-test-runner = "1.5.2"
 
 encoding = "2.2.1"
 
-gradle-android = "8.1.4"
+gradle-android = "8.2.2"
 gradle-binary-compat = "0.14.0"
-gradle-kmp-configuration = "0.2.1"
-gradle-kotlin = "1.9.23"
-gradle-publish-maven = "0.27.0"
+gradle-kmp-configuration = "0.2.2"
+gradle-kotlin = "1.9.24"
+gradle-publish-maven = "0.28.0"
 
-kmp-process = "0.1.0-alpha03"
-kmp-tor-core = "2.0.0-alpha10"
+kmp-process = "0.1.0-beta01"
+kmp-tor-core = "2.0.0"
 kmp-tor-resource = "408.10.0-SNAPSHOT"
-kotlinx-coroutines = "1.8.0"
+kotlinx-coroutines = "1.8.1"
 
 # Tests only
 ktor = "2.3.11"
