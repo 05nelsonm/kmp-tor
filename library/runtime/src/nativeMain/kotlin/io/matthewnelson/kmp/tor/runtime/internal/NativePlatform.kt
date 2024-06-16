@@ -17,15 +17,28 @@
 
 package io.matthewnelson.kmp.tor.runtime.internal
 
+import io.matthewnelson.kmp.file.errnoToIOException
 import io.matthewnelson.kmp.tor.runtime.FileID.Companion.fidEllipses
 import io.matthewnelson.kmp.tor.runtime.TorRuntime
+import io.matthewnelson.kmp.tor.runtime.internal.process.TorDaemon
+import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.newSingleThreadContext
+import platform.posix.SIGKILL
+import platform.posix.errno
 
 @Suppress("NOTHING_TO_INLINE")
 internal actual inline fun TorRuntime.Environment.newRuntimeDispatcher(): CoroutineDispatcher {
     @OptIn(DelicateCoroutinesApi::class, ExperimentalCoroutinesApi::class)
     return newSingleThreadContext("Tor[$fidEllipses]")
+}
+
+@Throws(Throwable::class)
+internal actual fun TorDaemon.kill(pid: Int) {
+    if (platform.posix.kill(pid, SIGKILL) == -1) {
+        @OptIn(ExperimentalForeignApi::class)
+        throw errnoToIOException(errno)
+    }
 }

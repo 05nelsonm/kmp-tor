@@ -25,6 +25,7 @@ import io.matthewnelson.kmp.tor.core.resource.OSHost
 import io.matthewnelson.kmp.tor.core.resource.OSInfo
 import io.matthewnelson.kmp.tor.runtime.FileID.Companion.fidEllipses
 import io.matthewnelson.kmp.tor.runtime.TorRuntime
+import io.matthewnelson.kmp.tor.runtime.internal.process.TorDaemon
 import kotlinx.coroutines.*
 import java.util.concurrent.Executors
 import java.util.concurrent.atomic.AtomicLong
@@ -41,6 +42,9 @@ internal actual inline fun TorRuntime.Environment.newRuntimeDispatcher(): Corout
     }
     return executor.asCoroutineDispatcher()
 }
+
+@Throws(Throwable::class)
+internal actual fun TorDaemon.kill(pid: Int) {}
 
 @Throws(Throwable::class)
 internal actual fun File.setDirectoryPermissions() {

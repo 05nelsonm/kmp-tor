@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-import io.matthewnelson.kmp.configuration.ExperimentalKmpConfigurationApi
 import io.matthewnelson.kmp.configuration.extension.KmpConfigurationExtension
 import io.matthewnelson.kmp.configuration.extension.container.target.KmpConfigurationContainerDsl
 import io.matthewnelson.kmp.configuration.extension.container.target.TargetAndroidContainer
@@ -22,7 +21,6 @@ import org.gradle.api.JavaVersion
 
 fun KmpConfigurationExtension.configureShared(
     androidNamespace: String? = null,
-    java9ModuleName: String? = null,
     publish: Boolean = false,
     action: Action<KmpConfigurationContainerDsl>
 ) {
@@ -37,9 +35,6 @@ fun KmpConfigurationExtension.configureShared(
             kotlinJvmTarget = JavaVersion.VERSION_1_8
             compileSourceCompatibility = JavaVersion.VERSION_1_8
             compileTargetCompatibility = JavaVersion.VERSION_1_8
-
-            @OptIn(ExperimentalKmpConfigurationApi::class)
-            java9MultiReleaseModuleInfo(java9ModuleName)
         }
 
         js {
@@ -78,8 +73,8 @@ fun KmpConfigurationExtension.configureShared(
 
 fun KmpConfigurationContainerDsl.androidLibrary(
     namespace: String,
-    buildTools: String? = "33.0.2",
-    compileSdk: Int = 33,
+    buildTools: String? = "34.0.0",
+    compileSdk: Int = 34,
     minSdk: Int = 16,
     javaVersion: JavaVersion = JavaVersion.VERSION_1_8,
     action: (Action<TargetAndroidContainer.Library>)? = null,

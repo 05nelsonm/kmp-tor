@@ -13,20 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-@file:Suppress("KotlinRedundantDiagnosticSuppress")
+@file:JsModule("process")
+@file:JsNonModule
+@file:Suppress("FunctionName")
 
 package io.matthewnelson.kmp.tor.runtime.internal
 
-import io.matthewnelson.kmp.tor.runtime.TorRuntime
-import io.matthewnelson.kmp.tor.runtime.internal.process.TorDaemon
-import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.Dispatchers
-
-@Suppress("NOTHING_TO_INLINE")
-internal actual inline fun TorRuntime.Environment.newRuntimeDispatcher(): CoroutineDispatcher = Dispatchers.Main
-
-// @Throws(Throwable::class)
-@Suppress("ACTUAL_ANNOTATIONS_NOT_MATCH_EXPECT")
-internal actual fun TorDaemon.kill(pid: Int) {
-    process_kill(pid, "SIGKILL")
-}
+/** [docs](https://nodejs.org/api/process.html#processkillpid-signal) */
+@JsName("kill")
+internal external fun process_kill(pid: Number, signal: String)

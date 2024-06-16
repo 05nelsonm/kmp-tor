@@ -5,7 +5,11 @@
 [![badge-kotlin]][url-kotlin]
 [![badge-coroutines]][url-coroutines]
 [![badge-encoding]][url-encoding]
+[![badge-kmp-process]][url-kmp-process]
 [![badge-kmp-tor-core]][url-kmp-tor-core]
+[![badge-kotlincrypto-hash]][url-kotlincrypto-hash]
+[![badge-kotlincrypto-secure-random]][url-kotlincrypto-secure-random]
+[![badge-androidx-startup]][url-androidx-startup]
 
 ![badge-platform-android]
 ![badge-platform-jvm]
@@ -27,10 +31,14 @@ published until `2.0.0` work has been completed.
 [badge-license]: https://img.shields.io/badge/license-Apache%20License%202.0-blue.svg?style=flat
 
 <!-- TAG_DEPENDENCIES -->
-[badge-kotlin]: https://img.shields.io/badge/kotlin-1.9.23-blue.svg?logo=kotlin
-[badge-coroutines]: https://img.shields.io/badge/kotlinx.coroutines-1.8.0-blue.svg?logo=kotlin
+[badge-androidx-startup]: https://img.shields.io/badge/androidx.startup-1.1.1-6EDB8D.svg?logo=android
+[badge-coroutines]: https://img.shields.io/badge/kotlinx.coroutines-1.8.1-blue.svg?logo=kotlin
 [badge-encoding]: https://img.shields.io/badge/encoding-2.2.1-blue.svg?style=flat
-[badge-kmp-tor-core]: https://img.shields.io/badge/kmp--tor--core-2.0.0--alpha10-blue.svg?style=flat
+[badge-kmp-process]: https://img.shields.io/badge/kmp--process-0.1.0--beta01-blue.svg?style=flat
+[badge-kmp-tor-core]: https://img.shields.io/badge/kmp--tor--core-2.0.0-blue.svg?style=flat
+[badge-kotlin]: https://img.shields.io/badge/kotlin-1.9.24-blue.svg?logo=kotlin
+[badge-kotlincrypto-hash]: https://img.shields.io/badge/KotlinCrypto.hash-0.5.1-blue.svg?style=flat
+[badge-kotlincrypto-secure-random]: https://img.shields.io/badge/KotlinCrypto.secure--random-0.3.1-blue.svg?style=flat
 
 <!-- TAG_PLATFORMS -->
 [badge-platform-android]: http://img.shields.io/badge/-android-6EDB8D.svg?style=flat
@@ -52,7 +60,11 @@ published until `2.0.0` work has been completed.
 [url-1.x.x]: https://github.com/05nelsonm/kmp-tor/tree/1.x.x
 [url-latest-release]: https://github.com/05nelsonm/kmp-tor/releases/latest
 [url-license]: https://www.apache.org/licenses/LICENSE-2.0
-[url-kotlin]: https://kotlinlang.org
+[url-androidx-startup]: https://developer.android.com/jetpack/androidx/releases/startup
 [url-coroutines]: https://github.com/Kotlin/kotlinx.coroutines
 [url-encoding]: https://github.com/05nelsonm/component-encoding
+[url-kmp-process]: https://github.com/05nelsonm/kmp-process
 [url-kmp-tor-core]: https://github.com/05nelsonm/kmp-tor-core
+[url-kotlin]: https://kotlinlang.org
+[url-kotlincrypto-hash]: https://github.com/KotlinCrypto/hash
+[url-kotlincrypto-secure-random]: https://github.com/KotlinCrypto/secure-random
