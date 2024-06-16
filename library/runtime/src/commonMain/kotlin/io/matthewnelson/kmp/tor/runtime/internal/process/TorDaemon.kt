@@ -27,7 +27,6 @@ import io.matthewnelson.kmp.tor.core.api.ResourceInstaller
 import io.matthewnelson.kmp.tor.runtime.*
 import io.matthewnelson.kmp.tor.runtime.FileID.Companion.toFIDString
 import io.matthewnelson.kmp.tor.runtime.RuntimeEvent.Notifier.Companion.d
-import io.matthewnelson.kmp.tor.runtime.RuntimeEvent.Notifier.Companion.e
 import io.matthewnelson.kmp.tor.runtime.RuntimeEvent.Notifier.Companion.i
 import io.matthewnelson.kmp.tor.runtime.RuntimeEvent.Notifier.Companion.lce
 import io.matthewnelson.kmp.tor.runtime.RuntimeEvent.Notifier.Companion.stderr
@@ -40,7 +39,6 @@ import io.matthewnelson.kmp.tor.runtime.core.address.IPSocketAddress.Companion.t
 import io.matthewnelson.kmp.tor.runtime.core.apply
 import io.matthewnelson.kmp.tor.runtime.core.ctrl.TorCmd
 import io.matthewnelson.kmp.tor.runtime.ctrl.TorCtrl
-import io.matthewnelson.kmp.tor.runtime.internal.*
 import io.matthewnelson.kmp.tor.runtime.internal.InstanceKeeper
 import io.matthewnelson.kmp.tor.runtime.internal.TorConfigGenerator
 import io.matthewnelson.kmp.tor.runtime.internal.process.TorDaemon.StartArgs.Companion.createStartArgs
@@ -246,26 +244,7 @@ internal class TorDaemon private constructor(
             state.stopMark = TimeSource.Monotonic.markNow()
 
             try {
-                // TODO: https://github.com/05nelsonm/kmp-process/issues/108
-                //  Node.js is awful, especially on Windows...
-                with(process) {
-                    try {
-                        destroy()
-                    } catch (_: Throwable) {
-                        NOTIFIER.w(this@TorDaemon, "Process.destroy threw exception, attempting to kill.")
-                    }
-
-                    if (!isAlive) return@with
-                    val pid = pid()
-                    if (pid < 1) return@with
-
-                    try {
-                        kill(pid)
-                    } catch (t: Throwable) {
-                        NOTIFIER.e(t)
-                    }
-                }
-
+                process.destroy()
                 NOTIFIER.lce(Lifecycle.Event.OnStop(this@TorDaemon))
             } finally {
                 manager.update(TorState.Daemon.Off)
