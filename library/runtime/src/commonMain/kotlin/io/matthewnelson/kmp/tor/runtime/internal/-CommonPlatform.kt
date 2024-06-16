@@ -18,7 +18,9 @@
 package io.matthewnelson.kmp.tor.runtime.internal
 
 import io.matthewnelson.kmp.file.File
+import io.matthewnelson.kmp.process.Process
 import io.matthewnelson.kmp.tor.runtime.TorRuntime
+import io.matthewnelson.kmp.tor.runtime.internal.process.TorDaemon
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.delay
 import kotlin.time.Duration
@@ -29,6 +31,10 @@ internal expect inline fun TorRuntime.Environment.newRuntimeDispatcher(): Corout
 
 @Throws(Throwable::class)
 internal expect fun File.setDirectoryPermissions()
+
+// TODO: https://github.com/05nelsonm/kmp-process/issues/108
+@Throws(Throwable::class)
+internal expect fun TorDaemon.kill(pid: Int)
 
 // No matter the Delay implementation (Coroutines Test library)
 // Will delay the specified duration using a TimeSource.
