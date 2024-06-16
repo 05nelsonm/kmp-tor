@@ -20,7 +20,6 @@ package io.matthewnelson.kmp.tor.runtime.internal
 import io.matthewnelson.kmp.file.ANDROID
 import io.matthewnelson.kmp.file.File
 import io.matthewnelson.kmp.file.SysDirSep
-import io.matthewnelson.kmp.process.Process
 import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
 import io.matthewnelson.kmp.tor.core.resource.OSHost
 import io.matthewnelson.kmp.tor.core.resource.OSInfo

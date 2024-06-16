@@ -18,7 +18,6 @@
 package io.matthewnelson.kmp.tor.runtime.internal
 
 import io.matthewnelson.kmp.file.File
-import io.matthewnelson.kmp.process.Process
 import io.matthewnelson.kmp.tor.runtime.TorRuntime
 import io.matthewnelson.kmp.tor.runtime.internal.process.TorDaemon
 import kotlinx.coroutines.CoroutineDispatcher
