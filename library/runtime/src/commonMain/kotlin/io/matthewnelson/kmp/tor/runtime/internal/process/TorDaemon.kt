@@ -27,6 +27,7 @@ import io.matthewnelson.kmp.tor.core.api.ResourceInstaller
 import io.matthewnelson.kmp.tor.runtime.*
 import io.matthewnelson.kmp.tor.runtime.FileID.Companion.toFIDString
 import io.matthewnelson.kmp.tor.runtime.RuntimeEvent.Notifier.Companion.d
+import io.matthewnelson.kmp.tor.runtime.RuntimeEvent.Notifier.Companion.e
 import io.matthewnelson.kmp.tor.runtime.RuntimeEvent.Notifier.Companion.i
 import io.matthewnelson.kmp.tor.runtime.RuntimeEvent.Notifier.Companion.lce
 import io.matthewnelson.kmp.tor.runtime.RuntimeEvent.Notifier.Companion.stderr
@@ -34,6 +35,7 @@ import io.matthewnelson.kmp.tor.runtime.RuntimeEvent.Notifier.Companion.stdout
 import io.matthewnelson.kmp.tor.runtime.RuntimeEvent.Notifier.Companion.w
 import io.matthewnelson.kmp.tor.runtime.core.Executable
 import io.matthewnelson.kmp.tor.runtime.core.TorConfig
+import io.matthewnelson.kmp.tor.runtime.core.UncaughtException
 import io.matthewnelson.kmp.tor.runtime.core.address.IPSocketAddress
 import io.matthewnelson.kmp.tor.runtime.core.address.IPSocketAddress.Companion.toIPSocketAddressOrNull
 import io.matthewnelson.kmp.tor.runtime.core.apply
@@ -185,6 +187,21 @@ internal class TorDaemon private constructor(
             Process.Builder(command = paths.tor.path)
                 .args(cmdLine)
                 .environment { putAll(generator.environment.processEnv) }
+                .onError { t ->
+                    if (t.cause is UncaughtException) {
+                        // OutputFeed was passed to event observers
+                        // and one threw exception. That exception
+                        // was caught by the UncaughtException.Handler
+                        // and piped to RuntimeEvent.ERROR observer. If
+                        // the ERROR observer threw (or one was not
+                        // subscribed), the UncaughtException was thrown
+                        // within the OutputFeed.onOutput lambda and piped
+                        // here. Throw it and shut things down.
+                        throw t.cause
+                    } else {
+                        NOTIFIER.e(t)
+                    }
+                }
                 .stdin(Stdio.Null)
                 .stdout(Stdio.Pipe)
                 .stderr(Stdio.Pipe)
