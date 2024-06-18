@@ -97,7 +97,7 @@ class ServiceFactoryUnitTest {
     @Test
     fun givenBinder_whenBindAndOtherInstanceIsNotDestroyed_thenDestroysPriorInstance() = runTest {
         val factory = TorRuntime.Builder(env("sf_multi_bind_destroy")) {}
-            .ensureStoppedOnTestCompletion() as TestFactory
+            .ensureStoppedOnTestCompletion(errorObserver = false) as TestFactory
 
         // If tor failed to start for some reason with the second bind
         // b/c we did not use enqueue via the factory ourselves, then
@@ -122,7 +122,7 @@ class ServiceFactoryUnitTest {
     @Test
     fun givenNoStart_whenBindWithoutEnqueue_thenAutoEnqueuesStartJob() = runTest {
         val factory = TorRuntime.Builder(env("sf_enqueue_start")) {}
-            .ensureStoppedOnTestCompletion() as TestFactory
+            .ensureStoppedOnTestCompletion(errorObserver = false) as TestFactory
 
         // If tor failed to start for some reason with the second bind
         // b/c we did not use enqueue via the factory ourselves, then
