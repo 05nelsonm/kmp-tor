@@ -68,6 +68,8 @@ public sealed class RuntimeEvent<Data: Any> private constructor(
      * observers (including [TorEvent] observers) are piped to [ERROR]
      * observers as [UncaughtException].
      *
+     * **NOTE:** All [ERROR] observers utilize [OnEvent.Executor.Immediate].
+     *
      * **NOTE:** Any exceptions thrown by [ERROR] observers are re-thrown
      * as [UncaughtException] (if not already one). This will likely crash
      * the program.
@@ -456,10 +458,13 @@ public sealed class RuntimeEvent<Data: Any> private constructor(
         executor: OnEvent.Executor?,
         onEvent: OnEvent<Data>,
     ): Event.Observer<Data, RuntimeEvent<Data>>(
-        event,
-        tag,
-        executor,
-        onEvent,
+        event = event,
+        tag = tag,
+        executor = when (event) {
+            is ERROR -> OnEvent.Executor.Immediate
+            else -> executor
+        },
+        onEvent = onEvent,
     )
 
     /**
