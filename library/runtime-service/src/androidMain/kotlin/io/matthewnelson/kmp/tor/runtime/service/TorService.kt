@@ -16,9 +16,11 @@
 package io.matthewnelson.kmp.tor.runtime.service
 
 import android.app.Application
+import android.app.ForegroundServiceStartNotAllowedException
 import android.content.Context
 import android.content.Intent
 import android.content.res.Resources
+import android.os.Build
 import androidx.startup.AppInitializer
 import io.matthewnelson.kmp.tor.core.api.annotation.ExperimentalKmpTorApi
 import io.matthewnelson.kmp.tor.runtime.*
@@ -36,9 +38,53 @@ internal class TorService internal constructor(): AbstractTorService() {
 
         @Throws(RuntimeException::class)
         protected override fun startService() {
-            val i = Intent(app, TorService::class.java)
-            app.startService(i)
-            app.bindService(i, connection, Context.BIND_AUTO_CREATE)
+            val intent = Intent(app, TorService::class.java)
+
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+                // API 25-
+                app.startService(intent)
+                intent.bindService()
+                return
+            }
+
+            // API 26+
+            if (!connection.config.enableForeground) {
+                app.startService(intent)
+                intent.bindService()
+                return
+            }
+
+            val threw: IllegalStateException? = try {
+                app.startForegroundService(intent)
+
+                // Will only run if startForegroundService does not throw
+                intent.bindService()
+                null
+            } catch (e: IllegalStateException) {
+                e
+            }
+
+            // Good start.
+            if (threw == null) return
+
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S) {
+                // API 30-
+                throw threw
+            }
+
+            // API 31+
+            if (threw !is ForegroundServiceStartNotAllowedException) {
+                throw threw
+            }
+
+            // TODO: Bypass background startup restrictions for foreground service specified in
+            //  https://developer.android.com/develop/background-work/services/foreground-services#bg-access-restrictions
+            throw threw
+        }
+
+        @Suppress("NOTHING_TO_INLINE")
+        private inline fun Intent.bindService(): Boolean {
+            return app.bindService(this, connection, Context.BIND_AUTO_CREATE)
         }
     }
 

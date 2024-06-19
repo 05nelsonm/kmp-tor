@@ -35,8 +35,9 @@
     recent app's tray). See attribute
     `tor_service_if_foreground_exit_process_on_destroy_when_task_removed` below
     for more information.
+    TODO: Enable when Service.startForeground implemented
     -->
-    <bool name="tor_service_enable_foreground">true</bool>
+    <bool name="tor_service_enable_foreground">false</bool>
 
     <!--
     Not Required
