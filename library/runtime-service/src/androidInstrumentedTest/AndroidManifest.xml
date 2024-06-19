@@ -40,6 +40,57 @@
             android:name="io.matthewnelson.kmp.tor.runtime.service.TorService"
             android:enabled="true"
             android:exported="false" />
+        <meta-data
+                android:name="io.matthewnelson.kmp.tor.enable_foreground"
+                android:value="@bool/tor_service_enable_foreground" />
+        <meta-data
+                android:name="io.matthewnelson.kmp.tor.stop_service_on_task_removed"
+                android:value="@bool/tor_service_stop_service_on_task_removed" />
+        <meta-data
+                android:name="io.matthewnelson.kmp.tor.if_foreground_exit_process_on_destroy_when_task_removed"
+                android:value="@bool/tor_service_if_foreground_exit_process_on_destroy_when_task_removed" />
+        <meta-data
+                android:name="io.matthewnelson.kmp.tor.notification_id"
+                android:value="@integer/tor_service_notification_id" />
+        <meta-data
+                android:name="io.matthewnelson.kmp.tor.notification_channel_id"
+                android:value="@string/tor_service_notification_channel_id" />
+        <meta-data
+                android:name="io.matthewnelson.kmp.tor.notification_channel_name"
+                android:value="@string/tor_service_notification_channel_name" />
+        <meta-data
+                android:name="io.matthewnelson.kmp.tor.notification_channel_description"
+                android:value="@string/tor_service_notification_channel_description" />
+        <meta-data
+                android:name="io.matthewnelson.kmp.tor.notification_channel_show_badge"
+                android:value="@bool/tor_service_notification_channel_show_badge" />
+        <meta-data
+                android:name="io.matthewnelson.kmp.tor.notification_icon_network_enabled"
+                android:resource="@drawable/tor_service_notification_icon_network_enabled" />
+        <meta-data
+                android:name="io.matthewnelson.kmp.tor.notification_icon_network_disabled"
+                android:resource="@drawable/tor_service_notification_icon_network_disabled" />
+        <meta-data
+                android:name="io.matthewnelson.kmp.tor.notification_icon_data_xfer"
+                android:resource="@drawable/tor_service_notification_icon_data_xfer" />
+        <meta-data
+                android:name="io.matthewnelson.kmp.tor.notification_icon_error"
+                android:resource="@drawable/tor_service_notification_icon_error" />
+        <meta-data
+                android:name="io.matthewnelson.kmp.tor.notification_color_when_bootstrapped_true"
+                android:resource="@color/tor_service_notification_color_when_bootstrapped_true" />
+        <meta-data
+                android:name="io.matthewnelson.kmp.tor.notification_color_when_bootstrapped_false"
+                android:resource="@color/tor_service_notification_color_when_bootstrapped_false" />
+        <meta-data
+                android:name="io.matthewnelson.kmp.tor.notification_visibility"
+                android:value="@string/tor_service_notification_visibility" />
+        <meta-data
+                android:name="io.matthewnelson.kmp.tor.notification_action_enable_restart"
+                android:value="@bool/tor_service_notification_action_enable_restart" />
+        <meta-data
+                android:name="io.matthewnelson.kmp.tor.notification_action_enable_stop"
+                android:value="@bool/tor_service_notification_action_enable_stop" />
     </application>
 
 </manifest>
