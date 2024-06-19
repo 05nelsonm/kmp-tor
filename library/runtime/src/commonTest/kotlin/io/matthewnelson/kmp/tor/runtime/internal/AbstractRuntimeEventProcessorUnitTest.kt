@@ -246,6 +246,25 @@ class AbstractRuntimeEventProcessorUnitTest {
     }
 
     @Test
+    fun givenMultipleErrorObservers_whenThrows_thenUncaughtExceptionsStacked() {
+        var invocationO1 = 0
+        var invocationO2 = 0
+        var invocationO3 = 0
+        val o1 = RuntimeEvent.ERROR.observer { invocationO1++ }
+        val o2 = RuntimeEvent.ERROR.observer { invocationO2++; throw it }
+        val o3 = RuntimeEvent.ERROR.observer { invocationO3++ }
+        processor.subscribe(o1, o2, o3)
+
+        assertFailsWith<UncaughtException> {
+            processor.notify(RuntimeEvent.ERROR, IllegalStateException())
+        }
+
+        assertEquals(1, invocationO1)
+        assertEquals(1, invocationO2)
+        assertEquals(1, invocationO3)
+    }
+
+    @Test
     fun givenIsService_whenDestroyed_thenStaticObserversNotRemoved() {
         var invocationDebug = 0
         val processor = TestProcessor(isService = true)

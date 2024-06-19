@@ -24,6 +24,7 @@ import io.matthewnelson.kmp.tor.runtime.ctrl.AbstractTorEventProcessor
 import io.matthewnelson.kmp.tor.runtime.core.TorEvent
 import io.matthewnelson.kmp.tor.runtime.core.UncaughtException
 import io.matthewnelson.kmp.tor.runtime.core.UncaughtException.Handler.Companion.tryCatch
+import io.matthewnelson.kmp.tor.runtime.core.UncaughtException.Handler.Companion.withSuppression
 
 @OptIn(InternalKmpTorApi::class)
 internal abstract class AbstractRuntimeEventProcessor internal constructor(
@@ -38,8 +39,6 @@ internal abstract class AbstractRuntimeEventProcessor internal constructor(
     private val observers = LinkedHashSet<RuntimeEvent.Observer<*>>(observersRuntimeEvent.size + 1, 1.0F)
     private val lock = SynchronizedObject()
     protected override val handler = HandlerWithContext.of { t -> RuntimeEvent.ERROR.notifyObservers(t) }
-    // Used for RuntimeEvent.ERROR ONLY
-    private val handlerERROR = HandlerWithContext.of(UncaughtException.Handler.THROW)
 
     init {
         observers.addAll(observersRuntimeEvent)
@@ -138,19 +137,21 @@ internal abstract class AbstractRuntimeEventProcessor internal constructor(
             return
         }
 
-        val handler = if (event is RuntimeEvent.ERROR) {
-            handlerERROR
+        if (event is RuntimeEvent.ERROR) {
+            UncaughtException.Handler.THROW.withSuppression { notify(observers, data) }
         } else {
-            handler
+            handler.notify(observers, data)
         }
+    }
 
+    private fun <Data: Any> UncaughtException.Handler.notify(observers: List<RuntimeEvent.Observer<*>>, data: Data) {
         observers.forEach { observer ->
             val ctx = ObserverContext(observer.toString(isStatic = observer.tag.isStaticTag()))
+            val handlerContext = if (this is HandlerWithContext) this + ctx else ctx
 
-            handler.tryCatch(ctx) {
+            tryCatch(ctx) {
                 @Suppress("UNCHECKED_CAST")
-                (observer as RuntimeEvent.Observer<Data>)
-                    .notify(handler + ctx, defaultExecutor, data)
+                (observer as RuntimeEvent.Observer<Data>).notify(handlerContext, defaultExecutor, data)
             }
         }
     }
