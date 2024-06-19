@@ -138,21 +138,20 @@ internal abstract class AbstractRuntimeEventProcessor internal constructor(
         }
 
         if (event is RuntimeEvent.ERROR) {
-            UncaughtException.Handler.THROW.withSuppression {
-                notify(observers, data)
-            }
+            UncaughtException.Handler.THROW.withSuppression { notify(observers, data) }
         } else {
             handler.notify(observers, data)
         }
     }
 
-    private fun <Data: Any> UncaughtException.Handler?.notify(observers: List<RuntimeEvent.Observer<*>>, data: Data) {
+    private fun <Data: Any> UncaughtException.Handler.notify(observers: List<RuntimeEvent.Observer<*>>, data: Data) {
         observers.forEach { observer ->
             val ctx = ObserverContext(observer.toString(isStatic = observer.tag.isStaticTag()))
+            val handlerContext = if (this is HandlerWithContext) this + ctx else ctx
 
             tryCatch(ctx) {
                 @Suppress("UNCHECKED_CAST")
-                (observer as RuntimeEvent.Observer<Data>).notify(handler + ctx, defaultExecutor, data)
+                (observer as RuntimeEvent.Observer<Data>).notify(handlerContext, defaultExecutor, data)
             }
         }
     }
