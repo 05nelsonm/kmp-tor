@@ -51,7 +51,7 @@ internal class StartupFeedParser(private val lineLimit: Int = 50, private val ex
 
         if (_lines >= lineLimit) {
             if (!_isReady && _error == null) {
-                // Feed is not closed, nor has tor has output
+                // Feed is not closed, nor has tor output
                 // control connection info within the first
                 // {lineLimit} lines... something is wrong.
                 @Suppress("ThrowableNotThrown")

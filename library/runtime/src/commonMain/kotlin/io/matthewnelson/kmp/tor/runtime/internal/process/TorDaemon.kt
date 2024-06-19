@@ -21,6 +21,8 @@ import io.matthewnelson.immutable.collections.toImmutableList
 import io.matthewnelson.kmp.file.*
 import io.matthewnelson.kmp.process.OutputFeed
 import io.matthewnelson.kmp.process.Process
+import io.matthewnelson.kmp.process.ProcessException.Companion.CTX_FEED_STDERR
+import io.matthewnelson.kmp.process.ProcessException.Companion.CTX_FEED_STDOUT
 import io.matthewnelson.kmp.process.Signal
 import io.matthewnelson.kmp.process.Stdio
 import io.matthewnelson.kmp.tor.core.api.ResourceInstaller
@@ -187,19 +189,38 @@ internal class TorDaemon private constructor(
             Process.Builder(command = paths.tor.path)
                 .args(cmdLine)
                 .environment { putAll(generator.environment.processEnv) }
-                .onError { t ->
-                    if (t.cause is UncaughtException) {
-                        // OutputFeed was passed to event observers
-                        // and one threw exception. That exception
-                        // was caught by the UncaughtException.Handler
-                        // and piped to RuntimeEvent.ERROR observer. If
-                        // the ERROR observer threw (or one was not
-                        // subscribed), the UncaughtException was thrown
-                        // within the OutputFeed.onOutput lambda and piped
-                        // here. Throw it and shut things down.
-                        throw t.cause
-                    } else {
-                        NOTIFIER.e(t)
+                .onError { e ->
+                    if (e.cause is UncaughtException) {
+                        // OutputFeed line was dispatched to event observers
+                        // and one threw an exception. That exception was
+                        // caught by the UncaughtException.Handler and piped
+                        // to RuntimeEvent.ERROR observers. If the ERROR
+                        // observers threw (or none were subscribed), the
+                        // UncaughtException was thrown. All that occurred
+                        // within the OutputFeed.onOutput lambda, finally making
+                        // its way back here. Throw it to shut things down (and
+                        // potentially crash the app).
+                        throw e.cause
+                    }
+
+                    val threw = try {
+                        NOTIFIER.e(e)
+                        null
+                    } catch (t: UncaughtException) {
+                        // ERROR observer chose to throw exception
+                        t
+                    }
+
+                    if (threw == null) return@onError
+
+                    when (e.context) {
+                        CTX_FEED_STDERR,
+                        CTX_FEED_STDOUT -> throw threw
+                        else -> {
+                            // If the origin of the exception was **not** from
+                            // an OutputFeed, ignore the ERROR observer's wish
+                            // and do not crash things.
+                        }
                     }
                 }
                 .stdin(Stdio.Null)
@@ -215,13 +236,7 @@ internal class TorDaemon private constructor(
         NOTIFIER.lce(Lifecycle.Event.OnStart(this@TorDaemon))
         NOTIFIER.i(this@TorDaemon, process.toString())
 
-        val startupFeed = StartupFeedParser(exitCodeOrNull = {
-            try {
-                process.exitCode()
-            } catch (_: IllegalStateException) {
-                null
-            }
-        })
+        val startupFeed = StartupFeedParser(exitCodeOrNull = process::exitCodeOrNull)
 
         run {
             var notify: Executable.Once?
