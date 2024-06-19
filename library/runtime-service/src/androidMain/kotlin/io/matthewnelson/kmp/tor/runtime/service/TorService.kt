@@ -22,14 +22,13 @@ import android.content.res.Resources
 import androidx.startup.AppInitializer
 import io.matthewnelson.kmp.tor.core.api.annotation.ExperimentalKmpTorApi
 import io.matthewnelson.kmp.tor.runtime.*
-import io.matthewnelson.kmp.tor.runtime.service.internal.RealTorServiceConfig
 
 @OptIn(ExperimentalKmpTorApi::class)
 internal class TorService internal constructor(): AbstractTorService() {
 
     private class AndroidServiceFactory(
         private val app: Application,
-        config: RealTorServiceConfig,
+        config: TorServiceConfig,
         initializer: Initializer,
     ): TorRuntime.ServiceFactory(initializer) {
 
@@ -88,15 +87,17 @@ internal class TorService internal constructor(): AbstractTorService() {
 
         @JvmSynthetic
         @Throws(Resources.NotFoundException::class)
-        internal fun loaderOrNull(): TorRuntime.ServiceFactory.Loader? {
+        internal fun loaderOrNull(
+            config: TorServiceConfig? = null,
+        ): TorRuntime.ServiceFactory.Loader? {
             val app = app ?: return null
-            val config = RealTorServiceConfig.of(app)
+            val c = config ?: TorServiceConfig.getMetaData(app)
 
             return object : TorRuntime.ServiceFactory.Loader() {
                 override fun loadProtected(
                     initializer: TorRuntime.ServiceFactory.Initializer,
                 ): TorRuntime.ServiceFactory {
-                    return AndroidServiceFactory(app, config, initializer)
+                    return AndroidServiceFactory(app, c, initializer)
                 }
             }
         }

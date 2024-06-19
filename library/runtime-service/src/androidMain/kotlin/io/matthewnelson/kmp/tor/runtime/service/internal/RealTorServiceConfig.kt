@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-@file:Suppress("PropertyName", "LocalVariableName")
+@file:Suppress("LocalVariableName")
 
 package io.matthewnelson.kmp.tor.runtime.service.internal
 
@@ -37,12 +37,12 @@ internal class RealTorServiceConfig private constructor(
     channelName: String,
     channelDescription: String,
     channelShowBadge: Boolean,
-    internal val _iconNetworkEnabled: DrawableRes,
-    internal val _iconNetworkDisabled: DrawableRes,
-    internal val _iconDataXfer: DrawableRes,
-    internal val _iconError: DrawableRes,
-    internal val _colorWhenBootstrappedTrue: ColorRes,
-    internal val _colorWhenBootstrappedFalse: ColorRes,
+    _iconNetworkEnabled: DrawableRes,
+    _iconNetworkDisabled: DrawableRes,
+    _iconDataXfer: DrawableRes,
+    _iconError: DrawableRes,
+    _colorWhenBootstrappedTrue: ColorRes,
+    _colorWhenBootstrappedFalse: ColorRes,
     visibility: Int,
     enableActionRestart: Boolean,
     enableActionStop: Boolean,
@@ -55,15 +55,16 @@ internal class RealTorServiceConfig private constructor(
     channelName,
     channelDescription,
     channelShowBadge,
-    _iconNetworkEnabled.id,
-    _iconNetworkDisabled.id,
-    _iconDataXfer.id,
-    _iconError.id,
-    _colorWhenBootstrappedTrue.id,
-    _colorWhenBootstrappedFalse.id,
+    _iconNetworkEnabled,
+    _iconNetworkDisabled,
+    _iconDataXfer,
+    _iconError,
+    _colorWhenBootstrappedTrue,
+    _colorWhenBootstrappedFalse,
     visibility,
     enableActionRestart,
     enableActionStop,
+    Synthetic.INIT,
 ) {
 
     internal companion object {
@@ -87,7 +88,7 @@ internal class RealTorServiceConfig private constructor(
                 packageManager.getApplicationInfo(packageName, flags).metaData
             } else {
                 // API 32-
-                @Suppress("DEPRECATION")
+                @Suppress("DEPRECATION", "KotlinRedundantDiagnosticSuppress")
                 packageManager.getApplicationInfo(packageName, PackageManager.GET_META_DATA).metaData
             }
 

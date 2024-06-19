@@ -33,3 +33,7 @@ public final class io/matthewnelson/kmp/tor/runtime/service/TorServiceConfig$Com
 	public final fun getMetaData (Landroid/content/Context;)Lio/matthewnelson/kmp/tor/runtime/service/TorServiceConfig;
 }
 
+protected final class io/matthewnelson/kmp/tor/runtime/service/TorServiceConfig$Synthetic {
+	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/service/TorServiceConfig$Synthetic;
+}
+

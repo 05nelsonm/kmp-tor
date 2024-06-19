@@ -13,6 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
+@file:Suppress("PropertyName")
+
 package io.matthewnelson.kmp.tor.runtime.service
 
 import android.content.Context
@@ -49,25 +51,33 @@ public abstract class TorServiceConfig internal constructor(
     public val channelDescription: String,
     @JvmField
     public val channelShowBadge: Boolean,
-    @JvmField
-    public val iconNetworkEnabled: Int,
-    @JvmField
-    public val iconNetworkDisabled: Int,
-    @JvmField
-    public val iconDataXfer: Int,
-    @JvmField
-    public val iconError: Int,
-    @JvmField
-    public val colorWhenBootstrappedTrue: Int,
-    @JvmField
-    public val colorWhenBootstrappedFalse: Int,
+    internal val _iconNetworkEnabled: DrawableRes,
+    internal val _iconNetworkDisabled: DrawableRes,
+    internal val _iconDataXfer: DrawableRes,
+    internal val _iconError: DrawableRes,
+    internal val _colorWhenBootstrappedTrue: ColorRes,
+    internal val _colorWhenBootstrappedFalse: ColorRes,
     @JvmField
     public val visibility: Int,
     @JvmField
     public val enableActionRestart: Boolean,
     @JvmField
     public val enableActionStop: Boolean,
+    init: Any,
 ) {
+
+    @JvmField
+    public val iconNetworkEnabled: Int = _iconNetworkEnabled.id
+    @JvmField
+    public val iconNetworkDisabled: Int = _iconNetworkDisabled.id
+    @JvmField
+    public val iconDataXfer: Int = _iconDataXfer.id
+    @JvmField
+    public val iconError: Int = _iconError.id
+    @JvmField
+    public val colorWhenBootstrappedTrue: Int = _colorWhenBootstrappedTrue.id
+    @JvmField
+    public val colorWhenBootstrappedFalse: Int = _colorWhenBootstrappedFalse.id
 
     public companion object {
 
@@ -425,5 +435,15 @@ public abstract class TorServiceConfig internal constructor(
             internal const val KEY_ACTION_ENABLE_RESTART = "$BASE.notification_action_enable_restart"
             internal const val KEY_ACTION_ENABLE_STOP = "$BASE.notification_action_enable_stop"
         }
+    }
+
+    protected object Synthetic {
+
+        @JvmSynthetic
+        internal val INIT = Any()
+    }
+
+    init {
+        check(init == Synthetic.INIT) { "TorServiceConfig cannot be extended. Use getMetaData." }
     }
 }
