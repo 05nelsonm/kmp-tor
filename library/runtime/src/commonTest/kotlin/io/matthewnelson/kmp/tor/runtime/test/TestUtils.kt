@@ -23,13 +23,12 @@ import io.matthewnelson.kmp.file.resolve
 import io.matthewnelson.kmp.tor.core.api.ResourceInstaller
 import io.matthewnelson.kmp.tor.core.api.ResourceInstaller.Paths
 import io.matthewnelson.kmp.tor.resource.tor.TorResources
-import io.matthewnelson.kmp.tor.runtime.Action
-import io.matthewnelson.kmp.tor.runtime.FileID
+import io.matthewnelson.kmp.tor.runtime.*
 import io.matthewnelson.kmp.tor.runtime.FileID.Companion.fidEllipses
-import io.matthewnelson.kmp.tor.runtime.Lifecycle
-import io.matthewnelson.kmp.tor.runtime.TorRuntime
+import io.matthewnelson.kmp.tor.runtime.core.OnEvent
 import io.matthewnelson.kmp.tor.runtime.core.ThisBlock
 import io.matthewnelson.kmp.tor.runtime.core.TorConfig
+import io.matthewnelson.kmp.tor.runtime.core.UncaughtException
 import io.matthewnelson.kmp.tor.runtime.core.key.X25519
 import io.matthewnelson.kmp.tor.runtime.core.key.X25519.PrivateKey.Companion.toX25519PrivateKey
 import io.matthewnelson.kmp.tor.runtime.core.key.X25519.PublicKey.Companion.toX25519PublicKey
@@ -56,9 +55,19 @@ object TestUtils {
         block = block
     ).also { it.debug = true }
 
-    suspend fun <T: Action.Processor> T.ensureStoppedOnTestCompletion(): T {
+    suspend fun <T: Action.Processor> T.ensureStoppedOnTestCompletion(
+        errorObserver: Boolean = true,
+    ): T {
         currentCoroutineContext().job.invokeOnCompletion {
             enqueue(Action.StopDaemon, {}, {})
+        }
+
+        if (errorObserver && this is TorRuntime) {
+            val tag = environment().staticTag()
+            subscribe(RuntimeEvent.ERROR.observer(tag, OnEvent.Executor.Immediate) { t ->
+                if (t is UncaughtException) throw t
+                t.printStackTrace()
+            })
         }
 
         withContext(Dispatchers.Default) { delay(100.milliseconds) }

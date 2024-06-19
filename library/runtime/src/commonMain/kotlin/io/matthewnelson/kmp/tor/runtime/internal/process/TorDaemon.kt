@@ -21,6 +21,8 @@ import io.matthewnelson.immutable.collections.toImmutableList
 import io.matthewnelson.kmp.file.*
 import io.matthewnelson.kmp.process.OutputFeed
 import io.matthewnelson.kmp.process.Process
+import io.matthewnelson.kmp.process.ProcessException.Companion.CTX_FEED_STDERR
+import io.matthewnelson.kmp.process.ProcessException.Companion.CTX_FEED_STDOUT
 import io.matthewnelson.kmp.process.Signal
 import io.matthewnelson.kmp.process.Stdio
 import io.matthewnelson.kmp.tor.core.api.ResourceInstaller
@@ -35,12 +37,12 @@ import io.matthewnelson.kmp.tor.runtime.RuntimeEvent.Notifier.Companion.stdout
 import io.matthewnelson.kmp.tor.runtime.RuntimeEvent.Notifier.Companion.w
 import io.matthewnelson.kmp.tor.runtime.core.Executable
 import io.matthewnelson.kmp.tor.runtime.core.TorConfig
+import io.matthewnelson.kmp.tor.runtime.core.UncaughtException
 import io.matthewnelson.kmp.tor.runtime.core.address.IPSocketAddress
 import io.matthewnelson.kmp.tor.runtime.core.address.IPSocketAddress.Companion.toIPSocketAddressOrNull
 import io.matthewnelson.kmp.tor.runtime.core.apply
 import io.matthewnelson.kmp.tor.runtime.core.ctrl.TorCmd
 import io.matthewnelson.kmp.tor.runtime.ctrl.TorCtrl
-import io.matthewnelson.kmp.tor.runtime.internal.*
 import io.matthewnelson.kmp.tor.runtime.internal.InstanceKeeper
 import io.matthewnelson.kmp.tor.runtime.internal.TorConfigGenerator
 import io.matthewnelson.kmp.tor.runtime.internal.process.TorDaemon.StartArgs.Companion.createStartArgs
@@ -187,6 +189,40 @@ internal class TorDaemon private constructor(
             Process.Builder(command = paths.tor.path)
                 .args(cmdLine)
                 .environment { putAll(generator.environment.processEnv) }
+                .onError { e ->
+                    if (e.cause is UncaughtException) {
+                        // OutputFeed line was dispatched to event observers
+                        // and one threw an exception. That exception was
+                        // caught by the UncaughtException.Handler and piped
+                        // to RuntimeEvent.ERROR observers. If the ERROR
+                        // observers threw (or none were subscribed), the
+                        // UncaughtException was thrown. All that occurred
+                        // within the OutputFeed.onOutput lambda, finally making
+                        // its way back here. Throw it to shut things down (and
+                        // potentially crash the app).
+                        throw e.cause
+                    }
+
+                    val threw = try {
+                        NOTIFIER.e(e)
+                        null
+                    } catch (t: UncaughtException) {
+                        // ERROR observer chose to throw exception
+                        t
+                    }
+
+                    if (threw == null) return@onError
+
+                    when (e.context) {
+                        CTX_FEED_STDERR,
+                        CTX_FEED_STDOUT -> throw threw
+                        else -> {
+                            // If the origin of the exception was **not** from
+                            // an OutputFeed, ignore the ERROR observer's wish
+                            // and do not crash things.
+                        }
+                    }
+                }
                 .stdin(Stdio.Null)
                 .stdout(Stdio.Pipe)
                 .stderr(Stdio.Pipe)
@@ -200,13 +236,7 @@ internal class TorDaemon private constructor(
         NOTIFIER.lce(Lifecycle.Event.OnStart(this@TorDaemon))
         NOTIFIER.i(this@TorDaemon, process.toString())
 
-        val startupFeed = StartupFeedParser(exitCodeOrNull = {
-            try {
-                process.exitCode()
-            } catch (_: IllegalStateException) {
-                null
-            }
-        })
+        val startupFeed = StartupFeedParser(exitCodeOrNull = process::exitCodeOrNull)
 
         run {
             var notify: Executable.Once?
@@ -246,26 +276,7 @@ internal class TorDaemon private constructor(
             state.stopMark = TimeSource.Monotonic.markNow()
 
             try {
-                // TODO: https://github.com/05nelsonm/kmp-process/issues/108
-                //  Node.js is awful, especially on Windows...
-                with(process) {
-                    try {
-                        destroy()
-                    } catch (_: Throwable) {
-                        NOTIFIER.w(this@TorDaemon, "Process.destroy threw exception, attempting to kill.")
-                    }
-
-                    if (!isAlive) return@with
-                    val pid = pid()
-                    if (pid < 1) return@with
-
-                    try {
-                        kill(pid)
-                    } catch (t: Throwable) {
-                        NOTIFIER.e(t)
-                    }
-                }
-
+                process.destroy()
                 NOTIFIER.lce(Lifecycle.Event.OnStop(this@TorDaemon))
             } finally {
                 manager.update(TorState.Daemon.Off)
