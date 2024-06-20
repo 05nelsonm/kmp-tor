@@ -36,6 +36,7 @@ import io.matthewnelson.kmp.tor.runtime.RuntimeEvent.Notifier.Companion.stderr
 import io.matthewnelson.kmp.tor.runtime.RuntimeEvent.Notifier.Companion.stdout
 import io.matthewnelson.kmp.tor.runtime.RuntimeEvent.Notifier.Companion.w
 import io.matthewnelson.kmp.tor.runtime.core.Executable
+import io.matthewnelson.kmp.tor.runtime.core.OnEvent
 import io.matthewnelson.kmp.tor.runtime.core.TorConfig
 import io.matthewnelson.kmp.tor.runtime.core.UncaughtException
 import io.matthewnelson.kmp.tor.runtime.core.address.IPSocketAddress
@@ -178,14 +179,14 @@ internal class TorDaemon private constructor(
     }
 
     @Throws(CancellationException::class, InterruptedException::class, IOException::class)
-    private fun StartArgs.spawnProcess(
+    private suspend fun StartArgs.spawnProcess(
         paths: ResourceInstaller.Paths.Tor,
         checkCancellationOrInterrupt: () -> Unit,
     ): Pair<StartupFeedParser, Job> {
         val process = try {
             checkCancellationOrInterrupt()
 
-            Process.Builder(command = paths.tor.path)
+            val b = Process.Builder(command = paths.tor.path)
                 .args(cmdLine)
                 .environment { putAll(generator.environment.processEnv) }
                 .onError { e ->
@@ -226,7 +227,14 @@ internal class TorDaemon private constructor(
                 .stdout(Stdio.Pipe)
                 .stderr(Stdio.Pipe)
                 .destroySignal(Signal.SIGTERM)
-                .spawn()
+
+            if (OnEvent.Executor.Main.isAvailable) {
+                withContext(NonCancellable + Dispatchers.Main) {
+                    b.spawn()
+                }
+            } else {
+                b.spawn()
+            }
         } catch (t: Throwable) {
             NOTIFIER.lce(Lifecycle.Event.OnDestroy(this@TorDaemon))
             throw t
