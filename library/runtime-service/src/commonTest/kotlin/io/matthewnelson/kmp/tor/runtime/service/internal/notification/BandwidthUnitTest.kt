@@ -13,9 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-package io.matthewnelson.kmp.tor.runtime.service.internal
+package io.matthewnelson.kmp.tor.runtime.service.internal.notification
 
-import io.matthewnelson.kmp.tor.runtime.service.internal.notification.Bandwidth
 import kotlin.test.Test
 import kotlin.test.assertIs
 import kotlin.test.assertIsNot
