@@ -13,6 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
+@file:Suppress("EXPECT_ACTUAL_CLASSIFIERS_ARE_IN_BETA_WARNING")
+
 package io.matthewnelson.kmp.tor.runtime.service.internal
 
 import android.content.Context
@@ -20,8 +22,15 @@ import android.content.res.Resources
 import android.graphics.drawable.Drawable
 import android.os.Build
 
+@Suppress("ACTUAL_WITHOUT_EXPECT")
+internal actual typealias ColorId = Int
+@Suppress("ACTUAL_WITHOUT_EXPECT")
+internal actual typealias DrawableId = Int
+
 @JvmInline
-internal value class ColorRes private constructor(internal val id: Int) {
+internal actual value class ColorRes private actual constructor(
+    internal actual val id: ColorId,
+) {
 
     @Throws(Resources.NotFoundException::class)
     internal fun retrieve(ctx: Context): Int {
@@ -35,11 +44,13 @@ internal value class ColorRes private constructor(internal val id: Int) {
         }
     }
 
-    internal companion object {
+    public actual override fun toString(): String = commonToString()
+
+    internal actual companion object {
 
         internal val ZERO: ColorRes = ColorRes(0)
 
-        internal fun of(id: Int): ColorRes {
+        internal actual fun of(id: ColorId): ColorRes {
             if (id == 0) return ZERO
             return ColorRes(id)
         }
@@ -47,7 +58,9 @@ internal value class ColorRes private constructor(internal val id: Int) {
 }
 
 @JvmInline
-internal value class DrawableRes private constructor(internal val id: Int) {
+internal actual value class DrawableRes private actual constructor(
+    internal actual val id: DrawableId,
+) {
 
     @Throws(Resources.NotFoundException::class)
     internal fun retrieve(ctx: Context): Drawable {
@@ -67,11 +80,13 @@ internal value class DrawableRes private constructor(internal val id: Int) {
         return drawable
     }
 
-    internal companion object {
+    public actual override fun toString(): String = commonToString()
+
+    internal actual companion object {
 
         internal val ZERO: DrawableRes = DrawableRes(0)
 
-        internal fun of(id: Int): DrawableRes {
+        internal actual fun of(id: DrawableId): DrawableRes {
             if (id == 0) return ZERO
             return DrawableRes(id)
         }
