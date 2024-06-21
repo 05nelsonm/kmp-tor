@@ -20,9 +20,20 @@ import io.matthewnelson.kmp.tor.core.resource.SynchronizedObject
 import io.matthewnelson.kmp.tor.core.resource.synchronized
 
 @OptIn(InternalKmpTorApi::class)
-internal class SynchronizedInstance<T: Any> internal constructor(private val instance: T) {
+internal class SynchronizedInstance<T: Any> private constructor(private val instance: T) {
 
     private val lock = SynchronizedObject()
 
     internal fun <R: Any?> withLock(block: T.() -> R): R = synchronized(lock) { block(instance) }
+
+    internal companion object {
+
+        internal fun <E: Any?, T: MutableCollection<E>> of(
+            collection: T,
+        ): SynchronizedInstance<T> = SynchronizedInstance(collection)
+
+        internal fun <K: Any?, V: Any?, T: MutableMap<K, V>> of(
+            map: T,
+        ): SynchronizedInstance<T> = SynchronizedInstance(map)
+    }
 }

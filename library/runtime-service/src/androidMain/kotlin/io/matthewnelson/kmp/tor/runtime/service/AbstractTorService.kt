@@ -38,7 +38,7 @@ internal sealed class AbstractTorService: Service() {
 
     @Volatile
     private var _isDestroyed: Boolean = false
-    private val holders = SynchronizedInstance(LinkedHashMap<TorBinder, Holder?>(1, 1.0f))
+    private val holders = SynchronizedInstance.of(LinkedHashMap<TorBinder, Holder?>(1, 1.0f))
 
     private val binder = object : Binder() {
         override fun inject(conn: Connection) {
