@@ -2,6 +2,24 @@
 
 ### Android
 
+To utilize the `TorService` you must use the `Context.createTorRuntimeEnvironment` 
+extension functions (or for `Java` users, `TorRuntimeEnvironment.Builder` functions).
+
+This will set the `TorRuntime.Environment.Builder.serviceFactoryLoader` so that when 
+`TorRuntime` is then created, it will instantiate the `TorRuntime.ServiceFactory` instead 
+of the regular `TorRuntime` implementation. If you do not want to use `TorService` for
+another instance of `TorRuntime`, instantiate `TorRuntime.Environment` the regular way w/o
+using the `Context` extensions.
+
+e.g.
+
+```kotlin
+val environment = context.createTorRuntimeEnvironment { installationDirectory ->
+    // Assuming use of `kmp-tor:resource-tor` dependency...
+    TorResources(installationDirectory)
+}
+```
+
 By default, the `TorService` will run in the background and no configuration is 
 necessary. However, if you would like to run it as a Foreground Service, some 
 configuration is needed. 

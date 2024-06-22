@@ -134,16 +134,16 @@ internal class TorService internal constructor(): AbstractTorService() {
         @JvmSynthetic
         @Throws(Resources.NotFoundException::class)
         internal fun loaderOrNull(
-            config: TorServiceConfig? = null,
+            // TODO: TorServiceConfig.Overrides?
         ): TorRuntime.ServiceFactory.Loader? {
             val app = app ?: return null
-            val c = config ?: TorServiceConfig.getMetaData(app)
+            val config = TorServiceConfig.getMetaData(app)
 
             return object : TorRuntime.ServiceFactory.Loader() {
                 override fun loadProtected(
                     initializer: TorRuntime.ServiceFactory.Initializer,
                 ): TorRuntime.ServiceFactory {
-                    return AndroidServiceFactory(app, c, initializer)
+                    return AndroidServiceFactory(app, config, initializer)
                 }
             }
         }

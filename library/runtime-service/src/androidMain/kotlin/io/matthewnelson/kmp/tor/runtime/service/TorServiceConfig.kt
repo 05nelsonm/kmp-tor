@@ -13,12 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-@file:Suppress("PropertyName")
+@file:Suppress("PropertyName", "FunctionName")
 
 package io.matthewnelson.kmp.tor.runtime.service
 
 import android.content.Context
 import android.content.res.Resources
+import io.matthewnelson.kmp.tor.runtime.core.ThisBlock
+import io.matthewnelson.kmp.tor.runtime.core.apply
 import io.matthewnelson.kmp.tor.runtime.service.internal.ColorRes
 import io.matthewnelson.kmp.tor.runtime.service.internal.DrawableRes
 import io.matthewnelson.kmp.tor.runtime.service.internal.RealTorServiceConfig
@@ -86,6 +88,84 @@ public abstract class TorServiceConfig internal constructor(
             return RealTorServiceConfig.of(context)
         }
     }
+
+//    // TODO
+//    public class Overrides private constructor(
+//        internal val _iconNetworkEnabled: DrawableRes?,
+//        internal val _iconNetworkDisabled: DrawableRes?,
+//        internal val _iconDataXfer: DrawableRes?,
+//        internal val _iconError: DrawableRes?,
+//        internal val _colorWhenBootstrappedTrue: ColorRes?,
+//        internal val _colorWhenBootstrappedFalse: ColorRes?,
+//        @JvmField
+//        public val enableActionRestart: Boolean?,
+//        @JvmField
+//        public val enableActionStop: Boolean?,
+//    ) {
+//
+//        @JvmField
+//        public val iconNetworkEnabled: Int? = _iconNetworkEnabled?.id
+//        @JvmField
+//        public val iconNetworkDisabled: Int? = _iconNetworkDisabled?.id
+//        @JvmField
+//        public val iconDataXfer: Int? = _iconDataXfer?.id
+//        @JvmField
+//        public val iconError: Int? = _iconError?.id
+//        @JvmField
+//        public val colorWhenBootstrappedTrue: Int? = _colorWhenBootstrappedTrue?.id
+//        @JvmField
+//        public val colorWhenBootstrappedFalse: Int? = _colorWhenBootstrappedFalse?.id
+//
+//        public companion object {
+//
+//            @JvmStatic
+//            @Throws(Resources.NotFoundException::class)
+//            public fun Builder(
+//                context: Context,
+//                block: ThisBlock<Builder>,
+//            ): Overrides = Builder.build(context, block)
+//        }
+//
+//        public class Builder private constructor() {
+//
+//            @JvmField
+//            public var enableActionRestart: Boolean? = null
+//            @JvmField
+//            public var enableActionStop: Boolean? = null
+//
+//            /**
+//             * Drawable resource id for overriding the default notification
+//             * icon from [getMetaData] when network is disabled. If `null`,
+//             * the default will not be overridden for that instance of
+//             * */
+//            @JvmField
+//            public var iconNetworkEnabled: Int? = null
+//            @JvmField
+//            public var iconNetworkDisabled: Int? = null
+//            @JvmField
+//            public var iconDataXfer: Int? = null
+//            @JvmField
+//            public var iconError: Int? = null
+//
+//            @JvmField
+//            public var colorWhenBootstrappedTrue: Int? = null
+//            @JvmField
+//            public var colorWhenBootstrappedFalse: Int? = null
+//
+//            internal companion object {
+//
+//                @JvmSynthetic
+//                @Throws(Resources.NotFoundException::class)
+//                internal fun build(
+//                    context: Context,
+//                    block: ThisBlock<Builder>,
+//                ): Overrides {
+//                    val b = Builder().apply(block)
+//                    TODO()
+//                }
+//            }
+//        }
+//    }
 
     public final override fun equals(other: Any?): Boolean {
         return  other is TorServiceConfig                                       &&

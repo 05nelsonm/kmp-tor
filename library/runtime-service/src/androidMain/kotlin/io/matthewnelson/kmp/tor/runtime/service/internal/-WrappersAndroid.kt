@@ -35,7 +35,7 @@ internal actual value class ColorRes private actual constructor(
 
     @Throws(Resources.NotFoundException::class)
     internal fun retrieve(ctx: Context): Int {
-        if (id == NONE.id) throw Resources.NotFoundException()
+        if (id == NONE.id) throw Resources.NotFoundException("id=0")
 
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             // API 23+
@@ -67,7 +67,7 @@ internal actual value class DrawableRes private actual constructor(
 
     @Throws(Resources.NotFoundException::class)
     internal fun retrieve(ctx: Context): Drawable {
-        if (id == NONE.id) throw Resources.NotFoundException()
+        if (id == NONE.id) throw Resources.NotFoundException("id=0")
 
         val drawable = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             // API 21+
@@ -79,7 +79,7 @@ internal actual value class DrawableRes private actual constructor(
         }
 
         if (drawable == null) {
-            throw Resources.NotFoundException("drawable[id=$id] was null")
+            throw Resources.NotFoundException("Drawable[id=$id] was null")
         }
 
         return drawable
