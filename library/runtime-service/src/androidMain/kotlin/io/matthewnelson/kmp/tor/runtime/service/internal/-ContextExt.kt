@@ -18,9 +18,54 @@ package io.matthewnelson.kmp.tor.runtime.service.internal
 import android.content.Context
 import android.content.pm.PackageManager.PERMISSION_GRANTED
 import android.os.Process
+import io.matthewnelson.kmp.tor.runtime.Action
+import io.matthewnelson.kmp.tor.runtime.TorState
+import io.matthewnelson.kmp.tor.runtime.service.R
+import io.matthewnelson.kmp.tor.runtime.service.internal.notification.ButtonAction
+import io.matthewnelson.kmp.tor.runtime.service.internal.notification.content.ContentAction
+import io.matthewnelson.kmp.tor.runtime.service.internal.notification.content.ContentBandwidth
+import io.matthewnelson.kmp.tor.runtime.service.internal.notification.content.ContentBootstrap
+import io.matthewnelson.kmp.tor.runtime.service.internal.notification.content.ContentMessage
+import io.matthewnelson.kmp.tor.runtime.service.internal.notification.content.ContentNetworkWaiting
+import io.matthewnelson.kmp.tor.runtime.service.internal.notification.content.ContentText
 
 @Suppress("NOTHING_TO_INLINE")
 internal inline fun Context.isPermissionGranted(permission: String): Boolean {
     val result = checkPermission(permission, Process.myPid(), Process.myUid())
     return result == PERMISSION_GRANTED
 }
+
+internal fun Context.renderString(action: ButtonAction): String = when (action) {
+    ButtonAction.NewIdentity -> R.string.kmp_tor_notification_action_newnym
+    ButtonAction.RestartTor -> R.string.kmp_tor_notification_action_restart
+    ButtonAction.StopTor -> R.string.kmp_tor_notification_action_stop
+}.let { id -> getString(id) }
+
+internal fun Context.renderString(content: ContentText<*>): String = when (content) {
+    is ContentAction -> when (content.value) {
+        Action.StartDaemon -> R.string.kmp_tor_action_start
+        Action.StopDaemon -> R.string.kmp_tor_action_stop
+        Action.RestartDaemon -> R.string.kmp_tor_action_restart
+    }.let { id -> getString(id) }
+    is ContentBandwidth -> content.value
+    is ContentBootstrap -> {
+        getString(R.string.kmp_tor_bootstrapped_format, content.value, "%")
+    }
+    is ContentMessage.NewNym.RateLimited.Raw -> content.value
+    is ContentMessage.NewNym.RateLimited.Seconds -> {
+        getString(R.string.kmp_tor_newnym_rate_limited, content.value)
+    }
+    is ContentMessage.NewNym.Success -> {
+        getString(R.string.kmp_tor_newnym_success)
+    }
+    is ContentNetworkWaiting -> {
+        getString(R.string.kmp_tor_waiting_on_network)
+    }
+}
+
+internal fun Context.renderString(state: TorState.Daemon): String = when (state) {
+    is TorState.Daemon.Off -> R.string.kmp_tor_tor_state_off
+    is TorState.Daemon.On -> R.string.kmp_tor_tor_state_on
+    is TorState.Daemon.Starting -> R.string.kmp_tor_tor_state_starting
+    is TorState.Daemon.Stopping -> R.string.kmp_tor_tor_state_stopping
+}.let { id -> getString(id) }

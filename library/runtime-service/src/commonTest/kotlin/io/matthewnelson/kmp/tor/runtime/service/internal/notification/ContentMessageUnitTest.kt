@@ -15,18 +15,18 @@
  **/
 package io.matthewnelson.kmp.tor.runtime.service.internal.notification
 
+import io.matthewnelson.kmp.tor.runtime.service.internal.notification.content.ContentMessage
 import kotlin.test.Test
+import kotlin.test.assertEquals
 import kotlin.test.assertIs
-import kotlin.test.assertIsNot
 
-class BandwidthUnitTest {
+class ContentMessageUnitTest {
 
     @Test
-    fun givenCopy_whenDownZeroUpZero_thenIsSingletonZeroInstance() {
-        val down = Bandwidth.ZERO.copy(down = 2)
-        val up = Bandwidth.ZERO.copy(up = 2)
-        assertIsNot<Bandwidth.ZERO>(down)
-        assertIs<Bandwidth.ZERO>(down.copy(down = 0))
-        assertIs<Bandwidth.ZERO>(up.copy(up = 0))
+    fun givenRateLimit_whenParsed_thenIsSeconds() {
+        val line = "Rate limiting NEWNYM request: delaying by 10 second(s)"
+        val content = ContentMessage.NewNym.RateLimited.of(line)
+        assertIs<ContentMessage.NewNym.RateLimited.Seconds>(content)
+        assertEquals(10, content.value)
     }
 }

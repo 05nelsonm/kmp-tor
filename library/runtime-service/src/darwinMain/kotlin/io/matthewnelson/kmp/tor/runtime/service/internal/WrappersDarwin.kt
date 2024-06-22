@@ -29,7 +29,10 @@ internal actual value class ColorRes private actual constructor(
     public actual override fun toString(): String = commonToString()
 
     internal actual companion object {
+
+        internal actual val NONE: ColorRes = ColorRes(0)
         internal actual fun of(id: ColorId): ColorRes {
+            if (id == NONE.id) return NONE
             return ColorRes(id)
         }
     }
@@ -42,7 +45,11 @@ internal actual value class DrawableRes private actual constructor(
     public actual override fun toString(): String = commonToString()
 
     internal actual companion object {
+
+        internal actual val NONE: DrawableRes = DrawableRes(0)
+
         internal actual fun of(id: DrawableId): DrawableRes {
+            if (id == NONE.id) return NONE
             return DrawableRes(id)
         }
     }

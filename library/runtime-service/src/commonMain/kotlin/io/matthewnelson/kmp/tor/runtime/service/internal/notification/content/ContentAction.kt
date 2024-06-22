@@ -13,24 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-package io.matthewnelson.kmp.tor.runtime.service.test
+package io.matthewnelson.kmp.tor.runtime.service.internal.notification.content
 
-import android.content.res.Resources
-import io.matthewnelson.kmp.tor.runtime.service.internal.DrawableRes
-import kotlin.test.Test
-import kotlin.test.assertFailsWith
+import io.matthewnelson.kmp.tor.runtime.Action
+import kotlin.jvm.JvmSynthetic
 
-class TestTorServiceConfigUnitTest {
+internal class ContentAction private constructor(
+    internal override val value: Action,
+): ContentText<Action>() {
 
-    @Test
-    fun givenDefaults_whenInitialized_thenDoesNotThrowException() {
-        TestTorServiceConfig()
-    }
+    internal companion object {
 
-    @Test
-    fun givenBadResource_whenInitialized_thenFailsResourceValidation() {
-        assertFailsWith<Resources.NotFoundException> {
-            TestTorServiceConfig(_iconError = DrawableRes.NONE)
-        }
+        @JvmSynthetic
+        internal fun of(
+            action: Action,
+        ): ContentAction = ContentAction(action)
     }
 }

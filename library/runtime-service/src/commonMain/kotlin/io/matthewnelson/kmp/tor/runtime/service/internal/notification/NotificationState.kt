@@ -18,69 +18,68 @@ package io.matthewnelson.kmp.tor.runtime.service.internal.notification
 import io.matthewnelson.immutable.collections.toImmutableSet
 import io.matthewnelson.kmp.tor.runtime.FileID
 import io.matthewnelson.kmp.tor.runtime.FileID.Companion.fidEllipses
+import io.matthewnelson.kmp.tor.runtime.TorState
 import io.matthewnelson.kmp.tor.runtime.service.internal.ColorRes
 import io.matthewnelson.kmp.tor.runtime.service.internal.DrawableRes
+import io.matthewnelson.kmp.tor.runtime.service.internal.notification.content.ContentText
 import kotlin.jvm.JvmSynthetic
 
 internal class NotificationState private constructor(
     actions: Set<ButtonAction>,
     internal val color: ColorRes,
-    internal val contentText: CharSequence,
-    internal val contentTitle: String,
-    internal val progress: Progress,
     internal val icon: DrawableRes,
+    internal val progress: Progress,
+    internal val text: ContentText<*>,
+    internal val title: TorState.Daemon,
     internal val fid: String,
 ) {
 
     internal val actions: Set<ButtonAction> = actions.toImmutableSet()
 
-    @Throws(IllegalArgumentException::class)
     internal fun diff(
-        old: NotificationState,
+        other: NotificationState,
         setColor: (ColorRes) -> Unit,
-        setContentText: (CharSequence) -> Unit,
-        setContentTitle: (String) -> Unit,
+        setContentText: (ContentText<*>) -> Unit,
+        setContentTitle: (TorState.Daemon) -> Unit,
         setProgress: (Progress) -> Unit,
         setIcon: (DrawableRes) -> Unit
     ) {
-        require(old.fid == fid) { "old[fid=${old.fid}] does not match new[fid=${fid}]" }
-
-        if (old.color != color) {
+        if (other.color != color) {
             setColor(color)
         }
-        if (old.contentText != contentText) {
-            setContentText(contentText)
+        if (other.icon != icon) {
+            setIcon(icon)
         }
-        if (old.contentTitle != contentTitle) {
-            setContentTitle(contentTitle)
-        }
-        if (old.progress != progress) {
+        if (other.progress != progress) {
             setProgress(progress)
         }
-        if (old.icon != icon) {
-            setIcon(icon)
+        if (other.text != text) {
+            setContentText(text)
+        }
+        if (other.title != title) {
+            setContentTitle(title)
         }
     }
 
-    internal fun isActionRefreshNeeded(old: Set<ButtonAction>): Boolean {
-        return old.size != actions.size
+    internal fun isActionRefreshNeeded(other: NotificationState): Boolean {
+        return other.fid != fid ||  other.actions.size != actions.size
     }
 
     internal fun copy(
         actions: Set<ButtonAction> = this.actions,
         color: ColorRes = this.color,
-        contentText: CharSequence = this.contentText,
-        contentTitle: String = this.contentTitle,
+        icon: DrawableRes = this.icon,
         progress: Progress = this.progress,
-        icon: DrawableRes = this.icon
+        text: ContentText<*> = this.text,
+        title: TorState.Daemon = this.title,
     ): NotificationState {
         if (
             actions == this.actions
             && color == this.color
-            && contentText == this.contentText
-            && contentTitle == this.contentTitle
-            && progress == this.progress
             && icon == this.icon
+            && progress == this.progress
+            && text == this.text
+            && title == this.title
         ) {
             return this
         }
@@ -88,10 +87,10 @@ internal class NotificationState private constructor(
         return NotificationState(
             actions,
             color,
-            contentText,
-            contentTitle,
-            progress,
             icon,
+            progress,
+            text,
+            title,
             fid,
         )
     }
@@ -101,10 +100,10 @@ internal class NotificationState private constructor(
                 && other.fid == fid
                 && other.actions == actions
                 && other.color == color
-                && other.contentText == contentText
-                && other.contentTitle == contentTitle
-                && other.progress == progress
                 && other.icon == icon
+                && other.progress == progress
+                && other.text == text
+                && other.title == title
     }
 
     public override fun hashCode(): Int {
@@ -112,10 +111,10 @@ internal class NotificationState private constructor(
         result = result * 42 + fid.hashCode()
         result = result * 42 + actions.hashCode()
         result = result * 42 + color.hashCode()
-        result = result * 42 + contentText.hashCode()
-        result = result * 42 + contentTitle.hashCode()
-        result = result * 42 + progress.hashCode()
         result = result * 42 + icon.hashCode()
+        result = result * 42 + progress.hashCode()
+        result = result * 42 + text.hashCode()
+        result = result * 42 + title.hashCode()
         return result
     }
 
@@ -139,14 +138,21 @@ internal class NotificationState private constructor(
 
         append("    color: ")
         appendLine(color)
-        append("    contentText: ")
-        appendLine(contentText)
-        append("    contentTitle: ")
-        appendLine(contentTitle)
-        append("    progress: ")
-        appendLine(progress)
         append("    icon: ")
         appendLine(icon)
+        append("    progress: ")
+        appendLine(progress)
+        append("    text: ")
+        appendLine(text)
+
+        append("    title: ")
+        when (title) {
+            is TorState.Daemon.Off -> "TorState.Daemon.Off"
+            is TorState.Daemon.On -> "TorState.Daemon.On{${title.bootstrap}}"
+            is TorState.Daemon.Starting -> "TorState.Daemon.Starting"
+            is TorState.Daemon.Stopping -> "TorState.Daemon.Stopping"
+        }.let { appendLine(it) }
+
         append(']')
     }
 
@@ -156,18 +162,18 @@ internal class NotificationState private constructor(
         internal fun of(
             actions: Set<ButtonAction>,
             color: ColorRes,
-            contentText: String,
-            contentTitle: String,
-            progress: Progress,
             icon: DrawableRes,
+            progress: Progress,
+            text: ContentText<*>,
+            title: TorState.Daemon,
             fid: FileID,
         ): NotificationState = NotificationState(
             actions,
             color,
-            contentText,
-            contentTitle,
-            progress,
             icon,
+            progress,
+            text,
+            title,
             fid.fidEllipses,
         )
     }

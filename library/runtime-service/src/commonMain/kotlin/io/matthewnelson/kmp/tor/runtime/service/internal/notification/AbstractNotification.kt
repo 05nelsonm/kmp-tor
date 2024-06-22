@@ -33,6 +33,10 @@ import io.matthewnelson.kmp.tor.runtime.core.TorEvent
 import io.matthewnelson.kmp.tor.runtime.service.internal.ColorRes
 import io.matthewnelson.kmp.tor.runtime.service.internal.DrawableRes
 import io.matthewnelson.kmp.tor.runtime.service.internal.SynchronizedInstance
+import io.matthewnelson.kmp.tor.runtime.service.internal.notification.content.*
+import io.matthewnelson.kmp.tor.runtime.service.internal.notification.content.ContentAction
+import io.matthewnelson.kmp.tor.runtime.service.internal.notification.content.ContentBandwidth
+import io.matthewnelson.kmp.tor.runtime.service.internal.notification.content.ContentBootstrap
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -108,13 +112,6 @@ internal abstract class AbstractNotification internal constructor(
         }.forEach { it.execute() }
     }
 
-    protected abstract fun Action.provideString(): String
-    protected abstract fun TorState.Daemon.provideString(): String
-    protected abstract fun Byte.provideBootstrappedString(): BootstrappedString
-    protected abstract fun Int.provideNewNymRateLimitedString(): String
-    protected abstract fun provideNewNymSuccessString(): String
-    protected abstract fun provideNetworkWaitingString(): NetworkWaitingString
-
     protected abstract fun InstanceView.remove()
     protected abstract fun InstanceView.render(old: NotificationState, new: NotificationState)
 
@@ -131,7 +128,7 @@ internal abstract class AbstractNotification internal constructor(
     ): Destroyable {
 
         @Volatile
-        private var _bandwidth: Bandwidth = Bandwidth.ZERO
+        private var _bandwidth: ContentBandwidth = ContentBandwidth.ZERO
         @Volatile
         private var _isDestroyed: Boolean = false
         @Volatile
@@ -142,10 +139,10 @@ internal abstract class AbstractNotification internal constructor(
         private var _state = NotificationState.of(
             actions = emptySet(),
             color = colorWhenBootstrappedFalse,
-            contentText = Action.StartDaemon.provideString(),
-            contentTitle = _stateTor.daemon.provideString(),
-            progress = Progress.Indeterminate,
             icon = iconNetworkDisabled,
+            progress = Progress.Indeterminate,
+            text = ContentAction.of(Action.StartDaemon),
+            title = _stateTor.daemon,
             fid = fid
         )
 
@@ -196,14 +193,14 @@ internal abstract class AbstractNotification internal constructor(
             }?.execute()
         }
 
-        private fun postMessage(message: CharSequence, duration: Duration) {
+        private fun postMessage(message: ContentMessage<*>, duration: Duration) {
             if (duration <= Duration.ZERO) return
 
             _messageJob?.cancel()
             _messageJob = serviceScope.launch {
                 update { current ->
                     current.copy(
-                        contentText = message,
+                        text = message,
                     )
                 }
 
@@ -213,7 +210,7 @@ internal abstract class AbstractNotification internal constructor(
 
                 update { current ->
                     current.copy(
-                        contentText = _bandwidth,
+                        text = _bandwidth,
                     )
                 }
             }
@@ -225,7 +222,7 @@ internal abstract class AbstractNotification internal constructor(
             val oACTION = RuntimeEvent.EXECUTE.ACTION.observer(tag, executor) { job ->
                 update { current ->
                     current.copy(
-                        contentText = job.action.provideString(),
+                        text = ContentAction.of(job.action),
                     )
                 }
             }
@@ -235,7 +232,7 @@ internal abstract class AbstractNotification internal constructor(
 
                 update { current ->
                     current.copy(
-                        contentText = provideNetworkWaitingString(),
+                        text = ContentNetworkWaiting,
                     )
                 }
             }
@@ -262,12 +259,12 @@ internal abstract class AbstractNotification internal constructor(
                     val progress = if (new.isOn) {
                         when {
                             !old.isBootstrapped
-                                    && new.isBootstrapped -> {
+                            && new.isBootstrapped -> {
                                 update { current ->
                                     current.copy(
                                         color = color,
-                                        contentText = new.daemon.bootstrap.provideBootstrappedString(),
                                         progress = Progress.Determinant(new.daemon),
+                                        text = ContentBootstrap.of(new.daemon.bootstrap),
                                     )
                                 }
 
@@ -275,7 +272,7 @@ internal abstract class AbstractNotification internal constructor(
                             }
 
                             !new.isBootstrapped
-                                    && new.isNetworkEnabled -> Progress.Determinant(new.daemon)
+                            && new.isNetworkEnabled -> Progress.Determinant(new.daemon)
 
                             else -> Progress.None
                         }
@@ -284,13 +281,13 @@ internal abstract class AbstractNotification internal constructor(
                     }
 
                     update { current ->
-                        val contentText = when (progress) {
-                            is Progress.Determinant -> progress.value.provideBootstrappedString()
+                        val text = when (progress) {
+                            is Progress.Determinant -> ContentBootstrap.of(progress.value)
                             is Progress.Indeterminate,
                             is Progress.None -> {
-                                val currentText = current.contentText
+                                val currentText = current.text
 
-                                if (new.isNetworkEnabled && currentText is BootstrappedString) {
+                                if (new.isNetworkEnabled && currentText is ContentBootstrap) {
                                     _bandwidth
                                 } else {
                                     currentText
@@ -320,7 +317,7 @@ internal abstract class AbstractNotification internal constructor(
                         val icon = when {
                             new.isNetworkDisabled -> iconNetworkDisabled
                             new.isNetworkEnabled && new.isBootstrapped -> {
-                                if (_bandwidth != Bandwidth) {
+                                if (_bandwidth !is ContentBandwidth.ZERO) {
                                     iconDataXfer
                                 } else {
                                     iconNetworkEnabled
@@ -333,10 +330,10 @@ internal abstract class AbstractNotification internal constructor(
                         current.copy(
                             actions = actions,
                             color = color,
-                            contentText = contentText,
-                            contentTitle = new.daemon.provideString(),
-                            progress = progress,
                             icon = icon,
+                            progress = progress,
+                            text = text,
+                            title = new.daemon,
                         )
                     }
                 }
@@ -347,14 +344,9 @@ internal abstract class AbstractNotification internal constructor(
                     newNymObserver.dispose()
                     newNymObserver = lazyRuntime().observeSignalNewNym(tag, executor) { line ->
                         val message = if (line == null) {
-                            provideNewNymSuccessString()
+                            ContentMessage.NewNym.Success
                         } else {
-                            // Rate limiting NEWNYM request: delaying by 10 second(s)
-                            line.substringBeforeLast(' ', "")
-                                .substringAfterLast(' ', "")
-                                .toIntOrNull()
-                                ?.provideNewNymRateLimitedString()
-                                ?: line
+                            ContentMessage.NewNym.RateLimited.of(line)
                         }
 
                         postMessage(message, 5_000.milliseconds)
@@ -382,21 +374,17 @@ internal abstract class AbstractNotification internal constructor(
                     if (!isNetworkEnabled) return@observer
                 }
 
-                val icon = if (bandwidth != Bandwidth.ZERO) {
+                val icon = if (bandwidth !is ContentBandwidth.ZERO) {
                     iconDataXfer
                 } else {
                     iconNetworkEnabled
                 }
 
                 update { current ->
-                    val contentText = if (_messageJob?.isActive == true) {
-                        current.contentText
-                    } else {
-                        bandwidth
-                    }
+                    val isMessageActive = _messageJob?.isActive == true
 
                     current.copy(
-                        contentText = contentText,
+                        text = if (isMessageActive) current.text else bandwidth,
                         icon = icon,
                     )
                 }

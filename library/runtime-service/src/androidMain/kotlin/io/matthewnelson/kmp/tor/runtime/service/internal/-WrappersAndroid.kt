@@ -21,6 +21,7 @@ import android.content.Context
 import android.content.res.Resources
 import android.graphics.drawable.Drawable
 import android.os.Build
+import io.matthewnelson.kmp.tor.runtime.service.internal.ColorRes.Companion
 
 @Suppress("ACTUAL_WITHOUT_EXPECT")
 internal actual typealias ColorId = Int
@@ -34,6 +35,8 @@ internal actual value class ColorRes private actual constructor(
 
     @Throws(Resources.NotFoundException::class)
     internal fun retrieve(ctx: Context): Int {
+        if (id == NONE.id) throw Resources.NotFoundException()
+
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             // API 23+
             ctx.getColor(id)
@@ -48,10 +51,10 @@ internal actual value class ColorRes private actual constructor(
 
     internal actual companion object {
 
-        internal val ZERO: ColorRes = ColorRes(0)
+        internal actual val NONE: ColorRes = ColorRes(0)
 
         internal actual fun of(id: ColorId): ColorRes {
-            if (id == 0) return ZERO
+            if (id == NONE.id) return NONE
             return ColorRes(id)
         }
     }
@@ -64,6 +67,8 @@ internal actual value class DrawableRes private actual constructor(
 
     @Throws(Resources.NotFoundException::class)
     internal fun retrieve(ctx: Context): Drawable {
+        if (id == NONE.id) throw Resources.NotFoundException()
+
         val drawable = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             // API 21+
             ctx.getDrawable(id)
@@ -84,10 +89,10 @@ internal actual value class DrawableRes private actual constructor(
 
     internal actual companion object {
 
-        internal val ZERO: DrawableRes = DrawableRes(0)
+        internal actual val NONE: DrawableRes = DrawableRes(0)
 
         internal actual fun of(id: DrawableId): DrawableRes {
-            if (id == 0) return ZERO
+            if (id == NONE.id) return NONE
             return DrawableRes(id)
         }
     }

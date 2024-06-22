@@ -13,21 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-package io.matthewnelson.kmp.tor.runtime.service.internal.notification
+package io.matthewnelson.kmp.tor.runtime.service.internal.notification.content
 
 import io.matthewnelson.kmp.tor.runtime.service.internal.NumberFormat
 import io.matthewnelson.kmp.tor.runtime.service.internal.numberFormat
 import kotlin.jvm.JvmField
 import kotlin.math.roundToLong
 
-internal open class Bandwidth private constructor(
+internal open class ContentBandwidth private constructor(
     @JvmField
     internal val down: Long,
     @JvmField
     internal val up: Long,
-): CharSequence {
+): ContentText<String>() {
 
-    private val formatted: String by lazy {
+    internal override val value: String by lazy {
         val formatter = numberFormat()
         val d = down.formatWith(formatter)
         val u = up.formatWith(formatter)
@@ -37,7 +37,7 @@ internal open class Bandwidth private constructor(
     internal fun copy(
         down: Long = this.down,
         up: Long = this.up,
-    ): Bandwidth {
+    ): ContentBandwidth {
         val d = down.coerceAtLeast(0)
         val u = up.coerceAtLeast(0)
 
@@ -49,23 +49,16 @@ internal open class Bandwidth private constructor(
             return ZERO
         }
 
-        return Bandwidth(d, u)
+        return ContentBandwidth(d, u)
     }
 
-    public override val length: Int get() = formatted.length
-    public override fun get(index: Int): Char = formatted[index]
-    public override fun subSequence(
-        startIndex: Int,
-        endIndex: Int,
-    ): CharSequence = formatted.subSequence(startIndex, endIndex)
-
-    public override fun equals(other: Any?): Boolean {
-        return  other is Bandwidth
+    public final override fun equals(other: Any?): Boolean {
+        return  other is ContentBandwidth
                 && other.down == down
                 && other.up == up
     }
 
-    public override fun hashCode(): Int {
+    public final override fun hashCode(): Int {
         var result = 17
         result = result * 42 + this::class.hashCode()
         result = result * 42 + down.toString().hashCode()
@@ -73,9 +66,7 @@ internal open class Bandwidth private constructor(
         return result
     }
 
-    public override fun toString(): String = formatted
-
-    internal companion object ZERO: Bandwidth(0, 0)
+    internal companion object ZERO: ContentBandwidth(0, 0)
 }
 
 @Suppress("NOTHING_TO_INLINE", "KotlinRedundantDiagnosticSuppress")

@@ -13,24 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-package io.matthewnelson.kmp.tor.runtime.service.test
+package io.matthewnelson.kmp.tor.runtime.service.internal.notification.content
 
-import android.content.res.Resources
-import io.matthewnelson.kmp.tor.runtime.service.internal.DrawableRes
-import kotlin.test.Test
-import kotlin.test.assertFailsWith
-
-class TestTorServiceConfigUnitTest {
-
-    @Test
-    fun givenDefaults_whenInitialized_thenDoesNotThrowException() {
-        TestTorServiceConfig()
-    }
-
-    @Test
-    fun givenBadResource_whenInitialized_thenFailsResourceValidation() {
-        assertFailsWith<Resources.NotFoundException> {
-            TestTorServiceConfig(_iconError = DrawableRes.NONE)
-        }
-    }
+internal object ContentNetworkWaiting: ContentText<Unit>() {
+    internal override val value: Unit = Unit
 }

@@ -13,23 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-package io.matthewnelson.kmp.tor.runtime.service.internal.notification
+package io.matthewnelson.kmp.tor.runtime.service.internal.notification.content
 
 import kotlin.jvm.JvmSynthetic
 
-internal class BootstrappedString private constructor(
-    private val value: String,
-): CharSequence by value {
-
-    public override fun equals(other: Any?): Boolean = other is CharSequence && other.toString() == value
-    public override fun hashCode(): Int = value.hashCode()
-    public override fun toString() = value
+internal class ContentBootstrap private constructor(
+    internal override val value: Byte,
+): ContentText<Byte>() {
 
     internal companion object {
 
         @JvmSynthetic
         internal fun of(
-            value: String,
-        ): BootstrappedString = BootstrappedString(value)
+            bootstrap: Byte,
+        ): ContentBootstrap = ContentBootstrap(bootstrap)
     }
 }

@@ -15,21 +15,19 @@
  **/
 package io.matthewnelson.kmp.tor.runtime.service.internal.notification
 
-import kotlin.jvm.JvmSynthetic
+import io.matthewnelson.kmp.tor.runtime.service.internal.notification.content.ContentBandwidth
+import kotlin.test.Test
+import kotlin.test.assertIs
+import kotlin.test.assertIsNot
 
-internal class NetworkWaitingString private constructor(
-    private val value: String,
-): CharSequence by value {
+class ContentBandwidthUnitTest {
 
-    public override fun equals(other: Any?): Boolean = other is CharSequence && other.toString() == value
-    public override fun hashCode(): Int = value.hashCode()
-    public override fun toString() = value
-
-    internal companion object {
-
-        @JvmSynthetic
-        internal fun of(
-            value: String,
-        ): NetworkWaitingString = NetworkWaitingString(value)
+    @Test
+    fun givenCopy_whenDownZeroUpZero_thenIsSingletonZeroInstance() {
+        val down = ContentBandwidth.ZERO.copy(down = 2)
+        val up = ContentBandwidth.ZERO.copy(up = 2)
+        assertIsNot<ContentBandwidth.ZERO>(down)
+        assertIs<ContentBandwidth.ZERO>(down.copy(down = 0))
+        assertIs<ContentBandwidth.ZERO>(up.copy(up = 0))
     }
 }

@@ -28,6 +28,9 @@ internal expect value class ColorRes private constructor(internal val id: ColorI
     public override fun toString(): String
 
     internal companion object {
+
+        internal val NONE: ColorRes
+
         internal fun of(id: ColorId): ColorRes
     }
 }
@@ -38,6 +41,9 @@ internal expect value class DrawableRes private constructor(internal val id: Dra
     public override fun toString(): String
 
     internal companion object {
+
+        internal val NONE: DrawableRes
+
         internal fun of(id: DrawableId): DrawableRes
     }
 }

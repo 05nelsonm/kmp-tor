@@ -39,7 +39,7 @@ internal sealed class Progress {
     internal data object Indeterminate: Progress()
     internal data object None: Progress()
 
-    public final override fun toString(): String = "Progress." + when (this) {
+    public final override fun toString(): String = when (this) {
         is Determinant -> "Determinant{$value}"
         is Indeterminate -> "Indeterminate"
         is None -> "None"

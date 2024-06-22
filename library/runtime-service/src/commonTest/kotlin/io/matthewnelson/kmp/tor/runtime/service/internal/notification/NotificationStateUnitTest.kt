@@ -15,9 +15,12 @@
  **/
 package io.matthewnelson.kmp.tor.runtime.service.internal.notification
 
+import io.matthewnelson.kmp.tor.runtime.Action
 import io.matthewnelson.kmp.tor.runtime.FileID
+import io.matthewnelson.kmp.tor.runtime.TorState
 import io.matthewnelson.kmp.tor.runtime.service.internal.ColorRes
 import io.matthewnelson.kmp.tor.runtime.service.internal.DrawableRes
+import io.matthewnelson.kmp.tor.runtime.service.internal.notification.content.ContentAction
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
@@ -28,11 +31,11 @@ class NotificationStateUnitTest {
     fun givenState_whenToString_thenIsAsExpected() {
         val state = NotificationState.of(
             setOf(ButtonAction.NewIdentity),
-            ColorRes.ZERO,
-            "text",
-            "title",
+            ColorRes.NONE,
+            DrawableRes.NONE,
             Progress.Indeterminate,
-            DrawableRes.ZERO,
+            ContentAction.of(Action.StartDaemon),
+            TorState.Daemon.Off,
             object : FileID {
                 override val fid: String = "abcdefg12345678"
             }
@@ -43,11 +46,11 @@ class NotificationStateUnitTest {
                 actions: [
                     NewIdentity
                 ]
-                color: ColorRes[id=0]
-                contentText: text
-                contentTitle: title
-                progress: Progress.Indeterminate
-                icon: DrawableRes[id=0]
+                color: ColorRes[id=${ColorRes.NONE.id}]
+                icon: DrawableRes[id=${DrawableRes.NONE.id}]
+                progress: Indeterminate
+                text: ContentAction[value=StartDaemon]
+                title: TorState.Daemon.Off
             ]
         """.trimIndent(), state.toString())
 

@@ -23,12 +23,16 @@ import io.matthewnelson.kmp.tor.runtime.Action
 import io.matthewnelson.kmp.tor.runtime.TorState
 import io.matthewnelson.kmp.tor.runtime.service.R
 import io.matthewnelson.kmp.tor.runtime.service.internal.notification.*
-import io.matthewnelson.kmp.tor.runtime.service.internal.notification.AndroidAbstractNotification
-import io.matthewnelson.kmp.tor.runtime.service.internal.notification.BootstrappedString
+import io.matthewnelson.kmp.tor.runtime.service.internal.notification.content.ContentBootstrap
 import io.matthewnelson.kmp.tor.runtime.service.internal.notification.ButtonAction
-import io.matthewnelson.kmp.tor.runtime.service.internal.notification.NotificationState
-import kotlinx.coroutines.GlobalScope
+import io.matthewnelson.kmp.tor.runtime.service.internal.notification.content.ContentAction
+import io.matthewnelson.kmp.tor.runtime.service.internal.notification.content.ContentMessage
+import io.matthewnelson.kmp.tor.runtime.service.internal.notification.content.ContentNetworkWaiting
+import io.matthewnelson.kmp.tor.runtime.service.internal.renderString
 import java.util.Locale
+import kotlin.contracts.ExperimentalContracts
+import kotlin.contracts.InvocationKind
+import kotlin.contracts.contract
 import kotlin.test.Test
 import kotlin.test.assertTrue
 
@@ -37,7 +41,7 @@ import kotlin.test.assertTrue
  * string resources load when they are retrieved and do not throw exception
  * due to a bad translation or formatting error. Shipping that would be awful.
  * */
-class AndroidAbstractNotificationResourceTest {
+class NotificationStateResourceUnitTest {
 
     /**
      * List of all the [Locale] to be checked, and a simple test value
@@ -58,74 +62,77 @@ class AndroidAbstractNotificationResourceTest {
 
     private val app = ApplicationProvider.getApplicationContext<Application>()
 
-    @Suppress("OPT_IN_USAGE")
-    private class TestNotification(
-        override val context: Context,
-    ) : AndroidAbstractNotification(
-        serviceScope = GlobalScope,
-        isServiceDestroyed = { false },
-        init = Synthetic.INIT,
-    ) {
-        override fun InstanceView.remove() = TODO("Not yet implemented")
-        override fun InstanceView.render(old: NotificationState, new: NotificationState) = TODO("Not yet implemented")
-
-        fun string(action: ButtonAction): String = action.provideString()
-        fun string(action: Action): String = action.provideString()
-        fun string(daemon: TorState.Daemon): String = daemon.provideString()
-        fun stringBootstrapped(byte: Byte): BootstrappedString = byte.provideBootstrappedString()
-        fun stringRateLimited(seconds: Int): String = seconds.provideNewNymRateLimitedString()
-        fun stringNewNymSuccess(): String = provideNewNymSuccessString()
-        fun stringNetworkWaiting(): NetworkWaitingString = provideNetworkWaitingString()
-    }
-
-    private val instance = TestNotification(app)
-
     @Test
-    fun givenLocale_whenProvideString_thenStringResourceIsAsExpected() {
+    fun givenLocale_whenRenderContentFromResource_thenIsSuccess() {
         locales.forEach { (locale, expected) ->
             assertTrue(expected.isNotBlank())
 
             app.setResourceLocale(locale)
 
             ButtonAction.entries.forEach { action ->
-                tryCatch(locale, action) { string(action) }
+                locale.tryCatch(action) {
+                    renderString(action)
+                }.let {}
             }
+
             Action.entries.forEach { action ->
-                tryCatch(locale, action) { string(action) }
+                locale.tryCatch(action) {
+                    renderString(ContentAction.of(action))
+                }.let {}
             }
+
             setOf(
                 TorState.Daemon.On(5),
                 TorState.Daemon.Off,
                 TorState.Daemon.Starting,
                 TorState.Daemon.Stopping,
             ).forEach { state ->
-                tryCatch(locale, state) { string(state) }
+                locale.tryCatch(state) {
+                    renderString(state)
+                }.let {}
             }
 
-            tryCatch(locale, "Bootstrapped") {
-                stringBootstrapped(5)
-            }.toString().let { actual ->
-                tryCatch(locale, "Bootstrapped{contains expected}") {
+            locale.tryCatch("Bootstrapped") {
+                renderString(ContentBootstrap.of(5))
+            }.let { actual ->
+                locale.tryCatch("Bootstrapped{contains expected}") {
                     assertTrue(actual.contains(expected))
-                }
+                }.let {}
             }
 
-            tryCatch(locale, "RateLimited") { stringRateLimited(10) }
-            tryCatch(locale, "NewNymSuccess") { stringNewNymSuccess() }
-            tryCatch(locale, "NetworkWaiting") { stringNetworkWaiting() }
+            locale.tryCatch("RateLimited") {
+                renderString(ContentMessage.NewNym.RateLimited.Seconds.of(5))
+            }.let {}
+            locale.tryCatch("NewNymSuccess") {
+                renderString(ContentMessage.NewNym.Success)
+            }.let {}
+            locale.tryCatch("NetworkWaiting") {
+                renderString(ContentNetworkWaiting)
+            }.let {}
         }
     }
 
     @Throws(AssertionError::class)
-    private fun <T: Any?> tryCatch(
-        locale: Locale,
+    @OptIn(ExperimentalContracts::class)
+    private inline fun <T: Any?> Locale.tryCatch(
         failMsg: Any,
-        block: TestNotification.() -> T
-    ): T = try {
-        block(instance)
-    } catch (t: Throwable) {
-        val msg = "Locale[$locale]: $failMsg"
-        throw AssertionError(msg, t)
+        block: Context.() -> T
+    ): T {
+        contract {
+            callsInPlace(block, InvocationKind.EXACTLY_ONCE)
+        }
+
+        val msg = "Locale[$this]: $failMsg"
+
+        val result = try {
+            block(app)
+        } catch (t: Throwable) {
+            throw AssertionError(msg, t)
+        }
+
+        println("$msg[result=$result]")
+
+        return result
     }
 
     private fun Application.setResourceLocale(locale: Locale) {
