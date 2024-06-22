@@ -68,6 +68,7 @@ kmpConfiguration {
                 dependencies {
                     api(project(":library:runtime"))
                     implementation(libs.kmp.tor.core.resource)
+                    implementation(libs.kotlinx.coroutines.core)
                 }
             }
             sourceSetTest {
