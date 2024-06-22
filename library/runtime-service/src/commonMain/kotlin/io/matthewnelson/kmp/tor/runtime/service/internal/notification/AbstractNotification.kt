@@ -193,7 +193,7 @@ internal abstract class AbstractNotification internal constructor(
             }?.execute()
         }
 
-        private fun postMessage(message: ContentMessage<*>, duration: Duration) {
+        internal fun postMessage(message: ContentMessage<*>, duration: Duration) {
             if (duration <= Duration.ZERO) return
 
             _messageJob?.cancel()

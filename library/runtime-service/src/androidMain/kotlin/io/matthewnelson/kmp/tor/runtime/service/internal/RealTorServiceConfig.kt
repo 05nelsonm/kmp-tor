@@ -107,13 +107,13 @@ internal class RealTorServiceConfig private constructor(
                     }
 
                     override fun ColorRes.isValid(): Boolean = try {
-                        retrieve(ctx)
+                        renderColor(this)
                         true
                     } catch (_: Resources.NotFoundException) {
                         false
                     }
                     override fun DrawableRes.isValid(): Boolean = try {
-                        retrieve(ctx)
+                        renderDrawable(this)
                         true
                     } catch (_: Resources.NotFoundException) {
                         false

@@ -17,12 +17,6 @@
 
 package io.matthewnelson.kmp.tor.runtime.service.internal
 
-import android.content.Context
-import android.content.res.Resources
-import android.graphics.drawable.Drawable
-import android.os.Build
-import io.matthewnelson.kmp.tor.runtime.service.internal.ColorRes.Companion
-
 @Suppress("ACTUAL_WITHOUT_EXPECT")
 internal actual typealias ColorId = Int
 @Suppress("ACTUAL_WITHOUT_EXPECT")
@@ -32,20 +26,6 @@ internal actual typealias DrawableId = Int
 internal actual value class ColorRes private actual constructor(
     internal actual val id: ColorId,
 ) {
-
-    @Throws(Resources.NotFoundException::class)
-    internal fun retrieve(ctx: Context): Int {
-        if (id == NONE.id) throw Resources.NotFoundException("id=0")
-
-        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            // API 23+
-            ctx.getColor(id)
-        } else {
-            // API 22-
-            @Suppress("DEPRECATION")
-            ctx.resources.getColor(id)
-        }
-    }
 
     public actual override fun toString(): String = commonToString()
 
@@ -64,26 +44,6 @@ internal actual value class ColorRes private actual constructor(
 internal actual value class DrawableRes private actual constructor(
     internal actual val id: DrawableId,
 ) {
-
-    @Throws(Resources.NotFoundException::class)
-    internal fun retrieve(ctx: Context): Drawable {
-        if (id == NONE.id) throw Resources.NotFoundException("id=0")
-
-        val drawable = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            // API 21+
-            ctx.getDrawable(id)
-        } else {
-            // API 20-
-            @Suppress("DEPRECATION")
-            ctx.resources.getDrawable(id)
-        }
-
-        if (drawable == null) {
-            throw Resources.NotFoundException("Drawable[id=$id] was null")
-        }
-
-        return drawable
-    }
 
     public actual override fun toString(): String = commonToString()
 

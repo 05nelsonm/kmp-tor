@@ -17,6 +17,9 @@ package io.matthewnelson.kmp.tor.runtime.service.internal
 
 import android.content.Context
 import android.content.pm.PackageManager.PERMISSION_GRANTED
+import android.content.res.Resources
+import android.graphics.drawable.Drawable
+import android.os.Build
 import android.os.Process
 import io.matthewnelson.kmp.tor.runtime.Action
 import io.matthewnelson.kmp.tor.runtime.TorState
@@ -33,6 +36,40 @@ import io.matthewnelson.kmp.tor.runtime.service.internal.notification.content.Co
 internal inline fun Context.isPermissionGranted(permission: String): Boolean {
     val result = checkPermission(permission, Process.myPid(), Process.myUid())
     return result == PERMISSION_GRANTED
+}
+
+@Throws(Resources.NotFoundException::class)
+internal fun Context.renderColor(res: ColorRes): Int {
+    if (res.id == ColorRes.NONE.id) throw Resources.NotFoundException("id=0")
+
+    return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+        // API 23+
+        getColor(res.id)
+    } else {
+        // API 22-
+        @Suppress("DEPRECATION")
+        resources.getColor(res.id)
+    }
+}
+
+@Throws(Resources.NotFoundException::class)
+internal fun Context.renderDrawable(res: DrawableRes): Drawable {
+    if (res.id == DrawableRes.NONE.id) throw Resources.NotFoundException("id=0")
+
+    val drawable = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+        // API 21+
+        getDrawable(res.id)
+    } else {
+        // API 20-
+        @Suppress("DEPRECATION")
+        resources.getDrawable(res.id)
+    }
+
+    if (drawable == null) {
+        throw Resources.NotFoundException("Drawable[id=${res.id}] was null")
+    }
+
+    return drawable
 }
 
 internal fun Context.renderString(action: ButtonAction): String = when (action) {

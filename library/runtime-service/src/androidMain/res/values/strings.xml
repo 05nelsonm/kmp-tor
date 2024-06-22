@@ -35,7 +35,7 @@
     <string name="kmp_tor_newnym_success">You\'ve changed Tor identities!</string>
     <string name="kmp_tor_newnym_rate_limited">Rate limiting NewIdentity: delaying by %ds</string>
 
-    <!-- DEPRECATED - NOT IN USE -->
+    <!-- DEPRECATED - kmp-tor 1.x.x -->
     <string name="kmp_tor_bootstrapped">Bootstrapped</string>
     <string name="kmp_tor_newnym_no_network">No network. Cannot request a new identity</string>
 </resources>
