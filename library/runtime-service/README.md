@@ -2,8 +2,8 @@
 
 ### Android
 
-To utilize the `TorService` you must use the `Context.createTorRuntimeEnvironment` 
-extension functions (or for `Java` users, `TorRuntimeEnvironment.Builder` functions).
+To utilize the `TorService` you must use the `Application.createTorServiceEnvironment` 
+extension functions (or for `Java` users, `TorServiceEnvironment.Builder` functions).
 
 This will set the `TorRuntime.Environment.Builder.serviceFactoryLoader` so that when 
 `TorRuntime` is then created, it will instantiate the `TorRuntime.ServiceFactory` instead 
@@ -14,7 +14,7 @@ using the `Context` extensions.
 e.g.
 
 ```kotlin
-val environment = context.createTorRuntimeEnvironment { installationDirectory ->
+val environment = app.createTorServiceEnvironment { installationDirectory ->
     // Assuming use of `kmp-tor:resource-tor` dependency...
     TorResources(installationDirectory)
 }

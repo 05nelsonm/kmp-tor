@@ -28,11 +28,20 @@
     <string name="kmp_tor_notification_action_restart">Restart Tor</string>
     <string name="kmp_tor_notification_action_stop">Stop Tor</string>
 
-    <!-- {digit}{"%"} b/c formatter freaks out with percent signs in resource xml -->
-    <string name="kmp_tor_bootstrapped_format">Bootstrapped %1$d%2$s</string>
+    <!-- percent sign injected for 2nd argument b/c formatter freaks out
+         %1$d = digit (e.g. 25)
+         %2$s = "%" (percent sign character)
+         result = 25%
+    -->
+    <string name="kmp_tor_bootstrapped_formated">Bootstrapped %1$d%2$s</string>
     <string name="kmp_tor_waiting_on_network">No Network Connectivity. Waiting…</string>
 
     <string name="kmp_tor_newnym_success">You\'ve changed Tor identities!</string>
+
+    <!--
+         %d = digit (e.g 5)
+         result = [...] delaying by 5s
+    -->
     <string name="kmp_tor_newnym_rate_limited">Rate limiting NewIdentity: delaying by %ds</string>
 
     <!-- DEPRECATED - kmp-tor 1.x.x -->

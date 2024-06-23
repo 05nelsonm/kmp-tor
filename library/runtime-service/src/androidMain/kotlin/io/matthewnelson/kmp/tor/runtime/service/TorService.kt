@@ -21,20 +21,22 @@ import android.content.Context
 import android.content.Intent
 import android.content.res.Resources
 import android.os.Build
-import androidx.startup.AppInitializer
 import io.matthewnelson.kmp.tor.core.api.annotation.ExperimentalKmpTorApi
 import io.matthewnelson.kmp.tor.runtime.*
+import io.matthewnelson.kmp.tor.runtime.core.ThisBlock
+import io.matthewnelson.kmp.tor.runtime.service.internal.notification.ServiceNotification
 
 @OptIn(ExperimentalKmpTorApi::class)
 internal class TorService internal constructor(): AbstractTorService() {
 
     private class AndroidServiceFactory(
         private val app: Application,
-        config: TorServiceConfig,
+        private val enableForeground: Boolean,
+        instanceConfig: ServiceNotification.Config,
         initializer: Initializer,
     ): TorRuntime.ServiceFactory(initializer) {
 
-        private val connection = Connection(binder, config)
+        private val connection = Connection(binder, instanceConfig)
 
         @Throws(RuntimeException::class)
         protected override fun startService() {
@@ -48,7 +50,7 @@ internal class TorService internal constructor(): AbstractTorService() {
             }
 
             // API 26+
-            if (!connection.config.enableForeground) {
+            if (!enableForeground) {
                 app.startService(intent)
                 intent.bindService()
                 return
@@ -88,63 +90,30 @@ internal class TorService internal constructor(): AbstractTorService() {
         }
     }
 
-    internal class Initializer internal constructor(): androidx.startup.Initializer<Initializer.Companion> {
-
-        public override fun create(context: Context): Companion {
-            val initializer = AppInitializer.getInstance(context)
-            check(initializer.isEagerlyInitialized(javaClass)) {
-                val classPath = "io.matthewnelson.kmp.tor.runtime.service.TorService$" + "Initializer"
-
-                """
-                    TorService.Initializer cannot be initialized lazily.
-                    Please ensure that you have:
-                    <meta-data
-                        android:name='$classPath'
-                        android:value='androidx.startup' />
-                    under InitializationProvider in your AndroidManifest.xml
-                """.trimIndent()
-            }
-            app = context.applicationContext as Application
-            return Companion
-        }
-
-        public override fun dependencies(): List<Class<androidx.startup.Initializer<*>>> {
-            return try {
-                val clazz = Class
-                    .forName("io.matthewnelson.kmp.tor.core.lib.locator.KmpTorLibLocator\$Initializer")
-
-                @Suppress("UNCHECKED_CAST")
-                listOf((clazz as Class<androidx.startup.Initializer<*>>))
-            } catch (_: Throwable) {
-                emptyList()
-            }
-        }
-
-        internal companion object {
-
-            @JvmSynthetic
-            internal fun isInitialized(): Boolean = app != null
-        }
-    }
-
     internal companion object {
-
-        private var app: Application? = null
 
         @JvmSynthetic
         @Throws(Resources.NotFoundException::class)
-        internal fun loaderOrNull(
-            // TODO: TorServiceConfig.Overrides?
-        ): TorRuntime.ServiceFactory.Loader? {
-            val app = app ?: return null
+        internal fun Application.serviceFactoryLoader(
+            block: ThisBlock<TorServiceConfig.OverridesBuilder>,
+        ): TorRuntime.ServiceFactory.Loader {
+            val app = this
+
             val config = TorServiceConfig.getMetaData(app)
+            val instanceConfig = TorServiceConfig
+                .OverridesBuilder
+                .build(app, config, block)
 
             return object : TorRuntime.ServiceFactory.Loader() {
-                override fun loadProtected(
+
+                protected override fun loadProtected(
                     initializer: TorRuntime.ServiceFactory.Initializer,
-                ): TorRuntime.ServiceFactory {
-                    return AndroidServiceFactory(app, config, initializer)
-                }
+                ): TorRuntime.ServiceFactory = AndroidServiceFactory(
+                    app = app,
+                    enableForeground = config.enableForeground,
+                    instanceConfig = instanceConfig,
+                    initializer = initializer,
+                )
             }
         }
     }

@@ -27,15 +27,6 @@
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 
     <application>
-        <provider
-            android:name="androidx.startup.InitializationProvider"
-            android:authorities="${applicationId}.androidx-startup"
-            android:exported="false"
-            tools:node="merge">
-            <meta-data
-                android:name="io.matthewnelson.kmp.tor.runtime.service.TorService$Initializer"
-                android:value="androidx.startup" />
-        </provider>
         <service
             android:name="io.matthewnelson.kmp.tor.runtime.service.TorService"
             android:enabled="true"

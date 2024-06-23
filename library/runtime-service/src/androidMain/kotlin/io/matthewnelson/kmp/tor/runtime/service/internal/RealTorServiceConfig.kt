@@ -26,6 +26,7 @@ import android.os.Bundle
 import io.matthewnelson.kmp.tor.runtime.service.TorServiceConfig
 import io.matthewnelson.kmp.tor.runtime.service.TorServiceConfig.MetaData.Companion.enableForeground
 import io.matthewnelson.kmp.tor.runtime.service.TorServiceConfig.MetaData.Companion.stopServiceOnTaskRemoved
+import io.matthewnelson.kmp.tor.runtime.service.internal.notification.ServiceNotification
 import kotlin.concurrent.Volatile
 
 internal class RealTorServiceConfig private constructor(
@@ -37,15 +38,8 @@ internal class RealTorServiceConfig private constructor(
     channelName: String,
     channelDescription: String,
     channelShowBadge: Boolean,
-    _iconNetworkEnabled: DrawableRes,
-    _iconNetworkDisabled: DrawableRes,
-    _iconDataXfer: DrawableRes,
-    _iconError: DrawableRes,
-    _colorWhenBootstrappedTrue: ColorRes,
-    _colorWhenBootstrappedFalse: ColorRes,
     visibility: Int,
-    enableActionRestart: Boolean,
-    enableActionStop: Boolean,
+    defaults: ServiceNotification.Config,
 ): TorServiceConfig(
     enableForeground,
     stopServiceOnTaskRemoved,
@@ -55,15 +49,8 @@ internal class RealTorServiceConfig private constructor(
     channelName,
     channelDescription,
     channelShowBadge,
-    _iconNetworkEnabled,
-    _iconNetworkDisabled,
-    _iconDataXfer,
-    _iconError,
-    _colorWhenBootstrappedTrue,
-    _colorWhenBootstrappedFalse,
     visibility,
-    enableActionRestart,
-    enableActionStop,
+    defaults,
     Synthetic.INIT,
 ) {
 
@@ -93,8 +80,6 @@ internal class RealTorServiceConfig private constructor(
             }
 
             val metaData = if (bundle != null) {
-                val ctx = this
-
                 object : MetaData<Resources.NotFoundException>() {
                     override fun getBoolean(key: String, default: Boolean): Boolean {
                         return bundle.getBoolean(key, default)
@@ -107,13 +92,13 @@ internal class RealTorServiceConfig private constructor(
                     }
 
                     override fun ColorRes.isValid(): Boolean = try {
-                        renderColor(this)
+                        retrieveColor(this)
                         true
                     } catch (_: Resources.NotFoundException) {
                         false
                     }
                     override fun DrawableRes.isValid(): Boolean = try {
-                        renderDrawable(this)
+                        retrieveDrawable(this)
                         true
                     } catch (_: Resources.NotFoundException) {
                         false
@@ -149,15 +134,17 @@ internal class RealTorServiceConfig private constructor(
                     channelName = "",
                     channelDescription = "",
                     channelShowBadge = false,
-                    _iconNetworkEnabled = DrawableRes.NONE,
-                    _iconNetworkDisabled = DrawableRes.NONE,
-                    _iconDataXfer = DrawableRes.NONE,
-                    _iconError = DrawableRes.NONE,
-                    _colorWhenBootstrappedTrue = ColorRes.NONE,
-                    _colorWhenBootstrappedFalse = ColorRes.NONE,
                     visibility = 0,
-                    enableActionRestart = false,
-                    enableActionStop = false,
+                    defaults = ServiceNotification.Config(
+                        enableActionRestart = false,
+                        enableActionStop = false,
+                        colorWhenBootstrappedTrue = ColorRes.NONE,
+                        colorWhenBootstrappedFalse = ColorRes.NONE,
+                        iconNetworkEnabled = DrawableRes.NONE,
+                        iconNetworkDisabled = DrawableRes.NONE,
+                        iconDataXfer = DrawableRes.NONE,
+                        iconError = DrawableRes.NONE,
+                    ),
                 )
             }
 
@@ -181,18 +168,29 @@ internal class RealTorServiceConfig private constructor(
             val channelDescription = metaData.channelDescription()
             val channelShowBadge = metaData.channelShowBadge()
 
-            val _iconNetworkEnabled = metaData.iconNetworkEnabled()
-            val _iconNetworkDisabled = metaData.iconNetworkDisabled() ?: _iconNetworkEnabled
-            val _iconError = metaData.iconError()
-            val _iconDataXfer = metaData.iconDataXfer() ?: _iconNetworkEnabled
-
-            val _colorWhenBootstrappedTrue = metaData.colorWhenBootstrappedTrue() ?: ColorRes.of(android.R.color.white)
-            val _colorWhenBootstrappedFalse = metaData.colorWhenBootstrappedFalse() ?: ColorRes.of(android.R.color.white)
-
             val visibility = metaData.visibility()
+
+            val iconNetworkEnabled = metaData.iconNetworkEnabled()
+            val iconNetworkDisabled = metaData.iconNetworkDisabled() ?: iconNetworkEnabled
+            val iconDataXfer = metaData.iconDataXfer() ?: iconNetworkEnabled
+            val iconError = metaData.iconError()
+
+            val colorWhenBootstrappedTrue = metaData.colorWhenBootstrappedTrue() ?: ColorRes.of(android.R.color.white)
+            val colorWhenBootstrappedFalse = metaData.colorWhenBootstrappedFalse() ?: ColorRes.of(android.R.color.white)
 
             val enableActionRestart = metaData.enableActionRestart()
             val enableActionStop = metaData.enableActionStop()
+
+            val config = ServiceNotification.Config(
+                enableActionRestart = enableActionRestart,
+                enableActionStop = enableActionStop,
+                colorWhenBootstrappedTrue = colorWhenBootstrappedTrue,
+                colorWhenBootstrappedFalse = colorWhenBootstrappedFalse,
+                iconNetworkEnabled = iconNetworkEnabled,
+                iconNetworkDisabled = iconNetworkDisabled,
+                iconDataXfer = iconDataXfer,
+                iconError = iconError,
+            )
 
             return RealTorServiceConfig(
                 enableForeground = true,
@@ -203,15 +201,8 @@ internal class RealTorServiceConfig private constructor(
                 channelName = channelName,
                 channelDescription = channelDescription,
                 channelShowBadge = channelShowBadge,
-                _iconNetworkEnabled = _iconNetworkEnabled,
-                _iconNetworkDisabled = _iconNetworkDisabled,
-                _iconDataXfer = _iconDataXfer,
-                _iconError = _iconError,
-                _colorWhenBootstrappedTrue = _colorWhenBootstrappedTrue,
-                _colorWhenBootstrappedFalse = _colorWhenBootstrappedFalse,
                 visibility = visibility,
-                enableActionRestart = enableActionRestart,
-                enableActionStop = enableActionStop,
+                defaults = config
             )
         }
     }

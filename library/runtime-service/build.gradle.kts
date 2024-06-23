@@ -23,12 +23,6 @@ kmpConfiguration {
             target { publishLibraryVariants("release") }
 
             android {
-                lint {
-                    // linter does not like the subclass. Runtime tests
-                    // are performed to ensure everything is copacetic.
-                    disable.add("EnsureInitializerMetadata")
-                }
-
                 defaultConfig {
                     testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
                 }
@@ -43,7 +37,6 @@ kmpConfiguration {
 
             sourceSetMain {
                 dependencies {
-                    implementation(libs.androidx.startup.runtime)
                     implementation(libs.kotlinx.coroutines.android)
                 }
             }

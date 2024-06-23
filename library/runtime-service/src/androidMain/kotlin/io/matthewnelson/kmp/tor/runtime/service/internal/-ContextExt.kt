@@ -39,7 +39,7 @@ internal inline fun Context.isPermissionGranted(permission: String): Boolean {
 }
 
 @Throws(Resources.NotFoundException::class)
-internal fun Context.renderColor(res: ColorRes): Int {
+internal fun Context.retrieveColor(res: ColorRes): Int {
     if (res.id == ColorRes.NONE.id) throw Resources.NotFoundException("id=0")
 
     return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
@@ -53,7 +53,7 @@ internal fun Context.renderColor(res: ColorRes): Int {
 }
 
 @Throws(Resources.NotFoundException::class)
-internal fun Context.renderDrawable(res: DrawableRes): Drawable {
+internal fun Context.retrieveDrawable(res: DrawableRes): Drawable {
     if (res.id == DrawableRes.NONE.id) throw Resources.NotFoundException("id=0")
 
     val drawable = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
@@ -72,13 +72,13 @@ internal fun Context.renderDrawable(res: DrawableRes): Drawable {
     return drawable
 }
 
-internal fun Context.renderString(action: ButtonAction): String = when (action) {
+internal fun Context.retrieveString(action: ButtonAction): String = when (action) {
     ButtonAction.NewIdentity -> R.string.kmp_tor_notification_action_newnym
     ButtonAction.RestartTor -> R.string.kmp_tor_notification_action_restart
     ButtonAction.StopTor -> R.string.kmp_tor_notification_action_stop
 }.let { id -> getString(id) }
 
-internal fun Context.renderString(content: ContentText<*>): String = when (content) {
+internal fun Context.retrieveString(content: ContentText<*>): String = when (content) {
     is ContentAction -> when (content.value) {
         Action.StartDaemon -> R.string.kmp_tor_action_start
         Action.StopDaemon -> R.string.kmp_tor_action_stop
@@ -86,7 +86,7 @@ internal fun Context.renderString(content: ContentText<*>): String = when (conte
     }.let { id -> getString(id) }
     is ContentBandwidth -> content.value
     is ContentBootstrap -> {
-        getString(R.string.kmp_tor_bootstrapped_format, content.value, "%")
+        getString(R.string.kmp_tor_bootstrapped_formated, content.value, "%")
     }
     is ContentMessage.NewNym.RateLimited.Raw -> content.value
     is ContentMessage.NewNym.RateLimited.Seconds -> {
@@ -100,7 +100,7 @@ internal fun Context.renderString(content: ContentText<*>): String = when (conte
     }
 }
 
-internal fun Context.renderString(state: TorState.Daemon): String = when (state) {
+internal fun Context.retrieveString(state: TorState.Daemon): String = when (state) {
     is TorState.Daemon.Off -> R.string.kmp_tor_tor_state_off
     is TorState.Daemon.On -> R.string.kmp_tor_tor_state_on
     is TorState.Daemon.Starting -> R.string.kmp_tor_tor_state_starting

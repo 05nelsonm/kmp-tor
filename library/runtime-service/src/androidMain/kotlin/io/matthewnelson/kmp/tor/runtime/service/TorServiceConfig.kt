@@ -19,22 +19,39 @@ package io.matthewnelson.kmp.tor.runtime.service
 
 import android.content.Context
 import android.content.res.Resources
+import android.os.Build
+import io.matthewnelson.kmp.tor.core.api.annotation.KmpTorDsl
+import io.matthewnelson.kmp.tor.runtime.TorRuntime
 import io.matthewnelson.kmp.tor.runtime.core.ThisBlock
 import io.matthewnelson.kmp.tor.runtime.core.apply
+import io.matthewnelson.kmp.tor.runtime.service.internal.*
 import io.matthewnelson.kmp.tor.runtime.service.internal.ColorRes
 import io.matthewnelson.kmp.tor.runtime.service.internal.DrawableRes
 import io.matthewnelson.kmp.tor.runtime.service.internal.RealTorServiceConfig
+import io.matthewnelson.kmp.tor.runtime.service.internal.notification.ServiceNotification
+import io.matthewnelson.kmp.tor.runtime.service.internal.retrieveDrawable
+import kotlin.contracts.ExperimentalContracts
+import kotlin.contracts.InvocationKind
+import kotlin.contracts.contract
 
 /**
  * Configuration options for running [TorService] in the foreground.
  *
  * By default, [TorService] runs in the background and without any
  * configuration necessary. Configuration is passed via `<meta-data>`
- * tags within the `AndroidManifest.xml` `<application>` block.
+ * tags within the `AndroidManifest.xml` `<application>` block. These
+ * are the "global defaults" utilized by all instances of [TorRuntime]
+ * operating within [TorService], some of which can be overridden on
+ * a per-instance basis via [OverridesBuilder].
+ *
+ * **NOTE:** If [enableForeground] is `false`, parsing of manifest
+ * meta-data stops early and does not check/validate any other tags
+ * that may be declared.
  *
  * See the [README.md](https://github.com/05nelsonm/kmp-tor/blob/master/library/runtime-service/README.md)
  *
  * @see [getMetaData]
+ * @see [OverridesBuilder]
  * */
 public abstract class TorServiceConfig internal constructor(
     @JvmField
@@ -53,119 +70,232 @@ public abstract class TorServiceConfig internal constructor(
     public val channelDescription: String,
     @JvmField
     public val channelShowBadge: Boolean,
-    internal val _iconNetworkEnabled: DrawableRes,
-    internal val _iconNetworkDisabled: DrawableRes,
-    internal val _iconDataXfer: DrawableRes,
-    internal val _iconError: DrawableRes,
-    internal val _colorWhenBootstrappedTrue: ColorRes,
-    internal val _colorWhenBootstrappedFalse: ColorRes,
     @JvmField
     public val visibility: Int,
-    @JvmField
-    public val enableActionRestart: Boolean,
-    @JvmField
-    public val enableActionStop: Boolean,
+    private val _defaults: ServiceNotification.Config,
     init: Any,
 ) {
 
     @JvmField
-    public val iconNetworkEnabled: Int = _iconNetworkEnabled.id
+    public val colorWhenBootstrappedTrue: Int = _defaults.colorWhenBootstrappedTrue.id
     @JvmField
-    public val iconNetworkDisabled: Int = _iconNetworkDisabled.id
+    public val colorWhenBootstrappedFalse: Int = _defaults.colorWhenBootstrappedFalse.id
+
     @JvmField
-    public val iconDataXfer: Int = _iconDataXfer.id
+    public val iconNetworkEnabled: Int = _defaults.iconNetworkEnabled.id
     @JvmField
-    public val iconError: Int = _iconError.id
+    public val iconNetworkDisabled: Int = _defaults.iconNetworkDisabled.id
     @JvmField
-    public val colorWhenBootstrappedTrue: Int = _colorWhenBootstrappedTrue.id
+    public val iconDataXfer: Int = _defaults.iconDataXfer.id
     @JvmField
-    public val colorWhenBootstrappedFalse: Int = _colorWhenBootstrappedFalse.id
+    public val iconError: Int = _defaults.iconError.id
+
+    @JvmField
+    public val enableActionRestart: Boolean = _defaults.enableActionRestart
+    @JvmField
+    public val enableActionStop: Boolean = _defaults.enableActionStop
 
     public companion object {
 
+        /**
+         * Retrieves the manifest `meta-data` and parses it.
+         * */
         @Throws(Resources.NotFoundException::class)
         public fun getMetaData(context: Context): TorServiceConfig {
             return RealTorServiceConfig.of(context)
         }
     }
 
-//    // TODO
-//    public class Overrides private constructor(
-//        internal val _iconNetworkEnabled: DrawableRes?,
-//        internal val _iconNetworkDisabled: DrawableRes?,
-//        internal val _iconDataXfer: DrawableRes?,
-//        internal val _iconError: DrawableRes?,
-//        internal val _colorWhenBootstrappedTrue: ColorRes?,
-//        internal val _colorWhenBootstrappedFalse: ColorRes?,
-//        @JvmField
-//        public val enableActionRestart: Boolean?,
-//        @JvmField
-//        public val enableActionStop: Boolean?,
-//    ) {
-//
-//        @JvmField
-//        public val iconNetworkEnabled: Int? = _iconNetworkEnabled?.id
-//        @JvmField
-//        public val iconNetworkDisabled: Int? = _iconNetworkDisabled?.id
-//        @JvmField
-//        public val iconDataXfer: Int? = _iconDataXfer?.id
-//        @JvmField
-//        public val iconError: Int? = _iconError?.id
-//        @JvmField
-//        public val colorWhenBootstrappedTrue: Int? = _colorWhenBootstrappedTrue?.id
-//        @JvmField
-//        public val colorWhenBootstrappedFalse: Int? = _colorWhenBootstrappedFalse?.id
-//
-//        public companion object {
-//
-//            @JvmStatic
-//            @Throws(Resources.NotFoundException::class)
-//            public fun Builder(
-//                context: Context,
-//                block: ThisBlock<Builder>,
-//            ): Overrides = Builder.build(context, block)
-//        }
-//
-//        public class Builder private constructor() {
-//
-//            @JvmField
-//            public var enableActionRestart: Boolean? = null
-//            @JvmField
-//            public var enableActionStop: Boolean? = null
-//
-//            /**
-//             * Drawable resource id for overriding the default notification
-//             * icon from [getMetaData] when network is disabled. If `null`,
-//             * the default will not be overridden for that instance of
-//             * */
-//            @JvmField
-//            public var iconNetworkEnabled: Int? = null
-//            @JvmField
-//            public var iconNetworkDisabled: Int? = null
-//            @JvmField
-//            public var iconDataXfer: Int? = null
-//            @JvmField
-//            public var iconError: Int? = null
-//
-//            @JvmField
-//            public var colorWhenBootstrappedTrue: Int? = null
-//            @JvmField
-//            public var colorWhenBootstrappedFalse: Int? = null
-//
-//            internal companion object {
-//
-//                @JvmSynthetic
-//                @Throws(Resources.NotFoundException::class)
-//                internal fun build(
-//                    context: Context,
-//                    block: ThisBlock<Builder>,
-//                ): Overrides {
-//                    val b = Builder().apply(block)
-//                    TODO()
-//                }
-//            }
-//        }
-//    }
+    /**
+     * When the user is viewing the Foreground Service notification,
+     * and there are more than one active instances of [TorRuntime],
+     * they are able to cycle through them.
+     *
+     * This API provides a way to override the "global defaults", which
+     * are set by manifest meta-data and retrieved via [getMetaData],
+     * on a per-instance basis if you wish. This is to provide some
+     * differentiation, or "uniqueness" to instances for users when
+     * viewing the notification.
+     *
+     * If any field is left as `null` after lambda closure, the default
+     * from [TorServiceConfig] will be utilized for that setting.
+     *
+     * **NOTE:** If [enableForeground] is `false`, the builder returns
+     * early and does not check/validate any customizations that may be
+     * declared.
+     *
+     * This builder is accessible from [createTorServiceEnvironment],
+     * are entirely optional, and are only relevant if you are running
+     * multiple instances of [TorRuntime].
+     * */
+    @KmpTorDsl
+    public class OverridesBuilder private constructor() {
+
+        // TODO: display name
+
+        /**
+         * Override what is set as the default from [TorServiceConfig.enableActionRestart]
+         * */
+        @JvmField
+        public var enableActionRestart: Boolean? = null
+
+        /**
+         * Override what is set as the default from [TorServiceConfig.enableActionRestart]
+         * */
+        @JvmField
+        public var enableActionStop: Boolean? = null
+
+        /**
+         * The color resource id for overriding what is set as the default
+         * from [TorServiceConfig.colorWhenBootstrappedTrue].
+         *
+         * e.g.
+         *
+         *     colorWhenBootstrappedTrue = android.R.color.white
+         * */
+        @JvmField
+        public var colorWhenBootstrappedTrue: Int? = null
+        /**
+         * The color resource id for overriding what is set as the default
+         * from [TorServiceConfig.colorWhenBootstrappedFalse].
+         *
+         * e.g.
+         *
+         *     colorWhenBootstrappedFalse = android.R.color.white
+         * */
+        @JvmField
+        public var colorWhenBootstrappedFalse: Int? = null
+
+        /**
+         * The drawable resource id for overriding what is set as the default
+         * from [TorServiceConfig.iconNetworkEnabled].
+         *
+         * e.g.
+         *
+         *     iconNetworkEnabled = android.R.drawable.stat_notify_chat
+         * */
+        @JvmField
+        public var iconNetworkEnabled: Int? = null
+
+        /**
+         * The drawable resource id for overriding what is set as the default
+         * from [TorServiceConfig.iconNetworkDisabled].
+         *
+         * e.g.
+         *
+         *     iconNetworkDisabled = android.R.drawable.stat_notify_chat
+         * */
+        @JvmField
+        public var iconNetworkDisabled: Int? = null
+
+        /**
+         * The drawable resource id for overriding what is set as the default
+         * from [TorServiceConfig.iconDataXfer].
+         *
+         * e.g.
+         *
+         *     iconDataXfer = android.R.drawable.stat_notify_chat
+         * */
+        @JvmField
+        public var iconDataXfer: Int? = null
+
+        /**
+         * The drawable resource id for overriding what is set as the default
+         * from [TorServiceConfig.iconError].
+         *
+         * e.g.
+         *
+         *     iconError = android.R.drawable.stat_notify_chat
+         * */
+        @JvmField
+        public var iconError: Int? = null
+
+        internal companion object {
+
+            @JvmSynthetic
+            @Throws(Resources.NotFoundException::class)
+            internal fun build(
+                context: Context,
+                config: TorServiceConfig,
+                block: ThisBlock<OverridesBuilder>,
+            ): ServiceNotification.Config {
+                if (!config.enableForeground) return config._defaults
+
+                val b = OverridesBuilder().apply(block)
+
+                val enableActionRestart = b.enableActionRestart ?: config._defaults.enableActionRestart
+                val enableActionStop = b.enableActionStop ?: config._defaults.enableActionStop
+
+                val colorWhenBootstrappedTrue = b.colorWhenBootstrappedTrue?.let { id ->
+                    val res = ColorRes.of(id)
+                    "colorWhenBootstrappedTrue".tryRetrieve { context.retrieveColor(res) }
+                    res
+                } ?: config._defaults.colorWhenBootstrappedTrue
+
+                val colorWhenBootstrappedFalse = b.colorWhenBootstrappedFalse?.let { id ->
+                    val res = ColorRes.of(id)
+                    "colorWhenBootstrappedFalse".tryRetrieve { context.retrieveColor(res) }
+                    res
+                } ?: config._defaults.colorWhenBootstrappedFalse
+
+                val iconNetworkEnabled = b.iconNetworkEnabled?.let { id ->
+                    val res = DrawableRes.of(id)
+                    "iconNetworkEnabled".tryRetrieve { context.retrieveDrawable(res) }
+                    res
+                } ?: config._defaults.iconNetworkEnabled
+
+                val iconNetworkDisabled = b.iconNetworkDisabled?.let { id ->
+                    val res = DrawableRes.of(id)
+                    "iconNetworkDisabled".tryRetrieve { context.retrieveDrawable(res) }
+                    res
+                } ?: config._defaults.iconNetworkDisabled
+
+                val iconDataXfer = b.iconDataXfer?.let { id ->
+                    val res = DrawableRes.of(id)
+                    "iconDataXfer".tryRetrieve { context.retrieveDrawable(res) }
+                    res
+                } ?: config._defaults.iconDataXfer
+
+                val iconError = b.iconError?.let { id ->
+                    val res = DrawableRes.of(id)
+                    "iconError".tryRetrieve { context.retrieveDrawable(res) }
+                    res
+                } ?: config._defaults.iconError
+
+                return ServiceNotification.Config(
+                    enableActionRestart = enableActionRestart,
+                    enableActionStop = enableActionStop,
+                    colorWhenBootstrappedTrue = colorWhenBootstrappedTrue,
+                    colorWhenBootstrappedFalse = colorWhenBootstrappedFalse,
+                    iconNetworkEnabled = iconNetworkEnabled,
+                    iconNetworkDisabled = iconNetworkDisabled,
+                    iconDataXfer = iconDataXfer,
+                    iconError = iconError,
+                )
+            }
+
+            @OptIn(ExperimentalContracts::class)
+            @Throws(Resources.NotFoundException::class)
+            private inline fun <T: Any> String.tryRetrieve(block: () -> T): T {
+                contract {
+                    callsInPlace(block, InvocationKind.EXACTLY_ONCE)
+                }
+
+                try {
+                    return block()
+                } catch (e: Resources.NotFoundException) {
+                    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) {
+                        throw e
+                    }
+
+                    throw Resources.NotFoundException("Invalid resource id. Field[$this]", e)
+                }
+            }
+        }
+    }
+
+    @JvmSynthetic
+    internal fun defaults(): ServiceNotification.Config = _defaults
 
     public final override fun equals(other: Any?): Boolean {
         return  other is TorServiceConfig                                       &&
@@ -177,15 +307,8 @@ public abstract class TorServiceConfig internal constructor(
                 other.channelName == channelName                                &&
                 other.channelDescription == channelDescription                  &&
                 other.channelShowBadge == channelShowBadge                      &&
-                other.iconNetworkEnabled == iconNetworkEnabled                  &&
-                other.iconNetworkDisabled == iconNetworkDisabled                &&
-                other.iconDataXfer == iconDataXfer                              &&
-                other.iconError == iconError                                    &&
-                other.colorWhenBootstrappedTrue == colorWhenBootstrappedTrue    &&
-                other.colorWhenBootstrappedFalse == colorWhenBootstrappedFalse  &&
                 other.visibility == visibility                                  &&
-                other.enableActionRestart == enableActionRestart                &&
-                other.enableActionStop == enableActionStop
+                other._defaults == _defaults
     }
 
     public final override fun hashCode(): Int {
@@ -198,15 +321,8 @@ public abstract class TorServiceConfig internal constructor(
         result = result * 31 + channelName.hashCode()
         result = result * 31 + channelDescription.hashCode()
         result = result * 31 + channelShowBadge.hashCode()
-        result = result * 31 + iconNetworkEnabled.hashCode()
-        result = result * 31 + iconNetworkDisabled.hashCode()
-        result = result * 31 + iconDataXfer.hashCode()
-        result = result * 31 + iconError.hashCode()
-        result = result * 31 + colorWhenBootstrappedTrue.hashCode()
-        result = result * 31 + colorWhenBootstrappedFalse.hashCode()
         result = result * 31 + visibility.hashCode()
-        result = result * 31 + enableActionRestart.hashCode()
-        result = result * 31 + enableActionStop.hashCode()
+        result = result * 31 + _defaults.hashCode()
         return result
     }
 
@@ -228,6 +344,12 @@ public abstract class TorServiceConfig internal constructor(
         appendLine(channelDescription)
         append("    channelShowBadge: ")
         appendLine(channelShowBadge)
+        append("    visibility: ")
+        appendLine(visibility)
+        append("    colorWhenBootstrappedTrue: ")
+        appendLine(colorWhenBootstrappedTrue)
+        append("    colorWhenBootstrappedFalse: ")
+        appendLine(colorWhenBootstrappedFalse)
         append("    iconNetworkEnabled: ")
         appendLine(iconNetworkEnabled)
         append("    iconNetworkDisabled: ")
@@ -236,12 +358,6 @@ public abstract class TorServiceConfig internal constructor(
         appendLine(iconDataXfer)
         append("    iconError: ")
         appendLine(iconError)
-        append("    colorWhenBootstrappedTrue: ")
-        appendLine(colorWhenBootstrappedTrue)
-        append("    colorWhenBootstrappedFalse: ")
-        appendLine(colorWhenBootstrappedFalse)
-        append("    visibility: ")
-        appendLine(visibility)
         append("    enableActionRestart: ")
         appendLine(enableActionRestart)
         append("    enableActionStop: ")

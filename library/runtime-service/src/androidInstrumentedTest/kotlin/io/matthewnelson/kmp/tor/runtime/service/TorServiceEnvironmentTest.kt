@@ -25,7 +25,7 @@ import kotlin.test.assertEquals
 import kotlin.test.assertIs
 import kotlin.test.fail
 
-class TorRuntimeEnvironmentTest {
+class TorServiceEnvironmentTest {
 
     private val app = ApplicationProvider.getApplicationContext<Application>()
 
@@ -39,7 +39,7 @@ class TorRuntimeEnvironmentTest {
 
     @Test
     fun givenContext_whenDefaultDirname_thenIsAsExpected() {
-        val environment = app.createTorRuntimeEnvironment(::installerFail)
+        val environment = app.createTorServiceEnvironment(::installerFail)
 
         assertEquals("app_torservice", environment.workDirectory.name)
         assertEquals("torservice", environment.cacheDirectory.name)
@@ -47,9 +47,9 @@ class TorRuntimeEnvironmentTest {
 
     @Test
     fun givenContext_whenDefaultDirnameWithConfigurationBlock_thenIsAsExpected() {
-        val environment = app.createTorRuntimeEnvironment(
+        val environment = app.createTorServiceEnvironment(
             installer = ::installerFail,
-            block = {},
+            environment = {},
         )
 
         assertEquals("app_torservice", environment.workDirectory.name)
@@ -58,7 +58,7 @@ class TorRuntimeEnvironmentTest {
 
     @Test
     fun givenContext_whenBlankDirName_thenIsAsExpected() {
-        val environment = app.createTorRuntimeEnvironment(dirName = "  ", ::installerFail)
+        val environment = app.createTorServiceEnvironment(dirName = "  ", ::installerFail)
 
         assertEquals("app_torservice", environment.workDirectory.name)
         assertEquals("torservice", environment.cacheDirectory.name)
@@ -66,7 +66,7 @@ class TorRuntimeEnvironmentTest {
 
     @Test
     fun givenContext_whenDispatchersMainAvailable_thenDefaultsToExecutorMain() {
-        app.createTorRuntimeEnvironment(::installerFail) {
+        app.createTorServiceEnvironment(::installerFail) {
             assertIs<OnEvent.Executor.Main>(defaultEventExecutor)
         }
     }

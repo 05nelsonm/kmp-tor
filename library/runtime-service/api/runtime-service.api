@@ -1,10 +1,3 @@
-public final class io/matthewnelson/kmp/tor/runtime/service/TorRuntimeEnvironment {
-	public static final fun Builder (Landroid/content/Context;Ljava/lang/String;Lkotlin/jvm/functions/Function1;)Lio/matthewnelson/kmp/tor/runtime/TorRuntime$Environment;
-	public static final fun Builder (Landroid/content/Context;Ljava/lang/String;Lkotlin/jvm/functions/Function1;Lio/matthewnelson/kmp/tor/runtime/core/ThisBlock;)Lio/matthewnelson/kmp/tor/runtime/TorRuntime$Environment;
-	public static final fun Builder (Landroid/content/Context;Lkotlin/jvm/functions/Function1;)Lio/matthewnelson/kmp/tor/runtime/TorRuntime$Environment;
-	public static final fun Builder (Landroid/content/Context;Lkotlin/jvm/functions/Function1;Lio/matthewnelson/kmp/tor/runtime/core/ThisBlock;)Lio/matthewnelson/kmp/tor/runtime/TorRuntime$Environment;
-}
-
 public abstract class io/matthewnelson/kmp/tor/runtime/service/TorServiceConfig {
 	public static final field Companion Lio/matthewnelson/kmp/tor/runtime/service/TorServiceConfig$Companion;
 	public final field channelDescription Ljava/lang/String;
@@ -33,7 +26,26 @@ public final class io/matthewnelson/kmp/tor/runtime/service/TorServiceConfig$Com
 	public final fun getMetaData (Landroid/content/Context;)Lio/matthewnelson/kmp/tor/runtime/service/TorServiceConfig;
 }
 
+public final class io/matthewnelson/kmp/tor/runtime/service/TorServiceConfig$OverridesBuilder {
+	public field colorWhenBootstrappedFalse Ljava/lang/Integer;
+	public field colorWhenBootstrappedTrue Ljava/lang/Integer;
+	public field enableActionRestart Ljava/lang/Boolean;
+	public field enableActionStop Ljava/lang/Boolean;
+	public field iconDataXfer Ljava/lang/Integer;
+	public field iconError Ljava/lang/Integer;
+	public field iconNetworkDisabled Ljava/lang/Integer;
+	public field iconNetworkEnabled Ljava/lang/Integer;
+}
+
 protected final class io/matthewnelson/kmp/tor/runtime/service/TorServiceConfig$Synthetic {
 	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/service/TorServiceConfig$Synthetic;
+}
+
+public final class io/matthewnelson/kmp/tor/runtime/service/TorServiceEnvironment {
+	public static final fun Builder (Landroid/app/Application;Ljava/lang/String;Lkotlin/jvm/functions/Function1;)Lio/matthewnelson/kmp/tor/runtime/TorRuntime$Environment;
+	public static final fun Builder (Landroid/app/Application;Ljava/lang/String;Lkotlin/jvm/functions/Function1;Lio/matthewnelson/kmp/tor/runtime/core/ThisBlock;)Lio/matthewnelson/kmp/tor/runtime/TorRuntime$Environment;
+	public static final fun Builder (Landroid/app/Application;Ljava/lang/String;Lkotlin/jvm/functions/Function1;Lio/matthewnelson/kmp/tor/runtime/core/ThisBlock;Lio/matthewnelson/kmp/tor/runtime/core/ThisBlock;)Lio/matthewnelson/kmp/tor/runtime/TorRuntime$Environment;
+	public static final fun Builder (Landroid/app/Application;Lkotlin/jvm/functions/Function1;)Lio/matthewnelson/kmp/tor/runtime/TorRuntime$Environment;
+	public static final fun Builder (Landroid/app/Application;Lkotlin/jvm/functions/Function1;Lio/matthewnelson/kmp/tor/runtime/core/ThisBlock;)Lio/matthewnelson/kmp/tor/runtime/TorRuntime$Environment;
 }
 

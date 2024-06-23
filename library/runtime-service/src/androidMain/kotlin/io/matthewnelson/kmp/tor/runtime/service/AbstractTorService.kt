@@ -31,14 +31,32 @@ import io.matthewnelson.kmp.tor.runtime.RuntimeEvent.Notifier.Companion.lce
 import io.matthewnelson.kmp.tor.runtime.RuntimeEvent.Notifier.Companion.w
 import io.matthewnelson.kmp.tor.runtime.core.Executable
 import io.matthewnelson.kmp.tor.runtime.service.internal.SynchronizedInstance
+import io.matthewnelson.kmp.tor.runtime.service.internal.notification.AndroidServiceNotification
+import io.matthewnelson.kmp.tor.runtime.service.internal.notification.ServiceNotification
+import kotlinx.coroutines.*
 import io.matthewnelson.kmp.tor.runtime.TorRuntime.ServiceFactory.Binder as TorBinder
 
 @OptIn(ExperimentalKmpTorApi::class)
 internal sealed class AbstractTorService: Service() {
 
-    @Volatile
-    private var _isDestroyed: Boolean = false
     private val holders = SynchronizedInstance.of(LinkedHashMap<TorBinder, Holder?>(1, 1.0f))
+
+    private val supervisor = SupervisorJob()
+    private val scope by lazy {
+        CoroutineScope(context =
+            CoroutineName("TorServiceScope@${hashCode()}")
+            + supervisor
+            + Dispatchers.Main.immediate
+        )
+    }
+
+    private val notification: AndroidServiceNotification? by lazy {
+        AndroidServiceNotification.of(
+            service = this,
+            config = TorServiceConfig.getMetaData(this),
+            serviceScope = scope,
+        )
+    }
 
     private val binder = object : Binder() {
         override fun inject(conn: Connection) {
@@ -47,7 +65,7 @@ internal sealed class AbstractTorService: Service() {
             holders.withLock {
                 val executables = ArrayList<Executable>(1)
 
-                if (_isDestroyed) {
+                if (service.isDestroyed()) {
                     executables.add(Executable {
                         conn.binder.e(IllegalStateException("$service cannot be bound to. isDestroyed[true]"))
                     })
@@ -101,7 +119,7 @@ internal sealed class AbstractTorService: Service() {
 
     protected class Connection(
         val binder: TorBinder,
-        val config: TorServiceConfig,
+        val instanceConfig: ServiceNotification.Config,
     ): ServiceConnection {
         public override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
             if (service !is Binder) return
@@ -111,13 +129,19 @@ internal sealed class AbstractTorService: Service() {
         public override fun onServiceDisconnected(name: ComponentName?) {}
     }
 
+    private fun isDestroyed(): Boolean = !supervisor.isActive
+
     public final override fun onBind(intent: Intent?): IBinder {
         return binder
     }
 
     public final override fun onCreate() {
         super.onCreate()
-        // TODO: stop service if nothing binds within 100ms
+        // Initialize things
+        notification
+        scope.launch {
+            // TODO: stop service if nothing binds within 100ms
+        }
     }
 
     public final override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
@@ -136,7 +160,7 @@ internal sealed class AbstractTorService: Service() {
     }
 
     public final override fun onDestroy() {
-        _isDestroyed = true
+        scope.cancel()
         super.onDestroy()
 
         holders.withLock { entries.toImmutableSet() }.map { (binder, holder) ->
@@ -174,7 +198,7 @@ internal sealed class AbstractTorService: Service() {
                         // this holder with the destroyed runtime.
                         put(binder, null)
 
-                        if (_isDestroyed) return@withLock null
+                        if (this@AbstractTorService.isDestroyed()) return@withLock null
 
                         application.unbindService(conn)
                         Executable {
@@ -183,7 +207,7 @@ internal sealed class AbstractTorService: Service() {
                     }?.execute()
                 }
                 invokeOnDestroy {
-                    if (_isDestroyed) return@invokeOnDestroy
+                    if (this@AbstractTorService.isDestroyed()) return@invokeOnDestroy
 
                     val isLastInstance = holders.withLock { count { it.value != null } } == 0
                     if (!isLastInstance) return@invokeOnDestroy

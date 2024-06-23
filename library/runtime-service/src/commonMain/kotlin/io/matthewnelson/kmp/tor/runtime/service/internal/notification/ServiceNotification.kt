@@ -37,10 +37,7 @@ import io.matthewnelson.kmp.tor.runtime.service.internal.notification.content.*
 import io.matthewnelson.kmp.tor.runtime.service.internal.notification.content.ContentAction
 import io.matthewnelson.kmp.tor.runtime.service.internal.notification.content.ContentBandwidth
 import io.matthewnelson.kmp.tor.runtime.service.internal.notification.content.ContentBootstrap
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 import kotlin.concurrent.Volatile
 import kotlin.jvm.JvmField
 import kotlin.jvm.JvmName
@@ -49,13 +46,23 @@ import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 
 @OptIn(InternalKmpTorApi::class)
-internal abstract class AbstractNotification internal constructor(
+internal abstract class ServiceNotification
+@Throws(IllegalStateException::class)
+internal constructor(
     @JvmField
     protected val serviceScope: CoroutineScope,
-    @JvmField
-    protected val isServiceDestroyed: () -> Boolean,
     init: Any,
 ) {
+
+    private val isServiceDestroyed: () -> Boolean
+
+    init {
+        val job = serviceScope.coroutineContext[Job]
+        check(job != null) { "serviceScope must have a Job" }
+        check(job.isActive) { "serviceScope[Job].isActive[false]" }
+
+        isServiceDestroyed = { !job.isActive }
+    }
 
     @Volatile
     private var _isDeviceLocked: Boolean = false
@@ -95,10 +102,10 @@ internal abstract class AbstractNotification internal constructor(
                         val newActions = buildSet(1) {
                             add(ButtonAction.NewIdentity)
 
-                            if (view.actionEnableRestart) {
+                            if (view.config.enableActionRestart) {
                                 add(ButtonAction.RestartTor)
                             }
-                            if (view.actionEnableStop) {
+                            if (view.config.enableActionStop) {
                                 add(ButtonAction.StopTor)
                             }
                         }
@@ -115,15 +122,20 @@ internal abstract class AbstractNotification internal constructor(
     protected abstract fun InstanceView.remove()
     protected abstract fun InstanceView.render(old: NotificationState, new: NotificationState)
 
+    internal data class Config(
+        internal val enableActionRestart: Boolean,
+        internal val enableActionStop: Boolean,
+        internal val colorWhenBootstrappedTrue: ColorRes,
+        internal val colorWhenBootstrappedFalse: ColorRes,
+        internal val iconNetworkEnabled: DrawableRes,
+        internal val iconNetworkDisabled: DrawableRes,
+        internal val iconDataXfer: DrawableRes,
+        internal val iconError: DrawableRes,
+    )
+
     internal inner class InstanceView(
         fid: FileID,
-        internal val actionEnableRestart: Boolean,
-        internal val actionEnableStop: Boolean,
-        private val colorWhenBootstrappedTrue: ColorRes,
-        private val colorWhenBootstrappedFalse: ColorRes,
-        private val iconNetworkEnabled: DrawableRes,
-        private val iconNetworkDisabled: DrawableRes,
-        private val iconDataXfer: DrawableRes,
+        internal val config: Config,
         private val lazyRuntime: () -> RuntimeEvent.Processor,
     ): Destroyable {
 
@@ -138,8 +150,8 @@ internal abstract class AbstractNotification internal constructor(
         @Volatile
         private var _state = NotificationState.of(
             actions = emptySet(),
-            color = colorWhenBootstrappedFalse,
-            icon = iconNetworkDisabled,
+            color = config.colorWhenBootstrappedFalse,
+            icon = config.iconNetworkDisabled,
             progress = Progress.Indeterminate,
             text = ContentAction.of(Action.StartDaemon),
             title = _stateTor.daemon,
@@ -147,7 +159,7 @@ internal abstract class AbstractNotification internal constructor(
         )
 
         private val fidString: String = fid.fid
-        private val tag = (AbstractNotification::class.simpleName ?: "Notification") + "[fid=${fid.fidEllipses}]"
+        private val tag = (ServiceNotification::class.simpleName ?: "Notification") + "[fid=${fid.fidEllipses}]"
         private val lock = SynchronizedObject()
 
         @get:JvmName("state")
@@ -251,9 +263,9 @@ internal abstract class AbstractNotification internal constructor(
                     }
 
                     val color = if (new.isBootstrapped && new.isNetworkEnabled) {
-                        colorWhenBootstrappedTrue
+                        config.colorWhenBootstrappedTrue
                     } else {
-                        colorWhenBootstrappedFalse
+                        config.colorWhenBootstrappedFalse
                     }
 
                     val progress = if (new.isOn) {
@@ -304,10 +316,10 @@ internal abstract class AbstractNotification internal constructor(
                                 _isDeviceLocked -> setOf(ButtonAction.NewIdentity)
                                 else -> buildSet {
                                     add(ButtonAction.NewIdentity)
-                                    if (actionEnableRestart) {
+                                    if (config.enableActionRestart) {
                                         add(ButtonAction.RestartTor)
                                     }
-                                    if (actionEnableStop) {
+                                    if (config.enableActionStop) {
                                         add(ButtonAction.StopTor)
                                     }
                                 }
@@ -315,16 +327,16 @@ internal abstract class AbstractNotification internal constructor(
                         }
 
                         val icon = when {
-                            new.isNetworkDisabled -> iconNetworkDisabled
+                            new.isNetworkDisabled -> config.iconNetworkDisabled
                             new.isNetworkEnabled && new.isBootstrapped -> {
                                 if (_bandwidth !is ContentBandwidth.ZERO) {
-                                    iconDataXfer
+                                    config.iconDataXfer
                                 } else {
-                                    iconNetworkEnabled
+                                    config.iconNetworkEnabled
                                 }
                             }
 
-                            else -> iconNetworkDisabled
+                            else -> config.iconNetworkDisabled
                         }
 
                         current.copy(
@@ -375,9 +387,9 @@ internal abstract class AbstractNotification internal constructor(
                 }
 
                 val icon = if (bandwidth !is ContentBandwidth.ZERO) {
-                    iconDataXfer
+                    config.iconDataXfer
                 } else {
-                    iconNetworkEnabled
+                    config.iconNetworkEnabled
                 }
 
                 update { current ->

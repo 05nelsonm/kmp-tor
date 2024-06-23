@@ -28,7 +28,7 @@ import io.matthewnelson.kmp.tor.runtime.service.internal.notification.ButtonActi
 import io.matthewnelson.kmp.tor.runtime.service.internal.notification.content.ContentAction
 import io.matthewnelson.kmp.tor.runtime.service.internal.notification.content.ContentMessage
 import io.matthewnelson.kmp.tor.runtime.service.internal.notification.content.ContentNetworkWaiting
-import io.matthewnelson.kmp.tor.runtime.service.internal.renderString
+import io.matthewnelson.kmp.tor.runtime.service.internal.retrieveString
 import java.util.Locale
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.InvocationKind
@@ -48,7 +48,7 @@ class NotificationStateResourceUnitTest {
      * for that [Locale] to verify that those resources were in fact
      * loaded.
      *
-     * The assertion is performed on [R.string.kmp_tor_bootstrapped_format]
+     * The assertion is performed on [R.string.kmp_tor_bootstrapped_formated]
      * to verify that the retrieved string contains "Bootstrapped" (or
      * whatever its translated value is for the [Locale]).
      *
@@ -71,13 +71,13 @@ class NotificationStateResourceUnitTest {
 
             ButtonAction.entries.forEach { action ->
                 locale.tryCatch(action) {
-                    renderString(action)
+                    retrieveString(action)
                 }.let {}
             }
 
             Action.entries.forEach { action ->
                 locale.tryCatch(action) {
-                    renderString(ContentAction.of(action))
+                    retrieveString(ContentAction.of(action))
                 }.let {}
             }
 
@@ -88,12 +88,12 @@ class NotificationStateResourceUnitTest {
                 TorState.Daemon.Stopping,
             ).forEach { state ->
                 locale.tryCatch(state) {
-                    renderString(state)
+                    retrieveString(state)
                 }.let {}
             }
 
             locale.tryCatch("Bootstrapped") {
-                renderString(ContentBootstrap.of(5))
+                retrieveString(ContentBootstrap.of(5))
             }.let { actual ->
                 locale.tryCatch("Bootstrapped{contains expected}") {
                     assertTrue(actual.contains(expected))
@@ -101,13 +101,13 @@ class NotificationStateResourceUnitTest {
             }
 
             locale.tryCatch("RateLimited") {
-                renderString(ContentMessage.NewNym.RateLimited.Seconds.of(5))
+                retrieveString(ContentMessage.NewNym.RateLimited.Seconds.of(5))
             }.let {}
             locale.tryCatch("NewNymSuccess") {
-                renderString(ContentMessage.NewNym.Success)
+                retrieveString(ContentMessage.NewNym.Success)
             }.let {}
             locale.tryCatch("NetworkWaiting") {
-                renderString(ContentNetworkWaiting)
+                retrieveString(ContentNetworkWaiting)
             }.let {}
         }
     }

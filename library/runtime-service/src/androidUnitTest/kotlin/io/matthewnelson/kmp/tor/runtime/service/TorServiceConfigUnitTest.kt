@@ -41,7 +41,7 @@ import kotlin.test.*
 class TorServiceConfigUnitTest {
 
     private class TestMetaData(
-        var hasForegroundPerms: Boolean = true,
+        var hasForegroundPermission: Boolean = true,
         var colorIsValid: Boolean = true,
         var drawableIsValid: Boolean = true,
     ): TorServiceConfig.MetaData<IllegalStateException>() {
@@ -77,7 +77,7 @@ class TorServiceConfigUnitTest {
 
         override fun hasForegroundServicePermission(): Boolean {
             invocationHasPermission++
-            return hasForegroundPerms
+            return hasForegroundPermission
         }
 
         override fun createException(message: String): IllegalStateException {
@@ -115,11 +115,11 @@ class TorServiceConfigUnitTest {
     fun givenMetaData_whenEnableForegroundTrue_thenChecksPermissions() {
         metaData.booleans[KEY_ENABLE_FOREGROUND] = true
 
-        metaData.hasForegroundPerms = false
+        metaData.hasForegroundPermission = false
         assertFalse(metaData.enableForeground())
         assertEquals(1, metaData.invocationHasPermission)
 
-        metaData.hasForegroundPerms = true
+        metaData.hasForegroundPermission = true
         assertTrue(metaData.enableForeground())
         assertEquals(2, metaData.invocationHasPermission)
     }
