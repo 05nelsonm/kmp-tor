@@ -417,12 +417,17 @@ public sealed interface TorRuntime:
              * contextual or non-singleton references outside the
              * [OnEvent.Executor.execute] lambda.
              *
-             * Default: [OnEvent.Executor.Immediate]
+             * Default: If [OnEvent.Executor.Main.isAvailable] is `true`, will
+             * use [OnEvent.Executor.Main], otherwise [OnEvent.Executor.Immediate].
              *
              * @see [OnEvent.Executor]
              * */
             @JvmField
-            public var defaultEventExecutor: OnEvent.Executor = OnEvent.Executor.Immediate
+            public var defaultEventExecutor: OnEvent.Executor = if (OnEvent.Executor.Main.isAvailable) {
+                OnEvent.Executor.Main
+            } else {
+                OnEvent.Executor.Immediate
+            }
 
             /**
              * If true, [TorConfig.GeoIPFile] and [TorConfig.GeoIPv6File] will **not**
@@ -479,6 +484,7 @@ public sealed interface TorRuntime:
             internal companion object: InstanceKeeper<EnvironmentKey, Environment>() {
 
                 @JvmSynthetic
+                @OptIn(ExperimentalKmpTorApi::class)
                 internal fun build(
                     workDirectory: File,
                     cacheDirectory: File,
@@ -489,11 +495,17 @@ public sealed interface TorRuntime:
                     // Apply block outside getOrCreateInstance call to
                     // prevent double instance creation
                     if (block != null) b.apply(block)
+
+                    // Clear loader reference from builder so if the builder
+                    // reference was held outside block lambda it will always
+                    // be null.
+                    val loader = b.serviceFactoryLoader
+                    b.serviceFactoryLoader = null
+
                     var torResource = installer(b.installationDirectory.absoluteFile.normalize())
 
                     val key = EnvironmentKey(b.workDirectory, b.cacheDirectory)
 
-                    @OptIn(ExperimentalKmpTorApi::class)
                     return getOrCreateInstance(key = key, block = { instances ->
 
                         for (other in instances) {
@@ -514,7 +526,7 @@ public sealed interface TorRuntime:
                             torResource = torResource,
                             processEnv = b.processEnv.toImmutableMap(),
                             _defaultExecutor = b.defaultEventExecutor,
-                            _serviceFactoryLoader = b.serviceFactoryLoader,
+                            _serviceFactoryLoader = loader,
                         )
                     })
                 }

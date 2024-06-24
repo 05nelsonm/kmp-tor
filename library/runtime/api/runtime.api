@@ -227,7 +227,7 @@ public final class io/matthewnelson/kmp/tor/runtime/RuntimeEvent$EXECUTE$ACTION 
 
 public final class io/matthewnelson/kmp/tor/runtime/RuntimeEvent$EXECUTE$CMD : io/matthewnelson/kmp/tor/runtime/RuntimeEvent {
 	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/RuntimeEvent$EXECUTE$CMD;
-	public static final fun observeSignalNewNym (Lio/matthewnelson/kmp/tor/runtime/TorRuntime;Ljava/lang/String;Lio/matthewnelson/kmp/tor/runtime/core/OnEvent$Executor;Lio/matthewnelson/kmp/tor/runtime/core/OnEvent;)Lio/matthewnelson/kmp/tor/runtime/core/Disposable;
+	public static final fun observeSignalNewNym (Lio/matthewnelson/kmp/tor/runtime/RuntimeEvent$Processor;Ljava/lang/String;Lio/matthewnelson/kmp/tor/runtime/core/OnEvent$Executor;Lio/matthewnelson/kmp/tor/runtime/core/OnEvent;)Lio/matthewnelson/kmp/tor/runtime/core/Disposable;
 }
 
 public final class io/matthewnelson/kmp/tor/runtime/RuntimeEvent$LIFECYCLE : io/matthewnelson/kmp/tor/runtime/RuntimeEvent {

@@ -179,7 +179,7 @@ public sealed class RuntimeEvent<Data: Any> private constructor(
              * @param [onEvent] The callback to pass the data to.
              * */
             @JvmStatic
-            public fun TorRuntime.observeSignalNewNym(
+            public fun Processor.observeSignalNewNym(
                 tag: String?,
                 executor: OnEvent.Executor?,
                 onEvent: OnEvent<String?>,
