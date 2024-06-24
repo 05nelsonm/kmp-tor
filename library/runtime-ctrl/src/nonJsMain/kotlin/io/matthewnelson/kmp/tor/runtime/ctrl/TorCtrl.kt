@@ -28,12 +28,12 @@ import io.matthewnelson.kmp.tor.runtime.core.*
 import io.matthewnelson.kmp.tor.runtime.core.address.IPSocketAddress
 import io.matthewnelson.kmp.tor.runtime.core.ctrl.TorCmd
 import io.matthewnelson.kmp.tor.runtime.ctrl.internal.*
+import io.matthewnelson.kmp.tor.runtime.ctrl.internal.Debugger.Companion.d
 import kotlinx.coroutines.*
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
 import kotlin.coroutines.CoroutineContext
-import kotlin.coroutines.EmptyCoroutineContext
 import kotlin.coroutines.cancellation.CancellationException
 import kotlin.jvm.JvmOverloads
 import kotlin.time.Duration.Companion.milliseconds
@@ -187,8 +187,8 @@ public actual interface TorCtrl : Destroyable, TorEvent.Processor, TorCmd.Privil
             }
         }
 
-        @Throws(IOException::class)
-        @Suppress("NOTHING_TO_INLINE")
+        @Suppress("NOTHING_TO_INLINE", "LocalVariableName")
+        @Throws(CancellationException::class, IOException::class)
         @OptIn(ExperimentalContracts::class, ExperimentalCoroutinesApi::class)
         private inline fun connect(
             connect: (context: CoroutineContext) -> CtrlConnection,
@@ -207,15 +207,14 @@ public actual interface TorCtrl : Destroyable, TorEvent.Processor, TorCmd.Privil
                 throw t.wrapIOException()
             }
 
-            val executable = Executable.Once.of(concurrent = true) {
+            return RealTorCtrl.of(this, dispatcher, connection, closeDispatcher = { LOG ->
                 @OptIn(DelicateCoroutinesApi::class)
                 GlobalScope.launch(CLOSE_DISPATCHER) {
                     delay(250.milliseconds)
                     dispatcher.close()
+                    LOG.d { "Dispatchers Closed" }
                 }
-            }
-
-            return RealTorCtrl.of(this, dispatcher, executable, connection)
+            })
         }
 
         /**
@@ -276,10 +275,9 @@ public actual interface TorCtrl : Destroyable, TorEvent.Processor, TorCmd.Privil
         private companion object {
 
             private val CLOSE_DISPATCHER by lazy {
-                try {
-                    Dispatchers.Main.isDispatchNeeded(EmptyCoroutineContext)
+                if (OnEvent.Executor.Main.isAvailable) {
                     Dispatchers.Main
-                } catch (_: Throwable) {
+                } else {
                     Dispatchers.IO
                 }
             }

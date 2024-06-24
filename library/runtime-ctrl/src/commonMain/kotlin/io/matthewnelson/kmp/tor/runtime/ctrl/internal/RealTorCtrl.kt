@@ -13,6 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
+@file:Suppress("LocalVariableName")
+
 package io.matthewnelson.kmp.tor.runtime.ctrl.internal
 
 import io.matthewnelson.kmp.file.IOException
@@ -20,7 +22,6 @@ import io.matthewnelson.kmp.file.InterruptedException
 import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
 import io.matthewnelson.kmp.tor.core.resource.SynchronizedObject
 import io.matthewnelson.kmp.tor.core.resource.synchronized
-import io.matthewnelson.kmp.tor.runtime.core.Executable
 import io.matthewnelson.kmp.tor.runtime.core.TorEvent
 import io.matthewnelson.kmp.tor.runtime.core.UncaughtException.Handler.Companion.tryCatch
 import io.matthewnelson.kmp.tor.runtime.core.UncaughtException.Handler.Companion.withSuppression
@@ -40,8 +41,8 @@ import kotlin.time.TimeSource
 internal class RealTorCtrl private constructor(
     factory: TorCtrl.Factory,
     dispatcher: CoroutineDispatcher,
-    private val closeDispatcher: Executable,
     private val connection: CtrlConnection,
+    private val closeDispatcher: ((LOG: Debugger?) -> Unit)?,
 ): AbstractTorCtrl(
     factory.staticTag,
     factory.observers,
@@ -194,11 +195,21 @@ internal class RealTorCtrl private constructor(
             threw = t
         }
 
-        (handler.delegate as? CloseableExceptionHandler)?.close()
+        val closeableHandler = handler.delegate as? CloseableExceptionHandler
+        closeableHandler?.close()
 
-        if (closeDispatcher != Executable.noOp()) {
+        closeDispatcher?.let { callback ->
+            val _LOG = if (closeableHandler == null) {
+                // factory.handler was HandlerWithContext, so it is
+                // coming from TorRuntime implementation. Allow logging
+                // past destruction.
+                LOG
+            } else {
+                null
+            }
+
             LOG.d { "Closing Dispatchers" }
-            closeDispatcher.execute()
+            callback.invoke(_LOG)
         }
 
         LOG = null
@@ -351,13 +362,13 @@ internal class RealTorCtrl private constructor(
         internal fun of(
             factory: TorCtrl.Factory,
             dispatcher: CoroutineDispatcher,
-            closeDispatcher: Executable,
             connection: CtrlConnection,
+            closeDispatcher: ((LOG: Debugger?) -> Unit)?,
         ): RealTorCtrl = RealTorCtrl(
             factory,
             dispatcher,
-            closeDispatcher,
             connection,
+            closeDispatcher,
         )
     }
 }
