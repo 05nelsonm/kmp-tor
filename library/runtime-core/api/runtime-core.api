@@ -3124,7 +3124,7 @@ public final class io/matthewnelson/kmp/tor/runtime/core/TorEvent$WARN : io/matt
 	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/core/TorEvent$WARN;
 }
 
-public final class io/matthewnelson/kmp/tor/runtime/core/UncaughtException : java/lang/Exception {
+public final class io/matthewnelson/kmp/tor/runtime/core/UncaughtException : java/lang/RuntimeException {
 	public final field context Ljava/lang/String;
 	public synthetic fun <init> (Ljava/lang/String;Ljava/lang/Throwable;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
 	public fun getCause ()Ljava/lang/Throwable;
@@ -3152,6 +3152,7 @@ public final class io/matthewnelson/kmp/tor/runtime/core/UncaughtException$Suppr
 	public fun invoke (Lio/matthewnelson/kmp/tor/runtime/core/UncaughtException;)V
 	public synthetic fun invoke (Ljava/lang/Object;)V
 	public final fun isActive ()Z
+	public fun toString ()Ljava/lang/String;
 }
 
 public abstract class io/matthewnelson/kmp/tor/runtime/core/address/Address : java/lang/Comparable {

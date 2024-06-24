@@ -31,9 +31,20 @@ import kotlin.jvm.JvmSynthetic
  * @see [io.matthewnelson.kmp.tor.runtime.RuntimeEvent.ERROR]
  * */
 public class UncaughtException private constructor(
-    public override val message: String,
+
+    /**
+     * Contextual information about where the [UncaughtException] occurred.
+     * */
+    @JvmField
+    public val context: String,
+
+    /**
+     * The underlying cause of the [UncaughtException].
+     * */
     public override val cause: Throwable,
-): Exception(message, cause) {
+): RuntimeException(context, cause) {
+
+    public override val message: String = "context: $context"
 
     /**
      * A typealias for message with contextual information about
@@ -41,8 +52,6 @@ public class UncaughtException private constructor(
      *
      * @see [Handler.tryCatch]
      * */
-    @JvmField
-    public val context: String = message
 
     /**
      * Producer for [UncaughtException]
@@ -58,19 +67,28 @@ public class UncaughtException private constructor(
              * Instance that prints [UncaughtException] stack trace to stderr.
              * */
             @JvmField
-            public val PRINT: Handler = Handler { it.printStackTrace() }
+            public val PRINT: Handler = object : Handler {
+                override fun invoke(it: UncaughtException) { it.printStackTrace() }
+                override fun toString(): String = "UncaughtException.Handler.PRINT"
+            }
 
             /**
              * Instance that swallows (ignores) the [UncaughtException].
              * */
             @JvmField
-            public val IGNORE: Handler = Handler {}
+            public val IGNORE: Handler = object : Handler {
+                override fun invoke(it: UncaughtException) {}
+                override fun toString(): String = "UncaughtException.Handler.IGNORE"
+            }
 
             /**
              * Instance that automatically throws [UncaughtException]
              * */
             @JvmField
-            public val THROW: Handler = Handler { throw it }
+            public val THROW: Handler = object : Handler {
+                override fun invoke(it: UncaughtException) { throw it }
+                override fun toString(): String = "UncaughtException.Handler.THROW"
+            }
 
             /**
              * Helper for wrapping external function calls in order to redirect
@@ -102,7 +120,7 @@ public class UncaughtException private constructor(
                     threw = if (t is UncaughtException) {
                         t
                     } else {
-                        UncaughtException("context: $context", t)
+                        UncaughtException(context.toString(), t)
                     }
                 }
 
@@ -179,8 +197,9 @@ public class UncaughtException private constructor(
                     handler
                 } else {
                     SuppressedHandler.of(isActive = { isActive }, root = handler) { t ->
-                        val result: Unit? = threw?.addSuppressed(t)
-                        if (result == null) threw = t
+                        if (threw?.addSuppressed(t) == null) {
+                            threw = t
+                        }
                     }
                 }
 
@@ -240,6 +259,8 @@ public class UncaughtException private constructor(
             if (!useRoot) return
             _root(it)
         }
+
+        override fun toString(): String = "UncaughtException.SuppressedHandler@${hashCode()}"
 
         @JvmSynthetic
         internal fun root(): Handler = _root
