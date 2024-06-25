@@ -84,7 +84,7 @@ class ServiceFactoryUnitTest {
 
         assertIs<TestFactory>(runtime)
         assertEquals(2, lces.size)
-        lces.assertContains("RealServiceFactoryCtrl", Lifecycle.Event.Name.OnCreate, fid = runtime)
+        lces.assertContains("RealServiceFactoryDriver", Lifecycle.Event.Name.OnCreate, fid = runtime)
         lces.assertContains(TestFactory::class.simpleName!!, Lifecycle.Event.Name.OnCreate, fid = runtime)
     }
 

@@ -24,7 +24,7 @@ import io.matthewnelson.kmp.tor.runtime.core.TorEvent
 import kotlin.jvm.JvmSynthetic
 
 @ExperimentalKmpTorApi
-internal sealed class ServiceFactoryCtrl(
+internal sealed class ServiceFactoryDriver(
     staticTag: String?,
     observersRuntimeEvent: Set<RuntimeEvent.Observer<*>>,
     defaultExecutor: OnEvent.Executor,

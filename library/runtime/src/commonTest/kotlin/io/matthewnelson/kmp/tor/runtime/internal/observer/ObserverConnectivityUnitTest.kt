@@ -204,7 +204,7 @@ class ObserverConnectivityUnitTest {
         runtime.startDaemonAsync()
 
         assertEquals(1, warnings.count { it.contains("No Network Connectivity") })
-        assertFalse(runtime.state().isNetworkEnabled)
+        assertFalse(runtime.state().network.isEnabled)
 
         observer.isConnected = true
 
@@ -226,6 +226,6 @@ class ObserverConnectivityUnitTest {
         withContext(Dispatchers.Default) { delay(500.milliseconds) }
 
         assertEquals(1, cmds.count { it.name == "SETCONF" })
-        assertTrue(runtime.state().isNetworkEnabled)
+        assertTrue(runtime.state().network.isEnabled)
     }
 }
