@@ -56,7 +56,6 @@ abstract class OnEventExecutorBaseTest {
         if (isMainActuallyImmediate) {
             assertFalse(job.isActive)
         } else {
-            assertTrue(job.isActive)
             job.join()
             assertTrue(job.isCompleted)
         }

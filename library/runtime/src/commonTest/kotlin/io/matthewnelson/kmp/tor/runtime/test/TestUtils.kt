@@ -25,6 +25,7 @@ import io.matthewnelson.kmp.tor.core.api.ResourceInstaller.Paths
 import io.matthewnelson.kmp.tor.resource.tor.TorResources
 import io.matthewnelson.kmp.tor.runtime.*
 import io.matthewnelson.kmp.tor.runtime.FileID.Companion.fidEllipses
+import io.matthewnelson.kmp.tor.runtime.core.apply
 import io.matthewnelson.kmp.tor.runtime.core.OnEvent
 import io.matthewnelson.kmp.tor.runtime.core.ThisBlock
 import io.matthewnelson.kmp.tor.runtime.core.TorConfig
@@ -52,8 +53,11 @@ object TestUtils {
         workDirectory = TMP_TEST_DIR.resolve("$dirName/work"),
         cacheDirectory = TMP_TEST_DIR.resolve("$dirName/cache"),
         installer = installer,
-        block = block
-    ).also { it.debug = true }
+    ) {
+        defaultEventExecutor = OnEvent.Executor.Immediate
+
+        apply(block)
+    }.also { it.debug = true }
 
     suspend fun <T: Action.Processor> T.ensureStoppedOnTestCompletion(
         errorObserver: Boolean = true,
