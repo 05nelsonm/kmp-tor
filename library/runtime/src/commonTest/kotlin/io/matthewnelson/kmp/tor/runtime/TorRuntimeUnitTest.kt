@@ -158,7 +158,7 @@ class TorRuntimeUnitTest {
             j.invokeOnCompletion { latch.complete() }
             latch.join()
 
-            assertTrue(runtime.state().isOff)
+            assertTrue(runtime.state().daemon.isOff)
         }
 
         suspend fun assertCancellable() {

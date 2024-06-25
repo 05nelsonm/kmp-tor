@@ -41,20 +41,6 @@ public class TorState private constructor(
 
     public constructor(daemon: Daemon, network: Network): this(daemon, network, null)
 
-    @JvmField
-    public val isOff: Boolean = daemon is Daemon.Off
-    @JvmField
-    public val isOn: Boolean = daemon is Daemon.On
-    @JvmField
-    public val isStarting: Boolean = daemon is Daemon.Starting
-    @JvmField
-    public val isStopping: Boolean = daemon is Daemon.Stopping
-
-    @JvmField
-    public val isNetworkDisabled: Boolean = network is Network.Disabled
-    @JvmField
-    public val isNetworkEnabled: Boolean = network is Network.Enabled
-
     public operator fun component1(): Daemon = daemon
     public operator fun component2(): Network = network
 
@@ -73,7 +59,15 @@ public class TorState private constructor(
      * */
     public sealed class Daemon private constructor(
         @JvmField
-        public val bootstrap: Byte
+        public val bootstrap: Byte,
+        @JvmField
+        public val isOff: Boolean = false,
+        @JvmField
+        public val isOn: Boolean = false,
+        @JvmField
+        public val isStarting: Boolean = false,
+        @JvmField
+        public val isStopping: Boolean = false,
     ) {
 
         @JvmField
@@ -82,12 +76,12 @@ public class TorState private constructor(
         /**
          * The tor process is **not** running
          * */
-        public data object Off: Daemon(bootstrap = 0)
+        public data object Off: Daemon(bootstrap = 0, isOff = true)
 
         /**
          * The tor process is running
          * */
-        public class On(bootstrap: Byte): Daemon(bootstrap.coerceIn(0, 100)) {
+        public class On(bootstrap: Byte): Daemon(bootstrap.coerceIn(0, 100), isOn = true) {
 
             public override fun equals(other: Any?): Boolean = other is On && other.bootstrap == bootstrap
             public override fun hashCode(): Int = 17 * 42 + toString().hashCode() + bootstrap
@@ -97,19 +91,19 @@ public class TorState private constructor(
          * An intermediary state whereby [TorRuntime] is starting the
          * tor process.
          * */
-        public data object Starting: Daemon(bootstrap = 0)
+        public data object Starting: Daemon(bootstrap = 0, isStarting = true)
 
         /**
          * An intermediary state whereby [TorRuntime] is stopping the
          * tor process.
          * */
-        public data object Stopping: Daemon(bootstrap = 0)
+        public data object Stopping: Daemon(bootstrap = 0, isStopping = true)
 
-        public final override fun toString(): String = when (this) {
-            is Off -> "Tor: Off"
-            is On -> "Tor: On"
-            is Starting -> "Tor: Starting"
-            is Stopping -> "Tor: Stopping"
+        public final override fun toString(): String = "TorState.Daemon." + when (this) {
+            is Off -> "Off"
+            is On -> "On{$bootstrap%}"
+            is Starting -> "Starting"
+            is Stopping -> "Stopping"
         }
     }
 
@@ -117,14 +111,19 @@ public class TorState private constructor(
      * The [TorConfig.DisableNetwork] setting for which the tor
      * process currently has set.
      * */
-    public sealed class Network private constructor() {
+    public sealed class Network private constructor(
+        @JvmField
+        public val isDisabled: Boolean = false,
+        @JvmField
+        public val isEnabled: Boolean = false,
+    ) {
 
-        public data object Disabled: Network()
-        public data object Enabled: Network()
+        public data object Disabled: Network(isDisabled = true)
+        public data object Enabled: Network(isEnabled = true)
 
-        public final override fun toString(): String = when (this) {
-            is Disabled -> "Network: Disabled"
-            is Enabled -> "Network: Enabled"
+        public final override fun toString(): String = "TorState.Network." + when (this) {
+            is Disabled -> "Disabled"
+            is Enabled -> "Enabled"
         }
     }
 
@@ -230,7 +229,7 @@ public class TorState private constructor(
                     }
                     false
                 } else {
-                    if (new.daemon.isBootstrapped && new.isNetworkEnabled) {
+                    if (new.daemon.isBootstrapped && new.network.isEnabled) {
                         _isReady = true
                         true
                     } else {
@@ -259,17 +258,17 @@ public class TorState private constructor(
                     // on -> off
                     // on -> stopping
                     // on -> on
-                    if (old.isOn && new.isStarting) return null
+                    if (old.daemon.isOn && new.daemon.isStarting) return null
 
                     // off -> starting
                     // off -> off
-                    if (old.isOff && new.isOn) return null
-                    if (old.isOff && new.isStopping) return null
+                    if (old.daemon.isOff && new.daemon.isOn) return null
+                    if (old.daemon.isOff && new.daemon.isStopping) return null
 
                     // stopping -> off
                     // stopping -> starting
                     // stopping -> stopping
-                    if (old.isStopping && new.isOn) return null
+                    if (old.daemon.isStopping && new.daemon.isOn) return null
 
                     // starting -> on
                     // starting -> off

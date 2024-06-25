@@ -327,7 +327,7 @@ public class TorListeners private constructor(
 
         internal val listeners: TorListeners get() = _listeners
         internal val listenersOrEmpty: TorListeners get() = with(state) {
-            if (daemon.isBootstrapped && isNetworkEnabled) {
+            if (daemon.isBootstrapped && network.isEnabled) {
                 _listeners
             } else {
                 EMPTY
@@ -377,7 +377,7 @@ public class TorListeners private constructor(
             _listeners = new
 
             with(state) {
-                if (!daemon.isBootstrapped || isNetworkDisabled) {
+                if (!daemon.isBootstrapped || network.isDisabled) {
                     return
                 }
             }
@@ -397,21 +397,21 @@ public class TorListeners private constructor(
         protected override fun notify(old: TorState, new: TorState) {
             val listeners = synchronized(lock) { with(_listeners) {
                 // on -> NOT on
-                if (old.isOn && !new.isOn) {
+                if (old.daemon.isOn && !new.daemon.isOn) {
                     return@with EMPTY
                 }
 
                 if (new.daemon.isBootstrapped) {
 
                     // enabled -> disabled
-                    if (old.isNetworkEnabled && new.isNetworkDisabled) {
+                    if (old.network.isEnabled && new.network.isDisabled) {
                         return@with EMPTY
                     }
 
-                    if (new.isNetworkEnabled) {
+                    if (new.network.isEnabled) {
 
                         // disabled -> enabled
-                        if (old.isNetworkDisabled) {
+                        if (old.network.isDisabled) {
                             return@with this
                         }
 
@@ -601,8 +601,8 @@ public class TorListeners private constructor(
             }
 
             with(state) {
-                if (!(isOn || isStarting)) return
-                if (isNetworkDisabled) return
+                if (!(daemon.isOn || daemon.isStarting)) return
+                if (network.isDisabled) return
             }
             if (listeners.isEmpty()) return
 
