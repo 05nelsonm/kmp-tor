@@ -25,7 +25,7 @@ import kotlin.test.assertEquals
 import kotlin.test.assertIs
 import kotlin.test.fail
 
-class TorServiceEnvironmentTest {
+class TorServiceFactoryBuilderTest {
 
     private val app = ApplicationProvider.getApplicationContext<Application>()
 

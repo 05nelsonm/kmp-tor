@@ -29,6 +29,8 @@ import io.matthewnelson.kmp.tor.runtime.core.ThisBlock
 import io.matthewnelson.kmp.tor.runtime.core.apply
 import io.matthewnelson.kmp.tor.runtime.service.TorService.Companion.serviceFactoryLoader
 
+private const val DEFAULT_DIRNAME = "torservice"
+
 /**
  * Android extension which utilizes [Context.getDir] and [Context.getCacheDir]
  * to acquire default tor directory locations within the application's data
@@ -52,14 +54,10 @@ import io.matthewnelson.kmp.tor.runtime.service.TorService.Companion.serviceFact
 @JvmName("Builder")
 public fun Application.createTorServiceEnvironment(
     installer: (installationDirectory: File) -> ResourceInstaller<Paths.Tor>,
-<<<<<<< HEAD:library/runtime-service/src/androidMain/kotlin/io/matthewnelson/kmp/tor/runtime/service/TorRuntimeEnvironment.kt
-): TorRuntime.Environment = createTorRuntimeEnvironment("torservice", installer)
-=======
 ): TorRuntime.Environment = createTorServiceEnvironment(
     dirName = DEFAULT_DIRNAME,
     installer = installer,
 )
->>>>>>> 1abe97b5 (WIP: Stub in ServiceNotification abstraction for Android usage):library/runtime-service/src/androidMain/kotlin/io/matthewnelson/kmp/tor/runtime/service/TorServiceEnvironment.kt
 
 /**
  * Android extension which utilizes [Context.getDir] and [Context.getCacheDir]
@@ -88,17 +86,12 @@ public fun Application.createTorServiceEnvironment(
 @JvmName("Builder")
 public fun Application.createTorServiceEnvironment(
     installer: (installationDirectory: File) -> ResourceInstaller<Paths.Tor>,
-<<<<<<< HEAD:library/runtime-service/src/androidMain/kotlin/io/matthewnelson/kmp/tor/runtime/service/TorRuntimeEnvironment.kt
-    block: ThisBlock<TorRuntime.Environment.Builder>,
-): TorRuntime.Environment = createTorRuntimeEnvironment("torservice", installer, block)
-=======
     environment: ThisBlock<TorRuntime.Environment.Builder>,
 ): TorRuntime.Environment = createTorServiceEnvironment(
     dirName = DEFAULT_DIRNAME,
     installer = installer,
     environment = environment,
 )
->>>>>>> 1abe97b5 (WIP: Stub in ServiceNotification abstraction for Android usage):library/runtime-service/src/androidMain/kotlin/io/matthewnelson/kmp/tor/runtime/service/TorServiceEnvironment.kt
 
 /**
  * Android extension which utilizes [Context.getDir] and [Context.getCacheDir]
@@ -216,11 +209,7 @@ public fun Application.createTorServiceEnvironment(
     cacheDirectory = cacheDir.resolve(dirName.ifBlank { "torservice" }),
     installer = installer,
 ) {
-<<<<<<< HEAD:library/runtime-service/src/androidMain/kotlin/io/matthewnelson/kmp/tor/runtime/service/TorRuntimeEnvironment.kt
-    this.apply(block)
-=======
     apply(environment)
->>>>>>> 1abe97b5 (WIP: Stub in ServiceNotification abstraction for Android usage):library/runtime-service/src/androidMain/kotlin/io/matthewnelson/kmp/tor/runtime/service/TorServiceEnvironment.kt
 
     // Will not be null b/c TorService.Initializer
     // should be there if consumer is utilizing this

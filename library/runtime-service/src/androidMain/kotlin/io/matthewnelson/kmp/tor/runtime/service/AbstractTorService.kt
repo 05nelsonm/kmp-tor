@@ -41,6 +41,8 @@ internal sealed class AbstractTorService: Service() {
 
     private val holders = SynchronizedInstance.of(LinkedHashMap<TorBinder, Holder?>(1, 1.0f))
 
+    private val config by lazy { TorServiceConfig.getMetaData(this) }
+
     private val supervisor = SupervisorJob()
     private val scope by lazy {
         CoroutineScope(context =
@@ -53,7 +55,7 @@ internal sealed class AbstractTorService: Service() {
     private val notification: AndroidServiceNotification? by lazy {
         AndroidServiceNotification.of(
             service = this,
-            config = TorServiceConfig.getMetaData(this),
+            config = config,
             serviceScope = scope,
         )
     }
@@ -179,14 +181,24 @@ internal sealed class AbstractTorService: Service() {
 
         private val binder get() = conn.binder
 
+        private val instanceView by lazy {
+            val notification = notification ?: return@lazy null
+
+            notification.InstanceView(
+                fid = binder,
+                config = conn.instanceConfig,
+                lazyRuntime = { runtime }
+            )
+        }
+
         // Want to lazily instantiate so that the holders map
         // entry can be created before we start calling things.
         public val runtime: Lifecycle.DestroyableTorRuntime by lazy {
             binder.onBind(
-                serviceEvents = emptySet(),
+                serviceEvents = instanceView?.requiredEventTor ?: emptySet(),
                 serviceObserverNetwork = null,
-                serviceObserversTorEvent = emptySet(),
-                serviceObserversRuntimeEvent = emptySet(),
+                serviceObserversTorEvent = instanceView?.observersEventTor ?: emptySet(),
+                serviceObserversRuntimeEvent = instanceView?.observersEventRuntime ?: emptySet(),
             ).apply {
                 invokeOnDestroy {
                     holders.withLock {

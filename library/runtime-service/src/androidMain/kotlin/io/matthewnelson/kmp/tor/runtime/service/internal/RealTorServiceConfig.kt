@@ -68,15 +68,25 @@ internal class RealTorServiceConfig private constructor(
 
         @Throws(Resources.NotFoundException::class)
         private fun Context.toRealTorServiceConfig(): RealTorServiceConfig {
+            val name = packageName
+
             val bundle: Bundle? = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                 // API 33+
                 val flags = PackageManager.ApplicationInfoFlags.of(PackageManager.GET_META_DATA.toLong())
 
-                packageManager.getApplicationInfo(packageName, flags).metaData
+                if (name != null) {
+                    packageManager?.getApplicationInfo(name, flags)?.metaData
+                } else {
+                    null
+                }
             } else {
                 // API 32-
-                @Suppress("DEPRECATION", "KotlinRedundantDiagnosticSuppress")
-                packageManager.getApplicationInfo(packageName, PackageManager.GET_META_DATA).metaData
+                if (name != null) {
+                    @Suppress("DEPRECATION", "KotlinRedundantDiagnosticSuppress")
+                    packageManager?.getApplicationInfo(name, PackageManager.GET_META_DATA)?.metaData
+                } else {
+                    null
+                }
             }
 
             val metaData = if (bundle != null) {
@@ -104,7 +114,7 @@ internal class RealTorServiceConfig private constructor(
                         false
                     }
 
-                    override fun hasForegroundServicePermission(): Boolean {
+                    override fun hasPermissionForegroundService(): Boolean {
                         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
                             // API 28+
                             isPermissionGranted(Manifest.permission.FOREGROUND_SERVICE)
@@ -112,6 +122,9 @@ internal class RealTorServiceConfig private constructor(
                             true
                         }
                     }
+
+                    // TODO: API 34+ Issue #457
+                    //  hasPermissionForegroundService{Type}
 
                     override fun createException(message: String): Resources.NotFoundException {
                         return Resources.NotFoundException(message)

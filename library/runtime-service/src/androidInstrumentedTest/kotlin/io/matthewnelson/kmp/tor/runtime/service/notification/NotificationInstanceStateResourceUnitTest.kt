@@ -41,7 +41,7 @@ import kotlin.test.assertTrue
  * string resources load when they are retrieved and do not throw exception
  * due to a bad translation or formatting error. Shipping that would be awful.
  * */
-class NotificationStateResourceUnitTest {
+class NotificationInstanceStateResourceUnitTest {
 
     /**
      * List of all the [Locale] to be checked, and a simple test value

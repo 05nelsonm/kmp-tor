@@ -374,7 +374,9 @@ public abstract class TorServiceConfig internal constructor(
         protected abstract fun ColorRes.isValid(): Boolean
         protected abstract fun DrawableRes.isValid(): Boolean
 
-        protected abstract fun hasForegroundServicePermission(): Boolean
+        protected abstract fun hasPermissionForegroundService(): Boolean
+        // TODO: API 34+ Issue #457
+        //  hasPermissionForegroundService{Type}
 
         protected abstract fun createException(message: String): E
 
@@ -599,7 +601,7 @@ public abstract class TorServiceConfig internal constructor(
                     false
                 ) ?: return false
 
-                return enable && hasForegroundServicePermission()
+                return enable && hasPermissionForegroundService()
             }
 
             internal fun MetaData<*>?.stopServiceOnTaskRemoved(): Boolean {

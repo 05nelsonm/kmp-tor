@@ -75,7 +75,7 @@ class TorServiceConfigUnitTest {
             return drawableIsValid
         }
 
-        override fun hasForegroundServicePermission(): Boolean {
+        override fun hasPermissionForegroundService(): Boolean {
             invocationHasPermission++
             return hasForegroundPermission
         }

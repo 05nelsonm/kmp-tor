@@ -218,7 +218,7 @@ internal constructor(
 
                 delay(duration)
 
-                if (!_stateTor.isBootstrapped) return@launch
+                if (!_stateTor.daemon.isBootstrapped) return@launch
 
                 update { current ->
                     current.copy(
@@ -257,21 +257,21 @@ internal constructor(
                     val old = _stateTor
                     _stateTor = new
 
-                    if (old.isOn && !new.isOn) {
+                    if (old.daemon.isOn && !new.daemon.isOn) {
                         newNymObserver.dispose()
                         _messageJob?.cancel()
                     }
 
-                    val color = if (new.isBootstrapped && new.isNetworkEnabled) {
+                    val color = if (new.daemon.isBootstrapped && new.network.isEnabled) {
                         config.colorWhenBootstrappedTrue
                     } else {
                         config.colorWhenBootstrappedFalse
                     }
 
-                    val progress = if (new.isOn) {
+                    val progress = if (new.daemon.isOn) {
                         when {
-                            !old.isBootstrapped
-                            && new.isBootstrapped -> {
+                            !old.daemon.isBootstrapped
+                            && new.daemon.isBootstrapped -> {
                                 update { current ->
                                     current.copy(
                                         color = color,
@@ -283,8 +283,8 @@ internal constructor(
                                 Progress.None
                             }
 
-                            !new.isBootstrapped
-                            && new.isNetworkEnabled -> Progress.Determinant(new.daemon)
+                            !new.daemon.isBootstrapped
+                            && new.network.isEnabled -> Progress.Determinant(new.daemon)
 
                             else -> Progress.None
                         }
@@ -299,7 +299,7 @@ internal constructor(
                             is Progress.None -> {
                                 val currentText = current.text
 
-                                if (new.isNetworkEnabled && currentText is ContentBootstrap) {
+                                if (new.network.isEnabled && currentText is ContentBootstrap) {
                                     _bandwidth
                                 } else {
                                     currentText
@@ -312,7 +312,7 @@ internal constructor(
                             is Progress.Indeterminate -> emptySet()
 
                             is Progress.None -> when {
-                                !new.isBootstrapped -> emptySet()
+                                !new.daemon.isBootstrapped -> emptySet()
                                 _isDeviceLocked -> setOf(ButtonAction.NewIdentity)
                                 else -> buildSet {
                                     add(ButtonAction.NewIdentity)
@@ -327,8 +327,8 @@ internal constructor(
                         }
 
                         val icon = when {
-                            new.isNetworkDisabled -> config.iconNetworkDisabled
-                            new.isNetworkEnabled && new.isBootstrapped -> {
+                            new.network.isDisabled -> config.iconNetworkDisabled
+                            new.network.isEnabled && new.daemon.isBootstrapped -> {
                                 if (_bandwidth !is ContentBandwidth.ZERO) {
                                     config.iconDataXfer
                                 } else {
@@ -382,8 +382,8 @@ internal constructor(
                 _bandwidth = bandwidth
 
                 with(_stateTor) {
-                    if (!isBootstrapped) return@observer
-                    if (!isNetworkEnabled) return@observer
+                    if (!daemon.isBootstrapped) return@observer
+                    if (!network.isEnabled) return@observer
                 }
 
                 val icon = if (bandwidth !is ContentBandwidth.ZERO) {
