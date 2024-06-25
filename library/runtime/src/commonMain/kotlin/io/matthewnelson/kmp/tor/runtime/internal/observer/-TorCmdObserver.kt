@@ -36,7 +36,11 @@ internal inline fun <T: Processor, Data: Any?> T.newTorCmdObserver(
     val exec = executor ?: if (this is TorRuntime) {
         environment().defaultExecutor()
     } else {
-        OnEvent.Executor.Immediate
+        if (OnEvent.Executor.Main.isAvailable) {
+            OnEvent.Executor.Main
+        } else {
+            OnEvent.Executor.Immediate
+        }
     }
 
     val observer = factory(this, tag, exec, onEvent)
