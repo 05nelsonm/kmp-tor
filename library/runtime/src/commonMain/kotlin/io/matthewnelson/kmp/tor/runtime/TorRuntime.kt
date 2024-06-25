@@ -38,7 +38,6 @@ import io.matthewnelson.kmp.tor.runtime.internal.*
 import io.matthewnelson.kmp.tor.runtime.internal.InstanceKeeper
 import io.matthewnelson.kmp.tor.runtime.internal.RealTorRuntime
 import io.matthewnelson.kmp.tor.runtime.internal.TorConfigGenerator
-import kotlinx.coroutines.Dispatchers
 import org.kotlincrypto.SecRandomCopyException
 import org.kotlincrypto.SecureRandom
 import kotlin.concurrent.Volatile
@@ -666,9 +665,6 @@ public sealed interface TorRuntime:
          * 500ms, otherwise a timeout will occur and all enqueued jobs waiting
          * to be handed off to [Lifecycle.DestroyableTorRuntime] for completion
          * will be terminated.
-         *
-         * **NOTE:** If [Dispatchers.Main] is available, [startService] will always
-         * be called from the main thread.
          *
          * @throws [RuntimeException] if there was an error trying to start the service.
          * */

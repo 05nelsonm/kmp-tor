@@ -946,13 +946,7 @@ internal class RealTorRuntime private constructor(
                 var _failure: Throwable? = null
 
                 try {
-                    if (OnEvent.Executor.Main.isAvailable) {
-                        withContext(NonCancellable + Dispatchers.Main) {
-                            startService()
-                        }
-                    } else {
-                        startService()
-                    }
+                    startService()
                 } catch (t: RuntimeException) {
                     _failure = t
                 }
