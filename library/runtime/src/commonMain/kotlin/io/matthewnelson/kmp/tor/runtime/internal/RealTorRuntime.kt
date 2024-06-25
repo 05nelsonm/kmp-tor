@@ -946,7 +946,13 @@ internal class RealTorRuntime private constructor(
                 var _failure: Throwable? = null
 
                 try {
-                    startService()
+                    if (OnEvent.Executor.Main.isAvailable) {
+                        withContext(NonCancellable + Dispatchers.Main) {
+                            startService()
+                        }
+                    } else {
+                        startService()
+                    }
                 } catch (t: RuntimeException) {
                     _failure = t
                 }
@@ -956,10 +962,11 @@ internal class RealTorRuntime private constructor(
                     // Node.js uses Dispatchers.Main so the test coroutine
                     // library will not wait an actual 500ms. Make it so
                     // there's a 500ms delay no matter what.
+                    val interval = 100.milliseconds
+                    val timeout = 500.milliseconds
                     while (_failure == null && _instance == null) {
-                        delay(100.milliseconds)
-                        if (mark.elapsedNow() < 500.milliseconds) continue
-                        if (_instance != null) break
+                        delay(interval)
+                        if (mark.elapsedNow() < timeout) continue
                         _failure = InterruptedException("${name.name} timed out after 500ms")
                     }
                 }
@@ -968,6 +975,8 @@ internal class RealTorRuntime private constructor(
                 val failure = _failure ?: return@launch
 
                 val executables = synchronized(lock) cancel@ {
+                    if (_instance != null) return@cancel emptyList()
+
                     val executables = ArrayList<Executable>(actionStack.size + 3)
 
                     // Interrupt or complete all ActionJob
