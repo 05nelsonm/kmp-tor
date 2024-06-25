@@ -964,8 +964,12 @@ internal class RealTorRuntime private constructor(
                     // there's a 500ms delay no matter what.
                     val interval = 100.milliseconds
                     val timeout = 500.milliseconds
-                    while (_failure == null && _instance == null) {
+                    while (isActive) {
+                        if (_failure != null) break
+                        if (_instance != null) break
                         delay(interval)
+                        if (_failure != null) break
+                        if (_instance != null) break
                         if (mark.elapsedNow() < timeout) continue
                         _failure = InterruptedException("${name.name} timed out after 500ms")
                     }
@@ -975,8 +979,6 @@ internal class RealTorRuntime private constructor(
                 val failure = _failure ?: return@launch
 
                 val executables = synchronized(lock) cancel@ {
-                    if (_instance != null) return@cancel emptyList()
-
                     val executables = ArrayList<Executable>(actionStack.size + 3)
 
                     // Interrupt or complete all ActionJob
