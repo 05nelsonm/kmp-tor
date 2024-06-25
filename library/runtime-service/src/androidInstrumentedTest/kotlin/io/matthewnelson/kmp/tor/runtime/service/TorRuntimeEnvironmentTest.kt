@@ -37,28 +37,28 @@ class TorRuntimeEnvironmentTest {
 
     @Test
     fun givenContext_whenDefaultDirname_thenIsAsExpected() {
-        val environment = config.Environment(::installerFail)
+        val environment = config.newEnvironment(::installerFail)
         assertEquals("app_torservice", environment.workDirectory.name)
         assertEquals("torservice", environment.cacheDirectory.name)
     }
 
     @Test
     fun givenContext_whenDefaultDirnameWithConfigurationBlock_thenIsAsExpected() {
-        val environment = config.Environment(::installerFail, block = {})
+        val environment = config.newEnvironment(::installerFail, block = {})
         assertEquals("app_torservice", environment.workDirectory.name)
         assertEquals("torservice", environment.cacheDirectory.name)
     }
 
     @Test
     fun givenContext_whenBlankDirName_thenIsAsExpected() {
-        val environment = config.Environment(dirName = "    ", ::installerFail)
+        val environment = config.newEnvironment(dirName = "    ", ::installerFail)
         assertEquals("app_torservice", environment.workDirectory.name)
         assertEquals("torservice", environment.cacheDirectory.name)
     }
 
     @Test
     fun givenDispatchersMainAvailable_whenDefaultExecutor_thenIsExecutorMain() {
-        config.Environment(::installerFail) {
+        config.newEnvironment(::installerFail) {
             assertIs<OnEvent.Executor.Main>(defaultEventExecutor)
         }
     }

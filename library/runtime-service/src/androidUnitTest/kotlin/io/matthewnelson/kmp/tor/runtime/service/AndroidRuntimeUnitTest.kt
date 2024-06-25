@@ -15,26 +15,29 @@
  **/
 package io.matthewnelson.kmp.tor.runtime.service
 
-import io.matthewnelson.kmp.tor.core.api.ResourceInstaller
-import io.matthewnelson.kmp.tor.core.api.ResourceInstaller.Paths
+import io.matthewnelson.kmp.tor.core.api.annotation.ExperimentalKmpTorApi
+import io.matthewnelson.kmp.tor.resource.tor.TorResources
 import io.matthewnelson.kmp.tor.runtime.Lifecycle
 import io.matthewnelson.kmp.tor.runtime.RuntimeEvent
 import io.matthewnelson.kmp.tor.runtime.TorRuntime
 import kotlin.test.*
 
+@OptIn(ExperimentalKmpTorApi::class)
 class AndroidRuntimeUnitTest {
 
-    private val config = TorServiceConfig.Builder {}
+    private val config = TorServiceConfig.Builder {
+        testUseBuildDirectory = true
+    }
 
     @Test
     fun givenTorRuntime_whenNotAndroidRuntime_thenIsNotAndroidTorRuntime() {
-        val environment = config.Environment(dirName = "rt_unit_tests") { installationDir ->
-            object : ResourceInstaller<Paths.Tor>(installationDir) {
-                override fun install(): Paths.Tor { fail() }
-            }
+        val environment = config.newEnvironment(dirName = "rt_unit_tests") { installationDir ->
+            TorResources(installationDir)
         }
 
-        assertTrue(environment.workDirectory.path.contains("kmp_tor_android_test"))
+        val path = environment.workDirectory.path
+        assertTrue(path.contains("kmp_tor_android_test"))
+        assertTrue(path.contains("build"))
         assertEquals("work", environment.workDirectory.name)
         assertEquals("cache", environment.cacheDirectory.name)
 

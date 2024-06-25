@@ -25,19 +25,22 @@
     <!--
     API 34+
 
-    Below are examples of declaring the foregroundServiceType and
-    associated permissions which are required to start as a Foreground
-    Service.
+    Below are examples of declaring the `foregroundServiceType` and
+    associated permission which are required to start as a Foreground
+    Service. The types utilized in the examples are, as of now, the only
+    types which require no other permissions or runtime prerequisites.
 
     It is up to you what to declare for the service as it may have an
-    effect on your application submission depending on the type, and
-    this library is unwilling to make that choice unilaterally for all
-    consumers.
+    impact on your app store review, depending on the type, and this library
+    is unwilling to make that choice unilaterally for all its consumers.
+
+    NOTE: `tools:node="merge"` and `android:foregroundServiceType="{type}"`
+    MUST be declared within the service tag (as shown in the examples).
     -->
 
 
     <!--
-    API 34+ (e.g. Special Use)
+    API 34+ (e.g. type: Special Use)
     https://developer.android.com/about/versions/14/changes/fgs-types-required#special-use
 
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE" />
@@ -61,7 +64,7 @@
 
 
     <!--
-    API 34+ (e.g. Data Sync)
+    API 34+ (e.g. type: Data Sync)
     https://developer.android.com/about/versions/14/changes/fgs-types-required#data-sync
 
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC" />
@@ -78,7 +81,7 @@
 
 
     <!--
-    API 34+ (e.g. Media Playback)
+    API 34+ (e.g. type: Media Playback)
     https://developer.android.com/about/versions/14/changes/fgs-types-required#media
 
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK" />

@@ -36,7 +36,7 @@ class AndroidServiceFactoryTest {
 
     @Test
     fun givenTorRuntime_whenAndroidRuntime_thenIsAndroidServiceFactory() {
-        val environment = config.Environment(dirName = "sf_is_instance") { dir -> TorResources(dir) }
+        val environment = config.newEnvironment(dirName = "sf_is_instance") { dir -> TorResources(dir) }
 
         val lces = mutableListOf<Lifecycle.Event>()
         val factory = TorRuntime.Builder(environment) {
@@ -59,7 +59,7 @@ class AndroidServiceFactoryTest {
             return
         }
 
-        val environment = config.Environment(dirName = "sf_single") { dir -> TorResources(dir) }
+        val environment = config.newEnvironment(dirName = "sf_single") { dir -> TorResources(dir) }
         environment.debug = true
 
         var assertionErrorInvocation = 0
@@ -114,8 +114,8 @@ class AndroidServiceFactoryTest {
             return
         }
 
-        val env1 = config.Environment(dirName = "sf_multi1") { dir -> TorResources(dir) }
-        val env2 = config.Environment(dirName = "sf_multi2") { dir -> TorResources(dir) }
+        val env1 = config.newEnvironment(dirName = "sf_multi1") { dir -> TorResources(dir) }
+        val env2 = config.newEnvironment(dirName = "sf_multi2") { dir -> TorResources(dir) }
         env1.debug = true
         env2.debug = true
 

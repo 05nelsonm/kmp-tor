@@ -13,6 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
+@file:Suppress("FunctionName")
+
 package io.matthewnelson.kmp.tor.runtime.service
 
 import android.app.Application
@@ -21,12 +23,14 @@ import androidx.startup.AppInitializer
 import io.matthewnelson.kmp.file.File
 import io.matthewnelson.kmp.file.SysTempDir
 import io.matthewnelson.kmp.file.resolve
+import io.matthewnelson.kmp.file.toFile
 import io.matthewnelson.kmp.tor.core.api.ResourceInstaller
 import io.matthewnelson.kmp.tor.core.api.ResourceInstaller.Paths
 import io.matthewnelson.kmp.tor.core.api.annotation.ExperimentalKmpTorApi
 import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
 import io.matthewnelson.kmp.tor.core.api.annotation.KmpTorDsl
 import io.matthewnelson.kmp.tor.core.resource.OSInfo
+import io.matthewnelson.kmp.tor.runtime.Action
 import io.matthewnelson.kmp.tor.runtime.TorRuntime
 import io.matthewnelson.kmp.tor.runtime.core.ThisBlock
 import io.matthewnelson.kmp.tor.runtime.core.apply
@@ -47,18 +51,33 @@ import kotlin.concurrent.Volatile
  *         // configure ...
  *     }
  *
- *     val runtime = config.Environment { installationDirectory ->
- *         // Assuming use of `kmp-tor:resource-tor` dependency
+ *     val environment = config.newEnvironment { installationDirectory ->
+ *         // Assuming use of `kmp-tor:resource-tor` or
+ *         // `kmp-tor:resource-tor-gpl` dependency
  *         TorResources(installationDirectory)
+ *     }
+ *
+ *     val runtime = TorRuntime.Builder(environment) {
+ *         // configure...
  *     }
  *
  * @see [Companion.Builder]
  * @see [Companion.instanceOrNull]
- * @see [Environment]
+ * @see [newEnvironment]
  * */
 public class TorServiceConfig private constructor(
+
+    /**
+     * See [Builder.stopServiceOnTaskRemoved]
+     * */
     @JvmField
     public val stopServiceOnTaskRemoved: Boolean,
+
+    /**
+     * See [Builder.testUseBuildDirectory]
+     * */
+    @JvmField
+    public val testUseBuildDirectory: Boolean,
 ) {
 
     /**
@@ -68,17 +87,21 @@ public class TorServiceConfig private constructor(
      * **NOTE:** [TorRuntime.Environment.Builder.serviceFactoryLoader] is set
      * automatically and tor will run inside an [android.app.Service].
      *
-     * Directories (emulator & device)
+     * Directories (emulator & device):
      *  - workDirectory: app_torservice
      *  - cacheDirectory: cache/torservice
      *
-     * Directories (android unit tests)
+     * Directories (android unit test where [testUseBuildDirectory] = `false`):
      *  - workDirectory: {system temp}/kmp_tor_android_test/torservice/work
      *  - cacheDirectory: {system temp}/kmp_tor_android_test/torservice/cache
+     *
+     * Directories (android unit test where [testUseBuildDirectory] = `true`):
+     *  - workDirectory: {module}/build/kmp_tor_android_test/torservice/work
+     *  - cacheDirectory: {module}/build/kmp_tor_android_test/torservice/cache
      * */
-    public fun Environment(
+    public fun newEnvironment(
         installer: (installationDirectory: File) -> ResourceInstaller<Paths.Tor>,
-    ): TorRuntime.Environment = Environment(DEFAULT_DIRNAME, installer)
+    ): TorRuntime.Environment = newEnvironment(DEFAULT_DIRNAME, installer)
 
     /**
      * Android implementation which creates the [TorRuntime.Environment] using
@@ -87,18 +110,22 @@ public class TorServiceConfig private constructor(
      * **NOTE:** [TorRuntime.Environment.Builder.serviceFactoryLoader] is set
      * automatically and tor will run inside an [android.app.Service].
      *
-     * Directories (emulator & device)
+     * Directories (emulator & device):
      *  - workDirectory: app_torservice
      *  - cacheDirectory: cache/torservice
      *
-     * Directories (android unit tests)
+     * Directories (android unit test where [testUseBuildDirectory] = `false`):
      *  - workDirectory: {system temp}/kmp_tor_android_test/torservice/work
      *  - cacheDirectory: {system temp}/kmp_tor_android_test/torservice/cache
+     *
+     * Directories (android unit test where [testUseBuildDirectory] = `true`):
+     *  - workDirectory: {module}/build/kmp_tor_android_test/torservice/work
+     *  - cacheDirectory: {module}/build/kmp_tor_android_test/torservice/cache
      * */
-    public fun Environment(
+    public fun newEnvironment(
         installer: (installationDirectory: File) -> ResourceInstaller<Paths.Tor>,
         block: ThisBlock<TorRuntime.Environment.Builder>,
-    ): TorRuntime.Environment = Environment(DEFAULT_DIRNAME, installer, block)
+    ): TorRuntime.Environment = newEnvironment(DEFAULT_DIRNAME, installer, block)
 
     /**
      * Android implementation which creates the [TorRuntime.Environment] using
@@ -107,18 +134,22 @@ public class TorServiceConfig private constructor(
      * **NOTE:** [TorRuntime.Environment.Builder.serviceFactoryLoader] is set
      * automatically and tor will run inside an [android.app.Service].
      *
-     * Directories (emulator & device)
+     * Directories (emulator & device):
      *  - workDirectory: app_[dirName]
      *  - cacheDirectory: cache/[dirName]
      *
-     * Directories (android unit tests)
+     * Directories (android unit test where [testUseBuildDirectory] = `false`):
      *  - workDirectory: {system temp}/kmp_tor_android_test/[dirName]/work
      *  - cacheDirectory: {system temp}/kmp_tor_android_test/[dirName]/cache
+     *
+     * Directories (android unit test where [testUseBuildDirectory] = `true`):
+     *  - workDirectory: {module}/build/kmp_tor_android_test/[dirName]/work
+     *  - cacheDirectory: {module}/build/kmp_tor_android_test/[dirName]/cache
      * */
-    public fun Environment(
+    public fun newEnvironment(
         dirName: String,
         installer: (installationDirectory: File) -> ResourceInstaller<Paths.Tor>,
-    ): TorRuntime.Environment = Environment(dirName, installer) {}
+    ): TorRuntime.Environment = newEnvironment(dirName, installer) {}
 
     /**
      * Android implementation which creates the [TorRuntime.Environment] using
@@ -127,15 +158,19 @@ public class TorServiceConfig private constructor(
      * **NOTE:** [TorRuntime.Environment.Builder.serviceFactoryLoader] is set
      * automatically and tor will run inside an [android.app.Service].
      *
-     * Directories (emulator & device)
+     * Directories (emulator & device):
      *  - workDirectory: app_[dirName]
      *  - cacheDirectory: cache/[dirName]
      *
-     * Directories (android unit tests)
+     * Directories (android unit test where [testUseBuildDirectory] = `false`):
      *  - workDirectory: {system temp}/kmp_tor_android_test/[dirName]/work
      *  - cacheDirectory: {system temp}/kmp_tor_android_test/[dirName]/cache
+     *
+     * Directories (android unit test where [testUseBuildDirectory] = `true`):
+     *  - workDirectory: {module}/build/kmp_tor_android_test/[dirName]/work
+     *  - cacheDirectory: {module}/build/kmp_tor_android_test/[dirName]/cache
      * */
-    public fun Environment(
+    public fun newEnvironment(
         dirName: String,
         installer: (installationDirectory: File) -> ResourceInstaller<Paths.Tor>,
         block: ThisBlock<TorRuntime.Environment.Builder>,
@@ -154,28 +189,32 @@ public class TorServiceConfig private constructor(
             }
 
             // Android unit tests
-            val tmp = SysTempDir
-                .resolve("kmp_tor_android_test")
-                .resolve(_dirName)
+            val testDir = if (testUseBuildDirectory) {
+                "".toFile().absoluteFile.resolve("build")
+            } else {
+                SysTempDir
+            }.resolve("kmp_tor_android_test").resolve(_dirName)
 
             return TorRuntime.Environment.Builder(
-                workDirectory = tmp.resolve("work"),
-                cacheDirectory = tmp.resolve("cache"),
+                workDirectory = testDir.resolve("work"),
+                cacheDirectory = testDir.resolve("cache"),
                 installer = installer,
                 block = block,
             )
         }
 
+        // Emulator or device
         return TorRuntime.Environment.Builder(
             workDirectory = app.getDir(_dirName, Context.MODE_PRIVATE),
             cacheDirectory = app.cacheDir.resolve(_dirName),
             installer = installer,
-        ) {
-            apply(block)
+            block = {
+                apply(block)
 
-            @OptIn(ExperimentalKmpTorApi::class)
-            serviceFactoryLoader = app.serviceFactoryLoader(this@TorServiceConfig)
-        }
+                @OptIn(ExperimentalKmpTorApi::class)
+                serviceFactoryLoader = app.serviceFactoryLoader(this@TorServiceConfig)
+            },
+        )
     }
 
     public companion object {
@@ -196,10 +235,12 @@ public class TorServiceConfig private constructor(
         ): TorServiceConfig {
             val b = Builder.get().apply(block)
 
+            @OptIn(ExperimentalKmpTorApi::class)
             return _instance ?: synchronized(this) {
                 _instance ?: run {
                     TorServiceConfig(
                         stopServiceOnTaskRemoved = b.stopServiceOnTaskRemoved,
+                        testUseBuildDirectory = b.testUseBuildDirectory,
                     ).also { _instance = it }
                 }
             }
@@ -209,8 +250,44 @@ public class TorServiceConfig private constructor(
     @KmpTorDsl
     public class Builder private constructor() {
 
+        /**
+         * If [TorService] is running and your application is swiped from
+         * the recent app's tray (user removes the Task), this setting
+         * indicates the behavior of how you wish to react.
+         *
+         * If `true`, all instances of [TorRuntime] will be destroyed and
+         * [android.app.Service.stopService] will be called. If `false`,
+         * no reaction will be had and the service will either be:
+         *  - If operating as a background service, killed when the
+         *   application process is killed.
+         *  - If operating as a foreground service, keep your application
+         *   alive until [Action.StopDaemon] is executed for all instances
+         *   of [TorRuntime] operating within the service.
+         *
+         * This can be useful if:
+         *  - You are running [TorService] in the background alongside other
+         *   services that are operating in the foreground which are keeping
+         *   the application alive past Task removal.
+         *  - You are running [TorService] in the foreground and wish to keep
+         *   the application alive until [Action.StopDaemon] is executed.
+         *
+         * Default: `true`
+         * */
         @JvmField
         public var stopServiceOnTaskRemoved: Boolean = true
+
+        /**
+         * For android unit tests, a setting of `true` will use the module build
+         * directory, instead of the system temp directory, when setting up the
+         * environment directories.
+         *
+         * **NOTE:** This has no effect if running on an emulator or device.
+         *
+         * Default: `false`
+         * */
+        @JvmField
+        @ExperimentalKmpTorApi
+        public var testUseBuildDirectory: Boolean = false
 
         internal companion object {
 
