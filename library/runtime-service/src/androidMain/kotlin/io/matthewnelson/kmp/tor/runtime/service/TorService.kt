@@ -18,22 +18,18 @@ package io.matthewnelson.kmp.tor.runtime.service
 import android.app.Application
 import android.content.Context
 import android.content.Intent
-import android.content.res.Resources
-import androidx.startup.AppInitializer
 import io.matthewnelson.kmp.tor.core.api.annotation.ExperimentalKmpTorApi
 import io.matthewnelson.kmp.tor.runtime.*
-import io.matthewnelson.kmp.tor.runtime.service.internal.RealTorServiceConfig
 
 @OptIn(ExperimentalKmpTorApi::class)
 internal class TorService internal constructor(): AbstractTorService() {
 
     private class AndroidServiceFactory(
         private val app: Application,
-        config: RealTorServiceConfig,
         initializer: Initializer,
     ): TorRuntime.ServiceFactory(initializer) {
 
-        private val connection = Connection(binder, config)
+        private val connection = Connection(binder)
 
         @Throws(RuntimeException::class)
         protected override fun startService() {
@@ -43,60 +39,17 @@ internal class TorService internal constructor(): AbstractTorService() {
         }
     }
 
-    internal class Initializer internal constructor(): androidx.startup.Initializer<Initializer.Companion> {
-
-        public override fun create(context: Context): Companion {
-            val initializer = AppInitializer.getInstance(context)
-            check(initializer.isEagerlyInitialized(javaClass)) {
-                val classPath = "io.matthewnelson.kmp.tor.runtime.service.TorService$" + "Initializer"
-
-                """
-                    TorService.Initializer cannot be initialized lazily.
-                    Please ensure that you have:
-                    <meta-data
-                        android:name='$classPath'
-                        android:value='androidx.startup' />
-                    under InitializationProvider in your AndroidManifest.xml
-                """.trimIndent()
-            }
-            app = context.applicationContext as Application
-            return Companion
-        }
-
-        public override fun dependencies(): List<Class<androidx.startup.Initializer<*>>> {
-            return try {
-                val clazz = Class
-                    .forName("io.matthewnelson.kmp.tor.core.lib.locator.KmpTorLibLocator\$Initializer")
-
-                @Suppress("UNCHECKED_CAST")
-                listOf((clazz as Class<androidx.startup.Initializer<*>>))
-            } catch (_: Throwable) {
-                emptyList()
-            }
-        }
-
-        internal companion object {
-
-            @JvmSynthetic
-            internal fun isInitialized(): Boolean = app != null
-        }
-    }
-
     internal companion object {
 
-        private var app: Application? = null
-
         @JvmSynthetic
-        @Throws(Resources.NotFoundException::class)
-        internal fun loaderOrNull(): TorRuntime.ServiceFactory.Loader? {
-            val app = app ?: return null
-            val config = RealTorServiceConfig.of(app)
+        internal fun Application.serviceFactoryLoader(): TorRuntime.ServiceFactory.Loader? {
+            val app = this
 
             return object : TorRuntime.ServiceFactory.Loader() {
                 override fun loadProtected(
                     initializer: TorRuntime.ServiceFactory.Initializer,
                 ): TorRuntime.ServiceFactory {
-                    return AndroidServiceFactory(app, config, initializer)
+                    return AndroidServiceFactory(app, initializer)
                 }
             }
         }

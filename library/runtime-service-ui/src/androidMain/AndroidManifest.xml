@@ -17,29 +17,29 @@
  **/
 -->
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-          xmlns:tools="http://schemas.android.com/tools">
+    xmlns:tools="http://schemas.android.com/tools">
 
-    <uses-sdk tools:overrideLibrary="io.matthewnelson.kmp.tor.resource.tor" />
-
+    <!-- API 28+ -->
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-    <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+
+    <!-- API 34+ https://developer.android.com/about/versions/14/changes/fgs-types-required#special-use -->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE" />
 
     <application>
-        <provider
-            android:name="androidx.startup.InitializationProvider"
-            android:authorities="${applicationId}.androidx-startup"
-            android:exported="false"
-            tools:node="merge">
-            <meta-data
-                android:name="io.matthewnelson.kmp.tor.runtime.service.TorServiceConfig$Initializer"
-                android:value="androidx.startup" />
-        </provider>
         <service
             android:name="io.matthewnelson.kmp.tor.runtime.service.TorService"
             android:enabled="true"
-            android:exported="false" />
+            android:exported="false"
+            android:foregroundServiceType="specialUse"
+            tools:node="merge">
+
+            <!-- TODO: Issue #457 -->
+            <property
+                android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"
+                android:value="TODO\n
+                Issue\n
+                #457" />
+        </service>
     </application>
 
 </manifest>

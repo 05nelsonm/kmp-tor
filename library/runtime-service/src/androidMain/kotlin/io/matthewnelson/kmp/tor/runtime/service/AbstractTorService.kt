@@ -30,7 +30,6 @@ import io.matthewnelson.kmp.tor.runtime.RuntimeEvent.Notifier.Companion.e
 import io.matthewnelson.kmp.tor.runtime.RuntimeEvent.Notifier.Companion.lce
 import io.matthewnelson.kmp.tor.runtime.RuntimeEvent.Notifier.Companion.w
 import io.matthewnelson.kmp.tor.runtime.core.Executable
-import io.matthewnelson.kmp.tor.runtime.service.internal.RealTorServiceConfig
 import io.matthewnelson.kmp.tor.runtime.service.internal.SynchronizedInstance
 import io.matthewnelson.kmp.tor.runtime.TorRuntime.ServiceFactory.Binder as TorBinder
 
@@ -102,7 +101,6 @@ internal sealed class AbstractTorService: Service() {
 
     protected class Connection(
         val binder: TorBinder,
-        val config: RealTorServiceConfig,
     ): ServiceConnection {
         public override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
             if (service !is Binder) return

@@ -17,8 +17,8 @@
 
 package io.matthewnelson.kmp.tor.runtime.service
 
+import android.app.Application
 import android.content.Context
-import android.content.res.Resources
 import io.matthewnelson.kmp.file.File
 import io.matthewnelson.kmp.tor.core.api.ResourceInstaller
 import io.matthewnelson.kmp.tor.core.api.ResourceInstaller.Paths
@@ -26,6 +26,7 @@ import io.matthewnelson.kmp.tor.core.api.annotation.ExperimentalKmpTorApi
 import io.matthewnelson.kmp.tor.runtime.TorRuntime
 import io.matthewnelson.kmp.tor.runtime.core.ThisBlock
 import io.matthewnelson.kmp.tor.runtime.core.apply
+import io.matthewnelson.kmp.tor.runtime.service.TorService.Companion.serviceFactoryLoader
 
 /**
  * Android extension which utilizes [Context.getDir] and [Context.getCacheDir]
@@ -37,12 +38,9 @@ import io.matthewnelson.kmp.tor.runtime.core.apply
  *
  * - workDirectory: app_torservice
  * - cacheDirectory: cache/torservice
- *
- * @throws [Resources.NotFoundException] if configured to run as a Foreground
- *   Service and [TorServiceConfig.getMetaData] throws exception.
  * */
 @JvmName("Builder")
-public fun Context.createTorRuntimeEnvironment(
+public fun Application.createTorRuntimeEnvironment(
     installer: (installationDirectory: File) -> ResourceInstaller<Paths.Tor>,
 ): TorRuntime.Environment = createTorRuntimeEnvironment("torservice", installer)
 
@@ -56,12 +54,9 @@ public fun Context.createTorRuntimeEnvironment(
  *
  * - workDirectory: app_torservice
  * - cacheDirectory: cache/torservice
- *
- * @throws [Resources.NotFoundException] if configured to run as a Foreground
- *   Service and [TorServiceConfig.getMetaData] throws exception.
  * */
 @JvmName("Builder")
-public fun Context.createTorRuntimeEnvironment(
+public fun Application.createTorRuntimeEnvironment(
     installer: (installationDirectory: File) -> ResourceInstaller<Paths.Tor>,
     block: ThisBlock<TorRuntime.Environment.Builder>,
 ): TorRuntime.Environment = createTorRuntimeEnvironment("torservice", installer, block)
@@ -76,12 +71,9 @@ public fun Context.createTorRuntimeEnvironment(
  *
  * - workDirectory: app_[dirName]
  * - cacheDirectory: cache/[dirName]
- *
- * @throws [Resources.NotFoundException] if configured to run as a Foreground
- *   Service and [TorServiceConfig.getMetaData] throws exception.
  * */
 @JvmName("Builder")
-public fun Context.createTorRuntimeEnvironment(
+public fun Application.createTorRuntimeEnvironment(
     dirName: String,
     installer: (installationDirectory: File) -> ResourceInstaller<Paths.Tor>,
 ): TorRuntime.Environment = createTorRuntimeEnvironment(dirName, installer) {}
@@ -96,12 +88,9 @@ public fun Context.createTorRuntimeEnvironment(
  *
  * - workDirectory: app_[dirName]
  * - cacheDirectory: cache/[dirName]
- *
- * @throws [Resources.NotFoundException] if configured to run as a Foreground
- *   Service and [TorServiceConfig.getMetaData] throws exception.
  * */
 @JvmName("Builder")
-public fun Context.createTorRuntimeEnvironment(
+public fun Application.createTorRuntimeEnvironment(
     dirName: String,
     installer: (installationDirectory: File) -> ResourceInstaller<Paths.Tor>,
     block: ThisBlock<TorRuntime.Environment.Builder>,
@@ -110,11 +99,8 @@ public fun Context.createTorRuntimeEnvironment(
     cacheDirectory = cacheDir.resolve(dirName.ifBlank { "torservice" }),
     installer = installer,
 ) {
-    this.apply(block)
+    apply(block)
 
-    // Will not be null b/c TorService.Initializer
-    // should be there if consumer is utilizing this
-    // function which has Context available.
     @OptIn(ExperimentalKmpTorApi::class)
-    serviceFactoryLoader = TorService.loaderOrNull()
+    serviceFactoryLoader = serviceFactoryLoader()
 }

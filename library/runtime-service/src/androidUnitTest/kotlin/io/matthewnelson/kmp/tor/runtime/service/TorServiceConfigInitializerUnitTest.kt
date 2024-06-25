@@ -17,17 +17,17 @@ package io.matthewnelson.kmp.tor.runtime.service
 
 import kotlin.test.Test
 import kotlin.test.assertEquals
-import kotlin.test.assertTrue
+import kotlin.test.assertFalse
 
-class TorServiceInitializerTest {
+class TorServiceConfigInitializerUnitTest {
 
     @Test
-    fun givenAndroidEmulator_whenIsInitialized_thenIsTrue() {
-        assertTrue(TorService.Initializer.isInitialized())
+    fun givenNonAndroidRuntime_whenIsInitialized_thenIsFalse() {
+        assertFalse(TorServiceConfig.Initializer.isInitialized())
     }
 
     @Test
-    fun givenDependencies_whenKmpTorLibLocatorPresent_thenAddsAsDependency() {
-        assertEquals(1, TorService.Initializer().dependencies().size)
+    fun givenDependencies_whenKmpTorLibLocatorNotPresent_thenDoseNotAddAsDependency() {
+        assertEquals(0, TorServiceConfig.Initializer().dependencies().size)
     }
 }
