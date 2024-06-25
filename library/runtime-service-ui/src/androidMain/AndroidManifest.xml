@@ -22,7 +22,24 @@
     <!-- API 28+ -->
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
 
-    <!-- API 34+ https://developer.android.com/about/versions/14/changes/fgs-types-required#special-use -->
+    <!--
+    API 34+
+
+    Below are examples of declaring the foregroundServiceType and
+    associated permissions which are required to start as a Foreground
+    Service.
+
+    It is up to you what to declare for the service as it may have an
+    effect on your application submission depending on the type, and
+    this library is unwilling to make that choice unilaterally for all
+    consumers.
+    -->
+
+
+    <!--
+    API 34+ (e.g. Special Use)
+    https://developer.android.com/about/versions/14/changes/fgs-types-required#special-use
+
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE" />
 
     <application>
@@ -33,13 +50,47 @@
             android:foregroundServiceType="specialUse"
             tools:node="merge">
 
-            <!-- TODO: Issue #457 -->
             <property
                 android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"
-                android:value="TODO\n
-                Issue\n
-                #457" />
+                android:value="Your explanation\n
+                for special use\n
+                here" />
         </service>
     </application>
+    -->
+
+
+    <!--
+    API 34+ (e.g. Data Sync)
+    https://developer.android.com/about/versions/14/changes/fgs-types-required#data-sync
+
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC" />
+
+    <application>
+        <service
+            android:name="io.matthewnelson.kmp.tor.runtime.service.TorService"
+            android:enabled="true"
+            android:exported="false"
+            android:foregroundServiceType="dataSync"
+            tools:node="merge" />
+    </application>
+    -->
+
+
+    <!--
+    API 34+ (e.g. Media Playback)
+    https://developer.android.com/about/versions/14/changes/fgs-types-required#media
+
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK" />
+
+    <application>
+        <service
+            android:name="io.matthewnelson.kmp.tor.runtime.service.TorService"
+            android:enabled="true"
+            android:exported="false"
+            android:foregroundServiceType="mediaPlayback"
+            tools:node="merge" />
+    </application>
+    -->
 
 </manifest>

@@ -1,3 +1,5 @@
+import com.android.build.gradle.internal.ide.kmp.KotlinAndroidSourceSetMarker.Companion.android
+
 /*
  * Copyright (c) 2021 Matthew Nelson
  *
@@ -26,13 +28,25 @@ kmpConfiguration {
                 defaultConfig {
                     testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
                 }
+
+                sourceSets["androidTest"].manifest.srcFile(
+                    projectDir
+                        .resolve("src")
+                        .resolve("androidInstrumentedTest")
+                        .resolve("AndroidManifest.xml")
+                )
+            }
+
+            sourceSetTest {
+                dependencies {
+                    implementation(libs.kmp.tor.resource.android.unit.test)
+                }
             }
 
             sourceSetTestInstrumented {
                 dependencies {
                     implementation(libs.androidx.test.core)
                     implementation(libs.androidx.test.runner)
-                    implementation(libs.kmp.tor.resource.tor)
                 }
             }
         }
@@ -47,9 +61,11 @@ kmpConfiguration {
                     api(project(":library:runtime-service"))
                 }
             }
+
             sourceSetTest {
                 dependencies {
                     implementation(kotlin("test"))
+                    implementation(libs.kmp.tor.resource.tor)
                     implementation(libs.kotlinx.coroutines.test)
                 }
             }

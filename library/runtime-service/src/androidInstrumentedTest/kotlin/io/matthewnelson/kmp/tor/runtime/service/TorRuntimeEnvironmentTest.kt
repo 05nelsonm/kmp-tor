@@ -15,53 +15,51 @@
  **/
 package io.matthewnelson.kmp.tor.runtime.service
 
-import android.app.Application
-import androidx.test.core.app.ApplicationProvider
+import io.matthewnelson.kmp.file.File
 import io.matthewnelson.kmp.tor.core.api.ResourceInstaller
+import io.matthewnelson.kmp.tor.runtime.core.OnEvent
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertIs
 import kotlin.test.fail
 
 class TorRuntimeEnvironmentTest {
 
-    private val app = ApplicationProvider.getApplicationContext<Application>()
+    private fun installerFail(
+        installationDir: File
+    ): ResourceInstaller<ResourceInstaller.Paths.Tor> {
+        return object : ResourceInstaller<ResourceInstaller.Paths.Tor>(installationDir) {
+            override fun install(): Paths.Tor { fail() }
+        }
+    }
+
+    private val config = TorServiceConfig.Builder {}
 
     @Test
     fun givenContext_whenDefaultDirname_thenIsAsExpected() {
-        val environment = app.createTorRuntimeEnvironment { installationDir ->
-            object : ResourceInstaller<ResourceInstaller.Paths.Tor>(installationDir) {
-                override fun install(): Paths.Tor { fail() }
-            }
-        }
-
+        val environment = config.Environment(::installerFail)
         assertEquals("app_torservice", environment.workDirectory.name)
         assertEquals("torservice", environment.cacheDirectory.name)
     }
 
     @Test
     fun givenContext_whenDefaultDirnameWithConfigurationBlock_thenIsAsExpected() {
-        val environment = app.createTorRuntimeEnvironment(
-            installer = { installationDir ->
-                object : ResourceInstaller<ResourceInstaller.Paths.Tor>(installationDir) {
-                    override fun install(): Paths.Tor { fail() }
-                }
-            },
-            block = {},
-        )
-
+        val environment = config.Environment(::installerFail, block = {})
         assertEquals("app_torservice", environment.workDirectory.name)
         assertEquals("torservice", environment.cacheDirectory.name)
     }
 
     @Test
     fun givenContext_whenBlankDirName_thenIsAsExpected() {
-        val environment = app.createTorRuntimeEnvironment(dirName = "  ") { installationDir ->
-            object : ResourceInstaller<ResourceInstaller.Paths.Tor>(installationDir) {
-                override fun install(): Paths.Tor { fail() }
-            }
-        }
-
+        val environment = config.Environment(dirName = "    ", ::installerFail)
         assertEquals("app_torservice", environment.workDirectory.name)
         assertEquals("torservice", environment.cacheDirectory.name)
+    }
+
+    @Test
+    fun givenDispatchersMainAvailable_whenDefaultExecutor_thenIsExecutorMain() {
+        config.Environment(::installerFail) {
+            assertIs<OnEvent.Executor.Main>(defaultEventExecutor)
+        }
     }
 }

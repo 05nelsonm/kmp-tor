@@ -38,6 +38,7 @@ kmp-tor-core-api = { module = "io.matthewnelson.kmp-tor:core-api", version.ref =
 kmp-tor-core-lib-locator = { module = "io.matthewnelson.kmp-tor:core-lib-locator", version.ref = "kmp-tor-core" }
 kmp-tor-core-resource = { module = "io.matthewnelson.kmp-tor:core-resource", version.ref = "kmp-tor-core" }
 kmp-tor-resource-tor = { module = "io.matthewnelson.kmp-tor:resource-tor", version.ref = "kmp-tor-resource" }
+kmp-tor-resource-android-unit-test = { module = "io.matthewnelson.kmp-tor:resource-android-unit-test", version.ref = "kmp-tor-resource" }
 kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "kotlinx-coroutines" }
 kotlinx-coroutines-android = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version.ref = "kotlinx-coroutines" }
 kotlinx-coroutines-javafx = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-javafx", version.ref = "kotlinx-coroutines" }

@@ -1,13 +1,20 @@
-public final class io/matthewnelson/kmp/tor/runtime/service/TorRuntimeEnvironment {
-	public static final fun Builder (Landroid/app/Application;Ljava/lang/String;Lkotlin/jvm/functions/Function1;)Lio/matthewnelson/kmp/tor/runtime/TorRuntime$Environment;
-	public static final fun Builder (Landroid/app/Application;Ljava/lang/String;Lkotlin/jvm/functions/Function1;Lio/matthewnelson/kmp/tor/runtime/core/ThisBlock;)Lio/matthewnelson/kmp/tor/runtime/TorRuntime$Environment;
-	public static final fun Builder (Landroid/app/Application;Lkotlin/jvm/functions/Function1;)Lio/matthewnelson/kmp/tor/runtime/TorRuntime$Environment;
-	public static final fun Builder (Landroid/app/Application;Lkotlin/jvm/functions/Function1;Lio/matthewnelson/kmp/tor/runtime/core/ThisBlock;)Lio/matthewnelson/kmp/tor/runtime/TorRuntime$Environment;
-}
-
 public final class io/matthewnelson/kmp/tor/runtime/service/TorServiceConfig {
+	public static final field Companion Lio/matthewnelson/kmp/tor/runtime/service/TorServiceConfig$Companion;
+	public final field stopServiceOnTaskRemoved Z
+	public synthetic fun <init> (ZLkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public static final fun Builder (Lio/matthewnelson/kmp/tor/runtime/core/ThisBlock;)Lio/matthewnelson/kmp/tor/runtime/service/TorServiceConfig;
+	public final fun Environment (Ljava/lang/String;Lkotlin/jvm/functions/Function1;)Lio/matthewnelson/kmp/tor/runtime/TorRuntime$Environment;
+	public final fun Environment (Ljava/lang/String;Lkotlin/jvm/functions/Function1;Lio/matthewnelson/kmp/tor/runtime/core/ThisBlock;)Lio/matthewnelson/kmp/tor/runtime/TorRuntime$Environment;
+	public final fun Environment (Lkotlin/jvm/functions/Function1;)Lio/matthewnelson/kmp/tor/runtime/TorRuntime$Environment;
+	public final fun Environment (Lkotlin/jvm/functions/Function1;Lio/matthewnelson/kmp/tor/runtime/core/ThisBlock;)Lio/matthewnelson/kmp/tor/runtime/TorRuntime$Environment;
+	public static final fun instanceOrNull$runtime_service_release ()Lio/matthewnelson/kmp/tor/runtime/service/TorServiceConfig;
 }
 
 public final class io/matthewnelson/kmp/tor/runtime/service/TorServiceConfig$Builder {
+	public field stopServiceOnTaskRemoved Z
+}
+
+public final class io/matthewnelson/kmp/tor/runtime/service/TorServiceConfig$Companion {
+	public final fun Builder (Lio/matthewnelson/kmp/tor/runtime/core/ThisBlock;)Lio/matthewnelson/kmp/tor/runtime/service/TorServiceConfig;
 }
 

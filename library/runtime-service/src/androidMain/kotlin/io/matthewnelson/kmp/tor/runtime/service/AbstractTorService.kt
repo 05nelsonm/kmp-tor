@@ -101,6 +101,7 @@ internal sealed class AbstractTorService: Service() {
 
     protected class Connection(
         val binder: TorBinder,
+        val config: TorServiceConfig,
     ): ServiceConnection {
         public override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
             if (service !is Binder) return

@@ -26,10 +26,11 @@ internal class TorService internal constructor(): AbstractTorService() {
 
     private class AndroidServiceFactory(
         private val app: Application,
+        config: TorServiceConfig,
         initializer: Initializer,
     ): TorRuntime.ServiceFactory(initializer) {
 
-        private val connection = Connection(binder)
+        private val connection = Connection(binder, config)
 
         @Throws(RuntimeException::class)
         protected override fun startService() {
@@ -42,14 +43,16 @@ internal class TorService internal constructor(): AbstractTorService() {
     internal companion object {
 
         @JvmSynthetic
-        internal fun Application.serviceFactoryLoader(): TorRuntime.ServiceFactory.Loader? {
+        internal fun Application.serviceFactoryLoader(
+            config: TorServiceConfig,
+        ): TorRuntime.ServiceFactory.Loader {
             val app = this
 
             return object : TorRuntime.ServiceFactory.Loader() {
                 override fun loadProtected(
                     initializer: TorRuntime.ServiceFactory.Initializer,
                 ): TorRuntime.ServiceFactory {
-                    return AndroidServiceFactory(app, initializer)
+                    return AndroidServiceFactory(app, config, initializer)
                 }
             }
         }
