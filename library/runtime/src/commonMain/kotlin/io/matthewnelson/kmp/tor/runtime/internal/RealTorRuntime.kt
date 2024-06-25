@@ -763,7 +763,7 @@ internal class RealTorRuntime private constructor(
         }
     }
 
-    private class RealServiceFactoryCtrl(
+    private class RealServiceFactoryDriver(
         private val generator: TorConfigGenerator,
         private val builderObserver: NetworkObserver,
         builderRequiredEvents: Set<TorEvent>,
@@ -771,7 +771,7 @@ internal class RealTorRuntime private constructor(
         @Suppress("RemoveRedundantQualifierName")
         observersRuntimeEvent: Set<RuntimeEvent.Observer<*>>,
         private val startService: () -> Unit,
-    ):  ServiceFactoryCtrl(
+    ):  ServiceFactoryDriver(
         generator.environment.staticTag(),
         observersRuntimeEvent,
         generator.environment.defaultExecutor(),
@@ -803,7 +803,7 @@ internal class RealTorRuntime private constructor(
         private val dispatcher by lazy { generator.environment.newRuntimeDispatcher() }
 
         @get:JvmSynthetic
-        internal override val binder: ServiceCtrlBinder = ServiceCtrlBinder()
+        internal override val binder: TorRuntime.ServiceFactory.Binder = ServiceFactoryBinder()
 
         public override fun environment(): TorRuntime.Environment = generator.environment
         public override fun isReady(): Boolean = _instance?.isReady() ?: false
@@ -1002,7 +1002,7 @@ internal class RealTorRuntime private constructor(
                 // onBind was called and stack + queue were transferred
                 if (executables.isEmpty()) return@launch
 
-                w(this@RealServiceFactoryCtrl, "Failed to start service. Interrupting EnqueuedJobs.")
+                w(this@RealServiceFactoryDriver, "Failed to start service. Interrupting EnqueuedJobs.")
 
                 handler.withSuppression {
 
@@ -1022,13 +1022,13 @@ internal class RealTorRuntime private constructor(
             }
         }
 
-        private inner class ServiceCtrlBinder:
+        private inner class ServiceFactoryBinder:
             TorRuntime.ServiceFactory.Binder,
             FileID by generator.environment,
             RuntimeEvent.Notifier by this
         {
 
-            // Pipe all events to observers registered with ServiceFactoryCtrl
+            // Pipe all events to observers registered with ServiceFactoryDriver
             private val observersTorEvent = TorEvent.entries().let { events ->
                 val tag = generator.environment.staticTag()
                 events.mapTo(LinkedHashSet(events.size + 1, 1.0f)) { event ->
@@ -1036,7 +1036,7 @@ internal class RealTorRuntime private constructor(
                 }.toImmutableSet()
             }
 
-            // Pipe all events to observers registered with ServiceFactoryCtrl
+            // Pipe all events to observers registered with ServiceFactoryDriver
             private val observersRuntimeEvent = RuntimeEvent.entries().let { events ->
                 val tag = generator.environment.staticTag()
                 events.mapTo(LinkedHashSet(events.size + 1, 1.0f)) { event ->
@@ -1082,7 +1082,7 @@ internal class RealTorRuntime private constructor(
                     dispatcher,
 
                     // Put services observers first so that they are notified
-                    // BEFORE static observers redirect to ServiceCtrl observers.
+                    // BEFORE static observers redirect to ServiceFactoryDriver observers.
                     (serviceObserversTorEvent + observersTorEvent),
 
                     // Want to utilize Immediate here as all events will be
@@ -1090,7 +1090,7 @@ internal class RealTorRuntime private constructor(
                     OnEvent.Executor.Immediate,
 
                     // Put services observers first so that they are notified
-                    // BEFORE static observers redirect to ServiceCtrl observers.
+                    // BEFORE static observers redirect to ServiceFactoryDriver observers.
                     (serviceObserversRuntimeEvent + observersRuntimeEvent),
                 )
 
@@ -1164,8 +1164,8 @@ internal class RealTorRuntime private constructor(
                 destroyable
             }
 
-            public override fun equals(other: Any?): Boolean = other is ServiceCtrlBinder && other.hashCode() == hashCode()
-            public override fun hashCode(): Int = this@RealServiceFactoryCtrl.hashCode()
+            public override fun equals(other: Any?): Boolean = other is ServiceFactoryBinder && other.hashCode() == hashCode()
+            public override fun hashCode(): Int = this@RealServiceFactoryDriver.hashCode()
             public override fun toString(): String = toFIDString(includeHashCode = false)
         }
 
@@ -1189,8 +1189,8 @@ internal class RealTorRuntime private constructor(
         ): TorRuntime = generator.environment.serviceFactoryLoader()?.let { loader ->
             var n: RuntimeEvent.Notifier? = null
 
-            val initializer = TorRuntime.ServiceFactory.Initializer.of { startService ->
-                RealServiceFactoryCtrl(
+            val initializer = TorRuntime.ServiceFactory.Initializer.of(create = { startService ->
+                RealServiceFactoryDriver(
                     generator,
                     networkObserver,
                     requiredTorEvents,
@@ -1198,7 +1198,7 @@ internal class RealTorRuntime private constructor(
                     observersRuntimeEvent,
                     startService,
                 ).also { n = it }
-            }
+            })
 
             val factory = loader.load(initializer)
 

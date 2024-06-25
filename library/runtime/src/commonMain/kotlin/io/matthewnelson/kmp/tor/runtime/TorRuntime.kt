@@ -38,6 +38,7 @@ import io.matthewnelson.kmp.tor.runtime.internal.*
 import io.matthewnelson.kmp.tor.runtime.internal.InstanceKeeper
 import io.matthewnelson.kmp.tor.runtime.internal.RealTorRuntime
 import io.matthewnelson.kmp.tor.runtime.internal.TorConfigGenerator
+import kotlinx.coroutines.Dispatchers
 import org.kotlincrypto.SecRandomCopyException
 import org.kotlincrypto.SecureRandom
 import kotlin.concurrent.Volatile
@@ -558,7 +559,11 @@ public sealed interface TorRuntime:
 
     /**
      * An instance of [TorRuntime] which produces [Lifecycle.DestroyableTorRuntime]
-     * that is intended to be run within a service object.
+     * under the hood which are intended to be run within a service object.
+     *
+     * **NOTE:** This is currently an [ExperimentalKmpTorApi], only being implemented
+     * by the `kmp-tor:runtime-service` dependency. Things may change, so use at your
+     * own risk!
      *
      * @see [Lifecycle.DestroyableTorRuntime]
      * */
@@ -581,10 +586,10 @@ public sealed interface TorRuntime:
         /**
          * Single use class for initializing [ServiceFactory]. Multiples uses will
          * result in [IllegalStateException] as the [ServiceFactory] implementation
-         * is a held as a singleton for the given [Environment] it belongs to.
+         * is held as a singleton for the given [Environment] that it belongs to.
          * */
         public class Initializer private constructor(
-            private val ctrl: (startService: () -> Unit) -> ServiceFactoryCtrl,
+            private val create: (startService: () -> Unit) -> ServiceFactoryDriver,
         ) {
 
             @Volatile
@@ -597,26 +602,52 @@ public sealed interface TorRuntime:
             @Throws(IllegalStateException::class)
             internal fun initialize(
                 startService: () -> Unit,
-            ): ServiceFactoryCtrl = synchronized(lock) {
+            ): ServiceFactoryDriver = synchronized(lock) {
                 check(!_isInitialized) {
                     "TorRuntime.ServiceFactory.Initializer can only be initialized once"
                 }
 
                 _isInitialized = true
-                ctrl(startService)
+                create(startService)
             }
 
             internal companion object {
 
                 @JvmSynthetic
                 internal fun of(
-                    ctrl: (startService: () -> Unit) -> ServiceFactoryCtrl,
-                ): Initializer = Initializer(ctrl)
+                    create: (startService: () -> Unit) -> ServiceFactoryDriver,
+                ): Initializer = Initializer(create)
             }
         }
 
+        /**
+         * Helper for service objects to bind to the [ServiceFactory] by creating
+         * an instance of [Lifecycle.DestroyableTorRuntime].
+         *
+         * @see [ServiceFactory.binder]
+         * */
         public interface Binder: RuntimeEvent.Notifier, FileID {
 
+            /**
+             * Meant to be called within the service object instance after
+             * [startService] has successfully executed, and [ServiceFactory.binder]
+             * has been injected into it.
+             *
+             * The returned instance of [Lifecycle.DestroyableTorRuntime] will
+             * invoke any [Lifecycle.DestroyableTorRuntime.invokeOnDestroy] handles
+             * upon processing of [Action.StopDaemon] such that the service object
+             * can attach one and know when to shut itself down.
+             *
+             * If an instance of [Lifecycle.DestroyableTorRuntime] already exists
+             * for the calling [ServiceFactory], that instance will be destroyed
+             * before a new instance of [Lifecycle.DestroyableTorRuntime] is returned.
+             *
+             * **WARNING:** This should not be called without first enqueueing
+             * [Action.StartDaemon] or [Action.RestartDaemon]. If no action job is
+             * present when [onBind] is called from [ServiceFactory.binder], then
+             * [Action.StartDaemon] will be enqueued for you. If the execution of
+             * that job results in failure an [UncaughtException] may occur.
+             * */
             public fun onBind(
                 serviceEvents: Set<TorEvent>,
                 serviceObserverNetwork: NetworkObserver?,
@@ -625,90 +656,106 @@ public sealed interface TorRuntime:
             ): Lifecycle.DestroyableTorRuntime
         }
 
+        /**
+         * Called when [Action.StartDaemon] or [Action.RestartDaemon] has been
+         * enqueued and an instance of [Lifecycle.DestroyableTorRuntime] does
+         * not currently exist for this [ServiceFactory].
+         *
+         * Implementors of [ServiceFactory.startService] must start the service
+         * and call [Binder.onBind] from the injected [binder] reference within
+         * 500ms, otherwise a timeout will occur and all enqueued jobs waiting
+         * to be handed off to [Lifecycle.DestroyableTorRuntime] for completion
+         * will be terminated.
+         *
+         * **NOTE:** If [Dispatchers.Main] is available, [startService] will always
+         * be called from the main thread.
+         *
+         * @throws [RuntimeException] if there was an error trying to start the service.
+         * */
         @Throws(RuntimeException::class)
         protected abstract fun startService()
 
-        private val ctrl: ServiceFactoryCtrl = initializer.initialize(::startService)
+        private val driver: ServiceFactoryDriver = initializer.initialize(::startService)
 
         @JvmField
-        protected val binder: Binder = ctrl.binder
+        protected val binder: Binder = driver.binder
 
-        public final override val fid: String = ctrl.fid
-        public final override fun environment(): Environment = ctrl.environment()
-        public final override fun isReady(): Boolean = ctrl.isReady()
-        public final override fun listeners(): TorListeners = ctrl.listeners()
-        public final override fun state(): TorState = ctrl.state()
+        public final override val fid: String = driver.fid
+        public final override fun environment(): Environment = driver.environment()
+        public final override fun isReady(): Boolean = driver.isReady()
+        public final override fun listeners(): TorListeners = driver.listeners()
+        public final override fun state(): TorState = driver.state()
 
         public final override fun <Success: Any> enqueue(
             cmd: TorCmd.Unprivileged<Success>,
             onFailure: OnFailure,
             onSuccess: OnSuccess<Success>,
-        ): EnqueuedJob = ctrl.enqueue(cmd, onFailure, onSuccess)
+        ): EnqueuedJob = driver.enqueue(cmd, onFailure, onSuccess)
 
         public final override fun enqueue(
             action: Action,
             onFailure: OnFailure,
             onSuccess: OnSuccess<Unit>,
-        ): EnqueuedJob = ctrl.enqueue(action, onFailure, onSuccess)
+        ): EnqueuedJob = driver.enqueue(action, onFailure, onSuccess)
 
         public final override fun subscribe(observer: TorEvent.Observer) {
-            ctrl.subscribe(observer)
+            driver.subscribe(observer)
         }
 
         public final override fun subscribe(vararg observers: TorEvent.Observer) {
-            ctrl.subscribe(*observers)
+            driver.subscribe(*observers)
         }
 
         public final override fun subscribe(observer: RuntimeEvent.Observer<*>) {
-            ctrl.subscribe(observer)
+            driver.subscribe(observer)
         }
 
         public final override fun subscribe(vararg observers: RuntimeEvent.Observer<*>) {
-            ctrl.subscribe(*observers)
+            driver.subscribe(*observers)
         }
 
         public final override fun unsubscribe(observer: TorEvent.Observer) {
-            ctrl.unsubscribe(observer)
+            driver.unsubscribe(observer)
         }
 
         public final override fun unsubscribe(vararg observers: TorEvent.Observer) {
-            ctrl.unsubscribe(*observers)
+            driver.unsubscribe(*observers)
         }
 
         public final override fun unsubscribe(observer: RuntimeEvent.Observer<*>) {
-            ctrl.unsubscribe(observer)
+            driver.unsubscribe(observer)
         }
 
         public final override fun unsubscribe(vararg observers: RuntimeEvent.Observer<*>) {
-            ctrl.unsubscribe(*observers)
+            driver.unsubscribe(*observers)
         }
 
         public final override fun unsubscribeAll(event: TorEvent) {
-            ctrl.unsubscribeAll(event)
+            driver.unsubscribeAll(event)
         }
 
         public final override fun unsubscribeAll(vararg events: TorEvent) {
-            ctrl.unsubscribeAll(*events)
+            driver.unsubscribeAll(*events)
         }
 
         public final override fun unsubscribeAll(tag: String) {
-            ctrl.unsubscribeAll(tag)
+            driver.unsubscribeAll(tag)
         }
 
         public final override fun unsubscribeAll(event: RuntimeEvent<*>) {
-            ctrl.unsubscribeAll(event)
+            driver.unsubscribeAll(event)
         }
 
         public final override fun unsubscribeAll(vararg events: RuntimeEvent<*>) {
-            ctrl.unsubscribeAll(*events)
+            driver.unsubscribeAll(*events)
         }
 
         public final override fun clearObservers() {
-            ctrl.clearObservers()
+            driver.clearObservers()
         }
 
-        public final override fun equals(other: Any?): Boolean = other is ServiceFactory && other.ctrl == ctrl
-        public final override fun hashCode(): Int = ctrl.hashCode()
+        public final override fun equals(other: Any?): Boolean = other is ServiceFactory && other.driver == driver
+        public final override fun hashCode(): Int = driver.hashCode()
         public final override fun toString(): String = toFIDString(defaultClassName = "ServiceFactory", includeHashCode = false)
     }
 }
