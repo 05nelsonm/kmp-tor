@@ -24,7 +24,6 @@ import android.content.Intent
 import android.content.ServiceConnection
 import android.os.Binder as AndroidBinder
 import android.os.IBinder
-import io.matthewnelson.immutable.collections.toImmutableMap
 import io.matthewnelson.immutable.collections.toImmutableSet
 import io.matthewnelson.kmp.tor.core.api.annotation.ExperimentalKmpTorApi
 import io.matthewnelson.kmp.tor.runtime.*
@@ -73,7 +72,7 @@ internal class TorService internal constructor(): Service() {
         }
     }
 
-    private val holders = SynchronizedInstance(LinkedHashMap<TorBinder, Holder?>(1, 1.0f))
+    private val holders = SynchronizedInstance.of(LinkedHashMap<TorBinder, Holder?>(1, 1.0f))
 
     private val supervisor = SupervisorJob()
     private val scope by lazy {
