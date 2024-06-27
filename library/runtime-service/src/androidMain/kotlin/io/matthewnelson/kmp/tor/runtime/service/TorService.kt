@@ -173,9 +173,11 @@ internal class TorService internal constructor(): Service() {
 
                 // First bind for this TorService instance
                 if (size == 0) {
-                    // config is a singleton and is the same for all AndroidServiceFactory.
-                    // If this is the first bind for TorService, need to instantiate and
-                    // set the new instance before the Holder gets created.
+
+                    // TorServiceConfig is a singleton and is the same for all
+                    // AndroidServiceFactory. If this is the first bind for
+                    // TorService, need to instantiate and set the new instance
+                    // before the Holder gets created.
                     if (conn.config is TorServiceConfig.Foreground<*, *>) {
                         val args = AndroidTorServiceUI.Args.of(
                             conn.config.factory.defaultConfig,
@@ -320,6 +322,8 @@ internal class TorService internal constructor(): Service() {
                     if (!isLastInstance) return@invokeOnDestroy
 
                     // Last instance destroyed. Kill it.
+                    // TODO: Needs testing to ensure notification is cleared.
+                    ui?.stopForeground()
                     application.stopService(Intent(application, TorService::class.java))
                 }
             }

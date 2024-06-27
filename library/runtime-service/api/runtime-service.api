@@ -1,7 +1,12 @@
 public abstract class io/matthewnelson/kmp/tor/runtime/service/AndroidTorServiceUI : io/matthewnelson/kmp/tor/runtime/service/TorServiceUI {
 	protected final field appContext Landroid/content/Context;
-	protected final field info Lio/matthewnelson/kmp/tor/runtime/service/NotificationInfo;
+	protected final field channelID Ljava/lang/String;
 	protected fun <init> (Lio/matthewnelson/kmp/tor/runtime/service/AndroidTorServiceUI$Args;)V
+	protected final fun post (Landroid/app/Notification;)V
+	protected final fun register (Landroid/content/BroadcastReceiver;Landroid/content/IntentFilter;Ljava/lang/String;Landroid/os/Handler;Ljava/lang/Boolean;)Landroid/content/Intent;
+	protected final fun register (Landroid/content/BroadcastReceiver;Landroid/content/IntentFilter;Ljava/lang/String;Landroid/os/Handler;Ljava/lang/Boolean;I)Landroid/content/Intent;
+	public static synthetic fun register$default (Lio/matthewnelson/kmp/tor/runtime/service/AndroidTorServiceUI;Landroid/content/BroadcastReceiver;Landroid/content/IntentFilter;Ljava/lang/String;Landroid/os/Handler;Ljava/lang/Boolean;IILjava/lang/Object;)Landroid/content/Intent;
+	protected final fun unregister (Landroid/content/BroadcastReceiver;)V
 }
 
 public final class io/matthewnelson/kmp/tor/runtime/service/AndroidTorServiceUI$Args : io/matthewnelson/kmp/tor/runtime/service/TorServiceUI$Args {
