@@ -99,7 +99,7 @@ protected final class io/matthewnelson/kmp/tor/runtime/service/TorServiceUI$Comp
 }
 
 public abstract class io/matthewnelson/kmp/tor/runtime/service/TorServiceUI$Config {
-	protected fun <init> (Ljava/util/Set;)V
+	protected fun <init> (Ljava/util/Set;Ljava/lang/Object;)V
 	public final fun equals (Ljava/lang/Object;)Z
 	public final fun hashCode ()I
 	public final fun toString ()Ljava/lang/String;

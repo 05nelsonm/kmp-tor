@@ -52,7 +52,6 @@ protected constructor(
     args: Args,
 ): TorServiceUI<AndroidTorServiceUI.Args, C>(
     args,
-    args.defaultConfig(),
     INIT,
 ) {
 
@@ -181,15 +180,16 @@ protected constructor(
     }
 
     public class Args private constructor(
-        private val _defaultConfig: Config,
+        defaultConfig: Config,
         private val _info: NotificationInfo,
         private val _service: Context,
         serviceJob: Job,
-    ): TorServiceUI.Args(serviceJob) {
+    ): TorServiceUI.Args(
+        defaultConfig,
+        serviceJob,
+        INIT,
+    ) {
 
-        @JvmSynthetic
-        @Suppress("UNCHECKED_CAST")
-        internal fun <C: Config> defaultConfig(): C = _defaultConfig as C
         @JvmSynthetic
         internal fun info(): NotificationInfo = _info
         @JvmSynthetic
@@ -215,7 +215,12 @@ protected constructor(
     public abstract class Config
     @ExperimentalKmpTorApi
     @Throws(IllegalArgumentException::class)
-    protected constructor(fields: Set<Field>): TorServiceUI.Config(fields) {
+    protected constructor(
+        fields: Set<Field>
+    ): TorServiceUI.Config(
+        fields,
+        INIT,
+    ) {
 
         /**
          * Implementations **MUST** ensure all resources specified

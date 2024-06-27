@@ -37,10 +37,11 @@ public abstract class TorServiceUI<A: TorServiceUI.Args, C: TorServiceUI.Config>
 @Throws(IllegalStateException::class)
 internal constructor(
     private val args: A,
-    @JvmField
-    protected val defaultConfig: C,
     init: Any,
 ) {
+
+    @JvmField
+    protected val defaultConfig: C = args.defaultConfig()
 
     protected fun isDestroyed(): Boolean = !args.serviceJob().isActive
 
@@ -57,7 +58,11 @@ internal constructor(
      * consumed, otherwise exceptions are raised and a probable crash
      * will ensue.
      * */
-    public abstract class Args internal constructor(private val _serviceJob: Job) {
+    public abstract class Args internal constructor(
+        private val _defaultConfig: Config,
+        private val _serviceJob: Job,
+        init: Any,
+    ) {
 
         @Volatile
         private var _isInitialized: Boolean = false
@@ -65,6 +70,9 @@ internal constructor(
         @OptIn(InternalKmpTorApi::class)
         private val lock = SynchronizedObject()
 
+        @JvmSynthetic
+        @Suppress("UNCHECKED_CAST")
+        internal fun <C: Config> defaultConfig(): C = _defaultConfig as C
         @JvmSynthetic
         internal fun serviceJob(): Job = _serviceJob
 
@@ -99,16 +107,24 @@ internal constructor(
             @OptIn(InternalKmpTorApi::class)
             return lock.hashCode()
         }
+
+        init {
+            check(init == INIT) { "TorServiceUI.Args cannot be extended" }
+        }
     }
 
     /**
      * Core abstraction for a [TorServiceUI] configuration.
      *
      * @throws [IllegalArgumentException] if [fields] is empty
+     * @throws [IllegalStateException] if init is not [INIT]
      * */
     public abstract class Config
     @Throws(IllegalArgumentException::class)
-    protected constructor(fields: Set<Field>) {
+    protected constructor(
+        fields: Set<Field>,
+        init: Any,
+    ) {
 
         protected class Field(
             @JvmField
@@ -155,6 +171,10 @@ internal constructor(
                 appendLine()
             }
             append(']')
+        }
+
+        init {
+            check(init == INIT) { "TorServiceUI.Config cannot be extended" }
         }
     }
 
@@ -228,6 +248,11 @@ internal constructor(
     }
 
     protected companion object {
+
+        // Synthetic access to inhibit extension of abstract
+        // classes externally. Only accessible within the
+        // TorServiceUI class, and within the `runtime-service`
+        // module.
         @JvmSynthetic
         internal val INIT = Any()
     }
