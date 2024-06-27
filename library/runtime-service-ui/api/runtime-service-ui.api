@@ -1,0 +1,21 @@
+public final class io/matthewnelson/kmp/tor/runtime/service/ui/KmpTorServiceUI : io/matthewnelson/kmp/tor/runtime/service/AndroidTorServiceUI {
+	public synthetic fun <init> (Lio/matthewnelson/kmp/tor/runtime/service/AndroidTorServiceUI$Args;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
+}
+
+public final class io/matthewnelson/kmp/tor/runtime/service/ui/KmpTorServiceUI$Config : io/matthewnelson/kmp/tor/runtime/service/AndroidTorServiceUI$Config {
+	public fun <init> ()V
+	public fun validate (Landroid/app/Application;)V
+}
+
+public final class io/matthewnelson/kmp/tor/runtime/service/ui/KmpTorServiceUI$Factory : io/matthewnelson/kmp/tor/runtime/service/AndroidTorServiceUI$Factory {
+	public fun <init> (Lio/matthewnelson/kmp/tor/runtime/service/ui/KmpTorServiceUI$Config;Lio/matthewnelson/kmp/tor/runtime/service/NotificationInfo;)V
+	public fun <init> (Lio/matthewnelson/kmp/tor/runtime/service/ui/KmpTorServiceUI$Config;Lio/matthewnelson/kmp/tor/runtime/service/NotificationInfo;Lio/matthewnelson/kmp/tor/runtime/core/ThisBlock;)V
+	public synthetic fun newInstanceProtected (Lio/matthewnelson/kmp/tor/runtime/service/TorServiceUI$Args;)Lio/matthewnelson/kmp/tor/runtime/service/TorServiceUI;
+}
+
+public final class io/matthewnelson/kmp/tor/runtime/service/ui/KmpTorServiceUI$Factory$Builder {
+	public final field defaultConfig Lio/matthewnelson/kmp/tor/runtime/service/ui/KmpTorServiceUI$Config;
+	public final field info Lio/matthewnelson/kmp/tor/runtime/service/NotificationInfo;
+	public synthetic fun <init> (Lio/matthewnelson/kmp/tor/runtime/service/ui/KmpTorServiceUI$Config;Lio/matthewnelson/kmp/tor/runtime/service/NotificationInfo;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
+}
+

@@ -17,11 +17,14 @@ package io.matthewnelson.kmp.tor.runtime.service
 
 
 import android.app.Application
+import android.app.ForegroundServiceStartNotAllowedException
 import android.app.Service
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.content.ServiceConnection
+import android.content.res.Resources
+import android.os.Build
 import android.os.Binder as AndroidBinder
 import android.os.IBinder
 import io.matthewnelson.immutable.collections.toImmutableSet
@@ -41,24 +44,71 @@ internal class TorService internal constructor(): Service() {
     private class AndroidServiceFactory(
         private val app: Application,
         config: TorServiceConfig,
+        instanceConfig: AndroidTorServiceUI.Config?,
         initializer: Initializer,
     ): TorRuntime.ServiceFactory(initializer) {
 
-        private val connection = Connection(binder, config)
+        private val connection = Connection(binder, config, instanceConfig)
 
         @Throws(RuntimeException::class)
         protected override fun startService() {
-            val i = Intent(app, TorService::class.java)
-            app.startService(i)
-            app.bindService(i, connection, Context.BIND_AUTO_CREATE)
+            val intent = Intent(app, TorService::class.java)
+
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+                // API 25-
+                app.startService(intent)
+                intent.bindService()
+                return
+            }
+
+            // API 26+
+            if (connection.config !is TorServiceConfig.Foreground<*, *>) {
+                app.startService(intent)
+                intent.bindService()
+                return
+            }
+
+            val threw: IllegalStateException? = try {
+                app.startForegroundService(intent)
+
+                // Will only run if startForegroundService does not throw
+                intent.bindService()
+                null
+            } catch (e: IllegalStateException) {
+                e
+            }
+
+            // Good start
+            if (threw == null) return
+
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S) {
+                // API 30-
+                throw threw
+            }
+
+            // API 31+
+            if (threw !is ForegroundServiceStartNotAllowedException) {
+                throw threw
+            }
+
+            // TODO: Bypass background startup restrictions for foreground service specified in
+            //  https://developer.android.com/develop/background-work/services/foreground-services#bg-access-restrictions
+            throw threw
+        }
+
+        @Suppress("NOTHING_TO_INLINE")
+        private inline fun Intent.bindService(): Boolean {
+            return app.bindService(this, connection, Context.BIND_AUTO_CREATE)
         }
     }
 
     internal companion object {
 
         @JvmSynthetic
+        @Throws(IllegalArgumentException::class, Resources.NotFoundException::class)
         internal fun Application.serviceFactoryLoader(
             config: TorServiceConfig,
+            instanceConfig: AndroidTorServiceUI.Config?,
         ): TorRuntime.ServiceFactory.Loader {
             val app = this
 
@@ -66,7 +116,7 @@ internal class TorService internal constructor(): Service() {
                 override fun loadProtected(
                     initializer: TorRuntime.ServiceFactory.Initializer,
                 ): TorRuntime.ServiceFactory {
-                    return AndroidServiceFactory(app, config, initializer)
+                    return AndroidServiceFactory(app, config, instanceConfig, initializer)
                 }
             }
         }
@@ -84,6 +134,9 @@ internal class TorService internal constructor(): Service() {
     }
 
     private fun isDestroyed(): Boolean = !supervisor.isActive
+
+    @Volatile
+    private var ui: AndroidTorServiceUI<*>? = null
 
     private val binder = object : Binder() {
         override fun inject(conn: Connection) {
@@ -118,15 +171,29 @@ internal class TorService internal constructor(): Service() {
                     return@withLock executables
                 }
 
-                // This is the first bind for this TorService instance
+                // First bind for this TorService instance
                 if (size == 0) {
-                    executables.add(Executable {
-                        conn.binder.lce(Lifecycle.Event.OnCreate(service))
-                        conn.binder.lce(Lifecycle.Event.OnStart(service))
-                    })
+                    // config is a singleton and is the same for all AndroidServiceFactory.
+                    // If this is the first bind for TorService, need to instantiate and
+                    // set the new instance before the Holder gets created.
+                    if (conn.config is TorServiceConfig.Foreground<*, *>) {
+                        val args = AndroidTorServiceUI.Args.of(
+                            conn.config.factory.defaultConfig,
+                            conn.config.factory.info,
+                            service,
+                            service.supervisor,
+                        )
 
-                    // TODO: setup notification config
-                    //  if present
+                        ui = conn.config.factory.newInstance(args)
+                    }
+
+                    executables.add(Executable {
+                        with(conn.binder) {
+                            lce(Lifecycle.Event.OnCreate(service))
+                            service.ui?.let { ui -> lce(Lifecycle.Event.OnCreate(ui)) }
+                            lce(Lifecycle.Event.OnStart(service))
+                        }
+                    })
                 }
 
                 val holder = Holder(conn)
@@ -152,7 +219,10 @@ internal class TorService internal constructor(): Service() {
         public val binder: TorBinder,
         @JvmField
         public val config: TorServiceConfig,
+        @JvmField
+        public val instanceConfig: AndroidTorServiceUI.Config?,
     ): ServiceConnection {
+
         public override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
             if (service !is Binder) return
             service.inject(this)
@@ -183,7 +253,7 @@ internal class TorService internal constructor(): Service() {
             holder
         }.forEach { holder ->
             if (holder == null) return@forEach
-            if (!holder.config.stopServiceOnTaskRemoved) return@forEach
+            if (!holder.stopServiceOnTaskRemoved) return@forEach
             holder.runtime.destroy()
         }
     }
@@ -197,17 +267,22 @@ internal class TorService internal constructor(): Service() {
             binder
         }.forEach { binder ->
             // Notify all instances that we're finally destroyed
+            ui?.let { ui -> binder.lce(Lifecycle.Event.OnDestroy(ui)) }
             binder.lce(Lifecycle.Event.OnDestroy(this))
         }
 
         // Clean up
         holders.withLock { clear() }
+        ui = null
     }
 
     private inner class Holder(private val conn: Connection) {
 
-        val config: TorServiceConfig get() = conn.config
+        val stopServiceOnTaskRemoved: Boolean get() = conn.config.stopServiceOnTaskRemoved
         private val binder get() = conn.binder
+
+        // TODO: Create new notification instance to get bind
+        //  arguments
 
         // Want to lazily instantiate so that the holders map
         // entry can be created before we start calling things.

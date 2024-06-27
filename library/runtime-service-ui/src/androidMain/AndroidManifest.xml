@@ -52,7 +52,6 @@
             android:exported="false"
             android:foregroundServiceType="specialUse"
             tools:node="merge">
-
             <property
                 android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"
                 android:value="Your explanation\n

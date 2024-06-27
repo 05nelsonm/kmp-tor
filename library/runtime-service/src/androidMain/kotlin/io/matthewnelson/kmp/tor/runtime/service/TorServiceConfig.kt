@@ -13,12 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-@file:Suppress("FunctionName")
+@file:Suppress("FunctionName", "UnnecessaryOptInAnnotation")
 
 package io.matthewnelson.kmp.tor.runtime.service
 
 import android.app.Application
+import android.app.NotificationChannel
+import android.app.NotificationManager
 import android.content.Context
+import android.content.res.Resources
+import android.os.Build
 import androidx.startup.AppInitializer
 import io.matthewnelson.kmp.file.File
 import io.matthewnelson.kmp.file.SysTempDir
@@ -35,20 +39,21 @@ import io.matthewnelson.kmp.tor.runtime.TorRuntime
 import io.matthewnelson.kmp.tor.runtime.core.ThisBlock
 import io.matthewnelson.kmp.tor.runtime.core.apply
 import io.matthewnelson.kmp.tor.runtime.service.TorService.Companion.serviceFactoryLoader
+import io.matthewnelson.kmp.tor.runtime.service.TorServiceUI.Factory.Companion.unsafeCastAsType
 import kotlin.concurrent.Volatile
 
 /**
  * Configuration info for producing [TorRuntime.ServiceFactory] to
  * run tor within an [android.app.Service].
  *
- * **NOTE:** Only one [TorServiceConfig] will be created. Successive
- * invocations of [Companion.Builder] will return the singleton
- * instance.
+ * **NOTE:** Only one [TorServiceConfig] instance can be instantiated.
+ * Successive invocations of [Companion.Builder] or [Foreground.Builder]
+ * will return the already created singleton instance.
  *
- * e.g.
+ * e.g. (A Background Service)
  *
  *     val config = TorServiceConfig.Builder {
- *         // configure ...
+ *         // configure...
  *     }
  *
  *     val environment = config.newEnvironment { installationDirectory ->
@@ -62,10 +67,10 @@ import kotlin.concurrent.Volatile
  *     }
  *
  * @see [Companion.Builder]
- * @see [Companion.instanceOrNull]
+ * @see [Foreground.Builder]
  * @see [newEnvironment]
  * */
-public class TorServiceConfig private constructor(
+public open class TorServiceConfig private constructor(
 
     /**
      * See [Builder.stopServiceOnTaskRemoved]
@@ -87,15 +92,15 @@ public class TorServiceConfig private constructor(
      * **NOTE:** [TorRuntime.Environment.Builder.serviceFactoryLoader] is set
      * automatically and tor will run inside an [android.app.Service].
      *
-     * Directories (emulator & device):
+     * Directories (emulators & devices):
      *  - workDirectory: app_torservice
      *  - cacheDirectory: cache/torservice
      *
-     * Directories (android unit test where [testUseBuildDirectory] = `false`):
+     * Directories (android unit tests where [testUseBuildDirectory] = `false`):
      *  - workDirectory: {system temp}/kmp_tor_android_test/torservice/work
      *  - cacheDirectory: {system temp}/kmp_tor_android_test/torservice/cache
      *
-     * Directories (android unit test where [testUseBuildDirectory] = `true`):
+     * Directories (android unit tests where [testUseBuildDirectory] = `true`):
      *  - workDirectory: {module}/build/kmp_tor_android_test/torservice/work
      *  - cacheDirectory: {module}/build/kmp_tor_android_test/torservice/cache
      * */
@@ -110,15 +115,15 @@ public class TorServiceConfig private constructor(
      * **NOTE:** [TorRuntime.Environment.Builder.serviceFactoryLoader] is set
      * automatically and tor will run inside an [android.app.Service].
      *
-     * Directories (emulator & device):
+     * Directories (emulators & devices):
      *  - workDirectory: app_torservice
      *  - cacheDirectory: cache/torservice
      *
-     * Directories (android unit test where [testUseBuildDirectory] = `false`):
+     * Directories (android unit tests where [testUseBuildDirectory] = `false`):
      *  - workDirectory: {system temp}/kmp_tor_android_test/torservice/work
      *  - cacheDirectory: {system temp}/kmp_tor_android_test/torservice/cache
      *
-     * Directories (android unit test where [testUseBuildDirectory] = `true`):
+     * Directories (android unit tests where [testUseBuildDirectory] = `true`):
      *  - workDirectory: {module}/build/kmp_tor_android_test/torservice/work
      *  - cacheDirectory: {module}/build/kmp_tor_android_test/torservice/cache
      * */
@@ -134,15 +139,15 @@ public class TorServiceConfig private constructor(
      * **NOTE:** [TorRuntime.Environment.Builder.serviceFactoryLoader] is set
      * automatically and tor will run inside an [android.app.Service].
      *
-     * Directories (emulator & device):
+     * Directories (emulators & devices):
      *  - workDirectory: app_[dirName]
      *  - cacheDirectory: cache/[dirName]
      *
-     * Directories (android unit test where [testUseBuildDirectory] = `false`):
+     * Directories (android unit tests where [testUseBuildDirectory] = `false`):
      *  - workDirectory: {system temp}/kmp_tor_android_test/[dirName]/work
      *  - cacheDirectory: {system temp}/kmp_tor_android_test/[dirName]/cache
      *
-     * Directories (android unit test where [testUseBuildDirectory] = `true`):
+     * Directories (android unit tests where [testUseBuildDirectory] = `true`):
      *  - workDirectory: {module}/build/kmp_tor_android_test/[dirName]/work
      *  - cacheDirectory: {module}/build/kmp_tor_android_test/[dirName]/cache
      * */
@@ -158,15 +163,15 @@ public class TorServiceConfig private constructor(
      * **NOTE:** [TorRuntime.Environment.Builder.serviceFactoryLoader] is set
      * automatically and tor will run inside an [android.app.Service].
      *
-     * Directories (emulator & device):
+     * Directories (emulators & devices):
      *  - workDirectory: app_[dirName]
      *  - cacheDirectory: cache/[dirName]
      *
-     * Directories (android unit test where [testUseBuildDirectory] = `false`):
+     * Directories (android unit tests where [testUseBuildDirectory] = `false`):
      *  - workDirectory: {system temp}/kmp_tor_android_test/[dirName]/work
      *  - cacheDirectory: {system temp}/kmp_tor_android_test/[dirName]/cache
      *
-     * Directories (android unit test where [testUseBuildDirectory] = `true`):
+     * Directories (android unit tests where [testUseBuildDirectory] = `true`):
      *  - workDirectory: {module}/build/kmp_tor_android_test/[dirName]/work
      *  - cacheDirectory: {module}/build/kmp_tor_android_test/[dirName]/cache
      * */
@@ -175,46 +180,10 @@ public class TorServiceConfig private constructor(
         installer: (installationDirectory: File) -> ResourceInstaller<Paths.Tor>,
         block: ThisBlock<TorRuntime.Environment.Builder>,
     ): TorRuntime.Environment {
-        val app = app
-
-        @Suppress("LocalVariableName")
-        val _dirName = dirName.ifBlank { DEFAULT_DIRNAME }
-
-        if (app == null) {
-            // Verify not Android runtime.
-            @OptIn(InternalKmpTorApi::class)
-            check(!OSInfo.INSTANCE.isAndroidRuntime()) {
-                // Initializer error
-                Initializer.errorMsg()
-            }
-
-            // Android unit tests
-            val testDir = if (testUseBuildDirectory) {
-                "".toFile().absoluteFile.resolve("build")
-            } else {
-                SysTempDir
-            }.resolve("kmp_tor_android_test").resolve(_dirName)
-
-            return TorRuntime.Environment.Builder(
-                workDirectory = testDir.resolve("work"),
-                cacheDirectory = testDir.resolve("cache"),
-                installer = installer,
-                block = block,
-            )
-        }
-
-        // Emulator or device
-        return TorRuntime.Environment.Builder(
-            workDirectory = app.getDir(_dirName, Context.MODE_PRIVATE),
-            cacheDirectory = app.cacheDir.resolve(_dirName),
-            installer = installer,
-            block = {
-                apply(block)
-
-                @OptIn(ExperimentalKmpTorApi::class)
-                serviceFactoryLoader = app.serviceFactoryLoader(this@TorServiceConfig)
-            },
-        )
+        @OptIn(ExperimentalKmpTorApi::class)
+        return Loader { app ->
+            app.serviceFactoryLoader(this, instanceConfig = null)
+        }.newEnvironment(dirName, installer, block)
     }
 
     public companion object {
@@ -226,23 +195,22 @@ public class TorServiceConfig private constructor(
         @Volatile
         private var _instance: TorServiceConfig? = null
 
-        @JvmStatic
-        internal fun instanceOrNull(): TorServiceConfig? = _instance
-
+        /**
+         * Opener for creating a [TorServiceConfig] which will run all instances
+         * of [TorRuntime] that have been created via [newEnvironment] inside of
+         * [TorService] operating as a Background Service.
+         *
+         * @see [Foreground.Builder]
+         * */
         @JvmStatic
         public fun Builder(
             block: ThisBlock<Builder>,
         ): TorServiceConfig {
             val b = Builder.get().apply(block)
 
-            @OptIn(ExperimentalKmpTorApi::class)
-            return _instance ?: synchronized(this) {
-                _instance ?: run {
-                    TorServiceConfig(
-                        stopServiceOnTaskRemoved = b.stopServiceOnTaskRemoved,
-                        testUseBuildDirectory = b.testUseBuildDirectory,
-                    ).also { _instance = it }
-                }
+            return _instance ?: synchronized(Builder.Companion) {
+                _instance ?: TorServiceConfig(b)
+                    .also { _instance = it }
             }
         }
     }
@@ -296,6 +264,311 @@ public class TorServiceConfig private constructor(
         }
     }
 
+    /**
+     * An instance of [TorServiceConfig] which indicates to [TorService] that
+     * it should start itself as a Foreground Service.
+     *
+     * This instance provides additional [newEnvironment] functions which enable
+     * the passing of per-environment based configurations for the declared
+     * [factory]. They are entirely optional and the regular [newEnvironment]
+     * functions provided by [TorServiceConfig] will simply default to what
+     * was declared for your [AndroidTorServiceUI.Factory.defaultConfig].
+     *
+     * TODO: AndroidManifest requirements
+     * TODO: README.md
+     *
+     * e.g. (A Foreground Service using the `kmp-tor:runtime-service-ui` dependency)
+     *
+     *     val factory = KmpTorServiceUI.Factory(
+     *         defaultConfig = KmpTorServiceUI.Config(
+     *             // ...
+     *         ),
+     *         info = NotificationInfo.of(
+     *             // ...
+     *         ),
+     *         block = {
+     *             // configure...
+     *         },
+     *     )
+     *
+     *     val config = TorServiceConfig.Foreground.Builder(factory) {
+     *         // configure...
+     *     }
+     *
+     *     val environment = config.newEnvironment { installationDirectory ->
+     *         // Assuming use of `kmp-tor:resource-tor` or
+     *         // `kmp-tor:resource-tor-gpl` dependency
+     *         TorResources(installationDirectory)
+     *     }
+     *
+     *     val runtime = TorRuntime.Builder(environment) {
+     *         // configure...
+     *     }
+     *
+     * @see [Foreground.Builder]
+     * */
+    public class Foreground <C: AndroidTorServiceUI.Config, F: AndroidTorServiceUI.Factory<C, *>> private constructor(
+        @JvmField
+        public val factory: F,
+        b: Builder,
+    ): TorServiceConfig(b) {
+
+        /**
+         * Android implementation which creates the [TorRuntime.Environment] using
+         * the provided [TorServiceConfig].
+         *
+         * **NOTE:** [TorRuntime.Environment.Builder.serviceFactoryLoader] is set
+         * automatically and tor will run inside an [android.app.Service].
+         *
+         * Directories (emulators & devices):
+         *  - workDirectory: app_torservice
+         *  - cacheDirectory: cache/torservice
+         *
+         * Directories (android unit tests where [testUseBuildDirectory] = `false`):
+         *  - workDirectory: {system temp}/kmp_tor_android_test/torservice/work
+         *  - cacheDirectory: {system temp}/kmp_tor_android_test/torservice/cache
+         *
+         * Directories (android unit tests where [testUseBuildDirectory] = `true`):
+         *  - workDirectory: {module}/build/kmp_tor_android_test/torservice/work
+         *  - cacheDirectory: {module}/build/kmp_tor_android_test/torservice/cache
+         *
+         * @throws [Resources.NotFoundException] If [instanceConfig] fails validation
+         *   checks (emulators & devices only).
+         * @throws [IllegalArgumentException] if [instanceConfig] is not the same
+         *   class type as the provided [AndroidTorServiceUI.Factory.defaultConfig].
+         * */
+        public fun newEnvironment(
+            instanceConfig: C,
+            installer: (installationDirectory: File) -> ResourceInstaller<Paths.Tor>,
+        ): TorRuntime.Environment = newEnvironment(
+            instanceConfig = instanceConfig,
+            installer = installer,
+            block = {},
+        )
+
+        /**
+         * Android implementation which creates the [TorRuntime.Environment] using
+         * the provided [TorServiceConfig].
+         *
+         * **NOTE:** [TorRuntime.Environment.Builder.serviceFactoryLoader] is set
+         * automatically and tor will run inside an [android.app.Service].
+         *
+         * Directories (emulators & devices):
+         *  - workDirectory: app_torservice
+         *  - cacheDirectory: cache/torservice
+         *
+         * Directories (android unit tests where [testUseBuildDirectory] = `false`):
+         *  - workDirectory: {system temp}/kmp_tor_android_test/torservice/work
+         *  - cacheDirectory: {system temp}/kmp_tor_android_test/torservice/cache
+         *
+         * Directories (android unit tests where [testUseBuildDirectory] = `true`):
+         *  - workDirectory: {module}/build/kmp_tor_android_test/torservice/work
+         *  - cacheDirectory: {module}/build/kmp_tor_android_test/torservice/cache
+         *
+         * @throws [Resources.NotFoundException] If [instanceConfig] fails validation
+         *   checks (emulators & devices only).
+         * @throws [IllegalArgumentException] if [instanceConfig] is not the same
+         *   class type as the provided [AndroidTorServiceUI.Factory.defaultConfig].
+         * */
+        public fun newEnvironment(
+            instanceConfig: C,
+            installer: (installationDirectory: File) -> ResourceInstaller<Paths.Tor>,
+            block: ThisBlock<TorRuntime.Environment.Builder>,
+        ): TorRuntime.Environment = newEnvironment(
+            dirName = DEFAULT_DIRNAME,
+            instanceConfig = instanceConfig,
+            installer = installer,
+            block = block,
+        )
+
+        /**
+         * Android implementation which creates the [TorRuntime.Environment] using
+         * the provided [TorServiceConfig].
+         *
+         * **NOTE:** [TorRuntime.Environment.Builder.serviceFactoryLoader] is set
+         * automatically and tor will run inside an [android.app.Service].
+         *
+         * Directories (emulators & devices):
+         *  - workDirectory: app_[dirName]
+         *  - cacheDirectory: cache/[dirName]
+         *
+         * Directories (android unit tests where [testUseBuildDirectory] = `false`):
+         *  - workDirectory: {system temp}/kmp_tor_android_test/[dirName]/work
+         *  - cacheDirectory: {system temp}/kmp_tor_android_test/[dirName]/cache
+         *
+         * Directories (android unit tests where [testUseBuildDirectory] = `true`):
+         *  - workDirectory: {module}/build/kmp_tor_android_test/[dirName]/work
+         *  - cacheDirectory: {module}/build/kmp_tor_android_test/[dirName]/cache
+         *
+         * @throws [Resources.NotFoundException] If [instanceConfig] fails validation
+         *   checks (emulators & devices only).
+         * @throws [IllegalArgumentException] if [instanceConfig] is not the same
+         *   class type as the provided [AndroidTorServiceUI.Factory.defaultConfig].
+         * */
+        public fun newEnvironment(
+            dirName: String,
+            instanceConfig: C,
+            installer: (installationDirectory: File) -> ResourceInstaller<Paths.Tor>,
+        ): TorRuntime.Environment = newEnvironment(
+            dirName = dirName,
+            instanceConfig = instanceConfig,
+            installer = installer,
+            block = {},
+        )
+
+        /**
+         * Android implementation which creates the [TorRuntime.Environment] using
+         * the provided [TorServiceConfig].
+         *
+         * **NOTE:** [TorRuntime.Environment.Builder.serviceFactoryLoader] is set
+         * automatically and tor will run inside an [android.app.Service].
+         *
+         * Directories (emulators & devices):
+         *  - workDirectory: app_[dirName]
+         *  - cacheDirectory: cache/[dirName]
+         *
+         * Directories (android unit tests where [testUseBuildDirectory] = `false`):
+         *  - workDirectory: {system temp}/kmp_tor_android_test/[dirName]/work
+         *  - cacheDirectory: {system temp}/kmp_tor_android_test/[dirName]/cache
+         *
+         * Directories (android unit tests where [testUseBuildDirectory] = `true`):
+         *  - workDirectory: {module}/build/kmp_tor_android_test/[dirName]/work
+         *  - cacheDirectory: {module}/build/kmp_tor_android_test/[dirName]/cache
+         *
+         * @throws [Resources.NotFoundException] If [instanceConfig] fails validation
+         *   checks (emulators & devices only).
+         * @throws [IllegalArgumentException] if [instanceConfig] is not the same
+         *   class type as the provided [AndroidTorServiceUI.Factory.defaultConfig].
+         * */
+        public fun newEnvironment(
+            dirName: String,
+            instanceConfig: C,
+            installer: (installationDirectory: File) -> ResourceInstaller<Paths.Tor>,
+            block: ThisBlock<TorRuntime.Environment.Builder>,
+        ): TorRuntime.Environment {
+            @OptIn(ExperimentalKmpTorApi::class)
+            return Loader { app ->
+                instanceConfig.validate(app)
+                instanceConfig.unsafeCastAsType(other = factory.defaultConfig)
+                app.serviceFactoryLoader(this, instanceConfig = instanceConfig)
+            }.newEnvironment(dirName, installer, block)
+        }
+
+        public companion object {
+
+            /**
+             * Opener for creating a [TorServiceConfig.Foreground] which will run all
+             * instances of [TorRuntime] that have been created via [newEnvironment]
+             * inside of [TorService] operating as a Foreground Service.
+             *
+             * **NOTE:** An [android.app.NotificationChannel] for API 26+ is set up
+             * using the provided [AndroidTorServiceUI.Factory.info] (emulators &
+             * devices only).
+             *
+             * @throws [ClassCastException] If an instance of [TorServiceConfig] has
+             *   already been instantiated and is unable to be returned because it is
+             *   not an instance of [Foreground].
+             * @throws [Resources.NotFoundException] If [factory] fails validation
+             *   checks (emulators & devices only).
+             * @see [TorServiceConfig.Companion.Builder]
+             * @see [io.matthewnelson.kmp.tor.runtime.service.ui.KmpTorServiceUI]
+             * */
+            @JvmStatic
+            @Throws(ClassCastException::class, Resources.NotFoundException::class)
+            public fun <
+                C: AndroidTorServiceUI.Config,
+                UI: AndroidTorServiceUI<C>,
+                F: AndroidTorServiceUI.Factory<C, UI>
+            > Builder(
+                factory: F,
+                block: ThisBlock<Builder>,
+            ): Foreground<C, F> {
+                val b = Builder.get().apply(block)
+
+                return _instance?.unsafeCast() ?: synchronized(Builder.Companion) {
+                    _instance?.unsafeCast() ?: run {
+                        val app = app
+
+                        if (app != null) {
+                            factory.defaultConfig.validate(app)
+
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                                val info = factory.info
+                                val channel = NotificationChannel(
+                                    info.channelID,
+                                    info.channelName,
+                                    NotificationManager.IMPORTANCE_DEFAULT,
+                                ).apply {
+                                    setShowBadge(info.channelShowBadge)
+                                    description = info.channelDescription
+                                    setSound(null, null)
+                                }
+
+                                (app.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager)
+                                    .createNotificationChannel(channel)
+                            }
+                        }
+
+                        Foreground(factory, b)
+                            .also { _instance = it }
+                    }
+                }
+            }
+        }
+    }
+
+    @OptIn(ExperimentalKmpTorApi::class)
+    protected fun interface Loader {
+        public fun newInstance(app: Application): TorRuntime.ServiceFactory.Loader
+    }
+
+    protected fun Loader.newEnvironment(
+        dirName: String,
+        installer: (installationDirectory: File) -> ResourceInstaller<Paths.Tor>,
+        block: ThisBlock<TorRuntime.Environment.Builder>,
+    ): TorRuntime.Environment {
+        val app = app
+
+        @Suppress("LocalVariableName")
+        val _dirName = dirName.ifBlank { DEFAULT_DIRNAME }
+
+        if (app == null) {
+            // Verify not Android runtime.
+            @OptIn(InternalKmpTorApi::class)
+            check(!OSInfo.INSTANCE.isAndroidRuntime()) {
+                // Initializer error
+                Initializer.errorMsg()
+            }
+
+            // Android unit tests
+            val testDir = if (testUseBuildDirectory) {
+                "".toFile().absoluteFile.resolve("build")
+            } else {
+                SysTempDir
+            }.resolve("kmp_tor_android_test").resolve(_dirName)
+
+            return TorRuntime.Environment.Builder(
+                workDirectory = testDir.resolve("work"),
+                cacheDirectory = testDir.resolve("cache"),
+                installer = installer,
+                block = block,
+            )
+        }
+
+        // Emulator or device
+        return TorRuntime.Environment.Builder(
+            workDirectory = app.getDir(_dirName, Context.MODE_PRIVATE),
+            cacheDirectory = app.cacheDir.resolve(_dirName),
+            installer = installer,
+            block = {
+                apply(block)
+
+                @OptIn(ExperimentalKmpTorApi::class)
+                serviceFactoryLoader = this@newEnvironment.newInstance(app)
+            },
+        )
+    }
+
     internal class Initializer internal constructor(): androidx.startup.Initializer<Initializer.Companion> {
 
         public override fun create(context: Context): Companion {
@@ -336,4 +609,35 @@ public class TorServiceConfig private constructor(
             }
         }
     }
+
+    @OptIn(ExperimentalKmpTorApi::class)
+    private constructor(b: Builder): this(
+        stopServiceOnTaskRemoved = b.stopServiceOnTaskRemoved,
+        testUseBuildDirectory = b.testUseBuildDirectory,
+    )
+
+    protected object LOCK {
+
+    }
+}
+
+@Suppress("NOTHING_TO_INLINE")
+@Throws(ClassCastException::class)
+private inline fun <
+    C: AndroidTorServiceUI.Config,
+    UI: AndroidTorServiceUI<C>,
+    F: AndroidTorServiceUI.Factory<C, UI>
+> TorServiceConfig.unsafeCast(): TorServiceConfig.Foreground<C, F> {
+    if (this !is TorServiceConfig.Foreground<*, *>) {
+        val msg = """
+            Unable to return TorServiceConfig.Foreground. An instance was already
+            configured without declaring a AndroidTorServiceUI.Factory and is not
+            able to be cast.
+        """.trimIndent()
+
+        throw ClassCastException(msg)
+    }
+
+    @Suppress("UNCHECKED_CAST")
+    return this as TorServiceConfig.Foreground<C, F>
 }
