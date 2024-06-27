@@ -42,9 +42,9 @@ public class KmpTorServiceUI private constructor(
      * */
     public class Config(
         // TODO
-    ): AndroidTorServiceUI.Config(setOf(
+    ): AndroidTorServiceUI.Config(mapOf(
         // TODO
-        Field("TODO", "TODO")
+        "TODO" to "TODO"
     )) {
 
         @Throws(Resources.NotFoundException::class)

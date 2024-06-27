@@ -14,7 +14,7 @@ public final class io/matthewnelson/kmp/tor/runtime/service/AndroidTorServiceUI$
 }
 
 public abstract class io/matthewnelson/kmp/tor/runtime/service/AndroidTorServiceUI$Config : io/matthewnelson/kmp/tor/runtime/service/TorServiceUI$Config {
-	protected fun <init> (Ljava/util/Set;)V
+	protected fun <init> (Ljava/util/Map;)V
 	public abstract fun validate (Landroid/app/Application;)V
 }
 
@@ -99,18 +99,9 @@ protected final class io/matthewnelson/kmp/tor/runtime/service/TorServiceUI$Comp
 }
 
 public abstract class io/matthewnelson/kmp/tor/runtime/service/TorServiceUI$Config {
-	protected fun <init> (Ljava/util/Set;Ljava/lang/Object;)V
 	public final fun equals (Ljava/lang/Object;)Z
 	public final fun hashCode ()I
 	public final fun toString ()Ljava/lang/String;
-}
-
-protected final class io/matthewnelson/kmp/tor/runtime/service/TorServiceUI$Config$Field {
-	public final field name Ljava/lang/String;
-	public final field value Ljava/lang/Object;
-	public fun <init> (Ljava/lang/String;Ljava/lang/Object;)V
-	public fun equals (Ljava/lang/Object;)Z
-	public fun hashCode ()I
 }
 
 public abstract class io/matthewnelson/kmp/tor/runtime/service/TorServiceUI$Factory {

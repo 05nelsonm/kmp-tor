@@ -212,11 +212,16 @@ protected constructor(
         }
     }
 
+    /**
+     * Abstraction for an android Config
+     *
+     * @throws [IllegalArgumentException] if [fields] is empty
+     * */
     public abstract class Config
     @ExperimentalKmpTorApi
     @Throws(IllegalArgumentException::class)
     protected constructor(
-        fields: Set<Field>
+        fields: Map<String, Any>
     ): TorServiceUI.Config(
         fields,
         INIT,

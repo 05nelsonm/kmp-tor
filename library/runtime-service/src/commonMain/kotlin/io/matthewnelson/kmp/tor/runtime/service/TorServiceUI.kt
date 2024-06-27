@@ -15,6 +15,7 @@
  **/
 package io.matthewnelson.kmp.tor.runtime.service
 
+import io.matthewnelson.immutable.collections.toImmutableMap
 import io.matthewnelson.immutable.collections.toImmutableSet
 import io.matthewnelson.kmp.tor.core.api.annotation.ExperimentalKmpTorApi
 import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
@@ -117,26 +118,13 @@ internal constructor(
      * Core abstraction for a [TorServiceUI] configuration.
      *
      * @throws [IllegalArgumentException] if [fields] is empty
-     * @throws [IllegalStateException] if init is not [INIT]
      * */
-    public abstract class Config
-    @Throws(IllegalArgumentException::class)
-    protected constructor(
-        fields: Set<Field>,
+    public abstract class Config internal constructor(
+        fields: Map<String, Any>,
         init: Any,
     ) {
 
-        protected class Field(
-            @JvmField
-            public val name: String,
-            @JvmField
-            public val value: Any,
-        ) {
-            override fun equals(other: Any?): Boolean = other is Field && other.name == name
-            override fun hashCode(): Int = 11 * 42 + name.hashCode()
-        }
-
-        private val fields = fields.toImmutableSet()
+        private val fields = fields.toImmutableMap()
 
         init {
             require(this.fields.isNotEmpty()) { "fields cannot be empty" }
@@ -145,31 +133,28 @@ internal constructor(
         public final override fun equals(other: Any?): Boolean {
             if (other !is Config) return false
             if (other::class != this::class) return false
-            // Compare strings b/c fields only use name when comparing
-            return other.toString() == toString()
+            return other.fields == fields
         }
 
         public final override fun hashCode(): Int {
             var result = 17
             result = result * 42 + this::class.hashCode()
-            result = result * 42 + toString().hashCode()
+            result = result * 42 + fields.hashCode()
             return result
         }
 
         public final override fun toString(): String = buildString {
             append("TorServiceUI.Config: [")
 
-            fields.forEach { field ->
+            fields.entries.forEach { (name, value) ->
                 appendLine()
                 append("    ")
-                append(field.name)
+                append(name)
                 append(": ")
-                append(field.value)
+                append(value)
             }
 
-            if (fields.isNotEmpty()) {
-                appendLine()
-            }
+            appendLine()
             append(']')
         }
 
