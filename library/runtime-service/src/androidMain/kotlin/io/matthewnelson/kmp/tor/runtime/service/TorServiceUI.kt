@@ -15,7 +15,6 @@
  **/
 package io.matthewnelson.kmp.tor.runtime.service
 
-import android.app.Application
 import android.app.Notification
 import android.app.NotificationManager
 import android.app.Service
@@ -31,26 +30,28 @@ import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
 import io.matthewnelson.kmp.tor.core.resource.synchronized
 import io.matthewnelson.kmp.tor.core.resource.SynchronizedObject
 import io.matthewnelson.kmp.tor.runtime.TorRuntime
+import io.matthewnelson.kmp.tor.runtime.service.AbstractTorServiceUI.Args
+import io.matthewnelson.kmp.tor.runtime.service.AbstractTorServiceUI.Factory
 import io.matthewnelson.kmp.tor.runtime.service.internal.register
-import kotlinx.coroutines.Job
+import kotlinx.coroutines.CoroutineScope
 
 /**
- * Core abstraction for Android which enables implementors the ability
- * to create a fully customized notification for the running instances of
+ * Core `androidMain` abstraction which enables implementors the ability to
+ * create a fully customized notifications for the running instances of
  * [TorRuntime] as they operate within [TorService].
  *
  * Alternatively, use the default implementation `kmp-tor:runtime-service-ui`
  * dependency, [io.matthewnelson.kmp.tor.runtime.service.ui.KmpTorServiceUI].
  *
- * @see [TorServiceConfig.Foreground]
+ * @throws [IllegalStateException] on instantiation if [args] were not those
+ *   which were passed to [Factory.newInstance]. See [Args].
  * */
-@OptIn(ExperimentalKmpTorApi::class)
-public abstract class AndroidTorServiceUI<C: AndroidTorServiceUI.Config>
+public abstract class TorServiceUI<C: TorServiceUI.Config>
 @ExperimentalKmpTorApi
 @Throws(IllegalStateException::class)
 protected constructor(
     args: Args,
-): TorServiceUI<AndroidTorServiceUI.Args, C>(
+): AbstractTorServiceUI<TorServiceUI.Args, C>(
     args,
     INIT,
 ) {
@@ -179,14 +180,22 @@ protected constructor(
         }
     }
 
+    /**
+     * `androidMain` implementation for passing arguments in an encapsulated
+     * manner when instantiating new instances of [TorServiceUI] implementations.
+     *
+     * [Args] are single use items and must be consumed only once, otherwise
+     * an exception is raised when [Factory.newInstance] is called resulting
+     * a service start failure.
+     * */
     public class Args private constructor(
         defaultConfig: Config,
         private val _info: NotificationInfo,
         private val _service: Context,
-        serviceJob: Job,
-    ): TorServiceUI.Args(
+        serviceScope: CoroutineScope,
+    ): AbstractTorServiceUI.Args(
         defaultConfig,
-        serviceJob,
+        serviceScope,
         INIT,
     ) {
 
@@ -202,18 +211,22 @@ protected constructor(
                 defaultConfig: Config,
                 info: NotificationInfo,
                 service: Context,
-                serviceJob: Job,
+                serviceScope: CoroutineScope,
             ): Args = Args(
                 defaultConfig,
                 info,
                 service,
-                serviceJob,
+                serviceScope,
             )
         }
     }
 
     /**
-     * Abstraction for an android Config
+     * Core `androidMain` abstraction for holding UI customization input from
+     * consumers of `kmp-tor-service`.
+     *
+     * As an example implementation, see
+     * [io.matthewnelson.kmp.tor.runtime.service.ui.KmpTorServiceUI.Config]
      *
      * @throws [IllegalArgumentException] if [fields] is empty
      * */
@@ -221,40 +234,79 @@ protected constructor(
     @ExperimentalKmpTorApi
     @Throws(IllegalArgumentException::class)
     protected constructor(
-        fields: Map<String, Any>
-    ): TorServiceUI.Config(
+        fields: Map<String, Any>,
+    ): AbstractTorServiceUI.Config(
         fields,
         INIT,
     ) {
 
         /**
-         * Implementations **MUST** ensure all resources specified
-         * are valid for their given implementation. This is simply
-         * a runtime check that is performed from [TorServiceConfig]
-         * before instantiating new [TorRuntime.Environment] and
-         * [TorServiceConfig.Foreground] instances to ensure errors
-         * are caught and handled immediately.
+         * Implementations **MUST** ensure all resources specified in their
+         * given [Config] implementations are valid. This is called from
+         * [TorServiceConfig.Foreground.Builder], as well as
+         * [TorServiceConfig.Foreground.newEnvironment], in order to raise
+         * errors before instantiating the singleton instances.
          * */
         @Throws(Resources.NotFoundException::class)
-        public abstract fun validate(app: Application)
+        public abstract fun validate(context: Context)
     }
 
     /**
-     * Core abstraction for Android which enables [TorService] the
-     * ability to create new instances of [UI].
+     * Holder for customized input from consumers of `kmp-tor-service`
+     * for the Foreground Service's [Notification].
      * */
-    public abstract class Factory<C: Config, UI: AndroidTorServiceUI<C>>
+    public class NotificationInfo private constructor(
+        @JvmField
+        public val channelID: String,
+        @JvmField
+        public val channelName: String,
+        @JvmField
+        public val channelDescription: String,
+        @JvmField
+        public val channelShowBadge: Boolean,
+        @JvmField
+        public val notificationID: Int,
+    ) {
+
+        public companion object {
+
+            @JvmStatic
+            public fun of(
+                channelID: String,
+                channelName: String,
+                channelDescription: String,
+                channelShowBadge: Boolean,
+                notificationID: Int,
+            ): NotificationInfo {
+                // TODO: Validate
+
+                return NotificationInfo(
+                    channelID,
+                    channelName,
+                    channelDescription,
+                    channelShowBadge,
+                    notificationID,
+                )
+            }
+        }
+    }
+
+    /**
+     * Core `androidMain` abstraction for a [Factory] class which is
+     * responsible for instantiating new instances of [TorServiceUI]
+     * when requested by [TorService].
+     *
+     * Implementations are encouraged to keep it as a subclass within,
+     * and use a `private constructor` for, their [UI] implementations.
+     *
+     * As an example implementation, see
+     * [io.matthewnelson.kmp.tor.runtime.service.ui.KmpTorServiceUI.Factory]
+     * */
+    public abstract class Factory<C: Config, UI: TorServiceUI<C>>
     @ExperimentalKmpTorApi
     protected constructor(
         defaultConfig: C,
-
-        /**
-         * Information for the notification. If API 26+, an
-         * [android.app.NotificationChannel] is automatically set up using
-         * the provided [NotificationInfo] when the [Factory] implementation
-         * is utilized to instantiate [TorServiceConfig.Foreground].
-         * */
         @JvmField
         public val info: NotificationInfo
-    ): TorServiceUI.Factory<Args, C, UI>(defaultConfig, INIT)
+    ): AbstractTorServiceUI.Factory<Args, C, UI>(defaultConfig, INIT)
 }

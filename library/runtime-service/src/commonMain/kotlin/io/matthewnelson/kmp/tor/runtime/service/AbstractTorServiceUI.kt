@@ -16,54 +16,82 @@
 package io.matthewnelson.kmp.tor.runtime.service
 
 import io.matthewnelson.immutable.collections.toImmutableMap
-import io.matthewnelson.immutable.collections.toImmutableSet
-import io.matthewnelson.kmp.tor.core.api.annotation.ExperimentalKmpTorApi
 import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
 import io.matthewnelson.kmp.tor.core.resource.SynchronizedObject
 import io.matthewnelson.kmp.tor.core.resource.synchronized
 import io.matthewnelson.kmp.tor.runtime.TorRuntime
-import kotlinx.coroutines.Job
+import kotlinx.coroutines.*
 import kotlin.concurrent.Volatile
 import kotlin.jvm.JvmField
 import kotlin.jvm.JvmSynthetic
 
 /**
- * Core abstraction for creating hooks to manage the UI state of
- * a service object running multiple instances of [TorRuntime].
+ * Core `commonMain` abstraction which enables implementors the ability to
+ * create a fully customized notifications for the running instances of
+ * [TorRuntime] as they operate within a service object.
  *
- * @see [io.matthewnelson.kmp.tor.runtime.service.AndroidTorServiceUI]
+ * Alternatively, use the default implementation `kmp-tor:runtime-service-ui`
+ * dependency, [io.matthewnelson.kmp.tor.runtime.service.ui.KmpTorServiceUI].
+ *
+ * @see [io.matthewnelson.kmp.tor.runtime.service.TorServiceUI]
+ * @throws [IllegalStateException] on instantiation if [args] were not those
+ *   which were passed to [Factory.newInstance]. See [Args].
  * */
-public abstract class TorServiceUI<A: TorServiceUI.Args, C: TorServiceUI.Config>
-@ExperimentalKmpTorApi
+public abstract class AbstractTorServiceUI<A: AbstractTorServiceUI.Args, C: AbstractTorServiceUI.Config>
 @Throws(IllegalStateException::class)
 internal constructor(
     private val args: A,
     init: Any,
 ) {
 
+    init {
+        args.initialize()
+        check(init == INIT) { "AbstractTorServiceUI cannot be extended" }
+    }
+
+    private val serviceJob = args.serviceScope().coroutineContext.job
+
+    /**
+     * The default [Config] that was defined for [Factory.defaultConfig]
+     * */
     @JvmField
     protected val defaultConfig: C = args.defaultConfig()
 
-    protected fun isDestroyed(): Boolean = !args.serviceJob().isActive
+    /**
+     * A [CoroutineScope] which is a child of the service object's
+     * [CoroutineScope].
+     * */
+    @JvmField
+    protected val serviceChildScope: CoroutineScope = CoroutineScope(context =
+        args.serviceScope().coroutineContext
+        + CoroutineName("TorServiceUIScope@${args.hashCode()}")
+        + SupervisorJob(serviceJob)
+    )
+
+    protected fun isDestroyed(): Boolean = !serviceJob.isActive
 
     protected open fun onDestroy() {}
 
-    init {
-        args.serviceJob().invokeOnCompletion { onDestroy() }
-    }
-
     /**
-     * Core abstraction for passing platform specific arguments
-     * in an encapsulated manner when instantiating new instances
-     * of [TorServiceUI]. [Args] are single use items and must be
-     * consumed, otherwise exceptions are raised and a probable crash
-     * will ensue.
+     * Core `commonMain` abstraction for passing platform specific arguments
+     * in an encapsulated manner when instantiating new instances of
+     * [AbstractTorServiceUI] implementations.
+     *
+     * [Args] are single use items and must be consumed only once, otherwise
+     * an exception is raised when [Factory.newInstance] is called resulting
+     * a service start failure.
+     *
+     * @see [io.matthewnelson.kmp.tor.runtime.service.TorServiceUI.Args]
      * */
     public abstract class Args internal constructor(
         private val _defaultConfig: Config,
-        private val _serviceJob: Job,
+        private val _serviceScope: CoroutineScope,
         init: Any,
     ) {
+
+        init {
+            check(init == INIT) { "AbstractTorServiceUI.Args cannot be extended" }
+        }
 
         @Volatile
         private var _isInitialized: Boolean = false
@@ -75,13 +103,13 @@ internal constructor(
         @Suppress("UNCHECKED_CAST")
         internal fun <C: Config> defaultConfig(): C = _defaultConfig as C
         @JvmSynthetic
-        internal fun serviceJob(): Job = _serviceJob
+        internal fun serviceScope(): CoroutineScope = _serviceScope
 
         @JvmSynthetic
         @Throws(IllegalStateException::class)
         internal fun initialize() {
             @OptIn(InternalKmpTorApi::class)
-            val initialized = if (_isInitialized) {
+            val wasAlreadyInitialized = if (_isInitialized) {
                 true
             } else {
                 synchronized(lock) {
@@ -94,7 +122,7 @@ internal constructor(
                 }
             }
 
-            check(!initialized) {
+            check(!wasAlreadyInitialized) {
                 "$this has already been used to initialize another instance"
             }
         }
@@ -108,21 +136,28 @@ internal constructor(
             @OptIn(InternalKmpTorApi::class)
             return lock.hashCode()
         }
-
-        init {
-            check(init == INIT) { "TorServiceUI.Args cannot be extended" }
-        }
     }
 
     /**
-     * Core abstraction for a [TorServiceUI] configuration.
+     * Core `commonMain` abstraction for holding UI customization input from
+     * consumers of `kmp-tor-service`.
      *
+     * As an example implementation, see
+     * [io.matthewnelson.kmp.tor.runtime.service.ui.KmpTorServiceUI.Config]
+     *
+     * @see [io.matthewnelson.kmp.tor.runtime.service.TorServiceUI.Config]
      * @throws [IllegalArgumentException] if [fields] is empty
      * */
-    public abstract class Config internal constructor(
+    public abstract class Config
+    @Throws(IllegalArgumentException::class)
+    internal constructor(
         fields: Map<String, Any>,
         init: Any,
     ) {
+
+        init {
+            check(init == INIT) { "AbstractTorServiceUI.Config cannot be extended" }
+        }
 
         private val fields = fields.toImmutableMap()
 
@@ -157,21 +192,22 @@ internal constructor(
             appendLine()
             append(']')
         }
-
-        init {
-            check(init == INIT) { "TorServiceUI.Config cannot be extended" }
-        }
     }
 
     /**
-     * Core abstraction for creating new instances of [TorServiceUI].
+     * Core `commonMain` abstraction for a [Factory] class which is
+     * responsible for instantiating new instances of [AbstractTorServiceUI]
+     * when requested by the service object.
      *
      * Implementations are encouraged to keep it as a subclass within,
      * and use a `private constructor` for, their [UI] implementations.
      *
-     * As an example, see [io.matthewnelson.kmp.tor.runtime.service.ui.KmpTorServiceUI.Factory]
+     * As an example implementation, see
+     * [io.matthewnelson.kmp.tor.runtime.service.ui.KmpTorServiceUI.Factory]
+     *
+     * @see [io.matthewnelson.kmp.tor.runtime.service.TorServiceUI.Factory]
      * */
-    public abstract class Factory<A: Args, C: Config, UI: TorServiceUI<A, C>>(
+    public abstract class Factory<A: Args, C: Config, UI: AbstractTorServiceUI<A, C>> internal constructor(
 
         /**
          * The default [Config] to use if one was not specified when
@@ -182,36 +218,40 @@ internal constructor(
         init: Any
     ) {
 
+        init {
+            check(init == INIT) { "AbstractTorServiceUI.Factory cannot be extended" }
+        }
+
         /**
          * Implementors **MUST** utilize [args] to instantiate a new instance
-         * of [UI]. If [args] were not consumed by the returned instance of
-         * [UI], an exception will be thrown.
+         * of the [UI] implementation. If [args] were not consumed by the
+         * returned instance of [UI], an exception will be thrown by
+         * [newInstance]. See [Args].
          * */
         protected abstract fun newInstanceProtected(args: A): UI
 
+        @JvmSynthetic
         @Throws(IllegalStateException::class)
-        public fun newInstance(args: A): UI {
+        internal fun newInstance(args: A): UI {
             val i = newInstanceProtected(args)
 
             try {
                 // Should already be initialized from instance init
-                // block and thus should throw exception.
+                // block and thus should throw exception here.
                 args.initialize()
             } catch (_: IllegalStateException) {
                 // args are initialized. Ensure args
-                check(i.args == args) {
-                    "args@${args.hashCode()} were not used to instantiate instance of $i"
-                }
+                check(i.args == args) { "$args were not used to instantiate instance $i" }
+
+                // Set completion handler to call onDestroy.
+                i.serviceJob.invokeOnCompletion { i.onDestroy() }
                 return i
             }
 
-            // args did not throw exception. They were used for another
-            // instance and an old instance was returned via Factory.newInstance
-            throw IllegalStateException("args@${hashCode()} were not used to create $i")
-        }
-
-        init {
-            check(init == INIT) { "TorServiceUI.Factory cannot be extended" }
+            // args did not throw exception and were just initialized in this
+            // function body meaning newInstanceProtected implementation held
+            // onto them and returned a different instance of UI
+            throw IllegalStateException("$args were not used to create $i")
         }
 
         internal companion object {
@@ -232,6 +272,14 @@ internal constructor(
         }
     }
 
+    public final override fun equals(other: Any?): Boolean {
+        if (other !is AbstractTorServiceUI<*, *>) return false
+        if (other::class != this::class) return false
+        return other.args == args
+    }
+
+    public final override fun hashCode(): Int = args.hashCode()
+
     protected companion object {
 
         // Synthetic access to inhibit extension of abstract
@@ -240,10 +288,5 @@ internal constructor(
         // module.
         @JvmSynthetic
         internal val INIT = Any()
-    }
-
-    init {
-        check(init == INIT) { "TorServiceUI cannot be extended" }
-        args.initialize()
     }
 }

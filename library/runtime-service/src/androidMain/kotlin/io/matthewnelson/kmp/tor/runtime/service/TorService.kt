@@ -23,7 +23,6 @@ import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.content.ServiceConnection
-import android.content.res.Resources
 import android.os.Build
 import android.os.Binder as AndroidBinder
 import android.os.IBinder
@@ -44,11 +43,11 @@ internal class TorService internal constructor(): Service() {
     private class AndroidServiceFactory(
         private val app: Application,
         config: TorServiceConfig,
-        instanceConfig: AndroidTorServiceUI.Config?,
+        instanceUIConfig: TorServiceUI.Config?,
         initializer: Initializer,
     ): TorRuntime.ServiceFactory(initializer) {
 
-        private val connection = Connection(binder, config, instanceConfig)
+        private val connection = Connection(binder, config, instanceUIConfig)
 
         @Throws(RuntimeException::class)
         protected override fun startService() {
@@ -105,10 +104,9 @@ internal class TorService internal constructor(): Service() {
     internal companion object {
 
         @JvmSynthetic
-        @Throws(IllegalArgumentException::class, Resources.NotFoundException::class)
         internal fun Application.serviceFactoryLoader(
             config: TorServiceConfig,
-            instanceConfig: AndroidTorServiceUI.Config?,
+            instanceUIConfig: TorServiceUI.Config?,
         ): TorRuntime.ServiceFactory.Loader {
             val app = this
 
@@ -116,7 +114,7 @@ internal class TorService internal constructor(): Service() {
                 override fun loadProtected(
                     initializer: TorRuntime.ServiceFactory.Initializer,
                 ): TorRuntime.ServiceFactory {
-                    return AndroidServiceFactory(app, config, instanceConfig, initializer)
+                    return AndroidServiceFactory(app, config, instanceUIConfig, initializer)
                 }
             }
         }
@@ -136,10 +134,10 @@ internal class TorService internal constructor(): Service() {
     private fun isDestroyed(): Boolean = !supervisor.isActive
 
     @Volatile
-    private var ui: AndroidTorServiceUI<*>? = null
+    private var ui: TorServiceUI<*>? = null
 
     private val binder = object : Binder() {
-        override fun inject(conn: Connection) {
+        public override fun inject(conn: Connection) {
             val service = this@TorService
 
             holders.withLock {
@@ -174,34 +172,49 @@ internal class TorService internal constructor(): Service() {
                 // First bind for this TorService instance
                 if (size == 0) {
 
+                    executables.add(Executable {
+                        conn.binder.lce(Lifecycle.Event.OnCreate(service))
+                        service.ui?.let { ui -> conn.binder.lce(Lifecycle.Event.OnCreate(ui)) }
+                        conn.binder.lce(Lifecycle.Event.OnStart(service))
+                    })
+
                     // TorServiceConfig is a singleton and is the same for all
                     // AndroidServiceFactory. If this is the first bind for
-                    // TorService, need to instantiate and set the new instance
-                    // before the Holder gets created.
+                    // TorService and config is an instance of Foreground, need
+                    // to instantiate and set a new instance before the Holder
+                    // gets created.
                     if (conn.config is TorServiceConfig.Foreground<*, *>) {
-                        val args = AndroidTorServiceUI.Args.of(
+                        val args = TorServiceUI.Args.of(
                             conn.config.factory.defaultConfig,
                             conn.config.factory.info,
                             service,
-                            service.supervisor,
+                            service.scope,
                         )
 
-                        ui = conn.config.factory.newInstance(args)
-                    }
-
-                    executables.add(Executable {
-                        with(conn.binder) {
-                            lce(Lifecycle.Event.OnCreate(service))
-                            service.ui?.let { ui -> lce(Lifecycle.Event.OnCreate(ui)) }
-                            lce(Lifecycle.Event.OnStart(service))
+                        val ui = try {
+                            conn.config.factory.newInstance(args)
+                        } catch (e: IllegalStateException) {
+                            // Implementation of TorServiceUI.Factory is bad.
+                            // Report error and shutdown TorService.
+                            executables.add(Executable {
+                                conn.binder.e(e)
+                                application.unbindService(conn)
+                                conn.binder.lce(Lifecycle.Event.OnUnbind(service))
+                                application.stopService(Intent(application, TorService::class.java))
+                            })
+                            null
                         }
-                    })
+
+                        if (ui == null) return@withLock executables
+
+                        service.ui = ui
+                    }
                 }
 
                 val holder = Holder(conn)
                 put(conn.binder, holder)
 
-                // Initialize lazy value
+                // Initialize lazy runtime value (outside of lock lambda)
                 executables.add(Executable {
                     conn.binder.lce(Lifecycle.Event.OnBind(service))
                     holder.runtime
@@ -222,7 +235,7 @@ internal class TorService internal constructor(): Service() {
         @JvmField
         public val config: TorServiceConfig,
         @JvmField
-        public val instanceConfig: AndroidTorServiceUI.Config?,
+        public val instanceUIConfig: TorServiceUI.Config?,
     ): ServiceConnection {
 
         public override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
@@ -240,7 +253,7 @@ internal class TorService internal constructor(): Service() {
     public override fun onCreate() {
         super.onCreate()
         scope.launch {
-            // TODO: stop service if nothing binds within 100ms
+            // TODO: stop service if nothing binds within 250ms
         }
     }
 
@@ -280,7 +293,7 @@ internal class TorService internal constructor(): Service() {
 
     private inner class Holder(private val conn: Connection) {
 
-        val stopServiceOnTaskRemoved: Boolean get() = conn.config.stopServiceOnTaskRemoved
+        public val stopServiceOnTaskRemoved: Boolean get() = conn.config.stopServiceOnTaskRemoved
         private val binder get() = conn.binder
 
         // TODO: Create new notification instance to get bind

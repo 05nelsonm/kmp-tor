@@ -1,41 +1,30 @@
-public abstract class io/matthewnelson/kmp/tor/runtime/service/AndroidTorServiceUI : io/matthewnelson/kmp/tor/runtime/service/TorServiceUI {
-	protected final field appContext Landroid/content/Context;
-	protected final field channelID Ljava/lang/String;
-	protected fun <init> (Lio/matthewnelson/kmp/tor/runtime/service/AndroidTorServiceUI$Args;)V
-	protected final fun post (Landroid/app/Notification;)V
-	protected final fun register (Landroid/content/BroadcastReceiver;Landroid/content/IntentFilter;Ljava/lang/String;Landroid/os/Handler;Ljava/lang/Boolean;)Landroid/content/Intent;
-	protected final fun register (Landroid/content/BroadcastReceiver;Landroid/content/IntentFilter;Ljava/lang/String;Landroid/os/Handler;Ljava/lang/Boolean;I)Landroid/content/Intent;
-	public static synthetic fun register$default (Lio/matthewnelson/kmp/tor/runtime/service/AndroidTorServiceUI;Landroid/content/BroadcastReceiver;Landroid/content/IntentFilter;Ljava/lang/String;Landroid/os/Handler;Ljava/lang/Boolean;IILjava/lang/Object;)Landroid/content/Intent;
-	protected final fun unregister (Landroid/content/BroadcastReceiver;)V
+public abstract class io/matthewnelson/kmp/tor/runtime/service/AbstractTorServiceUI {
+	protected static final field Companion Lio/matthewnelson/kmp/tor/runtime/service/AbstractTorServiceUI$Companion;
+	protected final field defaultConfig Lio/matthewnelson/kmp/tor/runtime/service/AbstractTorServiceUI$Config;
+	protected final field serviceChildScope Lkotlinx/coroutines/CoroutineScope;
+	public final fun equals (Ljava/lang/Object;)Z
+	public final fun hashCode ()I
+	protected final fun isDestroyed ()Z
+	protected fun onDestroy ()V
 }
 
-public final class io/matthewnelson/kmp/tor/runtime/service/AndroidTorServiceUI$Args : io/matthewnelson/kmp/tor/runtime/service/TorServiceUI$Args {
-	public synthetic fun <init> (Lio/matthewnelson/kmp/tor/runtime/service/AndroidTorServiceUI$Config;Lio/matthewnelson/kmp/tor/runtime/service/NotificationInfo;Landroid/content/Context;Lkotlinx/coroutines/Job;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
+public abstract class io/matthewnelson/kmp/tor/runtime/service/AbstractTorServiceUI$Args {
+	public final fun equals (Ljava/lang/Object;)Z
+	public final fun hashCode ()I
 }
 
-public abstract class io/matthewnelson/kmp/tor/runtime/service/AndroidTorServiceUI$Config : io/matthewnelson/kmp/tor/runtime/service/TorServiceUI$Config {
-	protected fun <init> (Ljava/util/Map;)V
-	public abstract fun validate (Landroid/app/Application;)V
+protected final class io/matthewnelson/kmp/tor/runtime/service/AbstractTorServiceUI$Companion {
 }
 
-public abstract class io/matthewnelson/kmp/tor/runtime/service/AndroidTorServiceUI$Factory : io/matthewnelson/kmp/tor/runtime/service/TorServiceUI$Factory {
-	public final field info Lio/matthewnelson/kmp/tor/runtime/service/NotificationInfo;
-	protected fun <init> (Lio/matthewnelson/kmp/tor/runtime/service/AndroidTorServiceUI$Config;Lio/matthewnelson/kmp/tor/runtime/service/NotificationInfo;)V
+public abstract class io/matthewnelson/kmp/tor/runtime/service/AbstractTorServiceUI$Config {
+	public final fun equals (Ljava/lang/Object;)Z
+	public final fun hashCode ()I
+	public final fun toString ()Ljava/lang/String;
 }
 
-public final class io/matthewnelson/kmp/tor/runtime/service/NotificationInfo {
-	public static final field Companion Lio/matthewnelson/kmp/tor/runtime/service/NotificationInfo$Companion;
-	public final field channelDescription Ljava/lang/String;
-	public final field channelID Ljava/lang/String;
-	public final field channelName Ljava/lang/String;
-	public final field channelShowBadge Z
-	public final field notificationID I
-	public synthetic fun <init> (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;ZILkotlin/jvm/internal/DefaultConstructorMarker;)V
-	public static final fun of (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;ZI)Lio/matthewnelson/kmp/tor/runtime/service/NotificationInfo;
-}
-
-public final class io/matthewnelson/kmp/tor/runtime/service/NotificationInfo$Companion {
-	public final fun of (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;ZI)Lio/matthewnelson/kmp/tor/runtime/service/NotificationInfo;
+public abstract class io/matthewnelson/kmp/tor/runtime/service/AbstractTorServiceUI$Factory {
+	public final field defaultConfig Lio/matthewnelson/kmp/tor/runtime/service/AbstractTorServiceUI$Config;
+	protected abstract fun newInstanceProtected (Lio/matthewnelson/kmp/tor/runtime/service/AbstractTorServiceUI$Args;)Lio/matthewnelson/kmp/tor/runtime/service/AbstractTorServiceUI;
 }
 
 public class io/matthewnelson/kmp/tor/runtime/service/TorServiceConfig {
@@ -62,52 +51,60 @@ public final class io/matthewnelson/kmp/tor/runtime/service/TorServiceConfig$Com
 
 public final class io/matthewnelson/kmp/tor/runtime/service/TorServiceConfig$Foreground : io/matthewnelson/kmp/tor/runtime/service/TorServiceConfig {
 	public static final field Companion Lio/matthewnelson/kmp/tor/runtime/service/TorServiceConfig$Foreground$Companion;
-	public final field factory Lio/matthewnelson/kmp/tor/runtime/service/AndroidTorServiceUI$Factory;
-	public synthetic fun <init> (Lio/matthewnelson/kmp/tor/runtime/service/AndroidTorServiceUI$Factory;Lio/matthewnelson/kmp/tor/runtime/service/TorServiceConfig$Builder;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
-	public static final fun Builder (Lio/matthewnelson/kmp/tor/runtime/service/AndroidTorServiceUI$Factory;Lio/matthewnelson/kmp/tor/runtime/core/ThisBlock;)Lio/matthewnelson/kmp/tor/runtime/service/TorServiceConfig$Foreground;
-	public final fun newEnvironment (Lio/matthewnelson/kmp/tor/runtime/service/AndroidTorServiceUI$Config;Lkotlin/jvm/functions/Function1;)Lio/matthewnelson/kmp/tor/runtime/TorRuntime$Environment;
-	public final fun newEnvironment (Lio/matthewnelson/kmp/tor/runtime/service/AndroidTorServiceUI$Config;Lkotlin/jvm/functions/Function1;Lio/matthewnelson/kmp/tor/runtime/core/ThisBlock;)Lio/matthewnelson/kmp/tor/runtime/TorRuntime$Environment;
-	public final fun newEnvironment (Ljava/lang/String;Lio/matthewnelson/kmp/tor/runtime/service/AndroidTorServiceUI$Config;Lkotlin/jvm/functions/Function1;)Lio/matthewnelson/kmp/tor/runtime/TorRuntime$Environment;
-	public final fun newEnvironment (Ljava/lang/String;Lio/matthewnelson/kmp/tor/runtime/service/AndroidTorServiceUI$Config;Lkotlin/jvm/functions/Function1;Lio/matthewnelson/kmp/tor/runtime/core/ThisBlock;)Lio/matthewnelson/kmp/tor/runtime/TorRuntime$Environment;
+	public final field factory Lio/matthewnelson/kmp/tor/runtime/service/TorServiceUI$Factory;
+	public synthetic fun <init> (Lio/matthewnelson/kmp/tor/runtime/service/TorServiceUI$Factory;Lio/matthewnelson/kmp/tor/runtime/service/TorServiceConfig$Builder;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public static final fun Builder (Lio/matthewnelson/kmp/tor/runtime/service/TorServiceUI$Factory;Lio/matthewnelson/kmp/tor/runtime/core/ThisBlock;)Lio/matthewnelson/kmp/tor/runtime/service/TorServiceConfig$Foreground;
+	public final fun newEnvironment (Lio/matthewnelson/kmp/tor/runtime/service/TorServiceUI$Config;Lkotlin/jvm/functions/Function1;)Lio/matthewnelson/kmp/tor/runtime/TorRuntime$Environment;
+	public final fun newEnvironment (Lio/matthewnelson/kmp/tor/runtime/service/TorServiceUI$Config;Lkotlin/jvm/functions/Function1;Lio/matthewnelson/kmp/tor/runtime/core/ThisBlock;)Lio/matthewnelson/kmp/tor/runtime/TorRuntime$Environment;
+	public final fun newEnvironment (Ljava/lang/String;Lio/matthewnelson/kmp/tor/runtime/service/TorServiceUI$Config;Lkotlin/jvm/functions/Function1;)Lio/matthewnelson/kmp/tor/runtime/TorRuntime$Environment;
+	public final fun newEnvironment (Ljava/lang/String;Lio/matthewnelson/kmp/tor/runtime/service/TorServiceUI$Config;Lkotlin/jvm/functions/Function1;Lio/matthewnelson/kmp/tor/runtime/core/ThisBlock;)Lio/matthewnelson/kmp/tor/runtime/TorRuntime$Environment;
 }
 
 public final class io/matthewnelson/kmp/tor/runtime/service/TorServiceConfig$Foreground$Companion {
-	public final fun Builder (Lio/matthewnelson/kmp/tor/runtime/service/AndroidTorServiceUI$Factory;Lio/matthewnelson/kmp/tor/runtime/core/ThisBlock;)Lio/matthewnelson/kmp/tor/runtime/service/TorServiceConfig$Foreground;
-}
-
-protected final class io/matthewnelson/kmp/tor/runtime/service/TorServiceConfig$LOCK {
-	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/service/TorServiceConfig$LOCK;
+	public final fun Builder (Lio/matthewnelson/kmp/tor/runtime/service/TorServiceUI$Factory;Lio/matthewnelson/kmp/tor/runtime/core/ThisBlock;)Lio/matthewnelson/kmp/tor/runtime/service/TorServiceConfig$Foreground;
 }
 
 protected abstract interface class io/matthewnelson/kmp/tor/runtime/service/TorServiceConfig$Loader {
 	public abstract fun newInstance (Landroid/app/Application;)Lio/matthewnelson/kmp/tor/runtime/TorRuntime$ServiceFactory$Loader;
 }
 
-public abstract class io/matthewnelson/kmp/tor/runtime/service/TorServiceUI {
-	protected static final field Companion Lio/matthewnelson/kmp/tor/runtime/service/TorServiceUI$Companion;
-	protected final field defaultConfig Lio/matthewnelson/kmp/tor/runtime/service/TorServiceUI$Config;
-	protected final fun isDestroyed ()Z
-	protected fun onDestroy ()V
+public abstract class io/matthewnelson/kmp/tor/runtime/service/TorServiceUI : io/matthewnelson/kmp/tor/runtime/service/AbstractTorServiceUI {
+	protected final field appContext Landroid/content/Context;
+	protected final field channelID Ljava/lang/String;
+	protected fun <init> (Lio/matthewnelson/kmp/tor/runtime/service/TorServiceUI$Args;)V
+	protected final fun post (Landroid/app/Notification;)V
+	protected final fun register (Landroid/content/BroadcastReceiver;Landroid/content/IntentFilter;Ljava/lang/String;Landroid/os/Handler;Ljava/lang/Boolean;)Landroid/content/Intent;
+	protected final fun register (Landroid/content/BroadcastReceiver;Landroid/content/IntentFilter;Ljava/lang/String;Landroid/os/Handler;Ljava/lang/Boolean;I)Landroid/content/Intent;
+	public static synthetic fun register$default (Lio/matthewnelson/kmp/tor/runtime/service/TorServiceUI;Landroid/content/BroadcastReceiver;Landroid/content/IntentFilter;Ljava/lang/String;Landroid/os/Handler;Ljava/lang/Boolean;IILjava/lang/Object;)Landroid/content/Intent;
+	protected final fun unregister (Landroid/content/BroadcastReceiver;)V
 }
 
-public abstract class io/matthewnelson/kmp/tor/runtime/service/TorServiceUI$Args {
-	public final fun equals (Ljava/lang/Object;)Z
-	public final fun hashCode ()I
+public final class io/matthewnelson/kmp/tor/runtime/service/TorServiceUI$Args : io/matthewnelson/kmp/tor/runtime/service/AbstractTorServiceUI$Args {
+	public synthetic fun <init> (Lio/matthewnelson/kmp/tor/runtime/service/TorServiceUI$Config;Lio/matthewnelson/kmp/tor/runtime/service/TorServiceUI$NotificationInfo;Landroid/content/Context;Lkotlinx/coroutines/CoroutineScope;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
 }
 
-protected final class io/matthewnelson/kmp/tor/runtime/service/TorServiceUI$Companion {
+public abstract class io/matthewnelson/kmp/tor/runtime/service/TorServiceUI$Config : io/matthewnelson/kmp/tor/runtime/service/AbstractTorServiceUI$Config {
+	protected fun <init> (Ljava/util/Map;)V
+	public abstract fun validate (Landroid/content/Context;)V
 }
 
-public abstract class io/matthewnelson/kmp/tor/runtime/service/TorServiceUI$Config {
-	public final fun equals (Ljava/lang/Object;)Z
-	public final fun hashCode ()I
-	public final fun toString ()Ljava/lang/String;
+public abstract class io/matthewnelson/kmp/tor/runtime/service/TorServiceUI$Factory : io/matthewnelson/kmp/tor/runtime/service/AbstractTorServiceUI$Factory {
+	public final field info Lio/matthewnelson/kmp/tor/runtime/service/TorServiceUI$NotificationInfo;
+	protected fun <init> (Lio/matthewnelson/kmp/tor/runtime/service/TorServiceUI$Config;Lio/matthewnelson/kmp/tor/runtime/service/TorServiceUI$NotificationInfo;)V
 }
 
-public abstract class io/matthewnelson/kmp/tor/runtime/service/TorServiceUI$Factory {
-	public final field defaultConfig Lio/matthewnelson/kmp/tor/runtime/service/TorServiceUI$Config;
-	public fun <init> (Lio/matthewnelson/kmp/tor/runtime/service/TorServiceUI$Config;Ljava/lang/Object;)V
-	public final fun newInstance (Lio/matthewnelson/kmp/tor/runtime/service/TorServiceUI$Args;)Lio/matthewnelson/kmp/tor/runtime/service/TorServiceUI;
-	protected abstract fun newInstanceProtected (Lio/matthewnelson/kmp/tor/runtime/service/TorServiceUI$Args;)Lio/matthewnelson/kmp/tor/runtime/service/TorServiceUI;
+public final class io/matthewnelson/kmp/tor/runtime/service/TorServiceUI$NotificationInfo {
+	public static final field Companion Lio/matthewnelson/kmp/tor/runtime/service/TorServiceUI$NotificationInfo$Companion;
+	public final field channelDescription Ljava/lang/String;
+	public final field channelID Ljava/lang/String;
+	public final field channelName Ljava/lang/String;
+	public final field channelShowBadge Z
+	public final field notificationID I
+	public synthetic fun <init> (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;ZILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public static final fun of (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;ZI)Lio/matthewnelson/kmp/tor/runtime/service/TorServiceUI$NotificationInfo;
+}
+
+public final class io/matthewnelson/kmp/tor/runtime/service/TorServiceUI$NotificationInfo$Companion {
+	public final fun of (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;ZI)Lio/matthewnelson/kmp/tor/runtime/service/TorServiceUI$NotificationInfo;
 }
 

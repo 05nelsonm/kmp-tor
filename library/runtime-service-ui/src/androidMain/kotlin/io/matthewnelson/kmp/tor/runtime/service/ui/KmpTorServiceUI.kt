@@ -15,46 +15,45 @@
  **/
 package io.matthewnelson.kmp.tor.runtime.service.ui
 
-import android.app.Application
+import android.content.Context
 import android.content.res.Resources
 import io.matthewnelson.kmp.tor.core.api.annotation.ExperimentalKmpTorApi
 import io.matthewnelson.kmp.tor.core.api.annotation.KmpTorDsl
 import io.matthewnelson.kmp.tor.runtime.core.ThisBlock
 import io.matthewnelson.kmp.tor.runtime.core.apply
-import io.matthewnelson.kmp.tor.runtime.service.AndroidTorServiceUI
-import io.matthewnelson.kmp.tor.runtime.service.NotificationInfo
+import io.matthewnelson.kmp.tor.runtime.service.TorServiceUI
 import io.matthewnelson.kmp.tor.runtime.service.TorServiceConfig
 
 /**
  * The "default" UI implementation for `kmp-tor:runtime-service`, serving
  * both as an example for others to model their own implementations after,
- * or to utilize when instantiating [TorServiceConfig.Foreground].
+ * or to utilize with [TorServiceConfig.Foreground.Builder].
  *
  * @see [Factory]
  * */
 @OptIn(ExperimentalKmpTorApi::class)
 public class KmpTorServiceUI private constructor(
     args: Args,
-): AndroidTorServiceUI<KmpTorServiceUI.Config>(args) {
+): TorServiceUI<KmpTorServiceUI.Config>(args) {
 
     /**
-     *
+     * TODO
      * */
     public class Config(
         // TODO
-    ): AndroidTorServiceUI.Config(mapOf(
+    ): TorServiceUI.Config(mapOf(
         // TODO
         "TODO" to "TODO"
     )) {
 
         @Throws(Resources.NotFoundException::class)
-        public override fun validate(app: Application) {
+        public override fun validate(context: Context) {
             // TODO
         }
     }
 
     /**
-     * Factory class for [TorServiceConfig.Builder]
+     * Factory class for [TorServiceConfig.Foreground.Builder]
      *
      * e.g.
      *
@@ -62,7 +61,7 @@ public class KmpTorServiceUI private constructor(
      *         defaultConfig = KmpTorServiceUI.Config(
      *             // ...
      *         ),
-     *         info = NotificationInfo(
+     *         info = TorServiceUI.NotificationInfo.of(
      *             // ...
      *         ),
      *         block = {
@@ -76,7 +75,7 @@ public class KmpTorServiceUI private constructor(
      * */
     public class Factory private constructor(
         b: Builder,
-    ): AndroidTorServiceUI.Factory<Config, KmpTorServiceUI>(
+    ): TorServiceUI.Factory<Config, KmpTorServiceUI>(
         b.defaultConfig,
         b.info
     ) {

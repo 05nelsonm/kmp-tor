@@ -39,7 +39,7 @@ import io.matthewnelson.kmp.tor.runtime.TorRuntime
 import io.matthewnelson.kmp.tor.runtime.core.ThisBlock
 import io.matthewnelson.kmp.tor.runtime.core.apply
 import io.matthewnelson.kmp.tor.runtime.service.TorService.Companion.serviceFactoryLoader
-import io.matthewnelson.kmp.tor.runtime.service.TorServiceUI.Factory.Companion.unsafeCastAsType
+import io.matthewnelson.kmp.tor.runtime.service.AbstractTorServiceUI.Factory.Companion.unsafeCastAsType
 import kotlin.concurrent.Volatile
 
 /**
@@ -182,7 +182,7 @@ public open class TorServiceConfig private constructor(
     ): TorRuntime.Environment {
         @OptIn(ExperimentalKmpTorApi::class)
         return Loader { app ->
-            app.serviceFactoryLoader(this, instanceConfig = null)
+            app.serviceFactoryLoader(this, instanceUIConfig = null)
         }.newEnvironment(dirName, installer, block)
     }
 
@@ -272,7 +272,7 @@ public open class TorServiceConfig private constructor(
      * the passing of per-environment based configurations for the declared
      * [factory]. They are entirely optional and the regular [newEnvironment]
      * functions provided by [TorServiceConfig] will simply default to what
-     * was declared for your [AndroidTorServiceUI.Factory.defaultConfig].
+     * was declared for your [TorServiceUI.Factory.defaultConfig].
      *
      * TODO: AndroidManifest requirements
      * TODO: README.md
@@ -283,7 +283,7 @@ public open class TorServiceConfig private constructor(
      *         defaultConfig = KmpTorServiceUI.Config(
      *             // ...
      *         ),
-     *         info = NotificationInfo.of(
+     *         info = TorServiceUI.NotificationInfo.of(
      *             // ...
      *         ),
      *         block = {
@@ -307,7 +307,7 @@ public open class TorServiceConfig private constructor(
      *
      * @see [Foreground.Builder]
      * */
-    public class Foreground <C: AndroidTorServiceUI.Config, F: AndroidTorServiceUI.Factory<C, *>> private constructor(
+    public class Foreground <C: TorServiceUI.Config, F: TorServiceUI.Factory<C, *>> private constructor(
         @JvmField
         public val factory: F,
         b: Builder,
@@ -335,7 +335,7 @@ public open class TorServiceConfig private constructor(
          * @throws [Resources.NotFoundException] If [instanceConfig] fails validation
          *   checks (emulators & devices only).
          * @throws [IllegalArgumentException] if [instanceConfig] is not the same
-         *   class type as the provided [AndroidTorServiceUI.Factory.defaultConfig].
+         *   class type as the provided [TorServiceUI.Factory.defaultConfig].
          * */
         public fun newEnvironment(
             instanceConfig: C,
@@ -368,7 +368,7 @@ public open class TorServiceConfig private constructor(
          * @throws [Resources.NotFoundException] If [instanceConfig] fails validation
          *   checks (emulators & devices only).
          * @throws [IllegalArgumentException] if [instanceConfig] is not the same
-         *   class type as the provided [AndroidTorServiceUI.Factory.defaultConfig].
+         *   class type as the provided [TorServiceUI.Factory.defaultConfig].
          * */
         public fun newEnvironment(
             instanceConfig: C,
@@ -403,7 +403,7 @@ public open class TorServiceConfig private constructor(
          * @throws [Resources.NotFoundException] If [instanceConfig] fails validation
          *   checks (emulators & devices only).
          * @throws [IllegalArgumentException] if [instanceConfig] is not the same
-         *   class type as the provided [AndroidTorServiceUI.Factory.defaultConfig].
+         *   class type as the provided [TorServiceUI.Factory.defaultConfig].
          * */
         public fun newEnvironment(
             dirName: String,
@@ -438,7 +438,7 @@ public open class TorServiceConfig private constructor(
          * @throws [Resources.NotFoundException] If [instanceConfig] fails validation
          *   checks (emulators & devices only).
          * @throws [IllegalArgumentException] if [instanceConfig] is not the same
-         *   class type as the provided [AndroidTorServiceUI.Factory.defaultConfig].
+         *   class type as the provided [TorServiceUI.Factory.defaultConfig].
          * */
         public fun newEnvironment(
             dirName: String,
@@ -450,7 +450,7 @@ public open class TorServiceConfig private constructor(
             return Loader { app ->
                 instanceConfig.validate(app)
                 instanceConfig.unsafeCastAsType(other = factory.defaultConfig)
-                app.serviceFactoryLoader(this, instanceConfig = instanceConfig)
+                app.serviceFactoryLoader(this, instanceUIConfig = instanceConfig)
             }.newEnvironment(dirName, installer, block)
         }
 
@@ -462,7 +462,7 @@ public open class TorServiceConfig private constructor(
              * inside of [TorService] operating as a Foreground Service.
              *
              * **NOTE:** An [android.app.NotificationChannel] for API 26+ is set up
-             * using the provided [AndroidTorServiceUI.Factory.info] (emulators &
+             * using the provided [TorServiceUI.Factory.info] (emulators &
              * devices only).
              *
              * @throws [ClassCastException] If an instance of [TorServiceConfig] has
@@ -476,9 +476,9 @@ public open class TorServiceConfig private constructor(
             @JvmStatic
             @Throws(ClassCastException::class, Resources.NotFoundException::class)
             public fun <
-                C: AndroidTorServiceUI.Config,
-                UI: AndroidTorServiceUI<C>,
-                F: AndroidTorServiceUI.Factory<C, UI>
+                C: TorServiceUI.Config,
+                UI: TorServiceUI<C>,
+                F: TorServiceUI.Factory<C, UI>
             > Builder(
                 factory: F,
                 block: ThisBlock<Builder>,
@@ -536,7 +536,7 @@ public open class TorServiceConfig private constructor(
             // Verify not Android runtime.
             @OptIn(InternalKmpTorApi::class)
             check(!OSInfo.INSTANCE.isAndroidRuntime()) {
-                // Initializer error
+                // Startup initializer failed???
                 Initializer.errorMsg()
             }
 
@@ -555,7 +555,7 @@ public open class TorServiceConfig private constructor(
             )
         }
 
-        // Emulator or device
+        // Emulator or Device
         return TorRuntime.Environment.Builder(
             workDirectory = app.getDir(_dirName, Context.MODE_PRIVATE),
             cacheDirectory = app.cacheDir.resolve(_dirName),
@@ -615,23 +615,19 @@ public open class TorServiceConfig private constructor(
         stopServiceOnTaskRemoved = b.stopServiceOnTaskRemoved,
         testUseBuildDirectory = b.testUseBuildDirectory,
     )
-
-    protected object LOCK {
-
-    }
 }
 
 @Suppress("NOTHING_TO_INLINE")
 @Throws(ClassCastException::class)
 private inline fun <
-    C: AndroidTorServiceUI.Config,
-    UI: AndroidTorServiceUI<C>,
-    F: AndroidTorServiceUI.Factory<C, UI>
+    C: TorServiceUI.Config,
+    UI: TorServiceUI<C>,
+    F: TorServiceUI.Factory<C, UI>
 > TorServiceConfig.unsafeCast(): TorServiceConfig.Foreground<C, F> {
     if (this !is TorServiceConfig.Foreground<*, *>) {
         val msg = """
             Unable to return TorServiceConfig.Foreground. An instance was already
-            configured without declaring a AndroidTorServiceUI.Factory and is not
+            configured without declaring a TorServiceUI.Factory and is not
             able to be cast.
         """.trimIndent()
 

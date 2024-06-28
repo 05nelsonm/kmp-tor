@@ -31,7 +31,8 @@ internal inline fun Context.isPermissionGranted(permission: String): Boolean {
     return result == PERMISSION_GRANTED
 }
 
-internal fun Context.register(
+@Suppress("NOTHING_TO_INLINE")
+internal inline fun Context.register(
     receiver: BroadcastReceiver,
     filter: IntentFilter,
     permission: String?,
@@ -41,10 +42,8 @@ internal fun Context.register(
 ): Intent? {
     var f = flags
 
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-        if (exported != null) {
-            f = f or if (exported) Context.RECEIVER_EXPORTED else Context.RECEIVER_NOT_EXPORTED
-        }
+    if (exported != null && Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+        f = f or if (exported) Context.RECEIVER_EXPORTED else Context.RECEIVER_NOT_EXPORTED
     }
 
     @SuppressLint("UnspecifiedRegisterReceiverFlag")
