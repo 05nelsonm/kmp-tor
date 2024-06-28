@@ -33,7 +33,6 @@ public class io/matthewnelson/kmp/tor/runtime/service/TorServiceConfig {
 	public final field testUseBuildDirectory Z
 	public synthetic fun <init> (Lio/matthewnelson/kmp/tor/runtime/service/TorServiceConfig$Builder;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
 	public static final fun Builder (Lio/matthewnelson/kmp/tor/runtime/core/ThisBlock;)Lio/matthewnelson/kmp/tor/runtime/service/TorServiceConfig;
-	protected final fun newEnvironment (Lio/matthewnelson/kmp/tor/runtime/service/TorServiceConfig$Loader;Ljava/lang/String;Lkotlin/jvm/functions/Function1;Lio/matthewnelson/kmp/tor/runtime/core/ThisBlock;)Lio/matthewnelson/kmp/tor/runtime/TorRuntime$Environment;
 	public final fun newEnvironment (Ljava/lang/String;Lkotlin/jvm/functions/Function1;)Lio/matthewnelson/kmp/tor/runtime/TorRuntime$Environment;
 	public final fun newEnvironment (Ljava/lang/String;Lkotlin/jvm/functions/Function1;Lio/matthewnelson/kmp/tor/runtime/core/ThisBlock;)Lio/matthewnelson/kmp/tor/runtime/TorRuntime$Environment;
 	public final fun newEnvironment (Lkotlin/jvm/functions/Function1;)Lio/matthewnelson/kmp/tor/runtime/TorRuntime$Environment;
@@ -64,8 +63,8 @@ public final class io/matthewnelson/kmp/tor/runtime/service/TorServiceConfig$For
 	public final fun Builder (Lio/matthewnelson/kmp/tor/runtime/service/TorServiceUI$Factory;Lio/matthewnelson/kmp/tor/runtime/core/ThisBlock;)Lio/matthewnelson/kmp/tor/runtime/service/TorServiceConfig$Foreground;
 }
 
-protected abstract interface class io/matthewnelson/kmp/tor/runtime/service/TorServiceConfig$Loader {
-	public abstract fun newInstance (Landroid/app/Application;)Lio/matthewnelson/kmp/tor/runtime/TorRuntime$ServiceFactory$Loader;
+protected final class io/matthewnelson/kmp/tor/runtime/service/TorServiceConfig$UTIL {
+	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/service/TorServiceConfig$UTIL;
 }
 
 public abstract class io/matthewnelson/kmp/tor/runtime/service/TorServiceUI : io/matthewnelson/kmp/tor/runtime/service/AbstractTorServiceUI {

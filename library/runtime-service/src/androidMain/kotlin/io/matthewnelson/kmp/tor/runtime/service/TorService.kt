@@ -15,8 +15,6 @@
  **/
 package io.matthewnelson.kmp.tor.runtime.service
 
-
-import android.app.Application
 import android.app.ForegroundServiceStartNotAllowedException
 import android.app.Service
 import android.content.ComponentName
@@ -33,6 +31,8 @@ import io.matthewnelson.kmp.tor.runtime.RuntimeEvent.Notifier.Companion.e
 import io.matthewnelson.kmp.tor.runtime.RuntimeEvent.Notifier.Companion.lce
 import io.matthewnelson.kmp.tor.runtime.RuntimeEvent.Notifier.Companion.w
 import io.matthewnelson.kmp.tor.runtime.core.Executable
+import io.matthewnelson.kmp.tor.runtime.service.internal.ApplicationContext
+import io.matthewnelson.kmp.tor.runtime.service.internal.ApplicationContext.Companion.toApplicationContext
 import io.matthewnelson.kmp.tor.runtime.service.internal.SynchronizedInstance
 import kotlinx.coroutines.*
 import io.matthewnelson.kmp.tor.runtime.TorRuntime.ServiceFactory.Binder as TorBinder
@@ -41,7 +41,7 @@ import io.matthewnelson.kmp.tor.runtime.TorRuntime.ServiceFactory.Binder as TorB
 internal class TorService internal constructor(): Service() {
 
     private class AndroidServiceFactory(
-        private val app: Application,
+        private val appContext: ApplicationContext,
         config: TorServiceConfig,
         instanceUIConfig: TorServiceUI.Config?,
         initializer: Initializer,
@@ -51,24 +51,25 @@ internal class TorService internal constructor(): Service() {
 
         @Throws(RuntimeException::class)
         protected override fun startService() {
-            val intent = Intent(app, TorService::class.java)
+            val context = appContext.get()
+            val intent = Intent(context, TorService::class.java)
 
             if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
                 // API 25-
-                app.startService(intent)
+                context.startService(intent)
                 intent.bindService()
                 return
             }
 
             // API 26+
             if (connection.config !is TorServiceConfig.Foreground<*, *>) {
-                app.startService(intent)
+                context.startService(intent)
                 intent.bindService()
                 return
             }
 
             val threw: IllegalStateException? = try {
-                app.startForegroundService(intent)
+                context.startForegroundService(intent)
 
                 // Will only run if startForegroundService does not throw
                 intent.bindService()
@@ -97,28 +98,30 @@ internal class TorService internal constructor(): Service() {
 
         @Suppress("NOTHING_TO_INLINE")
         private inline fun Intent.bindService(): Boolean {
-            return app.bindService(this, connection, Context.BIND_AUTO_CREATE)
+            return appContext.get().bindService(this, connection, Context.BIND_AUTO_CREATE)
         }
     }
 
     internal companion object {
 
         @JvmSynthetic
-        internal fun Application.serviceFactoryLoader(
+        internal fun ApplicationContext.serviceFactoryLoader(
             config: TorServiceConfig,
             instanceUIConfig: TorServiceUI.Config?,
         ): TorRuntime.ServiceFactory.Loader {
-            val app = this
+            val context = this
 
             return object : TorRuntime.ServiceFactory.Loader() {
-                override fun loadProtected(
+                protected override fun loadProtected(
                     initializer: TorRuntime.ServiceFactory.Initializer,
                 ): TorRuntime.ServiceFactory {
-                    return AndroidServiceFactory(app, config, instanceUIConfig, initializer)
+                    return AndroidServiceFactory(context, config, instanceUIConfig, initializer)
                 }
             }
         }
     }
+
+    private val appContext: ApplicationContext by lazy { toApplicationContext() }
 
     private val holders = SynchronizedInstance.of(LinkedHashMap<TorBinder, Holder?>(1, 1.0f))
 
@@ -252,6 +255,7 @@ internal class TorService internal constructor(): Service() {
 
     public override fun onCreate() {
         super.onCreate()
+        appContext
         scope.launch {
             // TODO: stop service if nothing binds within 250ms
         }
@@ -322,7 +326,7 @@ internal class TorService internal constructor(): Service() {
 
                         if (service.isDestroyed()) return@withLock null
 
-                        application.unbindService(conn)
+                        appContext.get().unbindService(conn)
                         Executable {
                             binder.lce(Lifecycle.Event.OnUnbind(service))
                         }
@@ -337,7 +341,8 @@ internal class TorService internal constructor(): Service() {
                     // Last instance destroyed. Kill it.
                     // TODO: Needs testing to ensure notification is cleared.
                     ui?.stopForeground()
-                    application.stopService(Intent(application, TorService::class.java))
+                    val context = appContext.get()
+                    context.stopService(Intent(context, TorService::class.java))
                 }
             }
         }

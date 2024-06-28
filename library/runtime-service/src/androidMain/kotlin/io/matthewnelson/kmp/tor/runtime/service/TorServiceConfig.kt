@@ -17,7 +17,6 @@
 
 package io.matthewnelson.kmp.tor.runtime.service
 
-import android.app.Application
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
@@ -40,6 +39,8 @@ import io.matthewnelson.kmp.tor.runtime.core.ThisBlock
 import io.matthewnelson.kmp.tor.runtime.core.apply
 import io.matthewnelson.kmp.tor.runtime.service.TorService.Companion.serviceFactoryLoader
 import io.matthewnelson.kmp.tor.runtime.service.AbstractTorServiceUI.Factory.Companion.unsafeCastAsType
+import io.matthewnelson.kmp.tor.runtime.service.internal.ApplicationContext
+import io.matthewnelson.kmp.tor.runtime.service.internal.ApplicationContext.Companion.toApplicationContext
 import kotlin.concurrent.Volatile
 
 /**
@@ -180,17 +181,21 @@ public open class TorServiceConfig private constructor(
         installer: (installationDirectory: File) -> ResourceInstaller<Paths.Tor>,
         block: ThisBlock<TorRuntime.Environment.Builder>,
     ): TorRuntime.Environment {
+        val config = this
+
         @OptIn(ExperimentalKmpTorApi::class)
-        return Loader { app ->
-            app.serviceFactoryLoader(this, instanceUIConfig = null)
-        }.newEnvironment(dirName, installer, block)
+        return with(UTIL) {
+            UTIL.ProvideLoader { appContext ->
+                appContext.serviceFactoryLoader(config, instanceUIConfig = null)
+            }.newEnvironment(config, dirName, installer, block)
+        }
     }
 
     public companion object {
 
         private const val DEFAULT_DIRNAME: String = "torservice"
 
-        private var app: Application? = null
+        private var appContext: ApplicationContext? = null
 
         @Volatile
         private var _instance: TorServiceConfig? = null
@@ -208,7 +213,7 @@ public open class TorServiceConfig private constructor(
         ): TorServiceConfig {
             val b = Builder.get().apply(block)
 
-            return _instance ?: synchronized(Builder.Companion) {
+            return _instance ?: synchronized(UTIL) {
                 _instance ?: TorServiceConfig(b)
                     .also { _instance = it }
             }
@@ -446,12 +451,16 @@ public open class TorServiceConfig private constructor(
             installer: (installationDirectory: File) -> ResourceInstaller<Paths.Tor>,
             block: ThisBlock<TorRuntime.Environment.Builder>,
         ): TorRuntime.Environment {
+            val config = this
+
             @OptIn(ExperimentalKmpTorApi::class)
-            return Loader { app ->
-                instanceConfig.validate(app)
-                instanceConfig.unsafeCastAsType(other = factory.defaultConfig)
-                app.serviceFactoryLoader(this, instanceUIConfig = instanceConfig)
-            }.newEnvironment(dirName, installer, block)
+            return with(UTIL) {
+                UTIL.ProvideLoader { appContext ->
+                    instanceConfig.validate(appContext.get())
+                    instanceConfig.unsafeCastAsType(other = factory.defaultConfig)
+                    appContext.serviceFactoryLoader(config, instanceUIConfig = instanceConfig)
+                }.newEnvironment(config, dirName, installer, block)
+            }
         }
 
         public companion object {
@@ -485,12 +494,12 @@ public open class TorServiceConfig private constructor(
             ): Foreground<C, F> {
                 val b = Builder.get().apply(block)
 
-                return _instance?.unsafeCast() ?: synchronized(Builder.Companion) {
+                return _instance?.unsafeCast() ?: synchronized(UTIL) {
                     _instance?.unsafeCast() ?: run {
-                        val app = app
+                        val app = appContext
 
                         if (app != null) {
-                            factory.defaultConfig.validate(app)
+                            factory.defaultConfig.validate(app.get())
 
                             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                                 val info = factory.info
@@ -504,7 +513,7 @@ public open class TorServiceConfig private constructor(
                                     setSound(null, null)
                                 }
 
-                                (app.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager)
+                                (app.get().getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager)
                                     .createNotificationChannel(channel)
                             }
                         }
@@ -517,56 +526,60 @@ public open class TorServiceConfig private constructor(
         }
     }
 
-    @OptIn(ExperimentalKmpTorApi::class)
-    protected fun interface Loader {
-        public fun newInstance(app: Application): TorRuntime.ServiceFactory.Loader
-    }
+    protected object UTIL {
 
-    protected fun Loader.newEnvironment(
-        dirName: String,
-        installer: (installationDirectory: File) -> ResourceInstaller<Paths.Tor>,
-        block: ThisBlock<TorRuntime.Environment.Builder>,
-    ): TorRuntime.Environment {
-        val app = app
-
-        @Suppress("LocalVariableName")
-        val _dirName = dirName.ifBlank { DEFAULT_DIRNAME }
-
-        if (app == null) {
-            // Verify not Android runtime.
-            @OptIn(InternalKmpTorApi::class)
-            check(!OSInfo.INSTANCE.isAndroidRuntime()) {
-                // Startup initializer failed???
-                Initializer.errorMsg()
-            }
-
-            // Android unit tests
-            val testDir = if (testUseBuildDirectory) {
-                "".toFile().absoluteFile.resolve("build")
-            } else {
-                SysTempDir
-            }.resolve("kmp_tor_android_test").resolve(_dirName)
-
-            return TorRuntime.Environment.Builder(
-                workDirectory = testDir.resolve("work"),
-                cacheDirectory = testDir.resolve("cache"),
-                installer = installer,
-                block = block,
-            )
+        @OptIn(ExperimentalKmpTorApi::class)
+        internal fun interface ProvideLoader {
+            fun newInstance(appContext: ApplicationContext): TorRuntime.ServiceFactory.Loader
         }
 
-        // Emulator or Device
-        return TorRuntime.Environment.Builder(
-            workDirectory = app.getDir(_dirName, Context.MODE_PRIVATE),
-            cacheDirectory = app.cacheDir.resolve(_dirName),
-            installer = installer,
-            block = {
-                apply(block)
+        internal fun ProvideLoader.newEnvironment(
+            config: TorServiceConfig,
+            dirName: String,
+            installer: (installationDirectory: File) -> ResourceInstaller<Paths.Tor>,
+            block: ThisBlock<TorRuntime.Environment.Builder>,
+        ): TorRuntime.Environment {
+            val appContext = appContext
 
-                @OptIn(ExperimentalKmpTorApi::class)
-                serviceFactoryLoader = this@newEnvironment.newInstance(app)
-            },
-        )
+            @Suppress("LocalVariableName")
+            val _dirName = dirName.ifBlank { DEFAULT_DIRNAME }
+
+            if (appContext == null) {
+                // Verify not Android runtime.
+                @OptIn(InternalKmpTorApi::class)
+                check(!OSInfo.INSTANCE.isAndroidRuntime()) {
+                    // Startup initializer failed???
+                    Initializer.errorMsg()
+                }
+
+                // Android unit tests
+                val testDir = if (config.testUseBuildDirectory) {
+                    "".toFile().absoluteFile.resolve("build")
+                } else {
+                    SysTempDir
+                }.resolve("kmp_tor_android_test").resolve(_dirName)
+
+                return TorRuntime.Environment.Builder(
+                    workDirectory = testDir.resolve("work"),
+                    cacheDirectory = testDir.resolve("cache"),
+                    installer = installer,
+                    block = block,
+                )
+            }
+
+            // Emulator or Device
+            return TorRuntime.Environment.Builder(
+                workDirectory = appContext.get().getDir(_dirName, Context.MODE_PRIVATE),
+                cacheDirectory = appContext.get().cacheDir.resolve(_dirName),
+                installer = installer,
+                block = {
+                    apply(block)
+
+                    @OptIn(ExperimentalKmpTorApi::class)
+                    serviceFactoryLoader = this@newEnvironment.newInstance(appContext)
+                },
+            )
+        }
     }
 
     internal class Initializer internal constructor(): androidx.startup.Initializer<Initializer.Companion> {
@@ -574,7 +587,7 @@ public open class TorServiceConfig private constructor(
         public override fun create(context: Context): Companion {
             val initializer = AppInitializer.getInstance(context)
             check(initializer.isEagerlyInitialized(javaClass)) { errorMsg() }
-            app = context.applicationContext as Application
+            appContext = context.toApplicationContext()
             return Companion
         }
 
@@ -593,7 +606,7 @@ public open class TorServiceConfig private constructor(
         internal companion object {
 
             @JvmSynthetic
-            internal fun isInitialized(): Boolean = app != null
+            internal fun isInitialized(): Boolean = appContext != null
 
             internal fun errorMsg(): String {
                 val classPath = "io.matthewnelson.kmp.tor.runtime.service.TorServiceConfig$" + "Initializer"
