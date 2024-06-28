@@ -16,7 +16,6 @@
 package io.matthewnelson.kmp.tor.runtime.service
 
 import kotlin.test.Test
-import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 
 class TorServiceConfigInitializerUnitTest {

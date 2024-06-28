@@ -30,7 +30,7 @@ class AndroidRuntimeUnitTest {
     }
 
     @Test
-    fun givenTorRuntime_whenNotAndroidRuntime_thenIsNotAndroidTorRuntime() {
+    fun givenTorRuntime_whenNotAndroidRuntime_thenIsNotAndroidTorServiceFactory() {
         val environment = config.newEnvironment(dirName = "rt_unit_tests") { installationDir ->
             TorResources(installationDir)
         }
@@ -47,6 +47,8 @@ class AndroidRuntimeUnitTest {
         }
 
         assertEquals("RealTorRuntime", runtime::class.simpleName)
+        assertIsNot<TorRuntime.ServiceFactory>(runtime)
+
         val lce = lces.filter { it.className == "RealTorRuntime" }
         assertEquals(1, lce.size)
         assertEquals(Lifecycle.Event.Name.OnCreate, lce.first().name)

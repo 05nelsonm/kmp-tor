@@ -567,6 +567,8 @@ public open class TorServiceConfig private constructor(
                 )
             }
 
+            val loader = this
+
             // Emulator or Device
             return TorRuntime.Environment.Builder(
                 workDirectory = appContext.get().getDir(_dirName, Context.MODE_PRIVATE),
@@ -576,7 +578,7 @@ public open class TorServiceConfig private constructor(
                     apply(block)
 
                     @OptIn(ExperimentalKmpTorApi::class)
-                    serviceFactoryLoader = this@newEnvironment.newInstance(appContext)
+                    serviceFactoryLoader = loader.newInstance(appContext)
                 },
             )
         }
