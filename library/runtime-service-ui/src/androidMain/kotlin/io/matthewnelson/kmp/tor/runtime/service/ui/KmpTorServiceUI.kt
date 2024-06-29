@@ -21,6 +21,7 @@ import io.matthewnelson.kmp.tor.core.api.annotation.ExperimentalKmpTorApi
 import io.matthewnelson.kmp.tor.core.api.annotation.KmpTorDsl
 import io.matthewnelson.kmp.tor.runtime.core.ThisBlock
 import io.matthewnelson.kmp.tor.runtime.core.apply
+import io.matthewnelson.kmp.tor.runtime.service.AbstractTorServiceUI
 import io.matthewnelson.kmp.tor.runtime.service.TorServiceUI
 import io.matthewnelson.kmp.tor.runtime.service.TorServiceConfig
 
@@ -34,7 +35,7 @@ import io.matthewnelson.kmp.tor.runtime.service.TorServiceConfig
 @OptIn(ExperimentalKmpTorApi::class)
 public class KmpTorServiceUI private constructor(
     args: Args,
-): TorServiceUI<KmpTorServiceUI.Config>(args) {
+): TorServiceUI<KmpTorServiceUI.Config, KmpTorServiceState<KmpTorServiceUI.Config>>(args) {
 
     /**
      * TODO
@@ -75,7 +76,7 @@ public class KmpTorServiceUI private constructor(
      * */
     public class Factory private constructor(
         b: Builder,
-    ): TorServiceUI.Factory<Config, KmpTorServiceUI>(
+    ): TorServiceUI.Factory<Config, KmpTorServiceState<Config>, KmpTorServiceUI>(
         b.defaultConfig,
         b.info
     ) {
@@ -112,8 +113,14 @@ public class KmpTorServiceUI private constructor(
             }
         }
 
-        protected override fun newInstanceProtected(args: Args): KmpTorServiceUI {
+        protected override fun newInstanceUIProtected(args: Args): KmpTorServiceUI {
             return KmpTorServiceUI(args)
         }
+    }
+
+    protected override fun newInstanceStateProtected(
+        args: AbstractTorServiceUI.Args.Instance,
+    ): KmpTorServiceState<Config> {
+        TODO("Not yet implemented")
     }
 }

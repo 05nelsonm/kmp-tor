@@ -137,7 +137,7 @@ internal class TorService internal constructor(): Service() {
     private fun isDestroyed(): Boolean = !supervisor.isActive
 
     @Volatile
-    private var ui: TorServiceUI<*>? = null
+    private var ui: TorServiceUI<*, *>? = null
 
     private val binder = object : Binder() {
         public override fun inject(conn: Connection) {
@@ -195,7 +195,7 @@ internal class TorService internal constructor(): Service() {
                         )
 
                         val ui = try {
-                            conn.config.factory.newInstance(args)
+                            conn.config.factory.newInstanceUI(args)
                         } catch (e: IllegalStateException) {
                             // Implementation of TorServiceUI.Factory is bad.
                             // Report error and shutdown TorService.

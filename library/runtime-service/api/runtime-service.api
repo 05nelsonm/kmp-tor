@@ -4,13 +4,22 @@ public abstract class io/matthewnelson/kmp/tor/runtime/service/AbstractTorServic
 	protected final field serviceChildScope Lkotlinx/coroutines/CoroutineScope;
 	public final fun equals (Ljava/lang/Object;)Z
 	public final fun hashCode ()I
-	protected final fun isDestroyed ()Z
+	public final fun isDestroyed ()Z
+	protected abstract fun newInstanceStateProtected (Lio/matthewnelson/kmp/tor/runtime/service/AbstractTorServiceUI$Args$Instance;)Lio/matthewnelson/kmp/tor/runtime/service/AbstractTorServiceUI$InstanceState;
 	protected fun onDestroy ()V
 }
 
 public abstract class io/matthewnelson/kmp/tor/runtime/service/AbstractTorServiceUI$Args {
+	public synthetic fun <init> (Lio/matthewnelson/kmp/tor/runtime/service/AbstractTorServiceUI$Config;Lkotlinx/coroutines/CoroutineScope;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
 	public final fun equals (Ljava/lang/Object;)Z
 	public final fun hashCode ()I
+}
+
+public abstract class io/matthewnelson/kmp/tor/runtime/service/AbstractTorServiceUI$Args$Instance : io/matthewnelson/kmp/tor/runtime/service/AbstractTorServiceUI$Args {
+	public synthetic fun <init> (Lio/matthewnelson/kmp/tor/runtime/service/AbstractTorServiceUI$Config;Lkotlinx/coroutines/CoroutineScope;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
+}
+
+public abstract class io/matthewnelson/kmp/tor/runtime/service/AbstractTorServiceUI$Args$UI : io/matthewnelson/kmp/tor/runtime/service/AbstractTorServiceUI$Args {
 }
 
 protected final class io/matthewnelson/kmp/tor/runtime/service/AbstractTorServiceUI$Companion {
@@ -24,7 +33,17 @@ public abstract class io/matthewnelson/kmp/tor/runtime/service/AbstractTorServic
 
 public abstract class io/matthewnelson/kmp/tor/runtime/service/AbstractTorServiceUI$Factory {
 	public final field defaultConfig Lio/matthewnelson/kmp/tor/runtime/service/AbstractTorServiceUI$Config;
-	protected abstract fun newInstanceProtected (Lio/matthewnelson/kmp/tor/runtime/service/AbstractTorServiceUI$Args;)Lio/matthewnelson/kmp/tor/runtime/service/AbstractTorServiceUI;
+	protected abstract fun newInstanceUIProtected (Lio/matthewnelson/kmp/tor/runtime/service/AbstractTorServiceUI$Args$UI;)Lio/matthewnelson/kmp/tor/runtime/service/AbstractTorServiceUI;
+}
+
+public abstract class io/matthewnelson/kmp/tor/runtime/service/AbstractTorServiceUI$InstanceState {
+	public final field instanceConfig Lio/matthewnelson/kmp/tor/runtime/service/AbstractTorServiceUI$Config;
+	protected final field instanceScope Lkotlinx/coroutines/CoroutineScope;
+	protected fun <init> (Lio/matthewnelson/kmp/tor/runtime/service/AbstractTorServiceUI$Args$Instance;)V
+	public final fun equals (Ljava/lang/Object;)Z
+	public final fun hashCode ()I
+	public final fun isDestroyed ()Z
+	protected fun onDestroy ()V
 }
 
 public class io/matthewnelson/kmp/tor/runtime/service/TorServiceConfig {
@@ -78,7 +97,7 @@ public abstract class io/matthewnelson/kmp/tor/runtime/service/TorServiceUI : io
 	protected final fun unregister (Landroid/content/BroadcastReceiver;)V
 }
 
-public final class io/matthewnelson/kmp/tor/runtime/service/TorServiceUI$Args : io/matthewnelson/kmp/tor/runtime/service/AbstractTorServiceUI$Args {
+public final class io/matthewnelson/kmp/tor/runtime/service/TorServiceUI$Args : io/matthewnelson/kmp/tor/runtime/service/AbstractTorServiceUI$Args$UI {
 	public synthetic fun <init> (Lio/matthewnelson/kmp/tor/runtime/service/TorServiceUI$Config;Lio/matthewnelson/kmp/tor/runtime/service/TorServiceUI$NotificationInfo;Landroid/content/Context;Lkotlinx/coroutines/CoroutineScope;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
 }
 

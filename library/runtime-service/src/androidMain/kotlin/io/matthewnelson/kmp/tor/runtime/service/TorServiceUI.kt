@@ -29,9 +29,9 @@ import io.matthewnelson.kmp.tor.core.api.annotation.ExperimentalKmpTorApi
 import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
 import io.matthewnelson.kmp.tor.core.resource.synchronized
 import io.matthewnelson.kmp.tor.core.resource.SynchronizedObject
+import io.matthewnelson.kmp.tor.runtime.Lifecycle
 import io.matthewnelson.kmp.tor.runtime.TorRuntime
-import io.matthewnelson.kmp.tor.runtime.service.AbstractTorServiceUI.Args
-import io.matthewnelson.kmp.tor.runtime.service.AbstractTorServiceUI.Factory
+import io.matthewnelson.kmp.tor.runtime.service.AbstractTorServiceUI.InstanceState
 import io.matthewnelson.kmp.tor.runtime.service.internal.register
 import kotlinx.coroutines.CoroutineScope
 
@@ -43,23 +43,79 @@ import kotlinx.coroutines.CoroutineScope
  * Alternatively, use the default implementation `kmp-tor:runtime-service-ui`
  * dependency, [io.matthewnelson.kmp.tor.runtime.service.ui.KmpTorServiceUI].
  *
+ * This class' API is designed as follows:
+ *  - [Factory]: To be used for all [TorRuntime.ServiceFactory] instances and
+ *   injected into [TorService] upon creation.
+ *      - Context: `SINGLETON`
+ *  - [AbstractTorServiceUI]: To be created via [Factory.newInstanceUIProtected]
+ *   upon [TorService] start.
+ *      - Context: `SERVICE`
+ *  - [InstanceState]: To be created via [AbstractTorServiceUI.newInstanceStateProtected]
+ *   for every instance of [Lifecycle.DestroyableTorRuntime] operating within
+ *   [TorService].
+ *      - Context: `INSTANCE`
+ *
  * @throws [IllegalStateException] on instantiation if [args] were not those
- *   which were passed to [Factory.newInstance]. See [Args].
+ *   which were passed to [Factory.newInstanceUI]. See [Args].
  * */
-public abstract class TorServiceUI<C: TorServiceUI.Config>
+public abstract class TorServiceUI<C: TorServiceUI.Config, IS: InstanceState<C>>
 @ExperimentalKmpTorApi
 @Throws(IllegalStateException::class)
 protected constructor(
     args: Args,
-): AbstractTorServiceUI<TorServiceUI.Args, C>(
+): AbstractTorServiceUI<TorServiceUI.Args, C, IS>(
     args,
     INIT,
 ) {
+
+    /**
+     * Holder for customized input from consumers of `kmp-tor-service`
+     * for the Foreground Service's [Notification].
+     *
+     * @see [of]
+     * */
+    public class NotificationInfo private constructor(
+        @JvmField
+        public val channelID: String,
+        @JvmField
+        public val channelName: String,
+        @JvmField
+        public val channelDescription: String,
+        @JvmField
+        public val channelShowBadge: Boolean,
+        @JvmField
+        public val notificationID: Int,
+    ) {
+
+        public companion object {
+
+            @JvmStatic
+            public fun of(
+                channelID: String,
+                channelName: String,
+                channelDescription: String,
+                channelShowBadge: Boolean,
+                notificationID: Int,
+            ): NotificationInfo {
+                // TODO: Validate
+
+                return NotificationInfo(
+                    channelID,
+                    channelName,
+                    channelDescription,
+                    channelShowBadge,
+                    notificationID,
+                )
+            }
+        }
+    }
 
     private val service: Context = args.service()
     private val info: NotificationInfo = args.info()
     @Volatile
     private var _hasStartedForeground: Boolean = false
+    @Volatile
+    private var _isStoppingForeground: Boolean = false
     @Volatile
     private var manager: NotificationManager? = service
         .getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
@@ -102,6 +158,8 @@ protected constructor(
         }
 
         if (isDestroyed()) return
+        if (_isStoppingForeground) return
+
         if (startForeground && service is Service) {
             // API 29+ will pull foregroundServiceType from whatever was
             // declared in the manifest.
@@ -147,80 +205,6 @@ protected constructor(
         service.unregisterReceiver(this)
     }
 
-    @JvmSynthetic
-    internal fun stopForeground() {
-        @OptIn(InternalKmpTorApi::class)
-        val stopForeground = synchronized(lock) {
-            val wasNotNull = manager != null
-            manager = null
-
-            if (!_hasStartedForeground) {
-                // Manager set to null above which will simply not post
-                // anymore notification updates. Nothing else to do.
-                _hasStartedForeground = true
-                false
-            } else {
-                // if not null, this is first call where manager reference
-                // was released.
-                wasNotNull
-            }
-        }
-
-        if (!stopForeground) return
-        if (service !is Service) return
-        if (isDestroyed()) return
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            // API 33+
-            service.stopForeground(Service.STOP_FOREGROUND_REMOVE)
-        } else {
-            // API 32-
-            @Suppress("DEPRECATION")
-            service.stopForeground(/* removeNotification */true)
-        }
-    }
-
-    /**
-     * `androidMain` implementation for passing arguments in an encapsulated
-     * manner when instantiating new instances of [TorServiceUI] implementations.
-     *
-     * [Args] are single use items and must be consumed only once, otherwise
-     * an exception is raised when [Factory.newInstance] is called resulting
-     * a service start failure.
-     * */
-    public class Args private constructor(
-        defaultConfig: Config,
-        private val _info: NotificationInfo,
-        private val _service: Context,
-        serviceScope: CoroutineScope,
-    ): AbstractTorServiceUI.Args(
-        defaultConfig,
-        serviceScope,
-        INIT,
-    ) {
-
-        @JvmSynthetic
-        internal fun info(): NotificationInfo = _info
-        @JvmSynthetic
-        internal fun service(): Context = _service
-
-        internal companion object {
-
-            @JvmSynthetic
-            internal fun of(
-                defaultConfig: Config,
-                info: NotificationInfo,
-                service: Context,
-                serviceScope: CoroutineScope,
-            ): Args = Args(
-                defaultConfig,
-                info,
-                service,
-                serviceScope,
-            )
-        }
-    }
-
     /**
      * Core `androidMain` abstraction for holding UI customization input from
      * consumers of `kmp-tor-service`.
@@ -252,46 +236,6 @@ protected constructor(
     }
 
     /**
-     * Holder for customized input from consumers of `kmp-tor-service`
-     * for the Foreground Service's [Notification].
-     * */
-    public class NotificationInfo private constructor(
-        @JvmField
-        public val channelID: String,
-        @JvmField
-        public val channelName: String,
-        @JvmField
-        public val channelDescription: String,
-        @JvmField
-        public val channelShowBadge: Boolean,
-        @JvmField
-        public val notificationID: Int,
-    ) {
-
-        public companion object {
-
-            @JvmStatic
-            public fun of(
-                channelID: String,
-                channelName: String,
-                channelDescription: String,
-                channelShowBadge: Boolean,
-                notificationID: Int,
-            ): NotificationInfo {
-                // TODO: Validate
-
-                return NotificationInfo(
-                    channelID,
-                    channelName,
-                    channelDescription,
-                    channelShowBadge,
-                    notificationID,
-                )
-            }
-        }
-    }
-
-    /**
      * Core `androidMain` abstraction for a [Factory] class which is
      * responsible for instantiating new instances of [TorServiceUI]
      * when requested by [TorService].
@@ -302,11 +246,93 @@ protected constructor(
      * As an example implementation, see
      * [io.matthewnelson.kmp.tor.runtime.service.ui.KmpTorServiceUI.Factory]
      * */
-    public abstract class Factory<C: Config, UI: TorServiceUI<C>>
+    public abstract class Factory<C: Config, IS: InstanceState<C>, UI: TorServiceUI<C, IS>>
     @ExperimentalKmpTorApi
     protected constructor(
         defaultConfig: C,
         @JvmField
         public val info: NotificationInfo
-    ): AbstractTorServiceUI.Factory<Args, C, UI>(defaultConfig, INIT)
+    ): AbstractTorServiceUI.Factory<Args, C, IS, UI>(defaultConfig, INIT)
+
+
+    @JvmSynthetic
+    internal fun stopForeground() {
+        _isStoppingForeground = true
+
+        @OptIn(InternalKmpTorApi::class)
+        val stopForeground = synchronized(lock) {
+            val wasNotNull = manager != null
+            manager = null
+
+            if (!_hasStartedForeground) {
+                // Notification.post was never called, so startForeground
+                // never triggered. Setting this to `true` will modify future
+                // Notification.post behavior so that startForeground is NOT
+                // called, it will use the NotificationManager (which was
+                // de-referenced above).
+                _hasStartedForeground = true
+                false
+            } else {
+                // Notification.post has been called before, the first of which
+                // had called Service.startForeground.
+                //
+                // If manager was not null, then this is first call to stopForeground
+                // and Service is about to stop (e.g. onTaskRemoved).
+                wasNotNull
+            }
+        }
+
+        if (!stopForeground) return
+        if (service !is Service) return
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            // API 33+
+            service.stopForeground(Service.STOP_FOREGROUND_REMOVE)
+        } else {
+            // API 32-
+            @Suppress("DEPRECATION")
+            service.stopForeground(/* removeNotification */true)
+        }
+    }
+
+    /**
+     * `androidMain` implementation for passing arguments in an encapsulated
+     * manner when instantiating new instances of [TorServiceUI] implementations.
+     *
+     * [Args] are single use items and must be consumed only once, otherwise
+     * an exception is raised when [Factory.newInstanceUI] is called resulting
+     * a service start failure.
+     * */
+    public class Args private constructor(
+        defaultConfig: Config,
+        private val _info: NotificationInfo,
+        private val _service: Context,
+        serviceScope: CoroutineScope,
+    ): AbstractTorServiceUI.Args.UI(
+        defaultConfig,
+        serviceScope,
+        INIT,
+    ) {
+
+        @JvmSynthetic
+        internal fun info(): NotificationInfo = _info
+        @JvmSynthetic
+        internal fun service(): Context = _service
+
+        internal companion object {
+
+            @JvmSynthetic
+            internal fun of(
+                defaultConfig: Config,
+                info: NotificationInfo,
+                service: Context,
+                serviceScope: CoroutineScope,
+            ): Args = Args(
+                defaultConfig,
+                info,
+                service,
+                serviceScope,
+            )
+        }
+    }
 }

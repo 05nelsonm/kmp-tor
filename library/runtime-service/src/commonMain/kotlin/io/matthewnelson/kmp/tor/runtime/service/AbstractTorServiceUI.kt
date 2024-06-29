@@ -19,7 +19,11 @@ import io.matthewnelson.immutable.collections.toImmutableMap
 import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
 import io.matthewnelson.kmp.tor.core.resource.SynchronizedObject
 import io.matthewnelson.kmp.tor.core.resource.synchronized
+import io.matthewnelson.kmp.tor.runtime.Lifecycle
+import io.matthewnelson.kmp.tor.runtime.RuntimeEvent
 import io.matthewnelson.kmp.tor.runtime.TorRuntime
+import io.matthewnelson.kmp.tor.runtime.core.TorEvent
+import io.matthewnelson.kmp.tor.runtime.service.AbstractTorServiceUI.Factory.Companion.unsafeCastAsType
 import kotlinx.coroutines.*
 import kotlin.concurrent.Volatile
 import kotlin.jvm.JvmField
@@ -33,11 +37,27 @@ import kotlin.jvm.JvmSynthetic
  * Alternatively, use the default implementation `kmp-tor:runtime-service-ui`
  * dependency, [io.matthewnelson.kmp.tor.runtime.service.ui.KmpTorServiceUI].
  *
+ * This class' API is designed as follows:
+ *  - [Factory]: To be used for all [TorRuntime.ServiceFactory] instances and
+ *   injected into a service object upon service creation.
+ *      - Context: `SINGLETON`
+ *  - [AbstractTorServiceUI]: To be created via [Factory.newInstanceUIProtected]
+ *   upon service start.
+ *      - Context: `SERVICE`
+ *  - [InstanceState]: To be created via [AbstractTorServiceUI.newInstanceStateProtected]
+ *   for every instance of [Lifecycle.DestroyableTorRuntime] operating within
+ *   the service object.
+ *      - Context: `INSTANCE`
+ *
  * @see [io.matthewnelson.kmp.tor.runtime.service.TorServiceUI]
  * @throws [IllegalStateException] on instantiation if [args] were not those
- *   which were passed to [Factory.newInstance]. See [Args].
+ *   which were passed to [Factory.newInstanceUI]. See [Args].
  * */
-public abstract class AbstractTorServiceUI<A: AbstractTorServiceUI.Args, C: AbstractTorServiceUI.Config>
+public abstract class AbstractTorServiceUI<
+        A: AbstractTorServiceUI.Args.UI,
+        C: AbstractTorServiceUI.Config,
+        IS: AbstractTorServiceUI.InstanceState<C>,
+        >
 @Throws(IllegalStateException::class)
 internal constructor(
     private val args: A,
@@ -49,49 +69,72 @@ internal constructor(
         check(init == INIT) { "AbstractTorServiceUI cannot be extended" }
     }
 
-    private val serviceJob = args.serviceScope().coroutineContext.job
+    private val serviceJob = args.scope().coroutineContext.job
 
     /**
      * The default [Config] that was defined for [Factory.defaultConfig]
      * */
     @JvmField
-    protected val defaultConfig: C = args.defaultConfig()
+    protected val defaultConfig: C = args.config()
 
     /**
-     * A [CoroutineScope] which is a child of the service object's
-     * [CoroutineScope].
+     * A [CoroutineScope] which is configured as a child to the service
+     * object's [CoroutineScope].
      * */
     @JvmField
     protected val serviceChildScope: CoroutineScope = CoroutineScope(context =
-        args.serviceScope().coroutineContext
+        args.scope().coroutineContext
         + CoroutineName("TorServiceUIScope@${args.hashCode()}")
-        + SupervisorJob(serviceJob)
+
+        // In order to not expose the service's Job externally of
+        // the `runtime-service` module, this scope is created with
+        // a SupervisorJob that is detached (no parent Job). Its
+        // cancellation is instead called via completion handler on
+        // the service's Job.
+        + SupervisorJob()
     )
 
-    protected fun isDestroyed(): Boolean = !serviceJob.isActive
+    public fun isDestroyed(): Boolean = !serviceJob.isActive
 
     protected open fun onDestroy() {}
 
     /**
      * Core `commonMain` abstraction for passing platform specific arguments
      * in an encapsulated manner when instantiating new instances of
-     * [AbstractTorServiceUI] implementations.
+     * [AbstractTorServiceUI] components.
      *
      * [Args] are single use items and must be consumed only once, otherwise
-     * an exception is raised when [Factory.newInstance] is called resulting
-     * a service start failure.
+     * an exception is raised when [Factory.newInstanceUI] or [newInstanceState]
+     * is called, resulting a service start failure.
      *
      * @see [io.matthewnelson.kmp.tor.runtime.service.TorServiceUI.Args]
      * */
-    public abstract class Args internal constructor(
-        private val _defaultConfig: Config,
-        private val _serviceScope: CoroutineScope,
-        init: Any,
+    public sealed class Args private constructor(
+        private val _config: Config,
+        private val _scope: CoroutineScope,
     ) {
 
-        init {
-            check(init == INIT) { "AbstractTorServiceUI.Args cannot be extended" }
+        /**
+         * For [Factory.newInstanceUIProtected]
+         * */
+        public abstract class UI internal constructor(
+            defaultConfig: Config,
+            serviceScope: CoroutineScope,
+            init: Any,
+        ): Args(defaultConfig, serviceScope) {
+
+            init {
+                check(init == INIT) { "AbstractTorServiceUI.Args.UI cannot be extended" }
+            }
         }
+
+        /**
+         * For [newInstanceStateProtected]
+         * */
+        public sealed class Instance(
+            instanceConfig: Config,
+            instanceScope: CoroutineScope,
+        ): Args(instanceConfig, instanceScope)
 
         @Volatile
         private var _isInitialized: Boolean = false
@@ -101,9 +144,9 @@ internal constructor(
 
         @JvmSynthetic
         @Suppress("UNCHECKED_CAST")
-        internal fun <C: Config> defaultConfig(): C = _defaultConfig as C
+        internal fun <C: Config> config(): C = _config as C
         @JvmSynthetic
-        internal fun serviceScope(): CoroutineScope = _serviceScope
+        internal fun scope(): CoroutineScope = _scope
 
         @JvmSynthetic
         @Throws(IllegalStateException::class)
@@ -207,7 +250,12 @@ internal constructor(
      *
      * @see [io.matthewnelson.kmp.tor.runtime.service.TorServiceUI.Factory]
      * */
-    public abstract class Factory<A: Args, C: Config, UI: AbstractTorServiceUI<A, C>> internal constructor(
+    public abstract class Factory<
+            A: Args.UI,
+            C: Config,
+            IS: InstanceState<C>,
+            UI: AbstractTorServiceUI<A, C, IS>
+        > internal constructor(
 
         /**
          * The default [Config] to use if one was not specified when
@@ -226,14 +274,14 @@ internal constructor(
          * Implementors **MUST** utilize [args] to instantiate a new instance
          * of the [UI] implementation. If [args] were not consumed by the
          * returned instance of [UI], an exception will be thrown by
-         * [newInstance]. See [Args].
+         * [newInstanceUI]. See [Args].
          * */
-        protected abstract fun newInstanceProtected(args: A): UI
+        protected abstract fun newInstanceUIProtected(args: A): UI
 
         @JvmSynthetic
         @Throws(IllegalStateException::class)
-        internal fun newInstance(args: A): UI {
-            val i = newInstanceProtected(args)
+        internal fun newInstanceUI(args: A): UI {
+            val i = newInstanceUIProtected(args)
 
             try {
                 // Should already be initialized from instance init
@@ -241,10 +289,20 @@ internal constructor(
                 args.initialize()
             } catch (_: IllegalStateException) {
                 // args are initialized. Ensure args
-                check(i.args == args) { "$args were not used to instantiate instance $i" }
+                check(i.args == args) {
+                    "$args were not used to instantiate instance $i"
+                }
 
-                // Set completion handler to call onDestroy.
-                i.serviceJob.invokeOnCompletion { i.onDestroy() }
+                // Set completion handler to clean up.
+                with(i.serviceJob) {
+                    invokeOnCompletion {
+                        i.serviceChildScope.cancel()
+                    }
+                    invokeOnCompletion {
+                        i.onDestroy()
+                    }
+                }
+
                 return i
             }
 
@@ -258,12 +316,12 @@ internal constructor(
 
             @JvmSynthetic
             @Throws(IllegalArgumentException::class)
-            internal fun <C: Config> Config.unsafeCastAsType(other: C): C {
-                val otherClazz = this::class
-                val thisClazz = other::class
+            internal fun <C: Config> Config.unsafeCastAsType(default: C): C {
+                val tClazz = this::class
+                val dClazz = default::class
 
-                require(thisClazz == otherClazz) {
-                    "this[$thisClazz] is not the same type as other[$otherClazz]"
+                require(tClazz == dClazz) {
+                    "this[$tClazz] is not the same type as defaultConfig[$dClazz]"
                 }
 
                 @Suppress("UNCHECKED_CAST")
@@ -272,8 +330,97 @@ internal constructor(
         }
     }
 
+    /**
+     * Core `commonMain` abstraction for implementors to track changes
+     * via registration of [RuntimeEvent.Observer] and [TorEvent.Observer]
+     * for the instance of [Lifecycle.DestroyableTorRuntime] operating
+     * within the service object.
+     * */
+    public abstract class InstanceState<C: Config>
+    @Throws(IllegalStateException::class)
+    protected constructor(private val args: Args.Instance) {
+
+        init {
+            args.initialize()
+        }
+
+        private val instanceJob: Job = args.scope().coroutineContext.job
+
+        /**
+         * The config for this instance. If no config was expressed when setting
+         * up the [TorRuntime.Environment], then [Factory.defaultConfig] was
+         * utilized.
+         * */
+        @JvmField
+        public val instanceConfig: C = args.config()
+
+        /**
+         * A [CoroutineScope] which is configured as a child to the [serviceChildScope].
+         * */
+        @JvmField
+        protected val instanceScope: CoroutineScope = args.scope()
+
+        public fun isDestroyed(): Boolean = !instanceJob.isActive
+
+        protected open fun onDestroy() {}
+
+        init {
+            instanceJob.invokeOnCompletion { onDestroy() }
+        }
+
+        public final override fun equals(other: Any?): Boolean {
+            if (other !is InstanceState<*>) return false
+            if (other::class != this::class) return false
+            return other.instanceJob == instanceJob
+        }
+
+        public final override fun hashCode(): Int = instanceJob.hashCode()
+    }
+
+    protected abstract fun newInstanceStateProtected(args: Args.Instance): IS
+
+    @JvmSynthetic
+    @Throws(IllegalArgumentException::class, IllegalStateException::class)
+    internal fun newInstanceState(
+        instanceConfig: Config?,
+    ): Pair<CompletableJob, IS> {
+        val config = instanceConfig?.unsafeCastAsType(default = defaultConfig) ?: defaultConfig
+
+        val (instanceJob, instanceScope) = serviceChildScope.coroutineContext.let { ctx ->
+            val job = SupervisorJob(ctx.job)
+
+            job to CoroutineScope(context =
+                ctx
+                + CoroutineName("TorServiceUI.InstanceStateScope@${job.hashCode()}")
+                + job
+            )
+        }
+
+        val args = InstanceArgs(config, instanceScope)
+        val i = newInstanceStateProtected(args)
+
+        try {
+            args.initialize()
+        } catch (_: IllegalStateException) {
+            // InstanceState.hashCode() is overridden to return instanceJob.hashCode()
+            check(i.hashCode() == instanceJob.hashCode()) {
+                instanceJob.cancel()
+
+                "$args were not used to instantiate instance $i"
+            }
+
+            return instanceJob to i
+        }
+
+        // args did not throw exception and were just initialized in this
+        // function body meaning newInstanceStateProtected implementation held
+        // onto them and returned a different instance of InstanceState
+        instanceJob.cancel()
+        throw IllegalStateException("$args were not used to create $i")
+    }
+
     public final override fun equals(other: Any?): Boolean {
-        if (other !is AbstractTorServiceUI<*, *>) return false
+        if (other !is AbstractTorServiceUI<*, *, *>) return false
         if (other::class != this::class) return false
         return other.args == args
     }
@@ -289,4 +436,9 @@ internal constructor(
         @JvmSynthetic
         internal val INIT = Any()
     }
+
+    private inner class InstanceArgs(
+        instanceConfig: Config,
+        instanceScope: CoroutineScope,
+    ): Args.Instance(instanceConfig, instanceScope)
 }

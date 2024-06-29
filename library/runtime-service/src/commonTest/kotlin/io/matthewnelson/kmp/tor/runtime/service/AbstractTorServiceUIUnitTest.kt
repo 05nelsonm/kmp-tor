@@ -15,42 +15,52 @@
  **/
 package io.matthewnelson.kmp.tor.runtime.service
 
-import kotlinx.coroutines.cancel
 import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.job
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runTest
-import kotlin.test.Test
-import kotlin.test.assertEquals
-import kotlin.test.assertFailsWith
+import kotlin.test.*
 
 class AbstractTorServiceUIUnitTest {
 
     class TestUI(
         args: Args,
         init: Any = INIT,
-    ): AbstractTorServiceUI<TestUI.Args, TestUI.Config>(
+        private val newInstanceState: ((args: AbstractTorServiceUI.Args.Instance) -> State)? = null,
+    ): AbstractTorServiceUI<TestUI.Args, TestUI.Config, TestUI.State>(
         args,
         init,
     ) {
 
-        init {
-            serviceChildScope.cancel()
-        }
-
         var invocationOnDestroy = 0
             private set
 
-        override fun onDestroy() {
+        val scope = serviceChildScope
+
+        protected override fun onDestroy() {
             super.onDestroy()
             invocationOnDestroy++
+        }
+
+        protected override fun newInstanceStateProtected(
+            args: AbstractTorServiceUI.Args.Instance
+        ): State {
+            val callback = newInstanceState
+
+            return if (callback != null) {
+                callback(args)
+            } else {
+                State(args)
+            }
         }
 
         class Args(
             defaultConfig: Config,
             scope: TestScope,
+            val newInstanceState: ((args: Instance) -> State)? = null,
             init: Any = INIT
-        ): AbstractTorServiceUI.Args(
+        ): AbstractTorServiceUI.Args.UI(
             defaultConfig,
             scope,
             init,
@@ -67,13 +77,25 @@ class AbstractTorServiceUIUnitTest {
         open class Factory(
             defaultConfig: Config,
             init: Any = INIT,
-        ): AbstractTorServiceUI.Factory<Args, Config, TestUI>(
+        ): AbstractTorServiceUI.Factory<Args, Config, State, TestUI>(
             defaultConfig,
             init,
         ) {
 
-            public override fun newInstanceProtected(args: Args): TestUI {
-                return TestUI(args)
+            public override fun newInstanceUIProtected(args: Args): TestUI {
+                return TestUI(args, newInstanceState = args.newInstanceState)
+            }
+        }
+
+        class State(args: AbstractTorServiceUI.Args.Instance): InstanceState<Config>(args) {
+
+            val scope = instanceScope
+            var invocationOnDestroy = 0
+                private set
+
+            override fun onDestroy() {
+                super.onDestroy()
+                invocationOnDestroy++
             }
         }
     }
@@ -95,7 +117,7 @@ class AbstractTorServiceUIUnitTest {
     }
 
     @Test
-    fun givenArgs_whenInitialized_thenSuccessiveInvocationsThrowException() = runTest {
+    fun givenArgs_whenInitialized_thenSuccessiveInitializeInvocationsThrowException() = runTest {
         val args = TestUI.Args(config, this)
         args.initialize()
         assertFailsWith<IllegalStateException> { args.initialize() }
@@ -107,36 +129,71 @@ class AbstractTorServiceUIUnitTest {
     }
 
     @Test
-    fun givenFactory_whenNewInstance_thenArgsAreVerified() = runTest {
+    fun givenFactory_whenNewUIInstance_thenArgsAreVerified() = runTest {
         run {
             val args = TestUI.Args(config, this)
             val factory = TestUI.Factory(config)
-            factory.newInstance(args)
+            factory.newInstanceUI(args)
 
             assertFailsWith<IllegalStateException> { args.initialize() }
-            assertFailsWith<IllegalStateException> { factory.newInstance(args) }
+            assertFailsWith<IllegalStateException> { factory.newInstanceUI(args) }
         }
 
         run {
             val other = TestUI(TestUI.Args(config, this))
             val factory = object : TestUI.Factory(config) {
-                override fun newInstanceProtected(args: TestUI.Args): TestUI {
+                override fun newInstanceUIProtected(args: TestUI.Args): TestUI {
                     return other
                 }
             }
 
             val otherArgs = TestUI.Args(config, this)
-            assertFailsWith<IllegalStateException> { factory.newInstance(otherArgs) }
+            assertFailsWith<IllegalStateException> { factory.newInstanceUI(otherArgs) }
             assertFailsWith<IllegalStateException> { otherArgs.initialize() }
         }
     }
 
     @Test
-    fun testFactory_whenNewInstance_thenOnDestroyCallbackSet() = runTest {
+    fun givenFactory_whenNewUIInstance_thenOnDestroyCallbackSet() = runTest {
         val factory = TestUI.Factory(config)
-        val instance = factory.newInstance(TestUI.Args(config, this))
+        val instance = factory.newInstanceUI(TestUI.Args(config, this))
+
+        assertTrue(instance.scope.isActive)
+        assertFalse(instance.isDestroyed())
 
         currentCoroutineContext().job.invokeOnCompletion {
+            assertFalse(instance.scope.isActive)
+            assertTrue(instance.isDestroyed())
+            assertEquals(1, instance.invocationOnDestroy)
+        }
+    }
+
+    @Test
+    fun givenUIInstance_whenNewInstanceState_thenArgsAreVerified() = runTest {
+        var state: TestUI.State? = null
+        var iArgs: AbstractTorServiceUI.Args.Instance? = null
+
+        val factory = TestUI.Factory(config)
+        val ui = factory.newInstanceUI(TestUI.Args(config, this, newInstanceState = { args ->
+            iArgs = args
+            state ?: TestUI.State(args)
+        }))
+
+        val (job, instance) = ui.newInstanceState(instanceConfig = null)
+        state = instance
+        val lastArgs = iArgs!!
+        assertFailsWith<IllegalStateException> { lastArgs.initialize() }
+
+        // Check Args.Instance created are consumed when implementation
+        // does not return new instance.
+        assertFailsWith<IllegalStateException> { ui.newInstanceState(instanceConfig = null) }
+        assertNotEquals(lastArgs, iArgs)
+        assertFailsWith<IllegalStateException> { iArgs?.initialize() }
+
+        currentCoroutineContext().job.invokeOnCompletion {
+            assertTrue(instance.isDestroyed())
+            assertFalse(instance.scope.isActive)
+            assertFalse(job.isActive)
             assertEquals(1, instance.invocationOnDestroy)
         }
     }
