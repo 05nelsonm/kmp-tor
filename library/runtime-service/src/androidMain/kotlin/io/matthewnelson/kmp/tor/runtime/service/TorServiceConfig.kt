@@ -280,6 +280,7 @@ public open class TorServiceConfig private constructor(
      * was declared for your [TorServiceUI.Factory.defaultConfig].
      *
      * TODO: AndroidManifest requirements
+     *
      * TODO: README.md
      *
      * e.g. (A Foreground Service using the `kmp-tor:runtime-service-ui` dependency)

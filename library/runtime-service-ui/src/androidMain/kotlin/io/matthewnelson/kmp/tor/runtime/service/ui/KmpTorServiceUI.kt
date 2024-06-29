@@ -113,14 +113,16 @@ public class KmpTorServiceUI private constructor(
             }
         }
 
-        protected override fun newInstanceUIProtected(args: Args): KmpTorServiceUI {
-            return KmpTorServiceUI(args)
-        }
+        protected override fun newInstanceUIProtected(
+            args: Args,
+        ): KmpTorServiceUI = KmpTorServiceUI(args)
     }
 
     protected override fun newInstanceStateProtected(
         args: AbstractTorServiceUI.Args.Instance,
-    ): KmpTorServiceState<Config> {
-        TODO("Not yet implemented")
+    ): KmpTorServiceState<Config> = KmpTorServiceState.of(args)
+
+    protected override fun onUpdate(target: FileIDKey, type: UpdateType) {
+        // TODO
     }
 }

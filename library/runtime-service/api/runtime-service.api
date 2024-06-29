@@ -1,12 +1,14 @@
-public abstract class io/matthewnelson/kmp/tor/runtime/service/AbstractTorServiceUI {
+public abstract class io/matthewnelson/kmp/tor/runtime/service/AbstractTorServiceUI : io/matthewnelson/kmp/tor/runtime/service/TorServiceUIUtils {
 	protected static final field Companion Lio/matthewnelson/kmp/tor/runtime/service/AbstractTorServiceUI$Companion;
 	protected final field defaultConfig Lio/matthewnelson/kmp/tor/runtime/service/AbstractTorServiceUI$Config;
 	protected final field serviceChildScope Lkotlinx/coroutines/CoroutineScope;
 	public final fun equals (Ljava/lang/Object;)Z
 	public final fun hashCode ()I
+	protected final fun instanceStates ()Ljava/util/Map;
 	public final fun isDestroyed ()Z
 	protected abstract fun newInstanceStateProtected (Lio/matthewnelson/kmp/tor/runtime/service/AbstractTorServiceUI$Args$Instance;)Lio/matthewnelson/kmp/tor/runtime/service/AbstractTorServiceUI$InstanceState;
 	protected fun onDestroy ()V
+	protected abstract fun onUpdate (Lio/matthewnelson/kmp/tor/runtime/service/TorServiceUIUtils$FileIDKey;Lio/matthewnelson/kmp/tor/runtime/service/TorServiceUIUtils$UpdateType;)V
 }
 
 public abstract class io/matthewnelson/kmp/tor/runtime/service/AbstractTorServiceUI$Args {
@@ -36,7 +38,8 @@ public abstract class io/matthewnelson/kmp/tor/runtime/service/AbstractTorServic
 	protected abstract fun newInstanceUIProtected (Lio/matthewnelson/kmp/tor/runtime/service/AbstractTorServiceUI$Args$UI;)Lio/matthewnelson/kmp/tor/runtime/service/AbstractTorServiceUI;
 }
 
-public abstract class io/matthewnelson/kmp/tor/runtime/service/AbstractTorServiceUI$InstanceState {
+public abstract class io/matthewnelson/kmp/tor/runtime/service/AbstractTorServiceUI$InstanceState : io/matthewnelson/kmp/tor/runtime/service/TorServiceUIUtils {
+	public final field fileID Lio/matthewnelson/kmp/tor/runtime/FileID;
 	public final field instanceConfig Lio/matthewnelson/kmp/tor/runtime/service/AbstractTorServiceUI$Config;
 	protected final field instanceScope Lkotlinx/coroutines/CoroutineScope;
 	protected fun <init> (Lio/matthewnelson/kmp/tor/runtime/service/AbstractTorServiceUI$Args$Instance;)V
@@ -44,6 +47,7 @@ public abstract class io/matthewnelson/kmp/tor/runtime/service/AbstractTorServic
 	public final fun hashCode ()I
 	public final fun isDestroyed ()Z
 	protected fun onDestroy ()V
+	protected final fun postStateChange ()V
 }
 
 public class io/matthewnelson/kmp/tor/runtime/service/TorServiceConfig {
@@ -124,5 +128,30 @@ public final class io/matthewnelson/kmp/tor/runtime/service/TorServiceUI$Notific
 
 public final class io/matthewnelson/kmp/tor/runtime/service/TorServiceUI$NotificationInfo$Companion {
 	public final fun of (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;ZI)Lio/matthewnelson/kmp/tor/runtime/service/TorServiceUI$NotificationInfo;
+}
+
+public abstract class io/matthewnelson/kmp/tor/runtime/service/TorServiceUIUtils {
+}
+
+protected final class io/matthewnelson/kmp/tor/runtime/service/TorServiceUIUtils$FileIDKey : io/matthewnelson/kmp/tor/runtime/FileID {
+	public synthetic fun <init> (Ljava/lang/String;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public fun equals (Ljava/lang/Object;)Z
+	public fun getFid ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+protected final class io/matthewnelson/kmp/tor/runtime/service/TorServiceUIUtils$Lock {
+	public fun <init> ()V
+	public final fun withLock (Lkotlin/jvm/functions/Function0;)Ljava/lang/Object;
+}
+
+protected final class io/matthewnelson/kmp/tor/runtime/service/TorServiceUIUtils$UpdateType : java/lang/Enum {
+	public static final field Added Lio/matthewnelson/kmp/tor/runtime/service/TorServiceUIUtils$UpdateType;
+	public static final field Changed Lio/matthewnelson/kmp/tor/runtime/service/TorServiceUIUtils$UpdateType;
+	public static final field Removed Lio/matthewnelson/kmp/tor/runtime/service/TorServiceUIUtils$UpdateType;
+	public static fun getEntries ()Lkotlin/enums/EnumEntries;
+	public static fun valueOf (Ljava/lang/String;)Lio/matthewnelson/kmp/tor/runtime/service/TorServiceUIUtils$UpdateType;
+	public static fun values ()[Lio/matthewnelson/kmp/tor/runtime/service/TorServiceUIUtils$UpdateType;
 }
 

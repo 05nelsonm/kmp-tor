@@ -15,16 +15,21 @@
  **/
 package io.matthewnelson.kmp.tor.runtime.service
 
-import kotlinx.coroutines.currentCoroutineContext
-import kotlinx.coroutines.isActive
-import kotlinx.coroutines.job
+import io.matthewnelson.kmp.tor.core.api.annotation.ExperimentalKmpTorApi
+import io.matthewnelson.kmp.tor.runtime.FileID
+import kotlinx.coroutines.*
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runTest
 import kotlin.test.*
 
+@OptIn(ExperimentalKmpTorApi::class)
 class AbstractTorServiceUIUnitTest {
 
-    class TestUI(
+    class TestUI
+    // Only public to test init args on a few tests.
+    // Otherwise, Factory.newInstanceUI must be utilized
+    // for functionality
+    public constructor(
         args: Args,
         init: Any = INIT,
         private val newInstanceState: ((args: AbstractTorServiceUI.Args.Instance) -> State)? = null,
@@ -37,6 +42,16 @@ class AbstractTorServiceUIUnitTest {
             private set
 
         val scope = serviceChildScope
+
+        val updates = mutableListOf<Pair<FileID, String>>()
+
+        val instanceStatesTest: Map<FileID, State> get() {
+            return instanceStates.toMap()
+        }
+
+        protected override fun onUpdate(target: FileIDKey, type: UpdateType) {
+            updates.add(target to type.name)
+        }
 
         protected override fun onDestroy() {
             super.onDestroy()
@@ -67,7 +82,7 @@ class AbstractTorServiceUIUnitTest {
         )
 
         class Config(
-            fields: Map<String, Any>,
+            fields: Map<String, Any?>,
             init: Any = INIT
         ): AbstractTorServiceUI.Config(
             fields,
@@ -97,6 +112,8 @@ class AbstractTorServiceUIUnitTest {
                 super.onDestroy()
                 invocationOnDestroy++
             }
+
+            fun postStateChangeTest() { postStateChange() }
         }
     }
 
@@ -179,14 +196,14 @@ class AbstractTorServiceUIUnitTest {
             state ?: TestUI.State(args)
         }))
 
-        val (job, instance) = ui.newInstanceState(instanceConfig = null)
+        val (job, instance) = ui.newInstanceState(instanceConfig = null, fid = "abcde12345")
         state = instance
         val lastArgs = iArgs!!
         assertFailsWith<IllegalStateException> { lastArgs.initialize() }
 
         // Check Args.Instance created are consumed when implementation
         // does not return new instance.
-        assertFailsWith<IllegalStateException> { ui.newInstanceState(instanceConfig = null) }
+        assertFailsWith<IllegalStateException> { ui.newInstanceState(instanceConfig = null, fid = "") }
         assertNotEquals(lastArgs, iArgs)
         assertFailsWith<IllegalStateException> { iArgs?.initialize() }
 
@@ -196,5 +213,33 @@ class AbstractTorServiceUIUnitTest {
             assertFalse(job.isActive)
             assertEquals(1, instance.invocationOnDestroy)
         }
+    }
+
+    @Test
+    fun givenUIInstance_whenInstanceState_thenDispatchesUpdatesToUI() = runTest {
+        val factory = TestUI.Factory(config)
+        val ui = factory.newInstanceUI(TestUI.Args(config, this))
+        val (instanceJob, instance) = ui.newInstanceState(null, fid = "abcde12345")
+
+        ui.instanceStatesTest.let { instances ->
+            assertEquals(1, instances.size)
+            assertEquals(instance, instances.values.first())
+        }
+
+        assertEquals(1, ui.updates.size)
+        assertEquals("Added", ui.updates[0].second)
+        assertEquals("abcde12345", ui.updates[0].first.fid)
+
+        instance.postStateChangeTest()
+        assertEquals(2, ui.updates.size)
+        assertEquals("Changed", ui.updates[1].second)
+        assertEquals("abcde12345", ui.updates[1].first.fid)
+
+        instanceJob.cancel()
+        assertEquals(3, ui.updates.size)
+        assertEquals("Removed", ui.updates[2].second)
+        assertEquals("abcde12345", ui.updates[2].first.fid)
+
+        assertTrue(ui.instanceStatesTest.isEmpty())
     }
 }

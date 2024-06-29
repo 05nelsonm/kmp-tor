@@ -212,13 +212,15 @@ protected constructor(
      * As an example implementation, see
      * [io.matthewnelson.kmp.tor.runtime.service.ui.KmpTorServiceUI.Config]
      *
+     * @param [fields] A map of the field name value pairs.
+     *   (e.g. `mapOf("iconOff" to R.drawable.my_icon_off)`)
      * @throws [IllegalArgumentException] if [fields] is empty
      * */
     public abstract class Config
     @ExperimentalKmpTorApi
     @Throws(IllegalArgumentException::class)
     protected constructor(
-        fields: Map<String, Any>,
+        fields: Map<String, Any?>,
     ): AbstractTorServiceUI.Config(
         fields,
         INIT,

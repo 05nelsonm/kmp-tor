@@ -15,9 +15,21 @@
  **/
 package io.matthewnelson.kmp.tor.runtime.service.ui
 
+import io.matthewnelson.kmp.tor.core.api.annotation.ExperimentalKmpTorApi
 import io.matthewnelson.kmp.tor.runtime.service.AbstractTorServiceUI
+import kotlin.jvm.JvmSynthetic
 
-public class KmpTorServiceState<C: AbstractTorServiceUI.Config>(
+@OptIn(ExperimentalKmpTorApi::class)
+public class KmpTorServiceState<C: AbstractTorServiceUI.Config> private constructor(
     args: AbstractTorServiceUI.Args.Instance,
 ): AbstractTorServiceUI.InstanceState<C>(args) {
+    // TODO
+
+    internal companion object {
+
+        @JvmSynthetic
+        internal fun <C: AbstractTorServiceUI.Config> of(
+            args: AbstractTorServiceUI.Args.Instance
+        ): KmpTorServiceState<C> = KmpTorServiceState(args)
+    }
 }
