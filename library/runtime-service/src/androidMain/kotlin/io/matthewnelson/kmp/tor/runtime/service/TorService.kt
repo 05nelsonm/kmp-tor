@@ -27,14 +27,20 @@ import android.os.IBinder
 import io.matthewnelson.immutable.collections.toImmutableSet
 import io.matthewnelson.kmp.tor.core.api.annotation.ExperimentalKmpTorApi
 import io.matthewnelson.kmp.tor.runtime.*
+import io.matthewnelson.kmp.tor.runtime.RuntimeEvent.EXECUTE.CMD.observeSignalNewNym
 import io.matthewnelson.kmp.tor.runtime.RuntimeEvent.Notifier.Companion.e
 import io.matthewnelson.kmp.tor.runtime.RuntimeEvent.Notifier.Companion.lce
 import io.matthewnelson.kmp.tor.runtime.RuntimeEvent.Notifier.Companion.w
+import io.matthewnelson.kmp.tor.runtime.core.EnqueuedJob
 import io.matthewnelson.kmp.tor.runtime.core.Executable
+import io.matthewnelson.kmp.tor.runtime.core.OnFailure
+import io.matthewnelson.kmp.tor.runtime.core.OnSuccess
+import io.matthewnelson.kmp.tor.runtime.core.ctrl.TorCmd
 import io.matthewnelson.kmp.tor.runtime.service.internal.ApplicationContext
 import io.matthewnelson.kmp.tor.runtime.service.internal.ApplicationContext.Companion.toApplicationContext
 import io.matthewnelson.kmp.tor.runtime.service.internal.SynchronizedInstance
 import kotlinx.coroutines.*
+import kotlin.concurrent.Volatile
 import io.matthewnelson.kmp.tor.runtime.TorRuntime.ServiceFactory.Binder as TorBinder
 
 @OptIn(ExperimentalKmpTorApi::class)
@@ -300,51 +306,128 @@ internal class TorService internal constructor(): Service() {
         public val stopServiceOnTaskRemoved: Boolean get() = conn.config.stopServiceOnTaskRemoved
         private val binder get() = conn.binder
 
-        // TODO: Create new notification instance to get bind
-        //  arguments
+        private val instanceJob: CompletableJob?
+        private val instanceState: AbstractTorServiceUI.InstanceState<*>?
+        private var newInstanceStateThrew: RuntimeException? = null
+
+        @Volatile
+        private var processorAction: Action.Processor? = null
+        @Volatile
+        private var processorCmd: TorCmd.Unprivileged.Processor? = null
+
+        init {
+            val ui = ui
+            if (ui == null) {
+                instanceJob = null
+                instanceState = null
+            } else {
+                val pair = try {
+                    ui.newInstanceState(
+                        conn.instanceUIConfig,
+                        binder.fid,
+                        observeSignalNewNym = { tag, executor, onEvent ->
+                            if (processorAction == null) return@newInstanceState null
+                            runtime.observeSignalNewNym(tag, executor, onEvent)
+                        },
+                        processorAction = { processorAction },
+                        processorTorCmd = { processorCmd }
+                    )
+                } catch (e: RuntimeException) {
+                    newInstanceStateThrew = e
+                    null
+                }
+
+                instanceJob = pair?.first
+                instanceState = pair?.second
+            }
+        }
 
         // Want to lazily instantiate so that the holders map
         // entry can be created before we start calling things.
         public val runtime: Lifecycle.DestroyableTorRuntime by lazy {
-            binder.onBind(
-                serviceEvents = emptySet(),
+            if (instanceState != null) {
+                binder.lce(Lifecycle.Event.OnCreate(instanceState))
+            }
+
+            val instance = binder.onBind(
+                serviceEvents = instanceState?.events ?: emptySet(),
+                // TODO: Add option to TorServiceConfig
+                //  and check permissions Issue #465
                 serviceObserverNetwork = null,
-                serviceObserversTorEvent = emptySet(),
-                serviceObserversRuntimeEvent = emptySet(),
-            ).apply {
-                invokeOnDestroy {
-                    val service = this@TorService
+                serviceObserversTorEvent = instanceState?.observersTorEvent ?: emptySet(),
+                serviceObserversRuntimeEvent = instanceState?.observersRuntimeEvent ?: emptySet(),
+            )
 
-                    holders.withLock {
-                        val isThis = get(binder) == this@Holder
-
-                        if (!isThis) return@withLock null
-
-                        // Leave the singleton binder, but de-reference
-                        // this holder with the destroyed runtime.
-                        put(binder, null)
-
-                        if (service.isDestroyed()) return@withLock null
-
-                        appContext.get().unbindService(conn)
-                        Executable {
-                            binder.lce(Lifecycle.Event.OnUnbind(service))
-                        }
-                    }?.execute()
+            if (instanceJob != null) {
+                processorAction = object : Action.Processor {
+                    override fun enqueue(
+                        action: Action,
+                        onFailure: OnFailure,
+                        onSuccess: OnSuccess<Unit>
+                    ): EnqueuedJob = instance.enqueue(
+                        action,
+                        onFailure,
+                        onSuccess,
+                    )
                 }
-                invokeOnDestroy {
-                    if (this@TorService.isDestroyed()) return@invokeOnDestroy
-
-                    val isLastInstance = holders.withLock { count { it.value != null } } == 0
-                    if (!isLastInstance) return@invokeOnDestroy
-
-                    // Last instance destroyed. Kill it.
-                    // TODO: Needs testing to ensure notification is cleared.
-                    ui?.stopForeground()
-                    val context = appContext.get()
-                    context.stopService(Intent(context, TorService::class.java))
+                processorCmd = object : TorCmd.Unprivileged.Processor {
+                    override fun <Success : Any> enqueue(
+                        cmd: TorCmd.Unprivileged<Success>,
+                        onFailure: OnFailure,
+                        onSuccess: OnSuccess<Success>
+                    ): EnqueuedJob = instance.enqueue(
+                        cmd,
+                        onFailure,
+                        onSuccess,
+                    )
+                }
+                instance.invokeOnDestroy {
+                    processorAction = null
+                    processorCmd = null
+                    instanceJob.cancel()
+                    binder.lce(Lifecycle.Event.OnDestroy(instanceState!!))
                 }
             }
+
+            instance.invokeOnDestroy {
+                val service = this@TorService
+
+                holders.withLock {
+                    val isThis = get(binder) == this@Holder
+
+                    if (!isThis) return@withLock null
+
+                    // Leave the singleton binder, but de-reference
+                    // this holder with the destroyed runtime.
+                    put(binder, null)
+
+                    if (service.isDestroyed()) return@withLock null
+
+                    appContext.get().unbindService(conn)
+                    Executable {
+                        binder.lce(Lifecycle.Event.OnUnbind(service))
+                    }
+                }?.execute()
+            }
+            instance.invokeOnDestroy {
+                if (this@TorService.isDestroyed()) return@invokeOnDestroy
+
+                val isLastInstance = holders.withLock { count { it.value != null } } == 0
+                if (!isLastInstance) return@invokeOnDestroy
+
+                // Last instance destroyed. Kill it.
+                // TODO: Needs testing to ensure notification is cleared.
+                ui?.stopForeground()
+                val context = appContext.get()
+                context.stopService(Intent(context, TorService::class.java))
+            }
+
+            newInstanceStateThrew?.let { t ->
+                binder.e(t)
+                scope.launch { instance.destroy() }
+            }
+
+            instance
         }
     }
 

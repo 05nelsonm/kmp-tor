@@ -60,6 +60,8 @@ import kotlin.concurrent.Volatile
  *     val environment = config.newEnvironment { installationDirectory ->
  *         // Assuming use of `kmp-tor:resource-tor` or
  *         // `kmp-tor:resource-tor-gpl` dependency
+ *         // as well as the unit test dependency
+ *         // `kmp-tor:resource-android-unit-test`
  *         TorResources(installationDirectory)
  *     }
  *
@@ -304,6 +306,8 @@ public open class TorServiceConfig private constructor(
      *     val environment = config.newEnvironment { installationDirectory ->
      *         // Assuming use of `kmp-tor:resource-tor` or
      *         // `kmp-tor:resource-tor-gpl` dependency
+     *         // as well as the unit test dependency
+     *         // `kmp-tor:resource-android-unit-test`
      *         TorResources(installationDirectory)
      *     }
      *

@@ -22,11 +22,12 @@ import io.matthewnelson.kmp.tor.core.api.annotation.ExperimentalKmpTorApi
 import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
 import io.matthewnelson.kmp.tor.core.resource.SynchronizedObject
 import io.matthewnelson.kmp.tor.core.resource.synchronized
-import io.matthewnelson.kmp.tor.runtime.FileID
-import io.matthewnelson.kmp.tor.runtime.Lifecycle
-import io.matthewnelson.kmp.tor.runtime.RuntimeEvent
-import io.matthewnelson.kmp.tor.runtime.TorRuntime
+import io.matthewnelson.kmp.tor.runtime.*
+import io.matthewnelson.kmp.tor.runtime.FileID.Companion.toFIDString
+import io.matthewnelson.kmp.tor.runtime.core.Disposable
+import io.matthewnelson.kmp.tor.runtime.core.OnEvent
 import io.matthewnelson.kmp.tor.runtime.core.TorEvent
+import io.matthewnelson.kmp.tor.runtime.core.ctrl.TorCmd
 import io.matthewnelson.kmp.tor.runtime.service.AbstractTorServiceUI.Args
 import io.matthewnelson.kmp.tor.runtime.service.AbstractTorServiceUI.Factory.Companion.unsafeCastAsType
 import io.matthewnelson.kmp.tor.runtime.service.internal.SynchronizedInstance
@@ -360,7 +361,7 @@ internal constructor(
     public abstract class InstanceState<C: Config>
     @ExperimentalKmpTorApi
     @Throws(IllegalStateException::class)
-    protected constructor(args: Args.Instance): TorServiceUIUtils() {
+    protected constructor(args: Args.Instance): TorServiceUIUtils(), FileID {
 
         init {
             args.initialize()
@@ -369,8 +370,13 @@ internal constructor(
         private val args = args as AbstractTorServiceUI<*, *, *>.InstanceArgs
         private val instanceJob: Job = args.scope().coroutineContext.job
 
+        public abstract val events: Set<TorEvent>
+        public abstract val observersRuntimeEvent: Set<RuntimeEvent.Observer<*>>
+        public abstract val observersTorEvent: Set<TorEvent.Observer>
+
         @JvmField
         public val fileID: FileID = this.args.key
+        public final override val fid: String = fileID.fid
 
         /**
          * The config for this instance. If no config was expressed when setting
@@ -401,6 +407,25 @@ internal constructor(
             ui.onUpdate(key, UpdateType.Changed)
         }
 
+        protected fun observeSignalNewNym(
+            tag: String?,
+            executor: OnEvent.Executor?,
+            onEvent: OnEvent<String?>,
+        ): Disposable? {
+            if (isDestroyed()) return null
+            return args.observeSignalNewNym(tag, executor, onEvent)
+        }
+
+        public fun processorAction(): Action.Processor? {
+            if (isDestroyed()) return null
+            return args.processorAction()
+        }
+
+        public fun processorTorCmd(): TorCmd.Unprivileged.Processor? {
+            if (isDestroyed()) return null
+            return args.processorTorCmd()
+        }
+
         init {
             instanceJob.invokeOnCompletion {
                 // Remove instance from states before calling
@@ -419,6 +444,8 @@ internal constructor(
         }
 
         public final override fun hashCode(): Int = instanceJob.hashCode()
+
+        public final override fun toString(): String = toFIDString(defaultClassName = "TorServiceUI.InstanceState")
     }
 
     /**
@@ -434,6 +461,9 @@ internal constructor(
     internal fun newInstanceState(
         instanceConfig: Config?,
         fid: String,
+        observeSignalNewNym: (tag: String?, executor: OnEvent.Executor?, onEvent: OnEvent<String?>) -> Disposable?,
+        processorAction: () -> Action.Processor?,
+        processorTorCmd: () -> TorCmd.Unprivileged.Processor?,
     ): Pair<CompletableJob, IS> {
         val config = instanceConfig?.unsafeCastAsType(default = defaultConfig) ?: defaultConfig
 
@@ -447,7 +477,14 @@ internal constructor(
             )
         }
 
-        val args = InstanceArgs(config, instanceScope, fid)
+        val args = InstanceArgs(
+            config,
+            instanceScope,
+            fid,
+            observeSignalNewNym,
+            processorAction,
+            processorTorCmd,
+        )
         val i = newInstanceStateProtected(args)
 
         try {
@@ -510,6 +547,9 @@ internal constructor(
         instanceConfig: Config,
         instanceScope: CoroutineScope,
         fid: String,
+        val observeSignalNewNym: (tag: String?, executor: OnEvent.Executor?, onEvent: OnEvent<String?>) -> Disposable?,
+        val processorAction: () -> Action.Processor?,
+        val processorTorCmd: () -> TorCmd.Unprivileged.Processor?,
     ): Args.Instance(instanceConfig, instanceScope) {
 
         val key = FileIDKey.of(fid)

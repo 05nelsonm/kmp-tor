@@ -16,7 +16,14 @@
 package io.matthewnelson.kmp.tor.runtime.service
 
 import io.matthewnelson.kmp.tor.core.api.annotation.ExperimentalKmpTorApi
+import io.matthewnelson.kmp.tor.runtime.Action
 import io.matthewnelson.kmp.tor.runtime.FileID
+import io.matthewnelson.kmp.tor.runtime.RuntimeEvent
+import io.matthewnelson.kmp.tor.runtime.core.Disposable
+import io.matthewnelson.kmp.tor.runtime.core.OnEvent
+import io.matthewnelson.kmp.tor.runtime.core.TorEvent
+import io.matthewnelson.kmp.tor.runtime.core.ctrl.TorCmd
+import io.matthewnelson.kmp.tor.runtime.service.AbstractTorServiceUI.Config
 import kotlinx.coroutines.*
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runTest
@@ -108,6 +115,10 @@ class AbstractTorServiceUIUnitTest {
             var invocationOnDestroy = 0
                 private set
 
+            override val events: Set<TorEvent> = emptySet()
+            override val observersRuntimeEvent: Set<RuntimeEvent.Observer<*>> = emptySet()
+            override val observersTorEvent: Set<TorEvent.Observer> = emptySet()
+
             override fun onDestroy() {
                 super.onDestroy()
                 invocationOnDestroy++
@@ -196,14 +207,14 @@ class AbstractTorServiceUIUnitTest {
             state ?: TestUI.State(args)
         }))
 
-        val (job, instance) = ui.newInstanceState(instanceConfig = null, fid = "abcde12345")
+        val (job, instance) = ui.newInstanceState(fid = "abcde12345")
         state = instance
         val lastArgs = iArgs!!
         assertFailsWith<IllegalStateException> { lastArgs.initialize() }
 
         // Check Args.Instance created are consumed when implementation
         // does not return new instance.
-        assertFailsWith<IllegalStateException> { ui.newInstanceState(instanceConfig = null, fid = "") }
+        assertFailsWith<IllegalStateException> { ui.newInstanceState(fid = "") }
         assertNotEquals(lastArgs, iArgs)
         assertFailsWith<IllegalStateException> { iArgs?.initialize() }
 
@@ -219,7 +230,7 @@ class AbstractTorServiceUIUnitTest {
     fun givenUIInstance_whenInstanceState_thenDispatchesUpdatesToUI() = runTest {
         val factory = TestUI.Factory(config)
         val ui = factory.newInstanceUI(TestUI.Args(config, this))
-        val (instanceJob, instance) = ui.newInstanceState(null, fid = "abcde12345")
+        val (instanceJob, instance) = ui.newInstanceState(fid = "abcde12345")
 
         ui.instanceStatesTest.let { instances ->
             assertEquals(1, instances.size)
@@ -242,4 +253,19 @@ class AbstractTorServiceUIUnitTest {
 
         assertTrue(ui.instanceStatesTest.isEmpty())
     }
+
+    // overloaded with defaults for making tests simpler
+    private fun TestUI.newInstanceState(
+        instanceConfig: Config? = null,
+        fid: String = "abcde12345",
+        observeSignalNewNym: (String?, OnEvent.Executor?, OnEvent<String?>) -> Disposable? = { _, _, _ -> null },
+        processorAction: () -> Action.Processor? = { null },
+        processorTorCmd: () -> TorCmd.Unprivileged.Processor? = { null },
+    ): Pair<CompletableJob, TestUI.State> = newInstanceState(
+        instanceConfig,
+        fid,
+        observeSignalNewNym,
+        processorAction,
+        processorTorCmd,
+    )
 }

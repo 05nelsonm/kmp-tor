@@ -38,16 +38,24 @@ public abstract class io/matthewnelson/kmp/tor/runtime/service/AbstractTorServic
 	protected abstract fun newInstanceUIProtected (Lio/matthewnelson/kmp/tor/runtime/service/AbstractTorServiceUI$Args$UI;)Lio/matthewnelson/kmp/tor/runtime/service/AbstractTorServiceUI;
 }
 
-public abstract class io/matthewnelson/kmp/tor/runtime/service/AbstractTorServiceUI$InstanceState : io/matthewnelson/kmp/tor/runtime/service/TorServiceUIUtils {
+public abstract class io/matthewnelson/kmp/tor/runtime/service/AbstractTorServiceUI$InstanceState : io/matthewnelson/kmp/tor/runtime/service/TorServiceUIUtils, io/matthewnelson/kmp/tor/runtime/FileID {
 	public final field fileID Lio/matthewnelson/kmp/tor/runtime/FileID;
 	public final field instanceConfig Lio/matthewnelson/kmp/tor/runtime/service/AbstractTorServiceUI$Config;
 	protected final field instanceScope Lkotlinx/coroutines/CoroutineScope;
 	protected fun <init> (Lio/matthewnelson/kmp/tor/runtime/service/AbstractTorServiceUI$Args$Instance;)V
 	public final fun equals (Ljava/lang/Object;)Z
+	public abstract fun getEvents ()Ljava/util/Set;
+	public final fun getFid ()Ljava/lang/String;
+	public abstract fun getObserversRuntimeEvent ()Ljava/util/Set;
+	public abstract fun getObserversTorEvent ()Ljava/util/Set;
 	public final fun hashCode ()I
 	public final fun isDestroyed ()Z
+	protected final fun observeSignalNewNym (Ljava/lang/String;Lio/matthewnelson/kmp/tor/runtime/core/OnEvent$Executor;Lio/matthewnelson/kmp/tor/runtime/core/OnEvent;)Lio/matthewnelson/kmp/tor/runtime/core/Disposable;
 	protected fun onDestroy ()V
 	protected final fun postStateChange ()V
+	public final fun processorAction ()Lio/matthewnelson/kmp/tor/runtime/Action$Processor;
+	public final fun processorTorCmd ()Lio/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$Unprivileged$Processor;
+	public final fun toString ()Ljava/lang/String;
 }
 
 public class io/matthewnelson/kmp/tor/runtime/service/TorServiceConfig {

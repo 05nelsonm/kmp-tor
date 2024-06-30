@@ -35,7 +35,10 @@ import io.matthewnelson.kmp.tor.runtime.service.TorServiceConfig
 @OptIn(ExperimentalKmpTorApi::class)
 public class KmpTorServiceUI private constructor(
     args: Args,
-): TorServiceUI<KmpTorServiceUI.Config, KmpTorServiceState<KmpTorServiceUI.Config>>(args) {
+): TorServiceUI<
+    KmpTorServiceUI.Config,
+    KmpTorServiceUIInstanceState<KmpTorServiceUI.Config>
+>(args) {
 
     /**
      * TODO
@@ -76,7 +79,7 @@ public class KmpTorServiceUI private constructor(
      * */
     public class Factory private constructor(
         b: Builder,
-    ): TorServiceUI.Factory<Config, KmpTorServiceState<Config>, KmpTorServiceUI>(
+    ): TorServiceUI.Factory<Config, KmpTorServiceUIInstanceState<Config>, KmpTorServiceUI>(
         b.defaultConfig,
         b.info
     ) {
@@ -120,9 +123,14 @@ public class KmpTorServiceUI private constructor(
 
     protected override fun newInstanceStateProtected(
         args: AbstractTorServiceUI.Args.Instance,
-    ): KmpTorServiceState<Config> = KmpTorServiceState.of(args)
+    ): KmpTorServiceUIInstanceState<Config> = KmpTorServiceUIInstanceState.of(args)
 
     protected override fun onUpdate(target: FileIDKey, type: UpdateType) {
+        // TODO
+    }
+
+    protected override fun onDestroy() {
+        super.onDestroy()
         // TODO
     }
 }
