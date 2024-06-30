@@ -28,6 +28,7 @@ import io.matthewnelson.immutable.collections.toImmutableSet
 import io.matthewnelson.kmp.tor.core.api.annotation.ExperimentalKmpTorApi
 import io.matthewnelson.kmp.tor.runtime.*
 import io.matthewnelson.kmp.tor.runtime.RuntimeEvent.EXECUTE.CMD.observeSignalNewNym
+import io.matthewnelson.kmp.tor.runtime.RuntimeEvent.Notifier.Companion.d
 import io.matthewnelson.kmp.tor.runtime.RuntimeEvent.Notifier.Companion.e
 import io.matthewnelson.kmp.tor.runtime.RuntimeEvent.Notifier.Companion.lce
 import io.matthewnelson.kmp.tor.runtime.RuntimeEvent.Notifier.Companion.w
@@ -321,12 +322,33 @@ internal class TorService internal constructor(): Service() {
                 instanceJob = null
                 instanceState = null
             } else {
+                val factory = conn.config.let { config ->
+                    if (config is TorServiceConfig.Foreground<*, *>) {
+                        config.factory
+                    } else {
+                        null
+                    }
+                }
+
+                fun log(lazyMessage: () -> String) {
+                    if (processorAction == null) return
+                    if (factory?.debug != true) return
+                    if (!runtime.environment().debug) return
+
+                    binder.d(null, lazyMessage())
+                }
+
                 val pair = try {
                     ui.newInstanceState(
                         conn.instanceUIConfig,
                         binder.fid,
-                        observeSignalNewNym = { tag, executor, onEvent ->
-                            if (processorAction == null) return@newInstanceState null
+                        debugger = debugger@ {
+                            if (factory == null) return@debugger null
+                            if (processorAction == null) return@debugger null
+                            ::log
+                        },
+                        observeSignalNewNym = observe@ { tag, executor, onEvent ->
+                            if (processorAction == null) return@observe null
                             runtime.observeSignalNewNym(tag, executor, onEvent)
                         },
                         processorAction = { processorAction },

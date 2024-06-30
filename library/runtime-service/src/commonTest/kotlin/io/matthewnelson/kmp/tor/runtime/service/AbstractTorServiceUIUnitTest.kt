@@ -204,14 +204,14 @@ class AbstractTorServiceUIUnitTest {
             state ?: TestUI.State(args)
         }))
 
-        val (job, instance) = ui.newInstanceState(fid = "abcde12345")
+        val (job, instance) = ui.newTestInstanceState(fid = "abcde12345")
         state = instance
         val lastArgs = iArgs!!
         assertFailsWith<IllegalStateException> { lastArgs.initialize() }
 
         // Check Args.Instance created are consumed when implementation
         // does not return new instance.
-        assertFailsWith<IllegalStateException> { ui.newInstanceState(fid = "") }
+        assertFailsWith<IllegalStateException> { ui.newTestInstanceState(fid = "") }
         assertNotEquals(lastArgs, iArgs)
         assertFailsWith<IllegalStateException> { iArgs?.initialize() }
 
@@ -227,7 +227,7 @@ class AbstractTorServiceUIUnitTest {
     fun givenUIInstance_whenInstanceState_thenDispatchesUpdatesToUI() = runTest {
         val factory = TestUI.Factory(config)
         val ui = factory.newInstanceUI(TestUI.Args(config, this))
-        val (instanceJob, instance) = ui.newInstanceState(fid = "abcde12345")
+        val (instanceJob, instance) = ui.newTestInstanceState(fid = "abcde12345")
 
         ui.instanceStatesTest.let { instances ->
             assertEquals(1, instances.size)
@@ -252,15 +252,17 @@ class AbstractTorServiceUIUnitTest {
     }
 
     // overloaded with defaults for making tests simpler
-    private fun TestUI.newInstanceState(
+    private fun TestUI.newTestInstanceState(
         instanceConfig: Config? = null,
         fid: String = "abcde12345",
+        debugger: () -> ((() -> String) -> Unit)? = { null },
         observeSignalNewNym: (String?, OnEvent.Executor?, OnEvent<String?>) -> Disposable? = { _, _, _ -> null },
         processorAction: () -> Action.Processor? = { null },
         processorTorCmd: () -> TorCmd.Unprivileged.Processor? = { null },
     ): Pair<CompletableJob, TestUI.State> = newInstanceState(
         instanceConfig,
         fid,
+        debugger,
         observeSignalNewNym,
         processorAction,
         processorTorCmd,

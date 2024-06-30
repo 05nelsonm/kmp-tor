@@ -281,6 +281,32 @@ internal constructor(
         init: Any
     ) {
 
+        /**
+         * Enable/disable [RuntimeEvent.LOG.DEBUG] messages for UI components.
+         *
+         * **NOTE:** [TorRuntime.Environment.debug] must also be set to `true`
+         * for logs to be dispatched.
+         *
+         * e.g. (`kmp-tor:runtime-service-ui` dependency UIState debug logs)
+         *
+         *     UIState[fid=0438…B37D]: [
+         *         actions: [
+         *             ButtonAction.NewIdentity
+         *             ButtonAction.RestartTor
+         *             ButtonAction.StopTor
+         *         ]
+         *         color: ColorState.Ready
+         *         icon: IconState.DataXfer
+         *         progress: Progress.None
+         *         text: NewNym.RateLimited[seconds=8]
+         *         title: TorState.Daemon.On{100%}
+         *     ]
+         *
+         * @see [InstanceState.debug]
+         * */
+        @Volatile
+        public var debug: Boolean = false
+
         init {
             check(init == INIT) { "AbstractTorServiceUI.Factory cannot be extended" }
         }
@@ -422,6 +448,11 @@ internal constructor(
             return args.processorTorCmd()
         }
 
+        public fun debug(lazyMessage: () -> String) {
+            if (isDestroyed()) return
+            args.debugger()?.invoke(lazyMessage)
+        }
+
         init {
             instanceJob.invokeOnCompletion {
                 // Remove instance from states before calling
@@ -457,6 +488,7 @@ internal constructor(
     internal fun newInstanceState(
         instanceConfig: Config?,
         fid: String,
+        debugger: () -> ((() -> String) -> Unit)?,
         observeSignalNewNym: (tag: String?, executor: OnEvent.Executor?, onEvent: OnEvent<String?>) -> Disposable?,
         processorAction: () -> Action.Processor?,
         processorTorCmd: () -> TorCmd.Unprivileged.Processor?,
@@ -477,6 +509,7 @@ internal constructor(
             config,
             instanceScope,
             fid,
+            debugger,
             observeSignalNewNym,
             processorAction,
             processorTorCmd,
@@ -543,6 +576,7 @@ internal constructor(
         instanceConfig: Config,
         instanceScope: CoroutineScope,
         fid: String,
+        val debugger: () -> ((() -> String) -> Unit)?,
         val observeSignalNewNym: (tag: String?, executor: OnEvent.Executor?, onEvent: OnEvent<String?>) -> Disposable?,
         val processorAction: () -> Action.Processor?,
         val processorTorCmd: () -> TorCmd.Unprivileged.Processor?,

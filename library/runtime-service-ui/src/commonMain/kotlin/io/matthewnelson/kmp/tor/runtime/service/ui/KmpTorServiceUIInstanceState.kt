@@ -80,7 +80,10 @@ public class KmpTorServiceUIInstanceState<C: AbstractKmpTorServiceUIConfig> priv
             } else {
                 _state = new
                 // Post the change outside the lock lambda
-                Executable { postStateChange() }
+                Executable {
+                    postStateChange()
+                    debug(lazyMessage = { new.toString() })
+                }
             }
         }?.execute()
     }
