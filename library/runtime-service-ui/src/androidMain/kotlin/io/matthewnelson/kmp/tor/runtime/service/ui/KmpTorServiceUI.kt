@@ -44,17 +44,14 @@ public class KmpTorServiceUI private constructor(
      * TODO
      * */
     public class Config(
-        // TODO
-    ): TorServiceUI.Config(mapOf(
-        // TODO
-        "TODO" to "TODO"
-    )) {
-
-        @Throws(Resources.NotFoundException::class)
-        public override fun validate(context: Context) {
-            // TODO
-        }
-    }
+        enableActionRestart: Boolean,
+        enableActionStop: Boolean,
+    ): AbstractKmpTorServiceUIConfig(
+        enableActionRestart,
+        enableActionStop,
+        emptyMap(), // TODO
+        INIT,
+    )
 
     /**
      * Factory class for [TorServiceConfig.Foreground.Builder]
@@ -116,6 +113,11 @@ public class KmpTorServiceUI private constructor(
             }
         }
 
+        @Throws(Resources.NotFoundException::class)
+        public override fun validate(context: Context, config: Config) {
+            // TODO("Not yet implemented")
+        }
+
         protected override fun newInstanceUIProtected(
             args: Args,
         ): KmpTorServiceUI = KmpTorServiceUI(args)
@@ -123,7 +125,10 @@ public class KmpTorServiceUI private constructor(
 
     protected override fun newInstanceStateProtected(
         args: AbstractTorServiceUI.Args.Instance,
-    ): KmpTorServiceUIInstanceState<Config> = KmpTorServiceUIInstanceState.of(args)
+    ): KmpTorServiceUIInstanceState<Config> = KmpTorServiceUIInstanceState.of(
+        args,
+        isDeviceLocked = { false /* TODO */ }
+    )
 
     protected override fun onUpdate(target: FileIDKey, type: UpdateType) {
         // TODO

@@ -90,10 +90,8 @@ class AbstractTorServiceUIUnitTest {
 
         class Config(
             fields: Map<String, Any?>,
-            init: Any = INIT
         ): AbstractTorServiceUI.Config(
             fields,
-            init,
         )
 
         open class Factory(
@@ -139,7 +137,6 @@ class AbstractTorServiceUIUnitTest {
         // (before throwing exception for an invalid init argument)
         assertFailsWith<IllegalStateException> { args.initialize() }
 
-        assertFailsWith<IllegalStateException> { TestUI.Config(mapOf("" to ""), init = Any()) }
         assertFailsWith<IllegalStateException> { TestUI.Args(config, this, init = Any()) }
         assertFailsWith<IllegalStateException> { TestUI.Factory(config, init = Any()) }
     }

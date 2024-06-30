@@ -49,7 +49,7 @@ internal class TorService internal constructor(): Service() {
     private class AndroidServiceFactory(
         private val appContext: ApplicationContext,
         config: TorServiceConfig,
-        instanceUIConfig: TorServiceUI.Config?,
+        instanceUIConfig: AbstractTorServiceUI.Config?,
         initializer: Initializer,
     ): TorRuntime.ServiceFactory(initializer) {
 
@@ -113,7 +113,7 @@ internal class TorService internal constructor(): Service() {
         @JvmSynthetic
         internal fun ApplicationContext.serviceFactoryLoader(
             config: TorServiceConfig,
-            instanceUIConfig: TorServiceUI.Config?,
+            instanceUIConfig: AbstractTorServiceUI.Config?,
         ): TorRuntime.ServiceFactory.Loader {
             val context = this
 
@@ -244,7 +244,7 @@ internal class TorService internal constructor(): Service() {
         @JvmField
         public val config: TorServiceConfig,
         @JvmField
-        public val instanceUIConfig: TorServiceUI.Config?,
+        public val instanceUIConfig: AbstractTorServiceUI.Config?,
     ): ServiceConnection {
 
         public override fun onServiceConnected(name: ComponentName?, service: IBinder?) {

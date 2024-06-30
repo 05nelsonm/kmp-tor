@@ -1,17 +1,27 @@
+public abstract class io/matthewnelson/kmp/tor/runtime/service/ui/AbstractKmpTorServiceUIConfig : io/matthewnelson/kmp/tor/runtime/service/AbstractTorServiceUI$Config {
+	protected static final field Companion Lio/matthewnelson/kmp/tor/runtime/service/ui/AbstractKmpTorServiceUIConfig$Companion;
+	public final field enableActionRestart Z
+	public final field enableActionStop Z
+}
+
+protected final class io/matthewnelson/kmp/tor/runtime/service/ui/AbstractKmpTorServiceUIConfig$Companion {
+}
+
 public final class io/matthewnelson/kmp/tor/runtime/service/ui/KmpTorServiceUI : io/matthewnelson/kmp/tor/runtime/service/TorServiceUI {
 	public synthetic fun <init> (Lio/matthewnelson/kmp/tor/runtime/service/TorServiceUI$Args;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
 	public synthetic fun newInstanceStateProtected (Lio/matthewnelson/kmp/tor/runtime/service/AbstractTorServiceUI$Args$Instance;)Lio/matthewnelson/kmp/tor/runtime/service/AbstractTorServiceUI$InstanceState;
 }
 
-public final class io/matthewnelson/kmp/tor/runtime/service/ui/KmpTorServiceUI$Config : io/matthewnelson/kmp/tor/runtime/service/TorServiceUI$Config {
-	public fun <init> ()V
-	public fun validate (Landroid/content/Context;)V
+public final class io/matthewnelson/kmp/tor/runtime/service/ui/KmpTorServiceUI$Config : io/matthewnelson/kmp/tor/runtime/service/ui/AbstractKmpTorServiceUIConfig {
+	public fun <init> (ZZ)V
 }
 
 public final class io/matthewnelson/kmp/tor/runtime/service/ui/KmpTorServiceUI$Factory : io/matthewnelson/kmp/tor/runtime/service/TorServiceUI$Factory {
 	public fun <init> (Lio/matthewnelson/kmp/tor/runtime/service/ui/KmpTorServiceUI$Config;Lio/matthewnelson/kmp/tor/runtime/service/TorServiceUI$NotificationInfo;)V
 	public fun <init> (Lio/matthewnelson/kmp/tor/runtime/service/ui/KmpTorServiceUI$Config;Lio/matthewnelson/kmp/tor/runtime/service/TorServiceUI$NotificationInfo;Lio/matthewnelson/kmp/tor/runtime/core/ThisBlock;)V
 	public synthetic fun newInstanceUIProtected (Lio/matthewnelson/kmp/tor/runtime/service/AbstractTorServiceUI$Args$UI;)Lio/matthewnelson/kmp/tor/runtime/service/AbstractTorServiceUI;
+	public synthetic fun validate (Landroid/content/Context;Lio/matthewnelson/kmp/tor/runtime/service/AbstractTorServiceUI$Config;)V
+	public fun validate (Landroid/content/Context;Lio/matthewnelson/kmp/tor/runtime/service/ui/KmpTorServiceUI$Config;)V
 }
 
 public final class io/matthewnelson/kmp/tor/runtime/service/ui/KmpTorServiceUI$Factory$Builder {
@@ -21,7 +31,7 @@ public final class io/matthewnelson/kmp/tor/runtime/service/ui/KmpTorServiceUI$F
 }
 
 public final class io/matthewnelson/kmp/tor/runtime/service/ui/KmpTorServiceUIInstanceState : io/matthewnelson/kmp/tor/runtime/service/AbstractTorServiceUI$InstanceState {
-	public synthetic fun <init> (Lio/matthewnelson/kmp/tor/runtime/service/AbstractTorServiceUI$Args$Instance;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public synthetic fun <init> (Lio/matthewnelson/kmp/tor/runtime/service/AbstractTorServiceUI$Args$Instance;Lkotlin/jvm/functions/Function0;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
 	public fun getEvents ()Ljava/util/Set;
 	public fun getObserversRuntimeEvent ()Ljava/util/Set;
 	public fun getObserversTorEvent ()Ljava/util/Set;

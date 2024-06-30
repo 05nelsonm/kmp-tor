@@ -210,19 +210,12 @@ internal constructor(
      *
      * @param [fields] A map of the field name value pairs.
      *   (e.g. `mapOf("iconOff" to R.drawable.my_icon_off)`)
-     * @see [io.matthewnelson.kmp.tor.runtime.service.TorServiceUI.Config]
      * @throws [IllegalArgumentException] if [fields] is empty
      * */
     public abstract class Config
+    @ExperimentalKmpTorApi
     @Throws(IllegalArgumentException::class)
-    internal constructor(
-        fields: Map<String, Any?>,
-        init: Any,
-    ) {
-
-        init {
-            check(init == INIT) { "AbstractTorServiceUI.Config cannot be extended" }
-        }
+    public constructor(fields: Map<String, Any?>) {
 
         private val fields = fields.toImmutableMap()
 

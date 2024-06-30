@@ -28,6 +28,7 @@ protected final class io/matthewnelson/kmp/tor/runtime/service/AbstractTorServic
 }
 
 public abstract class io/matthewnelson/kmp/tor/runtime/service/AbstractTorServiceUI$Config {
+	public fun <init> (Ljava/util/Map;)V
 	public final fun equals (Ljava/lang/Object;)Z
 	public final fun hashCode ()I
 	public final fun toString ()Ljava/lang/String;
@@ -84,10 +85,10 @@ public final class io/matthewnelson/kmp/tor/runtime/service/TorServiceConfig$For
 	public final field factory Lio/matthewnelson/kmp/tor/runtime/service/TorServiceUI$Factory;
 	public synthetic fun <init> (Lio/matthewnelson/kmp/tor/runtime/service/TorServiceUI$Factory;Lio/matthewnelson/kmp/tor/runtime/service/TorServiceConfig$Builder;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
 	public static final fun Builder (Lio/matthewnelson/kmp/tor/runtime/service/TorServiceUI$Factory;Lio/matthewnelson/kmp/tor/runtime/core/ThisBlock;)Lio/matthewnelson/kmp/tor/runtime/service/TorServiceConfig$Foreground;
-	public final fun newEnvironment (Lio/matthewnelson/kmp/tor/runtime/service/TorServiceUI$Config;Lkotlin/jvm/functions/Function1;)Lio/matthewnelson/kmp/tor/runtime/TorRuntime$Environment;
-	public final fun newEnvironment (Lio/matthewnelson/kmp/tor/runtime/service/TorServiceUI$Config;Lkotlin/jvm/functions/Function1;Lio/matthewnelson/kmp/tor/runtime/core/ThisBlock;)Lio/matthewnelson/kmp/tor/runtime/TorRuntime$Environment;
-	public final fun newEnvironment (Ljava/lang/String;Lio/matthewnelson/kmp/tor/runtime/service/TorServiceUI$Config;Lkotlin/jvm/functions/Function1;)Lio/matthewnelson/kmp/tor/runtime/TorRuntime$Environment;
-	public final fun newEnvironment (Ljava/lang/String;Lio/matthewnelson/kmp/tor/runtime/service/TorServiceUI$Config;Lkotlin/jvm/functions/Function1;Lio/matthewnelson/kmp/tor/runtime/core/ThisBlock;)Lio/matthewnelson/kmp/tor/runtime/TorRuntime$Environment;
+	public final fun newEnvironment (Lio/matthewnelson/kmp/tor/runtime/service/AbstractTorServiceUI$Config;Lkotlin/jvm/functions/Function1;)Lio/matthewnelson/kmp/tor/runtime/TorRuntime$Environment;
+	public final fun newEnvironment (Lio/matthewnelson/kmp/tor/runtime/service/AbstractTorServiceUI$Config;Lkotlin/jvm/functions/Function1;Lio/matthewnelson/kmp/tor/runtime/core/ThisBlock;)Lio/matthewnelson/kmp/tor/runtime/TorRuntime$Environment;
+	public final fun newEnvironment (Ljava/lang/String;Lio/matthewnelson/kmp/tor/runtime/service/AbstractTorServiceUI$Config;Lkotlin/jvm/functions/Function1;)Lio/matthewnelson/kmp/tor/runtime/TorRuntime$Environment;
+	public final fun newEnvironment (Ljava/lang/String;Lio/matthewnelson/kmp/tor/runtime/service/AbstractTorServiceUI$Config;Lkotlin/jvm/functions/Function1;Lio/matthewnelson/kmp/tor/runtime/core/ThisBlock;)Lio/matthewnelson/kmp/tor/runtime/TorRuntime$Environment;
 }
 
 public final class io/matthewnelson/kmp/tor/runtime/service/TorServiceConfig$Foreground$Companion {
@@ -110,17 +111,13 @@ public abstract class io/matthewnelson/kmp/tor/runtime/service/TorServiceUI : io
 }
 
 public final class io/matthewnelson/kmp/tor/runtime/service/TorServiceUI$Args : io/matthewnelson/kmp/tor/runtime/service/AbstractTorServiceUI$Args$UI {
-	public synthetic fun <init> (Lio/matthewnelson/kmp/tor/runtime/service/TorServiceUI$Config;Lio/matthewnelson/kmp/tor/runtime/service/TorServiceUI$NotificationInfo;Landroid/content/Context;Lkotlinx/coroutines/CoroutineScope;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
-}
-
-public abstract class io/matthewnelson/kmp/tor/runtime/service/TorServiceUI$Config : io/matthewnelson/kmp/tor/runtime/service/AbstractTorServiceUI$Config {
-	protected fun <init> (Ljava/util/Map;)V
-	public abstract fun validate (Landroid/content/Context;)V
+	public synthetic fun <init> (Lio/matthewnelson/kmp/tor/runtime/service/AbstractTorServiceUI$Config;Lio/matthewnelson/kmp/tor/runtime/service/TorServiceUI$NotificationInfo;Landroid/content/Context;Lkotlinx/coroutines/CoroutineScope;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
 }
 
 public abstract class io/matthewnelson/kmp/tor/runtime/service/TorServiceUI$Factory : io/matthewnelson/kmp/tor/runtime/service/AbstractTorServiceUI$Factory {
 	public final field info Lio/matthewnelson/kmp/tor/runtime/service/TorServiceUI$NotificationInfo;
-	protected fun <init> (Lio/matthewnelson/kmp/tor/runtime/service/TorServiceUI$Config;Lio/matthewnelson/kmp/tor/runtime/service/TorServiceUI$NotificationInfo;)V
+	protected fun <init> (Lio/matthewnelson/kmp/tor/runtime/service/AbstractTorServiceUI$Config;Lio/matthewnelson/kmp/tor/runtime/service/TorServiceUI$NotificationInfo;)V
+	public abstract fun validate (Landroid/content/Context;Lio/matthewnelson/kmp/tor/runtime/service/AbstractTorServiceUI$Config;)V
 }
 
 public final class io/matthewnelson/kmp/tor/runtime/service/TorServiceUI$NotificationInfo {

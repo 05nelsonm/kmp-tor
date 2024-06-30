@@ -31,6 +31,7 @@ import io.matthewnelson.kmp.tor.core.resource.synchronized
 import io.matthewnelson.kmp.tor.core.resource.SynchronizedObject
 import io.matthewnelson.kmp.tor.runtime.Lifecycle
 import io.matthewnelson.kmp.tor.runtime.TorRuntime
+import io.matthewnelson.kmp.tor.runtime.service.AbstractTorServiceUI.Config
 import io.matthewnelson.kmp.tor.runtime.service.AbstractTorServiceUI.InstanceState
 import io.matthewnelson.kmp.tor.runtime.service.internal.register
 import kotlinx.coroutines.CoroutineScope
@@ -58,7 +59,7 @@ import kotlinx.coroutines.CoroutineScope
  * @throws [IllegalStateException] on instantiation if [args] were not those
  *   which were passed to [Factory.newInstanceUI]. See [Args].
  * */
-public abstract class TorServiceUI<C: TorServiceUI.Config, IS: InstanceState<C>>
+public abstract class TorServiceUI<C: Config, IS: InstanceState<C>>
 @ExperimentalKmpTorApi
 @Throws(IllegalStateException::class)
 protected constructor(
@@ -206,38 +207,6 @@ protected constructor(
     }
 
     /**
-     * Core `androidMain` abstraction for holding UI customization input from
-     * consumers of `kmp-tor-service`.
-     *
-     * As an example implementation, see
-     * [io.matthewnelson.kmp.tor.runtime.service.ui.KmpTorServiceUI.Config]
-     *
-     * @param [fields] A map of the field name value pairs.
-     *   (e.g. `mapOf("iconOff" to R.drawable.my_icon_off)`)
-     * @throws [IllegalArgumentException] if [fields] is empty
-     * */
-    public abstract class Config
-    @ExperimentalKmpTorApi
-    @Throws(IllegalArgumentException::class)
-    protected constructor(
-        fields: Map<String, Any?>,
-    ): AbstractTorServiceUI.Config(
-        fields,
-        INIT,
-    ) {
-
-        /**
-         * Implementations **MUST** ensure all resources specified in their
-         * given [Config] implementations are valid. This is called from
-         * [TorServiceConfig.Foreground.Builder], as well as
-         * [TorServiceConfig.Foreground.newEnvironment], in order to raise
-         * errors before instantiating the singleton instances.
-         * */
-        @Throws(Resources.NotFoundException::class)
-        public abstract fun validate(context: Context)
-    }
-
-    /**
      * Core `androidMain` abstraction for a [Factory] class which is
      * responsible for instantiating new instances of [TorServiceUI]
      * when requested by [TorService].
@@ -254,7 +223,18 @@ protected constructor(
         defaultConfig: C,
         @JvmField
         public val info: NotificationInfo
-    ): AbstractTorServiceUI.Factory<Args, C, IS, UI>(defaultConfig, INIT)
+    ): AbstractTorServiceUI.Factory<Args, C, IS, UI>(defaultConfig, INIT) {
+
+        /**
+         * Implementations **MUST** ensure all resources specified in their
+         * given [Config] implementations are valid. This is called from
+         * [TorServiceConfig.Foreground.Builder], as well as
+         * [TorServiceConfig.Foreground.newEnvironment], in order to raise
+         * errors before instantiating the singleton instances.
+         * */
+        @Throws(Resources.NotFoundException::class)
+        public abstract fun validate(context: Context, config: C)
+    }
 
 
     @JvmSynthetic

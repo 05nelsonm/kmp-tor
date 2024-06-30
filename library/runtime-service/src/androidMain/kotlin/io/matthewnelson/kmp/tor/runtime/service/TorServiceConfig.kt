@@ -317,7 +317,7 @@ public open class TorServiceConfig private constructor(
      *
      * @see [Foreground.Builder]
      * */
-    public class Foreground <C: TorServiceUI.Config, F: TorServiceUI.Factory<C, *, *>> private constructor(
+    public class Foreground <C: AbstractTorServiceUI.Config, F: TorServiceUI.Factory<C, *, *>> private constructor(
         @JvmField
         public val factory: F,
         b: Builder,
@@ -461,7 +461,7 @@ public open class TorServiceConfig private constructor(
             @OptIn(ExperimentalKmpTorApi::class)
             return with(UTIL) {
                 UTIL.ProvideLoader { appContext ->
-                    instanceConfig.validate(appContext.get())
+                    factory.validate(appContext.get(), instanceConfig)
                     instanceConfig.unsafeCastAsType(default = factory.defaultConfig)
                     appContext.serviceFactoryLoader(config, instanceUIConfig = instanceConfig)
                 }.newEnvironment(config, dirName, installer, block)
@@ -489,7 +489,7 @@ public open class TorServiceConfig private constructor(
              * */
             @JvmStatic
             @Throws(ClassCastException::class, Resources.NotFoundException::class)
-            public fun <C: TorServiceUI.Config, F: TorServiceUI.Factory<C, *, *>> Builder(
+            public fun <C: AbstractTorServiceUI.Config, F: TorServiceUI.Factory<C, *, *>> Builder(
                 factory: F,
                 block: ThisBlock<Builder>,
             ): Foreground<C, F> {
@@ -500,7 +500,7 @@ public open class TorServiceConfig private constructor(
                         val app = appContext
 
                         if (app != null) {
-                            factory.defaultConfig.validate(app.get())
+                            factory.validate(app.get(), factory.defaultConfig)
 
                             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                                 val info = factory.info
@@ -635,7 +635,7 @@ public open class TorServiceConfig private constructor(
 
 @Suppress("NOTHING_TO_INLINE")
 @Throws(ClassCastException::class)
-private inline fun <C: TorServiceUI.Config, F: TorServiceUI.Factory<C, *, *>> TorServiceConfig.unsafeCast(): TorServiceConfig.Foreground<C, F> {
+private inline fun <C: AbstractTorServiceUI.Config, F: TorServiceUI.Factory<C, *, *>> TorServiceConfig.unsafeCast(): TorServiceConfig.Foreground<C, F> {
     if (this !is TorServiceConfig.Foreground<*, *>) {
         val msg = """
             Unable to return TorServiceConfig.Foreground. An instance was already
