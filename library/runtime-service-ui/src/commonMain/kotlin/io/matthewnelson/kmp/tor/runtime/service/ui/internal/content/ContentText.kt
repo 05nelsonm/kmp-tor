@@ -32,8 +32,19 @@ internal sealed class ContentText<T: Any> {
         return result
     }
 
-    public final override fun toString(): String {
-        val name = this::class.simpleName ?: "ContentText"
-        return "$name[value=$value]"
+    public override fun toString(): String {
+        val name =if (this is ContentBandwidth.ZERO) {
+            "ContentBandwidth"
+        } else {
+            this::class.simpleName ?: "ContentText"
+        }
+
+        val value = if (value is Unit) {
+            ""
+        } else {
+            "[value=$value]"
+        }
+
+        return "$name$value"
     }
 }

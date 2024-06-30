@@ -18,6 +18,7 @@ package io.matthewnelson.kmp.tor.runtime.service.ui.internal.content
 import kotlin.test.Test
 import kotlin.test.assertIs
 import kotlin.test.assertIsNot
+import kotlin.test.assertTrue
 
 class ContentBandwidthUnitTest {
 
@@ -28,5 +29,11 @@ class ContentBandwidthUnitTest {
         assertIsNot<ContentBandwidth.ZERO>(down)
         assertIs<ContentBandwidth.ZERO>(down.copy(down = 0))
         assertIs<ContentBandwidth.ZERO>(up.copy(up = 0))
+    }
+
+    @Test
+    fun givenZEROInstance_whenToString_thenNameIsContentBandwidth() {
+        val zero = ContentBandwidth.ZERO.toString()
+        assertTrue(zero.startsWith("ContentBandwidth"))
     }
 }

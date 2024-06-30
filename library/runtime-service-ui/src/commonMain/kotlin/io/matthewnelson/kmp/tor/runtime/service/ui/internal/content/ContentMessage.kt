@@ -65,5 +65,11 @@ internal sealed class ContentMessage<T: Any> private constructor(): ContentText<
                 }
             }
         }
+
+        public override fun toString(): String = "NewNym." + when (this) {
+            is Success -> "Success"
+            is RateLimited.Raw -> "RateLimited.Raw[value=$value]"
+            is RateLimited.Seconds -> "RateLimited[seconds=$value]"
+        }
     }
 }
