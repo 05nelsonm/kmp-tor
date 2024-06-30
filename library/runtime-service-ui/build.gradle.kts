@@ -1,5 +1,3 @@
-import com.android.build.gradle.internal.ide.kmp.KotlinAndroidSourceSetMarker.Companion.android
-
 /*
  * Copyright (c) 2021 Matthew Nelson
  *
