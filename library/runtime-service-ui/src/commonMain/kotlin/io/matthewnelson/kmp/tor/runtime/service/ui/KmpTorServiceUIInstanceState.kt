@@ -27,16 +27,14 @@ import io.matthewnelson.kmp.tor.runtime.service.AbstractTorServiceUI
 import io.matthewnelson.kmp.tor.runtime.service.ui.internal.ButtonAction
 import io.matthewnelson.kmp.tor.runtime.service.ui.internal.ColorState
 import io.matthewnelson.kmp.tor.runtime.service.ui.internal.IconState
-import io.matthewnelson.kmp.tor.runtime.service.ui.internal.State
+import io.matthewnelson.kmp.tor.runtime.service.ui.internal.UIState
 import io.matthewnelson.kmp.tor.runtime.service.ui.internal.Progress
 import io.matthewnelson.kmp.tor.runtime.service.ui.internal.content.ContentAction
 import io.matthewnelson.kmp.tor.runtime.service.ui.internal.content.ContentBandwidth
 import io.matthewnelson.kmp.tor.runtime.service.ui.internal.content.ContentBootstrap
 import io.matthewnelson.kmp.tor.runtime.service.ui.internal.content.ContentMessage
 import io.matthewnelson.kmp.tor.runtime.service.ui.internal.content.ContentNetworkWaiting
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 import kotlin.concurrent.Volatile
 import kotlin.jvm.JvmName
 import kotlin.jvm.JvmSynthetic
@@ -54,14 +52,14 @@ public class KmpTorServiceUIInstanceState<C: AbstractKmpTorServiceUIConfig> priv
     @Volatile
     private var _messageJob: Job? = null
     @Volatile
-    private var _state = State.of(fid = this)
+    private var _state = UIState.of(fid = this)
     @Volatile
     private var _stateTor: TorState = TorState(_state.title, TorState.Network.Disabled)
 
-    private val lock = Lock()
+    private val lockUpdate = Lock()
 
     @get:JvmName("state")
-    internal val state: State get() = _state
+    internal val state: UIState get() = _state
 
     public override val events: Set<TorEvent> = EVENTS
     public override val observersRuntimeEvent: Set<RuntimeEvent.Observer<*>>
@@ -73,8 +71,8 @@ public class KmpTorServiceUIInstanceState<C: AbstractKmpTorServiceUIConfig> priv
         }
     }
 
-    private fun update(block: (current: State) -> State?) {
-        lock.withLock {
+    private fun update(block: (current: UIState) -> UIState?) {
+        lockUpdate.withLock {
             val old = _state
             val new = block(old)
             if (new == null || old == new) {
@@ -90,23 +88,28 @@ public class KmpTorServiceUIInstanceState<C: AbstractKmpTorServiceUIConfig> priv
     private fun postMessage(message: ContentMessage<*>, duration: Duration) {
         if (duration <= Duration.ZERO) return
 
-        _messageJob?.cancel()
-        _messageJob = instanceScope.launch {
-            update { current ->
-                current.copy(
-                    text = message,
-                )
-            }
+        lockUpdate.withLock {
+            val oldJob = _messageJob
+            _messageJob = instanceScope.launch {
+                oldJob?.cancelAndJoin()
 
-            delay(duration)
+                update { current ->
+                    current.copy(
+                        text = message,
+                    )
+                }
 
-            if (!_stateTor.daemon.isBootstrapped) return@launch
+                delay(duration)
 
-            update { current ->
-                current.copy(
-                    text = _bandwidth,
-                )
-            }
+                update { current ->
+                    ensureActive()
+                    if (!_stateTor.daemon.isBootstrapped) return@update null
+
+                    current.copy(
+                        text = _bandwidth,
+                    )
+                }
+            }.also { newJob -> newJob.invokeOnCompletion { oldJob?.cancel() } }
         }
     }
 

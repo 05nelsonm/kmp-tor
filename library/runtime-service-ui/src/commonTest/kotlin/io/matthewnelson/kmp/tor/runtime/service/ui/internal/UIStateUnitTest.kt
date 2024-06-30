@@ -20,17 +20,17 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
-class StateUnitTest {
+class UIStateUnitTest {
 
     @Test
-    fun givenState_whenToString_thenIsAsExpected() {
-        val state = State.of(object : FileID {
+    fun givenUIState_whenToString_thenIsAsExpected() {
+        val state = UIState.of(object : FileID {
             override val fid: String = "abcdefg12345678"
         }).copy(actions = setOf(ButtonAction.NewIdentity))
 
         assertEquals(
             """
-                State[fid=abcd…5678]: [
+                UIState[fid=abcd…5678]: [
                     actions: [
                         ButtonAction.NewIdentity
                     ]

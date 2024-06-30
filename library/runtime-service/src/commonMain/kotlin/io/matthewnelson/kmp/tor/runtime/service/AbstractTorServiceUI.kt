@@ -350,6 +350,9 @@ internal constructor(
      * via registration of [RuntimeEvent.Observer] and [TorEvent.Observer]
      * for the instance of [Lifecycle.DestroyableTorRuntime] operating
      * within the service object.
+     *
+     * @throws [IllegalStateException] on instantiation if [args] were not those
+     *   which were passed to [newInstanceState]. See [Args].
      * */
     public abstract class InstanceState<C: Config>
     @ExperimentalKmpTorApi

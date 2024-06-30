@@ -24,7 +24,7 @@ import io.matthewnelson.kmp.tor.runtime.service.ui.internal.content.ContentActio
 import io.matthewnelson.kmp.tor.runtime.service.ui.internal.content.ContentText
 import kotlin.jvm.JvmSynthetic
 
-internal class State private constructor(
+internal class UIState private constructor(
     actions: Set<ButtonAction>,
     internal val color: ColorState,
     internal val icon: IconState,
@@ -43,7 +43,7 @@ internal class State private constructor(
         progress: Progress = this.progress,
         text: ContentText<*> = this.text,
         title: TorState.Daemon = this.title,
-    ): State {
+    ): UIState {
         if (
             actions == this.actions
             && color == this.color
@@ -55,7 +55,7 @@ internal class State private constructor(
             return this
         }
 
-        return State(
+        return UIState(
             actions,
             color,
             icon,
@@ -67,7 +67,7 @@ internal class State private constructor(
     }
 
     public override fun equals(other: Any?): Boolean {
-        return  other is State
+        return  other is UIState
                 && other.fid == fid
                 && other.actions == actions
                 && other.color == color
@@ -90,7 +90,7 @@ internal class State private constructor(
     }
 
     public override fun toString(): String = buildString {
-        append("State[fid=")
+        append("UIState[fid=")
         append(fid)
         appendLine("]: [")
 
@@ -127,7 +127,7 @@ internal class State private constructor(
         @JvmSynthetic
         internal fun of(
             fid: FileID,
-        ): State = State(
+        ): UIState = UIState(
             emptySet(),
             ColorState.NotReady,
             IconState.NetworkDisabled,
