@@ -15,8 +15,10 @@
  **/
 package io.matthewnelson.kmp.tor.runtime.service.ui
 
+import android.app.Notification
 import android.content.Context
 import android.content.res.Resources
+import android.os.Build
 import io.matthewnelson.kmp.tor.core.api.annotation.ExperimentalKmpTorApi
 import io.matthewnelson.kmp.tor.core.api.annotation.KmpTorDsl
 import io.matthewnelson.kmp.tor.runtime.core.ThisBlock
@@ -178,6 +180,29 @@ public class KmpTorServiceUI private constructor(
         protected override fun newInstanceUIProtected(
             args: Args,
         ): KmpTorServiceUI = KmpTorServiceUI(args)
+    }
+
+    init {
+        // TODO
+        val b = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            Notification.Builder(appContext, channelID)
+        } else {
+            @Suppress("DEPRECATION")
+            Notification.Builder(appContext)
+        }
+
+        b.setContentTitle("Title")
+        b.setContentText("Text")
+        b.setSmallIcon(android.R.drawable.stat_notify_chat)
+        b.setOngoing(true)
+        b.setOnlyAlertOnce(true)
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            // API 31+
+            b.setForegroundServiceBehavior(Notification.FOREGROUND_SERVICE_IMMEDIATE)
+        }
+
+        b.build().post()
     }
 
     protected override fun newInstanceStateProtected(
