@@ -113,4 +113,4 @@ jobs:
         with:
           emulator-boot-timeout: 300 # 5 minutes
           api-level: ${{ matrix.api-level }}
-          script: ./gradlew :library:runtime-service:connectedCheck -PKMP_TARGETS="ANDROID,JVM"
+          script: ./gradlew connectedCheck -PKMP_TARGETS="ANDROID,JVM"

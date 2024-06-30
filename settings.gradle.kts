@@ -35,6 +35,7 @@ if (CHECK_PUBLICATION != null) {
         "runtime-core",
         "runtime-ctrl",
         "runtime-service",
+        "runtime-service-ui",
     ).forEach { name ->
         include(":library:$name")
     }

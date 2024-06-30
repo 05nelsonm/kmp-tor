@@ -13,21 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-package io.matthewnelson.kmp.tor.runtime.service
+@file:Suppress("EXPECT_ACTUAL_CLASSIFIERS_ARE_IN_BETA_WARNING")
 
-import kotlin.test.Test
-import kotlin.test.assertEquals
-import kotlin.test.assertFalse
+package io.matthewnelson.kmp.tor.runtime.service.ui.internal
 
-class TorServiceInitializerUnitTest {
+@Suppress("ACTUAL_WITHOUT_EXPECT")
+internal actual typealias NumberFormat = java.text.NumberFormat
 
-    @Test
-    fun givenNonAndroidRuntime_whenIsInitialized_thenIsFalse() {
-        assertFalse(TorService.Initializer.isInitialized())
-    }
-
-    @Test
-    fun givenDependencies_whenKmpTorLibLocatorNotPresent_thenDoseNotAddAsDependency() {
-        assertEquals(0, TorService.Initializer().dependencies().size)
-    }
+@Suppress("NOTHING_TO_INLINE")
+internal actual inline fun numberFormat(): NumberFormat {
+    return NumberFormat.getInstance(java.util.Locale.getDefault())
 }

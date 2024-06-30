@@ -17,7 +17,7 @@
  **/
 -->
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-          xmlns:tools="http://schemas.android.com/tools">
+    xmlns:tools="http://schemas.android.com/tools">
 
     <application>
         <provider
@@ -26,7 +26,7 @@
             android:exported="false"
             tools:node="merge">
             <meta-data
-                android:name="io.matthewnelson.kmp.tor.runtime.service.TorService$Initializer"
+                android:name="io.matthewnelson.kmp.tor.runtime.service.TorServiceConfig$Initializer"
                 android:value="androidx.startup" />
         </provider>
         <service

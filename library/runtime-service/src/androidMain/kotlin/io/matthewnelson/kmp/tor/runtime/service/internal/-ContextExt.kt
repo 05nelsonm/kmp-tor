@@ -15,12 +15,41 @@
  **/
 package io.matthewnelson.kmp.tor.runtime.service.internal
 
+import android.annotation.SuppressLint
+import android.content.BroadcastReceiver
 import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
 import android.content.pm.PackageManager.PERMISSION_GRANTED
+import android.os.Build
+import android.os.Handler
 import android.os.Process
 
 @Suppress("NOTHING_TO_INLINE")
 internal inline fun Context.isPermissionGranted(permission: String): Boolean {
     val result = checkPermission(permission, Process.myPid(), Process.myUid())
     return result == PERMISSION_GRANTED
+}
+
+@Suppress("NOTHING_TO_INLINE")
+internal inline fun Context.register(
+    receiver: BroadcastReceiver,
+    filter: IntentFilter,
+    permission: String?,
+    scheduler: Handler?,
+    exported: Boolean?,
+    flags: Int = 0,
+): Intent? {
+    var f = flags
+
+    if (exported != null && Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+        f = f or if (exported) Context.RECEIVER_EXPORTED else Context.RECEIVER_NOT_EXPORTED
+    }
+
+    @SuppressLint("UnspecifiedRegisterReceiverFlag")
+    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+        return registerReceiver(receiver, filter, permission, scheduler)
+    }
+
+    return registerReceiver(receiver, filter, permission, scheduler, f)
 }

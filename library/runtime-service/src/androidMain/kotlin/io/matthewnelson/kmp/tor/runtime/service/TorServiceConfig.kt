@@ -13,417 +13,639 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
+@file:Suppress("FunctionName", "UnnecessaryOptInAnnotation")
+
 package io.matthewnelson.kmp.tor.runtime.service
 
+import android.app.NotificationChannel
+import android.app.NotificationManager
 import android.content.Context
 import android.content.res.Resources
-import io.matthewnelson.kmp.tor.runtime.service.internal.ColorRes
-import io.matthewnelson.kmp.tor.runtime.service.internal.DrawableRes
-import io.matthewnelson.kmp.tor.runtime.service.internal.RealTorServiceConfig
+import android.os.Build
+import androidx.startup.AppInitializer
+import io.matthewnelson.kmp.file.File
+import io.matthewnelson.kmp.file.SysTempDir
+import io.matthewnelson.kmp.file.resolve
+import io.matthewnelson.kmp.file.toFile
+import io.matthewnelson.kmp.tor.core.api.ResourceInstaller
+import io.matthewnelson.kmp.tor.core.api.ResourceInstaller.Paths
+import io.matthewnelson.kmp.tor.core.api.annotation.ExperimentalKmpTorApi
+import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
+import io.matthewnelson.kmp.tor.core.api.annotation.KmpTorDsl
+import io.matthewnelson.kmp.tor.core.resource.OSInfo
+import io.matthewnelson.kmp.tor.runtime.Action
+import io.matthewnelson.kmp.tor.runtime.TorRuntime
+import io.matthewnelson.kmp.tor.runtime.core.ThisBlock
+import io.matthewnelson.kmp.tor.runtime.core.apply
+import io.matthewnelson.kmp.tor.runtime.service.TorService.Companion.serviceFactoryLoader
+import io.matthewnelson.kmp.tor.runtime.service.AbstractTorServiceUI.Factory.Companion.unsafeCastAsType
+import io.matthewnelson.kmp.tor.runtime.service.internal.ApplicationContext
+import io.matthewnelson.kmp.tor.runtime.service.internal.ApplicationContext.Companion.toApplicationContext
+import kotlin.concurrent.Volatile
 
 /**
- * Configuration options for running [TorService] in the foreground.
+ * Configuration info for producing [TorRuntime.ServiceFactory] to
+ * run tor within an [android.app.Service].
  *
- * By default, [TorService] runs in the background and without any
- * configuration necessary. Configuration is passed via `<meta-data>`
- * tags within the `AndroidManifest.xml` `<application>` block.
+ * **NOTE:** Only one [TorServiceConfig] instance can be instantiated.
+ * Successive invocations of [Companion.Builder] or [Foreground.Builder]
+ * will return the already created singleton instance.
  *
- * See the [README.md](https://github.com/05nelsonm/kmp-tor/blob/master/library/runtime-service/README.md)
+ * e.g. (A Background Service)
  *
- * @see [getMetaData]
+ *     val config = TorServiceConfig.Builder {
+ *         // configure...
+ *     }
+ *
+ *     val environment = config.newEnvironment { installationDirectory ->
+ *         // Assuming use of `kmp-tor:resource-tor` or
+ *         // `kmp-tor:resource-tor-gpl` dependency
+ *         // as well as the unit test dependency
+ *         // `kmp-tor:resource-android-unit-test`
+ *         TorResources(installationDirectory)
+ *     }
+ *
+ *     val runtime = TorRuntime.Builder(environment) {
+ *         // configure...
+ *     }
+ *
+ * @see [Companion.Builder]
+ * @see [Foreground.Builder]
+ * @see [newEnvironment]
  * */
-public abstract class TorServiceConfig internal constructor(
-    @JvmField
-    public val enableForeground: Boolean,
+public open class TorServiceConfig private constructor(
+
+    /**
+     * See [Builder.stopServiceOnTaskRemoved]
+     * */
     @JvmField
     public val stopServiceOnTaskRemoved: Boolean,
+
+    /**
+     * See [Builder.testUseBuildDirectory]
+     * */
     @JvmField
-    public val ifForegroundExitProcessOnDestroyWhenTaskRemoved: Boolean,
-    @JvmField
-    public val notificationId: Int,
-    @JvmField
-    public val channelId: String,
-    @JvmField
-    public val channelName: String,
-    @JvmField
-    public val channelDescription: String,
-    @JvmField
-    public val channelShowBadge: Boolean,
-    @JvmField
-    public val iconNetworkEnabled: Int,
-    @JvmField
-    public val iconNetworkDisabled: Int,
-    @JvmField
-    public val iconDataXfer: Int,
-    @JvmField
-    public val iconError: Int,
-    @JvmField
-    public val colorWhenBootstrappedTrue: Int,
-    @JvmField
-    public val colorWhenBootstrappedFalse: Int,
-    @JvmField
-    public val visibility: Int,
-    @JvmField
-    public val enableActionRestart: Boolean,
-    @JvmField
-    public val enableActionStop: Boolean,
+    public val testUseBuildDirectory: Boolean,
 ) {
+
+    /**
+     * Android implementation which creates the [TorRuntime.Environment] using
+     * the provided [TorServiceConfig].
+     *
+     * **NOTE:** [TorRuntime.Environment.Builder.serviceFactoryLoader] is set
+     * automatically and tor will run inside an [android.app.Service].
+     *
+     * Directories (emulators & devices):
+     *  - workDirectory: app_torservice
+     *  - cacheDirectory: cache/torservice
+     *
+     * Directories (android unit tests where [testUseBuildDirectory] = `false`):
+     *  - workDirectory: {system temp}/kmp_tor_android_test/torservice/work
+     *  - cacheDirectory: {system temp}/kmp_tor_android_test/torservice/cache
+     *
+     * Directories (android unit tests where [testUseBuildDirectory] = `true`):
+     *  - workDirectory: {module}/build/kmp_tor_android_test/torservice/work
+     *  - cacheDirectory: {module}/build/kmp_tor_android_test/torservice/cache
+     * */
+    public fun newEnvironment(
+        installer: (installationDirectory: File) -> ResourceInstaller<Paths.Tor>,
+    ): TorRuntime.Environment = newEnvironment(DEFAULT_DIRNAME, installer)
+
+    /**
+     * Android implementation which creates the [TorRuntime.Environment] using
+     * the provided [TorServiceConfig].
+     *
+     * **NOTE:** [TorRuntime.Environment.Builder.serviceFactoryLoader] is set
+     * automatically and tor will run inside an [android.app.Service].
+     *
+     * Directories (emulators & devices):
+     *  - workDirectory: app_torservice
+     *  - cacheDirectory: cache/torservice
+     *
+     * Directories (android unit tests where [testUseBuildDirectory] = `false`):
+     *  - workDirectory: {system temp}/kmp_tor_android_test/torservice/work
+     *  - cacheDirectory: {system temp}/kmp_tor_android_test/torservice/cache
+     *
+     * Directories (android unit tests where [testUseBuildDirectory] = `true`):
+     *  - workDirectory: {module}/build/kmp_tor_android_test/torservice/work
+     *  - cacheDirectory: {module}/build/kmp_tor_android_test/torservice/cache
+     * */
+    public fun newEnvironment(
+        installer: (installationDirectory: File) -> ResourceInstaller<Paths.Tor>,
+        block: ThisBlock<TorRuntime.Environment.Builder>,
+    ): TorRuntime.Environment = newEnvironment(DEFAULT_DIRNAME, installer, block)
+
+    /**
+     * Android implementation which creates the [TorRuntime.Environment] using
+     * the provided [TorServiceConfig].
+     *
+     * **NOTE:** [TorRuntime.Environment.Builder.serviceFactoryLoader] is set
+     * automatically and tor will run inside an [android.app.Service].
+     *
+     * Directories (emulators & devices):
+     *  - workDirectory: app_[dirName]
+     *  - cacheDirectory: cache/[dirName]
+     *
+     * Directories (android unit tests where [testUseBuildDirectory] = `false`):
+     *  - workDirectory: {system temp}/kmp_tor_android_test/[dirName]/work
+     *  - cacheDirectory: {system temp}/kmp_tor_android_test/[dirName]/cache
+     *
+     * Directories (android unit tests where [testUseBuildDirectory] = `true`):
+     *  - workDirectory: {module}/build/kmp_tor_android_test/[dirName]/work
+     *  - cacheDirectory: {module}/build/kmp_tor_android_test/[dirName]/cache
+     * */
+    public fun newEnvironment(
+        dirName: String,
+        installer: (installationDirectory: File) -> ResourceInstaller<Paths.Tor>,
+    ): TorRuntime.Environment = newEnvironment(dirName, installer) {}
+
+    /**
+     * Android implementation which creates the [TorRuntime.Environment] using
+     * the provided [TorServiceConfig].
+     *
+     * **NOTE:** [TorRuntime.Environment.Builder.serviceFactoryLoader] is set
+     * automatically and tor will run inside an [android.app.Service].
+     *
+     * Directories (emulators & devices):
+     *  - workDirectory: app_[dirName]
+     *  - cacheDirectory: cache/[dirName]
+     *
+     * Directories (android unit tests where [testUseBuildDirectory] = `false`):
+     *  - workDirectory: {system temp}/kmp_tor_android_test/[dirName]/work
+     *  - cacheDirectory: {system temp}/kmp_tor_android_test/[dirName]/cache
+     *
+     * Directories (android unit tests where [testUseBuildDirectory] = `true`):
+     *  - workDirectory: {module}/build/kmp_tor_android_test/[dirName]/work
+     *  - cacheDirectory: {module}/build/kmp_tor_android_test/[dirName]/cache
+     * */
+    public fun newEnvironment(
+        dirName: String,
+        installer: (installationDirectory: File) -> ResourceInstaller<Paths.Tor>,
+        block: ThisBlock<TorRuntime.Environment.Builder>,
+    ): TorRuntime.Environment {
+        val config = this
+
+        @OptIn(ExperimentalKmpTorApi::class)
+        return with(UTIL) {
+            UTIL.ProvideLoader { appContext ->
+                appContext.serviceFactoryLoader(config, instanceUIConfig = null)
+            }.newEnvironment(config, dirName, installer, block)
+        }
+    }
 
     public companion object {
 
-        @Throws(Resources.NotFoundException::class)
-        public fun getMetaData(context: Context): TorServiceConfig {
-            return RealTorServiceConfig.of(context)
+        private const val DEFAULT_DIRNAME: String = "torservice"
+
+        private var appContext: ApplicationContext? = null
+
+        @Volatile
+        private var _instance: TorServiceConfig? = null
+
+        /**
+         * Opener for creating a [TorServiceConfig] which will run all instances
+         * of [TorRuntime] that have been created via [newEnvironment] inside of
+         * [TorService] operating as a Background Service.
+         *
+         * @see [Foreground.Builder]
+         * */
+        @JvmStatic
+        public fun Builder(
+            block: ThisBlock<Builder>,
+        ): TorServiceConfig {
+            val b = Builder.get().apply(block)
+
+            return _instance ?: synchronized(UTIL) {
+                _instance ?: TorServiceConfig(b)
+                    .also { _instance = it }
+            }
         }
     }
 
-    public final override fun equals(other: Any?): Boolean {
-        return  other is TorServiceConfig                                       &&
-                other.enableForeground == enableForeground                      &&
-                other.stopServiceOnTaskRemoved == stopServiceOnTaskRemoved      &&
-                other.ifForegroundExitProcessOnDestroyWhenTaskRemoved == ifForegroundExitProcessOnDestroyWhenTaskRemoved &&
-                other.notificationId == notificationId                          &&
-                other.channelId == channelId                                    &&
-                other.channelName == channelName                                &&
-                other.channelDescription == channelDescription                  &&
-                other.channelShowBadge == channelShowBadge                      &&
-                other.iconNetworkEnabled == iconNetworkEnabled                  &&
-                other.iconNetworkDisabled == iconNetworkDisabled                &&
-                other.iconDataXfer == iconDataXfer                              &&
-                other.iconError == iconError                                    &&
-                other.colorWhenBootstrappedTrue == colorWhenBootstrappedTrue    &&
-                other.colorWhenBootstrappedFalse == colorWhenBootstrappedFalse  &&
-                other.visibility == visibility                                  &&
-                other.enableActionRestart == enableActionRestart                &&
-                other.enableActionStop == enableActionStop
+    @KmpTorDsl
+    public class Builder private constructor() {
+
+        /**
+         * If [TorService] is running and your application is swiped from
+         * the recent app's tray (user removes the Task), this setting
+         * indicates the behavior of how you wish to react.
+         *
+         * If `true`, all instances of [TorRuntime] will be destroyed and
+         * [android.app.Service.stopService] will be called. If `false`,
+         * no reaction will be had and the service will either be:
+         *  - If operating as a background service, killed when the
+         *   application process is killed.
+         *  - If operating as a foreground service, keep your application
+         *   alive until [Action.StopDaemon] is executed for all instances
+         *   of [TorRuntime] operating within the service.
+         *
+         * This can be useful if:
+         *  - You are running [TorService] in the background alongside other
+         *   services that are operating in the foreground which are keeping
+         *   the application alive past Task removal.
+         *  - You are running [TorService] in the foreground and wish to keep
+         *   the application alive until [Action.StopDaemon] is executed.
+         *
+         * Default: `true`
+         * */
+        @JvmField
+        public var stopServiceOnTaskRemoved: Boolean = true
+
+        /**
+         * For android unit tests, a setting of `true` will use the module build
+         * directory, instead of the system temp directory, when setting up the
+         * environment directories.
+         *
+         * **NOTE:** This has no effect if running on an emulator or device.
+         *
+         * Default: `false`
+         * */
+        @JvmField
+        @ExperimentalKmpTorApi
+        public var testUseBuildDirectory: Boolean = false
+
+        internal companion object {
+
+            @JvmSynthetic
+            internal fun get(): Builder = Builder()
+        }
     }
 
-    public final override fun hashCode(): Int {
-        var result = 17
-        result = result * 31 + enableForeground.hashCode()
-        result = result * 31 + stopServiceOnTaskRemoved.hashCode()
-        result = result * 31 + ifForegroundExitProcessOnDestroyWhenTaskRemoved.hashCode()
-        result = result * 31 + notificationId.hashCode()
-        result = result * 31 + channelId.hashCode()
-        result = result * 31 + channelName.hashCode()
-        result = result * 31 + channelDescription.hashCode()
-        result = result * 31 + channelShowBadge.hashCode()
-        result = result * 31 + iconNetworkEnabled.hashCode()
-        result = result * 31 + iconNetworkDisabled.hashCode()
-        result = result * 31 + iconDataXfer.hashCode()
-        result = result * 31 + iconError.hashCode()
-        result = result * 31 + colorWhenBootstrappedTrue.hashCode()
-        result = result * 31 + colorWhenBootstrappedFalse.hashCode()
-        result = result * 31 + visibility.hashCode()
-        result = result * 31 + enableActionRestart.hashCode()
-        result = result * 31 + enableActionStop.hashCode()
-        return result
+    /**
+     * An instance of [TorServiceConfig] which indicates to [TorService] that
+     * it should start itself as a Foreground Service.
+     *
+     * This instance provides additional [newEnvironment] functions which enable
+     * the passing of per-environment based configurations for the declared
+     * [factory]. They are entirely optional and the regular [newEnvironment]
+     * functions provided by [TorServiceConfig] will simply default to what
+     * was declared for your [TorServiceUI.Factory.defaultConfig].
+     *
+     * TODO: AndroidManifest requirements
+     *
+     * TODO: README.md
+     *
+     * e.g. (A Foreground Service using the `kmp-tor:runtime-service-ui` dependency)
+     *
+     *     val factory = KmpTorServiceUI.Factory(
+     *         defaultConfig = KmpTorServiceUI.Config(
+     *             // ...
+     *         ),
+     *         info = TorServiceUI.NotificationInfo.of(
+     *             // ...
+     *         ),
+     *         block = {
+     *             // configure...
+     *         },
+     *     )
+     *
+     *     val config = TorServiceConfig.Foreground.Builder(factory) {
+     *         // configure...
+     *     }
+     *
+     *     val environment = config.newEnvironment { installationDirectory ->
+     *         // Assuming use of `kmp-tor:resource-tor` or
+     *         // `kmp-tor:resource-tor-gpl` dependency
+     *         // as well as the unit test dependency
+     *         // `kmp-tor:resource-android-unit-test`
+     *         TorResources(installationDirectory)
+     *     }
+     *
+     *     val runtime = TorRuntime.Builder(environment) {
+     *         // configure...
+     *     }
+     *
+     * @see [Foreground.Builder]
+     * */
+    public class Foreground <C: AbstractTorServiceUI.Config, F: TorServiceUI.Factory<C, *, *>> private constructor(
+        @JvmField
+        public val factory: F,
+        b: Builder,
+    ): TorServiceConfig(b) {
+
+        /**
+         * Android implementation which creates the [TorRuntime.Environment] using
+         * the provided [TorServiceConfig].
+         *
+         * **NOTE:** [TorRuntime.Environment.Builder.serviceFactoryLoader] is set
+         * automatically and tor will run inside an [android.app.Service].
+         *
+         * Directories (emulators & devices):
+         *  - workDirectory: app_torservice
+         *  - cacheDirectory: cache/torservice
+         *
+         * Directories (android unit tests where [testUseBuildDirectory] = `false`):
+         *  - workDirectory: {system temp}/kmp_tor_android_test/torservice/work
+         *  - cacheDirectory: {system temp}/kmp_tor_android_test/torservice/cache
+         *
+         * Directories (android unit tests where [testUseBuildDirectory] = `true`):
+         *  - workDirectory: {module}/build/kmp_tor_android_test/torservice/work
+         *  - cacheDirectory: {module}/build/kmp_tor_android_test/torservice/cache
+         *
+         * @throws [Resources.NotFoundException] If [instanceConfig] fails validation
+         *   checks (emulators & devices only).
+         * @throws [IllegalArgumentException] if [instanceConfig] is not the same
+         *   class type as the provided [TorServiceUI.Factory.defaultConfig].
+         * */
+        public fun newEnvironment(
+            instanceConfig: C,
+            installer: (installationDirectory: File) -> ResourceInstaller<Paths.Tor>,
+        ): TorRuntime.Environment = newEnvironment(
+            instanceConfig = instanceConfig,
+            installer = installer,
+            block = {},
+        )
+
+        /**
+         * Android implementation which creates the [TorRuntime.Environment] using
+         * the provided [TorServiceConfig].
+         *
+         * **NOTE:** [TorRuntime.Environment.Builder.serviceFactoryLoader] is set
+         * automatically and tor will run inside an [android.app.Service].
+         *
+         * Directories (emulators & devices):
+         *  - workDirectory: app_torservice
+         *  - cacheDirectory: cache/torservice
+         *
+         * Directories (android unit tests where [testUseBuildDirectory] = `false`):
+         *  - workDirectory: {system temp}/kmp_tor_android_test/torservice/work
+         *  - cacheDirectory: {system temp}/kmp_tor_android_test/torservice/cache
+         *
+         * Directories (android unit tests where [testUseBuildDirectory] = `true`):
+         *  - workDirectory: {module}/build/kmp_tor_android_test/torservice/work
+         *  - cacheDirectory: {module}/build/kmp_tor_android_test/torservice/cache
+         *
+         * @throws [Resources.NotFoundException] If [instanceConfig] fails validation
+         *   checks (emulators & devices only).
+         * @throws [IllegalArgumentException] if [instanceConfig] is not the same
+         *   class type as the provided [TorServiceUI.Factory.defaultConfig].
+         * */
+        public fun newEnvironment(
+            instanceConfig: C,
+            installer: (installationDirectory: File) -> ResourceInstaller<Paths.Tor>,
+            block: ThisBlock<TorRuntime.Environment.Builder>,
+        ): TorRuntime.Environment = newEnvironment(
+            dirName = DEFAULT_DIRNAME,
+            instanceConfig = instanceConfig,
+            installer = installer,
+            block = block,
+        )
+
+        /**
+         * Android implementation which creates the [TorRuntime.Environment] using
+         * the provided [TorServiceConfig].
+         *
+         * **NOTE:** [TorRuntime.Environment.Builder.serviceFactoryLoader] is set
+         * automatically and tor will run inside an [android.app.Service].
+         *
+         * Directories (emulators & devices):
+         *  - workDirectory: app_[dirName]
+         *  - cacheDirectory: cache/[dirName]
+         *
+         * Directories (android unit tests where [testUseBuildDirectory] = `false`):
+         *  - workDirectory: {system temp}/kmp_tor_android_test/[dirName]/work
+         *  - cacheDirectory: {system temp}/kmp_tor_android_test/[dirName]/cache
+         *
+         * Directories (android unit tests where [testUseBuildDirectory] = `true`):
+         *  - workDirectory: {module}/build/kmp_tor_android_test/[dirName]/work
+         *  - cacheDirectory: {module}/build/kmp_tor_android_test/[dirName]/cache
+         *
+         * @throws [Resources.NotFoundException] If [instanceConfig] fails validation
+         *   checks (emulators & devices only).
+         * @throws [IllegalArgumentException] if [instanceConfig] is not the same
+         *   class type as the provided [TorServiceUI.Factory.defaultConfig].
+         * */
+        public fun newEnvironment(
+            dirName: String,
+            instanceConfig: C,
+            installer: (installationDirectory: File) -> ResourceInstaller<Paths.Tor>,
+        ): TorRuntime.Environment = newEnvironment(
+            dirName = dirName,
+            instanceConfig = instanceConfig,
+            installer = installer,
+            block = {},
+        )
+
+        /**
+         * Android implementation which creates the [TorRuntime.Environment] using
+         * the provided [TorServiceConfig].
+         *
+         * **NOTE:** [TorRuntime.Environment.Builder.serviceFactoryLoader] is set
+         * automatically and tor will run inside an [android.app.Service].
+         *
+         * Directories (emulators & devices):
+         *  - workDirectory: app_[dirName]
+         *  - cacheDirectory: cache/[dirName]
+         *
+         * Directories (android unit tests where [testUseBuildDirectory] = `false`):
+         *  - workDirectory: {system temp}/kmp_tor_android_test/[dirName]/work
+         *  - cacheDirectory: {system temp}/kmp_tor_android_test/[dirName]/cache
+         *
+         * Directories (android unit tests where [testUseBuildDirectory] = `true`):
+         *  - workDirectory: {module}/build/kmp_tor_android_test/[dirName]/work
+         *  - cacheDirectory: {module}/build/kmp_tor_android_test/[dirName]/cache
+         *
+         * @throws [Resources.NotFoundException] If [instanceConfig] fails validation
+         *   checks (emulators & devices only).
+         * @throws [IllegalArgumentException] if [instanceConfig] is not the same
+         *   class type as the provided [TorServiceUI.Factory.defaultConfig].
+         * */
+        public fun newEnvironment(
+            dirName: String,
+            instanceConfig: C,
+            installer: (installationDirectory: File) -> ResourceInstaller<Paths.Tor>,
+            block: ThisBlock<TorRuntime.Environment.Builder>,
+        ): TorRuntime.Environment {
+            val config = this
+
+            @OptIn(ExperimentalKmpTorApi::class)
+            return with(UTIL) {
+                UTIL.ProvideLoader { appContext ->
+                    factory.validate(appContext.get(), instanceConfig)
+                    instanceConfig.unsafeCastAsType(default = factory.defaultConfig)
+                    appContext.serviceFactoryLoader(config, instanceUIConfig = instanceConfig)
+                }.newEnvironment(config, dirName, installer, block)
+            }
+        }
+
+        public companion object {
+
+            /**
+             * Opener for creating a [TorServiceConfig.Foreground] which will run all
+             * instances of [TorRuntime] that have been created via [newEnvironment]
+             * inside of [TorService] operating as a Foreground Service.
+             *
+             * **NOTE:** An [android.app.NotificationChannel] for API 26+ is set up
+             * using the provided [TorServiceUI.Factory.info] (emulators &
+             * devices only).
+             *
+             * @throws [ClassCastException] If an instance of [TorServiceConfig] has
+             *   already been instantiated and is unable to be returned because it is
+             *   not an instance of [Foreground].
+             * @throws [Resources.NotFoundException] If [factory] fails validation
+             *   checks (emulators & devices only).
+             * @see [TorServiceConfig.Companion.Builder]
+             * @see [io.matthewnelson.kmp.tor.runtime.service.ui.KmpTorServiceUI]
+             * */
+            @JvmStatic
+            @Throws(ClassCastException::class, Resources.NotFoundException::class)
+            public fun <C: AbstractTorServiceUI.Config, F: TorServiceUI.Factory<C, *, *>> Builder(
+                factory: F,
+                block: ThisBlock<Builder>,
+            ): Foreground<C, F> {
+                val b = Builder.get().apply(block)
+
+                return _instance?.unsafeCast() ?: synchronized(UTIL) {
+                    _instance?.unsafeCast() ?: run {
+                        val app = appContext
+
+                        if (app != null) {
+                            factory.validate(app.get(), factory.defaultConfig)
+
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                                val info = factory.info
+                                val channel = NotificationChannel(
+                                    info.channelID,
+                                    info.channelName,
+                                    NotificationManager.IMPORTANCE_DEFAULT,
+                                ).apply {
+                                    setShowBadge(info.channelShowBadge)
+                                    description = info.channelDescription
+                                    setSound(null, null)
+                                }
+
+                                (app.get().getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager)
+                                    .createNotificationChannel(channel)
+                            }
+                        }
+
+                        Foreground(factory, b)
+                            .also { _instance = it }
+                    }
+                }
+            }
+        }
     }
 
-    public final override fun toString(): String = buildString {
-        appendLine("TorServiceConfig: [")
-        append("    enableForeground: ")
-        appendLine(enableForeground)
-        append("    stopServiceOnTaskRemoved: ")
-        appendLine(stopServiceOnTaskRemoved)
-        append("    ifForegroundExitProcessOnDestroyWhenTaskRemoved: ")
-        appendLine(ifForegroundExitProcessOnDestroyWhenTaskRemoved)
-        append("    notificationId: ")
-        appendLine(notificationId)
-        append("    channelId: ")
-        appendLine(channelId)
-        append("    channelName: ")
-        appendLine(channelName)
-        append("    channelDescription: ")
-        appendLine(channelDescription)
-        append("    channelShowBadge: ")
-        appendLine(channelShowBadge)
-        append("    iconNetworkEnabled: ")
-        appendLine(iconNetworkEnabled)
-        append("    iconNetworkDisabled: ")
-        appendLine(iconNetworkDisabled)
-        append("    iconDataXfer: ")
-        appendLine(iconDataXfer)
-        append("    iconError: ")
-        appendLine(iconError)
-        append("    colorWhenBootstrappedTrue: ")
-        appendLine(colorWhenBootstrappedTrue)
-        append("    colorWhenBootstrappedFalse: ")
-        appendLine(colorWhenBootstrappedFalse)
-        append("    visibility: ")
-        appendLine(visibility)
-        append("    enableActionRestart: ")
-        appendLine(enableActionRestart)
-        append("    enableActionStop: ")
-        appendLine(enableActionStop)
-        append(']')
+    protected object UTIL {
+
+        @OptIn(ExperimentalKmpTorApi::class)
+        internal fun interface ProvideLoader {
+            fun newInstance(appContext: ApplicationContext): TorRuntime.ServiceFactory.Loader
+        }
+
+        internal fun ProvideLoader.newEnvironment(
+            config: TorServiceConfig,
+            dirName: String,
+            installer: (installationDirectory: File) -> ResourceInstaller<Paths.Tor>,
+            block: ThisBlock<TorRuntime.Environment.Builder>,
+        ): TorRuntime.Environment {
+            val appContext = appContext
+
+            @Suppress("LocalVariableName")
+            val _dirName = dirName.ifBlank { DEFAULT_DIRNAME }
+
+            if (appContext == null) {
+                // Verify not Android runtime.
+                @OptIn(InternalKmpTorApi::class)
+                check(!OSInfo.INSTANCE.isAndroidRuntime()) {
+                    // Startup initializer failed???
+                    Initializer.errorMsg()
+                }
+
+                // Android unit tests
+                val testDir = if (config.testUseBuildDirectory) {
+                    "".toFile().absoluteFile.resolve("build")
+                } else {
+                    SysTempDir
+                }.resolve("kmp_tor_android_test").resolve(_dirName)
+
+                return TorRuntime.Environment.Builder(
+                    workDirectory = testDir.resolve("work"),
+                    cacheDirectory = testDir.resolve("cache"),
+                    installer = installer,
+                    block = block,
+                )
+            }
+
+            val loader = this
+
+            // Emulator or Device
+            return TorRuntime.Environment.Builder(
+                workDirectory = appContext.get().getDir(_dirName, Context.MODE_PRIVATE),
+                cacheDirectory = appContext.get().cacheDir.resolve(_dirName),
+                installer = installer,
+                block = {
+                    apply(block)
+
+                    @OptIn(ExperimentalKmpTorApi::class)
+                    serviceFactoryLoader = loader.newInstance(appContext)
+                },
+            )
+        }
     }
 
-    internal abstract class MetaData<E: RuntimeException> internal constructor() {
+    internal class Initializer internal constructor(): androidx.startup.Initializer<Initializer.Companion> {
 
-        protected abstract fun getBoolean(key: String, default: Boolean): Boolean
-        protected abstract fun getIntOrZero(key: String): Int
-        protected abstract fun getString(key: String): String?
-
-        protected abstract fun ColorRes.isValid(): Boolean
-        protected abstract fun DrawableRes.isValid(): Boolean
-
-        protected abstract fun hasForegroundServicePermission(): Boolean
-
-        protected abstract fun createException(message: String): E
-
-        internal fun ifForegroundExitProcessOnDestroyWhenTaskRemoved(): Boolean {
-            return getBoolean(KEY_IF_FOREGROUND_EXIT_PROCESS_ON_DESTROY_WHEN_TASK_REMOVED, true)
+        public override fun create(context: Context): Companion {
+            val initializer = AppInitializer.getInstance(context)
+            check(initializer.isEagerlyInitialized(javaClass)) { errorMsg() }
+            appContext = context.toApplicationContext()
+            return Companion
         }
 
-        @Throws(RuntimeException::class)
-        internal fun notificationId(): Int {
-            val notificationId = getIntOrZero(KEY_NOTIFICATION_ID)
-            if (notificationId !in 1..9999) {
-                throw misconfigurationException(
-                    KEY_NOTIFICATION_ID,
-                    "@integer/tor_service_notification_id",
-                    "<integer name=\"tor_service_notification_id\">**VALUE BETWEEN 1 AND 9999**</integer>",
-                )
+        public override fun dependencies(): List<Class<androidx.startup.Initializer<*>>> {
+            return try {
+                val clazz = Class
+                    .forName("io.matthewnelson.kmp.tor.core.lib.locator.KmpTorLibLocator\$Initializer")
+
+                @Suppress("UNCHECKED_CAST")
+                listOf((clazz as Class<androidx.startup.Initializer<*>>))
+            } catch (_: Throwable) {
+                emptyList()
             }
-            return notificationId
-        }
-
-        @Throws(RuntimeException::class)
-        internal fun channelId(): String {
-            val channelId = getString(KEY_CHANNEL_ID)
-            if (channelId.isNullOrEmpty()) {
-                throw misconfigurationException(
-                    KEY_CHANNEL_ID,
-                    "@string/tor_service_notification_channel_id",
-                    "<string name=\"tor_service_notification_channel_id\">**NON-EMPTY VALUE**</string>",
-                )
-            }
-            return channelId
-        }
-
-        @Throws(RuntimeException::class)
-        internal fun channelName(): String {
-            val channelName = getString(KEY_CHANNEL_NAME)
-            if (channelName.isNullOrEmpty()) {
-                throw misconfigurationException(
-                    KEY_CHANNEL_NAME,
-                    "@string/tor_service_notification_channel_name",
-                    "<string name=\"tor_service_notification_channel_name\">**NON-EMPTY VALUE**</string>",
-                )
-            }
-            return channelName
-        }
-
-        @Throws(RuntimeException::class)
-        internal fun channelDescription(): String {
-            val channelDescription = getString(KEY_CHANNEL_DESCRIPTION)
-            if (channelDescription.isNullOrEmpty()) {
-                throw misconfigurationException(
-                    KEY_CHANNEL_DESCRIPTION,
-                    "@string/tor_service_notification_channel_description",
-                    "<string name=\"tor_service_notification_channel_description\">**NON-EMPTY VALUE**</string>",
-                )
-            }
-            return channelDescription
-        }
-
-        internal fun channelShowBadge(): Boolean {
-            return getBoolean(KEY_CHANNEL_SHOW_BADGE, false)
-        }
-
-        @Throws(RuntimeException::class)
-        internal fun iconNetworkEnabled(): DrawableRes {
-            val id = getIntOrZero(KEY_ICON_NETWORK_ENABLED)
-            if (id < 1) {
-                throw misconfigurationException(
-                    KEY_ICON_NETWORK_ENABLED,
-                    "@drawable/tor_service_notification_icon_network_enabled",
-                    "<drawable name=\"tor_service_notification_icon_network_enabled\">@drawable/your_drawable_resource</drawable>",
-                )
-            }
-            val res = DrawableRes.of(id)
-            res.checkValid(KEY_ICON_NETWORK_ENABLED)
-            return res
-        }
-
-        @Throws(RuntimeException::class)
-        internal fun iconNetworkDisabled(): DrawableRes? {
-            val id = getIntOrZero(KEY_ICON_NETWORK_DISABLED)
-            if (id < 1) return null
-            val res = DrawableRes.of(id)
-            res.checkValid(KEY_ICON_NETWORK_DISABLED)
-            return res
-        }
-
-        @Throws(RuntimeException::class)
-        internal fun iconError(): DrawableRes {
-            val id = getIntOrZero(KEY_ICON_ERROR)
-            if (id < 1) {
-                throw misconfigurationException(
-                    KEY_ICON_ERROR,
-                    "@drawable/tor_service_notification_icon_error",
-                    "<drawable name=\"tor_service_notification_icon_error\">@drawable/your_drawable_resource</drawable>",
-                )
-            }
-            val res = DrawableRes.of(id)
-            res.checkValid(KEY_ICON_ERROR)
-            return res
-        }
-
-        @Throws(RuntimeException::class)
-        internal fun iconDataXfer(): DrawableRes? {
-            val id = getIntOrZero(KEY_ICON_DATA_XFER)
-            if (id < 1) return null
-            val res = DrawableRes.of(id)
-            res.checkValid(KEY_ICON_DATA_XFER)
-            return res
-        }
-
-        @Throws(RuntimeException::class)
-        internal fun colorWhenBootstrappedTrue(): ColorRes? {
-            val id = getIntOrZero(KEY_COLOR_WHEN_BOOTSTRAPPED_TRUE)
-            if (id < 1) return null
-            val res = ColorRes.of(id)
-            res.checkValid(KEY_COLOR_WHEN_BOOTSTRAPPED_TRUE)
-            return res
-        }
-
-        @Throws(RuntimeException::class)
-        internal fun colorWhenBootstrappedFalse(): ColorRes? {
-            val id = getIntOrZero(KEY_COLOR_WHEN_BOOTSTRAPPED_FALSE)
-            if (id < 1) return null
-            val res = ColorRes.of(id)
-            res.checkValid(KEY_COLOR_WHEN_BOOTSTRAPPED_FALSE)
-            return res
-        }
-
-        @Throws(RuntimeException::class)
-        internal fun visibility(): Int {
-            val name = getString(KEY_VISIBILITY)
-
-            val type = when (name?.lowercase()) {
-                "public" -> /* Notification.VISIBILITY_PUBLIC */ 1
-                "secret" -> /* Notification.VISIBILITY_SECRET */ -1
-                null,
-                "null",
-                "private" -> /* Notification.VISIBILITY_PRIVATE */ 0
-                else -> throw misconfigurationException(
-                    KEY_VISIBILITY,
-                    "@string/tor_service_notification_visibility",
-                    "<string name=\"tor_service_notification_visibility\">**VALUE HERE**</string>",
-                    """
-                    Unknown value: $name
-                    Accepted resource values: @null, null, public, secret, private
-                    Defaults to private if unset or null
-                    """,
-                )
-            }
-
-            return type
-        }
-
-        internal fun enableActionRestart(): Boolean {
-            return getBoolean(KEY_ACTION_ENABLE_RESTART, false)
-        }
-
-        internal fun enableActionStop(): Boolean {
-            return getBoolean(KEY_ACTION_ENABLE_STOP, false)
-        }
-
-        @Throws(RuntimeException::class)
-        private fun ColorRes.checkValid(key: String) {
-            if (isValid()) return
-            throw createException("""
-                Color resource not found for: $key
-    
-                AndroidManifest.xml <meta-data> flag was present, but resource
-                retrieval failed.
-            """.trimIndent())
-        }
-
-        @Throws(RuntimeException::class)
-        private fun DrawableRes.checkValid(key: String) {
-            if (isValid()) return
-            throw createException("""
-                Drawable resource not found for: $key
-    
-                AndroidManifest.xml <meta-data> flag was present, but resource
-                retrieval failed.
-            """.trimIndent())
-        }
-
-        private fun misconfigurationException(
-            key: String,
-            androidValue: String,
-            lineAttrs: String,
-            defaults: String? = null
-        ): E {
-            val d = if (defaults.isNullOrBlank()) "" else defaults
-
-            return createException("""
-                AndroidManifest.xml <meta-data> missing or erroneous for: $key
-                $d
-                Please add the following to AndroidManifest.xml:
-                ```
-                <application>
-                    <meta-data
-                        android:name="$key"
-                        android:value="$androidValue" />
-                </application>
-                ```
-
-                And the following to res/values/attrs.xml:
-                ```
-                <resources>
-                    $lineAttrs
-                </resources>
-                ```
-
-                See the README.md:
-                - https://github.com/05nelsonm/kmp-tor/blob/master/library/runtime-service/README.md
-            """.trimIndent())
         }
 
         internal companion object {
 
-            internal fun MetaData<*>?.enableForeground(): Boolean {
-                val enable = this?.getBoolean(
-                    KEY_ENABLE_FOREGROUND,
-                    false
-                ) ?: return false
+            @JvmSynthetic
+            internal fun isInitialized(): Boolean = appContext != null
 
-                return enable && hasForegroundServicePermission()
+            internal fun errorMsg(): String {
+                val classPath = "io.matthewnelson.kmp.tor.runtime.service.TorServiceConfig$" + "Initializer"
+
+                return """
+                    TorServiceConfig.Initializer cannot be initialized lazily.
+                    Please ensure that you have:
+                    <meta-data
+                        android:name='$classPath'
+                        android:value='androidx.startup' />
+                    under InitializationProvider in your AndroidManifest.xml
+                """.trimIndent()
             }
-
-            internal fun MetaData<*>?.stopServiceOnTaskRemoved(): Boolean {
-                return this?.getBoolean(KEY_STOP_SERVICE_ON_TASK_REMOVED, true) ?: true
-            }
-
-            private const val BASE = "io.matthewnelson.kmp.tor"
-
-            internal const val KEY_ENABLE_FOREGROUND = "$BASE.enable_foreground"
-            internal const val KEY_STOP_SERVICE_ON_TASK_REMOVED = "$BASE.stop_service_on_task_removed"
-            internal const val KEY_IF_FOREGROUND_EXIT_PROCESS_ON_DESTROY_WHEN_TASK_REMOVED = "$BASE.if_foreground_exit_process_on_destroy_when_task_removed"
-
-            internal const val KEY_NOTIFICATION_ID = "$BASE.notification_id"
-            internal const val KEY_CHANNEL_ID = "$BASE.notification_channel_id"
-            internal const val KEY_CHANNEL_NAME = "$BASE.notification_channel_name"
-            internal const val KEY_CHANNEL_DESCRIPTION = "$BASE.notification_channel_description"
-            internal const val KEY_CHANNEL_SHOW_BADGE = "$BASE.notification_channel_show_badge"
-
-            internal const val KEY_ICON_NETWORK_ENABLED = "$BASE.notification_icon_network_enabled"
-            internal const val KEY_ICON_NETWORK_DISABLED = "$BASE.notification_icon_network_disabled"
-            internal const val KEY_ICON_DATA_XFER = "$BASE.notification_icon_data_xfer"
-            internal const val KEY_ICON_ERROR = "$BASE.notification_icon_error"
-
-            internal const val KEY_COLOR_WHEN_BOOTSTRAPPED_TRUE = "$BASE.notification_color_when_bootstrapped_true"
-            internal const val KEY_COLOR_WHEN_BOOTSTRAPPED_FALSE = "$BASE.notification_color_when_bootstrapped_false"
-
-            internal const val KEY_VISIBILITY = "$BASE.notification_visibility"
-
-            internal const val KEY_ACTION_ENABLE_RESTART = "$BASE.notification_action_enable_restart"
-            internal const val KEY_ACTION_ENABLE_STOP = "$BASE.notification_action_enable_stop"
         }
     }
+
+    @OptIn(ExperimentalKmpTorApi::class)
+    private constructor(b: Builder): this(
+        stopServiceOnTaskRemoved = b.stopServiceOnTaskRemoved,
+        testUseBuildDirectory = b.testUseBuildDirectory,
+    )
+}
+
+@Suppress("NOTHING_TO_INLINE")
+@Throws(ClassCastException::class)
+private inline fun <C: AbstractTorServiceUI.Config, F: TorServiceUI.Factory<C, *, *>> TorServiceConfig.unsafeCast(): TorServiceConfig.Foreground<C, F> {
+    if (this !is TorServiceConfig.Foreground<*, *>) {
+        val msg = """
+            Unable to return TorServiceConfig.Foreground. An instance was already
+            configured without declaring a TorServiceUI.Factory and is not
+            able to be cast.
+        """.trimIndent()
+
+        throw ClassCastException(msg)
+    }
+
+    @Suppress("UNCHECKED_CAST")
+    return this as TorServiceConfig.Foreground<C, F>
 }

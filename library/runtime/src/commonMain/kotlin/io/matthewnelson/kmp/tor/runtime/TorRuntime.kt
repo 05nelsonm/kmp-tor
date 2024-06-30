@@ -350,7 +350,7 @@ public sealed interface TorRuntime:
              * @param [cacheDirectory] tor's cache directory (e.g. `$HOME/.my_application/cache/torservice`).
              * @param [installer] lambda for creating [ResourceInstaller] using the configured
              *   [Builder.installationDirectory]. See [kmp-tor-resource](https://github.com/05nelsonm/kmp-tor-resource)
-             * @see [io.matthewnelson.kmp.tor.runtime.service.createTorRuntimeEnvironment]
+             * @see [io.matthewnelson.kmp.tor.runtime.service.TorServiceConfig]
              * */
             @JvmStatic
             public fun Builder(
@@ -385,7 +385,7 @@ public sealed interface TorRuntime:
              * @param [installer] lambda for creating [ResourceInstaller] using the configured
              *   [Builder.installationDirectory]. See [kmp-tor-resource](https://github.com/05nelsonm/kmp-tor-resource)
              * @param [block] optional lambda for modifying default parameters.
-             * @see [io.matthewnelson.kmp.tor.runtime.service.createTorRuntimeEnvironment]
+             * @see [io.matthewnelson.kmp.tor.runtime.service.TorServiceConfig]
              * */
             @JvmStatic
             public fun Builder(
@@ -475,7 +475,7 @@ public sealed interface TorRuntime:
              * only Android support is available via the `runtime-service`
              * dependency. This setting is automatically configured if using
              * `runtime-service` dependency and utilizing the extended builder
-             * functions [io.matthewnelson.kmp.tor.runtime.service.createTorRuntimeEnvironment]
+             * functions [io.matthewnelson.kmp.tor.runtime.service.TorServiceConfig]
              * */
             @JvmField
             @ExperimentalKmpTorApi

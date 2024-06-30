@@ -21,10 +21,7 @@
 
     <uses-sdk tools:overrideLibrary="io.matthewnelson.kmp.tor.resource.tor" />
 
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 
     <application>
         <provider
@@ -33,7 +30,7 @@
             android:exported="false"
             tools:node="merge">
             <meta-data
-                android:name="io.matthewnelson.kmp.tor.runtime.service.TorService$Initializer"
+                android:name="io.matthewnelson.kmp.tor.runtime.service.TorServiceConfig$Initializer"
                 android:value="androidx.startup" />
         </provider>
         <service

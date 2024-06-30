@@ -48,12 +48,17 @@ kmpConfiguration {
                 }
             }
 
+            sourceSetTest {
+                dependencies {
+                    implementation(libs.kmp.tor.resource.android.unit.test)
+                }
+            }
+
             sourceSetTestInstrumented {
                 dependencies {
                     implementation(libs.androidx.test.core)
                     implementation(libs.androidx.test.runner)
                     implementation(libs.kmp.process)
-                    implementation(libs.kmp.tor.resource.tor)
                     implementation(project(":library:runtime-ctrl"))
                 }
             }
@@ -68,11 +73,14 @@ kmpConfiguration {
                 dependencies {
                     api(project(":library:runtime"))
                     implementation(libs.kmp.tor.core.resource)
+                    implementation(libs.kotlinx.coroutines.core)
                 }
             }
+
             sourceSetTest {
                 dependencies {
                     implementation(kotlin("test"))
+                    implementation(libs.kmp.tor.resource.tor)
                     implementation(libs.kotlinx.coroutines.test)
                 }
             }
