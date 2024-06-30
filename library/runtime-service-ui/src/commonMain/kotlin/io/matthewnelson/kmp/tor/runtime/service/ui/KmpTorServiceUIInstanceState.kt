@@ -54,9 +54,9 @@ public class KmpTorServiceUIInstanceState<C: AbstractKmpTorServiceUIConfig> priv
     @Volatile
     private var _messageJob: Job? = null
     @Volatile
-    private var _stateTor: TorState = TorState(TorState.Daemon.Off, TorState.Network.Disabled)
-    @Volatile
     private var _state = State.of(fid = this)
+    @Volatile
+    private var _stateTor: TorState = TorState(_state.title, TorState.Network.Disabled)
 
     private val lock = Lock()
 
@@ -67,7 +67,13 @@ public class KmpTorServiceUIInstanceState<C: AbstractKmpTorServiceUIConfig> priv
     public override val observersRuntimeEvent: Set<RuntimeEvent.Observer<*>>
     public override val observersTorEvent: Set<TorEvent.Observer>
 
-    internal fun update(block: (current: State) -> State?) {
+    internal fun onDeviceLock() {
+        update { current ->
+            current.copy(actions = current.progress.toActions())
+        }
+    }
+
+    private fun update(block: (current: State) -> State?) {
         lock.withLock {
             val old = _state
             val new = block(old)
@@ -81,7 +87,7 @@ public class KmpTorServiceUIInstanceState<C: AbstractKmpTorServiceUIConfig> priv
         }?.execute()
     }
 
-    internal fun postMessage(message: ContentMessage<*>, duration: Duration) {
+    private fun postMessage(message: ContentMessage<*>, duration: Duration) {
         if (duration <= Duration.ZERO) return
 
         _messageJob?.cancel()
@@ -100,6 +106,25 @@ public class KmpTorServiceUIInstanceState<C: AbstractKmpTorServiceUIConfig> priv
                 current.copy(
                     text = _bandwidth,
                 )
+            }
+        }
+    }
+
+    private fun Progress.toActions(): Set<ButtonAction> = when (this) {
+        is Progress.Determinant,
+        is Progress.Indeterminate -> emptySet()
+        is Progress.None -> when {
+            !_stateTor.daemon.isBootstrapped -> emptySet()
+            isDeviceLocked() -> setOf(ButtonAction.NewIdentity)
+            else -> buildSet {
+                add(ButtonAction.NewIdentity)
+
+                if (instanceConfig.enableActionRestart) {
+                    add(ButtonAction.RestartTor)
+                }
+                if (instanceConfig.enableActionStop) {
+                    add(ButtonAction.StopTor)
+                }
             }
         }
     }
@@ -184,24 +209,7 @@ public class KmpTorServiceUIInstanceState<C: AbstractKmpTorServiceUIConfig> priv
                         }
                     }
 
-                    val actions = when (progress) {
-                        is Progress.Determinant,
-                        is Progress.Indeterminate -> emptySet()
-
-                        is Progress.None -> when {
-                            !new.daemon.isBootstrapped -> emptySet()
-                            isDeviceLocked() -> setOf(ButtonAction.NewIdentity)
-                            else -> buildSet {
-                                add(ButtonAction.NewIdentity)
-                                if (instanceConfig.enableActionRestart) {
-                                    add(ButtonAction.RestartTor)
-                                }
-                                if (instanceConfig.enableActionStop) {
-                                    add(ButtonAction.StopTor)
-                                }
-                            }
-                        }
-                    }
+                    val actions = progress.toActions()
 
                     val icon = when {
                         new.network.isDisabled -> IconState.NetworkDisabled

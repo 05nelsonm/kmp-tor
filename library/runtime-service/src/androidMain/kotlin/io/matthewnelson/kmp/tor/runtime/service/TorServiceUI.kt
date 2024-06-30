@@ -174,6 +174,10 @@ protected constructor(
      * Registers a [BroadcastReceiver] with the [Service] context (which
      * is not exposed to implementors).
      *
+     * TODO: Check if this will leak the service context... May need to
+     *  instantiate an anonymous object with lambda and return
+     *  a disposable to unregister.
+     *
      * @param [flags] Only utilized if API 26+. Default 0 (none).
      * @param [exported] Only utilized if non-null and API 33+, adding flag
      *   [Context.RECEIVER_EXPORTED] or [Context.RECEIVER_NOT_EXPORTED]
