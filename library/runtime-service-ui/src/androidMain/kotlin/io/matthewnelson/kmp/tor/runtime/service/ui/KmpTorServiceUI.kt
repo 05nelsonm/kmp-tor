@@ -43,15 +43,67 @@ public class KmpTorServiceUI private constructor(
     /**
      * TODO
      * */
-    public class Config(
+    public class Config private constructor(
         enableActionRestart: Boolean,
         enableActionStop: Boolean,
+        init: Any
     ): AbstractKmpTorServiceUIConfig(
         enableActionRestart,
         enableActionStop,
         emptyMap(), // TODO
-        INIT,
-    )
+        init,
+    ) {
+
+        public constructor(
+            enableActionRestart: Boolean,
+            enableActionStop: Boolean,
+        ): this(
+            enableActionRestart,
+            enableActionStop,
+            {},
+        )
+
+        public constructor(
+            enableActionRestart: Boolean,
+            enableActionStop: Boolean,
+            block: ThisBlock<Builder>,
+        ): this(
+            b = Builder.of(
+                enableActionRestart,
+                enableActionStop,
+            ).apply(block)
+        )
+
+        private constructor(b: Builder): this(
+            b.enableActionRestart,
+            b.enableActionStop,
+            // TODO: Wrappers
+            INIT,
+        )
+
+        @KmpTorDsl
+        public class Builder private constructor(
+            @JvmField
+            public val enableActionRestart: Boolean,
+            @JvmField
+            public val enableActionStop: Boolean,
+        ) {
+
+            // TODO
+
+            internal companion object {
+
+                @JvmSynthetic
+                internal fun of(
+                    enableActionRestart: Boolean,
+                    enableActionStop: Boolean,
+                ): Builder = Builder(
+                    enableActionRestart,
+                    enableActionStop,
+                )
+            }
+        }
+    }
 
     /**
      * Factory class for [TorServiceConfig.Foreground.Builder]
@@ -78,7 +130,7 @@ public class KmpTorServiceUI private constructor(
         b: Builder,
     ): TorServiceUI.Factory<Config, KmpTorServiceUIInstanceState<Config>, KmpTorServiceUI>(
         b.defaultConfig,
-        b.info
+        b.info,
     ) {
 
         public constructor(
@@ -90,7 +142,12 @@ public class KmpTorServiceUI private constructor(
             defaultConfig: Config,
             info: NotificationInfo,
             block: ThisBlock<Builder>,
-        ): this(Builder.of(defaultConfig, info).apply(block))
+        ): this(
+            b = Builder.of(
+                defaultConfig,
+                info,
+            ).apply(block)
+        )
 
         @KmpTorDsl
         public class Builder private constructor(
