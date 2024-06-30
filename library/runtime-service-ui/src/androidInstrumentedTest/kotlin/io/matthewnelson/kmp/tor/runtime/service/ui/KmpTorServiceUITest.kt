@@ -15,6 +15,7 @@
  **/
 package io.matthewnelson.kmp.tor.runtime.service.ui
 
+import android.os.Build
 import io.matthewnelson.kmp.tor.resource.tor.TorResources
 import io.matthewnelson.kmp.tor.runtime.Action
 import io.matthewnelson.kmp.tor.runtime.Action.Companion.startDaemonAsync
@@ -58,6 +59,11 @@ class KmpTorServiceUITest {
 
     @Test
     fun givenUIFactory_whenForeground_thenIsSuccessful() = runTest {
+        if (Build.VERSION.SDK_INT < 21) {
+            println("Skipping...")
+            return@runTest
+        }
+
         val env = config.newEnvironment(
             dirName = "ui_startup",
             installer = { dir -> TorResources(dir) },
