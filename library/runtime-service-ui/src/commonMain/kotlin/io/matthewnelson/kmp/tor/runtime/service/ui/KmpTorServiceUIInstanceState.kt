@@ -203,6 +203,7 @@ public class KmpTorServiceUIInstanceState<C: AbstractKmpTorServiceUIConfig> priv
                 update { current ->
                     val text = when (progress) {
                         is Progress.Determinant -> ContentBootstrap.of(progress.value)
+
                         is Progress.Indeterminate,
                         is Progress.None -> {
                             val currentText = current.text
@@ -219,13 +220,11 @@ public class KmpTorServiceUIInstanceState<C: AbstractKmpTorServiceUIConfig> priv
 
                     val icon = when {
                         new.network.isDisabled -> IconState.NetworkDisabled
-                        new.network.isEnabled
-                        && new.daemon.isBootstrapped -> if (_bandwidth !is ContentBandwidth.ZERO) {
+                        new.daemon.isBootstrapped -> if (_bandwidth !is ContentBandwidth.ZERO) {
                             IconState.DataXfer
                         } else {
                             IconState.NetworkEnabled
                         }
-
                         else -> IconState.NetworkDisabled
                     }
 

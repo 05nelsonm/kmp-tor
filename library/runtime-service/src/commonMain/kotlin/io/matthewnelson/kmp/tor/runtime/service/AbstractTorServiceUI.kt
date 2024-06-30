@@ -89,6 +89,10 @@ internal constructor(
     @JvmField
     protected val defaultConfig: C = args.config()
 
+    /**
+     * All [InstanceState] currently operating within this "container"
+     * instance.
+     * */
     @get:JvmName("instanceStates")
     protected val instanceStates: Map<FileIDKey, IS> get() = _immutableInstanceStates
 
@@ -114,7 +118,9 @@ internal constructor(
     protected open fun onDestroy() {}
 
     /**
-     * Indicates that there has been an update for the
+     * Indicates that the [target] was updated.
+     *
+     * @see [instanceStates]
      * */
     protected abstract fun onUpdate(target: FileIDKey, type: UpdateType)
 

@@ -208,9 +208,11 @@ internal class TorService internal constructor(): Service() {
                             // Report error and shutdown TorService.
                             executables.add(Executable {
                                 conn.binder.e(e)
-                                application.unbindService(conn)
+
+                                val context = appContext.get()
+                                context.unbindService(conn)
                                 conn.binder.lce(Lifecycle.Event.OnUnbind(service))
-                                application.stopService(Intent(application, TorService::class.java))
+                                context.stopService(Intent(context, TorService::class.java))
                             })
                             null
                         }
