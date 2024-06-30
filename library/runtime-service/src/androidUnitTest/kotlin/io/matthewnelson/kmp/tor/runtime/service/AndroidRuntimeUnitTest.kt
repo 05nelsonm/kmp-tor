@@ -20,6 +20,7 @@ import io.matthewnelson.kmp.tor.resource.tor.TorResources
 import io.matthewnelson.kmp.tor.runtime.Lifecycle
 import io.matthewnelson.kmp.tor.runtime.RuntimeEvent
 import io.matthewnelson.kmp.tor.runtime.TorRuntime
+import io.matthewnelson.kmp.tor.runtime.core.OnEvent
 import kotlin.test.*
 
 @OptIn(ExperimentalKmpTorApi::class)
@@ -31,9 +32,15 @@ class AndroidRuntimeUnitTest {
 
     @Test
     fun givenTorRuntime_whenNotAndroidRuntime_thenIsNotAndroidTorServiceFactory() {
-        val environment = config.newEnvironment(dirName = "rt_unit_tests") { installationDir ->
-            TorResources(installationDir)
-        }
+        val environment = config.newEnvironment(
+            dirName = "rt_unit_tests",
+            installer = { installationDir ->
+                TorResources(installationDir)
+            },
+            block = {
+                defaultEventExecutor = OnEvent.Executor.Immediate
+            }
+        )
 
         val path = environment.workDirectory.path
         assertTrue(path.contains("kmp_tor_android_test"))
