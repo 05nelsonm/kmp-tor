@@ -15,7 +15,7 @@
  **/
 package io.matthewnelson.kmp.tor.runtime.service.internal
 
-import android.Manifest
+import android.Manifest.permission.ACCESS_NETWORK_STATE
 import android.annotation.SuppressLint
 import android.content.BroadcastReceiver
 import android.content.Context
@@ -110,8 +110,8 @@ internal class AndroidNetworkObserver private constructor(
             service: Context,
             serviceJob: Job,
         ): AndroidNetworkObserver {
-            check(service.isPermissionGranted(Manifest.permission.ACCESS_NETWORK_STATE)) {
-                "Permission '${Manifest.permission.ACCESS_NETWORK_STATE}' not granted"
+            check(service.isPermissionGranted(ACCESS_NETWORK_STATE)) {
+                "Permission '$ACCESS_NETWORK_STATE' is missing"
             }
 
             val manager = service.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager

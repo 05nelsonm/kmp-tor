@@ -109,10 +109,9 @@ public abstract class io/matthewnelson/kmp/tor/runtime/service/TorServiceUI : io
 	protected final field channelID Ljava/lang/String;
 	protected fun <init> (Lio/matthewnelson/kmp/tor/runtime/service/TorServiceUI$Args;)V
 	protected final fun post (Landroid/app/Notification;)V
-	protected final fun register (Landroid/content/BroadcastReceiver;Landroid/content/IntentFilter;Ljava/lang/String;Landroid/os/Handler;Ljava/lang/Boolean;)Landroid/content/Intent;
-	protected final fun register (Landroid/content/BroadcastReceiver;Landroid/content/IntentFilter;Ljava/lang/String;Landroid/os/Handler;Ljava/lang/Boolean;I)Landroid/content/Intent;
-	public static synthetic fun register$default (Lio/matthewnelson/kmp/tor/runtime/service/TorServiceUI;Landroid/content/BroadcastReceiver;Landroid/content/IntentFilter;Ljava/lang/String;Landroid/os/Handler;Ljava/lang/Boolean;IILjava/lang/Object;)Landroid/content/Intent;
-	protected final fun unregister (Landroid/content/BroadcastReceiver;)V
+	protected final fun register (Lio/matthewnelson/kmp/tor/runtime/service/TorServiceUI$Receiver;Landroid/content/IntentFilter;Ljava/lang/String;Landroid/os/Handler;Ljava/lang/Boolean;)Lio/matthewnelson/kmp/tor/runtime/core/Disposable$Once;
+	protected final fun register (Lio/matthewnelson/kmp/tor/runtime/service/TorServiceUI$Receiver;Landroid/content/IntentFilter;Ljava/lang/String;Landroid/os/Handler;Ljava/lang/Boolean;I)Lio/matthewnelson/kmp/tor/runtime/core/Disposable$Once;
+	public static synthetic fun register$default (Lio/matthewnelson/kmp/tor/runtime/service/TorServiceUI;Lio/matthewnelson/kmp/tor/runtime/service/TorServiceUI$Receiver;Landroid/content/IntentFilter;Ljava/lang/String;Landroid/os/Handler;Ljava/lang/Boolean;IILjava/lang/Object;)Lio/matthewnelson/kmp/tor/runtime/core/Disposable$Once;
 }
 
 public final class io/matthewnelson/kmp/tor/runtime/service/TorServiceUI$Args : io/matthewnelson/kmp/tor/runtime/service/AbstractTorServiceUI$Args$UI {
@@ -138,6 +137,10 @@ public final class io/matthewnelson/kmp/tor/runtime/service/TorServiceUI$Notific
 
 public final class io/matthewnelson/kmp/tor/runtime/service/TorServiceUI$NotificationInfo$Companion {
 	public final fun of (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;ZI)Lio/matthewnelson/kmp/tor/runtime/service/TorServiceUI$NotificationInfo;
+}
+
+protected abstract interface class io/matthewnelson/kmp/tor/runtime/service/TorServiceUI$Receiver {
+	public abstract fun onReceive (Landroid/content/Intent;)V
 }
 
 public abstract class io/matthewnelson/kmp/tor/runtime/service/TorServiceUIUtils {

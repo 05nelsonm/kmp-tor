@@ -31,6 +31,7 @@ import io.matthewnelson.kmp.tor.core.resource.synchronized
 import io.matthewnelson.kmp.tor.core.resource.SynchronizedObject
 import io.matthewnelson.kmp.tor.runtime.Lifecycle
 import io.matthewnelson.kmp.tor.runtime.TorRuntime
+import io.matthewnelson.kmp.tor.runtime.core.Disposable
 import io.matthewnelson.kmp.tor.runtime.service.AbstractTorServiceUI.Config
 import io.matthewnelson.kmp.tor.runtime.service.AbstractTorServiceUI.InstanceState
 import io.matthewnelson.kmp.tor.runtime.service.internal.register
@@ -171,12 +172,23 @@ protected constructor(
     }
 
     /**
-     * Registers a [BroadcastReceiver] with the [Service] context (which
-     * is not exposed to implementors).
+     * Callback for creating [BroadcastReceiver] that belong to the [Service]
+     * context, without exposing the [Service] to implementors of [TorServiceUI].
      *
-     * TODO: Check if this will leak the service context... May need to
-     *  instantiate an anonymous object with lambda and return
-     *  a disposable to unregister.
+     * @see [register]
+     * */
+    protected fun interface Receiver {
+        public fun onReceive(intent: Intent?)
+    }
+
+    /**
+     * Registers a [BroadcastReceiver] with the [Service] context and pipes
+     * the [Intent] from [BroadcastReceiver.onReceive] to [Receiver.onReceive].
+     *
+     * **NOTE:** Underlying [BroadcastReceiver] are not automatically unregistered.
+     * The returned [Disposable] should be invoked when done with the [Receiver],
+     * or from [onDestroy] override when this instance of [TorServiceUI] is
+     * destroyed. Otherwise, there will be a reference leak.
      *
      * @param [flags] Only utilized if API 26+. Default 0 (none).
      * @param [exported] Only utilized if non-null and API 33+, adding flag
@@ -184,32 +196,47 @@ protected constructor(
      *   automatically. This **must** be non-null if the receiver is not being
      *   registered for system broadcasts, otherwise a [SecurityException]
      *   will be thrown on API 34+.
+     * @return [Disposable.Once] to unregister the underlying [BroadcastReceiver]
+     *   or `null` if [TorServiceUI.isDestroyed] was true.
      * @see [Context.registerReceiver]
      * */
     @JvmOverloads
-    protected fun BroadcastReceiver.register(
+    protected fun Receiver.register(
         filter: IntentFilter,
         permission: String?,
         scheduler: Handler?,
         exported: Boolean?,
         flags: Int = 0,
-    ): Intent? = service.register(
-        this,
-        filter,
-        permission,
-        scheduler,
-        exported,
-        flags,
-    )
+    ): Disposable.Once? {
+        if (isDestroyed()) return null
 
-    /**
-     * Unregisters a [BroadcastReceiver] from the [android.app.Service]
-     * context (which is not exposed to implementors).
-     *
-     * @throws [RuntimeException] if the receiver was not registered.
-     * */
-    protected fun BroadcastReceiver.unregister() {
-        service.unregisterReceiver(this)
+        var disposable: Disposable.Once? = null
+
+        val receiver = object : BroadcastReceiver() {
+            override fun onReceive(context: Context?, intent: Intent?) {
+                if (isDestroyed()) {
+                    disposable?.dispose()
+                    return
+                }
+
+                onReceive(intent)
+            }
+        }
+
+        service.register(
+            receiver,
+            filter,
+            permission,
+            scheduler,
+            exported,
+            flags,
+        )
+
+        return Disposable.Once.of(concurrent = true) {
+            try {
+                service.unregisterReceiver(receiver)
+            } catch (_: Throwable) {}
+        }.also { disposable = it }
     }
 
     /**
