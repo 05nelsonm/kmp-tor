@@ -13,10 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-@file:Suppress("FunctionName", "UnnecessaryOptInAnnotation")
+@file:Suppress("FunctionName", "UnnecessaryOptInAnnotation", "RemoveRedundantQualifierName")
 
 package io.matthewnelson.kmp.tor.runtime.service
 
+import android.app.Application
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
@@ -49,8 +50,8 @@ import kotlin.concurrent.Volatile
  * run tor within an [android.app.Service].
  *
  * **NOTE:** Only one [TorServiceConfig] instance can be instantiated.
- * Successive invocations of [Companion.Builder] or [Foreground.Builder]
- * will return the already created singleton instance.
+ * Successive invocations of [Foreground.Companion.Builder] or
+ * [Companion.Builder] will return the already created singleton instance.
  *
  * e.g. (A Background Service)
  *
@@ -71,7 +72,7 @@ import kotlin.concurrent.Volatile
  *     }
  *
  * @see [Companion.Builder]
- * @see [Foreground.Builder]
+ * @see [Foreground.Companion.Builder]
  * @see [newEnvironment]
  * */
 public open class TorServiceConfig private constructor(
@@ -214,13 +215,13 @@ public open class TorServiceConfig private constructor(
          * of [TorRuntime] that have been created via [newEnvironment] inside of
          * [TorService] operating as a Background Service.
          *
-         * @see [Foreground.Builder]
+         * @see [Foreground.Companion.Builder]
          * */
         @JvmStatic
         public fun Builder(
-            block: ThisBlock<Builder>,
+            block: ThisBlock<TorServiceConfig.Builder>,
         ): TorServiceConfig {
-            val b = Builder.get().apply(block)
+            val b = TorServiceConfig.Builder().apply(block)
 
             return _instance ?: synchronized(UTIL) {
                 _instance ?: TorServiceConfig(b)
@@ -230,7 +231,7 @@ public open class TorServiceConfig private constructor(
     }
 
     @KmpTorDsl
-    public class Builder private constructor() {
+    public open class Builder internal constructor() {
 
         /**
          * If [TorService] is running and your application is swiped from
@@ -282,12 +283,6 @@ public open class TorServiceConfig private constructor(
          * */
         @JvmField
         public var useNetworkStateObserver: Boolean = true
-
-        internal companion object {
-
-            @JvmSynthetic
-            internal fun get(): Builder = Builder()
-        }
     }
 
     /**
@@ -334,13 +329,19 @@ public open class TorServiceConfig private constructor(
      *         // configure...
      *     }
      *
-     * @see [Foreground.Builder]
+     * @see [Foreground.Companion.Builder]
      * */
     public class Foreground <C: AbstractTorServiceUI.Config, F: TorServiceUI.Factory<C, *, *>> private constructor(
         @JvmField
         public val factory: F,
-        b: Builder,
+        b: Foreground.Builder,
     ): TorServiceConfig(b) {
+
+        /**
+         * See [Builder.exitProcessIfTaskRemoved]
+         * */
+        @JvmField
+        public val exitProcessIfTaskRemoved: Boolean = b.exitProcessIfTaskRemoved
 
         /**
          * Android implementation which creates the [TorRuntime.Environment] using
@@ -510,9 +511,9 @@ public open class TorServiceConfig private constructor(
             @Throws(ClassCastException::class, Resources.NotFoundException::class)
             public fun <C: AbstractTorServiceUI.Config, F: TorServiceUI.Factory<C, *, *>> Builder(
                 factory: F,
-                block: ThisBlock<Builder>,
+                block: ThisBlock<Foreground.Builder>,
             ): Foreground<C, F> {
-                val b = Builder.get().apply(block)
+                val b = Foreground.Builder().apply(block)
 
                 return _instance?.unsafeCast() ?: synchronized(UTIL) {
                     _instance?.unsafeCast() ?: run {
@@ -543,6 +544,35 @@ public open class TorServiceConfig private constructor(
                     }
                 }
             }
+        }
+
+        /**
+         * Extended builder options for [TorServiceConfig.Builder], specific to
+         * [Foreground] operations.
+         * */
+        @KmpTorDsl
+        public class Builder internal constructor(): TorServiceConfig.Builder() {
+
+            /**
+             * On Android API 24+, if a Foreground Service stops while the task
+             * is removed (e.g. user swipes it away from the recent app's tray),
+             * the OS does not kill the application process like it would on
+             * Android API 23 and below.
+             *
+             * If `true`, this setting will modify that behavior for API 24+ such
+             * that upon execution of [TorService.onDestroy], if the task is not
+             * present, then [System.exit] will be called.
+             *
+             * If `false`, the application process will continue to run in the
+             * background until either:
+             *   - The OS kills the process to recoup memory (approximately 1m)
+             *   - The user returns to it (warm start, no [Application.onCreate])
+             *       - TODO: Saved State restarts
+             *
+             * Default: `true`
+             * */
+            @JvmField
+            public var exitProcessIfTaskRemoved: Boolean = true
         }
     }
 
