@@ -34,6 +34,7 @@ import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
 import io.matthewnelson.kmp.tor.core.api.annotation.KmpTorDsl
 import io.matthewnelson.kmp.tor.core.resource.OSInfo
 import io.matthewnelson.kmp.tor.runtime.Action
+import io.matthewnelson.kmp.tor.runtime.NetworkObserver
 import io.matthewnelson.kmp.tor.runtime.TorRuntime
 import io.matthewnelson.kmp.tor.runtime.core.ThisBlock
 import io.matthewnelson.kmp.tor.runtime.core.apply
@@ -86,6 +87,12 @@ public open class TorServiceConfig private constructor(
      * */
     @JvmField
     public val testUseBuildDirectory: Boolean,
+
+    /**
+     * See [Builder.useNetworkStateObserver]
+     * */
+    @JvmField
+    public val useNetworkStateObserver: Boolean,
 ) {
 
     /**
@@ -263,6 +270,18 @@ public open class TorServiceConfig private constructor(
         @JvmField
         @ExperimentalKmpTorApi
         public var testUseBuildDirectory: Boolean = false
+
+        /**
+         * While [TorService] is running, a [NetworkObserver] that monitors the
+         * device's connectivity state will be used for all instances of [TorRuntime]
+         * operating within the service. If this is set to `false`, it will not be
+         * used and the [TorRuntime] will be created with whatever was declared for
+         * [TorRuntime.Builder.networkObserver].
+         *
+         * **NOTE:** Requires permission [android.Manifest.permission.ACCESS_NETWORK_STATE]
+         * */
+        @JvmField
+        public var useNetworkStateObserver: Boolean = true
 
         internal companion object {
 
@@ -630,6 +649,7 @@ public open class TorServiceConfig private constructor(
     private constructor(b: Builder): this(
         stopServiceOnTaskRemoved = b.stopServiceOnTaskRemoved,
         testUseBuildDirectory = b.testUseBuildDirectory,
+        useNetworkStateObserver = b.useNetworkStateObserver,
     )
 }
 

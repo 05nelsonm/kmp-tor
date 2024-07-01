@@ -205,6 +205,8 @@ protected constructor(
     /**
      * Unregisters a [BroadcastReceiver] from the [android.app.Service]
      * context (which is not exposed to implementors).
+     *
+     * @throws [RuntimeException] if the receiver was not registered.
      * */
     protected fun BroadcastReceiver.unregister() {
         service.unregisterReceiver(this)

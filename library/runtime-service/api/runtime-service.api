@@ -66,6 +66,7 @@ public class io/matthewnelson/kmp/tor/runtime/service/TorServiceConfig {
 	public static final field Companion Lio/matthewnelson/kmp/tor/runtime/service/TorServiceConfig$Companion;
 	public final field stopServiceOnTaskRemoved Z
 	public final field testUseBuildDirectory Z
+	public final field useNetworkStateObserver Z
 	public synthetic fun <init> (Lio/matthewnelson/kmp/tor/runtime/service/TorServiceConfig$Builder;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
 	public static final fun Builder (Lio/matthewnelson/kmp/tor/runtime/core/ThisBlock;)Lio/matthewnelson/kmp/tor/runtime/service/TorServiceConfig;
 	public final fun newEnvironment (Ljava/lang/String;Lkotlin/jvm/functions/Function1;)Lio/matthewnelson/kmp/tor/runtime/TorRuntime$Environment;
@@ -77,6 +78,7 @@ public class io/matthewnelson/kmp/tor/runtime/service/TorServiceConfig {
 public final class io/matthewnelson/kmp/tor/runtime/service/TorServiceConfig$Builder {
 	public field stopServiceOnTaskRemoved Z
 	public field testUseBuildDirectory Z
+	public field useNetworkStateObserver Z
 }
 
 public final class io/matthewnelson/kmp/tor/runtime/service/TorServiceConfig$Companion {
