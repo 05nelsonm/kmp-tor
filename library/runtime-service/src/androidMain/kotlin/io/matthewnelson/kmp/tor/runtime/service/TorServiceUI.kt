@@ -261,7 +261,7 @@ protected constructor(
         /**
          * Implementations **MUST** ensure all resources specified in their
          * given [Config] implementations are valid. This is called from
-         * [TorServiceConfig.Foreground.Builder], as well as
+         * [TorServiceConfig.Foreground.Companion.Builder], as well as
          * [TorServiceConfig.Foreground.newEnvironment], in order to raise
          * errors before instantiating the singleton instances.
          * */

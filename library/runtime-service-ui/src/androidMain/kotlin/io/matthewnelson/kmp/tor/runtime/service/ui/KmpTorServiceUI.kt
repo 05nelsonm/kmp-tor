@@ -26,11 +26,13 @@ import io.matthewnelson.kmp.tor.runtime.core.apply
 import io.matthewnelson.kmp.tor.runtime.service.AbstractTorServiceUI
 import io.matthewnelson.kmp.tor.runtime.service.TorServiceUI
 import io.matthewnelson.kmp.tor.runtime.service.TorServiceConfig
+import io.matthewnelson.kmp.tor.runtime.service.ui.internal.retrieveString
+import kotlinx.coroutines.*
 
 /**
  * The "default" UI implementation for `kmp-tor:runtime-service`, serving
  * both as an example for others to model their own implementations after,
- * or to utilize with [TorServiceConfig.Foreground.Builder].
+ * or to utilize with [TorServiceConfig.Foreground.Companion.Builder].
  *
  * @see [Factory]
  * */
@@ -108,7 +110,7 @@ public class KmpTorServiceUI private constructor(
     }
 
     /**
-     * Factory class for [TorServiceConfig.Foreground.Builder]
+     * Factory class for [TorServiceConfig.Foreground.Companion.Builder]
      *
      * e.g.
      *
@@ -182,27 +184,26 @@ public class KmpTorServiceUI private constructor(
         ): KmpTorServiceUI = KmpTorServiceUI(args)
     }
 
-    init {
-        // TODO
-        val b = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            Notification.Builder(appContext, channelID)
-        } else {
-            @Suppress("DEPRECATION")
-            Notification.Builder(appContext)
-        }
+    // TODO
+    private val b = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+        Notification.Builder(appContext, channelID)
+    } else {
+        @Suppress("DEPRECATION")
+        Notification.Builder(appContext)
+    }
 
-        b.setContentTitle("Title")
-        b.setContentText("Text")
+    init {
         b.setSmallIcon(android.R.drawable.stat_notify_chat)
         b.setOngoing(true)
         b.setOnlyAlertOnce(true)
 
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            b.setTimeoutAfter(10L)
+        }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             // API 31+
             b.setForegroundServiceBehavior(Notification.FOREGROUND_SERVICE_IMMEDIATE)
         }
-
-        b.build().post()
     }
 
     protected override fun newInstanceStateProtected(
@@ -213,7 +214,10 @@ public class KmpTorServiceUI private constructor(
     )
 
     protected override fun onUpdate(target: FileIDKey, type: UpdateType) {
-        // TODO
+        val state = instanceStates[target]?.state ?: return
+        b.setContentText(appContext.retrieveString(state.text))
+        b.setContentTitle(appContext.retrieveString(state.title))
+        b.build().post()
     }
 
     protected override fun onDestroy() {
