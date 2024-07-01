@@ -554,12 +554,12 @@ public open class TorServiceConfig private constructor(
         public class Builder internal constructor(): TorServiceConfig.Builder() {
 
             /**
-             * On Android API 26+, if a Foreground Service stops while the task
+             * On Android API 24+, if a Foreground Service stops while the task
              * is removed (e.g. user swipes it away from the recent app's tray),
              * the OS does not kill the application process like it would on
-             * Android API 25 and below.
+             * Android API 23 and below.
              *
-             * If `true`, this setting will modify that behavior for API 26+ such
+             * If `true`, this setting will modify that behavior for API 24+ such
              * that upon execution of [TorService.onDestroy], if the task is not
              * present, then [System.exit] will be called.
              *

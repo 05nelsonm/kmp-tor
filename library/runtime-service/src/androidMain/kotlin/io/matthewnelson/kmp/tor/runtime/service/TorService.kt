@@ -15,6 +15,8 @@
  **/
 package io.matthewnelson.kmp.tor.runtime.service
 
+import android.app.Activity
+import android.app.Application
 import android.app.ForegroundServiceStartNotAllowedException
 import android.app.Service
 import android.content.ComponentName
@@ -22,6 +24,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.ServiceConnection
 import android.os.Build
+import android.os.Bundle
 import android.os.Binder as AndroidBinder
 import android.os.IBinder
 import io.matthewnelson.immutable.collections.toImmutableSet
@@ -44,6 +47,7 @@ import io.matthewnelson.kmp.tor.runtime.service.internal.ApplicationContext.Comp
 import io.matthewnelson.kmp.tor.runtime.service.internal.SynchronizedInstance
 import kotlinx.coroutines.*
 import kotlin.concurrent.Volatile
+import kotlin.system.exitProcess
 
 @OptIn(ExperimentalKmpTorApi::class)
 internal class TorService internal constructor(): Service() {
@@ -168,6 +172,13 @@ internal class TorService internal constructor(): Service() {
     @Volatile
     private var ui: TorServiceUI<*, *>? = null
 
+    // Gets set to whatever config is on first bind
+    private var stopServiceOnTaskRemoved: Boolean = true
+    // Gets set to whatever config is on first bind
+    private var exitProcessIfTaskRemoved: Boolean = false
+
+    private var taskReturnMonitor: TaskReturnMonitor? = null
+
     private val binder = object : Binder() {
         public override fun inject(conn: Connection) {
             val service = this@TorService
@@ -204,6 +215,8 @@ internal class TorService internal constructor(): Service() {
                 // First bind for this TorService instance
                 if (size == 0) {
 
+                    service.stopServiceOnTaskRemoved = conn.config.stopServiceOnTaskRemoved
+
                     executables.add(Executable {
                         conn.binder.lce(Lifecycle.Event.OnCreate(service))
                         service.networkObserver?.let { o -> conn.binder.lce(Lifecycle.Event.OnCreate(o)) }
@@ -238,6 +251,8 @@ internal class TorService internal constructor(): Service() {
                     // to instantiate and set a new instance before the Holder
                     // gets created.
                     if (conn.config is TorServiceConfig.Foreground<*, *>) {
+                        service.exitProcessIfTaskRemoved = conn.config.exitProcessIfTaskRemoved
+
                         val args = TorServiceUI.Args.of(
                             conn.config.factory.defaultConfig,
                             conn.config.factory.info,
@@ -301,16 +316,15 @@ internal class TorService internal constructor(): Service() {
 
     public override fun onTaskRemoved(rootIntent: Intent?) {
         super.onTaskRemoved(rootIntent)
-        // TODO:
-        //  Register Application.ActivityLifecycleCallbacks
-        //  to see if user returns to the Task.
+
+        TaskReturnMonitor()
 
         holders.withLock { entries.toImmutableSet() }.map { (binder, holder) ->
             binder.lce(Lifecycle.Event.OnRemoved(application))
             holder
         }.forEach { holder ->
             if (holder == null) return@forEach
-            if (!holder.conn.config.stopServiceOnTaskRemoved) return@forEach
+            if (!stopServiceOnTaskRemoved) return@forEach
             holder.runtime.destroy()
         }
     }
@@ -332,15 +346,19 @@ internal class TorService internal constructor(): Service() {
         // Clean up
         holders.withLock { clear() }
         networkObserver = null
-
-        // TODO:
-        //  If Foreground Service + task is removed + user has not returned, need
-        //  to call exit here. API 26+ will keep the application alive until system
-        //  kills it.
         ui = null
+
+        if (taskReturnMonitor != null) {
+            // So, task was removed and did not return.
+            //
+            // Monitor only sets itself in following scenarios:
+            //  - Foreground Service
+            //  - TorServiceConfig.Foreground.exitProcessIfTaskRemoved = true
+            exitProcess(0)
+        }
     }
 
-    private inner class Holder(val conn: Connection) {
+    private inner class Holder(private val conn: Connection) {
 
         private val binder get() = conn.binder
 
@@ -491,6 +509,34 @@ internal class TorService internal constructor(): Service() {
 
             instance
         }
+    }
+
+    // Will set and register itself, if applicable. See onTaskRemoved & onDestroy
+    private inner class TaskReturnMonitor: Application.ActivityLifecycleCallbacks {
+
+        init {
+            if (ui != null && exitProcessIfTaskRemoved) {
+                taskReturnMonitor = this
+                application.registerActivityLifecycleCallbacks(this)
+            } else {
+                taskReturnMonitor = null
+            }
+        }
+
+        override fun onActivityCreated(activity: Activity, savedInstanceState: Bundle?) {
+            taskReturnMonitor = null
+            application.unregisterActivityLifecycleCallbacks(this)
+            holders.withLock { keys.toImmutableSet() }.forEach { binder ->
+                binder.lce(Lifecycle.Event.OnReturned(application))
+            }
+        }
+
+        override fun onActivityStarted(activity: Activity) {}
+        override fun onActivityResumed(activity: Activity) {}
+        override fun onActivityPaused(activity: Activity) {}
+        override fun onActivityStopped(activity: Activity) {}
+        override fun onActivitySaveInstanceState(activity: Activity, outState: Bundle) {}
+        override fun onActivityDestroyed(activity: Activity) {}
     }
 
     public override fun toString(): String = "TorService@${hashCode()}"
