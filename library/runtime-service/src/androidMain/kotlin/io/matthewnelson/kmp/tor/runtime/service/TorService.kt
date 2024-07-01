@@ -37,6 +37,7 @@ import io.matthewnelson.kmp.tor.runtime.core.Executable
 import io.matthewnelson.kmp.tor.runtime.core.OnFailure
 import io.matthewnelson.kmp.tor.runtime.core.OnSuccess
 import io.matthewnelson.kmp.tor.runtime.core.ctrl.TorCmd
+import io.matthewnelson.kmp.tor.runtime.service.internal.AndroidNetworkObserver
 import io.matthewnelson.kmp.tor.runtime.service.internal.ApplicationContext
 import io.matthewnelson.kmp.tor.runtime.service.internal.ApplicationContext.Companion.toApplicationContext
 import io.matthewnelson.kmp.tor.runtime.service.internal.SynchronizedInstance
@@ -132,17 +133,19 @@ internal class TorService internal constructor(): Service() {
 
     private val holders = SynchronizedInstance.of(LinkedHashMap<TorBinder, Holder?>(1, 1.0f))
 
-    private val supervisor = SupervisorJob()
-    private val scope by lazy {
+    private val serviceJob = SupervisorJob()
+    private val serviceScope by lazy {
         CoroutineScope(context =
             CoroutineName("TorServiceScope@${hashCode()}")
-            + supervisor
+            + serviceJob
             + Dispatchers.Main.immediate
         )
     }
 
-    private fun isDestroyed(): Boolean = !supervisor.isActive
+    private fun isDestroyed(): Boolean = !serviceJob.isActive
 
+    @Volatile
+    private var observer: AndroidNetworkObserver? = null
     @Volatile
     private var ui: TorServiceUI<*, *>? = null
 
@@ -184,9 +187,31 @@ internal class TorService internal constructor(): Service() {
 
                     executables.add(Executable {
                         conn.binder.lce(Lifecycle.Event.OnCreate(service))
+                        service.observer?.let { o -> conn.binder.lce(Lifecycle.Event.OnCreate(o)) }
                         service.ui?.let { ui -> conn.binder.lce(Lifecycle.Event.OnCreate(ui)) }
                         conn.binder.lce(Lifecycle.Event.OnStart(service))
                     })
+
+                    if (conn.config.useNetworkStateObserver) {
+                        val observer = try {
+                            AndroidNetworkObserver.of(service, service.serviceJob)
+                        } catch (e: IllegalStateException) {
+                            // Configured to be used, but permission was missing.
+                            executables.add(Executable {
+                                conn.binder.e(e)
+
+                                val appContext = appContext.get()
+                                appContext.unbindService(conn)
+                                conn.binder.lce(Lifecycle.Event.OnUnbind(service))
+                                appContext.stopService(Intent(appContext, TorService::class.java))
+                            })
+                            null
+                        }
+
+                        if (observer == null) return@withLock executables
+
+                        service.observer = observer
+                    }
 
                     // TorServiceConfig is a singleton and is the same for all
                     // AndroidServiceFactory. If this is the first bind for
@@ -198,7 +223,7 @@ internal class TorService internal constructor(): Service() {
                             conn.config.factory.defaultConfig,
                             conn.config.factory.info,
                             service,
-                            service.scope,
+                            service.serviceScope,
                         )
 
                         val ui = try {
@@ -209,10 +234,10 @@ internal class TorService internal constructor(): Service() {
                             executables.add(Executable {
                                 conn.binder.e(e)
 
-                                val context = appContext.get()
-                                context.unbindService(conn)
+                                val appContext = appContext.get()
+                                appContext.unbindService(conn)
                                 conn.binder.lce(Lifecycle.Event.OnUnbind(service))
-                                context.stopService(Intent(context, TorService::class.java))
+                                appContext.stopService(Intent(appContext, TorService::class.java))
                             })
                             null
                         }
@@ -265,7 +290,7 @@ internal class TorService internal constructor(): Service() {
     public override fun onCreate() {
         super.onCreate()
         appContext
-        scope.launch {
+        serviceScope.launch {
             // TODO: stop service if nothing binds within 250ms
         }
     }
@@ -287,7 +312,7 @@ internal class TorService internal constructor(): Service() {
     }
 
     public override fun onDestroy() {
-        supervisor.cancel()
+        serviceJob.cancel()
         super.onDestroy()
 
         holders.withLock { entries.toImmutableSet() }.map { (binder, holder) ->
@@ -295,12 +320,14 @@ internal class TorService internal constructor(): Service() {
             binder
         }.forEach { binder ->
             // Notify all instances that we're finally destroyed
+            observer?.let { o -> binder.lce(Lifecycle.Event.OnDestroy(o)) }
             ui?.let { ui -> binder.lce(Lifecycle.Event.OnDestroy(ui)) }
             binder.lce(Lifecycle.Event.OnDestroy(this))
         }
 
         // Clean up
         holders.withLock { clear() }
+        observer = null
         ui = null
     }
 
@@ -377,7 +404,7 @@ internal class TorService internal constructor(): Service() {
                 serviceEvents = instanceState?.events ?: emptySet(),
                 // TODO: Add option to TorServiceConfig
                 //  and check permissions Issue #465
-                serviceObserverNetwork = null,
+                serviceObserverNetwork = observer,
                 serviceObserversTorEvent = instanceState?.observersTorEvent ?: emptySet(),
                 serviceObserversRuntimeEvent = instanceState?.observersRuntimeEvent ?: emptySet(),
             )
@@ -442,13 +469,13 @@ internal class TorService internal constructor(): Service() {
                 // Last instance destroyed. Kill it.
                 // TODO: Needs testing to ensure notification is cleared.
                 ui?.stopForeground()
-                val context = appContext.get()
-                context.stopService(Intent(context, TorService::class.java))
+                val appContext = appContext.get()
+                appContext.stopService(Intent(appContext, TorService::class.java))
             }
 
             newInstanceStateThrew?.let { t ->
                 binder.e(t)
-                scope.launch { instance.destroy() }
+                serviceScope.launch { instance.destroy() }
             }
 
             instance

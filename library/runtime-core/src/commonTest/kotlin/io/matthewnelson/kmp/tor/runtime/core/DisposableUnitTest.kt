@@ -19,37 +19,37 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 
-class ExecutableUnitTest {
+class DisposableUnitTest {
 
     @Test
     fun givenOnce_whenIsOnce_thenThrows() {
         assertFailsWith<IllegalArgumentException> {
-            Executable.Once.of(Executable.Once.of {})
+            Disposable.Once.of(Disposable.Once.of {})
         }
     }
 
     @Test
     fun givenOnce_whenIsNOOP_thenThrows() {
         assertFailsWith<IllegalArgumentException> {
-            Executable.Once.of(Executable.noOp())
+            Disposable.Once.of(Disposable.noOp())
         }
     }
 
     @Test
-    fun givenOnce_whenConcurrent_thenExecutesOnce() {
+    fun givenOnce_whenConcurrent_thenDisposesOnce() {
         var invocationExecute = 0
-        val once = Executable.Once.of(concurrent = true) { invocationExecute++ }
-        once.execute()
-        once.execute()
+        val once = Disposable.Once.of(concurrent = true) { invocationExecute++ }
+        once.dispose()
+        once.dispose()
         assertEquals(1, invocationExecute)
     }
 
     @Test
-    fun givenOnce_whenNonConcurrent_thenExecutesOnce() {
+    fun givenOnce_whenNonConcurrent_thenDisposesOnce() {
         var invocationExecute = 0
-        val once = Executable.Once.of { invocationExecute++ }
-        once.execute()
-        once.execute()
+        val once = Disposable.Once.of { invocationExecute++ }
+        once.dispose()
+        once.dispose()
         assertEquals(1, invocationExecute)
     }
 }

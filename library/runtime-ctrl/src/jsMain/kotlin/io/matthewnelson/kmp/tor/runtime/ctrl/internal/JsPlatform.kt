@@ -23,7 +23,7 @@ internal inline fun net_Socket.onError(
     noinline listener: (error: dynamic) -> Unit
 ): Disposable {
     on("error", listener)
-    return Disposable {
+    return Disposable.Once.of {
         removeListener("error", listener)
     }
 }
@@ -33,7 +33,7 @@ internal inline fun net_Socket.onceError(
     noinline listener: (error: dynamic) -> Unit
 ): Disposable {
     once("error", listener)
-    return Disposable {
+    return Disposable.Once.of {
         removeListener("error", listener)
     }
 }

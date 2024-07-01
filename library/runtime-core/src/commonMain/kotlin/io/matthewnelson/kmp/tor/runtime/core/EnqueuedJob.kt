@@ -161,18 +161,12 @@ public abstract class EnqueuedJob protected constructor(
 
         if (!wasAdded) return Disposable.noOp()
 
-        var isDisposed = false
-
-        return Disposable {
-            if (!isActive) return@Disposable
-            if (isDisposed) return@Disposable
+        return Disposable.Once.of {
+            if (!isActive) return@of
 
             @OptIn(InternalKmpTorApi::class)
             synchronized(lock) {
-                if (isDisposed) return@synchronized
-
                 _completionCallbacks?.remove(handle)
-                isDisposed = true
             }
         }
     }

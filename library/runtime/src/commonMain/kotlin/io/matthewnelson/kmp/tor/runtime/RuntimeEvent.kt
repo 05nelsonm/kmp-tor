@@ -183,7 +183,7 @@ public sealed class RuntimeEvent<Data: Any> private constructor(
                 tag: String?,
                 executor: OnEvent.Executor?,
                 onEvent: OnEvent<String?>,
-            ): Disposable = newTorCmdObserver(
+            ): Disposable.Once = newTorCmdObserver(
                 tag,
                 executor,
                 onEvent,
