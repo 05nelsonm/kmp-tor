@@ -32,6 +32,7 @@ import io.matthewnelson.kmp.tor.runtime.RuntimeEvent.Notifier.Companion.d
 import io.matthewnelson.kmp.tor.runtime.RuntimeEvent.Notifier.Companion.e
 import io.matthewnelson.kmp.tor.runtime.RuntimeEvent.Notifier.Companion.lce
 import io.matthewnelson.kmp.tor.runtime.RuntimeEvent.Notifier.Companion.w
+import io.matthewnelson.kmp.tor.runtime.TorRuntime.ServiceFactory.Binder as ServiceFactoryBinder
 import io.matthewnelson.kmp.tor.runtime.core.EnqueuedJob
 import io.matthewnelson.kmp.tor.runtime.core.Executable
 import io.matthewnelson.kmp.tor.runtime.core.OnFailure
@@ -43,7 +44,6 @@ import io.matthewnelson.kmp.tor.runtime.service.internal.ApplicationContext.Comp
 import io.matthewnelson.kmp.tor.runtime.service.internal.SynchronizedInstance
 import kotlinx.coroutines.*
 import kotlin.concurrent.Volatile
-import io.matthewnelson.kmp.tor.runtime.TorRuntime.ServiceFactory.Binder as TorBinder
 
 @OptIn(ExperimentalKmpTorApi::class)
 internal class TorService internal constructor(): Service() {
@@ -59,25 +59,25 @@ internal class TorService internal constructor(): Service() {
 
         @Throws(RuntimeException::class)
         protected override fun startService() {
-            val context = appContext.get()
-            val intent = Intent(context, TorService::class.java)
+            val appContext = appContext.get()
+            val intent = Intent(appContext, TorService::class.java)
 
             if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
                 // API 25-
-                context.startService(intent)
+                appContext.startService(intent)
                 intent.bindService()
                 return
             }
 
             // API 26+
             if (connection.config !is TorServiceConfig.Foreground<*, *>) {
-                context.startService(intent)
+                appContext.startService(intent)
                 intent.bindService()
                 return
             }
 
             val threw: IllegalStateException? = try {
-                context.startForegroundService(intent)
+                appContext.startForegroundService(intent)
 
                 // Will only run if startForegroundService does not throw
                 intent.bindService()
@@ -129,9 +129,30 @@ internal class TorService internal constructor(): Service() {
         }
     }
 
+    private abstract class Binder: AndroidBinder() {
+        public abstract fun inject(conn: Connection)
+    }
+
+    private class Connection(
+        @JvmField
+        public val binder: ServiceFactoryBinder,
+        @JvmField
+        public val config: TorServiceConfig,
+        @JvmField
+        public val instanceUIConfig: AbstractTorServiceUI.Config?,
+    ): ServiceConnection {
+
+        public override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
+            if (service !is Binder) return
+            service.inject(this)
+        }
+
+        public override fun onServiceDisconnected(name: ComponentName?) {}
+    }
+
     private val appContext: ApplicationContext by lazy { toApplicationContext() }
 
-    private val holders = SynchronizedInstance.of(LinkedHashMap<TorBinder, Holder?>(1, 1.0f))
+    private val holders = SynchronizedInstance.of(LinkedHashMap<ServiceFactoryBinder, Holder?>(1, 1.0f))
 
     private val serviceJob = SupervisorJob()
     private val serviceScope by lazy {
@@ -142,10 +163,8 @@ internal class TorService internal constructor(): Service() {
         )
     }
 
-    private fun isDestroyed(): Boolean = !serviceJob.isActive
-
     @Volatile
-    private var observer: AndroidNetworkObserver? = null
+    private var networkObserver: AndroidNetworkObserver? = null
     @Volatile
     private var ui: TorServiceUI<*, *>? = null
 
@@ -187,7 +206,7 @@ internal class TorService internal constructor(): Service() {
 
                     executables.add(Executable {
                         conn.binder.lce(Lifecycle.Event.OnCreate(service))
-                        service.observer?.let { o -> conn.binder.lce(Lifecycle.Event.OnCreate(o)) }
+                        service.networkObserver?.let { o -> conn.binder.lce(Lifecycle.Event.OnCreate(o)) }
                         service.ui?.let { ui -> conn.binder.lce(Lifecycle.Event.OnCreate(ui)) }
                         conn.binder.lce(Lifecycle.Event.OnStart(service))
                     })
@@ -210,7 +229,7 @@ internal class TorService internal constructor(): Service() {
 
                         if (observer == null) return@withLock executables
 
-                        service.observer = observer
+                        service.networkObserver = observer
                     }
 
                     // TorServiceConfig is a singleton and is the same for all
@@ -262,26 +281,7 @@ internal class TorService internal constructor(): Service() {
         }
     }
 
-    private abstract class Binder: AndroidBinder() {
-        public abstract fun inject(conn: Connection)
-    }
-
-    private class Connection(
-        @JvmField
-        public val binder: TorBinder,
-        @JvmField
-        public val config: TorServiceConfig,
-        @JvmField
-        public val instanceUIConfig: AbstractTorServiceUI.Config?,
-    ): ServiceConnection {
-
-        public override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
-            if (service !is Binder) return
-            service.inject(this)
-        }
-
-        public override fun onServiceDisconnected(name: ComponentName?) {}
-    }
+    private fun isDestroyed(): Boolean = !serviceJob.isActive
 
     public override fun onBind(intent: Intent?): IBinder {
         return binder
@@ -301,12 +301,16 @@ internal class TorService internal constructor(): Service() {
 
     public override fun onTaskRemoved(rootIntent: Intent?) {
         super.onTaskRemoved(rootIntent)
+        // TODO:
+        //  Register Application.ActivityLifecycleCallbacks
+        //  to see if user returns to the Task.
+
         holders.withLock { entries.toImmutableSet() }.map { (binder, holder) ->
             binder.lce(Lifecycle.Event.OnRemoved(application))
             holder
         }.forEach { holder ->
             if (holder == null) return@forEach
-            if (!holder.stopServiceOnTaskRemoved) return@forEach
+            if (!holder.conn.config.stopServiceOnTaskRemoved) return@forEach
             holder.runtime.destroy()
         }
     }
@@ -320,20 +324,24 @@ internal class TorService internal constructor(): Service() {
             binder
         }.forEach { binder ->
             // Notify all instances that we're finally destroyed
-            observer?.let { o -> binder.lce(Lifecycle.Event.OnDestroy(o)) }
+            networkObserver?.let { o -> binder.lce(Lifecycle.Event.OnDestroy(o)) }
             ui?.let { ui -> binder.lce(Lifecycle.Event.OnDestroy(ui)) }
             binder.lce(Lifecycle.Event.OnDestroy(this))
         }
 
         // Clean up
         holders.withLock { clear() }
-        observer = null
+        networkObserver = null
+
+        // TODO:
+        //  If Foreground Service + task is removed + user has not returned, need
+        //  to call exit here. API 26+ will keep the application alive until system
+        //  kills it.
         ui = null
     }
 
-    private inner class Holder(private val conn: Connection) {
+    private inner class Holder(val conn: Connection) {
 
-        public val stopServiceOnTaskRemoved: Boolean get() = conn.config.stopServiceOnTaskRemoved
         private val binder get() = conn.binder
 
         private val instanceJob: CompletableJob?
@@ -402,9 +410,7 @@ internal class TorService internal constructor(): Service() {
 
             val instance = binder.onBind(
                 serviceEvents = instanceState?.events ?: emptySet(),
-                // TODO: Add option to TorServiceConfig
-                //  and check permissions Issue #465
-                serviceObserverNetwork = observer,
+                serviceObserverNetwork = networkObserver,
                 serviceObserversTorEvent = instanceState?.observersTorEvent ?: emptySet(),
                 serviceObserversRuntimeEvent = instanceState?.observersRuntimeEvent ?: emptySet(),
             )
@@ -445,7 +451,6 @@ internal class TorService internal constructor(): Service() {
 
                 holders.withLock {
                     val isThis = get(binder) == this@Holder
-
                     if (!isThis) return@withLock null
 
                     // Leave the singleton binder, but de-reference
@@ -454,23 +459,29 @@ internal class TorService internal constructor(): Service() {
 
                     if (service.isDestroyed()) return@withLock null
 
-                    appContext.get().unbindService(conn)
+                    val isLastInstance = count { it.value != null } == 0
+
+                    ui?.let { ui ->
+                        // Must call stopForeground before unbindService if this
+                        // is the last instance running. Otherwise, notification
+                        // will hang around for API 25- if the task is removed b/c
+                        // unbindService will immediately start killing things.
+                        if (isLastInstance) {
+                            ui.stopForeground()
+                        }
+                    }
+
+                    val appContext = appContext.get()
+                    appContext.unbindService(conn)
+
+                    if (isLastInstance) {
+                        appContext.stopService(Intent(appContext, TorService::class.java))
+                    }
+
                     Executable {
                         binder.lce(Lifecycle.Event.OnUnbind(service))
                     }
                 }?.execute()
-            }
-            instance.invokeOnDestroy {
-                if (this@TorService.isDestroyed()) return@invokeOnDestroy
-
-                val isLastInstance = holders.withLock { count { it.value != null } } == 0
-                if (!isLastInstance) return@invokeOnDestroy
-
-                // Last instance destroyed. Kill it.
-                // TODO: Needs testing to ensure notification is cleared.
-                ui?.stopForeground()
-                val appContext = appContext.get()
-                appContext.stopService(Intent(appContext, TorService::class.java))
             }
 
             newInstanceStateThrew?.let { t ->
