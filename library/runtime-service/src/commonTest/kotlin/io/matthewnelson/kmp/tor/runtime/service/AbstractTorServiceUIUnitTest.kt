@@ -256,7 +256,7 @@ class AbstractTorServiceUIUnitTest {
         instanceConfig: Config? = null,
         fid: String = "abcde12345",
         debugger: () -> ((() -> String) -> Unit)? = { null },
-        observeSignalNewNym: (String?, OnEvent.Executor?, OnEvent<String?>) -> Disposable? = { _, _, _ -> null },
+        observeSignalNewNym: (String?, OnEvent.Executor?, OnEvent<String?>) -> Disposable.Once? = { _, _, _ -> null },
         processorAction: () -> Action.Processor? = { null },
         processorTorCmd: () -> TorCmd.Unprivileged.Processor? = { null },
     ): Pair<CompletableJob, TestUI.State> = newInstanceState(

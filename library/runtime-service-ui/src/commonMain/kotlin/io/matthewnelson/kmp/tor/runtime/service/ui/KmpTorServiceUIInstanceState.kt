@@ -157,7 +157,7 @@ public class KmpTorServiceUIInstanceState<C: AbstractKmpTorServiceUIConfig> priv
             }
         }
 
-        var newNymObserver: Disposable? = null
+        var newNymObserver: Disposable.Once? = null
         val stateLock = Lock()
 
         val oSTATE = RuntimeEvent.STATE.observer(tag, executor) { new ->

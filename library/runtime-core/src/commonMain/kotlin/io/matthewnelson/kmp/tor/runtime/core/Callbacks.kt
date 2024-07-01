@@ -216,6 +216,9 @@ public fun interface OnEvent<in Data: Any?>: ItBlock<Data> {
 /**
  * A callback to return to callers to "undo", or
  * "dispose" of something.
+ *
+ * @see [noOp]
+ * @see [Once]
  * */
 public fun interface Disposable {
     public fun dispose()
@@ -227,6 +230,76 @@ public fun interface Disposable {
          * */
         @JvmStatic
         public fun noOp(): Disposable = NOOP
+    }
+
+    /**
+     * Helper for creating single-shot [Disposable], with
+     * built-in support for thread-safe execution (if needed).
+     *
+     * Successive invocations of [dispose] are ignored.
+     *
+     * @see [of]
+     * @see [Executable.Once]
+     * */
+    public class Once private constructor(
+        private val delegate: Disposable,
+        concurrent: Boolean,
+    ): Disposable {
+
+        @Volatile
+        private var _isDisposed: Boolean = false
+        @get:JvmName("isDisposed")
+        public val isDisposed: Boolean get() = _isDisposed
+
+        @OptIn(InternalKmpTorApi::class)
+        private val lock = if (concurrent) SynchronizedObject() else null
+
+        public override fun dispose() {
+            if (_isDisposed) return
+
+            @OptIn(InternalKmpTorApi::class)
+            if (lock != null) {
+                synchronized(lock) {
+                    if (_isDisposed) return@synchronized null
+                    _isDisposed = true
+                    delegate
+                }
+            } else {
+                _isDisposed = true
+                delegate
+            }?.dispose()
+        }
+
+        public companion object {
+
+            /**
+             * Returns an instance of [Disposable.Once] that is **not** thread-safe.
+             *
+             * @throws [IllegalArgumentException] if [disposable] is an instance
+             *   of [Once] or [noOp]
+             * */
+            @JvmStatic
+            @Throws(IllegalArgumentException::class)
+            public fun of (disposable: Disposable): Once = of(false, disposable)
+
+            /**
+             * Returns an instance of [Disposable.Once].
+             *
+             * @param [concurrent] true for thread-safe, false not thread-safe
+             * @throws [IllegalArgumentException] if [disposable] is an instance
+             *   of [Once] or [noOp]
+             * */
+            @JvmStatic
+            @Throws(IllegalArgumentException::class)
+            public fun of(concurrent: Boolean, disposable: Disposable): Once {
+                require(disposable !is Once) { "disposable cannot be an instance of Disposable.Once" }
+                require(disposable !is NOOP) { "disposable cannot be an instance of Disposable.NOOP" }
+
+                return Once(disposable, concurrent = concurrent)
+            }
+        }
+
+        public override fun toString(): String = "Disposable.Once@${hashCode()}"
     }
 
     private data object NOOP: Disposable {
@@ -260,6 +333,7 @@ public fun interface Executable {
      * Successive invocations of [execute] are ignored.
      *
      * @see [of]
+     * @see [Disposable.Once]
      * */
     public class Once private constructor(
         private val delegate: Executable,

@@ -52,17 +52,9 @@ internal abstract class AbstractTorCtrl internal constructor(
 
         if (!wasAdded) return Disposable.noOp()
 
-        var isDisposed = false
-
-        return Disposable {
-            if (isDestroyed()) return@Disposable
-            if (isDisposed) return@Disposable
-
+        return Disposable.Once.of {
             synchronized(lock) {
-                if (isDisposed) return@Disposable
-
                 _destroyCallbacks?.remove(handle)
-                isDisposed = true
             }
         }
     }

@@ -439,7 +439,7 @@ internal constructor(
             tag: String?,
             executor: OnEvent.Executor?,
             onEvent: OnEvent<String?>,
-        ): Disposable? {
+        ): Disposable.Once? {
             if (isDestroyed()) return null
             return args.observeSignalNewNym(tag, executor, onEvent)
         }
@@ -495,7 +495,7 @@ internal constructor(
         instanceConfig: Config?,
         fid: String,
         debugger: () -> ((() -> String) -> Unit)?,
-        observeSignalNewNym: (tag: String?, executor: OnEvent.Executor?, onEvent: OnEvent<String?>) -> Disposable?,
+        observeSignalNewNym: (tag: String?, executor: OnEvent.Executor?, onEvent: OnEvent<String?>) -> Disposable.Once?,
         processorAction: () -> Action.Processor?,
         processorTorCmd: () -> TorCmd.Unprivileged.Processor?,
     ): Pair<CompletableJob, IS> {
@@ -583,7 +583,7 @@ internal constructor(
         instanceScope: CoroutineScope,
         fid: String,
         val debugger: () -> ((() -> String) -> Unit)?,
-        val observeSignalNewNym: (tag: String?, executor: OnEvent.Executor?, onEvent: OnEvent<String?>) -> Disposable?,
+        val observeSignalNewNym: (tag: String?, executor: OnEvent.Executor?, onEvent: OnEvent<String?>) -> Disposable.Once?,
         val processorAction: () -> Action.Processor?,
         val processorTorCmd: () -> TorCmd.Unprivileged.Processor?,
     ): Args.Instance(instanceConfig, instanceScope) {

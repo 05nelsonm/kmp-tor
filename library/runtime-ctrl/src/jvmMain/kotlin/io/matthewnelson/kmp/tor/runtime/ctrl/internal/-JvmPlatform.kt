@@ -81,7 +81,7 @@ internal actual fun IPSocketAddress.connect(): CtrlConnection {
         throw t
     }
 
-    return Disposable(socket::close).toCtrlConnection(input, output)
+    return Disposable.Once.of(concurrent = true, socket::close).toCtrlConnection(input, output)
 }
 
 @Throws(Throwable::class)
@@ -180,7 +180,7 @@ private object UnixSocketReflect {
             throw t
         }
 
-        return Disposable {
+        return Disposable.Once.of(concurrent = true) {
             try {
                 A_METHOD_CLOSE.invoke(socket)
             } catch (t: Throwable) {
@@ -255,7 +255,7 @@ private object UnixSocketReflect {
             throw t
         }
 
-        return Disposable(channel::close).toCtrlConnection(input, output)
+        return Disposable.Once.of(concurrent = true, channel::close).toCtrlConnection(input, output)
     }
 
     private val J_METHOD_ADDRESS_OF: Method by lazy {

@@ -35,6 +35,7 @@ import io.matthewnelson.kmp.tor.runtime.RuntimeEvent.Notifier.Companion.lce
 import io.matthewnelson.kmp.tor.runtime.RuntimeEvent.Notifier.Companion.stderr
 import io.matthewnelson.kmp.tor.runtime.RuntimeEvent.Notifier.Companion.stdout
 import io.matthewnelson.kmp.tor.runtime.RuntimeEvent.Notifier.Companion.w
+import io.matthewnelson.kmp.tor.runtime.core.Disposable
 import io.matthewnelson.kmp.tor.runtime.core.Executable
 import io.matthewnelson.kmp.tor.runtime.core.TorConfig
 import io.matthewnelson.kmp.tor.runtime.core.UncaughtException
@@ -271,7 +272,7 @@ internal class TorDaemon private constructor(
         // execution callback allows to ensure it is
         // executed either within the non-cancelled job,
         // or via invokeOnCompletion handler.
-        val completion = Executable.Once.of(concurrent = true, executable = {
+        val completion = Disposable.Once.of(concurrent = true, disposable = {
             state.stopMark = TimeSource.Monotonic.markNow()
 
             try {
@@ -293,14 +294,14 @@ internal class TorDaemon private constructor(
                     timedDelay(50.milliseconds)
                 }
             } finally {
-                completion.execute()
+                completion.dispose()
             }
         }
 
         state.processJob = processJob
 
         processJob.invokeOnCompletion {
-            completion.execute()
+            completion.dispose()
             NOTIFIER.lce(Lifecycle.Event.OnDestroy(this@TorDaemon))
         }
 

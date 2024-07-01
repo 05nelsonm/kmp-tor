@@ -30,6 +30,21 @@ public final class io/matthewnelson/kmp/tor/runtime/core/Disposable$Companion {
 	public final fun noOp ()Lio/matthewnelson/kmp/tor/runtime/core/Disposable;
 }
 
+public final class io/matthewnelson/kmp/tor/runtime/core/Disposable$Once : io/matthewnelson/kmp/tor/runtime/core/Disposable {
+	public static final field Companion Lio/matthewnelson/kmp/tor/runtime/core/Disposable$Once$Companion;
+	public synthetic fun <init> (Lio/matthewnelson/kmp/tor/runtime/core/Disposable;ZLkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public fun dispose ()V
+	public final fun isDisposed ()Z
+	public static final fun of (Lio/matthewnelson/kmp/tor/runtime/core/Disposable;)Lio/matthewnelson/kmp/tor/runtime/core/Disposable$Once;
+	public static final fun of (ZLio/matthewnelson/kmp/tor/runtime/core/Disposable;)Lio/matthewnelson/kmp/tor/runtime/core/Disposable$Once;
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/matthewnelson/kmp/tor/runtime/core/Disposable$Once$Companion {
+	public final fun of (Lio/matthewnelson/kmp/tor/runtime/core/Disposable;)Lio/matthewnelson/kmp/tor/runtime/core/Disposable$Once;
+	public final fun of (ZLio/matthewnelson/kmp/tor/runtime/core/Disposable;)Lio/matthewnelson/kmp/tor/runtime/core/Disposable$Once;
+}
+
 public abstract class io/matthewnelson/kmp/tor/runtime/core/EnqueuedJob {
 	public static final field Companion Lio/matthewnelson/kmp/tor/runtime/core/EnqueuedJob$Companion;
 	public final field name Ljava/lang/String;

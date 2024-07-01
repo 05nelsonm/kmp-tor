@@ -32,7 +32,7 @@ internal inline fun <T: Processor, Data: Any?> T.newTorCmdObserver(
     executor: OnEvent.Executor?,
     onEvent: OnEvent<Data>,
     factory: (T, String?, OnEvent.Executor, OnEvent<Data>) -> Observer<TorCmdJob>
-): Disposable {
+): Disposable.Once {
     val exec = executor ?: if (this is TorRuntime) {
         environment().defaultExecutor()
     } else {
@@ -47,10 +47,7 @@ internal inline fun <T: Processor, Data: Any?> T.newTorCmdObserver(
 
     subscribe(observer)
 
-    var isDisposed = false
-    return Disposable {
-        if (isDisposed) return@Disposable
-        isDisposed = true
+    return Disposable.Once.of(concurrent = true) {
         unsubscribe(observer)
     }
 }
