@@ -17,6 +17,7 @@
 
 package io.matthewnelson.kmp.tor.runtime.service
 
+import io.matthewnelson.immutable.collections.immutableMapOf
 import io.matthewnelson.immutable.collections.toImmutableMap
 import io.matthewnelson.kmp.tor.core.api.annotation.ExperimentalKmpTorApi
 import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
@@ -30,7 +31,6 @@ import io.matthewnelson.kmp.tor.runtime.core.TorEvent
 import io.matthewnelson.kmp.tor.runtime.core.ctrl.TorCmd
 import io.matthewnelson.kmp.tor.runtime.service.AbstractTorServiceUI.Args
 import io.matthewnelson.kmp.tor.runtime.service.AbstractTorServiceUI.Factory.Companion.unsafeCastAsType
-import io.matthewnelson.kmp.tor.runtime.service.internal.SynchronizedInstance
 import kotlinx.coroutines.*
 import kotlin.concurrent.Volatile
 import kotlin.jvm.JvmField
@@ -78,8 +78,9 @@ internal constructor(
     }
 
     @Volatile
-    private var _immutableInstanceStates: Map<FileIDKey, IS> = emptyMap()
-    private val _instanceStates = SynchronizedInstance.of(LinkedHashMap<FileIDKey, IS>(1, 1.0f))
+    private var _instanceStates: Map<FileIDKey, IS> = emptyMap()
+    @OptIn(InternalKmpTorApi::class)
+    private val instanceStatesLock = SynchronizedObject()
 
     private val serviceJob = args.scope().coroutineContext.job
 
@@ -94,7 +95,7 @@ internal constructor(
      * instance.
      * */
     @get:JvmName("instanceStates")
-    protected val instanceStates: Map<FileIDKey, IS> get() = _immutableInstanceStates
+    protected val instanceStates: Map<FileIDKey, IS> get() = _instanceStates
 
     /**
      * A [CoroutineScope] which is configured as a child to the service
@@ -431,7 +432,7 @@ internal constructor(
         protected fun postStateChange() {
             val ui = args.ui
             val key = args.key
-            if (ui._immutableInstanceStates[key] != this) return
+            if (ui._instanceStates[key] != this) return
             ui.onUpdate(key, UpdateType.Changed)
         }
 
@@ -547,13 +548,23 @@ internal constructor(
         if (isDestroyed() || instance.isDestroyed()) return
 
         val key = instance.fileID as FileIDKey
-        val post = _instanceStates.withLock {
-            if (isDestroyed() || instance.isDestroyed()) return@withLock false
-            val i = get(key)
-            if (i == instance) return@withLock false
+        @OptIn(InternalKmpTorApi::class)
+        val post = synchronized (instanceStatesLock) {
+            if (isDestroyed() || instance.isDestroyed()) return@synchronized false
 
-            put(key, instance)
-            _immutableInstanceStates = toImmutableMap()
+            if (_instanceStates.isEmpty()) {
+                _instanceStates = immutableMapOf(key to instance)
+                return@synchronized true
+            }
+
+            val i = _instanceStates[key]
+            if (i == instance) return@synchronized false
+
+            val m = LinkedHashMap<FileIDKey, IS>(_instanceStates.size + 1, 1.0f)
+            m.putAll(_instanceStates)
+            m[key] = instance
+            _instanceStates = m.toImmutableMap()
+
             true
         }
 
@@ -564,12 +575,23 @@ internal constructor(
 
     private fun removeInstanceState(instance: InstanceState<*>) {
         val key = instance.fileID as FileIDKey
-        val post = _instanceStates.withLock {
-            val i = get(key)
-            if (i != instance) return@withLock false
+        @OptIn(InternalKmpTorApi::class)
+        val post = synchronized(instanceStatesLock) {
+            val i = _instanceStates[key]
+            if (i != instance) return@synchronized false
 
-            remove(key)
-            _immutableInstanceStates = toImmutableMap()
+            if (_instanceStates.size == 1) {
+                _instanceStates = emptyMap()
+            } else {
+                val m = LinkedHashMap<FileIDKey, IS>(_instanceStates.size - 1, 1.0f)
+                _instanceStates.forEach { entry ->
+                    if (entry.value != instance) {
+                        m[entry.key] = entry.value
+                    }
+                }
+                _instanceStates = m.toImmutableMap()
+            }
+
             true
         }
 
