@@ -58,52 +58,37 @@ public class KmpTorServiceUI private constructor(
         init,
     ) {
 
-        public constructor(
-            enableActionRestart: Boolean,
-            enableActionStop: Boolean,
-        ): this(
-            enableActionRestart,
-            enableActionStop,
-            {},
-        )
+        public constructor(): this({})
 
-        public constructor(
-            enableActionRestart: Boolean,
-            enableActionStop: Boolean,
-            block: ThisBlock<Builder>,
-        ): this(
+        public constructor(block: ThisBlock<Builder>, ): this(
             b = Builder.of(
-                enableActionRestart,
-                enableActionStop,
+                // ...
             ).apply(block)
         )
 
         private constructor(b: Builder): this(
-            b.enableActionRestart,
-            b.enableActionStop,
+            enableActionRestart = b.enableActionRestart,
+            enableActionStop = b.enableActionStop,
             // TODO: Wrappers
             INIT,
         )
 
         @KmpTorDsl
-        public class Builder private constructor(
-            @JvmField
-            public val enableActionRestart: Boolean,
-            @JvmField
-            public val enableActionStop: Boolean,
-        ) {
+        public class Builder private constructor() {
 
-            // TODO
+            @JvmField
+            public var enableActionRestart: Boolean = false
+
+            @JvmField
+            public var enableActionStop: Boolean = false
 
             internal companion object {
 
                 @JvmSynthetic
                 internal fun of(
-                    enableActionRestart: Boolean,
-                    enableActionStop: Boolean,
+                    // TODO
                 ): Builder = Builder(
-                    enableActionRestart,
-                    enableActionStop,
+                    // TODO
                 )
             }
         }
@@ -175,7 +160,12 @@ public class KmpTorServiceUI private constructor(
         }
 
         @Throws(Resources.NotFoundException::class)
-        public override fun validate(context: Context, config: Config) {
+        public override fun validate(context: Context) {
+            // TODO("Not yet implemented")
+        }
+
+        @Throws(Resources.NotFoundException::class)
+        public override fun validateConfig(context: Context, config: Config) {
             // TODO("Not yet implemented")
         }
 

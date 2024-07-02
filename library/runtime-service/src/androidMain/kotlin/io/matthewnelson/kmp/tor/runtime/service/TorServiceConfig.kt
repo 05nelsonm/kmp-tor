@@ -36,6 +36,7 @@ import io.matthewnelson.kmp.tor.core.api.annotation.KmpTorDsl
 import io.matthewnelson.kmp.tor.core.resource.OSInfo
 import io.matthewnelson.kmp.tor.runtime.Action
 import io.matthewnelson.kmp.tor.runtime.NetworkObserver
+import io.matthewnelson.kmp.tor.runtime.RuntimeEvent
 import io.matthewnelson.kmp.tor.runtime.TorRuntime
 import io.matthewnelson.kmp.tor.runtime.core.ThisBlock
 import io.matthewnelson.kmp.tor.runtime.core.apply
@@ -481,7 +482,7 @@ public open class TorServiceConfig private constructor(
             @OptIn(ExperimentalKmpTorApi::class)
             return with(UTIL) {
                 UTIL.ProvideLoader { appContext ->
-                    factory.validate(appContext.get(), instanceConfig)
+                    factory.validateConfig(appContext.get(), instanceConfig)
                     instanceConfig.unsafeCastAsType(default = factory.defaultConfig)
                     appContext.serviceFactoryLoader(config, instanceUIConfig = instanceConfig)
                 }.newEnvironment(config, dirName, installer, block)
@@ -517,10 +518,11 @@ public open class TorServiceConfig private constructor(
 
                 return _instance?.unsafeCast() ?: synchronized(UTIL) {
                     _instance?.unsafeCast() ?: run {
-                        val app = appContext
+                        val appContext = appContext
 
-                        if (app != null) {
-                            factory.validate(app.get(), factory.defaultConfig)
+                        if (appContext != null) {
+                            factory.validate(appContext.get())
+                            factory.validateConfig(appContext.get(), factory.defaultConfig)
 
                             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                                 val info = factory.info
@@ -534,7 +536,7 @@ public open class TorServiceConfig private constructor(
                                     setSound(null, null)
                                 }
 
-                                (app.get().getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager)
+                                (appContext.get().getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager)
                                     .createNotificationChannel(channel)
                             }
                         }
@@ -560,14 +562,23 @@ public open class TorServiceConfig private constructor(
              * Android API 23 and below.
              *
              * If `true`, this setting will modify that behavior for API 24+ such
-             * that upon execution of [TorService.onDestroy], if the task is not
-             * present, then [System.exit] will be called.
+             * that if [TorService.onTaskRemoved] is triggered, when [TorService.onDestroy]
+             * executes and the task is still not present (user has not returned),
+             * then [System.exit] will be called.
              *
              * If `false`, the application process will continue to run in the
              * background until either:
              *   - The OS kills the process to recoup memory (approximately 1m)
              *   - The user returns to it (warm start, no [Application.onCreate])
              *       - TODO: Saved State restarts
+             *
+             * **NOTE:** This can be monitored while [TorService] is running with a
+             * [RuntimeEvent.LIFECYCLE] observer which will dispatch task removal/return.
+             *
+             * e.g.
+             *
+             *    Lifecycle.Event[obj=YourApp@246663594, name=onRemoved]
+             *    Lifecycle.Event[obj=YourApp@246663594, name=onReturned]
              *
              * Default: `true`
              * */

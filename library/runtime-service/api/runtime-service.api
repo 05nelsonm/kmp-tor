@@ -42,7 +42,6 @@ public abstract class io/matthewnelson/kmp/tor/runtime/service/AbstractTorServic
 }
 
 public abstract class io/matthewnelson/kmp/tor/runtime/service/AbstractTorServiceUI$InstanceState : io/matthewnelson/kmp/tor/runtime/service/TorServiceUIUtils, io/matthewnelson/kmp/tor/runtime/FileID {
-	public final field fileID Lio/matthewnelson/kmp/tor/runtime/FileID;
 	public final field instanceConfig Lio/matthewnelson/kmp/tor/runtime/service/AbstractTorServiceUI$Config;
 	protected final field instanceScope Lkotlinx/coroutines/CoroutineScope;
 	protected fun <init> (Lio/matthewnelson/kmp/tor/runtime/service/AbstractTorServiceUI$Args$Instance;)V
@@ -126,7 +125,8 @@ public final class io/matthewnelson/kmp/tor/runtime/service/TorServiceUI$Args : 
 public abstract class io/matthewnelson/kmp/tor/runtime/service/TorServiceUI$Factory : io/matthewnelson/kmp/tor/runtime/service/AbstractTorServiceUI$Factory {
 	public final field info Lio/matthewnelson/kmp/tor/runtime/service/TorServiceUI$NotificationInfo;
 	protected fun <init> (Lio/matthewnelson/kmp/tor/runtime/service/AbstractTorServiceUI$Config;Lio/matthewnelson/kmp/tor/runtime/service/TorServiceUI$NotificationInfo;)V
-	public abstract fun validate (Landroid/content/Context;Lio/matthewnelson/kmp/tor/runtime/service/AbstractTorServiceUI$Config;)V
+	public abstract fun validate (Landroid/content/Context;)V
+	public abstract fun validateConfig (Landroid/content/Context;Lio/matthewnelson/kmp/tor/runtime/service/AbstractTorServiceUI$Config;)V
 }
 
 public final class io/matthewnelson/kmp/tor/runtime/service/TorServiceUI$NotificationInfo {

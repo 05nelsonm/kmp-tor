@@ -13,22 +13,22 @@ public final class io/matthewnelson/kmp/tor/runtime/service/ui/KmpTorServiceUI :
 }
 
 public final class io/matthewnelson/kmp/tor/runtime/service/ui/KmpTorServiceUI$Config : io/matthewnelson/kmp/tor/runtime/service/ui/AbstractKmpTorServiceUIConfig {
-	public fun <init> (ZZ)V
-	public fun <init> (ZZLio/matthewnelson/kmp/tor/runtime/core/ThisBlock;)V
+	public fun <init> ()V
+	public fun <init> (Lio/matthewnelson/kmp/tor/runtime/core/ThisBlock;)V
 }
 
 public final class io/matthewnelson/kmp/tor/runtime/service/ui/KmpTorServiceUI$Config$Builder {
-	public final field enableActionRestart Z
-	public final field enableActionStop Z
-	public synthetic fun <init> (ZZLkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public field enableActionRestart Z
+	public field enableActionStop Z
 }
 
 public final class io/matthewnelson/kmp/tor/runtime/service/ui/KmpTorServiceUI$Factory : io/matthewnelson/kmp/tor/runtime/service/TorServiceUI$Factory {
 	public fun <init> (Lio/matthewnelson/kmp/tor/runtime/service/ui/KmpTorServiceUI$Config;Lio/matthewnelson/kmp/tor/runtime/service/TorServiceUI$NotificationInfo;)V
 	public fun <init> (Lio/matthewnelson/kmp/tor/runtime/service/ui/KmpTorServiceUI$Config;Lio/matthewnelson/kmp/tor/runtime/service/TorServiceUI$NotificationInfo;Lio/matthewnelson/kmp/tor/runtime/core/ThisBlock;)V
 	public synthetic fun newInstanceUIProtected (Lio/matthewnelson/kmp/tor/runtime/service/AbstractTorServiceUI$Args$UI;)Lio/matthewnelson/kmp/tor/runtime/service/AbstractTorServiceUI;
-	public synthetic fun validate (Landroid/content/Context;Lio/matthewnelson/kmp/tor/runtime/service/AbstractTorServiceUI$Config;)V
-	public fun validate (Landroid/content/Context;Lio/matthewnelson/kmp/tor/runtime/service/ui/KmpTorServiceUI$Config;)V
+	public fun validate (Landroid/content/Context;)V
+	public synthetic fun validateConfig (Landroid/content/Context;Lio/matthewnelson/kmp/tor/runtime/service/AbstractTorServiceUI$Config;)V
+	public fun validateConfig (Landroid/content/Context;Lio/matthewnelson/kmp/tor/runtime/service/ui/KmpTorServiceUI$Config;)V
 }
 
 public final class io/matthewnelson/kmp/tor/runtime/service/ui/KmpTorServiceUI$Factory$Builder {

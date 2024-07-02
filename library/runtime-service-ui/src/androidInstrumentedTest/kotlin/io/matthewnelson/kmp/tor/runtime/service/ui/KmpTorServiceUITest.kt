@@ -35,8 +35,6 @@ class KmpTorServiceUITest {
 
     private val factory = KmpTorServiceUI.Factory(
         defaultConfig = KmpTorServiceUI.Config(
-            enableActionRestart = true,
-            enableActionStop = true,
             block = {
                 // TODO
             }

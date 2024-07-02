@@ -142,7 +142,10 @@ protected constructor(
     protected val channelID: String = info.channelID
 
     /**
-     * Posts the [Notification].
+     * Posts the [Notification]. This **MUST** be called upon first
+     * [onUpdate] invocation (or sooner) to ensure that the call to
+     * [Service.startForeground] is had, otherwise an ANR will result
+     * for Android API 26+.
      * */
     protected fun Notification.post() {
         val startForeground = if (_hasStartedForeground) {
@@ -259,16 +262,37 @@ protected constructor(
     ): AbstractTorServiceUI.Factory<Args, C, IS, UI>(defaultConfig, INIT) {
 
         /**
-         * Implementations **MUST** ensure all resources specified in their
-         * given [Config] implementations are valid. This is called from
-         * [TorServiceConfig.Foreground.Companion.Builder], as well as
-         * [TorServiceConfig.Foreground.newEnvironment], in order to raise
-         * errors before instantiating the singleton instances.
+         * Called from [TorServiceConfig.Foreground.Companion.Builder] when
+         * creating a new instance of [TorServiceConfig.Foreground].
+         *
+         * The intended purpose is to validate anything requiring [Context]
+         * that the [Factory] maintains outside the [defaultConfig].
+         *
+         * The [defaultConfig] is also validated directly after this returns,
+         * from [TorServiceConfig.Foreground.Companion.Builder].
+         *
+         * Implementations **MUST** ensure all resources are configured
+         * correctly to inhibit an unrecoverable application state if
+         * [TorServiceConfig] is allowed to be instantiated with a
+         * non-operational component.
          * */
         @Throws(Resources.NotFoundException::class)
-        public abstract fun validate(context: Context, config: C)
-    }
+        public abstract fun validate(context: Context)
 
+        /**
+         * Called from [TorServiceConfig.Foreground.Companion.Builder] and
+         * [TorServiceConfig.Foreground.newEnvironment] when checking the
+         * [defaultConfig], or if a stand-alone [Config] is being used to
+         * create a new instance of [TorRuntime.Environment].
+         *
+         * Implementations **MUST** ensure all resources are configured
+         * correctly to inhibit an unrecoverable application state if
+         * [TorServiceConfig], or [TorRuntime.Environment] is allowed to be
+         * instantiated with a non-operational component.
+         * */
+        @Throws(Resources.NotFoundException::class)
+        public abstract fun validateConfig(context: Context, config: C)
+    }
 
     @JvmSynthetic
     internal fun stopForeground() {
