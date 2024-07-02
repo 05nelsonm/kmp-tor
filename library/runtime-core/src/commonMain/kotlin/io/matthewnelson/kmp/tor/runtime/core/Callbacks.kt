@@ -242,31 +242,31 @@ public fun interface Disposable {
      * @see [Executable.Once]
      * */
     public class Once private constructor(
-        private val delegate: Disposable,
+        @Volatile
+        private var _disposable: Disposable?,
         concurrent: Boolean,
     ): Disposable {
 
-        @Volatile
-        private var _isDisposed: Boolean = false
         @get:JvmName("isDisposed")
-        public val isDisposed: Boolean get() = _isDisposed
+        public val isDisposed: Boolean get() = _disposable == null
 
         @OptIn(InternalKmpTorApi::class)
         private val lock = if (concurrent) SynchronizedObject() else null
 
         public override fun dispose() {
-            if (_isDisposed) return
+            if (_disposable == null) return
 
             @OptIn(InternalKmpTorApi::class)
             if (lock != null) {
                 synchronized(lock) {
-                    if (_isDisposed) return@synchronized null
-                    _isDisposed = true
-                    delegate
+                    val d = _disposable ?: return@synchronized null
+                    _disposable = null
+                    d
                 }
             } else {
-                _isDisposed = true
-                delegate
+                val d = _disposable
+                _disposable = null
+                d
             }?.dispose()
         }
 
@@ -280,7 +280,7 @@ public fun interface Disposable {
              * */
             @JvmStatic
             @Throws(IllegalArgumentException::class)
-            public fun of (disposable: Disposable): Once = of(false, disposable)
+            public fun of(disposable: Disposable): Once = of(false, disposable)
 
             /**
              * Returns an instance of [Disposable.Once].
@@ -336,31 +336,31 @@ public fun interface Executable {
      * @see [Disposable.Once]
      * */
     public class Once private constructor(
-        private val delegate: Executable,
+        @Volatile
+        private var _executable: Executable?,
         concurrent: Boolean,
     ): Executable {
 
-        @Volatile
-        private var _hasExecuted: Boolean = false
         @get:JvmName("hasExecuted")
-        public val hasExecuted: Boolean get() = _hasExecuted
+        public val hasExecuted: Boolean get() = _executable == null
 
         @OptIn(InternalKmpTorApi::class)
         private val lock = if (concurrent) SynchronizedObject() else null
 
         public override fun execute() {
-            if (_hasExecuted) return
+            if (_executable == null) return
 
             @OptIn(InternalKmpTorApi::class)
             if (lock != null) {
                 synchronized(lock) {
-                    if (_hasExecuted) return@synchronized null
-                    _hasExecuted = true
-                    delegate
+                    val e = _executable ?: return@synchronized null
+                    _executable = null
+                    e
                 }
             } else {
-                _hasExecuted = true
-                delegate
+                val e = _executable
+                _executable = null
+                e
             }?.execute()
         }
 
@@ -374,7 +374,7 @@ public fun interface Executable {
              * */
             @JvmStatic
             @Throws(IllegalArgumentException::class)
-            public fun of (executable: Executable): Once = of(false, executable)
+            public fun of(executable: Executable): Once = of(false, executable)
 
             /**
              * Returns an instance of [Executable.Once].
