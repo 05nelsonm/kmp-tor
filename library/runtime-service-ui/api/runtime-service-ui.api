@@ -13,13 +13,20 @@ public final class io/matthewnelson/kmp/tor/runtime/service/ui/KmpTorServiceUI :
 }
 
 public final class io/matthewnelson/kmp/tor/runtime/service/ui/KmpTorServiceUI$Config : io/matthewnelson/kmp/tor/runtime/service/ui/AbstractKmpTorServiceUIConfig {
-	public fun <init> ()V
-	public fun <init> (Lio/matthewnelson/kmp/tor/runtime/core/ThisBlock;)V
+	public final field iconDataXfer I
+	public final field iconNetworkDisabled I
+	public final field iconNetworkEnabled I
+	public fun <init> (II)V
+	public fun <init> (IILio/matthewnelson/kmp/tor/runtime/core/ThisBlock;)V
 }
 
 public final class io/matthewnelson/kmp/tor/runtime/service/ui/KmpTorServiceUI$Config$Builder {
 	public field enableActionRestart Z
 	public field enableActionStop Z
+	public field iconDataXfer I
+	public final field iconNetworkDisabled I
+	public final field iconNetworkEnabled I
+	public synthetic fun <init> (IILkotlin/jvm/internal/DefaultConstructorMarker;)V
 }
 
 public final class io/matthewnelson/kmp/tor/runtime/service/ui/KmpTorServiceUI$Factory : io/matthewnelson/kmp/tor/runtime/service/TorServiceUI$Factory {

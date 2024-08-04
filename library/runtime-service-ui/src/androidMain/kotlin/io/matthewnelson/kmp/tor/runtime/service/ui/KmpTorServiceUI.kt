@@ -13,6 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
+@file:Suppress("PropertyName")
+
 package io.matthewnelson.kmp.tor.runtime.service.ui
 
 import android.app.Notification
@@ -29,7 +31,11 @@ import io.matthewnelson.kmp.tor.runtime.core.apply
 import io.matthewnelson.kmp.tor.runtime.service.AbstractTorServiceUI
 import io.matthewnelson.kmp.tor.runtime.service.TorServiceUI
 import io.matthewnelson.kmp.tor.runtime.service.TorServiceConfig
+import io.matthewnelson.kmp.tor.runtime.service.ui.internal.*
+import io.matthewnelson.kmp.tor.runtime.service.ui.internal.DrawableRes
+import io.matthewnelson.kmp.tor.runtime.service.ui.internal.IconState
 import io.matthewnelson.kmp.tor.runtime.service.ui.internal.Progress
+import io.matthewnelson.kmp.tor.runtime.service.ui.internal.retrieveDrawable
 import io.matthewnelson.kmp.tor.runtime.service.ui.internal.retrieveString
 import kotlinx.coroutines.*
 import kotlin.time.Duration.Companion.days
@@ -56,33 +62,69 @@ public class KmpTorServiceUI private constructor(
      * TODO
      * */
     public class Config private constructor(
+        internal val _iconNetworkEnabled: DrawableRes,
+        internal val _iconNetworkDisabled: DrawableRes,
+        internal val _iconDataXfer: DrawableRes,
         enableActionRestart: Boolean,
         enableActionStop: Boolean,
         init: Any
     ): AbstractKmpTorServiceUIConfig(
         enableActionRestart,
         enableActionStop,
-        emptyMap(), // TODO
+        fields = mapOf(
+            "iconNetworkEnabled" to _iconNetworkEnabled,
+            "iconNetworkDisabled" to _iconNetworkDisabled,
+            "iconDataXfer" to _iconDataXfer,
+        ),
         init,
     ) {
 
-        public constructor(): this({})
+        @JvmField
+        public val iconNetworkEnabled: Int = _iconNetworkEnabled.id
+        @JvmField
+        public val iconNetworkDisabled: Int = _iconNetworkDisabled.id
+        @JvmField
+        public val iconDataXfer: Int = _iconDataXfer.id
 
-        public constructor(block: ThisBlock<Builder>): this(
+        public constructor(
+            iconNetworkEnabled: Int,
+            iconNetworkDisabled: Int,
+        ): this(
+            iconNetworkEnabled,
+            iconNetworkDisabled,
+            {},
+        )
+
+        public constructor(
+            iconNetworkEnabled: Int,
+            iconNetworkDisabled: Int,
+            block: ThisBlock<Builder>,
+        ): this(
             b = Builder.of(
-                // ...
+                iconNetworkEnabled,
+                iconNetworkDisabled,
             ).apply(block)
         )
 
         private constructor(b: Builder): this(
+            _iconNetworkEnabled = DrawableRes(b.iconNetworkEnabled),
+            _iconNetworkDisabled = DrawableRes(b.iconNetworkDisabled),
+            _iconDataXfer = DrawableRes(b.iconDataXfer),
             enableActionRestart = b.enableActionRestart,
             enableActionStop = b.enableActionStop,
-            // TODO: Wrappers
             INIT,
         )
 
         @KmpTorDsl
-        public class Builder private constructor() {
+        public class Builder private constructor(
+            @JvmField
+            public val iconNetworkEnabled: Int,
+            @JvmField
+            public val iconNetworkDisabled: Int,
+        ) {
+
+            @JvmField
+            public var iconDataXfer: Int = iconNetworkEnabled
 
             @JvmField
             public var enableActionRestart: Boolean = false
@@ -94,9 +136,11 @@ public class KmpTorServiceUI private constructor(
 
                 @JvmSynthetic
                 internal fun of(
-                    // TODO
+                    iconNetworkEnabled: Int,
+                    iconNetworkDisabled: Int,
                 ): Builder = Builder(
-                    // TODO
+                    iconNetworkEnabled,
+                    iconNetworkDisabled,
                 )
             }
         }
@@ -174,7 +218,9 @@ public class KmpTorServiceUI private constructor(
 
         @Throws(Resources.NotFoundException::class)
         public override fun validateConfig(context: Context, config: Config) {
-            // TODO("Not yet implemented")
+            context.retrieveDrawable(config._iconNetworkEnabled)
+            context.retrieveDrawable(config._iconNetworkDisabled)
+            context.retrieveDrawable(config._iconDataXfer)
         }
 
         protected override fun newInstanceUIProtected(
@@ -237,13 +283,17 @@ public class KmpTorServiceUI private constructor(
 
     protected override fun onUpdate(target: FileIDKey, type: UpdateType) {
         val instanceStates = instanceStates
-        val state = instanceStates[target]?.state ?: return
+        val instance = instanceStates[target] ?: return
+        val state = instance.state
 
         val content = RemoteViews(appContext.packageName, R.layout.kmp_tor_ui_notification)
 
-        // TODO: Config
-        val iconRes = android.R.drawable.stat_notify_chat
-        b.setSmallIcon(iconRes)
+        val iconRes = when (state.icon) {
+            IconState.NetworkEnabled -> instance.instanceConfig._iconNetworkEnabled
+            IconState.NetworkDisabled -> instance.instanceConfig._iconNetworkDisabled
+            IconState.DataXfer -> instance.instanceConfig._iconDataXfer
+        }
+        b.setSmallIcon(iconRes.id)
 
         val title = appContext.retrieveString(state.title)
         val text = appContext.retrieveString(state.text)
@@ -251,8 +301,7 @@ public class KmpTorServiceUI private constructor(
         // Headers
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) {
             // API 23-
-            content.setImageViewResource(R.id.kmp_tor_ui_header_icon, iconRes)
-
+            content.setImageViewResource(R.id.kmp_tor_ui_header_icon, iconRes.id)
             content.setTextViewText(R.id.kmp_tor_ui_header_app_name, appLabel)
 
             (SystemClock.elapsedRealtime() - startTime).toDuration(DurationUnit.MILLISECONDS).let { elapsed ->
