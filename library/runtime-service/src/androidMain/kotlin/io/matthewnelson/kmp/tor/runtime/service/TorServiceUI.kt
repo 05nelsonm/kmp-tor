@@ -172,6 +172,15 @@ protected constructor(
         } else {
             manager?.notify(info.notificationID, this)
         }
+
+        val i = instanceStates.values.firstOrNull() ?: return
+        val n = this
+
+        if (Build.VERSION.SDK_INT >= 19) {
+            i.debug {
+                "EXTRAS: ${n.extras.toString()}"
+            }
+        }
     }
 
     /**

@@ -19,6 +19,9 @@ import android.app.Notification
 import android.content.Context
 import android.content.res.Resources
 import android.os.Build
+import android.os.SystemClock
+import android.view.View
+import android.widget.RemoteViews
 import io.matthewnelson.kmp.tor.core.api.annotation.ExperimentalKmpTorApi
 import io.matthewnelson.kmp.tor.core.api.annotation.KmpTorDsl
 import io.matthewnelson.kmp.tor.runtime.core.ThisBlock
@@ -26,8 +29,13 @@ import io.matthewnelson.kmp.tor.runtime.core.apply
 import io.matthewnelson.kmp.tor.runtime.service.AbstractTorServiceUI
 import io.matthewnelson.kmp.tor.runtime.service.TorServiceUI
 import io.matthewnelson.kmp.tor.runtime.service.TorServiceConfig
+import io.matthewnelson.kmp.tor.runtime.service.ui.internal.Progress
 import io.matthewnelson.kmp.tor.runtime.service.ui.internal.retrieveString
 import kotlinx.coroutines.*
+import kotlin.time.Duration.Companion.days
+import kotlin.time.Duration.Companion.hours
+import kotlin.time.DurationUnit
+import kotlin.time.toDuration
 
 /**
  * The "default" UI implementation for `kmp-tor:runtime-service`, serving
@@ -60,7 +68,7 @@ public class KmpTorServiceUI private constructor(
 
         public constructor(): this({})
 
-        public constructor(block: ThisBlock<Builder>, ): this(
+        public constructor(block: ThisBlock<Builder>): this(
             b = Builder.of(
                 // ...
             ).apply(block)
@@ -174,25 +182,49 @@ public class KmpTorServiceUI private constructor(
         ): KmpTorServiceUI = KmpTorServiceUI(args)
     }
 
-    // TODO
+    private val startTime = SystemClock.elapsedRealtime()
+    private val appLabel = appContext.applicationInfo.loadLabel(appContext.packageManager)
+
     private val b = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
         Notification.Builder(appContext, channelID)
     } else {
         @Suppress("DEPRECATION")
         Notification.Builder(appContext)
-    }
+    }.apply {
+        setOngoing(true)
+        setOnlyAlertOnce(true)
+        setWhen(System.currentTimeMillis())
 
-    init {
-        b.setSmallIcon(android.R.drawable.stat_notify_chat)
-        b.setOngoing(true)
-        b.setOnlyAlertOnce(true)
-
+        if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.TIRAMISU) {
+            // API 33-
+            @Suppress("DEPRECATION")
+            setSound(null)
+        }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
+            // API 17+
+            setShowWhen(true)
+        }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT_WATCH) {
+            // API 20+
+            setGroup("TorService")
+            setGroupSummary(false)
+        }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            // API 21+
+            setCategory(Notification.CATEGORY_PROGRESS)
+            setVisibility(Notification.VISIBILITY_PUBLIC)
+        }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            // API 24+
+            setStyle(Notification.DecoratedCustomViewStyle())
+        }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            b.setTimeoutAfter(10L)
+            // API 26+
+            setTimeoutAfter(10L)
         }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             // API 31+
-            b.setForegroundServiceBehavior(Notification.FOREGROUND_SERVICE_IMMEDIATE)
+            setForegroundServiceBehavior(Notification.FOREGROUND_SERVICE_IMMEDIATE)
         }
     }
 
@@ -204,14 +236,87 @@ public class KmpTorServiceUI private constructor(
     )
 
     protected override fun onUpdate(target: FileIDKey, type: UpdateType) {
+        val instanceStates = instanceStates
         val state = instanceStates[target]?.state ?: return
-        b.setContentText(appContext.retrieveString(state.text))
-        b.setContentTitle(appContext.retrieveString(state.title))
-        b.build().post()
+
+        val content = RemoteViews(appContext.packageName, R.layout.kmp_tor_ui_notification)
+
+        // TODO: Config
+        val iconRes = android.R.drawable.stat_notify_chat
+        b.setSmallIcon(iconRes)
+
+        val title = appContext.retrieveString(state.title)
+        val text = appContext.retrieveString(state.text)
+
+        // Headers
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) {
+            // API 23-
+            content.setImageViewResource(R.id.kmp_tor_ui_header_icon, iconRes)
+
+            content.setTextViewText(R.id.kmp_tor_ui_header_app_name, appLabel)
+
+            (SystemClock.elapsedRealtime() - startTime).toDuration(DurationUnit.MILLISECONDS).let { elapsed ->
+                when {
+                    elapsed > DURATION_1_DAY -> "${elapsed.inWholeDays}d"
+                    elapsed > DURATION_1_HOUR -> "${elapsed.inWholeHours}h"
+                    else -> "${elapsed.inWholeMinutes}m"
+                }
+            }.let { content.setTextViewText(R.id.kmp_tor_ui_header_duration, it) }
+        }
+
+        // Content
+        content.setTextViewText(R.id.kmp_tor_ui_content_title_state, title)
+
+        when (state.progress) {
+            is Progress.Determinant -> {
+                View.VISIBLE to Triple(100, state.progress.value.toInt(), false)
+            }
+            is Progress.Indeterminate -> {
+                View.VISIBLE to Triple(100, 0, true)
+            }
+            is Progress.None -> {
+                View.GONE to null
+            }
+        }.let { (progressVisibility, progressParams) ->
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && progressParams == null) {
+                // API 24+
+                Triple("", View.VISIBLE, text)
+            } else {
+                // API 23-
+                Triple(text, View.GONE, "")
+            }.let { (titleText, infoVisibility, infoText) ->
+                content.setTextViewText(R.id.kmp_tor_ui_content_title_text, titleText)
+                content.setViewVisibility(R.id.kmp_tor_ui_content_info_text, infoVisibility)
+                content.setTextViewText(R.id.kmp_tor_ui_content_info_text, infoText)
+            }
+
+            content.setViewVisibility(R.id.kmp_tor_ui_content_info_progress, progressVisibility)
+            val (max, progress, indeterminate) = progressParams ?: return@let
+            content.setProgressBar(R.id.kmp_tor_ui_content_info_progress, max, progress, indeterminate)
+        }
+
+        // TODO: Actions
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            // API 24+
+            b.setCustomBigContentView(content)
+            b.build()
+        } else {
+            // API 23-
+            @Suppress("DEPRECATION")
+            b.setContent(content)
+            b.build()
+        }.post()
     }
 
     protected override fun onDestroy() {
         super.onDestroy()
         // TODO
+    }
+
+    private companion object {
+        private val DURATION_1_DAY = 1.days
+        private val DURATION_1_HOUR = 1.hours
     }
 }

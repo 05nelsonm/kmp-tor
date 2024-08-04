@@ -65,7 +65,11 @@ public class KmpTorServiceUIInstanceState<C: AbstractKmpTorServiceUIConfig> priv
     public override val observersRuntimeEvent: Set<RuntimeEvent.Observer<*>>
     public override val observersTorEvent: Set<TorEvent.Observer>
 
-    internal fun onDeviceLock() {
+    internal fun onDeviceLockChange() {
+        if (!instanceConfig.enableActionRestart && !instanceConfig.enableActionStop) {
+            return
+        }
+
         update { current ->
             current.copy(actions = current.progress.toActions())
         }
