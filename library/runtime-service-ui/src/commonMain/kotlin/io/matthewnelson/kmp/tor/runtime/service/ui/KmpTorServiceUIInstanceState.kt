@@ -180,28 +180,27 @@ public class KmpTorServiceUIInstanceState<C: AbstractKmpTorServiceUIConfig> priv
                     ColorState.NotReady
                 }
 
-                val progress = if (new.daemon.isOn) {
-                    when {
-                        !old.daemon.isBootstrapped
-                        && new.daemon.isBootstrapped -> {
-                            update { current ->
-                                current.copy(
-                                    color = color,
-                                    progress = Progress.Determinant(new.daemon),
-                                    text = ContentBootstrap.of(new.daemon.bootstrap),
-                                )
-                            }
-
-                            Progress.None
+                val progress = when {
+                    !new.daemon.isOn -> {
+                        Progress.Indeterminate
+                    }
+                    !old.daemon.isBootstrapped && new.daemon.isBootstrapped -> {
+                        update { current ->
+                            current.copy(
+                                color = color,
+                                progress = Progress.Determinant(new.daemon),
+                                text = ContentBootstrap.of(new.daemon.bootstrap),
+                            )
                         }
 
-                        !new.daemon.isBootstrapped
-                        && new.network.isEnabled -> Progress.Determinant(new.daemon)
-
-                        else -> Progress.None
+                        Progress.None
                     }
-                } else {
-                    Progress.Indeterminate
+                    !new.daemon.isBootstrapped && new.network.isEnabled -> {
+                        Progress.Determinant(new.daemon)
+                    }
+                    else -> {
+                        Progress.None
+                    }
                 }
 
                 update { current ->

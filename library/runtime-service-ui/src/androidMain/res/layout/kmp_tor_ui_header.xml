@@ -21,6 +21,7 @@
     android:orientation="horizontal"
     android:paddingBottom="4dp">
 
+    <!-- TODO: Circle background -->
     <ImageView
         android:id="@+id/kmp_tor_ui_header_icon"
         android:layout_width="20dp"

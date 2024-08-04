@@ -56,8 +56,9 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="top"
+            android:indeterminateOnly="false"
             android:visibility="gone"
-            style="?android:attr/progressBarStyleHorizontal"
+            style="@android:style/Widget.DeviceDefault.ProgressBar.Horizontal"
             tools:visibility="visible"
             tools:max="100"
             tools:progress="50" />
