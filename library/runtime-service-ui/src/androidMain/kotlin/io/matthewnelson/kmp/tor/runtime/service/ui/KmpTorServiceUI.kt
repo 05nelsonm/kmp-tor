@@ -17,8 +17,11 @@
 
 package io.matthewnelson.kmp.tor.runtime.service.ui
 
+import android.app.KeyguardManager
 import android.app.Notification
 import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
 import android.content.res.Resources
 import android.os.Build
 import android.os.SystemClock
@@ -38,6 +41,7 @@ import io.matthewnelson.kmp.tor.runtime.service.ui.internal.Progress
 import io.matthewnelson.kmp.tor.runtime.service.ui.internal.retrieveDrawable
 import io.matthewnelson.kmp.tor.runtime.service.ui.internal.retrieveString
 import kotlinx.coroutines.*
+import kotlin.concurrent.Volatile
 import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.DurationUnit
@@ -231,7 +235,7 @@ public class KmpTorServiceUI private constructor(
     private val startTime = SystemClock.elapsedRealtime()
     private val appLabel = appContext.applicationInfo.loadLabel(appContext.packageManager)
 
-    private val b = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+    private val builder = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
         Notification.Builder(appContext, channelID)
     } else {
         @Suppress("DEPRECATION")
@@ -274,11 +278,41 @@ public class KmpTorServiceUI private constructor(
         }
     }
 
+    private val keyguardManager = appContext.getSystemService(Context.KEYGUARD_SERVICE) as KeyguardManager
+    @Volatile
+    private var _isDeviceLocked: Boolean = keyguardManager.isKeyguardLocked
+
+    private val keyguardReceiver = Receiver { intent ->
+        when (intent?.action) {
+            Intent.ACTION_SCREEN_OFF,
+            Intent.ACTION_SCREEN_ON,
+            Intent.ACTION_USER_PRESENT -> {
+                val old = _isDeviceLocked
+                val new = keyguardManager.isKeyguardLocked
+                if (old != new) {
+                    _isDeviceLocked = new
+                    instanceStates.values.forEach { instance ->
+                        instance.debug { "DeviceIsLocked[$new]" }
+                        instance.onDeviceLockChange()
+                    }
+                }
+            }
+        }
+    }.register(
+        filter = IntentFilter(Intent.ACTION_SCREEN_OFF).apply {
+            addAction(Intent.ACTION_SCREEN_ON)
+            addAction(Intent.ACTION_USER_PRESENT)
+        },
+        permission = null,
+        scheduler = null,
+        exported = null,
+    )
+
     protected override fun newInstanceStateProtected(
         args: AbstractTorServiceUI.Args.Instance,
     ): KmpTorServiceUIInstanceState<Config> = KmpTorServiceUIInstanceState.of(
         args,
-        isDeviceLocked = { false /* TODO */ }
+        isDeviceLocked = { _isDeviceLocked }
     )
 
     protected override fun onUpdate(target: FileIDKey, type: UpdateType) {
@@ -293,7 +327,7 @@ public class KmpTorServiceUI private constructor(
             IconState.NetworkDisabled -> instance.instanceConfig._iconNetworkDisabled
             IconState.DataXfer -> instance.instanceConfig._iconDataXfer
         }
-        b.setSmallIcon(iconRes.id)
+        builder.setSmallIcon(iconRes.id)
 
         val title = appContext.retrieveString(state.title)
         val text = appContext.retrieveString(state.text)
@@ -349,19 +383,19 @@ public class KmpTorServiceUI private constructor(
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             // API 24+
-            b.setCustomBigContentView(content)
-            b.build()
+            builder.setCustomBigContentView(content)
+            builder.build()
         } else {
             // API 23-
             @Suppress("DEPRECATION")
-            b.setContent(content)
-            b.build()
+            builder.setContent(content)
+            builder.build()
         }.post()
     }
 
     protected override fun onDestroy() {
         super.onDestroy()
-        // TODO
+        keyguardReceiver?.dispose()
     }
 
     private companion object {
