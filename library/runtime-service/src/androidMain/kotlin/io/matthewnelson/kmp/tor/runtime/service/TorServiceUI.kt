@@ -299,7 +299,7 @@ protected constructor(
          * [TorServiceConfig] is allowed to be instantiated with a
          * non-operational component.
          * */
-        @Throws(IllegalStateException::class)
+        @Throws(IllegalStateException::class, Resources.NotFoundException::class)
         public abstract fun validate(context: Context)
 
         /**

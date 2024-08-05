@@ -69,10 +69,8 @@
             android:layout_height="wrap_content"
             android:layout_gravity="top"
             android:singleLine="true"
-            android:visibility="gone"
             style="@style/TextAppearance.KmpTorUI.Line2"
-            tools:text="0KBps ↓ / 0KBps ↑"
-            tools:visibility="visible" />
+            tools:text="0KBps ↓ / 0KBps ↑" />
 
     </FrameLayout>
 

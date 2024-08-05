@@ -19,29 +19,58 @@
     android:id="@+id/kmp_tor_ui_container_actions"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:paddingTop="8dp"
     android:visibility="gone"
+    tools:background="@android:color/holo_blue_light"
     tools:visibility="visible">
 
     <LinearLayout
-        android:id="@+id/kmp_tor_ui_container_actions_start"
-        android:layout_width="0dp"
+        android:id="@+id/kmp_tor_ui_actions_load_instance"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="start|top"
+        android:layout_marginStart="-8dp"
         android:orientation="horizontal"
+        android:showDividers="middle"
+        android:divider="?android:attr/listDivider"
+        android:dividerPadding="8dp"
+        tools:background="@android:color/holo_green_dark"
         tools:layout_width="96dp"
         tools:layout_height="32dp">
 
+        <!-- Instance Actions added here -->
     </LinearLayout>
 
     <LinearLayout
-        android:id="@+id/kmp_tor_ui_container_actions_end"
+        android:id="@+id/kmp_tor_ui_container_actions_cycle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="end|top"
-        android:orientation="horizontal"
-        tools:layout_width="64dp"
-        tools:layout_height="32dp">
+        android:layout_gravity="end"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:id="@+id/kmp_tor_ui_actions_load_cycle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end"
+            android:layout_marginEnd="-12dp"
+            android:orientation="horizontal"
+            android:showDividers="middle"
+            android:divider="?android:attr/listDivider"
+            android:dividerPadding="8dp"
+            tools:background="@android:color/holo_green_dark"
+            tools:layout_width="64dp"
+            tools:layout_height="32dp">
+
+            <!-- Cycle Actions added here -->
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/kmp_tor_ui_actions_cycle_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textStyle="bold"
+            style="@style/TextAppearance.KmpTorUI.Line2"
+            tools:text="[0A17…755C]" />
 
     </LinearLayout>
 

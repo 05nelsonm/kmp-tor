@@ -14,18 +14,6 @@
   * See the License for the specific language governing permissions and
   * limitations under the License.
   *-->
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/kmp_tor_ui_container"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:orientation="vertical"
-    android:paddingStart="12dp"
-    android:paddingEnd="8dp"
-    android:paddingVertical="6dp">
-
-    <include layout="@layout/kmp_tor_ui_header" />
-    <include layout="@layout/kmp_tor_ui_content" />
-    <include layout="@layout/kmp_tor_ui_actions" />
-
-</LinearLayout>
+<resources>
+    <style name="TextAppearance.KmpTorUI.Title" parent="@android:style/TextAppearance.Material.Notification.Title" />
+</resources>

@@ -16,16 +16,20 @@
   *-->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/kmp_tor_ui_container"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:orientation="vertical"
-    android:paddingStart="12dp"
-    android:paddingEnd="8dp"
-    android:paddingVertical="6dp">
+    android:id="@+id/kmp_tor_ui_action"
+    android:layout_width="40dp"
+    android:layout_height="40dp"
+    android:padding="4dp"
+    style="@style/Widget.KmpTorUI.NotificationAction"
+    tools:background="@android:color/holo_blue_dark">
 
-    <include layout="@layout/kmp_tor_ui_header" />
-    <include layout="@layout/kmp_tor_ui_content" />
-    <include layout="@layout/kmp_tor_ui_actions" />
+    <ImageView
+        android:id="@+id/kmp_tor_ui_action_image"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:scaleType="centerInside"
+        tools:background="@android:color/holo_green_light"
+        tools:src="@android:drawable/arrow_down_float"
+        tools:ignore="ContentDescription" />
 
 </LinearLayout>

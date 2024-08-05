@@ -28,7 +28,7 @@ import android.os.Build
 import android.os.SystemClock
 import android.view.View
 import android.widget.RemoteViews
-import io.matthewnelson.immutable.collections.toImmutableMap
+import io.matthewnelson.immutable.collections.toImmutableList
 import io.matthewnelson.kmp.tor.core.api.annotation.ExperimentalKmpTorApi
 import io.matthewnelson.kmp.tor.core.api.annotation.KmpTorDsl
 import io.matthewnelson.kmp.tor.runtime.Action
@@ -61,6 +61,7 @@ import kotlin.time.toDuration
  * */
 @OptIn(ExperimentalKmpTorApi::class)
 public class KmpTorServiceUI private constructor(
+    private val actionIcons: NotificationAction.Icons,
     actionIntentPermissionSuffix: String?,
     contentIntentCode: Int,
     contentIntent: (code: Int, context: Context) -> PendingIntent?,
@@ -135,12 +136,21 @@ public class KmpTorServiceUI private constructor(
             public val iconNetworkDisabled: Int,
         ) {
 
+            /**
+             * TODO
+             * */
             @JvmField
             public var iconDataXfer: Int = iconNetworkEnabled
 
+            /**
+             * TODO
+             * */
             @JvmField
             public var enableActionRestart: Boolean = false
 
+            /**
+             * TODO
+             * */
             @JvmField
             public var enableActionStop: Boolean = false
 
@@ -193,6 +203,19 @@ public class KmpTorServiceUI private constructor(
         @JvmField
         public val contentIntent: (code: Int, context: Context) -> PendingIntent? = b.contentIntent
 
+        private val actionIcons = NotificationAction.Icons(b)
+
+        @JvmField
+        public val iconActionNewNym: Int = actionIcons[NotificationAction.NewNym].id
+        @JvmField
+        public val iconActionRestart: Int = actionIcons[NotificationAction.Restart].id
+        @JvmField
+        public val iconActionStop: Int = actionIcons[NotificationAction.Stop].id
+        @JvmField
+        public val iconActionPrevious: Int = actionIcons[NotificationAction.Previous].id
+        @JvmField
+        public val iconActionNext: Int = actionIcons[NotificationAction.Next].id
+
         public constructor(
             defaultConfig: Config,
             info: NotificationInfo,
@@ -241,6 +264,36 @@ public class KmpTorServiceUI private constructor(
                 PendingIntent.getActivity(context, code, launchIntent, P_INTENT_FLAGS)
             }
 
+            /**
+             * TODO
+             * */
+            @JvmField
+            public var iconActionNewNym: Int = android.R.drawable.ic_menu_add
+
+            /**
+             * TODO
+             * */
+            @JvmField
+            public var iconActionRestart: Int = android.R.drawable.ic_media_play
+
+            /**
+             * TODO
+             * */
+            @JvmField
+            public var iconActionStop: Int = android.R.drawable.ic_menu_delete
+
+            /**
+             * TODO
+             * */
+            @JvmField
+            public var iconActionPrevious: Int = android.R.drawable.ic_media_previous
+
+            /**
+             * TODO
+             * */
+            @JvmField
+            public var iconActionNext: Int = android.R.drawable.ic_media_next
+
             internal companion object {
 
                 @JvmSynthetic
@@ -251,7 +304,7 @@ public class KmpTorServiceUI private constructor(
             }
         }
 
-        @Throws(IllegalStateException::class)
+        @Throws(IllegalStateException::class, Resources.NotFoundException::class)
         public override fun validate(context: Context) {
             try {
                 val i = contentIntent(contentIntentCode, context)
@@ -277,6 +330,22 @@ public class KmpTorServiceUI private constructor(
                     "actionIntentPermissionSuffix is declared, but permission is not granted for $permission"
                 }
             }
+
+            NotificationAction.entries.forEach { entry ->
+                val res = actionIcons[entry]
+
+                try {
+                    context.retrieveDrawable(res)
+                } catch (e: Resources.NotFoundException) {
+                    val msg = "Invalid iconAction$entry of $res"
+
+                    throw if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                        Resources.NotFoundException(msg, e)
+                    } else {
+                        Resources.NotFoundException(msg).apply { addSuppressed(e) }
+                    }
+                }
+            }
         }
 
         @Throws(Resources.NotFoundException::class)
@@ -289,6 +358,7 @@ public class KmpTorServiceUI private constructor(
         protected override fun newInstanceUIProtected(
             args: Args,
         ): KmpTorServiceUI = KmpTorServiceUI(
+            actionIcons,
             actionIntentPermissionSuffix,
             contentIntentCode,
             contentIntent,
@@ -367,6 +437,9 @@ public class KmpTorServiceUI private constructor(
                 // Currently selected instance was removed. Cycle
                 // to first available (if available).
                 targetLock.withLock {
+                    // Check if still selected
+                    if (selected != _target) return@withLock null
+
                     val next = instanceStates.keys.firstOrNull()
                     _target = next
                     next
@@ -431,13 +504,12 @@ public class KmpTorServiceUI private constructor(
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && progressParams == null) {
                 // API 24+
-                Triple("", View.VISIBLE, text)
+                "" to text
             } else {
                 // API 23-
-                Triple(text, View.GONE, "")
-            }.let { (titleText, infoVisibility, infoText) ->
+                text to ""
+            }.let { (titleText, infoText) ->
                 content.setTextViewText(R.id.kmp_tor_ui_content_title_text, titleText)
-                content.setViewVisibility(R.id.kmp_tor_ui_content_info_text, infoVisibility)
                 content.setTextViewText(R.id.kmp_tor_ui_content_info_text, infoText)
             }
 
@@ -446,17 +518,101 @@ public class KmpTorServiceUI private constructor(
             content.setProgressBar(R.id.kmp_tor_ui_content_info_progress, max, progress, indeterminate)
         }
 
-        // TODO: Actions
+        // Actions
+        content.removeAllViews(R.id.kmp_tor_ui_actions_load_instance)
+        content.removeAllViews(R.id.kmp_tor_ui_actions_load_cycle)
+
+        var expandedApi23: RemoteViews? = null
+        val showCycleActions = enableCyclePrevious || enableCycleNext
+        val showInstanceActions = state.actions.isNotEmpty()
+        val showActions = showInstanceActions || showCycleActions
+
+        if (showActions) {
+            val contentTarget = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                // API 24+
+                content
+            } else {
+                // API 23-
+                @Suppress("DEPRECATION")
+                val clone = content.clone()
+                expandedApi23 = clone
+                clone.setViewVisibility(R.id.kmp_tor_ui_container_actions, View.VISIBLE)
+
+                if (state.progress is Progress.None) {
+                    clone.setTextViewText(R.id.kmp_tor_ui_content_title_text, "")
+                    clone.setTextViewText(R.id.kmp_tor_ui_content_info_text, text)
+                }
+
+                clone
+            }
+
+            if (showInstanceActions) {
+                state.actions.forEach { action ->
+                    val view = RemoteViews(appContext.packageName, R.layout.kmp_tor_ui_action_enabled)
+                    contentTarget.addView(R.id.kmp_tor_ui_actions_load_instance, view)
+
+                    when (action) {
+                        ButtonAction.NewIdentity -> NotificationAction.NewNym
+                        ButtonAction.RestartTor -> NotificationAction.Restart
+                        ButtonAction.StopTor -> NotificationAction.Stop
+                    }.let { intent ->
+                        view.setOnClickPendingIntent(R.id.kmp_tor_ui_action, pendingIntents[intent])
+                        view.setImageViewResource(R.id.kmp_tor_ui_action_image, actionIcons[intent].id)
+                    }
+                }
+                View.VISIBLE
+            } else {
+                View.GONE
+            }.let { contentTarget.setViewVisibility(R.id.kmp_tor_ui_actions_load_instance, it) }
+
+            if (showCycleActions) {
+                // TODO: instance.displayName()
+                contentTarget.setTextViewText(R.id.kmp_tor_ui_actions_cycle_text, "[${state.fid}]")
+                contentTarget.setOnClickPendingIntent(R.id.kmp_tor_ui_actions_cycle_text, appContext.noOpPendingIntent())
+
+                listOf(
+                    NotificationAction.Previous to enableCyclePrevious,
+                    NotificationAction.Next to enableCycleNext,
+                ).forEach { (intent, enable) ->
+                    val layoutId = if (enable) {
+                        R.layout.kmp_tor_ui_action_enabled
+                    } else {
+                        R.layout.kmp_tor_ui_action_disabled
+                    }
+
+                    val view = RemoteViews(appContext.packageName, layoutId)
+                    contentTarget.addView(R.id.kmp_tor_ui_actions_load_cycle, view)
+
+                    if (enable) {
+                        pendingIntents[intent]
+                    } else {
+                        appContext.noOpPendingIntent()
+                    }.let { view.setOnClickPendingIntent(R.id.kmp_tor_ui_action, it) }
+
+                    view.setImageViewResource(R.id.kmp_tor_ui_action_image, actionIcons[intent].id)
+                }
+
+                View.VISIBLE
+            } else {
+                View.GONE
+            }.let { contentTarget.setViewVisibility(R.id.kmp_tor_ui_container_actions_cycle, it) }
+        }
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             // API 24+
+            val actionVisibility = if (showActions) View.VISIBLE else View.GONE
+            content.setViewVisibility(R.id.kmp_tor_ui_container_actions, actionVisibility)
+
             builder.setCustomBigContentView(content)
             builder.build()
         } else {
             // API 23-
             @Suppress("DEPRECATION")
             builder.setContent(content)
-            builder.build()
+            builder.build().apply {
+                @Suppress("DEPRECATION")
+                bigContentView = expandedApi23
+            }
         }.post()
     }
 
@@ -520,7 +676,7 @@ public class KmpTorServiceUI private constructor(
 
         @JvmField
         public val contentIntent: PendingIntent? = contentIntent(contentIntentCode, appContext)
-        public operator fun get(action: IntentAction): PendingIntent = actionIntents[action]!!
+        public operator fun get(action: NotificationAction): PendingIntent = actionIntents[action.ordinal]
 
         @Volatile
         private var _isDestroyed: Boolean = false
@@ -536,41 +692,41 @@ public class KmpTorServiceUI private constructor(
 
             val action = intent.getStringExtra(filter)?.let { extra ->
                 try {
-                    IntentAction.valueOf(extra)
+                    NotificationAction.valueOf(extra)
                 } catch (_: IllegalArgumentException) {
                     null
                 }
             } ?: return@Receiver
 
             when (action) {
-                IntentAction.NewNym -> {
+                NotificationAction.NewNym -> {
                     instanceStates[selected]?.processorTorCmd()?.enqueue(
                         TorCmd.Signal.NewNym,
                         OnFailure.noOp(),
                         OnSuccess.noOp(),
                     )
                 }
-                IntentAction.Restart -> {
+                NotificationAction.Restart -> {
                     instanceStates[selected]?.processorAction()?.enqueue(
                         Action.RestartDaemon,
                         OnFailure.noOp(),
                         OnSuccess.noOp(),
                     )
                 }
-                IntentAction.Stop -> {
+                NotificationAction.Stop -> {
                     instanceStates[selected]?.processorAction()?.enqueue(
                         Action.StopDaemon,
                         OnFailure.noOp(),
                         OnSuccess.noOp(),
                     )
                 }
-                IntentAction.CyclePrevious -> {
+                NotificationAction.Previous -> {
                     val keys = instanceStates.keys
                     val previous: FileIDKey = keys.elementAtOrNull(keys.indexOf(selected) - 1) ?: return@Receiver
                     _target = previous
                     onUpdate(previous, UpdateType.Changed)
                 }
-                IntentAction.CycleNext -> {
+                NotificationAction.Next -> {
                     val keys = instanceStates.keys
                     val next: FileIDKey = keys.elementAtOrNull(keys.indexOf(selected) + 1) ?: return@Receiver
                     _target = next
@@ -584,17 +740,15 @@ public class KmpTorServiceUI private constructor(
             exported = false,
         )
 
-        private val actionIntents = IntentAction.entries.let { entries ->
-            val map = LinkedHashMap<IntentAction, PendingIntent>(entries.size, 1.0f)
-            entries.forEach { entry -> map[entry] = entry.toPendingIntent() }
-            map.toImmutableMap()
-        }
+        private val actionIntents = NotificationAction.entries.let { entries ->
+            entries.mapTo(ArrayList(entries.size)) { it.toPendingIntent() }
+        }.toImmutableList()
 
         public override fun destroy() {
             if (_isDestroyed) return
             _isDestroyed = true
 
-            (actionIntents.values + contentIntent).forEach { intent ->
+            (actionIntents + contentIntent).forEach { intent ->
                 try {
                     intent?.cancel()
                 } catch (_: Throwable) {}
@@ -604,7 +758,7 @@ public class KmpTorServiceUI private constructor(
 
         public override fun isDestroyed(): Boolean = _isDestroyed
 
-        private fun IntentAction.toPendingIntent(): PendingIntent = PendingIntent.getBroadcast(
+        private fun NotificationAction.toPendingIntent(): PendingIntent = PendingIntent.getBroadcast(
             appContext,
             ordinal,
             Intent(filter).putExtra(filter, name).setPackage(appContext.packageName),
@@ -612,12 +766,27 @@ public class KmpTorServiceUI private constructor(
         )
     }
 
-    private enum class IntentAction {
+    private enum class NotificationAction {
         NewNym,
         Restart,
         Stop,
-        CyclePrevious,
-        CycleNext;
+        Previous,
+        Next;
+
+        public class Icons(b: Factory.Builder) {
+
+            private val icons = entries.mapTo(ArrayList(entries.size)) { entry ->
+                when (entry) {
+                    NewNym -> b.iconActionNewNym
+                    Restart -> b.iconActionRestart
+                    Stop -> b.iconActionStop
+                    Previous -> b.iconActionPrevious
+                    Next -> b.iconActionNext
+                }.let { id -> DrawableRes(id) }
+            }.toImmutableList()
+
+            public operator fun get(action: NotificationAction): DrawableRes = icons[action.ordinal]
+        }
     }
 
     private companion object {
@@ -630,6 +799,30 @@ public class KmpTorServiceUI private constructor(
                 f = f or PendingIntent.FLAG_IMMUTABLE
             }
             f
+        }
+
+        @Volatile
+        private var _noOpPendingIntent: PendingIntent? = null
+
+        private fun Context.noOpPendingIntent(): PendingIntent {
+            return _noOpPendingIntent ?: synchronized(Companion) {
+                _noOpPendingIntent ?: run {
+                    val pIntent = PendingIntent.getBroadcast(
+                        applicationContext,
+                        0,
+                        Intent("io.matthewnelson.kmp.tor.service.ui.NO_ACTION").setPackage(packageName),
+                        P_INTENT_FLAGS,
+                    )
+
+                    try {
+                        pIntent.cancel()
+                    } catch (_: Throwable) {
+                    }
+
+                    _noOpPendingIntent = pIntent
+                    pIntent
+                }
+            }
         }
     }
 }

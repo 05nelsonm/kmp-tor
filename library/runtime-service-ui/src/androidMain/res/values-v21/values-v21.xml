@@ -15,8 +15,14 @@
   * limitations under the License.
   *-->
 <resources>
-    <style name="TextAppearance.KmpTorUI" parent="@android:style/TextAppearance.Material.Notification"/>
-    <style name="TextAppearance.KmpTorUI.Info" parent="@android:style/TextAppearance.Material.Notification.Info"/>
-    <style name="TextAppearance.KmpTorUI.Time" parent="@android:style/TextAppearance.Material.Notification.Time"/>
-    <style name="TextAppearance.KmpTorUI.Title" parent="@android:style/TextAppearance.Material.Notification.Title"/>
+    <style name="TextAppearance.KmpTorUI" parent="@android:style/TextAppearance.Material.Notification" />
+    <style name="TextAppearance.KmpTorUI.Info" parent="@android:style/TextAppearance.Material.Notification.Info" />
+    <style name="TextAppearance.KmpTorUI.Time" parent="@android:style/TextAppearance.Material.Notification.Time" />
+    <style name="TextAppearance.KmpTorUI.Title" parent="@android:style/TextAppearance.Material.Notification.Title">
+        <item name="android:textSize">14sp</item>
+    </style>
+    <style name="Widget.KmpTorUI.NotificationAction" parent="">
+        <!-- TODO: drawable ripple -->
+        <item name="android:background">@null</item>
+    </style>
 </resources>

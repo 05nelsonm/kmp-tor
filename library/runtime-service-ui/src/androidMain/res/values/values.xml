@@ -15,15 +15,20 @@
   * limitations under the License.
   *-->
 <resources>
-    <style name="TextAppearance.KmpTorUI" parent="@android:style/TextAppearance.StatusBar.EventContent"/>
+    <style name="TextAppearance.KmpTorUI" parent="@android:style/TextAppearance.StatusBar.EventContent" />
     <style name="TextAppearance.KmpTorUI.Info">
         <item name="android:textSize">12sp</item>
         <item name="android:textColor">?android:attr/textColorSecondary</item>
     </style>
-    <style name="TextAppearance.KmpTorUI.Line2" parent="TextAppearance.KmpTorUI.Info"/>
+    <style name="TextAppearance.KmpTorUI.Line2" parent="TextAppearance.KmpTorUI.Info" />
     <style name="TextAppearance.KmpTorUI.Time">
         <item name="android:textSize">12sp</item>
         <item name="android:textColor">?android:attr/textColorSecondary</item>
     </style>
-    <style name="TextAppearance.KmpTorUI.Title" parent="@android:style/TextAppearance.StatusBar.EventContent.Title"/>
+    <style name="TextAppearance.KmpTorUI.Title" parent="@android:style/TextAppearance.StatusBar.EventContent.Title">
+        <item name="android:textSize">14sp</item>
+    </style>
+    <style name="Widget.KmpTorUI.NotificationAction" parent="">
+        <item name="android:background">@null</item>
+    </style>
 </resources>
