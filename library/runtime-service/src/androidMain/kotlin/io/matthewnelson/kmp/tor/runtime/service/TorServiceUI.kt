@@ -92,7 +92,16 @@ protected constructor(
 
         public companion object {
 
+            /**
+             * Verifies input before creating the [NotificationInfo]
+             *
+             * @throws [IllegalArgumentException] if fields:
+             *  - [channelID], [channelName], [channelDescription] exceed length
+             *    bounds of 1 to 1000 (i.e. cannot be empty or more than 1000 chars).
+             *  - [notificationID] is not between 1 and 9999
+             * */
             @JvmStatic
+            @Throws(IllegalArgumentException::class)
             public fun of(
                 channelID: String,
                 channelName: String,
@@ -100,7 +109,12 @@ protected constructor(
                 channelShowBadge: Boolean,
                 notificationID: Int,
             ): NotificationInfo {
-                // TODO: Validate
+                channelID.checkLength { "channelID" }
+                channelName.checkLength { "channelName" }
+                channelDescription.checkLength { "channelDescription" }
+                require(notificationID in 1..9999) {
+                    "field[notificationID] must be between 1 and 9999"
+                }
 
                 return NotificationInfo(
                     channelID,
@@ -109,6 +123,14 @@ protected constructor(
                     channelShowBadge,
                     notificationID,
                 )
+            }
+
+            @JvmStatic
+            @Throws(IllegalArgumentException::class)
+            private inline fun String.checkLength(field: () -> String) {
+                require(length in 1..1000) {
+                    "field[${field()}] must be between 1 and 1000 characters in length"
+                }
             }
         }
     }
