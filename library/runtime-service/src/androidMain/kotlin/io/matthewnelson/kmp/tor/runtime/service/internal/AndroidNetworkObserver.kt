@@ -25,8 +25,6 @@ import android.net.ConnectivityManager
 import io.matthewnelson.kmp.tor.runtime.NetworkObserver
 import io.matthewnelson.kmp.tor.runtime.core.Disposable
 import kotlinx.coroutines.Job
-import java.math.BigInteger
-import java.security.SecureRandom
 import kotlin.concurrent.Volatile
 
 internal class AndroidNetworkObserver private constructor(
@@ -36,14 +34,8 @@ internal class AndroidNetworkObserver private constructor(
 ): NetworkObserver() {
 
     private val registry = SynchronizedInstance.of(ArrayList<Disposable.Once>(1))
-    private val filter: IntentFilter
-
-    init {
-        val s = BigInteger(130, SecureRandom()).toString(32)
-        filter = IntentFilter(s)
-        @Suppress("DEPRECATION")
-        filter.addAction(ConnectivityManager.CONNECTIVITY_ACTION)
-    }
+    @Suppress("DEPRECATION")
+    private val filter: IntentFilter = IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION)
 
     @Volatile
     private var receiver: BroadcastReceiver? = object : BroadcastReceiver() {
@@ -74,7 +66,9 @@ internal class AndroidNetworkObserver private constructor(
             )
 
             add(Disposable.Once.of {
-                service.unregisterReceiver(receiver)
+                try {
+                    service.unregisterReceiver(receiver)
+                } catch (_: Throwable) {}
             })
         }
     }
@@ -111,7 +105,14 @@ internal class AndroidNetworkObserver private constructor(
             serviceJob: Job,
         ): AndroidNetworkObserver {
             check(service.isPermissionGranted(ACCESS_NETWORK_STATE)) {
-                "Permission '$ACCESS_NETWORK_STATE' is missing"
+                """
+                    Permission '$ACCESS_NETWORK_STATE' is missing...
+
+                    Either:
+                     - Set TorServiceConfig.Builder.useNetworkStateObserver to 'false'
+                     - Add the following permission to your Manifest:
+                         <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+                """.trimIndent()
             }
 
             val manager = service.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager

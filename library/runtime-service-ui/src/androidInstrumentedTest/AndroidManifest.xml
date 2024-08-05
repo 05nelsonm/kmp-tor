@@ -37,7 +37,7 @@
             tools:node="merge">
             <property
                 android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"
-                android:value="EMULATOR_TESTING" />
+                android:value="TESTING" />
         </service>
     </application>
 

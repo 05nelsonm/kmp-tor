@@ -65,7 +65,11 @@ public class KmpTorServiceUIInstanceState<C: AbstractKmpTorServiceUIConfig> priv
     public override val observersRuntimeEvent: Set<RuntimeEvent.Observer<*>>
     public override val observersTorEvent: Set<TorEvent.Observer>
 
-    internal fun onDeviceLock() {
+    internal fun onDeviceLockChange() {
+        if (!instanceConfig.enableActionRestart && !instanceConfig.enableActionStop) {
+            return
+        }
+
         update { current ->
             current.copy(actions = current.progress.toActions())
         }
@@ -143,6 +147,7 @@ public class KmpTorServiceUIInstanceState<C: AbstractKmpTorServiceUIConfig> priv
             update { current ->
                 current.copy(
                     text = ContentAction.of(job.action),
+                    progress = Progress.Indeterminate,
                 )
             }
         }
@@ -176,28 +181,30 @@ public class KmpTorServiceUIInstanceState<C: AbstractKmpTorServiceUIConfig> priv
                     ColorState.NotReady
                 }
 
-                val progress = if (new.daemon.isOn) {
-                    when {
-                        !old.daemon.isBootstrapped
-                        && new.daemon.isBootstrapped -> {
-                            update { current ->
-                                current.copy(
-                                    color = color,
-                                    progress = Progress.Determinant(new.daemon),
-                                    text = ContentBootstrap.of(new.daemon.bootstrap),
-                                )
-                            }
-
-                            Progress.None
+                val progress = when {
+                    !new.daemon.isOn -> {
+                        Progress.Indeterminate
+                    }
+                    !old.daemon.isBootstrapped && new.daemon.isBootstrapped -> {
+                        update { current ->
+                            current.copy(
+                                color = color,
+                                progress = Progress.Determinant(new.daemon),
+                                text = ContentBootstrap.of(new.daemon.bootstrap),
+                            )
                         }
 
-                        !new.daemon.isBootstrapped
-                        && new.network.isEnabled -> Progress.Determinant(new.daemon)
-
-                        else -> Progress.None
+                        Progress.None
                     }
-                } else {
-                    Progress.Indeterminate
+                    !new.daemon.isBootstrapped && new.network.isEnabled -> {
+                        Progress.Determinant(new.daemon)
+                    }
+                    _state.text is ContentAction -> {
+                        Progress.Indeterminate
+                    }
+                    else -> {
+                        Progress.None
+                    }
                 }
 
                 update { current ->

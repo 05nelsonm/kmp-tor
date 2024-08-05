@@ -219,9 +219,10 @@ internal class TorService internal constructor(): Service() {
 
                     executables.add(Executable {
                         conn.binder.lce(Lifecycle.Event.OnCreate(service))
+                        conn.binder.lce(Lifecycle.Event.OnStart(service))
+                        conn.binder.lce(Lifecycle.Event.OnBind(service))
                         service.networkObserver?.let { o -> conn.binder.lce(Lifecycle.Event.OnCreate(o)) }
                         service.ui?.let { ui -> conn.binder.lce(Lifecycle.Event.OnCreate(ui)) }
-                        conn.binder.lce(Lifecycle.Event.OnStart(service))
                     })
 
                     if (conn.config.useNetworkStateObserver) {
@@ -280,14 +281,17 @@ internal class TorService internal constructor(): Service() {
 
                         service.ui = ui
                     }
+                } else {
+                    executables.add(Executable {
+                        conn.binder.lce(Lifecycle.Event.OnBind(service))
+                    })
                 }
 
                 val holder = Holder(conn)
                 put(conn.binder, holder)
 
-                // Initialize lazy runtime value (outside of lock lambda)
                 executables.add(Executable {
-                    conn.binder.lce(Lifecycle.Event.OnBind(service))
+                    // Initialize lazy runtime value (outside of lock lambda)
                     holder.runtime
                 })
 

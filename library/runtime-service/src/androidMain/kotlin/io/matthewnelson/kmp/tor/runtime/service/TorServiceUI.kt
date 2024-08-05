@@ -34,6 +34,7 @@ import io.matthewnelson.kmp.tor.runtime.TorRuntime
 import io.matthewnelson.kmp.tor.runtime.core.Disposable
 import io.matthewnelson.kmp.tor.runtime.service.AbstractTorServiceUI.Config
 import io.matthewnelson.kmp.tor.runtime.service.AbstractTorServiceUI.InstanceState
+import io.matthewnelson.kmp.tor.runtime.service.internal.isPermissionGranted
 import io.matthewnelson.kmp.tor.runtime.service.internal.register
 import kotlinx.coroutines.CoroutineScope
 
@@ -91,7 +92,16 @@ protected constructor(
 
         public companion object {
 
+            /**
+             * Verifies input before creating the [NotificationInfo]
+             *
+             * @throws [IllegalArgumentException] if fields:
+             *  - [channelID], [channelName], [channelDescription] exceed length
+             *    bounds of 1 to 1000 (i.e. cannot be empty or more than 1000 chars).
+             *  - [notificationID] is not between 1 and 9999
+             * */
             @JvmStatic
+            @Throws(IllegalArgumentException::class)
             public fun of(
                 channelID: String,
                 channelName: String,
@@ -99,7 +109,12 @@ protected constructor(
                 channelShowBadge: Boolean,
                 notificationID: Int,
             ): NotificationInfo {
-                // TODO: Validate
+                channelID.checkLength { "channelID" }
+                channelName.checkLength { "channelName" }
+                channelDescription.checkLength { "channelDescription" }
+                require(notificationID in 1..9999) {
+                    "field[notificationID] must be between 1 and 9999"
+                }
 
                 return NotificationInfo(
                     channelID,
@@ -108,6 +123,14 @@ protected constructor(
                     channelShowBadge,
                     notificationID,
                 )
+            }
+
+            @JvmStatic
+            @Throws(IllegalArgumentException::class)
+            private inline fun String.checkLength(field: () -> String) {
+                require(length in 1..1000) {
+                    "field[${field()}] must be between 1 and 1000 characters in length"
+                }
             }
         }
     }
@@ -142,7 +165,10 @@ protected constructor(
     protected val channelID: String = info.channelID
 
     /**
-     * Posts the [Notification].
+     * Posts the [Notification]. This **MUST** be called upon first
+     * [onUpdate] invocation (or sooner) to ensure that the call to
+     * [Service.startForeground] is had, otherwise an ANR will result
+     * for Android API 26+.
      * */
     protected fun Notification.post() {
         val startForeground = if (_hasStartedForeground) {
@@ -259,16 +285,37 @@ protected constructor(
     ): AbstractTorServiceUI.Factory<Args, C, IS, UI>(defaultConfig, INIT) {
 
         /**
-         * Implementations **MUST** ensure all resources specified in their
-         * given [Config] implementations are valid. This is called from
-         * [TorServiceConfig.Foreground.Companion.Builder], as well as
-         * [TorServiceConfig.Foreground.newEnvironment], in order to raise
-         * errors before instantiating the singleton instances.
+         * Called from [TorServiceConfig.Foreground.Companion.Builder] when
+         * creating a new instance of [TorServiceConfig.Foreground].
+         *
+         * The intended purpose is to validate anything requiring [Context]
+         * that the [Factory] maintains outside the [defaultConfig].
+         *
+         * The [defaultConfig] is also validated directly after this returns,
+         * from [TorServiceConfig.Foreground.Companion.Builder].
+         *
+         * Implementations **MUST** ensure all resources are configured
+         * correctly to inhibit an unrecoverable application state if
+         * [TorServiceConfig] is allowed to be instantiated with a
+         * non-operational component.
+         * */
+        @Throws(IllegalStateException::class, Resources.NotFoundException::class)
+        public abstract fun validate(context: Context)
+
+        /**
+         * Called from [TorServiceConfig.Foreground.Companion.Builder] and
+         * [TorServiceConfig.Foreground.newEnvironment] when checking the
+         * [defaultConfig], or if a stand-alone [Config] is being used to
+         * create a new instance of [TorRuntime.Environment].
+         *
+         * Implementations **MUST** ensure all resources are configured
+         * correctly to inhibit an unrecoverable application state if
+         * [TorServiceConfig], or [TorRuntime.Environment] is allowed to be
+         * instantiated with a non-operational component.
          * */
         @Throws(Resources.NotFoundException::class)
-        public abstract fun validate(context: Context, config: C)
+        public abstract fun validateConfig(context: Context, config: C)
     }
-
 
     @JvmSynthetic
     internal fun stopForeground() {
@@ -349,5 +396,17 @@ protected constructor(
                 serviceScope,
             )
         }
+    }
+
+    protected companion object {
+
+        /**
+         * Helper for checking if the provided [permission] string is
+         * granted for the calling application PID/UID.
+         *
+         * @see [Context.checkPermission]
+         * */
+        @JvmStatic
+        public fun Context.hasPermission(permission: String): Boolean = isPermissionGranted(permission)
     }
 }
