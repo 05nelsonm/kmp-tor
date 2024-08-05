@@ -21,7 +21,6 @@
 
     <uses-sdk tools:overrideLibrary="io.matthewnelson.kmp.tor.resource.tor" />
 
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.INTERNET" />
 
     <application>
