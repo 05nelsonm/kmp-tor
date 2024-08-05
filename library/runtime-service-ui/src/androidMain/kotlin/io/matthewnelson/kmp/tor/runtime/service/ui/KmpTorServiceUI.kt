@@ -28,11 +28,12 @@ import android.os.Build
 import android.os.SystemClock
 import android.view.View
 import android.widget.RemoteViews
+import io.matthewnelson.immutable.collections.toImmutableMap
 import io.matthewnelson.kmp.tor.core.api.annotation.ExperimentalKmpTorApi
 import io.matthewnelson.kmp.tor.core.api.annotation.KmpTorDsl
-import io.matthewnelson.kmp.tor.runtime.core.Destroyable
-import io.matthewnelson.kmp.tor.runtime.core.ThisBlock
-import io.matthewnelson.kmp.tor.runtime.core.apply
+import io.matthewnelson.kmp.tor.runtime.Action
+import io.matthewnelson.kmp.tor.runtime.core.*
+import io.matthewnelson.kmp.tor.runtime.core.ctrl.TorCmd
 import io.matthewnelson.kmp.tor.runtime.service.AbstractTorServiceUI
 import io.matthewnelson.kmp.tor.runtime.service.TorServiceUI
 import io.matthewnelson.kmp.tor.runtime.service.TorServiceConfig
@@ -43,6 +44,8 @@ import io.matthewnelson.kmp.tor.runtime.service.ui.internal.Progress
 import io.matthewnelson.kmp.tor.runtime.service.ui.internal.retrieveDrawable
 import io.matthewnelson.kmp.tor.runtime.service.ui.internal.retrieveString
 import kotlinx.coroutines.*
+import java.math.BigInteger
+import java.security.SecureRandom
 import kotlin.concurrent.Volatile
 import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.hours
@@ -58,6 +61,7 @@ import kotlin.time.toDuration
  * */
 @OptIn(ExperimentalKmpTorApi::class)
 public class KmpTorServiceUI private constructor(
+    actionIntentPermissionSuffix: String?,
     contentIntentCode: Int,
     contentIntent: (code: Int, context: Context) -> PendingIntent?,
     args: Args
@@ -183,6 +187,8 @@ public class KmpTorServiceUI private constructor(
     ) {
 
         @JvmField
+        public val actionIntentPermissionSuffix: String? = b.actionIntentPermissionSuffix
+        @JvmField
         public val contentIntentCode: Int = b.contentIntentCode
         @JvmField
         public val contentIntent: (code: Int, context: Context) -> PendingIntent? = b.contentIntent
@@ -211,9 +217,21 @@ public class KmpTorServiceUI private constructor(
             public val info: NotificationInfo,
         ) {
 
+            /**
+             * TODO
+             * */
+            @JvmField
+            public var actionIntentPermissionSuffix: String? = null
+
+            /**
+             * TODO
+             * */
             @JvmField
             public var contentIntentCode: Int = 0
 
+            /**
+             * TODO
+             * */
             @JvmField
             public var contentIntent: (code: Int, context: Context) -> PendingIntent? = create@ { code, context ->
                 val launchIntent = context.packageManager
@@ -233,23 +251,30 @@ public class KmpTorServiceUI private constructor(
             }
         }
 
-        @Throws(Resources.NotFoundException::class)
+        @Throws(IllegalStateException::class)
         public override fun validate(context: Context) {
             try {
                 val i = contentIntent(contentIntentCode, context)
                 try {
                     i?.cancel()
                 } catch (_: Throwable) {}
-            } catch (e: Exception) {
-                if (e is Resources.NotFoundException) throw e
+            } catch (t: Throwable) {
+                if (t is IllegalStateException) throw t
+                throw IllegalStateException("contentIntent check failed")
+            }
 
-                val msg = "contentIntent check failed"
-                throw if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                    Resources.NotFoundException(msg, e)
-                } else {
-                    Resources.NotFoundException(msg).also {
-                        it.addSuppressed(e)
-                    }
+            actionIntentPermissionSuffix?.let { suffix ->
+                val name = context.packageName
+                check(suffix.isNotEmpty() && suffix.indexOfFirst { it.isWhitespace() } == -1) {
+                    "actionIntentPermissionSuffix cannot be empty or contain any whitespace"
+                }
+                check(!suffix.contains(name)) {
+                    "actionIntentPermissionSuffix cannot contain the packageName[$name]"
+                }
+
+                val permission = name + suffix
+                check(context.hasPermission(permission)) {
+                    "actionIntentPermissionSuffix is declared, but permission is not granted for $permission"
                 }
             }
         }
@@ -264,6 +289,7 @@ public class KmpTorServiceUI private constructor(
         protected override fun newInstanceUIProtected(
             args: Args,
         ): KmpTorServiceUI = KmpTorServiceUI(
+            actionIntentPermissionSuffix,
             contentIntentCode,
             contentIntent,
             args,
@@ -273,7 +299,7 @@ public class KmpTorServiceUI private constructor(
     private val startTime = SystemClock.elapsedRealtime()
     private val appLabel = appContext.applicationInfo.loadLabel(appContext.packageManager)
     private val keyguardHandler = KeyguardHandler()
-    private val pendingIntents = PendingIntents(contentIntentCode, contentIntent)
+    private val pendingIntents = PendingIntents(actionIntentPermissionSuffix, contentIntentCode, contentIntent)
 
     private val builder = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
         Notification.Builder(appContext, channelID)
@@ -319,16 +345,46 @@ public class KmpTorServiceUI private constructor(
         }
     }
 
-    protected override fun newInstanceStateProtected(
-        args: AbstractTorServiceUI.Args.Instance,
-    ): KmpTorServiceUIInstanceState<Config> = KmpTorServiceUIInstanceState.of(
-        args,
-        isDeviceLocked = keyguardHandler::isDeviceLocked
-    )
+    @Volatile
+    private var _target: FileIDKey? = null
+    private val targetLock = Lock()
 
     protected override fun onUpdate(target: FileIDKey, type: UpdateType) {
-        val instanceStates = instanceStates
-        val instance = instanceStates[target] ?: return
+        val selected: FileIDKey = _target ?: targetLock.withLock {
+            _target ?: run {
+                // UpdateType.Added for the first time
+                _target = target
+                target
+            }
+        }
+
+        // Update to a target's state that is not currently
+        // being displayed in the Notification area. Ignore.
+        if (type == UpdateType.Changed && selected != _target) return
+
+        val (instance, enableCyclePrevious, enableCycleNext) = instanceStates.let { instanceStates ->
+            val s = if (type == UpdateType.Removed && selected == target) {
+                // Currently selected instance was removed. Cycle
+                // to first available (if available).
+                targetLock.withLock {
+                    val next = instanceStates.keys.firstOrNull()
+                    _target = next
+                    next
+                }
+            } else {
+                // Another instance was added or removed, or the currently
+                // selected one was just added or had a change.
+                selected
+            }
+
+            if (s == null) return
+
+            val instance = instanceStates[s] ?: return
+            val index = instanceStates.keys.indexOf(s).takeIf { it != -1 } ?: return
+
+            Triple(instance, index > 0, index < (instanceStates.size - 1))
+        }
+
         val state = instance.state
 
         val content = RemoteViews(appContext.packageName, R.layout.kmp_tor_ui_notification)
@@ -410,15 +466,22 @@ public class KmpTorServiceUI private constructor(
         pendingIntents.destroy()
     }
 
+    protected override fun newInstanceStateProtected(
+        args: AbstractTorServiceUI.Args.Instance,
+    ): KmpTorServiceUIInstanceState<Config> = KmpTorServiceUIInstanceState.of(
+        args,
+        isDeviceLocked = keyguardHandler::isDeviceLocked
+    )
+
     private inner class KeyguardHandler: Destroyable {
 
         private val manager = appContext.getSystemService(Context.KEYGUARD_SERVICE) as KeyguardManager
         @Volatile
         private var _isDeviceLocked: Boolean = manager.isKeyguardLocked
 
-        fun isDeviceLocked(): Boolean = _isDeviceLocked
+        public fun isDeviceLocked(): Boolean = _isDeviceLocked
 
-        private val disposable = Receiver { intent ->
+        private val receiver = Receiver { intent ->
             when (intent?.action) {
                 Intent.ACTION_SCREEN_OFF,
                 Intent.ACTION_SCREEN_ON,
@@ -444,34 +507,117 @@ public class KmpTorServiceUI private constructor(
             exported = null,
         )
 
-        override fun destroy() { disposable?.dispose() }
+        public override fun destroy() { receiver?.dispose() }
 
-        override fun isDestroyed(): Boolean = disposable?.isDisposed ?: true
+        public override fun isDestroyed(): Boolean = receiver?.isDisposed ?: true
     }
 
     private inner class PendingIntents(
+        actionIntentPermissionSuffix: String?,
         contentIntentCode: Int,
         contentIntent: (code: Int, context: Context) -> PendingIntent?,
     ): Destroyable {
 
+        @JvmField
+        public val contentIntent: PendingIntent? = contentIntent(contentIntentCode, appContext)
+        public operator fun get(action: IntentAction): PendingIntent = actionIntents[action]!!
+
         @Volatile
         private var _isDestroyed: Boolean = false
+        private val filter = BigInteger(130, SecureRandom()).toString(32)
 
-        val contentIntent: PendingIntent? = contentIntent(contentIntentCode, appContext)
+        private val receiver = Receiver { intent ->
+            if (intent == null) return@Receiver
+            if (intent.action != filter) return@Receiver
+            if (intent.`package` != appContext.packageName) return@Receiver
 
-        override fun destroy() {
-            if (_isDestroyed) return
+            val selected = _target ?: return@Receiver
+            val instanceStates = instanceStates
 
-            listOf(
-                contentIntent,
-            ).forEach { i ->
+            val action = intent.getStringExtra(filter)?.let { extra ->
                 try {
-                    i?.cancel()
-                } catch (_: Throwable) {}
+                    IntentAction.valueOf(extra)
+                } catch (_: IllegalArgumentException) {
+                    null
+                }
+            } ?: return@Receiver
+
+            when (action) {
+                IntentAction.NewNym -> {
+                    instanceStates[selected]?.processorTorCmd()?.enqueue(
+                        TorCmd.Signal.NewNym,
+                        OnFailure.noOp(),
+                        OnSuccess.noOp(),
+                    )
+                }
+                IntentAction.Restart -> {
+                    instanceStates[selected]?.processorAction()?.enqueue(
+                        Action.RestartDaemon,
+                        OnFailure.noOp(),
+                        OnSuccess.noOp(),
+                    )
+                }
+                IntentAction.Stop -> {
+                    instanceStates[selected]?.processorAction()?.enqueue(
+                        Action.StopDaemon,
+                        OnFailure.noOp(),
+                        OnSuccess.noOp(),
+                    )
+                }
+                IntentAction.CyclePrevious -> {
+                    val keys = instanceStates.keys
+                    val previous: FileIDKey = keys.elementAtOrNull(keys.indexOf(selected) - 1) ?: return@Receiver
+                    _target = previous
+                    onUpdate(previous, UpdateType.Changed)
+                }
+                IntentAction.CycleNext -> {
+                    val keys = instanceStates.keys
+                    val next: FileIDKey = keys.elementAtOrNull(keys.indexOf(selected) + 1) ?: return@Receiver
+                    _target = next
+                    onUpdate(next, UpdateType.Changed)
+                }
             }
+        }.register(
+            filter = IntentFilter(filter),
+            permission = actionIntentPermissionSuffix?.let { suffix -> appContext.packageName + suffix },
+            scheduler = null,
+            exported = false,
+        )
+
+        private val actionIntents = IntentAction.entries.let { entries ->
+            val map = LinkedHashMap<IntentAction, PendingIntent>(entries.size, 1.0f)
+            entries.forEach { entry -> map[entry] = entry.toPendingIntent() }
+            map.toImmutableMap()
         }
 
-        override fun isDestroyed(): Boolean = _isDestroyed
+        public override fun destroy() {
+            if (_isDestroyed) return
+            _isDestroyed = true
+
+            (actionIntents.values + contentIntent).forEach { intent ->
+                try {
+                    intent?.cancel()
+                } catch (_: Throwable) {}
+            }
+            receiver?.dispose()
+        }
+
+        public override fun isDestroyed(): Boolean = _isDestroyed
+
+        private fun IntentAction.toPendingIntent(): PendingIntent = PendingIntent.getBroadcast(
+            appContext,
+            ordinal,
+            Intent(filter).putExtra(filter, name).setPackage(appContext.packageName),
+            P_INTENT_FLAGS,
+        )
+    }
+
+    private enum class IntentAction {
+        NewNym,
+        Restart,
+        Stop,
+        CyclePrevious,
+        CycleNext;
     }
 
     private companion object {

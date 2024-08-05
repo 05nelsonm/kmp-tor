@@ -109,9 +109,11 @@ protected final class io/matthewnelson/kmp/tor/runtime/service/TorServiceConfig$
 }
 
 public abstract class io/matthewnelson/kmp/tor/runtime/service/TorServiceUI : io/matthewnelson/kmp/tor/runtime/service/AbstractTorServiceUI {
+	protected static final field Companion Lio/matthewnelson/kmp/tor/runtime/service/TorServiceUI$Companion;
 	protected final field appContext Landroid/content/Context;
 	protected final field channelID Ljava/lang/String;
 	protected fun <init> (Lio/matthewnelson/kmp/tor/runtime/service/TorServiceUI$Args;)V
+	public static final fun hasPermission (Landroid/content/Context;Ljava/lang/String;)Z
 	protected final fun post (Landroid/app/Notification;)V
 	protected final fun register (Lio/matthewnelson/kmp/tor/runtime/service/TorServiceUI$Receiver;Landroid/content/IntentFilter;Ljava/lang/String;Landroid/os/Handler;Ljava/lang/Boolean;)Lio/matthewnelson/kmp/tor/runtime/core/Disposable$Once;
 	protected final fun register (Lio/matthewnelson/kmp/tor/runtime/service/TorServiceUI$Receiver;Landroid/content/IntentFilter;Ljava/lang/String;Landroid/os/Handler;Ljava/lang/Boolean;I)Lio/matthewnelson/kmp/tor/runtime/core/Disposable$Once;
@@ -120,6 +122,10 @@ public abstract class io/matthewnelson/kmp/tor/runtime/service/TorServiceUI : io
 
 public final class io/matthewnelson/kmp/tor/runtime/service/TorServiceUI$Args : io/matthewnelson/kmp/tor/runtime/service/AbstractTorServiceUI$Args$UI {
 	public synthetic fun <init> (Lio/matthewnelson/kmp/tor/runtime/service/AbstractTorServiceUI$Config;Lio/matthewnelson/kmp/tor/runtime/service/TorServiceUI$NotificationInfo;Landroid/content/Context;Lkotlinx/coroutines/CoroutineScope;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
+}
+
+protected final class io/matthewnelson/kmp/tor/runtime/service/TorServiceUI$Companion {
+	public final fun hasPermission (Landroid/content/Context;Ljava/lang/String;)Z
 }
 
 public abstract class io/matthewnelson/kmp/tor/runtime/service/TorServiceUI$Factory : io/matthewnelson/kmp/tor/runtime/service/AbstractTorServiceUI$Factory {

@@ -8,7 +8,7 @@ protected final class io/matthewnelson/kmp/tor/runtime/service/ui/AbstractKmpTor
 }
 
 public final class io/matthewnelson/kmp/tor/runtime/service/ui/KmpTorServiceUI : io/matthewnelson/kmp/tor/runtime/service/TorServiceUI {
-	public synthetic fun <init> (ILkotlin/jvm/functions/Function2;Lio/matthewnelson/kmp/tor/runtime/service/TorServiceUI$Args;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public synthetic fun <init> (Ljava/lang/String;ILkotlin/jvm/functions/Function2;Lio/matthewnelson/kmp/tor/runtime/service/TorServiceUI$Args;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
 	public synthetic fun newInstanceStateProtected (Lio/matthewnelson/kmp/tor/runtime/service/AbstractTorServiceUI$Args$Instance;)Lio/matthewnelson/kmp/tor/runtime/service/AbstractTorServiceUI$InstanceState;
 }
 
@@ -30,6 +30,7 @@ public final class io/matthewnelson/kmp/tor/runtime/service/ui/KmpTorServiceUI$C
 }
 
 public final class io/matthewnelson/kmp/tor/runtime/service/ui/KmpTorServiceUI$Factory : io/matthewnelson/kmp/tor/runtime/service/TorServiceUI$Factory {
+	public final field actionIntentPermissionSuffix Ljava/lang/String;
 	public final field contentIntent Lkotlin/jvm/functions/Function2;
 	public final field contentIntentCode I
 	public fun <init> (Lio/matthewnelson/kmp/tor/runtime/service/ui/KmpTorServiceUI$Config;Lio/matthewnelson/kmp/tor/runtime/service/TorServiceUI$NotificationInfo;)V
@@ -41,6 +42,7 @@ public final class io/matthewnelson/kmp/tor/runtime/service/ui/KmpTorServiceUI$F
 }
 
 public final class io/matthewnelson/kmp/tor/runtime/service/ui/KmpTorServiceUI$Factory$Builder {
+	public field actionIntentPermissionSuffix Ljava/lang/String;
 	public field contentIntent Lkotlin/jvm/functions/Function2;
 	public field contentIntentCode I
 	public final field defaultConfig Lio/matthewnelson/kmp/tor/runtime/service/ui/KmpTorServiceUI$Config;

@@ -34,6 +34,7 @@ import io.matthewnelson.kmp.tor.runtime.TorRuntime
 import io.matthewnelson.kmp.tor.runtime.core.Disposable
 import io.matthewnelson.kmp.tor.runtime.service.AbstractTorServiceUI.Config
 import io.matthewnelson.kmp.tor.runtime.service.AbstractTorServiceUI.InstanceState
+import io.matthewnelson.kmp.tor.runtime.service.internal.isPermissionGranted
 import io.matthewnelson.kmp.tor.runtime.service.internal.register
 import kotlinx.coroutines.CoroutineScope
 
@@ -276,7 +277,7 @@ protected constructor(
          * [TorServiceConfig] is allowed to be instantiated with a
          * non-operational component.
          * */
-        @Throws(Resources.NotFoundException::class)
+        @Throws(IllegalStateException::class)
         public abstract fun validate(context: Context)
 
         /**
@@ -373,5 +374,17 @@ protected constructor(
                 serviceScope,
             )
         }
+    }
+
+    protected companion object {
+
+        /**
+         * Helper for checking if the provided [permission] string is
+         * granted for the calling application PID/UID.
+         *
+         * @see [Context.checkPermission]
+         * */
+        @JvmStatic
+        public fun Context.hasPermission(permission: String): Boolean = isPermissionGranted(permission)
     }
 }

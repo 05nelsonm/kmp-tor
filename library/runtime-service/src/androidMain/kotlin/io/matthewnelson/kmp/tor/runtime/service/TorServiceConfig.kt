@@ -503,13 +503,14 @@ public open class TorServiceConfig private constructor(
              * @throws [ClassCastException] If an instance of [TorServiceConfig] has
              *   already been instantiated and is unable to be returned because it is
              *   not an instance of [Foreground].
+             * @throws [IllegalStateException] If [factory] fails validation
+             *   checks (emulators & devices only)
              * @throws [Resources.NotFoundException] If [factory] fails validation
              *   checks (emulators & devices only).
              * @see [TorServiceConfig.Companion.Builder]
              * @see [io.matthewnelson.kmp.tor.runtime.service.ui.KmpTorServiceUI]
              * */
             @JvmStatic
-            @Throws(ClassCastException::class, Resources.NotFoundException::class)
             public fun <C: AbstractTorServiceUI.Config, F: TorServiceUI.Factory<C, *, *>> Builder(
                 factory: F,
                 block: ThisBlock<Foreground.Builder>,
