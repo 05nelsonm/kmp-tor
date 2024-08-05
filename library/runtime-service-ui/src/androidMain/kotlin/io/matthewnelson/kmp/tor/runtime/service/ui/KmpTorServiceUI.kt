@@ -19,6 +19,7 @@ package io.matthewnelson.kmp.tor.runtime.service.ui
 
 import android.app.KeyguardManager
 import android.app.Notification
+import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
@@ -29,6 +30,7 @@ import android.view.View
 import android.widget.RemoteViews
 import io.matthewnelson.kmp.tor.core.api.annotation.ExperimentalKmpTorApi
 import io.matthewnelson.kmp.tor.core.api.annotation.KmpTorDsl
+import io.matthewnelson.kmp.tor.runtime.core.Destroyable
 import io.matthewnelson.kmp.tor.runtime.core.ThisBlock
 import io.matthewnelson.kmp.tor.runtime.core.apply
 import io.matthewnelson.kmp.tor.runtime.service.AbstractTorServiceUI
@@ -56,7 +58,9 @@ import kotlin.time.toDuration
  * */
 @OptIn(ExperimentalKmpTorApi::class)
 public class KmpTorServiceUI private constructor(
-    args: Args,
+    contentIntentCode: Int,
+    contentIntent: (code: Int, context: Context) -> PendingIntent?,
+    args: Args
 ): TorServiceUI<
     KmpTorServiceUI.Config,
     KmpTorServiceUIInstanceState<KmpTorServiceUI.Config>
@@ -178,6 +182,11 @@ public class KmpTorServiceUI private constructor(
         b.info,
     ) {
 
+        @JvmField
+        public val contentIntentCode: Int = b.contentIntentCode
+        @JvmField
+        public val contentIntent: (code: Int, context: Context) -> PendingIntent? = b.contentIntent
+
         public constructor(
             defaultConfig: Config,
             info: NotificationInfo,
@@ -202,8 +211,17 @@ public class KmpTorServiceUI private constructor(
             public val info: NotificationInfo,
         ) {
 
-            // TODO: content pending intent
-            // TODO: notification builder options
+            @JvmField
+            public var contentIntentCode: Int = 0
+
+            @JvmField
+            public var contentIntent: (code: Int, context: Context) -> PendingIntent? = create@ { code, context ->
+                val launchIntent = context.packageManager
+                    ?.getLaunchIntentForPackage(context.packageName)
+                    ?: return@create null
+
+                PendingIntent.getActivity(context, code, launchIntent, P_INTENT_FLAGS)
+            }
 
             internal companion object {
 
@@ -217,7 +235,23 @@ public class KmpTorServiceUI private constructor(
 
         @Throws(Resources.NotFoundException::class)
         public override fun validate(context: Context) {
-            // TODO("Not yet implemented")
+            try {
+                val i = contentIntent(contentIntentCode, context)
+                try {
+                    i?.cancel()
+                } catch (_: Throwable) {}
+            } catch (e: Exception) {
+                if (e is Resources.NotFoundException) throw e
+
+                val msg = "contentIntent check failed"
+                throw if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                    Resources.NotFoundException(msg, e)
+                } else {
+                    Resources.NotFoundException(msg).also {
+                        it.addSuppressed(e)
+                    }
+                }
+            }
         }
 
         @Throws(Resources.NotFoundException::class)
@@ -229,11 +263,17 @@ public class KmpTorServiceUI private constructor(
 
         protected override fun newInstanceUIProtected(
             args: Args,
-        ): KmpTorServiceUI = KmpTorServiceUI(args)
+        ): KmpTorServiceUI = KmpTorServiceUI(
+            contentIntentCode,
+            contentIntent,
+            args,
+        )
     }
 
     private val startTime = SystemClock.elapsedRealtime()
     private val appLabel = appContext.applicationInfo.loadLabel(appContext.packageManager)
+    private val keyguardHandler = KeyguardHandler()
+    private val pendingIntents = PendingIntents(contentIntentCode, contentIntent)
 
     private val builder = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
         Notification.Builder(appContext, channelID)
@@ -244,6 +284,7 @@ public class KmpTorServiceUI private constructor(
         setOngoing(true)
         setOnlyAlertOnce(true)
         setWhen(System.currentTimeMillis())
+        setContentIntent(pendingIntents.contentIntent)
 
         if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.TIRAMISU) {
             // API 33-
@@ -278,41 +319,11 @@ public class KmpTorServiceUI private constructor(
         }
     }
 
-    private val keyguardManager = appContext.getSystemService(Context.KEYGUARD_SERVICE) as KeyguardManager
-    @Volatile
-    private var _isDeviceLocked: Boolean = keyguardManager.isKeyguardLocked
-
-    private val keyguardReceiver = Receiver { intent ->
-        when (intent?.action) {
-            Intent.ACTION_SCREEN_OFF,
-            Intent.ACTION_SCREEN_ON,
-            Intent.ACTION_USER_PRESENT -> {
-                val old = _isDeviceLocked
-                val new = keyguardManager.isKeyguardLocked
-                if (old != new) {
-                    _isDeviceLocked = new
-                    instanceStates.values.forEach { instance ->
-                        instance.debug { "DeviceIsLocked[$new]" }
-                        instance.onDeviceLockChange()
-                    }
-                }
-            }
-        }
-    }.register(
-        filter = IntentFilter(Intent.ACTION_SCREEN_OFF).apply {
-            addAction(Intent.ACTION_SCREEN_ON)
-            addAction(Intent.ACTION_USER_PRESENT)
-        },
-        permission = null,
-        scheduler = null,
-        exported = null,
-    )
-
     protected override fun newInstanceStateProtected(
         args: AbstractTorServiceUI.Args.Instance,
     ): KmpTorServiceUIInstanceState<Config> = KmpTorServiceUIInstanceState.of(
         args,
-        isDeviceLocked = { _isDeviceLocked }
+        isDeviceLocked = keyguardHandler::isDeviceLocked
     )
 
     protected override fun onUpdate(target: FileIDKey, type: UpdateType) {
@@ -395,11 +406,84 @@ public class KmpTorServiceUI private constructor(
 
     protected override fun onDestroy() {
         super.onDestroy()
-        keyguardReceiver?.dispose()
+        keyguardHandler.destroy()
+        pendingIntents.destroy()
+    }
+
+    private inner class KeyguardHandler: Destroyable {
+
+        private val manager = appContext.getSystemService(Context.KEYGUARD_SERVICE) as KeyguardManager
+        @Volatile
+        private var _isDeviceLocked: Boolean = manager.isKeyguardLocked
+
+        fun isDeviceLocked(): Boolean = _isDeviceLocked
+
+        private val disposable = Receiver { intent ->
+            when (intent?.action) {
+                Intent.ACTION_SCREEN_OFF,
+                Intent.ACTION_SCREEN_ON,
+                Intent.ACTION_USER_PRESENT -> {
+                    val old = _isDeviceLocked
+                    val new = manager.isKeyguardLocked
+                    if (old != new) {
+                        _isDeviceLocked = new
+                        instanceStates.values.forEach { instance ->
+                            instance.debug { "DeviceIsLocked[$new]" }
+                            instance.onDeviceLockChange()
+                        }
+                    }
+                }
+            }
+        }.register(
+            filter = IntentFilter(Intent.ACTION_SCREEN_OFF).apply {
+                addAction(Intent.ACTION_SCREEN_ON)
+                addAction(Intent.ACTION_USER_PRESENT)
+            },
+            permission = null,
+            scheduler = null,
+            exported = null,
+        )
+
+        override fun destroy() { disposable?.dispose() }
+
+        override fun isDestroyed(): Boolean = disposable?.isDisposed ?: true
+    }
+
+    private inner class PendingIntents(
+        contentIntentCode: Int,
+        contentIntent: (code: Int, context: Context) -> PendingIntent?,
+    ): Destroyable {
+
+        @Volatile
+        private var _isDestroyed: Boolean = false
+
+        val contentIntent: PendingIntent? = contentIntent(contentIntentCode, appContext)
+
+        override fun destroy() {
+            if (_isDestroyed) return
+
+            listOf(
+                contentIntent,
+            ).forEach { i ->
+                try {
+                    i?.cancel()
+                } catch (_: Throwable) {}
+            }
+        }
+
+        override fun isDestroyed(): Boolean = _isDestroyed
     }
 
     private companion object {
         private val DURATION_1_DAY = 1.days
         private val DURATION_1_HOUR = 1.hours
+
+        private val P_INTENT_FLAGS by lazy {
+            var f = PendingIntent.FLAG_UPDATE_CURRENT
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                f = f or PendingIntent.FLAG_IMMUTABLE
+            }
+            f
+        }
     }
 }

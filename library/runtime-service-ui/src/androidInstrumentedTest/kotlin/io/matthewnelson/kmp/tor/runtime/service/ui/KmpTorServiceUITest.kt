@@ -35,8 +35,10 @@ class KmpTorServiceUITest {
 
     private val factory = KmpTorServiceUI.Factory(
         defaultConfig = KmpTorServiceUI.Config(
+            iconNetworkEnabled = android.R.drawable.stat_notify_chat,
+            iconNetworkDisabled = android.R.drawable.stat_notify_more,
             block = {
-                // TODO
+                iconDataXfer = android.R.drawable.stat_notify_sync
             }
         ),
         info = TorServiceUI.NotificationInfo.of(
