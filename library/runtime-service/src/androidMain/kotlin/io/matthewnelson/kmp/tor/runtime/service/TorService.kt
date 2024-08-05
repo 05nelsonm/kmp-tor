@@ -226,24 +226,15 @@ internal class TorService internal constructor(): Service() {
                     })
 
                     if (conn.config.useNetworkStateObserver) {
-                        val observer = try {
-                            AndroidNetworkObserver.of(service, service.serviceJob)
+                        try {
+                            val observer = AndroidNetworkObserver.of(service, service.serviceJob)
+                            service.networkObserver = observer
                         } catch (e: IllegalStateException) {
                             // Configured to be used, but permission was missing.
                             executables.add(Executable {
                                 conn.binder.e(e)
-
-                                val appContext = appContext.get()
-                                appContext.unbindService(conn)
-                                conn.binder.lce(Lifecycle.Event.OnUnbind(service))
-                                appContext.stopService(Intent(appContext, TorService::class.java))
                             })
-                            null
                         }
-
-                        if (observer == null) return@withLock executables
-
-                        service.networkObserver = observer
                     }
 
                     // TorServiceConfig is a singleton and is the same for all

@@ -15,7 +15,10 @@
  **/
 package io.matthewnelson.kmp.tor.runtime.service
 
+import android.Manifest.permission.ACCESS_NETWORK_STATE
+import android.content.Context
 import android.os.Build
+import androidx.test.core.app.ApplicationProvider
 import io.matthewnelson.kmp.process.Blocking
 import io.matthewnelson.kmp.tor.resource.tor.TorResources
 import io.matthewnelson.kmp.tor.runtime.Action
@@ -26,13 +29,18 @@ import io.matthewnelson.kmp.tor.runtime.RuntimeEvent
 import io.matthewnelson.kmp.tor.runtime.TorRuntime
 import io.matthewnelson.kmp.tor.runtime.core.OnEvent
 import io.matthewnelson.kmp.tor.runtime.core.UncaughtException
+import io.matthewnelson.kmp.tor.runtime.service.internal.isPermissionGranted
 import kotlin.coroutines.cancellation.CancellationException
 import kotlin.test.*
 import kotlin.time.Duration.Companion.milliseconds
 
 class AndroidServiceFactoryTest {
 
-    private val config = TorServiceConfig.Builder {}
+    private val ctx = ApplicationProvider.getApplicationContext<Context>()
+
+    private val config = TorServiceConfig.Builder {
+        useNetworkStateObserver = true
+    }
 
     private fun newEnvironment(dirName: String): TorRuntime.Environment {
         return config.newEnvironment(
@@ -181,6 +189,39 @@ class AndroidServiceFactoryTest {
         } catch (t: Throwable) {
             factory1.enqueue(Action.StopDaemon, {}, {})
             factory2.enqueue(Action.StopDaemon, {}, {})
+            throw t
+        }
+    }
+
+    @Test
+    fun givenNetworkObserver_whenNoPermissions_thenStillStarts() {
+        if (Build.VERSION.SDK_INT < 21) {
+            println("Skipping...")
+            return
+        }
+
+        assertTrue(config.useNetworkStateObserver)
+        assertFalse(ctx.isPermissionGranted(ACCESS_NETWORK_STATE))
+        val env = newEnvironment("sf_permissions")
+
+        val exceptions = mutableListOf<IllegalStateException>()
+        val factory = TorRuntime.Builder(env) {
+            observerStatic(RuntimeEvent.ERROR) { t ->
+                if (t !is IllegalStateException) throw t
+                synchronized(exceptions) { exceptions.add(t) }
+            }
+        }
+
+        try {
+            factory.startDaemonSync().stopDaemonSync()
+
+            synchronized(exceptions) {
+                assertEquals(1, exceptions.size)
+                // Missing permissions exception
+                assertEquals(true, exceptions.first().message?.contains(ACCESS_NETWORK_STATE))
+            }
+        } catch (t: Throwable) {
+            factory.enqueue(Action.StopDaemon, {}, {})
             throw t
         }
     }

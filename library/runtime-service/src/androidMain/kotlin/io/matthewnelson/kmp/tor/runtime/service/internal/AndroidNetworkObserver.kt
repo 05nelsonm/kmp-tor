@@ -111,7 +111,7 @@ internal class AndroidNetworkObserver private constructor(
                     Either:
                      - Set TorServiceConfig.Builder.useNetworkStateObserver to 'false'
                      - Add the following permission to your Manifest:
-                         <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+                         <uses-permission android:name="$ACCESS_NETWORK_STATE" />
                 """.trimIndent()
             }
 
