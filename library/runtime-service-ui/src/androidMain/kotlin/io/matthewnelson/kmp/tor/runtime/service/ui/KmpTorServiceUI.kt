@@ -18,7 +18,6 @@
 package io.matthewnelson.kmp.tor.runtime.service.ui
 
 import android.app.KeyguardManager
-import android.app.Notification
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
@@ -366,61 +365,20 @@ public class KmpTorServiceUI private constructor(
         )
     }
 
-    private val startTime = SystemClock.elapsedRealtime()
     private val appLabel = appContext.applicationInfo.loadLabel(appContext.packageManager)
+    private val startTime = SystemClock.elapsedRealtime()
+
     private val keyguardHandler = KeyguardHandler()
     private val pendingIntents = PendingIntents(actionIntentPermissionSuffix, contentIntentCode, contentIntent)
 
-    private val builder = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-        Notification.Builder(appContext, channelID)
-    } else {
-        @Suppress("DEPRECATION")
-        Notification.Builder(appContext)
-    }.apply {
-        setOngoing(true)
-        setOnlyAlertOnce(true)
-        setWhen(System.currentTimeMillis())
-        setContentIntent(pendingIntents.contentIntent)
-
-        if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.TIRAMISU) {
-            // API 33-
-            @Suppress("DEPRECATION")
-            setSound(null)
-        }
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
-            // API 17+
-            setShowWhen(true)
-        }
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT_WATCH) {
-            // API 20+
-            setGroup("TorService")
-            setGroupSummary(false)
-        }
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            // API 21+
-            setCategory(Notification.CATEGORY_PROGRESS)
-            setVisibility(Notification.VISIBILITY_PUBLIC)
-        }
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            // API 24+
-            setStyle(Notification.DecoratedCustomViewStyle())
-        }
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            // API 26+
-            setTimeoutAfter(10L)
-        }
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            // API 31+
-            setForegroundServiceBehavior(Notification.FOREGROUND_SERVICE_IMMEDIATE)
-        }
-    }
+    private val builder = NotificationBuilder.of(appContext, channelID, pendingIntents.contentIntent)
 
     @Volatile
     private var _target: FileIDKey? = null
-    private val targetLock = Lock()
+    private val lockTarget = Lock()
 
     protected override fun onUpdate(target: FileIDKey, type: UpdateType) {
-        val selected: FileIDKey = _target ?: targetLock.withLock {
+        val selected: FileIDKey = _target ?: lockTarget.withLock {
             _target ?: run {
                 // UpdateType.Added for the first time
                 _target = target
@@ -436,7 +394,7 @@ public class KmpTorServiceUI private constructor(
             val s = if (type == UpdateType.Removed && selected == target) {
                 // Currently selected instance was removed. Cycle
                 // to first available (if available).
-                targetLock.withLock {
+                lockTarget.withLock {
                     // Check if still selected
                     if (selected != _target) return@withLock null
 
@@ -467,7 +425,6 @@ public class KmpTorServiceUI private constructor(
             IconState.NetworkDisabled -> instance.instanceConfig._iconNetworkDisabled
             IconState.DataXfer -> instance.instanceConfig._iconDataXfer
         }
-        builder.setSmallIcon(iconRes.id)
 
         val title = appContext.retrieveString(state.title)
         val text = appContext.retrieveString(state.text)
@@ -598,22 +555,26 @@ public class KmpTorServiceUI private constructor(
             }.let { contentTarget.setViewVisibility(R.id.kmp_tor_ui_container_actions_cycle, it) }
         }
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            // API 24+
-            val actionVisibility = if (showActions) View.VISIBLE else View.GONE
-            content.setViewVisibility(R.id.kmp_tor_ui_container_actions, actionVisibility)
+        builder.withLock {
+            setSmallIcon(iconRes.id)
 
-            builder.setCustomBigContentView(content)
-            builder.build()
-        } else {
-            // API 23-
-            @Suppress("DEPRECATION")
-            builder.setContent(content)
-            builder.build().apply {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                // API 24+
+                val actionVisibility = if (showActions) View.VISIBLE else View.GONE
+                content.setViewVisibility(R.id.kmp_tor_ui_container_actions, actionVisibility)
+
+                setCustomBigContentView(content)
+                build()
+            } else {
+                // API 23-
                 @Suppress("DEPRECATION")
-                bigContentView = expandedApi23
-            }
-        }.post()
+                setContent(content)
+                build().apply {
+                    @Suppress("DEPRECATION")
+                    bigContentView = expandedApi23
+                }
+            }.post()
+        }
     }
 
     protected override fun onDestroy() {
@@ -687,9 +648,6 @@ public class KmpTorServiceUI private constructor(
             if (intent.action != filter) return@Receiver
             if (intent.`package` != appContext.packageName) return@Receiver
 
-            val selected = _target ?: return@Receiver
-            val instanceStates = instanceStates
-
             val action = intent.getStringExtra(filter)?.let { extra ->
                 try {
                     NotificationAction.valueOf(extra)
@@ -698,39 +656,44 @@ public class KmpTorServiceUI private constructor(
                 }
             } ?: return@Receiver
 
-            when (action) {
-                NotificationAction.NewNym -> {
-                    instanceStates[selected]?.processorTorCmd()?.enqueue(
-                        TorCmd.Signal.NewNym,
-                        OnFailure.noOp(),
-                        OnSuccess.noOp(),
-                    )
-                }
-                NotificationAction.Restart -> {
-                    instanceStates[selected]?.processorAction()?.enqueue(
-                        Action.RestartDaemon,
-                        OnFailure.noOp(),
-                        OnSuccess.noOp(),
-                    )
-                }
-                NotificationAction.Stop -> {
-                    instanceStates[selected]?.processorAction()?.enqueue(
-                        Action.StopDaemon,
-                        OnFailure.noOp(),
-                        OnSuccess.noOp(),
-                    )
-                }
-                NotificationAction.Previous -> {
-                    val keys = instanceStates.keys
-                    val previous: FileIDKey = keys.elementAtOrNull(keys.indexOf(selected) - 1) ?: return@Receiver
-                    _target = previous
-                    onUpdate(previous, UpdateType.Changed)
-                }
-                NotificationAction.Next -> {
-                    val keys = instanceStates.keys
-                    val next: FileIDKey = keys.elementAtOrNull(keys.indexOf(selected) + 1) ?: return@Receiver
-                    _target = next
-                    onUpdate(next, UpdateType.Changed)
+            serviceChildScope.launch {
+                val selected = _target ?: return@launch
+                val instanceStates = instanceStates
+
+                when (action) {
+                    NotificationAction.NewNym -> {
+                        instanceStates[selected]?.processorTorCmd()?.enqueue(
+                            TorCmd.Signal.NewNym,
+                            OnFailure.noOp(),
+                            OnSuccess.noOp(),
+                        )
+                    }
+                    NotificationAction.Restart -> {
+                        instanceStates[selected]?.processorAction()?.enqueue(
+                            Action.RestartDaemon,
+                            OnFailure.noOp(),
+                            OnSuccess.noOp(),
+                        )
+                    }
+                    NotificationAction.Stop -> {
+                        instanceStates[selected]?.processorAction()?.enqueue(
+                            Action.StopDaemon,
+                            OnFailure.noOp(),
+                            OnSuccess.noOp(),
+                        )
+                    }
+                    NotificationAction.Previous -> {
+                        val keys = instanceStates.keys
+                        val previous: FileIDKey = keys.elementAtOrNull(keys.indexOf(selected) - 1) ?: return@launch
+                        _target = previous
+                        onUpdate(previous, UpdateType.Changed)
+                    }
+                    NotificationAction.Next -> {
+                        val keys = instanceStates.keys
+                        val next: FileIDKey = keys.elementAtOrNull(keys.indexOf(selected) + 1) ?: return@launch
+                        _target = next
+                        onUpdate(next, UpdateType.Changed)
+                    }
                 }
             }
         }.register(
