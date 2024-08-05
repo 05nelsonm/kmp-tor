@@ -147,6 +147,7 @@ public class KmpTorServiceUIInstanceState<C: AbstractKmpTorServiceUIConfig> priv
             update { current ->
                 current.copy(
                     text = ContentAction.of(job.action),
+                    progress = Progress.Indeterminate,
                 )
             }
         }
@@ -197,6 +198,9 @@ public class KmpTorServiceUIInstanceState<C: AbstractKmpTorServiceUIConfig> priv
                     }
                     !new.daemon.isBootstrapped && new.network.isEnabled -> {
                         Progress.Determinant(new.daemon)
+                    }
+                    _state.text is ContentAction -> {
+                        Progress.Indeterminate
                     }
                     else -> {
                         Progress.None
