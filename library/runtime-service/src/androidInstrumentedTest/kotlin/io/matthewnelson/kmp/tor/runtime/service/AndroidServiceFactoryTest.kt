@@ -15,6 +15,7 @@
  **/
 package io.matthewnelson.kmp.tor.runtime.service
 
+import android.Manifest.permission.ACCESS_NETWORK_STATE
 import android.content.Context
 import android.os.Build
 import androidx.test.core.app.ApplicationProvider
@@ -200,7 +201,7 @@ class AndroidServiceFactoryTest {
         }
 
         assertTrue(config.useNetworkStateObserver)
-        assertFalse(ctx.isPermissionGranted("android.permission.ACCESS_NETWORK_STATE"))
+        assertFalse(ctx.isPermissionGranted(ACCESS_NETWORK_STATE))
         val env = newEnvironment("sf_permissions")
 
         val exceptions = mutableListOf<IllegalStateException>()
@@ -217,7 +218,7 @@ class AndroidServiceFactoryTest {
             synchronized(exceptions) {
                 assertEquals(1, exceptions.size)
                 // Missing permissions exception
-                assertEquals(true, exceptions.first().message?.contains("ACCESS_NETWORK_STATE"))
+                assertEquals(true, exceptions.first().message?.contains(ACCESS_NETWORK_STATE))
             }
         } catch (t: Throwable) {
             factory.enqueue(Action.StopDaemon, {}, {})
