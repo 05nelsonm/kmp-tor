@@ -103,6 +103,40 @@ public class KmpTorServiceUI private constructor(
         @JvmField
         public val iconDataXfer: Int = _iconDataXfer.id
 
+        /**
+         * TODO
+         * */
+        public fun newConfig(
+            block: ThisBlock<Builder>
+        ): Config = newConfig(null, block)
+
+        /**
+         * TODO
+         * */
+        public fun newConfig(
+            iconNetworkEnabled: Int?,
+            block: ThisBlock<Builder>,
+        ): Config = newConfig(
+            iconNetworkEnabled,
+            null,
+            block
+        )
+
+        /**
+         * TODO
+         * */
+        public fun newConfig(
+            iconNetworkEnabled: Int?,
+            iconNetworkDisabled: Int?,
+            block: ThisBlock<Builder>,
+        ): Config = Config(
+            b = Builder.of(
+                this,
+                iconNetworkEnabled,
+                iconNetworkDisabled,
+            ).apply(block)
+        )
+
         public constructor(
             iconNetworkEnabled: Int,
             iconNetworkDisabled: Int,
@@ -177,6 +211,21 @@ public class KmpTorServiceUI private constructor(
                     iconNetworkEnabled,
                     iconNetworkDisabled,
                 )
+
+                @JvmSynthetic
+                internal fun of(
+                    other: Config,
+                    iconNetworkEnabled: Int?,
+                    iconNetworkDisabled: Int?,
+                ): Builder = Builder(
+                    iconNetworkEnabled ?: other.iconNetworkEnabled,
+                    iconNetworkDisabled ?: other.iconNetworkDisabled
+                ).apply {
+                    iconDataXfer = other.iconDataXfer
+                    enableActionRestart = other.enableActionRestart
+                    enableActionStop = other.enableActionStop
+                    displayName = other.displayName
+                }
             }
         }
     }

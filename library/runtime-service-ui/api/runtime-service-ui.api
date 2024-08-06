@@ -46,6 +46,9 @@ public final class io/matthewnelson/kmp/tor/runtime/service/ui/KmpTorServiceUI$C
 	public final field iconNetworkEnabled I
 	public fun <init> (II)V
 	public fun <init> (IILio/matthewnelson/kmp/tor/runtime/core/ThisBlock;)V
+	public final fun newConfig (Lio/matthewnelson/kmp/tor/runtime/core/ThisBlock;)Lio/matthewnelson/kmp/tor/runtime/service/ui/KmpTorServiceUI$Config;
+	public final fun newConfig (Ljava/lang/Integer;Lio/matthewnelson/kmp/tor/runtime/core/ThisBlock;)Lio/matthewnelson/kmp/tor/runtime/service/ui/KmpTorServiceUI$Config;
+	public final fun newConfig (Ljava/lang/Integer;Ljava/lang/Integer;Lio/matthewnelson/kmp/tor/runtime/core/ThisBlock;)Lio/matthewnelson/kmp/tor/runtime/service/ui/KmpTorServiceUI$Config;
 }
 
 public final class io/matthewnelson/kmp/tor/runtime/service/ui/KmpTorServiceUI$Config$Builder {
