@@ -119,7 +119,7 @@ public class KmpTorServiceUI private constructor(
             ).apply(block)
         )
 
-        private constructor(b: Builder): this(
+        internal constructor(b: Builder): this(
             _iconNetworkEnabled = DrawableRes(b.iconNetworkEnabled),
             _iconNetworkDisabled = DrawableRes(b.iconNetworkDisabled),
             _iconDataXfer = DrawableRes(b.iconDataXfer),
@@ -174,14 +174,17 @@ public class KmpTorServiceUI private constructor(
      * e.g.
      *
      *     val factory = KmpTorServiceUI.Factory(
-     *         defaultConfig = KmpTorServiceUI.Config(
-     *             // ...
-     *         ),
+     *         iconNetworkEnabled = myIconA,
+     *         iconNetworkDisabled = myIconB,
      *         info = TorServiceUI.NotificationInfo.of(
      *             // ...
      *         ),
      *         block = {
      *             // configure...
+     *
+     *             defaultConfig {
+     *                 // configure ...
+     *             }
      *         }
      *     )
      *
@@ -191,9 +194,10 @@ public class KmpTorServiceUI private constructor(
      * */
     public class Factory private constructor(
         b: Builder,
+        c: Config.Builder,
     ): TorServiceUI.Factory<Config, KmpTorServiceUIInstanceState<Config>, KmpTorServiceUI>(
-        b.defaultConfig,
-        b.info,
+        defaultConfig = Config(c.apply { /* TODO: Configure displayName */ }),
+        info = b.info,
     ) {
 
         @JvmField
@@ -217,27 +221,47 @@ public class KmpTorServiceUI private constructor(
         public val iconActionNext: Int = actionIcons[NotificationAction.Next].id
 
         public constructor(
-            defaultConfig: Config,
+            iconNetworkEnabled: Int,
+            iconNetworkDisabled: Int,
             info: NotificationInfo,
-        ): this(defaultConfig, info, {})
+        ): this(
+            iconNetworkEnabled,
+            iconNetworkDisabled,
+            info,
+            {},
+        )
 
         public constructor(
-            defaultConfig: Config,
+            iconNetworkEnabled: Int,
+            iconNetworkDisabled: Int,
             info: NotificationInfo,
             block: ThisBlock<Builder>,
         ): this(
+            Config.Builder.of(
+                iconNetworkEnabled,
+                iconNetworkDisabled,
+            ),
+            info,
+            block,
+        )
+
+        private constructor(
+            c: Config.Builder,
+            info: NotificationInfo,
+            block: ThisBlock<Builder>,
+        ): this (
             b = Builder.of(
-                defaultConfig,
                 info,
-            ).apply(block)
+                c,
+            ).apply(block),
+            c = c,
         )
 
         @KmpTorDsl
         public class Builder private constructor(
             @JvmField
-            public val defaultConfig: Config,
-            @JvmField
             public val info: NotificationInfo,
+            private val c: Config.Builder,
         ) {
 
             /**
@@ -294,13 +318,21 @@ public class KmpTorServiceUI private constructor(
             @JvmField
             public var iconActionNext: Int = android.R.drawable.ic_media_next
 
+            /**
+             * TODO
+             * */
+            @KmpTorDsl
+            public fun defaultConfig(
+                block: ThisBlock<Config.Builder>
+            ): Builder = apply { c.apply(block) }
+
             internal companion object {
 
                 @JvmSynthetic
                 internal fun of(
-                    defaultConfig: Config,
                     info: NotificationInfo,
-                ): Builder = Builder(defaultConfig, info)
+                    config: Config.Builder,
+                ): Builder = Builder(info, config)
             }
         }
 
