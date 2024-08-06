@@ -28,6 +28,7 @@ import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runTest
 import kotlin.test.*
 
+@Suppress("BooleanLiteralArgument")
 @OptIn(ExperimentalKmpTorApi::class)
 class AbstractTorServiceUIUnitTest {
 
@@ -49,12 +50,15 @@ class AbstractTorServiceUIUnitTest {
 
         val scope = serviceChildScope
 
-        val updates = mutableListOf<Triple<State, Boolean, Boolean>>()
+        val updates = mutableListOf<Update>()
 
         val instanceStatesTest: Collection<State> get() = instanceStates
 
+        fun previousTest() { previous() }
+        fun nextTest() { next() }
+
         protected override fun onUpdate(displayed: State, hasPrevious: Boolean, hasNext: Boolean) {
-            updates.add(Triple(displayed, hasPrevious, hasNext))
+            updates.add(Update(displayed, Update.Indicators(hasPrevious, hasNext)))
         }
 
         protected override fun onDestroy() {
@@ -121,6 +125,11 @@ class AbstractTorServiceUIUnitTest {
 
             fun postStateChangeTest() { postStateChange() }
         }
+
+        data class Update(val state: State, val indicators: Indicators) {
+
+            data class Indicators(val hasPrevious: Boolean, val hasNext: Boolean)
+        }
     }
 
     val config = TestUI.Config(mapOf("" to ""))
@@ -151,7 +160,7 @@ class AbstractTorServiceUIUnitTest {
     }
 
     @Test
-    fun givenFactory_whenNewUIInstance_thenArgsAreVerified() = runTest {
+    fun givenFactory_whenNewUI_thenArgsAreVerified() = runTest {
         run {
             val args = TestUI.Args(config, this)
             val factory = TestUI.Factory(config)
@@ -176,7 +185,7 @@ class AbstractTorServiceUIUnitTest {
     }
 
     @Test
-    fun givenFactory_whenNewUIInstance_thenOnDestroyCallbackSet() = runTest {
+    fun givenFactory_whenNewUI_thenOnDestroyCallbackSet() = runTest {
         val factory = TestUI.Factory(config)
         val instance = factory.newInstanceUI(TestUI.Args(config, this))
 
@@ -191,7 +200,7 @@ class AbstractTorServiceUIUnitTest {
     }
 
     @Test
-    fun givenUIInstance_whenNewInstanceState_thenArgsAreVerified() = runTest {
+    fun givenUI_whenNewInstanceState_thenArgsAreVerified() = runTest {
         var state: TestUI.State? = null
         var iArgs: AbstractTorServiceUI.Args.Instance? = null
 
@@ -221,7 +230,7 @@ class AbstractTorServiceUIUnitTest {
     }
 
     @Test
-    fun givenUIInstance_whenInstanceState_thenDispatchesUpdatesToUI() = runTest {
+    fun givenUI_whenInstanceState_thenDispatchesUpdatesToUI() = runTest {
         val factory = TestUI.Factory(config)
         val ui = factory.newInstanceUI(TestUI.Args(config, this))
         val (instanceJob, instance) = ui.newTestInstanceState(fid = "abcde12345")
@@ -233,12 +242,12 @@ class AbstractTorServiceUIUnitTest {
 
         delayTest()
         assertEquals(1, ui.updates.size)
-        assertEquals("abcde12345", ui.updates[0].first.fid)
+        assertEquals("abcde12345", ui.updates[0].state.fid)
 
         instance.postStateChangeTest()
         delayTest()
         assertEquals(2, ui.updates.size)
-        assertEquals("abcde12345", ui.updates[1].first.fid)
+        assertEquals("abcde12345", ui.updates[1].state.fid)
 
         instanceJob.cancel()
         delayTest()
@@ -249,6 +258,117 @@ class AbstractTorServiceUIUnitTest {
         assertEquals(2, ui.updates.size)
 
         assertTrue(ui.instanceStatesTest.isEmpty())
+    }
+
+    @Test
+    fun givenUI_whenMultipleInstanceStates_thenUpdatesHasPreviousOrNextAsExpected() = runTest {
+        val factory = TestUI.Factory(config)
+        val ui = factory.newInstanceUI(TestUI.Args(config, this))
+
+        val numInstances = 5
+        val instances = mutableListOf<Pair<Job, TestUI.State>>()
+        repeat(numInstances) { i ->
+            val pair = ui.newTestInstanceState(fid = "abcde12345$i")
+            instances.add(pair)
+            delayTest()
+        }
+
+        assertEquals(numInstances, instances.size)
+        assertEquals(instances.size, ui.instanceStatesTest.size)
+
+        // Even with 5 added, the only update posted should be when
+        // the 2nd instance was created for hasNext
+        assertEquals(2, ui.updates.size)
+        assertEquals(TestUI.Update.Indicators(false, false), ui.updates[0].indicators)
+        assertEquals(TestUI.Update.Indicators(false, true), ui.updates[1].indicators)
+
+        // instanceNumber 0 -> 1
+        ui.nextTest()
+        delayTest()
+        assertEquals(3, ui.updates.size)
+        assertEquals(TestUI.Update.Indicators(true, true), ui.updates[2].indicators)
+
+        // instanceNumber 1 -> 2
+        ui.nextTest()
+        // instanceNumber 2 -> 3
+        ui.nextTest()
+
+        delayTest()
+        // 1st update should not post an update b/c the _displayed
+        // variable that was set was changed in 2nd call. This indicates
+        // that the launch lambda performs a check before calling onUpdate.
+        assertEquals(4, ui.updates.size)
+        assertEquals(ui.instanceStatesTest.elementAt(3), ui.updates[3].state)
+        assertEquals(TestUI.Update.Indicators(true, true), ui.updates[3].indicators)
+
+        // instanceNumber 3 -> 2
+        ui.previousTest()
+        delayTest()
+        assertEquals(5, ui.updates.size)
+        assertEquals(ui.instanceStatesTest.elementAt(2), ui.updates[4].state)
+        assertEquals(TestUI.Update.Indicators(true, true), ui.updates[4].indicators)
+
+        // instanceNumber 2 -> 3
+        ui.nextTest()
+        // instanceNumber 3 -> 4
+        ui.nextTest()
+        delayTest()
+        assertEquals(6, ui.updates.size)
+        assertEquals(ui.instanceStatesTest.last(), ui.updates[5].state)
+        assertEquals(TestUI.Update.Indicators(true, false), ui.updates[5].indicators)
+
+        // Should not do anything because on last instance
+        ui.nextTest()
+        delayTest()
+        assertEquals(6, ui.updates.size)
+
+        // instanceNumber 4 -> 3
+        // Instance removed, update with new displayed Instance
+        instances.last().first.cancel()
+        // Should immediately remove instance, but not dispatch an update
+        // b/c is not next to currently displayed.
+        assertEquals(numInstances - 1, ui.instanceStatesTest.size)
+        delayTest()
+        assertEquals(7, ui.updates.size)
+        assertEquals(ui.instanceStatesTest.last(), ui.updates[6].state)
+        assertEquals(TestUI.Update.Indicators(true, false), ui.updates[6].indicators)
+
+        // instanceNumber 3 -> 2
+        instances.first().first.cancel()
+        // Should immediately remove instance, but not dispatch an update
+        // b/c is not next to currently displayed.
+        assertEquals(numInstances - 2, ui.instanceStatesTest.size)
+        delayTest()
+        assertEquals(7, ui.updates.size)
+
+        // Should not post b/c it is not the currently displayed instance
+        ui.instanceStatesTest.first().postStateChangeTest()
+        delayTest()
+        assertEquals(7, ui.updates.size)
+
+        // instanceNumber 2 -> 1
+        ui.previousTest()
+        delayTest()
+        assertEquals(8, ui.updates.size)
+        assertEquals(TestUI.Update.Indicators(true, true), ui.updates[7].indicators)
+
+        assertEquals(3, ui.instanceStatesTest.size)
+        assertEquals(instances[2].first, ui.instanceStatesTest.elementAt(1).scope.coroutineContext.job)
+
+        // instanceNumber 1 -> 0
+        instances[2].first.cancel()
+        delayTest()
+        assertEquals(9, ui.updates.size)
+        assertEquals(TestUI.Update.Indicators(false, true), ui.updates[8].indicators)
+
+        // Destroy remaining
+        instances.forEach { it.first.cancel() }
+        delayTest()
+        // No updates should post b/c all were removed and the
+        // currently set _displayed variable is null and does not
+        // match the instance in the coroutine launch lambda, so
+        // stops.
+        assertEquals(9, ui.updates.size)
     }
 
     private suspend fun delayTest() = delay(500)

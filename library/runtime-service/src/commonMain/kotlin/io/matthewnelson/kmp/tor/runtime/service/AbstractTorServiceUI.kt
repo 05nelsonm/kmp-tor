@@ -812,6 +812,8 @@ internal constructor(
     private fun IS.postUpdate() {
         if (_displayed != fileIDKey()) return
         val instance = this
+        val hasPrevious = hasPrevious
+        val hasNext = hasNext
 
         serviceChildScope.launch {
             if (_displayed != fileIDKey()) return@launch
