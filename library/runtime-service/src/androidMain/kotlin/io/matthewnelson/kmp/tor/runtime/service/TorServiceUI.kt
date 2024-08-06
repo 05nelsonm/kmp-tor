@@ -25,6 +25,7 @@ import android.content.IntentFilter
 import android.content.res.Resources
 import android.os.Build
 import android.os.Handler
+import android.os.Looper
 import io.matthewnelson.kmp.tor.core.api.annotation.ExperimentalKmpTorApi
 import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
 import io.matthewnelson.kmp.tor.core.resource.synchronized
@@ -142,7 +143,7 @@ protected constructor(
     @Volatile
     private var _isStoppingForeground: Boolean = false
     @Volatile
-    private var manager: NotificationManager? = service
+    private var _manager: NotificationManager? = service
         .getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
     @OptIn(InternalKmpTorApi::class)
@@ -169,8 +170,16 @@ protected constructor(
      * [onUpdate] invocation (or sooner) to ensure that the call to
      * [Service.startForeground] is had, otherwise an ANR will result
      * for Android API 26+.
+     *
+     * @throws [IllegalThreadStateException] if called from non-main thread.
      * */
+    @Throws(IllegalThreadStateException::class)
     protected fun Notification.post() {
+        Looper.getMainLooper().let { looper ->
+            if (Thread.currentThread() == looper.thread) return@let
+            throw IllegalThreadStateException("Notification.post() must be called from the main thread")
+        }
+
         val startForeground = if (_hasStartedForeground) {
             false
         } else {
@@ -193,7 +202,7 @@ protected constructor(
             // declared in the manifest.
             service.startForeground(info.notificationID, this)
         } else {
-            manager?.notify(info.notificationID, this)
+            _manager?.notify(info.notificationID, this)
         }
     }
 
@@ -323,8 +332,8 @@ protected constructor(
 
         @OptIn(InternalKmpTorApi::class)
         val stopForeground = synchronized(lock) {
-            val wasNotNull = manager != null
-            manager = null
+            val wasNotNull = _manager != null
+            _manager = null
 
             if (!_hasStartedForeground) {
                 // Notification.post was never called, so startForeground
