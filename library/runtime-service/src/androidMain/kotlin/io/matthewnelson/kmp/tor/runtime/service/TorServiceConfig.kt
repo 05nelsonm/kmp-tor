@@ -303,15 +303,18 @@ public open class TorServiceConfig private constructor(
      * e.g. (A Foreground Service using the `kmp-tor:runtime-service-ui` dependency)
      *
      *     val factory = KmpTorServiceUI.Factory(
-     *         defaultConfig = KmpTorServiceUI.Config(
-     *             // ...
-     *         ),
+     *         iconNetworkEnabled = myIconA,
+     *         iconNetworkDisabled = myIconB,
      *         info = TorServiceUI.NotificationInfo.of(
      *             // ...
      *         ),
      *         block = {
      *             // configure...
-     *         },
+     *
+     *             defaultConfig {
+     *                 // configure ...
+     *             }
+     *         }
      *     )
      *
      *     val config = TorServiceConfig.Foreground.Builder(factory) {
@@ -365,8 +368,7 @@ public open class TorServiceConfig private constructor(
          *
          * @throws [Resources.NotFoundException] If [instanceConfig] fails validation
          *   checks (emulators & devices only).
-         * @throws [IllegalArgumentException] if [instanceConfig] is not the same
-         *   class type as the provided [TorServiceUI.Factory.defaultConfig].
+         * @throws [IllegalArgumentException] if [instanceConfig] is invalid.
          * */
         public fun newEnvironment(
             instanceConfig: C,
@@ -398,8 +400,7 @@ public open class TorServiceConfig private constructor(
          *
          * @throws [Resources.NotFoundException] If [instanceConfig] fails validation
          *   checks (emulators & devices only).
-         * @throws [IllegalArgumentException] if [instanceConfig] is not the same
-         *   class type as the provided [TorServiceUI.Factory.defaultConfig].
+         * @throws [IllegalArgumentException] if [instanceConfig] is invalid.
          * */
         public fun newEnvironment(
             instanceConfig: C,
@@ -433,8 +434,7 @@ public open class TorServiceConfig private constructor(
          *
          * @throws [Resources.NotFoundException] If [instanceConfig] fails validation
          *   checks (emulators & devices only).
-         * @throws [IllegalArgumentException] if [instanceConfig] is not the same
-         *   class type as the provided [TorServiceUI.Factory.defaultConfig].
+         * @throws [IllegalArgumentException] if [instanceConfig] is invalid.
          * */
         public fun newEnvironment(
             dirName: String,
@@ -468,8 +468,7 @@ public open class TorServiceConfig private constructor(
          *
          * @throws [Resources.NotFoundException] If [instanceConfig] fails validation
          *   checks (emulators & devices only).
-         * @throws [IllegalArgumentException] if [instanceConfig] is not the same
-         *   class type as the provided [TorServiceUI.Factory.defaultConfig].
+         * @throws [IllegalArgumentException] if [instanceConfig] is invalid.
          * */
         public fun newEnvironment(
             dirName: String,
@@ -503,8 +502,10 @@ public open class TorServiceConfig private constructor(
              * @throws [ClassCastException] If an instance of [TorServiceConfig] has
              *   already been instantiated and is unable to be returned because it is
              *   not an instance of [Foreground].
+             * @throws [IllegalArgumentException] If [factory] fails validation
+             *   checks (emulators & devices only).
              * @throws [IllegalStateException] If [factory] fails validation
-             *   checks (emulators & devices only)
+             *   checks (emulators & devices only).
              * @throws [Resources.NotFoundException] If [factory] fails validation
              *   checks (emulators & devices only).
              * @see [TorServiceConfig.Companion.Builder]

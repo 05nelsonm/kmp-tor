@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-@file:Suppress("PropertyName")
+@file:Suppress("PropertyName", "CanBePrimaryConstructorProperty")
 
 package io.matthewnelson.kmp.tor.runtime.service.ui
 
@@ -80,11 +80,13 @@ public class KmpTorServiceUI private constructor(
         internal val _iconDataXfer: DrawableRes,
         enableActionRestart: Boolean,
         enableActionStop: Boolean,
+        displayName: DisplayName,
         init: Any
     ): AbstractKmpTorServiceUIConfig(
         enableActionRestart,
         enableActionStop,
         fields = mapOf(
+            "displayName" to displayName,
             "iconNetworkEnabled" to _iconNetworkEnabled,
             "iconNetworkDisabled" to _iconNetworkDisabled,
             "iconDataXfer" to _iconDataXfer,
@@ -93,11 +95,47 @@ public class KmpTorServiceUI private constructor(
     ) {
 
         @JvmField
+        public val displayName: DisplayName = displayName
+        @JvmField
         public val iconNetworkEnabled: Int = _iconNetworkEnabled.id
         @JvmField
         public val iconNetworkDisabled: Int = _iconNetworkDisabled.id
         @JvmField
         public val iconDataXfer: Int = _iconDataXfer.id
+
+        /**
+         * TODO
+         * */
+        public fun newConfig(
+            block: ThisBlock<Builder>
+        ): Config = newConfig(null, block)
+
+        /**
+         * TODO
+         * */
+        public fun newConfig(
+            iconNetworkEnabled: Int?,
+            block: ThisBlock<Builder>,
+        ): Config = newConfig(
+            iconNetworkEnabled,
+            null,
+            block
+        )
+
+        /**
+         * TODO
+         * */
+        public fun newConfig(
+            iconNetworkEnabled: Int?,
+            iconNetworkDisabled: Int?,
+            block: ThisBlock<Builder>,
+        ): Config = Config(
+            b = Builder.of(
+                this,
+                iconNetworkEnabled,
+                iconNetworkDisabled,
+            ).apply(block)
+        )
 
         public constructor(
             iconNetworkEnabled: Int,
@@ -119,14 +157,17 @@ public class KmpTorServiceUI private constructor(
             ).apply(block)
         )
 
-        private constructor(b: Builder): this(
+        internal constructor(b: Builder): this(
             _iconNetworkEnabled = DrawableRes(b.iconNetworkEnabled),
             _iconNetworkDisabled = DrawableRes(b.iconNetworkDisabled),
             _iconDataXfer = DrawableRes(b.iconDataXfer),
             enableActionRestart = b.enableActionRestart,
             enableActionStop = b.enableActionStop,
+            displayName = b.displayName,
             INIT,
         )
+
+
 
         @KmpTorDsl
         public class Builder private constructor(
@@ -154,6 +195,12 @@ public class KmpTorServiceUI private constructor(
             @JvmField
             public var enableActionStop: Boolean = false
 
+            /**
+             * TODO
+             * */
+            @JvmField
+            public var displayName: DisplayName = DisplayName.FID
+
             internal companion object {
 
                 @JvmSynthetic
@@ -164,6 +211,21 @@ public class KmpTorServiceUI private constructor(
                     iconNetworkEnabled,
                     iconNetworkDisabled,
                 )
+
+                @JvmSynthetic
+                internal fun of(
+                    other: Config,
+                    iconNetworkEnabled: Int?,
+                    iconNetworkDisabled: Int?,
+                ): Builder = Builder(
+                    iconNetworkEnabled ?: other.iconNetworkEnabled,
+                    iconNetworkDisabled ?: other.iconNetworkDisabled
+                ).apply {
+                    iconDataXfer = other.iconDataXfer
+                    enableActionRestart = other.enableActionRestart
+                    enableActionStop = other.enableActionStop
+                    displayName = other.displayName
+                }
             }
         }
     }
@@ -174,14 +236,17 @@ public class KmpTorServiceUI private constructor(
      * e.g.
      *
      *     val factory = KmpTorServiceUI.Factory(
-     *         defaultConfig = KmpTorServiceUI.Config(
-     *             // ...
-     *         ),
+     *         iconNetworkEnabled = myIconA,
+     *         iconNetworkDisabled = myIconB,
      *         info = TorServiceUI.NotificationInfo.of(
      *             // ...
      *         ),
      *         block = {
      *             // configure...
+     *
+     *             defaultConfig {
+     *                 // configure ...
+     *             }
      *         }
      *     )
      *
@@ -191,9 +256,10 @@ public class KmpTorServiceUI private constructor(
      * */
     public class Factory private constructor(
         b: Builder,
+        c: Config.Builder,
     ): TorServiceUI.Factory<Config, KmpTorServiceUIInstanceState<Config>, KmpTorServiceUI>(
-        b.defaultConfig,
-        b.info,
+        defaultConfig = Config(c.apply { displayName = DisplayName.FID }),
+        info = b.info,
     ) {
 
         @JvmField
@@ -217,27 +283,47 @@ public class KmpTorServiceUI private constructor(
         public val iconActionNext: Int = actionIcons[NotificationAction.Next].id
 
         public constructor(
-            defaultConfig: Config,
+            iconNetworkEnabled: Int,
+            iconNetworkDisabled: Int,
             info: NotificationInfo,
-        ): this(defaultConfig, info, {})
+        ): this(
+            iconNetworkEnabled,
+            iconNetworkDisabled,
+            info,
+            {},
+        )
 
         public constructor(
-            defaultConfig: Config,
+            iconNetworkEnabled: Int,
+            iconNetworkDisabled: Int,
             info: NotificationInfo,
             block: ThisBlock<Builder>,
         ): this(
+            Config.Builder.of(
+                iconNetworkEnabled,
+                iconNetworkDisabled,
+            ),
+            info,
+            block,
+        )
+
+        private constructor(
+            c: Config.Builder,
+            info: NotificationInfo,
+            block: ThisBlock<Builder>,
+        ): this (
             b = Builder.of(
-                defaultConfig,
                 info,
-            ).apply(block)
+                c,
+            ).apply(block),
+            c = c,
         )
 
         @KmpTorDsl
         public class Builder private constructor(
             @JvmField
-            public val defaultConfig: Config,
-            @JvmField
             public val info: NotificationInfo,
+            private val c: Config.Builder,
         ) {
 
             /**
@@ -294,13 +380,21 @@ public class KmpTorServiceUI private constructor(
             @JvmField
             public var iconActionNext: Int = android.R.drawable.ic_media_next
 
+            /**
+             * TODO
+             * */
+            @KmpTorDsl
+            public fun defaultConfig(
+                block: ThisBlock<Config.Builder>
+            ): Builder = apply { c.apply(block) }
+
             internal companion object {
 
                 @JvmSynthetic
                 internal fun of(
-                    defaultConfig: Config,
                     info: NotificationInfo,
-                ): Builder = Builder(defaultConfig, info)
+                    config: Config.Builder,
+                ): Builder = Builder(info, config)
             }
         }
 
@@ -339,7 +433,7 @@ public class KmpTorServiceUI private constructor(
             }
         }
 
-        @Throws(Resources.NotFoundException::class)
+        @Throws(IllegalArgumentException::class, Resources.NotFoundException::class)
         public override fun validateConfig(context: Context, config: Config) {
             listOf(
                 config._iconNetworkEnabled to "iconNetworkEnabled",
@@ -351,13 +445,26 @@ public class KmpTorServiceUI private constructor(
                     lazyText = { "Invalid $field of $res" }
                 )
             }
+
+            if (config.displayName is DisplayName.StringRes) {
+                val text = context.validateResource(
+                    block = { getString(config.displayName.id) },
+                    lazyText = { "Invalid displayName of ${config.displayName}" },
+                )
+
+                // Parse returned text for required constraints
+                DisplayName.Text.of(text)
+            }
         }
 
         @Throws(Resources.NotFoundException::class)
-        private inline fun Context.validateResource(block: Context.() -> Unit, lazyText: () -> String) {
+        private inline fun <T: Any?> Context.validateResource(
+            block: Context.() -> T,
+            lazyText: () -> String,
+        ): T {
             try {
-                block(this)
-            } catch (e: Resources.NotFoundException) {
+                return block(this)
+            } catch (e: Exception) {
                 val msg = lazyText()
 
                 throw if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
@@ -446,10 +553,15 @@ public class KmpTorServiceUI private constructor(
 
         val title = appContext.retrieveString(state.title)
         val text = appContext.retrieveString(state.text)
+        val displayName = when (val n = displayed.instanceConfig.displayName) {
+            is DisplayName.FID -> "[${state.fid}]"
+            is DisplayName.StringRes -> appContext.getString(n.id)
+            is DisplayName.Text -> n.text
+        }
 
         content.applyHeader(iconRes)
         content.applyContent(state, title, text)
-        val (showActions, expandedApi23) = content.applyActions(state, hasPrevious, hasNext, text)
+        val (showActions, expandedApi23) = content.applyActions(state, displayName, hasPrevious, hasNext, text)
 
         builder.setSmallIcon(iconRes.id)
 
@@ -530,6 +642,7 @@ public class KmpTorServiceUI private constructor(
 
     private fun RemoteViews.applyActions(
         state: UIState,
+        displayName: String,
         hasPrevious: Boolean,
         hasNext: Boolean,
         text: String,
@@ -565,7 +678,7 @@ public class KmpTorServiceUI private constructor(
         }
 
         contentTarget.applyInstanceActions(state, showInstanceActions)
-        contentTarget.applyCycleActions(state, hasPrevious, hasNext, showCycleActions)
+        contentTarget.applyCycleActions(displayName, hasPrevious, hasNext, showCycleActions)
 
         return true to expandedApi23
     }
@@ -598,14 +711,13 @@ public class KmpTorServiceUI private constructor(
     }
 
     private fun RemoteViews.applyCycleActions(
-        state: UIState,
+        displayName: String,
         hasPrevious: Boolean,
         hasNext: Boolean,
         showCycleActions: Boolean,
     ) {
         val visibility = if (showCycleActions) {
-            // TODO: instance.displayName()
-            setTextViewText(R.id.kmp_tor_ui_actions_cycle_text, "[${state.fid}]")
+            setTextViewText(R.id.kmp_tor_ui_actions_cycle_text, displayName)
             setOnClickPendingIntent(R.id.kmp_tor_ui_actions_cycle_text, appContext.noOpPendingIntent())
 
             listOf(

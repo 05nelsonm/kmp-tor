@@ -322,7 +322,7 @@ protected constructor(
          * [TorServiceConfig], or [TorRuntime.Environment] is allowed to be
          * instantiated with a non-operational component.
          * */
-        @Throws(Resources.NotFoundException::class)
+        @Throws(IllegalArgumentException::class, Resources.NotFoundException::class)
         public abstract fun validateConfig(context: Context, config: C)
     }
 

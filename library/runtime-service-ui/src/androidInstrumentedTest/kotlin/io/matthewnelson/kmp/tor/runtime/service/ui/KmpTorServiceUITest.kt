@@ -34,13 +34,8 @@ import kotlin.time.Duration.Companion.seconds
 class KmpTorServiceUITest {
 
     private val factory = KmpTorServiceUI.Factory(
-        defaultConfig = KmpTorServiceUI.Config(
-            iconNetworkEnabled = android.R.drawable.stat_notify_chat,
-            iconNetworkDisabled = android.R.drawable.stat_notify_more,
-            block = {
-                iconDataXfer = android.R.drawable.stat_notify_sync
-            }
-        ),
+        iconNetworkEnabled = android.R.drawable.stat_notify_chat,
+        iconNetworkDisabled = android.R.drawable.stat_notify_more,
         info = TorServiceUI.NotificationInfo.of(
             channelID = "Tor Channel ID",
             channelName = "Tor Channel Name",
@@ -50,10 +45,17 @@ class KmpTorServiceUITest {
         ),
         block = {
             // TODO
+
+            defaultConfig {
+                iconDataXfer = android.R.drawable.stat_notify_sync_noanim
+                enableActionStop = true
+                enableActionRestart = true
+                displayName = DisplayName.Text.of("testing...")
+            }
         }
     ).also { it.debug = true }
 
-    private val config = TorServiceConfig.Foreground.Builder(factory) {
+    private val serviceConfig = TorServiceConfig.Foreground.Builder(factory) {
         // TODO
     }
 
@@ -64,7 +66,7 @@ class KmpTorServiceUITest {
             return@runTest
         }
 
-        val env = config.newEnvironment(
+        val env = serviceConfig.newEnvironment(
             dirName = "ui_startup",
             installer = { dir -> TorResources(dir) },
             block = {
