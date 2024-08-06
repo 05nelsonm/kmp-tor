@@ -50,6 +50,7 @@ class KmpTorServiceUITest {
                 iconDataXfer = android.R.drawable.stat_notify_sync_noanim
                 enableActionStop = true
                 enableActionRestart = true
+                displayName = DisplayName.Text.of("testing...")
             }
         }
     ).also { it.debug = true }

@@ -7,6 +7,32 @@ public abstract class io/matthewnelson/kmp/tor/runtime/service/ui/AbstractKmpTor
 protected final class io/matthewnelson/kmp/tor/runtime/service/ui/AbstractKmpTorServiceUIConfig$Companion {
 }
 
+public abstract class io/matthewnelson/kmp/tor/runtime/service/ui/DisplayName {
+	public final fun equals (Ljava/lang/Object;)Z
+	public final fun hashCode ()I
+	public final fun toString ()Ljava/lang/String;
+}
+
+public final class io/matthewnelson/kmp/tor/runtime/service/ui/DisplayName$FID : io/matthewnelson/kmp/tor/runtime/service/ui/DisplayName {
+	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/service/ui/DisplayName$FID;
+}
+
+public final class io/matthewnelson/kmp/tor/runtime/service/ui/DisplayName$StringRes : io/matthewnelson/kmp/tor/runtime/service/ui/DisplayName {
+	public final field id I
+	public fun <init> (I)V
+}
+
+public final class io/matthewnelson/kmp/tor/runtime/service/ui/DisplayName$Text : io/matthewnelson/kmp/tor/runtime/service/ui/DisplayName {
+	public static final field Companion Lio/matthewnelson/kmp/tor/runtime/service/ui/DisplayName$Text$Companion;
+	public final field text Ljava/lang/String;
+	public synthetic fun <init> (Ljava/lang/String;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public static final fun of (Ljava/lang/String;)Lio/matthewnelson/kmp/tor/runtime/service/ui/DisplayName$Text;
+}
+
+public final class io/matthewnelson/kmp/tor/runtime/service/ui/DisplayName$Text$Companion {
+	public final fun of (Ljava/lang/String;)Lio/matthewnelson/kmp/tor/runtime/service/ui/DisplayName$Text;
+}
+
 public final class io/matthewnelson/kmp/tor/runtime/service/ui/KmpTorServiceUI : io/matthewnelson/kmp/tor/runtime/service/TorServiceUI {
 	public synthetic fun <init> (Lio/matthewnelson/kmp/tor/runtime/service/ui/KmpTorServiceUI$NotificationAction$Icons;Ljava/lang/String;ILkotlin/jvm/functions/Function2;Lio/matthewnelson/kmp/tor/runtime/service/TorServiceUI$Args;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
 	public synthetic fun newInstanceStateProtected (Lio/matthewnelson/kmp/tor/runtime/service/AbstractTorServiceUI$Args$Instance;)Lio/matthewnelson/kmp/tor/runtime/service/AbstractTorServiceUI$InstanceState;
@@ -14,6 +40,7 @@ public final class io/matthewnelson/kmp/tor/runtime/service/ui/KmpTorServiceUI :
 }
 
 public final class io/matthewnelson/kmp/tor/runtime/service/ui/KmpTorServiceUI$Config : io/matthewnelson/kmp/tor/runtime/service/ui/AbstractKmpTorServiceUIConfig {
+	public final field displayName Lio/matthewnelson/kmp/tor/runtime/service/ui/DisplayName;
 	public final field iconDataXfer I
 	public final field iconNetworkDisabled I
 	public final field iconNetworkEnabled I
@@ -22,6 +49,7 @@ public final class io/matthewnelson/kmp/tor/runtime/service/ui/KmpTorServiceUI$C
 }
 
 public final class io/matthewnelson/kmp/tor/runtime/service/ui/KmpTorServiceUI$Config$Builder {
+	public field displayName Lio/matthewnelson/kmp/tor/runtime/service/ui/DisplayName;
 	public field enableActionRestart Z
 	public field enableActionStop Z
 	public field iconDataXfer I

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-@file:Suppress("PropertyName")
+@file:Suppress("PropertyName", "CanBePrimaryConstructorProperty")
 
 package io.matthewnelson.kmp.tor.runtime.service.ui
 
@@ -80,11 +80,13 @@ public class KmpTorServiceUI private constructor(
         internal val _iconDataXfer: DrawableRes,
         enableActionRestart: Boolean,
         enableActionStop: Boolean,
+        displayName: DisplayName,
         init: Any
     ): AbstractKmpTorServiceUIConfig(
         enableActionRestart,
         enableActionStop,
         fields = mapOf(
+            "displayName" to displayName,
             "iconNetworkEnabled" to _iconNetworkEnabled,
             "iconNetworkDisabled" to _iconNetworkDisabled,
             "iconDataXfer" to _iconDataXfer,
@@ -92,6 +94,8 @@ public class KmpTorServiceUI private constructor(
         init,
     ) {
 
+        @JvmField
+        public val displayName: DisplayName = displayName
         @JvmField
         public val iconNetworkEnabled: Int = _iconNetworkEnabled.id
         @JvmField
@@ -125,8 +129,11 @@ public class KmpTorServiceUI private constructor(
             _iconDataXfer = DrawableRes(b.iconDataXfer),
             enableActionRestart = b.enableActionRestart,
             enableActionStop = b.enableActionStop,
+            displayName = b.displayName,
             INIT,
         )
+
+
 
         @KmpTorDsl
         public class Builder private constructor(
@@ -153,6 +160,12 @@ public class KmpTorServiceUI private constructor(
              * */
             @JvmField
             public var enableActionStop: Boolean = false
+
+            /**
+             * TODO
+             * */
+            @JvmField
+            public var displayName: DisplayName = DisplayName.FID
 
             internal companion object {
 
@@ -196,7 +209,7 @@ public class KmpTorServiceUI private constructor(
         b: Builder,
         c: Config.Builder,
     ): TorServiceUI.Factory<Config, KmpTorServiceUIInstanceState<Config>, KmpTorServiceUI>(
-        defaultConfig = Config(c.apply { /* TODO: Configure displayName */ }),
+        defaultConfig = Config(c.apply { displayName = DisplayName.FID }),
         info = b.info,
     ) {
 
@@ -371,7 +384,7 @@ public class KmpTorServiceUI private constructor(
             }
         }
 
-        @Throws(Resources.NotFoundException::class)
+        @Throws(IllegalArgumentException::class, Resources.NotFoundException::class)
         public override fun validateConfig(context: Context, config: Config) {
             listOf(
                 config._iconNetworkEnabled to "iconNetworkEnabled",
@@ -383,13 +396,26 @@ public class KmpTorServiceUI private constructor(
                     lazyText = { "Invalid $field of $res" }
                 )
             }
+
+            if (config.displayName is DisplayName.StringRes) {
+                val text = context.validateResource(
+                    block = { getString(config.displayName.id) },
+                    lazyText = { "Invalid displayName of ${config.displayName}" },
+                )
+
+                // Parse returned text for required constraints
+                DisplayName.Text.of(text)
+            }
         }
 
         @Throws(Resources.NotFoundException::class)
-        private inline fun Context.validateResource(block: Context.() -> Unit, lazyText: () -> String) {
+        private inline fun <T: Any?> Context.validateResource(
+            block: Context.() -> T,
+            lazyText: () -> String,
+        ): T {
             try {
-                block(this)
-            } catch (e: Resources.NotFoundException) {
+                return block(this)
+            } catch (e: Exception) {
                 val msg = lazyText()
 
                 throw if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
