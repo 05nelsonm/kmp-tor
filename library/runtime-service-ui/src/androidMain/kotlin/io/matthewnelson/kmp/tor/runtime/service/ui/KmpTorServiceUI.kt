@@ -504,10 +504,15 @@ public class KmpTorServiceUI private constructor(
 
         val title = appContext.retrieveString(state.title)
         val text = appContext.retrieveString(state.text)
+        val displayName = when (val n = displayed.instanceConfig.displayName) {
+            is DisplayName.FID -> "[${state.fid}]"
+            is DisplayName.StringRes -> appContext.getString(n.id)
+            is DisplayName.Text -> n.text
+        }
 
         content.applyHeader(iconRes)
         content.applyContent(state, title, text)
-        val (showActions, expandedApi23) = content.applyActions(state, hasPrevious, hasNext, text)
+        val (showActions, expandedApi23) = content.applyActions(state, displayName, hasPrevious, hasNext, text)
 
         builder.setSmallIcon(iconRes.id)
 
@@ -588,6 +593,7 @@ public class KmpTorServiceUI private constructor(
 
     private fun RemoteViews.applyActions(
         state: UIState,
+        displayName: String,
         hasPrevious: Boolean,
         hasNext: Boolean,
         text: String,
@@ -623,7 +629,7 @@ public class KmpTorServiceUI private constructor(
         }
 
         contentTarget.applyInstanceActions(state, showInstanceActions)
-        contentTarget.applyCycleActions(state, hasPrevious, hasNext, showCycleActions)
+        contentTarget.applyCycleActions(displayName, hasPrevious, hasNext, showCycleActions)
 
         return true to expandedApi23
     }
@@ -656,14 +662,13 @@ public class KmpTorServiceUI private constructor(
     }
 
     private fun RemoteViews.applyCycleActions(
-        state: UIState,
+        displayName: String,
         hasPrevious: Boolean,
         hasNext: Boolean,
         showCycleActions: Boolean,
     ) {
         val visibility = if (showCycleActions) {
-            // TODO: instance.displayName()
-            setTextViewText(R.id.kmp_tor_ui_actions_cycle_text, "[${state.fid}]")
+            setTextViewText(R.id.kmp_tor_ui_actions_cycle_text, displayName)
             setOnClickPendingIntent(R.id.kmp_tor_ui_actions_cycle_text, appContext.noOpPendingIntent())
 
             listOf(
