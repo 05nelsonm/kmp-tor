@@ -332,26 +332,40 @@ public class KmpTorServiceUI private constructor(
 
             NotificationAction.entries.forEach { entry ->
                 val res = actionIcons[entry]
-
-                try {
-                    context.retrieveDrawable(res)
-                } catch (e: Resources.NotFoundException) {
-                    val msg = "Invalid iconAction$entry of $res"
-
-                    throw if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                        Resources.NotFoundException(msg, e)
-                    } else {
-                        Resources.NotFoundException(msg).apply { addSuppressed(e) }
-                    }
-                }
+                context.validateResource(
+                    block = { retrieveDrawable(res) },
+                    lazyText = { "Invalid iconAction$entry of $res" }
+                )
             }
         }
 
         @Throws(Resources.NotFoundException::class)
         public override fun validateConfig(context: Context, config: Config) {
-            context.retrieveDrawable(config._iconNetworkEnabled)
-            context.retrieveDrawable(config._iconNetworkDisabled)
-            context.retrieveDrawable(config._iconDataXfer)
+            listOf(
+                config._iconNetworkEnabled to "iconNetworkEnabled",
+                config._iconNetworkDisabled to "iconNetworkDisabled",
+                config._iconDataXfer to "iconDataXfer"
+            ).forEach { (res, field) ->
+                context.validateResource(
+                    block = { retrieveDrawable(res) },
+                    lazyText = { "Invalid $field of $res" }
+                )
+            }
+        }
+
+        @Throws(Resources.NotFoundException::class)
+        private inline fun Context.validateResource(block: Context.() -> Unit, lazyText: () -> String) {
+            try {
+                block(this)
+            } catch (e: Resources.NotFoundException) {
+                val msg = lazyText()
+
+                throw if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                    Resources.NotFoundException(msg, e)
+                } else {
+                    Resources.NotFoundException(msg).apply { addSuppressed(e) }
+                }
+            }
         }
 
         protected override fun newInstanceUIProtected(
