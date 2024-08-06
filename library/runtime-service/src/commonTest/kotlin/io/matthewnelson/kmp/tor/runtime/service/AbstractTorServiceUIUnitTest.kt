@@ -353,10 +353,11 @@ class AbstractTorServiceUIUnitTest {
         assertEquals(TestUI.Update.Indicators(true, true), ui.updates[7].indicators)
 
         assertEquals(3, ui.instanceStatesTest.size)
-        assertEquals(instances[2].first, ui.instanceStatesTest.elementAt(1).scope.coroutineContext.job)
+        assertEquals(instances[1].first, ui.instanceStatesTest.elementAt(0).scope.coroutineContext.job)
+        assertEquals(ui.updates.last().state, ui.instanceStatesTest.elementAt(1))
 
         // instanceNumber 1 -> 0
-        instances[2].first.cancel()
+        instances[1].first.cancel()
         delayTest()
         assertEquals(9, ui.updates.size)
         assertEquals(TestUI.Update.Indicators(false, true), ui.updates[8].indicators)

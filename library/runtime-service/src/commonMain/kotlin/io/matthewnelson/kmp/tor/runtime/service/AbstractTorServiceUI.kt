@@ -728,7 +728,7 @@ internal constructor(
                     // Fine new previous
                     var previousKey: FileIDKey? = null
                     for (k in m.keys) {
-                        if (k == key) break
+                        if (k == _displayed) break
                         previousKey = k
                     }
                     Executable {
@@ -852,7 +852,7 @@ internal constructor(
         val processorTorCmd: () -> TorCmd.Unprivileged.Processor?,
     ): Args.Instance(instanceConfig, instanceScope) {
 
-        val key: FileID = FileIDKey(fid)
+        val key = FileIDKey(fid)
         val ui = this@AbstractTorServiceUI
     }
 
