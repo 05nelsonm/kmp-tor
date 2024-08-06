@@ -18,6 +18,7 @@
 package io.matthewnelson.kmp.tor.runtime.service.ui
 
 import android.app.KeyguardManager
+import android.app.Notification
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
@@ -311,20 +312,19 @@ public class KmpTorServiceUI private constructor(
                     i?.cancel()
                 } catch (_: Throwable) {}
             } catch (t: Throwable) {
-                if (t is IllegalStateException) throw t
-                throw IllegalStateException("contentIntent check failed")
+                throw IllegalStateException("contentIntent check failed", t)
             }
 
             actionIntentPermissionSuffix?.let { suffix ->
-                val name = context.packageName
+                val packageName = context.packageName
                 check(suffix.isNotEmpty() && suffix.indexOfFirst { it.isWhitespace() } == -1) {
-                    "actionIntentPermissionSuffix cannot be empty or contain any whitespace"
+                    "actionIntentPermissionSuffix cannot be empty or contain whitespace"
                 }
-                check(!suffix.contains(name)) {
-                    "actionIntentPermissionSuffix cannot contain the packageName[$name]"
+                check(!suffix.contains(packageName)) {
+                    "actionIntentPermissionSuffix cannot contain the packageName[$packageName]"
                 }
 
-                val permission = name + suffix
+                val permission = packageName + suffix
                 check(context.hasPermission(permission)) {
                     "actionIntentPermissionSuffix is declared, but permission is not granted for $permission"
                 }
@@ -371,83 +371,121 @@ public class KmpTorServiceUI private constructor(
     private val keyguardHandler = KeyguardHandler()
     private val pendingIntents = PendingIntents(actionIntentPermissionSuffix, contentIntentCode, contentIntent)
 
-    private val builder = NotificationBuilder.of(appContext, channelID, pendingIntents.contentIntent)
+    private val builder = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+        Notification.Builder(appContext, channelID)
+    } else {
+        @Suppress("DEPRECATION")
+        Notification.Builder(appContext)
+    }.apply {
+        setOngoing(true)
+        setOnlyAlertOnce(true)
+        setWhen(System.currentTimeMillis())
+        setContentIntent(pendingIntents.contentIntent)
 
-    @Volatile
-    private var _target: FileIDKey? = null
-    private val lockTarget = Lock()
-
-    protected override fun onUpdate(target: FileIDKey, type: UpdateType) {
-        val selected: FileIDKey = _target ?: lockTarget.withLock {
-            _target ?: run {
-                // UpdateType.Added for the first time
-                _target = target
-                target
-            }
+        if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.TIRAMISU) {
+            // API 33-
+            @Suppress("DEPRECATION")
+            setSound(null)
         }
-
-        // Update to a target's state that is not currently
-        // being displayed in the Notification area. Ignore.
-        if (type == UpdateType.Changed && selected != _target) return
-
-        val (instance, enableCyclePrevious, enableCycleNext) = instanceStates.let { instanceStates ->
-            val s = if (type == UpdateType.Removed && selected == target) {
-                // Currently selected instance was removed. Cycle
-                // to first available (if available).
-                lockTarget.withLock {
-                    // Check if still selected
-                    if (selected != _target) return@withLock null
-
-                    val next = instanceStates.keys.firstOrNull()
-                    _target = next
-                    next
-                }
-            } else {
-                // Another instance was added or removed, or the currently
-                // selected one was just added or had a change.
-                selected
-            }
-
-            if (s == null) return
-
-            val instance = instanceStates[s] ?: return
-            val index = instanceStates.keys.indexOf(s).takeIf { it != -1 } ?: return
-
-            Triple(instance, index > 0, index < (instanceStates.size - 1))
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
+            // API 17+
+            setShowWhen(true)
         }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT_WATCH) {
+            // API 20+
+            setGroup("TorService")
+            setGroupSummary(false)
+        }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            // API 21+
+            setCategory(Notification.CATEGORY_PROGRESS)
+            setVisibility(Notification.VISIBILITY_PUBLIC)
+        }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            // API 24+
+            setStyle(Notification.DecoratedCustomViewStyle())
+        }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            // API 26+
+            setTimeoutAfter(10L)
+        }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            // API 31+
+            setForegroundServiceBehavior(Notification.FOREGROUND_SERVICE_IMMEDIATE)
+        }
+    }
 
-        val state = instance.state
+    protected override fun onUpdate(
+        displayed: KmpTorServiceUIInstanceState<Config>,
+        hasPrevious: Boolean,
+        hasNext: Boolean,
+    ) {
+        val state = displayed.state
 
         val content = RemoteViews(appContext.packageName, R.layout.kmp_tor_ui_notification)
 
         val iconRes = when (state.icon) {
-            IconState.NetworkEnabled -> instance.instanceConfig._iconNetworkEnabled
-            IconState.NetworkDisabled -> instance.instanceConfig._iconNetworkDisabled
-            IconState.DataXfer -> instance.instanceConfig._iconDataXfer
+            IconState.NetworkEnabled -> displayed.instanceConfig._iconNetworkEnabled
+            IconState.NetworkDisabled -> displayed.instanceConfig._iconNetworkDisabled
+            IconState.DataXfer -> displayed.instanceConfig._iconDataXfer
         }
 
         val title = appContext.retrieveString(state.title)
         val text = appContext.retrieveString(state.text)
 
-        // Headers
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) {
-            // API 23-
-            content.setImageViewResource(R.id.kmp_tor_ui_header_icon, iconRes.id)
-            content.setTextViewText(R.id.kmp_tor_ui_header_app_name, appLabel)
+        content.applyHeader(iconRes)
+        content.applyContent(state, title, text)
+        val (showActions, expandedApi23) = content.applyActions(state, hasPrevious, hasNext, text)
 
-            (SystemClock.elapsedRealtime() - startTime).toDuration(DurationUnit.MILLISECONDS).let { elapsed ->
-                when {
-                    elapsed > DURATION_1_DAY -> "${elapsed.inWholeDays}d"
-                    elapsed > DURATION_1_HOUR -> "${elapsed.inWholeHours}h"
-                    else -> "${elapsed.inWholeMinutes}m"
-                }
-            }.let { content.setTextViewText(R.id.kmp_tor_ui_header_duration, it) }
+        builder.setSmallIcon(iconRes.id)
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            // API 24+
+            val actionVisibility = if (showActions) View.VISIBLE else View.GONE
+            content.setViewVisibility(R.id.kmp_tor_ui_container_actions, actionVisibility)
+
+            builder.setCustomBigContentView(content)
+            builder.build()
+        } else {
+            // API 23-
+            @Suppress("DEPRECATION")
+            builder.setContent(content)
+            builder.build().apply {
+                @Suppress("DEPRECATION")
+                bigContentView = expandedApi23
+            }
+        }.post()
+    }
+
+    private fun RemoteViews.applyHeader(
+        iconRes: DrawableRes,
+    ) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) return
+        // API 23-
+
+        setImageViewResource(R.id.kmp_tor_ui_header_icon, iconRes.id)
+        setTextViewText(R.id.kmp_tor_ui_header_app_name, appLabel)
+
+        val elapsed = (SystemClock.elapsedRealtime() - startTime)
+            .toDuration(DurationUnit.MILLISECONDS)
+
+        val durationText = when {
+            elapsed > DURATION_1_DAY -> "${elapsed.inWholeDays}d"
+            elapsed > DURATION_1_HOUR -> "${elapsed.inWholeHours}h"
+            else -> "${elapsed.inWholeMinutes}m"
         }
 
-        // Content
-        content.setTextViewText(R.id.kmp_tor_ui_content_title_state, title)
+        setTextViewText(R.id.kmp_tor_ui_header_duration, durationText)
+    }
 
-        when (state.progress) {
+    private fun RemoteViews.applyContent(
+        state: UIState,
+        title: String,
+        text: String,
+    ) {
+        setTextViewText(R.id.kmp_tor_ui_content_title_state, title)
+
+        val (progressVisibility, progressParams) = when (state.progress) {
             is Progress.Determinant -> {
                 View.VISIBLE to Triple(100, state.progress.value.toInt(), false)
             }
@@ -457,124 +495,126 @@ public class KmpTorServiceUI private constructor(
             is Progress.None -> {
                 View.GONE to null
             }
-        }.let { (progressVisibility, progressParams) ->
-
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && progressParams == null) {
-                // API 24+
-                "" to text
-            } else {
-                // API 23-
-                text to ""
-            }.let { (titleText, infoText) ->
-                content.setTextViewText(R.id.kmp_tor_ui_content_title_text, titleText)
-                content.setTextViewText(R.id.kmp_tor_ui_content_info_text, infoText)
-            }
-
-            content.setViewVisibility(R.id.kmp_tor_ui_content_info_progress, progressVisibility)
-            val (max, progress, indeterminate) = progressParams ?: return@let
-            content.setProgressBar(R.id.kmp_tor_ui_content_info_progress, max, progress, indeterminate)
         }
 
-        // Actions
-        content.removeAllViews(R.id.kmp_tor_ui_actions_load_instance)
-        content.removeAllViews(R.id.kmp_tor_ui_actions_load_cycle)
+        val (titleText, infoText) = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && progressParams == null) {
+            // API 24+
+            "" to text
+        } else {
+            // API 23-
+            text to ""
+        }
 
-        var expandedApi23: RemoteViews? = null
-        val showCycleActions = enableCyclePrevious || enableCycleNext
+        setTextViewText(R.id.kmp_tor_ui_content_title_text, titleText)
+        setTextViewText(R.id.kmp_tor_ui_content_info_text, infoText)
+
+        setViewVisibility(R.id.kmp_tor_ui_content_info_progress, progressVisibility)
+        val (max, progress, indeterminate) = progressParams ?: return
+
+        setProgressBar(R.id.kmp_tor_ui_content_info_progress, max, progress, indeterminate)
+    }
+
+    private fun RemoteViews.applyActions(
+        state: UIState,
+        hasPrevious: Boolean,
+        hasNext: Boolean,
+        text: String,
+    ): Pair<Boolean, RemoteViews?> {
+        removeAllViews(R.id.kmp_tor_ui_actions_load_instance)
+        removeAllViews(R.id.kmp_tor_ui_actions_load_cycle)
+
+
+        val showCycleActions = hasPrevious || hasNext
         val showInstanceActions = state.actions.isNotEmpty()
         val showActions = showInstanceActions || showCycleActions
 
-        if (showActions) {
-            val contentTarget = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                // API 24+
-                content
-            } else {
-                // API 23-
-                @Suppress("DEPRECATION")
-                val clone = content.clone()
-                expandedApi23 = clone
-                clone.setViewVisibility(R.id.kmp_tor_ui_container_actions, View.VISIBLE)
+        if (!showActions) return false to null
 
-                if (state.progress is Progress.None) {
-                    clone.setTextViewText(R.id.kmp_tor_ui_content_title_text, "")
-                    clone.setTextViewText(R.id.kmp_tor_ui_content_info_text, text)
-                }
+        var expandedApi23: RemoteViews? = null
 
-                clone
+        val contentTarget = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            // API 24+
+            this
+        } else {
+            // API 23-
+            @Suppress("DEPRECATION")
+            val clone = clone()
+            expandedApi23 = clone
+            clone.setViewVisibility(R.id.kmp_tor_ui_container_actions, View.VISIBLE)
+
+            if (state.progress is Progress.None) {
+                clone.setTextViewText(R.id.kmp_tor_ui_content_title_text, "")
+                clone.setTextViewText(R.id.kmp_tor_ui_content_info_text, text)
             }
 
-            if (showInstanceActions) {
-                state.actions.forEach { action ->
-                    val view = RemoteViews(appContext.packageName, R.layout.kmp_tor_ui_action_enabled)
-                    contentTarget.addView(R.id.kmp_tor_ui_actions_load_instance, view)
-
-                    when (action) {
-                        ButtonAction.NewIdentity -> NotificationAction.NewNym
-                        ButtonAction.RestartTor -> NotificationAction.Restart
-                        ButtonAction.StopTor -> NotificationAction.Stop
-                    }.let { intent ->
-                        view.setOnClickPendingIntent(R.id.kmp_tor_ui_action, pendingIntents[intent])
-                        view.setImageViewResource(R.id.kmp_tor_ui_action_image, actionIcons[intent].id)
-                    }
-                }
-                View.VISIBLE
-            } else {
-                View.GONE
-            }.let { contentTarget.setViewVisibility(R.id.kmp_tor_ui_actions_load_instance, it) }
-
-            if (showCycleActions) {
-                // TODO: instance.displayName()
-                contentTarget.setTextViewText(R.id.kmp_tor_ui_actions_cycle_text, "[${state.fid}]")
-                contentTarget.setOnClickPendingIntent(R.id.kmp_tor_ui_actions_cycle_text, appContext.noOpPendingIntent())
-
-                listOf(
-                    NotificationAction.Previous to enableCyclePrevious,
-                    NotificationAction.Next to enableCycleNext,
-                ).forEach { (intent, enable) ->
-                    val layoutId = if (enable) {
-                        R.layout.kmp_tor_ui_action_enabled
-                    } else {
-                        R.layout.kmp_tor_ui_action_disabled
-                    }
-
-                    val view = RemoteViews(appContext.packageName, layoutId)
-                    contentTarget.addView(R.id.kmp_tor_ui_actions_load_cycle, view)
-
-                    if (enable) {
-                        pendingIntents[intent]
-                    } else {
-                        appContext.noOpPendingIntent()
-                    }.let { view.setOnClickPendingIntent(R.id.kmp_tor_ui_action, it) }
-
-                    view.setImageViewResource(R.id.kmp_tor_ui_action_image, actionIcons[intent].id)
-                }
-
-                View.VISIBLE
-            } else {
-                View.GONE
-            }.let { contentTarget.setViewVisibility(R.id.kmp_tor_ui_container_actions_cycle, it) }
+            clone
         }
 
-        builder.withLock {
-            setSmallIcon(iconRes.id)
+        contentTarget.applyInstanceActions(state, showInstanceActions)
+        contentTarget.applyCycleActions(state, hasPrevious, hasNext, showCycleActions)
 
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                // API 24+
-                val actionVisibility = if (showActions) View.VISIBLE else View.GONE
-                content.setViewVisibility(R.id.kmp_tor_ui_container_actions, actionVisibility)
+        return true to expandedApi23
+    }
 
-                setCustomBigContentView(content)
-                build()
-            } else {
-                // API 23-
-                @Suppress("DEPRECATION")
-                setContent(content)
-                build().apply {
-                    @Suppress("DEPRECATION")
-                    bigContentView = expandedApi23
+    private fun RemoteViews.applyInstanceActions(
+        state: UIState,
+        showInstanceActions: Boolean,
+    ) {
+        val visibility = if (showInstanceActions) {
+            state.actions.forEach { btnAction ->
+                val view = RemoteViews(appContext.packageName, R.layout.kmp_tor_ui_action_enabled)
+                addView(R.id.kmp_tor_ui_actions_load_instance, view)
+
+                val nAction = when (btnAction) {
+                    ButtonAction.NewIdentity -> NotificationAction.NewNym
+                    ButtonAction.RestartTor -> NotificationAction.Restart
+                    ButtonAction.StopTor -> NotificationAction.Stop
                 }
-            }.post()
+
+                view.setOnClickPendingIntent(R.id.kmp_tor_ui_action, pendingIntents[nAction])
+                view.setImageViewResource(R.id.kmp_tor_ui_action_image, actionIcons[nAction].id)
+            }
+
+            View.VISIBLE
+        } else {
+            View.GONE
         }
+
+        setViewVisibility(R.id.kmp_tor_ui_actions_load_instance, visibility)
+    }
+
+    private fun RemoteViews.applyCycleActions(
+        state: UIState,
+        hasPrevious: Boolean,
+        hasNext: Boolean,
+        showCycleActions: Boolean,
+    ) {
+        val visibility = if (showCycleActions) {
+            // TODO: instance.displayName()
+            setTextViewText(R.id.kmp_tor_ui_actions_cycle_text, "[${state.fid}]")
+            setOnClickPendingIntent(R.id.kmp_tor_ui_actions_cycle_text, appContext.noOpPendingIntent())
+
+            listOf(
+                NotificationAction.Previous to hasPrevious,
+                NotificationAction.Next to hasNext,
+            ).forEach { (action, enable) ->
+                val layoutId = if (enable) R.layout.kmp_tor_ui_action_enabled else R.layout.kmp_tor_ui_action_disabled
+
+                val view = RemoteViews(appContext.packageName, layoutId)
+                addView(R.id.kmp_tor_ui_actions_load_cycle, view)
+
+                val pIntent = if (enable) pendingIntents[action] else appContext.noOpPendingIntent()
+
+                view.setOnClickPendingIntent(R.id.kmp_tor_ui_action, pIntent)
+                view.setImageViewResource(R.id.kmp_tor_ui_action_image, actionIcons[action].id)
+            }
+
+            View.VISIBLE
+        } else {
+            View.GONE
+        }
+
+        setViewVisibility(R.id.kmp_tor_ui_container_actions_cycle, visibility)
     }
 
     protected override fun onDestroy() {
@@ -607,7 +647,7 @@ public class KmpTorServiceUI private constructor(
                     val new = manager.isKeyguardLocked
                     if (old != new) {
                         _isDeviceLocked = new
-                        instanceStates.values.forEach { instance ->
+                        instanceStates.forEach { instance ->
                             instance.debug { "DeviceIsLocked[$new]" }
                             instance.onDeviceLockChange()
                         }
@@ -656,44 +696,33 @@ public class KmpTorServiceUI private constructor(
                 }
             } ?: return@Receiver
 
-            serviceChildScope.launch {
-                val selected = _target ?: return@launch
-                val instanceStates = instanceStates
-
-                when (action) {
-                    NotificationAction.NewNym -> {
-                        instanceStates[selected]?.processorTorCmd()?.enqueue(
-                            TorCmd.Signal.NewNym,
-                            OnFailure.noOp(),
-                            OnSuccess.noOp(),
-                        )
-                    }
-                    NotificationAction.Restart -> {
-                        instanceStates[selected]?.processorAction()?.enqueue(
-                            Action.RestartDaemon,
-                            OnFailure.noOp(),
-                            OnSuccess.noOp(),
-                        )
-                    }
-                    NotificationAction.Stop -> {
-                        instanceStates[selected]?.processorAction()?.enqueue(
-                            Action.StopDaemon,
-                            OnFailure.noOp(),
-                            OnSuccess.noOp(),
-                        )
-                    }
-                    NotificationAction.Previous -> {
-                        val keys = instanceStates.keys
-                        val previous: FileIDKey = keys.elementAtOrNull(keys.indexOf(selected) - 1) ?: return@launch
-                        _target = previous
-                        onUpdate(previous, UpdateType.Changed)
-                    }
-                    NotificationAction.Next -> {
-                        val keys = instanceStates.keys
-                        val next: FileIDKey = keys.elementAtOrNull(keys.indexOf(selected) + 1) ?: return@launch
-                        _target = next
-                        onUpdate(next, UpdateType.Changed)
-                    }
+            when (action) {
+                NotificationAction.NewNym -> {
+                    displayed?.processorTorCmd()?.enqueue(
+                        TorCmd.Signal.NewNym,
+                        OnFailure.noOp(),
+                        OnSuccess.noOp(),
+                    )
+                }
+                NotificationAction.Restart -> {
+                    displayed?.processorAction()?.enqueue(
+                        Action.RestartDaemon,
+                        OnFailure.noOp(),
+                        OnSuccess.noOp(),
+                    )
+                }
+                NotificationAction.Stop -> {
+                    displayed?.processorAction()?.enqueue(
+                        Action.StopDaemon,
+                        OnFailure.noOp(),
+                        OnSuccess.noOp(),
+                    )
+                }
+                NotificationAction.Previous -> {
+                    previous()
+                }
+                NotificationAction.Next -> {
+                    next()
                 }
             }
         }.register(

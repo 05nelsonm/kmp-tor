@@ -17,7 +17,6 @@
 
 package io.matthewnelson.kmp.tor.runtime.service
 
-import io.matthewnelson.immutable.collections.immutableMapOf
 import io.matthewnelson.immutable.collections.toImmutableMap
 import io.matthewnelson.kmp.tor.core.api.annotation.ExperimentalKmpTorApi
 import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
@@ -26,6 +25,7 @@ import io.matthewnelson.kmp.tor.core.resource.synchronized
 import io.matthewnelson.kmp.tor.runtime.*
 import io.matthewnelson.kmp.tor.runtime.FileID.Companion.toFIDString
 import io.matthewnelson.kmp.tor.runtime.core.Disposable
+import io.matthewnelson.kmp.tor.runtime.core.Executable
 import io.matthewnelson.kmp.tor.runtime.core.OnEvent
 import io.matthewnelson.kmp.tor.runtime.core.TorEvent
 import io.matthewnelson.kmp.tor.runtime.core.ctrl.TorCmd
@@ -70,7 +70,7 @@ public abstract class AbstractTorServiceUI<
 internal constructor(
     private val args: A,
     init: Any,
-): TorServiceUIUtils() {
+) {
 
     init {
         args.initialize()
@@ -78,9 +78,18 @@ internal constructor(
     }
 
     @Volatile
+    private var _previous: FileIDKey? = null
+    @Volatile
+    private var _displayed: FileIDKey? = null
+    @Volatile
+    private var _next: FileIDKey? = null
+    @Volatile
     private var _instanceStates: Map<FileIDKey, IS> = emptyMap()
+
     @OptIn(InternalKmpTorApi::class)
-    private val instanceStatesLock = SynchronizedObject()
+    private val stateLock = SynchronizedObject()
+    private val hasPrevious: Boolean get() = _previous != null
+    private val hasNext: Boolean get() = _next != null
 
     private val serviceJob = args.scope().coroutineContext.job
 
@@ -91,15 +100,23 @@ internal constructor(
     protected val defaultConfig: C = args.config()
 
     /**
-     * All [InstanceState] currently operating within this "container"
-     * instance.
+     * Returns the currently displayed [InstanceState].
+     *
+     * @see [previous]
+     * @see [next]
+     * */
+    @get:JvmName("displayed")
+    protected val displayed: IS? get() = _displayed?.let { _instanceStates[it] }
+
+    /**
+     * All [InstanceState] currently operating within this UI "container".
      * */
     @get:JvmName("instanceStates")
-    protected val instanceStates: Map<FileIDKey, IS> get() = _instanceStates
+    protected val instanceStates: Collection<IS> get() = _instanceStates.values
 
     /**
      * A [CoroutineScope] which is configured as a child to the service
-     * object's [CoroutineScope].
+     * object's [CoroutineScope] which utilizes [Dispatchers.Main]
      * */
     @JvmField
     protected val serviceChildScope: CoroutineScope = CoroutineScope(context =
@@ -119,11 +136,80 @@ internal constructor(
     protected open fun onDestroy() {}
 
     /**
-     * Indicates that the [target] was updated.
+     * Indicates there was a stateful change that required an update to the UI.
      *
-     * @see [instanceStates]
+     * **NOTE:** This is always invoked from the UI thread
+     *
+     * @param [displayed] The current [InstanceState] selected to be shown
+     * @param [hasPrevious] Indicates there is another [InstanceState]
+     *   that exists in [instanceStates] before [displayed].
+     * @param [hasNext] Indicates there is another [InstanceState]
+     *   that exists in [instanceStates] after [displayed].
+     * @see [previous]
+     * @see [next]
      * */
-    protected abstract fun onUpdate(target: FileIDKey, type: UpdateType)
+    protected abstract fun onUpdate(displayed: IS, hasPrevious: Boolean, hasNext: Boolean)
+
+    /**
+     * Shifts the pointer to the "left" and calls [onUpdate] with the new
+     * parameters. If no previous [InstanceState] is available, then nothing
+     * occurs.
+     *
+     * This is for cycling through running instances via some button in the
+     * UI, such as `<`.
+     * */
+    protected fun previous() {
+        if (!hasPrevious) return
+
+        @OptIn(InternalKmpTorApi::class)
+        synchronized(stateLock) {
+            val newDisplayed = _previous ?: return@synchronized
+
+            // shift [ p, D, n ] -> [ ?, P, d ]
+            var previousKey: FileIDKey? = null
+            for (key in _instanceStates.keys) {
+                if (key == newDisplayed) break
+                previousKey = key
+            }
+            _previous = previousKey
+            _next = _displayed
+            _displayed = newDisplayed
+
+            _instanceStates[newDisplayed]?.postUpdate()
+        }
+    }
+
+    /**
+     * Shifts the pointer to the "right" and calls [onUpdate] with the new
+     * parameters. If no next [InstanceState] is available, then nothing
+     * occurs.
+     *
+     * This is for cycling through running instances via some button in the
+     * UI, such as `>`.
+     * */
+    protected fun next() {
+        if (!hasNext) return
+
+        @OptIn(InternalKmpTorApi::class)
+        synchronized(stateLock) {
+            val newDisplayed = _next ?: return@synchronized
+
+            // shift [ p, D, n ] -> [ d, N, ? ]
+            var takeNextKey = false
+            _next = _instanceStates.keys.firstOrNull { key ->
+                if (takeNextKey) return@firstOrNull true
+
+                if (key == newDisplayed) {
+                    takeNextKey = true
+                }
+                false
+            }
+            _previous = _displayed
+            _displayed = newDisplayed
+
+            _instanceStates[newDisplayed]?.postUpdate()
+        }
+    }
 
     /**
      * Core `commonMain` abstraction for passing platform specific arguments
@@ -397,7 +483,7 @@ internal constructor(
     public abstract class InstanceState<C: Config>
     @ExperimentalKmpTorApi
     @Throws(IllegalStateException::class)
-    protected constructor(args: Args.Instance): TorServiceUIUtils(), FileID {
+    protected constructor(args: Args.Instance): FileID {
 
         init {
             args.initialize()
@@ -431,15 +517,10 @@ internal constructor(
         protected open fun onDestroy() {}
 
         /**
-         * Notifies the [AbstractTorServiceUI.onUpdate] that this instance had
+         * Notifies the [AbstractTorServiceUI.postStateChange] that this instance had
          * some sort of stateful change so that it may update the UI (if needed).
          * */
-        protected fun postStateChange() {
-            val ui = args.ui
-            val key = args.key
-            if (ui._instanceStates[key] != this) return
-            ui.onUpdate(key, UpdateType.Changed)
-        }
+        protected fun postStateChange() { args.ui.postStateChange(this) }
 
         /**
          * Exported functionality of [RuntimeEvent.EXECUTE.CMD.observeSignalNewNym]
@@ -485,6 +566,21 @@ internal constructor(
         public fun debug(lazyMessage: () -> String) {
             if (isDestroyed()) return
             args.debugger()?.invoke(lazyMessage)
+        }
+
+        /**
+         * Helper for exporting [synchronized] functionality to implementors
+         * for thread safety.
+         * */
+        protected class Lock {
+
+            @OptIn(InternalKmpTorApi::class)
+            private val lock = SynchronizedObject()
+
+            public fun <T: Any?> withLock(block: () -> T): T {
+                @OptIn(InternalKmpTorApi::class)
+                return synchronized(lock, block)
+            }
         }
 
         init {
@@ -580,27 +676,34 @@ internal constructor(
         val key = instance.fileIDKey() as FileIDKey
 
         @OptIn(InternalKmpTorApi::class)
-        val post = synchronized (instanceStatesLock) {
-            if (isDestroyed() || instance.isDestroyed()) return@synchronized false
+        synchronized (stateLock) {
+            if (isDestroyed() || instance.isDestroyed()) return@synchronized
 
-            if (_instanceStates.isEmpty()) {
-                _instanceStates = immutableMapOf(key to instance)
-                return@synchronized true
-            }
-
-            val i = _instanceStates[key]
-            if (i == instance) return@synchronized false
+            // Instance already added
+            if (_instanceStates[key] == instance) return@synchronized
 
             val m = LinkedHashMap<FileIDKey, IS>(_instanceStates.size + 1, 1.0f)
             m.putAll(_instanceStates)
             m[key] = instance
             _instanceStates = m.toImmutableMap()
 
-            true
-        }
+            val displayed = displayed
+            if (displayed == null) {
+                // First instance to be added
+                _displayed = key
 
-        if (!isDestroyed() && !instance.isDestroyed() && post) {
-            onUpdate(key, UpdateType.Added)
+                instance.postUpdate()
+                return@synchronized
+            }
+
+            if (_next == null) {
+                // Currently displayed instance was the last entry.
+                _next = key
+
+                displayed.postUpdate()
+            }
+
+            // No display changes
         }
     }
 
@@ -608,28 +711,133 @@ internal constructor(
         val key = instance.fileIDKey() as FileIDKey
 
         @OptIn(InternalKmpTorApi::class)
-        val post = synchronized(instanceStatesLock) {
-            val i = _instanceStates[key]
-            if (i != instance) return@synchronized false
+        synchronized(stateLock) {
+            // Instance not present
+            if (_instanceStates[key] != instance) return@synchronized
 
-            if (_instanceStates.size == 1) {
-                _instanceStates = emptyMap()
-            } else {
-                val m = LinkedHashMap<FileIDKey, IS>(_instanceStates.size - 1, 1.0f)
-                _instanceStates.forEach { entry ->
-                    if (entry.value != instance) {
-                        m[entry.key] = entry.value
+            val m = LinkedHashMap<FileIDKey, IS>(_instanceStates.size - 1, 1.0f).apply {
+                for ((k, v) in _instanceStates.entries) {
+                    if (v != instance) {
+                        put(k, v)
                     }
                 }
-                _instanceStates = m.toImmutableMap()
+            }.toImmutableMap()
+
+            val update = when (key) {
+                _previous -> {
+                    // Fine new previous
+                    var previousKey: FileIDKey? = null
+                    for (k in m.keys) {
+                        if (k == key) break
+                        previousKey = k
+                    }
+                    Executable {
+                        _previous = previousKey
+                    }
+                }
+                _displayed -> {
+                    val newDisplayed = _previous ?: _next
+
+                    if (newDisplayed == null) {
+                        // Was the only instance
+                        Executable {
+                            _displayed = null
+                        }
+                    } else {
+                        var newPrevious: FileIDKey? = null
+                        var newNext: FileIDKey? = null
+
+                        var displayFound = false
+                        for (k in m.keys) {
+                            if (k == newDisplayed) {
+                                displayFound = true
+                                continue
+                            }
+
+                            if (!displayFound) {
+                                newPrevious = k
+                                continue
+                            }
+
+                            if (newNext == null) {
+                                newNext = k
+                                break
+                            }
+                        }
+
+                        Executable {
+                            _previous = newPrevious
+                            _displayed = newDisplayed
+                            _next = newNext
+                        }
+                    }
+                }
+                _next -> {
+                    // Find new next
+                    var takeNextKey = false
+                    var newNext: FileIDKey? = null
+                    for (k in m.keys) {
+                        if (k == _displayed) {
+                            takeNextKey = true
+                            continue
+                        }
+
+                        if (takeNextKey) {
+                            newNext = k
+                            break
+                        }
+                    }
+
+                    Executable {
+                        _next = newNext
+                    }
+                }
+                else -> null
             }
 
-            true
+            _instanceStates = m
+            update?.execute()
+
+            if (update != null) {
+                displayed?.postUpdate()
+            }
+        }
+    }
+
+    private fun postStateChange(instance: InstanceState<*>) {
+        val key = instance.fileIDKey() as FileIDKey
+        _instanceStates[key]?.postUpdate()
+    }
+
+    private fun IS.postUpdate() {
+        if (_displayed != fileIDKey()) return
+        val instance = this
+
+        serviceChildScope.launch {
+            if (_displayed != fileIDKey()) return@launch
+            if (instance.isDestroyed()) return@launch
+            if (this@AbstractTorServiceUI.isDestroyed()) return@launch
+
+            ensureActive()
+
+            onUpdate(instance, hasPrevious, hasNext)
+        }
+    }
+
+    private class FileIDKey(override val fid: String): FileID {
+
+        override fun equals(other: Any?): Boolean {
+            return other is FileIDKey && other.fid == fid
         }
 
-        if (!isDestroyed() && post) {
-            onUpdate(key, UpdateType.Removed)
+        override fun hashCode(): Int {
+            var result = 17
+            result = result * 42 + this::class.hashCode()
+            result = result * 42 + fid.hashCode()
+            return result
         }
+
+        override fun toString(): String = toFIDString(includeHashCode = false)
     }
 
     private inner class InstanceArgs(
@@ -642,7 +850,7 @@ internal constructor(
         val processorTorCmd: () -> TorCmd.Unprivileged.Processor?,
     ): Args.Instance(instanceConfig, instanceScope) {
 
-        val key = FileIDKey.of(fid)
+        val key: FileID = FileIDKey(fid)
         val ui = this@AbstractTorServiceUI
     }
 

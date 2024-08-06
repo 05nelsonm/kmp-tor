@@ -17,7 +17,6 @@ package io.matthewnelson.kmp.tor.runtime.service
 
 import io.matthewnelson.kmp.tor.core.api.annotation.ExperimentalKmpTorApi
 import io.matthewnelson.kmp.tor.runtime.Action
-import io.matthewnelson.kmp.tor.runtime.FileID
 import io.matthewnelson.kmp.tor.runtime.RuntimeEvent
 import io.matthewnelson.kmp.tor.runtime.core.Disposable
 import io.matthewnelson.kmp.tor.runtime.core.OnEvent
@@ -50,14 +49,12 @@ class AbstractTorServiceUIUnitTest {
 
         val scope = serviceChildScope
 
-        val updates = mutableListOf<Pair<FileID, String>>()
+        val updates = mutableListOf<Triple<State, Boolean, Boolean>>()
 
-        val instanceStatesTest: Map<FileID, State> get() {
-            return instanceStates.toMap()
-        }
+        val instanceStatesTest: Collection<State> get() = instanceStates
 
-        protected override fun onUpdate(target: FileIDKey, type: UpdateType) {
-            updates.add(target to type.name)
+        protected override fun onUpdate(displayed: State, hasPrevious: Boolean, hasNext: Boolean) {
+            updates.add(Triple(displayed, hasPrevious, hasNext))
         }
 
         protected override fun onDestroy() {
@@ -231,25 +228,30 @@ class AbstractTorServiceUIUnitTest {
 
         ui.instanceStatesTest.let { instances ->
             assertEquals(1, instances.size)
-            assertEquals(instance, instances.values.first())
+            assertEquals(instance, instances.first())
         }
 
+        delayTest()
         assertEquals(1, ui.updates.size)
-        assertEquals("Added", ui.updates[0].second)
         assertEquals("abcde12345", ui.updates[0].first.fid)
 
         instance.postStateChangeTest()
+        delayTest()
         assertEquals(2, ui.updates.size)
-        assertEquals("Changed", ui.updates[1].second)
         assertEquals("abcde12345", ui.updates[1].first.fid)
 
         instanceJob.cancel()
-        assertEquals(3, ui.updates.size)
-        assertEquals("Removed", ui.updates[2].second)
-        assertEquals("abcde12345", ui.updates[2].first.fid)
+        delayTest()
+
+        // _displayed was set to null because this is the only instance
+        // and posting the state change will just return b/c instance
+        // key does not match _displayed.
+        assertEquals(2, ui.updates.size)
 
         assertTrue(ui.instanceStatesTest.isEmpty())
     }
+
+    private suspend fun delayTest() = delay(500)
 
     // overloaded with defaults for making tests simpler
     private fun TestUI.newTestInstanceState(
