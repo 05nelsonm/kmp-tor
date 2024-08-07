@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!--
+  * Copyright (c) 2024 Matthew Nelson
+  *
+  * Licensed under the Apache License, Version 2.0 (the "License");
+  * you may not use this file except in compliance with the License.
+  * You may obtain a copy of the License at
+  *
+  *     https://www.apache.org/licenses/LICENSE-2.0
+  *
+  * Unless required by applicable law or agreed to in writing, software
+  * distributed under the License is distributed on an "AS IS" BASIS,
+  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  * See the License for the specific language governing permissions and
+  * limitations under the License.
+  *-->
+<svg
+   width="256"
+   height="256"
+   viewBox="0 0 24 24"
+   fill="none"
+   stroke="#ffffff"
+   stroke-width="0.00024"
+   version="1.1"
+   id="svg1"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <defs
+     id="defs1" />
+  <g
+     transform="matrix(0.98635687,0,0,1.002023,0.3596511,-0.03966354)"
+     style="fill:#ffffff;fill-opacity:1">
+    <path
+       fill-rule="evenodd"
+       clip-rule="evenodd"
+       d="m 5.7280649,0.42946746 c 0.5196493,-0.51963595 1.3621482,-0.51963595 1.8817974,0 L 18.254855,11.074486 c 0.519609,0.51961 0.519609,1.362161 0,1.881772 L 7.6098623,23.601262 c -0.5196492,0.51961 -1.3621481,0.51961 -1.8817974,0 -0.519636,-0.519609 -0.519636,-1.36216 0,-1.881771 L 15.432198,12.015372 5.7280649,2.3112649 c -0.519636,-0.5196492 -0.519636,-1.36214819 0,-1.88179744 z"
+       fill="#ffffff"
+       id="path1"
+       style="fill:#ffffff;fill-opacity:1;stroke-width:0.00031935" />
+  </g>
+</svg>
