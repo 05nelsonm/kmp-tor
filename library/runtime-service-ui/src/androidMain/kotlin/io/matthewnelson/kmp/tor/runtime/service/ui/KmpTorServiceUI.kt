@@ -354,31 +354,31 @@ public class KmpTorServiceUI private constructor(
              * TODO
              * */
             @JvmField
-            public var iconActionNewNym: Int = android.R.drawable.ic_menu_add
+            public var iconActionNewNym: Int = R.drawable.ic_kmp_tor_ui_action_newnym
 
             /**
              * TODO
              * */
             @JvmField
-            public var iconActionRestart: Int = android.R.drawable.ic_media_play
+            public var iconActionRestart: Int = R.drawable.ic_kmp_tor_ui_action_restart
 
             /**
              * TODO
              * */
             @JvmField
-            public var iconActionStop: Int = android.R.drawable.ic_menu_delete
+            public var iconActionStop: Int = R.drawable.ic_kmp_tor_ui_action_stop
 
             /**
              * TODO
              * */
             @JvmField
-            public var iconActionPrevious: Int = android.R.drawable.ic_media_previous
+            public var iconActionPrevious: Int = R.drawable.ic_kmp_tor_ui_action_previous
 
             /**
              * TODO
              * */
             @JvmField
-            public var iconActionNext: Int = android.R.drawable.ic_media_next
+            public var iconActionNext: Int = R.drawable.ic_kmp_tor_ui_action_next
 
             /**
              * TODO
