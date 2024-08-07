@@ -21,7 +21,7 @@
     <style name="TextAppearance.KmpTorUI.Title" parent="@android:style/TextAppearance.Material.Notification.Title">
         <item name="android:textSize">14sp</item>
     </style>
-    <style name="Widget.KmpTorUI.NotificationAction" parent="">
+    <style name="Widget.KmpTorUI.NotificationActionImage" parent="">
         <!-- TODO: drawable ripple -->
         <item name="android:background">@null</item>
     </style>

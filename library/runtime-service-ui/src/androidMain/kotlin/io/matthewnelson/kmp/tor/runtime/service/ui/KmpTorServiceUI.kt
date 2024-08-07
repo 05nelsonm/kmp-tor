@@ -167,8 +167,6 @@ public class KmpTorServiceUI private constructor(
             INIT,
         )
 
-
-
         @KmpTorDsl
         public class Builder private constructor(
             @JvmField
@@ -236,8 +234,8 @@ public class KmpTorServiceUI private constructor(
      * e.g.
      *
      *     val factory = KmpTorServiceUI.Factory(
-     *         iconNetworkEnabled = myIconA,
-     *         iconNetworkDisabled = myIconB,
+     *         iconNetworkEnabled = R.drawable.my_icon_a,
+     *         iconNetworkDisabled = R.drawable.my_icon_b,
      *         info = TorServiceUI.NotificationInfo.of(
      *             // ...
      *         ),
@@ -543,7 +541,7 @@ public class KmpTorServiceUI private constructor(
     ) {
         val state = displayed.state
 
-        val content = RemoteViews(appContext.packageName, R.layout.kmp_tor_ui_notification)
+        val content = RemoteViews(appContext.packageName, R.layout.kmp_tor_ui)
 
         val iconRes = when (state.icon) {
             IconState.NetworkEnabled -> displayed.instanceConfig._iconNetworkEnabled

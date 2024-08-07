@@ -303,8 +303,8 @@ public open class TorServiceConfig private constructor(
      * e.g. (A Foreground Service using the `kmp-tor:runtime-service-ui` dependency)
      *
      *     val factory = KmpTorServiceUI.Factory(
-     *         iconNetworkEnabled = myIconA,
-     *         iconNetworkDisabled = myIconB,
+     *         iconNetworkEnabled = R.drawable.my_icon_a,
+     *         iconNetworkDisabled = R.drawable.my_icon_b,
      *         info = TorServiceUI.NotificationInfo.of(
      *             // ...
      *         ),
