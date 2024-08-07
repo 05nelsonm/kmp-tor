@@ -21,7 +21,6 @@
     android:orientation="vertical">
 
     <FrameLayout
-        android:id="@+id/kmp_tor_ui_container_content_title"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
@@ -47,7 +46,6 @@
     </FrameLayout>
 
     <FrameLayout
-        android:id="@+id/kmp_tor_ui_container_content_info"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 

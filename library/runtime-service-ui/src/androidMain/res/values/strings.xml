@@ -24,10 +24,6 @@
     <string name="kmp_tor_action_start">Starting…</string>
     <string name="kmp_tor_action_stop">Stopping…</string>
 
-    <string name="kmp_tor_notification_action_newnym">New Identity</string>
-    <string name="kmp_tor_notification_action_restart">Restart</string>
-    <string name="kmp_tor_notification_action_stop">Stop</string>
-
     <!-- percent sign injected for 2nd argument b/c formatter freaks out
          %1$d = digit (e.g. 25)
          %2$s = "%" (percent sign character)
@@ -47,4 +43,7 @@
     <!-- DEPRECATED - kmp-tor 1.x.x -->
     <string name="kmp_tor_bootstrapped">Bootstrapped</string>
     <string name="kmp_tor_newnym_no_network">No network. Cannot request a new identity</string>
+    <string name="kmp_tor_notification_action_newnym">New Identity</string>
+    <string name="kmp_tor_notification_action_restart">Restart Tor</string>
+    <string name="kmp_tor_notification_action_stop">Stop Tor</string>
 </resources>
