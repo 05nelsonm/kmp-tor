@@ -22,7 +22,6 @@ import io.matthewnelson.kmp.file.IOException
 import io.matthewnelson.kmp.tor.core.api.ResourceInstaller
 import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
 import io.matthewnelson.kmp.tor.runtime.ConfigBuilderCallback
-import io.matthewnelson.kmp.tor.runtime.ConfigBuilderCallback.Companion.putDefaults
 import io.matthewnelson.kmp.tor.runtime.FileID
 import io.matthewnelson.kmp.tor.runtime.FileID.Companion.toFIDString
 import io.matthewnelson.kmp.tor.runtime.RuntimeEvent.*
@@ -79,8 +78,7 @@ internal class TorConfigGenerator internal constructor(
 
         // Apply library consumers' configuration(s)
         config.forEach { block -> apply(environment, block) }
-
-        putDefaults(environment, paths)
+        apply(environment, ConfigBuilderCallback.Defaults.of(paths))
     }
 
     private suspend fun TorConfig.validateTCPPorts(

@@ -41,18 +41,20 @@ import kotlin.jvm.JvmSynthetic
  * */
 public fun interface ConfigBuilderCallback: ThisBlock.WithIt<TorConfig.Builder, TorRuntime.Environment> {
 
-    public companion object {
+    /**
+     * After all [ConfigBuilderCallback] have been applied, defaults
+     * are applied in order to ensure minimum settings required for
+     * [TorRuntime] are had.
+     * */
+    public class Defaults private constructor(
+        private val paths: ResourceInstaller.Paths.Tor,
+    ): ConfigBuilderCallback {
 
-        /**
-         * After all [ConfigBuilderCallback] have been applied, this is called
-         * in order to ensure minimum settings required for [TorRuntime] are had.
-         * */
-        @JvmSynthetic
         @OptIn(InternalKmpTorApi::class)
-        internal fun TorConfig.Builder.putDefaults(
-            environment: TorRuntime.Environment,
-            paths: ResourceInstaller.Paths.Tor,
-        ) {
+        public override fun TorConfig.Builder.invoke(it: TorRuntime.Environment) {
+            @Suppress("UnnecessaryVariable", "RedundantSuppression")
+            val environment = it
+
             // Dirs/Files
             if (!environment.omitGeoIPFileSettings) {
                 put(TorConfig.GeoIPFile) { file = paths.geoip }
@@ -151,6 +153,14 @@ public fun interface ConfigBuilderCallback: ThisBlock.WithIt<TorConfig.Builder, 
             put(TorConfig.RunAsDaemon) { enable = false }
             put(TorConfig.__OwningControllerProcess) { /* default */ }
             put(TorConfig.__ReloadTorrcOnSIGHUP) { reload = false }
+        }
+
+        internal companion object {
+            
+            @JvmSynthetic
+            internal fun of(
+                paths: ResourceInstaller.Paths.Tor,
+            ): Defaults = Defaults(paths)
         }
     }
 }
