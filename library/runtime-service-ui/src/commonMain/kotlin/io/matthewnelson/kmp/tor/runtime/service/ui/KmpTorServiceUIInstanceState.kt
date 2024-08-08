@@ -196,7 +196,7 @@ public class KmpTorServiceUIInstanceState<C: AbstractKmpTorServiceUIConfig> priv
 
                         Progress.None
                     }
-                    !new.daemon.isBootstrapped && new.network.isEnabled -> {
+                    !new.daemon.isBootstrapped -> {
                         Progress.Determinant(new.daemon)
                     }
                     _state.text is ContentAction -> {
