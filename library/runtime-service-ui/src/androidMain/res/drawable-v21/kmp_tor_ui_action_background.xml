@@ -14,11 +14,15 @@
   * See the License for the specific language governing permissions and
   * limitations under the License.
   *-->
-<resources>
-    <style name="TextAppearance.KmpTorUI" parent="@android:style/TextAppearance.Material.Notification" />
-    <style name="TextAppearance.KmpTorUI.Info" parent="@android:style/TextAppearance.Material.Notification.Info" />
-    <style name="TextAppearance.KmpTorUI.Time" parent="@android:style/TextAppearance.Material.Notification.Time" />
-    <style name="TextAppearance.KmpTorUI.Title" parent="@android:style/TextAppearance.Material.Notification.Title">
-        <item name="android:textSize">14sp</item>
-    </style>
-</resources>
+<ripple
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:color="#ffffff">
+    <item>
+        <inset android:inset="4dp">
+            <shape android:shape="rectangle">
+                <corners android:radius="64dp" />
+                <solid android:color="#000000" />
+            </shape>
+        </inset>
+    </item>
+</ripple>

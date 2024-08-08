@@ -25,12 +25,11 @@
 
     <ImageView
         android:id="@+id/kmp_tor_ui_action_image"
-        android:layout_width="@dimen/kmp_tor_ui_action_icon_width"
-        android:layout_height="@dimen/kmp_tor_ui_action_icon_height"
-        android:padding="@dimen/kmp_tor_ui_action_icon_padding"
+        android:layout_width="@dimen/kmp_tor_ui_action_image_width"
+        android:layout_height="@dimen/kmp_tor_ui_action_image_height"
+        android:padding="@dimen/kmp_tor_ui_action_image_padding"
         android:scaleType="centerInside"
-        style="@style/Widget.KmpTorUI.NotificationActionImage"
-        tools:background="@android:color/holo_green_light"
+        android:background="@drawable/kmp_tor_ui_action_background"
         tools:src="@drawable/ic_kmp_tor_ui_action_newnym"
         tools:ignore="ContentDescription" />
 

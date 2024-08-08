@@ -41,14 +41,14 @@
     </LinearLayout>
 
     <LinearLayout
-        android:id="@+id/kmp_tor_ui_container_actions_cycle"
+        android:id="@+id/kmp_tor_ui_container_actions_selector"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="end"
         android:orientation="vertical">
 
         <LinearLayout
-            android:id="@+id/kmp_tor_ui_actions_load_cycle"
+            android:id="@+id/kmp_tor_ui_actions_load_selector"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="end"
@@ -61,11 +61,11 @@
             tools:layout_width="64dp"
             tools:layout_height="32dp">
 
-            <!-- Cycle Actions added here -->
+            <!-- Selector Actions added here -->
         </LinearLayout>
 
         <TextView
-            android:id="@+id/kmp_tor_ui_actions_cycle_text"
+            android:id="@+id/kmp_tor_ui_actions_selector_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="end"

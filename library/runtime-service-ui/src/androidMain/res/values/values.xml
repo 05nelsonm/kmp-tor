@@ -18,12 +18,12 @@
     <!-- Action Icon size and positioning can be adjusted by overriding, if necessary -->
     <dimen name="kmp_tor_ui_action_width">48dp</dimen>
     <dimen name="kmp_tor_ui_action_height">48dp</dimen>
-    <dimen name="kmp_tor_ui_action_icon_width">40dp</dimen>
-    <dimen name="kmp_tor_ui_action_icon_height">40dp</dimen>
-    <dimen name="kmp_tor_ui_action_icon_padding">12dp</dimen>
+    <dimen name="kmp_tor_ui_action_image_width">40dp</dimen>
+    <dimen name="kmp_tor_ui_action_image_height">40dp</dimen>
+    <dimen name="kmp_tor_ui_action_image_padding">12dp</dimen>
     <dimen name="kmp_tor_ui_action_list_divider_padding">12dp</dimen>
-    <dimen name="kmp_tor_ui_action_container_margin_start">-15dp</dimen>
-    <dimen name="kmp_tor_ui_action_container_margin_end">-19dp</dimen>
+    <dimen name="kmp_tor_ui_action_container_margin_start">-8dp</dimen>
+    <dimen name="kmp_tor_ui_action_container_margin_end">-8dp</dimen>
 
     <style name="TextAppearance.KmpTorUI" parent="@android:style/TextAppearance.StatusBar.EventContent" />
     <style name="TextAppearance.KmpTorUI.Info">
@@ -37,8 +37,5 @@
     </style>
     <style name="TextAppearance.KmpTorUI.Title" parent="@android:style/TextAppearance.StatusBar.EventContent.Title">
         <item name="android:textSize">14sp</item>
-    </style>
-    <style name="Widget.KmpTorUI.NotificationActionImage" parent="">
-        <item name="android:background">@null</item>
     </style>
 </resources>

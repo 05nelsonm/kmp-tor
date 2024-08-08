@@ -35,7 +35,7 @@ public final class io/matthewnelson/kmp/tor/runtime/service/ui/DisplayName$Text$
 
 public final class io/matthewnelson/kmp/tor/runtime/service/ui/KmpTorServiceUI : io/matthewnelson/kmp/tor/runtime/service/TorServiceUI {
 	public synthetic fun <init> (Lio/matthewnelson/kmp/tor/runtime/service/ui/KmpTorServiceUI$NotificationAction$Icons;Ljava/lang/String;ILkotlin/jvm/functions/Function2;Lio/matthewnelson/kmp/tor/runtime/service/TorServiceUI$Args;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
-	public synthetic fun newInstanceStateProtected (Lio/matthewnelson/kmp/tor/runtime/service/AbstractTorServiceUI$Args$Instance;)Lio/matthewnelson/kmp/tor/runtime/service/AbstractTorServiceUI$InstanceState;
+	public synthetic fun createProtected (Lio/matthewnelson/kmp/tor/runtime/service/AbstractTorServiceUI$Args$Instance;)Lio/matthewnelson/kmp/tor/runtime/service/AbstractTorServiceUI$InstanceState;
 	public synthetic fun onUpdate (Lio/matthewnelson/kmp/tor/runtime/service/AbstractTorServiceUI$InstanceState;ZZ)V
 }
 
@@ -72,7 +72,7 @@ public final class io/matthewnelson/kmp/tor/runtime/service/ui/KmpTorServiceUI$F
 	public final field iconActionStop I
 	public fun <init> (IILio/matthewnelson/kmp/tor/runtime/service/TorServiceUI$NotificationInfo;)V
 	public fun <init> (IILio/matthewnelson/kmp/tor/runtime/service/TorServiceUI$NotificationInfo;Lio/matthewnelson/kmp/tor/runtime/core/ThisBlock;)V
-	public synthetic fun newInstanceUIProtected (Lio/matthewnelson/kmp/tor/runtime/service/AbstractTorServiceUI$Args$UI;)Lio/matthewnelson/kmp/tor/runtime/service/AbstractTorServiceUI;
+	public synthetic fun createProtected (Lio/matthewnelson/kmp/tor/runtime/service/AbstractTorServiceUI$Args$UI;)Lio/matthewnelson/kmp/tor/runtime/service/AbstractTorServiceUI;
 	public fun validate (Landroid/content/Context;)V
 	public synthetic fun validateConfig (Landroid/content/Context;Lio/matthewnelson/kmp/tor/runtime/service/AbstractTorServiceUI$Config;)V
 	public fun validateConfig (Landroid/content/Context;Lio/matthewnelson/kmp/tor/runtime/service/ui/KmpTorServiceUI$Config;)V

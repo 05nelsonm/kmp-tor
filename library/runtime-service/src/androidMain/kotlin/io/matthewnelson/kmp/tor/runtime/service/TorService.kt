@@ -253,7 +253,7 @@ internal class TorService internal constructor(): Service() {
                         )
 
                         val ui = try {
-                            conn.config.factory.newInstanceUI(args)
+                            conn.config.factory.create(args)
                         } catch (e: IllegalStateException) {
                             // Implementation of TorServiceUI.Factory is bad.
                             // Report error and shutdown TorService.
@@ -389,7 +389,7 @@ internal class TorService internal constructor(): Service() {
                 }
 
                 val pair = try {
-                    ui.newInstanceState(
+                    ui.create(
                         conn.instanceUIConfig,
                         binder.fid,
                         debugger = debugger@ {

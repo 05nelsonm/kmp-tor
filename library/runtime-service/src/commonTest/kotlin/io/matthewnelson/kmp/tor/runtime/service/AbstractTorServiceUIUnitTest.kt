@@ -66,7 +66,7 @@ class AbstractTorServiceUIUnitTest {
             invocationOnDestroy++
         }
 
-        protected override fun newInstanceStateProtected(
+        protected override fun createProtected(
             args: AbstractTorServiceUI.Args.Instance
         ): State {
             val callback = newInstanceState
@@ -103,7 +103,7 @@ class AbstractTorServiceUIUnitTest {
             init,
         ) {
 
-            public override fun newInstanceUIProtected(args: Args): TestUI {
+            public override fun createProtected(args: Args): TestUI {
                 return TestUI(args, newInstanceState = args.newInstanceState)
             }
         }
@@ -164,22 +164,22 @@ class AbstractTorServiceUIUnitTest {
         run {
             val args = TestUI.Args(config, this)
             val factory = TestUI.Factory(config)
-            factory.newInstanceUI(args)
+            factory.create(args)
 
             assertFailsWith<IllegalStateException> { args.initialize() }
-            assertFailsWith<IllegalStateException> { factory.newInstanceUI(args) }
+            assertFailsWith<IllegalStateException> { factory.create(args) }
         }
 
         run {
             val other = TestUI(TestUI.Args(config, this))
             val factory = object : TestUI.Factory(config) {
-                override fun newInstanceUIProtected(args: TestUI.Args): TestUI {
+                override fun createProtected(args: TestUI.Args): TestUI {
                     return other
                 }
             }
 
             val otherArgs = TestUI.Args(config, this)
-            assertFailsWith<IllegalStateException> { factory.newInstanceUI(otherArgs) }
+            assertFailsWith<IllegalStateException> { factory.create(otherArgs) }
             assertFailsWith<IllegalStateException> { otherArgs.initialize() }
         }
     }
@@ -187,7 +187,7 @@ class AbstractTorServiceUIUnitTest {
     @Test
     fun givenFactory_whenNewUI_thenOnDestroyCallbackSet() = runTest {
         val factory = TestUI.Factory(config)
-        val instance = factory.newInstanceUI(TestUI.Args(config, this))
+        val instance = factory.create(TestUI.Args(config, this))
 
         assertTrue(instance.scope.isActive)
         assertFalse(instance.isDestroyed())
@@ -205,7 +205,7 @@ class AbstractTorServiceUIUnitTest {
         var iArgs: AbstractTorServiceUI.Args.Instance? = null
 
         val factory = TestUI.Factory(config)
-        val ui = factory.newInstanceUI(TestUI.Args(config, this, newInstanceState = { args ->
+        val ui = factory.create(TestUI.Args(config, this, newInstanceState = { args ->
             iArgs = args
             state ?: TestUI.State(args)
         }))
@@ -232,7 +232,7 @@ class AbstractTorServiceUIUnitTest {
     @Test
     fun givenUI_whenInstanceState_thenDispatchesUpdatesToUI() = runTest {
         val factory = TestUI.Factory(config)
-        val ui = factory.newInstanceUI(TestUI.Args(config, this))
+        val ui = factory.create(TestUI.Args(config, this))
         val (instanceJob, instance) = ui.newTestInstanceState(fid = "abcde12345")
 
         ui.instanceStatesTest.let { instances ->
@@ -263,7 +263,7 @@ class AbstractTorServiceUIUnitTest {
     @Test
     fun givenUI_whenMultipleInstanceStates_thenUpdatesHasPreviousOrNextAsExpected() = runTest {
         val factory = TestUI.Factory(config)
-        val ui = factory.newInstanceUI(TestUI.Args(config, this))
+        val ui = factory.create(TestUI.Args(config, this))
 
         val numInstances = 5
         val instances = mutableListOf<Pair<Job, TestUI.State>>()
@@ -382,7 +382,7 @@ class AbstractTorServiceUIUnitTest {
         observeSignalNewNym: (String?, OnEvent.Executor?, OnEvent<String?>) -> Disposable.Once? = { _, _, _ -> null },
         processorAction: () -> Action.Processor? = { null },
         processorTorCmd: () -> TorCmd.Unprivileged.Processor? = { null },
-    ): Pair<CompletableJob, TestUI.State> = newInstanceState(
+    ): Pair<CompletableJob, TestUI.State> = create(
         instanceConfig,
         fid,
         debugger,

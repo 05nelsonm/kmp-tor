@@ -473,7 +473,7 @@ public class KmpTorServiceUI private constructor(
             }
         }
 
-        protected override fun newInstanceUIProtected(
+        protected override fun createProtected(
             args: Args,
         ): KmpTorServiceUI = KmpTorServiceUI(
             actionIcons,
@@ -646,7 +646,7 @@ public class KmpTorServiceUI private constructor(
         text: String,
     ): Pair<Boolean, RemoteViews?> {
         removeAllViews(R.id.kmp_tor_ui_actions_load_instance)
-        removeAllViews(R.id.kmp_tor_ui_actions_load_cycle)
+        removeAllViews(R.id.kmp_tor_ui_actions_load_selector)
 
 
         val showCycleActions = hasPrevious || hasNext
@@ -676,7 +676,7 @@ public class KmpTorServiceUI private constructor(
         }
 
         contentTarget.applyInstanceActions(state, showInstanceActions)
-        contentTarget.applyCycleActions(displayName, hasPrevious, hasNext, showCycleActions)
+        contentTarget.applySelectorActions(displayName, hasPrevious, hasNext, showCycleActions)
 
         return true to expandedApi23
     }
@@ -696,7 +696,7 @@ public class KmpTorServiceUI private constructor(
                     ButtonAction.StopTor -> NotificationAction.Stop
                 }
 
-                view.setOnClickPendingIntent(R.id.kmp_tor_ui_action, pendingIntents[nAction])
+                view.setOnClickPendingIntent(R.id.kmp_tor_ui_action_image, pendingIntents[nAction])
                 view.setImageViewResource(R.id.kmp_tor_ui_action_image, actionIcons[nAction].id)
             }
 
@@ -708,15 +708,15 @@ public class KmpTorServiceUI private constructor(
         setViewVisibility(R.id.kmp_tor_ui_actions_load_instance, visibility)
     }
 
-    private fun RemoteViews.applyCycleActions(
+    private fun RemoteViews.applySelectorActions(
         displayName: String,
         hasPrevious: Boolean,
         hasNext: Boolean,
-        showCycleActions: Boolean,
+        showSelectorActions: Boolean,
     ) {
-        val visibility = if (showCycleActions) {
-            setTextViewText(R.id.kmp_tor_ui_actions_cycle_text, displayName)
-            setOnClickPendingIntent(R.id.kmp_tor_ui_actions_cycle_text, appContext.noOpPendingIntent())
+        val visibility = if (showSelectorActions) {
+            setTextViewText(R.id.kmp_tor_ui_actions_selector_text, displayName)
+            setOnClickPendingIntent(R.id.kmp_tor_ui_actions_selector_text, appContext.noOpPendingIntent())
 
             listOf(
                 NotificationAction.Previous to hasPrevious,
@@ -725,7 +725,7 @@ public class KmpTorServiceUI private constructor(
                 val layoutId = if (enable) R.layout.kmp_tor_ui_action_enabled else R.layout.kmp_tor_ui_action_disabled
 
                 val view = RemoteViews(appContext.packageName, layoutId)
-                addView(R.id.kmp_tor_ui_actions_load_cycle, view)
+                addView(R.id.kmp_tor_ui_actions_load_selector, view)
 
                 val pIntent = if (enable) pendingIntents[action] else appContext.noOpPendingIntent()
 
@@ -738,7 +738,7 @@ public class KmpTorServiceUI private constructor(
             View.GONE
         }
 
-        setViewVisibility(R.id.kmp_tor_ui_container_actions_cycle, visibility)
+        setViewVisibility(R.id.kmp_tor_ui_container_actions_selector, visibility)
     }
 
     protected override fun onDestroy() {
@@ -747,7 +747,7 @@ public class KmpTorServiceUI private constructor(
         pendingIntents.destroy()
     }
 
-    protected override fun newInstanceStateProtected(
+    protected override fun createProtected(
         args: AbstractTorServiceUI.Args.Instance,
     ): KmpTorServiceUIInstanceState<Config> = KmpTorServiceUIInstanceState.of(
         args,
@@ -829,6 +829,8 @@ public class KmpTorServiceUI private constructor(
                     )
                 }
                 NotificationAction.Restart -> {
+                    if (keyguardHandler.isDeviceLocked()) return@Receiver
+
                     displayed?.processorAction()?.enqueue(
                         Action.RestartDaemon,
                         OnFailure.noOp(),
@@ -836,6 +838,8 @@ public class KmpTorServiceUI private constructor(
                     )
                 }
                 NotificationAction.Stop -> {
+                    if (keyguardHandler.isDeviceLocked()) return@Receiver
+
                     displayed?.processorAction()?.enqueue(
                         Action.StopDaemon,
                         OnFailure.noOp(),
