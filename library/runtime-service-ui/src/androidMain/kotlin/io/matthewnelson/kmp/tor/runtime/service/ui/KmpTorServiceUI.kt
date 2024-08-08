@@ -651,11 +651,10 @@ public class KmpTorServiceUI private constructor(
         removeAllViews(R.id.kmp_tor_ui_actions_load_selector)
 
 
-        val showCycleActions = hasPrevious || hasNext
         val showInstanceActions = state.actions.isNotEmpty()
-        val showActions = showInstanceActions || showCycleActions
+        val showSelectorActions = hasPrevious || hasNext
 
-        if (!showActions) return false to null
+        if (!showInstanceActions && !showSelectorActions) return false to null
 
         var expandedApi23: RemoteViews? = null
 
@@ -677,14 +676,18 @@ public class KmpTorServiceUI private constructor(
             clone
         }
 
-        contentTarget.applyInstanceActions(state, showInstanceActions)
-        contentTarget.applySelectorActions(displayName, hasPrevious, hasNext, showCycleActions)
+        contentTarget.applyInstanceActions(showInstanceActions, state)
+        contentTarget.applySelectorActions(showSelectorActions, displayName, hasPrevious, hasNext)
 
         return true to expandedApi23
     }
 
-    private fun RemoteViews.applyInstanceActions(state: UIState, showInstanceActions: Boolean) {
+    private fun RemoteViews.applyInstanceActions(showInstanceActions: Boolean, state: UIState) {
         val visibility = if (showInstanceActions) {
+            if (pendingIntents.contentIntent != null) {
+                setOnClickPendingIntent(R.id.kmp_tor_ui_actions_load_instance, appContext.noOpPendingIntent())
+            }
+
             state.actions.forEach { btnAction ->
                 val view = RemoteViews(appContext.packageName, R.layout.kmp_tor_ui_action_enabled)
                 addView(R.id.kmp_tor_ui_actions_load_instance, view)
@@ -708,14 +711,17 @@ public class KmpTorServiceUI private constructor(
     }
 
     private fun RemoteViews.applySelectorActions(
+        showSelectorActions: Boolean,
         displayName: String,
         hasPrevious: Boolean,
         hasNext: Boolean,
-        showSelectorActions: Boolean,
     ) {
         val visibility = if (showSelectorActions) {
+            if (pendingIntents.contentIntent != null) {
+                setOnClickPendingIntent(R.id.kmp_tor_ui_actions_load_instance, appContext.noOpPendingIntent())
+                setOnClickPendingIntent(R.id.kmp_tor_ui_actions_selector_text, appContext.noOpPendingIntent())
+            }
             setTextViewText(R.id.kmp_tor_ui_actions_selector_text, displayName)
-            setOnClickPendingIntent(R.id.kmp_tor_ui_actions_selector_text, appContext.noOpPendingIntent())
 
             listOf(
                 NotificationAction.Previous to hasPrevious,
