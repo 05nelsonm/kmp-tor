@@ -534,12 +534,20 @@ public class KmpTorServiceUI private constructor(
         }
     }
 
+    private var current: Triple<UIState, Boolean, Boolean>? = null
+
     protected override fun onUpdate(
         displayed: KmpTorServiceUIInstanceState<Config>,
         hasPrevious: Boolean,
         hasNext: Boolean,
     ) {
         val state = displayed.state
+
+        // TODO: Duration on API 23- needs to handled
+        Triple(state, hasPrevious, hasNext).let { new ->
+            if (new == current) return
+            current = new
+        }
 
         val content = RemoteViews(appContext.packageName, R.layout.kmp_tor_ui)
 
@@ -581,9 +589,7 @@ public class KmpTorServiceUI private constructor(
         }.post()
     }
 
-    private fun RemoteViews.applyHeader(
-        iconRes: DrawableRes,
-    ) {
+    private fun RemoteViews.applyHeader(iconRes: DrawableRes) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) return
         // API 23-
 
@@ -602,11 +608,7 @@ public class KmpTorServiceUI private constructor(
         setTextViewText(R.id.kmp_tor_ui_header_duration, durationText)
     }
 
-    private fun RemoteViews.applyContent(
-        state: UIState,
-        title: String,
-        text: String,
-    ) {
+    private fun RemoteViews.applyContent(state: UIState, title: String, text: String) {
         setTextViewText(R.id.kmp_tor_ui_content_title_state, title)
 
         val (progressVisibility, progressParams) = when (state.progress) {
@@ -681,10 +683,7 @@ public class KmpTorServiceUI private constructor(
         return true to expandedApi23
     }
 
-    private fun RemoteViews.applyInstanceActions(
-        state: UIState,
-        showInstanceActions: Boolean,
-    ) {
+    private fun RemoteViews.applyInstanceActions(state: UIState, showInstanceActions: Boolean) {
         val visibility = if (showInstanceActions) {
             state.actions.forEach { btnAction ->
                 val view = RemoteViews(appContext.packageName, R.layout.kmp_tor_ui_action_enabled)
