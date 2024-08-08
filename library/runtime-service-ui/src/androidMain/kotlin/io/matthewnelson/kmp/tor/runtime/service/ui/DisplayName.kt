@@ -51,8 +51,8 @@ public sealed class DisplayName private constructor() {
             @JvmStatic
             @Throws(IllegalArgumentException::class)
             public fun of(text: String): Text {
-                require(text.length in 1..25) {
-                    "text must be between 1 and 25 characters in length"
+                require(text.length in 1..50) {
+                    "text must be between 1 and 50 characters in length"
                 }
                 require(text.isNotBlank()) {
                     "text cannot be blank"
