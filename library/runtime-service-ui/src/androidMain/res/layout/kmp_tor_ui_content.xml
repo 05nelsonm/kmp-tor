@@ -56,7 +56,7 @@
             android:layout_gravity="top"
             android:indeterminateOnly="false"
             android:visibility="gone"
-            style="@android:style/Widget.DeviceDefault.ProgressBar.Horizontal"
+            style="@style/Widget.KmpTorUI.ProgressBar"
             tools:visibility="visible"
             tools:max="100"
             tools:progress="50" />

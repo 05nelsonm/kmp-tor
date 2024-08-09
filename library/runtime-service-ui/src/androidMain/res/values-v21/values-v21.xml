@@ -21,4 +21,9 @@
     <style name="TextAppearance.KmpTorUI.Title" parent="@android:style/TextAppearance.Material.Notification.Title">
         <item name="android:textSize">14sp</item>
     </style>
+    <style name="Widget.KmpTorUI.ProgressBar" parent="@android:style/Widget.Material.Light.ProgressBar.Horizontal">
+        <item name="android:progressTint">?android:attr/textColorSecondaryInverse</item>
+        <item name="android:progressBackgroundTint">?android:attr/textColorSecondaryInverse</item>
+        <item name="android:indeterminateTint">?android:attr/textColorSecondaryInverse</item>
+    </style>
 </resources>
