@@ -34,8 +34,8 @@ import kotlin.time.Duration.Companion.seconds
 class KmpTorServiceUITest {
 
     private val factory = KmpTorServiceUI.Factory(
-        iconNetworkEnabled = android.R.drawable.stat_notify_chat,
-        iconNetworkDisabled = android.R.drawable.stat_notify_more,
+        iconReady = android.R.drawable.stat_notify_chat,
+        iconNotReady = android.R.drawable.stat_notify_more,
         info = TorServiceUI.NotificationInfo.of(
             channelID = "Tor Channel ID",
             channelName = "Tor Channel Name",
@@ -47,7 +47,7 @@ class KmpTorServiceUITest {
             // TODO
 
             defaultConfig {
-                iconDataXfer = android.R.drawable.stat_notify_sync_noanim
+                iconData = android.R.drawable.stat_notify_sync_noanim
                 enableActionStop = true
                 enableActionRestart = true
                 displayName = DisplayName.Text.of("testing...")
