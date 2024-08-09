@@ -15,22 +15,20 @@
   * limitations under the License.
   *-->
 <resources>
-    <!-- Action Icon size and positioning can be adjusted by overriding, if necessary -->
-    <dimen name="kmp_tor_ui_action_width">48dp</dimen>
-    <dimen name="kmp_tor_ui_action_height">48dp</dimen>
-    <dimen name="kmp_tor_ui_action_image_width">40dp</dimen>
-    <dimen name="kmp_tor_ui_action_image_height">40dp</dimen>
+    <!-- TODO: Use static values & set programmatically -->
+    <dimen name="kmp_tor_ui_action_size">48dp</dimen>
+    <dimen name="kmp_tor_ui_action_image_size">40dp</dimen>
     <dimen name="kmp_tor_ui_action_image_padding">12dp</dimen>
     <dimen name="kmp_tor_ui_action_list_divider_padding">12dp</dimen>
-    <dimen name="kmp_tor_ui_action_container_margin_start">-8dp</dimen>
-    <dimen name="kmp_tor_ui_action_container_margin_end">-8dp</dimen>
+    <dimen name="kmp_tor_ui_action_container_margin_start">-15dp</dimen>
+    <dimen name="kmp_tor_ui_action_container_margin_end">-19dp</dimen>
 
     <style name="TextAppearance.KmpTorUI" parent="@android:style/TextAppearance.StatusBar.EventContent" />
     <style name="TextAppearance.KmpTorUI.Info">
         <item name="android:textSize">12sp</item>
         <item name="android:textColor">?android:attr/textColorSecondary</item>
     </style>
-    <style name="TextAppearance.KmpTorUI.Line2" parent="TextAppearance.KmpTorUI.Info" />
+    <style name="TextAppearance.KmpTorUI.Text" parent="TextAppearance.KmpTorUI.Info" />
     <style name="TextAppearance.KmpTorUI.Time">
         <item name="android:textSize">12sp</item>
         <item name="android:textColor">?android:attr/textColorSecondary</item>

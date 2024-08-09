@@ -70,7 +70,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="end"
             android:textStyle="bold"
-            style="@style/TextAppearance.KmpTorUI.Line2"
+            style="@style/TextAppearance.KmpTorUI.Text"
             tools:text="[0A17…755C]" />
 
     </LinearLayout>

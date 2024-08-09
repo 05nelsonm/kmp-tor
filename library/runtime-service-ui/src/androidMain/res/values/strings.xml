@@ -40,10 +40,14 @@
     -->
     <string name="kmp_tor_newnym_rate_limited">Rate limiting NewIdentity: delaying by %ds</string>
 
-    <!-- DEPRECATED - kmp-tor 1.x.x -->
+    <!-- {@deprecated Use kmp_tor_bootstrapped_formated.} -->
     <string name="kmp_tor_bootstrapped">Bootstrapped</string>
+    <!-- {@deprecated No longer in use.} -->
     <string name="kmp_tor_newnym_no_network">No network. Cannot request a new identity</string>
+    <!-- {@deprecated No longer in use.} -->
     <string name="kmp_tor_notification_action_newnym">New Identity</string>
+    <!-- {@deprecated No longer in use.} -->
     <string name="kmp_tor_notification_action_restart">Restart Tor</string>
+    <!-- {@deprecated No longer in use.} -->
     <string name="kmp_tor_notification_action_stop">Stop Tor</string>
 </resources>
