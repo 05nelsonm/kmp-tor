@@ -21,12 +21,11 @@
     android:orientation="horizontal"
     android:paddingBottom="4dp">
 
-    <!-- TODO: Circle background -->
     <ImageView
         android:id="@+id/kmp_tor_ui_header_icon"
         android:layout_width="20dp"
         android:layout_height="20dp"
-        android:scaleType="center"
+        android:scaleType="centerInside"
         tools:src="@android:drawable/stat_notify_chat"
         tools:ignore="ContentDescription" />
 

@@ -61,14 +61,14 @@ import kotlin.time.toDuration
  * */
 @OptIn(ExperimentalKmpTorApi::class)
 public class KmpTorServiceUI private constructor(
-    private val actionIcons: UIAction.Icons,
+    actionIcons: UIAction.Icons,
     actionIntentPermissionSuffix: String?,
     contentIntentCode: Int,
     contentIntent: (code: Int, context: Context) -> PendingIntent?,
-    args: Args
+    args: Args,
 ): TorServiceUI<
     KmpTorServiceUI.Config,
-    KmpTorServiceUIInstanceState<KmpTorServiceUI.Config>
+    KmpTorServiceUIInstanceState<KmpTorServiceUI.Config>,
 >(args) {
 
     /**
@@ -478,9 +478,17 @@ public class KmpTorServiceUI private constructor(
 
     private val appLabel = appContext.applicationInfo.loadLabel(appContext.packageManager)
     private val startTime = SystemClock.elapsedRealtime()
+    private val uiColor = UIColor.of(appContext)
 
     private val keyguardHandler = KeyguardHandler()
     private val pendingIntents = PendingIntents(actionIntentPermissionSuffix, contentIntentCode, contentIntent)
+    private val actionCache = UIAction.View.Cache.of(appContext, actionIcons) { action ->
+        if (action != null) {
+            pendingIntents[action]
+        } else {
+            appContext.noOpPendingIntent()
+        }
+    }
 
     private val builder = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
         Notification.Builder(appContext, channelID)
@@ -543,12 +551,17 @@ public class KmpTorServiceUI private constructor(
             current = new
         }
 
+        val pallet = uiColor[state.color]
         val iconRes = when (state.icon) {
             IconState.NetworkEnabled -> displayed.instanceConfig._iconReady
             IconState.NetworkDisabled -> displayed.instanceConfig._iconNotReady
             IconState.Data -> displayed.instanceConfig._iconData
         }
+
         builder.setSmallIcon(iconRes.id)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            builder.setColor(pallet.notNight.defaultColor)
+        }
 
         val content = RemoteViews(appContext.packageName, R.layout.kmp_tor_ui)
 
@@ -560,9 +573,9 @@ public class KmpTorServiceUI private constructor(
             is DisplayName.Text -> n.text
         }
 
-        content.applyHeader(iconRes)
-        content.applyContent(state, title, text)
-        val (showActions, expandedApi23) = content.applyActions(state, displayName, hasPrevious, hasNext, text)
+        content.applyHeader(pallet, iconRes)
+        content.applyContent(pallet, state, title, text)
+        val (showActions, expandedApi23) = content.applyActions(pallet, state, displayName, hasPrevious, hasNext, text)
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             // API 24+
@@ -585,10 +598,11 @@ public class KmpTorServiceUI private constructor(
     // TODO: Duration on API 23- needs to handled for header
     //  which may also affect current depending on the
     //  implementation.
-    private fun RemoteViews.applyHeader(iconRes: DrawableRes) {
+    private fun RemoteViews.applyHeader(pallet: UIColor.Pallet, iconRes: DrawableRes) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) return
         // API 23-
 
+        // TODO: Bitmap & Colors
         setImageViewResource(R.id.kmp_tor_ui_header_icon, iconRes.id)
         setTextViewText(R.id.kmp_tor_ui_header_app_name, appLabel)
 
@@ -604,7 +618,12 @@ public class KmpTorServiceUI private constructor(
         setTextViewText(R.id.kmp_tor_ui_header_duration, durationText)
     }
 
-    private fun RemoteViews.applyContent(state: UIState, title: String, text: String) {
+    private fun RemoteViews.applyContent(
+        pallet: UIColor.Pallet,
+        state: UIState,
+        title: String,
+        text: String,
+    ) {
         setTextViewText(R.id.kmp_tor_ui_content_title_state, title)
 
         val (progressVisibility, progressParams) = when (state.progress) {
@@ -630,13 +649,22 @@ public class KmpTorServiceUI private constructor(
         setTextViewText(R.id.kmp_tor_ui_content_title_text, titleText)
         setTextViewText(R.id.kmp_tor_ui_content_info_text, infoText)
 
-        setViewVisibility(R.id.kmp_tor_ui_content_info_progress, progressVisibility)
+        val progressId = R.id.kmp_tor_ui_content_info_progress
+        setViewVisibility(progressId, progressVisibility)
+
         val (max, progress, indeterminate) = progressParams ?: return
 
-        setProgressBar(R.id.kmp_tor_ui_content_info_progress, max, progress, indeterminate)
+        setProgressBar(progressId, max, progress, indeterminate)
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            setColorStateList(progressId, "setProgressTintList", pallet.notNight, pallet.night)
+            setColorStateList(progressId, "setProgressBackgroundTintList", pallet.notNight, pallet.night)
+            setColorStateList(progressId, "setIndeterminateTintList", pallet.notNight, pallet.night)
+        }
     }
 
     private fun RemoteViews.applyActions(
+        pallet: UIColor.Pallet,
         state: UIState,
         displayName: String,
         hasPrevious: Boolean,
@@ -672,30 +700,32 @@ public class KmpTorServiceUI private constructor(
             clone
         }
 
-        contentTarget.applyInstanceActions(showInstanceActions, state)
-        contentTarget.applySelectorActions(showSelectorActions, displayName, hasPrevious, hasNext)
+        contentTarget.applyInstanceActions(pallet, showInstanceActions, state)
+        contentTarget.applySelectorActions(pallet, showSelectorActions, displayName, hasPrevious, hasNext)
 
         return true to expandedApi23
     }
 
-    private fun RemoteViews.applyInstanceActions(showInstanceActions: Boolean, state: UIState) {
+    private fun RemoteViews.applyInstanceActions(
+        pallet: UIColor.Pallet,
+        showInstanceActions: Boolean,
+        state: UIState,
+    ) {
         val visibility = if (showInstanceActions) {
             if (pendingIntents.contentIntent != null) {
                 setOnClickPendingIntent(R.id.kmp_tor_ui_actions_load_instance, appContext.noOpPendingIntent())
             }
 
             state.actions.forEach { btnAction ->
-                val view = RemoteViews(appContext.packageName, R.layout.kmp_tor_ui_action_enabled)
-                addView(R.id.kmp_tor_ui_actions_load_instance, view)
 
-                val nAction = when (btnAction) {
+                val uiAction = when (btnAction) {
                     ButtonAction.NewIdentity -> UIAction.NewNym
                     ButtonAction.RestartTor -> UIAction.Restart
                     ButtonAction.StopTor -> UIAction.Stop
                 }
 
-                view.setOnClickPendingIntent(R.id.kmp_tor_ui_action_image, pendingIntents[nAction])
-                view.setImageViewResource(R.id.kmp_tor_ui_action_image, actionIcons[nAction].id)
+                val view = actionCache.getOrCreate(uiAction, pallet, enabled = true)
+                addView(R.id.kmp_tor_ui_actions_load_instance, view)
             }
 
             View.VISIBLE
@@ -707,6 +737,7 @@ public class KmpTorServiceUI private constructor(
     }
 
     private fun RemoteViews.applySelectorActions(
+        pallet: UIColor.Pallet,
         showSelectorActions: Boolean,
         displayName: String,
         hasPrevious: Boolean,
@@ -722,16 +753,9 @@ public class KmpTorServiceUI private constructor(
             listOf(
                 UIAction.Previous to hasPrevious,
                 UIAction.Next to hasNext,
-            ).forEach { (action, enable) ->
-                val layoutId = if (enable) R.layout.kmp_tor_ui_action_enabled else R.layout.kmp_tor_ui_action_disabled
-
-                val view = RemoteViews(appContext.packageName, layoutId)
+            ).forEach { (uiAction, enabled) ->
+                val view = actionCache.getOrCreate(uiAction, pallet, enabled = enabled)
                 addView(R.id.kmp_tor_ui_actions_load_selector, view)
-
-                val pIntent = if (enable) pendingIntents[action] else appContext.noOpPendingIntent()
-
-                view.setOnClickPendingIntent(R.id.kmp_tor_ui_action, pIntent)
-                view.setImageViewResource(R.id.kmp_tor_ui_action_image, actionIcons[action].id)
             }
 
             View.VISIBLE
@@ -746,6 +770,7 @@ public class KmpTorServiceUI private constructor(
         super.onDestroy()
         keyguardHandler.destroy()
         pendingIntents.destroy()
+        actionCache.clearCache()
     }
 
     protected override fun createProtected(

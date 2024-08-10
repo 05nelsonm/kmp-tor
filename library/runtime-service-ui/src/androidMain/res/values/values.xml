@@ -15,12 +15,11 @@
   * limitations under the License.
   *-->
 <resources>
-    <!-- TODO: Use static values & set programmatically -->
-    <dimen name="kmp_tor_ui_action_size">48dp</dimen>
-    <dimen name="kmp_tor_ui_action_image_size">40dp</dimen>
-    <dimen name="kmp_tor_ui_action_image_padding">12dp</dimen>
+    <!-- Override and adjust when setting custom notification actions -->
     <dimen name="kmp_tor_ui_action_list_divider_padding">12dp</dimen>
+    <!-- Override and adjust when setting custom notification actions -->
     <dimen name="kmp_tor_ui_action_container_margin_start">-15dp</dimen>
+    <!-- Override and adjust when setting custom notification actions -->
     <dimen name="kmp_tor_ui_action_container_margin_end">-19dp</dimen>
 
     <style name="TextAppearance.KmpTorUI" parent="@android:style/TextAppearance.StatusBar.EventContent" />
@@ -36,5 +35,6 @@
     <style name="TextAppearance.KmpTorUI.Title" parent="@android:style/TextAppearance.StatusBar.EventContent.Title">
         <item name="android:textSize">14sp</item>
     </style>
+
     <style name="Widget.KmpTorUI.ProgressBar" parent="@android:style/Widget.DeviceDefault.ProgressBar.Horizontal" />
 </resources>

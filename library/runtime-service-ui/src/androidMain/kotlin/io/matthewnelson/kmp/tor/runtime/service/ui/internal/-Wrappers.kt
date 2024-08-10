@@ -16,6 +16,11 @@
 package io.matthewnelson.kmp.tor.runtime.service.ui.internal
 
 @JvmInline
+internal value class ColorInt internal constructor(internal val argb: Int) {
+    public override fun toString(): String = "ColorInt[argb=$argb]"
+}
+
+@JvmInline
 internal value class ColorRes internal constructor(internal val id: Int) {
     public override fun toString(): String = "ColorRes[id=$id]"
 }
