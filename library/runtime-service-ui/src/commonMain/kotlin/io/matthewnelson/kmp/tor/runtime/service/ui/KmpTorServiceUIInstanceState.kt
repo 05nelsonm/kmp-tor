@@ -158,6 +158,7 @@ public class KmpTorServiceUIInstanceState<C: AbstractKmpTorServiceUIConfig> priv
             update { current ->
                 current.copy(
                     text = ContentNetworkWaiting,
+                    progress = Progress.Indeterminate,
                 )
             }
         }
@@ -199,11 +200,15 @@ public class KmpTorServiceUIInstanceState<C: AbstractKmpTorServiceUIConfig> priv
                     !new.daemon.isBootstrapped -> {
                         Progress.Determinant(new.daemon)
                     }
-                    _state.text is ContentAction -> {
-                        Progress.Indeterminate
-                    }
-                    else -> {
-                        Progress.None
+                    else -> when (_state.text) {
+                        is ContentAction,
+                        is ContentNetworkWaiting -> {
+                            Progress.Indeterminate
+                        }
+                        is ContentBootstrap -> {
+                            Progress.Determinant(new.daemon)
+                        }
+                        else -> Progress.None
                     }
                 }
 

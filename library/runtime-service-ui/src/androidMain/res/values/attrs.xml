@@ -15,5 +15,17 @@
   * limitations under the License.
   *-->
 <resources>
-    <public name="kmp_tor_ui_color_ready" type="attr" />
+    <!--
+        Declare a color (or reference to another color) in
+        your base AppTheme. This will be utilized automatically
+        as the notification color when the TorRuntime instance is
+        ready (i.e. 100% Bootstrapped and Network is enabled).
+
+        e.g.
+
+        <style name="AppTheme" parent="@style/Theme.AppCompat.DayNight.NoActionBar">
+            <item name="kmp_tor_ui_color_ready">?attr/colorPrimary</item>
+        </style>
+    -->
+    <attr name="kmp_tor_ui_color_ready" format="reference|color" />
 </resources>
