@@ -15,6 +15,11 @@
  **/
 package io.matthewnelson.kmp.tor.runtime.service.ui.internal
 
+import android.content.Context
+import android.graphics.*
+import android.graphics.Bitmap.Config
+import android.graphics.drawable.Drawable
+
 @JvmInline
 internal value class ColorInt internal constructor(internal val argb: Int) {
     public override fun toString(): String = "ColorInt[argb=$argb]"
@@ -27,5 +32,39 @@ internal value class ColorRes internal constructor(internal val id: Int) {
 
 @JvmInline
 internal value class DrawableRes internal constructor(internal val id: Int) {
+
+    internal fun toIconBitmap(
+        context: Context,
+        color: ColorInt,
+        dpSize: Int,
+    ): Bitmap {
+        require(dpSize > 0) { "dpSize must be greater than 0" }
+
+        val appContext = context.applicationContext
+        val pxSize = (dpSize * appContext.resources.displayMetrics.density).toInt()
+
+        return appContext
+            .retrieveDrawable(this)
+            .toBitmap(pxSize)
+            .applyColor(pxSize, color)
+    }
+
+    private fun Drawable.toBitmap(pxSize: Int): Bitmap {
+        val bitmap = Bitmap.createBitmap(pxSize, pxSize, Config.ARGB_8888)
+        setBounds(0, 0, pxSize, pxSize)
+        draw(Canvas(bitmap))
+        return bitmap
+    }
+
+    private fun Bitmap.applyColor(size: Int, color: ColorInt): Bitmap {
+        val source = this
+        val paint = Paint()
+        paint.setColorFilter(PorterDuffColorFilter(color.argb, PorterDuff.Mode.SRC_IN))
+
+        val result = Bitmap.createBitmap(size, size, Config.ARGB_8888)
+        Canvas(result).drawBitmap(source, 0f, 0f, paint)
+        return result
+    }
+
     public override fun toString(): String = "DrawableRes[id=$id]"
 }

@@ -29,7 +29,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="start|top"
         android:layout_marginStart="@dimen/kmp_tor_ui_action_container_margin_start"
-        android:layout_marginBottom="-15dp"
+        android:layout_marginBottom="-7dp"
         android:orientation="horizontal"
         android:showDividers="middle"
         android:divider="?android:attr/listDivider"

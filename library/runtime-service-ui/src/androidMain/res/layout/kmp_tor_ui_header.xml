@@ -25,6 +25,8 @@
         android:id="@+id/kmp_tor_ui_header_icon"
         android:layout_width="20dp"
         android:layout_height="20dp"
+        android:layout_gravity="center"
+        android:padding="2dp"
         android:scaleType="centerInside"
         tools:src="@android:drawable/stat_notify_chat"
         tools:ignore="ContentDescription" />

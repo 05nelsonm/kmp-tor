@@ -17,14 +17,7 @@ package io.matthewnelson.kmp.tor.runtime.service.ui.internal
 
 import android.app.PendingIntent
 import android.content.Context
-import android.graphics.Bitmap
-import android.graphics.Bitmap.Config
-import android.graphics.Canvas
-import android.graphics.Paint
 import android.graphics.PorterDuff
-import android.graphics.PorterDuffColorFilter
-import android.graphics.drawable.BitmapDrawable
-import android.graphics.drawable.Drawable
 import android.graphics.drawable.Icon
 import android.os.Build
 import android.widget.RemoteViews
@@ -125,85 +118,37 @@ internal enum class UIAction {
                 view.setOnClickPendingIntent(R.id.kmp_tor_ui_action, pIntent)
 
                 val iconRes = icons[action]
-                val resId = R.id.kmp_tor_ui_action_image
+                val imageResId = R.id.kmp_tor_ui_action_image
 
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                     val icon = Icon.createWithResource(appContext, iconRes.id)
 
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                        view.setColorStateList(resId, "setImageTintList", pallet.notNight, pallet.night)
+                        view.setColorStateList(imageResId, "setImageTintList", pallet.notNight, pallet.night)
                     } else {
                         icon.setTint(pallet.notNight.defaultColor)
                         icon.setTintMode(PorterDuff.Mode.SRC_IN)
                     }
 
-                    view.setImageViewIcon(resId, icon)
+                    view.setImageViewIcon(imageResId, icon)
                 } else {
-                    val pxSize = (24 * appContext.resources.displayMetrics.density).toInt()
-                    val bitmap = appContext.retrieveDrawable(iconRes)
-                        .toBitmap(pxSize, pxSize)
-                        .applyColor(pxSize, pallet.notNight.defaultColor)
-
-                    view.setImageViewBitmap(resId, bitmap)
+                    val color = ColorInt(pallet.notNight.defaultColor)
+                    val bitmap = iconRes.toIconBitmap(appContext, color, dpSize = 24)
+                    view.setImageViewBitmap(imageResId, bitmap)
                 }
 
                 return view
             }
-
-            // TODO: Move
-            // androidx.core.graphics.drawable
-            private fun Drawable.toBitmap(
-                width: Int = intrinsicWidth,
-                height: Int = intrinsicHeight,
-                config: Config? = null
-            ): Bitmap {
-                if (this is BitmapDrawable) {
-                    if (bitmap == null) {
-                        // This is slightly better than returning an empty, zero-size bitmap.
-                        throw IllegalArgumentException("bitmap is null")
-                    }
-                    if (config == null || bitmap.config == config) {
-                        // Fast-path to return original. Bitmap.createScaledBitmap will do this check, but it
-                        // involves allocation and two jumps into native code so we perform the check ourselves.
-                        if (width == bitmap.width && height == bitmap.height) {
-                            return bitmap
-                        }
-                        return Bitmap.createScaledBitmap(bitmap, width, height, true)
-                    }
-                }
-
-                val oldLeft = bounds.left
-                val oldTop = bounds.top
-                val oldRight = bounds.right
-                val oldBottom = bounds.bottom
-
-                val bitmap = Bitmap.createBitmap(width, height, config ?: Config.ARGB_8888)
-                setBounds(0, 0, width, height)
-                draw(Canvas(bitmap))
-
-                setBounds(oldLeft, oldTop, oldRight, oldBottom)
-                return bitmap
-            }
-
-            private fun Bitmap.applyColor(size: Int, color: Int): Bitmap {
-                val source = this
-                val paint = Paint()
-                paint.setColorFilter(PorterDuffColorFilter(color, PorterDuff.Mode.SRC_IN))
-
-                val result = Bitmap.createBitmap(size, size, Config.ARGB_8888)
-                Canvas(result).drawBitmap(source, 0f, 0f, paint)
-                return result
-            }
         }
 
-        override fun equals(other: Any?): Boolean {
+        public override fun equals(other: Any?): Boolean {
             return  other is View
                     && other.action == action
                     && other.pallet == pallet
                     && other.enabled == enabled
         }
 
-        override fun hashCode(): Int {
+        public override fun hashCode(): Int {
             var result = 17
             result = result * 42 + action.hashCode()
             result = result * 42 + pallet.hashCode()
@@ -211,5 +156,4 @@ internal enum class UIAction {
             return result
         }
     }
-
 }

@@ -597,13 +597,17 @@ public class KmpTorServiceUI private constructor(
 
     // TODO: Duration on API 23- needs to handled for header
     //  which may also affect current depending on the
-    //  implementation.
-    private fun RemoteViews.applyHeader(pallet: UIColor.Pallet, iconRes: DrawableRes) {
+    //  implementation. Issue #490.
+    private fun RemoteViews.applyHeader(
+        pallet: UIColor.Pallet,
+        iconRes: DrawableRes,
+    ) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) return
         // API 23-
 
-        // TODO: Bitmap & Colors
-        setImageViewResource(R.id.kmp_tor_ui_header_icon, iconRes.id)
+        val color = ColorInt(pallet.notNight.defaultColor)
+        val bitmap = iconRes.toIconBitmap(appContext, color, dpSize = 18)
+        setImageViewBitmap(R.id.kmp_tor_ui_header_icon, bitmap)
         setTextViewText(R.id.kmp_tor_ui_header_app_name, appLabel)
 
         val elapsed = (SystemClock.elapsedRealtime() - startTime)
