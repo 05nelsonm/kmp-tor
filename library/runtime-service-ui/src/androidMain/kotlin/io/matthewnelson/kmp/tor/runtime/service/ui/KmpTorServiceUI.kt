@@ -76,6 +76,7 @@ public class KmpTorServiceUI private constructor(
      * TODO
      * */
     public class Config private constructor(
+        internal val _colorReady: ColorRes?,
         internal val _iconReady: DrawableRes,
         internal val _iconNotReady: DrawableRes,
         internal val _iconData: DrawableRes,
@@ -87,6 +88,7 @@ public class KmpTorServiceUI private constructor(
         enableActionRestart,
         enableActionStop,
         fields = mapOf(
+            "colorReady" to _colorReady,
             "displayName" to displayName,
             "iconReady" to _iconReady,
             "iconNotReady" to _iconNotReady,
@@ -95,12 +97,33 @@ public class KmpTorServiceUI private constructor(
         init,
     ) {
 
+        /**
+         * See [Builder.colorReady]
+         * */
+        @JvmField
+        public val colorReady: Int? = _colorReady?.id
+
+        /**
+         * See [Builder.displayName]
+         * */
         @JvmField
         public val displayName: DisplayName = displayName
+
+        /**
+         * See [Builder.iconReady]
+         * */
         @JvmField
         public val iconReady: Int = _iconReady.id
+
+        /**
+         * See [Builder.iconNotReady]
+         * */
         @JvmField
         public val iconNotReady: Int = _iconNotReady.id
+
+        /**
+         * See [Builder.iconData]
+         * */
         @JvmField
         public val iconData: Int = _iconData.id
 
@@ -108,7 +131,7 @@ public class KmpTorServiceUI private constructor(
          * TODO
          * */
         public fun newConfig(
-            block: ThisBlock<Builder>
+            block: ThisBlock<Builder>,
         ): Config = newConfig(null, block)
 
         /**
@@ -159,6 +182,9 @@ public class KmpTorServiceUI private constructor(
         )
 
         internal constructor(b: Builder): this(
+            // NOTE: If adding any fields, must also update
+            // Builder.of(other, ...) & fields map.
+            _colorReady = b.colorReady.takeIf { it > 0 }?.let { ColorRes(it) },
             _iconReady = DrawableRes(b.iconReady),
             _iconNotReady = DrawableRes(b.iconNotReady),
             _iconData = DrawableRes(b.iconData),
@@ -175,6 +201,12 @@ public class KmpTorServiceUI private constructor(
             @JvmField
             public val iconNotReady: Int,
         ) {
+
+            /**
+             * TODO
+             * */
+            @JvmField
+            public var colorReady: Int = 0
 
             /**
              * TODO
@@ -220,6 +252,7 @@ public class KmpTorServiceUI private constructor(
                     iconReady ?: other.iconReady,
                     iconNotReady ?: other.iconNotReady
                 ).apply {
+                    colorReady = other.colorReady ?: 0
                     iconData = other.iconData
                     enableActionRestart = other.enableActionRestart
                     enableActionStop = other.enableActionStop
@@ -458,6 +491,13 @@ public class KmpTorServiceUI private constructor(
                 // Parse returned text for required constraints
                 DisplayName.Text.of(text)
             }
+
+            config._colorReady?.let { res ->
+                context.validateResource(
+                    block = { retrieveColor(res) },
+                    lazyText = { "Invalid colorReady of $res" }
+                )
+            }
         }
 
         @Throws(Resources.NotFoundException::class)
@@ -599,7 +639,7 @@ public class KmpTorServiceUI private constructor(
             }
         }
 
-        val pallet = uiColor[state.color]
+        val pallet = uiColor[state.color, displayed.instanceConfig._colorReady]
         val iconRes = when (state.icon) {
             IconState.NetworkEnabled -> displayed.instanceConfig._iconReady
             IconState.NetworkDisabled -> displayed.instanceConfig._iconNotReady
@@ -651,7 +691,7 @@ public class KmpTorServiceUI private constructor(
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) return
         // API 23-
 
-        val bitmap = iconRes.toIconBitmap(appContext, pallet.default, dpSize = 18)
+        val bitmap = iconRes.toBitmap(appContext, pallet.default, dpSize = 18)
         setImageViewBitmap(R.id.kmp_tor_ui_header_icon, bitmap)
         setTextViewText(R.id.kmp_tor_ui_header_app_name, appLabel)
         setTextViewText(R.id.kmp_tor_ui_header_duration, durationText)

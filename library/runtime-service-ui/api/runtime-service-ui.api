@@ -40,6 +40,7 @@ public final class io/matthewnelson/kmp/tor/runtime/service/ui/KmpTorServiceUI :
 }
 
 public final class io/matthewnelson/kmp/tor/runtime/service/ui/KmpTorServiceUI$Config : io/matthewnelson/kmp/tor/runtime/service/ui/AbstractKmpTorServiceUIConfig {
+	public final field colorReady Ljava/lang/Integer;
 	public final field displayName Lio/matthewnelson/kmp/tor/runtime/service/ui/DisplayName;
 	public final field iconData I
 	public final field iconNotReady I
@@ -52,6 +53,7 @@ public final class io/matthewnelson/kmp/tor/runtime/service/ui/KmpTorServiceUI$C
 }
 
 public final class io/matthewnelson/kmp/tor/runtime/service/ui/KmpTorServiceUI$Config$Builder {
+	public field colorReady I
 	public field displayName Lio/matthewnelson/kmp/tor/runtime/service/ui/DisplayName;
 	public field enableActionRestart Z
 	public field enableActionStop Z

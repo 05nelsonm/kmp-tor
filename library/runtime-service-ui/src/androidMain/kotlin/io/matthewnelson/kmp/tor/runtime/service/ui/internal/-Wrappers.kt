@@ -16,6 +16,7 @@
 package io.matthewnelson.kmp.tor.runtime.service.ui.internal
 
 import android.content.Context
+import android.content.res.Resources
 import android.graphics.*
 import android.graphics.Bitmap.Config
 import android.graphics.drawable.Drawable
@@ -33,9 +34,10 @@ internal value class ColorRes internal constructor(internal val id: Int) {
 @JvmInline
 internal value class DrawableRes internal constructor(internal val id: Int) {
 
-    internal fun toIconBitmap(
+    @Throws(Resources.NotFoundException::class)
+    internal fun toBitmap(
         context: Context,
-        color: ColorInt,
+        tint: ColorInt,
         dpSize: Int,
     ): Bitmap {
         require(dpSize > 0) { "dpSize must be greater than 0" }
@@ -46,7 +48,7 @@ internal value class DrawableRes internal constructor(internal val id: Int) {
         return appContext
             .retrieveDrawable(this)
             .toBitmap(pxSize)
-            .applyColor(pxSize, color)
+            .applyTint(pxSize, tint)
     }
 
     private fun Drawable.toBitmap(pxSize: Int): Bitmap {
@@ -56,7 +58,7 @@ internal value class DrawableRes internal constructor(internal val id: Int) {
         return bitmap
     }
 
-    private fun Bitmap.applyColor(pxSize: Int, color: ColorInt): Bitmap {
+    private fun Bitmap.applyTint(pxSize: Int, color: ColorInt): Bitmap {
         val source = this
         val paint = Paint()
         paint.setColorFilter(PorterDuffColorFilter(color.argb, PorterDuff.Mode.SRC_IN))
