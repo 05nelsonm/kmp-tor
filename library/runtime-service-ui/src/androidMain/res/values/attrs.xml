@@ -14,13 +14,18 @@
   * See the License for the specific language governing permissions and
   * limitations under the License.
   *-->
-<vector
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    android:width="24dp"
-    android:height="24dp"
-    android:viewportWidth="24"
-    android:viewportHeight="24">
-    <path
-        android:fillColor="#ffffff"
-        android:pathData="m6.01,0.391c0.513,-0.521 1.344,-0.521 1.856,0L18.365,11.057c0.513,0.521 0.513,1.365 0,1.886L7.866,23.609c-0.513,0.521 -1.344,0.521 -1.856,0 -0.513,-0.521 -0.513,-1.365 0,-1.886L15.581,12 6.01,2.276c-0.513,-0.521 -0.513,-1.365 0,-1.886z" />
-</vector>
+<resources>
+    <!--
+        Declare a color (or reference to another color) in
+        your base AppTheme. This will be utilized automatically
+        as the notification color when the TorRuntime instance is
+        ready (i.e. 100% Bootstrapped and Network is enabled).
+
+        e.g.
+
+        <style name="AppTheme" parent="@style/Theme.AppCompat.DayNight.NoActionBar">
+            <item name="kmp_tor_ui_color_ready">?attr/colorPrimary</item>
+        </style>
+    -->
+    <attr name="kmp_tor_ui_color_ready" format="reference|color" />
+</resources>

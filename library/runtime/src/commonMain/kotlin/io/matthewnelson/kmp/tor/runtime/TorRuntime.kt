@@ -142,7 +142,7 @@ public sealed interface TorRuntime:
          * of [Action.StartDaemon] or [Action.RestartDaemon].
          *
          * **NOTE:** This can be omitted as a minimum viable configuration
-         * is always created. See [ConfigBuilderCallback.putDefaults] for what
+         * is always created. See [ConfigBuilderCallback.Defaults] for what
          * settings are automatically applied.
          *
          * **NOTE:** [block] should not contain any external contextual

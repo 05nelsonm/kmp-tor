@@ -61,23 +61,23 @@ import kotlin.time.toDuration
  * */
 @OptIn(ExperimentalKmpTorApi::class)
 public class KmpTorServiceUI private constructor(
-    private val actionIcons: NotificationAction.Icons,
+    actionIcons: UIAction.Icons,
     actionIntentPermissionSuffix: String?,
     contentIntentCode: Int,
     contentIntent: (code: Int, context: Context) -> PendingIntent?,
-    args: Args
+    args: Args,
 ): TorServiceUI<
     KmpTorServiceUI.Config,
-    KmpTorServiceUIInstanceState<KmpTorServiceUI.Config>
+    KmpTorServiceUIInstanceState<KmpTorServiceUI.Config>,
 >(args) {
 
     /**
      * TODO
      * */
     public class Config private constructor(
-        internal val _iconNetworkEnabled: DrawableRes,
-        internal val _iconNetworkDisabled: DrawableRes,
-        internal val _iconDataXfer: DrawableRes,
+        internal val _iconReady: DrawableRes,
+        internal val _iconNotReady: DrawableRes,
+        internal val _iconData: DrawableRes,
         enableActionRestart: Boolean,
         enableActionStop: Boolean,
         displayName: DisplayName,
@@ -87,9 +87,9 @@ public class KmpTorServiceUI private constructor(
         enableActionStop,
         fields = mapOf(
             "displayName" to displayName,
-            "iconNetworkEnabled" to _iconNetworkEnabled,
-            "iconNetworkDisabled" to _iconNetworkDisabled,
-            "iconDataXfer" to _iconDataXfer,
+            "iconReady" to _iconReady,
+            "iconNotReady" to _iconNotReady,
+            "iconData" to _iconData,
         ),
         init,
     ) {
@@ -97,11 +97,11 @@ public class KmpTorServiceUI private constructor(
         @JvmField
         public val displayName: DisplayName = displayName
         @JvmField
-        public val iconNetworkEnabled: Int = _iconNetworkEnabled.id
+        public val iconReady: Int = _iconReady.id
         @JvmField
-        public val iconNetworkDisabled: Int = _iconNetworkDisabled.id
+        public val iconNotReady: Int = _iconNotReady.id
         @JvmField
-        public val iconDataXfer: Int = _iconDataXfer.id
+        public val iconData: Int = _iconData.id
 
         /**
          * TODO
@@ -114,10 +114,10 @@ public class KmpTorServiceUI private constructor(
          * TODO
          * */
         public fun newConfig(
-            iconNetworkEnabled: Int?,
+            iconReady: Int?,
             block: ThisBlock<Builder>,
         ): Config = newConfig(
-            iconNetworkEnabled,
+            iconReady,
             null,
             block
         )
@@ -126,41 +126,41 @@ public class KmpTorServiceUI private constructor(
          * TODO
          * */
         public fun newConfig(
-            iconNetworkEnabled: Int?,
-            iconNetworkDisabled: Int?,
+            iconReady: Int?,
+            iconNotReady: Int?,
             block: ThisBlock<Builder>,
         ): Config = Config(
             b = Builder.of(
                 this,
-                iconNetworkEnabled,
-                iconNetworkDisabled,
+                iconReady,
+                iconNotReady,
             ).apply(block)
         )
 
         public constructor(
-            iconNetworkEnabled: Int,
-            iconNetworkDisabled: Int,
+            iconReady: Int,
+            iconNotReady: Int,
         ): this(
-            iconNetworkEnabled,
-            iconNetworkDisabled,
+            iconReady,
+            iconNotReady,
             {},
         )
 
         public constructor(
-            iconNetworkEnabled: Int,
-            iconNetworkDisabled: Int,
+            iconReady: Int,
+            iconNotReady: Int,
             block: ThisBlock<Builder>,
         ): this(
             b = Builder.of(
-                iconNetworkEnabled,
-                iconNetworkDisabled,
+                iconReady,
+                iconNotReady,
             ).apply(block)
         )
 
         internal constructor(b: Builder): this(
-            _iconNetworkEnabled = DrawableRes(b.iconNetworkEnabled),
-            _iconNetworkDisabled = DrawableRes(b.iconNetworkDisabled),
-            _iconDataXfer = DrawableRes(b.iconDataXfer),
+            _iconReady = DrawableRes(b.iconReady),
+            _iconNotReady = DrawableRes(b.iconNotReady),
+            _iconData = DrawableRes(b.iconData),
             enableActionRestart = b.enableActionRestart,
             enableActionStop = b.enableActionStop,
             displayName = b.displayName,
@@ -170,16 +170,16 @@ public class KmpTorServiceUI private constructor(
         @KmpTorDsl
         public class Builder private constructor(
             @JvmField
-            public val iconNetworkEnabled: Int,
+            public val iconReady: Int,
             @JvmField
-            public val iconNetworkDisabled: Int,
+            public val iconNotReady: Int,
         ) {
 
             /**
              * TODO
              * */
             @JvmField
-            public var iconDataXfer: Int = iconNetworkEnabled
+            public var iconData: Int = iconReady
 
             /**
              * TODO
@@ -203,23 +203,23 @@ public class KmpTorServiceUI private constructor(
 
                 @JvmSynthetic
                 internal fun of(
-                    iconNetworkEnabled: Int,
-                    iconNetworkDisabled: Int,
+                    iconReady: Int,
+                    iconNotReady: Int,
                 ): Builder = Builder(
-                    iconNetworkEnabled,
-                    iconNetworkDisabled,
+                    iconReady,
+                    iconNotReady,
                 )
 
                 @JvmSynthetic
                 internal fun of(
                     other: Config,
-                    iconNetworkEnabled: Int?,
-                    iconNetworkDisabled: Int?,
+                    iconReady: Int?,
+                    iconNotReady: Int?,
                 ): Builder = Builder(
-                    iconNetworkEnabled ?: other.iconNetworkEnabled,
-                    iconNetworkDisabled ?: other.iconNetworkDisabled
+                    iconReady ?: other.iconReady,
+                    iconNotReady ?: other.iconNotReady
                 ).apply {
-                    iconDataXfer = other.iconDataXfer
+                    iconData = other.iconData
                     enableActionRestart = other.enableActionRestart
                     enableActionStop = other.enableActionStop
                     displayName = other.displayName
@@ -234,8 +234,8 @@ public class KmpTorServiceUI private constructor(
      * e.g.
      *
      *     val factory = KmpTorServiceUI.Factory(
-     *         iconNetworkEnabled = R.drawable.my_icon_a,
-     *         iconNetworkDisabled = R.drawable.my_icon_b,
+     *         iconReady = R.drawable.my_icon_a,
+     *         iconNotReady = R.drawable.my_icon_b,
      *         info = TorServiceUI.NotificationInfo.of(
      *             // ...
      *         ),
@@ -260,72 +260,70 @@ public class KmpTorServiceUI private constructor(
         info = b.info,
     ) {
 
+        private val actionIcons = UIAction.Icons.of(b)
+        private val contentIntent: (code: Int, context: Context) -> PendingIntent? = b.contentIntent
+            ?: create@ { code, context ->
+                val appContext = context.applicationContext
+
+                val launchIntent = appContext.packageManager
+                    ?.getLaunchIntentForPackage(appContext.packageName)
+                    ?: return@create null
+
+                PendingIntent.getActivity(appContext, code, launchIntent, P_INTENT_FLAGS)
+            }
+
         @JvmField
         public val actionIntentPermissionSuffix: String? = b.actionIntentPermissionSuffix
         @JvmField
         public val contentIntentCode: Int = b.contentIntentCode
-        @JvmField
-        public val contentIntent: (code: Int, context: Context) -> PendingIntent? = b.contentIntent
-
-        private val actionIcons = NotificationAction.Icons(b)
-
-        @JvmField
-        public val iconActionNewNym: Int = actionIcons[NotificationAction.NewNym].id
-        @JvmField
-        public val iconActionRestart: Int = actionIcons[NotificationAction.Restart].id
-        @JvmField
-        public val iconActionStop: Int = actionIcons[NotificationAction.Stop].id
-        @JvmField
-        public val iconActionPrevious: Int = actionIcons[NotificationAction.Previous].id
-        @JvmField
-        public val iconActionNext: Int = actionIcons[NotificationAction.Next].id
 
         public constructor(
-            iconNetworkEnabled: Int,
-            iconNetworkDisabled: Int,
+            iconReady: Int,
+            iconNotReady: Int,
             info: NotificationInfo,
         ): this(
-            iconNetworkEnabled,
-            iconNetworkDisabled,
+            iconReady,
+            iconNotReady,
             info,
             {},
         )
 
         public constructor(
-            iconNetworkEnabled: Int,
-            iconNetworkDisabled: Int,
+            iconReady: Int,
+            iconNotReady: Int,
             info: NotificationInfo,
             block: ThisBlock<Builder>,
         ): this(
             Config.Builder.of(
-                iconNetworkEnabled,
-                iconNetworkDisabled,
+                iconReady,
+                iconNotReady,
             ),
             info,
             block,
         )
 
         private constructor(
-            c: Config.Builder,
+            config: Config.Builder,
             info: NotificationInfo,
             block: ThisBlock<Builder>,
         ): this (
             b = Builder.of(
                 info,
-                c,
+                config,
             ).apply(block),
-            c = c,
+            c = config,
         )
 
         @KmpTorDsl
         public class Builder private constructor(
             @JvmField
             public val info: NotificationInfo,
-            private val c: Config.Builder,
+            private val config: Config.Builder,
         ) {
 
             /**
-             * TODO
+             * TODO: Add string resource for description and label that
+             *  consumers can easily point to for the permission declaration.
              * */
             @JvmField
             public var actionIntentPermissionSuffix: String? = null
@@ -340,43 +338,37 @@ public class KmpTorServiceUI private constructor(
              * TODO
              * */
             @JvmField
-            public var contentIntent: (code: Int, context: Context) -> PendingIntent? = create@ { code, context ->
-                val launchIntent = context.packageManager
-                    ?.getLaunchIntentForPackage(context.packageName)
-                    ?: return@create null
-
-                PendingIntent.getActivity(context, code, launchIntent, P_INTENT_FLAGS)
-            }
+            public var contentIntent: ((code: Int, context: Context) -> PendingIntent?)? = null
 
             /**
              * TODO
              * */
             @JvmField
-            public var iconActionNewNym: Int = R.drawable.ic_kmp_tor_ui_action_newnym
+            public var iconActionNewNym: Int? = null
 
             /**
              * TODO
              * */
             @JvmField
-            public var iconActionRestart: Int = R.drawable.ic_kmp_tor_ui_action_restart
+            public var iconActionRestart: Int? = null
 
             /**
              * TODO
              * */
             @JvmField
-            public var iconActionStop: Int = R.drawable.ic_kmp_tor_ui_action_stop
+            public var iconActionStop: Int? = null
 
             /**
              * TODO
              * */
             @JvmField
-            public var iconActionPrevious: Int = R.drawable.ic_kmp_tor_ui_action_previous
+            public var iconActionPrevious: Int? = null
 
             /**
              * TODO
              * */
             @JvmField
-            public var iconActionNext: Int = R.drawable.ic_kmp_tor_ui_action_next
+            public var iconActionNext: Int? = null
 
             /**
              * TODO
@@ -384,7 +376,7 @@ public class KmpTorServiceUI private constructor(
             @KmpTorDsl
             public fun defaultConfig(
                 block: ThisBlock<Config.Builder>
-            ): Builder = apply { c.apply(block) }
+            ): Builder = apply { config.apply(block) }
 
             internal companion object {
 
@@ -422,7 +414,7 @@ public class KmpTorServiceUI private constructor(
                 }
             }
 
-            NotificationAction.entries.forEach { entry ->
+            UIAction.entries.forEach { entry ->
                 val res = actionIcons[entry]
                 context.validateResource(
                     block = { retrieveDrawable(res) },
@@ -434,9 +426,9 @@ public class KmpTorServiceUI private constructor(
         @Throws(IllegalArgumentException::class, Resources.NotFoundException::class)
         public override fun validateConfig(context: Context, config: Config) {
             listOf(
-                config._iconNetworkEnabled to "iconNetworkEnabled",
-                config._iconNetworkDisabled to "iconNetworkDisabled",
-                config._iconDataXfer to "iconDataXfer"
+                config._iconReady to "iconReady",
+                config._iconNotReady to "iconNotReady",
+                config._iconData to "iconData"
             ).forEach { (res, field) ->
                 context.validateResource(
                     block = { retrieveDrawable(res) },
@@ -473,7 +465,7 @@ public class KmpTorServiceUI private constructor(
             }
         }
 
-        protected override fun newInstanceUIProtected(
+        protected override fun createProtected(
             args: Args,
         ): KmpTorServiceUI = KmpTorServiceUI(
             actionIcons,
@@ -486,9 +478,17 @@ public class KmpTorServiceUI private constructor(
 
     private val appLabel = appContext.applicationInfo.loadLabel(appContext.packageManager)
     private val startTime = SystemClock.elapsedRealtime()
+    private val uiColor = UIColor.of(appContext)
 
     private val keyguardHandler = KeyguardHandler()
     private val pendingIntents = PendingIntents(actionIntentPermissionSuffix, contentIntentCode, contentIntent)
+    private val actionCache = UIAction.View.Cache.of(appContext, actionIcons) { action ->
+        if (action != null) {
+            pendingIntents[action]
+        } else {
+            appContext.noOpPendingIntent()
+        }
+    }
 
     private val builder = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
         Notification.Builder(appContext, channelID)
@@ -496,22 +496,25 @@ public class KmpTorServiceUI private constructor(
         @Suppress("DEPRECATION")
         Notification.Builder(appContext)
     }.apply {
+        setContentIntent(pendingIntents.contentIntent)
+        // TODO: Issue #485
+        @Suppress("DEPRECATION")
+        setPriority(Notification.PRIORITY_DEFAULT)
         setOngoing(true)
         setOnlyAlertOnce(true)
+        @Suppress("DEPRECATION")
+        setSound(null)
         setWhen(System.currentTimeMillis())
-        setContentIntent(pendingIntents.contentIntent)
 
-        if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.TIRAMISU) {
-            // API 33-
-            @Suppress("DEPRECATION")
-            setSound(null)
-        }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
             // API 17+
             setShowWhen(true)
         }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT_WATCH) {
             // API 20+
+            // TODO: Issue #485
+            //  Allow ability to configure, but use TorService
+            //  as default for backward compatibility
             setGroup("TorService")
             setGroupSummary(false)
         }
@@ -534,6 +537,8 @@ public class KmpTorServiceUI private constructor(
         }
     }
 
+    private var current: Triple<UIState, Boolean, Boolean>? = null
+
     protected override fun onUpdate(
         displayed: KmpTorServiceUIInstanceState<Config>,
         hasPrevious: Boolean,
@@ -541,13 +546,24 @@ public class KmpTorServiceUI private constructor(
     ) {
         val state = displayed.state
 
-        val content = RemoteViews(appContext.packageName, R.layout.kmp_tor_ui)
-
-        val iconRes = when (state.icon) {
-            IconState.NetworkEnabled -> displayed.instanceConfig._iconNetworkEnabled
-            IconState.NetworkDisabled -> displayed.instanceConfig._iconNetworkDisabled
-            IconState.DataXfer -> displayed.instanceConfig._iconDataXfer
+        Triple(state, hasPrevious, hasNext).let { new ->
+            if (new == current) return
+            current = new
         }
+
+        val pallet = uiColor[state.color]
+        val iconRes = when (state.icon) {
+            IconState.NetworkEnabled -> displayed.instanceConfig._iconReady
+            IconState.NetworkDisabled -> displayed.instanceConfig._iconNotReady
+            IconState.Data -> displayed.instanceConfig._iconData
+        }
+
+        builder.setSmallIcon(iconRes.id)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            builder.setColor(pallet.default.argb)
+        }
+
+        val content = RemoteViews(appContext.packageName, R.layout.kmp_tor_ui)
 
         val title = appContext.retrieveString(state.title)
         val text = appContext.retrieveString(state.text)
@@ -557,11 +573,9 @@ public class KmpTorServiceUI private constructor(
             is DisplayName.Text -> n.text
         }
 
-        content.applyHeader(iconRes)
-        content.applyContent(state, title, text)
-        val (showActions, expandedApi23) = content.applyActions(state, displayName, hasPrevious, hasNext, text)
-
-        builder.setSmallIcon(iconRes.id)
+        content.applyHeader(pallet, iconRes)
+        content.applyContent(pallet, state, title, text)
+        val (showActions, expandedApi23) = content.applyActions(pallet, state, displayName, hasPrevious, hasNext, text)
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             // API 24+
@@ -581,13 +595,18 @@ public class KmpTorServiceUI private constructor(
         }.post()
     }
 
+    // TODO: Duration on API 23- needs to handled for header
+    //  which may also affect current depending on the
+    //  implementation. Issue #490.
     private fun RemoteViews.applyHeader(
+        pallet: UIColor.Pallet,
         iconRes: DrawableRes,
     ) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) return
         // API 23-
 
-        setImageViewResource(R.id.kmp_tor_ui_header_icon, iconRes.id)
+        val bitmap = iconRes.toIconBitmap(appContext, pallet.default, dpSize = 18)
+        setImageViewBitmap(R.id.kmp_tor_ui_header_icon, bitmap)
         setTextViewText(R.id.kmp_tor_ui_header_app_name, appLabel)
 
         val elapsed = (SystemClock.elapsedRealtime() - startTime)
@@ -603,6 +622,7 @@ public class KmpTorServiceUI private constructor(
     }
 
     private fun RemoteViews.applyContent(
+        pallet: UIColor.Pallet,
         state: UIState,
         title: String,
         text: String,
@@ -632,13 +652,23 @@ public class KmpTorServiceUI private constructor(
         setTextViewText(R.id.kmp_tor_ui_content_title_text, titleText)
         setTextViewText(R.id.kmp_tor_ui_content_info_text, infoText)
 
-        setViewVisibility(R.id.kmp_tor_ui_content_info_progress, progressVisibility)
+        val progressId = R.id.kmp_tor_ui_content_info_progress
+        setViewVisibility(progressId, progressVisibility)
+
         val (max, progress, indeterminate) = progressParams ?: return
 
-        setProgressBar(R.id.kmp_tor_ui_content_info_progress, max, progress, indeterminate)
+        setProgressBar(progressId, max, progress, indeterminate)
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            // API 31+
+            setColorStateList(progressId, "setProgressTintList", pallet.notNight, pallet.yesNight)
+            setColorStateList(progressId, "setProgressBackgroundTintList", pallet.notNight, pallet.yesNight)
+            setColorStateList(progressId, "setIndeterminateTintList", pallet.notNight, pallet.yesNight)
+        }
     }
 
     private fun RemoteViews.applyActions(
+        pallet: UIColor.Pallet,
         state: UIState,
         displayName: String,
         hasPrevious: Boolean,
@@ -646,14 +676,13 @@ public class KmpTorServiceUI private constructor(
         text: String,
     ): Pair<Boolean, RemoteViews?> {
         removeAllViews(R.id.kmp_tor_ui_actions_load_instance)
-        removeAllViews(R.id.kmp_tor_ui_actions_load_cycle)
+        removeAllViews(R.id.kmp_tor_ui_actions_load_selector)
 
 
-        val showCycleActions = hasPrevious || hasNext
         val showInstanceActions = state.actions.isNotEmpty()
-        val showActions = showInstanceActions || showCycleActions
+        val showSelectorActions = hasPrevious || hasNext
 
-        if (!showActions) return false to null
+        if (!showInstanceActions && !showSelectorActions) return false to null
 
         var expandedApi23: RemoteViews? = null
 
@@ -675,29 +704,32 @@ public class KmpTorServiceUI private constructor(
             clone
         }
 
-        contentTarget.applyInstanceActions(state, showInstanceActions)
-        contentTarget.applyCycleActions(displayName, hasPrevious, hasNext, showCycleActions)
+        contentTarget.applyInstanceActions(pallet, showInstanceActions, state)
+        contentTarget.applySelectorActions(pallet, showSelectorActions, displayName, hasPrevious, hasNext)
 
         return true to expandedApi23
     }
 
     private fun RemoteViews.applyInstanceActions(
-        state: UIState,
+        pallet: UIColor.Pallet,
         showInstanceActions: Boolean,
+        state: UIState,
     ) {
         val visibility = if (showInstanceActions) {
-            state.actions.forEach { btnAction ->
-                val view = RemoteViews(appContext.packageName, R.layout.kmp_tor_ui_action_enabled)
-                addView(R.id.kmp_tor_ui_actions_load_instance, view)
+            if (pendingIntents.contentIntent != null) {
+                setOnClickPendingIntent(R.id.kmp_tor_ui_actions_load_instance, appContext.noOpPendingIntent())
+            }
 
-                val nAction = when (btnAction) {
-                    ButtonAction.NewIdentity -> NotificationAction.NewNym
-                    ButtonAction.RestartTor -> NotificationAction.Restart
-                    ButtonAction.StopTor -> NotificationAction.Stop
+            state.actions.forEach { btnAction ->
+
+                val uiAction = when (btnAction) {
+                    ButtonAction.NewIdentity -> UIAction.NewNym
+                    ButtonAction.RestartTor -> UIAction.Restart
+                    ButtonAction.StopTor -> UIAction.Stop
                 }
 
-                view.setOnClickPendingIntent(R.id.kmp_tor_ui_action, pendingIntents[nAction])
-                view.setImageViewResource(R.id.kmp_tor_ui_action_image, actionIcons[nAction].id)
+                val view = actionCache.getOrCreate(uiAction, pallet, enabled = true)
+                addView(R.id.kmp_tor_ui_actions_load_instance, view)
             }
 
             View.VISIBLE
@@ -708,29 +740,26 @@ public class KmpTorServiceUI private constructor(
         setViewVisibility(R.id.kmp_tor_ui_actions_load_instance, visibility)
     }
 
-    private fun RemoteViews.applyCycleActions(
+    private fun RemoteViews.applySelectorActions(
+        pallet: UIColor.Pallet,
+        showSelectorActions: Boolean,
         displayName: String,
         hasPrevious: Boolean,
         hasNext: Boolean,
-        showCycleActions: Boolean,
     ) {
-        val visibility = if (showCycleActions) {
-            setTextViewText(R.id.kmp_tor_ui_actions_cycle_text, displayName)
-            setOnClickPendingIntent(R.id.kmp_tor_ui_actions_cycle_text, appContext.noOpPendingIntent())
+        val visibility = if (showSelectorActions) {
+            if (pendingIntents.contentIntent != null) {
+                setOnClickPendingIntent(R.id.kmp_tor_ui_actions_load_instance, appContext.noOpPendingIntent())
+                setOnClickPendingIntent(R.id.kmp_tor_ui_actions_selector_text, appContext.noOpPendingIntent())
+            }
+            setTextViewText(R.id.kmp_tor_ui_actions_selector_text, displayName)
 
             listOf(
-                NotificationAction.Previous to hasPrevious,
-                NotificationAction.Next to hasNext,
-            ).forEach { (action, enable) ->
-                val layoutId = if (enable) R.layout.kmp_tor_ui_action_enabled else R.layout.kmp_tor_ui_action_disabled
-
-                val view = RemoteViews(appContext.packageName, layoutId)
-                addView(R.id.kmp_tor_ui_actions_load_cycle, view)
-
-                val pIntent = if (enable) pendingIntents[action] else appContext.noOpPendingIntent()
-
-                view.setOnClickPendingIntent(R.id.kmp_tor_ui_action, pIntent)
-                view.setImageViewResource(R.id.kmp_tor_ui_action_image, actionIcons[action].id)
+                UIAction.Previous to hasPrevious,
+                UIAction.Next to hasNext,
+            ).forEach { (uiAction, enabled) ->
+                val view = actionCache.getOrCreate(uiAction, pallet, enabled = enabled)
+                addView(R.id.kmp_tor_ui_actions_load_selector, view)
             }
 
             View.VISIBLE
@@ -738,16 +767,17 @@ public class KmpTorServiceUI private constructor(
             View.GONE
         }
 
-        setViewVisibility(R.id.kmp_tor_ui_container_actions_cycle, visibility)
+        setViewVisibility(R.id.kmp_tor_ui_container_actions_selector, visibility)
     }
 
     protected override fun onDestroy() {
         super.onDestroy()
         keyguardHandler.destroy()
         pendingIntents.destroy()
+        actionCache.clearCache()
     }
 
-    protected override fun newInstanceStateProtected(
+    protected override fun createProtected(
         args: AbstractTorServiceUI.Args.Instance,
     ): KmpTorServiceUIInstanceState<Config> = KmpTorServiceUIInstanceState.of(
         args,
@@ -771,9 +801,14 @@ public class KmpTorServiceUI private constructor(
                     val new = manager.isKeyguardLocked
                     if (old != new) {
                         _isDeviceLocked = new
-                        instanceStates.forEach { instance ->
-                            instance.debug { "DeviceIsLocked[$new]" }
+                        val instances = instanceStates
+                        instances.forEach { instance ->
                             instance.onDeviceLockChange()
+                        }
+                        serviceChildScope.launch {
+                            instances.forEach { instance ->
+                                instance.debug { "DeviceIsLocked[$new]" }
+                            }
                         }
                     }
                 }
@@ -801,7 +836,7 @@ public class KmpTorServiceUI private constructor(
 
         @JvmField
         public val contentIntent: PendingIntent? = contentIntent(contentIntentCode, appContext)
-        public operator fun get(action: NotificationAction): PendingIntent = actionIntents[action.ordinal]
+        public operator fun get(action: UIAction): PendingIntent = actionIntents[action.ordinal]
 
         @Volatile
         private var _isDestroyed: Boolean = false
@@ -814,38 +849,42 @@ public class KmpTorServiceUI private constructor(
 
             val action = intent.getStringExtra(filter)?.let { extra ->
                 try {
-                    NotificationAction.valueOf(extra)
+                    UIAction.valueOf(extra)
                 } catch (_: IllegalArgumentException) {
                     null
                 }
             } ?: return@Receiver
 
             when (action) {
-                NotificationAction.NewNym -> {
+                UIAction.NewNym -> {
                     displayed?.processorTorCmd()?.enqueue(
                         TorCmd.Signal.NewNym,
                         OnFailure.noOp(),
                         OnSuccess.noOp(),
                     )
                 }
-                NotificationAction.Restart -> {
+                UIAction.Restart -> {
+                    if (keyguardHandler.isDeviceLocked()) return@Receiver
+
                     displayed?.processorAction()?.enqueue(
                         Action.RestartDaemon,
                         OnFailure.noOp(),
                         OnSuccess.noOp(),
                     )
                 }
-                NotificationAction.Stop -> {
+                UIAction.Stop -> {
+                    if (keyguardHandler.isDeviceLocked()) return@Receiver
+
                     displayed?.processorAction()?.enqueue(
                         Action.StopDaemon,
                         OnFailure.noOp(),
                         OnSuccess.noOp(),
                     )
                 }
-                NotificationAction.Previous -> {
+                UIAction.Previous -> {
                     previous()
                 }
-                NotificationAction.Next -> {
+                UIAction.Next -> {
                     next()
                 }
             }
@@ -856,7 +895,7 @@ public class KmpTorServiceUI private constructor(
             exported = false,
         )
 
-        private val actionIntents = NotificationAction.entries.let { entries ->
+        private val actionIntents = UIAction.entries.let { entries ->
             entries.mapTo(ArrayList(entries.size)) { it.toPendingIntent() }
         }.toImmutableList()
 
@@ -874,35 +913,12 @@ public class KmpTorServiceUI private constructor(
 
         public override fun isDestroyed(): Boolean = _isDestroyed
 
-        private fun NotificationAction.toPendingIntent(): PendingIntent = PendingIntent.getBroadcast(
+        private fun UIAction.toPendingIntent(): PendingIntent = PendingIntent.getBroadcast(
             appContext,
-            ordinal,
+            ordinal + 42,
             Intent(filter).putExtra(filter, name).setPackage(appContext.packageName),
             P_INTENT_FLAGS,
         )
-    }
-
-    private enum class NotificationAction {
-        NewNym,
-        Restart,
-        Stop,
-        Previous,
-        Next;
-
-        public class Icons(b: Factory.Builder) {
-
-            private val icons = entries.mapTo(ArrayList(entries.size)) { entry ->
-                when (entry) {
-                    NewNym -> b.iconActionNewNym
-                    Restart -> b.iconActionRestart
-                    Stop -> b.iconActionStop
-                    Previous -> b.iconActionPrevious
-                    Next -> b.iconActionNext
-                }.let { id -> DrawableRes(id) }
-            }.toImmutableList()
-
-            public operator fun get(action: NotificationAction): DrawableRes = icons[action.ordinal]
-        }
     }
 
     private companion object {
@@ -912,6 +928,7 @@ public class KmpTorServiceUI private constructor(
         private val P_INTENT_FLAGS by lazy {
             var f = PendingIntent.FLAG_UPDATE_CURRENT
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                // API 31+
                 f = f or PendingIntent.FLAG_IMMUTABLE
             }
             f
@@ -932,8 +949,7 @@ public class KmpTorServiceUI private constructor(
 
                     try {
                         pIntent.cancel()
-                    } catch (_: Throwable) {
-                    }
+                    } catch (_: Throwable) {}
 
                     _noOpPendingIntent = pIntent
                     pIntent

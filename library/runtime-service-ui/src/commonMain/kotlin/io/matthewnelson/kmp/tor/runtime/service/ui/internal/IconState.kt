@@ -18,7 +18,7 @@ package io.matthewnelson.kmp.tor.runtime.service.ui.internal
 internal enum class IconState {
     NetworkEnabled,
     NetworkDisabled,
-    DataXfer;
+    Data;
 
     public override fun toString(): String = "IconState.$name"
 }

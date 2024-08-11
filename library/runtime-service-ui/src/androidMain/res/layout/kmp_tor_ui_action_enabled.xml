@@ -17,20 +17,18 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/kmp_tor_ui_action"
-    android:layout_width="@dimen/kmp_tor_ui_action_width"
-    android:layout_height="@dimen/kmp_tor_ui_action_height"
+    android:layout_width="48dp"
+    android:layout_height="48dp"
     android:gravity="center"
     android:background="@null"
     tools:background="@android:color/holo_blue_dark">
 
     <ImageView
         android:id="@+id/kmp_tor_ui_action_image"
-        android:layout_width="@dimen/kmp_tor_ui_action_icon_width"
-        android:layout_height="@dimen/kmp_tor_ui_action_icon_height"
-        android:padding="@dimen/kmp_tor_ui_action_icon_padding"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:padding="12dp"
         android:scaleType="centerInside"
-        style="@style/Widget.KmpTorUI.NotificationActionImage"
-        tools:background="@android:color/holo_green_light"
         tools:src="@drawable/ic_kmp_tor_ui_action_newnym"
         tools:ignore="ContentDescription" />
 

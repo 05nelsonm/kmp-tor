@@ -30,7 +30,7 @@ import io.matthewnelson.kmp.tor.runtime.service.ui.internal.content.ContentMessa
 import io.matthewnelson.kmp.tor.runtime.service.ui.internal.content.ContentNetworkWaiting
 
 @Throws(Resources.NotFoundException::class)
-internal fun Context.retrieveColor(res: ColorRes): Int {
+internal fun Context.retrieveColor(res: ColorRes): ColorInt {
     if (res.id == 0) throw Resources.NotFoundException("id=0")
 
     return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
@@ -40,7 +40,7 @@ internal fun Context.retrieveColor(res: ColorRes): Int {
         // API 22-
         @Suppress("DEPRECATION")
         resources.getColor(res.id)
-    }
+    }.let { ColorInt(it) }
 }
 
 @Throws(Resources.NotFoundException::class)
@@ -62,12 +62,6 @@ internal fun Context.retrieveDrawable(res: DrawableRes): Drawable {
 
     return drawable
 }
-
-internal fun Context.retrieveString(action: ButtonAction): String = when (action) {
-    ButtonAction.NewIdentity -> R.string.kmp_tor_notification_action_newnym
-    ButtonAction.RestartTor -> R.string.kmp_tor_notification_action_restart
-    ButtonAction.StopTor -> R.string.kmp_tor_notification_action_stop
-}.let { id -> getString(id) }
 
 internal fun Context.retrieveString(content: ContentText<*>): String = when (content) {
     is ContentAction -> when (content.value) {

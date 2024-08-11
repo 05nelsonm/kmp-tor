@@ -49,17 +49,17 @@ import kotlin.jvm.JvmSynthetic
  *  - [Factory]: To be used for all [TorRuntime.ServiceFactory] instances and
  *   injected into a service object upon service creation.
  *      - Context: `SINGLETON`
- *  - [AbstractTorServiceUI]: To be created via [Factory.newInstanceUIProtected]
+ *  - [AbstractTorServiceUI]: To be created via [Factory.createProtected]
  *   upon service start.
  *      - Context: `SERVICE`
- *  - [InstanceState]: To be created via [AbstractTorServiceUI.newInstanceStateProtected]
+ *  - [InstanceState]: To be created via [AbstractTorServiceUI.createProtected]
  *   for every instance of [Lifecycle.DestroyableTorRuntime] operating within
  *   the service object.
  *      - Context: `INSTANCE`
  *
  * @see [io.matthewnelson.kmp.tor.runtime.service.TorServiceUI]
  * @throws [IllegalStateException] on instantiation if [args] were not those
- *   which were passed to [Factory.newInstanceUI]. See [Args].
+ *   which were passed to [Factory.create]. See [Args].
  * */
 public abstract class AbstractTorServiceUI<
     A: AbstractTorServiceUI.Args.UI,
@@ -217,7 +217,7 @@ internal constructor(
      * [AbstractTorServiceUI] components.
      *
      * [Args] are single use items and must be consumed only once, otherwise
-     * an exception is raised when [Factory.newInstanceUI] or [newInstanceState]
+     * an exception is raised when [Factory.create] or [create]
      * is called, resulting a service start failure.
      *
      * @see [io.matthewnelson.kmp.tor.runtime.service.TorServiceUI.Args]
@@ -228,7 +228,7 @@ internal constructor(
     ) {
 
         /**
-         * For [Factory.newInstanceUIProtected]
+         * For [Factory.createProtected]
          * */
         public abstract class UI internal constructor(
             defaultConfig: Config,
@@ -242,7 +242,7 @@ internal constructor(
         }
 
         /**
-         * For [newInstanceStateProtected]
+         * For [AbstractTorServiceUI.createProtected]
          * */
         public sealed class Instance(
             instanceConfig: Config,
@@ -408,14 +408,14 @@ internal constructor(
          * Implementors **MUST** utilize [args] to instantiate a new instance
          * of the [UI] implementation. If [args] were not consumed by the
          * returned instance of [UI], an exception will be thrown by
-         * [newInstanceUI]. See [Args].
+         * [create]. See [Args].
          * */
-        protected abstract fun newInstanceUIProtected(args: A): UI
+        protected abstract fun createProtected(args: A): UI
 
         @JvmSynthetic
         @Throws(IllegalStateException::class)
-        internal fun newInstanceUI(args: A): UI {
-            val i = newInstanceUIProtected(args)
+        internal fun create(args: A): UI {
+            val i = createProtected(args)
 
             try {
                 // Should already be initialized from instance init
@@ -478,7 +478,7 @@ internal constructor(
      * change has occurred.
      *
      * @throws [IllegalStateException] on instantiation if [args] were not those
-     *   which were passed to [newInstanceState]. See [Args].
+     *   which were passed to [create]. See [Args].
      * */
     public abstract class InstanceState<C: Config>
     @ExperimentalKmpTorApi
@@ -612,13 +612,13 @@ internal constructor(
      * Implementors **MUST** utilize [args] to instantiate a new instance
      * of the [IS] implementation. If [args] were not consumed by the
      * returned instance of [IS], an exception will be thrown by
-     * [newInstanceState]. See [Args].
+     * [create]. See [Args].
      * */
-    protected abstract fun newInstanceStateProtected(args: Args.Instance): IS
+    protected abstract fun createProtected(args: Args.Instance): IS
 
     @JvmSynthetic
     @Throws(IllegalArgumentException::class, IllegalStateException::class)
-    internal fun newInstanceState(
+    internal fun create(
         instanceConfig: Config?,
         fid: String,
         debugger: () -> ((() -> String) -> Unit)?,
@@ -647,7 +647,7 @@ internal constructor(
             processorAction,
             processorTorCmd,
         )
-        val i = newInstanceStateProtected(args)
+        val i = createProtected(args)
 
         try {
             args.initialize()

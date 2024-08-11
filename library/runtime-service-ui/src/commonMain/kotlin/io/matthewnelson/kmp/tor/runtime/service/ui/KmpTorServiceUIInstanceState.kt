@@ -86,7 +86,7 @@ public class KmpTorServiceUIInstanceState<C: AbstractKmpTorServiceUIConfig> priv
                 // Post the change outside the lock lambda
                 Executable {
                     postStateChange()
-                    debug(lazyMessage = { new.toString() })
+                    debug { new.toString() }
                 }
             }
         }?.execute()
@@ -158,6 +158,7 @@ public class KmpTorServiceUIInstanceState<C: AbstractKmpTorServiceUIConfig> priv
             update { current ->
                 current.copy(
                     text = ContentNetworkWaiting,
+                    progress = Progress.Indeterminate,
                 )
             }
         }
@@ -196,14 +197,18 @@ public class KmpTorServiceUIInstanceState<C: AbstractKmpTorServiceUIConfig> priv
 
                         Progress.None
                     }
-                    !new.daemon.isBootstrapped && new.network.isEnabled -> {
+                    !new.daemon.isBootstrapped -> {
                         Progress.Determinant(new.daemon)
                     }
-                    _state.text is ContentAction -> {
-                        Progress.Indeterminate
-                    }
-                    else -> {
-                        Progress.None
+                    else -> when (_state.text) {
+                        is ContentAction,
+                        is ContentNetworkWaiting -> {
+                            Progress.Indeterminate
+                        }
+                        is ContentBootstrap -> {
+                            Progress.Determinant(new.daemon)
+                        }
+                        else -> Progress.None
                     }
                 }
 
@@ -228,7 +233,7 @@ public class KmpTorServiceUIInstanceState<C: AbstractKmpTorServiceUIConfig> priv
                     val icon = when {
                         new.network.isDisabled -> IconState.NetworkDisabled
                         new.daemon.isBootstrapped -> if (_bandwidth !is ContentBandwidth.ZERO) {
-                            IconState.DataXfer
+                            IconState.Data
                         } else {
                             IconState.NetworkEnabled
                         }
@@ -283,7 +288,7 @@ public class KmpTorServiceUIInstanceState<C: AbstractKmpTorServiceUIConfig> priv
             }
 
             val icon = if (bandwidth !is ContentBandwidth.ZERO) {
-                IconState.DataXfer
+                IconState.Data
             } else {
                 IconState.NetworkEnabled
             }

@@ -40,7 +40,7 @@
             android:layout_gravity="end"
             android:gravity="bottom"
             android:singleLine="true"
-            style="@style/TextAppearance.KmpTorUI.Line2"
+            style="@style/TextAppearance.KmpTorUI.Text"
             tools:text="Bootstrapped 50%" />
 
     </FrameLayout>
@@ -56,7 +56,7 @@
             android:layout_gravity="top"
             android:indeterminateOnly="false"
             android:visibility="gone"
-            style="@android:style/Widget.DeviceDefault.ProgressBar.Horizontal"
+            style="@style/Widget.KmpTorUI.ProgressBar"
             tools:visibility="visible"
             tools:max="100"
             tools:progress="50" />
@@ -67,7 +67,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="top"
             android:singleLine="true"
-            style="@style/TextAppearance.KmpTorUI.Line2"
+            style="@style/TextAppearance.KmpTorUI.Text"
             tools:text="0KBps ↓ / 0KBps ↑" />
 
     </FrameLayout>

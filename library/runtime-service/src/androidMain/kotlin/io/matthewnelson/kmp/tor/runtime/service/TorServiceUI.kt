@@ -22,6 +22,7 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import android.content.res.Configuration
 import android.content.res.Resources
 import android.os.Build
 import android.os.Handler
@@ -51,16 +52,16 @@ import kotlinx.coroutines.CoroutineScope
  *  - [Factory]: To be used for all [TorRuntime.ServiceFactory] instances and
  *   injected into [TorService] upon creation.
  *      - Context: `SINGLETON`
- *  - [AbstractTorServiceUI]: To be created via [Factory.newInstanceUIProtected]
+ *  - [AbstractTorServiceUI]: To be created via [Factory.createProtected]
  *   upon [TorService] start.
  *      - Context: `SERVICE`
- *  - [InstanceState]: To be created via [AbstractTorServiceUI.newInstanceStateProtected]
+ *  - [InstanceState]: To be created via [AbstractTorServiceUI.createProtected]
  *   for every instance of [Lifecycle.DestroyableTorRuntime] operating within
  *   [TorService].
  *      - Context: `INSTANCE`
  *
  * @throws [IllegalStateException] on instantiation if [args] were not those
- *   which were passed to [Factory.newInstanceUI]. See [Args].
+ *   which were passed to [Factory.create]. See [Args].
  * */
 public abstract class TorServiceUI<C: Config, IS: InstanceState<C>>
 @ExperimentalKmpTorApi
@@ -274,6 +275,8 @@ protected constructor(
         }.also { disposable = it }
     }
 
+    public open fun onConfigurationChanged(newConfig: Configuration) {}
+
     /**
      * Core `androidMain` abstraction for a [Factory] class which is
      * responsible for instantiating new instances of [TorServiceUI]
@@ -371,7 +374,7 @@ protected constructor(
      * manner when instantiating new instances of [TorServiceUI] implementations.
      *
      * [Args] are single use items and must be consumed only once, otherwise
-     * an exception is raised when [Factory.newInstanceUI] is called resulting
+     * an exception is raised when [Factory.create] is called resulting
      * a service start failure.
      * */
     public class Args private constructor(

@@ -23,6 +23,7 @@ import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.content.ServiceConnection
+import android.content.res.Configuration
 import android.os.Build
 import android.os.Bundle
 import android.os.Binder as AndroidBinder
@@ -253,7 +254,7 @@ internal class TorService internal constructor(): Service() {
                         )
 
                         val ui = try {
-                            conn.config.factory.newInstanceUI(args)
+                            conn.config.factory.create(args)
                         } catch (e: IllegalStateException) {
                             // Implementation of TorServiceUI.Factory is bad.
                             // Report error and shutdown TorService.
@@ -295,6 +296,11 @@ internal class TorService internal constructor(): Service() {
 
     public override fun onBind(intent: Intent?): IBinder {
         return binder
+    }
+
+    public override fun onConfigurationChanged(newConfig: Configuration) {
+        super.onConfigurationChanged(newConfig)
+        ui?.onConfigurationChanged(newConfig)
     }
 
     public override fun onCreate() {
@@ -389,7 +395,7 @@ internal class TorService internal constructor(): Service() {
                 }
 
                 val pair = try {
-                    ui.newInstanceState(
+                    ui.create(
                         conn.instanceUIConfig,
                         binder.fid,
                         debugger = debugger@ {

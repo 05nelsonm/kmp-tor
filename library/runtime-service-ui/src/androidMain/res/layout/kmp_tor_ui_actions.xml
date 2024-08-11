@@ -29,6 +29,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="start|top"
         android:layout_marginStart="@dimen/kmp_tor_ui_action_container_margin_start"
+        android:layout_marginBottom="-7dp"
         android:orientation="horizontal"
         android:showDividers="middle"
         android:divider="?android:attr/listDivider"
@@ -41,14 +42,14 @@
     </LinearLayout>
 
     <LinearLayout
-        android:id="@+id/kmp_tor_ui_container_actions_cycle"
+        android:id="@+id/kmp_tor_ui_container_actions_selector"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="end"
         android:orientation="vertical">
 
         <LinearLayout
-            android:id="@+id/kmp_tor_ui_actions_load_cycle"
+            android:id="@+id/kmp_tor_ui_actions_load_selector"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="end"
@@ -61,16 +62,16 @@
             tools:layout_width="64dp"
             tools:layout_height="32dp">
 
-            <!-- Cycle Actions added here -->
+            <!-- Selector Actions added here -->
         </LinearLayout>
 
         <TextView
-            android:id="@+id/kmp_tor_ui_actions_cycle_text"
+            android:id="@+id/kmp_tor_ui_actions_selector_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="end"
             android:textStyle="bold"
-            style="@style/TextAppearance.KmpTorUI.Line2"
+            style="@style/TextAppearance.KmpTorUI.Text"
             tools:text="[0A17…755C]" />
 
     </LinearLayout>

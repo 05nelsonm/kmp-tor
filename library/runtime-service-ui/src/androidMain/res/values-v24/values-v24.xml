@@ -15,5 +15,6 @@
   * limitations under the License.
   *-->
 <resources>
+    <!-- Notification.DecoratedCustomViewStyle is used on API 24+, so no need to adjust textSize -->
     <style name="TextAppearance.KmpTorUI.Title" parent="@android:style/TextAppearance.Material.Notification.Title" />
 </resources>

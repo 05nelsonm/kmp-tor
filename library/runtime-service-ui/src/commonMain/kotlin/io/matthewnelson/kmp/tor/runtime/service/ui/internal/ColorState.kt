@@ -15,9 +15,13 @@
  **/
 package io.matthewnelson.kmp.tor.runtime.service.ui.internal
 
-internal enum class ColorState {
-    Ready,
-    NotReady;
+internal sealed class ColorState private constructor() {
 
-    public override fun toString(): String = "ColorState.$name"
+    internal data object Ready: ColorState()
+    internal data object NotReady: ColorState()
+
+    public final override fun toString(): String = "ColorState." + when (this) {
+        is Ready -> "Ready"
+        is NotReady -> "NotReady"
+    }
 }
