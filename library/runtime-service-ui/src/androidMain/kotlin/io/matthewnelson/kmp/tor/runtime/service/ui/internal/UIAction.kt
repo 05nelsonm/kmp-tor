@@ -75,16 +75,24 @@ internal enum class UIAction {
                 pallet: UIColor.Pallet,
                 enabled: Boolean,
             ): RemoteViews {
-                val new = View(action, pallet, enabled)
+                val view = View(action, pallet, enabled)
+
+                // Caching is disabled on API 23- because
+                // it can cause a failed binder transaction.
+                if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) {
+                    // API 23-
+                    return view.build()
+                }
+
                 val cached = cache[action.ordinal]
-                if (cached == new) {
+                if (cached == view) {
                     cached.remoteView?.let { return it }
                 }
 
-                val view = new.build()
-                new.remoteView = view
-                cache[action.ordinal] = new
-                return view
+                val remoteView = view.build()
+                view.remoteView = remoteView
+                cache[action.ordinal] = view
+                return remoteView
             }
 
             internal fun clearCache() {
