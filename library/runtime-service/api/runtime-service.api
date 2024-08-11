@@ -122,6 +122,7 @@ public abstract class io/matthewnelson/kmp/tor/runtime/service/TorServiceUI : io
 	protected final field channelID Ljava/lang/String;
 	protected fun <init> (Lio/matthewnelson/kmp/tor/runtime/service/TorServiceUI$Args;)V
 	public static final fun hasPermission (Landroid/content/Context;Ljava/lang/String;)Z
+	public fun onConfigurationChanged (Landroid/content/res/Configuration;)V
 	protected final fun post (Landroid/app/Notification;)V
 	protected final fun register (Lio/matthewnelson/kmp/tor/runtime/service/TorServiceUI$Receiver;Landroid/content/IntentFilter;Ljava/lang/String;Landroid/os/Handler;Ljava/lang/Boolean;)Lio/matthewnelson/kmp/tor/runtime/core/Disposable$Once;
 	protected final fun register (Lio/matthewnelson/kmp/tor/runtime/service/TorServiceUI$Receiver;Landroid/content/IntentFilter;Ljava/lang/String;Landroid/os/Handler;Ljava/lang/Boolean;I)Lio/matthewnelson/kmp/tor/runtime/core/Disposable$Once;

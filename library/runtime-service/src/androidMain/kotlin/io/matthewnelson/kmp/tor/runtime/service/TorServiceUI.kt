@@ -22,6 +22,7 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import android.content.res.Configuration
 import android.content.res.Resources
 import android.os.Build
 import android.os.Handler
@@ -273,6 +274,8 @@ protected constructor(
             } catch (_: Throwable) {}
         }.also { disposable = it }
     }
+
+    public open fun onConfigurationChanged(newConfig: Configuration) {}
 
     /**
      * Core `androidMain` abstraction for a [Factory] class which is
