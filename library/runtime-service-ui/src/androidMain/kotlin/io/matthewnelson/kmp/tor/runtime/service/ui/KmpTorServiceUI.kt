@@ -673,7 +673,7 @@ public class KmpTorServiceUI private constructor(
                 View.VISIBLE to Triple(100, 0, true)
             }
             is Progress.None -> {
-                View.GONE to null
+                View.INVISIBLE to null
             }
         }
 
