@@ -560,7 +560,7 @@ public class KmpTorServiceUI private constructor(
 
         builder.setSmallIcon(iconRes.id)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            builder.setColor(pallet.notNight.defaultColor)
+            builder.setColor(pallet.default.argb)
         }
 
         val content = RemoteViews(appContext.packageName, R.layout.kmp_tor_ui)
@@ -605,8 +605,7 @@ public class KmpTorServiceUI private constructor(
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) return
         // API 23-
 
-        val color = ColorInt(pallet.notNight.defaultColor)
-        val bitmap = iconRes.toIconBitmap(appContext, color, dpSize = 18)
+        val bitmap = iconRes.toIconBitmap(appContext, pallet.default, dpSize = 18)
         setImageViewBitmap(R.id.kmp_tor_ui_header_icon, bitmap)
         setTextViewText(R.id.kmp_tor_ui_header_app_name, appLabel)
 
@@ -661,9 +660,10 @@ public class KmpTorServiceUI private constructor(
         setProgressBar(progressId, max, progress, indeterminate)
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            setColorStateList(progressId, "setProgressTintList", pallet.notNight, pallet.night)
-            setColorStateList(progressId, "setProgressBackgroundTintList", pallet.notNight, pallet.night)
-            setColorStateList(progressId, "setIndeterminateTintList", pallet.notNight, pallet.night)
+            // API 31+
+            setColorStateList(progressId, "setProgressTintList", pallet.notNight, pallet.yesNight)
+            setColorStateList(progressId, "setProgressBackgroundTintList", pallet.notNight, pallet.yesNight)
+            setColorStateList(progressId, "setIndeterminateTintList", pallet.notNight, pallet.yesNight)
         }
     }
 
@@ -928,6 +928,7 @@ public class KmpTorServiceUI private constructor(
         private val P_INTENT_FLAGS by lazy {
             var f = PendingIntent.FLAG_UPDATE_CURRENT
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                // API 31+
                 f = f or PendingIntent.FLAG_IMMUTABLE
             }
             f

@@ -121,19 +121,22 @@ internal enum class UIAction {
                 val imageResId = R.id.kmp_tor_ui_action_image
 
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                    // API 24+
                     val icon = Icon.createWithResource(appContext, iconRes.id)
 
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                        view.setColorStateList(imageResId, "setImageTintList", pallet.notNight, pallet.night)
+                        // API 31+
+                        view.setColorStateList(imageResId, "setImageTintList", pallet.notNight, pallet.yesNight)
                     } else {
-                        icon.setTint(pallet.notNight.defaultColor)
+                        // API 24..30
+                        icon.setTint(pallet.default.argb)
                         icon.setTintMode(PorterDuff.Mode.SRC_IN)
                     }
 
                     view.setImageViewIcon(imageResId, icon)
                 } else {
-                    val color = ColorInt(pallet.notNight.defaultColor)
-                    val bitmap = iconRes.toIconBitmap(appContext, color, dpSize = 24)
+                    // API 23-
+                    val bitmap = iconRes.toIconBitmap(appContext, pallet.default, dpSize = 24)
                     view.setImageViewBitmap(imageResId, bitmap)
                 }
 

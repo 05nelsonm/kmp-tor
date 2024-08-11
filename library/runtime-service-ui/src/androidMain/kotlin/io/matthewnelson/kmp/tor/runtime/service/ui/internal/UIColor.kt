@@ -17,6 +17,8 @@ package io.matthewnelson.kmp.tor.runtime.service.ui.internal
 
 import android.content.Context
 import android.content.res.ColorStateList
+import android.content.res.Configuration
+import android.content.res.Resources
 import android.content.res.TypedArray
 import android.graphics.Color
 import android.util.TypedValue
@@ -26,11 +28,21 @@ import io.matthewnelson.kmp.tor.runtime.service.ui.R
 internal class UIColor private constructor(
     private val appContext: Context,
     private val devContext: ContextThemeWrapper,
+    private val sysResources: Resources,
     private val defaultNotNight: Int,
-    private val defaultNight: Int,
+    private val defaultYesNight: Int,
 ) {
 
-    internal data class Pallet(internal val notNight: ColorStateList, internal val night: ColorStateList)
+    internal data class Pallet(
+        internal val notNight: ColorStateList,
+        internal val yesNight: ColorStateList,
+        internal val isUIModeNight: Boolean,
+    ) {
+
+        internal val default: ColorInt = (if (isUIModeNight) yesNight else notNight)
+            .defaultColor
+            .let { ColorInt(it) }
+    }
 
     private var appThemeHashCode: Int? = appContext.theme?.hashCode()
     private var isReadyAttributeDefined: Boolean? = null
@@ -43,7 +55,7 @@ internal class UIColor private constructor(
                 val hashCode = appTheme.hashCode()
                 if (hashCode != appThemeHashCode) {
                     isReadyAttributeDefined = null
-                    appThemeHashCode = null
+                    appThemeHashCode = hashCode
                 }
 
                 if (isReadyAttributeDefined != false) {
@@ -57,7 +69,11 @@ internal class UIColor private constructor(
                     ) {
                         isReadyAttributeDefined = true
                         val csl = ColorStateList.valueOf(t.data)
-                        return Pallet(csl, csl)
+
+                        // Always set isUIModeNight to true here b/c
+                        // ColorStateList is the same, so it doesn't
+                        // matter which is chosen from for RemoteViews.
+                        return Pallet(csl, csl, isUIModeNight = true)
                     }
 
                     isReadyAttributeDefined = false
@@ -65,7 +81,21 @@ internal class UIColor private constructor(
             }
         }
 
-        palletNotReady?.let { return it }
+        return getOrCreatePalletNotReady()
+    }
+
+    private fun getOrCreatePalletNotReady(): Pallet {
+        val isUIModeNight = sysResources.isUIModeNight()
+
+        palletNotReady?.let { pallet ->
+            return if (pallet.isUIModeNight == isUIModeNight) {
+                pallet
+            } else {
+                val copy = pallet.copy(isUIModeNight = isUIModeNight)
+                palletNotReady = copy
+                copy
+            }
+        }
 
         var ta: TypedArray? = null
         try {
@@ -77,18 +107,18 @@ internal class UIColor private constructor(
 
             var notNight = ta.getColorStateList(0)
             @Suppress("ResourceType")
-            var night = ta.getColorStateList(1)
+            var yesnight = ta.getColorStateList(1)
 
-            val setGlobal = notNight != null && night != null
+            val setGlobal = notNight != null && yesnight != null
 
             if (notNight == null) {
                 notNight = ColorStateList.valueOf(defaultNotNight)
             }
-            if (night == null) {
-                night = ColorStateList.valueOf(defaultNight)
+            if (yesnight == null) {
+                yesnight = ColorStateList.valueOf(defaultYesNight)
             }
 
-            val result = Pallet(notNight, night)
+            val result = Pallet(notNight, yesnight, isUIModeNight)
             if (setGlobal) {
                 palletNotReady = result
             }
@@ -100,7 +130,16 @@ internal class UIColor private constructor(
             ta?.recycle()
         }
 
-        return Pallet(ColorStateList.valueOf(defaultNotNight), ColorStateList.valueOf(defaultNight))
+        return Pallet(
+            ColorStateList.valueOf(defaultNotNight),
+            ColorStateList.valueOf(defaultYesNight),
+            isUIModeNight,
+        )
+    }
+
+    private fun Resources.isUIModeNight(): Boolean {
+        val current = configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK
+        return current == Configuration.UI_MODE_NIGHT_YES
     }
 
     internal companion object {
@@ -108,13 +147,14 @@ internal class UIColor private constructor(
         @JvmSynthetic
         internal fun of(
             context: Context,
+            sysResources: Resources = Resources.getSystem(),
             defaultNotNight: Int = Color.DKGRAY,
-            defaultNight: Int = Color.GRAY,
+            defaultYesNight: Int = Color.GRAY,
         ): UIColor {
             val appContext = context.applicationContext
             val devContext = ContextThemeWrapper(appContext, android.R.style.Theme_DeviceDefault)
 
-            return UIColor(appContext, devContext, defaultNotNight, defaultNight)
+            return UIColor(appContext, devContext, sysResources, defaultNotNight, defaultYesNight)
         }
     }
 }
