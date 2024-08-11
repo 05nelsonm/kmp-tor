@@ -52,10 +52,10 @@
         <ProgressBar
             android:id="@+id/kmp_tor_ui_content_info_progress"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="18dp"
             android:layout_gravity="top"
             android:indeterminateOnly="false"
-            android:visibility="gone"
+            android:visibility="invisible"
             style="@style/Widget.KmpTorUI.ProgressBar"
             tools:visibility="visible"
             tools:max="100"
@@ -66,6 +66,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="top"
+            android:maxHeight="18dp"
             android:singleLine="true"
             style="@style/TextAppearance.KmpTorUI.Text"
             tools:text="0KBps ↓ / 0KBps ↑" />

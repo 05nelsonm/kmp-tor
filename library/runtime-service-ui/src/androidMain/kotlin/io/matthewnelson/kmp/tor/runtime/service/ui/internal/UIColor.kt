@@ -27,7 +27,6 @@ import io.matthewnelson.kmp.tor.runtime.service.ui.R
 
 internal class UIColor private constructor(
     private val appContext: Context,
-    private val devContext: ContextThemeWrapper,
     private val sysResources: Resources,
     private val defaultNotNight: Int,
     private val defaultYesNight: Int,
@@ -99,11 +98,12 @@ internal class UIColor private constructor(
 
         var ta: TypedArray? = null
         try {
+            val wrapper = ContextThemeWrapper(appContext, android.R.style.Theme_DeviceDefault)
             val attrs = intArrayOf(
                 android.R.attr.textColorSecondaryInverse,   // Not Night
                 android.R.attr.textColorSecondary,          // Night
             )
-            ta = devContext.obtainStyledAttributes(attrs)
+            ta = wrapper.obtainStyledAttributes(attrs)
 
             var notNight = ta.getColorStateList(0)
             @Suppress("ResourceType")
@@ -150,11 +150,11 @@ internal class UIColor private constructor(
             sysResources: Resources = Resources.getSystem(),
             defaultNotNight: Int = Color.DKGRAY,
             defaultYesNight: Int = Color.GRAY,
-        ): UIColor {
-            val appContext = context.applicationContext
-            val devContext = ContextThemeWrapper(appContext, android.R.style.Theme_DeviceDefault)
-
-            return UIColor(appContext, devContext, sysResources, defaultNotNight, defaultYesNight)
-        }
+        ): UIColor = UIColor(
+            context.applicationContext,
+            sysResources,
+            defaultNotNight,
+            defaultYesNight,
+        )
     }
 }

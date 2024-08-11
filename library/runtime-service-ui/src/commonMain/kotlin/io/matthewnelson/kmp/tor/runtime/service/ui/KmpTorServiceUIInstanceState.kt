@@ -275,7 +275,10 @@ public class KmpTorServiceUIInstanceState<C: AbstractKmpTorServiceUIConfig> priv
                 val u = bw.substring(i + 1).trim().toLongOrNull() ?: _bandwidth.up
 
                 val new = _bandwidth.copy(down = d, up = u)
-                if (_bandwidth == new) return@observer
+                if (_bandwidth == new) {
+                    postStateChange()
+                    return@observer
+                }
 
                 new
             }
@@ -283,8 +286,10 @@ public class KmpTorServiceUIInstanceState<C: AbstractKmpTorServiceUIConfig> priv
             _bandwidth = bandwidth
 
             with(_stateTor) {
-                if (!daemon.isBootstrapped) return@observer
-                if (!network.isEnabled) return@observer
+                if (!daemon.isBootstrapped || !network.isEnabled) {
+                    postStateChange()
+                    return@observer
+                }
             }
 
             val icon = if (bandwidth !is ContentBandwidth.ZERO) {

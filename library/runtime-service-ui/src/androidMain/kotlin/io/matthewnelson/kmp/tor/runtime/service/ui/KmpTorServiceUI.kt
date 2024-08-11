@@ -23,6 +23,7 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import android.content.pm.PackageManager
 import android.content.res.Resources
 import android.os.Build
 import android.os.SystemClock
@@ -261,16 +262,28 @@ public class KmpTorServiceUI private constructor(
     ) {
 
         private val actionIcons = UIAction.Icons.of(b)
-        private val contentIntent: (code: Int, context: Context) -> PendingIntent? = b.contentIntent
-            ?: create@ { code, context ->
-                val appContext = context.applicationContext
+        private val contentIntent: (code: Int, context: Context) -> PendingIntent? = when (val ci = b.contentIntent) {
+            // Builder value was set to null to indicate no
+            // content intent is desired. STUB actually produces
+            // null, so reuse.
+            null -> STUB_PACKAGE_LAUNCHER
 
-                val launchIntent = appContext.packageManager
-                    ?.getLaunchIntentForPackage(appContext.packageName)
-                    ?: return@create null
+            // Builder value was not modified, create the default.
+            STUB_PACKAGE_LAUNCHER -> {
+                create@ { code, context ->
+                    val appContext = context.applicationContext
 
-                PendingIntent.getActivity(appContext, code, launchIntent, P_INTENT_FLAGS)
+                    val launchIntent = appContext.packageManager
+                        ?.getLaunchIntentForPackage(appContext.packageName)
+                        ?: return@create null
+
+                    PendingIntent.getActivity(appContext, code, launchIntent, P_INTENT_FLAGS)
+                }
             }
+
+            // Custom implementation
+            else -> ci
+        }
 
         @JvmField
         public val actionIntentPermissionSuffix: String? = b.actionIntentPermissionSuffix
@@ -338,7 +351,7 @@ public class KmpTorServiceUI private constructor(
              * TODO
              * */
             @JvmField
-            public var contentIntent: ((code: Int, context: Context) -> PendingIntent?)? = null
+            public var contentIntent: ((code: Int, context: Context) -> PendingIntent?)? = STUB_PACKAGE_LAUNCHER
 
             /**
              * TODO
@@ -474,15 +487,26 @@ public class KmpTorServiceUI private constructor(
             contentIntent,
             args,
         )
+
+        private companion object {
+
+            /**
+             * This is simply a stub for [Builder] to indicate that the default
+             * [PackageManager.getLaunchIntentForPackage] should be used, without
+             * exposing the actual callback implementation via [Builder].
+             * */
+            private val STUB_PACKAGE_LAUNCHER: (code: Int, context: Context) -> PendingIntent? = { _, _ -> null }
+        }
     }
 
     private val appLabel = appContext.applicationInfo.loadLabel(appContext.packageManager)
     private val startTime = SystemClock.elapsedRealtime()
-    private val uiColor = UIColor.of(appContext)
 
     private val keyguardHandler = KeyguardHandler()
     private val pendingIntents = PendingIntents(actionIntentPermissionSuffix, contentIntentCode, contentIntent)
-    private val actionCache = UIAction.View.Cache.of(appContext, actionIcons) { action ->
+
+    private val uiColor = UIColor.of(appContext)
+    private val uiActionCache = UIAction.View.Cache.of(appContext, actionIcons) { action ->
         if (action != null) {
             pendingIntents[action]
         } else {
@@ -537,7 +561,7 @@ public class KmpTorServiceUI private constructor(
         }
     }
 
-    private var current: Triple<UIState, Boolean, Boolean>? = null
+    private var current: CurrentUIState? = null
 
     protected override fun onUpdate(
         displayed: KmpTorServiceUIInstanceState<Config>,
@@ -546,9 +570,33 @@ public class KmpTorServiceUI private constructor(
     ) {
         val state = displayed.state
 
-        Triple(state, hasPrevious, hasNext).let { new ->
-            if (new == current) return
-            current = new
+        // TorEvent.BW is dispatched every 1 second (even if DisableNetwork is true).
+        // This allows API 23- header layout to be a simple TextView, instead of
+        // something like a Chronometer. Need to check for each onUpdate invocation
+        // if the text changes in order to rebuild & post a new notification.
+        val durationText = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) "" else {
+            val elapsed = (SystemClock.elapsedRealtime() - startTime)
+                .toDuration(DurationUnit.MILLISECONDS)
+
+            when {
+                elapsed > DURATION_1_DAY -> "${elapsed.inWholeDays}d"
+                elapsed > DURATION_1_HOUR -> "${elapsed.inWholeHours}h"
+                else -> "${elapsed.inWholeMinutes}m"
+            }
+        }
+
+        current?.let { current ->
+            if (
+                current.state != state
+                || current.hasPrevious != hasPrevious
+                || current.hasNext != hasNext
+                || current.durationText != durationText
+            ) {
+                // There was a stateful change. Continue.
+                this.current = CurrentUIState(state, hasPrevious, hasNext, durationText)
+            } else {
+                return
+            }
         }
 
         val pallet = uiColor[state.color]
@@ -573,7 +621,7 @@ public class KmpTorServiceUI private constructor(
             is DisplayName.Text -> n.text
         }
 
-        content.applyHeader(pallet, iconRes)
+        content.applyHeader(pallet, iconRes, durationText)
         content.applyContent(pallet, state, title, text)
         val (showActions, expandedApi23) = content.applyActions(pallet, state, displayName, hasPrevious, hasNext, text)
 
@@ -595,12 +643,10 @@ public class KmpTorServiceUI private constructor(
         }.post()
     }
 
-    // TODO: Duration on API 23- needs to handled for header
-    //  which may also affect current depending on the
-    //  implementation. Issue #490.
     private fun RemoteViews.applyHeader(
         pallet: UIColor.Pallet,
         iconRes: DrawableRes,
+        durationText: String,
     ) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) return
         // API 23-
@@ -608,16 +654,6 @@ public class KmpTorServiceUI private constructor(
         val bitmap = iconRes.toIconBitmap(appContext, pallet.default, dpSize = 18)
         setImageViewBitmap(R.id.kmp_tor_ui_header_icon, bitmap)
         setTextViewText(R.id.kmp_tor_ui_header_app_name, appLabel)
-
-        val elapsed = (SystemClock.elapsedRealtime() - startTime)
-            .toDuration(DurationUnit.MILLISECONDS)
-
-        val durationText = when {
-            elapsed > DURATION_1_DAY -> "${elapsed.inWholeDays}d"
-            elapsed > DURATION_1_HOUR -> "${elapsed.inWholeHours}h"
-            else -> "${elapsed.inWholeMinutes}m"
-        }
-
         setTextViewText(R.id.kmp_tor_ui_header_duration, durationText)
     }
 
@@ -637,7 +673,7 @@ public class KmpTorServiceUI private constructor(
                 View.VISIBLE to Triple(100, 0, true)
             }
             is Progress.None -> {
-                View.GONE to null
+                View.INVISIBLE to null
             }
         }
 
@@ -728,7 +764,7 @@ public class KmpTorServiceUI private constructor(
                     ButtonAction.StopTor -> UIAction.Stop
                 }
 
-                val view = actionCache.getOrCreate(uiAction, pallet, enabled = true)
+                val view = uiActionCache.getOrCreate(uiAction, pallet, enabled = true)
                 addView(R.id.kmp_tor_ui_actions_load_instance, view)
             }
 
@@ -758,7 +794,7 @@ public class KmpTorServiceUI private constructor(
                 UIAction.Previous to hasPrevious,
                 UIAction.Next to hasNext,
             ).forEach { (uiAction, enabled) ->
-                val view = actionCache.getOrCreate(uiAction, pallet, enabled = enabled)
+                val view = uiActionCache.getOrCreate(uiAction, pallet, enabled = enabled)
                 addView(R.id.kmp_tor_ui_actions_load_selector, view)
             }
 
@@ -774,7 +810,7 @@ public class KmpTorServiceUI private constructor(
         super.onDestroy()
         keyguardHandler.destroy()
         pendingIntents.destroy()
-        actionCache.clearCache()
+        uiActionCache.clearCache()
     }
 
     protected override fun createProtected(
@@ -782,6 +818,13 @@ public class KmpTorServiceUI private constructor(
     ): KmpTorServiceUIInstanceState<Config> = KmpTorServiceUIInstanceState.of(
         args,
         isDeviceLocked = keyguardHandler::isDeviceLocked
+    )
+
+    private class CurrentUIState(
+        val state: UIState,
+        val hasPrevious: Boolean,
+        val hasNext: Boolean,
+        val durationText: String,
     )
 
     private inner class KeyguardHandler: Destroyable {
