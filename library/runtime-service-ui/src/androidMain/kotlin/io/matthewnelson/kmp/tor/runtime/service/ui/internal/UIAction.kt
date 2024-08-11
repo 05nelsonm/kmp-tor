@@ -144,7 +144,7 @@ internal enum class UIAction {
                     view.setImageViewIcon(imageResId, icon)
                 } else {
                     // API 23-
-                    val bitmap = iconRes.toIconBitmap(appContext, pallet.default, dpSize = 24)
+                    val bitmap = iconRes.toBitmap(appContext, pallet.default, dpSize = 24)
                     view.setImageViewBitmap(imageResId, bitmap)
                 }
 

@@ -23,6 +23,7 @@ import android.content.res.TypedArray
 import android.graphics.Color
 import android.util.TypedValue
 import android.view.ContextThemeWrapper
+import io.matthewnelson.kmp.tor.runtime.service.ui.KmpTorServiceUI
 import io.matthewnelson.kmp.tor.runtime.service.ui.R
 
 internal class UIColor private constructor(
@@ -38,6 +39,13 @@ internal class UIColor private constructor(
         internal val isUIModeNight: Boolean,
     ) {
 
+        internal constructor(colorReady: ColorInt): this(ColorStateList.valueOf(colorReady.argb))
+
+        // Always set isUIModeNight to true here b/c ColorStateList
+        // is the same for the accent color, so it doesn't matter
+        // which is chosen from for RemoteViews.
+        internal constructor(colorReady: ColorStateList): this(colorReady, colorReady, true)
+
         internal val default: ColorInt = (if (isUIModeNight) yesNight else notNight)
             .defaultColor
             .let { ColorInt(it) }
@@ -47,8 +55,12 @@ internal class UIColor private constructor(
     private var isReadyAttributeDefined: Boolean? = null
     private var palletNotReady: Pallet? = null
 
-    internal operator fun get(state: ColorState): Pallet {
+    internal operator fun get(state: ColorState, colorReady: ColorRes?): Pallet {
         if (state is ColorState.Ready) {
+            if (colorReady != null) {
+                return Pallet(appContext.retrieveColor(colorReady))
+            }
+
             appContext.theme?.let { appTheme ->
 
                 val hashCode = appTheme.hashCode()
@@ -67,12 +79,7 @@ internal class UIColor private constructor(
                         && t.type <= TypedValue.TYPE_LAST_COLOR_INT
                     ) {
                         isReadyAttributeDefined = true
-                        val csl = ColorStateList.valueOf(t.data)
-
-                        // Always set isUIModeNight to true here b/c
-                        // ColorStateList is the same, so it doesn't
-                        // matter which is chosen from for RemoteViews.
-                        return Pallet(csl, csl, isUIModeNight = true)
+                        return Pallet(ColorInt(t.data))
                     }
 
                     isReadyAttributeDefined = false
@@ -101,7 +108,7 @@ internal class UIColor private constructor(
             val wrapper = ContextThemeWrapper(appContext, android.R.style.Theme_DeviceDefault)
             val attrs = intArrayOf(
                 android.R.attr.textColorSecondaryInverse,   // Not Night
-                android.R.attr.textColorSecondary,          // Night
+                android.R.attr.textColorSecondary,          // Yes Night
             )
             ta = wrapper.obtainStyledAttributes(attrs)
 
