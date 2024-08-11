@@ -56,12 +56,12 @@ internal value class DrawableRes internal constructor(internal val id: Int) {
         return bitmap
     }
 
-    private fun Bitmap.applyColor(size: Int, color: ColorInt): Bitmap {
+    private fun Bitmap.applyColor(pxSize: Int, color: ColorInt): Bitmap {
         val source = this
         val paint = Paint()
         paint.setColorFilter(PorterDuffColorFilter(color.argb, PorterDuff.Mode.SRC_IN))
 
-        val result = Bitmap.createBitmap(size, size, Config.ARGB_8888)
+        val result = Bitmap.createBitmap(pxSize, pxSize, Config.ARGB_8888)
         Canvas(result).drawBitmap(source, 0f, 0f, paint)
         return result
     }
