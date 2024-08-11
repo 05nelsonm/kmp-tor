@@ -23,6 +23,7 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import android.content.pm.PackageManager
 import android.content.res.Resources
 import android.os.Build
 import android.os.SystemClock
@@ -261,16 +262,28 @@ public class KmpTorServiceUI private constructor(
     ) {
 
         private val actionIcons = UIAction.Icons.of(b)
-        private val contentIntent: (code: Int, context: Context) -> PendingIntent? = b.contentIntent
-            ?: create@ { code, context ->
-                val appContext = context.applicationContext
+        private val contentIntent: (code: Int, context: Context) -> PendingIntent? = when (val ci = b.contentIntent) {
+            // Builder value was set to null to indicate no
+            // content intent is desired. STUB actually produces
+            // null, so reuse.
+            null -> STUB_PACKAGE_LAUNCHER
 
-                val launchIntent = appContext.packageManager
-                    ?.getLaunchIntentForPackage(appContext.packageName)
-                    ?: return@create null
+            // Builder value was not modified, create the default.
+            STUB_PACKAGE_LAUNCHER -> {
+                create@ { code, context ->
+                    val appContext = context.applicationContext
 
-                PendingIntent.getActivity(appContext, code, launchIntent, P_INTENT_FLAGS)
+                    val launchIntent = appContext.packageManager
+                        ?.getLaunchIntentForPackage(appContext.packageName)
+                        ?: return@create null
+
+                    PendingIntent.getActivity(appContext, code, launchIntent, P_INTENT_FLAGS)
+                }
             }
+
+            // Custom implementation
+            else -> ci
+        }
 
         @JvmField
         public val actionIntentPermissionSuffix: String? = b.actionIntentPermissionSuffix
@@ -338,7 +351,7 @@ public class KmpTorServiceUI private constructor(
              * TODO
              * */
             @JvmField
-            public var contentIntent: ((code: Int, context: Context) -> PendingIntent?)? = null
+            public var contentIntent: ((code: Int, context: Context) -> PendingIntent?)? = STUB_PACKAGE_LAUNCHER
 
             /**
              * TODO
@@ -474,6 +487,16 @@ public class KmpTorServiceUI private constructor(
             contentIntent,
             args,
         )
+
+        private companion object {
+
+            /**
+             * This is simply a stub for [Builder] to indicate that the default
+             * [PackageManager.getLaunchIntentForPackage] should be used, without
+             * exposing the actual callback implementation via [Builder].
+             * */
+            private val STUB_PACKAGE_LAUNCHER: (code: Int, context: Context) -> PendingIntent? = { _, _ -> null }
+        }
     }
 
     private val appLabel = appContext.applicationInfo.loadLabel(appContext.packageManager)
