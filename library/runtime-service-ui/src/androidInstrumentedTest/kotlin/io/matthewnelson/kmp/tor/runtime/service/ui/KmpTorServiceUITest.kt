@@ -41,7 +41,7 @@ class KmpTorServiceUITest {
             notificationId = 615,
             channelId = "Tor Channel ID",
             channelName = R_test.string.kmp_tor_ui_test_channel_name,
-            channelDescription = R_test.string.kmp_tor_ui_test_channel_name,
+            channelDescription = R_test.string.kmp_tor_ui_test_channel_description,
         ),
         block = {
             // TODO

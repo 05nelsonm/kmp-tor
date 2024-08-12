@@ -19,7 +19,6 @@ package io.matthewnelson.kmp.tor.runtime.service.ui
 
 import android.app.KeyguardManager
 import android.app.Notification
-import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
