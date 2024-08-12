@@ -178,10 +178,9 @@ protected constructor(
 
     private val service: Context = args.service()
     private val info: NotificationInfo = args.info()
+
     @Volatile
     private var _hasStartedForeground: Boolean = false
-    @Volatile
-    private var _isStoppingForeground: Boolean = false
     @Volatile
     private var _manager: NotificationManager? = service
         .getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
@@ -241,30 +240,30 @@ protected constructor(
             }
         }
 
-        val startForeground = if (_hasStartedForeground) {
-            false
-        } else {
-            @OptIn(InternalKmpTorApi::class)
-            synchronized(lock) {
-                if (_hasStartedForeground) {
-                    false
-                } else {
-                    _hasStartedForeground = true
-                    true
-                }
-            }
-        }
-
         if (isDestroyed()) return
-        if (_isStoppingForeground) return
+        if (_manager == null) return
 
         val id = info.notificationId.toInt()
-        if (startForeground && service is Service) {
-            // API 29+ will pull foregroundServiceType from
-            // whatever has been declared in the manifest.
-            service.startForeground(id, this)
-        } else {
-            _manager?.notify(id, this)
+
+        @OptIn(InternalKmpTorApi::class)
+        synchronized(lock) {
+            if (isDestroyed()) return
+            val manager = _manager ?: return
+
+            val startForeground = if (!_hasStartedForeground) {
+                _hasStartedForeground = true
+                true
+            } else {
+                false
+            }
+
+            if (startForeground && service is Service) {
+                // API 29+ will pull foregroundServiceType from
+                // whatever has been declared in the manifest.
+                service.startForeground(id, this)
+            } else {
+                manager.notify(id, this)
+            }
         }
     }
 
@@ -362,15 +361,15 @@ protected constructor(
          * creating a new instance of [TorServiceConfig.Foreground].
          *
          * The intended purpose is to validate anything requiring [Context]
-         * that the [Factory] maintains outside the [defaultConfig].
+         * that the [Factory] was instantiated with.
          *
-         * The [defaultConfig] is also validated directly after this returns,
-         * from [TorServiceConfig.Foreground.Companion.Builder].
+         * The [defaultConfig] and [info] are validated directly after this
+         * function is called and do not need to be validated here.
          *
          * Implementations **MUST** ensure all resources are configured
          * correctly to inhibit an unrecoverable application state if
          * [TorServiceConfig] is allowed to be instantiated with a
-         * non-operational component.
+         * non-operational component or resource.
          * */
         @Throws(IllegalStateException::class, Resources.NotFoundException::class)
         public abstract fun validate(context: Context)
@@ -384,50 +383,10 @@ protected constructor(
          * Implementations **MUST** ensure all resources are configured
          * correctly to inhibit an unrecoverable application state if
          * [TorServiceConfig], or [TorRuntime.Environment] is allowed to be
-         * instantiated with a non-operational component.
+         * instantiated with a non-operational component or resource.
          * */
         @Throws(IllegalArgumentException::class, Resources.NotFoundException::class)
         public abstract fun validateConfig(context: Context, config: C)
-    }
-
-    @JvmSynthetic
-    internal fun stopForeground() {
-        _isStoppingForeground = true
-
-        @OptIn(InternalKmpTorApi::class)
-        val stopForeground = synchronized(lock) {
-            val wasNotNull = _manager != null
-            _manager = null
-
-            if (!_hasStartedForeground) {
-                // Notification.post was never called, so startForeground
-                // never triggered. Setting this to `true` will modify future
-                // Notification.post behavior so that startForeground is NOT
-                // called, it will use the NotificationManager (which was
-                // de-referenced above).
-                _hasStartedForeground = true
-                false
-            } else {
-                // Notification.post has been called before, the first of which
-                // had called Service.startForeground.
-                //
-                // If manager was not null, then this is first call to stopForeground
-                // and Service is about to stop (e.g. onTaskRemoved).
-                wasNotNull
-            }
-        }
-
-        if (!stopForeground) return
-        if (service !is Service) return
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            // API 33+
-            service.stopForeground(Service.STOP_FOREGROUND_REMOVE)
-        } else {
-            // API 32-
-            @Suppress("DEPRECATION")
-            service.stopForeground(/* removeNotification */true)
-        }
     }
 
     /**
@@ -481,5 +440,28 @@ protected constructor(
          * */
         @JvmStatic
         public fun Context.hasPermission(permission: String): Boolean = isPermissionGranted(permission)
+    }
+
+    @JvmSynthetic
+    internal fun stopForeground() {
+
+        @OptIn(InternalKmpTorApi::class)
+        synchronized(lock) {
+            val isFirstInvocation = _manager != null
+            _manager = null
+
+            if (service !is Service) return
+            if (!_hasStartedForeground) return
+            if (!isFirstInvocation) return
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                // API 33+
+                service.stopForeground(Service.STOP_FOREGROUND_REMOVE)
+            } else {
+                // API 32-
+                @Suppress("DEPRECATION")
+                service.stopForeground(/* removeNotification */true)
+            }
+        }
     }
 }
