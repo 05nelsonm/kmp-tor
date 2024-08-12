@@ -22,6 +22,8 @@ import io.matthewnelson.kmp.tor.runtime.core.Destroyable.Companion.checkIsNotDes
 import io.matthewnelson.kmp.tor.runtime.core.ctrl.Reply
 import io.matthewnelson.kmp.tor.runtime.ctrl.internal.Debugger.Companion.d
 import kotlinx.coroutines.delay
+import kotlin.collections.removeFirst as kRemoveFirst
+import kotlin.collections.removeFirstOrNull as kRemoveFirstOrNull
 import kotlin.concurrent.Volatile
 import kotlin.time.Duration.Companion.milliseconds
 
@@ -42,7 +44,7 @@ internal class Waiters(private val LOG: () -> Debugger?): Destroyable {
             _isDestroyed = true
 
             while (waiters.isNotEmpty()) {
-                val w = waiters.removeFirst()
+                val w = waiters.kRemoveFirst()
                 w.response = ArrayList(0)
             }
         }
@@ -54,7 +56,7 @@ internal class Waiters(private val LOG: () -> Debugger?): Destroyable {
 
         val waiter = lock.withLock {
             checkIsNotDestroyed()
-            waiters.removeFirstOrNull()
+            waiters.kRemoveFirstOrNull()
         }
 
         if (waiter == null) {

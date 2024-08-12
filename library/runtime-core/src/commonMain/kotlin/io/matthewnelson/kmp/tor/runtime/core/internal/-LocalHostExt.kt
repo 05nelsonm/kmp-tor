@@ -25,6 +25,7 @@ import io.matthewnelson.kmp.process.Stdio
 import io.matthewnelson.kmp.tor.runtime.core.address.IPAddress
 import io.matthewnelson.kmp.tor.runtime.core.address.IPAddress.Companion.toIPAddressOrNull
 import io.matthewnelson.kmp.tor.runtime.core.address.LocalHost
+import kotlin.collections.removeLast as kRemoveLast
 
 @Throws(Exception::class)
 internal expect fun LocalHost.Companion.tryPlatformResolve(set: LinkedHashSet<IPAddress>)
@@ -58,7 +59,7 @@ internal fun LocalHost.Companion.tryParsingIfConfig(set: LinkedHashSet<IPAddress
     }
 
     while (configs.isNotEmpty()) {
-        val config = configs.removeLast()
+        val config = configs.kRemoveLast()
         if (config.isEmpty()) continue
 
         val i = config.iterator()

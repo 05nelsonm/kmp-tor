@@ -24,6 +24,8 @@ import io.matthewnelson.kmp.tor.runtime.core.address.IPAddress.V6.Companion.toIP
 import io.matthewnelson.kmp.tor.runtime.core.internal.HostAndPort
 import io.matthewnelson.kmp.tor.runtime.core.internal.HostAndPort.Companion.findHostnameAndPortFromURL
 import kotlin.jvm.*
+import kotlin.collections.removeLast as kRemoveLast
+import kotlin.collections.removeFirst as kRemoveFirst
 
 /**
  * Base abstraction for denoting an ip address
@@ -460,13 +462,13 @@ public sealed class IPAddress private constructor(
                         if (emptyFirst) {
                             // Must start with `::`, otherwise invalid.
                             iExpand = 1
-                            _blocks.removeFirst()
+                            _blocks.kRemoveFirst()
                             _blocks.add(0, "0")
                         }
                         if (emptyLast) {
                             // Must end with `::`, otherwise invalid.
                             iExpand = splits.lastIndex - 1
-                            _blocks.removeLast()
+                            _blocks.kRemoveLast()
                             _blocks.add("0")
                         }
 

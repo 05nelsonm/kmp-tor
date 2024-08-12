@@ -28,6 +28,7 @@ import io.matthewnelson.kmp.tor.runtime.core.UncaughtException
 import io.matthewnelson.kmp.tor.runtime.core.UncaughtException.Handler.Companion.tryCatch
 import io.matthewnelson.kmp.tor.runtime.core.UncaughtException.Handler.Companion.withSuppression
 import io.matthewnelson.kmp.tor.runtime.core.ctrl.TorCmd
+import kotlin.collections.removeFirst as kRemoveFirst
 
 @Suppress("NOTHING_TO_INLINE")
 @Throws(FileNotFoundException::class, UnsupportedOperationException::class)
@@ -54,7 +55,7 @@ internal fun <T: TorCmdJob<*>> MutableList<T>.interruptAndClearAll(
 
     handler.withSuppression {
         while (isNotEmpty()) {
-            val job = removeFirst()
+            val job = kRemoveFirst()
             tryCatch(job) { job.error(InterruptedException(message)) }
         }
     }
