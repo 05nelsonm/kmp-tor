@@ -20,6 +20,7 @@ package io.matthewnelson.kmp.tor.runtime.service.ui
 import android.app.KeyguardManager
 import android.app.Notification
 import android.app.PendingIntent
+import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
@@ -33,6 +34,7 @@ import io.matthewnelson.immutable.collections.toImmutableList
 import io.matthewnelson.kmp.tor.core.api.annotation.ExperimentalKmpTorApi
 import io.matthewnelson.kmp.tor.core.api.annotation.KmpTorDsl
 import io.matthewnelson.kmp.tor.runtime.Action
+import io.matthewnelson.kmp.tor.runtime.TorRuntime
 import io.matthewnelson.kmp.tor.runtime.core.*
 import io.matthewnelson.kmp.tor.runtime.core.ctrl.TorCmd
 import io.matthewnelson.kmp.tor.runtime.service.AbstractTorServiceUI
@@ -73,7 +75,10 @@ public class KmpTorServiceUI private constructor(
 >(args) {
 
     /**
-     * TODO
+     * Configuration to be utilized with [Factory], or on a per-instance
+     * basis via [TorServiceConfig.Foreground.newEnvironment].
+     *
+     * @see [Config.Builder]
      * */
     public class Config private constructor(
         internal val _colorReady: ColorRes?,
@@ -96,6 +101,34 @@ public class KmpTorServiceUI private constructor(
         ),
         init,
     ) {
+
+        /**
+         * Create a new [Config] with the default options.
+         * */
+        public constructor(
+            iconReady: Int,
+            iconNotReady: Int,
+        ): this(
+            iconReady,
+            iconNotReady,
+            {},
+        )
+
+        /**
+         * Create and new [Config] and configure options via [block].
+         *
+         * @see [Config.Builder]
+         * */
+        public constructor(
+            iconReady: Int,
+            iconNotReady: Int,
+            block: ThisBlock<Builder>,
+        ): this(
+            b = Builder.of(
+                iconReady,
+                iconNotReady,
+            ).apply(block)
+        )
 
         /**
          * See [Builder.colorReady]
@@ -128,14 +161,19 @@ public class KmpTorServiceUI private constructor(
         public val iconData: Int = _iconData.id
 
         /**
-         * TODO
+         * Configure a new [Config.Builder] which inherits all options
+         * from this one.
          * */
         public fun newConfig(
             block: ThisBlock<Builder>,
         ): Config = newConfig(null, block)
 
         /**
-         * TODO
+         * Configure a new [Config.Builder] which inherits all options
+         * from this one.
+         *
+         * @param [iconReady] If non-null, that value will be set for
+         *   [Builder.iconReady] instead of the current [Config.iconReady].
          * */
         public fun newConfig(
             iconReady: Int?,
@@ -147,7 +185,13 @@ public class KmpTorServiceUI private constructor(
         )
 
         /**
-         * TODO
+         * Configure a new [Config.Builder] which inherits all options
+         * from this one.
+         *
+         * @param [iconReady] If non-null, that value will be set for
+         *   [Builder.iconReady] instead of the current [Config.iconReady].
+         * @param [iconNotReady] If non-null, that value will be set for
+         *   [Builder.iconNotReady] instead of the current [Config.iconNotReady].
          * */
         public fun newConfig(
             iconReady: Int?,
@@ -161,73 +205,132 @@ public class KmpTorServiceUI private constructor(
             ).apply(block)
         )
 
-        public constructor(
-            iconReady: Int,
-            iconNotReady: Int,
-        ): this(
-            iconReady,
-            iconNotReady,
-            {},
-        )
-
-        public constructor(
-            iconReady: Int,
-            iconNotReady: Int,
-            block: ThisBlock<Builder>,
-        ): this(
-            b = Builder.of(
-                iconReady,
-                iconNotReady,
-            ).apply(block)
-        )
-
-        internal constructor(b: Builder): this(
-            // NOTE: If adding any fields, must also update
-            // Builder.of(other, ...) & fields map.
-            _colorReady = b.colorReady.takeIf { it > 0 }?.let { ColorRes(it) },
-            _iconReady = DrawableRes(b.iconReady),
-            _iconNotReady = DrawableRes(b.iconNotReady),
-            _iconData = DrawableRes(b.iconData),
-            enableActionRestart = b.enableActionRestart,
-            enableActionStop = b.enableActionStop,
-            displayName = b.displayName,
-            INIT,
-        )
-
+        /**
+         * Configure optionals for [Config].
+         *
+         * e.g.
+         *
+         *     Config(
+         *         iconReady = R.drawable.my_icon_ready,
+         *         iconNotReady = R.drawable.my_icon_not_ready,
+         *     ) {
+         *         colorReady = R.color.tor_purple
+         *         iconData = R.drawable.my_icon_data
+         *         enableActionRestart = true
+         *         displayName = DisplayName.StringRes(R.string.tor_instance_1)
+         *     }
+         * */
         @KmpTorDsl
         public class Builder private constructor(
+
+            /**
+             * The drawable resource id of the notification icon which will be
+             * displayed when the instance of [TorRuntime] is in an operative
+             * state (i.e. bootstrapped & network enabled).
+             *
+             * **NOTE:** Icons should be `24dp` x `24dp` for best performance.
+             * */
             @JvmField
             public val iconReady: Int,
+
+            /**
+             * The drawable resource id of the notification icon which will be
+             * displayed when the instance of [TorRuntime] is in a non-operative
+             * state (i.e. not bootstrapped or network disabled).
+             *
+             * **NOTE:** Icons should be `24dp` x `24dp` for best performance.
+             * */
             @JvmField
             public val iconNotReady: Int,
         ) {
 
             /**
-             * TODO
+             * The color resource id to apply to the notification when the instance
+             * of [TorRuntime] is in an operative state (i.e. bootstrapped & network
+             * enabled).
+             *
+             * Set to a value less than 1 to disable.
+             *
+             * **NOTE:** This setting will override whatever may be declared in
+             * your application theme for [R.attr.kmp_tor_ui_color_ready].
+             *
+             * Default: `0`, unless this [Builder] is a result of [Config.newConfig],
+             * then whatever [Config.colorReady] is.
+             *
+             * @see [R.attr.kmp_tor_ui_color_ready]
              * */
             @JvmField
             public var colorReady: Int = 0
 
             /**
-             * TODO
+             * The drawable resource id of the notification icon which will be
+             * displayed when the instance of [TorRuntime] is in an operative state
+             * and receives data via [TorEvent.BW].
+             *
+             * **NOTE:** Icons should be `24dp` x `24dp` for best performance.
+             *
+             * Default: Whatever [iconReady] is set to, unless this [Builder] is being
+             * configured via [Config.newConfig], then whatever [Config.iconData] is.
              * */
             @JvmField
             public var iconData: Int = iconReady
 
             /**
-             * TODO
+             * If `true`, a notification action will be which allows users to restart
+             * the [TorRuntime] instance via [Action.RestartDaemon] upon click.
+             *
+             * If `false`, the action will not be applied to the notification view.
+             *
+             * **NOTE:** This action is removed from the notification while on the
+             * lock screen.
+             *
+             * Default: `false`
              * */
             @JvmField
             public var enableActionRestart: Boolean = false
 
             /**
-             * TODO
+             * If `true`, a notification action will be which allows users to restart
+             * the [TorRuntime] instance via [Action.StopDaemon] upon click.
+             *
+             * If `false`, the action will not be applied to the notification view.
+             *
+             * **NOTE:** This action is removed from the notification while on the
+             * lock screen.
+             *
+             * Default: `false`
              * */
             @JvmField
             public var enableActionStop: Boolean = false
 
             /**
-             * TODO
+             * Declare an instance specific [DisplayName] to be shown while multiple
+             * instances of [TorRuntime] are in operation. The "previous" and "next"
+             * notification action buttons (only shown if more than 1 [TorRuntime]
+             * is in operation) will cycle between instances, showing that instance's
+             * current state. This should be different for each of your [TorRuntime]
+             * instances so the user may differentiate between more easily.
+             *
+             * **NOTE:** If this [Builder] is being configured via the
+             * [Factory.Builder.defaultConfig] DSL, then it will be set back to
+             * [DisplayName.FID] when [Factory] is instantiated. Use [Config.newConfig]
+             * from [Factory.defaultConfig] to modify for instance specific configs.
+             *
+             * e.g.
+             *
+             *     val environment = serviceConfig.newEnvironment(
+             *         dirName = "torservice1",
+             *         instanceConfig = serviceConfig.factory.defaultConfig.newConfig {
+             *             displayName = DisplayName.StringRes(R.string.tor_instance_1)
+             *             // ...
+             *         },
+             *         installer = { ... },
+             *         block = { ... },
+             *     )
+             *
+             * Default: [DisplayName.FID]
+             *
+             * @see [DisplayName]
              * */
             @JvmField
             public var displayName: DisplayName = DisplayName.FID
@@ -260,6 +363,19 @@ public class KmpTorServiceUI private constructor(
                 }
             }
         }
+
+        internal constructor(b: Builder): this(
+            // NOTE: If adding any fields, must also update
+            // Builder.of(other, ...) & fields map.
+            _colorReady = b.colorReady.takeIf { it > 0 }?.let { ColorRes(it) },
+            _iconReady = DrawableRes(b.iconReady),
+            _iconNotReady = DrawableRes(b.iconNotReady),
+            _iconData = DrawableRes(b.iconData),
+            enableActionRestart = b.enableActionRestart,
+            enableActionStop = b.enableActionStop,
+            displayName = b.displayName,
+            INIT,
+        )
     }
 
     /**
@@ -268,8 +384,8 @@ public class KmpTorServiceUI private constructor(
      * e.g.
      *
      *     val factory = KmpTorServiceUI.Factory(
-     *         iconReady = R.drawable.my_icon_a,
-     *         iconNotReady = R.drawable.my_icon_b,
+     *         iconReady = R.drawable.my_icon_ready,
+     *         iconNotReady = R.drawable.my_icon_not_ready,
      *         info = TorServiceUI.NotificationInfo(
      *             // ...
      *         ),
@@ -285,14 +401,210 @@ public class KmpTorServiceUI private constructor(
      *     val config = TorServiceConfig.Foreground.Builder(factory) {
      *         // configure...
      *     }
+     *
+     * @see [Factory.Builder]
+     * @see [TorServiceUI.NotificationInfo]
      * */
     public class Factory private constructor(
         b: Builder,
         c: Config.Builder,
+        i: NotificationInfo,
     ): TorServiceUI.Factory<Config, KmpTorServiceUIInstanceState<Config>, KmpTorServiceUI>(
         defaultConfig = Config(c.apply { displayName = DisplayName.FID }),
-        info = b.info,
+        info = i,
     ) {
+
+        /**
+         * Create a new [Factory] with the default options.
+         *
+         * @param [iconReady] See [Config.Builder.iconReady]
+         * @param [iconNotReady] See [Config.Builder.iconNotReady]
+         * */
+        public constructor(
+            iconReady: Int,
+            iconNotReady: Int,
+            info: NotificationInfo,
+        ): this(
+            iconReady,
+            iconNotReady,
+            info,
+            {},
+        )
+
+        /**
+         * Create a new [Factory] and configure options via [block].
+         *
+         * @param [iconReady] See [Config.Builder.iconReady]
+         * @param [iconNotReady] See [Config.Builder.iconNotReady]
+         * @see [Factory.Builder]
+         * */
+        public constructor(
+            iconReady: Int,
+            iconNotReady: Int,
+            info: NotificationInfo,
+            block: ThisBlock<Builder>,
+        ): this(
+            Config.Builder.of(
+                iconReady,
+                iconNotReady,
+            ),
+            info,
+            block,
+        )
+
+        /**
+         * See [Builder.actionIntentPermissionSuffix]
+         * */
+        @JvmField
+        public val actionIntentPermissionSuffix: String? = b.actionIntentPermissionSuffix
+
+        /**
+         * See [Builder.contentIntentCode]
+         * */
+        @JvmField
+        public val contentIntentCode: Int = b.contentIntentCode
+
+        @KmpTorDsl
+        public class Builder private constructor(private val config: Config.Builder) {
+
+            /**
+             * The suffix of a signature level permission to define in your manifest, which
+             * will be used to further lock down the notification action [BroadcastReceiver].
+             *
+             * The permission string used will be the concatenation of your applicationId,
+             * a dot character (i.e. `.`), and this suffix.
+             *
+             * e.g.
+             *
+             *     // defined suffix
+             *     actionIntentPermissionSuffix = "NOTIFICATION_ACTION_KMP_TOR"
+             *
+             *     // AndroidManifest.xml (with `runtime-service-ui` provided description)
+             *     <permission
+             *         android:name="${applicationId}.NOTIFICATION_ACTION_KMP_TOR"
+             *         android:description="@string/kmp_tor_ui_action_permission_description"
+             *         android:protectionLevel="signature" />
+             *
+             *     <uses-permission android:name="${applicationId}.NOTIFICATION_ACTION_KMP_TOR" />
+             *
+             * All "non-system" [IntentFilter] (i.e. notification action [PendingIntent]) use
+             * [SecureRandom] to generate their action string values. Sadly, there is no way
+             * to define something like `exported="false"` when registering a [BroadcastReceiver]
+             * at runtime until API 33 via the [Context.RECEIVER_NOT_EXPORTED] flag. This option
+             * resolves that for all APIs by signature enforced permissions.
+             *
+             * **NOTE:** Suffix cannot be empty or contain any whitespace, and cannot contain
+             * the application package name (it is just the suffix, as shown in the above example).
+             *
+             * Default: `null` (i.e. no permissions)
+             * */
+            @JvmField
+            public var actionIntentPermissionSuffix: String? = null
+
+            /**
+             * Define a code to use when creating the [PendingIntent] which is to be set via
+             * [Notification.Builder.setContentIntent].
+             *
+             * Default: `0`
+             * */
+            @JvmField
+            public var contentIntentCode: Int = 0
+
+            /**
+             * Supply your own [PendingIntent] factory for [Notification.Builder.setContentIntent].
+             *
+             * If `null`, or the factory function returns `null`, then no [PendingIntent] will be
+             * set for [Notification.Builder.setContentIntent].
+             *
+             * Default: An implementation which will wrap the [Intent] returned by
+             * [PackageManager.getLaunchIntentForPackage] in a [PendingIntent].
+             * */
+            @JvmField
+            public var contentIntent: ((code: Int, context: Context) -> PendingIntent?)? = STUB_PACKAGE_LAUNCHER
+
+            /**
+             * The drawable resource id for the notification action icon which allows users to
+             * submit [TorCmd.Signal.NewNym] to the [TorRuntime] instance upon click.
+             *
+             * **NOTE:** Icons should be `24dp` x `24dp` for best performance.
+             *
+             * Default: `null` (do not override default [R.drawable.ic_kmp_tor_ui_action_newnym])
+             * */
+            @JvmField
+            public var iconActionNewNym: Int? = null
+
+            /**
+             * The drawable resource id for the notification action icon which allows users to
+             * submit [Action.RestartDaemon] to the [TorRuntime] instance upon click.
+             *
+             * **NOTE:** This will not be utilized unless [Config.Builder.enableActionRestart]
+             * has been set to `true` for the currently displayed instance of [TorRuntime].
+             *
+             * **NOTE:** Icons should be `24dp` x `24dp` for best performance.
+             *
+             * Default: `null` (do not override default [R.drawable.ic_kmp_tor_ui_action_restart])
+             * */
+            @JvmField
+            public var iconActionRestart: Int? = null
+
+            /**
+             * The drawable resource id for the notification action icon which allows users to
+             * submit [Action.StopDaemon] to the [TorRuntime] instance upon click.
+             *
+             * **NOTE:** This will not be utilized unless [Config.Builder.enableActionStop]
+             * has been set to `true` for the currently displayed instance of [TorRuntime].
+             *
+             * **NOTE:** Icons should be `24dp` x `24dp` for best performance.
+             *
+             * Default: `null` (do not override default [R.drawable.ic_kmp_tor_ui_action_stop])
+             * */
+            @JvmField
+            public var iconActionStop: Int? = null
+
+            /**
+             * The drawable resource id for the notification action icon which allows users to
+             * cycle to the "previous" [TorRuntime] instance that is operating, upon click.
+             *
+             * **NOTE:** This will not be utilized unless multiple instances of [TorRuntime]
+             * are operating within the service.
+             *
+             * **NOTE:** Icons should be `24dp` x `24dp` for best performance.
+             *
+             * Default: `null` (do not override default [R.drawable.ic_kmp_tor_ui_action_previous])
+             * */
+            @JvmField
+            public var iconActionPrevious: Int? = null
+
+            /**
+             * The drawable resource id for the notification action icon which allows users to
+             * cycle to the "next" [TorRuntime] instance that is operating, upon click.
+             *
+             * **NOTE:** This will not be utilized unless multiple instances of [TorRuntime]
+             * are operating within the service.
+             *
+             * **NOTE:** Icons should be `24dp` x `24dp` for best performance.
+             *
+             * Default: `null` (do not override default [R.drawable.ic_kmp_tor_ui_action_next])
+             * */
+            @JvmField
+            public var iconActionNext: Int? = null
+
+            /**
+             * Configure [Config.Builder] optionals for [Factory.defaultConfig].
+             * */
+            @KmpTorDsl
+            public fun defaultConfig(
+                block: ThisBlock<Config.Builder>
+            ): Builder = apply { config.apply(block) }
+
+            internal companion object {
+
+                @JvmSynthetic
+                internal fun of(
+                    config: Config.Builder,
+                ): Builder = Builder(config)
+            }
+        }
 
         private val actionIcons = UIAction.Icons.of(b)
         private val contentIntent: (code: Int, context: Context) -> PendingIntent? = when (val ci = b.contentIntent) {
@@ -318,122 +630,19 @@ public class KmpTorServiceUI private constructor(
             else -> ci
         }
 
-        @JvmField
-        public val actionIntentPermissionSuffix: String? = b.actionIntentPermissionSuffix
-        @JvmField
-        public val contentIntentCode: Int = b.contentIntentCode
-
-        public constructor(
-            iconReady: Int,
-            iconNotReady: Int,
-            info: NotificationInfo,
-        ): this(
-            iconReady,
-            iconNotReady,
-            info,
-            {},
-        )
-
-        public constructor(
-            iconReady: Int,
-            iconNotReady: Int,
-            info: NotificationInfo,
-            block: ThisBlock<Builder>,
-        ): this(
-            Config.Builder.of(
-                iconReady,
-                iconNotReady,
-            ),
-            info,
-            block,
-        )
-
         private constructor(
             config: Config.Builder,
             info: NotificationInfo,
             block: ThisBlock<Builder>,
         ): this (
-            b = Builder.of(
-                info,
-                config,
-            ).apply(block),
-            c = config,
+            Builder.of(config).apply(block),
+            config,
+            info,
         )
 
-        @KmpTorDsl
-        public class Builder private constructor(
-            @JvmField
-            public val info: NotificationInfo,
-            private val config: Config.Builder,
-        ) {
-
-            /**
-             * TODO: Add string resource for description and label that
-             *  consumers can easily point to for the permission declaration.
-             * */
-            @JvmField
-            public var actionIntentPermissionSuffix: String? = null
-
-            /**
-             * TODO
-             * */
-            @JvmField
-            public var contentIntentCode: Int = 0
-
-            /**
-             * TODO
-             * */
-            @JvmField
-            public var contentIntent: ((code: Int, context: Context) -> PendingIntent?)? = STUB_PACKAGE_LAUNCHER
-
-            /**
-             * TODO
-             * */
-            @JvmField
-            public var iconActionNewNym: Int? = null
-
-            /**
-             * TODO
-             * */
-            @JvmField
-            public var iconActionRestart: Int? = null
-
-            /**
-             * TODO
-             * */
-            @JvmField
-            public var iconActionStop: Int? = null
-
-            /**
-             * TODO
-             * */
-            @JvmField
-            public var iconActionPrevious: Int? = null
-
-            /**
-             * TODO
-             * */
-            @JvmField
-            public var iconActionNext: Int? = null
-
-            /**
-             * TODO
-             * */
-            @KmpTorDsl
-            public fun defaultConfig(
-                block: ThisBlock<Config.Builder>
-            ): Builder = apply { config.apply(block) }
-
-            internal companion object {
-
-                @JvmSynthetic
-                internal fun of(
-                    info: NotificationInfo,
-                    config: Config.Builder,
-                ): Builder = Builder(info, config)
-            }
-        }
-
+        /**
+         * See [TorServiceUI.Factory.validate]
+         * */
         @Throws(IllegalStateException::class, Resources.NotFoundException::class)
         public override fun validate(context: Context) {
             try {
@@ -454,7 +663,7 @@ public class KmpTorServiceUI private constructor(
                     "actionIntentPermissionSuffix cannot contain the packageName[$packageName]"
                 }
 
-                val permission = packageName + suffix
+                val permission = "$packageName.$suffix"
                 check(context.hasPermission(permission)) {
                     "actionIntentPermissionSuffix is declared, but permission is not granted for $permission"
                 }
@@ -469,6 +678,9 @@ public class KmpTorServiceUI private constructor(
             }
         }
 
+        /**
+         * See [TorServiceUI.Factory.validateConfig]
+         * */
         @Throws(IllegalArgumentException::class, Resources.NotFoundException::class)
         public override fun validateConfig(context: Context, config: Config) {
             listOf(
@@ -966,7 +1178,7 @@ public class KmpTorServiceUI private constructor(
             }
         }.register(
             filter = IntentFilter(filter),
-            permission = actionIntentPermissionSuffix?.let { suffix -> appContext.packageName + suffix },
+            permission = actionIntentPermissionSuffix?.let { suffix -> "${appContext.packageName}.$suffix" },
             scheduler = null,
             exported = false,
         )

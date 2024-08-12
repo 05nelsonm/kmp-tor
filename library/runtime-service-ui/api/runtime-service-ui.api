@@ -83,8 +83,7 @@ public final class io/matthewnelson/kmp/tor/runtime/service/ui/KmpTorServiceUI$F
 	public field iconActionPrevious Ljava/lang/Integer;
 	public field iconActionRestart Ljava/lang/Integer;
 	public field iconActionStop Ljava/lang/Integer;
-	public final field info Lio/matthewnelson/kmp/tor/runtime/service/TorServiceUI$NotificationInfo;
-	public synthetic fun <init> (Lio/matthewnelson/kmp/tor/runtime/service/TorServiceUI$NotificationInfo;Lio/matthewnelson/kmp/tor/runtime/service/ui/KmpTorServiceUI$Config$Builder;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public synthetic fun <init> (Lio/matthewnelson/kmp/tor/runtime/service/ui/KmpTorServiceUI$Config$Builder;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
 	public final fun defaultConfig (Lio/matthewnelson/kmp/tor/runtime/core/ThisBlock;)Lio/matthewnelson/kmp/tor/runtime/service/ui/KmpTorServiceUI$Factory$Builder;
 }
 

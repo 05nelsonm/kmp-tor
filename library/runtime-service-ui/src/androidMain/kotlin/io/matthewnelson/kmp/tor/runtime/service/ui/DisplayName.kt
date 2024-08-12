@@ -15,18 +15,41 @@
  **/
 package io.matthewnelson.kmp.tor.runtime.service.ui
 
+import io.matthewnelson.kmp.tor.runtime.FileID
+import io.matthewnelson.kmp.tor.runtime.TorRuntime
+
 /**
- * TODO
+ * Configuration option types for [KmpTorServiceUI.Config.Builder.displayName].
+ *
+ * Will be shown below the selector action button icons
+ * [R.drawable.ic_kmp_tor_ui_action_previous] and
+ * [R.drawable.ic_kmp_tor_ui_action_next]
+ *
+ * e.g. (The bottom right corner of the notification)
+ *
+ *                          |
+ *             <        >   |      <<< Button icons
+ *               TextView   |      <<< Loaded DisplayName
+ *     _____________________|
  * */
 public sealed class DisplayName private constructor() {
 
     /**
-     * TODO
+     * Will display to the user the [FileID.fidEllipses] for that
+     * [TorRuntime] currently "selected" in the notification area.
+     *
+     * e.g.
+     *
+     *     [abcd…1234]
      * */
     public data object FID: DisplayName()
 
     /**
-     * TODO
+     * A string resource id to be retrieved and loaded for that
+     * [TorRuntime] currently "selected" in the notification area.
+     *
+     * **NOTE:** Requirements for the retrieved string value match
+     * those expressed in [Text.of]
      * */
     public class StringRes(
         @JvmField
@@ -34,7 +57,10 @@ public sealed class DisplayName private constructor() {
     ): DisplayName()
 
     /**
-     * TODO
+     * The raw text to be loaded for that [TorRuntime] currently
+     * "selected" in the notification area.
+     *
+     * Not friendly for multilingual applications, but is an option
      *
      * @see [of]
      * */
@@ -46,7 +72,12 @@ public sealed class DisplayName private constructor() {
         public companion object {
 
             /**
-             * TODO
+             * Creates a new [Text] item
+             *
+             * @throws [IllegalArgumentException] when:
+             *  - [text] is blank or empty
+             *  - [text] exceeds 50 characters in length
+             *  - [text] has multiple lines
              * */
             @JvmStatic
             @Throws(IllegalArgumentException::class)
