@@ -305,7 +305,7 @@ public open class TorServiceConfig private constructor(
      *     val factory = KmpTorServiceUI.Factory(
      *         iconReady = R.drawable.my_icon_a,
      *         iconNotReady = R.drawable.my_icon_b,
-     *         info = TorServiceUI.NotificationInfo.of(
+     *         info = TorServiceUI.NotificationInfo(
      *             // ...
      *         ),
      *         block = {
@@ -493,11 +493,10 @@ public open class TorServiceConfig private constructor(
             /**
              * Opener for creating a [TorServiceConfig.Foreground] which will run all
              * instances of [TorRuntime] that have been created via [newEnvironment]
-             * inside of [TorService] operating as a Foreground Service.
+             * inside of [TorService], operating as a Foreground Service.
              *
              * **NOTE:** An [android.app.NotificationChannel] for API 26+ is set up
-             * using the provided [TorServiceUI.Factory.info] (emulators &
-             * devices only).
+             * using the provided [TorServiceUI.Factory.info] (emulators & devices only).
              *
              * @throws [ClassCastException] If an instance of [TorServiceConfig] has
              *   already been instantiated and is unable to be returned because it is
@@ -520,31 +519,37 @@ public open class TorServiceConfig private constructor(
 
                 return _instance?.unsafeCast() ?: synchronized(UTIL) {
                     _instance?.unsafeCast() ?: run {
-                        val appContext = appContext
+                        @Suppress("SimpleRedundantLet")
+                        val appContext = appContext?.let { it.get() }
 
                         if (appContext != null) {
-                            factory.validate(appContext.get())
-                            factory.validateConfig(appContext.get(), factory.defaultConfig)
+                            factory.validate(appContext)
+                            factory.validateConfig(appContext, factory.defaultConfig)
+                            val (cName, cDescription) = factory.info.validate(appContext)
 
                             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                                val info = factory.info
+                                val cImportance = if (factory.info.channelImportanceLow) {
+                                    NotificationManager.IMPORTANCE_LOW
+                                } else {
+                                    NotificationManager.IMPORTANCE_DEFAULT
+                                }
+
                                 val channel = NotificationChannel(
-                                    info.channelID,
-                                    info.channelName,
-                                    NotificationManager.IMPORTANCE_DEFAULT,
+                                    factory.info.channelId,
+                                    cName,
+                                    cImportance,
                                 ).apply {
-                                    setShowBadge(info.channelShowBadge)
-                                    description = info.channelDescription
+                                    setShowBadge(factory.info.channelShowBadge)
+                                    description = cDescription
                                     setSound(null, null)
                                 }
 
-                                (appContext.get().getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager)
+                                (appContext.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager)
                                     .createNotificationChannel(channel)
                             }
                         }
 
-                        Foreground(factory, b)
-                            .also { _instance = it }
+                        Foreground(factory, b).also { _instance = it }
                     }
                 }
             }

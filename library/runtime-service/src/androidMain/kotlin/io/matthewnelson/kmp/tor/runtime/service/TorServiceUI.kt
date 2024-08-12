@@ -16,6 +16,7 @@
 package io.matthewnelson.kmp.tor.runtime.service
 
 import android.app.Notification
+import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.Service
 import android.content.BroadcastReceiver
@@ -74,66 +75,104 @@ protected constructor(
 ) {
 
     /**
-     * Holder for customized input from consumers of `kmp-tor-service`
-     * for the Foreground Service's [Notification].
-     *
-     * @see [of]
+     * Holder for Foreground Service [Notification] and [NotificationChannel]
+     * configuration info used to instantiate [Factory] and validated upon
+     * invocation of [TorServiceConfig.Foreground.Companion.Builder].
      * */
-    public class NotificationInfo private constructor(
+    public class NotificationInfo
+    @JvmOverloads
+    public constructor(
+
+        /**
+         * The integer value to utilize when posting the [Notification] to
+         * [NotificationManager].
+         *
+         * Must be between 1 and 9999 (inclusive).
+         * */
         @JvmField
-        public val channelID: String,
+        public val notificationId: Short,
+
+        /**
+         * The string value to utilize for [NotificationChannel.getId].
+         *
+         * Must be between 1 and 1000 characters in length.
+         * */
         @JvmField
-        public val channelName: String,
+        public val channelId: String,
+
+        /**
+         * The id of the string resource to resolve to utilize for the
+         * [NotificationChannel] name.
+         *
+         * Resolved string value must not be empty.
+         *
+         * The recommended maximum length is 40 characters.
+         * */
         @JvmField
-        public val channelDescription: String,
+        public val channelName: Int,
+
+        /**
+         * The id of the string resource to resolve to utilize for the
+         * [NotificationChannel] description.
+         *
+         * Resolved string value must not be empty.
+         *
+         * The recommended maximum length is 300 characters.
+         * */
         @JvmField
-        public val channelShowBadge: Boolean,
+        public val channelDescription: Int,
+
+        /**
+         * The value to utilize for [NotificationChannel.setShowBadge].
+         *
+         * Default: `false`
+         * */
         @JvmField
-        public val notificationID: Int,
+        public val channelShowBadge: Boolean = false,
+
+        /**
+         * If `true`, [NotificationManager.IMPORTANCE_LOW] will be
+         * used for [NotificationChannel.setImportance].
+         *
+         * If `false`, [NotificationManager.IMPORTANCE_DEFAULT] will
+         * be used instead.
+         *
+         * **NOTE:** The [NotificationChannel] is configured to **NOT**
+         * make any noise, even if [NotificationManager.IMPORTANCE_DEFAULT]
+         * is being utilized.
+         *
+         * Default: `false`
+         * */
+        @JvmField
+        public val channelImportanceLow: Boolean = false,
     ) {
 
-        public companion object {
+        /**
+         * Called from [TorServiceConfig.Foreground.Companion.Builder] to
+         * resolve string resources and validate parameters for correctness.
+         *
+         * @return resolved string resource values for [channelName]
+         *   and [channelDescription].
+         * */
+        @Throws(IllegalArgumentException::class, Resources.NotFoundException::class)
+        public fun validate(context: Context): Pair<String, String> {
+            val cName = context.getString(channelName)
+            val cDescription = context.getString(channelDescription)
 
-            /**
-             * Verifies input before creating the [NotificationInfo]
-             *
-             * @throws [IllegalArgumentException] if fields:
-             *  - [channelID], [channelName], [channelDescription] exceed length
-             *    bounds of 1 to 1000 (i.e. cannot be empty or more than 1000 chars).
-             *  - [notificationID] is not between 1 and 9999
-             * */
-            @JvmStatic
-            @Throws(IllegalArgumentException::class)
-            public fun of(
-                channelID: String,
-                channelName: String,
-                channelDescription: String,
-                channelShowBadge: Boolean,
-                notificationID: Int,
-            ): NotificationInfo {
-                channelID.checkLength { "channelID" }
-                channelName.checkLength { "channelName" }
-                channelDescription.checkLength { "channelDescription" }
-                require(notificationID in 1..9999) {
-                    "field[notificationID] must be between 1 and 9999"
-                }
-
-                return NotificationInfo(
-                    channelID,
-                    channelName,
-                    channelDescription,
-                    channelShowBadge,
-                    notificationID,
-                )
+            require(notificationId in 1..9999) {
+                "notificationId must be between 1 and 99999 (inclusive)"
+            }
+            require(channelId.length in 1..1000) {
+                "channelId must be between 1 and 1000 characters in length"
+            }
+            require(cName.isNotEmpty()) {
+                "channelName cannot be empty"
+            }
+            require(cDescription.isNotEmpty()) {
+                "channelDescription cannot be empty"
             }
 
-            @JvmStatic
-            @Throws(IllegalArgumentException::class)
-            private inline fun String.checkLength(field: () -> String) {
-                require(length in 1..1000) {
-                    "field[${field()}] must be between 1 and 1000 characters in length"
-                }
-            }
+            return cName to cDescription
         }
     }
 
@@ -161,10 +200,10 @@ protected constructor(
     protected val appContext: Context = service.applicationContext
 
     /**
-     * The [NotificationInfo.channelID] for creating [Notification.Builder].
+     * The [NotificationInfo.channelId] for instantiating [Notification.Builder].
      * */
     @JvmField
-    protected val channelID: String = info.channelID
+    protected val channelId: String = info.channelId
 
     /**
      * Posts the [Notification]. This **MUST** be called upon first
@@ -172,13 +211,34 @@ protected constructor(
      * [Service.startForeground] is had, otherwise an ANR will result
      * for Android API 26+.
      *
+     * **NOTE:** [Notification.priority], [Notification.audioAttributes],
+     * [Notification.audioStreamType], and [Notification.sound] are always
+     * set for each invocation of [post].
+     *
      * @throws [IllegalThreadStateException] if called from non-main thread.
      * */
     @Throws(IllegalThreadStateException::class)
     protected fun Notification.post() {
-        Looper.getMainLooper().let { looper ->
-            if (Thread.currentThread() == looper.thread) return@let
+        Looper.getMainLooper().let { main ->
+            if (Thread.currentThread() == main.thread) return@let
             throw IllegalThreadStateException("Notification.post() must be called from the main thread")
+        }
+
+        @Suppress("DEPRECATION")
+        run {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                // API 21+
+                audioAttributes = null
+            }
+
+            audioStreamType = Notification.STREAM_DEFAULT
+            sound = null
+
+            priority = if (info.channelImportanceLow) {
+                Notification.PRIORITY_LOW
+            } else {
+                Notification.PRIORITY_DEFAULT
+            }
         }
 
         val startForeground = if (_hasStartedForeground) {
@@ -198,12 +258,13 @@ protected constructor(
         if (isDestroyed()) return
         if (_isStoppingForeground) return
 
+        val id = info.notificationId.toInt()
         if (startForeground && service is Service) {
-            // API 29+ will pull foregroundServiceType from whatever was
-            // declared in the manifest.
-            service.startForeground(info.notificationID, this)
+            // API 29+ will pull foregroundServiceType from
+            // whatever has been declared in the manifest.
+            service.startForeground(id, this)
         } else {
-            _manager?.notify(info.notificationID, this)
+            _manager?.notify(id, this)
         }
     }
 

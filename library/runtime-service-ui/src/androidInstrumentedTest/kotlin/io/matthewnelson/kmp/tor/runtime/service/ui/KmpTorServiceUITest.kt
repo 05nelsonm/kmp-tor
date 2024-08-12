@@ -25,6 +25,7 @@ import io.matthewnelson.kmp.tor.runtime.TorRuntime
 import io.matthewnelson.kmp.tor.runtime.core.OnEvent
 import io.matthewnelson.kmp.tor.runtime.service.TorServiceConfig
 import io.matthewnelson.kmp.tor.runtime.service.TorServiceUI
+import io.matthewnelson.kmp.tor.runtime.service.ui.test.R as R_test
 import kotlinx.coroutines.*
 import kotlinx.coroutines.test.runTest
 import kotlin.test.Test
@@ -36,12 +37,11 @@ class KmpTorServiceUITest {
     private val factory = KmpTorServiceUI.Factory(
         iconReady = android.R.drawable.stat_notify_chat,
         iconNotReady = android.R.drawable.stat_notify_more,
-        info = TorServiceUI.NotificationInfo.of(
-            channelID = "Tor Channel ID",
-            channelName = "Tor Channel Name",
-            channelDescription = "Tor Channel Description",
-            channelShowBadge = false,
-            notificationID = 615,
+        info = TorServiceUI.NotificationInfo(
+            notificationId = 615,
+            channelId = "Tor Channel ID",
+            channelName = R_test.string.kmp_tor_ui_test_channel_name,
+            channelDescription = R_test.string.kmp_tor_ui_test_channel_name,
         ),
         block = {
             // TODO
