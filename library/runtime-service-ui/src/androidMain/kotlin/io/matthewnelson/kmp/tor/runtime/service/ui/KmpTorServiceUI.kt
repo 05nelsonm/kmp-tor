@@ -276,8 +276,8 @@ public class KmpTorServiceUI private constructor(
             public var iconData: Int = iconReady
 
             /**
-             * If `true`, a notification action will be which allows users to restart
-             * the [TorRuntime] instance via [Action.RestartDaemon] upon click.
+             * If `true`, a notification action will be applied which allows users to
+             * restart the [TorRuntime] instance via [Action.RestartDaemon] upon click.
              *
              * If `false`, the action will not be applied to the notification view.
              *
@@ -290,8 +290,8 @@ public class KmpTorServiceUI private constructor(
             public var enableActionRestart: Boolean = false
 
             /**
-             * If `true`, a notification action will be which allows users to restart
-             * the [TorRuntime] instance via [Action.StopDaemon] upon click.
+             * If `true`, a notification action will be applied which allows users to
+             * stop the [TorRuntime] instance via [Action.StopDaemon] upon click.
              *
              * If `false`, the action will not be applied to the notification view.
              *
@@ -395,10 +395,10 @@ public class KmpTorServiceUI private constructor(
      *             defaultConfig {
      *                 // configure ...
      *             }
-     *         }
+     *         },
      *     )
      *
-     *     val config = TorServiceConfig.Foreground.Builder(factory) {
+     *     val serviceConfig = TorServiceConfig.Foreground.Builder(factory) {
      *         // configure...
      *     }
      *
@@ -772,6 +772,9 @@ public class KmpTorServiceUI private constructor(
         @Suppress("DEPRECATION")
         Notification.Builder(appContext)
     }.apply {
+        // Sound and priority attributes set automatically
+        // by TorServiceUI Notification.post
+
         setContentIntent(pendingIntents.contentIntent)
         setOngoing(true)
         setOnlyAlertOnce(true)

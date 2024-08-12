@@ -314,14 +314,14 @@ public open class TorServiceConfig private constructor(
      *             defaultConfig {
      *                 // configure ...
      *             }
-     *         }
+     *         },
      *     )
      *
-     *     val config = TorServiceConfig.Foreground.Builder(factory) {
+     *     val serviceConfig = TorServiceConfig.Foreground.Builder(factory) {
      *         // configure...
      *     }
      *
-     *     val environment = config.newEnvironment { installationDirectory ->
+     *     val environment = serviceConfig.newEnvironment { installationDirectory ->
      *         // Assuming use of `kmp-tor:resource-tor` or
      *         // `kmp-tor:resource-tor-gpl` dependency
      *         // as well as the unit test dependency
