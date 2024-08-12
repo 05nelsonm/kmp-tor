@@ -17,6 +17,8 @@
 
 package io.matthewnelson.kmp.tor.runtime.internal
 
+import kotlin.collections.removeLast as kRemoveLast
+
 internal typealias Stack<T> = ArrayList<T>
 
 @Suppress("NOTHING_TO_INLINE")
@@ -24,4 +26,4 @@ internal inline fun <T: Any> Stack<T>.push(element: T): Boolean = add(element)
 
 @Suppress("NOTHING_TO_INLINE")
 @Throws(NoSuchElementException::class)
-internal inline fun <T: Any> Stack<T>.pop(): T = removeLast()
+internal inline fun <T: Any> Stack<T>.pop(): T = kRemoveLast()

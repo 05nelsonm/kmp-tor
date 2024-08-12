@@ -270,7 +270,7 @@ public class KmpTorServiceUI private constructor(
      *     val factory = KmpTorServiceUI.Factory(
      *         iconReady = R.drawable.my_icon_a,
      *         iconNotReady = R.drawable.my_icon_b,
-     *         info = TorServiceUI.NotificationInfo.of(
+     *         info = TorServiceUI.NotificationInfo(
      *             // ...
      *         ),
      *         block = {
@@ -555,30 +555,23 @@ public class KmpTorServiceUI private constructor(
     }
 
     private val builder = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-        Notification.Builder(appContext, channelID)
+        Notification.Builder(appContext, channelId)
     } else {
         @Suppress("DEPRECATION")
         Notification.Builder(appContext)
     }.apply {
         setContentIntent(pendingIntents.contentIntent)
-        // TODO: Issue #485
-        @Suppress("DEPRECATION")
-        setPriority(Notification.PRIORITY_DEFAULT)
         setOngoing(true)
         setOnlyAlertOnce(true)
-        @Suppress("DEPRECATION")
-        setSound(null)
         setWhen(System.currentTimeMillis())
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
             // API 17+
+            // TODO: Issue #497
             setShowWhen(true)
         }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT_WATCH) {
             // API 20+
-            // TODO: Issue #485
-            //  Allow ability to configure, but use TorService
-            //  as default for backward compatibility
             setGroup("TorService")
             setGroupSummary(false)
         }

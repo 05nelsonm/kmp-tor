@@ -24,6 +24,7 @@ import io.matthewnelson.kmp.tor.runtime.core.UncaughtException.Handler.Companion
 import io.matthewnelson.kmp.tor.runtime.core.ctrl.TorCmd
 import io.matthewnelson.kmp.tor.runtime.ctrl.AbstractTorEventProcessor
 import io.matthewnelson.kmp.tor.runtime.ctrl.internal.Debugger.Companion.d
+import kotlin.collections.removeFirst as kRemoveFirst
 import kotlin.concurrent.Volatile
 import kotlin.jvm.JvmSynthetic
 
@@ -132,7 +133,7 @@ internal abstract class AbstractTorCmdQueue internal constructor(
         val job = synchronized(lock) {
             var job: TorCmdJob<*>? = null
             while (!isDestroyed() && queueExecute.isNotEmpty()) {
-                job = queueExecute.removeFirst()
+                job = queueExecute.kRemoveFirst()
 
                 try {
                     job.executing()
@@ -185,7 +186,7 @@ internal abstract class AbstractTorCmdQueue internal constructor(
             val suppressed = this
 
             while (interrupts.isNotEmpty()) {
-                val interrupt = interrupts.removeFirst()
+                val interrupt = interrupts.kRemoveFirst()
                 interrupt(suppressed)
             }
         }
