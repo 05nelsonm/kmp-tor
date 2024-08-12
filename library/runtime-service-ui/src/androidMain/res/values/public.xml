@@ -16,4 +16,5 @@
   *-->
 <resources>
     <public name="kmp_tor_ui_color_ready" type="attr" />
+    <public name="kmp_tor_ui_action_permission_description" type="string" />
 </resources>

@@ -43,13 +43,16 @@ internal inline fun Context.register(
     var f = flags
 
     if (exported != null && Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+        // API 33+
         f = f or if (exported) Context.RECEIVER_EXPORTED else Context.RECEIVER_NOT_EXPORTED
     }
 
     @SuppressLint("UnspecifiedRegisterReceiverFlag")
     if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+        // API 25-
         return registerReceiver(receiver, filter, permission, scheduler)
     }
 
+    // API 26+
     return registerReceiver(receiver, filter, permission, scheduler, f)
 }

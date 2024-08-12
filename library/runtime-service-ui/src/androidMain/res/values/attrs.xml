@@ -32,4 +32,30 @@
         </style>
     -->
     <attr name="kmp_tor_ui_color_ready" format="reference|color" />
+
+    <!--
+        A default permission description to use in your manifest,
+        if needed, when defining one for the configuration of
+        KmpTorServiceUI.Factory.Builder.actionIntentPermissionSuffix
+
+        e.g.
+
+            // defined suffix
+            actionIntentPermissionSuffix = "NOTIFICATION_ACTION_KMP_TOR"
+
+            // AndroidManifest.xml (with `runtime-service-ui` provided description)
+            <permission
+                android:name="${applicationId}.NOTIFICATION_ACTION_KMP_TOR"
+                android:description="@string/kmp_tor_ui_action_permission_description"
+                android:protectionLevel="signature" />
+
+            <uses-permission android:name="${applicationId}.NOTIFICATION_ACTION_KMP_TOR" />
+    -->
+    <string name="kmp_tor_ui_action_permission_description">
+        \nSelf-held permission for securing
+        \nthe BroadcastReceiver that is used
+        \nto facilitate interaction between
+        \nthe TorService Notification Actions,
+        \nand TorRuntime.
+    </string>
 </resources>
