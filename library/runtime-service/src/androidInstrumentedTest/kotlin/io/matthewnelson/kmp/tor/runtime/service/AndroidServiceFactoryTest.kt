@@ -132,10 +132,14 @@ class AndroidServiceFactoryTest {
             return
         }
 
-        val env1 = newEnvironment("sf_multi1")
-        val env2 = newEnvironment("sf_multi2")
+        // passing relative path with fs separator to ensure
+        // Context.getDir was called with only `sf_multi`
+        val env1 = newEnvironment("sf_multi/1")
+        val env2 = newEnvironment("sf_multi/2")
         env1.debug = true
         env2.debug = true
+
+        assertTrue(env1.workDirectory.path.endsWith("sf_multi/1"))
 
         val lces1 = mutableListOf<Lifecycle.Event>()
         val factory1 = TorRuntime.Builder(env1) {
