@@ -78,7 +78,7 @@ internal constructor(
     }
 
     @Volatile
-    private var _displayedState: DisplayedState = DisplayedState(null, null, null)
+    private var _selectorState: SelectorState = SelectorState(previous = null, displayed = null, next = null)
     @Volatile
     private var _instanceStates: Map<FileIDKey, IS> = emptyMap()
 
@@ -100,7 +100,7 @@ internal constructor(
      * @see [next]
      * */
     @get:JvmName("displayed")
-    protected val displayed: IS? get() = _displayedState.displayed?.let { _instanceStates[it] }
+    protected val displayed: IS? get() = _selectorState.displayed?.let { _instanceStates[it] }
 
     /**
      * All [InstanceState] currently operating within this UI "container".
@@ -153,11 +153,11 @@ internal constructor(
      * UI, such as `<`.
      * */
     protected fun previous() {
-        if (!_displayedState.hasPrevious) return
+        if (!_selectorState.hasPrevious) return
 
         @OptIn(InternalKmpTorApi::class)
         synchronized(stateLock) {
-            val newDisplayed = _displayedState.previous ?: return@synchronized
+            val newDisplayed = _selectorState.previous ?: return@synchronized
 
             // shift [ p, D, n ] -> [ ?, P, d ]
             var previousKey: FileIDKey? = null
@@ -166,10 +166,10 @@ internal constructor(
                 previousKey = key
             }
 
-            _displayedState = DisplayedState(
+            _selectorState = SelectorState(
                 previous = previousKey,
                 displayed = newDisplayed,
-                next = _displayedState.displayed
+                next = _selectorState.displayed
             )
 
             _instanceStates[newDisplayed]?.postUpdate()
@@ -185,11 +185,11 @@ internal constructor(
      * UI, such as `>`.
      * */
     protected fun next() {
-        if (!_displayedState.hasNext) return
+        if (!_selectorState.hasNext) return
 
         @OptIn(InternalKmpTorApi::class)
         synchronized(stateLock) {
-            val newDisplayed = _displayedState.next ?: return@synchronized
+            val newDisplayed = _selectorState.next ?: return@synchronized
 
             // shift [ p, D, n ] -> [ d, N, ? ]
             var takeNextKey = false
@@ -202,8 +202,8 @@ internal constructor(
                 false
             }
 
-            _displayedState = DisplayedState(
-                previous = _displayedState.displayed,
+            _selectorState = SelectorState(
+                previous = _selectorState.displayed,
                 displayed = newDisplayed,
                 next = newNext
             )
@@ -691,15 +691,15 @@ internal constructor(
             val displayed = displayed
             if (displayed == null) {
                 // First instance to be added
-                _displayedState = _displayedState.copy(displayed = key)
+                _selectorState = _selectorState.copy(displayed = key)
 
                 instance.postUpdate()
                 return@synchronized
             }
 
-            if (!_displayedState.hasNext) {
+            if (!_selectorState.hasNext) {
                 // Currently displayed instance was the last entry.
-                _displayedState = _displayedState.copy(next = key)
+                _selectorState = _selectorState.copy(next = key)
 
                 displayed.postUpdate()
             }
@@ -724,7 +724,7 @@ internal constructor(
                 }
             }.toImmutableMap()
 
-            val state = _displayedState
+            val state = _selectorState
 
             val updateState = when (key) {
                 state.previous -> {
@@ -735,7 +735,7 @@ internal constructor(
                         previousKey = k
                     }
                     Executable {
-                        _displayedState = state.copy(previous = previousKey)
+                        _selectorState = state.copy(previous = previousKey)
                     }
                 }
                 state.displayed -> {
@@ -744,7 +744,7 @@ internal constructor(
                     if (newDisplayed == null) {
                         // Was the only instance
                         Executable {
-                            _displayedState = state.copy(displayed = null)
+                            _selectorState = state.copy(displayed = null)
                         }
                     } else {
                         var newPrevious: FileIDKey? = null
@@ -769,7 +769,7 @@ internal constructor(
                         }
 
                         Executable {
-                            _displayedState = DisplayedState(
+                            _selectorState = SelectorState(
                                 previous = newPrevious,
                                 displayed = newDisplayed,
                                 next = newNext,
@@ -794,7 +794,7 @@ internal constructor(
                     }
 
                     Executable {
-                        _displayedState = state.copy(next = newNext)
+                        _selectorState = state.copy(next = newNext)
                     }
                 }
                 else -> {
@@ -819,11 +819,11 @@ internal constructor(
     }
 
     private fun IS.postUpdate() {
-        if (_displayedState.displayed != fileIDKey()) return
+        if (_selectorState.displayed != fileIDKey()) return
         val instance = this
 
         serviceChildScope.launch {
-            val state = _displayedState
+            val state = _selectorState
             if (state.displayed != fileIDKey()) return@launch
             if (instance.isDestroyed()) return@launch
             if (this@AbstractTorServiceUI.isDestroyed()) return@launch
@@ -834,7 +834,7 @@ internal constructor(
         }
     }
 
-    private data class DisplayedState(val previous: FileIDKey?, val displayed: FileIDKey?, val next: FileIDKey?) {
+    private data class SelectorState(val previous: FileIDKey?, val displayed: FileIDKey?, val next: FileIDKey?) {
         val hasPrevious: Boolean = previous != null
         val hasNext: Boolean = next != null
     }
