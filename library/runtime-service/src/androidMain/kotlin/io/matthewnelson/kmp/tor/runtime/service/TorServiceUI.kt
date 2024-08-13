@@ -206,7 +206,7 @@ protected constructor(
 
     /**
      * Posts the [Notification]. This **MUST** be called upon first
-     * [onUpdate] invocation (or sooner) to ensure that the call to
+     * [onRender] invocation (or sooner) to ensure that the call to
      * [Service.startForeground] is had, otherwise an ANR will result
      * for Android API 26+.
      *

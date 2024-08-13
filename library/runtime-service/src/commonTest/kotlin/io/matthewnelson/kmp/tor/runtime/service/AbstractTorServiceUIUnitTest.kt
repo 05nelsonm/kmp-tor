@@ -54,10 +54,10 @@ class AbstractTorServiceUIUnitTest {
 
         val instanceStatesTest: Collection<State> get() = instanceStates
 
-        fun previousTest() { previous() }
-        fun nextTest() { next() }
+        fun previousTest() { selectPrevious() }
+        fun nextTest() { selectNext() }
 
-        protected override fun onUpdate(displayed: State, hasPrevious: Boolean, hasNext: Boolean) {
+        protected override fun onRender(displayed: State, hasPrevious: Boolean, hasNext: Boolean) {
             updates.add(Update(displayed, Update.Indicators(hasPrevious, hasNext)))
         }
 
@@ -296,7 +296,7 @@ class AbstractTorServiceUIUnitTest {
         delayTest()
         // 1st update should not post an update b/c the _displayed
         // variable that was set was changed in 2nd call. This indicates
-        // that the launch lambda performs a check before calling onUpdate.
+        // that the launch lambda performs a check before calling onRender.
         assertEquals(4, ui.updates.size)
         assertEquals(ui.instanceStatesTest.elementAt(3), ui.updates[3].state)
         assertEquals(TestUI.Update.Indicators(true, true), ui.updates[3].indicators)

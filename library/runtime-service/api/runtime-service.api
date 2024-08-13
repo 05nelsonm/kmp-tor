@@ -8,10 +8,10 @@ public abstract class io/matthewnelson/kmp/tor/runtime/service/AbstractTorServic
 	public final fun hashCode ()I
 	protected final fun instanceStates ()Ljava/util/Collection;
 	public final fun isDestroyed ()Z
-	protected final fun next ()V
 	protected fun onDestroy ()V
-	protected abstract fun onUpdate (Lio/matthewnelson/kmp/tor/runtime/service/AbstractTorServiceUI$InstanceState;ZZ)V
-	protected final fun previous ()V
+	protected abstract fun onRender (Lio/matthewnelson/kmp/tor/runtime/service/AbstractTorServiceUI$InstanceState;ZZ)V
+	protected final fun selectNext ()V
+	protected final fun selectPrevious ()V
 }
 
 public abstract class io/matthewnelson/kmp/tor/runtime/service/AbstractTorServiceUI$Args {
