@@ -66,7 +66,9 @@ internal open class ContentBandwidth private constructor(
         return result
     }
 
-    internal companion object ZERO: ContentBandwidth(0, 0)
+    internal companion object ZERO: ContentBandwidth(0, 0) {
+        public override fun toString(): String = "ContentBandwidth[value=$value]"
+    }
 }
 
 @Suppress("NOTHING_TO_INLINE", "KotlinRedundantDiagnosticSuppress")

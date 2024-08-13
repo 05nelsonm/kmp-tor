@@ -23,7 +23,6 @@ import android.content.res.TypedArray
 import android.graphics.Color
 import android.util.TypedValue
 import android.view.ContextThemeWrapper
-import io.matthewnelson.kmp.tor.runtime.service.ui.KmpTorServiceUI
 import io.matthewnelson.kmp.tor.runtime.service.ui.R
 
 internal class UIColor private constructor(
@@ -55,38 +54,45 @@ internal class UIColor private constructor(
     private var isReadyAttributeDefined: Boolean? = null
     private var palletNotReady: Pallet? = null
 
-    internal operator fun get(state: ColorState, colorReady: ColorRes?): Pallet {
-        if (state is ColorState.Ready) {
-            if (colorReady != null) {
-                return Pallet(appContext.retrieveColor(colorReady))
+    internal operator fun get(colorize: Boolean, colorReady: ColorRes?): Pallet {
+        return if (colorize) {
+            getOrCreatePalletReady(colorReady)
+        } else {
+            getOrCreatePalletNotReady()
+        }
+    }
+
+    private fun getOrCreatePalletReady(colorReady: ColorRes?): Pallet {
+        if (colorReady != null) {
+            return Pallet(appContext.retrieveColor(colorReady))
+        }
+
+        appContext.theme?.let { appTheme ->
+
+            val hashCode = appTheme.hashCode()
+            if (hashCode != appThemeHashCode) {
+                isReadyAttributeDefined = null
+                appThemeHashCode = hashCode
             }
 
-            appContext.theme?.let { appTheme ->
+            if (isReadyAttributeDefined != false) {
+                val t = TypedValue()
+                val wasFound = appTheme.resolveAttribute(R.attr.kmp_tor_ui_color_ready, t, true)
 
-                val hashCode = appTheme.hashCode()
-                if (hashCode != appThemeHashCode) {
-                    isReadyAttributeDefined = null
-                    appThemeHashCode = hashCode
+                if (
+                    wasFound
+                    && t.type >= TypedValue.TYPE_FIRST_COLOR_INT
+                    && t.type <= TypedValue.TYPE_LAST_COLOR_INT
+                ) {
+                    isReadyAttributeDefined = true
+                    return Pallet(ColorInt(t.data))
                 }
 
-                if (isReadyAttributeDefined != false) {
-                    val t = TypedValue()
-                    val wasFound = appTheme.resolveAttribute(R.attr.kmp_tor_ui_color_ready, t, true)
-
-                    if (
-                        wasFound
-                        && t.type >= TypedValue.TYPE_FIRST_COLOR_INT
-                        && t.type <= TypedValue.TYPE_LAST_COLOR_INT
-                    ) {
-                        isReadyAttributeDefined = true
-                        return Pallet(ColorInt(t.data))
-                    }
-
-                    isReadyAttributeDefined = false
-                }
+                isReadyAttributeDefined = false
             }
         }
 
+        // Fall back to NotReady colors
         return getOrCreatePalletNotReady()
     }
 

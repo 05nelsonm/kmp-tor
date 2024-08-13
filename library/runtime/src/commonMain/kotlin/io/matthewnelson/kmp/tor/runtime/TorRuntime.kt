@@ -560,9 +560,9 @@ public sealed interface TorRuntime:
      * An instance of [TorRuntime] which produces [Lifecycle.DestroyableTorRuntime]
      * under the hood which are intended to be run within a service object.
      *
-     * **NOTE:** This is currently an [ExperimentalKmpTorApi], only being implemented
-     * by the `kmp-tor:runtime-service` dependency. Things may change, so use at your
-     * own risk!
+     * **NOTE:** This and its subclasses are currently an [ExperimentalKmpTorApi].
+     * Things may change (as the annotation states), so use at your own risk! Prefer
+     * using the stable implementation via the `kmp-tor:runtime-service` dependency.
      *
      * @see [Lifecycle.DestroyableTorRuntime]
      * */
@@ -574,6 +574,7 @@ public sealed interface TorRuntime:
          *
          * @see [Environment.Builder.serviceFactoryLoader]
          * */
+        @ExperimentalKmpTorApi
         public abstract class Loader {
 
             protected abstract fun loadProtected(initializer: Initializer): ServiceFactory
@@ -587,6 +588,7 @@ public sealed interface TorRuntime:
          * result in [IllegalStateException] as the [ServiceFactory] implementation
          * is held as a singleton for the given [Environment] that it belongs to.
          * */
+        @ExperimentalKmpTorApi
         public class Initializer private constructor(
             private val create: (startService: () -> Unit) -> ServiceFactoryDriver,
         ) {
@@ -625,6 +627,7 @@ public sealed interface TorRuntime:
          *
          * @see [ServiceFactory.binder]
          * */
+        @ExperimentalKmpTorApi
         public interface Binder: RuntimeEvent.Notifier, FileID {
 
             /**

@@ -42,9 +42,6 @@ import kotlin.jvm.JvmSynthetic
  * create a fully customized notifications for the running instances of
  * [TorRuntime] as they operate within a service object.
  *
- * Alternatively, use the default implementation `kmp-tor:runtime-service-ui`
- * dependency, [io.matthewnelson.kmp.tor.runtime.service.ui.KmpTorServiceUI].
- *
  * This class' API is designed as follows:
  *  - [Factory]: To be used for all [TorRuntime.ServiceFactory] instances and
  *   injected into a service object upon service creation.
@@ -302,6 +299,11 @@ internal constructor(
      * As an example implementation, see
      * [io.matthewnelson.kmp.tor.runtime.service.ui.KmpTorServiceUI.Config]
      *
+     * **NOTE:** This is currently an [ExperimentalKmpTorApi] when extending
+     * to create your own implementation. Things may change (as the annotation
+     * states), so use at your own risk! Prefer using the stable implementation
+     * via the `kmp-tor:runtime-service-ui` dependency.
+     *
      * @param [fields] A map of the field name value pairs.
      *   (e.g. `mapOf("iconOff" to R.drawable.my_icon_off)`)
      * @throws [IllegalArgumentException] if [fields] is empty
@@ -390,7 +392,7 @@ internal constructor(
          *             ButtonAction.StopTor
          *         ]
          *         color: ColorState.Ready
-         *         icon: IconState.DataXfer
+         *         icon: IconState.Data
          *         progress: Progress.None
          *         text: NewNym.RateLimited[seconds=8]
          *         title: TorState.Daemon.On{100%}
@@ -478,6 +480,11 @@ internal constructor(
      * [AbstractTorServiceUI] "container" via [postStateChange] that a
      * change has occurred.
      *
+     * **NOTE:** This is currently an [ExperimentalKmpTorApi] when extending
+     * to create your own implementation. Things may change (as the annotation
+     * states), so use at your own risk! Prefer using the stable implementation
+     * via the `kmp-tor:runtime-service-ui` dependency.
+     *
      * @throws [IllegalStateException] on instantiation if [args] were not those
      *   which were passed to [create]. See [Args].
      * */
@@ -518,14 +525,20 @@ internal constructor(
         protected open fun onDestroy() {}
 
         /**
-         * Notifies the [AbstractTorServiceUI.postStateChange] that this instance had
-         * some sort of stateful change so that it may update the UI (if needed).
+         * Notifies the [AbstractTorServiceUI] that this instance had some
+         * sort of stateful change so that it may update the UI (if needed).
+         * If this [InstanceState] is not the currently [displayed] instance,
+         * then the update is ignored and [onRender] will not be invoked.
          * */
         protected fun postStateChange() { args.ui.postStateChange(this) }
 
         /**
          * Exported functionality of [RuntimeEvent.EXECUTE.CMD.observeSignalNewNym]
          * with the running instance of [Lifecycle.DestroyableTorRuntime].
+         *
+         * It may not immediately available upon instantiation of [InstanceState]
+         * as the [TorRuntime.ServiceFactory.Binder] needs to use arguments provided
+         * by [InstanceState] to bind.
          * */
         protected fun observeSignalNewNym(
             tag: String?,
@@ -541,6 +554,10 @@ internal constructor(
          * running instance of [Lifecycle.DestroyableTorRuntime].
          *
          * The [Action.Processor] reference **should not** be held onto.
+         *
+         * It may not immediately available upon instantiation of [InstanceState]
+         * as the [TorRuntime.ServiceFactory.Binder] needs to use arguments provided
+         * by [InstanceState] to bind.
          * */
         public fun processorAction(): Action.Processor? {
             if (isDestroyed()) return null
@@ -553,6 +570,10 @@ internal constructor(
          *
          * The [TorCmd.Unprivileged.Processor] reference **should not**
          * be held onto.
+         *
+         * It may not immediately available upon instantiation of [InstanceState]
+         * as the [TorRuntime.ServiceFactory.Binder] needs to use arguments provided
+         * by [InstanceState] to bind.
          * */
         public fun processorTorCmd(): TorCmd.Unprivileged.Processor? {
             if (isDestroyed()) return null
@@ -587,7 +608,7 @@ internal constructor(
         init {
             instanceJob.invokeOnCompletion {
                 // Remove instance from states before calling
-                // onDestroy so that any postUpdate calls will
+                // onDestroy so that any postStateChange calls will
                 // be ignored.
                 this.args.ui.removeInstanceState(this)
             }
@@ -606,7 +627,7 @@ internal constructor(
 
         public final override fun hashCode(): Int = instanceJob.hashCode()
 
-        public final override fun toString(): String = toFIDString(defaultClassName = "TorServiceUI.InstanceState")
+        public final override fun toString(): String = toFIDString(defaultClassName = "AbstractTorServiceUI.InstanceState")
     }
 
     /**
@@ -728,7 +749,7 @@ internal constructor(
 
             val updateState = when (key) {
                 state.previous -> {
-                    // Fine new previous
+                    // Find new previous
                     var previousKey: FileIDKey? = null
                     for (k in m.keys) {
                         if (k == state.displayed) break

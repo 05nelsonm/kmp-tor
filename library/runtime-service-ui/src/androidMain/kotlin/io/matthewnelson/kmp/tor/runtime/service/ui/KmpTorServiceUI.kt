@@ -104,6 +104,9 @@ public class KmpTorServiceUI private constructor(
 
         /**
          * Create a new [Config] with the default options.
+         *
+         * @param [iconReady] See [Builder.iconReady]
+         * @param [iconNotReady] See [Builder.iconNotReady]
          * */
         public constructor(
             iconReady: Int,
@@ -117,7 +120,9 @@ public class KmpTorServiceUI private constructor(
         /**
          * Create and new [Config] and configure options via [block].
          *
-         * @see [Config.Builder]
+         * @param [iconReady] See [Builder.iconReady]
+         * @param [iconNotReady] See [Builder.iconNotReady]
+         * @param [block] lambda for configuring optionals via [Builder]
          * */
         public constructor(
             iconReady: Int,
@@ -161,7 +166,7 @@ public class KmpTorServiceUI private constructor(
         public val iconData: Int = _iconData.id
 
         /**
-         * Configure a new [Config.Builder] which inherits all options
+         * Configure a new [Config.Builder] which inherits all settings
          * from this one.
          * */
         public fun newConfig(
@@ -169,7 +174,7 @@ public class KmpTorServiceUI private constructor(
         ): Config = newConfig(null, block)
 
         /**
-         * Configure a new [Config.Builder] which inherits all options
+         * Configure a new [Config.Builder] which inherits all settings
          * from this one.
          *
          * @param [iconReady] If non-null, that value will be set for
@@ -833,24 +838,32 @@ public class KmpTorServiceUI private constructor(
             }
         }
 
+        val pallet = uiColor[state.icon.colorize, displayed.instanceConfig._colorReady]
+
         current?.let { current ->
             if (
                 current.state != state
                 || current.hasPrevious != hasPrevious
                 || current.hasNext != hasNext
+                || current.pallet != pallet
                 || current.durationText != durationText
             ) {
                 // There was a stateful change. Continue.
-                this.current = CurrentUIState(state, hasPrevious, hasNext, durationText)
+                this.current = CurrentUIState(
+                    state,
+                    hasPrevious,
+                    hasNext,
+                    pallet,
+                    durationText,
+                )
             } else {
                 return
             }
         }
 
-        val pallet = uiColor[state.color, displayed.instanceConfig._colorReady]
         val iconRes = when (state.icon) {
-            IconState.NetworkEnabled -> displayed.instanceConfig._iconReady
-            IconState.NetworkDisabled -> displayed.instanceConfig._iconNotReady
+            IconState.Ready -> displayed.instanceConfig._iconReady
+            IconState.NotReady -> displayed.instanceConfig._iconNotReady
             IconState.Data -> displayed.instanceConfig._iconData
         }
 
@@ -1072,6 +1085,7 @@ public class KmpTorServiceUI private constructor(
         val state: UIState,
         val hasPrevious: Boolean,
         val hasNext: Boolean,
+        val pallet: UIColor.Pallet,
         val durationText: String,
     )
 

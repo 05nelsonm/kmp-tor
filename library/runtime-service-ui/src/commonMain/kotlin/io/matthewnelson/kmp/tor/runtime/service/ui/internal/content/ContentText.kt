@@ -33,11 +33,7 @@ internal sealed class ContentText<T: Any> {
     }
 
     public override fun toString(): String {
-        val name =if (this is ContentBandwidth.ZERO) {
-            "ContentBandwidth"
-        } else {
-            this::class.simpleName ?: "ContentText"
-        }
+        val name = this::class.simpleName ?: "ContentText"
 
         val value = if (value is Unit) {
             ""

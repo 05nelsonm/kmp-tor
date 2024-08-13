@@ -26,7 +26,6 @@ import kotlin.jvm.JvmSynthetic
 
 internal class UIState private constructor(
     actions: Set<ButtonAction>,
-    internal val color: ColorState,
     internal val icon: IconState,
     internal val progress: Progress,
     internal val text: ContentText<*>,
@@ -38,7 +37,6 @@ internal class UIState private constructor(
 
     internal fun copy(
         actions: Set<ButtonAction> = this.actions,
-        color: ColorState = this.color,
         icon: IconState = this.icon,
         progress: Progress = this.progress,
         text: ContentText<*> = this.text,
@@ -46,7 +44,6 @@ internal class UIState private constructor(
     ): UIState {
         if (
             actions == this.actions
-            && color == this.color
             && icon == this.icon
             && progress == this.progress
             && text == this.text
@@ -57,7 +54,6 @@ internal class UIState private constructor(
 
         return UIState(
             actions,
-            color,
             icon,
             progress,
             text,
@@ -70,7 +66,6 @@ internal class UIState private constructor(
         return  other is UIState
                 && other.fid == fid
                 && other.actions == actions
-                && other.color == color
                 && other.icon == icon
                 && other.progress == progress
                 && other.text == text
@@ -81,7 +76,6 @@ internal class UIState private constructor(
         var result = 17
         result = result * 42 + fid.hashCode()
         result = result * 42 + actions.hashCode()
-        result = result * 42 + color.hashCode()
         result = result * 42 + icon.hashCode()
         result = result * 42 + progress.hashCode()
         result = result * 42 + text.hashCode()
@@ -107,8 +101,6 @@ internal class UIState private constructor(
             appendLine("    ]")
         }
 
-        append("    color: ")
-        appendLine(color)
         append("    icon: ")
         appendLine(icon)
         append("    progress: ")
@@ -129,8 +121,7 @@ internal class UIState private constructor(
             fid: FileID,
         ): UIState = UIState(
             emptySet(),
-            ColorState.NotReady,
-            IconState.NetworkDisabled,
+            IconState.NotReady,
             Progress.Indeterminate,
             ContentAction.of(Action.StartDaemon),
             TorState.Daemon.Off,

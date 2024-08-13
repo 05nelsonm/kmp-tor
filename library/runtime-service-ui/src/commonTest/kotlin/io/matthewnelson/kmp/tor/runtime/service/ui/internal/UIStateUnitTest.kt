@@ -34,8 +34,7 @@ class UIStateUnitTest {
                     actions: [
                         ButtonAction.NewIdentity
                     ]
-                    color: ColorState.NotReady
-                    icon: IconState.NetworkDisabled
+                    icon: IconState.NotReady[colorize=false]
                     progress: Progress.Indeterminate
                     text: ContentAction[value=StartDaemon]
                     title: TorState.Daemon.Off
