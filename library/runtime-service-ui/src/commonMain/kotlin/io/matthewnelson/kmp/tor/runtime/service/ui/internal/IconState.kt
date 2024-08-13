@@ -15,10 +15,10 @@
  **/
 package io.matthewnelson.kmp.tor.runtime.service.ui.internal
 
-internal enum class IconState {
-    NetworkEnabled,
-    NetworkDisabled,
-    Data;
+internal enum class IconState(internal val colorize: Boolean) {
+    Ready(colorize = true),
+    NotReady(colorize = false),
+    Data(colorize = true);
 
-    public override fun toString(): String = "IconState.$name"
+    public override fun toString(): String = "IconState.$name[colorize=$colorize]"
 }

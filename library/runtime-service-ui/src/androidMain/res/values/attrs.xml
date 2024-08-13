@@ -16,10 +16,10 @@
   *-->
 <resources>
     <!--
-        Declare a color (or reference to another color) in
-        your base AppTheme. This will be utilized automatically
-        as the notification color when the TorRuntime instance is
-        ready (i.e. 100% Bootstrapped and Network is enabled).
+        Declare a color (or reference to color) in your base AppTheme.
+        This will be utilized automatically as the notification color
+        when the TorRuntime instance is in an operative state (i.e. 100%
+        Bootstrapped and Network is enabled).
 
         NOTE: This can be overridden on a per-instance basis by
               setting `KmpTorServiceUI.Config.Builder.colorReady`

@@ -46,20 +46,22 @@ import kotlinx.coroutines.CoroutineScope
  * create a fully customized notifications for the running instances of
  * [TorRuntime] as they operate within [TorService].
  *
- * Alternatively, use the default implementation `kmp-tor:runtime-service-ui`
- * dependency, [io.matthewnelson.kmp.tor.runtime.service.ui.KmpTorServiceUI].
- *
  * This class' API is designed as follows:
  *  - [Factory]: To be used for all [TorRuntime.ServiceFactory] instances and
  *   injected into [TorService] upon creation.
  *      - Context: `SINGLETON`
- *  - [AbstractTorServiceUI]: To be created via [Factory.createProtected]
+ *  - [TorServiceUI]: To be created via [Factory.createProtected]
  *   upon [TorService] start.
  *      - Context: `SERVICE`
  *  - [InstanceState]: To be created via [AbstractTorServiceUI.createProtected]
  *   for every instance of [Lifecycle.DestroyableTorRuntime] operating within
  *   [TorService].
  *      - Context: `INSTANCE`
+ *
+ * **NOTE:** This is currently an [ExperimentalKmpTorApi] when extending
+ * to create your own implementation. Things may change (as the annotation
+ * states), so use at your own risk! Prefer using the stable implementation
+ * via the `kmp-tor:runtime-service-ui` dependency.
  *
  * @throws [IllegalStateException] on instantiation if [args] were not those
  *   which were passed to [Factory.create]. See [Args].
@@ -341,6 +343,11 @@ protected constructor(
      * Core `androidMain` abstraction for a [Factory] class which is
      * responsible for instantiating new instances of [TorServiceUI]
      * when requested by [TorService].
+     *
+     * **NOTE:** This is currently an [ExperimentalKmpTorApi] when extending
+     * to create your own implementation. Things may change (as the annotation
+     * states), so use at your own risk! Prefer using the stable implementation
+     * via the `kmp-tor:runtime-service-ui` dependency.
      *
      * Implementations are encouraged to keep it as a subclass within,
      * and use a `private constructor` for, their [UI] implementations.

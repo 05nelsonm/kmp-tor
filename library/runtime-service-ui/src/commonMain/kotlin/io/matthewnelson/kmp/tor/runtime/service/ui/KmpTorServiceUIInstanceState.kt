@@ -25,7 +25,6 @@ import io.matthewnelson.kmp.tor.runtime.core.OnEvent
 import io.matthewnelson.kmp.tor.runtime.core.TorEvent
 import io.matthewnelson.kmp.tor.runtime.service.AbstractTorServiceUI
 import io.matthewnelson.kmp.tor.runtime.service.ui.internal.ButtonAction
-import io.matthewnelson.kmp.tor.runtime.service.ui.internal.ColorState
 import io.matthewnelson.kmp.tor.runtime.service.ui.internal.IconState
 import io.matthewnelson.kmp.tor.runtime.service.ui.internal.UIState
 import io.matthewnelson.kmp.tor.runtime.service.ui.internal.Progress
@@ -176,12 +175,6 @@ public class KmpTorServiceUIInstanceState<C: AbstractKmpTorServiceUIConfig> priv
                     _messageJob?.cancel()
                 }
 
-                val color = if (new.daemon.isBootstrapped && new.network.isEnabled) {
-                    ColorState.Ready
-                } else {
-                    ColorState.NotReady
-                }
-
                 val progress = when {
                     !new.daemon.isOn -> {
                         Progress.Indeterminate
@@ -189,7 +182,6 @@ public class KmpTorServiceUIInstanceState<C: AbstractKmpTorServiceUIConfig> priv
                     !old.daemon.isBootstrapped && new.daemon.isBootstrapped -> {
                         update { current ->
                             current.copy(
-                                color = color,
                                 progress = Progress.Determinant(new.daemon),
                                 text = ContentBootstrap.of(new.daemon.bootstrap),
                             )
@@ -231,18 +223,17 @@ public class KmpTorServiceUIInstanceState<C: AbstractKmpTorServiceUIConfig> priv
                     val actions = progress.toActions()
 
                     val icon = when {
-                        new.network.isDisabled -> IconState.NetworkDisabled
+                        new.network.isDisabled -> IconState.NotReady
                         new.daemon.isBootstrapped -> if (_bandwidth !is ContentBandwidth.ZERO) {
                             IconState.Data
                         } else {
-                            IconState.NetworkEnabled
+                            IconState.Ready
                         }
-                        else -> IconState.NetworkDisabled
+                        else -> IconState.NotReady
                     }
 
                     current.copy(
                         actions = actions,
-                        color = color,
                         icon = icon,
                         progress = progress,
                         text = text,
@@ -295,7 +286,7 @@ public class KmpTorServiceUIInstanceState<C: AbstractKmpTorServiceUIConfig> priv
             val icon = if (bandwidth !is ContentBandwidth.ZERO) {
                 IconState.Data
             } else {
-                IconState.NetworkEnabled
+                IconState.Ready
             }
 
             update { current ->

@@ -24,10 +24,7 @@ import android.content.Context
 import android.content.res.Resources
 import android.os.Build
 import androidx.startup.AppInitializer
-import io.matthewnelson.kmp.file.File
-import io.matthewnelson.kmp.file.SysTempDir
-import io.matthewnelson.kmp.file.resolve
-import io.matthewnelson.kmp.file.toFile
+import io.matthewnelson.kmp.file.*
 import io.matthewnelson.kmp.tor.core.api.ResourceInstaller
 import io.matthewnelson.kmp.tor.core.api.ResourceInstaller.Paths
 import io.matthewnelson.kmp.tor.core.api.annotation.ExperimentalKmpTorApi
@@ -162,6 +159,8 @@ public open class TorServiceConfig private constructor(
      * Directories (android unit tests where [testUseBuildDirectory] = `true`):
      *  - workDirectory: {module}/build/kmp_tor_android_test/[dirName]/work
      *  - cacheDirectory: {module}/build/kmp_tor_android_test/[dirName]/cache
+     *
+     * @throws [IllegalArgumentException] if [dirName] is an absolute file path
      * */
     public fun newEnvironment(
         dirName: String,
@@ -186,6 +185,8 @@ public open class TorServiceConfig private constructor(
      * Directories (android unit tests where [testUseBuildDirectory] = `true`):
      *  - workDirectory: {module}/build/kmp_tor_android_test/[dirName]/work
      *  - cacheDirectory: {module}/build/kmp_tor_android_test/[dirName]/cache
+     *
+     * @throws [IllegalArgumentException] if [dirName] is an absolute file path
      * */
     public fun newEnvironment(
         dirName: String,
@@ -434,7 +435,8 @@ public open class TorServiceConfig private constructor(
          *
          * @throws [Resources.NotFoundException] If [instanceConfig] fails validation
          *   checks (emulators & devices only).
-         * @throws [IllegalArgumentException] if [instanceConfig] is invalid.
+         * @throws [IllegalArgumentException] if [instanceConfig] is invalid or [dirName]
+         *   is an absolute file path (starts with `/`).
          * */
         public fun newEnvironment(
             dirName: String,
@@ -468,7 +470,8 @@ public open class TorServiceConfig private constructor(
          *
          * @throws [Resources.NotFoundException] If [instanceConfig] fails validation
          *   checks (emulators & devices only).
-         * @throws [IllegalArgumentException] if [instanceConfig] is invalid.
+         * @throws [IllegalArgumentException] if [instanceConfig] is invalid or [dirName]
+         *   is an absolute file path (starts with `/`).
          * */
         public fun newEnvironment(
             dirName: String,
@@ -611,6 +614,7 @@ public open class TorServiceConfig private constructor(
 
             @Suppress("LocalVariableName")
             val _dirName = dirName.ifBlank { DEFAULT_DIRNAME }
+            require(!_dirName.toFile().isAbsolute) { "dirName[$_dirName] cannot be an absolute file path." }
 
             if (appContext == null) {
                 // Verify not Android runtime.
@@ -637,9 +641,18 @@ public open class TorServiceConfig private constructor(
 
             val loader = this
 
+            val workDirectory = if (_dirName.contains(SysDirSep)) {
+                val base = _dirName.substringBefore(SysDirSep)
+                val remainder = _dirName.substringAfter(SysDirSep)
+
+                appContext.get().getDir(base, Context.MODE_PRIVATE).resolve(remainder)
+            } else {
+                appContext.get().getDir(_dirName, Context.MODE_PRIVATE)
+            }
+
             // Emulator or Device
             return TorRuntime.Environment.Builder(
-                workDirectory = appContext.get().getDir(_dirName, Context.MODE_PRIVATE),
+                workDirectory = workDirectory,
                 cacheDirectory = appContext.get().cacheDir.resolve(_dirName),
                 installer = installer,
                 block = {
