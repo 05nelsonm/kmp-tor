@@ -126,7 +126,7 @@ internal enum class UIAction {
                 view.setOnClickPendingIntent(R.id.kmp_tor_ui_action, pIntent)
 
                 val iconRes = icons[action]
-                val imageResId = R.id.kmp_tor_ui_action_image
+                val actionImageId = R.id.kmp_tor_ui_action_image
 
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                     // API 24+
@@ -134,18 +134,18 @@ internal enum class UIAction {
 
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
                         // API 31+
-                        view.setColorStateList(imageResId, "setImageTintList", pallet.notNight, pallet.yesNight)
+                        view.setColorStateList(actionImageId, "setImageTintList", pallet.notNight, pallet.yesNight)
                     } else {
                         // API 24..30
                         icon.setTint(pallet.default.argb)
                         icon.setTintMode(PorterDuff.Mode.SRC_IN)
                     }
 
-                    view.setImageViewIcon(imageResId, icon)
+                    view.setImageViewIcon(actionImageId, icon)
                 } else {
                     // API 23-
                     val bitmap = iconRes.toBitmap(appContext, pallet.default, dpSize = 24)
-                    view.setImageViewBitmap(imageResId, bitmap)
+                    view.setImageViewBitmap(actionImageId, bitmap)
                 }
 
                 return view

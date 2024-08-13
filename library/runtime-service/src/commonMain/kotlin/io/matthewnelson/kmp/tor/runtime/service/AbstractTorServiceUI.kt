@@ -96,8 +96,8 @@ internal constructor(
     /**
      * Returns the currently displayed [InstanceState].
      *
-     * @see [previous]
-     * @see [next]
+     * @see [selectPrevious]
+     * @see [selectNext]
      * */
     @get:JvmName("displayed")
     protected val displayed: IS? get() = _selectorState.displayed?.let { _instanceStates[it] }
@@ -139,20 +139,20 @@ internal constructor(
      *   that exists in [instanceStates] before [displayed].
      * @param [hasNext] Indicates there is another [InstanceState]
      *   that exists in [instanceStates] after [displayed].
-     * @see [previous]
-     * @see [next]
+     * @see [selectPrevious]
+     * @see [selectNext]
      * */
-    protected abstract fun onUpdate(displayed: IS, hasPrevious: Boolean, hasNext: Boolean)
+    protected abstract fun onRender(displayed: IS, hasPrevious: Boolean, hasNext: Boolean)
 
     /**
-     * Shifts the pointer to the "left" and calls [onUpdate] with the new
+     * Shifts the pointer to the "left" and calls [onRender] with the new
      * parameters. If no previous [InstanceState] is available, then nothing
      * occurs.
      *
      * This is for cycling through running instances via some button in the
      * UI, such as `<`.
      * */
-    protected fun previous() {
+    protected fun selectPrevious() {
         if (!_selectorState.hasPrevious) return
 
         @OptIn(InternalKmpTorApi::class)
@@ -177,14 +177,14 @@ internal constructor(
     }
 
     /**
-     * Shifts the pointer to the "right" and calls [onUpdate] with the new
+     * Shifts the pointer to the "right" and calls [onRender] with the new
      * parameters. If no next [InstanceState] is available, then nothing
      * occurs.
      *
      * This is for cycling through running instances via some button in the
      * UI, such as `>`.
      * */
-    protected fun next() {
+    protected fun selectNext() {
         if (!_selectorState.hasNext) return
 
         @OptIn(InternalKmpTorApi::class)
@@ -830,7 +830,7 @@ internal constructor(
 
             ensureActive()
 
-            onUpdate(instance, state.hasPrevious, state.hasNext)
+            onRender(instance, state.hasPrevious, state.hasNext)
         }
     }
 

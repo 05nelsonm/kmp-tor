@@ -811,7 +811,7 @@ public class KmpTorServiceUI private constructor(
 
     private var current: CurrentUIState? = null
 
-    protected override fun onUpdate(
+    protected override fun onRender(
         displayed: KmpTorServiceUIInstanceState<Config>,
         hasPrevious: Boolean,
         hasNext: Boolean,
@@ -820,7 +820,7 @@ public class KmpTorServiceUI private constructor(
 
         // TorEvent.BW is dispatched every 1 second (even if DisableNetwork is true).
         // This allows API 23- header layout to be a simple TextView, instead of
-        // something like a Chronometer. Need to check for each onUpdate invocation
+        // something like a Chronometer. Need to check for each onRender invocation
         // if the text changes in order to rebuild & post a new notification.
         val durationText = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) "" else {
             val elapsed = (SystemClock.elapsedRealtime() - startTime)
@@ -1173,10 +1173,10 @@ public class KmpTorServiceUI private constructor(
                     )
                 }
                 UIAction.Previous -> {
-                    previous()
+                    selectPrevious()
                 }
                 UIAction.Next -> {
-                    next()
+                    selectNext()
                 }
             }
         }.register(
