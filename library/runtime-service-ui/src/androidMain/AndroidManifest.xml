@@ -31,6 +31,14 @@
 
         https://github.com/05nelsonm/kmp-tor/blob/master/library/runtime-service/src/androidMain/AndroidManifest.xml
 
+    • POST_NOTIFICATIONS:
+
+        • Needed for API 33+ for the notification to be posted. If not declared
+          and held, the notification will not be shown but TorService will still
+          function.
+
+        <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+
     • FOREGROUND_SERVICE:
 
         • Needed for API 28+ when utilizing `TorServiceConfig.Foreground.Builder`.
