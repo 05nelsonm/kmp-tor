@@ -197,7 +197,10 @@ public open class Port private constructor(
 
     public final override fun compareTo(other: Port): Int = value.compareTo(other.value)
 
+    /** @suppress */
     public final override fun equals(other: Any?): Boolean = other is Port && other.value == value
+    /** @suppress */
     public final override fun hashCode(): Int = 17 * 31 + value.hashCode()
+    /** @suppress */
     public final override fun toString(): String = value.toString()
 }

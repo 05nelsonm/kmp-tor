@@ -33,6 +33,8 @@ import kotlin.jvm.JvmStatic
 
 /**
  * Base abstraction for implementations that process [TorEvent].
+ *
+ * @suppress
  * */
 @OptIn(InternalKmpTorApi::class)
 public abstract class AbstractTorEventProcessor

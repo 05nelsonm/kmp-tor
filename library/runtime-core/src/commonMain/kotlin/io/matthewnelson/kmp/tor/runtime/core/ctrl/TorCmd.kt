@@ -683,5 +683,6 @@ public sealed class TorCmd<Success: Any> private constructor(
         }
     }
 
-    final override fun toString(): String = keyword
+    /** @suppress */
+    public final override fun toString(): String = keyword
 }

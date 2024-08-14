@@ -135,6 +135,9 @@ public sealed class LocalHost private constructor(): Address("localhost") {
 
     public companion object {
 
+        /**
+         * @suppress
+         * */
         @InternalKmpTorApi
         @Throws(IOException::class)
         public fun refreshCache() { Cache.resolve(checkCache = false) }

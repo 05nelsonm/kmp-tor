@@ -69,6 +69,7 @@ public class UncaughtException private constructor(
             @JvmField
             public val PRINT: Handler = object : Handler {
                 override fun invoke(it: UncaughtException) { it.printStackTrace() }
+                /** @suppress */
                 override fun toString(): String = "UncaughtException.Handler.PRINT"
             }
 
@@ -78,6 +79,7 @@ public class UncaughtException private constructor(
             @JvmField
             public val IGNORE: Handler = object : Handler {
                 override fun invoke(it: UncaughtException) {}
+                /** @suppress */
                 override fun toString(): String = "UncaughtException.Handler.IGNORE"
             }
 
@@ -87,6 +89,7 @@ public class UncaughtException private constructor(
             @JvmField
             public val THROW: Handler = object : Handler {
                 override fun invoke(it: UncaughtException) { throw it }
+                /** @suppress */
                 override fun toString(): String = "UncaughtException.Handler.THROW"
             }
 
@@ -260,7 +263,8 @@ public class UncaughtException private constructor(
             _root(it)
         }
 
-        override fun toString(): String = "UncaughtException.SuppressedHandler@${hashCode()}"
+        /** @suppress */
+        public override fun toString(): String = "UncaughtException.SuppressedHandler@${hashCode()}"
 
         @JvmSynthetic
         internal fun root(): Handler = _root

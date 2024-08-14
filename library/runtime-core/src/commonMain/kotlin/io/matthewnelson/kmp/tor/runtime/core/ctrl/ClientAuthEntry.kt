@@ -69,6 +69,7 @@ public class ClientAuthEntry private constructor(
         }
     }
 
+    /** @suppress */
     public override fun equals(other: Any?): Boolean {
         return  other is ClientAuthEntry
                 && other.address == address
@@ -77,6 +78,7 @@ public class ClientAuthEntry private constructor(
                 && other.flags == flags
     }
 
+    /** @suppress */
     public override fun hashCode(): Int {
         var result = 20
         result = result * 42 + address.hashCode()
@@ -86,6 +88,7 @@ public class ClientAuthEntry private constructor(
         return result
     }
 
+    /** @suppress */
     public override fun toString(): String = buildString {
         appendLine("ClientAuthEntry: [")
         append("    address: ")

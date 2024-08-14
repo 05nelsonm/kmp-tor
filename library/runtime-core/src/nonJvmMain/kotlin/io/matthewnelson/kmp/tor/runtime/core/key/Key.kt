@@ -50,8 +50,11 @@ public actual sealed class Key private actual constructor() {
         public actual final override fun base64OrNull(): String = base64()
 
         private val _toString by lazy { "${algorithm()}.PublicKey[${base32()}]" }
+        /** @suppress */
         public actual final override fun equals(other: Any?): Boolean = other is Public && other.toString() == toString()
+        /** @suppress */
         public actual final override fun hashCode(): Int = 17 * 31 + toString().hashCode()
+        /** @suppress */
         public actual final override fun toString(): String = _toString
     }
 
@@ -103,8 +106,11 @@ public actual sealed class Key private actual constructor() {
             }
         }
 
+        /** @suppress */
         public actual final override fun equals(other: Any?): Boolean = other is Private && other.hashCode() == hashCode()
+        /** @suppress */
         public actual final override fun hashCode(): Int = 17 * 42 + key.hashCode()
+        /** @suppress */
         public actual final override fun toString(): String = "${algorithm()}.PrivateKey[isDestroyed=$_destroyed]@${hashCode()}"
     }
 

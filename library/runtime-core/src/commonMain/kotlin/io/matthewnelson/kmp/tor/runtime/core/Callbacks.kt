@@ -185,6 +185,7 @@ public fun interface OnEvent<in Data: Any?>: ItBlock<Data> {
                 }
             }
 
+            /** @suppress */
             public override fun toString(): String = "OnEvent.Executor.Main"
         }
 
@@ -203,6 +204,7 @@ public fun interface OnEvent<in Data: Any?>: ItBlock<Data> {
 
             @InternalKmpTorApi
             public override fun execute(handler: CoroutineContext, executable: Executable) { executable.execute() }
+            /** @suppress */
             public override fun toString(): String = "OnEvent.Executor.Immediate"
         }
     }
@@ -299,6 +301,7 @@ public fun interface Disposable {
             }
         }
 
+        /** @suppress */
         public override fun toString(): String = "Disposable.Once@${hashCode()}"
     }
 
@@ -393,6 +396,7 @@ public fun interface Executable {
             }
         }
 
+        /** @suppress */
         public override fun toString(): String = "Executable.Once@${hashCode()}"
     }
 

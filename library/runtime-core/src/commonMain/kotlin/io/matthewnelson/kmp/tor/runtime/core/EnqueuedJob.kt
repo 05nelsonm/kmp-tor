@@ -435,8 +435,11 @@ public abstract class EnqueuedJob protected constructor(
                 }
             }
 
+            /** @suppress */
             public override fun equals(other: Any?): Boolean = privateEquals(other)
+            /** @suppress */
             public override fun hashCode(): Int = privateHashCode()
+            /** @suppress */
             public override fun toString(): String = privateToString()
         }
 
@@ -476,8 +479,11 @@ public abstract class EnqueuedJob protected constructor(
             }
         }
 
+        /** @suppress */
         public override fun equals(other: Any?): Boolean = privateEquals(other)
+        /** @suppress */
         public override fun hashCode(): Int = privateHashCode()
+        /** @suppress */
         public override fun toString(): String = privateToString()
     }
 
@@ -711,6 +717,7 @@ public abstract class EnqueuedJob protected constructor(
         }
     }
 
+    /** @suppress */
     public final override fun toString(): String = toString(_state)
 
     private fun toString(state: State): String {
@@ -727,6 +734,7 @@ public abstract class EnqueuedJob protected constructor(
      * @see [io.matthewnelson.kmp.tor.runtime.core.ctrl.TorCmd.Unprivileged.Processor]
      * @see [io.matthewnelson.kmp.tor.runtime.core.util.awaitAsync]
      * @see [io.matthewnelson.kmp.tor.runtime.core.util.awaitSync]
+     * @suppress
      * */
     @InternalKmpTorApi
     public interface Argument

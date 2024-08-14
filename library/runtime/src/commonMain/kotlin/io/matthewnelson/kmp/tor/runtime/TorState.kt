@@ -83,7 +83,9 @@ public class TorState private constructor(
          * */
         public class On(bootstrap: Byte): Daemon(bootstrap.coerceIn(0, 100), isOn = true) {
 
+            /** @suppress */
             public override fun equals(other: Any?): Boolean = other is On && other.bootstrap == bootstrap
+            /** @suppress */
             public override fun hashCode(): Int = 17 * 42 + toString().hashCode() + bootstrap
         }
 
@@ -99,6 +101,7 @@ public class TorState private constructor(
          * */
         public data object Stopping: Daemon(bootstrap = 0, isStopping = true)
 
+        /** @suppress */
         public final override fun toString(): String = "TorState.Daemon." + when (this) {
             is Off -> "Off"
             is On -> "On{$bootstrap%}"
@@ -121,18 +124,21 @@ public class TorState private constructor(
         public data object Disabled: Network(isDisabled = true)
         public data object Enabled: Network(isEnabled = true)
 
+        /** @suppress */
         public final override fun toString(): String = "TorState.Network." + when (this) {
             is Disabled -> "Disabled"
             is Enabled -> "Enabled"
         }
     }
 
+    /** @suppress */
     public override fun equals(other: Any?): Boolean {
         return  other is TorState
                 && other.daemon == daemon
                 && other.network == network
     }
 
+    /** @suppress */
     public override fun hashCode(): Int {
         var result = 17
         result = result * 42 + daemon.hashCode()
@@ -140,6 +146,7 @@ public class TorState private constructor(
         return result
     }
 
+    /** @suppress */
     public override fun toString(): String = buildString {
         append("TorState[")
         if (!fid.isNullOrBlank()) {

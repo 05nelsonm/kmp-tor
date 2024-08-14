@@ -551,8 +551,11 @@ public sealed interface TorRuntime:
         @OptIn(ExperimentalKmpTorApi::class)
         internal fun serviceFactoryLoader(): ServiceFactory.Loader? = _serviceFactoryLoader
 
+        /** @suppress */
         public override fun equals(other: Any?): Boolean = other is Environment && other.fid == fid
+        /** @suppress */
         public override fun hashCode(): Int = 17 * 31 + fid.hashCode()
+        /** @suppress */
         public override fun toString(): String = toFIDString(includeHashCode = false)
     }
 
@@ -753,8 +756,11 @@ public sealed interface TorRuntime:
             driver.clearObservers()
         }
 
+        /** @suppress */
         public final override fun equals(other: Any?): Boolean = other is ServiceFactory && other.driver == driver
+        /** @suppress */
         public final override fun hashCode(): Int = driver.hashCode()
+        /** @suppress */
         public final override fun toString(): String = toFIDString(defaultClassName = "ServiceFactory", includeHashCode = false)
     }
 }

@@ -172,12 +172,14 @@ public abstract class Event<Data: Any?, E: Event<Data, E, O>, O: Event.Observer<
         return factory(this as E, tag, executor, onEvent)
     }
 
+    /** @suppress */
     public final override fun equals(other: Any?): Boolean {
         if (other !is Event<*, *, *>) return false
         if (other::class != this::class) return false
         return other.name == name
     }
 
+    /** @suppress */
     public final override fun hashCode(): Int {
         var result = 17
         result = result * 31 + this::class.hashCode()
@@ -185,6 +187,7 @@ public abstract class Event<Data: Any?, E: Event<Data, E, O>, O: Event.Observer<
         return result
     }
 
+    /** @suppress */
     public final override fun toString(): String = name
 
     /**
@@ -264,6 +267,7 @@ public abstract class Event<Data: Any?, E: Event<Data, E, O>, O: Event.Observer<
             }
         }
 
+        /** @suppress */
         public final override fun toString(): String = toString(isStatic = false)
 
         /**

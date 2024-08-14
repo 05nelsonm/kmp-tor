@@ -34,6 +34,7 @@ import kotlin.contracts.contract
  *
  * @see [io.matthewnelson.kmp.tor.runtime.core.util.executeAsync]
  * @see [io.matthewnelson.kmp.tor.runtime.Action.Companion.executeAsync]
+ * @suppress
  * */
 @InternalKmpTorApi
 //@Throws(Throwable::class)

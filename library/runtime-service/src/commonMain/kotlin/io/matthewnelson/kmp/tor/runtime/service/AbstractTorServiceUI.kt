@@ -282,11 +282,13 @@ internal constructor(
             }
         }
 
+        /** @suppress */
         public final override fun equals(other: Any?): Boolean {
             @OptIn(InternalKmpTorApi::class)
             return other is Args && other.lock == lock
         }
 
+        /** @suppress */
         public final override fun hashCode(): Int {
             @OptIn(InternalKmpTorApi::class)
             return lock.hashCode()
@@ -318,12 +320,14 @@ internal constructor(
             require(this.fields.isNotEmpty()) { "fields cannot be empty" }
         }
 
+        /** @suppress */
         public final override fun equals(other: Any?): Boolean {
             if (other !is Config) return false
             if (other::class != this::class) return false
             return other.fields == fields
         }
 
+        /** @suppress */
         public final override fun hashCode(): Int {
             var result = 17
             result = result * 42 + this::class.hashCode()
@@ -331,6 +335,7 @@ internal constructor(
             return result
         }
 
+        /** @suppress */
         public final override fun toString(): String = buildString {
             append("TorServiceUI.Config: [")
 
@@ -636,14 +641,17 @@ internal constructor(
         @JvmSynthetic
         internal fun fileIDKey(): FileID = args.key
 
+        /** @suppress */
         public final override fun equals(other: Any?): Boolean {
             if (other !is InstanceState<*>) return false
             if (other::class != this::class) return false
             return other.instanceJob == instanceJob
         }
 
+        /** @suppress */
         public final override fun hashCode(): Int = instanceJob.hashCode()
 
+        /** @suppress */
         public final override fun toString(): String = toFIDString(defaultClassName = "AbstractTorServiceUI.InstanceState")
     }
 

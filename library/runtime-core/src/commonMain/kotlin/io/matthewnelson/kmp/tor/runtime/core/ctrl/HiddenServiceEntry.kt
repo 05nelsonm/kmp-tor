@@ -74,6 +74,7 @@ public class HiddenServiceEntry private constructor(
         }
     }
 
+    /** @suppress */
     public override fun equals(other: Any?): Boolean {
         return  other is HiddenServiceEntry
                 && other.publicKey == publicKey
@@ -81,6 +82,7 @@ public class HiddenServiceEntry private constructor(
                 && other.clientAuth == clientAuth
     }
 
+    /** @suppress */
     public override fun hashCode(): Int {
         var result = 21
         result = result * 42 + publicKey.hashCode()
@@ -89,6 +91,7 @@ public class HiddenServiceEntry private constructor(
         return result
     }
 
+    /** @suppress */
     public override fun toString(): String = buildString {
         appendLine("HiddenServiceEntry: [")
         append("    publicKey: ")

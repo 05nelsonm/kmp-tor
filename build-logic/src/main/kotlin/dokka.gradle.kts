@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Matthew Nelson
+ * Copyright (c) 2024 Matthew Nelson
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,14 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
+import org.jetbrains.dokka.gradle.DokkaTaskPartial
+
 plugins {
-    `kotlin-dsl`
+    id("org.jetbrains.dokka")
 }
 
-dependencies {
-    implementation(libs.gradle.android)
-    implementation(libs.gradle.dokka)
-    implementation(libs.gradle.kmp.configuration)
-    implementation(libs.gradle.kotlin)
-    implementation(libs.gradle.publish.maven)
+tasks.withType<DokkaTaskPartial>().configureEach {
+    suppressObviousFunctions.set(true)
+    suppressInheritedMembers.set(true)
 }
