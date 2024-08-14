@@ -43,7 +43,7 @@ import kotlinx.coroutines.CoroutineScope
 
 /**
  * Core `androidMain` abstraction which enables implementors the ability to
- * create a fully customized notifications for the running instances of
+ * create a fully customized notification for the running instances of
  * [TorRuntime] as they operate within [TorService].
  *
  * This class' API is designed as follows:
@@ -63,6 +63,7 @@ import kotlinx.coroutines.CoroutineScope
  * states), so use at your own risk! Prefer using the stable implementation
  * via the `kmp-tor:runtime-service-ui` dependency.
  *
+ * @see [io.matthewnelson.kmp.tor.runtime.service.ui.KmpTorServiceUI]
  * @throws [IllegalStateException] on instantiation if [args] were not those
  *   which were passed to [Factory.create]. See [Args].
  * */
@@ -78,7 +79,7 @@ protected constructor(
 
     /**
      * Holder for Foreground Service [Notification] and [NotificationChannel]
-     * configuration info used to instantiate [Factory] and validated upon
+     * configuration info used to instantiate [Factory]. Is validated upon
      * invocation of [TorServiceConfig.Foreground.Companion.Builder].
      * */
     public class NotificationInfo
@@ -207,10 +208,10 @@ protected constructor(
     protected val channelId: String = info.channelId
 
     /**
-     * Posts the [Notification]. This **MUST** be called upon first
-     * [onRender] invocation (or sooner) to ensure that the call to
-     * [Service.startForeground] is had, otherwise an ANR will result
-     * for Android API 26+.
+     * Posts the [Notification] to [NotificationManager]. This **MUST**
+     * be called upon first [onRender] invocation (or sooner) to ensure
+     * that the call to [Service.startForeground] is had, otherwise an ANR
+     * will result for Android API 26+.
      *
      * **NOTE:** [Notification.priority], [Notification.audioAttributes],
      * [Notification.audioStreamType], and [Notification.sound] are always
@@ -352,8 +353,7 @@ protected constructor(
      * Implementations are encouraged to keep it as a subclass within,
      * and use a `private constructor` for, their [UI] implementations.
      *
-     * As an example implementation, see
-     * [io.matthewnelson.kmp.tor.runtime.service.ui.KmpTorServiceUI.Factory]
+     * @see [io.matthewnelson.kmp.tor.runtime.service.ui.KmpTorServiceUI.Factory]
      * */
     public abstract class Factory<C: Config, IS: InstanceState<C>, UI: TorServiceUI<C, IS>>
     @ExperimentalKmpTorApi

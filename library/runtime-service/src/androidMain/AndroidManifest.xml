@@ -19,6 +19,35 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <!--
+    NOTE: No permissions are declared by kmp-tor. Consumers of kmp-tor
+    must declare them themselves.
+
+    Below are permissions for `:runtime-service` operation.
+
+    This does NOT include permissions needed for the `:runtime-service-ui`
+    dependency. If utilizing `:runtime-service-ui`, those can be viewed at:
+
+        https://github.com/05nelsonm/kmp-tor/blob/master/library/runtime-service-ui/src/androidMain/AndroidManifest.xml
+
+    • ACCESS_NETWORK_STATE:
+
+        • For the `AndroidNetworkObserver` to be utilized during `TorService`
+          operation. It will toggle tor's `DisableNetwork` setting when connectivity
+          is lost/gained.
+
+          Alternatively, the permission can be omitted and the configuration option
+          `TorServiceConfig.Builder.useNetworkStateObserver` can be set to `false`.
+
+        <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+
+    • INTERNET:
+
+        • Obviously...
+
+        <uses-permission android:name="android.permission.INTERNET" />
+    -->
+
     <application>
         <provider
             android:name="androidx.startup.InitializationProvider"

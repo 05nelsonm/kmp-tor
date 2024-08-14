@@ -281,7 +281,11 @@ public open class TorServiceConfig private constructor(
          * used and the [TorRuntime] will be created with whatever was declared for
          * [TorRuntime.Builder.networkObserver].
          *
-         * **NOTE:** Requires permission [android.Manifest.permission.ACCESS_NETWORK_STATE]
+         * **NOTE:** Requires a permission. If not held, [RuntimeEvent.ERROR] observers
+         * will be notified, but operations will not be interrupted.
+         * See [AndroidManifest.xml](https://github.com/05nelsonm/kmp-tor/blob/master/library/runtime-service/src/androidMain/AndroidManifest.xml)
+         *
+         * Default: `true`
          * */
         @JvmField
         public var useNetworkStateObserver: Boolean = true
@@ -295,11 +299,11 @@ public open class TorServiceConfig private constructor(
      * the passing of per-environment based configurations for the declared
      * [factory]. They are entirely optional and the regular [newEnvironment]
      * functions provided by [TorServiceConfig] will simply default to what
-     * was declared for your [TorServiceUI.Factory.defaultConfig].
+     * was declared for [TorServiceUI.Factory.defaultConfig].
      *
-     * TODO: AndroidManifest requirements
-     *
-     * TODO: README.md
+     * **NOTE:** No matter the implementation of [TorServiceUI.Factory] being
+     * utilized, this requires permissions. Otherwise, [TorService] will fail to
+     * start. See [AndroidManifest.xml](https://github.com/05nelsonm/kmp-tor/blob/master/library/runtime-service-ui/src/androidMain/AndroidManifest.xml)
      *
      * e.g. (A Foreground Service using the `kmp-tor:runtime-service-ui` dependency)
      *

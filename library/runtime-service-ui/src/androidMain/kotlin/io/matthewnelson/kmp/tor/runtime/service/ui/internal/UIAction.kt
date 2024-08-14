@@ -33,17 +33,17 @@ internal enum class UIAction {
 
     internal class Icons private constructor(b: Factory.Builder) {
 
-        private val icons = IntArray(UIAction.entries.size) { i ->
+        private val icons = Array(UIAction.entries.size) { i ->
             when (UIAction.entries.elementAt(i)) {
                 NewNym -> b.iconActionNewNym ?: R.drawable.ic_kmp_tor_ui_action_newnym
                 Restart -> b.iconActionRestart ?: R.drawable.ic_kmp_tor_ui_action_restart
                 Stop -> b.iconActionStop ?: R.drawable.ic_kmp_tor_ui_action_stop
                 Previous -> b.iconActionPrevious ?: R.drawable.ic_kmp_tor_ui_action_previous
                 Next -> b.iconActionNext ?: R.drawable.ic_kmp_tor_ui_action_next
-            }
+            }.let { DrawableRes(it) }
         }
 
-        internal operator fun get(action: UIAction): DrawableRes = DrawableRes(icons.elementAt(action.ordinal))
+        internal operator fun get(action: UIAction): DrawableRes = icons.elementAt(action.ordinal)
 
         internal companion object {
 

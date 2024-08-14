@@ -70,7 +70,8 @@ public class KmpTorServiceUIInstanceState<C: AbstractKmpTorServiceUIConfig> priv
         }
 
         update { current ->
-            current.copy(actions = current.progress.toActions())
+            val newActions = current.progress.toActions()
+            current.copy(actions = newActions)
         }
     }
 
