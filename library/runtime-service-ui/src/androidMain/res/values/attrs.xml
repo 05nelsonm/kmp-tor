@@ -16,46 +16,45 @@
   *-->
 <resources>
     <!--
-        Declare a color (or reference to color) in your base AppTheme.
-        This will be utilized automatically as the notification color
-        when the TorRuntime instance is in an operative state (i.e. 100%
-        Bootstrapped and Network is enabled).
+    Declare a color (or reference to color) in your base AppTheme.
+    This will be utilized automatically as the notification color
+    when the TorRuntime instance is in an operative state (i.e. 100%
+    Bootstrapped and Network is enabled).
 
-        NOTE: This can be overridden on a per-instance basis by
-              setting `KmpTorServiceUI.Config.Builder.colorReady`
-              to a color resource.
+    NOTE: This can be overridden on a per-instance basis by setting
+    `KmpTorServiceUI.Config.Builder.colorReady` to a color resource.
 
-        e.g.
+    e.g.
 
-        <style name="AppTheme" parent="@style/Theme.AppCompat.DayNight.NoActionBar">
+        <style name="AppTheme.Base" parent="@style/Theme.AppCompat.DayNight.NoActionBar">
             <item name="kmp_tor_ui_color_ready">?attr/colorPrimary</item>
         </style>
     -->
     <attr name="kmp_tor_ui_color_ready" format="reference|color" />
 
     <!--
-        A default permission description to use in your manifest,
-        if needed, when defining one for the configuration of
-        KmpTorServiceUI.Factory.Builder.actionIntentPermissionSuffix
+    A default permission description to use in your manifest,
+    if needed, when defining one for the configuration of
+    `KmpTorServiceUI.Factory.Builder.actionIntentPermissionSuffix`
 
-        e.g.
+    e.g.
 
-            // defined suffix
-            actionIntentPermissionSuffix = "NOTIFICATION_ACTION_KMP_TOR"
+        // defined suffix
+        actionIntentPermissionSuffix = "NOTIFICATION_ACTION_KMP_TOR"
 
-            // AndroidManifest.xml (with `runtime-service-ui` provided description)
-            <permission
-                android:name="${applicationId}.NOTIFICATION_ACTION_KMP_TOR"
-                android:description="@string/kmp_tor_ui_action_permission_description"
-                android:protectionLevel="signature" />
+        // AndroidManifest.xml
+        <permission
+            android:name="${applicationId}.NOTIFICATION_ACTION_KMP_TOR"
+            android:description="@string/kmp_tor_ui_action_permission_description"
+            android:protectionLevel="signature" />
 
-            <uses-permission android:name="${applicationId}.NOTIFICATION_ACTION_KMP_TOR" />
+        <uses-permission android:name="${applicationId}.NOTIFICATION_ACTION_KMP_TOR" />
     -->
     <string name="kmp_tor_ui_action_permission_description">
         \nSelf-held permission for securing
         \nthe BroadcastReceiver that is used
         \nto facilitate interaction between
-        \nthe TorService Notification Actions,
+        \nTorService Notification Actions,
         \nand TorRuntime.
     </string>
 </resources>

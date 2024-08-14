@@ -19,80 +19,101 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
-    <!-- API 28+ -->
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
-
     <!--
-    API 34+
+    NOTE: No permissions are declared by kmp-tor. Consumers of kmp-tor
+    must declare them themselves.
 
-    Below are examples of declaring the `foregroundServiceType` and
-    associated permission which are required to start as a Foreground
-    Service. The types utilized in the examples are, as of now, the only
-    types which require no other permissions or runtime prerequisites.
+    Below are permissions for `:runtime-service-ui` operation.
 
-    It is up to you what to declare for the service as it may have an
-    impact on your app store review, depending on the type, and this library
-    is unwilling to make that choice unilaterally for all its consumers.
+    This does NOT include permissions needed for the `:runtime-service`
+    dependency, which are also needed when using `:runtime-service-ui`.
+    Those can be viewed at:
 
-    NOTE: `tools:node="merge"` and `android:foregroundServiceType="{type}"`
-    MUST be declared within the service tag (as shown in the examples).
-    -->
+        https://github.com/05nelsonm/kmp-tor/blob/master/library/runtime-service/src/androidMain/AndroidManifest.xml
 
+    • POST_NOTIFICATIONS:
 
-    <!--
-    API 34+ (e.g. type: Special Use)
-    https://developer.android.com/about/versions/14/changes/fgs-types-required#special-use
+        • Needed for API 33+ for the notification to be posted. If not declared
+          and held, the notification will not be shown but TorService will still
+          function.
 
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE" />
+        <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 
-    <application>
-        <service
-            android:name="io.matthewnelson.kmp.tor.runtime.service.TorService"
-            android:enabled="true"
-            android:exported="false"
-            android:foregroundServiceType="specialUse"
-            tools:node="merge">
-            <property
-                android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"
-                android:value="Your explanation\n
-                for special use\n
-                here" />
-        </service>
-    </application>
-    -->
+    • FOREGROUND_SERVICE:
 
+        • Needed for API 28+ when utilizing `TorServiceConfig.Foreground.Builder`.
 
-    <!--
-    API 34+ (e.g. type: Data Sync)
-    https://developer.android.com/about/versions/14/changes/fgs-types-required#data-sync
+        <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
 
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC" />
+    • `foregroundServiceType` property declaration:
 
-    <application>
-        <service
-            android:name="io.matthewnelson.kmp.tor.runtime.service.TorService"
-            android:enabled="true"
-            android:exported="false"
-            android:foregroundServiceType="dataSync"
-            tools:node="merge" />
-    </application>
-    -->
+        • Needed for API 34+ when utilizing `TorServiceConfig.Foreground.Builder`.
 
+          Below are examples of declaring the `foregroundServiceType` property
+          and its associated permission which are required to start a Foreground
+          Service. The types utilized in the examples are, as of now, the only
+          types which require no other permissions or runtime prerequisites.
 
-    <!--
-    API 34+ (e.g. type: Media Playback)
-    https://developer.android.com/about/versions/14/changes/fgs-types-required#media
+          It is up to you which `foregroundServiceType` to declare for your
+          application, as it may have an impact on your app store submission. This
+          library is unwilling to make that choice unilaterally for all its consumers.
 
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK" />
+          NOTE: `tools:node="merge"` and `android:foregroundServiceType="{type}"`
+          MUST be declared within the service tag (as shown in the examples below).
 
-    <application>
-        <service
-            android:name="io.matthewnelson.kmp.tor.runtime.service.TorService"
-            android:enabled="true"
-            android:exported="false"
-            android:foregroundServiceType="mediaPlayback"
-            tools:node="merge" />
-    </application>
+        • FOREGROUND_SERVICE_SPECIAL_USE:
+
+            • See: https://developer.android.com/about/versions/14/changes/fgs-types-required#special-use
+
+            • Remember to fill in your explanation for the `android:value` property tag
+
+            <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE" />
+
+            <application>
+                <service
+                    android:name="io.matthewnelson.kmp.tor.runtime.service.TorService"
+                    android:enabled="true"
+                    android:exported="false"
+                    android:foregroundServiceType="specialUse"
+                    tools:node="merge">
+                    <property
+                        android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"
+                        android:value="
+                        \nYour explanation
+                        \nfor special use
+                        \nhere" />
+                </service>
+            </application>
+
+        • FOREGROUND_SERVICE_DATA_SYNC:
+
+            • See: https://developer.android.com/about/versions/14/changes/fgs-types-required#data-sync
+
+            <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC" />
+
+            <application>
+                <service
+                    android:name="io.matthewnelson.kmp.tor.runtime.service.TorService"
+                    android:enabled="true"
+                    android:exported="false"
+                    android:foregroundServiceType="dataSync"
+                    tools:node="merge" />
+            </application>
+
+        • FOREGROUND_SERVICE_MEDIA_PLAYBACK
+
+            • See: https://developer.android.com/about/versions/14/changes/fgs-types-required#media
+
+            <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK" />
+
+            <application>
+                <service
+                    android:name="io.matthewnelson.kmp.tor.runtime.service.TorService"
+                    android:enabled="true"
+                    android:exported="false"
+                    android:foregroundServiceType="mediaPlayback"
+                    tools:node="merge" />
+            </application>
     -->
 
 </manifest>

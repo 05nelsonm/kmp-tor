@@ -259,8 +259,8 @@ public class KmpTorServiceUI private constructor(
              * **NOTE:** This setting will override whatever may be declared in
              * your application theme for [R.attr.kmp_tor_ui_color_ready].
              *
-             * Default: `0`, unless this [Builder] is a result of [Config.newConfig],
-             * then whatever [Config.colorReady] is.
+             * Default: `0` (disabled), unless this [Builder] is a result of
+             * [Config.newConfig], then whatever [Config.colorReady] is.
              *
              * @see [R.attr.kmp_tor_ui_color_ready]
              * */
@@ -274,8 +274,8 @@ public class KmpTorServiceUI private constructor(
              *
              * **NOTE:** Icons should be `24dp` x `24dp` for best performance.
              *
-             * Default: Whatever [iconReady] is set to, unless this [Builder] is being
-             * configured via [Config.newConfig], then whatever [Config.iconData] is.
+             * Default: Whatever [iconReady] is set to, unless this [Builder] is a
+             * result of [Config.newConfig], then whatever [Config.iconData] is.
              * */
             @JvmField
             public var iconData: Int = iconReady
@@ -289,7 +289,8 @@ public class KmpTorServiceUI private constructor(
              * **NOTE:** This action is removed from the notification while on the
              * lock screen.
              *
-             * Default: `false`
+             * Default: `false`, unless this [Builder] is a result of [Config.newConfig],
+             * then whatever [Config.enableActionRestart] is.
              * */
             @JvmField
             public var enableActionRestart: Boolean = false
@@ -303,7 +304,8 @@ public class KmpTorServiceUI private constructor(
              * **NOTE:** This action is removed from the notification while on the
              * lock screen.
              *
-             * Default: `false`
+             * Default: `false`, unless this [Builder] is a result of [Config.newConfig],
+             * then whatever [Config.enableActionStop] is.
              * */
             @JvmField
             public var enableActionStop: Boolean = false
@@ -318,22 +320,34 @@ public class KmpTorServiceUI private constructor(
              *
              * **NOTE:** If this [Builder] is being configured via the
              * [Factory.Builder.defaultConfig] DSL, then it will be set back to
-             * [DisplayName.FID] when [Factory] is instantiated. Use [Config.newConfig]
-             * from [Factory.defaultConfig] to modify for instance specific configs.
+             * [DisplayName.FID] when [Factory] is instantiated. This can only be
+             * configured on a per-instance basis. Use [Config.newConfig] from
+             * [Factory.defaultConfig] to modify for instance specific configs.
              *
              * e.g.
              *
+             *     // Assuming multiple instances because you are overriding something
+             *     // that is only used when multiple runtimes are operating.
              *     val environment = serviceConfig.newEnvironment(
-             *         dirName = "torservice1",
+             *         dirName = "torservice/1",
              *         instanceConfig = serviceConfig.factory.defaultConfig.newConfig {
              *             displayName = DisplayName.StringRes(R.string.tor_instance_1)
              *             // ...
              *         },
-             *         installer = { ... },
-             *         block = { ... },
+             *         installer = { TorResources(it) },
+             *         block = {
+             *             // Use base directory for all resources for all Environment
+             *             // instances. They will share the same TorResources object
+             *             // auto-magically and all processes will read from the same
+             *             // files.
+             *             installationDirectory = workDirectory.parentFile!!
+             *
+             *             // ...
+             *         },
              *     )
              *
-             * Default: [DisplayName.FID]
+             * Default: [DisplayName.FID], unless this [Builder] is a result of [Config.newConfig],
+             * then whatever [Config.enableActionRestart] is.
              *
              * @see [DisplayName]
              * */
@@ -975,7 +989,6 @@ public class KmpTorServiceUI private constructor(
         removeAllViews(R.id.kmp_tor_ui_actions_load_instance)
         removeAllViews(R.id.kmp_tor_ui_actions_load_selector)
 
-
         val showInstanceActions = state.actions.isNotEmpty()
         val showSelectorActions = hasPrevious || hasNext
 
@@ -1104,16 +1117,17 @@ public class KmpTorServiceUI private constructor(
                 Intent.ACTION_USER_PRESENT -> {
                     val old = _isDeviceLocked
                     val new = manager.isKeyguardLocked
-                    if (old != new) {
-                        _isDeviceLocked = new
-                        val instances = instanceStates
+
+                    if (old == new) return@Receiver
+
+                    _isDeviceLocked = new
+                    val instances = instanceStates
+                    instances.forEach { instance ->
+                        instance.onDeviceLockChange()
+                    }
+                    serviceChildScope.launch {
                         instances.forEach { instance ->
-                            instance.onDeviceLockChange()
-                        }
-                        serviceChildScope.launch {
-                            instances.forEach { instance ->
-                                instance.debug { "DeviceIsLocked[$new]" }
-                            }
+                            instance.debug { "DeviceIsLocked[$new]" }
                         }
                     }
                 }

@@ -39,7 +39,7 @@ import kotlin.jvm.JvmSynthetic
 
 /**
  * Core `commonMain` abstraction which enables implementors the ability to
- * create a fully customized notifications for the running instances of
+ * create a fully customized notification for the running instances of
  * [TorRuntime] as they operate within a service object.
  *
  * This class' API is designed as follows:
@@ -55,6 +55,7 @@ import kotlin.jvm.JvmSynthetic
  *      - Context: `INSTANCE`
  *
  * @see [io.matthewnelson.kmp.tor.runtime.service.TorServiceUI]
+ * @see [io.matthewnelson.kmp.tor.runtime.service.ui.KmpTorServiceUI]
  * @throws [IllegalStateException] on instantiation if [args] were not those
  *   which were passed to [Factory.create]. See [Args].
  * */
@@ -127,7 +128,7 @@ internal constructor(
     protected open fun onDestroy() {}
 
     /**
-     * Indicates there was a stateful change that required an update to the UI.
+     * Indicates there was a stateful change that requires an update to the UI.
      *
      * **NOTE:** This is always invoked from the UI thread
      *
@@ -157,14 +158,14 @@ internal constructor(
             val newDisplayed = _selectorState.previous ?: return@synchronized
 
             // shift [ p, D, n ] -> [ ?, P, d ]
-            var previousKey: FileIDKey? = null
+            var newPrevious: FileIDKey? = null
             for (key in _instanceStates.keys) {
                 if (key == newDisplayed) break
-                previousKey = key
+                newPrevious = key
             }
 
             _selectorState = SelectorState(
-                previous = previousKey,
+                previous = newPrevious,
                 displayed = newDisplayed,
                 next = _selectorState.displayed
             )
@@ -210,13 +211,13 @@ internal constructor(
     }
 
     /**
-     * Core `commonMain` abstraction for passing platform specific arguments
-     * in an encapsulated manner when instantiating new instances of
+     * Core `commonMain` abstraction for passing platform specific arguments,
+     * in an encapsulated manner, when instantiating new instances of
      * [AbstractTorServiceUI] components.
      *
      * [Args] are single use items and must be consumed only once, otherwise
-     * an exception is raised when [Factory.create] or [create]
-     * is called, resulting a service start failure.
+     * an exception is raised when [Factory.create] or [create] is called
+     * resulting a service start failure.
      *
      * @see [io.matthewnelson.kmp.tor.runtime.service.TorServiceUI.Args]
      * */
@@ -296,9 +297,6 @@ internal constructor(
      * Core `commonMain` abstraction for holding UI customization input from
      * consumers of `kmp-tor-service`.
      *
-     * As an example implementation, see
-     * [io.matthewnelson.kmp.tor.runtime.service.ui.KmpTorServiceUI.Config]
-     *
      * **NOTE:** This is currently an [ExperimentalKmpTorApi] when extending
      * to create your own implementation. Things may change (as the annotation
      * states), so use at your own risk! Prefer using the stable implementation
@@ -307,6 +305,7 @@ internal constructor(
      * @param [fields] A map of the field name value pairs.
      *   (e.g. `mapOf("iconOff" to R.drawable.my_icon_off)`)
      * @throws [IllegalArgumentException] if [fields] is empty
+     * @see [io.matthewnelson.kmp.tor.runtime.service.ui.KmpTorServiceUI.Config]
      * */
     public abstract class Config
     @ExperimentalKmpTorApi
@@ -356,10 +355,8 @@ internal constructor(
      * Implementations are encouraged to keep it as a subclass within,
      * and use a `private constructor` for, their [UI] implementations.
      *
-     * As an example implementation, see
-     * [io.matthewnelson.kmp.tor.runtime.service.ui.KmpTorServiceUI.Factory]
-     *
      * @see [io.matthewnelson.kmp.tor.runtime.service.TorServiceUI.Factory]
+     * @see [io.matthewnelson.kmp.tor.runtime.service.ui.KmpTorServiceUI.Factory]
      * */
     public abstract class Factory<
             A: Args.UI,
@@ -391,8 +388,7 @@ internal constructor(
          *             ButtonAction.RestartTor
          *             ButtonAction.StopTor
          *         ]
-         *         color: ColorState.Ready
-         *         icon: IconState.Data
+         *         icon: IconState.Data[colorize=true]
          *         progress: Progress.None
          *         text: NewNym.RateLimited[seconds=8]
          *         title: TorState.Daemon.On{100%}
@@ -410,8 +406,9 @@ internal constructor(
         /**
          * Implementors **MUST** utilize [args] to instantiate a new instance
          * of the [UI] implementation. If [args] were not consumed by the
-         * returned instance of [UI], an exception will be thrown by
-         * [create]. See [Args].
+         * returned instance of [UI], an exception will be thrown by [create].
+         *
+         * @see [Args].
          * */
         protected abstract fun createProtected(args: A): UI
 
@@ -468,17 +465,16 @@ internal constructor(
     }
 
     /**
-     * Core `commonMain` abstraction for implementors to track changes
-     * via registration of [RuntimeEvent.Observer] and [TorEvent.Observer]
-     * for the instance of [Lifecycle.DestroyableTorRuntime] operating
-     * within the service object.
+     * Core `commonMain` abstraction for implementors to track changes via
+     * registration of [RuntimeEvent.Observer] and [TorEvent.Observer] for
+     * the instance of [Lifecycle.DestroyableTorRuntime] operating within
+     * the service object.
      *
      * The primary objective of the [InstanceState] API is to observe the
-     * instance of [Lifecycle.DestroyableTorRuntime] operating within the
-     * service object and react by updating some sort of stateful object
-     * (whatever that may be for the implementation), then notify the
-     * [AbstractTorServiceUI] "container" via [postStateChange] that a
-     * change has occurred.
+     * [Lifecycle.DestroyableTorRuntime] instance operating within the service
+     * object and react by updating some sort of stateful object (whatever
+     * that may be for the implementation), then notify the UI "container"
+     * via [postStateChange] that a change has occurred.
      *
      * **NOTE:** This is currently an [ExperimentalKmpTorApi] when extending
      * to create your own implementation. Things may change (as the annotation
@@ -500,8 +496,27 @@ internal constructor(
         private val args = args as AbstractTorServiceUI<*, *, *>.InstanceArgs
         private val instanceJob: Job = args.scope().coroutineContext.job
 
+        /**
+         * The required [TorEvent]s needed for this implementation to function.
+         *
+         * Used for the [TorRuntime.ServiceFactory.Binder.onBind] argument.
+         * */
         public abstract val events: Set<TorEvent>
+
+        /**
+         * The [RuntimeEvent.Observer]s that will be added upon instantiation
+         * of [Lifecycle.DestroyableTorRuntime].
+         *
+         * Used for the [TorRuntime.ServiceFactory.Binder.onBind] argument.
+         * */
         public abstract val observersRuntimeEvent: Set<RuntimeEvent.Observer<*>>
+
+        /**
+         * The [TorEvent.Observer]s that will be added upon instantiation
+         * of [Lifecycle.DestroyableTorRuntime].
+         *
+         * Used for the [TorRuntime.ServiceFactory.Binder.onBind] argument.
+         * */
         public abstract val observersTorEvent: Set<TorEvent.Observer>
 
         public final override val fid: String = this.args.key.fid
@@ -527,6 +542,7 @@ internal constructor(
         /**
          * Notifies the [AbstractTorServiceUI] that this instance had some
          * sort of stateful change so that it may update the UI (if needed).
+         *
          * If this [InstanceState] is not the currently [displayed] instance,
          * then the update is ignored and [onRender] will not be invoked.
          * */
@@ -536,9 +552,9 @@ internal constructor(
          * Exported functionality of [RuntimeEvent.EXECUTE.CMD.observeSignalNewNym]
          * with the running instance of [Lifecycle.DestroyableTorRuntime].
          *
-         * It may not immediately available upon instantiation of [InstanceState]
-         * as the [TorRuntime.ServiceFactory.Binder] needs to use arguments provided
-         * by [InstanceState] to bind.
+         * **NOTE:** It may not immediately available upon instantiation of
+         * [InstanceState] as the [TorRuntime.ServiceFactory.Binder] needs
+         * to use arguments provided by [InstanceState] to bind.
          * */
         protected fun observeSignalNewNym(
             tag: String?,
@@ -550,14 +566,14 @@ internal constructor(
         }
 
         /**
-         * Retrieves a [Action.Processor] which will pipe actions to the
+         * Retrieves an [Action.Processor] which will pipe actions to the
          * running instance of [Lifecycle.DestroyableTorRuntime].
          *
          * The [Action.Processor] reference **should not** be held onto.
          *
-         * It may not immediately available upon instantiation of [InstanceState]
-         * as the [TorRuntime.ServiceFactory.Binder] needs to use arguments provided
-         * by [InstanceState] to bind.
+         * **NOTE:** It may not immediately available upon instantiation of
+         * [InstanceState] as the [TorRuntime.ServiceFactory.Binder] needs
+         * to use arguments provided by [InstanceState] to bind.
          * */
         public fun processorAction(): Action.Processor? {
             if (isDestroyed()) return null
@@ -571,9 +587,9 @@ internal constructor(
          * The [TorCmd.Unprivileged.Processor] reference **should not**
          * be held onto.
          *
-         * It may not immediately available upon instantiation of [InstanceState]
-         * as the [TorRuntime.ServiceFactory.Binder] needs to use arguments provided
-         * by [InstanceState] to bind.
+         * **NOTE:** It may not immediately available upon instantiation of
+         * [InstanceState] as the [TorRuntime.ServiceFactory.Binder] needs
+         * to use arguments provided by [InstanceState] to bind.
          * */
         public fun processorTorCmd(): TorCmd.Unprivileged.Processor? {
             if (isDestroyed()) return null
@@ -582,8 +598,9 @@ internal constructor(
 
         /**
          * Notify [RuntimeEvent.LOG.DEBUG] observers for the running instance
-         * of [Lifecycle.DestroyableTorRuntime]. Requires that [Factory.debug]
-         * and [TorRuntime.Environment.debug] both be set to true.
+         * of [Lifecycle.DestroyableTorRuntime].
+         *
+         * @see [Factory.debug]
          * */
         public fun debug(lazyMessage: () -> String) {
             if (isDestroyed()) return
@@ -591,7 +608,7 @@ internal constructor(
         }
 
         /**
-         * Helper for exporting [synchronized] functionality to implementors
+         * Helper for exporting synchronization functionality to implementors
          * for thread safety.
          * */
         protected class Lock {
@@ -633,8 +650,9 @@ internal constructor(
     /**
      * Implementors **MUST** utilize [args] to instantiate a new instance
      * of the [IS] implementation. If [args] were not consumed by the
-     * returned instance of [IS], an exception will be thrown by
-     * [create]. See [Args].
+     * returned instance of [IS], an exception will be thrown by [create].
+     *
+     * @see [Args].
      * */
     protected abstract fun createProtected(args: Args.Instance): IS
 
@@ -900,10 +918,6 @@ internal constructor(
 
     protected companion object {
 
-        // Synthetic access to inhibit extension of abstract
-        // classes externally. Only accessible within the
-        // TorServiceUI class, and within the `runtime-service`
-        // module.
         @JvmSynthetic
         internal val INIT = Any()
     }

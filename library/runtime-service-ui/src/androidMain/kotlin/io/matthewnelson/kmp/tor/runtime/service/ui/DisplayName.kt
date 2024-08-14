@@ -60,7 +60,7 @@ public sealed class DisplayName private constructor() {
      * The raw text to be loaded for that [TorRuntime] currently
      * "selected" in the notification area.
      *
-     * Not friendly for multilingual applications, but is an option
+     * Not friendly for multilingual applications, but is an option.
      *
      * @see [of]
      * */
