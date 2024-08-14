@@ -48,7 +48,7 @@ public class TempTorCmdQueue private constructor(
     @Volatile
     private var _destroyed = false
     private val lock = SynchronizedObject()
-    private val queue = ArrayList<TorCmdJob<*>>(1)
+    private var queue = ArrayDeque<TorCmdJob<*>>(10)
 
     @get:JvmName("connection")
     public val connection: TorCtrl? get() = _connection
@@ -63,6 +63,7 @@ public class TempTorCmdQueue private constructor(
             checkIsNotDestroyed()
             connection.transferAllUnprivileged(queue)
             _connection = connection
+            queue = ArrayDeque(0)
         }
 
         connection.invokeOnDestroy { destroy() }
@@ -82,6 +83,7 @@ public class TempTorCmdQueue private constructor(
 
         if (!interrupt) return
         queue.interruptAndClearAll(message = "${this::class.simpleName}.onDestroy", handler)
+        queue = ArrayDeque(0)
     }
 
     public override fun <Success: Any> enqueue(

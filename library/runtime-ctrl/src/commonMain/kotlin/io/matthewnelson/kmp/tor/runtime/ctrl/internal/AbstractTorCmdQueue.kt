@@ -40,8 +40,8 @@ internal abstract class AbstractTorCmdQueue internal constructor(
 {
 
     private val lock = SynchronizedObject()
-    private val queueInterrupt = ArrayList<ItBlock<UncaughtException.Handler>>(1)
-    private val queueExecute = ArrayList<TorCmdJob<*>>(1)
+    private val queueInterrupt: ArrayDeque<ItBlock<UncaughtException.Handler>> = ArrayDeque(1)
+    private val queueExecute: ArrayDeque<TorCmdJob<*>> = ArrayDeque(64)
     @Volatile
     @Suppress("PropertyName")
     protected open var LOG: Debugger? = null
@@ -63,7 +63,7 @@ internal abstract class AbstractTorCmdQueue internal constructor(
 
     @JvmSynthetic
     @Throws(IllegalStateException::class)
-    internal fun transferAllUnprivileged(queue: ArrayList<TorCmdJob<*>>) {
+    internal fun transferAllUnprivileged(queue: ArrayDeque<TorCmdJob<*>>) {
         checkIsNotDestroyed()
         if (queue.isEmpty()) return
 
@@ -106,7 +106,7 @@ internal abstract class AbstractTorCmdQueue internal constructor(
             }?.let { signal ->
                 if (queueExecute.isEmpty()) return@let
 
-                val interrupts = ArrayList(queueExecute)
+                val interrupts = ArrayDeque(queueExecute)
 
                 queueInterrupt.add(ItBlock { handler ->
                     interrupts.interruptAndClearAll(message = "${cmd.keyword} $signal", handler)
@@ -165,7 +165,7 @@ internal abstract class AbstractTorCmdQueue internal constructor(
                     // dequeueNextOrNull could potentially be executing,
                     // so just to be on the safe side, copy over all
                     // before cancelling them.
-                    ArrayList(queueExecute).also { queueExecute.clear() }
+                    ArrayDeque(queueExecute).also { queueExecute.clear() }
                 }?.also {
                     LOG.d { "Interrupting EnqueuedJobs" }
                 }?.interruptAndClearAll(message = "${this::class.simpleName}.onDestroy", this)
@@ -178,7 +178,7 @@ internal abstract class AbstractTorCmdQueue internal constructor(
     private fun doCancellations(handler: UncaughtException.Handler) {
         val interrupts = synchronized(lock) {
             if (queueInterrupt.isEmpty()) return@synchronized null
-            ArrayList(queueInterrupt).also { queueInterrupt.clear() }
+            ArrayDeque(queueInterrupt).also { queueInterrupt.clear() }
         } ?: return
 
         LOG.d { "Cancelling EnqueuedJobs" }
