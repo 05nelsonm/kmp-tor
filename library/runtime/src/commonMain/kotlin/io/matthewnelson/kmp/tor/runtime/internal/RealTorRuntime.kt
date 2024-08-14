@@ -79,7 +79,7 @@ internal class RealTorRuntime private constructor(
     private var _cmdQueue: TempTorCmdQueue? = null
 
     private val enqueueLock = SynchronizedObject()
-    private val actionStack = Stack<ActionJob.Sealed>(10)
+    private val actionStack = ArrayDeque<ActionJob.Sealed>(16)
     private val actionProcessor = ActionProcessor()
 
     private val destroyedErrMsg by lazy { "$this.isDestroyed[true]" }
@@ -190,7 +190,7 @@ internal class RealTorRuntime private constructor(
                 }
             }
 
-            if (job != null) actionStack.push(job)
+            if (job != null) actionStack.add(job)
 
             job
         }
@@ -395,10 +395,10 @@ internal class RealTorRuntime private constructor(
                 val executables = ArrayList<Executable.Once>((actionStack.size - 1).coerceAtLeast(0))
 
                 while (actionStack.isNotEmpty()) {
-                    // LIFO
-                    val popped = actionStack.pop()
-
                     if (execute == null) {
+                        // LIFO
+                        val popped = actionStack.removeLast()
+
                         try {
                             popped.executing()
                             execute = popped
@@ -408,7 +408,11 @@ internal class RealTorRuntime private constructor(
                         continue
                     }
 
-                    if (popped.isCompleting || !popped.isActive) continue
+                    // Attach all others from FIFI order so they complete
+                    // in the order for which they were enqueued.
+                    val dangler = actionStack.removeFirst()
+
+                    if (dangler.isCompleting || !dangler.isActive) continue
 
                     // Last job on the stack is executed, while all others are
                     // grouped such that the appropriate completion is had for each
@@ -418,8 +422,8 @@ internal class RealTorRuntime private constructor(
                     // should be interrupted & all StopJobs complete alongside the
                     // one executing.
                     when (execute) {
-                        is ActionJob.Started -> execute.configureCompletionFor(popped)
-                        is ActionJob.StopJob -> execute.configureCompletionFor(popped)
+                        is ActionJob.Started -> execute.configureCompletionFor(dangler)
+                        is ActionJob.StopJob -> execute.configureCompletionFor(dangler)
                     }.let { executables.add(it) }
                 }
 
@@ -787,7 +791,7 @@ internal class RealTorRuntime private constructor(
         private var _startServiceJob: Job? = null
         @Volatile
         private var _cmdQueue: TempTorCmdQueue? = null
-        private val actionStack = Stack<ActionJob.Sealed>(1)
+        private val actionStack = ArrayDeque<ActionJob.Sealed>(16)
         private val lock = SynchronizedObject()
 
         private val EMPTY = TorListeners.of(fid = generator.environment)
@@ -849,7 +853,7 @@ internal class RealTorRuntime private constructor(
                         // for the first ActionJob (restart will do nothing...)
                         val start = ActionJob.StartJob(onSuccess, onFailure, handler, immediateExecute = true)
 
-                        actionStack.push(start)
+                        actionStack.add(start)
 
                         // Start the service
                         execute = ::executeStartService
@@ -866,7 +870,7 @@ internal class RealTorRuntime private constructor(
                         ActionJob.StartJob(onSuccess, onFailure, handler)
                     }
 
-                    actionStack.push(tempJob)
+                    actionStack.add(tempJob)
                     tempJob
                 }
 

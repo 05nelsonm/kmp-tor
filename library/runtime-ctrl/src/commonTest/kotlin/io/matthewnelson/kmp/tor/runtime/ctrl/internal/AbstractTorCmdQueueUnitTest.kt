@@ -99,7 +99,7 @@ class AbstractTorCmdQueueUnitTest {
 
     @Test
     fun givenTemporaryQueue_whenTransferred_thenTransfersUnprivilegedCommands() {
-        val tempQueue = ArrayList<TorCmdJob<*>>(5)
+        val tempQueue = ArrayDeque<TorCmdJob<*>>(5)
         var invocationSuccess = 0
         var invocationFailure = 0
 
