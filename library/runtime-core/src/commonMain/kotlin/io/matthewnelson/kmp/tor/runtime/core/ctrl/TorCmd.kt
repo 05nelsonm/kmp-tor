@@ -464,6 +464,8 @@ public sealed class TorCmd<Success: Any> private constructor(
          * "ONION_CLIENT_AUTH_VIEW"
          *
          * [docs](https://spec.torproject.org/control-spec/commands.html#onion_client_auth_view)
+         *
+         * @see [View.ALL]
          * */
         public class View: Unprivileged<List<ClientAuthEntry>> {
 
@@ -478,6 +480,11 @@ public sealed class TorCmd<Success: Any> private constructor(
 
             public companion object {
 
+                /**
+                 * Static instance where [address] is `null`, indicating that
+                 * tor should return all Onion Client Auth information it is
+                 * operating with for all [OnionAddress].
+                 * */
                 @JvmField
                 public val ALL: View = View(address = null)
             }
@@ -683,5 +690,6 @@ public sealed class TorCmd<Success: Any> private constructor(
         }
     }
 
-    final override fun toString(): String = keyword
+    /** @suppress */
+    public final override fun toString(): String = keyword
 }

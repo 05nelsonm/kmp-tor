@@ -149,12 +149,14 @@ public open class Reply private constructor(
         }
     }
 
+    /** @suppress */
     public final override fun equals(other: Any?): Boolean {
         return  other is Reply
                 && other.status == status
                 && other.message == message
     }
 
+    /** @suppress */
     public final override fun hashCode(): Int {
         var result = 17
         result = result * 31 + status.hashCode()
@@ -162,5 +164,6 @@ public open class Reply private constructor(
         return result
     }
 
+    /** @suppress */
     public final override fun toString(): String = "$status $message"
 }

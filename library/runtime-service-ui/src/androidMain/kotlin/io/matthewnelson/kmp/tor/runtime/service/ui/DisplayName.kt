@@ -97,11 +97,13 @@ public sealed class DisplayName private constructor() {
         }
     }
 
+    /** @suppress */
     public final override fun equals(other: Any?): Boolean {
         if (other !is DisplayName) return false
         return other.hashCode() == hashCode()
     }
 
+    /** @suppress */
     public final override fun hashCode(): Int {
         var result = 17
         result = result * 42 + this::class.hashCode()
@@ -109,6 +111,7 @@ public sealed class DisplayName private constructor() {
         return result
     }
 
+    /** @suppress */
     public final override fun toString(): String = "DisplayName." + when (this) {
         is FID -> "FID"
         is StringRes -> "StringRes[id=$id]"

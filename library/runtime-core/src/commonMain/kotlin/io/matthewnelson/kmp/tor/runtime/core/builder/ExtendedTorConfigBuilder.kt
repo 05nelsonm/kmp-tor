@@ -18,6 +18,8 @@ package io.matthewnelson.kmp.tor.runtime.core.builder
 import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
 import io.matthewnelson.kmp.tor.runtime.core.TorConfig
 
+
+/** @suppress */
 @InternalKmpTorApi
 public interface ExtendedTorConfigBuilder {
     public fun contains(keyword: TorConfig.Keyword): Boolean

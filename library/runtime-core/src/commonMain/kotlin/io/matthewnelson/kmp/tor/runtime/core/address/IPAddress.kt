@@ -49,12 +49,13 @@ import kotlin.collections.removeFirst as kRemoveFirst
  *         // 0:0:0:0:0:0:0:0%1
  *     }
  *
- * @see [V4]
- * @see [V6]
+ * @see [toIPAddress]
+ * @see [toIPAddressOrNull]
  * @see [io.matthewnelson.kmp.tor.runtime.core.util.toInetAddress]
  * @see [io.matthewnelson.kmp.tor.runtime.core.util.toIPAddress]
  * */
 public sealed class IPAddress private constructor(
+    /** @suppress */
     @JvmField
     protected val bytes: ByteArray,
     value: String,
@@ -134,6 +135,8 @@ public sealed class IPAddress private constructor(
      * Holder for an IPv4 address
      *
      * @see [AnyHost]
+     * @see [toIPAddressV4]
+     * @see [toIPAddressV4OrNull]
      * @see [io.matthewnelson.kmp.tor.runtime.core.util.toInet4Address]
      * @see [io.matthewnelson.kmp.tor.runtime.core.util.toIPAddressV4]
      * */
@@ -274,6 +277,8 @@ public sealed class IPAddress private constructor(
      * @param [scope] The network interface name or index
      *   number, or null if no scope was expressed.
      * @see [AnyHost]
+     * @see [toIPAddressV6]
+     * @see [toIPAddressV6OrNull]
      * @see [io.matthewnelson.kmp.tor.runtime.core.util.toInet6Address]
      * @see [io.matthewnelson.kmp.tor.runtime.core.util.toIPAddressV6]
      * */
@@ -616,7 +621,7 @@ public sealed class IPAddress private constructor(
             private val BASE_16 = Base16 { strict(); encodeToLowercase = true }
         }
 
-        // Typical IPv4 loopback address of `::1`
+        // Typical IPv6 loopback address of `::1`
         private open class Loopback private constructor(
             scope: String?,
             bytes: ByteArray,

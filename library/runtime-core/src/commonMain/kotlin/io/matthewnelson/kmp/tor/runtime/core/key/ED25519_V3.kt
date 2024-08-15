@@ -22,15 +22,34 @@ import io.matthewnelson.encoding.base64.Base64
 import io.matthewnelson.kmp.tor.runtime.core.address.OnionAddress
 import io.matthewnelson.kmp.tor.runtime.core.address.OnionAddress.V3.Companion.toOnionAddressV3OrNull
 import io.matthewnelson.kmp.tor.runtime.core.internal.tryDecodeOrNull
+import io.matthewnelson.kmp.tor.runtime.core.key.ED25519_V3.PublicKey.Companion.toED25519_V3PublicKey
+import io.matthewnelson.kmp.tor.runtime.core.key.ED25519_V3.PublicKey.Companion.toED25519_V3PublicKeyOrNull
 import kotlin.jvm.JvmName
 import kotlin.jvm.JvmStatic
 
+/**
+ * An [ED25519_V3] [KeyType]. Also known as "Version 3 Hidden Services".
+ * */
 public object ED25519_V3: KeyType.Address<ED25519_V3.PublicKey, ED25519_V3.PrivateKey>() {
 
+    /**
+     * `ED25519-V3`
+     * */
     public override fun algorithm(): String = "ED25519-V3"
 
+    /**
+     * The public key of a Hidden Service (i.e. a [OnionAddress.V3] wrapped in
+     * [AddressKey.Public] functionality).
+     *
+     * @see [OnionAddress.V3]
+     * @see [toED25519_V3PublicKey]
+     * @see [toED25519_V3PublicKeyOrNull]
+     * */
     public class PublicKey(address: OnionAddress.V3): AddressKey.Public(address) {
 
+        /**
+         * `ED25519-V3`
+         * */
         public override fun algorithm(): String = ED25519_V3.algorithm()
         public override fun address(): OnionAddress.V3 = super.address() as OnionAddress.V3
 
@@ -107,10 +126,19 @@ public object ED25519_V3: KeyType.Address<ED25519_V3.PublicKey, ED25519_V3.Priva
         }
     }
 
+    /**
+     * The private key of a Hidden Service.
+     *
+     * @see [toED25519_V3PrivateKey]
+     * @see [toED25519_V3PrivateKeyOrNull]
+     * */
     public class PrivateKey private constructor(
         key: ByteArray,
     ): AddressKey.Private(key) {
 
+        /**
+         * `ED25519-V3`
+         * */
         public override fun algorithm(): String = ED25519_V3.algorithm()
 
         public companion object {

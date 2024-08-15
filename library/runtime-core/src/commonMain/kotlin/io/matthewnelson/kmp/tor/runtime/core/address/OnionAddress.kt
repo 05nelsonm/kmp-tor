@@ -42,11 +42,17 @@ import kotlin.jvm.JvmSynthetic
  *     "http://${string}.onion:8080/some/path".toOnionAddress()
  *     "http://subdomain.${string}.onion:8080/some/path".toOnionAddress()
  *
- * @see [V3]
+ * @see [toOnionAddress]
+ * @see [toOnionAddressOrNull]
  * */
 public sealed class OnionAddress private constructor(value: String): Address(value) {
 
     public abstract fun decode(): ByteArray
+
+    /**
+     * Wraps the [OnionAddress] in its [AddressKey.Public] format for extended
+     * functionality.
+     * */
     public abstract fun asPublicKey(): AddressKey.Public
 
     public companion object {
@@ -128,10 +134,18 @@ public sealed class OnionAddress private constructor(value: String): Address(val
      *
      * This is only a preliminary check for character and length correctness.
      * Public key validity is **not** checked.
+     *
+     * @see [toOnionAddressV3]
+     * @see [toOnionAddressV3OrNull]
      * */
     public class V3 private constructor(value: String): OnionAddress(value) {
 
         public override fun decode(): ByteArray = value.decodeToByteArray(Base32.Default)
+
+        /**
+         * Wraps the [OnionAddress.V3] in its [ED25519_V3.PublicKey] format for extended
+         * functionality.
+         * */
         public override fun asPublicKey(): ED25519_V3.PublicKey = ED25519_V3.PublicKey(this)
 
         public companion object {

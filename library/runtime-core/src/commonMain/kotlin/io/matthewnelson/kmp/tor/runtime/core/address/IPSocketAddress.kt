@@ -30,6 +30,9 @@ import kotlin.jvm.JvmStatic
  *     "127.0.0.1:8080".toIPSocketAddress()
  *     "[::1]:8080".toIPSocketAddress()
  *     IPSocketAddress(IPAddress.V4.AnyHost, 8080.toPort())
+ *
+ * @see [toIPSocketAddress]
+ * @see [toIPSocketAddressOrNull]
  * */
 public class IPSocketAddress(
     @JvmField

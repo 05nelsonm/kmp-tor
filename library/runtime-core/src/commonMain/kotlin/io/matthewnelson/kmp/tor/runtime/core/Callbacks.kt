@@ -37,6 +37,8 @@ import kotlin.jvm.JvmStatic
  * treated as an [UncaughtException] and dispatched
  * to [io.matthewnelson.kmp.tor.runtime.RuntimeEvent.ERROR]
  * observers.
+ *
+ * @see [noOp]
  * */
 public fun interface OnSuccess<in T: Any?>: ItBlock<T> {
 
@@ -65,6 +67,8 @@ public fun interface OnSuccess<in T: Any?>: ItBlock<T> {
  * treated as an [UncaughtException] and dispatched
  * to [io.matthewnelson.kmp.tor.runtime.RuntimeEvent.ERROR]
  * observers.
+ *
+ * @see [noOp]
  * */
 public fun interface OnFailure: ItBlock<Throwable> {
 
@@ -93,8 +97,8 @@ public fun interface OnFailure: ItBlock<Throwable> {
  * exceptions will be treated as an [UncaughtException] and dispatched
  * to [io.matthewnelson.kmp.tor.runtime.RuntimeEvent.ERROR].
  *
- * @see [OnEvent.noOp]
- * @see [OnEvent.Executor]
+ * @see [noOp]
+ * @see [Executor]
  * */
 public fun interface OnEvent<in Data: Any?>: ItBlock<Data> {
 
@@ -185,6 +189,7 @@ public fun interface OnEvent<in Data: Any?>: ItBlock<Data> {
                 }
             }
 
+            /** @suppress */
             public override fun toString(): String = "OnEvent.Executor.Main"
         }
 
@@ -203,6 +208,7 @@ public fun interface OnEvent<in Data: Any?>: ItBlock<Data> {
 
             @InternalKmpTorApi
             public override fun execute(handler: CoroutineContext, executable: Executable) { executable.execute() }
+            /** @suppress */
             public override fun toString(): String = "OnEvent.Executor.Immediate"
         }
     }
@@ -299,6 +305,7 @@ public fun interface Disposable {
             }
         }
 
+        /** @suppress */
         public override fun toString(): String = "Disposable.Once@${hashCode()}"
     }
 
@@ -393,6 +400,7 @@ public fun interface Executable {
             }
         }
 
+        /** @suppress */
         public override fun toString(): String = "Executable.Once@${hashCode()}"
     }
 

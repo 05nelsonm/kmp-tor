@@ -131,11 +131,15 @@ public class Lifecycle: Destroyable {
                 public val OnReturned: Name = Name("onReturned")
             }
 
+            /** @suppress */
             override fun equals(other: Any?): Boolean = other is Name && other.value == value
+            /** @suppress */
             override fun hashCode(): Int = 17 * 42 + value.hashCode()
+            /** @suppress */
             override fun toString(): String = value
         }
 
+        /** @suppress */
         override fun equals(other: Any?): Boolean {
             return  other is Event
                     && other.className == className
@@ -144,6 +148,7 @@ public class Lifecycle: Destroyable {
                     && other.name == name
         }
 
+        /** @suppress */
         override fun hashCode(): Int {
             var result = 17
             result = result * 31 + className.hashCode()
@@ -153,6 +158,7 @@ public class Lifecycle: Destroyable {
             return result
         }
 
+        /** @suppress */
         override fun toString(): String = buildString {
             append("Lifecycle.Event[obj=")
             append(className)
@@ -195,8 +201,11 @@ public class Lifecycle: Destroyable {
             handle: ItBlock<Any?>,
         ): Disposable = lifecycle.job.invokeOnCompletion(handle)
 
+        /** @suppress */
         public override fun equals(other: Any?): Boolean = other is DestroyableTorRuntime && other.runtime == runtime
+        /** @suppress */
         public override fun hashCode(): Int = runtime.hashCode()
+        /** @suppress */
         public override fun toString(): String = toFIDString()
 
         internal companion object {
@@ -223,6 +232,7 @@ public class Lifecycle: Destroyable {
     public override fun isDestroyed(): Boolean = job.isCompleting || !job.isActive
     public override fun destroy() { job.complete() }
 
+    /** @suppress */
     public override fun toString(): String = job.toString()
 
     private class LifecycleJob(

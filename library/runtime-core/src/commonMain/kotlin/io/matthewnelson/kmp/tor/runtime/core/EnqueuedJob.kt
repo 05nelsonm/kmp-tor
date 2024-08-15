@@ -38,8 +38,16 @@ import kotlin.jvm.*
  * discarded.
  *
  * Heavily inspired by [kotlinx.coroutines.Job]
+ *
+ * @see [toImmediateErrorJob]
+ * @see [toImmediateSuccessJob]
  * */
 public abstract class EnqueuedJob protected constructor(
+
+    /**
+     * The name for this job. Will be utilized with error handling
+     * for contextual purposes.
+     * */
     @JvmField
     public val name: String,
     onFailure: OnFailure,
@@ -66,7 +74,7 @@ public abstract class EnqueuedJob protected constructor(
     /**
      * The [ExecutionPolicy] of this job.
      *
-     * @see [ExecutionPolicy]
+     * Default: [ExecutionPolicy.DEFAULT]
      * */
     public open val executionPolicy: ExecutionPolicy = ExecutionPolicy.DEFAULT
 
@@ -101,8 +109,8 @@ public abstract class EnqueuedJob protected constructor(
     /**
      * Checks if the job is in a completion state or not.
      *
-     * @return true when [state] is [Enqueued] or [Executing]
-     *   otherwise false
+     * @return true when [state] is [Enqueued] or [Executing],
+     *   otherwise false.
      * */
     @get:JvmName("isActive")
     public val isActive: Boolean get() = when (_state) {
@@ -114,7 +122,7 @@ public abstract class EnqueuedJob protected constructor(
     }
 
     /**
-     * The current [State] of the job
+     * The current [State] of the job.
      * */
     @get:JvmName("state")
     public val state: State get() = _state
@@ -279,6 +287,11 @@ public abstract class EnqueuedJob protected constructor(
      * @see [Cancellation]
      * */
     public class ExecutionPolicy private constructor(
+
+        /**
+         * The [Cancellation] configuration of a job while it is
+         * in a state of [State.Executing].
+         * */
         @JvmField
         public val cancellation: Cancellation,
     ) {
@@ -435,8 +448,11 @@ public abstract class EnqueuedJob protected constructor(
                 }
             }
 
+            /** @suppress */
             public override fun equals(other: Any?): Boolean = privateEquals(other)
+            /** @suppress */
             public override fun hashCode(): Int = privateHashCode()
+            /** @suppress */
             public override fun toString(): String = privateToString()
         }
 
@@ -471,13 +487,17 @@ public abstract class EnqueuedJob protected constructor(
             }
 
             internal companion object {
+
                 @JvmSynthetic
                 internal fun get(): Builder = Builder()
             }
         }
 
+        /** @suppress */
         public override fun equals(other: Any?): Boolean = privateEquals(other)
+        /** @suppress */
         public override fun hashCode(): Int = privateHashCode()
+        /** @suppress */
         public override fun toString(): String = privateToString()
     }
 
@@ -711,6 +731,7 @@ public abstract class EnqueuedJob protected constructor(
         }
     }
 
+    /** @suppress */
     public final override fun toString(): String = toString(_state)
 
     private fun toString(state: State): String {
@@ -727,6 +748,7 @@ public abstract class EnqueuedJob protected constructor(
      * @see [io.matthewnelson.kmp.tor.runtime.core.ctrl.TorCmd.Unprivileged.Processor]
      * @see [io.matthewnelson.kmp.tor.runtime.core.util.awaitAsync]
      * @see [io.matthewnelson.kmp.tor.runtime.core.util.awaitSync]
+     * @suppress
      * */
     @InternalKmpTorApi
     public interface Argument

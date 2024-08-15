@@ -23,7 +23,7 @@ import io.matthewnelson.encoding.base64.Base64
 import io.matthewnelson.kmp.tor.runtime.core.Destroyable
 
 /**
- * Base abstraction for Public/Private keys
+ * Base abstraction for Public/Private keys used in tor.
  * */
 public expect sealed class Key private constructor() {
 
@@ -45,8 +45,11 @@ public expect sealed class Key private constructor() {
         public final override fun base32OrNull(): String
         public final override fun base64OrNull(): String
 
+        /** @suppress */
         public final override fun equals(other: Any?): Boolean
+        /** @suppress */
         public final override fun hashCode(): Int
+        /** @suppress */
         public final override fun toString(): String
     }
 
@@ -70,8 +73,11 @@ public expect sealed class Key private constructor() {
 
         protected fun <T: Any> withKeyOrNull(block: (key: ByteArray) -> T): T?
 
+        /** @suppress */
         public final override fun equals(other: Any?): Boolean
+        /** @suppress */
         public final override fun hashCode(): Int
+        /** @suppress */
         public final override fun toString(): String
     }
 

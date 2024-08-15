@@ -126,6 +126,7 @@ public expect interface TorCtrl: Destroyable, TorEvent.Processor, TorCmd.Privile
         @Throws(CancellationException::class, IOException::class, UnsupportedOperationException::class)
         public suspend fun connectAsync(path: File): TorCtrl
 
+        /** @suppress */
         @InternalKmpTorApi
         public fun tempQueue(): TempTorCmdQueue
     }

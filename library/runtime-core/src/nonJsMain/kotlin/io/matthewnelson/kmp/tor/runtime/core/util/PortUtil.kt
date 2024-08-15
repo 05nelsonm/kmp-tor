@@ -57,7 +57,7 @@ public actual suspend fun Port.isAvailableAsync(
  * @throws [CancellationException] if underlying coroutine was cancelled
  * */
 @Throws(IOException::class, CancellationException::class)
-public actual suspend fun Port.Ephemeral.findAvailableAsync(
+public actual suspend fun Port.Ephemeral.findNextAvailableAsync(
     limit: Int,
     host: LocalHost,
 ): Port.Ephemeral = withContext(Dispatchers.IO) {
@@ -93,12 +93,12 @@ public fun Port.isAvailableSync(
  *
  * @param [host] either [LocalHost.IPv4] or [LocalHost.IPv6]
  * @param [limit] the number of ports to scan. min: 1, max: 1_000
- * @see [findAvailableAsync]
+ * @see [findNextAvailableAsync]
  * @throws [IllegalArgumentException] if [limit] is not between 1 and 1_000 (inclusive)
  * @throws [IOException] if the check fails (e.g. calling from Main thread on Android)
  * */
 @Throws(IOException::class)
-public fun Port.Ephemeral.findAvailableSync(
+public fun Port.Ephemeral.findNextAvailableSync(
     limit: Int,
     host: LocalHost,
 ): Port.Ephemeral = findAvailableSync(limit, host, null)

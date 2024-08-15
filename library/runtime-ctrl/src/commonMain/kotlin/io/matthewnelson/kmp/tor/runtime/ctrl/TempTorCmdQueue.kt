@@ -37,6 +37,7 @@ import kotlin.jvm.JvmSynthetic
  * [TorCtrl].
  *
  * @see [TorCtrl.Factory.tempQueue]
+ * @suppress
  * */
 @OptIn(InternalKmpTorApi::class)
 public class TempTorCmdQueue private constructor(

@@ -18,6 +18,7 @@
 package io.matthewnelson.kmp.tor.runtime.core.util
 
 import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
+import io.matthewnelson.kmp.tor.runtime.core.OnFailure
 import io.matthewnelson.kmp.tor.runtime.core.ctrl.TorCmd
 
 /**
@@ -25,6 +26,7 @@ import io.matthewnelson.kmp.tor.runtime.core.ctrl.TorCmd
  * or cancellation/error.
  *
  * @see [TorCmd.Privileged.Processor]
+ * @throws [Throwable] when underlying [OnFailure] callback is invoked.
  * */
 // @Throws(Throwable::class)
 public actual suspend fun <Success: Any> TorCmd.Privileged.Processor.executeAsync(
@@ -40,6 +42,7 @@ public actual suspend fun <Success: Any> TorCmd.Privileged.Processor.executeAsyn
  * or cancellation/error.
  *
  * @see [TorCmd.Unprivileged.Processor]
+ * @throws [Throwable] when underlying [OnFailure] callback is invoked.
  * */
 // @Throws(Throwable::class)
 public actual suspend fun <Success: Any> TorCmd.Unprivileged.Processor.executeAsync(

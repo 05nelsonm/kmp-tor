@@ -72,7 +72,7 @@ import kotlin.jvm.JvmField
  *                 }
  *         }
  *
- *         protected final override fun factory(
+ *         protected final override fun createProtected(
  *             event: MyEvent,
  *             tag: String?,
  *             executor: OnEvent.Executor?,
@@ -169,23 +169,8 @@ public abstract class Event<Data: Any?, E: Event<Data, E, O>, O: Event.Observer<
         onEvent: OnEvent<Data>,
     ): O {
         @Suppress("UNCHECKED_CAST")
-        return factory(this as E, tag, executor, onEvent)
+        return createProtected(this as E, tag, executor, onEvent)
     }
-
-    public final override fun equals(other: Any?): Boolean {
-        if (other !is Event<*, *, *>) return false
-        if (other::class != this::class) return false
-        return other.name == name
-    }
-
-    public final override fun hashCode(): Int {
-        var result = 17
-        result = result * 31 + this::class.hashCode()
-        result = result * 31 + name.hashCode()
-        return result
-    }
-
-    public final override fun toString(): String = name
 
     /**
      * Base abstraction for creating event observer types.
@@ -264,8 +249,6 @@ public abstract class Event<Data: Any?, E: Event<Data, E, O>, O: Event.Observer<
             }
         }
 
-        public final override fun toString(): String = toString(isStatic = false)
-
         /**
          * Helper for processor implementations as to not expose a
          * static tag externally.
@@ -291,18 +274,10 @@ public abstract class Event<Data: Any?, E: Event<Data, E, O>, O: Event.Observer<
             append("]@")
             append(hashCode())
         }
-    }
 
-    /**
-     * Protected factory function for creating instances
-     * of the [Event.Observer] implementation.
-     * */
-    protected abstract fun factory(
-        event: E,
-        tag: String?,
-        executor: OnEvent.Executor?,
-        onEvent: OnEvent<Data>,
-    ): O
+        /** @suppress */
+        public final override fun toString(): String = toString(isStatic = false)
+    }
 
     /**
      * Abstraction for the [Event] implementation's companion object.
@@ -341,4 +316,33 @@ public abstract class Event<Data: Any?, E: Event<Data, E, O>, O: Event.Observer<
          * */
         protected abstract val lazyEntries: ThisBlock<LinkedHashSet<E>>
     }
+
+    /**
+     * Protected factory function for creating instances of the
+     * [Event.Observer] implementation.
+     * */
+    protected abstract fun createProtected(
+        event: E,
+        tag: String?,
+        executor: OnEvent.Executor?,
+        onEvent: OnEvent<Data>,
+    ): O
+
+    /** @suppress */
+    public final override fun equals(other: Any?): Boolean {
+        if (other !is Event<*, *, *>) return false
+        if (other::class != this::class) return false
+        return other.name == name
+    }
+
+    /** @suppress */
+    public final override fun hashCode(): Int {
+        var result = 17
+        result = result * 31 + this::class.hashCode()
+        result = result * 31 + name.hashCode()
+        return result
+    }
+
+    /** @suppress */
+    public final override fun toString(): String = name
 }

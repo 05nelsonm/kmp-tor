@@ -57,7 +57,7 @@ import kotlin.jvm.JvmSynthetic
  * @see [io.matthewnelson.kmp.tor.runtime.service.TorServiceUI]
  * @see [io.matthewnelson.kmp.tor.runtime.service.ui.KmpTorServiceUI]
  * @throws [IllegalStateException] on instantiation if [args] were not those
- *   which were passed to [Factory.create]. See [Args].
+ *   which were passed to [Factory.createProtected]. See [Args].
  * */
 public abstract class AbstractTorServiceUI<
     A: AbstractTorServiceUI.Args.UI,
@@ -216,8 +216,8 @@ internal constructor(
      * [AbstractTorServiceUI] components.
      *
      * [Args] are single use items and must be consumed only once, otherwise
-     * an exception is raised when [Factory.create] or [create] is called
-     * resulting a service start failure.
+     * an exception is raised when [Factory.createProtected] or [createProtected]
+     * is called resulting a service start failure.
      *
      * @see [io.matthewnelson.kmp.tor.runtime.service.TorServiceUI.Args]
      * */
@@ -282,11 +282,13 @@ internal constructor(
             }
         }
 
+        /** @suppress */
         public final override fun equals(other: Any?): Boolean {
             @OptIn(InternalKmpTorApi::class)
             return other is Args && other.lock == lock
         }
 
+        /** @suppress */
         public final override fun hashCode(): Int {
             @OptIn(InternalKmpTorApi::class)
             return lock.hashCode()
@@ -318,12 +320,14 @@ internal constructor(
             require(this.fields.isNotEmpty()) { "fields cannot be empty" }
         }
 
+        /** @suppress */
         public final override fun equals(other: Any?): Boolean {
             if (other !is Config) return false
             if (other::class != this::class) return false
             return other.fields == fields
         }
 
+        /** @suppress */
         public final override fun hashCode(): Int {
             var result = 17
             result = result * 42 + this::class.hashCode()
@@ -331,6 +335,7 @@ internal constructor(
             return result
         }
 
+        /** @suppress */
         public final override fun toString(): String = buildString {
             append("TorServiceUI.Config: [")
 
@@ -405,8 +410,9 @@ internal constructor(
 
         /**
          * Implementors **MUST** utilize [args] to instantiate a new instance
-         * of the [UI] implementation. If [args] were not consumed by the
-         * returned instance of [UI], an exception will be thrown by [create].
+         * of the [AbstractTorServiceUI] implementation. If [args] were not
+         * consumed by the returned instance, an exception will be thrown by
+         * [createProtected].
          *
          * @see [Args].
          * */
@@ -482,7 +488,7 @@ internal constructor(
      * via the `kmp-tor:runtime-service-ui` dependency.
      *
      * @throws [IllegalStateException] on instantiation if [args] were not those
-     *   which were passed to [create]. See [Args].
+     *   which were passed to [createProtected]. See [Args].
      * */
     public abstract class InstanceState<C: Config>
     @ExperimentalKmpTorApi
@@ -636,21 +642,25 @@ internal constructor(
         @JvmSynthetic
         internal fun fileIDKey(): FileID = args.key
 
+        /** @suppress */
         public final override fun equals(other: Any?): Boolean {
             if (other !is InstanceState<*>) return false
             if (other::class != this::class) return false
             return other.instanceJob == instanceJob
         }
 
+        /** @suppress */
         public final override fun hashCode(): Int = instanceJob.hashCode()
 
+        /** @suppress */
         public final override fun toString(): String = toFIDString(defaultClassName = "AbstractTorServiceUI.InstanceState")
     }
 
     /**
      * Implementors **MUST** utilize [args] to instantiate a new instance
-     * of the [IS] implementation. If [args] were not consumed by the
-     * returned instance of [IS], an exception will be thrown by [create].
+     * of the [InstanceState] implementation. If [args] were not consumed
+     * by the returned instance of [InstanceState], an exception will be
+     * thrown by [createProtected].
      *
      * @see [Args].
      * */

@@ -242,6 +242,7 @@ public class TorListeners private constructor(
         )
     }
 
+    /** @suppress */
     public override fun equals(other: Any?): Boolean {
         return  other is TorListeners
                 && other.dir == dir
@@ -256,6 +257,7 @@ public class TorListeners private constructor(
                 && other.trans == trans
     }
 
+    /** @suppress */
     public override fun hashCode(): Int {
         var result = 15
         result = result * 31 + dir.hashCode()
@@ -271,6 +273,7 @@ public class TorListeners private constructor(
         return result
     }
 
+    /** @suppress */
     public override fun toString(): String = buildString {
         append("TorListeners")
 

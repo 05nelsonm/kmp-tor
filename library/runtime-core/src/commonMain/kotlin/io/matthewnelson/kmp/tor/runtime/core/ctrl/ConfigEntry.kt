@@ -48,6 +48,7 @@ public data class ConfigEntry(
     @JvmField
     public val isDefault: Boolean = if (setting.isEmpty()) true else setting == keyword.default
 
+    /** @suppress */
     public override fun toString(): String = buildString {
         appendLine("ConfigEntry: [")
         append("    keyword: ")

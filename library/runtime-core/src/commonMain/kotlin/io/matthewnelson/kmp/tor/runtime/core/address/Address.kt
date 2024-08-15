@@ -80,6 +80,7 @@ public sealed class Address(
 
     public final override fun compareTo(other: Address): Int = value.compareTo(other.value)
 
+    /** @suppress */
     public final override fun equals(other: Any?): Boolean {
         if (other === this) return true
         if (other !is Address) return false
@@ -87,6 +88,7 @@ public sealed class Address(
         return other.value == value
     }
 
+    /** @suppress */
     public final override fun hashCode(): Int {
         var result = 17
         result = result * 31 + this::class.hashCode()
@@ -94,5 +96,6 @@ public sealed class Address(
         return result
     }
 
+    /** @suppress */
     public final override fun toString(): String = value
 }

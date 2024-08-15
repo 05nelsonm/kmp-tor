@@ -67,7 +67,7 @@ kmpConfiguration {
         iosAll()
 
         common {
-            pluginIds("publication")
+            pluginIds("publication", "dokka")
 
             sourceSetMain {
                 dependencies {

@@ -33,6 +33,8 @@ kmpConfiguration {
         }
 
         common {
+            pluginIds("dokka")
+
             sourceSetMain {
                 dependencies {
                     api(project(":library:runtime-core"))

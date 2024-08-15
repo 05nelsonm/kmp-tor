@@ -26,7 +26,7 @@ import io.matthewnelson.kmp.tor.runtime.core.address.LocalHost
 import io.matthewnelson.kmp.tor.runtime.core.address.Port
 import io.matthewnelson.kmp.tor.runtime.core.address.Port.Ephemeral.Companion.toPortEphemeral
 import io.matthewnelson.kmp.tor.runtime.core.address.IPSocketAddress
-import io.matthewnelson.kmp.tor.runtime.core.util.findAvailableAsync
+import io.matthewnelson.kmp.tor.runtime.core.util.findNextAvailableAsync
 import kotlinx.coroutines.*
 import kotlinx.coroutines.test.runTest
 import kotlin.test.Test
@@ -105,7 +105,7 @@ class TorCtrlFactoryUnitTest {
         )
 
         val host = resolve()
-        val port = startPort.findAvailableAsync(100, this)
+        val port = startPort.findNextAvailableAsync(100, this)
 
         val address = IPSocketAddress(host, port)
 

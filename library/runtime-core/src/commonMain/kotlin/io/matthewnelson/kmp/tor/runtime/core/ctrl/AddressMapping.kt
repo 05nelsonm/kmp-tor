@@ -74,6 +74,10 @@ import kotlin.jvm.JvmStatic
  *
  *     // {address-mappings/control=}
  *
+ * @see [mappingToAnyHost]
+ * @see [mappingToAnyHostIPv4]
+ * @see [mappingToAnyHostIPv6]
+ * @see [unmappingFrom]
  * @see [TorCmd.MapAddress]
  * @see [AddressMapping.Result]
  * */
@@ -238,12 +242,14 @@ public class AddressMapping(from: String, to: String) {
          * */
         public fun toUnmapping(): AddressMapping = from.unmappingFrom()
 
+        /** @suppress */
         public override fun equals(other: Any?): Boolean {
             return  other is Result
                     && other.from == from
                     && other.to == to
         }
 
+        /** @suppress */
         public override fun hashCode(): Int {
             var result = 17
             result = result * 42 + from.hashCode()
@@ -251,6 +257,7 @@ public class AddressMapping(from: String, to: String) {
             return result
         }
 
+        /** @suppress */
         public override fun toString(): String = buildString {
             appendLine("AddressMapping.Result: [")
             append("    from: ")
@@ -285,12 +292,14 @@ public class AddressMapping(from: String, to: String) {
         this.to = to
     }
 
+    /** @suppress */
     public override fun equals(other: Any?): Boolean {
         return  other is AddressMapping
                 && other.from == from
                 && other.to == to
     }
 
+    /** @suppress */
     public override fun hashCode(): Int {
         var result = 15
         result = result * 42 + from.hashCode()
@@ -298,6 +307,7 @@ public class AddressMapping(from: String, to: String) {
         return result
     }
 
+    /** @suppress */
     public override fun toString(): String {
         return "AddressMapping[from=$from, to=$to]"
     }

@@ -29,6 +29,9 @@ import io.matthewnelson.kmp.tor.runtime.core.Destroyable
 import io.matthewnelson.kmp.tor.runtime.core.Destroyable.Companion.destroyedException
 import kotlin.concurrent.Volatile
 
+/**
+ * Base abstraction for Public/Private keys used in tor.
+ * */
 public actual sealed class Key private actual constructor(): java.security.Key {
 
     public actual abstract fun algorithm(): String
@@ -57,8 +60,11 @@ public actual sealed class Key private actual constructor(): java.security.Key {
         public actual final override fun base64OrNull(): String = base64()
 
         private val _toString by lazy { "${algorithm()}.PublicKey[${base32()}]" }
+        /** @suppress */
         public actual final override fun equals(other: Any?): Boolean = other is Public && other.toString() == toString()
+        /** @suppress */
         public actual final override fun hashCode(): Int = 17 * 31 + toString().hashCode()
+        /** @suppress */
         public actual final override fun toString(): String = _toString
     }
 
@@ -110,8 +116,11 @@ public actual sealed class Key private actual constructor(): java.security.Key {
             }
         }
 
+        /** @suppress */
         public actual final override fun equals(other: Any?): Boolean = other is Private && other.hashCode() == hashCode()
+        /** @suppress */
         public actual final override fun hashCode(): Int = 17 * 42 + key.hashCode()
+        /** @suppress */
         public actual final override fun toString(): String = "${algorithm()}.PrivateKey[isDestroyed=$_destroyed]@${hashCode()}"
     }
 

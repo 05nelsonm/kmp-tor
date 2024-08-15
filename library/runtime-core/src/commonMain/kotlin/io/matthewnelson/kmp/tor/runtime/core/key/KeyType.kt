@@ -15,12 +15,36 @@
  **/
 package io.matthewnelson.kmp.tor.runtime.core.key
 
+import io.matthewnelson.kmp.tor.runtime.core.address.OnionAddress
+
+/**
+ * Type definition for public/private key associations utilized by tor.
+ * */
 public sealed class KeyType<T: Key.Public, V: Key.Private> private constructor() {
 
+    /**
+     * The algorithm name for this [KeyType].
+     * */
     public abstract fun algorithm(): String
 
+    /**
+     * Represents a [KeyType] associated with [OnionAddress], such as
+     * adding a Hidden Service to a running tor client via its control
+     * connection.
+     *
+     * @see [ED25519_V3]
+     * */
     public sealed class Address<T: AddressKey.Public, V: AddressKey.Private>: KeyType<T, V>()
+
+    /**
+     * Represents a [KeyType] associated with client authentication,
+     * such as adding a private key to your running client in order
+     * to connect to a Hidden Service which is using client authentication.
+     *
+     * @see [X25519]
+     * */
     public sealed class Auth<T: AuthKey.Public, V: AuthKey.Private>: KeyType<T, V>()
 
+    /** @suppress */
     public final override fun toString(): String = algorithm()
 }

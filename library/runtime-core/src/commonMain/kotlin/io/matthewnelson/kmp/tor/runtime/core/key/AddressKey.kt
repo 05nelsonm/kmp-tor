@@ -22,14 +22,14 @@ import kotlin.jvm.JvmSynthetic
 /**
  * Type definition of [Key.Public] and [Key.Private] specific to
  * [OnionAddress].
- *
- * @see [OnionAddress.asPublicKey]
- * @see [ED25519_V3]
  * */
 public class AddressKey private constructor() {
 
     /**
-     * Wrapper to extend [OnionAddress] capabilities for public key usage
+     * Wrapper to extend [OnionAddress] capabilities for public key usage.
+     *
+     * @see [OnionAddress.asPublicKey]
+     * @see [ED25519_V3.PublicKey]
      * */
     public sealed class Public(private val onionAddress: OnionAddress): Key.Public(), Comparable<Public> {
 
@@ -46,7 +46,10 @@ public class AddressKey private constructor() {
     }
 
     /**
-     * Holder for an [OnionAddress] private key
+     * Holder for an [OnionAddress] private key. Private keys are utilized
+     * when creating Hidden Services.
+     *
+     * @see [ED25519_V3.PrivateKey]
      * */
     public sealed class Private(key: ByteArray): Key.Private(key) {
 

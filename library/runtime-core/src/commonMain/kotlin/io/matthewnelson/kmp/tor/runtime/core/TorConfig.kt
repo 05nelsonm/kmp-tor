@@ -143,9 +143,15 @@ public class TorConfig private constructor(
     @KmpTorDsl
     public open class Builder private constructor(other: TorConfig?) {
 
+        /** @suppress */
         @JvmField
         protected val settings: MutableSet<Setting> = LinkedHashSet(1, 1.0f)
-        // For dealing with inherited disabled port
+
+        /**
+         * For dealing with inherited disabled port
+         *
+         * @suppress
+         * */
         @JvmField
         protected val inheritedDisabledPorts: MutableSet<Setting> = LinkedHashSet(1, 1.0f)
 
@@ -7091,6 +7097,7 @@ public class TorConfig private constructor(
             false
         }
 
+        /** @suppress */
         public override fun equals(other: Any?): Boolean {
             if (other !is LineItem) return false
 
@@ -7122,6 +7129,7 @@ public class TorConfig private constructor(
                     && other.argument == argument
         }
 
+        /** @suppress */
         public override fun hashCode(): Int {
             var result = 13
             if (keyword.isUnique) {
@@ -7141,6 +7149,7 @@ public class TorConfig private constructor(
             return result * 42 + argument.hashCode()
         }
 
+        /** @suppress */
         public override fun toString(): String = buildString {
             append(keyword)
             append(' ')
@@ -7339,14 +7348,21 @@ public class TorConfig private constructor(
             }
         }
 
+        /** @suppress */
         public override fun equals(other: Any?): Boolean = other is Setting && other.items.first() == items.first()
+        /** @suppress */
         public override fun hashCode(): Int = 17 * 31 + items.first().hashCode()
+        /** @suppress */
         public override fun toString(): String = buildString {
             items.joinTo(this, separator = "\n")
         }
 
-        // Returns a new Setting if it is a *Port that is
-        // not configured as disabled or auto.
+        /**
+         * Returns a new [Setting] if it is a *Port that is
+         * not configured as disabled or auto.
+         *
+         * @suppress
+         * */
         @InternalKmpTorApi
         public fun reassignTCPPortAutoOrNull(): Setting? {
             // Setting does not have Attribute.Port
@@ -7428,8 +7444,11 @@ public class TorConfig private constructor(
         public final override fun compareTo(other: Keyword): Int = name.compareTo(other.name)
         public operator fun plus(other: Any?): String = name + other
 
+        /** @suppress */
         public final override fun equals(other: Any?): Boolean = other is Keyword && other.name == name
+        /** @suppress */
         public final override fun hashCode(): Int = 21 * 31 + name.hashCode()
+        /** @suppress */
         public final override fun toString(): String = name
     }
 
@@ -7460,8 +7479,11 @@ public class TorConfig private constructor(
         }
     }
 
+    /** @suppress */
     public override fun equals(other: Any?): Boolean = other is TorConfig && other.settings == settings
+    /** @suppress */
     public override fun hashCode(): Int = 5 * 42 + settings.hashCode()
+    /** @suppress */
     public override fun toString(): String = buildString {
         settings.joinTo(this, separator = "\n")
     }

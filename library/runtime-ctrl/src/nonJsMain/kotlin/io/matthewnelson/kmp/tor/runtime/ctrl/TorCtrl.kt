@@ -269,6 +269,7 @@ public actual interface TorCtrl : Destroyable, TorEvent.Processor, TorCmd.Privil
             return ctrl
         }
 
+        /** @suppress */
         @InternalKmpTorApi
         public actual fun tempQueue(): TempTorCmdQueue = TempTorCmdQueue.of(handler)
 

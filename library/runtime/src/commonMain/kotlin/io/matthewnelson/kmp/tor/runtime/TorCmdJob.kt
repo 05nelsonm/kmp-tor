@@ -67,7 +67,9 @@ public class TorCmdJob private constructor(
         }
     }
 
+    /** @suppress */
     public override fun equals(other: Any?): Boolean = other is TorCmdJob && other.delegate == delegate
+    /** @suppress */
     public override fun hashCode(): Int = delegate.hashCode()
 
     @JvmSynthetic

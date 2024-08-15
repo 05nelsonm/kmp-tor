@@ -40,6 +40,7 @@ import kotlin.time.Duration.Companion.milliseconds
  * @see [io.matthewnelson.kmp.tor.runtime.core.util.awaitSync]
  * @see [io.matthewnelson.kmp.tor.runtime.core.util.executeAsync]
  * @see [io.matthewnelson.kmp.tor.runtime.Action.Companion.executeAsync]
+ * @suppress
  * */
 @InternalKmpTorApi
 @Throws(Throwable::class)
@@ -67,6 +68,7 @@ public actual suspend fun <Arg: EnqueuedJob.Argument, Success: Any> Arg.awaitAsy
  * @see [io.matthewnelson.kmp.tor.runtime.core.util.awaitAsync]
  * @see [io.matthewnelson.kmp.tor.runtime.core.util.executeSync]
  * @see [io.matthewnelson.kmp.tor.runtime.Action.Companion.executeSync]
+ * @suppress
  * */
 @InternalKmpTorApi
 @Throws(Throwable::class)
