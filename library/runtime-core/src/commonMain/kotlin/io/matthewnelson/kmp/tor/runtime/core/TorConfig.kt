@@ -143,9 +143,15 @@ public class TorConfig private constructor(
     @KmpTorDsl
     public open class Builder private constructor(other: TorConfig?) {
 
+        /** @suppress */
         @JvmField
         protected val settings: MutableSet<Setting> = LinkedHashSet(1, 1.0f)
-        // For dealing with inherited disabled port
+
+        /**
+         * For dealing with inherited disabled port
+         *
+         * @suppress
+         * */
         @JvmField
         protected val inheritedDisabledPorts: MutableSet<Setting> = LinkedHashSet(1, 1.0f)
 

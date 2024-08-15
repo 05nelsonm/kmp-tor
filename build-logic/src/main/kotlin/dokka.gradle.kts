@@ -13,13 +13,34 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
+import org.jetbrains.dokka.DokkaConfiguration.Visibility
 import org.jetbrains.dokka.gradle.DokkaTaskPartial
+import java.net.URL
 
 plugins {
     id("org.jetbrains.dokka")
 }
 
 tasks.withType<DokkaTaskPartial>().configureEach {
-    suppressObviousFunctions.set(true)
-    suppressInheritedMembers.set(true)
+    suppressInheritedMembers = true
+
+    dokkaSourceSets.configureEach {
+        includes.from("README.md")
+        noStdlibLink = true
+    }
+
+    dokkaSourceSets.configureEach {
+        sourceLink {
+            localDirectory = rootDir
+            remoteUrl = URL("https://github.com/05nelsonm/kmp-tor/tree/master")
+            remoteLineSuffix = "#L"
+        }
+    }
+
+    dokkaSourceSets.configureEach {
+        documentedVisibilities.set(setOf(
+            Visibility.PUBLIC,
+            Visibility.PROTECTED,
+        ))
+    }
 }

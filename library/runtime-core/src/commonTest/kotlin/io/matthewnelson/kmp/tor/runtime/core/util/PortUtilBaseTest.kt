@@ -55,7 +55,7 @@ abstract class PortUtilBaseTest {
     }
 
     @Test
-    fun givenFindAvailable_whenCoroutineCancelled_thenHandlesCancellationProperly() = runTest(timeout = 120.seconds) {
+    fun givenFindNextAvailable_whenCoroutineCancelled_thenHandlesCancellationProperly() = runTest(timeout = 120.seconds) {
         if (isNodeJs) {
             // Only needed to test blocking code to ensure
             // context is checked to trigger cancellation
@@ -69,7 +69,7 @@ abstract class PortUtilBaseTest {
         val i = port.iterator(limit)
 
         var count = 0
-        // Make next ports unavailable to force findAvailable
+        // Make next ports unavailable to force findNextAvailable
         // to loop through all the values of PortProxyIterator
         while (i.hasNext()) {
             val next = i.next().toPortEphemeral()
@@ -83,7 +83,7 @@ abstract class PortUtilBaseTest {
         var result: Port.Ephemeral? = null
         var throwable: Throwable? = null
         val job = launch(CoroutineExceptionHandler { _, t -> throwable = t }) {
-            result = port.findAvailableAsync(limit + 50, host)
+            result = port.findNextAvailableAsync(limit + 50, host)
         }
 
         // Slight delay to ensure blocking code is running
@@ -117,7 +117,7 @@ abstract class PortUtilBaseTest {
     ): Pair<AutoCloseable, Port.Ephemeral> {
         val portEphemeral = port ?: Port.Ephemeral.MIN
             .toPortEphemeral()
-            .findAvailableAsync(1_000, this)
+            .findNextAvailableAsync(1_000, this)
 
         val socket = openServerSocket(resolve(), portEphemeral.value)
         currentCoroutineContext().job.invokeOnCompletion {

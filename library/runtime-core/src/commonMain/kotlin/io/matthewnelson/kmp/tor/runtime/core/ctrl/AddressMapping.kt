@@ -74,6 +74,10 @@ import kotlin.jvm.JvmStatic
  *
  *     // {address-mappings/control=}
  *
+ * @see [mappingToAnyHost]
+ * @see [mappingToAnyHostIPv4]
+ * @see [mappingToAnyHostIPv6]
+ * @see [unmappingFrom]
  * @see [TorCmd.MapAddress]
  * @see [AddressMapping.Result]
  * */

@@ -29,6 +29,9 @@ import io.matthewnelson.kmp.tor.runtime.core.Destroyable
 import io.matthewnelson.kmp.tor.runtime.core.Destroyable.Companion.destroyedException
 import kotlin.concurrent.Volatile
 
+/**
+ * Base abstraction for Public/Private keys used in tor.
+ * */
 public actual sealed class Key private actual constructor() {
 
     public actual abstract fun algorithm(): String

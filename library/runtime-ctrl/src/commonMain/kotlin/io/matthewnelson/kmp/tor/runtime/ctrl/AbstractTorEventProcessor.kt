@@ -42,6 +42,7 @@ public abstract class AbstractTorEventProcessor
 protected constructor(
     staticTag: String?,
     observers: Set<TorEvent.Observer>,
+    @JvmField
     protected val defaultExecutor: OnEvent.Executor
 ): TorEvent.Processor {
 

@@ -306,7 +306,7 @@ public sealed class TorEvent private constructor(
         }
     }
 
-    protected final override fun factory(
+    protected final override fun createProtected(
         event: TorEvent,
         tag: String?,
         executor: OnEvent.Executor?,

@@ -23,11 +23,19 @@ import kotlin.jvm.JvmSynthetic
 /**
  * Type definition of [Key.Public] and [Key.Private] specific to
  * client authentication.
- *
- * @see [X25519]
  * */
 public class AuthKey private constructor() {
 
+    /**
+     * Holder for a public key associated with a Hidden Service's client
+     * authentication configuration.
+     *
+     * This would be the key a Hidden Service operator adds, to only allow
+     * connections from tor clients who have the [AuthKey.Private] associated
+     * with this [AuthKey.Public].
+     *
+     * @see [X25519.PublicKey]
+     * */
     public sealed class Public(private val key: ByteArray): Key.Public() {
 
         public final override fun encoded(): ByteArray = key.copyOf()
@@ -36,17 +44,54 @@ public class AuthKey private constructor() {
         public final override fun base32(): String = key.encodeToString(BASE_32)
         public final override fun base64(): String = key.encodeToString(BASE_64)
 
+        /**
+         * Produces the base 32 descriptor string for this [AuthKey.Public]
+         * in the form of `descriptor:{algorithm}:{base-32}`.
+         * */
         public fun descriptorBase32(): String = toDescriptor("descriptor", base32())
+
+        /**
+         * Produces the base 64 descriptor string for this [AuthKey.Public]
+         * in the form of `descriptor:{algorithm}:{base-64}`.
+         * */
         public fun descriptorBase64(): String = toDescriptor("descriptor", base64())
     }
 
+    /**
+     * Holder for a private key associated with a Hidden Service's client
+     * authentication configuration.
+     *
+     * This would be the key added to a tor client by a user who wishes to
+     * connect to a Hidden Service that has been configured using the
+     * [AuthKey.Public] associated with this [AuthKey.Private].
+     *
+     * @see [X25519.PrivateKey]
+     * */
     public sealed class Private(key: ByteArray): Key.Private(key) {
 
+        /**
+         * Produces the base 32 descriptor string for this [AuthKey.Private]
+         * in the form of `{onion-address}:{algorithm}:{base-32}`.
+         *
+         * @see [descriptorBase32OrNull]
+         * @throws [IllegalArgumentException] if the [address] is not a
+         *   compatible [OnionAddress] for this [algorithm].
+         * @throws [IllegalStateException] if [isDestroyed] is `true`.
+         * */
         @Throws(IllegalArgumentException::class, IllegalStateException::class)
         public fun descriptorBase32(
             address: OnionAddress,
         ): String = descriptorBase32(address.asPublicKey())
 
+        /**
+         * Produces the base 32 descriptor string for this [AuthKey.Private]
+         * in the form of `{onion-address}:{algorithm}:{base-32}`.
+         *
+         * @see [descriptorBase32OrNull]
+         * @throws [IllegalArgumentException] if the [publicKey] is not a
+         *   compatible [AddressKey.Public] for this [algorithm].
+         * @throws [IllegalStateException] if [isDestroyed] is `true`.
+         * */
         @Throws(IllegalArgumentException::class, IllegalStateException::class)
         public fun descriptorBase32(
             publicKey: AddressKey.Public,
@@ -61,10 +106,24 @@ public class AuthKey private constructor() {
             throw IllegalArgumentException("${publicKey.algorithm()}.PublicKey is not compatible with ${algorithm()}.PrivateKey")
         }
 
+        /**
+         * Produces the base 32 descriptor string for this [AuthKey.Private]
+         * in the form of `{onion-address}:{algorithm}:{base-32}`, or `null`
+         * if [isDestroyed] is `true`.
+         *
+         * @see [descriptorBase32]
+         * */
         public fun descriptorBase32OrNull(
             address: OnionAddress,
         ): String? = descriptorBase32OrNull(address.asPublicKey())
 
+        /**
+         * Produces the base 32 descriptor string for this [AuthKey.Private]
+         * in the form of `{onion-address}:{algorithm}:{base-32}`, or `null`
+         * if [isDestroyed] is `true`.
+         *
+         * @see [descriptorBase32]
+         * */
         public fun descriptorBase32OrNull(
             publicKey: AddressKey.Public,
         ): String? {
@@ -74,11 +133,29 @@ public class AuthKey private constructor() {
             return toDescriptor(publicKey.address().value, encoded)
         }
 
+        /**
+         * Produces the base 64 descriptor string for this [AuthKey.Private]
+         * in the form of `{onion-address}:{algorithm}:{base-64}`.
+         *
+         * @see [descriptorBase64OrNull]
+         * @throws [IllegalArgumentException] if the [address] is not a
+         *   compatible [OnionAddress] for this [algorithm].
+         * @throws [IllegalStateException] if [isDestroyed] is `true`.
+         * */
         @Throws(IllegalArgumentException::class, IllegalStateException::class)
         public fun descriptorBase64(
             address: OnionAddress,
         ): String = descriptorBase64(address.asPublicKey())
 
+        /**
+         * Produces the base 64 descriptor string for this [AuthKey.Private]
+         * in the form of `{onion-address}:{algorithm}:{base-64}`.
+         *
+         * @see [descriptorBase64OrNull]
+         * @throws [IllegalArgumentException] if the [publicKey] is not a
+         *   compatible [AddressKey.Public] for this [algorithm].
+         * @throws [IllegalStateException] if [isDestroyed] is `true`.
+         * */
         @Throws(IllegalArgumentException::class, IllegalStateException::class)
         public fun descriptorBase64(
             publicKey: AddressKey.Public,
@@ -93,10 +170,24 @@ public class AuthKey private constructor() {
             throw IllegalArgumentException("${publicKey.algorithm()}.PublicKey is not compatible with ${algorithm()}.PrivateKey")
         }
 
+        /**
+         * Produces the base 64 descriptor string for this [AuthKey.Private]
+         * in the form of `{onion-address}:{algorithm}:{base-64}`, or `null`
+         * if [isDestroyed] is `true`.
+         *
+         * @see [descriptorBase64]
+         * */
         public fun descriptorBase64OrNull(
             address: OnionAddress,
         ): String? = descriptorBase64OrNull(address.asPublicKey())
 
+        /**
+         * Produces the base 64 descriptor string for this [AuthKey.Private]
+         * in the form of `{onion-address}:{algorithm}:{base-64}`, or `null`
+         * if [isDestroyed] is `true`.
+         *
+         * @see [descriptorBase64]
+         * */
         public fun descriptorBase64OrNull(
             publicKey: AddressKey.Public,
         ): String? {

@@ -23,7 +23,7 @@ import io.matthewnelson.encoding.base64.Base64
 import io.matthewnelson.kmp.tor.runtime.core.Destroyable
 
 /**
- * Base abstraction for Public/Private keys
+ * Base abstraction for Public/Private keys used in tor.
  * */
 public expect sealed class Key private constructor() {
 

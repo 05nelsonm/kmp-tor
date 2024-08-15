@@ -15,6 +15,8 @@
  **/
 package io.matthewnelson.kmp.tor.runtime.core.address
 
+import io.matthewnelson.kmp.tor.runtime.core.address.Port.Companion.MAX
+import io.matthewnelson.kmp.tor.runtime.core.address.Port.Companion.MIN
 import io.matthewnelson.kmp.tor.runtime.core.address.Port.Ephemeral.Companion.toPortEphemeralOrNull
 import io.matthewnelson.kmp.tor.runtime.core.internal.HostAndPort
 import io.matthewnelson.kmp.tor.runtime.core.internal.HostAndPort.Companion.findHostnameAndPortFromURL
@@ -24,14 +26,17 @@ import kotlin.jvm.JvmStatic
 import kotlin.jvm.JvmSynthetic
 
 /**
- * Holder for a port between `0` and `65535` (inclusive).
+ * Holder for an integer between [MIN] and [MAX] (inclusive).
  *
  * e.g.
  *
  *     443.toPort()
- *     8443.toPortEphemeral()
+ *     "443".toPort()
+ *     "http://example.com:8080".toPort()
+ *     "http://[::1]:8181".toPort()
  *
- * @see [Ephemeral]
+ * @see [toPort]
+ * @see [toPortOrNull]
  * @see [io.matthewnelson.kmp.tor.runtime.core.util.isAvailableAsync]
  * @see [io.matthewnelson.kmp.tor.runtime.core.util.isAvailableSync]
  * */
@@ -42,9 +47,25 @@ public open class Port private constructor(
 
     public companion object {
 
+        /**
+         * The minimum integer value of a [Port], `0`
+         * */
         public const val MIN: Int = 0
+
+        /**
+         * The maximum integer value of a [Port], `65535`
+         * */
         public const val MAX: Int = 65535
 
+        /**
+         * Wraps the integer in the [Port] class.
+         *
+         * If the value is within [Ephemeral.MIN] and [Ephemeral.MAX],
+         * then [Ephemeral] is always returned.
+         *
+         * @throws [IllegalArgumentException] if not within [MIN] and
+         *   [MAX] (inclusive).
+         * */
         @JvmStatic
         @JvmName("get")
         @Throws(IllegalArgumentException::class)
@@ -54,13 +75,15 @@ public open class Port private constructor(
         }
 
         /**
-         * Parses a String for a port between 0 and 65535 (inclusive).
+         * Parses a String for a port between [MIN] and [MAX] (inclusive).
          *
          * String can be either a URL containing the port, or the
-         * port itself.
+         * port string itself.
          *
-         * @return [Port]
-         * @throws [IllegalArgumentException] if no port is found
+         * If the value is within [Ephemeral.MIN] and [Ephemeral.MAX],
+         * then [Ephemeral] is always returned.
+         *
+         * @throws [IllegalArgumentException] if no port is found.
          * */
         @JvmStatic
         @JvmName("get")
@@ -70,6 +93,14 @@ public open class Port private constructor(
                 ?: throw IllegalArgumentException("$this does not contain a port")
         }
 
+        /**
+         * Wraps the integer in the [Port] class.
+         *
+         * If the value is within [Ephemeral.MIN] and [Ephemeral.MAX],
+         * then [Ephemeral] is always returned.
+         *
+         * @return [Port] or `null` if not within [MIN] and [MAX] (inclusive)
+         * */
         @JvmStatic
         @JvmName("getOrNull")
         public fun Int.toPortOrNull(): Port? {
@@ -83,9 +114,12 @@ public open class Port private constructor(
          * Parses a String for a port between 0 and 65535 (inclusive).
          *
          * String can be either a URL containing the port, or the
-         * port itself.
+         * port string itself.
          *
-         * @return [Port] or null
+         * If the value is within [Ephemeral.MIN] and [Ephemeral.MAX],
+         * then [Ephemeral] is always returned.
+         *
+         * @return [Port] or `null` if no port is found.
          * */
         @JvmStatic
         @JvmName("getOrNull")
@@ -129,22 +163,44 @@ public open class Port private constructor(
     }
 
     /**
-     * A [Port] with a more constrained range of 1024 and 65535 (inclusive)
-     * in accordance with that specified in
+     * A [Port] with a more constrained range of [Ephemeral.MIN] to
+     * [Ephemeral.MIN] (inclusive), in accordance with that specified in
      * [RFC 6056 section 3.2](https://datatracker.ietf.org/doc/html/rfc6056#section-3.2)
      *
+     * e.g.
+     *
+     *     443.toPortEphemeralOrNull()
+     *     "443".toPortEphemeralOrNull()
+     *     "http://example.com:8080".toPortEphemeral()
+     *     "http://[::1]:8181".toPortEphemeral()
+     *
+     * @see [toPortEphemeral]
+     * @see [toPortEphemeralOrNull]
      * @see [io.matthewnelson.kmp.tor.runtime.core.util.isAvailableAsync]
      * @see [io.matthewnelson.kmp.tor.runtime.core.util.isAvailableSync]
-     * @see [io.matthewnelson.kmp.tor.runtime.core.util.findAvailableAsync]
+     * @see [io.matthewnelson.kmp.tor.runtime.core.util.findNextAvailableAsync]
      * @see [io.matthewnelson.kmp.tor.runtime.core.util.findAvailableSync]
      * */
     public class Ephemeral private constructor(value: Int): Port(value) {
 
         public companion object {
 
+            /**
+             * The minimum integer value of a [Port.Ephemeral], `1024`
+             * */
             public const val MIN: Int = 1024
+
+            /**
+             * The maximum integer value of a [Port.Ephemeral], `65535`
+             * */
             public const val MAX: Int = Port.MAX
 
+            /**
+             * Wraps the integer in the [Ephemeral] class.
+             *
+             * @throws [IllegalArgumentException] if not within [MIN] and
+             *   [MAX] (inclusive).
+             * */
             @JvmStatic
             @JvmName("get")
             @Throws(IllegalArgumentException::class)
@@ -154,13 +210,12 @@ public open class Port private constructor(
             }
 
             /**
-             * Parses a String for a port between 1024 and 65535 (inclusive).
+             * Parses a String for a port between [MIN] and [MAX] (inclusive).
              *
-             * String can be either a URL containing the port, or the
-             * port itself.
+             * String can be either a URL containing the ephemeral port, or the
+             * ephemeral port string itself.
              *
-             * @return [Port.Ephemeral]
-             * @throws [IllegalArgumentException] if no port is found
+             * @throws [IllegalArgumentException] if no ephemeral port is found.
              * */
             @JvmStatic
             @JvmName("get")
@@ -170,6 +225,11 @@ public open class Port private constructor(
                     ?: throw IllegalArgumentException("$this does not contain a valid ephemeral port")
             }
 
+            /**
+             * Wraps the integer in the [Ephemeral] class.
+             *
+             * @return [Ephemeral] or `null` if not within [MIN] and [MAX] (inclusive).
+             * */
             @JvmStatic
             @JvmName("getOrNull")
             public fun Int.toPortEphemeralOrNull(): Ephemeral? {
@@ -178,12 +238,12 @@ public open class Port private constructor(
             }
 
             /**
-             * Parses a String for a port between 1024 and 65535 (inclusive).
+             * Parses a String for a port between [MIN] and [MAX] (inclusive).
              *
-             * String can be either a URL containing the port, or the
-             * port itself.
+             * String can be either a URL containing the ephemeral port, or the
+             * ephemeral port string itself.
              *
-             * @return [Port.Ephemeral] or null
+             * @return [Ephemeral] or `null` if no ephemeral port is found.
              * */
             @JvmStatic
             @JvmName("getOrNull")

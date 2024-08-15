@@ -16,18 +16,40 @@
 package io.matthewnelson.kmp.tor.runtime.core.key
 
 import io.matthewnelson.kmp.tor.runtime.core.internal.tryDecodeOrNull
+import io.matthewnelson.kmp.tor.runtime.core.key.X25519.PublicKey.Companion.toX25519PublicKey
+import io.matthewnelson.kmp.tor.runtime.core.key.X25519.PublicKey.Companion.toX25519PublicKeyOrNull
 import kotlin.jvm.JvmName
 import kotlin.jvm.JvmStatic
 import kotlin.jvm.JvmSynthetic
 
+/**
+ * An [X25519] [KeyType.Auth]. Also known as "Version 3 Client Authentication".
+ * */
 public object X25519: KeyType.Auth<X25519.PublicKey, X25519.PrivateKey>() {
 
+    /**
+     * `x25519`
+     * */
     public override fun algorithm(): String = "x25519"
 
+    /**
+     * Holder for a public key associated with a [ED25519_V3] Hidden Service's
+     * client authentication configuration.
+     *
+     * This would be the key a Hidden Service operator adds, to only allow
+     * connections from tor clients who have the [X25519.PrivateKey] associated
+     * with this [X25519.PublicKey].
+     *
+     * @see [toX25519PublicKey]
+     * @see [toX25519PublicKeyOrNull]
+     * */
     public class PublicKey private constructor(
         key: ByteArray
     ): AuthKey.Public(key) {
 
+        /**
+         * `x25519`
+         * */
         public override fun algorithm(): String = X25519.algorithm()
 
         public companion object {
@@ -90,10 +112,24 @@ public object X25519: KeyType.Auth<X25519.PublicKey, X25519.PrivateKey>() {
         }
     }
 
+    /**
+     * Holder for a private key associated with a [ED25519_V3] Hidden Service's
+     * client authentication configuration.
+     *
+     * This would be the key added to a tor client by a user who wishes to
+     * connect to a Hidden Service that has been configured using the
+     * [X25519.PublicKey] associated with this [X25519.PrivateKey].
+     *
+     * @see [toX25519PublicKey]
+     * @see [toX25519PublicKeyOrNull]
+     * */
     public class PrivateKey private constructor(
         key: ByteArray
     ): AuthKey.Private(key) {
 
+        /**
+         * `x25519`
+         * */
         public override fun algorithm(): String = X25519.algorithm()
 
         public companion object {

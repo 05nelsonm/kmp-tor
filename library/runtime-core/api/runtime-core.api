@@ -129,8 +129,8 @@ public final class io/matthewnelson/kmp/tor/runtime/core/EnqueuedJob$State : jav
 public abstract class io/matthewnelson/kmp/tor/runtime/core/Event {
 	public final field name Ljava/lang/String;
 	protected fun <init> (Ljava/lang/String;)V
+	protected abstract fun createProtected (Lio/matthewnelson/kmp/tor/runtime/core/Event;Ljava/lang/String;Lio/matthewnelson/kmp/tor/runtime/core/OnEvent$Executor;Lio/matthewnelson/kmp/tor/runtime/core/OnEvent;)Lio/matthewnelson/kmp/tor/runtime/core/Event$Observer;
 	public final fun equals (Ljava/lang/Object;)Z
-	protected abstract fun factory (Lio/matthewnelson/kmp/tor/runtime/core/Event;Ljava/lang/String;Lio/matthewnelson/kmp/tor/runtime/core/OnEvent$Executor;Lio/matthewnelson/kmp/tor/runtime/core/OnEvent;)Lio/matthewnelson/kmp/tor/runtime/core/Event$Observer;
 	public final fun hashCode ()I
 	public final fun observer (Lio/matthewnelson/kmp/tor/runtime/core/OnEvent;)Lio/matthewnelson/kmp/tor/runtime/core/Event$Observer;
 	public final fun observer (Ljava/lang/String;Lio/matthewnelson/kmp/tor/runtime/core/OnEvent$Executor;Lio/matthewnelson/kmp/tor/runtime/core/OnEvent;)Lio/matthewnelson/kmp/tor/runtime/core/Event$Observer;
@@ -2985,9 +2985,9 @@ public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$__TransPort$C
 public abstract class io/matthewnelson/kmp/tor/runtime/core/TorEvent : io/matthewnelson/kmp/tor/runtime/core/Event {
 	public static final field Companion Lio/matthewnelson/kmp/tor/runtime/core/TorEvent$Companion;
 	public synthetic fun <init> (Ljava/lang/String;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public synthetic fun createProtected (Lio/matthewnelson/kmp/tor/runtime/core/Event;Ljava/lang/String;Lio/matthewnelson/kmp/tor/runtime/core/OnEvent$Executor;Lio/matthewnelson/kmp/tor/runtime/core/OnEvent;)Lio/matthewnelson/kmp/tor/runtime/core/Event$Observer;
+	protected final fun createProtected (Lio/matthewnelson/kmp/tor/runtime/core/TorEvent;Ljava/lang/String;Lio/matthewnelson/kmp/tor/runtime/core/OnEvent$Executor;Lio/matthewnelson/kmp/tor/runtime/core/OnEvent;)Lio/matthewnelson/kmp/tor/runtime/core/TorEvent$Observer;
 	public static fun entries ()Ljava/util/Set;
-	public synthetic fun factory (Lio/matthewnelson/kmp/tor/runtime/core/Event;Ljava/lang/String;Lio/matthewnelson/kmp/tor/runtime/core/OnEvent$Executor;Lio/matthewnelson/kmp/tor/runtime/core/OnEvent;)Lio/matthewnelson/kmp/tor/runtime/core/Event$Observer;
-	protected final fun factory (Lio/matthewnelson/kmp/tor/runtime/core/TorEvent;Ljava/lang/String;Lio/matthewnelson/kmp/tor/runtime/core/OnEvent$Executor;Lio/matthewnelson/kmp/tor/runtime/core/OnEvent;)Lio/matthewnelson/kmp/tor/runtime/core/TorEvent$Observer;
 	public static fun valueOf (Ljava/lang/String;)Lio/matthewnelson/kmp/tor/runtime/core/TorEvent;
 	public static fun valueOfOrNull (Ljava/lang/String;)Lio/matthewnelson/kmp/tor/runtime/core/TorEvent;
 }
@@ -4069,8 +4069,8 @@ public final class io/matthewnelson/kmp/tor/runtime/core/util/IPAddressUtil {
 }
 
 public final class io/matthewnelson/kmp/tor/runtime/core/util/PortUtil {
-	public static final fun findAvailableAsync (Lio/matthewnelson/kmp/tor/runtime/core/address/Port$Ephemeral;ILio/matthewnelson/kmp/tor/runtime/core/address/LocalHost;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public static final fun findAvailableSync (Lio/matthewnelson/kmp/tor/runtime/core/address/Port$Ephemeral;ILio/matthewnelson/kmp/tor/runtime/core/address/LocalHost;)Lio/matthewnelson/kmp/tor/runtime/core/address/Port$Ephemeral;
+	public static final fun findNextAvailableAsync (Lio/matthewnelson/kmp/tor/runtime/core/address/Port$Ephemeral;ILio/matthewnelson/kmp/tor/runtime/core/address/LocalHost;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static final fun findNextAvailableSync (Lio/matthewnelson/kmp/tor/runtime/core/address/Port$Ephemeral;ILio/matthewnelson/kmp/tor/runtime/core/address/LocalHost;)Lio/matthewnelson/kmp/tor/runtime/core/address/Port$Ephemeral;
 	public static final fun isAvailableAsync (Lio/matthewnelson/kmp/tor/runtime/core/address/Port;Lio/matthewnelson/kmp/tor/runtime/core/address/LocalHost;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public static final fun isAvailableSync (Lio/matthewnelson/kmp/tor/runtime/core/address/Port;Lio/matthewnelson/kmp/tor/runtime/core/address/LocalHost;)Z
 }

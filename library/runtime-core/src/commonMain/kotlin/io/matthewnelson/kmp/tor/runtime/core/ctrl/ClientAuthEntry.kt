@@ -23,6 +23,8 @@ import kotlin.jvm.JvmStatic
 
 /**
  * Holder for results from [TorCmd.OnionClientAuth.View]
+ *
+ * @see [of]
  * */
 public class ClientAuthEntry private constructor(
     @JvmField

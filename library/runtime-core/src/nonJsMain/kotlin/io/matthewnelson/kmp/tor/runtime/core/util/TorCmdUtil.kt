@@ -18,6 +18,7 @@
 package io.matthewnelson.kmp.tor.runtime.core.util
 
 import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
+import io.matthewnelson.kmp.tor.runtime.core.OnFailure
 import io.matthewnelson.kmp.tor.runtime.core.ctrl.TorCmd
 import kotlin.coroutines.cancellation.CancellationException
 import kotlin.jvm.JvmName
@@ -29,6 +30,7 @@ import kotlin.jvm.JvmOverloads
  *
  * @see [TorCmd.Privileged.Processor]
  * @see [executeSync]
+ * @throws [Throwable] when underlying [OnFailure] callback is invoked.
  * */
 @Throws(Throwable::class)
 public actual suspend fun <Success: Any> TorCmd.Privileged.Processor.executeAsync(
@@ -45,6 +47,7 @@ public actual suspend fun <Success: Any> TorCmd.Privileged.Processor.executeAsyn
  *
  * @see [TorCmd.Unprivileged.Processor]
  * @see [executeSync]
+ * @throws [Throwable] when underlying [OnFailure] callback is invoked.
  * */
 @Throws(Throwable::class)
 public actual suspend fun <Success: Any> TorCmd.Unprivileged.Processor.executeAsync(
@@ -68,6 +71,7 @@ public actual suspend fun <Success: Any> TorCmd.Unprivileged.Processor.executeAs
  *   after every thread sleep (so, multiple times) in order
  *   to trigger job cancellation if a non-null exception
  *   value is returned.
+ * @throws [Throwable] when underlying [OnFailure] callback is invoked.
  * */
 @JvmOverloads
 @Throws(Throwable::class)
@@ -93,6 +97,7 @@ public fun <Success: Any> TorCmd.Privileged.Processor.executeSync(
  *   after every thread sleep (so, multiple times) in order
  *   to trigger job cancellation if a non-null exception
  *   value is returned.
+ * @throws [Throwable] when underlying [OnFailure] callback is invoked.
  * */
 @JvmOverloads
 @Throws(Throwable::class)

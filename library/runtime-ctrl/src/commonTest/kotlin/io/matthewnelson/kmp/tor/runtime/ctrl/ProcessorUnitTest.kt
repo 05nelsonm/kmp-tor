@@ -25,7 +25,7 @@ import io.matthewnelson.kmp.tor.runtime.core.address.IPSocketAddress
 import io.matthewnelson.kmp.tor.runtime.core.ctrl.Reply
 import io.matthewnelson.kmp.tor.runtime.core.ctrl.TorCmd
 import io.matthewnelson.kmp.tor.runtime.core.util.executeAsync
-import io.matthewnelson.kmp.tor.runtime.core.util.findAvailableAsync
+import io.matthewnelson.kmp.tor.runtime.core.util.findNextAvailableAsync
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.test.runTest
@@ -62,7 +62,7 @@ class ProcessorUnitTest {
             handler = UncaughtException.Handler.THROW,
         )
         val host = LocalHost.IPv4.resolve()
-        val port = 9355.toPortEphemeral().findAvailableAsync(1_000, LocalHost.IPv4)
+        val port = 9355.toPortEphemeral().findNextAvailableAsync(1_000, LocalHost.IPv4)
         val address = IPSocketAddress(host, port)
 
         withContext(Dispatchers.Default) { delay(350.milliseconds) }
