@@ -53,9 +53,7 @@ public sealed class TorCmd<Success: Any> private constructor(
 ): EnqueuedJob.Argument {
 
     /**
-     * "AUTHENTICATE"
-     *
-     * [docs](https://spec.torproject.org/control-spec/commands.html#authenticate)
+     * [control-spec#AUTHENTICATE](https://spec.torproject.org/control-spec/commands.html#authenticate)
      * */
     public class Authenticate: Privileged<Reply.Success.OK> {
 
@@ -75,32 +73,24 @@ public sealed class TorCmd<Success: Any> private constructor(
     }
 
 //    /**
-//     * "AUTHCHALLENGE"
-//     *
-//     * [docs](https://spec.torproject.org/control-spec/commands.html#authchallenge)
+//     * [control-spec#AUTHCHALLENGE](https://spec.torproject.org/control-spec/commands.html#authchallenge)
 //     * */
 //    public class ChallengeAuth: Privileged<Reply.Success.OK>("AUTHCHALLENGE")
 
 //    public data object Circuit {
 //
 //        /**
-//         * "CLOSECIRCUIT"
-//         *
-//         * [docs](https://spec.torproject.org/control-spec/commands.html#closecircuit)
+//         * [control-spec#CLOSECIRCUIT](https://spec.torproject.org/control-spec/commands.html#closecircuit)
 //         * */
 //        public class Close: Unprivileged<Reply.Success.OK>("CLOSECIRCUIT")
 //
 //        /**
-//         * "EXTENDCIRCUIT"
-//         *
-//         * [docs](https://spec.torproject.org/control-spec/commands.html#extendcircuit)
+//         * [control-spec#EXTENDCIRCUIT](https://spec.torproject.org/control-spec/commands.html#extendcircuit)
 //         * */
 //        public class Extend: Unprivileged<String>("EXTENDCIRCUIT")
 //
 //        /**
-//         * "SETCIRCUITPURPOSE"
-//         *
-//         * [docs](https://spec.torproject.org/control-spec/commands.html#setcircuitpurpose)
+//         * [control-spec#SETCIRCUITPURPOSE](https://spec.torproject.org/control-spec/commands.html#setcircuitpurpose)
 //         * */
 //        public class SetPurpose: Unprivileged<Reply.Success.OK>("SETCIRCUITPURPOSE")
 //    }
@@ -108,9 +98,7 @@ public sealed class TorCmd<Success: Any> private constructor(
     public data object Config {
 
         /**
-         * "GETCONF"
-         *
-         * [docs](https://spec.torproject.org/control-spec/commands.html#getconf)
+         * [control-spec#GETCONF](https://spec.torproject.org/control-spec/commands.html#getconf)
          * */
         public class Get: Unprivileged<List<ConfigEntry>> {
 
@@ -125,9 +113,7 @@ public sealed class TorCmd<Success: Any> private constructor(
         }
 
         /**
-         * "+LOADCONF"
-         *
-         * [docs](https://spec.torproject.org/control-spec/commands.html#loadconf)
+         * [control-spec#LOADCONF](https://spec.torproject.org/control-spec/commands.html#loadconf)
          * */
         public class Load(
             @JvmField
@@ -135,9 +121,7 @@ public sealed class TorCmd<Success: Any> private constructor(
         ): Privileged<Reply.Success.OK>("LOADCONF")
 
         /**
-         * "RESETCONF"
-         *
-         * [docs](https://spec.torproject.org/control-spec/commands.html#resetconf)
+         * [control-spec#RESETCONF](https://spec.torproject.org/control-spec/commands.html#resetconf)
          * */
         public class Reset: Unprivileged<Reply.Success.OK> {
 
@@ -152,9 +136,7 @@ public sealed class TorCmd<Success: Any> private constructor(
         }
 
         /**
-         * "SAVECONF"
-         *
-         * [docs](https://spec.torproject.org/control-spec/commands.html#saveconf)
+         * [control-spec#SAVECONF](https://spec.torproject.org/control-spec/commands.html#saveconf)
          * */
         public class Save: Privileged<Reply.Success.OK> {
 
@@ -169,9 +151,7 @@ public sealed class TorCmd<Success: Any> private constructor(
         }
 
         /**
-         * "SETCONF"
-         *
-         * [docs](https://spec.torproject.org/control-spec/commands.html#setconf)
+         * [control-spec#SETCONF](https://spec.torproject.org/control-spec/commands.html#setconf)
          * */
         public class Set: Unprivileged<Reply.Success.OK> {
 
@@ -188,18 +168,14 @@ public sealed class TorCmd<Success: Any> private constructor(
     }
 
     /**
-     * "DROPGUARDS"
-     *
-     * [docs](https://spec.torproject.org/control-spec/commands.html#dropguards)
+     * [control-spec#DROPGUARDS](https://spec.torproject.org/control-spec/commands.html#dropguards)
      * */
     public data object DropGuards: Unprivileged<Reply.Success.OK>("DROPGUARDS")
 
     public data object Hs {
 
         /**
-         * "HSFETCH"
-         *
-         * [docs](https://spec.torproject.org/control-spec/commands.html#hsfetch)
+         * [control-spec#HSFETCH](https://spec.torproject.org/control-spec/commands.html#hsfetch)
          * */
         public class Fetch: Unprivileged<Reply.Success.OK> {
 
@@ -251,9 +227,7 @@ public sealed class TorCmd<Success: Any> private constructor(
         }
 
 //        /**
-//         * "+HSPOST"
-//         *
-//         * [docs](https://spec.torproject.org/control-spec/commands.html#hspost)
+//         * [control-spec#HSPOST](https://spec.torproject.org/control-spec/commands.html#hspost)
 //         * */
 //        public class Post: Unprivileged<Reply.Success.OK>("HSPOST")
     }
@@ -261,9 +235,7 @@ public sealed class TorCmd<Success: Any> private constructor(
     public data object Info {
 
         /**
-         * "GETINFO"
-         *
-         * [docs](https://spec.torproject.org/control-spec/commands.html#getinfo)
+         * [control-spec#GETINFO](https://spec.torproject.org/control-spec/commands.html#getinfo)
          * */
         public class Get: Unprivileged<Map<String, String>> {
 
@@ -278,17 +250,13 @@ public sealed class TorCmd<Success: Any> private constructor(
         }
 
 //        /**
-//         * "PROTOCOLINFO"
-//         *
-//         * [docs](https://spec.torproject.org/control-spec/commands.html#protocolinfo)
+//         * [control-spec#PROTOCOLINFO](https://spec.torproject.org/control-spec/commands.html#protocolinfo)
 //         * */
 //        public class Protocol: Privileged<Map<String, String>>("PROTOCOLINFO")
     }
 
     /**
-     * "MAPADDRESS"
-     *
-     * [docs](https://spec.torproject.org/control-spec/commands.html#mapaddress)
+     * [control-spec#MAPADDRESS](https://spec.torproject.org/control-spec/commands.html#mapaddress)
      * */
     public class MapAddress: Unprivileged<Set<AddressMapping.Result>> {
 
@@ -305,9 +273,7 @@ public sealed class TorCmd<Success: Any> private constructor(
     public data object Onion {
 
         /**
-         * "ADD_ONION"
-         *
-         * [docs](https://spec.torproject.org/control-spec/commands.html#add_onion)
+         * [control-spec#ADD_ONION](https://spec.torproject.org/control-spec/commands.html#add_onion)
          * */
         public class Add: Unprivileged<HiddenServiceEntry> {
 
@@ -328,12 +294,20 @@ public sealed class TorCmd<Success: Any> private constructor(
 
             /**
              * Creates an [Onion.Add] command that will instruct tor
-             * to create a new HiddenService of type [keyType].
+             * to create a new Hidden Service of type [keyType].
+             *
+             * **NOTE:** The resulting [HiddenServiceEntry.privateKey]
+             * should be destroyed when done with it. The option
+             * [OnionAddBuilder.destroyKeyOnJobCompletion] does nothing
+             * for this option.
              *
              * e.g.
              *
              *     TorCmd.Onion.Add(ED25519_V3) {
-             *         port { virtual = 80.toPort() }
+             *         port {
+             *             virtual = 80.toPort()
+             *             targetAsPort { target = 8080.toPort() }
+             *         }
              *     }
              *
              * @see [OnionAddBuilder]
@@ -342,18 +316,26 @@ public sealed class TorCmd<Success: Any> private constructor(
             public constructor(
                 keyType: KeyType.Address<*, *>,
                 block: ThisBlock<OnionAddBuilder>,
-            ): this(null, keyType.configure(block))
+            ): this(null, keyType.configure(isExisting = false, block))
 
             /**
              * Creates an [Onion.Add] command that will instruct tor
-             * to add a HiddenService to its runtime for the provided
-             * [addressKey].
+             * to add a Hidden Service to its runtime for the provided
+             * [AddressKey.Private].
+             *
+             * **NOTE:** [OnionAddBuilder], for this option, is instantiated
+             * with the [OnionAddBuilder.FlagBuilder.DiscardPK] enabled in
+             * order to reduce exposure of private key material. If this is
+             * undesirable, you must explicitly set the flag to `false` for
+             * it to be removed.
              *
              * e.g.
              *
              *     TorCmd.Onion.Add("[Blob Redacted]".toED25519_V3PrivateKey()) {
-             *         port { virtual = 80.toPort() }
-             *         flags { DiscardPK = true }
+             *         port {
+             *             virtual = 80.toPort()
+             *             targetAsPort { target = 8080.toPort() }
+             *         }
              *     }
              *
              * @see [OnionAddBuilder]
@@ -362,7 +344,7 @@ public sealed class TorCmd<Success: Any> private constructor(
             public constructor(
                 addressKey: AddressKey.Private,
                 block: ThisBlock<OnionAddBuilder>,
-            ): this(addressKey, addressKey.type().configure(block))
+            ): this(addressKey, addressKey.type().configure(isExisting = true, block))
 
             private constructor(
                 addressKey: AddressKey.Private?,
@@ -383,9 +365,7 @@ public sealed class TorCmd<Success: Any> private constructor(
         }
 
         /**
-         * "DEL_ONION"
-         *
-         * [docs](https://spec.torproject.org/control-spec/commands.html#del_onion)
+         * [control-spec#DEL_ONION](https://spec.torproject.org/control-spec/commands.html#del_onion)
          * */
         public class Delete: Unprivileged<Reply.Success> {
 
@@ -402,9 +382,7 @@ public sealed class TorCmd<Success: Any> private constructor(
     public data object OnionClientAuth {
 
         /**
-         * "ONION_CLIENT_AUTH_ADD"
-         *
-         * [docs](https://spec.torproject.org/control-spec/commands.html#onion_client_auth_add)
+         * [control-spec#ONION_CLIENT_AUTH_ADD](https://spec.torproject.org/control-spec/commands.html#onion_client_auth_add)
          * */
         public class Add: Unprivileged<Reply.Success> {
 
@@ -444,9 +422,7 @@ public sealed class TorCmd<Success: Any> private constructor(
         }
 
         /**
-         * "ONION_CLIENT_AUTH_REMOVE"
-         *
-         * [docs](https://spec.torproject.org/control-spec/commands.html#onion_client_auth_remove)
+         * [control-spec#ONION_CLIENT_AUTH_REMOVE](https://spec.torproject.org/control-spec/commands.html#onion_client_auth_remove)
          * */
         public class Remove: Unprivileged<Reply.Success> {
 
@@ -461,9 +437,7 @@ public sealed class TorCmd<Success: Any> private constructor(
         }
 
         /**
-         * "ONION_CLIENT_AUTH_VIEW"
-         *
-         * [docs](https://spec.torproject.org/control-spec/commands.html#onion_client_auth_view)
+         * [control-spec#ONION_CLIENT_AUTH_VIEW](https://spec.torproject.org/control-spec/commands.html#onion_client_auth_view)
          *
          * @see [View.ALL]
          * */
@@ -494,31 +468,23 @@ public sealed class TorCmd<Success: Any> private constructor(
     public data object Ownership {
 
         /**
-         * "DROPOWNERSHIP"
-         *
-         * [docs](https://spec.torproject.org/control-spec/commands.html#dropownership)
+         * [control-spec#DROPOWNERSHIP](https://spec.torproject.org/control-spec/commands.html#dropownership)
          * */
         public data object Drop: Privileged<Reply.Success.OK>("DROPOWNERSHIP")
 
         /**
-         * "TAKEOWNERSHIP"
-         *
-         * [docs](https://spec.torproject.org/control-spec/commands.html#takeownership)
+         * [control-spec#TAKEOWNERSHIP](https://spec.torproject.org/control-spec/commands.html#takeownership)
          * */
         public data object Take: Privileged<Reply.Success.OK>("TAKEOWNERSHIP")
     }
 
 //    /**
-//     * "+POSTDESCRIPTOR"
-//     *
-//     * [docs](https://spec.torproject.org/control-spec/commands.html#postdescriptor)
+//     * [control-spec#POSTDESCRIPTOR](https://spec.torproject.org/control-spec/commands.html#postdescriptor)
 //     * */
 //    public class PostDescriptor: Unprivileged<String>("POSTDESCRIPTOR")
 
     /**
-     * "RESOLVE"
-     *
-     * [docs](https://spec.torproject.org/control-spec/commands.html#resolve)
+     * [control-spec#RESOLVE](https://spec.torproject.org/control-spec/commands.html#resolve)
      * */
     public class Resolve: Unprivileged<Reply.Success.OK> {
 
@@ -535,9 +501,7 @@ public sealed class TorCmd<Success: Any> private constructor(
     }
 
     /**
-     * "SETEVENTS"
-     *
-     * [docs](https://spec.torproject.org/control-spec/commands.html#setevents)
+     * [control-spec#SETEVENTS](https://spec.torproject.org/control-spec/commands.html#setevents)
      * */
     public class SetEvents: Unprivileged<Reply.Success.OK> {
 
@@ -553,9 +517,7 @@ public sealed class TorCmd<Success: Any> private constructor(
     }
 
     /**
-     * "SIGNAL"
-     *
-     * [docs](https://spec.torproject.org/control-spec/commands.html#signal)
+     * [control-spec#SIGNAL](https://spec.torproject.org/control-spec/commands.html#signal)
      * */
     public data object Signal {
 
@@ -580,31 +542,23 @@ public sealed class TorCmd<Success: Any> private constructor(
 //    public data object Stream {
 //
 //        /**
-//         * "ATTACHSTREAM"
-//         *
-//         * [ATTACHSTREAM](https://spec.torproject.org/control-spec/commands.html#attachstream)
+//         * [control-spec#ATTACHSTREAM](https://spec.torproject.org/control-spec/commands.html#attachstream)
 //         * */
 //        public class Attach: Unprivileged<Reply.Success.OK>("ATTACHSTREAM")
 //
 //        /**
-//         * "CLOSESTREAM"
-//         *
-//         * [CLOSESTREAM](https://spec.torproject.org/control-spec/commands.html#closestream)
+//         * [control-spec#CLOSESTREAM](https://spec.torproject.org/control-spec/commands.html#closestream)
 //         * */
 //        public class Close: Unprivileged<Reply.Success.OK>("CLOSESTREAM")
 //
 //        /**
-//         * "REDIRECTSTREAM"
-//         *
-//         * [REDIRECTSTREAM](https://spec.torproject.org/control-spec/commands.html#redirectstream)
+//         * [control-spec#REDIRECTSTREAM](https://spec.torproject.org/control-spec/commands.html#redirectstream)
 //         * */
 //        public class Redirect: Unprivileged<Reply.Success.OK>("REDIRECTSTREAM")
 //    }
 
 //    /**
-//     * "USEFEATURE"
-//     *
-//     * [USEFEATURE](https://spec.torproject.org/control-spec/commands.html#usefeature)
+//     * [control-spec#USEFEATURE](https://spec.torproject.org/control-spec/commands.html#usefeature)
 //     * */
 //    public class UseFeature: Unprivileged<Reply.Success.OK>("USEFEATURE")
 

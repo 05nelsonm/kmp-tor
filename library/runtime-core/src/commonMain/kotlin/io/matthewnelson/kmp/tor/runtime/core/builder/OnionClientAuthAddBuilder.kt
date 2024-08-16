@@ -28,6 +28,9 @@ import io.matthewnelson.kmp.tor.runtime.core.key.AuthKey
 import kotlin.jvm.JvmField
 import kotlin.jvm.JvmSynthetic
 
+/**
+ * Helper for configuring [TorCmd.OnionClientAuth.Add] options.
+ * */
 @KmpTorDsl
 public class OnionClientAuthAddBuilder private constructor() {
 
@@ -46,7 +49,7 @@ public class OnionClientAuthAddBuilder private constructor() {
      * once the job completes, either successfully or by
      * cancellation/error.
      *
-     * Default = `true`
+     * Default: `true`
      * */
     @JvmField
     public var destroyKeyOnJobCompletion: Boolean = true
@@ -70,7 +73,7 @@ public class OnionClientAuthAddBuilder private constructor() {
     public class FlagBuilder private constructor() {
 
         /**
-         * Declaring `true` requires that [TorConfig.ClientOnionAuthDir]
+         * Setting to `true` requires that [TorConfig.ClientOnionAuthDir]
          * be defined, otherwise tor will reject the request.
          * */
         @JvmField
@@ -101,7 +104,7 @@ public class OnionClientAuthAddBuilder private constructor() {
         ): Arguments {
             val b = OnionClientAuthAddBuilder().apply(block)
 
-            return Arguments(
+            return Arguments.of(
                 clientName = b.clientName,
                 destroyKeyOnJobCompletion = b.destroyKeyOnJobCompletion,
                 flags = b.flags,
@@ -109,7 +112,7 @@ public class OnionClientAuthAddBuilder private constructor() {
         }
     }
 
-    internal class Arguments internal constructor(
+    internal class Arguments private constructor(
         internal val clientName: String?,
         internal val destroyKeyOnJobCompletion: Boolean,
         flags: Set<String>,
@@ -120,6 +123,27 @@ public class OnionClientAuthAddBuilder private constructor() {
         internal companion object {
 
             internal val DEFAULT = Arguments(null, true, emptySet())
+
+            @JvmSynthetic
+            internal fun of(
+                clientName: String?,
+                destroyKeyOnJobCompletion: Boolean,
+                flags: Set<String>,
+            ): Arguments {
+                if (
+                    clientName == DEFAULT.clientName
+                    && destroyKeyOnJobCompletion == DEFAULT.destroyKeyOnJobCompletion
+                    && flags == DEFAULT.flags
+                ) {
+                    return DEFAULT
+                }
+
+                return Arguments(
+                    clientName,
+                    destroyKeyOnJobCompletion,
+                    flags,
+                )
+            }
         }
     }
 }

@@ -31,7 +31,7 @@ import kotlin.jvm.JvmSynthetic
  * - `true`  - add the flag if not present
  * - `false` - remove the flag if present
  *
- * [OtherSocksPortFlags](https://2019.www.torproject.org/docs/tor-manual.html.en#OtherSocksPortFlags)
+ * [tor-man#OtherSocksPortFlags](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#OtherSocksPortFlags)
  * */
 @KmpTorDsl
 public class SocksFlagBuilder private constructor() {

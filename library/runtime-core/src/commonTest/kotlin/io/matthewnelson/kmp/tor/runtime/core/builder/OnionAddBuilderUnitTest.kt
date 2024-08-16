@@ -16,10 +16,15 @@
 package io.matthewnelson.kmp.tor.runtime.core.builder
 
 import io.matthewnelson.kmp.tor.runtime.core.builder.OnionAddBuilder.FlagBuilder
+import io.matthewnelson.kmp.tor.runtime.core.ctrl.TorCmd
+import io.matthewnelson.kmp.tor.runtime.core.key.ED25519_V3
+import io.matthewnelson.kmp.tor.runtime.core.key.ED25519_V3.PrivateKey.Companion.toED25519_V3PrivateKey
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFalse
+import kotlin.test.assertTrue
 
-class OnionAddFlagBuilderUnitTest {
+class OnionAddBuilderUnitTest {
 
     @Test
     fun givenFlags_whenFalse_thenAreRemoved() {
@@ -47,5 +52,17 @@ class OnionAddFlagBuilderUnitTest {
         }
 
         assertEquals(i, allFlags.size)
+    }
+
+    @Test
+    fun givenAddExisting_whenCmdCreated_thenFlagDiscardPKIsPresentByDefault() {
+        val cmd = TorCmd.Onion.Add(ByteArray(64).toED25519_V3PrivateKey()) {}
+        assertTrue(cmd.flags.contains("DiscardPK"))
+    }
+
+    @Test
+    fun givenCreateNew_whenCmdCreated_thenFlagDiscardPKIsNotPresentByDefault() {
+        val cmd = TorCmd.Onion.Add(ED25519_V3) {}
+        assertFalse(cmd.flags.contains("DiscardPK"))
     }
 }
