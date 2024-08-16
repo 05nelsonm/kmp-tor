@@ -19,6 +19,7 @@ import io.matthewnelson.kmp.tor.runtime.core.OnFailure
 import io.matthewnelson.kmp.tor.runtime.core.OnSuccess
 import io.matthewnelson.kmp.tor.runtime.core.TorEvent
 import io.matthewnelson.kmp.tor.runtime.core.UncaughtException
+import io.matthewnelson.kmp.tor.runtime.core.address.Port
 import io.matthewnelson.kmp.tor.runtime.core.address.Port.Companion.toPort
 import io.matthewnelson.kmp.tor.runtime.core.ctrl.TorCmd
 import io.matthewnelson.kmp.tor.runtime.core.key.ED25519_V3
@@ -117,7 +118,7 @@ class TorCmdInterceptorUnitTest {
                 is TorCmd.Onion.Add -> TorCmd.Onion.Add(
                     ByteArray(64) { it.toByte() }.toED25519_V3PrivateKey()
                 ) {
-                    port { virtual = 80.toPort() }
+                    port { virtual = Port.HTTP }
                 }.also { invocationOnionAdd = true }
 
                 is TorCmd.Onion.Delete -> TorCmd.Onion.Delete(

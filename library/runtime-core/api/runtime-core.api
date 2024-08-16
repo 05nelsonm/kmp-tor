@@ -3372,6 +3372,14 @@ public final class io/matthewnelson/kmp/tor/runtime/core/address/Port$Ephemeral$
 	public final fun getOrNull (Ljava/lang/String;)Lio/matthewnelson/kmp/tor/runtime/core/address/Port$Ephemeral;
 }
 
+public final class io/matthewnelson/kmp/tor/runtime/core/address/Port$HTTP : io/matthewnelson/kmp/tor/runtime/core/address/Port {
+	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/core/address/Port$HTTP;
+}
+
+public final class io/matthewnelson/kmp/tor/runtime/core/address/Port$HTTPS : io/matthewnelson/kmp/tor/runtime/core/address/Port {
+	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/core/address/Port$HTTPS;
+}
+
 public final class io/matthewnelson/kmp/tor/runtime/core/builder/IsolationFlagBuilder {
 	public field IsolateClientAddr Ljava/lang/Boolean;
 	public field IsolateClientProtocol Ljava/lang/Boolean;

@@ -21,6 +21,7 @@ import io.matthewnelson.kmp.file.toFile
 import io.matthewnelson.kmp.tor.runtime.core.address.Port.Companion.toPort
 import io.matthewnelson.kmp.tor.runtime.core.TorConfig.Setting.Companion.filterByAttribute
 import io.matthewnelson.kmp.tor.runtime.core.TorConfig.Setting.Companion.filterByKeyword
+import io.matthewnelson.kmp.tor.runtime.core.address.Port
 import io.matthewnelson.kmp.tor.runtime.core.internal.UnixSocketsNotSupportedMessage
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -55,13 +56,13 @@ class KeywordUnitTest {
             directory = dir
 
             port {
-                virtual = 80.toPort()
+                virtual = Port.HTTP
                 targetAsUnixSocket {
                     file = dir.resolve("hs.sock")
                 }
             }
             port {
-                virtual = 80.toPort()
+                virtual = Port.HTTP
                 targetAsPort {
                     target = 8080.toPort()
                 }

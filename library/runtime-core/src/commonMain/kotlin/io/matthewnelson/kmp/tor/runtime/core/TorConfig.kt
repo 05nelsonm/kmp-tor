@@ -1389,7 +1389,7 @@ public class TorConfig private constructor(
      *
      *     val setting = HiddenServiceDir.Builder {
      *         directory = "/some/path".toFile()
-     *         port { virtual = 80.toPort() }
+     *         port { virtual = Port.HTTP }
      *         version { HSv(3) }
      *     }
      *

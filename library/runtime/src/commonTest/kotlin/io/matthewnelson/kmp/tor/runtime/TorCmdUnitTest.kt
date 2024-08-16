@@ -29,6 +29,7 @@ import io.matthewnelson.kmp.tor.runtime.core.address.IPAddress
 import io.matthewnelson.kmp.tor.runtime.core.address.IPAddress.V4.Companion.toIPAddressV4OrNull
 import io.matthewnelson.kmp.tor.runtime.core.address.IPAddress.V6.Companion.toIPAddressV6OrNull
 import io.matthewnelson.kmp.tor.runtime.core.address.OnionAddress
+import io.matthewnelson.kmp.tor.runtime.core.address.Port
 import io.matthewnelson.kmp.tor.runtime.core.address.Port.Companion.toPort
 import io.matthewnelson.kmp.tor.runtime.core.builder.OnionClientAuthAddBuilder
 import io.matthewnelson.kmp.tor.runtime.core.ctrl.AddressMapping.Companion.mappingToAnyHost
@@ -179,7 +180,7 @@ class TorCmdUnitTest {
 
         val entry1 = runtime.executeAsync(TorCmd.Onion.Add(ED25519_V3) {
             port {
-                virtual = 80.toPort()
+                virtual = Port.HTTP
 
                 try {
                     targetAsUnixSocket {
@@ -188,7 +189,7 @@ class TorCmdUnitTest {
                     }
                 } catch (_: UnsupportedOperationException) {}
             }
-            port { virtual = 443.toPort() }
+            port { virtual = Port.HTTPS }
         })
 
         // DiscardPK not expressed
@@ -226,7 +227,7 @@ class TorCmdUnitTest {
             for (keys in authKeys) {
                 clientAuth(keys.first)
             }
-            port { virtual = 80.toPort() }
+            port { virtual = Port.HTTP }
             flags { DiscardPK = true }
         })
 
@@ -336,7 +337,7 @@ class TorCmdUnitTest {
 
         val entries = mutableListOf<HiddenServiceEntry>().let { list ->
             val cmd = TorCmd.Onion.Add(ED25519_V3) {
-                port { virtual = 80.toPort() }
+                port { virtual = Port.HTTP }
                 flags { DiscardPK = true }
             }
 

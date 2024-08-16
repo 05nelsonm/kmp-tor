@@ -19,6 +19,7 @@ import io.matthewnelson.kmp.file.absoluteFile
 import io.matthewnelson.kmp.file.resolve
 import io.matthewnelson.kmp.file.toFile
 import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
+import io.matthewnelson.kmp.tor.runtime.core.address.Port
 import io.matthewnelson.kmp.tor.runtime.core.address.Port.Companion.toPort
 import io.matthewnelson.kmp.tor.runtime.core.address.Port.Ephemeral.Companion.toPortEphemeral
 import kotlin.test.*
@@ -131,8 +132,8 @@ class SettingUnitTest {
         val dir = ".".toFile()
         val a = TorConfig.HiddenServiceDir.Builder {
             directory = dir
-            port { virtual = 80.toPort() }
-            port { virtual = 443.toPort() }
+            port { virtual = Port.HTTP }
+            port { virtual = Port.HTTPS }
             version { HSv(3) }
         }!!
         val b = TorConfig.HiddenServiceDir.Builder {
@@ -152,7 +153,7 @@ class SettingUnitTest {
     fun givenEqualsHash_whenHiddenServiceDifferentDirectory_thenAreDifferent() {
         val a = TorConfig.HiddenServiceDir.Builder {
             directory = ".".toFile()
-            port { virtual = 80.toPort() }
+            port { virtual = Port.HTTP }
             port { virtual = 443.toPort() }
             version { HSv(3) }
         }!!

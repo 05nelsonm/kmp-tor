@@ -81,4 +81,16 @@ class PortUnitTest {
         assertIs<Port.Ephemeral>(1024.toPort())
         assertIs<Port.Ephemeral>("http://something.com:1025/path".toPort())
     }
+
+    @Test
+    fun givenToPort_whenIs80_thenReturnsInstanceHTTP() {
+        assertIs<Port.HTTP>(80.toPort())
+        assertIs<Port.HTTP>("http://something.com:80/path".toPort())
+    }
+
+    @Test
+    fun givenToPort_whenIs443_thenReturnsInstanceHTTPS() {
+        assertIs<Port.HTTPS>(443.toPort())
+        assertIs<Port.HTTPS>("https://something.com:443/path".toPort())
+    }
 }
