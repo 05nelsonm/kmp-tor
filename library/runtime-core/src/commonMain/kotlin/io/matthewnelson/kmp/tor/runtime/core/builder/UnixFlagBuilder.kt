@@ -29,14 +29,16 @@ import kotlin.jvm.JvmSynthetic
  * Configure flags specific to [TorConfig.__ControlPort] and
  * [TorConfig.__SocksPort] when they are set up as Unix Sockets.
  *
- * Flags can be configured no matter if the port is configured as
- * a TCP Port, or a Unix Socket. They will only be added to the
- * [TorConfig.Setting] if the final builder result is that of a
- * Unix Socket.
+ * Flags can be configured no matter if the current configuration
+ * is a TCP Port or not. They will only be added to the [TorConfig.Setting]
+ * if the final builder result is that of a Unix Socket.
  *
  * - `null`  - no action (default)
  * - `true`  - add the flag if not present
  * - `false` - remove the flag if present
+ *
+ * [tor-man#ControlPort](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#ControlPort)
+ * [tor-man#OtherSocksPortFlags](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#OtherSocksPortFlags)
  * */
 @KmpTorDsl
 public class UnixFlagBuilder private constructor() {
@@ -48,7 +50,8 @@ public class UnixFlagBuilder private constructor() {
     public var WorldWritable: Boolean? = null
 
     /**
-     * Only applicable for [TorConfig.__ControlPort]
+     * Only applicable for [TorConfig.__ControlPort], otherwise
+     * is ignored if configured.
      * */
     @JvmField
     public var RelaxDirModeCheck: Boolean? = null
@@ -80,11 +83,15 @@ public class UnixFlagBuilder private constructor() {
         }
     }
 
+    /**
+     * Not meant for public use.
+     * */
     @InternalKmpTorApi
     public interface DSL<out R: Any> {
 
         /**
-         * For [TorConfig.__ControlPort] and [TorConfig.__SocksPort].
+         * Flag configuration for a [TorConfig.Keyword] that
+         * has been assigned a Unix Socket path.
          * */
         @KmpTorDsl
         public fun unixFlags(

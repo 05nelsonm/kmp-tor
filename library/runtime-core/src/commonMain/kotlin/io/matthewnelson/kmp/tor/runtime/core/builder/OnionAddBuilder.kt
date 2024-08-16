@@ -44,7 +44,7 @@ import kotlin.jvm.JvmSynthetic
  *
  * e.g.
  *
- *     // Create new V3 HiddenService (tor will generate keys)
+ *     // Create new V3 Hidden Service (tor will generate keys)
  *     val entry = runtime.executeAsync(TorCmd.Onion.Add(ED25519_V3) {
  *         port {
  *             virtual = 80.toPort()
@@ -67,22 +67,27 @@ import kotlin.jvm.JvmSynthetic
  *         maxStreams { maximum = 25 }
  *     })
  *
- *     // Remove the HiddenService
+ *     // Remove the Hidden Service
  *     runtime.executeAsync(TorCmd.Onion.Delete(entry.publicKey))
  *
- *     // Re-add the HiddenService
+ *     // Re-add the Hidden Service
  *     //
- *     // entry.privateKey will not be null because `DiscardPK`
+ *     // entry.privateKey will not be `null` because `DiscardPK`
  *     // flag was not defined when created above.
- *     runtime.executeAsync(TorCmd.Onion.Add(entry.privateKey!!) {
+ *     val newEntry = runtime.executeAsync(TorCmd.Onion.Add(entry.privateKey!!) {
  *         port {
  *             virtual = 80.toPort()
  *             targetAsPort { target = 8080.toPort() }
  *         }
- *         flags {
- *             DiscardPK = true
- *         }
  *     })
+ *
+ *     // destroyKeyOnJobCompletion was true (the default) and cleaned
+ *     // up private key material automatically for re-adding.
+ *     assertTrue(entry.privateKey!!.isDestroyed())
+ *
+ *     // The `DiscardPK` flag was automatically set for adding existing
+ *     // Hidden Service, so tor did not return a private key.
+ *     assertNull(newEntry.privateKey)
  *
  * @see [TorCmd.Onion.Add]
  * @see [HiddenServiceEntry]
@@ -103,11 +108,11 @@ public class OnionAddBuilder private constructor(private val keyType: KeyType.Ad
      * once the job completes, either successfully or by
      * cancellation/error.
      *
-     * Default = `true`
-     *
      * This setting has no effect if [TorCmd.Onion.Add] is being
-     * instantiated using [KeyType.Address] for new HiddenService
+     * instantiated using [KeyType.Address] for new Hidden Service
      * creation, as there will be no [AddressKey.Private] present.
+     *
+     * Default: `true`
      * */
     @JvmField
     public var destroyKeyOnJobCompletion: Boolean = true
@@ -199,9 +204,16 @@ public class OnionAddBuilder private constructor(private val keyType: KeyType.Ad
 
         @JvmSynthetic
         internal fun KeyType.Address<*, *>.configure(
+            isExisting: Boolean,
             block: ThisBlock<OnionAddBuilder>,
         ): Arguments {
-            val b = OnionAddBuilder(this).apply(block)
+            val b = OnionAddBuilder(this)
+
+            if (isExisting) {
+                b.flags { DiscardPK = true }
+            }
+
+            b.apply(block)
 
             return Arguments(
                 clientAuth = b.clientAuth,

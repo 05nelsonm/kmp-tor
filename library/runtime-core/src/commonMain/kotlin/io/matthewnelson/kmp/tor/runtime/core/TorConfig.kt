@@ -308,9 +308,9 @@ public class TorConfig private constructor(
      * depends on the control port the default [argument] used is "auto" and it cannot
      * be set to disabled (0).
      *
-     * [ControlPort](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#ControlPort)
+     * [tor-man#ControlPort](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#ControlPort)
      *
-     * [Non-Persistent Options](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#non-persistent-options)
+     * [tor-man#Non-Persistent Options](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#non-persistent-options)
      * */
     @KmpTorDsl
     public class __ControlPort private constructor(): Setting.Builder(
@@ -369,9 +369,9 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [DNSPort](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#DNSPort)
+     * [tor-man#DNSPort](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#DNSPort)
      *
-     * [Non-Persistent Options](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#non-persistent-options)
+     * [tor-man#Non-Persistent Options](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#non-persistent-options)
      * */
     @KmpTorDsl
     public class __DNSPort private constructor(): Setting.Builder(
@@ -435,9 +435,9 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [HTTPTunnelPort](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#HTTPTunnelPort)
+     * [tor-man#HTTPTunnelPort](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#HTTPTunnelPort)
      *
-     * [Non-Persistent Options](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#non-persistent-options)
+     * [tor-man#Non-Persistent Options](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#non-persistent-options)
      * */
     @KmpTorDsl
     public class __HTTPTunnelPort private constructor(): Setting.Builder(
@@ -501,9 +501,9 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [SocksPort](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#SocksPort)
+     * [tor-man#SocksPort](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#SocksPort)
      *
-     * [Non-Persistent Options](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#non-persistent-options)
+     * [tor-man#Non-Persistent Options](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#non-persistent-options)
      * */
     @KmpTorDsl
     public class __SocksPort private constructor(): Setting.Builder(
@@ -588,9 +588,9 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [TransPort](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#TransPort)
+     * [tor-man#TransPort](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#TransPort)
      *
-     * [Non-Persistent Options](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#non-persistent-options)
+     * [tor-man#Non-Persistent Options](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#non-persistent-options)
      * */
     @KmpTorDsl
     public class __TransPort private constructor(): Setting.Builder(
@@ -658,9 +658,9 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [__OwningControllerProcess](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#OwningControllerProcess)
+     * [tor-man#__OwningControllerProcess](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#OwningControllerProcess)
      *
-     * [TAKEOWNERSHIP](https://spec.torproject.org/control-spec/commands.html#takeownership)
+     * [control-spec#TAKEOWNERSHIP](https://spec.torproject.org/control-spec/commands.html#takeownership)
      * */
     @KmpTorDsl
     public class __OwningControllerProcess private constructor(): Setting.Builder(
@@ -704,7 +704,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [CacheDirectory](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#CacheDirectory)
+     * [tor-man#CacheDirectory](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#CacheDirectory)
      * */
     @KmpTorDsl
     public class CacheDirectory private constructor(): Setting.Builder(
@@ -726,7 +726,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [ControlPortWriteToFile](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#ControlPortWriteToFile)
+     * [tor-man#ControlPortWriteToFile](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#ControlPortWriteToFile)
      * */
     @KmpTorDsl
     public class ControlPortWriteToFile private constructor(): Setting.Builder(
@@ -753,7 +753,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [CookieAuthentication](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#CookieAuthentication)
+     * [tor-man#CookieAuthentication](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#CookieAuthentication)
      * */
     @KmpTorDsl
     public class CookieAuthentication private constructor(): Setting.Builder(
@@ -775,7 +775,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [CookieAuthFile](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#CookieAuthFile)
+     * [tor-man#CookieAuthFile](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#CookieAuthFile)
      * */
     @KmpTorDsl
     public class CookieAuthFile private constructor(): Setting.Builder(
@@ -802,7 +802,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [DataDirectory](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#DataDirectory)
+     * [tor-man#DataDirectory](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#DataDirectory)
      * */
     @KmpTorDsl
     public class DataDirectory private constructor(): Setting.Builder(
@@ -829,7 +829,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [DisableNetwork](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#DisableNetwork)
+     * [tor-man#DisableNetwork](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#DisableNetwork)
      * */
     @KmpTorDsl
     public class DisableNetwork private constructor(): Setting.Builder(
@@ -851,7 +851,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [RunAsDaemon](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#RunAsDaemon)
+     * [tor-man#RunAsDaemon](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#RunAsDaemon)
      * */
     @KmpTorDsl
     public class RunAsDaemon private constructor(): Setting.Builder(
@@ -873,7 +873,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [SyslogIdentityTag](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#SyslogIdentityTag)
+     * [tor-man#SyslogIdentityTag](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#SyslogIdentityTag)
      * */
     @KmpTorDsl
     public class SyslogIdentityTag private constructor(): Setting.Builder(
@@ -927,7 +927,7 @@ public class TorConfig private constructor(
      * This is automatically added via [SyslogIdentityTag] as a second
      * [Setting.items] if Android Runtime is observed.
      *
-     * [AndroidIdentityTag](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#AndroidIdentityTag)
+     * [tor-man#AndroidIdentityTag](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#AndroidIdentityTag)
      * */
     public class AndroidIdentityTag private constructor() {
         public companion object: Keyword(
@@ -940,7 +940,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [AutomapHostsOnResolve](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#AutomapHostsOnResolve)
+     * [tor-man#AutomapHostsOnResolve](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#AutomapHostsOnResolve)
      * */
     @KmpTorDsl
     public class AutomapHostsOnResolve private constructor(): Setting.Builder(
@@ -962,7 +962,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [AutomapHostsSuffixes](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#AutomapHostsSuffixes)
+     * [tor-man#AutomapHostsSuffixes](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#AutomapHostsSuffixes)
      * */
     @KmpTorDsl
     public class AutomapHostsSuffixes private constructor(): Setting.Builder(
@@ -1038,7 +1038,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [ClientOnionAuthDir](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#ClientOnionAuthDir)
+     * [tor-man#ClientOnionAuthDir](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#ClientOnionAuthDir)
      * */
     @KmpTorDsl
     public class ClientOnionAuthDir private constructor(): Setting.Builder(
@@ -1065,7 +1065,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [ConnectionPadding](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#ConnectionPadding)
+     * [tor-man#ConnectionPadding](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#ConnectionPadding)
      * */
     @KmpTorDsl
     public class ConnectionPadding private constructor(): Setting.Builder(
@@ -1098,7 +1098,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [ReducedConnectionPadding](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#ReducedConnectionPadding)
+     * [tor-man#ReducedConnectionPadding](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#ReducedConnectionPadding)
      * */
     @KmpTorDsl
     public class ReducedConnectionPadding private constructor(): Setting.Builder(
@@ -1120,7 +1120,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [VirtualAddrNetworkIPv4](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#VirtualAddrNetworkIPv4)
+     * [tor-man#VirtualAddrNetworkIPv4](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#VirtualAddrNetworkIPv4)
      * */
     @KmpTorDsl
     public class VirtualAddrNetworkIPv4 private constructor(): Setting.Builder(
@@ -1155,7 +1155,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [VirtualAddrNetworkIPv6](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#VirtualAddrNetworkIPv6)
+     * [tor-man#VirtualAddrNetworkIPv6](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#VirtualAddrNetworkIPv6)
      * */
     @KmpTorDsl
     public class VirtualAddrNetworkIPv6 private constructor(): Setting.Builder(
@@ -1190,7 +1190,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [DormantCanceledByStartup](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#DormantCanceledByStartup)
+     * [tor-man#DormantCanceledByStartup](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#DormantCanceledByStartup)
      * */
     @KmpTorDsl
     public class DormantCanceledByStartup private constructor(): Setting.Builder(
@@ -1212,7 +1212,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [DormantClientTimeout](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#DormantClientTimeout)
+     * [tor-man#DormantClientTimeout](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#DormantClientTimeout)
      * */
     @KmpTorDsl
     public class DormantClientTimeout private constructor(): Setting.Builder(
@@ -1258,7 +1258,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [DormantOnFirstStartup](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#DormantOnFirstStartup)
+     * [tor-man#DormantOnFirstStartup](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#DormantOnFirstStartup)
      * */
     @KmpTorDsl
     public class DormantOnFirstStartup private constructor(): Setting.Builder(
@@ -1280,7 +1280,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [DormantTimeoutDisabledByIdleStreams](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#DormantTimeoutDisabledByIdleStreams)
+     * [tor-man#DormantTimeoutDisabledByIdleStreams](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#DormantTimeoutDisabledByIdleStreams)
      * */
     @KmpTorDsl
     public class DormantTimeoutDisabledByIdleStreams private constructor(): Setting.Builder(
@@ -1302,7 +1302,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [GeoIPExcludeUnknown](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#GeoIPExcludeUnknown)
+     * [tor-man#GeoIPExcludeUnknown](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#GeoIPExcludeUnknown)
      * */
     @KmpTorDsl
     public class GeoIPExcludeUnknown private constructor(): Setting.Builder(
@@ -1335,7 +1335,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [GeoIPFile](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#GeoIPFile)
+     * [tor-man#GeoIPFile](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#GeoIPFile)
      * */
     @KmpTorDsl
     public class GeoIPFile private constructor(): Setting.Builder(
@@ -1357,7 +1357,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [GeoIPv6File](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#GeoIPv6File)
+     * [tor-man#GeoIPv6File](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#GeoIPv6File)
      * */
     @KmpTorDsl
     public class GeoIPv6File private constructor(): Setting.Builder(
@@ -1395,7 +1395,7 @@ public class TorConfig private constructor(
      *
      *     assertNotNull(setting)
      *
-     * [HiddenServiceDir](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#HiddenServiceDir)
+     * [tor-man#HiddenServiceDir](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#HiddenServiceDir)
      * */
     @KmpTorDsl
     public class HiddenServiceDir private constructor(): Setting.Builder(
@@ -1516,7 +1516,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [HiddenServicePort](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#HiddenServicePort)
+     * [tor-man#HiddenServicePort](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#HiddenServicePort)
      * */
     @KmpTorDsl
     public class HiddenServicePort private constructor() {
@@ -1525,28 +1525,39 @@ public class TorConfig private constructor(
 
         // TODO: Check if can be 0 (Issue #419)
         /**
-         * Configures the virtual port that this HiddenServicePort
-         * declaration will listen on.
+         * Configures the "virtual" port for which the Hidden Service
+         * will be accessible at from the tor network. If no "target"
+         * is expressed (either as a port, or Unix Socket), then this
+         * value will be used for the "target" as well.
          *
          * e.g.
          *
          *     HiddenServicePort 80
-         *     // http://<onion-address>.onion
+         *     // http://{onion-address}.onion/index.html
          *
          *     HiddenServicePort 443
-         *     // https://<onion-address>.onion
+         *     // https://{onion-address}.onion/index.html
          *
          *     HiddenServicePort 8080
-         *     // http://<onion-address>.onion:8080
+         *     // http://{onion-address}.onion:8080/index.html
          * */
         @JvmField
         public var virtual: Port? = null
 
         /**
-         * Configure the target to use a TCP Port.
+         * Configures the "target" as a TCP port for which incoming http
+         * requests will be directed locally.
          *
-         * Only necessary if a value different than [virtual]
-         * is required.
+         * e.g. (Web server running locally at `127.0.0.1:8080`)
+         *
+         *     HiddenServicePort 8080 8080
+         *     // http://{onion-address}.onion:8080/index.html
+         *
+         *     HiddenServicePort 80 8080
+         *     // http://{onion-address}.onion/index.html
+         *
+         * Only necessary if a target different from [virtual] is required.
+         * If a target port is not specified, [virtual] will be used.
          * */
         @KmpTorDsl
         public fun targetAsPort(
@@ -1557,7 +1568,19 @@ public class TorConfig private constructor(
         }
 
         /**
-         * Configure the target to use a Unix Socket
+         * Configures the "target" as a Unix Socket for which incoming
+         * http requests will be directed locally.
+         *
+         * e.g. (Web server running locally at `/path/to/my/server/hs.sock`)
+         *
+         *     HiddenServicePort 8080 unix:"/path/to/my/server/hs.sock"
+         *     // http://{onion-address}.onion:8080/index.html
+         *
+         *     HiddenServicePort 80 unix:"/path/to/my/server/hs.sock"
+         *     // http://{onion-address}.onion/index.html
+         *
+         * Only necessary if a target different from [virtual] is required.
+         * If a target port is not specified, [virtual] will be used.
          *
          * @throws [UnsupportedOperationException] see [UnixSocketBuilder.DSL]
          * */
@@ -1600,7 +1623,7 @@ public class TorConfig private constructor(
      * already created hidden services. By explicitly declaring it within
      * your code, this potential issue is mitigated.
      *
-     * [HiddenServiceVersion](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#HiddenServiceVersion)
+     * [tor-man#HiddenServiceVersion](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#HiddenServiceVersion)
      * */
     @KmpTorDsl
     public class HiddenServiceVersion private constructor() {
@@ -1645,7 +1668,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [HiddenServiceAllowUnknownPorts](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#HiddenServiceAllowUnknownPorts)
+     * [tor-man#HiddenServiceAllowUnknownPorts](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#HiddenServiceAllowUnknownPorts)
      * */
     @KmpTorDsl
     public class HiddenServiceAllowUnknownPorts private constructor() {
@@ -1672,7 +1695,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [HiddenServiceMaxStreams](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#HiddenServiceMaxStreams)
+     * [tor-man#HiddenServiceMaxStreams](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#HiddenServiceMaxStreams)
      * */
     @KmpTorDsl
     public class HiddenServiceMaxStreams private constructor() {
@@ -1705,7 +1728,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [HiddenServiceMaxStreamsCloseCircuit](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#HiddenServiceMaxStreamsCloseCircuit)
+     * [tor-man#HiddenServiceMaxStreamsCloseCircuit](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#HiddenServiceMaxStreamsCloseCircuit)
      * */
     @KmpTorDsl
     public class HiddenServiceMaxStreamsCloseCircuit private constructor() {
@@ -1732,7 +1755,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [HiddenServiceDirGroupReadable](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#HiddenServiceDirGroupReadable)
+     * [tor-man#HiddenServiceDirGroupReadable](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#HiddenServiceDirGroupReadable)
      * */
     @KmpTorDsl
     public class HiddenServiceDirGroupReadable private constructor() {
@@ -1759,7 +1782,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [HiddenServiceNumIntroductionPoints](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#HiddenServiceNumIntroductionPoints)
+     * [tor-man#HiddenServiceNumIntroductionPoints](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#HiddenServiceNumIntroductionPoints)
      * */
     @KmpTorDsl
     public class HiddenServiceNumIntroductionPoints private constructor(
@@ -1818,9 +1841,9 @@ public class TorConfig private constructor(
     // (IMPLEMENTED) __ControlPort
 
     /**
-     * [DirPort](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#DirPort)
+     * [tor-man#DirPort](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#DirPort)
      *
-     * [Non-Persistent Options](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#non-persistent-options)
+     * [tor-man#Non-Persistent Options](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#non-persistent-options)
      * */
     @KmpTorDsl
     public class __DirPort private constructor(): Setting.Builder(
@@ -1838,9 +1861,9 @@ public class TorConfig private constructor(
     // (IMPLEMENTED) __DNSPort
 
     /**
-     * [ExtORPort](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#ExtORPort)
+     * [tor-man#ExtORPort](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#ExtORPort)
      *
-     * [Non-Persistent Options](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#non-persistent-options)
+     * [tor-man#Non-Persistent Options](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#non-persistent-options)
      * */
     @KmpTorDsl
     public class __ExtORPort private constructor(): Setting.Builder(
@@ -1856,9 +1879,9 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [MetricsPort](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#MetricsPort)
+     * [tor-man#MetricsPort](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#MetricsPort)
      *
-     * [Non-Persistent Options](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#non-persistent-options)
+     * [tor-man#Non-Persistent Options](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#non-persistent-options)
      * */
     @KmpTorDsl
     public class __MetricsPort private constructor(): Setting.Builder(
@@ -1874,9 +1897,9 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [NATDPort](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#NATDPort)
+     * [tor-man#NATDPort](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#NATDPort)
      *
-     * [Non-Persistent Options](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#non-persistent-options)
+     * [tor-man#Non-Persistent Options](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#non-persistent-options)
      * */
     @KmpTorDsl
     public class __NATDPort private constructor(): Setting.Builder(
@@ -1892,9 +1915,9 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [ORPort](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#ORPort)
+     * [tor-man#ORPort](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#ORPort)
      *
-     * [Non-Persistent Options](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#non-persistent-options)
+     * [tor-man#Non-Persistent Options](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#non-persistent-options)
      * */
     @KmpTorDsl
     public class __ORPort private constructor(): Setting.Builder(
@@ -2047,7 +2070,7 @@ public class TorConfig private constructor(
     ///////////////////////
 
     /**
-     * [AccelDir](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#AccelDir)
+     * [tor-man#AccelDir](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#AccelDir)
      * */
     @KmpTorDsl
     public class AccelDir private constructor(): Setting.Builder(
@@ -2063,7 +2086,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [AccelName](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#AccelName)
+     * [tor-man#AccelName](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#AccelName)
      * */
     @KmpTorDsl
     public class AccelName private constructor(): Setting.Builder(
@@ -2079,7 +2102,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [AlternateBridgeAuthority](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#AlternateBridgeAuthority)
+     * [tor-man#AlternateBridgeAuthority](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#AlternateBridgeAuthority)
      * */
     @KmpTorDsl
     public class AlternateBridgeAuthority private constructor(): Setting.Builder(
@@ -2095,7 +2118,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [AlternateDirAuthority](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#AlternateDirAuthority)
+     * [tor-man#AlternateDirAuthority](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#AlternateDirAuthority)
      * */
     @KmpTorDsl
     public class AlternateDirAuthority private constructor(): Setting.Builder(
@@ -2111,7 +2134,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [AvoidDiskWrites](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#AvoidDiskWrites)
+     * [tor-man#AvoidDiskWrites](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#AvoidDiskWrites)
      * */
     @KmpTorDsl
     public class AvoidDiskWrites private constructor(): Setting.Builder(
@@ -2127,7 +2150,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [BandwidthBurst](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#BandwidthBurst)
+     * [tor-man#BandwidthBurst](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#BandwidthBurst)
      * */
     @KmpTorDsl
     public class BandwidthBurst private constructor(): Setting.Builder(
@@ -2143,7 +2166,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [BandwidthRate](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#BandwidthRate)
+     * [tor-man#BandwidthRate](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#BandwidthRate)
      * */
     @KmpTorDsl
     public class BandwidthRate private constructor(): Setting.Builder(
@@ -2161,7 +2184,7 @@ public class TorConfig private constructor(
     // (IMPLEMENTED) CacheDirectory
 
     /**
-     * [CacheDirectoryGroupReadable](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#CacheDirectoryGroupReadable)
+     * [tor-man#CacheDirectoryGroupReadable](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#CacheDirectoryGroupReadable)
      * */
     @KmpTorDsl
     public class CacheDirectoryGroupReadable private constructor(): Setting.Builder(
@@ -2177,7 +2200,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [CircuitPriorityHalflife](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#CircuitPriorityHalflife)
+     * [tor-man#CircuitPriorityHalflife](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#CircuitPriorityHalflife)
      * */
     @KmpTorDsl
     public class CircuitPriorityHalflife private constructor(): Setting.Builder(
@@ -2193,7 +2216,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [ClientTransportPlugin](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#ClientTransportPlugin)
+     * [tor-man#ClientTransportPlugin](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#ClientTransportPlugin)
      * */
     @KmpTorDsl
     public class ClientTransportPlugin private constructor(): Setting.Builder(
@@ -2209,7 +2232,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [ConfluxEnabled](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#ConfluxEnabled)
+     * [tor-man#ConfluxEnabled](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#ConfluxEnabled)
      * */
     @KmpTorDsl
     public class ConfluxEnabled private constructor(): Setting.Builder(
@@ -2225,7 +2248,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [ConfluxClientUX](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#ConfluxClientUX)
+     * [tor-man#ConfluxClientUX](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#ConfluxClientUX)
      * */
     @KmpTorDsl
     public class ConfluxClientUX private constructor(): Setting.Builder(
@@ -2241,7 +2264,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [ConnLimit](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#ConnLimit)
+     * [tor-man#ConnLimit](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#ConnLimit)
      * */
     @KmpTorDsl
     public class ConnLimit private constructor(): Setting.Builder(
@@ -2257,7 +2280,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [ConstrainedSockets](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#ConstrainedSockets)
+     * [tor-man#ConstrainedSockets](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#ConstrainedSockets)
      * */
     @KmpTorDsl
     public class ConstrainedSockets private constructor(): Setting.Builder(
@@ -2273,7 +2296,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [ConstrainedSockSize](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#ConstrainedSockSize)
+     * [tor-man#ConstrainedSockSize](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#ConstrainedSockSize)
      * */
     @KmpTorDsl
     public class ConstrainedSockSize private constructor(): Setting.Builder(
@@ -2305,7 +2328,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [ControlPortFileGroupReadable](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#ControlPortFileGroupReadable)
+     * [tor-man#ControlPortFileGroupReadable](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#ControlPortFileGroupReadable)
      * */
     @KmpTorDsl
     public class ControlPortFileGroupReadable private constructor(): Setting.Builder(
@@ -2323,7 +2346,7 @@ public class TorConfig private constructor(
     // (IMPLEMENTED) ControlPortWriteToFile
 
     /**
-     * [ControlSocket](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#ControlSocket)
+     * [tor-man#ControlSocket](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#ControlSocket)
      * */
     @KmpTorDsl
     public class ControlSocket private constructor(): Setting.Builder(
@@ -2339,7 +2362,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [ControlSocketsGroupWritable](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#ControlSocketsGroupWritable)
+     * [tor-man#ControlSocketsGroupWritable](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#ControlSocketsGroupWritable)
      * */
     @KmpTorDsl
     public class ControlSocketsGroupWritable private constructor(): Setting.Builder(
@@ -2358,7 +2381,7 @@ public class TorConfig private constructor(
     // (IMPLEMENTED) CookieAuthFile
 
     /**
-     * [CookieAuthFileGroupReadable](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#CookieAuthFileGroupReadable)
+     * [tor-man#CookieAuthFileGroupReadable](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#CookieAuthFileGroupReadable)
      * */
     @KmpTorDsl
     public class CookieAuthFileGroupReadable private constructor(): Setting.Builder(
@@ -2374,7 +2397,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [CountPrivateBandwidth](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#CountPrivateBandwidth)
+     * [tor-man#CountPrivateBandwidth](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#CountPrivateBandwidth)
      * */
     @KmpTorDsl
     public class CountPrivateBandwidth private constructor(): Setting.Builder(
@@ -2392,7 +2415,7 @@ public class TorConfig private constructor(
     // (IMPLEMENTED) DataDirectory
 
     /**
-     * [DataDirectoryGroupReadable](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#DataDirectoryGroupReadable)
+     * [tor-man#DataDirectoryGroupReadable](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#DataDirectoryGroupReadable)
      * */
     @KmpTorDsl
     public class DataDirectoryGroupReadable private constructor(): Setting.Builder(
@@ -2408,7 +2431,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [DirAuthority](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#DirAuthority)
+     * [tor-man#DirAuthority](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#DirAuthority)
      * */
     @KmpTorDsl
     public class DirAuthority private constructor(): Setting.Builder(
@@ -2424,7 +2447,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [DirAuthorityFallbackRate](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#DirAuthorityFallbackRate)
+     * [tor-man#DirAuthorityFallbackRate](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#DirAuthorityFallbackRate)
      * */
     @KmpTorDsl
     public class DirAuthorityFallbackRate private constructor(): Setting.Builder(
@@ -2440,7 +2463,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [DisableAllSwap](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#DisableAllSwap)
+     * [tor-man#DisableAllSwap](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#DisableAllSwap)
      * */
     @KmpTorDsl
     public class DisableAllSwap private constructor(): Setting.Builder(
@@ -2456,7 +2479,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [DisableDebuggerAttachment](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#DisableDebuggerAttachment)
+     * [tor-man#DisableDebuggerAttachment](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#DisableDebuggerAttachment)
      * */
     @KmpTorDsl
     public class DisableDebuggerAttachment private constructor(): Setting.Builder(
@@ -2474,7 +2497,7 @@ public class TorConfig private constructor(
     // (IMPLEMENTED) DisableNetwork
 
     /**
-     * [ExtendByEd25519ID](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#ExtendByEd25519ID)
+     * [tor-man#ExtendByEd25519ID](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#ExtendByEd25519ID)
      * */
     @KmpTorDsl
     public class ExtendByEd25519ID private constructor(): Setting.Builder(
@@ -2490,7 +2513,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [ExtORPort](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#ExtORPort)
+     * [tor-man#ExtORPort](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#ExtORPort)
      * */
     @KmpTorDsl
     public class ExtORPort private constructor(): Setting.Builder(
@@ -2506,7 +2529,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [ExtORPortCookieAuthFile](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#ExtORPortCookieAuthFile)
+     * [tor-man#ExtORPortCookieAuthFile](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#ExtORPortCookieAuthFile)
      * */
     @KmpTorDsl
     public class ExtORPortCookieAuthFile private constructor(): Setting.Builder(
@@ -2522,7 +2545,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [ExtORPortCookieAuthFileGroupReadable](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#ExtORPortCookieAuthFileGroupReadable)
+     * [tor-man#ExtORPortCookieAuthFileGroupReadable](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#ExtORPortCookieAuthFileGroupReadable)
      * */
     @KmpTorDsl
     public class ExtORPortCookieAuthFileGroupReadable private constructor(): Setting.Builder(
@@ -2538,7 +2561,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [FallbackDir](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#FallbackDir)
+     * [tor-man#FallbackDir](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#FallbackDir)
      * */
     @KmpTorDsl
     public class FallbackDir private constructor(): Setting.Builder(
@@ -2554,7 +2577,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [FetchDirInfoEarly](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#FetchDirInfoEarly)
+     * [tor-man#FetchDirInfoEarly](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#FetchDirInfoEarly)
      * */
     @KmpTorDsl
     public class FetchDirInfoEarly private constructor(): Setting.Builder(
@@ -2570,7 +2593,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [FetchDirInfoExtraEarly](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#FetchDirInfoExtraEarly)
+     * [tor-man#FetchDirInfoExtraEarly](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#FetchDirInfoExtraEarly)
      * */
     @KmpTorDsl
     public class FetchDirInfoExtraEarly private constructor(): Setting.Builder(
@@ -2586,7 +2609,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [FetchHidServDescriptors](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#FetchHidServDescriptors)
+     * [tor-man#FetchHidServDescriptors](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#FetchHidServDescriptors)
      * */
     @KmpTorDsl
     public class FetchHidServDescriptors private constructor(): Setting.Builder(
@@ -2602,7 +2625,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [FetchServerDescriptors](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#FetchServerDescriptors)
+     * [tor-man#FetchServerDescriptors](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#FetchServerDescriptors)
      * */
     @KmpTorDsl
     public class FetchServerDescriptors private constructor(): Setting.Builder(
@@ -2618,7 +2641,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [FetchUselessDescriptors](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#FetchUselessDescriptors)
+     * [tor-man#FetchUselessDescriptors](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#FetchUselessDescriptors)
      * */
     @KmpTorDsl
     public class FetchUselessDescriptors private constructor(): Setting.Builder(
@@ -2634,7 +2657,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [HardwareAccel](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#HardwareAccel)
+     * [tor-man#HardwareAccel](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#HardwareAccel)
      * */
     @KmpTorDsl
     public class HardwareAccel private constructor(): Setting.Builder(
@@ -2650,7 +2673,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [HashedControlPassword](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#HashedControlPassword)
+     * [tor-man#HashedControlPassword](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#HashedControlPassword)
      * */
     @KmpTorDsl
     public class HashedControlPassword private constructor(): Setting.Builder(
@@ -2669,7 +2692,7 @@ public class TorConfig private constructor(
     // (DEPRECATED) HTTPProxyAuthenticator
 
     /**
-     * [HTTPSProxy](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#HTTPSProxy)
+     * [tor-man#HTTPSProxy](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#HTTPSProxy)
      * */
     @KmpTorDsl
     public class HTTPSProxy private constructor(): Setting.Builder(
@@ -2685,7 +2708,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [HTTPSProxyAuthenticator](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#HTTPSProxyAuthenticator)
+     * [tor-man#HTTPSProxyAuthenticator](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#HTTPSProxyAuthenticator)
      * */
     @KmpTorDsl
     public class HTTPSProxyAuthenticator private constructor(): Setting.Builder(
@@ -2701,7 +2724,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [KeepalivePeriod](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#KeepalivePeriod)
+     * [tor-man#KeepalivePeriod](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#KeepalivePeriod)
      * */
     @KmpTorDsl
     public class KeepalivePeriod private constructor(): Setting.Builder(
@@ -2717,7 +2740,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [KeepBindCapabilities](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#KeepBindCapabilities)
+     * [tor-man#KeepBindCapabilities](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#KeepBindCapabilities)
      * */
     @KmpTorDsl
     public class KeepBindCapabilities private constructor(): Setting.Builder(
@@ -2733,7 +2756,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [Log](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#Log)
+     * [tor-man#Log](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#Log)
      * */
     @KmpTorDsl
     public class Log private constructor(): Setting.Builder(
@@ -2749,7 +2772,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [LogMessageDomains](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#LogMessageDomains)
+     * [tor-man#LogMessageDomains](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#LogMessageDomains)
      * */
     @KmpTorDsl
     public class LogMessageDomains private constructor(): Setting.Builder(
@@ -2765,7 +2788,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [LogTimeGranularity](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#LogTimeGranularity)
+     * [tor-man#LogTimeGranularity](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#LogTimeGranularity)
      * */
     @KmpTorDsl
     public class LogTimeGranularity private constructor(): Setting.Builder(
@@ -2781,7 +2804,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [MaxAdvertisedBandwidth](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#MaxAdvertisedBandwidth)
+     * [tor-man#MaxAdvertisedBandwidth](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#MaxAdvertisedBandwidth)
      * */
     @KmpTorDsl
     public class MaxAdvertisedBandwidth private constructor(): Setting.Builder(
@@ -2797,7 +2820,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [MaxUnparseableDescSizeToLog](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#MaxUnparseableDescSizeToLog)
+     * [tor-man#MaxUnparseableDescSizeToLog](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#MaxUnparseableDescSizeToLog)
      * */
     @KmpTorDsl
     public class MaxUnparseableDescSizeToLog private constructor(): Setting.Builder(
@@ -2813,7 +2836,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [MetricsPort](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#MetricsPort)
+     * [tor-man#MetricsPort](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#MetricsPort)
      * */
     @KmpTorDsl
     public class MetricsPort private constructor(): Setting.Builder(
@@ -2829,7 +2852,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [MetricsPortPolicy](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#MetricsPortPolicy)
+     * [tor-man#MetricsPortPolicy](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#MetricsPortPolicy)
      * */
     @KmpTorDsl
     public class MetricsPortPolicy private constructor(): Setting.Builder(
@@ -2845,7 +2868,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [NoExec](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#NoExec)
+     * [tor-man#NoExec](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#NoExec)
      * */
     @KmpTorDsl
     public class NoExec private constructor(): Setting.Builder(
@@ -2861,7 +2884,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [OutboundBindAddress](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#OutboundBindAddress)
+     * [tor-man#OutboundBindAddress](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#OutboundBindAddress)
      * */
     @KmpTorDsl
     public class OutboundBindAddress private constructor(): Setting.Builder(
@@ -2879,7 +2902,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [OutboundBindAddressExit](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#OutboundBindAddressExit)
+     * [tor-man#OutboundBindAddressExit](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#OutboundBindAddressExit)
      * */
     @KmpTorDsl
     public class OutboundBindAddressExit private constructor(): Setting.Builder(
@@ -2897,7 +2920,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [OutboundBindAddressOR](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#OutboundBindAddressOR)
+     * [tor-man#OutboundBindAddressOR](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#OutboundBindAddressOR)
      * */
     @KmpTorDsl
     public class OutboundBindAddressOR private constructor(): Setting.Builder(
@@ -2917,7 +2940,7 @@ public class TorConfig private constructor(
     // (IMPLEMENTED) __OwningControllerProcess
 
     /**
-     * [PerConnBWBurst](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#PerConnBWBurst)
+     * [tor-man#PerConnBWBurst](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#PerConnBWBurst)
      * */
     @KmpTorDsl
     public class PerConnBWBurst private constructor(): Setting.Builder(
@@ -2933,7 +2956,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [PerConnBWRate](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#PerConnBWRate)
+     * [tor-man#PerConnBWRate](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#PerConnBWRate)
      * */
     @KmpTorDsl
     public class PerConnBWRate private constructor(): Setting.Builder(
@@ -2949,7 +2972,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [OutboundBindAddressPT](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#OutboundBindAddressPT)
+     * [tor-man#OutboundBindAddressPT](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#OutboundBindAddressPT)
      * */
     @KmpTorDsl
     public class OutboundBindAddressPT private constructor(): Setting.Builder(
@@ -2967,7 +2990,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [PidFile](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#PidFile)
+     * [tor-man#PidFile](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#PidFile)
      * */
     @KmpTorDsl
     public class PidFile private constructor(): Setting.Builder(
@@ -2983,7 +3006,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [ProtocolWarnings](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#ProtocolWarnings)
+     * [tor-man#ProtocolWarnings](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#ProtocolWarnings)
      * */
     @KmpTorDsl
     public class ProtocolWarnings private constructor(): Setting.Builder(
@@ -2999,7 +3022,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [RelayBandwidthBurst](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#RelayBandwidthBurst)
+     * [tor-man#RelayBandwidthBurst](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#RelayBandwidthBurst)
      * */
     @KmpTorDsl
     public class RelayBandwidthBurst private constructor(): Setting.Builder(
@@ -3015,7 +3038,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [RelayBandwidthRate](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#RelayBandwidthRate)
+     * [tor-man#RelayBandwidthRate](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#RelayBandwidthRate)
      * */
     @KmpTorDsl
     public class RelayBandwidthRate private constructor(): Setting.Builder(
@@ -3031,7 +3054,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [RephistTrackTime](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#RephistTrackTime)
+     * [tor-man#RephistTrackTime](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#RephistTrackTime)
      * */
     @KmpTorDsl
     public class RephistTrackTime private constructor(): Setting.Builder(
@@ -3049,7 +3072,7 @@ public class TorConfig private constructor(
     // (IMPLEMENTED) RunAsDaemon
 
     /**
-     * [SafeLogging](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#SafeLogging)
+     * [tor-man#SafeLogging](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#SafeLogging)
      * */
     @KmpTorDsl
     public class SafeLogging private constructor(): Setting.Builder(
@@ -3065,7 +3088,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [Sandbox](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#Sandbox)
+     * [tor-man#Sandbox](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#Sandbox)
      * */
     @KmpTorDsl
     public class Sandbox private constructor(): Setting.Builder(
@@ -3081,7 +3104,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [Schedulers](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#Schedulers)
+     * [tor-man#Schedulers](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#Schedulers)
      * */
     @KmpTorDsl
     public class Schedulers private constructor(): Setting.Builder(
@@ -3097,7 +3120,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [KISTSchedRunInterval](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#KISTSchedRunInterval)
+     * [tor-man#KISTSchedRunInterval](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#KISTSchedRunInterval)
      * */
     @KmpTorDsl
     public class KISTSchedRunInterval private constructor(): Setting.Builder(
@@ -3113,7 +3136,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [KISTSockBufSizeFactor](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#KISTSockBufSizeFactor)
+     * [tor-man#KISTSockBufSizeFactor](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#KISTSockBufSizeFactor)
      * */
     @KmpTorDsl
     public class KISTSockBufSizeFactor private constructor(): Setting.Builder(
@@ -3129,7 +3152,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [Socks4Proxy](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#Socks4Proxy)
+     * [tor-man#Socks4Proxy](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#Socks4Proxy)
      * */
     @KmpTorDsl
     public class Socks4Proxy private constructor(): Setting.Builder(
@@ -3145,7 +3168,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [Socks5Proxy](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#Socks5Proxy)
+     * [tor-man#Socks5Proxy](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#Socks5Proxy)
      * */
     @KmpTorDsl
     public class Socks5Proxy private constructor(): Setting.Builder(
@@ -3161,7 +3184,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [Socks5ProxyUsername](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#Socks5ProxyUsername)
+     * [tor-man#Socks5ProxyUsername](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#Socks5ProxyUsername)
      * */
     @KmpTorDsl
     public class Socks5ProxyUsername private constructor(): Setting.Builder(
@@ -3177,7 +3200,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [Socks5ProxyPassword](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#Socks5ProxyPassword)
+     * [tor-man#Socks5ProxyPassword](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#Socks5ProxyPassword)
      * */
     @KmpTorDsl
     public class Socks5ProxyPassword private constructor(): Setting.Builder(
@@ -3195,7 +3218,7 @@ public class TorConfig private constructor(
     // (IMPLEMENTED) SyslogIdentityTag
 
     /**
-     * [TCPProxy](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#TCPProxy)
+     * [tor-man#TCPProxy](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#TCPProxy)
      * */
     @KmpTorDsl
     public class TCPProxy private constructor(): Setting.Builder(
@@ -3211,7 +3234,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [TruncateLogFile](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#TruncateLogFile)
+     * [tor-man#TruncateLogFile](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#TruncateLogFile)
      * */
     @KmpTorDsl
     public class TruncateLogFile private constructor(): Setting.Builder(
@@ -3227,7 +3250,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [UnixSocksGroupWritable](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#UnixSocksGroupWritable)
+     * [tor-man#UnixSocksGroupWritable](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#UnixSocksGroupWritable)
      * */
     @KmpTorDsl
     public class UnixSocksGroupWritable private constructor(): Setting.Builder(
@@ -3243,7 +3266,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [UseDefaultFallbackDirs](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#UseDefaultFallbackDirs)
+     * [tor-man#UseDefaultFallbackDirs](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#UseDefaultFallbackDirs)
      * */
     @KmpTorDsl
     public class UseDefaultFallbackDirs private constructor(): Setting.Builder(
@@ -3259,7 +3282,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [User](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#User)
+     * [tor-man#User](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#User)
      * */
     @KmpTorDsl
     public class User private constructor(): Setting.Builder(
@@ -3279,7 +3302,7 @@ public class TorConfig private constructor(
     //////////////////////
 
     /**
-     * [AllowNonRFC953Hostnames](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#AllowNonRFC953Hostnames)
+     * [tor-man#AllowNonRFC953Hostnames](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#AllowNonRFC953Hostnames)
      * */
     @KmpTorDsl
     public class AllowNonRFC953Hostnames private constructor(): Setting.Builder(
@@ -3298,7 +3321,7 @@ public class TorConfig private constructor(
     // (IMPLEMENTED) AutomapHostsSuffixes
 
     /**
-     * [Bridge](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#Bridge)
+     * [tor-man#Bridge](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#Bridge)
      * */
     @KmpTorDsl
     public class Bridge private constructor(): Setting.Builder(
@@ -3314,7 +3337,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [CircuitPadding](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#CircuitPadding)
+     * [tor-man#CircuitPadding](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#CircuitPadding)
      * */
     @KmpTorDsl
     public class CircuitPadding private constructor(): Setting.Builder(
@@ -3330,7 +3353,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [ReducedCircuitPadding](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#ReducedCircuitPadding)
+     * [tor-man#ReducedCircuitPadding](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#ReducedCircuitPadding)
      * */
     @KmpTorDsl
     public class ReducedCircuitPadding private constructor(): Setting.Builder(
@@ -3346,7 +3369,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [ClientBootstrapConsensusAuthorityDownloadInitialDelay](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#ClientBootstrapConsensusAuthorityDownloadInitialDelay)
+     * [tor-man#ClientBootstrapConsensusAuthorityDownloadInitialDelay](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#ClientBootstrapConsensusAuthorityDownloadInitialDelay)
      * */
     @KmpTorDsl
     public class ClientBootstrapConsensusAuthorityDownloadInitialDelay private constructor(): Setting.Builder(
@@ -3362,7 +3385,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [ClientBootstrapConsensusAuthorityOnlyDownloadInitialDelay](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#ClientBootstrapConsensusAuthorityOnlyDownloadInitialDelay)
+     * [tor-man#ClientBootstrapConsensusAuthorityOnlyDownloadInitialDelay](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#ClientBootstrapConsensusAuthorityOnlyDownloadInitialDelay)
      * */
     @KmpTorDsl
     public class ClientBootstrapConsensusAuthorityOnlyDownloadInitialDelay private constructor(): Setting.Builder(
@@ -3378,7 +3401,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [ClientBootstrapConsensusFallbackDownloadInitialDelay](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#ClientBootstrapConsensusFallbackDownloadInitialDelay)
+     * [tor-man#ClientBootstrapConsensusFallbackDownloadInitialDelay](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#ClientBootstrapConsensusFallbackDownloadInitialDelay)
      * */
     @KmpTorDsl
     public class ClientBootstrapConsensusFallbackDownloadInitialDelay private constructor(): Setting.Builder(
@@ -3394,7 +3417,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [ClientBootstrapConsensusMaxInProgressTries](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#ClientBootstrapConsensusMaxInProgressTries)
+     * [tor-man#ClientBootstrapConsensusMaxInProgressTries](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#ClientBootstrapConsensusMaxInProgressTries)
      * */
     @KmpTorDsl
     public class ClientBootstrapConsensusMaxInProgressTries private constructor(): Setting.Builder(
@@ -3410,7 +3433,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [ClientDNSRejectInternalAddresses](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#ClientDNSRejectInternalAddresses)
+     * [tor-man#ClientDNSRejectInternalAddresses](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#ClientDNSRejectInternalAddresses)
      * */
     @KmpTorDsl
     public class ClientDNSRejectInternalAddresses private constructor(): Setting.Builder(
@@ -3428,7 +3451,7 @@ public class TorConfig private constructor(
     // (IMPLEMENTED) ClientOnionAuthDir
 
     /**
-     * [ClientOnly](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#ClientOnly)
+     * [tor-man#ClientOnly](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#ClientOnly)
      * */
     @KmpTorDsl
     public class ClientOnly private constructor(): Setting.Builder(
@@ -3446,7 +3469,7 @@ public class TorConfig private constructor(
     // (DEPRECATED) ClientPreferIPv6DirPort
 
     /**
-     * [ClientPreferIPv6ORPort](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#ClientPreferIPv6ORPort)
+     * [tor-man#ClientPreferIPv6ORPort](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#ClientPreferIPv6ORPort)
      * */
     @KmpTorDsl
     public class ClientPreferIPv6ORPort private constructor(): Setting.Builder(
@@ -3462,7 +3485,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [ClientRejectInternalAddresses](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#ClientRejectInternalAddresses)
+     * [tor-man#ClientRejectInternalAddresses](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#ClientRejectInternalAddresses)
      * */
     @KmpTorDsl
     public class ClientRejectInternalAddresses private constructor(): Setting.Builder(
@@ -3478,7 +3501,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [ClientUseIPv4](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#ClientUseIPv4)
+     * [tor-man#ClientUseIPv4](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#ClientUseIPv4)
      * */
     @KmpTorDsl
     public class ClientUseIPv4 private constructor(): Setting.Builder(
@@ -3494,7 +3517,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [ClientUseIPv6](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#ClientUseIPv6)
+     * [tor-man#ClientUseIPv6](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#ClientUseIPv6)
      * */
     @KmpTorDsl
     public class ClientUseIPv6 private constructor(): Setting.Builder(
@@ -3529,7 +3552,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [DownloadExtraInfo](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#DownloadExtraInfo)
+     * [tor-man#DownloadExtraInfo](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#DownloadExtraInfo)
      * */
     @KmpTorDsl
     public class DownloadExtraInfo private constructor(): Setting.Builder(
@@ -3545,7 +3568,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [EnforceDistinctSubnets](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#EnforceDistinctSubnets)
+     * [tor-man#EnforceDistinctSubnets](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#EnforceDistinctSubnets)
      * */
     @KmpTorDsl
     public class EnforceDistinctSubnets private constructor(): Setting.Builder(
@@ -3561,7 +3584,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [FascistFirewall](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#FascistFirewall)
+     * [tor-man#FascistFirewall](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#FascistFirewall)
      * */
     @KmpTorDsl
     public class FascistFirewall private constructor(): Setting.Builder(
@@ -3595,7 +3618,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [LongLivedPorts](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#LongLivedPorts)
+     * [tor-man#LongLivedPorts](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#LongLivedPorts)
      * */
     @KmpTorDsl
     public class LongLivedPorts private constructor(): Setting.Builder(
@@ -3611,7 +3634,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [MapAddress](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#MapAddress)
+     * [tor-man#MapAddress](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#MapAddress)
      * */
     @KmpTorDsl
     public class MapAddress private constructor(): Setting.Builder(
@@ -3627,7 +3650,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [MaxCircuitDirtiness](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#MaxCircuitDirtiness)
+     * [tor-man#MaxCircuitDirtiness](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#MaxCircuitDirtiness)
      * */
     @KmpTorDsl
     public class MaxCircuitDirtiness private constructor(): Setting.Builder(
@@ -3643,7 +3666,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [MaxClientCircuitsPending](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#MaxClientCircuitsPending)
+     * [tor-man#MaxClientCircuitsPending](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#MaxClientCircuitsPending)
      * */
     @KmpTorDsl
     public class MaxClientCircuitsPending private constructor(): Setting.Builder(
@@ -3659,7 +3682,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [NATDPort](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#NATDPort)
+     * [tor-man#NATDPort](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#NATDPort)
      * */
     @KmpTorDsl
     public class NATDPort private constructor(): Setting.Builder(
@@ -3675,7 +3698,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [NewCircuitPeriod](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#NewCircuitPeriod)
+     * [tor-man#NewCircuitPeriod](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#NewCircuitPeriod)
      * */
     @KmpTorDsl
     public class NewCircuitPeriod private constructor(): Setting.Builder(
@@ -3691,7 +3714,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [PathBiasCircThreshold](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#PathBiasCircThreshold)
+     * [tor-man#PathBiasCircThreshold](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#PathBiasCircThreshold)
      * */
     @KmpTorDsl
     public class PathBiasCircThreshold private constructor(): Setting.Builder(
@@ -3707,7 +3730,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [PathBiasDropGuards](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#PathBiasDropGuards)
+     * [tor-man#PathBiasDropGuards](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#PathBiasDropGuards)
      * */
     @KmpTorDsl
     public class PathBiasDropGuards private constructor(): Setting.Builder(
@@ -3723,7 +3746,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [PathBiasExtremeRate](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#PathBiasExtremeRate)
+     * [tor-man#PathBiasExtremeRate](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#PathBiasExtremeRate)
      * */
     @KmpTorDsl
     public class PathBiasExtremeRate private constructor(): Setting.Builder(
@@ -3739,7 +3762,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [PathBiasNoticeRate](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#PathBiasNoticeRate)
+     * [tor-man#PathBiasNoticeRate](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#PathBiasNoticeRate)
      * */
     @KmpTorDsl
     public class PathBiasNoticeRate private constructor(): Setting.Builder(
@@ -3755,7 +3778,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [PathBiasWarnRate](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#PathBiasWarnRate)
+     * [tor-man#PathBiasWarnRate](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#PathBiasWarnRate)
      * */
     @KmpTorDsl
     public class PathBiasWarnRate private constructor(): Setting.Builder(
@@ -3771,7 +3794,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [PathBiasScaleThreshold](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#PathBiasScaleThreshold)
+     * [tor-man#PathBiasScaleThreshold](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#PathBiasScaleThreshold)
      * */
     @KmpTorDsl
     public class PathBiasScaleThreshold private constructor(): Setting.Builder(
@@ -3787,7 +3810,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [PathBiasUseThreshold](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#PathBiasUseThreshold)
+     * [tor-man#PathBiasUseThreshold](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#PathBiasUseThreshold)
      * */
     @KmpTorDsl
     public class PathBiasUseThreshold private constructor(): Setting.Builder(
@@ -3803,7 +3826,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [PathBiasNoticeUseRate](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#PathBiasNoticeUseRate)
+     * [tor-man#PathBiasNoticeUseRate](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#PathBiasNoticeUseRate)
      * */
     @KmpTorDsl
     public class PathBiasNoticeUseRate private constructor(): Setting.Builder(
@@ -3819,7 +3842,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [PathBiasExtremeUseRate](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#PathBiasExtremeUseRate)
+     * [tor-man#PathBiasExtremeUseRate](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#PathBiasExtremeUseRate)
      * */
     @KmpTorDsl
     public class PathBiasExtremeUseRate private constructor(): Setting.Builder(
@@ -3835,7 +3858,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [PathBiasScaleUseThreshold](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#PathBiasScaleUseThreshold)
+     * [tor-man#PathBiasScaleUseThreshold](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#PathBiasScaleUseThreshold)
      * */
     @KmpTorDsl
     public class PathBiasScaleUseThreshold private constructor(): Setting.Builder(
@@ -3851,7 +3874,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [PathsNeededToBuildCircuits](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#PathsNeededToBuildCircuits)
+     * [tor-man#PathsNeededToBuildCircuits](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#PathsNeededToBuildCircuits)
      * */
     @KmpTorDsl
     public class PathsNeededToBuildCircuits private constructor(): Setting.Builder(
@@ -3867,7 +3890,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [ReachableAddresses](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#ReachableAddresses)
+     * [tor-man#ReachableAddresses](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#ReachableAddresses)
      * */
     @KmpTorDsl
     public class ReachableAddresses private constructor(): Setting.Builder(
@@ -3885,7 +3908,7 @@ public class TorConfig private constructor(
     // (DEPRECATED) ReachableDirAddresses
 
     /**
-     * [ReachableORAddresses](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#ReachableORAddresses)
+     * [tor-man#ReachableORAddresses](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#ReachableORAddresses)
      * */
     @KmpTorDsl
     public class ReachableORAddresses private constructor(): Setting.Builder(
@@ -3901,7 +3924,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [SafeSocks](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#SafeSocks)
+     * [tor-man#SafeSocks](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#SafeSocks)
      * */
     @KmpTorDsl
     public class SafeSocks private constructor(): Setting.Builder(
@@ -3917,7 +3940,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [TestSocks](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#TestSocks)
+     * [tor-man#TestSocks](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#TestSocks)
      * */
     @KmpTorDsl
     public class TestSocks private constructor(): Setting.Builder(
@@ -3933,7 +3956,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [WarnPlaintextPorts](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#WarnPlaintextPorts)
+     * [tor-man#WarnPlaintextPorts](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#WarnPlaintextPorts)
      * */
     @KmpTorDsl
     public class WarnPlaintextPorts private constructor(): Setting.Builder(
@@ -3949,7 +3972,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [RejectPlaintextPorts](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#RejectPlaintextPorts)
+     * [tor-man#RejectPlaintextPorts](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#RejectPlaintextPorts)
      * */
     @KmpTorDsl
     public class RejectPlaintextPorts private constructor(): Setting.Builder(
@@ -3965,7 +3988,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [SocksPolicy](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#SocksPolicy)
+     * [tor-man#SocksPolicy](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#SocksPolicy)
      * */
     @KmpTorDsl
     public class SocksPolicy private constructor(): Setting.Builder(
@@ -3997,7 +4020,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [TokenBucketRefillInterval](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#TokenBucketRefillInterval)
+     * [tor-man#TokenBucketRefillInterval](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#TokenBucketRefillInterval)
      * */
     @KmpTorDsl
     public class TokenBucketRefillInterval private constructor(): Setting.Builder(
@@ -4013,7 +4036,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [TrackHostExits](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#TrackHostExits)
+     * [tor-man#TrackHostExits](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#TrackHostExits)
      * */
     @KmpTorDsl
     public class TrackHostExits private constructor(): Setting.Builder(
@@ -4029,7 +4052,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [TrackHostExitsExpire](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#TrackHostExitsExpire)
+     * [tor-man#TrackHostExitsExpire](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#TrackHostExitsExpire)
      * */
     @KmpTorDsl
     public class TrackHostExitsExpire private constructor(): Setting.Builder(
@@ -4061,7 +4084,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [TransProxyType](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#TransProxyType)
+     * [tor-man#TransProxyType](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#TransProxyType)
      * */
     @KmpTorDsl
     public class TransProxyType private constructor(): Setting.Builder(
@@ -4077,7 +4100,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [UpdateBridgesFromAuthority](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#UpdateBridgesFromAuthority)
+     * [tor-man#UpdateBridgesFromAuthority](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#UpdateBridgesFromAuthority)
      * */
     @KmpTorDsl
     public class UpdateBridgesFromAuthority private constructor(): Setting.Builder(
@@ -4093,7 +4116,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [UseBridges](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#UseBridges)
+     * [tor-man#UseBridges](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#UseBridges)
      * */
     @KmpTorDsl
     public class UseBridges private constructor(): Setting.Builder(
@@ -4109,7 +4132,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [UseEntryGuards](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#UseEntryGuards)
+     * [tor-man#UseEntryGuards](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#UseEntryGuards)
      * */
     @KmpTorDsl
     public class UseEntryGuards private constructor(): Setting.Builder(
@@ -4125,7 +4148,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [UseGuardFraction](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#UseGuardFraction)
+     * [tor-man#UseGuardFraction](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#UseGuardFraction)
      * */
     @KmpTorDsl
     public class UseGuardFraction private constructor(): Setting.Builder(
@@ -4141,7 +4164,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [GuardLifetime](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#GuardLifetime)
+     * [tor-man#GuardLifetime](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#GuardLifetime)
      * */
     @KmpTorDsl
     public class GuardLifetime private constructor(): Setting.Builder(
@@ -4157,7 +4180,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [NumDirectoryGuards](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#NumDirectoryGuards)
+     * [tor-man#NumDirectoryGuards](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#NumDirectoryGuards)
      * */
     @KmpTorDsl
     public class NumDirectoryGuards private constructor(): Setting.Builder(
@@ -4173,7 +4196,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [NumEntryGuards](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#NumEntryGuards)
+     * [tor-man#NumEntryGuards](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#NumEntryGuards)
      * */
     @KmpTorDsl
     public class NumEntryGuards private constructor(): Setting.Builder(
@@ -4189,7 +4212,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [NumPrimaryGuards](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#NumPrimaryGuards)
+     * [tor-man#NumPrimaryGuards](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#NumPrimaryGuards)
      * */
     @KmpTorDsl
     public class NumPrimaryGuards private constructor(): Setting.Builder(
@@ -4205,7 +4228,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [VanguardsLiteEnabled](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#VanguardsLiteEnabled)
+     * [tor-man#VanguardsLiteEnabled](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#VanguardsLiteEnabled)
      * */
     @KmpTorDsl
     public class VanguardsLiteEnabled private constructor(): Setting.Builder(
@@ -4221,7 +4244,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [UseMicrodescriptors](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#UseMicrodescriptors)
+     * [tor-man#UseMicrodescriptors](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#UseMicrodescriptors)
      * */
     @KmpTorDsl
     public class UseMicrodescriptors private constructor(): Setting.Builder(
@@ -4244,7 +4267,7 @@ public class TorConfig private constructor(
     ///////////////////////////////
 
     /**
-     * [CircuitsAvailableTimeout](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#CircuitsAvailableTimeout)
+     * [tor-man#CircuitsAvailableTimeout](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#CircuitsAvailableTimeout)
      * */
     @KmpTorDsl
     public class CircuitsAvailableTimeout private constructor(): Setting.Builder(
@@ -4260,7 +4283,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [LearnCircuitBuildTimeout](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#LearnCircuitBuildTimeout)
+     * [tor-man#LearnCircuitBuildTimeout](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#LearnCircuitBuildTimeout)
      * */
     @KmpTorDsl
     public class LearnCircuitBuildTimeout private constructor(): Setting.Builder(
@@ -4276,7 +4299,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [CircuitBuildTimeout](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#CircuitBuildTimeout)
+     * [tor-man#CircuitBuildTimeout](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#CircuitBuildTimeout)
      * */
     @KmpTorDsl
     public class CircuitBuildTimeout private constructor(): Setting.Builder(
@@ -4292,7 +4315,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [CircuitStreamTimeout](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#CircuitStreamTimeout)
+     * [tor-man#CircuitStreamTimeout](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#CircuitStreamTimeout)
      * */
     @KmpTorDsl
     public class CircuitStreamTimeout private constructor(): Setting.Builder(
@@ -4308,7 +4331,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [SocksTimeout](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#SocksTimeout)
+     * [tor-man#SocksTimeout](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#SocksTimeout)
      * */
     @KmpTorDsl
     public class SocksTimeout private constructor(): Setting.Builder(
@@ -4333,7 +4356,7 @@ public class TorConfig private constructor(
     // (IMPLEMENTED) DormantTimeoutDisabledByIdleStreams
 
     /**
-     * [DormantTimeoutEnabled](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#DormantTimeoutEnabled)
+     * [tor-man#DormantTimeoutEnabled](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#DormantTimeoutEnabled)
      * */
     @KmpTorDsl
     public class DormantTimeoutEnabled private constructor(): Setting.Builder(
@@ -4353,7 +4376,7 @@ public class TorConfig private constructor(
     ////////////////////////////
 
     /**
-     * [EntryNodes](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#EntryNodes)
+     * [tor-man#EntryNodes](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#EntryNodes)
      * */
     @KmpTorDsl
     public class EntryNodes private constructor(): Setting.Builder(
@@ -4369,7 +4392,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [ExcludeNodes](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#ExcludeNodes)
+     * [tor-man#ExcludeNodes](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#ExcludeNodes)
      * */
     @KmpTorDsl
     public class ExcludeNodes private constructor(): Setting.Builder(
@@ -4385,7 +4408,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [ExcludeExitNodes](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#ExcludeExitNodes)
+     * [tor-man#ExcludeExitNodes](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#ExcludeExitNodes)
      * */
     @KmpTorDsl
     public class ExcludeExitNodes private constructor(): Setting.Builder(
@@ -4401,7 +4424,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [ExitNodes](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#ExitNodes)
+     * [tor-man#ExitNodes](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#ExitNodes)
      * */
     @KmpTorDsl
     public class ExitNodes private constructor(): Setting.Builder(
@@ -4419,7 +4442,7 @@ public class TorConfig private constructor(
     // (IMPLEMENTED) GeoIPExcludeUnknown
 
     /**
-     * [HSLayer2Nodes](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#HSLayer2Nodes)
+     * [tor-man#HSLayer2Nodes](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#HSLayer2Nodes)
      * */
     @KmpTorDsl
     public class HSLayer2Nodes private constructor(): Setting.Builder(
@@ -4435,7 +4458,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [HSLayer3Nodes](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#HSLayer3Nodes)
+     * [tor-man#HSLayer3Nodes](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#HSLayer3Nodes)
      * */
     @KmpTorDsl
     public class HSLayer3Nodes private constructor(): Setting.Builder(
@@ -4451,7 +4474,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [MiddleNodes](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#MiddleNodes)
+     * [tor-man#MiddleNodes](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#MiddleNodes)
      * */
     @KmpTorDsl
     public class MiddleNodes private constructor(): Setting.Builder(
@@ -4467,7 +4490,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [NodeFamily](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#NodeFamily)
+     * [tor-man#NodeFamily](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#NodeFamily)
      * */
     @KmpTorDsl
     public class NodeFamily private constructor(): Setting.Builder(
@@ -4483,7 +4506,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [StrictNodes](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#StrictNodes)
+     * [tor-man#StrictNodes](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#StrictNodes)
      * */
     @KmpTorDsl
     public class StrictNodes private constructor(): Setting.Builder(
@@ -4503,7 +4526,7 @@ public class TorConfig private constructor(
     //////////////////////
 
     /**
-     * [AccountingMax](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#AccountingMax)
+     * [tor-man#AccountingMax](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#AccountingMax)
      * */
     @KmpTorDsl
     public class AccountingMax private constructor(): Setting.Builder(
@@ -4519,7 +4542,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [AccountingRule](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#AccountingRule)
+     * [tor-man#AccountingRule](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#AccountingRule)
      * */
     @KmpTorDsl
     public class AccountingRule private constructor(): Setting.Builder(
@@ -4535,7 +4558,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [AccountingStart](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#AccountingStart)
+     * [tor-man#AccountingStart](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#AccountingStart)
      * */
     @KmpTorDsl
     public class AccountingStart private constructor(): Setting.Builder(
@@ -4551,7 +4574,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [Address](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#Address)
+     * [tor-man#Address](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#Address)
      * */
     @KmpTorDsl
     public class Address private constructor(): Setting.Builder(
@@ -4567,7 +4590,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [AddressDisableIPv6](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#AddressDisableIPv6)
+     * [tor-man#AddressDisableIPv6](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#AddressDisableIPv6)
      * */
     @KmpTorDsl
     public class AddressDisableIPv6 private constructor(): Setting.Builder(
@@ -4583,7 +4606,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [AssumeReachable](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#AssumeReachable)
+     * [tor-man#AssumeReachable](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#AssumeReachable)
      * */
     @KmpTorDsl
     public class AssumeReachable private constructor(): Setting.Builder(
@@ -4599,7 +4622,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [AssumeReachableIPv6](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#AssumeReachableIPv6)
+     * [tor-man#AssumeReachableIPv6](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#AssumeReachableIPv6)
      * */
     @KmpTorDsl
     public class AssumeReachableIPv6 private constructor(): Setting.Builder(
@@ -4615,7 +4638,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [BridgeRelay](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#BridgeRelay)
+     * [tor-man#BridgeRelay](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#BridgeRelay)
      * */
     @KmpTorDsl
     public class BridgeRelay private constructor(): Setting.Builder(
@@ -4631,7 +4654,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [BridgeDistribution](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#BridgeDistribution)
+     * [tor-man#BridgeDistribution](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#BridgeDistribution)
      * */
     @KmpTorDsl
     public class BridgeDistribution private constructor(): Setting.Builder(
@@ -4647,7 +4670,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [ContactInfo](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#ContactInfo)
+     * [tor-man#ContactInfo](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#ContactInfo)
      * */
     @KmpTorDsl
     public class ContactInfo private constructor(): Setting.Builder(
@@ -4663,7 +4686,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [DisableOOSCheck](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#DisableOOSCheck)
+     * [tor-man#DisableOOSCheck](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#DisableOOSCheck)
      * */
     @KmpTorDsl
     public class DisableOOSCheck private constructor(): Setting.Builder(
@@ -4679,7 +4702,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [ExitPolicy](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#ExitPolicy)
+     * [tor-man#ExitPolicy](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#ExitPolicy)
      * */
     @KmpTorDsl
     public class ExitPolicy private constructor(): Setting.Builder(
@@ -4695,7 +4718,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [ExitPolicyRejectLocalInterfaces](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#ExitPolicyRejectLocalInterfaces)
+     * [tor-man#ExitPolicyRejectLocalInterfaces](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#ExitPolicyRejectLocalInterfaces)
      * */
     @KmpTorDsl
     public class ExitPolicyRejectLocalInterfaces private constructor(): Setting.Builder(
@@ -4711,7 +4734,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [ExitPolicyRejectPrivate](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#ExitPolicyRejectPrivate)
+     * [tor-man#ExitPolicyRejectPrivate](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#ExitPolicyRejectPrivate)
      * */
     @KmpTorDsl
     public class ExitPolicyRejectPrivate private constructor(): Setting.Builder(
@@ -4727,7 +4750,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [ExitRelay](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#ExitRelay)
+     * [tor-man#ExitRelay](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#ExitRelay)
      * */
     @KmpTorDsl
     public class ExitRelay private constructor(): Setting.Builder(
@@ -4743,7 +4766,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [ExtendAllowPrivateAddresses](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#ExtendAllowPrivateAddresses)
+     * [tor-man#ExtendAllowPrivateAddresses](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#ExtendAllowPrivateAddresses)
      * */
     @KmpTorDsl
     public class ExtendAllowPrivateAddresses private constructor(): Setting.Builder(
@@ -4762,7 +4785,7 @@ public class TorConfig private constructor(
     // (IMPLEMENTED) GeoIPv6File
 
     /**
-     * [HeartbeatPeriod](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#HeartbeatPeriod)
+     * [tor-man#HeartbeatPeriod](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#HeartbeatPeriod)
      * */
     @KmpTorDsl
     public class HeartbeatPeriod private constructor(): Setting.Builder(
@@ -4778,7 +4801,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [IPv6Exit](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#IPv6Exit)
+     * [tor-man#IPv6Exit](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#IPv6Exit)
      * */
     @KmpTorDsl
     public class IPv6Exit private constructor(): Setting.Builder(
@@ -4794,7 +4817,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [KeyDirectory](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#KeyDirectory)
+     * [tor-man#KeyDirectory](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#KeyDirectory)
      * */
     @KmpTorDsl
     public class KeyDirectory private constructor(): Setting.Builder(
@@ -4810,7 +4833,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [KeyDirectoryGroupReadable](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#KeyDirectoryGroupReadable)
+     * [tor-man#KeyDirectoryGroupReadable](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#KeyDirectoryGroupReadable)
      * */
     @KmpTorDsl
     public class KeyDirectoryGroupReadable private constructor(): Setting.Builder(
@@ -4826,7 +4849,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [MainloopStats](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#MainloopStats)
+     * [tor-man#MainloopStats](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#MainloopStats)
      * */
     @KmpTorDsl
     public class MainloopStats private constructor(): Setting.Builder(
@@ -4842,7 +4865,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [MaxMemInQueues](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#MaxMemInQueues)
+     * [tor-man#MaxMemInQueues](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#MaxMemInQueues)
      * */
     @KmpTorDsl
     public class MaxMemInQueues private constructor(): Setting.Builder(
@@ -4858,7 +4881,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [MaxOnionQueueDelay](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#MaxOnionQueueDelay)
+     * [tor-man#MaxOnionQueueDelay](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#MaxOnionQueueDelay)
      * */
     @KmpTorDsl
     public class MaxOnionQueueDelay private constructor(): Setting.Builder(
@@ -4874,7 +4897,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [MyFamily](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#MyFamily)
+     * [tor-man#MyFamily](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#MyFamily)
      * */
     @KmpTorDsl
     public class MyFamily private constructor(): Setting.Builder(
@@ -4890,7 +4913,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [Nickname](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#Nickname)
+     * [tor-man#Nickname](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#Nickname)
      * */
     @KmpTorDsl
     public class Nickname private constructor(): Setting.Builder(
@@ -4906,7 +4929,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [NumCPUs](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#NumCPUs)
+     * [tor-man#NumCPUs](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#NumCPUs)
      * */
     @KmpTorDsl
     public class NumCPUs private constructor(): Setting.Builder(
@@ -4922,7 +4945,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [OfflineMasterKey](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#OfflineMasterKey)
+     * [tor-man#OfflineMasterKey](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#OfflineMasterKey)
      * */
     @KmpTorDsl
     public class OfflineMasterKey private constructor(): Setting.Builder(
@@ -4938,7 +4961,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [ORPort](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#ORPort)
+     * [tor-man#ORPort](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#ORPort)
      * */
     @KmpTorDsl
     public class ORPort private constructor(): Setting.Builder(
@@ -4954,7 +4977,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [PublishServerDescriptor](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#PublishServerDescriptor)
+     * [tor-man#PublishServerDescriptor](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#PublishServerDescriptor)
      * */
     @KmpTorDsl
     public class PublishServerDescriptor private constructor(): Setting.Builder(
@@ -4970,7 +4993,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [ReducedExitPolicy](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#ReducedExitPolicy)
+     * [tor-man#ReducedExitPolicy](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#ReducedExitPolicy)
      * */
     @KmpTorDsl
     public class ReducedExitPolicy private constructor(): Setting.Builder(
@@ -4986,7 +5009,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [RefuseUnknownExits](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#RefuseUnknownExits)
+     * [tor-man#RefuseUnknownExits](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#RefuseUnknownExits)
      * */
     @KmpTorDsl
     public class RefuseUnknownExits private constructor(): Setting.Builder(
@@ -5002,7 +5025,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [ServerDNSAllowBrokenConfig](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#ServerDNSAllowBrokenConfig)
+     * [tor-man#ServerDNSAllowBrokenConfig](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#ServerDNSAllowBrokenConfig)
      * */
     @KmpTorDsl
     public class ServerDNSAllowBrokenConfig private constructor(): Setting.Builder(
@@ -5018,7 +5041,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [ServerDNSAllowNonRFC953Hostnames](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#ServerDNSAllowNonRFC953Hostnames)
+     * [tor-man#ServerDNSAllowNonRFC953Hostnames](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#ServerDNSAllowNonRFC953Hostnames)
      * */
     @KmpTorDsl
     public class ServerDNSAllowNonRFC953Hostnames private constructor(): Setting.Builder(
@@ -5034,7 +5057,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [ServerDNSDetectHijacking](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#ServerDNSDetectHijacking)
+     * [tor-man#ServerDNSDetectHijacking](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#ServerDNSDetectHijacking)
      * */
     @KmpTorDsl
     public class ServerDNSDetectHijacking private constructor(): Setting.Builder(
@@ -5050,7 +5073,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [ServerDNSRandomizeCase](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#ServerDNSRandomizeCase)
+     * [tor-man#ServerDNSRandomizeCase](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#ServerDNSRandomizeCase)
      * */
     @KmpTorDsl
     public class ServerDNSRandomizeCase private constructor(): Setting.Builder(
@@ -5066,7 +5089,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [ServerDNSResolvConfFile](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#ServerDNSResolvConfFile)
+     * [tor-man#ServerDNSResolvConfFile](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#ServerDNSResolvConfFile)
      * */
     @KmpTorDsl
     public class ServerDNSResolvConfFile private constructor(): Setting.Builder(
@@ -5082,7 +5105,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [ServerDNSSearchDomains](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#ServerDNSSearchDomains)
+     * [tor-man#ServerDNSSearchDomains](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#ServerDNSSearchDomains)
      * */
     @KmpTorDsl
     public class ServerDNSSearchDomains private constructor(): Setting.Builder(
@@ -5098,7 +5121,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [ServerDNSTestAddresses](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#ServerDNSTestAddresses)
+     * [tor-man#ServerDNSTestAddresses](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#ServerDNSTestAddresses)
      * */
     @KmpTorDsl
     public class ServerDNSTestAddresses private constructor(): Setting.Builder(
@@ -5114,7 +5137,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [ServerTransportListenAddr](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#ServerTransportListenAddr)
+     * [tor-man#ServerTransportListenAddr](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#ServerTransportListenAddr)
      * */
     @KmpTorDsl
     public class ServerTransportListenAddr private constructor(): Setting.Builder(
@@ -5130,7 +5153,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [ServerTransportOptions](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#ServerTransportOptions)
+     * [tor-man#ServerTransportOptions](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#ServerTransportOptions)
      * */
     @KmpTorDsl
     public class ServerTransportOptions private constructor(): Setting.Builder(
@@ -5146,7 +5169,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [ServerTransportPlugin](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#ServerTransportPlugin)
+     * [tor-man#ServerTransportPlugin](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#ServerTransportPlugin)
      * */
     @KmpTorDsl
     public class ServerTransportPlugin private constructor(): Setting.Builder(
@@ -5162,7 +5185,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [ShutdownWaitLength](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#ShutdownWaitLength)
+     * [tor-man#ShutdownWaitLength](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#ShutdownWaitLength)
      * */
     @KmpTorDsl
     public class ShutdownWaitLength private constructor(): Setting.Builder(
@@ -5178,7 +5201,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [SigningKeyLifetime](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#SigningKeyLifetime)
+     * [tor-man#SigningKeyLifetime](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#SigningKeyLifetime)
      * */
     @KmpTorDsl
     public class SigningKeyLifetime private constructor(): Setting.Builder(
@@ -5194,7 +5217,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [SSLKeyLifetime](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#SSLKeyLifetime)
+     * [tor-man#SSLKeyLifetime](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#SSLKeyLifetime)
      * */
     @KmpTorDsl
     public class SSLKeyLifetime private constructor(): Setting.Builder(
@@ -5214,7 +5237,7 @@ public class TorConfig private constructor(
     ////////////////////////
 
     /**
-     * [BridgeRecordUsageByCountry](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#BridgeRecordUsageByCountry)
+     * [tor-man#BridgeRecordUsageByCountry](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#BridgeRecordUsageByCountry)
      * */
     @KmpTorDsl
     public class BridgeRecordUsageByCountry private constructor(): Setting.Builder(
@@ -5230,7 +5253,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [CellStatistics](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#CellStatistics)
+     * [tor-man#CellStatistics](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#CellStatistics)
      * */
     @KmpTorDsl
     public class CellStatistics private constructor(): Setting.Builder(
@@ -5246,7 +5269,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [ConnDirectionStatistics](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#ConnDirectionStatistics)
+     * [tor-man#ConnDirectionStatistics](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#ConnDirectionStatistics)
      * */
     @KmpTorDsl
     public class ConnDirectionStatistics private constructor(): Setting.Builder(
@@ -5262,7 +5285,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [DirReqStatistics](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#DirReqStatistics)
+     * [tor-man#DirReqStatistics](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#DirReqStatistics)
      * */
     @KmpTorDsl
     public class DirReqStatistics private constructor(): Setting.Builder(
@@ -5278,7 +5301,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [EntryStatistics](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#EntryStatistics)
+     * [tor-man#EntryStatistics](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#EntryStatistics)
      * */
     @KmpTorDsl
     public class EntryStatistics private constructor(): Setting.Builder(
@@ -5294,7 +5317,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [ExitPortStatistics](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#ExitPortStatistics)
+     * [tor-man#ExitPortStatistics](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#ExitPortStatistics)
      * */
     @KmpTorDsl
     public class ExitPortStatistics private constructor(): Setting.Builder(
@@ -5310,7 +5333,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [ExtraInfoStatistics](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#ExtraInfoStatistics)
+     * [tor-man#ExtraInfoStatistics](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#ExtraInfoStatistics)
      * */
     @KmpTorDsl
     public class ExtraInfoStatistics private constructor(): Setting.Builder(
@@ -5326,7 +5349,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [HiddenServiceStatistics](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#HiddenServiceStatistics)
+     * [tor-man#HiddenServiceStatistics](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#HiddenServiceStatistics)
      * */
     @KmpTorDsl
     public class HiddenServiceStatistics private constructor(): Setting.Builder(
@@ -5342,7 +5365,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [OverloadStatistics](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#OverloadStatistics)
+     * [tor-man#OverloadStatistics](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#OverloadStatistics)
      * */
     @KmpTorDsl
     public class OverloadStatistics private constructor(): Setting.Builder(
@@ -5358,7 +5381,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [PaddingStatistics](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#PaddingStatistics)
+     * [tor-man#PaddingStatistics](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#PaddingStatistics)
      * */
     @KmpTorDsl
     public class PaddingStatistics private constructor(): Setting.Builder(
@@ -5378,7 +5401,7 @@ public class TorConfig private constructor(
     ////////////////////////////////
 
     /**
-     * [DirCache](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#DirCache)
+     * [tor-man#DirCache](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#DirCache)
      * */
     @KmpTorDsl
     public class DirCache private constructor(): Setting.Builder(
@@ -5394,7 +5417,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [DirPolicy](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#DirPolicy)
+     * [tor-man#DirPolicy](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#DirPolicy)
      * */
     @KmpTorDsl
     public class DirPolicy private constructor(): Setting.Builder(
@@ -5410,7 +5433,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [DirPort](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#DirPort)
+     * [tor-man#DirPort](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#DirPort)
      * */
     @KmpTorDsl
     public class DirPort private constructor(): Setting.Builder(
@@ -5426,7 +5449,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [DirPortFrontPage](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#DirPortFrontPage)
+     * [tor-man#DirPortFrontPage](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#DirPortFrontPage)
      * */
     @KmpTorDsl
     public class DirPortFrontPage private constructor(): Setting.Builder(
@@ -5442,7 +5465,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [MaxConsensusAgeForDiffs](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#MaxConsensusAgeForDiffs)
+     * [tor-man#MaxConsensusAgeForDiffs](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#MaxConsensusAgeForDiffs)
      * */
     @KmpTorDsl
     public class MaxConsensusAgeForDiffs private constructor(): Setting.Builder(
@@ -5462,7 +5485,7 @@ public class TorConfig private constructor(
     ////////////////////////////////////////////
 
     /**
-     * [DoSCircuitCreationEnabled](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#DoSCircuitCreationEnabled)
+     * [tor-man#DoSCircuitCreationEnabled](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#DoSCircuitCreationEnabled)
      * */
     @KmpTorDsl
     public class DoSCircuitCreationEnabled private constructor(): Setting.Builder(
@@ -5478,7 +5501,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [DoSCircuitCreationBurst](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#DoSCircuitCreationBurst)
+     * [tor-man#DoSCircuitCreationBurst](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#DoSCircuitCreationBurst)
      * */
     @KmpTorDsl
     public class DoSCircuitCreationBurst private constructor(): Setting.Builder(
@@ -5494,7 +5517,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [DoSCircuitCreationDefenseTimePeriod](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#DoSCircuitCreationDefenseTimePeriod)
+     * [tor-man#DoSCircuitCreationDefenseTimePeriod](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#DoSCircuitCreationDefenseTimePeriod)
      * */
     @KmpTorDsl
     public class DoSCircuitCreationDefenseTimePeriod private constructor(): Setting.Builder(
@@ -5510,7 +5533,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [DoSCircuitCreationDefenseType](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#DoSCircuitCreationDefenseType)
+     * [tor-man#DoSCircuitCreationDefenseType](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#DoSCircuitCreationDefenseType)
      * */
     @KmpTorDsl
     public class DoSCircuitCreationDefenseType private constructor(): Setting.Builder(
@@ -5526,7 +5549,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [DoSCircuitCreationMinConnections](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#DoSCircuitCreationMinConnections)
+     * [tor-man#DoSCircuitCreationMinConnections](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#DoSCircuitCreationMinConnections)
      * */
     @KmpTorDsl
     public class DoSCircuitCreationMinConnections private constructor(): Setting.Builder(
@@ -5542,7 +5565,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [DoSCircuitCreationRate](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#DoSCircuitCreationRate)
+     * [tor-man#DoSCircuitCreationRate](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#DoSCircuitCreationRate)
      * */
     @KmpTorDsl
     public class DoSCircuitCreationRate private constructor(): Setting.Builder(
@@ -5558,7 +5581,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [DoSConnectionEnabled](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#DoSConnectionEnabled)
+     * [tor-man#DoSConnectionEnabled](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#DoSConnectionEnabled)
      * */
     @KmpTorDsl
     public class DoSConnectionEnabled private constructor(): Setting.Builder(
@@ -5574,7 +5597,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [DoSConnectionDefenseType](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#DoSConnectionDefenseType)
+     * [tor-man#DoSConnectionDefenseType](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#DoSConnectionDefenseType)
      * */
     @KmpTorDsl
     public class DoSConnectionDefenseType private constructor(): Setting.Builder(
@@ -5590,7 +5613,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [DoSConnectionMaxConcurrentCount](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#DoSConnectionMaxConcurrentCount)
+     * [tor-man#DoSConnectionMaxConcurrentCount](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#DoSConnectionMaxConcurrentCount)
      * */
     @KmpTorDsl
     public class DoSConnectionMaxConcurrentCount private constructor(): Setting.Builder(
@@ -5606,7 +5629,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [DoSConnectionConnectRate](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#DoSConnectionConnectRate)
+     * [tor-man#DoSConnectionConnectRate](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#DoSConnectionConnectRate)
      * */
     @KmpTorDsl
     public class DoSConnectionConnectRate private constructor(): Setting.Builder(
@@ -5622,7 +5645,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [DoSConnectionConnectBurst](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#DoSConnectionConnectBurst)
+     * [tor-man#DoSConnectionConnectBurst](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#DoSConnectionConnectBurst)
      * */
     @KmpTorDsl
     public class DoSConnectionConnectBurst private constructor(): Setting.Builder(
@@ -5638,7 +5661,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [DoSConnectionConnectDefenseTimePeriod](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#DoSConnectionConnectDefenseTimePeriod)
+     * [tor-man#DoSConnectionConnectDefenseTimePeriod](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#DoSConnectionConnectDefenseTimePeriod)
      * */
     @KmpTorDsl
     public class DoSConnectionConnectDefenseTimePeriod private constructor(): Setting.Builder(
@@ -5654,7 +5677,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [DoSRefuseSingleHopClientRendezvous](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#DoSRefuseSingleHopClientRendezvous)
+     * [tor-man#DoSRefuseSingleHopClientRendezvous](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#DoSRefuseSingleHopClientRendezvous)
      * */
     @KmpTorDsl
     public class DoSRefuseSingleHopClientRendezvous private constructor(): Setting.Builder(
@@ -5670,7 +5693,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [HiddenServiceEnableIntroDoSDefense](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#HiddenServiceEnableIntroDoSDefense)
+     * [tor-man#HiddenServiceEnableIntroDoSDefense](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#HiddenServiceEnableIntroDoSDefense)
      * */
     @KmpTorDsl
     public class HiddenServiceEnableIntroDoSDefense private constructor(): Setting.Builder(
@@ -5686,7 +5709,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [HiddenServiceEnableIntroDoSBurstPerSec](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#HiddenServiceEnableIntroDoSBurstPerSec)
+     * [tor-man#HiddenServiceEnableIntroDoSBurstPerSec](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#HiddenServiceEnableIntroDoSBurstPerSec)
      * */
     @KmpTorDsl
     public class HiddenServiceEnableIntroDoSBurstPerSec private constructor(): Setting.Builder(
@@ -5702,7 +5725,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [HiddenServiceEnableIntroDoSRatePerSec](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#HiddenServiceEnableIntroDoSRatePerSec)
+     * [tor-man#HiddenServiceEnableIntroDoSRatePerSec](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#HiddenServiceEnableIntroDoSRatePerSec)
      * */
     @KmpTorDsl
     public class HiddenServiceEnableIntroDoSRatePerSec private constructor(): Setting.Builder(
@@ -5718,7 +5741,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [HiddenServicePoWDefensesEnabled](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#HiddenServicePoWDefensesEnabled)
+     * [tor-man#HiddenServicePoWDefensesEnabled](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#HiddenServicePoWDefensesEnabled)
      * */
     @KmpTorDsl
     public class HiddenServicePoWDefensesEnabled private constructor(): Setting.Builder(
@@ -5734,7 +5757,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [HiddenServicePoWQueueRate](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#HiddenServicePoWQueueRate)
+     * [tor-man#HiddenServicePoWQueueRate](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#HiddenServicePoWQueueRate)
      * */
     @KmpTorDsl
     public class HiddenServicePoWQueueRate private constructor(): Setting.Builder(
@@ -5750,7 +5773,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [HiddenServicePoWQueueBurst](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#HiddenServicePoWQueueBurst)
+     * [tor-man#HiddenServicePoWQueueBurst](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#HiddenServicePoWQueueBurst)
      * */
     @KmpTorDsl
     public class HiddenServicePoWQueueBurst private constructor(): Setting.Builder(
@@ -5766,7 +5789,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [CompiledProofOfWorkHash](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#CompiledProofOfWorkHash)
+     * [tor-man#CompiledProofOfWorkHash](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#CompiledProofOfWorkHash)
      * */
     @KmpTorDsl
     public class CompiledProofOfWorkHash private constructor(): Setting.Builder(
@@ -5787,7 +5810,7 @@ public class TorConfig private constructor(
     //////////////////////////////////////////
 
     /**
-     * [AuthoritativeDirectory](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#AuthoritativeDirectory)
+     * [tor-man#AuthoritativeDirectory](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#AuthoritativeDirectory)
      * */
     @KmpTorDsl
     public class AuthoritativeDirectory private constructor(): Setting.Builder(
@@ -5803,7 +5826,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [BridgeAuthoritativeDir](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#BridgeAuthoritativeDir)
+     * [tor-man#BridgeAuthoritativeDir](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#BridgeAuthoritativeDir)
      * */
     @KmpTorDsl
     public class BridgeAuthoritativeDir private constructor(): Setting.Builder(
@@ -5819,7 +5842,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [V3AuthoritativeDirectory](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#V3AuthoritativeDirectory)
+     * [tor-man#V3AuthoritativeDirectory](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#V3AuthoritativeDirectory)
      * */
     @KmpTorDsl
     public class V3AuthoritativeDirectory private constructor(): Setting.Builder(
@@ -5835,7 +5858,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [AuthDirBadExit](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#AuthDirBadExit)
+     * [tor-man#AuthDirBadExit](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#AuthDirBadExit)
      * */
     @KmpTorDsl
     public class AuthDirBadExit private constructor(): Setting.Builder(
@@ -5851,7 +5874,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [AuthDirMiddleOnly](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#AuthDirMiddleOnly)
+     * [tor-man#AuthDirMiddleOnly](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#AuthDirMiddleOnly)
      * */
     @KmpTorDsl
     public class AuthDirMiddleOnly private constructor(): Setting.Builder(
@@ -5868,7 +5891,7 @@ public class TorConfig private constructor(
 
 
     /**
-     * [AuthDirFastGuarantee](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#AuthDirFastGuarantee)
+     * [tor-man#AuthDirFastGuarantee](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#AuthDirFastGuarantee)
      * */
     @KmpTorDsl
     public class AuthDirFastGuarantee private constructor(): Setting.Builder(
@@ -5884,7 +5907,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [AuthDirGuardBWGuarantee](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#AuthDirGuardBWGuarantee)
+     * [tor-man#AuthDirGuardBWGuarantee](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#AuthDirGuardBWGuarantee)
      * */
     @KmpTorDsl
     public class AuthDirGuardBWGuarantee private constructor(): Setting.Builder(
@@ -5900,7 +5923,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [AuthDirHasIPv6Connectivity](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#AuthDirHasIPv6Connectivity)
+     * [tor-man#AuthDirHasIPv6Connectivity](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#AuthDirHasIPv6Connectivity)
      * */
     @KmpTorDsl
     public class AuthDirHasIPv6Connectivity private constructor(): Setting.Builder(
@@ -5916,7 +5939,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [AuthDirInvalid](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#AuthDirInvalid)
+     * [tor-man#AuthDirInvalid](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#AuthDirInvalid)
      * */
     @KmpTorDsl
     public class AuthDirInvalid private constructor(): Setting.Builder(
@@ -5932,7 +5955,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [AuthDirListBadExits](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#AuthDirListBadExits)
+     * [tor-man#AuthDirListBadExits](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#AuthDirListBadExits)
      * */
     @KmpTorDsl
     public class AuthDirListBadExits private constructor(): Setting.Builder(
@@ -5948,7 +5971,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [AuthDirListMiddleOnly](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#AuthDirListMiddleOnly)
+     * [tor-man#AuthDirListMiddleOnly](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#AuthDirListMiddleOnly)
      * */
     @KmpTorDsl
     public class AuthDirListMiddleOnly private constructor(): Setting.Builder(
@@ -5964,7 +5987,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [AuthDirMaxServersPerAddr](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#AuthDirMaxServersPerAddr)
+     * [tor-man#AuthDirMaxServersPerAddr](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#AuthDirMaxServersPerAddr)
      * */
     @KmpTorDsl
     public class AuthDirMaxServersPerAddr private constructor(): Setting.Builder(
@@ -5980,7 +6003,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [AuthDirPinKeys](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#AuthDirPinKeys)
+     * [tor-man#AuthDirPinKeys](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#AuthDirPinKeys)
      * */
     @KmpTorDsl
     public class AuthDirPinKeys private constructor(): Setting.Builder(
@@ -5996,7 +6019,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [AuthDirReject](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#AuthDirReject)
+     * [tor-man#AuthDirReject](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#AuthDirReject)
      * */
     @KmpTorDsl
     public class AuthDirReject private constructor(): Setting.Builder(
@@ -6012,7 +6035,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [AuthDirRejectRequestsUnderLoad](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#AuthDirRejectRequestsUnderLoad)
+     * [tor-man#AuthDirRejectRequestsUnderLoad](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#AuthDirRejectRequestsUnderLoad)
      * */
     @KmpTorDsl
     public class AuthDirRejectRequestsUnderLoad private constructor(): Setting.Builder(
@@ -6028,7 +6051,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [AuthDirBadExitCCs](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#AuthDirBadExitCCs)
+     * [tor-man#AuthDirBadExitCCs](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#AuthDirBadExitCCs)
      * */
     @KmpTorDsl
     public class AuthDirBadExitCCs private constructor(): Setting.Builder(
@@ -6044,7 +6067,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [AuthDirInvalidCCs](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#AuthDirInvalidCCs)
+     * [tor-man#AuthDirInvalidCCs](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#AuthDirInvalidCCs)
      * */
     @KmpTorDsl
     public class AuthDirInvalidCCs private constructor(): Setting.Builder(
@@ -6060,7 +6083,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [AuthDirMiddleOnlyCCs](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#AuthDirMiddleOnlyCCs)
+     * [tor-man#AuthDirMiddleOnlyCCs](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#AuthDirMiddleOnlyCCs)
      * */
     @KmpTorDsl
     public class AuthDirMiddleOnlyCCs private constructor(): Setting.Builder(
@@ -6077,7 +6100,7 @@ public class TorConfig private constructor(
 
 
     /**
-     * [AuthDirRejectCCs](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#AuthDirRejectCCs)
+     * [tor-man#AuthDirRejectCCs](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#AuthDirRejectCCs)
      * */
     @KmpTorDsl
     public class AuthDirRejectCCs private constructor(): Setting.Builder(
@@ -6093,7 +6116,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [AuthDirSharedRandomness](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#AuthDirSharedRandomness)
+     * [tor-man#AuthDirSharedRandomness](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#AuthDirSharedRandomness)
      * */
     @KmpTorDsl
     public class AuthDirSharedRandomness private constructor(): Setting.Builder(
@@ -6109,7 +6132,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [AuthDirTestEd25519LinkKeys](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#AuthDirTestEd25519LinkKeys)
+     * [tor-man#AuthDirTestEd25519LinkKeys](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#AuthDirTestEd25519LinkKeys)
      * */
     @KmpTorDsl
     public class AuthDirTestEd25519LinkKeys private constructor(): Setting.Builder(
@@ -6125,7 +6148,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [AuthDirTestReachability](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#AuthDirTestReachability)
+     * [tor-man#AuthDirTestReachability](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#AuthDirTestReachability)
      * */
     @KmpTorDsl
     public class AuthDirTestReachability private constructor(): Setting.Builder(
@@ -6141,7 +6164,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [AuthDirVoteGuard](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#AuthDirVoteGuard)
+     * [tor-man#AuthDirVoteGuard](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#AuthDirVoteGuard)
      * */
     @KmpTorDsl
     public class AuthDirVoteGuard private constructor(): Setting.Builder(
@@ -6157,7 +6180,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [AuthDirVoteGuardBwThresholdFraction](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#AuthDirVoteGuardBwThresholdFraction)
+     * [tor-man#AuthDirVoteGuardBwThresholdFraction](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#AuthDirVoteGuardBwThresholdFraction)
      * */
     @KmpTorDsl
     public class AuthDirVoteGuardBwThresholdFraction private constructor(): Setting.Builder(
@@ -6173,7 +6196,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [AuthDirVoteGuardGuaranteeTimeKnown](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#AuthDirVoteGuardGuaranteeTimeKnown)
+     * [tor-man#AuthDirVoteGuardGuaranteeTimeKnown](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#AuthDirVoteGuardGuaranteeTimeKnown)
      * */
     @KmpTorDsl
     public class AuthDirVoteGuardGuaranteeTimeKnown private constructor(): Setting.Builder(
@@ -6189,7 +6212,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [AuthDirVoteGuardGuaranteeWFU](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#AuthDirVoteGuardGuaranteeWFU)
+     * [tor-man#AuthDirVoteGuardGuaranteeWFU](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#AuthDirVoteGuardGuaranteeWFU)
      * */
     @KmpTorDsl
     public class AuthDirVoteGuardGuaranteeWFU private constructor(): Setting.Builder(
@@ -6205,7 +6228,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [AuthDirVoteStableGuaranteeMinUptime](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#AuthDirVoteStableGuaranteeMinUptime)
+     * [tor-man#AuthDirVoteStableGuaranteeMinUptime](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#AuthDirVoteStableGuaranteeMinUptime)
      * */
     @KmpTorDsl
     public class AuthDirVoteStableGuaranteeMinUptime private constructor(): Setting.Builder(
@@ -6221,7 +6244,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [AuthDirVoteStableGuaranteeMTBF](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#AuthDirVoteStableGuaranteeMTBF)
+     * [tor-man#AuthDirVoteStableGuaranteeMTBF](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#AuthDirVoteStableGuaranteeMTBF)
      * */
     @KmpTorDsl
     public class AuthDirVoteStableGuaranteeMTBF private constructor(): Setting.Builder(
@@ -6237,7 +6260,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [BridgePassword](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#BridgePassword)
+     * [tor-man#BridgePassword](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#BridgePassword)
      * */
     @KmpTorDsl
     public class BridgePassword private constructor(): Setting.Builder(
@@ -6253,7 +6276,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [ConsensusParams](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#ConsensusParams)
+     * [tor-man#ConsensusParams](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#ConsensusParams)
      * */
     @KmpTorDsl
     public class ConsensusParams private constructor(): Setting.Builder(
@@ -6269,7 +6292,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [DirAllowPrivateAddresses](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#DirAllowPrivateAddresses)
+     * [tor-man#DirAllowPrivateAddresses](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#DirAllowPrivateAddresses)
      * */
     @KmpTorDsl
     public class DirAllowPrivateAddresses private constructor(): Setting.Builder(
@@ -6285,7 +6308,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [GuardfractionFile](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#GuardfractionFile)
+     * [tor-man#GuardfractionFile](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#GuardfractionFile)
      * */
     @KmpTorDsl
     public class GuardfractionFile private constructor(): Setting.Builder(
@@ -6301,7 +6324,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [MinMeasuredBWsForAuthToIgnoreAdvertised](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#MinMeasuredBWsForAuthToIgnoreAdvertised)
+     * [tor-man#MinMeasuredBWsForAuthToIgnoreAdvertised](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#MinMeasuredBWsForAuthToIgnoreAdvertised)
      * */
     @KmpTorDsl
     public class MinMeasuredBWsForAuthToIgnoreAdvertised private constructor(): Setting.Builder(
@@ -6317,7 +6340,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [MinUptimeHidServDirectoryV2](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#MinUptimeHidServDirectoryV2)
+     * [tor-man#MinUptimeHidServDirectoryV2](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#MinUptimeHidServDirectoryV2)
      * */
     @KmpTorDsl
     public class MinUptimeHidServDirectoryV2 private constructor(): Setting.Builder(
@@ -6333,7 +6356,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [RecommendedClientVersions](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#RecommendedClientVersions)
+     * [tor-man#RecommendedClientVersions](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#RecommendedClientVersions)
      * */
     @KmpTorDsl
     public class RecommendedClientVersions private constructor(): Setting.Builder(
@@ -6349,7 +6372,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [RecommendedServerVersions](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#RecommendedServerVersions)
+     * [tor-man#RecommendedServerVersions](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#RecommendedServerVersions)
      * */
     @KmpTorDsl
     public class RecommendedServerVersions private constructor(): Setting.Builder(
@@ -6365,7 +6388,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [RecommendedVersions](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#RecommendedVersions)
+     * [tor-man#RecommendedVersions](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#RecommendedVersions)
      * */
     @KmpTorDsl
     public class RecommendedVersions private constructor(): Setting.Builder(
@@ -6381,7 +6404,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [V3AuthDistDelay](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#V3AuthDistDelay)
+     * [tor-man#V3AuthDistDelay](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#V3AuthDistDelay)
      * */
     @KmpTorDsl
     public class V3AuthDistDelay private constructor(): Setting.Builder(
@@ -6397,7 +6420,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [V3AuthNIntervalsValid](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#V3AuthNIntervalsValid)
+     * [tor-man#V3AuthNIntervalsValid](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#V3AuthNIntervalsValid)
      * */
     @KmpTorDsl
     public class V3AuthNIntervalsValid private constructor(): Setting.Builder(
@@ -6413,7 +6436,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [V3AuthUseLegacyKey](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#V3AuthUseLegacyKey)
+     * [tor-man#V3AuthUseLegacyKey](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#V3AuthUseLegacyKey)
      * */
     @KmpTorDsl
     public class V3AuthUseLegacyKey private constructor(): Setting.Builder(
@@ -6429,7 +6452,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [V3AuthVoteDelay](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#V3AuthVoteDelay)
+     * [tor-man#V3AuthVoteDelay](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#V3AuthVoteDelay)
      * */
     @KmpTorDsl
     public class V3AuthVoteDelay private constructor(): Setting.Builder(
@@ -6445,7 +6468,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [V3AuthVotingInterval](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#V3AuthVotingInterval)
+     * [tor-man#V3AuthVotingInterval](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#V3AuthVotingInterval)
      * */
     @KmpTorDsl
     public class V3AuthVotingInterval private constructor(): Setting.Builder(
@@ -6461,7 +6484,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [V3BandwidthsFile](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#V3BandwidthsFile)
+     * [tor-man#V3BandwidthsFile](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#V3BandwidthsFile)
      * */
     @KmpTorDsl
     public class V3BandwidthsFile private constructor(): Setting.Builder(
@@ -6477,7 +6500,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [VersioningAuthoritativeDirectory](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#VersioningAuthoritativeDirectory)
+     * [tor-man#VersioningAuthoritativeDirectory](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#VersioningAuthoritativeDirectory)
      * */
     @KmpTorDsl
     public class VersioningAuthoritativeDirectory private constructor(): Setting.Builder(
@@ -6501,7 +6524,7 @@ public class TorConfig private constructor(
     // (IMPLEMENTED) HiddenServiceDirGroupReadable
 
     /**
-     * [HiddenServiceExportCircuitID](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#HiddenServiceExportCircuitID)
+     * [tor-man#HiddenServiceExportCircuitID](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#HiddenServiceExportCircuitID)
      * */
     @KmpTorDsl
     public class HiddenServiceExportCircuitID private constructor(): Setting.Builder(
@@ -6517,7 +6540,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [HiddenServiceOnionBalanceInstance](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#HiddenServiceOnionBalanceInstance)
+     * [tor-man#HiddenServiceOnionBalanceInstance](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#HiddenServiceOnionBalanceInstance)
      * */
     @KmpTorDsl
     public class HiddenServiceOnionBalanceInstance private constructor(): Setting.Builder(
@@ -6539,7 +6562,7 @@ public class TorConfig private constructor(
     // (IMPLEMENTED) HiddenServiceVersion
 
     /**
-     * [HiddenServiceSingleHopMode](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#HiddenServiceSingleHopMode)
+     * [tor-man#HiddenServiceSingleHopMode](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#HiddenServiceSingleHopMode)
      * */
     @KmpTorDsl
     public class HiddenServiceSingleHopMode private constructor(): Setting.Builder(
@@ -6555,7 +6578,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [HiddenServiceNonAnonymousMode](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#HiddenServiceNonAnonymousMode)
+     * [tor-man#HiddenServiceNonAnonymousMode](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#HiddenServiceNonAnonymousMode)
      * */
     @KmpTorDsl
     public class HiddenServiceNonAnonymousMode private constructor(): Setting.Builder(
@@ -6571,7 +6594,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [PublishHidServDescriptors](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#PublishHidServDescriptors)
+     * [tor-man#PublishHidServDescriptors](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#PublishHidServDescriptors)
      * */
     @KmpTorDsl
     public class PublishHidServDescriptors private constructor(): Setting.Builder(
@@ -6591,7 +6614,7 @@ public class TorConfig private constructor(
     ///////////////////////////////
 
     /**
-     * [TestingTorNetwork](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#TestingTorNetwork)
+     * [tor-man#TestingTorNetwork](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#TestingTorNetwork)
      * */
     @KmpTorDsl
     public class TestingTorNetwork private constructor(): Setting.Builder(
@@ -6607,7 +6630,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [TestingAuthDirTimeToLearnReachability](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#TestingAuthDirTimeToLearnReachability)
+     * [tor-man#TestingAuthDirTimeToLearnReachability](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#TestingAuthDirTimeToLearnReachability)
      * */
     @KmpTorDsl
     public class TestingAuthDirTimeToLearnReachability private constructor(): Setting.Builder(
@@ -6623,7 +6646,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [TestingAuthKeyLifetime](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#TestingAuthKeyLifetime)
+     * [tor-man#TestingAuthKeyLifetime](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#TestingAuthKeyLifetime)
      * */
     @KmpTorDsl
     public class TestingAuthKeyLifetime private constructor(): Setting.Builder(
@@ -6639,7 +6662,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [TestingAuthKeySlop](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#TestingAuthKeySlop)
+     * [tor-man#TestingAuthKeySlop](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#TestingAuthKeySlop)
      * */
     @KmpTorDsl
     public class TestingAuthKeySlop private constructor(): Setting.Builder(
@@ -6655,7 +6678,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [TestingBridgeBootstrapDownloadInitialDelay](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#TestingBridgeBootstrapDownloadInitialDelay)
+     * [tor-man#TestingBridgeBootstrapDownloadInitialDelay](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#TestingBridgeBootstrapDownloadInitialDelay)
      * */
     @KmpTorDsl
     public class TestingBridgeBootstrapDownloadInitialDelay private constructor(): Setting.Builder(
@@ -6671,7 +6694,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [TestingBridgeDownloadInitialDelay](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#TestingBridgeDownloadInitialDelay)
+     * [tor-man#TestingBridgeDownloadInitialDelay](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#TestingBridgeDownloadInitialDelay)
      * */
     @KmpTorDsl
     public class TestingBridgeDownloadInitialDelay private constructor(): Setting.Builder(
@@ -6687,7 +6710,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [TestingClientConsensusDownloadInitialDelay](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#TestingClientConsensusDownloadInitialDelay)
+     * [tor-man#TestingClientConsensusDownloadInitialDelay](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#TestingClientConsensusDownloadInitialDelay)
      * */
     @KmpTorDsl
     public class TestingClientConsensusDownloadInitialDelay private constructor(): Setting.Builder(
@@ -6703,7 +6726,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [TestingClientDownloadInitialDelay](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#TestingClientDownloadInitialDelay)
+     * [tor-man#TestingClientDownloadInitialDelay](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#TestingClientDownloadInitialDelay)
      * */
     @KmpTorDsl
     public class TestingClientDownloadInitialDelay private constructor(): Setting.Builder(
@@ -6719,7 +6742,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [TestingClientMaxIntervalWithoutRequest](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#TestingClientMaxIntervalWithoutRequest)
+     * [tor-man#TestingClientMaxIntervalWithoutRequest](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#TestingClientMaxIntervalWithoutRequest)
      * */
     @KmpTorDsl
     public class TestingClientMaxIntervalWithoutRequest private constructor(): Setting.Builder(
@@ -6735,7 +6758,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [TestingDirAuthVoteExit](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#TestingDirAuthVoteExit)
+     * [tor-man#TestingDirAuthVoteExit](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#TestingDirAuthVoteExit)
      * */
     @KmpTorDsl
     public class TestingDirAuthVoteExit private constructor(): Setting.Builder(
@@ -6751,7 +6774,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [TestingDirAuthVoteExitIsStrict](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#TestingDirAuthVoteExitIsStrict)
+     * [tor-man#TestingDirAuthVoteExitIsStrict](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#TestingDirAuthVoteExitIsStrict)
      * */
     @KmpTorDsl
     public class TestingDirAuthVoteExitIsStrict private constructor(): Setting.Builder(
@@ -6767,7 +6790,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [TestingDirAuthVoteGuard](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#TestingDirAuthVoteGuard)
+     * [tor-man#TestingDirAuthVoteGuard](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#TestingDirAuthVoteGuard)
      * */
     @KmpTorDsl
     public class TestingDirAuthVoteGuard private constructor(): Setting.Builder(
@@ -6783,7 +6806,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [TestingDirAuthVoteGuardIsStrict](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#TestingDirAuthVoteGuardIsStrict)
+     * [tor-man#TestingDirAuthVoteGuardIsStrict](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#TestingDirAuthVoteGuardIsStrict)
      * */
     @KmpTorDsl
     public class TestingDirAuthVoteGuardIsStrict private constructor(): Setting.Builder(
@@ -6799,7 +6822,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [TestingDirAuthVoteHSDir](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#TestingDirAuthVoteHSDir)
+     * [tor-man#TestingDirAuthVoteHSDir](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#TestingDirAuthVoteHSDir)
      * */
     @KmpTorDsl
     public class TestingDirAuthVoteHSDir private constructor(): Setting.Builder(
@@ -6815,7 +6838,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [TestingDirAuthVoteHSDirIsStrict](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#TestingDirAuthVoteHSDirIsStrict)
+     * [tor-man#TestingDirAuthVoteHSDirIsStrict](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#TestingDirAuthVoteHSDirIsStrict)
      * */
     @KmpTorDsl
     public class TestingDirAuthVoteHSDirIsStrict private constructor(): Setting.Builder(
@@ -6831,7 +6854,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [TestingDirConnectionMaxStall](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#TestingDirConnectionMaxStall)
+     * [tor-man#TestingDirConnectionMaxStall](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#TestingDirConnectionMaxStall)
      * */
     @KmpTorDsl
     public class TestingDirConnectionMaxStall private constructor(): Setting.Builder(
@@ -6847,7 +6870,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [TestingEnableCellStatsEvent](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#TestingEnableCellStatsEvent)
+     * [tor-man#TestingEnableCellStatsEvent](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#TestingEnableCellStatsEvent)
      * */
     @KmpTorDsl
     public class TestingEnableCellStatsEvent private constructor(): Setting.Builder(
@@ -6863,7 +6886,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [TestingEnableConnBwEvent](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#TestingEnableConnBwEvent)
+     * [tor-man#TestingEnableConnBwEvent](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#TestingEnableConnBwEvent)
      * */
     @KmpTorDsl
     public class TestingEnableConnBwEvent private constructor(): Setting.Builder(
@@ -6879,7 +6902,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [TestingLinkCertLifetime](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#TestingLinkCertLifetime)
+     * [tor-man#TestingLinkCertLifetime](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#TestingLinkCertLifetime)
      * */
     @KmpTorDsl
     public class TestingLinkCertLifetime private constructor(): Setting.Builder(
@@ -6895,7 +6918,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [TestingLinkKeySlop](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#TestingLinkKeySlop)
+     * [tor-man#TestingLinkKeySlop](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#TestingLinkKeySlop)
      * */
     @KmpTorDsl
     public class TestingLinkKeySlop private constructor(): Setting.Builder(
@@ -6911,7 +6934,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [TestingMinExitFlagThreshold](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#TestingMinExitFlagThreshold)
+     * [tor-man#TestingMinExitFlagThreshold](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#TestingMinExitFlagThreshold)
      * */
     @KmpTorDsl
     public class TestingMinExitFlagThreshold private constructor(): Setting.Builder(
@@ -6927,7 +6950,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [TestingMinFastFlagThreshold](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#TestingMinFastFlagThreshold)
+     * [tor-man#TestingMinFastFlagThreshold](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#TestingMinFastFlagThreshold)
      * */
     @KmpTorDsl
     public class TestingMinFastFlagThreshold private constructor(): Setting.Builder(
@@ -6943,7 +6966,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [TestingMinTimeToReportBandwidth](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#TestingMinTimeToReportBandwidth)
+     * [tor-man#TestingMinTimeToReportBandwidth](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#TestingMinTimeToReportBandwidth)
      * */
     @KmpTorDsl
     public class TestingMinTimeToReportBandwidth private constructor(): Setting.Builder(
@@ -6959,7 +6982,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [TestingServerConsensusDownloadInitialDelay](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#TestingServerConsensusDownloadInitialDelay)
+     * [tor-man#TestingServerConsensusDownloadInitialDelay](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#TestingServerConsensusDownloadInitialDelay)
      * */
     @KmpTorDsl
     public class TestingServerConsensusDownloadInitialDelay private constructor(): Setting.Builder(
@@ -6975,7 +6998,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [TestingServerDownloadInitialDelay](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#TestingServerDownloadInitialDelay)
+     * [tor-man#TestingServerDownloadInitialDelay](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#TestingServerDownloadInitialDelay)
      * */
     @KmpTorDsl
     public class TestingServerDownloadInitialDelay private constructor(): Setting.Builder(
@@ -6991,7 +7014,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [TestingSigningKeySlop](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#TestingSigningKeySlop)
+     * [tor-man#TestingSigningKeySlop](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#TestingSigningKeySlop)
      * */
     @KmpTorDsl
     public class TestingSigningKeySlop private constructor(): Setting.Builder(
@@ -7007,7 +7030,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [TestingV3AuthInitialDistDelay](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#TestingV3AuthInitialDistDelay)
+     * [tor-man#TestingV3AuthInitialDistDelay](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#TestingV3AuthInitialDistDelay)
      * */
     @KmpTorDsl
     public class TestingV3AuthInitialDistDelay private constructor(): Setting.Builder(
@@ -7023,7 +7046,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [TestingV3AuthInitialVoteDelay](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#TestingV3AuthInitialVoteDelay)
+     * [tor-man#TestingV3AuthInitialVoteDelay](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#TestingV3AuthInitialVoteDelay)
      * */
     @KmpTorDsl
     public class TestingV3AuthInitialVoteDelay private constructor(): Setting.Builder(
@@ -7039,7 +7062,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [TestingV3AuthInitialVotingInterval](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#TestingV3AuthInitialVotingInterval)
+     * [tor-man#TestingV3AuthInitialVotingInterval](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#TestingV3AuthInitialVotingInterval)
      * */
     @KmpTorDsl
     public class TestingV3AuthInitialVotingInterval private constructor(): Setting.Builder(
@@ -7055,7 +7078,7 @@ public class TorConfig private constructor(
     }
 
     /**
-     * [TestingV3AuthVotingStartOffset](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#TestingV3AuthVotingStartOffset)
+     * [tor-man#TestingV3AuthVotingStartOffset](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#TestingV3AuthVotingStartOffset)
      * */
     @KmpTorDsl
     public class TestingV3AuthVotingStartOffset private constructor(): Setting.Builder(
@@ -7396,7 +7419,7 @@ public class TorConfig private constructor(
      *     assertIs<TorConfig.KeyWord>(TorConfig.__DNSPort)
      *     assertIs<TorConfig.KeyWord>(TorConfig.__DNSPort.Companion)
      *
-     * [Docs](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc)
+     * [tor-manual](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc)
      *
      * @see [Setting.Factory]
      * @see [Setting.filterByKeyword]

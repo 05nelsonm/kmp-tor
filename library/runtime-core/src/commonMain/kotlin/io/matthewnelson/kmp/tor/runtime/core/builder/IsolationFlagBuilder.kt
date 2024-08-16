@@ -25,13 +25,13 @@ import kotlin.jvm.JvmField
 import kotlin.jvm.JvmSynthetic
 
 /**
- * Configure a Ports Isolation Flags
+ * Configure a port's Isolation Flags.
  *
  * - `null`  - no action (default)
  * - `true`  - add the flag if not present
  * - `false` - remove the flag if present
  *
- * [SocksPort](https://2019.www.torproject.org/docs/tor-manual.html.en#SocksPort)
+ * [tor-man#SocksPort](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#SocksPort)
  * */
 @KmpTorDsl
 public class IsolationFlagBuilder private constructor() {
@@ -106,9 +106,15 @@ public class IsolationFlagBuilder private constructor() {
         }
     }
 
+    /**
+     * Not meant for public use.
+     * */
     @InternalKmpTorApi
     public interface DSL<out R: Any> {
 
+        /**
+         * Configure a port's isolation flags.
+         * */
         @KmpTorDsl
         public fun isolationFlags(
             block: ThisBlock<IsolationFlagBuilder>,

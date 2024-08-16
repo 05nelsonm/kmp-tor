@@ -118,11 +118,6 @@ public sealed class TCPPortBuilder private constructor() {
         }
     }
 
-    /**
-     * For configuring [TorConfig.HiddenServicePort] to use a specific
-     * target TCP Port, instead of utilizing the specified
-     * [TorConfig.HiddenServicePort.virtual] port.
-     * */
     @KmpTorDsl
     public class HiddenService private constructor(): TCPPortBuilder() {
 
@@ -138,12 +133,18 @@ public sealed class TCPPortBuilder private constructor() {
         }
     }
 
+    /**
+     * Not meant for public use.
+     * */
     @InternalKmpTorApi
     public interface DSL<out T: TCPPortBuilder, out R: Any> {
 
         /**
          * For a [TorConfig.Keyword] that can be configured to use
-         * a TCP Port, or a Unix Socket.
+         * either a TCP port, or a Unix Socket. This will configure
+         * it to use a TCP port.
+         *
+         * @see [UnixSocketBuilder.DSL.asUnixSocket]
          * */
         @KmpTorDsl
         public fun asPort(
@@ -151,23 +152,28 @@ public sealed class TCPPortBuilder private constructor() {
         ): R
     }
 
+    /**
+     * Not meant for public use.
+     * */
     @InternalKmpTorApi
     public interface DSLAuto<out R: Any> {
 
         /**
-         * Sets the port to "auto", indicating that Tor should
-         * pick an available port.
+         * Sets the port to `auto`, indicating that tor should
+         * pick an available port at random.
          * */
         @KmpTorDsl
         public fun auto(): R
     }
 
+    /**
+     * Not meant for public use.
+     * */
     @InternalKmpTorApi
     public interface DSLDisable<out R: Any> {
 
         /**
-         * Disables the [TorConfig.Keyword] by setting its port
-         * to "0".
+         * Disables the [TorConfig.Keyword] by setting its port to `0`.
          * */
         @KmpTorDsl
         public fun disable(): R
@@ -175,16 +181,22 @@ public sealed class TCPPortBuilder private constructor() {
 
     // TODO: IPAddress/Localhost
 
+    /**
+     * Not meant for public use.
+     * */
     @InternalKmpTorApi
     public interface DSLPort<out R: Any>: DSLReassign<R> {
 
         /**
-         * Specify a port
+         * Specify a port for the given [TorConfig.Keyword]
          * */
         @KmpTorDsl
         public fun port(port: Port.Ephemeral): R
     }
 
+    /**
+     * Not meant for public use.
+     * */
     @InternalKmpTorApi
     public interface DSLReassign<out R: Any> {
 
