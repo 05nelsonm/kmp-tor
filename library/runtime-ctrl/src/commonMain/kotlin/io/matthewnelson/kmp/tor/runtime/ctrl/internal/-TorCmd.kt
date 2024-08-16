@@ -158,12 +158,12 @@ private fun TorCmd.Config.Set.encode(LOG: Debugger?): ByteArray {
 
                     with(line.keyword.attributes) {
                         when {
-                            contains(Attribute.UnixSocket) -> {
+                            contains(Attribute.UNIX_SOCKET) -> {
                                 if (argument.startsWith("unix:")) {
                                     argument = argument.replace("\"", "\\\"")
                                 }
                             }
-                            contains(Attribute.File) || contains(Attribute.Directory) -> {
+                            contains(Attribute.FILE) || contains(Attribute.DIRECTORY) -> {
                                 if (SysDirSep == '\\') {
                                     argument = argument.replace("\\", "\\\\")
                                 }

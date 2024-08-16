@@ -466,7 +466,7 @@ internal class TorDaemon private constructor(
                             cmdLine.add(remainder)
                         }
 
-                        if (lineItem.keyword.attributes.contains(TorConfig.Keyword.Attribute.Directory)) {
+                        if (lineItem.keyword.attributes.contains(TorConfig.Keyword.Attribute.DIRECTORY)) {
                             directories.add(lineItem.argument.toFile())
                         }
                     }

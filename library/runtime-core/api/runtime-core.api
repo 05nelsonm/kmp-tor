@@ -1642,43 +1642,43 @@ public abstract class io/matthewnelson/kmp/tor/runtime/core/TorConfig$Keyword : 
 public abstract class io/matthewnelson/kmp/tor/runtime/core/TorConfig$Keyword$Attribute {
 }
 
-public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$Keyword$Attribute$Directory : io/matthewnelson/kmp/tor/runtime/core/TorConfig$Keyword$Attribute {
-	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/core/TorConfig$Keyword$Attribute$Directory;
+public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$Keyword$Attribute$DIRECTORY : io/matthewnelson/kmp/tor/runtime/core/TorConfig$Keyword$Attribute {
+	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/core/TorConfig$Keyword$Attribute$DIRECTORY;
 	public fun equals (Ljava/lang/Object;)Z
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$Keyword$Attribute$File : io/matthewnelson/kmp/tor/runtime/core/TorConfig$Keyword$Attribute {
-	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/core/TorConfig$Keyword$Attribute$File;
+public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$Keyword$Attribute$FILE : io/matthewnelson/kmp/tor/runtime/core/TorConfig$Keyword$Attribute {
+	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/core/TorConfig$Keyword$Attribute$FILE;
 	public fun equals (Ljava/lang/Object;)Z
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$Keyword$Attribute$HiddenService : io/matthewnelson/kmp/tor/runtime/core/TorConfig$Keyword$Attribute {
-	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/core/TorConfig$Keyword$Attribute$HiddenService;
+public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$Keyword$Attribute$HIDDEN_SERVICE : io/matthewnelson/kmp/tor/runtime/core/TorConfig$Keyword$Attribute {
+	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/core/TorConfig$Keyword$Attribute$HIDDEN_SERVICE;
 	public fun equals (Ljava/lang/Object;)Z
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$Keyword$Attribute$Logging : io/matthewnelson/kmp/tor/runtime/core/TorConfig$Keyword$Attribute {
-	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/core/TorConfig$Keyword$Attribute$Logging;
+public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$Keyword$Attribute$LOGGING : io/matthewnelson/kmp/tor/runtime/core/TorConfig$Keyword$Attribute {
+	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/core/TorConfig$Keyword$Attribute$LOGGING;
 	public fun equals (Ljava/lang/Object;)Z
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$Keyword$Attribute$Port : io/matthewnelson/kmp/tor/runtime/core/TorConfig$Keyword$Attribute {
-	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/core/TorConfig$Keyword$Attribute$Port;
+public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$Keyword$Attribute$PORT : io/matthewnelson/kmp/tor/runtime/core/TorConfig$Keyword$Attribute {
+	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/core/TorConfig$Keyword$Attribute$PORT;
 	public fun equals (Ljava/lang/Object;)Z
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$Keyword$Attribute$UnixSocket : io/matthewnelson/kmp/tor/runtime/core/TorConfig$Keyword$Attribute {
-	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/core/TorConfig$Keyword$Attribute$UnixSocket;
+public final class io/matthewnelson/kmp/tor/runtime/core/TorConfig$Keyword$Attribute$UNIX_SOCKET : io/matthewnelson/kmp/tor/runtime/core/TorConfig$Keyword$Attribute {
+	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/core/TorConfig$Keyword$Attribute$UNIX_SOCKET;
 	public fun equals (Ljava/lang/Object;)Z
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
