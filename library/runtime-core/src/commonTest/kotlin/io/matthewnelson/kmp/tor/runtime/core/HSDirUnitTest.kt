@@ -16,7 +16,7 @@
 package io.matthewnelson.kmp.tor.runtime.core
 
 import io.matthewnelson.kmp.file.toFile
-import io.matthewnelson.kmp.tor.runtime.core.address.Port.Companion.toPort
+import io.matthewnelson.kmp.tor.runtime.core.address.Port
 import kotlin.test.Test
 import kotlin.test.assertIs
 import kotlin.test.assertNull
@@ -27,7 +27,7 @@ class HSDirUnitTest {
     fun givenSetting_whenConfigured_thenFirstItemIsHiddenServiceDir() {
         val setting = TorConfig.HiddenServiceDir.Builder {
             directory = "/some/path".toFile()
-            port { virtual = 80.toPort() }
+            port { virtual = Port.HTTP }
             version { HSv(3) }
         }!!
 
@@ -38,7 +38,7 @@ class HSDirUnitTest {
     fun givenBuilder_whenNoDirectory_thenReturnsNull() {
         val setting = TorConfig.HiddenServiceDir.Builder {
 //            directory = "/some/path".toFile()
-            port { virtual = 80.toPort() }
+            port { virtual = Port.HTTP }
             version { HSv(3) }
         }
 
@@ -49,7 +49,7 @@ class HSDirUnitTest {
     fun givenBuilder_whenNoPort_thenReturnsNull() {
         val setting = TorConfig.HiddenServiceDir.Builder {
             directory = "/some/path".toFile()
-//            port { virtual = 80.toPort() }
+//            port { virtual = Port.HTTP }
             version { HSv(3) }
         }
 
@@ -60,7 +60,7 @@ class HSDirUnitTest {
     fun givenBuilder_whenNoVersion_thenReturnsNull() {
         val setting = TorConfig.HiddenServiceDir.Builder {
             directory = "/some/path".toFile()
-            port { virtual = 80.toPort() }
+            port { virtual = Port.HTTP }
 //            version { HSv(3) }
         }
 

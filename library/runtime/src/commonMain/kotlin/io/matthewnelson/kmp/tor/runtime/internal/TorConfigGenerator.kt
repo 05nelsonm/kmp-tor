@@ -84,7 +84,7 @@ internal class TorConfigGenerator internal constructor(
     private suspend fun TorConfig.validateTCPPorts(
         NOTIFIER: Notifier,
     ): TorConfig {
-        val ports = filterByAttribute<Keyword.Attribute.Port>().filter { setting ->
+        val ports = filterByAttribute<Keyword.Attribute.PORT>().filter { setting ->
             setting[Extra.AllowReassign] == true
         }
 

@@ -220,7 +220,7 @@ public class TorConfig private constructor(
 
                 other.settings.forEach { setting ->
                     if (
-                        setting.keyword.attributes.contains(Attribute.Port)
+                        setting.keyword.attributes.contains(Attribute.PORT)
                         && setting.argument == "0"
                     ) {
                         disabledPorts.add(setting)
@@ -246,7 +246,7 @@ public class TorConfig private constructor(
                 val settings = b.settings.toMutableSet()
                 settings.addAll(b.inheritedDisabledPorts)
 
-                settings.filterByAttribute<Attribute.Port>().forEach { setting ->
+                settings.filterByAttribute<Attribute.PORT>().forEach { setting ->
                     if (setting.keyword is HiddenServiceDir.Companion) return@forEach
                     if (setting.argument != "0") return@forEach
 
@@ -273,7 +273,7 @@ public class TorConfig private constructor(
                     }
                 }
 
-                if (keyword.attributes.contains(Attribute.Port)) {
+                if (keyword.attributes.contains(Attribute.PORT)) {
                     for (port in inheritedDisabledPorts) {
                         if (port.keyword == keyword) return true
                     }
@@ -355,7 +355,7 @@ public class TorConfig private constructor(
         public companion object: Setting.Factory<__ControlPort, Setting>(
             name = "__ControlPort",
             default = "0",
-            attributes = immutableSetOf(Attribute.Port, Attribute.UnixSocket),
+            attributes = immutableSetOf(Attribute.PORT, Attribute.UNIX_SOCKET),
             isCmdLineArg = true,
             isUnique = false,
             factory = { __ControlPort() },
@@ -421,7 +421,7 @@ public class TorConfig private constructor(
         public companion object: Setting.Factory<__DNSPort, Setting>(
             name = "__DNSPort",
             default = "0",
-            attributes = immutableSetOf(Attribute.Port),
+            attributes = immutableSetOf(Attribute.PORT),
             isCmdLineArg = false,
             isUnique = false,
             factory = { __DNSPort() },
@@ -487,7 +487,7 @@ public class TorConfig private constructor(
         public companion object: Setting.Factory<__HTTPTunnelPort, Setting>(
             name = "__HTTPTunnelPort",
             default = "0",
-            attributes = immutableSetOf(Attribute.Port),
+            attributes = immutableSetOf(Attribute.PORT),
             isCmdLineArg = false,
             isUnique = false,
             factory = { __HTTPTunnelPort() },
@@ -567,7 +567,7 @@ public class TorConfig private constructor(
         public companion object: Setting.Factory<__SocksPort, Setting>(
             name = "__SocksPort",
             default = "9050",
-            attributes = immutableSetOf(Attribute.Port, Attribute.UnixSocket),
+            attributes = immutableSetOf(Attribute.PORT, Attribute.UNIX_SOCKET),
             isCmdLineArg = false,
             isUnique = false,
             factory = { __SocksPort() },
@@ -644,7 +644,7 @@ public class TorConfig private constructor(
         public companion object: Setting.Factory<__TransPort, Setting>(
             name = "__TransPort",
             default = "0",
-            attributes = immutableSetOf(Attribute.Port),
+            attributes = immutableSetOf(Attribute.PORT),
             isCmdLineArg = false,
             isUnique = false,
             factory = { __TransPort() },
@@ -717,7 +717,7 @@ public class TorConfig private constructor(
         public companion object: Setting.Factory<CacheDirectory, Setting?>(
             name = "CacheDirectory",
             default = "",
-            attributes = immutableSetOf(Attribute.Directory),
+            attributes = immutableSetOf(Attribute.DIRECTORY),
             isCmdLineArg = true,
             isUnique = true,
             factory = { CacheDirectory() },
@@ -739,7 +739,7 @@ public class TorConfig private constructor(
         public companion object: Setting.Factory<ControlPortWriteToFile, Setting?>(
             name = "ControlPortWriteToFile",
             default = "",
-            attributes = immutableSetOf(Attribute.File),
+            attributes = immutableSetOf(Attribute.FILE),
             isCmdLineArg = true,
             isUnique = true,
             factory = { ControlPortWriteToFile() },
@@ -788,7 +788,7 @@ public class TorConfig private constructor(
         public companion object: Setting.Factory<CookieAuthFile, Setting?>(
             name = "CookieAuthFile",
             default = "",
-            attributes = immutableSetOf(Attribute.File),
+            attributes = immutableSetOf(Attribute.FILE),
             isCmdLineArg = true,
             isUnique = true,
             factory = { CookieAuthFile() },
@@ -815,7 +815,7 @@ public class TorConfig private constructor(
         public companion object: Setting.Factory<DataDirectory, Setting?>(
             name = "DataDirectory",
             default = "",
-            attributes = immutableSetOf(Attribute.Directory),
+            attributes = immutableSetOf(Attribute.DIRECTORY),
             isCmdLineArg = true,
             isUnique = true,
             factory = { DataDirectory() },
@@ -897,7 +897,7 @@ public class TorConfig private constructor(
         public companion object: Setting.Factory<SyslogIdentityTag, Setting?>(
             name = "SyslogIdentityTag",
             default = "",
-            attributes = immutableSetOf(Attribute.Logging),
+            attributes = immutableSetOf(Attribute.LOGGING),
             isCmdLineArg = true,
             isUnique = true,
             factory = { SyslogIdentityTag() },
@@ -933,7 +933,7 @@ public class TorConfig private constructor(
         public companion object: Keyword(
             name = "AndroidIdentityTag",
             default = "",
-            attributes = immutableSetOf(Attribute.Logging),
+            attributes = immutableSetOf(Attribute.LOGGING),
             isCmdLineArg = true,
             isUnique = true
         )
@@ -1051,7 +1051,7 @@ public class TorConfig private constructor(
         public companion object: Setting.Factory<ClientOnionAuthDir, Setting?>(
             name = "ClientOnionAuthDir",
             default = "",
-            attributes = immutableSetOf(Attribute.Directory),
+            attributes = immutableSetOf(Attribute.DIRECTORY),
             isCmdLineArg = true,
             isUnique = true,
             factory = { ClientOnionAuthDir() },
@@ -1348,7 +1348,7 @@ public class TorConfig private constructor(
         public companion object: Setting.Factory<GeoIPFile, Setting?>(
             name = "GeoIPFile",
             default = "",
-            attributes = immutableSetOf(Attribute.File),
+            attributes = immutableSetOf(Attribute.FILE),
             isCmdLineArg = true,
             isUnique = true,
             factory = { GeoIPFile() },
@@ -1370,7 +1370,7 @@ public class TorConfig private constructor(
         public companion object: Setting.Factory<GeoIPv6File, Setting?>(
             name = "GeoIPv6File",
             default = "",
-            attributes = immutableSetOf(Attribute.File),
+            attributes = immutableSetOf(Attribute.FILE),
             isCmdLineArg = true,
             isUnique = true,
             factory = { GeoIPv6File() },
@@ -1389,7 +1389,7 @@ public class TorConfig private constructor(
      *
      *     val setting = HiddenServiceDir.Builder {
      *         directory = "/some/path".toFile()
-     *         port { virtual = 80.toPort() }
+     *         port { virtual = Port.HTTP }
      *         version { HSv(3) }
      *     }
      *
@@ -1496,7 +1496,7 @@ public class TorConfig private constructor(
         public companion object: Setting.Factory<HiddenServiceDir, Setting?>(
             name = "HiddenServiceDir",
             default = "",
-            attributes = immutableSetOf(Attribute.Directory, Attribute.HiddenService),
+            attributes = immutableSetOf(Attribute.DIRECTORY, Attribute.HIDDEN_SERVICE),
             isCmdLineArg = false,
             isUnique = false,
             factory = { HiddenServiceDir() },
@@ -1597,7 +1597,7 @@ public class TorConfig private constructor(
         public companion object: Keyword(
             name = "HiddenServicePort",
             default = "",
-            attributes = immutableSetOf(Attribute.HiddenService, Attribute.Port, Attribute.UnixSocket),
+            attributes = immutableSetOf(Attribute.HIDDEN_SERVICE, Attribute.PORT, Attribute.UNIX_SOCKET),
             isCmdLineArg = false,
             isUnique = false,
         ) {
@@ -1652,7 +1652,7 @@ public class TorConfig private constructor(
         public companion object: Keyword(
             name = "HiddenServiceVersion",
             default = "3",
-            attributes = immutableSetOf(Attribute.HiddenService),
+            attributes = immutableSetOf(Attribute.HIDDEN_SERVICE),
             isCmdLineArg = false,
             isUnique = false,
         ) {
@@ -1679,7 +1679,7 @@ public class TorConfig private constructor(
         public companion object: Keyword(
             name = "HiddenServiceAllowUnknownPorts",
             default = false.byte.toString(),
-            attributes = immutableSetOf(Attribute.HiddenService),
+            attributes = immutableSetOf(Attribute.HIDDEN_SERVICE),
             isCmdLineArg = false,
             isUnique = false,
         ) {
@@ -1710,7 +1710,7 @@ public class TorConfig private constructor(
         public companion object: Keyword(
             name = "HiddenServiceMaxStreams",
             default = "0",
-            attributes = immutableSetOf(Attribute.HiddenService),
+            attributes = immutableSetOf(Attribute.HIDDEN_SERVICE),
             isCmdLineArg = false,
             isUnique = false,
         ) {
@@ -1739,7 +1739,7 @@ public class TorConfig private constructor(
         public companion object: Keyword(
             name = "HiddenServiceMaxStreamsCloseCircuit",
             default = false.byte.toString(),
-            attributes = immutableSetOf(Attribute.HiddenService),
+            attributes = immutableSetOf(Attribute.HIDDEN_SERVICE),
             isCmdLineArg = false,
             isUnique = false,
         ) {
@@ -1766,7 +1766,7 @@ public class TorConfig private constructor(
         public companion object: Keyword(
             name = "HiddenServiceDirGroupReadable",
             default = false.byte.toString(),
-            attributes = immutableSetOf(Attribute.HiddenService),
+            attributes = immutableSetOf(Attribute.HIDDEN_SERVICE),
             isCmdLineArg = false,
             isUnique = false,
         ) {
@@ -1813,7 +1813,7 @@ public class TorConfig private constructor(
         public companion object: Keyword(
             name = "HiddenServiceNumIntroductionPoints",
             default = "3",
-            attributes = immutableSetOf(Attribute.HiddenService),
+            attributes = immutableSetOf(Attribute.HIDDEN_SERVICE),
             isCmdLineArg = false,
             isUnique = false,
         ) {
@@ -1852,7 +1852,7 @@ public class TorConfig private constructor(
         public companion object: Keyword(
             name = "__DirPort",
             default = "0",
-            attributes = immutableSetOf(Attribute.Port),
+            attributes = immutableSetOf(Attribute.PORT),
             isCmdLineArg = false,
             isUnique = false,
         )
@@ -1872,7 +1872,7 @@ public class TorConfig private constructor(
         public companion object: Keyword(
             name = "__ExtORPort",
             default = "",
-            attributes = immutableSetOf(Attribute.Port),
+            attributes = immutableSetOf(Attribute.PORT),
             isCmdLineArg = false,
             isUnique = false,
         )
@@ -1890,7 +1890,7 @@ public class TorConfig private constructor(
         public companion object: Keyword(
             name = "__MetricsPort",
             default = "",
-            attributes = immutableSetOf(Attribute.Port),
+            attributes = immutableSetOf(Attribute.PORT),
             isCmdLineArg = false,
             isUnique = false,
         )
@@ -1908,7 +1908,7 @@ public class TorConfig private constructor(
         public companion object: Keyword(
             name = "__NATDPort",
             default = "0",
-            attributes = immutableSetOf(Attribute.Port),
+            attributes = immutableSetOf(Attribute.PORT),
             isCmdLineArg = false,
             isUnique = false,
         )
@@ -1926,7 +1926,7 @@ public class TorConfig private constructor(
         public companion object: Keyword(
             name = "__ORPort",
             default = "0",
-            attributes = immutableSetOf(Attribute.Port),
+            attributes = immutableSetOf(Attribute.PORT),
             isCmdLineArg = false,
             isUnique = false,
         )
@@ -2079,7 +2079,7 @@ public class TorConfig private constructor(
         public companion object: Keyword(
             name = "AccelDir",
             default = "",
-            attributes = immutableSetOf(Attribute.Directory),
+            attributes = immutableSetOf(Attribute.DIRECTORY),
             isCmdLineArg = true,
             isUnique = true,
         )
@@ -2355,7 +2355,7 @@ public class TorConfig private constructor(
         public companion object: Keyword(
             name = "ControlSocket",
             default = "0",
-            attributes = immutableSetOf(Attribute.UnixSocket),
+            attributes = immutableSetOf(Attribute.UNIX_SOCKET),
             isCmdLineArg = true,
             isUnique = true,
         )
@@ -2538,7 +2538,7 @@ public class TorConfig private constructor(
         public companion object: Keyword(
             name = "ExtORPortCookieAuthFile",
             default = "",
-            attributes = immutableSetOf(Attribute.File),
+            attributes = immutableSetOf(Attribute.FILE),
             isCmdLineArg = true,
             isUnique = true,
         )
@@ -2765,7 +2765,7 @@ public class TorConfig private constructor(
         public companion object: Keyword(
             name = "Log",
             default = "",
-            attributes = immutableSetOf(Attribute.Logging),
+            attributes = immutableSetOf(Attribute.LOGGING),
             isCmdLineArg = false,
             isUnique = false,
         )
@@ -2781,7 +2781,7 @@ public class TorConfig private constructor(
         public companion object: Keyword(
             name = "LogMessageDomains",
             default = false.byte.toString(),
-            attributes = immutableSetOf(Attribute.Logging),
+            attributes = immutableSetOf(Attribute.LOGGING),
             isCmdLineArg = false,
             isUnique = true,
         )
@@ -2797,7 +2797,7 @@ public class TorConfig private constructor(
         public companion object: Keyword(
             name = "LogTimeGranularity",
             default = 1.seconds.inWholeMilliseconds.toString(),
-            attributes = immutableSetOf(Attribute.Logging),
+            attributes = immutableSetOf(Attribute.LOGGING),
             isCmdLineArg = false,
             isUnique = true,
         )
@@ -2999,7 +2999,7 @@ public class TorConfig private constructor(
         public companion object: Keyword(
             name = "PidFile",
             default = "",
-            attributes = immutableSetOf(Attribute.File),
+            attributes = immutableSetOf(Attribute.FILE),
             isCmdLineArg = true,
             isUnique = true,
         )
@@ -3081,7 +3081,7 @@ public class TorConfig private constructor(
         public companion object: Keyword(
             name = "SafeLogging",
             default = "1",
-            attributes = immutableSetOf(Attribute.Logging),
+            attributes = immutableSetOf(Attribute.LOGGING),
             isCmdLineArg = false,
             isUnique = true,
         )
@@ -3243,7 +3243,7 @@ public class TorConfig private constructor(
         public companion object: Keyword(
             name = "TruncateLogFile",
             default = false.byte.toString(),
-            attributes = immutableSetOf(Attribute.Logging),
+            attributes = immutableSetOf(Attribute.LOGGING),
             isCmdLineArg = false,
             isUnique = true,
         )
@@ -4826,7 +4826,7 @@ public class TorConfig private constructor(
         public companion object: Keyword(
             name = "KeyDirectory",
             default = "",
-            attributes = immutableSetOf(Attribute.Directory),
+            attributes = immutableSetOf(Attribute.DIRECTORY),
             isCmdLineArg = true,
             isUnique = true,
         )
@@ -5098,7 +5098,7 @@ public class TorConfig private constructor(
         public companion object: Keyword(
             name = "ServerDNSResolvConfFile",
             default = "",
-            attributes = immutableSetOf(Attribute.File),
+            attributes = immutableSetOf(Attribute.FILE),
             isCmdLineArg = false,
             isUnique = true,
         )
@@ -5458,7 +5458,7 @@ public class TorConfig private constructor(
         public companion object: Keyword(
             name = "DirPortFrontPage",
             default = "",
-            attributes = immutableSetOf(Attribute.File),
+            attributes = immutableSetOf(Attribute.FILE),
             isCmdLineArg = false,
             isUnique = true,
         )
@@ -6317,7 +6317,7 @@ public class TorConfig private constructor(
         public companion object: Keyword(
             name = "GuardfractionFile",
             default = "",
-            attributes = immutableSetOf(Attribute.File),
+            attributes = immutableSetOf(Attribute.FILE),
             isCmdLineArg = false,
             isUnique = true,
         )
@@ -6493,7 +6493,7 @@ public class TorConfig private constructor(
         public companion object: Keyword(
             name = "V3BandwidthsFile",
             default = "",
-            attributes = immutableSetOf(Attribute.File),
+            attributes = immutableSetOf(Attribute.FILE),
             isCmdLineArg = false,
             isUnique = true,
         )
@@ -7110,9 +7110,9 @@ public class TorConfig private constructor(
         public val optionals: Set<String>,
     ) {
 
-        private val isPort = keyword.attributes.contains(Attribute.Port)
+        private val isPort = keyword.attributes.contains(Attribute.PORT)
         private val isPath = with(keyword.attributes) {
-            contains(Attribute.File) || contains(Attribute.Directory)
+            contains(Attribute.FILE) || contains(Attribute.DIRECTORY)
         }
         private val isPortAutoOrDisabled = if (isPort) {
             argument == "0" || argument == AUTO
@@ -7326,13 +7326,13 @@ public class TorConfig private constructor(
                             if (attr !is T) return@forEachAttr
                             // Found specified attribute T
 
-                            if (attr is Attribute.Port) {
+                            if (attr is Attribute.PORT) {
                                 if (item.isArgumentAUnixSocket()) {
                                     return@forEachItem
                                 }
                             }
 
-                            if (attr is Attribute.UnixSocket) {
+                            if (attr is Attribute.UNIX_SOCKET) {
                                 if (item.isArgumentAPort()) {
                                     return@forEachItem
                                 }
@@ -7349,7 +7349,7 @@ public class TorConfig private constructor(
             @PublishedApi
             @JvmSynthetic
             internal fun LineItem.isArgumentAPort(): Boolean {
-                if (!keyword.attributes.contains(Attribute.Port)) return false
+                if (!keyword.attributes.contains(Attribute.PORT)) return false
                 // If not a unix socket configurable Port keyword, then it MUST be
                 // configured as a port.
                 //
@@ -7360,7 +7360,7 @@ public class TorConfig private constructor(
             @PublishedApi
             @JvmSynthetic
             internal fun LineItem.isArgumentAUnixSocket(): Boolean {
-                if (!keyword.attributes.contains(Attribute.UnixSocket)) return false
+                if (!keyword.attributes.contains(Attribute.UNIX_SOCKET)) return false
 
                 return if (keyword is HiddenServicePort.Companion) {
                     // Check the target, not the virtual port
@@ -7389,7 +7389,7 @@ public class TorConfig private constructor(
         @InternalKmpTorApi
         public fun reassignTCPPortAutoOrNull(): Setting? {
             // Setting does not have Attribute.Port
-            if (!keyword.attributes.contains(Attribute.Port)) return null
+            if (!keyword.attributes.contains(Attribute.PORT)) return null
             if (this[Extra.AllowReassign] != true) return null
 
             // Remove and replace argument with auto
@@ -7448,13 +7448,13 @@ public class TorConfig private constructor(
         public val isUnique: Boolean,
     ): Comparable<Keyword>, CharSequence {
 
-        public sealed class Attribute private constructor() {
-            public data object Directory: Attribute()
-            public data object File: Attribute()
-            public data object HiddenService: Attribute()
-            public data object Logging: Attribute()
-            public data object Port: Attribute()
-            public data object UnixSocket: Attribute()
+        public abstract class Attribute private constructor() {
+            public data object DIRECTORY: Attribute()
+            public data object FILE: Attribute()
+            public data object HIDDEN_SERVICE: Attribute()
+            public data object LOGGING: Attribute()
+            public data object PORT: Attribute()
+            public data object UNIX_SOCKET: Attribute()
         }
 
         public final override val length: Int get() = name.length
@@ -7480,7 +7480,7 @@ public class TorConfig private constructor(
      * excluded from the tor configuration, but may be utilized
      * elsewhere in `kmp-tor`.
      * */
-    public sealed class Extra<T: Any> {
+    public abstract class Extra<T: Any> private constructor() {
 
         /**
          * An [Extra] which signals that if a TCP port is not available,

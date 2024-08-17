@@ -145,7 +145,10 @@ public sealed class IPAddress private constructor(
         /**
          * Static instance for `0.0.0.0`
          * */
-        public object AnyHost: V4(ByteArray(4), "0.0.0.0")
+        public object AnyHost: V4(
+            bytes = ByteArray(4),
+            value = "0.0.0.0",
+        )
 
         public companion object {
 
@@ -307,7 +310,7 @@ public sealed class IPAddress private constructor(
             public companion object NoScope: AnyHost(
                 scope = null,
                 bytes = ByteArray(16),
-                value = "0:0:0:0:0:0:0:0"
+                value = "0:0:0:0:0:0:0:0",
             ) {
 
                 /**

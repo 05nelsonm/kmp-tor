@@ -13,6 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
+@file:Suppress("ObjectPropertyName")
+
 package io.matthewnelson.kmp.tor.runtime.core.address
 
 import io.matthewnelson.kmp.tor.runtime.core.address.Port.Companion.MAX
@@ -30,8 +32,8 @@ import kotlin.jvm.JvmSynthetic
  *
  * e.g.
  *
- *     443.toPort()
- *     "443".toPort()
+ *     assertIs<Port.HTTPS>(443.toPort())
+ *     assertIs<Port.HTTP>("80".toPort())
  *     "http://example.com:8080".toPort()
  *     "http://[::1]:8181".toPort()
  *
@@ -44,6 +46,16 @@ public open class Port private constructor(
     @JvmField
     public val value: Int,
 ): Comparable<Port> {
+
+    /**
+     * Static instance for the default http port `80`
+     * */
+    public object HTTP: Port(value = 80)
+
+    /**
+     * Static instance for the default https port `443`
+     * */
+    public object HTTPS: Port(value = 443)
 
     public companion object {
 
@@ -107,6 +119,10 @@ public open class Port private constructor(
             // Try Port.Ephemeral first (more constrained)
             toPortEphemeralOrNull()?.let { return it }
             if (this !in MIN..MAX) return null
+
+            if (this == HTTP.value) return HTTP
+            if (this == HTTPS.value) return HTTPS
+
             return Port(this)
         }
 

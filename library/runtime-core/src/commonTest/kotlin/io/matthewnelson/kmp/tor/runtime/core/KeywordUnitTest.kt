@@ -21,6 +21,7 @@ import io.matthewnelson.kmp.file.toFile
 import io.matthewnelson.kmp.tor.runtime.core.address.Port.Companion.toPort
 import io.matthewnelson.kmp.tor.runtime.core.TorConfig.Setting.Companion.filterByAttribute
 import io.matthewnelson.kmp.tor.runtime.core.TorConfig.Setting.Companion.filterByKeyword
+import io.matthewnelson.kmp.tor.runtime.core.address.Port
 import io.matthewnelson.kmp.tor.runtime.core.internal.UnixSocketsNotSupportedMessage
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -36,7 +37,7 @@ class KeywordUnitTest {
         list.add(TorConfig.DataDirectory.Builder { directory = File(".") }!!)
 
         assertEquals(3, list.size)
-        assertEquals(1, list.filterByAttribute<TorConfig.Keyword.Attribute.Directory>().size)
+        assertEquals(1, list.filterByAttribute<TorConfig.Keyword.Attribute.DIRECTORY>().size)
         assertEquals(1, list.filterByKeyword<TorConfig.RunAsDaemon.Companion>().size)
     }
 
@@ -55,13 +56,13 @@ class KeywordUnitTest {
             directory = dir
 
             port {
-                virtual = 80.toPort()
+                virtual = Port.HTTP
                 targetAsUnixSocket {
                     file = dir.resolve("hs.sock")
                 }
             }
             port {
-                virtual = 80.toPort()
+                virtual = Port.HTTP
                 targetAsPort {
                     target = 8080.toPort()
                 }
@@ -79,12 +80,12 @@ class KeywordUnitTest {
             directory = "".toFile()
         }.let { list.add(it!!) }
 
-        val byPort = list.filterByAttribute<TorConfig.Keyword.Attribute.Port>()
+        val byPort = list.filterByAttribute<TorConfig.Keyword.Attribute.PORT>()
         assertEquals(2, byPort.size)
         assertNotNull(byPort.find { it.keyword is TorConfig.__DNSPort.Companion })
         assertNotNull(byPort.find { it.keyword is TorConfig.HiddenServiceDir.Companion })
 
-        val byUnixSocket = list.filterByAttribute<TorConfig.Keyword.Attribute.UnixSocket>()
+        val byUnixSocket = list.filterByAttribute<TorConfig.Keyword.Attribute.UNIX_SOCKET>()
         assertEquals(2, byUnixSocket.size)
         assertNotNull(byUnixSocket.find { it.keyword is TorConfig.__ControlPort.Companion })
         assertNotNull(byUnixSocket.find { it.keyword is TorConfig.HiddenServiceDir.Companion })

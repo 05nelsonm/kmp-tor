@@ -305,7 +305,7 @@ public sealed class TorCmd<Success: Any> private constructor(
              *
              *     TorCmd.Onion.Add(ED25519_V3) {
              *         port {
-             *             virtual = 80.toPort()
+             *             virtual = Port.HTTP
              *             targetAsPort { target = 8080.toPort() }
              *         }
              *     }
@@ -333,7 +333,7 @@ public sealed class TorCmd<Success: Any> private constructor(
              *
              *     TorCmd.Onion.Add("[Blob Redacted]".toED25519_V3PrivateKey()) {
              *         port {
-             *             virtual = 80.toPort()
+             *             virtual = Port.HTTP
              *             targetAsPort { target = 8080.toPort() }
              *         }
              *     }

@@ -47,11 +47,11 @@ import kotlin.jvm.JvmSynthetic
  *     // Create new V3 Hidden Service (tor will generate keys)
  *     val entry = runtime.executeAsync(TorCmd.Onion.Add(ED25519_V3) {
  *         port {
- *             virtual = 80.toPort()
+ *             virtual = Port.HTTP
  *             targetAsPort { target = 8080.toPort() }
  *         }
  *         port {
- *             virtual = 443.toPort()
+ *             virtual = Port.HTTPS
  *             try {
  *                 targetAsUnixSocket {
  *                     file = runtime.environment()
@@ -76,7 +76,7 @@ import kotlin.jvm.JvmSynthetic
  *     // flag was not defined when created above.
  *     val newEntry = runtime.executeAsync(TorCmd.Onion.Add(entry.privateKey!!) {
  *         port {
- *             virtual = 80.toPort()
+ *             virtual = Port.HTTP
  *             targetAsPort { target = 8080.toPort() }
  *         }
  *     })

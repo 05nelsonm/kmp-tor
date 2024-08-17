@@ -20,7 +20,7 @@ import io.matthewnelson.kmp.file.normalize
 import io.matthewnelson.kmp.file.toFile
 import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
 import io.matthewnelson.kmp.tor.runtime.core.TorConfig
-import io.matthewnelson.kmp.tor.runtime.core.address.Port.Companion.toPort
+import io.matthewnelson.kmp.tor.runtime.core.address.Port
 import io.matthewnelson.kmp.tor.runtime.core.address.Port.Ephemeral.Companion.toPortEphemeral
 import io.matthewnelson.kmp.tor.runtime.core.internal.byte
 import kotlin.test.*
@@ -40,8 +40,8 @@ class ExtendedTorConfigUnitTest {
                 directory = "".toFile()
                 version { HSv(3) }
                 port {
-                    virtual = 80.toPort()
-                    targetAsPort { target = 443.toPort() }
+                    virtual = Port.HTTP
+                    targetAsPort { target = Port.HTTPS }
                 }
             }
 
