@@ -41,7 +41,7 @@ class TorOptionJvmUnitTest {
         }
 
         // Force update expected test value when something is added.
-        val expected = 358
+        val expected = 357
         assertEquals(expected, TorOption.entries.size)
         assertEquals(expected, entriesReflect.size)
         assertEquals(expected, entriesReflect.toSet().size)

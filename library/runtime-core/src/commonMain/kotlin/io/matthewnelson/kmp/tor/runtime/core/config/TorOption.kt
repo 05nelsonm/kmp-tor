@@ -359,7 +359,7 @@ public abstract class TorOption: Comparable<TorOption>, CharSequence {
         default = Port.ZERO,
         attributes = immutableSetOf(Attribute.UNIX_SOCKET),
         isCmdLineArg = true,
-        isUnique = true,
+        isUnique = false,
     )
 
     /**
@@ -559,7 +559,7 @@ public abstract class TorOption: Comparable<TorOption>, CharSequence {
     public data object ExtORPortCookieAuthFile: TorOption(
         default = "",
         attributes = immutableSetOf(Attribute.FILE),
-        isCmdLineArg = true,
+        isCmdLineArg = false,
         isUnique = true,
     ), ConfigurableFile {
 
@@ -573,7 +573,7 @@ public abstract class TorOption: Comparable<TorOption>, CharSequence {
     public data object ExtORPortCookieAuthFileGroupReadable: TorOption(
         default = false.byte,
         attributes = emptySet(),
-        isCmdLineArg = true,
+        isCmdLineArg = false,
         isUnique = true,
     ), ConfigurableBoolean {
 
@@ -588,7 +588,7 @@ public abstract class TorOption: Comparable<TorOption>, CharSequence {
         default = "",
         attributes = emptySet(),
         isCmdLineArg = false,
-        isUnique = true,
+        isUnique = false,
     )
 
     /**
@@ -814,7 +814,7 @@ public abstract class TorOption: Comparable<TorOption>, CharSequence {
         default = "",
         attributes = emptySet(),
         isCmdLineArg = false,
-        isUnique = true,
+        isUnique = false,
     )
 
     /**
@@ -839,7 +839,7 @@ public abstract class TorOption: Comparable<TorOption>, CharSequence {
         default = "",
         attributes = emptySet(),
         isCmdLineArg = false,
-        isUnique = true,
+        isUnique = false,
     )
 
     // Can be utilized 2 times max. IPv4 & IPv6
@@ -850,7 +850,7 @@ public abstract class TorOption: Comparable<TorOption>, CharSequence {
         default = "",
         attributes = emptySet(),
         isCmdLineArg = false,
-        isUnique = true,
+        isUnique = false,
     )
 
     // Can be utilized 2 times max. IPv4 & IPv6
@@ -861,7 +861,7 @@ public abstract class TorOption: Comparable<TorOption>, CharSequence {
         default = "",
         attributes = emptySet(),
         isCmdLineArg = false,
-        isUnique = true,
+        isUnique = false,
     )
 
     /**
@@ -892,7 +892,7 @@ public abstract class TorOption: Comparable<TorOption>, CharSequence {
         default = "",
         attributes = emptySet(),
         isCmdLineArg = false,
-        isUnique = true,
+        isUnique = false,
     )
 
     /**
@@ -1065,18 +1065,6 @@ public abstract class TorOption: Comparable<TorOption>, CharSequence {
      * [tor-man#SyslogIdentityTag](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#SyslogIdentityTag)
      * */
     public data object SyslogIdentityTag: TorOption(
-        default = "",
-        attributes = immutableSetOf(Attribute.LOGGING),
-        isCmdLineArg = true,
-        isUnique = true,
-    ) {
-        // TODO: IMPLEMENT
-    }
-
-    /**
-     * [tor-man#SyslogIdentityTag](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#SyslogIdentityTag)
-     * */
-    public data object AndroidIdentityTag: TorOption(
         default = "",
         attributes = immutableSetOf(Attribute.LOGGING),
         isCmdLineArg = true,
@@ -1289,7 +1277,7 @@ public abstract class TorOption: Comparable<TorOption>, CharSequence {
     public data object ClientOnionAuthDir: TorOption(
         default = "",
         attributes = immutableSetOf(Attribute.DIRECTORY),
-        isCmdLineArg = true,
+        isCmdLineArg = false,
         isUnique = true,
     ), ConfigurableDirectory {
 
@@ -1671,7 +1659,7 @@ public abstract class TorOption: Comparable<TorOption>, CharSequence {
         default = "accept *:*",
         attributes = emptySet(),
         isCmdLineArg = false,
-        isUnique = true,
+        isUnique = false,
     )
 
     // (DEPRECATED) ReachableDirAddresses
@@ -1683,7 +1671,7 @@ public abstract class TorOption: Comparable<TorOption>, CharSequence {
         default = "",
         attributes = emptySet(),
         isCmdLineArg = false,
-        isUnique = true,
+        isUnique = false,
     )
 
     /**
@@ -1741,7 +1729,7 @@ public abstract class TorOption: Comparable<TorOption>, CharSequence {
         default = "",
         attributes = emptySet(),
         isCmdLineArg = false,
-        isUnique = true,
+        isUnique = false,
     )
 
     /**
@@ -2269,7 +2257,7 @@ public abstract class TorOption: Comparable<TorOption>, CharSequence {
         default = "",
         attributes = emptySet(),
         isCmdLineArg = false,
-        isUnique = true,
+        isUnique = false,
     )
 
     /**
@@ -2438,7 +2426,7 @@ public abstract class TorOption: Comparable<TorOption>, CharSequence {
     public data object GeoIPFile: TorOption(
         default = "",
         attributes = immutableSetOf(Attribute.FILE),
-        isCmdLineArg = true,
+        isCmdLineArg = false,
         isUnique = true,
     ), ConfigurableFile {
 
@@ -2452,7 +2440,7 @@ public abstract class TorOption: Comparable<TorOption>, CharSequence {
     public data object GeoIPv6File: TorOption(
         default = "",
         attributes = immutableSetOf(Attribute.FILE),
-        isCmdLineArg = true,
+        isCmdLineArg = false,
         isUnique = true,
     ), ConfigurableFile {
 
@@ -2750,7 +2738,7 @@ public abstract class TorOption: Comparable<TorOption>, CharSequence {
         default = "",
         attributes = emptySet(),
         isCmdLineArg = false,
-        isUnique = true,
+        isUnique = false,
     )
 
     /**
@@ -2760,7 +2748,7 @@ public abstract class TorOption: Comparable<TorOption>, CharSequence {
         default = "",
         attributes = emptySet(),
         isCmdLineArg = false,
-        isUnique = true,
+        isUnique = false,
     )
 
     /**
@@ -2770,7 +2758,7 @@ public abstract class TorOption: Comparable<TorOption>, CharSequence {
         default = "",
         attributes = emptySet(),
         isCmdLineArg = false,
-        isUnique = true,
+        isUnique = false,
     )
 
     /**
@@ -2968,7 +2956,7 @@ public abstract class TorOption: Comparable<TorOption>, CharSequence {
         default = "",
         attributes = emptySet(),
         isCmdLineArg = false,
-        isUnique = true,
+        isUnique = false,
     )
 
     /**
@@ -3309,7 +3297,7 @@ public abstract class TorOption: Comparable<TorOption>, CharSequence {
         default = "",
         attributes = emptySet(),
         isCmdLineArg = false,
-        isUnique = true,
+        isUnique = false,
     )
 
     /**
@@ -3319,7 +3307,7 @@ public abstract class TorOption: Comparable<TorOption>, CharSequence {
         default = "",
         attributes = emptySet(),
         isCmdLineArg = false,
-        isUnique = true,
+        isUnique = false,
     )
 
 
@@ -3364,7 +3352,7 @@ public abstract class TorOption: Comparable<TorOption>, CharSequence {
         default = "",
         attributes = emptySet(),
         isCmdLineArg = false,
-        isUnique = true,
+        isUnique = false,
     )
 
     /**
@@ -3426,7 +3414,7 @@ public abstract class TorOption: Comparable<TorOption>, CharSequence {
         default = "",
         attributes = emptySet(),
         isCmdLineArg = false,
-        isUnique = true,
+        isUnique = false,
     )
 
     /**
@@ -4761,7 +4749,6 @@ public abstract class TorOption: Comparable<TorOption>, CharSequence {
                 Socks5ProxyUsername,
                 Socks5ProxyPassword,
                 SyslogIdentityTag,
-                AndroidIdentityTag,
                 TCPProxy,
                 TruncateLogFile,
                 UnixSocksGroupWritable,
