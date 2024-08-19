@@ -39,9 +39,8 @@ class ExtendedTorConfigUnitTest {
             put(TorConfig.HiddenServiceDir) {
                 directory = "".toFile()
                 version { HSv(3) }
-                port {
-                    virtual = Port.HTTP
-                    targetAsPort { target = Port.HTTPS }
+                port(virtual = Port.HTTP) {
+                    target(Port.HTTPS)
                 }
             }
 

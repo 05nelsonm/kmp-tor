@@ -55,17 +55,11 @@ class KeywordUnitTest {
             val dir = "/path/to/data_dir/${TorConfig.HiddenServiceDir.DEFAULT_PARENT_DIR_NAME}/hs_test".toFile()
             directory = dir
 
-            port {
-                virtual = Port.HTTP
-                targetAsUnixSocket {
-                    file = dir.resolve("hs.sock")
-                }
+            port(virtual = Port.HTTP) {
+                target(unixSocket = dir.resolve("hs.sock"))
             }
-            port {
-                virtual = Port.HTTP
-                targetAsPort {
-                    target = 8080.toPort()
-                }
+            port(virtual = Port.HTTP) {
+                target(port = 8080.toPort())
             }
             version {
                 HSv(3)

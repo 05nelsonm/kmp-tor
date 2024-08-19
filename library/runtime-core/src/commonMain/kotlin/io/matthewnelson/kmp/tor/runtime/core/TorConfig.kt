@@ -1389,7 +1389,7 @@ public class TorConfig private constructor(
      *
      *     val setting = HiddenServiceDir.Builder {
      *         directory = "/some/path".toFile()
-     *         port { virtual = Port.HTTP }
+     *         port(virtual = Port.HTTP)
      *         version { HSv(3) }
      *     }
      *
@@ -1416,10 +1416,16 @@ public class TorConfig private constructor(
 
         @KmpTorDsl
         public fun port(
+            virtual: Port,
+        ): HiddenServiceDir = port(virtual) {}
+
+        @KmpTorDsl
+        public fun port(
+            virtual: Port,
             block: ThisBlock<HiddenServicePort>,
         ): HiddenServiceDir {
-            val port = HiddenServicePort.build(block)
-            if (port != null) ports.add(port)
+            val port = HiddenServicePort.build(virtual, block)
+            ports.add(port)
             return this
         }
 
@@ -1519,30 +1525,33 @@ public class TorConfig private constructor(
      * [tor-man#HiddenServicePort](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#HiddenServicePort)
      * */
     @KmpTorDsl
-    public class HiddenServicePort private constructor() {
+    public class HiddenServicePort private constructor(
+        @JvmField
+        public val virtual: Port,
+    ) {
 
-        private var targetArgument: String? = null
+        private var targetArgument: String = virtual.toString()
 
         // TODO: Check if can be 0 (Issue #419)
-        /**
-         * Configures the "virtual" port for which the Hidden Service
-         * will be accessible at from the tor network. If no "target"
-         * is expressed (either as a port, or Unix Socket), then this
-         * value will be used for the "target" as well.
-         *
-         * e.g.
-         *
-         *     HiddenServicePort 80
-         *     // http://{onion-address}.onion/index.html
-         *
-         *     HiddenServicePort 443
-         *     // https://{onion-address}.onion/index.html
-         *
-         *     HiddenServicePort 8080
-         *     // http://{onion-address}.onion:8080/index.html
-         * */
-        @JvmField
-        public var virtual: Port? = null
+//        /**
+//         * Configures the "virtual" port for which the Hidden Service
+//         * will be accessible at from the tor network. If no "target"
+//         * is expressed (either as a port, or Unix Socket), then this
+//         * value will be used for the "target" as well.
+//         *
+//         * e.g.
+//         *
+//         *     HiddenServicePort 80
+//         *     // http://{onion-address}.onion/index.html
+//         *
+//         *     HiddenServicePort 443
+//         *     // https://{onion-address}.onion/index.html
+//         *
+//         *     HiddenServicePort 8080
+//         *     // http://{onion-address}.onion:8080/index.html
+//         * */
+//        @JvmField
+//        public var virtual: Port? = null
 
         /**
          * Configures the "target" as a TCP port for which incoming http
@@ -1560,10 +1569,10 @@ public class TorConfig private constructor(
          * If a target port is not specified, [virtual] will be used.
          * */
         @KmpTorDsl
-        public fun targetAsPort(
-            block: ThisBlock<TCPPortBuilder.HiddenService>
+        public fun target(
+            port: Port,
         ): HiddenServicePort {
-            targetArgument = TCPPortBuilder.HiddenService.build(block)
+            targetArgument = port.toString()
             return this
         }
 
@@ -1586,10 +1595,11 @@ public class TorConfig private constructor(
          * */
         @KmpTorDsl
         @Throws(UnsupportedOperationException::class)
-        public fun targetAsUnixSocket(
-            block: ThisBlock<UnixSocketBuilder>
+        public fun target(
+            unixSocket: File,
         ): HiddenServicePort {
-            val path = UnixSocketBuilder.build(block) ?: return this
+            // TODO
+            val path = UnixSocketBuilder.build { file = unixSocket } ?: return this
             targetArgument = path
             return this
         }
@@ -1604,12 +1614,12 @@ public class TorConfig private constructor(
 
             @JvmSynthetic
             internal fun build(
+                virtual: Port,
                 block: ThisBlock<HiddenServicePort>
-            ): LineItem? {
-                val b = HiddenServicePort().apply(block)
-                val virtual = b.virtual ?: return null
-                val target = b.targetArgument ?: virtual.toString()
-                return toLineItem("$virtual $target")
+            ): LineItem {
+                val b = HiddenServicePort(virtual).apply(block)
+                val target = b.targetArgument
+                return toLineItem("$virtual $target")!!
             }
         }
     }

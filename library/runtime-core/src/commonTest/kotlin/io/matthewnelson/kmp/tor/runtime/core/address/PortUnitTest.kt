@@ -83,6 +83,12 @@ class PortUnitTest {
     }
 
     @Test
+    fun givenToPort_whenIs0_thenReturnsInstanceZERO() {
+        assertIs<Port.ZERO>(0.toPort())
+        assertIs<Port.ZERO>("http://something.com:0/path".toPort())
+    }
+
+    @Test
     fun givenToPort_whenIs80_thenReturnsInstanceHTTP() {
         assertIs<Port.HTTP>(80.toPort())
         assertIs<Port.HTTP>("http://something.com:80/path".toPort())

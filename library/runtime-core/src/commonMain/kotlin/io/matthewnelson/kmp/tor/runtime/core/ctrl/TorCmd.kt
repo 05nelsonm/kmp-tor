@@ -304,9 +304,8 @@ public sealed class TorCmd<Success: Any> private constructor(
              * e.g.
              *
              *     TorCmd.Onion.Add(ED25519_V3) {
-             *         port {
-             *             virtual = Port.HTTP
-             *             targetAsPort { target = 8080.toPort() }
+             *         port(virtual = Port.HTTP) {
+             *             target(port = 8080.toPort())
              *         }
              *     }
              *

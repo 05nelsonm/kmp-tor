@@ -178,17 +178,14 @@ class TorCmdUnitTest {
         runtime.startDaemonAsync()
 
         val entry1 = runtime.executeAsync(TorCmd.Onion.Add(ED25519_V3) {
-            port {
-                virtual = Port.HTTP
-
+            port(virtual = Port.HTTP) {
                 try {
-                    targetAsUnixSocket {
-                        file = runtime.environment().workDirectory
-                            .resolve("test_hs.sock")
-                    }
+                    target(unixSocket = runtime.environment()
+                        .workDirectory
+                        .resolve("test_hs.sock"))
                 } catch (_: UnsupportedOperationException) {}
             }
-            port { virtual = Port.HTTPS }
+            port(virtual = Port.HTTPS)
         })
 
         // DiscardPK not expressed
@@ -206,7 +203,7 @@ class TorCmdUnitTest {
         assertNotNull(keyCopy)
 
         val entry2 = runtime.executeAsync(TorCmd.Onion.Add(entry1.privateKey!!) {
-            port { virtual = Port.HTTP }
+            port(virtual = Port.HTTP)
             flags { DiscardPK = true }
         })
 
@@ -226,7 +223,7 @@ class TorCmdUnitTest {
             for (keys in authKeys) {
                 clientAuth(keys.first)
             }
-            port { virtual = Port.HTTP }
+            port(virtual = Port.HTTP)
             flags { DiscardPK = true }
         })
 
@@ -256,7 +253,7 @@ class TorCmdUnitTest {
         runtime.startDaemonAsync()
 
         val entry = runtime.executeAsync(TorCmd.Onion.Add(ED25519_V3) {
-            port { virtual = Port.HTTP }
+            port(virtual = Port.HTTP)
             flags { DiscardPK = true }
             for (auth in authKeys) {
                 // PublicKey
@@ -336,7 +333,7 @@ class TorCmdUnitTest {
 
         val entries = mutableListOf<HiddenServiceEntry>().let { list ->
             val cmd = TorCmd.Onion.Add(ED25519_V3) {
-                port { virtual = Port.HTTP }
+                port(virtual = Port.HTTP)
                 flags { DiscardPK = true }
             }
 

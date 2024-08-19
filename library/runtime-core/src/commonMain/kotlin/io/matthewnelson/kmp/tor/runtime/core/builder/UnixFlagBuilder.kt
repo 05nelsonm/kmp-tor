@@ -49,10 +49,10 @@ public class UnixFlagBuilder private constructor() {
     @JvmField
     public var WorldWritable: Boolean? = null
 
-    /**
-     * Only applicable for [TorConfig.__ControlPort], otherwise
-     * is ignored if configured.
-     * */
+//    /**
+//     * Only applicable for [TorConfig.__ControlPort], otherwise
+//     * is ignored if configured.
+//     * */
     @JvmField
     public var RelaxDirModeCheck: Boolean? = null
 

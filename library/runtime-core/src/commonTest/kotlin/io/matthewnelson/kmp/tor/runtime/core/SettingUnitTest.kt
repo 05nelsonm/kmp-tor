@@ -131,13 +131,13 @@ class SettingUnitTest {
         val dir = ".".toFile()
         val a = TorConfig.HiddenServiceDir.Builder {
             directory = dir
-            port { virtual = Port.HTTP }
-            port { virtual = Port.HTTPS }
+            port(virtual = Port.HTTP)
+            port(virtual = Port.HTTPS)
             version { HSv(3) }
         }!!
         val b = TorConfig.HiddenServiceDir.Builder {
             directory = dir
-            port { virtual = Port.HTTP }
+            port(virtual = Port.HTTP)
             version { HSv(3) }
         }!!
 
@@ -152,13 +152,13 @@ class SettingUnitTest {
     fun givenEqualsHash_whenHiddenServiceDifferentDirectory_thenAreDifferent() {
         val a = TorConfig.HiddenServiceDir.Builder {
             directory = ".".toFile()
-            port { virtual = Port.HTTP }
-            port { virtual = Port.HTTPS }
+            port(virtual = Port.HTTP)
+            port(virtual = Port.HTTPS)
             version { HSv(3) }
         }!!
         val b = TorConfig.HiddenServiceDir.Builder {
             directory = "/some/random/path".toFile()
-            port { virtual = Port.HTTP }
+            port(virtual = Port.HTTP)
             version { HSv(3) }
         }!!
 

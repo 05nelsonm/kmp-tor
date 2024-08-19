@@ -48,6 +48,11 @@ public open class Port private constructor(
 ): Comparable<Port> {
 
     /**
+     * Static instance for port `0`
+     * */
+    public object ZERO: Port(value = 0)
+
+    /**
      * Static instance for the default http port `80`
      * */
     public object HTTP: Port(value = 80)
@@ -120,6 +125,7 @@ public open class Port private constructor(
             toPortEphemeralOrNull()?.let { return it }
             if (this !in MIN..MAX) return null
 
+            if (this == ZERO.value) return ZERO
             if (this == HTTP.value) return HTTP
             if (this == HTTPS.value) return HTTPS
 

@@ -117,7 +117,7 @@ class TorCmdInterceptorUnitTest {
                 is TorCmd.Onion.Add -> TorCmd.Onion.Add(
                     ByteArray(64) { it.toByte() }.toED25519_V3PrivateKey()
                 ) {
-                    port { virtual = Port.HTTP }
+                    port(virtual = Port.HTTP)
                 }.also { invocationOnionAdd = true }
 
                 is TorCmd.Onion.Delete -> TorCmd.Onion.Delete(
@@ -129,7 +129,7 @@ class TorCmdInterceptorUnitTest {
 
         val jobAdd = newJob(
             TorCmd.Onion.Add(ED25519_V3) {
-                port { virtual = Port.HTTP }
+                port(virtual = Port.HTTP)
             }
         )
 

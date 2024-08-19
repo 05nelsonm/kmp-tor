@@ -24,6 +24,7 @@ import io.matthewnelson.kmp.tor.runtime.core.ThisBlock
 import io.matthewnelson.kmp.tor.runtime.core.TorConfig
 import io.matthewnelson.kmp.tor.runtime.core.TorConfig.HiddenServiceMaxStreams
 import io.matthewnelson.kmp.tor.runtime.core.TorConfig.HiddenServicePort
+import io.matthewnelson.kmp.tor.runtime.core.address.Port
 import io.matthewnelson.kmp.tor.runtime.core.apply
 import io.matthewnelson.kmp.tor.runtime.core.ctrl.HiddenServiceEntry
 import io.matthewnelson.kmp.tor.runtime.core.ctrl.TorCmd
@@ -46,22 +47,18 @@ import kotlin.jvm.JvmSynthetic
  *
  *     // Create new V3 Hidden Service (tor will generate keys)
  *     val entry = runtime.executeAsync(TorCmd.Onion.Add(ED25519_V3) {
- *         port {
- *             virtual = Port.HTTP
- *             targetAsPort { target = 8080.toPort() }
+ *         port(virtual = Port.HTTP) {
+ *             target(port = 8080.toPort())
  *         }
- *         port {
- *             virtual = Port.HTTPS
+ *         port(virtual = Port.HTTPS) {
  *             try {
- *                 targetAsUnixSocket {
- *                     file = runtime.environment()
- *                         .workDirectory
- *                         .resolve("test_hs.sock")
- *                 }
+ *                 target(unixSocket = runtime.environment()
+ *                     .workDirectory
+ *                     .resolve("test_hs.sock"))
  *             } catch (_: UnsupportedOperationException) {
  *                 // Fallback to TCP if on system w/o
  *                 // UnixSocket support.
- *                 targetAsPort { target = 8443.toPort() }
+ *                 target(port = 8443.toPort())
  *             }
  *         }
  *         maxStreams { maximum = 25 }
@@ -75,9 +72,8 @@ import kotlin.jvm.JvmSynthetic
  *     // entry.privateKey will not be `null` because `DiscardPK`
  *     // flag was not defined when created above.
  *     val newEntry = runtime.executeAsync(TorCmd.Onion.Add(entry.privateKey!!) {
- *         port {
- *             virtual = Port.HTTP
- *             targetAsPort { target = 8080.toPort() }
+ *         port(virtual = Port.HTTP) {
+ *             target(port = 8080.toPort())
  *         }
  *     })
  *
@@ -119,10 +115,16 @@ public class OnionAddBuilder private constructor(private val keyType: KeyType.Ad
 
     @KmpTorDsl
     public fun port(
+        virtual: Port,
+    ): OnionAddBuilder = port(virtual) {}
+
+    @KmpTorDsl
+    public fun port(
+        virtual: Port,
         block: ThisBlock<HiddenServicePort>,
     ): OnionAddBuilder {
-        val port = HiddenServicePort.build(block)
-        if (port != null) ports.add(port)
+        val port = HiddenServicePort.build(virtual, block)
+        ports.add(port)
         return this
     }
 
