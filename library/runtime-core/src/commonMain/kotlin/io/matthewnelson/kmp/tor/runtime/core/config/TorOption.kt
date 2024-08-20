@@ -69,16 +69,16 @@ public abstract class TorOption: Comparable<TorOption>, CharSequence {
     public val attributes: Set<Attribute>
 
     /**
-     * `kmp-tor:runtime` specific flag used to determine if a setting
-     * for this option should be used as an argument when starting
-     * the tor process, or via [TorCmd.Config.Load].
+     * A flag for `kmp-tor:runtime` used to determine if a setting
+     * for this option should be used as an argument when starting the
+     * tor process, or via control connection with [TorCmd.Config.Load].
      * */
     @JvmField
     public val isCmdLineArg: Boolean
 
     /**
-     * If expression of this option is allowed multiple times
-     * within a [Set] or not.
+     * If expression of this option is allowed multiple times within
+     * a configuration or not.
      * */
     @JvmField
     public val isUnique: Boolean
@@ -2150,7 +2150,7 @@ public abstract class TorOption: Comparable<TorOption>, CharSequence {
     public data object GeoIPExcludeUnknown: TorOption(
         default = AUTO,
         attributes = emptySet(),
-        isCmdLineArg = false,
+        isCmdLineArg = true,
         isUnique = true,
     ), ConfigurableBuildable<BuilderScopeAutoBoolean> {
 
@@ -2426,7 +2426,7 @@ public abstract class TorOption: Comparable<TorOption>, CharSequence {
     public data object GeoIPFile: TorOption(
         default = "",
         attributes = immutableSetOf(Attribute.FILE),
-        isCmdLineArg = false,
+        isCmdLineArg = true,
         isUnique = true,
     ), ConfigurableFile {
 
@@ -2440,7 +2440,7 @@ public abstract class TorOption: Comparable<TorOption>, CharSequence {
     public data object GeoIPv6File: TorOption(
         default = "",
         attributes = immutableSetOf(Attribute.FILE),
-        isCmdLineArg = false,
+        isCmdLineArg = true,
         isUnique = true,
     ), ConfigurableFile {
 
@@ -4614,9 +4614,9 @@ public abstract class TorOption: Comparable<TorOption>, CharSequence {
          * that of a TCP Port, `auto`, or `0`.
          *
          * @see [TorSetting.LineItem.isPort]
-         * @see [TorSetting.LineItem.isPortAndAuto]
-         * @see [TorSetting.LineItem.isPortAndDisabled]
-         * @see [TorSetting.LineItem.isPortAndDistinct]
+         * @see [TorSetting.LineItem.isPortAuto]
+         * @see [TorSetting.LineItem.isPortDisabled]
+         * @see [TorSetting.LineItem.isPortDistinct]
          * */
         public data object PORT: Attribute()
 
@@ -4654,8 +4654,8 @@ public abstract class TorOption: Comparable<TorOption>, CharSequence {
             ?: throw IllegalArgumentException("Unknown name[$name]")
 
         /**
-         * Retrieves the [TorOption] for the provided [name], or `null`
-         * if [name] is unknown.
+         * Retrieves the [TorOption] for the provided [name], or
+         * `null` if [name] is unknown.
          * */
         @JvmStatic
         public fun valueOfOrNull(name: String): TorOption? {

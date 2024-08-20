@@ -19,13 +19,9 @@ package io.matthewnelson.kmp.tor.runtime.core.config
 
 import io.matthewnelson.immutable.collections.toImmutableSet
 import io.matthewnelson.kmp.file.File
-import io.matthewnelson.kmp.file.resolve
-import io.matthewnelson.kmp.file.toFile
 import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
 import io.matthewnelson.kmp.tor.core.api.annotation.KmpTorDsl
 import io.matthewnelson.kmp.tor.runtime.core.ThisBlock
-import io.matthewnelson.kmp.tor.runtime.core.address.Port
-import io.matthewnelson.kmp.tor.runtime.core.address.Port.Companion.toPort
 import io.matthewnelson.kmp.tor.runtime.core.config.builder.BuilderScopeHS
 import io.matthewnelson.kmp.tor.runtime.core.config.builder.RealBuilderScopeTorConfig
 import kotlin.jvm.JvmField
@@ -59,22 +55,7 @@ public class TorConfig2 private constructor(settings: Set<TorSetting>) {
             block: ThisBlock<BuilderScope>,
         ): TorConfig2 {
             @OptIn(InternalKmpTorApi::class)
-            return RealBuilderScopeTorConfig.of(null, ::TorConfig2, block)
-        }
-
-        /**
-         * Opener for [BuilderScope] DSL to create [TorConfig2].
-         *
-         * @param [other] Another [TorConfig2] to inherit settings from.
-         * @see [BuilderScope]
-         * */
-        @JvmStatic
-        public fun Builder(
-            other: TorConfig2,
-            block: ThisBlock<BuilderScope>,
-        ): TorConfig2 {
-            @OptIn(InternalKmpTorApi::class)
-            return RealBuilderScopeTorConfig.of(other, ::TorConfig2, block)
+            return RealBuilderScopeTorConfig.build(::TorConfig2, block)
         }
     }
 
@@ -214,6 +195,17 @@ public class TorConfig2 private constructor(settings: Set<TorSetting>) {
             directory: File,
             block: ThisBlock<BuilderScopeHS>,
         ): BuilderScope = put(asSetting(directory, block))
+
+        /**
+         * Adds all the already configured [TorSetting] to [BuilderScope]
+         * */
+        @KmpTorDsl
+        public fun putAll(
+            setting: Collection<TorSetting>,
+        ): BuilderScope {
+            setting.forEach { put(it) }
+            return this
+        }
 
         /**
          * Adds the already configured [TorSetting] to [BuilderScope]

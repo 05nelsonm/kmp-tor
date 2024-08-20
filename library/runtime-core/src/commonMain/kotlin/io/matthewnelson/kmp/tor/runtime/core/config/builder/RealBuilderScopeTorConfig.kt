@@ -20,7 +20,6 @@ import io.matthewnelson.kmp.tor.core.api.annotation.KmpTorDsl
 import io.matthewnelson.kmp.tor.runtime.core.ThisBlock
 import io.matthewnelson.kmp.tor.runtime.core.apply
 import io.matthewnelson.kmp.tor.runtime.core.config.TorConfig2
-import io.matthewnelson.kmp.tor.runtime.core.config.TorOption
 import io.matthewnelson.kmp.tor.runtime.core.config.TorSetting
 import kotlin.jvm.JvmSynthetic
 
@@ -29,32 +28,36 @@ import kotlin.jvm.JvmSynthetic
 @InternalKmpTorApi
 public class RealBuilderScopeTorConfig private constructor(): TorConfig2.BuilderScope(INIT) {
 
-    private val settings = LinkedHashSet<TorSetting>(16, 1.0f)
+    private val settings = LinkedHashMap<Int, TorSetting>(16, 1.0f)
 
     @KmpTorDsl
     public override fun put(
         setting: TorSetting,
     ): TorConfig2.BuilderScope {
-        TODO("Not yet implemented")
+        val option = setting.items.first().option
+
+        val key = if (option.isUnique) {
+            option.hashCode()
+        } else {
+            setting.hashCode()
+        }
+
+        settings[key] = setting
+
+        return this
     }
 
     internal companion object {
 
         @JvmSynthetic
-        internal fun of(
-            other: TorConfig2?,
+        internal fun build(
             create: (Set<TorSetting>) -> TorConfig2,
             block: ThisBlock<TorConfig2.BuilderScope>,
         ): TorConfig2 {
-            val b = RealBuilderScopeTorConfig()
-
-            if (other != null) {
-                // TODO
-            }
-
-            b.apply(block)
-
-            return create(b.settings)
+            val b = RealBuilderScopeTorConfig().apply(block)
+            val entries = b.settings.entries
+            val settings = entries.mapTo(LinkedHashSet(entries.size, 1.0f)) { it.value }
+            return create(settings)
         }
     }
 }

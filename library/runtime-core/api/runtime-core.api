@@ -3503,7 +3503,6 @@ public final class io/matthewnelson/kmp/tor/runtime/core/config/TorConfig2 {
 	public final field settings Ljava/util/Set;
 	public synthetic fun <init> (Ljava/util/Set;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
 	public static final fun Builder (Lio/matthewnelson/kmp/tor/runtime/core/ThisBlock;)Lio/matthewnelson/kmp/tor/runtime/core/config/TorConfig2;
-	public static final fun Builder (Lio/matthewnelson/kmp/tor/runtime/core/config/TorConfig2;Lio/matthewnelson/kmp/tor/runtime/core/ThisBlock;)Lio/matthewnelson/kmp/tor/runtime/core/config/TorConfig2;
 }
 
 public abstract class io/matthewnelson/kmp/tor/runtime/core/config/TorConfig2$BuilderScope {
@@ -3514,6 +3513,7 @@ public abstract class io/matthewnelson/kmp/tor/runtime/core/config/TorConfig2$Bu
 	public final fun configure (Lio/matthewnelson/kmp/tor/runtime/core/config/ConfigurableFile;Ljava/io/File;)Lio/matthewnelson/kmp/tor/runtime/core/config/TorConfig2$BuilderScope;
 	public final fun configure (Lio/matthewnelson/kmp/tor/runtime/core/config/TorOption$HiddenServiceDir;Ljava/io/File;Lio/matthewnelson/kmp/tor/runtime/core/ThisBlock;)Lio/matthewnelson/kmp/tor/runtime/core/config/TorConfig2$BuilderScope;
 	public abstract fun put (Lio/matthewnelson/kmp/tor/runtime/core/config/TorSetting;)Lio/matthewnelson/kmp/tor/runtime/core/config/TorConfig2$BuilderScope;
+	public final fun putAll (Ljava/util/Collection;)Lio/matthewnelson/kmp/tor/runtime/core/config/TorConfig2$BuilderScope;
 }
 
 protected final class io/matthewnelson/kmp/tor/runtime/core/config/TorConfig2$BuilderScope$Companion {
@@ -3521,7 +3521,6 @@ protected final class io/matthewnelson/kmp/tor/runtime/core/config/TorConfig2$Bu
 
 public final class io/matthewnelson/kmp/tor/runtime/core/config/TorConfig2$Companion {
 	public final fun Builder (Lio/matthewnelson/kmp/tor/runtime/core/ThisBlock;)Lio/matthewnelson/kmp/tor/runtime/core/config/TorConfig2;
-	public final fun Builder (Lio/matthewnelson/kmp/tor/runtime/core/config/TorConfig2;Lio/matthewnelson/kmp/tor/runtime/core/ThisBlock;)Lio/matthewnelson/kmp/tor/runtime/core/config/TorConfig2;
 }
 
 public abstract class io/matthewnelson/kmp/tor/runtime/core/config/TorOption : java/lang/CharSequence, java/lang/Comparable {
@@ -6274,8 +6273,6 @@ public final class io/matthewnelson/kmp/tor/runtime/core/config/TorSetting {
 	public static final fun get (Lio/matthewnelson/kmp/tor/runtime/core/config/TorSetting$LineItem;Ljava/util/Map;)Lio/matthewnelson/kmp/tor/runtime/core/config/TorSetting;
 	public static final fun get (Ljava/util/Set;)Lio/matthewnelson/kmp/tor/runtime/core/config/TorSetting;
 	public static final fun get (Ljava/util/Set;Ljava/util/Map;)Lio/matthewnelson/kmp/tor/runtime/core/config/TorSetting;
-	public static final fun getOrNull (Lio/matthewnelson/kmp/tor/runtime/core/config/TorSetting$LineItem;)Lio/matthewnelson/kmp/tor/runtime/core/config/TorSetting;
-	public static final fun getOrNull (Lio/matthewnelson/kmp/tor/runtime/core/config/TorSetting$LineItem;Ljava/util/Map;)Lio/matthewnelson/kmp/tor/runtime/core/config/TorSetting;
 	public static final fun getOrNull (Ljava/util/Set;)Lio/matthewnelson/kmp/tor/runtime/core/config/TorSetting;
 	public static final fun getOrNull (Ljava/util/Set;Ljava/util/Map;)Lio/matthewnelson/kmp/tor/runtime/core/config/TorSetting;
 	public fun hashCode ()I
@@ -6301,11 +6298,8 @@ public final class io/matthewnelson/kmp/tor/runtime/core/config/TorSetting$Compa
 	public final fun get (Ljava/util/Set;Ljava/util/Map;)Lio/matthewnelson/kmp/tor/runtime/core/config/TorSetting;
 	public static synthetic fun get$default (Lio/matthewnelson/kmp/tor/runtime/core/config/TorSetting$Companion;Lio/matthewnelson/kmp/tor/runtime/core/config/TorSetting$LineItem;Ljava/util/Map;ILjava/lang/Object;)Lio/matthewnelson/kmp/tor/runtime/core/config/TorSetting;
 	public static synthetic fun get$default (Lio/matthewnelson/kmp/tor/runtime/core/config/TorSetting$Companion;Ljava/util/Set;Ljava/util/Map;ILjava/lang/Object;)Lio/matthewnelson/kmp/tor/runtime/core/config/TorSetting;
-	public final fun getOrNull (Lio/matthewnelson/kmp/tor/runtime/core/config/TorSetting$LineItem;)Lio/matthewnelson/kmp/tor/runtime/core/config/TorSetting;
-	public final fun getOrNull (Lio/matthewnelson/kmp/tor/runtime/core/config/TorSetting$LineItem;Ljava/util/Map;)Lio/matthewnelson/kmp/tor/runtime/core/config/TorSetting;
 	public final fun getOrNull (Ljava/util/Set;)Lio/matthewnelson/kmp/tor/runtime/core/config/TorSetting;
 	public final fun getOrNull (Ljava/util/Set;Ljava/util/Map;)Lio/matthewnelson/kmp/tor/runtime/core/config/TorSetting;
-	public static synthetic fun getOrNull$default (Lio/matthewnelson/kmp/tor/runtime/core/config/TorSetting$Companion;Lio/matthewnelson/kmp/tor/runtime/core/config/TorSetting$LineItem;Ljava/util/Map;ILjava/lang/Object;)Lio/matthewnelson/kmp/tor/runtime/core/config/TorSetting;
 	public static synthetic fun getOrNull$default (Lio/matthewnelson/kmp/tor/runtime/core/config/TorSetting$Companion;Ljava/util/Set;Ljava/util/Map;ILjava/lang/Object;)Lio/matthewnelson/kmp/tor/runtime/core/config/TorSetting;
 }
 
@@ -6317,9 +6311,9 @@ public final class io/matthewnelson/kmp/tor/runtime/core/config/TorSetting$LineI
 	public final field isHiddenService Z
 	public final field isNonPersistent Z
 	public final field isPort Z
-	public final field isPortAndAuto Z
-	public final field isPortAndDisabled Z
-	public final field isPortAndDistinct Z
+	public final field isPortAuto Z
+	public final field isPortDisabled Z
+	public final field isPortDistinct Z
 	public final field isUnixSocket Z
 	public final field option Lio/matthewnelson/kmp/tor/runtime/core/config/TorOption;
 	public final field optionals Ljava/util/Set;

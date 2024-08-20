@@ -13,6 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
+@file:Suppress("KotlinRedundantDiagnosticSuppress")
+
 package io.matthewnelson.kmp.tor.runtime.core.config
 
 import io.matthewnelson.immutable.collections.immutableSetOf
@@ -30,16 +32,17 @@ import kotlin.jvm.*
 /**
  * Holder for a "setting".
  *
- * Most [TorOption] are 1 [LineItem], but there are some which
- * require "grouping", such as Hidden Services. For example,
- * declaring a Hidden Service in a configuration requires that
- * [TorOption.HiddenServiceDir] be declared first, and a minimum
- * of 1 declaration of [TorOption.HiddenServicePort] following
- * it. In this case, [items] would contain all Hidden Service
- * [LineItem] for that Hidden Service instance.
+ * Most [TorOption] are a single [LineItem], but there are some which
+ * require "grouping", such as Hidden Services. For example, declaring a
+ * Hidden Service in a configuration requires [TorOption.HiddenServiceDir]
+ * be declared first, and a minimum of one [TorOption.HiddenServicePort]
+ * declaration following it. In this case, [items] would contain all
+ * Hidden Service [LineItem] for that Hidden Service "instance".
+ *
+ * Comparison of settings is done such that only the first [LineItem] (or
+ * "root" item) within [items] is considered.
  *
  * @see [toSetting]
- * @see [toSettingOrNull]
  * @see [Iterable.filterByAttribute]
  * @see [Iterable.filterByOption]
  * */
@@ -75,7 +78,9 @@ public class TorSetting private constructor(
      * e.g.
      *
      *     |    option    | argument |            optionals             |
-     *       __SocksPort     9050     OnionTrafficOnly IsolateDestPort
+     *     __SocksPort      9050       OnionTrafficOnly IsolateDestPort
+     *     DisableNetwork   1
+     *     RunAsDaemon      0
      *
      * @see [toLineItem]
      * @see [toLineItemOrNull]
@@ -83,7 +88,7 @@ public class TorSetting private constructor(
     public class LineItem private constructor(
 
         /**
-         * The [TorOption], or "keyword" for this single line expression.
+         * The [TorOption] for this single line expression.
          * */
         @JvmField
         public val option: TorOption,
@@ -96,8 +101,10 @@ public class TorSetting private constructor(
 
         /**
          * Optional things for this [TorOption] which are excluded from [equals]
-         * and [hashCode] consideration. All contents will be non-blank and single
-         * line. Can be empty.
+         * and [hashCode] consideration. They are appended to the option and
+         * argument string using a single space deliminator.
+         *
+         * All contents will be non-blank and single line. Can be empty.
          * */
         @JvmField
         public val optionals: Set<String>,
@@ -173,15 +180,21 @@ public class TorSetting private constructor(
 
         /**
          * If this [LineItem] is a [TorOption] with the attribute
-         * [TorOption.Attribute.UNIX_SOCKET], and is configured with
-         * an [argument] starting with `unix:`.
+         * [TorOption.Attribute.UNIX_SOCKET], and is configured as such.
+         *
+         * If the attribute [TorOption.Attribute.PORT] is also present
+         * for the [TorOption] (e.g. [TorOption.ControlPort]), then the
+         * [argument] will be checked to see if it starts with `unix:`.
          * */
         @JvmField
         public val isUnixSocket: Boolean = run {
             if (!option.attributes.contains(TorOption.Attribute.UNIX_SOCKET)) {
+                // Does not contain UNIX_SOCKET
                 return@run false
             }
-            if (option is TorOption.ControlSocket) {
+
+            if (!option.attributes.contains(TorOption.Attribute.PORT)) {
+                // Can only be configured as UNIX_SOCKET (e.g. ControlSocket)
                 return@run true
             }
 
@@ -208,7 +221,7 @@ public class TorSetting private constructor(
          * [TorOption.Attribute.PORT], and is configured as `auto`.
          * */
         @JvmField
-        public val isPortAndAuto: Boolean =
+        public val isPortAuto: Boolean =
             isPort && argument == TorOption.AUTO
 
         /**
@@ -216,17 +229,17 @@ public class TorSetting private constructor(
          * [TorOption.Attribute.PORT], and is configured as `0`.
          * */
         @JvmField
-        public val isPortAndDisabled: Boolean =
+        public val isPortDisabled: Boolean =
             isPort && argument == Port.ZERO.toString()
 
         /**
          * If this [LineItem] is a [TorOption] with the attribute
-         * [TorOption.Attribute.PORT], and is configured as neither
-         * `0` or `auto` (e.g. it is 9050).
+         * [TorOption.Attribute.PORT], and is configured with a
+         * distinct port, such as 9050 (i.e. not `0` or `auto`).
          * */
         @JvmField
-        public val isPortAndDistinct: Boolean =
-            !isPortAndAuto && !isPortAndDisabled
+        public val isPortDistinct: Boolean =
+            isPort && !isPortAuto && !isPortDisabled
 
         /**
          * If this [LineItem] is a [TorOption] with the attribute
@@ -253,43 +266,50 @@ public class TorSetting private constructor(
             option.attributes.contains(TorOption.Attribute.HIDDEN_SERVICE)
 
         /** @suppress */
-        public override fun equals(other: Any?): Boolean = equalsPrivate(other)
+        public override fun equals(other: Any?): Boolean {
+            return  other is LineItem
+                    && other.option == option
+                    && other.argument == argument
+        }
+
         /** @suppress */
-        public override fun hashCode(): Int = hashCodePrivate()
+        public override fun hashCode(): Int {
+            var result = 13
+            result = result * 42 + option.hashCode()
+            result = result * 42 + argument.hashCode()
+            return result
+        }
+
         /** @suppress */
-        public override fun toString(): String = toStringPrivate()
+        public override fun toString(): String = buildString {
+            append(option)
+            append(' ')
+            append(argument)
+            if (optionals.isNotEmpty()) {
+                append(' ')
+                optionals.joinTo(this, separator = " ")
+            }
+        }
     }
 
     public companion object {
 
         /**
          * Creates the [TorSetting] for a single [LineItem].
-         *
-         * TODO: Shouldn't throw if the only thing checked is
-         *  a non-empty Set<LineItem>. May want to keep though
-         *  in case of further validation, such as ensuring
-         *  if [LineItem.option] contains the attribute
-         *  [TorOption.Attribute.HIDDEN_SERVICE], that it will
-         *  throw if at least [TorOption.HiddenServiceDir] and
-         *  1 [TorOption.HiddenServicePort] are not present.
          * */
         @JvmStatic
         @JvmOverloads
         @JvmName("get")
         @ExperimentalKmpTorApi
-        @Throws(IllegalArgumentException::class)
         public fun LineItem.toSetting(
             extras: Map<String, Any> = emptyMap(),
         ): TorSetting = immutableSetOf(this).toSetting(extras)
 
-        @JvmStatic
-        @JvmOverloads
-        @ExperimentalKmpTorApi
-        @JvmName("getOrNull")
-        public fun LineItem.toSettingOrNull(
-            extras: Map<String, Any> = emptyMap(),
-        ): TorSetting? = immutableSetOf(this).toSettingOrNull(extras)
-
+        /**
+         * Creates the [TorSetting] for multiple [LineItem].
+         *
+         * @throws [IllegalArgumentException] when [LineItem] are empty.
+         * */
         @JvmStatic
         @JvmOverloads
         @JvmName("get")
@@ -300,16 +320,16 @@ public class TorSetting private constructor(
         ): TorSetting {
             val items = toImmutableSet()
 
-            require(items.isNotEmpty()) { "line items cannot be empty" }
-
-            // TODO: Verify things.
-            //  - Hidden Service attr requires HiddenServiceDir first item
-            //    with
-            //  - Many different things are single LineItem
+            require(items.isNotEmpty()) { "items cannot be empty" }
 
             return TorSetting(items, extras.toImmutableMap())
         }
 
+        /**
+         * Creates the [TorSetting] for multiple [LineItem].
+         *
+         * @return [TorSetting] or `null` if items are empty.
+         * */
         @JvmStatic
         @JvmOverloads
         @JvmName("getOrNull")
@@ -324,14 +344,14 @@ public class TorSetting private constructor(
 
         /**
          * Returns a list containing all elements of [TorSetting] within
-         * the [TorConfig2] which contain, and are configured for, parameter
-         * [A].
+         * the [Iterable] which contain a [LineItem], and is configured
+         * for, attribute [A].
          *
-         * For example, if [TorOption.Attribute.UNIX_SOCKET] is parameter [A]
-         * and 2 declarations of [TorOption.ControlPort] are present (one
-         * configured as a Unix Socket, and the other as a TCP port), then
-         * only the one configured as a Unix Socket will be present in the
-         * returned list.
+         * For example, if [TorOption.Attribute.UNIX_SOCKET] is parameter
+         * [A] and 2 declarations of [TorOption.ControlPort] are present
+         * (one configured as a Unix Socket, and the other as a TCP port),
+         * then only the one configured as a Unix Socket will be present
+         * in the returned list.
          *
          * @see [Iterable.filterByAttribute]
          * */
@@ -342,14 +362,14 @@ public class TorSetting private constructor(
 
         /**
          * Returns a list containing all elements of [TorSetting] within
-         * the [Iterable] which contain, and are configured for, parameter
-         * [A].
+         * the [Iterable] which contain a [LineItem], and is configured
+         * for, attribute [A].
          *
-         * For example, if [TorOption.Attribute.UNIX_SOCKET] is parameter [A]
-         * and 2 declarations of [TorOption.ControlPort] are present (one
-         * configured as a Unix Socket, and the other as a TCP port), then
-         * only the one configured as a Unix Socket will be present in the
-         * returned list.
+         * For example, if [TorOption.Attribute.UNIX_SOCKET] is parameter
+         * [A] and 2 declarations of [TorOption.ControlPort] are present
+         * (one configured as a Unix Socket, and the other as a TCP port),
+         * then only the one configured as a Unix Socket will be present
+         * in the returned list.
          * */
         @JvmStatic
         public inline fun <reified A: TorOption.Attribute> Iterable<TorSetting>.filterByAttribute(): List<TorSetting> {
@@ -392,7 +412,8 @@ public class TorSetting private constructor(
         }
 
         /**
-         * TODO
+         * Returns a list containing all elements of [TorSetting] within
+         * the [TorConfig2] which contain a [LineItem] for option [O].
          *
          * @see [Iterable.filterByOption]
          * */
@@ -402,7 +423,8 @@ public class TorSetting private constructor(
         }
 
         /**
-         * TODO
+         * Returns a list containing all elements of [TorSetting] within
+         * the [Iterable] which contain a [LineItem] for option [O].
          * */
         @JvmStatic
         public inline fun <reified O: TorOption> Iterable<TorSetting>.filterByOption(): List<TorSetting> {
@@ -479,124 +501,11 @@ public class TorSetting private constructor(
     }
 
     /** @suppress */
-    public override fun equals(other: Any?): Boolean = equalsPrivate(other)
+    public override fun equals(other: Any?): Boolean = other is TorSetting && other.items.first() == items.first()
     /** @suppress */
-    public override fun hashCode(): Int = hashCodePrivate()
+    public override fun hashCode(): Int = 17 * 31 + items.first().hashCode()
     /** @suppress */
-    public override fun toString(): String = toStringPrivate()
-}
-
-private fun TorSetting.LineItem.equalsPrivate(other: Any?): Boolean {
-    if (other !is TorSetting.LineItem) return false
-
-    if (other.option.isUnique || this.option.isUnique) {
-        // If either are unique, compare only the option.
-        //
-        // This is safe from non-persistent namespace
-        // because only non-persistent options that
-        // are unique do not have persistent counterparts
-        return other.option == this.option
+    public override fun toString(): String = buildString {
+        items.joinTo(this, separator = "\n")
     }
-
-    // Have to compare 2 non-unique Items
-
-    // Use option name to compare, as there are non-persistent
-    // options which are not unique that also have persistent
-    // counterparts (e.g. __ControlPort and ControlPort)
-    val thisName = if (this.isNonPersistent) this.option.name.drop(2) else this.option.name
-    val otherName = if (other.isNonPersistent) other.option.name.drop(2) else other.option.name
-
-    // If both are ports
-    if (other.isPort && this.isPort) {
-        return if (!other.isPortAndDistinct || !this.isPortAndDistinct) {
-            otherName == thisName && other.argument == this.argument
-        } else {
-            // Neither are disabled or set to auto, compare
-            // only their port arguments (or unix socket paths)
-            other.argument == this.argument
-        }
-    }
-
-    // If both are Unix Sockets
-    if (other.isUnixSocket && this.isUnixSocket) {
-        return other.argument == this.argument
-    }
-
-    // if both are file system paths
-    val thisIsFs = this.isFile || this.isDirectory
-    val otherIsFs = other.isFile || other.isDirectory
-
-    if (otherIsFs && thisIsFs) {
-        // compare only by their arguments (file system paths)
-        return other.argument == this.argument
-    }
-
-    return  otherName == thisName
-            && other.argument == this.argument
-}
-
-private fun TorSetting.LineItem.hashCodePrivate(): Int {
-    var result = 13
-    if (option.isUnique) {
-        return result * 42 + option.hashCode()
-    }
-
-    // Not unique, need to handle non-persistent options.
-    // Instead of using option.hashCode() which would be
-    // different for non-persistent and persistent options
-    // of the same category, the name must always be used
-    // w/o the prefixing `__`.
-    val nameHashCode = if (isNonPersistent) {
-        option.name.drop(2)
-    } else {
-        option.name
-    }.hashCode()
-
-    if (!isPortAndDistinct) {
-        // If a port is `0` or `auto`, it needs to register
-        // as the "same" as another port option of the same
-        // namespace (e.g. ControlPort and ControlPort and
-        // __ControlPort).
-
-        result = result * 42 + nameHashCode
-        return result * 42 + argument.hashCode()
-    }
-
-    if (isUnixSocket || isPort || isFile || isDirectory) {
-        // TCP Ports and filesystem paths are shared across
-        // the host, so only consider the argument and not
-        // what option it is. If there is a collision of
-        // host namespace with another option (e.g. DataDirectory
-        // and CacheDirectory are set to the same path), it
-        // needs to register as such.
-        return result * 42 + argument.hashCode()
-    }
-
-    // Was something else, do name & argument only
-    result = result * 42 + nameHashCode
-    return result * 42 + argument.hashCode()
-}
-
-private fun TorSetting.LineItem.toStringPrivate(): String {
-    return buildString {
-        append(option)
-        append(' ')
-        append(argument)
-        if (optionals.isNotEmpty()) {
-            append(' ')
-            optionals.joinTo(this, separator = " ")
-        }
-    }
-}
-
-private fun TorSetting.equalsPrivate(other: Any?): Boolean {
-    return  other is TorSetting && other.items.first() == items.first()
-}
-
-private fun TorSetting.hashCodePrivate(): Int {
-    return 17 * 31 + items.first().hashCode()
-}
-
-private fun TorSetting.toStringPrivate(): String {
-    return buildString { items.joinTo(this, separator = "\n") }
 }
