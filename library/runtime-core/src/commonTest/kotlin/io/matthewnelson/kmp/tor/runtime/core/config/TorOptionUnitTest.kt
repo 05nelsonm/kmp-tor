@@ -107,19 +107,20 @@ class TorOptionUnitTest {
     }
 
     @Test
-    fun givenOptions_whenNonPersistentPort_thenIsNotUnique() {
-        val options = TorOption.entries.mapNotNull { option ->
-            if (option.name[0] != '_') return@mapNotNull null
-            if (!option.attributes.contains(TorOption.Attribute.PORT)) return@mapNotNull null
-            option
+    fun givenOptions_whenAttributePORTorUNIXSOCKET_thenIsNotUnique() {
+        val options: List<TorOption> = TorOption.entries.mapNotNull { option ->
+            val attrs = option.attributes
+            if (attrs.contains(TorOption.Attribute.PORT)) return@mapNotNull option
+            if (attrs.contains(TorOption.Attribute.UNIX_SOCKET)) return@mapNotNull option
+            null
         }
 
         // Force update expected test value when something
         // is added (same as reflection tests for Jvm).
-        assertEquals(10, options.size)
+        assertEquals(22, options.size)
 
         options.forEach { option ->
-            assertFalse(option.isUnique, "$option is non-persistent PORT, but isUnique was true")
+            assertFalse(option.isUnique)
         }
     }
 
