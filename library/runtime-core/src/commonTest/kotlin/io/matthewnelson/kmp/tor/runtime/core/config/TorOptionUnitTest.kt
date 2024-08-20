@@ -18,6 +18,7 @@ package io.matthewnelson.kmp.tor.runtime.core.config
 import io.matthewnelson.kmp.tor.runtime.core.config.TorOption.Companion.buildableInternal
 import io.matthewnelson.kmp.tor.runtime.core.config.builder.BuilderScopeAutoBoolean
 import io.matthewnelson.kmp.tor.runtime.core.config.builder.BuilderScopePort
+import io.matthewnelson.kmp.tor.runtime.core.internal.IsUnixLikeHost
 import kotlin.test.*
 
 class TorOptionUnitTest {
@@ -125,12 +126,12 @@ class TorOptionUnitTest {
     }
 
     @Test
-    fun givenOptions_whenInstanceConfigurableBuildable_thenImplementsBuildableFunction() {
-        val options = TorOption.entries.filterIsInstance<ConfigurableBuildable<*>>()
+    fun givenOptions_whenInstanceConfigureBuildable_thenImplementsBuildableFunction() {
+        val options = TorOption.entries.filterIsInstance<ConfigureBuildable<*>>()
 
         // Force update expected test value when something
         // is added (same as reflection tests for Jvm).
-        assertEquals(29, options.size)
+        assertEquals(27, options.size)
 
         options.forEach { option ->
 
@@ -145,12 +146,38 @@ class TorOptionUnitTest {
     }
 
     @Test
-    fun givenOptions_whenNotInstanceConfigurableBuildable_thenDoesNotImplementBuildableFunction() {
-        val options = TorOption.entries.filter { it !is ConfigurableBuildable<*> }
+    fun givenOptions_whenInstanceConfigureTryBuildable_thenImplementsBuildableFunction() {
+        val options = TorOption.entries.filterIsInstance<ConfigureTryBuildable<*>>()
 
         // Force update expected test value when something
         // is added (same as reflection tests for Jvm).
-        assertEquals(328, options.size)
+        assertEquals(3, options.size)
+
+        options.forEach { option ->
+
+            // Would throw ClassCastException if buildable was not
+            // implemented because of a default return of null.
+            try {
+                option.buildContract {}
+            } catch (_: IllegalArgumentException) {
+                // pass
+            } catch (_: UnsupportedOperationException) {
+                // pass
+            }
+        }
+    }
+
+    @Test
+    fun givenOptions_whenNotInstanceConfigureBuildable_thenDoesNotImplementBuildableFunction() {
+        val options = TorOption.entries.filter { option ->
+            if (option is ConfigureBuildable<*>) return@filter false
+            if (option is ConfigureTryBuildable<*>) return@filter false
+            true
+        }
+
+        // Force update expected test value when something
+        // is added (same as reflection tests for Jvm).
+        assertEquals(327, options.size)
 
         options.forEach { option ->
             assertNull(option.buildableInternal())
@@ -160,7 +187,12 @@ class TorOptionUnitTest {
     @Test
     fun givenOptions_whenBuildableAutoBoolean_thenDefaultIsAutoOrOneOrZero() {
         val options = TorOption.entries.mapNotNull { option ->
-            val buildable = option.buildableInternal()
+            val buildable = try {
+                option.buildableInternal()
+            } catch (_: UnsupportedOperationException) {
+                null
+            }
+
             if (buildable is BuilderScopeAutoBoolean) {
                 option
             } else {
@@ -181,8 +213,8 @@ class TorOptionUnitTest {
     }
 
     @Test
-    fun givenOptions_whenInstanceConfigurableBoolean_thenDefaultIsTrueOrFalse() {
-        val options = TorOption.entries.filterIsInstance<ConfigurableBoolean>()
+    fun givenOptions_whenInstanceConfigureBoolean_thenDefaultIsTrueOrFalse() {
+        val options = TorOption.entries.filterIsInstance<ConfigureBoolean>()
 
         // Force update expected test value when something
         // is added (same as reflection tests for Jvm).
@@ -199,7 +231,12 @@ class TorOptionUnitTest {
     @Test
     fun givenOptions_whenBuildablePort_thenHasAttributePORT() {
         val options = TorOption.entries.filter { option ->
-            option.buildableInternal() is BuilderScopePort
+            try {
+                option.buildableInternal() is BuilderScopePort
+            } catch (_: UnsupportedOperationException) {
+                // __TransPort or TransPort will throw on windows.
+                option.name.endsWith("TransPort")
+            }
         }
 
         // Force update expected test value when something
@@ -214,8 +251,8 @@ class TorOptionUnitTest {
     }
 
     @Test
-    fun givenOptions_whenInstanceConfigurableDirectory_thenHasAttributeDIRECTORY() {
-        val options = TorOption.entries.filterIsInstance<ConfigurableDirectory>()
+    fun givenOptions_whenInstanceConfigureDirectory_thenHasAttributeDIRECTORY() {
+        val options = TorOption.entries.filterIsInstance<ConfigureDirectory>()
 
         // Force update expected test value when something
         // is added (same as reflection tests for Jvm).
@@ -230,8 +267,8 @@ class TorOptionUnitTest {
     }
 
     @Test
-    fun givenOptions_whenInstanceConfigurableFile_thenHasAttributeFILE() {
-        val options = TorOption.entries.filterIsInstance<ConfigurableFile>()
+    fun givenOptions_whenInstanceConfigureFile_thenHasAttributeFILE() {
+        val options = TorOption.entries.filterIsInstance<ConfigureFile>()
 
         // Force update expected test value when something
         // is added (same as reflection tests for Jvm).

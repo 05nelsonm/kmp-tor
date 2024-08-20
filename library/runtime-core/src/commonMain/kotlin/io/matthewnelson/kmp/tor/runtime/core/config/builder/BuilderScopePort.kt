@@ -24,7 +24,6 @@ import io.matthewnelson.kmp.tor.runtime.core.address.Port
 import io.matthewnelson.kmp.tor.runtime.core.apply
 import io.matthewnelson.kmp.tor.runtime.core.config.TorOption
 import io.matthewnelson.kmp.tor.runtime.core.config.TorSetting
-import io.matthewnelson.kmp.tor.runtime.core.internal.IsUnixLikeHost
 import io.matthewnelson.kmp.tor.runtime.core.internal.toUnixSocketPath
 import io.matthewnelson.kmp.tor.runtime.core.util.isAvailableAsync
 import kotlin.jvm.JvmField
@@ -68,17 +67,8 @@ public open class BuilderScopePort: TorSetting.BuilderScope {
         @KmpTorDsl
         public override fun auto(): Control = super.auto() as Control
 
-        // TODO: Comment
-        init { auto() }
-
-        // TODO: Maybe allow and for runtime, always check and ensure enabled?
-        //  would need to see if TorCmd.Config.Set would close the listener
-        //  or not.
-        // TODO: Comment
-//        @KmpTorDsl
-//        public override fun disable(): Control {
-//            return super.disable() as Control
-//        }
+        @KmpTorDsl
+        public override fun disable(): Control = super.disable() as Control
 
         @KmpTorDsl
         public override fun port(
@@ -264,6 +254,10 @@ public open class BuilderScopePort: TorSetting.BuilderScope {
     /**
      * A DSL builder scope for [TorOption.__TransPort] and
      * [TorOption.TransPort].
+     *
+     * This builder is only available for unix-like hosts.
+     * [UnsupportedOperationException] may be thrown when
+     * attempting to instantiate.
      * */
     @KmpTorDsl
     public class Trans: BuilderScopePort {
@@ -272,40 +266,25 @@ public open class BuilderScopePort: TorSetting.BuilderScope {
         private constructor(option: TorOption.TransPort): super(option)
 
         @KmpTorDsl
-        public override fun auto(): Trans {
-            if (!IsUnixLikeHost) return this
-            return super.auto() as Trans
-        }
+        public override fun auto(): Trans = super.auto() as Trans
 
         @KmpTorDsl
-        public override fun disable(): Trans {
-            if (!IsUnixLikeHost) return this
-            return super.disable() as Trans
-        }
+        public override fun disable(): Trans = super.disable() as Trans
 
         @KmpTorDsl
         public override fun port(
             value: Port.Ephemeral,
-        ): Trans {
-            if (!IsUnixLikeHost) return this
-            return super.port(value) as Trans
-        }
+        ): Trans = super.port(value) as Trans
 
         @KmpTorDsl
         public override fun reassignable(
             allow: Boolean,
-        ): Trans {
-            if (!IsUnixLikeHost) return this
-            return super.reassignable(allow) as Trans
-        }
+        ): Trans = super.reassignable(allow) as Trans
 
         @KmpTorDsl
         public override fun flagsIsolation(
             block: ThisBlock<FlagsBuilderIsolation>,
-        ): Trans {
-            if (!IsUnixLikeHost) return this
-            return super.flagsIsolation(block) as Trans
-        }
+        ): Trans = super.flagsIsolation(block) as Trans
 
         internal companion object {
 
@@ -397,7 +376,7 @@ public open class BuilderScopePort: TorSetting.BuilderScope {
      *
      * This sets the [argument] to the expressed file path, which will
      * be formatted as `unix:\"${file-path}\"`. The [value] passed is
-     * always sanitized via [File.absoluteFile] and [File.normalize]
+     * always sanitized via [File.absoluteFile] + [File.normalize]
      * before applying final formatting.
      *
      * e.g.

@@ -22,7 +22,7 @@ import io.matthewnelson.kmp.tor.core.api.annotation.ExperimentalKmpTorApi
 import io.matthewnelson.kmp.tor.core.api.annotation.KmpTorDsl
 import io.matthewnelson.kmp.tor.runtime.core.ThisBlock
 import io.matthewnelson.kmp.tor.runtime.core.address.Port
-import io.matthewnelson.kmp.tor.runtime.core.apply
+import io.matthewnelson.kmp.tor.runtime.core.config.TorConfig2
 import io.matthewnelson.kmp.tor.runtime.core.config.TorOption
 import io.matthewnelson.kmp.tor.runtime.core.config.TorSetting
 import io.matthewnelson.kmp.tor.runtime.core.config.TorSetting.LineItem.Companion.toLineItem
@@ -37,11 +37,11 @@ import kotlin.jvm.JvmSynthetic
  * that contain the attribute [TorOption.Attribute.HIDDEN_SERVICE]).
  *
  * At a minimum, tor requires [TorOption.HiddenServiceDir] and at least
- * `1` [TorOption.HiddenServicePort] be defined. Defaults for all other
- * Hidden Service options are utilized, unless specified.
+ * `1` [TorOption.HiddenServicePort] be defined. Tor then uses its hard
+ * coded defaults for all other Hidden Service options, unless overridden.
  *
  * This builder scope takes it further in that it **also requires** the
- * definition of [TorOption.HiddenServiceVersion] via [version], as well.
+ * definition of [TorOption.HiddenServiceVersion], as well (see [version]).
  *
  * The requirement for the version expression is because if, in a future
  * release of the tor C library, the default value changes to a newer
@@ -49,24 +49,29 @@ import kotlin.jvm.JvmSynthetic
  * source of conflict if an explicit definition is not there (surprise
  * upgrade from `v3` -> `v4`?). In that event, `kmp-tor` consumers using this
  * builder scope will be unaffected by the change to the tor C library. A
- * conscious decision to migrate to the new version, and modifying their
- * builder usages would need to be made to update the [version] invocation.
+ * conscious decision to migrate to the new version, and update usages
+ * of this builder, would need to be made.
  *
  * **NOTE:** Any misconfiguration will result in an [IllegalArgumentException]
  * when build is called.
  *
- * e.g. (Minimum viable configuration with [version] and [port] defined)
+ * e.g. (Minimum requirements with [directory], [version] and [port] defined)
  *
  *     // Also available via HiddenServiceDir.asSetting
  *     TorConfig.Builder {
- *         TorOption.HiddenServiceDir.configure(directory = "/path/to/this/hs/dir".toFile()) {
+ *
+ *         // No try/catch needed b/c minimums are met
+ *         TorOption.HiddenServiceDir.tryConfigure {
+ *             // Must be defined
+ *             directory("/path/to/this/hs/dir".toFile())
+ *
  *             // Must be defined
  *             version(3)
  *
  *             // At least 1 port must be defined
  *             port(virtual = Port.HTTPS) {
  *                 try {
- *                     target(unixSocket = "/path/to/server/dir/uds.sock".toFile())
+ *                     target(unixSocket = "/path/to/server/uds.sock".toFile())
  *                 } catch (_: UnsupportedOperationException) {
  *                     target(port = 8443.toPort())
  *                 }
@@ -75,14 +80,15 @@ import kotlin.jvm.JvmSynthetic
  *             // ...
  *         }
  *     }
+ *
+ * @see [TorOption.HiddenServiceDir.asSetting]
+ * @see [TorConfig2.BuilderScope.tryConfigure]
  * */
 @KmpTorDsl
 @OptIn(ExperimentalKmpTorApi::class)
 public class BuilderScopeHS: TorSetting.BuilderScope, BuilderScopeHSPort.DSL<BuilderScopeHS> {
 
-    private constructor(directory: File): super(TorOption.HiddenServiceDir, INIT) {
-        argument = directory.absoluteNormalizedFile.path
-    }
+    private constructor(): super(TorOption.HiddenServiceDir, INIT)
 
     // Required to be defined
     private var _version: Int? = null
@@ -97,11 +103,29 @@ public class BuilderScopeHS: TorSetting.BuilderScope, BuilderScopeHSPort.DSL<Bui
     private var _numIntroductionPoints: Int? = null
 
     /**
+     * Sets the [argument] to the specified directory.
+     *
+     * **NOTE:** Provided [File] is always sanitized using
+     * [File.absoluteFile] + [File.normalize].
+     * */
+    @KmpTorDsl
+    public fun directory(
+        dir: File,
+    ): BuilderScopeHS {
+        argument = dir.absoluteNormalizedFile.path
+        return this
+    }
+
+    /**
      * Sets [TorOption.HiddenServiceVersion] for this Hidden Service
      * instance. Currently, the only supported version is `v3`. Anything
      * else will cause a build failure.
      *
      * **NOTE:** This is required to be defined.
+     *
+     * e.g.
+     *
+     *     version(3)
      * */
     @KmpTorDsl
     public fun version(
@@ -167,7 +191,7 @@ public class BuilderScopeHS: TorSetting.BuilderScope, BuilderScopeHSPort.DSL<Bui
      * Otherwise, the default will be used.
      *
      * **NOTE:** Must be between [Port.MIN] and [Port.MAX] (inclusive).
-     * Otherwise, will cause a build failure.
+     * Otherwise, will cause a failure when build is called.
      * */
     @KmpTorDsl
     public fun maxStreams(
@@ -194,7 +218,8 @@ public class BuilderScopeHS: TorSetting.BuilderScope, BuilderScopeHSPort.DSL<Bui
      * Otherwise, the default will be used.
      *
      * **NOTE:** For [version] 3 Hidden Service, the acceptable range
-     * is `1` to `20` (inclusive). Otherwise, will cause a build failure.
+     * is from `1` to `20` (inclusive). Otherwise, will cause a failure
+     * when build is called.
      * */
     @KmpTorDsl
     public fun numIntroductionPoints(
@@ -214,13 +239,9 @@ public class BuilderScopeHS: TorSetting.BuilderScope, BuilderScopeHSPort.DSL<Bui
     internal companion object {
 
         @JvmSynthetic
-        @Throws(IllegalArgumentException::class)
-        internal fun build(
-            directory: File,
-            block: ThisBlock<BuilderScopeHS>,
-        ): TorSetting = BuilderScopeHS(directory)
-            .apply(block)
-            .build()
+        internal fun get(): BuilderScopeHS {
+            return BuilderScopeHS()
+        }
 
         private val HSV_3 by lazy {
             TorOption.HiddenServiceVersion.toLineItem(argument = 3.toString())

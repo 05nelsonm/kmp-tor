@@ -3483,19 +3483,22 @@ public final class io/matthewnelson/kmp/tor/runtime/core/builder/UnixSocketBuild
 public final class io/matthewnelson/kmp/tor/runtime/core/builder/UnixSocketBuilder$Companion {
 }
 
-public abstract interface class io/matthewnelson/kmp/tor/runtime/core/config/ConfigurableBoolean : io/matthewnelson/kmp/tor/runtime/core/config/ConfigurableContract {
-}
-
-public abstract interface class io/matthewnelson/kmp/tor/runtime/core/config/ConfigurableBuildable : io/matthewnelson/kmp/tor/runtime/core/config/ConfigurableContract {
-}
-
 public abstract interface class io/matthewnelson/kmp/tor/runtime/core/config/ConfigurableContract {
 }
 
-public abstract interface class io/matthewnelson/kmp/tor/runtime/core/config/ConfigurableDirectory : io/matthewnelson/kmp/tor/runtime/core/config/ConfigurableContract {
+public abstract interface class io/matthewnelson/kmp/tor/runtime/core/config/ConfigureBoolean : io/matthewnelson/kmp/tor/runtime/core/config/ConfigurableContract {
 }
 
-public abstract interface class io/matthewnelson/kmp/tor/runtime/core/config/ConfigurableFile : io/matthewnelson/kmp/tor/runtime/core/config/ConfigurableContract {
+public abstract interface class io/matthewnelson/kmp/tor/runtime/core/config/ConfigureBuildable : io/matthewnelson/kmp/tor/runtime/core/config/ConfigurableContract {
+}
+
+public abstract interface class io/matthewnelson/kmp/tor/runtime/core/config/ConfigureDirectory : io/matthewnelson/kmp/tor/runtime/core/config/ConfigurableContract {
+}
+
+public abstract interface class io/matthewnelson/kmp/tor/runtime/core/config/ConfigureFile : io/matthewnelson/kmp/tor/runtime/core/config/ConfigurableContract {
+}
+
+public abstract interface class io/matthewnelson/kmp/tor/runtime/core/config/ConfigureTryBuildable : io/matthewnelson/kmp/tor/runtime/core/config/ConfigurableContract {
 }
 
 public final class io/matthewnelson/kmp/tor/runtime/core/config/TorConfig2 {
@@ -3507,13 +3510,13 @@ public final class io/matthewnelson/kmp/tor/runtime/core/config/TorConfig2 {
 
 public abstract class io/matthewnelson/kmp/tor/runtime/core/config/TorConfig2$BuilderScope {
 	protected static final field Companion Lio/matthewnelson/kmp/tor/runtime/core/config/TorConfig2$BuilderScope$Companion;
-	public final fun configure (Lio/matthewnelson/kmp/tor/runtime/core/config/ConfigurableBoolean;Z)Lio/matthewnelson/kmp/tor/runtime/core/config/TorConfig2$BuilderScope;
-	public final fun configure (Lio/matthewnelson/kmp/tor/runtime/core/config/ConfigurableBuildable;Lio/matthewnelson/kmp/tor/runtime/core/ThisBlock;)Lio/matthewnelson/kmp/tor/runtime/core/config/TorConfig2$BuilderScope;
-	public final fun configure (Lio/matthewnelson/kmp/tor/runtime/core/config/ConfigurableDirectory;Ljava/io/File;)Lio/matthewnelson/kmp/tor/runtime/core/config/TorConfig2$BuilderScope;
-	public final fun configure (Lio/matthewnelson/kmp/tor/runtime/core/config/ConfigurableFile;Ljava/io/File;)Lio/matthewnelson/kmp/tor/runtime/core/config/TorConfig2$BuilderScope;
-	public final fun configure (Lio/matthewnelson/kmp/tor/runtime/core/config/TorOption$HiddenServiceDir;Ljava/io/File;Lio/matthewnelson/kmp/tor/runtime/core/ThisBlock;)Lio/matthewnelson/kmp/tor/runtime/core/config/TorConfig2$BuilderScope;
+	public final fun configure (Lio/matthewnelson/kmp/tor/runtime/core/config/ConfigureBoolean;Z)Lio/matthewnelson/kmp/tor/runtime/core/config/TorConfig2$BuilderScope;
+	public final fun configure (Lio/matthewnelson/kmp/tor/runtime/core/config/ConfigureBuildable;Lio/matthewnelson/kmp/tor/runtime/core/ThisBlock;)Lio/matthewnelson/kmp/tor/runtime/core/config/TorConfig2$BuilderScope;
+	public final fun configure (Lio/matthewnelson/kmp/tor/runtime/core/config/ConfigureDirectory;Ljava/io/File;)Lio/matthewnelson/kmp/tor/runtime/core/config/TorConfig2$BuilderScope;
+	public final fun configure (Lio/matthewnelson/kmp/tor/runtime/core/config/ConfigureFile;Ljava/io/File;)Lio/matthewnelson/kmp/tor/runtime/core/config/TorConfig2$BuilderScope;
 	public abstract fun put (Lio/matthewnelson/kmp/tor/runtime/core/config/TorSetting;)Lio/matthewnelson/kmp/tor/runtime/core/config/TorConfig2$BuilderScope;
 	public final fun putAll (Ljava/util/Collection;)Lio/matthewnelson/kmp/tor/runtime/core/config/TorConfig2$BuilderScope;
+	public final fun tryConfigure (Lio/matthewnelson/kmp/tor/runtime/core/config/ConfigureTryBuildable;Lio/matthewnelson/kmp/tor/runtime/core/ThisBlock;)Lio/matthewnelson/kmp/tor/runtime/core/config/TorConfig2$BuilderScope;
 }
 
 protected final class io/matthewnelson/kmp/tor/runtime/core/config/TorConfig2$BuilderScope$Companion {
@@ -3545,7 +3548,7 @@ public abstract class io/matthewnelson/kmp/tor/runtime/core/config/TorOption : j
 	public static final fun valueOfOrNull (Ljava/lang/String;)Lio/matthewnelson/kmp/tor/runtime/core/config/TorOption;
 }
 
-public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$AccelDir : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigurableDirectory {
+public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$AccelDir : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigureDirectory {
 	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/core/config/TorOption$AccelDir;
 	public static final fun asSetting (Ljava/io/File;)Lio/matthewnelson/kmp/tor/runtime/core/config/TorSetting;
 	public fun equals (Ljava/lang/Object;)Z
@@ -3588,7 +3591,7 @@ public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$Addres
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$AddressDisableIPv6 : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigurableBoolean {
+public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$AddressDisableIPv6 : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigureBoolean {
 	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/core/config/TorOption$AddressDisableIPv6;
 	public static final fun asSetting (Z)Lio/matthewnelson/kmp/tor/runtime/core/config/TorSetting;
 	public fun equals (Ljava/lang/Object;)Z
@@ -3596,7 +3599,7 @@ public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$Addres
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$AllowNonRFC953Hostnames : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigurableBoolean {
+public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$AllowNonRFC953Hostnames : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigureBoolean {
 	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/core/config/TorOption$AllowNonRFC953Hostnames;
 	public static final fun asSetting (Z)Lio/matthewnelson/kmp/tor/runtime/core/config/TorSetting;
 	public fun equals (Ljava/lang/Object;)Z
@@ -3618,7 +3621,7 @@ public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$Altern
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$AssumeReachable : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigurableBoolean {
+public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$AssumeReachable : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigureBoolean {
 	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/core/config/TorOption$AssumeReachable;
 	public static final fun asSetting (Z)Lio/matthewnelson/kmp/tor/runtime/core/config/TorSetting;
 	public fun equals (Ljava/lang/Object;)Z
@@ -3626,7 +3629,7 @@ public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$Assume
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$AssumeReachableIPv6 : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigurableBuildable {
+public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$AssumeReachableIPv6 : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigureBuildable {
 	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/core/config/TorOption$AssumeReachableIPv6;
 	public static final fun asSetting (Lio/matthewnelson/kmp/tor/runtime/core/ThisBlock;)Lio/matthewnelson/kmp/tor/runtime/core/config/TorSetting;
 	public synthetic fun buildable ()Lio/matthewnelson/kmp/tor/runtime/core/config/TorSetting$BuilderScope;
@@ -3708,7 +3711,7 @@ public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$AuthDi
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$AuthDirHasIPv6Connectivity : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigurableBoolean {
+public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$AuthDirHasIPv6Connectivity : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigureBoolean {
 	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/core/config/TorOption$AuthDirHasIPv6Connectivity;
 	public static final fun asSetting (Z)Lio/matthewnelson/kmp/tor/runtime/core/config/TorSetting;
 	public fun equals (Ljava/lang/Object;)Z
@@ -3730,7 +3733,7 @@ public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$AuthDi
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$AuthDirListBadExits : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigurableBoolean {
+public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$AuthDirListBadExits : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigureBoolean {
 	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/core/config/TorOption$AuthDirListBadExits;
 	public static final fun asSetting (Z)Lio/matthewnelson/kmp/tor/runtime/core/config/TorSetting;
 	public fun equals (Ljava/lang/Object;)Z
@@ -3738,7 +3741,7 @@ public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$AuthDi
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$AuthDirListMiddleOnly : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigurableBoolean {
+public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$AuthDirListMiddleOnly : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigureBoolean {
 	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/core/config/TorOption$AuthDirListMiddleOnly;
 	public static final fun asSetting (Z)Lio/matthewnelson/kmp/tor/runtime/core/config/TorSetting;
 	public fun equals (Ljava/lang/Object;)Z
@@ -3767,7 +3770,7 @@ public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$AuthDi
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$AuthDirPinKeys : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigurableBoolean {
+public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$AuthDirPinKeys : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigureBoolean {
 	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/core/config/TorOption$AuthDirPinKeys;
 	public static final fun asSetting (Z)Lio/matthewnelson/kmp/tor/runtime/core/config/TorSetting;
 	public fun equals (Ljava/lang/Object;)Z
@@ -3789,7 +3792,7 @@ public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$AuthDi
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$AuthDirRejectRequestsUnderLoad : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigurableBoolean {
+public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$AuthDirRejectRequestsUnderLoad : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigureBoolean {
 	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/core/config/TorOption$AuthDirRejectRequestsUnderLoad;
 	public static final fun asSetting (Z)Lio/matthewnelson/kmp/tor/runtime/core/config/TorSetting;
 	public fun equals (Ljava/lang/Object;)Z
@@ -3797,7 +3800,7 @@ public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$AuthDi
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$AuthDirSharedRandomness : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigurableBoolean {
+public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$AuthDirSharedRandomness : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigureBoolean {
 	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/core/config/TorOption$AuthDirSharedRandomness;
 	public static final fun asSetting (Z)Lio/matthewnelson/kmp/tor/runtime/core/config/TorSetting;
 	public fun equals (Ljava/lang/Object;)Z
@@ -3805,7 +3808,7 @@ public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$AuthDi
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$AuthDirTestEd25519LinkKeys : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigurableBoolean {
+public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$AuthDirTestEd25519LinkKeys : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigureBoolean {
 	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/core/config/TorOption$AuthDirTestEd25519LinkKeys;
 	public static final fun asSetting (Z)Lio/matthewnelson/kmp/tor/runtime/core/config/TorSetting;
 	public fun equals (Ljava/lang/Object;)Z
@@ -3813,7 +3816,7 @@ public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$AuthDi
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$AuthDirTestReachability : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigurableBoolean {
+public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$AuthDirTestReachability : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigureBoolean {
 	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/core/config/TorOption$AuthDirTestReachability;
 	public static final fun asSetting (Z)Lio/matthewnelson/kmp/tor/runtime/core/config/TorSetting;
 	public fun equals (Ljava/lang/Object;)Z
@@ -3863,7 +3866,7 @@ public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$AuthDi
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$AuthoritativeDirectory : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigurableBoolean {
+public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$AuthoritativeDirectory : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigureBoolean {
 	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/core/config/TorOption$AuthoritativeDirectory;
 	public static final fun asSetting (Z)Lio/matthewnelson/kmp/tor/runtime/core/config/TorSetting;
 	public fun equals (Ljava/lang/Object;)Z
@@ -3871,7 +3874,7 @@ public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$Author
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$AutomapHostsOnResolve : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigurableBoolean {
+public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$AutomapHostsOnResolve : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigureBoolean {
 	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/core/config/TorOption$AutomapHostsOnResolve;
 	public static final fun asSetting (Z)Lio/matthewnelson/kmp/tor/runtime/core/config/TorSetting;
 	public fun equals (Ljava/lang/Object;)Z
@@ -3886,7 +3889,7 @@ public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$Automa
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$AvoidDiskWrites : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigurableBoolean {
+public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$AvoidDiskWrites : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigureBoolean {
 	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/core/config/TorOption$AvoidDiskWrites;
 	public static final fun asSetting (Z)Lio/matthewnelson/kmp/tor/runtime/core/config/TorSetting;
 	public fun equals (Ljava/lang/Object;)Z
@@ -3915,7 +3918,7 @@ public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$Bridge
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$BridgeAuthoritativeDir : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigurableBoolean {
+public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$BridgeAuthoritativeDir : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigureBoolean {
 	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/core/config/TorOption$BridgeAuthoritativeDir;
 	public static final fun asSetting (Z)Lio/matthewnelson/kmp/tor/runtime/core/config/TorSetting;
 	public fun equals (Ljava/lang/Object;)Z
@@ -3937,7 +3940,7 @@ public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$Bridge
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$BridgeRecordUsageByCountry : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigurableBoolean {
+public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$BridgeRecordUsageByCountry : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigureBoolean {
 	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/core/config/TorOption$BridgeRecordUsageByCountry;
 	public static final fun asSetting (Z)Lio/matthewnelson/kmp/tor/runtime/core/config/TorSetting;
 	public fun equals (Ljava/lang/Object;)Z
@@ -3945,7 +3948,7 @@ public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$Bridge
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$BridgeRelay : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigurableBoolean {
+public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$BridgeRelay : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigureBoolean {
 	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/core/config/TorOption$BridgeRelay;
 	public static final fun asSetting (Z)Lio/matthewnelson/kmp/tor/runtime/core/config/TorSetting;
 	public fun equals (Ljava/lang/Object;)Z
@@ -3953,7 +3956,7 @@ public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$Bridge
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$CacheDirectory : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigurableDirectory {
+public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$CacheDirectory : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigureDirectory {
 	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/core/config/TorOption$CacheDirectory;
 	public static final fun asSetting (Ljava/io/File;)Lio/matthewnelson/kmp/tor/runtime/core/config/TorSetting;
 	public fun equals (Ljava/lang/Object;)Z
@@ -3961,7 +3964,7 @@ public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$CacheD
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$CacheDirectoryGroupReadable : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigurableBuildable {
+public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$CacheDirectoryGroupReadable : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigureBuildable {
 	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/core/config/TorOption$CacheDirectoryGroupReadable;
 	public static final fun asSetting (Lio/matthewnelson/kmp/tor/runtime/core/ThisBlock;)Lio/matthewnelson/kmp/tor/runtime/core/config/TorSetting;
 	public synthetic fun buildable ()Lio/matthewnelson/kmp/tor/runtime/core/config/TorSetting$BuilderScope;
@@ -3970,7 +3973,7 @@ public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$CacheD
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$CellStatistics : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigurableBoolean {
+public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$CellStatistics : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigureBoolean {
 	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/core/config/TorOption$CellStatistics;
 	public static final fun asSetting (Z)Lio/matthewnelson/kmp/tor/runtime/core/config/TorSetting;
 	public fun equals (Ljava/lang/Object;)Z
@@ -3985,7 +3988,7 @@ public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$Circui
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$CircuitPadding : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigurableBoolean {
+public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$CircuitPadding : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigureBoolean {
 	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/core/config/TorOption$CircuitPadding;
 	public static final fun asSetting (Z)Lio/matthewnelson/kmp/tor/runtime/core/config/TorSetting;
 	public fun equals (Ljava/lang/Object;)Z
@@ -4042,7 +4045,7 @@ public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$Client
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$ClientDNSRejectInternalAddresses : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigurableBoolean {
+public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$ClientDNSRejectInternalAddresses : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigureBoolean {
 	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/core/config/TorOption$ClientDNSRejectInternalAddresses;
 	public static final fun asSetting (Z)Lio/matthewnelson/kmp/tor/runtime/core/config/TorSetting;
 	public fun equals (Ljava/lang/Object;)Z
@@ -4050,7 +4053,7 @@ public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$Client
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$ClientOnionAuthDir : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigurableDirectory {
+public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$ClientOnionAuthDir : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigureDirectory {
 	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/core/config/TorOption$ClientOnionAuthDir;
 	public static final fun asSetting (Ljava/io/File;)Lio/matthewnelson/kmp/tor/runtime/core/config/TorSetting;
 	public fun equals (Ljava/lang/Object;)Z
@@ -4058,7 +4061,7 @@ public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$Client
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$ClientOnly : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigurableBoolean {
+public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$ClientOnly : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigureBoolean {
 	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/core/config/TorOption$ClientOnly;
 	public static final fun asSetting (Z)Lio/matthewnelson/kmp/tor/runtime/core/config/TorSetting;
 	public fun equals (Ljava/lang/Object;)Z
@@ -4066,7 +4069,7 @@ public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$Client
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$ClientPreferIPv6ORPort : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigurableBuildable {
+public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$ClientPreferIPv6ORPort : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigureBuildable {
 	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/core/config/TorOption$ClientPreferIPv6ORPort;
 	public static final fun asSetting (Lio/matthewnelson/kmp/tor/runtime/core/ThisBlock;)Lio/matthewnelson/kmp/tor/runtime/core/config/TorSetting;
 	public synthetic fun buildable ()Lio/matthewnelson/kmp/tor/runtime/core/config/TorSetting$BuilderScope;
@@ -4075,7 +4078,7 @@ public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$Client
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$ClientRejectInternalAddresses : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigurableBoolean {
+public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$ClientRejectInternalAddresses : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigureBoolean {
 	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/core/config/TorOption$ClientRejectInternalAddresses;
 	public static final fun asSetting (Z)Lio/matthewnelson/kmp/tor/runtime/core/config/TorSetting;
 	public fun equals (Ljava/lang/Object;)Z
@@ -4090,7 +4093,7 @@ public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$Client
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$ClientUseIPv4 : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigurableBoolean {
+public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$ClientUseIPv4 : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigureBoolean {
 	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/core/config/TorOption$ClientUseIPv4;
 	public static final fun asSetting (Z)Lio/matthewnelson/kmp/tor/runtime/core/config/TorSetting;
 	public fun equals (Ljava/lang/Object;)Z
@@ -4098,7 +4101,7 @@ public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$Client
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$ClientUseIPv6 : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigurableBoolean {
+public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$ClientUseIPv6 : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigureBoolean {
 	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/core/config/TorOption$ClientUseIPv6;
 	public static final fun asSetting (Z)Lio/matthewnelson/kmp/tor/runtime/core/config/TorSetting;
 	public fun equals (Ljava/lang/Object;)Z
@@ -4112,7 +4115,7 @@ public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$Compan
 	public final fun valueOfOrNull (Ljava/lang/String;)Lio/matthewnelson/kmp/tor/runtime/core/config/TorOption;
 }
 
-public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$CompiledProofOfWorkHash : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigurableBuildable {
+public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$CompiledProofOfWorkHash : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigureBuildable {
 	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/core/config/TorOption$CompiledProofOfWorkHash;
 	public static final fun asSetting (Lio/matthewnelson/kmp/tor/runtime/core/ThisBlock;)Lio/matthewnelson/kmp/tor/runtime/core/config/TorSetting;
 	public synthetic fun buildable ()Lio/matthewnelson/kmp/tor/runtime/core/config/TorSetting$BuilderScope;
@@ -4128,7 +4131,7 @@ public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$Conflu
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$ConfluxEnabled : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigurableBuildable {
+public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$ConfluxEnabled : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigureBuildable {
 	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/core/config/TorOption$ConfluxEnabled;
 	public static final fun asSetting (Lio/matthewnelson/kmp/tor/runtime/core/ThisBlock;)Lio/matthewnelson/kmp/tor/runtime/core/config/TorSetting;
 	public synthetic fun buildable ()Lio/matthewnelson/kmp/tor/runtime/core/config/TorSetting$BuilderScope;
@@ -4137,7 +4140,7 @@ public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$Conflu
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$ConnDirectionStatistics : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigurableBoolean {
+public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$ConnDirectionStatistics : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigureBoolean {
 	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/core/config/TorOption$ConnDirectionStatistics;
 	public static final fun asSetting (Z)Lio/matthewnelson/kmp/tor/runtime/core/config/TorSetting;
 	public fun equals (Ljava/lang/Object;)Z
@@ -4152,7 +4155,7 @@ public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$ConnLi
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$ConnectionPadding : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigurableBuildable {
+public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$ConnectionPadding : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigureBuildable {
 	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/core/config/TorOption$ConnectionPadding;
 	public static final fun asSetting (Lio/matthewnelson/kmp/tor/runtime/core/ThisBlock;)Lio/matthewnelson/kmp/tor/runtime/core/config/TorSetting;
 	public synthetic fun buildable ()Lio/matthewnelson/kmp/tor/runtime/core/config/TorSetting$BuilderScope;
@@ -4175,7 +4178,7 @@ public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$Constr
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$ConstrainedSockets : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigurableBoolean {
+public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$ConstrainedSockets : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigureBoolean {
 	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/core/config/TorOption$ConstrainedSockets;
 	public static final fun asSetting (Z)Lio/matthewnelson/kmp/tor/runtime/core/config/TorSetting;
 	public fun equals (Ljava/lang/Object;)Z
@@ -4190,7 +4193,7 @@ public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$Contac
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$ControlPort : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigurableBuildable {
+public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$ControlPort : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigureBuildable {
 	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/core/config/TorOption$ControlPort;
 	public static final fun asSetting (Lio/matthewnelson/kmp/tor/runtime/core/ThisBlock;)Lio/matthewnelson/kmp/tor/runtime/core/config/TorSetting;
 	public synthetic fun buildable ()Lio/matthewnelson/kmp/tor/runtime/core/config/TorSetting$BuilderScope;
@@ -4199,7 +4202,7 @@ public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$Contro
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$ControlPortFileGroupReadable : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigurableBoolean {
+public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$ControlPortFileGroupReadable : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigureBoolean {
 	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/core/config/TorOption$ControlPortFileGroupReadable;
 	public static final fun asSetting (Z)Lio/matthewnelson/kmp/tor/runtime/core/config/TorSetting;
 	public fun equals (Ljava/lang/Object;)Z
@@ -4207,7 +4210,7 @@ public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$Contro
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$ControlPortWriteToFile : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigurableFile {
+public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$ControlPortWriteToFile : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigureFile {
 	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/core/config/TorOption$ControlPortWriteToFile;
 	public static final fun asSetting (Ljava/io/File;)Lio/matthewnelson/kmp/tor/runtime/core/config/TorSetting;
 	public fun equals (Ljava/lang/Object;)Z
@@ -4222,7 +4225,7 @@ public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$Contro
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$ControlSocketsGroupWritable : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigurableBoolean {
+public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$ControlSocketsGroupWritable : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigureBoolean {
 	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/core/config/TorOption$ControlSocketsGroupWritable;
 	public static final fun asSetting (Z)Lio/matthewnelson/kmp/tor/runtime/core/config/TorSetting;
 	public fun equals (Ljava/lang/Object;)Z
@@ -4230,7 +4233,7 @@ public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$Contro
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$CookieAuthFile : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigurableFile {
+public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$CookieAuthFile : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigureFile {
 	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/core/config/TorOption$CookieAuthFile;
 	public static final fun asSetting (Ljava/io/File;)Lio/matthewnelson/kmp/tor/runtime/core/config/TorSetting;
 	public fun equals (Ljava/lang/Object;)Z
@@ -4238,7 +4241,7 @@ public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$Cookie
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$CookieAuthFileGroupReadable : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigurableBoolean {
+public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$CookieAuthFileGroupReadable : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigureBoolean {
 	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/core/config/TorOption$CookieAuthFileGroupReadable;
 	public static final fun asSetting (Z)Lio/matthewnelson/kmp/tor/runtime/core/config/TorSetting;
 	public fun equals (Ljava/lang/Object;)Z
@@ -4246,7 +4249,7 @@ public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$Cookie
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$CookieAuthentication : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigurableBoolean {
+public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$CookieAuthentication : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigureBoolean {
 	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/core/config/TorOption$CookieAuthentication;
 	public static final fun asSetting (Z)Lio/matthewnelson/kmp/tor/runtime/core/config/TorSetting;
 	public fun equals (Ljava/lang/Object;)Z
@@ -4254,7 +4257,7 @@ public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$Cookie
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$CountPrivateBandwidth : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigurableBoolean {
+public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$CountPrivateBandwidth : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigureBoolean {
 	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/core/config/TorOption$CountPrivateBandwidth;
 	public static final fun asSetting (Z)Lio/matthewnelson/kmp/tor/runtime/core/config/TorSetting;
 	public fun equals (Ljava/lang/Object;)Z
@@ -4262,7 +4265,7 @@ public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$CountP
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$DNSPort : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigurableBuildable {
+public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$DNSPort : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigureBuildable {
 	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/core/config/TorOption$DNSPort;
 	public static final fun asSetting (Lio/matthewnelson/kmp/tor/runtime/core/ThisBlock;)Lio/matthewnelson/kmp/tor/runtime/core/config/TorSetting;
 	public synthetic fun buildable ()Lio/matthewnelson/kmp/tor/runtime/core/config/TorSetting$BuilderScope;
@@ -4271,7 +4274,7 @@ public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$DNSPor
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$DataDirectory : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigurableDirectory {
+public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$DataDirectory : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigureDirectory {
 	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/core/config/TorOption$DataDirectory;
 	public static final fun asSetting (Ljava/io/File;)Lio/matthewnelson/kmp/tor/runtime/core/config/TorSetting;
 	public fun equals (Ljava/lang/Object;)Z
@@ -4279,7 +4282,7 @@ public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$DataDi
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$DataDirectoryGroupReadable : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigurableBoolean {
+public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$DataDirectoryGroupReadable : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigureBoolean {
 	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/core/config/TorOption$DataDirectoryGroupReadable;
 	public static final fun asSetting (Z)Lio/matthewnelson/kmp/tor/runtime/core/config/TorSetting;
 	public fun equals (Ljava/lang/Object;)Z
@@ -4287,7 +4290,7 @@ public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$DataDi
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$DirAllowPrivateAddresses : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigurableBoolean {
+public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$DirAllowPrivateAddresses : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigureBoolean {
 	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/core/config/TorOption$DirAllowPrivateAddresses;
 	public static final fun asSetting (Z)Lio/matthewnelson/kmp/tor/runtime/core/config/TorSetting;
 	public fun equals (Ljava/lang/Object;)Z
@@ -4309,7 +4312,7 @@ public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$DirAut
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$DirCache : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigurableBoolean {
+public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$DirCache : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigureBoolean {
 	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/core/config/TorOption$DirCache;
 	public static final fun asSetting (Z)Lio/matthewnelson/kmp/tor/runtime/core/config/TorSetting;
 	public fun equals (Ljava/lang/Object;)Z
@@ -4331,7 +4334,7 @@ public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$DirPor
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$DirPortFrontPage : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigurableFile {
+public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$DirPortFrontPage : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigureFile {
 	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/core/config/TorOption$DirPortFrontPage;
 	public static final fun asSetting (Ljava/io/File;)Lio/matthewnelson/kmp/tor/runtime/core/config/TorSetting;
 	public fun equals (Ljava/lang/Object;)Z
@@ -4339,7 +4342,7 @@ public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$DirPor
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$DirReqStatistics : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigurableBoolean {
+public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$DirReqStatistics : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigureBoolean {
 	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/core/config/TorOption$DirReqStatistics;
 	public static final fun asSetting (Z)Lio/matthewnelson/kmp/tor/runtime/core/config/TorSetting;
 	public fun equals (Ljava/lang/Object;)Z
@@ -4347,7 +4350,7 @@ public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$DirReq
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$DisableAllSwap : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigurableBoolean {
+public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$DisableAllSwap : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigureBoolean {
 	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/core/config/TorOption$DisableAllSwap;
 	public static final fun asSetting (Z)Lio/matthewnelson/kmp/tor/runtime/core/config/TorSetting;
 	public fun equals (Ljava/lang/Object;)Z
@@ -4355,7 +4358,7 @@ public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$Disabl
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$DisableDebuggerAttachment : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigurableBoolean {
+public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$DisableDebuggerAttachment : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigureBoolean {
 	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/core/config/TorOption$DisableDebuggerAttachment;
 	public static final fun asSetting (Z)Lio/matthewnelson/kmp/tor/runtime/core/config/TorSetting;
 	public fun equals (Ljava/lang/Object;)Z
@@ -4363,7 +4366,7 @@ public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$Disabl
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$DisableNetwork : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigurableBoolean {
+public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$DisableNetwork : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigureBoolean {
 	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/core/config/TorOption$DisableNetwork;
 	public static final fun asSetting (Z)Lio/matthewnelson/kmp/tor/runtime/core/config/TorSetting;
 	public fun equals (Ljava/lang/Object;)Z
@@ -4371,7 +4374,7 @@ public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$Disabl
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$DisableOOSCheck : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigurableBoolean {
+public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$DisableOOSCheck : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigureBoolean {
 	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/core/config/TorOption$DisableOOSCheck;
 	public static final fun asSetting (Z)Lio/matthewnelson/kmp/tor/runtime/core/config/TorSetting;
 	public fun equals (Ljava/lang/Object;)Z
@@ -4400,7 +4403,7 @@ public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$DoSCir
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$DoSCircuitCreationEnabled : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigurableBuildable {
+public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$DoSCircuitCreationEnabled : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigureBuildable {
 	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/core/config/TorOption$DoSCircuitCreationEnabled;
 	public static final fun asSetting (Lio/matthewnelson/kmp/tor/runtime/core/ThisBlock;)Lio/matthewnelson/kmp/tor/runtime/core/config/TorSetting;
 	public synthetic fun buildable ()Lio/matthewnelson/kmp/tor/runtime/core/config/TorSetting$BuilderScope;
@@ -4451,7 +4454,7 @@ public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$DoSCon
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$DoSConnectionEnabled : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigurableBuildable {
+public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$DoSConnectionEnabled : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigureBuildable {
 	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/core/config/TorOption$DoSConnectionEnabled;
 	public static final fun asSetting (Lio/matthewnelson/kmp/tor/runtime/core/ThisBlock;)Lio/matthewnelson/kmp/tor/runtime/core/config/TorSetting;
 	public synthetic fun buildable ()Lio/matthewnelson/kmp/tor/runtime/core/config/TorSetting$BuilderScope;
@@ -4467,7 +4470,7 @@ public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$DoSCon
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$DoSRefuseSingleHopClientRendezvous : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigurableBuildable {
+public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$DoSRefuseSingleHopClientRendezvous : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigureBuildable {
 	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/core/config/TorOption$DoSRefuseSingleHopClientRendezvous;
 	public static final fun asSetting (Lio/matthewnelson/kmp/tor/runtime/core/ThisBlock;)Lio/matthewnelson/kmp/tor/runtime/core/config/TorSetting;
 	public synthetic fun buildable ()Lio/matthewnelson/kmp/tor/runtime/core/config/TorSetting$BuilderScope;
@@ -4476,7 +4479,7 @@ public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$DoSRef
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$DormantCanceledByStartup : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigurableBoolean {
+public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$DormantCanceledByStartup : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigureBoolean {
 	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/core/config/TorOption$DormantCanceledByStartup;
 	public static final fun asSetting (Z)Lio/matthewnelson/kmp/tor/runtime/core/config/TorSetting;
 	public fun equals (Ljava/lang/Object;)Z
@@ -4491,7 +4494,7 @@ public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$Dorman
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$DormantOnFirstStartup : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigurableBoolean {
+public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$DormantOnFirstStartup : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigureBoolean {
 	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/core/config/TorOption$DormantOnFirstStartup;
 	public static final fun asSetting (Z)Lio/matthewnelson/kmp/tor/runtime/core/config/TorSetting;
 	public fun equals (Ljava/lang/Object;)Z
@@ -4499,7 +4502,7 @@ public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$Dorman
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$DormantTimeoutDisabledByIdleStreams : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigurableBoolean {
+public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$DormantTimeoutDisabledByIdleStreams : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigureBoolean {
 	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/core/config/TorOption$DormantTimeoutDisabledByIdleStreams;
 	public static final fun asSetting (Z)Lio/matthewnelson/kmp/tor/runtime/core/config/TorSetting;
 	public fun equals (Ljava/lang/Object;)Z
@@ -4507,7 +4510,7 @@ public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$Dorman
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$DormantTimeoutEnabled : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigurableBoolean {
+public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$DormantTimeoutEnabled : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigureBoolean {
 	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/core/config/TorOption$DormantTimeoutEnabled;
 	public static final fun asSetting (Z)Lio/matthewnelson/kmp/tor/runtime/core/config/TorSetting;
 	public fun equals (Ljava/lang/Object;)Z
@@ -4515,7 +4518,7 @@ public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$Dorman
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$DownloadExtraInfo : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigurableBoolean {
+public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$DownloadExtraInfo : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigureBoolean {
 	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/core/config/TorOption$DownloadExtraInfo;
 	public static final fun asSetting (Z)Lio/matthewnelson/kmp/tor/runtime/core/config/TorSetting;
 	public fun equals (Ljava/lang/Object;)Z
@@ -4523,7 +4526,7 @@ public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$Downlo
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$EnforceDistinctSubnets : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigurableBoolean {
+public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$EnforceDistinctSubnets : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigureBoolean {
 	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/core/config/TorOption$EnforceDistinctSubnets;
 	public static final fun asSetting (Z)Lio/matthewnelson/kmp/tor/runtime/core/config/TorSetting;
 	public fun equals (Ljava/lang/Object;)Z
@@ -4538,7 +4541,7 @@ public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$EntryN
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$EntryStatistics : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigurableBoolean {
+public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$EntryStatistics : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigureBoolean {
 	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/core/config/TorOption$EntryStatistics;
 	public static final fun asSetting (Z)Lio/matthewnelson/kmp/tor/runtime/core/config/TorSetting;
 	public fun equals (Ljava/lang/Object;)Z
@@ -4588,7 +4591,7 @@ public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$ExitPo
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$ExitPortStatistics : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigurableBoolean {
+public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$ExitPortStatistics : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigureBoolean {
 	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/core/config/TorOption$ExitPortStatistics;
 	public static final fun asSetting (Z)Lio/matthewnelson/kmp/tor/runtime/core/config/TorSetting;
 	public fun equals (Ljava/lang/Object;)Z
@@ -4596,7 +4599,7 @@ public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$ExitPo
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$ExitRelay : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigurableBuildable {
+public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$ExitRelay : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigureBuildable {
 	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/core/config/TorOption$ExitRelay;
 	public static final fun asSetting (Lio/matthewnelson/kmp/tor/runtime/core/ThisBlock;)Lio/matthewnelson/kmp/tor/runtime/core/config/TorSetting;
 	public synthetic fun buildable ()Lio/matthewnelson/kmp/tor/runtime/core/config/TorSetting$BuilderScope;
@@ -4612,7 +4615,7 @@ public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$ExtORP
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$ExtORPortCookieAuthFile : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigurableFile {
+public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$ExtORPortCookieAuthFile : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigureFile {
 	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/core/config/TorOption$ExtORPortCookieAuthFile;
 	public static final fun asSetting (Ljava/io/File;)Lio/matthewnelson/kmp/tor/runtime/core/config/TorSetting;
 	public fun equals (Ljava/lang/Object;)Z
@@ -4620,7 +4623,7 @@ public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$ExtORP
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$ExtORPortCookieAuthFileGroupReadable : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigurableBoolean {
+public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$ExtORPortCookieAuthFileGroupReadable : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigureBoolean {
 	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/core/config/TorOption$ExtORPortCookieAuthFileGroupReadable;
 	public static final fun asSetting (Z)Lio/matthewnelson/kmp/tor/runtime/core/config/TorSetting;
 	public fun equals (Ljava/lang/Object;)Z
@@ -4628,7 +4631,7 @@ public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$ExtORP
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$ExtendAllowPrivateAddresses : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigurableBoolean {
+public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$ExtendAllowPrivateAddresses : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigureBoolean {
 	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/core/config/TorOption$ExtendAllowPrivateAddresses;
 	public static final fun asSetting (Z)Lio/matthewnelson/kmp/tor/runtime/core/config/TorSetting;
 	public fun equals (Ljava/lang/Object;)Z
@@ -4636,7 +4639,7 @@ public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$Extend
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$ExtendByEd25519ID : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigurableBuildable {
+public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$ExtendByEd25519ID : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigureBuildable {
 	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/core/config/TorOption$ExtendByEd25519ID;
 	public static final fun asSetting (Lio/matthewnelson/kmp/tor/runtime/core/ThisBlock;)Lio/matthewnelson/kmp/tor/runtime/core/config/TorSetting;
 	public synthetic fun buildable ()Lio/matthewnelson/kmp/tor/runtime/core/config/TorSetting$BuilderScope;
@@ -4645,7 +4648,7 @@ public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$Extend
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$ExtraInfoStatistics : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigurableBoolean {
+public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$ExtraInfoStatistics : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigureBoolean {
 	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/core/config/TorOption$ExtraInfoStatistics;
 	public static final fun asSetting (Z)Lio/matthewnelson/kmp/tor/runtime/core/config/TorSetting;
 	public fun equals (Ljava/lang/Object;)Z
@@ -4660,7 +4663,7 @@ public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$Fallba
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$FascistFirewall : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigurableBoolean {
+public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$FascistFirewall : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigureBoolean {
 	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/core/config/TorOption$FascistFirewall;
 	public static final fun asSetting (Z)Lio/matthewnelson/kmp/tor/runtime/core/config/TorSetting;
 	public fun equals (Ljava/lang/Object;)Z
@@ -4668,7 +4671,7 @@ public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$Fascis
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$FetchDirInfoEarly : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigurableBoolean {
+public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$FetchDirInfoEarly : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigureBoolean {
 	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/core/config/TorOption$FetchDirInfoEarly;
 	public static final fun asSetting (Z)Lio/matthewnelson/kmp/tor/runtime/core/config/TorSetting;
 	public fun equals (Ljava/lang/Object;)Z
@@ -4676,7 +4679,7 @@ public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$FetchD
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$FetchDirInfoExtraEarly : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigurableBoolean {
+public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$FetchDirInfoExtraEarly : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigureBoolean {
 	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/core/config/TorOption$FetchDirInfoExtraEarly;
 	public static final fun asSetting (Z)Lio/matthewnelson/kmp/tor/runtime/core/config/TorSetting;
 	public fun equals (Ljava/lang/Object;)Z
@@ -4684,7 +4687,7 @@ public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$FetchD
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$FetchHidServDescriptors : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigurableBoolean {
+public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$FetchHidServDescriptors : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigureBoolean {
 	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/core/config/TorOption$FetchHidServDescriptors;
 	public static final fun asSetting (Z)Lio/matthewnelson/kmp/tor/runtime/core/config/TorSetting;
 	public fun equals (Ljava/lang/Object;)Z
@@ -4692,7 +4695,7 @@ public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$FetchH
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$FetchServerDescriptors : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigurableBoolean {
+public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$FetchServerDescriptors : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigureBoolean {
 	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/core/config/TorOption$FetchServerDescriptors;
 	public static final fun asSetting (Z)Lio/matthewnelson/kmp/tor/runtime/core/config/TorSetting;
 	public fun equals (Ljava/lang/Object;)Z
@@ -4700,7 +4703,7 @@ public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$FetchS
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$FetchUselessDescriptors : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigurableBoolean {
+public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$FetchUselessDescriptors : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigureBoolean {
 	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/core/config/TorOption$FetchUselessDescriptors;
 	public static final fun asSetting (Z)Lio/matthewnelson/kmp/tor/runtime/core/config/TorSetting;
 	public fun equals (Ljava/lang/Object;)Z
@@ -4708,7 +4711,7 @@ public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$FetchU
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$GeoIPExcludeUnknown : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigurableBuildable {
+public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$GeoIPExcludeUnknown : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigureBuildable {
 	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/core/config/TorOption$GeoIPExcludeUnknown;
 	public static final fun asSetting (Lio/matthewnelson/kmp/tor/runtime/core/ThisBlock;)Lio/matthewnelson/kmp/tor/runtime/core/config/TorSetting;
 	public synthetic fun buildable ()Lio/matthewnelson/kmp/tor/runtime/core/config/TorSetting$BuilderScope;
@@ -4717,7 +4720,7 @@ public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$GeoIPE
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$GeoIPFile : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigurableFile {
+public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$GeoIPFile : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigureFile {
 	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/core/config/TorOption$GeoIPFile;
 	public static final fun asSetting (Ljava/io/File;)Lio/matthewnelson/kmp/tor/runtime/core/config/TorSetting;
 	public fun equals (Ljava/lang/Object;)Z
@@ -4725,7 +4728,7 @@ public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$GeoIPF
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$GeoIPv6File : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigurableFile {
+public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$GeoIPv6File : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigureFile {
 	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/core/config/TorOption$GeoIPv6File;
 	public static final fun asSetting (Ljava/io/File;)Lio/matthewnelson/kmp/tor/runtime/core/config/TorSetting;
 	public fun equals (Ljava/lang/Object;)Z
@@ -4740,7 +4743,7 @@ public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$GuardL
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$GuardfractionFile : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigurableFile {
+public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$GuardfractionFile : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigureFile {
 	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/core/config/TorOption$GuardfractionFile;
 	public static final fun asSetting (Ljava/io/File;)Lio/matthewnelson/kmp/tor/runtime/core/config/TorSetting;
 	public fun equals (Ljava/lang/Object;)Z
@@ -4776,7 +4779,7 @@ public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$HTTPSP
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$HTTPTunnelPort : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigurableBuildable {
+public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$HTTPTunnelPort : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigureBuildable {
 	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/core/config/TorOption$HTTPTunnelPort;
 	public static final fun asSetting (Lio/matthewnelson/kmp/tor/runtime/core/ThisBlock;)Lio/matthewnelson/kmp/tor/runtime/core/config/TorSetting;
 	public synthetic fun buildable ()Lio/matthewnelson/kmp/tor/runtime/core/config/TorSetting$BuilderScope;
@@ -4785,7 +4788,7 @@ public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$HTTPTu
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$HardwareAccel : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigurableBoolean {
+public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$HardwareAccel : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigureBoolean {
 	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/core/config/TorOption$HardwareAccel;
 	public static final fun asSetting (Z)Lio/matthewnelson/kmp/tor/runtime/core/config/TorSetting;
 	public fun equals (Ljava/lang/Object;)Z
@@ -4814,9 +4817,10 @@ public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$Hidden
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$HiddenServiceDir : io/matthewnelson/kmp/tor/runtime/core/config/TorOption {
+public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$HiddenServiceDir : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigureTryBuildable {
 	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/core/config/TorOption$HiddenServiceDir;
-	public static final fun asSetting (Ljava/io/File;Lio/matthewnelson/kmp/tor/runtime/core/ThisBlock;)Lio/matthewnelson/kmp/tor/runtime/core/config/TorSetting;
+	public static final fun asSetting (Lio/matthewnelson/kmp/tor/runtime/core/ThisBlock;)Lio/matthewnelson/kmp/tor/runtime/core/config/TorSetting;
+	public synthetic fun buildable ()Lio/matthewnelson/kmp/tor/runtime/core/config/TorSetting$BuilderScope;
 	public fun equals (Ljava/lang/Object;)Z
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
@@ -4927,7 +4931,7 @@ public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$Hidden
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$HiddenServiceStatistics : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigurableBoolean {
+public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$HiddenServiceStatistics : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigureBoolean {
 	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/core/config/TorOption$HiddenServiceStatistics;
 	public static final fun asSetting (Z)Lio/matthewnelson/kmp/tor/runtime/core/config/TorSetting;
 	public fun equals (Ljava/lang/Object;)Z
@@ -4942,7 +4946,7 @@ public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$Hidden
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$IPv6Exit : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigurableBoolean {
+public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$IPv6Exit : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigureBoolean {
 	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/core/config/TorOption$IPv6Exit;
 	public static final fun asSetting (Z)Lio/matthewnelson/kmp/tor/runtime/core/config/TorSetting;
 	public fun equals (Ljava/lang/Object;)Z
@@ -4964,7 +4968,7 @@ public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$KISTSo
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$KeepBindCapabilities : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigurableBuildable {
+public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$KeepBindCapabilities : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigureBuildable {
 	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/core/config/TorOption$KeepBindCapabilities;
 	public static final fun asSetting (Lio/matthewnelson/kmp/tor/runtime/core/ThisBlock;)Lio/matthewnelson/kmp/tor/runtime/core/config/TorSetting;
 	public synthetic fun buildable ()Lio/matthewnelson/kmp/tor/runtime/core/config/TorSetting$BuilderScope;
@@ -4980,7 +4984,7 @@ public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$Keepal
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$KeyDirectory : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigurableDirectory {
+public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$KeyDirectory : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigureDirectory {
 	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/core/config/TorOption$KeyDirectory;
 	public static final fun asSetting (Ljava/io/File;)Lio/matthewnelson/kmp/tor/runtime/core/config/TorSetting;
 	public fun equals (Ljava/lang/Object;)Z
@@ -4988,7 +4992,7 @@ public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$KeyDir
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$KeyDirectoryGroupReadable : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigurableBuildable {
+public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$KeyDirectoryGroupReadable : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigureBuildable {
 	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/core/config/TorOption$KeyDirectoryGroupReadable;
 	public static final fun asSetting (Lio/matthewnelson/kmp/tor/runtime/core/ThisBlock;)Lio/matthewnelson/kmp/tor/runtime/core/config/TorSetting;
 	public synthetic fun buildable ()Lio/matthewnelson/kmp/tor/runtime/core/config/TorSetting$BuilderScope;
@@ -4997,7 +5001,7 @@ public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$KeyDir
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$LearnCircuitBuildTimeout : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigurableBoolean {
+public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$LearnCircuitBuildTimeout : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigureBoolean {
 	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/core/config/TorOption$LearnCircuitBuildTimeout;
 	public static final fun asSetting (Z)Lio/matthewnelson/kmp/tor/runtime/core/config/TorSetting;
 	public fun equals (Ljava/lang/Object;)Z
@@ -5012,7 +5016,7 @@ public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$Log : 
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$LogMessageDomains : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigurableBoolean {
+public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$LogMessageDomains : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigureBoolean {
 	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/core/config/TorOption$LogMessageDomains;
 	public static final fun asSetting (Z)Lio/matthewnelson/kmp/tor/runtime/core/config/TorSetting;
 	public fun equals (Ljava/lang/Object;)Z
@@ -5034,7 +5038,7 @@ public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$LongLi
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$MainloopStats : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigurableBoolean {
+public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$MainloopStats : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigureBoolean {
 	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/core/config/TorOption$MainloopStats;
 	public static final fun asSetting (Z)Lio/matthewnelson/kmp/tor/runtime/core/config/TorSetting;
 	public fun equals (Ljava/lang/Object;)Z
@@ -5161,7 +5165,7 @@ public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$Nickna
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$NoExec : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigurableBoolean {
+public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$NoExec : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigureBoolean {
 	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/core/config/TorOption$NoExec;
 	public static final fun asSetting (Z)Lio/matthewnelson/kmp/tor/runtime/core/config/TorSetting;
 	public fun equals (Ljava/lang/Object;)Z
@@ -5211,7 +5215,7 @@ public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$ORPort
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$OfflineMasterKey : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigurableBoolean {
+public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$OfflineMasterKey : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigureBoolean {
 	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/core/config/TorOption$OfflineMasterKey;
 	public static final fun asSetting (Z)Lio/matthewnelson/kmp/tor/runtime/core/config/TorSetting;
 	public fun equals (Ljava/lang/Object;)Z
@@ -5254,7 +5258,7 @@ public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$Overlo
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$PaddingStatistics : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigurableBoolean {
+public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$PaddingStatistics : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigureBoolean {
 	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/core/config/TorOption$PaddingStatistics;
 	public static final fun asSetting (Z)Lio/matthewnelson/kmp/tor/runtime/core/config/TorSetting;
 	public fun equals (Ljava/lang/Object;)Z
@@ -5353,7 +5357,7 @@ public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$PerCon
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$PidFile : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigurableFile {
+public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$PidFile : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigureFile {
 	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/core/config/TorOption$PidFile;
 	public static final fun asSetting (Ljava/io/File;)Lio/matthewnelson/kmp/tor/runtime/core/config/TorSetting;
 	public fun equals (Ljava/lang/Object;)Z
@@ -5361,7 +5365,7 @@ public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$PidFil
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$ProtocolWarnings : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigurableBoolean {
+public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$ProtocolWarnings : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigureBoolean {
 	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/core/config/TorOption$ProtocolWarnings;
 	public static final fun asSetting (Z)Lio/matthewnelson/kmp/tor/runtime/core/config/TorSetting;
 	public fun equals (Ljava/lang/Object;)Z
@@ -5369,7 +5373,7 @@ public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$Protoc
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$PublishHidServDescriptors : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigurableBoolean {
+public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$PublishHidServDescriptors : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigureBoolean {
 	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/core/config/TorOption$PublishHidServDescriptors;
 	public static final fun asSetting (Z)Lio/matthewnelson/kmp/tor/runtime/core/config/TorSetting;
 	public fun equals (Ljava/lang/Object;)Z
@@ -5419,7 +5423,7 @@ public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$Recomm
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$ReducedCircuitPadding : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigurableBoolean {
+public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$ReducedCircuitPadding : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigureBoolean {
 	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/core/config/TorOption$ReducedCircuitPadding;
 	public static final fun asSetting (Z)Lio/matthewnelson/kmp/tor/runtime/core/config/TorSetting;
 	public fun equals (Ljava/lang/Object;)Z
@@ -5427,7 +5431,7 @@ public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$Reduce
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$ReducedConnectionPadding : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigurableBoolean {
+public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$ReducedConnectionPadding : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigureBoolean {
 	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/core/config/TorOption$ReducedConnectionPadding;
 	public static final fun asSetting (Z)Lio/matthewnelson/kmp/tor/runtime/core/config/TorSetting;
 	public fun equals (Ljava/lang/Object;)Z
@@ -5435,7 +5439,7 @@ public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$Reduce
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$ReducedExitPolicy : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigurableBoolean {
+public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$ReducedExitPolicy : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigureBoolean {
 	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/core/config/TorOption$ReducedExitPolicy;
 	public static final fun asSetting (Z)Lio/matthewnelson/kmp/tor/runtime/core/config/TorSetting;
 	public fun equals (Ljava/lang/Object;)Z
@@ -5443,7 +5447,7 @@ public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$Reduce
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$RefuseUnknownExits : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigurableBuildable {
+public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$RefuseUnknownExits : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigureBuildable {
 	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/core/config/TorOption$RefuseUnknownExits;
 	public static final fun asSetting (Lio/matthewnelson/kmp/tor/runtime/core/ThisBlock;)Lio/matthewnelson/kmp/tor/runtime/core/config/TorSetting;
 	public synthetic fun buildable ()Lio/matthewnelson/kmp/tor/runtime/core/config/TorSetting$BuilderScope;
@@ -5480,7 +5484,7 @@ public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$Rephis
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$RunAsDaemon : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigurableBoolean {
+public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$RunAsDaemon : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigureBoolean {
 	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/core/config/TorOption$RunAsDaemon;
 	public static final fun asSetting (Z)Lio/matthewnelson/kmp/tor/runtime/core/config/TorSetting;
 	public fun equals (Ljava/lang/Object;)Z
@@ -5502,7 +5506,7 @@ public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$SafeLo
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$SafeSocks : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigurableBoolean {
+public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$SafeSocks : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigureBoolean {
 	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/core/config/TorOption$SafeSocks;
 	public static final fun asSetting (Z)Lio/matthewnelson/kmp/tor/runtime/core/config/TorSetting;
 	public fun equals (Ljava/lang/Object;)Z
@@ -5510,7 +5514,7 @@ public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$SafeSo
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$Sandbox : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigurableBoolean {
+public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$Sandbox : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigureBoolean {
 	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/core/config/TorOption$Sandbox;
 	public static final fun asSetting (Z)Lio/matthewnelson/kmp/tor/runtime/core/config/TorSetting;
 	public fun equals (Ljava/lang/Object;)Z
@@ -5525,7 +5529,7 @@ public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$Schedu
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$ServerDNSAllowBrokenConfig : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigurableBoolean {
+public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$ServerDNSAllowBrokenConfig : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigureBoolean {
 	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/core/config/TorOption$ServerDNSAllowBrokenConfig;
 	public static final fun asSetting (Z)Lio/matthewnelson/kmp/tor/runtime/core/config/TorSetting;
 	public fun equals (Ljava/lang/Object;)Z
@@ -5533,7 +5537,7 @@ public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$Server
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$ServerDNSAllowNonRFC953Hostnames : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigurableBoolean {
+public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$ServerDNSAllowNonRFC953Hostnames : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigureBoolean {
 	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/core/config/TorOption$ServerDNSAllowNonRFC953Hostnames;
 	public static final fun asSetting (Z)Lio/matthewnelson/kmp/tor/runtime/core/config/TorSetting;
 	public fun equals (Ljava/lang/Object;)Z
@@ -5541,7 +5545,7 @@ public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$Server
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$ServerDNSDetectHijacking : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigurableBoolean {
+public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$ServerDNSDetectHijacking : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigureBoolean {
 	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/core/config/TorOption$ServerDNSDetectHijacking;
 	public static final fun asSetting (Z)Lio/matthewnelson/kmp/tor/runtime/core/config/TorSetting;
 	public fun equals (Ljava/lang/Object;)Z
@@ -5549,7 +5553,7 @@ public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$Server
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$ServerDNSRandomizeCase : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigurableBoolean {
+public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$ServerDNSRandomizeCase : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigureBoolean {
 	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/core/config/TorOption$ServerDNSRandomizeCase;
 	public static final fun asSetting (Z)Lio/matthewnelson/kmp/tor/runtime/core/config/TorSetting;
 	public fun equals (Ljava/lang/Object;)Z
@@ -5557,7 +5561,7 @@ public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$Server
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$ServerDNSResolvConfFile : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigurableFile {
+public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$ServerDNSResolvConfFile : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigureFile {
 	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/core/config/TorOption$ServerDNSResolvConfFile;
 	public static final fun asSetting (Ljava/io/File;)Lio/matthewnelson/kmp/tor/runtime/core/config/TorSetting;
 	public fun equals (Ljava/lang/Object;)Z
@@ -5565,7 +5569,7 @@ public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$Server
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$ServerDNSSearchDomains : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigurableBoolean {
+public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$ServerDNSSearchDomains : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigureBoolean {
 	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/core/config/TorOption$ServerDNSSearchDomains;
 	public static final fun asSetting (Z)Lio/matthewnelson/kmp/tor/runtime/core/config/TorSetting;
 	public fun equals (Ljava/lang/Object;)Z
@@ -5650,7 +5654,7 @@ public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$SocksP
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$SocksPort : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigurableBuildable {
+public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$SocksPort : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigureBuildable {
 	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/core/config/TorOption$SocksPort;
 	public static final fun asSetting (Lio/matthewnelson/kmp/tor/runtime/core/ThisBlock;)Lio/matthewnelson/kmp/tor/runtime/core/config/TorSetting;
 	public synthetic fun buildable ()Lio/matthewnelson/kmp/tor/runtime/core/config/TorSetting$BuilderScope;
@@ -5666,7 +5670,7 @@ public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$SocksT
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$StrictNodes : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigurableBoolean {
+public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$StrictNodes : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigureBoolean {
 	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/core/config/TorOption$StrictNodes;
 	public static final fun asSetting (Z)Lio/matthewnelson/kmp/tor/runtime/core/config/TorSetting;
 	public fun equals (Ljava/lang/Object;)Z
@@ -5688,7 +5692,7 @@ public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$TCPPro
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$TestSocks : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigurableBoolean {
+public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$TestSocks : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigureBoolean {
 	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/core/config/TorOption$TestSocks;
 	public static final fun asSetting (Z)Lio/matthewnelson/kmp/tor/runtime/core/config/TorSetting;
 	public fun equals (Ljava/lang/Object;)Z
@@ -5927,7 +5931,7 @@ public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$TrackH
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$TransPort : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigurableBuildable {
+public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$TransPort : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigureTryBuildable {
 	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/core/config/TorOption$TransPort;
 	public static final fun asSetting (Lio/matthewnelson/kmp/tor/runtime/core/ThisBlock;)Lio/matthewnelson/kmp/tor/runtime/core/config/TorSetting;
 	public synthetic fun buildable ()Lio/matthewnelson/kmp/tor/runtime/core/config/TorSetting$BuilderScope;
@@ -5943,7 +5947,7 @@ public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$TransP
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$TruncateLogFile : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigurableBoolean {
+public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$TruncateLogFile : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigureBoolean {
 	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/core/config/TorOption$TruncateLogFile;
 	public static final fun asSetting (Z)Lio/matthewnelson/kmp/tor/runtime/core/config/TorSetting;
 	public fun equals (Ljava/lang/Object;)Z
@@ -5951,7 +5955,7 @@ public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$Trunca
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$UnixSocksGroupWritable : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigurableBoolean {
+public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$UnixSocksGroupWritable : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigureBoolean {
 	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/core/config/TorOption$UnixSocksGroupWritable;
 	public static final fun asSetting (Z)Lio/matthewnelson/kmp/tor/runtime/core/config/TorSetting;
 	public fun equals (Ljava/lang/Object;)Z
@@ -5973,7 +5977,7 @@ public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$UseBri
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$UseDefaultFallbackDirs : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigurableBoolean {
+public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$UseDefaultFallbackDirs : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigureBoolean {
 	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/core/config/TorOption$UseDefaultFallbackDirs;
 	public static final fun asSetting (Z)Lio/matthewnelson/kmp/tor/runtime/core/config/TorSetting;
 	public fun equals (Ljava/lang/Object;)Z
@@ -5981,7 +5985,7 @@ public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$UseDef
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$UseEntryGuards : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigurableBoolean {
+public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$UseEntryGuards : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigureBoolean {
 	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/core/config/TorOption$UseEntryGuards;
 	public static final fun asSetting (Z)Lio/matthewnelson/kmp/tor/runtime/core/config/TorSetting;
 	public fun equals (Ljava/lang/Object;)Z
@@ -5989,7 +5993,7 @@ public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$UseEnt
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$UseGuardFraction : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigurableBuildable {
+public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$UseGuardFraction : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigureBuildable {
 	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/core/config/TorOption$UseGuardFraction;
 	public static final fun asSetting (Lio/matthewnelson/kmp/tor/runtime/core/ThisBlock;)Lio/matthewnelson/kmp/tor/runtime/core/config/TorSetting;
 	public synthetic fun buildable ()Lio/matthewnelson/kmp/tor/runtime/core/config/TorSetting$BuilderScope;
@@ -5998,7 +6002,7 @@ public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$UseGua
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$UseMicrodescriptors : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigurableBuildable {
+public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$UseMicrodescriptors : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigureBuildable {
 	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/core/config/TorOption$UseMicrodescriptors;
 	public static final fun asSetting (Lio/matthewnelson/kmp/tor/runtime/core/ThisBlock;)Lio/matthewnelson/kmp/tor/runtime/core/config/TorSetting;
 	public synthetic fun buildable ()Lio/matthewnelson/kmp/tor/runtime/core/config/TorSetting$BuilderScope;
@@ -6028,7 +6032,7 @@ public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$V3Auth
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$V3AuthUseLegacyKey : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigurableBoolean {
+public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$V3AuthUseLegacyKey : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigureBoolean {
 	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/core/config/TorOption$V3AuthUseLegacyKey;
 	public static final fun asSetting (Z)Lio/matthewnelson/kmp/tor/runtime/core/config/TorSetting;
 	public fun equals (Ljava/lang/Object;)Z
@@ -6050,7 +6054,7 @@ public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$V3Auth
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$V3AuthoritativeDirectory : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigurableBoolean {
+public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$V3AuthoritativeDirectory : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigureBoolean {
 	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/core/config/TorOption$V3AuthoritativeDirectory;
 	public static final fun asSetting (Z)Lio/matthewnelson/kmp/tor/runtime/core/config/TorSetting;
 	public fun equals (Ljava/lang/Object;)Z
@@ -6058,7 +6062,7 @@ public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$V3Auth
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$V3BandwidthsFile : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigurableFile {
+public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$V3BandwidthsFile : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigureFile {
 	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/core/config/TorOption$V3BandwidthsFile;
 	public static final fun asSetting (Ljava/io/File;)Lio/matthewnelson/kmp/tor/runtime/core/config/TorSetting;
 	public fun equals (Ljava/lang/Object;)Z
@@ -6066,7 +6070,7 @@ public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$V3Band
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$VanguardsLiteEnabled : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigurableBuildable {
+public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$VanguardsLiteEnabled : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigureBuildable {
 	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/core/config/TorOption$VanguardsLiteEnabled;
 	public static final fun asSetting (Lio/matthewnelson/kmp/tor/runtime/core/ThisBlock;)Lio/matthewnelson/kmp/tor/runtime/core/config/TorSetting;
 	public synthetic fun buildable ()Lio/matthewnelson/kmp/tor/runtime/core/config/TorSetting$BuilderScope;
@@ -6075,7 +6079,7 @@ public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$Vangua
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$VersioningAuthoritativeDirectory : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigurableBoolean {
+public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$VersioningAuthoritativeDirectory : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigureBoolean {
 	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/core/config/TorOption$VersioningAuthoritativeDirectory;
 	public static final fun asSetting (Z)Lio/matthewnelson/kmp/tor/runtime/core/config/TorSetting;
 	public fun equals (Ljava/lang/Object;)Z
@@ -6104,7 +6108,7 @@ public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$WarnPl
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$__AllDirActionsPrivate : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigurableBoolean {
+public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$__AllDirActionsPrivate : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigureBoolean {
 	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/core/config/TorOption$__AllDirActionsPrivate;
 	public static final fun asSetting (Z)Lio/matthewnelson/kmp/tor/runtime/core/config/TorSetting;
 	public fun equals (Ljava/lang/Object;)Z
@@ -6112,7 +6116,7 @@ public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$__AllD
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$__AlwaysCongestionControl : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigurableBoolean {
+public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$__AlwaysCongestionControl : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigureBoolean {
 	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/core/config/TorOption$__AlwaysCongestionControl;
 	public static final fun asSetting (Z)Lio/matthewnelson/kmp/tor/runtime/core/config/TorSetting;
 	public fun equals (Ljava/lang/Object;)Z
@@ -6120,7 +6124,7 @@ public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$__Alwa
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$__ControlPort : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigurableBuildable {
+public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$__ControlPort : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigureBuildable {
 	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/core/config/TorOption$__ControlPort;
 	public static final fun asSetting (Lio/matthewnelson/kmp/tor/runtime/core/ThisBlock;)Lio/matthewnelson/kmp/tor/runtime/core/config/TorSetting;
 	public synthetic fun buildable ()Lio/matthewnelson/kmp/tor/runtime/core/config/TorSetting$BuilderScope;
@@ -6129,7 +6133,7 @@ public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$__Cont
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$__DNSPort : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigurableBuildable {
+public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$__DNSPort : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigureBuildable {
 	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/core/config/TorOption$__DNSPort;
 	public static final fun asSetting (Lio/matthewnelson/kmp/tor/runtime/core/ThisBlock;)Lio/matthewnelson/kmp/tor/runtime/core/config/TorSetting;
 	public synthetic fun buildable ()Lio/matthewnelson/kmp/tor/runtime/core/config/TorSetting$BuilderScope;
@@ -6145,7 +6149,7 @@ public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$__DirP
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$__DisablePredictedCircuits : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigurableBoolean {
+public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$__DisablePredictedCircuits : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigureBoolean {
 	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/core/config/TorOption$__DisablePredictedCircuits;
 	public static final fun asSetting (Z)Lio/matthewnelson/kmp/tor/runtime/core/config/TorSetting;
 	public fun equals (Ljava/lang/Object;)Z
@@ -6153,7 +6157,7 @@ public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$__Disa
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$__DisableSignalHandlers : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigurableBoolean {
+public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$__DisableSignalHandlers : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigureBoolean {
 	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/core/config/TorOption$__DisableSignalHandlers;
 	public static final fun asSetting (Z)Lio/matthewnelson/kmp/tor/runtime/core/config/TorSetting;
 	public fun equals (Ljava/lang/Object;)Z
@@ -6168,7 +6172,7 @@ public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$__ExtO
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$__HTTPTunnelPort : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigurableBuildable {
+public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$__HTTPTunnelPort : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigureBuildable {
 	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/core/config/TorOption$__HTTPTunnelPort;
 	public static final fun asSetting (Lio/matthewnelson/kmp/tor/runtime/core/ThisBlock;)Lio/matthewnelson/kmp/tor/runtime/core/config/TorSetting;
 	public synthetic fun buildable ()Lio/matthewnelson/kmp/tor/runtime/core/config/TorSetting$BuilderScope;
@@ -6184,7 +6188,7 @@ public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$__Hash
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$__LeaveStreamsUnattached : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigurableBoolean {
+public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$__LeaveStreamsUnattached : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigureBoolean {
 	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/core/config/TorOption$__LeaveStreamsUnattached;
 	public static final fun asSetting (Z)Lio/matthewnelson/kmp/tor/runtime/core/config/TorSetting;
 	public fun equals (Ljava/lang/Object;)Z
@@ -6220,7 +6224,7 @@ public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$__Owni
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$__OwningControllerProcess : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigurableBuildable {
+public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$__OwningControllerProcess : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigureBuildable {
 	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/core/config/TorOption$__OwningControllerProcess;
 	public static final fun asSetting (Lio/matthewnelson/kmp/tor/runtime/core/ThisBlock;)Lio/matthewnelson/kmp/tor/runtime/core/config/TorSetting;
 	public synthetic fun buildable ()Lio/matthewnelson/kmp/tor/runtime/core/config/TorSetting$BuilderScope;
@@ -6229,7 +6233,7 @@ public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$__Owni
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$__ReloadTorrcOnSIGHUP : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigurableBoolean {
+public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$__ReloadTorrcOnSIGHUP : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigureBoolean {
 	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/core/config/TorOption$__ReloadTorrcOnSIGHUP;
 	public static final fun asSetting (Z)Lio/matthewnelson/kmp/tor/runtime/core/config/TorSetting;
 	public fun equals (Ljava/lang/Object;)Z
@@ -6237,7 +6241,7 @@ public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$__Relo
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$__SbwsExit : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigurableBoolean {
+public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$__SbwsExit : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigureBoolean {
 	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/core/config/TorOption$__SbwsExit;
 	public static final fun asSetting (Z)Lio/matthewnelson/kmp/tor/runtime/core/config/TorSetting;
 	public fun equals (Ljava/lang/Object;)Z
@@ -6245,7 +6249,7 @@ public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$__Sbws
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$__SocksPort : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigurableBuildable {
+public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$__SocksPort : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigureBuildable {
 	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/core/config/TorOption$__SocksPort;
 	public static final fun asSetting (Lio/matthewnelson/kmp/tor/runtime/core/ThisBlock;)Lio/matthewnelson/kmp/tor/runtime/core/config/TorSetting;
 	public synthetic fun buildable ()Lio/matthewnelson/kmp/tor/runtime/core/config/TorSetting$BuilderScope;
@@ -6254,7 +6258,7 @@ public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$__Sock
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$__TransPort : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigurableBuildable {
+public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$__TransPort : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigureTryBuildable {
 	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/core/config/TorOption$__TransPort;
 	public static final fun asSetting (Lio/matthewnelson/kmp/tor/runtime/core/ThisBlock;)Lio/matthewnelson/kmp/tor/runtime/core/config/TorSetting;
 	public synthetic fun buildable ()Lio/matthewnelson/kmp/tor/runtime/core/config/TorSetting$BuilderScope;
@@ -6344,9 +6348,9 @@ public final class io/matthewnelson/kmp/tor/runtime/core/config/builder/BuilderS
 }
 
 public final class io/matthewnelson/kmp/tor/runtime/core/config/builder/BuilderScopeHS : io/matthewnelson/kmp/tor/runtime/core/config/TorSetting$BuilderScope, io/matthewnelson/kmp/tor/runtime/core/config/builder/BuilderScopeHSPort$DSL {
-	public synthetic fun <init> (Ljava/io/File;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
 	public final fun allowUnknownPorts (Z)Lio/matthewnelson/kmp/tor/runtime/core/config/builder/BuilderScopeHS;
 	public final fun dirGroupReadable (Z)Lio/matthewnelson/kmp/tor/runtime/core/config/builder/BuilderScopeHS;
+	public final fun directory (Ljava/io/File;)Lio/matthewnelson/kmp/tor/runtime/core/config/builder/BuilderScopeHS;
 	public final fun maxStreams (I)Lio/matthewnelson/kmp/tor/runtime/core/config/builder/BuilderScopeHS;
 	public final fun maxStreamsCloseCircuit (Z)Lio/matthewnelson/kmp/tor/runtime/core/config/builder/BuilderScopeHS;
 	public final fun numIntroductionPoints (I)Lio/matthewnelson/kmp/tor/runtime/core/config/builder/BuilderScopeHS;
@@ -6365,8 +6369,8 @@ public final class io/matthewnelson/kmp/tor/runtime/core/config/builder/BuilderS
 	public final fun target (Ljava/io/File;)Lio/matthewnelson/kmp/tor/runtime/core/config/builder/BuilderScopeHSPort;
 }
 
-public final class io/matthewnelson/kmp/tor/runtime/core/config/builder/BuilderScopeOwningControllerProcess : io/matthewnelson/kmp/tor/runtime/core/config/TorSetting$BuilderScope {
-	public final fun processId (I)Lio/matthewnelson/kmp/tor/runtime/core/config/builder/BuilderScopeOwningControllerProcess;
+public final class io/matthewnelson/kmp/tor/runtime/core/config/builder/BuilderScopeOwningCtrlProcess : io/matthewnelson/kmp/tor/runtime/core/config/TorSetting$BuilderScope {
+	public final fun processId (I)Lio/matthewnelson/kmp/tor/runtime/core/config/builder/BuilderScopeOwningCtrlProcess;
 }
 
 public class io/matthewnelson/kmp/tor/runtime/core/config/builder/BuilderScopePort : io/matthewnelson/kmp/tor/runtime/core/config/TorSetting$BuilderScope {
@@ -6391,6 +6395,8 @@ public final class io/matthewnelson/kmp/tor/runtime/core/config/builder/BuilderS
 	public synthetic fun <init> (Lio/matthewnelson/kmp/tor/runtime/core/config/TorOption$__ControlPort;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
 	public fun auto ()Lio/matthewnelson/kmp/tor/runtime/core/config/builder/BuilderScopePort$Control;
 	public synthetic fun auto ()Lio/matthewnelson/kmp/tor/runtime/core/config/builder/BuilderScopePort;
+	public fun disable ()Lio/matthewnelson/kmp/tor/runtime/core/config/builder/BuilderScopePort$Control;
+	public synthetic fun disable ()Lio/matthewnelson/kmp/tor/runtime/core/config/builder/BuilderScopePort;
 	public fun flagsUnix (Lio/matthewnelson/kmp/tor/runtime/core/ThisBlock;)Lio/matthewnelson/kmp/tor/runtime/core/config/builder/BuilderScopePort$Control;
 	public synthetic fun flagsUnix (Lio/matthewnelson/kmp/tor/runtime/core/ThisBlock;)Lio/matthewnelson/kmp/tor/runtime/core/config/builder/BuilderScopePort;
 	public fun port (Lio/matthewnelson/kmp/tor/runtime/core/address/Port$Ephemeral;)Lio/matthewnelson/kmp/tor/runtime/core/config/builder/BuilderScopePort$Control;

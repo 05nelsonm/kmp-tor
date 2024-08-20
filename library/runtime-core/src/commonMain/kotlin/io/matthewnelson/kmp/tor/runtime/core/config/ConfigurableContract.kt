@@ -31,7 +31,8 @@ import kotlin.jvm.JvmSynthetic
 /**
  * Used as a contractual agreement between [TorConfig2.BuilderScope]
  * and [TorOption] such that factory-like functionality can be had
- * via [TorConfig2.BuilderScope.configure] for the implementing
+ * via [TorConfig2.BuilderScope.configure] (or alternatively the
+ * [TorConfig2.BuilderScope.tryConfigure] call) for the implementing
  * [TorOption]. This is the "root" interface that all `Configurable*`
  * interface types extend.
  *
@@ -40,10 +41,10 @@ import kotlin.jvm.JvmSynthetic
  * the [TorSetting] outside of the [TorConfig2.BuilderScope], if
  * desired.
  *
- * @see [ConfigurableBuildable]
- * @see [ConfigurableBoolean]
- * @see [ConfigurableDirectory]
- * @see [ConfigurableFile]
+ * @see [ConfigureBuildable]
+ * @see [ConfigureBoolean]
+ * @see [ConfigureDirectory]
+ * @see [ConfigureFile]
  * */
 public interface ConfigurableContract
 // Inhibits TorOption from implementing
@@ -55,16 +56,41 @@ public interface ConfigurableContract
  * which declares that [TorOption.buildable] is implemented and
  * able to produce [B] for [TorConfig2.BuilderScope.configure].
  * */
-public interface ConfigurableBuildable<B: TorSetting.BuilderScope>: ConfigurableContract<ConfigurableBuildable<B>>
+public interface ConfigureBuildable<B: TorSetting.BuilderScope>: ConfigurableContract<ConfigureBuildable<B>>
 
 @JvmSynthetic
 @Suppress("NOTHING_TO_INLINE")
 @Throws(ClassCastException::class)
-internal inline fun <B: TorSetting.BuilderScope> ConfigurableBuildable<B>.buildContract(
+internal inline fun <B: TorSetting.BuilderScope> ConfigureBuildable<B>.buildContract(
+    block: ThisBlock<B>,
+): TorSetting = (this as TorOption).buildBuildable(block)
+
+/**
+ * Denotes a [TorOption] as implementing the [ConfigurableContract]
+ * which declares that [TorOption.buildable] is implemented and
+ * able to produce [B] for [TorConfig2.BuilderScope.tryConfigure].
+ *
+ * This is distinctly different from [ConfigureBuildable] in
+ * that builder scope [B] may throw exception due to requirements
+ * not being met, such as the [TorOption] not being available for
+ * the given host or environment.
+ * */
+public interface ConfigureTryBuildable<B: TorSetting.BuilderScope>: ConfigurableContract<ConfigureTryBuildable<B>>
+
+@JvmSynthetic
+@Suppress("NOTHING_TO_INLINE")
+@Throws(ClassCastException::class, UnsupportedOperationException::class)
+internal inline fun <B: TorSetting.BuilderScope> ConfigureTryBuildable<B>.buildContract(
+    block: ThisBlock<B>,
+): TorSetting = (this as TorOption).buildBuildable(block)
+
+@Suppress("NOTHING_TO_INLINE")
+@Throws(ClassCastException::class, UnsupportedOperationException::class)
+private inline fun <B: TorSetting.BuilderScope> TorOption.buildBuildable(
     block: ThisBlock<B>,
 ): TorSetting = try {
     @Suppress("UNCHECKED_CAST")
-    ((this as TorOption).buildableInternal() as B)
+    buildableInternal() as B
 } catch (_: NullPointerException) {
     // Tests ensure this never occurs, but in an abundance
     // of caution this ensures we are at least throwing
@@ -78,12 +104,12 @@ internal inline fun <B: TorSetting.BuilderScope> ConfigurableBuildable<B>.buildC
  * available to be configured with an argument of `1` or `0`, for
  * [TorConfig2.BuilderScope.configure].
  * */
-public interface ConfigurableBoolean: ConfigurableContract<ConfigurableBoolean>
+public interface ConfigureBoolean: ConfigurableContract<ConfigureBoolean>
 
 @JvmSynthetic
 @Suppress("NOTHING_TO_INLINE")
 @Throws(ClassCastException::class)
-internal inline fun ConfigurableBoolean.buildContract(
+internal inline fun ConfigureBoolean.buildContract(
     enable: Boolean,
 ): TorSetting {
     @OptIn(ExperimentalKmpTorApi::class)
@@ -98,18 +124,18 @@ internal inline fun ConfigurableBoolean.buildContract(
  * to a directory location and is available to be configured via
  * [TorConfig2.BuilderScope.configure] when supplied one.
  *
- * [TorOption] implementors of [ConfigurableDirectory] **MUST**
+ * [TorOption] implementors of [ConfigureDirectory] **MUST**
  * also contain [TorOption.Attribute.DIRECTORY].
  *
  * **NOTE:** Provided [File] is always sanitized for the resulting
- * [TorSetting] using [File.absoluteFile] and [File.normalize].
+ * [TorSetting] using [File.absoluteFile] + [File.normalize].
  * */
-public interface ConfigurableDirectory: ConfigurableContract<ConfigurableDirectory>
+public interface ConfigureDirectory: ConfigurableContract<ConfigureDirectory>
 
 @JvmSynthetic
 @Suppress("NOTHING_TO_INLINE")
 @Throws(ClassCastException::class)
-internal fun ConfigurableDirectory.buildContract(
+internal fun ConfigureDirectory.buildContract(
     directory: File,
 ): TorSetting {
     @OptIn(ExperimentalKmpTorApi::class)
@@ -124,18 +150,18 @@ internal fun ConfigurableDirectory.buildContract(
  * to a file location and is available to be configured via
  * [TorConfig2.BuilderScope.configure] when supplied one.
  *
- * [TorOption] implementors of [ConfigurableDirectory] **MUST**
+ * [TorOption] implementors of [ConfigureDirectory] **MUST**
  * also contain [TorOption.Attribute.FILE].
  *
  * **NOTE:** Provided [File] is always sanitized for the resulting
- * [TorSetting] using [File.absoluteFile] and [File.normalize].
+ * [TorSetting] using [File.absoluteFile] + [File.normalize].
  * */
-public interface ConfigurableFile: ConfigurableContract<ConfigurableFile>
+public interface ConfigureFile: ConfigurableContract<ConfigureFile>
 
 @JvmSynthetic
 @Suppress("NOTHING_TO_INLINE")
 @Throws(ClassCastException::class)
-internal fun ConfigurableFile.buildContract(
+internal fun ConfigureFile.buildContract(
     file: File,
 ): TorSetting {
     @OptIn(ExperimentalKmpTorApi::class)

@@ -22,7 +22,6 @@ import io.matthewnelson.kmp.file.File
 import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
 import io.matthewnelson.kmp.tor.core.api.annotation.KmpTorDsl
 import io.matthewnelson.kmp.tor.runtime.core.ThisBlock
-import io.matthewnelson.kmp.tor.runtime.core.config.builder.BuilderScopeHS
 import io.matthewnelson.kmp.tor.runtime.core.config.builder.RealBuilderScopeTorConfig
 import kotlin.jvm.JvmField
 import kotlin.jvm.JvmStatic
@@ -68,13 +67,25 @@ public class TorConfig2 private constructor(settings: Set<TorSetting>) {
      *
      *         TorOption.DisableNetwork.configure(true)
      *
+     *         TorOption.DataDirectory.configure("/path/to/data".toFile())
+     *
      *         TorOption.__SocksPort.configure {
      *             port(9055.toPortEphemeral())
-     *
      *             flagsSocks {
      *                 OnionTrafficOnly = true
      *                 PreferIPv6 = true
      *             }
+     *         }
+     *
+     *         try {
+     *             TorOption.__TransPort.tryConfigure {
+     *                 auto()
+     *                 flagsIsolation {
+     *                     IsolateClientProtocol = true
+     *                 }
+     *             }
+     *         } catch(_: UnsupportedOperationException) {
+     *             // recover
      *         }
      *
      *         put(myPreDefinedTorSetting)
@@ -86,16 +97,26 @@ public class TorConfig2 private constructor(settings: Set<TorSetting>) {
      *
      *         c.configure(TorOption.DisableNetwork.INSTANCE, true);
      *
-     *         c.configure(TorOption.DataDirectory.INSTANCE, File("/path/to/data"));
+     *         c.configure(TorOption.DataDirectory.INSTANCE, new File("/path/to/data"));
      *
      *         c.configure(TorOption.__SocksPort.INSTANCE, b -> {
      *             b.port(Port.Ephemeral.get(9055));
-     *
      *             b.flagsSocks(f -> {
      *                 f.OnionTrafficOnly = true;
      *                 f.PreferIPv6 = true;
      *             });
      *         });
+     *
+     *         try {
+     *             c.tryConfigure(TorOption.TransPort.INSTANCE, b -> {
+     *                 b.auto();
+     *                 b.flagsIsolation(f -> {
+     *                     f.IsolateClientProtocol = true;
+     *                 });
+     *             });
+     *         } catch (UnsupportedOperationException e) {
+     *             // recover
+     *         }
      *
      *         c.put(myPreDefinedTorSetting);
      *     });
@@ -108,7 +129,7 @@ public class TorConfig2 private constructor(settings: Set<TorSetting>) {
     internal constructor(init: Any) {
 
         /**
-         * Configures a [TorOption] which implements the [ConfigurableBuildable]
+         * Configures a [TorOption] which implements the [ConfigureBuildable]
          * contract type for [TorSetting.BuilderScope] of type [B], adding the
          * resultant [TorSetting] to [BuilderScope].
          *
@@ -120,16 +141,56 @@ public class TorConfig2 private constructor(settings: Set<TorSetting>) {
          *         }
          *     }
          *
-         * @throws [ClassCastException] when [ConfigurableBuildable] is not
+         * @throws [ClassCastException] when [ConfigureBuildable] is not
          *   an instance of [TorOption].
          * */
         @KmpTorDsl
-        public fun <B: TorSetting.BuilderScope> ConfigurableBuildable<B>.configure(
+        public fun <B: TorSetting.BuilderScope> ConfigureBuildable<B>.configure(
             block: ThisBlock<B>,
         ): BuilderScope = put(buildContract(block))
 
         /**
-         * Configures a [TorOption] which implements the [ConfigurableBoolean]
+         * Configures a [TorOption] which implements the [ConfigureTryBuildable]
+         * contract type for [TorSetting.BuilderScope] of type [B], adding the
+         * resultant [TorSetting] to [BuilderScope].
+         *
+         * **NOTE:** This may throw exception. Usage of a `try/catch` block is
+         * likely needed. The [TorOption] should be inspected to see its `asSetting`
+         * requirements.
+         *
+         * e.g.
+         *
+         *     TorConfig.Builder {
+         *         try {
+         *             TorOption.TransPort.tryConfigure {
+         *                 auto()
+         *             }
+         *         } catch(_: UnsupportedOperationException) {
+         *             // Unavailable for current host
+         *             // do something else
+         *         }
+         *
+         *         // No try/catch needed because we know requirements
+         *         // for BuilderScopeHS are going to be met.
+         *         TorOption.HiddenServiceDir.tryConfigure {
+         *             directory("/path/to/this/hs/dir".toFile())
+         *             version(3)
+         *             port(virtual = Port.HTTP) {
+         *                 target(port = 8080.toPort())
+         *             }
+         *         }
+         *     }
+         *
+         * @throws [ClassCastException] when [ConfigureTryBuildable] is not
+         *   an instance of [TorOption].
+         * */
+        @KmpTorDsl
+        public fun <B: TorSetting.BuilderScope> ConfigureTryBuildable<B>.tryConfigure(
+            block: ThisBlock<B>,
+        ): BuilderScope = put(buildContract(block))
+
+        /**
+         * Configures a [TorOption] which implements the [ConfigureBoolean]
          * contract type, adding the resultant [TorSetting] to [BuilderScope].
          *
          * e.g.
@@ -138,16 +199,16 @@ public class TorConfig2 private constructor(settings: Set<TorSetting>) {
          *         TorOption.DisableNetwork.configure(true)
          *     }
          *
-         * @throws [ClassCastException] when [ConfigurableBoolean] is not
+         * @throws [ClassCastException] when [ConfigureBoolean] is not
          *   an instance of [TorOption].
          * */
         @KmpTorDsl
-        public fun ConfigurableBoolean.configure(
+        public fun ConfigureBoolean.configure(
             enable: Boolean,
         ): BuilderScope = put(buildContract(enable))
 
         /**
-         * Configures a [TorOption] which implements the [ConfigurableDirectory]
+         * Configures a [TorOption] which implements the [ConfigureDirectory]
          * contract type, adding the resultant [TorSetting] to [BuilderScope].
          *
          * e.g.
@@ -156,16 +217,16 @@ public class TorConfig2 private constructor(settings: Set<TorSetting>) {
          *         TorOption.DataDirectory.configure(directory = "/path/to/data".toFile())
          *     }
          *
-         * @throws [ClassCastException] when [ConfigurableDirectory] is not
+         * @throws [ClassCastException] when [ConfigureDirectory] is not
          *   an instance of [TorOption].
          * */
         @KmpTorDsl
-        public fun ConfigurableDirectory.configure(
+        public fun ConfigureDirectory.configure(
             directory: File,
         ): BuilderScope = put(buildContract(directory))
 
         /**
-         * Configures a [TorOption] which implements the [ConfigurableFile]
+         * Configures a [TorOption] which implements the [ConfigureFile]
          * contract type, adding the resultant [TorSetting] to [BuilderScope].
          *
          * e.g.
@@ -174,27 +235,13 @@ public class TorConfig2 private constructor(settings: Set<TorSetting>) {
          *         TorOption.GeoIPFile.configure(file = "/path/to/geoip".toFile())
          *     }
          *
-         * @throws [ClassCastException] when [ConfigurableFile] is not
+         * @throws [ClassCastException] when [ConfigureFile] is not
          *   an instance of [TorOption].
          * */
         @KmpTorDsl
-        public fun ConfigurableFile.configure(
+        public fun ConfigureFile.configure(
             file: File,
         ): BuilderScope = put(buildContract(file))
-
-        /**
-         * Configures a Hidden Service, adding the resultant [TorSetting] to
-         * [BuilderScope].
-         *
-         * @see [BuilderScopeHS]
-         * @see [TorOption.HiddenServiceDir.asSetting]
-         * @throws [IllegalArgumentException] if misconfigured. See [BuilderScopeHS].
-         * */
-        @KmpTorDsl
-        public fun TorOption.HiddenServiceDir.configure(
-            directory: File,
-            block: ThisBlock<BuilderScopeHS>,
-        ): BuilderScope = put(asSetting(directory, block))
 
         /**
          * Adds all the already configured [TorSetting] to [BuilderScope]

@@ -31,6 +31,9 @@ import kotlin.jvm.JvmSynthetic
 
 /**
  * A DSL builder scope for configuring [TorOption.HiddenServicePort].
+ *
+ * @see [BuilderScopeHS.port]
+ * @see [TorOption.HiddenServiceDir.asSetting]
  * */
 @KmpTorDsl
 public class BuilderScopeHSPort private constructor(
@@ -66,7 +69,7 @@ public class BuilderScopeHSPort private constructor(
      * This sets the "target" argument to a Unix Socket path for which
      * incoming http requests will be directed locally on the host. The
      * [unixSocket] result will be formatted as `unix:\"${file-path}\"`
-     * after being sanitized via [File.absoluteFile] and [File.normalize].
+     * after being sanitized via [File.absoluteFile] + [File.normalize].
      *
      * e.g.
      *

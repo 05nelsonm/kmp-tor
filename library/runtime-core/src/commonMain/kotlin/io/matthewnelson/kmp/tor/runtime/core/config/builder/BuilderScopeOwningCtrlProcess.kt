@@ -28,10 +28,10 @@ import kotlin.jvm.JvmSynthetic
  *
  * By default, the [argument] is set to [Process.Current.pid] upon instantiation.
  *
- * @see [TorOption.__OwningControllerProcess]
+ * @see [TorOption.__OwningControllerProcess.asSetting]
  * */
 @KmpTorDsl
-public class BuilderScopeOwningControllerProcess: TorSetting.BuilderScope {
+public class BuilderScopeOwningCtrlProcess: TorSetting.BuilderScope {
 
     private constructor(): super(TorOption.__OwningControllerProcess, INIT) {
         argument = Process.Current.pid().toString()
@@ -39,15 +39,11 @@ public class BuilderScopeOwningControllerProcess: TorSetting.BuilderScope {
 
     /**
      * Sets the [argument] to the provided [id].
-     *
-     * @throws [IllegalArgumentException] if [id] is less than 1.
      * */
     @KmpTorDsl
-    @Throws(IllegalArgumentException::class)
     public fun processId(
         id: Int,
-    ): BuilderScopeOwningControllerProcess {
-        require(id > 0) { "id must be greater than 0" }
+    ): BuilderScopeOwningCtrlProcess {
         argument = id.toString()
         return this
     }
@@ -55,8 +51,8 @@ public class BuilderScopeOwningControllerProcess: TorSetting.BuilderScope {
     internal companion object {
 
         @JvmSynthetic
-        internal fun get(): BuilderScopeOwningControllerProcess {
-            return BuilderScopeOwningControllerProcess()
+        internal fun get(): BuilderScopeOwningCtrlProcess {
+            return BuilderScopeOwningCtrlProcess()
         }
     }
 }

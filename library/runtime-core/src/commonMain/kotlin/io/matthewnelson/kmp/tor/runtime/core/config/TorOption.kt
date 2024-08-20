@@ -25,9 +25,10 @@ import io.matthewnelson.kmp.tor.runtime.core.address.Port
 import io.matthewnelson.kmp.tor.runtime.core.config.builder.BuilderScopeAutoBoolean
 import io.matthewnelson.kmp.tor.runtime.core.config.builder.BuilderScopeAutoBoolean.Companion.toBuilderScopeAutoBoolean
 import io.matthewnelson.kmp.tor.runtime.core.config.builder.BuilderScopeHS
-import io.matthewnelson.kmp.tor.runtime.core.config.builder.BuilderScopeOwningControllerProcess
+import io.matthewnelson.kmp.tor.runtime.core.config.builder.BuilderScopeOwningCtrlProcess
 import io.matthewnelson.kmp.tor.runtime.core.config.builder.BuilderScopePort
 import io.matthewnelson.kmp.tor.runtime.core.ctrl.TorCmd
+import io.matthewnelson.kmp.tor.runtime.core.internal.IsUnixLikeHost
 import io.matthewnelson.kmp.tor.runtime.core.internal.byte
 import kotlin.jvm.JvmField
 import kotlin.jvm.JvmName
@@ -120,7 +121,7 @@ public abstract class TorOption: Comparable<TorOption>, CharSequence {
         attributes = immutableSetOf(Attribute.DIRECTORY),
         isCmdLineArg = true,
         isUnique = true,
-    ), ConfigurableDirectory {
+    ), ConfigureDirectory {
 
         @JvmStatic
         public fun asSetting(directory: File): TorSetting = buildContract(directory)
@@ -164,7 +165,7 @@ public abstract class TorOption: Comparable<TorOption>, CharSequence {
         attributes = emptySet(),
         isCmdLineArg = false,
         isUnique = true,
-    ), ConfigurableBoolean {
+    ), ConfigureBoolean {
 
         @JvmStatic
         public fun asSetting(enable: Boolean): TorSetting = buildContract(enable)
@@ -198,7 +199,7 @@ public abstract class TorOption: Comparable<TorOption>, CharSequence {
         attributes = immutableSetOf(Attribute.DIRECTORY),
         isCmdLineArg = true,
         isUnique = true,
-    ), ConfigurableDirectory {
+    ), ConfigureDirectory {
 
         @JvmStatic
         public fun asSetting(directory: File): TorSetting = buildContract(directory)
@@ -212,7 +213,7 @@ public abstract class TorOption: Comparable<TorOption>, CharSequence {
         attributes = emptySet(),
         isCmdLineArg = true,
         isUnique = true,
-    ), ConfigurableBuildable<BuilderScopeAutoBoolean> {
+    ), ConfigureBuildable<BuilderScopeAutoBoolean> {
 
         @JvmStatic
         public fun asSetting(
@@ -250,7 +251,7 @@ public abstract class TorOption: Comparable<TorOption>, CharSequence {
         attributes = emptySet(),
         isCmdLineArg = false,
         isUnique = true,
-    ), ConfigurableBuildable<BuilderScopeAutoBoolean> {
+    ), ConfigureBuildable<BuilderScopeAutoBoolean> {
 
         @JvmStatic
         public fun asSetting(
@@ -288,7 +289,7 @@ public abstract class TorOption: Comparable<TorOption>, CharSequence {
         attributes = emptySet(),
         isCmdLineArg = false,
         isUnique = true,
-    ), ConfigurableBoolean {
+    ), ConfigureBoolean {
 
         @JvmStatic
         public fun asSetting(enable: Boolean): TorSetting = buildContract(enable)
@@ -314,7 +315,7 @@ public abstract class TorOption: Comparable<TorOption>, CharSequence {
         attributes = immutableSetOf(Attribute.PORT, Attribute.UNIX_SOCKET),
         isCmdLineArg = true,
         isUnique = false,
-    ), ConfigurableBuildable<BuilderScopePort.Control> {
+    ), ConfigureBuildable<BuilderScopePort.Control> {
 
         @JvmStatic
         public fun asSetting(
@@ -332,7 +333,7 @@ public abstract class TorOption: Comparable<TorOption>, CharSequence {
         attributes = emptySet(),
         isCmdLineArg = true,
         isUnique = true,
-    ), ConfigurableBoolean {
+    ), ConfigureBoolean {
 
         @JvmStatic
         public fun asSetting(enable: Boolean): TorSetting = buildContract(enable)
@@ -346,7 +347,7 @@ public abstract class TorOption: Comparable<TorOption>, CharSequence {
         attributes = immutableSetOf(Attribute.FILE),
         isCmdLineArg = true,
         isUnique = true,
-    ), ConfigurableFile {
+    ), ConfigureFile {
 
         @JvmStatic
         public fun asSetting(file: File): TorSetting = buildContract(file)
@@ -370,7 +371,7 @@ public abstract class TorOption: Comparable<TorOption>, CharSequence {
         attributes = emptySet(),
         isCmdLineArg = true,
         isUnique = true,
-    ), ConfigurableBoolean {
+    ), ConfigureBoolean {
 
         @JvmStatic
         public fun asSetting(enable: Boolean): TorSetting = buildContract(enable)
@@ -384,7 +385,7 @@ public abstract class TorOption: Comparable<TorOption>, CharSequence {
         attributes = emptySet(),
         isCmdLineArg = true,
         isUnique = true,
-    ), ConfigurableBoolean {
+    ), ConfigureBoolean {
 
         @JvmStatic
         public fun asSetting(enable: Boolean): TorSetting = buildContract(enable)
@@ -398,7 +399,7 @@ public abstract class TorOption: Comparable<TorOption>, CharSequence {
         attributes = immutableSetOf(Attribute.FILE),
         isCmdLineArg = true,
         isUnique = true,
-    ), ConfigurableFile {
+    ), ConfigureFile {
 
         @JvmStatic
         public fun asSetting(file: File): TorSetting = buildContract(file)
@@ -412,7 +413,7 @@ public abstract class TorOption: Comparable<TorOption>, CharSequence {
         attributes = emptySet(),
         isCmdLineArg = true,
         isUnique = true,
-    ), ConfigurableBoolean {
+    ), ConfigureBoolean {
 
         @JvmStatic
         public fun asSetting(enable: Boolean): TorSetting = buildContract(enable)
@@ -426,7 +427,7 @@ public abstract class TorOption: Comparable<TorOption>, CharSequence {
         attributes = emptySet(),
         isCmdLineArg = false,
         isUnique = true,
-    ), ConfigurableBoolean {
+    ), ConfigureBoolean {
 
         @JvmStatic
         public fun asSetting(enable: Boolean): TorSetting = buildContract(enable)
@@ -440,7 +441,7 @@ public abstract class TorOption: Comparable<TorOption>, CharSequence {
         attributes = immutableSetOf(Attribute.DIRECTORY),
         isCmdLineArg = true,
         isUnique = true,
-    ), ConfigurableDirectory {
+    ), ConfigureDirectory {
 
         @JvmStatic
         public fun asSetting(directory: File): TorSetting = buildContract(directory)
@@ -454,7 +455,7 @@ public abstract class TorOption: Comparable<TorOption>, CharSequence {
         attributes = emptySet(),
         isCmdLineArg = true,
         isUnique = true,
-    ), ConfigurableBoolean {
+    ), ConfigureBoolean {
 
         @JvmStatic
         public fun asSetting(enable: Boolean): TorSetting = buildContract(enable)
@@ -488,7 +489,7 @@ public abstract class TorOption: Comparable<TorOption>, CharSequence {
         attributes = emptySet(),
         isCmdLineArg = true,
         isUnique = true,
-    ), ConfigurableBoolean {
+    ), ConfigureBoolean {
 
         @JvmStatic
         public fun asSetting(enable: Boolean): TorSetting = buildContract(enable)
@@ -502,7 +503,7 @@ public abstract class TorOption: Comparable<TorOption>, CharSequence {
         attributes = emptySet(),
         isCmdLineArg = true,
         isUnique = true,
-    ), ConfigurableBoolean {
+    ), ConfigureBoolean {
 
         @JvmStatic
         public fun asSetting(enable: Boolean): TorSetting = buildContract(enable)
@@ -516,7 +517,7 @@ public abstract class TorOption: Comparable<TorOption>, CharSequence {
         attributes = emptySet(),
         isCmdLineArg = true,
         isUnique = true,
-    ), ConfigurableBoolean {
+    ), ConfigureBoolean {
 
         @JvmStatic
         public fun asSetting(enable: Boolean): TorSetting = buildContract(enable)
@@ -530,7 +531,7 @@ public abstract class TorOption: Comparable<TorOption>, CharSequence {
         attributes = emptySet(),
         isCmdLineArg = false,
         isUnique = true,
-    ), ConfigurableBuildable<BuilderScopeAutoBoolean> {
+    ), ConfigureBuildable<BuilderScopeAutoBoolean> {
 
         @JvmStatic
         public fun asSetting(
@@ -561,7 +562,7 @@ public abstract class TorOption: Comparable<TorOption>, CharSequence {
         attributes = immutableSetOf(Attribute.FILE),
         isCmdLineArg = false,
         isUnique = true,
-    ), ConfigurableFile {
+    ), ConfigureFile {
 
         @JvmStatic
         public fun asSetting(file: File): TorSetting = buildContract(file)
@@ -575,7 +576,7 @@ public abstract class TorOption: Comparable<TorOption>, CharSequence {
         attributes = emptySet(),
         isCmdLineArg = false,
         isUnique = true,
-    ), ConfigurableBoolean {
+    ), ConfigureBoolean {
 
         @JvmStatic
         public fun asSetting(enable: Boolean): TorSetting = buildContract(enable)
@@ -599,7 +600,7 @@ public abstract class TorOption: Comparable<TorOption>, CharSequence {
         attributes = emptySet(),
         isCmdLineArg = false,
         isUnique = true,
-    ), ConfigurableBoolean {
+    ), ConfigureBoolean {
 
         @JvmStatic
         public fun asSetting(enable: Boolean): TorSetting = buildContract(enable)
@@ -613,7 +614,7 @@ public abstract class TorOption: Comparable<TorOption>, CharSequence {
         attributes = emptySet(),
         isCmdLineArg = false,
         isUnique = true,
-    ), ConfigurableBoolean {
+    ), ConfigureBoolean {
 
         @JvmStatic
         public fun asSetting(enable: Boolean): TorSetting = buildContract(enable)
@@ -627,7 +628,7 @@ public abstract class TorOption: Comparable<TorOption>, CharSequence {
         attributes = emptySet(),
         isCmdLineArg = false,
         isUnique = true,
-    ), ConfigurableBoolean {
+    ), ConfigureBoolean {
 
         @JvmStatic
         public fun asSetting(enable: Boolean): TorSetting = buildContract(enable)
@@ -641,7 +642,7 @@ public abstract class TorOption: Comparable<TorOption>, CharSequence {
         attributes = emptySet(),
         isCmdLineArg = false,
         isUnique = true,
-    ), ConfigurableBoolean {
+    ), ConfigureBoolean {
 
         @JvmStatic
         public fun asSetting(enable: Boolean): TorSetting = buildContract(enable)
@@ -655,7 +656,7 @@ public abstract class TorOption: Comparable<TorOption>, CharSequence {
         attributes = emptySet(),
         isCmdLineArg = false,
         isUnique = true,
-    ), ConfigurableBoolean {
+    ), ConfigureBoolean {
 
         @JvmStatic
         public fun asSetting(enable: Boolean): TorSetting = buildContract(enable)
@@ -669,7 +670,7 @@ public abstract class TorOption: Comparable<TorOption>, CharSequence {
         attributes = emptySet(),
         isCmdLineArg = true,
         isUnique = true,
-    ), ConfigurableBoolean {
+    ), ConfigureBoolean {
 
         @JvmStatic
         public fun asSetting(enable: Boolean): TorSetting = buildContract(enable)
@@ -728,7 +729,7 @@ public abstract class TorOption: Comparable<TorOption>, CharSequence {
         attributes = emptySet(),
         isCmdLineArg = true,
         isUnique = true,
-    ), ConfigurableBuildable<BuilderScopeAutoBoolean> {
+    ), ConfigureBuildable<BuilderScopeAutoBoolean> {
 
         @JvmStatic
         public fun asSetting(
@@ -758,7 +759,7 @@ public abstract class TorOption: Comparable<TorOption>, CharSequence {
         attributes = immutableSetOf(Attribute.LOGGING),
         isCmdLineArg = false,
         isUnique = true,
-    ), ConfigurableBoolean {
+    ), ConfigureBoolean {
 
         @JvmStatic
         public fun asSetting(enable: Boolean): TorSetting = buildContract(enable)
@@ -825,7 +826,7 @@ public abstract class TorOption: Comparable<TorOption>, CharSequence {
         attributes = emptySet(),
         isCmdLineArg = true,
         isUnique = true,
-    ), ConfigurableBoolean {
+    ), ConfigureBoolean {
 
         @JvmStatic
         public fun asSetting(enable: Boolean): TorSetting = buildContract(enable)
@@ -903,7 +904,7 @@ public abstract class TorOption: Comparable<TorOption>, CharSequence {
         attributes = immutableSetOf(Attribute.FILE),
         isCmdLineArg = true,
         isUnique = true,
-    ), ConfigurableFile {
+    ), ConfigureFile {
 
         @JvmStatic
         public fun asSetting(file: File): TorSetting = buildContract(file)
@@ -917,7 +918,7 @@ public abstract class TorOption: Comparable<TorOption>, CharSequence {
         attributes = emptySet(),
         isCmdLineArg = false,
         isUnique = true,
-    ), ConfigurableBoolean {
+    ), ConfigureBoolean {
 
         @JvmStatic
         public fun asSetting(enable: Boolean): TorSetting = buildContract(enable)
@@ -961,7 +962,7 @@ public abstract class TorOption: Comparable<TorOption>, CharSequence {
         attributes = emptySet(),
         isCmdLineArg = true,
         isUnique = true,
-    ), ConfigurableBoolean {
+    ), ConfigureBoolean {
 
         @JvmStatic
         public fun asSetting(enable: Boolean): TorSetting = buildContract(enable)
@@ -985,7 +986,7 @@ public abstract class TorOption: Comparable<TorOption>, CharSequence {
         attributes = emptySet(),
         isCmdLineArg = true,
         isUnique = true,
-    ), ConfigurableBoolean {
+    ), ConfigureBoolean {
 
         @JvmStatic
         public fun asSetting(enable: Boolean): TorSetting = buildContract(enable)
@@ -1091,7 +1092,7 @@ public abstract class TorOption: Comparable<TorOption>, CharSequence {
         attributes = immutableSetOf(Attribute.LOGGING),
         isCmdLineArg = false,
         isUnique = true,
-    ), ConfigurableBoolean {
+    ), ConfigureBoolean {
 
         @JvmStatic
         public fun asSetting(enable: Boolean): TorSetting = buildContract(enable)
@@ -1105,7 +1106,7 @@ public abstract class TorOption: Comparable<TorOption>, CharSequence {
         attributes = emptySet(),
         isCmdLineArg = true,
         isUnique = true,
-    ), ConfigurableBoolean {
+    ), ConfigureBoolean {
 
         @JvmStatic
         public fun asSetting(enable: Boolean): TorSetting = buildContract(enable)
@@ -1119,7 +1120,7 @@ public abstract class TorOption: Comparable<TorOption>, CharSequence {
         attributes = emptySet(),
         isCmdLineArg = false,
         isUnique = true,
-    ), ConfigurableBoolean {
+    ), ConfigureBoolean {
 
         @JvmStatic
         public fun asSetting(enable: Boolean): TorSetting = buildContract(enable)
@@ -1147,7 +1148,7 @@ public abstract class TorOption: Comparable<TorOption>, CharSequence {
         attributes = emptySet(),
         isCmdLineArg = false,
         isUnique = true,
-    ), ConfigurableBoolean {
+    ), ConfigureBoolean {
 
         @JvmStatic
         public fun asSetting(enable: Boolean): TorSetting = buildContract(enable)
@@ -1161,7 +1162,7 @@ public abstract class TorOption: Comparable<TorOption>, CharSequence {
         attributes = emptySet(),
         isCmdLineArg = false,
         isUnique = true,
-    ), ConfigurableBoolean {
+    ), ConfigureBoolean {
 
         @JvmStatic
         public fun asSetting(enable: Boolean): TorSetting = buildContract(enable)
@@ -1197,7 +1198,7 @@ public abstract class TorOption: Comparable<TorOption>, CharSequence {
         attributes = emptySet(),
         isCmdLineArg = true,
         isUnique = true,
-    ), ConfigurableBoolean {
+    ), ConfigureBoolean {
 
         @JvmStatic
         public fun asSetting(enable: Boolean): TorSetting = buildContract(enable)
@@ -1211,7 +1212,7 @@ public abstract class TorOption: Comparable<TorOption>, CharSequence {
         attributes = emptySet(),
         isCmdLineArg = false,
         isUnique = true,
-    ), ConfigurableBoolean {
+    ), ConfigureBoolean {
 
         @JvmStatic
         public fun asSetting(enable: Boolean): TorSetting = buildContract(enable)
@@ -1265,7 +1266,7 @@ public abstract class TorOption: Comparable<TorOption>, CharSequence {
         attributes = emptySet(),
         isCmdLineArg = false,
         isUnique = true,
-    ), ConfigurableBoolean {
+    ), ConfigureBoolean {
 
         @JvmStatic
         public fun asSetting(enable: Boolean): TorSetting = buildContract(enable)
@@ -1279,7 +1280,7 @@ public abstract class TorOption: Comparable<TorOption>, CharSequence {
         attributes = immutableSetOf(Attribute.DIRECTORY),
         isCmdLineArg = false,
         isUnique = true,
-    ), ConfigurableDirectory {
+    ), ConfigureDirectory {
 
         @JvmStatic
         public fun asSetting(directory: File): TorSetting = buildContract(directory)
@@ -1293,7 +1294,7 @@ public abstract class TorOption: Comparable<TorOption>, CharSequence {
         attributes = emptySet(),
         isCmdLineArg = false,
         isUnique = true,
-    ), ConfigurableBoolean {
+    ), ConfigureBoolean {
 
         @JvmStatic
         public fun asSetting(enable: Boolean): TorSetting = buildContract(enable)
@@ -1309,7 +1310,7 @@ public abstract class TorOption: Comparable<TorOption>, CharSequence {
         attributes = emptySet(),
         isCmdLineArg = false,
         isUnique = true,
-    ), ConfigurableBuildable<BuilderScopeAutoBoolean> {
+    ), ConfigureBuildable<BuilderScopeAutoBoolean> {
 
         @JvmStatic
         public fun asSetting(
@@ -1327,7 +1328,7 @@ public abstract class TorOption: Comparable<TorOption>, CharSequence {
         attributes = emptySet(),
         isCmdLineArg = false,
         isUnique = true,
-    ), ConfigurableBoolean {
+    ), ConfigureBoolean {
 
         @JvmStatic
         public fun asSetting(enable: Boolean): TorSetting = buildContract(enable)
@@ -1341,7 +1342,7 @@ public abstract class TorOption: Comparable<TorOption>, CharSequence {
         attributes = emptySet(),
         isCmdLineArg = false,
         isUnique = true,
-    ), ConfigurableBoolean {
+    ), ConfigureBoolean {
 
         @JvmStatic
         public fun asSetting(enable: Boolean): TorSetting = buildContract(enable)
@@ -1355,7 +1356,7 @@ public abstract class TorOption: Comparable<TorOption>, CharSequence {
         attributes = emptySet(),
         isCmdLineArg = false,
         isUnique = true,
-    ), ConfigurableBoolean {
+    ), ConfigureBoolean {
 
         @JvmStatic
         public fun asSetting(enable: Boolean): TorSetting = buildContract(enable)
@@ -1369,7 +1370,7 @@ public abstract class TorOption: Comparable<TorOption>, CharSequence {
         attributes = emptySet(),
         isCmdLineArg = false,
         isUnique = true,
-    ), ConfigurableBuildable<BuilderScopeAutoBoolean> {
+    ), ConfigureBuildable<BuilderScopeAutoBoolean> {
 
         @JvmStatic
         public fun asSetting(
@@ -1387,7 +1388,7 @@ public abstract class TorOption: Comparable<TorOption>, CharSequence {
         attributes = emptySet(),
         isCmdLineArg = false,
         isUnique = true,
-    ), ConfigurableBoolean {
+    ), ConfigureBoolean {
 
         @JvmStatic
         public fun asSetting(enable: Boolean): TorSetting = buildContract(enable)
@@ -1404,7 +1405,7 @@ public abstract class TorOption: Comparable<TorOption>, CharSequence {
         attributes = immutableSetOf(Attribute.PORT),
         isCmdLineArg = false,
         isUnique = false,
-    ), ConfigurableBuildable<BuilderScopePort.DNS> {
+    ), ConfigureBuildable<BuilderScopePort.DNS> {
 
         @JvmStatic
         public fun asSetting(
@@ -1422,7 +1423,7 @@ public abstract class TorOption: Comparable<TorOption>, CharSequence {
         attributes = emptySet(),
         isCmdLineArg = false,
         isUnique = true,
-    ), ConfigurableBoolean {
+    ), ConfigureBoolean {
 
         @JvmStatic
         public fun asSetting(enable: Boolean): TorSetting = buildContract(enable)
@@ -1436,7 +1437,7 @@ public abstract class TorOption: Comparable<TorOption>, CharSequence {
         attributes = emptySet(),
         isCmdLineArg = false,
         isUnique = true,
-    ), ConfigurableBoolean {
+    ), ConfigureBoolean {
 
         @JvmStatic
         public fun asSetting(enable: Boolean): TorSetting = buildContract(enable)
@@ -1450,7 +1451,7 @@ public abstract class TorOption: Comparable<TorOption>, CharSequence {
         attributes = emptySet(),
         isCmdLineArg = false,
         isUnique = true,
-    ), ConfigurableBoolean {
+    ), ConfigureBoolean {
 
         @JvmStatic
         public fun asSetting(enable: Boolean): TorSetting = buildContract(enable)
@@ -1469,7 +1470,7 @@ public abstract class TorOption: Comparable<TorOption>, CharSequence {
         attributes = immutableSetOf(Attribute.PORT),
         isCmdLineArg = false,
         isUnique = false,
-    ), ConfigurableBuildable<BuilderScopePort.HTTPTunnel> {
+    ), ConfigureBuildable<BuilderScopePort.HTTPTunnel> {
 
         @JvmStatic
         public fun asSetting(
@@ -1682,7 +1683,7 @@ public abstract class TorOption: Comparable<TorOption>, CharSequence {
         attributes = emptySet(),
         isCmdLineArg = false,
         isUnique = true,
-    ), ConfigurableBoolean {
+    ), ConfigureBoolean {
 
         @JvmStatic
         public fun asSetting(enable: Boolean): TorSetting = buildContract(enable)
@@ -1696,7 +1697,7 @@ public abstract class TorOption: Comparable<TorOption>, CharSequence {
         attributes = emptySet(),
         isCmdLineArg = false,
         isUnique = true,
-    ), ConfigurableBoolean {
+    ), ConfigureBoolean {
 
         @JvmStatic
         public fun asSetting(enable: Boolean): TorSetting = buildContract(enable)
@@ -1743,7 +1744,7 @@ public abstract class TorOption: Comparable<TorOption>, CharSequence {
         attributes = immutableSetOf(Attribute.PORT, Attribute.UNIX_SOCKET),
         isCmdLineArg = false,
         isUnique = false,
-    ), ConfigurableBuildable<BuilderScopePort.Socks> {
+    ), ConfigureBuildable<BuilderScopePort.Socks> {
 
         @JvmStatic
         public fun asSetting(
@@ -1787,6 +1788,7 @@ public abstract class TorOption: Comparable<TorOption>, CharSequence {
      * [tor-man#TransPort](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#TransPort)
      *
      * @see [__TransPort]
+     * @see [TorConfig2.BuilderScope.tryConfigure]
      * */
     public data object TransPort: TorOption(
         // Note: If modifying, update __TransPort
@@ -1794,14 +1796,26 @@ public abstract class TorOption: Comparable<TorOption>, CharSequence {
         attributes = immutableSetOf(Attribute.PORT),
         isCmdLineArg = false,
         isUnique = false,
-    ), ConfigurableBuildable<BuilderScopePort.Trans> {
+    ), ConfigureTryBuildable<BuilderScopePort.Trans> {
 
+        /**
+         * See [BuilderScopePort.Trans]
+         *
+         * @throws [UnsupportedOperationException] if host is not
+         *   unix-like (e.g. on Windows).
+         * */
         @JvmStatic
         public fun asSetting(
             block: ThisBlock<BuilderScopePort.Trans>,
         ): TorSetting = buildContract(block)
 
-        override fun buildable(): BuilderScopePort.Trans = BuilderScopePort.Trans.of(isNonPersistent = false)
+        @Throws(UnsupportedOperationException::class)
+        override fun buildable(): BuilderScopePort.Trans {
+            if (!IsUnixLikeHost) {
+                throw UnsupportedOperationException("$this is only supported for unix-like hosts")
+            }
+            return BuilderScopePort.Trans.of(isNonPersistent = false)
+        }
     }
 
     /**
@@ -1846,7 +1860,7 @@ public abstract class TorOption: Comparable<TorOption>, CharSequence {
         attributes = emptySet(),
         isCmdLineArg = false,
         isUnique = true,
-    ), ConfigurableBoolean {
+    ), ConfigureBoolean {
 
         @JvmStatic
         public fun asSetting(enable: Boolean): TorSetting = buildContract(enable)
@@ -1860,7 +1874,7 @@ public abstract class TorOption: Comparable<TorOption>, CharSequence {
         attributes = emptySet(),
         isCmdLineArg = false,
         isUnique = true,
-    ), ConfigurableBuildable<BuilderScopeAutoBoolean> {
+    ), ConfigureBuildable<BuilderScopeAutoBoolean> {
 
         @JvmStatic
         public fun asSetting(
@@ -1918,7 +1932,7 @@ public abstract class TorOption: Comparable<TorOption>, CharSequence {
         attributes = emptySet(),
         isCmdLineArg = false,
         isUnique = true,
-    ), ConfigurableBuildable<BuilderScopeAutoBoolean> {
+    ), ConfigureBuildable<BuilderScopeAutoBoolean> {
 
         @JvmStatic
         public fun asSetting(
@@ -1936,7 +1950,7 @@ public abstract class TorOption: Comparable<TorOption>, CharSequence {
         attributes = emptySet(),
         isCmdLineArg = false,
         isUnique = true,
-    ), ConfigurableBuildable<BuilderScopeAutoBoolean> {
+    ), ConfigureBuildable<BuilderScopeAutoBoolean> {
 
         @JvmStatic
         public fun asSetting(
@@ -1992,7 +2006,7 @@ public abstract class TorOption: Comparable<TorOption>, CharSequence {
         attributes = emptySet(),
         isCmdLineArg = false,
         isUnique = true,
-    ), ConfigurableBoolean {
+    ), ConfigureBoolean {
 
         @JvmStatic
         public fun asSetting(enable: Boolean): TorSetting = buildContract(enable)
@@ -2040,7 +2054,7 @@ public abstract class TorOption: Comparable<TorOption>, CharSequence {
         attributes = emptySet(),
         isCmdLineArg = false,
         isUnique = true,
-    ), ConfigurableBoolean {
+    ), ConfigureBoolean {
 
         @JvmStatic
         public fun asSetting(enable: Boolean): TorSetting = buildContract(enable)
@@ -2066,7 +2080,7 @@ public abstract class TorOption: Comparable<TorOption>, CharSequence {
         attributes = emptySet(),
         isCmdLineArg = false,
         isUnique = true,
-    ), ConfigurableBoolean {
+    ), ConfigureBoolean {
 
         @JvmStatic
         public fun asSetting(enable: Boolean): TorSetting = buildContract(enable)
@@ -2080,7 +2094,7 @@ public abstract class TorOption: Comparable<TorOption>, CharSequence {
         attributes = emptySet(),
         isCmdLineArg = false,
         isUnique = true,
-    ), ConfigurableBoolean {
+    ), ConfigureBoolean {
 
         @JvmStatic
         public fun asSetting(enable: Boolean): TorSetting = buildContract(enable)
@@ -2094,7 +2108,7 @@ public abstract class TorOption: Comparable<TorOption>, CharSequence {
         attributes = emptySet(),
         isCmdLineArg = false,
         isUnique = true,
-    ), ConfigurableBoolean {
+    ), ConfigureBoolean {
 
         @JvmStatic
         public fun asSetting(enable: Boolean): TorSetting = buildContract(enable)
@@ -2152,7 +2166,7 @@ public abstract class TorOption: Comparable<TorOption>, CharSequence {
         attributes = emptySet(),
         isCmdLineArg = true,
         isUnique = true,
-    ), ConfigurableBuildable<BuilderScopeAutoBoolean> {
+    ), ConfigureBuildable<BuilderScopeAutoBoolean> {
 
         @JvmStatic
         public fun asSetting(
@@ -2210,7 +2224,7 @@ public abstract class TorOption: Comparable<TorOption>, CharSequence {
         attributes = emptySet(),
         isCmdLineArg = false,
         isUnique = true,
-    ), ConfigurableBoolean {
+    ), ConfigureBoolean {
 
         @JvmStatic
         public fun asSetting(enable: Boolean): TorSetting = buildContract(enable)
@@ -2268,7 +2282,7 @@ public abstract class TorOption: Comparable<TorOption>, CharSequence {
         attributes = emptySet(),
         isCmdLineArg = false,
         isUnique = true,
-    ), ConfigurableBoolean {
+    ), ConfigureBoolean {
 
         @JvmStatic
         public fun asSetting(enable: Boolean): TorSetting = buildContract(enable)
@@ -2282,7 +2296,7 @@ public abstract class TorOption: Comparable<TorOption>, CharSequence {
         attributes = emptySet(),
         isCmdLineArg = false,
         isUnique = true,
-    ), ConfigurableBoolean {
+    ), ConfigureBoolean {
 
         @JvmStatic
         public fun asSetting(enable: Boolean): TorSetting = buildContract(enable)
@@ -2296,7 +2310,7 @@ public abstract class TorOption: Comparable<TorOption>, CharSequence {
         attributes = emptySet(),
         isCmdLineArg = false,
         isUnique = true,
-    ), ConfigurableBuildable<BuilderScopeAutoBoolean> {
+    ), ConfigureBuildable<BuilderScopeAutoBoolean> {
 
         @JvmStatic
         public fun asSetting(
@@ -2314,7 +2328,7 @@ public abstract class TorOption: Comparable<TorOption>, CharSequence {
         attributes = emptySet(),
         isCmdLineArg = false,
         isUnique = true,
-    ), ConfigurableBoolean {
+    ), ConfigureBoolean {
 
         @JvmStatic
         public fun asSetting(enable: Boolean): TorSetting = buildContract(enable)
@@ -2348,7 +2362,7 @@ public abstract class TorOption: Comparable<TorOption>, CharSequence {
         attributes = emptySet(),
         isCmdLineArg = false,
         isUnique = true,
-    ), ConfigurableBoolean {
+    ), ConfigureBoolean {
 
         @JvmStatic
         public fun asSetting(enable: Boolean): TorSetting = buildContract(enable)
@@ -2396,7 +2410,7 @@ public abstract class TorOption: Comparable<TorOption>, CharSequence {
         attributes = emptySet(),
         isCmdLineArg = false,
         isUnique = true,
-    ), ConfigurableBuildable<BuilderScopeAutoBoolean> {
+    ), ConfigureBuildable<BuilderScopeAutoBoolean> {
 
         @JvmStatic
         public fun asSetting(
@@ -2414,7 +2428,7 @@ public abstract class TorOption: Comparable<TorOption>, CharSequence {
         attributes = emptySet(),
         isCmdLineArg = false,
         isUnique = true,
-    ), ConfigurableBoolean {
+    ), ConfigureBoolean {
 
         @JvmStatic
         public fun asSetting(enable: Boolean): TorSetting = buildContract(enable)
@@ -2428,7 +2442,7 @@ public abstract class TorOption: Comparable<TorOption>, CharSequence {
         attributes = immutableSetOf(Attribute.FILE),
         isCmdLineArg = true,
         isUnique = true,
-    ), ConfigurableFile {
+    ), ConfigureFile {
 
         @JvmStatic
         public fun asSetting(file: File): TorSetting = buildContract(file)
@@ -2442,7 +2456,7 @@ public abstract class TorOption: Comparable<TorOption>, CharSequence {
         attributes = immutableSetOf(Attribute.FILE),
         isCmdLineArg = true,
         isUnique = true,
-    ), ConfigurableFile {
+    ), ConfigureFile {
 
         @JvmStatic
         public fun asSetting(file: File): TorSetting = buildContract(file)
@@ -2466,7 +2480,7 @@ public abstract class TorOption: Comparable<TorOption>, CharSequence {
         attributes = emptySet(),
         isCmdLineArg = false,
         isUnique = true,
-    ), ConfigurableBoolean {
+    ), ConfigureBoolean {
 
         @JvmStatic
         public fun asSetting(enable: Boolean): TorSetting = buildContract(enable)
@@ -2480,7 +2494,7 @@ public abstract class TorOption: Comparable<TorOption>, CharSequence {
         attributes = immutableSetOf(Attribute.DIRECTORY),
         isCmdLineArg = true,
         isUnique = true,
-    ), ConfigurableDirectory {
+    ), ConfigureDirectory {
 
         @JvmStatic
         public fun asSetting(directory: File): TorSetting = buildContract(directory)
@@ -2494,7 +2508,7 @@ public abstract class TorOption: Comparable<TorOption>, CharSequence {
         attributes = emptySet(),
         isCmdLineArg = true,
         isUnique = true,
-    ), ConfigurableBuildable<BuilderScopeAutoBoolean> {
+    ), ConfigureBuildable<BuilderScopeAutoBoolean> {
 
         @JvmStatic
         public fun asSetting(
@@ -2512,7 +2526,7 @@ public abstract class TorOption: Comparable<TorOption>, CharSequence {
         attributes = emptySet(),
         isCmdLineArg = false,
         isUnique = true,
-    ), ConfigurableBoolean {
+    ), ConfigureBoolean {
 
         @JvmStatic
         public fun asSetting(enable: Boolean): TorSetting = buildContract(enable)
@@ -2576,7 +2590,7 @@ public abstract class TorOption: Comparable<TorOption>, CharSequence {
         attributes = emptySet(),
         isCmdLineArg = false,
         isUnique = true,
-    ), ConfigurableBoolean {
+    ), ConfigureBoolean {
 
         @JvmStatic
         public fun asSetting(enable: Boolean): TorSetting = buildContract(enable)
@@ -2613,7 +2627,7 @@ public abstract class TorOption: Comparable<TorOption>, CharSequence {
         attributes = emptySet(),
         isCmdLineArg = false,
         isUnique = true,
-    ), ConfigurableBoolean {
+    ), ConfigureBoolean {
 
         @JvmStatic
         public fun asSetting(enable: Boolean): TorSetting = buildContract(enable)
@@ -2627,7 +2641,7 @@ public abstract class TorOption: Comparable<TorOption>, CharSequence {
         attributes = emptySet(),
         isCmdLineArg = false,
         isUnique = true,
-    ), ConfigurableBuildable<BuilderScopeAutoBoolean> {
+    ), ConfigureBuildable<BuilderScopeAutoBoolean> {
 
         @JvmStatic
         public fun asSetting(
@@ -2645,7 +2659,7 @@ public abstract class TorOption: Comparable<TorOption>, CharSequence {
         attributes = emptySet(),
         isCmdLineArg = false,
         isUnique = true,
-    ), ConfigurableBoolean {
+    ), ConfigureBoolean {
 
         @JvmStatic
         public fun asSetting(enable: Boolean): TorSetting = buildContract(enable)
@@ -2659,7 +2673,7 @@ public abstract class TorOption: Comparable<TorOption>, CharSequence {
         attributes = emptySet(),
         isCmdLineArg = false,
         isUnique = true,
-    ), ConfigurableBoolean {
+    ), ConfigureBoolean {
 
         @JvmStatic
         public fun asSetting(enable: Boolean): TorSetting = buildContract(enable)
@@ -2673,7 +2687,7 @@ public abstract class TorOption: Comparable<TorOption>, CharSequence {
         attributes = emptySet(),
         isCmdLineArg = false,
         isUnique = true,
-    ), ConfigurableBoolean {
+    ), ConfigureBoolean {
 
         @JvmStatic
         public fun asSetting(enable: Boolean): TorSetting = buildContract(enable)
@@ -2687,7 +2701,7 @@ public abstract class TorOption: Comparable<TorOption>, CharSequence {
         attributes = emptySet(),
         isCmdLineArg = false,
         isUnique = true,
-    ), ConfigurableBoolean {
+    ), ConfigureBoolean {
 
         @JvmStatic
         public fun asSetting(enable: Boolean): TorSetting = buildContract(enable)
@@ -2701,7 +2715,7 @@ public abstract class TorOption: Comparable<TorOption>, CharSequence {
         attributes = immutableSetOf(Attribute.FILE),
         isCmdLineArg = false,
         isUnique = true,
-    ), ConfigurableFile {
+    ), ConfigureFile {
 
         @JvmStatic
         public fun asSetting(file: File): TorSetting = buildContract(file)
@@ -2715,7 +2729,7 @@ public abstract class TorOption: Comparable<TorOption>, CharSequence {
         attributes = emptySet(),
         isCmdLineArg = false,
         isUnique = true,
-    ), ConfigurableBoolean {
+    ), ConfigureBoolean {
 
         @JvmStatic
         public fun asSetting(enable: Boolean): TorSetting = buildContract(enable)
@@ -2803,7 +2817,7 @@ public abstract class TorOption: Comparable<TorOption>, CharSequence {
         attributes = emptySet(),
         isCmdLineArg = false,
         isUnique = true,
-    ), ConfigurableBoolean {
+    ), ConfigureBoolean {
 
         @JvmStatic
         public fun asSetting(enable: Boolean): TorSetting = buildContract(enable)
@@ -2817,7 +2831,7 @@ public abstract class TorOption: Comparable<TorOption>, CharSequence {
         attributes = emptySet(),
         isCmdLineArg = false,
         isUnique = true,
-    ), ConfigurableBoolean {
+    ), ConfigureBoolean {
 
         @JvmStatic
         public fun asSetting(enable: Boolean): TorSetting = buildContract(enable)
@@ -2831,7 +2845,7 @@ public abstract class TorOption: Comparable<TorOption>, CharSequence {
         attributes = emptySet(),
         isCmdLineArg = false,
         isUnique = true,
-    ), ConfigurableBoolean {
+    ), ConfigureBoolean {
 
         @JvmStatic
         public fun asSetting(enable: Boolean): TorSetting = buildContract(enable)
@@ -2845,7 +2859,7 @@ public abstract class TorOption: Comparable<TorOption>, CharSequence {
         attributes = emptySet(),
         isCmdLineArg = false,
         isUnique = true,
-    ), ConfigurableBoolean {
+    ), ConfigureBoolean {
 
         @JvmStatic
         public fun asSetting(enable: Boolean): TorSetting = buildContract(enable)
@@ -2859,7 +2873,7 @@ public abstract class TorOption: Comparable<TorOption>, CharSequence {
         attributes = emptySet(),
         isCmdLineArg = false,
         isUnique = true,
-    ), ConfigurableBoolean {
+    ), ConfigureBoolean {
 
         @JvmStatic
         public fun asSetting(enable: Boolean): TorSetting = buildContract(enable)
@@ -2873,7 +2887,7 @@ public abstract class TorOption: Comparable<TorOption>, CharSequence {
         attributes = emptySet(),
         isCmdLineArg = false,
         isUnique = true,
-    ), ConfigurableBoolean {
+    ), ConfigureBoolean {
 
         @JvmStatic
         public fun asSetting(enable: Boolean): TorSetting = buildContract(enable)
@@ -2887,7 +2901,7 @@ public abstract class TorOption: Comparable<TorOption>, CharSequence {
         attributes = emptySet(),
         isCmdLineArg = false,
         isUnique = true,
-    ), ConfigurableBoolean {
+    ), ConfigureBoolean {
 
         @JvmStatic
         public fun asSetting(enable: Boolean): TorSetting = buildContract(enable)
@@ -2901,7 +2915,7 @@ public abstract class TorOption: Comparable<TorOption>, CharSequence {
         attributes = emptySet(),
         isCmdLineArg = false,
         isUnique = true,
-    ), ConfigurableBoolean {
+    ), ConfigureBoolean {
 
         @JvmStatic
         public fun asSetting(enable: Boolean): TorSetting = buildContract(enable)
@@ -2925,7 +2939,7 @@ public abstract class TorOption: Comparable<TorOption>, CharSequence {
         attributes = emptySet(),
         isCmdLineArg = false,
         isUnique = true,
-    ), ConfigurableBoolean {
+    ), ConfigureBoolean {
 
         @JvmStatic
         public fun asSetting(enable: Boolean): TorSetting = buildContract(enable)
@@ -2943,7 +2957,7 @@ public abstract class TorOption: Comparable<TorOption>, CharSequence {
         attributes = emptySet(),
         isCmdLineArg = false,
         isUnique = true,
-    ), ConfigurableBoolean {
+    ), ConfigureBoolean {
 
         @JvmStatic
         public fun asSetting(enable: Boolean): TorSetting = buildContract(enable)
@@ -2980,7 +2994,7 @@ public abstract class TorOption: Comparable<TorOption>, CharSequence {
         attributes = immutableSetOf(Attribute.FILE),
         isCmdLineArg = false,
         isUnique = true,
-    ), ConfigurableFile {
+    ), ConfigureFile {
 
         @JvmStatic
         public fun asSetting(file: File): TorSetting = buildContract(file)
@@ -3008,7 +3022,7 @@ public abstract class TorOption: Comparable<TorOption>, CharSequence {
         attributes = emptySet(),
         isCmdLineArg = false,
         isUnique = true,
-    ), ConfigurableBuildable<BuilderScopeAutoBoolean> {
+    ), ConfigureBuildable<BuilderScopeAutoBoolean> {
 
         @JvmStatic
         public fun asSetting(
@@ -3076,7 +3090,7 @@ public abstract class TorOption: Comparable<TorOption>, CharSequence {
         attributes = emptySet(),
         isCmdLineArg = false,
         isUnique = true,
-    ), ConfigurableBuildable<BuilderScopeAutoBoolean> {
+    ), ConfigureBuildable<BuilderScopeAutoBoolean> {
 
         @JvmStatic
         public fun asSetting(
@@ -3144,7 +3158,7 @@ public abstract class TorOption: Comparable<TorOption>, CharSequence {
         attributes = emptySet(),
         isCmdLineArg = false,
         isUnique = true,
-    ), ConfigurableBuildable<BuilderScopeAutoBoolean> {
+    ), ConfigureBuildable<BuilderScopeAutoBoolean> {
 
         @JvmStatic
         public fun asSetting(
@@ -3234,7 +3248,7 @@ public abstract class TorOption: Comparable<TorOption>, CharSequence {
         attributes = emptySet(),
         isCmdLineArg = false,
         isUnique = true,
-    ), ConfigurableBuildable<BuilderScopeAutoBoolean> {
+    ), ConfigureBuildable<BuilderScopeAutoBoolean> {
 
         @JvmStatic
         public fun asSetting(
@@ -3256,7 +3270,7 @@ public abstract class TorOption: Comparable<TorOption>, CharSequence {
         attributes = emptySet(),
         isCmdLineArg = false,
         isUnique = true,
-    ), ConfigurableBoolean {
+    ), ConfigureBoolean {
 
         @JvmStatic
         public fun asSetting(enable: Boolean): TorSetting = buildContract(enable)
@@ -3270,7 +3284,7 @@ public abstract class TorOption: Comparable<TorOption>, CharSequence {
         attributes = emptySet(),
         isCmdLineArg = false,
         isUnique = true,
-    ), ConfigurableBoolean {
+    ), ConfigureBoolean {
 
         @JvmStatic
         public fun asSetting(enable: Boolean): TorSetting = buildContract(enable)
@@ -3284,7 +3298,7 @@ public abstract class TorOption: Comparable<TorOption>, CharSequence {
         attributes = emptySet(),
         isCmdLineArg = false,
         isUnique = true,
-    ), ConfigurableBoolean {
+    ), ConfigureBoolean {
 
         @JvmStatic
         public fun asSetting(enable: Boolean): TorSetting = buildContract(enable)
@@ -3339,7 +3353,7 @@ public abstract class TorOption: Comparable<TorOption>, CharSequence {
         attributes = emptySet(),
         isCmdLineArg = false,
         isUnique = true,
-    ), ConfigurableBoolean {
+    ), ConfigureBoolean {
 
         @JvmStatic
         public fun asSetting(enable: Boolean): TorSetting = buildContract(enable)
@@ -3363,7 +3377,7 @@ public abstract class TorOption: Comparable<TorOption>, CharSequence {
         attributes = emptySet(),
         isCmdLineArg = false,
         isUnique = true,
-    ), ConfigurableBoolean {
+    ), ConfigureBoolean {
 
         @JvmStatic
         public fun asSetting(enable: Boolean): TorSetting = buildContract(enable)
@@ -3377,7 +3391,7 @@ public abstract class TorOption: Comparable<TorOption>, CharSequence {
         attributes = emptySet(),
         isCmdLineArg = false,
         isUnique = true,
-    ), ConfigurableBoolean {
+    ), ConfigureBoolean {
 
         @JvmStatic
         public fun asSetting(enable: Boolean): TorSetting = buildContract(enable)
@@ -3401,7 +3415,7 @@ public abstract class TorOption: Comparable<TorOption>, CharSequence {
         attributes = emptySet(),
         isCmdLineArg = false,
         isUnique = true,
-    ), ConfigurableBoolean {
+    ), ConfigureBoolean {
 
         @JvmStatic
         public fun asSetting(enable: Boolean): TorSetting = buildContract(enable)
@@ -3425,7 +3439,7 @@ public abstract class TorOption: Comparable<TorOption>, CharSequence {
         attributes = emptySet(),
         isCmdLineArg = false,
         isUnique = true,
-    ), ConfigurableBoolean {
+    ), ConfigureBoolean {
 
         @JvmStatic
         public fun asSetting(enable: Boolean): TorSetting = buildContract(enable)
@@ -3480,7 +3494,7 @@ public abstract class TorOption: Comparable<TorOption>, CharSequence {
         attributes = emptySet(),
         isCmdLineArg = false,
         isUnique = true,
-    ), ConfigurableBoolean {
+    ), ConfigureBoolean {
 
         @JvmStatic
         public fun asSetting(enable: Boolean): TorSetting = buildContract(enable)
@@ -3494,7 +3508,7 @@ public abstract class TorOption: Comparable<TorOption>, CharSequence {
         attributes = emptySet(),
         isCmdLineArg = false,
         isUnique = true,
-    ), ConfigurableBoolean {
+    ), ConfigureBoolean {
 
         @JvmStatic
         public fun asSetting(enable: Boolean): TorSetting = buildContract(enable)
@@ -3508,7 +3522,7 @@ public abstract class TorOption: Comparable<TorOption>, CharSequence {
         attributes = emptySet(),
         isCmdLineArg = false,
         isUnique = true,
-    ), ConfigurableBoolean {
+    ), ConfigureBoolean {
 
         @JvmStatic
         public fun asSetting(enable: Boolean): TorSetting = buildContract(enable)
@@ -3602,7 +3616,7 @@ public abstract class TorOption: Comparable<TorOption>, CharSequence {
         attributes = emptySet(),
         isCmdLineArg = false,
         isUnique = true,
-    ), ConfigurableBoolean {
+    ), ConfigureBoolean {
 
         @JvmStatic
         public fun asSetting(enable: Boolean): TorSetting = buildContract(enable)
@@ -3616,7 +3630,7 @@ public abstract class TorOption: Comparable<TorOption>, CharSequence {
         attributes = immutableSetOf(Attribute.FILE),
         isCmdLineArg = false,
         isUnique = true,
-    ), ConfigurableFile {
+    ), ConfigureFile {
 
         @JvmStatic
         public fun asSetting(file: File): TorSetting = buildContract(file)
@@ -3700,7 +3714,7 @@ public abstract class TorOption: Comparable<TorOption>, CharSequence {
         attributes = emptySet(),
         isCmdLineArg = false,
         isUnique = true,
-    ), ConfigurableBoolean {
+    ), ConfigureBoolean {
 
         @JvmStatic
         public fun asSetting(enable: Boolean): TorSetting = buildContract(enable)
@@ -3734,7 +3748,7 @@ public abstract class TorOption: Comparable<TorOption>, CharSequence {
         attributes = immutableSetOf(Attribute.FILE),
         isCmdLineArg = false,
         isUnique = true,
-    ), ConfigurableFile {
+    ), ConfigureFile {
 
         @JvmStatic
         public fun asSetting(file: File): TorSetting = buildContract(file)
@@ -3748,7 +3762,7 @@ public abstract class TorOption: Comparable<TorOption>, CharSequence {
         attributes = emptySet(),
         isCmdLineArg = false,
         isUnique = true,
-    ), ConfigurableBoolean {
+    ), ConfigureBoolean {
 
         @JvmStatic
         public fun asSetting(enable: Boolean): TorSetting = buildContract(enable)
@@ -3773,7 +3787,7 @@ public abstract class TorOption: Comparable<TorOption>, CharSequence {
     /**
      * [tor-man#HiddenServiceDir](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#HiddenServiceDir)
      *
-     * @see [TorConfig2.BuilderScope.configure]
+     * @see [TorConfig2.BuilderScope.tryConfigure]
      * @see [HiddenServiceDir.asSetting]
      * */
     public data object HiddenServiceDir: TorOption(
@@ -3781,18 +3795,19 @@ public abstract class TorOption: Comparable<TorOption>, CharSequence {
         attributes = immutableSetOf(Attribute.DIRECTORY, Attribute.HIDDEN_SERVICE),
         isCmdLineArg = false,
         isUnique = false,
-    ) {
+    ), ConfigureTryBuildable<BuilderScopeHS> {
 
         /**
          * See [BuilderScopeHS]
          *
-         * @throws [IllegalArgumentException] if misconfigured. See [BuilderScopeHS]
+         * @throws [IllegalArgumentException] if misconfigured. See [BuilderScopeHS].
          * */
         @JvmStatic
         public fun asSetting(
-            directory: File,
             block: ThisBlock<BuilderScopeHS>,
-        ): TorSetting = BuilderScopeHS.build(directory, block)
+        ): TorSetting = buildContract(block)
+
+        override fun buildable(): BuilderScopeHS = BuilderScopeHS.get()
     }
 
     /**
@@ -3926,7 +3941,7 @@ public abstract class TorOption: Comparable<TorOption>, CharSequence {
         attributes = emptySet(),
         isCmdLineArg = true,
         isUnique = true,
-    ), ConfigurableBoolean {
+    ), ConfigureBoolean {
 
         @JvmStatic
         public fun asSetting(enable: Boolean): TorSetting = buildContract(enable)
@@ -4255,7 +4270,7 @@ public abstract class TorOption: Comparable<TorOption>, CharSequence {
         attributes = immutableSetOf(Attribute.PORT, Attribute.UNIX_SOCKET),
         isCmdLineArg = true,
         isUnique = false,
-    ), ConfigurableBuildable<BuilderScopePort.Control> {
+    ), ConfigureBuildable<BuilderScopePort.Control> {
 
         @JvmStatic
         public fun asSetting(
@@ -4293,7 +4308,7 @@ public abstract class TorOption: Comparable<TorOption>, CharSequence {
         attributes = immutableSetOf(Attribute.PORT),
         isCmdLineArg = false,
         isUnique = false,
-    ), ConfigurableBuildable<BuilderScopePort.DNS> {
+    ), ConfigureBuildable<BuilderScopePort.DNS> {
 
         @JvmStatic
         public fun asSetting(
@@ -4316,7 +4331,7 @@ public abstract class TorOption: Comparable<TorOption>, CharSequence {
         attributes = immutableSetOf(Attribute.PORT),
         isCmdLineArg = false,
         isUnique = false,
-    ), ConfigurableBuildable<BuilderScopePort.HTTPTunnel> {
+    ), ConfigureBuildable<BuilderScopePort.HTTPTunnel> {
 
         @JvmStatic
         public fun asSetting(
@@ -4399,7 +4414,7 @@ public abstract class TorOption: Comparable<TorOption>, CharSequence {
         attributes = immutableSetOf(Attribute.PORT, Attribute.UNIX_SOCKET),
         isCmdLineArg = false,
         isUnique = false,
-    ), ConfigurableBuildable<BuilderScopePort.Socks> {
+    ), ConfigureBuildable<BuilderScopePort.Socks> {
 
         @JvmStatic
         public fun asSetting(
@@ -4415,6 +4430,7 @@ public abstract class TorOption: Comparable<TorOption>, CharSequence {
      * [tor-man#Non-Persistent Options](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#non-persistent-options)
      *
      * @see [TransPort]
+     * @see [TorConfig2.BuilderScope.tryConfigure]
      * */
     public data object __TransPort: TorOption(
         // Note: If modifying, update TransPort
@@ -4422,14 +4438,26 @@ public abstract class TorOption: Comparable<TorOption>, CharSequence {
         attributes = immutableSetOf(Attribute.PORT),
         isCmdLineArg = false,
         isUnique = false,
-    ), ConfigurableBuildable<BuilderScopePort.Trans> {
+    ), ConfigureTryBuildable<BuilderScopePort.Trans> {
 
+        /**
+         * See [BuilderScopePort.Trans]
+         *
+         * @throws [UnsupportedOperationException] if host is not
+         *   unix-like (e.g. on Windows).
+         * */
         @JvmStatic
         public fun asSetting(
             block: ThisBlock<BuilderScopePort.Trans>,
         ): TorSetting = buildContract(block)
 
-        override fun buildable(): BuilderScopePort.Trans = BuilderScopePort.Trans.of(isNonPersistent = true)
+        @Throws(UnsupportedOperationException::class)
+        override fun buildable(): BuilderScopePort.Trans {
+            if (!IsUnixLikeHost) {
+                throw UnsupportedOperationException("$this is only supported for unix-like hosts")
+            }
+            return BuilderScopePort.Trans.of(isNonPersistent = true)
+        }
     }
 
     /**
@@ -4440,7 +4468,7 @@ public abstract class TorOption: Comparable<TorOption>, CharSequence {
         attributes = emptySet(),
         isCmdLineArg = true,
         isUnique = true,
-    ), ConfigurableBoolean {
+    ), ConfigureBoolean {
 
         @JvmStatic
         public fun asSetting(enable: Boolean): TorSetting = buildContract(enable)
@@ -4454,7 +4482,7 @@ public abstract class TorOption: Comparable<TorOption>, CharSequence {
         attributes = emptySet(),
         isCmdLineArg = true,
         isUnique = true,
-    ), ConfigurableBoolean {
+    ), ConfigureBoolean {
 
         @JvmStatic
         public fun asSetting(enable: Boolean): TorSetting = buildContract(enable)
@@ -4468,7 +4496,7 @@ public abstract class TorOption: Comparable<TorOption>, CharSequence {
         attributes = emptySet(),
         isCmdLineArg = true,
         isUnique = true,
-    ), ConfigurableBoolean {
+    ), ConfigureBoolean {
 
         @JvmStatic
         public fun asSetting(enable: Boolean): TorSetting = buildContract(enable)
@@ -4494,7 +4522,7 @@ public abstract class TorOption: Comparable<TorOption>, CharSequence {
         attributes = emptySet(),
         isCmdLineArg = true,
         isUnique = true,
-    ), ConfigurableBoolean {
+    ), ConfigureBoolean {
 
         @JvmStatic
         public fun asSetting(enable: Boolean): TorSetting = buildContract(enable)
@@ -4508,14 +4536,14 @@ public abstract class TorOption: Comparable<TorOption>, CharSequence {
         attributes = emptySet(),
         isCmdLineArg = true,
         isUnique = true,
-    ), ConfigurableBuildable<BuilderScopeOwningControllerProcess> {
+    ), ConfigureBuildable<BuilderScopeOwningCtrlProcess> {
 
         @JvmStatic
         public fun asSetting(
-            block: ThisBlock<BuilderScopeOwningControllerProcess>,
+            block: ThisBlock<BuilderScopeOwningCtrlProcess>,
         ): TorSetting = buildContract(block)
 
-        override fun buildable(): BuilderScopeOwningControllerProcess = BuilderScopeOwningControllerProcess.get()
+        override fun buildable(): BuilderScopeOwningCtrlProcess = BuilderScopeOwningCtrlProcess.get()
     }
 
     /**
@@ -4536,7 +4564,7 @@ public abstract class TorOption: Comparable<TorOption>, CharSequence {
         attributes = emptySet(),
         isCmdLineArg = true,
         isUnique = true,
-    ), ConfigurableBoolean {
+    ), ConfigureBoolean {
 
         @JvmStatic
         public fun asSetting(enable: Boolean): TorSetting = buildContract(enable)
@@ -4550,7 +4578,7 @@ public abstract class TorOption: Comparable<TorOption>, CharSequence {
         attributes = emptySet(),
         isCmdLineArg = true,
         isUnique = true,
-    ), ConfigurableBoolean {
+    ), ConfigureBoolean {
 
         @JvmStatic
         public fun asSetting(enable: Boolean): TorSetting = buildContract(enable)
@@ -4564,7 +4592,7 @@ public abstract class TorOption: Comparable<TorOption>, CharSequence {
         attributes = emptySet(),
         isCmdLineArg = true,
         isUnique = true,
-    ), ConfigurableBoolean {
+    ), ConfigureBoolean {
 
         @JvmStatic
         public fun asSetting(enable: Boolean): TorSetting = buildContract(enable)
@@ -5034,13 +5062,19 @@ public abstract class TorOption: Comparable<TorOption>, CharSequence {
         internal const val AUTO: String = "auto"
 
         @JvmSynthetic
+        @Throws(UnsupportedOperationException::class)
         internal fun TorOption.buildableInternal(): TorSetting.BuilderScope? = buildable()
     }
 
     /**
      * Factory function for a [TorOption] that, when implemented along
-     * with implementation of the [ConfigurableBuildable] interface, makes the
-     * [TorOption] available for use with [TorConfig2.BuilderScope.configure].
+     * with implementation of the [ConfigureBuildable] interface, makes the
+     * [TorOption] available for use with [TorConfig2.BuilderScope.configure]
+     * and [TorConfig2.BuilderScope.tryConfigure]
+     *
+     * @throws [UnsupportedOperationException] if the option implementing has
+     *   platform specific requirements that are not met. (e.g. [TransPort])
      * */
+    @Throws(UnsupportedOperationException::class)
     protected open fun buildable(): TorSetting.BuilderScope? = null
 }

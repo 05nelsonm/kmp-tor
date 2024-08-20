@@ -59,7 +59,7 @@ class TorOptionJvmUnitTest {
         val contracts = TorOption.entries.filterIsInstance<ConfigurableContract<*>>()
 
         // Force update expected test value when something is added.
-        assertEquals(138, contracts.size)
+        assertEquals(139, contracts.size)
 
         contracts.forEach { instance ->
             val asSetting = instance::class.declaredFunctions.filter { it.name == "asSetting" }
