@@ -116,6 +116,9 @@ public class TorSetting private constructor(
              * Creates a [LineItem] for the [TorOption] and provided
              * [argument] and [optionals].
              *
+             * **NOTE:** This is currently an experimental API.
+             * It may be moved to `internal`. Use at your own risk!
+             *
              * @throws [IllegalArgumentException] when:
              *  - [argument] is blank.
              *  - [argument] is multiple lines.
@@ -148,6 +151,9 @@ public class TorSetting private constructor(
             /**
              * Creates a [LineItem] for the [TorOption] and provided
              * [argument] and [optionals].
+             *
+             * **NOTE:** This is currently an experimental API.
+             * It may be moved to `internal`. Use at your own risk!
              *
              * @return [LineItem], or `null` when:
              *  - [argument] is blank.
@@ -296,6 +302,9 @@ public class TorSetting private constructor(
 
         /**
          * Creates the [TorSetting] for a single [LineItem].
+         *
+         * **NOTE:** This is currently an experimental API.
+         * It may be moved to `internal`. Use at your own risk!
          * */
         @JvmStatic
         @JvmOverloads
@@ -307,6 +316,9 @@ public class TorSetting private constructor(
 
         /**
          * Creates the [TorSetting] for multiple [LineItem].
+         *
+         * **NOTE:** This is currently an experimental API.
+         * It may be moved to `internal`. Use at your own risk!
          *
          * @throws [IllegalArgumentException] when [LineItem] are empty.
          * */
@@ -321,12 +333,16 @@ public class TorSetting private constructor(
             val items = toImmutableSet()
 
             require(items.isNotEmpty()) { "items cannot be empty" }
+            // TODO: Restrict grouping behavior...
 
             return TorSetting(items, extras.toImmutableMap())
         }
 
         /**
          * Creates the [TorSetting] for multiple [LineItem].
+         *
+         * **NOTE:** This is currently an experimental API.
+         * It may be moved to `internal`. Use at your own risk!
          *
          * @return [TorSetting] or `null` if items are empty.
          * */
