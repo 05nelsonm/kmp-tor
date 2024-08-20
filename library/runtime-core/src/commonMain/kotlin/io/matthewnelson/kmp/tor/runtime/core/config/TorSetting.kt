@@ -177,14 +177,21 @@ public class TorSetting private constructor(
          * an [argument] starting with `unix:`.
          * */
         @JvmField
-        public val isUnixSocket: Boolean =
-            option.attributes.contains(TorOption.Attribute.UNIX_SOCKET)
-            && if (option is TorOption.HiddenServicePort) {
+        public val isUnixSocket: Boolean = run {
+            if (!option.attributes.contains(TorOption.Attribute.UNIX_SOCKET)) {
+                return@run false
+            }
+            if (option is TorOption.ControlSocket) {
+                return@run true
+            }
+
+            if (option is TorOption.HiddenServicePort) {
                 // Check target, not virtual port
                 argument.substringAfter(' ')
             } else {
                 argument
             }.startsWith("unix:")
+        }
 
         /**
          * If this [LineItem] is a [TorOption] with the attribute
