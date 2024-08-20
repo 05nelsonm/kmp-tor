@@ -24,6 +24,7 @@ import io.matthewnelson.kmp.tor.runtime.core.address.Port
 import io.matthewnelson.kmp.tor.runtime.core.apply
 import io.matthewnelson.kmp.tor.runtime.core.config.TorOption
 import io.matthewnelson.kmp.tor.runtime.core.config.TorSetting
+import io.matthewnelson.kmp.tor.runtime.core.internal.configure
 import io.matthewnelson.kmp.tor.runtime.core.internal.toUnixSocketPath
 import io.matthewnelson.kmp.tor.runtime.core.util.isAvailableAsync
 import kotlin.jvm.JvmField
@@ -35,7 +36,7 @@ import kotlin.jvm.JvmSynthetic
  * [TorOption.Attribute.PORT].
  * */
 @KmpTorDsl
-public open class BuilderScopePort: TorSetting.BuilderScope {
+public abstract class BuilderScopePort: TorSetting.BuilderScope {
 
     private constructor(option: TorOption): super(option, INIT) {
         // Always instantiate with `true` added.
@@ -516,30 +517,13 @@ public open class BuilderScopePort: TorSetting.BuilderScope {
             ) {
                 val b = FlagsBuilderIsolation().apply(block)
 
-                b.IsolateClientAddr?.let {
-                    val flag = "IsolateClientAddr"
-                    if (it) flags.add(flag) else flags.remove(flag)
-                }
-                b.IsolateSOCKSAuth?.let {
-                    val flag = "IsolateSOCKSAuth"
-                    if (it) flags.add(flag) else flags.remove(flag)
-                }
-                b.IsolateClientProtocol?.let {
-                    val flag = "IsolateClientProtocol"
-                    if (it) flags.add(flag) else flags.remove(flag)
-                }
-                b.IsolateDestPort?.let {
-                    val flag = "IsolateDestPort"
-                    if (it) flags.add(flag) else flags.remove(flag)
-                }
-                b.IsolateDestAddr?.let {
-                    val flag = "IsolateDestAddr"
-                    if (it) flags.add(flag) else flags.remove(flag)
-                }
-                b.KeepAliveIsolateSOCKSAuth?.let {
-                    val flag = "KeepAliveIsolateSOCKSAuth"
-                    if (it) flags.add(flag) else flags.remove(flag)
-                }
+                b.IsolateClientAddr.configure(flags, "IsolateClientAddr")
+                b.IsolateSOCKSAuth.configure(flags, "IsolateSOCKSAuth")
+                b.IsolateClientProtocol.configure(flags, "IsolateClientProtocol")
+                b.IsolateDestPort.configure(flags, "IsolateDestPort")
+                b.IsolateDestAddr.configure(flags, "IsolateDestAddr")
+                b.KeepAliveIsolateSOCKSAuth.configure(flags, "KeepAliveIsolateSOCKSAuth")
+
                 b.sessionGroupId?.let { id ->
                     val flag = "SessionGroup"
                     // always remove
@@ -619,62 +603,20 @@ public open class BuilderScopePort: TorSetting.BuilderScope {
             ) {
                 val b = FlagsBuilderSocks().apply(block)
 
-                b.NoIPv4Traffic?.let {
-                    val flag = "NoIPv4Traffic"
-                    if (it) flags.add(flag) else flags.remove(flag)
-                }
-                b.IPv6Traffic?.let {
-                    val flag = "IPv6Traffic"
-                    if (it) flags.add(flag) else flags.remove(flag)
-                }
-                b.PreferIPv6?.let {
-                    val flag = "PreferIPv6"
-                    if (it) flags.add(flag) else flags.remove(flag)
-                }
-                b.NoDNSRequest?.let {
-                    val flag = "NoDNSRequest"
-                    if (it) flags.add(flag) else flags.remove(flag)
-                }
-                b.NoOnionTraffic?.let {
-                    val flag = "NoOnionTraffic"
-                    if (it) flags.add(flag) else flags.remove(flag)
-                }
-                b.OnionTrafficOnly?.let {
-                    val flag = "OnionTrafficOnly"
-                    if (it) flags.add(flag) else flags.remove(flag)
-                }
-                b.CacheIPv4DNS?.let {
-                    val flag = "CacheIPv4DNS"
-                    if (it) flags.add(flag) else flags.remove(flag)
-                }
-                b.CacheIPv6DNS?.let {
-                    val flag = "CacheIPv6DNS"
-                    if (it) flags.add(flag) else flags.remove(flag)
-                }
-                b.CacheDNS?.let {
-                    val flag = "CacheDNS"
-                    if (it) flags.add(flag) else flags.remove(flag)
-                }
-                b.UseIPv4Cache?.let {
-                    val flag = "UseIPv4Cache"
-                    if (it) flags.add(flag) else flags.remove(flag)
-                }
-                b.UseIPv6Cache?.let {
-                    val flag = "UseIPv6Cache"
-                    if (it) flags.add(flag) else flags.remove(flag)
-                }
-                b.UseDNSCache?.let {
-                    val flag = "UseDNSCache"
-                    if (it) flags.add(flag) else flags.remove(flag)
-                }
-                b.PreferIPv6Automap?.let {
-                    val flag = "PreferIPv6Automap"
-                    if (it) flags.add(flag) else flags.remove(flag)
-                }
-                b.PreferSOCKSNoAuth?.let {
-                    val flag = "PreferSOCKSNoAuth"
-                    if (it) flags.add(flag) else flags.remove(flag)
-                }
+                b.NoIPv4Traffic.configure(flags, "NoIPv4Traffic")
+                b.IPv6Traffic.configure(flags, "IPv6Traffic")
+                b.PreferIPv6.configure(flags, "PreferIPv6")
+                b.NoDNSRequest.configure(flags, "NoDNSRequest")
+                b.NoOnionTraffic.configure(flags, "NoOnionTraffic")
+                b.OnionTrafficOnly.configure(flags, "OnionTrafficOnly")
+                b.CacheIPv4DNS.configure(flags, "CacheIPv4DNS")
+                b.CacheIPv6DNS.configure(flags, "CacheIPv6DNS")
+                b.CacheDNS.configure(flags, "CacheDNS")
+                b.UseIPv4Cache.configure(flags, "UseIPv4Cache")
+                b.UseIPv6Cache.configure(flags, "UseIPv6Cache")
+                b.UseDNSCache.configure(flags, "UseDNSCache")
+                b.PreferIPv6Automap.configure(flags, "PreferIPv6Automap")
+                b.PreferSOCKSNoAuth.configure(flags, "PreferSOCKSNoAuth")
             }
         }
     }
@@ -748,20 +690,11 @@ public open class BuilderScopePort: TorSetting.BuilderScope {
             ) {
                 val b = FlagsBuilderUnix().apply(block)
 
-                b.GroupWritable?.let {
-                    val flag = "GroupWritable"
-                    if (it) flags.add(flag) else flags.remove(flag)
-                }
-                b.WorldWritable?.let {
-                    val flag = "WorldWritable"
-                    if (it) flags.add(flag) else flags.remove(flag)
-                }
+                b.GroupWritable.configure(flags, "GroupWritable")
+                b.WorldWritable.configure(flags, "WorldWritable")
 
                 if (!isControl) return
-                b.RelaxDirModeCheck?.let {
-                    val flag = "RelaxDirModeCheck"
-                    if (it) flags.add(flag) else flags.remove(flag)
-                }
+                b.RelaxDirModeCheck.configure(flags, "RelaxDirModeCheck")
             }
         }
     }

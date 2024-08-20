@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Matthew Nelson
+ * Copyright (c) 2024 Matthew Nelson
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,18 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-@file:Suppress("KotlinRedundantDiagnosticSuppress")
+package io.matthewnelson.kmp.tor.runtime.core.config.builder
 
-package io.matthewnelson.kmp.tor.runtime.core.internal
+import io.matthewnelson.kmp.process.Process
+import kotlin.test.Test
+import kotlin.test.assertEquals
 
-@Suppress("NOTHING_TO_INLINE")
-internal inline val Boolean.byte: Byte get() = if (this) 1 else 0
+class BuilderScopeOwningCtrlProcessUnitTest {
 
-@Suppress("NOTHING_TO_INLINE")
-internal inline fun Boolean?.configure(
-    flags: LinkedHashSet<String>,
-    name: String,
-) {
-    val condition = this ?: return
-    if (condition) flags.add(name) else flags.remove(name)
+    @Test
+    fun givenNoConfiguration_whenInitialize_thenDefaultsToCurrentPID() {
+        val actual = BuilderScopeOwningCtrlProcess.get().build().items.first().argument
+        assertEquals(Process.Current.pid().toString(), actual)
+    }
 }

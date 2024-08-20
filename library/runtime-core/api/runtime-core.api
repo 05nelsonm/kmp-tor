@@ -6373,7 +6373,7 @@ public final class io/matthewnelson/kmp/tor/runtime/core/config/builder/BuilderS
 	public final fun processId (I)Lio/matthewnelson/kmp/tor/runtime/core/config/builder/BuilderScopeOwningCtrlProcess;
 }
 
-public class io/matthewnelson/kmp/tor/runtime/core/config/builder/BuilderScopePort : io/matthewnelson/kmp/tor/runtime/core/config/TorSetting$BuilderScope {
+public abstract class io/matthewnelson/kmp/tor/runtime/core/config/builder/BuilderScopePort : io/matthewnelson/kmp/tor/runtime/core/config/TorSetting$BuilderScope {
 	public static final field Companion Lio/matthewnelson/kmp/tor/runtime/core/config/builder/BuilderScopePort$Companion;
 	public static final field EXTRA_REASSIGNABLE Ljava/lang/String;
 	public synthetic fun <init> (Lio/matthewnelson/kmp/tor/runtime/core/config/TorOption;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
