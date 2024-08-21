@@ -3501,6 +3501,58 @@ public abstract interface class io/matthewnelson/kmp/tor/runtime/core/config/Con
 public abstract interface class io/matthewnelson/kmp/tor/runtime/core/config/ConfigureFile : io/matthewnelson/kmp/tor/runtime/core/config/ConfigurableContract {
 }
 
+public abstract interface class io/matthewnelson/kmp/tor/runtime/core/config/ConfigureInterval : io/matthewnelson/kmp/tor/runtime/core/config/ConfigurableContract {
+}
+
+public abstract interface class io/matthewnelson/kmp/tor/runtime/core/config/ConfigureIntervalMsec : io/matthewnelson/kmp/tor/runtime/core/config/ConfigurableContract {
+}
+
+public abstract class io/matthewnelson/kmp/tor/runtime/core/config/IntervalUnit {
+	public final fun of (I)Ljava/lang/String;
+}
+
+public final class io/matthewnelson/kmp/tor/runtime/core/config/IntervalUnit$DAYS : io/matthewnelson/kmp/tor/runtime/core/config/IntervalUnit {
+	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/core/config/IntervalUnit$DAYS;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/matthewnelson/kmp/tor/runtime/core/config/IntervalUnit$HOURS : io/matthewnelson/kmp/tor/runtime/core/config/IntervalUnit {
+	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/core/config/IntervalUnit$HOURS;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/matthewnelson/kmp/tor/runtime/core/config/IntervalUnit$MINUTES : io/matthewnelson/kmp/tor/runtime/core/config/IntervalUnit {
+	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/core/config/IntervalUnit$MINUTES;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/matthewnelson/kmp/tor/runtime/core/config/IntervalUnit$MONTHS : io/matthewnelson/kmp/tor/runtime/core/config/IntervalUnit {
+	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/core/config/IntervalUnit$MONTHS;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/matthewnelson/kmp/tor/runtime/core/config/IntervalUnit$SECONDS : io/matthewnelson/kmp/tor/runtime/core/config/IntervalUnit {
+	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/core/config/IntervalUnit$SECONDS;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/matthewnelson/kmp/tor/runtime/core/config/IntervalUnit$WEEKS : io/matthewnelson/kmp/tor/runtime/core/config/IntervalUnit {
+	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/core/config/IntervalUnit$WEEKS;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
 public final class io/matthewnelson/kmp/tor/runtime/core/config/TorConfig2 {
 	public static final field Companion Lio/matthewnelson/kmp/tor/runtime/core/config/TorConfig2$Companion;
 	public final field settings Ljava/util/Set;
@@ -3514,6 +3566,8 @@ public abstract class io/matthewnelson/kmp/tor/runtime/core/config/TorConfig2$Bu
 	public final fun configure (Lio/matthewnelson/kmp/tor/runtime/core/config/ConfigureBuildable;Lio/matthewnelson/kmp/tor/runtime/core/ThisBlock;)Lio/matthewnelson/kmp/tor/runtime/core/config/TorConfig2$BuilderScope;
 	public final fun configure (Lio/matthewnelson/kmp/tor/runtime/core/config/ConfigureDirectory;Ljava/io/File;)Lio/matthewnelson/kmp/tor/runtime/core/config/TorConfig2$BuilderScope;
 	public final fun configure (Lio/matthewnelson/kmp/tor/runtime/core/config/ConfigureFile;Ljava/io/File;)Lio/matthewnelson/kmp/tor/runtime/core/config/TorConfig2$BuilderScope;
+	public final fun configure (Lio/matthewnelson/kmp/tor/runtime/core/config/ConfigureInterval;ILio/matthewnelson/kmp/tor/runtime/core/config/IntervalUnit;)Lio/matthewnelson/kmp/tor/runtime/core/config/TorConfig2$BuilderScope;
+	public final fun configure (Lio/matthewnelson/kmp/tor/runtime/core/config/ConfigureIntervalMsec;I)Lio/matthewnelson/kmp/tor/runtime/core/config/TorConfig2$BuilderScope;
 	public abstract fun put (Lio/matthewnelson/kmp/tor/runtime/core/config/TorSetting;)Lio/matthewnelson/kmp/tor/runtime/core/config/TorConfig2$BuilderScope;
 	public final fun putAll (Ljava/util/Collection;)Lio/matthewnelson/kmp/tor/runtime/core/config/TorConfig2$BuilderScope;
 	public final fun tryConfigure (Lio/matthewnelson/kmp/tor/runtime/core/config/ConfigureBuildableTry;Lio/matthewnelson/kmp/tor/runtime/core/ThisBlock;)Lio/matthewnelson/kmp/tor/runtime/core/config/TorConfig2$BuilderScope;
@@ -3981,8 +4035,9 @@ public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$CellSt
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$CircuitBuildTimeout : io/matthewnelson/kmp/tor/runtime/core/config/TorOption {
+public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$CircuitBuildTimeout : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigureInterval {
 	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/core/config/TorOption$CircuitBuildTimeout;
+	public static final fun asSetting (ILio/matthewnelson/kmp/tor/runtime/core/config/IntervalUnit;)Lio/matthewnelson/kmp/tor/runtime/core/config/TorSetting;
 	public fun equals (Ljava/lang/Object;)Z
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
@@ -4003,15 +4058,17 @@ public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$Circui
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$CircuitStreamTimeout : io/matthewnelson/kmp/tor/runtime/core/config/TorOption {
+public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$CircuitStreamTimeout : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigureInterval {
 	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/core/config/TorOption$CircuitStreamTimeout;
+	public static final fun asSetting (ILio/matthewnelson/kmp/tor/runtime/core/config/IntervalUnit;)Lio/matthewnelson/kmp/tor/runtime/core/config/TorSetting;
 	public fun equals (Ljava/lang/Object;)Z
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$CircuitsAvailableTimeout : io/matthewnelson/kmp/tor/runtime/core/config/TorOption {
+public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$CircuitsAvailableTimeout : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigureInterval {
 	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/core/config/TorOption$CircuitsAvailableTimeout;
+	public static final fun asSetting (ILio/matthewnelson/kmp/tor/runtime/core/config/IntervalUnit;)Lio/matthewnelson/kmp/tor/runtime/core/config/TorSetting;
 	public fun equals (Ljava/lang/Object;)Z
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
@@ -4487,8 +4544,9 @@ public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$Dorman
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$DormantClientTimeout : io/matthewnelson/kmp/tor/runtime/core/config/TorOption {
+public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$DormantClientTimeout : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigureInterval {
 	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/core/config/TorOption$DormantClientTimeout;
+	public static final fun asSetting (ILio/matthewnelson/kmp/tor/runtime/core/config/IntervalUnit;)Lio/matthewnelson/kmp/tor/runtime/core/config/TorSetting;
 	public fun equals (Ljava/lang/Object;)Z
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
@@ -4736,8 +4794,9 @@ public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$GeoIPv
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$GuardLifetime : io/matthewnelson/kmp/tor/runtime/core/config/TorOption {
+public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$GuardLifetime : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigureInterval {
 	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/core/config/TorOption$GuardLifetime;
+	public static final fun asSetting (ILio/matthewnelson/kmp/tor/runtime/core/config/IntervalUnit;)Lio/matthewnelson/kmp/tor/runtime/core/config/TorSetting;
 	public fun equals (Ljava/lang/Object;)Z
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
@@ -4803,8 +4862,9 @@ public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$Hashed
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$HeartbeatPeriod : io/matthewnelson/kmp/tor/runtime/core/config/TorOption {
+public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$HeartbeatPeriod : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigureInterval {
 	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/core/config/TorOption$HeartbeatPeriod;
+	public static final fun asSetting (ILio/matthewnelson/kmp/tor/runtime/core/config/IntervalUnit;)Lio/matthewnelson/kmp/tor/runtime/core/config/TorSetting;
 	public fun equals (Ljava/lang/Object;)Z
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
@@ -4954,8 +5014,9 @@ public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$IPv6Ex
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$KISTSchedRunInterval : io/matthewnelson/kmp/tor/runtime/core/config/TorOption {
+public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$KISTSchedRunInterval : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigureIntervalMsec {
 	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/core/config/TorOption$KISTSchedRunInterval;
+	public static final fun asSetting (I)Lio/matthewnelson/kmp/tor/runtime/core/config/TorSetting;
 	public fun equals (Ljava/lang/Object;)Z
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
@@ -4977,8 +5038,9 @@ public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$KeepBi
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$KeepalivePeriod : io/matthewnelson/kmp/tor/runtime/core/config/TorOption {
+public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$KeepalivePeriod : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigureInterval {
 	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/core/config/TorOption$KeepalivePeriod;
+	public static final fun asSetting (ILio/matthewnelson/kmp/tor/runtime/core/config/IntervalUnit;)Lio/matthewnelson/kmp/tor/runtime/core/config/TorSetting;
 	public fun equals (Ljava/lang/Object;)Z
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
@@ -5024,8 +5086,9 @@ public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$LogMes
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$LogTimeGranularity : io/matthewnelson/kmp/tor/runtime/core/config/TorOption {
+public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$LogTimeGranularity : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigureIntervalMsec {
 	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/core/config/TorOption$LogTimeGranularity;
+	public static final fun asSetting (I)Lio/matthewnelson/kmp/tor/runtime/core/config/TorSetting;
 	public fun equals (Ljava/lang/Object;)Z
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
@@ -5060,8 +5123,9 @@ public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$MaxAdv
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$MaxCircuitDirtiness : io/matthewnelson/kmp/tor/runtime/core/config/TorOption {
+public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$MaxCircuitDirtiness : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigureInterval {
 	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/core/config/TorOption$MaxCircuitDirtiness;
+	public static final fun asSetting (ILio/matthewnelson/kmp/tor/runtime/core/config/IntervalUnit;)Lio/matthewnelson/kmp/tor/runtime/core/config/TorSetting;
 	public fun equals (Ljava/lang/Object;)Z
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
@@ -5074,8 +5138,9 @@ public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$MaxCli
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$MaxConsensusAgeForDiffs : io/matthewnelson/kmp/tor/runtime/core/config/TorOption {
+public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$MaxConsensusAgeForDiffs : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigureInterval {
 	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/core/config/TorOption$MaxConsensusAgeForDiffs;
+	public static final fun asSetting (ILio/matthewnelson/kmp/tor/runtime/core/config/IntervalUnit;)Lio/matthewnelson/kmp/tor/runtime/core/config/TorSetting;
 	public fun equals (Ljava/lang/Object;)Z
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
@@ -5088,8 +5153,9 @@ public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$MaxMem
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$MaxOnionQueueDelay : io/matthewnelson/kmp/tor/runtime/core/config/TorOption {
+public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$MaxOnionQueueDelay : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigureIntervalMsec {
 	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/core/config/TorOption$MaxOnionQueueDelay;
+	public static final fun asSetting (I)Lio/matthewnelson/kmp/tor/runtime/core/config/TorSetting;
 	public fun equals (Ljava/lang/Object;)Z
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
@@ -5151,8 +5217,9 @@ public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$NATDPo
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$NewCircuitPeriod : io/matthewnelson/kmp/tor/runtime/core/config/TorOption {
+public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$NewCircuitPeriod : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigureInterval {
 	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/core/config/TorOption$NewCircuitPeriod;
+	public static final fun asSetting (ILio/matthewnelson/kmp/tor/runtime/core/config/IntervalUnit;)Lio/matthewnelson/kmp/tor/runtime/core/config/TorSetting;
 	public fun equals (Ljava/lang/Object;)Z
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
@@ -5477,8 +5544,9 @@ public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$RelayB
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$RephistTrackTime : io/matthewnelson/kmp/tor/runtime/core/config/TorOption {
+public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$RephistTrackTime : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigureInterval {
 	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/core/config/TorOption$RephistTrackTime;
+	public static final fun asSetting (ILio/matthewnelson/kmp/tor/runtime/core/config/IntervalUnit;)Lio/matthewnelson/kmp/tor/runtime/core/config/TorSetting;
 	public fun equals (Ljava/lang/Object;)Z
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
@@ -5492,8 +5560,9 @@ public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$RunAsD
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$SSLKeyLifetime : io/matthewnelson/kmp/tor/runtime/core/config/TorOption {
+public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$SSLKeyLifetime : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigureInterval {
 	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/core/config/TorOption$SSLKeyLifetime;
+	public static final fun asSetting (ILio/matthewnelson/kmp/tor/runtime/core/config/IntervalUnit;)Lio/matthewnelson/kmp/tor/runtime/core/config/TorSetting;
 	public fun equals (Ljava/lang/Object;)Z
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
@@ -5605,15 +5674,17 @@ public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$Server
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$ShutdownWaitLength : io/matthewnelson/kmp/tor/runtime/core/config/TorOption {
+public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$ShutdownWaitLength : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigureInterval {
 	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/core/config/TorOption$ShutdownWaitLength;
+	public static final fun asSetting (ILio/matthewnelson/kmp/tor/runtime/core/config/IntervalUnit;)Lio/matthewnelson/kmp/tor/runtime/core/config/TorSetting;
 	public fun equals (Ljava/lang/Object;)Z
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$SigningKeyLifetime : io/matthewnelson/kmp/tor/runtime/core/config/TorOption {
+public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$SigningKeyLifetime : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigureInterval {
 	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/core/config/TorOption$SigningKeyLifetime;
+	public static final fun asSetting (ILio/matthewnelson/kmp/tor/runtime/core/config/IntervalUnit;)Lio/matthewnelson/kmp/tor/runtime/core/config/TorSetting;
 	public fun equals (Ljava/lang/Object;)Z
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
@@ -5663,8 +5734,9 @@ public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$SocksP
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$SocksTimeout : io/matthewnelson/kmp/tor/runtime/core/config/TorOption {
+public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$SocksTimeout : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigureInterval {
 	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/core/config/TorOption$SocksTimeout;
+	public static final fun asSetting (ILio/matthewnelson/kmp/tor/runtime/core/config/IntervalUnit;)Lio/matthewnelson/kmp/tor/runtime/core/config/TorSetting;
 	public fun equals (Ljava/lang/Object;)Z
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
@@ -5912,8 +5984,9 @@ public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$Testin
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$TokenBucketRefillInterval : io/matthewnelson/kmp/tor/runtime/core/config/TorOption {
+public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$TokenBucketRefillInterval : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigureIntervalMsec {
 	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/core/config/TorOption$TokenBucketRefillInterval;
+	public static final fun asSetting (I)Lio/matthewnelson/kmp/tor/runtime/core/config/TorSetting;
 	public fun equals (Ljava/lang/Object;)Z
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
@@ -5926,8 +5999,9 @@ public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$TrackH
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$TrackHostExitsExpire : io/matthewnelson/kmp/tor/runtime/core/config/TorOption {
+public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$TrackHostExitsExpire : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigureInterval {
 	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/core/config/TorOption$TrackHostExitsExpire;
+	public static final fun asSetting (ILio/matthewnelson/kmp/tor/runtime/core/config/IntervalUnit;)Lio/matthewnelson/kmp/tor/runtime/core/config/TorSetting;
 	public fun equals (Ljava/lang/Object;)Z
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
@@ -6020,8 +6094,9 @@ public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$User :
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$V3AuthDistDelay : io/matthewnelson/kmp/tor/runtime/core/config/TorOption {
+public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$V3AuthDistDelay : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigureInterval {
 	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/core/config/TorOption$V3AuthDistDelay;
+	public static final fun asSetting (ILio/matthewnelson/kmp/tor/runtime/core/config/IntervalUnit;)Lio/matthewnelson/kmp/tor/runtime/core/config/TorSetting;
 	public fun equals (Ljava/lang/Object;)Z
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
@@ -6042,15 +6117,17 @@ public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$V3Auth
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$V3AuthVoteDelay : io/matthewnelson/kmp/tor/runtime/core/config/TorOption {
+public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$V3AuthVoteDelay : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigureInterval {
 	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/core/config/TorOption$V3AuthVoteDelay;
+	public static final fun asSetting (ILio/matthewnelson/kmp/tor/runtime/core/config/IntervalUnit;)Lio/matthewnelson/kmp/tor/runtime/core/config/TorSetting;
 	public fun equals (Ljava/lang/Object;)Z
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$V3AuthVotingInterval : io/matthewnelson/kmp/tor/runtime/core/config/TorOption {
+public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$V3AuthVotingInterval : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigureInterval {
 	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/core/config/TorOption$V3AuthVotingInterval;
+	public static final fun asSetting (ILio/matthewnelson/kmp/tor/runtime/core/config/IntervalUnit;)Lio/matthewnelson/kmp/tor/runtime/core/config/TorSetting;
 	public fun equals (Ljava/lang/Object;)Z
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;

@@ -716,7 +716,14 @@ public abstract class TorOption: Comparable<TorOption>, CharSequence {
         attributes = emptySet(),
         isCmdLineArg = false,
         isUnique = true,
-    )
+    ), ConfigureInterval {
+
+        @JvmStatic
+        public fun asSetting(
+            num: Int,
+            interval: IntervalUnit,
+        ): TorSetting = buildContract(num, interval)
+    }
 
     /**
      * [tor-man#KeepBindCapabilities](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#KeepBindCapabilities)
@@ -770,7 +777,13 @@ public abstract class TorOption: Comparable<TorOption>, CharSequence {
         attributes = immutableSetOf(Attribute.LOGGING),
         isCmdLineArg = false,
         isUnique = true,
-    )
+    ), ConfigureIntervalMsec {
+
+        @JvmStatic
+        public fun asSetting(
+            milliseconds: Int,
+        ): TorSetting = buildContract(milliseconds)
+    }
 
     /**
      * [tor-man#MaxAdvertisedBandwidth](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#MaxAdvertisedBandwidth)
@@ -949,7 +962,14 @@ public abstract class TorOption: Comparable<TorOption>, CharSequence {
         attributes = emptySet(),
         isCmdLineArg = false,
         isUnique = true,
-    )
+    ), ConfigureInterval {
+
+        @JvmStatic
+        public fun asSetting(
+            num: Int,
+            interval: IntervalUnit,
+        ): TorSetting = buildContract(num, interval)
+    }
 
     /**
      * [tor-man#RunAsDaemon](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#RunAsDaemon)
@@ -1003,11 +1023,17 @@ public abstract class TorOption: Comparable<TorOption>, CharSequence {
      * [tor-man#KISTSchedRunInterval](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#KISTSchedRunInterval)
      * */
     public data object KISTSchedRunInterval: TorOption(
-        default = 0,
+        default = 0.milliseconds.inWholeMilliseconds,
         attributes = emptySet(),
         isCmdLineArg = false,
         isUnique = true,
-    )
+    ), ConfigureIntervalMsec {
+
+        @JvmStatic
+        public fun asSetting(
+            milliseconds: Int,
+        ): TorSetting = buildContract(milliseconds)
+    }
 
     /**
      * [tor-man#KISTSockBufSizeFactor](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#KISTSockBufSizeFactor)
@@ -1070,7 +1096,7 @@ public abstract class TorOption: Comparable<TorOption>, CharSequence {
     ), ConfigureBuildableTry<BuilderScopeSyslogIdTag> {
 
         /**
-         * See [BuilderScopeSyslogIdTag]
+         * See [BuilderScopeSyslogIdTag].
          *
          * @throws [IllegalArgumentException] if misconfigured.
          *   See [BuilderScopeSyslogIdTag].
@@ -1517,7 +1543,14 @@ public abstract class TorOption: Comparable<TorOption>, CharSequence {
         attributes = emptySet(),
         isCmdLineArg = false,
         isUnique = true,
-    )
+    ), ConfigureInterval {
+
+        @JvmStatic
+        public fun asSetting(
+            num: Int,
+            interval: IntervalUnit,
+        ): TorSetting = buildContract(num, interval)
+    }
 
     /**
      * [tor-man#MaxClientCircuitsPending](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#MaxClientCircuitsPending)
@@ -1546,11 +1579,18 @@ public abstract class TorOption: Comparable<TorOption>, CharSequence {
      * [tor-man#NewCircuitPeriod](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#NewCircuitPeriod)
      * */
     public data object NewCircuitPeriod: TorOption(
-        default = 30,
+        default = 30.seconds.inWholeSeconds,
         attributes = emptySet(),
         isCmdLineArg = false,
         isUnique = true,
-    )
+    ), ConfigureInterval {
+
+        @JvmStatic
+        public fun asSetting(
+            num: Int,
+            interval: IntervalUnit,
+        ): TorSetting = buildContract(num, interval)
+    }
 
     /**
      * [tor-man#PathBiasCircThreshold](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#PathBiasCircThreshold)
@@ -1771,7 +1811,13 @@ public abstract class TorOption: Comparable<TorOption>, CharSequence {
         attributes = emptySet(),
         isCmdLineArg = true,
         isUnique = true,
-    )
+    ), ConfigureIntervalMsec {
+
+        @JvmStatic
+        public fun asSetting(
+            milliseconds: Int,
+        ): TorSetting = buildContract(milliseconds)
+    }
 
     /**
      * [tor-man#TrackHostExits](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#TrackHostExits)
@@ -1791,13 +1837,19 @@ public abstract class TorOption: Comparable<TorOption>, CharSequence {
         attributes = emptySet(),
         isCmdLineArg = false,
         isUnique = true,
-    )
+    ), ConfigureInterval {
+
+        @JvmStatic
+        public fun asSetting(
+            num: Int,
+            interval: IntervalUnit,
+        ): TorSetting = buildContract(num, interval)
+    }
 
     /**
      * [tor-man#TransPort](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#TransPort)
      *
      * @see [__TransPort]
-     * @see [TorConfig2.BuilderScope.tryConfigure]
      * */
     public data object TransPort: TorOption(
         // Note: If modifying, update __TransPort
@@ -1811,7 +1863,7 @@ public abstract class TorOption: Comparable<TorOption>, CharSequence {
          * See [BuilderScopePort.Trans]
          *
          * @throws [UnsupportedOperationException] if host is not
-         *   unix-like (e.g. on Windows).
+         *   unix-like (e.g. Windows). See [BuilderScopePort.Trans]
          * */
         @JvmStatic
         public fun asSetting(
@@ -1897,11 +1949,18 @@ public abstract class TorOption: Comparable<TorOption>, CharSequence {
      * [tor-man#GuardLifetime](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#GuardLifetime)
      * */
     public data object GuardLifetime: TorOption(
-        default = 0,
+        default = 0.minutes.inWholeSeconds,
         attributes = emptySet(),
         isCmdLineArg = false,
         isUnique = true,
-    )
+    ), ConfigureInterval {
+
+        @JvmStatic
+        public fun asSetting(
+            num: Int,
+            interval: IntervalUnit,
+        ): TorSetting = buildContract(num, interval)
+    }
 
     /**
      * [tor-man#NumDirectoryGuards](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#NumDirectoryGuards)
@@ -2029,7 +2088,14 @@ public abstract class TorOption: Comparable<TorOption>, CharSequence {
         attributes = emptySet(),
         isCmdLineArg = false,
         isUnique = true,
-    )
+    ), ConfigureInterval {
+
+        @JvmStatic
+        public fun asSetting(
+            num: Int,
+            interval: IntervalUnit,
+        ): TorSetting = buildContract(num, interval)
+    }
 
     /**
      * [tor-man#LearnCircuitBuildTimeout](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#LearnCircuitBuildTimeout)
@@ -2053,17 +2119,31 @@ public abstract class TorOption: Comparable<TorOption>, CharSequence {
         attributes = emptySet(),
         isCmdLineArg = false,
         isUnique = true,
-    )
+    ), ConfigureInterval {
+
+        @JvmStatic
+        public fun asSetting(
+            num: Int,
+            interval: IntervalUnit,
+        ): TorSetting = buildContract(num, interval)
+    }
 
     /**
      * [tor-man#CircuitStreamTimeout](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#CircuitStreamTimeout)
      * */
     public data object CircuitStreamTimeout: TorOption(
-        default = 0,
+        default = 0.seconds.inWholeSeconds,
         attributes = emptySet(),
         isCmdLineArg = false,
         isUnique = true,
-    )
+    ), ConfigureInterval {
+
+        @JvmStatic
+        public fun asSetting(
+            num: Int,
+            interval: IntervalUnit,
+        ): TorSetting = buildContract(num, interval)
+    }
 
     /**
      * [tor-man#SocksTimeout](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#SocksTimeout)
@@ -2073,7 +2153,14 @@ public abstract class TorOption: Comparable<TorOption>, CharSequence {
         attributes = emptySet(),
         isCmdLineArg = false,
         isUnique = true,
-    )
+    ), ConfigureInterval {
+
+        @JvmStatic
+        public fun asSetting(
+            num: Int,
+            interval: IntervalUnit,
+        ): TorSetting = buildContract(num, interval)
+    }
 
     //////////////////////////
     // DORMANT MODE OPTIONS //
@@ -2101,8 +2188,13 @@ public abstract class TorOption: Comparable<TorOption>, CharSequence {
         attributes = emptySet(),
         isCmdLineArg = false,
         isUnique = true,
-    ) {
-        // TODO: IMPLEMENT
+    ), ConfigureInterval {
+
+        @JvmStatic
+        public fun asSetting(
+            num: Int,
+            interval: IntervalUnit,
+        ): TorSetting = buildContract(num, interval)
     }
 
     /**
@@ -2503,7 +2595,14 @@ public abstract class TorOption: Comparable<TorOption>, CharSequence {
         attributes = emptySet(),
         isCmdLineArg = false,
         isUnique = true,
-    )
+    ), ConfigureInterval {
+
+        @JvmStatic
+        public fun asSetting(
+            num: Int,
+            interval: IntervalUnit,
+        ): TorSetting = buildContract(num, interval)
+    }
 
     /**
      * [tor-man#IPv6Exit](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#IPv6Exit)
@@ -2583,7 +2682,13 @@ public abstract class TorOption: Comparable<TorOption>, CharSequence {
         attributes = emptySet(),
         isCmdLineArg = false,
         isUnique = true,
-    )
+    ), ConfigureIntervalMsec {
+
+        @JvmStatic
+        public fun asSetting(
+            milliseconds: Int,
+        ): TorSetting = buildContract(milliseconds)
+    }
 
     /**
      * [tor-man#MyFamily](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#MyFamily)
@@ -2816,7 +2921,14 @@ public abstract class TorOption: Comparable<TorOption>, CharSequence {
         attributes = emptySet(),
         isCmdLineArg = false,
         isUnique = true,
-    )
+    ), ConfigureInterval {
+
+        @JvmStatic
+        public fun asSetting(
+            num: Int,
+            interval: IntervalUnit,
+        ): TorSetting = buildContract(num, interval)
+    }
 
     /**
      * [tor-man#SigningKeyLifetime](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#SigningKeyLifetime)
@@ -2826,17 +2938,31 @@ public abstract class TorOption: Comparable<TorOption>, CharSequence {
         attributes = emptySet(),
         isCmdLineArg = false,
         isUnique = true,
-    )
+    ), ConfigureInterval {
+
+        @JvmStatic
+        public fun asSetting(
+            num: Int,
+            interval: IntervalUnit,
+        ): TorSetting = buildContract(num, interval)
+    }
 
     /**
      * [tor-man#SSLKeyLifetime](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#SSLKeyLifetime)
      * */
     public data object SSLKeyLifetime: TorOption(
-        default = 0,
+        default = 0.seconds.inWholeSeconds,
         attributes = emptySet(),
         isCmdLineArg = false,
         isUnique = true,
-    )
+    ), ConfigureInterval {
+
+        @JvmStatic
+        public fun asSetting(
+            num: Int,
+            interval: IntervalUnit,
+        ): TorSetting = buildContract(num, interval)
+    }
 
     ////////////////////////
     // STATISTICS OPTIONS //
@@ -3037,11 +3163,18 @@ public abstract class TorOption: Comparable<TorOption>, CharSequence {
      * [tor-man#MaxConsensusAgeForDiffs](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#MaxConsensusAgeForDiffs)
      * */
     public data object MaxConsensusAgeForDiffs: TorOption(
-        default = 0,
+        default = 0.seconds.inWholeSeconds,
         attributes = emptySet(),
         isCmdLineArg = false,
         isUnique = true,
-    )
+    ), ConfigureInterval {
+
+        @JvmStatic
+        public fun asSetting(
+            num: Int,
+            interval: IntervalUnit,
+        ): TorSetting = buildContract(num, interval)
+    }
 
     ////////////////////////////////////////////
     //  DENIAL OF SERVICE MITIGATION OPTIONS  //
@@ -3727,7 +3860,14 @@ public abstract class TorOption: Comparable<TorOption>, CharSequence {
         attributes = emptySet(),
         isCmdLineArg = false,
         isUnique = true,
-    )
+    ), ConfigureInterval {
+
+        @JvmStatic
+        public fun asSetting(
+            num: Int,
+            interval: IntervalUnit,
+        ): TorSetting = buildContract(num, interval)
+    }
 
     /**
      * [tor-man#V3AuthNIntervalsValid](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#V3AuthNIntervalsValid)
@@ -3761,7 +3901,14 @@ public abstract class TorOption: Comparable<TorOption>, CharSequence {
         attributes = emptySet(),
         isCmdLineArg = false,
         isUnique = true,
-    )
+    ), ConfigureInterval {
+
+        @JvmStatic
+        public fun asSetting(
+            num: Int,
+            interval: IntervalUnit,
+        ): TorSetting = buildContract(num, interval)
+    }
 
     /**
      * [tor-man#V3AuthVotingInterval](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#V3AuthVotingInterval)
@@ -3771,7 +3918,14 @@ public abstract class TorOption: Comparable<TorOption>, CharSequence {
         attributes = emptySet(),
         isCmdLineArg = false,
         isUnique = true,
-    )
+    ), ConfigureInterval {
+
+        @JvmStatic
+        public fun asSetting(
+            num: Int,
+            interval: IntervalUnit,
+        ): TorSetting = buildContract(num, interval)
+    }
 
     /**
      * [tor-man#V3BandwidthsFile](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#V3BandwidthsFile)
@@ -3820,7 +3974,6 @@ public abstract class TorOption: Comparable<TorOption>, CharSequence {
     /**
      * [tor-man#HiddenServiceDir](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#HiddenServiceDir)
      *
-     * @see [TorConfig2.BuilderScope.tryConfigure]
      * @see [HiddenServiceDir.asSetting]
      * */
     public data object HiddenServiceDir: TorOption(
@@ -3833,7 +3986,8 @@ public abstract class TorOption: Comparable<TorOption>, CharSequence {
         /**
          * See [BuilderScopeHS]
          *
-         * @throws [IllegalArgumentException] if misconfigured. See [BuilderScopeHS].
+         * @throws [IllegalArgumentException] if misconfigured.
+         *   See [BuilderScopeHS].
          * */
         @JvmStatic
         public fun asSetting(
@@ -4463,7 +4617,6 @@ public abstract class TorOption: Comparable<TorOption>, CharSequence {
      * [tor-man#Non-Persistent Options](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#non-persistent-options)
      *
      * @see [TransPort]
-     * @see [TorConfig2.BuilderScope.tryConfigure]
      * */
     public data object __TransPort: TorOption(
         // Note: If modifying, update TransPort
@@ -4477,7 +4630,7 @@ public abstract class TorOption: Comparable<TorOption>, CharSequence {
          * See [BuilderScopePort.Trans]
          *
          * @throws [UnsupportedOperationException] if host is not
-         *   unix-like (e.g. on Windows).
+         *   unix-like (e.g. Windows). See [BuilderScopePort.Trans]
          * */
         @JvmStatic
         public fun asSetting(
@@ -5101,11 +5254,11 @@ public abstract class TorOption: Comparable<TorOption>, CharSequence {
 
     /**
      * Factory function for a [TorOption] that, when implemented along
-     * with implementation of the [ConfigureBuildable] or [ConfigureBuildableTry]
-     * interfaces, makes the [TorOption] available for use with
+     * with the [ConfigureBuildable] or [ConfigureBuildableTry] interface,
+     * makes the [TorOption] available for factory-like functionality via
      * [TorConfig2.BuilderScope.configure] and [TorConfig2.BuilderScope.tryConfigure]
      *
-     * @throws [UnsupportedOperationException] if the option implementing has
+     * @throws [UnsupportedOperationException] if the implementation has
      *   platform specific requirements that are not met. (e.g. [TransPort])
      * */
     @Throws(UnsupportedOperationException::class)

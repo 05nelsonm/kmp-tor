@@ -256,9 +256,9 @@ public abstract class BuilderScopePort: TorSetting.BuilderScope {
      * A DSL builder scope for [TorOption.__TransPort] and
      * [TorOption.TransPort].
      *
-     * This builder is only available for unix-like hosts.
-     * [UnsupportedOperationException] may be thrown when
-     * attempting to instantiate.
+     * **NOTE:** This builder scope is **only** available for
+     * unix-like hosts. [UnsupportedOperationException] may
+     * be thrown when attempting to instantiate it.
      * */
     @KmpTorDsl
     public class Trans: BuilderScopePort {

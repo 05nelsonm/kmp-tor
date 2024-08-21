@@ -34,10 +34,10 @@ public class RealBuilderScopeTorConfig private constructor(): TorConfig2.Builder
     public override fun put(
         setting: TorSetting,
     ): TorConfig2.BuilderScope {
-        val option = setting.items.first().option
+        val root = setting.items.first()
 
-        val key = if (option.isUnique) {
-            option.hashCode()
+        val key = if (root.option.isUnique) {
+            root.option.hashCode()
         } else {
             setting.hashCode()
         }

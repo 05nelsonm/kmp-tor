@@ -88,7 +88,7 @@ public class TorConfig2 private constructor(settings: Set<TorSetting>) {
      *             // recover
      *         }
      *
-     *         put(myPreDefinedTorSetting)
+     *         put(somePreDefinedTorSetting)
      *     }
      *
      * e.g. (Java)
@@ -118,10 +118,11 @@ public class TorConfig2 private constructor(settings: Set<TorSetting>) {
      *             // recover
      *         }
      *
-     *         c.put(myPreDefinedTorSetting);
+     *         c.put(somePreDefinedTorSetting);
      *     });
      *
      * @see [Builder]
+     * @see [ConfigurableContract]
      * */
     @KmpTorDsl
     public abstract class BuilderScope
@@ -154,10 +155,6 @@ public class TorConfig2 private constructor(settings: Set<TorSetting>) {
          * contract type for [TorSetting.BuilderScope] of type [B], adding the
          * resultant [TorSetting] to [BuilderScope].
          *
-         * **NOTE:** This may throw exception. Usage of a `try/catch` block is
-         * likely needed. The [TorOption] should be inspected to see its `asSetting`
-         * requirements.
-         *
          * e.g.
          *
          *     TorConfig.Builder {
@@ -183,6 +180,10 @@ public class TorConfig2 private constructor(settings: Set<TorSetting>) {
          *
          * @throws [ClassCastException] when [ConfigureBuildableTry] is not
          *   an instance of [TorOption].
+         * @throws [IllegalArgumentException] if [B] was misconfigured when
+         *   build was called on [block] closure.
+         * @throws [UnsupportedOperationException] when the [TorOption] has
+         *   host and/or environment requirements that were not met.
          * */
         @KmpTorDsl
         public fun <B: TorSetting.BuilderScope> ConfigureBuildableTry<B>.tryConfigure(
@@ -244,7 +245,44 @@ public class TorConfig2 private constructor(settings: Set<TorSetting>) {
         ): BuilderScope = put(buildContract(file))
 
         /**
-         * Adds all the already configured [TorSetting] to [BuilderScope]
+         * Configures a [TorOption] which implements the [ConfigureInterval]
+         * contract type, adding the resultant [TorSetting] to [BuilderScope].
+         *
+         * e.g. (Disabling HeartbeatPeriod)
+         *
+         *     TorConfig.Builder {
+         *         TorOption.HeartbeatPeriod.configure(0, IntervalUnit.SECONDS)
+         *     }
+         *
+         * @throws [ClassCastException] when [ConfigureInterval] is not
+         *   an instance of [TorOption].
+         * */
+        @KmpTorDsl
+        public fun ConfigureInterval.configure(
+            num: Int,
+            interval: IntervalUnit,
+        ): BuilderScope = put(buildContract(num, interval))
+
+        /**
+         * Configures a [TorOption] which implements the [ConfigureIntervalMsec]
+         * contract type, adding the resultant [TorSetting] to [BuilderScope].
+         *
+         * e.g.
+         *
+         *     TorConfig.Builder {
+         *         TorOption.LogTimeGranularity.configure(milliseconds = 2_000)
+         *     }
+         *
+         * @throws [ClassCastException] when [ConfigureIntervalMsec] is not
+         *   an instance of [TorOption].
+         * */
+        @KmpTorDsl
+        public fun ConfigureIntervalMsec.configure(
+            milliseconds: Int,
+        ): BuilderScope = put(buildContract(milliseconds))
+
+        /**
+         * Add already configured [TorSetting] to [BuilderScope].
          * */
         @KmpTorDsl
         public fun putAll(
@@ -255,7 +293,7 @@ public class TorConfig2 private constructor(settings: Set<TorSetting>) {
         }
 
         /**
-         * Adds the already configured [TorSetting] to [BuilderScope]
+         * Add an already configured [TorSetting] to [BuilderScope].
          * */
         @KmpTorDsl
         public abstract fun put(

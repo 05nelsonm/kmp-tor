@@ -31,21 +31,23 @@ import kotlin.jvm.JvmSynthetic
 /**
  * Used as a contractual agreement between [TorConfig2.BuilderScope]
  * and [TorOption] such that factory-like functionality can be had
- * via [TorConfig2.BuilderScope.configure] (or alternatively the
- * [TorConfig2.BuilderScope.tryConfigure] call) for the implementing
- * [TorOption]. This is the "root" interface that all `Configurable*`
- * interface types extend.
+ * via function calls [TorConfig2.BuilderScope.configure] and
+ * [TorConfig2.BuilderScope.tryConfigure] for the [TorOption].
+ *
+ * This is the "root" interface that all `Configurable*` interface
+ * types extend. No [TorOption] implements this interface directly.
  *
  * All [TorOption] that implement a [ConfigurableContract] type
- * will have an accompanying static function `asSetting` to create
- * the [TorSetting] outside of the [TorConfig2.BuilderScope], if
- * desired.
+ * have an accompanying static function `asSetting` to create its
+ * [TorSetting], outside of the [TorConfig2.BuilderScope], if needed.
  *
  * @see [ConfigureBuildable]
  * @see [ConfigureBuildableTry]
  * @see [ConfigureBoolean]
  * @see [ConfigureDirectory]
  * @see [ConfigureFile]
+ * @see [ConfigureInterval]
+ * @see [ConfigureIntervalMsec]
  * */
 public interface ConfigurableContract
 // Inhibits TorOption from implementing
@@ -55,9 +57,104 @@ public interface ConfigurableContract
 /**
  * Denotes a [TorOption] as implementing the [ConfigurableContract]
  * which declares that [TorOption.buildable] is implemented and
- * able to produce [B] for [TorConfig2.BuilderScope.configure].
+ * able to produce [B] for a DSL builder scope.
+ *
+ * @see [TorConfig2.BuilderScope.configure]
  * */
 public interface ConfigureBuildable<B: TorSetting.BuilderScope>: ConfigurableContract<ConfigureBuildable<B>>
+
+/**
+ * Denotes a [TorOption] as implementing the [ConfigurableContract]
+ * which declares that [TorOption.buildable] is implemented and
+ * able to produce [B] for a DSL builder scope.
+ *
+ * This is distinctly different from [ConfigureBuildable] in
+ * that builder scope [B] has exceptional requirements, such as
+ * the [TorOption] not being available for the host/environment,
+ * or configuration requirements for [B] not met resulting in
+ * an [IllegalArgumentException] when build gets automatically
+ * called upon [ThisBlock] lambda closure.
+ *
+ * Unless *absolutely certain* that no errors will occur (e.g. you
+ * know for a fact that requirements for [B] will be met), a try/catch
+ * block **is** advised.
+ *
+ * Consult the documentation for the builder scope [B] regarding
+ * what its exceptional requirements are.
+ *
+ * @see [TorConfig2.BuilderScope.tryConfigure]
+ * */
+public interface ConfigureBuildableTry<B: TorSetting.BuilderScope>: ConfigurableContract<ConfigureBuildableTry<B>>
+
+/**
+ * Denotes a [TorOption] as implementing the [ConfigurableContract]
+ * which declares that the [TorOption] uses a boolean argument,
+ * available to be configured with `true` or `false` (which will
+ * resolve to `1` or `0`, respectively, for the [TorSetting] argument).
+ *
+ * @see [TorConfig2.BuilderScope.configure]
+ * */
+public interface ConfigureBoolean: ConfigurableContract<ConfigureBoolean>
+
+/**
+ * Denotes a [TorOption] as implementing the [ConfigurableContract]
+ * which declares that the [TorOption] uses a [File] argument which
+ * points to a directory location, and is available to be configured
+ * when supplied one.
+ *
+ * [TorOption] that implement [ConfigureDirectory] will **always**
+ * contain the [TorOption.Attribute.DIRECTORY] attribute.
+ *
+ * **NOTE:** Provided [File] is always sanitized for the resulting
+ * [TorSetting] using [File.absoluteFile] + [File.normalize].
+ *
+ * @see [TorConfig2.BuilderScope.configure]
+ * */
+public interface ConfigureDirectory: ConfigurableContract<ConfigureDirectory>
+
+/**
+ * Denotes a [TorOption] as implementing the [ConfigurableContract]
+ * which declares that the [TorOption] uses a [File] argument which
+ * points to a file location, and is available to be configured
+ * when supplied one.
+ *
+ * [TorOption] that implement [ConfigureFile] will **always**
+ * contain the [TorOption.Attribute.FILE] attribute.
+ *
+ * **NOTE:** Provided [File] is always sanitized for the resulting
+ * [TorSetting] using [File.absoluteFile] + [File.normalize].
+ *
+ * @see [TorConfig2.BuilderScope.configure]
+ * */
+public interface ConfigureFile: ConfigurableContract<ConfigureFile>
+
+/**
+ * Denotes a [TorOption] as implementing the [ConfigurableContract]
+ * which declares that the [TorOption] uses an interval argument,
+ * and is available to be configured when supplied a number and the
+ * [IntervalUnit] expression.
+ *
+ * **NOTE:** No range validation is performed. Consult documentation
+ * of the [TorOption] (which points to `tor-man`) for its acceptable
+ * minimum and maximum values. Otherwise, tor may error out.
+ *
+ * @see [TorConfig2.BuilderScope.configure]
+ * */
+public interface ConfigureInterval: ConfigurableContract<ConfigureInterval>
+
+/**
+ * Denotes a [TorOption] as implementing the [ConfigurableContract]
+ * which declares that the [TorOption] uses an interval argument (in
+ * milliseconds) and is available to be configured when supplied a
+ * number.
+ *
+ * **NOTE:** No range validation is performed. Consult documentation
+ * of the [TorOption] (which points to `tor-man`) for its acceptable
+ * minimum and maximum values. Otherwise, tor may error out.
+ *
+ * @see [TorConfig2.BuilderScope.configure]
+ * */
+public interface ConfigureIntervalMsec: ConfigurableContract<ConfigureIntervalMsec>
 
 @JvmSynthetic
 @Suppress("NOTHING_TO_INLINE")
@@ -65,20 +162,6 @@ public interface ConfigureBuildable<B: TorSetting.BuilderScope>: ConfigurableCon
 internal inline fun <B: TorSetting.BuilderScope> ConfigureBuildable<B>.buildContract(
     block: ThisBlock<B>,
 ): TorSetting = (this as TorOption).buildBuildable(block)
-
-/**
- * Denotes a [TorOption] as implementing the [ConfigurableContract]
- * which declares that [TorOption.buildable] is implemented and
- * able to produce [B] for [TorConfig2.BuilderScope.tryConfigure].
- *
- * This is distinctly different from [ConfigureBuildable] in
- * that builder scope [B] may throw exception due to requirements
- * not being met, such as the [TorOption] not being available for
- * the given host or environment, or the builder being misconfigured
- * resulting in an [IllegalArgumentException] when build is
- * called (automatically happens on lambda closure).
- * */
-public interface ConfigureBuildableTry<B: TorSetting.BuilderScope>: ConfigurableContract<ConfigureBuildableTry<B>>
 
 @JvmSynthetic
 @Suppress("NOTHING_TO_INLINE")
@@ -101,14 +184,6 @@ private inline fun <B: TorSetting.BuilderScope> TorOption.buildBuildable(
     throw ClassCastException("TorOption.$this has not implemented buildable()")
 }.apply(block).build()
 
-/**
- * Denotes a [TorOption] as implementing the [ConfigurableContract]
- * which declares that the [TorOption] uses a boolean argument,
- * available to be configured with an argument of `1` or `0`, for
- * [TorConfig2.BuilderScope.configure].
- * */
-public interface ConfigureBoolean: ConfigurableContract<ConfigureBoolean>
-
 @JvmSynthetic
 @Suppress("NOTHING_TO_INLINE")
 @Throws(ClassCastException::class)
@@ -121,24 +196,10 @@ internal inline fun ConfigureBoolean.buildContract(
         .toSetting()
 }
 
-/**
- * Denotes a [TorOption] as implementing the [ConfigurableContract]
- * which declares that the [TorOption] uses a [File] argument
- * to a directory location and is available to be configured via
- * [TorConfig2.BuilderScope.configure] when supplied one.
- *
- * [TorOption] implementors of [ConfigureDirectory] **MUST**
- * also contain [TorOption.Attribute.DIRECTORY].
- *
- * **NOTE:** Provided [File] is always sanitized for the resulting
- * [TorSetting] using [File.absoluteFile] + [File.normalize].
- * */
-public interface ConfigureDirectory: ConfigurableContract<ConfigureDirectory>
-
 @JvmSynthetic
 @Suppress("NOTHING_TO_INLINE")
 @Throws(ClassCastException::class)
-internal fun ConfigureDirectory.buildContract(
+internal inline fun ConfigureDirectory.buildContract(
     directory: File,
 ): TorSetting {
     @OptIn(ExperimentalKmpTorApi::class)
@@ -147,28 +208,39 @@ internal fun ConfigureDirectory.buildContract(
         .toSetting()
 }
 
-/**
- * Denotes a [TorOption] as implementing the [ConfigurableContract]
- * which declares that the [TorOption] uses a [File] argument
- * to a file location and is available to be configured via
- * [TorConfig2.BuilderScope.configure] when supplied one.
- *
- * [TorOption] implementors of [ConfigureDirectory] **MUST**
- * also contain [TorOption.Attribute.FILE].
- *
- * **NOTE:** Provided [File] is always sanitized for the resulting
- * [TorSetting] using [File.absoluteFile] + [File.normalize].
- * */
-public interface ConfigureFile: ConfigurableContract<ConfigureFile>
-
 @JvmSynthetic
 @Suppress("NOTHING_TO_INLINE")
 @Throws(ClassCastException::class)
-internal fun ConfigureFile.buildContract(
+internal inline fun ConfigureFile.buildContract(
     file: File,
 ): TorSetting {
     @OptIn(ExperimentalKmpTorApi::class)
     return (this as TorOption)
         .toLineItem(file.absoluteNormalizedFile.path)
+        .toSetting()
+}
+
+@JvmSynthetic
+@Suppress("NOTHING_TO_INLINE")
+@Throws(ClassCastException::class)
+internal inline fun ConfigureInterval.buildContract(
+    num: Int,
+    interval: IntervalUnit,
+): TorSetting {
+    @OptIn(ExperimentalKmpTorApi::class)
+    return (this as TorOption)
+        .toLineItem(interval.of(num))
+        .toSetting()
+}
+
+@JvmSynthetic
+@Suppress("NOTHING_TO_INLINE")
+@Throws(ClassCastException::class)
+internal inline fun ConfigureIntervalMsec.buildContract(
+    milliseconds: Int,
+): TorSetting {
+    @OptIn(ExperimentalKmpTorApi::class)
+    return (this as TorOption)
+        .toLineItem("$milliseconds msec")
         .toSetting()
 }

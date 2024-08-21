@@ -43,6 +43,7 @@ import kotlin.jvm.*
  * "root" item) within [items] is considered.
  *
  * @see [toSetting]
+ * @see [toSettingOrNull]
  * @see [Iterable.filterByAttribute]
  * @see [Iterable.filterByOption]
  * */
