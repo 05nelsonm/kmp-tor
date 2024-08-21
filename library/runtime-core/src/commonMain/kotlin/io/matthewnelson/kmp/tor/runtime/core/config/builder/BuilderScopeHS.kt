@@ -150,7 +150,6 @@ public class BuilderScopeHS: TorSetting.BuilderScope, BuilderScopeHSPort.DSL<Bui
 
     /**
      * Sets [TorOption.HiddenServiceAllowUnknownPorts], if desired.
-     * Otherwise, the default will be used.
      * */
     @KmpTorDsl
     public fun allowUnknownPorts(
@@ -162,7 +161,6 @@ public class BuilderScopeHS: TorSetting.BuilderScope, BuilderScopeHSPort.DSL<Bui
 
     /**
      * Sets [TorOption.HiddenServiceDirGroupReadable], if desired.
-     * Otherwise, the default will be used.
      * */
     @KmpTorDsl
     public fun dirGroupReadable(
@@ -176,7 +174,6 @@ public class BuilderScopeHS: TorSetting.BuilderScope, BuilderScopeHSPort.DSL<Bui
 
     /**
      * Sets [TorOption.HiddenServiceOnionBalanceInstance], if desired.
-     * Otherwise, the default will be used.
      * */
     @KmpTorDsl
     public fun onionBalanceInstance(
@@ -188,7 +185,6 @@ public class BuilderScopeHS: TorSetting.BuilderScope, BuilderScopeHSPort.DSL<Bui
 
     /**
      * Sets [TorOption.HiddenServiceMaxStreams], if desired.
-     * Otherwise, the default will be used.
      *
      * **NOTE:** Must be between [Port.MIN] and [Port.MAX] (inclusive).
      * Otherwise, will cause a failure when build is called.
@@ -203,7 +199,6 @@ public class BuilderScopeHS: TorSetting.BuilderScope, BuilderScopeHSPort.DSL<Bui
 
     /**
      * Sets [TorOption.HiddenServiceMaxStreamsCloseCircuit], if desired.
-     * Otherwise, the default will be used.
      * */
     @KmpTorDsl
     public fun maxStreamsCloseCircuit(
@@ -215,7 +210,6 @@ public class BuilderScopeHS: TorSetting.BuilderScope, BuilderScopeHSPort.DSL<Bui
 
     /**
      * Sets [TorOption.HiddenServiceNumIntroductionPoints], if desired.
-     * Otherwise, the default will be used.
      *
      * **NOTE:** For [version] 3 Hidden Service, the acceptable range
      * is from `1` to `20` (inclusive). Otherwise, will cause a failure

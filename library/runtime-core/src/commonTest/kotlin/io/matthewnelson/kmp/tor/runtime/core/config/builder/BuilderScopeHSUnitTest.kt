@@ -83,7 +83,7 @@ class BuilderScopeHSUnitTest {
             applyRequiredForTest()
             build()
 
-            // Max should be 65535
+            // Max should be 65535 (inclusive)
             maxStreams(Port.MAX)
             assertEquals(Port.MAX.toString(), build().items.elementAt(3).argument)
 

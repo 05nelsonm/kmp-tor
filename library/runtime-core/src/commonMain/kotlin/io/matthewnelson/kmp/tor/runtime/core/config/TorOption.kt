@@ -22,11 +22,8 @@ import io.matthewnelson.immutable.collections.toImmutableSet
 import io.matthewnelson.kmp.file.File
 import io.matthewnelson.kmp.tor.runtime.core.ThisBlock
 import io.matthewnelson.kmp.tor.runtime.core.address.Port
-import io.matthewnelson.kmp.tor.runtime.core.config.builder.BuilderScopeAutoBoolean
+import io.matthewnelson.kmp.tor.runtime.core.config.builder.*
 import io.matthewnelson.kmp.tor.runtime.core.config.builder.BuilderScopeAutoBoolean.Companion.toBuilderScopeAutoBoolean
-import io.matthewnelson.kmp.tor.runtime.core.config.builder.BuilderScopeHS
-import io.matthewnelson.kmp.tor.runtime.core.config.builder.BuilderScopeOwningCtrlProcess
-import io.matthewnelson.kmp.tor.runtime.core.config.builder.BuilderScopePort
 import io.matthewnelson.kmp.tor.runtime.core.ctrl.TorCmd
 import io.matthewnelson.kmp.tor.runtime.core.internal.IsUnixLikeHost
 import io.matthewnelson.kmp.tor.runtime.core.internal.byte
@@ -1968,8 +1965,20 @@ public abstract class TorOption: Comparable<TorOption>, CharSequence {
         attributes = emptySet(),
         isCmdLineArg = false,
         isUnique = true,
-    ) {
-        // TODO: IMPLEMENT
+    ), ConfigureTryBuildable<BuilderScopeVirtualAddr.NetworkIPv4> {
+
+        /**
+         * See [BuilderScopeVirtualAddr.NetworkIPv4]
+         *
+         * @throws [IllegalArgumentException] if misconfigured.
+         *   See [BuilderScopeVirtualAddr.NetworkIPv4].
+         * */
+        @JvmStatic
+        public fun asSetting(
+            block: ThisBlock<BuilderScopeVirtualAddr.NetworkIPv4>,
+        ): TorSetting = buildContract(block)
+
+        override fun buildable(): BuilderScopeVirtualAddr.NetworkIPv4 = BuilderScopeVirtualAddr.NetworkIPv4.get()
     }
 
     /**
@@ -1980,8 +1989,20 @@ public abstract class TorOption: Comparable<TorOption>, CharSequence {
         attributes = emptySet(),
         isCmdLineArg = false,
         isUnique = true,
-    ) {
-        // TODO: IMPLEMENT
+    ), ConfigureTryBuildable<BuilderScopeVirtualAddr.NetworkIPv6> {
+
+        /**
+         * See [BuilderScopeVirtualAddr.NetworkIPv4]
+         *
+         * @throws [IllegalArgumentException] if misconfigured.
+         *   See [BuilderScopeVirtualAddr.NetworkIPv4].
+         * */
+        @JvmStatic
+        public fun asSetting(
+            block: ThisBlock<BuilderScopeVirtualAddr.NetworkIPv6>,
+        ): TorSetting = buildContract(block)
+
+        override fun buildable(): BuilderScopeVirtualAddr.NetworkIPv6 = BuilderScopeVirtualAddr.NetworkIPv6.get()
     }
 
     ///////////////////////////////
