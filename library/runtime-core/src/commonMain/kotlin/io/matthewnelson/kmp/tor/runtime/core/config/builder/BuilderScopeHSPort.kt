@@ -39,7 +39,8 @@ import kotlin.jvm.JvmSynthetic
 public class BuilderScopeHSPort private constructor(
 
     /**
-     * TODO
+     * The "virtual" port for the [TorOption.HiddenServicePort]
+     * being configured.
      * */
     @JvmField
     public val virtual: Port,
@@ -56,6 +57,7 @@ public class BuilderScopeHSPort private constructor(
      * e.g.
      *
      *     target(port = 8080.toPort())
+     *     // HiddenServicePort {virtual} 8080
      * */
     @KmpTorDsl
     public fun target(
@@ -78,6 +80,11 @@ public class BuilderScopeHSPort private constructor(
      *     } catch(_: UnsupportedOperationException) {
      *         target(port = 8080.toPort())
      *     }
+     *     // When Unix Socket successful
+     *     // HiddenServicePort {virtual} unix:"/path/to/server/dir/uds.sock"
+     *
+     *     // When Unix Socket failure
+     *     // HiddenServicePort {virtual} 8080
      *
      * @throws [UnsupportedOperationException] when:
      *   - Is Windows (tor does not support Unix Sockets on windows).
@@ -93,6 +100,45 @@ public class BuilderScopeHSPort private constructor(
         val path = unixSocket.toUnixSocketPath()
         _target = path
         return this
+    }
+
+    internal interface DSL<B: DSL<B>> {
+
+        /**
+         * Configure a [TorOption.HiddenServicePort] with no "target".
+         * In this event, the "target" will be the same as [virtual].
+         *
+         * e.g.
+         *
+         *     port(virtual = Port.HTTP)
+         *     // HiddenServicePort 80 80
+         *
+         * @see [TorOption.HiddenServicePort] documentation.
+         * */
+        @KmpTorDsl
+        public fun port(
+            virtual: Port,
+        ): B
+
+        /**
+         * Configure a [TorOption.HiddenServicePort] with a specified
+         * virtual port and configure other options.
+         *
+         * e.g.
+         *
+         *     port(virtual = Port.HTTP) {
+         *         target(port = 8080.toPort())
+         *     }
+         *     // HiddenServicePort 80 8080
+         *
+         * @see [BuilderScopeHSPort.target].
+         * @see [TorOption.HiddenServicePort] documentation.
+         * */
+        @KmpTorDsl
+        public fun port(
+            virtual: Port,
+            block: ThisBlock<BuilderScopeHSPort>,
+        ): B
     }
 
     internal companion object {
@@ -112,25 +158,5 @@ public class BuilderScopeHSPort private constructor(
             ports.add(item)
             return this
         }
-    }
-
-    internal interface DSL<B: DSL<B>> {
-
-        /**
-         * TODO
-         * */
-        @KmpTorDsl
-        public fun port(
-            virtual: Port,
-        ): B
-
-        /**
-         * TODO
-         * */
-        @KmpTorDsl
-        public fun port(
-            virtual: Port,
-            block: ThisBlock<BuilderScopeHSPort>,
-        ): B
     }
 }
