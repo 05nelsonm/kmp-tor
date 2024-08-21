@@ -702,11 +702,15 @@ public abstract class BuilderScopePort: TorSetting.BuilderScope {
     @JvmSynthetic
     @Throws(IllegalArgumentException::class)
     internal final override fun build(): TorSetting {
-        optionals.addAll(_flagsIsolation)
-        optionals.addAll(_flagsSocks)
+        if (argument != Port.ZERO.toString()) {
+            // Do not add flags if disabled
 
-        if (argument.startsWith("unix:")) {
-            optionals.addAll(_flagsUnix)
+            optionals.addAll(_flagsIsolation)
+            optionals.addAll(_flagsSocks)
+
+            if (argument.startsWith("unix:")) {
+                optionals.addAll(_flagsUnix)
+            }
         }
 
         return try {

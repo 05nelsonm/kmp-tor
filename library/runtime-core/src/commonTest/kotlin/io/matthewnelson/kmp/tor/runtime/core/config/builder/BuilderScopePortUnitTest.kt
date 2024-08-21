@@ -126,6 +126,22 @@ class BuilderScopePortUnitTest {
     }
 
     @Test
+    fun givenPort_whenDisabled_thenFlagsAreNotAdded() {
+        val setting = SocksPort.asSetting {
+            disable()
+
+            flagsIsolation {
+                IsolateDestPort = true
+            }
+            flagsSocks {
+                NoIPv4Traffic = true
+            }
+        }
+
+        assertTrue(setting.items.first().optionals.isEmpty())
+    }
+
+    @Test
     fun givenPort_whenInitialized_thenReassignableDefaultsToTrue() {
         val setting = ControlPort.asSetting {}
         val actual = setting.extras[BuilderScopePort.EXTRA_REASSIGNABLE]
@@ -205,6 +221,8 @@ class BuilderScopePortUnitTest {
     @Test
     fun givenPort_whenIsolationFlags_thenFlagsAdded() {
         val item = DNSPort.asSetting {
+            auto()
+
             flagsIsolation {
                 IsolateDestPort = true
             }
