@@ -150,7 +150,7 @@ public class TorConfig2 private constructor(settings: Set<TorSetting>) {
         ): BuilderScope = put(buildContract(block))
 
         /**
-         * Configures a [TorOption] which implements the [ConfigureTryBuildable]
+         * Configures a [TorOption] which implements the [ConfigureBuildableTry]
          * contract type for [TorSetting.BuilderScope] of type [B], adding the
          * resultant [TorSetting] to [BuilderScope].
          *
@@ -181,11 +181,11 @@ public class TorConfig2 private constructor(settings: Set<TorSetting>) {
          *         }
          *     }
          *
-         * @throws [ClassCastException] when [ConfigureTryBuildable] is not
+         * @throws [ClassCastException] when [ConfigureBuildableTry] is not
          *   an instance of [TorOption].
          * */
         @KmpTorDsl
-        public fun <B: TorSetting.BuilderScope> ConfigureTryBuildable<B>.tryConfigure(
+        public fun <B: TorSetting.BuilderScope> ConfigureBuildableTry<B>.tryConfigure(
             block: ThisBlock<B>,
         ): BuilderScope = put(buildContract(block))
 

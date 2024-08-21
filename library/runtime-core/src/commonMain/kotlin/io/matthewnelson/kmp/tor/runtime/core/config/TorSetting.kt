@@ -318,7 +318,8 @@ public class TorSetting private constructor(
          * Creates the [TorSetting] for multiple [LineItem].
          *
          * **NOTE:** This is currently an experimental API.
-         * It may be moved to `internal`. Use at your own risk!
+         * It may be moved to `internal`, or have constraints added
+         * to "grouping" behavior. Use at your own risk!
          *
          * @throws [IllegalArgumentException] when [LineItem] are empty.
          * */
@@ -342,7 +343,8 @@ public class TorSetting private constructor(
          * Creates the [TorSetting] for multiple [LineItem].
          *
          * **NOTE:** This is currently an experimental API.
-         * It may be moved to `internal`. Use at your own risk!
+         * It may be moved to `internal`, or have constraints added
+         * to "grouping" behavior. Use at your own risk!
          *
          * @return [TorSetting] or `null` if items are empty.
          * */
@@ -521,7 +523,5 @@ public class TorSetting private constructor(
     /** @suppress */
     public override fun hashCode(): Int = 17 * 31 + items.first().hashCode()
     /** @suppress */
-    public override fun toString(): String = buildString {
-        items.joinTo(this, separator = "\n")
-    }
+    public override fun toString(): String = buildString { items.joinTo(this, separator = "\n") }
 }

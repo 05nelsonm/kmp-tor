@@ -78,6 +78,7 @@ class BuilderScopeVirtualAddrUnitTest {
     @Test
     fun givenIPv4_whenSetting_thenIsProperlyFormatted() {
         val item = VirtualAddrNetworkIPv4.asSetting {
+            // do not use AnyHost for real... just doing so to test.
             address(IPAddress.V4.AnyHost)
             bits(11)
         }.items.first()
@@ -89,6 +90,7 @@ class BuilderScopeVirtualAddrUnitTest {
     @Test
     fun givenIPv6_whenSetting_thenIsProperlyFormatted() {
         val item = VirtualAddrNetworkIPv6.asSetting {
+            // do not use AnyHost for real... just doing so to test.
             address(IPAddress.V6.AnyHost)
             bits(20)
         }.items.first()

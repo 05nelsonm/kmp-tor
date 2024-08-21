@@ -18,7 +18,6 @@ package io.matthewnelson.kmp.tor.runtime.core.config
 import io.matthewnelson.kmp.tor.runtime.core.config.TorOption.Companion.buildableInternal
 import io.matthewnelson.kmp.tor.runtime.core.config.builder.BuilderScopeAutoBoolean
 import io.matthewnelson.kmp.tor.runtime.core.config.builder.BuilderScopePort
-import io.matthewnelson.kmp.tor.runtime.core.internal.IsUnixLikeHost
 import kotlin.test.*
 
 class TorOptionUnitTest {
@@ -147,7 +146,7 @@ class TorOptionUnitTest {
 
     @Test
     fun givenOptions_whenInstanceConfigureTryBuildable_thenImplementsBuildableFunction() {
-        val options = TorOption.entries.filterIsInstance<ConfigureTryBuildable<*>>()
+        val options = TorOption.entries.filterIsInstance<ConfigureBuildableTry<*>>()
 
         // Force update expected test value when something
         // is added (same as reflection tests for Jvm).
@@ -171,7 +170,7 @@ class TorOptionUnitTest {
     fun givenOptions_whenNotInstanceConfigureBuildable_thenDoesNotImplementBuildableFunction() {
         val options = TorOption.entries.filter { option ->
             if (option is ConfigureBuildable<*>) return@filter false
-            if (option is ConfigureTryBuildable<*>) return@filter false
+            if (option is ConfigureBuildableTry<*>) return@filter false
             true
         }
 

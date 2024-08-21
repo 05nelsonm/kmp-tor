@@ -1067,7 +1067,7 @@ public abstract class TorOption: Comparable<TorOption>, CharSequence {
         attributes = immutableSetOf(Attribute.LOGGING),
         isCmdLineArg = true,
         isUnique = true,
-    ), ConfigureTryBuildable<BuilderScopeSyslogIdTag> {
+    ), ConfigureBuildableTry<BuilderScopeSyslogIdTag> {
 
         /**
          * See [BuilderScopeSyslogIdTag]
@@ -1805,7 +1805,7 @@ public abstract class TorOption: Comparable<TorOption>, CharSequence {
         attributes = immutableSetOf(Attribute.PORT),
         isCmdLineArg = false,
         isUnique = false,
-    ), ConfigureTryBuildable<BuilderScopePort.Trans> {
+    ), ConfigureBuildableTry<BuilderScopePort.Trans> {
 
         /**
          * See [BuilderScopePort.Trans]
@@ -1977,7 +1977,7 @@ public abstract class TorOption: Comparable<TorOption>, CharSequence {
         attributes = emptySet(),
         isCmdLineArg = false,
         isUnique = true,
-    ), ConfigureTryBuildable<BuilderScopeVirtualAddr.NetworkIPv4> {
+    ), ConfigureBuildableTry<BuilderScopeVirtualAddr.NetworkIPv4> {
 
         /**
          * See [BuilderScopeVirtualAddr.NetworkIPv4]
@@ -2001,7 +2001,7 @@ public abstract class TorOption: Comparable<TorOption>, CharSequence {
         attributes = emptySet(),
         isCmdLineArg = false,
         isUnique = true,
-    ), ConfigureTryBuildable<BuilderScopeVirtualAddr.NetworkIPv6> {
+    ), ConfigureBuildableTry<BuilderScopeVirtualAddr.NetworkIPv6> {
 
         /**
          * See [BuilderScopeVirtualAddr.NetworkIPv4]
@@ -3828,7 +3828,7 @@ public abstract class TorOption: Comparable<TorOption>, CharSequence {
         attributes = immutableSetOf(Attribute.DIRECTORY, Attribute.HIDDEN_SERVICE),
         isCmdLineArg = false,
         isUnique = false,
-    ), ConfigureTryBuildable<BuilderScopeHS> {
+    ), ConfigureBuildableTry<BuilderScopeHS> {
 
         /**
          * See [BuilderScopeHS]
@@ -4471,7 +4471,7 @@ public abstract class TorOption: Comparable<TorOption>, CharSequence {
         attributes = immutableSetOf(Attribute.PORT),
         isCmdLineArg = false,
         isUnique = false,
-    ), ConfigureTryBuildable<BuilderScopePort.Trans> {
+    ), ConfigureBuildableTry<BuilderScopePort.Trans> {
 
         /**
          * See [BuilderScopePort.Trans]
@@ -5101,9 +5101,9 @@ public abstract class TorOption: Comparable<TorOption>, CharSequence {
 
     /**
      * Factory function for a [TorOption] that, when implemented along
-     * with implementation of the [ConfigureBuildable] interface, makes the
-     * [TorOption] available for use with [TorConfig2.BuilderScope.configure]
-     * and [TorConfig2.BuilderScope.tryConfigure]
+     * with implementation of the [ConfigureBuildable] or [ConfigureBuildableTry]
+     * interfaces, makes the [TorOption] available for use with
+     * [TorConfig2.BuilderScope.configure] and [TorConfig2.BuilderScope.tryConfigure]
      *
      * @throws [UnsupportedOperationException] if the option implementing has
      *   platform specific requirements that are not met. (e.g. [TransPort])

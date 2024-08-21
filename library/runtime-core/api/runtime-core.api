@@ -3492,13 +3492,13 @@ public abstract interface class io/matthewnelson/kmp/tor/runtime/core/config/Con
 public abstract interface class io/matthewnelson/kmp/tor/runtime/core/config/ConfigureBuildable : io/matthewnelson/kmp/tor/runtime/core/config/ConfigurableContract {
 }
 
+public abstract interface class io/matthewnelson/kmp/tor/runtime/core/config/ConfigureBuildableTry : io/matthewnelson/kmp/tor/runtime/core/config/ConfigurableContract {
+}
+
 public abstract interface class io/matthewnelson/kmp/tor/runtime/core/config/ConfigureDirectory : io/matthewnelson/kmp/tor/runtime/core/config/ConfigurableContract {
 }
 
 public abstract interface class io/matthewnelson/kmp/tor/runtime/core/config/ConfigureFile : io/matthewnelson/kmp/tor/runtime/core/config/ConfigurableContract {
-}
-
-public abstract interface class io/matthewnelson/kmp/tor/runtime/core/config/ConfigureTryBuildable : io/matthewnelson/kmp/tor/runtime/core/config/ConfigurableContract {
 }
 
 public final class io/matthewnelson/kmp/tor/runtime/core/config/TorConfig2 {
@@ -3516,7 +3516,7 @@ public abstract class io/matthewnelson/kmp/tor/runtime/core/config/TorConfig2$Bu
 	public final fun configure (Lio/matthewnelson/kmp/tor/runtime/core/config/ConfigureFile;Ljava/io/File;)Lio/matthewnelson/kmp/tor/runtime/core/config/TorConfig2$BuilderScope;
 	public abstract fun put (Lio/matthewnelson/kmp/tor/runtime/core/config/TorSetting;)Lio/matthewnelson/kmp/tor/runtime/core/config/TorConfig2$BuilderScope;
 	public final fun putAll (Ljava/util/Collection;)Lio/matthewnelson/kmp/tor/runtime/core/config/TorConfig2$BuilderScope;
-	public final fun tryConfigure (Lio/matthewnelson/kmp/tor/runtime/core/config/ConfigureTryBuildable;Lio/matthewnelson/kmp/tor/runtime/core/ThisBlock;)Lio/matthewnelson/kmp/tor/runtime/core/config/TorConfig2$BuilderScope;
+	public final fun tryConfigure (Lio/matthewnelson/kmp/tor/runtime/core/config/ConfigureBuildableTry;Lio/matthewnelson/kmp/tor/runtime/core/ThisBlock;)Lio/matthewnelson/kmp/tor/runtime/core/config/TorConfig2$BuilderScope;
 }
 
 protected final class io/matthewnelson/kmp/tor/runtime/core/config/TorConfig2$BuilderScope$Companion {
@@ -4817,7 +4817,7 @@ public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$Hidden
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$HiddenServiceDir : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigureTryBuildable {
+public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$HiddenServiceDir : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigureBuildableTry {
 	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/core/config/TorOption$HiddenServiceDir;
 	public static final fun asSetting (Lio/matthewnelson/kmp/tor/runtime/core/ThisBlock;)Lio/matthewnelson/kmp/tor/runtime/core/config/TorSetting;
 	public synthetic fun buildable ()Lio/matthewnelson/kmp/tor/runtime/core/config/TorSetting$BuilderScope;
@@ -5678,7 +5678,7 @@ public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$Strict
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$SyslogIdentityTag : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigureTryBuildable {
+public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$SyslogIdentityTag : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigureBuildableTry {
 	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/core/config/TorOption$SyslogIdentityTag;
 	public static final fun asSetting (Lio/matthewnelson/kmp/tor/runtime/core/ThisBlock;)Lio/matthewnelson/kmp/tor/runtime/core/config/TorSetting;
 	public synthetic fun buildable ()Lio/matthewnelson/kmp/tor/runtime/core/config/TorSetting$BuilderScope;
@@ -5933,7 +5933,7 @@ public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$TrackH
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$TransPort : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigureTryBuildable {
+public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$TransPort : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigureBuildableTry {
 	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/core/config/TorOption$TransPort;
 	public static final fun asSetting (Lio/matthewnelson/kmp/tor/runtime/core/ThisBlock;)Lio/matthewnelson/kmp/tor/runtime/core/config/TorSetting;
 	public synthetic fun buildable ()Lio/matthewnelson/kmp/tor/runtime/core/config/TorSetting$BuilderScope;
@@ -6089,7 +6089,7 @@ public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$Versio
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$VirtualAddrNetworkIPv4 : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigureTryBuildable {
+public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$VirtualAddrNetworkIPv4 : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigureBuildableTry {
 	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/core/config/TorOption$VirtualAddrNetworkIPv4;
 	public static final fun asSetting (Lio/matthewnelson/kmp/tor/runtime/core/ThisBlock;)Lio/matthewnelson/kmp/tor/runtime/core/config/TorSetting;
 	public synthetic fun buildable ()Lio/matthewnelson/kmp/tor/runtime/core/config/TorSetting$BuilderScope;
@@ -6098,7 +6098,7 @@ public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$Virtua
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$VirtualAddrNetworkIPv6 : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigureTryBuildable {
+public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$VirtualAddrNetworkIPv6 : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigureBuildableTry {
 	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/core/config/TorOption$VirtualAddrNetworkIPv6;
 	public static final fun asSetting (Lio/matthewnelson/kmp/tor/runtime/core/ThisBlock;)Lio/matthewnelson/kmp/tor/runtime/core/config/TorSetting;
 	public synthetic fun buildable ()Lio/matthewnelson/kmp/tor/runtime/core/config/TorSetting$BuilderScope;
@@ -6264,7 +6264,7 @@ public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$__Sock
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$__TransPort : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigureTryBuildable {
+public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$__TransPort : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigureBuildableTry {
 	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/core/config/TorOption$__TransPort;
 	public static final fun asSetting (Lio/matthewnelson/kmp/tor/runtime/core/ThisBlock;)Lio/matthewnelson/kmp/tor/runtime/core/config/TorSetting;
 	public synthetic fun buildable ()Lio/matthewnelson/kmp/tor/runtime/core/config/TorSetting$BuilderScope;

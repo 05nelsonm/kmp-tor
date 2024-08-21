@@ -42,6 +42,7 @@ import kotlin.jvm.JvmSynthetic
  * desired.
  *
  * @see [ConfigureBuildable]
+ * @see [ConfigureBuildableTry]
  * @see [ConfigureBoolean]
  * @see [ConfigureDirectory]
  * @see [ConfigureFile]
@@ -77,12 +78,12 @@ internal inline fun <B: TorSetting.BuilderScope> ConfigureBuildable<B>.buildCont
  * resulting in an [IllegalArgumentException] when build is
  * called (automatically happens on lambda closure).
  * */
-public interface ConfigureTryBuildable<B: TorSetting.BuilderScope>: ConfigurableContract<ConfigureTryBuildable<B>>
+public interface ConfigureBuildableTry<B: TorSetting.BuilderScope>: ConfigurableContract<ConfigureBuildableTry<B>>
 
 @JvmSynthetic
 @Suppress("NOTHING_TO_INLINE")
 @Throws(ClassCastException::class, UnsupportedOperationException::class)
-internal inline fun <B: TorSetting.BuilderScope> ConfigureTryBuildable<B>.buildContract(
+internal inline fun <B: TorSetting.BuilderScope> ConfigureBuildableTry<B>.buildContract(
     block: ThisBlock<B>,
 ): TorSetting = (this as TorOption).buildBuildable(block)
 
