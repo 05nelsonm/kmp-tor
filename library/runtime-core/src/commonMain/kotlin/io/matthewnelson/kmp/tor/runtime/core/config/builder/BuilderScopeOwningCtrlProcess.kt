@@ -39,6 +39,10 @@ public class BuilderScopeOwningCtrlProcess: TorSetting.BuilderScope {
 
     /**
      * Sets the [argument] to the provided [id].
+     *
+     * **NOTE:** Setting an invalid process id will cause tor to fail to start.
+     * The [argument] has already been set to [Process.Current.pid]. You *can*
+     * change it though.
      * */
     @KmpTorDsl
     public fun processId(
