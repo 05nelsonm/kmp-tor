@@ -18,7 +18,6 @@
 package io.matthewnelson.kmp.tor.runtime.core.config
 
 import io.matthewnelson.kmp.file.*
-import io.matthewnelson.kmp.tor.core.api.annotation.ExperimentalKmpTorApi
 import io.matthewnelson.kmp.tor.runtime.core.ThisBlock
 import io.matthewnelson.kmp.tor.runtime.core.apply
 import io.matthewnelson.kmp.tor.runtime.core.config.TorOption.Companion.buildableInternal
@@ -189,36 +188,27 @@ private inline fun <B: TorSetting.BuilderScope> TorOption.buildBuildable(
 @Throws(ClassCastException::class)
 internal inline fun ConfigureBoolean.buildContract(
     enable: Boolean,
-): TorSetting {
-    @OptIn(ExperimentalKmpTorApi::class)
-    return (this as TorOption)
-        .toLineItem(enable.byte.toString())
-        .toSetting()
-}
+): TorSetting = (this as TorOption)
+    .toLineItem(enable.byte.toString())
+    .toSetting()
 
 @JvmSynthetic
 @Suppress("NOTHING_TO_INLINE")
 @Throws(ClassCastException::class)
 internal inline fun ConfigureDirectory.buildContract(
     directory: File,
-): TorSetting {
-    @OptIn(ExperimentalKmpTorApi::class)
-    return (this as TorOption)
-        .toLineItem(directory.absoluteNormalizedFile.path)
-        .toSetting()
-}
+): TorSetting = (this as TorOption)
+    .toLineItem(directory.absoluteNormalizedFile.path)
+    .toSetting()
 
 @JvmSynthetic
 @Suppress("NOTHING_TO_INLINE")
 @Throws(ClassCastException::class)
 internal inline fun ConfigureFile.buildContract(
     file: File,
-): TorSetting {
-    @OptIn(ExperimentalKmpTorApi::class)
-    return (this as TorOption)
-        .toLineItem(file.absoluteNormalizedFile.path)
-        .toSetting()
-}
+): TorSetting = (this as TorOption)
+    .toLineItem(file.absoluteNormalizedFile.path)
+    .toSetting()
 
 @JvmSynthetic
 @Suppress("NOTHING_TO_INLINE")
@@ -226,21 +216,15 @@ internal inline fun ConfigureFile.buildContract(
 internal inline fun ConfigureInterval.buildContract(
     num: Int,
     interval: IntervalUnit,
-): TorSetting {
-    @OptIn(ExperimentalKmpTorApi::class)
-    return (this as TorOption)
-        .toLineItem(interval.of(num))
-        .toSetting()
-}
+): TorSetting = (this as TorOption)
+    .toLineItem(interval.of(num))
+    .toSetting()
 
 @JvmSynthetic
 @Suppress("NOTHING_TO_INLINE")
 @Throws(ClassCastException::class)
 internal inline fun ConfigureIntervalMsec.buildContract(
     milliseconds: Int,
-): TorSetting {
-    @OptIn(ExperimentalKmpTorApi::class)
-    return (this as TorOption)
-        .toLineItem("$milliseconds msec")
-        .toSetting()
-}
+): TorSetting = (this as TorOption)
+    .toLineItem("$milliseconds msec")
+    .toSetting()

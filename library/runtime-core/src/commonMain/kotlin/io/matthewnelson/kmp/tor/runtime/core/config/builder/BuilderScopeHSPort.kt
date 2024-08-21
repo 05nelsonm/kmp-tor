@@ -17,7 +17,6 @@ package io.matthewnelson.kmp.tor.runtime.core.config.builder
 
 import io.matthewnelson.kmp.file.*
 import io.matthewnelson.kmp.file.normalize
-import io.matthewnelson.kmp.tor.core.api.annotation.ExperimentalKmpTorApi
 import io.matthewnelson.kmp.tor.core.api.annotation.KmpTorDsl
 import io.matthewnelson.kmp.tor.runtime.core.ThisBlock
 import io.matthewnelson.kmp.tor.runtime.core.address.Port
@@ -153,7 +152,6 @@ public class BuilderScopeHSPort private constructor(
             // TODO: IPAddress. Issue #313
             val argument = "$virtual ${b._target}"
 
-            @OptIn(ExperimentalKmpTorApi::class)
             val item = TorOption.HiddenServicePort.toLineItem(argument)
             ports.add(item)
             return this

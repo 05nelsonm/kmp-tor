@@ -19,7 +19,6 @@ import io.matthewnelson.kmp.file.absoluteFile
 import io.matthewnelson.kmp.file.path
 import io.matthewnelson.kmp.file.resolve
 import io.matthewnelson.kmp.file.toFile
-import io.matthewnelson.kmp.tor.core.api.annotation.ExperimentalKmpTorApi
 import io.matthewnelson.kmp.tor.runtime.core.address.Port
 import io.matthewnelson.kmp.tor.runtime.core.address.Port.Companion.toPort
 import io.matthewnelson.kmp.tor.runtime.core.address.Port.Ephemeral.Companion.toPortEphemeral
@@ -30,7 +29,6 @@ import io.matthewnelson.kmp.tor.runtime.core.config.TorSetting.Companion.toSetti
 import io.matthewnelson.kmp.tor.runtime.core.internal.UnixSocketsNotSupportedMessage
 import kotlin.test.*
 
-@OptIn(ExperimentalKmpTorApi::class)
 class TorSettingUnitTest {
 
     @Test

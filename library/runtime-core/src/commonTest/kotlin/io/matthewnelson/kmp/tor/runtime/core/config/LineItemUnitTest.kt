@@ -15,17 +15,24 @@
  **/
 package io.matthewnelson.kmp.tor.runtime.core.config
 
-import io.matthewnelson.kmp.tor.core.api.annotation.ExperimentalKmpTorApi
 import io.matthewnelson.kmp.tor.runtime.core.address.Port
 import io.matthewnelson.kmp.tor.runtime.core.address.Port.Ephemeral.Companion.toPortEphemeral
 import io.matthewnelson.kmp.tor.runtime.core.config.TorOption.*
 import io.matthewnelson.kmp.tor.runtime.core.config.TorOption.Companion.AUTO
+import io.matthewnelson.kmp.tor.runtime.core.config.TorSetting.LineItem
 import io.matthewnelson.kmp.tor.runtime.core.config.TorSetting.LineItem.Companion.toLineItem
-import io.matthewnelson.kmp.tor.runtime.core.config.TorSetting.LineItem.Companion.toLineItemOrNull
 import kotlin.test.*
 
-@OptIn(ExperimentalKmpTorApi::class)
 class LineItemUnitTest {
+
+    private fun TorOption.toLineItemOrNull(
+        argument: String,
+        optionals: Set<String> = emptySet(),
+    ): LineItem? = try {
+        toLineItem(argument, optionals)
+    } catch (_: IllegalArgumentException) {
+        null
+    }
 
     @Test
     fun givenImproperArgument_whenToLineItemOrNull_thenReturnsNull() {

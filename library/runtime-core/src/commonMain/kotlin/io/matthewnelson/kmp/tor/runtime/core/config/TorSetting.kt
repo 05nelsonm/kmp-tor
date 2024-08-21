@@ -20,11 +20,9 @@ package io.matthewnelson.kmp.tor.runtime.core.config
 import io.matthewnelson.immutable.collections.immutableSetOf
 import io.matthewnelson.immutable.collections.toImmutableMap
 import io.matthewnelson.immutable.collections.toImmutableSet
-import io.matthewnelson.kmp.tor.core.api.annotation.ExperimentalKmpTorApi
 import io.matthewnelson.kmp.tor.core.api.annotation.KmpTorDsl
 import io.matthewnelson.kmp.tor.runtime.core.address.Port
 import io.matthewnelson.kmp.tor.runtime.core.config.TorSetting.LineItem.Companion.toLineItem
-import io.matthewnelson.kmp.tor.runtime.core.config.TorSetting.LineItem.Companion.toLineItemOrNull
 import io.matthewnelson.kmp.tor.runtime.core.config.builder.BuilderScopePort
 import io.matthewnelson.kmp.tor.runtime.core.internal.isSingleLine
 import kotlin.jvm.*
@@ -42,8 +40,6 @@ import kotlin.jvm.*
  * Comparison of settings is done such that only the first [LineItem] (or
  * "root" item) within [items] is considered.
  *
- * @see [toSetting]
- * @see [toSettingOrNull]
  * @see [Iterable.filterByAttribute]
  * @see [Iterable.filterByOption]
  * */
@@ -82,9 +78,6 @@ public class TorSetting private constructor(
      *     __SocksPort      9050       OnionTrafficOnly IsolateDestPort
      *     DisableNetwork   1
      *     RunAsDaemon      0
-     *
-     * @see [toLineItem]
-     * @see [toLineItemOrNull]
      * */
     public class LineItem private constructor(
 
@@ -110,71 +103,6 @@ public class TorSetting private constructor(
         @JvmField
         public val optionals: Set<String>,
     ) {
-
-        public companion object {
-
-            /**
-             * Creates a [LineItem] for the [TorOption] and provided
-             * [argument] and [optionals].
-             *
-             * **NOTE:** This is currently an experimental API.
-             * It may be moved to `internal`. Use at your own risk!
-             *
-             * @throws [IllegalArgumentException] when:
-             *  - [argument] is blank.
-             *  - [argument] is multiple lines.
-             *  - [optionals] contains a value that is blank.
-             *  - [optionals] contains a value that is multiple lines.
-             * */
-            @JvmStatic
-            @JvmOverloads
-            @JvmName("get")
-            @ExperimentalKmpTorApi
-            @Throws(IllegalArgumentException::class)
-            public fun TorOption.toLineItem(
-                argument: String,
-                optionals: Set<String> = emptySet(),
-            ): LineItem {
-                require(argument.isNotBlank()) { "argument cannot be blank" }
-                require(argument.isSingleLine()) { "argument cannot be multiple lines" }
-
-                @Suppress("LocalVariableName")
-                val _optionals = optionals.toImmutableSet()
-
-                _optionals.forEach { optional ->
-                    require(optional.isNotBlank()) { "optionals cannot be blank" }
-                    require(optional.isSingleLine()) { "optionals cannot be multiple lines" }
-                }
-
-                return LineItem(this, argument, _optionals)
-            }
-
-            /**
-             * Creates a [LineItem] for the [TorOption] and provided
-             * [argument] and [optionals].
-             *
-             * **NOTE:** This is currently an experimental API.
-             * It may be moved to `internal`. Use at your own risk!
-             *
-             * @return [LineItem], or `null` when:
-             *  - [argument] is blank.
-             *  - [argument] is multiple lines.
-             *  - [optionals] contains a value that is blank.
-             *  - [optionals] contains a value that is multiple lines.
-             * */
-            @JvmStatic
-            @JvmOverloads
-            @JvmName("getOrNull")
-            @ExperimentalKmpTorApi
-            public fun TorOption.toLineItemOrNull(
-                argument: String,
-                optionals: Set<String> = emptySet(),
-            ): LineItem? = try {
-                toLineItem(argument, optionals)
-            } catch (_: IllegalArgumentException) {
-                null
-            }
-        }
 
         /**
          * If the [LineItem] is a [TorOption] that is "Non-Persistent",
@@ -272,6 +200,29 @@ public class TorSetting private constructor(
         public val isHiddenService: Boolean =
             option.attributes.contains(TorOption.Attribute.HIDDEN_SERVICE)
 
+        internal companion object {
+
+            @JvmSynthetic
+            @Throws(IllegalArgumentException::class)
+            internal fun TorOption.toLineItem(
+                argument: String,
+                optionals: Set<String> = emptySet(),
+            ): LineItem {
+                require(argument.isNotBlank()) { "argument cannot be blank" }
+                require(argument.isSingleLine()) { "argument cannot be multiple lines" }
+
+                @Suppress("LocalVariableName")
+                val _optionals = optionals.toImmutableSet()
+
+                _optionals.forEach { optional ->
+                    require(optional.isNotBlank()) { "optionals cannot be blank" }
+                    require(optional.isSingleLine()) { "optionals cannot be multiple lines" }
+                }
+
+                return LineItem(this, argument, _optionals)
+            }
+        }
+
         /** @suppress */
         public override fun equals(other: Any?): Boolean {
             return  other is LineItem
@@ -300,66 +251,6 @@ public class TorSetting private constructor(
     }
 
     public companion object {
-
-        /**
-         * Creates the [TorSetting] for a single [LineItem].
-         *
-         * **NOTE:** This is currently an experimental API.
-         * It may be moved to `internal`. Use at your own risk!
-         * */
-        @JvmStatic
-        @JvmOverloads
-        @JvmName("get")
-        @ExperimentalKmpTorApi
-        public fun LineItem.toSetting(
-            extras: Map<String, Any> = emptyMap(),
-        ): TorSetting = immutableSetOf(this).toSetting(extras)
-
-        /**
-         * Creates the [TorSetting] for multiple [LineItem].
-         *
-         * **NOTE:** This is currently an experimental API.
-         * It may be moved to `internal`, or have constraints added
-         * to "grouping" behavior. Use at your own risk!
-         *
-         * @throws [IllegalArgumentException] when [LineItem] are empty.
-         * */
-        @JvmStatic
-        @JvmOverloads
-        @JvmName("get")
-        @ExperimentalKmpTorApi
-        @Throws(IllegalArgumentException::class)
-        public fun Set<LineItem>.toSetting(
-            extras: Map<String, Any> = emptyMap(),
-        ): TorSetting {
-            val items = toImmutableSet()
-
-            require(items.isNotEmpty()) { "items cannot be empty" }
-            // TODO: Restrict grouping behavior...
-
-            return TorSetting(items, extras.toImmutableMap())
-        }
-
-        /**
-         * Creates the [TorSetting] for multiple [LineItem].
-         *
-         * **NOTE:** This is currently an experimental API.
-         * It may be moved to `internal`, or have constraints added
-         * to "grouping" behavior. Use at your own risk!
-         *
-         * @return [TorSetting] or `null` if items are empty.
-         * */
-        @JvmStatic
-        @JvmOverloads
-        @JvmName("getOrNull")
-        @ExperimentalKmpTorApi
-        public fun Set<LineItem>.toSettingOrNull(
-            extras: Map<String, Any> = emptyMap(),
-        ): TorSetting? = try {
-            toSetting(extras)
-        } catch (_: IllegalArgumentException) {
-            null
-        }
 
         /**
          * Returns a list containing all elements of [TorSetting] within
@@ -455,6 +346,24 @@ public class TorSetting private constructor(
                 false
             }
         }
+
+        @JvmSynthetic
+        internal fun LineItem.toSetting(
+            extras: Map<String, Any> = emptyMap(),
+        ): TorSetting = immutableSetOf(this).toSetting(extras)
+
+        @JvmSynthetic
+        @Throws(IllegalArgumentException::class)
+        internal fun Set<LineItem>.toSetting(
+            extras: Map<String, Any> = emptyMap(),
+        ): TorSetting {
+            val items = toImmutableSet()
+
+            require(items.isNotEmpty()) { "items cannot be empty" }
+            // TODO: Restrict grouping behavior...
+
+            return TorSetting(items, extras.toImmutableMap())
+        }
     }
 
     /**
@@ -494,10 +403,8 @@ public class TorSetting private constructor(
         @JvmSynthetic
         @Throws(IllegalArgumentException::class)
         internal open fun build(): TorSetting {
-            @OptIn(ExperimentalKmpTorApi::class)
             val root = option.toLineItem(argument, optionals)
 
-            @OptIn(ExperimentalKmpTorApi::class)
             return if (others.isEmpty()) {
                 root.toSetting(extras)
             } else {

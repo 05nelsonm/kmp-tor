@@ -18,7 +18,6 @@
 package io.matthewnelson.kmp.tor.runtime.core.config.builder
 
 import io.matthewnelson.kmp.file.*
-import io.matthewnelson.kmp.tor.core.api.annotation.ExperimentalKmpTorApi
 import io.matthewnelson.kmp.tor.core.api.annotation.KmpTorDsl
 import io.matthewnelson.kmp.tor.runtime.core.ThisBlock
 import io.matthewnelson.kmp.tor.runtime.core.address.Port
@@ -85,7 +84,6 @@ import kotlin.jvm.JvmSynthetic
  * @see [TorConfig2.BuilderScope.tryConfigure]
  * */
 @KmpTorDsl
-@OptIn(ExperimentalKmpTorApi::class)
 public class BuilderScopeHS: TorSetting.BuilderScope, BuilderScopeHSPort.DSL<BuilderScopeHS> {
 
     private constructor(): super(TorOption.HiddenServiceDir, INIT)
