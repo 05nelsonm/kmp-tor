@@ -5678,8 +5678,10 @@ public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$Strict
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$SyslogIdentityTag : io/matthewnelson/kmp/tor/runtime/core/config/TorOption {
+public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$SyslogIdentityTag : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigureTryBuildable {
 	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/core/config/TorOption$SyslogIdentityTag;
+	public static final fun asSetting (Lio/matthewnelson/kmp/tor/runtime/core/ThisBlock;)Lio/matthewnelson/kmp/tor/runtime/core/config/TorSetting;
+	public synthetic fun buildable ()Lio/matthewnelson/kmp/tor/runtime/core/config/TorSetting$BuilderScope;
 	public fun equals (Ljava/lang/Object;)Z
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
@@ -6508,6 +6510,10 @@ public final class io/matthewnelson/kmp/tor/runtime/core/config/builder/BuilderS
 	public synthetic fun port (Lio/matthewnelson/kmp/tor/runtime/core/address/Port$Ephemeral;)Lio/matthewnelson/kmp/tor/runtime/core/config/builder/BuilderScopePort;
 	public fun reassignable (Z)Lio/matthewnelson/kmp/tor/runtime/core/config/builder/BuilderScopePort$Trans;
 	public synthetic fun reassignable (Z)Lio/matthewnelson/kmp/tor/runtime/core/config/builder/BuilderScopePort;
+}
+
+public final class io/matthewnelson/kmp/tor/runtime/core/config/builder/BuilderScopeSyslogIdTag : io/matthewnelson/kmp/tor/runtime/core/config/TorSetting$BuilderScope {
+	public final fun tag (Ljava/lang/String;)Lio/matthewnelson/kmp/tor/runtime/core/config/builder/BuilderScopeSyslogIdTag;
 }
 
 public abstract class io/matthewnelson/kmp/tor/runtime/core/config/builder/BuilderScopeVirtualAddr : io/matthewnelson/kmp/tor/runtime/core/config/TorSetting$BuilderScope {

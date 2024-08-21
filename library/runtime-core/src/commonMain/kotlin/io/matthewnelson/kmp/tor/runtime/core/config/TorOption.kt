@@ -1067,8 +1067,20 @@ public abstract class TorOption: Comparable<TorOption>, CharSequence {
         attributes = immutableSetOf(Attribute.LOGGING),
         isCmdLineArg = true,
         isUnique = true,
-    ) {
-        // TODO: IMPLEMENT
+    ), ConfigureTryBuildable<BuilderScopeSyslogIdTag> {
+
+        /**
+         * See [BuilderScopeSyslogIdTag]
+         *
+         * @throws [IllegalArgumentException] if misconfigured.
+         *   See [BuilderScopeSyslogIdTag].
+         * */
+        @JvmStatic
+        public fun asSetting(
+            block: ThisBlock<BuilderScopeSyslogIdTag>,
+        ): TorSetting = buildContract(block)
+
+        override fun buildable(): BuilderScopeSyslogIdTag = BuilderScopeSyslogIdTag.get()
     }
 
     /**

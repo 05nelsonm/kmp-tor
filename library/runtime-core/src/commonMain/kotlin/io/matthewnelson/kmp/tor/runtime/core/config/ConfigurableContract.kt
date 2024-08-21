@@ -73,7 +73,9 @@ internal inline fun <B: TorSetting.BuilderScope> ConfigureBuildable<B>.buildCont
  * This is distinctly different from [ConfigureBuildable] in
  * that builder scope [B] may throw exception due to requirements
  * not being met, such as the [TorOption] not being available for
- * the given host or environment.
+ * the given host or environment, or the builder being misconfigured
+ * resulting in an [IllegalArgumentException] when build is
+ * called (automatically happens on lambda closure).
  * */
 public interface ConfigureTryBuildable<B: TorSetting.BuilderScope>: ConfigurableContract<ConfigureTryBuildable<B>>
 
