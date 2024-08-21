@@ -310,17 +310,10 @@ public class TorConfig2 private constructor(settings: Set<TorSetting>) {
         }
     }
 
-// TODO
-//    /** @suppress */
-//    public override fun equals(other: Any?): Boolean {
-//        return super.equals(other)
-//    }
-//    /** @suppress */
-//    public override fun hashCode(): Int {
-//        return super.hashCode()
-//    }
-//    /** @suppress */
-//    public override fun toString(): String {
-//        return super.toString()
-//    }
+    /** @suppress */
+    public override fun equals(other: Any?): Boolean = other is TorConfig2 && other.settings == settings
+    /** @suppress */
+    public override fun hashCode(): Int = 5 * 42 + settings.hashCode()
+    /** @suppress */
+    public override fun toString(): String = buildString { settings.joinTo(this, separator = "\n") }
 }
