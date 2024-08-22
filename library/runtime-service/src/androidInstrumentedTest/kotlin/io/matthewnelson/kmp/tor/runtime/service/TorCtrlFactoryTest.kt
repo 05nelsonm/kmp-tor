@@ -22,8 +22,8 @@ import io.matthewnelson.kmp.process.Process
 import io.matthewnelson.kmp.process.Signal
 import io.matthewnelson.kmp.process.Stdio
 import io.matthewnelson.kmp.tor.resource.tor.TorResources
-import io.matthewnelson.kmp.tor.runtime.core.TorConfig
 import io.matthewnelson.kmp.tor.runtime.core.UncaughtException
+import io.matthewnelson.kmp.tor.runtime.core.config.TorOption
 import io.matthewnelson.kmp.tor.runtime.core.ctrl.TorCmd
 import io.matthewnelson.kmp.tor.runtime.core.util.executeAsync
 import io.matthewnelson.kmp.tor.runtime.ctrl.TorCmdInterceptor
@@ -48,9 +48,9 @@ class TorCtrlFactoryTest {
             .resolve("data")
             .resolve("ctrl.sock")
 
-        val ctrlArg = TorConfig.__ControlPort.Builder {
-            asUnixSocket { file = uds }
-        }.argument
+        val ctrlArg = TorOption.__ControlPort.asSetting {
+            unixSocket(uds)
+        }.items.first().argument
 
         val p = startTor(ctrlArg)
 

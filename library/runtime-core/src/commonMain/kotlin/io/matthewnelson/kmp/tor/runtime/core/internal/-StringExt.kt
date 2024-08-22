@@ -59,3 +59,9 @@ internal inline fun String.tryDecodeOrNull(
 
     return null
 }
+
+@Suppress("NOTHING_TO_INLINE")
+internal inline fun String.isSingleLine(): Boolean {
+    val i = indexOfFirst { c -> c == '\r' || c == '\n' }
+    return i == -1
+}

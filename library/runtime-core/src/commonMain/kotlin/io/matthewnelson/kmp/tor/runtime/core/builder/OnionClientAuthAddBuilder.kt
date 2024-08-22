@@ -21,15 +21,17 @@ import io.matthewnelson.immutable.collections.toImmutableSet
 import io.matthewnelson.kmp.tor.core.api.annotation.KmpTorDsl
 import io.matthewnelson.kmp.tor.runtime.core.EnqueuedJob
 import io.matthewnelson.kmp.tor.runtime.core.ThisBlock
-import io.matthewnelson.kmp.tor.runtime.core.TorConfig
 import io.matthewnelson.kmp.tor.runtime.core.apply
+import io.matthewnelson.kmp.tor.runtime.core.config.TorOption
 import io.matthewnelson.kmp.tor.runtime.core.ctrl.TorCmd
+import io.matthewnelson.kmp.tor.runtime.core.internal.configure
 import io.matthewnelson.kmp.tor.runtime.core.key.AuthKey
 import kotlin.jvm.JvmField
 import kotlin.jvm.JvmSynthetic
 
 /**
  * Helper for configuring [TorCmd.OnionClientAuth.Add] options.
+ * // TODO: Rename and move to `...ctrl.builder` package + (java9 module info). Issue #516
  * */
 @KmpTorDsl
 public class OnionClientAuthAddBuilder private constructor() {
@@ -73,7 +75,7 @@ public class OnionClientAuthAddBuilder private constructor() {
     public class FlagBuilder private constructor() {
 
         /**
-         * Setting to `true` requires that [TorConfig.ClientOnionAuthDir]
+         * Setting to `true` requires that [TorOption.ClientOnionAuthDir]
          * be defined, otherwise tor will reject the request.
          * */
         @JvmField
@@ -83,15 +85,12 @@ public class OnionClientAuthAddBuilder private constructor() {
 
             @JvmSynthetic
             internal fun configure(
-                flags: MutableSet<String>,
+                flags: LinkedHashSet<String>,
                 block: ThisBlock<FlagBuilder>,
             ) {
                 val b = FlagBuilder().apply(block)
 
-                b.Permanent?.let {
-                    val flag = "Permanent"
-                    if (it) flags.add(flag) else flags.remove(flag)
-                }
+                b.Permanent.configure(flags, "Permanent")
             }
         }
     }

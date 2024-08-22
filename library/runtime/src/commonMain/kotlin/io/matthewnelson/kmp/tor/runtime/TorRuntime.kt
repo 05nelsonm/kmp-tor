@@ -32,6 +32,8 @@ import io.matthewnelson.kmp.tor.runtime.FileID.Companion.toFIDString
 import io.matthewnelson.kmp.tor.runtime.TorRuntime.Companion.Builder
 import io.matthewnelson.kmp.tor.runtime.TorRuntime.Environment.Companion.Builder
 import io.matthewnelson.kmp.tor.runtime.core.*
+import io.matthewnelson.kmp.tor.runtime.core.config.TorConfig
+import io.matthewnelson.kmp.tor.runtime.core.config.TorOption
 import io.matthewnelson.kmp.tor.runtime.core.ctrl.TorCmd
 import io.matthewnelson.kmp.tor.runtime.core.util.isAvailableAsync
 import io.matthewnelson.kmp.tor.runtime.internal.*
@@ -430,7 +432,7 @@ public sealed interface TorRuntime:
             }
 
             /**
-             * If true, [TorConfig.GeoIPFile] and [TorConfig.GeoIPv6File] will **not**
+             * If true, [TorOption.GeoIPFile] and [TorOption.GeoIPv6File] will **not**
              * be automatically added via [TorRuntime.Builder.config] using paths
              * returned from [ResourceInstaller.install].
              *

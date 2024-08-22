@@ -26,9 +26,10 @@ import io.matthewnelson.kmp.tor.core.resource.SynchronizedObject
 import io.matthewnelson.kmp.tor.core.resource.synchronized
 import io.matthewnelson.kmp.tor.runtime.FileID.Companion.fidEllipses
 import io.matthewnelson.kmp.tor.runtime.core.*
-import io.matthewnelson.kmp.tor.runtime.core.TorConfig.Setting.Companion.filterByKeyword
 import io.matthewnelson.kmp.tor.runtime.core.address.IPSocketAddress
 import io.matthewnelson.kmp.tor.runtime.core.address.IPSocketAddress.Companion.toIPSocketAddressOrNull
+import io.matthewnelson.kmp.tor.runtime.core.config.TorOption
+import io.matthewnelson.kmp.tor.runtime.core.config.TorSetting.Companion.filterByOption
 import io.matthewnelson.kmp.tor.runtime.core.ctrl.TorCmd
 import io.matthewnelson.kmp.tor.runtime.ctrl.TorCmdInterceptor
 import io.matthewnelson.kmp.tor.runtime.internal.timedDelay
@@ -90,63 +91,73 @@ public class TorListeners private constructor(
     )
 
     /**
-     * Listeners defined by [TorConfig.__DirPort].
+     * Listeners defined by [TorOption.DirPort] and its
+     * non-persistent counterpart, [TorOption.__DirPort].
      * */
     @JvmField
     public val dir: Set<IPSocketAddress> = dir.toImmutableSet()
 
     /**
-     * Listeners defined by [TorConfig.__DNSPort].
+     * Listeners defined by [TorOption.DNSPort] and its
+     * non-persistent counterpart, [TorOption.__DNSPort].
      * */
     @JvmField
     public val dns: Set<IPSocketAddress> = dns.toImmutableSet()
 
     /**
-     * Listeners defined by [TorConfig.__HTTPTunnelPort].
+     * Listeners defined by [TorOption.HTTPTunnelPort] and its
+     * non-persistent counterpart, [TorOption.__HTTPTunnelPort].
      * */
     @JvmField
     public val http: Set<IPSocketAddress> = http.toImmutableSet()
 
     /**
-     * Listeners defined by [TorConfig.__MetricsPort].
+     * Listeners defined by [TorOption.MetricsPort] and its
+     * non-persistent counterpart, [TorOption.__MetricsPort].
      * */
     @JvmField
     public val metrics: Set<IPSocketAddress> = metrics.toImmutableSet()
 
     /**
-     * Listeners defined by [TorConfig.__NATDPort].
+     * Listeners defined by [TorOption.NATDPort] and its
+     * non-persistent counterpart, [TorOption.__NATDPort].
      * */
     @JvmField
     public val natd: Set<IPSocketAddress> = natd.toImmutableSet()
 
     /**
-     * Listeners defined by [TorConfig.__ORPort].
+     * Listeners defined by [TorOption.ORPort] and its
+     * non-persistent counterpart, [TorOption.__ORPort].
      * */
     @JvmField
     public val or: Set<IPSocketAddress> = or.toImmutableSet()
 
     /**
-     * Listeners defined by [TorConfig.__ExtORPort].
+     * Listeners defined by [TorOption.ExtORPort] and its
+     * non-persistent counterpart, [TorOption.__ExtORPort].
      * */
     @JvmField
     public val orExt: Set<IPSocketAddress> = orExt.toImmutableSet()
 
     /**
-     * Listeners defined by [TorConfig.__SocksPort] configured
-     * to use a TCP port.
+     * Listeners defined by [TorOption.SocksPort] and its
+     * non-persistent counterpart, [TorOption.__SocksPort],
+     * configured as TCP ports.
      * */
     @JvmField
     public val socks: Set<IPSocketAddress> = socks.toImmutableSet()
 
     /**
-     * Listeners defined by [TorConfig.__SocksPort] configured
-     * to use a unix socket.
+     * Listeners defined by [TorOption.SocksPort] and its
+     * non-persistent counterpart, [TorOption.__SocksPort],
+     * configured as Unix Sockets.
      * */
     @JvmField
     public val socksUnix: Set<File> = socksUnix.toImmutableSet()
 
     /**
-     * Listeners defined by [TorConfig.__TransPort].
+     * Listeners defined by [TorOption.TransPort] and its
+     * non-persistent counterpart, [TorOption.__TransPort].
      * */
     @JvmField
     public val trans: Set<IPSocketAddress> = trans.toImmutableSet()
@@ -543,8 +554,8 @@ public class TorListeners private constructor(
         protected open fun onConfigChangeJob(cmd: TorCmd.Config.Reset, job: EnqueuedJob) {
             job.invokeOnErrorRecovery(recovery = {
                 if (
-                    cmd.keywords.contains(TorConfig.__SocksPort)
-                    || cmd.keywords.contains(TorConfig.SocksPort)
+                    cmd.options.contains(TorOption.__SocksPort)
+                    || cmd.options.contains(TorOption.SocksPort)
                 ) {
                     // SocksPort was set to default. tor will still
                     // close all other socks listeners that may be
@@ -558,8 +569,8 @@ public class TorListeners private constructor(
         protected open fun onConfigChangeJob(cmd: TorCmd.Config.Set, job: EnqueuedJob) {
             job.invokeOnErrorRecovery(recovery = {
                 val changes = run {
-                    val eSocks = cmd.settings.filterByKeyword<TorConfig.__SocksPort.Companion>()
-                    val socks = cmd.settings.filterByKeyword<TorConfig.SocksPort.Companion>()
+                    val eSocks = cmd.settings.filterByOption<TorOption.__SocksPort>()
+                    val socks = cmd.settings.filterByOption<TorOption.SocksPort>()
                     eSocks + socks
                 }.takeIf { it.isNotEmpty() }?.let { settings ->
                         settings.mapTo(LinkedHashSet(settings.size, 1.0F)) { setting ->

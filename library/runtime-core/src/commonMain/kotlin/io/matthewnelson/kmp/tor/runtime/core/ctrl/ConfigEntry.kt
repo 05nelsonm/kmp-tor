@@ -15,7 +15,7 @@
  **/
 package io.matthewnelson.kmp.tor.runtime.core.ctrl
 
-import io.matthewnelson.kmp.tor.runtime.core.TorConfig
+import io.matthewnelson.kmp.tor.runtime.core.config.TorOption
 import kotlin.jvm.JvmField
 
 /**
@@ -26,33 +26,33 @@ import kotlin.jvm.JvmField
 public data class ConfigEntry(
 
     /**
-     * The [TorConfig] keyword for this entry.
+     * The [TorOption] for this entry.
      * */
     @JvmField
-    public val keyword: TorConfig.Keyword,
+    public val option: TorOption,
 
     /**
-     * The value tor is using for this [keyword], as returned by its
+     * The value tor is using for this [option], as returned by its
      * control connection.
      *
-     * If empty, then tor's set value for the given [keyword] is the
-     * default value, as defined by [TorConfig.Keyword.default].
+     * If empty, then tor's set value for the given [option] is the
+     * default value, as defined by [TorOption.default].
      * */
     @JvmField
     public val setting: String,
 ) {
 
     /**
-     * If tor is using the default value for the given [keyword] for this entry.
+     * If tor is using the default value for the given [option] for this entry.
      * */
     @JvmField
-    public val isDefault: Boolean = if (setting.isEmpty()) true else setting == keyword.default
+    public val isDefault: Boolean = if (setting.isEmpty()) true else setting == option.default
 
     /** @suppress */
     public override fun toString(): String = buildString {
         appendLine("ConfigEntry: [")
-        append("    keyword: ")
-        appendLine(keyword)
+        append("    option: ")
+        appendLine(option)
         append("    setting: ")
         appendLine(setting)
         append("    isDefault: ")

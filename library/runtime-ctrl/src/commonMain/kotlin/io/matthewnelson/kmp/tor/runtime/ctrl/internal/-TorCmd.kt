@@ -3,7 +3,7 @@
 package io.matthewnelson.kmp.tor.runtime.ctrl.internal
 
 import io.matthewnelson.kmp.file.SysDirSep
-import io.matthewnelson.kmp.tor.runtime.core.TorConfig.Keyword.Attribute
+import io.matthewnelson.kmp.tor.runtime.core.config.TorOption.Attribute
 import io.matthewnelson.kmp.tor.runtime.core.ctrl.TorCmd
 import io.matthewnelson.kmp.tor.runtime.ctrl.internal.Debugger.Companion.d
 
@@ -76,11 +76,11 @@ private fun TorCmd.Authenticate.encode(LOG: Debugger?): ByteArray {
 
 @Throws(IllegalArgumentException::class)
 private fun TorCmd.Config.Get.encode(LOG: Debugger?): ByteArray {
-    require(keywords.isNotEmpty()) { "A minimum of 1 keyword is required" }
+    require(options.isNotEmpty()) { "A minimum of 1 option is required" }
 
     return StringBuilder(keyword).apply {
-        for (word in keywords) {
-            SP().append(word)
+        for (option in options) {
+            SP().append(option)
         }
         LOG.d { ">> ${toString()}" }
         CRLF()
@@ -123,11 +123,11 @@ private fun TorCmd.Config.Load.encode(LOG: Debugger?): ByteArray {
 
 @Throws(IllegalArgumentException::class)
 private fun TorCmd.Config.Reset.encode(LOG: Debugger?): ByteArray {
-    require(keywords.isNotEmpty()) { "A minimum of 1 keyword is required" }
+    require(options.isNotEmpty()) { "A minimum of 1 option is required" }
 
     return StringBuilder(keyword).apply {
-        for (word in keywords) {
-            SP().append(word)
+        for (option in options) {
+            SP().append(option)
         }
         LOG.d { ">> ${toString()}" }
         CRLF()
@@ -151,12 +151,12 @@ private fun TorCmd.Config.Set.encode(LOG: Debugger?): ByteArray {
     return StringBuilder(keyword).apply {
         for (setting in settings) {
             for (line in setting.items) {
-                SP().append(line.keyword).append('=').append('"')
+                SP().append(line.option).append('=').append('"')
 
                 run {
                     var argument = line.argument
 
-                    with(line.keyword.attributes) {
+                    with(line.option.attributes) {
                         when {
                             contains(Attribute.UNIX_SOCKET) -> {
                                 if (argument.startsWith("unix:")) {
@@ -270,7 +270,7 @@ private fun TorCmd.Onion.Add.encode(LOG: Debugger?): ByteArray {
         }
 
         maxStreams?.let { maxStreams ->
-            SP().append("MaxStreams=").append(maxStreams.argument)
+            SP().append("MaxStreams=").append(maxStreams)
         }
 
         for (port in ports) {

@@ -19,3 +19,12 @@ package io.matthewnelson.kmp.tor.runtime.core.internal
 
 @Suppress("NOTHING_TO_INLINE")
 internal inline val Boolean.byte: Byte get() = if (this) 1 else 0
+
+@Suppress("NOTHING_TO_INLINE")
+internal inline fun Boolean?.configure(
+    flags: LinkedHashSet<String>,
+    name: String,
+) {
+    val condition = this ?: return
+    if (condition) flags.add(name) else flags.remove(name)
+}

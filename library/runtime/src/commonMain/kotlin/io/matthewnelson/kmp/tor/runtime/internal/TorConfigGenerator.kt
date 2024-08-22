@@ -28,15 +28,17 @@ import io.matthewnelson.kmp.tor.runtime.RuntimeEvent.*
 import io.matthewnelson.kmp.tor.runtime.RuntimeEvent.Notifier.Companion.d
 import io.matthewnelson.kmp.tor.runtime.RuntimeEvent.Notifier.Companion.w
 import io.matthewnelson.kmp.tor.runtime.TorRuntime
-import io.matthewnelson.kmp.tor.runtime.core.TorConfig
-import io.matthewnelson.kmp.tor.runtime.core.TorConfig.*
 import io.matthewnelson.kmp.tor.runtime.core.address.IPAddress
 import io.matthewnelson.kmp.tor.runtime.core.address.LocalHost
 import io.matthewnelson.kmp.tor.runtime.core.address.Port
 import io.matthewnelson.kmp.tor.runtime.core.address.Port.Ephemeral.Companion.toPortEphemeral
 import io.matthewnelson.kmp.tor.runtime.core.address.IPSocketAddress.Companion.toIPSocketAddressOrNull
 import io.matthewnelson.kmp.tor.runtime.core.apply
-import io.matthewnelson.kmp.tor.runtime.core.builder.ExtendedTorConfigBuilder
+import io.matthewnelson.kmp.tor.runtime.core.config.TorConfig
+import io.matthewnelson.kmp.tor.runtime.core.config.TorOption
+import io.matthewnelson.kmp.tor.runtime.core.config.TorSetting.Companion.filterByAttribute
+import io.matthewnelson.kmp.tor.runtime.core.config.builder.BuilderScopePort
+import io.matthewnelson.kmp.tor.runtime.core.config.builder.RealBuilderScopeTorConfig
 
 /**
  * Generates a minimum viable [TorConfig] using the provided settings from
@@ -84,43 +86,54 @@ internal class TorConfigGenerator internal constructor(
     private suspend fun TorConfig.validateTCPPorts(
         NOTIFIER: Notifier,
     ): TorConfig {
-        val ports = filterByAttribute<Keyword.Attribute.PORT>().filter { setting ->
-            setting[Extra.AllowReassign] == true
+        // All distinct ports that are "reassignable"
+        val ports = filterByAttribute<TorOption.Attribute.PORT>().filter { setting ->
+            setting.extras[BuilderScopePort.EXTRA_REASSIGNABLE] == true
+            // If it's Hidden Service, HiddenServiceDir is always the
+            // first argument so will be false (we don't want to reassign
+            // that).
+            && setting.items.first().isPortDistinct
         }
 
         if (ports.isEmpty()) return this
 
         val reassignments = ports.mapNotNull { setting ->
-            val (host, port) = setting.argument.toIPSocketAddressOrNull().let { pAddress ->
-                if (pAddress != null) {
-                    val host = when (pAddress.address) {
+            val root = setting.items.first()
+            val (host, port) = root.argument.toIPSocketAddressOrNull().let { ipAddress ->
+                if (ipAddress != null) {
+                    val host = when (ipAddress.address) {
                         is IPAddress.V4 -> LocalHost.IPv4
                         is IPAddress.V6 -> LocalHost.IPv6
                     }
 
-                    host to pAddress.port
+                    host to ipAddress.port
                 } else {
-                    LocalHost.IPv4 to setting.argument.toPortEphemeral()
+                    LocalHost.IPv4 to root.argument.toPortEphemeral()
                 }
             }
 
             if (isPortAvailable(host, port)) return@mapNotNull null
-            val reassigned = setting.reassignTCPPortAutoOrNull() ?: return@mapNotNull null
+
+
+            val reassigned = RealBuilderScopeTorConfig.reassignTCPPortAutoOrNull(setting)
+                ?: return@mapNotNull null
+
             NOTIFIER.w(
                 this@TorConfigGenerator,
-                "UNAVAILABLE_PORT[${setting.keyword}] ${setting.argument} reassigned to 'auto'",
+                "UNAVAILABLE_PORT[${root.option}] ${root.argument} reassigned to 'auto'",
             )
             setting to reassigned
         }
 
         if (reassignments.isEmpty()) return this
 
-        return TorConfig.Builder(other = this) {
-            reassignments.forEach { (old, new) ->
-                (this as ExtendedTorConfigBuilder).remove(old)
-                put(new)
-            }
+        val newSettings = settings.toMutableSet()
+        reassignments.forEach { (old, new) ->
+            newSettings.remove(old)
+            newSettings.add(new)
         }
+
+        return TorConfig.Builder { putAll(newSettings) }
     }
 
     public override fun toString(): String = toFIDString(includeHashCode = false)

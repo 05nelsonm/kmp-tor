@@ -21,12 +21,16 @@ import io.matthewnelson.immutable.collections.toImmutableSet
 import io.matthewnelson.kmp.tor.core.api.annotation.KmpTorDsl
 import io.matthewnelson.kmp.tor.runtime.core.EnqueuedJob
 import io.matthewnelson.kmp.tor.runtime.core.ThisBlock
-import io.matthewnelson.kmp.tor.runtime.core.TorConfig
-import io.matthewnelson.kmp.tor.runtime.core.TorConfig.HiddenServiceMaxStreams
-import io.matthewnelson.kmp.tor.runtime.core.TorConfig.HiddenServicePort
+import io.matthewnelson.kmp.tor.runtime.core.address.Port
 import io.matthewnelson.kmp.tor.runtime.core.apply
+import io.matthewnelson.kmp.tor.runtime.core.config.TorOption
+import io.matthewnelson.kmp.tor.runtime.core.config.TorSetting
+import io.matthewnelson.kmp.tor.runtime.core.config.TorSetting.LineItem.Companion.toLineItem
+import io.matthewnelson.kmp.tor.runtime.core.config.builder.BuilderScopeHSPort
+import io.matthewnelson.kmp.tor.runtime.core.config.builder.BuilderScopeHSPort.Companion.configureHSPort
 import io.matthewnelson.kmp.tor.runtime.core.ctrl.HiddenServiceEntry
 import io.matthewnelson.kmp.tor.runtime.core.ctrl.TorCmd
+import io.matthewnelson.kmp.tor.runtime.core.internal.configure
 import io.matthewnelson.kmp.tor.runtime.core.key.*
 import kotlin.jvm.JvmField
 import kotlin.jvm.JvmSynthetic
@@ -38,33 +42,29 @@ import kotlin.jvm.JvmSynthetic
  * is extremely overloaded with several "gotchas". This
  * attempts to alleviate some pain points.
  *
- * **NOTE:** A minimum of 1 [port] **must** be declared for
- * the call to succeed (i.e. [HiddenServicePort.virtual] must
- * be set).
+ * **NOTE:** A minimum of 1 [TorOption.HiddenServicePort]
+ * **must** be declared for the call to succeed (i.e. [port]
+ * must be called).
  *
  * e.g.
  *
  *     // Create new V3 Hidden Service (tor will generate keys)
  *     val entry = runtime.executeAsync(TorCmd.Onion.Add(ED25519_V3) {
- *         port {
- *             virtual = Port.HTTP
- *             targetAsPort { target = 8080.toPort() }
+ *         port(virtual = Port.HTTP) {
+ *             target(port = 8080.toPort())
  *         }
- *         port {
- *             virtual = Port.HTTPS
+ *         port(virtual = Port.HTTPS) {
  *             try {
- *                 targetAsUnixSocket {
- *                     file = runtime.environment()
- *                         .workDirectory
- *                         .resolve("test_hs.sock")
- *                 }
+ *                 target(unixSocket = runtime.environment()
+ *                     .workDirectory
+ *                     .resolve("test_hs.sock"))
  *             } catch (_: UnsupportedOperationException) {
  *                 // Fallback to TCP if on system w/o
  *                 // UnixSocket support.
- *                 targetAsPort { target = 8443.toPort() }
+ *                 target(port = 8443.toPort())
  *             }
  *         }
- *         maxStreams { maximum = 25 }
+ *         maxStreams(25)
  *     })
  *
  *     // Remove the Hidden Service
@@ -75,9 +75,8 @@ import kotlin.jvm.JvmSynthetic
  *     // entry.privateKey will not be `null` because `DiscardPK`
  *     // flag was not defined when created above.
  *     val newEntry = runtime.executeAsync(TorCmd.Onion.Add(entry.privateKey!!) {
- *         port {
- *             virtual = Port.HTTP
- *             targetAsPort { target = 8080.toPort() }
+ *         port(virtual = Port.HTTP) {
+ *             target(port = 8080.toPort())
  *         }
  *     })
  *
@@ -89,18 +88,21 @@ import kotlin.jvm.JvmSynthetic
  *     // Hidden Service, so tor did not return a private key.
  *     assertNull(newEntry.privateKey)
  *
+ * // TODO: Rename and move to `...ctrl.builder` package + (java9 module info). Issue #516
  * @see [TorCmd.Onion.Add]
  * @see [HiddenServiceEntry]
- * @see [TorConfig.HiddenServiceMaxStreams]
- * @see [TorConfig.HiddenServicePort]
+ * @see [TorOption.HiddenServiceMaxStreams]
+ * @see [TorOption.HiddenServicePort]
  * */
 @KmpTorDsl
-public class OnionAddBuilder private constructor(private val keyType: KeyType.Address<*, *>) {
+public class OnionAddBuilder private constructor(
+    private val keyType: KeyType.Address<*, *>
+): BuilderScopeHSPort.DSL<OnionAddBuilder> {
 
     private val clientAuth = LinkedHashSet<AuthKey.Public>(1, 1.0f)
     private val flags = LinkedHashSet<String>(1, 1.0f)
-    private var maxStreams: TorConfig.LineItem? = null
-    private val ports = LinkedHashSet<TorConfig.LineItem>(1, 1.0f)
+    private var maxStreams: Int? = null
+    private val ports = LinkedHashSet<TorSetting.LineItem>(1, 1.0f)
 
     /**
      * When true, an [EnqueuedJob.invokeOnCompletion] handler is
@@ -118,13 +120,15 @@ public class OnionAddBuilder private constructor(private val keyType: KeyType.Ad
     public var destroyKeyOnJobCompletion: Boolean = true
 
     @KmpTorDsl
-    public fun port(
-        block: ThisBlock<HiddenServicePort>,
-    ): OnionAddBuilder {
-        val port = HiddenServicePort.build(block)
-        if (port != null) ports.add(port)
-        return this
-    }
+    public override fun port(
+        virtual: Port,
+    ): OnionAddBuilder = port(virtual) {}
+
+    @KmpTorDsl
+    public override fun port(
+        virtual: Port,
+        block: ThisBlock<BuilderScopeHSPort>,
+    ): OnionAddBuilder = configureHSPort(virtual, ports, block)
 
     @KmpTorDsl
     public fun clientAuth(
@@ -146,9 +150,9 @@ public class OnionAddBuilder private constructor(private val keyType: KeyType.Ad
 
     @KmpTorDsl
     public fun maxStreams(
-        block: ThisBlock<HiddenServiceMaxStreams>,
+        num: Int,
     ): OnionAddBuilder {
-        maxStreams = HiddenServiceMaxStreams.build(block)
+        maxStreams = num
         return this
     }
 
@@ -175,27 +179,15 @@ public class OnionAddBuilder private constructor(private val keyType: KeyType.Ad
 
             @JvmSynthetic
             internal fun configure(
-                flags: MutableSet<String>,
+                flags: LinkedHashSet<String>,
                 block: ThisBlock<FlagBuilder>,
             ) {
                 val b = FlagBuilder().apply(block)
 
-                b.Detach?.let {
-                    val flag = "Detach"
-                    if (it) flags.add(flag) else flags.remove(flag)
-                }
-                b.DiscardPK?.let {
-                    val flag = "DiscardPK"
-                    if (it) flags.add(flag) else flags.remove(flag)
-                }
-                b.MaxStreamsCloseCircuit?.let {
-                    val flag = "MaxStreamsCloseCircuit"
-                    if (it) flags.add(flag) else flags.remove(flag)
-                }
-//                b.NonAnonymous?.let {
-//                    val flag = "NonAnonymous"
-//                    if (it) flags.add(flag) else flags.remove(flag)
-//                }
+                b.Detach.configure(flags, "Detach")
+                b.DiscardPK.configure(flags, "DiscardPK")
+                b.MaxStreamsCloseCircuit.configure(flags, "MaxStreamsCloseCircuit")
+//                b.NonAnonymous.configure(flags, "NonAnonymous")
             }
         }
     }
@@ -231,8 +223,8 @@ public class OnionAddBuilder private constructor(private val keyType: KeyType.Ad
         internal val destroyKeyOnJobCompletion: Boolean,
         flags: Set<String>,
         internal val keyType: KeyType.Address<*, *>,
-        internal val maxStreams: TorConfig.LineItem?,
-        ports: Set<TorConfig.LineItem>,
+        internal val maxStreams: Int?,
+        ports: Set<TorSetting.LineItem>,
     ) {
 
         internal val clientAuth = clientAuth.toImmutableSet()

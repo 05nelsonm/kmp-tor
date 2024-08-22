@@ -19,7 +19,7 @@ import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
 import io.matthewnelson.kmp.tor.core.resource.SynchronizedObject
 import io.matthewnelson.kmp.tor.core.resource.synchronized
 import io.matthewnelson.kmp.tor.runtime.FileID.Companion.fidEllipses
-import io.matthewnelson.kmp.tor.runtime.core.TorConfig
+import io.matthewnelson.kmp.tor.runtime.core.config.TorOption
 import kotlin.concurrent.Volatile
 import kotlin.jvm.JvmField
 import kotlin.jvm.JvmStatic
@@ -111,7 +111,7 @@ public class TorState private constructor(
     }
 
     /**
-     * The [TorConfig.DisableNetwork] setting for which the tor
+     * The [TorOption.DisableNetwork] setting for which the tor
      * process currently has set.
      * */
     public sealed class Network private constructor(

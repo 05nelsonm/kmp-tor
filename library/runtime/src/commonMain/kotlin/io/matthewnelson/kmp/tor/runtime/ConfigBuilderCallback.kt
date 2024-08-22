@@ -13,146 +13,223 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
+@file:Suppress("ProtectedInFinal", "UnnecessaryOptInAnnotation")
+
 package io.matthewnelson.kmp.tor.runtime
 
+import io.matthewnelson.kmp.file.File
 import io.matthewnelson.kmp.file.resolve
-import io.matthewnelson.kmp.file.toFile
 import io.matthewnelson.kmp.tor.core.api.ResourceInstaller
 import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
 import io.matthewnelson.kmp.tor.runtime.core.ThisBlock
-import io.matthewnelson.kmp.tor.runtime.core.TorConfig
-import io.matthewnelson.kmp.tor.runtime.core.builder.ExtendedTorConfigBuilder
-import io.matthewnelson.kmp.tor.runtime.core.builder.UnixSocketBuilder
+import io.matthewnelson.kmp.tor.runtime.core.config.TorConfig
+import io.matthewnelson.kmp.tor.runtime.core.config.TorOption
+import io.matthewnelson.kmp.tor.runtime.core.config.builder.BuilderScopePort
+import io.matthewnelson.kmp.tor.runtime.core.config.builder.RealBuilderScopeTorConfig
 import kotlin.jvm.JvmSynthetic
 
 /**
- * A Callback for configuring [TorConfig.Builder].
+ * A Callback for configuring [TorConfig.BuilderScope].
  *
  * e.g.
  *
  *     ConfigBuilderCallback { environment ->
- *         put(TorConfig.ClientOnionAuthDir) {
- *             directory = environment.workDirectory
- *                 .resolve(TorConfig.ClientOnionAuthDir.DEFAULT_NAME)
- *         }
+ *         TorOption.__SocksPort.configure { auto() }
+ *
+ *         TorOption.ClientOnionAuthDir.configure(directory =
+ *             environment.workDirectory
+ *                 .resolve("auth_private_files")
+ *         )
+ *
+ *         // ...
  *     }
  *
  * @see [TorRuntime.Builder.config]
  * */
-public fun interface ConfigBuilderCallback: ThisBlock.WithIt<TorConfig.Builder, TorRuntime.Environment> {
+public fun interface ConfigBuilderCallback: ThisBlock.WithIt<TorConfig.BuilderScope, TorRuntime.Environment> {
+
+    // TODO: Delete ThisBlock.WithIt. It's only used here.
+    // TODO: Rename to something better...
 
     /**
      * After all [ConfigBuilderCallback] have been applied, defaults
-     * are applied in order to ensure minimum settings required for
-     * [TorRuntime] are had.
+     * are then configured in order to ensure minimum settings required
+     * for [TorRuntime] are had.
      * */
     public class Defaults private constructor(
         private val paths: ResourceInstaller.Paths.Tor,
     ): ConfigBuilderCallback {
 
-        @OptIn(InternalKmpTorApi::class)
-        public override fun TorConfig.Builder.invoke(it: TorRuntime.Environment) {
-            @Suppress("UnnecessaryVariable", "RedundantSuppression")
-            val environment = it
+        public override fun TorConfig.BuilderScope.invoke(it: TorRuntime.Environment) {
+            val dataDirectory = configureFilesystem(it)
+            configureControlAuthentication(dataDirectory)
+            ensureSocksPort()
+            ensureControlPort(it.workDirectory)
+            configureDormancy()
+            configureRuntimeRequired()
+        }
 
-            // Dirs/Files
+        /**
+         * TODO
+         * */
+        protected fun TorConfig.BuilderScope.configureFilesystem(environment: TorRuntime.Environment): File {
+            @OptIn(InternalKmpTorApi::class)
+            var dataDirectory = (this as RealBuilderScopeTorConfig).dataDirectoryOrNull
+
+            if (dataDirectory == null) {
+                dataDirectory = environment.workDirectory.resolve("data")
+                TorOption.DataDirectory.configure(dataDirectory)
+            }
+
+            @OptIn(InternalKmpTorApi::class)
+            if (!containsCacheDirectory) {
+                TorOption.CacheDirectory.configure(environment.cacheDirectory)
+            }
+
+            @OptIn(InternalKmpTorApi::class)
+            if (!containsControlPortWriteToFile) {
+                val controlPortFile = environment.workDirectory.resolve("control.txt")
+                TorOption.ControlPortWriteToFile.configure(controlPortFile)
+            }
+
             if (!environment.omitGeoIPFileSettings) {
-                put(TorConfig.GeoIPFile) { file = paths.geoip }
-                put(TorConfig.GeoIPv6File) { file = paths.geoip6 }
+                TorOption.GeoIPFile.configure(paths.geoip)
+                TorOption.GeoIPv6File.configure(paths.geoip6)
             }
 
-            val dataDir = (this as ExtendedTorConfigBuilder)
-                .dataDirectory()
-                ?: TorConfig.DataDirectory.Builder {
-                    directory = environment.workDirectory
-                        .resolve(TorConfig.DataDirectory.DEFAULT_NAME)
-                }!!
+            return dataDirectory
+        }
 
-            putIfAbsent(dataDir)
+        /**
+         * TODO
+         * */
+        protected fun TorConfig.BuilderScope.configureControlAuthentication(dataDirectory: File) {
+            @OptIn(InternalKmpTorApi::class)
+            when ((this as RealBuilderScopeTorConfig).cookieAuthenticationOrNull) {
+                true -> {
+                    // Enabled. Ensure CookieAuthFile is present.
+                    if (!containsCookieAuthFile) {
+                        TorOption.CookieAuthFile.configure(dataDirectory.resolve("control_auth_cookie"))
+                    }
+                }
+                false -> {
+                    // Disabled. Ensure CookieAuthFile is NOT
+                    // present to simplify TorDaemon startup.
+                    removeCookieAuthFile()
+                }
+                null -> {
+                    // Undefined. If CookieAuthFile has been
+                    // defined, enable CookieAuthentication.
+                    if (containsCookieAuthFile) {
+                        TorOption.CookieAuthentication.configure(true)
+                    }
+                }
+            }
 
-            putIfAbsent(TorConfig.CacheDirectory) {
-                directory = environment.cacheDirectory
+            // If no authentication methods have been defined, then
+            // enable CookieAuthentication. This gives the option for
+            // consumers to disable authentication by defining
+            // `TorOption.CookieAuthentication.configure(false)`, which
+            // will then roll unauthenticated (highly ill-advised).
+            @OptIn(InternalKmpTorApi::class)
+            if (cookieAuthenticationOrNull == null) {
+                TorOption.CookieAuthentication.configure(true)
+                if (!containsCookieAuthFile) {
+                    TorOption.CookieAuthFile.configure(dataDirectory.resolve("control_auth_cookie"))
+                }
             }
-            putIfAbsent(TorConfig.ControlPortWriteToFile) {
-                file = environment.workDirectory
-                    .resolve(TorConfig.ControlPortWriteToFile.DEFAULT_NAME)
+        }
+
+        /**
+         * If [TorOption.SocksPort] or [TorOption.__SocksPort] is
+         * not defined, add [TorOption.__SocksPort] (with its default
+         * of `9050`) so that it can be checked for availability on
+         * the host and set to `auto`, if needed.
+         *
+         * This can be overridden by defining [TorOption.SocksPort]
+         * or [TorOption.__SocksPort], and then assigning a value
+         * of `false` for [BuilderScopePort.Socks.reassignable].
+         *
+         * e.g.
+         *
+         *     TorOption.__SocksPort.configure {
+         *         // argument is already `9050`, tor's default
+         *
+         *         reassignable(false)
+         *     }
+         * */
+        protected fun TorConfig.BuilderScope.ensureSocksPort() {
+            @OptIn(InternalKmpTorApi::class)
+            if ((this as RealBuilderScopeTorConfig).containsSocksPort) return
+
+            TorOption.__SocksPort.configure { /* default 9050 */ }
+        }
+
+        /**
+         * If [TorOption.ControlPort] or [TorOption.__ControlPort] have
+         * not been defined, add [TorOption.__ControlPort]. This will
+         * always prefer configuring the option as a Unix Socket, if
+         * available for the host and runtime environment.
+         *
+         * This can be overridden by defining [TorOption.ControlPort]
+         * or [TorOption.__ControlPort].
+         *
+         * e.g.
+         *
+         *     TorOption.__ControlPort.configure {
+         *         // argument is already set to `auto`
+         *     }
+         * */
+        protected fun TorConfig.BuilderScope.ensureControlPort(workDirectory: File) {
+            @OptIn(InternalKmpTorApi::class)
+            if ((this as RealBuilderScopeTorConfig).containsControlPort) return
+
+            TorOption.__ControlPort.configure {
+                try {
+                    // Prefer using Unix Sockets whenever possible
+                    // because of things like airplane mode.
+                    unixSocket(workDirectory.resolve("ctrl.sock"))
+                } catch (_: UnsupportedOperationException) {
+                    // Fallback to TCP port
+                    auto()
+                }
             }
+        }
+
+        /**
+         * If [TorOption.DormantCanceledByStartup] is not defined, it is
+         * added to the configuration with a value of `true`. The default
+         * value for tor is `false`, but that is very problematic as the
+         * for [TorOption.DormantClientTimeout] is `24 hours`. If the
+         * application is running for that long in a dormant state and a
+         * restart is performed (e.g. user closes app, opens it up again),
+         * then the next startup will sit there in dormant mode. Not a
+         * well-thought-out feature; this smooths it over while still
+         * providing choice.
+         *
+         * This can be overridden by defining [TorOption.DormantCanceledByStartup].
+         * */
+        protected fun TorConfig.BuilderScope.configureDormancy() {
+            @OptIn(InternalKmpTorApi::class)
+            if ((this as RealBuilderScopeTorConfig).containsDormantCanceledByStartup) return
 
             // If not declared specifically, add it. Tor defaults to using
             // false and that can be very problematic if default timeout of
             // 24h is reached and a restart is performed (even after application
             // is re-started)... Not a well thought feature, this smooths it
             // over while still providing choice by only adding if not declared.
-            putIfAbsent(TorConfig.DormantCanceledByStartup) { cancel = true }
 
-            // CookieAuthentication & CookieAuthFile
-            when (cookieAuthentication()?.argument) {
-                "1" -> {
-                    // If CookieAuthentication is enabled, ensure CookieAuthFile is
-                    // declared (default location or not).
-                    putIfAbsent(TorConfig.CookieAuthFile) {
-                        file = dataDir.argument.toFile()
-                            .resolve(TorConfig.CookieAuthFile.DEFAULT_NAME)
-                    }
-                }
-                "0" -> {
-                    // If specifically disabled, ensure CookieAuthFile is NOT present
-                    // to simplify process startup arguments.
-                    cookieAuthFile()?.let { remove(it) }
-                }
-                // Not present
-                else -> {
-                    if (cookieAuthFile() != null) {
-                        // If CookieAuthFile has been declared, enable it.
-                        put(TorConfig.CookieAuthentication) { enable = true }
-                    }
-                }
-            }
+            TorOption.DormantCanceledByStartup.configure(true)
+        }
 
-            // If no authentication methods are declared, add CookieAuthentication
-            //
-            // This gives the option for consumers to disable authentication by
-            // defining `put(TorConfig.CookieAuthentication) { enable = false }`
-            // which will then roll unauthenticated (highly ill-advised).
-            if (
-                !contains(TorConfig.CookieAuthentication)
-//                && !contains(TorConfig.HashedControlPassword)
-            ) {
-                put(TorConfig.CookieAuthentication) { enable = true }
-                putIfAbsent(TorConfig.CookieAuthFile) {
-                    file = dataDir.argument.toFile()
-                        .resolve(TorConfig.CookieAuthFile.DEFAULT_NAME)
-                }
-            }
-
-            // Ports
-            if (!contains(TorConfig.__SocksPort)) {
-                // Add default socks port so that port availability check
-                // can reassign it to auto if needed
-                put(TorConfig.__SocksPort) { /* default 9050 */ }
-            }
-
-            if (!contains(TorConfig.__ControlPort)) {
-                put(TorConfig.__ControlPort) {
-                    try {
-                        // Prefer using Unix Domain Sockets whenever possible
-                        // because of things like Airplane Mode.
-                        asUnixSocket {
-                            file = environment.workDirectory
-                                .resolve(UnixSocketBuilder.DEFAULT_NAME_CTRL)
-                        }
-                    } catch (_: UnsupportedOperationException) {
-                        // fallback to TCP if unavailable on the system
-                        asPort { auto() }
-                    }
-                }
-            }
-
-            // Required for TorRuntime
-            put(TorConfig.DisableNetwork) { disable = true }
-            put(TorConfig.RunAsDaemon) { enable = false }
-            put(TorConfig.__OwningControllerProcess) { /* default */ }
-            put(TorConfig.__ReloadTorrcOnSIGHUP) { reload = false }
+        /**
+         * TODO
+         * */
+        protected fun TorConfig.BuilderScope.configureRuntimeRequired() {
+            TorOption.DisableNetwork.configure(true)
+            TorOption.RunAsDaemon.configure(false)
+            TorOption.__OwningControllerProcess.configure { /* default (current pid) */ }
+            TorOption.__ReloadTorrcOnSIGHUP.configure(false)
         }
 
         internal companion object {

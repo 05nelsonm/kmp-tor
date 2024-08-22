@@ -26,7 +26,7 @@ import io.matthewnelson.kmp.tor.runtime.RuntimeEvent.Notifier.Companion.lce
 import io.matthewnelson.kmp.tor.runtime.RuntimeEvent.Notifier.Companion.w
 import io.matthewnelson.kmp.tor.runtime.core.Destroyable
 import io.matthewnelson.kmp.tor.runtime.core.OnEvent
-import io.matthewnelson.kmp.tor.runtime.core.TorConfig
+import io.matthewnelson.kmp.tor.runtime.core.config.TorOption
 import io.matthewnelson.kmp.tor.runtime.core.ctrl.TorCmd
 import io.matthewnelson.kmp.tor.runtime.core.util.executeAsync
 import io.matthewnelson.kmp.tor.runtime.internal.timedDelay
@@ -72,9 +72,7 @@ internal open class ObserverConnectivity internal constructor(
                 NetworkObserver.Connectivity.Disconnected -> true
             }
 
-            val cmd = TorConfig.DisableNetwork.Builder {
-                disable = disabled
-            }.let { TorCmd.Config.Set(it) }
+            val cmd = TorCmd.Config.Set(TorOption.DisableNetwork.asSetting(disabled))
 
             var retry = 0
             var threw: Throwable? = null
