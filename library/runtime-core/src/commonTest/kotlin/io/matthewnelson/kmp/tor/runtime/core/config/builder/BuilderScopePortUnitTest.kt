@@ -102,8 +102,14 @@ class BuilderScopePortUnitTest {
     }
 
     @Test
+    fun givenControl_whenInitialized_thenDefaultsToAuto() {
+        val setting = ControlPort.asSetting {}
+        assertEquals("auto", setting.items.first().argument)
+    }
+
+    @Test
     fun givenPort_whenAuto_thenArgumentIsAuto() {
-        val setting = ControlPort.asSetting { auto() }
+        val setting = DNSPort.asSetting { auto() }
         assertEquals("auto", setting.items.first().argument)
     }
 

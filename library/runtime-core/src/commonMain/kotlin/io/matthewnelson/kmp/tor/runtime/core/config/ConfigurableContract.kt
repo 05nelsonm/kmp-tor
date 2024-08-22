@@ -28,17 +28,17 @@ import io.matthewnelson.kmp.tor.runtime.core.internal.byte
 import kotlin.jvm.JvmSynthetic
 
 /**
- * Used as a contractual agreement between [TorConfig2.BuilderScope]
+ * Used as a contractual agreement between [TorConfig.BuilderScope]
  * and [TorOption] such that factory-like functionality can be had
- * via function calls [TorConfig2.BuilderScope.configure] and
- * [TorConfig2.BuilderScope.tryConfigure] for the [TorOption].
+ * via function calls [TorConfig.BuilderScope.configure] and
+ * [TorConfig.BuilderScope.tryConfigure] for the [TorOption].
  *
  * This is the "root" interface that all `Configurable*` interface
  * types extend. No [TorOption] implements this interface directly.
  *
  * All [TorOption] that implement a [ConfigurableContract] type
  * have an accompanying static function `asSetting` to create its
- * [TorSetting], outside of the [TorConfig2.BuilderScope], if needed.
+ * [TorSetting], outside of the [TorConfig.BuilderScope], if needed.
  *
  * @see [ConfigureBuildable]
  * @see [ConfigureBuildableTry]
@@ -58,7 +58,7 @@ public interface ConfigurableContract
  * which declares that [TorOption.buildable] is implemented and
  * able to produce [B] for a DSL builder scope.
  *
- * @see [TorConfig2.BuilderScope.configure]
+ * @see [TorConfig.BuilderScope.configure]
  * */
 public interface ConfigureBuildable<B: TorSetting.BuilderScope>: ConfigurableContract<ConfigureBuildable<B>>
 
@@ -81,7 +81,7 @@ public interface ConfigureBuildable<B: TorSetting.BuilderScope>: ConfigurableCon
  * Consult the documentation for the builder scope [B] regarding
  * what its exceptional requirements are.
  *
- * @see [TorConfig2.BuilderScope.tryConfigure]
+ * @see [TorConfig.BuilderScope.tryConfigure]
  * */
 public interface ConfigureBuildableTry<B: TorSetting.BuilderScope>: ConfigurableContract<ConfigureBuildableTry<B>>
 
@@ -91,7 +91,7 @@ public interface ConfigureBuildableTry<B: TorSetting.BuilderScope>: Configurable
  * available to be configured with `true` or `false` (which will
  * resolve to `1` or `0`, respectively, for the [TorSetting] argument).
  *
- * @see [TorConfig2.BuilderScope.configure]
+ * @see [TorConfig.BuilderScope.configure]
  * */
 public interface ConfigureBoolean: ConfigurableContract<ConfigureBoolean>
 
@@ -107,7 +107,7 @@ public interface ConfigureBoolean: ConfigurableContract<ConfigureBoolean>
  * **NOTE:** Provided [File] is always sanitized for the resulting
  * [TorSetting] using [File.absoluteFile] + [File.normalize].
  *
- * @see [TorConfig2.BuilderScope.configure]
+ * @see [TorConfig.BuilderScope.configure]
  * */
 public interface ConfigureDirectory: ConfigurableContract<ConfigureDirectory>
 
@@ -123,7 +123,7 @@ public interface ConfigureDirectory: ConfigurableContract<ConfigureDirectory>
  * **NOTE:** Provided [File] is always sanitized for the resulting
  * [TorSetting] using [File.absoluteFile] + [File.normalize].
  *
- * @see [TorConfig2.BuilderScope.configure]
+ * @see [TorConfig.BuilderScope.configure]
  * */
 public interface ConfigureFile: ConfigurableContract<ConfigureFile>
 
@@ -137,7 +137,7 @@ public interface ConfigureFile: ConfigurableContract<ConfigureFile>
  * of the [TorOption] (which points to `tor-man`) for its acceptable
  * minimum and maximum values. Otherwise, tor may error out.
  *
- * @see [TorConfig2.BuilderScope.configure]
+ * @see [TorConfig.BuilderScope.configure]
  * */
 public interface ConfigureInterval: ConfigurableContract<ConfigureInterval>
 
@@ -151,7 +151,7 @@ public interface ConfigureInterval: ConfigurableContract<ConfigureInterval>
  * of the [TorOption] (which points to `tor-man`) for its acceptable
  * minimum and maximum values. Otherwise, tor may error out.
  *
- * @see [TorConfig2.BuilderScope.configure]
+ * @see [TorConfig.BuilderScope.configure]
  * */
 public interface ConfigureIntervalMsec: ConfigurableContract<ConfigureIntervalMsec>
 

@@ -37,10 +37,12 @@ import io.matthewnelson.kmp.tor.runtime.RuntimeEvent.Notifier.Companion.stdout
 import io.matthewnelson.kmp.tor.runtime.RuntimeEvent.Notifier.Companion.w
 import io.matthewnelson.kmp.tor.runtime.core.Disposable
 import io.matthewnelson.kmp.tor.runtime.core.Executable
-import io.matthewnelson.kmp.tor.runtime.core.TorConfig
 import io.matthewnelson.kmp.tor.runtime.core.UncaughtException
 import io.matthewnelson.kmp.tor.runtime.core.address.IPSocketAddress
 import io.matthewnelson.kmp.tor.runtime.core.address.IPSocketAddress.Companion.toIPSocketAddressOrNull
+import io.matthewnelson.kmp.tor.runtime.core.config.TorConfig
+import io.matthewnelson.kmp.tor.runtime.core.config.TorOption
+import io.matthewnelson.kmp.tor.runtime.core.config.TorSetting.Companion.filterByOption
 import io.matthewnelson.kmp.tor.runtime.core.ctrl.TorCmd
 import io.matthewnelson.kmp.tor.runtime.ctrl.TorCtrl
 import io.matthewnelson.kmp.tor.runtime.internal.InstanceKeeper
@@ -314,7 +316,9 @@ internal class TorDaemon private constructor(
         checkCancellationOrInterrupt: () -> Unit,
     ): CtrlArguments.Connection {
         // Is **always** present in generated config.
-        val ctrlPortFile = filterByKeyword<TorConfig.ControlPortWriteToFile.Companion>()
+        val ctrlPortFile = filterByOption<TorOption.ControlPortWriteToFile>()
+            .first()
+            .items
             .first()
             .argument
             .toFile()
@@ -364,8 +368,10 @@ internal class TorDaemon private constructor(
     ): TorCmd.Authenticate {
         // TODO: HashedControlPassword Issue #1
 
-        return filterByKeyword<TorConfig.CookieAuthFile.Companion>()
+        return filterByOption<TorOption.CookieAuthFile>()
             .firstOrNull()
+            ?.items
+            ?.first()
             ?.argument
             ?.toFile()
             ?.awaitRead(feed, 1.seconds, checkCancellationOrInterrupt)
@@ -461,12 +467,12 @@ internal class TorDaemon private constructor(
                         val key = "--${line.substring(0, i)}"
                         val remainder = line.substring(i + 1)
 
-                        if (lineItem.keyword.isCmdLineArg) {
+                        if (lineItem.option.isCmdLineArg) {
                             cmdLine.add(key)
                             cmdLine.add(remainder)
                         }
 
-                        if (lineItem.keyword.attributes.contains(TorConfig.Keyword.Attribute.DIRECTORY)) {
+                        if (lineItem.option.attributes.contains(TorOption.Attribute.DIRECTORY)) {
                             directories.add(lineItem.argument.toFile())
                         }
                     }

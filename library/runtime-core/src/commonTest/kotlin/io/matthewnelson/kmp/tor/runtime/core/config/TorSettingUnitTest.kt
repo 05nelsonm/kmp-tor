@@ -40,7 +40,7 @@ class TorSettingUnitTest {
 
     @Test
     fun givenFilterBy_whenNestedInGroupSetting_thenReturnsSetting() {
-        val config = TorConfig2.Builder {
+        val config = TorConfig.Builder {
             DataDirectory.configure("".toFile().absoluteFile.resolve("data"))
             CacheDirectory.configure("".toFile().absoluteFile.resolve("cache"))
             HiddenServiceDir.tryConfigure {
@@ -77,7 +77,7 @@ class TorSettingUnitTest {
         }
 
         val expected = "/some/path/ctrl.sock".toFile()
-        val settings = TorConfig2.Builder {
+        val settings = TorConfig.Builder {
             ControlPort.configure {
                 unixSocket(value = expected)
             }
@@ -99,7 +99,7 @@ class TorSettingUnitTest {
         }
 
         val expected = "/some/path/ctrl.sock".toFile()
-        val settings = TorConfig2.Builder {
+        val settings = TorConfig.Builder {
             ControlPort.configure {
                 unixSocket(value = expected)
             }
@@ -115,7 +115,7 @@ class TorSettingUnitTest {
 
     @Test
     fun givenFilterBy_whenMultipleOfSame_thenReturnsExpected() {
-        val settings = TorConfig2.Builder {
+        val settings = TorConfig.Builder {
             CacheDirectory.configure("/path/to/cache".toFile())
 
             ControlPort.configure { port(9055.toPortEphemeral()) }

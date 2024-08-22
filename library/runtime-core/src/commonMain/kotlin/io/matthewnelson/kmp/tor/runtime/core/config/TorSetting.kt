@@ -266,7 +266,7 @@ public class TorSetting private constructor(
          * @see [Iterable.filterByAttribute]
          * */
         @JvmStatic
-        public inline fun <reified A: TorOption.Attribute> TorConfig2.filterByAttribute(): List<TorSetting> {
+        public inline fun <reified A: TorOption.Attribute> TorConfig.filterByAttribute(): List<TorSetting> {
             return settings.filterByAttribute<A>()
         }
 
@@ -323,12 +323,12 @@ public class TorSetting private constructor(
 
         /**
          * Returns a list containing all elements of [TorSetting] within
-         * the [TorConfig2] which contain a [LineItem] for option [O].
+         * the [TorConfig] which contain a [LineItem] for option [O].
          *
          * @see [Iterable.filterByOption]
          * */
         @JvmStatic
-        public inline fun <reified O: TorOption> TorConfig2.filterByOption(): List<TorSetting> {
+        public inline fun <reified O: TorOption> TorConfig.filterByOption(): List<TorSetting> {
             return settings.filterByOption<O>()
         }
 
@@ -360,7 +360,6 @@ public class TorSetting private constructor(
             val items = toImmutableSet()
 
             require(items.isNotEmpty()) { "items cannot be empty" }
-            // TODO: Restrict grouping behavior...
 
             return TorSetting(items, extras.toImmutableMap())
         }

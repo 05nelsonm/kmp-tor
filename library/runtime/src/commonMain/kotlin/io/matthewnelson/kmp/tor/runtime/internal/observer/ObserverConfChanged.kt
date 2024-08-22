@@ -18,8 +18,8 @@ package io.matthewnelson.kmp.tor.runtime.internal.observer
 import io.matthewnelson.kmp.tor.runtime.TorListeners
 import io.matthewnelson.kmp.tor.runtime.TorState
 import io.matthewnelson.kmp.tor.runtime.core.OnEvent
-import io.matthewnelson.kmp.tor.runtime.core.TorConfig
 import io.matthewnelson.kmp.tor.runtime.core.TorEvent
+import io.matthewnelson.kmp.tor.runtime.core.config.TorOption
 
 internal open class ObserverConfChanged internal constructor(
     private val manager: TorListeners.Manager,
@@ -39,7 +39,7 @@ internal open class ObserverConfChanged internal constructor(
             // DisableNetwork=0
             // DisableNetwork=1
             // DisableNetwork  << Implied 1
-            line.startsWith(TorConfig.DisableNetwork.name, ignoreCase = true) -> {
+            line.startsWith(TorOption.DisableNetwork.name, ignoreCase = true) -> {
                 network = if (line.substringAfter('=') == "0") {
                     TorState.Network.Enabled
                 } else {

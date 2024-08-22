@@ -37,6 +37,7 @@ import io.matthewnelson.kmp.tor.runtime.core.Destroyable.Companion.checkIsNotDes
 import io.matthewnelson.kmp.tor.runtime.core.EnqueuedJob.Companion.toImmediateErrorJob
 import io.matthewnelson.kmp.tor.runtime.core.UncaughtException.Handler.Companion.tryCatch
 import io.matthewnelson.kmp.tor.runtime.core.UncaughtException.Handler.Companion.withSuppression
+import io.matthewnelson.kmp.tor.runtime.core.config.TorOption
 import io.matthewnelson.kmp.tor.runtime.core.ctrl.TorCmd
 import io.matthewnelson.kmp.tor.runtime.core.util.executeAsync
 import io.matthewnelson.kmp.tor.runtime.ctrl.TempTorCmdQueue
@@ -609,14 +610,14 @@ internal class RealTorRuntime private constructor(
                 checkCancellationOrInterrupt()
                 observer.subscribe()
 
-                ctrl.executeAsync(TorCmd.Config.Reset(keywords = buildSet {
+                ctrl.executeAsync(TorCmd.Config.Reset(options = buildSet {
                     if (networkObserver.isNetworkConnected()) {
-                        add(TorConfig.DisableNetwork)
+                        add(TorOption.DisableNetwork)
                     } else {
                         NOTIFIER.w(this@RealTorRuntime, "No Network Connectivity. Waiting...")
                     }
 
-                    add(TorConfig.__OwningControllerProcess)
+                    add(TorOption.__OwningControllerProcess)
                 }))
 
                 checkCancellationOrInterrupt()

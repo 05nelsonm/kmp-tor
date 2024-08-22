@@ -15,7 +15,7 @@
  **/
 package io.matthewnelson.kmp.tor.runtime.core.ctrl
 
-import io.matthewnelson.kmp.tor.runtime.core.TorConfig
+import io.matthewnelson.kmp.tor.runtime.core.config.TorOption
 import kotlin.test.Test
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
@@ -24,13 +24,13 @@ class ConfigEntryUnitTest {
 
     @Test
     fun givenEntry_whenValueIsEmpty_thenIsDefaultIsTrue() {
-        val entry = ConfigEntry(TorConfig.__SocksPort, "")
+        val entry = ConfigEntry(TorOption.__SocksPort, "")
         assertTrue(entry.isDefault)
     }
 
     @Test
     fun givenEntry_whenValueIsNotEmpty_thenChecksKeywordDefault() {
-        val entry = ConfigEntry(TorConfig.__SocksPort, TorConfig.__SocksPort.default)
+        val entry = ConfigEntry(TorOption.__SocksPort, TorOption.__SocksPort.default)
         assertTrue(entry.isDefault)
         assertFalse(entry.copy(setting = "9055").isDefault)
     }

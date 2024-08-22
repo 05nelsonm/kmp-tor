@@ -31,6 +31,7 @@ import io.matthewnelson.kmp.tor.runtime.core.address.IPAddress.V6.Companion.toIP
 import io.matthewnelson.kmp.tor.runtime.core.address.OnionAddress
 import io.matthewnelson.kmp.tor.runtime.core.address.Port
 import io.matthewnelson.kmp.tor.runtime.core.builder.OnionClientAuthAddBuilder
+import io.matthewnelson.kmp.tor.runtime.core.config.TorOption
 import io.matthewnelson.kmp.tor.runtime.core.ctrl.AddressMapping.Companion.mappingToAnyHost
 import io.matthewnelson.kmp.tor.runtime.core.ctrl.AddressMapping.Companion.mappingToAnyHostIPv4
 import io.matthewnelson.kmp.tor.runtime.core.ctrl.AddressMapping.Companion.mappingToAnyHostIPv6
@@ -41,7 +42,6 @@ import io.matthewnelson.kmp.tor.runtime.core.ctrl.TorCmd
 import io.matthewnelson.kmp.tor.runtime.core.key.ED25519_V3
 import io.matthewnelson.kmp.tor.runtime.core.key.ED25519_V3.PrivateKey.Companion.toED25519_V3PrivateKeyOrNull
 import io.matthewnelson.kmp.tor.runtime.core.util.executeAsync
-import io.matthewnelson.kmp.tor.runtime.test.TestUtils
 import io.matthewnelson.kmp.tor.runtime.test.TestUtils.clientAuthTestKeyPairs
 import io.matthewnelson.kmp.tor.runtime.test.TestUtils.ensureStoppedOnTestCompletion
 import io.matthewnelson.kmp.tor.runtime.test.TestUtils.testEnv
@@ -70,15 +70,15 @@ class TorCmdUnitTest {
 //            println(entries.first())
         }
 
-        TestUtils.KEYWORDS.forEach { kw ->
-            runtime.enqueue(TorCmd.Config.Get(kw), onFailure, onSuccess)
+        TorOption.entries.forEach { option ->
+            runtime.enqueue(TorCmd.Config.Get(option), onFailure, onSuccess)
         }
 
         // Will suspend test until all previously enqueued jobs complete.
         // This also ensures that multi-keyword requests are functional.
         val resultMulti = runtime.executeAsync(TorCmd.Config.Get(
-            TorConfig.ConnectionPadding,
-            TorConfig.DataDirectory,
+            TorOption.ConnectionPadding,
+            TorOption.DataDirectory,
         ))
 
         synchronized(lock) {
@@ -322,10 +322,10 @@ class TorCmdUnitTest {
         val runtime = TorRuntime.Builder(testEnv("cmd_onion_view")) {
 //            observerStatic(RuntimeEvent.LOG.DEBUG) { println(it) }
             config { environment ->
-                put(TorConfig.ClientOnionAuthDir) {
-                    directory = environment.workDirectory
-                        .resolve(TorConfig.ClientOnionAuthDir.DEFAULT_NAME)
-                }
+                TorOption.ClientOnionAuthDir.configure(directory =
+                    environment.workDirectory
+                        .resolve("auth_private_files")
+                )
             }
         }.ensureStoppedOnTestCompletion()
 

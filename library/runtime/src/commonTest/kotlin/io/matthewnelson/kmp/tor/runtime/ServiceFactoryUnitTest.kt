@@ -35,7 +35,6 @@ import kotlinx.coroutines.test.runTest
 import kotlin.coroutines.cancellation.CancellationException
 import kotlin.test.*
 import kotlin.time.Duration.Companion.milliseconds
-import kotlin.time.Duration.Companion.seconds
 
 @OptIn(ExperimentalKmpTorApi::class, InternalKmpTorApi::class)
 class ServiceFactoryUnitTest {

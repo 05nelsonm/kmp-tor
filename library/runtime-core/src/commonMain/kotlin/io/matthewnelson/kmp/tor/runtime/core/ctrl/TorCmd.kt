@@ -13,6 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
+@file:Suppress("UNUSED_PARAMETER")
+
 package io.matthewnelson.kmp.tor.runtime.core.ctrl
 
 import io.matthewnelson.encoding.base16.Base16
@@ -27,6 +29,9 @@ import io.matthewnelson.kmp.tor.runtime.core.address.OnionAddress
 import io.matthewnelson.kmp.tor.runtime.core.builder.OnionAddBuilder
 import io.matthewnelson.kmp.tor.runtime.core.builder.OnionAddBuilder.Companion.configure
 import io.matthewnelson.kmp.tor.runtime.core.builder.OnionClientAuthAddBuilder
+import io.matthewnelson.kmp.tor.runtime.core.config.TorConfig
+import io.matthewnelson.kmp.tor.runtime.core.config.TorOption
+import io.matthewnelson.kmp.tor.runtime.core.config.TorSetting
 import io.matthewnelson.kmp.tor.runtime.core.key.*
 import kotlin.coroutines.cancellation.CancellationException
 import kotlin.jvm.JvmField
@@ -103,12 +108,12 @@ public sealed class TorCmd<Success: Any> private constructor(
         public class Get: Unprivileged<List<ConfigEntry>> {
 
             @JvmField
-            public val keywords: kotlin.collections.Set<TorConfig.Keyword>
+            public val options: kotlin.collections.Set<TorOption>
 
-            public constructor(keyword: TorConfig.Keyword): this(immutableSetOf(keyword))
-            public constructor(vararg keywords: TorConfig.Keyword): this(immutableSetOf(*keywords))
-            public constructor(keywords: Collection<TorConfig.Keyword>): super("GETCONF") {
-                this.keywords = keywords.toImmutableSet()
+            public constructor(options: TorOption): this(immutableSetOf(options))
+            public constructor(vararg options: TorOption): this(immutableSetOf(*options))
+            public constructor(options: Collection<TorOption>): super("GETCONF") {
+                this.options = options.toImmutableSet()
             }
         }
 
@@ -126,12 +131,12 @@ public sealed class TorCmd<Success: Any> private constructor(
         public class Reset: Unprivileged<Reply.Success.OK> {
 
             @JvmField
-            public val keywords: kotlin.collections.Set<TorConfig.Keyword>
+            public val options: kotlin.collections.Set<TorOption>
 
-            public constructor(keyword: TorConfig.Keyword): this(immutableSetOf(keyword))
-            public constructor(vararg keywords: TorConfig.Keyword): this(immutableSetOf(*keywords))
-            public constructor(keywords: Collection<TorConfig.Keyword>): super("RESETCONF") {
-                this.keywords = keywords.toImmutableSet()
+            public constructor(option: TorOption): this(immutableSetOf(option))
+            public constructor(vararg options: TorOption): this(immutableSetOf(*options))
+            public constructor(options: Collection<TorOption>): super("RESETCONF") {
+                this.options = options.toImmutableSet()
             }
         }
 
@@ -156,13 +161,17 @@ public sealed class TorCmd<Success: Any> private constructor(
         public class Set: Unprivileged<Reply.Success.OK> {
 
             @JvmField
-            public val settings: kotlin.collections.Set<TorConfig.Setting>
+            public val settings: kotlin.collections.Set<TorSetting>
 
-            public constructor(block: ThisBlock<TorConfig.Builder>): this(TorConfig.Builder(block).settings)
-            public constructor(setting: TorConfig.Setting): this(immutableSetOf(setting))
-            public constructor(vararg settings: TorConfig.Setting): this(immutableSetOf(*settings))
-            public constructor(settings: Collection<TorConfig.Setting>): super("SETCONF") {
-                this.settings = settings.toImmutableSet()
+            public constructor(setting: TorSetting): this(immutableSetOf(setting), null)
+            public constructor(vararg settings: TorSetting): this(ThisBlock { settings.forEach { put(it) } })
+            public constructor(settings: Collection<TorSetting>): this(ThisBlock { putAll(settings) })
+
+            public constructor(block: ThisBlock<TorConfig.BuilderScope>): this(TorConfig.Builder(block))
+            public constructor(config: TorConfig): this(config.settings, null)
+
+            private constructor(settings: kotlin.collections.Set<TorSetting>, any: Any?): super("SETCONF") {
+                this.settings = settings
             }
         }
     }
@@ -286,9 +295,9 @@ public sealed class TorCmd<Success: Any> private constructor(
             @JvmField
             public val flags: Set<String>
             @JvmField
-            public val maxStreams: TorConfig.LineItem?
+            public val maxStreams: Int?
             @JvmField
-            public val ports: Set<TorConfig.LineItem>
+            public val ports: Set<TorSetting.LineItem>
             @JvmField
             public val destroyKeyOnJobCompletion: Boolean
 
@@ -331,9 +340,8 @@ public sealed class TorCmd<Success: Any> private constructor(
              * e.g.
              *
              *     TorCmd.Onion.Add("[Blob Redacted]".toED25519_V3PrivateKey()) {
-             *         port {
-             *             virtual = Port.HTTP
-             *             targetAsPort { target = 8080.toPort() }
+             *         port(virtual = Port.HTTP) {
+             *             target(port = 8080.toPort())
              *         }
              *     }
              *

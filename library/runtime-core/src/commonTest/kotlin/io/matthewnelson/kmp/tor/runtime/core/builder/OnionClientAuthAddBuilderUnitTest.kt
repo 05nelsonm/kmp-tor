@@ -22,7 +22,7 @@ class OnionClientAuthAddBuilderUnitTest {
 
     @Test
     fun givenFlags_whenEnabled_thenArePresent() {
-        val flags = mutableSetOf<String>()
+        val flags = LinkedHashSet<String>()
         OnionClientAuthAddBuilder.FlagBuilder.configure(flags) {
             Permanent = true
         }

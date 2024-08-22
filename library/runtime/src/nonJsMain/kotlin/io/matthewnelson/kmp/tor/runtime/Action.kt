@@ -20,6 +20,7 @@ package io.matthewnelson.kmp.tor.runtime
 import io.matthewnelson.kmp.file.InterruptedException
 import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
 import io.matthewnelson.kmp.tor.runtime.core.*
+import io.matthewnelson.kmp.tor.runtime.core.config.TorConfig
 import io.matthewnelson.kmp.tor.runtime.core.ctrl.TorCmd
 import io.matthewnelson.kmp.tor.runtime.core.util.awaitAsync
 import io.matthewnelson.kmp.tor.runtime.core.util.awaitSync

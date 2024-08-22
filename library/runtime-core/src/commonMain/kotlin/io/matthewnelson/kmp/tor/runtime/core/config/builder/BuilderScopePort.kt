@@ -57,7 +57,13 @@ public abstract class BuilderScopePort: TorSetting.BuilderScope {
 
     /**
      * A DSL builder scope for [TorOption.__ControlPort] and
-     * [TorOption.ControlPort].
+     * [TorOption.ControlPort]. Because `kmp-tor` is built entirely
+     * around tor's control connection APIs, [disable] is made
+     * unavailable and the [argument] is always initialized with
+     * a value of [auto].
+     *
+     * If utilizing `kmp-tor:runtime`, [TorOption.__ControlPort] will
+     * always be added if not already present.
      * */
     @KmpTorDsl
     public class Control: BuilderScopePort {
@@ -68,8 +74,10 @@ public abstract class BuilderScopePort: TorSetting.BuilderScope {
         @KmpTorDsl
         public override fun auto(): Control = super.auto() as Control
 
-        @KmpTorDsl
-        public override fun disable(): Control = super.disable() as Control
+        init { auto() }
+
+//        @KmpTorDsl
+//        public override fun disable(): Control = super.disable() as Control
 
         @KmpTorDsl
         public override fun port(

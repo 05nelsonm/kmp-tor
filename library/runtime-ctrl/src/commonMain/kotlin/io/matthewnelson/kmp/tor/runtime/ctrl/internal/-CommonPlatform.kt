@@ -23,10 +23,10 @@ import io.matthewnelson.kmp.file.InterruptedException
 import io.matthewnelson.kmp.tor.runtime.core.OnFailure
 import io.matthewnelson.kmp.tor.runtime.core.EnqueuedJob
 import io.matthewnelson.kmp.tor.runtime.core.EnqueuedJob.Companion.toImmediateErrorJob
-import io.matthewnelson.kmp.tor.runtime.core.TorConfig
 import io.matthewnelson.kmp.tor.runtime.core.UncaughtException
 import io.matthewnelson.kmp.tor.runtime.core.UncaughtException.Handler.Companion.tryCatch
 import io.matthewnelson.kmp.tor.runtime.core.UncaughtException.Handler.Companion.withSuppression
+import io.matthewnelson.kmp.tor.runtime.core.config.TorOption
 import io.matthewnelson.kmp.tor.runtime.core.ctrl.TorCmd
 import kotlin.collections.removeFirst as kRemoveFirst
 
@@ -35,8 +35,8 @@ import kotlin.collections.removeFirst as kRemoveFirst
 internal inline fun File.checkUnixSockedSupport() {
     val path = this
 
-    TorConfig.__ControlPort.Builder {
-        asUnixSocket { file = path }
+    TorOption.__ControlPort.asSetting {
+        unixSocket(path)
     }
 
     if (exists()) return

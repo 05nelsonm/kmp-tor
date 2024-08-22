@@ -99,8 +99,8 @@ internal fun TorCmdJob<*>.respond(replies: ArrayList<Reply>) {
 private fun TorCmd.Config.Get.complete(job: TorCmdJob<*>, replies: ArrayList<Reply.Success>) {
     val entries = ArrayList<ConfigEntry>(replies.size)
     replies.forEachKvp { key, setting ->
-        val keyword = keywords.first { it.name.equals(key, ignoreCase = true) }
-        entries.add(ConfigEntry(keyword, setting))
+        val option = options.first { it.name.equals(key, ignoreCase = true) }
+        entries.add(ConfigEntry(option, setting))
     }
     job.unsafeCast<List<ConfigEntry>>().completion(entries.toImmutableList())
 }

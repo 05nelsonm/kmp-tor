@@ -28,8 +28,8 @@ class OnionAddBuilderUnitTest {
 
     @Test
     fun givenFlags_whenFalse_thenAreRemoved() {
-        val flags = mutableSetOf<String>()
-        val allFlags = mutableSetOf<String>()
+        val flags = LinkedHashSet<String>()
+        val allFlags = LinkedHashSet<String>()
         var i = 0
 
         listOf<Triple<String, FlagBuilder.() -> Unit, FlagBuilder.() -> Unit>>(

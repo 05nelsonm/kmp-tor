@@ -34,7 +34,7 @@ import kotlin.jvm.JvmSynthetic
  * @see [TorSetting.filterByAttribute]
  * @see [TorSetting.filterByOption]
  * */
-public class TorConfig2 private constructor(settings: Set<TorSetting>) {
+public class TorConfig private constructor(settings: Set<TorSetting>) {
 
     /**
      * All [TorSetting] which make up this configuration.
@@ -45,21 +45,21 @@ public class TorConfig2 private constructor(settings: Set<TorSetting>) {
     public companion object {
 
         /**
-         * Opener for [BuilderScope] DSL to create [TorConfig2].
+         * Opener for [BuilderScope] DSL to create [TorConfig].
          *
          * @see [BuilderScope]
          * */
         @JvmStatic
         public fun Builder(
             block: ThisBlock<BuilderScope>,
-        ): TorConfig2 {
+        ): TorConfig {
             @OptIn(InternalKmpTorApi::class)
-            return RealBuilderScopeTorConfig.build(::TorConfig2, block)
+            return RealBuilderScopeTorConfig.build(::TorConfig, block)
         }
     }
 
     /**
-     * A DSL builder scope for creating [TorConfig2].
+     * A DSL builder scope for creating [TorConfig].
      *
      * e.g. (Kotlin)
      *
@@ -311,7 +311,7 @@ public class TorConfig2 private constructor(settings: Set<TorSetting>) {
     }
 
     /** @suppress */
-    public override fun equals(other: Any?): Boolean = other is TorConfig2 && other.settings == settings
+    public override fun equals(other: Any?): Boolean = other is TorConfig && other.settings == settings
     /** @suppress */
     public override fun hashCode(): Int = 5 * 42 + settings.hashCode()
     /** @suppress */

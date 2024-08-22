@@ -42,7 +42,7 @@ import kotlin.time.Duration.Companion.seconds
  * Option models for those specified in the [tor-manual](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc)
  * and [control-spec](https://spec.torproject.org/control-spec/implementation-notes.html?highlight=__#special-config-options).
  *
- * @see [TorConfig2]
+ * @see [TorConfig]
  * @see [TorSetting]
  * @see [ConfigurableContract]
  * @see [entries]
@@ -5256,7 +5256,7 @@ public abstract class TorOption: Comparable<TorOption>, CharSequence {
      * Factory function for a [TorOption] that, when implemented along
      * with the [ConfigureBuildable] or [ConfigureBuildableTry] interface,
      * makes the [TorOption] available for factory-like functionality via
-     * [TorConfig2.BuilderScope.configure] and [TorConfig2.BuilderScope.tryConfigure]
+     * [TorConfig.BuilderScope.configure] and [TorConfig.BuilderScope.tryConfigure]
      *
      * @throws [UnsupportedOperationException] if the implementation has
      *   platform specific requirements that are not met. (e.g. [TransPort])

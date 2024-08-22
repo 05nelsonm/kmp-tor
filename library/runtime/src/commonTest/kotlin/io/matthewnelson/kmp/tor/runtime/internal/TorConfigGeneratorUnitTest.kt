@@ -23,11 +23,12 @@ import io.matthewnelson.kmp.tor.core.api.ResourceInstaller.Paths
 import io.matthewnelson.kmp.tor.runtime.ConfigBuilderCallback
 import io.matthewnelson.kmp.tor.runtime.RuntimeEvent
 import io.matthewnelson.kmp.tor.runtime.TorRuntime
-import io.matthewnelson.kmp.tor.runtime.core.TorConfig
-import io.matthewnelson.kmp.tor.runtime.core.TorConfig.Setting.Companion.filterByKeyword
 import io.matthewnelson.kmp.tor.runtime.core.address.LocalHost
 import io.matthewnelson.kmp.tor.runtime.core.address.Port
 import io.matthewnelson.kmp.tor.runtime.core.address.Port.Ephemeral.Companion.toPortEphemeral
+import io.matthewnelson.kmp.tor.runtime.core.config.TorConfig
+import io.matthewnelson.kmp.tor.runtime.core.config.TorOption
+import io.matthewnelson.kmp.tor.runtime.core.config.TorSetting.Companion.filterByOption
 import io.matthewnelson.kmp.tor.runtime.test.TestUtils.testEnv
 import kotlinx.coroutines.test.runTest
 import kotlin.test.Test
@@ -57,15 +58,15 @@ class TorConfigGeneratorUnitTest {
     fun givenGeoipOmission_whenGenerate_thenDoesNotContainSettings() = runTest {
         val environment = testEnv("config_test_omit_geoip", ::installer) { omitGeoIPFileSettings = true }
         val settings = newGenerator(environment).generate(notifier).first.settings
-        assertEquals(0, settings.filterByKeyword<TorConfig.GeoIPFile.Companion>().size)
-        assertEquals(0, settings.filterByKeyword<TorConfig.GeoIPv6File.Companion>().size)
+        assertEquals(0, settings.filterByOption<TorOption.GeoIPFile>().size)
+        assertEquals(0, settings.filterByOption<TorOption.GeoIPv6File>().size)
     }
 
     @Test
     fun givenGeoipNoOmission_whenGenerate_thenContainsSettings() = runTest {
         with(newGenerator().generate(notifier).first) {
-            assertContains(TorConfig.GeoIPFile)
-            assertContains(TorConfig.GeoIPv6File)
+            assertContains(TorOption.GeoIPFile)
+            assertContains(TorOption.GeoIPv6File)
         }
     }
 
@@ -85,16 +86,16 @@ class TorConfigGeneratorUnitTest {
     @Test
     fun givenNoConfig_whenGenerate_thenMinimumSettingsApplied() = runTest {
         with(newGenerator().generate(notifier).first) {
-            assertContains(TorConfig.DataDirectory)
-            assertContains(TorConfig.CacheDirectory)
-            assertContains(TorConfig.ControlPortWriteToFile)
-            assertContains(TorConfig.CookieAuthFile)
-            assertContains(TorConfig.__SocksPort)
-            assertContains(TorConfig.__ControlPort)
-            assertContains(TorConfig.DisableNetwork)
-            assertContains(TorConfig.RunAsDaemon)
-            assertContains(TorConfig.__OwningControllerProcess)
-            assertContains(TorConfig.__ReloadTorrcOnSIGHUP)
+            assertContains(TorOption.DataDirectory)
+            assertContains(TorOption.CacheDirectory)
+            assertContains(TorOption.ControlPortWriteToFile)
+            assertContains(TorOption.CookieAuthFile)
+            assertContains(TorOption.__SocksPort)
+            assertContains(TorOption.__ControlPort)
+            assertContains(TorOption.DisableNetwork)
+            assertContains(TorOption.RunAsDaemon)
+            assertContains(TorOption.__OwningControllerProcess)
+            assertContains(TorOption.__ReloadTorrcOnSIGHUP)
         }
     }
 
@@ -104,16 +105,16 @@ class TorConfigGeneratorUnitTest {
         val settings = newGenerator(
             config = setOf(
                 ConfigBuilderCallback {
-                    put(TorConfig.__DNSPort) { port(1080.toPortEphemeral()) }
+                    TorOption.__DNSPort.configure { port(1080.toPortEphemeral()) }
                 }
             ),
             isPortAvailable = { _, _ -> false }
         ).generate(notifier).first.settings
 
-        val socks = settings.filterByKeyword<TorConfig.__SocksPort.Companion>().first()
-        assertEquals("auto", socks.argument)
-        val dns = settings.filterByKeyword<TorConfig.__DNSPort.Companion>().first()
-        assertEquals("auto", dns.argument)
+        val socks = settings.filterByOption<TorOption.__SocksPort>().first()
+        assertEquals("auto", socks.items.first().argument)
+        val dns = settings.filterByOption<TorOption.__DNSPort>().first()
+        assertEquals("auto", dns.items.first().argument)
     }
 
     @Test
@@ -121,55 +122,51 @@ class TorConfigGeneratorUnitTest {
         val config = newGenerator(
             config = setOf(
                 ConfigBuilderCallback {
-                    put(TorConfig.CookieAuthentication) { enable = true }
+                    TorOption.CookieAuthentication.configure(true)
                 }
             )
         ).generate(notifier).first
 
-        config.assertContains(TorConfig.CookieAuthFile)
+        config.assertContains(TorOption.CookieAuthFile)
     }
 
     @Test
     fun givenCookieAuthenticationEnabled_whenCookieAuthFile_thenDoesNotModify() = runTest {
         val expected = environment.workDirectory.resolve("data")
-            .resolve(TorConfig.CookieAuthFile.DEFAULT_NAME + "_something")
+            .resolve("control_auth_cookie_something")
 
         val setting = newGenerator(
             config = setOf(
                 ConfigBuilderCallback {
-                    put(TorConfig.CookieAuthentication) { enable = true }
-                    put(TorConfig.CookieAuthFile) {
-                        file = expected
-                    }
+                    TorOption.CookieAuthentication.configure(true)
+                    TorOption.CookieAuthFile.configure(expected)
                 }
             )
         ).generate(notifier)
             .first
             .settings
-            .filterByKeyword<TorConfig.CookieAuthFile.Companion>()
+            .filterByOption<TorOption.CookieAuthFile>()
             .first()
 
-        assertEquals(expected.path, setting.argument)
+        assertEquals(expected.path, setting.items.first().argument)
     }
 
     @Test
     fun givenCookieAuthenticationDisabled_whenCookieAuthFile_thenRemoves() = runTest {
         val expected = environment.workDirectory.resolve("data")
-            .resolve(TorConfig.CookieAuthFile.DEFAULT_NAME + "_something")
+            .resolve("control_auth_cookie_something")
 
         val setting = newGenerator(
             config = setOf(
                 ConfigBuilderCallback {
-                    put(TorConfig.CookieAuthentication) { enable = false }
-                    put(TorConfig.CookieAuthFile) {
-                        file = expected
-                    }
+                    TorOption.CookieAuthentication.configure(false)
+                    TorOption.CookieAuthFile.configure(expected)
                 }
             )
         ).generate(notifier)
             .first
             .settings
-            .filterByKeyword<TorConfig.CookieAuthFile.Companion>()
+            .filterByOption<TorOption.CookieAuthFile>()
             .firstOrNull()
 
         assertNull(setting)
@@ -179,8 +176,8 @@ class TorConfigGeneratorUnitTest {
     fun givenAuthentication_whenNothingDeclared_thenAddsCookieAuthenticationDefaults() = runTest {
         val config = newGenerator().generate(notifier).first
 
-        config.assertContains(TorConfig.CookieAuthentication)
-        config.assertContains(TorConfig.CookieAuthFile)
+        config.assertContains(TorOption.CookieAuthentication)
+        config.assertContains(TorOption.CookieAuthFile)
     }
 
     @Test
@@ -188,26 +185,28 @@ class TorConfigGeneratorUnitTest {
         val setting = newGenerator(
             config = setOf(
                 ConfigBuilderCallback {
-                    put(TorConfig.CookieAuthFile) {
-                        file = environment.workDirectory
+                    TorOption.CookieAuthFile.configure(file =
+                        environment.workDirectory
                             .resolve("data")
-                            .resolve(TorConfig.CookieAuthFile.DEFAULT_NAME)
-                    }
+                            .resolve("control_auth_cookie")
+                    )
                 }
             )
         ).generate(notifier)
             .first
             .settings
-            .filterByKeyword<TorConfig.CookieAuthentication.Companion>()
+            .filterByOption<TorOption.CookieAuthentication>()
+            .first()
+            .items
             .first()
 
         assertEquals("1", setting.argument)
-        assertEquals(TorConfig.CookieAuthentication.Companion, setting.keyword)
+        assertEquals(TorOption.CookieAuthentication, setting.option)
     }
 
     @Suppress("UNUSED_PARAMETER")
-    private inline fun <reified K: TorConfig.Keyword> TorConfig.assertContains(keyword: K) {
-        assertTrue(filterByKeyword<K>().isNotEmpty())
+    private inline fun <reified K: TorOption> TorConfig.assertContains(keyword: K) {
+        assertTrue(filterByOption<K>().isNotEmpty())
     }
 
     private fun newGenerator(

@@ -19,12 +19,12 @@ import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
 import io.matthewnelson.kmp.tor.core.resource.SynchronizedObject
 import io.matthewnelson.kmp.tor.core.resource.synchronized
 import io.matthewnelson.kmp.tor.runtime.core.OnEvent
-import io.matthewnelson.kmp.tor.runtime.core.TorConfig
+import io.matthewnelson.kmp.tor.runtime.core.config.TorOption
 import kotlin.jvm.JvmStatic
 import kotlin.jvm.JvmSynthetic
 
 /**
- * A Hook for [TorRuntime] that controls [TorConfig.DisableNetwork]
+ * A Hook for [TorRuntime] that controls [TorOption.DisableNetwork]
  * toggling when device connectivity is lost/gained.
  *
  * Multiple instances of [TorRuntime] can [subscribe] to a single

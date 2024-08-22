@@ -29,7 +29,7 @@ class TorConfigUnitTest {
     fun givenUniqueOption_whenMultipleConfigured_thenIsReplacedWithLatest() {
         val expected = "/some/path/2".toFile()
 
-        val settings = TorConfig2.Builder {
+        val settings = TorConfig.Builder {
             CacheDirectory.configure("/some/other/path".toFile())
 
             DataDirectory.configure("/some/path/data".toFile())
@@ -44,7 +44,7 @@ class TorConfigUnitTest {
 
     @Test
     fun givenNonUniqueOption_whenMultipleConfiguredDifferentArgs_thenIsNotReplaced() {
-        val settings = TorConfig2.Builder {
+        val settings = TorConfig.Builder {
             SocksPort.configure { port(9050.toPortEphemeral()) }
             SocksPort.configure { port(9055.toPortEphemeral()) }
         }.settings
@@ -56,7 +56,7 @@ class TorConfigUnitTest {
     fun givenNonUniqueOption_whenMultipleConfiguredSameArgs_thenIsReplaced() {
         val port = 9055.toPortEphemeral()
 
-        val settings = TorConfig2.Builder {
+        val settings = TorConfig.Builder {
             SocksPort.configure { port(9050.toPortEphemeral()) }
             SocksPort.configure { port(port) }
 

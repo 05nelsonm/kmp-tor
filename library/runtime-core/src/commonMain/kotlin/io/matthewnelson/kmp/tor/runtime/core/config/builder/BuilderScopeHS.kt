@@ -21,7 +21,7 @@ import io.matthewnelson.kmp.file.*
 import io.matthewnelson.kmp.tor.core.api.annotation.KmpTorDsl
 import io.matthewnelson.kmp.tor.runtime.core.ThisBlock
 import io.matthewnelson.kmp.tor.runtime.core.address.Port
-import io.matthewnelson.kmp.tor.runtime.core.config.TorConfig2
+import io.matthewnelson.kmp.tor.runtime.core.config.TorConfig
 import io.matthewnelson.kmp.tor.runtime.core.config.TorOption
 import io.matthewnelson.kmp.tor.runtime.core.config.TorSetting
 import io.matthewnelson.kmp.tor.runtime.core.config.TorSetting.LineItem.Companion.toLineItem
@@ -81,7 +81,7 @@ import kotlin.jvm.JvmSynthetic
  *     }
  *
  * @see [TorOption.HiddenServiceDir.asSetting]
- * @see [TorConfig2.BuilderScope.tryConfigure]
+ * @see [TorConfig.BuilderScope.tryConfigure]
  * */
 @KmpTorDsl
 public class BuilderScopeHS: TorSetting.BuilderScope, BuilderScopeHSPort.DSL<BuilderScopeHS> {

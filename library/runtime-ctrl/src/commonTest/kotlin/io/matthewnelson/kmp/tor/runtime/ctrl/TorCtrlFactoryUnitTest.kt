@@ -20,12 +20,12 @@ import io.matthewnelson.kmp.process.Process
 import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
 import io.matthewnelson.kmp.tor.core.resource.SynchronizedObject
 import io.matthewnelson.kmp.tor.core.resource.synchronized
-import io.matthewnelson.kmp.tor.runtime.core.TorConfig
 import io.matthewnelson.kmp.tor.runtime.core.UncaughtException
 import io.matthewnelson.kmp.tor.runtime.core.address.LocalHost
 import io.matthewnelson.kmp.tor.runtime.core.address.Port
 import io.matthewnelson.kmp.tor.runtime.core.address.Port.Ephemeral.Companion.toPortEphemeral
 import io.matthewnelson.kmp.tor.runtime.core.address.IPSocketAddress
+import io.matthewnelson.kmp.tor.runtime.core.config.TorOption
 import io.matthewnelson.kmp.tor.runtime.core.util.findNextAvailableAsync
 import kotlinx.coroutines.*
 import kotlinx.coroutines.test.runTest
@@ -62,9 +62,9 @@ class TorCtrlFactoryUnitTest {
             .resolve("ctrl.sock")
 
         val ctrlArg = try {
-            TorConfig.__ControlPort.Builder {
-                asUnixSocket { file = uds }
-            }.argument
+            TorOption.__ControlPort.asSetting {
+                unixSocket(value = uds)
+            }.items.first().argument
         } catch (_: UnsupportedOperationException) {
             println("Skipping...")
             return@runTest
