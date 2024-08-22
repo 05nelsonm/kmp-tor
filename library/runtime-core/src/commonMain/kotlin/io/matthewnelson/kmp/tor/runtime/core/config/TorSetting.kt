@@ -94,9 +94,8 @@ public class TorSetting private constructor(
         public val argument: String,
 
         /**
-         * Optional things for this [TorOption] which are excluded from [equals]
-         * and [hashCode] consideration. They are appended to the option and
-         * argument string using a single space deliminator.
+         * Optional things for this [TorOption]. They are appended to the
+         * option and argument string using a single space deliminator.
          *
          * All contents will be non-blank and single line. Can be empty.
          * */
@@ -225,9 +224,15 @@ public class TorSetting private constructor(
 
         /** @suppress */
         public override fun equals(other: Any?): Boolean {
-            return  other is LineItem
-                    && other.option == option
-                    && other.argument == argument
+            if (other !is LineItem) return false
+            if (other.option != option) return false
+            if (other.argument != argument) return false
+
+            return if (isPortAuto) {
+                other.optionals == optionals
+            } else {
+                true
+            }
         }
 
         /** @suppress */
@@ -235,6 +240,9 @@ public class TorSetting private constructor(
             var result = 13
             result = result * 42 + option.hashCode()
             result = result * 42 + argument.hashCode()
+            if (isPortAuto) {
+                result = result * 42 + optionals.hashCode()
+            }
             return result
         }
 

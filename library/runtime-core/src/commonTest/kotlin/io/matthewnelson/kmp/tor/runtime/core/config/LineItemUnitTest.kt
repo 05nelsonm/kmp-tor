@@ -172,4 +172,16 @@ class LineItemUnitTest {
         assertFalse(item.isPortDistinct)
         assertFalse(item.isFile)
     }
+
+    @Test
+    fun givenSamePortTypes_whenAuto_thenOptionalsAreIncludedInEqualsHash() {
+        val port1 = ControlPort.toLineItem("auto", setOf("first"))
+        val port2 = ControlPort.toLineItem("auto", setOf("second"))
+        assertNotEquals(port1, port2)
+        assertNotEquals(port1.hashCode(), port2.hashCode())
+
+        val port1Same = ControlPort.toLineItem("auto", setOf("first"))
+        assertEquals(port1, port1Same)
+        assertEquals(port1.hashCode(), port1Same.hashCode())
+    }
 }
