@@ -29,6 +29,14 @@ class BuilderScopeHSUnitTest {
     @Test
     fun givenBuilder_whenMinimumRequirementsNotMet_thenThrowsException() {
         val setting = HiddenServiceDir.asSetting {
+            // Must contain directory
+            try {
+                build()
+                fail()
+            } catch (e: IllegalArgumentException) {
+                assertTrue(e.message!!.contains(HiddenServiceDir.name))
+            }
+            directory("".toFile())
 
             // Must contain version
             try {
@@ -47,15 +55,6 @@ class BuilderScopeHSUnitTest {
                 assertTrue(e.message!!.contains(HiddenServicePort.name))
             }
             port(virtual = Port.HTTP)
-
-            try {
-                build()
-                fail()
-            } catch (e: IllegalArgumentException) {
-                assertTrue(e.message!!.contains("argument cannot be blank"))
-            }
-
-            directory("".toFile())
         }
 
         assertEquals(3, setting.items.size)
@@ -75,59 +74,6 @@ class BuilderScopeHSUnitTest {
 
         assertEquals(3, setting.items.size)
         assertEquals("3", setting.items.elementAt(1).argument)
-    }
-
-    @Test
-    fun givenBuilder_whenInvalidMaxStreams_thenThrowsException() {
-        val setting = HiddenServiceDir.asSetting {
-            applyRequiredForTest()
-            build()
-
-            // Max should be 65535 (inclusive)
-            maxStreams(Port.MAX)
-            assertEquals(Port.MAX.toString(), build().items.elementAt(3).argument)
-
-            maxStreams(Port.MAX + 1)
-            assertFailsWith<IllegalArgumentException> { build() }
-
-            // Min should be 0 (unlimited)
-            maxStreams(0)
-            assertEquals("0", build().items.elementAt(3).argument)
-
-            maxStreams(-1)
-            assertFailsWith<IllegalArgumentException> { build() }
-
-            maxStreams(0)
-        }
-
-        assertEquals(4, setting.items.size)
-    }
-
-    @Test
-    fun givenBuilder_whenInvalidNumIntroductionPoints_thenThrowsException() {
-        val setting = HiddenServiceDir.asSetting {
-            applyRequiredForTest()
-            build()
-
-            // minimum should be 1 for all version
-            numIntroductionPoints(1)
-            assertEquals("1", build().items.elementAt(3).argument)
-
-            numIntroductionPoints(0)
-            assertFailsWith<IllegalArgumentException> { build() }
-
-            // Max should be 20 for v3
-            version(3)
-            numIntroductionPoints(20)
-            assertEquals("20", build().items.elementAt(3).argument)
-
-            numIntroductionPoints(21)
-            assertFailsWith<IllegalArgumentException> { build() }
-
-            numIntroductionPoints(20)
-        }
-
-        assertEquals(4, setting.items.size)
     }
 
     @Test

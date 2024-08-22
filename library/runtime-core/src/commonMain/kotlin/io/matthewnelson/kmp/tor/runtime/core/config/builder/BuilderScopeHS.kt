@@ -35,6 +35,8 @@ import kotlin.jvm.JvmSynthetic
  * other applicable [TorOption] for Hidden Services (i.e. those options
  * that contain the attribute [TorOption.Attribute.HIDDEN_SERVICE]).
  *
+ * **TL;DR** [directory], [version], and at least 1 [port] are required.
+ *
  * At a minimum, tor requires [TorOption.HiddenServiceDir] and at least
  * `1` [TorOption.HiddenServicePort] be defined. Tor then uses its hard
  * coded defaults for all other Hidden Service options, unless overridden.
@@ -52,7 +54,7 @@ import kotlin.jvm.JvmSynthetic
  * of this builder, would need to be made.
  *
  * **NOTE:** Any misconfiguration will result in an [IllegalArgumentException]
- * when build is called.
+ * when the scope goes to build.
  *
  * e.g. (Minimum requirements with [directory], [version] and [port] defined)
  *
@@ -117,9 +119,7 @@ public class BuilderScopeHS: TorSetting.BuilderScope, BuilderScopeHSPort.DSL<Bui
     /**
      * Sets [TorOption.HiddenServiceVersion] for this Hidden Service
      * instance. Currently, the only supported version is `v3`. Anything
-     * else will cause a build failure.
-     *
-     * **NOTE:** This is required to be defined.
+     * else will cause a failure when this scope builds.
      *
      * e.g.
      *
@@ -185,7 +185,7 @@ public class BuilderScopeHS: TorSetting.BuilderScope, BuilderScopeHSPort.DSL<Bui
      * Sets [TorOption.HiddenServiceMaxStreams], if desired.
      *
      * **NOTE:** Must be between [Port.MIN] and [Port.MAX] (inclusive).
-     * Otherwise, will cause a failure when build is called.
+     * Otherwise, will cause tor to error out.
      * */
     @KmpTorDsl
     public fun maxStreams(
@@ -210,8 +210,8 @@ public class BuilderScopeHS: TorSetting.BuilderScope, BuilderScopeHSPort.DSL<Bui
      * Sets [TorOption.HiddenServiceNumIntroductionPoints], if desired.
      *
      * **NOTE:** For [version] 3 Hidden Service, the acceptable range
-     * is from `1` to `20` (inclusive). Otherwise, will cause a failure
-     * when build is called.
+     * is from `1` to `20` (inclusive). Otherwise, will cause tor to
+     * error out.
      * */
     @KmpTorDsl
     public fun numIntroductionPoints(
@@ -243,8 +243,12 @@ public class BuilderScopeHS: TorSetting.BuilderScope, BuilderScopeHSPort.DSL<Bui
     @JvmSynthetic
     @Throws(IllegalArgumentException::class)
     internal override fun build(): TorSetting {
-        val (hsVersion, maxIntroductionPoints) = when (_version) {
-            3 -> HSV_3 to 20
+        require(argument.isNotEmpty()) {
+            "Invalid ${TorOption.HiddenServiceDir}. Cannot be empty. Was `directory` not called?"
+        }
+
+        val hsVersion = when (_version) {
+            3 -> HSV_3
             else -> throw IllegalArgumentException(
                 "Invalid ${TorOption.HiddenServiceVersion} of $_version."
             )
@@ -256,20 +260,10 @@ public class BuilderScopeHS: TorSetting.BuilderScope, BuilderScopeHSPort.DSL<Bui
         }
 
         val maxStreams = _maxStreams?.let { num ->
-            require(num in Port.MIN..Port.MAX) {
-                "Invalid ${TorOption.HiddenServiceMaxStreams} of $num." +
-                " Must be between ${Port.MIN} and ${Port.MAX} (inclusive)."
-            }
-
             TorOption.HiddenServiceMaxStreams.toLineItem(num.toString())
         }
 
         val numIntroductionPoints = _numIntroductionPoints?.let { num ->
-            require(num in 1..maxIntroductionPoints) {
-                "Invalid ${TorOption.HiddenServiceNumIntroductionPoints} of $num." +
-                " Must be between 1 and $maxIntroductionPoints (inclusive) for $hsVersion."
-            }
-
             TorOption.HiddenServiceNumIntroductionPoints.toLineItem(num.toString())
         }
 
