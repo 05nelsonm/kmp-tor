@@ -64,8 +64,6 @@ public object TestUtils {
             .args(ctrlPortArg)
             .args("--SocksPort")
             .args("0")
-//            .args("VirtualAddrNetworkIPv4")
-//            .args("127.192.0.0/10")
             .args("--DisableNetwork")
             .args("1")
             .args("--RunAsDaemon")
