@@ -20,18 +20,16 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
+/**
+ * Ensure that [RuntimeEvent.entries] contains all
+ * instances of [RuntimeEvent] via reflection.
+ * */
 class RuntimeEventEntriesUnitTest {
 
     @Test
-    fun givenEvents_whenEntries_thenContainsAllSealedSubclasses() {
-        val subclasses = mutableListOf<KClass<*>>()
-        for (clazz in RuntimeEvent::class.sealedSubclasses) {
-            if (clazz.isSealed) {
-                subclasses.addAll(clazz.sealedSubclasses)
-            } else {
-                subclasses.add(clazz)
-            }
-        }
+    fun givenRuntimeEventInstances_whenEntriesList_thenContainsAllEventTypes() {
+        val subclasses = mutableSetOf<KClass<*>>()
+        subclasses.addAllSubclassForSealed(RuntimeEvent::class)
 
         val entries = RuntimeEvent.entries().map { it::class }
 
@@ -39,6 +37,17 @@ class RuntimeEventEntriesUnitTest {
 
         for (subclass in subclasses) {
             assertTrue(entries.contains(subclass))
+        }
+    }
+
+    private fun MutableSet<KClass<*>>.addAllSubclassForSealed(root: KClass<*>) {
+        for (clazz in root.sealedSubclasses) {
+            if (clazz.isSealed) {
+                addAllSubclassForSealed(clazz)
+            } else {
+                println(clazz)
+                add(clazz)
+            }
         }
     }
 }

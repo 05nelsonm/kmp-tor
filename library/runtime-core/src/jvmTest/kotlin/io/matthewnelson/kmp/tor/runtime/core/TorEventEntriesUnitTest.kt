@@ -20,18 +20,16 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
+/**
+ * Ensure that [TorEvent.entries] contains all
+ * instances of [TorEvent] via reflection.
+ * */
 class TorEventEntriesUnitTest {
 
     @Test
-    fun givenEvents_whenEntries_thenContainsAllSealedSubclasses() {
-        val subclasses = mutableListOf<KClass<*>>()
-        for (clazz in TorEvent::class.sealedSubclasses) {
-            if (clazz.isSealed) {
-                subclasses.addAll(clazz.sealedSubclasses)
-            } else {
-                subclasses.add(clazz)
-            }
-        }
+    fun givenTorEventInstances_whenEntriesList_thenContainsAllTorEventTypes() {
+        val subclasses = mutableSetOf<KClass<*>>()
+        subclasses.addAllSubclassForSealed(TorEvent::class)
 
         val entries = TorEvent.entries().map { it::class }
 
@@ -39,6 +37,17 @@ class TorEventEntriesUnitTest {
 
         for (subclass in subclasses) {
             assertTrue((entries.contains(subclass)))
+        }
+    }
+
+    private fun MutableSet<KClass<*>>.addAllSubclassForSealed(root: KClass<*>) {
+        for (clazz in root.sealedSubclasses) {
+            if (clazz.isSealed) {
+                addAllSubclassForSealed(clazz)
+            } else {
+                println(clazz)
+                add(clazz)
+            }
         }
     }
 }
