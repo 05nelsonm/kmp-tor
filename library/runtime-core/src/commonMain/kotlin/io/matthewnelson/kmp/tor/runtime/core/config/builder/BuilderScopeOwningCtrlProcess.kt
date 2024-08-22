@@ -40,7 +40,7 @@ public class BuilderScopeOwningCtrlProcess: TorSetting.BuilderScope {
     /**
      * Sets the [argument] to the provided [id].
      *
-     * **NOTE:** Setting an invalid process id will cause tor error out.
+     * **NOTE:** Setting an invalid process id will cause tor to error out.
      * The [argument] has **already** been set to [Process.Current.pid]
      * when the builder scope was instantiated. You *can* change it though.
      * */

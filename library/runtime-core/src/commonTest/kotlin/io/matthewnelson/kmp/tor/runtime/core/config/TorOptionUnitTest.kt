@@ -130,7 +130,7 @@ class TorOptionUnitTest {
 
         // Force update expected test value when something
         // is added (same as reflection tests for Jvm).
-        assertEquals(27, options.size)
+        assertEquals(29, options.size)
 
         options.forEach { option ->
 
@@ -150,7 +150,7 @@ class TorOptionUnitTest {
 
         // Force update expected test value when something
         // is added (same as reflection tests for Jvm).
-        assertEquals(6, options.size)
+        assertEquals(4, options.size)
 
         options.forEach { option ->
 

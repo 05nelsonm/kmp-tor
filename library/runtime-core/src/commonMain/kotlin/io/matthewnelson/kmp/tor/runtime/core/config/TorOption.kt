@@ -27,10 +27,7 @@ import io.matthewnelson.kmp.tor.runtime.core.config.builder.BuilderScopeAutoBool
 import io.matthewnelson.kmp.tor.runtime.core.ctrl.TorCmd
 import io.matthewnelson.kmp.tor.runtime.core.internal.IsUnixLikeHost
 import io.matthewnelson.kmp.tor.runtime.core.internal.byte
-import kotlin.jvm.JvmField
-import kotlin.jvm.JvmName
-import kotlin.jvm.JvmStatic
-import kotlin.jvm.JvmSynthetic
+import kotlin.jvm.*
 import kotlin.math.pow
 import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.hours
@@ -2036,14 +2033,8 @@ public abstract class TorOption: Comparable<TorOption>, CharSequence {
         attributes = emptySet(),
         isCmdLineArg = false,
         isUnique = true,
-    ), ConfigureBuildableTry<BuilderScopeVirtualAddr.NetworkIPv4> {
+    ), ConfigureBuildable<BuilderScopeVirtualAddr.NetworkIPv4> {
 
-        /**
-         * See [BuilderScopeVirtualAddr.NetworkIPv4]
-         *
-         * @throws [IllegalArgumentException] if misconfigured.
-         *   See [BuilderScopeVirtualAddr.NetworkIPv4].
-         * */
         @JvmStatic
         public fun asSetting(
             block: ThisBlock<BuilderScopeVirtualAddr.NetworkIPv4>,
@@ -2060,14 +2051,8 @@ public abstract class TorOption: Comparable<TorOption>, CharSequence {
         attributes = emptySet(),
         isCmdLineArg = false,
         isUnique = true,
-    ), ConfigureBuildableTry<BuilderScopeVirtualAddr.NetworkIPv6> {
+    ), ConfigureBuildable<BuilderScopeVirtualAddr.NetworkIPv6> {
 
-        /**
-         * See [BuilderScopeVirtualAddr.NetworkIPv4]
-         *
-         * @throws [IllegalArgumentException] if misconfigured.
-         *   See [BuilderScopeVirtualAddr.NetworkIPv4].
-         * */
         @JvmStatic
         public fun asSetting(
             block: ThisBlock<BuilderScopeVirtualAddr.NetworkIPv6>,
@@ -4725,8 +4710,9 @@ public abstract class TorOption: Comparable<TorOption>, CharSequence {
     ), ConfigureBuildable<BuilderScopeOwningCtrlProcess> {
 
         @JvmStatic
+        @JvmOverloads
         public fun asSetting(
-            block: ThisBlock<BuilderScopeOwningCtrlProcess>,
+            block: ThisBlock<BuilderScopeOwningCtrlProcess> = ThisBlock { /* use current process' PID */ },
         ): TorSetting = buildContract(block)
 
         override fun buildable(): BuilderScopeOwningCtrlProcess = BuilderScopeOwningCtrlProcess.get()

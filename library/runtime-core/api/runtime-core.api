@@ -3351,7 +3351,7 @@ public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$Versio
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$VirtualAddrNetworkIPv4 : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigureBuildableTry {
+public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$VirtualAddrNetworkIPv4 : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigureBuildable {
 	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/core/config/TorOption$VirtualAddrNetworkIPv4;
 	public static final fun asSetting (Lio/matthewnelson/kmp/tor/runtime/core/ThisBlock;)Lio/matthewnelson/kmp/tor/runtime/core/config/TorSetting;
 	public synthetic fun buildable ()Lio/matthewnelson/kmp/tor/runtime/core/config/TorSetting$BuilderScope;
@@ -3360,7 +3360,7 @@ public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$Virtua
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$VirtualAddrNetworkIPv6 : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigureBuildableTry {
+public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$VirtualAddrNetworkIPv6 : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigureBuildable {
 	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/core/config/TorOption$VirtualAddrNetworkIPv6;
 	public static final fun asSetting (Lio/matthewnelson/kmp/tor/runtime/core/ThisBlock;)Lio/matthewnelson/kmp/tor/runtime/core/config/TorSetting;
 	public synthetic fun buildable ()Lio/matthewnelson/kmp/tor/runtime/core/config/TorSetting$BuilderScope;
@@ -3494,7 +3494,9 @@ public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$__Owni
 
 public final class io/matthewnelson/kmp/tor/runtime/core/config/TorOption$__OwningControllerProcess : io/matthewnelson/kmp/tor/runtime/core/config/TorOption, io/matthewnelson/kmp/tor/runtime/core/config/ConfigureBuildable {
 	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/core/config/TorOption$__OwningControllerProcess;
+	public static final fun asSetting ()Lio/matthewnelson/kmp/tor/runtime/core/config/TorSetting;
 	public static final fun asSetting (Lio/matthewnelson/kmp/tor/runtime/core/ThisBlock;)Lio/matthewnelson/kmp/tor/runtime/core/config/TorSetting;
+	public static synthetic fun asSetting$default (Lio/matthewnelson/kmp/tor/runtime/core/ThisBlock;ILjava/lang/Object;)Lio/matthewnelson/kmp/tor/runtime/core/config/TorSetting;
 	public synthetic fun buildable ()Lio/matthewnelson/kmp/tor/runtime/core/config/TorSetting$BuilderScope;
 	public fun equals (Ljava/lang/Object;)Z
 	public fun hashCode ()I

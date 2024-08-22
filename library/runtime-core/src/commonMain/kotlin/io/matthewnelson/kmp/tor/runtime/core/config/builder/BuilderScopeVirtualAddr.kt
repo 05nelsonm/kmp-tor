@@ -36,11 +36,6 @@ public abstract class BuilderScopeVirtualAddr: TorSetting.BuilderScope {
 
     /**
      * A DSL builder scope for [TorOption.VirtualAddrNetworkIPv4].
-     *
-     * **NOTE:** Any misconfiguration ([bits] value) will result
-     * in an [IllegalArgumentException] when build is called.
-     *
-     * @see [TorOption.VirtualAddrNetworkIPv4.asSetting]
      * */
     @KmpTorDsl
     public class NetworkIPv4: BuilderScopeVirtualAddr {
@@ -48,8 +43,8 @@ public abstract class BuilderScopeVirtualAddr: TorSetting.BuilderScope {
         private constructor(): super(TorOption.VirtualAddrNetworkIPv4)
 
         /**
-         * Sets the address. If not changed the default [IPAddress.V4]
-         * for this option will be used.
+         * Sets the address. If not changed, the default [IPAddress.V4]
+         * address for this [TorOption] will be used.
          * */
         @KmpTorDsl
         public fun address(
@@ -60,11 +55,11 @@ public abstract class BuilderScopeVirtualAddr: TorSetting.BuilderScope {
         }
 
         /**
-         * Sets the bit value. If not changed, the default value
-         * will be used.
+         * Sets the bit value. If not changed, the default bit value
+         * for this [TorOption] will be used.
          *
-         * **NOTE:** Must be between `0` and `16` (inclusive). Otherwise,
-         * will cause a failure when build is called.
+         * **NOTE:** Must be between `0` and `16` (inclusive), otherwise
+         * will cause tor to error out.
          * */
         @KmpTorDsl
         public fun bits(
@@ -83,11 +78,6 @@ public abstract class BuilderScopeVirtualAddr: TorSetting.BuilderScope {
 
     /**
      * A DSL builder scope for [TorOption.VirtualAddrNetworkIPv6].
-     *
-     * **NOTE:** Any misconfiguration ([bits] value) will result
-     * in an [IllegalArgumentException] when build is called.
-     *
-     * @see [TorOption.VirtualAddrNetworkIPv6.asSetting]
      * */
     @KmpTorDsl
     public class NetworkIPv6: BuilderScopeVirtualAddr {
@@ -96,7 +86,7 @@ public abstract class BuilderScopeVirtualAddr: TorSetting.BuilderScope {
 
         /**
          * Sets the address. If not changed the default [IPAddress.V6]
-         * for this option will be used.
+         * address for this [TorOption] will be used.
          * */
         @KmpTorDsl
         public fun address(
@@ -107,11 +97,11 @@ public abstract class BuilderScopeVirtualAddr: TorSetting.BuilderScope {
         }
 
         /**
-         * Sets the bit value. If not changed, the default value
-         * will be used.
+         * Sets the bit value. If not changed, the default bit value
+         * for this [TorOption] will be used.
          *
-         * **NOTE:** Must be between `0` and `104` (inclusive). Otherwise,
-         * will cause a failure when build is called.
+         * **NOTE:** Must be between `0` and `104` (inclusive), otherwise
+         * will cause tor to error out.
          * */
         @KmpTorDsl
         public fun bits(
@@ -134,20 +124,9 @@ public abstract class BuilderScopeVirtualAddr: TorSetting.BuilderScope {
     protected var _bits: Byte = argument.substringAfter('/').toByte()
 
     @JvmSynthetic
-    @Throws(IllegalArgumentException::class)
     internal final override fun build(): TorSetting {
         val address = _address
         val bits = _bits
-
-        val maxBits = when (address) {
-            is IPAddress.V4 -> 16
-            is IPAddress.V6 -> 104
-        }
-
-        require(bits in 0..maxBits) {
-            "Invalid bit value of $bits for $option." +
-            " Must be between 0 and $maxBits (inclusive)"
-        }
 
         val before = argument
         argument = address.canonicalHostName() + '/' + bits

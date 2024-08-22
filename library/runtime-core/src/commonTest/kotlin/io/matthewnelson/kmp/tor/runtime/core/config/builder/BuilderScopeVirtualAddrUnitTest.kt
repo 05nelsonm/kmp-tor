@@ -16,64 +16,13 @@
 package io.matthewnelson.kmp.tor.runtime.core.config.builder
 
 import io.matthewnelson.kmp.tor.runtime.core.address.IPAddress
+import io.matthewnelson.kmp.tor.runtime.core.address.IPAddress.V4.Companion.toIPAddressV4
+import io.matthewnelson.kmp.tor.runtime.core.address.IPAddress.V6.Companion.toIPAddressV6
 import io.matthewnelson.kmp.tor.runtime.core.config.TorOption.*
 import kotlin.test.Test
-import kotlin.test.assertFailsWith
 import kotlin.test.assertTrue
 
 class BuilderScopeVirtualAddrUnitTest {
-
-    @Test
-    fun givenIPv4_whenBitsMisconfigured_thenThrowsException() {
-        val item = VirtualAddrNetworkIPv4.asSetting {
-            // default
-            build()
-
-            // Max should be 16 (inclusive)
-            bits(16)
-            assertTrue(build().items.first().argument.endsWith("/16"))
-
-            bits(17)
-            assertFailsWith<IllegalArgumentException> { build() }
-
-            // Min should be 0 (inclusive)
-            bits(0)
-            assertTrue(build().items.first().argument.endsWith("/0"))
-
-            bits(-1)
-            assertFailsWith<IllegalArgumentException> { build() }
-
-            bits(15)
-        }.items.first()
-
-        assertTrue(item.argument.endsWith("/15"))
-    }
-
-    @Test
-    fun givenIPv6_whenBitsMisconfigured_thenThrowsException() {
-        val item = VirtualAddrNetworkIPv6.asSetting {
-            // default
-            build()
-
-            // Max should be 104 (inclusive)
-            bits(104)
-            assertTrue(build().items.first().argument.endsWith("]/104"))
-
-            bits(105)
-            assertFailsWith<IllegalArgumentException> { build() }
-
-            // Min should be 0 (inclusive)
-            bits(0)
-            assertTrue(build().items.first().argument.endsWith("]/0"))
-
-            bits(-1)
-            assertFailsWith<IllegalArgumentException> { build() }
-
-            bits(24)
-        }.items.first()
-
-        assertTrue(item.argument.endsWith("]/24"))
-    }
 
     @Test
     fun givenIPv4_whenSetting_thenIsProperlyFormatted() {
@@ -98,5 +47,23 @@ class BuilderScopeVirtualAddrUnitTest {
         assertTrue(item.argument.startsWith('['))
         assertTrue(item.argument.endsWith("]/20"))
         assertTrue(item.argument.contains(IPAddress.V6.AnyHost.value))
+    }
+
+    @Test
+    fun givenIPv4_whenNoModification_thenOptionDefaultIsUsed() {
+        val argument = VirtualAddrNetworkIPv4.asSetting {}.items.first().argument
+        val defIP = VirtualAddrNetworkIPv4.default.toIPAddressV4()
+        val defBits = VirtualAddrNetworkIPv4.default.substringAfterLast('/')
+        assertTrue(argument.startsWith(defIP.canonicalHostName()))
+        assertTrue(argument.endsWith(defBits))
+    }
+
+    @Test
+    fun givenIPv6_whenNoModification_thenOptionDefaultIsUsed() {
+        val argument = VirtualAddrNetworkIPv6.asSetting {}.items.first().argument
+        val defIP = VirtualAddrNetworkIPv6.default.toIPAddressV6()
+        val defBits = VirtualAddrNetworkIPv6.default.substringAfterLast('/')
+        assertTrue(argument.startsWith(defIP.canonicalHostName()))
+        assertTrue(argument.endsWith(defBits))
     }
 }

@@ -45,7 +45,6 @@ class TorEventEntriesUnitTest {
             if (clazz.isSealed) {
                 addAllSubclassForSealed(clazz)
             } else {
-                println(clazz)
                 add(clazz)
             }
         }
