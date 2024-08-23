@@ -30,7 +30,7 @@ import io.matthewnelson.kmp.tor.runtime.core.address.IPAddress.V4.Companion.toIP
 import io.matthewnelson.kmp.tor.runtime.core.address.IPAddress.V6.Companion.toIPAddressV6OrNull
 import io.matthewnelson.kmp.tor.runtime.core.address.OnionAddress
 import io.matthewnelson.kmp.tor.runtime.core.address.Port
-import io.matthewnelson.kmp.tor.runtime.core.builder.OnionClientAuthAddBuilder
+import io.matthewnelson.kmp.tor.runtime.core.ctrl.builder.BuilderScopeClientAuthAdd
 import io.matthewnelson.kmp.tor.runtime.core.config.TorOption
 import io.matthewnelson.kmp.tor.runtime.core.ctrl.AddressMapping.Companion.mappingToAnyHost
 import io.matthewnelson.kmp.tor.runtime.core.ctrl.AddressMapping.Companion.mappingToAnyHostIPv4
@@ -177,7 +177,7 @@ class TorCmdUnitTest {
 
         runtime.startDaemonAsync()
 
-        val entry1 = runtime.executeAsync(TorCmd.Onion.Add(ED25519_V3) {
+        val entry1 = runtime.executeAsync(TorCmd.Onion.Add.new(ED25519_V3) {
             port(virtual = Port.HTTP) {
                 try {
                     target(unixSocket = runtime.environment()
@@ -202,7 +202,7 @@ class TorCmdUnitTest {
         val keyCopy = entry1.privateKey?.encoded()?.toED25519_V3PrivateKeyOrNull()
         assertNotNull(keyCopy)
 
-        val entry2 = runtime.executeAsync(TorCmd.Onion.Add(entry1.privateKey!!) {
+        val entry2 = runtime.executeAsync(TorCmd.Onion.Add.existing(entry1.privateKey!!) {
             port(virtual = Port.HTTP)
             flags { DiscardPK = true }
         })
@@ -216,9 +216,9 @@ class TorCmdUnitTest {
 
         runtime.executeAsync(TorCmd.Onion.Delete(entry1.publicKey))
 
-        val entry3 = runtime.executeAsync(TorCmd.Onion.Add(keyCopy) {
+        val entry3 = runtime.executeAsync(TorCmd.Onion.Add.existing(keyCopy) {
 
-            destroyKeyOnJobCompletion = false
+            destroyKeyOnJobCompletion(false)
 
             for (keys in authKeys) {
                 clientAuth(keys.first)
@@ -252,7 +252,7 @@ class TorCmdUnitTest {
 
         runtime.startDaemonAsync()
 
-        val entry = runtime.executeAsync(TorCmd.Onion.Add(ED25519_V3) {
+        val entry = runtime.executeAsync(TorCmd.Onion.Add.new(ED25519_V3) {
             port(virtual = Port.HTTP)
             flags { DiscardPK = true }
             for (auth in authKeys) {
@@ -282,8 +282,8 @@ class TorCmdUnitTest {
                     // PrivateKey
                     authKeys.first().second,
                 ) {
-                    clientName = nickname
-                    destroyKeyOnJobCompletion = false
+                    clientName(nickname)
+                    destroyKeyOnJobCompletion(false)
                 }
             )
 
@@ -291,11 +291,11 @@ class TorCmdUnitTest {
             assertion(result)
         }
 
-        listOf<ThisBlock<OnionClientAuthAddBuilder>>(
+        listOf<ThisBlock<BuilderScopeClientAuthAdd>>(
             // Should produce error because no auth dir
             // specified in config.
             ThisBlock { flags { Permanent = true } },
-            ThisBlock { clientName = "12345678901234567" },
+            ThisBlock { clientName("12345678901234567") },
         ).forEach { block ->
             assertFailsWith<Reply.Error> {
                 runtime.executeAsync(
@@ -303,7 +303,7 @@ class TorCmdUnitTest {
                         entry.publicKey.address() as OnionAddress.V3,
                         authKeys.last().second,
                     ) {
-                        destroyKeyOnJobCompletion = false
+                        destroyKeyOnJobCompletion(false)
                         this.apply(block)
                     }
                 )
@@ -332,7 +332,7 @@ class TorCmdUnitTest {
         runtime.startDaemonAsync()
 
         val entries = mutableListOf<HiddenServiceEntry>().let { list ->
-            val cmd = TorCmd.Onion.Add(ED25519_V3) {
+            val cmd = TorCmd.Onion.Add.new(ED25519_V3) {
                 port(virtual = Port.HTTP)
                 flags { DiscardPK = true }
             }
@@ -356,7 +356,7 @@ class TorCmdUnitTest {
             ) {
                 if (index == 0) return@Add
 
-                clientName = "test$index"
+                clientName("test$index")
 
                 if (index == 2) {
                     flags { Permanent = true }

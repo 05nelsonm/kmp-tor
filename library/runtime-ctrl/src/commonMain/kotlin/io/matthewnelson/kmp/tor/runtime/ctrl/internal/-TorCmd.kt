@@ -252,8 +252,8 @@ private fun TorCmd.MapAddress.encode(LOG: Debugger?): ByteArray {
 
 @Throws(IllegalArgumentException::class, IllegalStateException::class)
 private fun TorCmd.Onion.Add.encode(LOG: Debugger?): ByteArray {
-    require(ports.isNotEmpty()) { "At minimum of 1 port is required" }
-    val privateKey = addressKey?.base64()
+    require(ports.isNotEmpty()) { "A minimum of 1 port is required" }
+    val privateKey = key?.base64()
 
     return StringBuilder(keyword).apply {
         SP()
@@ -334,11 +334,11 @@ private fun TorCmd.OnionClientAuth.Add.encode(LOG: Debugger?): ByteArray {
         }
     }
 
-    val privateKey = authKey.base64()
+    val privateKey = key.base64()
 
     return StringBuilder(keyword).apply {
         SP().append(address)
-        SP().append(authKey.algorithm()).append(':').append(privateKey)
+        SP().append(key.algorithm()).append(':').append(privateKey)
         if (nickname != null) {
             SP().append("ClientName=").append(nickname)
         }
