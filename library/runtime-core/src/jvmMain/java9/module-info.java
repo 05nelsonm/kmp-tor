@@ -12,10 +12,10 @@ module io.matthewnelson.kmp.tor.runtime.core {
 
     exports io.matthewnelson.kmp.tor.runtime.core;
     exports io.matthewnelson.kmp.tor.runtime.core.address;
-    exports io.matthewnelson.kmp.tor.runtime.core.builder;
     exports io.matthewnelson.kmp.tor.runtime.core.config;
     exports io.matthewnelson.kmp.tor.runtime.core.config.builder;
     exports io.matthewnelson.kmp.tor.runtime.core.ctrl;
+    exports io.matthewnelson.kmp.tor.runtime.core.ctrl.builder;
     exports io.matthewnelson.kmp.tor.runtime.core.key;
     exports io.matthewnelson.kmp.tor.runtime.core.util;
 }

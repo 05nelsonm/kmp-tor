@@ -13,17 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-package io.matthewnelson.kmp.tor.runtime.core.builder
+package io.matthewnelson.kmp.tor.runtime.core.ctrl.builder
 
 import kotlin.test.Test
 import kotlin.test.assertTrue
 
-class OnionClientAuthAddBuilderUnitTest {
+class BuilderScopeClientAuthAddUnitTest {
 
     @Test
     fun givenFlags_whenEnabled_thenArePresent() {
         val flags = LinkedHashSet<String>()
-        OnionClientAuthAddBuilder.FlagBuilder.configure(flags) {
+        BuilderScopeClientAuthAdd.FlagsBuilder.configure(flags) {
             Permanent = true
         }
 

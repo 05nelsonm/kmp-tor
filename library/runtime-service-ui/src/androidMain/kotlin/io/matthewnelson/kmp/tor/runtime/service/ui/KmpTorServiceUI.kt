@@ -78,7 +78,7 @@ public class KmpTorServiceUI private constructor(
      * Configuration to be utilized with [Factory], or on a per-instance
      * basis via [TorServiceConfig.Foreground.newEnvironment].
      *
-     * @see [Config.Builder]
+     * @see [Config.BuilderScope]
      * */
     public class Config private constructor(
         internal val _colorReady: ColorRes?,
@@ -105,8 +105,8 @@ public class KmpTorServiceUI private constructor(
         /**
          * Create a new [Config] with the default options.
          *
-         * @param [iconReady] See [Builder.iconReady]
-         * @param [iconNotReady] See [Builder.iconNotReady]
+         * @param [iconReady] See [BuilderScope.iconReady]
+         * @param [iconNotReady] See [BuilderScope.iconNotReady]
          * */
         public constructor(
             iconReady: Int,
@@ -120,69 +120,69 @@ public class KmpTorServiceUI private constructor(
         /**
          * Create and new [Config] and configure options via [block].
          *
-         * @param [iconReady] See [Builder.iconReady]
-         * @param [iconNotReady] See [Builder.iconNotReady]
-         * @param [block] lambda for configuring optionals via [Builder]
+         * @param [iconReady] See [BuilderScope.iconReady]
+         * @param [iconNotReady] See [BuilderScope.iconNotReady]
+         * @param [block] lambda for configuring optionals via [BuilderScope]
          * */
         public constructor(
             iconReady: Int,
             iconNotReady: Int,
-            block: ThisBlock<Builder>,
+            block: ThisBlock<BuilderScope>,
         ): this(
-            b = Builder.of(
+            b = BuilderScope.of(
                 iconReady,
                 iconNotReady,
             ).apply(block)
         )
 
         /**
-         * See [Builder.colorReady]
+         * See [BuilderScope.colorReady]
          * */
         @JvmField
         public val colorReady: Int? = _colorReady?.id
 
         /**
-         * See [Builder.displayName]
+         * See [BuilderScope.displayName]
          * */
         @JvmField
         public val displayName: DisplayName = displayName
 
         /**
-         * See [Builder.iconReady]
+         * See [BuilderScope.iconReady]
          * */
         @JvmField
         public val iconReady: Int = _iconReady.id
 
         /**
-         * See [Builder.iconNotReady]
+         * See [BuilderScope.iconNotReady]
          * */
         @JvmField
         public val iconNotReady: Int = _iconNotReady.id
 
         /**
-         * See [Builder.iconData]
+         * See [BuilderScope.iconData]
          * */
         @JvmField
         public val iconData: Int = _iconData.id
 
         /**
-         * Configure a new [Config.Builder] which inherits all settings
+         * Configure a new [Config.BuilderScope] which inherits all settings
          * from this one.
          * */
         public fun newConfig(
-            block: ThisBlock<Builder>,
+            block: ThisBlock<BuilderScope>,
         ): Config = newConfig(null, block)
 
         /**
-         * Configure a new [Config.Builder] which inherits all settings
+         * Configure a new [Config.BuilderScope] which inherits all settings
          * from this one.
          *
          * @param [iconReady] If non-null, that value will be set for
-         *   [Builder.iconReady] instead of the current [Config.iconReady].
+         *   [BuilderScope.iconReady] instead of the current [Config.iconReady].
          * */
         public fun newConfig(
             iconReady: Int?,
-            block: ThisBlock<Builder>,
+            block: ThisBlock<BuilderScope>,
         ): Config = newConfig(
             iconReady,
             null,
@@ -190,20 +190,20 @@ public class KmpTorServiceUI private constructor(
         )
 
         /**
-         * Configure a new [Config.Builder] which inherits all options
+         * Configure a new [Config.BuilderScope] which inherits all options
          * from this one.
          *
          * @param [iconReady] If non-null, that value will be set for
-         *   [Builder.iconReady] instead of the current [Config.iconReady].
+         *   [BuilderScope.iconReady] instead of the current [Config.iconReady].
          * @param [iconNotReady] If non-null, that value will be set for
-         *   [Builder.iconNotReady] instead of the current [Config.iconNotReady].
+         *   [BuilderScope.iconNotReady] instead of the current [Config.iconNotReady].
          * */
         public fun newConfig(
             iconReady: Int?,
             iconNotReady: Int?,
-            block: ThisBlock<Builder>,
+            block: ThisBlock<BuilderScope>,
         ): Config = Config(
-            b = Builder.of(
+            b = BuilderScope.of(
                 this,
                 iconReady,
                 iconNotReady,
@@ -226,7 +226,7 @@ public class KmpTorServiceUI private constructor(
          *     }
          * */
         @KmpTorDsl
-        public class Builder private constructor(
+        public class BuilderScope private constructor(
 
             /**
              * The drawable resource id of the notification icon which will be
@@ -259,7 +259,7 @@ public class KmpTorServiceUI private constructor(
              * **NOTE:** This setting will override whatever may be declared in
              * your application theme for [R.attr.kmp_tor_ui_color_ready].
              *
-             * Default: `0` (disabled), unless this [Builder] is a result of
+             * Default: `0` (disabled), unless this [BuilderScope] is a result of
              * [Config.newConfig], then whatever [Config.colorReady] is.
              *
              * @see [R.attr.kmp_tor_ui_color_ready]
@@ -274,7 +274,7 @@ public class KmpTorServiceUI private constructor(
              *
              * **NOTE:** Icons should be `24dp` x `24dp` for best performance.
              *
-             * Default: Whatever [iconReady] is set to, unless this [Builder] is a
+             * Default: Whatever [iconReady] is set to, unless this [BuilderScope] is a
              * result of [Config.newConfig], then whatever [Config.iconData] is.
              * */
             @JvmField
@@ -289,7 +289,7 @@ public class KmpTorServiceUI private constructor(
              * **NOTE:** This action is removed from the notification while on the
              * lock screen.
              *
-             * Default: `false`, unless this [Builder] is a result of [Config.newConfig],
+             * Default: `false`, unless this [BuilderScope] is a result of [Config.newConfig],
              * then whatever [Config.enableActionRestart] is.
              * */
             @JvmField
@@ -304,7 +304,7 @@ public class KmpTorServiceUI private constructor(
              * **NOTE:** This action is removed from the notification while on the
              * lock screen.
              *
-             * Default: `false`, unless this [Builder] is a result of [Config.newConfig],
+             * Default: `false`, unless this [BuilderScope] is a result of [Config.newConfig],
              * then whatever [Config.enableActionStop] is.
              * */
             @JvmField
@@ -318,8 +318,8 @@ public class KmpTorServiceUI private constructor(
              * current state. This should be different for each of your [TorRuntime]
              * instances so the user may differentiate between more easily.
              *
-             * **NOTE:** If this [Builder] is being configured via the
-             * [Factory.Builder.defaultConfig] DSL, then it will be set back to
+             * **NOTE:** If this [BuilderScope] is being configured via the
+             * [Factory.BuilderScope.defaultConfig] DSL, then it will be set back to
              * [DisplayName.FID] when [Factory] is instantiated. This can only be
              * configured on a per-instance basis. Use [Config.newConfig] from
              * [Factory.defaultConfig] to modify for instance specific configs.
@@ -346,7 +346,7 @@ public class KmpTorServiceUI private constructor(
              *         },
              *     )
              *
-             * Default: [DisplayName.FID], unless this [Builder] is a result of [Config.newConfig],
+             * Default: [DisplayName.FID], unless this [BuilderScope] is a result of [Config.newConfig],
              * then whatever [Config.enableActionRestart] is.
              *
              * @see [DisplayName]
@@ -360,7 +360,7 @@ public class KmpTorServiceUI private constructor(
                 internal fun of(
                     iconReady: Int,
                     iconNotReady: Int,
-                ): Builder = Builder(
+                ): BuilderScope = BuilderScope(
                     iconReady,
                     iconNotReady,
                 )
@@ -370,7 +370,7 @@ public class KmpTorServiceUI private constructor(
                     other: Config,
                     iconReady: Int?,
                     iconNotReady: Int?,
-                ): Builder = Builder(
+                ): BuilderScope = BuilderScope(
                     iconReady ?: other.iconReady,
                     iconNotReady ?: other.iconNotReady
                 ).apply {
@@ -383,7 +383,7 @@ public class KmpTorServiceUI private constructor(
             }
         }
 
-        internal constructor(b: Builder): this(
+        internal constructor(b: BuilderScope): this(
             // NOTE: If adding any fields, must also update
             // Builder.of(other, ...) & fields map.
             _colorReady = b.colorReady.takeIf { it > 0 }?.let { ColorRes(it) },
@@ -421,12 +421,12 @@ public class KmpTorServiceUI private constructor(
      *         // configure...
      *     }
      *
-     * @see [Factory.Builder]
+     * @see [Factory.BuilderScope]
      * @see [TorServiceUI.NotificationInfo]
      * */
     public class Factory private constructor(
-        b: Builder,
-        c: Config.Builder,
+        b: BuilderScope,
+        c: Config.BuilderScope,
         i: NotificationInfo,
     ): TorServiceUI.Factory<Config, KmpTorServiceUIInstanceState<Config>, KmpTorServiceUI>(
         defaultConfig = Config(c.apply { displayName = DisplayName.FID }),
@@ -436,8 +436,8 @@ public class KmpTorServiceUI private constructor(
         /**
          * Create a new [Factory] with the default options.
          *
-         * @param [iconReady] See [Config.Builder.iconReady]
-         * @param [iconNotReady] See [Config.Builder.iconNotReady]
+         * @param [iconReady] See [Config.BuilderScope.iconReady]
+         * @param [iconNotReady] See [Config.BuilderScope.iconNotReady]
          * */
         public constructor(
             iconReady: Int,
@@ -453,17 +453,17 @@ public class KmpTorServiceUI private constructor(
         /**
          * Create a new [Factory] and configure options via [block].
          *
-         * @param [iconReady] See [Config.Builder.iconReady]
-         * @param [iconNotReady] See [Config.Builder.iconNotReady]
-         * @see [Factory.Builder]
+         * @param [iconReady] See [Config.BuilderScope.iconReady]
+         * @param [iconNotReady] See [Config.BuilderScope.iconNotReady]
+         * @see [Factory.BuilderScope]
          * */
         public constructor(
             iconReady: Int,
             iconNotReady: Int,
             info: NotificationInfo,
-            block: ThisBlock<Builder>,
+            block: ThisBlock<BuilderScope>,
         ): this(
-            Config.Builder.of(
+            Config.BuilderScope.of(
                 iconReady,
                 iconNotReady,
             ),
@@ -472,19 +472,19 @@ public class KmpTorServiceUI private constructor(
         )
 
         /**
-         * See [Builder.actionIntentPermissionSuffix]
+         * See [BuilderScope.actionIntentPermissionSuffix]
          * */
         @JvmField
         public val actionIntentPermissionSuffix: String? = b.actionIntentPermissionSuffix
 
         /**
-         * See [Builder.contentIntentCode]
+         * See [BuilderScope.contentIntentCode]
          * */
         @JvmField
         public val contentIntentCode: Int = b.contentIntentCode
 
         @KmpTorDsl
-        public class Builder private constructor(private val config: Config.Builder) {
+        public class BuilderScope private constructor(private val config: Config.BuilderScope) {
 
             /**
              * The suffix of a signature level permission to define in your manifest, which
@@ -556,7 +556,7 @@ public class KmpTorServiceUI private constructor(
              * The drawable resource id for the notification action icon which allows users to
              * submit [Action.RestartDaemon] to the [TorRuntime] instance upon click.
              *
-             * **NOTE:** This will not be utilized unless [Config.Builder.enableActionRestart]
+             * **NOTE:** This will not be utilized unless [Config.BuilderScope.enableActionRestart]
              * has been set to `true` for the currently displayed instance of [TorRuntime].
              *
              * **NOTE:** Icons should be `24dp` x `24dp` for best performance.
@@ -570,7 +570,7 @@ public class KmpTorServiceUI private constructor(
              * The drawable resource id for the notification action icon which allows users to
              * submit [Action.StopDaemon] to the [TorRuntime] instance upon click.
              *
-             * **NOTE:** This will not be utilized unless [Config.Builder.enableActionStop]
+             * **NOTE:** This will not be utilized unless [Config.BuilderScope.enableActionStop]
              * has been set to `true` for the currently displayed instance of [TorRuntime].
              *
              * **NOTE:** Icons should be `24dp` x `24dp` for best performance.
@@ -609,19 +609,19 @@ public class KmpTorServiceUI private constructor(
             public var iconActionNext: Int? = null
 
             /**
-             * Configure [Config.Builder] optionals for [Factory.defaultConfig].
+             * Configure [Config.BuilderScope] optionals for [Factory.defaultConfig].
              * */
             @KmpTorDsl
             public fun defaultConfig(
-                block: ThisBlock<Config.Builder>
-            ): Builder = apply { config.apply(block) }
+                block: ThisBlock<Config.BuilderScope>
+            ): BuilderScope = apply { config.apply(block) }
 
             internal companion object {
 
                 @JvmSynthetic
                 internal fun of(
-                    config: Config.Builder,
-                ): Builder = Builder(config)
+                    config: Config.BuilderScope,
+                ): BuilderScope = BuilderScope(config)
             }
         }
 
@@ -650,11 +650,11 @@ public class KmpTorServiceUI private constructor(
         }
 
         private constructor(
-            config: Config.Builder,
+            config: Config.BuilderScope,
             info: NotificationInfo,
-            block: ThisBlock<Builder>,
+            block: ThisBlock<BuilderScope>,
         ): this (
-            Builder.of(config).apply(block),
+            BuilderScope.of(config).apply(block),
             config,
             info,
         )
@@ -762,9 +762,9 @@ public class KmpTorServiceUI private constructor(
         private companion object {
 
             /**
-             * This is simply a stub for [Builder] to indicate that the default
+             * This is simply a stub for [BuilderScope] to indicate that the default
              * [PackageManager.getLaunchIntentForPackage] should be used, without
-             * exposing the actual callback implementation via [Builder].
+             * exposing the actual callback implementation via [BuilderScope].
              * */
             private val STUB_PACKAGE_LAUNCHER: (code: Int, context: Context) -> PendingIntent? = { _, _ -> null }
         }

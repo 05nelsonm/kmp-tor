@@ -74,7 +74,7 @@ public class io/matthewnelson/kmp/tor/runtime/service/TorServiceConfig {
 	public final field stopServiceOnTaskRemoved Z
 	public final field testUseBuildDirectory Z
 	public final field useNetworkStateObserver Z
-	public synthetic fun <init> (Lio/matthewnelson/kmp/tor/runtime/service/TorServiceConfig$Builder;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public synthetic fun <init> (Lio/matthewnelson/kmp/tor/runtime/service/TorServiceConfig$BuilderScope;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
 	public static final fun Builder (Lio/matthewnelson/kmp/tor/runtime/core/ThisBlock;)Lio/matthewnelson/kmp/tor/runtime/service/TorServiceConfig;
 	public final fun newEnvironment (Ljava/lang/String;Lkotlin/jvm/functions/Function1;)Lio/matthewnelson/kmp/tor/runtime/TorRuntime$Environment;
 	public final fun newEnvironment (Ljava/lang/String;Lkotlin/jvm/functions/Function1;Lio/matthewnelson/kmp/tor/runtime/core/ThisBlock;)Lio/matthewnelson/kmp/tor/runtime/TorRuntime$Environment;
@@ -82,7 +82,7 @@ public class io/matthewnelson/kmp/tor/runtime/service/TorServiceConfig {
 	public final fun newEnvironment (Lkotlin/jvm/functions/Function1;Lio/matthewnelson/kmp/tor/runtime/core/ThisBlock;)Lio/matthewnelson/kmp/tor/runtime/TorRuntime$Environment;
 }
 
-public class io/matthewnelson/kmp/tor/runtime/service/TorServiceConfig$Builder {
+public class io/matthewnelson/kmp/tor/runtime/service/TorServiceConfig$BuilderScope {
 	public field stopServiceOnTaskRemoved Z
 	public field testUseBuildDirectory Z
 	public field useNetworkStateObserver Z
@@ -96,7 +96,7 @@ public final class io/matthewnelson/kmp/tor/runtime/service/TorServiceConfig$For
 	public static final field Companion Lio/matthewnelson/kmp/tor/runtime/service/TorServiceConfig$Foreground$Companion;
 	public final field exitProcessIfTaskRemoved Z
 	public final field factory Lio/matthewnelson/kmp/tor/runtime/service/TorServiceUI$Factory;
-	public synthetic fun <init> (Lio/matthewnelson/kmp/tor/runtime/service/TorServiceUI$Factory;Lio/matthewnelson/kmp/tor/runtime/service/TorServiceConfig$Foreground$Builder;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public synthetic fun <init> (Lio/matthewnelson/kmp/tor/runtime/service/TorServiceUI$Factory;Lio/matthewnelson/kmp/tor/runtime/service/TorServiceConfig$Foreground$BuilderScope;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
 	public static final fun Builder (Lio/matthewnelson/kmp/tor/runtime/service/TorServiceUI$Factory;Lio/matthewnelson/kmp/tor/runtime/core/ThisBlock;)Lio/matthewnelson/kmp/tor/runtime/service/TorServiceConfig$Foreground;
 	public final fun newEnvironment (Lio/matthewnelson/kmp/tor/runtime/service/AbstractTorServiceUI$Config;Lkotlin/jvm/functions/Function1;)Lio/matthewnelson/kmp/tor/runtime/TorRuntime$Environment;
 	public final fun newEnvironment (Lio/matthewnelson/kmp/tor/runtime/service/AbstractTorServiceUI$Config;Lkotlin/jvm/functions/Function1;Lio/matthewnelson/kmp/tor/runtime/core/ThisBlock;)Lio/matthewnelson/kmp/tor/runtime/TorRuntime$Environment;
@@ -104,7 +104,7 @@ public final class io/matthewnelson/kmp/tor/runtime/service/TorServiceConfig$For
 	public final fun newEnvironment (Ljava/lang/String;Lio/matthewnelson/kmp/tor/runtime/service/AbstractTorServiceUI$Config;Lkotlin/jvm/functions/Function1;Lio/matthewnelson/kmp/tor/runtime/core/ThisBlock;)Lio/matthewnelson/kmp/tor/runtime/TorRuntime$Environment;
 }
 
-public final class io/matthewnelson/kmp/tor/runtime/service/TorServiceConfig$Foreground$Builder : io/matthewnelson/kmp/tor/runtime/service/TorServiceConfig$Builder {
+public final class io/matthewnelson/kmp/tor/runtime/service/TorServiceConfig$Foreground$BuilderScope : io/matthewnelson/kmp/tor/runtime/service/TorServiceConfig$BuilderScope {
 	public field exitProcessIfTaskRemoved Z
 }
 

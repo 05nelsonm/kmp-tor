@@ -76,19 +76,19 @@ import kotlin.concurrent.Volatile
 public open class TorServiceConfig private constructor(
 
     /**
-     * See [Builder.stopServiceOnTaskRemoved]
+     * See [BuilderScope.stopServiceOnTaskRemoved]
      * */
     @JvmField
     public val stopServiceOnTaskRemoved: Boolean,
 
     /**
-     * See [Builder.testUseBuildDirectory]
+     * See [BuilderScope.testUseBuildDirectory]
      * */
     @JvmField
     public val testUseBuildDirectory: Boolean,
 
     /**
-     * See [Builder.useNetworkStateObserver]
+     * See [BuilderScope.useNetworkStateObserver]
      * */
     @JvmField
     public val useNetworkStateObserver: Boolean,
@@ -98,7 +98,7 @@ public open class TorServiceConfig private constructor(
      * Android implementation which creates the [TorRuntime.Environment] using
      * the provided [TorServiceConfig].
      *
-     * **NOTE:** [TorRuntime.Environment.Builder.serviceFactoryLoader] is set
+     * **NOTE:** [TorRuntime.Environment.BuilderScope.serviceFactoryLoader] is set
      * automatically and tor will run inside an [android.app.Service].
      *
      * Directories (emulators & devices):
@@ -121,7 +121,7 @@ public open class TorServiceConfig private constructor(
      * Android implementation which creates the [TorRuntime.Environment] using
      * the provided [TorServiceConfig].
      *
-     * **NOTE:** [TorRuntime.Environment.Builder.serviceFactoryLoader] is set
+     * **NOTE:** [TorRuntime.Environment.BuilderScope.serviceFactoryLoader] is set
      * automatically and tor will run inside an [android.app.Service].
      *
      * Directories (emulators & devices):
@@ -138,14 +138,14 @@ public open class TorServiceConfig private constructor(
      * */
     public fun newEnvironment(
         installer: (installationDirectory: File) -> ResourceInstaller<Paths.Tor>,
-        block: ThisBlock<TorRuntime.Environment.Builder>,
+        block: ThisBlock<TorRuntime.Environment.BuilderScope>,
     ): TorRuntime.Environment = newEnvironment(DEFAULT_DIRNAME, installer, block)
 
     /**
      * Android implementation which creates the [TorRuntime.Environment] using
      * the provided [TorServiceConfig].
      *
-     * **NOTE:** [TorRuntime.Environment.Builder.serviceFactoryLoader] is set
+     * **NOTE:** [TorRuntime.Environment.BuilderScope.serviceFactoryLoader] is set
      * automatically and tor will run inside an [android.app.Service].
      *
      * Directories (emulators & devices):
@@ -171,7 +171,7 @@ public open class TorServiceConfig private constructor(
      * Android implementation which creates the [TorRuntime.Environment] using
      * the provided [TorServiceConfig].
      *
-     * **NOTE:** [TorRuntime.Environment.Builder.serviceFactoryLoader] is set
+     * **NOTE:** [TorRuntime.Environment.BuilderScope.serviceFactoryLoader] is set
      * automatically and tor will run inside an [android.app.Service].
      *
      * Directories (emulators & devices):
@@ -191,7 +191,7 @@ public open class TorServiceConfig private constructor(
     public fun newEnvironment(
         dirName: String,
         installer: (installationDirectory: File) -> ResourceInstaller<Paths.Tor>,
-        block: ThisBlock<TorRuntime.Environment.Builder>,
+        block: ThisBlock<TorRuntime.Environment.BuilderScope>,
     ): TorRuntime.Environment {
         val config = this
 
@@ -221,9 +221,9 @@ public open class TorServiceConfig private constructor(
          * */
         @JvmStatic
         public fun Builder(
-            block: ThisBlock<TorServiceConfig.Builder>,
+            block: ThisBlock<TorServiceConfig.BuilderScope>,
         ): TorServiceConfig {
-            val b = TorServiceConfig.Builder().apply(block)
+            val b = TorServiceConfig.BuilderScope().apply(block)
 
             return _instance ?: synchronized(UTIL) {
                 _instance ?: TorServiceConfig(b)
@@ -233,7 +233,7 @@ public open class TorServiceConfig private constructor(
     }
 
     @KmpTorDsl
-    public open class Builder internal constructor() {
+    public open class BuilderScope internal constructor() {
 
         /**
          * If [TorService] is running and your application is swiped from
@@ -279,7 +279,7 @@ public open class TorServiceConfig private constructor(
          * device's connectivity state will be used for all instances of [TorRuntime]
          * operating within the service. If this is set to `false`, it will not be
          * used and the [TorRuntime] will be created with whatever was declared for
-         * [TorRuntime.Builder.networkObserver].
+         * [TorRuntime.BuilderScope.networkObserver].
          *
          * **NOTE:** Requires a permission. If not held, [RuntimeEvent.ERROR] observers
          * will be notified, but operations will not be interrupted.
@@ -343,11 +343,11 @@ public open class TorServiceConfig private constructor(
     public class Foreground <C: AbstractTorServiceUI.Config, F: TorServiceUI.Factory<C, *, *>> private constructor(
         @JvmField
         public val factory: F,
-        b: Foreground.Builder,
+        b: Foreground.BuilderScope,
     ): TorServiceConfig(b) {
 
         /**
-         * See [Builder.exitProcessIfTaskRemoved]
+         * See [BuilderScope.exitProcessIfTaskRemoved]
          * */
         @JvmField
         public val exitProcessIfTaskRemoved: Boolean = b.exitProcessIfTaskRemoved
@@ -356,7 +356,7 @@ public open class TorServiceConfig private constructor(
          * Android implementation which creates the [TorRuntime.Environment] using
          * the provided [TorServiceConfig].
          *
-         * **NOTE:** [TorRuntime.Environment.Builder.serviceFactoryLoader] is set
+         * **NOTE:** [TorRuntime.Environment.BuilderScope.serviceFactoryLoader] is set
          * automatically and tor will run inside an [android.app.Service].
          *
          * Directories (emulators & devices):
@@ -388,7 +388,7 @@ public open class TorServiceConfig private constructor(
          * Android implementation which creates the [TorRuntime.Environment] using
          * the provided [TorServiceConfig].
          *
-         * **NOTE:** [TorRuntime.Environment.Builder.serviceFactoryLoader] is set
+         * **NOTE:** [TorRuntime.Environment.BuilderScope.serviceFactoryLoader] is set
          * automatically and tor will run inside an [android.app.Service].
          *
          * Directories (emulators & devices):
@@ -410,7 +410,7 @@ public open class TorServiceConfig private constructor(
         public fun newEnvironment(
             instanceConfig: C,
             installer: (installationDirectory: File) -> ResourceInstaller<Paths.Tor>,
-            block: ThisBlock<TorRuntime.Environment.Builder>,
+            block: ThisBlock<TorRuntime.Environment.BuilderScope>,
         ): TorRuntime.Environment = newEnvironment(
             dirName = DEFAULT_DIRNAME,
             instanceConfig = instanceConfig,
@@ -422,7 +422,7 @@ public open class TorServiceConfig private constructor(
          * Android implementation which creates the [TorRuntime.Environment] using
          * the provided [TorServiceConfig].
          *
-         * **NOTE:** [TorRuntime.Environment.Builder.serviceFactoryLoader] is set
+         * **NOTE:** [TorRuntime.Environment.BuilderScope.serviceFactoryLoader] is set
          * automatically and tor will run inside an [android.app.Service].
          *
          * Directories (emulators & devices):
@@ -457,7 +457,7 @@ public open class TorServiceConfig private constructor(
          * Android implementation which creates the [TorRuntime.Environment] using
          * the provided [TorServiceConfig].
          *
-         * **NOTE:** [TorRuntime.Environment.Builder.serviceFactoryLoader] is set
+         * **NOTE:** [TorRuntime.Environment.BuilderScope.serviceFactoryLoader] is set
          * automatically and tor will run inside an [android.app.Service].
          *
          * Directories (emulators & devices):
@@ -481,7 +481,7 @@ public open class TorServiceConfig private constructor(
             dirName: String,
             instanceConfig: C,
             installer: (installationDirectory: File) -> ResourceInstaller<Paths.Tor>,
-            block: ThisBlock<TorRuntime.Environment.Builder>,
+            block: ThisBlock<TorRuntime.Environment.BuilderScope>,
         ): TorRuntime.Environment {
             val config = this
 
@@ -520,9 +520,9 @@ public open class TorServiceConfig private constructor(
             @JvmStatic
             public fun <C: AbstractTorServiceUI.Config, F: TorServiceUI.Factory<C, *, *>> Builder(
                 factory: F,
-                block: ThisBlock<Foreground.Builder>,
+                block: ThisBlock<BuilderScope>,
             ): Foreground<C, F> {
-                val b = Foreground.Builder().apply(block)
+                val b = Foreground.BuilderScope().apply(block)
 
                 return _instance?.unsafeCast() ?: synchronized(UTIL) {
                     _instance?.unsafeCast() ?: run {
@@ -567,7 +567,7 @@ public open class TorServiceConfig private constructor(
          * [Foreground] operations.
          * */
         @KmpTorDsl
-        public class Builder internal constructor(): TorServiceConfig.Builder() {
+        public class BuilderScope internal constructor(): TorServiceConfig.BuilderScope() {
 
             /**
              * On Android API 24+, if a Foreground Service stops while the task
@@ -612,7 +612,7 @@ public open class TorServiceConfig private constructor(
             config: TorServiceConfig,
             dirName: String,
             installer: (installationDirectory: File) -> ResourceInstaller<Paths.Tor>,
-            block: ThisBlock<TorRuntime.Environment.Builder>,
+            block: ThisBlock<TorRuntime.Environment.BuilderScope>,
         ): TorRuntime.Environment {
             val appContext = appContext
 
@@ -711,7 +711,7 @@ public open class TorServiceConfig private constructor(
     }
 
     @OptIn(ExperimentalKmpTorApi::class)
-    private constructor(b: Builder): this(
+    private constructor(b: BuilderScope): this(
         stopServiceOnTaskRemoved = b.stopServiceOnTaskRemoved,
         testUseBuildDirectory = b.testUseBuildDirectory,
         useNetworkStateObserver = b.useNetworkStateObserver,

@@ -13,9 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-package io.matthewnelson.kmp.tor.runtime.core.builder
+package io.matthewnelson.kmp.tor.runtime.core.ctrl.builder
 
-import io.matthewnelson.kmp.tor.runtime.core.builder.OnionAddBuilder.FlagBuilder
+import io.matthewnelson.kmp.tor.runtime.core.ctrl.builder.BuilderScopeOnionAdd.FlagsBuilder
 import io.matthewnelson.kmp.tor.runtime.core.ctrl.TorCmd
 import io.matthewnelson.kmp.tor.runtime.core.key.ED25519_V3
 import io.matthewnelson.kmp.tor.runtime.core.key.ED25519_V3.PrivateKey.Companion.toED25519_V3PrivateKey
@@ -24,7 +24,7 @@ import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
-class OnionAddBuilderUnitTest {
+class BuilderScopeOnionAddUnitTest {
 
     @Test
     fun givenFlags_whenFalse_thenAreRemoved() {
@@ -32,22 +32,22 @@ class OnionAddBuilderUnitTest {
         val allFlags = LinkedHashSet<String>()
         var i = 0
 
-        listOf<Triple<String, FlagBuilder.() -> Unit, FlagBuilder.() -> Unit>>(
+        listOf<Triple<String, FlagsBuilder.() -> Unit, FlagsBuilder.() -> Unit>>(
             Triple("Detach", { Detach = true }, { Detach = false }),
             Triple("DiscardPK", { DiscardPK = true }, { DiscardPK = false }),
             Triple("MaxStreamsCloseCircuit", { MaxStreamsCloseCircuit = true }, { MaxStreamsCloseCircuit = false }),
         ).forEach { (expected, enable, disable) ->
             i++
-            FlagBuilder.configure(allFlags) { enable() }
+            FlagsBuilder.configure(allFlags) { enable() }
 
-            FlagBuilder.configure(flags) { enable() }
+            FlagsBuilder.configure(flags) { enable() }
             assertEquals(1, flags.size)
             assertEquals(expected, flags.first())
 
-            FlagBuilder.configure(flags) { /* no action */ }
+            FlagsBuilder.configure(flags) { /* no action */ }
             assertEquals(1, flags.size)
 
-            FlagBuilder.configure(flags) { disable() }
+            FlagsBuilder.configure(flags) { disable() }
             assertEquals(0, flags.size)
         }
 
@@ -56,13 +56,13 @@ class OnionAddBuilderUnitTest {
 
     @Test
     fun givenAddExisting_whenCmdCreated_thenFlagDiscardPKIsPresentByDefault() {
-        val cmd = TorCmd.Onion.Add(ByteArray(64).toED25519_V3PrivateKey()) {}
+        val cmd = TorCmd.Onion.Add.existing(ByteArray(64).toED25519_V3PrivateKey()) {}
         assertTrue(cmd.flags.contains("DiscardPK"))
     }
 
     @Test
     fun givenCreateNew_whenCmdCreated_thenFlagDiscardPKIsNotPresentByDefault() {
-        val cmd = TorCmd.Onion.Add(ED25519_V3) {}
+        val cmd = TorCmd.Onion.Add.new(ED25519_V3) {}
         assertFalse(cmd.flags.contains("DiscardPK"))
     }
 }

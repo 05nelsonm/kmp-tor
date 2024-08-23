@@ -29,8 +29,6 @@ import io.matthewnelson.kmp.tor.core.api.annotation.KmpTorDsl
 import io.matthewnelson.kmp.tor.core.resource.SynchronizedObject
 import io.matthewnelson.kmp.tor.core.resource.synchronized
 import io.matthewnelson.kmp.tor.runtime.FileID.Companion.toFIDString
-import io.matthewnelson.kmp.tor.runtime.TorRuntime.Companion.Builder
-import io.matthewnelson.kmp.tor.runtime.TorRuntime.Environment.Companion.Builder
 import io.matthewnelson.kmp.tor.runtime.core.*
 import io.matthewnelson.kmp.tor.runtime.core.config.TorConfig
 import io.matthewnelson.kmp.tor.runtime.core.config.TorOption
@@ -103,17 +101,17 @@ public sealed interface TorRuntime:
          * [Environment], that [TorRuntime] instance will be returned.
          *
          * @param [environment] the operational environment for the instance
-         * @see [TorRuntime.Builder]
+         * @see [TorRuntime.BuilderScope]
          * */
         @JvmStatic
         public fun Builder(
             environment: Environment,
-            block: ThisBlock<Builder>,
-        ): TorRuntime = Builder.build(environment, block)
+            block: ThisBlock<BuilderScope>,
+        ): TorRuntime = BuilderScope.build(environment, block)
     }
 
     @KmpTorDsl
-    public class Builder private constructor(private val environment: Environment) {
+    public class BuilderScope private constructor(private val environment: Environment) {
 
         private val config = mutableSetOf<ConfigBuilderCallback>()
         private val requiredTorEvents = mutableSetOf<TorEvent>()
@@ -153,7 +151,7 @@ public sealed interface TorRuntime:
         @KmpTorDsl
         public fun config(
             block: ConfigBuilderCallback,
-        ): Builder {
+        ): BuilderScope {
             config.add(block)
             return this
         }
@@ -173,7 +171,7 @@ public sealed interface TorRuntime:
         @KmpTorDsl
         public fun required(
             event: TorEvent,
-        ): Builder {
+        ): BuilderScope {
             requiredTorEvents.add(event)
             return this
         }
@@ -186,7 +184,7 @@ public sealed interface TorRuntime:
         @KmpTorDsl
         public fun observer(
             observer: TorEvent.Observer,
-        ): Builder {
+        ): BuilderScope {
             observersTorEvent.add(observer)
             return this
         }
@@ -200,7 +198,7 @@ public sealed interface TorRuntime:
         public fun observerStatic(
             event: TorEvent,
             onEvent: OnEvent<String>,
-        ): Builder = observerStatic(event, null, onEvent)
+        ): BuilderScope = observerStatic(event, null, onEvent)
 
         /**
          * Add [TorEvent.Observer] which will never be removed from [TorRuntime].
@@ -212,7 +210,7 @@ public sealed interface TorRuntime:
             event: TorEvent,
             executor: OnEvent.Executor?,
             onEvent: OnEvent<String>,
-        ): Builder = observer(TorEvent.Observer(event, environment.staticTag(), executor, onEvent))
+        ): BuilderScope = observer(TorEvent.Observer(event, environment.staticTag(), executor, onEvent))
 
         /**
          * Add [RuntimeEvent.Observer] which is non-static (can be removed at any time).
@@ -222,7 +220,7 @@ public sealed interface TorRuntime:
         @KmpTorDsl
         public fun <R: Any> observer(
             observer: RuntimeEvent.Observer<R>,
-        ): Builder {
+        ): BuilderScope {
             observersRuntimeEvent.add(observer)
             return this
         }
@@ -236,7 +234,7 @@ public sealed interface TorRuntime:
         public fun <R: Any> observerStatic(
             event: RuntimeEvent<R>,
             onEvent: OnEvent<R>,
-        ): Builder = observerStatic(event, null, onEvent)
+        ): BuilderScope = observerStatic(event, null, onEvent)
 
         /**
          * Add [RuntimeEvent.Observer] which will never be removed from [TorRuntime].
@@ -248,16 +246,16 @@ public sealed interface TorRuntime:
             event: RuntimeEvent<R>,
             executor: OnEvent.Executor?,
             onEvent: OnEvent<R>,
-        ): Builder = observer(RuntimeEvent.Observer(event, environment.staticTag(), executor, onEvent))
+        ): BuilderScope = observer(RuntimeEvent.Observer(event, environment.staticTag(), executor, onEvent))
 
         internal companion object: InstanceKeeper<String, TorRuntime>() {
 
             @JvmSynthetic
             internal fun build(
                 environment: Environment,
-                block: ThisBlock<Builder>,
+                block: ThisBlock<BuilderScope>,
             ): TorRuntime {
-                val b = Builder(environment).apply(block)
+                val b = BuilderScope(environment).apply(block)
 
                 return getOrCreateInstance(key = environment.fid, block = {
 
@@ -282,7 +280,7 @@ public sealed interface TorRuntime:
     /**
      * The environment for which [TorRuntime] operates.
      *
-     * Specified directories/files are utilized by [TorRuntime.Builder.config]
+     * Specified directories/files are utilized by [TorRuntime.BuilderScope.config]
      * to create a minimum viable [TorConfig].
      *
      * The [Environment] API is mostly based around configuration options that
@@ -314,7 +312,7 @@ public sealed interface TorRuntime:
          *
          * **NOTE:** This does not alter control connection event listeners
          * via [TorCmd.SetEvents]. Add [TorEvent.DEBUG] via
-         * [TorRuntime.Builder.required] if debug logs from tor are needed.
+         * [TorRuntime.BuilderScope.required] if debug logs from tor are needed.
          *
          * **NOTE:** Debug logs may reveal sensitive information and should
          * not be enabled in production!
@@ -351,7 +349,7 @@ public sealed interface TorRuntime:
              *   This will be utilized as the tor process' `HOME` environment variable.
              * @param [cacheDirectory] tor's cache directory (e.g. `$HOME/.my_application/cache/torservice`).
              * @param [installer] lambda for creating [ResourceInstaller] using the configured
-             *   [Builder.installationDirectory]. See [kmp-tor-resource](https://github.com/05nelsonm/kmp-tor-resource)
+             *   [BuilderScope.installationDirectory]. See [kmp-tor-resource](https://github.com/05nelsonm/kmp-tor-resource)
              * @see [io.matthewnelson.kmp.tor.runtime.service.TorServiceConfig]
              * */
             @JvmStatic
@@ -359,7 +357,7 @@ public sealed interface TorRuntime:
                 workDirectory: File,
                 cacheDirectory: File,
                 installer: (installationDirectory: File) -> ResourceInstaller<Paths.Tor>,
-            ): Environment = Builder.build(workDirectory, cacheDirectory, installer, null)
+            ): Environment = BuilderScope.build(workDirectory, cacheDirectory, installer, null)
 
             /**
              * Opener for creating an [Environment] instance.
@@ -385,7 +383,7 @@ public sealed interface TorRuntime:
              *   This will be utilized as the tor process' `HOME` environment variable.
              * @param [cacheDirectory] tor's cache directory (e.g. `$HOME/.my_application/cache/torservice`).
              * @param [installer] lambda for creating [ResourceInstaller] using the configured
-             *   [Builder.installationDirectory]. See [kmp-tor-resource](https://github.com/05nelsonm/kmp-tor-resource)
+             *   [BuilderScope.installationDirectory]. See [kmp-tor-resource](https://github.com/05nelsonm/kmp-tor-resource)
              * @param [block] optional lambda for modifying default parameters.
              * @see [io.matthewnelson.kmp.tor.runtime.service.TorServiceConfig]
              * */
@@ -394,12 +392,12 @@ public sealed interface TorRuntime:
                 workDirectory: File,
                 cacheDirectory: File,
                 installer: (installationDirectory: File) -> ResourceInstaller<Paths.Tor>,
-                block: ThisBlock<Builder>,
-            ): Environment = Builder.build(workDirectory, cacheDirectory, installer, block)
+                block: ThisBlock<BuilderScope>,
+            ): Environment = BuilderScope.build(workDirectory, cacheDirectory, installer, block)
         }
 
         @KmpTorDsl
-        public class Builder private constructor(
+        public class BuilderScope private constructor(
             @JvmField
             public val workDirectory: File,
             @JvmField
@@ -433,7 +431,7 @@ public sealed interface TorRuntime:
 
             /**
              * If true, [TorOption.GeoIPFile] and [TorOption.GeoIPv6File] will **not**
-             * be automatically added via [TorRuntime.Builder.config] using paths
+             * be automatically added via [TorRuntime.BuilderScope.config] using paths
              * returned from [ResourceInstaller.install].
              *
              * This is useful if an alternative installation of tor is being used from
@@ -491,9 +489,9 @@ public sealed interface TorRuntime:
                     workDirectory: File,
                     cacheDirectory: File,
                     installer: (installationDirectory: File) -> ResourceInstaller<Paths.Tor>,
-                    block: ThisBlock<Builder>?,
+                    block: ThisBlock<BuilderScope>?,
                 ): Environment {
-                    val b = Builder(workDirectory.absoluteFile.normalize(), cacheDirectory.absoluteFile.normalize())
+                    val b = BuilderScope(workDirectory.absoluteFile.normalize(), cacheDirectory.absoluteFile.normalize())
                     // Apply block outside getOrCreateInstance call to
                     // prevent double instance creation
                     if (block != null) b.apply(block)
@@ -577,7 +575,7 @@ public sealed interface TorRuntime:
         /**
          * Helper for loading the implementation of [ServiceFactory].
          *
-         * @see [Environment.Builder.serviceFactoryLoader]
+         * @see [Environment.BuilderScope.serviceFactoryLoader]
          * */
         @ExperimentalKmpTorApi
         public abstract class Loader {

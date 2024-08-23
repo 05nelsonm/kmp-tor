@@ -26,27 +26,27 @@ import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
 import io.matthewnelson.kmp.tor.runtime.core.*
 import io.matthewnelson.kmp.tor.runtime.core.address.IPAddress
 import io.matthewnelson.kmp.tor.runtime.core.address.OnionAddress
-import io.matthewnelson.kmp.tor.runtime.core.builder.OnionAddBuilder
-import io.matthewnelson.kmp.tor.runtime.core.builder.OnionAddBuilder.Companion.configure
-import io.matthewnelson.kmp.tor.runtime.core.builder.OnionClientAuthAddBuilder
+import io.matthewnelson.kmp.tor.runtime.core.ctrl.builder.BuilderScopeOnionAdd
+import io.matthewnelson.kmp.tor.runtime.core.ctrl.builder.BuilderScopeOnionAdd.Companion.configure
+import io.matthewnelson.kmp.tor.runtime.core.ctrl.builder.BuilderScopeClientAuthAdd
 import io.matthewnelson.kmp.tor.runtime.core.config.TorConfig
 import io.matthewnelson.kmp.tor.runtime.core.config.TorOption
 import io.matthewnelson.kmp.tor.runtime.core.config.TorSetting
 import io.matthewnelson.kmp.tor.runtime.core.key.*
 import kotlin.coroutines.cancellation.CancellationException
 import kotlin.jvm.JvmField
+import kotlin.jvm.JvmStatic
 
 /**
- * Commands to interact with tor via its control connection, as
- * described in [control-spec](https://spec.torproject.org/control-spec/index.html).
+ * Commands to interact with tor via its control connection, as described
+ * in [control-spec](https://spec.torproject.org/control-spec/index.html).
  *
- * Commands are separated into 2 categories, [Privileged] and
- * [Unprivileged]. This is unique to `kmp-tor` only, not tor.
- * The purpose is to allow abstractions to be built on top of a
- * control connection implementation (such as `TorRuntime`) that
- * manage the connection and allow pass-through of [Unprivileged]
- * commands, while internally using [Privileged] commands to set
- * up and maintain the connection.
+ * Commands are separated into 2 categories, [Privileged] and [Unprivileged].
+ * This is unique to `kmp-tor` only, not tor. The purpose is to allow
+ * abstractions to be built on top of a control connection implementation
+ * (such as `kmp-tor:runtime`) that manage the connection and allow for
+ * pass-through of [Unprivileged] commands while internally using [Privileged]
+ * commands to set up and maintain the connection.
  *
  * @see [Privileged.Processor]
  * @see [Unprivileged.Processor]
@@ -65,15 +65,19 @@ public sealed class TorCmd<Success: Any> private constructor(
         @JvmField
         public val hex: String
 
-        /** No Password (i.e. unauthenticated control connection) */
-        public constructor(): this(ByteArray(0))
+        /** No Password (i.e. An unauthenticated control connection) */
+        public constructor(): this(NO_PASS)
 
-        /** Un-Hashed (raw) Password for HashedControlPassword (e.g. `"Hello World!"`) */
+        /** Un-Hashed (raw) Password for [TorOption.HashedControlPassword] (e.g. `"Hello World!"`) */
         public constructor(password: String): this(password.encodeToByteArray())
 
         /** Cookie authentication bytes (or password UTF-8 encoded to bytes) */
         public constructor(cookie: ByteArray): super("AUTHENTICATE") {
             hex = if (cookie.isEmpty()) "" else cookie.encodeToString(Base16())
+        }
+
+        private companion object {
+            private val NO_PASS = ByteArray(0)
         }
     }
 
@@ -194,23 +198,23 @@ public sealed class TorCmd<Success: Any> private constructor(
             public val servers: Set<String>
 
             public constructor(
-                addressKey: AddressKey.Public,
-            ): this(addressKey.address())
+                key: AddressKey.Public,
+            ): this(key.address())
 
             public constructor(
-                addressKey: AddressKey.Public,
+                key: AddressKey.Public,
                 server: String,
-            ): this(addressKey.address(), server)
+            ): this(key.address(), server)
 
             public constructor(
-                addressKey: AddressKey.Public,
+                key: AddressKey.Public,
                 vararg servers: String,
-            ): this(addressKey, immutableSetOf(*servers))
+            ): this(key, immutableSetOf(*servers))
 
             public constructor(
-                addressKey: AddressKey.Public,
+                key: AddressKey.Public,
                 servers: Collection<String>,
-            ): this(addressKey.address(), servers)
+            ): this(key.address(), servers)
 
             public constructor(
                 address: OnionAddress,
@@ -266,6 +270,8 @@ public sealed class TorCmd<Success: Any> private constructor(
 
     /**
      * [control-spec#MAPADDRESS](https://spec.torproject.org/control-spec/commands.html#mapaddress)
+     *
+     * @see [AddressMapping]
      * */
     public class MapAddress: Unprivileged<Set<AddressMapping.Result>> {
 
@@ -283,13 +289,16 @@ public sealed class TorCmd<Success: Any> private constructor(
 
         /**
          * [control-spec#ADD_ONION](https://spec.torproject.org/control-spec/commands.html#add_onion)
+         *
+         * @see [new]
+         * @see [existing]
          * */
         public class Add: Unprivileged<HiddenServiceEntry> {
 
             @JvmField
             public val keyType: KeyType.Address<*, *>
             @JvmField
-            public val addressKey: AddressKey.Private?
+            public val key: AddressKey.Private?
             @JvmField
             public val clientAuth: Set<AuthKey.Public>
             @JvmField
@@ -301,69 +310,45 @@ public sealed class TorCmd<Success: Any> private constructor(
             @JvmField
             public val destroyKeyOnJobCompletion: Boolean
 
-            /**
-             * Creates an [Onion.Add] command that will instruct tor
-             * to create a new Hidden Service of type [keyType].
-             *
-             * **NOTE:** The resulting [HiddenServiceEntry.privateKey]
-             * should be destroyed when done with it. The option
-             * [OnionAddBuilder.destroyKeyOnJobCompletion] does nothing
-             * for this option.
-             *
-             * e.g.
-             *
-             *     TorCmd.Onion.Add(ED25519_V3) {
-             *         port(virtual = Port.HTTP) {
-             *             target(port = 8080.toPort())
-             *         }
-             *     }
-             *
-             * @see [OnionAddBuilder]
-             * @see [ED25519_V3]
-             * */
-            public constructor(
-                keyType: KeyType.Address<*, *>,
-                block: ThisBlock<OnionAddBuilder>,
-            ): this(null, keyType.configure(isExisting = false, block))
+            public companion object {
 
-            /**
-             * Creates an [Onion.Add] command that will instruct tor
-             * to add a Hidden Service to its runtime for the provided
-             * [AddressKey.Private].
-             *
-             * **NOTE:** [OnionAddBuilder], for this option, is instantiated
-             * with the [OnionAddBuilder.FlagBuilder.DiscardPK] enabled in
-             * order to reduce exposure of private key material. If this is
-             * undesirable, you must explicitly set the flag to `false` for
-             * it to be removed.
-             *
-             * e.g.
-             *
-             *     TorCmd.Onion.Add("[Blob Redacted]".toED25519_V3PrivateKey()) {
-             *         port(virtual = Port.HTTP) {
-             *             target(port = 8080.toPort())
-             *         }
-             *     }
-             *
-             * @see [OnionAddBuilder]
-             * @see [ED25519_V3.PrivateKey]
-             * */
-            public constructor(
-                addressKey: AddressKey.Private,
-                block: ThisBlock<OnionAddBuilder>,
-            ): this(addressKey, addressKey.type().configure(isExisting = true, block))
+                /**
+                 * Creates a command object that will instruct tor to generate keys for,
+                 * and add to its runtime, a new Hidden Service.
+                 *
+                 * @see [BuilderScopeOnionAdd]
+                 * */
+                @JvmStatic
+                public fun new(
+                    type: KeyType.Address<*, *>,
+                    block: ThisBlock<BuilderScopeOnionAdd>,
+                ): Add = Add(null, type.configure(isExisting = false, block))
 
+                /**
+                 * Creates a command object that will instruct tor to add an existing
+                 * Hidden Service to its runtime, for the provided [AddressKey.Private].
+                 *
+                 * @see [BuilderScopeOnionAdd]
+                 * */
+                @JvmStatic
+                public fun existing(
+                    key: AddressKey.Private,
+                    block: ThisBlock<BuilderScopeOnionAdd>,
+                ): Add = Add(key, key.type().configure(isExisting = true, block))
+            }
+
+            @Suppress("ConvertSecondaryConstructorToPrimary")
             private constructor(
-                addressKey: AddressKey.Private?,
-                arguments: OnionAddBuilder.Arguments,
+                key: AddressKey.Private?,
+                arguments: BuilderScopeOnionAdd.Arguments,
             ): super("ADD_ONION") {
                 this.keyType = arguments.keyType
-                this.addressKey = addressKey
+                this.key = key
                 this.clientAuth = arguments.clientAuth
                 this.flags = arguments.flags
                 this.maxStreams = arguments.maxStreams
                 this.ports = arguments.ports
-                this.destroyKeyOnJobCompletion = if (addressKey == null) {
+                this.destroyKeyOnJobCompletion = if (key == null) {
                     false
                 } else {
                     arguments.destroyKeyOnJobCompletion
@@ -379,7 +364,7 @@ public sealed class TorCmd<Success: Any> private constructor(
             @JvmField
             public val address: OnionAddress
 
-            public constructor(addressKey: AddressKey.Public): this(addressKey.address())
+            public constructor(key: AddressKey.Public): this(key.address())
             public constructor(address: OnionAddress): super("DEL_ONION") {
                 this.address = address
             }
@@ -390,13 +375,15 @@ public sealed class TorCmd<Success: Any> private constructor(
 
         /**
          * [control-spec#ONION_CLIENT_AUTH_ADD](https://spec.torproject.org/control-spec/commands.html#onion_client_auth_add)
+         *
+         * @see [BuilderScopeClientAuthAdd]
          * */
         public class Add: Unprivileged<Reply.Success> {
 
             @JvmField
             public val address: OnionAddress
             @JvmField
-            public val authKey: AuthKey.Private
+            public val key: AuthKey.Private
             @JvmField
             public val clientName: String?
             @JvmField
@@ -406,22 +393,22 @@ public sealed class TorCmd<Success: Any> private constructor(
 
             public constructor(
                 address: OnionAddress.V3,
-                authKey: X25519.PrivateKey,
-            ): this(address, authKey, OnionClientAuthAddBuilder.Arguments.DEFAULT)
+                key: X25519.PrivateKey,
+            ): this(address, key, BuilderScopeClientAuthAdd.Arguments.DEFAULT)
 
             public constructor(
                 address: OnionAddress.V3,
-                authKey: X25519.PrivateKey,
-                block: ThisBlock<OnionClientAuthAddBuilder>,
-            ): this(address, authKey, OnionClientAuthAddBuilder.configure(block))
+                key: X25519.PrivateKey,
+                block: ThisBlock<BuilderScopeClientAuthAdd>,
+            ): this(address, key, BuilderScopeClientAuthAdd.configure(block))
 
             private constructor(
                 address: OnionAddress,
-                authKey: AuthKey.Private,
-                arguments: OnionClientAuthAddBuilder.Arguments,
+                key: AuthKey.Private,
+                arguments: BuilderScopeClientAuthAdd.Arguments,
             ): super("ONION_CLIENT_AUTH_ADD") {
                 this.address = address
-                this.authKey = authKey
+                this.key = key
                 this.clientName = arguments.clientName
                 this.flags = arguments.flags
                 this.destroyKeyOnJobCompletion = arguments.destroyKeyOnJobCompletion
@@ -436,7 +423,7 @@ public sealed class TorCmd<Success: Any> private constructor(
             @JvmField
             public val address: OnionAddress
 
-            public constructor(addressKey: ED25519_V3.PublicKey): this(addressKey.address())
+            public constructor(key: ED25519_V3.PublicKey): this(key.address())
             public constructor(address: OnionAddress.V3): this(address as OnionAddress)
             private constructor(address: OnionAddress): super("ONION_CLIENT_AUTH_REMOVE") {
                 this.address = address
@@ -463,8 +450,7 @@ public sealed class TorCmd<Success: Any> private constructor(
 
                 /**
                  * Static instance where [address] is `null`, indicating that
-                 * tor should return all Onion Client Auth information it is
-                 * operating with for all [OnionAddress].
+                 * tor should return all Onion Client Auth information it has.
                  * */
                 @JvmField
                 public val ALL: View = View(address = null)

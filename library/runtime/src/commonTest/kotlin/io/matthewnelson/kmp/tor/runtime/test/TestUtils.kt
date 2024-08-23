@@ -47,7 +47,7 @@ object TestUtils {
     fun testEnv(
         dirName: String,
         installer: (File) -> ResourceInstaller<Paths.Tor> = { INSTALLER },
-        block: ThisBlock<TorRuntime.Environment.Builder> = ThisBlock {}
+        block: ThisBlock<TorRuntime.Environment.BuilderScope> = ThisBlock {}
     ): TorRuntime.Environment = TorRuntime.Environment.Builder(
         workDirectory = TMP_TEST_DIR.resolve("$dirName/work"),
         cacheDirectory = TMP_TEST_DIR.resolve("$dirName/cache"),

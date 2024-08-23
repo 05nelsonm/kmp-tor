@@ -19,7 +19,7 @@ import io.matthewnelson.kmp.tor.runtime.FileID
 import io.matthewnelson.kmp.tor.runtime.TorRuntime
 
 /**
- * Configuration option types for [KmpTorServiceUI.Config.Builder.displayName].
+ * Configuration option types for [KmpTorServiceUI.Config.BuilderScope.displayName].
  *
  * Will be shown below the selector action button icons
  * [R.drawable.ic_kmp_tor_ui_action_previous] and

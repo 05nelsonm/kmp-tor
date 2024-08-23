@@ -15,13 +15,14 @@
  **/
 @file:Suppress("PropertyName")
 
-package io.matthewnelson.kmp.tor.runtime.core.builder
+package io.matthewnelson.kmp.tor.runtime.core.ctrl.builder
 
 import io.matthewnelson.immutable.collections.toImmutableSet
 import io.matthewnelson.kmp.tor.core.api.annotation.KmpTorDsl
 import io.matthewnelson.kmp.tor.runtime.core.EnqueuedJob
 import io.matthewnelson.kmp.tor.runtime.core.ThisBlock
 import io.matthewnelson.kmp.tor.runtime.core.apply
+import io.matthewnelson.kmp.tor.runtime.core.config.TorConfig
 import io.matthewnelson.kmp.tor.runtime.core.config.TorOption
 import io.matthewnelson.kmp.tor.runtime.core.ctrl.TorCmd
 import io.matthewnelson.kmp.tor.runtime.core.internal.configure
@@ -30,53 +31,73 @@ import kotlin.jvm.JvmField
 import kotlin.jvm.JvmSynthetic
 
 /**
- * Helper for configuring [TorCmd.OnionClientAuth.Add] options.
- * // TODO: Rename and move to `...ctrl.builder` package + (java9 module info). Issue #516
+ * A DSL builder scope for configuring [TorCmd.OnionClientAuth.Add].
+ *
+ * All elements of this builder scope are optional, and not required.
  * */
 @KmpTorDsl
-public class OnionClientAuthAddBuilder private constructor() {
+public class BuilderScopeClientAuthAdd private constructor() {
 
-    private val flags = LinkedHashSet<String>(1, 1.0f)
-
-    /**
-     * Cannot exceed 16 characters in length and must not contain
-     * whitespace, otherwise tor will reject the request.
-     * */
-    @JvmField
-    public var clientName: String? = null
+    private var _clientName: String? = null
+    private var _destroyKeyOnJobCompletion: Boolean = true
+    private val _flags = LinkedHashSet<String>(1, 1.0f)
 
     /**
-     * When true, an [EnqueuedJob.invokeOnCompletion] handler is
-     * automatically set which calls [AuthKey.Private.destroy]
-     * once the job completes, either successfully or by
-     * cancellation/error.
+     * Specify the [nickname] for this client key.
      *
-     * Default: `true`
+     * **NOTE:** Cannot exceed 16 characters in length or contain
+     * whitespace. Otherwise, the call will fail.
      * */
-    @JvmField
-    public var destroyKeyOnJobCompletion: Boolean = true
-
     @KmpTorDsl
-    public fun flags(
-        block: ThisBlock<FlagBuilder>,
-    ): OnionClientAuthAddBuilder {
-        FlagBuilder.configure(flags, block)
+    public fun clientName(
+        nickname: String?,
+    ): BuilderScopeClientAuthAdd {
+        _clientName = nickname
         return this
     }
 
     /**
-     * Configure flags specific to [TorCmd.OnionClientAuth.Add].
+     * When true, an [EnqueuedJob.invokeOnCompletion] handler is automatically
+     * set when the resulting [TorCmd.OnionClientAuth.Add] object is enqueued.
+     * The handler calls [AuthKey.Private.destroy] upon job completion (either
+     * successfully or by cancellation/error).
      *
-     * - `null`  - no action (default)
-     * - `true`  - add the flag if not present
-     * - `false` - remove the flag if present
+     * Default: `true`
      * */
     @KmpTorDsl
-    public class FlagBuilder private constructor() {
+    public fun destroyKeyOnJobCompletion(
+        destroy: Boolean,
+    ): BuilderScopeClientAuthAdd {
+        _destroyKeyOnJobCompletion = destroy
+        return this
+    }
+
+    /**
+     * Add and/or remove flags.
+     * */
+    @KmpTorDsl
+    public fun flags(
+        block: ThisBlock<FlagsBuilder>,
+    ): BuilderScopeClientAuthAdd {
+        FlagsBuilder.configure(_flags, block)
+        return this
+    }
+
+    /**
+     * Configure flags for the [TorCmd.OnionClientAuth.Add] object, as described
+     * in  [control-spec#ONION_CLIENT_AUTH_ADD](https://spec.torproject.org/control-spec/commands.html#onion_client_auth_add).
+     *
+     * Configurability is as follows:
+     *  - `null`: no action (default).
+     *  - `true`: add the flag if not present.
+     *  - `false`: remove the flag if present.
+     * */
+    @KmpTorDsl
+    public class FlagsBuilder private constructor() {
 
         /**
-         * Setting to `true` requires that [TorOption.ClientOnionAuthDir]
-         * be defined, otherwise tor will reject the request.
+         * **NOTE:** Adding this flag requires that [TorOption.ClientOnionAuthDir]
+         * be defined in your [TorConfig]. Otherwise, the call will fail.
          * */
         @JvmField
         public var Permanent: Boolean? = null
@@ -86,9 +107,9 @@ public class OnionClientAuthAddBuilder private constructor() {
             @JvmSynthetic
             internal fun configure(
                 flags: LinkedHashSet<String>,
-                block: ThisBlock<FlagBuilder>,
+                block: ThisBlock<FlagsBuilder>,
             ) {
-                val b = FlagBuilder().apply(block)
+                val b = FlagsBuilder().apply(block)
 
                 b.Permanent.configure(flags, "Permanent")
             }
@@ -99,14 +120,14 @@ public class OnionClientAuthAddBuilder private constructor() {
 
         @JvmSynthetic
         internal fun configure(
-            block: ThisBlock<OnionClientAuthAddBuilder>,
+            block: ThisBlock<BuilderScopeClientAuthAdd>,
         ): Arguments {
-            val b = OnionClientAuthAddBuilder().apply(block)
+            val b = BuilderScopeClientAuthAdd().apply(block)
 
             return Arguments.of(
-                clientName = b.clientName,
-                destroyKeyOnJobCompletion = b.destroyKeyOnJobCompletion,
-                flags = b.flags,
+                clientName = b._clientName,
+                destroyKeyOnJobCompletion = b._destroyKeyOnJobCompletion,
+                flags = b._flags,
             )
         }
     }
