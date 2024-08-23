@@ -63,7 +63,7 @@ class ServiceFactoryUnitTest {
     private fun env(
         dirName: String,
         start: ((TorRuntime.ServiceFactory.Binder) -> Unit)? = null,
-        block: ThisBlock<TorRuntime.Environment.Builder> = ThisBlock {},
+        block: ThisBlock<TorRuntime.Environment.BuilderScope> = ThisBlock {},
     ): TorRuntime.Environment = testEnv(dirName) {
         serviceFactoryLoader = object : TorRuntime.ServiceFactory.Loader() {
             override fun loadProtected(initializer: TorRuntime.ServiceFactory.Initializer): TorRuntime.ServiceFactory {

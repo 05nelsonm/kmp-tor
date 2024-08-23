@@ -357,17 +357,17 @@ public abstract interface class io/matthewnelson/kmp/tor/runtime/TorRuntime : io
 	public abstract fun state ()Lio/matthewnelson/kmp/tor/runtime/TorState;
 }
 
-public final class io/matthewnelson/kmp/tor/runtime/TorRuntime$Builder {
+public final class io/matthewnelson/kmp/tor/runtime/TorRuntime$BuilderScope {
 	public field networkObserver Lio/matthewnelson/kmp/tor/runtime/NetworkObserver;
 	public synthetic fun <init> (Lio/matthewnelson/kmp/tor/runtime/TorRuntime$Environment;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
-	public final fun config (Lio/matthewnelson/kmp/tor/runtime/ConfigBuilderCallback;)Lio/matthewnelson/kmp/tor/runtime/TorRuntime$Builder;
-	public final fun observer (Lio/matthewnelson/kmp/tor/runtime/RuntimeEvent$Observer;)Lio/matthewnelson/kmp/tor/runtime/TorRuntime$Builder;
-	public final fun observer (Lio/matthewnelson/kmp/tor/runtime/core/TorEvent$Observer;)Lio/matthewnelson/kmp/tor/runtime/TorRuntime$Builder;
-	public final fun observerStatic (Lio/matthewnelson/kmp/tor/runtime/RuntimeEvent;Lio/matthewnelson/kmp/tor/runtime/core/OnEvent$Executor;Lio/matthewnelson/kmp/tor/runtime/core/OnEvent;)Lio/matthewnelson/kmp/tor/runtime/TorRuntime$Builder;
-	public final fun observerStatic (Lio/matthewnelson/kmp/tor/runtime/RuntimeEvent;Lio/matthewnelson/kmp/tor/runtime/core/OnEvent;)Lio/matthewnelson/kmp/tor/runtime/TorRuntime$Builder;
-	public final fun observerStatic (Lio/matthewnelson/kmp/tor/runtime/core/TorEvent;Lio/matthewnelson/kmp/tor/runtime/core/OnEvent$Executor;Lio/matthewnelson/kmp/tor/runtime/core/OnEvent;)Lio/matthewnelson/kmp/tor/runtime/TorRuntime$Builder;
-	public final fun observerStatic (Lio/matthewnelson/kmp/tor/runtime/core/TorEvent;Lio/matthewnelson/kmp/tor/runtime/core/OnEvent;)Lio/matthewnelson/kmp/tor/runtime/TorRuntime$Builder;
-	public final fun required (Lio/matthewnelson/kmp/tor/runtime/core/TorEvent;)Lio/matthewnelson/kmp/tor/runtime/TorRuntime$Builder;
+	public final fun config (Lio/matthewnelson/kmp/tor/runtime/ConfigBuilderCallback;)Lio/matthewnelson/kmp/tor/runtime/TorRuntime$BuilderScope;
+	public final fun observer (Lio/matthewnelson/kmp/tor/runtime/RuntimeEvent$Observer;)Lio/matthewnelson/kmp/tor/runtime/TorRuntime$BuilderScope;
+	public final fun observer (Lio/matthewnelson/kmp/tor/runtime/core/TorEvent$Observer;)Lio/matthewnelson/kmp/tor/runtime/TorRuntime$BuilderScope;
+	public final fun observerStatic (Lio/matthewnelson/kmp/tor/runtime/RuntimeEvent;Lio/matthewnelson/kmp/tor/runtime/core/OnEvent$Executor;Lio/matthewnelson/kmp/tor/runtime/core/OnEvent;)Lio/matthewnelson/kmp/tor/runtime/TorRuntime$BuilderScope;
+	public final fun observerStatic (Lio/matthewnelson/kmp/tor/runtime/RuntimeEvent;Lio/matthewnelson/kmp/tor/runtime/core/OnEvent;)Lio/matthewnelson/kmp/tor/runtime/TorRuntime$BuilderScope;
+	public final fun observerStatic (Lio/matthewnelson/kmp/tor/runtime/core/TorEvent;Lio/matthewnelson/kmp/tor/runtime/core/OnEvent$Executor;Lio/matthewnelson/kmp/tor/runtime/core/OnEvent;)Lio/matthewnelson/kmp/tor/runtime/TorRuntime$BuilderScope;
+	public final fun observerStatic (Lio/matthewnelson/kmp/tor/runtime/core/TorEvent;Lio/matthewnelson/kmp/tor/runtime/core/OnEvent;)Lio/matthewnelson/kmp/tor/runtime/TorRuntime$BuilderScope;
+	public final fun required (Lio/matthewnelson/kmp/tor/runtime/core/TorEvent;)Lio/matthewnelson/kmp/tor/runtime/TorRuntime$BuilderScope;
 }
 
 public final class io/matthewnelson/kmp/tor/runtime/TorRuntime$Companion {
@@ -391,7 +391,7 @@ public final class io/matthewnelson/kmp/tor/runtime/TorRuntime$Environment : io/
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/matthewnelson/kmp/tor/runtime/TorRuntime$Environment$Builder {
+public final class io/matthewnelson/kmp/tor/runtime/TorRuntime$Environment$BuilderScope {
 	public final field cacheDirectory Ljava/io/File;
 	public field defaultEventExecutor Lio/matthewnelson/kmp/tor/runtime/core/OnEvent$Executor;
 	public field installationDirectory Ljava/io/File;

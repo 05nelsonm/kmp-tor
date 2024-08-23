@@ -44,7 +44,7 @@ import kotlin.jvm.JvmSynthetic
  *         // ...
  *     }
  *
- * @see [TorRuntime.Builder.config]
+ * @see [TorRuntime.BuilderScope.config]
  * */
 public fun interface ConfigBuilderCallback: ThisBlock.WithIt<TorConfig.BuilderScope, TorRuntime.Environment> {
 

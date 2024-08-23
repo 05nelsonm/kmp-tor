@@ -85,8 +85,8 @@ public final class io/matthewnelson/kmp/tor/runtime/core/EnqueuedJob$ExecutionPo
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/matthewnelson/kmp/tor/runtime/core/EnqueuedJob$ExecutionPolicy$Builder {
-	public final fun cancellation (Lio/matthewnelson/kmp/tor/runtime/core/ThisBlock;)Lio/matthewnelson/kmp/tor/runtime/core/EnqueuedJob$ExecutionPolicy$Builder;
+public final class io/matthewnelson/kmp/tor/runtime/core/EnqueuedJob$ExecutionPolicy$BuilderScope {
+	public final fun cancellation (Lio/matthewnelson/kmp/tor/runtime/core/ThisBlock;)Lio/matthewnelson/kmp/tor/runtime/core/EnqueuedJob$ExecutionPolicy$BuilderScope;
 }
 
 public final class io/matthewnelson/kmp/tor/runtime/core/EnqueuedJob$ExecutionPolicy$Cancellation {
@@ -102,7 +102,7 @@ public final class io/matthewnelson/kmp/tor/runtime/core/EnqueuedJob$ExecutionPo
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/matthewnelson/kmp/tor/runtime/core/EnqueuedJob$ExecutionPolicy$Cancellation$Builder {
+public final class io/matthewnelson/kmp/tor/runtime/core/EnqueuedJob$ExecutionPolicy$Cancellation$BuilderScope {
 	public field accessibilityOpen Z
 	public field allowAttempts Z
 	public field substituteErrorWithAttempt Z

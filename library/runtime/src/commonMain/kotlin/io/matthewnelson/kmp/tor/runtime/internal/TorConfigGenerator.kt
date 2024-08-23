@@ -42,7 +42,7 @@ import io.matthewnelson.kmp.tor.runtime.core.config.builder.RealBuilderScopeTorC
 
 /**
  * Generates a minimum viable [TorConfig] using the provided settings from
- * [TorRuntime.Builder] and [TorRuntime.Environment].
+ * [TorRuntime.BuilderScope] and [TorRuntime.Environment].
  *
  * [generate] is called from a background thread during runtime operations
  * prior to each tor daemon start.

@@ -31,7 +31,7 @@ internal enum class UIAction {
     Previous,
     Next;
 
-    internal class Icons private constructor(b: Factory.Builder) {
+    internal class Icons private constructor(b: Factory.BuilderScope) {
 
         private val icons = Array(UIAction.entries.size) { i ->
             when (UIAction.entries.elementAt(i)) {
@@ -49,7 +49,7 @@ internal enum class UIAction {
 
             @JvmSynthetic
             internal fun of(
-                b: Factory.Builder
+                b: Factory.BuilderScope
             ): Icons = Icons(b)
         }
     }

@@ -32,7 +32,7 @@ import kotlin.jvm.JvmSynthetic
  *
  * @see [notify]
  * @see [noOp]
- * @see [TorRuntime.Builder.networkObserver]
+ * @see [TorRuntime.BuilderScope.networkObserver]
  * */
 @OptIn(InternalKmpTorApi::class)
 public abstract class NetworkObserver {

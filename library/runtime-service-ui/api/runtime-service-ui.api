@@ -52,7 +52,7 @@ public final class io/matthewnelson/kmp/tor/runtime/service/ui/KmpTorServiceUI$C
 	public final fun newConfig (Ljava/lang/Integer;Ljava/lang/Integer;Lio/matthewnelson/kmp/tor/runtime/core/ThisBlock;)Lio/matthewnelson/kmp/tor/runtime/service/ui/KmpTorServiceUI$Config;
 }
 
-public final class io/matthewnelson/kmp/tor/runtime/service/ui/KmpTorServiceUI$Config$Builder {
+public final class io/matthewnelson/kmp/tor/runtime/service/ui/KmpTorServiceUI$Config$BuilderScope {
 	public field colorReady I
 	public field displayName Lio/matthewnelson/kmp/tor/runtime/service/ui/DisplayName;
 	public field enableActionRestart Z
@@ -74,7 +74,7 @@ public final class io/matthewnelson/kmp/tor/runtime/service/ui/KmpTorServiceUI$F
 	public fun validateConfig (Landroid/content/Context;Lio/matthewnelson/kmp/tor/runtime/service/ui/KmpTorServiceUI$Config;)V
 }
 
-public final class io/matthewnelson/kmp/tor/runtime/service/ui/KmpTorServiceUI$Factory$Builder {
+public final class io/matthewnelson/kmp/tor/runtime/service/ui/KmpTorServiceUI$Factory$BuilderScope {
 	public field actionIntentPermissionSuffix Ljava/lang/String;
 	public field contentIntent Lkotlin/jvm/functions/Function2;
 	public field contentIntentCode I
@@ -83,8 +83,8 @@ public final class io/matthewnelson/kmp/tor/runtime/service/ui/KmpTorServiceUI$F
 	public field iconActionPrevious Ljava/lang/Integer;
 	public field iconActionRestart Ljava/lang/Integer;
 	public field iconActionStop Ljava/lang/Integer;
-	public synthetic fun <init> (Lio/matthewnelson/kmp/tor/runtime/service/ui/KmpTorServiceUI$Config$Builder;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
-	public final fun defaultConfig (Lio/matthewnelson/kmp/tor/runtime/core/ThisBlock;)Lio/matthewnelson/kmp/tor/runtime/service/ui/KmpTorServiceUI$Factory$Builder;
+	public synthetic fun <init> (Lio/matthewnelson/kmp/tor/runtime/service/ui/KmpTorServiceUI$Config$BuilderScope;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun defaultConfig (Lio/matthewnelson/kmp/tor/runtime/core/ThisBlock;)Lio/matthewnelson/kmp/tor/runtime/service/ui/KmpTorServiceUI$Factory$BuilderScope;
 }
 
 public final class io/matthewnelson/kmp/tor/runtime/service/ui/KmpTorServiceUIInstanceState : io/matthewnelson/kmp/tor/runtime/service/AbstractTorServiceUI$InstanceState {

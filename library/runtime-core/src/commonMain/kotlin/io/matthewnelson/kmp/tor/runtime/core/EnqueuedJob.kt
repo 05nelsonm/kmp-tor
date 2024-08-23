@@ -321,8 +321,8 @@ public abstract class EnqueuedJob protected constructor(
              * */
             @JvmStatic
             public fun Builder(
-                block: ThisBlock<Builder>,
-            ): ExecutionPolicy = Builder.get().apply(block).build()
+                block: ThisBlock<BuilderScope>,
+            ): ExecutionPolicy = BuilderScope.get().apply(block).build()
         }
 
         /**
@@ -395,7 +395,7 @@ public abstract class EnqueuedJob protected constructor(
             }
 
             @KmpTorDsl
-            public class Builder private constructor() {
+            public class BuilderScope private constructor() {
 
                 /**
                  * Default: `false`
@@ -444,7 +444,8 @@ public abstract class EnqueuedJob protected constructor(
 
                 internal companion object {
                     @JvmSynthetic
-                    internal fun get(): Builder = Builder()
+                    internal fun get(): BuilderScope =
+                        BuilderScope()
                 }
             }
 
@@ -462,14 +463,14 @@ public abstract class EnqueuedJob protected constructor(
          * @see [ExecutionPolicy.Companion.Builder]
          * */
         @KmpTorDsl
-        public class Builder private constructor() {
+        public class BuilderScope private constructor() {
 
-            private val _cancellation = Cancellation.Builder.get()
+            private val _cancellation = Cancellation.BuilderScope.get()
 
             @KmpTorDsl
             public fun cancellation(
-                block: ThisBlock<Cancellation.Builder>,
-            ): Builder = apply { _cancellation.apply(block) }
+                block: ThisBlock<Cancellation.BuilderScope>,
+            ): BuilderScope = apply { _cancellation.apply(block) }
 
             @JvmSynthetic
             internal fun build(): ExecutionPolicy {
@@ -489,7 +490,7 @@ public abstract class EnqueuedJob protected constructor(
             internal companion object {
 
                 @JvmSynthetic
-                internal fun get(): Builder = Builder()
+                internal fun get(): BuilderScope = BuilderScope()
             }
         }
 

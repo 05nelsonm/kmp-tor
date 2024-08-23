@@ -77,7 +77,7 @@ public sealed class RuntimeEvent<Data: Any> private constructor(
      * **NOTE:** If the error is an [UncaughtException] and no observers
      * for [ERROR] are subscribed with the [TorRuntime], the [UncaughtException]
      * will be thrown and likely crash the program. It is **critical** that an
-     * [ERROR] observer be registered either via [TorRuntime.Builder.observerStatic],
+     * [ERROR] observer be registered either via [TorRuntime.BuilderScope.observerStatic],
      * or immediately after [TorRuntime] is instantiated via [TorRuntime.subscribe].
      * */
     public data object ERROR: RuntimeEvent<Throwable>("ERROR")
@@ -175,7 +175,7 @@ public sealed class RuntimeEvent<Data: Any> private constructor(
              * @param [tag] A string to help grouping/identifying observer(s)
              * @param [executor] The thread context in which [onEvent] will be
              *   invoked in. If `null` whatever was declared via
-             *   [TorRuntime.Environment.Builder.defaultEventExecutor] is used.
+             *   [TorRuntime.Environment.BuilderScope.defaultEventExecutor] is used.
              * @param [onEvent] The callback to pass the data to.
              * */
             @JvmStatic
