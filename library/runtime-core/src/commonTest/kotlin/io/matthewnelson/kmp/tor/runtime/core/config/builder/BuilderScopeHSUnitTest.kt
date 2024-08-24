@@ -117,7 +117,6 @@ class BuilderScopeHSUnitTest {
         val items = HiddenServiceDir.asSetting {
             applyRequiredForTest()
             port(virtual = Port.HTTPS) { target(port = 8443.toPort()) }
-            onionBalanceInstance(true)
             dirGroupReadable(true)
             maxStreams(25)
             maxStreamsCloseCircuit(true)
@@ -131,10 +130,9 @@ class BuilderScopeHSUnitTest {
         assertIs<HiddenServicePort>(items.elementAt(3).option)
         assertIs<HiddenServiceAllowUnknownPorts>(items.elementAt(4).option)
         assertIs<HiddenServiceDirGroupReadable>(items.elementAt(5).option)
-        assertIs<HiddenServiceOnionBalanceInstance>(items.elementAt(6).option)
-        assertIs<HiddenServiceMaxStreams>(items.elementAt(7).option)
-        assertIs<HiddenServiceMaxStreamsCloseCircuit>(items.elementAt(8).option)
-        assertIs<HiddenServiceNumIntroductionPoints>(items.elementAt(9).option)
+        assertIs<HiddenServiceMaxStreams>(items.elementAt(6).option)
+        assertIs<HiddenServiceMaxStreamsCloseCircuit>(items.elementAt(7).option)
+        assertIs<HiddenServiceNumIntroductionPoints>(items.elementAt(8).option)
     }
 
     private fun BuilderScopeHS.applyRequiredForTest() {

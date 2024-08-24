@@ -3567,7 +3567,6 @@ public final class io/matthewnelson/kmp/tor/runtime/core/config/builder/BuilderS
 	public final fun maxStreams (I)Lio/matthewnelson/kmp/tor/runtime/core/config/builder/BuilderScopeHS;
 	public final fun maxStreamsCloseCircuit (Z)Lio/matthewnelson/kmp/tor/runtime/core/config/builder/BuilderScopeHS;
 	public final fun numIntroductionPoints (I)Lio/matthewnelson/kmp/tor/runtime/core/config/builder/BuilderScopeHS;
-	public final fun onionBalanceInstance (Z)Lio/matthewnelson/kmp/tor/runtime/core/config/builder/BuilderScopeHS;
 	public fun port (Lio/matthewnelson/kmp/tor/runtime/core/address/Port;)Lio/matthewnelson/kmp/tor/runtime/core/config/builder/BuilderScopeHS;
 	public synthetic fun port (Lio/matthewnelson/kmp/tor/runtime/core/address/Port;)Lio/matthewnelson/kmp/tor/runtime/core/config/builder/BuilderScopeHSPort$DSL;
 	public fun port (Lio/matthewnelson/kmp/tor/runtime/core/address/Port;Lio/matthewnelson/kmp/tor/runtime/core/ThisBlock;)Lio/matthewnelson/kmp/tor/runtime/core/config/builder/BuilderScopeHS;

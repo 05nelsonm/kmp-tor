@@ -169,17 +169,7 @@ public class BuilderScopeHS: TorSetting.BuilderScope, BuilderScopeHSPort.DSL<Bui
     }
 
     // TODO: [TorOption.HiddenServiceExportCircuitID]
-
-    /**
-     * Sets [TorOption.HiddenServiceOnionBalanceInstance], if desired.
-     * */
-    @KmpTorDsl
-    public fun onionBalanceInstance(
-        enable: Boolean,
-    ): BuilderScopeHS {
-        _onionBalanceInstance = enable
-        return this
-    }
+    // TODO: [TorOption.HiddenServiceOnionBalanceInstance]
 
     /**
      * Sets [TorOption.HiddenServiceMaxStreams], if desired.
