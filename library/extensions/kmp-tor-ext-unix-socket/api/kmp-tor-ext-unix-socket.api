@@ -1,5 +1,0 @@
-public final class io/matthewnelson/kmp/tor/ext/unix/socket/UnixDomainSocketFactory {
-	public static final field INSTANCE Lio/matthewnelson/kmp/tor/ext/unix/socket/UnixDomainSocketFactory;
-	public static final fun create (Ljava/lang/String;)Ljava/net/Socket;
-}
-
