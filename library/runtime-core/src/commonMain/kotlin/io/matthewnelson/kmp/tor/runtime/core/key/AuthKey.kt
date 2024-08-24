@@ -48,13 +48,13 @@ public class AuthKey private constructor() {
          * Produces the base 32 descriptor string for this [AuthKey.Public]
          * in the form of `descriptor:{algorithm}:{base-32}`.
          * */
-        public fun descriptorBase32(): String = toDescriptor("descriptor", base32())
+        public fun descriptorBase32(): String = toDescriptor(address = null, base32())
 
         /**
          * Produces the base 64 descriptor string for this [AuthKey.Public]
          * in the form of `descriptor:{algorithm}:{base-64}`.
          * */
-        public fun descriptorBase64(): String = toDescriptor("descriptor", base64())
+        public fun descriptorBase64(): String = toDescriptor(address = null, base64())
     }
 
     /**
@@ -71,7 +71,7 @@ public class AuthKey private constructor() {
 
         /**
          * Produces the base 32 descriptor string for this [AuthKey.Private]
-         * in the form of `{onion-address}:{algorithm}:{base-32}`.
+         * in the form of `{onion-address}:descriptor:{algorithm}:{base-32}`.
          *
          * @see [descriptorBase32OrNull]
          * @throws [IllegalArgumentException] if the [address] is not a
@@ -85,7 +85,7 @@ public class AuthKey private constructor() {
 
         /**
          * Produces the base 32 descriptor string for this [AuthKey.Private]
-         * in the form of `{onion-address}:{algorithm}:{base-32}`.
+         * in the form of `{onion-address}:descriptor:{algorithm}:{base-32}`.
          *
          * @see [descriptorBase32OrNull]
          * @throws [IllegalArgumentException] if the [publicKey] is not a
@@ -108,8 +108,8 @@ public class AuthKey private constructor() {
 
         /**
          * Produces the base 32 descriptor string for this [AuthKey.Private]
-         * in the form of `{onion-address}:{algorithm}:{base-32}`, or `null`
-         * if [isDestroyed] is `true`.
+         * in the form of `{address-w/o-.onion}:descriptor:{algorithm}:{base-32}`,
+         * or `null` if [isDestroyed] is `true`.
          *
          * @see [descriptorBase32]
          * */
@@ -119,8 +119,8 @@ public class AuthKey private constructor() {
 
         /**
          * Produces the base 32 descriptor string for this [AuthKey.Private]
-         * in the form of `{onion-address}:{algorithm}:{base-32}`, or `null`
-         * if [isDestroyed] is `true`.
+         * in the form of `{address-w/o-.onion}:descriptor:{algorithm}:{base-32}`,
+         * or `null` if [isDestroyed] is `true`.
          *
          * @see [descriptorBase32]
          * */
@@ -130,12 +130,12 @@ public class AuthKey private constructor() {
             if (!isCompatibleWith(publicKey)) return null
 
             val encoded = base32OrNull() ?: return null
-            return toDescriptor(publicKey.address().value, encoded)
+            return toDescriptor(address = publicKey.address(), encoded)
         }
 
         /**
          * Produces the base 64 descriptor string for this [AuthKey.Private]
-         * in the form of `{onion-address}:{algorithm}:{base-64}`.
+         * in the form of `{address-w/o-.onion}:{algorithm}:{base-64}`.
          *
          * @see [descriptorBase64OrNull]
          * @throws [IllegalArgumentException] if the [address] is not a
@@ -149,7 +149,7 @@ public class AuthKey private constructor() {
 
         /**
          * Produces the base 64 descriptor string for this [AuthKey.Private]
-         * in the form of `{onion-address}:{algorithm}:{base-64}`.
+         * in the form of `{address-w/o-.onion}:descriptor:{algorithm}:{base-64}`.
          *
          * @see [descriptorBase64OrNull]
          * @throws [IllegalArgumentException] if the [publicKey] is not a
@@ -172,8 +172,8 @@ public class AuthKey private constructor() {
 
         /**
          * Produces the base 64 descriptor string for this [AuthKey.Private]
-         * in the form of `{onion-address}:{algorithm}:{base-64}`, or `null`
-         * if [isDestroyed] is `true`.
+         * in the form of `{address-w/o-.onion}:descriptor:{algorithm}:{base-64}`,
+         * or `null` if [isDestroyed] is `true`.
          *
          * @see [descriptorBase64]
          * */
@@ -183,8 +183,8 @@ public class AuthKey private constructor() {
 
         /**
          * Produces the base 64 descriptor string for this [AuthKey.Private]
-         * in the form of `{onion-address}:{algorithm}:{base-64}`, or `null`
-         * if [isDestroyed] is `true`.
+         * in the form of `{address-w/o-.onion}:descriptor:{algorithm}:{base-64}`,
+         * or `null` if [isDestroyed] is `true`.
          *
          * @see [descriptorBase64]
          * */
@@ -194,7 +194,7 @@ public class AuthKey private constructor() {
             if (!isCompatibleWith(publicKey)) return null
 
             val encoded = base64OrNull() ?: return null
-            return toDescriptor(publicKey.address().value, encoded)
+            return toDescriptor(address = publicKey.address(), encoded)
         }
 
         @JvmSynthetic
@@ -208,15 +208,20 @@ public class AuthKey private constructor() {
 
 @Suppress("NOTHING_TO_INLINE", "KotlinRedundantDiagnosticSuppress")
 private inline fun Key.toDescriptor(
-    descriptor: String,
-    encoded: String
+    address: OnionAddress?,
+    encoded: String,
 ): String {
-    val sb = StringBuilder()
-    sb.append(descriptor)
-    sb.append(':')
-    sb.append(algorithm())
-    sb.append(':')
-    sb.append(encoded)
+    val sb = StringBuilder().apply {
+        if (address != null) {
+            append(address.value)
+            append(':')
+        }
+
+        append("descriptor:")
+        append(algorithm())
+        append(':')
+        append(encoded)
+    }
 
     val result = sb.toString()
 
