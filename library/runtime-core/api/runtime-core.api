@@ -1,7 +1,6 @@
 public final class io/matthewnelson/kmp/tor/runtime/core/BlocksKt {
 	public static final fun apply (Ljava/lang/Object;Lio/matthewnelson/kmp/tor/runtime/core/ItBlock;)Ljava/lang/Object;
 	public static final fun apply (Ljava/lang/Object;Lio/matthewnelson/kmp/tor/runtime/core/ThisBlock;)Ljava/lang/Object;
-	public static final fun apply (Ljava/lang/Object;Ljava/lang/Object;Lio/matthewnelson/kmp/tor/runtime/core/ThisBlock$WithIt;)Ljava/lang/Object;
 }
 
 public abstract interface class io/matthewnelson/kmp/tor/runtime/core/Destroyable {
@@ -229,10 +228,6 @@ public final class io/matthewnelson/kmp/tor/runtime/core/OnSuccess$Companion {
 
 public abstract interface class io/matthewnelson/kmp/tor/runtime/core/ThisBlock {
 	public abstract fun invoke (Ljava/lang/Object;)V
-}
-
-public abstract interface class io/matthewnelson/kmp/tor/runtime/core/ThisBlock$WithIt {
-	public abstract fun invoke (Ljava/lang/Object;Ljava/lang/Object;)V
 }
 
 public abstract class io/matthewnelson/kmp/tor/runtime/core/TorEvent : io/matthewnelson/kmp/tor/runtime/core/Event {
