@@ -17,6 +17,7 @@
 
 package io.matthewnelson.kmp.tor.runtime.core.config
 
+import io.matthewnelson.immutable.collections.immutableSetOf
 import io.matthewnelson.immutable.collections.toImmutableSet
 import io.matthewnelson.kmp.file.File
 import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
@@ -55,6 +56,14 @@ public class TorConfig private constructor(settings: Set<TorSetting>) {
         ): TorConfig {
             @OptIn(InternalKmpTorApi::class)
             return RealBuilderScopeTorConfig.build(::TorConfig, block)
+        }
+
+        /**
+         * Wraps a single [TorSetting] in [TorConfig].
+         * */
+        @JvmStatic
+        public fun TorSetting.toConfig(): TorConfig {
+            return TorConfig(immutableSetOf(this))
         }
     }
 

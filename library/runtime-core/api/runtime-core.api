@@ -714,6 +714,7 @@ public final class io/matthewnelson/kmp/tor/runtime/core/config/TorConfig {
 	public static final fun Builder (Lio/matthewnelson/kmp/tor/runtime/core/ThisBlock;)Lio/matthewnelson/kmp/tor/runtime/core/config/TorConfig;
 	public fun equals (Ljava/lang/Object;)Z
 	public fun hashCode ()I
+	public static final fun toConfig (Lio/matthewnelson/kmp/tor/runtime/core/config/TorSetting;)Lio/matthewnelson/kmp/tor/runtime/core/config/TorConfig;
 	public fun toString ()Ljava/lang/String;
 }
 
@@ -735,6 +736,7 @@ protected final class io/matthewnelson/kmp/tor/runtime/core/config/TorConfig$Bui
 
 public final class io/matthewnelson/kmp/tor/runtime/core/config/TorConfig$Companion {
 	public final fun Builder (Lio/matthewnelson/kmp/tor/runtime/core/ThisBlock;)Lio/matthewnelson/kmp/tor/runtime/core/config/TorConfig;
+	public final fun toConfig (Lio/matthewnelson/kmp/tor/runtime/core/config/TorSetting;)Lio/matthewnelson/kmp/tor/runtime/core/config/TorConfig;
 }
 
 public abstract class io/matthewnelson/kmp/tor/runtime/core/config/TorOption : java/lang/CharSequence, java/lang/Comparable {
@@ -3919,7 +3921,7 @@ public final class io/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$Config$Save
 }
 
 public final class io/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$Config$Set : io/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$Unprivileged {
-	public final field settings Ljava/util/Set;
+	public final field config Lio/matthewnelson/kmp/tor/runtime/core/config/TorConfig;
 	public fun <init> (Lio/matthewnelson/kmp/tor/runtime/core/ThisBlock;)V
 	public fun <init> (Lio/matthewnelson/kmp/tor/runtime/core/config/TorConfig;)V
 	public fun <init> (Lio/matthewnelson/kmp/tor/runtime/core/config/TorSetting;)V

@@ -569,8 +569,8 @@ public class TorListeners private constructor(
         protected open fun onConfigChangeJob(cmd: TorCmd.Config.Set, job: EnqueuedJob) {
             job.invokeOnErrorRecovery(recovery = {
                 val changes = run {
-                    val eSocks = cmd.settings.filterByOption<TorOption.__SocksPort>()
-                    val socks = cmd.settings.filterByOption<TorOption.SocksPort>()
+                    val eSocks = cmd.config.filterByOption<TorOption.__SocksPort>()
+                    val socks = cmd.config.filterByOption<TorOption.SocksPort>()
                     eSocks + socks
                 }.takeIf { it.isNotEmpty() }?.let { settings ->
                         settings.mapTo(LinkedHashSet(settings.size, 1.0F)) { setting ->

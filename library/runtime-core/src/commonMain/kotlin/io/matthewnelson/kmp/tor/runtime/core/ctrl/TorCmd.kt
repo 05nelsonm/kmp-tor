@@ -13,8 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-@file:Suppress("UNUSED_PARAMETER")
-
 package io.matthewnelson.kmp.tor.runtime.core.ctrl
 
 import io.matthewnelson.encoding.base16.Base16
@@ -30,6 +28,7 @@ import io.matthewnelson.kmp.tor.runtime.core.ctrl.builder.BuilderScopeOnionAdd
 import io.matthewnelson.kmp.tor.runtime.core.ctrl.builder.BuilderScopeOnionAdd.Companion.configure
 import io.matthewnelson.kmp.tor.runtime.core.ctrl.builder.BuilderScopeClientAuthAdd
 import io.matthewnelson.kmp.tor.runtime.core.config.TorConfig
+import io.matthewnelson.kmp.tor.runtime.core.config.TorConfig.Companion.toConfig
 import io.matthewnelson.kmp.tor.runtime.core.config.TorOption
 import io.matthewnelson.kmp.tor.runtime.core.config.TorSetting
 import io.matthewnelson.kmp.tor.runtime.core.key.*
@@ -124,7 +123,7 @@ public sealed class TorCmd<Success: Any> private constructor(
         /**
          * [control-spec#LOADCONF](https://spec.torproject.org/control-spec/commands.html#loadconf)
          * */
-        public class Load(
+        public class Load public constructor(
             @JvmField
             public val configText: String,
         ): Privileged<Reply.Success.OK>("LOADCONF")
@@ -165,17 +164,15 @@ public sealed class TorCmd<Success: Any> private constructor(
         public class Set: Unprivileged<Reply.Success.OK> {
 
             @JvmField
-            public val settings: kotlin.collections.Set<TorSetting>
+            public val config: TorConfig
 
-            public constructor(setting: TorSetting): this(immutableSetOf(setting), null)
+            public constructor(setting: TorSetting): this(setting.toConfig())
             public constructor(vararg settings: TorSetting): this(ThisBlock { settings.forEach { put(it) } })
             public constructor(settings: Collection<TorSetting>): this(ThisBlock { putAll(settings) })
 
             public constructor(block: ThisBlock<TorConfig.BuilderScope>): this(TorConfig.Builder(block))
-            public constructor(config: TorConfig): this(config.settings, null)
-
-            private constructor(settings: kotlin.collections.Set<TorSetting>, any: Any?): super("SETCONF") {
-                this.settings = settings
+            public constructor(config: TorConfig): super("SETCONF") {
+                this.config = config
             }
         }
     }

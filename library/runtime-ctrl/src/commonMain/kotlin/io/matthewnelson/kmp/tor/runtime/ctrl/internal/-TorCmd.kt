@@ -146,28 +146,23 @@ private fun TorCmd.Config.Save.encode(LOG: Debugger?): ByteArray {
 
 @Throws(IllegalArgumentException::class)
 private fun TorCmd.Config.Set.encode(LOG: Debugger?): ByteArray {
-    require(settings.isNotEmpty()) { "A minimum of 1 setting is required" }
+    require(config.settings.isNotEmpty()) { "A minimum of 1 setting is required" }
 
     return StringBuilder(keyword).apply {
-        for (setting in settings) {
+        for (setting in config.settings) {
             for (line in setting.items) {
                 SP().append(line.option).append('=').append('"')
 
                 run {
                     var argument = line.argument
 
-                    with(line.option.attributes) {
-                        when {
-                            contains(Attribute.UNIX_SOCKET) -> {
-                                if (argument.startsWith("unix:")) {
-                                    argument = argument.replace("\"", "\\\"")
-                                }
-                            }
-                            contains(Attribute.FILE) || contains(Attribute.DIRECTORY) -> {
-                                if (SysDirSep == '\\') {
-                                    argument = argument.replace("\\", "\\\\")
-                                }
-                            }
+                    // Escapes
+                    when {
+                        line.isUnixSocket -> {
+                            argument = argument.replace("\"", "\\\"")
+                        }
+                        (line.isDirectory || line.isFile) && SysDirSep == '\\' -> {
+                            argument = argument.replace("\\", "\\\\")
                         }
                     }
 
