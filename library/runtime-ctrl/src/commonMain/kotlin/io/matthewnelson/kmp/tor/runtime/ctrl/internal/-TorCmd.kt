@@ -149,7 +149,7 @@ private fun TorCmd.Config.Set.encode(LOG: Debugger?): ByteArray {
     require(config.settings.isNotEmpty()) { "A minimum of 1 setting is required" }
 
     return StringBuilder(keyword).apply {
-        for (setting in config.settings) {
+        for (setting in config) {
             for (line in setting.items) {
                 SP().append(line.option).append('=').append('"')
 

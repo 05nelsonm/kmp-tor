@@ -35,13 +35,15 @@ import kotlin.jvm.JvmSynthetic
  * @see [TorSetting.filterByAttribute]
  * @see [TorSetting.filterByOption]
  * */
-public class TorConfig private constructor(settings: Set<TorSetting>) {
+public class TorConfig private constructor(settings: Set<TorSetting>): Iterable<TorSetting> {
 
     /**
      * All [TorSetting] which make up this configuration.
      * */
     @JvmField
     public val settings: Set<TorSetting> = settings.toImmutableSet()
+
+    public override fun iterator(): Iterator<TorSetting> = settings.iterator()
 
     public companion object {
 

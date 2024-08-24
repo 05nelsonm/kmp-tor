@@ -707,13 +707,14 @@ public final class io/matthewnelson/kmp/tor/runtime/core/config/IntervalUnit$WEE
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/matthewnelson/kmp/tor/runtime/core/config/TorConfig {
+public final class io/matthewnelson/kmp/tor/runtime/core/config/TorConfig : java/lang/Iterable, kotlin/jvm/internal/markers/KMappedMarker {
 	public static final field Companion Lio/matthewnelson/kmp/tor/runtime/core/config/TorConfig$Companion;
 	public final field settings Ljava/util/Set;
 	public synthetic fun <init> (Ljava/util/Set;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
 	public static final fun Builder (Lio/matthewnelson/kmp/tor/runtime/core/ThisBlock;)Lio/matthewnelson/kmp/tor/runtime/core/config/TorConfig;
 	public fun equals (Ljava/lang/Object;)Z
 	public fun hashCode ()I
+	public fun iterator ()Ljava/util/Iterator;
 	public static final fun toConfig (Lio/matthewnelson/kmp/tor/runtime/core/config/TorSetting;)Lio/matthewnelson/kmp/tor/runtime/core/config/TorConfig;
 	public fun toString ()Ljava/lang/String;
 }
