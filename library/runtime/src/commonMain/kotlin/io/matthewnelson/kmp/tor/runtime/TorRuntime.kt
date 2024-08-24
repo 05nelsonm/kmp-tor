@@ -113,7 +113,7 @@ public sealed interface TorRuntime:
     @KmpTorDsl
     public class BuilderScope private constructor(private val environment: Environment) {
 
-        private val config = mutableSetOf<ConfigBuilderCallback>()
+        private val config = mutableSetOf<ConfigCallback>()
         private val requiredTorEvents = mutableSetOf<TorEvent>()
         private val observersTorEvent = mutableSetOf<TorEvent.Observer>()
         private val observersRuntimeEvent = mutableSetOf<RuntimeEvent.Observer<*>>()
@@ -142,7 +142,7 @@ public sealed interface TorRuntime:
          * of [Action.StartDaemon] or [Action.RestartDaemon].
          *
          * **NOTE:** This can be omitted as a minimum viable configuration
-         * is always created. See [ConfigBuilderCallback.Defaults] for what
+         * is always created. See [ConfigCallback.Defaults] for what
          * settings are automatically applied.
          *
          * **NOTE:** [block] should not contain any external contextual
@@ -150,7 +150,7 @@ public sealed interface TorRuntime:
          * */
         @KmpTorDsl
         public fun config(
-            block: ConfigBuilderCallback,
+            block: ConfigCallback,
         ): BuilderScope {
             config.add(block)
             return this

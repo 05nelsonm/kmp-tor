@@ -20,7 +20,7 @@ import io.matthewnelson.kmp.file.path
 import io.matthewnelson.kmp.file.resolve
 import io.matthewnelson.kmp.tor.core.api.ResourceInstaller
 import io.matthewnelson.kmp.tor.core.api.ResourceInstaller.Paths
-import io.matthewnelson.kmp.tor.runtime.ConfigBuilderCallback
+import io.matthewnelson.kmp.tor.runtime.ConfigCallback
 import io.matthewnelson.kmp.tor.runtime.RuntimeEvent
 import io.matthewnelson.kmp.tor.runtime.TorRuntime
 import io.matthewnelson.kmp.tor.runtime.core.address.LocalHost
@@ -75,8 +75,8 @@ class TorConfigGeneratorUnitTest {
         var invocations = 0
         newGenerator(
             config = setOf(
-                ConfigBuilderCallback { _ -> invocations++ },
-                ConfigBuilderCallback { _ -> invocations++ },
+                ConfigCallback { _ -> invocations++ },
+                ConfigCallback { _ -> invocations++ },
             )
         ).generate(notifier)
 
@@ -104,7 +104,7 @@ class TorConfigGeneratorUnitTest {
         // socks port at 9050 is automatically added
         val config = newGenerator(
             config = setOf(
-                ConfigBuilderCallback {
+                ConfigCallback {
                     TorOption.__DNSPort.configure { port(1080.toPortEphemeral()) }
                 }
             ),
@@ -121,7 +121,7 @@ class TorConfigGeneratorUnitTest {
     fun givenCookieAuthenticationEnabled_whenNoCookieAuthFile_thenAddsDefault() = runTest {
         val config = newGenerator(
             config = setOf(
-                ConfigBuilderCallback {
+                ConfigCallback {
                     TorOption.CookieAuthentication.configure(true)
                 }
             )
@@ -137,7 +137,7 @@ class TorConfigGeneratorUnitTest {
 
         val setting = newGenerator(
             config = setOf(
-                ConfigBuilderCallback {
+                ConfigCallback {
                     TorOption.CookieAuthentication.configure(true)
                     TorOption.CookieAuthFile.configure(expected)
                 }
@@ -157,7 +157,7 @@ class TorConfigGeneratorUnitTest {
 
         val setting = newGenerator(
             config = setOf(
-                ConfigBuilderCallback {
+                ConfigCallback {
                     TorOption.CookieAuthentication.configure(false)
                     TorOption.CookieAuthFile.configure(expected)
                 }
@@ -182,7 +182,7 @@ class TorConfigGeneratorUnitTest {
     fun givenAuthCookieFile_whenNoCookieAuthentication_thenEnablesIt() = runTest {
         val setting = newGenerator(
             config = setOf(
-                ConfigBuilderCallback {
+                ConfigCallback {
                     TorOption.CookieAuthFile.configure(file =
                         environment.workDirectory
                             .resolve("data")
@@ -208,7 +208,7 @@ class TorConfigGeneratorUnitTest {
 
     private fun newGenerator(
         environment: TorRuntime.Environment = this.environment,
-        config: Set<ConfigBuilderCallback> = emptySet(),
+        config: Set<ConfigCallback> = emptySet(),
         isPortAvailable: suspend (LocalHost, Port) -> Boolean = { _, _ -> true },
     ): TorConfigGenerator = TorConfigGenerator(
         environment,

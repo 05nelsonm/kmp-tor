@@ -21,7 +21,7 @@ import io.matthewnelson.immutable.collections.toImmutableSet
 import io.matthewnelson.kmp.file.IOException
 import io.matthewnelson.kmp.tor.core.api.ResourceInstaller
 import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
-import io.matthewnelson.kmp.tor.runtime.ConfigBuilderCallback
+import io.matthewnelson.kmp.tor.runtime.ConfigCallback
 import io.matthewnelson.kmp.tor.runtime.FileID
 import io.matthewnelson.kmp.tor.runtime.FileID.Companion.toFIDString
 import io.matthewnelson.kmp.tor.runtime.RuntimeEvent.*
@@ -33,7 +33,6 @@ import io.matthewnelson.kmp.tor.runtime.core.address.LocalHost
 import io.matthewnelson.kmp.tor.runtime.core.address.Port
 import io.matthewnelson.kmp.tor.runtime.core.address.Port.Ephemeral.Companion.toPortEphemeral
 import io.matthewnelson.kmp.tor.runtime.core.address.IPSocketAddress.Companion.toIPSocketAddressOrNull
-import io.matthewnelson.kmp.tor.runtime.core.apply
 import io.matthewnelson.kmp.tor.runtime.core.config.TorConfig
 import io.matthewnelson.kmp.tor.runtime.core.config.TorOption
 import io.matthewnelson.kmp.tor.runtime.core.config.TorSetting.Companion.filterByAttribute
@@ -50,7 +49,7 @@ import io.matthewnelson.kmp.tor.runtime.core.config.builder.RealBuilderScopeTorC
 @OptIn(InternalKmpTorApi::class)
 internal class TorConfigGenerator internal constructor(
     internal val environment: TorRuntime.Environment,
-    config: Set<ConfigBuilderCallback>,
+    config: Set<ConfigCallback>,
     private val isPortAvailable: suspend (LocalHost, Port) -> Boolean,
 ): FileID by environment {
 
@@ -79,8 +78,8 @@ internal class TorConfigGenerator internal constructor(
         }
 
         // Apply library consumers' configuration(s)
-        config.forEach { block -> apply(environment, block) }
-        apply(environment, ConfigBuilderCallback.Defaults.of(paths))
+        config.forEach { block -> with(block) { invoke(environment) } }
+        ConfigCallback.Defaults.apply(this, environment, paths)
     }
 
     private suspend fun TorConfig.validateTCPPorts(

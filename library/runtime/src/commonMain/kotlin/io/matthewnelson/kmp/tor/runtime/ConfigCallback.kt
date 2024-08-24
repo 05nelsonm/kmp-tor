@@ -21,19 +21,18 @@ import io.matthewnelson.kmp.file.File
 import io.matthewnelson.kmp.file.resolve
 import io.matthewnelson.kmp.tor.core.api.ResourceInstaller
 import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
-import io.matthewnelson.kmp.tor.runtime.core.ThisBlock
 import io.matthewnelson.kmp.tor.runtime.core.config.TorConfig
 import io.matthewnelson.kmp.tor.runtime.core.config.TorOption
 import io.matthewnelson.kmp.tor.runtime.core.config.builder.BuilderScopePort
 import io.matthewnelson.kmp.tor.runtime.core.config.builder.RealBuilderScopeTorConfig
-import kotlin.jvm.JvmSynthetic
+import kotlin.jvm.JvmStatic
 
 /**
  * A Callback for configuring [TorConfig.BuilderScope].
  *
  * e.g.
  *
- *     ConfigBuilderCallback { environment ->
+ *     ConfigCallback { environment ->
  *         TorOption.__SocksPort.configure { auto() }
  *
  *         TorOption.ClientOnionAuthDir.configure(directory =
@@ -46,31 +45,38 @@ import kotlin.jvm.JvmSynthetic
  *
  * @see [TorRuntime.BuilderScope.config]
  * */
-public fun interface ConfigBuilderCallback: ThisBlock.WithIt<TorConfig.BuilderScope, TorRuntime.Environment> {
+public fun interface ConfigCallback {
 
-    // TODO: Delete ThisBlock.WithIt. It's only used here.
-    // TODO: Rename to something better...
+    public operator fun TorConfig.BuilderScope.invoke(environment: TorRuntime.Environment)
 
     /**
-     * After all [ConfigBuilderCallback] have been applied, defaults
-     * are then configured in order to ensure minimum settings required
-     * for [TorRuntime] are had.
+     * After all [ConfigCallback] for [TorRuntime.BuilderScope.config] have
+     * been applied, defaults are then configured in order to ensure minimum
+     * settings required for [TorRuntime] are had.
      * */
     public class Defaults private constructor(
         private val paths: ResourceInstaller.Paths.Tor,
-    ): ConfigBuilderCallback {
+    ): ConfigCallback {
 
-        public override fun TorConfig.BuilderScope.invoke(it: TorRuntime.Environment) {
-            val dataDirectory = configureFilesystem(it)
+        public override fun TorConfig.BuilderScope.invoke(environment: TorRuntime.Environment) {
+            val dataDirectory = configureFilesystem(environment)
             configureControlAuthentication(dataDirectory)
             ensureSocksPort()
-            ensureControlPort(it.workDirectory)
+            ensureControlPort(environment.workDirectory)
             configureDormancy()
             configureRuntimeRequired()
         }
 
         /**
-         * TODO
+         * Ensures that the following [TorOption] are present. If they
+         * are not, then they are defined using tor's defaults and the
+         * [TorRuntime.Environment].
+         *
+         *  - [TorOption.DataDirectory]
+         *  - [TorOption.CacheDirectory]
+         *  - [TorOption.ControlPortWriteToFile]
+         *  - [TorOption.GeoIPFile]
+         *  - [TorOption.GeoIPv6File]
          * */
         protected fun TorConfig.BuilderScope.configureFilesystem(environment: TorRuntime.Environment): File {
             @OptIn(InternalKmpTorApi::class)
@@ -101,7 +107,10 @@ public fun interface ConfigBuilderCallback: ThisBlock.WithIt<TorConfig.BuilderSc
         }
 
         /**
-         * TODO
+         * Ensures that controller authentication options are present.
+         * If they are not, then [TorOption.CookieAuthentication] and
+         * [TorOption.CookieAuthFile] are defined utilizing the
+         * [TorOption.DataDirectory] location.
          * */
         protected fun TorConfig.BuilderScope.configureControlAuthentication(dataDirectory: File) {
             @OptIn(InternalKmpTorApi::class)
@@ -141,7 +150,7 @@ public fun interface ConfigBuilderCallback: ThisBlock.WithIt<TorConfig.BuilderSc
         }
 
         /**
-         * If [TorOption.SocksPort] or [TorOption.__SocksPort] is
+         * If [TorOption.SocksPort] or [TorOption.__SocksPort] are
          * not defined, add [TorOption.__SocksPort] (with its default
          * of `9050`) so that it can be checked for availability on
          * the host and set to `auto`, if needed.
@@ -167,7 +176,7 @@ public fun interface ConfigBuilderCallback: ThisBlock.WithIt<TorConfig.BuilderSc
 
         /**
          * If [TorOption.ControlPort] or [TorOption.__ControlPort] have
-         * not been defined, add [TorOption.__ControlPort]. This will
+         * not been defined, [TorOption.__ControlPort] is added. This will
          * always prefer configuring the option as a Unix Socket, if
          * available for the host and runtime environment.
          *
@@ -223,7 +232,12 @@ public fun interface ConfigBuilderCallback: ThisBlock.WithIt<TorConfig.BuilderSc
         }
 
         /**
-         * TODO
+         * Defines (and overrides if present) the following settings required for runtime
+         * operations.
+         *  - [TorOption.DisableNetwork]
+         *  - [TorOption.RunAsDaemon]
+         *  - [TorOption.__OwningControllerProcess]
+         *  - [TorOption.__ReloadTorrcOnSIGHUP]
          * */
         protected fun TorConfig.BuilderScope.configureRuntimeRequired() {
             TorOption.DisableNetwork.configure(true)
@@ -233,11 +247,19 @@ public fun interface ConfigBuilderCallback: ThisBlock.WithIt<TorConfig.BuilderSc
         }
 
         internal companion object {
-            
-            @JvmSynthetic
-            internal fun of(
+
+            @JvmStatic
+            internal fun apply(
+                scope: TorConfig.BuilderScope,
+                environment: TorRuntime.Environment,
                 paths: ResourceInstaller.Paths.Tor,
-            ): Defaults = Defaults(paths)
+            ) {
+                with(scope) {
+                    with(Defaults(paths)) {
+                        invoke(environment)
+                    }
+                }
+            }
         }
     }
 }

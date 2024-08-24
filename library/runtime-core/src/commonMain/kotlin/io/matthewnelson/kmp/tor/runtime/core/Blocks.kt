@@ -39,40 +39,10 @@ package io.matthewnelson.kmp.tor.runtime.core
  *     });
  *
  * @see [ItBlock]
- * @see [WithIt]
  * @see [apply]
  * */
 public fun interface ThisBlock<in This: Any> {
     public operator fun This.invoke()
-
-    /**
-     * Helper for non-Kotlin consumers instead of using
-     *
-     *     T.(V) -> Unit
-     *
-     * which would force a return of `Unit`.
-     * 
-     * e.g. (Kotlin)
-     * 
-     *     My.Builder {
-     *         add(My.Factory) { arg -> enable = arg.someLogic() }
-     *     }
-     *
-     * e.g. (Java)
-     *
-     *     My.Builder(b -> {
-     *         b.add(My.Factory.Companion, (s, arg) -> {
-     *             s.enable = arg.someLogic();
-     *         });
-     *     });
-     * 
-     * @see [ThisBlock]
-     * @see [ItBlock]
-     * @see [apply]
-     * */
-    public fun interface WithIt<in This: Any, in It: Any?> {
-        public operator fun This.invoke(it: It)
-    }
 }
 
 /**
@@ -97,7 +67,6 @@ public fun interface ThisBlock<in This: Any> {
  *     });
  *
  * @see [ThisBlock]
- * @see [ThisBlock.WithIt]
  * @see [apply]
  * */
 public fun interface ItBlock<in It: Any?> {
@@ -107,12 +76,6 @@ public fun interface ItBlock<in It: Any?> {
 @Suppress("NOTHING_TO_INLINE")
 public inline fun <This: Any> This.apply(block: ThisBlock<This>): This {
     with(block) { invoke() }
-    return this
-}
-
-@Suppress("NOTHING_TO_INLINE")
-public inline fun <This: Any, It: Any?> This.apply(it: It, block: ThisBlock.WithIt<This, It>): This {
-    with(block) { invoke(it) }
     return this
 }
 
