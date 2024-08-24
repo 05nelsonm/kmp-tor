@@ -18,10 +18,7 @@ package io.matthewnelson.kmp.tor.runtime
 import io.matthewnelson.kmp.file.*
 import io.matthewnelson.kmp.tor.core.api.ResourceInstaller
 import io.matthewnelson.kmp.tor.core.api.annotation.ExperimentalKmpTorApi
-import kotlin.test.Test
-import kotlin.test.assertEquals
-import kotlin.test.assertNotEquals
-import kotlin.test.fail
+import kotlin.test.*
 
 @OptIn(ExperimentalKmpTorApi::class)
 class TorRuntimeEnvironmentUnitTest {
@@ -92,5 +89,12 @@ class TorRuntimeEnvironmentUnitTest {
 
         assertNotEquals(env1, env2)
         assertEquals(env1.torResource, env2.torResource)
+    }
+
+    @Test
+    fun givenBuilder_whenWorkDirectorySameAsCache_thenThrowsException() {
+        assertFailsWith<IllegalArgumentException> {
+            TorRuntime.Environment.Builder("".toFile(), "".toFile()) { torResource(it) }
+        }
     }
 }

@@ -339,9 +339,6 @@ public sealed interface TorRuntime:
              * identical (e.g. `torservice`), especially when creating multiple
              * instances of [Environment].
              *
-             * **NOTE:** If the same directory is utilized for both [workDirectory]
-             * and [cacheDirectory], tor may fail to start; they **must** be different.
-             *
              * **NOTE:** If an [Environment] already exists for the provided [workDirectory]
              * **or** [cacheDirectory], that instance will be returned.
              *
@@ -350,7 +347,8 @@ public sealed interface TorRuntime:
              * @param [cacheDirectory] tor's cache directory (e.g. `$HOME/.my_application/cache/torservice`).
              * @param [installer] lambda for creating [ResourceInstaller] using the configured
              *   [BuilderScope.installationDirectory]. See [kmp-tor-resource](https://github.com/05nelsonm/kmp-tor-resource)
-             * @see [io.matthewnelson.kmp.tor.runtime.service.TorServiceConfig]
+             * @throws [IllegalArgumentException] when [workDirectory] and [cacheDirectory] are
+             *   the same.
              * */
             @JvmStatic
             public fun Builder(
@@ -373,9 +371,6 @@ public sealed interface TorRuntime:
              * identical (e.g. `torservice`), especially when creating multiple
              * instances of [Environment].
              *
-             * **NOTE:** If the same directory is utilized for both [workDirectory]
-             * and [cacheDirectory], tor may fail to start; they **must** be different.
-             *
              * **NOTE:** If an [Environment] already exists for the provided [workDirectory]
              * **or** [cacheDirectory], that instance will be returned.
              *
@@ -385,7 +380,8 @@ public sealed interface TorRuntime:
              * @param [installer] lambda for creating [ResourceInstaller] using the configured
              *   [BuilderScope.installationDirectory]. See [kmp-tor-resource](https://github.com/05nelsonm/kmp-tor-resource)
              * @param [block] optional lambda for modifying default parameters.
-             * @see [io.matthewnelson.kmp.tor.runtime.service.TorServiceConfig]
+             * @throws [IllegalArgumentException] when [workDirectory] and [cacheDirectory] are
+             *   the same.
              * */
             @JvmStatic
             public fun Builder(
@@ -492,6 +488,11 @@ public sealed interface TorRuntime:
                     block: ThisBlock<BuilderScope>?,
                 ): Environment {
                     val b = BuilderScope(workDirectory.absoluteFile.normalize(), cacheDirectory.absoluteFile.normalize())
+
+                    require(b.workDirectory != b.cacheDirectory) {
+                        "workDirectory and cacheDirectory cannot be the same locations"
+                    }
+
                     // Apply block outside getOrCreateInstance call to
                     // prevent double instance creation
                     if (block != null) b.apply(block)
