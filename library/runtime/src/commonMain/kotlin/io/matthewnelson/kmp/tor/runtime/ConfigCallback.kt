@@ -25,7 +25,7 @@ import io.matthewnelson.kmp.tor.runtime.core.config.TorConfig
 import io.matthewnelson.kmp.tor.runtime.core.config.TorOption
 import io.matthewnelson.kmp.tor.runtime.core.config.builder.BuilderScopePort
 import io.matthewnelson.kmp.tor.runtime.core.config.builder.RealBuilderScopeTorConfig
-import kotlin.jvm.JvmStatic
+import kotlin.jvm.JvmSynthetic
 
 /**
  * A Callback for configuring [TorConfig.BuilderScope].
@@ -248,7 +248,7 @@ public fun interface ConfigCallback {
 
         internal companion object {
 
-            @JvmStatic
+            @JvmSynthetic
             internal fun apply(
                 scope: TorConfig.BuilderScope,
                 environment: TorRuntime.Environment,

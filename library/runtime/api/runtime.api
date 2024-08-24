@@ -57,7 +57,6 @@ public abstract interface class io/matthewnelson/kmp/tor/runtime/ConfigCallback 
 
 public final class io/matthewnelson/kmp/tor/runtime/ConfigCallback$Defaults : io/matthewnelson/kmp/tor/runtime/ConfigCallback {
 	public synthetic fun <init> (Lio/matthewnelson/kmp/tor/core/api/ResourceInstaller$Paths$Tor;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
-	public static final fun apply$runtime (Lio/matthewnelson/kmp/tor/runtime/core/config/TorConfig$BuilderScope;Lio/matthewnelson/kmp/tor/runtime/TorRuntime$Environment;Lio/matthewnelson/kmp/tor/core/api/ResourceInstaller$Paths$Tor;)V
 	public fun invoke (Lio/matthewnelson/kmp/tor/runtime/core/config/TorConfig$BuilderScope;Lio/matthewnelson/kmp/tor/runtime/TorRuntime$Environment;)V
 }
 
