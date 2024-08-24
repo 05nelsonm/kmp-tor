@@ -325,6 +325,7 @@ public class TorConfig private constructor(settings: Set<TorSetting>): Iterable<
     public override fun equals(other: Any?): Boolean = other is TorConfig && other.settings == settings
     /** @suppress */
     public override fun hashCode(): Int = 5 * 42 + settings.hashCode()
+    // TODO: Extras as code comments. Issue #526
     /** @suppress */
     public override fun toString(): String = buildString { settings.joinTo(this, separator = "\n") }
 }

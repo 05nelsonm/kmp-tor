@@ -123,10 +123,16 @@ public sealed class TorCmd<Success: Any> private constructor(
         /**
          * [control-spec#LOADCONF](https://spec.torproject.org/control-spec/commands.html#loadconf)
          * */
-        public class Load public constructor(
+        public class Load: Privileged<Reply.Success.OK> {
+
             @JvmField
-            public val configText: String,
-        ): Privileged<Reply.Success.OK>("LOADCONF")
+            public val config: TorConfig
+
+            public constructor(block: ThisBlock<TorConfig.BuilderScope>): this(TorConfig.Builder(block))
+            public constructor(config: TorConfig): super("LOADCONF") {
+                this.config = config
+            }
+        }
 
         /**
          * [control-spec#RESETCONF](https://spec.torproject.org/control-spec/commands.html#resetconf)

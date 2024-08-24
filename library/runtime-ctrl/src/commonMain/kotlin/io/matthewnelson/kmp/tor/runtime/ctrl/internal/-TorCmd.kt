@@ -89,30 +89,26 @@ private fun TorCmd.Config.Get.encode(LOG: Debugger?): ByteArray {
 
 @Throws(IllegalArgumentException::class)
 private fun TorCmd.Config.Load.encode(LOG: Debugger?): ByteArray {
+    require(config.settings.isNotEmpty()) { "A minimum of 1 setting is required" }
+
     return StringBuilder().apply {
         append('+').append(keyword)
 
-        var hasLine = false
-        for (line in configText.lines()) {
-            val isCommentOrBlank = run {
-                val i = line.indexOfFirst { !it.isWhitespace() }
-                if (i == -1) true else line[i] == '#'
-            }
-            if (isCommentOrBlank) continue
+        var crlf = false
+        for (setting in config) {
+            for (line in setting.items) {
+                if (!crlf) {
+                    crlf = true
+                    LOG.d { ">> ${toString()}" }
+                    CRLF()
+                } else {
+                    appendLine()
+                }
 
-            if (!hasLine) {
-                hasLine = true
-                LOG.d { ">> ${toString()}" }
-                CRLF()
-            } else {
-                appendLine()
+                append(line)
+                LOG.d { ">> $line" }
             }
-
-            append(line)
-            LOG.d { ">> $line" }
         }
-
-        require(hasLine) { "configText must contain at least 1 setting" }
 
         CRLF()
         LOG.d { ">> ." }
