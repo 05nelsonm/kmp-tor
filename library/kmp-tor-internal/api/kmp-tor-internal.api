@@ -1,9 +1,0 @@
-public final class io/matthewnelson/kmp/tor/internal/ProcessId {
-	public static final field Companion Lio/matthewnelson/kmp/tor/internal/ProcessId$Companion;
-	public static final fun get ()I
-}
-
-public final class io/matthewnelson/kmp/tor/internal/ProcessId$Companion {
-	public final fun get ()I
-}
-
