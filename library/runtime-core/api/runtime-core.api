@@ -707,13 +707,15 @@ public final class io/matthewnelson/kmp/tor/runtime/core/config/IntervalUnit$WEE
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/matthewnelson/kmp/tor/runtime/core/config/TorConfig {
+public final class io/matthewnelson/kmp/tor/runtime/core/config/TorConfig : java/lang/Iterable, kotlin/jvm/internal/markers/KMappedMarker {
 	public static final field Companion Lio/matthewnelson/kmp/tor/runtime/core/config/TorConfig$Companion;
 	public final field settings Ljava/util/Set;
 	public synthetic fun <init> (Ljava/util/Set;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
 	public static final fun Builder (Lio/matthewnelson/kmp/tor/runtime/core/ThisBlock;)Lio/matthewnelson/kmp/tor/runtime/core/config/TorConfig;
 	public fun equals (Ljava/lang/Object;)Z
 	public fun hashCode ()I
+	public fun iterator ()Ljava/util/Iterator;
+	public static final fun toConfig (Lio/matthewnelson/kmp/tor/runtime/core/config/TorSetting;)Lio/matthewnelson/kmp/tor/runtime/core/config/TorConfig;
 	public fun toString ()Ljava/lang/String;
 }
 
@@ -735,6 +737,7 @@ protected final class io/matthewnelson/kmp/tor/runtime/core/config/TorConfig$Bui
 
 public final class io/matthewnelson/kmp/tor/runtime/core/config/TorConfig$Companion {
 	public final fun Builder (Lio/matthewnelson/kmp/tor/runtime/core/ThisBlock;)Lio/matthewnelson/kmp/tor/runtime/core/config/TorConfig;
+	public final fun toConfig (Lio/matthewnelson/kmp/tor/runtime/core/config/TorSetting;)Lio/matthewnelson/kmp/tor/runtime/core/config/TorConfig;
 }
 
 public abstract class io/matthewnelson/kmp/tor/runtime/core/config/TorOption : java/lang/CharSequence, java/lang/Comparable {
@@ -3901,8 +3904,9 @@ public final class io/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$Config$Get 
 }
 
 public final class io/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$Config$Load : io/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$Privileged {
-	public final field configText Ljava/lang/String;
-	public fun <init> (Ljava/lang/String;)V
+	public final field config Lio/matthewnelson/kmp/tor/runtime/core/config/TorConfig;
+	public fun <init> (Lio/matthewnelson/kmp/tor/runtime/core/ThisBlock;)V
+	public fun <init> (Lio/matthewnelson/kmp/tor/runtime/core/config/TorConfig;)V
 }
 
 public final class io/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$Config$Reset : io/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$Unprivileged {
@@ -3919,7 +3923,7 @@ public final class io/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$Config$Save
 }
 
 public final class io/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$Config$Set : io/matthewnelson/kmp/tor/runtime/core/ctrl/TorCmd$Unprivileged {
-	public final field settings Ljava/util/Set;
+	public final field config Lio/matthewnelson/kmp/tor/runtime/core/config/TorConfig;
 	public fun <init> (Lio/matthewnelson/kmp/tor/runtime/core/ThisBlock;)V
 	public fun <init> (Lio/matthewnelson/kmp/tor/runtime/core/config/TorConfig;)V
 	public fun <init> (Lio/matthewnelson/kmp/tor/runtime/core/config/TorSetting;)V

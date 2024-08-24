@@ -40,8 +40,8 @@ import kotlin.jvm.*
  * Comparison of settings is done such that only the first [LineItem] (or
  * "root" item) within [items] is considered.
  *
- * @see [Iterable.filterByAttribute]
- * @see [Iterable.filterByOption]
+ * @see [filterByAttribute]
+ * @see [filterByOption]
  * */
 public class TorSetting private constructor(
 
@@ -270,24 +270,6 @@ public class TorSetting private constructor(
          * (one configured as a Unix Socket, and the other as a TCP port),
          * then only the one configured as a Unix Socket will be present
          * in the returned list.
-         *
-         * @see [Iterable.filterByAttribute]
-         * */
-        @JvmStatic
-        public inline fun <reified A: TorOption.Attribute> TorConfig.filterByAttribute(): List<TorSetting> {
-            return settings.filterByAttribute<A>()
-        }
-
-        /**
-         * Returns a list containing all elements of [TorSetting] within
-         * the [Iterable] which contain a [LineItem], and is configured
-         * for, attribute [A].
-         *
-         * For example, if [TorOption.Attribute.UNIX_SOCKET] is parameter
-         * [A] and 2 declarations of [TorOption.ControlPort] are present
-         * (one configured as a Unix Socket, and the other as a TCP port),
-         * then only the one configured as a Unix Socket will be present
-         * in the returned list.
          * */
         @JvmStatic
         public inline fun <reified A: TorOption.Attribute> Iterable<TorSetting>.filterByAttribute(): List<TorSetting> {
@@ -327,17 +309,6 @@ public class TorSetting private constructor(
 
                 false
             }
-        }
-
-        /**
-         * Returns a list containing all elements of [TorSetting] within
-         * the [TorConfig] which contain a [LineItem] for option [O].
-         *
-         * @see [Iterable.filterByOption]
-         * */
-        @JvmStatic
-        public inline fun <reified O: TorOption> TorConfig.filterByOption(): List<TorSetting> {
-            return settings.filterByOption<O>()
         }
 
         /**

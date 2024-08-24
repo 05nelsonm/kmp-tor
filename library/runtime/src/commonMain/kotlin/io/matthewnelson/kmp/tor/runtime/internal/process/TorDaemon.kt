@@ -104,7 +104,7 @@ internal class TorDaemon private constructor(
             this,
             "Starting Tor with the following settings:\n"
             + "------------------------------------------------------------------------\n"
-            + startArgs.load.configText
+            + startArgs.load.config.toString()
             + "\n------------------------------------------------------------------------"
         )
 
@@ -490,7 +490,7 @@ internal class TorDaemon private constructor(
                     }
                 }
 
-                return StartArgs(cmdLine.toImmutableList(), TorCmd.Config.Load(toString()))
+                return StartArgs(cmdLine.toImmutableList(), TorCmd.Config.Load(this))
             }
         }
     }

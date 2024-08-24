@@ -17,6 +17,7 @@
 
 package io.matthewnelson.kmp.tor.runtime.core.config
 
+import io.matthewnelson.immutable.collections.immutableSetOf
 import io.matthewnelson.immutable.collections.toImmutableSet
 import io.matthewnelson.kmp.file.File
 import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
@@ -34,13 +35,15 @@ import kotlin.jvm.JvmSynthetic
  * @see [TorSetting.filterByAttribute]
  * @see [TorSetting.filterByOption]
  * */
-public class TorConfig private constructor(settings: Set<TorSetting>) {
+public class TorConfig private constructor(settings: Set<TorSetting>): Iterable<TorSetting> {
 
     /**
      * All [TorSetting] which make up this configuration.
      * */
     @JvmField
     public val settings: Set<TorSetting> = settings.toImmutableSet()
+
+    public override fun iterator(): Iterator<TorSetting> = settings.iterator()
 
     public companion object {
 
@@ -55,6 +58,14 @@ public class TorConfig private constructor(settings: Set<TorSetting>) {
         ): TorConfig {
             @OptIn(InternalKmpTorApi::class)
             return RealBuilderScopeTorConfig.build(::TorConfig, block)
+        }
+
+        /**
+         * Wraps a single [TorSetting] in [TorConfig].
+         * */
+        @JvmStatic
+        public fun TorSetting.toConfig(): TorConfig {
+            return TorConfig(immutableSetOf(this))
         }
     }
 
@@ -314,6 +325,7 @@ public class TorConfig private constructor(settings: Set<TorSetting>) {
     public override fun equals(other: Any?): Boolean = other is TorConfig && other.settings == settings
     /** @suppress */
     public override fun hashCode(): Int = 5 * 42 + settings.hashCode()
+    // TODO: Extras as code comments. Issue #526
     /** @suppress */
     public override fun toString(): String = buildString { settings.joinTo(this, separator = "\n") }
 }

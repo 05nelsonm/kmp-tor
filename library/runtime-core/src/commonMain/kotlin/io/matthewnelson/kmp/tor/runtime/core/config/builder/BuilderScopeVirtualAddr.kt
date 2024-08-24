@@ -121,7 +121,7 @@ public abstract class BuilderScopeVirtualAddr: TorSetting.BuilderScope {
     @JvmField
     protected var _address: IPAddress = argument.toIPAddress()
     @JvmField
-    protected var _bits: Byte = argument.substringAfter('/').toByte()
+    protected var _bits: Byte = argument.substringAfterLast('/').toByte()
 
     @JvmSynthetic
     internal final override fun build(): TorSetting {

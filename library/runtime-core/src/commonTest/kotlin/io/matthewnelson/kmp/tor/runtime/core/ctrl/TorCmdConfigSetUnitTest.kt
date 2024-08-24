@@ -31,10 +31,10 @@ class TorCmdConfigSetUnitTest {
         assertEquals(2, set.size)
 
         val cmd = TorCmd.Config.Set(set)
-        assertEquals(1, cmd.settings.size)
+        assertEquals(1, cmd.config.settings.size)
 
         // When all items in the set were added to TorConfig.BuilderScope, the
         // final argument should have overridden the first one.
-        assertEquals(false.byte.toString(), cmd.settings.first().items.first().argument)
+        assertEquals(false.byte.toString(), cmd.config.settings.first().items.first().argument)
     }
 }

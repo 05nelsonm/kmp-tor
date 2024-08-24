@@ -102,18 +102,18 @@ class TorConfigGeneratorUnitTest {
     @Test
     fun givenUnavailablePort_whenGenerate_thenPortRemovedAndReplaced() = runTest {
         // socks port at 9050 is automatically added
-        val settings = newGenerator(
+        val config = newGenerator(
             config = setOf(
                 ConfigBuilderCallback {
                     TorOption.__DNSPort.configure { port(1080.toPortEphemeral()) }
                 }
             ),
             isPortAvailable = { _, _ -> false }
-        ).generate(notifier).first.settings
+        ).generate(notifier).first
 
-        val socks = settings.filterByOption<TorOption.__SocksPort>().first()
+        val socks = config.filterByOption<TorOption.__SocksPort>().first()
         assertEquals("auto", socks.items.first().argument)
-        val dns = settings.filterByOption<TorOption.__DNSPort>().first()
+        val dns = config.filterByOption<TorOption.__DNSPort>().first()
         assertEquals("auto", dns.items.first().argument)
     }
 
@@ -144,7 +144,6 @@ class TorConfigGeneratorUnitTest {
             )
         ).generate(notifier)
             .first
-            .settings
             .filterByOption<TorOption.CookieAuthFile>()
             .first()
 
@@ -165,7 +164,6 @@ class TorConfigGeneratorUnitTest {
             )
         ).generate(notifier)
             .first
-            .settings
             .filterByOption<TorOption.CookieAuthFile>()
             .firstOrNull()
 
@@ -194,7 +192,6 @@ class TorConfigGeneratorUnitTest {
             )
         ).generate(notifier)
             .first
-            .settings
             .filterByOption<TorOption.CookieAuthentication>()
             .first()
             .items
