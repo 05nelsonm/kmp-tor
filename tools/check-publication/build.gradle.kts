@@ -40,6 +40,7 @@ kmpConfiguration {
             sourceSetMain {
                 dependencies {
                     implementation("$group:runtime-service:$version")
+                    implementation("$group:runtime-service-ui:$version")
                 }
             }
         }
@@ -57,6 +58,7 @@ kmpConfiguration {
         kotlin {
             sourceSets.findByName("iosMain")?.dependencies {
                 implementation("$group:runtime-service:$version")
+                implementation("$group:runtime-service-ui:$version")
             }
         }
     }
