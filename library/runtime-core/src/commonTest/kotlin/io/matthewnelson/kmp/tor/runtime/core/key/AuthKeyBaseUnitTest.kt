@@ -47,13 +47,13 @@ abstract class AuthKeyBaseUnitTest<T: AuthKey.Public, V: AuthKey.Private>(
 
     @Test
     fun givenPrivateKey_whenBase32Descriptor_thenIsAsExpected() {
-        val expected = ONION_ADDRESS_V3 + ":" + expectedAlgorithm + ":" + privateKey.base32()
+        val expected = ONION_ADDRESS_V3 + ":descriptor" + ":" + expectedAlgorithm + ":" + privateKey.base32()
         assertEquals(expected, privateKey.descriptorBase32(ONION_ADDRESS_V3.toOnionAddress()))
     }
 
     @Test
     fun givenPrivateKey_whenBase64Descriptor_thenIsAsExpected() {
-        val expected = ONION_ADDRESS_V3 + ":" + expectedAlgorithm + ":" + privateKey.base64()
+        val expected = ONION_ADDRESS_V3 + ":descriptor" + ":" + expectedAlgorithm + ":" + privateKey.base64()
         assertEquals(expected, privateKey.descriptorBase64(ONION_ADDRESS_V3.toOnionAddress()))
     }
 
