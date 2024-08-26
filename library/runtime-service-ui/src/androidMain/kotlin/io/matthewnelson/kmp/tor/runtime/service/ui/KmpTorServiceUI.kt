@@ -347,7 +347,7 @@ public class KmpTorServiceUI private constructor(
              *     )
              *
              * Default: [DisplayName.FID], unless this [BuilderScope] is a result of [Config.newConfig],
-             * then whatever [Config.enableActionRestart] is.
+             * then whatever [Config.displayName] is.
              *
              * @see [DisplayName]
              * */
@@ -854,9 +854,10 @@ public class KmpTorServiceUI private constructor(
 
         val pallet = uiColor[state.icon.colorize, displayed.instanceConfig._colorReady]
 
-        current?.let { current ->
+        current.let { current ->
             if (
-                current.state != state
+                current == null
+                || current.state != state
                 || current.hasPrevious != hasPrevious
                 || current.hasNext != hasNext
                 || current.pallet != pallet
@@ -870,9 +871,11 @@ public class KmpTorServiceUI private constructor(
                     pallet,
                     durationText,
                 )
-            } else {
-                return
+                return@let
             }
+
+            // No stateful change. Ignore.
+            return@onRender
         }
 
         val iconRes = when (state.icon) {
