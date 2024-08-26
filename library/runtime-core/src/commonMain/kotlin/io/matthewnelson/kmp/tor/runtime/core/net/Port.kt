@@ -15,11 +15,11 @@
  **/
 @file:Suppress("ObjectPropertyName")
 
-package io.matthewnelson.kmp.tor.runtime.core.address
+package io.matthewnelson.kmp.tor.runtime.core.net
 
-import io.matthewnelson.kmp.tor.runtime.core.address.Port.Companion.MAX
-import io.matthewnelson.kmp.tor.runtime.core.address.Port.Companion.MIN
-import io.matthewnelson.kmp.tor.runtime.core.address.Port.Ephemeral.Companion.toPortEphemeralOrNull
+import io.matthewnelson.kmp.tor.runtime.core.net.Port.Companion.MAX
+import io.matthewnelson.kmp.tor.runtime.core.net.Port.Companion.MIN
+import io.matthewnelson.kmp.tor.runtime.core.net.Port.Ephemeral.Companion.toPortEphemeralOrNull
 import io.matthewnelson.kmp.tor.runtime.core.internal.HostAndPort
 import io.matthewnelson.kmp.tor.runtime.core.internal.HostAndPort.Companion.findHostnameAndPortFromURL
 import kotlin.jvm.JvmField

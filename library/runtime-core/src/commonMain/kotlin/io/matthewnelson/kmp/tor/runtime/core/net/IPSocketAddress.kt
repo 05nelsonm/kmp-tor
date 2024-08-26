@@ -13,10 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-package io.matthewnelson.kmp.tor.runtime.core.address
+package io.matthewnelson.kmp.tor.runtime.core.net
 
-import io.matthewnelson.kmp.tor.runtime.core.address.IPAddress.Companion.toIPAddressOrNull
-import io.matthewnelson.kmp.tor.runtime.core.address.Port.Companion.toPortOrNull
+import io.matthewnelson.kmp.tor.runtime.core.net.IPAddress.Companion.toIPAddressOrNull
+import io.matthewnelson.kmp.tor.runtime.core.net.Port.Companion.toPortOrNull
 import io.matthewnelson.kmp.tor.runtime.core.internal.HostAndPort.Companion.findHostnameAndPortFromURL
 import kotlin.jvm.JvmField
 import kotlin.jvm.JvmName

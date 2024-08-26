@@ -18,8 +18,8 @@
 package io.matthewnelson.kmp.tor.runtime.core.config.builder
 
 import io.matthewnelson.kmp.tor.core.api.annotation.KmpTorDsl
-import io.matthewnelson.kmp.tor.runtime.core.address.IPAddress
-import io.matthewnelson.kmp.tor.runtime.core.address.IPAddress.Companion.toIPAddress
+import io.matthewnelson.kmp.tor.runtime.core.net.IPAddress
+import io.matthewnelson.kmp.tor.runtime.core.net.IPAddress.Companion.toIPAddress
 import io.matthewnelson.kmp.tor.runtime.core.config.TorOption
 import io.matthewnelson.kmp.tor.runtime.core.config.TorSetting
 import kotlin.jvm.JvmField

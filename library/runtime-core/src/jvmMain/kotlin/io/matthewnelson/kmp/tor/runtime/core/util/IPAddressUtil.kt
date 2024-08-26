@@ -17,9 +17,9 @@
 
 package io.matthewnelson.kmp.tor.runtime.core.util
 
-import io.matthewnelson.kmp.tor.runtime.core.address.IPAddress
-import io.matthewnelson.kmp.tor.runtime.core.address.IPAddress.V4.Companion.toIPAddressV4
-import io.matthewnelson.kmp.tor.runtime.core.address.IPAddress.V6.Companion.toIPAddressV6
+import io.matthewnelson.kmp.tor.runtime.core.net.IPAddress
+import io.matthewnelson.kmp.tor.runtime.core.net.IPAddress.V4.Companion.toIPAddressV4
+import io.matthewnelson.kmp.tor.runtime.core.net.IPAddress.V6.Companion.toIPAddressV6
 import java.net.*
 
 /**

@@ -16,9 +16,9 @@
 package io.matthewnelson.kmp.tor.runtime.core.internal
 
 import io.matthewnelson.kmp.file.IOException
-import io.matthewnelson.kmp.tor.runtime.core.address.IPAddress
-import io.matthewnelson.kmp.tor.runtime.core.address.Port
-import io.matthewnelson.kmp.tor.runtime.core.address.Port.Ephemeral.Companion.toPortEphemeral
+import io.matthewnelson.kmp.tor.runtime.core.net.IPAddress
+import io.matthewnelson.kmp.tor.runtime.core.net.Port
+import io.matthewnelson.kmp.tor.runtime.core.net.Port.Ephemeral.Companion.toPortEphemeral
 import kotlin.jvm.JvmSynthetic
 
 internal class PortEphemeralIterator private constructor(

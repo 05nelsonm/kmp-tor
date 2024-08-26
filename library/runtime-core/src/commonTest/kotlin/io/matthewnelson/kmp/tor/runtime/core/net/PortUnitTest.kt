@@ -13,12 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-package io.matthewnelson.kmp.tor.runtime.core.address
+package io.matthewnelson.kmp.tor.runtime.core.net
 
-import io.matthewnelson.kmp.tor.runtime.core.address.Port.Companion.toPort
-import io.matthewnelson.kmp.tor.runtime.core.address.Port.Companion.toPortOrNull
-import io.matthewnelson.kmp.tor.runtime.core.address.Port.Ephemeral.Companion.toPortEphemeral
-import io.matthewnelson.kmp.tor.runtime.core.address.Port.Ephemeral.Companion.toPortEphemeralOrNull
+import io.matthewnelson.kmp.tor.runtime.core.net.Port.Companion.toPort
+import io.matthewnelson.kmp.tor.runtime.core.net.Port.Companion.toPortOrNull
+import io.matthewnelson.kmp.tor.runtime.core.net.Port.Ephemeral.Companion.toPortEphemeral
+import io.matthewnelson.kmp.tor.runtime.core.net.Port.Ephemeral.Companion.toPortEphemeralOrNull
 import kotlin.test.*
 
 class PortUnitTest {

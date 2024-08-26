@@ -21,7 +21,7 @@ import io.matthewnelson.immutable.collections.toImmutableList
 import io.matthewnelson.immutable.collections.toImmutableMap
 import io.matthewnelson.immutable.collections.toImmutableSet
 import io.matthewnelson.kmp.file.InterruptedException
-import io.matthewnelson.kmp.tor.runtime.core.address.OnionAddress.Companion.toOnionAddressOrNull
+import io.matthewnelson.kmp.tor.runtime.core.net.OnionAddress.Companion.toOnionAddressOrNull
 import io.matthewnelson.kmp.tor.runtime.core.ctrl.*
 import io.matthewnelson.kmp.tor.runtime.core.ctrl.Reply.Error.Companion.toError
 import io.matthewnelson.kmp.tor.runtime.core.key.AddressKey

@@ -13,10 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-package io.matthewnelson.kmp.tor.runtime.core.address
+package io.matthewnelson.kmp.tor.runtime.core.net
 
-import io.matthewnelson.kmp.tor.runtime.core.address.IPAddress.V6.Companion.toIPAddressV6
-import io.matthewnelson.kmp.tor.runtime.core.address.IPAddressV6UnitTest.Companion.TEST_ADDRESSES_IPV6
+import io.matthewnelson.kmp.tor.runtime.core.net.IPAddress.V6.Companion.toIPAddressV6
+import io.matthewnelson.kmp.tor.runtime.core.net.IPAddressV6UnitTest.Companion.TEST_ADDRESSES_IPV6
 import java.net.Inet6Address
 import kotlin.test.*
 

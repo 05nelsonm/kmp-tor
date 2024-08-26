@@ -25,7 +25,7 @@ import io.matthewnelson.kmp.file.wrapIOException
 import io.matthewnelson.kmp.process.Blocking
 import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
 import io.matthewnelson.kmp.tor.runtime.core.*
-import io.matthewnelson.kmp.tor.runtime.core.address.IPSocketAddress
+import io.matthewnelson.kmp.tor.runtime.core.net.IPSocketAddress
 import io.matthewnelson.kmp.tor.runtime.core.ctrl.TorCmd
 import io.matthewnelson.kmp.tor.runtime.ctrl.internal.*
 import io.matthewnelson.kmp.tor.runtime.ctrl.internal.Debugger.Companion.d

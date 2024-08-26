@@ -23,7 +23,7 @@ package io.matthewnelson.kmp.tor.runtime.core.internal
 
 import io.matthewnelson.kmp.file.IOException
 import io.matthewnelson.kmp.file.errnoToIOException
-import io.matthewnelson.kmp.tor.runtime.core.address.IPAddress
+import io.matthewnelson.kmp.tor.runtime.core.net.IPAddress
 import io.matthewnelson.kmp.tor.runtime.core.internal.InetSocketAddress.Companion.toInetSocketAddress
 import kotlinx.cinterop.*
 import org.kotlincrypto.endians.BigEndian.Companion.toBigEndian

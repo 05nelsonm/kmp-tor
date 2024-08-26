@@ -17,8 +17,8 @@
 
 package io.matthewnelson.kmp.tor.runtime.core.ctrl
 
-import io.matthewnelson.kmp.tor.runtime.core.address.IPAddress
-import io.matthewnelson.kmp.tor.runtime.core.address.OnionAddress
+import io.matthewnelson.kmp.tor.runtime.core.net.IPAddress
+import io.matthewnelson.kmp.tor.runtime.core.net.OnionAddress
 import kotlin.jvm.JvmField
 import kotlin.jvm.JvmName
 import kotlin.jvm.JvmOverloads

@@ -16,7 +16,7 @@
 package io.matthewnelson.kmp.tor.runtime.core.ctrl
 
 import io.matthewnelson.immutable.collections.toImmutableSet
-import io.matthewnelson.kmp.tor.runtime.core.address.OnionAddress
+import io.matthewnelson.kmp.tor.runtime.core.net.OnionAddress
 import io.matthewnelson.kmp.tor.runtime.core.key.AuthKey
 import kotlin.jvm.JvmField
 import kotlin.jvm.JvmStatic

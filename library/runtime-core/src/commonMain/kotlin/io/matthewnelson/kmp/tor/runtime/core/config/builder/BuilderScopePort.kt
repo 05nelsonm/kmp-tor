@@ -20,7 +20,7 @@ package io.matthewnelson.kmp.tor.runtime.core.config.builder
 import io.matthewnelson.kmp.file.*
 import io.matthewnelson.kmp.tor.core.api.annotation.KmpTorDsl
 import io.matthewnelson.kmp.tor.runtime.core.ThisBlock
-import io.matthewnelson.kmp.tor.runtime.core.address.Port
+import io.matthewnelson.kmp.tor.runtime.core.net.Port
 import io.matthewnelson.kmp.tor.runtime.core.apply
 import io.matthewnelson.kmp.tor.runtime.core.config.TorOption
 import io.matthewnelson.kmp.tor.runtime.core.config.TorSetting

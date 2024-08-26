@@ -17,7 +17,7 @@ package io.matthewnelson.kmp.tor.runtime.core.key
 
 import io.matthewnelson.encoding.core.Encoder.Companion.encodeToString
 import io.matthewnelson.kmp.tor.runtime.core.Destroyable.Companion.destroyedException
-import io.matthewnelson.kmp.tor.runtime.core.address.OnionAddress
+import io.matthewnelson.kmp.tor.runtime.core.net.OnionAddress
 import kotlin.jvm.JvmSynthetic
 
 /**

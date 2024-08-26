@@ -13,14 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-package io.matthewnelson.kmp.tor.runtime.core.address
+package io.matthewnelson.kmp.tor.runtime.core.net
 
 import io.matthewnelson.encoding.base32.Base32
 import io.matthewnelson.encoding.base32.Base32Default
 import io.matthewnelson.encoding.core.Decoder.Companion.decodeToByteArray
 import io.matthewnelson.encoding.core.Encoder.Companion.encodeToString
-import io.matthewnelson.kmp.tor.runtime.core.address.OnionAddress.OnionString.Companion.toOnionString
-import io.matthewnelson.kmp.tor.runtime.core.address.OnionAddress.V3.Companion.toOnionAddressV3OrNull
+import io.matthewnelson.kmp.tor.runtime.core.net.OnionAddress.OnionString.Companion.toOnionString
+import io.matthewnelson.kmp.tor.runtime.core.net.OnionAddress.V3.Companion.toOnionAddressV3OrNull
 import io.matthewnelson.kmp.tor.runtime.core.internal.HostAndPort
 import io.matthewnelson.kmp.tor.runtime.core.internal.HostAndPort.Companion.findHostnameAndPortFromURL
 import io.matthewnelson.kmp.tor.runtime.core.internal.stripBaseEncoding

@@ -15,9 +15,9 @@
  **/
 package io.matthewnelson.kmp.tor.runtime.core.internal
 
-import io.matthewnelson.kmp.tor.runtime.core.address.IPAddress
-import io.matthewnelson.kmp.tor.runtime.core.address.IPAddress.Companion.toIPAddress
-import io.matthewnelson.kmp.tor.runtime.core.address.LocalHost
+import io.matthewnelson.kmp.tor.runtime.core.net.IPAddress
+import io.matthewnelson.kmp.tor.runtime.core.net.IPAddress.Companion.toIPAddress
+import io.matthewnelson.kmp.tor.runtime.core.net.LocalHost
 
 @Suppress("ACTUAL_ANNOTATIONS_NOT_MATCH_EXPECT")
 internal actual fun LocalHost.Companion.tryPlatformResolve(set: LinkedHashSet<IPAddress>) {

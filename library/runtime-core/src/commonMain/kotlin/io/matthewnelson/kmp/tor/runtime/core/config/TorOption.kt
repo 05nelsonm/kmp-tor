@@ -21,7 +21,7 @@ import io.matthewnelson.immutable.collections.immutableSetOf
 import io.matthewnelson.immutable.collections.toImmutableSet
 import io.matthewnelson.kmp.file.File
 import io.matthewnelson.kmp.tor.runtime.core.ThisBlock
-import io.matthewnelson.kmp.tor.runtime.core.address.Port
+import io.matthewnelson.kmp.tor.runtime.core.net.Port
 import io.matthewnelson.kmp.tor.runtime.core.config.builder.*
 import io.matthewnelson.kmp.tor.runtime.core.config.builder.BuilderScopeAutoBoolean.Companion.toBuilderScopeAutoBoolean
 import io.matthewnelson.kmp.tor.runtime.core.ctrl.TorCmd

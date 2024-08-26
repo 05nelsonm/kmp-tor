@@ -22,9 +22,9 @@ import io.matthewnelson.kmp.file.readUtf8
 import io.matthewnelson.kmp.file.toFile
 import io.matthewnelson.kmp.process.Process
 import io.matthewnelson.kmp.process.Stdio
-import io.matthewnelson.kmp.tor.runtime.core.address.IPAddress
-import io.matthewnelson.kmp.tor.runtime.core.address.IPAddress.Companion.toIPAddressOrNull
-import io.matthewnelson.kmp.tor.runtime.core.address.LocalHost
+import io.matthewnelson.kmp.tor.runtime.core.net.IPAddress
+import io.matthewnelson.kmp.tor.runtime.core.net.IPAddress.Companion.toIPAddressOrNull
+import io.matthewnelson.kmp.tor.runtime.core.net.LocalHost
 import kotlin.collections.removeLast as kRemoveLast
 
 @Throws(Exception::class)

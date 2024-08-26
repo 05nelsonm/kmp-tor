@@ -13,14 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-package io.matthewnelson.kmp.tor.runtime.core.address
+package io.matthewnelson.kmp.tor.runtime.core.net
 
 import io.matthewnelson.immutable.collections.toImmutableSet
 import io.matthewnelson.kmp.file.IOException
 import io.matthewnelson.kmp.file.wrapIOException
 import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
-import io.matthewnelson.kmp.tor.runtime.core.address.LocalHost.Cache.Companion.firstOrNull
-import io.matthewnelson.kmp.tor.runtime.core.address.LocalHost.Cache.Companion.firstOrThrow
+import io.matthewnelson.kmp.tor.runtime.core.net.LocalHost.Cache.Companion.firstOrNull
+import io.matthewnelson.kmp.tor.runtime.core.net.LocalHost.Cache.Companion.firstOrThrow
 import io.matthewnelson.kmp.tor.runtime.core.internal.*
 import kotlin.concurrent.Volatile
 import kotlin.jvm.JvmStatic

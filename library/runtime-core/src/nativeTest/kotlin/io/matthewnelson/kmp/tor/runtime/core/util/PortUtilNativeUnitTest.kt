@@ -17,7 +17,7 @@ package io.matthewnelson.kmp.tor.runtime.core.util
 
 import io.ktor.network.selector.*
 import io.ktor.network.sockets.*
-import io.matthewnelson.kmp.tor.runtime.core.address.IPAddress
+import io.matthewnelson.kmp.tor.runtime.core.net.IPAddress
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 
