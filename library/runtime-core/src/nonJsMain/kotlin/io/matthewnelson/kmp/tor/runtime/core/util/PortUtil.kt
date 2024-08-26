@@ -19,8 +19,8 @@ package io.matthewnelson.kmp.tor.runtime.core.util
 
 import io.matthewnelson.kmp.file.IOException
 import io.matthewnelson.kmp.file.wrapIOException
-import io.matthewnelson.kmp.tor.runtime.core.address.LocalHost
-import io.matthewnelson.kmp.tor.runtime.core.address.Port
+import io.matthewnelson.kmp.tor.runtime.core.net.LocalHost
+import io.matthewnelson.kmp.tor.runtime.core.net.Port
 import io.matthewnelson.kmp.tor.runtime.core.internal.ServerSocketProducer.Companion.toServerSocketProducer
 import io.matthewnelson.kmp.tor.runtime.core.internal.PortEphemeralIterator.Companion.iterator
 import io.matthewnelson.kmp.tor.runtime.core.internal.cancellationExceptionOr

@@ -16,8 +16,8 @@
 package io.matthewnelson.kmp.tor.runtime.core.util
 
 import io.matthewnelson.kmp.file.IOException
-import io.matthewnelson.kmp.tor.runtime.core.address.LocalHost
-import io.matthewnelson.kmp.tor.runtime.core.address.Port
+import io.matthewnelson.kmp.tor.runtime.core.net.LocalHost
+import io.matthewnelson.kmp.tor.runtime.core.net.Port
 import kotlin.coroutines.cancellation.CancellationException
 
 /**

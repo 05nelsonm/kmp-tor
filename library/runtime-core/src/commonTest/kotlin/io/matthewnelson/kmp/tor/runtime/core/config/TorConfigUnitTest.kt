@@ -18,7 +18,7 @@ package io.matthewnelson.kmp.tor.runtime.core.config
 import io.matthewnelson.kmp.file.absoluteFile
 import io.matthewnelson.kmp.file.path
 import io.matthewnelson.kmp.file.toFile
-import io.matthewnelson.kmp.tor.runtime.core.address.Port.Ephemeral.Companion.toPortEphemeral
+import io.matthewnelson.kmp.tor.runtime.core.net.Port.Ephemeral.Companion.toPortEphemeral
 import io.matthewnelson.kmp.tor.runtime.core.config.TorOption.*
 import kotlin.test.Test
 import kotlin.test.assertEquals

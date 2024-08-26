@@ -15,7 +15,7 @@
  **/
 package io.matthewnelson.kmp.tor.runtime.core.util
 
-import io.matthewnelson.kmp.tor.runtime.core.address.IPAddress
+import io.matthewnelson.kmp.tor.runtime.core.net.IPAddress
 import io.matthewnelson.kmp.tor.runtime.core.internal.net_createServer
 import io.matthewnelson.kmp.tor.runtime.core.internal.onError
 import kotlinx.coroutines.Dispatchers

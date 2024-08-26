@@ -19,7 +19,7 @@ package io.matthewnelson.kmp.tor.runtime.core.internal
 
 import io.matthewnelson.kmp.file.IOException
 import io.matthewnelson.kmp.file.wrapIOException
-import io.matthewnelson.kmp.tor.runtime.core.address.IPAddress
+import io.matthewnelson.kmp.tor.runtime.core.net.IPAddress
 import kotlin.jvm.JvmInline
 import kotlin.jvm.JvmSynthetic
 

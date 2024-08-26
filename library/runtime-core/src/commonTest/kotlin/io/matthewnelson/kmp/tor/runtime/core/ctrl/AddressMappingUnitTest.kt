@@ -15,7 +15,7 @@
  **/
 package io.matthewnelson.kmp.tor.runtime.core.ctrl
 
-import io.matthewnelson.kmp.tor.runtime.core.address.IPAddress
+import io.matthewnelson.kmp.tor.runtime.core.net.IPAddress
 import kotlin.test.Test
 import kotlin.test.assertEquals
 

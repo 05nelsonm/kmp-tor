@@ -15,8 +15,8 @@
  **/
 package io.matthewnelson.kmp.tor.runtime.core.key
 
-import io.matthewnelson.kmp.tor.runtime.core.address.OnionAddress.Companion.toOnionAddress
-import io.matthewnelson.kmp.tor.runtime.core.address.OnionAddressV3UnitTest.Companion.ONION_ADDRESS_V3
+import io.matthewnelson.kmp.tor.runtime.core.net.OnionAddress.Companion.toOnionAddress
+import io.matthewnelson.kmp.tor.runtime.core.net.OnionAddressV3UnitTest.Companion.ONION_ADDRESS_V3
 import kotlin.test.Test
 import kotlin.test.assertEquals
 

@@ -19,8 +19,8 @@ import io.matthewnelson.kmp.file.absoluteFile
 import io.matthewnelson.kmp.file.path
 import io.matthewnelson.kmp.file.resolve
 import io.matthewnelson.kmp.file.toFile
-import io.matthewnelson.kmp.tor.runtime.core.address.Port
-import io.matthewnelson.kmp.tor.runtime.core.address.Port.Companion.toPort
+import io.matthewnelson.kmp.tor.runtime.core.net.Port
+import io.matthewnelson.kmp.tor.runtime.core.net.Port.Companion.toPort
 import io.matthewnelson.kmp.tor.runtime.core.config.TorOption.*
 import kotlin.test.*
 

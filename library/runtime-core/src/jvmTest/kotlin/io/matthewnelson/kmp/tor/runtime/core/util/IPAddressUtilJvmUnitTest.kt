@@ -15,10 +15,9 @@
  **/
 package io.matthewnelson.kmp.tor.runtime.core.util
 
-import io.matthewnelson.kmp.file.SysDirSep
-import io.matthewnelson.kmp.tor.runtime.core.address.IPAddress
-import io.matthewnelson.kmp.tor.runtime.core.address.IPAddress.V6.Companion.toIPAddressV6
-import io.matthewnelson.kmp.tor.runtime.core.address.LocalHost
+import io.matthewnelson.kmp.tor.runtime.core.net.IPAddress
+import io.matthewnelson.kmp.tor.runtime.core.net.IPAddress.V6.Companion.toIPAddressV6
+import io.matthewnelson.kmp.tor.runtime.core.net.LocalHost
 import io.matthewnelson.kmp.tor.runtime.core.internal.IsUnixLikeHost
 import java.net.Inet6Address
 import java.net.NetworkInterface

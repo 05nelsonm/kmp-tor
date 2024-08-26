@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-package io.matthewnelson.kmp.tor.runtime.core.address
+package io.matthewnelson.kmp.tor.runtime.core.net
 
 import io.matthewnelson.kmp.tor.runtime.core.internal.tryParsingEtcHosts
 import io.matthewnelson.kmp.tor.runtime.core.internal.tryParsingIfConfig
