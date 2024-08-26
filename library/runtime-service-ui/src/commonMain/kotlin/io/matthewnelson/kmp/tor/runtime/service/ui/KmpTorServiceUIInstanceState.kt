@@ -17,6 +17,7 @@ package io.matthewnelson.kmp.tor.runtime.service.ui
 
 import io.matthewnelson.immutable.collections.immutableSetOf
 import io.matthewnelson.kmp.tor.core.api.annotation.ExperimentalKmpTorApi
+import io.matthewnelson.kmp.tor.runtime.Action
 import io.matthewnelson.kmp.tor.runtime.RuntimeEvent
 import io.matthewnelson.kmp.tor.runtime.TorState
 import io.matthewnelson.kmp.tor.runtime.core.Disposable
@@ -143,12 +144,11 @@ public class KmpTorServiceUIInstanceState<C: AbstractKmpTorServiceUIConfig> priv
         val executor = OnEvent.Executor.Immediate
         val tag = toString()
 
+        var lastAction = Action.StartDaemon
         val oACTION = RuntimeEvent.EXECUTE.ACTION.observer(tag, executor) { job ->
-            update { current ->
-                current.copy(
-                    text = ContentAction.of(job.action),
-                    progress = Progress.Indeterminate,
-                )
+            update {
+                lastAction = job.action
+                null
             }
         }
 
@@ -208,8 +208,7 @@ public class KmpTorServiceUIInstanceState<C: AbstractKmpTorServiceUIConfig> priv
                 update { current ->
                     val text = when (progress) {
                         is Progress.Determinant -> ContentBootstrap.of(progress.value)
-
-                        is Progress.Indeterminate,
+                        is Progress.Indeterminate -> ContentAction.of(lastAction)
                         is Progress.None -> {
                             val currentText = current.text
 
