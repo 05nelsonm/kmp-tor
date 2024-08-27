@@ -956,13 +956,14 @@ internal class RealTorRuntime private constructor(
                     _failure = t
                 }
 
-                // Wait for 500ms
+                // Wait for service startup
                 TimeSource.Monotonic.markNow().let { mark ->
                     // Node.js uses Dispatchers.Main so the test coroutine
-                    // library will not wait an actual 500ms. Make it so
-                    // there's a 500ms delay no matter what.
+                    // library will not wait an actual timeout. Make it so
+                    // there's a delay no matter what.
                     val interval = 100.milliseconds
-                    val timeout = 500.milliseconds
+                    val timeout = 1_000.milliseconds
+
                     while (isActive) {
                         if (_failure != null) break
                         if (_instance != null) break
@@ -970,7 +971,7 @@ internal class RealTorRuntime private constructor(
                         if (_failure != null) break
                         if (_instance != null) break
                         if (mark.elapsedNow() < timeout) continue
-                        _failure = InterruptedException("${name.name} timed out after 500ms")
+                        _failure = InterruptedException("${name.name} timed out after 1000ms")
                     }
                 }
 

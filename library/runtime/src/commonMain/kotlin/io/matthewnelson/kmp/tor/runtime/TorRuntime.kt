@@ -561,10 +561,10 @@ public sealed interface TorRuntime:
     }
 
     /**
-     * An instance of [TorRuntime] which produces [Lifecycle.DestroyableTorRuntime]
+     * An instance of [TorRuntime] that produces [Lifecycle.DestroyableTorRuntime]
      * under the hood which are intended to be run within a service object.
      *
-     * **NOTE:** This and its subclasses are currently an [ExperimentalKmpTorApi].
+     * **NOTE:** This and its subclasses are currently marked as [ExperimentalKmpTorApi].
      * Things may change (as the annotation states), so use at your own risk! Prefer
      * using the stable implementation via the `kmp-tor:runtime-service` dependency.
      *
@@ -669,7 +669,7 @@ public sealed interface TorRuntime:
          *
          * Implementors of [ServiceFactory.startService] must start the service
          * and call [Binder.onBind] from the injected [binder] reference within
-         * 500ms, otherwise a timeout will occur and all enqueued jobs waiting
+         * 1_000ms, otherwise a timeout will occur and all enqueued jobs waiting
          * to be handed off to [Lifecycle.DestroyableTorRuntime] for completion
          * will be terminated.
          *
