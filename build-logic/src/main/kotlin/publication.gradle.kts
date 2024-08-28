@@ -56,6 +56,10 @@ tasks.all {
         throw GradleException("group cannot be null or blank")
     }
 
+    if (groupName.indexOfFirst { it.isWhitespace() } != -1) {
+        throw GradleException("group cannot contain whitespace or new lines")
+    }
+
     doLast {
         outputs.files.files.forEach out@ { output ->
             val manifests = output.walkTopDown().mapNotNull { file ->
