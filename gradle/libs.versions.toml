@@ -8,8 +8,7 @@ encoding = "2.2.1"
 gradle-android = "8.2.2"
 gradle-binary-compat = "0.14.0"
 gradle-dokka = "1.9.20"
-gradle-fix-kmp-metadata = "0.1.0"
-gradle-kmp-configuration = "0.2.2"
+gradle-kmp-configuration = "0.3.1"
 gradle-kotlin = "1.9.24"
 gradle-publish-maven = "0.28.0"
 
@@ -58,5 +57,4 @@ android-app = { id = "com.android.application", version.ref = "gradle-android" }
 android-library = { id = "com.android.library", version.ref = "gradle-android" }
 binary-compat = { id = "org.jetbrains.kotlinx.binary-compatibility-validator", version.ref = "gradle-binary-compat" }
 dokka = { id = "org.jetbrains.dokka", version.ref = "gradle-dokka" }
-fix-kmp-metadata = { id = "io.matthewnelson.fix.kmp.metadata", version.ref = "gradle-fix-kmp-metadata" }
 kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "gradle-kotlin" }

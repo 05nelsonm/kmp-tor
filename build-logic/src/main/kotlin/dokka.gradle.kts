@@ -15,7 +15,7 @@
  **/
 import org.jetbrains.dokka.DokkaConfiguration.Visibility
 import org.jetbrains.dokka.gradle.DokkaTaskPartial
-import java.net.URL
+import java.net.URI
 
 plugins {
     id("org.jetbrains.dokka")
@@ -32,7 +32,7 @@ tasks.withType<DokkaTaskPartial>().configureEach {
     dokkaSourceSets.configureEach {
         sourceLink {
             localDirectory = rootDir
-            remoteUrl = URL("https://github.com/05nelsonm/kmp-tor/tree/master")
+            remoteUrl = URI("https://github.com/05nelsonm/kmp-tor/tree/master").toURL()
             remoteLineSuffix = "#L"
         }
     }

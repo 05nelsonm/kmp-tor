@@ -25,6 +25,10 @@ fun KmpConfigurationExtension.configureShared(
     action: Action<KmpConfigurationContainerDsl>
 ) {
     configure {
+        options {
+            useUniqueModuleNames = true
+        }
+
         if (androidNamespace != null) {
             androidLibrary(namespace = androidNamespace) {
                 if (publish) target { publishLibraryVariants("release") }
