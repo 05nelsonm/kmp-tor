@@ -4262,14 +4262,14 @@ public final class io/matthewnelson/kmp/tor/runtime/core/net/LocalHost$Companion
 
 public final class io/matthewnelson/kmp/tor/runtime/core/net/LocalHost$IPv4 : io/matthewnelson/kmp/tor/runtime/core/net/LocalHost {
 	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/core/net/LocalHost$IPv4;
-	public synthetic fun fromCache$runtime_core ()Lio/matthewnelson/kmp/tor/runtime/core/net/IPAddress;
+	public synthetic fun fromCache$io_matthewnelson_kmp_tor_runtime_core_jvm ()Lio/matthewnelson/kmp/tor/runtime/core/net/IPAddress;
 	public fun resolve ()Lio/matthewnelson/kmp/tor/runtime/core/net/IPAddress$V4;
 	public synthetic fun resolve ()Lio/matthewnelson/kmp/tor/runtime/core/net/IPAddress;
 }
 
 public final class io/matthewnelson/kmp/tor/runtime/core/net/LocalHost$IPv6 : io/matthewnelson/kmp/tor/runtime/core/net/LocalHost {
 	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/core/net/LocalHost$IPv6;
-	public synthetic fun fromCache$runtime_core ()Lio/matthewnelson/kmp/tor/runtime/core/net/IPAddress;
+	public synthetic fun fromCache$io_matthewnelson_kmp_tor_runtime_core_jvm ()Lio/matthewnelson/kmp/tor/runtime/core/net/IPAddress;
 	public fun resolve ()Lio/matthewnelson/kmp/tor/runtime/core/net/IPAddress$V6;
 	public synthetic fun resolve ()Lio/matthewnelson/kmp/tor/runtime/core/net/IPAddress;
 }
