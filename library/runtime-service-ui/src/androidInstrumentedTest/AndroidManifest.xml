@@ -21,8 +21,7 @@
 
     <!-- TODO: REMOVE -->
     <uses-sdk tools:overrideLibrary="io.matthewnelson.kmp.tor.resource.tor" />
-    <uses-sdk tools:overrideLibrary="io.matthewnelson.kmp.tor.resource.exec.tor" />
-    <uses-sdk tools:overrideLibrary="io.matthewnelson.kmp.tor.resource.noexec.tor" />
+<!--    <uses-sdk tools:overrideLibrary="io.matthewnelson.kmp.tor.resource.lib.tor,io.matthewnelson.kmp.tor.resource.exec.tor,io.matthewnelson.kmp.tor.resource.noexec.tor" />-->
 
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.INTERNET" />

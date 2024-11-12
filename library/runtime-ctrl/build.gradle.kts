@@ -44,7 +44,6 @@ kmpConfiguration {
             }
             sourceSetTest {
                 dependencies {
-                    implementation(libs.kmp.tor.resource.tor) // TODO: REMOVE
                     implementation(libs.kmp.tor.resource.exec.tor)
                     implementation(libs.kmp.tor.resource.noexec.tor)
                     implementation(libs.kotlinx.coroutines.test)
