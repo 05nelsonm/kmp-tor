@@ -25,7 +25,7 @@ import io.matthewnelson.kmp.process.ProcessException.Companion.CTX_FEED_STDERR
 import io.matthewnelson.kmp.process.ProcessException.Companion.CTX_FEED_STDOUT
 import io.matthewnelson.kmp.process.Signal
 import io.matthewnelson.kmp.process.Stdio
-import io.matthewnelson.kmp.tor.core.api.ResourceInstaller
+import io.matthewnelson.kmp.tor.core.api.ResourceInstaller // TODO: REMOVE
 import io.matthewnelson.kmp.tor.runtime.*
 import io.matthewnelson.kmp.tor.runtime.FileID.Companion.toFIDString
 import io.matthewnelson.kmp.tor.runtime.RuntimeEvent.Notifier.Companion.d

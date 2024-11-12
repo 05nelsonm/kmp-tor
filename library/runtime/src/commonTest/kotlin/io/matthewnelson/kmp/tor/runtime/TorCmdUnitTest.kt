@@ -19,9 +19,9 @@ package io.matthewnelson.kmp.tor.runtime
 
 import io.matthewnelson.immutable.collections.toImmutableList
 import io.matthewnelson.kmp.file.resolve
-import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
-import io.matthewnelson.kmp.tor.core.resource.SynchronizedObject
-import io.matthewnelson.kmp.tor.core.resource.synchronized
+import io.matthewnelson.kmp.tor.common.api.InternalKmpTorApi
+import io.matthewnelson.kmp.tor.common.core.SynchronizedObject
+import io.matthewnelson.kmp.tor.common.core.synchronized
 import io.matthewnelson.kmp.tor.runtime.Action.Companion.startDaemonAsync
 import io.matthewnelson.kmp.tor.runtime.Action.Companion.stopDaemonAsync
 import io.matthewnelson.kmp.tor.runtime.core.*

@@ -18,8 +18,8 @@ package io.matthewnelson.kmp.tor.runtime.internal
 import io.matthewnelson.kmp.file.File
 import io.matthewnelson.kmp.file.path
 import io.matthewnelson.kmp.file.resolve
-import io.matthewnelson.kmp.tor.core.api.ResourceInstaller
-import io.matthewnelson.kmp.tor.core.api.ResourceInstaller.Paths
+import io.matthewnelson.kmp.tor.core.api.ResourceInstaller // TODO: REMOVE
+import io.matthewnelson.kmp.tor.core.api.ResourceInstaller.Paths // TODO: REMOVE
 import io.matthewnelson.kmp.tor.runtime.ConfigCallback
 import io.matthewnelson.kmp.tor.runtime.RuntimeEvent
 import io.matthewnelson.kmp.tor.runtime.TorRuntime

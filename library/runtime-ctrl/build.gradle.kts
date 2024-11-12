@@ -13,20 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-import io.matthewnelson.kmp.configuration.ExperimentalKmpConfigurationApi
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
 import org.jetbrains.kotlin.konan.target.Family
-import org.jetbrains.kotlin.konan.target.HostManager
 
 plugins {
     id("configuration")
 }
 
 kmpConfiguration {
-    configureShared(publish = true) {
-        jvm {
-            @OptIn(ExperimentalKmpConfigurationApi::class)
-            java9ModuleInfoName = "io.matthewnelson.kmp.tor.runtime.ctrl"
+    configureShared(java9ModuleName = "io.matthewnelson.kmp.tor.runtime.ctrl", publish = true) {
+        js {
+            sourceSetTest {
+                dependencies {
+                    // TODO: REMOVE SNAPSHOT version suffix once released
+                    implementation(npm("kmp-tor.resource-exec-tor.all", libs.versions.kmp.tor.resource.get() + ".6"))
+                }
+            }
         }
 
         common {
@@ -36,13 +38,15 @@ kmpConfiguration {
                 dependencies {
                     api(project(":library:runtime-core"))
                     implementation(libs.kmp.process)
-                    implementation(libs.kmp.tor.core.resource)
+                    implementation(libs.kmp.tor.common.core)
                     implementation(libs.kotlinx.coroutines.core)
                 }
             }
             sourceSetTest {
                 dependencies {
-                    implementation(libs.kmp.tor.resource.tor)
+                    implementation(libs.kmp.tor.resource.tor) // TODO: REMOVE
+                    implementation(libs.kmp.tor.resource.exec.tor)
+                    implementation(libs.kmp.tor.resource.noexec.tor)
                     implementation(libs.kotlinx.coroutines.test)
                 }
             }
@@ -66,30 +70,22 @@ kmpConfiguration {
                     findByName("nativeTest")?.apply { dependsOn(nonJsTest) }
                 }
             }
+        }
 
+        kotlin {
             val cInteropDir = projectDir
                 .resolve("src")
                 .resolve("nativeInterop")
                 .resolve("cinterop")
 
-            targets.filterIsInstance<KotlinNativeTarget>()
-                .unCInterop(cInteropDir)
-        }
-    }
-}
+            targets.filterIsInstance<KotlinNativeTarget>().forEach target@ { target ->
+                if (target.konanTarget.family != Family.IOS) return@target
 
-fun List<KotlinNativeTarget>.unCInterop(
-    cInteropDir: File,
-): List<KotlinNativeTarget> {
-    if (HostManager.hostIsMac) {
-        forEach { target ->
-            if (target.konanTarget.family != Family.IOS) return@forEach
-
-            target.compilations["main"].cinterops.create("un").apply {
-                defFile = cInteropDir.resolve("un.def")
+                target
+                    .compilations["main"]
+                    .cinterops.create("un")
+                    .defFile(cInteropDir.resolve("un.def"))
             }
         }
     }
-
-    return this
 }

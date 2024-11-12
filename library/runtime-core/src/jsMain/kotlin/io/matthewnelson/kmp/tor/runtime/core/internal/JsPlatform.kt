@@ -19,9 +19,9 @@ package io.matthewnelson.kmp.tor.runtime.core.internal
 
 import io.matthewnelson.kmp.file.*
 import io.matthewnelson.kmp.process.InternalProcessApi
-import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
-import io.matthewnelson.kmp.tor.core.resource.OSHost
-import io.matthewnelson.kmp.tor.core.resource.OSInfo
+import io.matthewnelson.kmp.tor.common.api.InternalKmpTorApi
+import io.matthewnelson.kmp.tor.common.core.OSHost
+import io.matthewnelson.kmp.tor.common.core.OSInfo
 import io.matthewnelson.kmp.tor.runtime.core.OnEvent
 
 @Suppress("ACTUAL_WITHOUT_EXPECT")

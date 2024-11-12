@@ -21,7 +21,7 @@ import io.matthewnelson.kmp.file.resolve
 import io.matthewnelson.kmp.process.Process
 import io.matthewnelson.kmp.process.Signal
 import io.matthewnelson.kmp.process.Stdio
-import io.matthewnelson.kmp.tor.resource.tor.TorResources
+import io.matthewnelson.kmp.tor.resource.tor.TorResources // TODO: REMOVE
 import io.matthewnelson.kmp.tor.runtime.core.UncaughtException
 import io.matthewnelson.kmp.tor.runtime.core.config.TorOption
 import io.matthewnelson.kmp.tor.runtime.core.ctrl.TorCmd

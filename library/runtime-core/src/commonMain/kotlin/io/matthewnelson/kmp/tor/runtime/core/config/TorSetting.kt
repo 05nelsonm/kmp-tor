@@ -20,7 +20,7 @@ package io.matthewnelson.kmp.tor.runtime.core.config
 import io.matthewnelson.immutable.collections.immutableSetOf
 import io.matthewnelson.immutable.collections.toImmutableMap
 import io.matthewnelson.immutable.collections.toImmutableSet
-import io.matthewnelson.kmp.tor.core.api.annotation.KmpTorDsl
+import io.matthewnelson.kmp.tor.common.api.KmpTorDsl
 import io.matthewnelson.kmp.tor.runtime.core.net.Port
 import io.matthewnelson.kmp.tor.runtime.core.config.TorSetting.LineItem.Companion.toLineItem
 import io.matthewnelson.kmp.tor.runtime.core.config.builder.BuilderScopePort

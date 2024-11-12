@@ -16,7 +16,7 @@
 package io.matthewnelson.kmp.tor.runtime.service.ui
 
 import io.matthewnelson.immutable.collections.immutableSetOf
-import io.matthewnelson.kmp.tor.core.api.annotation.ExperimentalKmpTorApi
+import io.matthewnelson.kmp.tor.common.api.ExperimentalKmpTorApi
 import io.matthewnelson.kmp.tor.runtime.Action
 import io.matthewnelson.kmp.tor.runtime.RuntimeEvent
 import io.matthewnelson.kmp.tor.runtime.TorState

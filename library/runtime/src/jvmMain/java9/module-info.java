@@ -5,6 +5,7 @@ module io.matthewnelson.kmp.tor.runtime {
     requires io.matthewnelson.kmp.process;
     requires io.matthewnelson.kmp.tor.runtime.ctrl;
     requires transitive io.matthewnelson.kmp.tor.runtime.core;
+    requires transitive io.matthewnelson.kmp.tor.core.api; // TODO: REMOVE
     requires kotlinx.coroutines.core;
     requires org.kotlincrypto;
     requires org.kotlincrypto.hash.sha2;

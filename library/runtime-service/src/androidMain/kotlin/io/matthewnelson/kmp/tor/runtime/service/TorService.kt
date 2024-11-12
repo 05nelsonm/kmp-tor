@@ -29,7 +29,7 @@ import android.os.Bundle
 import android.os.Binder as AndroidBinder
 import android.os.IBinder
 import io.matthewnelson.immutable.collections.toImmutableSet
-import io.matthewnelson.kmp.tor.core.api.annotation.ExperimentalKmpTorApi
+import io.matthewnelson.kmp.tor.common.api.ExperimentalKmpTorApi
 import io.matthewnelson.kmp.tor.runtime.*
 import io.matthewnelson.kmp.tor.runtime.RuntimeEvent.EXECUTE.CMD.observeSignalNewNym
 import io.matthewnelson.kmp.tor.runtime.RuntimeEvent.Notifier.Companion.d

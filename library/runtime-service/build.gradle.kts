@@ -54,7 +54,8 @@ kmpConfiguration {
 
             sourceSetTest {
                 dependencies {
-                    implementation(libs.kmp.tor.resource.android.unit.test)
+                    implementation(libs.kmp.tor.resource.android.unit.test) // TODO: REMOVE
+                    implementation(libs.kmp.tor.resource.android.unit.test.tor)
                 }
             }
 
@@ -76,7 +77,7 @@ kmpConfiguration {
             sourceSetMain {
                 dependencies {
                     api(project(":library:runtime"))
-                    implementation(libs.kmp.tor.core.resource)
+                    implementation(libs.kmp.tor.common.core)
                     implementation(libs.kotlinx.coroutines.core)
                 }
             }
@@ -84,7 +85,9 @@ kmpConfiguration {
             sourceSetTest {
                 dependencies {
                     implementation(kotlin("test"))
-                    implementation(libs.kmp.tor.resource.tor)
+                    implementation(libs.kmp.tor.resource.tor) // TODO: REMOVE
+                    implementation(libs.kmp.tor.resource.exec.tor)
+                    implementation(libs.kmp.tor.resource.noexec.tor)
                     implementation(libs.kotlinx.coroutines.test)
                 }
             }

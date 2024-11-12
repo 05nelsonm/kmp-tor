@@ -17,10 +17,10 @@
 
 package io.matthewnelson.kmp.tor.runtime.core
 
-import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
-import io.matthewnelson.kmp.tor.core.api.annotation.KmpTorDsl
-import io.matthewnelson.kmp.tor.core.resource.SynchronizedObject
-import io.matthewnelson.kmp.tor.core.resource.synchronized
+import io.matthewnelson.kmp.tor.common.api.InternalKmpTorApi
+import io.matthewnelson.kmp.tor.common.api.KmpTorDsl
+import io.matthewnelson.kmp.tor.common.core.SynchronizedObject
+import io.matthewnelson.kmp.tor.common.core.synchronized
 import io.matthewnelson.kmp.tor.runtime.core.EnqueuedJob.ExecutionPolicy.Cancellation
 import io.matthewnelson.kmp.tor.runtime.core.EnqueuedJob.State.*
 import io.matthewnelson.kmp.tor.runtime.core.UncaughtException.Handler.Companion.tryCatch

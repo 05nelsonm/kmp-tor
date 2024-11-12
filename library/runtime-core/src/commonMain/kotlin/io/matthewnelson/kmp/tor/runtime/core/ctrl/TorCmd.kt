@@ -20,7 +20,7 @@ import io.matthewnelson.encoding.core.Encoder.Companion.encodeToString
 import io.matthewnelson.immutable.collections.immutableSetOf
 import io.matthewnelson.immutable.collections.toImmutableSet
 import io.matthewnelson.kmp.file.InterruptedException
-import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
+import io.matthewnelson.kmp.tor.common.api.InternalKmpTorApi
 import io.matthewnelson.kmp.tor.runtime.core.*
 import io.matthewnelson.kmp.tor.runtime.core.net.IPAddress
 import io.matthewnelson.kmp.tor.runtime.core.net.OnionAddress

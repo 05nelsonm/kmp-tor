@@ -19,8 +19,8 @@ package io.matthewnelson.kmp.tor.runtime.internal
 
 import io.matthewnelson.immutable.collections.toImmutableSet
 import io.matthewnelson.kmp.file.IOException
-import io.matthewnelson.kmp.tor.core.api.ResourceInstaller
-import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
+import io.matthewnelson.kmp.tor.core.api.ResourceInstaller // TODO: REMOVE
+import io.matthewnelson.kmp.tor.common.api.InternalKmpTorApi
 import io.matthewnelson.kmp.tor.runtime.ConfigCallback
 import io.matthewnelson.kmp.tor.runtime.FileID
 import io.matthewnelson.kmp.tor.runtime.FileID.Companion.toFIDString

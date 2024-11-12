@@ -16,9 +16,9 @@
 package io.matthewnelson.kmp.tor.runtime.internal.process
 
 import io.matthewnelson.kmp.process.OutputFeed
-import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
-import io.matthewnelson.kmp.tor.core.resource.SynchronizedObject
-import io.matthewnelson.kmp.tor.core.resource.synchronized
+import io.matthewnelson.kmp.tor.common.api.InternalKmpTorApi
+import io.matthewnelson.kmp.tor.common.core.SynchronizedObject
+import io.matthewnelson.kmp.tor.common.core.synchronized
 import kotlin.concurrent.Volatile
 
 @OptIn(InternalKmpTorApi::class)

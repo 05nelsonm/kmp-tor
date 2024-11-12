@@ -21,13 +21,13 @@ import io.matthewnelson.encoding.base16.Base16
 import io.matthewnelson.encoding.core.Encoder.Companion.encodeToString
 import io.matthewnelson.immutable.collections.toImmutableMap
 import io.matthewnelson.kmp.file.*
-import io.matthewnelson.kmp.tor.core.api.ResourceInstaller
-import io.matthewnelson.kmp.tor.core.api.ResourceInstaller.Paths
-import io.matthewnelson.kmp.tor.core.api.annotation.ExperimentalKmpTorApi
-import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
-import io.matthewnelson.kmp.tor.core.api.annotation.KmpTorDsl
-import io.matthewnelson.kmp.tor.core.resource.SynchronizedObject
-import io.matthewnelson.kmp.tor.core.resource.synchronized
+import io.matthewnelson.kmp.tor.core.api.ResourceInstaller // TODO: REMOVE
+import io.matthewnelson.kmp.tor.core.api.ResourceInstaller.Paths // TODO: REMOVE
+import io.matthewnelson.kmp.tor.common.api.ExperimentalKmpTorApi
+import io.matthewnelson.kmp.tor.common.api.InternalKmpTorApi
+import io.matthewnelson.kmp.tor.common.api.KmpTorDsl
+import io.matthewnelson.kmp.tor.common.core.SynchronizedObject
+import io.matthewnelson.kmp.tor.common.core.synchronized
 import io.matthewnelson.kmp.tor.runtime.FileID.Companion.toFIDString
 import io.matthewnelson.kmp.tor.runtime.core.*
 import io.matthewnelson.kmp.tor.runtime.core.config.TorConfig

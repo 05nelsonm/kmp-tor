@@ -31,8 +31,8 @@ import android.os.SystemClock
 import android.view.View
 import android.widget.RemoteViews
 import io.matthewnelson.immutable.collections.toImmutableList
-import io.matthewnelson.kmp.tor.core.api.annotation.ExperimentalKmpTorApi
-import io.matthewnelson.kmp.tor.core.api.annotation.KmpTorDsl
+import io.matthewnelson.kmp.tor.common.api.ExperimentalKmpTorApi
+import io.matthewnelson.kmp.tor.common.api.KmpTorDsl
 import io.matthewnelson.kmp.tor.runtime.Action
 import io.matthewnelson.kmp.tor.runtime.TorRuntime
 import io.matthewnelson.kmp.tor.runtime.core.*

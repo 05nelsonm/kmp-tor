@@ -16,7 +16,7 @@
 package io.matthewnelson.kmp.tor.runtime.service
 
 import io.matthewnelson.kmp.file.File
-import io.matthewnelson.kmp.tor.core.api.ResourceInstaller
+import io.matthewnelson.kmp.tor.core.api.ResourceInstaller // TODO: REMOVE
 import io.matthewnelson.kmp.tor.runtime.core.OnEvent
 import kotlin.test.Test
 import kotlin.test.assertEquals

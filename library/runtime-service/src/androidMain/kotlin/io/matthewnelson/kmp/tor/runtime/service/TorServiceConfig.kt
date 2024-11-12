@@ -25,12 +25,12 @@ import android.content.res.Resources
 import android.os.Build
 import androidx.startup.AppInitializer
 import io.matthewnelson.kmp.file.*
-import io.matthewnelson.kmp.tor.core.api.ResourceInstaller
-import io.matthewnelson.kmp.tor.core.api.ResourceInstaller.Paths
-import io.matthewnelson.kmp.tor.core.api.annotation.ExperimentalKmpTorApi
-import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
-import io.matthewnelson.kmp.tor.core.api.annotation.KmpTorDsl
-import io.matthewnelson.kmp.tor.core.resource.OSInfo
+import io.matthewnelson.kmp.tor.core.api.ResourceInstaller // TODO: REMOVE
+import io.matthewnelson.kmp.tor.core.api.ResourceInstaller.Paths // TODO: REMOVE
+import io.matthewnelson.kmp.tor.common.api.ExperimentalKmpTorApi
+import io.matthewnelson.kmp.tor.common.api.InternalKmpTorApi
+import io.matthewnelson.kmp.tor.common.api.KmpTorDsl
+import io.matthewnelson.kmp.tor.common.core.OSInfo
 import io.matthewnelson.kmp.tor.runtime.Action
 import io.matthewnelson.kmp.tor.runtime.NetworkObserver
 import io.matthewnelson.kmp.tor.runtime.RuntimeEvent
@@ -58,11 +58,9 @@ import kotlin.concurrent.Volatile
  *     }
  *
  *     val environment = config.newEnvironment { installationDirectory ->
- *         // Assuming use of `kmp-tor:resource-tor` or
- *         // `kmp-tor:resource-tor-gpl` dependency
- *         // as well as the unit test dependency
- *         // `kmp-tor:resource-android-unit-test`
- *         TorResources(installationDirectory)
+ *         // Assuming use of `kmp-tor-resource` dependency, for example
+ *         // the `exec` type.
+ *         ResourceLoaderTorExec.getOrCreate(installationDirectory)
  *     }
  *
  *     val runtime = TorRuntime.Builder(environment) {
@@ -327,11 +325,9 @@ public open class TorServiceConfig private constructor(
      *     }
      *
      *     val environment = serviceConfig.newEnvironment { installationDirectory ->
-     *         // Assuming use of `kmp-tor:resource-tor` or
-     *         // `kmp-tor:resource-tor-gpl` dependency
-     *         // as well as the unit test dependency
-     *         // `kmp-tor:resource-android-unit-test`
-     *         TorResources(installationDirectory)
+     *         // Assuming use of `kmp-tor-resource` dependency, for example
+     *         // the `exec` type.
+     *         ResourceLoaderTorExec.getOrCreate(installationDirectory)
      *     }
      *
      *     val runtime = TorRuntime.Builder(environment) {
@@ -681,7 +677,7 @@ public open class TorServiceConfig private constructor(
         public override fun dependencies(): List<Class<androidx.startup.Initializer<*>>> {
             return try {
                 val clazz = Class
-                    .forName("io.matthewnelson.kmp.tor.core.lib.locator.KmpTorLibLocator\$Initializer")
+                    .forName("io.matthewnelson.kmp.tor.common.lib.locator.KmpTorLibLocator\$Initializer")
 
                 @Suppress("UNCHECKED_CAST")
                 listOf((clazz as Class<androidx.startup.Initializer<*>>))

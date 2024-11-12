@@ -16,8 +16,8 @@
 package io.matthewnelson.kmp.tor.runtime
 
 import io.matthewnelson.kmp.file.*
-import io.matthewnelson.kmp.tor.core.api.ResourceInstaller
-import io.matthewnelson.kmp.tor.core.api.annotation.ExperimentalKmpTorApi
+import io.matthewnelson.kmp.tor.core.api.ResourceInstaller // TODO: REMOVE
+import io.matthewnelson.kmp.tor.common.api.ExperimentalKmpTorApi
 import kotlin.test.*
 
 @OptIn(ExperimentalKmpTorApi::class)

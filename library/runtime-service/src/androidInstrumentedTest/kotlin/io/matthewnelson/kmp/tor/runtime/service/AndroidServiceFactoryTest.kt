@@ -20,7 +20,7 @@ import android.content.Context
 import android.os.Build
 import androidx.test.core.app.ApplicationProvider
 import io.matthewnelson.kmp.process.Blocking
-import io.matthewnelson.kmp.tor.resource.tor.TorResources
+import io.matthewnelson.kmp.tor.resource.tor.TorResources // TODO: REMOVE
 import io.matthewnelson.kmp.tor.runtime.Action
 import io.matthewnelson.kmp.tor.runtime.Action.Companion.startDaemonSync
 import io.matthewnelson.kmp.tor.runtime.Action.Companion.stopDaemonSync

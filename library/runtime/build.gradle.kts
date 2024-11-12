@@ -13,21 +13,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-import io.matthewnelson.kmp.configuration.ExperimentalKmpConfigurationApi
-
 plugins {
     id("configuration")
 }
 
 kmpConfiguration {
-    configureShared(publish = true) {
+    configureShared(java9ModuleName = "io.matthewnelson.kmp.tor.runtime", publish = true) {
         jvm {
-            @OptIn(ExperimentalKmpConfigurationApi::class)
-            java9ModuleInfoName = "io.matthewnelson.kmp.tor.runtime"
-
             sourceSetTest {
                 dependencies {
                     implementation(kotlin("reflect"))
+                }
+            }
+        }
+
+        js {
+            sourceSetTest {
+                dependencies {
+                    // TODO: REMOVE SNAPSHOT version suffix once released
+                    implementation(npm("kmp-tor.resource-exec-tor.all", libs.versions.kmp.tor.resource.get() + ".6"))
                 }
             }
         }
@@ -41,7 +45,8 @@ kmpConfiguration {
                     implementation(project(":library:runtime-ctrl"))
                     implementation(libs.encoding.base16)
                     implementation(libs.kmp.process)
-                    implementation(libs.kmp.tor.core.resource)
+                    implementation(libs.kmp.tor.common.core)
+                    api(libs.kmp.tor.core.api) // TODO: REMOVE
                     implementation(kotlincrypto.secureRandom)
                     implementation(kotlincrypto.hash.sha2)
                     implementation(libs.kotlinx.coroutines.core)
@@ -50,7 +55,9 @@ kmpConfiguration {
 
             sourceSetTest {
                 dependencies {
-                    implementation(libs.kmp.tor.resource.tor)
+                    implementation(libs.kmp.tor.resource.tor) // TODO: REMOVE
+                    implementation(libs.kmp.tor.resource.exec.tor)
+                    implementation(libs.kmp.tor.resource.noexec.tor)
                     implementation(libs.kotlinx.coroutines.test)
                 }
             }

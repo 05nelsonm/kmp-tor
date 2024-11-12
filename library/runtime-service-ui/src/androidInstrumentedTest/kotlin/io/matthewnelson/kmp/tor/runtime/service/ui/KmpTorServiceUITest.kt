@@ -16,7 +16,7 @@
 package io.matthewnelson.kmp.tor.runtime.service.ui
 
 import android.os.Build
-import io.matthewnelson.kmp.tor.resource.tor.TorResources
+import io.matthewnelson.kmp.tor.resource.tor.TorResources // TODO: REMOVE
 import io.matthewnelson.kmp.tor.runtime.Action
 import io.matthewnelson.kmp.tor.runtime.Action.Companion.startDaemonAsync
 import io.matthewnelson.kmp.tor.runtime.Action.Companion.stopDaemonAsync

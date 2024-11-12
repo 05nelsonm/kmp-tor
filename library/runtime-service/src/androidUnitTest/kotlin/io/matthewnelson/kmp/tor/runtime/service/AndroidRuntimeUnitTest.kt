@@ -15,8 +15,8 @@
  **/
 package io.matthewnelson.kmp.tor.runtime.service
 
-import io.matthewnelson.kmp.tor.core.api.annotation.ExperimentalKmpTorApi
-import io.matthewnelson.kmp.tor.resource.tor.TorResources
+import io.matthewnelson.kmp.tor.common.api.ExperimentalKmpTorApi
+import io.matthewnelson.kmp.tor.resource.tor.TorResources // TODO: REMOVE
 import io.matthewnelson.kmp.tor.runtime.Lifecycle
 import io.matthewnelson.kmp.tor.runtime.RuntimeEvent
 import io.matthewnelson.kmp.tor.runtime.TorRuntime

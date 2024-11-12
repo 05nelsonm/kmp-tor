@@ -15,7 +15,7 @@
  **/
 package io.matthewnelson.kmp.tor.runtime.service
 
-import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
+import io.matthewnelson.kmp.tor.common.api.InternalKmpTorApi
 import io.matthewnelson.kmp.tor.runtime.core.OnEvent
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.test.runTest

@@ -18,7 +18,7 @@
 package io.matthewnelson.kmp.tor.runtime.core.config.builder
 
 import io.matthewnelson.kmp.process.Process
-import io.matthewnelson.kmp.tor.core.api.annotation.KmpTorDsl
+import io.matthewnelson.kmp.tor.common.api.KmpTorDsl
 import io.matthewnelson.kmp.tor.runtime.core.config.TorOption
 import io.matthewnelson.kmp.tor.runtime.core.config.TorSetting
 import kotlin.jvm.JvmSynthetic

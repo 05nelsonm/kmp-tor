@@ -17,7 +17,7 @@
 
 package io.matthewnelson.kmp.tor.runtime.internal.observer
 
-import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
+import io.matthewnelson.kmp.tor.common.api.InternalKmpTorApi
 import io.matthewnelson.kmp.tor.runtime.RuntimeEvent.*
 import io.matthewnelson.kmp.tor.runtime.TorCmdJob
 import io.matthewnelson.kmp.tor.runtime.TorRuntime

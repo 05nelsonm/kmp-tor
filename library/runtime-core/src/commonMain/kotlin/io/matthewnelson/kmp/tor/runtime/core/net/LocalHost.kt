@@ -18,7 +18,7 @@ package io.matthewnelson.kmp.tor.runtime.core.net
 import io.matthewnelson.immutable.collections.toImmutableSet
 import io.matthewnelson.kmp.file.IOException
 import io.matthewnelson.kmp.file.wrapIOException
-import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
+import io.matthewnelson.kmp.tor.common.api.InternalKmpTorApi
 import io.matthewnelson.kmp.tor.runtime.core.net.LocalHost.Cache.Companion.firstOrNull
 import io.matthewnelson.kmp.tor.runtime.core.net.LocalHost.Cache.Companion.firstOrThrow
 import io.matthewnelson.kmp.tor.runtime.core.internal.*
