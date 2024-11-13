@@ -60,7 +60,7 @@ internal class TorConfigGenerator internal constructor(
         NOTIFIER: Notifier,
     ): Pair<TorConfig, ResourceInstaller.Paths.Tor> {
         NOTIFIER.d(this, "Installing tor resources (if needed)")
-        val paths = environment.torResource.install()
+        val paths = environment.loader.install()
 
         val config = createConfig(paths, NOTIFIER).validateTCPPorts(NOTIFIER)
         return config to paths

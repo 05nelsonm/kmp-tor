@@ -51,7 +51,7 @@ object TestUtils {
     ): TorRuntime.Environment = TorRuntime.Environment.Builder(
         workDirectory = TMP_TEST_DIR.resolve("$dirName/work"),
         cacheDirectory = TMP_TEST_DIR.resolve("$dirName/cache"),
-        installer = installer,
+        loader = installer,
     ) {
         defaultEventExecutor = OnEvent.Executor.Immediate
 

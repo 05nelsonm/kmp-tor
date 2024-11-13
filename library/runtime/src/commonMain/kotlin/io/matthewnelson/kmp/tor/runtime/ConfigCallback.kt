@@ -98,10 +98,8 @@ public fun interface ConfigCallback {
                 TorOption.ControlPortWriteToFile.configure(controlPortFile)
             }
 
-            if (!environment.omitGeoIPFileSettings) {
-                TorOption.GeoIPFile.configure(paths.geoip)
-                TorOption.GeoIPv6File.configure(paths.geoip6)
-            }
+            TorOption.GeoIPFile.configure(paths.geoip)
+            TorOption.GeoIPv6File.configure(paths.geoip6)
 
             return dataDirectory
         }

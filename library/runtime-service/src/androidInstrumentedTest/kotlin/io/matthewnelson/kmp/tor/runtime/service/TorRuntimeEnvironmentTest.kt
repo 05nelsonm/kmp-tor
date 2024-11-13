@@ -25,10 +25,10 @@ import kotlin.test.fail
 
 class TorRuntimeEnvironmentTest {
 
-    private fun installerFail(
-        installationDir: File
+    private fun loaderFail(
+        resourceDir: File
     ): ResourceInstaller<ResourceInstaller.Paths.Tor> {
-        return object : ResourceInstaller<ResourceInstaller.Paths.Tor>(installationDir) {
+        return object : ResourceInstaller<ResourceInstaller.Paths.Tor>(resourceDir) {
             override fun install(): Paths.Tor { fail() }
         }
     }
@@ -37,28 +37,28 @@ class TorRuntimeEnvironmentTest {
 
     @Test
     fun givenContext_whenDefaultDirname_thenIsAsExpected() {
-        val environment = config.newEnvironment(::installerFail)
+        val environment = config.newEnvironment(::loaderFail)
         assertEquals("app_torservice", environment.workDirectory.name)
         assertEquals("torservice", environment.cacheDirectory.name)
     }
 
     @Test
     fun givenContext_whenDefaultDirnameWithConfigurationBlock_thenIsAsExpected() {
-        val environment = config.newEnvironment(::installerFail, block = {})
+        val environment = config.newEnvironment(::loaderFail, block = {})
         assertEquals("app_torservice", environment.workDirectory.name)
         assertEquals("torservice", environment.cacheDirectory.name)
     }
 
     @Test
     fun givenContext_whenBlankDirName_thenIsAsExpected() {
-        val environment = config.newEnvironment(dirName = "    ", ::installerFail)
+        val environment = config.newEnvironment(dirName = "    ", ::loaderFail)
         assertEquals("app_torservice", environment.workDirectory.name)
         assertEquals("torservice", environment.cacheDirectory.name)
     }
 
     @Test
     fun givenDispatchersMainAvailable_whenDefaultExecutor_thenIsExecutorMain() {
-        config.newEnvironment(::installerFail) {
+        config.newEnvironment(::loaderFail) {
             assertIs<OnEvent.Executor.Main>(defaultEventExecutor)
         }
     }

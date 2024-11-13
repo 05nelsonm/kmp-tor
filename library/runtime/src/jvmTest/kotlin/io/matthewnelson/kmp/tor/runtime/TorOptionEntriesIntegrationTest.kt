@@ -29,7 +29,7 @@ class TorOptionEntriesIntegrationTest {
 
     @Test
     fun givenAllTorOption_whenCheckedAgainstTorCLIListed_thenAreAsExpected() {
-        val paths = testEnv("test_tor_options").torResource.install()
+        val paths = testEnv("test_tor_options").loader.install()
 
         val (cliActive, cliDeprecated) = listOf(
             "--list-torrc-options",

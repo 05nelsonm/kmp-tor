@@ -190,7 +190,6 @@ internal class TorDaemon private constructor(
 
             Process.Builder(command = paths.tor.path)
                 .args(cmdLine)
-                .environment { putAll(generator.environment.processEnv) }
                 .onError { e ->
                     if (e.cause is UncaughtException) {
                         // OutputFeed line was dispatched to event observers

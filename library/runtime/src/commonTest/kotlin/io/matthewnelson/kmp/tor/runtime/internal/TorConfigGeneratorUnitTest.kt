@@ -55,14 +55,6 @@ class TorConfigGeneratorUnitTest {
     }
 
     @Test
-    fun givenGeoipOmission_whenGenerate_thenDoesNotContainSettings() = runTest {
-        val environment = testEnv("config_test_omit_geoip", ::installer) { omitGeoIPFileSettings = true }
-        val settings = newGenerator(environment).generate(notifier).first.settings
-        assertEquals(0, settings.filterByOption<TorOption.GeoIPFile>().size)
-        assertEquals(0, settings.filterByOption<TorOption.GeoIPv6File>().size)
-    }
-
-    @Test
     fun givenGeoipNoOmission_whenGenerate_thenContainsSettings() = runTest {
         with(newGenerator().generate(notifier).first) {
             assertContains(TorOption.GeoIPFile)

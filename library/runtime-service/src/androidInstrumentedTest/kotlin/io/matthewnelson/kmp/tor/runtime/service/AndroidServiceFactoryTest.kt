@@ -45,7 +45,7 @@ class AndroidServiceFactoryTest {
     private fun newEnvironment(dirName: String): TorRuntime.Environment {
         return config.newEnvironment(
             dirName = dirName,
-            installer = { dir -> TorResources(dir) },
+            loader = { dir -> TorResources(dir) },
             block = {
                 defaultEventExecutor = OnEvent.Executor.Immediate
             }

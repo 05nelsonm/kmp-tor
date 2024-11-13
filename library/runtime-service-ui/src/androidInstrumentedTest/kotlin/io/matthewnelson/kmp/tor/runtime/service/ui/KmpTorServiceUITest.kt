@@ -68,7 +68,7 @@ class KmpTorServiceUITest {
 
         val env = serviceConfig.newEnvironment(
             dirName = "ui_startup",
-            installer = { dir -> TorResources(dir) },
+            loader = { dir -> TorResources(dir) },
             block = {
                 defaultEventExecutor = OnEvent.Executor.Immediate
             }

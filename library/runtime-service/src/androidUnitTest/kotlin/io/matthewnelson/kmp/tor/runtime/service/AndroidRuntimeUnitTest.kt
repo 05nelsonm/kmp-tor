@@ -34,7 +34,7 @@ class AndroidRuntimeUnitTest {
     fun givenTorRuntime_whenNotAndroidRuntime_thenIsNotAndroidTorServiceFactory() {
         val environment = config.newEnvironment(
             dirName = "rt_unit_tests",
-            installer = { installationDir ->
+            loader = { installationDir ->
                 TorResources(installationDir)
             },
             block = {

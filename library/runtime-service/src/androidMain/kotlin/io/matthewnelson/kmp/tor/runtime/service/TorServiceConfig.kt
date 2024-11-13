@@ -112,8 +112,8 @@ public open class TorServiceConfig private constructor(
      *  - cacheDirectory: {module}/build/kmp_tor_android_test/torservice/cache
      * */
     public fun newEnvironment(
-        installer: (installationDirectory: File) -> ResourceInstaller<Paths.Tor>,
-    ): TorRuntime.Environment = newEnvironment(DEFAULT_DIRNAME, installer)
+        loader: (resourceDir: File) -> ResourceInstaller<Paths.Tor>,
+    ): TorRuntime.Environment = newEnvironment(DEFAULT_DIRNAME, loader)
 
     /**
      * Android implementation which creates the [TorRuntime.Environment] using
@@ -135,9 +135,9 @@ public open class TorServiceConfig private constructor(
      *  - cacheDirectory: {module}/build/kmp_tor_android_test/torservice/cache
      * */
     public fun newEnvironment(
-        installer: (installationDirectory: File) -> ResourceInstaller<Paths.Tor>,
+        loader: (resourceDir: File) -> ResourceInstaller<Paths.Tor>,
         block: ThisBlock<TorRuntime.Environment.BuilderScope>,
-    ): TorRuntime.Environment = newEnvironment(DEFAULT_DIRNAME, installer, block)
+    ): TorRuntime.Environment = newEnvironment(DEFAULT_DIRNAME, loader, block)
 
     /**
      * Android implementation which creates the [TorRuntime.Environment] using
@@ -162,8 +162,8 @@ public open class TorServiceConfig private constructor(
      * */
     public fun newEnvironment(
         dirName: String,
-        installer: (installationDirectory: File) -> ResourceInstaller<Paths.Tor>,
-    ): TorRuntime.Environment = newEnvironment(dirName, installer) {}
+        loader: (resourceDir: File) -> ResourceInstaller<Paths.Tor>,
+    ): TorRuntime.Environment = newEnvironment(dirName, loader) {}
 
     /**
      * Android implementation which creates the [TorRuntime.Environment] using
@@ -188,7 +188,7 @@ public open class TorServiceConfig private constructor(
      * */
     public fun newEnvironment(
         dirName: String,
-        installer: (installationDirectory: File) -> ResourceInstaller<Paths.Tor>,
+        loader: (resourceDir: File) -> ResourceInstaller<Paths.Tor>,
         block: ThisBlock<TorRuntime.Environment.BuilderScope>,
     ): TorRuntime.Environment {
         val config = this
@@ -197,7 +197,7 @@ public open class TorServiceConfig private constructor(
         return with(UTIL) {
             UTIL.ProvideLoader { appContext ->
                 appContext.serviceFactoryLoader(config, instanceUIConfig = null)
-            }.newEnvironment(config, dirName, installer, block)
+            }.newEnvironment(config, dirName, loader, block)
         }
     }
 
@@ -373,10 +373,10 @@ public open class TorServiceConfig private constructor(
          * */
         public fun newEnvironment(
             instanceConfig: C,
-            installer: (installationDirectory: File) -> ResourceInstaller<Paths.Tor>,
+            loader: (resourceDir: File) -> ResourceInstaller<Paths.Tor>,
         ): TorRuntime.Environment = newEnvironment(
             instanceConfig = instanceConfig,
-            installer = installer,
+            loader = loader,
             block = {},
         )
 
@@ -405,12 +405,12 @@ public open class TorServiceConfig private constructor(
          * */
         public fun newEnvironment(
             instanceConfig: C,
-            installer: (installationDirectory: File) -> ResourceInstaller<Paths.Tor>,
+            loader: (resourceDir: File) -> ResourceInstaller<Paths.Tor>,
             block: ThisBlock<TorRuntime.Environment.BuilderScope>,
         ): TorRuntime.Environment = newEnvironment(
             dirName = DEFAULT_DIRNAME,
             instanceConfig = instanceConfig,
-            installer = installer,
+            loader = loader,
             block = block,
         )
 
@@ -441,11 +441,11 @@ public open class TorServiceConfig private constructor(
         public fun newEnvironment(
             dirName: String,
             instanceConfig: C,
-            installer: (installationDirectory: File) -> ResourceInstaller<Paths.Tor>,
+            loader: (resourceDir: File) -> ResourceInstaller<Paths.Tor>,
         ): TorRuntime.Environment = newEnvironment(
             dirName = dirName,
             instanceConfig = instanceConfig,
-            installer = installer,
+            loader = loader,
             block = {},
         )
 
@@ -476,7 +476,7 @@ public open class TorServiceConfig private constructor(
         public fun newEnvironment(
             dirName: String,
             instanceConfig: C,
-            installer: (installationDirectory: File) -> ResourceInstaller<Paths.Tor>,
+            loader: (resourceDir: File) -> ResourceInstaller<Paths.Tor>,
             block: ThisBlock<TorRuntime.Environment.BuilderScope>,
         ): TorRuntime.Environment {
             val config = this
@@ -487,7 +487,7 @@ public open class TorServiceConfig private constructor(
                     factory.validateConfig(appContext.get(), instanceConfig)
                     instanceConfig.unsafeCastAsType(default = factory.defaultConfig)
                     appContext.serviceFactoryLoader(config, instanceUIConfig = instanceConfig)
-                }.newEnvironment(config, dirName, installer, block)
+                }.newEnvironment(config, dirName, loader, block)
             }
         }
 
@@ -607,7 +607,7 @@ public open class TorServiceConfig private constructor(
         internal fun ProvideLoader.newEnvironment(
             config: TorServiceConfig,
             dirName: String,
-            installer: (installationDirectory: File) -> ResourceInstaller<Paths.Tor>,
+            loader: (resourceDir: File) -> ResourceInstaller<Paths.Tor>,
             block: ThisBlock<TorRuntime.Environment.BuilderScope>,
         ): TorRuntime.Environment {
             val appContext = appContext
@@ -626,7 +626,12 @@ public open class TorServiceConfig private constructor(
 
                 // Android unit tests
                 val testDir = if (config.testUseBuildDirectory) {
-                    "".toFile().absoluteFile.resolve("build")
+                    val dir = "".toFile().absoluteFile.resolve("build")
+                    if (dir.exists()) {
+                        dir
+                    } else {
+                        SysTempDir
+                    }
                 } else {
                     SysTempDir
                 }.resolve("kmp_tor_android_test").resolve(_dirName)
@@ -634,12 +639,12 @@ public open class TorServiceConfig private constructor(
                 return TorRuntime.Environment.Builder(
                     workDirectory = testDir.resolve("work"),
                     cacheDirectory = testDir.resolve("cache"),
-                    installer = installer,
+                    loader = loader,
                     block = block,
                 )
             }
 
-            val loader = this
+            val factoryProvider = this
 
             val workDirectory = if (_dirName.contains(SysDirSep)) {
                 val base = _dirName.substringBefore(SysDirSep)
@@ -654,12 +659,12 @@ public open class TorServiceConfig private constructor(
             return TorRuntime.Environment.Builder(
                 workDirectory = workDirectory,
                 cacheDirectory = appContext.get().cacheDir.resolve(_dirName),
-                installer = installer,
+                loader = loader,
                 block = {
                     apply(block)
 
                     @OptIn(ExperimentalKmpTorApi::class)
-                    serviceFactoryLoader = loader.newInstance(appContext)
+                    serviceFactoryLoader = factoryProvider.newInstance(appContext)
                 },
             )
         }
