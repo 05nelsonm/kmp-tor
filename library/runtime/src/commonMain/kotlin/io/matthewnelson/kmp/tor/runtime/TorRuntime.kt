@@ -20,8 +20,6 @@ package io.matthewnelson.kmp.tor.runtime
 import io.matthewnelson.encoding.base16.Base16
 import io.matthewnelson.encoding.core.Encoder.Companion.encodeToString
 import io.matthewnelson.kmp.file.*
-import io.matthewnelson.kmp.tor.core.api.ResourceInstaller // TODO: REMOVE
-import io.matthewnelson.kmp.tor.core.api.ResourceInstaller.Paths // TODO: REMOVE
 import io.matthewnelson.kmp.tor.common.api.ExperimentalKmpTorApi
 import io.matthewnelson.kmp.tor.common.api.InternalKmpTorApi
 import io.matthewnelson.kmp.tor.common.api.KmpTorDsl
@@ -55,8 +53,7 @@ public sealed interface TorRuntime:
     Action.Processor,
     FileID,
     RuntimeEvent.Processor,
-    TorCmd.Unprivileged.Processor,
-    TorEvent.Processor
+    TorCmd.Unprivileged.Processor
 {
 
     /**
@@ -68,7 +65,7 @@ public sealed interface TorRuntime:
      * Checks if the tor process backing [TorRuntime] (if it is running)
      * has completed starting up.
      *
-     * @see [RuntimeEvent.PROCESS.READY]
+     * @see [RuntimeEvent.READY]
      * */
     public fun isReady(): Boolean
 
@@ -163,9 +160,9 @@ public sealed interface TorRuntime:
          * Any subsequent calls for [TorCmd.SetEvents] during runtime will
          * be intercepted and modified to include all required [TorEvent].
          *
-         * **NOTE:** [TorEvent.CONF_CHANGED] will always present as it is
-         * required for the [TorRuntime] implementation. It does not need to
-         * be added here.
+         * **NOTE:** [TorEvent.CONF_CHANGED] and [TorEvent.NOTICE] will always
+         * be present as it is required for the [TorRuntime] implementation.
+         * They need not be added here.
          * */
         @KmpTorDsl
         public fun required(
@@ -294,7 +291,7 @@ public sealed interface TorRuntime:
         @JvmField
         public val cacheDirectory: File,
         @JvmField
-        public val loader: ResourceInstaller<Paths.Tor>,
+        public val loader: ResourceLoader.Tor,
 
         private val _defaultExecutor: OnEvent.Executor,
         @OptIn(ExperimentalKmpTorApi::class)
@@ -350,7 +347,7 @@ public sealed interface TorRuntime:
             public fun Builder(
                 workDirectory: File,
                 cacheDirectory: File,
-                loader: (resourceDir: File) -> ResourceInstaller<Paths.Tor>,
+                loader: (resourceDir: File) -> ResourceLoader.Tor,
             ): Environment = BuilderScope.build(workDirectory, cacheDirectory, loader, null)
 
             /**
@@ -384,7 +381,7 @@ public sealed interface TorRuntime:
             public fun Builder(
                 workDirectory: File,
                 cacheDirectory: File,
-                loader: (resourceDir: File) -> ResourceInstaller<Paths.Tor>,
+                loader: (resourceDir: File) -> ResourceLoader.Tor,
                 block: ThisBlock<BuilderScope>,
             ): Environment = BuilderScope.build(workDirectory, cacheDirectory, loader, block)
         }
@@ -423,7 +420,9 @@ public sealed interface TorRuntime:
             }
 
             /**
-             * The directory for which [ResourceLoader.Tor] will be created with.
+             * The directory for which [ResourceLoader.Tor] will be created with. This
+             * is a convenience function, as only a single instance of [ResourceLoader.Tor]
+             * can ever be created per application process.
              *
              * Default: [workDirectory]
              * */
@@ -448,7 +447,7 @@ public sealed interface TorRuntime:
                 internal fun build(
                     workDirectory: File,
                     cacheDirectory: File,
-                    installer: (installationDirectory: File) -> ResourceInstaller<Paths.Tor>,
+                    loader: (resourceDir: File) -> ResourceLoader.Tor,
                     block: ThisBlock<BuilderScope>?,
                 ): Environment {
                     val b = BuilderScope(workDirectory.absoluteFile.normalize(), cacheDirectory.absoluteFile.normalize())
@@ -464,29 +463,29 @@ public sealed interface TorRuntime:
                     // Clear loader reference from builder so if the builder
                     // reference was held outside block lambda it will always
                     // be null.
-                    val loader = b.serviceFactoryLoader
+                    val serviceLoader = b.serviceFactoryLoader
                     b.serviceFactoryLoader = null
 
-                    var torResource = installer(b.resourceDir.absoluteFile.normalize())
+                    val resourceLoader = loader(b.resourceDir.absoluteFile.normalize())
 
                     val key = EnvironmentKey(b.workDirectory, b.cacheDirectory)
 
-                    return getOrCreateInstance(key = key, block = { instances ->
-
-                        for (other in instances) {
-                            val otherTorResource = other.second.loader
-                            if (otherTorResource.installationDir == torResource.installationDir) {
-                                torResource = otherTorResource
-                                break
+                    return getOrCreateInstance(key = key, block = block@ { existing ->
+                        // If Environment already exists for NoExec, return
+                        // that instance. Multi-Instance support is only available
+                        // for Exec (process creation).
+                        if (resourceLoader is ResourceLoader.Tor.NoExec) {
+                            if (existing.isNotEmpty()) {
+                                return@block existing.first().second
                             }
                         }
 
                         Environment(
                             workDirectory = b.workDirectory,
                             cacheDirectory = b.cacheDirectory,
-                            loader = torResource,
+                            loader = resourceLoader,
                             _defaultExecutor = b.defaultEventExecutor,
-                            _serviceFactoryLoader = loader,
+                            _serviceFactoryLoader = serviceLoader,
                         )
                     })
                 }

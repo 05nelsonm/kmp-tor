@@ -42,7 +42,9 @@ internal abstract class InstanceKeeper<K: Any, V: Any> internal constructor(init
         if (instance == null) {
             val others = instances.toImmutableList()
             val i = block(others)
-            instances.add(key to i)
+            if (others.find { it.second == i } == null) {
+                instances.add(key to i)
+            }
             instance = i
         }
 

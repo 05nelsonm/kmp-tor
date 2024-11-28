@@ -46,7 +46,6 @@ kmpConfiguration {
                     implementation(libs.encoding.base16)
                     implementation(libs.kmp.process)
                     implementation(libs.kmp.tor.common.core)
-                    api(libs.kmp.tor.core.api) // TODO: REMOVE
                     implementation(kotlincrypto.secureRandom)
                     implementation(kotlincrypto.hash.sha2)
                     implementation(libs.kotlinx.coroutines.core)
@@ -55,7 +54,6 @@ kmpConfiguration {
 
             sourceSetTest {
                 dependencies {
-                    implementation(libs.kmp.tor.resource.tor) // TODO: REMOVE
                     implementation(libs.kmp.tor.resource.exec.tor)
                     implementation(libs.kmp.tor.resource.noexec.tor)
                     implementation(libs.kotlinx.coroutines.test)

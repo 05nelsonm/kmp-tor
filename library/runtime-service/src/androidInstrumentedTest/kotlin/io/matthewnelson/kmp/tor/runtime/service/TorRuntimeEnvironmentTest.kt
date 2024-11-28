@@ -15,50 +15,40 @@
  **/
 package io.matthewnelson.kmp.tor.runtime.service
 
-import io.matthewnelson.kmp.file.File
-import io.matthewnelson.kmp.tor.core.api.ResourceInstaller // TODO: REMOVE
+import io.matthewnelson.kmp.tor.resource.exec.tor.ResourceLoaderTorExec
 import io.matthewnelson.kmp.tor.runtime.core.OnEvent
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertIs
-import kotlin.test.fail
 
 class TorRuntimeEnvironmentTest {
-
-    private fun loaderFail(
-        resourceDir: File
-    ): ResourceInstaller<ResourceInstaller.Paths.Tor> {
-        return object : ResourceInstaller<ResourceInstaller.Paths.Tor>(resourceDir) {
-            override fun install(): Paths.Tor { fail() }
-        }
-    }
 
     private val config = TorServiceConfig.Builder {}
 
     @Test
     fun givenContext_whenDefaultDirname_thenIsAsExpected() {
-        val environment = config.newEnvironment(::loaderFail)
+        val environment = config.newEnvironment(ResourceLoaderTorExec::getOrCreate)
         assertEquals("app_torservice", environment.workDirectory.name)
         assertEquals("torservice", environment.cacheDirectory.name)
     }
 
     @Test
     fun givenContext_whenDefaultDirnameWithConfigurationBlock_thenIsAsExpected() {
-        val environment = config.newEnvironment(::loaderFail, block = {})
+        val environment = config.newEnvironment(ResourceLoaderTorExec::getOrCreate)
         assertEquals("app_torservice", environment.workDirectory.name)
         assertEquals("torservice", environment.cacheDirectory.name)
     }
 
     @Test
     fun givenContext_whenBlankDirName_thenIsAsExpected() {
-        val environment = config.newEnvironment(dirName = "    ", ::loaderFail)
+        val environment = config.newEnvironment(dirName = "    ", ResourceLoaderTorExec::getOrCreate)
         assertEquals("app_torservice", environment.workDirectory.name)
         assertEquals("torservice", environment.cacheDirectory.name)
     }
 
     @Test
     fun givenDispatchersMainAvailable_whenDefaultExecutor_thenIsExecutorMain() {
-        config.newEnvironment(::loaderFail) {
+        config.newEnvironment(ResourceLoaderTorExec::getOrCreate) {
             assertIs<OnEvent.Executor.Main>(defaultEventExecutor)
         }
     }

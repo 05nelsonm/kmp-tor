@@ -1,7 +1,5 @@
 [versions]
 androidx-startup = "1.1.1"
-androidx-test-core = "1.5.0"
-androidx-test-runner = "1.5.2"
 
 encoding = "2.2.2"
 
@@ -16,17 +14,17 @@ immutable = "0.1.4"
 
 kmp-process = "0.1.0-rc01"
 kmp-tor-common = "2.1.0-SNAPSHOT"
-kmp-tor-core = "2.0.0" # TODO: REMOVE
 kmp-tor-resource = "408.12.0-SNAPSHOT"
 kotlinx-coroutines = "1.8.1"
 
-# Tests only
+# Tests Only
+androidx-test-core = "1.5.0"
+androidx-test-runner = "1.5.2"
+
 ktor = "2.3.11"
 
 [libraries]
 androidx-startup-runtime = { module = "androidx.startup:startup-runtime", version.ref = "androidx-startup" }
-androidx-test-core = { module = "androidx.test:core", version.ref = "androidx-test-core" }
-androidx-test-runner = { module = "androidx.test:runner", version.ref = "androidx-test-runner" }
 
 encoding-base16 = { module = "io.matthewnelson.encoding:base16", version.ref = "encoding" }
 encoding-base32 = { module = "io.matthewnelson.encoding:base32", version.ref = "encoding" }
@@ -43,19 +41,16 @@ immutable-collections = { module = "io.matthewnelson.immutable:collections", ver
 kmp-process = { module = "io.matthewnelson.kmp-process:process", version.ref = "kmp-process" }
 kmp-tor-common-api = { module = "io.matthewnelson.kmp-tor:common-api", version.ref = "kmp-tor-common" }
 kmp-tor-common-core = { module = "io.matthewnelson.kmp-tor:common-core", version.ref = "kmp-tor-common" }
-kmp-tor-common-lib-locator = { module = "io.matthewnelson.kmp-tor:common-lib-locator", version.ref = "kmp-tor-common" }
+kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "kotlinx-coroutines" }
+kotlinx-coroutines-android = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version.ref = "kotlinx-coroutines" }
+
+# Tests Only
+androidx-test-core = { module = "androidx.test:core", version.ref = "androidx-test-core" }
+androidx-test-runner = { module = "androidx.test:runner", version.ref = "androidx-test-runner" }
+
 kmp-tor-resource-exec-tor = { module = "io.matthewnelson.kmp-tor:resource-exec-tor", version.ref = "kmp-tor-resource" }
 kmp-tor-resource-noexec-tor = { module = "io.matthewnelson.kmp-tor:resource-noexec-tor", version.ref = "kmp-tor-resource" }
 kmp-tor-resource-android-unit-test-tor = { module = "io.matthewnelson.kmp-tor:resource-android-unit-test-tor", version.ref = "kmp-tor-resource" }
-kmp-tor-core-api = { module = "io.matthewnelson.kmp-tor:core-api", version.ref = "kmp-tor-core" } # TODO: REMOVE
-kmp-tor-core-lib-locator = { module = "io.matthewnelson.kmp-tor:core-lib-locator", version.ref = "kmp-tor-core" } # TODO: REMOVE
-kmp-tor-core-resource = { module = "io.matthewnelson.kmp-tor:core-resource", version.ref = "kmp-tor-core" } # TODO: REMOVE
-kmp-tor-resource-tor = { module = "io.matthewnelson.kmp-tor:resource-tor", version = "408.10.0-SNAPSHOT" } # TODO: REMOVE
-kmp-tor-resource-android-unit-test = { module = "io.matthewnelson.kmp-tor:resource-android-unit-test", version = "408.10.0-SNAPSHOT" } # TODO: REMOVE
-kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "kotlinx-coroutines" }
-kotlinx-coroutines-android = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version.ref = "kotlinx-coroutines" }
-kotlinx-coroutines-javafx = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-javafx", version.ref = "kotlinx-coroutines" }
-kotlinx-coroutines-swing = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-swing", version.ref = "kotlinx-coroutines" }
 kotlinx-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "kotlinx-coroutines" }
 ktor-network = { module = "io.ktor:ktor-network", version.ref = "ktor" }
 

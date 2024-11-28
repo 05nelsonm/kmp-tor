@@ -16,7 +16,7 @@
 package io.matthewnelson.kmp.tor.runtime.service
 
 import io.matthewnelson.kmp.tor.common.api.ExperimentalKmpTorApi
-import io.matthewnelson.kmp.tor.resource.tor.TorResources // TODO: REMOVE
+import io.matthewnelson.kmp.tor.resource.exec.tor.ResourceLoaderTorExec
 import io.matthewnelson.kmp.tor.runtime.Lifecycle
 import io.matthewnelson.kmp.tor.runtime.RuntimeEvent
 import io.matthewnelson.kmp.tor.runtime.TorRuntime
@@ -34,9 +34,7 @@ class AndroidRuntimeUnitTest {
     fun givenTorRuntime_whenNotAndroidRuntime_thenIsNotAndroidTorServiceFactory() {
         val environment = config.newEnvironment(
             dirName = "rt_unit_tests",
-            loader = { installationDir ->
-                TorResources(installationDir)
-            },
+            loader = ResourceLoaderTorExec::getOrCreate,
             block = {
                 defaultEventExecutor = OnEvent.Executor.Immediate
             }

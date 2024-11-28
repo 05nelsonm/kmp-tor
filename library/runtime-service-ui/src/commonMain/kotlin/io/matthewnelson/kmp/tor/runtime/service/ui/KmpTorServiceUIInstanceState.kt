@@ -243,7 +243,7 @@ public class KmpTorServiceUIInstanceState<C: AbstractKmpTorServiceUIConfig> priv
             }
         }
 
-        val oREADY = RuntimeEvent.PROCESS.READY.observer(tag, executor) {
+        val oREADY = RuntimeEvent.READY.observer(tag, executor) {
             stateLock.withLock {
                 newNymObserver?.dispose()
                 newNymObserver = observeSignalNewNym(tag, executor) { line ->

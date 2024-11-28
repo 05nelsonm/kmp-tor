@@ -17,12 +17,9 @@ package io.matthewnelson.kmp.tor.runtime.test
 
 import io.matthewnelson.immutable.collections.immutableSetOf
 import io.matthewnelson.immutable.collections.toImmutableSet
-import io.matthewnelson.kmp.file.File
 import io.matthewnelson.kmp.file.SysTempDir
 import io.matthewnelson.kmp.file.resolve
-import io.matthewnelson.kmp.tor.core.api.ResourceInstaller // TODO: REMOVE
-import io.matthewnelson.kmp.tor.core.api.ResourceInstaller.Paths // TODO: REMOVE
-import io.matthewnelson.kmp.tor.resource.tor.TorResources
+import io.matthewnelson.kmp.tor.common.api.ResourceLoader
 import io.matthewnelson.kmp.tor.runtime.*
 import io.matthewnelson.kmp.tor.runtime.FileID.Companion.fidEllipses
 import io.matthewnelson.kmp.tor.runtime.core.apply
@@ -36,22 +33,20 @@ import kotlinx.coroutines.*
 import kotlin.test.fail
 import kotlin.time.Duration.Companion.milliseconds
 
+private val TMP_TEST_DIR = SysTempDir.resolve("kmp_tor_test")
+
+internal val LOADER_DIR = TMP_TEST_DIR.resolve("resources")
+internal expect val LOADER: ResourceLoader.Tor
+
 object TestUtils {
-
-    private val TMP_TEST_DIR = SysTempDir.resolve("kmp_tor_test")
-
-    private val INSTALLER by lazy {
-        TorResources(TMP_TEST_DIR.resolve("resources"))
-    }
 
     fun testEnv(
         dirName: String,
-        installer: (File) -> ResourceInstaller<Paths.Tor> = { INSTALLER },
         block: ThisBlock<TorRuntime.Environment.BuilderScope> = ThisBlock {}
     ): TorRuntime.Environment = TorRuntime.Environment.Builder(
         workDirectory = TMP_TEST_DIR.resolve("$dirName/work"),
         cacheDirectory = TMP_TEST_DIR.resolve("$dirName/cache"),
-        loader = installer,
+        loader = { LOADER },
     ) {
         defaultEventExecutor = OnEvent.Executor.Immediate
 

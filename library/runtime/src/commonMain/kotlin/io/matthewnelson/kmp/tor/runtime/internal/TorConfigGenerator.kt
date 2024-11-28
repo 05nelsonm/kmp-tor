@@ -19,7 +19,7 @@ package io.matthewnelson.kmp.tor.runtime.internal
 
 import io.matthewnelson.immutable.collections.toImmutableSet
 import io.matthewnelson.kmp.file.IOException
-import io.matthewnelson.kmp.tor.core.api.ResourceInstaller // TODO: REMOVE
+import io.matthewnelson.kmp.tor.common.api.GeoipFiles
 import io.matthewnelson.kmp.tor.common.api.InternalKmpTorApi
 import io.matthewnelson.kmp.tor.runtime.ConfigCallback
 import io.matthewnelson.kmp.tor.runtime.FileID
@@ -58,16 +58,14 @@ internal class TorConfigGenerator internal constructor(
     @Throws(Exception::class)
     internal suspend fun generate(
         NOTIFIER: Notifier,
-    ): Pair<TorConfig, ResourceInstaller.Paths.Tor> {
+    ): TorConfig {
         NOTIFIER.d(this, "Installing tor resources (if needed)")
-        val paths = environment.loader.install()
-
-        val config = createConfig(paths, NOTIFIER).validateTCPPorts(NOTIFIER)
-        return config to paths
+        val geoipFiles = environment.loader.extract()
+        return createConfig(geoipFiles, NOTIFIER).validateTCPPorts(NOTIFIER)
     }
 
     private fun createConfig(
-        paths: ResourceInstaller.Paths.Tor,
+        geoipFiles: GeoipFiles,
         NOTIFIER: Notifier,
     ): TorConfig = TorConfig.Builder {
         NOTIFIER.d(this@TorConfigGenerator, "Refreshing localhost IP address cache")
@@ -79,7 +77,7 @@ internal class TorConfigGenerator internal constructor(
 
         // Apply library consumers' configuration(s)
         config.forEach { block -> with(block) { invoke(environment) } }
-        ConfigCallback.Defaults.apply(this, environment, paths)
+        ConfigCallback.Defaults.apply(this, environment, geoipFiles)
     }
 
     private suspend fun TorConfig.validateTCPPorts(

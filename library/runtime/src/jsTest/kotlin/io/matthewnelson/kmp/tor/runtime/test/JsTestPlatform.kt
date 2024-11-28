@@ -13,8 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-package io.matthewnelson.kmp.tor.runtime.internal.process
+package io.matthewnelson.kmp.tor.runtime.test
 
-import io.matthewnelson.kmp.file.IOException
+import io.matthewnelson.kmp.tor.common.api.ResourceLoader
+import io.matthewnelson.kmp.tor.resource.exec.tor.ResourceLoaderTorExec
 
-internal class ProcessStartException(override val message: String): IOException(message)
+internal actual val LOADER: ResourceLoader.Tor by lazy {
+    ResourceLoaderTorExec.getOrCreate(LOADER_DIR)
+}
