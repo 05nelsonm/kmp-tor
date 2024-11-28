@@ -15,10 +15,21 @@
  **/
 package io.matthewnelson.kmp.tor.runtime.test
 
-import io.matthewnelson.kmp.file.File
+import io.matthewnelson.kmp.tor.common.api.ExperimentalKmpTorApi
 import io.matthewnelson.kmp.tor.common.api.ResourceLoader
-import io.matthewnelson.kmp.tor.resource.exec.tor.ResourceLoaderTorExec
-import okio.FileSystem
+import io.matthewnelson.kmp.tor.runtime.TorRuntime
 
-internal actual fun filesystem(): FileSystem = FileSystem.SYSTEM
-internal actual fun testLoader(dir: File): ResourceLoader.Tor = ResourceLoaderTorExec.getOrCreate(dir)
+@OptIn(ExperimentalKmpTorApi::class)
+class TestServiceFactory(
+    val initializer: Initializer,
+    var serviceStart: ((Binder) -> Unit)? = null,
+): TorRuntime.ServiceFactory(initializer) {
+
+    val isLoaderExec: Boolean get() = environment().loader is ResourceLoader.Tor.Exec
+
+    val testBinder: Binder get() = binder
+
+    override fun startService() {
+        serviceStart?.invoke(binder) ?: binder.onBind(emptySet(), null, emptySet(), emptySet())
+    }
+}

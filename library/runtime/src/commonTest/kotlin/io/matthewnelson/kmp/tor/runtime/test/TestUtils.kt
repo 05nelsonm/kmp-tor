@@ -15,147 +15,193 @@
  **/
 package io.matthewnelson.kmp.tor.runtime.test
 
-import io.matthewnelson.immutable.collections.immutableSetOf
-import io.matthewnelson.immutable.collections.toImmutableSet
+import io.matthewnelson.kmp.file.File
 import io.matthewnelson.kmp.file.SysTempDir
+import io.matthewnelson.kmp.file.path
 import io.matthewnelson.kmp.file.resolve
+import io.matthewnelson.kmp.tor.common.api.ExperimentalKmpTorApi
+import io.matthewnelson.kmp.tor.common.api.InternalKmpTorApi
 import io.matthewnelson.kmp.tor.common.api.ResourceLoader
+import io.matthewnelson.kmp.tor.common.core.SynchronizedObject
+import io.matthewnelson.kmp.tor.common.core.synchronized
 import io.matthewnelson.kmp.tor.runtime.*
+import io.matthewnelson.kmp.tor.runtime.Action.Companion.stopDaemonAsync
 import io.matthewnelson.kmp.tor.runtime.FileID.Companion.fidEllipses
-import io.matthewnelson.kmp.tor.runtime.core.apply
-import io.matthewnelson.kmp.tor.runtime.core.OnEvent
-import io.matthewnelson.kmp.tor.runtime.core.ThisBlock
-import io.matthewnelson.kmp.tor.runtime.core.UncaughtException
-import io.matthewnelson.kmp.tor.runtime.core.key.X25519
-import io.matthewnelson.kmp.tor.runtime.core.key.X25519.PrivateKey.Companion.toX25519PrivateKey
-import io.matthewnelson.kmp.tor.runtime.core.key.X25519.PublicKey.Companion.toX25519PublicKey
-import kotlinx.coroutines.*
+import io.matthewnelson.kmp.tor.runtime.core.*
+import io.matthewnelson.kmp.tor.runtime.core.config.TorConfig
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
+import kotlinx.coroutines.test.TestResult
+import kotlinx.coroutines.test.TestScope
+import kotlinx.coroutines.test.runTest
+import okio.FileSystem
+import okio.Path.Companion.toPath
+import kotlin.coroutines.CoroutineContext
+import kotlin.coroutines.EmptyCoroutineContext
 import kotlin.test.fail
-import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.minutes
 
-private val TMP_TEST_DIR = SysTempDir.resolve("kmp_tor_test")
+private val TEST_DIR = SysTempDir.resolve("kmp_tor_runtime_test")
 
-internal val LOADER_DIR = TMP_TEST_DIR.resolve("resources")
-internal expect val LOADER: ResourceLoader.Tor
+internal expect fun filesystem(): FileSystem
+internal expect fun testLoader(dir: File): ResourceLoader.Tor
 
-object TestUtils {
+private val TEST_ENV: TorRuntime.Environment by lazy {
+    TorRuntime.Environment.Builder(
+        workDirectory = TEST_DIR.resolve("work"),
+        cacheDirectory = TEST_DIR.resolve("cache"),
+        loader = ::testLoader,
+        block = {
+            defaultEventExecutor = OnEvent.Executor.Immediate
 
-    fun testEnv(
-        dirName: String,
-        block: ThisBlock<TorRuntime.Environment.BuilderScope> = ThisBlock {}
-    ): TorRuntime.Environment = TorRuntime.Environment.Builder(
-        workDirectory = TMP_TEST_DIR.resolve("$dirName/work"),
-        cacheDirectory = TMP_TEST_DIR.resolve("$dirName/cache"),
-        loader = { LOADER },
-    ) {
-        defaultEventExecutor = OnEvent.Executor.Immediate
-
-        apply(block)
-    }.also { it.debug = true }
-
-    suspend fun <T: Action.Processor> T.ensureStoppedOnTestCompletion(
-        errorObserver: Boolean = true,
-    ): T {
-        currentCoroutineContext().job.invokeOnCompletion {
-            enqueue(Action.StopDaemon, {}, {})
-        }
-
-        if (errorObserver && this is TorRuntime) {
-            val tag = environment().staticTag()
-            subscribe(RuntimeEvent.ERROR.observer(tag, OnEvent.Executor.Immediate) { t ->
-                if (t is UncaughtException) throw t
-                t.printStackTrace()
-            })
-        }
-
-        withContext(Dispatchers.Default) { delay(100.milliseconds) }
-
-        return this
-    }
-
-    fun clientAuthTestKeyPairs(): Set<Pair<X25519.PublicKey, X25519.PrivateKey>> {
-        return CLIENT_AUTH_TEST_KEYS.mapTo(LinkedHashSet(3, 1.0f)) { (pub, prv) ->
-            pub.toX25519PublicKey() to prv.toX25519PrivateKey()
-        }.toImmutableSet()
-    }
-
-    fun List<Lifecycle.Event>.assertDoesNotContain(
-        className: String,
-        name: Lifecycle.Event.Name,
-        fid: FileID? = null,
-    ) {
-        var error: AssertionError? = null
-        try {
-            assertContains(className, name, fid)
-            error = AssertionError("LCEs contained $name for $className${fid?.let { "[fid=${it.fidEllipses}]" } ?: ""}")
-        } catch (_: AssertionError) {
-            // pass
-        }
-
-        error?.let { throw it }
-    }
-
-    fun List<Lifecycle.Event>.assertContains(
-        className: String,
-        name: Lifecycle.Event.Name,
-        fid: FileID? = null,
-    ) {
-        for (lce in this) {
-            if (lce.className != className) continue
-            if (fid != null) {
-                if (lce.fid != fid.fidEllipses) continue
+            @OptIn(ExperimentalKmpTorApi::class)
+            serviceFactoryLoader = object : TorRuntime.ServiceFactory.Loader() {
+                override fun loadProtected(initializer: TorRuntime.ServiceFactory.Initializer): TorRuntime.ServiceFactory {
+                    return TestServiceFactory(initializer)
+                }
             }
 
-            if (lce.name == name) return
+            resourceDir = TEST_DIR.resolve("resources")
+        }
+    )
+}
+
+private val LOGS = mutableListOf<String>()
+
+@OptIn(InternalKmpTorApi::class)
+private val LOGS_LOCK = SynchronizedObject()
+
+@OptIn(InternalKmpTorApi::class)
+private object TestConfig: ConfigCallback {
+
+    private val lock = SynchronizedObject()
+    private val configs = mutableListOf<ConfigCallback>()
+
+    fun add(config: ConfigCallback) {
+        synchronized(lock) { configs.add(config) }
+    }
+
+    fun clear() {
+        synchronized(lock) { configs.clear() }
+    }
+
+    override fun TorConfig.BuilderScope.invoke(environment: TorRuntime.Environment) {
+        synchronized(lock) {
+            configs.forEach { config -> with(config) { invoke(environment) } }
+        }
+    }
+}
+
+private val TEST_RUNTIME: TestServiceFactory by lazy {
+    TorRuntime.Builder(TEST_ENV) {
+        required(TorEvent.ADDRMAP)
+        required(TorEvent.ERR)
+        required(TorEvent.WARN)
+
+        config(TestConfig)
+
+        RuntimeEvent.entries().forEach { event ->
+            when (event) {
+                is RuntimeEvent.ERROR -> observerStatic(event) { t ->
+                    if (t is UncaughtException) {
+                        throw t
+                    }
+
+                    @OptIn(InternalKmpTorApi::class)
+                    synchronized(LOGS_LOCK) { LOGS.add(t.toString()) }
+                }
+                else -> observerStatic(event, OnEvent.Executor.Immediate) { data ->
+                    @OptIn(InternalKmpTorApi::class)
+                    synchronized(LOGS_LOCK) { LOGS.add(data.toString()) }
+                }
+            }
+        }
+        TorEvent.entries().forEach { event ->
+            observerStatic(event, OnEvent.Executor.Immediate) { data ->
+                @OptIn(InternalKmpTorApi::class)
+                synchronized(LOGS_LOCK) { LOGS.add(data) }
+            }
+        }
+    } as TestServiceFactory
+}
+
+private val TEST_LOCK = Mutex()
+
+internal fun runTorTest(
+    context: CoroutineContext = EmptyCoroutineContext,
+    timeout: Duration = 5.minutes,
+    config: ConfigCallback? = null,
+    testBody: suspend TestScope.(runtime: TestServiceFactory) -> Unit,
+): TestResult = runTest(context, timeout) {
+    TEST_LOCK.withLock {
+        TEST_RUNTIME.stopDaemonAsync()
+
+        @OptIn(InternalKmpTorApi::class)
+        synchronized(LOGS_LOCK) { LOGS.clear() }
+
+        @OptIn(ExperimentalKmpTorApi::class)
+        TEST_RUNTIME.serviceStart = null
+        if (config != null) TestConfig.add(config)
+        TEST_RUNTIME.environment().debug = true
+
+        var threw: Throwable? = null
+        try {
+            testBody(TEST_RUNTIME)
+        } catch (t: Throwable) {
+            threw = t
         }
 
-        fail("LCEs did not contain $name for $className${fid?.let { "[fid=${it.fidEllipses}]" } ?: ""}")
+        try {
+            TEST_RUNTIME.stopDaemonAsync()
+        } catch (_: Throwable) {}
+
+        TEST_RUNTIME.clearObservers()
+
+        @OptIn(ExperimentalKmpTorApi::class)
+        TEST_RUNTIME.serviceStart = null
+        TestConfig.clear()
+
+        filesystem().deleteRecursively(TEST_DIR.path.toPath())
+
+        if (threw == null) return@withLock
+
+        @OptIn(InternalKmpTorApi::class)
+        val logs = synchronized(LOGS_LOCK) { LOGS.joinToString(separator = "\n") }
+        threw.addSuppressed(Error("LOGS: \n$logs"))
+        throw threw
+    }
+}
+
+fun List<Lifecycle.Event>.assertLCEsContain(
+    className: String,
+    name: Lifecycle.Event.Name,
+    fid: FileID? = null,
+) {
+    for (lce in this) {
+        if (lce.className != className) continue
+        if (fid != null) {
+            if (lce.fid != fid.fidEllipses) continue
+        }
+
+        if (lce.name == name) return
     }
 
-    private val CLIENT_AUTH_TEST_KEYS by lazy {
-        val pub1 = byteArrayOf(
-            25, -126, -57, 114, -127, 21, 26, -78,
-            53, -84, 111, -119, -95, 97, 30, 56,
-            89, 70, 0, 1, -101, 83, 62, 82,
-            55, 100, 84, 57, -24, -28, -1, 109,
-        )
-        val prv1 = byteArrayOf(
-            -88, -76, 0, -64, 103, 3, 48, -24,
-            -96, -91, -20, 105, -2, -36, -60, 111,
-            99, 76, -87, 85, 58, -54, 69, 86,
-            -96, 107, -53, -93, 106, -11, 70, 87,
-        )
+    fail("LCEs did not contain $name for $className${fid?.let { "[fid=${it.fidEllipses}]" } ?: ""}")
+}
 
-        val pub2 = byteArrayOf(
-            100, 59, 2, 66, -103, -67, 5, 73,
-            19, 106, 69, -106, -13, 49, -86, -17,
-            -113, 51, -4, 74, -65, 77, -122, -90,
-            80, -125, 45, 81, -53, 61, -54, 66,
-        )
-        val prv2 = byteArrayOf(
-            72, 127, 34, -97, -98, 84, -74, -106,
-            63, -78, -47, -19, 63, -34, -13, -14,
-            18, -77, 88, 127, 5, 85, -59, 100,
-            116, 124, -128, -125, -102, -103, -128, 65,
-        )
-
-        val pub3 = byteArrayOf(
-            67, -57, -106, 104, 23, 112, 0, -77,
-            50, 91, 69, 28, 17, -107, -73, -80,
-            -112, 67, -11, -118, -74, 18, 57, 108,
-            -52, 83, 126, 10, 2, 70, -73, 91,
-        )
-        val prv3 = byteArrayOf(
-            -80, 25, 97, 20, 3, -70, -84, -19,
-            88, -124, 48, 100, 19, -83, 116, 94,
-            -20, -108, -24, 124, -113, -4, -99, -25,
-            53, 71, -68, -10, -86, 51, -55, 99,
-        )
-
-        immutableSetOf(
-            pub1 to prv1,
-            pub2 to prv2,
-            pub3 to prv3,
-        )
+fun List<Lifecycle.Event>.assertLCEsDoNotContain(
+    className: String,
+    name: Lifecycle.Event.Name,
+    fid: FileID? = null,
+) {
+    var error: AssertionError? = null
+    try {
+        assertLCEsContain(className, name, fid)
+        error = AssertionError("LCEs contained $name for $className${fid?.let { "[fid=${it.fidEllipses}]" } ?: ""}")
+    } catch (_: AssertionError) {
+        // pass
     }
+
+    error?.let { throw it }
 }

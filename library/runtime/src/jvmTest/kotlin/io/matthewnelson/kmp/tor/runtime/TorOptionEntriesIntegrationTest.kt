@@ -19,7 +19,7 @@ import io.matthewnelson.kmp.process.Process
 import io.matthewnelson.kmp.tor.common.api.ResourceLoader
 import io.matthewnelson.kmp.tor.runtime.core.config.TorOption
 import io.matthewnelson.kmp.tor.runtime.internal.TorDaemon
-import io.matthewnelson.kmp.tor.runtime.test.LOADER
+import io.matthewnelson.kmp.tor.runtime.test.runTorTest
 import kotlin.test.Test
 import kotlin.test.assertIs
 
@@ -31,8 +31,8 @@ import kotlin.test.assertIs
 class TorOptionEntriesIntegrationTest {
 
     @Test
-    fun givenAllTorOption_whenCheckedAgainstTorCLIListed_thenAreAsExpected() {
-        val loader = LOADER
+    fun givenAllTorOption_whenCheckedAgainstTorCLIListed_thenAreAsExpected() = runTorTest { runtime ->
+        val loader = runtime.environment().loader
         assertIs<ResourceLoader.Tor.Exec>(loader)
 
         val (cliActive, cliDeprecated) = listOf(
@@ -157,7 +157,7 @@ class TorOptionEntriesIntegrationTest {
         }
 
         // No errors. kmp-tor does not need to update TorOption
-        if (sb.isEmpty()) return
+        if (sb.isEmpty()) return@runTorTest
 
         throw AssertionError(sb.toString())
     }

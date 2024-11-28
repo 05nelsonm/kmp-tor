@@ -50,6 +50,7 @@ import kotlinx.coroutines.*
 import kotlin.concurrent.Volatile
 import kotlin.coroutines.cancellation.CancellationException
 import kotlin.jvm.JvmSynthetic
+import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.TimeSource
 
@@ -955,7 +956,6 @@ internal class RealTorRuntime private constructor(
                     // library will not wait an actual timeout. Make it so
                     // there's a delay no matter what.
                     val interval = 100.milliseconds
-                    val timeout = 1_000.milliseconds
 
                     while (isActive) {
                         if (_failure != null) break
@@ -963,7 +963,7 @@ internal class RealTorRuntime private constructor(
                         delay(interval)
                         if (_failure != null) break
                         if (_instance != null) break
-                        if (mark.elapsedNow() < timeout) continue
+                        if (mark.elapsedNow() < TIMEOUT_START_SERVICE) continue
                         _failure = InterruptedException("${name.name} timed out after 1000ms")
                     }
                 }
@@ -1172,6 +1172,8 @@ internal class RealTorRuntime private constructor(
     }
 
     internal companion object {
+
+        internal val TIMEOUT_START_SERVICE: Duration = 1_000.milliseconds
 
         @JvmSynthetic
         @Suppress("RemoveRedundantQualifierName")

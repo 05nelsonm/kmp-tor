@@ -22,6 +22,7 @@ androidx-test-core = "1.5.0"
 androidx-test-runner = "1.5.2"
 
 ktor = "2.3.11"
+okio = "3.7.0"
 
 [libraries]
 androidx-startup-runtime = { module = "androidx.startup:startup-runtime", version.ref = "androidx-startup" }
@@ -53,6 +54,9 @@ kmp-tor-resource-noexec-tor = { module = "io.matthewnelson.kmp-tor:resource-noex
 kmp-tor-resource-android-unit-test-tor = { module = "io.matthewnelson.kmp-tor:resource-android-unit-test-tor", version.ref = "kmp-tor-resource" }
 kotlinx-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "kotlinx-coroutines" }
 ktor-network = { module = "io.ktor:ktor-network", version.ref = "ktor" }
+
+okio-okio = { module = "com.squareup.okio:okio", version.ref = "okio" }
+okio-node = { module = "com.squareup.okio:okio-nodefilesystem", version.ref = "okio" }
 
 [plugins]
 android-app = { id = "com.android.application", version.ref = "gradle-android" }

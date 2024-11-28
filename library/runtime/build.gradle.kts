@@ -32,6 +32,7 @@ kmpConfiguration {
                 dependencies {
                     // TODO: REMOVE SNAPSHOT version suffix once released
                     implementation(npm("kmp-tor.resource-exec-tor.all", libs.versions.kmp.tor.resource.get() + ".6"))
+                    implementation(libs.okio.node)
                 }
             }
         }
@@ -57,6 +58,7 @@ kmpConfiguration {
                     implementation(libs.kmp.tor.resource.exec.tor)
                     implementation(libs.kmp.tor.resource.noexec.tor)
                     implementation(libs.kotlinx.coroutines.test)
+                    implementation(libs.okio.okio)
                 }
             }
         }

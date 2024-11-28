@@ -15,9 +15,11 @@
  **/
 package io.matthewnelson.kmp.tor.runtime.test
 
+import io.matthewnelson.kmp.file.File
 import io.matthewnelson.kmp.tor.common.api.ResourceLoader
 import io.matthewnelson.kmp.tor.resource.exec.tor.ResourceLoaderTorExec
+import okio.FileSystem
+import okio.NodeJsFileSystem
 
-internal actual val LOADER: ResourceLoader.Tor by lazy {
-    ResourceLoaderTorExec.getOrCreate(LOADER_DIR)
-}
+internal actual fun filesystem(): FileSystem = NodeJsFileSystem
+internal actual fun testLoader(dir: File): ResourceLoader.Tor = ResourceLoaderTorExec.getOrCreate(dir)
