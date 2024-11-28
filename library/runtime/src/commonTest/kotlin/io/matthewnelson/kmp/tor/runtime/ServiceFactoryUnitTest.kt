@@ -69,7 +69,8 @@ class ServiceFactoryUnitTest {
     @Test
     fun givenNoStartJob_whenOnBind_thenEnqueuesStartJob() = runTorTest { runtime ->
         val executes = mutableListOf<ActionJob>()
-        val observer = RuntimeEvent.EXECUTE.ACTION.observer { executes.add(it) }
+        val lock = SynchronizedObject()
+        val observer = RuntimeEvent.EXECUTE.ACTION.observer { synchronized(lock) { executes.add(it) } }
         runtime.subscribe(observer)
         runtime.testBinder.onBind(emptySet(), null, emptySet(), emptySet())
 
@@ -77,8 +78,10 @@ class ServiceFactoryUnitTest {
         withContext(Dispatchers.Default) { delay(500.milliseconds) }
         runtime.unsubscribe(observer)
 
-        assertEquals(1, executes.size)
-        assertIs<ActionJob.StartJob>(executes.first())
+        synchronized(lock) {
+            assertEquals(1, executes.size)
+            assertIs<ActionJob.StartJob>(executes.first())
+        }
     }
 
     @Test
