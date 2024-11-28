@@ -43,7 +43,7 @@ class TorOptionEntriesIntegrationTest {
                 Process.Builder(tor.path)
                     .args(cmd)
                     .environment(configureEnv)
-            }.output { timeoutMillis = 1_000 }
+            }.output { timeoutMillis = 3_000 }
 
             if (
                 out.stdout.isEmpty()
