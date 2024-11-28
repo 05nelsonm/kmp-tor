@@ -110,9 +110,9 @@ internal class TorDaemon private constructor(
 
         val torJob = startArgs.startTor(checkCancellationOrInterrupt)
 
-        val result = try {
-            timedDelay(250.milliseconds)
+        torJob.invokeOnCompletion { controlPortFile.delete() }
 
+        val result = try {
             val connection = awaitCtrlConnection(controlPortFile, checkCancellationOrInterrupt)
             val authenticate = config.awaitAuthentication(checkCancellationOrInterrupt)
 
@@ -266,6 +266,8 @@ internal class TorDaemon private constructor(
         controlPortFile: File,
         checkCancellationOrInterrupt: () -> Unit,
     ): CtrlArguments.Connection {
+        timedDelay(100.milliseconds)
+
         val lines = controlPortFile
             .awaitRead(10.seconds, checkCancellationOrInterrupt)
             .decodeToString()
