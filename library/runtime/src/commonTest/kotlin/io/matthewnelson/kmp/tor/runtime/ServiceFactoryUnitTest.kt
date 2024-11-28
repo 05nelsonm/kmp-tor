@@ -36,6 +36,7 @@ import kotlinx.coroutines.*
 import kotlin.coroutines.cancellation.CancellationException
 import kotlin.test.*
 import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.TimeSource
 
 @OptIn(ExperimentalKmpTorApi::class, InternalKmpTorApi::class)
 class ServiceFactoryUnitTest {
@@ -71,11 +72,20 @@ class ServiceFactoryUnitTest {
         val executes = mutableListOf<ActionJob>()
         val lock = SynchronizedObject()
         val observer = RuntimeEvent.EXECUTE.ACTION.observer { synchronized(lock) { executes.add(it) } }
-        runtime.subscribe(observer)
-        runtime.testBinder.onBind(emptySet(), null, emptySet(), emptySet())
 
-        // Need slight delay for RealTorRuntime.Processor to start up
-        withContext(Dispatchers.Default) { delay(500.milliseconds) }
+        runtime.subscribe(observer)
+
+        runtime.testBinder.onBind(emptySet(), null, emptySet(), emptySet())
+        val start = TimeSource.Monotonic.markNow()
+
+        while (executes.isEmpty()) {
+            withContext(Dispatchers.Default) { delay(100.milliseconds) }
+
+            if (start.elapsedNow() > 2_000.milliseconds) {
+                break
+            }
+        }
+
         runtime.unsubscribe(observer)
 
         synchronized(lock) {
