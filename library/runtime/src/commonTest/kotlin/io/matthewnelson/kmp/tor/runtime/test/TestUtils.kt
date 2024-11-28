@@ -29,21 +29,17 @@ import io.matthewnelson.kmp.tor.runtime.Action.Companion.stopDaemonAsync
 import io.matthewnelson.kmp.tor.runtime.FileID.Companion.fidEllipses
 import io.matthewnelson.kmp.tor.runtime.core.*
 import io.matthewnelson.kmp.tor.runtime.core.config.TorConfig
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.test.TestResult
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runTest
-import kotlinx.coroutines.withContext
 import okio.FileSystem
 import okio.Path.Companion.toPath
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
 import kotlin.test.fail
 import kotlin.time.Duration
-import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.minutes
 
 private val TEST_DIR = SysTempDir.resolve("kmp_tor_runtime_test")
@@ -149,8 +145,6 @@ internal fun runTorTest(
         if (config != null) TestConfig.add(config)
         TEST_RUNTIME.environment().debug = true
 
-        withContext(Dispatchers.Default) { delay(100.milliseconds) }
-
         var threw: Throwable? = null
         try {
             testBody(TEST_RUNTIME)
@@ -171,8 +165,6 @@ internal fun runTorTest(
         try {
             filesystem().deleteRecursively(TEST_DIR.path.toPath())
         } catch (_: Throwable) {}
-
-        withContext(Dispatchers.Default) { delay(100.milliseconds) }
 
         if (threw == null) return@withLock
 

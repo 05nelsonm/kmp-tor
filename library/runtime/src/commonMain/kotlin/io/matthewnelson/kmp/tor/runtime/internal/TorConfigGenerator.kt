@@ -60,7 +60,13 @@ internal class TorConfigGenerator internal constructor(
         NOTIFIER: Notifier,
     ): TorConfig {
         NOTIFIER.d(this, "Installing tor resources (if needed)")
-        val geoipFiles = environment.loader.extract()
+
+        val geoipFiles = try {
+            environment.loader.extract()
+        } catch (_: IOException) {
+            environment.loader.extract()
+        }
+
         return createConfig(geoipFiles, NOTIFIER).validateTCPPorts(NOTIFIER)
     }
 
