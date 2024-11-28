@@ -100,6 +100,7 @@ jobs:
         with:
           emulator-boot-timeout: 300 # 5 minutes
           api-level: ${{ matrix.api-level }}
+          arch: x86_64
           script: ./gradlew connectedCheck -PKMP_TARGETS="ANDROID,JVM"
 
       - name: Upload Test Reports
