@@ -111,6 +111,8 @@ internal class TorDaemon private constructor(
         val torJob = startArgs.startTor(checkCancellationOrInterrupt)
 
         val result = try {
+            timedDelay(250.milliseconds)
+
             val connection = awaitCtrlConnection(controlPortFile, checkCancellationOrInterrupt)
             val authenticate = config.awaitAuthentication(checkCancellationOrInterrupt)
 
