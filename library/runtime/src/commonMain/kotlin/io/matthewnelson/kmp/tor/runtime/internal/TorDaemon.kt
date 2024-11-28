@@ -29,7 +29,7 @@ import io.matthewnelson.kmp.tor.runtime.FileID.Companion.toFIDString
 import io.matthewnelson.kmp.tor.runtime.RuntimeEvent.Notifier.Companion.d
 import io.matthewnelson.kmp.tor.runtime.RuntimeEvent.Notifier.Companion.i
 import io.matthewnelson.kmp.tor.runtime.RuntimeEvent.Notifier.Companion.lce
-import io.matthewnelson.kmp.tor.runtime.core.Disposable
+import io.matthewnelson.kmp.tor.runtime.core.Executable
 import io.matthewnelson.kmp.tor.runtime.core.net.IPSocketAddress
 import io.matthewnelson.kmp.tor.runtime.core.net.IPSocketAddress.Companion.toIPSocketAddressOrNull
 import io.matthewnelson.kmp.tor.runtime.core.config.TorConfig
@@ -232,13 +232,12 @@ internal class TorDaemon private constructor(
         // allows to ensure it is executed either within
         // the non-cancelled job, or via invokeOnCompletion
         // handler (immediately upon handle being set).
-        val completion = Disposable.Once.of(concurrent = true, disposable = {
-            state.stopMark = TimeSource.Monotonic.markNow()
-
+        val finalize = Executable.Once.of(concurrent = true, executable = {
             try {
                 terminate()
                 NOTIFIER.lce(Lifecycle.Event.OnStop(this@TorDaemon))
             } finally {
+                state.stopMark = TimeSource.Monotonic.markNow()
                 manager.update(TorState.Daemon.Off)
             }
         })
@@ -247,14 +246,14 @@ internal class TorDaemon private constructor(
             try {
                 awaitStop()
             } finally {
-                completion.dispose()
+                finalize.execute()
             }
         }
 
         state.torJob = torJob
 
         torJob.invokeOnCompletion {
-            completion.dispose()
+            finalize.execute()
             NOTIFIER.lce(Lifecycle.Event.OnDestroy(this@TorDaemon))
         }
 
