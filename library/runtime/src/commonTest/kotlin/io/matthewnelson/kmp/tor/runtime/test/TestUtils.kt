@@ -162,7 +162,9 @@ internal fun runTorTest(
         TEST_RUNTIME.serviceStart = null
         TestConfig.clear()
 
-        filesystem().deleteRecursively(TEST_DIR.path.toPath())
+        try {
+            filesystem().deleteRecursively(TEST_DIR.path.toPath())
+        } catch (_: Throwable) {}
 
         if (threw == null) return@withLock
 
