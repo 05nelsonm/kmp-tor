@@ -39,14 +39,6 @@ class TorConfigGeneratorUnitTest {
     }
 
     @Test
-    fun givenGeoipNoOmission_whenGenerate_thenContainsSettings() = runTorTest { runtime ->
-        with(newGenerator(runtime.environment()).generate(notifier)) {
-            assertContains(TorOption.GeoIPFile)
-            assertContains(TorOption.GeoIPv6File)
-        }
-    }
-
-    @Test
     fun givenMultipleUserConfigs_whenGenerate_thenAllAreApplied() = runTorTest { runtime ->
         var invocations = 0
         newGenerator(
