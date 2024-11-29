@@ -13,24 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-@file:Suppress("VARIABLE_WITH_REDUNDANT_INITIALIZER")
-
 package io.matthewnelson.kmp.tor.runtime
 
 import io.matthewnelson.immutable.collections.toImmutableList
 import io.matthewnelson.kmp.file.resolve
-import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
-import io.matthewnelson.kmp.tor.core.resource.SynchronizedObject
-import io.matthewnelson.kmp.tor.core.resource.synchronized
+import io.matthewnelson.kmp.tor.common.api.InternalKmpTorApi
+import io.matthewnelson.kmp.tor.common.core.SynchronizedObject
+import io.matthewnelson.kmp.tor.common.core.synchronized
 import io.matthewnelson.kmp.tor.runtime.Action.Companion.startDaemonAsync
-import io.matthewnelson.kmp.tor.runtime.Action.Companion.stopDaemonAsync
-import io.matthewnelson.kmp.tor.runtime.core.*
-import io.matthewnelson.kmp.tor.runtime.core.net.IPAddress
-import io.matthewnelson.kmp.tor.runtime.core.net.IPAddress.V4.Companion.toIPAddressV4OrNull
-import io.matthewnelson.kmp.tor.runtime.core.net.IPAddress.V6.Companion.toIPAddressV6OrNull
-import io.matthewnelson.kmp.tor.runtime.core.net.OnionAddress
-import io.matthewnelson.kmp.tor.runtime.core.net.Port
-import io.matthewnelson.kmp.tor.runtime.core.ctrl.builder.BuilderScopeClientAuthAdd
+import io.matthewnelson.kmp.tor.runtime.core.OnFailure
+import io.matthewnelson.kmp.tor.runtime.core.OnSuccess
+import io.matthewnelson.kmp.tor.runtime.core.ThisBlock
+import io.matthewnelson.kmp.tor.runtime.core.apply
 import io.matthewnelson.kmp.tor.runtime.core.config.TorOption
 import io.matthewnelson.kmp.tor.runtime.core.ctrl.AddressMapping.Companion.mappingToAnyHost
 import io.matthewnelson.kmp.tor.runtime.core.ctrl.AddressMapping.Companion.mappingToAnyHostIPv4
@@ -39,73 +33,65 @@ import io.matthewnelson.kmp.tor.runtime.core.ctrl.ConfigEntry
 import io.matthewnelson.kmp.tor.runtime.core.ctrl.HiddenServiceEntry
 import io.matthewnelson.kmp.tor.runtime.core.ctrl.Reply
 import io.matthewnelson.kmp.tor.runtime.core.ctrl.TorCmd
+import io.matthewnelson.kmp.tor.runtime.core.ctrl.builder.BuilderScopeClientAuthAdd
 import io.matthewnelson.kmp.tor.runtime.core.key.ED25519_V3
 import io.matthewnelson.kmp.tor.runtime.core.key.ED25519_V3.PrivateKey.Companion.toED25519_V3PrivateKeyOrNull
+import io.matthewnelson.kmp.tor.runtime.core.net.IPAddress
+import io.matthewnelson.kmp.tor.runtime.core.net.IPAddress.V4.Companion.toIPAddressV4OrNull
+import io.matthewnelson.kmp.tor.runtime.core.net.IPAddress.V6.Companion.toIPAddressV6OrNull
+import io.matthewnelson.kmp.tor.runtime.core.net.OnionAddress
+import io.matthewnelson.kmp.tor.runtime.core.net.Port
 import io.matthewnelson.kmp.tor.runtime.core.util.executeAsync
-import io.matthewnelson.kmp.tor.runtime.test.TestUtils.clientAuthTestKeyPairs
-import io.matthewnelson.kmp.tor.runtime.test.TestUtils.ensureStoppedOnTestCompletion
-import io.matthewnelson.kmp.tor.runtime.test.TestUtils.testEnv
-import kotlinx.coroutines.test.runTest
+import io.matthewnelson.kmp.tor.runtime.internal.setDirectoryPermissions
+import io.matthewnelson.kmp.tor.runtime.test.runTorTest
+import io.matthewnelson.kmp.tor.runtime.test.testClientAuthKeyPairs
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.withContext
 import kotlin.test.*
+import kotlin.time.Duration.Companion.milliseconds
 
 @OptIn(InternalKmpTorApi::class)
 class TorCmdUnitTest {
 
     @Test
-    fun givenConfigGet_whenKeyword_thenIsRecognizedByController() = runTest {
-        val runtime = TorRuntime.Builder(testEnv("cmd_getconf_test")) {
-//            observerStatic(RuntimeEvent.LOG.DEBUG) { println(it) }
-        }.ensureStoppedOnTestCompletion()
-
+    fun givenConfigGet_whenAllKeywords_thenAreRecognizedByController() = runTorTest { runtime ->
         runtime.startDaemonAsync()
 
         val failures = mutableListOf<Throwable>()
         val lock = SynchronizedObject()
-
-        val onFailure = OnFailure { t ->
-            synchronized(lock) { failures.add(t) }
-        }
+        val onFailure = OnFailure { t -> synchronized(lock) { failures.add(t) } }
         val onSuccess = OnSuccess<List<ConfigEntry>> { entries ->
             assertEquals(1, entries.size)
 //            println(entries.first())
         }
 
-        TorOption.entries.forEach { option ->
+        TorOption.entries.map { option ->
             runtime.enqueue(TorCmd.Config.Get(option), onFailure, onSuccess)
+        }.forEach { job ->
+            // Wait for all jobs to complete
+            while (job.isActive) {
+                withContext(Dispatchers.Default) { delay(5.milliseconds) }
+            }
         }
-
-        // Will suspend test until all previously enqueued jobs complete.
-        // This also ensures that multi-keyword requests are functional.
-        val resultMulti = runtime.executeAsync(TorCmd.Config.Get(
-            TorOption.ConnectionPadding,
-            TorOption.DataDirectory,
-        ))
 
         synchronized(lock) {
             var e: AssertionError? = null
 
-            failures.forEach { f ->
+            failures.forEach { failure ->
                 if (e == null) {
                     e = AssertionError("Config.Get failures")
                 }
 
-                e!!.addSuppressed(f)
+                e!!.addSuppressed(failure)
             }
 
-            e?.let { err -> throw err }
+            e?.let { throw it }
         }
-
-        assertEquals(2, resultMulti.size)
     }
 
     @Test
-    fun givenMapAddress_whenMapping_thenIsAsExpected() = runTest {
-        val runtime = TorRuntime.Builder(testEnv("cmd_mapaddress_test")) {
-            required(TorEvent.ADDRMAP)
-//            observerStatic(RuntimeEvent.LOG.DEBUG) { println(it) }
-//            observerStatic(RuntimeEvent.PROCESS.STDOUT) { println(it) }
-        }.ensureStoppedOnTestCompletion()
-
+    fun givenMapAddress_whenMapping_thenIsAsExpected() = runTorTest { runtime ->
         runtime.startDaemonAsync()
 
         val expected = "torproject.org"
@@ -157,25 +143,22 @@ class TorCmdUnitTest {
             // Should all have been un mapped
             assertTrue(mappings.entries.first().value.isEmpty())
         }
-
-        runtime.stopDaemonAsync()
     }
 
     @Test
-    fun givenOnion_whenAddAndDelete_thenIsAsExpected() = runTest {
-        val authKeys = clientAuthTestKeyPairs()
+    fun givenOnion_whenAddAndDelete_thenIsAsExpected() = runTorTest { runtime ->
+        runtime.startDaemonAsync()
+
+        val keys = runtime.testClientAuthKeyPairs()
 
         var containsRedacted = false
-        val runtime = TorRuntime.Builder(testEnv("cmd_onion_add")) {
-            observerStatic(RuntimeEvent.LOG.DEBUG) { line ->
-                if (line.endsWith("<< 250-PrivateKey=ED25519-V3:[REDACTED]")) {
-                    containsRedacted = true
-                }
-//                println(line)
+        val observer = RuntimeEvent.LOG.DEBUG.observer { line ->
+            if (line.endsWith("<< 250-PrivateKey=ED25519-V3:[REDACTED]")) {
+                containsRedacted = true
             }
-        }.ensureStoppedOnTestCompletion()
-
-        runtime.startDaemonAsync()
+//            println(line)
+        }
+        runtime.subscribe(observer)
 
         val entry1 = runtime.executeAsync(TorCmd.Onion.Add.new(ED25519_V3) {
             port(virtual = Port.HTTP) {
@@ -220,8 +203,9 @@ class TorCmdUnitTest {
 
             destroyKeyOnJobCompletion(false)
 
-            for (keys in authKeys) {
-                clientAuth(keys.first)
+            for (key in keys) {
+                // Public keys
+                clientAuth(key.first)
             }
             port(virtual = Port.HTTP)
             flags { DiscardPK = true }
@@ -230,34 +214,34 @@ class TorCmdUnitTest {
         assertFalse(keyCopy.isDestroyed())
         assertFalse(containsRedacted)
 
-        assertEquals(authKeys.size, entry3.clientAuth.size)
-        authKeys.forEach { (public, _) ->
+        assertEquals(keys.size, entry3.clientAuth.size)
+        keys.forEach { (public, _) ->
             assertTrue(entry3.clientAuth.contains(public))
         }
     }
 
     @Test
-    fun givenOnionClientAuth_whenAdd_thenIsAsExpected() = runTest {
-        val authKeys = clientAuthTestKeyPairs()
-
-        var containsRedacted = false
-        val runtime = TorRuntime.Builder(testEnv("cmd_oca_add")) {
-            observerStatic(RuntimeEvent.LOG.DEBUG) { line ->
-                if (line.contains("x25519:[REDACTED]")) {
-                    containsRedacted = true
-                }
-//                println(line)
-            }
-        }.ensureStoppedOnTestCompletion()
-
+    fun givenOnionClientAuth_whenAdd_thenIsAsExpected() = runTorTest { runtime ->
         runtime.startDaemonAsync()
+
+        val keys = runtime.testClientAuthKeyPairs()
+
+        @Suppress("VARIABLE_WITH_REDUNDANT_INITIALIZER")
+        var containsRedacted = false
+        val observer = RuntimeEvent.LOG.DEBUG.observer { line ->
+            if (line.contains("x25519:[REDACTED]")) {
+                containsRedacted = true
+            }
+//            println(line)
+        }
+        runtime.subscribe(observer)
 
         val entry = runtime.executeAsync(TorCmd.Onion.Add.new(ED25519_V3) {
             port(virtual = Port.HTTP)
             flags { DiscardPK = true }
-            for (auth in authKeys) {
+            for (key in keys) {
                 // PublicKey
-                clientAuth(auth.first)
+                clientAuth(key.first)
             }
         })
 
@@ -280,7 +264,7 @@ class TorCmdUnitTest {
                 TorCmd.OnionClientAuth.Add(
                     entry.publicKey.address() as OnionAddress.V3,
                     // PrivateKey
-                    authKeys.first().second,
+                    keys.first().second,
                 ) {
                     clientName(nickname)
                     destroyKeyOnJobCompletion(false)
@@ -292,19 +276,19 @@ class TorCmdUnitTest {
         }
 
         listOf<ThisBlock<BuilderScopeClientAuthAdd>>(
-            // Should produce error because no auth dir
-            // specified in config.
+            // Should produce error because no TorOption.ClientOnionAuthDir specified.
             ThisBlock { flags { Permanent = true } },
+            // Should produce error because nickname is too long.
             ThisBlock { clientName("12345678901234567") },
         ).forEach { block ->
             assertFailsWith<Reply.Error> {
                 runtime.executeAsync(
                     TorCmd.OnionClientAuth.Add(
                         entry.publicKey.address() as OnionAddress.V3,
-                        authKeys.last().second,
+                        keys.last().second,
                     ) {
                         destroyKeyOnJobCompletion(false)
-                        this.apply(block)
+                        apply(block)
                     }
                 )
             }
@@ -316,28 +300,25 @@ class TorCmdUnitTest {
     }
 
     @Test
-    fun givenOnionClientAuth_whenView_thenIsAsExpected() = runTest {
-        val authKeys = clientAuthTestKeyPairs()
-
-        val runtime = TorRuntime.Builder(testEnv("cmd_onion_view")) {
-//            observerStatic(RuntimeEvent.LOG.DEBUG) { println(it) }
-            config { environment ->
-                TorOption.ClientOnionAuthDir.configure(directory =
-                    environment.workDirectory
-                        .resolve("auth_private_files")
-                )
-            }
-        }.ensureStoppedOnTestCompletion()
-
+    fun givenOnionClientAuth_whenView_thenIsAsExpected() = runTorTest { runtime ->
         runtime.startDaemonAsync()
 
+        runtime.executeAsync(TorCmd.Config.Set {
+            val dir = runtime.environment().workDirectory.resolve("auth_private_files")
+            dir.mkdirs()
+            dir.setDirectoryPermissions()
+
+            TorOption.ClientOnionAuthDir.configure(dir)
+        })
+
+        val keys = runtime.testClientAuthKeyPairs()
         val entries = mutableListOf<HiddenServiceEntry>().let { list ->
             val cmd = TorCmd.Onion.Add.new(ED25519_V3) {
                 port(virtual = Port.HTTP)
                 flags { DiscardPK = true }
             }
 
-            repeat(authKeys.size) {
+            repeat(keys.size) {
                 val entry = runtime.executeAsync(cmd)
                 runtime.executeAsync(TorCmd.Onion.Delete(entry.publicKey))
                 list.add(entry)
@@ -346,13 +327,13 @@ class TorCmdUnitTest {
             list.toImmutableList()
         }
 
-        assertTrue(authKeys.isNotEmpty())
-        assertEquals(authKeys.size, entries.size)
+        assertTrue(keys.isNotEmpty())
+        assertEquals(keys.size, entries.size)
 
         val addCommands = entries.mapIndexed { index, entry ->
             TorCmd.OnionClientAuth.Add(
                 entry.publicKey.address() as OnionAddress.V3,
-                authKeys.elementAt(index).second,
+                keys.elementAt(index).second,
             ) {
                 if (index == 0) return@Add
 
@@ -403,7 +384,5 @@ class TorCmdUnitTest {
         runtime.executeAsync(TorCmd.OnionClientAuth.View(
             entries.first().publicKey as ED25519_V3.PublicKey
         )).let { result -> assertEquals(0, result.size)  }
-
-        runtime.stopDaemonAsync()
     }
 }

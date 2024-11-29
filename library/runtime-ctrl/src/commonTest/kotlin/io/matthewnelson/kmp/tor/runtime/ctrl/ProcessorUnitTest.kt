@@ -15,9 +15,9 @@
  **/
 package io.matthewnelson.kmp.tor.runtime.ctrl
 
-import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
-import io.matthewnelson.kmp.tor.core.resource.SynchronizedObject
-import io.matthewnelson.kmp.tor.core.resource.synchronized
+import io.matthewnelson.kmp.tor.common.api.InternalKmpTorApi
+import io.matthewnelson.kmp.tor.common.core.SynchronizedObject
+import io.matthewnelson.kmp.tor.common.core.synchronized
 import io.matthewnelson.kmp.tor.runtime.core.*
 import io.matthewnelson.kmp.tor.runtime.core.net.LocalHost
 import io.matthewnelson.kmp.tor.runtime.core.net.Port.Ephemeral.Companion.toPortEphemeral
@@ -35,7 +35,7 @@ import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 import kotlin.time.Duration.Companion.milliseconds
 
-@OptIn(InternalKmpTorApi::class)
+@OptIn(ExperimentalStdlibApi::class, InternalKmpTorApi::class)
 class ProcessorUnitTest {
 
     @Test
@@ -67,7 +67,7 @@ class ProcessorUnitTest {
 
         withContext(Dispatchers.Default) { delay(350.milliseconds) }
 
-        val process = TestUtils.startTor(address.toString())
+        val runtime = startTor(address.toString())
 
         var threw: Throwable? = null
 
@@ -77,7 +77,7 @@ class ProcessorUnitTest {
             val onFailure = OnFailure { threw = it }
             val onSuccess = OnSuccess<Reply.Success.OK> { synchronized(lockSuccess) { invocationSuccess++ } }
 
-            ctrl.enqueue(TorCmd.Authenticate(TestUtils.AUTH_PASS), onFailure, onSuccess)
+            ctrl.enqueue(TorCmd.Authenticate(AUTH_PASS), onFailure, onSuccess)
             ctrl.enqueue(TorCmd.SetEvents(TorEvent.entries()), onFailure, onSuccess)
 
             repeat(100) {
@@ -94,7 +94,7 @@ class ProcessorUnitTest {
         } catch (t: Throwable) {
             threw = t
         } finally {
-            process.destroy()
+            runtime.close()
         }
 
         withContext(Dispatchers.Default) { delay(350.milliseconds) }

@@ -18,7 +18,7 @@
 package io.matthewnelson.kmp.tor.runtime.core.ctrl.builder
 
 import io.matthewnelson.immutable.collections.toImmutableSet
-import io.matthewnelson.kmp.tor.core.api.annotation.KmpTorDsl
+import io.matthewnelson.kmp.tor.common.api.KmpTorDsl
 import io.matthewnelson.kmp.tor.runtime.core.EnqueuedJob
 import io.matthewnelson.kmp.tor.runtime.core.ThisBlock
 import io.matthewnelson.kmp.tor.runtime.core.net.Port

@@ -15,9 +15,9 @@
  **/
 package io.matthewnelson.kmp.tor.runtime.service.internal
 
-import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
-import io.matthewnelson.kmp.tor.core.resource.SynchronizedObject
-import io.matthewnelson.kmp.tor.core.resource.synchronized
+import io.matthewnelson.kmp.tor.common.api.InternalKmpTorApi
+import io.matthewnelson.kmp.tor.common.core.SynchronizedObject
+import io.matthewnelson.kmp.tor.common.core.synchronized
 
 @OptIn(InternalKmpTorApi::class)
 internal class SynchronizedInstance<T: Any> private constructor(private val instance: T) {

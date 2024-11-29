@@ -13,8 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-package io.matthewnelson.kmp.tor.runtime.internal.process
+package io.matthewnelson.kmp.tor.runtime.test
 
-import io.matthewnelson.kmp.file.IOException
+import io.matthewnelson.kmp.file.File
+import io.matthewnelson.kmp.tor.common.api.ResourceLoader
+import io.matthewnelson.kmp.tor.resource.exec.tor.ResourceLoaderTorExec
+import okio.FileSystem
 
-internal class ProcessStartException(override val message: String): IOException(message)
+internal actual fun filesystem(): FileSystem = FileSystem.SYSTEM
+internal actual fun testLoader(dir: File): ResourceLoader.Tor = ResourceLoaderTorExec.getOrCreate(dir)

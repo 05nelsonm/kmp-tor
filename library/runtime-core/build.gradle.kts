@@ -13,18 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-import io.matthewnelson.kmp.configuration.ExperimentalKmpConfigurationApi
-
 plugins {
     id("configuration")
 }
 
 kmpConfiguration {
-    configureShared(publish = true) {
+    configureShared(java9ModuleName = "io.matthewnelson.kmp.tor.runtime.core", publish = true) {
         jvm {
-            @OptIn(ExperimentalKmpConfigurationApi::class)
-            java9ModuleInfoName = "io.matthewnelson.kmp.tor.runtime.core"
-
             sourceSetTest {
                 dependencies {
                     implementation(kotlin("reflect"))
@@ -41,8 +36,8 @@ kmpConfiguration {
                     implementation(libs.encoding.base32)
                     implementation(libs.encoding.base64)
                     implementation(libs.kmp.process)
-                    api(libs.kmp.tor.core.api)
-                    implementation(libs.kmp.tor.core.resource)
+                    api(libs.kmp.tor.common.api)
+                    implementation(libs.kmp.tor.common.core)
                     implementation(libs.kotlinx.coroutines.core)
                 }
             }

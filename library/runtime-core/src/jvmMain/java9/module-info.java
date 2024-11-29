@@ -6,8 +6,8 @@ module io.matthewnelson.kmp.tor.runtime.core {
     requires io.matthewnelson.encoding.core;
     requires io.matthewnelson.immutable.collections;
     requires io.matthewnelson.kmp.process;
-    requires transitive io.matthewnelson.kmp.tor.core.api;
-    requires io.matthewnelson.kmp.tor.core.resource;
+    requires transitive io.matthewnelson.kmp.tor.common.api;
+    requires io.matthewnelson.kmp.tor.common.core;
     requires kotlinx.coroutines.core;
 
     exports io.matthewnelson.kmp.tor.runtime.core;

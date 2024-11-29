@@ -20,7 +20,7 @@ import android.content.Context
 import android.os.Build
 import androidx.test.core.app.ApplicationProvider
 import io.matthewnelson.kmp.process.Blocking
-import io.matthewnelson.kmp.tor.resource.tor.TorResources
+import io.matthewnelson.kmp.tor.resource.exec.tor.ResourceLoaderTorExec
 import io.matthewnelson.kmp.tor.runtime.Action
 import io.matthewnelson.kmp.tor.runtime.Action.Companion.startDaemonSync
 import io.matthewnelson.kmp.tor.runtime.Action.Companion.stopDaemonSync
@@ -45,7 +45,7 @@ class AndroidServiceFactoryTest {
     private fun newEnvironment(dirName: String): TorRuntime.Environment {
         return config.newEnvironment(
             dirName = dirName,
-            installer = { dir -> TorResources(dir) },
+            loader = ResourceLoaderTorExec::getOrCreate,
             block = {
                 defaultEventExecutor = OnEvent.Executor.Immediate
             }

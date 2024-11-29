@@ -17,13 +17,14 @@
 
 package io.matthewnelson.kmp.tor.runtime.internal.observer
 
-import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
+import io.matthewnelson.kmp.tor.common.api.InternalKmpTorApi
 import io.matthewnelson.kmp.tor.runtime.RuntimeEvent.*
 import io.matthewnelson.kmp.tor.runtime.TorCmdJob
 import io.matthewnelson.kmp.tor.runtime.TorRuntime
 import io.matthewnelson.kmp.tor.runtime.core.Disposable
 import io.matthewnelson.kmp.tor.runtime.core.Executable
 import io.matthewnelson.kmp.tor.runtime.core.OnEvent
+import io.matthewnelson.kmp.tor.runtime.core.TorEvent
 import io.matthewnelson.kmp.tor.runtime.core.ctrl.TorCmd
 import kotlin.coroutines.CoroutineContext
 
@@ -61,16 +62,16 @@ internal fun <T: Processor> observeSignalNewNymInternal(
     if (job.cmd != TorCmd.Signal.NewNym::class) return@observer
 
     var rateLimited: String? = null
-    val stdout = PROCESS.STDOUT.observer(tag, OnEvent.Executor.Immediate) stdout@{ line ->
-        val contains = line.contains("[notice] Rate limiting ", ignoreCase = true)
-        if (!contains) return@stdout
-        rateLimited = line.substringAfter(" [notice] ")
+    val noticeObserver = TorEvent.NOTICE.observer(tag, OnEvent.Executor.Immediate) data@ { line ->
+        val contains = line.contains("Rate limiting ", ignoreCase = true)
+        if (!contains) return@data
+        rateLimited = line
     }
 
-    processor.subscribe(stdout)
+    processor.subscribe(noticeObserver)
 
     job.invokeOnCompletion {
-        processor.unsubscribe(stdout)
+        processor.unsubscribe(noticeObserver)
         if (job.isError) return@invokeOnCompletion
         onEvent.notify(executor, job.handlerContext(), rateLimited)
     }

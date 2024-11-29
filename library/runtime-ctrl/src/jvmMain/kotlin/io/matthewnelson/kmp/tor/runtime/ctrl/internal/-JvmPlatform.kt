@@ -20,8 +20,8 @@ import io.matthewnelson.kmp.file.IOException
 import io.matthewnelson.kmp.file.wrapIOException
 import io.matthewnelson.kmp.process.InternalProcessApi
 import io.matthewnelson.kmp.process.ReadBuffer
-import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
-import io.matthewnelson.kmp.tor.core.resource.OSInfo
+import io.matthewnelson.kmp.tor.common.api.InternalKmpTorApi
+import io.matthewnelson.kmp.tor.common.core.OSInfo
 import io.matthewnelson.kmp.tor.runtime.core.Disposable
 import io.matthewnelson.kmp.tor.runtime.core.net.IPSocketAddress
 import io.matthewnelson.kmp.tor.runtime.core.util.toInetAddress

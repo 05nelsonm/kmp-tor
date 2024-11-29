@@ -20,9 +20,9 @@ package io.matthewnelson.kmp.tor.runtime.internal
 import io.matthewnelson.kmp.file.ANDROID
 import io.matthewnelson.kmp.file.File
 import io.matthewnelson.kmp.file.SysDirSep
-import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
-import io.matthewnelson.kmp.tor.core.resource.OSHost
-import io.matthewnelson.kmp.tor.core.resource.OSInfo
+import io.matthewnelson.kmp.tor.common.api.InternalKmpTorApi
+import io.matthewnelson.kmp.tor.common.core.OSHost
+import io.matthewnelson.kmp.tor.common.core.OSInfo
 import io.matthewnelson.kmp.tor.runtime.FileID.Companion.fidEllipses
 import io.matthewnelson.kmp.tor.runtime.TorRuntime
 import kotlinx.coroutines.*

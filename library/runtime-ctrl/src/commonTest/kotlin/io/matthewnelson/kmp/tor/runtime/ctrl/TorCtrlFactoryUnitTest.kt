@@ -16,10 +16,9 @@
 package io.matthewnelson.kmp.tor.runtime.ctrl
 
 import io.matthewnelson.kmp.file.resolve
-import io.matthewnelson.kmp.process.Process
-import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
-import io.matthewnelson.kmp.tor.core.resource.SynchronizedObject
-import io.matthewnelson.kmp.tor.core.resource.synchronized
+import io.matthewnelson.kmp.tor.common.api.InternalKmpTorApi
+import io.matthewnelson.kmp.tor.common.core.SynchronizedObject
+import io.matthewnelson.kmp.tor.common.core.synchronized
 import io.matthewnelson.kmp.tor.runtime.core.UncaughtException
 import io.matthewnelson.kmp.tor.runtime.core.net.LocalHost
 import io.matthewnelson.kmp.tor.runtime.core.net.Port
@@ -35,7 +34,7 @@ import kotlin.test.assertTrue
 import kotlin.test.fail
 import kotlin.time.Duration.Companion.milliseconds
 
-@OptIn(InternalKmpTorApi::class)
+@OptIn(ExperimentalStdlibApi::class, InternalKmpTorApi::class)
 class TorCtrlFactoryUnitTest {
 
     @Test
@@ -50,14 +49,14 @@ class TorCtrlFactoryUnitTest {
 
     @Test
     fun givenConnection_whenTorStops_thenDestroysItself() = runTest {
-        LocalHost.IPv4.runTCPTest(9255.toPortEphemeral()) { process, _ ->
-            process.destroy()
+        LocalHost.IPv4.runTCPTest(9255.toPortEphemeral()) { runtime, _ ->
+            runtime.close()
         }
     }
 
     @Test
     fun givenUnixDomainSocket_whenConnect_thenIsSuccessful() = runTest {
-        val uds = TestUtils.INSTALLER.installationDir
+        val uds = LOADER.resourceDir
             .resolve("data")
             .resolve("ctrl.sock")
 
@@ -70,7 +69,7 @@ class TorCtrlFactoryUnitTest {
             return@runTest
         }
 
-        val p = TestUtils.startTor(ctrlArg)
+        val runtime = startTor(ctrlArg)
         val factory = TorCtrl.Factory(handler = UncaughtException.Handler.THROW)
 
         val ctrl = try {
@@ -81,7 +80,7 @@ class TorCtrlFactoryUnitTest {
                 factory.connectAsync(uds)
             }
         } finally {
-            p.destroy()
+            runtime.close()
         }
 
         withContext(Dispatchers.Default) { delay(350.milliseconds) }
@@ -91,10 +90,10 @@ class TorCtrlFactoryUnitTest {
 
     private suspend fun LocalHost.runTCPTest(
         startPort: Port.Ephemeral,
-        block: suspend (process: Process, ctrl: TorCtrl) -> Unit = { process, ctrl ->
+        block: suspend (runtime: AutoCloseable, ctrl: TorCtrl) -> Unit = { runtime, ctrl ->
             // default test behavior is to disconnect ctrl listener first
             ctrl.destroy()
-            process.destroy()
+            runtime.close()
         }
     ) {
         val debugLogs = mutableListOf<String>()
@@ -109,7 +108,7 @@ class TorCtrlFactoryUnitTest {
 
         val address = IPSocketAddress(host, port)
 
-        val process = TestUtils.startTor(ctrlPortArg = address.toString())
+        val runtime = startTor(address.toString())
 
         val ctrl = try {
             factory.connectAsync(address)
@@ -125,7 +124,7 @@ class TorCtrlFactoryUnitTest {
             latch.complete()
         }
 
-        block(process, ctrl)
+        block(runtime, ctrl)
 
         latch.join()
 

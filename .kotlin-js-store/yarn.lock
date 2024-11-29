@@ -58,11 +58,11 @@ brace-expansion@^2.0.1:
     balanced-match "^1.0.0"
 
 braces@~3.0.2:
-  version "3.0.2"
-  resolved "https://registry.yarnpkg.com/braces/-/braces-3.0.2.tgz#3454e1a462ee8d599e236df336cd9ea4f8afe107"
-  integrity sha512-b8um+L1RzM3WDSzvhm6gIz1yfTbBt6YTlcEKAvsmqCZZFw46z626lVj9j1yEPW33H5H+lBQpZMP1k8l+78Ha0A==
+  version "3.0.3"
+  resolved "https://registry.yarnpkg.com/braces/-/braces-3.0.3.tgz#490332f40919452272d55a8480adc0c441358789"
+  integrity sha512-yQbXgO/OSZVD2IsiLlro+7Hf6Q18EJrKSEsdoMzKePKXct3gvD8oLcOQdIzGupr5Fj+EDe8gO/lxc1BzfMpxvA==
   dependencies:
-    fill-range "^7.0.1"
+    fill-range "^7.1.1"
 
 browser-stdout@1.3.1:
   version "1.3.1"
@@ -151,19 +151,19 @@ emoji-regex@^8.0.0:
   integrity sha512-MSjYzcWNOA0ewAHpz0MxpYFvwg6yjy1NG3xteoqz644VCo/RPgnr1/GGt+ic3iJTzQ8Eu3TdM14SawnVUmGE6A==
 
 escalade@^3.1.1:
-  version "3.1.2"
-  resolved "https://registry.yarnpkg.com/escalade/-/escalade-3.1.2.tgz#54076e9ab29ea5bf3d8f1ed62acffbb88272df27"
-  integrity sha512-ErCHMCae19vR8vQGe50xIsVomy19rg6gFu3+r3jkEO46suLMWBksvVyoGgQV+jOfl84ZSOSlmv6Gxa89PmTGmA==
+  version "3.2.0"
+  resolved "https://registry.yarnpkg.com/escalade/-/escalade-3.2.0.tgz#011a3f69856ba189dffa7dc8fcce99d2a87903e5"
+  integrity sha512-WUj2qlxaQtO4g6Pq5c29GTcWGDyd8itL8zTlipgECz3JesAiiOKotd8JU6otB3PACgG6xkJUyVhboMS+bje/jA==
 
 escape-string-regexp@4.0.0:
   version "4.0.0"
   resolved "https://registry.yarnpkg.com/escape-string-regexp/-/escape-string-regexp-4.0.0.tgz#14ba83a5d373e3d311e5afca29cf5bfad965bf34"
   integrity sha512-TtpcNJ3XAzx3Gq8sWRzJaVajRs0uVxA2YAkdb1jm2YkPz4G6egUFAyA3n5vtEIZefPk5Wa4UXbKuS5fKkJWdgA==
 
-fill-range@^7.0.1:
-  version "7.0.1"
-  resolved "https://registry.yarnpkg.com/fill-range/-/fill-range-7.0.1.tgz#1919a6a7c75fe38b2c7c77e5198535da9acdda40"
-  integrity sha512-qOo9F+dMUmC2Lcb4BbVvnKJxTPjCm+RRpe4gDuGrzkL7mEVl/djYSu2OdQ2Pa302N4oqkSg9ir6jaLWJ2USVpQ==
+fill-range@^7.1.1:
+  version "7.1.1"
+  resolved "https://registry.yarnpkg.com/fill-range/-/fill-range-7.1.1.tgz#44265d3cac07e3ea7dc247516380643754a05292"
+  integrity sha512-YsGpe3WHLK8ZYi4tWDg2Jy3ebRz2rXowDxnld4bkQB00cc/1Zw9AWnC0i9ztDJitivtQvaI9KaLyKrc+hBW0yg==
   dependencies:
     to-regex-range "^5.0.1"
 
@@ -288,10 +288,40 @@ js-yaml@4.1.0:
   dependencies:
     argparse "^2.0.1"
 
-kmp-tor-resource-tor@408.10.0-SNAPSHOT.0:
-  version "408.10.0-SNAPSHOT.0"
-  resolved "https://registry.yarnpkg.com/kmp-tor-resource-tor/-/kmp-tor-resource-tor-408.10.0-SNAPSHOT.0.tgz#83caaf1f03d08ddd5b764fa5aa4c1347aad9f3d6"
-  integrity sha512-1dRccrHL5Bt7wEiy7j8zt2DPTKPi0yQHaE81IcbppKMpW+++cHo6K5U8WLoezBhERZVP/eXswglTMlSJ53WJDg==
+kmp-tor.resource-exec-tor.all@408.12.0-SNAPSHOT.6:
+  version "408.12.0-SNAPSHOT.6"
+  resolved "https://registry.yarnpkg.com/kmp-tor.resource-exec-tor.all/-/kmp-tor.resource-exec-tor.all-408.12.0-SNAPSHOT.6.tgz#a46573ac98aca59e9ee325b3e1597739b85a7bef"
+  integrity sha512-V4242t1wyYcr8oi7SvS8NNXtlkt98OJzlJeW/DXqT6pMkfWmJWiQ+U91uADsd7TI1RHYYzPUsK8IIrQmtEEXyA==
+  dependencies:
+    kmp-tor.resource-exec-tor.linux-android "408.12.0-SNAPSHOT.6"
+    kmp-tor.resource-exec-tor.linux-libc "408.12.0-SNAPSHOT.6"
+    kmp-tor.resource-exec-tor.macos "408.12.0-SNAPSHOT.6"
+    kmp-tor.resource-exec-tor.mingw "408.12.0-SNAPSHOT.6"
+
+kmp-tor.resource-exec-tor.linux-android@408.12.0-SNAPSHOT.6:
+  version "408.12.0-SNAPSHOT.6"
+  resolved "https://registry.yarnpkg.com/kmp-tor.resource-exec-tor.linux-android/-/kmp-tor.resource-exec-tor.linux-android-408.12.0-SNAPSHOT.6.tgz#93a054b8ec228e400587c691e233d464b9ac45db"
+  integrity sha512-4qP4+HRlD6Imwb1ArbKAzt8gWq0xpQ/5+ZIrNZXjbqk5S/WIMRywURBmndjzegNVP0J/UtkchdnAsFNbtLY+jQ==
+
+kmp-tor.resource-exec-tor.linux-libc@408.12.0-SNAPSHOT.6:
+  version "408.12.0-SNAPSHOT.6"
+  resolved "https://registry.yarnpkg.com/kmp-tor.resource-exec-tor.linux-libc/-/kmp-tor.resource-exec-tor.linux-libc-408.12.0-SNAPSHOT.6.tgz#594bdb4659d1cc2bc426457c9ed49d1d5ffd96d2"
+  integrity sha512-1jpQ1UzjPSjb3OGOflnz2QAdRL1/ACjK6bb/PHVfnCUIctSL8mV4adV4lxvv4fP54iFFgu9r4vWYsmivppJMPw==
+
+kmp-tor.resource-exec-tor.macos@408.12.0-SNAPSHOT.6:
+  version "408.12.0-SNAPSHOT.6"
+  resolved "https://registry.yarnpkg.com/kmp-tor.resource-exec-tor.macos/-/kmp-tor.resource-exec-tor.macos-408.12.0-SNAPSHOT.6.tgz#ff7b09d0512bcb5e16c3c70c90094a23a5be199b"
+  integrity sha512-I2Np4VuItavqT/AkFC1+0QAGNsDMUrXLq7kdCgim7kPcuO2ELQyOyfXBPA8UQeZFHXjZO7zyJxTy7DtgkP+0cQ==
+
+kmp-tor.resource-exec-tor.mingw@408.12.0-SNAPSHOT.6:
+  version "408.12.0-SNAPSHOT.6"
+  resolved "https://registry.yarnpkg.com/kmp-tor.resource-exec-tor.mingw/-/kmp-tor.resource-exec-tor.mingw-408.12.0-SNAPSHOT.6.tgz#247673bacb777dbd59893eada50d5e39d8c3bddf"
+  integrity sha512-waSxpuh2097nd/tY7tVhOfCgL6X+S46o7B/svxztONEfQHvSw9bmAo1xpCpkMUMPa75ExU67aBcB/w0R/BZWAA==
+
+kmp-tor.resource-geoip@408.12.0-SNAPSHOT.6:
+  version "408.12.0-SNAPSHOT.6"
+  resolved "https://registry.yarnpkg.com/kmp-tor.resource-geoip/-/kmp-tor.resource-geoip-408.12.0-SNAPSHOT.6.tgz#962c844a0b7cd6e76973fa84a3e99ceb52aae919"
+  integrity sha512-E9G+0VZQaNQea4c08UdrJOGVh2IWYa53YAmzd0w0kXoCurOOHprxU5/ZSIT9VLSs0GjaFzgTx8Do7GihQGzmqg==
 
 locate-path@^6.0.0:
   version "6.0.0"

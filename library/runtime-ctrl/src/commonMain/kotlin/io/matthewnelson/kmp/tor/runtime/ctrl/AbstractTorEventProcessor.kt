@@ -15,9 +15,9 @@
  **/
 package io.matthewnelson.kmp.tor.runtime.ctrl
 
-import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
-import io.matthewnelson.kmp.tor.core.resource.SynchronizedObject
-import io.matthewnelson.kmp.tor.core.resource.synchronized
+import io.matthewnelson.kmp.tor.common.api.InternalKmpTorApi
+import io.matthewnelson.kmp.tor.common.core.SynchronizedObject
+import io.matthewnelson.kmp.tor.common.core.synchronized
 import io.matthewnelson.kmp.tor.runtime.core.*
 import io.matthewnelson.kmp.tor.runtime.core.UncaughtException.Handler.Companion.tryCatch
 import io.matthewnelson.kmp.tor.runtime.core.ctrl.TorCmd
@@ -186,7 +186,7 @@ protected constructor(
         @JvmStatic
         @InternalKmpTorApi
         @Suppress("UNCHECKED_CAST")
-        protected fun <T : Any> noOpMutableSet(): MutableSet<T> = NoOpMutableSet as MutableSet<T>
+        protected fun <T : Any?> noOpMutableSet(): MutableSet<T> = NoOpMutableSet as MutableSet<T>
 
         @JvmStatic
         @InternalKmpTorApi
@@ -240,7 +240,7 @@ protected constructor(
     }
 }
 
-private object NoOpMutableSet: MutableSet<Any> {
+private object NoOpMutableSet: MutableSet<Any?> {
 
     override fun equals(other: Any?): Boolean = other is MutableSet<*> && other.isEmpty()
     override fun hashCode(): Int = 0
@@ -248,21 +248,21 @@ private object NoOpMutableSet: MutableSet<Any> {
 
     override val size: Int get() = 0
     override fun isEmpty(): Boolean = true
-    override fun contains(element: Any): Boolean = false
-    override fun containsAll(elements: Collection<Any>): Boolean = elements.isEmpty()
+    override fun contains(element: Any?): Boolean = false
+    override fun containsAll(elements: Collection<Any?>): Boolean = elements.isEmpty()
 
-    override fun iterator(): MutableIterator<Any> = EmptyMutableIterator
+    override fun iterator(): MutableIterator<Any?> = EmptyMutableIterator
 
-    override fun add(element: Any): Boolean = false
-    override fun addAll(elements: Collection<Any>): Boolean = elements.isEmpty()
+    override fun add(element: Any?): Boolean = false
+    override fun addAll(elements: Collection<Any?>): Boolean = elements.isEmpty()
 
     override fun clear() {}
 
-    override fun retainAll(elements: Collection<Any>): Boolean = elements.isEmpty()
-    override fun removeAll(elements: Collection<Any>): Boolean = elements.isEmpty()
-    override fun remove(element: Any): Boolean = false
+    override fun retainAll(elements: Collection<Any?>): Boolean = elements.isEmpty()
+    override fun removeAll(elements: Collection<Any?>): Boolean = elements.isEmpty()
+    override fun remove(element: Any?): Boolean = false
 
-    private object EmptyMutableIterator: MutableIterator<Any> {
+    private object EmptyMutableIterator: MutableIterator<Any?> {
         override fun hasNext(): Boolean = false
         override fun next(): Any = throw NoSuchElementException()
         override fun remove() { throw IllegalStateException() }

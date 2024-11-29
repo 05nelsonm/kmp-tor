@@ -16,52 +16,35 @@
 package io.matthewnelson.kmp.tor.runtime
 
 import io.matthewnelson.kmp.file.IOException
-import io.matthewnelson.kmp.file.InterruptedException
-import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
-import io.matthewnelson.kmp.tor.core.resource.SynchronizedObject
-import io.matthewnelson.kmp.tor.core.resource.synchronized
+import io.matthewnelson.kmp.tor.common.api.InternalKmpTorApi
+import io.matthewnelson.kmp.tor.common.core.SynchronizedObject
+import io.matthewnelson.kmp.tor.common.core.synchronized
 import io.matthewnelson.kmp.tor.runtime.Action.Companion.startDaemonAsync
 import io.matthewnelson.kmp.tor.runtime.Action.Companion.stopDaemonAsync
 import io.matthewnelson.kmp.tor.runtime.RuntimeEvent.EXECUTE.CMD.observeSignalNewNym
 import io.matthewnelson.kmp.tor.runtime.core.EnqueuedJob
-import io.matthewnelson.kmp.tor.runtime.test.TestUtils.testEnv
 import io.matthewnelson.kmp.tor.runtime.core.ctrl.TorCmd
 import io.matthewnelson.kmp.tor.runtime.core.util.executeAsync
-import io.matthewnelson.kmp.tor.runtime.test.TestUtils.ensureStoppedOnTestCompletion
+import io.matthewnelson.kmp.tor.runtime.test.runTorTest
 import kotlinx.coroutines.*
-import kotlinx.coroutines.test.runTest
 import kotlin.coroutines.cancellation.CancellationException
-import kotlin.reflect.KClass
 import kotlin.test.*
 import kotlin.time.Duration.Companion.milliseconds
-import kotlin.time.Duration.Companion.seconds
 
 @OptIn(InternalKmpTorApi::class)
 class TorRuntimeUnitTest {
 
     @Test
-    fun givenStartedState_whenFailure_thenStopExecuted() = runTest {
-        val lockJob = SynchronizedObject()
-        val executeJobs = mutableListOf<ActionJob>()
-
-        val runtime = TorRuntime.Builder(testEnv("rt_start_fail")) {
-            observerStatic(RuntimeEvent.EXECUTE.ACTION) { job ->
-                synchronized(lockJob) { executeJobs.add(job) }
-            }
-
-//            observerStatic(RuntimeEvent.LIFECYCLE) { println(it) }
-//            observerStatic(RuntimeEvent.LISTENERS) { println(it) }
-//            observerStatic(RuntimeEvent.LOG.DEBUG) { println(it) }
-//            observerStatic(RuntimeEvent.LOG.INFO) { println(it) }
-//            observerStatic(RuntimeEvent.LOG.WARN) { println(it) }
-//            observerStatic(RuntimeEvent.PROCESS.STDOUT) { println(it) }
-            observerStatic(RuntimeEvent.PROCESS.STDERR) { println(it) }
-//            observerStatic(RuntimeEvent.STATE) { println(it) }
-
-            config {
-                throw IOException()
-            }
-        }.ensureStoppedOnTestCompletion()
+    @Suppress("RedundantSamConstructor")
+    fun givenStartedState_whenFailure_thenStopExecuted() = runTorTest(
+        config = ConfigCallback { throw IOException() }
+    ) { runtime ->
+        val executes = mutableListOf<ActionJob>()
+        val lock = SynchronizedObject()
+        val observer = RuntimeEvent.EXECUTE.ACTION.observer { job ->
+            synchronized(lock) { executes.add(job) }
+        }
+        runtime.subscribe(observer)
 
         suspend fun EnqueuedJob.await() {
             val latch = Job(currentCoroutineContext().job)
@@ -111,12 +94,12 @@ class TorRuntimeUnitTest {
             // Slight delay for StopJob to do its thing
             withContext(Dispatchers.Default) { delay(150.milliseconds) }
 
-            synchronized(lockJob) {
-                assertEquals(3, executeJobs.size)
-                assertEquals(job, executeJobs.first())
+            synchronized(lock) {
+                assertEquals(3, executes.size)
+                assertEquals(job, executes.first())
                 assertEquals(2, invocationFailure)
-                assertEquals(1, executeJobs.count { it is ActionJob.StopJob })
-                executeJobs.clear()
+                assertEquals(1, executes.count { it is ActionJob.StopJob })
+                executes.clear()
             }
 
             // Ensure that cmd queue is unavailable
@@ -124,162 +107,26 @@ class TorRuntimeUnitTest {
                 runtime.executeAsync(TorCmd.Signal.NewNym)
                 fail()
             } catch (e: IllegalStateException) {
-                assertEquals("Tor is stopped or stopping", e.message)
+                assertEquals("Tor is not started", e.message)
             }
         }
     }
 
     @Test
-    fun givenStartedAction_whenCancelledOrInterrupted_thenStops() = runTest(timeout = 120.seconds) {
-        val runtime = TorRuntime.Builder(testEnv("rt_interrupt")) {
-//            observerStatic(RuntimeEvent.EXECUTE.ACTION) { println(it) }
-//            observerStatic(RuntimeEvent.EXECUTE.CMD) { println(it) }
-//            observerStatic(RuntimeEvent.LIFECYCLE) { println(it) }
-//            observerStatic(RuntimeEvent.LISTENERS) { println(it) }
-//            observerStatic(RuntimeEvent.LOG.DEBUG) { println(it) }
-//            observerStatic(RuntimeEvent.LOG.INFO) { println(it) }
-//            observerStatic(RuntimeEvent.LOG.WARN) { println(it) }
-//            observerStatic(RuntimeEvent.PROCESS.STDOUT) { println(it) }
-            observerStatic(RuntimeEvent.PROCESS.STDERR) { println(it) }
-//            observerStatic(RuntimeEvent.STATE) { println(it) }
-        }
+    fun givenRuntime_whenObserveSignalNewNym_thenWorksAsExpected() = runTorTest { runtime ->
+        runtime.startDaemonAsync()
 
-        currentCoroutineContext().job.invokeOnCompletion { runtime.clearObservers() }
-        runtime.ensureStoppedOnTestCompletion()
-
-        var cancellableJob: Job? = null
-        var interruptJob: EnqueuedJob? = null
-
-        suspend fun assertInterrupted() {
-            assertFailsWith<InterruptedException> { runtime.startDaemonAsync() }
-
-            val j = interruptJob!!
-            val latch = Job(currentCoroutineContext().job)
-            j.invokeOnCompletion { latch.complete() }
-            latch.join()
-
-            assertTrue(runtime.state().daemon.isOff)
-        }
-
-        suspend fun assertCancellable() {
-            val j = Job(currentCoroutineContext().job)
-            cancellableJob = j
-            assertFailsWith<CancellationException> {
-                withContext(j) {
-                    runtime.startDaemonAsync()
-                }
-            }
-        }
-
-        run {
-            val observerACTION = RuntimeEvent.EXECUTE.ACTION.observer { job ->
-                if (job.isStop) return@observer
-                cancellableJob?.let {
-                    if (it.isActive) {
-                        it.cancel()
-                        return@observer
-                    }
-                }
-
-                interruptJob = runtime.enqueue(Action.StopDaemon, {}, {})
-            }
-            runtime.subscribe(observerACTION)
-
-            assertInterrupted()
-            assertCancellable()
-
-            runtime.unsubscribe(observerACTION)
-        }
-
-        run {
-            var eventClassName: String? = null
-            var eventName: Lifecycle.Event.Name? = null
-            val observerLCE = RuntimeEvent.LIFECYCLE.observer { event ->
-                if (event.name != eventName) return@observer
-                if (event.className != eventClassName) return@observer
-                cancellableJob?.let {
-                    if (it.isActive) {
-                        it.cancel()
-                        return@observer
-                    }
-                }
-                interruptJob = runtime.enqueue(Action.StopDaemon, {}, {})
-            }
-            runtime.subscribe(observerLCE)
-
-            listOf(
-                "TorDaemon" to Lifecycle.Event.Name.OnStart,
-                "RealTorCtrl" to Lifecycle.Event.Name.OnCreate,
-            ).forEach { (clazz, event) ->
-                eventClassName = clazz
-                eventName = event
-
-                assertInterrupted()
-                assertCancellable()
-            }
-            runtime.unsubscribe(observerLCE)
-        }
-
-        run {
-            var cmdClass: KClass<out TorCmd<*>>? = null
-            val observerCMD = RuntimeEvent.EXECUTE.CMD.observer { job ->
-                if (job.cmd != cmdClass) return@observer
-                cancellableJob?.let {
-                    if (it.isActive) {
-                        it.cancel()
-                        return@observer
-                    }
-                }
-                interruptJob = runtime.enqueue(Action.StopDaemon, {}, {})
-            }
-            runtime.subscribe(observerCMD)
-
-            listOf(
-                TorCmd.Authenticate::class,
-                TorCmd.Ownership.Take::class,
-                TorCmd.Config.Load::class,
-                TorCmd.SetEvents::class,
-                TorCmd.Config.Reset::class,
-            ).forEach { cmd ->
-                cmdClass = cmd
-
-                assertInterrupted()
-                assertCancellable()
-            }
-            runtime.unsubscribe(observerCMD)
-        }
-    }
-
-    @Test
-    fun givenRuntime_whenExecuteCmdObserver_thenWorksAsExpected() = runTest {
-        val runtime = TorRuntime.Builder(testEnv("rt_cmd_observer")) {
-//            observerStatic(RuntimeEvent.EXECUTE.ACTION) { println(it) }
-//            observerStatic(RuntimeEvent.EXECUTE.CMD) { println(it) }
-//            observerStatic(RuntimeEvent.LIFECYCLE) { println(it) }
-//            observerStatic(RuntimeEvent.LISTENERS) { println(it) }
-//            observerStatic(RuntimeEvent.LOG.DEBUG) { println(it) }
-//            observerStatic(RuntimeEvent.LOG.INFO) { println(it) }
-//            observerStatic(RuntimeEvent.LOG.WARN) { println(it) }
-//            observerStatic(RuntimeEvent.PROCESS.STDOUT) { println(it) }
-            observerStatic(RuntimeEvent.PROCESS.STDERR) { println(it) }
-//            observerStatic(RuntimeEvent.STATE) { println(it) }
-        }
-
-        currentCoroutineContext().job.invokeOnCompletion { runtime.clearObservers() }
-        runtime.ensureStoppedOnTestCompletion()
-
-        val lock = SynchronizedObject()
         val notices = mutableListOf<String?>()
-        runtime.observeSignalNewNym(null, null) { limited ->
+        val lock = SynchronizedObject()
+        val disposable = runtime.observeSignalNewNym(null, null) { limited ->
             synchronized(lock) { notices.add(limited) }
         }
 
-        runtime.startDaemonAsync()
-        runtime.executeAsync(TorCmd.Signal.NewNym)
-        runtime.executeAsync(TorCmd.Signal.NewNym)
-        runtime.executeAsync(TorCmd.Signal.NewNym)
-        runtime.executeAsync(TorCmd.Signal.NewNym)
+        repeat(4) { runtime.executeAsync(TorCmd.Signal.NewNym) }
+
         runtime.stopDaemonAsync()
+
+        disposable.dispose()
 
         assertEquals(4, notices.size)
 

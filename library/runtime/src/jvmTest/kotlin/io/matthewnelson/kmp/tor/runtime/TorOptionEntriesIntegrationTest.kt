@@ -16,9 +16,12 @@
 package io.matthewnelson.kmp.tor.runtime
 
 import io.matthewnelson.kmp.process.Process
+import io.matthewnelson.kmp.tor.common.api.ResourceLoader
 import io.matthewnelson.kmp.tor.runtime.core.config.TorOption
-import io.matthewnelson.kmp.tor.runtime.test.TestUtils.testEnv
+import io.matthewnelson.kmp.tor.runtime.internal.TorDaemon
+import io.matthewnelson.kmp.tor.runtime.test.runTorTest
 import kotlin.test.Test
+import kotlin.test.assertIs
 
 /**
  * Simply verifies that all [TorOption.entries] are accounted for by
@@ -28,16 +31,19 @@ import kotlin.test.Test
 class TorOptionEntriesIntegrationTest {
 
     @Test
-    fun givenAllTorOption_whenCheckedAgainstTorCLIListed_thenAreAsExpected() {
-        val paths = testEnv("test_tor_options").torResource.install()
+    fun givenAllTorOption_whenCheckedAgainstTorCLIListed_thenAreAsExpected() = runTorTest { runtime ->
+        val loader = runtime.environment().loader
+        assertIs<ResourceLoader.Tor.Exec>(loader)
 
         val (cliActive, cliDeprecated) = listOf(
             "--list-torrc-options",
             "--list-deprecated-options",
         ).map { cmd ->
-            val out = Process.Builder(paths.tor.toString())
-                .args(cmd)
-                .output { timeoutMillis = 1_000 }
+            val out = loader.process(TorDaemon.torBinder) { tor, configureEnv ->
+                Process.Builder(tor.path)
+                    .args(cmd)
+                    .environment(configureEnv)
+            }.output { timeoutMillis = 3_000 }
 
             if (
                 out.stdout.isEmpty()
@@ -151,7 +157,7 @@ class TorOptionEntriesIntegrationTest {
         }
 
         // No errors. kmp-tor does not need to update TorOption
-        if (sb.isEmpty()) return
+        if (sb.isEmpty()) return@runTorTest
 
         throw AssertionError(sb.toString())
     }

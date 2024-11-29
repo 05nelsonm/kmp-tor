@@ -19,19 +19,16 @@ package io.matthewnelson.kmp.tor.runtime
 
 import io.matthewnelson.encoding.base16.Base16
 import io.matthewnelson.encoding.core.Encoder.Companion.encodeToString
-import io.matthewnelson.immutable.collections.toImmutableMap
 import io.matthewnelson.kmp.file.*
-import io.matthewnelson.kmp.tor.core.api.ResourceInstaller
-import io.matthewnelson.kmp.tor.core.api.ResourceInstaller.Paths
-import io.matthewnelson.kmp.tor.core.api.annotation.ExperimentalKmpTorApi
-import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
-import io.matthewnelson.kmp.tor.core.api.annotation.KmpTorDsl
-import io.matthewnelson.kmp.tor.core.resource.SynchronizedObject
-import io.matthewnelson.kmp.tor.core.resource.synchronized
+import io.matthewnelson.kmp.tor.common.api.ExperimentalKmpTorApi
+import io.matthewnelson.kmp.tor.common.api.InternalKmpTorApi
+import io.matthewnelson.kmp.tor.common.api.KmpTorDsl
+import io.matthewnelson.kmp.tor.common.api.ResourceLoader
+import io.matthewnelson.kmp.tor.common.core.SynchronizedObject
+import io.matthewnelson.kmp.tor.common.core.synchronized
 import io.matthewnelson.kmp.tor.runtime.FileID.Companion.toFIDString
 import io.matthewnelson.kmp.tor.runtime.core.*
 import io.matthewnelson.kmp.tor.runtime.core.config.TorConfig
-import io.matthewnelson.kmp.tor.runtime.core.config.TorOption
 import io.matthewnelson.kmp.tor.runtime.core.ctrl.TorCmd
 import io.matthewnelson.kmp.tor.runtime.core.util.isAvailableAsync
 import io.matthewnelson.kmp.tor.runtime.internal.*
@@ -56,8 +53,7 @@ public sealed interface TorRuntime:
     Action.Processor,
     FileID,
     RuntimeEvent.Processor,
-    TorCmd.Unprivileged.Processor,
-    TorEvent.Processor
+    TorCmd.Unprivileged.Processor
 {
 
     /**
@@ -69,7 +65,7 @@ public sealed interface TorRuntime:
      * Checks if the tor process backing [TorRuntime] (if it is running)
      * has completed starting up.
      *
-     * @see [RuntimeEvent.PROCESS.READY]
+     * @see [RuntimeEvent.READY]
      * */
     public fun isReady(): Boolean
 
@@ -164,9 +160,9 @@ public sealed interface TorRuntime:
          * Any subsequent calls for [TorCmd.SetEvents] during runtime will
          * be intercepted and modified to include all required [TorEvent].
          *
-         * **NOTE:** [TorEvent.CONF_CHANGED] will always present as it is
-         * required for the [TorRuntime] implementation. It does not need to
-         * be added here.
+         * **NOTE:** [TorEvent.CONF_CHANGED] and [TorEvent.NOTICE] will always
+         * be present as it is required for the [TorRuntime] implementation.
+         * They need not be added here.
          * */
         @KmpTorDsl
         public fun required(
@@ -295,11 +291,7 @@ public sealed interface TorRuntime:
         @JvmField
         public val cacheDirectory: File,
         @JvmField
-        public val omitGeoIPFileSettings: Boolean,
-        @JvmField
-        public val torResource: ResourceInstaller<Paths.Tor>,
-        @JvmField
-        public val processEnv: Map<String, String>,
+        public val loader: ResourceLoader.Tor,
 
         private val _defaultExecutor: OnEvent.Executor,
         @OptIn(ExperimentalKmpTorApi::class)
@@ -330,7 +322,8 @@ public sealed interface TorRuntime:
              *
              * [workDirectory] should be specified within your application's home
              * directory (e.g. `$HOME/.my_application/torservice`). This will
-             * be utilized as the tor process' `HOME` environment variable.
+             * be utilized as the tor process' `HOME` environment variable (if using
+             * a [ResourceLoader.Tor.Exec]).
              *
              * [cacheDirectory] should be specified within your application's cache
              * directory (e.g. `$HOME/.my_application/cache/torservice`).
@@ -343,10 +336,10 @@ public sealed interface TorRuntime:
              * **or** [cacheDirectory], that instance will be returned.
              *
              * @param [workDirectory] tor's working directory (e.g. `$HOME/.my_application/torservice`)
-             *   This will be utilized as the tor process' `HOME` environment variable.
+             *   This will be utilized as the tor process' `HOME` environment variable (if using [ResourceLoader.Tor.Exec]).
              * @param [cacheDirectory] tor's cache directory (e.g. `$HOME/.my_application/cache/torservice`).
-             * @param [installer] lambda for creating [ResourceInstaller] using the configured
-             *   [BuilderScope.installationDirectory]. See [kmp-tor-resource](https://github.com/05nelsonm/kmp-tor-resource)
+             * @param [loader] lambda for creating [ResourceLoader.Tor] using the configured
+             *   [BuilderScope.resourceDir]. See [kmp-tor-resource](https://github.com/05nelsonm/kmp-tor-resource)
              * @throws [IllegalArgumentException] when [workDirectory] and [cacheDirectory] are
              *   the same.
              * */
@@ -354,15 +347,16 @@ public sealed interface TorRuntime:
             public fun Builder(
                 workDirectory: File,
                 cacheDirectory: File,
-                installer: (installationDirectory: File) -> ResourceInstaller<Paths.Tor>,
-            ): Environment = BuilderScope.build(workDirectory, cacheDirectory, installer, null)
+                loader: (resourceDir: File) -> ResourceLoader.Tor,
+            ): Environment = BuilderScope.build(workDirectory, cacheDirectory, loader, null)
 
             /**
              * Opener for creating an [Environment] instance.
              *
              * [workDirectory] should be specified within your application's home
              * directory (e.g. `$HOME/.my_application/torservice`). This will
-             * be utilized as the tor process' `HOME` environment variable.
+             * be utilized as the tor process' `HOME` environment variable (if using
+             * a [ResourceLoader.Tor.Exec]).
              *
              * [cacheDirectory] should be specified within your application's cache
              * directory (e.g. `$HOME/.my_application/cache/torservice`).
@@ -375,10 +369,10 @@ public sealed interface TorRuntime:
              * **or** [cacheDirectory], that instance will be returned.
              *
              * @param [workDirectory] tor's working directory (e.g. `$HOME/.my_application/torservice`)
-             *   This will be utilized as the tor process' `HOME` environment variable.
+             *   This will be utilized as the tor process' `HOME` environment variable (if using [ResourceLoader.Tor.Exec]).
              * @param [cacheDirectory] tor's cache directory (e.g. `$HOME/.my_application/cache/torservice`).
-             * @param [installer] lambda for creating [ResourceInstaller] using the configured
-             *   [BuilderScope.installationDirectory]. See [kmp-tor-resource](https://github.com/05nelsonm/kmp-tor-resource)
+             * @param [loader] lambda for creating [ResourceLoader.Tor] using the configured
+             *   [BuilderScope.resourceDir]. See [kmp-tor-resource](https://github.com/05nelsonm/kmp-tor-resource)
              * @param [block] optional lambda for modifying default parameters.
              * @throws [IllegalArgumentException] when [workDirectory] and [cacheDirectory] are
              *   the same.
@@ -387,9 +381,9 @@ public sealed interface TorRuntime:
             public fun Builder(
                 workDirectory: File,
                 cacheDirectory: File,
-                installer: (installationDirectory: File) -> ResourceInstaller<Paths.Tor>,
+                loader: (resourceDir: File) -> ResourceLoader.Tor,
                 block: ThisBlock<BuilderScope>,
-            ): Environment = BuilderScope.build(workDirectory, cacheDirectory, installer, block)
+            ): Environment = BuilderScope.build(workDirectory, cacheDirectory, loader, block)
         }
 
         @KmpTorDsl
@@ -426,45 +420,14 @@ public sealed interface TorRuntime:
             }
 
             /**
-             * If true, [TorOption.GeoIPFile] and [TorOption.GeoIPv6File] will **not**
-             * be automatically added via [TorRuntime.BuilderScope.config] using paths
-             * returned from [ResourceInstaller.install].
-             *
-             * This is useful if an alternative installation of tor is being used from
-             * [kmp-tor-resource](https://github.com/05nelsonm/kmp-tor-resource).
-             *
-             * Default: `false`
-             * */
-            @JvmField
-            public var omitGeoIPFileSettings: Boolean = false
-
-            /**
-             * The directory for which **all** resources will be installed.
+             * The directory for which [ResourceLoader.Tor] will be created with. This
+             * is a convenience function, as only a single instance of [ResourceLoader.Tor]
+             * can ever be created per application process.
              *
              * Default: [workDirectory]
-             *
-             * **NOTE:** If the same [installationDirectory] is defined for
-             * multiple [Environment] instances, the same [ResourceInstaller]
-             * instance will be utilized across those [Environment]. This helps
-             * mitigate unnecessary resource extraction when running multiple
-             * instances of [TorRuntime].
              * */
             @JvmField
-            public var installationDirectory: File = workDirectory
-
-            /**
-             * Customization of environment variables for the tor process.
-             *
-             * **NOTE:** The `HOME` environment variable is **always** set to [workDirectory].
-             * */
-            @JvmField
-            @ExperimentalKmpTorApi
-            public val processEnv: LinkedHashMap<String, String> = LinkedHashMap(1, 1.0F)
-
-            init {
-                @OptIn(ExperimentalKmpTorApi::class)
-                processEnv["HOME"] = workDirectory.path
-            }
+            public var resourceDir: File = workDirectory
 
             /**
              * Experimental support for running tor as a service. Currently
@@ -484,7 +447,7 @@ public sealed interface TorRuntime:
                 internal fun build(
                     workDirectory: File,
                     cacheDirectory: File,
-                    installer: (installationDirectory: File) -> ResourceInstaller<Paths.Tor>,
+                    loader: (resourceDir: File) -> ResourceLoader.Tor,
                     block: ThisBlock<BuilderScope>?,
                 ): Environment {
                     val b = BuilderScope(workDirectory.absoluteFile.normalize(), cacheDirectory.absoluteFile.normalize())
@@ -500,34 +463,29 @@ public sealed interface TorRuntime:
                     // Clear loader reference from builder so if the builder
                     // reference was held outside block lambda it will always
                     // be null.
-                    val loader = b.serviceFactoryLoader
+                    val serviceLoader = b.serviceFactoryLoader
                     b.serviceFactoryLoader = null
 
-                    var torResource = installer(b.installationDirectory.absoluteFile.normalize())
+                    val resourceLoader = loader(b.resourceDir.absoluteFile.normalize())
 
                     val key = EnvironmentKey(b.workDirectory, b.cacheDirectory)
 
-                    return getOrCreateInstance(key = key, block = { instances ->
-
-                        for (other in instances) {
-                            val otherTorResource = other.second.torResource
-                            if (otherTorResource.installationDir == torResource.installationDir) {
-                                torResource = otherTorResource
-                                break
+                    return getOrCreateInstance(key = key, block = block@ { existing ->
+                        // If Environment already exists for NoExec, return
+                        // that instance. Multi-Instance support is only available
+                        // for Exec (process creation).
+                        if (resourceLoader is ResourceLoader.Tor.NoExec) {
+                            if (existing.isNotEmpty()) {
+                                return@block existing.first().second
                             }
                         }
-
-                        // Always reset, just in case it was overridden
-                        b.processEnv["HOME"] = b.workDirectory.path
 
                         Environment(
                             workDirectory = b.workDirectory,
                             cacheDirectory = b.cacheDirectory,
-                            omitGeoIPFileSettings = b.omitGeoIPFileSettings,
-                            torResource = torResource,
-                            processEnv = b.processEnv.toImmutableMap(),
+                            loader = resourceLoader,
                             _defaultExecutor = b.defaultEventExecutor,
-                            _serviceFactoryLoader = loader,
+                            _serviceFactoryLoader = serviceLoader,
                         )
                     })
                 }

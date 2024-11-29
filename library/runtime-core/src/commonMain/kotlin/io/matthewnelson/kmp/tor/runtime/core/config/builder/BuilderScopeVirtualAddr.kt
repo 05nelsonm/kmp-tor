@@ -17,7 +17,7 @@
 
 package io.matthewnelson.kmp.tor.runtime.core.config.builder
 
-import io.matthewnelson.kmp.tor.core.api.annotation.KmpTorDsl
+import io.matthewnelson.kmp.tor.common.api.KmpTorDsl
 import io.matthewnelson.kmp.tor.runtime.core.net.IPAddress
 import io.matthewnelson.kmp.tor.runtime.core.net.IPAddress.Companion.toIPAddress
 import io.matthewnelson.kmp.tor.runtime.core.config.TorOption

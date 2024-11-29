@@ -19,10 +19,10 @@ package io.matthewnelson.kmp.tor.runtime.internal
 
 import io.matthewnelson.immutable.collections.toImmutableSet
 import io.matthewnelson.kmp.file.InterruptedException
-import io.matthewnelson.kmp.tor.core.api.annotation.ExperimentalKmpTorApi
-import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
-import io.matthewnelson.kmp.tor.core.resource.SynchronizedObject
-import io.matthewnelson.kmp.tor.core.resource.synchronized
+import io.matthewnelson.kmp.tor.common.api.ExperimentalKmpTorApi
+import io.matthewnelson.kmp.tor.common.api.InternalKmpTorApi
+import io.matthewnelson.kmp.tor.common.core.SynchronizedObject
+import io.matthewnelson.kmp.tor.common.core.synchronized
 import io.matthewnelson.kmp.tor.runtime.*
 import io.matthewnelson.kmp.tor.runtime.FileID.Companion.fidEllipses
 import io.matthewnelson.kmp.tor.runtime.FileID.Companion.toFIDString
@@ -45,12 +45,12 @@ import io.matthewnelson.kmp.tor.runtime.ctrl.TorCmdInterceptor
 import io.matthewnelson.kmp.tor.runtime.ctrl.TorCtrl
 import io.matthewnelson.kmp.tor.runtime.internal.observer.ObserverConfChanged
 import io.matthewnelson.kmp.tor.runtime.internal.observer.ObserverConnectivity
-import io.matthewnelson.kmp.tor.runtime.internal.observer.ObserverProcessStdout
-import io.matthewnelson.kmp.tor.runtime.internal.process.TorDaemon
+import io.matthewnelson.kmp.tor.runtime.internal.observer.ObserverNotice
 import kotlinx.coroutines.*
 import kotlin.concurrent.Volatile
 import kotlin.coroutines.cancellation.CancellationException
 import kotlin.jvm.JvmSynthetic
+import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.TimeSource
 
@@ -85,8 +85,9 @@ internal class RealTorRuntime private constructor(
 
     private val destroyedErrMsg by lazy { "$this.isDestroyed[true]" }
 
-    private val requiredTorEvents = LinkedHashSet<TorEvent>(2 + requiredTorEvents.size, 1.0f).apply {
+    private val requiredTorEvents = LinkedHashSet<TorEvent>(3 + requiredTorEvents.size, 1.0f).apply {
         add(TorEvent.CONF_CHANGED)
+        add(TorEvent.NOTICE)
         addAll(requiredTorEvents)
     }.toImmutableSet()
 
@@ -102,15 +103,21 @@ internal class RealTorRuntime private constructor(
 
     private val manager = StateManager(scope)
 
-    private val NOTIFIER = Notifier(manager)
+    private val NOTIFIER = object : Notifier {
+        override fun <Data : Any, E : RuntimeEvent<Data>> notify(event: E, data: Data) {
+            event.notifyObservers(data)
+        }
+    }
 
     private val factory = TorCtrl.Factory(
         staticTag = generator.environment.staticTag(),
         observers = TorEvent.entries().let { events ->
             val tag = generator.environment.staticTag()
+
             events.mapTo(LinkedHashSet(events.size, 1.0f)) { event ->
                 when (event) {
                     is TorEvent.CONF_CHANGED -> ConfChangedObserver(manager)
+                    is TorEvent.NOTICE -> NoticeObserver(manager)
                     else -> event.observer(tag) { event.notifyObservers(it) }
                 }
             }
@@ -720,31 +727,18 @@ internal class RealTorRuntime private constructor(
         public override fun toString(): String = this.toFIDString(includeHashCode = isService)
     }
 
-    private inner class Notifier(
-        private val manager: TorListeners.Manager
-    ): RuntimeEvent.Notifier {
-
-        private val processStdout = ProcessStdoutObserver()
-
-        public override fun <Data : Any, E : RuntimeEvent<Data>> notify(event: E, data: Data) {
-            if (event is PROCESS.STDOUT && data is String) {
-                processStdout.notify(data)
-            } else {
-                event.notifyObservers(data)
-            }
-        }
-
-        private inner class ProcessStdoutObserver: ObserverProcessStdout(manager) {
-            public override fun notify(line: String) {
-                super.notify(line)
-                PROCESS.STDOUT.notifyObservers(line)
-            }
-        }
-    }
-
     private inner class ConfChangedObserver(
         manager: TorListeners.Manager,
     ): ObserverConfChanged(manager, generator.environment.staticTag()) {
+        protected override fun notify(data: String) {
+            super.notify(data)
+            event.notifyObservers(data)
+        }
+    }
+
+    private inner class NoticeObserver(
+        manager: TorListeners.Manager,
+    ): ObserverNotice(manager, generator.environment.staticTag()) {
         protected override fun notify(data: String) {
             super.notify(data)
             event.notifyObservers(data)
@@ -764,7 +758,7 @@ internal class RealTorRuntime private constructor(
             STATE.notifyObservers(state)
         }
         protected override fun notifyReady() {
-            PROCESS.READY.notifyObservers(isReadyString)
+            READY.notifyObservers(isReadyString)
         }
     }
 
@@ -962,7 +956,6 @@ internal class RealTorRuntime private constructor(
                     // library will not wait an actual timeout. Make it so
                     // there's a delay no matter what.
                     val interval = 100.milliseconds
-                    val timeout = 1_000.milliseconds
 
                     while (isActive) {
                         if (_failure != null) break
@@ -970,7 +963,7 @@ internal class RealTorRuntime private constructor(
                         delay(interval)
                         if (_failure != null) break
                         if (_instance != null) break
-                        if (mark.elapsedNow() < timeout) continue
+                        if (mark.elapsedNow() < TIMEOUT_START_SERVICE) continue
                         _failure = InterruptedException("${name.name} timed out after 1000ms")
                     }
                 }
@@ -1049,7 +1042,7 @@ internal class RealTorRuntime private constructor(
                         is LIFECYCLE -> event.observer(tag) { event.notifyObservers(it) }
                         is LISTENERS -> event.observer(tag) { event.notifyObservers(it) }
                         is LOG -> event.observer(tag) { event.notifyObservers(it) }
-                        is PROCESS -> event.observer(tag) { event.notifyObservers(it) }
+                        is READY -> event.observer(tag) { event.notifyObservers(it) }
                         is STATE -> event.observer(tag) { event.notifyObservers(it) }
                     }
                 }.toImmutableSet()
@@ -1179,6 +1172,8 @@ internal class RealTorRuntime private constructor(
     }
 
     internal companion object {
+
+        internal val TIMEOUT_START_SERVICE: Duration = 1_000.milliseconds
 
         @JvmSynthetic
         @Suppress("RemoveRedundantQualifierName")

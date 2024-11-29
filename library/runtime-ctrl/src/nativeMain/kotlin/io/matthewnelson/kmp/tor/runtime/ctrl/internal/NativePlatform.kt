@@ -24,11 +24,12 @@ import io.matthewnelson.kmp.tor.runtime.core.net.IPSocketAddress
 import io.matthewnelson.kmp.tor.runtime.ctrl.TorCtrl
 import kotlinx.cinterop.*
 import kotlinx.coroutines.CloseableCoroutineDispatcher
+import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.newFixedThreadPoolContext
 import platform.posix.*
 
-@OptIn(ExperimentalCoroutinesApi::class)
+@OptIn(DelicateCoroutinesApi::class, ExperimentalCoroutinesApi::class)
 internal actual fun TorCtrl.Factory.newTorCtrlDispatcher(): CloseableCoroutineDispatcher {
     return newFixedThreadPoolContext(2, "TorCtrl")
 }

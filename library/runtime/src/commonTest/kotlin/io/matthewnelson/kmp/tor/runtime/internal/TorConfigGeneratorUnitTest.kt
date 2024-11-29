@@ -15,11 +15,8 @@
  **/
 package io.matthewnelson.kmp.tor.runtime.internal
 
-import io.matthewnelson.kmp.file.File
 import io.matthewnelson.kmp.file.path
 import io.matthewnelson.kmp.file.resolve
-import io.matthewnelson.kmp.tor.core.api.ResourceInstaller
-import io.matthewnelson.kmp.tor.core.api.ResourceInstaller.Paths
 import io.matthewnelson.kmp.tor.runtime.ConfigCallback
 import io.matthewnelson.kmp.tor.runtime.RuntimeEvent
 import io.matthewnelson.kmp.tor.runtime.TorRuntime
@@ -29,8 +26,7 @@ import io.matthewnelson.kmp.tor.runtime.core.net.Port.Ephemeral.Companion.toPort
 import io.matthewnelson.kmp.tor.runtime.core.config.TorConfig
 import io.matthewnelson.kmp.tor.runtime.core.config.TorOption
 import io.matthewnelson.kmp.tor.runtime.core.config.TorSetting.Companion.filterByOption
-import io.matthewnelson.kmp.tor.runtime.test.TestUtils.testEnv
-import kotlinx.coroutines.test.runTest
+import io.matthewnelson.kmp.tor.runtime.test.runTorTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNull
@@ -38,42 +34,15 @@ import kotlin.test.assertTrue
 
 class TorConfigGeneratorUnitTest {
 
-    private fun installer(installationDir: File) = object : ResourceInstaller<Paths.Tor>(installationDir) {
-        private val paths = Paths.Tor(
-            geoip = installationDir.resolve("geoip"),
-            geoip6 = installationDir.resolve("geoip6"),
-            tor = installationDir.resolve("tor")
-        )
-
-        override fun install(): Paths.Tor = paths
-    }
-
-    private val environment = testEnv("config_test", ::installer)
-
     private val notifier = object : RuntimeEvent.Notifier {
         override fun <Data: Any, E: RuntimeEvent<Data>> notify(event: E, data: Data) {}
     }
 
     @Test
-    fun givenGeoipOmission_whenGenerate_thenDoesNotContainSettings() = runTest {
-        val environment = testEnv("config_test_omit_geoip", ::installer) { omitGeoIPFileSettings = true }
-        val settings = newGenerator(environment).generate(notifier).first.settings
-        assertEquals(0, settings.filterByOption<TorOption.GeoIPFile>().size)
-        assertEquals(0, settings.filterByOption<TorOption.GeoIPv6File>().size)
-    }
-
-    @Test
-    fun givenGeoipNoOmission_whenGenerate_thenContainsSettings() = runTest {
-        with(newGenerator().generate(notifier).first) {
-            assertContains(TorOption.GeoIPFile)
-            assertContains(TorOption.GeoIPv6File)
-        }
-    }
-
-    @Test
-    fun givenMultipleUserConfigs_whenGenerate_thenAllAreApplied() = runTest {
+    fun givenMultipleUserConfigs_whenGenerate_thenAllAreApplied() = runTorTest { runtime ->
         var invocations = 0
         newGenerator(
+            runtime.environment(),
             config = setOf(
                 ConfigCallback { _ -> invocations++ },
                 ConfigCallback { _ -> invocations++ },
@@ -84,8 +53,8 @@ class TorConfigGeneratorUnitTest {
     }
 
     @Test
-    fun givenNoConfig_whenGenerate_thenMinimumSettingsApplied() = runTest {
-        with(newGenerator().generate(notifier).first) {
+    fun givenNoConfig_whenGenerate_thenMinimumSettingsApplied() = runTorTest { runtime ->
+        with(newGenerator(runtime.environment()).generate(notifier)) {
             assertContains(TorOption.DataDirectory)
             assertContains(TorOption.CacheDirectory)
             assertContains(TorOption.ControlPortWriteToFile)
@@ -100,16 +69,17 @@ class TorConfigGeneratorUnitTest {
     }
 
     @Test
-    fun givenUnavailablePort_whenGenerate_thenPortRemovedAndReplaced() = runTest {
+    fun givenUnavailablePort_whenGenerate_thenPortRemovedAndReplaced() = runTorTest { runtime ->
         // socks port at 9050 is automatically added
         val config = newGenerator(
+            environment = runtime.environment(),
             config = setOf(
                 ConfigCallback {
                     TorOption.__DNSPort.configure { port(1080.toPortEphemeral()) }
                 }
             ),
             isPortAvailable = { _, _ -> false }
-        ).generate(notifier).first
+        ).generate(notifier)
 
         val socks = config.filterByOption<TorOption.__SocksPort>().first()
         assertEquals("auto", socks.items.first().argument)
@@ -118,24 +88,26 @@ class TorConfigGeneratorUnitTest {
     }
 
     @Test
-    fun givenCookieAuthenticationEnabled_whenNoCookieAuthFile_thenAddsDefault() = runTest {
+    fun givenCookieAuthenticationEnabled_whenNoCookieAuthFile_thenAddsDefault() = runTorTest { runtime ->
         val config = newGenerator(
+            environment = runtime.environment(),
             config = setOf(
                 ConfigCallback {
                     TorOption.CookieAuthentication.configure(true)
                 }
             )
-        ).generate(notifier).first
+        ).generate(notifier)
 
         config.assertContains(TorOption.CookieAuthFile)
     }
 
     @Test
-    fun givenCookieAuthenticationEnabled_whenCookieAuthFile_thenDoesNotModify() = runTest {
-        val expected = environment.workDirectory.resolve("data")
+    fun givenCookieAuthenticationEnabled_whenCookieAuthFile_thenDoesNotModify() = runTorTest { runtime ->
+        val expected = runtime.environment().workDirectory.resolve("data")
             .resolve("control_auth_cookie_something")
 
         val setting = newGenerator(
+            environment = runtime.environment(),
             config = setOf(
                 ConfigCallback {
                     TorOption.CookieAuthentication.configure(true)
@@ -143,7 +115,6 @@ class TorConfigGeneratorUnitTest {
                 }
             )
         ).generate(notifier)
-            .first
             .filterByOption<TorOption.CookieAuthFile>()
             .first()
 
@@ -151,11 +122,12 @@ class TorConfigGeneratorUnitTest {
     }
 
     @Test
-    fun givenCookieAuthenticationDisabled_whenCookieAuthFile_thenRemoves() = runTest {
-        val expected = environment.workDirectory.resolve("data")
+    fun givenCookieAuthenticationDisabled_whenCookieAuthFile_thenRemoves() = runTorTest { runtime ->
+        val expected = runtime.environment().workDirectory.resolve("data")
             .resolve("control_auth_cookie_something")
 
         val setting = newGenerator(
+            environment = runtime.environment(),
             config = setOf(
                 ConfigCallback {
                     TorOption.CookieAuthentication.configure(false)
@@ -163,7 +135,6 @@ class TorConfigGeneratorUnitTest {
                 }
             )
         ).generate(notifier)
-            .first
             .filterByOption<TorOption.CookieAuthFile>()
             .firstOrNull()
 
@@ -171,27 +142,27 @@ class TorConfigGeneratorUnitTest {
     }
 
     @Test
-    fun givenAuthentication_whenNothingDeclared_thenAddsCookieAuthenticationDefaults() = runTest {
-        val config = newGenerator().generate(notifier).first
+    fun givenAuthentication_whenNothingDeclared_thenAddsCookieAuthenticationDefaults() = runTorTest { runtime ->
+        val config = newGenerator(runtime.environment()).generate(notifier)
 
         config.assertContains(TorOption.CookieAuthentication)
         config.assertContains(TorOption.CookieAuthFile)
     }
 
     @Test
-    fun givenAuthCookieFile_whenNoCookieAuthentication_thenEnablesIt() = runTest {
+    fun givenAuthCookieFile_whenNoCookieAuthentication_thenEnablesIt() = runTorTest { runtime ->
         val setting = newGenerator(
+            environment = runtime.environment(),
             config = setOf(
                 ConfigCallback {
                     TorOption.CookieAuthFile.configure(file =
-                        environment.workDirectory
+                        runtime.environment().workDirectory
                             .resolve("data")
                             .resolve("control_auth_cookie")
                     )
                 }
             )
         ).generate(notifier)
-            .first
             .filterByOption<TorOption.CookieAuthentication>()
             .first()
             .items
@@ -207,12 +178,12 @@ class TorConfigGeneratorUnitTest {
     }
 
     private fun newGenerator(
-        environment: TorRuntime.Environment = this.environment,
+        environment: TorRuntime.Environment,
         config: Set<ConfigCallback> = emptySet(),
         isPortAvailable: suspend (LocalHost, Port) -> Boolean = { _, _ -> true },
     ): TorConfigGenerator = TorConfigGenerator(
         environment,
         config,
-        isPortAvailable
+        isPortAvailable,
     )
 }

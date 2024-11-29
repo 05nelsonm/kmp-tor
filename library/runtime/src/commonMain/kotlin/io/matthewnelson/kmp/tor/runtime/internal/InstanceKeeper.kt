@@ -16,9 +16,9 @@
 package io.matthewnelson.kmp.tor.runtime.internal
 
 import io.matthewnelson.immutable.collections.toImmutableList
-import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
-import io.matthewnelson.kmp.tor.core.resource.SynchronizedObject
-import io.matthewnelson.kmp.tor.core.resource.synchronized
+import io.matthewnelson.kmp.tor.common.api.InternalKmpTorApi
+import io.matthewnelson.kmp.tor.common.core.SynchronizedObject
+import io.matthewnelson.kmp.tor.common.core.synchronized
 
 @OptIn(InternalKmpTorApi::class)
 internal abstract class InstanceKeeper<K: Any, V: Any> internal constructor(initialCapacity: Int = 1) {
@@ -42,7 +42,9 @@ internal abstract class InstanceKeeper<K: Any, V: Any> internal constructor(init
         if (instance == null) {
             val others = instances.toImmutableList()
             val i = block(others)
-            instances.add(key to i)
+            if (others.find { it.second == i } == null) {
+                instances.add(key to i)
+            }
             instance = i
         }
 

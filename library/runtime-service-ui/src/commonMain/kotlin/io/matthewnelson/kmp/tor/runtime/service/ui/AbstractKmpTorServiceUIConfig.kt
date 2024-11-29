@@ -15,7 +15,7 @@
  **/
 package io.matthewnelson.kmp.tor.runtime.service.ui
 
-import io.matthewnelson.kmp.tor.core.api.annotation.ExperimentalKmpTorApi
+import io.matthewnelson.kmp.tor.common.api.ExperimentalKmpTorApi
 import io.matthewnelson.kmp.tor.runtime.service.AbstractTorServiceUI
 import kotlin.jvm.JvmField
 import kotlin.jvm.JvmSynthetic

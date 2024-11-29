@@ -16,7 +16,7 @@
 package io.matthewnelson.kmp.tor.runtime.core
 
 import io.matthewnelson.immutable.collections.toImmutableSet
-import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
+import io.matthewnelson.kmp.tor.common.api.InternalKmpTorApi
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext

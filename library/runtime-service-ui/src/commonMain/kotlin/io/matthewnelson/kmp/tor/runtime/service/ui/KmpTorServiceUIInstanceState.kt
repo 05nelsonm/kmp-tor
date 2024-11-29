@@ -16,7 +16,7 @@
 package io.matthewnelson.kmp.tor.runtime.service.ui
 
 import io.matthewnelson.immutable.collections.immutableSetOf
-import io.matthewnelson.kmp.tor.core.api.annotation.ExperimentalKmpTorApi
+import io.matthewnelson.kmp.tor.common.api.ExperimentalKmpTorApi
 import io.matthewnelson.kmp.tor.runtime.Action
 import io.matthewnelson.kmp.tor.runtime.RuntimeEvent
 import io.matthewnelson.kmp.tor.runtime.TorState
@@ -243,7 +243,7 @@ public class KmpTorServiceUIInstanceState<C: AbstractKmpTorServiceUIConfig> priv
             }
         }
 
-        val oREADY = RuntimeEvent.PROCESS.READY.observer(tag, executor) {
+        val oREADY = RuntimeEvent.READY.observer(tag, executor) {
             stateLock.withLock {
                 newNymObserver?.dispose()
                 newNymObserver = observeSignalNewNym(tag, executor) { line ->

@@ -22,9 +22,9 @@ import io.matthewnelson.encoding.base32.Base32
 import io.matthewnelson.encoding.base32.Base32Default
 import io.matthewnelson.encoding.base64.Base64
 import io.matthewnelson.encoding.core.Encoder.Companion.encodeToString
-import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
-import io.matthewnelson.kmp.tor.core.resource.SynchronizedObject
-import io.matthewnelson.kmp.tor.core.resource.synchronized
+import io.matthewnelson.kmp.tor.common.api.InternalKmpTorApi
+import io.matthewnelson.kmp.tor.common.core.SynchronizedObject
+import io.matthewnelson.kmp.tor.common.core.synchronized
 import io.matthewnelson.kmp.tor.runtime.core.Destroyable
 import io.matthewnelson.kmp.tor.runtime.core.Destroyable.Companion.destroyedException
 import kotlin.concurrent.Volatile

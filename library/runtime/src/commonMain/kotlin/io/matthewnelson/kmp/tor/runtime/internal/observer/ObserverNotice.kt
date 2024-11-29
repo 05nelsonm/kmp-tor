@@ -17,17 +17,21 @@ package io.matthewnelson.kmp.tor.runtime.internal.observer
 
 import io.matthewnelson.kmp.tor.runtime.TorListeners
 import io.matthewnelson.kmp.tor.runtime.TorState
+import io.matthewnelson.kmp.tor.runtime.core.OnEvent
+import io.matthewnelson.kmp.tor.runtime.core.TorEvent
 
-internal open class ObserverProcessStdout internal constructor(
+internal open class ObserverNotice internal constructor(
     private val manager: TorListeners.Manager,
+    staticTag: String,
+): TorEvent.Observer(
+    TorEvent.NOTICE,
+    staticTag,
+    OnEvent.Executor.Immediate,
+    OnEvent.noOp()
 ) {
 
-    protected open fun notify(line: String) {
-        val notice = line
-            .substringAfter(NOTICE, "")
-            .ifBlank { return }
-
-        with(notice) {
+    protected override fun notify(data: String) {
+        with(data) {
             when {
                 startsWith(BOOTSTRAPPED) -> parseBootstrapped()
                 startsWith(CLOSING) -> parseListenerClosing()
@@ -36,7 +40,7 @@ internal open class ObserverProcessStdout internal constructor(
         }
     }
 
-    // [notice] Bootstrapped 0%
+    // Bootstrapped 0%
     private fun String.parseBootstrapped() {
         val pct = substringAfter(BOOTSTRAPPED, "")
             .substringBefore('%', "")
@@ -46,14 +50,14 @@ internal open class ObserverProcessStdout internal constructor(
         manager.update(TorState.Daemon.On(pct))
     }
 
-    // [notice] Closing no-longer-configured DNS listener on 127.0.0.1:53085
-    // [notice] Closing no-longer-configured HTTP tunnel listener on 127.0.0.1:48932
-    // [notice] Closing no-longer-configured Socks listener on 127.0.0.1:9150
-    // [notice] Closing no-longer-configured Transparent pf/netfilter listener on 127.0.0.1:45963
-    // [notice] Closing partially-constructed Socks listener connection (ready) on /tmp/kmp_tor_test/obs_conn_no_net/work/socks5.sock
+    // Closing no-longer-configured DNS listener on 127.0.0.1:53085
+    // Closing no-longer-configured HTTP tunnel listener on 127.0.0.1:48932
+    // Closing no-longer-configured Socks listener on 127.0.0.1:9150
+    // Closing no-longer-configured Transparent pf/netfilter listener on 127.0.0.1:45963
+    // Closing partially-constructed Socks listener connection (ready) on /tmp/kmp_tor_test/obs_conn_no_net/work/socks5.sock
     //
     // UnixDomainSocket
-    // [notice] Closing no-longer-configured Socks listener on ???:0
+    // Closing no-longer-configured Socks listener on ???:0
     private fun String.parseListenerClosing() {
         val trimmed = substringAfter(CLOSING, "")
             .substringAfter(' ', "")
@@ -71,16 +75,16 @@ internal open class ObserverProcessStdout internal constructor(
         manager.update(type, address, wasClosed = true)
     }
 
-    // [notice] Opened DNS listener connection (ready) on 127.0.0.1:34841
-    // [notice] Opened HTTP tunnel listener connection (ready) on 127.0.0.1:46779
-    // [notice] Opened Socks listener connection (ready) on 127.0.0.1:36237
-    // [notice] Opened Socks listener connection (ready) on /tmp/kmp_tor_test/sf_restart/work/socks.sock
-    // [notice] Opened Transparent pf/netfilter listener connection (ready) on 127.0.0.1:37527
-    // [notice] Opened Transparent natd listener connection (ready) on 127.0.0.1:9060
-    // [notice] Opened Metrics listener connection (ready) on 127.0.0.1:9059
-    // [notice] Opened OR listener connection (ready) on 0.0.0.0:9061
-    // [notice] Opened Extended OR listener connection (ready) on 127.0.0.1:9058
-    // [notice] Opened Directory listener connection (ready) on 0.0.0.0:9057
+    // Opened DNS listener connection (ready) on 127.0.0.1:34841
+    // Opened HTTP tunnel listener connection (ready) on 127.0.0.1:46779
+    // Opened Socks listener connection (ready) on 127.0.0.1:36237
+    // Opened Socks listener connection (ready) on /tmp/kmp_tor_test/sf_restart/work/socks.sock
+    // Opened Transparent pf/netfilter listener connection (ready) on 127.0.0.1:37527
+    // Opened Transparent natd listener connection (ready) on 127.0.0.1:9060
+    // Opened Metrics listener connection (ready) on 127.0.0.1:9059
+    // Opened OR listener connection (ready) on 0.0.0.0:9061
+    // Opened Extended OR listener connection (ready) on 127.0.0.1:9058
+    // Opened Directory listener connection (ready) on 0.0.0.0:9057
     private fun String.parseListenerOpened() {
         val iOpened = indexOf(OPENED)
         val iReady = indexOf(CONN_READY_ON)
@@ -93,8 +97,6 @@ internal open class ObserverProcessStdout internal constructor(
     }
 
     private companion object {
-        private const val NOTICE = " [notice] "
-
         private const val BOOTSTRAPPED = "Bootstrapped "
 
         private const val CLOSING = "Closing "

@@ -22,9 +22,7 @@ import io.matthewnelson.kmp.tor.runtime.core.ctrl.Reply
 import io.matthewnelson.kmp.tor.runtime.core.ctrl.TorCmd
 import io.matthewnelson.kmp.tor.runtime.internal.observer.newTorCmdObserver
 import io.matthewnelson.kmp.tor.runtime.internal.observer.observeSignalNewNymInternal
-import io.matthewnelson.kmp.tor.runtime.internal.process.TorDaemon
 import kotlin.jvm.JvmStatic
-import kotlin.jvm.JvmSynthetic
 
 /**
  * Events specific to [TorRuntime]
@@ -230,7 +228,7 @@ public sealed class RuntimeEvent<Data: Any> private constructor(
      * be notified with [TorListeners] whereby [TorListeners.isEmpty] is
      * true (all listeners are closed or closing).
      *
-     * e.g. (println observers for events [STATE], [LISTENERS], [PROCESS.READY])
+     * e.g. (println observers for events [STATE], [LISTENERS], [READY])
      *
      *     TorState[fid=6E96…6985, daemon=On{95%}, network=Enabled]
      *     TorState[fid=6E96…6985, daemon=On{100%}, network=Enabled]
@@ -294,120 +292,97 @@ public sealed class RuntimeEvent<Data: Any> private constructor(
     }
 
     /**
-     * Events pertaining to the tor process.
+     * Indicates that tor has completed bootstrapping and the network is enabled.
+     * All [READY] observers will be notified a **single** time per runtime startup
+     * completion. If the currently running tor instance is stopped via [Action.StopDaemon]
+     * or [Action.RestartDaemon], [READY] observers will be notified again
+     * in the same manner when the next start completion occurs.
      *
-     * Observers are notified with single line output for **all**
-     * [PROCESS] events, even [STDOUT] and [STDERR]. On Jvm & Native,
-     * [kmp-process](https://github.com/05nelsonm/kmp-process) dispatches
-     * lines on its own separate background threads; 1 for [STDOUT], 1
-     * for [STDERR].
+     * This is useful for triggering single execution events.
+     *
+     * **NOTE:** Toggling DisableNetwork on/off does **not** affect this. A
+     * single notification will be dispatched the first time bootstrapping
+     * completes and network is enabled.
+     *
+     * e.g. (println observers for events [STATE], [LISTENERS], [READY])
+     *
+     *     TorState[fid=6E96…6985, daemon=Starting, network=Disabled]
+     *     TorState[fid=6E96…6985, daemon=On{0%}, network=Disabled]
+     *     TorState[fid=6E96…6985, daemon=On{0%}, network=Enabled]
+     *     TorState[fid=6E96…6985, daemon=On{5%}, network=Enabled]
+     *     TorState[fid=6E96…6985, daemon=On{10%}, network=Enabled]
+     *     TorState[fid=6E96…6985, daemon=On{14%}, network=Enabled]
+     *     TorState[fid=6E96…6985, daemon=On{15%}, network=Enabled]
+     *     TorState[fid=6E96…6985, daemon=On{75%}, network=Enabled]
+     *     TorState[fid=6E96…6985, daemon=On{90%}, network=Enabled]
+     *     TorState[fid=6E96…6985, daemon=On{95%}, network=Enabled]
+     *     TorState[fid=6E96…6985, daemon=On{100%}, network=Enabled]
+     *     TorListeners[fid=6E96…6985]: [
+     *         dir: []
+     *         dns: []
+     *         http: []
+     *         metrics: []
+     *         natd: []
+     *         or: []
+     *         orExt: []
+     *         socks: [
+     *             127.0.0.1:35607
+     *         ]
+     *         socksUnix: []
+     *         trans: []
+     *     ]
+     *     Tor[fid=6E96…6985] IS READY
+     *     TorState[fid=6E96…6985, daemon=On{100%}, network=Disabled]
+     *     TorListeners[fid=6E96…6985]: [
+     *         dir: []
+     *         dns: []
+     *         http: []
+     *         metrics: []
+     *         natd: []
+     *         or: []
+     *         orExt: []
+     *         socks: []
+     *         socksUnix: []
+     *         trans: []
+     *     ]
+     *     TorState[fid=6E96…6985, daemon=On{100%}, network=Enabled]
+     *     TorListeners[fid=6E96…6985]: [
+     *         dir: []
+     *         dns: []
+     *         http: []
+     *         metrics: []
+     *         natd: []
+     *         or: []
+     *         orExt: []
+     *         socks: [
+     *             127.0.0.1:38255
+     *         ]
+     *         socksUnix: []
+     *         trans: []
+     *     ]
+     *     TorState[fid=6E96…6985, daemon=Stopping, network=Enabled]
+     *     TorListeners[fid=6E96…6985]: [
+     *         dir: []
+     *         dns: []
+     *         http: []
+     *         metrics: []
+     *         natd: []
+     *         or: []
+     *         orExt: []
+     *         socks: []
+     *         socksUnix: []
+     *         trans: []
+     *     ]
+     *     TorState[fid=6E96…6985, daemon=Off, network=Disabled]
+     *
+     * @see [TorRuntime.isReady]
      * */
-    public sealed class PROCESS private constructor(name: String): RuntimeEvent<String>(name) {
-
-        /**
-         * Indicates that the tor process has completed bootstrapping and
-         * the network is enabled. All [READY] observers will be notified
-         * a **single** time per process startup completion. If the currently
-         * running process is stopped via [Action.StopDaemon] or
-         * [Action.RestartDaemon], [READY] observers will be notified again
-         * in the same manner when the next process start completion occurs.
-         *
-         * This is useful for triggering single execution events.
-         *
-         * **NOTE:** Toggling DisableNetwork on/off does **not** affect this. A
-         * single notification will be dispatched the first time bootstrapping
-         * completes and network is enabled.
-         *
-         * e.g. (println observers for events [STATE], [LISTENERS], [PROCESS.READY])
-         *
-         *     TorState[fid=6E96…6985, daemon=Starting, network=Disabled]
-         *     TorState[fid=6E96…6985, daemon=On{0%}, network=Disabled]
-         *     TorState[fid=6E96…6985, daemon=On{0%}, network=Enabled]
-         *     TorState[fid=6E96…6985, daemon=On{5%}, network=Enabled]
-         *     TorState[fid=6E96…6985, daemon=On{10%}, network=Enabled]
-         *     TorState[fid=6E96…6985, daemon=On{14%}, network=Enabled]
-         *     TorState[fid=6E96…6985, daemon=On{15%}, network=Enabled]
-         *     TorState[fid=6E96…6985, daemon=On{75%}, network=Enabled]
-         *     TorState[fid=6E96…6985, daemon=On{90%}, network=Enabled]
-         *     TorState[fid=6E96…6985, daemon=On{95%}, network=Enabled]
-         *     TorState[fid=6E96…6985, daemon=On{100%}, network=Enabled]
-         *     TorListeners[fid=6E96…6985]: [
-         *         dir: []
-         *         dns: []
-         *         http: []
-         *         metrics: []
-         *         natd: []
-         *         or: []
-         *         orExt: []
-         *         socks: [
-         *             127.0.0.1:35607
-         *         ]
-         *         socksUnix: []
-         *         trans: []
-         *     ]
-         *     Tor[fid=6E96…6985] IS READY
-         *     TorState[fid=6E96…6985, daemon=On{100%}, network=Disabled]
-         *     TorListeners[fid=6E96…6985]: [
-         *         dir: []
-         *         dns: []
-         *         http: []
-         *         metrics: []
-         *         natd: []
-         *         or: []
-         *         orExt: []
-         *         socks: []
-         *         socksUnix: []
-         *         trans: []
-         *     ]
-         *     TorState[fid=6E96…6985, daemon=On{100%}, network=Enabled]
-         *     TorListeners[fid=6E96…6985]: [
-         *         dir: []
-         *         dns: []
-         *         http: []
-         *         metrics: []
-         *         natd: []
-         *         or: []
-         *         orExt: []
-         *         socks: [
-         *             127.0.0.1:38255
-         *         ]
-         *         socksUnix: []
-         *         trans: []
-         *     ]
-         *     TorState[fid=6E96…6985, daemon=Stopping, network=Enabled]
-         *     TorListeners[fid=6E96…6985]: [
-         *         dir: []
-         *         dns: []
-         *         http: []
-         *         metrics: []
-         *         natd: []
-         *         or: []
-         *         orExt: []
-         *         socks: []
-         *         socksUnix: []
-         *         trans: []
-         *     ]
-         *     TorState[fid=6E96…6985, daemon=Off, network=Disabled]
-         *
-         * @see [TorRuntime.isReady]
-         * */
-        public data object READY: PROCESS("PROCESS_READY")
-
-        /**
-         * Lines from the tor process' standard output stream.
-         * */
-        public data object STDOUT: PROCESS("PROCESS_STDOUT")
-
-        /**
-         * Lines form the tor process' error output stream.
-         * */
-        public data object STDERR: PROCESS("PROCESS_STDERR")
-    }
+    public data object READY: RuntimeEvent<String>("READY")
 
     /**
      * Events pertaining to the current state of [TorRuntime].
      *
-     * e.g. (println observers for events [STATE], [LISTENERS], [PROCESS.READY])
+     * e.g. (println observers for events [STATE], [LISTENERS], [READY])
      *
      *     TorState[fid=6E96…6985, daemon=On{95%}, network=Enabled]
      *     TorState[fid=6E96…6985, daemon=On{100%}, network=Enabled]
@@ -470,7 +445,7 @@ public sealed class RuntimeEvent<Data: Any> private constructor(
     /**
      * Base interface for implementations that process [RuntimeEvent].
      * */
-    public interface Processor {
+    public interface Processor: TorEvent.Processor {
 
         /**
          * Add a single [Observer].
@@ -501,28 +476,9 @@ public sealed class RuntimeEvent<Data: Any> private constructor(
          * Remove all [Observer] of multiple [RuntimeEvent].
          * */
         public fun unsubscribeAll(vararg events: RuntimeEvent<*>)
-
-        /**
-         * Remove all [Observer] with the given [tag].
-         *
-         * If the implementing class extends both [Processor]
-         * and [TorEvent.Processor], all [TorEvent.Observer] with
-         * the given [tag] will also be removed.
-         * */
-        public fun unsubscribeAll(tag: String)
-
-        /**
-         * Remove all non-static [Observer] that are currently
-         * registered.
-         *
-         * If the implementing class extends both [Processor]
-         * and [TorEvent.Processor], all [TorEvent.Observer]
-         * will also be removed.
-         * */
-        public fun clearObservers()
     }
 
-    public companion object: Entries<RuntimeEvent<*>>(numEvents = 12) {
+    public companion object: Entries<RuntimeEvent<*>>(numEvents = 10) {
 
         @JvmStatic
         @Throws(IllegalArgumentException::class)
@@ -542,9 +498,9 @@ public sealed class RuntimeEvent<Data: Any> private constructor(
 
         protected override val lazyEntries: ThisBlock<LinkedHashSet<RuntimeEvent<*>>> = ThisBlock {
             // NOTE: Update numEvents when adding an event
-            add(ERROR); add(EXECUTE.ACTION); add(EXECUTE.CMD); add(LIFECYCLE);
-            add(LISTENERS); add(LOG.DEBUG); add(LOG.INFO); add(LOG.WARN);
-            add(PROCESS.READY); add(PROCESS.STDOUT); add(PROCESS.STDERR); add(STATE);
+            add(ERROR); add(EXECUTE.ACTION); add(EXECUTE.CMD); add(LIFECYCLE)
+            add(LISTENERS); add(LOG.DEBUG); add(LOG.INFO); add(LOG.WARN)
+            add(READY); add(STATE)
         }
     }
 
@@ -599,16 +555,6 @@ public sealed class RuntimeEvent<Data: Any> private constructor(
             @JvmStatic
             public fun Notifier.lce(event: Lifecycle.Event) {
                 notify(LIFECYCLE, event)
-            }
-
-            @JvmSynthetic
-            internal fun Notifier.stdout(from: TorDaemon, line: String) {
-                notify(PROCESS.STDOUT, from.appendLog(line))
-            }
-
-            @JvmSynthetic
-            internal fun Notifier.stderr(from: TorDaemon, line: String) {
-                notify(PROCESS.STDERR, from.appendLog(line))
             }
 
             @Suppress("NOTHING_TO_INLINE")

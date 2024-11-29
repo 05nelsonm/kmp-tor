@@ -16,9 +16,9 @@
 package io.matthewnelson.kmp.tor.runtime.core.internal
 
 import io.matthewnelson.kmp.file.SysDirSep
-import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
-import io.matthewnelson.kmp.tor.core.resource.OSHost
-import io.matthewnelson.kmp.tor.core.resource.OSInfo
+import io.matthewnelson.kmp.tor.common.api.InternalKmpTorApi
+import io.matthewnelson.kmp.tor.common.core.OSHost
+import io.matthewnelson.kmp.tor.common.core.OSInfo
 import kotlin.jvm.JvmSynthetic
 
 @get:JvmSynthetic

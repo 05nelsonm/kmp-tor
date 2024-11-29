@@ -15,29 +15,21 @@
  **/
 @file:Suppress("PrivatePropertyName", "LocalVariableName")
 
-package io.matthewnelson.kmp.tor.runtime.internal.process
+package io.matthewnelson.kmp.tor.runtime.internal
 
 import io.matthewnelson.immutable.collections.toImmutableList
 import io.matthewnelson.kmp.file.*
-import io.matthewnelson.kmp.process.OutputFeed
 import io.matthewnelson.kmp.process.Process
-import io.matthewnelson.kmp.process.ProcessException.Companion.CTX_FEED_STDERR
-import io.matthewnelson.kmp.process.ProcessException.Companion.CTX_FEED_STDOUT
 import io.matthewnelson.kmp.process.Signal
 import io.matthewnelson.kmp.process.Stdio
-import io.matthewnelson.kmp.tor.core.api.ResourceInstaller
+import io.matthewnelson.kmp.tor.common.api.ResourceLoader
+import io.matthewnelson.kmp.tor.common.api.TorApi
 import io.matthewnelson.kmp.tor.runtime.*
 import io.matthewnelson.kmp.tor.runtime.FileID.Companion.toFIDString
 import io.matthewnelson.kmp.tor.runtime.RuntimeEvent.Notifier.Companion.d
-import io.matthewnelson.kmp.tor.runtime.RuntimeEvent.Notifier.Companion.e
 import io.matthewnelson.kmp.tor.runtime.RuntimeEvent.Notifier.Companion.i
 import io.matthewnelson.kmp.tor.runtime.RuntimeEvent.Notifier.Companion.lce
-import io.matthewnelson.kmp.tor.runtime.RuntimeEvent.Notifier.Companion.stderr
-import io.matthewnelson.kmp.tor.runtime.RuntimeEvent.Notifier.Companion.stdout
-import io.matthewnelson.kmp.tor.runtime.RuntimeEvent.Notifier.Companion.w
-import io.matthewnelson.kmp.tor.runtime.core.Disposable
 import io.matthewnelson.kmp.tor.runtime.core.Executable
-import io.matthewnelson.kmp.tor.runtime.core.UncaughtException
 import io.matthewnelson.kmp.tor.runtime.core.net.IPSocketAddress
 import io.matthewnelson.kmp.tor.runtime.core.net.IPSocketAddress.Companion.toIPSocketAddressOrNull
 import io.matthewnelson.kmp.tor.runtime.core.config.TorConfig
@@ -45,11 +37,7 @@ import io.matthewnelson.kmp.tor.runtime.core.config.TorOption
 import io.matthewnelson.kmp.tor.runtime.core.config.TorSetting.Companion.filterByOption
 import io.matthewnelson.kmp.tor.runtime.core.ctrl.TorCmd
 import io.matthewnelson.kmp.tor.runtime.ctrl.TorCtrl
-import io.matthewnelson.kmp.tor.runtime.internal.InstanceKeeper
-import io.matthewnelson.kmp.tor.runtime.internal.TorConfigGenerator
-import io.matthewnelson.kmp.tor.runtime.internal.process.TorDaemon.StartArgs.Companion.createStartArgs
-import io.matthewnelson.kmp.tor.runtime.internal.setDirectoryPermissions
-import io.matthewnelson.kmp.tor.runtime.internal.timedDelay
+import io.matthewnelson.kmp.tor.runtime.internal.TorDaemon.StartArgs.Companion.createStartArgs
 import kotlinx.coroutines.*
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
@@ -84,7 +72,7 @@ internal class TorDaemon private constructor(
             throw t
         }
 
-        val (config, paths) = try {
+        val config = try {
             checkCancellationOrInterrupt()
             generator.generate(NOTIFIER)
         } catch (t: Throwable) {
@@ -108,14 +96,28 @@ internal class TorDaemon private constructor(
             + "\n------------------------------------------------------------------------"
         )
 
-        val (feed, processJob) = startArgs.spawnProcess(paths, checkCancellationOrInterrupt)
+        // Is **always** present in generated config.
+        val controlPortFile = config
+            .filterByOption<TorOption.ControlPortWriteToFile>()
+            .first()
+            .items
+            .first()
+            .argument
+            .toFile()
+
+        // Delete any remnants from last start (if present)
+        controlPortFile.delete()
+
+        val torJob = startArgs.startTor(checkCancellationOrInterrupt)
+
+        torJob.invokeOnCompletion { controlPortFile.delete() }
 
         val result = try {
-            val connection = config.awaitCtrlConnection(feed, checkCancellationOrInterrupt)
-            val authenticate = config.awaitAuthentication(feed, checkCancellationOrInterrupt)
+            val connection = awaitCtrlConnection(controlPortFile, checkCancellationOrInterrupt)
+            val authenticate = config.awaitAuthentication(checkCancellationOrInterrupt)
 
             val arguments = CtrlArguments(
-                processJob,
+                torJob,
                 authenticate,
                 startArgs.load,
                 connection,
@@ -126,19 +128,15 @@ internal class TorDaemon private constructor(
         } catch (t: Throwable) {
             when (t) {
                 is CancellationException,
-                is InterruptedException,
-                is ProcessStartException -> {}
+                is InterruptedException -> {}
                 else -> {
-                    val e = feed.createError("Connect failure")
-                    t.addSuppressed(e)
+                    t.addSuppressed(IOException("Connect failure"))
                 }
             }
 
             manager.update(TorState.Daemon.Stopping)
-            processJob.cancel()
+            torJob.cancel()
             throw t
-        } finally {
-            feed.close()
         }
 
         result
@@ -146,7 +144,7 @@ internal class TorDaemon private constructor(
 
     @Throws(CancellationException::class, InterruptedException::class, IOException::class)
     private suspend fun FIDState.cancelAndJoinOtherProcess(checkCancellationOrInterrupt: () -> Unit) {
-        processJob?.cancelAndJoin()
+        torJob?.cancelAndJoin()
         yield()
         checkCancellationOrInterrupt()
 
@@ -181,150 +179,96 @@ internal class TorDaemon private constructor(
     }
 
     @Throws(CancellationException::class, InterruptedException::class, IOException::class)
-    private fun StartArgs.spawnProcess(
-        paths: ResourceInstaller.Paths.Tor,
-        checkCancellationOrInterrupt: () -> Unit,
-    ): Pair<StartupFeedParser, Job> {
-        val process = try {
+    private fun StartArgs.startTor(checkCancellationOrInterrupt: () -> Unit): Job {
+        val loader = generator.environment.loader
+
+        var process: Process? = null
+
+        val (awaitStop, terminate) = try {
             checkCancellationOrInterrupt()
 
-            Process.Builder(command = paths.tor.path)
-                .args(cmdLine)
-                .environment { putAll(generator.environment.processEnv) }
-                .onError { e ->
-                    if (e.cause is UncaughtException) {
-                        // OutputFeed line was dispatched to event observers
-                        // and one threw an exception. That exception was
-                        // caught by the UncaughtException.Handler and piped
-                        // to RuntimeEvent.ERROR observers. If the ERROR
-                        // observers threw (or none were subscribed), the
-                        // UncaughtException was thrown. All that occurred
-                        // within the OutputFeed.onOutput lambda, finally making
-                        // its way back here. Throw it to shut things down (and
-                        // potentially crash the app).
-                        throw e.cause
+            when (loader) {
+                is ResourceLoader.Tor.Exec -> {
+                    process = loader.process(TorBinder) { tor, configureEnv ->
+                        Process.Builder(command = tor.path)
+                            .args(cmdLine)
+                            .environment(configureEnv)
+                            .environment("HOME", generator.environment.workDirectory.path)
+                            .stdin(Stdio.Null)
+                            .stdout(Stdio.Null)
+                            .stderr(Stdio.Null)
+                            .destroySignal(Signal.SIGTERM)
+                            .spawn()
                     }
 
-                    val threw = try {
-                        NOTIFIER.e(e)
-                        null
-                    } catch (t: UncaughtException) {
-                        // ERROR observer chose to throw exception
-                        t
-                    }
+                    suspend { process.waitForAsync() } to process::destroy
+                }
+                is ResourceLoader.Tor.NoExec -> {
+                    loader.withApi(TorBinder) {
+                        torRunMain(cmdLine)
 
-                    if (threw == null) return@onError
-
-                    when (e.context) {
-                        CTX_FEED_STDERR,
-                        CTX_FEED_STDOUT -> throw threw
-                        else -> {
-                            // If the origin of the exception was **not** from
-                            // an OutputFeed, ignore the ERROR observer's wish
-                            // and do not crash things.
-                        }
+                        suspend {
+                            while (state() == TorApi.State.STARTED) {
+                                delay(100.milliseconds)
+                            }
+                        } to ::terminateAndAwaitResult
                     }
                 }
-                .stdin(Stdio.Null)
-                .stdout(Stdio.Pipe)
-                .stderr(Stdio.Pipe)
-                .destroySignal(Signal.SIGTERM)
-                .spawn()
+            }
         } catch (t: Throwable) {
             NOTIFIER.lce(Lifecycle.Event.OnDestroy(this@TorDaemon))
             throw t
         }
 
         NOTIFIER.lce(Lifecycle.Event.OnStart(this@TorDaemon))
-        NOTIFIER.i(this@TorDaemon, process.toString())
 
-        val startupFeed = StartupFeedParser(exitCodeOrNull = process::exitCodeOrNull)
-
-        run {
-            var notify: Executable.Once?
-            notify = Executable.Once.of(executable = {
-                notify = null
-                val time = process.startTime.elapsedNow().inWholeMilliseconds
-
-                NOTIFIER.i(
-                    this@TorDaemon,
-                    "took ${time}ms before dispatching its first stdout line"
-                )
-            })
-
-            process.stdoutFeed(
-                startupFeed.stdout,
-                OutputFeed { line ->
-                    if (line == null) return@OutputFeed
-                    notify?.execute()
-                    NOTIFIER.stdout(this@TorDaemon, line)
-                }
-            ).stderrFeed(
-                startupFeed.stderr,
-                OutputFeed { line ->
-                    if (line == null) return@OutputFeed
-                    NOTIFIER.stderr(this@TorDaemon, line)
-                }
-            )
+        if (process != null) {
+            NOTIFIER.i(this@TorDaemon, process.toString())
         }
 
         // If scope is cancelled when we go to launch
-        // the coroutine to await process exit, it won't
-        // trigger the try/finally block. So, this single
-        // execution callback allows to ensure it is
-        // executed either within the non-cancelled job,
-        // or via invokeOnCompletion handler.
-        val completion = Disposable.Once.of(concurrent = true, disposable = {
-            state.stopMark = TimeSource.Monotonic.markNow()
-
+        // the coroutine and await exit, it won't trigger
+        // the try/finally block. So, this single callback
+        // allows to ensure it is executed either within
+        // the non-cancelled job, or via invokeOnCompletion
+        // handler (immediately upon handle being set).
+        val finalize = Executable.Once.of(concurrent = true, executable = {
             try {
-                process.destroy()
+                terminate()
                 NOTIFIER.lce(Lifecycle.Event.OnStop(this@TorDaemon))
             } finally {
+                state.stopMark = TimeSource.Monotonic.markNow()
                 manager.update(TorState.Daemon.Off)
             }
         })
 
-        val processJob = scope.launch {
+        val torJob = scope.launch {
             try {
-                process.waitForAsync()
-
-                // Process has exited. If we have not completed the
-                // startup, give OutputFeed a moment to fully flush
-                // before Process.destroy() is called.
-                if (!startupFeed.isClosed) {
-                    timedDelay(50.milliseconds)
-                }
+                awaitStop()
             } finally {
-                completion.dispose()
+                finalize.execute()
             }
         }
 
-        state.processJob = processJob
+        state.torJob = torJob
 
-        processJob.invokeOnCompletion {
-            completion.dispose()
+        torJob.invokeOnCompletion {
+            finalize.execute()
             NOTIFIER.lce(Lifecycle.Event.OnDestroy(this@TorDaemon))
         }
 
-        return startupFeed to processJob
+        return torJob
     }
 
     @Throws(CancellationException::class, InterruptedException::class, IOException::class)
-    private suspend fun TorConfig.awaitCtrlConnection(
-        feed: StartupFeedParser,
+    private suspend fun awaitCtrlConnection(
+        controlPortFile: File,
         checkCancellationOrInterrupt: () -> Unit,
     ): CtrlArguments.Connection {
-        // Is **always** present in generated config.
-        val ctrlPortFile = filterByOption<TorOption.ControlPortWriteToFile>()
-            .first()
-            .items
-            .first()
-            .argument
-            .toFile()
+        timedDelay(100.milliseconds)
 
-        val lines = ctrlPortFile
-            .awaitRead(feed, 10.seconds, checkCancellationOrInterrupt)
+        val lines = controlPortFile
+            .awaitRead(10.seconds, checkCancellationOrInterrupt)
             .decodeToString()
             .lines()
             .mapNotNull { it.ifBlank { null } }
@@ -358,12 +302,11 @@ internal class TorDaemon private constructor(
             return CtrlArguments.Connection(socketAddress)
         }
 
-        throw feed.createError("Failed to acquire control connection info from file[${ctrlPortFile.name}]")
+        throw IOException("Failed to acquire control connection info from file[${controlPortFile.name}]")
     }
 
     @Throws(CancellationException::class, InterruptedException::class, IOException::class)
     private suspend fun TorConfig.awaitAuthentication(
-        feed: StartupFeedParser,
         checkCancellationOrInterrupt: () -> Unit,
     ): TorCmd.Authenticate {
         // TODO: HashedControlPassword Issue #1
@@ -374,40 +317,34 @@ internal class TorDaemon private constructor(
             ?.first()
             ?.argument
             ?.toFile()
-            ?.awaitRead(feed, 1.seconds, checkCancellationOrInterrupt)
+            ?.awaitRead(1.seconds, checkCancellationOrInterrupt)
             ?.let { bytes -> TorCmd.Authenticate(cookie = bytes)  }
             ?: TorCmd.Authenticate() // Unauthenticated
     }
 
     @Throws(CancellationException::class, InterruptedException::class, IOException::class)
     private suspend fun File.awaitRead(
-        feed: StartupFeedParser,
         timeout: Duration,
         checkCancellationOrInterrupt: () -> Unit,
     ): ByteArray {
         require(timeout >= 500.milliseconds) { "timeout must be greater than or equal to 500ms" }
-        feed.checkError()
         checkCancellationOrInterrupt()
 
         val startMark = TimeSource.Monotonic.markNow()
 
         var notified = false
-        var throwInactiveNext = false
         while (true) {
             // Ensure that stdout is flowing, otherwise wait until it is.
-            if (feed.isReady) {
+            val content = try {
+                readBytes()
+            } catch (_: IOException) {
+                null
+            }
 
-                val content = try {
-                    readBytes()
-                } catch (_: IOException) {
-                    null
-                }
-
-                // It's either ctrl port file or cookie auth, so
-                // be longer than PORT=
-                if (content != null && content.size > 5) {
-                    return content
-                }
+            // It's either ctrl port file or cookie auth, so
+            // be longer than PORT=
+            if (content != null && content.size > 5) {
+                return content
             }
 
             if (!notified) {
@@ -416,25 +353,17 @@ internal class TorDaemon private constructor(
             }
 
             timedDelay(50.milliseconds)
-            feed.checkError()
-
-            if (throwInactiveNext) {
-                throw feed.createError("Process exited early...")
-            }
 
             checkCancellationOrInterrupt()
 
-            if (state.processJob?.isActive != true) {
-                // Want to give Process time to close down resources
-                // and dispatch null line, which will result in the
-                // OutputFeed generating an error. Give it another 50ms.
-                throwInactiveNext = true
+            if (state.torJob?.isActive != true) {
+                throw IOException("Tor exited early...")
             }
 
             if (startMark.elapsedNow() > timeout) break
         }
 
-        throw feed.createError("$TIMED_OUT after ${timeout.inWholeMilliseconds}ms waiting for tor to write to file[$name]")
+        throw IOException("$TIMED_OUT after ${timeout.inWholeMilliseconds}ms waiting for tor to write to file[$name]")
     }
 
     public override fun toString(): String = _toString
@@ -446,8 +375,17 @@ internal class TorDaemon private constructor(
             @Throws(IOException::class)
             fun TorConfig.createStartArgs(env: TorRuntime.Environment): StartArgs {
                 val cmdLine = mutableListOf<String>().apply {
+                    add("--quiet")
                     add("--torrc-file")
-                    add("-") // stdin (i.e. /dev/null)
+
+                    if (env.loader is ResourceLoader.Tor.Exec) {
+                        add("-") // stdin (i.e. /dev/null)
+                    } else {
+                        val torrc = env.loader.resourceDir.resolve("__torrc")
+                        add(torrc.path)
+                        add("--ignore-missing-torrc")
+                        torrc.delete()
+                    }
                 }
 
                 val directories = mutableSetOf<File>().apply {
@@ -520,6 +458,12 @@ internal class TorDaemon private constructor(
 
     internal companion object: InstanceKeeper<String, Any>() {
 
+        private object TorBinder: ResourceLoader.RuntimeBinder
+
+        // Exposed for testing only
+        @get:JvmSynthetic
+        internal val torBinder: ResourceLoader.RuntimeBinder get() = TorBinder
+
         @JvmSynthetic
         @Throws(Throwable::class)
         internal suspend fun <T: Any> start(
@@ -532,50 +476,20 @@ internal class TorDaemon private constructor(
         ): T {
             val state = getOrCreateInstance(generator.environment.fid) { FIDState() }
 
-            val daemon = TorDaemon(
+            return TorDaemon(
                 generator,
                 manager,
                 NOTIFIER,
                 scope,
                 state as FIDState,
-            )
-
-            val result: T? = try {
-                daemon.start(checkCancellationOrInterrupt, connect)
-            } catch (e: ProcessStartException) {
-                // Can happen on iOS b/c of their shit implementation
-                // of posix_spawn where it will fail but still creates a
-                // zombie process.
-                if (
-                    e.message.contains("cause: $TIMED_OUT")
-                    && e.message.contains("stdout: []")
-                ) {
-                    null
-                } else {
-                    throw e
-                }
-            }
-
-            if (result != null) return result
-
-            NOTIFIER.w(daemon, "ZOMBIE PROCESS! Retrying...")
-
-            val daemonRetry = TorDaemon(
-                generator,
-                manager,
-                NOTIFIER,
-                scope,
-                state,
-            )
-
-            return daemonRetry.start(checkCancellationOrInterrupt, connect)
+            ).start(checkCancellationOrInterrupt, connect)
         }
 
         private class FIDState {
             val lock = Mutex()
 
             @Volatile
-            var processJob: Job? = null
+            var torJob: Job? = null
 
             @Volatile
             var stopMark: TimeSource.Monotonic.ValueTimeMark? = null

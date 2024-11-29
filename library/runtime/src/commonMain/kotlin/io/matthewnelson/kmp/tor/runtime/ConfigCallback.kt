@@ -19,8 +19,9 @@ package io.matthewnelson.kmp.tor.runtime
 
 import io.matthewnelson.kmp.file.File
 import io.matthewnelson.kmp.file.resolve
-import io.matthewnelson.kmp.tor.core.api.ResourceInstaller
-import io.matthewnelson.kmp.tor.core.api.annotation.InternalKmpTorApi
+import io.matthewnelson.kmp.tor.common.api.GeoipFiles
+import io.matthewnelson.kmp.tor.common.api.InternalKmpTorApi
+import io.matthewnelson.kmp.tor.common.api.ResourceLoader
 import io.matthewnelson.kmp.tor.runtime.core.config.TorConfig
 import io.matthewnelson.kmp.tor.runtime.core.config.TorOption
 import io.matthewnelson.kmp.tor.runtime.core.config.builder.BuilderScopePort
@@ -55,7 +56,7 @@ public fun interface ConfigCallback {
      * settings required for [TorRuntime] are had.
      * */
     public class Defaults private constructor(
-        private val paths: ResourceInstaller.Paths.Tor,
+        private val geoipFiles: GeoipFiles,
     ): ConfigCallback {
 
         public override fun TorConfig.BuilderScope.invoke(environment: TorRuntime.Environment) {
@@ -98,10 +99,8 @@ public fun interface ConfigCallback {
                 TorOption.ControlPortWriteToFile.configure(controlPortFile)
             }
 
-            if (!environment.omitGeoIPFileSettings) {
-                TorOption.GeoIPFile.configure(paths.geoip)
-                TorOption.GeoIPv6File.configure(paths.geoip6)
-            }
+            TorOption.GeoIPFile.configure(geoipFiles.geoip)
+            TorOption.GeoIPv6File.configure(geoipFiles.geoip6)
 
             return dataDirectory
         }
@@ -252,10 +251,10 @@ public fun interface ConfigCallback {
             internal fun apply(
                 scope: TorConfig.BuilderScope,
                 environment: TorRuntime.Environment,
-                paths: ResourceInstaller.Paths.Tor,
+                geoipFiles: GeoipFiles,
             ) {
                 with(scope) {
-                    with(Defaults(paths)) {
+                    with(Defaults(geoipFiles)) {
                         invoke(environment)
                     }
                 }
