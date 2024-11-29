@@ -20,6 +20,7 @@ import io.matthewnelson.kmp.tor.common.api.InternalKmpTorApi
 import io.matthewnelson.kmp.tor.common.core.SynchronizedObject
 import io.matthewnelson.kmp.tor.common.core.synchronized
 import io.matthewnelson.kmp.tor.runtime.Action.Companion.startDaemonAsync
+import io.matthewnelson.kmp.tor.runtime.Action.Companion.stopDaemonAsync
 import io.matthewnelson.kmp.tor.runtime.RuntimeEvent.EXECUTE.CMD.observeSignalNewNym
 import io.matthewnelson.kmp.tor.runtime.core.EnqueuedJob
 import io.matthewnelson.kmp.tor.runtime.core.ctrl.TorCmd
@@ -122,6 +123,8 @@ class TorRuntimeUnitTest {
         }
 
         repeat(4) { runtime.executeAsync(TorCmd.Signal.NewNym) }
+
+        runtime.stopDaemonAsync()
 
         disposable.dispose()
 
