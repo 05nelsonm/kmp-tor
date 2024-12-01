@@ -25,8 +25,7 @@ kmpConfiguration {
         js {
             sourceSetTest {
                 dependencies {
-                    // TODO: REMOVE SNAPSHOT version suffix once released
-                    implementation(npm("kmp-tor.resource-exec-tor.all", libs.versions.kmp.tor.resource.get() + ".6"))
+                    implementation(npm("kmp-tor.resource-exec-tor.all", libs.versions.kmp.tor.resource.get()))
                 }
             }
         }
