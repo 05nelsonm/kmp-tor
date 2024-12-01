@@ -6,7 +6,7 @@
 [![badge-coroutines]][url-coroutines]
 [![badge-encoding]][url-encoding]
 [![badge-kmp-process]][url-kmp-process]
-[![badge-kmp-tor-core]][url-kmp-tor-core]
+[![badge-kmp-tor-common]][url-kmp-tor-common]
 [![badge-kotlincrypto-hash]][url-kotlincrypto-hash]
 [![badge-kotlincrypto-secure-random]][url-kotlincrypto-secure-random]
 [![badge-androidx-startup]][url-androidx-startup]
@@ -23,11 +23,82 @@
 
 Kotlin Multiplatform support for embedding Tor into your application.
 
-**NOTICE:** `kmp-tor` is being overhauled. See branch [1.x.x][url-1.x.x] which will continue to be 
-published until `2.0.0` work has been completed.
+```kotlin
+val myTorRuntime = TorRuntime.Builder(myTorEnvironment) {
+    RuntimeEvent.entries().forEach { event ->
+        observerStatic(event, OnEvent.Executor.Immediate) { data -> println(data.toString()) }
+    }
+    TorEvent.entries().forEach { event ->
+        observerStatic(event, OnEvent.Executor.Immediate) { data -> println(data) }
+    }
+}
+```
+
+```kotlin
+// Asynchronous APIs
+myScope.launch {
+    myTorRuntime.startDaemonAsync()
+    myTorRuntime.restartDaemonAsync()
+    myTorRuntime.stopDaemonAsync()
+}
+```
+
+```kotlin
+// Synchronous APIs (Android/Jvm/Native)
+myTorRuntime.startDaemonSync()
+myTorRuntime.restartDaemonSync()
+myTorRuntime.stopDaemonSync()
+```
+
+```kotlin
+// Callback APIs
+myTorRuntime.enqueue(
+    Action.StartDaemon,
+    OnFailure.noOp(),
+    OnSuccess {
+        myTorRuntime.enqueue(
+            Action.RestartDaemon,
+            OnFailure.noOp(),
+            OnSuccess {
+                myTorRuntime.enqueue(
+                    Action.StopDaemon,
+                    OnFailure.noOp(),
+                    OnSuccess.noOp(),
+                )
+            },
+        )
+    },
+)
+```
+
+### Get Started
 
 <!-- TAG_VERSION -->
-[badge-latest-release]: https://img.shields.io/badge/latest--release-Pending-5d2f68.svg?logo=torproject&style=flat&logoColor=5d2f68
+
+- Add runtime dependency
+  ```kotlin
+  // build.gradle.kts
+  val vKmpTor = "2.0.0-alpha01"
+
+  dependencies {
+      implementation("io.matthewnelson.kmp-tor:runtime:$vKmpTor")
+  }
+  ```
+
+- Configure tor resources
+    - See [kmp-tor-resource#Get Started][url-kmp-tor-resource-start]
+
+- Configure optional service dependency
+    - See [runtime-service][docs-runtime-service]
+
+- Create and utilize `TorRuntime`
+    - See [kmp-tor-samples][url-kmp-tor-samples]
+
+- Refer to the API docs
+    - See [https://kmp-tor.matthewnelson.io][docs-root]
+
+<!-- TAG_VERSION -->
+[badge-latest-release]: https://img.shields.io/badge/latest--release-2.0.0--alpha01-5d2f68.svg?logo=torproject&style=flat&logoColor=5d2f68
 [badge-license]: https://img.shields.io/badge/license-Apache%20License%202.0-blue.svg?style=flat
 
 <!-- TAG_DEPENDENCIES -->
@@ -35,36 +106,40 @@ published until `2.0.0` work has been completed.
 [badge-coroutines]: https://img.shields.io/badge/kotlinx.coroutines-1.8.1-blue.svg?logo=kotlin
 [badge-encoding]: https://img.shields.io/badge/encoding-2.2.2-blue.svg?style=flat
 [badge-kmp-process]: https://img.shields.io/badge/kmp--process-0.1.0-blue.svg?style=flat
-[badge-kmp-tor-core]: https://img.shields.io/badge/kmp--tor--core-2.1.0-blue.svg?style=flat
+[badge-kmp-tor-common]: https://img.shields.io/badge/kmp--tor--common-2.1.0-blue.svg?style=flat
 [badge-kotlin]: https://img.shields.io/badge/kotlin-1.9.24-blue.svg?logo=kotlin
 [badge-kotlincrypto-hash]: https://img.shields.io/badge/KotlinCrypto.hash-0.5.3-blue.svg?style=flat
 [badge-kotlincrypto-secure-random]: https://img.shields.io/badge/KotlinCrypto.secure--random-0.3.2-blue.svg?style=flat
 
 <!-- TAG_PLATFORMS -->
-[badge-platform-android]: http://img.shields.io/badge/-android-6EDB8D.svg?style=flat
-[badge-platform-jvm]: http://img.shields.io/badge/-jvm-DB413D.svg?style=flat
-[badge-platform-js]: http://img.shields.io/badge/-js-F8DB5D.svg?style=flat
+[badge-platform-android]: https://img.shields.io/badge/-android-6EDB8D.svg?style=flat
+[badge-platform-jvm]: https://img.shields.io/badge/-jvm-DB413D.svg?style=flat
+[badge-platform-js]: https://img.shields.io/badge/-js-F8DB5D.svg?style=flat
 [badge-platform-js-node]: https://img.shields.io/badge/-nodejs-68a063.svg?style=flat
-[badge-platform-linux]: http://img.shields.io/badge/-linux-2D3F6C.svg?style=flat
-[badge-platform-macos]: http://img.shields.io/badge/-macos-111111.svg?style=flat
-[badge-platform-ios]: http://img.shields.io/badge/-ios-CDCDCD.svg?style=flat
-[badge-platform-tvos]: http://img.shields.io/badge/-tvos-808080.svg?style=flat
-[badge-platform-watchos]: http://img.shields.io/badge/-watchos-C0C0C0.svg?style=flat
+[badge-platform-linux]: https://img.shields.io/badge/-linux-2D3F6C.svg?style=flat
+[badge-platform-macos]: https://img.shields.io/badge/-macos-111111.svg?style=flat
+[badge-platform-ios]: https://img.shields.io/badge/-ios-CDCDCD.svg?style=flat
+[badge-platform-tvos]: https://img.shields.io/badge/-tvos-808080.svg?style=flat
+[badge-platform-watchos]: https://img.shields.io/badge/-watchos-C0C0C0.svg?style=flat
 [badge-platform-wasm]: https://img.shields.io/badge/-wasm-624FE8.svg?style=flat
-[badge-platform-windows]: http://img.shields.io/badge/-windows-4D76CD.svg?style=flat
-[badge-support-android-native]: http://img.shields.io/badge/support-[AndroidNative]-6EDB8D.svg?style=flat
-[badge-support-apple-silicon]: http://img.shields.io/badge/support-[AppleSilicon]-43BBFF.svg?style=flat
+[badge-platform-windows]: https://img.shields.io/badge/-windows-4D76CD.svg?style=flat
+[badge-support-android-native]: https://img.shields.io/badge/support-[AndroidNative]-6EDB8D.svg?style=flat
+[badge-support-apple-silicon]: https://img.shields.io/badge/support-[AppleSilicon]-43BBFF.svg?style=flat
 [badge-support-js-ir]: https://img.shields.io/badge/support-[js--IR]-AAC4E0.svg?style=flat
-[badge-support-linux-arm]: http://img.shields.io/badge/support-[LinuxArm]-2D3F6C.svg?style=flat
+[badge-support-linux-arm]: https://img.shields.io/badge/support-[LinuxArm]-2D3F6C.svg?style=flat
 
-[url-1.x.x]: https://github.com/05nelsonm/kmp-tor/tree/1.x.x
+[docs-root]: https://kmp-tor.matthewnelson.io
+[docs-runtime-service]: https://kmp-tor.matthewnelson.io/library/runtime-service/index.html
+
 [url-latest-release]: https://github.com/05nelsonm/kmp-tor/releases/latest
 [url-license]: https://www.apache.org/licenses/LICENSE-2.0
 [url-androidx-startup]: https://developer.android.com/jetpack/androidx/releases/startup
 [url-coroutines]: https://github.com/Kotlin/kotlinx.coroutines
 [url-encoding]: https://github.com/05nelsonm/component-encoding
 [url-kmp-process]: https://github.com/05nelsonm/kmp-process
-[url-kmp-tor-core]: https://github.com/05nelsonm/kmp-tor-core
+[url-kmp-tor-common]: https://github.com/05nelsonm/kmp-tor-common
+[url-kmp-tor-samples]: https://github.com/05nelsonm/kmp-tor-samples
+[url-kmp-tor-resource-start]: https://github.com/05nelsonm/kmp-tor-resource?tab=readme-ov-file#get-started
 [url-kotlin]: https://kotlinlang.org
 [url-kotlincrypto-hash]: https://github.com/KotlinCrypto/hash
 [url-kotlincrypto-secure-random]: https://github.com/KotlinCrypto/secure-random

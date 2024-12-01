@@ -56,10 +56,10 @@ import kotlin.concurrent.Volatile
  *         // configure...
  *     }
  *
- *     val environment = config.newEnvironment { installationDirectory ->
+ *     val environment = config.newEnvironment { resourceDir ->
  *         // Assuming use of `kmp-tor-resource` dependency, for example
  *         // the `exec` type.
- *         ResourceLoaderTorExec.getOrCreate(installationDirectory)
+ *         ResourceLoaderTorExec.getOrCreate(resourceDir)
  *     }
  *
  *     val runtime = TorRuntime.Builder(environment) {
@@ -323,10 +323,10 @@ public open class TorServiceConfig private constructor(
      *         // configure...
      *     }
      *
-     *     val environment = serviceConfig.newEnvironment { installationDirectory ->
+     *     val environment = serviceConfig.newEnvironment { resourceDir ->
      *         // Assuming use of `kmp-tor-resource` dependency, for example
      *         // the `exec` type.
-     *         ResourceLoaderTorExec.getOrCreate(installationDirectory)
+     *         ResourceLoaderTorExec.getOrCreate(resourceDir)
      *     }
      *
      *     val runtime = TorRuntime.Builder(environment) {
