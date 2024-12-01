@@ -15,4 +15,6 @@
  **/
 package io.matthewnelson.kmp.tor.manager.internal
 
+internal const val DEPRECATION_NOTICE: String = "kmp-tor 1.x.x is deprecated. See: https://github.com/05nelsonm/kmp-tor/blob/master/MIGRATION.md"
+
 internal expect fun realTorManagerInstanceDestroyed(instanceId: String)

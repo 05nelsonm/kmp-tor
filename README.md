@@ -14,8 +14,7 @@
 
 Kotlin Multiplatform support for embedding Tor into your application.
 
-**NOTICE:** `kmp-tor` is being overhauled. This branch is for the `1.x.x` version. See 
-[HERE][url-kmp-tor-master] for the latest and greatest.
+## **NOTICE:** `kmp-tor` version `1.x.x` is `DEPRECATED`. Refer to [master branch][url-kmp-tor-master]
 
 ### Get Started
 
@@ -27,7 +26,7 @@ Add dependency
 
 dependencies {
     val vTor = "4.8.10-0"
-    val vKmpTor = "1.4.4"
+    val vKmpTor = "1.4.5"
 
     implementation("io.matthewnelson.kotlin-components:kmp-tor:$vTor-$vKmpTor")
 }
@@ -39,7 +38,7 @@ dependencies {
 
 dependencies {
     def vTor = '4.8.10-0'
-    def vKmpTor = '1.4.4'
+    def vKmpTor = '1.4.5'
 
     implementation "io.matthewnelson.kotlin-components:kmp-tor:$vTor-$vKmpTor"
 }
@@ -136,7 +135,7 @@ can express the `TorConfig.Setting.Ports.Control` setting when providing your co
 
 dependencies {
     def vTor = '4.8.10-0'
-    def vKmpTor = '1.4.4'
+    def vKmpTor = '1.4.5'
 
     implementation "io.matthewnelson.kotlin-components:kmp-tor:$vTor-$vKmpTor"
     // Add the callback extension
@@ -221,7 +220,7 @@ public class Example2 {
 <!-- TAG_VERSION -->
 <!-- If Tor version was updated, don't forget to update [badge-kmp-tor-binary] -->
 
-[badge-latest-release]: https://img.shields.io/badge/latest--release-4.8.10--0--1.4.4-5d2f68.svg?logo=torproject&style=flat&logoColor=5d2f68
+[badge-latest-release]: https://img.shields.io/badge/latest--release-2.0.0--alpha01-5d2f68.svg?logo=torproject&style=flat&logoColor=5d2f68
 [badge-license]: https://img.shields.io/badge/license-Apache%20License%202.0-blue.svg?style=flat
 
 <!-- TAG_DEPENDENCIES -->
@@ -233,19 +232,19 @@ public class Example2 {
 [badge-kmp-tor-binary]: https://img.shields.io/badge/kmp--tor--binary-4.8.10--0-5d2f68.svg?logo=torproject&style=flat&logoColor=5d2f68
 
 <!-- TAG_PLATFORMS -->
-[badge-platform-android]: http://img.shields.io/badge/-android-6EDB8D.svg?style=flat
-[badge-platform-jvm]: http://img.shields.io/badge/-jvm-DB413D.svg?style=flat
-[badge-platform-js]: http://img.shields.io/badge/-js-F8DB5D.svg?style=flat
+[badge-platform-android]: https://img.shields.io/badge/-android-6EDB8D.svg?style=flat
+[badge-platform-jvm]: https://img.shields.io/badge/-jvm-DB413D.svg?style=flat
+[badge-platform-js]: https://img.shields.io/badge/-js-F8DB5D.svg?style=flat
 [badge-platform-js-node]: https://img.shields.io/badge/-nodejs-68a063.svg?style=flat
-[badge-platform-linux]: http://img.shields.io/badge/-linux-2D3F6C.svg?style=flat
-[badge-platform-macos]: http://img.shields.io/badge/-macos-111111.svg?style=flat
-[badge-platform-ios]: http://img.shields.io/badge/-ios-CDCDCD.svg?style=flat
-[badge-platform-tvos]: http://img.shields.io/badge/-tvos-808080.svg?style=flat
-[badge-platform-watchos]: http://img.shields.io/badge/-watchos-C0C0C0.svg?style=flat
+[badge-platform-linux]: https://img.shields.io/badge/-linux-2D3F6C.svg?style=flat
+[badge-platform-macos]: https://img.shields.io/badge/-macos-111111.svg?style=flat
+[badge-platform-ios]: https://img.shields.io/badge/-ios-CDCDCD.svg?style=flat
+[badge-platform-tvos]: https://img.shields.io/badge/-tvos-808080.svg?style=flat
+[badge-platform-watchos]: https://img.shields.io/badge/-watchos-C0C0C0.svg?style=flat
 [badge-platform-wasm]: https://img.shields.io/badge/-wasm-624FE8.svg?style=flat
-[badge-platform-windows]: http://img.shields.io/badge/-windows-4D76CD.svg?style=flat
-[badge-support-android-native]: http://img.shields.io/badge/support-[AndroidNative]-6EDB8D.svg?style=flat
-[badge-support-apple-silicon]: http://img.shields.io/badge/support-[AppleSilicon]-43BBFF.svg?style=flat
+[badge-platform-windows]: https://img.shields.io/badge/-windows-4D76CD.svg?style=flat
+[badge-support-android-native]: https://img.shields.io/badge/support-[AndroidNative]-6EDB8D.svg?style=flat
+[badge-support-apple-silicon]: https://img.shields.io/badge/support-[AppleSilicon]-43BBFF.svg?style=flat
 [badge-support-js-ir]: https://img.shields.io/badge/support-[js--IR]-AAC4E0.svg?style=flat
 
 [url-latest-release]: https://github.com/05nelsonm/kmp-tor/releases/latest
@@ -253,16 +252,16 @@ public class Example2 {
 [url-kotlin]: https://kotlinlang.org
 [url-atomicfu]: https://github.com/Kotlin/kotlinx.atomicfu
 [url-coroutines]: https://github.com/Kotlin/kotlinx.coroutines
-[url-encoding]: https://github.com/05nelsonm/component-encoding
+[url-encoding]: https://github.com/05nelsonm/encoding
 [url-parcelize]: https://github.com/05nelsonm/component-parcelize
 [url-kmp-tor-binary]: https://github.com/05nelsonm/kmp-tor-binary
-[url-android-kotlin-app]: https://github.com/05nelsonm/kmp-tor/tree/master/samples/kotlin/android/src/main/java/io/matthewnelson/kmp/tor/sample/kotlin/android
-[url-android-kotlin-attrs]: https://github.com/05nelsonm/kmp-tor/blob/master/samples/kotlin/android/src/main/res/values/attrs.xml
-[url-android-kotlin-manifest]: https://github.com/05nelsonm/kmp-tor/blob/master/samples/kotlin/android/src/main/AndroidManifest.xml
-[url-android-java-app]: https://github.com/05nelsonm/kmp-tor/blob/master/samples/java/android/src/main/java/io/matthewnelson/kmp/tor/sample/java/android/App.java
-[url-android-java-gradle]: https://github.com/05nelsonm/kmp-tor/blob/master/samples/java/android/build.gradle.kts
-[url-javafx-kotlin-app]: https://github.com/05nelsonm/kmp-tor/blob/master/samples/kotlin/javafx/src/jvmMain/kotlin/io/matthewnelson/kmp/tor/sample/kotlin/javafx/SampleApp.kt
-[url-javafx-kotlin-gradle]: https://github.com/05nelsonm/kmp-tor/blob/master/samples/kotlin/javafx/build.gradle.kts
-[url-javafx-java-app]: https://github.com/05nelsonm/kmp-tor/blob/master/samples/java/javafx/src/main/java/io/matthewnelson/kmp/tor/sample/java/javafx/App.java
-[url-javafx-java-gradle]: https://github.com/05nelsonm/kmp-tor/blob/master/samples/java/javafx/build.gradle.kts
+[url-android-kotlin-app]: https://github.com/05nelsonm/kmp-tor/tree/1.x.x/samples/kotlin/android/src/main/java/io/matthewnelson/kmp/tor/sample/kotlin/android
+[url-android-kotlin-attrs]: https://github.com/05nelsonm/kmp-tor/blob/1.x.x/samples/kotlin/android/src/main/res/values/attrs.xml
+[url-android-kotlin-manifest]: https://github.com/05nelsonm/kmp-tor/blob/1.x.x/samples/kotlin/android/src/main/AndroidManifest.xml
+[url-android-java-app]: https://github.com/05nelsonm/kmp-tor/blob/1.x.x/samples/java/android/src/main/java/io/matthewnelson/kmp/tor/sample/java/android/App.java
+[url-android-java-gradle]: https://github.com/05nelsonm/kmp-tor/blob/1.x.x/samples/java/android/build.gradle.kts
+[url-javafx-kotlin-app]: https://github.com/05nelsonm/kmp-tor/blob/1.x.x/samples/kotlin/javafx/src/jvmMain/kotlin/io/matthewnelson/kmp/tor/sample/kotlin/javafx/SampleApp.kt
+[url-javafx-kotlin-gradle]: https://github.com/05nelsonm/kmp-tor/blob/1.x.x/samples/kotlin/javafx/build.gradle.kts
+[url-javafx-java-app]: https://github.com/05nelsonm/kmp-tor/blob/1.x.x/samples/java/javafx/src/main/java/io/matthewnelson/kmp/tor/sample/java/javafx/App.java
+[url-javafx-java-gradle]: https://github.com/05nelsonm/kmp-tor/blob/1.x.x/samples/java/javafx/build.gradle.kts
 [url-kmp-tor-master]: https://github.com/05nelsonm/kmp-tor/tree/master

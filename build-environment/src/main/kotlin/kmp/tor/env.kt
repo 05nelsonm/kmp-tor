@@ -18,7 +18,7 @@ package kmp.tor
 @Suppress("ClassName")
 object env {
     // Must be either "-SNAPSHOT" || ""
-    private const val SNAPSHOT              = "-SNAPSHOT"
+    private const val SNAPSHOT              = ""
 
     private const val MANAGER_VERSION_NAME  = "1.4.5"
     //                       1.0.0-alpha1  ==     01_00_00_11

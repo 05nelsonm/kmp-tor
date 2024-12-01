@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## Version 4.8.10-0-1.4.5 (2024-12-01)
+ - Add deprecation notice to `TorManager` in preparation for `2.0.0` release.
+ - Disable non-Android & non-Jvm targets
+
 ## Version 4.8.10-0-1.4.4 (2023-12-20)
  - Updates dependencies
      - `kmp-tor-binary` -> `4.8.10-0`

@@ -22,6 +22,7 @@ import io.matthewnelson.kmp.tor.manager.common.TorControlManager
 import io.matthewnelson.kmp.tor.manager.common.TorOperationManager
 import io.matthewnelson.kmp.tor.manager.common.event.TorManagerEvent
 import io.matthewnelson.kmp.tor.manager.common.state.TorStateManager
+import io.matthewnelson.kmp.tor.manager.internal.DEPRECATION_NOTICE
 import io.matthewnelson.kmp.tor.manager.internal.RealTorManager
 import io.matthewnelson.kmp.tor.manager.instance.InstanceId
 import io.matthewnelson.kmp.tor.manager.instance.TorMultiInstanceManager
@@ -57,6 +58,7 @@ import kotlin.jvm.JvmStatic
  * @see [TorStateManager]
  * @see [TorEventProcessor]
  * */
+@Deprecated(message = DEPRECATION_NOTICE)
 actual interface TorManager:
     Destroyable,
     TorControlManager,
