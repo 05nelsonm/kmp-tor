@@ -1,0 +1,104 @@
+<!doctype html>
+<html class="no-js">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" charset="UTF-8">
+    <title>runtime-service</title>
+<link href="../../images/logo-icon.svg" rel="icon" type="image/svg">    <script>var pathToRoot = "../../";</script>
+    <script>document.documentElement.classList.replace("no-js","js");</script>
+    <script>const storage = localStorage.getItem("dokka-dark-mode")
+    if (storage == null) {
+        const osDarkSchemePreferred = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
+        if (osDarkSchemePreferred === true) {
+            document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        }
+    } else {
+        const savedDarkMode = JSON.parse(storage)
+        if(savedDarkMode === true) {
+            document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        }
+    }
+    </script>
+<script type="text/javascript" src="https://unpkg.com/kotlin-playground@1/dist/playground.min.js" async></script>
+<script type="text/javascript" src="../../scripts/sourceset_dependencies.js" async></script>
+<link href="../../styles/style.css" rel="Stylesheet">
+<link href="../../styles/main.css" rel="Stylesheet">
+<link href="../../styles/prism.css" rel="Stylesheet">
+<link href="../../styles/logo-styles.css" rel="Stylesheet">
+<link href="../../styles/font-jb-sans-auto.css" rel="Stylesheet">
+<script type="text/javascript" src="../../scripts/clipboard.js" async></script>
+<script type="text/javascript" src="../../scripts/navigation-loader.js" async></script>
+<script type="text/javascript" src="../../scripts/platform-content-handler.js" async></script>
+<script type="text/javascript" src="../../scripts/main.js" defer></script>
+<script type="text/javascript" src="../../scripts/prism.js" async></script>
+<script type="text/javascript" src="../../scripts/symbol-parameters-wrapper_deferred.js" defer></script></head>
+<body>
+    <div class="root">
+<nav class="navigation" id="navigation-wrapper">
+    <div class="navigation--inner">
+        <div class="navigation-title">
+            <button class="menu-toggle" id="menu-toggle" type="button">toggle menu</button>
+            <div class="library-name">
+<a class="library-name--link" href="../../index.html">
+                            kmp-tor
+                    </a>            </div>
+            <div class="library-version">2.0.0-alpha01
+            </div>
+        </div>
+        <div class="filter-section" id="filter-section">
+                <button class="platform-tag platform-selector jvm-like" data-active="" data-filter=":library:runtime-service:dokkaHtmlPartial/androidMain">android</button>
+                <button class="platform-tag platform-selector common-like" data-active="" data-filter=":library:runtime-service:dokkaHtmlPartial/commonMain">common</button>
+        </div>
+    </div>
+    <div class="navigation-controls">
+        <button class="navigation-controls--btn navigation-controls--theme" id="theme-toggle-button" type="button">switch theme</button>
+        <div class="navigation-controls--btn navigation-controls--search" id="searchBar" role="button">search in API</div>
+    </div>
+</nav>
+        <div id="container">
+            <div class="sidebar" id="leftColumn">
+                <div class="sidebar--inner" id="sideMenu"></div>
+            </div>
+            <div id="main">
+<div class="main-content" id="content" pageids="runtime-service::////PointingToDeclaration//1731779278">
+  <div class="breadcrumbs"></div>
+  <div class="cover ">
+    <h1 class="cover"><span><span>runtime-service</span></span></h1>
+    <div class="platform-hinted UnderCoverText with-platform-tabs" data-platform-hinted="data-platform-hinted">
+      <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":library:runtime-service:dokkaHtmlPartial/androidMain" data-filterable-set=":library:runtime-service:dokkaHtmlPartial/androidMain" data-active="" data-toggle=":library:runtime-service:dokkaHtmlPartial/androidMain">android</button><button class="platform-bookmark" data-filterable-current=":library:runtime-service:dokkaHtmlPartial/commonMain" data-filterable-set=":library:runtime-service:dokkaHtmlPartial/commonMain" data-toggle=":library:runtime-service:dokkaHtmlPartial/commonMain">common</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":library:runtime-service:dokkaHtmlPartial/androidMain"><p class="paragraph">A <a href="https://kmp-tor.matthewnelson.io/library/runtime/io.matthewnelson.kmp.tor.runtime/-tor-runtime/-service-factory/index.html">TorRuntime.ServiceFactory</a> implementation which facilitates execution of  <a href="https://kmp-tor.matthewnelson.io/library/runtime/io.matthewnelson.kmp.tor.runtime/-tor-runtime/index.html">TorRuntime</a> within a service object, such as an <code class="lang-kotlin">android.app.Service</code>.</p><details>
+    <summary>Configure Android</summary><p class="paragraph">This dependency will "wrap" <a href="https://kmp-tor.matthewnelson.io/library/runtime/io.matthewnelson.kmp.tor.runtime/-tor-runtime/-environment/index.html">TorRuntime.Environment</a> creation with some helpers,  whereby all instances of <a href="https://kmp-tor.matthewnelson.io/library/runtime/io.matthewnelson.kmp.tor.runtime/-tor-runtime/index.html">TorRuntime</a> instantiated with them will be started within  <code class="lang-kotlin">TorService</code>.</p><p class="paragraph">For Foreground Service support, you can either implement the <a href="https://kmp-tor.matthewnelson.io/library/runtime-service/io.matthewnelson.kmp.tor.runtime.service/-tor-service-u-i/index.html">TorServiceUI</a> yourself,  or utilize the <a href="https://kmp-tor.matthewnelson.io/library/runtime-service-ui/index.html">runtime-service-ui</a> dependency.</p><ul><li><p class="paragraph"><strong>Permissions may be required when using this dependency:</strong></p></li><ul><li><p class="paragraph">See <a href="https://github.com/05nelsonm/kmp-tor/blob/master/library/runtime-service/src/androidMain/AndroidManifest.xml">AndroidManifest.xml</a></p></li></ul><li><p class="paragraph">See the <a href="https://kmp-tor.matthewnelson.io/library/runtime-service/io.matthewnelson.kmp.tor.runtime.service/-tor-service-config/index.html">TorServiceConfig Docs</a></p></li><li><p class="paragraph">See the <a href="https://github.com/05nelsonm/kmp-tor-samples/blob/master/samples/compose/src/androidMain/kotlin/io/matthewnelson/kmp/tor/sample/compose/Tor.android.kt">Sample Implementation</a></p></li></ul></details><details>
+    <summary>Configure iOS</summary><p class="paragraph">Not yet implemented. PRs are welcomed! See <a href="https://github.com/05nelsonm/kmp-tor/issues/547">Issue #547</a></p></details><h3 class="">Get Started</h3><p class="paragraph"><strong>NOTE:</strong> if using <a href="https://kmp-tor.matthewnelson.io/library/runtime-service-ui/index.html">runtime-service-ui</a>, this dependency does not need to  be expressed (it is automatically added by <a href="https://kmp-tor.matthewnelson.io/library/runtime-service-ui/index.html">runtime-service-ui</a>).</p><ul><li><p class="paragraph">Add dependency to project/sourceSet(s)</p><div class="sample-container"><pre><code class="block lang-kotlin" theme="idea">// build.gradle.kts<br>dependencies {<br>    implementation("io.matthewnelson.kmp-tor:runtime-service:$vKmpTor")<br>}</code></pre><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div></li></ul></div><div class="content sourceset-dependent-content" data-togglable=":library:runtime-service:dokkaHtmlPartial/commonMain"><p class="paragraph">A <a href="https://kmp-tor.matthewnelson.io/library/runtime/io.matthewnelson.kmp.tor.runtime/-tor-runtime/-service-factory/index.html">TorRuntime.ServiceFactory</a> implementation which facilitates execution of  <a href="https://kmp-tor.matthewnelson.io/library/runtime/io.matthewnelson.kmp.tor.runtime/-tor-runtime/index.html">TorRuntime</a> within a service object, such as an <code class="lang-kotlin">android.app.Service</code>.</p><details>
+    <summary>Configure Android</summary><p class="paragraph">This dependency will "wrap" <a href="https://kmp-tor.matthewnelson.io/library/runtime/io.matthewnelson.kmp.tor.runtime/-tor-runtime/-environment/index.html">TorRuntime.Environment</a> creation with some helpers,  whereby all instances of <a href="https://kmp-tor.matthewnelson.io/library/runtime/io.matthewnelson.kmp.tor.runtime/-tor-runtime/index.html">TorRuntime</a> instantiated with them will be started within  <code class="lang-kotlin">TorService</code>.</p><p class="paragraph">For Foreground Service support, you can either implement the <a href="https://kmp-tor.matthewnelson.io/library/runtime-service/io.matthewnelson.kmp.tor.runtime.service/-tor-service-u-i/index.html">TorServiceUI</a> yourself,  or utilize the <a href="https://kmp-tor.matthewnelson.io/library/runtime-service-ui/index.html">runtime-service-ui</a> dependency.</p><ul><li><p class="paragraph"><strong>Permissions may be required when using this dependency:</strong></p></li><ul><li><p class="paragraph">See <a href="https://github.com/05nelsonm/kmp-tor/blob/master/library/runtime-service/src/androidMain/AndroidManifest.xml">AndroidManifest.xml</a></p></li></ul><li><p class="paragraph">See the <a href="https://kmp-tor.matthewnelson.io/library/runtime-service/io.matthewnelson.kmp.tor.runtime.service/-tor-service-config/index.html">TorServiceConfig Docs</a></p></li><li><p class="paragraph">See the <a href="https://github.com/05nelsonm/kmp-tor-samples/blob/master/samples/compose/src/androidMain/kotlin/io/matthewnelson/kmp/tor/sample/compose/Tor.android.kt">Sample Implementation</a></p></li></ul></details><details>
+    <summary>Configure iOS</summary><p class="paragraph">Not yet implemented. PRs are welcomed! See <a href="https://github.com/05nelsonm/kmp-tor/issues/547">Issue #547</a></p></details><h3 class="">Get Started</h3><p class="paragraph"><strong>NOTE:</strong> if using <a href="https://kmp-tor.matthewnelson.io/library/runtime-service-ui/index.html">runtime-service-ui</a>, this dependency does not need to  be expressed (it is automatically added by <a href="https://kmp-tor.matthewnelson.io/library/runtime-service-ui/index.html">runtime-service-ui</a>).</p><ul><li><p class="paragraph">Add dependency to project/sourceSet(s)</p><div class="sample-container"><pre><code class="block lang-kotlin" theme="idea">// build.gradle.kts<br>dependencies {<br>    implementation("io.matthewnelson.kmp-tor:runtime-service:$vKmpTor")<br>}</code></pre><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div></li></ul></div>    </div>
+  </div>
+  <h2 class="">Packages</h2>
+  <div class="table"><a data-name="-897287881%2FPackages%2F1731779278" anchor-label="io.matthewnelson.kmp.tor.runtime.service" id="-897287881%2FPackages%2F1731779278" data-filterable-set=":library:runtime-service:dokkaHtmlPartial/androidMain,:library:runtime-service:dokkaHtmlPartial/commonMain"></a>
+    <div class="table-row" data-filterable-current=":library:runtime-service:dokkaHtmlPartial/androidMain,:library:runtime-service:dokkaHtmlPartial/commonMain" data-filterable-set=":library:runtime-service:dokkaHtmlPartial/androidMain,:library:runtime-service:dokkaHtmlPartial/commonMain">
+      <div>
+        <div class="main-subrow ">
+          <div class=""><span class="inline-flex">
+              <div><a href="io.matthewnelson.kmp.tor.runtime.service/index.html">io.matthewnelson.kmp.tor.runtime.service</a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-897287881%2FPackages%2F1731779278"></span>
+                <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+              </span></span></div>
+          <div class="pull-right">
+            <div class="platform-tags no-gutters">
+              <div class="platform-tag jvm-like">android</div>
+              <div class="platform-tag common-like">common</div>
+            </div>
+          </div>
+        </div>
+        <div></div>
+      </div>
+    </div>
+  </div>
+</div>
+      <div class="footer">
+        <span class="go-to-top-icon"><a href="#content" id="go-to-top-link"></a></span><span>© 2024 Copyright</span><span class="pull-right"><span>Generated by </span><a href="https://github.com/Kotlin/dokka"><span>dokka</span><span class="padded-icon"></span></a></span>
+      </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+

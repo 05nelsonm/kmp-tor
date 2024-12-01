@@ -1,0 +1,197 @@
+<!doctype html>
+<html class="no-js">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" charset="UTF-8">
+    <title>IPAddress</title>
+<link href="../../../../images/logo-icon.svg" rel="icon" type="image/svg">    <script>var pathToRoot = "../../../../";</script>
+    <script>document.documentElement.classList.replace("no-js","js");</script>
+    <script>const storage = localStorage.getItem("dokka-dark-mode")
+    if (storage == null) {
+        const osDarkSchemePreferred = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
+        if (osDarkSchemePreferred === true) {
+            document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        }
+    } else {
+        const savedDarkMode = JSON.parse(storage)
+        if(savedDarkMode === true) {
+            document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        }
+    }
+    </script>
+<script type="text/javascript" src="https://unpkg.com/kotlin-playground@1/dist/playground.min.js" async></script>
+<script type="text/javascript" src="../../../../scripts/sourceset_dependencies.js" async></script>
+<link href="../../../../styles/style.css" rel="Stylesheet">
+<link href="../../../../styles/main.css" rel="Stylesheet">
+<link href="../../../../styles/prism.css" rel="Stylesheet">
+<link href="../../../../styles/logo-styles.css" rel="Stylesheet">
+<link href="../../../../styles/font-jb-sans-auto.css" rel="Stylesheet">
+<script type="text/javascript" src="../../../../scripts/clipboard.js" async></script>
+<script type="text/javascript" src="../../../../scripts/navigation-loader.js" async></script>
+<script type="text/javascript" src="../../../../scripts/platform-content-handler.js" async></script>
+<script type="text/javascript" src="../../../../scripts/main.js" defer></script>
+<script type="text/javascript" src="../../../../scripts/prism.js" async></script>
+<script type="text/javascript" src="../../../../scripts/symbol-parameters-wrapper_deferred.js" defer></script></head>
+<body>
+    <div class="root">
+<nav class="navigation" id="navigation-wrapper">
+    <div class="navigation--inner">
+        <div class="navigation-title">
+            <button class="menu-toggle" id="menu-toggle" type="button">toggle menu</button>
+            <div class="library-name">
+<a class="library-name--link" href="../../../../index.html">
+                            kmp-tor
+                    </a>            </div>
+            <div class="library-version">2.0.0-alpha01
+            </div>
+        </div>
+        <div class="filter-section" id="filter-section">
+                <button class="platform-tag platform-selector common-like" data-active="" data-filter=":library:runtime-core:dokkaHtmlPartial/commonMain">common</button>
+                <button class="platform-tag platform-selector jvm-like" data-active="" data-filter=":library:runtime-core:dokkaHtmlPartial/jvmMain">jvm</button>
+        </div>
+    </div>
+    <div class="navigation-controls">
+        <button class="navigation-controls--btn navigation-controls--theme" id="theme-toggle-button" type="button">switch theme</button>
+        <div class="navigation-controls--btn navigation-controls--search" id="searchBar" role="button">search in API</div>
+    </div>
+</nav>
+        <div id="container">
+            <div class="sidebar" id="leftColumn">
+                <div class="sidebar--inner" id="sideMenu"></div>
+            </div>
+            <div id="main">
+<div class="main-content" data-page-type="classlike" id="content" pageids="runtime-core::io.matthewnelson.kmp.tor.runtime.core.net/IPAddress///PointingToDeclaration//-1857527840">
+  <div class="breadcrumbs"><a href="../../index.html">runtime-core</a><span class="delimiter">/</span><a href="../index.html">io.matthewnelson.kmp.tor.runtime.core.net</a><span class="delimiter">/</span><span class="current">IPAddress</span></div>
+  <div class="cover ">
+    <h1 class="cover"><span><span>IPAddress</span></span></h1>
+    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":library:runtime-core:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">sealed </span><span class="token keyword">class </span><a href="index.html">IPAddress</a> : <a href="../-address/index.html">Address</a><span class="clearfix"><span class="floating-right">(<a href="https://github.com/05nelsonm/kmp-tor/tree/master/library/runtime-core/src/commonMain/kotlin/io/matthewnelson/kmp/tor/runtime/core/net/IPAddress.kt#L57">source</a>)</span></span></div><p class="paragraph">Base abstraction for denoting an ip address</p><p class="paragraph">e.g.</p><div class="sample-container"><pre><code class="block lang-kotlin" theme="idea">"192.168.0.1".toIPAddress()
+"http://127.0.0.1:8080".toIPAddress()
+"::1".toIPAddress()
+"[::1]".toIPAddress()
+"http://[::1]:8080".toIPAddress()
+"https://uName:pass word@[::1]:8443/some/path".toIPAddress()
+
+ByteArray(4).toIPAddressV4().let { address -&gt;
+    assertIs<ipaddress.v4.anyhost>(address)
+}
+ByteArray(16).toIPAddressV6(scope = "1").let { address -&gt;
+    assertIs<ipaddress.v6.anyhost>(address)
+    assertIsNot<ipaddress.v6.anyhost.noscope>(address)
+    println(address)
+    // 0:0:0:0:0:0:0:0%1
+}</ipaddress.v6.anyhost.noscope></ipaddress.v6.anyhost></ipaddress.v4.anyhost></code></pre><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><h4 class="">See also</h4><div class="table"><div class="table-row" data-filterable-current=":library:runtime-core:dokkaHtmlPartial/commonMain" data-filterable-set=":library:runtime-core:dokkaHtmlPartial/commonMain"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="-companion/to-i-p-address.html"><span>IPAddress.</span><wbr><span>Companion.</span><wbr><span>to</span><wbr><span><span>IPAddress</span></span></a></div></span></div><div></div></div></div><div class="table-row" data-filterable-current=":library:runtime-core:dokkaHtmlPartial/commonMain" data-filterable-set=":library:runtime-core:dokkaHtmlPartial/commonMain"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="-companion/to-i-p-address-or-null.html"><span>IPAddress.</span><wbr><span>Companion.</span><wbr><span>to</span><wbr><span>IPAddress</span><wbr><span>Or</span><wbr><span><span>Null</span></span></a></div></span></div><div></div></div></div><div class="table-row" data-filterable-current=":library:runtime-core:dokkaHtmlPartial/commonMain" data-filterable-set=":library:runtime-core:dokkaHtmlPartial/commonMain"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><span>io.</span><wbr><span>matthewnelson.</span><wbr><span>kmp.</span><wbr><span>tor.</span><wbr><span>runtime.</span><wbr><span>core.</span><wbr><span>util.</span><wbr><span>to</span><wbr><span>Inet</span><wbr><span><span>Address</span></span></div></span></div><div></div></div></div><div class="table-row" data-filterable-current=":library:runtime-core:dokkaHtmlPartial/commonMain" data-filterable-set=":library:runtime-core:dokkaHtmlPartial/commonMain"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><span>io.</span><wbr><span>matthewnelson.</span><wbr><span>kmp.</span><wbr><span>tor.</span><wbr><span>runtime.</span><wbr><span>core.</span><wbr><span>util.</span><wbr><span>to</span><wbr><span><span>IPAddress</span></span></div></span></div><div></div></div></div></div><h4 class="">Inheritors</h4><div class="table"><div class="table-row" data-filterable-current=":library:runtime-core:dokkaHtmlPartial/commonMain" data-filterable-set=":library:runtime-core:dokkaHtmlPartial/commonMain"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="-v4/index.html">V4</a></div></span></div><div></div></div></div><div class="table-row" data-filterable-current=":library:runtime-core:dokkaHtmlPartial/commonMain" data-filterable-set=":library:runtime-core:dokkaHtmlPartial/commonMain"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="-v6/index.html">V6</a></div></span></div><div></div></div></div></div></div></div>
+  </div>
+  <div class="tabbedcontent">
+    <div class="tabs-section" tabs-section="tabs-section"><button class="section-tab" data-active="" data-togglable="CONSTRUCTOR,TYPE,PROPERTY,FUNCTION">Members</button><button class="section-tab" data-togglable="CONSTRUCTOR,TYPE,PROPERTY,FUNCTION,EXTENSION_PROPERTY,EXTENSION_FUNCTION">Members &amp; Extensions</button></div>
+    <div class="tabs-section-body">
+      <div data-togglable="TYPE">
+        <h2 class="">Types</h2>
+        <div class="table"><a data-name="818188551%2FClasslikes%2F-1857527840" anchor-label="Companion" id="818188551%2FClasslikes%2F-1857527840" data-filterable-set=":library:runtime-core:dokkaHtmlPartial/commonMain"></a>
+          <div class="table-row" data-filterable-current=":library:runtime-core:dokkaHtmlPartial/commonMain" data-filterable-set=":library:runtime-core:dokkaHtmlPartial/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-companion/index.html"><span><span>Companion</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="818188551%2FClasslikes%2F-1857527840"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":library:runtime-core:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">object </span><a href="-companion/index.html">Companion</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-640556207%2FClasslikes%2F-1857527840" anchor-label="V4" id="-640556207%2FClasslikes%2F-1857527840" data-filterable-set=":library:runtime-core:dokkaHtmlPartial/commonMain"></a>
+          <div class="table-row" data-filterable-current=":library:runtime-core:dokkaHtmlPartial/commonMain" data-filterable-set=":library:runtime-core:dokkaHtmlPartial/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-v4/index.html"><span><span>V4</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-640556207%2FClasslikes%2F-1857527840"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":library:runtime-core:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">class </span><a href="-v4/index.html">V4</a> : <a href="index.html">IPAddress</a></div><div class="brief "><p class="paragraph">Holder for an IPv4 address</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-578516593%2FClasslikes%2F-1857527840" anchor-label="V6" id="-578516593%2FClasslikes%2F-1857527840" data-filterable-set=":library:runtime-core:dokkaHtmlPartial/commonMain"></a>
+          <div class="table-row" data-filterable-current=":library:runtime-core:dokkaHtmlPartial/commonMain" data-filterable-set=":library:runtime-core:dokkaHtmlPartial/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-v6/index.html"><span><span>V6</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-578516593%2FClasslikes%2F-1857527840"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":library:runtime-core:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">class </span><a href="-v6/index.html">V6</a> : <a href="index.html">IPAddress</a></div><div class="brief "><p class="paragraph">Holder for an IPv6 address</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div data-togglable="FUNCTION">
+        <h2 class="">Functions</h2>
+        <div class="table"><a data-name="-413867252%2FFunctions%2F-1857527840" anchor-label="address" id="-413867252%2FFunctions%2F-1857527840" data-filterable-set=":library:runtime-core:dokkaHtmlPartial/commonMain"></a>
+          <div class="table-row" data-filterable-current=":library:runtime-core:dokkaHtmlPartial/commonMain" data-filterable-set=":library:runtime-core:dokkaHtmlPartial/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="address.html"><span><span>address</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-413867252%2FFunctions%2F-1857527840"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":library:runtime-core:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">fun </span><a href="address.html"><span class="token function">address</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><span data-unresolved-link="kotlin/ByteArray///PointingToDeclaration/">ByteArray</span></div><div class="brief "><p class="paragraph">Returns the raw bytes for this <a href="index.html">IPAddress</a> in network byte order. Will either be 4 or 16 bytes in length (<a href="-v4/index.html">V4</a> or <a href="-v6/index.html">V6</a> respectively).</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="314843712%2FFunctions%2F-469852394" anchor-label="toInetAddress" id="314843712%2FFunctions%2F-469852394" data-filterable-set=":library:runtime-core:dokkaHtmlPartial/jvmMain"></a>
+          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":library:runtime-core:dokkaHtmlPartial/jvmMain" data-filterable-set=":library:runtime-core:dokkaHtmlPartial/jvmMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="../../io.matthewnelson.kmp.tor.runtime.core.util/to-inet-address.html"><span>to</span><wbr><span>Inet</span><wbr><span><span>Address</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="314843712%2FFunctions%2F-469852394"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":library:runtime-core:dokkaHtmlPartial/jvmMain" data-filterable-set=":library:runtime-core:dokkaHtmlPartial/jvmMain" data-active="" data-toggle=":library:runtime-core:dokkaHtmlPartial/jvmMain">jvm</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":library:runtime-core:dokkaHtmlPartial/jvmMain"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><span data-unresolved-link="kotlin.jvm/JvmName///PointingToDeclaration/"><span class="token annotation builtin">JvmName</span></span><span class="token punctuation">(</span><span>name<span class="token operator"> = </span><span class="breakable-word"><span class="token string">"inetAddressOf"</span></span></span><wbr><span class="token punctuation">)</span></div></div><span class="token keyword">fun </span><a href="index.html">IPAddress</a><span class="token punctuation">.</span><a href="../../io.matthewnelson.kmp.tor.runtime.core.util/to-inet-address.html"><span class="token function">toInetAddress</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://docs.oracle.com/javase/8/docs/api/java/net/InetAddress.html">InetAddress</a></div><div class="brief "><p class="paragraph">Convert <a href="index.html">IPAddress</a> to <a href="https://docs.oracle.com/javase/8/docs/api/java/net/InetAddress.html">java.net.InetAddress</a>.</p></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="334652585%2FFunctions%2F-1857527840" anchor-label="unmappingFrom" id="334652585%2FFunctions%2F-1857527840" data-filterable-set=":library:runtime-core:dokkaHtmlPartial/commonMain"></a>
+          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":library:runtime-core:dokkaHtmlPartial/commonMain" data-filterable-set=":library:runtime-core:dokkaHtmlPartial/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="../../io.matthewnelson.kmp.tor.runtime.core.ctrl/-address-mapping/-companion/unmapping-from.html"><span>unmapping</span><wbr><span><span>From</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="334652585%2FFunctions%2F-1857527840"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":library:runtime-core:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><span data-unresolved-link="kotlin.jvm/JvmStatic///PointingToDeclaration/"><span class="token annotation builtin">JvmStatic</span></span></div><div class="block"><span class="token annotation builtin">@</span><span data-unresolved-link="kotlin.jvm/JvmName///PointingToDeclaration/"><span class="token annotation builtin">JvmName</span></span><span class="token punctuation">(</span><span>name<span class="token operator"> = </span><span class="breakable-word"><span class="token string">"unmapFrom"</span></span></span><wbr><span class="token punctuation">)</span></div></div><span class="token keyword">fun </span><a href="index.html">IPAddress</a><span class="token punctuation">.</span><a href="../../io.matthewnelson.kmp.tor.runtime.core.ctrl/-address-mapping/-companion/unmapping-from.html"><span class="token function">unmappingFrom</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../../io.matthewnelson.kmp.tor.runtime.core.ctrl/-address-mapping/index.html">AddressMapping</a></div><div class="brief "><p class="paragraph">Creates a <a href="../../io.matthewnelson.kmp.tor.runtime.core.ctrl/-address-mapping/index.html">AddressMapping</a> that instruct tor to unmap any addresses associated with the provided <a href="index.html">IPAddress</a>.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      <div class="footer">
+        <span class="go-to-top-icon"><a href="#content" id="go-to-top-link"></a></span><span>© 2024 Copyright</span><span class="pull-right"><span>Generated by </span><a href="https://github.com/Kotlin/dokka"><span>dokka</span><span class="padded-icon"></span></a></span>
+      </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+

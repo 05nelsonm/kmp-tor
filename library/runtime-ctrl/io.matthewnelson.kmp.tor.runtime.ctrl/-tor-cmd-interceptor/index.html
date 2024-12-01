@@ -1,0 +1,113 @@
+<!doctype html>
+<html class="no-js">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" charset="UTF-8">
+    <title>TorCmdInterceptor</title>
+<link href="../../../../images/logo-icon.svg" rel="icon" type="image/svg">    <script>var pathToRoot = "../../../../";</script>
+    <script>document.documentElement.classList.replace("no-js","js");</script>
+    <script>const storage = localStorage.getItem("dokka-dark-mode")
+    if (storage == null) {
+        const osDarkSchemePreferred = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
+        if (osDarkSchemePreferred === true) {
+            document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        }
+    } else {
+        const savedDarkMode = JSON.parse(storage)
+        if(savedDarkMode === true) {
+            document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        }
+    }
+    </script>
+<script type="text/javascript" src="https://unpkg.com/kotlin-playground@1/dist/playground.min.js" async></script>
+<script type="text/javascript" src="../../../../scripts/sourceset_dependencies.js" async></script>
+<link href="../../../../styles/style.css" rel="Stylesheet">
+<link href="../../../../styles/main.css" rel="Stylesheet">
+<link href="../../../../styles/prism.css" rel="Stylesheet">
+<link href="../../../../styles/logo-styles.css" rel="Stylesheet">
+<link href="../../../../styles/font-jb-sans-auto.css" rel="Stylesheet">
+<script type="text/javascript" src="../../../../scripts/clipboard.js" async></script>
+<script type="text/javascript" src="../../../../scripts/navigation-loader.js" async></script>
+<script type="text/javascript" src="../../../../scripts/platform-content-handler.js" async></script>
+<script type="text/javascript" src="../../../../scripts/main.js" defer></script>
+<script type="text/javascript" src="../../../../scripts/prism.js" async></script>
+<script type="text/javascript" src="../../../../scripts/symbol-parameters-wrapper_deferred.js" defer></script></head>
+<body>
+    <div class="root">
+<nav class="navigation" id="navigation-wrapper">
+    <div class="navigation--inner">
+        <div class="navigation-title">
+            <button class="menu-toggle" id="menu-toggle" type="button">toggle menu</button>
+            <div class="library-name">
+<a class="library-name--link" href="../../../../index.html">
+                            kmp-tor
+                    </a>            </div>
+            <div class="library-version">2.0.0-alpha01
+            </div>
+        </div>
+        <div class="filter-section" id="filter-section">
+                <button class="platform-tag platform-selector common-like" data-active="" data-filter=":library:runtime-ctrl:dokkaHtmlPartial/commonMain">common</button>
+        </div>
+    </div>
+    <div class="navigation-controls">
+        <button class="navigation-controls--btn navigation-controls--theme" id="theme-toggle-button" type="button">switch theme</button>
+        <div class="navigation-controls--btn navigation-controls--search" id="searchBar" role="button">search in API</div>
+    </div>
+</nav>
+        <div id="container">
+            <div class="sidebar" id="leftColumn">
+                <div class="sidebar--inner" id="sideMenu"></div>
+            </div>
+            <div id="main">
+<div class="main-content" data-page-type="classlike" id="content" pageids="runtime-ctrl::io.matthewnelson.kmp.tor.runtime.ctrl/TorCmdInterceptor///PointingToDeclaration//383942804">
+  <div class="breadcrumbs"><a href="../../index.html">runtime-ctrl</a><span class="delimiter">/</span><a href="../index.html">io.matthewnelson.kmp.tor.runtime.ctrl</a><span class="delimiter">/</span><span class="current">TorCmdInterceptor</span></div>
+  <div class="cover ">
+    <h1 class="cover"><span>Tor</span><wbr><span>Cmd</span><wbr><span><span>Interceptor</span></span></h1>
+    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":library:runtime-ctrl:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">class </span><a href="index.html">TorCmdInterceptor</a><span class="token operator">&lt;</span><a href="index.html">C</a><span class="token operator"> : </span><a href="../../../../library/runtime-core/io.matthewnelson.kmp.tor.runtime.core.ctrl/-tor-cmd/index.html">TorCmd</a><span class="token operator">&lt;</span><span class="token operator">*</span><span class="token operator">&gt;</span><span class="token operator">&gt;</span><span class="clearfix"><span class="floating-right">(<a href="https://github.com/05nelsonm/kmp-tor/tree/master/library/runtime-ctrl/src/commonMain/kotlin/io/matthewnelson/kmp/tor/runtime/ctrl/TorCmdInterceptor.kt#L55">source</a>)</span></span></div><p class="paragraph">Intercept the currently executing <a href="../../../../library/runtime-core/io.matthewnelson.kmp.tor.runtime.core/-enqueued-job/index.html">EnqueuedJob</a> and its associated <a href="../../../../library/runtime-core/io.matthewnelson.kmp.tor.runtime.core.ctrl/-tor-cmd/index.html">TorCmd</a> in order to apply <a href="../../../../library/runtime-core/io.matthewnelson.kmp.tor.runtime.core/-enqueued-job/invoke-on-completion.html">EnqueuedJob.invokeOnCompletion</a> handles, or modify the command's arguments.</p><p class="paragraph">If no modifications are needed for the <a href="../../../../library/runtime-core/io.matthewnelson.kmp.tor.runtime.core.ctrl/-tor-cmd/index.html">TorCmd</a>, the originating <a href="../../../../library/runtime-core/io.matthewnelson.kmp.tor.runtime.core.ctrl/-tor-cmd/index.html">TorCmd</a> should be returned.</p><p class="paragraph"><strong>NOTE:</strong> The following <a href="../../../../library/runtime-core/io.matthewnelson.kmp.tor.runtime.core.ctrl/-tor-cmd/index.html">TorCmd</a> <strong>cannot</strong> be replaced:</p><ul><li><p class="paragraph"><a href="../../../../library/runtime-core/io.matthewnelson.kmp.tor.runtime.core.ctrl/-tor-cmd/-onion/-add/index.html">TorCmd.Onion.Add</a></p></li><li><p class="paragraph"><a href="../../../../library/runtime-core/io.matthewnelson.kmp.tor.runtime.core.ctrl/-tor-cmd/-onion/-delete/index.html">TorCmd.Onion.Delete</a></p></li></ul><p class="paragraph">e.g.</p><div class="sample-container"><pre><code class="block lang-kotlin" theme="idea">TorCmdInterceptor.intercept<torcmd.setevents> { job, cmd -&gt;
+    job.invokeOnCompletion {
+        if (job.isError) return@invokeOnCompletion
+        // do something...
+    }
+
+    if (cmd.events.contains(TorEvent.NOTICE)) {
+        // Do not replace the command
+        cmd
+    } else {
+        // This is what will end up being executed
+        TorCmd.SetEvents(cmd.events + TorEvent.NOTICE)
+    }
+}</torcmd.setevents></code></pre><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><h4 class="">See also</h4><div class="table"><div class="table-row" data-filterable-current=":library:runtime-ctrl:dokkaHtmlPartial/commonMain" data-filterable-set=":library:runtime-ctrl:dokkaHtmlPartial/commonMain"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="-companion/intercept.html"><span>Tor</span><wbr><span>Cmd</span><wbr><span>Interceptor.</span><wbr><span>Companion.</span><wbr><span>intercept</span></a></div></span></div><div></div></div></div></div></div></div>
+  </div>
+  <div class="tabbedcontent">
+    <div class="tabs-section" tabs-section="tabs-section"><button class="section-tab" data-active="" data-togglable="CONSTRUCTOR,TYPE,PROPERTY,FUNCTION">Members</button></div>
+    <div class="tabs-section-body">
+      <div data-togglable="TYPE">
+        <h2 class="">Types</h2>
+        <div class="table"><a data-name="734800789%2FClasslikes%2F383942804" anchor-label="Companion" id="734800789%2FClasslikes%2F383942804" data-filterable-set=":library:runtime-ctrl:dokkaHtmlPartial/commonMain"></a>
+          <div class="table-row" data-filterable-current=":library:runtime-ctrl:dokkaHtmlPartial/commonMain" data-filterable-set=":library:runtime-ctrl:dokkaHtmlPartial/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-companion/index.html"><span><span>Companion</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="734800789%2FClasslikes%2F383942804"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":library:runtime-ctrl:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">object </span><a href="-companion/index.html">Companion</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      <div class="footer">
+        <span class="go-to-top-icon"><a href="#content" id="go-to-top-link"></a></span><span>© 2024 Copyright</span><span class="pull-right"><span>Generated by </span><a href="https://github.com/Kotlin/dokka"><span>dokka</span><span class="padded-icon"></span></a></span>
+      </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+

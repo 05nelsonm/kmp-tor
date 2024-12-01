@@ -1,0 +1,309 @@
+<!doctype html>
+<html class="no-js">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" charset="UTF-8">
+    <title>FlagsBuilderSocks</title>
+<link href="../../../../../images/logo-icon.svg" rel="icon" type="image/svg">    <script>var pathToRoot = "../../../../../";</script>
+    <script>document.documentElement.classList.replace("no-js","js");</script>
+    <script>const storage = localStorage.getItem("dokka-dark-mode")
+    if (storage == null) {
+        const osDarkSchemePreferred = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
+        if (osDarkSchemePreferred === true) {
+            document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        }
+    } else {
+        const savedDarkMode = JSON.parse(storage)
+        if(savedDarkMode === true) {
+            document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        }
+    }
+    </script>
+<script type="text/javascript" src="https://unpkg.com/kotlin-playground@1/dist/playground.min.js" async></script>
+<script type="text/javascript" src="../../../../../scripts/sourceset_dependencies.js" async></script>
+<link href="../../../../../styles/style.css" rel="Stylesheet">
+<link href="../../../../../styles/main.css" rel="Stylesheet">
+<link href="../../../../../styles/prism.css" rel="Stylesheet">
+<link href="../../../../../styles/logo-styles.css" rel="Stylesheet">
+<link href="../../../../../styles/font-jb-sans-auto.css" rel="Stylesheet">
+<script type="text/javascript" src="../../../../../scripts/clipboard.js" async></script>
+<script type="text/javascript" src="../../../../../scripts/navigation-loader.js" async></script>
+<script type="text/javascript" src="../../../../../scripts/platform-content-handler.js" async></script>
+<script type="text/javascript" src="../../../../../scripts/main.js" defer></script>
+<script type="text/javascript" src="../../../../../scripts/prism.js" async></script>
+<script type="text/javascript" src="../../../../../scripts/symbol-parameters-wrapper_deferred.js" defer></script></head>
+<body>
+    <div class="root">
+<nav class="navigation" id="navigation-wrapper">
+    <div class="navigation--inner">
+        <div class="navigation-title">
+            <button class="menu-toggle" id="menu-toggle" type="button">toggle menu</button>
+            <div class="library-name">
+<a class="library-name--link" href="../../../../../index.html">
+                            kmp-tor
+                    </a>            </div>
+            <div class="library-version">2.0.0-alpha01
+            </div>
+        </div>
+        <div class="filter-section" id="filter-section">
+                <button class="platform-tag platform-selector common-like" data-active="" data-filter=":library:runtime-core:dokkaHtmlPartial/commonMain">common</button>
+        </div>
+    </div>
+    <div class="navigation-controls">
+        <button class="navigation-controls--btn navigation-controls--theme" id="theme-toggle-button" type="button">switch theme</button>
+        <div class="navigation-controls--btn navigation-controls--search" id="searchBar" role="button">search in API</div>
+    </div>
+</nav>
+        <div id="container">
+            <div class="sidebar" id="leftColumn">
+                <div class="sidebar--inner" id="sideMenu"></div>
+            </div>
+            <div id="main">
+<div class="main-content" data-page-type="classlike" id="content" pageids="runtime-core::io.matthewnelson.kmp.tor.runtime.core.config.builder/BuilderScopePort.FlagsBuilderSocks///PointingToDeclaration//-1857527840">
+  <div class="breadcrumbs"><a href="../../../index.html">runtime-core</a><span class="delimiter">/</span><a href="../../index.html">io.matthewnelson.kmp.tor.runtime.core.config.builder</a><span class="delimiter">/</span><a href="../index.html">BuilderScopePort</a><span class="delimiter">/</span><span class="current">FlagsBuilderSocks</span></div>
+  <div class="cover ">
+    <h1 class="cover"><span>Flags</span><wbr><span>Builder</span><wbr><span><span>Socks</span></span></h1>
+    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":library:runtime-core:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">class </span><a href="index.html">FlagsBuilderSocks</a><span class="clearfix"><span class="floating-right">(<a href="https://github.com/05nelsonm/kmp-tor/tree/master/library/runtime-core/src/commonMain/kotlin/io/matthewnelson/kmp/tor/runtime/core/config/builder/BuilderScopePort.kt#L574">source</a>)</span></span></div><p class="paragraph">Configure the desired <a href="../../../io.matthewnelson.kmp.tor.runtime.core.config/-tor-option/index.html">TorOption</a> with Socks Flags, as described in <a href="https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#OtherSocksPortFlags">tor-man#OtherSocksPortFlags</a>.</p><p class="paragraph">Configurability is as follows:</p><ul><li><p class="paragraph"><code class="lang-kotlin">null</code>: no action (the default).</p></li><li><p class="paragraph"><code class="lang-kotlin">true</code>: add the flag if not present.</p></li><li><p class="paragraph"><code class="lang-kotlin">false</code>: remove the flag if present.</p></li></ul><p class="paragraph">e.g.</p><div class="sample-container"><pre><code class="block lang-kotlin" theme="idea">val setting = TorOption.__SocksPort.asSetting {
+    auto()
+
+    flagsSocks {
+        PreferIPv6 = true
+        OnionTrafficOnly = true
+    }
+    flagsSocks {
+        // Remove what was just added
+        OnionTrafficOnly = false
+    }
+}
+
+println(setting.items.first().optionals)
+// [PreferIPv6]</code></pre><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div></div></div>
+  </div>
+  <div class="tabbedcontent">
+    <div class="tabs-section" tabs-section="tabs-section"><button class="section-tab" data-active="" data-togglable="CONSTRUCTOR,TYPE,PROPERTY,FUNCTION">Members</button></div>
+    <div class="tabs-section-body">
+      <div data-togglable="PROPERTY">
+        <h2 class="">Properties</h2>
+        <div class="table"><a data-name="168257215%2FProperties%2F-1857527840" anchor-label="CacheDNS" id="168257215%2FProperties%2F-1857527840" data-filterable-set=":library:runtime-core:dokkaHtmlPartial/commonMain"></a>
+          <div class="table-row" data-filterable-current=":library:runtime-core:dokkaHtmlPartial/commonMain" data-filterable-set=":library:runtime-core:dokkaHtmlPartial/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-cache-d-n-s.html"><span>Cache</span><wbr><span><span>DNS</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="168257215%2FProperties%2F-1857527840"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":library:runtime-core:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><span data-unresolved-link="kotlin.jvm/JvmField///PointingToDeclaration/"><span class="token annotation builtin">JvmField</span></span></div></div><span class="token keyword">var </span><a href="-cache-d-n-s.html">CacheDNS</a><span class="token operator">: </span><span data-unresolved-link="kotlin/Boolean///PointingToDeclaration/">Boolean</span><span class="token operator">?</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1825687972%2FProperties%2F-1857527840" anchor-label="CacheIPv4DNS" id="1825687972%2FProperties%2F-1857527840" data-filterable-set=":library:runtime-core:dokkaHtmlPartial/commonMain"></a>
+          <div class="table-row" data-filterable-current=":library:runtime-core:dokkaHtmlPartial/commonMain" data-filterable-set=":library:runtime-core:dokkaHtmlPartial/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-cache-i-pv4-d-n-s.html"><span>Cache</span><wbr><span><span>IPv4DNS</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1825687972%2FProperties%2F-1857527840"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":library:runtime-core:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><span data-unresolved-link="kotlin.jvm/JvmField///PointingToDeclaration/"><span class="token annotation builtin">JvmField</span></span></div></div><span class="token keyword">var </span><a href="-cache-i-pv4-d-n-s.html">CacheIPv4DNS</a><span class="token operator">: </span><span data-unresolved-link="kotlin/Boolean///PointingToDeclaration/">Boolean</span><span class="token operator">?</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1083075930%2FProperties%2F-1857527840" anchor-label="CacheIPv6DNS" id="-1083075930%2FProperties%2F-1857527840" data-filterable-set=":library:runtime-core:dokkaHtmlPartial/commonMain"></a>
+          <div class="table-row" data-filterable-current=":library:runtime-core:dokkaHtmlPartial/commonMain" data-filterable-set=":library:runtime-core:dokkaHtmlPartial/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-cache-i-pv6-d-n-s.html"><span>Cache</span><wbr><span><span>IPv6DNS</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1083075930%2FProperties%2F-1857527840"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":library:runtime-core:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><span data-unresolved-link="kotlin.jvm/JvmField///PointingToDeclaration/"><span class="token annotation builtin">JvmField</span></span></div></div><span class="token keyword">var </span><a href="-cache-i-pv6-d-n-s.html">CacheIPv6DNS</a><span class="token operator">: </span><span data-unresolved-link="kotlin/Boolean///PointingToDeclaration/">Boolean</span><span class="token operator">?</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1261419070%2FProperties%2F-1857527840" anchor-label="IPv6Traffic" id="1261419070%2FProperties%2F-1857527840" data-filterable-set=":library:runtime-core:dokkaHtmlPartial/commonMain"></a>
+          <div class="table-row" data-filterable-current=":library:runtime-core:dokkaHtmlPartial/commonMain" data-filterable-set=":library:runtime-core:dokkaHtmlPartial/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-i-pv6-traffic.html"><span><span>IPv6Traffic</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1261419070%2FProperties%2F-1857527840"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":library:runtime-core:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><span data-unresolved-link="kotlin.jvm/JvmField///PointingToDeclaration/"><span class="token annotation builtin">JvmField</span></span></div></div><span class="token keyword">var </span><a href="-i-pv6-traffic.html">IPv6Traffic</a><span class="token operator">: </span><span data-unresolved-link="kotlin/Boolean///PointingToDeclaration/">Boolean</span><span class="token operator">?</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1455814977%2FProperties%2F-1857527840" anchor-label="NoDNSRequest" id="-1455814977%2FProperties%2F-1857527840" data-filterable-set=":library:runtime-core:dokkaHtmlPartial/commonMain"></a>
+          <div class="table-row" data-filterable-current=":library:runtime-core:dokkaHtmlPartial/commonMain" data-filterable-set=":library:runtime-core:dokkaHtmlPartial/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-no-d-n-s-request.html"><span>No</span><wbr><span><span>DNSRequest</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1455814977%2FProperties%2F-1857527840"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":library:runtime-core:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><span data-unresolved-link="kotlin.jvm/JvmField///PointingToDeclaration/"><span class="token annotation builtin">JvmField</span></span></div></div><span class="token keyword">var </span><a href="-no-d-n-s-request.html">NoDNSRequest</a><span class="token operator">: </span><span data-unresolved-link="kotlin/Boolean///PointingToDeclaration/">Boolean</span><span class="token operator">?</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-516418083%2FProperties%2F-1857527840" anchor-label="NoIPv4Traffic" id="-516418083%2FProperties%2F-1857527840" data-filterable-set=":library:runtime-core:dokkaHtmlPartial/commonMain"></a>
+          <div class="table-row" data-filterable-current=":library:runtime-core:dokkaHtmlPartial/commonMain" data-filterable-set=":library:runtime-core:dokkaHtmlPartial/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-no-i-pv4-traffic.html"><span>No</span><wbr><span><span>IPv4Traffic</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-516418083%2FProperties%2F-1857527840"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":library:runtime-core:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><span data-unresolved-link="kotlin.jvm/JvmField///PointingToDeclaration/"><span class="token annotation builtin">JvmField</span></span></div></div><span class="token keyword">var </span><a href="-no-i-pv4-traffic.html">NoIPv4Traffic</a><span class="token operator">: </span><span data-unresolved-link="kotlin/Boolean///PointingToDeclaration/">Boolean</span><span class="token operator">?</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="805535153%2FProperties%2F-1857527840" anchor-label="NoOnionTraffic" id="805535153%2FProperties%2F-1857527840" data-filterable-set=":library:runtime-core:dokkaHtmlPartial/commonMain"></a>
+          <div class="table-row" data-filterable-current=":library:runtime-core:dokkaHtmlPartial/commonMain" data-filterable-set=":library:runtime-core:dokkaHtmlPartial/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-no-onion-traffic.html"><span>No</span><wbr><span>Onion</span><wbr><span><span>Traffic</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="805535153%2FProperties%2F-1857527840"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":library:runtime-core:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><span data-unresolved-link="kotlin.jvm/JvmField///PointingToDeclaration/"><span class="token annotation builtin">JvmField</span></span></div></div><span class="token keyword">var </span><a href="-no-onion-traffic.html">NoOnionTraffic</a><span class="token operator">: </span><span data-unresolved-link="kotlin/Boolean///PointingToDeclaration/">Boolean</span><span class="token operator">?</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1599153254%2FProperties%2F-1857527840" anchor-label="OnionTrafficOnly" id="1599153254%2FProperties%2F-1857527840" data-filterable-set=":library:runtime-core:dokkaHtmlPartial/commonMain"></a>
+          <div class="table-row" data-filterable-current=":library:runtime-core:dokkaHtmlPartial/commonMain" data-filterable-set=":library:runtime-core:dokkaHtmlPartial/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-onion-traffic-only.html"><span>Onion</span><wbr><span>Traffic</span><wbr><span><span>Only</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1599153254%2FProperties%2F-1857527840"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":library:runtime-core:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><span data-unresolved-link="kotlin.jvm/JvmField///PointingToDeclaration/"><span class="token annotation builtin">JvmField</span></span></div></div><span class="token keyword">var </span><a href="-onion-traffic-only.html">OnionTrafficOnly</a><span class="token operator">: </span><span data-unresolved-link="kotlin/Boolean///PointingToDeclaration/">Boolean</span><span class="token operator">?</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1036580047%2FProperties%2F-1857527840" anchor-label="PreferIPv6" id="1036580047%2FProperties%2F-1857527840" data-filterable-set=":library:runtime-core:dokkaHtmlPartial/commonMain"></a>
+          <div class="table-row" data-filterable-current=":library:runtime-core:dokkaHtmlPartial/commonMain" data-filterable-set=":library:runtime-core:dokkaHtmlPartial/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-prefer-i-pv6.html"><span>Prefer</span><wbr><span><span>IPv6</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1036580047%2FProperties%2F-1857527840"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":library:runtime-core:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><span data-unresolved-link="kotlin.jvm/JvmField///PointingToDeclaration/"><span class="token annotation builtin">JvmField</span></span></div></div><span class="token keyword">var </span><a href="-prefer-i-pv6.html">PreferIPv6</a><span class="token operator">: </span><span data-unresolved-link="kotlin/Boolean///PointingToDeclaration/">Boolean</span><span class="token operator">?</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1545587166%2FProperties%2F-1857527840" anchor-label="PreferIPv6Automap" id="1545587166%2FProperties%2F-1857527840" data-filterable-set=":library:runtime-core:dokkaHtmlPartial/commonMain"></a>
+          <div class="table-row" data-filterable-current=":library:runtime-core:dokkaHtmlPartial/commonMain" data-filterable-set=":library:runtime-core:dokkaHtmlPartial/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-prefer-i-pv6-automap.html"><span>Prefer</span><wbr><span><span>IPv6Automap</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1545587166%2FProperties%2F-1857527840"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":library:runtime-core:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><span data-unresolved-link="kotlin.jvm/JvmField///PointingToDeclaration/"><span class="token annotation builtin">JvmField</span></span></div></div><span class="token keyword">var </span><a href="-prefer-i-pv6-automap.html">PreferIPv6Automap</a><span class="token operator">: </span><span data-unresolved-link="kotlin/Boolean///PointingToDeclaration/">Boolean</span><span class="token operator">?</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1376979596%2FProperties%2F-1857527840" anchor-label="PreferSOCKSNoAuth" id="1376979596%2FProperties%2F-1857527840" data-filterable-set=":library:runtime-core:dokkaHtmlPartial/commonMain"></a>
+          <div class="table-row" data-filterable-current=":library:runtime-core:dokkaHtmlPartial/commonMain" data-filterable-set=":library:runtime-core:dokkaHtmlPartial/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-prefer-s-o-c-k-s-no-auth.html"><span>Prefer</span><wbr><span>SOCKSNo</span><wbr><span><span>Auth</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1376979596%2FProperties%2F-1857527840"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":library:runtime-core:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><span data-unresolved-link="kotlin.jvm/JvmField///PointingToDeclaration/"><span class="token annotation builtin">JvmField</span></span></div></div><span class="token keyword">var </span><a href="-prefer-s-o-c-k-s-no-auth.html">PreferSOCKSNoAuth</a><span class="token operator">: </span><span data-unresolved-link="kotlin/Boolean///PointingToDeclaration/">Boolean</span><span class="token operator">?</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-62257868%2FProperties%2F-1857527840" anchor-label="UseDNSCache" id="-62257868%2FProperties%2F-1857527840" data-filterable-set=":library:runtime-core:dokkaHtmlPartial/commonMain"></a>
+          <div class="table-row" data-filterable-current=":library:runtime-core:dokkaHtmlPartial/commonMain" data-filterable-set=":library:runtime-core:dokkaHtmlPartial/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-use-d-n-s-cache.html"><span>Use</span><wbr><span><span>DNSCache</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-62257868%2FProperties%2F-1857527840"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":library:runtime-core:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><span data-unresolved-link="kotlin.jvm/JvmField///PointingToDeclaration/"><span class="token annotation builtin">JvmField</span></span></div></div><span class="token keyword">var </span><a href="-use-d-n-s-cache.html">UseDNSCache</a><span class="token operator">: </span><span data-unresolved-link="kotlin/Boolean///PointingToDeclaration/">Boolean</span><span class="token operator">?</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-206262160%2FProperties%2F-1857527840" anchor-label="UseIPv4Cache" id="-206262160%2FProperties%2F-1857527840" data-filterable-set=":library:runtime-core:dokkaHtmlPartial/commonMain"></a>
+          <div class="table-row" data-filterable-current=":library:runtime-core:dokkaHtmlPartial/commonMain" data-filterable-set=":library:runtime-core:dokkaHtmlPartial/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-use-i-pv4-cache.html"><span>Use</span><wbr><span><span>IPv4Cache</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-206262160%2FProperties%2F-1857527840"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":library:runtime-core:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><span data-unresolved-link="kotlin.jvm/JvmField///PointingToDeclaration/"><span class="token annotation builtin">JvmField</span></span></div></div><span class="token keyword">var </span><a href="-use-i-pv4-cache.html">UseIPv4Cache</a><span class="token operator">: </span><span data-unresolved-link="kotlin/Boolean///PointingToDeclaration/">Boolean</span><span class="token operator">?</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="495337714%2FProperties%2F-1857527840" anchor-label="UseIPv6Cache" id="495337714%2FProperties%2F-1857527840" data-filterable-set=":library:runtime-core:dokkaHtmlPartial/commonMain"></a>
+          <div class="table-row" data-filterable-current=":library:runtime-core:dokkaHtmlPartial/commonMain" data-filterable-set=":library:runtime-core:dokkaHtmlPartial/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-use-i-pv6-cache.html"><span>Use</span><wbr><span><span>IPv6Cache</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="495337714%2FProperties%2F-1857527840"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":library:runtime-core:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><span data-unresolved-link="kotlin.jvm/JvmField///PointingToDeclaration/"><span class="token annotation builtin">JvmField</span></span></div></div><span class="token keyword">var </span><a href="-use-i-pv6-cache.html">UseIPv6Cache</a><span class="token operator">: </span><span data-unresolved-link="kotlin/Boolean///PointingToDeclaration/">Boolean</span><span class="token operator">?</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      <div class="footer">
+        <span class="go-to-top-icon"><a href="#content" id="go-to-top-link"></a></span><span>© 2024 Copyright</span><span class="pull-right"><span>Generated by </span><a href="https://github.com/Kotlin/dokka"><span>dokka</span><span class="padded-icon"></span></a></span>
+      </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+

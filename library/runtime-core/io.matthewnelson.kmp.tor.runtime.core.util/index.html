@@ -1,0 +1,291 @@
+<!doctype html>
+<html class="no-js">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" charset="UTF-8">
+    <title>io.matthewnelson.kmp.tor.runtime.core.util</title>
+<link href="../../../images/logo-icon.svg" rel="icon" type="image/svg">    <script>var pathToRoot = "../../../";</script>
+    <script>document.documentElement.classList.replace("no-js","js");</script>
+    <script>const storage = localStorage.getItem("dokka-dark-mode")
+    if (storage == null) {
+        const osDarkSchemePreferred = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
+        if (osDarkSchemePreferred === true) {
+            document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        }
+    } else {
+        const savedDarkMode = JSON.parse(storage)
+        if(savedDarkMode === true) {
+            document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        }
+    }
+    </script>
+<script type="text/javascript" src="https://unpkg.com/kotlin-playground@1/dist/playground.min.js" async></script>
+<script type="text/javascript" src="../../../scripts/sourceset_dependencies.js" async></script>
+<link href="../../../styles/style.css" rel="Stylesheet">
+<link href="../../../styles/main.css" rel="Stylesheet">
+<link href="../../../styles/prism.css" rel="Stylesheet">
+<link href="../../../styles/logo-styles.css" rel="Stylesheet">
+<link href="../../../styles/font-jb-sans-auto.css" rel="Stylesheet">
+<script type="text/javascript" src="../../../scripts/clipboard.js" async></script>
+<script type="text/javascript" src="../../../scripts/navigation-loader.js" async></script>
+<script type="text/javascript" src="../../../scripts/platform-content-handler.js" async></script>
+<script type="text/javascript" src="../../../scripts/main.js" defer></script>
+<script type="text/javascript" src="../../../scripts/prism.js" async></script>
+<script type="text/javascript" src="../../../scripts/symbol-parameters-wrapper_deferred.js" defer></script></head>
+<body>
+    <div class="root">
+<nav class="navigation" id="navigation-wrapper">
+    <div class="navigation--inner">
+        <div class="navigation-title">
+            <button class="menu-toggle" id="menu-toggle" type="button">toggle menu</button>
+            <div class="library-name">
+<a class="library-name--link" href="../../../index.html">
+                            kmp-tor
+                    </a>            </div>
+            <div class="library-version">2.0.0-alpha01
+            </div>
+        </div>
+        <div class="filter-section" id="filter-section">
+                <button class="platform-tag platform-selector common-like" data-active="" data-filter=":library:runtime-core:dokkaHtmlPartial/commonMain">common</button>
+                <button class="platform-tag platform-selector js-like" data-active="" data-filter=":library:runtime-core:dokkaHtmlPartial/jsMain">js</button>
+                <button class="platform-tag platform-selector jvm-like" data-active="" data-filter=":library:runtime-core:dokkaHtmlPartial/jvmMain">jvm</button>
+                <button class="platform-tag platform-selector common-like" data-active="" data-filter=":library:runtime-core:dokkaHtmlPartial/nonJsMain">nonJs</button>
+        </div>
+    </div>
+    <div class="navigation-controls">
+        <button class="navigation-controls--btn navigation-controls--theme" id="theme-toggle-button" type="button">switch theme</button>
+        <div class="navigation-controls--btn navigation-controls--search" id="searchBar" role="button">search in API</div>
+    </div>
+</nav>
+        <div id="container">
+            <div class="sidebar" id="leftColumn">
+                <div class="sidebar--inner" id="sideMenu"></div>
+            </div>
+            <div id="main">
+<div class="main-content" data-page-type="package" id="content" pageids="runtime-core::io.matthewnelson.kmp.tor.runtime.core.util////PointingToDeclaration//633608622">
+  <div class="breadcrumbs"><a href="../index.html">runtime-core</a><span class="delimiter">/</span><span class="current">io.matthewnelson.kmp.tor.runtime.core.util</span></div>
+  <div class="cover ">
+    <h1 class="cover"><span><span>Package-level</span></span> <span><span>declarations</span></span></h1>
+  </div>
+  <div class="tabbedcontent">
+    <div class="tabs-section" tabs-section="tabs-section"><button class="section-tab" data-active="" data-togglable="FUNCTION,EXTENSION_FUNCTION">Functions</button></div>
+    <div class="tabs-section-body">
+      <div data-togglable="EXTENSION_FUNCTION">
+        <h2 class="">Functions</h2>
+        <div class="table"><a data-name="628360940%2FFunctions%2F1406914168" anchor-label="executeAsync" id="628360940%2FFunctions%2F1406914168" data-filterable-set=":library:runtime-core:dokkaHtmlPartial/commonMain,:library:runtime-core:dokkaHtmlPartial/jsMain,:library:runtime-core:dokkaHtmlPartial/nonJsMain"></a>
+          <div class="table-row" data-filterable-current=":library:runtime-core:dokkaHtmlPartial/commonMain,:library:runtime-core:dokkaHtmlPartial/jsMain,:library:runtime-core:dokkaHtmlPartial/nonJsMain" data-filterable-set=":library:runtime-core:dokkaHtmlPartial/commonMain,:library:runtime-core:dokkaHtmlPartial/jsMain,:library:runtime-core:dokkaHtmlPartial/nonJsMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="execute-async.html"><span>execute</span><wbr><span><span>Async</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="628360940%2FFunctions%2F1406914168"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":library:runtime-core:dokkaHtmlPartial/commonMain" data-filterable-set=":library:runtime-core:dokkaHtmlPartial/commonMain" data-active="" data-toggle=":library:runtime-core:dokkaHtmlPartial/commonMain">common</button><button class="platform-bookmark" data-filterable-current=":library:runtime-core:dokkaHtmlPartial/jsMain" data-filterable-set=":library:runtime-core:dokkaHtmlPartial/jsMain" data-toggle=":library:runtime-core:dokkaHtmlPartial/jsMain">js</button><button class="platform-bookmark" data-filterable-current=":library:runtime-core:dokkaHtmlPartial/nonJsMain" data-filterable-set=":library:runtime-core:dokkaHtmlPartial/nonJsMain" data-toggle=":library:runtime-core:dokkaHtmlPartial/nonJsMain">nonJs</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":library:runtime-core:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">expect </span><span class="token keyword">suspend </span><span class="token keyword">fun </span><span class="token operator">&lt;</span><a href="execute-async.html">Success</a><span class="token operator"> : </span><span data-unresolved-link="kotlin/Any///PointingToDeclaration/">Any</span><span class="token operator">&gt; </span><a href="../io.matthewnelson.kmp.tor.runtime.core.ctrl/-tor-cmd/-privileged/-processor/index.html">TorCmd.Privileged.Processor</a><span class="token punctuation">.</span><a href="execute-async.html"><span class="token function">executeAsync</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">cmd<span class="token operator">: </span><a href="../io.matthewnelson.kmp.tor.runtime.core.ctrl/-tor-cmd/-privileged/index.html">TorCmd.Privileged</a><span class="token operator">&lt;</span><a href="execute-async.html">Success</a><span class="token operator">&gt;</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="execute-async.html">Success</a></div><div class="symbol monospace"><span class="token keyword">expect </span><span class="token keyword">suspend </span><span class="token keyword">fun </span><span class="token operator">&lt;</span><a href="execute-async.html">Success</a><span class="token operator"> : </span><span data-unresolved-link="kotlin/Any///PointingToDeclaration/">Any</span><span class="token operator">&gt; </span><a href="../io.matthewnelson.kmp.tor.runtime.core.ctrl/-tor-cmd/-unprivileged/-processor/index.html">TorCmd.Unprivileged.Processor</a><span class="token punctuation">.</span><a href="execute-async.html"><span class="token function">executeAsync</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">cmd<span class="token operator">: </span><a href="../io.matthewnelson.kmp.tor.runtime.core.ctrl/-tor-cmd/-unprivileged/index.html">TorCmd.Unprivileged</a><span class="token operator">&lt;</span><a href="execute-async.html">Success</a><span class="token operator">&gt;</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="execute-async.html">Success</a></div><div class="brief "><p class="paragraph">Enqueues the <a href="execute-async.html">cmd</a>, suspending the current coroutine until completion or cancellation/error.</p></div></div><div class="content sourceset-dependent-content" data-togglable=":library:runtime-core:dokkaHtmlPartial/jsMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">suspend </span><span class="token keyword">fun </span><span class="token operator">&lt;</span><a href="execute-async.html">Success</a><span class="token operator"> : </span><span data-unresolved-link="kotlin/Any///PointingToDeclaration/">Any</span><span class="token operator">&gt; </span><a href="../io.matthewnelson.kmp.tor.runtime.core.ctrl/-tor-cmd/-privileged/-processor/index.html">TorCmd.Privileged.Processor</a><span class="token punctuation">.</span><a href="execute-async.html"><span class="token function">executeAsync</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">cmd<span class="token operator">: </span><a href="../io.matthewnelson.kmp.tor.runtime.core.ctrl/-tor-cmd/-privileged/index.html">TorCmd.Privileged</a><span class="token operator">&lt;</span><a href="execute-async.html">Success</a><span class="token operator">&gt;</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="execute-async.html">Success</a></div><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">suspend </span><span class="token keyword">fun </span><span class="token operator">&lt;</span><a href="execute-async.html">Success</a><span class="token operator"> : </span><span data-unresolved-link="kotlin/Any///PointingToDeclaration/">Any</span><span class="token operator">&gt; </span><a href="../io.matthewnelson.kmp.tor.runtime.core.ctrl/-tor-cmd/-unprivileged/-processor/index.html">TorCmd.Unprivileged.Processor</a><span class="token punctuation">.</span><a href="execute-async.html"><span class="token function">executeAsync</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">cmd<span class="token operator">: </span><a href="../io.matthewnelson.kmp.tor.runtime.core.ctrl/-tor-cmd/-unprivileged/index.html">TorCmd.Unprivileged</a><span class="token operator">&lt;</span><a href="execute-async.html">Success</a><span class="token operator">&gt;</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="execute-async.html">Success</a></div><div class="brief "><p class="paragraph">Enqueues the <a href="execute-async.html">cmd</a>, suspending the current coroutine until completion or cancellation/error.</p></div></div><div class="content sourceset-dependent-content" data-togglable=":library:runtime-core:dokkaHtmlPartial/nonJsMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">suspend </span><span class="token keyword">fun </span><span class="token operator">&lt;</span><a href="execute-async.html">Success</a><span class="token operator"> : </span><span data-unresolved-link="kotlin/Any///PointingToDeclaration/">Any</span><span class="token operator">&gt; </span><a href="../io.matthewnelson.kmp.tor.runtime.core.ctrl/-tor-cmd/-privileged/-processor/index.html">TorCmd.Privileged.Processor</a><span class="token punctuation">.</span><a href="execute-async.html"><span class="token function">executeAsync</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">cmd<span class="token operator">: </span><a href="../io.matthewnelson.kmp.tor.runtime.core.ctrl/-tor-cmd/-privileged/index.html">TorCmd.Privileged</a><span class="token operator">&lt;</span><a href="execute-async.html">Success</a><span class="token operator">&gt;</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="execute-async.html">Success</a></div><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">suspend </span><span class="token keyword">fun </span><span class="token operator">&lt;</span><a href="execute-async.html">Success</a><span class="token operator"> : </span><span data-unresolved-link="kotlin/Any///PointingToDeclaration/">Any</span><span class="token operator">&gt; </span><a href="../io.matthewnelson.kmp.tor.runtime.core.ctrl/-tor-cmd/-unprivileged/-processor/index.html">TorCmd.Unprivileged.Processor</a><span class="token punctuation">.</span><a href="execute-async.html"><span class="token function">executeAsync</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">cmd<span class="token operator">: </span><a href="../io.matthewnelson.kmp.tor.runtime.core.ctrl/-tor-cmd/-unprivileged/index.html">TorCmd.Unprivileged</a><span class="token operator">&lt;</span><a href="execute-async.html">Success</a><span class="token operator">&gt;</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="execute-async.html">Success</a></div><div class="brief "><p class="paragraph">Enqueues the <a href="execute-async.html">cmd</a>, suspending the current coroutine until completion or cancellation/error.</p></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1432896724%2FFunctions%2F-338500902" anchor-label="executeSync" id="-1432896724%2FFunctions%2F-338500902" data-filterable-set=":library:runtime-core:dokkaHtmlPartial/nonJsMain"></a>
+          <div class="table-row" data-filterable-current=":library:runtime-core:dokkaHtmlPartial/nonJsMain" data-filterable-set=":library:runtime-core:dokkaHtmlPartial/nonJsMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="execute-sync.html"><span>execute</span><wbr><span><span>Sync</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1432896724%2FFunctions%2F-338500902"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":library:runtime-core:dokkaHtmlPartial/nonJsMain" data-filterable-set=":library:runtime-core:dokkaHtmlPartial/nonJsMain" data-active="" data-toggle=":library:runtime-core:dokkaHtmlPartial/nonJsMain">nonJs</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":library:runtime-core:dokkaHtmlPartial/nonJsMain"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><span data-unresolved-link="kotlin.jvm/JvmOverloads///PointingToDeclaration/"><span class="token annotation builtin">JvmOverloads</span></span></div></div><span class="token keyword">fun </span><span class="token operator">&lt;</span><a href="execute-sync.html">Success</a><span class="token operator"> : </span><span data-unresolved-link="kotlin/Any///PointingToDeclaration/">Any</span><span class="token operator">&gt; </span><a href="../io.matthewnelson.kmp.tor.runtime.core.ctrl/-tor-cmd/-privileged/-processor/index.html">TorCmd.Privileged.Processor</a><span class="token punctuation">.</span><a href="execute-sync.html"><span class="token function">executeSync</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">cmd<span class="token operator">: </span><a href="../io.matthewnelson.kmp.tor.runtime.core.ctrl/-tor-cmd/-privileged/index.html">TorCmd.Privileged</a><span class="token operator">&lt;</span><a href="execute-sync.html">Success</a><span class="token operator">&gt;</span><span class="token punctuation">, </span></span><span class="parameter ">cancellation<span class="token operator">: </span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><span data-unresolved-link="kotlin.coroutines.cancellation/CancellationException///PointingToDeclaration/">CancellationException</span><span class="token operator">?</span><span class="token operator">?</span><span class="token operator"> = </span>null</span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="execute-sync.html">Success</a></div><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><span data-unresolved-link="kotlin.jvm/JvmOverloads///PointingToDeclaration/"><span class="token annotation builtin">JvmOverloads</span></span></div></div><span class="token keyword">fun </span><span class="token operator">&lt;</span><a href="execute-sync.html">Success</a><span class="token operator"> : </span><span data-unresolved-link="kotlin/Any///PointingToDeclaration/">Any</span><span class="token operator">&gt; </span><a href="../io.matthewnelson.kmp.tor.runtime.core.ctrl/-tor-cmd/-unprivileged/-processor/index.html">TorCmd.Unprivileged.Processor</a><span class="token punctuation">.</span><a href="execute-sync.html"><span class="token function">executeSync</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">cmd<span class="token operator">: </span><a href="../io.matthewnelson.kmp.tor.runtime.core.ctrl/-tor-cmd/-unprivileged/index.html">TorCmd.Unprivileged</a><span class="token operator">&lt;</span><a href="execute-sync.html">Success</a><span class="token operator">&gt;</span><span class="token punctuation">, </span></span><span class="parameter ">cancellation<span class="token operator">: </span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><span data-unresolved-link="kotlin.coroutines.cancellation/CancellationException///PointingToDeclaration/">CancellationException</span><span class="token operator">?</span><span class="token operator">?</span><span class="token operator"> = </span>null</span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="execute-sync.html">Success</a></div><div class="brief "><p class="paragraph">Enqueues the <a href="execute-sync.html">cmd</a>, blocking the current thread until completion or cancellation/error.</p></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="708752555%2FFunctions%2F1406914168" anchor-label="findNextAvailableAsync" id="708752555%2FFunctions%2F1406914168" data-filterable-set=":library:runtime-core:dokkaHtmlPartial/commonMain,:library:runtime-core:dokkaHtmlPartial/jsMain,:library:runtime-core:dokkaHtmlPartial/nonJsMain"></a>
+          <div class="table-row" data-filterable-current=":library:runtime-core:dokkaHtmlPartial/commonMain,:library:runtime-core:dokkaHtmlPartial/jsMain,:library:runtime-core:dokkaHtmlPartial/nonJsMain" data-filterable-set=":library:runtime-core:dokkaHtmlPartial/commonMain,:library:runtime-core:dokkaHtmlPartial/jsMain,:library:runtime-core:dokkaHtmlPartial/nonJsMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="find-next-available-async.html"><span>find</span><wbr><span>Next</span><wbr><span>Available</span><wbr><span><span>Async</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="708752555%2FFunctions%2F1406914168"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":library:runtime-core:dokkaHtmlPartial/commonMain" data-filterable-set=":library:runtime-core:dokkaHtmlPartial/commonMain" data-active="" data-toggle=":library:runtime-core:dokkaHtmlPartial/commonMain">common</button><button class="platform-bookmark" data-filterable-current=":library:runtime-core:dokkaHtmlPartial/jsMain" data-filterable-set=":library:runtime-core:dokkaHtmlPartial/jsMain" data-toggle=":library:runtime-core:dokkaHtmlPartial/jsMain">js</button><button class="platform-bookmark" data-filterable-current=":library:runtime-core:dokkaHtmlPartial/nonJsMain" data-filterable-set=":library:runtime-core:dokkaHtmlPartial/nonJsMain" data-toggle=":library:runtime-core:dokkaHtmlPartial/nonJsMain">nonJs</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":library:runtime-core:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">expect </span><span class="token keyword">suspend </span><span class="token keyword">fun </span><a href="../io.matthewnelson.kmp.tor.runtime.core.net/-port/-ephemeral/index.html">Port.Ephemeral</a><span class="token punctuation">.</span><a href="find-next-available-async.html"><span class="token function">findNextAvailableAsync</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">limit<span class="token operator">: </span><span data-unresolved-link="kotlin/Int///PointingToDeclaration/">Int</span><span class="token punctuation">, </span></span><span class="parameter ">host<span class="token operator">: </span><a href="../io.matthewnelson.kmp.tor.runtime.core.net/-local-host/index.html">LocalHost</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../io.matthewnelson.kmp.tor.runtime.core.net/-port/-ephemeral/index.html">Port.Ephemeral</a></div><div class="brief "><p class="paragraph">Finds an available TCP port on <a href="../io.matthewnelson.kmp.tor.runtime.core.net/-local-host/index.html">LocalHost</a> starting with the current <a href="../../../library/runtime-core/io.matthewnelson.kmp.tor.runtime.core.net/-port/-ephemeral/value.html">Port.Ephemeral.value</a> and iterating up <a href="find-next-available-async.html">limit</a> times.</p></div></div><div class="content sourceset-dependent-content" data-togglable=":library:runtime-core:dokkaHtmlPartial/jsMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">suspend </span><span class="token keyword">fun </span><a href="../io.matthewnelson.kmp.tor.runtime.core.net/-port/-ephemeral/index.html">Port.Ephemeral</a><span class="token punctuation">.</span><a href="find-next-available-async.html"><span class="token function">findNextAvailableAsync</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">limit<span class="token operator">: </span><span data-unresolved-link="kotlin/Int///PointingToDeclaration/">Int</span><span class="token punctuation">, </span></span><span class="parameter ">host<span class="token operator">: </span><a href="../io.matthewnelson.kmp.tor.runtime.core.net/-local-host/index.html">LocalHost</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../io.matthewnelson.kmp.tor.runtime.core.net/-port/-ephemeral/index.html">Port.Ephemeral</a></div><div class="brief "><p class="paragraph">Finds an available TCP port on <a href="../io.matthewnelson.kmp.tor.runtime.core.net/-local-host/index.html">LocalHost</a> starting with the current <a href="../../../library/runtime-core/io.matthewnelson.kmp.tor.runtime.core.net/-port/-ephemeral/value.html">Port.Ephemeral.value</a> and iterating up <a href="find-next-available-async.html">limit</a> times.</p></div></div><div class="content sourceset-dependent-content" data-togglable=":library:runtime-core:dokkaHtmlPartial/nonJsMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">suspend </span><span class="token keyword">fun </span><a href="../io.matthewnelson.kmp.tor.runtime.core.net/-port/-ephemeral/index.html">Port.Ephemeral</a><span class="token punctuation">.</span><a href="find-next-available-async.html"><span class="token function">findNextAvailableAsync</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">limit<span class="token operator">: </span><span data-unresolved-link="kotlin/Int///PointingToDeclaration/">Int</span><span class="token punctuation">, </span></span><span class="parameter ">host<span class="token operator">: </span><a href="../io.matthewnelson.kmp.tor.runtime.core.net/-local-host/index.html">LocalHost</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../io.matthewnelson.kmp.tor.runtime.core.net/-port/-ephemeral/index.html">Port.Ephemeral</a></div><div class="brief "><p class="paragraph">Finds an available TCP port on <a href="../io.matthewnelson.kmp.tor.runtime.core.net/-local-host/index.html">LocalHost</a> starting with the current <a href="../../../library/runtime-core/io.matthewnelson.kmp.tor.runtime.core.net/-port/-ephemeral/value.html">Port.Ephemeral.value</a> and iterating up <a href="find-next-available-async.html">limit</a> times.</p></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-296644140%2FFunctions%2F-338500902" anchor-label="findNextAvailableSync" id="-296644140%2FFunctions%2F-338500902" data-filterable-set=":library:runtime-core:dokkaHtmlPartial/nonJsMain"></a>
+          <div class="table-row" data-filterable-current=":library:runtime-core:dokkaHtmlPartial/nonJsMain" data-filterable-set=":library:runtime-core:dokkaHtmlPartial/nonJsMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="find-next-available-sync.html"><span>find</span><wbr><span>Next</span><wbr><span>Available</span><wbr><span><span>Sync</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-296644140%2FFunctions%2F-338500902"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":library:runtime-core:dokkaHtmlPartial/nonJsMain" data-filterable-set=":library:runtime-core:dokkaHtmlPartial/nonJsMain" data-active="" data-toggle=":library:runtime-core:dokkaHtmlPartial/nonJsMain">nonJs</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":library:runtime-core:dokkaHtmlPartial/nonJsMain"><div class="symbol monospace"><span class="token keyword">fun </span><a href="../io.matthewnelson.kmp.tor.runtime.core.net/-port/-ephemeral/index.html">Port.Ephemeral</a><span class="token punctuation">.</span><a href="find-next-available-sync.html"><span class="token function">findNextAvailableSync</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">limit<span class="token operator">: </span><span data-unresolved-link="kotlin/Int///PointingToDeclaration/">Int</span><span class="token punctuation">, </span></span><span class="parameter ">host<span class="token operator">: </span><a href="../io.matthewnelson.kmp.tor.runtime.core.net/-local-host/index.html">LocalHost</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../io.matthewnelson.kmp.tor.runtime.core.net/-port/-ephemeral/index.html">Port.Ephemeral</a></div><div class="brief "><p class="paragraph">Finds an available TCP port on <a href="../io.matthewnelson.kmp.tor.runtime.core.net/-local-host/index.html">LocalHost</a> starting with the current <a href="../../../library/runtime-core/io.matthewnelson.kmp.tor.runtime.core.net/-port/-ephemeral/value.html">Port.Ephemeral.value</a> and iterating up <a href="find-next-available-sync.html">limit</a> times.</p></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-737256225%2FFunctions%2F1406914168" anchor-label="isAvailableAsync" id="-737256225%2FFunctions%2F1406914168" data-filterable-set=":library:runtime-core:dokkaHtmlPartial/commonMain,:library:runtime-core:dokkaHtmlPartial/jsMain,:library:runtime-core:dokkaHtmlPartial/nonJsMain"></a>
+          <div class="table-row" data-filterable-current=":library:runtime-core:dokkaHtmlPartial/commonMain,:library:runtime-core:dokkaHtmlPartial/jsMain,:library:runtime-core:dokkaHtmlPartial/nonJsMain" data-filterable-set=":library:runtime-core:dokkaHtmlPartial/commonMain,:library:runtime-core:dokkaHtmlPartial/jsMain,:library:runtime-core:dokkaHtmlPartial/nonJsMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="is-available-async.html"><span>is</span><wbr><span>Available</span><wbr><span><span>Async</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-737256225%2FFunctions%2F1406914168"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":library:runtime-core:dokkaHtmlPartial/commonMain" data-filterable-set=":library:runtime-core:dokkaHtmlPartial/commonMain" data-active="" data-toggle=":library:runtime-core:dokkaHtmlPartial/commonMain">common</button><button class="platform-bookmark" data-filterable-current=":library:runtime-core:dokkaHtmlPartial/jsMain" data-filterable-set=":library:runtime-core:dokkaHtmlPartial/jsMain" data-toggle=":library:runtime-core:dokkaHtmlPartial/jsMain">js</button><button class="platform-bookmark" data-filterable-current=":library:runtime-core:dokkaHtmlPartial/nonJsMain" data-filterable-set=":library:runtime-core:dokkaHtmlPartial/nonJsMain" data-toggle=":library:runtime-core:dokkaHtmlPartial/nonJsMain">nonJs</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":library:runtime-core:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">expect </span><span class="token keyword">suspend </span><span class="token keyword">fun </span><a href="../io.matthewnelson.kmp.tor.runtime.core.net/-port/index.html">Port</a><span class="token punctuation">.</span><a href="is-available-async.html"><span class="token function">isAvailableAsync</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">host<span class="token operator">: </span><a href="../io.matthewnelson.kmp.tor.runtime.core.net/-local-host/index.html">LocalHost</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><span data-unresolved-link="kotlin/Boolean///PointingToDeclaration/">Boolean</span></div><div class="brief "><p class="paragraph">Checks if the TCP port is available on <a href="../io.matthewnelson.kmp.tor.runtime.core.net/-local-host/index.html">LocalHost</a> or not.</p></div></div><div class="content sourceset-dependent-content" data-togglable=":library:runtime-core:dokkaHtmlPartial/jsMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">suspend </span><span class="token keyword">fun </span><a href="../io.matthewnelson.kmp.tor.runtime.core.net/-port/index.html">Port</a><span class="token punctuation">.</span><a href="is-available-async.html"><span class="token function">isAvailableAsync</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">host<span class="token operator">: </span><a href="../io.matthewnelson.kmp.tor.runtime.core.net/-local-host/index.html">LocalHost</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><span data-unresolved-link="kotlin/Boolean///PointingToDeclaration/">Boolean</span></div><div class="brief "><p class="paragraph">Checks if the TCP port is available on <a href="../io.matthewnelson.kmp.tor.runtime.core.net/-local-host/index.html">LocalHost</a> or not.</p></div></div><div class="content sourceset-dependent-content" data-togglable=":library:runtime-core:dokkaHtmlPartial/nonJsMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">suspend </span><span class="token keyword">fun </span><a href="../io.matthewnelson.kmp.tor.runtime.core.net/-port/index.html">Port</a><span class="token punctuation">.</span><a href="is-available-async.html"><span class="token function">isAvailableAsync</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">host<span class="token operator">: </span><a href="../io.matthewnelson.kmp.tor.runtime.core.net/-local-host/index.html">LocalHost</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><span data-unresolved-link="kotlin/Boolean///PointingToDeclaration/">Boolean</span></div><div class="brief "><p class="paragraph">Checks if the TCP port is available on <a href="../io.matthewnelson.kmp.tor.runtime.core.net/-local-host/index.html">LocalHost</a> or not.</p></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-69518054%2FFunctions%2F-338500902" anchor-label="isAvailableSync" id="-69518054%2FFunctions%2F-338500902" data-filterable-set=":library:runtime-core:dokkaHtmlPartial/nonJsMain"></a>
+          <div class="table-row" data-filterable-current=":library:runtime-core:dokkaHtmlPartial/nonJsMain" data-filterable-set=":library:runtime-core:dokkaHtmlPartial/nonJsMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="is-available-sync.html"><span>is</span><wbr><span>Available</span><wbr><span><span>Sync</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-69518054%2FFunctions%2F-338500902"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":library:runtime-core:dokkaHtmlPartial/nonJsMain" data-filterable-set=":library:runtime-core:dokkaHtmlPartial/nonJsMain" data-active="" data-toggle=":library:runtime-core:dokkaHtmlPartial/nonJsMain">nonJs</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":library:runtime-core:dokkaHtmlPartial/nonJsMain"><div class="symbol monospace"><span class="token keyword">fun </span><a href="../io.matthewnelson.kmp.tor.runtime.core.net/-port/index.html">Port</a><span class="token punctuation">.</span><a href="is-available-sync.html"><span class="token function">isAvailableSync</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">host<span class="token operator">: </span><a href="../io.matthewnelson.kmp.tor.runtime.core.net/-local-host/index.html">LocalHost</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><span data-unresolved-link="kotlin/Boolean///PointingToDeclaration/">Boolean</span></div><div class="brief "><p class="paragraph">Checks if the TCP port is available on <a href="../io.matthewnelson.kmp.tor.runtime.core.net/-local-host/index.html">LocalHost</a> or not.</p></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1672671396%2FFunctions%2F-469852394" anchor-label="toInet4Address" id="-1672671396%2FFunctions%2F-469852394" data-filterable-set=":library:runtime-core:dokkaHtmlPartial/jvmMain"></a>
+          <div class="table-row" data-filterable-current=":library:runtime-core:dokkaHtmlPartial/jvmMain" data-filterable-set=":library:runtime-core:dokkaHtmlPartial/jvmMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="to-inet4-address.html"><span>to</span><wbr><span><span>Inet4Address</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1672671396%2FFunctions%2F-469852394"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":library:runtime-core:dokkaHtmlPartial/jvmMain" data-filterable-set=":library:runtime-core:dokkaHtmlPartial/jvmMain" data-active="" data-toggle=":library:runtime-core:dokkaHtmlPartial/jvmMain">jvm</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":library:runtime-core:dokkaHtmlPartial/jvmMain"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><span data-unresolved-link="kotlin.jvm/JvmName///PointingToDeclaration/"><span class="token annotation builtin">JvmName</span></span><span class="token punctuation">(</span><span>name<span class="token operator"> = </span><span class="breakable-word"><span class="token string">"inet4AddressOf"</span></span></span><wbr><span class="token punctuation">)</span></div></div><span class="token keyword">fun </span><a href="../io.matthewnelson.kmp.tor.runtime.core.net/-i-p-address/-v4/index.html">IPAddress.V4</a><span class="token punctuation">.</span><a href="to-inet4-address.html"><span class="token function">toInet4Address</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://docs.oracle.com/javase/8/docs/api/java/net/Inet4Address.html">Inet4Address</a></div><div class="brief "><p class="paragraph">Convert <a href="../io.matthewnelson.kmp.tor.runtime.core.net/-i-p-address/-v4/index.html">IPAddress.V4</a> to <a href="https://docs.oracle.com/javase/8/docs/api/java/net/Inet4Address.html">java.net.Inet4Address</a>.</p></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-2118399008%2FFunctions%2F-469852394" anchor-label="toInet6Address" id="-2118399008%2FFunctions%2F-469852394" data-filterable-set=":library:runtime-core:dokkaHtmlPartial/jvmMain"></a>
+          <div class="table-row" data-filterable-current=":library:runtime-core:dokkaHtmlPartial/jvmMain" data-filterable-set=":library:runtime-core:dokkaHtmlPartial/jvmMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="to-inet6-address.html"><span>to</span><wbr><span><span>Inet6Address</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-2118399008%2FFunctions%2F-469852394"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":library:runtime-core:dokkaHtmlPartial/jvmMain" data-filterable-set=":library:runtime-core:dokkaHtmlPartial/jvmMain" data-active="" data-toggle=":library:runtime-core:dokkaHtmlPartial/jvmMain">jvm</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":library:runtime-core:dokkaHtmlPartial/jvmMain"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><span data-unresolved-link="kotlin.jvm/JvmName///PointingToDeclaration/"><span class="token annotation builtin">JvmName</span></span><span class="token punctuation">(</span><span>name<span class="token operator"> = </span><span class="breakable-word"><span class="token string">"inet6AddressOf"</span></span></span><wbr><span class="token punctuation">)</span></div></div><span class="token keyword">fun </span><a href="../io.matthewnelson.kmp.tor.runtime.core.net/-i-p-address/-v6/index.html">IPAddress.V6</a><span class="token punctuation">.</span><a href="to-inet6-address.html"><span class="token function">toInet6Address</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://docs.oracle.com/javase/8/docs/api/java/net/Inet6Address.html">Inet6Address</a></div><div class="brief "><p class="paragraph">Convert <a href="../io.matthewnelson.kmp.tor.runtime.core.net/-i-p-address/-v6/index.html">IPAddress.V6</a> to <a href="https://docs.oracle.com/javase/8/docs/api/java/net/Inet6Address.html">java.net.Inet6Address</a>.</p></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="314843712%2FFunctions%2F-469852394" anchor-label="toInetAddress" id="314843712%2FFunctions%2F-469852394" data-filterable-set=":library:runtime-core:dokkaHtmlPartial/jvmMain"></a>
+          <div class="table-row" data-filterable-current=":library:runtime-core:dokkaHtmlPartial/jvmMain" data-filterable-set=":library:runtime-core:dokkaHtmlPartial/jvmMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="to-inet-address.html"><span>to</span><wbr><span>Inet</span><wbr><span><span>Address</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="314843712%2FFunctions%2F-469852394"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":library:runtime-core:dokkaHtmlPartial/jvmMain" data-filterable-set=":library:runtime-core:dokkaHtmlPartial/jvmMain" data-active="" data-toggle=":library:runtime-core:dokkaHtmlPartial/jvmMain">jvm</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":library:runtime-core:dokkaHtmlPartial/jvmMain"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><span data-unresolved-link="kotlin.jvm/JvmName///PointingToDeclaration/"><span class="token annotation builtin">JvmName</span></span><span class="token punctuation">(</span><span>name<span class="token operator"> = </span><span class="breakable-word"><span class="token string">"inetAddressOf"</span></span></span><wbr><span class="token punctuation">)</span></div></div><span class="token keyword">fun </span><a href="../io.matthewnelson.kmp.tor.runtime.core.net/-i-p-address/index.html">IPAddress</a><span class="token punctuation">.</span><a href="to-inet-address.html"><span class="token function">toInetAddress</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://docs.oracle.com/javase/8/docs/api/java/net/InetAddress.html">InetAddress</a></div><div class="brief "><p class="paragraph">Convert <a href="../io.matthewnelson.kmp.tor.runtime.core.net/-i-p-address/index.html">IPAddress</a> to <a href="https://docs.oracle.com/javase/8/docs/api/java/net/InetAddress.html">java.net.InetAddress</a>.</p></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1188645183%2FFunctions%2F-469852394" anchor-label="toIPAddress" id="1188645183%2FFunctions%2F-469852394" data-filterable-set=":library:runtime-core:dokkaHtmlPartial/jvmMain"></a>
+          <div class="table-row" data-filterable-current=":library:runtime-core:dokkaHtmlPartial/jvmMain" data-filterable-set=":library:runtime-core:dokkaHtmlPartial/jvmMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="to-i-p-address.html"><span>to</span><wbr><span><span>IPAddress</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1188645183%2FFunctions%2F-469852394"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":library:runtime-core:dokkaHtmlPartial/jvmMain" data-filterable-set=":library:runtime-core:dokkaHtmlPartial/jvmMain" data-active="" data-toggle=":library:runtime-core:dokkaHtmlPartial/jvmMain">jvm</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":library:runtime-core:dokkaHtmlPartial/jvmMain"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><span data-unresolved-link="kotlin.jvm/JvmName///PointingToDeclaration/"><span class="token annotation builtin">JvmName</span></span><span class="token punctuation">(</span><span>name<span class="token operator"> = </span><span class="breakable-word"><span class="token string">"ipAddressOf"</span></span></span><wbr><span class="token punctuation">)</span></div></div><span class="token keyword">fun </span><a href="https://docs.oracle.com/javase/8/docs/api/java/net/InetAddress.html">InetAddress</a><span class="token punctuation">.</span><a href="to-i-p-address.html"><span class="token function">toIPAddress</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../io.matthewnelson.kmp.tor.runtime.core.net/-i-p-address/index.html">IPAddress</a></div><div class="brief "><p class="paragraph">Convert <a href="https://docs.oracle.com/javase/8/docs/api/java/net/InetAddress.html">java.net.InetAddress</a> to <a href="../io.matthewnelson.kmp.tor.runtime.core.net/-i-p-address/index.html">IPAddress</a>.</p></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1425075791%2FFunctions%2F-469852394" anchor-label="toIPAddressV4" id="1425075791%2FFunctions%2F-469852394" data-filterable-set=":library:runtime-core:dokkaHtmlPartial/jvmMain"></a>
+          <div class="table-row" data-filterable-current=":library:runtime-core:dokkaHtmlPartial/jvmMain" data-filterable-set=":library:runtime-core:dokkaHtmlPartial/jvmMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="to-i-p-address-v4.html"><span>to</span><wbr><span>IPAddress</span><wbr><span><span>V4</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1425075791%2FFunctions%2F-469852394"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":library:runtime-core:dokkaHtmlPartial/jvmMain" data-filterable-set=":library:runtime-core:dokkaHtmlPartial/jvmMain" data-active="" data-toggle=":library:runtime-core:dokkaHtmlPartial/jvmMain">jvm</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":library:runtime-core:dokkaHtmlPartial/jvmMain"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><span data-unresolved-link="kotlin.jvm/JvmName///PointingToDeclaration/"><span class="token annotation builtin">JvmName</span></span><span class="token punctuation">(</span><span>name<span class="token operator"> = </span><span class="breakable-word"><span class="token string">"ipAddressV4Of"</span></span></span><wbr><span class="token punctuation">)</span></div></div><span class="token keyword">fun </span><a href="https://docs.oracle.com/javase/8/docs/api/java/net/Inet4Address.html">Inet4Address</a><span class="token punctuation">.</span><a href="to-i-p-address-v4.html"><span class="token function">toIPAddressV4</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../io.matthewnelson.kmp.tor.runtime.core.net/-i-p-address/-v4/index.html">IPAddress.V4</a></div><div class="brief "><p class="paragraph">Convert <a href="https://docs.oracle.com/javase/8/docs/api/java/net/Inet4Address.html">java.net.Inet4Address</a> to <a href="../io.matthewnelson.kmp.tor.runtime.core.net/-i-p-address/-v4/index.html">IPAddress.V4</a>.</p></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1346747023%2FFunctions%2F-469852394" anchor-label="toIPAddressV6" id="1346747023%2FFunctions%2F-469852394" data-filterable-set=":library:runtime-core:dokkaHtmlPartial/jvmMain"></a>
+          <div class="table-row" data-filterable-current=":library:runtime-core:dokkaHtmlPartial/jvmMain" data-filterable-set=":library:runtime-core:dokkaHtmlPartial/jvmMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="to-i-p-address-v6.html"><span>to</span><wbr><span>IPAddress</span><wbr><span><span>V6</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1346747023%2FFunctions%2F-469852394"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":library:runtime-core:dokkaHtmlPartial/jvmMain" data-filterable-set=":library:runtime-core:dokkaHtmlPartial/jvmMain" data-active="" data-toggle=":library:runtime-core:dokkaHtmlPartial/jvmMain">jvm</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":library:runtime-core:dokkaHtmlPartial/jvmMain"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><span data-unresolved-link="kotlin.jvm/JvmName///PointingToDeclaration/"><span class="token annotation builtin">JvmName</span></span><span class="token punctuation">(</span><span>name<span class="token operator"> = </span><span class="breakable-word"><span class="token string">"ipAddressV6Of"</span></span></span><wbr><span class="token punctuation">)</span></div></div><span class="token keyword">fun </span><a href="https://docs.oracle.com/javase/8/docs/api/java/net/Inet6Address.html">Inet6Address</a><span class="token punctuation">.</span><a href="to-i-p-address-v6.html"><span class="token function">toIPAddressV6</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../io.matthewnelson.kmp.tor.runtime.core.net/-i-p-address/-v6/index.html">IPAddress.V6</a></div><div class="brief "><p class="paragraph">Convert <a href="https://docs.oracle.com/javase/8/docs/api/java/net/Inet6Address.html">java.net.Inet6Address</a> to <a href="../io.matthewnelson.kmp.tor.runtime.core.net/-i-p-address/-v6/index.html">IPAddress.V6</a></p></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      <div class="footer">
+        <span class="go-to-top-icon"><a href="#content" id="go-to-top-link"></a></span><span>© 2024 Copyright</span><span class="pull-right"><span>Generated by </span><a href="https://github.com/Kotlin/dokka"><span>dokka</span><span class="padded-icon"></span></a></span>
+      </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+

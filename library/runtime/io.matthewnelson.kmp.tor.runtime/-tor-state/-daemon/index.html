@@ -1,0 +1,239 @@
+<!doctype html>
+<html class="no-js">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" charset="UTF-8">
+    <title>Daemon</title>
+<link href="../../../../../images/logo-icon.svg" rel="icon" type="image/svg">    <script>var pathToRoot = "../../../../../";</script>
+    <script>document.documentElement.classList.replace("no-js","js");</script>
+    <script>const storage = localStorage.getItem("dokka-dark-mode")
+    if (storage == null) {
+        const osDarkSchemePreferred = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
+        if (osDarkSchemePreferred === true) {
+            document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        }
+    } else {
+        const savedDarkMode = JSON.parse(storage)
+        if(savedDarkMode === true) {
+            document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        }
+    }
+    </script>
+<script type="text/javascript" src="https://unpkg.com/kotlin-playground@1/dist/playground.min.js" async></script>
+<script type="text/javascript" src="../../../../../scripts/sourceset_dependencies.js" async></script>
+<link href="../../../../../styles/style.css" rel="Stylesheet">
+<link href="../../../../../styles/main.css" rel="Stylesheet">
+<link href="../../../../../styles/prism.css" rel="Stylesheet">
+<link href="../../../../../styles/logo-styles.css" rel="Stylesheet">
+<link href="../../../../../styles/font-jb-sans-auto.css" rel="Stylesheet">
+<script type="text/javascript" src="../../../../../scripts/clipboard.js" async></script>
+<script type="text/javascript" src="../../../../../scripts/navigation-loader.js" async></script>
+<script type="text/javascript" src="../../../../../scripts/platform-content-handler.js" async></script>
+<script type="text/javascript" src="../../../../../scripts/main.js" defer></script>
+<script type="text/javascript" src="../../../../../scripts/prism.js" async></script>
+<script type="text/javascript" src="../../../../../scripts/symbol-parameters-wrapper_deferred.js" defer></script></head>
+<body>
+    <div class="root">
+<nav class="navigation" id="navigation-wrapper">
+    <div class="navigation--inner">
+        <div class="navigation-title">
+            <button class="menu-toggle" id="menu-toggle" type="button">toggle menu</button>
+            <div class="library-name">
+<a class="library-name--link" href="../../../../../index.html">
+                            kmp-tor
+                    </a>            </div>
+            <div class="library-version">2.0.0-alpha01
+            </div>
+        </div>
+        <div class="filter-section" id="filter-section">
+                <button class="platform-tag platform-selector common-like" data-active="" data-filter=":library:runtime:dokkaHtmlPartial/commonMain">common</button>
+        </div>
+    </div>
+    <div class="navigation-controls">
+        <button class="navigation-controls--btn navigation-controls--theme" id="theme-toggle-button" type="button">switch theme</button>
+        <div class="navigation-controls--btn navigation-controls--search" id="searchBar" role="button">search in API</div>
+    </div>
+</nav>
+        <div id="container">
+            <div class="sidebar" id="leftColumn">
+                <div class="sidebar--inner" id="sideMenu"></div>
+            </div>
+            <div id="main">
+<div class="main-content" data-page-type="classlike" id="content" pageids="runtime::io.matthewnelson.kmp.tor.runtime/TorState.Daemon///PointingToDeclaration//-606192660">
+  <div class="breadcrumbs"><a href="../../../index.html">runtime</a><span class="delimiter">/</span><a href="../../index.html">io.matthewnelson.kmp.tor.runtime</a><span class="delimiter">/</span><a href="../index.html">TorState</a><span class="delimiter">/</span><span class="current">Daemon</span></div>
+  <div class="cover ">
+    <h1 class="cover"><span><span>Daemon</span></span></h1>
+    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":library:runtime:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">sealed </span><span class="token keyword">class </span><a href="index.html">Daemon</a><span class="clearfix"><span class="floating-right">(<a href="https://github.com/05nelsonm/kmp-tor/tree/master/library/runtime/src/commonMain/kotlin/io/matthewnelson/kmp/tor/runtime/TorState.kt#L60">source</a>)</span></span></div><p class="paragraph">State of the tor process</p><h4 class="">Parameters</h4><div class="table"><div class="table-row" data-filterable-current=":library:runtime:dokkaHtmlPartial/commonMain" data-filterable-set=":library:runtime:dokkaHtmlPartial/commonMain"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><u><span><span>bootstrap</span></span></u></div></span></div><div><div class="title"><p class="paragraph">The percent for which tor has bootstrapped to the network. Will <strong>always</strong> be between 0 and 100 (inclusive)</p></div></div></div></div></div><h4 class="">Inheritors</h4><div class="table"><div class="table-row" data-filterable-current=":library:runtime:dokkaHtmlPartial/commonMain" data-filterable-set=":library:runtime:dokkaHtmlPartial/commonMain"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="-off/index.html">Off</a></div></span></div><div></div></div></div><div class="table-row" data-filterable-current=":library:runtime:dokkaHtmlPartial/commonMain" data-filterable-set=":library:runtime:dokkaHtmlPartial/commonMain"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="-on/index.html">On</a></div></span></div><div></div></div></div><div class="table-row" data-filterable-current=":library:runtime:dokkaHtmlPartial/commonMain" data-filterable-set=":library:runtime:dokkaHtmlPartial/commonMain"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="-starting/index.html">Starting</a></div></span></div><div></div></div></div><div class="table-row" data-filterable-current=":library:runtime:dokkaHtmlPartial/commonMain" data-filterable-set=":library:runtime:dokkaHtmlPartial/commonMain"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="-stopping/index.html">Stopping</a></div></span></div><div></div></div></div></div></div></div>
+  </div>
+  <div class="tabbedcontent">
+    <div class="tabs-section" tabs-section="tabs-section"><button class="section-tab" data-active="" data-togglable="CONSTRUCTOR,TYPE,PROPERTY,FUNCTION">Members</button></div>
+    <div class="tabs-section-body">
+      <div data-togglable="TYPE">
+        <h2 class="">Types</h2>
+        <div class="table"><a data-name="-125481703%2FClasslikes%2F-606192660" anchor-label="Off" id="-125481703%2FClasslikes%2F-606192660" data-filterable-set=":library:runtime:dokkaHtmlPartial/commonMain"></a>
+          <div class="table-row" data-filterable-current=":library:runtime:dokkaHtmlPartial/commonMain" data-filterable-set=":library:runtime:dokkaHtmlPartial/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-off/index.html"><span><span>Off</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-125481703%2FClasslikes%2F-606192660"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":library:runtime:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">data </span><span class="token keyword">object </span><a href="-off/index.html">Off</a> : <a href="index.html">TorState.Daemon</a></div><div class="brief "><p class="paragraph">The tor process is <strong>not</strong> running</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-710095653%2FClasslikes%2F-606192660" anchor-label="On" id="-710095653%2FClasslikes%2F-606192660" data-filterable-set=":library:runtime:dokkaHtmlPartial/commonMain"></a>
+          <div class="table-row" data-filterable-current=":library:runtime:dokkaHtmlPartial/commonMain" data-filterable-set=":library:runtime:dokkaHtmlPartial/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-on/index.html"><span><span>On</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-710095653%2FClasslikes%2F-606192660"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":library:runtime:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">class </span><a href="-on/index.html">On</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">bootstrap<span class="token operator">: </span><span data-unresolved-link="kotlin/Byte///PointingToDeclaration/">Byte</span></span></span><span class="token punctuation">)</span> : <a href="index.html">TorState.Daemon</a></div><div class="brief "><p class="paragraph">The tor process is running</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-80898342%2FClasslikes%2F-606192660" anchor-label="Starting" id="-80898342%2FClasslikes%2F-606192660" data-filterable-set=":library:runtime:dokkaHtmlPartial/commonMain"></a>
+          <div class="table-row" data-filterable-current=":library:runtime:dokkaHtmlPartial/commonMain" data-filterable-set=":library:runtime:dokkaHtmlPartial/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-starting/index.html"><span><span>Starting</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-80898342%2FClasslikes%2F-606192660"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":library:runtime:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">data </span><span class="token keyword">object </span><a href="-starting/index.html">Starting</a> : <a href="index.html">TorState.Daemon</a></div><div class="brief "><p class="paragraph">An intermediary state whereby <a href="../../-tor-runtime/index.html">TorRuntime</a> is starting the tor process.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="2035261734%2FClasslikes%2F-606192660" anchor-label="Stopping" id="2035261734%2FClasslikes%2F-606192660" data-filterable-set=":library:runtime:dokkaHtmlPartial/commonMain"></a>
+          <div class="table-row" data-filterable-current=":library:runtime:dokkaHtmlPartial/commonMain" data-filterable-set=":library:runtime:dokkaHtmlPartial/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-stopping/index.html"><span><span>Stopping</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="2035261734%2FClasslikes%2F-606192660"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":library:runtime:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">data </span><span class="token keyword">object </span><a href="-stopping/index.html">Stopping</a> : <a href="index.html">TorState.Daemon</a></div><div class="brief "><p class="paragraph">An intermediary state whereby <a href="../../-tor-runtime/index.html">TorRuntime</a> is stopping the tor process.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div data-togglable="PROPERTY">
+        <h2 class="">Properties</h2>
+        <div class="table"><a data-name="-467381017%2FProperties%2F-606192660" anchor-label="bootstrap" id="-467381017%2FProperties%2F-606192660" data-filterable-set=":library:runtime:dokkaHtmlPartial/commonMain"></a>
+          <div class="table-row" data-filterable-current=":library:runtime:dokkaHtmlPartial/commonMain" data-filterable-set=":library:runtime:dokkaHtmlPartial/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="bootstrap.html"><span><span>bootstrap</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-467381017%2FProperties%2F-606192660"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":library:runtime:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><span data-unresolved-link="kotlin.jvm/JvmField///PointingToDeclaration/"><span class="token annotation builtin">JvmField</span></span></div></div><span class="token keyword">val </span><a href="bootstrap.html">bootstrap</a><span class="token operator">: </span><span data-unresolved-link="kotlin/Byte///PointingToDeclaration/">Byte</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="950100762%2FProperties%2F-606192660" anchor-label="isBootstrapped" id="950100762%2FProperties%2F-606192660" data-filterable-set=":library:runtime:dokkaHtmlPartial/commonMain"></a>
+          <div class="table-row" data-filterable-current=":library:runtime:dokkaHtmlPartial/commonMain" data-filterable-set=":library:runtime:dokkaHtmlPartial/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="is-bootstrapped.html"><span>is</span><wbr><span><span>Bootstrapped</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="950100762%2FProperties%2F-606192660"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":library:runtime:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><span data-unresolved-link="kotlin.jvm/JvmField///PointingToDeclaration/"><span class="token annotation builtin">JvmField</span></span></div></div><span class="token keyword">val </span><a href="is-bootstrapped.html">isBootstrapped</a><span class="token operator">: </span><span data-unresolved-link="kotlin/Boolean///PointingToDeclaration/">Boolean</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="489517904%2FProperties%2F-606192660" anchor-label="isOff" id="489517904%2FProperties%2F-606192660" data-filterable-set=":library:runtime:dokkaHtmlPartial/commonMain"></a>
+          <div class="table-row" data-filterable-current=":library:runtime:dokkaHtmlPartial/commonMain" data-filterable-set=":library:runtime:dokkaHtmlPartial/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="is-off.html"><span>is</span><wbr><span><span>Off</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="489517904%2FProperties%2F-606192660"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":library:runtime:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><span data-unresolved-link="kotlin.jvm/JvmField///PointingToDeclaration/"><span class="token annotation builtin">JvmField</span></span></div></div><span class="token keyword">val </span><a href="is-off.html">isOff</a><span class="token operator">: </span><span data-unresolved-link="kotlin/Boolean///PointingToDeclaration/">Boolean</span><span class="token operator"> = </span><span class="token boolean">false</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-2128871332%2FProperties%2F-606192660" anchor-label="isOn" id="-2128871332%2FProperties%2F-606192660" data-filterable-set=":library:runtime:dokkaHtmlPartial/commonMain"></a>
+          <div class="table-row" data-filterable-current=":library:runtime:dokkaHtmlPartial/commonMain" data-filterable-set=":library:runtime:dokkaHtmlPartial/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="is-on.html"><span>is</span><wbr><span><span>On</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-2128871332%2FProperties%2F-606192660"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":library:runtime:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><span data-unresolved-link="kotlin.jvm/JvmField///PointingToDeclaration/"><span class="token annotation builtin">JvmField</span></span></div></div><span class="token keyword">val </span><a href="is-on.html">isOn</a><span class="token operator">: </span><span data-unresolved-link="kotlin/Boolean///PointingToDeclaration/">Boolean</span><span class="token operator"> = </span><span class="token boolean">false</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-718029157%2FProperties%2F-606192660" anchor-label="isStarting" id="-718029157%2FProperties%2F-606192660" data-filterable-set=":library:runtime:dokkaHtmlPartial/commonMain"></a>
+          <div class="table-row" data-filterable-current=":library:runtime:dokkaHtmlPartial/commonMain" data-filterable-set=":library:runtime:dokkaHtmlPartial/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="is-starting.html"><span>is</span><wbr><span><span>Starting</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-718029157%2FProperties%2F-606192660"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":library:runtime:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><span data-unresolved-link="kotlin.jvm/JvmField///PointingToDeclaration/"><span class="token annotation builtin">JvmField</span></span></div></div><span class="token keyword">val </span><a href="is-starting.html">isStarting</a><span class="token operator">: </span><span data-unresolved-link="kotlin/Boolean///PointingToDeclaration/">Boolean</span><span class="token operator"> = </span><span class="token boolean">false</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1398130919%2FProperties%2F-606192660" anchor-label="isStopping" id="1398130919%2FProperties%2F-606192660" data-filterable-set=":library:runtime:dokkaHtmlPartial/commonMain"></a>
+          <div class="table-row" data-filterable-current=":library:runtime:dokkaHtmlPartial/commonMain" data-filterable-set=":library:runtime:dokkaHtmlPartial/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="is-stopping.html"><span>is</span><wbr><span><span>Stopping</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1398130919%2FProperties%2F-606192660"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":library:runtime:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><span data-unresolved-link="kotlin.jvm/JvmField///PointingToDeclaration/"><span class="token annotation builtin">JvmField</span></span></div></div><span class="token keyword">val </span><a href="is-stopping.html">isStopping</a><span class="token operator">: </span><span data-unresolved-link="kotlin/Boolean///PointingToDeclaration/">Boolean</span><span class="token operator"> = </span><span class="token boolean">false</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      <div class="footer">
+        <span class="go-to-top-icon"><a href="#content" id="go-to-top-link"></a></span><span>© 2024 Copyright</span><span class="pull-right"><span>Generated by </span><a href="https://github.com/Kotlin/dokka"><span>dokka</span><span class="padded-icon"></span></a></span>
+      </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+
