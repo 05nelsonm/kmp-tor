@@ -91,11 +91,12 @@ myTorRuntime.enqueue(
 - Configure optional service dependency
     - See [runtime-service][docs-runtime-service]
 
-- Create and utilize `TorRuntime`
-    - See [kmp-tor-samples][url-kmp-tor-samples]
-
 - Refer to the API docs
     - See [https://kmp-tor.matthewnelson.io][docs-root]
+
+### Samples
+
+See [kmp-tor-samples][url-kmp-tor-samples]
 
 <!-- TAG_VERSION -->
 [badge-latest-release]: https://img.shields.io/badge/latest--release-2.0.0--alpha01-5d2f68.svg?logo=torproject&style=flat&logoColor=5d2f68

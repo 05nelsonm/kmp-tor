@@ -1,5 +1,42 @@
 # CHANGELOG
 
+## Version 2.0.0-alpha01 (2024-12-01)
+ - Complete codebase refactor starting with PR [[#308]][308] to [[#546]][546]
+ - Migrated all publication coordinates to start with `io.matthewnelson.kmp-tor`
+     - e.g. `io.matthewnelson.kmp-tor:runtime:2.0.0-alpha01`
+ - Added `dokka` documentation at `https://kmp-tor.matthewnelson.io`
+ - Added Java9 `module-info.java` support for all publications
+ - Added support for targets:
+     - `js` (`Node.js`)
+     - `linuxArm64`
+     - `linuxX64`
+     - `iosArm64`
+     - `iosSimulatorArm64`
+     - `iosX64`
+     - `macosArm64`
+     - `macosX64`
+ - Decoupled `kmp-tor` from `tor` compilation dependency in order to support split 
+   release cycles. `kmp-tor` is now a "runtime" that "loads" `tor` resources via the 
+   `kmp-tor-common` repository's abstraction for `ResourceLoader`.
+ - Added ability for API consumers to choose how to run tor (executable process, or 
+   natively).
+ - Rebuilt `TorService` for Android for better optionality and customization via the 
+   `runtime-service` and `runtime-service-ui` feature modules.
+ - Updated all dependencies for Kotlin `1.9.24` compatibility.
+ - Reworked event `Listener` API to be single purposed; they are now called `Observers` 
+   that are subscribed/unsubscribed.
+ - Reworked all APIs to support Callback, Async (coroutines), and Sync (Android/Jvm/Native) 
+   functionality.
+ - Reworked tor control spec APIs to be single interface with multiple sealed data types 
+   to better support future expansion/features (i.e. the `TorCmd` types).
+ - Reworked error handling via `UncaughtException.Handler` APIs and callbacks.
+ - Everything (mostly) uses a Builder pattern and has a DSL.
+ - Tons more.
+
+## Version 4.8.10-0-1.4.5 (2024-12-01)
+ - Add deprecation notice to `TorManager` in preparation for `2.0.0` release.
+ - Disable non-Android & non-Jvm targets
+
 ## Version 4.8.10-0-1.4.4 (2023-12-20)
  - Updates dependencies
      - `kmp-tor-binary` -> `4.8.10-0`
@@ -458,6 +495,8 @@
 [pr-289]: https://github.com/05nelsonm/kmp-tor/pull/289
 [pr-294]: https://github.com/05nelsonm/kmp-tor/pull/294
 [pr-304]: https://github.com/05nelsonm/kmp-tor/pull/304
+[308]: https://github.com/05nelsonm/kmp-tor/pull/308
+[546]: https://github.com/05nelsonm/kmp-tor/pull/546
 [issue-285]: https://github.com/05nelsonm/kmp-tor/issues/285
 [kmp-tor-binary-66]: https://github.com/05nelsonm/kmp-tor-binary/issues/66
 [kmp-tor-binary-75]: https://github.com/05nelsonm/kmp-tor-binary/pull/75
