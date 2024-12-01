@@ -12,15 +12,15 @@ gradle-publish-maven = "0.29.0"
 
 immutable = "0.1.4"
 
-kmp-process = "0.1.0-rc01"
-kmp-tor-common = "2.1.0-SNAPSHOT"
-kmp-tor-resource = "408.12.0-SNAPSHOT"
+kmp-process = "0.1.0"
+kmp-tor-common = "2.1.0"
 kotlinx-coroutines = "1.8.1"
 
 # Tests Only
 androidx-test-core = "1.5.0"
 androidx-test-runner = "1.5.2"
 
+kmp-tor-resource = "408.12.0"
 ktor = "2.3.11"
 okio = "3.7.0"
 
