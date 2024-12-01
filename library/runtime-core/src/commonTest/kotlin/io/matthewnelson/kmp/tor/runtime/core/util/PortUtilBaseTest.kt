@@ -82,15 +82,14 @@ abstract class PortUtilBaseTest {
 
         var result: Port.Ephemeral? = null
         var throwable: Throwable? = null
+        val latch = Job()
         val job = launch(CoroutineExceptionHandler { _, t -> throwable = t }) {
+            latch.complete()
             result = port.findNextAvailableAsync(limit + 50, host)
         }
 
-        // Slight delay to ensure blocking code is running
-        withContext(Dispatchers.Default) {
-            delay(3.milliseconds)
-        }
-
+        latch.join()
+        delay(1.milliseconds)
         job.cancel()
 
         // Ensure any exceptions/results are propagated
