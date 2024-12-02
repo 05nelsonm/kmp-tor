@@ -120,7 +120,7 @@ public sealed interface TorRuntime:
          * **NOTE:** This should be a singleton with **no** contextual or
          * non-singleton references (such as Android Activity Context).
          *
-         * **NOTE:** If utilizing the `kmp-tor-mobile` dependency, its
+         * **NOTE:** If utilizing the `runtime-service` dependency, its
          * own observer implementation will be favored over this setting.
          * */
         @JvmField

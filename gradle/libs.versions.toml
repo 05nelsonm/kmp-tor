@@ -20,7 +20,7 @@ kotlinx-coroutines = "1.8.1"
 androidx-test-core = "1.5.0"
 androidx-test-runner = "1.5.2"
 
-kmp-tor-resource = "408.12.0"
+kmp-tor-resource = "408.13.0"
 ktor = "2.3.11"
 okio = "3.7.0"
 
