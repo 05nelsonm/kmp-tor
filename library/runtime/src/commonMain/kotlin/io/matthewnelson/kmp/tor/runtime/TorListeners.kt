@@ -409,41 +409,57 @@ public class TorListeners private constructor(
         }
 
         protected override fun notify(old: TorState, new: TorState) {
-            val listeners = synchronized(lock) { with(_listeners) {
-                // on -> NOT on
-                if (old.daemon.isOn && !new.daemon.isOn) {
-                    return@with EMPTY
-                }
+            var notify = true
 
-                if (new.daemon.isBootstrapped) {
+            val listeners = synchronized(lock) {
+                run {
+                    // If not on or starting, ensure current is EMPTY
+                    if (!(new.daemon.isOn || new.daemon.isStarting)) {
+                        return@run if (_listeners.isEmpty) {
+                            null
+                        } else {
+                            // Have non-empty TorListeners that must be cleared.
 
-                    // enabled -> disabled
-                    if (old.network.isEnabled && new.network.isDisabled) {
-                        return@with EMPTY
-                    }
-
-                    if (new.network.isEnabled) {
-
-                        // disabled -> enabled
-                        if (old.network.isDisabled) {
-                            return@with this
-                        }
-
-                        // NOT bootstrapped -> bootstrapped
-                        if (!old.daemon.isBootstrapped) {
-                            return@with this
+                            // If subscribed observers were previously notified of
+                            // something, need to inform them of the change.
+                            notify = old.daemon.isBootstrapped
+                            EMPTY
                         }
                     }
-                }
 
-                null
-            }?.also {
-                _notifyJob?.cancel()
-                _listeners = it
-            } }
+                    if (new.daemon.isBootstrapped) {
+
+                        // enabled -> disabled
+                        if (old.network.isEnabled && new.network.isDisabled) {
+                            return@run EMPTY
+                        }
+
+                        if (new.network.isEnabled) {
+
+                            // disabled -> enabled
+                            if (old.network.isDisabled) {
+                                return@run _listeners
+                            }
+
+                            // NOT bootstrapped -> bootstrapped
+                            if (!old.daemon.isBootstrapped) {
+                                return@run _listeners
+                            }
+                        }
+                    }
+
+                    null
+                }?.let { update ->
+                    _notifyJob?.cancel()
+                    _listeners = update
+                    update
+                }
+            }
 
             notify(new)
-            listeners?.let { notify(it) }
+            if (notify && listeners != null) {
+                notify(listeners)
+            }
         }
 
         private fun Type.onClose(address: String) = when (this) {
