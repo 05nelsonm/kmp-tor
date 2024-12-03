@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## Version 2.0.0-alpha02 (2024-12-03)
+ - Fixes `TorListeners.Manager` not clearing old address references in some cases
+   when `Action.RestartDaemon` is executed [[#549]][549]
+
 ## Version 2.0.0-alpha01 (2024-12-01)
  - Complete codebase refactor starting with PR [[#308]][308] to [[#546]][546]
  - Migrated all publication coordinates to start with `io.matthewnelson.kmp-tor`
@@ -48,7 +52,7 @@
      - `kotlin` -> `1.9.10`
      - `jnr-unix-socket` -> `0.38.21`
      - `kmp-tor-binary` -> `4.8.6-0`
- - Fixes start failure when `UnixSocket` path length exceeded 105 characters [[#304]][pr-304]
+ - Fixes start failure when `UnixSocket` path length exceeded 105 characters [[#304]][304]
  - Removed gradle.property `kotlin.mpp.enableCompatibilityMetadataVariant`
 
 ## Version 4.7.13-4-1.4.3 (2023-06-21)
@@ -66,7 +70,7 @@
        resources. [[kmp-tor-binary-#76]][kmp-tor-binary-76]
  - Fixes an issue with coroutine dispatcher threads executing in userspace
    instead of application JVM whereby closing of the application was inhibited
-   if `TorManager.destroy` was not called. [[#294]][pr-294]
+   if `TorManager.destroy` was not called. [[#294]][294]
 
 ## Version 4.7.13-3-1.4.1 (2023-03-23)
  - Updates KmpTorBinary `4.7.13-2` -> `4.7.13-3`
@@ -75,7 +79,7 @@
 
 ## Version 4.7.13-2-1.4.1 (2023-03-21)
  - Moves process id retrieval to call-site in `kmp-tor` module 
-   and removes its dependency on `kmp-tor-internal` module. [[#289]][pr-289]
+   and removes its dependency on `kmp-tor-internal` module. [[#289]][289]
      - The `kmp-tor-internal` dependency will still be published as to 
        not break anyone's project if they had it as a dependency, but
        it will cease to be published on next major version release (`2.0.0`) 
@@ -84,15 +88,15 @@
 ## Version 4.7.13-2-1.4.0 (2023-03-16)
  - Updates KmpTorBinary `4.7.13-1` -> `4.7.13-2`
      - Intermediate fix for JVM `macOS aarch64` binaries failing to execute
-     -  More information can be found in [[#285]][issue-285] and 
+     -  More information can be found in [[#285]][285] and 
        [[kmp-tor-binary-#66]][kmp-tor-binary-66]
 
 ## Version 4.7.13-1-1.4.0 (2023-03-14)
  - Update Kotlin `1.8.0` -> `1.8.10`
  - Update AtomicFu `0.19.0` -> `0.20.0`
  - Adds ability for library consumers to package and load their own
-   Tor binary resources (Jvm/JS) [[#284]][pr-284]
- - Refactors gradle build system to use composite builds [[#283]][pr-283]
+   Tor binary resources (Jvm/JS) [[#284]][284]
+ - Refactors gradle build system to use composite builds [[#283]][283]
      - Removes submodule `kotlin-components`
 
 ## Version 4.7.13-0-1.3.4 (2023-01-31)
@@ -490,14 +494,16 @@
 ## Version 0.4.6.9+0.1.0-alpha1 (2022-02-06)
  - Initial `alpha` release
 
-[pr-283]: https://github.com/05nelsonm/kmp-tor/pull/283
-[pr-284]: https://github.com/05nelsonm/kmp-tor/pull/284
-[pr-289]: https://github.com/05nelsonm/kmp-tor/pull/289
-[pr-294]: https://github.com/05nelsonm/kmp-tor/pull/294
-[pr-304]: https://github.com/05nelsonm/kmp-tor/pull/304
+[283]: https://github.com/05nelsonm/kmp-tor/pull/283
+[284]: https://github.com/05nelsonm/kmp-tor/pull/284
+[285]: https://github.com/05nelsonm/kmp-tor/issues/285
+[289]: https://github.com/05nelsonm/kmp-tor/pull/289
+[294]: https://github.com/05nelsonm/kmp-tor/pull/294
+[304]: https://github.com/05nelsonm/kmp-tor/pull/304
 [308]: https://github.com/05nelsonm/kmp-tor/pull/308
 [546]: https://github.com/05nelsonm/kmp-tor/pull/546
-[issue-285]: https://github.com/05nelsonm/kmp-tor/issues/285
+[549]: https://github.com/05nelsonm/kmp-tor/pull/549
+
 [kmp-tor-binary-66]: https://github.com/05nelsonm/kmp-tor-binary/issues/66
 [kmp-tor-binary-75]: https://github.com/05nelsonm/kmp-tor-binary/pull/75
 [kmp-tor-binary-76]: https://github.com/05nelsonm/kmp-tor-binary/pull/76
