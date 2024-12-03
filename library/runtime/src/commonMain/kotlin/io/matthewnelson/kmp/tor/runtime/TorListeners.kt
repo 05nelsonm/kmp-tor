@@ -361,14 +361,14 @@ public class TorListeners private constructor(
         protected abstract fun notify(state: TorState)
 
         final override fun onListenerConfChange(type: String, changes: Set<String>) {
-            val executable = when (Type.valueOfOrNull(type)) {
+            val diff = when (Type.valueOfOrNull(type)) {
                 is Type.SOCKS -> Executable {
                     Type.SOCKS.diffUnixListeners(_listeners.socksUnix, changes)
                 }
                 else -> return
             }
 
-            synchronized(lock) { executable.execute() }
+            synchronized(lock) { diff.execute() }
         }
 
         final override fun update(type: String, address: String, wasClosed: Boolean) {
@@ -409,41 +409,62 @@ public class TorListeners private constructor(
         }
 
         protected override fun notify(old: TorState, new: TorState) {
-            val listeners = synchronized(lock) { with(_listeners) {
-                // on -> NOT on
-                if (old.daemon.isOn && !new.daemon.isOn) {
-                    return@with EMPTY
-                }
+            var notify = true
 
-                if (new.daemon.isBootstrapped) {
+            val listeners = synchronized(lock) {
 
-                    // enabled -> disabled
-                    if (old.network.isEnabled && new.network.isDisabled) {
-                        return@with EMPTY
-                    }
+                val update = run {
+                    // If NOT on or starting
+                    if (!(new.daemon.isOn || new.daemon.isStarting)) {
+                        // ensure current listeners are EMPTY
+                        return@run if (_listeners.isEmpty) {
+                            null
+                        } else {
+                            // Have non-empty TorListeners that must be cleared.
 
-                    if (new.network.isEnabled) {
-
-                        // disabled -> enabled
-                        if (old.network.isDisabled) {
-                            return@with this
-                        }
-
-                        // NOT bootstrapped -> bootstrapped
-                        if (!old.daemon.isBootstrapped) {
-                            return@with this
+                            // If subscribed observers were previously notified of
+                            // something, need to inform them of the change.
+                            notify = old.daemon.isBootstrapped
+                            EMPTY
                         }
                     }
+
+                    if (new.daemon.isBootstrapped) {
+
+                        // enabled -> disabled
+                        if (old.network.isEnabled && new.network.isDisabled) {
+                            return@run EMPTY
+                        }
+
+                        if (new.network.isEnabled) {
+
+                            // disabled -> enabled
+                            if (old.network.isDisabled) {
+                                return@run _listeners
+                            }
+
+                            // NOT bootstrapped -> bootstrapped
+                            if (!old.daemon.isBootstrapped) {
+                                return@run _listeners
+                            }
+                        }
+                    }
+
+                    null
                 }
 
-                null
-            }?.also {
-                _notifyJob?.cancel()
-                _listeners = it
-            } }
+                if (update != null) {
+                    _notifyJob?.cancel()
+                    _listeners = update
+                }
+
+                update
+            }
 
             notify(new)
-            listeners?.let { notify(it) }
+            if (notify && listeners != null) {
+                notify(listeners)
+            }
         }
 
         private fun Type.onClose(address: String) = when (this) {
@@ -609,10 +630,7 @@ public class TorListeners private constructor(
         }
 
         private fun Type.diffUnixListeners(listeners: Set<File>, changes: Set<String>) {
-            when (this) {
-                Type.SOCKS -> {}
-                else -> return
-            }
+            if (this !is Type.SOCKS) return
 
             with(state) {
                 if (!(daemon.isOn || daemon.isStarting)) return
