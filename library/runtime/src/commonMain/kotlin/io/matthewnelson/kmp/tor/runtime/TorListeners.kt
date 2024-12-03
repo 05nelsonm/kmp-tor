@@ -319,7 +319,7 @@ public class TorListeners private constructor(
     }
 
     internal interface Manager: TorState.Manager {
-        fun onListenerConfChange(type: String, changes: Set<String>)
+        fun onSocksConfChange(changes: Set<String>)
         fun update(type: String, address: String, wasClosed: Boolean)
     }
 
@@ -360,15 +360,43 @@ public class TorListeners private constructor(
         protected abstract fun notify(listeners: TorListeners)
         protected abstract fun notify(state: TorState)
 
-        final override fun onListenerConfChange(type: String, changes: Set<String>) {
-            val diff = when (Type.valueOfOrNull(type)) {
-                is Type.SOCKS -> Executable {
-                    Type.SOCKS.diffUnixListeners(_listeners.socksUnix, changes)
-                }
-                else -> return
-            }
+        final override fun onSocksConfChange(changes: Set<String>) {
+            synchronized(lock) {
+                val current = _listeners.socksUnix
 
-            synchronized(lock) { diff.execute() }
+                with(state) {
+                    if (!(daemon.isOn || daemon.isStarting)) return
+                    if (network.isDisabled) return
+                }
+                if (current.isEmpty()) return
+
+                val diffs = LinkedHashMap<File, Boolean>(current.size, 1.0F)
+
+                current.forEach { file ->
+                    var wasClosed = true
+
+                    for (change in changes) {
+                        // Change could be a TCP port or socket address, a
+                        // quoted or unquoted path prefixed with "unix:", contain
+                        // optionals appended to it, etc.
+                        //
+                        // The simplest way to check which unix listeners have
+                        // been closed is to see if any of the changes contain
+                        // the absolute path string. If it does, then it was NOT
+                        // closed.
+                        if (change.contains(file.path)) {
+                            wasClosed = false
+                            break
+                        }
+                    }
+
+                    diffs[file] = wasClosed
+                }
+
+                diffs.forEach { (file, wasClosed) ->
+                    updateNoLock(type = Type.SOCKS, file.path, wasClosed)
+                }
+            }
         }
 
         final override fun update(type: String, address: String, wasClosed: Boolean) {
@@ -408,7 +436,7 @@ public class TorListeners private constructor(
             }
         }
 
-        protected override fun notify(old: TorState, new: TorState) {
+        protected final override fun notify(old: TorState, new: TorState) {
             var notify = true
 
             val listeners = synchronized(lock) {
@@ -582,7 +610,7 @@ public class TorListeners private constructor(
                     // close all other socks listeners that may be
                     // open, but will not dispatch the CONF_CHANGED
                     // event.
-                    onListenerConfChange("Socks", setOf("9050"))
+                    onSocksConfChange(setOf("9050"))
                 }
             })
         }
@@ -600,7 +628,7 @@ public class TorListeners private constructor(
                     }
 
                 if (changes != null) {
-                    onListenerConfChange("Socks", changes)
+                    onSocksConfChange(changes)
                 }
             })
         }
@@ -627,41 +655,6 @@ public class TorListeners private constructor(
                     recovery.execute()
                 }
             }
-        }
-
-        private fun Type.diffUnixListeners(listeners: Set<File>, changes: Set<String>) {
-            if (this !is Type.SOCKS) return
-
-            with(state) {
-                if (!(daemon.isOn || daemon.isStarting)) return
-                if (network.isDisabled) return
-            }
-            if (listeners.isEmpty()) return
-
-            val diffs = LinkedHashMap<File, Boolean>(listeners.size, 1.0F)
-
-            listeners.forEach { file ->
-                var wasClosed = true
-
-                for (change in changes) {
-                    // Change could be a TCP port or socket address, a
-                    // quoted or unquoted path prefixed with "unix:", contain
-                    // optionals appended to it, etc.
-                    //
-                    // The simplest way to check which unix listeners have
-                    // been closed is to see if any of the changes contain
-                    // the absolute path string. If it does, then it was NOT
-                    // closed.
-                    if (change.contains(file.path)) {
-                        wasClosed = false
-                        break
-                    }
-                }
-
-                diffs[file] = wasClosed
-            }
-
-            diffs.forEach { (file, wasClosed) -> updateNoLock(type = this, file.path, wasClosed) }
         }
 
         private sealed interface Copy<T: Any> {

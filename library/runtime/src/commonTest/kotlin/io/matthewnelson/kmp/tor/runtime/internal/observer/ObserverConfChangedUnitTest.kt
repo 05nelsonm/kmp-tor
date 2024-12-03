@@ -80,8 +80,8 @@ class ObserverConfChangedUnitTest {
         observer.notify("SocksPort=$expected4")
 
         assertEquals(3, observer.manager.unixConf.size)
-        assertEquals("Socks" to setOf(expected1), observer.manager.unixConf[0])
-        assertEquals("Socks" to setOf(expected2, expected3), observer.manager.unixConf[1])
-        assertEquals("Socks" to setOf(expected4), observer.manager.unixConf[2])
+        assertEquals(setOf(expected1), observer.manager.unixConf[0])
+        assertEquals(setOf(expected2, expected3), observer.manager.unixConf[1])
+        assertEquals(setOf(expected4), observer.manager.unixConf[2])
     }
 }
