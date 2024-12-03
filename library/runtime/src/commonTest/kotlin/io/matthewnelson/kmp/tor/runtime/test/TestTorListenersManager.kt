@@ -22,9 +22,9 @@ internal class TestTorListenersManager: TorListeners.Manager {
 
     val states = mutableListOf<Pair<TorState.Daemon?, TorState.Network?>>()
     val listeners = mutableListOf<Triple<String, String, Boolean>>()
-    val unixConf = mutableListOf<Pair<String, Set<String>>>()
-    override fun onListenerConfChange(type: String, changes: Set<String>) {
-        unixConf.add(type to changes)
+    val unixConf = mutableListOf<Set<String>>()
+    override fun onSocksConfChange(changes: Set<String>) {
+        unixConf.add(changes)
     }
     override fun update(daemon: TorState.Daemon?, network: TorState.Network?) {
         states.add(daemon to network)

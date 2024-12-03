@@ -68,7 +68,7 @@ internal open class ObserverConfChanged internal constructor(
         }
 
         if (socks != null) {
-            manager.onListenerConfChange("Socks", socks)
+            manager.onSocksConfChange(socks)
         }
     }
 }

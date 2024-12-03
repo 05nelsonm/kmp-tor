@@ -69,8 +69,13 @@ class TorListenersManagerUnitTest {
     fun givenListeners_whenEmpty_thenIsEmptyTrue() {
         val listeners = TorListeners()
         assertTrue(listeners.isEmpty)
+        assertEquals(0, listeners.dir.size)
         assertEquals(0, listeners.dns.size)
         assertEquals(0, listeners.http.size)
+        assertEquals(0, listeners.metrics.size)
+        assertEquals(0, listeners.natd.size)
+        assertEquals(0, listeners.or.size)
+        assertEquals(0, listeners.orExt.size)
         assertEquals(0, listeners.socks.size)
         assertEquals(0, listeners.socksUnix.size)
         assertEquals(0, listeners.trans.size)
@@ -80,11 +85,27 @@ class TorListenersManagerUnitTest {
     fun givenListeners_whenNotEmpty_thenIsEmptyFalse() {
         val empty = TorListeners()
         assertTrue(empty.isEmpty)
-        assertFalse(empty.copy(dns = setOf(address)).isEmpty)
-        assertFalse(empty.copy(http = setOf(address)).isEmpty)
-        assertFalse(empty.copy(socks = setOf(address)).isEmpty)
-        assertFalse(empty.copy(socksUnix = setOf(SysTempDir)).isEmpty)
-        assertFalse(empty.copy(trans = setOf(address)).isEmpty)
+
+        fun TorListeners.assertIsNotEmpty(copyTarget: TorListeners.() -> Set<*>) {
+            assertFalse(isEmpty)
+
+            val target = copyTarget(this)
+            assertTrue(target.isNotEmpty())
+
+            val all = listOf(dir, dns, http, metrics, natd, or, orExt, socks, socksUnix, trans).flatten()
+            assertEquals(target.size, all.size)
+        }
+
+        empty.copy(dir = setOf(address)).assertIsNotEmpty { dir }
+        empty.copy(dns = setOf(address)).assertIsNotEmpty { dns }
+        empty.copy(http = setOf(address)).assertIsNotEmpty { http }
+        empty.copy(metrics = setOf(address)).assertIsNotEmpty { metrics }
+        empty.copy(natd = setOf(address)).assertIsNotEmpty { natd }
+        empty.copy(or = setOf(address)).assertIsNotEmpty { or }
+        empty.copy(orExt = setOf(address)).assertIsNotEmpty { orExt }
+        empty.copy(socks = setOf(address)).assertIsNotEmpty { socks }
+        empty.copy(socksUnix = setOf(SysTempDir)).assertIsNotEmpty { socksUnix }
+        empty.copy(trans = setOf(address)).assertIsNotEmpty { trans }
     }
 
     @Test

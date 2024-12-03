@@ -24,46 +24,64 @@
 Kotlin Multiplatform support for embedding Tor into your application.
 
 ```kotlin
-val myTorRuntime = TorRuntime.Builder(myTorEnvironment) {
+val runtime = TorRuntime.Builder(myEnvironment) {
     RuntimeEvent.entries().forEach { event ->
-        observerStatic(event, OnEvent.Executor.Immediate) { data -> println(data.toString()) }
+        observerStatic(event, OnEvent.Executor.Immediate) { data ->
+            println(data.toString())
+        }
     }
     TorEvent.entries().forEach { event ->
-        observerStatic(event, OnEvent.Executor.Immediate) { data -> println(data) }
+        observerStatic(event, OnEvent.Executor.Immediate) { data ->
+            println(data)
+        }
     }
+    config { environment ->
+        TorOption.SocksPort.configure { auto() }
+        // ...
+    }
+    required(TorEvent.ERR)
+    required(TorEvent.WARN)
 }
 ```
 
 ```kotlin
 // Asynchronous APIs
 myScope.launch {
-    myTorRuntime.startDaemonAsync()
-    myTorRuntime.restartDaemonAsync()
-    myTorRuntime.stopDaemonAsync()
+    runtime.startDaemonAsync()
+    runtime.restartDaemonAsync()
+    runtime.executeAsync(TorCmd.Signal.NewNym)
+    runtime.stopDaemonAsync()
 }
 ```
 
 ```kotlin
 // Synchronous APIs (Android/Jvm/Native)
-myTorRuntime.startDaemonSync()
-myTorRuntime.restartDaemonSync()
-myTorRuntime.stopDaemonSync()
+runtime.startDaemonSync()
+runtime.restartDaemonSync()
+runtime.executeSync(TorCmd.Signal.NewNym)
+runtime.stopDaemonSync()
 ```
 
 ```kotlin
 // Callback APIs
-myTorRuntime.enqueue(
+runtime.enqueue(
     Action.StartDaemon,
     OnFailure.noOp(),
     OnSuccess {
-        myTorRuntime.enqueue(
+        runtime.enqueue(
             Action.RestartDaemon,
             OnFailure.noOp(),
             OnSuccess {
-                myTorRuntime.enqueue(
-                    Action.StopDaemon,
+                runtime.enqueue(
+                    TorCmd.Signal.NewNym,
                     OnFailure.noOp(),
-                    OnSuccess.noOp(),
+                    OnSuccess {
+                        runtime.enqueue(
+                            Action.StopDaemon,
+                            OnFailure.noOp(),
+                            OnSuccess.noOp(),
+                        )  
+                    },
                 )
             },
         )
