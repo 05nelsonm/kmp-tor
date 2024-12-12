@@ -142,7 +142,7 @@ public actual interface TorCtrl : Destroyable, TorEvent.Processor, TorCmd.Privil
          * */
         @Throws(CancellationException::class, IOException::class, UnsupportedOperationException::class)
         public actual suspend fun connectAsync(path: File): TorCtrl {
-            path.checkUnixSockedSupport()
+            path.checkUnixSocketSupport()
 
             return withDelayedReturnAsync {
                 connect { context ->
@@ -180,7 +180,7 @@ public actual interface TorCtrl : Destroyable, TorEvent.Processor, TorCmd.Privil
          * */
         @Throws(IOException::class, UnsupportedOperationException::class)
         public fun connect(path: File): TorCtrl {
-            path.checkUnixSockedSupport()
+            path.checkUnixSocketSupport()
 
             return withDelayedReturn {
                 connect { path.connect() }

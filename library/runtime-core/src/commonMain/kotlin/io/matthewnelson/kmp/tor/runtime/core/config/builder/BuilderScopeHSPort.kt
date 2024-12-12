@@ -88,7 +88,7 @@ public class BuilderScopeHSPort private constructor(
      * @throws [UnsupportedOperationException] when:
      *   - Is Windows (tor does not support Unix Sockets on windows).
      *   - Is Java 15 or below (Jvm only, Android is always available).
-     *   - Configured path exceeds `104` characters in length.
+     *   - Configured path is too long.
      *   - Configured path is multiple lines.
      * */
     @KmpTorDsl

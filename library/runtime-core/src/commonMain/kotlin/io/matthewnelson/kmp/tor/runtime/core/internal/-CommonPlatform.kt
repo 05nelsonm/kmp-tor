@@ -27,6 +27,8 @@ import kotlin.coroutines.cancellation.CancellationException
 
 internal expect val UnixSocketsNotSupportedMessage: String?
 
+internal expect val AFUnixPathBufSize: Int
+
 internal expect val IsUnixLikeHost: Boolean
 
 internal expect val IsAndroidHost: Boolean
