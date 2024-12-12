@@ -21,6 +21,24 @@ import io.matthewnelson.kmp.tor.common.core.OSHost
 import io.matthewnelson.kmp.tor.common.core.OSInfo
 import kotlin.jvm.JvmSynthetic
 
+@OptIn(InternalKmpTorApi::class)
+internal actual val AFUnixPathBufSize: Int get() {
+    return when (OSInfo.INSTANCE.osHost) {
+        // sockaddr_un.sun_path buffer size as defined in sys/un.h
+        is OSHost.FreeBSD,
+        is OSHost.MacOS -> 104
+
+        // UNIX_PATH_MAX as defined in afunix.h
+        is OSHost.Windows -> 108
+
+        // sockaddr_un.sun_path buffer size as defined in sys/un.h
+        is OSHost.Linux -> 108
+
+        // Unknown (assuming Non-BSD)
+        else -> 108
+    }
+}
+
 @get:JvmSynthetic
 @OptIn(InternalKmpTorApi::class)
 internal actual val IsUnixLikeHost: Boolean get() {

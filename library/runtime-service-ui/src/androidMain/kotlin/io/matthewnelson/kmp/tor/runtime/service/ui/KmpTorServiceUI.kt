@@ -334,13 +334,11 @@ public class KmpTorServiceUI private constructor(
              *             displayName = DisplayName.StringRes(R.string.tor_instance_1)
              *             // ...
              *         },
-             *         installer = { TorResources(it) },
+             *         loader = ResourceLoaderTorExec::getOrCreate,
              *         block = {
              *             // Use base directory for all resources for all Environment
-             *             // instances. They will share the same TorResources object
-             *             // auto-magically and all processes will read from the same
-             *             // files.
-             *             installationDirectory = workDirectory.parentFile!!
+             *             // instances (i.e. torservice)
+             *             resourceDir = workDirectory.parentFile!!
              *
              *             // ...
              *         },

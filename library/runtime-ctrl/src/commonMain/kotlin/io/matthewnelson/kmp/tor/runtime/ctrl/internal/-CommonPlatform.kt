@@ -32,12 +32,10 @@ import kotlin.collections.removeFirst as kRemoveFirst
 
 @Suppress("NOTHING_TO_INLINE")
 @Throws(FileNotFoundException::class, UnsupportedOperationException::class)
-internal inline fun File.checkUnixSockedSupport() {
+internal inline fun File.checkUnixSocketSupport() {
     val path = this
 
-    TorOption.__ControlPort.asSetting {
-        unixSocket(path)
-    }
+    TorOption.__ControlPort.asSetting { unixSocket(path) }
 
     if (exists()) return
     throw FileNotFoundException(path.toString())

@@ -23,9 +23,7 @@ import io.matthewnelson.kmp.file.normalize
 import io.matthewnelson.kmp.file.path
 
 @Suppress("NOTHING_TO_INLINE")
-internal inline val File.absoluteNormalizedFile: File get() {
-    return absoluteFile.normalize()
-}
+internal inline val File.absoluteNormalizedFile: File get() = absoluteFile.normalize()
 
 @Throws(UnsupportedOperationException::class)
 internal fun File.toUnixSocketPath(): String {
@@ -33,8 +31,13 @@ internal fun File.toUnixSocketPath(): String {
 
     val path = absoluteNormalizedFile.path
 
-    if (path.length > 104) {
-        throw UnsupportedOperationException("path cannot exceed 104 characters")
+    // FreeBSD -> MAX 102 chars
+    // Darwin  -> MAX 102 chars
+    // Linux   -> MAX 106 chars
+    // Windows -> MAX 106 chars
+    // else    -> MAX 106 chars
+    if (path.length > (AFUnixPathBufSize - 2)) {
+        throw UnsupportedOperationException("path too long")
     }
 
     if (!path.isSingleLine()) {

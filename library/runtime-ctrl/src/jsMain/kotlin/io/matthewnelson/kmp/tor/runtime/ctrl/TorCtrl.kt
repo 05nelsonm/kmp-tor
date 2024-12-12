@@ -134,7 +134,7 @@ public actual interface TorCtrl : Destroyable, TorEvent.Processor, TorCmd.Privil
          * */
         // @Throws(CancellationException::class, IOException::class, UnsupportedOperationException::class)
         public actual suspend fun connectAsync(path: File): TorCtrl {
-            path.checkUnixSockedSupport()
+            path.checkUnixSocketSupport()
 
             val options = js("{}")
             options["path"] = path.path
