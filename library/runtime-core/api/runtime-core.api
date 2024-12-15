@@ -4055,7 +4055,6 @@ public final class io/matthewnelson/kmp/tor/runtime/core/key/ED25519_V3$PublicKe
 }
 
 public abstract class io/matthewnelson/kmp/tor/runtime/core/key/Key : java/security/Key {
-	protected static final field Companion Lio/matthewnelson/kmp/tor/runtime/core/key/Key$Companion;
 	public abstract fun algorithm ()Ljava/lang/String;
 	public abstract fun base16OrNull ()Ljava/lang/String;
 	public abstract fun base32OrNull ()Ljava/lang/String;
@@ -4066,10 +4065,8 @@ public abstract class io/matthewnelson/kmp/tor/runtime/core/key/Key : java/secur
 	public final fun getFormat ()Ljava/lang/String;
 }
 
-protected final class io/matthewnelson/kmp/tor/runtime/core/key/Key$Companion {
-}
-
 public abstract class io/matthewnelson/kmp/tor/runtime/core/key/Key$Private : io/matthewnelson/kmp/tor/runtime/core/key/Key, io/matthewnelson/kmp/tor/runtime/core/Destroyable, java/security/PrivateKey {
+	protected static final field Companion Lio/matthewnelson/kmp/tor/runtime/core/key/Key$Private$Companion;
 	public synthetic fun <init> ([BLkotlin/jvm/internal/DefaultConstructorMarker;)V
 	public final fun base16 ()Ljava/lang/String;
 	public final fun base16OrNull ()Ljava/lang/String;
@@ -4087,7 +4084,11 @@ public abstract class io/matthewnelson/kmp/tor/runtime/core/key/Key$Private : io
 	protected final fun withKeyOrNull (Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
 }
 
+protected final class io/matthewnelson/kmp/tor/runtime/core/key/Key$Private$Companion {
+}
+
 public abstract class io/matthewnelson/kmp/tor/runtime/core/key/Key$Public : io/matthewnelson/kmp/tor/runtime/core/key/Key, java/security/PublicKey {
+	protected static final field Companion Lio/matthewnelson/kmp/tor/runtime/core/key/Key$Public$Companion;
 	public abstract fun base16 ()Ljava/lang/String;
 	public final fun base16OrNull ()Ljava/lang/String;
 	public abstract fun base32 ()Ljava/lang/String;
@@ -4099,6 +4100,9 @@ public abstract class io/matthewnelson/kmp/tor/runtime/core/key/Key$Public : io/
 	public final fun equals (Ljava/lang/Object;)Z
 	public final fun hashCode ()I
 	public final fun toString ()Ljava/lang/String;
+}
+
+protected final class io/matthewnelson/kmp/tor/runtime/core/key/Key$Public$Companion {
 }
 
 public abstract class io/matthewnelson/kmp/tor/runtime/core/key/KeyType {
