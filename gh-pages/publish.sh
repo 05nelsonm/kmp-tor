@@ -25,10 +25,12 @@ echo "kmp-tor.matthewnelson.io" > "$DIR_SCRIPT/kmp-tor/CNAME"
 
 cd ..
 ./gradlew clean -DKMP_TARGETS_ALL
-./gradlew dokkaHtmlMultiModule -DKMP_TARGETS_ALL
+./gradlew dokkaHtmlMultiModule --no-build-cache -DKMP_TARGETS_ALL
 cp -aR build/dokka/htmlMultiModule/* gh-pages/kmp-tor
 
 cd "$DIR_SCRIPT/kmp-tor"
+sed -i "s|module:runtime|module:library/runtime|g" "package-list"
+
 git add --all
 git commit -S --message "Update dokka docs"
 git push

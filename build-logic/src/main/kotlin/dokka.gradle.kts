@@ -27,17 +27,22 @@ tasks.withType<DokkaTaskPartial>().configureEach {
     dokkaSourceSets.configureEach {
         includes.from("README.md")
         noStdlibLink = true
-    }
 
-    dokkaSourceSets.configureEach {
+        externalDocumentationLink {
+            url = URI("https://kmp-file.matthewnelson.io/").toURL()
+        }
+        externalDocumentationLink {
+            url = URI("https://kmp-process.matthewnelson.io/").toURL()
+        }
+        externalDocumentationLink {
+            url = URI("https://kmp-tor-common.matthewnelson.io/").toURL()
+        }
         sourceLink {
             localDirectory = rootDir
             remoteUrl = URI("https://github.com/05nelsonm/kmp-tor/tree/master").toURL()
             remoteLineSuffix = "#L"
         }
-    }
 
-    dokkaSourceSets.configureEach {
         documentedVisibilities.set(setOf(
             Visibility.PUBLIC,
             Visibility.PROTECTED,
