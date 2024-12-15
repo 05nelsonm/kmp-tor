@@ -42,11 +42,7 @@ internal inline fun String.stripBaseEncoding(): String {
 @Suppress("NOTHING_TO_INLINE")
 internal inline fun String.tryDecodeOrNull(
     expectedSize: Int,
-    decoders: List<Decoder<*>> = listOf(
-        Base16,
-        Base32.Default,
-        Base64.Default,
-    )
+    decoders: List<Decoder<*>>,
 ): ByteArray? {
     decoders.forEach { decoder ->
         val bytes = decodeToByteArrayOrNull(decoder) ?: return@forEach
