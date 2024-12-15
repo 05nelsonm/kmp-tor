@@ -66,6 +66,13 @@ public actual sealed class Key private actual constructor(): java.security.Key {
         public actual final override fun hashCode(): Int = 17 * 31 + toString().hashCode()
         /** @suppress */
         public actual final override fun toString(): String = _toString
+
+        /** @suppress */
+        protected actual companion object {
+            internal actual val BASE_16: Base16 = Base16()
+            internal actual val BASE_32: Base32.Default = Base32Default { padEncoded = false }
+            internal actual val BASE_64: Base64 = Base64 { padEncoded = false }
+        }
     }
 
     public actual sealed class Private actual constructor(
@@ -122,11 +129,21 @@ public actual sealed class Key private actual constructor(): java.security.Key {
         public actual final override fun hashCode(): Int = 17 * 42 + key.hashCode()
         /** @suppress */
         public actual final override fun toString(): String = "${algorithm()}.PrivateKey[isDestroyed=$_destroyed]@${hashCode()}"
-    }
 
-    protected actual companion object {
-        internal actual val BASE_16: Base16 = Base16()
-        internal actual val BASE_32: Base32.Default = Base32Default { padEncoded = false }
-        internal actual val BASE_64: Base64 = Base64 { padEncoded = false }
+        /** @suppress */
+        protected actual companion object {
+            // constant-time enabled
+            internal actual val BASE_16: Base16 = Base16 {
+                isConstantTime = true
+            }
+            internal actual val BASE_32: Base32.Default = Base32Default {
+                isConstantTime = true
+                padEncoded = false
+            }
+            internal actual val BASE_64: Base64 = Base64 {
+                isConstantTime = true
+                padEncoded = false
+            }
+        }
     }
 }

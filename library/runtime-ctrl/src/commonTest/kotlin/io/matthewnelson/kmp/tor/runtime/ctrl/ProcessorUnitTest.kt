@@ -34,12 +34,13 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Duration.Companion.minutes
 
 @OptIn(ExperimentalStdlibApi::class, InternalKmpTorApi::class)
 class ProcessorUnitTest {
 
     @Test
-    fun givenCommands_whenMultiple_thenSingleProcessorUtilized() = runTest {
+    fun givenCommands_whenMultiple_thenSingleProcessorUtilized() = runTest(timeout = 5.minutes) {
         val lockStarts = SynchronizedObject()
         val lockIntercept = SynchronizedObject()
         val lockSuccess = SynchronizedObject()

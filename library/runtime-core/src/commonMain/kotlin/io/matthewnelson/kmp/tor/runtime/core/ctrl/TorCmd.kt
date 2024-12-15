@@ -72,11 +72,12 @@ public sealed class TorCmd<Success: Any> private constructor(
 
         /** Cookie authentication bytes (or password UTF-8 encoded to bytes) */
         public constructor(cookie: ByteArray): super("AUTHENTICATE") {
-            hex = if (cookie.isEmpty()) "" else cookie.encodeToString(Base16())
+            hex = cookie.encodeToString(BASE_16)
         }
 
         private companion object {
             private val NO_PASS = ByteArray(0)
+            private val BASE_16 = Base16 { isConstantTime = true }
         }
     }
 

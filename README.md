@@ -123,7 +123,7 @@ See [kmp-tor-samples][url-kmp-tor-samples]
 <!-- TAG_DEPENDENCIES -->
 [badge-androidx-startup]: https://img.shields.io/badge/androidx.startup-1.1.1-6EDB8D.svg?logo=android
 [badge-coroutines]: https://img.shields.io/badge/kotlinx.coroutines-1.8.1-blue.svg?logo=kotlin
-[badge-encoding]: https://img.shields.io/badge/encoding-2.2.2-blue.svg?style=flat
+[badge-encoding]: https://img.shields.io/badge/encoding-2.3.0-blue.svg?style=flat
 [badge-kmp-process]: https://img.shields.io/badge/kmp--process-0.1.0-blue.svg?style=flat
 [badge-kmp-tor-common]: https://img.shields.io/badge/kmp--tor--common-2.1.0-blue.svg?style=flat
 [badge-kotlin]: https://img.shields.io/badge/kotlin-1.9.24-blue.svg?logo=kotlin

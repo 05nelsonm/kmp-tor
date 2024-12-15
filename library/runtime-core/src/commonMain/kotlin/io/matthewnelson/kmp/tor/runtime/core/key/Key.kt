@@ -51,6 +51,14 @@ public expect sealed class Key private constructor() {
         public final override fun hashCode(): Int
         /** @suppress */
         public final override fun toString(): String
+
+        /** @suppress */
+        protected companion object {
+            // constant-time disabled
+            internal val BASE_16: Base16
+            internal val BASE_32: Base32.Default
+            internal val BASE_64: Base64
+        }
     }
 
     public sealed class Private(key: ByteArray): Key, Destroyable {
@@ -79,11 +87,13 @@ public expect sealed class Key private constructor() {
         public final override fun hashCode(): Int
         /** @suppress */
         public final override fun toString(): String
-    }
 
-    protected companion object {
-        internal val BASE_16: Base16
-        internal val BASE_32: Base32.Default
-        internal val BASE_64: Base64
+        /** @suppress */
+        protected companion object {
+            // constant-time enabled
+            internal val BASE_16: Base16
+            internal val BASE_32: Base32.Default
+            internal val BASE_64: Base64
+        }
     }
 }

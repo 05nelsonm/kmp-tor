@@ -104,7 +104,7 @@ public object ED25519_V3: KeyType.Address<ED25519_V3.PublicKey, ED25519_V3.Priva
                 if (address == null) {
                     address = tryDecodeOrNull(
                         expectedSize = OnionAddress.V3.BYTE_SIZE,
-                        decoders = listOf(Base16, Base64.Default)
+                        decoders = listOf(BASE_16, BASE_64),
                     )?.toOnionAddressV3OrNull()
                 }
 
@@ -183,7 +183,10 @@ public object ED25519_V3: KeyType.Address<ED25519_V3.PublicKey, ED25519_V3.Priva
             @JvmStatic
             @JvmName("getOrNull")
             public fun String.toED25519_V3PrivateKeyOrNull(): PrivateKey? {
-                val decoded = tryDecodeOrNull(expectedSize = BYTE_SIZE) ?: return null
+                val decoded = tryDecodeOrNull(
+                    expectedSize = BYTE_SIZE,
+                    decoders = listOf(BASE_16, BASE_32, BASE_64),
+                ) ?: return null
                 return PrivateKey(decoded)
             }
 

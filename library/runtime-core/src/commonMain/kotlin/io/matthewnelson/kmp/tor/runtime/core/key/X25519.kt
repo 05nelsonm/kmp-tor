@@ -94,7 +94,10 @@ public object X25519: KeyType.Auth<X25519.PublicKey, X25519.PrivateKey>() {
             @JvmStatic
             @JvmName("getOrNull")
             public fun String.toX25519PublicKeyOrNull(): PublicKey? {
-                val decoded = tryDecodeOrNull(expectedSize = BYTE_SIZE) ?: return null
+                val decoded = tryDecodeOrNull(
+                    expectedSize = BYTE_SIZE,
+                    decoders = listOf(BASE_16, BASE_32, BASE_64),
+                ) ?: return null
                 return PublicKey(decoded)
             }
 
@@ -174,7 +177,10 @@ public object X25519: KeyType.Auth<X25519.PublicKey, X25519.PrivateKey>() {
             @JvmStatic
             @JvmName("getOrNull")
             public fun String.toX25519PrivateKeyOrNull(): PrivateKey? {
-                val decoded = tryDecodeOrNull(expectedSize = BYTE_SIZE) ?: return null
+                val decoded = tryDecodeOrNull(
+                    expectedSize = BYTE_SIZE,
+                    decoders = listOf(BASE_16, BASE_32, BASE_64),
+                ) ?: return null
                 return PrivateKey(decoded)
             }
 
