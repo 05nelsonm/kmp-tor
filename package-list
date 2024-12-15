@@ -3,9 +3,9 @@ $dokka.linkExtension:html
 $dokka.location:io.matthewnelson.kmp.tor.runtime/Action/entries/#/PointingToDeclaration/runtime/io.matthewnelson.kmp.tor.runtime/-action/[non-js]entries.html
 $dokka.location:io.matthewnelson.kmp.tor.runtime/Action/valueOf/#kotlin.String/PointingToDeclaration/runtime/io.matthewnelson.kmp.tor.runtime/-action/[non-js]value-of.html
 $dokka.location:io.matthewnelson.kmp.tor.runtime/Action/values/#/PointingToDeclaration/runtime/io.matthewnelson.kmp.tor.runtime/-action/[non-js]values.html
-module:runtime
+module:library/runtime
 io.matthewnelson.kmp.tor.runtime
-module:runtime-core
+module:library/runtime-core
 io.matthewnelson.kmp.tor.runtime.core
 io.matthewnelson.kmp.tor.runtime.core.config
 io.matthewnelson.kmp.tor.runtime.core.config.builder
@@ -14,9 +14,9 @@ io.matthewnelson.kmp.tor.runtime.core.ctrl.builder
 io.matthewnelson.kmp.tor.runtime.core.key
 io.matthewnelson.kmp.tor.runtime.core.net
 io.matthewnelson.kmp.tor.runtime.core.util
-module:runtime-ctrl
+module:library/runtime-ctrl
 io.matthewnelson.kmp.tor.runtime.ctrl
-module:runtime-service
+module:library/runtime-service
 io.matthewnelson.kmp.tor.runtime.service
-module:runtime-service-ui
+module:library/runtime-service-ui
 io.matthewnelson.kmp.tor.runtime.service.ui
