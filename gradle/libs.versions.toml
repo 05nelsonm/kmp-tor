@@ -1,7 +1,7 @@
 [versions]
 androidx-startup = "1.1.1"
 
-encoding = "2.3.0"
+encoding = "2.3.1"
 
 gradle-android = "8.2.2"
 gradle-binary-compat = "0.16.3"
@@ -12,7 +12,7 @@ gradle-publish-maven = "0.29.0"
 
 immutable = "0.1.4"
 
-kmp-process = "0.1.0"
+kmp-process = "0.1.1"
 kmp-tor-common = "2.1.0"
 kotlinx-coroutines = "1.8.1"
 
