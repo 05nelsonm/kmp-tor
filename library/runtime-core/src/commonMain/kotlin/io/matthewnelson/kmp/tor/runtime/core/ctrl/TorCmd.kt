@@ -76,8 +76,8 @@ public sealed class TorCmd<Success: Any> private constructor(
         }
 
         private companion object {
+            private val BASE_16 = Base16()
             private val NO_PASS = ByteArray(0)
-            private val BASE_16 = Base16 { isConstantTime = true }
         }
     }
 
