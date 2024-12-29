@@ -61,7 +61,8 @@
         <service
             android:name="io.matthewnelson.kmp.tor.runtime.service.TorService"
             android:enabled="true"
-            android:exported="false" />
+            android:exported="false"
+            android:foregroundServiceType="specialUse" />
     </application>
 
 </manifest>
