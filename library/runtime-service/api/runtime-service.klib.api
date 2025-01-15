@@ -1,0 +1,93 @@
+// Klib ABI Dump
+// Targets: [iosArm64, iosSimulatorArm64, iosX64]
+// Rendering settings:
+// - Signature version: 2
+// - Show manifest properties: true
+// - Show declarations: true
+
+// Library unique name: <io.matthewnelson.kmp-tor:runtime-service>
+abstract class <#A: io.matthewnelson.kmp.tor.runtime.service/AbstractTorServiceUI.Args.UI, #B: io.matthewnelson.kmp.tor.runtime.service/AbstractTorServiceUI.Config, #C: io.matthewnelson.kmp.tor.runtime.service/AbstractTorServiceUI.InstanceState<#B>> io.matthewnelson.kmp.tor.runtime.service/AbstractTorServiceUI { // io.matthewnelson.kmp.tor.runtime.service/AbstractTorServiceUI|null[0]
+    final val defaultConfig // io.matthewnelson.kmp.tor.runtime.service/AbstractTorServiceUI.defaultConfig|{}defaultConfig[0]
+        final fun <get-defaultConfig>(): #B // io.matthewnelson.kmp.tor.runtime.service/AbstractTorServiceUI.defaultConfig.<get-defaultConfig>|<get-defaultConfig>(){}[0]
+    final val displayed // io.matthewnelson.kmp.tor.runtime.service/AbstractTorServiceUI.displayed|{}displayed[0]
+        final fun <get-displayed>(): #C? // io.matthewnelson.kmp.tor.runtime.service/AbstractTorServiceUI.displayed.<get-displayed>|<get-displayed>(){}[0]
+    final val instanceStates // io.matthewnelson.kmp.tor.runtime.service/AbstractTorServiceUI.instanceStates|{}instanceStates[0]
+        final fun <get-instanceStates>(): kotlin.collections/Collection<#C> // io.matthewnelson.kmp.tor.runtime.service/AbstractTorServiceUI.instanceStates.<get-instanceStates>|<get-instanceStates>(){}[0]
+    final val serviceChildScope // io.matthewnelson.kmp.tor.runtime.service/AbstractTorServiceUI.serviceChildScope|{}serviceChildScope[0]
+        final fun <get-serviceChildScope>(): kotlinx.coroutines/CoroutineScope // io.matthewnelson.kmp.tor.runtime.service/AbstractTorServiceUI.serviceChildScope.<get-serviceChildScope>|<get-serviceChildScope>(){}[0]
+
+    abstract fun createProtected(io.matthewnelson.kmp.tor.runtime.service/AbstractTorServiceUI.Args.Instance): #C // io.matthewnelson.kmp.tor.runtime.service/AbstractTorServiceUI.createProtected|createProtected(io.matthewnelson.kmp.tor.runtime.service.AbstractTorServiceUI.Args.Instance){}[0]
+    abstract fun onRender(#C, kotlin/Boolean, kotlin/Boolean) // io.matthewnelson.kmp.tor.runtime.service/AbstractTorServiceUI.onRender|onRender(1:2;kotlin.Boolean;kotlin.Boolean){}[0]
+    final fun equals(kotlin/Any?): kotlin/Boolean // io.matthewnelson.kmp.tor.runtime.service/AbstractTorServiceUI.equals|equals(kotlin.Any?){}[0]
+    final fun hashCode(): kotlin/Int // io.matthewnelson.kmp.tor.runtime.service/AbstractTorServiceUI.hashCode|hashCode(){}[0]
+    final fun isDestroyed(): kotlin/Boolean // io.matthewnelson.kmp.tor.runtime.service/AbstractTorServiceUI.isDestroyed|isDestroyed(){}[0]
+    final fun selectNext() // io.matthewnelson.kmp.tor.runtime.service/AbstractTorServiceUI.selectNext|selectNext(){}[0]
+    final fun selectPrevious() // io.matthewnelson.kmp.tor.runtime.service/AbstractTorServiceUI.selectPrevious|selectPrevious(){}[0]
+    open fun onDestroy() // io.matthewnelson.kmp.tor.runtime.service/AbstractTorServiceUI.onDestroy|onDestroy(){}[0]
+
+    abstract class <#A1: io.matthewnelson.kmp.tor.runtime.service/AbstractTorServiceUI.Args.UI, #B1: io.matthewnelson.kmp.tor.runtime.service/AbstractTorServiceUI.Config, #C1: io.matthewnelson.kmp.tor.runtime.service/AbstractTorServiceUI.InstanceState<#B1>, #D1: io.matthewnelson.kmp.tor.runtime.service/AbstractTorServiceUI<#A1, #B1, #C1>> Factory { // io.matthewnelson.kmp.tor.runtime.service/AbstractTorServiceUI.Factory|null[0]
+        final val defaultConfig // io.matthewnelson.kmp.tor.runtime.service/AbstractTorServiceUI.Factory.defaultConfig|{}defaultConfig[0]
+            final fun <get-defaultConfig>(): #B1 // io.matthewnelson.kmp.tor.runtime.service/AbstractTorServiceUI.Factory.defaultConfig.<get-defaultConfig>|<get-defaultConfig>(){}[0]
+
+        final var debug // io.matthewnelson.kmp.tor.runtime.service/AbstractTorServiceUI.Factory.debug|{}debug[0]
+            final fun <get-debug>(): kotlin/Boolean // io.matthewnelson.kmp.tor.runtime.service/AbstractTorServiceUI.Factory.debug.<get-debug>|<get-debug>(){}[0]
+            final fun <set-debug>(kotlin/Boolean) // io.matthewnelson.kmp.tor.runtime.service/AbstractTorServiceUI.Factory.debug.<set-debug>|<set-debug>(kotlin.Boolean){}[0]
+
+        abstract fun createProtected(#A1): #D1 // io.matthewnelson.kmp.tor.runtime.service/AbstractTorServiceUI.Factory.createProtected|createProtected(1:0){}[0]
+    }
+
+    abstract class <#A1: io.matthewnelson.kmp.tor.runtime.service/AbstractTorServiceUI.Config> InstanceState : io.matthewnelson.kmp.tor.runtime/FileID { // io.matthewnelson.kmp.tor.runtime.service/AbstractTorServiceUI.InstanceState|null[0]
+        constructor <init>(io.matthewnelson.kmp.tor.runtime.service/AbstractTorServiceUI.Args.Instance) // io.matthewnelson.kmp.tor.runtime.service/AbstractTorServiceUI.InstanceState.<init>|<init>(io.matthewnelson.kmp.tor.runtime.service.AbstractTorServiceUI.Args.Instance){}[0]
+
+        abstract val events // io.matthewnelson.kmp.tor.runtime.service/AbstractTorServiceUI.InstanceState.events|{}events[0]
+            abstract fun <get-events>(): kotlin.collections/Set<io.matthewnelson.kmp.tor.runtime.core/TorEvent> // io.matthewnelson.kmp.tor.runtime.service/AbstractTorServiceUI.InstanceState.events.<get-events>|<get-events>(){}[0]
+        abstract val observersRuntimeEvent // io.matthewnelson.kmp.tor.runtime.service/AbstractTorServiceUI.InstanceState.observersRuntimeEvent|{}observersRuntimeEvent[0]
+            abstract fun <get-observersRuntimeEvent>(): kotlin.collections/Set<io.matthewnelson.kmp.tor.runtime/RuntimeEvent.Observer<*>> // io.matthewnelson.kmp.tor.runtime.service/AbstractTorServiceUI.InstanceState.observersRuntimeEvent.<get-observersRuntimeEvent>|<get-observersRuntimeEvent>(){}[0]
+        abstract val observersTorEvent // io.matthewnelson.kmp.tor.runtime.service/AbstractTorServiceUI.InstanceState.observersTorEvent|{}observersTorEvent[0]
+            abstract fun <get-observersTorEvent>(): kotlin.collections/Set<io.matthewnelson.kmp.tor.runtime.core/TorEvent.Observer> // io.matthewnelson.kmp.tor.runtime.service/AbstractTorServiceUI.InstanceState.observersTorEvent.<get-observersTorEvent>|<get-observersTorEvent>(){}[0]
+        final val fid // io.matthewnelson.kmp.tor.runtime.service/AbstractTorServiceUI.InstanceState.fid|{}fid[0]
+            final fun <get-fid>(): kotlin/String // io.matthewnelson.kmp.tor.runtime.service/AbstractTorServiceUI.InstanceState.fid.<get-fid>|<get-fid>(){}[0]
+        final val instanceConfig // io.matthewnelson.kmp.tor.runtime.service/AbstractTorServiceUI.InstanceState.instanceConfig|{}instanceConfig[0]
+            final fun <get-instanceConfig>(): #A1 // io.matthewnelson.kmp.tor.runtime.service/AbstractTorServiceUI.InstanceState.instanceConfig.<get-instanceConfig>|<get-instanceConfig>(){}[0]
+        final val instanceScope // io.matthewnelson.kmp.tor.runtime.service/AbstractTorServiceUI.InstanceState.instanceScope|{}instanceScope[0]
+            final fun <get-instanceScope>(): kotlinx.coroutines/CoroutineScope // io.matthewnelson.kmp.tor.runtime.service/AbstractTorServiceUI.InstanceState.instanceScope.<get-instanceScope>|<get-instanceScope>(){}[0]
+
+        final fun debug(kotlin/Function0<kotlin/String>) // io.matthewnelson.kmp.tor.runtime.service/AbstractTorServiceUI.InstanceState.debug|debug(kotlin.Function0<kotlin.String>){}[0]
+        final fun equals(kotlin/Any?): kotlin/Boolean // io.matthewnelson.kmp.tor.runtime.service/AbstractTorServiceUI.InstanceState.equals|equals(kotlin.Any?){}[0]
+        final fun hashCode(): kotlin/Int // io.matthewnelson.kmp.tor.runtime.service/AbstractTorServiceUI.InstanceState.hashCode|hashCode(){}[0]
+        final fun isDestroyed(): kotlin/Boolean // io.matthewnelson.kmp.tor.runtime.service/AbstractTorServiceUI.InstanceState.isDestroyed|isDestroyed(){}[0]
+        final fun observeSignalNewNym(kotlin/String?, io.matthewnelson.kmp.tor.runtime.core/OnEvent.Executor?, io.matthewnelson.kmp.tor.runtime.core/OnEvent<kotlin/String?>): io.matthewnelson.kmp.tor.runtime.core/Disposable.Once? // io.matthewnelson.kmp.tor.runtime.service/AbstractTorServiceUI.InstanceState.observeSignalNewNym|observeSignalNewNym(kotlin.String?;io.matthewnelson.kmp.tor.runtime.core.OnEvent.Executor?;io.matthewnelson.kmp.tor.runtime.core.OnEvent<kotlin.String?>){}[0]
+        final fun postStateChange() // io.matthewnelson.kmp.tor.runtime.service/AbstractTorServiceUI.InstanceState.postStateChange|postStateChange(){}[0]
+        final fun processorAction(): io.matthewnelson.kmp.tor.runtime/Action.Processor? // io.matthewnelson.kmp.tor.runtime.service/AbstractTorServiceUI.InstanceState.processorAction|processorAction(){}[0]
+        final fun processorTorCmd(): io.matthewnelson.kmp.tor.runtime.core.ctrl/TorCmd.Unprivileged.Processor? // io.matthewnelson.kmp.tor.runtime.service/AbstractTorServiceUI.InstanceState.processorTorCmd|processorTorCmd(){}[0]
+        final fun toString(): kotlin/String // io.matthewnelson.kmp.tor.runtime.service/AbstractTorServiceUI.InstanceState.toString|toString(){}[0]
+        open fun onDestroy() // io.matthewnelson.kmp.tor.runtime.service/AbstractTorServiceUI.InstanceState.onDestroy|onDestroy(){}[0]
+
+        final class Lock { // io.matthewnelson.kmp.tor.runtime.service/AbstractTorServiceUI.InstanceState.Lock|null[0]
+            constructor <init>() // io.matthewnelson.kmp.tor.runtime.service/AbstractTorServiceUI.InstanceState.Lock.<init>|<init>(){}[0]
+
+            final fun <#A3: kotlin/Any?> withLock(kotlin/Function0<#A3>): #A3 // io.matthewnelson.kmp.tor.runtime.service/AbstractTorServiceUI.InstanceState.Lock.withLock|withLock(kotlin.Function0<0:0>){0§<kotlin.Any?>}[0]
+        }
+    }
+
+    abstract class Config { // io.matthewnelson.kmp.tor.runtime.service/AbstractTorServiceUI.Config|null[0]
+        constructor <init>(kotlin.collections/Map<kotlin/String, kotlin/Any?>) // io.matthewnelson.kmp.tor.runtime.service/AbstractTorServiceUI.Config.<init>|<init>(kotlin.collections.Map<kotlin.String,kotlin.Any?>){}[0]
+
+        final fun equals(kotlin/Any?): kotlin/Boolean // io.matthewnelson.kmp.tor.runtime.service/AbstractTorServiceUI.Config.equals|equals(kotlin.Any?){}[0]
+        final fun hashCode(): kotlin/Int // io.matthewnelson.kmp.tor.runtime.service/AbstractTorServiceUI.Config.hashCode|hashCode(){}[0]
+        final fun toString(): kotlin/String // io.matthewnelson.kmp.tor.runtime.service/AbstractTorServiceUI.Config.toString|toString(){}[0]
+    }
+
+    sealed class Args { // io.matthewnelson.kmp.tor.runtime.service/AbstractTorServiceUI.Args|null[0]
+        final fun equals(kotlin/Any?): kotlin/Boolean // io.matthewnelson.kmp.tor.runtime.service/AbstractTorServiceUI.Args.equals|equals(kotlin.Any?){}[0]
+        final fun hashCode(): kotlin/Int // io.matthewnelson.kmp.tor.runtime.service/AbstractTorServiceUI.Args.hashCode|hashCode(){}[0]
+
+        abstract class UI : io.matthewnelson.kmp.tor.runtime.service/AbstractTorServiceUI.Args // io.matthewnelson.kmp.tor.runtime.service/AbstractTorServiceUI.Args.UI|null[0]
+
+        sealed class Instance : io.matthewnelson.kmp.tor.runtime.service/AbstractTorServiceUI.Args { // io.matthewnelson.kmp.tor.runtime.service/AbstractTorServiceUI.Args.Instance|null[0]
+            constructor <init>(io.matthewnelson.kmp.tor.runtime.service/AbstractTorServiceUI.Config, kotlinx.coroutines/CoroutineScope) // io.matthewnelson.kmp.tor.runtime.service/AbstractTorServiceUI.Args.Instance.<init>|<init>(io.matthewnelson.kmp.tor.runtime.service.AbstractTorServiceUI.Config;kotlinx.coroutines.CoroutineScope){}[0]
+        }
+    }
+
+    final object Companion // io.matthewnelson.kmp.tor.runtime.service/AbstractTorServiceUI.Companion|null[0]
+}

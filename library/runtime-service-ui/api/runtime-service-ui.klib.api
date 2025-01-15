@@ -1,0 +1,25 @@
+// Klib ABI Dump
+// Targets: [iosArm64, iosSimulatorArm64, iosX64]
+// Rendering settings:
+// - Signature version: 2
+// - Show manifest properties: true
+// - Show declarations: true
+
+// Library unique name: <io.matthewnelson.kmp-tor:runtime-service-ui>
+abstract class io.matthewnelson.kmp.tor.runtime.service.ui/AbstractKmpTorServiceUIConfig : io.matthewnelson.kmp.tor.runtime.service/AbstractTorServiceUI.Config { // io.matthewnelson.kmp.tor.runtime.service.ui/AbstractKmpTorServiceUIConfig|null[0]
+    final val enableActionRestart // io.matthewnelson.kmp.tor.runtime.service.ui/AbstractKmpTorServiceUIConfig.enableActionRestart|{}enableActionRestart[0]
+        final fun <get-enableActionRestart>(): kotlin/Boolean // io.matthewnelson.kmp.tor.runtime.service.ui/AbstractKmpTorServiceUIConfig.enableActionRestart.<get-enableActionRestart>|<get-enableActionRestart>(){}[0]
+    final val enableActionStop // io.matthewnelson.kmp.tor.runtime.service.ui/AbstractKmpTorServiceUIConfig.enableActionStop|{}enableActionStop[0]
+        final fun <get-enableActionStop>(): kotlin/Boolean // io.matthewnelson.kmp.tor.runtime.service.ui/AbstractKmpTorServiceUIConfig.enableActionStop.<get-enableActionStop>|<get-enableActionStop>(){}[0]
+
+    final object Companion // io.matthewnelson.kmp.tor.runtime.service.ui/AbstractKmpTorServiceUIConfig.Companion|null[0]
+}
+
+final class <#A: io.matthewnelson.kmp.tor.runtime.service.ui/AbstractKmpTorServiceUIConfig> io.matthewnelson.kmp.tor.runtime.service.ui/KmpTorServiceUIInstanceState : io.matthewnelson.kmp.tor.runtime.service/AbstractTorServiceUI.InstanceState<#A> { // io.matthewnelson.kmp.tor.runtime.service.ui/KmpTorServiceUIInstanceState|null[0]
+    final val events // io.matthewnelson.kmp.tor.runtime.service.ui/KmpTorServiceUIInstanceState.events|{}events[0]
+        final fun <get-events>(): kotlin.collections/Set<io.matthewnelson.kmp.tor.runtime.core/TorEvent> // io.matthewnelson.kmp.tor.runtime.service.ui/KmpTorServiceUIInstanceState.events.<get-events>|<get-events>(){}[0]
+    final val observersRuntimeEvent // io.matthewnelson.kmp.tor.runtime.service.ui/KmpTorServiceUIInstanceState.observersRuntimeEvent|{}observersRuntimeEvent[0]
+        final fun <get-observersRuntimeEvent>(): kotlin.collections/Set<io.matthewnelson.kmp.tor.runtime/RuntimeEvent.Observer<*>> // io.matthewnelson.kmp.tor.runtime.service.ui/KmpTorServiceUIInstanceState.observersRuntimeEvent.<get-observersRuntimeEvent>|<get-observersRuntimeEvent>(){}[0]
+    final val observersTorEvent // io.matthewnelson.kmp.tor.runtime.service.ui/KmpTorServiceUIInstanceState.observersTorEvent|{}observersTorEvent[0]
+        final fun <get-observersTorEvent>(): kotlin.collections/Set<io.matthewnelson.kmp.tor.runtime.core/TorEvent.Observer> // io.matthewnelson.kmp.tor.runtime.service.ui/KmpTorServiceUIInstanceState.observersTorEvent.<get-observersTorEvent>|<get-observersTorEvent>(){}[0]
+}

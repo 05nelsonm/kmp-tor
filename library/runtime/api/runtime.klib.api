@@ -1,0 +1,488 @@
+// Klib ABI Dump
+// Targets: [iosArm64, iosSimulatorArm64, iosX64, js, linuxArm64, linuxX64, macosArm64, macosX64]
+// Alias: native => [iosArm64, iosSimulatorArm64, iosX64, linuxArm64, linuxX64, macosArm64, macosX64]
+// Rendering settings:
+// - Signature version: 2
+// - Show manifest properties: true
+// - Show declarations: true
+
+// Library unique name: <io.matthewnelson.kmp-tor:runtime>
+final enum class io.matthewnelson.kmp.tor.runtime/Action : io.matthewnelson.kmp.tor.runtime.core/EnqueuedJob.Argument, kotlin/Enum<io.matthewnelson.kmp.tor.runtime/Action> { // io.matthewnelson.kmp.tor.runtime/Action|null[0]
+    enum entry RestartDaemon // io.matthewnelson.kmp.tor.runtime/Action.RestartDaemon|null[0]
+    enum entry StartDaemon // io.matthewnelson.kmp.tor.runtime/Action.StartDaemon|null[0]
+    enum entry StopDaemon // io.matthewnelson.kmp.tor.runtime/Action.StopDaemon|null[0]
+
+    final val entries // io.matthewnelson.kmp.tor.runtime/Action.entries|#static{}entries[0]
+        final fun <get-entries>(): kotlin.enums/EnumEntries<io.matthewnelson.kmp.tor.runtime/Action> // io.matthewnelson.kmp.tor.runtime/Action.entries.<get-entries>|<get-entries>#static(){}[0]
+
+    final fun valueOf(kotlin/String): io.matthewnelson.kmp.tor.runtime/Action // io.matthewnelson.kmp.tor.runtime/Action.valueOf|valueOf#static(kotlin.String){}[0]
+    final fun values(): kotlin/Array<io.matthewnelson.kmp.tor.runtime/Action> // io.matthewnelson.kmp.tor.runtime/Action.values|values#static(){}[0]
+
+    abstract interface Processor { // io.matthewnelson.kmp.tor.runtime/Action.Processor|null[0]
+        abstract fun enqueue(io.matthewnelson.kmp.tor.runtime/Action, io.matthewnelson.kmp.tor.runtime.core/OnFailure, io.matthewnelson.kmp.tor.runtime.core/OnSuccess<kotlin/Unit>): io.matthewnelson.kmp.tor.runtime.core/EnqueuedJob // io.matthewnelson.kmp.tor.runtime/Action.Processor.enqueue|enqueue(io.matthewnelson.kmp.tor.runtime.Action;io.matthewnelson.kmp.tor.runtime.core.OnFailure;io.matthewnelson.kmp.tor.runtime.core.OnSuccess<kotlin.Unit>){}[0]
+    }
+
+    final object Companion { // io.matthewnelson.kmp.tor.runtime/Action.Companion|null[0]
+        final suspend fun <#A2: io.matthewnelson.kmp.tor.runtime/Action.Processor> (#A2).executeAsync(io.matthewnelson.kmp.tor.runtime/Action): #A2 // io.matthewnelson.kmp.tor.runtime/Action.Companion.executeAsync|executeAsync@0:0(io.matthewnelson.kmp.tor.runtime.Action){0§<io.matthewnelson.kmp.tor.runtime.Action.Processor>}[0]
+        final suspend inline fun <#A2: io.matthewnelson.kmp.tor.runtime/Action.Processor> (#A2).restartDaemonAsync(): #A2 // io.matthewnelson.kmp.tor.runtime/Action.Companion.restartDaemonAsync|restartDaemonAsync@0:0(){0§<io.matthewnelson.kmp.tor.runtime.Action.Processor>}[0]
+        final suspend inline fun <#A2: io.matthewnelson.kmp.tor.runtime/Action.Processor> (#A2).startDaemonAsync(): #A2 // io.matthewnelson.kmp.tor.runtime/Action.Companion.startDaemonAsync|startDaemonAsync@0:0(){0§<io.matthewnelson.kmp.tor.runtime.Action.Processor>}[0]
+        final suspend inline fun <#A2: io.matthewnelson.kmp.tor.runtime/Action.Processor> (#A2).stopDaemonAsync(): #A2 // io.matthewnelson.kmp.tor.runtime/Action.Companion.stopDaemonAsync|stopDaemonAsync@0:0(){0§<io.matthewnelson.kmp.tor.runtime.Action.Processor>}[0]
+
+        // Targets: [native]
+        final fun <#A2: io.matthewnelson.kmp.tor.runtime/Action.Processor> (#A2).executeSync(io.matthewnelson.kmp.tor.runtime/Action, kotlin/Function0<kotlin.coroutines.cancellation/CancellationException?>? =...): #A2 // io.matthewnelson.kmp.tor.runtime/Action.Companion.executeSync|executeSync@0:0(io.matthewnelson.kmp.tor.runtime.Action;kotlin.Function0<kotlin.coroutines.cancellation.CancellationException?>?){0§<io.matthewnelson.kmp.tor.runtime.Action.Processor>}[0]
+
+        // Targets: [native]
+        final inline fun <#A2: io.matthewnelson.kmp.tor.runtime/Action.Processor> (#A2).restartDaemonSync(noinline kotlin/Function0<kotlin.coroutines.cancellation/CancellationException?>? =...): #A2 // io.matthewnelson.kmp.tor.runtime/Action.Companion.restartDaemonSync|restartDaemonSync@0:0(kotlin.Function0<kotlin.coroutines.cancellation.CancellationException?>?){0§<io.matthewnelson.kmp.tor.runtime.Action.Processor>}[0]
+
+        // Targets: [native]
+        final inline fun <#A2: io.matthewnelson.kmp.tor.runtime/Action.Processor> (#A2).startDaemonSync(noinline kotlin/Function0<kotlin.coroutines.cancellation/CancellationException?>? =...): #A2 // io.matthewnelson.kmp.tor.runtime/Action.Companion.startDaemonSync|startDaemonSync@0:0(kotlin.Function0<kotlin.coroutines.cancellation.CancellationException?>?){0§<io.matthewnelson.kmp.tor.runtime.Action.Processor>}[0]
+
+        // Targets: [native]
+        final inline fun <#A2: io.matthewnelson.kmp.tor.runtime/Action.Processor> (#A2).stopDaemonSync(noinline kotlin/Function0<kotlin.coroutines.cancellation/CancellationException?>? =...): #A2 // io.matthewnelson.kmp.tor.runtime/Action.Companion.stopDaemonSync|stopDaemonSync@0:0(kotlin.Function0<kotlin.coroutines.cancellation.CancellationException?>?){0§<io.matthewnelson.kmp.tor.runtime.Action.Processor>}[0]
+    }
+}
+
+abstract fun interface io.matthewnelson.kmp.tor.runtime/ConfigCallback { // io.matthewnelson.kmp.tor.runtime/ConfigCallback|null[0]
+    abstract fun (io.matthewnelson.kmp.tor.runtime.core.config/TorConfig.BuilderScope).invoke(io.matthewnelson.kmp.tor.runtime/TorRuntime.Environment) // io.matthewnelson.kmp.tor.runtime/ConfigCallback.invoke|invoke@io.matthewnelson.kmp.tor.runtime.core.config.TorConfig.BuilderScope(io.matthewnelson.kmp.tor.runtime.TorRuntime.Environment){}[0]
+
+    final class Defaults : io.matthewnelson.kmp.tor.runtime/ConfigCallback { // io.matthewnelson.kmp.tor.runtime/ConfigCallback.Defaults|null[0]
+        final fun (io.matthewnelson.kmp.tor.runtime.core.config/TorConfig.BuilderScope).invoke(io.matthewnelson.kmp.tor.runtime/TorRuntime.Environment) // io.matthewnelson.kmp.tor.runtime/ConfigCallback.Defaults.invoke|invoke@io.matthewnelson.kmp.tor.runtime.core.config.TorConfig.BuilderScope(io.matthewnelson.kmp.tor.runtime.TorRuntime.Environment){}[0]
+    }
+}
+
+abstract interface io.matthewnelson.kmp.tor.runtime/FileID { // io.matthewnelson.kmp.tor.runtime/FileID|null[0]
+    abstract val fid // io.matthewnelson.kmp.tor.runtime/FileID.fid|{}fid[0]
+        abstract fun <get-fid>(): kotlin/String // io.matthewnelson.kmp.tor.runtime/FileID.fid.<get-fid>|<get-fid>(){}[0]
+
+    final object Companion { // io.matthewnelson.kmp.tor.runtime/FileID.Companion|null[0]
+        final val fidEllipses // io.matthewnelson.kmp.tor.runtime/FileID.Companion.fidEllipses|<get-fidEllipses>@io.matthewnelson.kmp.tor.runtime.FileID(){}[0]
+            final fun (io.matthewnelson.kmp.tor.runtime/FileID).<get-fidEllipses>(): kotlin/String // io.matthewnelson.kmp.tor.runtime/FileID.Companion.fidEllipses.<get-fidEllipses>|<get-fidEllipses>@io.matthewnelson.kmp.tor.runtime.FileID(){}[0]
+
+        final fun (io.matthewnelson.kmp.tor.runtime/FileID).toFIDString(kotlin/String =..., kotlin/Boolean =...): kotlin/String // io.matthewnelson.kmp.tor.runtime/FileID.Companion.toFIDString|toFIDString@io.matthewnelson.kmp.tor.runtime.FileID(kotlin.String;kotlin.Boolean){}[0]
+        final fun createFID(io.matthewnelson.kmp.file/File): kotlin/String // io.matthewnelson.kmp.tor.runtime/FileID.Companion.createFID|createFID(io.matthewnelson.kmp.file.File){}[0]
+    }
+}
+
+sealed interface io.matthewnelson.kmp.tor.runtime/TorRuntime : io.matthewnelson.kmp.tor.runtime.core.ctrl/TorCmd.Unprivileged.Processor, io.matthewnelson.kmp.tor.runtime/Action.Processor, io.matthewnelson.kmp.tor.runtime/FileID, io.matthewnelson.kmp.tor.runtime/RuntimeEvent.Processor { // io.matthewnelson.kmp.tor.runtime/TorRuntime|null[0]
+    abstract fun environment(): io.matthewnelson.kmp.tor.runtime/TorRuntime.Environment // io.matthewnelson.kmp.tor.runtime/TorRuntime.environment|environment(){}[0]
+    abstract fun isReady(): kotlin/Boolean // io.matthewnelson.kmp.tor.runtime/TorRuntime.isReady|isReady(){}[0]
+    abstract fun listeners(): io.matthewnelson.kmp.tor.runtime/TorListeners // io.matthewnelson.kmp.tor.runtime/TorRuntime.listeners|listeners(){}[0]
+    abstract fun state(): io.matthewnelson.kmp.tor.runtime/TorState // io.matthewnelson.kmp.tor.runtime/TorRuntime.state|state(){}[0]
+
+    abstract class ServiceFactory : io.matthewnelson.kmp.tor.runtime/TorRuntime { // io.matthewnelson.kmp.tor.runtime/TorRuntime.ServiceFactory|null[0]
+        constructor <init>(io.matthewnelson.kmp.tor.runtime/TorRuntime.ServiceFactory.Initializer) // io.matthewnelson.kmp.tor.runtime/TorRuntime.ServiceFactory.<init>|<init>(io.matthewnelson.kmp.tor.runtime.TorRuntime.ServiceFactory.Initializer){}[0]
+
+        final val binder // io.matthewnelson.kmp.tor.runtime/TorRuntime.ServiceFactory.binder|{}binder[0]
+            final fun <get-binder>(): io.matthewnelson.kmp.tor.runtime/TorRuntime.ServiceFactory.Binder // io.matthewnelson.kmp.tor.runtime/TorRuntime.ServiceFactory.binder.<get-binder>|<get-binder>(){}[0]
+        final val fid // io.matthewnelson.kmp.tor.runtime/TorRuntime.ServiceFactory.fid|{}fid[0]
+            final fun <get-fid>(): kotlin/String // io.matthewnelson.kmp.tor.runtime/TorRuntime.ServiceFactory.fid.<get-fid>|<get-fid>(){}[0]
+
+        abstract fun startService() // io.matthewnelson.kmp.tor.runtime/TorRuntime.ServiceFactory.startService|startService(){}[0]
+        final fun <#A2: kotlin/Any> enqueue(io.matthewnelson.kmp.tor.runtime.core.ctrl/TorCmd.Unprivileged<#A2>, io.matthewnelson.kmp.tor.runtime.core/OnFailure, io.matthewnelson.kmp.tor.runtime.core/OnSuccess<#A2>): io.matthewnelson.kmp.tor.runtime.core/EnqueuedJob // io.matthewnelson.kmp.tor.runtime/TorRuntime.ServiceFactory.enqueue|enqueue(io.matthewnelson.kmp.tor.runtime.core.ctrl.TorCmd.Unprivileged<0:0>;io.matthewnelson.kmp.tor.runtime.core.OnFailure;io.matthewnelson.kmp.tor.runtime.core.OnSuccess<0:0>){0§<kotlin.Any>}[0]
+        final fun clearObservers() // io.matthewnelson.kmp.tor.runtime/TorRuntime.ServiceFactory.clearObservers|clearObservers(){}[0]
+        final fun enqueue(io.matthewnelson.kmp.tor.runtime/Action, io.matthewnelson.kmp.tor.runtime.core/OnFailure, io.matthewnelson.kmp.tor.runtime.core/OnSuccess<kotlin/Unit>): io.matthewnelson.kmp.tor.runtime.core/EnqueuedJob // io.matthewnelson.kmp.tor.runtime/TorRuntime.ServiceFactory.enqueue|enqueue(io.matthewnelson.kmp.tor.runtime.Action;io.matthewnelson.kmp.tor.runtime.core.OnFailure;io.matthewnelson.kmp.tor.runtime.core.OnSuccess<kotlin.Unit>){}[0]
+        final fun environment(): io.matthewnelson.kmp.tor.runtime/TorRuntime.Environment // io.matthewnelson.kmp.tor.runtime/TorRuntime.ServiceFactory.environment|environment(){}[0]
+        final fun equals(kotlin/Any?): kotlin/Boolean // io.matthewnelson.kmp.tor.runtime/TorRuntime.ServiceFactory.equals|equals(kotlin.Any?){}[0]
+        final fun hashCode(): kotlin/Int // io.matthewnelson.kmp.tor.runtime/TorRuntime.ServiceFactory.hashCode|hashCode(){}[0]
+        final fun isReady(): kotlin/Boolean // io.matthewnelson.kmp.tor.runtime/TorRuntime.ServiceFactory.isReady|isReady(){}[0]
+        final fun listeners(): io.matthewnelson.kmp.tor.runtime/TorListeners // io.matthewnelson.kmp.tor.runtime/TorRuntime.ServiceFactory.listeners|listeners(){}[0]
+        final fun state(): io.matthewnelson.kmp.tor.runtime/TorState // io.matthewnelson.kmp.tor.runtime/TorRuntime.ServiceFactory.state|state(){}[0]
+        final fun subscribe(io.matthewnelson.kmp.tor.runtime.core/TorEvent.Observer) // io.matthewnelson.kmp.tor.runtime/TorRuntime.ServiceFactory.subscribe|subscribe(io.matthewnelson.kmp.tor.runtime.core.TorEvent.Observer){}[0]
+        final fun subscribe(io.matthewnelson.kmp.tor.runtime/RuntimeEvent.Observer<*>) // io.matthewnelson.kmp.tor.runtime/TorRuntime.ServiceFactory.subscribe|subscribe(io.matthewnelson.kmp.tor.runtime.RuntimeEvent.Observer<*>){}[0]
+        final fun subscribe(kotlin/Array<out io.matthewnelson.kmp.tor.runtime.core/TorEvent.Observer>...) // io.matthewnelson.kmp.tor.runtime/TorRuntime.ServiceFactory.subscribe|subscribe(kotlin.Array<out|io.matthewnelson.kmp.tor.runtime.core.TorEvent.Observer>...){}[0]
+        final fun subscribe(kotlin/Array<out io.matthewnelson.kmp.tor.runtime/RuntimeEvent.Observer<*>>...) // io.matthewnelson.kmp.tor.runtime/TorRuntime.ServiceFactory.subscribe|subscribe(kotlin.Array<out|io.matthewnelson.kmp.tor.runtime.RuntimeEvent.Observer<*>>...){}[0]
+        final fun toString(): kotlin/String // io.matthewnelson.kmp.tor.runtime/TorRuntime.ServiceFactory.toString|toString(){}[0]
+        final fun unsubscribe(io.matthewnelson.kmp.tor.runtime.core/TorEvent.Observer) // io.matthewnelson.kmp.tor.runtime/TorRuntime.ServiceFactory.unsubscribe|unsubscribe(io.matthewnelson.kmp.tor.runtime.core.TorEvent.Observer){}[0]
+        final fun unsubscribe(io.matthewnelson.kmp.tor.runtime/RuntimeEvent.Observer<*>) // io.matthewnelson.kmp.tor.runtime/TorRuntime.ServiceFactory.unsubscribe|unsubscribe(io.matthewnelson.kmp.tor.runtime.RuntimeEvent.Observer<*>){}[0]
+        final fun unsubscribe(kotlin/Array<out io.matthewnelson.kmp.tor.runtime.core/TorEvent.Observer>...) // io.matthewnelson.kmp.tor.runtime/TorRuntime.ServiceFactory.unsubscribe|unsubscribe(kotlin.Array<out|io.matthewnelson.kmp.tor.runtime.core.TorEvent.Observer>...){}[0]
+        final fun unsubscribe(kotlin/Array<out io.matthewnelson.kmp.tor.runtime/RuntimeEvent.Observer<*>>...) // io.matthewnelson.kmp.tor.runtime/TorRuntime.ServiceFactory.unsubscribe|unsubscribe(kotlin.Array<out|io.matthewnelson.kmp.tor.runtime.RuntimeEvent.Observer<*>>...){}[0]
+        final fun unsubscribeAll(io.matthewnelson.kmp.tor.runtime.core/TorEvent) // io.matthewnelson.kmp.tor.runtime/TorRuntime.ServiceFactory.unsubscribeAll|unsubscribeAll(io.matthewnelson.kmp.tor.runtime.core.TorEvent){}[0]
+        final fun unsubscribeAll(io.matthewnelson.kmp.tor.runtime/RuntimeEvent<*>) // io.matthewnelson.kmp.tor.runtime/TorRuntime.ServiceFactory.unsubscribeAll|unsubscribeAll(io.matthewnelson.kmp.tor.runtime.RuntimeEvent<*>){}[0]
+        final fun unsubscribeAll(kotlin/Array<out io.matthewnelson.kmp.tor.runtime.core/TorEvent>...) // io.matthewnelson.kmp.tor.runtime/TorRuntime.ServiceFactory.unsubscribeAll|unsubscribeAll(kotlin.Array<out|io.matthewnelson.kmp.tor.runtime.core.TorEvent>...){}[0]
+        final fun unsubscribeAll(kotlin/Array<out io.matthewnelson.kmp.tor.runtime/RuntimeEvent<*>>...) // io.matthewnelson.kmp.tor.runtime/TorRuntime.ServiceFactory.unsubscribeAll|unsubscribeAll(kotlin.Array<out|io.matthewnelson.kmp.tor.runtime.RuntimeEvent<*>>...){}[0]
+        final fun unsubscribeAll(kotlin/String) // io.matthewnelson.kmp.tor.runtime/TorRuntime.ServiceFactory.unsubscribeAll|unsubscribeAll(kotlin.String){}[0]
+
+        abstract interface Binder : io.matthewnelson.kmp.tor.runtime/FileID, io.matthewnelson.kmp.tor.runtime/RuntimeEvent.Notifier { // io.matthewnelson.kmp.tor.runtime/TorRuntime.ServiceFactory.Binder|null[0]
+            abstract fun onBind(kotlin.collections/Set<io.matthewnelson.kmp.tor.runtime.core/TorEvent>, io.matthewnelson.kmp.tor.runtime/NetworkObserver?, kotlin.collections/Set<io.matthewnelson.kmp.tor.runtime.core/TorEvent.Observer>, kotlin.collections/Set<io.matthewnelson.kmp.tor.runtime/RuntimeEvent.Observer<*>>): io.matthewnelson.kmp.tor.runtime/Lifecycle.DestroyableTorRuntime // io.matthewnelson.kmp.tor.runtime/TorRuntime.ServiceFactory.Binder.onBind|onBind(kotlin.collections.Set<io.matthewnelson.kmp.tor.runtime.core.TorEvent>;io.matthewnelson.kmp.tor.runtime.NetworkObserver?;kotlin.collections.Set<io.matthewnelson.kmp.tor.runtime.core.TorEvent.Observer>;kotlin.collections.Set<io.matthewnelson.kmp.tor.runtime.RuntimeEvent.Observer<*>>){}[0]
+        }
+
+        abstract class Loader { // io.matthewnelson.kmp.tor.runtime/TorRuntime.ServiceFactory.Loader|null[0]
+            constructor <init>() // io.matthewnelson.kmp.tor.runtime/TorRuntime.ServiceFactory.Loader.<init>|<init>(){}[0]
+
+            abstract fun loadProtected(io.matthewnelson.kmp.tor.runtime/TorRuntime.ServiceFactory.Initializer): io.matthewnelson.kmp.tor.runtime/TorRuntime.ServiceFactory // io.matthewnelson.kmp.tor.runtime/TorRuntime.ServiceFactory.Loader.loadProtected|loadProtected(io.matthewnelson.kmp.tor.runtime.TorRuntime.ServiceFactory.Initializer){}[0]
+        }
+
+        final class Initializer // io.matthewnelson.kmp.tor.runtime/TorRuntime.ServiceFactory.Initializer|null[0]
+    }
+
+    final class BuilderScope { // io.matthewnelson.kmp.tor.runtime/TorRuntime.BuilderScope|null[0]
+        final var networkObserver // io.matthewnelson.kmp.tor.runtime/TorRuntime.BuilderScope.networkObserver|{}networkObserver[0]
+            final fun <get-networkObserver>(): io.matthewnelson.kmp.tor.runtime/NetworkObserver // io.matthewnelson.kmp.tor.runtime/TorRuntime.BuilderScope.networkObserver.<get-networkObserver>|<get-networkObserver>(){}[0]
+            final fun <set-networkObserver>(io.matthewnelson.kmp.tor.runtime/NetworkObserver) // io.matthewnelson.kmp.tor.runtime/TorRuntime.BuilderScope.networkObserver.<set-networkObserver>|<set-networkObserver>(io.matthewnelson.kmp.tor.runtime.NetworkObserver){}[0]
+
+        final fun <#A2: kotlin/Any> observer(io.matthewnelson.kmp.tor.runtime/RuntimeEvent.Observer<#A2>): io.matthewnelson.kmp.tor.runtime/TorRuntime.BuilderScope // io.matthewnelson.kmp.tor.runtime/TorRuntime.BuilderScope.observer|observer(io.matthewnelson.kmp.tor.runtime.RuntimeEvent.Observer<0:0>){0§<kotlin.Any>}[0]
+        final fun <#A2: kotlin/Any> observerStatic(io.matthewnelson.kmp.tor.runtime/RuntimeEvent<#A2>, io.matthewnelson.kmp.tor.runtime.core/OnEvent.Executor?, io.matthewnelson.kmp.tor.runtime.core/OnEvent<#A2>): io.matthewnelson.kmp.tor.runtime/TorRuntime.BuilderScope // io.matthewnelson.kmp.tor.runtime/TorRuntime.BuilderScope.observerStatic|observerStatic(io.matthewnelson.kmp.tor.runtime.RuntimeEvent<0:0>;io.matthewnelson.kmp.tor.runtime.core.OnEvent.Executor?;io.matthewnelson.kmp.tor.runtime.core.OnEvent<0:0>){0§<kotlin.Any>}[0]
+        final fun <#A2: kotlin/Any> observerStatic(io.matthewnelson.kmp.tor.runtime/RuntimeEvent<#A2>, io.matthewnelson.kmp.tor.runtime.core/OnEvent<#A2>): io.matthewnelson.kmp.tor.runtime/TorRuntime.BuilderScope // io.matthewnelson.kmp.tor.runtime/TorRuntime.BuilderScope.observerStatic|observerStatic(io.matthewnelson.kmp.tor.runtime.RuntimeEvent<0:0>;io.matthewnelson.kmp.tor.runtime.core.OnEvent<0:0>){0§<kotlin.Any>}[0]
+        final fun config(io.matthewnelson.kmp.tor.runtime/ConfigCallback): io.matthewnelson.kmp.tor.runtime/TorRuntime.BuilderScope // io.matthewnelson.kmp.tor.runtime/TorRuntime.BuilderScope.config|config(io.matthewnelson.kmp.tor.runtime.ConfigCallback){}[0]
+        final fun observer(io.matthewnelson.kmp.tor.runtime.core/TorEvent.Observer): io.matthewnelson.kmp.tor.runtime/TorRuntime.BuilderScope // io.matthewnelson.kmp.tor.runtime/TorRuntime.BuilderScope.observer|observer(io.matthewnelson.kmp.tor.runtime.core.TorEvent.Observer){}[0]
+        final fun observerStatic(io.matthewnelson.kmp.tor.runtime.core/TorEvent, io.matthewnelson.kmp.tor.runtime.core/OnEvent.Executor?, io.matthewnelson.kmp.tor.runtime.core/OnEvent<kotlin/String>): io.matthewnelson.kmp.tor.runtime/TorRuntime.BuilderScope // io.matthewnelson.kmp.tor.runtime/TorRuntime.BuilderScope.observerStatic|observerStatic(io.matthewnelson.kmp.tor.runtime.core.TorEvent;io.matthewnelson.kmp.tor.runtime.core.OnEvent.Executor?;io.matthewnelson.kmp.tor.runtime.core.OnEvent<kotlin.String>){}[0]
+        final fun observerStatic(io.matthewnelson.kmp.tor.runtime.core/TorEvent, io.matthewnelson.kmp.tor.runtime.core/OnEvent<kotlin/String>): io.matthewnelson.kmp.tor.runtime/TorRuntime.BuilderScope // io.matthewnelson.kmp.tor.runtime/TorRuntime.BuilderScope.observerStatic|observerStatic(io.matthewnelson.kmp.tor.runtime.core.TorEvent;io.matthewnelson.kmp.tor.runtime.core.OnEvent<kotlin.String>){}[0]
+        final fun required(io.matthewnelson.kmp.tor.runtime.core/TorEvent): io.matthewnelson.kmp.tor.runtime/TorRuntime.BuilderScope // io.matthewnelson.kmp.tor.runtime/TorRuntime.BuilderScope.required|required(io.matthewnelson.kmp.tor.runtime.core.TorEvent){}[0]
+    }
+
+    final class Environment : io.matthewnelson.kmp.tor.runtime/FileID { // io.matthewnelson.kmp.tor.runtime/TorRuntime.Environment|null[0]
+        final val cacheDirectory // io.matthewnelson.kmp.tor.runtime/TorRuntime.Environment.cacheDirectory|{}cacheDirectory[0]
+            final fun <get-cacheDirectory>(): io.matthewnelson.kmp.file/File // io.matthewnelson.kmp.tor.runtime/TorRuntime.Environment.cacheDirectory.<get-cacheDirectory>|<get-cacheDirectory>(){}[0]
+        final val fid // io.matthewnelson.kmp.tor.runtime/TorRuntime.Environment.fid|<get-fid>(){}[0]
+            final fun <get-fid>(): kotlin/String // io.matthewnelson.kmp.tor.runtime/TorRuntime.Environment.fid.<get-fid>|<get-fid>(){}[0]
+        final val loader // io.matthewnelson.kmp.tor.runtime/TorRuntime.Environment.loader|{}loader[0]
+            final fun <get-loader>(): io.matthewnelson.kmp.tor.common.api/ResourceLoader.Tor // io.matthewnelson.kmp.tor.runtime/TorRuntime.Environment.loader.<get-loader>|<get-loader>(){}[0]
+        final val workDirectory // io.matthewnelson.kmp.tor.runtime/TorRuntime.Environment.workDirectory|{}workDirectory[0]
+            final fun <get-workDirectory>(): io.matthewnelson.kmp.file/File // io.matthewnelson.kmp.tor.runtime/TorRuntime.Environment.workDirectory.<get-workDirectory>|<get-workDirectory>(){}[0]
+
+        final var debug // io.matthewnelson.kmp.tor.runtime/TorRuntime.Environment.debug|{}debug[0]
+            final fun <get-debug>(): kotlin/Boolean // io.matthewnelson.kmp.tor.runtime/TorRuntime.Environment.debug.<get-debug>|<get-debug>(){}[0]
+            final fun <set-debug>(kotlin/Boolean) // io.matthewnelson.kmp.tor.runtime/TorRuntime.Environment.debug.<set-debug>|<set-debug>(kotlin.Boolean){}[0]
+
+        final fun equals(kotlin/Any?): kotlin/Boolean // io.matthewnelson.kmp.tor.runtime/TorRuntime.Environment.equals|equals(kotlin.Any?){}[0]
+        final fun hashCode(): kotlin/Int // io.matthewnelson.kmp.tor.runtime/TorRuntime.Environment.hashCode|hashCode(){}[0]
+        final fun toString(): kotlin/String // io.matthewnelson.kmp.tor.runtime/TorRuntime.Environment.toString|toString(){}[0]
+
+        final class BuilderScope { // io.matthewnelson.kmp.tor.runtime/TorRuntime.Environment.BuilderScope|null[0]
+            final val cacheDirectory // io.matthewnelson.kmp.tor.runtime/TorRuntime.Environment.BuilderScope.cacheDirectory|{}cacheDirectory[0]
+                final fun <get-cacheDirectory>(): io.matthewnelson.kmp.file/File // io.matthewnelson.kmp.tor.runtime/TorRuntime.Environment.BuilderScope.cacheDirectory.<get-cacheDirectory>|<get-cacheDirectory>(){}[0]
+            final val workDirectory // io.matthewnelson.kmp.tor.runtime/TorRuntime.Environment.BuilderScope.workDirectory|{}workDirectory[0]
+                final fun <get-workDirectory>(): io.matthewnelson.kmp.file/File // io.matthewnelson.kmp.tor.runtime/TorRuntime.Environment.BuilderScope.workDirectory.<get-workDirectory>|<get-workDirectory>(){}[0]
+
+            final var defaultEventExecutor // io.matthewnelson.kmp.tor.runtime/TorRuntime.Environment.BuilderScope.defaultEventExecutor|{}defaultEventExecutor[0]
+                final fun <get-defaultEventExecutor>(): io.matthewnelson.kmp.tor.runtime.core/OnEvent.Executor // io.matthewnelson.kmp.tor.runtime/TorRuntime.Environment.BuilderScope.defaultEventExecutor.<get-defaultEventExecutor>|<get-defaultEventExecutor>(){}[0]
+                final fun <set-defaultEventExecutor>(io.matthewnelson.kmp.tor.runtime.core/OnEvent.Executor) // io.matthewnelson.kmp.tor.runtime/TorRuntime.Environment.BuilderScope.defaultEventExecutor.<set-defaultEventExecutor>|<set-defaultEventExecutor>(io.matthewnelson.kmp.tor.runtime.core.OnEvent.Executor){}[0]
+            final var resourceDir // io.matthewnelson.kmp.tor.runtime/TorRuntime.Environment.BuilderScope.resourceDir|{}resourceDir[0]
+                final fun <get-resourceDir>(): io.matthewnelson.kmp.file/File // io.matthewnelson.kmp.tor.runtime/TorRuntime.Environment.BuilderScope.resourceDir.<get-resourceDir>|<get-resourceDir>(){}[0]
+                final fun <set-resourceDir>(io.matthewnelson.kmp.file/File) // io.matthewnelson.kmp.tor.runtime/TorRuntime.Environment.BuilderScope.resourceDir.<set-resourceDir>|<set-resourceDir>(io.matthewnelson.kmp.file.File){}[0]
+            final var serviceFactoryLoader // io.matthewnelson.kmp.tor.runtime/TorRuntime.Environment.BuilderScope.serviceFactoryLoader|{}serviceFactoryLoader[0]
+                final fun <get-serviceFactoryLoader>(): io.matthewnelson.kmp.tor.runtime/TorRuntime.ServiceFactory.Loader? // io.matthewnelson.kmp.tor.runtime/TorRuntime.Environment.BuilderScope.serviceFactoryLoader.<get-serviceFactoryLoader>|<get-serviceFactoryLoader>(){}[0]
+                final fun <set-serviceFactoryLoader>(io.matthewnelson.kmp.tor.runtime/TorRuntime.ServiceFactory.Loader?) // io.matthewnelson.kmp.tor.runtime/TorRuntime.Environment.BuilderScope.serviceFactoryLoader.<set-serviceFactoryLoader>|<set-serviceFactoryLoader>(io.matthewnelson.kmp.tor.runtime.TorRuntime.ServiceFactory.Loader?){}[0]
+        }
+
+        final object Companion { // io.matthewnelson.kmp.tor.runtime/TorRuntime.Environment.Companion|null[0]
+            final fun Builder(io.matthewnelson.kmp.file/File, io.matthewnelson.kmp.file/File, kotlin/Function1<io.matthewnelson.kmp.file/File, io.matthewnelson.kmp.tor.common.api/ResourceLoader.Tor>): io.matthewnelson.kmp.tor.runtime/TorRuntime.Environment // io.matthewnelson.kmp.tor.runtime/TorRuntime.Environment.Companion.Builder|Builder(io.matthewnelson.kmp.file.File;io.matthewnelson.kmp.file.File;kotlin.Function1<io.matthewnelson.kmp.file.File,io.matthewnelson.kmp.tor.common.api.ResourceLoader.Tor>){}[0]
+            final fun Builder(io.matthewnelson.kmp.file/File, io.matthewnelson.kmp.file/File, kotlin/Function1<io.matthewnelson.kmp.file/File, io.matthewnelson.kmp.tor.common.api/ResourceLoader.Tor>, io.matthewnelson.kmp.tor.runtime.core/ThisBlock<io.matthewnelson.kmp.tor.runtime/TorRuntime.Environment.BuilderScope>): io.matthewnelson.kmp.tor.runtime/TorRuntime.Environment // io.matthewnelson.kmp.tor.runtime/TorRuntime.Environment.Companion.Builder|Builder(io.matthewnelson.kmp.file.File;io.matthewnelson.kmp.file.File;kotlin.Function1<io.matthewnelson.kmp.file.File,io.matthewnelson.kmp.tor.common.api.ResourceLoader.Tor>;io.matthewnelson.kmp.tor.runtime.core.ThisBlock<io.matthewnelson.kmp.tor.runtime.TorRuntime.Environment.BuilderScope>){}[0]
+        }
+    }
+
+    final object Companion { // io.matthewnelson.kmp.tor.runtime/TorRuntime.Companion|null[0]
+        final fun Builder(io.matthewnelson.kmp.tor.runtime/TorRuntime.Environment, io.matthewnelson.kmp.tor.runtime.core/ThisBlock<io.matthewnelson.kmp.tor.runtime/TorRuntime.BuilderScope>): io.matthewnelson.kmp.tor.runtime/TorRuntime // io.matthewnelson.kmp.tor.runtime/TorRuntime.Companion.Builder|Builder(io.matthewnelson.kmp.tor.runtime.TorRuntime.Environment;io.matthewnelson.kmp.tor.runtime.core.ThisBlock<io.matthewnelson.kmp.tor.runtime.TorRuntime.BuilderScope>){}[0]
+    }
+}
+
+abstract class io.matthewnelson.kmp.tor.runtime/ActionJob : io.matthewnelson.kmp.tor.runtime.core/EnqueuedJob { // io.matthewnelson.kmp.tor.runtime/ActionJob|null[0]
+    final val action // io.matthewnelson.kmp.tor.runtime/ActionJob.action|{}action[0]
+        final fun <get-action>(): io.matthewnelson.kmp.tor.runtime/Action // io.matthewnelson.kmp.tor.runtime/ActionJob.action.<get-action>|<get-action>(){}[0]
+    final val isRestart // io.matthewnelson.kmp.tor.runtime/ActionJob.isRestart|{}isRestart[0]
+        final fun <get-isRestart>(): kotlin/Boolean // io.matthewnelson.kmp.tor.runtime/ActionJob.isRestart.<get-isRestart>|<get-isRestart>(){}[0]
+    final val isStart // io.matthewnelson.kmp.tor.runtime/ActionJob.isStart|{}isStart[0]
+        final fun <get-isStart>(): kotlin/Boolean // io.matthewnelson.kmp.tor.runtime/ActionJob.isStart.<get-isStart>|<get-isStart>(){}[0]
+    final val isStop // io.matthewnelson.kmp.tor.runtime/ActionJob.isStop|{}isStop[0]
+        final fun <get-isStop>(): kotlin/Boolean // io.matthewnelson.kmp.tor.runtime/ActionJob.isStop.<get-isStop>|<get-isStop>(){}[0]
+}
+
+abstract class io.matthewnelson.kmp.tor.runtime/NetworkObserver { // io.matthewnelson.kmp.tor.runtime/NetworkObserver|null[0]
+    constructor <init>() // io.matthewnelson.kmp.tor.runtime/NetworkObserver.<init>|<init>(){}[0]
+
+    abstract fun isNetworkConnected(): kotlin/Boolean // io.matthewnelson.kmp.tor.runtime/NetworkObserver.isNetworkConnected|isNetworkConnected(){}[0]
+    final fun notify(io.matthewnelson.kmp.tor.runtime/NetworkObserver.Connectivity) // io.matthewnelson.kmp.tor.runtime/NetworkObserver.notify|notify(io.matthewnelson.kmp.tor.runtime.NetworkObserver.Connectivity){}[0]
+    open fun onObserversEmpty() // io.matthewnelson.kmp.tor.runtime/NetworkObserver.onObserversEmpty|onObserversEmpty(){}[0]
+    open fun onObserversNotEmpty() // io.matthewnelson.kmp.tor.runtime/NetworkObserver.onObserversNotEmpty|onObserversNotEmpty(){}[0]
+
+    final enum class Connectivity : kotlin/Enum<io.matthewnelson.kmp.tor.runtime/NetworkObserver.Connectivity> { // io.matthewnelson.kmp.tor.runtime/NetworkObserver.Connectivity|null[0]
+        enum entry Connected // io.matthewnelson.kmp.tor.runtime/NetworkObserver.Connectivity.Connected|null[0]
+        enum entry Disconnected // io.matthewnelson.kmp.tor.runtime/NetworkObserver.Connectivity.Disconnected|null[0]
+
+        final val entries // io.matthewnelson.kmp.tor.runtime/NetworkObserver.Connectivity.entries|#static{}entries[0]
+            final fun <get-entries>(): kotlin.enums/EnumEntries<io.matthewnelson.kmp.tor.runtime/NetworkObserver.Connectivity> // io.matthewnelson.kmp.tor.runtime/NetworkObserver.Connectivity.entries.<get-entries>|<get-entries>#static(){}[0]
+
+        final fun valueOf(kotlin/String): io.matthewnelson.kmp.tor.runtime/NetworkObserver.Connectivity // io.matthewnelson.kmp.tor.runtime/NetworkObserver.Connectivity.valueOf|valueOf#static(kotlin.String){}[0]
+        final fun values(): kotlin/Array<io.matthewnelson.kmp.tor.runtime/NetworkObserver.Connectivity> // io.matthewnelson.kmp.tor.runtime/NetworkObserver.Connectivity.values|values#static(){}[0]
+    }
+
+    final object Companion { // io.matthewnelson.kmp.tor.runtime/NetworkObserver.Companion|null[0]
+        final fun noOp(): io.matthewnelson.kmp.tor.runtime/NetworkObserver // io.matthewnelson.kmp.tor.runtime/NetworkObserver.Companion.noOp|noOp(){}[0]
+    }
+}
+
+final class io.matthewnelson.kmp.tor.runtime/Lifecycle : io.matthewnelson.kmp.tor.runtime.core/Destroyable { // io.matthewnelson.kmp.tor.runtime/Lifecycle|null[0]
+    final fun destroy() // io.matthewnelson.kmp.tor.runtime/Lifecycle.destroy|destroy(){}[0]
+    final fun isDestroyed(): kotlin/Boolean // io.matthewnelson.kmp.tor.runtime/Lifecycle.isDestroyed|isDestroyed(){}[0]
+    final fun toString(): kotlin/String // io.matthewnelson.kmp.tor.runtime/Lifecycle.toString|toString(){}[0]
+
+    final class DestroyableTorRuntime : io.matthewnelson.kmp.tor.runtime.core/Destroyable, io.matthewnelson.kmp.tor.runtime/TorRuntime { // io.matthewnelson.kmp.tor.runtime/Lifecycle.DestroyableTorRuntime|null[0]
+        final val fid // io.matthewnelson.kmp.tor.runtime/Lifecycle.DestroyableTorRuntime.fid|{}fid[0]
+            final fun <get-fid>(): kotlin/String // io.matthewnelson.kmp.tor.runtime/Lifecycle.DestroyableTorRuntime.fid.<get-fid>|<get-fid>(){}[0]
+
+        final fun <#A2: kotlin/Any> enqueue(io.matthewnelson.kmp.tor.runtime.core.ctrl/TorCmd.Unprivileged<#A2>, io.matthewnelson.kmp.tor.runtime.core/OnFailure, io.matthewnelson.kmp.tor.runtime.core/OnSuccess<#A2>): io.matthewnelson.kmp.tor.runtime.core/EnqueuedJob // io.matthewnelson.kmp.tor.runtime/Lifecycle.DestroyableTorRuntime.enqueue|enqueue(io.matthewnelson.kmp.tor.runtime.core.ctrl.TorCmd.Unprivileged<0:0>;io.matthewnelson.kmp.tor.runtime.core.OnFailure;io.matthewnelson.kmp.tor.runtime.core.OnSuccess<0:0>){0§<kotlin.Any>}[0]
+        final fun clearObservers() // io.matthewnelson.kmp.tor.runtime/Lifecycle.DestroyableTorRuntime.clearObservers|clearObservers(){}[0]
+        final fun destroy() // io.matthewnelson.kmp.tor.runtime/Lifecycle.DestroyableTorRuntime.destroy|destroy(){}[0]
+        final fun enqueue(io.matthewnelson.kmp.tor.runtime/Action, io.matthewnelson.kmp.tor.runtime.core/OnFailure, io.matthewnelson.kmp.tor.runtime.core/OnSuccess<kotlin/Unit>): io.matthewnelson.kmp.tor.runtime.core/EnqueuedJob // io.matthewnelson.kmp.tor.runtime/Lifecycle.DestroyableTorRuntime.enqueue|enqueue(io.matthewnelson.kmp.tor.runtime.Action;io.matthewnelson.kmp.tor.runtime.core.OnFailure;io.matthewnelson.kmp.tor.runtime.core.OnSuccess<kotlin.Unit>){}[0]
+        final fun environment(): io.matthewnelson.kmp.tor.runtime/TorRuntime.Environment // io.matthewnelson.kmp.tor.runtime/Lifecycle.DestroyableTorRuntime.environment|environment(){}[0]
+        final fun equals(kotlin/Any?): kotlin/Boolean // io.matthewnelson.kmp.tor.runtime/Lifecycle.DestroyableTorRuntime.equals|equals(kotlin.Any?){}[0]
+        final fun hashCode(): kotlin/Int // io.matthewnelson.kmp.tor.runtime/Lifecycle.DestroyableTorRuntime.hashCode|hashCode(){}[0]
+        final fun invokeOnDestroy(io.matthewnelson.kmp.tor.runtime.core/ItBlock<kotlin/Any?>): io.matthewnelson.kmp.tor.runtime.core/Disposable // io.matthewnelson.kmp.tor.runtime/Lifecycle.DestroyableTorRuntime.invokeOnDestroy|invokeOnDestroy(io.matthewnelson.kmp.tor.runtime.core.ItBlock<kotlin.Any?>){}[0]
+        final fun isDestroyed(): kotlin/Boolean // io.matthewnelson.kmp.tor.runtime/Lifecycle.DestroyableTorRuntime.isDestroyed|isDestroyed(){}[0]
+        final fun isReady(): kotlin/Boolean // io.matthewnelson.kmp.tor.runtime/Lifecycle.DestroyableTorRuntime.isReady|isReady(){}[0]
+        final fun listeners(): io.matthewnelson.kmp.tor.runtime/TorListeners // io.matthewnelson.kmp.tor.runtime/Lifecycle.DestroyableTorRuntime.listeners|listeners(){}[0]
+        final fun state(): io.matthewnelson.kmp.tor.runtime/TorState // io.matthewnelson.kmp.tor.runtime/Lifecycle.DestroyableTorRuntime.state|state(){}[0]
+        final fun subscribe(io.matthewnelson.kmp.tor.runtime.core/TorEvent.Observer) // io.matthewnelson.kmp.tor.runtime/Lifecycle.DestroyableTorRuntime.subscribe|subscribe(io.matthewnelson.kmp.tor.runtime.core.TorEvent.Observer){}[0]
+        final fun subscribe(io.matthewnelson.kmp.tor.runtime/RuntimeEvent.Observer<*>) // io.matthewnelson.kmp.tor.runtime/Lifecycle.DestroyableTorRuntime.subscribe|subscribe(io.matthewnelson.kmp.tor.runtime.RuntimeEvent.Observer<*>){}[0]
+        final fun subscribe(kotlin/Array<out io.matthewnelson.kmp.tor.runtime.core/TorEvent.Observer>...) // io.matthewnelson.kmp.tor.runtime/Lifecycle.DestroyableTorRuntime.subscribe|subscribe(kotlin.Array<out|io.matthewnelson.kmp.tor.runtime.core.TorEvent.Observer>...){}[0]
+        final fun subscribe(kotlin/Array<out io.matthewnelson.kmp.tor.runtime/RuntimeEvent.Observer<*>>...) // io.matthewnelson.kmp.tor.runtime/Lifecycle.DestroyableTorRuntime.subscribe|subscribe(kotlin.Array<out|io.matthewnelson.kmp.tor.runtime.RuntimeEvent.Observer<*>>...){}[0]
+        final fun toString(): kotlin/String // io.matthewnelson.kmp.tor.runtime/Lifecycle.DestroyableTorRuntime.toString|toString(){}[0]
+        final fun unsubscribe(io.matthewnelson.kmp.tor.runtime.core/TorEvent.Observer) // io.matthewnelson.kmp.tor.runtime/Lifecycle.DestroyableTorRuntime.unsubscribe|unsubscribe(io.matthewnelson.kmp.tor.runtime.core.TorEvent.Observer){}[0]
+        final fun unsubscribe(io.matthewnelson.kmp.tor.runtime/RuntimeEvent.Observer<*>) // io.matthewnelson.kmp.tor.runtime/Lifecycle.DestroyableTorRuntime.unsubscribe|unsubscribe(io.matthewnelson.kmp.tor.runtime.RuntimeEvent.Observer<*>){}[0]
+        final fun unsubscribe(kotlin/Array<out io.matthewnelson.kmp.tor.runtime.core/TorEvent.Observer>...) // io.matthewnelson.kmp.tor.runtime/Lifecycle.DestroyableTorRuntime.unsubscribe|unsubscribe(kotlin.Array<out|io.matthewnelson.kmp.tor.runtime.core.TorEvent.Observer>...){}[0]
+        final fun unsubscribe(kotlin/Array<out io.matthewnelson.kmp.tor.runtime/RuntimeEvent.Observer<*>>...) // io.matthewnelson.kmp.tor.runtime/Lifecycle.DestroyableTorRuntime.unsubscribe|unsubscribe(kotlin.Array<out|io.matthewnelson.kmp.tor.runtime.RuntimeEvent.Observer<*>>...){}[0]
+        final fun unsubscribeAll(io.matthewnelson.kmp.tor.runtime.core/TorEvent) // io.matthewnelson.kmp.tor.runtime/Lifecycle.DestroyableTorRuntime.unsubscribeAll|unsubscribeAll(io.matthewnelson.kmp.tor.runtime.core.TorEvent){}[0]
+        final fun unsubscribeAll(io.matthewnelson.kmp.tor.runtime/RuntimeEvent<*>) // io.matthewnelson.kmp.tor.runtime/Lifecycle.DestroyableTorRuntime.unsubscribeAll|unsubscribeAll(io.matthewnelson.kmp.tor.runtime.RuntimeEvent<*>){}[0]
+        final fun unsubscribeAll(kotlin/Array<out io.matthewnelson.kmp.tor.runtime.core/TorEvent>...) // io.matthewnelson.kmp.tor.runtime/Lifecycle.DestroyableTorRuntime.unsubscribeAll|unsubscribeAll(kotlin.Array<out|io.matthewnelson.kmp.tor.runtime.core.TorEvent>...){}[0]
+        final fun unsubscribeAll(kotlin/Array<out io.matthewnelson.kmp.tor.runtime/RuntimeEvent<*>>...) // io.matthewnelson.kmp.tor.runtime/Lifecycle.DestroyableTorRuntime.unsubscribeAll|unsubscribeAll(kotlin.Array<out|io.matthewnelson.kmp.tor.runtime.RuntimeEvent<*>>...){}[0]
+        final fun unsubscribeAll(kotlin/String) // io.matthewnelson.kmp.tor.runtime/Lifecycle.DestroyableTorRuntime.unsubscribeAll|unsubscribeAll(kotlin.String){}[0]
+    }
+
+    final class Event { // io.matthewnelson.kmp.tor.runtime/Lifecycle.Event|null[0]
+        final val className // io.matthewnelson.kmp.tor.runtime/Lifecycle.Event.className|{}className[0]
+            final fun <get-className>(): kotlin/String // io.matthewnelson.kmp.tor.runtime/Lifecycle.Event.className.<get-className>|<get-className>(){}[0]
+        final val fid // io.matthewnelson.kmp.tor.runtime/Lifecycle.Event.fid|{}fid[0]
+            final fun <get-fid>(): kotlin/String? // io.matthewnelson.kmp.tor.runtime/Lifecycle.Event.fid.<get-fid>|<get-fid>(){}[0]
+        final val hash // io.matthewnelson.kmp.tor.runtime/Lifecycle.Event.hash|{}hash[0]
+            final fun <get-hash>(): kotlin/Int // io.matthewnelson.kmp.tor.runtime/Lifecycle.Event.hash.<get-hash>|<get-hash>(){}[0]
+        final val name // io.matthewnelson.kmp.tor.runtime/Lifecycle.Event.name|{}name[0]
+            final fun <get-name>(): io.matthewnelson.kmp.tor.runtime/Lifecycle.Event.Name // io.matthewnelson.kmp.tor.runtime/Lifecycle.Event.name.<get-name>|<get-name>(){}[0]
+
+        final fun equals(kotlin/Any?): kotlin/Boolean // io.matthewnelson.kmp.tor.runtime/Lifecycle.Event.equals|equals(kotlin.Any?){}[0]
+        final fun hashCode(): kotlin/Int // io.matthewnelson.kmp.tor.runtime/Lifecycle.Event.hashCode|hashCode(){}[0]
+        final fun toString(): kotlin/String // io.matthewnelson.kmp.tor.runtime/Lifecycle.Event.toString|toString(){}[0]
+
+        final class Name { // io.matthewnelson.kmp.tor.runtime/Lifecycle.Event.Name|null[0]
+            final fun equals(kotlin/Any?): kotlin/Boolean // io.matthewnelson.kmp.tor.runtime/Lifecycle.Event.Name.equals|equals(kotlin.Any?){}[0]
+            final fun hashCode(): kotlin/Int // io.matthewnelson.kmp.tor.runtime/Lifecycle.Event.Name.hashCode|hashCode(){}[0]
+            final fun toString(): kotlin/String // io.matthewnelson.kmp.tor.runtime/Lifecycle.Event.Name.toString|toString(){}[0]
+
+            final object Companion { // io.matthewnelson.kmp.tor.runtime/Lifecycle.Event.Name.Companion|null[0]
+                final val OnBind // io.matthewnelson.kmp.tor.runtime/Lifecycle.Event.Name.Companion.OnBind|<get-OnBind>(){}[0]
+                    final fun <get-OnBind>(): io.matthewnelson.kmp.tor.runtime/Lifecycle.Event.Name // io.matthewnelson.kmp.tor.runtime/Lifecycle.Event.Name.Companion.OnBind.<get-OnBind>|<get-OnBind>(){}[0]
+                final val OnCreate // io.matthewnelson.kmp.tor.runtime/Lifecycle.Event.Name.Companion.OnCreate|<get-OnCreate>(){}[0]
+                    final fun <get-OnCreate>(): io.matthewnelson.kmp.tor.runtime/Lifecycle.Event.Name // io.matthewnelson.kmp.tor.runtime/Lifecycle.Event.Name.Companion.OnCreate.<get-OnCreate>|<get-OnCreate>(){}[0]
+                final val OnDestroy // io.matthewnelson.kmp.tor.runtime/Lifecycle.Event.Name.Companion.OnDestroy|<get-OnDestroy>(){}[0]
+                    final fun <get-OnDestroy>(): io.matthewnelson.kmp.tor.runtime/Lifecycle.Event.Name // io.matthewnelson.kmp.tor.runtime/Lifecycle.Event.Name.Companion.OnDestroy.<get-OnDestroy>|<get-OnDestroy>(){}[0]
+                final val OnRemoved // io.matthewnelson.kmp.tor.runtime/Lifecycle.Event.Name.Companion.OnRemoved|<get-OnRemoved>(){}[0]
+                    final fun <get-OnRemoved>(): io.matthewnelson.kmp.tor.runtime/Lifecycle.Event.Name // io.matthewnelson.kmp.tor.runtime/Lifecycle.Event.Name.Companion.OnRemoved.<get-OnRemoved>|<get-OnRemoved>(){}[0]
+                final val OnReturned // io.matthewnelson.kmp.tor.runtime/Lifecycle.Event.Name.Companion.OnReturned|<get-OnReturned>(){}[0]
+                    final fun <get-OnReturned>(): io.matthewnelson.kmp.tor.runtime/Lifecycle.Event.Name // io.matthewnelson.kmp.tor.runtime/Lifecycle.Event.Name.Companion.OnReturned.<get-OnReturned>|<get-OnReturned>(){}[0]
+                final val OnStart // io.matthewnelson.kmp.tor.runtime/Lifecycle.Event.Name.Companion.OnStart|<get-OnStart>(){}[0]
+                    final fun <get-OnStart>(): io.matthewnelson.kmp.tor.runtime/Lifecycle.Event.Name // io.matthewnelson.kmp.tor.runtime/Lifecycle.Event.Name.Companion.OnStart.<get-OnStart>|<get-OnStart>(){}[0]
+                final val OnStop // io.matthewnelson.kmp.tor.runtime/Lifecycle.Event.Name.Companion.OnStop|<get-OnStop>(){}[0]
+                    final fun <get-OnStop>(): io.matthewnelson.kmp.tor.runtime/Lifecycle.Event.Name // io.matthewnelson.kmp.tor.runtime/Lifecycle.Event.Name.Companion.OnStop.<get-OnStop>|<get-OnStop>(){}[0]
+                final val OnSubscribed // io.matthewnelson.kmp.tor.runtime/Lifecycle.Event.Name.Companion.OnSubscribed|<get-OnSubscribed>(){}[0]
+                    final fun <get-OnSubscribed>(): io.matthewnelson.kmp.tor.runtime/Lifecycle.Event.Name // io.matthewnelson.kmp.tor.runtime/Lifecycle.Event.Name.Companion.OnSubscribed.<get-OnSubscribed>|<get-OnSubscribed>(){}[0]
+                final val OnUnbind // io.matthewnelson.kmp.tor.runtime/Lifecycle.Event.Name.Companion.OnUnbind|<get-OnUnbind>(){}[0]
+                    final fun <get-OnUnbind>(): io.matthewnelson.kmp.tor.runtime/Lifecycle.Event.Name // io.matthewnelson.kmp.tor.runtime/Lifecycle.Event.Name.Companion.OnUnbind.<get-OnUnbind>|<get-OnUnbind>(){}[0]
+                final val OnUnsubscribed // io.matthewnelson.kmp.tor.runtime/Lifecycle.Event.Name.Companion.OnUnsubscribed|<get-OnUnsubscribed>(){}[0]
+                    final fun <get-OnUnsubscribed>(): io.matthewnelson.kmp.tor.runtime/Lifecycle.Event.Name // io.matthewnelson.kmp.tor.runtime/Lifecycle.Event.Name.Companion.OnUnsubscribed.<get-OnUnsubscribed>|<get-OnUnsubscribed>(){}[0]
+            }
+        }
+
+        final object Companion { // io.matthewnelson.kmp.tor.runtime/Lifecycle.Event.Companion|null[0]
+            final fun OnBind(kotlin/Any): io.matthewnelson.kmp.tor.runtime/Lifecycle.Event // io.matthewnelson.kmp.tor.runtime/Lifecycle.Event.Companion.OnBind|OnBind(kotlin.Any){}[0]
+            final fun OnCreate(kotlin/Any): io.matthewnelson.kmp.tor.runtime/Lifecycle.Event // io.matthewnelson.kmp.tor.runtime/Lifecycle.Event.Companion.OnCreate|OnCreate(kotlin.Any){}[0]
+            final fun OnDestroy(kotlin/Any): io.matthewnelson.kmp.tor.runtime/Lifecycle.Event // io.matthewnelson.kmp.tor.runtime/Lifecycle.Event.Companion.OnDestroy|OnDestroy(kotlin.Any){}[0]
+            final fun OnRemoved(kotlin/Any): io.matthewnelson.kmp.tor.runtime/Lifecycle.Event // io.matthewnelson.kmp.tor.runtime/Lifecycle.Event.Companion.OnRemoved|OnRemoved(kotlin.Any){}[0]
+            final fun OnReturned(kotlin/Any): io.matthewnelson.kmp.tor.runtime/Lifecycle.Event // io.matthewnelson.kmp.tor.runtime/Lifecycle.Event.Companion.OnReturned|OnReturned(kotlin.Any){}[0]
+            final fun OnStart(kotlin/Any): io.matthewnelson.kmp.tor.runtime/Lifecycle.Event // io.matthewnelson.kmp.tor.runtime/Lifecycle.Event.Companion.OnStart|OnStart(kotlin.Any){}[0]
+            final fun OnStop(kotlin/Any): io.matthewnelson.kmp.tor.runtime/Lifecycle.Event // io.matthewnelson.kmp.tor.runtime/Lifecycle.Event.Companion.OnStop|OnStop(kotlin.Any){}[0]
+            final fun OnSubscribed(kotlin/Any): io.matthewnelson.kmp.tor.runtime/Lifecycle.Event // io.matthewnelson.kmp.tor.runtime/Lifecycle.Event.Companion.OnSubscribed|OnSubscribed(kotlin.Any){}[0]
+            final fun OnUnbind(kotlin/Any): io.matthewnelson.kmp.tor.runtime/Lifecycle.Event // io.matthewnelson.kmp.tor.runtime/Lifecycle.Event.Companion.OnUnbind|OnUnbind(kotlin.Any){}[0]
+            final fun OnUnsubscribed(kotlin/Any): io.matthewnelson.kmp.tor.runtime/Lifecycle.Event // io.matthewnelson.kmp.tor.runtime/Lifecycle.Event.Companion.OnUnsubscribed|OnUnsubscribed(kotlin.Any){}[0]
+        }
+    }
+}
+
+final class io.matthewnelson.kmp.tor.runtime/TorCmdJob : io.matthewnelson.kmp.tor.runtime.core/EnqueuedJob { // io.matthewnelson.kmp.tor.runtime/TorCmdJob|null[0]
+    final val cmd // io.matthewnelson.kmp.tor.runtime/TorCmdJob.cmd|{}cmd[0]
+        final fun <get-cmd>(): kotlin.reflect/KClass<out io.matthewnelson.kmp.tor.runtime.core.ctrl/TorCmd<*>> // io.matthewnelson.kmp.tor.runtime/TorCmdJob.cmd.<get-cmd>|<get-cmd>(){}[0]
+
+    final fun equals(kotlin/Any?): kotlin/Boolean // io.matthewnelson.kmp.tor.runtime/TorCmdJob.equals|equals(kotlin.Any?){}[0]
+    final fun hashCode(): kotlin/Int // io.matthewnelson.kmp.tor.runtime/TorCmdJob.hashCode|hashCode(){}[0]
+}
+
+final class io.matthewnelson.kmp.tor.runtime/TorListeners { // io.matthewnelson.kmp.tor.runtime/TorListeners|null[0]
+    constructor <init>(kotlin.collections/Set<io.matthewnelson.kmp.tor.runtime.core.net/IPSocketAddress> =..., kotlin.collections/Set<io.matthewnelson.kmp.tor.runtime.core.net/IPSocketAddress> =..., kotlin.collections/Set<io.matthewnelson.kmp.tor.runtime.core.net/IPSocketAddress> =..., kotlin.collections/Set<io.matthewnelson.kmp.tor.runtime.core.net/IPSocketAddress> =..., kotlin.collections/Set<io.matthewnelson.kmp.tor.runtime.core.net/IPSocketAddress> =..., kotlin.collections/Set<io.matthewnelson.kmp.tor.runtime.core.net/IPSocketAddress> =..., kotlin.collections/Set<io.matthewnelson.kmp.tor.runtime.core.net/IPSocketAddress> =..., kotlin.collections/Set<io.matthewnelson.kmp.tor.runtime.core.net/IPSocketAddress> =..., kotlin.collections/Set<io.matthewnelson.kmp.file/File> =..., kotlin.collections/Set<io.matthewnelson.kmp.tor.runtime.core.net/IPSocketAddress> =...) // io.matthewnelson.kmp.tor.runtime/TorListeners.<init>|<init>(kotlin.collections.Set<io.matthewnelson.kmp.tor.runtime.core.net.IPSocketAddress>;kotlin.collections.Set<io.matthewnelson.kmp.tor.runtime.core.net.IPSocketAddress>;kotlin.collections.Set<io.matthewnelson.kmp.tor.runtime.core.net.IPSocketAddress>;kotlin.collections.Set<io.matthewnelson.kmp.tor.runtime.core.net.IPSocketAddress>;kotlin.collections.Set<io.matthewnelson.kmp.tor.runtime.core.net.IPSocketAddress>;kotlin.collections.Set<io.matthewnelson.kmp.tor.runtime.core.net.IPSocketAddress>;kotlin.collections.Set<io.matthewnelson.kmp.tor.runtime.core.net.IPSocketAddress>;kotlin.collections.Set<io.matthewnelson.kmp.tor.runtime.core.net.IPSocketAddress>;kotlin.collections.Set<io.matthewnelson.kmp.file.File>;kotlin.collections.Set<io.matthewnelson.kmp.tor.runtime.core.net.IPSocketAddress>){}[0]
+
+    final val dir // io.matthewnelson.kmp.tor.runtime/TorListeners.dir|{}dir[0]
+        final fun <get-dir>(): kotlin.collections/Set<io.matthewnelson.kmp.tor.runtime.core.net/IPSocketAddress> // io.matthewnelson.kmp.tor.runtime/TorListeners.dir.<get-dir>|<get-dir>(){}[0]
+    final val dns // io.matthewnelson.kmp.tor.runtime/TorListeners.dns|{}dns[0]
+        final fun <get-dns>(): kotlin.collections/Set<io.matthewnelson.kmp.tor.runtime.core.net/IPSocketAddress> // io.matthewnelson.kmp.tor.runtime/TorListeners.dns.<get-dns>|<get-dns>(){}[0]
+    final val http // io.matthewnelson.kmp.tor.runtime/TorListeners.http|{}http[0]
+        final fun <get-http>(): kotlin.collections/Set<io.matthewnelson.kmp.tor.runtime.core.net/IPSocketAddress> // io.matthewnelson.kmp.tor.runtime/TorListeners.http.<get-http>|<get-http>(){}[0]
+    final val isEmpty // io.matthewnelson.kmp.tor.runtime/TorListeners.isEmpty|{}isEmpty[0]
+        final fun <get-isEmpty>(): kotlin/Boolean // io.matthewnelson.kmp.tor.runtime/TorListeners.isEmpty.<get-isEmpty>|<get-isEmpty>(){}[0]
+    final val metrics // io.matthewnelson.kmp.tor.runtime/TorListeners.metrics|{}metrics[0]
+        final fun <get-metrics>(): kotlin.collections/Set<io.matthewnelson.kmp.tor.runtime.core.net/IPSocketAddress> // io.matthewnelson.kmp.tor.runtime/TorListeners.metrics.<get-metrics>|<get-metrics>(){}[0]
+    final val natd // io.matthewnelson.kmp.tor.runtime/TorListeners.natd|{}natd[0]
+        final fun <get-natd>(): kotlin.collections/Set<io.matthewnelson.kmp.tor.runtime.core.net/IPSocketAddress> // io.matthewnelson.kmp.tor.runtime/TorListeners.natd.<get-natd>|<get-natd>(){}[0]
+    final val or // io.matthewnelson.kmp.tor.runtime/TorListeners.or|{}or[0]
+        final fun <get-or>(): kotlin.collections/Set<io.matthewnelson.kmp.tor.runtime.core.net/IPSocketAddress> // io.matthewnelson.kmp.tor.runtime/TorListeners.or.<get-or>|<get-or>(){}[0]
+    final val orExt // io.matthewnelson.kmp.tor.runtime/TorListeners.orExt|{}orExt[0]
+        final fun <get-orExt>(): kotlin.collections/Set<io.matthewnelson.kmp.tor.runtime.core.net/IPSocketAddress> // io.matthewnelson.kmp.tor.runtime/TorListeners.orExt.<get-orExt>|<get-orExt>(){}[0]
+    final val socks // io.matthewnelson.kmp.tor.runtime/TorListeners.socks|{}socks[0]
+        final fun <get-socks>(): kotlin.collections/Set<io.matthewnelson.kmp.tor.runtime.core.net/IPSocketAddress> // io.matthewnelson.kmp.tor.runtime/TorListeners.socks.<get-socks>|<get-socks>(){}[0]
+    final val socksUnix // io.matthewnelson.kmp.tor.runtime/TorListeners.socksUnix|{}socksUnix[0]
+        final fun <get-socksUnix>(): kotlin.collections/Set<io.matthewnelson.kmp.file/File> // io.matthewnelson.kmp.tor.runtime/TorListeners.socksUnix.<get-socksUnix>|<get-socksUnix>(){}[0]
+    final val trans // io.matthewnelson.kmp.tor.runtime/TorListeners.trans|{}trans[0]
+        final fun <get-trans>(): kotlin.collections/Set<io.matthewnelson.kmp.tor.runtime.core.net/IPSocketAddress> // io.matthewnelson.kmp.tor.runtime/TorListeners.trans.<get-trans>|<get-trans>(){}[0]
+
+    final fun copy(kotlin.collections/Set<io.matthewnelson.kmp.tor.runtime.core.net/IPSocketAddress> =..., kotlin.collections/Set<io.matthewnelson.kmp.tor.runtime.core.net/IPSocketAddress> =..., kotlin.collections/Set<io.matthewnelson.kmp.tor.runtime.core.net/IPSocketAddress> =..., kotlin.collections/Set<io.matthewnelson.kmp.tor.runtime.core.net/IPSocketAddress> =..., kotlin.collections/Set<io.matthewnelson.kmp.tor.runtime.core.net/IPSocketAddress> =..., kotlin.collections/Set<io.matthewnelson.kmp.tor.runtime.core.net/IPSocketAddress> =..., kotlin.collections/Set<io.matthewnelson.kmp.tor.runtime.core.net/IPSocketAddress> =..., kotlin.collections/Set<io.matthewnelson.kmp.tor.runtime.core.net/IPSocketAddress> =..., kotlin.collections/Set<io.matthewnelson.kmp.file/File> =..., kotlin.collections/Set<io.matthewnelson.kmp.tor.runtime.core.net/IPSocketAddress> =...): io.matthewnelson.kmp.tor.runtime/TorListeners // io.matthewnelson.kmp.tor.runtime/TorListeners.copy|copy(kotlin.collections.Set<io.matthewnelson.kmp.tor.runtime.core.net.IPSocketAddress>;kotlin.collections.Set<io.matthewnelson.kmp.tor.runtime.core.net.IPSocketAddress>;kotlin.collections.Set<io.matthewnelson.kmp.tor.runtime.core.net.IPSocketAddress>;kotlin.collections.Set<io.matthewnelson.kmp.tor.runtime.core.net.IPSocketAddress>;kotlin.collections.Set<io.matthewnelson.kmp.tor.runtime.core.net.IPSocketAddress>;kotlin.collections.Set<io.matthewnelson.kmp.tor.runtime.core.net.IPSocketAddress>;kotlin.collections.Set<io.matthewnelson.kmp.tor.runtime.core.net.IPSocketAddress>;kotlin.collections.Set<io.matthewnelson.kmp.tor.runtime.core.net.IPSocketAddress>;kotlin.collections.Set<io.matthewnelson.kmp.file.File>;kotlin.collections.Set<io.matthewnelson.kmp.tor.runtime.core.net.IPSocketAddress>){}[0]
+    final fun equals(kotlin/Any?): kotlin/Boolean // io.matthewnelson.kmp.tor.runtime/TorListeners.equals|equals(kotlin.Any?){}[0]
+    final fun hashCode(): kotlin/Int // io.matthewnelson.kmp.tor.runtime/TorListeners.hashCode|hashCode(){}[0]
+    final fun toString(): kotlin/String // io.matthewnelson.kmp.tor.runtime/TorListeners.toString|toString(){}[0]
+}
+
+final class io.matthewnelson.kmp.tor.runtime/TorState { // io.matthewnelson.kmp.tor.runtime/TorState|null[0]
+    constructor <init>(io.matthewnelson.kmp.tor.runtime/TorState.Daemon, io.matthewnelson.kmp.tor.runtime/TorState.Network) // io.matthewnelson.kmp.tor.runtime/TorState.<init>|<init>(io.matthewnelson.kmp.tor.runtime.TorState.Daemon;io.matthewnelson.kmp.tor.runtime.TorState.Network){}[0]
+
+    final val daemon // io.matthewnelson.kmp.tor.runtime/TorState.daemon|{}daemon[0]
+        final fun <get-daemon>(): io.matthewnelson.kmp.tor.runtime/TorState.Daemon // io.matthewnelson.kmp.tor.runtime/TorState.daemon.<get-daemon>|<get-daemon>(){}[0]
+    final val network // io.matthewnelson.kmp.tor.runtime/TorState.network|{}network[0]
+        final fun <get-network>(): io.matthewnelson.kmp.tor.runtime/TorState.Network // io.matthewnelson.kmp.tor.runtime/TorState.network.<get-network>|<get-network>(){}[0]
+
+    final fun component1(): io.matthewnelson.kmp.tor.runtime/TorState.Daemon // io.matthewnelson.kmp.tor.runtime/TorState.component1|component1(){}[0]
+    final fun component2(): io.matthewnelson.kmp.tor.runtime/TorState.Network // io.matthewnelson.kmp.tor.runtime/TorState.component2|component2(){}[0]
+    final fun copy(io.matthewnelson.kmp.tor.runtime/TorState.Daemon): io.matthewnelson.kmp.tor.runtime/TorState // io.matthewnelson.kmp.tor.runtime/TorState.copy|copy(io.matthewnelson.kmp.tor.runtime.TorState.Daemon){}[0]
+    final fun copy(io.matthewnelson.kmp.tor.runtime/TorState.Daemon, io.matthewnelson.kmp.tor.runtime/TorState.Network): io.matthewnelson.kmp.tor.runtime/TorState // io.matthewnelson.kmp.tor.runtime/TorState.copy|copy(io.matthewnelson.kmp.tor.runtime.TorState.Daemon;io.matthewnelson.kmp.tor.runtime.TorState.Network){}[0]
+    final fun copy(io.matthewnelson.kmp.tor.runtime/TorState.Network): io.matthewnelson.kmp.tor.runtime/TorState // io.matthewnelson.kmp.tor.runtime/TorState.copy|copy(io.matthewnelson.kmp.tor.runtime.TorState.Network){}[0]
+    final fun equals(kotlin/Any?): kotlin/Boolean // io.matthewnelson.kmp.tor.runtime/TorState.equals|equals(kotlin.Any?){}[0]
+    final fun hashCode(): kotlin/Int // io.matthewnelson.kmp.tor.runtime/TorState.hashCode|hashCode(){}[0]
+    final fun toString(): kotlin/String // io.matthewnelson.kmp.tor.runtime/TorState.toString|toString(){}[0]
+
+    sealed class Daemon { // io.matthewnelson.kmp.tor.runtime/TorState.Daemon|null[0]
+        final val bootstrap // io.matthewnelson.kmp.tor.runtime/TorState.Daemon.bootstrap|{}bootstrap[0]
+            final fun <get-bootstrap>(): kotlin/Byte // io.matthewnelson.kmp.tor.runtime/TorState.Daemon.bootstrap.<get-bootstrap>|<get-bootstrap>(){}[0]
+        final val isBootstrapped // io.matthewnelson.kmp.tor.runtime/TorState.Daemon.isBootstrapped|{}isBootstrapped[0]
+            final fun <get-isBootstrapped>(): kotlin/Boolean // io.matthewnelson.kmp.tor.runtime/TorState.Daemon.isBootstrapped.<get-isBootstrapped>|<get-isBootstrapped>(){}[0]
+        final val isOff // io.matthewnelson.kmp.tor.runtime/TorState.Daemon.isOff|{}isOff[0]
+            final fun <get-isOff>(): kotlin/Boolean // io.matthewnelson.kmp.tor.runtime/TorState.Daemon.isOff.<get-isOff>|<get-isOff>(){}[0]
+        final val isOn // io.matthewnelson.kmp.tor.runtime/TorState.Daemon.isOn|{}isOn[0]
+            final fun <get-isOn>(): kotlin/Boolean // io.matthewnelson.kmp.tor.runtime/TorState.Daemon.isOn.<get-isOn>|<get-isOn>(){}[0]
+        final val isStarting // io.matthewnelson.kmp.tor.runtime/TorState.Daemon.isStarting|{}isStarting[0]
+            final fun <get-isStarting>(): kotlin/Boolean // io.matthewnelson.kmp.tor.runtime/TorState.Daemon.isStarting.<get-isStarting>|<get-isStarting>(){}[0]
+        final val isStopping // io.matthewnelson.kmp.tor.runtime/TorState.Daemon.isStopping|{}isStopping[0]
+            final fun <get-isStopping>(): kotlin/Boolean // io.matthewnelson.kmp.tor.runtime/TorState.Daemon.isStopping.<get-isStopping>|<get-isStopping>(){}[0]
+
+        final fun toString(): kotlin/String // io.matthewnelson.kmp.tor.runtime/TorState.Daemon.toString|toString(){}[0]
+
+        final class On : io.matthewnelson.kmp.tor.runtime/TorState.Daemon { // io.matthewnelson.kmp.tor.runtime/TorState.Daemon.On|null[0]
+            constructor <init>(kotlin/Byte) // io.matthewnelson.kmp.tor.runtime/TorState.Daemon.On.<init>|<init>(kotlin.Byte){}[0]
+
+            final fun equals(kotlin/Any?): kotlin/Boolean // io.matthewnelson.kmp.tor.runtime/TorState.Daemon.On.equals|equals(kotlin.Any?){}[0]
+            final fun hashCode(): kotlin/Int // io.matthewnelson.kmp.tor.runtime/TorState.Daemon.On.hashCode|hashCode(){}[0]
+        }
+
+        final object Off : io.matthewnelson.kmp.tor.runtime/TorState.Daemon { // io.matthewnelson.kmp.tor.runtime/TorState.Daemon.Off|null[0]
+            final fun equals(kotlin/Any?): kotlin/Boolean // io.matthewnelson.kmp.tor.runtime/TorState.Daemon.Off.equals|equals(kotlin.Any?){}[0]
+            final fun hashCode(): kotlin/Int // io.matthewnelson.kmp.tor.runtime/TorState.Daemon.Off.hashCode|hashCode(){}[0]
+        }
+
+        final object Starting : io.matthewnelson.kmp.tor.runtime/TorState.Daemon { // io.matthewnelson.kmp.tor.runtime/TorState.Daemon.Starting|null[0]
+            final fun equals(kotlin/Any?): kotlin/Boolean // io.matthewnelson.kmp.tor.runtime/TorState.Daemon.Starting.equals|equals(kotlin.Any?){}[0]
+            final fun hashCode(): kotlin/Int // io.matthewnelson.kmp.tor.runtime/TorState.Daemon.Starting.hashCode|hashCode(){}[0]
+        }
+
+        final object Stopping : io.matthewnelson.kmp.tor.runtime/TorState.Daemon { // io.matthewnelson.kmp.tor.runtime/TorState.Daemon.Stopping|null[0]
+            final fun equals(kotlin/Any?): kotlin/Boolean // io.matthewnelson.kmp.tor.runtime/TorState.Daemon.Stopping.equals|equals(kotlin.Any?){}[0]
+            final fun hashCode(): kotlin/Int // io.matthewnelson.kmp.tor.runtime/TorState.Daemon.Stopping.hashCode|hashCode(){}[0]
+        }
+    }
+
+    sealed class Network { // io.matthewnelson.kmp.tor.runtime/TorState.Network|null[0]
+        final val isDisabled // io.matthewnelson.kmp.tor.runtime/TorState.Network.isDisabled|{}isDisabled[0]
+            final fun <get-isDisabled>(): kotlin/Boolean // io.matthewnelson.kmp.tor.runtime/TorState.Network.isDisabled.<get-isDisabled>|<get-isDisabled>(){}[0]
+        final val isEnabled // io.matthewnelson.kmp.tor.runtime/TorState.Network.isEnabled|{}isEnabled[0]
+            final fun <get-isEnabled>(): kotlin/Boolean // io.matthewnelson.kmp.tor.runtime/TorState.Network.isEnabled.<get-isEnabled>|<get-isEnabled>(){}[0]
+
+        final fun toString(): kotlin/String // io.matthewnelson.kmp.tor.runtime/TorState.Network.toString|toString(){}[0]
+
+        final object Disabled : io.matthewnelson.kmp.tor.runtime/TorState.Network { // io.matthewnelson.kmp.tor.runtime/TorState.Network.Disabled|null[0]
+            final fun equals(kotlin/Any?): kotlin/Boolean // io.matthewnelson.kmp.tor.runtime/TorState.Network.Disabled.equals|equals(kotlin.Any?){}[0]
+            final fun hashCode(): kotlin/Int // io.matthewnelson.kmp.tor.runtime/TorState.Network.Disabled.hashCode|hashCode(){}[0]
+        }
+
+        final object Enabled : io.matthewnelson.kmp.tor.runtime/TorState.Network { // io.matthewnelson.kmp.tor.runtime/TorState.Network.Enabled|null[0]
+            final fun equals(kotlin/Any?): kotlin/Boolean // io.matthewnelson.kmp.tor.runtime/TorState.Network.Enabled.equals|equals(kotlin.Any?){}[0]
+            final fun hashCode(): kotlin/Int // io.matthewnelson.kmp.tor.runtime/TorState.Network.Enabled.hashCode|hashCode(){}[0]
+        }
+    }
+}
+
+sealed class <#A: kotlin/Any> io.matthewnelson.kmp.tor.runtime/RuntimeEvent : io.matthewnelson.kmp.tor.runtime.core/Event<#A, io.matthewnelson.kmp.tor.runtime/RuntimeEvent<#A>, io.matthewnelson.kmp.tor.runtime/RuntimeEvent.Observer<#A>> { // io.matthewnelson.kmp.tor.runtime/RuntimeEvent|null[0]
+    final fun createProtected(io.matthewnelson.kmp.tor.runtime/RuntimeEvent<#A>, kotlin/String?, io.matthewnelson.kmp.tor.runtime.core/OnEvent.Executor?, io.matthewnelson.kmp.tor.runtime.core/OnEvent<#A>): io.matthewnelson.kmp.tor.runtime/RuntimeEvent.Observer<#A> // io.matthewnelson.kmp.tor.runtime/RuntimeEvent.createProtected|createProtected(io.matthewnelson.kmp.tor.runtime.RuntimeEvent<1:0>;kotlin.String?;io.matthewnelson.kmp.tor.runtime.core.OnEvent.Executor?;io.matthewnelson.kmp.tor.runtime.core.OnEvent<1:0>){}[0]
+
+    abstract interface Notifier { // io.matthewnelson.kmp.tor.runtime/RuntimeEvent.Notifier|null[0]
+        abstract fun <#A2: kotlin/Any, #B2: io.matthewnelson.kmp.tor.runtime/RuntimeEvent<#A2>> notify(#B2, #A2) // io.matthewnelson.kmp.tor.runtime/RuntimeEvent.Notifier.notify|notify(0:1;0:0){0§<kotlin.Any>;1§<io.matthewnelson.kmp.tor.runtime.RuntimeEvent<0:0>>}[0]
+
+        final object Companion { // io.matthewnelson.kmp.tor.runtime/RuntimeEvent.Notifier.Companion|null[0]
+            final fun (io.matthewnelson.kmp.tor.runtime/RuntimeEvent.Notifier).d(kotlin/Any?, kotlin/String) // io.matthewnelson.kmp.tor.runtime/RuntimeEvent.Notifier.Companion.d|d@io.matthewnelson.kmp.tor.runtime.RuntimeEvent.Notifier(kotlin.Any?;kotlin.String){}[0]
+            final fun (io.matthewnelson.kmp.tor.runtime/RuntimeEvent.Notifier).e(kotlin/Throwable) // io.matthewnelson.kmp.tor.runtime/RuntimeEvent.Notifier.Companion.e|e@io.matthewnelson.kmp.tor.runtime.RuntimeEvent.Notifier(kotlin.Throwable){}[0]
+            final fun (io.matthewnelson.kmp.tor.runtime/RuntimeEvent.Notifier).i(kotlin/Any?, kotlin/String) // io.matthewnelson.kmp.tor.runtime/RuntimeEvent.Notifier.Companion.i|i@io.matthewnelson.kmp.tor.runtime.RuntimeEvent.Notifier(kotlin.Any?;kotlin.String){}[0]
+            final fun (io.matthewnelson.kmp.tor.runtime/RuntimeEvent.Notifier).lce(io.matthewnelson.kmp.tor.runtime/Lifecycle.Event) // io.matthewnelson.kmp.tor.runtime/RuntimeEvent.Notifier.Companion.lce|lce@io.matthewnelson.kmp.tor.runtime.RuntimeEvent.Notifier(io.matthewnelson.kmp.tor.runtime.Lifecycle.Event){}[0]
+            final fun (io.matthewnelson.kmp.tor.runtime/RuntimeEvent.Notifier).w(kotlin/Any?, kotlin/String) // io.matthewnelson.kmp.tor.runtime/RuntimeEvent.Notifier.Companion.w|w@io.matthewnelson.kmp.tor.runtime.RuntimeEvent.Notifier(kotlin.Any?;kotlin.String){}[0]
+        }
+    }
+
+    abstract interface Processor : io.matthewnelson.kmp.tor.runtime.core/TorEvent.Processor { // io.matthewnelson.kmp.tor.runtime/RuntimeEvent.Processor|null[0]
+        abstract fun subscribe(io.matthewnelson.kmp.tor.runtime/RuntimeEvent.Observer<*>) // io.matthewnelson.kmp.tor.runtime/RuntimeEvent.Processor.subscribe|subscribe(io.matthewnelson.kmp.tor.runtime.RuntimeEvent.Observer<*>){}[0]
+        abstract fun subscribe(kotlin/Array<out io.matthewnelson.kmp.tor.runtime/RuntimeEvent.Observer<*>>...) // io.matthewnelson.kmp.tor.runtime/RuntimeEvent.Processor.subscribe|subscribe(kotlin.Array<out|io.matthewnelson.kmp.tor.runtime.RuntimeEvent.Observer<*>>...){}[0]
+        abstract fun unsubscribe(io.matthewnelson.kmp.tor.runtime/RuntimeEvent.Observer<*>) // io.matthewnelson.kmp.tor.runtime/RuntimeEvent.Processor.unsubscribe|unsubscribe(io.matthewnelson.kmp.tor.runtime.RuntimeEvent.Observer<*>){}[0]
+        abstract fun unsubscribe(kotlin/Array<out io.matthewnelson.kmp.tor.runtime/RuntimeEvent.Observer<*>>...) // io.matthewnelson.kmp.tor.runtime/RuntimeEvent.Processor.unsubscribe|unsubscribe(kotlin.Array<out|io.matthewnelson.kmp.tor.runtime.RuntimeEvent.Observer<*>>...){}[0]
+        abstract fun unsubscribeAll(io.matthewnelson.kmp.tor.runtime/RuntimeEvent<*>) // io.matthewnelson.kmp.tor.runtime/RuntimeEvent.Processor.unsubscribeAll|unsubscribeAll(io.matthewnelson.kmp.tor.runtime.RuntimeEvent<*>){}[0]
+        abstract fun unsubscribeAll(kotlin/Array<out io.matthewnelson.kmp.tor.runtime/RuntimeEvent<*>>...) // io.matthewnelson.kmp.tor.runtime/RuntimeEvent.Processor.unsubscribeAll|unsubscribeAll(kotlin.Array<out|io.matthewnelson.kmp.tor.runtime.RuntimeEvent<*>>...){}[0]
+    }
+
+    open class <#A1: kotlin/Any> Observer : io.matthewnelson.kmp.tor.runtime.core/Event.Observer<#A1, io.matthewnelson.kmp.tor.runtime/RuntimeEvent<#A1>> { // io.matthewnelson.kmp.tor.runtime/RuntimeEvent.Observer|null[0]
+        constructor <init>(io.matthewnelson.kmp.tor.runtime/RuntimeEvent<#A1>, kotlin/String?, io.matthewnelson.kmp.tor.runtime.core/OnEvent.Executor?, io.matthewnelson.kmp.tor.runtime.core/OnEvent<#A1>) // io.matthewnelson.kmp.tor.runtime/RuntimeEvent.Observer.<init>|<init>(io.matthewnelson.kmp.tor.runtime.RuntimeEvent<1:0>;kotlin.String?;io.matthewnelson.kmp.tor.runtime.core.OnEvent.Executor?;io.matthewnelson.kmp.tor.runtime.core.OnEvent<1:0>){}[0]
+    }
+
+    sealed class LOG : io.matthewnelson.kmp.tor.runtime/RuntimeEvent<kotlin/String> { // io.matthewnelson.kmp.tor.runtime/RuntimeEvent.LOG|null[0]
+        final object DEBUG : io.matthewnelson.kmp.tor.runtime/RuntimeEvent.LOG // io.matthewnelson.kmp.tor.runtime/RuntimeEvent.LOG.DEBUG|null[0]
+
+        final object INFO : io.matthewnelson.kmp.tor.runtime/RuntimeEvent.LOG // io.matthewnelson.kmp.tor.runtime/RuntimeEvent.LOG.INFO|null[0]
+
+        final object WARN : io.matthewnelson.kmp.tor.runtime/RuntimeEvent.LOG // io.matthewnelson.kmp.tor.runtime/RuntimeEvent.LOG.WARN|null[0]
+    }
+
+    final object Companion : io.matthewnelson.kmp.tor.runtime.core/Event.Entries<io.matthewnelson.kmp.tor.runtime/RuntimeEvent<*>> { // io.matthewnelson.kmp.tor.runtime/RuntimeEvent.Companion|null[0]
+        final fun entries(): kotlin.collections/Set<io.matthewnelson.kmp.tor.runtime/RuntimeEvent<*>> // io.matthewnelson.kmp.tor.runtime/RuntimeEvent.Companion.entries|entries(){}[0]
+        final fun valueOf(kotlin/String): io.matthewnelson.kmp.tor.runtime/RuntimeEvent<*> // io.matthewnelson.kmp.tor.runtime/RuntimeEvent.Companion.valueOf|valueOf(kotlin.String){}[0]
+        final fun valueOfOrNull(kotlin/String): io.matthewnelson.kmp.tor.runtime/RuntimeEvent<*>? // io.matthewnelson.kmp.tor.runtime/RuntimeEvent.Companion.valueOfOrNull|valueOfOrNull(kotlin.String){}[0]
+    }
+
+    final object ERROR : io.matthewnelson.kmp.tor.runtime/RuntimeEvent<kotlin/Throwable> // io.matthewnelson.kmp.tor.runtime/RuntimeEvent.ERROR|null[0]
+
+    final object EXECUTE { // io.matthewnelson.kmp.tor.runtime/RuntimeEvent.EXECUTE|null[0]
+        final fun equals(kotlin/Any?): kotlin/Boolean // io.matthewnelson.kmp.tor.runtime/RuntimeEvent.EXECUTE.equals|equals(kotlin.Any?){}[0]
+        final fun hashCode(): kotlin/Int // io.matthewnelson.kmp.tor.runtime/RuntimeEvent.EXECUTE.hashCode|hashCode(){}[0]
+        final fun toString(): kotlin/String // io.matthewnelson.kmp.tor.runtime/RuntimeEvent.EXECUTE.toString|toString(){}[0]
+
+        final object ACTION : io.matthewnelson.kmp.tor.runtime/RuntimeEvent<io.matthewnelson.kmp.tor.runtime/ActionJob> // io.matthewnelson.kmp.tor.runtime/RuntimeEvent.EXECUTE.ACTION|null[0]
+
+        final object CMD : io.matthewnelson.kmp.tor.runtime/RuntimeEvent<io.matthewnelson.kmp.tor.runtime/TorCmdJob> { // io.matthewnelson.kmp.tor.runtime/RuntimeEvent.EXECUTE.CMD|null[0]
+            final fun (io.matthewnelson.kmp.tor.runtime/RuntimeEvent.Processor).observeSignalNewNym(kotlin/String?, io.matthewnelson.kmp.tor.runtime.core/OnEvent.Executor?, io.matthewnelson.kmp.tor.runtime.core/OnEvent<kotlin/String?>): io.matthewnelson.kmp.tor.runtime.core/Disposable.Once // io.matthewnelson.kmp.tor.runtime/RuntimeEvent.EXECUTE.CMD.observeSignalNewNym|observeSignalNewNym@io.matthewnelson.kmp.tor.runtime.RuntimeEvent.Processor(kotlin.String?;io.matthewnelson.kmp.tor.runtime.core.OnEvent.Executor?;io.matthewnelson.kmp.tor.runtime.core.OnEvent<kotlin.String?>){}[0]
+        }
+    }
+
+    final object LIFECYCLE : io.matthewnelson.kmp.tor.runtime/RuntimeEvent<io.matthewnelson.kmp.tor.runtime/Lifecycle.Event> // io.matthewnelson.kmp.tor.runtime/RuntimeEvent.LIFECYCLE|null[0]
+
+    final object LISTENERS : io.matthewnelson.kmp.tor.runtime/RuntimeEvent<io.matthewnelson.kmp.tor.runtime/TorListeners> // io.matthewnelson.kmp.tor.runtime/RuntimeEvent.LISTENERS|null[0]
+
+    final object READY : io.matthewnelson.kmp.tor.runtime/RuntimeEvent<kotlin/String> // io.matthewnelson.kmp.tor.runtime/RuntimeEvent.READY|null[0]
+
+    final object STATE : io.matthewnelson.kmp.tor.runtime/RuntimeEvent<io.matthewnelson.kmp.tor.runtime/TorState> // io.matthewnelson.kmp.tor.runtime/RuntimeEvent.STATE|null[0]
+}
