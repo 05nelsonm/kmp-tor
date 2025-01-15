@@ -7,6 +7,7 @@
 [![badge-encoding]][url-encoding]
 [![badge-kmp-process]][url-kmp-process]
 [![badge-kmp-tor-common]][url-kmp-tor-common]
+[![badge-kotlincrypto-bitops]][url-kotlincrypto-bitops]
 [![badge-kotlincrypto-hash]][url-kotlincrypto-hash]
 [![badge-kotlincrypto-secure-random]][url-kotlincrypto-secure-random]
 [![badge-androidx-startup]][url-androidx-startup]
@@ -124,10 +125,11 @@ See [kmp-tor-samples][url-kmp-tor-samples]
 [badge-androidx-startup]: https://img.shields.io/badge/androidx.startup-1.1.1-6EDB8D.svg?logo=android
 [badge-coroutines]: https://img.shields.io/badge/kotlinx.coroutines-1.8.1-blue.svg?logo=kotlin
 [badge-encoding]: https://img.shields.io/badge/encoding-2.3.1-blue.svg?style=flat
-[badge-kmp-process]: https://img.shields.io/badge/kmp--process-0.1.0-blue.svg?style=flat
-[badge-kmp-tor-common]: https://img.shields.io/badge/kmp--tor--common-2.1.0-blue.svg?style=flat
+[badge-kmp-process]: https://img.shields.io/badge/kmp--process-0.1.2-blue.svg?style=flat
+[badge-kmp-tor-common]: https://img.shields.io/badge/kmp--tor--common-2.1.1-blue.svg?style=flat
 [badge-kotlin]: https://img.shields.io/badge/kotlin-1.9.24-blue.svg?logo=kotlin
-[badge-kotlincrypto-hash]: https://img.shields.io/badge/KotlinCrypto.hash-0.5.3-blue.svg?style=flat
+[badge-kotlincrypto-bitops]: https://img.shields.io/badge/KotlinCrypto.bitops-0.1.1-blue.svg?style=flat
+[badge-kotlincrypto-hash]: https://img.shields.io/badge/KotlinCrypto.hash-0.6.0-blue.svg?style=flat
 [badge-kotlincrypto-secure-random]: https://img.shields.io/badge/KotlinCrypto.secure--random-0.3.2-blue.svg?style=flat
 
 <!-- TAG_PLATFORMS -->
@@ -160,5 +162,6 @@ See [kmp-tor-samples][url-kmp-tor-samples]
 [url-kmp-tor-samples]: https://github.com/05nelsonm/kmp-tor-samples
 [url-kmp-tor-resource-start]: https://github.com/05nelsonm/kmp-tor-resource?tab=readme-ov-file#get-started
 [url-kotlin]: https://kotlinlang.org
+[url-kotlincrypto-bitops]: https://github.com/KotlinCrypto/bitops
 [url-kotlincrypto-hash]: https://github.com/KotlinCrypto/hash
 [url-kotlincrypto-secure-random]: https://github.com/KotlinCrypto/secure-random

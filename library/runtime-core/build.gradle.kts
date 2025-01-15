@@ -62,7 +62,7 @@ kmpConfiguration {
 
                 val nativeMain = findByName("nativeMain")?.apply {
                     dependencies {
-                        implementation(kotlincrypto.endians.endians)
+                        implementation(kotlincrypto.bitops.endian)
                     }
                 }
                 val nativeTest = findByName("nativeTest")?.apply {

@@ -21,7 +21,8 @@ import io.matthewnelson.kmp.file.IOException
 import io.matthewnelson.kmp.file.errnoToIOException
 import io.matthewnelson.kmp.tor.runtime.core.net.IPAddress
 import kotlinx.cinterop.*
-import org.kotlincrypto.endians.BigEndian.Companion.toBigEndian
+import org.kotlincrypto.bitops.endian.Endian
+import org.kotlincrypto.bitops.endian.Endian.Big.bePackIntoUnsafe
 import platform.posix.*
 import kotlin.experimental.ExperimentalNativeApi
 
@@ -93,11 +94,8 @@ internal sealed class InetSocketAddress private constructor(
             @OptIn(ExperimentalNativeApi::class)
             if (!Platform.isLittleEndian) return this
 
-            return toShort()
-                .toBigEndian()
-                .toLittleEndian()
-                .toShort()
-                .toUShort()
+            val b = toShort().bePackIntoUnsafe(dest = ByteArray(2), destOffset = 0)
+            return Endian.Little.shortOf(b[1], b[0]).toUShort()
         }
     }
 }
