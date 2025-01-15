@@ -16,6 +16,7 @@
 import org.jetbrains.kotlin.gradle.targets.js.yarn.YarnLockMismatchReport
 import org.jetbrains.kotlin.gradle.targets.js.yarn.YarnPlugin
 import org.jetbrains.kotlin.gradle.targets.js.yarn.YarnRootExtension
+import org.jetbrains.kotlin.konan.target.HostManager
 
 plugins {
     alias(libs.plugins.android.app) apply(false)
@@ -57,6 +58,11 @@ plugins.withType<YarnPlugin> {
 }
 
 apiValidation {
+    // :runtime-service & :runtime-service-ui modules are problematic on
+    // non-macOS hosts because only iOS is enabled for native there.
+    @OptIn(kotlinx.validation.ExperimentalBCVApi::class)
+    klib.enabled = HostManager.hostIsMac && findProperty("KMP_TARGETS") == null
+
     if (CHECK_PUBLICATION) {
         ignoredProjects.add("check-publication")
     } else {
