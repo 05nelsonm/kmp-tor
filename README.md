@@ -97,7 +97,7 @@ runtime.enqueue(
 - Add runtime dependency
   ```kotlin
   // build.gradle.kts
-  val vKmpTor = "2.0.0-alpha02"
+  val vKmpTor = "2.0.0-beta01"
 
   dependencies {
       implementation("io.matthewnelson.kmp-tor:runtime:$vKmpTor")
@@ -118,7 +118,7 @@ runtime.enqueue(
 See [kmp-tor-samples][url-kmp-tor-samples]
 
 <!-- TAG_VERSION -->
-[badge-latest-release]: https://img.shields.io/badge/latest--release-2.0.0--alpha02-5d2f68.svg?logo=torproject&style=flat&logoColor=5d2f68
+[badge-latest-release]: https://img.shields.io/badge/latest--release-2.0.0--beta01-5d2f68.svg?logo=torproject&style=flat&logoColor=5d2f68
 [badge-license]: https://img.shields.io/badge/license-Apache%20License%202.0-blue.svg?style=flat
 
 <!-- TAG_DEPENDENCIES -->

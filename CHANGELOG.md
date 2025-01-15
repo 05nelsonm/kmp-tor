@@ -1,5 +1,14 @@
 # CHANGELOG
 
+## Version 2.0.0-beta01 (2025-01-15)
+ - Fixes Unix Domain Socket path length check [[#551]][551]
+ - Updates `kmp-tor-common` to `2.1.1` [[#557]][557]
+ - Updates `encoding` to `2.3.1` [[#557]][557]
+ - Updates `kmp-process` to `0.1.2` [[#557]][557]
+ - Updates `kotlincrypto.hash` to `0.6.0` [[#557]][557]
+ - Replaces use of `kotlincrypto.endians` with `kotlincrypto.bitops` [[#557]][557]
+ - Enables `klib` API validation [[#558]][558]
+
 ## Version 2.0.0-alpha02 (2024-12-03)
  - Fixes `TorListeners.Manager` not clearing old address references in some cases
    when `Action.RestartDaemon` is executed [[#549]][549]
@@ -503,6 +512,9 @@
 [308]: https://github.com/05nelsonm/kmp-tor/pull/308
 [546]: https://github.com/05nelsonm/kmp-tor/pull/546
 [549]: https://github.com/05nelsonm/kmp-tor/pull/549
+[551]: https://github.com/05nelsonm/kmp-tor/pull/551
+[557]: https://github.com/05nelsonm/kmp-tor/pull/557
+[558]: https://github.com/05nelsonm/kmp-tor/pull/558
 
 [kmp-tor-binary-66]: https://github.com/05nelsonm/kmp-tor-binary/issues/66
 [kmp-tor-binary-75]: https://github.com/05nelsonm/kmp-tor-binary/pull/75
