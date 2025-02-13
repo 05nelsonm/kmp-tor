@@ -443,9 +443,9 @@ public abstract class EnqueuedJob protected constructor(
                 }
 
                 internal companion object {
+
                     @JvmSynthetic
-                    internal fun get(): BuilderScope =
-                        BuilderScope()
+                    internal fun get(): BuilderScope = BuilderScope()
                 }
             }
 

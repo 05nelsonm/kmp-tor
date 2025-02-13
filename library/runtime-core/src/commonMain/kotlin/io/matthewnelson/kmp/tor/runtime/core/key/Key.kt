@@ -71,8 +71,6 @@ public expect sealed class Key private constructor() {
         public final override fun base32OrNull(): String?
         public final override fun base64OrNull(): String?
 
-        protected fun <T: Any> withKeyOrNull(block: (key: ByteArray) -> T): T?
-
         /** @suppress */
         public final override fun equals(other: Any?): Boolean
         /** @suppress */

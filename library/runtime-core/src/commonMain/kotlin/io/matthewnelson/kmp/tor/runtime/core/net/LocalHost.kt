@@ -66,8 +66,9 @@ public sealed class LocalHost private constructor(): Address("localhost") {
         internal override fun fromCache(): IPAddress.V6? = Cache.getOrNull()?.firstOrNull()
     }
 
-    private class Cache private constructor(private val addresses: Set<IPAddress>) {
+    private class Cache private constructor(addresses: Set<IPAddress>) {
 
+        private val addresses: Set<IPAddress> = addresses.toImmutableSet()
         private val timeMark = TimeSource.Monotonic.markNow()
 
         private fun isNotExpired(): Boolean {
@@ -114,8 +115,9 @@ public sealed class LocalHost private constructor(): Address("localhost") {
                 addresses.add(IPAddress.V4.loopback())
                 addresses.add(IPAddress.V6.loopback())
 
-                _cache = Cache(addresses.toImmutableSet())
-                return addresses
+                val c = Cache(addresses)
+                _cache = c
+                return c.addresses
             }
 
             @JvmStatic
@@ -135,9 +137,7 @@ public sealed class LocalHost private constructor(): Address("localhost") {
 
     public companion object {
 
-        /**
-         * @suppress
-         * */
+        /** @suppress */
         @InternalKmpTorApi
         @Throws(IOException::class)
         public fun refreshCache() { Cache.resolve(checkCache = false) }

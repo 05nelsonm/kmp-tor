@@ -3608,7 +3608,6 @@ sealed class io.matthewnelson.kmp.tor.runtime.core.key/Key { // io.matthewnelson
     sealed class Private : io.matthewnelson.kmp.tor.runtime.core.key/Key, io.matthewnelson.kmp.tor.runtime.core/Destroyable { // io.matthewnelson.kmp.tor.runtime.core.key/Key.Private|null[0]
         constructor <init>(kotlin/ByteArray) // io.matthewnelson.kmp.tor.runtime.core.key/Key.Private.<init>|<init>(kotlin.ByteArray){}[0]
 
-        final fun <#A2: kotlin/Any> withKeyOrNull(kotlin/Function1<kotlin/ByteArray, #A2>): #A2? // io.matthewnelson.kmp.tor.runtime.core.key/Key.Private.withKeyOrNull|withKeyOrNull(kotlin.Function1<kotlin.ByteArray,0:0>){0§<kotlin.Any>}[0]
         final fun base16(): kotlin/String // io.matthewnelson.kmp.tor.runtime.core.key/Key.Private.base16|base16(){}[0]
         final fun base16OrNull(): kotlin/String? // io.matthewnelson.kmp.tor.runtime.core.key/Key.Private.base16OrNull|base16OrNull(){}[0]
         final fun base32(): kotlin/String // io.matthewnelson.kmp.tor.runtime.core.key/Key.Private.base32|base32(){}[0]

@@ -17,8 +17,6 @@
 
 package io.matthewnelson.kmp.tor.runtime.core.key
 
-import io.matthewnelson.encoding.base16.Base16
-import io.matthewnelson.encoding.base64.Base64
 import io.matthewnelson.kmp.tor.runtime.core.net.OnionAddress
 import io.matthewnelson.kmp.tor.runtime.core.net.OnionAddress.V3.Companion.toOnionAddressV3OrNull
 import io.matthewnelson.kmp.tor.runtime.core.internal.tryDecodeOrNull
