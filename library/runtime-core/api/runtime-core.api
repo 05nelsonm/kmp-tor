@@ -4084,7 +4084,6 @@ public abstract class io/matthewnelson/kmp/tor/runtime/core/key/Key$Private : io
 	public final fun hashCode ()I
 	public final fun isDestroyed ()Z
 	public final fun toString ()Ljava/lang/String;
-	protected final fun withKeyOrNull (Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
 }
 
 public abstract class io/matthewnelson/kmp/tor/runtime/core/key/Key$Public : io/matthewnelson/kmp/tor/runtime/core/key/Key, java/security/PublicKey {

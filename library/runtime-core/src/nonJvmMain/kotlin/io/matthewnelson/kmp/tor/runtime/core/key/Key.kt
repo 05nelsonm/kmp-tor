@@ -28,6 +28,9 @@ import io.matthewnelson.kmp.tor.common.core.synchronized
 import io.matthewnelson.kmp.tor.runtime.core.Destroyable
 import io.matthewnelson.kmp.tor.runtime.core.Destroyable.Companion.destroyedException
 import kotlin.concurrent.Volatile
+import kotlin.contracts.ExperimentalContracts
+import kotlin.contracts.InvocationKind
+import kotlin.contracts.contract
 
 /**
  * Base abstraction for Public/Private keys used in tor.
@@ -97,10 +100,14 @@ public actual sealed class Key private actual constructor() {
         public actual final override fun base32OrNull(): String? = withKeyOrNull { it.encodeToString(BASE_32) }
         public actual final override fun base64OrNull(): String? = withKeyOrNull { it.encodeToString(BASE_64) }
 
-        @OptIn(InternalKmpTorApi::class)
-        protected actual fun <T : Any> withKeyOrNull(
+        @OptIn(ExperimentalContracts::class, InternalKmpTorApi::class)
+        private inline fun <T : Any> withKeyOrNull(
             block: (key: ByteArray) -> T
         ): T? {
+            contract {
+                callsInPlace(block, InvocationKind.AT_MOST_ONCE)
+            }
+
             if (_destroyed) return null
 
             return synchronized(lock) {
