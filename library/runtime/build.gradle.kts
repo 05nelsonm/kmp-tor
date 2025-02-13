@@ -30,24 +30,23 @@ kmpConfiguration {
         js {
             sourceSetTest {
                 dependencies {
-                    implementation(npm("kmp-tor.resource-exec-tor.all", libs.versions.kmp.tor.resource.get()))
+                    implementation(npm("kmp-tor.resource-exec-tor.all", libs.versions.kmp.tor.resource.get() + ".1"))
                     implementation(libs.okio.node)
                 }
             }
         }
 
         common {
-            pluginIds("dokka")
-
             sourceSetMain {
                 dependencies {
                     api(project(":library:runtime-core"))
                     implementation(project(":library:runtime-ctrl"))
                     implementation(libs.encoding.base16)
+                    implementation(libs.immutable.collections)
                     implementation(libs.kmp.process)
                     implementation(libs.kmp.tor.common.core)
-                    implementation(kotlincrypto.secureRandom)
                     implementation(kotlincrypto.hash.sha2)
+                    implementation(kotlincrypto.random.crypto.rand)
                     implementation(libs.kotlinx.coroutines.core)
                 }
             }

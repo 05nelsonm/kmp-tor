@@ -35,8 +35,8 @@ import io.matthewnelson.kmp.tor.runtime.internal.*
 import io.matthewnelson.kmp.tor.runtime.internal.InstanceKeeper
 import io.matthewnelson.kmp.tor.runtime.internal.RealTorRuntime
 import io.matthewnelson.kmp.tor.runtime.internal.TorConfigGenerator
-import org.kotlincrypto.SecRandomCopyException
-import org.kotlincrypto.SecureRandom
+import org.kotlincrypto.random.CryptoRand
+import org.kotlincrypto.random.RandomnessProcurementException
 import kotlin.concurrent.Volatile
 import kotlin.jvm.JvmField
 import kotlin.jvm.JvmStatic
@@ -493,11 +493,13 @@ public sealed interface TorRuntime:
         }
 
         private val _staticTag: String by lazy {
+            val buf = ByteArray(16)
             try {
-                SecureRandom().nextBytesOf(16)
-            } catch (_: SecRandomCopyException) {
-                Random.Default.nextBytes(16)
-            }.encodeToString(Base16)
+                CryptoRand.Default.nextBytes(buf)
+            } catch (_: RandomnessProcurementException) {
+                Random.Default.nextBytes(buf)
+            }
+            buf.encodeToString(Base16)
         }
 
         @JvmSynthetic

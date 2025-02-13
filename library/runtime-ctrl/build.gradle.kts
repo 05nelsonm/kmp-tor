@@ -25,17 +25,16 @@ kmpConfiguration {
         js {
             sourceSetTest {
                 dependencies {
-                    implementation(npm("kmp-tor.resource-exec-tor.all", libs.versions.kmp.tor.resource.get()))
+                    implementation(npm("kmp-tor.resource-exec-tor.all", libs.versions.kmp.tor.resource.get() + ".1"))
                 }
             }
         }
 
         common {
-            pluginIds("dokka")
-
             sourceSetMain {
                 dependencies {
                     api(project(":library:runtime-core"))
+                    implementation(libs.immutable.collections)
                     implementation(libs.kmp.process)
                     implementation(libs.kmp.tor.common.core)
                     implementation(libs.kotlinx.coroutines.core)
