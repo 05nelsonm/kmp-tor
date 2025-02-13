@@ -28,8 +28,6 @@ kmpConfiguration {
         }
 
         common {
-            pluginIds("dokka")
-
             sourceSetMain {
                 dependencies {
                     implementation(libs.encoding.base16)

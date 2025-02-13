@@ -37,8 +37,6 @@ kmpConfiguration {
         }
 
         common {
-            pluginIds("dokka")
-
             sourceSetMain {
                 dependencies {
                     api(project(":library:runtime-core"))
@@ -46,8 +44,8 @@ kmpConfiguration {
                     implementation(libs.encoding.base16)
                     implementation(libs.kmp.process)
                     implementation(libs.kmp.tor.common.core)
-                    implementation(kotlincrypto.secureRandom)
                     implementation(kotlincrypto.hash.sha2)
+                    implementation(kotlincrypto.random.crypto.rand)
                     implementation(libs.kotlinx.coroutines.core)
                 }
             }
