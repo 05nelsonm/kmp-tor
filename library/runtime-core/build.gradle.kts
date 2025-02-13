@@ -33,6 +33,7 @@ kmpConfiguration {
                     implementation(libs.encoding.base16)
                     implementation(libs.encoding.base32)
                     implementation(libs.encoding.base64)
+                    implementation(libs.immutable.collections)
                     implementation(libs.kmp.process)
                     api(libs.kmp.tor.common.api)
                     implementation(libs.kmp.tor.common.core)

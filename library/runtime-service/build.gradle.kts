@@ -76,6 +76,7 @@ kmpConfiguration {
             sourceSetMain {
                 dependencies {
                     api(project(":library:runtime"))
+                    implementation(libs.immutable.collections)
                     implementation(libs.kmp.tor.common.core)
                     implementation(libs.kotlinx.coroutines.core)
                 }
