@@ -1,5 +1,12 @@
 # CHANGELOG
 
+## Version 2.0.0 (2025-02-13)
+ - Updates `kmp-tor-common` to `2.1.2` [[#560]][560]
+ - Updates `kotlincrypto.bitops` to `0.1.2` [[#560]][560]
+ - Updates `kotlincrypto.hash` to `0.6.1` [[#560]][560]
+ - Replaces use of `kotlincrypto.secure-random` with `kotlincrypto.random` [[#560]][560]
+ - Modifies visibility of `Key.Private.withKeyOrNull` from `protected` to `private` & inlines it [[#562]][562]
+
 ## Version 2.0.0-beta01 (2025-01-15)
  - Fixes Unix Domain Socket path length check [[#551]][551]
  - Updates `kmp-tor-common` to `2.1.1` [[#557]][557]
@@ -515,6 +522,8 @@
 [551]: https://github.com/05nelsonm/kmp-tor/pull/551
 [557]: https://github.com/05nelsonm/kmp-tor/pull/557
 [558]: https://github.com/05nelsonm/kmp-tor/pull/558
+[560]: https://github.com/05nelsonm/kmp-tor/pull/560
+[562]: https://github.com/05nelsonm/kmp-tor/pull/562
 
 [kmp-tor-binary-66]: https://github.com/05nelsonm/kmp-tor-binary/issues/66
 [kmp-tor-binary-75]: https://github.com/05nelsonm/kmp-tor-binary/pull/75

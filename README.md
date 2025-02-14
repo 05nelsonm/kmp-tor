@@ -9,7 +9,7 @@
 [![badge-kmp-tor-common]][url-kmp-tor-common]
 [![badge-kotlincrypto-bitops]][url-kotlincrypto-bitops]
 [![badge-kotlincrypto-hash]][url-kotlincrypto-hash]
-[![badge-kotlincrypto-secure-random]][url-kotlincrypto-secure-random]
+[![badge-kotlincrypto-random]][url-kotlincrypto-random]
 [![badge-androidx-startup]][url-androidx-startup]
 
 ![badge-platform-android]
@@ -97,7 +97,7 @@ runtime.enqueue(
 - Add runtime dependency
   ```kotlin
   // build.gradle.kts
-  val vKmpTor = "2.0.0-beta01"
+  val vKmpTor = "2.0.0"
 
   dependencies {
       implementation("io.matthewnelson.kmp-tor:runtime:$vKmpTor")
@@ -118,7 +118,7 @@ runtime.enqueue(
 See [kmp-tor-samples][url-kmp-tor-samples]
 
 <!-- TAG_VERSION -->
-[badge-latest-release]: https://img.shields.io/badge/latest--release-2.0.0--beta01-5d2f68.svg?logo=torproject&style=flat&logoColor=5d2f68
+[badge-latest-release]: https://img.shields.io/badge/latest--release-2.0.0-5d2f68.svg?logo=torproject&style=flat&logoColor=5d2f68
 [badge-license]: https://img.shields.io/badge/license-Apache%20License%202.0-blue.svg?style=flat
 
 <!-- TAG_DEPENDENCIES -->
@@ -126,11 +126,11 @@ See [kmp-tor-samples][url-kmp-tor-samples]
 [badge-coroutines]: https://img.shields.io/badge/kotlinx.coroutines-1.8.1-blue.svg?logo=kotlin
 [badge-encoding]: https://img.shields.io/badge/encoding-2.3.1-blue.svg?style=flat
 [badge-kmp-process]: https://img.shields.io/badge/kmp--process-0.1.2-blue.svg?style=flat
-[badge-kmp-tor-common]: https://img.shields.io/badge/kmp--tor--common-2.1.1-blue.svg?style=flat
+[badge-kmp-tor-common]: https://img.shields.io/badge/kmp--tor--common-2.1.2-blue.svg?style=flat
 [badge-kotlin]: https://img.shields.io/badge/kotlin-1.9.24-blue.svg?logo=kotlin
-[badge-kotlincrypto-bitops]: https://img.shields.io/badge/KotlinCrypto.bitops-0.1.1-blue.svg?style=flat
-[badge-kotlincrypto-hash]: https://img.shields.io/badge/KotlinCrypto.hash-0.6.0-blue.svg?style=flat
-[badge-kotlincrypto-secure-random]: https://img.shields.io/badge/KotlinCrypto.secure--random-0.3.2-blue.svg?style=flat
+[badge-kotlincrypto-bitops]: https://img.shields.io/badge/kotlincrypto.bitops-0.1.2-blue.svg?style=flat
+[badge-kotlincrypto-hash]: https://img.shields.io/badge/kotlincrypto.hash-0.6.1-blue.svg?style=flat
+[badge-kotlincrypto-random]: https://img.shields.io/badge/kotlincrypto.random-0.4.0-blue.svg?style=flat
 
 <!-- TAG_PLATFORMS -->
 [badge-platform-android]: https://img.shields.io/badge/-android-6EDB8D.svg?style=flat
@@ -164,4 +164,4 @@ See [kmp-tor-samples][url-kmp-tor-samples]
 [url-kotlin]: https://kotlinlang.org
 [url-kotlincrypto-bitops]: https://github.com/KotlinCrypto/bitops
 [url-kotlincrypto-hash]: https://github.com/KotlinCrypto/hash
-[url-kotlincrypto-secure-random]: https://github.com/KotlinCrypto/secure-random
+[url-kotlincrypto-random]: https://github.com/KotlinCrypto/random
