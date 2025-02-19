@@ -56,11 +56,11 @@ internal class NativeCtrlConnection internal constructor(
 
         var interrupted = 0
         while (true) {
-            val read = buf.buf.usePinned { pinned ->
+            val read = buf.inner().usePinned { pinned ->
                 read(
                     descriptor,
                     pinned.addressOf(0),
-                    buf.buf.size.convert(),
+                    buf.inner().size.convert(),
                 ).toInt()
             }
 
@@ -71,7 +71,7 @@ internal class NativeCtrlConnection internal constructor(
             feed.onData(buf, read)
         }
 
-        buf.buf.fill(0)
+        buf.inner().fill(0)
         feed.close()
     }
 

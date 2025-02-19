@@ -123,7 +123,7 @@ private fun Disposable.toCtrlConnection(
 
         while (true) {
             val read = try {
-                input.read(buf.buf)
+                input.read(buf.inner())
             } catch (_: IOException) {
                 break
             }
@@ -132,7 +132,7 @@ private fun Disposable.toCtrlConnection(
             feed.onData(buf, read)
         }
 
-        buf.buf.fill(0)
+        buf.inner().fill(0)
         feed.close()
     }
 

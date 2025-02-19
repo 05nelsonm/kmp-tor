@@ -13,13 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-@file:Suppress("EXPECT_ACTUAL_CLASSIFIERS_ARE_IN_BETA_WARNING", "KotlinRedundantDiagnosticSuppress")
+package io.matthewnelson.kmp.tor.runtime.ctrl.internal
 
-package io.matthewnelson.kmp.tor.runtime.service.ui.internal
+import io.matthewnelson.kmp.file.File
+import io.matthewnelson.kmp.file.path
+import kotlinx.cinterop.*
+import platform.posix.sockaddr
+import platform.posix.socklen_t
+import platform.posix.strcpy
 
-internal expect abstract class NumberFormat {
-    internal fun format(number: Long): String
+@OptIn(ExperimentalForeignApi::class)
+internal actual fun File.socketAddress(
+    family: UShort,
+    block: (CValuesRef<sockaddr>, len: socklen_t) -> Unit,
+) {
+    cValue<sockaddr_un> {
+        strcpy(sun_path, path)
+        sun_family = family.convert()
+
+        block(ptr.reinterpret(), sizeOf<sockaddr_un>().convert())
+    }
 }
-
-@Suppress("NOTHING_TO_INLINE")
-internal expect inline fun numberFormat(): NumberFormat

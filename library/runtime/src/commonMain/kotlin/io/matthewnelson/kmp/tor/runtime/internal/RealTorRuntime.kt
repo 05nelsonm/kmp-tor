@@ -961,7 +961,6 @@ internal class RealTorRuntime private constructor(
                         if (_failure != null) break
                         if (_instance != null) break
                         delay(interval)
-                        if (_failure != null) break
                         if (_instance != null) break
                         if (mark.elapsedNow() < TIMEOUT_START_SERVICE) continue
                         _failure = InterruptedException("${name.name} timed out after 1000ms")

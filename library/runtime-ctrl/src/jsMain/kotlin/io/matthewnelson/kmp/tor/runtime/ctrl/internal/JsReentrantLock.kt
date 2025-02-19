@@ -13,16 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-@file:Suppress("EXPECT_ACTUAL_CLASSIFIERS_ARE_IN_BETA_WARNING")
+@file:Suppress("EXPECT_ACTUAL_CLASSIFIERS_ARE_IN_BETA_WARNING", "KotlinRedundantDiagnosticSuppress", "NOTHING_TO_INLINE")
 
 package io.matthewnelson.kmp.tor.runtime.ctrl.internal
 
+internal val REENTRANT_LOCK by lazy { ReentrantLock() }
+
 internal actual class ReentrantLock {
     internal actual fun lock() {}
-    internal actual fun tryLock(): Boolean = true
     internal actual fun unlock() {}
 }
 
-internal actual inline fun <T: Any?> ReentrantLock.withLockImpl(
-    block: () -> T
-): T = block()
+internal actual inline fun reentrantLock(): ReentrantLock = REENTRANT_LOCK
+
+internal actual inline fun <T: Any?> ReentrantLock.withLockImpl(block: () -> T): T = block()

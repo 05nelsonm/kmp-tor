@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-@file:Suppress("EXPECT_ACTUAL_CLASSIFIERS_ARE_IN_BETA_WARNING")
+@file:Suppress("EXPECT_ACTUAL_CLASSIFIERS_ARE_IN_BETA_WARNING", "KotlinRedundantDiagnosticSuppress", "NOTHING_TO_INLINE")
 
 package io.matthewnelson.kmp.tor.runtime.ctrl.internal
 
@@ -22,6 +22,6 @@ import kotlin.concurrent.withLock as _withLock
 @Suppress("ACTUAL_WITHOUT_EXPECT")
 internal actual typealias ReentrantLock = java.util.concurrent.locks.ReentrantLock
 
-internal actual inline fun <T: Any?> ReentrantLock.withLockImpl(
-    block: () -> T
-): T = _withLock(block)
+internal actual inline fun reentrantLock(): ReentrantLock = ReentrantLock()
+
+internal actual inline fun <T: Any?> ReentrantLock.withLockImpl(block: () -> T): T = _withLock(block)

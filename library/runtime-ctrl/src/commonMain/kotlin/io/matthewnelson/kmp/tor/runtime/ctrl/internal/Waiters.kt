@@ -29,7 +29,7 @@ import kotlin.time.Duration.Companion.milliseconds
 
 internal class Waiters(private val LOG: () -> Debugger?): Destroyable {
 
-    private val lock = ReentrantLock()
+    private val lock = reentrantLock()
     private val waiters = ArrayList<Waiter>(1)
     @Volatile
     private var _isDestroyed: Boolean = false

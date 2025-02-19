@@ -96,7 +96,9 @@ internal enum class UIAction {
             }
 
             internal fun clearCache() {
-                UIAction.entries.forEach { cache[it.ordinal] = null }
+                for (entry in UIAction.entries) {
+                    cache[entry.ordinal] = null
+                }
             }
 
             internal companion object {

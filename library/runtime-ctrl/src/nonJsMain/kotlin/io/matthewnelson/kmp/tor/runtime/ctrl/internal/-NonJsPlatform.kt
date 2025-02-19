@@ -16,6 +16,7 @@
 package io.matthewnelson.kmp.tor.runtime.ctrl.internal
 
 import io.matthewnelson.kmp.file.File
+import io.matthewnelson.kmp.process.ReadBuffer
 import io.matthewnelson.kmp.tor.runtime.core.net.IPSocketAddress
 import io.matthewnelson.kmp.tor.runtime.ctrl.TorCtrl
 import kotlinx.coroutines.CloseableCoroutineDispatcher
@@ -29,3 +30,5 @@ internal expect fun IPSocketAddress.connect(): CtrlConnection
 
 @Throws(Throwable::class)
 internal expect fun File.connect(): CtrlConnection
+
+internal fun ReadBuffer.inner(): ByteArray = buf

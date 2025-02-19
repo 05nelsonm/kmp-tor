@@ -18,12 +18,12 @@
 package io.matthewnelson.kmp.tor.runtime.service.ui.internal
 
 // TODO: NSNumberFormatter
-internal actual class NumberFormat private constructor() {
+internal actual abstract class NumberFormat private constructor() {
 
     internal actual fun format(number: Long): String = number.toString()
 
     internal companion object {
-        internal val INSTANCE = NumberFormat()
+        internal val INSTANCE = object : NumberFormat() {}
     }
 }
 

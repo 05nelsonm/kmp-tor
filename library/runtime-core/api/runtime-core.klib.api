@@ -110,7 +110,7 @@ abstract interface io.matthewnelson.kmp.tor.runtime.core/Destroyable { // io.mat
 
     final object Companion { // io.matthewnelson.kmp.tor.runtime.core/Destroyable.Companion|null[0]
         final fun (io.matthewnelson.kmp.tor.runtime.core/Destroyable).checkIsNotDestroyed() // io.matthewnelson.kmp.tor.runtime.core/Destroyable.Companion.checkIsNotDestroyed|checkIsNotDestroyed@io.matthewnelson.kmp.tor.runtime.core.Destroyable(){}[0]
-        final fun (io.matthewnelson.kmp.tor.runtime.core/Destroyable).destroyedException(kotlin/String =...): kotlin/IllegalStateException // io.matthewnelson.kmp.tor.runtime.core/Destroyable.Companion.destroyedException|destroyedException@io.matthewnelson.kmp.tor.runtime.core.Destroyable(kotlin.String){}[0]
+        final fun (io.matthewnelson.kmp.tor.runtime.core/Destroyable).destroyedException(kotlin/String = ...): kotlin/IllegalStateException // io.matthewnelson.kmp.tor.runtime.core/Destroyable.Companion.destroyedException|destroyedException@io.matthewnelson.kmp.tor.runtime.core.Destroyable(kotlin.String){}[0]
     }
 }
 
@@ -131,7 +131,7 @@ abstract class <#A: kotlin/Any?, #B: io.matthewnelson.kmp.tor.runtime.core/Event
     abstract class <#A1: io.matthewnelson.kmp.tor.runtime.core/Event<*, *, *>> Entries { // io.matthewnelson.kmp.tor.runtime.core/Event.Entries|null[0]
         constructor <init>(kotlin/Int) // io.matthewnelson.kmp.tor.runtime.core/Event.Entries.<init>|<init>(kotlin.Int){}[0]
 
-        abstract val lazyEntries // io.matthewnelson.kmp.tor.runtime.core/Event.Entries.lazyEntries|<get-lazyEntries>(){}[0]
+        abstract val lazyEntries // io.matthewnelson.kmp.tor.runtime.core/Event.Entries.lazyEntries|{}lazyEntries[0]
             // Targets: [native]
             abstract fun <get-lazyEntries>(): io.matthewnelson.kmp.tor.runtime.core/ThisBlock<kotlin.collections/HashSet<#A1>> // io.matthewnelson.kmp.tor.runtime.core/Event.Entries.lazyEntries.<get-lazyEntries>|<get-lazyEntries>(){}[0]
 
@@ -293,7 +293,7 @@ abstract class io.matthewnelson.kmp.tor.runtime.core.config.builder/BuilderScope
     }
 
     final object Companion { // io.matthewnelson.kmp.tor.runtime.core.config.builder/BuilderScopePort.Companion|null[0]
-        final const val EXTRA_REASSIGNABLE // io.matthewnelson.kmp.tor.runtime.core.config.builder/BuilderScopePort.Companion.EXTRA_REASSIGNABLE|<get-EXTRA_REASSIGNABLE>(){}[0]
+        final const val EXTRA_REASSIGNABLE // io.matthewnelson.kmp.tor.runtime.core.config.builder/BuilderScopePort.Companion.EXTRA_REASSIGNABLE|{}EXTRA_REASSIGNABLE[0]
             final fun <get-EXTRA_REASSIGNABLE>(): kotlin/String // io.matthewnelson.kmp.tor.runtime.core.config.builder/BuilderScopePort.Companion.EXTRA_REASSIGNABLE.<get-EXTRA_REASSIGNABLE>|<get-EXTRA_REASSIGNABLE>(){}[0]
     }
 }
@@ -863,7 +863,7 @@ abstract class io.matthewnelson.kmp.tor.runtime.core.config/TorOption : kotlin/C
     }
 
     final object Companion { // io.matthewnelson.kmp.tor.runtime.core.config/TorOption.Companion|null[0]
-        final val entries // io.matthewnelson.kmp.tor.runtime.core.config/TorOption.Companion.entries|<get-entries>(){}[0]
+        final val entries // io.matthewnelson.kmp.tor.runtime.core.config/TorOption.Companion.entries|{}entries[0]
             final fun <get-entries>(): kotlin.collections/Set<io.matthewnelson.kmp.tor.runtime.core.config/TorOption> // io.matthewnelson.kmp.tor.runtime.core.config/TorOption.Companion.entries.<get-entries>|<get-entries>(){}[0]
 
         final fun valueOf(kotlin/String): io.matthewnelson.kmp.tor.runtime.core.config/TorOption // io.matthewnelson.kmp.tor.runtime.core.config/TorOption.Companion.valueOf|valueOf(kotlin.String){}[0]
@@ -2696,7 +2696,7 @@ abstract class io.matthewnelson.kmp.tor.runtime.core.config/TorOption : kotlin/C
     }
 
     final object __OwningControllerProcess : io.matthewnelson.kmp.tor.runtime.core.config/ConfigureBuildable<io.matthewnelson.kmp.tor.runtime.core.config.builder/BuilderScopeOwningCtrlProcess>, io.matthewnelson.kmp.tor.runtime.core.config/TorOption { // io.matthewnelson.kmp.tor.runtime.core.config/TorOption.__OwningControllerProcess|null[0]
-        final fun asSetting(io.matthewnelson.kmp.tor.runtime.core/ThisBlock<io.matthewnelson.kmp.tor.runtime.core.config.builder/BuilderScopeOwningCtrlProcess> =...): io.matthewnelson.kmp.tor.runtime.core.config/TorSetting // io.matthewnelson.kmp.tor.runtime.core.config/TorOption.__OwningControllerProcess.asSetting|asSetting(io.matthewnelson.kmp.tor.runtime.core.ThisBlock<io.matthewnelson.kmp.tor.runtime.core.config.builder.BuilderScopeOwningCtrlProcess>){}[0]
+        final fun asSetting(io.matthewnelson.kmp.tor.runtime.core/ThisBlock<io.matthewnelson.kmp.tor.runtime.core.config.builder/BuilderScopeOwningCtrlProcess> = ...): io.matthewnelson.kmp.tor.runtime.core.config/TorSetting // io.matthewnelson.kmp.tor.runtime.core.config/TorOption.__OwningControllerProcess.asSetting|asSetting(io.matthewnelson.kmp.tor.runtime.core.ThisBlock<io.matthewnelson.kmp.tor.runtime.core.config.builder.BuilderScopeOwningCtrlProcess>){}[0]
         final fun equals(kotlin/Any?): kotlin/Boolean // io.matthewnelson.kmp.tor.runtime.core.config/TorOption.__OwningControllerProcess.equals|equals(kotlin.Any?){}[0]
         final fun hashCode(): kotlin/Int // io.matthewnelson.kmp.tor.runtime.core.config/TorOption.__OwningControllerProcess.hashCode|hashCode(){}[0]
         final fun toString(): kotlin/String // io.matthewnelson.kmp.tor.runtime.core.config/TorOption.__OwningControllerProcess.toString|toString(){}[0]
@@ -2775,7 +2775,7 @@ abstract class io.matthewnelson.kmp.tor.runtime.core/EnqueuedJob { // io.matthew
     }
 
     final class ExecutionPolicy { // io.matthewnelson.kmp.tor.runtime.core/EnqueuedJob.ExecutionPolicy|null[0]
-        final val cancellation // io.matthewnelson.kmp.tor.runtime.core/EnqueuedJob.ExecutionPolicy.cancellation|<get-cancellation>(){}[0]
+        final val cancellation // io.matthewnelson.kmp.tor.runtime.core/EnqueuedJob.ExecutionPolicy.cancellation|{}cancellation[0]
             final fun <get-cancellation>(): io.matthewnelson.kmp.tor.runtime.core/EnqueuedJob.ExecutionPolicy.Cancellation // io.matthewnelson.kmp.tor.runtime.core/EnqueuedJob.ExecutionPolicy.cancellation.<get-cancellation>|<get-cancellation>(){}[0]
         final val isDefault // io.matthewnelson.kmp.tor.runtime.core/EnqueuedJob.ExecutionPolicy.isDefault|{}isDefault[0]
             final fun <get-isDefault>(): kotlin/Boolean // io.matthewnelson.kmp.tor.runtime.core/EnqueuedJob.ExecutionPolicy.isDefault.<get-isDefault>|<get-isDefault>(){}[0]
@@ -2789,7 +2789,7 @@ abstract class io.matthewnelson.kmp.tor.runtime.core/EnqueuedJob { // io.matthew
         }
 
         final class Cancellation { // io.matthewnelson.kmp.tor.runtime.core/EnqueuedJob.ExecutionPolicy.Cancellation|null[0]
-            final val accessibilityOpen // io.matthewnelson.kmp.tor.runtime.core/EnqueuedJob.ExecutionPolicy.Cancellation.accessibilityOpen|<get-accessibilityOpen>(){}[0]
+            final val accessibilityOpen // io.matthewnelson.kmp.tor.runtime.core/EnqueuedJob.ExecutionPolicy.Cancellation.accessibilityOpen|{}accessibilityOpen[0]
                 final fun <get-accessibilityOpen>(): kotlin/Boolean // io.matthewnelson.kmp.tor.runtime.core/EnqueuedJob.ExecutionPolicy.Cancellation.accessibilityOpen.<get-accessibilityOpen>|<get-accessibilityOpen>(){}[0]
             final val allowAttempts // io.matthewnelson.kmp.tor.runtime.core/EnqueuedJob.ExecutionPolicy.Cancellation.allowAttempts|{}allowAttempts[0]
                 final fun <get-allowAttempts>(): kotlin/Boolean // io.matthewnelson.kmp.tor.runtime.core/EnqueuedJob.ExecutionPolicy.Cancellation.allowAttempts.<get-allowAttempts>|<get-allowAttempts>(){}[0]
@@ -2815,13 +2815,13 @@ abstract class io.matthewnelson.kmp.tor.runtime.core/EnqueuedJob { // io.matthew
             }
 
             final object Companion { // io.matthewnelson.kmp.tor.runtime.core/EnqueuedJob.ExecutionPolicy.Cancellation.Companion|null[0]
-                final val DEFAULT // io.matthewnelson.kmp.tor.runtime.core/EnqueuedJob.ExecutionPolicy.Cancellation.Companion.DEFAULT|<get-DEFAULT>(){}[0]
+                final val DEFAULT // io.matthewnelson.kmp.tor.runtime.core/EnqueuedJob.ExecutionPolicy.Cancellation.Companion.DEFAULT|{}DEFAULT[0]
                     final fun <get-DEFAULT>(): io.matthewnelson.kmp.tor.runtime.core/EnqueuedJob.ExecutionPolicy.Cancellation // io.matthewnelson.kmp.tor.runtime.core/EnqueuedJob.ExecutionPolicy.Cancellation.Companion.DEFAULT.<get-DEFAULT>|<get-DEFAULT>(){}[0]
             }
         }
 
         final object Companion { // io.matthewnelson.kmp.tor.runtime.core/EnqueuedJob.ExecutionPolicy.Companion|null[0]
-            final val DEFAULT // io.matthewnelson.kmp.tor.runtime.core/EnqueuedJob.ExecutionPolicy.Companion.DEFAULT|<get-DEFAULT>(){}[0]
+            final val DEFAULT // io.matthewnelson.kmp.tor.runtime.core/EnqueuedJob.ExecutionPolicy.Companion.DEFAULT|{}DEFAULT[0]
                 final fun <get-DEFAULT>(): io.matthewnelson.kmp.tor.runtime.core/EnqueuedJob.ExecutionPolicy // io.matthewnelson.kmp.tor.runtime.core/EnqueuedJob.ExecutionPolicy.Companion.DEFAULT.<get-DEFAULT>|<get-DEFAULT>(){}[0]
 
             final fun Builder(io.matthewnelson.kmp.tor.runtime.core/ThisBlock<io.matthewnelson.kmp.tor.runtime.core/EnqueuedJob.ExecutionPolicy.BuilderScope>): io.matthewnelson.kmp.tor.runtime.core/EnqueuedJob.ExecutionPolicy // io.matthewnelson.kmp.tor.runtime.core/EnqueuedJob.ExecutionPolicy.Companion.Builder|Builder(io.matthewnelson.kmp.tor.runtime.core.ThisBlock<io.matthewnelson.kmp.tor.runtime.core.EnqueuedJob.ExecutionPolicy.BuilderScope>){}[0]
@@ -3020,7 +3020,7 @@ final class io.matthewnelson.kmp.tor.runtime.core.ctrl/AddressMapping { // io.ma
 
     final fun component1(): kotlin/String // io.matthewnelson.kmp.tor.runtime.core.ctrl/AddressMapping.component1|component1(){}[0]
     final fun component2(): kotlin/String // io.matthewnelson.kmp.tor.runtime.core.ctrl/AddressMapping.component2|component2(){}[0]
-    final fun copy(kotlin/String =..., kotlin/String =...): io.matthewnelson.kmp.tor.runtime.core.ctrl/AddressMapping // io.matthewnelson.kmp.tor.runtime.core.ctrl/AddressMapping.copy|copy(kotlin.String;kotlin.String){}[0]
+    final fun copy(kotlin/String = ..., kotlin/String = ...): io.matthewnelson.kmp.tor.runtime.core.ctrl/AddressMapping // io.matthewnelson.kmp.tor.runtime.core.ctrl/AddressMapping.copy|copy(kotlin.String;kotlin.String){}[0]
     final fun equals(kotlin/Any?): kotlin/Boolean // io.matthewnelson.kmp.tor.runtime.core.ctrl/AddressMapping.equals|equals(kotlin.Any?){}[0]
     final fun hashCode(): kotlin/Int // io.matthewnelson.kmp.tor.runtime.core.ctrl/AddressMapping.hashCode|hashCode(){}[0]
     final fun toString(): kotlin/String // io.matthewnelson.kmp.tor.runtime.core.ctrl/AddressMapping.toString|toString(){}[0]
@@ -3083,7 +3083,7 @@ final class io.matthewnelson.kmp.tor.runtime.core.ctrl/ConfigEntry { // io.matth
 
     final fun component1(): io.matthewnelson.kmp.tor.runtime.core.config/TorOption // io.matthewnelson.kmp.tor.runtime.core.ctrl/ConfigEntry.component1|component1(){}[0]
     final fun component2(): kotlin/String // io.matthewnelson.kmp.tor.runtime.core.ctrl/ConfigEntry.component2|component2(){}[0]
-    final fun copy(io.matthewnelson.kmp.tor.runtime.core.config/TorOption =..., kotlin/String =...): io.matthewnelson.kmp.tor.runtime.core.ctrl/ConfigEntry // io.matthewnelson.kmp.tor.runtime.core.ctrl/ConfigEntry.copy|copy(io.matthewnelson.kmp.tor.runtime.core.config.TorOption;kotlin.String){}[0]
+    final fun copy(io.matthewnelson.kmp.tor.runtime.core.config/TorOption = ..., kotlin/String = ...): io.matthewnelson.kmp.tor.runtime.core.ctrl/ConfigEntry // io.matthewnelson.kmp.tor.runtime.core.ctrl/ConfigEntry.copy|copy(io.matthewnelson.kmp.tor.runtime.core.config.TorOption;kotlin.String){}[0]
     final fun equals(kotlin/Any?): kotlin/Boolean // io.matthewnelson.kmp.tor.runtime.core.ctrl/ConfigEntry.equals|equals(kotlin.Any?){}[0]
     final fun hashCode(): kotlin/Int // io.matthewnelson.kmp.tor.runtime.core.ctrl/ConfigEntry.hashCode|hashCode(){}[0]
     final fun toString(): kotlin/String // io.matthewnelson.kmp.tor.runtime.core.ctrl/ConfigEntry.toString|toString(){}[0]
@@ -3107,13 +3107,9 @@ final class io.matthewnelson.kmp.tor.runtime.core.ctrl/HiddenServiceEntry { // i
 }
 
 final class io.matthewnelson.kmp.tor.runtime.core.key/AddressKey { // io.matthewnelson.kmp.tor.runtime.core.key/AddressKey|null[0]
-    sealed class Private : io.matthewnelson.kmp.tor.runtime.core.key/Key.Private { // io.matthewnelson.kmp.tor.runtime.core.key/AddressKey.Private|null[0]
-        constructor <init>(kotlin/ByteArray) // io.matthewnelson.kmp.tor.runtime.core.key/AddressKey.Private.<init>|<init>(kotlin.ByteArray){}[0]
-    }
+    sealed class Private : io.matthewnelson.kmp.tor.runtime.core.key/Key.Private // io.matthewnelson.kmp.tor.runtime.core.key/AddressKey.Private|null[0]
 
     sealed class Public : io.matthewnelson.kmp.tor.runtime.core.key/Key.Public, kotlin/Comparable<io.matthewnelson.kmp.tor.runtime.core.key/AddressKey.Public> { // io.matthewnelson.kmp.tor.runtime.core.key/AddressKey.Public|null[0]
-        constructor <init>(io.matthewnelson.kmp.tor.runtime.core.net/OnionAddress) // io.matthewnelson.kmp.tor.runtime.core.key/AddressKey.Public.<init>|<init>(io.matthewnelson.kmp.tor.runtime.core.net.OnionAddress){}[0]
-
         final fun base16(): kotlin/String // io.matthewnelson.kmp.tor.runtime.core.key/AddressKey.Public.base16|base16(){}[0]
         final fun base32(): kotlin/String // io.matthewnelson.kmp.tor.runtime.core.key/AddressKey.Public.base32|base32(){}[0]
         final fun base64(): kotlin/String // io.matthewnelson.kmp.tor.runtime.core.key/AddressKey.Public.base64|base64(){}[0]
@@ -3125,8 +3121,6 @@ final class io.matthewnelson.kmp.tor.runtime.core.key/AddressKey { // io.matthew
 
 final class io.matthewnelson.kmp.tor.runtime.core.key/AuthKey { // io.matthewnelson.kmp.tor.runtime.core.key/AuthKey|null[0]
     sealed class Private : io.matthewnelson.kmp.tor.runtime.core.key/Key.Private { // io.matthewnelson.kmp.tor.runtime.core.key/AuthKey.Private|null[0]
-        constructor <init>(kotlin/ByteArray) // io.matthewnelson.kmp.tor.runtime.core.key/AuthKey.Private.<init>|<init>(kotlin.ByteArray){}[0]
-
         final fun descriptorBase32(io.matthewnelson.kmp.tor.runtime.core.key/AddressKey.Public): kotlin/String // io.matthewnelson.kmp.tor.runtime.core.key/AuthKey.Private.descriptorBase32|descriptorBase32(io.matthewnelson.kmp.tor.runtime.core.key.AddressKey.Public){}[0]
         final fun descriptorBase32(io.matthewnelson.kmp.tor.runtime.core.net/OnionAddress): kotlin/String // io.matthewnelson.kmp.tor.runtime.core.key/AuthKey.Private.descriptorBase32|descriptorBase32(io.matthewnelson.kmp.tor.runtime.core.net.OnionAddress){}[0]
         final fun descriptorBase32OrNull(io.matthewnelson.kmp.tor.runtime.core.key/AddressKey.Public): kotlin/String? // io.matthewnelson.kmp.tor.runtime.core.key/AuthKey.Private.descriptorBase32OrNull|descriptorBase32OrNull(io.matthewnelson.kmp.tor.runtime.core.key.AddressKey.Public){}[0]
@@ -3138,8 +3132,6 @@ final class io.matthewnelson.kmp.tor.runtime.core.key/AuthKey { // io.matthewnel
     }
 
     sealed class Public : io.matthewnelson.kmp.tor.runtime.core.key/Key.Public { // io.matthewnelson.kmp.tor.runtime.core.key/AuthKey.Public|null[0]
-        constructor <init>(kotlin/ByteArray) // io.matthewnelson.kmp.tor.runtime.core.key/AuthKey.Public.<init>|<init>(kotlin.ByteArray){}[0]
-
         final fun base16(): kotlin/String // io.matthewnelson.kmp.tor.runtime.core.key/AuthKey.Public.base16|base16(){}[0]
         final fun base32(): kotlin/String // io.matthewnelson.kmp.tor.runtime.core.key/AuthKey.Public.base32|base32(){}[0]
         final fun base64(): kotlin/String // io.matthewnelson.kmp.tor.runtime.core.key/AuthKey.Public.base64|base64(){}[0]
@@ -3193,7 +3185,7 @@ final class io.matthewnelson.kmp.tor.runtime.core/UncaughtException : kotlin/Run
     }
 
     final class SuppressedHandler : io.matthewnelson.kmp.tor.runtime.core/UncaughtException.Handler { // io.matthewnelson.kmp.tor.runtime.core/UncaughtException.SuppressedHandler|null[0]
-        final val isActive // io.matthewnelson.kmp.tor.runtime.core/UncaughtException.SuppressedHandler.isActive|<get-isActive>(){}[0]
+        final val isActive // io.matthewnelson.kmp.tor.runtime.core/UncaughtException.SuppressedHandler.isActive|{}isActive[0]
             final fun <get-isActive>(): kotlin/Boolean // io.matthewnelson.kmp.tor.runtime.core/UncaughtException.SuppressedHandler.isActive.<get-isActive>|<get-isActive>(){}[0]
 
         final fun invoke(io.matthewnelson.kmp.tor.runtime.core/UncaughtException) // io.matthewnelson.kmp.tor.runtime.core/UncaughtException.SuppressedHandler.invoke|invoke(io.matthewnelson.kmp.tor.runtime.core.UncaughtException){}[0]
@@ -3284,13 +3276,9 @@ sealed class <#A: io.matthewnelson.kmp.tor.runtime.core.key/Key.Public, #B: io.m
     abstract fun algorithm(): kotlin/String // io.matthewnelson.kmp.tor.runtime.core.key/KeyType.algorithm|algorithm(){}[0]
     final fun toString(): kotlin/String // io.matthewnelson.kmp.tor.runtime.core.key/KeyType.toString|toString(){}[0]
 
-    sealed class <#A1: io.matthewnelson.kmp.tor.runtime.core.key/AddressKey.Public, #B1: io.matthewnelson.kmp.tor.runtime.core.key/AddressKey.Private> Address : io.matthewnelson.kmp.tor.runtime.core.key/KeyType<#A1, #B1> { // io.matthewnelson.kmp.tor.runtime.core.key/KeyType.Address|null[0]
-        constructor <init>() // io.matthewnelson.kmp.tor.runtime.core.key/KeyType.Address.<init>|<init>(){}[0]
-    }
+    sealed class <#A1: io.matthewnelson.kmp.tor.runtime.core.key/AddressKey.Public, #B1: io.matthewnelson.kmp.tor.runtime.core.key/AddressKey.Private> Address : io.matthewnelson.kmp.tor.runtime.core.key/KeyType<#A1, #B1> // io.matthewnelson.kmp.tor.runtime.core.key/KeyType.Address|null[0]
 
-    sealed class <#A1: io.matthewnelson.kmp.tor.runtime.core.key/AuthKey.Public, #B1: io.matthewnelson.kmp.tor.runtime.core.key/AuthKey.Private> Auth : io.matthewnelson.kmp.tor.runtime.core.key/KeyType<#A1, #B1> { // io.matthewnelson.kmp.tor.runtime.core.key/KeyType.Auth|null[0]
-        constructor <init>() // io.matthewnelson.kmp.tor.runtime.core.key/KeyType.Auth.<init>|<init>(){}[0]
-    }
+    sealed class <#A1: io.matthewnelson.kmp.tor.runtime.core.key/AuthKey.Public, #B1: io.matthewnelson.kmp.tor.runtime.core.key/AuthKey.Private> Auth : io.matthewnelson.kmp.tor.runtime.core.key/KeyType<#A1, #B1> // io.matthewnelson.kmp.tor.runtime.core.key/KeyType.Auth|null[0]
 }
 
 sealed class <#A: kotlin/Any> io.matthewnelson.kmp.tor.runtime.core.ctrl/TorCmd : io.matthewnelson.kmp.tor.runtime.core/EnqueuedJob.Argument { // io.matthewnelson.kmp.tor.runtime.core.ctrl/TorCmd|null[0]
@@ -3338,16 +3326,12 @@ sealed class <#A: kotlin/Any> io.matthewnelson.kmp.tor.runtime.core.ctrl/TorCmd 
     }
 
     sealed class <#A1: kotlin/Any> Privileged : io.matthewnelson.kmp.tor.runtime.core.ctrl/TorCmd<#A1> { // io.matthewnelson.kmp.tor.runtime.core.ctrl/TorCmd.Privileged|null[0]
-        constructor <init>(kotlin/String) // io.matthewnelson.kmp.tor.runtime.core.ctrl/TorCmd.Privileged.<init>|<init>(kotlin.String){}[0]
-
         abstract interface Processor : io.matthewnelson.kmp.tor.runtime.core.ctrl/TorCmd.Unprivileged.Processor { // io.matthewnelson.kmp.tor.runtime.core.ctrl/TorCmd.Privileged.Processor|null[0]
             abstract fun <#A3: kotlin/Any> enqueue(io.matthewnelson.kmp.tor.runtime.core.ctrl/TorCmd.Privileged<#A3>, io.matthewnelson.kmp.tor.runtime.core/OnFailure, io.matthewnelson.kmp.tor.runtime.core/OnSuccess<#A3>): io.matthewnelson.kmp.tor.runtime.core/EnqueuedJob // io.matthewnelson.kmp.tor.runtime.core.ctrl/TorCmd.Privileged.Processor.enqueue|enqueue(io.matthewnelson.kmp.tor.runtime.core.ctrl.TorCmd.Privileged<0:0>;io.matthewnelson.kmp.tor.runtime.core.OnFailure;io.matthewnelson.kmp.tor.runtime.core.OnSuccess<0:0>){0§<kotlin.Any>}[0]
         }
     }
 
     sealed class <#A1: kotlin/Any> Unprivileged : io.matthewnelson.kmp.tor.runtime.core.ctrl/TorCmd<#A1> { // io.matthewnelson.kmp.tor.runtime.core.ctrl/TorCmd.Unprivileged|null[0]
-        constructor <init>(kotlin/String) // io.matthewnelson.kmp.tor.runtime.core.ctrl/TorCmd.Unprivileged.<init>|<init>(kotlin.String){}[0]
-
         abstract interface Processor { // io.matthewnelson.kmp.tor.runtime.core.ctrl/TorCmd.Unprivileged.Processor|null[0]
             abstract fun <#A3: kotlin/Any> enqueue(io.matthewnelson.kmp.tor.runtime.core.ctrl/TorCmd.Unprivileged<#A3>, io.matthewnelson.kmp.tor.runtime.core/OnFailure, io.matthewnelson.kmp.tor.runtime.core/OnSuccess<#A3>): io.matthewnelson.kmp.tor.runtime.core/EnqueuedJob // io.matthewnelson.kmp.tor.runtime.core.ctrl/TorCmd.Unprivileged.Processor.enqueue|enqueue(io.matthewnelson.kmp.tor.runtime.core.ctrl.TorCmd.Unprivileged<0:0>;io.matthewnelson.kmp.tor.runtime.core.OnFailure;io.matthewnelson.kmp.tor.runtime.core.OnSuccess<0:0>){0§<kotlin.Any>}[0]
         }
@@ -3606,8 +3590,6 @@ sealed class io.matthewnelson.kmp.tor.runtime.core.key/Key { // io.matthewnelson
     abstract fun encodedOrNull(): kotlin/ByteArray? // io.matthewnelson.kmp.tor.runtime.core.key/Key.encodedOrNull|encodedOrNull(){}[0]
 
     sealed class Private : io.matthewnelson.kmp.tor.runtime.core.key/Key, io.matthewnelson.kmp.tor.runtime.core/Destroyable { // io.matthewnelson.kmp.tor.runtime.core.key/Key.Private|null[0]
-        constructor <init>(kotlin/ByteArray) // io.matthewnelson.kmp.tor.runtime.core.key/Key.Private.<init>|<init>(kotlin.ByteArray){}[0]
-
         final fun base16(): kotlin/String // io.matthewnelson.kmp.tor.runtime.core.key/Key.Private.base16|base16(){}[0]
         final fun base16OrNull(): kotlin/String? // io.matthewnelson.kmp.tor.runtime.core.key/Key.Private.base16OrNull|base16OrNull(){}[0]
         final fun base32(): kotlin/String // io.matthewnelson.kmp.tor.runtime.core.key/Key.Private.base32|base32(){}[0]
@@ -3624,8 +3606,6 @@ sealed class io.matthewnelson.kmp.tor.runtime.core.key/Key { // io.matthewnelson
     }
 
     sealed class Public : io.matthewnelson.kmp.tor.runtime.core.key/Key { // io.matthewnelson.kmp.tor.runtime.core.key/Key.Public|null[0]
-        constructor <init>() // io.matthewnelson.kmp.tor.runtime.core.key/Key.Public.<init>|<init>(){}[0]
-
         abstract fun base16(): kotlin/String // io.matthewnelson.kmp.tor.runtime.core.key/Key.Public.base16|base16(){}[0]
         abstract fun base32(): kotlin/String // io.matthewnelson.kmp.tor.runtime.core.key/Key.Public.base32|base32(){}[0]
         abstract fun base64(): kotlin/String // io.matthewnelson.kmp.tor.runtime.core.key/Key.Public.base64|base64(){}[0]
@@ -3643,8 +3623,6 @@ sealed class io.matthewnelson.kmp.tor.runtime.core.key/Key { // io.matthewnelson
 }
 
 sealed class io.matthewnelson.kmp.tor.runtime.core.net/Address : kotlin/Comparable<io.matthewnelson.kmp.tor.runtime.core.net/Address> { // io.matthewnelson.kmp.tor.runtime.core.net/Address|null[0]
-    constructor <init>(kotlin/String) // io.matthewnelson.kmp.tor.runtime.core.net/Address.<init>|<init>(kotlin.String){}[0]
-
     final val value // io.matthewnelson.kmp.tor.runtime.core.net/Address.value|{}value[0]
         final fun <get-value>(): kotlin/String // io.matthewnelson.kmp.tor.runtime.core.net/Address.value.<get-value>|<get-value>(){}[0]
 
@@ -3683,8 +3661,8 @@ sealed class io.matthewnelson.kmp.tor.runtime.core.net/IPAddress : io.matthewnel
         }
 
         final object Companion { // io.matthewnelson.kmp.tor.runtime.core.net/IPAddress.V6.Companion|null[0]
-            final fun (kotlin/ByteArray).toIPAddressV6(kotlin/String? =...): io.matthewnelson.kmp.tor.runtime.core.net/IPAddress.V6 // io.matthewnelson.kmp.tor.runtime.core.net/IPAddress.V6.Companion.toIPAddressV6|toIPAddressV6@kotlin.ByteArray(kotlin.String?){}[0]
-            final fun (kotlin/ByteArray).toIPAddressV6OrNull(kotlin/String? =...): io.matthewnelson.kmp.tor.runtime.core.net/IPAddress.V6? // io.matthewnelson.kmp.tor.runtime.core.net/IPAddress.V6.Companion.toIPAddressV6OrNull|toIPAddressV6OrNull@kotlin.ByteArray(kotlin.String?){}[0]
+            final fun (kotlin/ByteArray).toIPAddressV6(kotlin/String? = ...): io.matthewnelson.kmp.tor.runtime.core.net/IPAddress.V6 // io.matthewnelson.kmp.tor.runtime.core.net/IPAddress.V6.Companion.toIPAddressV6|toIPAddressV6@kotlin.ByteArray(kotlin.String?){}[0]
+            final fun (kotlin/ByteArray).toIPAddressV6OrNull(kotlin/String? = ...): io.matthewnelson.kmp.tor.runtime.core.net/IPAddress.V6? // io.matthewnelson.kmp.tor.runtime.core.net/IPAddress.V6.Companion.toIPAddressV6OrNull|toIPAddressV6OrNull@kotlin.ByteArray(kotlin.String?){}[0]
             final fun (kotlin/String).toIPAddressV6(): io.matthewnelson.kmp.tor.runtime.core.net/IPAddress.V6 // io.matthewnelson.kmp.tor.runtime.core.net/IPAddress.V6.Companion.toIPAddressV6|toIPAddressV6@kotlin.String(){}[0]
             final fun (kotlin/String).toIPAddressV6OrNull(): io.matthewnelson.kmp.tor.runtime.core.net/IPAddress.V6? // io.matthewnelson.kmp.tor.runtime.core.net/IPAddress.V6.Companion.toIPAddressV6OrNull|toIPAddressV6OrNull@kotlin.String(){}[0]
         }
@@ -3892,7 +3870,7 @@ final fun (io.matthewnelson.kmp.tor.runtime.core.net/Port).io.matthewnelson.kmp.
 final fun (io.matthewnelson.kmp.tor.runtime.core.net/Port.Ephemeral).io.matthewnelson.kmp.tor.runtime.core.util/findNextAvailableSync(kotlin/Int, io.matthewnelson.kmp.tor.runtime.core.net/LocalHost): io.matthewnelson.kmp.tor.runtime.core.net/Port.Ephemeral // io.matthewnelson.kmp.tor.runtime.core.util/findNextAvailableSync|findNextAvailableSync@io.matthewnelson.kmp.tor.runtime.core.net.Port.Ephemeral(kotlin.Int;io.matthewnelson.kmp.tor.runtime.core.net.LocalHost){}[0]
 
 // Targets: [native]
-final fun <#A: kotlin/Any> (io.matthewnelson.kmp.tor.runtime.core.ctrl/TorCmd.Privileged.Processor).io.matthewnelson.kmp.tor.runtime.core.util/executeSync(io.matthewnelson.kmp.tor.runtime.core.ctrl/TorCmd.Privileged<#A>, kotlin/Function0<kotlin.coroutines.cancellation/CancellationException?>? =...): #A // io.matthewnelson.kmp.tor.runtime.core.util/executeSync|executeSync@io.matthewnelson.kmp.tor.runtime.core.ctrl.TorCmd.Privileged.Processor(io.matthewnelson.kmp.tor.runtime.core.ctrl.TorCmd.Privileged<0:0>;kotlin.Function0<kotlin.coroutines.cancellation.CancellationException?>?){0§<kotlin.Any>}[0]
+final fun <#A: kotlin/Any> (io.matthewnelson.kmp.tor.runtime.core.ctrl/TorCmd.Privileged.Processor).io.matthewnelson.kmp.tor.runtime.core.util/executeSync(io.matthewnelson.kmp.tor.runtime.core.ctrl/TorCmd.Privileged<#A>, kotlin/Function0<kotlin.coroutines.cancellation/CancellationException?>? = ...): #A // io.matthewnelson.kmp.tor.runtime.core.util/executeSync|executeSync@io.matthewnelson.kmp.tor.runtime.core.ctrl.TorCmd.Privileged.Processor(io.matthewnelson.kmp.tor.runtime.core.ctrl.TorCmd.Privileged<0:0>;kotlin.Function0<kotlin.coroutines.cancellation.CancellationException?>?){0§<kotlin.Any>}[0]
 
 // Targets: [native]
-final fun <#A: kotlin/Any> (io.matthewnelson.kmp.tor.runtime.core.ctrl/TorCmd.Unprivileged.Processor).io.matthewnelson.kmp.tor.runtime.core.util/executeSync(io.matthewnelson.kmp.tor.runtime.core.ctrl/TorCmd.Unprivileged<#A>, kotlin/Function0<kotlin.coroutines.cancellation/CancellationException?>? =...): #A // io.matthewnelson.kmp.tor.runtime.core.util/executeSync|executeSync@io.matthewnelson.kmp.tor.runtime.core.ctrl.TorCmd.Unprivileged.Processor(io.matthewnelson.kmp.tor.runtime.core.ctrl.TorCmd.Unprivileged<0:0>;kotlin.Function0<kotlin.coroutines.cancellation.CancellationException?>?){0§<kotlin.Any>}[0]
+final fun <#A: kotlin/Any> (io.matthewnelson.kmp.tor.runtime.core.ctrl/TorCmd.Unprivileged.Processor).io.matthewnelson.kmp.tor.runtime.core.util/executeSync(io.matthewnelson.kmp.tor.runtime.core.ctrl/TorCmd.Unprivileged<#A>, kotlin/Function0<kotlin.coroutines.cancellation/CancellationException?>? = ...): #A // io.matthewnelson.kmp.tor.runtime.core.util/executeSync|executeSync@io.matthewnelson.kmp.tor.runtime.core.ctrl.TorCmd.Unprivileged.Processor(io.matthewnelson.kmp.tor.runtime.core.ctrl.TorCmd.Unprivileged<0:0>;kotlin.Function0<kotlin.coroutines.cancellation.CancellationException?>?){0§<kotlin.Any>}[0]

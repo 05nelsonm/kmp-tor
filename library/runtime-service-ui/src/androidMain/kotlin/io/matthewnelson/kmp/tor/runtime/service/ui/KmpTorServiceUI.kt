@@ -686,7 +686,7 @@ public class KmpTorServiceUI private constructor(
                 }
             }
 
-            UIAction.entries.forEach { entry ->
+            for (entry in UIAction.entries) {
                 val res = actionIcons[entry]
                 context.validateResource(
                     block = { retrieveDrawable(res) },
@@ -1031,7 +1031,7 @@ public class KmpTorServiceUI private constructor(
                 setOnClickPendingIntent(R.id.kmp_tor_ui_actions_load_instance, appContext.noOpPendingIntent())
             }
 
-            state.actions.forEach { btnAction ->
+            for (btnAction in state.actions) {
 
                 val uiAction = when (btnAction) {
                     ButtonAction.NewIdentity -> UIAction.NewNym
@@ -1123,11 +1123,11 @@ public class KmpTorServiceUI private constructor(
 
                     _isDeviceLocked = new
                     val instances = instanceStates
-                    instances.forEach { instance ->
+                    for (instance in instances) {
                         instance.onDeviceLockChange()
                     }
                     serviceChildScope.launch {
-                        instances.forEach { instance ->
+                        for (instance in instances) {
                             instance.debug { "DeviceIsLocked[$new]" }
                         }
                     }
