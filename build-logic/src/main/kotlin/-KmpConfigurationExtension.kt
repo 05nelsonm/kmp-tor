@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-import io.matthewnelson.kmp.configuration.ExperimentalKmpConfigurationApi
 import io.matthewnelson.kmp.configuration.extension.KmpConfigurationExtension
 import io.matthewnelson.kmp.configuration.extension.container.target.KmpConfigurationContainerDsl
 import io.matthewnelson.kmp.configuration.extension.container.target.TargetAndroidContainer
@@ -25,7 +24,7 @@ fun KmpConfigurationExtension.configureShared(
     androidNamespace: String? = null,
     java9ModuleName: String? = null,
     publish: Boolean = false,
-    action: Action<KmpConfigurationContainerDsl>
+    action: Action<KmpConfigurationContainerDsl>,
 ) {
     if (publish) {
         require(!java9ModuleName.isNullOrBlank()) { "publications must specify a module-info name" }
@@ -51,7 +50,6 @@ fun KmpConfigurationExtension.configureShared(
             // compilations of module-info.java. Nobody deploys from Windows
             // anyway...
             if (!HostManager.hostIsMingw) {
-                @OptIn(ExperimentalKmpConfigurationApi::class)
                 java9ModuleInfoName = java9ModuleName
             }
         }
