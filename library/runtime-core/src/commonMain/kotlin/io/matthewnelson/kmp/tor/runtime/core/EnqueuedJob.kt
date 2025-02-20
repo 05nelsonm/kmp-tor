@@ -23,8 +23,8 @@ import io.matthewnelson.kmp.tor.common.core.synchronized
 import io.matthewnelson.kmp.tor.common.core.synchronizedObject
 import io.matthewnelson.kmp.tor.runtime.core.EnqueuedJob.ExecutionPolicy.Cancellation
 import io.matthewnelson.kmp.tor.runtime.core.EnqueuedJob.State.*
-import io.matthewnelson.kmp.tor.runtime.core.UncaughtException.Handler.Companion.tryCatch
-import io.matthewnelson.kmp.tor.runtime.core.UncaughtException.Handler.Companion.withSuppression
+import io.matthewnelson.kmp.tor.runtime.core.UncaughtException.Handler.Companion.tryCatch2
+import io.matthewnelson.kmp.tor.runtime.core.UncaughtException.Handler.Companion.withSuppression2
 import io.matthewnelson.kmp.tor.runtime.core.UncaughtException.SuppressedHandler
 import io.matthewnelson.kmp.tor.runtime.core.util.awaitAsync
 import kotlin.concurrent.Volatile
@@ -161,7 +161,7 @@ public abstract class EnqueuedJob protected constructor(
 
         // Invoke immediately
         if (wasAdded == null) {
-            UncaughtException.Handler.THROW.tryCatch(toString()) {
+            UncaughtException.Handler.THROW.tryCatch2(toString()) {
                 handle(_cancellationException)
             }
             return Disposable.noOp()
@@ -705,8 +705,8 @@ public abstract class EnqueuedJob protected constructor(
 
         val context = toString(this)
 
-        _handler.withSuppression {
-            tryCatch(context) { action() }
+        _handler.withSuppression2 {
+            tryCatch2(context) { action() }
 
             @OptIn(InternalKmpTorApi::class)
             synchronized(lock) {
@@ -723,7 +723,7 @@ public abstract class EnqueuedJob protected constructor(
                 _completionCallbacks = null
                 callbacks
             }?.forEach { callback ->
-                tryCatch("$context.invokeOnCompletion") {
+                tryCatch2("$context.invokeOnCompletion") {
                     callback(_cancellationException)
                 }
             }

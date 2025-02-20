@@ -19,11 +19,14 @@ import io.matthewnelson.kmp.tor.common.api.InternalKmpTorApi
 import io.matthewnelson.kmp.tor.common.core.synchronized
 import io.matthewnelson.kmp.tor.common.core.synchronizedObject
 import io.matthewnelson.kmp.tor.runtime.core.*
-import io.matthewnelson.kmp.tor.runtime.core.UncaughtException.Handler.Companion.tryCatch
+import io.matthewnelson.kmp.tor.runtime.core.UncaughtException.Handler.Companion.tryCatch2
 import io.matthewnelson.kmp.tor.runtime.core.ctrl.TorCmd
 import io.matthewnelson.kmp.tor.runtime.ctrl.internal.toDestroyedErrorJob
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlin.concurrent.Volatile
+import kotlin.contracts.ExperimentalContracts
+import kotlin.contracts.InvocationKind
+import kotlin.contracts.contract
 import kotlin.coroutines.AbstractCoroutineContextElement
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.cancellation.CancellationException
@@ -143,7 +146,7 @@ protected constructor(
         }?.forEach { observer ->
             val ctx = ObserverContext(observer.toString(isStatic = observer.tag.isStaticTag()))
 
-            handler.tryCatch(ctx) {
+            handler.tryCatch2(ctx) {
                 observer.notify(handler + ctx, defaultExecutor, data)
             }
         }
@@ -168,10 +171,12 @@ protected constructor(
         return wasDestroyed
     }
 
-    private fun <T : Any?> withObservers(
+    @OptIn(ExperimentalContracts::class)
+    private inline fun <T : Any?> withObservers(
         isNotify: Boolean = false,
         block: MutableSet<TorEvent.Observer>.() -> T,
     ): T {
+        contract { callsInPlace(block, InvocationKind.EXACTLY_ONCE) }
         if (_destroyed && !isNotify) return block(noOpMutableSet())
 
         return synchronized(lock) {
@@ -197,7 +202,7 @@ protected constructor(
         ): EnqueuedJob = toDestroyedErrorJob(onFailure, handler, message)
     }
 
-    // testing
+    // Testing
     protected open fun registered(): Int = synchronized(lock) { observers.size }
 
     // Handler that also implements CoroutineExceptionHandler
@@ -215,7 +220,7 @@ protected constructor(
                 is UncaughtException -> invoke(exception)
                 else -> {
                     val ctx = context[ObserverContext]?.context ?: context.toString()
-                    tryCatch(ctx) { throw exception }
+                    tryCatch2(ctx) { throw exception }
                 }
             }
         }

@@ -13,6 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
+@file:Suppress("RemoveRedundantQualifierName")
+
 package io.matthewnelson.kmp.tor.runtime.core
 
 import io.matthewnelson.kmp.tor.common.api.InternalKmpTorApi
@@ -50,14 +52,14 @@ public class UncaughtException private constructor(
      * A typealias for message with contextual information about
      * where and what threw the exception.
      *
-     * @see [Handler.tryCatch]
+     * @see [Handler.tryCatch2]
      * */
 
     /**
      * Producer for [UncaughtException]
      *
-     * @see [tryCatch]
-     * @see [withSuppression]
+     * @see [tryCatch2]
+     * @see [withSuppression2]
      * */
     public fun interface Handler: ItBlock<UncaughtException> {
 
@@ -102,57 +104,56 @@ public class UncaughtException private constructor(
              * entire program to crash, an [UncaughtException] is redirected to
              * [Handler].
              *
-             * **NOTE:** If [Handler] is null, [block] is still invoked and the
-             * [UncaughtException] is thrown.
+             * **NOTE:** If [Handler] is null, [Handler.THROW] is used.
+             *
+             * @see [withSuppression2]
+             * @see [io.matthewnelson.kmp.tor.runtime.RuntimeEvent.ERROR]
              *
              * @param [context] Contextual information about where/what [block] is
              *   to include in the [UncaughtException]
-             * @param [block] the thing to do that may or may not throw exception.
-             * @see [io.matthewnelson.kmp.tor.runtime.RuntimeEvent.ERROR]
-             * @see [withSuppression]
-             * @throws [UncaughtException] if handler is null or [Handler.invoke] is
-             *   set up to throw the exception
+             * @param [block] the thing to do that may or may not throw an exception.
+             *
+             * @throws [UncaughtException] if and only if [block] throws exception, and
+             *   provided [Handler] chooses to throw it.
              * */
             @JvmStatic
-            public fun Handler?.tryCatch(context: Any, block: ItBlock<Unit>) {
-                var threw: UncaughtException? = null
-
+            public inline fun Handler?.tryCatch2(context: Any, block: () -> Unit) {
                 try {
-                    block(Unit)
+                    block()
                 } catch (t: Throwable) {
-                    threw = if (t is UncaughtException) {
-                        t
-                    } else {
-                        UncaughtException(context.toString(), t)
+                    if (this == IGNORE) return
+                    val e = if (t is UncaughtException) t else {
+                        UncaughtException.of(context.toString(), t)
                     }
+                    (this ?: THROW).invoke(e)
                 }
-
-                threw?.let { (this ?: THROW)(it) }
             }
 
             /**
              * Wraps an existing handler with suppression such
-             * that any invocation of [tryCatch] within [block]
+             * that any invocation of [tryCatch2] within [block]
              * lambda is combined into a single [UncaughtException],
              * which is then propagated to the current handler (if
              * there even was an [UncaughtException]).
              *
              * If [SuppressedHandler] reference is leaked outside
-             * the [withSuppression] lambda, the [UncaughtException]
+             * the [withSuppression2] lambda, the [UncaughtException]
              * will be passed back to the originating non-suppressed
              * [Handler].
              *
-             * Nested calls of [withSuppression] will use the root
-             * [SuppressedHandler], so all [tryCatch] invocations
+             * Nested calls of [withSuppression2] will use the root
+             * [SuppressedHandler], so all [tryCatch2] invocations
              * are propagated to a root exception and added as a
              * suppressed exception.
              *
+             * **NOTE:** If [Handler] is null, [Handler.THROW] is used.
+             *
              * e.g.
              *
-             *     myHandler.withSuppression {
+             *     myHandler.withSuppression2 {
              *         val suppressed = this
              *
-             *         withSuppression {
+             *         withSuppression2 {
              *             val nested = this
              *             assertEquals(suppressed, nested)
              *         }
@@ -162,7 +163,7 @@ public class UncaughtException private constructor(
              *
              * e.g.
              *
-             *     myHandler.withSuppression {
+             *     myHandler.withSuppression2 {
              *         // demonstration purposes
              *         val suppressedHandler = this
              *
@@ -171,43 +172,36 @@ public class UncaughtException private constructor(
              *             // Any UncaughtException generated by tryCatch
              *             // will be added as a suppressed exception to
              *             // the first UncaughtException.
-             *             tryCatch(context = job) { job.cancel(null) }
+             *             tryCatch2(context = job) { job.cancel(null) }
              *         }
              *
              *         // on lambda closure the single UncaughtException
              *         // (if there is one) will be passed back to
              *         // myHandler
              *     }
-             *
-             * **NOTE:** If [Handler] is null, [block] is still invoked and the
-             * [UncaughtException] (if there is one) is thrown on lambda closure.
              * */
             @JvmStatic
-            public fun <T: Any?> Handler?.withSuppression(
-                block: SuppressedHandler.() -> T
-            ): T {
-                val handler = if (this is SuppressedHandler && !isActive) {
-                    root()
-                } else {
-                    this ?: THROW
-                }
+            public inline fun <T: Any?> Handler?.withSuppression2(block: SuppressedHandler.() -> T): T {
+                val handler = if (this is SuppressedHandler && !isActive) root() else this ?: THROW
 
                 var threw: UncaughtException? = null
                 var isActive = true
 
                 val suppressed = if (handler is SuppressedHandler) {
-                    // Was still active (nested withSuppression invocations)
+                    // Was still active. Is a nested withSuppression2 invocation
                     handler
                 } else {
                     SuppressedHandler.of(isActive = { isActive }, root = handler) { t ->
-                        if (threw?.addSuppressed(t) == null) {
-                            threw = t
-                        }
+                        if (threw?.addSuppressed(t) == null) threw = t
                     }
                 }
 
-                val result = block(suppressed)
-                isActive = false
+                val result = try {
+                    block(suppressed)
+                } finally {
+                    isActive = false
+                }
+
                 threw?.let { handler(it) }
                 return result
             }
@@ -223,13 +217,33 @@ public class UncaughtException private constructor(
                 val handler = get(CoroutineExceptionHandler) ?: return null
                 return handler as? Handler
             }
+
+            /** @suppress */
+            @JvmStatic
+            @Deprecated("Use tryCatch2", ReplaceWith("tryCatch2(context, block)"))
+            public fun Handler?.tryCatch(context: Any, block: ItBlock<Unit>) {
+                tryCatch2(context) { block(Unit) }
+            }
+
+            /** @suppress */
+            @JvmStatic
+            @Deprecated(
+                "Use withSuppression2",
+                ReplaceWith(
+                    "this.withSuppression2 { block() }",
+                    "io.matthewnelson.kmp.tor.core.UncaughtException.Handler.withSuppression2"
+                )
+            )
+            public fun <T: Any?> Handler?.withSuppression(block: SuppressedHandler.() -> T): T {
+                return withSuppression2(block)
+            }
         }
     }
 
     /**
-     * A special [Handler] utilized within [Handler.withSuppression]
-     * lambda which propagates all exceptions caught by [Handler.tryCatch]
-     * into a single, root exception (the first thrown), with all
+     * A special [Handler] utilized within [Handler.withSuppression2]
+     * lambda which propagates all exceptions caught by [Handler.tryCatch2]
+     * into a single, root exception (the first one thrown), with all
      * subsequent exceptions added via [Throwable.addSuppressed].
      * */
     public class SuppressedHandler private constructor(
@@ -239,7 +253,7 @@ public class UncaughtException private constructor(
     ): Handler {
 
         /**
-         * If the [Handler.withSuppression] block has completed.
+         * If the [Handler.withSuppression2] block has completed.
          * */
         @get:JvmName("isActive")
         public val isActive: Boolean get() = _isActive()
@@ -267,12 +281,14 @@ public class UncaughtException private constructor(
         public override fun toString(): String = "UncaughtException.SuppressedHandler@${hashCode()}"
 
         @JvmSynthetic
+        @PublishedApi
         internal fun root(): Handler = _root
 
+        @PublishedApi
         internal companion object {
 
             @JvmSynthetic
-            @Throws(IllegalArgumentException::class)
+            @PublishedApi
             internal fun of(
                 isActive: () -> Boolean,
                 root: Handler,
@@ -283,5 +299,13 @@ public class UncaughtException private constructor(
                 return SuppressedHandler(isActive, root, suppressed)
             }
         }
+    }
+
+    @PublishedApi
+    internal companion object {
+
+        @JvmSynthetic
+        @PublishedApi
+        internal fun of(context: String, cause: Throwable): UncaughtException = UncaughtException(context, cause)
     }
 }

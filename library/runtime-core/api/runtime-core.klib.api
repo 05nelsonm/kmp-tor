@@ -3181,6 +3181,8 @@ final class io.matthewnelson.kmp.tor.runtime.core/UncaughtException : kotlin/Run
             final fun (io.matthewnelson.kmp.tor.runtime.core/UncaughtException.Handler?).tryCatch(kotlin/Any, io.matthewnelson.kmp.tor.runtime.core/ItBlock<kotlin/Unit>) // io.matthewnelson.kmp.tor.runtime.core/UncaughtException.Handler.Companion.tryCatch|tryCatch@io.matthewnelson.kmp.tor.runtime.core.UncaughtException.Handler?(kotlin.Any;io.matthewnelson.kmp.tor.runtime.core.ItBlock<kotlin.Unit>){}[0]
             final fun (kotlin.coroutines/CoroutineContext).uncaughtExceptionHandlerOrNull(): io.matthewnelson.kmp.tor.runtime.core/UncaughtException.Handler? // io.matthewnelson.kmp.tor.runtime.core/UncaughtException.Handler.Companion.uncaughtExceptionHandlerOrNull|uncaughtExceptionHandlerOrNull@kotlin.coroutines.CoroutineContext(){}[0]
             final fun <#A3: kotlin/Any?> (io.matthewnelson.kmp.tor.runtime.core/UncaughtException.Handler?).withSuppression(kotlin/Function1<io.matthewnelson.kmp.tor.runtime.core/UncaughtException.SuppressedHandler, #A3>): #A3 // io.matthewnelson.kmp.tor.runtime.core/UncaughtException.Handler.Companion.withSuppression|withSuppression@io.matthewnelson.kmp.tor.runtime.core.UncaughtException.Handler?(kotlin.Function1<io.matthewnelson.kmp.tor.runtime.core.UncaughtException.SuppressedHandler,0:0>){0§<kotlin.Any?>}[0]
+            final inline fun (io.matthewnelson.kmp.tor.runtime.core/UncaughtException.Handler?).tryCatch2(kotlin/Any, kotlin/Function0<kotlin/Unit>) // io.matthewnelson.kmp.tor.runtime.core/UncaughtException.Handler.Companion.tryCatch2|tryCatch2@io.matthewnelson.kmp.tor.runtime.core.UncaughtException.Handler?(kotlin.Any;kotlin.Function0<kotlin.Unit>){}[0]
+            final inline fun <#A3: kotlin/Any?> (io.matthewnelson.kmp.tor.runtime.core/UncaughtException.Handler?).withSuppression2(kotlin/Function1<io.matthewnelson.kmp.tor.runtime.core/UncaughtException.SuppressedHandler, #A3>): #A3 // io.matthewnelson.kmp.tor.runtime.core/UncaughtException.Handler.Companion.withSuppression2|withSuppression2@io.matthewnelson.kmp.tor.runtime.core.UncaughtException.Handler?(kotlin.Function1<io.matthewnelson.kmp.tor.runtime.core.UncaughtException.SuppressedHandler,0:0>){0§<kotlin.Any?>}[0]
         }
     }
 
@@ -3189,7 +3191,16 @@ final class io.matthewnelson.kmp.tor.runtime.core/UncaughtException : kotlin/Run
             final fun <get-isActive>(): kotlin/Boolean // io.matthewnelson.kmp.tor.runtime.core/UncaughtException.SuppressedHandler.isActive.<get-isActive>|<get-isActive>(){}[0]
 
         final fun invoke(io.matthewnelson.kmp.tor.runtime.core/UncaughtException) // io.matthewnelson.kmp.tor.runtime.core/UncaughtException.SuppressedHandler.invoke|invoke(io.matthewnelson.kmp.tor.runtime.core.UncaughtException){}[0]
+        final fun root(): io.matthewnelson.kmp.tor.runtime.core/UncaughtException.Handler // io.matthewnelson.kmp.tor.runtime.core/UncaughtException.SuppressedHandler.root|root(){}[0]
         final fun toString(): kotlin/String // io.matthewnelson.kmp.tor.runtime.core/UncaughtException.SuppressedHandler.toString|toString(){}[0]
+
+        final object Companion { // io.matthewnelson.kmp.tor.runtime.core/UncaughtException.SuppressedHandler.Companion|null[0]
+            final fun of(kotlin/Function0<kotlin/Boolean>, io.matthewnelson.kmp.tor.runtime.core/UncaughtException.Handler, io.matthewnelson.kmp.tor.runtime.core/UncaughtException.Handler): io.matthewnelson.kmp.tor.runtime.core/UncaughtException.SuppressedHandler // io.matthewnelson.kmp.tor.runtime.core/UncaughtException.SuppressedHandler.Companion.of|of(kotlin.Function0<kotlin.Boolean>;io.matthewnelson.kmp.tor.runtime.core.UncaughtException.Handler;io.matthewnelson.kmp.tor.runtime.core.UncaughtException.Handler){}[0]
+        }
+    }
+
+    final object Companion { // io.matthewnelson.kmp.tor.runtime.core/UncaughtException.Companion|null[0]
+        final fun of(kotlin/String, kotlin/Throwable): io.matthewnelson.kmp.tor.runtime.core/UncaughtException // io.matthewnelson.kmp.tor.runtime.core/UncaughtException.Companion.of|of(kotlin.String;kotlin.Throwable){}[0]
     }
 }
 

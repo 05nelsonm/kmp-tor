@@ -20,8 +20,8 @@ import io.matthewnelson.kmp.tor.common.core.synchronized
 import io.matthewnelson.kmp.tor.common.core.synchronizedObject
 import io.matthewnelson.kmp.tor.runtime.core.*
 import io.matthewnelson.kmp.tor.runtime.ctrl.TorCtrl
-import io.matthewnelson.kmp.tor.runtime.core.UncaughtException.Handler.Companion.tryCatch
-import io.matthewnelson.kmp.tor.runtime.core.UncaughtException.Handler.Companion.withSuppression
+import io.matthewnelson.kmp.tor.runtime.core.UncaughtException.Handler.Companion.tryCatch2
+import io.matthewnelson.kmp.tor.runtime.core.UncaughtException.Handler.Companion.withSuppression2
 import io.matthewnelson.kmp.tor.runtime.ctrl.internal.Debugger.Companion.d
 import kotlin.concurrent.Volatile
 
@@ -64,11 +64,11 @@ internal abstract class AbstractTorCtrl internal constructor(
         // check quick win
         if (isDestroyed()) return false
 
-        val wasDestroyed = handler.withSuppression {
+        val wasDestroyed = handler.withSuppression2 {
             // Potential for super invocation to throw when cancelling
             // jobs if Factory.handler is THROW. Need to wrap it up in
             // order to ensure destroy callbacks get invoked.
-            tryCatch("AbstractTorCtrl.onDestroy") {
+            tryCatch2("AbstractTorCtrl.onDestroy") {
                 super.onDestroy()
             }
 
@@ -98,6 +98,6 @@ internal abstract class AbstractTorCtrl internal constructor(
         val context = "AbstractTorCtrl.invokeOnDestroy" +
             if (isImmediate) "[immediate]" else ""
 
-        handler.tryCatch(context) { invoke(this@AbstractTorCtrl) }
+        handler.tryCatch2(context) { invoke(this@AbstractTorCtrl) }
     }
 }
