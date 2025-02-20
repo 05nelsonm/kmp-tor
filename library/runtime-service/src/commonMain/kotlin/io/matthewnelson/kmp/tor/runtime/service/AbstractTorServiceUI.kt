@@ -20,8 +20,8 @@ package io.matthewnelson.kmp.tor.runtime.service
 import io.matthewnelson.immutable.collections.toImmutableMap
 import io.matthewnelson.kmp.tor.common.api.ExperimentalKmpTorApi
 import io.matthewnelson.kmp.tor.common.api.InternalKmpTorApi
-import io.matthewnelson.kmp.tor.common.core.SynchronizedObject
 import io.matthewnelson.kmp.tor.common.core.synchronized
+import io.matthewnelson.kmp.tor.common.core.synchronizedObject
 import io.matthewnelson.kmp.tor.runtime.*
 import io.matthewnelson.kmp.tor.runtime.FileID.Companion.toFIDString
 import io.matthewnelson.kmp.tor.runtime.core.Disposable
@@ -81,7 +81,7 @@ internal constructor(
     private var _instanceStates: Map<FileIDKey, IS> = emptyMap()
 
     @OptIn(InternalKmpTorApi::class)
-    private val stateLock = SynchronizedObject()
+    private val stateLock = synchronizedObject()
 
     private val serviceJob = args.scope().coroutineContext.job
 
@@ -252,7 +252,7 @@ internal constructor(
         private var _isInitialized: Boolean = false
 
         @OptIn(InternalKmpTorApi::class)
-        private val lock = SynchronizedObject()
+        private val lock = synchronizedObject()
 
         @JvmSynthetic
         @Suppress("UNCHECKED_CAST")
@@ -620,7 +620,7 @@ internal constructor(
         protected class Lock {
 
             @OptIn(InternalKmpTorApi::class)
-            private val lock = SynchronizedObject()
+            private val lock = synchronizedObject()
 
             public fun <T: Any?> withLock(block: () -> T): T {
                 @OptIn(InternalKmpTorApi::class)

@@ -16,8 +16,8 @@
 package io.matthewnelson.kmp.tor.runtime
 
 import io.matthewnelson.kmp.tor.common.api.InternalKmpTorApi
-import io.matthewnelson.kmp.tor.common.core.SynchronizedObject
 import io.matthewnelson.kmp.tor.common.core.synchronized
+import io.matthewnelson.kmp.tor.common.core.synchronizedObject
 import io.matthewnelson.kmp.tor.runtime.FileID.Companion.fidEllipses
 import io.matthewnelson.kmp.tor.runtime.core.config.TorOption
 import kotlin.concurrent.Volatile
@@ -201,7 +201,7 @@ public class TorState private constructor(
         private var _isReady: Boolean = false
         @Volatile
         private var _state: TorState = of(Daemon.Off, Network.Disabled, fid = fid)
-        private val lock = SynchronizedObject()
+        private val lock = synchronizedObject()
 
         internal val isReady: Boolean get() = _isReady
         internal val state: TorState get() = _state

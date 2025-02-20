@@ -16,8 +16,8 @@
 package io.matthewnelson.kmp.tor.runtime.ctrl
 
 import io.matthewnelson.kmp.tor.common.api.InternalKmpTorApi
-import io.matthewnelson.kmp.tor.common.core.SynchronizedObject
 import io.matthewnelson.kmp.tor.common.core.synchronized
+import io.matthewnelson.kmp.tor.common.core.synchronizedObject
 import io.matthewnelson.kmp.tor.runtime.core.*
 import io.matthewnelson.kmp.tor.runtime.core.Destroyable.Companion.checkIsNotDestroyed
 import io.matthewnelson.kmp.tor.runtime.core.ctrl.TorCmd
@@ -48,7 +48,7 @@ public class TempTorCmdQueue private constructor(
     private var _connection: AbstractTorCtrl? = null
     @Volatile
     private var _destroyed = false
-    private val lock = SynchronizedObject()
+    private val lock = synchronizedObject()
     private var queue = ArrayDeque<TorCmdJob<*>>(10)
 
     @get:JvmName("connection")

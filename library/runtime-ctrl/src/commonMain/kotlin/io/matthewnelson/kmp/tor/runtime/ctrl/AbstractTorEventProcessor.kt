@@ -16,8 +16,8 @@
 package io.matthewnelson.kmp.tor.runtime.ctrl
 
 import io.matthewnelson.kmp.tor.common.api.InternalKmpTorApi
-import io.matthewnelson.kmp.tor.common.core.SynchronizedObject
 import io.matthewnelson.kmp.tor.common.core.synchronized
+import io.matthewnelson.kmp.tor.common.core.synchronizedObject
 import io.matthewnelson.kmp.tor.runtime.core.*
 import io.matthewnelson.kmp.tor.runtime.core.UncaughtException.Handler.Companion.tryCatch
 import io.matthewnelson.kmp.tor.runtime.core.ctrl.TorCmd
@@ -48,7 +48,7 @@ protected constructor(
 
     @Volatile
     private var _destroyed: Boolean = false
-    private val lock = SynchronizedObject()
+    private val lock = synchronizedObject()
     private val observers = LinkedHashSet<TorEvent.Observer>(observers.size + 1, 1.0F)
     private val staticTag: String? = staticTag?.ifBlank { null }
 

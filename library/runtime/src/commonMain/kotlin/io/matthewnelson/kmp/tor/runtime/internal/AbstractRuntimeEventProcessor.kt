@@ -16,8 +16,8 @@
 package io.matthewnelson.kmp.tor.runtime.internal
 
 import io.matthewnelson.kmp.tor.common.api.InternalKmpTorApi
-import io.matthewnelson.kmp.tor.common.core.SynchronizedObject
 import io.matthewnelson.kmp.tor.common.core.synchronized
+import io.matthewnelson.kmp.tor.common.core.synchronizedObject
 import io.matthewnelson.kmp.tor.runtime.RuntimeEvent
 import io.matthewnelson.kmp.tor.runtime.core.OnEvent
 import io.matthewnelson.kmp.tor.runtime.ctrl.AbstractTorEventProcessor
@@ -37,7 +37,7 @@ internal abstract class AbstractRuntimeEventProcessor internal constructor(
 {
 
     private val observers = LinkedHashSet<RuntimeEvent.Observer<*>>(observersRuntimeEvent.size + 1, 1.0F)
-    private val lock = SynchronizedObject()
+    private val lock = synchronizedObject()
     protected override val handler = HandlerWithContext.of { t -> RuntimeEvent.ERROR.notifyObservers(t) }
 
     init {

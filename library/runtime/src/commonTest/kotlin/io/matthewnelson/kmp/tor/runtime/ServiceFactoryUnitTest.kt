@@ -18,8 +18,8 @@ package io.matthewnelson.kmp.tor.runtime
 import io.matthewnelson.kmp.file.InterruptedException
 import io.matthewnelson.kmp.tor.common.api.ExperimentalKmpTorApi
 import io.matthewnelson.kmp.tor.common.api.InternalKmpTorApi
-import io.matthewnelson.kmp.tor.common.core.SynchronizedObject
 import io.matthewnelson.kmp.tor.common.core.synchronized
+import io.matthewnelson.kmp.tor.common.core.synchronizedObject
 import io.matthewnelson.kmp.tor.runtime.Action.Companion.restartDaemonAsync
 import io.matthewnelson.kmp.tor.runtime.Action.Companion.startDaemonAsync
 import io.matthewnelson.kmp.tor.runtime.Action.Companion.stopDaemonAsync
@@ -51,7 +51,7 @@ class ServiceFactoryUnitTest {
         runtime.startDaemonAsync()
 
         val warnings = mutableListOf<String>()
-        val lock = SynchronizedObject()
+        val lock = synchronizedObject()
         val observer = RuntimeEvent.LOG.WARN.observer { synchronized(lock) { warnings.add(it) } }
         runtime.subscribe(observer)
 
@@ -70,7 +70,7 @@ class ServiceFactoryUnitTest {
     @Test
     fun givenNoStartJob_whenOnBind_thenEnqueuesStartJob() = runTorTest { runtime ->
         val executes = mutableListOf<ActionJob>()
-        val lock = SynchronizedObject()
+        val lock = synchronizedObject()
         val observer = RuntimeEvent.EXECUTE.ACTION.observer { synchronized(lock) { executes.add(it) } }
 
         runtime.subscribe(observer)
@@ -112,7 +112,7 @@ class ServiceFactoryUnitTest {
         }
 
         val lces = mutableListOf<Lifecycle.Event>()
-        val lock = SynchronizedObject()
+        val lock = synchronizedObject()
         runtime.subscribe(RuntimeEvent.LIFECYCLE.observer { event -> synchronized(lock) { lces.add(event) } })
 
         val actionJob = runtime.enqueue(Action.StartDaemon, {}, {}) as ActionJob.StartJob
@@ -188,7 +188,7 @@ class ServiceFactoryUnitTest {
     @Test
     fun givenActionRestart_whenAlreadyStarted_thenIsNotDestroyed() = runTorTest { runtime ->
         val lces = mutableListOf<Lifecycle.Event>()
-        val lock = SynchronizedObject()
+        val lock = synchronizedObject()
 
         val observer = RuntimeEvent.LIFECYCLE.observer { synchronized(lock) { lces.add(it) } }
         runtime.subscribe(observer)

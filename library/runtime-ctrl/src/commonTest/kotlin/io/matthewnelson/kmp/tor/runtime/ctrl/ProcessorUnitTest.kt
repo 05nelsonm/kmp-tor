@@ -16,8 +16,8 @@
 package io.matthewnelson.kmp.tor.runtime.ctrl
 
 import io.matthewnelson.kmp.tor.common.api.InternalKmpTorApi
-import io.matthewnelson.kmp.tor.common.core.SynchronizedObject
 import io.matthewnelson.kmp.tor.common.core.synchronized
+import io.matthewnelson.kmp.tor.common.core.synchronizedObject
 import io.matthewnelson.kmp.tor.runtime.core.*
 import io.matthewnelson.kmp.tor.runtime.core.net.LocalHost
 import io.matthewnelson.kmp.tor.runtime.core.net.Port.Ephemeral.Companion.toPortEphemeral
@@ -41,9 +41,9 @@ class ProcessorUnitTest {
 
     @Test
     fun givenCommands_whenMultiple_thenSingleProcessorUtilized() = runTest(timeout = 5.minutes) {
-        val lockStarts = SynchronizedObject()
-        val lockIntercept = SynchronizedObject()
-        val lockSuccess = SynchronizedObject()
+        val lockStarts = synchronizedObject()
+        val lockIntercept = synchronizedObject()
+        val lockSuccess = synchronizedObject()
 
         var processorStarts = 0
         var invocationIntercept = 0

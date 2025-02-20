@@ -20,8 +20,8 @@ package io.matthewnelson.kmp.tor.runtime.ctrl.internal
 import io.matthewnelson.kmp.file.IOException
 import io.matthewnelson.kmp.file.InterruptedException
 import io.matthewnelson.kmp.tor.common.api.InternalKmpTorApi
-import io.matthewnelson.kmp.tor.common.core.SynchronizedObject
 import io.matthewnelson.kmp.tor.common.core.synchronized
+import io.matthewnelson.kmp.tor.common.core.synchronizedObject
 import io.matthewnelson.kmp.tor.runtime.core.TorEvent
 import io.matthewnelson.kmp.tor.runtime.core.UncaughtException.Handler.Companion.tryCatch
 import io.matthewnelson.kmp.tor.runtime.core.UncaughtException.Handler.Companion.withSuppression
@@ -67,7 +67,7 @@ internal class RealTorCtrl private constructor(
     private var _isDisconnected = false
     @Volatile
     private var _closeException: IOException? = null
-    private val lock = SynchronizedObject()
+    private val lock = synchronizedObject()
 
     private val waiters = Waiters { LOG }
     private val processor = Processor(factory.interceptors)
@@ -252,7 +252,7 @@ internal class RealTorCtrl private constructor(
 
         @Volatile
         private var processorJob: Job? = null
-        private val processorLock = SynchronizedObject()
+        private val processorLock = synchronizedObject()
 
         fun start() {
             synchronized(processorLock) {

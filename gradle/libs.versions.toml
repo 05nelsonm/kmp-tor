@@ -18,7 +18,7 @@ gradle-publish-maven        = "0.30.0"
 immutable                   = "0.2.0-SNAPSHOT"
 
 kmp-process                 = "0.2.0-SNAPSHOT"
-kmp-tor-common              = "2.1.2"
+kmp-tor-common              = "2.2.0-SNAPSHOT"
 kmp-tor-resource            = "408.13.2"
 kotlincrypto-catalog        = "0.7.0-SNAPSHOT" # Utilized from settings.gradle.kts
 kotlinx-coroutines          = "1.10.1"

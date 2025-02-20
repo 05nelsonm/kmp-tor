@@ -21,8 +21,8 @@ import io.matthewnelson.immutable.collections.toImmutableSet
 import io.matthewnelson.kmp.file.InterruptedException
 import io.matthewnelson.kmp.tor.common.api.ExperimentalKmpTorApi
 import io.matthewnelson.kmp.tor.common.api.InternalKmpTorApi
-import io.matthewnelson.kmp.tor.common.core.SynchronizedObject
 import io.matthewnelson.kmp.tor.common.core.synchronized
+import io.matthewnelson.kmp.tor.common.core.synchronizedObject
 import io.matthewnelson.kmp.tor.runtime.*
 import io.matthewnelson.kmp.tor.runtime.FileID.Companion.fidEllipses
 import io.matthewnelson.kmp.tor.runtime.FileID.Companion.toFIDString
@@ -79,7 +79,7 @@ internal class RealTorRuntime private constructor(
     @Volatile
     private var _cmdQueue: TempTorCmdQueue? = null
 
-    private val enqueueLock = SynchronizedObject()
+    private val enqueueLock = synchronizedObject()
     private val actionStack = ArrayDeque<ActionJob.Sealed>(16)
     private val actionProcessor = ActionProcessor()
 
@@ -298,7 +298,7 @@ internal class RealTorRuntime private constructor(
         private var _processorJob: Job? = null
         @Volatile
         private var _executingJob: ActionJob.Sealed? = null
-        private val processorLock = SynchronizedObject()
+        private val processorLock = synchronizedObject()
 
         internal fun start(enqueuedJob: ActionJob.Sealed?) {
             synchronized(processorLock) {
@@ -787,7 +787,7 @@ internal class RealTorRuntime private constructor(
         @Volatile
         private var _cmdQueue: TempTorCmdQueue? = null
         private val actionStack = ArrayDeque<ActionJob.Sealed>(16)
-        private val lock = SynchronizedObject()
+        private val lock = synchronizedObject()
 
         private val EMPTY = TorListeners.of(fid = generator.environment)
         private val STATE_OFF = TorState.of(TorState.Daemon.Off, TorState.Network.Disabled, fid = generator.environment)

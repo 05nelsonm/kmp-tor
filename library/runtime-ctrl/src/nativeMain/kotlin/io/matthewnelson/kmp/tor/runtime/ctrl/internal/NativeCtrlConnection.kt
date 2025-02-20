@@ -22,8 +22,8 @@ import io.matthewnelson.kmp.file.errnoToIOException
 import io.matthewnelson.kmp.process.InternalProcessApi
 import io.matthewnelson.kmp.process.ReadBuffer
 import io.matthewnelson.kmp.tor.common.api.InternalKmpTorApi
-import io.matthewnelson.kmp.tor.common.core.SynchronizedObject
 import io.matthewnelson.kmp.tor.common.core.synchronized
+import io.matthewnelson.kmp.tor.common.core.synchronizedObject
 import kotlinx.cinterop.*
 import platform.posix.*
 import kotlin.concurrent.Volatile
@@ -38,7 +38,7 @@ internal class NativeCtrlConnection internal constructor(
     private var _isClosed: Boolean = false
     @Volatile
     private var _isReading: Boolean = false
-    private val lock = SynchronizedObject()
+    private val lock = synchronizedObject()
 
     override val isReading: Boolean get() = _isReading
 

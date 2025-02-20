@@ -18,8 +18,8 @@ package io.matthewnelson.kmp.tor.runtime
 import io.matthewnelson.immutable.collections.toImmutableList
 import io.matthewnelson.kmp.file.resolve
 import io.matthewnelson.kmp.tor.common.api.InternalKmpTorApi
-import io.matthewnelson.kmp.tor.common.core.SynchronizedObject
 import io.matthewnelson.kmp.tor.common.core.synchronized
+import io.matthewnelson.kmp.tor.common.core.synchronizedObject
 import io.matthewnelson.kmp.tor.runtime.Action.Companion.startDaemonAsync
 import io.matthewnelson.kmp.tor.runtime.core.OnFailure
 import io.matthewnelson.kmp.tor.runtime.core.OnSuccess
@@ -59,7 +59,7 @@ class TorCmdUnitTest {
         runtime.startDaemonAsync()
 
         val failures = mutableListOf<Throwable>()
-        val lock = SynchronizedObject()
+        val lock = synchronizedObject()
         val onFailure = OnFailure { t -> synchronized(lock) { failures.add(t) } }
         val onSuccess = OnSuccess<List<ConfigEntry>> { entries ->
             assertEquals(1, entries.size)

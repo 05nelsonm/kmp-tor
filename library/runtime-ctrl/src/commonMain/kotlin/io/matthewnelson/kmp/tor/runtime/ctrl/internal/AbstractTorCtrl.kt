@@ -16,8 +16,8 @@
 package io.matthewnelson.kmp.tor.runtime.ctrl.internal
 
 import io.matthewnelson.kmp.tor.common.api.InternalKmpTorApi
-import io.matthewnelson.kmp.tor.common.core.SynchronizedObject
 import io.matthewnelson.kmp.tor.common.core.synchronized
+import io.matthewnelson.kmp.tor.common.core.synchronizedObject
 import io.matthewnelson.kmp.tor.runtime.core.*
 import io.matthewnelson.kmp.tor.runtime.ctrl.TorCtrl
 import io.matthewnelson.kmp.tor.runtime.core.UncaughtException.Handler.Companion.tryCatch
@@ -37,7 +37,7 @@ internal abstract class AbstractTorCtrl internal constructor(
 
     @Volatile
     private var _destroyCallbacks: LinkedHashSet<ItBlock<TorCtrl>>? = LinkedHashSet(1, 1.0f)
-    private val lock = SynchronizedObject()
+    private val lock = synchronizedObject()
 
     public final override fun invokeOnDestroy(handle: ItBlock<TorCtrl>): Disposable {
         val wasAdded = synchronized(lock) {
