@@ -227,13 +227,7 @@ public class UncaughtException private constructor(
 
             /** @suppress */
             @JvmStatic
-            @Deprecated(
-                "Use withSuppression2",
-                ReplaceWith(
-                    "this.withSuppression2 { block() }",
-                    "io.matthewnelson.kmp.tor.core.UncaughtException.Handler.withSuppression2"
-                )
-            )
+            @Deprecated("Use withSuppression2", ReplaceWith("this.withSuppression2 { block() }"))
             public fun <T: Any?> Handler?.withSuppression(block: SuppressedHandler.() -> T): T {
                 return withSuppression2(block)
             }
