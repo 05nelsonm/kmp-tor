@@ -20,7 +20,7 @@ import io.matthewnelson.kmp.tor.common.core.synchronized
 import io.matthewnelson.kmp.tor.common.core.synchronizedObject
 import io.matthewnelson.kmp.tor.runtime.core.*
 import io.matthewnelson.kmp.tor.runtime.core.Destroyable.Companion.checkIsNotDestroyed
-import io.matthewnelson.kmp.tor.runtime.core.UncaughtException.Handler.Companion.withSuppression
+import io.matthewnelson.kmp.tor.runtime.core.UncaughtException.Handler.Companion.withSuppression2
 import io.matthewnelson.kmp.tor.runtime.core.ctrl.TorCmd
 import io.matthewnelson.kmp.tor.runtime.ctrl.AbstractTorEventProcessor
 import io.matthewnelson.kmp.tor.runtime.ctrl.internal.Debugger.Companion.d
@@ -155,7 +155,7 @@ internal abstract class AbstractTorCmdQueue internal constructor(
         val wasDestroyed = super.onDestroy()
 
         if (wasDestroyed) {
-            handler.withSuppression {
+            handler.withSuppression2 {
                 doCancellations(this)
 
                 @OptIn(InternalKmpTorApi::class)
@@ -182,7 +182,7 @@ internal abstract class AbstractTorCmdQueue internal constructor(
         } ?: return
 
         LOG.d { "Cancelling EnqueuedJobs" }
-        handler.withSuppression {
+        handler.withSuppression2 {
             val suppressed = this
 
             while (interrupts.isNotEmpty()) {

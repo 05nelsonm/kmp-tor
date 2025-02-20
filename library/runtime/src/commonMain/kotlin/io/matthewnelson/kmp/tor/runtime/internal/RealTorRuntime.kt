@@ -35,8 +35,8 @@ import io.matthewnelson.kmp.tor.runtime.RuntimeEvent.Notifier.Companion.i
 import io.matthewnelson.kmp.tor.runtime.RuntimeEvent.Notifier.Companion.w
 import io.matthewnelson.kmp.tor.runtime.core.Destroyable.Companion.checkIsNotDestroyed
 import io.matthewnelson.kmp.tor.runtime.core.EnqueuedJob.Companion.toImmediateErrorJob
-import io.matthewnelson.kmp.tor.runtime.core.UncaughtException.Handler.Companion.tryCatch
-import io.matthewnelson.kmp.tor.runtime.core.UncaughtException.Handler.Companion.withSuppression
+import io.matthewnelson.kmp.tor.runtime.core.UncaughtException.Handler.Companion.tryCatch2
+import io.matthewnelson.kmp.tor.runtime.core.UncaughtException.Handler.Companion.withSuppression2
 import io.matthewnelson.kmp.tor.runtime.core.config.TorOption
 import io.matthewnelson.kmp.tor.runtime.core.ctrl.TorCmd
 import io.matthewnelson.kmp.tor.runtime.core.util.executeAsync
@@ -998,12 +998,11 @@ internal class RealTorRuntime private constructor(
 
                 w(this@RealServiceFactoryDriver, "Failed to start service. Interrupting EnqueuedJobs.")
 
-                handler.withSuppression {
+                handler.withSuppression2 {
 
                     val context = name.name + " timed out"
-
                     executables.forEach { executable ->
-                        tryCatch(context) { executable.execute() }
+                        tryCatch2(context) { executable.execute() }
                     }
                 }
             }

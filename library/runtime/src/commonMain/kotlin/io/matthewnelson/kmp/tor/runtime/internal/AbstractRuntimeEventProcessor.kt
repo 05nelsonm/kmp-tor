@@ -23,8 +23,11 @@ import io.matthewnelson.kmp.tor.runtime.core.OnEvent
 import io.matthewnelson.kmp.tor.runtime.ctrl.AbstractTorEventProcessor
 import io.matthewnelson.kmp.tor.runtime.core.TorEvent
 import io.matthewnelson.kmp.tor.runtime.core.UncaughtException
-import io.matthewnelson.kmp.tor.runtime.core.UncaughtException.Handler.Companion.tryCatch
-import io.matthewnelson.kmp.tor.runtime.core.UncaughtException.Handler.Companion.withSuppression
+import io.matthewnelson.kmp.tor.runtime.core.UncaughtException.Handler.Companion.tryCatch2
+import io.matthewnelson.kmp.tor.runtime.core.UncaughtException.Handler.Companion.withSuppression2
+import kotlin.contracts.ExperimentalContracts
+import kotlin.contracts.InvocationKind
+import kotlin.contracts.contract
 
 @OptIn(InternalKmpTorApi::class)
 internal abstract class AbstractRuntimeEventProcessor internal constructor(
@@ -138,7 +141,7 @@ internal abstract class AbstractRuntimeEventProcessor internal constructor(
         }
 
         if (event is RuntimeEvent.ERROR) {
-            UncaughtException.Handler.THROW.withSuppression { notify(observers, data) }
+            UncaughtException.Handler.THROW.withSuppression2 { notify(observers, data) }
         } else {
             handler.notify(observers, data)
         }
@@ -149,7 +152,7 @@ internal abstract class AbstractRuntimeEventProcessor internal constructor(
             val ctx = ObserverContext(observer.toString(isStatic = observer.tag.isStaticTag()))
             val handlerContext = if (this is HandlerWithContext) this + ctx else ctx
 
-            tryCatch(ctx) {
+            tryCatch2(ctx) {
                 @Suppress("UNCHECKED_CAST")
                 (observer as RuntimeEvent.Observer<Data>).notify(handlerContext, defaultExecutor, data)
             }
@@ -169,10 +172,12 @@ internal abstract class AbstractRuntimeEventProcessor internal constructor(
         return true
     }
 
-    private fun <T: Any?> withObservers(
+    @OptIn(ExperimentalContracts::class)
+    private inline fun <T: Any?> withObservers(
         isNotify: Boolean = false,
         block: MutableSet<RuntimeEvent.Observer<*>>.() -> T,
     ): T {
+        contract { callsInPlace(block, InvocationKind.EXACTLY_ONCE) }
         if (destroyed && !isNotify) return block(noOpMutableSet())
 
         return synchronized(lock) {
@@ -180,5 +185,6 @@ internal abstract class AbstractRuntimeEventProcessor internal constructor(
         }
     }
 
+    // Testing
     protected final override fun registered(): Int = super.registered() + synchronized(lock) { observers.size }
 }

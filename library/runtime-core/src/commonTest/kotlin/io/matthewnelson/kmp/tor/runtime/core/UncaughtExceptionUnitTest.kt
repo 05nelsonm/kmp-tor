@@ -15,19 +15,19 @@
  **/
 package io.matthewnelson.kmp.tor.runtime.core
 
-import io.matthewnelson.kmp.tor.runtime.core.UncaughtException.Handler.Companion.tryCatch
-import io.matthewnelson.kmp.tor.runtime.core.UncaughtException.Handler.Companion.withSuppression
+import io.matthewnelson.kmp.tor.runtime.core.UncaughtException.Handler.Companion.tryCatch2
+import io.matthewnelson.kmp.tor.runtime.core.UncaughtException.Handler.Companion.withSuppression2
 import kotlin.test.*
 
 class UncaughtExceptionUnitTest {
 
     @Test
     fun givenHandler_whenEmbeddedWithSuppressionCalls_thenReturnsSameInstance() {
-        UncaughtException.Handler.THROW.withSuppression {
+        UncaughtException.Handler.THROW.withSuppression2 {
             val handler1 = this
-            withSuppression {
+            withSuppression2 {
                 val handler2 = this
-                tryCatch("") {
+                tryCatch2("") {
                     assertEquals(handler1, handler2)
                 }
             }
@@ -37,8 +37,8 @@ class UncaughtExceptionUnitTest {
     @Test
     fun givenHandler_whenWithSuppression_thenAddsMultipleExceptions() {
         val exceptions = mutableListOf<UncaughtException>()
-        UncaughtException.Handler { exceptions.add(it) }.withSuppression {
-            repeat(3) { i -> tryCatch(i) { throw IllegalStateException("$i") } }
+        UncaughtException.Handler { exceptions.add(it) }.withSuppression2 {
+            repeat(3) { i -> tryCatch2(i) { throw IllegalStateException("$i") } }
         }
 
         assertEquals(1, exceptions.size)

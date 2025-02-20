@@ -23,8 +23,8 @@ import io.matthewnelson.kmp.tor.common.api.InternalKmpTorApi
 import io.matthewnelson.kmp.tor.common.core.synchronized
 import io.matthewnelson.kmp.tor.common.core.synchronizedObject
 import io.matthewnelson.kmp.tor.runtime.core.TorEvent
-import io.matthewnelson.kmp.tor.runtime.core.UncaughtException.Handler.Companion.tryCatch
-import io.matthewnelson.kmp.tor.runtime.core.UncaughtException.Handler.Companion.withSuppression
+import io.matthewnelson.kmp.tor.runtime.core.UncaughtException.Handler.Companion.tryCatch2
+import io.matthewnelson.kmp.tor.runtime.core.UncaughtException.Handler.Companion.withSuppression2
 import io.matthewnelson.kmp.tor.runtime.core.ctrl.Reply
 import io.matthewnelson.kmp.tor.runtime.core.ctrl.TorCmd
 import io.matthewnelson.kmp.tor.runtime.ctrl.TorCmdInterceptor
@@ -182,14 +182,12 @@ internal class RealTorCtrl private constructor(
         var threw: Throwable? = null
 
         try {
-            handler.withSuppression {
+            handler.withSuppression2 {
                 val context = "RealTorCtrl.onDestroy"
 
-                tryCatch(context) { super.onDestroy() }
+                tryCatch2(context) { super.onDestroy() }
 
-                _closeException?.let { t ->
-                    tryCatch(context) { throw t }
-                }
+                _closeException?.let { t -> tryCatch2(context) { throw t } }
             }
         } catch (t: Throwable) {
             threw = t

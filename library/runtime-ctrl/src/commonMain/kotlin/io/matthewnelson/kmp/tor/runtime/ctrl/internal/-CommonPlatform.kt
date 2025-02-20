@@ -24,8 +24,8 @@ import io.matthewnelson.kmp.tor.runtime.core.OnFailure
 import io.matthewnelson.kmp.tor.runtime.core.EnqueuedJob
 import io.matthewnelson.kmp.tor.runtime.core.EnqueuedJob.Companion.toImmediateErrorJob
 import io.matthewnelson.kmp.tor.runtime.core.UncaughtException
-import io.matthewnelson.kmp.tor.runtime.core.UncaughtException.Handler.Companion.tryCatch
-import io.matthewnelson.kmp.tor.runtime.core.UncaughtException.Handler.Companion.withSuppression
+import io.matthewnelson.kmp.tor.runtime.core.UncaughtException.Handler.Companion.tryCatch2
+import io.matthewnelson.kmp.tor.runtime.core.UncaughtException.Handler.Companion.withSuppression2
 import io.matthewnelson.kmp.tor.runtime.core.config.TorOption
 import io.matthewnelson.kmp.tor.runtime.core.ctrl.TorCmd
 import kotlin.collections.removeFirst as kRemoveFirst
@@ -51,10 +51,10 @@ internal fun <T: TorCmdJob<*>> MutableList<T>.interruptAndClearAll(
 ) {
     if (isEmpty()) return
 
-    handler.withSuppression {
+    handler.withSuppression2 {
         while (isNotEmpty()) {
             val job = kRemoveFirst()
-            tryCatch(job) { job.error(InterruptedException(message)) }
+            tryCatch2(job) { job.error(InterruptedException(message)) }
         }
     }
 }

@@ -57,14 +57,18 @@ plugins.withType<YarnPlugin> {
 }
 
 apiValidation {
-    // :runtime-service & :runtime-service-ui modules are problematic on
-    // non-macOS hosts because only iOS is enabled for native there.
     @OptIn(kotlinx.validation.ExperimentalBCVApi::class)
-    klib.enabled = HostManager.hostIsMac && findProperty("KMP_TARGETS") == null
+    klib.enabled = findProperty("KMP_TARGETS") == null
 
     if (CHECK_PUBLICATION) {
         ignoredProjects.add("check-publication")
     } else {
         nonPublicMarkers.add("io.matthewnelson.kmp.tor.common.api.InternalKmpTorApi")
+
+        @OptIn(kotlinx.validation.ExperimentalBCVApi::class)
+        if (!HostManager.hostIsMac && klib.enabled) {
+            ignoredProjects.add("runtime-service")
+            ignoredProjects.add("runtime-service-ui")
+        }
     }
 }
