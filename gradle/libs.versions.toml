@@ -24,7 +24,7 @@ kotlincrypto-catalog        = "0.7.0-SNAPSHOT" # Utilized from settings.gradle.k
 kotlinx-coroutines          = "1.10.1"
 ktor                        = "2.3.11"
 
-okio                        = "3.7.0"
+okio                        = "3.10.2"
 
 [libraries]
 androidx-startup-runtime    = { module = "androidx.startup:startup-runtime", version.ref = "androidx-startup" }
