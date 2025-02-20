@@ -21,7 +21,7 @@ kmp-process                 = "0.1.2"
 kmp-tor-common              = "2.1.2"
 kmp-tor-resource            = "408.13.2"
 kotlincrypto-catalog        = "0.7.0-SNAPSHOT" # Utilized from settings.gradle.kts
-kotlinx-coroutines          = "1.8.1"
+kotlinx-coroutines          = "1.10.1"
 ktor                        = "2.3.11"
 
 okio                        = "3.7.0"
