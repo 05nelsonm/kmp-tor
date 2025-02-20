@@ -28,6 +28,9 @@ import io.matthewnelson.kmp.tor.runtime.core.UncaughtException.Handler.Companion
 import io.matthewnelson.kmp.tor.runtime.core.UncaughtException.SuppressedHandler
 import io.matthewnelson.kmp.tor.runtime.core.util.awaitAsync
 import kotlin.concurrent.Volatile
+import kotlin.contracts.ExperimentalContracts
+import kotlin.contracts.InvocationKind
+import kotlin.contracts.contract
 import kotlin.coroutines.cancellation.CancellationException
 import kotlin.jvm.*
 
@@ -607,43 +610,42 @@ public abstract class EnqueuedJob protected constructor(
     protected fun onError(cause: Throwable, withLock: ItBlock<Throwable>?): Boolean {
         if (_isCompleting || !isActive) return false
 
+        var isCancellation = false
+
         @OptIn(InternalKmpTorApi::class)
-        val completion = synchronized(lock) {
+        val error: Throwable? = synchronized(lock) {
             if (_isCompleting || !isActive) return@synchronized null
 
-            val c = if (executionPolicy.cancellation.substituteErrorWithAttempt) {
+            val e = if (executionPolicy.cancellation.substituteErrorWithAttempt) {
                 _cancellationAttempt ?: cause
             } else {
                 cause
             }
 
-            val isCancellation = c is CancellationException
+            isCancellation = e is CancellationException
 
             if (isCancellation) {
-                _cancellationException = c as CancellationException
+                _cancellationException = e as CancellationException
             }
             // Set before invoking withLock so that
             // if implementation calls again it will
             // not lock up.
             _isCompleting = true
-            withLock?.invoke(c)
+            withLock?.invoke(e)
+            e
+        }
 
-            Executable {
-                Error.doFinal {
-                    try {
-                        _onFailure?.let { it(c) }
-                    } finally {
-                        if (isCancellation) {
-                            onCancellation(_cancellationException)
-                        }
-                    }
+        if (error == null) return false
+
+        Error.doFinal {
+            try {
+                _onFailure?.let { it(error) }
+            } finally {
+                if (isCancellation) {
+                    onCancellation(_cancellationException)
                 }
             }
         }
-
-        if (completion == null) return false
-
-        completion.execute()
         return true
     }
 
@@ -662,7 +664,7 @@ public abstract class EnqueuedJob protected constructor(
         if (_isCompleting || !isActive) return false
 
         @OptIn(InternalKmpTorApi::class)
-        val completion = synchronized(lock) {
+        val cancellation = synchronized(lock) {
             if (_isCompleting || !isActive) return@synchronized null
 
             if (_state == Executing) {
@@ -678,11 +680,11 @@ public abstract class EnqueuedJob protected constructor(
             c
         }
 
-        if (completion == null) return false
+        if (cancellation == null) return false
 
         Cancelled.doFinal {
             try {
-                _onFailure?.let { it(completion) }
+                _onFailure?.let { it(cancellation) }
             } finally {
                 onCancellation(cause)
             }
@@ -691,7 +693,11 @@ public abstract class EnqueuedJob protected constructor(
         return true
     }
 
-    private fun State.doFinal(action: () -> Unit) {
+    @Suppress("LEAKED_IN_PLACE_LAMBDA")
+    @OptIn(ExperimentalContracts::class)
+    private inline fun State.doFinal(action: () -> Unit) {
+        contract { callsInPlace(action, InvocationKind.AT_MOST_ONCE) }
+
         check(_isCompleting) { "isCompleting must be true when doFinal is called" }
         check(isActive) { "isActive must be true when doFinal is called" }
 
@@ -704,9 +710,10 @@ public abstract class EnqueuedJob protected constructor(
         }
 
         val context = toString(this)
+        val contextCallbacks = "$context.invokeOnCompletion"
 
         _handler.withSuppression2 {
-            tryCatch2(context) { action() }
+            tryCatch2(context, action)
 
             @OptIn(InternalKmpTorApi::class)
             synchronized(lock) {
@@ -723,9 +730,7 @@ public abstract class EnqueuedJob protected constructor(
                 _completionCallbacks = null
                 callbacks
             }?.forEach { callback ->
-                tryCatch2("$context.invokeOnCompletion") {
-                    callback(_cancellationException)
-                }
+                tryCatch2(contextCallbacks) { callback(_cancellationException) }
             }
 
             _isCompleting = false
