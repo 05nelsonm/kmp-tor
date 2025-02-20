@@ -22,8 +22,8 @@ import io.matthewnelson.kmp.file.resolve
 import io.matthewnelson.kmp.tor.common.api.ExperimentalKmpTorApi
 import io.matthewnelson.kmp.tor.common.api.InternalKmpTorApi
 import io.matthewnelson.kmp.tor.common.api.ResourceLoader
-import io.matthewnelson.kmp.tor.common.core.SynchronizedObject
 import io.matthewnelson.kmp.tor.common.core.synchronized
+import io.matthewnelson.kmp.tor.common.core.synchronizedObject
 import io.matthewnelson.kmp.tor.runtime.*
 import io.matthewnelson.kmp.tor.runtime.Action.Companion.stopDaemonAsync
 import io.matthewnelson.kmp.tor.runtime.FileID.Companion.fidEllipses
@@ -70,12 +70,12 @@ private val TEST_ENV: TorRuntime.Environment by lazy {
 private val LOGS = mutableListOf<String>()
 
 @OptIn(InternalKmpTorApi::class)
-private val LOGS_LOCK = SynchronizedObject()
+private val LOGS_LOCK = synchronizedObject()
 
 @OptIn(InternalKmpTorApi::class)
 private object TestConfig: ConfigCallback {
 
-    private val lock = SynchronizedObject()
+    private val lock = synchronizedObject()
     private val configs = mutableListOf<ConfigCallback>()
 
     fun add(config: ConfigCallback) {

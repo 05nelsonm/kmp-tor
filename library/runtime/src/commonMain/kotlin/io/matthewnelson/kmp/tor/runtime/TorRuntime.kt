@@ -24,8 +24,8 @@ import io.matthewnelson.kmp.tor.common.api.ExperimentalKmpTorApi
 import io.matthewnelson.kmp.tor.common.api.InternalKmpTorApi
 import io.matthewnelson.kmp.tor.common.api.KmpTorDsl
 import io.matthewnelson.kmp.tor.common.api.ResourceLoader
-import io.matthewnelson.kmp.tor.common.core.SynchronizedObject
 import io.matthewnelson.kmp.tor.common.core.synchronized
+import io.matthewnelson.kmp.tor.common.core.synchronizedObject
 import io.matthewnelson.kmp.tor.runtime.FileID.Companion.toFIDString
 import io.matthewnelson.kmp.tor.runtime.core.*
 import io.matthewnelson.kmp.tor.runtime.core.config.TorConfig
@@ -560,7 +560,7 @@ public sealed interface TorRuntime:
             @Volatile
             private var _isInitialized: Boolean = false
             @OptIn(InternalKmpTorApi::class)
-            private val lock = SynchronizedObject()
+            private val lock = synchronizedObject()
 
             @JvmSynthetic
             @OptIn(InternalKmpTorApi::class)

@@ -22,8 +22,8 @@ import io.matthewnelson.kmp.file.File
 import io.matthewnelson.kmp.file.path
 import io.matthewnelson.kmp.file.toFile
 import io.matthewnelson.kmp.tor.common.api.InternalKmpTorApi
-import io.matthewnelson.kmp.tor.common.core.SynchronizedObject
 import io.matthewnelson.kmp.tor.common.core.synchronized
+import io.matthewnelson.kmp.tor.common.core.synchronizedObject
 import io.matthewnelson.kmp.tor.runtime.FileID.Companion.fidEllipses
 import io.matthewnelson.kmp.tor.runtime.core.*
 import io.matthewnelson.kmp.tor.runtime.core.net.IPSocketAddress
@@ -337,7 +337,7 @@ public class TorListeners private constructor(
         private var _listeners: TorListeners = EMPTY
         @Volatile
         private var _notifyJob: Job? = null
-        private val lock = SynchronizedObject()
+        private val lock = synchronizedObject()
 
         internal val listeners: TorListeners get() = _listeners
         internal val listenersOrEmpty: TorListeners get() = with(state) {

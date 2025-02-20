@@ -16,8 +16,8 @@
 package io.matthewnelson.kmp.tor.runtime.ctrl.internal
 
 import io.matthewnelson.kmp.tor.common.api.InternalKmpTorApi
-import io.matthewnelson.kmp.tor.common.core.SynchronizedObject
 import io.matthewnelson.kmp.tor.common.core.synchronized
+import io.matthewnelson.kmp.tor.common.core.synchronizedObject
 import io.matthewnelson.kmp.tor.runtime.core.*
 import io.matthewnelson.kmp.tor.runtime.core.Destroyable.Companion.checkIsNotDestroyed
 import io.matthewnelson.kmp.tor.runtime.core.UncaughtException.Handler.Companion.withSuppression
@@ -39,7 +39,7 @@ internal abstract class AbstractTorCmdQueue internal constructor(
     TorCmd.Privileged.Processor
 {
 
-    private val lock = SynchronizedObject()
+    private val lock = synchronizedObject()
     private val queueInterrupt: ArrayDeque<ItBlock<UncaughtException.Handler>> = ArrayDeque(1)
     private val queueExecute: ArrayDeque<TorCmdJob<*>> = ArrayDeque(64)
     @Volatile

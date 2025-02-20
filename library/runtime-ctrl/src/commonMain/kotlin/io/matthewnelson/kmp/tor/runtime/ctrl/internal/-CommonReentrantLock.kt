@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-@file:Suppress("EXPECT_ACTUAL_CLASSIFIERS_ARE_IN_BETA_WARNING", "KotlinRedundantDiagnosticSuppress")
+@file:Suppress("EXPECT_ACTUAL_CLASSIFIERS_ARE_IN_BETA_WARNING", "KotlinRedundantDiagnosticSuppress", "NOTHING_TO_INLINE")
 
 package io.matthewnelson.kmp.tor.runtime.ctrl.internal
 
@@ -21,36 +21,28 @@ import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
 
-internal expect class ReentrantLock() {
+internal expect class ReentrantLock {
     internal fun lock()
-    internal fun tryLock(): Boolean
     internal fun unlock()
 }
 
-internal expect inline fun <T: Any?> ReentrantLock.withLockImpl(
-    block: () -> T
-): T
+internal expect inline fun reentrantLock(): ReentrantLock
+
+internal expect inline fun <T: Any?> ReentrantLock.withLockImpl(block: () -> T): T
 
 @OptIn(ExperimentalContracts::class)
-internal inline fun <T: Any?> ReentrantLock.withLock(
-    block: () -> T
-): T {
-    contract {
-        callsInPlace(block, InvocationKind.EXACTLY_ONCE)
-    }
-
+@Suppress("WRONG_INVOCATION_KIND", "LEAKED_IN_PLACE_LAMBDA")
+internal inline fun <T: Any?> ReentrantLock.withLock(block: () -> T): T {
+    contract { callsInPlace(block, InvocationKind.EXACTLY_ONCE) }
     return withLockImpl(block)
 }
 
 // Needed because Jvm using withLock is not possible
 // with coroutines because block is a critical section
 @OptIn(ExperimentalContracts::class)
-internal suspend fun <T: Any?> ReentrantLock.withLockAsync(
-    block: suspend () -> T
-): T {
-    contract {
-        callsInPlace(block, InvocationKind.EXACTLY_ONCE)
-    }
+@Suppress("WRONG_INVOCATION_KIND", "LEAKED_IN_PLACE_LAMBDA")
+internal suspend fun <T: Any?> ReentrantLock.withLockAsync(block: suspend () -> T): T {
+    contract { callsInPlace(block, InvocationKind.EXACTLY_ONCE) }
 
     var threw: Throwable? = null
 

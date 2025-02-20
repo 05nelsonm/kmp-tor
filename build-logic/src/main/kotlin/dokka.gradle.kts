@@ -13,39 +13,51 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-import org.jetbrains.dokka.DokkaConfiguration.Visibility
-import org.jetbrains.dokka.gradle.DokkaTaskPartial
+import org.jetbrains.dokka.gradle.DokkaExtension
+import org.jetbrains.dokka.gradle.engine.parameters.VisibilityModifier
 import java.net.URI
+import java.time.LocalDate
 
 plugins {
     id("org.jetbrains.dokka")
 }
 
-tasks.withType<DokkaTaskPartial>().configureEach {
-    suppressInheritedMembers = true
+rootProject.dependencies { dokka(project(project.path)) }
+
+extensions.configure<DokkaExtension> {
+    dokkaPublications.configureEach {
+        suppressInheritedMembers.set(true)
+    }
 
     dokkaSourceSets.configureEach {
         includes.from("README.md")
-        noStdlibLink = true
+        enableKotlinStdLibDocumentationLink.set(false)
 
-        externalDocumentationLink {
-            url = URI("https://kmp-file.matthewnelson.io/").toURL()
+        externalDocumentationLinks {
+            register(project.path + ":kmp-file") {
+                url.set(URI("https://kmp-file.matthewnelson.io/"))
+            }
+            register(project.path + ":kmp-process") {
+                url.set(URI("https://kmp-process.matthewnelson.io/"))
+            }
+            register(project.path + ":kmp-tor-common") {
+                url.set(URI("https://kmp-tor-common.matthewnelson.io/"))
+            }
         }
-        externalDocumentationLink {
-            url = URI("https://kmp-process.matthewnelson.io/").toURL()
-        }
-        externalDocumentationLink {
-            url = URI("https://kmp-tor-common.matthewnelson.io/").toURL()
-        }
+
         sourceLink {
-            localDirectory = rootDir
-            remoteUrl = URI("https://github.com/05nelsonm/kmp-tor/tree/master").toURL()
-            remoteLineSuffix = "#L"
+            localDirectory.set(rootDir)
+            remoteUrl.set(URI("https://github.com/05nelsonm/kmp-tor/tree/master"))
+            remoteLineSuffix.set("#L")
         }
 
-        documentedVisibilities.set(setOf(
-            Visibility.PUBLIC,
-            Visibility.PROTECTED,
-        ))
+        documentedVisibilities(
+            VisibilityModifier.Public,
+            VisibilityModifier.Protected,
+        )
+    }
+
+    pluginsConfiguration.html {
+        footerMessage.set("© 2021-${LocalDate.now().year} Copyright Matthew Nelson")
     }
 }

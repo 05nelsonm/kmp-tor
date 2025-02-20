@@ -31,7 +31,7 @@ import android.os.Looper
 import io.matthewnelson.kmp.tor.common.api.ExperimentalKmpTorApi
 import io.matthewnelson.kmp.tor.common.api.InternalKmpTorApi
 import io.matthewnelson.kmp.tor.common.core.synchronized
-import io.matthewnelson.kmp.tor.common.core.SynchronizedObject
+import io.matthewnelson.kmp.tor.common.core.synchronizedObject
 import io.matthewnelson.kmp.tor.runtime.Lifecycle
 import io.matthewnelson.kmp.tor.runtime.TorRuntime
 import io.matthewnelson.kmp.tor.runtime.core.Disposable
@@ -189,7 +189,7 @@ protected constructor(
         .getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
     @OptIn(InternalKmpTorApi::class)
-    private val lock = SynchronizedObject()
+    private val lock = synchronizedObject()
 
     /**
      * Application [Context] for resolving android resources and creating

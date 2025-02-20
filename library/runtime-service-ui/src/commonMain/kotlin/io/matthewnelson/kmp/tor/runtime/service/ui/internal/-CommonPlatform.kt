@@ -17,7 +17,7 @@
 
 package io.matthewnelson.kmp.tor.runtime.service.ui.internal
 
-internal expect class NumberFormat {
+internal expect abstract class NumberFormat {
     internal fun format(number: Long): String
 }
 

@@ -16,8 +16,8 @@
 package io.matthewnelson.kmp.tor.runtime.core
 
 import io.matthewnelson.kmp.tor.common.api.InternalKmpTorApi
-import io.matthewnelson.kmp.tor.common.core.SynchronizedObject
 import io.matthewnelson.kmp.tor.common.core.synchronized
+import io.matthewnelson.kmp.tor.common.core.synchronizedObject
 import io.matthewnelson.kmp.tor.runtime.core.internal.ExecutorMainInternal
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.MainCoroutineDispatcher
@@ -257,7 +257,7 @@ public fun interface Disposable {
         public val isDisposed: Boolean get() = _disposable == null
 
         @OptIn(InternalKmpTorApi::class)
-        private val lock = if (concurrent) SynchronizedObject() else null
+        private val lock = if (concurrent) synchronizedObject() else null
 
         public override fun dispose() {
             if (_disposable == null) return
@@ -352,7 +352,7 @@ public fun interface Executable {
         public val hasExecuted: Boolean get() = _executable == null
 
         @OptIn(InternalKmpTorApi::class)
-        private val lock = if (concurrent) SynchronizedObject() else null
+        private val lock = if (concurrent) synchronizedObject() else null
 
         public override fun execute() {
             if (_executable == null) return

@@ -30,7 +30,7 @@ class ReentrantLockUnitTest {
 
     @Test
     fun givenWithLockAsync_whenBlockThrows_thenUnlocks() = runTest {
-        val lock = ReentrantLock()
+        val lock = reentrantLock()
 
         val dispatcher = newFixedThreadPoolContext(1, "Test.BG")
         currentCoroutineContext().job.invokeOnCompletion { dispatcher.close() }

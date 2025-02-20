@@ -16,8 +16,8 @@
 package io.matthewnelson.kmp.tor.runtime.core
 
 import io.matthewnelson.kmp.tor.common.api.InternalKmpTorApi
-import io.matthewnelson.kmp.tor.common.core.SynchronizedObject
 import io.matthewnelson.kmp.tor.common.core.synchronized
+import io.matthewnelson.kmp.tor.common.core.synchronizedObject
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlin.coroutines.CoroutineContext
 import kotlin.jvm.JvmField
@@ -245,7 +245,7 @@ public class UncaughtException private constructor(
         public val isActive: Boolean get() = _isActive()
 
         @OptIn(InternalKmpTorApi::class)
-        private val lock = SynchronizedObject()
+        private val lock = synchronizedObject()
 
         override fun invoke(it: UncaughtException) {
             if (!isActive) return _root(it)

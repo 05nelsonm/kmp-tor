@@ -17,8 +17,8 @@ package io.matthewnelson.kmp.tor.runtime
 
 import io.matthewnelson.kmp.file.IOException
 import io.matthewnelson.kmp.tor.common.api.InternalKmpTorApi
-import io.matthewnelson.kmp.tor.common.core.SynchronizedObject
 import io.matthewnelson.kmp.tor.common.core.synchronized
+import io.matthewnelson.kmp.tor.common.core.synchronizedObject
 import io.matthewnelson.kmp.tor.runtime.Action.Companion.startDaemonAsync
 import io.matthewnelson.kmp.tor.runtime.Action.Companion.stopDaemonAsync
 import io.matthewnelson.kmp.tor.runtime.RuntimeEvent.EXECUTE.CMD.observeSignalNewNym
@@ -40,7 +40,7 @@ class TorRuntimeUnitTest {
         config = ConfigCallback { throw IOException() }
     ) { runtime ->
         val executes = mutableListOf<ActionJob>()
-        val lock = SynchronizedObject()
+        val lock = synchronizedObject()
         val observer = RuntimeEvent.EXECUTE.ACTION.observer { job ->
             synchronized(lock) { executes.add(job) }
         }
@@ -117,7 +117,7 @@ class TorRuntimeUnitTest {
         runtime.startDaemonAsync()
 
         val notices = mutableListOf<String?>()
-        val lock = SynchronizedObject()
+        val lock = synchronizedObject()
         val disposable = runtime.observeSignalNewNym(null, null) { limited ->
             synchronized(lock) { notices.add(limited) }
         }

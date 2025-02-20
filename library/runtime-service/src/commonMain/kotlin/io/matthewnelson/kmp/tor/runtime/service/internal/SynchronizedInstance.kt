@@ -16,13 +16,13 @@
 package io.matthewnelson.kmp.tor.runtime.service.internal
 
 import io.matthewnelson.kmp.tor.common.api.InternalKmpTorApi
-import io.matthewnelson.kmp.tor.common.core.SynchronizedObject
 import io.matthewnelson.kmp.tor.common.core.synchronized
+import io.matthewnelson.kmp.tor.common.core.synchronizedObject
 
 @OptIn(InternalKmpTorApi::class)
 internal class SynchronizedInstance<T: Any> private constructor(private val instance: T) {
 
-    private val lock = SynchronizedObject()
+    private val lock = synchronizedObject()
 
     internal fun <R: Any?> withLock(block: T.() -> R): R = synchronized(lock) { block(instance) }
 

@@ -84,9 +84,7 @@ abstract class <#A: io.matthewnelson.kmp.tor.runtime.service/AbstractTorServiceU
 
         abstract class UI : io.matthewnelson.kmp.tor.runtime.service/AbstractTorServiceUI.Args // io.matthewnelson.kmp.tor.runtime.service/AbstractTorServiceUI.Args.UI|null[0]
 
-        sealed class Instance : io.matthewnelson.kmp.tor.runtime.service/AbstractTorServiceUI.Args { // io.matthewnelson.kmp.tor.runtime.service/AbstractTorServiceUI.Args.Instance|null[0]
-            constructor <init>(io.matthewnelson.kmp.tor.runtime.service/AbstractTorServiceUI.Config, kotlinx.coroutines/CoroutineScope) // io.matthewnelson.kmp.tor.runtime.service/AbstractTorServiceUI.Args.Instance.<init>|<init>(io.matthewnelson.kmp.tor.runtime.service.AbstractTorServiceUI.Config;kotlinx.coroutines.CoroutineScope){}[0]
-        }
+        sealed class Instance : io.matthewnelson.kmp.tor.runtime.service/AbstractTorServiceUI.Args // io.matthewnelson.kmp.tor.runtime.service/AbstractTorServiceUI.Args.Instance|null[0]
     }
 
     final object Companion // io.matthewnelson.kmp.tor.runtime.service/AbstractTorServiceUI.Companion|null[0]

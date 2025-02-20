@@ -19,8 +19,8 @@ package io.matthewnelson.kmp.tor.runtime.core
 
 import io.matthewnelson.kmp.tor.common.api.InternalKmpTorApi
 import io.matthewnelson.kmp.tor.common.api.KmpTorDsl
-import io.matthewnelson.kmp.tor.common.core.SynchronizedObject
 import io.matthewnelson.kmp.tor.common.core.synchronized
+import io.matthewnelson.kmp.tor.common.core.synchronizedObject
 import io.matthewnelson.kmp.tor.runtime.core.EnqueuedJob.ExecutionPolicy.Cancellation
 import io.matthewnelson.kmp.tor.runtime.core.EnqueuedJob.State.*
 import io.matthewnelson.kmp.tor.runtime.core.UncaughtException.Handler.Companion.tryCatch
@@ -69,7 +69,7 @@ public abstract class EnqueuedJob protected constructor(
     @Volatile
     private var _state: State = Enqueued
     @OptIn(InternalKmpTorApi::class)
-    private val lock = SynchronizedObject()
+    private val lock = synchronizedObject()
 
     /**
      * The [ExecutionPolicy] of this job.
