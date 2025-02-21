@@ -39,6 +39,9 @@ import io.matthewnelson.kmp.tor.runtime.service.ui.internal.content.ContentMessa
 import io.matthewnelson.kmp.tor.runtime.service.ui.internal.content.ContentNetworkWaiting
 import kotlinx.coroutines.*
 import kotlin.concurrent.Volatile
+import kotlin.contracts.ExperimentalContracts
+import kotlin.contracts.InvocationKind
+import kotlin.contracts.contract
 import kotlin.jvm.JvmName
 import kotlin.jvm.JvmSynthetic
 import kotlin.time.Duration
@@ -80,7 +83,10 @@ public class KmpTorServiceUIInstanceState<C: AbstractKmpTorServiceUIConfig> priv
         }
     }
 
-    private fun update(block: (current: UIState) -> UIState?) {
+    @OptIn(ExperimentalContracts::class)
+    private inline fun update(block: (current: UIState) -> UIState?) {
+        contract { callsInPlace(block, InvocationKind.EXACTLY_ONCE) }
+
         @OptIn(InternalKmpTorApi::class)
         synchronized(lockUpdate) {
             val old = _state
