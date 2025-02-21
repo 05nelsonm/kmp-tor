@@ -19,6 +19,9 @@ import io.matthewnelson.immutable.collections.toImmutableList
 import io.matthewnelson.kmp.tor.common.api.InternalKmpTorApi
 import io.matthewnelson.kmp.tor.common.core.synchronized
 import io.matthewnelson.kmp.tor.common.core.synchronizedObject
+import kotlin.contracts.ExperimentalContracts
+import kotlin.contracts.InvocationKind
+import kotlin.contracts.contract
 
 @OptIn(InternalKmpTorApi::class)
 internal abstract class InstanceKeeper<K: Any, V: Any> internal constructor(initialCapacity: Int = 1) {
@@ -26,28 +29,26 @@ internal abstract class InstanceKeeper<K: Any, V: Any> internal constructor(init
     private val lock = synchronizedObject()
     private val instances = ArrayList<Pair<K, V>>(initialCapacity)
 
-    protected fun getOrCreateInstance(
+    @OptIn(ExperimentalContracts::class)
+    protected inline fun getOrCreateInstance(
         key: K,
         block: (others: List<Pair<K, V>>) -> V,
-    ): V = synchronized(lock) {
-        var instance: V? = null
+    ): V {
+        contract { callsInPlace(block, InvocationKind.AT_MOST_ONCE) }
 
-        for (i in instances) {
-            if (i.first == key) {
-                instance = i.second
-                break
+        return synchronized(lock) {
+            for (i in instances) {
+                if (i.first != key) continue
+                return@synchronized i.second
             }
-        }
 
-        if (instance == null) {
+
             val others = instances.toImmutableList()
-            val i = block(others)
-            if (others.find { it.second == i } == null) {
-                instances.add(key to i)
+            val instance = block(others)
+            if (others.find { it.second == instance } == null) {
+                instances.add(key to instance)
             }
-            instance = i
+            instance
         }
-
-         instance
     }
 }
