@@ -1127,8 +1127,9 @@ public class KmpTorServiceUI private constructor(
                         instance.onDeviceLockChange()
                     }
                     serviceChildScope.launch {
+                        val lazyMessage = "DeviceIsLocked[$new]"::toString
                         for (instance in instances) {
-                            instance.debug { "DeviceIsLocked[$new]" }
+                            instance.debug(lazyMessage)
                         }
                     }
                 }
