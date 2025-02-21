@@ -62,12 +62,6 @@ abstract class <#A: io.matthewnelson.kmp.tor.runtime.service/AbstractTorServiceU
         final fun processorTorCmd(): io.matthewnelson.kmp.tor.runtime.core.ctrl/TorCmd.Unprivileged.Processor? // io.matthewnelson.kmp.tor.runtime.service/AbstractTorServiceUI.InstanceState.processorTorCmd|processorTorCmd(){}[0]
         final fun toString(): kotlin/String // io.matthewnelson.kmp.tor.runtime.service/AbstractTorServiceUI.InstanceState.toString|toString(){}[0]
         open fun onDestroy() // io.matthewnelson.kmp.tor.runtime.service/AbstractTorServiceUI.InstanceState.onDestroy|onDestroy(){}[0]
-
-        final class Lock { // io.matthewnelson.kmp.tor.runtime.service/AbstractTorServiceUI.InstanceState.Lock|null[0]
-            constructor <init>() // io.matthewnelson.kmp.tor.runtime.service/AbstractTorServiceUI.InstanceState.Lock.<init>|<init>(){}[0]
-
-            final fun <#A3: kotlin/Any?> withLock(kotlin/Function0<#A3>): #A3 // io.matthewnelson.kmp.tor.runtime.service/AbstractTorServiceUI.InstanceState.Lock.withLock|withLock(kotlin.Function0<0:0>){0§<kotlin.Any?>}[0]
-        }
     }
 
     abstract class Config { // io.matthewnelson.kmp.tor.runtime.service/AbstractTorServiceUI.Config|null[0]

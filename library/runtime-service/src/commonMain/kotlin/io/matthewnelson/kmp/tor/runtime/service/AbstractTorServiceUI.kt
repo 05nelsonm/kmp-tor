@@ -613,21 +613,6 @@ internal constructor(
             args.debugger()?.invoke(lazyMessage)
         }
 
-        /**
-         * Helper for exporting synchronization functionality to implementors
-         * for thread safety.
-         * */
-        protected class Lock {
-
-            @OptIn(InternalKmpTorApi::class)
-            private val lock = synchronizedObject()
-
-            public fun <T: Any?> withLock(block: () -> T): T {
-                @OptIn(InternalKmpTorApi::class)
-                return synchronized(lock, block)
-            }
-        }
-
         init {
             instanceJob.invokeOnCompletion {
                 // Remove instance from states before calling

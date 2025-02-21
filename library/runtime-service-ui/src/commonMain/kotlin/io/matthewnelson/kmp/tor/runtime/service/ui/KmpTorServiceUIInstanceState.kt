@@ -17,6 +17,9 @@ package io.matthewnelson.kmp.tor.runtime.service.ui
 
 import io.matthewnelson.immutable.collections.immutableSetOf
 import io.matthewnelson.kmp.tor.common.api.ExperimentalKmpTorApi
+import io.matthewnelson.kmp.tor.common.api.InternalKmpTorApi
+import io.matthewnelson.kmp.tor.common.core.synchronized
+import io.matthewnelson.kmp.tor.common.core.synchronizedObject
 import io.matthewnelson.kmp.tor.runtime.Action
 import io.matthewnelson.kmp.tor.runtime.RuntimeEvent
 import io.matthewnelson.kmp.tor.runtime.TorState
@@ -56,7 +59,8 @@ public class KmpTorServiceUIInstanceState<C: AbstractKmpTorServiceUIConfig> priv
     @Volatile
     private var _stateTor: TorState = TorState(_state.title, TorState.Network.Disabled)
 
-    private val lockUpdate = Lock()
+    @OptIn(InternalKmpTorApi::class)
+    private val lockUpdate = synchronizedObject()
 
     @get:JvmName("state")
     internal val state: UIState get() = _state
@@ -77,7 +81,8 @@ public class KmpTorServiceUIInstanceState<C: AbstractKmpTorServiceUIConfig> priv
     }
 
     private fun update(block: (current: UIState) -> UIState?) {
-        lockUpdate.withLock {
+        @OptIn(InternalKmpTorApi::class)
+        synchronized(lockUpdate) {
             val old = _state
             val new = block(old)
             if (new == null || old == new) {
@@ -96,7 +101,8 @@ public class KmpTorServiceUIInstanceState<C: AbstractKmpTorServiceUIConfig> priv
     private fun postMessage(message: ContentMessage<*>, duration: Duration) {
         if (duration <= Duration.ZERO) return
 
-        lockUpdate.withLock {
+        @OptIn(InternalKmpTorApi::class)
+        synchronized(lockUpdate) {
             val oldJob = _messageJob
             _messageJob = instanceScope.launch {
                 oldJob?.cancelAndJoin()
@@ -164,10 +170,12 @@ public class KmpTorServiceUIInstanceState<C: AbstractKmpTorServiceUIConfig> priv
         }
 
         var newNymObserver: Disposable.Once? = null
-        val stateLock = Lock()
+        @OptIn(InternalKmpTorApi::class)
+        val stateLock = synchronizedObject()
 
         val oSTATE = RuntimeEvent.STATE.observer(tag, executor) { new ->
-            stateLock.withLock {
+            @OptIn(InternalKmpTorApi::class)
+            synchronized(stateLock) {
                 val old = _stateTor
                 _stateTor = new
 
@@ -244,7 +252,8 @@ public class KmpTorServiceUIInstanceState<C: AbstractKmpTorServiceUIConfig> priv
         }
 
         val oREADY = RuntimeEvent.READY.observer(tag, executor) {
-            stateLock.withLock {
+            @OptIn(InternalKmpTorApi::class)
+            synchronized(stateLock) {
                 newNymObserver?.dispose()
                 newNymObserver = observeSignalNewNym(tag, executor) { line ->
                     val message = if (line == null) {

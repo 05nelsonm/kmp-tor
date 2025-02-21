@@ -62,6 +62,7 @@ kmpConfiguration {
                 dependencies {
                     api(project(":library:runtime-service"))
                     implementation(libs.immutable.collections)
+                    implementation(libs.kmp.tor.common.core)
                     implementation(libs.kotlinx.coroutines.core)
                 }
             }
