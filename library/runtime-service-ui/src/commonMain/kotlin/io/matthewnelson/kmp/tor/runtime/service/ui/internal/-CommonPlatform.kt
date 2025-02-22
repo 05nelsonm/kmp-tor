@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-@file:Suppress("EXPECT_ACTUAL_CLASSIFIERS_ARE_IN_BETA_WARNING", "KotlinRedundantDiagnosticSuppress")
+@file:Suppress("EXPECT_ACTUAL_CLASSIFIERS_ARE_IN_BETA_WARNING", "KotlinRedundantDiagnosticSuppress", "OPTIONAL_DECLARATION_USAGE_IN_NON_COMMON_SOURCE", "NOTHING_TO_INLINE")
 
 package io.matthewnelson.kmp.tor.runtime.service.ui.internal
 
@@ -21,5 +21,4 @@ internal expect abstract class NumberFormat {
     internal fun format(number: Long): String
 }
 
-@Suppress("NOTHING_TO_INLINE")
 internal expect inline fun numberFormat(): NumberFormat

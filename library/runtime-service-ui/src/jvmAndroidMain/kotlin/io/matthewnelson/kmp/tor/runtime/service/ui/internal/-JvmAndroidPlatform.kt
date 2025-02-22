@@ -13,14 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-@file:Suppress("EXPECT_ACTUAL_CLASSIFIERS_ARE_IN_BETA_WARNING")
+@file:Suppress("EXPECT_ACTUAL_CLASSIFIERS_ARE_IN_BETA_WARNING", "NOTHING_TO_INLINE")
 
 package io.matthewnelson.kmp.tor.runtime.service.ui.internal
 
 @Suppress("ACTUAL_WITHOUT_EXPECT")
 internal actual typealias NumberFormat = java.text.NumberFormat
 
-@Suppress("NOTHING_TO_INLINE")
 internal actual inline fun numberFormat(): NumberFormat {
     return NumberFormat.getInstance(java.util.Locale.getDefault())
 }
