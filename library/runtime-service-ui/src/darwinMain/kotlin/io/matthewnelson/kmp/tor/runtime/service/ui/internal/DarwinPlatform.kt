@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-@file:Suppress("EXPECT_ACTUAL_CLASSIFIERS_ARE_IN_BETA_WARNING", "KotlinRedundantDiagnosticSuppress")
+@file:Suppress("EXPECT_ACTUAL_CLASSIFIERS_ARE_IN_BETA_WARNING", "KotlinRedundantDiagnosticSuppress", "NOTHING_TO_INLINE")
 
 package io.matthewnelson.kmp.tor.runtime.service.ui.internal
 
@@ -27,5 +27,4 @@ internal actual abstract class NumberFormat private constructor() {
     }
 }
 
-@Suppress("NOTHING_TO_INLINE")
 internal actual inline fun numberFormat(): NumberFormat = NumberFormat.INSTANCE
