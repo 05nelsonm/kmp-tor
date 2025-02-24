@@ -18,6 +18,7 @@ package io.matthewnelson.kmp.tor.runtime.core.ctrl
 import io.matthewnelson.immutable.collections.toImmutableSet
 import io.matthewnelson.kmp.tor.runtime.core.key.AddressKey
 import io.matthewnelson.kmp.tor.runtime.core.key.AuthKey
+import org.kotlincrypto.error.KeyException
 import kotlin.jvm.JvmField
 import kotlin.jvm.JvmStatic
 
@@ -44,7 +45,7 @@ public class HiddenServiceEntry private constructor(
         /**
          * Creates a new [HiddenServiceEntry] for provided key(s).
          *
-         * @throws [IllegalArgumentException] if key algorithms do not match.
+         * @throws [KeyException] if key algorithms do not match.
          * */
         @JvmStatic
         public fun of(
@@ -59,10 +60,12 @@ public class HiddenServiceEntry private constructor(
             val aPublic = publicKey.algorithm()
             val aPrivate = privateKey.algorithm()
 
-            require(aPublic == aPrivate) {
-                "Incompatible key types. " +
-                "AddressKey.PublicKey[$aPublic]. " +
-                "AddressKey.PrivateKey[$aPrivate]"
+            if (aPublic != aPrivate) {
+                throw KeyException(
+                    "Incompatible key types. " +
+                    "AddressKey.PublicKey[$aPublic]. " +
+                    "AddressKey.PrivateKey[$aPrivate]"
+                )
             }
 
             return HiddenServiceEntry(
