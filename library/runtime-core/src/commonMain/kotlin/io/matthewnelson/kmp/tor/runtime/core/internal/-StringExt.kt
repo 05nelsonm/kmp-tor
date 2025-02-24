@@ -17,9 +17,6 @@
 
 package io.matthewnelson.kmp.tor.runtime.core.internal
 
-import io.matthewnelson.encoding.base16.Base16
-import io.matthewnelson.encoding.base32.Base32
-import io.matthewnelson.encoding.base64.Base64
 import io.matthewnelson.encoding.core.Decoder
 import io.matthewnelson.encoding.core.Decoder.Companion.decodeToByteArrayOrNull
 

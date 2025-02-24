@@ -9,6 +9,7 @@ module io.matthewnelson.kmp.tor.runtime.core {
     requires transitive io.matthewnelson.kmp.tor.common.api;
     requires io.matthewnelson.kmp.tor.common.core;
     requires kotlinx.coroutines.core;
+    requires transitive org.kotlincrypto.error;
 
     exports io.matthewnelson.kmp.tor.runtime.core;
     exports io.matthewnelson.kmp.tor.runtime.core.config;
