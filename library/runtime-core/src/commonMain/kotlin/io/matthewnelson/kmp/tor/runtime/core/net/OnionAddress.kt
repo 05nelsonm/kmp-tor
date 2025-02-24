@@ -70,7 +70,6 @@ public sealed class OnionAddress private constructor(value: String): Address(val
          * */
         @JvmStatic
         @JvmName("get")
-        @Throws(IllegalArgumentException::class)
         public fun String.toOnionAddress(): OnionAddress {
             return toOnionAddressOrNull()
                 ?: throw IllegalArgumentException("$this does not contain an onion address")
@@ -86,7 +85,6 @@ public sealed class OnionAddress private constructor(value: String): Address(val
          * */
         @JvmStatic
         @JvmName("get")
-        @Throws(IllegalArgumentException::class)
         public fun ByteArray.toOnionAddress(): OnionAddress {
             return toOnionAddressOrNull()
                 ?: throw IllegalArgumentException("bytes are not an onion address")
@@ -161,7 +159,6 @@ public sealed class OnionAddress private constructor(value: String): Address(val
              * */
             @JvmStatic
             @JvmName("get")
-            @Throws(IllegalArgumentException::class)
             public fun String.toOnionAddressV3(): V3 {
                 return toOnionAddressV3OrNull()
                     ?: throw IllegalArgumentException("$this does not contain a v3 onion address")
@@ -175,7 +172,6 @@ public sealed class OnionAddress private constructor(value: String): Address(val
              * */
             @JvmStatic
             @JvmName("get")
-            @Throws(IllegalArgumentException::class)
             public fun ByteArray.toOnionAddressV3(): V3 {
                 return toOnionAddressV3OrNull()
                     ?: throw IllegalArgumentException("bytes are not a v3 onion address")
@@ -204,13 +200,7 @@ public sealed class OnionAddress private constructor(value: String): Address(val
             @JvmName("getOrNull")
             public fun ByteArray.toOnionAddressV3OrNull(): V3? {
                 if (size != BYTE_SIZE) return null
-
-                val encoded = encodeToString(Base32Default {
-                    encodeToLowercase = true
-                    padEncoded = false
-                })
-
-                return V3(encoded)
+                return V3(encodeToString(BASE32_ENCODE))
             }
 
             @JvmSynthetic
@@ -226,6 +216,10 @@ public sealed class OnionAddress private constructor(value: String): Address(val
 
             internal const val BYTE_SIZE: Int = 35
             private val REGEX: Regex = "[${Base32.Default.CHARS_LOWER}]{56}".toRegex()
+            private val BASE32_ENCODE = Base32Default {
+                encodeToLowercase = true
+                padEncoded = false
+            }
         }
     }
 

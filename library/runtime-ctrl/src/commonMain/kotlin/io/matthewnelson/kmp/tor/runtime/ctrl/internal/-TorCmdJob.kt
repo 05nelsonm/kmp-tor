@@ -32,8 +32,9 @@ import io.matthewnelson.kmp.tor.runtime.core.key.ED25519_V3.PublicKey.Companion.
 import io.matthewnelson.kmp.tor.runtime.core.key.X25519
 import io.matthewnelson.kmp.tor.runtime.core.key.X25519.PrivateKey.Companion.toX25519PrivateKeyOrNull
 import io.matthewnelson.kmp.tor.runtime.core.key.X25519.PublicKey.Companion.toX25519PublicKeyOrNull
+import org.kotlincrypto.error.KeyException
 
-@Throws(IllegalArgumentException::class, NoSuchElementException::class)
+@Throws(IllegalArgumentException::class, KeyException::class, NoSuchElementException::class)
 internal fun TorCmdJob<*>.respond(replies: ArrayList<Reply>) {
     // waiters were destroyed while awaiting server response (i.e. EOS)
     if (replies.isEmpty()) {
@@ -117,7 +118,7 @@ private fun TorCmd.MapAddress.complete(job: TorCmdJob<*>, replies: ArrayList<Rep
     job.unsafeCast<Set<AddressMapping.Result>>().completion(set.toImmutableSet())
 }
 
-@Throws(IllegalArgumentException::class, NoSuchElementException::class)
+@Throws(KeyException::class, NoSuchElementException::class)
 private fun TorCmd.Onion.Add.complete(job: TorCmdJob<*>, replies: ArrayList<Reply.Success>) {
     @Suppress("LocalVariableName")
     var _publicKey: AddressKey.Public? = null
@@ -159,7 +160,7 @@ private fun TorCmd.Onion.Add.complete(job: TorCmdJob<*>, replies: ArrayList<Repl
     job.unsafeCast<HiddenServiceEntry>().completion(entry)
 }
 
-@Throws(IllegalArgumentException::class, NoSuchElementException::class)
+@Throws(KeyException::class, NoSuchElementException::class)
 private fun TorCmd.OnionClientAuth.View.complete(job: TorCmdJob<*>, replies: ArrayList<Reply.Success>) {
     // 250 CLIENT {onion address} {algorithm}:[Blob Redacted] Flags=Permanent ClientName=test0
     // 250 CLIENT {onion address} {algorithm}:[Blob Redacted] ClientName=test1

@@ -18,6 +18,7 @@ package io.matthewnelson.kmp.tor.runtime.core.ctrl
 import io.matthewnelson.immutable.collections.toImmutableSet
 import io.matthewnelson.kmp.tor.runtime.core.net.OnionAddress
 import io.matthewnelson.kmp.tor.runtime.core.key.AuthKey
+import org.kotlincrypto.error.KeyException
 import kotlin.jvm.JvmField
 import kotlin.jvm.JvmStatic
 
@@ -44,10 +45,9 @@ public class ClientAuthEntry private constructor(
         /**
          * Creates a new [ClientAuthEntry] for provided key(s).
          *
-         * @throws [IllegalArgumentException] if key types are incompatible.
+         * @throws [KeyException] if key types are incompatible.
          * */
         @JvmStatic
-        @Throws(IllegalArgumentException::class)
         public fun of(
             address: OnionAddress,
             privateKey: AuthKey.Private,
@@ -56,10 +56,12 @@ public class ClientAuthEntry private constructor(
         ): ClientAuthEntry {
             val addressKey = address.asPublicKey()
 
-            require(privateKey.isCompatibleWith(addressKey)) {
-                "Incompatible key types." +
-                " AddressKey.Public[${addressKey.algorithm()}]." +
-                " AuthKey.Private[${privateKey.algorithm()}]"
+            if (!privateKey.isCompatibleWith(addressKey)) {
+                throw KeyException(
+                    "Incompatible key types." +
+                    " AddressKey.Public[${addressKey.algorithm()}]." +
+                    " AuthKey.Private[${privateKey.algorithm()}]"
+                )
             }
 
             return ClientAuthEntry(

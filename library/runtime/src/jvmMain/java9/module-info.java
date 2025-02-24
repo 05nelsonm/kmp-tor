@@ -6,8 +6,8 @@ module io.matthewnelson.kmp.tor.runtime {
     requires io.matthewnelson.kmp.tor.runtime.ctrl;
     requires transitive io.matthewnelson.kmp.tor.runtime.core;
     requires kotlinx.coroutines.core;
-    requires org.kotlincrypto.random;
     requires org.kotlincrypto.hash.sha2;
+    requires org.kotlincrypto.random;
 
     exports io.matthewnelson.kmp.tor.runtime;
 }

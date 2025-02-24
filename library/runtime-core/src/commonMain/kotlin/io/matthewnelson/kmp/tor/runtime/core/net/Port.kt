@@ -85,7 +85,6 @@ public open class Port private constructor(
          * */
         @JvmStatic
         @JvmName("get")
-        @Throws(IllegalArgumentException::class)
         public fun Int.toPort(): Port {
             return toPortOrNull()
                 ?: throw IllegalArgumentException("$this is not a valid port")
@@ -104,7 +103,6 @@ public open class Port private constructor(
          * */
         @JvmStatic
         @JvmName("get")
-        @Throws(IllegalArgumentException::class)
         public fun String.toPort(): Port {
             return toPortOrNull()
                 ?: throw IllegalArgumentException("$this does not contain a port")
@@ -225,7 +223,6 @@ public open class Port private constructor(
              * */
             @JvmStatic
             @JvmName("get")
-            @Throws(IllegalArgumentException::class)
             public fun Int.toPortEphemeral(): Ephemeral {
                 return toPortEphemeralOrNull()
                     ?: throw IllegalArgumentException("$this is not a valid ephemeral port")
@@ -241,7 +238,6 @@ public open class Port private constructor(
              * */
             @JvmStatic
             @JvmName("get")
-            @Throws(IllegalArgumentException::class)
             public fun String.toPortEphemeral(): Ephemeral {
                 return toPortEphemeralOrNull()
                     ?: throw IllegalArgumentException("$this does not contain a valid ephemeral port")

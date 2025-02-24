@@ -22,6 +22,7 @@ import io.matthewnelson.kmp.tor.runtime.core.net.OnionAddress.V3.Companion.toOni
 import io.matthewnelson.kmp.tor.runtime.core.internal.tryDecodeOrNull
 import io.matthewnelson.kmp.tor.runtime.core.key.ED25519_V3.PublicKey.Companion.toED25519_V3PublicKey
 import io.matthewnelson.kmp.tor.runtime.core.key.ED25519_V3.PublicKey.Companion.toED25519_V3PublicKeyOrNull
+import org.kotlincrypto.error.InvalidKeyException
 import kotlin.jvm.JvmName
 import kotlin.jvm.JvmStatic
 
@@ -60,28 +61,26 @@ public object ED25519_V3: KeyType.Address<ED25519_V3.PublicKey, ED25519_V3.Priva
              * address itself, or Base 16/32/64 encoded raw value.
              *
              * @return [ED25519_V3.PublicKey]
-             * @throws [IllegalArgumentException] if no key is found
+             * @throws [InvalidKeyException] if no key is found
              * */
             @JvmStatic
             @JvmName("get")
-            @Throws(IllegalArgumentException::class)
             public fun String.toED25519_V3PublicKey(): PublicKey {
                 return toED25519_V3PublicKeyOrNull()
-                    ?: throw IllegalArgumentException("$this is not an ${algorithm()} public key")
+                    ?: throw InvalidKeyException("$this is not an ${algorithm()} public key")
             }
 
             /**
              * Transforms provided bytes into a ED25519-V3 public key.
              *
              * @return [ED25519_V3.PublicKey]
-             * @throws [IllegalArgumentException] if byte array size is inappropriate
+             * @throws [InvalidKeyException] if byte array size is inappropriate
              * */
             @JvmStatic
             @JvmName("get")
-            @Throws(IllegalArgumentException::class)
             public fun ByteArray.toED25519_V3PublicKey(): PublicKey {
                 return toED25519_V3PublicKeyOrNull()
-                    ?: throw IllegalArgumentException("bytes are not an ${algorithm()} public key")
+                    ?: throw InvalidKeyException("bytes are not an ${algorithm()} public key")
             }
 
             /**
@@ -147,28 +146,26 @@ public object ED25519_V3: KeyType.Address<ED25519_V3.PublicKey, ED25519_V3.Priva
              * String can be a Base 16/32/64 encoded raw value.
              *
              * @return [ED25519_V3.PrivateKey]
-             * @throws [IllegalArgumentException] if no key is found
+             * @throws [InvalidKeyException] if no key is found
              * */
             @JvmStatic
             @JvmName("get")
-            @Throws(IllegalArgumentException::class)
             public fun String.toED25519_V3PrivateKey(): PrivateKey {
                 return toED25519_V3PrivateKeyOrNull()
-                    ?: throw IllegalArgumentException("Tried base 16/32/64 decoding, but failed to find a $BYTE_SIZE byte key")
+                    ?: throw InvalidKeyException("Tried base 16/32/64 decoding, but failed to find a $BYTE_SIZE byte key")
             }
 
             /**
              * Transforms provided bytes into a ED25519-V3 private key.
              *
              * @return [ED25519_V3.PrivateKey]
-             * @throws [IllegalArgumentException] if byte array size is inappropriate
+             * @throws [InvalidKeyException] if byte array size is inappropriate
              * */
             @JvmStatic
             @JvmName("get")
-            @Throws(IllegalArgumentException::class)
             public fun ByteArray.toED25519_V3PrivateKey(): PrivateKey {
                 return toED25519_V3PrivateKeyOrNull()
-                    ?: throw IllegalArgumentException("Invalid key size. Must be $BYTE_SIZE bytes")
+                    ?: throw InvalidKeyException("Invalid key size. Must be $BYTE_SIZE bytes")
             }
 
             /**

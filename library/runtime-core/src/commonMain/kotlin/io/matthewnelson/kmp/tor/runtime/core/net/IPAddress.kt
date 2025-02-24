@@ -80,7 +80,6 @@ public sealed class IPAddress private constructor(
          * */
         @JvmStatic
         @JvmName("get")
-        @Throws(IllegalArgumentException::class)
         public fun String.toIPAddress(): IPAddress {
             return toIPAddressOrNull()
                 ?: throw IllegalArgumentException("$this does not contain an IP address")
@@ -94,7 +93,6 @@ public sealed class IPAddress private constructor(
          * */
         @JvmStatic
         @JvmName("get")
-        @Throws(IllegalArgumentException::class)
         public fun ByteArray.toIPAddress(): IPAddress {
             return toIPAddressOrNull()
                 ?: throw IllegalArgumentException("Invalid array size[$size]")
@@ -163,7 +161,6 @@ public sealed class IPAddress private constructor(
              * */
             @JvmStatic
             @JvmName("get")
-            @Throws(IllegalArgumentException::class)
             public fun String.toIPAddressV4(): V4 {
                 return toIPAddressV4OrNull()
                     ?: throw IllegalArgumentException("$this does not contain an IPv4 address")
@@ -177,7 +174,6 @@ public sealed class IPAddress private constructor(
              * */
             @JvmStatic
             @JvmName("get")
-            @Throws(IllegalArgumentException::class)
             public fun ByteArray.toIPAddressV4(): V4 {
                 return toIPAddressV4(copy = true)
             }
@@ -322,7 +318,6 @@ public sealed class IPAddress private constructor(
                  *   string, or an integer less than 1.
                  * */
                 @JvmStatic
-                @Throws(IllegalArgumentException::class)
                 public fun of(scope: String?): AnyHost {
                     if (scope == null) return NoScope
                     val msg = scope.isValidScopeOrErrorMessage()
@@ -345,7 +340,6 @@ public sealed class IPAddress private constructor(
              * */
             @JvmStatic
             @JvmName("get")
-            @Throws(IllegalArgumentException::class)
             public fun String.toIPAddressV6(): V6 {
                 return toIPAddressV6OrNull()
                     ?: throw IllegalArgumentException("$this does not contain a valid IPv6 address")
@@ -362,7 +356,6 @@ public sealed class IPAddress private constructor(
             @JvmStatic
             @JvmOverloads
             @JvmName("get")
-            @Throws(IllegalArgumentException::class)
             public fun ByteArray.toIPAddressV6(scope: String? = null): V6 {
                 return toIPAddressV6(scope, copy = true)
             }

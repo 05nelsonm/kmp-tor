@@ -26,7 +26,7 @@ rootProject.dependencies { dokka(project(project.path)) }
 
 extensions.configure<DokkaExtension> {
     dokkaPublications.configureEach {
-        suppressInheritedMembers.set(true)
+        suppressObviousFunctions.set(true)
     }
 
     dokkaSourceSets.configureEach {
@@ -34,6 +34,9 @@ extensions.configure<DokkaExtension> {
         enableKotlinStdLibDocumentationLink.set(false)
 
         externalDocumentationLinks {
+            register(project.path + ":error") {
+                url.set(URI("https://error.kotlincrypto.org/"))
+            }
             register(project.path + ":kmp-file") {
                 url.set(URI("https://kmp-file.matthewnelson.io/"))
             }

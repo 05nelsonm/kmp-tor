@@ -18,6 +18,7 @@ package io.matthewnelson.kmp.tor.runtime.core.key
 import io.matthewnelson.kmp.tor.runtime.core.internal.tryDecodeOrNull
 import io.matthewnelson.kmp.tor.runtime.core.key.X25519.PublicKey.Companion.toX25519PublicKey
 import io.matthewnelson.kmp.tor.runtime.core.key.X25519.PublicKey.Companion.toX25519PublicKeyOrNull
+import org.kotlincrypto.error.InvalidKeyException
 import kotlin.jvm.JvmName
 import kotlin.jvm.JvmStatic
 import kotlin.jvm.JvmSynthetic
@@ -60,28 +61,26 @@ public object X25519: KeyType.Auth<X25519.PublicKey, X25519.PrivateKey>() {
              * String can be a Base 16/32/64 encoded raw value.
              *
              * @return [X25519.PublicKey]
-             * @throws [IllegalArgumentException] if no key is found
+             * @throws [InvalidKeyException] if no key is found
              * */
             @JvmStatic
             @JvmName("get")
-            @Throws(IllegalArgumentException::class)
             public fun String.toX25519PublicKey(): PublicKey {
                 return toX25519PublicKeyOrNull()
-                    ?: throw IllegalArgumentException("Tried base 16/32/64 decoding, but failed to find a $BYTE_SIZE byte key")
+                    ?: throw InvalidKeyException("Tried base 16/32/64 decoding, but failed to find a $BYTE_SIZE byte key")
             }
 
             /**
              * Transforms provided bytes into a x25519 public key.
              *
              * @return [X25519.PublicKey]
-             * @throws [IllegalArgumentException] if byte array size is inappropriate
+             * @throws [InvalidKeyException] if byte array size is inappropriate
              * */
             @JvmStatic
             @JvmName("get")
-            @Throws(IllegalArgumentException::class)
             public fun ByteArray.toX25519PublicKey(): PublicKey {
                 return toX25519PublicKeyOrNull()
-                    ?: throw IllegalArgumentException("Invalid key size. Must be $BYTE_SIZE bytes")
+                    ?: throw InvalidKeyException("Invalid key size. Must be $BYTE_SIZE bytes")
             }
 
             /**
@@ -143,28 +142,26 @@ public object X25519: KeyType.Auth<X25519.PublicKey, X25519.PrivateKey>() {
              * String can be a Base 16/32/64 encoded raw value.
              *
              * @return [X25519.PrivateKey]
-             * @throws [IllegalArgumentException] if no key is found
+             * @throws [InvalidKeyException] if no key is found
              * */
             @JvmStatic
             @JvmName("get")
-            @Throws(IllegalArgumentException::class)
             public fun String.toX25519PrivateKey(): PrivateKey {
                 return toX25519PrivateKeyOrNull()
-                    ?: throw IllegalArgumentException("Tried base 16/32/64 decoding, but failed to find a $BYTE_SIZE byte key")
+                    ?: throw InvalidKeyException("Tried base 16/32/64 decoding, but failed to find a $BYTE_SIZE byte key")
             }
 
             /**
              * Transforms provided bytes into a x25519 private key.
              *
              * @return [X25519.PrivateKey]
-             * @throws [IllegalArgumentException] if byte array size is inappropriate
+             * @throws [InvalidKeyException] if byte array size is inappropriate
              * */
             @JvmStatic
             @JvmName("get")
-            @Throws(IllegalArgumentException::class)
             public fun ByteArray.toX25519PrivateKey(): PrivateKey {
                 return toX25519PrivateKeyOrNull()
-                    ?: throw IllegalArgumentException("Invalid key size. Must be $BYTE_SIZE bytes")
+                    ?: throw InvalidKeyException("Invalid key size. Must be $BYTE_SIZE bytes")
             }
 
             /**

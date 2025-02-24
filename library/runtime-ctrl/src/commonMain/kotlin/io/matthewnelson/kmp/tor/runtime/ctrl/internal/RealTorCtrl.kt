@@ -334,7 +334,7 @@ internal class RealTorCtrl private constructor(
 
                 try {
                     cmdJob.respond(replies)
-                } catch (e: RuntimeException) {
+                } catch (e: Exception) {
                     cmdJob.error(e)
                 }
             }.invokeOnCompletion { t ->
