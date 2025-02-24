@@ -47,7 +47,6 @@ public class HiddenServiceEntry private constructor(
          * @throws [IllegalArgumentException] if key algorithms do not match.
          * */
         @JvmStatic
-        @Throws(IllegalArgumentException::class)
         public fun of(
             publicKey: AddressKey.Public,
             privateKey: AddressKey.Private?,

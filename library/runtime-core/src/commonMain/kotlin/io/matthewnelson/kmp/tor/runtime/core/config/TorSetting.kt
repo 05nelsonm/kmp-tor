@@ -394,6 +394,7 @@ public class TorSetting private constructor(
             }
         }
 
+        /** @suppress */
         protected companion object {
             @JvmSynthetic
             internal val INIT = Any()

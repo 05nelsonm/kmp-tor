@@ -64,7 +64,6 @@ public object X25519: KeyType.Auth<X25519.PublicKey, X25519.PrivateKey>() {
              * */
             @JvmStatic
             @JvmName("get")
-            @Throws(IllegalArgumentException::class)
             public fun String.toX25519PublicKey(): PublicKey {
                 return toX25519PublicKeyOrNull()
                     ?: throw IllegalArgumentException("Tried base 16/32/64 decoding, but failed to find a $BYTE_SIZE byte key")
@@ -78,7 +77,6 @@ public object X25519: KeyType.Auth<X25519.PublicKey, X25519.PrivateKey>() {
              * */
             @JvmStatic
             @JvmName("get")
-            @Throws(IllegalArgumentException::class)
             public fun ByteArray.toX25519PublicKey(): PublicKey {
                 return toX25519PublicKeyOrNull()
                     ?: throw IllegalArgumentException("Invalid key size. Must be $BYTE_SIZE bytes")
@@ -147,7 +145,6 @@ public object X25519: KeyType.Auth<X25519.PublicKey, X25519.PrivateKey>() {
              * */
             @JvmStatic
             @JvmName("get")
-            @Throws(IllegalArgumentException::class)
             public fun String.toX25519PrivateKey(): PrivateKey {
                 return toX25519PrivateKeyOrNull()
                     ?: throw IllegalArgumentException("Tried base 16/32/64 decoding, but failed to find a $BYTE_SIZE byte key")
@@ -161,7 +158,6 @@ public object X25519: KeyType.Auth<X25519.PublicKey, X25519.PrivateKey>() {
              * */
             @JvmStatic
             @JvmName("get")
-            @Throws(IllegalArgumentException::class)
             public fun ByteArray.toX25519PrivateKey(): PrivateKey {
                 return toX25519PrivateKeyOrNull()
                     ?: throw IllegalArgumentException("Invalid key size. Must be $BYTE_SIZE bytes")

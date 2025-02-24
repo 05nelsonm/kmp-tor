@@ -58,7 +58,6 @@ public fun Inet6Address.toIPAddressV6(): IPAddress.V6 {
  *   network interface name that does not exist on the host machine.
  * */
 @JvmName("inetAddressOf")
-@Throws(SocketException::class)
 public fun IPAddress.toInetAddress(): InetAddress = when(this) {
     is IPAddress.V4 -> toInet4Address()
     is IPAddress.V6 -> toInet6Address()
@@ -79,7 +78,6 @@ public fun IPAddress.V4.toInet4Address(): Inet4Address {
  *   network interface name that does not exist on the host machine.
  * */
 @JvmName("inet6AddressOf")
-@Throws(SocketException::class)
 public fun IPAddress.V6.toInet6Address(): Inet6Address {
     val scope = scope
     val scopeId = scope?.toIntOrNull()

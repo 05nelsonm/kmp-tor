@@ -55,7 +55,6 @@ public actual suspend fun Port.isAvailableAsync(
  * @throws [IOException] if no ports are available
  * @throws [CancellationException] if underlying coroutine was cancelled
  * */
-// @Throws(IOException::class, CancellationException::class)
 public actual suspend fun Port.Ephemeral.findNextAvailableAsync(
     limit: Int,
     host: LocalHost,

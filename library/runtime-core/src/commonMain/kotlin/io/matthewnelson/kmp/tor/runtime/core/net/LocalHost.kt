@@ -45,13 +45,11 @@ public sealed class LocalHost private constructor(): Address("localhost") {
      * @throws [IOException] if there were any errors (e.g. calling
      *   from Main thread on Android)
      * */
-    @Throws(IOException::class)
     public abstract fun resolve(): IPAddress
 
     public object IPv4: LocalHost() {
 
-        @Throws(IOException::class)
-        override fun resolve(): IPAddress.V4 = Cache.resolve(checkCache = true).firstOrThrow()
+        public override fun resolve(): IPAddress.V4 = Cache.resolve(checkCache = true).firstOrThrow()
 
         @JvmSynthetic
         internal override fun fromCache(): IPAddress.V4? = Cache.getOrNull()?.firstOrNull()
@@ -59,8 +57,7 @@ public sealed class LocalHost private constructor(): Address("localhost") {
 
     public object IPv6: LocalHost() {
 
-        @Throws(IOException::class)
-        override fun resolve(): IPAddress.V6 = Cache.resolve(checkCache = true).firstOrThrow()
+        public override fun resolve(): IPAddress.V6 = Cache.resolve(checkCache = true).firstOrThrow()
 
         @JvmSynthetic
         internal override fun fromCache(): IPAddress.V6? = Cache.getOrNull()?.firstOrNull()

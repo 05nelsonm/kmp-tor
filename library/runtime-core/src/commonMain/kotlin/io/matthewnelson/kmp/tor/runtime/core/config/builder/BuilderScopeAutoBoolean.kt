@@ -67,7 +67,7 @@ public class BuilderScopeAutoBoolean: TorSetting.BuilderScope {
             // TorOption.default is checked for "auto", "1", or "0"
             // in tests to ensure proper default is always had for
             // TorSetting.BuilderScope.argument, and mitigate runtime
-            // overhead a `require` block would have here. Test fails
+            // overhead of a `require` block would have here. Test fails
             // if default for given TorOption is invalid.
             return BuilderScopeAutoBoolean(this)
         }

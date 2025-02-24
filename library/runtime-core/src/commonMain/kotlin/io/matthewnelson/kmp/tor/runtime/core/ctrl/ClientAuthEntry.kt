@@ -47,7 +47,6 @@ public class ClientAuthEntry private constructor(
          * @throws [IllegalArgumentException] if key types are incompatible.
          * */
         @JvmStatic
-        @Throws(IllegalArgumentException::class)
         public fun of(
             address: OnionAddress,
             privateKey: AuthKey.Private,

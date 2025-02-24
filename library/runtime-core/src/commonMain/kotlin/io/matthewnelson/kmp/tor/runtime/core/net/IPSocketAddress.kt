@@ -64,7 +64,6 @@ public class IPSocketAddress(
          * */
         @JvmStatic
         @JvmName("get")
-        @Throws(IllegalArgumentException::class)
         public fun String.toIPSocketAddress(): IPSocketAddress {
             return toIPSocketAddressOrNull()
                 ?: throw IllegalArgumentException("$this does not contain a valid IP address & port")
