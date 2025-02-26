@@ -1,5 +1,27 @@
 # CHANGELOG
 
+## Version 2.1.0 (2025-02-26)
+ - Updates `kotlin` to `2.1.10` [[#563]][563]
+ - Updates `android-gradle-plugin` to `8.7.3` [[#563]][563]
+ - Updates `encoding` to `2.4.0` [[#563]][563]
+ - Updates `immutable` to `0.2.0` [[#563]][563]
+ - Updates `kmp-process` to `0.2.0` [[#563]][563]
+ - Updates `kmp-tor-common` to `2.2.0` [[#563]][563]
+ - Updates `kotlincrypto.bitops` to `0.2.0` [[#563]][563]
+ - Updates `kotlincrypto.hash` to `0.7.0` [[#563]][563]
+ - Updates `kotlincrypto.random` to `0.5.0` [[#563]][563]
+ - Updates `kotlinx.coroutines` to `1.10.1` [[#563]][563]
+ - Adds `UncaughtException.Handler` extension functions `tryCatch2` and `withSuppression2` [[#566]][566]
+ - Deprecates `UncaughtException.Handler` extension functions `tryCatch` and `withSuppression` [[#566]][566]
+ - Performance improvements to higher order functions via inlining [[#566]][566] [[#569]][569]
+ - `X25519` and `ED25519` instantiation extension functions now throw `InvalidKeyException` instead 
+   of `IllegalArgumentException` when raw keys are inappropriate [[#573]][573]
+ - `ClientAuthEntry.of` and `HiddenServiceEntry.of` now throw `KeyException` instead 
+   of `IllegalArgumentException` when key types are inappropriate [[#573]][573]
+ - Removes `@Throws` annotation from wrapper class (e.g. `Port`, `OnionAddress`, ...) instantiation 
+   extension functions, in favor of expressing constraints via documentation [[#573]][573]
+ - Removes class `AbstractTorServiceUI.InstanceState.Lock` [[#569]][569]
+
 ## Version 2.0.0 (2025-02-13)
  - Updates `kmp-tor-common` to `2.1.2` [[#560]][560]
  - Updates `kotlincrypto.bitops` to `0.1.2` [[#560]][560]
@@ -524,6 +546,10 @@
 [558]: https://github.com/05nelsonm/kmp-tor/pull/558
 [560]: https://github.com/05nelsonm/kmp-tor/pull/560
 [562]: https://github.com/05nelsonm/kmp-tor/pull/562
+[563]: https://github.com/05nelsonm/kmp-tor/pull/563
+[566]: https://github.com/05nelsonm/kmp-tor/pull/566
+[569]: https://github.com/05nelsonm/kmp-tor/pull/569
+[573]: https://github.com/05nelsonm/kmp-tor/pull/573
 
 [kmp-tor-binary-66]: https://github.com/05nelsonm/kmp-tor-binary/issues/66
 [kmp-tor-binary-75]: https://github.com/05nelsonm/kmp-tor-binary/pull/75
