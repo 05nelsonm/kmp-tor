@@ -25,44 +25,76 @@
 <link href="../../../../styles/prism.css" rel="Stylesheet">
 <link href="../../../../styles/logo-styles.css" rel="Stylesheet">
 <link href="../../../../styles/font-jb-sans-auto.css" rel="Stylesheet">
+<link href="../../../../ui-kit/ui-kit.min.css" rel="Stylesheet">
 <script type="text/javascript" src="../../../../scripts/clipboard.js" async></script>
 <script type="text/javascript" src="../../../../scripts/navigation-loader.js" async></script>
 <script type="text/javascript" src="../../../../scripts/platform-content-handler.js" async></script>
 <script type="text/javascript" src="../../../../scripts/main.js" defer></script>
 <script type="text/javascript" src="../../../../scripts/prism.js" async></script>
+<script type="text/javascript" src="../../../../ui-kit/ui-kit.min.js" defer></script>
 <script type="text/javascript" src="../../../../scripts/symbol-parameters-wrapper_deferred.js" defer></script></head>
 <body>
     <div class="root">
-<nav class="navigation" id="navigation-wrapper">
-    <div class="navigation--inner">
-        <div class="navigation-title">
-            <button class="menu-toggle" id="menu-toggle" type="button">toggle menu</button>
-            <div class="library-name">
+    <nav class="navigation theme-dark" id="navigation-wrapper">
 <a class="library-name--link" href="../../../../index.html">
-                            kmp-tor
-                    </a>            </div>
-            <div class="library-version">2.0.0
+                    kmp-tor
+            </a>        <button class="navigation-controls--btn navigation-controls--btn_toc ui-kit_mobile-only" id="toc-toggle" type="button">Toggle table of contents
+        </button>
+        <div class="navigation-controls--break ui-kit_mobile-only"></div>
+        <div class="library-version" id="library-version">2.1.0
+        </div>
+        <div class="navigation-controls">
+        <div class="filter-section filter-section_loading" id="filter-section">
+                <button class="platform-tag platform-selector common-like" data-active="" data-filter=":library:runtime-core/commonMain">common</button>
+            <div class="dropdown filter-section--dropdown" data-role="dropdown" id="filter-section-dropdown">
+                <button class="button button_dropdown filter-section--dropdown-toggle" role="combobox" data-role="dropdown-toggle" aria-controls="platform-tags-listbox" aria-haspopup="listbox" aria-expanded="false" aria-label="Toggle source sets"></button>
+                <ul role="listbox" id="platform-tags-listbox" class="dropdown--list" data-role="dropdown-listbox">
+                    <div class="dropdown--header"><span>Platform filter</span>
+                        <button class="button" data-role="dropdown-toggle" aria-label="Close platform filter">
+                            <i class="ui-kit-icon ui-kit-icon_cross"></i>
+                        </button>
+                    </div>
+                        <li role="option" class="dropdown--option platform-selector-option common-like" tabindex="0">
+                            <label class="checkbox">
+                                <input type="checkbox" class="checkbox--input" id=":library:runtime-core/commonMain" data-filter=":library:runtime-core/commonMain">
+                                <span class="checkbox--icon"></span>
+                                common
+                            </label>
+                        </li>
+                </ul>
+                <div class="dropdown--overlay"></div>
             </div>
         </div>
-        <div class="filter-section" id="filter-section">
-                <button class="platform-tag platform-selector common-like" data-active="" data-filter=":library:runtime-core:dokkaHtmlPartial/commonMain">common</button>
+            <button class="navigation-controls--btn navigation-controls--btn_theme" id="theme-toggle-button" type="button">Switch theme
+            </button>
+            <div class="navigation-controls--btn navigation-controls--btn_search" id="searchBar" role="button">Search in
+                API
+            </div>
         </div>
-    </div>
-    <div class="navigation-controls">
-        <button class="navigation-controls--btn navigation-controls--theme" id="theme-toggle-button" type="button">switch theme</button>
-        <div class="navigation-controls--btn navigation-controls--search" id="searchBar" role="button">search in API</div>
-    </div>
-</nav>
+    </nav>
         <div id="container">
             <div class="sidebar" id="leftColumn">
-                <div class="sidebar--inner" id="sideMenu"></div>
+                <div class="dropdown theme-dark_mobile" data-role="dropdown" id="toc-dropdown">
+                    <ul role="listbox" id="toc-listbox" class="dropdown--list dropdown--list_toc-list" data-role="dropdown-listbox">
+                        <div class="dropdown--header">
+                            <span>
+                                    kmp-tor
+                            </span>
+                            <button class="button" data-role="dropdown-toggle" aria-label="Close table of contents">
+                                <i class="ui-kit-icon ui-kit-icon_cross"></i>
+                            </button>
+                        </div>
+                        <div class="sidebar--inner" id="sideMenu"></div>
+                    </ul>
+                    <div class="dropdown--overlay"></div>
+                </div>
             </div>
             <div id="main">
-<div class="main-content" data-page-type="classlike" id="content" pageids="runtime-core::io.matthewnelson.kmp.tor.runtime.core.config.builder/BuilderScopeHS///PointingToDeclaration//-1857527840">
+<div class="main-content" data-page-type="classlike" id="content" pageids="runtime-core::io.matthewnelson.kmp.tor.runtime.core.config.builder/BuilderScopeHS///PointingToDeclaration//1051389726">
   <div class="breadcrumbs"><a href="../../index.html">runtime-core</a><span class="delimiter">/</span><a href="../index.html">io.matthewnelson.kmp.tor.runtime.core.config.builder</a><span class="delimiter">/</span><span class="current">BuilderScopeHS</span></div>
   <div class="cover ">
     <h1 class="cover"><span>Builder</span><wbr><span>Scope</span><wbr><span><span>HS</span></span></h1>
-    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":library:runtime-core:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">class </span><a href="index.html">BuilderScopeHS</a> : <a href="../../io.matthewnelson.kmp.tor.runtime.core.config/-tor-setting/-builder-scope/index.html">TorSetting.BuilderScope</a>, <a href="../../../../library/runtime-core/io.matthewnelson.kmp.tor.runtime.core.config.builder/-builder-scope-h-s-port/-d-s-l/index.html">BuilderScopeHSPort.DSL</a><span class="token operator">&lt;</span><a href="index.html">BuilderScopeHS</a><span class="token operator">&gt; </span><span class="clearfix"><span class="floating-right">(<a href="https://github.com/05nelsonm/kmp-tor/tree/master/library/runtime-core/src/commonMain/kotlin/io/matthewnelson/kmp/tor/runtime/core/config/builder/BuilderScopeHS.kt#L89">source</a>)</span></span></div><p class="paragraph">A DSL builder scope for configuring <a href="../../io.matthewnelson.kmp.tor.runtime.core.config/-tor-option/-hidden-service-dir/index.html">TorOption.HiddenServiceDir</a> and other applicable <a href="../../io.matthewnelson.kmp.tor.runtime.core.config/-tor-option/index.html">TorOption</a> for Hidden Services (i.e. those options that contain the attribute <a href="../../io.matthewnelson.kmp.tor.runtime.core.config/-tor-option/-attribute/-h-i-d-d-e-n_-s-e-r-v-i-c-e/index.html">TorOption.Attribute.HIDDEN_SERVICE</a>).</p><p class="paragraph"><strong>TL;DR</strong> <a href="directory.html">directory</a>, <a href="version.html">version</a>, and at least 1 <a href="port.html">port</a> are required.</p><p class="paragraph">At a minimum, tor requires <a href="../../io.matthewnelson.kmp.tor.runtime.core.config/-tor-option/-hidden-service-dir/index.html">TorOption.HiddenServiceDir</a> and at least <code class="lang-kotlin">1</code> <a href="../../io.matthewnelson.kmp.tor.runtime.core.config/-tor-option/-hidden-service-port/index.html">TorOption.HiddenServicePort</a> be defined. Tor then uses its hard coded defaults for all other Hidden Service options, unless overridden.</p><p class="paragraph">This builder scope takes it further in that it <strong>also requires</strong> the definition of <a href="../../io.matthewnelson.kmp.tor.runtime.core.config/-tor-option/-hidden-service-version/index.html">TorOption.HiddenServiceVersion</a>, as well (see <a href="version.html">version</a>).</p><p class="paragraph">The requirement for the version expression is because if, in a future release of the tor C library, the default value changes to a newer version (and subsequently, the old version deprecated) that may be a source of conflict if an explicit definition is not there (surprise upgrade from <code class="lang-kotlin">v3</code> -&gt;<code class="lang-kotlin">v4</code>?). In that event, <code class="lang-kotlin">kmp-tor</code> consumers using this builder scope will be unaffected by the change to the tor C library. A conscious decision to migrate to the new version, and update usages of this builder, would need to be made.</p><p class="paragraph"><strong>NOTE:</strong> Any misconfiguration will result in an <span data-unresolved-link="kotlin/IllegalArgumentException///PointingToDeclaration/">IllegalArgumentException</span> when the scope goes to build.</p><p class="paragraph">e.g. (Minimum requirements with <a href="directory.html">directory</a>, <a href="version.html">version</a> and <a href="port.html">port</a> defined)</p><div class="sample-container"><pre><code class="block lang-kotlin" theme="idea">// Also available via HiddenServiceDir.asSetting
+    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":library:runtime-core/commonMain"><div class="symbol monospace"><span class="token keyword">class </span><a href="index.html">BuilderScopeHS</a> : <a href="../../io.matthewnelson.kmp.tor.runtime.core.config/-tor-setting/-builder-scope/index.html">TorSetting.BuilderScope</a>, <a href="../../../../library/runtime-core/io.matthewnelson.kmp.tor.runtime.core.config.builder/-builder-scope-h-s-port/-d-s-l/index.html">BuilderScopeHSPort.DSL</a><span class="token operator">&lt;</span><a href="index.html">BuilderScopeHS</a><span class="token operator">&gt; </span><span class="clearfix"><span class="floating-right">(<a href="https://github.com/05nelsonm/kmp-tor/tree/master/library/runtime-core/src/commonMain/kotlin/io/matthewnelson/kmp/tor/runtime/core/config/builder/BuilderScopeHS.kt#L89">source</a>)</span></span></div><p class="paragraph">A DSL builder scope for configuring <a href="../../io.matthewnelson.kmp.tor.runtime.core.config/-tor-option/-hidden-service-dir/index.html">TorOption.HiddenServiceDir</a> and other applicable <a href="../../io.matthewnelson.kmp.tor.runtime.core.config/-tor-option/index.html">TorOption</a> for Hidden Services (i.e. those options that contain the attribute <a href="../../io.matthewnelson.kmp.tor.runtime.core.config/-tor-option/-attribute/-h-i-d-d-e-n_-s-e-r-v-i-c-e/index.html">TorOption.Attribute.HIDDEN_SERVICE</a>).</p><p class="paragraph"><strong>TL;DR</strong> <a href="directory.html">directory</a>, <a href="version.html">version</a>, and at least 1 <a href="port.html">port</a> are required.</p><p class="paragraph">At a minimum, tor requires <a href="../../io.matthewnelson.kmp.tor.runtime.core.config/-tor-option/-hidden-service-dir/index.html">TorOption.HiddenServiceDir</a> and at least <code class="lang-kotlin">1</code> <a href="../../io.matthewnelson.kmp.tor.runtime.core.config/-tor-option/-hidden-service-port/index.html">TorOption.HiddenServicePort</a> be defined. Tor then uses its hard coded defaults for all other Hidden Service options, unless overridden.</p><p class="paragraph">This builder scope takes it further in that it <strong>also requires</strong> the definition of <a href="../../io.matthewnelson.kmp.tor.runtime.core.config/-tor-option/-hidden-service-version/index.html">TorOption.HiddenServiceVersion</a>, as well (see <a href="version.html">version</a>).</p><p class="paragraph">The requirement for the version expression is because if, in a future release of the tor C library, the default value changes to a newer version (and subsequently, the old version deprecated) that may be a source of conflict if an explicit definition is not there (surprise upgrade from <code class="lang-kotlin">v3</code> -&gt;<code class="lang-kotlin">v4</code>?). In that event, <code class="lang-kotlin">kmp-tor</code> consumers using this builder scope will be unaffected by the change to the tor C library. A conscious decision to migrate to the new version, and update usages of this builder, would need to be made.</p><p class="paragraph"><strong>NOTE:</strong> Any misconfiguration will result in an <span data-unresolved-link="kotlin/IllegalArgumentException///PointingToDeclaration/">IllegalArgumentException</span> when the scope goes to build.</p><p class="paragraph">e.g. (Minimum requirements with <a href="directory.html">directory</a>, <a href="version.html">version</a> and <a href="port.html">port</a> defined)</p><div class="sample-container"><pre><code class="block lang-kotlin" theme="idea">// Also available via HiddenServiceDir.asSetting
 TorConfig.Builder {
 
     // No try/catch needed b/c minimums are met
@@ -84,129 +116,163 @@ TorConfig.Builder {
 
         // ...
     }
-}</code></pre><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><h4 class="">See also</h4><div class="table"><div class="table-row" data-filterable-current=":library:runtime-core:dokkaHtmlPartial/commonMain" data-filterable-set=":library:runtime-core:dokkaHtmlPartial/commonMain"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="../../io.matthewnelson.kmp.tor.runtime.core.config/-tor-option/-hidden-service-dir/as-setting.html"><span>TorOption.</span><wbr><span>Hidden</span><wbr><span>Service</span><wbr><span>Dir.</span><wbr><span>asSetting</span></a></div></span></div><div></div></div></div><div class="table-row" data-filterable-current=":library:runtime-core:dokkaHtmlPartial/commonMain" data-filterable-set=":library:runtime-core:dokkaHtmlPartial/commonMain"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="../../io.matthewnelson.kmp.tor.runtime.core.config/-tor-config/-builder-scope/try-configure.html"><span>TorConfig.</span><wbr><span>Builder</span><wbr><span>Scope.</span><wbr><span>try</span><wbr><span><span>Configure</span></span></a></div></span></div><div></div></div></div></div></div></div>
+}</code></pre><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><h4 class="">See also</h4><div class="table"><div class="table-row" data-filterable-current=":library:runtime-core/commonMain" data-filterable-set=":library:runtime-core/commonMain"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="../../io.matthewnelson.kmp.tor.runtime.core.config/-tor-option/-hidden-service-dir/as-setting.html"><span>TorOption.</span><wbr><span>Hidden</span><wbr><span>Service</span><wbr><span>Dir.</span><wbr><span>asSetting</span></a></div></span></div><div></div></div></div><div class="table-row" data-filterable-current=":library:runtime-core/commonMain" data-filterable-set=":library:runtime-core/commonMain"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="../../io.matthewnelson.kmp.tor.runtime.core.config/-tor-config/-builder-scope/try-configure.html"><span>TorConfig.</span><wbr><span>Builder</span><wbr><span>Scope.</span><wbr><span>try</span><wbr><span><span>Configure</span></span></a></div></span></div><div></div></div></div></div></div></div>
   </div>
   <div class="tabbedcontent">
     <div class="tabs-section" tabs-section="tabs-section"><button class="section-tab" data-active="" data-togglable="CONSTRUCTOR,TYPE,PROPERTY,FUNCTION">Members</button></div>
     <div class="tabs-section-body">
+      <div data-togglable="PROPERTY">
+        <h2 class="">Properties</h2>
+        <div class="table"><a data-name="-1946906143%2FProperties%2F1051389726" anchor-label="argument" id="-1946906143%2FProperties%2F1051389726" data-filterable-set=":library:runtime-core/commonMain"></a>
+          <div class="table-row" data-filterable-current=":library:runtime-core/commonMain" data-filterable-set=":library:runtime-core/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="../../io.matthewnelson.kmp.tor.runtime.core.config/-tor-setting/-builder-scope/argument.html"><span><span>argument</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1946906143%2FProperties%2F1051389726"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":library:runtime-core/commonMain"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><span data-unresolved-link="kotlin.jvm/JvmField///PointingToDeclaration/"><span class="token annotation builtin">JvmField</span></span></div></div><span class="token keyword">protected </span><span class="token keyword">var </span><a href="../../io.matthewnelson.kmp.tor.runtime.core.config/-tor-setting/-builder-scope/argument.html">argument</a><span class="token operator">: </span><span data-unresolved-link="kotlin/String///PointingToDeclaration/">String</span></div><div class="brief "><p class="paragraph">The argument string for this <a href="../../io.matthewnelson.kmp.tor.runtime.core.config/-tor-setting/-builder-scope/index.html">BuilderScope</a>, the result of which is used as the <a href="../../io.matthewnelson.kmp.tor.runtime.core.config/-tor-setting/-line-item/argument.html">LineItem.argument</a>. Is initialized with whatever <a href="../../io.matthewnelson.kmp.tor.runtime.core.config/-tor-option/default.html">TorOption.default</a> is.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-564796567%2FProperties%2F1051389726" anchor-label="option" id="-564796567%2FProperties%2F1051389726" data-filterable-set=":library:runtime-core/commonMain"></a>
+          <div class="table-row" data-filterable-current=":library:runtime-core/commonMain" data-filterable-set=":library:runtime-core/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="../../io.matthewnelson.kmp.tor.runtime.core.config/-tor-setting/-builder-scope/option.html"><span><span>option</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-564796567%2FProperties%2F1051389726"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":library:runtime-core/commonMain"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><span data-unresolved-link="kotlin.jvm/JvmField///PointingToDeclaration/"><span class="token annotation builtin">JvmField</span></span></div></div><span class="token keyword">val </span><a href="../../io.matthewnelson.kmp.tor.runtime.core.config/-tor-setting/-builder-scope/option.html">option</a><span class="token operator">: </span><a href="../../io.matthewnelson.kmp.tor.runtime.core.config/-tor-option/index.html">TorOption</a></div><div class="brief "><p class="paragraph">The <a href="../../io.matthewnelson.kmp.tor.runtime.core.config/-tor-option/index.html">TorOption</a> being configured for this <a href="../../io.matthewnelson.kmp.tor.runtime.core.config/-tor-setting/-builder-scope/index.html">BuilderScope</a>.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
       <div data-togglable="FUNCTION">
         <h2 class="">Functions</h2>
-        <div class="table"><a data-name="-450802549%2FFunctions%2F-1857527840" anchor-label="allowUnknownPorts" id="-450802549%2FFunctions%2F-1857527840" data-filterable-set=":library:runtime-core:dokkaHtmlPartial/commonMain"></a>
-          <div class="table-row" data-filterable-current=":library:runtime-core:dokkaHtmlPartial/commonMain" data-filterable-set=":library:runtime-core:dokkaHtmlPartial/commonMain">
+        <div class="table"><a data-name="-450802549%2FFunctions%2F1051389726" anchor-label="allowUnknownPorts" id="-450802549%2FFunctions%2F1051389726" data-filterable-set=":library:runtime-core/commonMain"></a>
+          <div class="table-row" data-filterable-current=":library:runtime-core/commonMain" data-filterable-set=":library:runtime-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="allow-unknown-ports.html"><span>allow</span><wbr><span>Unknown</span><wbr><span><span>Ports</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-450802549%2FFunctions%2F-1857527840"></span>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-450802549%2FFunctions%2F1051389726"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":library:runtime-core:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">fun </span><a href="allow-unknown-ports.html"><span class="token function">allowUnknownPorts</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">enable<span class="token operator">: </span><span data-unresolved-link="kotlin/Boolean///PointingToDeclaration/">Boolean</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="index.html">BuilderScopeHS</a></div><div class="brief "><p class="paragraph">Sets <a href="../../io.matthewnelson.kmp.tor.runtime.core.config/-tor-option/-hidden-service-allow-unknown-ports/index.html">TorOption.HiddenServiceAllowUnknownPorts</a>, if desired.</p></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":library:runtime-core/commonMain"><div class="symbol monospace"><span class="token keyword">fun </span><a href="allow-unknown-ports.html"><span class="token function">allowUnknownPorts</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">enable<span class="token operator">: </span><span data-unresolved-link="kotlin/Boolean///PointingToDeclaration/">Boolean</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="index.html">BuilderScopeHS</a></div><div class="brief "><p class="paragraph">Sets <a href="../../io.matthewnelson.kmp.tor.runtime.core.config/-tor-option/-hidden-service-allow-unknown-ports/index.html">TorOption.HiddenServiceAllowUnknownPorts</a>, if desired.</p></div></div></div>
                 </div>
               </div>
             </div>
           </div>
-<a data-name="-1465819409%2FFunctions%2F-1857527840" anchor-label="directory" id="-1465819409%2FFunctions%2F-1857527840" data-filterable-set=":library:runtime-core:dokkaHtmlPartial/commonMain"></a>
-          <div class="table-row" data-filterable-current=":library:runtime-core:dokkaHtmlPartial/commonMain" data-filterable-set=":library:runtime-core:dokkaHtmlPartial/commonMain">
+<a data-name="-1465819409%2FFunctions%2F1051389726" anchor-label="directory" id="-1465819409%2FFunctions%2F1051389726" data-filterable-set=":library:runtime-core/commonMain"></a>
+          <div class="table-row" data-filterable-current=":library:runtime-core/commonMain" data-filterable-set=":library:runtime-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="directory.html"><span><span>directory</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1465819409%2FFunctions%2F-1857527840"></span>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1465819409%2FFunctions%2F1051389726"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":library:runtime-core:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">fun </span><a href="directory.html"><span class="token function">directory</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">dir<span class="token operator">: </span><a href="https://kmp-file.matthewnelson.io/library/file/io.matthewnelson.kmp.file/-file/index.html">File</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="index.html">BuilderScopeHS</a></div><div class="brief "><p class="paragraph">Sets the <a href="../../../../library/runtime-core/io.matthewnelson.kmp.tor.runtime.core.config.builder/-builder-scope-h-s/argument.html">argument</a> to the specified directory.</p></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":library:runtime-core/commonMain"><div class="symbol monospace"><span class="token keyword">fun </span><a href="directory.html"><span class="token function">directory</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">dir<span class="token operator">: </span><span data-unresolved-link="io.matthewnelson.kmp.file/File///PointingToDeclaration/">File</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="index.html">BuilderScopeHS</a></div><div class="brief "><p class="paragraph">Sets the <a href="../../../../library/runtime-core/io.matthewnelson.kmp.tor.runtime.core.config.builder/-builder-scope-h-s/argument.html">argument</a> to the specified directory.</p></div></div></div>
                 </div>
               </div>
             </div>
           </div>
-<a data-name="-2086428282%2FFunctions%2F-1857527840" anchor-label="dirGroupReadable" id="-2086428282%2FFunctions%2F-1857527840" data-filterable-set=":library:runtime-core:dokkaHtmlPartial/commonMain"></a>
-          <div class="table-row" data-filterable-current=":library:runtime-core:dokkaHtmlPartial/commonMain" data-filterable-set=":library:runtime-core:dokkaHtmlPartial/commonMain">
+<a data-name="-2086428282%2FFunctions%2F1051389726" anchor-label="dirGroupReadable" id="-2086428282%2FFunctions%2F1051389726" data-filterable-set=":library:runtime-core/commonMain"></a>
+          <div class="table-row" data-filterable-current=":library:runtime-core/commonMain" data-filterable-set=":library:runtime-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="dir-group-readable.html"><span>dir</span><wbr><span>Group</span><wbr><span><span>Readable</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-2086428282%2FFunctions%2F-1857527840"></span>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-2086428282%2FFunctions%2F1051389726"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":library:runtime-core:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">fun </span><a href="dir-group-readable.html"><span class="token function">dirGroupReadable</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">enable<span class="token operator">: </span><span data-unresolved-link="kotlin/Boolean///PointingToDeclaration/">Boolean</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="index.html">BuilderScopeHS</a></div><div class="brief "><p class="paragraph">Sets <a href="../../io.matthewnelson.kmp.tor.runtime.core.config/-tor-option/-hidden-service-dir-group-readable/index.html">TorOption.HiddenServiceDirGroupReadable</a>, if desired.</p></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":library:runtime-core/commonMain"><div class="symbol monospace"><span class="token keyword">fun </span><a href="dir-group-readable.html"><span class="token function">dirGroupReadable</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">enable<span class="token operator">: </span><span data-unresolved-link="kotlin/Boolean///PointingToDeclaration/">Boolean</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="index.html">BuilderScopeHS</a></div><div class="brief "><p class="paragraph">Sets <a href="../../io.matthewnelson.kmp.tor.runtime.core.config/-tor-option/-hidden-service-dir-group-readable/index.html">TorOption.HiddenServiceDirGroupReadable</a>, if desired.</p></div></div></div>
                 </div>
               </div>
             </div>
           </div>
-<a data-name="277948114%2FFunctions%2F-1857527840" anchor-label="maxStreams" id="277948114%2FFunctions%2F-1857527840" data-filterable-set=":library:runtime-core:dokkaHtmlPartial/commonMain"></a>
-          <div class="table-row" data-filterable-current=":library:runtime-core:dokkaHtmlPartial/commonMain" data-filterable-set=":library:runtime-core:dokkaHtmlPartial/commonMain">
+<a data-name="277948114%2FFunctions%2F1051389726" anchor-label="maxStreams" id="277948114%2FFunctions%2F1051389726" data-filterable-set=":library:runtime-core/commonMain"></a>
+          <div class="table-row" data-filterable-current=":library:runtime-core/commonMain" data-filterable-set=":library:runtime-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="max-streams.html"><span>max</span><wbr><span><span>Streams</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="277948114%2FFunctions%2F-1857527840"></span>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="277948114%2FFunctions%2F1051389726"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":library:runtime-core:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">fun </span><a href="max-streams.html"><span class="token function">maxStreams</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">num<span class="token operator">: </span><span data-unresolved-link="kotlin/Int///PointingToDeclaration/">Int</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="index.html">BuilderScopeHS</a></div><div class="brief "><p class="paragraph">Sets <a href="../../io.matthewnelson.kmp.tor.runtime.core.config/-tor-option/-hidden-service-max-streams/index.html">TorOption.HiddenServiceMaxStreams</a>, if desired.</p></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":library:runtime-core/commonMain"><div class="symbol monospace"><span class="token keyword">fun </span><a href="max-streams.html"><span class="token function">maxStreams</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">num<span class="token operator">: </span><span data-unresolved-link="kotlin/Int///PointingToDeclaration/">Int</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="index.html">BuilderScopeHS</a></div><div class="brief "><p class="paragraph">Sets <a href="../../io.matthewnelson.kmp.tor.runtime.core.config/-tor-option/-hidden-service-max-streams/index.html">TorOption.HiddenServiceMaxStreams</a>, if desired.</p></div></div></div>
                 </div>
               </div>
             </div>
           </div>
-<a data-name="1991105512%2FFunctions%2F-1857527840" anchor-label="maxStreamsCloseCircuit" id="1991105512%2FFunctions%2F-1857527840" data-filterable-set=":library:runtime-core:dokkaHtmlPartial/commonMain"></a>
-          <div class="table-row" data-filterable-current=":library:runtime-core:dokkaHtmlPartial/commonMain" data-filterable-set=":library:runtime-core:dokkaHtmlPartial/commonMain">
+<a data-name="1991105512%2FFunctions%2F1051389726" anchor-label="maxStreamsCloseCircuit" id="1991105512%2FFunctions%2F1051389726" data-filterable-set=":library:runtime-core/commonMain"></a>
+          <div class="table-row" data-filterable-current=":library:runtime-core/commonMain" data-filterable-set=":library:runtime-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="max-streams-close-circuit.html"><span>max</span><wbr><span>Streams</span><wbr><span>Close</span><wbr><span><span>Circuit</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1991105512%2FFunctions%2F-1857527840"></span>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1991105512%2FFunctions%2F1051389726"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":library:runtime-core:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">fun </span><a href="max-streams-close-circuit.html"><span class="token function">maxStreamsCloseCircuit</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">enable<span class="token operator">: </span><span data-unresolved-link="kotlin/Boolean///PointingToDeclaration/">Boolean</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="index.html">BuilderScopeHS</a></div><div class="brief "><p class="paragraph">Sets <a href="../../io.matthewnelson.kmp.tor.runtime.core.config/-tor-option/-hidden-service-max-streams-close-circuit/index.html">TorOption.HiddenServiceMaxStreamsCloseCircuit</a>, if desired.</p></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":library:runtime-core/commonMain"><div class="symbol monospace"><span class="token keyword">fun </span><a href="max-streams-close-circuit.html"><span class="token function">maxStreamsCloseCircuit</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">enable<span class="token operator">: </span><span data-unresolved-link="kotlin/Boolean///PointingToDeclaration/">Boolean</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="index.html">BuilderScopeHS</a></div><div class="brief "><p class="paragraph">Sets <a href="../../io.matthewnelson.kmp.tor.runtime.core.config/-tor-option/-hidden-service-max-streams-close-circuit/index.html">TorOption.HiddenServiceMaxStreamsCloseCircuit</a>, if desired.</p></div></div></div>
                 </div>
               </div>
             </div>
           </div>
-<a data-name="-1388280910%2FFunctions%2F-1857527840" anchor-label="numIntroductionPoints" id="-1388280910%2FFunctions%2F-1857527840" data-filterable-set=":library:runtime-core:dokkaHtmlPartial/commonMain"></a>
-          <div class="table-row" data-filterable-current=":library:runtime-core:dokkaHtmlPartial/commonMain" data-filterable-set=":library:runtime-core:dokkaHtmlPartial/commonMain">
+<a data-name="-1388280910%2FFunctions%2F1051389726" anchor-label="numIntroductionPoints" id="-1388280910%2FFunctions%2F1051389726" data-filterable-set=":library:runtime-core/commonMain"></a>
+          <div class="table-row" data-filterable-current=":library:runtime-core/commonMain" data-filterable-set=":library:runtime-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="num-introduction-points.html"><span>num</span><wbr><span>Introduction</span><wbr><span><span>Points</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1388280910%2FFunctions%2F-1857527840"></span>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1388280910%2FFunctions%2F1051389726"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":library:runtime-core:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">fun </span><a href="num-introduction-points.html"><span class="token function">numIntroductionPoints</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">num<span class="token operator">: </span><span data-unresolved-link="kotlin/Int///PointingToDeclaration/">Int</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="index.html">BuilderScopeHS</a></div><div class="brief "><p class="paragraph">Sets <a href="../../io.matthewnelson.kmp.tor.runtime.core.config/-tor-option/-hidden-service-num-introduction-points/index.html">TorOption.HiddenServiceNumIntroductionPoints</a>, if desired.</p></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":library:runtime-core/commonMain"><div class="symbol monospace"><span class="token keyword">fun </span><a href="num-introduction-points.html"><span class="token function">numIntroductionPoints</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">num<span class="token operator">: </span><span data-unresolved-link="kotlin/Int///PointingToDeclaration/">Int</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="index.html">BuilderScopeHS</a></div><div class="brief "><p class="paragraph">Sets <a href="../../io.matthewnelson.kmp.tor.runtime.core.config/-tor-option/-hidden-service-num-introduction-points/index.html">TorOption.HiddenServiceNumIntroductionPoints</a>, if desired.</p></div></div></div>
                 </div>
               </div>
             </div>
           </div>
-<a data-name="-1107037102%2FFunctions%2F-1857527840" anchor-label="port" id="-1107037102%2FFunctions%2F-1857527840" data-filterable-set=":library:runtime-core:dokkaHtmlPartial/commonMain"></a>
-          <div class="table-row" data-filterable-current=":library:runtime-core:dokkaHtmlPartial/commonMain" data-filterable-set=":library:runtime-core:dokkaHtmlPartial/commonMain">
+<a data-name="-1107037102%2FFunctions%2F1051389726" anchor-label="port" id="-1107037102%2FFunctions%2F1051389726" data-filterable-set=":library:runtime-core/commonMain"></a>
+          <div class="table-row" data-filterable-current=":library:runtime-core/commonMain" data-filterable-set=":library:runtime-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="port.html"><span><span>port</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1107037102%2FFunctions%2F-1857527840"></span>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1107037102%2FFunctions%2F1051389726"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":library:runtime-core:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">override </span><span class="token keyword">fun </span><a href="port.html"><span class="token function">port</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">virtual<span class="token operator">: </span><a href="../../io.matthewnelson.kmp.tor.runtime.core.net/-port/index.html">Port</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="index.html">BuilderScopeHS</a></div><div class="brief "><p class="paragraph">Configure a <a href="../../io.matthewnelson.kmp.tor.runtime.core.config/-tor-option/-hidden-service-port/index.html">TorOption.HiddenServicePort</a> with no "target". In this event, the "target" will be the same as <a href="port.html">virtual</a>.</p></div><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">override </span><span class="token keyword">fun </span><a href="port.html"><span class="token function">port</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">virtual<span class="token operator">: </span><a href="../../io.matthewnelson.kmp.tor.runtime.core.net/-port/index.html">Port</a><span class="token punctuation">, </span></span><span class="parameter ">block<span class="token operator">: </span><a href="../../io.matthewnelson.kmp.tor.runtime.core/-this-block/index.html">ThisBlock</a><span class="token operator">&lt;</span><a href="../-builder-scope-h-s-port/index.html">BuilderScopeHSPort</a><span class="token operator">&gt;</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="index.html">BuilderScopeHS</a></div><div class="brief "><p class="paragraph">Configure a <a href="../../io.matthewnelson.kmp.tor.runtime.core.config/-tor-option/-hidden-service-port/index.html">TorOption.HiddenServicePort</a> with a specified virtual port and configure other options.</p></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":library:runtime-core/commonMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">override </span><span class="token keyword">fun </span><a href="port.html"><span class="token function">port</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">virtual<span class="token operator">: </span><a href="../../io.matthewnelson.kmp.tor.runtime.core.net/-port/index.html">Port</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="index.html">BuilderScopeHS</a></div><div class="brief "><p class="paragraph">Configure a <a href="../../io.matthewnelson.kmp.tor.runtime.core.config/-tor-option/-hidden-service-port/index.html">TorOption.HiddenServicePort</a> with no "target". In this event, the "target" will be the same as <a href="port.html">virtual</a>.</p></div><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">override </span><span class="token keyword">fun </span><a href="port.html"><span class="token function">port</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">virtual<span class="token operator">: </span><a href="../../io.matthewnelson.kmp.tor.runtime.core.net/-port/index.html">Port</a><span class="token punctuation">, </span></span><span class="parameter ">block<span class="token operator">: </span><a href="../../io.matthewnelson.kmp.tor.runtime.core/-this-block/index.html">ThisBlock</a><span class="token operator">&lt;</span><a href="../-builder-scope-h-s-port/index.html">BuilderScopeHSPort</a><span class="token operator">&gt;</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="index.html">BuilderScopeHS</a></div><div class="brief "><p class="paragraph">Configure a <a href="../../io.matthewnelson.kmp.tor.runtime.core.config/-tor-option/-hidden-service-port/index.html">TorOption.HiddenServicePort</a> with a specified virtual port and configure other options.</p></div></div></div>
                 </div>
               </div>
             </div>
           </div>
-<a data-name="1271835645%2FFunctions%2F-1857527840" anchor-label="version" id="1271835645%2FFunctions%2F-1857527840" data-filterable-set=":library:runtime-core:dokkaHtmlPartial/commonMain"></a>
-          <div class="table-row" data-filterable-current=":library:runtime-core:dokkaHtmlPartial/commonMain" data-filterable-set=":library:runtime-core:dokkaHtmlPartial/commonMain">
+<a data-name="1271835645%2FFunctions%2F1051389726" anchor-label="version" id="1271835645%2FFunctions%2F1051389726" data-filterable-set=":library:runtime-core/commonMain"></a>
+          <div class="table-row" data-filterable-current=":library:runtime-core/commonMain" data-filterable-set=":library:runtime-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="version.html"><span><span>version</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1271835645%2FFunctions%2F-1857527840"></span>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1271835645%2FFunctions%2F1051389726"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":library:runtime-core:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">fun </span><a href="version.html"><span class="token function">version</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">num<span class="token operator">: </span><span data-unresolved-link="kotlin/Int///PointingToDeclaration/">Int</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="index.html">BuilderScopeHS</a></div><div class="brief "><p class="paragraph">Sets <a href="../../io.matthewnelson.kmp.tor.runtime.core.config/-tor-option/-hidden-service-version/index.html">TorOption.HiddenServiceVersion</a> for this Hidden Service instance. Currently, the only supported version is <code class="lang-kotlin">v3</code>. Anything else will cause a failure when this scope builds.</p></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":library:runtime-core/commonMain"><div class="symbol monospace"><span class="token keyword">fun </span><a href="version.html"><span class="token function">version</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">num<span class="token operator">: </span><span data-unresolved-link="kotlin/Int///PointingToDeclaration/">Int</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="index.html">BuilderScopeHS</a></div><div class="brief "><p class="paragraph">Sets <a href="../../io.matthewnelson.kmp.tor.runtime.core.config/-tor-option/-hidden-service-version/index.html">TorOption.HiddenServiceVersion</a> for this Hidden Service instance. Currently, the only supported version is <code class="lang-kotlin">v3</code>. Anything else will cause a failure when this scope builds.</p></div></div></div>
                 </div>
               </div>
             </div>
@@ -216,12 +282,18 @@ TorConfig.Builder {
     </div>
   </div>
 </div>
-      <div class="footer">
-        <span class="go-to-top-icon"><a href="#content" id="go-to-top-link"></a></span><span>© 2025 Copyright</span><span class="pull-right"><span>Generated by </span><a href="https://github.com/Kotlin/dokka"><span>dokka</span><span class="padded-icon"></span></a></span>
-      </div>
+    <div class="footer">
+        <a href="#content" id="go-to-top-link" class="footer--button footer--button_go-to-top"></a>
+        <span>© 2021-2025 Copyright Matthew Nelson</span>
+        <span class="pull-right">
+            <span>Generated by </span>
+            <a class="footer--link footer--link_external" href="https://github.com/Kotlin/dokka">
+                <span>dokka</span>
+            </a>
+        </span>
+    </div>
             </div>
         </div>
     </div>
 </body>
 </html>
-

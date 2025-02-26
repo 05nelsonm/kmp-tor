@@ -25,61 +25,292 @@
 <link href="../../../../../styles/prism.css" rel="Stylesheet">
 <link href="../../../../../styles/logo-styles.css" rel="Stylesheet">
 <link href="../../../../../styles/font-jb-sans-auto.css" rel="Stylesheet">
+<link href="../../../../../ui-kit/ui-kit.min.css" rel="Stylesheet">
 <script type="text/javascript" src="../../../../../scripts/clipboard.js" async></script>
 <script type="text/javascript" src="../../../../../scripts/navigation-loader.js" async></script>
 <script type="text/javascript" src="../../../../../scripts/platform-content-handler.js" async></script>
 <script type="text/javascript" src="../../../../../scripts/main.js" defer></script>
 <script type="text/javascript" src="../../../../../scripts/prism.js" async></script>
+<script type="text/javascript" src="../../../../../ui-kit/ui-kit.min.js" defer></script>
 <script type="text/javascript" src="../../../../../scripts/symbol-parameters-wrapper_deferred.js" defer></script></head>
 <body>
     <div class="root">
-<nav class="navigation" id="navigation-wrapper">
-    <div class="navigation--inner">
-        <div class="navigation-title">
-            <button class="menu-toggle" id="menu-toggle" type="button">toggle menu</button>
-            <div class="library-name">
+    <nav class="navigation theme-dark" id="navigation-wrapper">
 <a class="library-name--link" href="../../../../../index.html">
-                            kmp-tor
-                    </a>            </div>
-            <div class="library-version">2.0.0
+                    kmp-tor
+            </a>        <button class="navigation-controls--btn navigation-controls--btn_toc ui-kit_mobile-only" id="toc-toggle" type="button">Toggle table of contents
+        </button>
+        <div class="navigation-controls--break ui-kit_mobile-only"></div>
+        <div class="library-version" id="library-version">2.1.0
+        </div>
+        <div class="navigation-controls">
+        <div class="filter-section filter-section_loading" id="filter-section">
+                <button class="platform-tag platform-selector common-like" data-active="" data-filter=":library:runtime-core/commonMain">common</button>
+            <div class="dropdown filter-section--dropdown" data-role="dropdown" id="filter-section-dropdown">
+                <button class="button button_dropdown filter-section--dropdown-toggle" role="combobox" data-role="dropdown-toggle" aria-controls="platform-tags-listbox" aria-haspopup="listbox" aria-expanded="false" aria-label="Toggle source sets"></button>
+                <ul role="listbox" id="platform-tags-listbox" class="dropdown--list" data-role="dropdown-listbox">
+                    <div class="dropdown--header"><span>Platform filter</span>
+                        <button class="button" data-role="dropdown-toggle" aria-label="Close platform filter">
+                            <i class="ui-kit-icon ui-kit-icon_cross"></i>
+                        </button>
+                    </div>
+                        <li role="option" class="dropdown--option platform-selector-option common-like" tabindex="0">
+                            <label class="checkbox">
+                                <input type="checkbox" class="checkbox--input" id=":library:runtime-core/commonMain" data-filter=":library:runtime-core/commonMain">
+                                <span class="checkbox--icon"></span>
+                                common
+                            </label>
+                        </li>
+                </ul>
+                <div class="dropdown--overlay"></div>
             </div>
         </div>
-        <div class="filter-section" id="filter-section">
-                <button class="platform-tag platform-selector common-like" data-active="" data-filter=":library:runtime-core:dokkaHtmlPartial/commonMain">common</button>
+            <button class="navigation-controls--btn navigation-controls--btn_theme" id="theme-toggle-button" type="button">Switch theme
+            </button>
+            <div class="navigation-controls--btn navigation-controls--btn_search" id="searchBar" role="button">Search in
+                API
+            </div>
         </div>
-    </div>
-    <div class="navigation-controls">
-        <button class="navigation-controls--btn navigation-controls--theme" id="theme-toggle-button" type="button">switch theme</button>
-        <div class="navigation-controls--btn navigation-controls--search" id="searchBar" role="button">search in API</div>
-    </div>
-</nav>
+    </nav>
         <div id="container">
             <div class="sidebar" id="leftColumn">
-                <div class="sidebar--inner" id="sideMenu"></div>
+                <div class="dropdown theme-dark_mobile" data-role="dropdown" id="toc-dropdown">
+                    <ul role="listbox" id="toc-listbox" class="dropdown--list dropdown--list_toc-list" data-role="dropdown-listbox">
+                        <div class="dropdown--header">
+                            <span>
+                                    kmp-tor
+                            </span>
+                            <button class="button" data-role="dropdown-toggle" aria-label="Close table of contents">
+                                <i class="ui-kit-icon ui-kit-icon_cross"></i>
+                            </button>
+                        </div>
+                        <div class="sidebar--inner" id="sideMenu"></div>
+                    </ul>
+                    <div class="dropdown--overlay"></div>
+                </div>
             </div>
             <div id="main">
-<div class="main-content" data-page-type="classlike" id="content" pageids="runtime-core::io.matthewnelson.kmp.tor.runtime.core.key/AddressKey.Private///PointingToDeclaration//-1857527840">
+<div class="main-content" data-page-type="classlike" id="content" pageids="runtime-core::io.matthewnelson.kmp.tor.runtime.core.key/AddressKey.Private///PointingToDeclaration//1051389726">
   <div class="breadcrumbs"><a href="../../../index.html">runtime-core</a><span class="delimiter">/</span><a href="../../index.html">io.matthewnelson.kmp.tor.runtime.core.key</a><span class="delimiter">/</span><a href="../index.html">AddressKey</a><span class="delimiter">/</span><span class="current">Private</span></div>
   <div class="cover ">
     <h1 class="cover"><span><span>Private</span></span></h1>
-    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":library:runtime-core:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">sealed </span><span class="token keyword">class </span><a href="index.html">Private</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">key<span class="token operator">: </span><span data-unresolved-link="kotlin/ByteArray///PointingToDeclaration/">ByteArray</span></span></span><span class="token punctuation">)</span> : <a href="../../-key/-private/index.html">Key.Private</a><span class="clearfix"><span class="floating-right">(<a href="https://github.com/05nelsonm/kmp-tor/tree/master/library/runtime-core/src/commonMain/kotlin/io/matthewnelson/kmp/tor/runtime/core/key/AddressKey.kt#L54">source</a>)</span></span></div><p class="paragraph">Holder for an <a href="../../../io.matthewnelson.kmp.tor.runtime.core.net/-onion-address/index.html">OnionAddress</a> private key. Private keys are utilized when creating Hidden Services.</p><h4 class="">See also</h4><div class="table"><div class="table-row" data-filterable-current=":library:runtime-core:dokkaHtmlPartial/commonMain" data-filterable-set=":library:runtime-core:dokkaHtmlPartial/commonMain"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="../../-e-d25519_-v3/-private-key/index.html"><span>ED25519_V3.</span><wbr><span>PrivateKey</span></a></div></span></div><div></div></div></div></div><h4 class="">Inheritors</h4><div class="table"><div class="table-row" data-filterable-current=":library:runtime-core:dokkaHtmlPartial/commonMain" data-filterable-set=":library:runtime-core:dokkaHtmlPartial/commonMain"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="../../-e-d25519_-v3/-private-key/index.html">PrivateKey</a></div></span></div><div></div></div></div></div></div></div>
+    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":library:runtime-core/commonMain"><div class="symbol monospace"><span class="token keyword">sealed </span><span class="token keyword">class </span><a href="index.html">Private</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">key<span class="token operator">: </span><span data-unresolved-link="kotlin/ByteArray///PointingToDeclaration/">ByteArray</span></span></span><span class="token punctuation">)</span> : <a href="../../-key/-private/index.html">Key.Private</a><span class="clearfix"><span class="floating-right">(<a href="https://github.com/05nelsonm/kmp-tor/tree/master/library/runtime-core/src/commonMain/kotlin/io/matthewnelson/kmp/tor/runtime/core/key/AddressKey.kt#L54">source</a>)</span></span></div><p class="paragraph">Holder for an <a href="../../../io.matthewnelson.kmp.tor.runtime.core.net/-onion-address/index.html">OnionAddress</a> private key. Private keys are utilized when creating Hidden Services.</p><h4 class="">See also</h4><div class="table"><div class="table-row" data-filterable-current=":library:runtime-core/commonMain" data-filterable-set=":library:runtime-core/commonMain"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="../../-e-d25519_-v3/-private-key/index.html"><span>ED25519_V3.</span><wbr><span>PrivateKey</span></a></div></span></div><div></div></div></div></div><h4 class="">Inheritors</h4><div class="table"><div class="table-row" data-filterable-current=":library:runtime-core/commonMain" data-filterable-set=":library:runtime-core/commonMain"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="../../-e-d25519_-v3/-private-key/index.html">PrivateKey</a></div></span></div><div></div></div></div></div></div></div>
   </div>
   <div class="tabbedcontent">
-    <div class="tabs-section" tabs-section="tabs-section"><button class="section-tab" data-active="" data-togglable="CONSTRUCTOR,TYPE,PROPERTY,FUNCTION">Members</button></div>
+    <div class="tabs-section" tabs-section="tabs-section"><button class="section-tab" data-active="" data-togglable="CONSTRUCTOR,TYPE,PROPERTY,FUNCTION">Members</button><button class="section-tab" data-togglable="CONSTRUCTOR,TYPE,PROPERTY,FUNCTION,EXTENSION_PROPERTY,EXTENSION_FUNCTION">Members &amp; Extensions</button></div>
     <div class="tabs-section-body">
       <div data-togglable="CONSTRUCTOR">
         <h2 class="">Constructors</h2>
-        <div class="table"><a data-name="372146374%2FConstructors%2F-1857527840" anchor-label="Private" id="372146374%2FConstructors%2F-1857527840" data-filterable-set=":library:runtime-core:dokkaHtmlPartial/commonMain"></a>
-          <div class="table-row" data-togglable="CONSTRUCTOR" data-filterable-current=":library:runtime-core:dokkaHtmlPartial/commonMain" data-filterable-set=":library:runtime-core:dokkaHtmlPartial/commonMain">
+        <div class="table"><a data-name="372146374%2FConstructors%2F1051389726" anchor-label="Private" id="372146374%2FConstructors%2F1051389726" data-filterable-set=":library:runtime-core/commonMain"></a>
+          <div class="table-row" data-togglable="CONSTRUCTOR" data-filterable-current=":library:runtime-core/commonMain" data-filterable-set=":library:runtime-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-private.html"><span><span>Private</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="372146374%2FConstructors%2F-1857527840"></span>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="372146374%2FConstructors%2F1051389726"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":library:runtime-core:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">protected </span><span class="token keyword">constructor</span><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">key<span class="token operator">: </span><span data-unresolved-link="kotlin/ByteArray///PointingToDeclaration/">ByteArray</span></span></span><span class="token punctuation">)</span></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":library:runtime-core/commonMain"><div class="symbol monospace"><span class="token keyword">protected </span><span class="token keyword">constructor</span><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">key<span class="token operator">: </span><span data-unresolved-link="kotlin/ByteArray///PointingToDeclaration/">ByteArray</span></span></span><span class="token punctuation">)</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div data-togglable="FUNCTION">
+        <h2 class="">Functions</h2>
+        <div class="table"><a data-name="338777405%2FFunctions%2F1051389726" anchor-label="algorithm" id="338777405%2FFunctions%2F1051389726" data-filterable-set=":library:runtime-core/commonMain"></a>
+          <div class="table-row" data-filterable-current=":library:runtime-core/commonMain" data-filterable-set=":library:runtime-core/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="../../-key/algorithm.html"><span><span>algorithm</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="338777405%2FFunctions%2F1051389726"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":library:runtime-core/commonMain"><div class="symbol monospace"><span class="token keyword">expect </span><span class="token keyword">abstract </span><span class="token keyword">fun </span><a href="../../-key/algorithm.html"><span class="token function">algorithm</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><span data-unresolved-link="kotlin/String///PointingToDeclaration/">String</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1926664333%2FFunctions%2F1051389726" anchor-label="base16" id="1926664333%2FFunctions%2F1051389726" data-filterable-set=":library:runtime-core/commonMain"></a>
+          <div class="table-row" data-filterable-current=":library:runtime-core/commonMain" data-filterable-set=":library:runtime-core/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="../../-key/-private/base16.html"><span><span>base16</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1926664333%2FFunctions%2F1051389726"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":library:runtime-core/commonMain"><div class="symbol monospace"><span class="token keyword">expect </span><span class="token keyword">fun </span><a href="../../-key/-private/base16.html"><span class="token function">base16</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><span data-unresolved-link="kotlin/String///PointingToDeclaration/">String</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-763228765%2FFunctions%2F1051389726" anchor-label="base16OrNull" id="-763228765%2FFunctions%2F1051389726" data-filterable-set=":library:runtime-core/commonMain"></a>
+          <div class="table-row" data-filterable-current=":library:runtime-core/commonMain" data-filterable-set=":library:runtime-core/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="../../-key/-private/base16-or-null.html"><span>base16Or</span><wbr><span><span>Null</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-763228765%2FFunctions%2F1051389726"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":library:runtime-core/commonMain"><div class="symbol monospace"><span class="token keyword">expect </span><span class="token keyword">override </span><span class="token keyword">fun </span><a href="../../-key/-private/base16-or-null.html"><span class="token function">base16OrNull</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><span data-unresolved-link="kotlin/String///PointingToDeclaration/">String</span><span class="token operator">?</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-569154157%2FFunctions%2F1051389726" anchor-label="base32" id="-569154157%2FFunctions%2F1051389726" data-filterable-set=":library:runtime-core/commonMain"></a>
+          <div class="table-row" data-filterable-current=":library:runtime-core/commonMain" data-filterable-set=":library:runtime-core/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="../../-key/-private/base32.html"><span><span>base32</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-569154157%2FFunctions%2F1051389726"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":library:runtime-core/commonMain"><div class="symbol monospace"><span class="token keyword">expect </span><span class="token keyword">fun </span><a href="../../-key/-private/base32.html"><span class="token function">base32</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><span data-unresolved-link="kotlin/String///PointingToDeclaration/">String</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1385134551%2FFunctions%2F1051389726" anchor-label="base32OrNull" id="-1385134551%2FFunctions%2F1051389726" data-filterable-set=":library:runtime-core/commonMain"></a>
+          <div class="table-row" data-filterable-current=":library:runtime-core/commonMain" data-filterable-set=":library:runtime-core/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="../../-key/-private/base32-or-null.html"><span>base32Or</span><wbr><span><span>Null</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1385134551%2FFunctions%2F1051389726"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":library:runtime-core/commonMain"><div class="symbol monospace"><span class="token keyword">expect </span><span class="token keyword">override </span><span class="token keyword">fun </span><a href="../../-key/-private/base32-or-null.html"><span class="token function">base32OrNull</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><span data-unresolved-link="kotlin/String///PointingToDeclaration/">String</span><span class="token operator">?</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1917239788%2FFunctions%2F1051389726" anchor-label="base64" id="-1917239788%2FFunctions%2F1051389726" data-filterable-set=":library:runtime-core/commonMain"></a>
+          <div class="table-row" data-filterable-current=":library:runtime-core/commonMain" data-filterable-set=":library:runtime-core/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="../../-key/-private/base64.html"><span><span>base64</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1917239788%2FFunctions%2F1051389726"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":library:runtime-core/commonMain"><div class="symbol monospace"><span class="token keyword">expect </span><span class="token keyword">fun </span><a href="../../-key/-private/base64.html"><span class="token function">base64</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><span data-unresolved-link="kotlin/String///PointingToDeclaration/">String</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="928528874%2FFunctions%2F1051389726" anchor-label="base64OrNull" id="928528874%2FFunctions%2F1051389726" data-filterable-set=":library:runtime-core/commonMain"></a>
+          <div class="table-row" data-filterable-current=":library:runtime-core/commonMain" data-filterable-set=":library:runtime-core/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="../../-key/-private/base64-or-null.html"><span>base64Or</span><wbr><span><span>Null</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="928528874%2FFunctions%2F1051389726"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":library:runtime-core/commonMain"><div class="symbol monospace"><span class="token keyword">expect </span><span class="token keyword">override </span><span class="token keyword">fun </span><a href="../../-key/-private/base64-or-null.html"><span class="token function">base64OrNull</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><span data-unresolved-link="kotlin/String///PointingToDeclaration/">String</span><span class="token operator">?</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-2130907953%2FFunctions%2F1051389726" anchor-label="checkIsNotDestroyed" id="-2130907953%2FFunctions%2F1051389726" data-filterable-set=":library:runtime-core/commonMain"></a>
+          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":library:runtime-core/commonMain" data-filterable-set=":library:runtime-core/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="../../../io.matthewnelson.kmp.tor.runtime.core/-destroyable/-companion/check-is-not-destroyed.html"><span>check</span><wbr><span>Is</span><wbr><span>Not</span><wbr><span><span>Destroyed</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-2130907953%2FFunctions%2F1051389726"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":library:runtime-core/commonMain"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><span data-unresolved-link="kotlin.jvm/JvmStatic///PointingToDeclaration/"><span class="token annotation builtin">JvmStatic</span></span></div></div><span class="token keyword">fun </span><a href="../../../io.matthewnelson.kmp.tor.runtime.core/-destroyable/index.html">Destroyable</a><span class="token punctuation">.</span><a href="../../../io.matthewnelson.kmp.tor.runtime.core/-destroyable/-companion/check-is-not-destroyed.html"><span class="token function">checkIsNotDestroyed</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Checks if a <a href="../../../io.matthewnelson.kmp.tor.runtime.core/-destroyable/index.html">Destroyable</a> instance has been destroyed or not.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="138426621%2FFunctions%2F1051389726" anchor-label="destroy" id="138426621%2FFunctions%2F1051389726" data-filterable-set=":library:runtime-core/commonMain"></a>
+          <div class="table-row" data-filterable-current=":library:runtime-core/commonMain" data-filterable-set=":library:runtime-core/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="../../-key/-private/destroy.html"><span><span>destroy</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="138426621%2FFunctions%2F1051389726"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":library:runtime-core/commonMain"><div class="symbol monospace"><span class="token keyword">expect </span><span class="token keyword">override </span><span class="token keyword">fun </span><a href="../../-key/-private/destroy.html"><span class="token function">destroy</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="2007128925%2FFunctions%2F1051389726" anchor-label="destroyedException" id="2007128925%2FFunctions%2F1051389726" data-filterable-set=":library:runtime-core/commonMain"></a>
+          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":library:runtime-core/commonMain" data-filterable-set=":library:runtime-core/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="../../../io.matthewnelson.kmp.tor.runtime.core/-destroyable/-companion/destroyed-exception.html"><span>destroyed</span><wbr><span><span>Exception</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="2007128925%2FFunctions%2F1051389726"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":library:runtime-core/commonMain"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><span data-unresolved-link="kotlin.jvm/JvmStatic///PointingToDeclaration/"><span class="token annotation builtin">JvmStatic</span></span></div><div class="block"><span class="token annotation builtin">@</span><span data-unresolved-link="kotlin.jvm/JvmOverloads///PointingToDeclaration/"><span class="token annotation builtin">JvmOverloads</span></span></div></div><span class="token keyword">fun </span><a href="../../../io.matthewnelson.kmp.tor.runtime.core/-destroyable/index.html">Destroyable</a><span class="token punctuation">.</span><a href="../../../io.matthewnelson.kmp.tor.runtime.core/-destroyable/-companion/destroyed-exception.html"><span class="token function">destroyedException</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">namePrefix<span class="token operator">: </span><span data-unresolved-link="kotlin/String///PointingToDeclaration/">String</span><span class="token operator"> = </span><span class="token string">""</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><span data-unresolved-link="kotlin/IllegalStateException///PointingToDeclaration/">IllegalStateException</span></div><div class="brief "><p class="paragraph">Creates an <span data-unresolved-link="kotlin/IllegalStateException///PointingToDeclaration/">IllegalStateException</span> with a default message of</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-472354199%2FFunctions%2F1051389726" anchor-label="encoded" id="-472354199%2FFunctions%2F1051389726" data-filterable-set=":library:runtime-core/commonMain"></a>
+          <div class="table-row" data-filterable-current=":library:runtime-core/commonMain" data-filterable-set=":library:runtime-core/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="../../-key/-private/encoded.html"><span><span>encoded</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-472354199%2FFunctions%2F1051389726"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":library:runtime-core/commonMain"><div class="symbol monospace"><span class="token keyword">expect </span><span class="token keyword">fun </span><a href="../../-key/-private/encoded.html"><span class="token function">encoded</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><span data-unresolved-link="kotlin/ByteArray///PointingToDeclaration/">ByteArray</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1900930433%2FFunctions%2F1051389726" anchor-label="encodedOrNull" id="-1900930433%2FFunctions%2F1051389726" data-filterable-set=":library:runtime-core/commonMain"></a>
+          <div class="table-row" data-filterable-current=":library:runtime-core/commonMain" data-filterable-set=":library:runtime-core/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="../../-key/-private/encoded-or-null.html"><span>encoded</span><wbr><span>Or</span><wbr><span><span>Null</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1900930433%2FFunctions%2F1051389726"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":library:runtime-core/commonMain"><div class="symbol monospace"><span class="token keyword">expect </span><span class="token keyword">override </span><span class="token keyword">fun </span><a href="../../-key/-private/encoded-or-null.html"><span class="token function">encodedOrNull</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><span data-unresolved-link="kotlin/ByteArray///PointingToDeclaration/">ByteArray</span><span class="token operator">?</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="375735688%2FFunctions%2F1051389726" anchor-label="isDestroyed" id="375735688%2FFunctions%2F1051389726" data-filterable-set=":library:runtime-core/commonMain"></a>
+          <div class="table-row" data-filterable-current=":library:runtime-core/commonMain" data-filterable-set=":library:runtime-core/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="../../-key/-private/is-destroyed.html"><span>is</span><wbr><span><span>Destroyed</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="375735688%2FFunctions%2F1051389726"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":library:runtime-core/commonMain"><div class="symbol monospace"><span class="token keyword">expect </span><span class="token keyword">override </span><span class="token keyword">fun </span><a href="../../-key/-private/is-destroyed.html"><span class="token function">isDestroyed</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><span data-unresolved-link="kotlin/Boolean///PointingToDeclaration/">Boolean</span></div></div></div>
                 </div>
               </div>
             </div>
@@ -89,12 +320,18 @@
     </div>
   </div>
 </div>
-      <div class="footer">
-        <span class="go-to-top-icon"><a href="#content" id="go-to-top-link"></a></span><span>© 2025 Copyright</span><span class="pull-right"><span>Generated by </span><a href="https://github.com/Kotlin/dokka"><span>dokka</span><span class="padded-icon"></span></a></span>
-      </div>
+    <div class="footer">
+        <a href="#content" id="go-to-top-link" class="footer--button footer--button_go-to-top"></a>
+        <span>© 2021-2025 Copyright Matthew Nelson</span>
+        <span class="pull-right">
+            <span>Generated by </span>
+            <a class="footer--link footer--link_external" href="https://github.com/Kotlin/dokka">
+                <span>dokka</span>
+            </a>
+        </span>
+    </div>
             </div>
         </div>
     </div>
 </body>
 </html>
-

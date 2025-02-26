@@ -25,106 +25,172 @@
 <link href="../../../../styles/prism.css" rel="Stylesheet">
 <link href="../../../../styles/logo-styles.css" rel="Stylesheet">
 <link href="../../../../styles/font-jb-sans-auto.css" rel="Stylesheet">
+<link href="../../../../ui-kit/ui-kit.min.css" rel="Stylesheet">
 <script type="text/javascript" src="../../../../scripts/clipboard.js" async></script>
 <script type="text/javascript" src="../../../../scripts/navigation-loader.js" async></script>
 <script type="text/javascript" src="../../../../scripts/platform-content-handler.js" async></script>
 <script type="text/javascript" src="../../../../scripts/main.js" defer></script>
 <script type="text/javascript" src="../../../../scripts/prism.js" async></script>
+<script type="text/javascript" src="../../../../ui-kit/ui-kit.min.js" defer></script>
 <script type="text/javascript" src="../../../../scripts/symbol-parameters-wrapper_deferred.js" defer></script></head>
 <body>
     <div class="root">
-<nav class="navigation" id="navigation-wrapper">
-    <div class="navigation--inner">
-        <div class="navigation-title">
-            <button class="menu-toggle" id="menu-toggle" type="button">toggle menu</button>
-            <div class="library-name">
+    <nav class="navigation theme-dark" id="navigation-wrapper">
 <a class="library-name--link" href="../../../../index.html">
-                            kmp-tor
-                    </a>            </div>
-            <div class="library-version">2.0.0
+                    kmp-tor
+            </a>        <button class="navigation-controls--btn navigation-controls--btn_toc ui-kit_mobile-only" id="toc-toggle" type="button">Toggle table of contents
+        </button>
+        <div class="navigation-controls--break ui-kit_mobile-only"></div>
+        <div class="library-version" id="library-version">2.1.0
+        </div>
+        <div class="navigation-controls">
+        <div class="filter-section filter-section_loading" id="filter-section">
+                <button class="platform-tag platform-selector common-like" data-active="" data-filter=":library:runtime/commonMain">common</button>
+            <div class="dropdown filter-section--dropdown" data-role="dropdown" id="filter-section-dropdown">
+                <button class="button button_dropdown filter-section--dropdown-toggle" role="combobox" data-role="dropdown-toggle" aria-controls="platform-tags-listbox" aria-haspopup="listbox" aria-expanded="false" aria-label="Toggle source sets"></button>
+                <ul role="listbox" id="platform-tags-listbox" class="dropdown--list" data-role="dropdown-listbox">
+                    <div class="dropdown--header"><span>Platform filter</span>
+                        <button class="button" data-role="dropdown-toggle" aria-label="Close platform filter">
+                            <i class="ui-kit-icon ui-kit-icon_cross"></i>
+                        </button>
+                    </div>
+                        <li role="option" class="dropdown--option platform-selector-option common-like" tabindex="0">
+                            <label class="checkbox">
+                                <input type="checkbox" class="checkbox--input" id=":library:runtime/commonMain" data-filter=":library:runtime/commonMain">
+                                <span class="checkbox--icon"></span>
+                                common
+                            </label>
+                        </li>
+                </ul>
+                <div class="dropdown--overlay"></div>
             </div>
         </div>
-        <div class="filter-section" id="filter-section">
-                <button class="platform-tag platform-selector common-like" data-active="" data-filter=":library:runtime:dokkaHtmlPartial/commonMain">common</button>
+            <button class="navigation-controls--btn navigation-controls--btn_theme" id="theme-toggle-button" type="button">Switch theme
+            </button>
+            <div class="navigation-controls--btn navigation-controls--btn_search" id="searchBar" role="button">Search in
+                API
+            </div>
         </div>
-    </div>
-    <div class="navigation-controls">
-        <button class="navigation-controls--btn navigation-controls--theme" id="theme-toggle-button" type="button">switch theme</button>
-        <div class="navigation-controls--btn navigation-controls--search" id="searchBar" role="button">search in API</div>
-    </div>
-</nav>
+    </nav>
         <div id="container">
             <div class="sidebar" id="leftColumn">
-                <div class="sidebar--inner" id="sideMenu"></div>
+                <div class="dropdown theme-dark_mobile" data-role="dropdown" id="toc-dropdown">
+                    <ul role="listbox" id="toc-listbox" class="dropdown--list dropdown--list_toc-list" data-role="dropdown-listbox">
+                        <div class="dropdown--header">
+                            <span>
+                                    kmp-tor
+                            </span>
+                            <button class="button" data-role="dropdown-toggle" aria-label="Close table of contents">
+                                <i class="ui-kit-icon ui-kit-icon_cross"></i>
+                            </button>
+                        </div>
+                        <div class="sidebar--inner" id="sideMenu"></div>
+                    </ul>
+                    <div class="dropdown--overlay"></div>
+                </div>
             </div>
             <div id="main">
-<div class="main-content" data-page-type="classlike" id="content" pageids="runtime::io.matthewnelson.kmp.tor.runtime/TorRuntime///PointingToDeclaration//-606192660">
+<div class="main-content" data-page-type="classlike" id="content" pageids="runtime::io.matthewnelson.kmp.tor.runtime/TorRuntime///PointingToDeclaration//-1793144430">
   <div class="breadcrumbs"><a href="../../index.html">runtime</a><span class="delimiter">/</span><a href="../index.html">io.matthewnelson.kmp.tor.runtime</a><span class="delimiter">/</span><span class="current">TorRuntime</span></div>
   <div class="cover ">
     <h1 class="cover"><span>Tor</span><wbr><span><span>Runtime</span></span></h1>
-    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":library:runtime:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">sealed </span><span class="token keyword">interface </span><a href="index.html">TorRuntime</a> : <a href="../-action/-processor/index.html">Action.Processor</a>, <a href="../-file-i-d/index.html">FileID</a>, <a href="../-runtime-event/-processor/index.html">RuntimeEvent.Processor</a>, <a href="../../../../library/runtime-core/io.matthewnelson.kmp.tor.runtime.core.ctrl/-tor-cmd/-unprivileged/-processor/index.html">TorCmd.Unprivileged.Processor</a><span class="clearfix"><span class="floating-right">(<a href="https://github.com/05nelsonm/kmp-tor/tree/master/library/runtime/src/commonMain/kotlin/io/matthewnelson/kmp/tor/runtime/TorRuntime.kt#L52">source</a>)</span></span></div><p class="paragraph">Base interface for implementations that manage interaction with a single tor daemon (backed by a stand-alone process instance).</p><h4 class="">See also</h4><div class="table"><div class="table-row" data-filterable-current=":library:runtime:dokkaHtmlPartial/commonMain" data-filterable-set=":library:runtime:dokkaHtmlPartial/commonMain"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="-companion/-builder.html"><span>TorRuntime.</span><wbr><span>Companion.</span><wbr><span>Builder</span></a></div></span></div><div></div></div></div></div><h4 class="">Inheritors</h4><div class="table"><div class="table-row" data-filterable-current=":library:runtime:dokkaHtmlPartial/commonMain" data-filterable-set=":library:runtime:dokkaHtmlPartial/commonMain"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="../-lifecycle/-destroyable-tor-runtime/index.html">DestroyableTorRuntime</a></div></span></div><div></div></div></div><div class="table-row" data-filterable-current=":library:runtime:dokkaHtmlPartial/commonMain" data-filterable-set=":library:runtime:dokkaHtmlPartial/commonMain"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="-service-factory/index.html">ServiceFactory</a></div></span></div><div></div></div></div></div></div></div>
+    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":library:runtime/commonMain"><div class="symbol monospace"><span class="token keyword">sealed </span><span class="token keyword">interface </span><a href="index.html">TorRuntime</a> : <a href="../-action/-processor/index.html">Action.Processor</a>, <a href="../-file-i-d/index.html">FileID</a>, <a href="../-runtime-event/-processor/index.html">RuntimeEvent.Processor</a>, <a href="../../../../library/runtime-core/io.matthewnelson.kmp.tor.runtime.core.ctrl/-tor-cmd/-unprivileged/-processor/index.html">TorCmd.Unprivileged.Processor</a><span class="clearfix"><span class="floating-right">(<a href="https://github.com/05nelsonm/kmp-tor/tree/master/library/runtime/src/commonMain/kotlin/io/matthewnelson/kmp/tor/runtime/TorRuntime.kt#L52">source</a>)</span></span></div><p class="paragraph">Base interface for implementations that manage interaction with a single tor daemon (backed by a stand-alone process instance).</p><h4 class="">See also</h4><div class="table"><div class="table-row" data-filterable-current=":library:runtime/commonMain" data-filterable-set=":library:runtime/commonMain"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="-companion/-builder.html"><span>TorRuntime.</span><wbr><span>Companion.</span><wbr><span>Builder</span></a></div></span></div><div></div></div></div></div><h4 class="">Inheritors</h4><div class="table"><div class="table-row" data-filterable-current=":library:runtime/commonMain" data-filterable-set=":library:runtime/commonMain"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="../-lifecycle/-destroyable-tor-runtime/index.html">DestroyableTorRuntime</a></div></span></div><div></div></div></div><div class="table-row" data-filterable-current=":library:runtime/commonMain" data-filterable-set=":library:runtime/commonMain"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="-service-factory/index.html">ServiceFactory</a></div></span></div><div></div></div></div></div></div></div>
   </div>
   <div class="tabbedcontent">
-    <div class="tabs-section" tabs-section="tabs-section"><button class="section-tab" data-active="" data-togglable="CONSTRUCTOR,TYPE,PROPERTY,FUNCTION">Members</button></div>
+    <div class="tabs-section" tabs-section="tabs-section"><button class="section-tab" data-active="" data-togglable="CONSTRUCTOR,TYPE,PROPERTY,FUNCTION">Members</button><button class="section-tab" data-togglable="CONSTRUCTOR,TYPE,PROPERTY,FUNCTION,EXTENSION_PROPERTY,EXTENSION_FUNCTION">Members &amp; Extensions</button></div>
     <div class="tabs-section-body">
       <div data-togglable="TYPE">
         <h2 class="">Types</h2>
-        <div class="table"><a data-name="389532492%2FClasslikes%2F-606192660" anchor-label="BuilderScope" id="389532492%2FClasslikes%2F-606192660" data-filterable-set=":library:runtime:dokkaHtmlPartial/commonMain"></a>
-          <div class="table-row" data-filterable-current=":library:runtime:dokkaHtmlPartial/commonMain" data-filterable-set=":library:runtime:dokkaHtmlPartial/commonMain">
+        <div class="table"><a data-name="389532492%2FClasslikes%2F-1793144430" anchor-label="BuilderScope" id="389532492%2FClasslikes%2F-1793144430" data-filterable-set=":library:runtime/commonMain"></a>
+          <div class="table-row" data-filterable-current=":library:runtime/commonMain" data-filterable-set=":library:runtime/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-builder-scope/index.html"><span>Builder</span><wbr><span><span>Scope</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="389532492%2FClasslikes%2F-606192660"></span>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="389532492%2FClasslikes%2F-1793144430"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":library:runtime:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">class </span><a href="-builder-scope/index.html">BuilderScope</a></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":library:runtime/commonMain"><div class="symbol monospace"><span class="token keyword">class </span><a href="-builder-scope/index.html">BuilderScope</a></div></div></div>
                 </div>
               </div>
             </div>
           </div>
-<a data-name="-962086223%2FClasslikes%2F-606192660" anchor-label="Companion" id="-962086223%2FClasslikes%2F-606192660" data-filterable-set=":library:runtime:dokkaHtmlPartial/commonMain"></a>
-          <div class="table-row" data-filterable-current=":library:runtime:dokkaHtmlPartial/commonMain" data-filterable-set=":library:runtime:dokkaHtmlPartial/commonMain">
+<a data-name="-962086223%2FClasslikes%2F-1793144430" anchor-label="Companion" id="-962086223%2FClasslikes%2F-1793144430" data-filterable-set=":library:runtime/commonMain"></a>
+          <div class="table-row" data-filterable-current=":library:runtime/commonMain" data-filterable-set=":library:runtime/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-companion/index.html"><span><span>Companion</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-962086223%2FClasslikes%2F-606192660"></span>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-962086223%2FClasslikes%2F-1793144430"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":library:runtime:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">object </span><a href="-companion/index.html">Companion</a></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":library:runtime/commonMain"><div class="symbol monospace"><span class="token keyword">object </span><a href="-companion/index.html">Companion</a></div></div></div>
                 </div>
               </div>
             </div>
           </div>
-<a data-name="-1802486134%2FClasslikes%2F-606192660" anchor-label="Environment" id="-1802486134%2FClasslikes%2F-606192660" data-filterable-set=":library:runtime:dokkaHtmlPartial/commonMain"></a>
-          <div class="table-row" data-filterable-current=":library:runtime:dokkaHtmlPartial/commonMain" data-filterable-set=":library:runtime:dokkaHtmlPartial/commonMain">
+<a data-name="-1802486134%2FClasslikes%2F-1793144430" anchor-label="Environment" id="-1802486134%2FClasslikes%2F-1793144430" data-filterable-set=":library:runtime/commonMain"></a>
+          <div class="table-row" data-filterable-current=":library:runtime/commonMain" data-filterable-set=":library:runtime/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-environment/index.html"><span><span>Environment</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1802486134%2FClasslikes%2F-606192660"></span>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1802486134%2FClasslikes%2F-1793144430"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":library:runtime:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">class </span><a href="-environment/index.html">Environment</a> : <a href="../-file-i-d/index.html">FileID</a></div><div class="brief "><p class="paragraph">The environment for which <a href="index.html">TorRuntime</a> operates.</p></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":library:runtime/commonMain"><div class="symbol monospace"><span class="token keyword">class </span><a href="-environment/index.html">Environment</a> : <a href="../-file-i-d/index.html">FileID</a></div><div class="brief "><p class="paragraph">The environment for which <a href="index.html">TorRuntime</a> operates.</p></div></div></div>
                 </div>
               </div>
             </div>
           </div>
-<a data-name="-203775824%2FClasslikes%2F-606192660" anchor-label="ServiceFactory" id="-203775824%2FClasslikes%2F-606192660" data-filterable-set=":library:runtime:dokkaHtmlPartial/commonMain"></a>
-          <div class="table-row" data-filterable-current=":library:runtime:dokkaHtmlPartial/commonMain" data-filterable-set=":library:runtime:dokkaHtmlPartial/commonMain">
+<a data-name="-203775824%2FClasslikes%2F-1793144430" anchor-label="ServiceFactory" id="-203775824%2FClasslikes%2F-1793144430" data-filterable-set=":library:runtime/commonMain"></a>
+          <div class="table-row" data-filterable-current=":library:runtime/commonMain" data-filterable-set=":library:runtime/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-service-factory/index.html"><span>Service</span><wbr><span><span>Factory</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-203775824%2FClasslikes%2F-606192660"></span>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-203775824%2FClasslikes%2F-1793144430"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":library:runtime:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><a href="https://kmp-tor-common.matthewnelson.io/library/common-api/io.matthewnelson.kmp.tor.common.api/-experimental-kmp-tor-api/index.html"><span class="token annotation builtin">ExperimentalKmpTorApi</span></a></div></div><span class="token keyword">abstract </span><span class="token keyword">class </span><a href="-service-factory/index.html">ServiceFactory</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">initializer<span class="token operator">: </span><a href="-service-factory/-initializer/index.html">TorRuntime.ServiceFactory.Initializer</a></span></span><span class="token punctuation">)</span> : <a href="index.html">TorRuntime</a></div><div class="brief "><p class="paragraph">An instance of <a href="index.html">TorRuntime</a> that produces <a href="../-lifecycle/-destroyable-tor-runtime/index.html">Lifecycle.DestroyableTorRuntime</a> under the hood which are intended to be run within a service object.</p></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":library:runtime/commonMain"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><a href="https://kmp-tor-common.matthewnelson.io/library/common-api/io.matthewnelson.kmp.tor.common.api/-experimental-kmp-tor-api/index.html"><span class="token annotation builtin">ExperimentalKmpTorApi</span></a></div></div><span class="token keyword">abstract </span><span class="token keyword">class </span><a href="-service-factory/index.html">ServiceFactory</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">initializer<span class="token operator">: </span><a href="-service-factory/-initializer/index.html">TorRuntime.ServiceFactory.Initializer</a></span></span><span class="token punctuation">)</span> : <a href="index.html">TorRuntime</a></div><div class="brief "><p class="paragraph">An instance of <a href="index.html">TorRuntime</a> that produces <a href="../-lifecycle/-destroyable-tor-runtime/index.html">Lifecycle.DestroyableTorRuntime</a> under the hood which are intended to be run within a service object.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div data-togglable="PROPERTY">
+        <h2 class="">Properties</h2>
+        <div class="table"><a data-name="570946675%2FProperties%2F-1793144430" anchor-label="fid" id="570946675%2FProperties%2F-1793144430" data-filterable-set=":library:runtime/commonMain"></a>
+          <div class="table-row" data-filterable-current=":library:runtime/commonMain" data-filterable-set=":library:runtime/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="../-file-i-d/fid.html"><span><span>fid</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="570946675%2FProperties%2F-1793144430"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":library:runtime/commonMain"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword">val </span><a href="../-file-i-d/fid.html">fid</a><span class="token operator">: </span><span data-unresolved-link="kotlin/String///PointingToDeclaration/">String</span></div><div class="brief "><p class="paragraph">An ID string which is based off of a file path.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1886075949%2FProperties%2F-1793144430" anchor-label="fidEllipses" id="-1886075949%2FProperties%2F-1793144430" data-filterable-set=":library:runtime/commonMain"></a>
+          <div class="table-row" data-togglable="EXTENSION_PROPERTY" data-filterable-current=":library:runtime/commonMain" data-filterable-set=":library:runtime/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="../-file-i-d/-companion/fid-ellipses.html"><span>fid</span><wbr><span><span>Ellipses</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1886075949%2FProperties%2F-1793144430"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":library:runtime/commonMain"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@get:</span><span data-unresolved-link="kotlin.jvm/JvmStatic///PointingToDeclaration/"><span class="token annotation builtin">JvmStatic</span></span></div><div class="block"><span class="token annotation builtin">@get:</span><span data-unresolved-link="kotlin.jvm/JvmName///PointingToDeclaration/"><span class="token annotation builtin">JvmName</span></span><span class="token punctuation">(</span><span>name<span class="token operator"> = </span><span class="breakable-word"><span class="token string">"fidEllipses"</span></span></span><wbr><span class="token punctuation">)</span></div></div><span class="token keyword">val </span><a href="../-file-i-d/index.html">FileID</a><span class="token punctuation">.</span><a href="../-file-i-d/-companion/fid-ellipses.html">fidEllipses</a><span class="token operator">: </span><span data-unresolved-link="kotlin/String///PointingToDeclaration/">String</span></div><div class="brief "><p class="paragraph">Returns the first and last 4 characters of the <a href="../-file-i-d/fid.html">fid</a> concatenated together with an ellipses between.</p></div></div></div>
                 </div>
               </div>
             </div>
@@ -133,62 +199,167 @@
       </div>
       <div data-togglable="FUNCTION">
         <h2 class="">Functions</h2>
-        <div class="table"><a data-name="1611426679%2FFunctions%2F-606192660" anchor-label="environment" id="1611426679%2FFunctions%2F-606192660" data-filterable-set=":library:runtime:dokkaHtmlPartial/commonMain"></a>
-          <div class="table-row" data-filterable-current=":library:runtime:dokkaHtmlPartial/commonMain" data-filterable-set=":library:runtime:dokkaHtmlPartial/commonMain">
+        <div class="table"><a data-name="2062776661%2FFunctions%2F-1793144430" anchor-label="clearObservers" id="2062776661%2FFunctions%2F-1793144430" data-filterable-set=":library:runtime/commonMain"></a>
+          <div class="table-row" data-filterable-current=":library:runtime/commonMain" data-filterable-set=":library:runtime/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="index.html#2062776661%2FFunctions%2F-1793144430"><span>clear</span><wbr><span><span>Observers</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="2062776661%2FFunctions%2F-1793144430"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":library:runtime/commonMain"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword">fun </span><a href="index.html#2062776661%2FFunctions%2F-1793144430"><span class="token function">clearObservers</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1867386871%2FFunctions%2F-1793144430" anchor-label="enqueue" id="-1867386871%2FFunctions%2F-1793144430" data-filterable-set=":library:runtime/commonMain"></a>
+          <div class="table-row" data-filterable-current=":library:runtime/commonMain" data-filterable-set=":library:runtime/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="../-action/-processor/enqueue.html"><span><span>enqueue</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1867386871%2FFunctions%2F-1793144430"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":library:runtime/commonMain"><div class="symbol monospace"><span class="token keyword">expect </span><span class="token keyword">abstract </span><span class="token keyword">fun </span><a href="../-action/-processor/enqueue.html"><span class="token function">enqueue</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">action<span class="token operator">: </span><a href="../-action/index.html">Action</a><span class="token punctuation">, </span></span><span class="parameter ">onFailure<span class="token operator">: </span><a href="../../../../library/runtime-core/io.matthewnelson.kmp.tor.runtime.core/-on-failure/index.html">OnFailure</a><span class="token punctuation">, </span></span><span class="parameter ">onSuccess<span class="token operator">: </span><a href="../../../../library/runtime-core/io.matthewnelson.kmp.tor.runtime.core/-on-success/index.html">OnSuccess</a><span class="token operator">&lt;</span><span data-unresolved-link="kotlin/Unit///PointingToDeclaration/">Unit</span><span class="token operator">&gt;</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../../../../library/runtime-core/io.matthewnelson.kmp.tor.runtime.core/-enqueued-job/index.html">EnqueuedJob</a></div><div class="brief "><p class="paragraph">Enqueues the <a href="../-action/index.html">Action</a> for execution.</p></div><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword">fun </span><span class="token operator">&lt;</span><a href="index.html#-947706254%2FFunctions%2F-1793144430">Success</a><span class="token operator"> : </span><span data-unresolved-link="kotlin/Any///PointingToDeclaration/">Any</span><span class="token operator">&gt; </span><a href="index.html#-947706254%2FFunctions%2F-1793144430"><span class="token function">enqueue</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">cmd<span class="token operator">: </span><a href="../../../../library/runtime-core/io.matthewnelson.kmp.tor.runtime.core.ctrl/-tor-cmd/-unprivileged/index.html">TorCmd.Unprivileged</a><span class="token operator">&lt;</span><a href="index.html#-947706254%2FFunctions%2F-1793144430">Success</a><span class="token operator">&gt;</span><span class="token punctuation">, </span></span><span class="parameter ">onFailure<span class="token operator">: </span><a href="../../../../library/runtime-core/io.matthewnelson.kmp.tor.runtime.core/-on-failure/index.html">OnFailure</a><span class="token punctuation">, </span></span><span class="parameter ">onSuccess<span class="token operator">: </span><a href="../../../../library/runtime-core/io.matthewnelson.kmp.tor.runtime.core/-on-success/index.html">OnSuccess</a><span class="token operator">&lt;</span><a href="index.html#-947706254%2FFunctions%2F-1793144430">Success</a><span class="token operator">&gt;</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../../../../library/runtime-core/io.matthewnelson.kmp.tor.runtime.core/-enqueued-job/index.html">EnqueuedJob</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1611426679%2FFunctions%2F-1793144430" anchor-label="environment" id="1611426679%2FFunctions%2F-1793144430" data-filterable-set=":library:runtime/commonMain"></a>
+          <div class="table-row" data-filterable-current=":library:runtime/commonMain" data-filterable-set=":library:runtime/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="environment.html"><span><span>environment</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1611426679%2FFunctions%2F-606192660"></span>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1611426679%2FFunctions%2F-1793144430"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":library:runtime:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword">fun </span><a href="environment.html"><span class="token function">environment</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="-environment/index.html">TorRuntime.Environment</a></div><div class="brief "><p class="paragraph">Returns the current <a href="-environment/index.html">Environment</a> for this <a href="index.html">TorRuntime</a> instance.</p></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":library:runtime/commonMain"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword">fun </span><a href="environment.html"><span class="token function">environment</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="-environment/index.html">TorRuntime.Environment</a></div><div class="brief "><p class="paragraph">Returns the current <a href="-environment/index.html">Environment</a> for this <a href="index.html">TorRuntime</a> instance.</p></div></div></div>
                 </div>
               </div>
             </div>
           </div>
-<a data-name="-1368303567%2FFunctions%2F-606192660" anchor-label="isReady" id="-1368303567%2FFunctions%2F-606192660" data-filterable-set=":library:runtime:dokkaHtmlPartial/commonMain"></a>
-          <div class="table-row" data-filterable-current=":library:runtime:dokkaHtmlPartial/commonMain" data-filterable-set=":library:runtime:dokkaHtmlPartial/commonMain">
+<a data-name="-1368303567%2FFunctions%2F-1793144430" anchor-label="isReady" id="-1368303567%2FFunctions%2F-1793144430" data-filterable-set=":library:runtime/commonMain"></a>
+          <div class="table-row" data-filterable-current=":library:runtime/commonMain" data-filterable-set=":library:runtime/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="is-ready.html"><span>is</span><wbr><span><span>Ready</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1368303567%2FFunctions%2F-606192660"></span>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1368303567%2FFunctions%2F-1793144430"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":library:runtime:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword">fun </span><a href="is-ready.html"><span class="token function">isReady</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><span data-unresolved-link="kotlin/Boolean///PointingToDeclaration/">Boolean</span></div><div class="brief "><p class="paragraph">Checks if the tor process backing <a href="index.html">TorRuntime</a> (if it is running) has completed starting up.</p></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":library:runtime/commonMain"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword">fun </span><a href="is-ready.html"><span class="token function">isReady</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><span data-unresolved-link="kotlin/Boolean///PointingToDeclaration/">Boolean</span></div><div class="brief "><p class="paragraph">Checks if the tor process backing <a href="index.html">TorRuntime</a> (if it is running) has completed starting up.</p></div></div></div>
                 </div>
               </div>
             </div>
           </div>
-<a data-name="-1378169845%2FFunctions%2F-606192660" anchor-label="listeners" id="-1378169845%2FFunctions%2F-606192660" data-filterable-set=":library:runtime:dokkaHtmlPartial/commonMain"></a>
-          <div class="table-row" data-filterable-current=":library:runtime:dokkaHtmlPartial/commonMain" data-filterable-set=":library:runtime:dokkaHtmlPartial/commonMain">
+<a data-name="-1378169845%2FFunctions%2F-1793144430" anchor-label="listeners" id="-1378169845%2FFunctions%2F-1793144430" data-filterable-set=":library:runtime/commonMain"></a>
+          <div class="table-row" data-filterable-current=":library:runtime/commonMain" data-filterable-set=":library:runtime/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="listeners.html"><span><span>listeners</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1378169845%2FFunctions%2F-606192660"></span>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1378169845%2FFunctions%2F-1793144430"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":library:runtime:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword">fun </span><a href="listeners.html"><span class="token function">listeners</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../-tor-listeners/index.html">TorListeners</a></div><div class="brief "><p class="paragraph">Returns the current <a href="../-tor-listeners/index.html">TorListeners</a> of this <a href="index.html">TorRuntime</a> instance.</p></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":library:runtime/commonMain"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword">fun </span><a href="listeners.html"><span class="token function">listeners</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../-tor-listeners/index.html">TorListeners</a></div><div class="brief "><p class="paragraph">Returns the current <a href="../-tor-listeners/index.html">TorListeners</a> of this <a href="index.html">TorRuntime</a> instance.</p></div></div></div>
                 </div>
               </div>
             </div>
           </div>
-<a data-name="911513721%2FFunctions%2F-606192660" anchor-label="state" id="911513721%2FFunctions%2F-606192660" data-filterable-set=":library:runtime:dokkaHtmlPartial/commonMain"></a>
-          <div class="table-row" data-filterable-current=":library:runtime:dokkaHtmlPartial/commonMain" data-filterable-set=":library:runtime:dokkaHtmlPartial/commonMain">
+<a data-name="1267410752%2FFunctions%2F-1793144430" anchor-label="observeSignalNewNym" id="1267410752%2FFunctions%2F-1793144430" data-filterable-set=":library:runtime/commonMain"></a>
+          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":library:runtime/commonMain" data-filterable-set=":library:runtime/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
-                  <div><a href="state.html"><span><span>state</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="911513721%2FFunctions%2F-606192660"></span>
+                  <div><a href="../-runtime-event/-e-x-e-c-u-t-e/-c-m-d/observe-signal-new-nym.html"><span>observe</span><wbr><span>Signal</span><wbr><span>New</span><wbr><span><span>Nym</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1267410752%2FFunctions%2F-1793144430"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":library:runtime:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword">fun </span><a href="state.html"><span class="token function">state</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../-tor-state/index.html">TorState</a></div><div class="brief "><p class="paragraph">Returns the current <a href="../-tor-state/index.html">TorState</a> of this <a href="index.html">TorRuntime</a> instance.</p></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":library:runtime/commonMain"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><span data-unresolved-link="kotlin.jvm/JvmStatic///PointingToDeclaration/"><span class="token annotation builtin">JvmStatic</span></span></div></div><span class="token keyword">fun </span><a href="../-runtime-event/-processor/index.html">RuntimeEvent.Processor</a><span class="token punctuation">.</span><a href="../-runtime-event/-e-x-e-c-u-t-e/-c-m-d/observe-signal-new-nym.html"><span class="token function">observeSignalNewNym</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">tag<span class="token operator">: </span><span data-unresolved-link="kotlin/String///PointingToDeclaration/">String</span><span class="token operator">?</span><span class="token punctuation">, </span></span><span class="parameter ">executor<span class="token operator">: </span><a href="../../../../library/runtime-core/io.matthewnelson.kmp.tor.runtime.core/-on-event/-executor/index.html">OnEvent.Executor</a><span class="token operator">?</span><span class="token punctuation">, </span></span><span class="parameter ">onEvent<span class="token operator">: </span><a href="../../../../library/runtime-core/io.matthewnelson.kmp.tor.runtime.core/-on-event/index.html">OnEvent</a><span class="token operator">&lt;</span><span data-unresolved-link="kotlin/String///PointingToDeclaration/">String</span><span class="token operator">?</span><span class="token operator">&gt;</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../../../../library/runtime-core/io.matthewnelson.kmp.tor.runtime.core/-disposable/-once/index.html">Disposable.Once</a></div><div class="brief "><p class="paragraph">Subscribes with provided <a href="index.html">TorRuntime</a> a <a href="../-runtime-event/-e-x-e-c-u-t-e/-c-m-d/index.html">CMD</a> observer which will intercept execution of all <a href="../../../../library/runtime-core/io.matthewnelson.kmp.tor.runtime.core.ctrl/-tor-cmd/-signal/-new-nym/index.html">TorCmd.Signal.NewNym</a> jobs in order to transform tor's generic server response of <a href="../../../../library/runtime-core/io.matthewnelson.kmp.tor.runtime.core.ctrl/-reply/-success/-o-k/index.html">Reply.Success.OK</a>.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="911513721%2FFunctions%2F-1793144430" anchor-label="state" id="911513721%2FFunctions%2F-1793144430" data-filterable-set=":library:runtime/commonMain"></a>
+          <div class="table-row" data-filterable-current=":library:runtime/commonMain" data-filterable-set=":library:runtime/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="state.html"><span><span>state</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="911513721%2FFunctions%2F-1793144430"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":library:runtime/commonMain"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword">fun </span><a href="state.html"><span class="token function">state</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../-tor-state/index.html">TorState</a></div><div class="brief "><p class="paragraph">Returns the current <a href="../-tor-state/index.html">TorState</a> of this <a href="index.html">TorRuntime</a> instance.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="517758914%2FFunctions%2F-1793144430" anchor-label="subscribe" id="517758914%2FFunctions%2F-1793144430" data-filterable-set=":library:runtime/commonMain"></a>
+          <div class="table-row" data-filterable-current=":library:runtime/commonMain" data-filterable-set=":library:runtime/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="../-runtime-event/-processor/subscribe.html"><span><span>subscribe</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="517758914%2FFunctions%2F-1793144430"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":library:runtime/commonMain"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword">fun </span><a href="../-runtime-event/-processor/subscribe.html"><span class="token function">subscribe</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">observer<span class="token operator">: </span><a href="../-runtime-event/-observer/index.html">RuntimeEvent.Observer</a><span class="token operator">&lt;</span><span class="token operator">*</span><span class="token operator">&gt;</span></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Add a single <a href="../-runtime-event/-observer/index.html">Observer</a>.</p></div><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword">fun </span><a href="../-runtime-event/-processor/subscribe.html"><span class="token function">subscribe</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter "><span class="token keyword">vararg </span>observers<span class="token operator">: </span><a href="../-runtime-event/-observer/index.html">RuntimeEvent.Observer</a><span class="token operator">&lt;</span><span class="token operator">*</span><span class="token operator">&gt;</span></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Add multiple <a href="../-runtime-event/-observer/index.html">Observer</a>.</p></div><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword">fun </span><a href="index.html#-586578011%2FFunctions%2F-1793144430"><span class="token function">subscribe</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">observer<span class="token operator">: </span><a href="../../../../library/runtime-core/io.matthewnelson.kmp.tor.runtime.core/-tor-event/-observer/index.html">TorEvent.Observer</a></span></span><span class="token punctuation">)</span></div><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword">fun </span><a href="index.html#1371595933%2FFunctions%2F-1793144430"><span class="token function">subscribe</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter "><span class="token keyword">vararg </span>observers<span class="token operator">: </span><a href="../../../../library/runtime-core/io.matthewnelson.kmp.tor.runtime.core/-tor-event/-observer/index.html">TorEvent.Observer</a></span></span><span class="token punctuation">)</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1326787476%2FFunctions%2F-1793144430" anchor-label="toFIDString" id="1326787476%2FFunctions%2F-1793144430" data-filterable-set=":library:runtime/commonMain"></a>
+          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":library:runtime/commonMain" data-filterable-set=":library:runtime/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="../-file-i-d/-companion/to-f-i-d-string.html"><span>to</span><wbr><span><span>FIDString</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1326787476%2FFunctions%2F-1793144430"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":library:runtime/commonMain"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><span data-unresolved-link="kotlin.jvm/JvmStatic///PointingToDeclaration/"><span class="token annotation builtin">JvmStatic</span></span></div><div class="block"><span class="token annotation builtin">@</span><span data-unresolved-link="kotlin.jvm/JvmOverloads///PointingToDeclaration/"><span class="token annotation builtin">JvmOverloads</span></span></div><div class="block"><span class="token annotation builtin">@</span><span data-unresolved-link="kotlin.jvm/JvmName///PointingToDeclaration/"><span class="token annotation builtin">JvmName</span></span><span class="token punctuation">(</span><span>name<span class="token operator"> = </span><span class="breakable-word"><span class="token string">"fidString"</span></span></span><wbr><span class="token punctuation">)</span></div></div><span class="token keyword">fun </span><a href="../-file-i-d/index.html">FileID</a><span class="token punctuation">.</span><a href="../-file-i-d/-companion/to-f-i-d-string.html"><span class="token function">toFIDString</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">defaultClassName<span class="token operator">: </span><span data-unresolved-link="kotlin/String///PointingToDeclaration/">String</span><span class="token operator"> = </span><span class="token string">"Unknown"</span><span class="token punctuation">, </span></span><span class="parameter ">includeHashCode<span class="token operator">: </span><span data-unresolved-link="kotlin/Boolean///PointingToDeclaration/">Boolean</span><span class="token operator"> = </span><span class="token boolean">true</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><span data-unresolved-link="kotlin/String///PointingToDeclaration/">String</span></div><div class="brief "><p class="paragraph">Helper for overriding a class's <a href="../../../../library/runtime/io.matthewnelson.kmp.tor.runtime/-file-i-d/-companion/to-string.html">toString</a> function.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1590454960%2FFunctions%2F-1793144430" anchor-label="unsubscribe" id="1590454960%2FFunctions%2F-1793144430" data-filterable-set=":library:runtime/commonMain"></a>
+          <div class="table-row" data-filterable-current=":library:runtime/commonMain" data-filterable-set=":library:runtime/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="../-runtime-event/-processor/unsubscribe.html"><span><span>unsubscribe</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1590454960%2FFunctions%2F-1793144430"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":library:runtime/commonMain"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword">fun </span><a href="../-runtime-event/-processor/unsubscribe.html"><span class="token function">unsubscribe</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">observer<span class="token operator">: </span><a href="../-runtime-event/-observer/index.html">RuntimeEvent.Observer</a><span class="token operator">&lt;</span><span class="token operator">*</span><span class="token operator">&gt;</span></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Remove a single <a href="../-runtime-event/-observer/index.html">Observer</a>.</p></div><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword">fun </span><a href="../-runtime-event/-processor/unsubscribe.html"><span class="token function">unsubscribe</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter "><span class="token keyword">vararg </span>observers<span class="token operator">: </span><a href="../-runtime-event/-observer/index.html">RuntimeEvent.Observer</a><span class="token operator">&lt;</span><span class="token operator">*</span><span class="token operator">&gt;</span></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Remove multiple <a href="../-runtime-event/-observer/index.html">Observer</a>.</p></div><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword">fun </span><a href="index.html#-687586004%2FFunctions%2F-1793144430"><span class="token function">unsubscribe</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">observer<span class="token operator">: </span><a href="../../../../library/runtime-core/io.matthewnelson.kmp.tor.runtime.core/-tor-event/-observer/index.html">TorEvent.Observer</a></span></span><span class="token punctuation">)</span></div><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword">fun </span><a href="index.html#-1369314844%2FFunctions%2F-1793144430"><span class="token function">unsubscribe</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter "><span class="token keyword">vararg </span>observers<span class="token operator">: </span><a href="../../../../library/runtime-core/io.matthewnelson.kmp.tor.runtime.core/-tor-event/-observer/index.html">TorEvent.Observer</a></span></span><span class="token punctuation">)</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-953293899%2FFunctions%2F-1793144430" anchor-label="unsubscribeAll" id="-953293899%2FFunctions%2F-1793144430" data-filterable-set=":library:runtime/commonMain"></a>
+          <div class="table-row" data-filterable-current=":library:runtime/commonMain" data-filterable-set=":library:runtime/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="../-runtime-event/-processor/unsubscribe-all.html"><span>unsubscribe</span><wbr><span><span>All</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-953293899%2FFunctions%2F-1793144430"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":library:runtime/commonMain"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword">fun </span><a href="../-runtime-event/-processor/unsubscribe-all.html"><span class="token function">unsubscribeAll</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">event<span class="token operator">: </span><a href="../-runtime-event/index.html">RuntimeEvent</a><span class="token operator">&lt;</span><span class="token operator">*</span><span class="token operator">&gt;</span></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Remove all <a href="../-runtime-event/-observer/index.html">Observer</a> of a single <a href="../-runtime-event/index.html">RuntimeEvent</a>.</p></div><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword">fun </span><a href="../-runtime-event/-processor/unsubscribe-all.html"><span class="token function">unsubscribeAll</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter "><span class="token keyword">vararg </span>events<span class="token operator">: </span><a href="../-runtime-event/index.html">RuntimeEvent</a><span class="token operator">&lt;</span><span class="token operator">*</span><span class="token operator">&gt;</span></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Remove all <a href="../-runtime-event/-observer/index.html">Observer</a> of multiple <a href="../-runtime-event/index.html">RuntimeEvent</a>.</p></div><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword">fun </span><a href="index.html#-137787741%2FFunctions%2F-1793144430"><span class="token function">unsubscribeAll</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">event<span class="token operator">: </span><a href="../../../../library/runtime-core/io.matthewnelson.kmp.tor.runtime.core/-tor-event/index.html">TorEvent</a></span></span><span class="token punctuation">)</span></div><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword">fun </span><a href="index.html#1307199065%2FFunctions%2F-1793144430"><span class="token function">unsubscribeAll</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter "><span class="token keyword">vararg </span>events<span class="token operator">: </span><a href="../../../../library/runtime-core/io.matthewnelson.kmp.tor.runtime.core/-tor-event/index.html">TorEvent</a></span></span><span class="token punctuation">)</span></div><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword">fun </span><a href="index.html#1900882511%2FFunctions%2F-1793144430"><span class="token function">unsubscribeAll</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">tag<span class="token operator">: </span><span data-unresolved-link="kotlin/String///PointingToDeclaration/">String</span></span></span><span class="token punctuation">)</span></div></div></div>
                 </div>
               </div>
             </div>
@@ -198,12 +369,18 @@
     </div>
   </div>
 </div>
-      <div class="footer">
-        <span class="go-to-top-icon"><a href="#content" id="go-to-top-link"></a></span><span>© 2025 Copyright</span><span class="pull-right"><span>Generated by </span><a href="https://github.com/Kotlin/dokka"><span>dokka</span><span class="padded-icon"></span></a></span>
-      </div>
+    <div class="footer">
+        <a href="#content" id="go-to-top-link" class="footer--button footer--button_go-to-top"></a>
+        <span>© 2021-2025 Copyright Matthew Nelson</span>
+        <span class="pull-right">
+            <span>Generated by </span>
+            <a class="footer--link footer--link_external" href="https://github.com/Kotlin/dokka">
+                <span>dokka</span>
+            </a>
+        </span>
+    </div>
             </div>
         </div>
     </div>
 </body>
 </html>
-

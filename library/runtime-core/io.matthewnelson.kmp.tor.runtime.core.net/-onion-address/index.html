@@ -25,80 +25,131 @@
 <link href="../../../../styles/prism.css" rel="Stylesheet">
 <link href="../../../../styles/logo-styles.css" rel="Stylesheet">
 <link href="../../../../styles/font-jb-sans-auto.css" rel="Stylesheet">
+<link href="../../../../ui-kit/ui-kit.min.css" rel="Stylesheet">
 <script type="text/javascript" src="../../../../scripts/clipboard.js" async></script>
 <script type="text/javascript" src="../../../../scripts/navigation-loader.js" async></script>
 <script type="text/javascript" src="../../../../scripts/platform-content-handler.js" async></script>
 <script type="text/javascript" src="../../../../scripts/main.js" defer></script>
 <script type="text/javascript" src="../../../../scripts/prism.js" async></script>
+<script type="text/javascript" src="../../../../ui-kit/ui-kit.min.js" defer></script>
 <script type="text/javascript" src="../../../../scripts/symbol-parameters-wrapper_deferred.js" defer></script></head>
 <body>
     <div class="root">
-<nav class="navigation" id="navigation-wrapper">
-    <div class="navigation--inner">
-        <div class="navigation-title">
-            <button class="menu-toggle" id="menu-toggle" type="button">toggle menu</button>
-            <div class="library-name">
+    <nav class="navigation theme-dark" id="navigation-wrapper">
 <a class="library-name--link" href="../../../../index.html">
-                            kmp-tor
-                    </a>            </div>
-            <div class="library-version">2.0.0
+                    kmp-tor
+            </a>        <button class="navigation-controls--btn navigation-controls--btn_toc ui-kit_mobile-only" id="toc-toggle" type="button">Toggle table of contents
+        </button>
+        <div class="navigation-controls--break ui-kit_mobile-only"></div>
+        <div class="library-version" id="library-version">2.1.0
+        </div>
+        <div class="navigation-controls">
+        <div class="filter-section filter-section_loading" id="filter-section">
+                <button class="platform-tag platform-selector common-like" data-active="" data-filter=":library:runtime-core/commonMain">common</button>
+            <div class="dropdown filter-section--dropdown" data-role="dropdown" id="filter-section-dropdown">
+                <button class="button button_dropdown filter-section--dropdown-toggle" role="combobox" data-role="dropdown-toggle" aria-controls="platform-tags-listbox" aria-haspopup="listbox" aria-expanded="false" aria-label="Toggle source sets"></button>
+                <ul role="listbox" id="platform-tags-listbox" class="dropdown--list" data-role="dropdown-listbox">
+                    <div class="dropdown--header"><span>Platform filter</span>
+                        <button class="button" data-role="dropdown-toggle" aria-label="Close platform filter">
+                            <i class="ui-kit-icon ui-kit-icon_cross"></i>
+                        </button>
+                    </div>
+                        <li role="option" class="dropdown--option platform-selector-option common-like" tabindex="0">
+                            <label class="checkbox">
+                                <input type="checkbox" class="checkbox--input" id=":library:runtime-core/commonMain" data-filter=":library:runtime-core/commonMain">
+                                <span class="checkbox--icon"></span>
+                                common
+                            </label>
+                        </li>
+                </ul>
+                <div class="dropdown--overlay"></div>
             </div>
         </div>
-        <div class="filter-section" id="filter-section">
-                <button class="platform-tag platform-selector common-like" data-active="" data-filter=":library:runtime-core:dokkaHtmlPartial/commonMain">common</button>
+            <button class="navigation-controls--btn navigation-controls--btn_theme" id="theme-toggle-button" type="button">Switch theme
+            </button>
+            <div class="navigation-controls--btn navigation-controls--btn_search" id="searchBar" role="button">Search in
+                API
+            </div>
         </div>
-    </div>
-    <div class="navigation-controls">
-        <button class="navigation-controls--btn navigation-controls--theme" id="theme-toggle-button" type="button">switch theme</button>
-        <div class="navigation-controls--btn navigation-controls--search" id="searchBar" role="button">search in API</div>
-    </div>
-</nav>
+    </nav>
         <div id="container">
             <div class="sidebar" id="leftColumn">
-                <div class="sidebar--inner" id="sideMenu"></div>
+                <div class="dropdown theme-dark_mobile" data-role="dropdown" id="toc-dropdown">
+                    <ul role="listbox" id="toc-listbox" class="dropdown--list dropdown--list_toc-list" data-role="dropdown-listbox">
+                        <div class="dropdown--header">
+                            <span>
+                                    kmp-tor
+                            </span>
+                            <button class="button" data-role="dropdown-toggle" aria-label="Close table of contents">
+                                <i class="ui-kit-icon ui-kit-icon_cross"></i>
+                            </button>
+                        </div>
+                        <div class="sidebar--inner" id="sideMenu"></div>
+                    </ul>
+                    <div class="dropdown--overlay"></div>
+                </div>
             </div>
             <div id="main">
-<div class="main-content" data-page-type="classlike" id="content" pageids="runtime-core::io.matthewnelson.kmp.tor.runtime.core.net/OnionAddress///PointingToDeclaration//-1857527840">
+<div class="main-content" data-page-type="classlike" id="content" pageids="runtime-core::io.matthewnelson.kmp.tor.runtime.core.net/OnionAddress///PointingToDeclaration//1051389726">
   <div class="breadcrumbs"><a href="../../index.html">runtime-core</a><span class="delimiter">/</span><a href="../index.html">io.matthewnelson.kmp.tor.runtime.core.net</a><span class="delimiter">/</span><span class="current">OnionAddress</span></div>
   <div class="cover ">
     <h1 class="cover"><span>Onion</span><wbr><span><span>Address</span></span></h1>
-    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":library:runtime-core:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">sealed </span><span class="token keyword">class </span><a href="index.html">OnionAddress</a> : <a href="../-address/index.html">Address</a><span class="clearfix"><span class="floating-right">(<a href="https://github.com/05nelsonm/kmp-tor/tree/master/library/runtime-core/src/commonMain/kotlin/io/matthewnelson/kmp/tor/runtime/core/net/OnionAddress.kt#L48">source</a>)</span></span></div><p class="paragraph">Base abstraction for denoting a String value as a <code class="lang-kotlin">.onion</code> address</p><p class="paragraph">e.g.</p><div class="sample-container"><pre><code class="block lang-kotlin" theme="idea">val string = "2gzyxa5ihm7nsggfxnu52rck2vv4rvmdlkiu3zzui5du4xyclen53wid"
+    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":library:runtime-core/commonMain"><div class="symbol monospace"><span class="token keyword">sealed </span><span class="token keyword">class </span><a href="index.html">OnionAddress</a> : <a href="../-address/index.html">Address</a><span class="clearfix"><span class="floating-right">(<a href="https://github.com/05nelsonm/kmp-tor/tree/master/library/runtime-core/src/commonMain/kotlin/io/matthewnelson/kmp/tor/runtime/core/net/OnionAddress.kt#L48">source</a>)</span></span></div><p class="paragraph">Base abstraction for denoting a String value as a <code class="lang-kotlin">.onion</code> address</p><p class="paragraph">e.g.</p><div class="sample-container"><pre><code class="block lang-kotlin" theme="idea">val string = "2gzyxa5ihm7nsggfxnu52rck2vv4rvmdlkiu3zzui5du4xyclen53wid"
 
 string.toOnionAddress()
 "http://${string}.onion:8080/some/path".toOnionAddress()
-"http://subdomain.${string}.onion:8080/some/path".toOnionAddress()</code></pre><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><h4 class="">See also</h4><div class="table"><div class="table-row" data-filterable-current=":library:runtime-core:dokkaHtmlPartial/commonMain" data-filterable-set=":library:runtime-core:dokkaHtmlPartial/commonMain"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="-companion/to-onion-address.html"><span>Onion</span><wbr><span>Address.</span><wbr><span>Companion.</span><wbr><span>to</span><wbr><span>Onion</span><wbr><span><span>Address</span></span></a></div></span></div><div></div></div></div><div class="table-row" data-filterable-current=":library:runtime-core:dokkaHtmlPartial/commonMain" data-filterable-set=":library:runtime-core:dokkaHtmlPartial/commonMain"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="-companion/to-onion-address-or-null.html"><span>Onion</span><wbr><span>Address.</span><wbr><span>Companion.</span><wbr><span>to</span><wbr><span>Onion</span><wbr><span>Address</span><wbr><span>Or</span><wbr><span><span>Null</span></span></a></div></span></div><div></div></div></div></div><h4 class="">Inheritors</h4><div class="table"><div class="table-row" data-filterable-current=":library:runtime-core:dokkaHtmlPartial/commonMain" data-filterable-set=":library:runtime-core:dokkaHtmlPartial/commonMain"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="-v3/index.html">V3</a></div></span></div><div></div></div></div></div></div></div>
+"http://subdomain.${string}.onion:8080/some/path".toOnionAddress()</code></pre><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><h4 class="">See also</h4><div class="table"><div class="table-row" data-filterable-current=":library:runtime-core/commonMain" data-filterable-set=":library:runtime-core/commonMain"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="-companion/to-onion-address.html"><span>Onion</span><wbr><span>Address.</span><wbr><span>Companion.</span><wbr><span>to</span><wbr><span>Onion</span><wbr><span><span>Address</span></span></a></div></span></div><div></div></div></div><div class="table-row" data-filterable-current=":library:runtime-core/commonMain" data-filterable-set=":library:runtime-core/commonMain"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="-companion/to-onion-address-or-null.html"><span>Onion</span><wbr><span>Address.</span><wbr><span>Companion.</span><wbr><span>to</span><wbr><span>Onion</span><wbr><span>Address</span><wbr><span>Or</span><wbr><span><span>Null</span></span></a></div></span></div><div></div></div></div></div><h4 class="">Inheritors</h4><div class="table"><div class="table-row" data-filterable-current=":library:runtime-core/commonMain" data-filterable-set=":library:runtime-core/commonMain"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="-v3/index.html">V3</a></div></span></div><div></div></div></div></div></div></div>
   </div>
   <div class="tabbedcontent">
     <div class="tabs-section" tabs-section="tabs-section"><button class="section-tab" data-active="" data-togglable="CONSTRUCTOR,TYPE,PROPERTY,FUNCTION">Members</button><button class="section-tab" data-togglable="CONSTRUCTOR,TYPE,PROPERTY,FUNCTION,EXTENSION_PROPERTY,EXTENSION_FUNCTION">Members &amp; Extensions</button></div>
     <div class="tabs-section-body">
       <div data-togglable="TYPE">
         <h2 class="">Types</h2>
-        <div class="table"><a data-name="1888885863%2FClasslikes%2F-1857527840" anchor-label="Companion" id="1888885863%2FClasslikes%2F-1857527840" data-filterable-set=":library:runtime-core:dokkaHtmlPartial/commonMain"></a>
-          <div class="table-row" data-filterable-current=":library:runtime-core:dokkaHtmlPartial/commonMain" data-filterable-set=":library:runtime-core:dokkaHtmlPartial/commonMain">
+        <div class="table"><a data-name="1888885863%2FClasslikes%2F1051389726" anchor-label="Companion" id="1888885863%2FClasslikes%2F1051389726" data-filterable-set=":library:runtime-core/commonMain"></a>
+          <div class="table-row" data-filterable-current=":library:runtime-core/commonMain" data-filterable-set=":library:runtime-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-companion/index.html"><span><span>Companion</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1888885863%2FClasslikes%2F-1857527840"></span>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1888885863%2FClasslikes%2F1051389726"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":library:runtime-core:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">object </span><a href="-companion/index.html">Companion</a></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":library:runtime-core/commonMain"><div class="symbol monospace"><span class="token keyword">object </span><a href="-companion/index.html">Companion</a></div></div></div>
                 </div>
               </div>
             </div>
           </div>
-<a data-name="1779634386%2FClasslikes%2F-1857527840" anchor-label="V3" id="1779634386%2FClasslikes%2F-1857527840" data-filterable-set=":library:runtime-core:dokkaHtmlPartial/commonMain"></a>
-          <div class="table-row" data-filterable-current=":library:runtime-core:dokkaHtmlPartial/commonMain" data-filterable-set=":library:runtime-core:dokkaHtmlPartial/commonMain">
+<a data-name="1779634386%2FClasslikes%2F1051389726" anchor-label="V3" id="1779634386%2FClasslikes%2F1051389726" data-filterable-set=":library:runtime-core/commonMain"></a>
+          <div class="table-row" data-filterable-current=":library:runtime-core/commonMain" data-filterable-set=":library:runtime-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-v3/index.html"><span><span>V3</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1779634386%2FClasslikes%2F-1857527840"></span>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1779634386%2FClasslikes%2F1051389726"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":library:runtime-core:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">class </span><a href="-v3/index.html">V3</a> : <a href="index.html">OnionAddress</a></div><div class="brief "><p class="paragraph">Holder for a 56 character v3 onion address without the scheme or <code class="lang-kotlin">.onion</code> appended.</p></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":library:runtime-core/commonMain"><div class="symbol monospace"><span class="token keyword">class </span><a href="-v3/index.html">V3</a> : <a href="index.html">OnionAddress</a></div><div class="brief "><p class="paragraph">Holder for a 56 character v3 onion address without the scheme or <code class="lang-kotlin">.onion</code> appended.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div data-togglable="PROPERTY">
+        <h2 class="">Properties</h2>
+        <div class="table"><a data-name="-1863806648%2FProperties%2F1051389726" anchor-label="value" id="-1863806648%2FProperties%2F1051389726" data-filterable-set=":library:runtime-core/commonMain"></a>
+          <div class="table-row" data-filterable-current=":library:runtime-core/commonMain" data-filterable-set=":library:runtime-core/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="../-address/value.html"><span><span>value</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1863806648%2FProperties%2F1051389726"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":library:runtime-core/commonMain"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><span data-unresolved-link="kotlin.jvm/JvmField///PointingToDeclaration/"><span class="token annotation builtin">JvmField</span></span></div></div><span class="token keyword">val </span><a href="../-address/value.html">value</a><span class="token operator">: </span><span data-unresolved-link="kotlin/String///PointingToDeclaration/">String</span></div></div></div>
                 </div>
               </div>
             </div>
@@ -107,62 +158,92 @@ string.toOnionAddress()
       </div>
       <div data-togglable="FUNCTION">
         <h2 class="">Functions</h2>
-        <div class="table"><a data-name="2054910908%2FFunctions%2F-1857527840" anchor-label="asPublicKey" id="2054910908%2FFunctions%2F-1857527840" data-filterable-set=":library:runtime-core:dokkaHtmlPartial/commonMain"></a>
-          <div class="table-row" data-filterable-current=":library:runtime-core:dokkaHtmlPartial/commonMain" data-filterable-set=":library:runtime-core:dokkaHtmlPartial/commonMain">
+        <div class="table"><a data-name="2054910908%2FFunctions%2F1051389726" anchor-label="asPublicKey" id="2054910908%2FFunctions%2F1051389726" data-filterable-set=":library:runtime-core/commonMain"></a>
+          <div class="table-row" data-filterable-current=":library:runtime-core/commonMain" data-filterable-set=":library:runtime-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="as-public-key.html"><span>as</span><wbr><span>Public</span><wbr><span><span>Key</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="2054910908%2FFunctions%2F-1857527840"></span>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="2054910908%2FFunctions%2F1051389726"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":library:runtime-core:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword">fun </span><a href="as-public-key.html"><span class="token function">asPublicKey</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../../io.matthewnelson.kmp.tor.runtime.core.key/-address-key/-public/index.html">AddressKey.Public</a></div><div class="brief "><p class="paragraph">Wraps the <a href="index.html">OnionAddress</a> in its <a href="../../io.matthewnelson.kmp.tor.runtime.core.key/-address-key/-public/index.html">AddressKey.Public</a> format for extended functionality.</p></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":library:runtime-core/commonMain"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword">fun </span><a href="as-public-key.html"><span class="token function">asPublicKey</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../../io.matthewnelson.kmp.tor.runtime.core.key/-address-key/-public/index.html">AddressKey.Public</a></div><div class="brief "><p class="paragraph">Wraps the <a href="index.html">OnionAddress</a> in its <a href="../../io.matthewnelson.kmp.tor.runtime.core.key/-address-key/-public/index.html">AddressKey.Public</a> format for extended functionality.</p></div></div></div>
                 </div>
               </div>
             </div>
           </div>
-<a data-name="-578501364%2FFunctions%2F-1857527840" anchor-label="decode" id="-578501364%2FFunctions%2F-1857527840" data-filterable-set=":library:runtime-core:dokkaHtmlPartial/commonMain"></a>
-          <div class="table-row" data-filterable-current=":library:runtime-core:dokkaHtmlPartial/commonMain" data-filterable-set=":library:runtime-core:dokkaHtmlPartial/commonMain">
+<a data-name="11654162%2FFunctions%2F1051389726" anchor-label="canonicalHostName" id="11654162%2FFunctions%2F1051389726" data-filterable-set=":library:runtime-core/commonMain"></a>
+          <div class="table-row" data-filterable-current=":library:runtime-core/commonMain" data-filterable-set=":library:runtime-core/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="../-address/canonical-host-name.html"><span>canonical</span><wbr><span>Host</span><wbr><span><span>Name</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="11654162%2FFunctions%2F1051389726"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":library:runtime-core/commonMain"><div class="symbol monospace"><span class="token keyword">fun </span><a href="../-address/canonical-host-name.html"><span class="token function">canonicalHostName</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><span data-unresolved-link="kotlin/String///PointingToDeclaration/">String</span></div><div class="brief "><p class="paragraph">Returns <a href="../-address/value.html">value</a> in its canonicalized hostname form</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1531068811%2FFunctions%2F1051389726" anchor-label="compareTo" id="-1531068811%2FFunctions%2F1051389726" data-filterable-set=":library:runtime-core/commonMain"></a>
+          <div class="table-row" data-filterable-current=":library:runtime-core/commonMain" data-filterable-set=":library:runtime-core/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="../-address/compare-to.html"><span>compare</span><wbr><span><span>To</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1531068811%2FFunctions%2F1051389726"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":library:runtime-core/commonMain"><div class="symbol monospace"><span class="token keyword">operator override </span><span class="token keyword">fun </span><a href="../-address/compare-to.html"><span class="token function">compareTo</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">other<span class="token operator">: </span><a href="../-address/index.html">Address</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><span data-unresolved-link="kotlin/Int///PointingToDeclaration/">Int</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-578501364%2FFunctions%2F1051389726" anchor-label="decode" id="-578501364%2FFunctions%2F1051389726" data-filterable-set=":library:runtime-core/commonMain"></a>
+          <div class="table-row" data-filterable-current=":library:runtime-core/commonMain" data-filterable-set=":library:runtime-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="decode.html"><span><span>decode</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-578501364%2FFunctions%2F-1857527840"></span>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-578501364%2FFunctions%2F1051389726"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":library:runtime-core:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword">fun </span><a href="decode.html"><span class="token function">decode</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><span data-unresolved-link="kotlin/ByteArray///PointingToDeclaration/">ByteArray</span></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":library:runtime-core/commonMain"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword">fun </span><a href="decode.html"><span class="token function">decode</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><span data-unresolved-link="kotlin/ByteArray///PointingToDeclaration/">ByteArray</span></div></div></div>
                 </div>
               </div>
             </div>
           </div>
-<a data-name="2085236502%2FFunctions%2F-1857527840" anchor-label="mappingToAnyHostIPv4" id="2085236502%2FFunctions%2F-1857527840" data-filterable-set=":library:runtime-core:dokkaHtmlPartial/commonMain"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":library:runtime-core:dokkaHtmlPartial/commonMain" data-filterable-set=":library:runtime-core:dokkaHtmlPartial/commonMain">
+<a data-name="2085236502%2FFunctions%2F1051389726" anchor-label="mappingToAnyHostIPv4" id="2085236502%2FFunctions%2F1051389726" data-filterable-set=":library:runtime-core/commonMain"></a>
+          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":library:runtime-core/commonMain" data-filterable-set=":library:runtime-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="../../io.matthewnelson.kmp.tor.runtime.core.ctrl/-address-mapping/-companion/mapping-to-any-host-i-pv4.html"><span>mapping</span><wbr><span>To</span><wbr><span>Any</span><wbr><span>Host</span><wbr><span><span>IPv4</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="2085236502%2FFunctions%2F-1857527840"></span>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="2085236502%2FFunctions%2F1051389726"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":library:runtime-core:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><span data-unresolved-link="kotlin.jvm/JvmStatic///PointingToDeclaration/"><span class="token annotation builtin">JvmStatic</span></span></div><div class="block"><span class="token annotation builtin">@</span><span data-unresolved-link="kotlin.jvm/JvmName///PointingToDeclaration/"><span class="token annotation builtin">JvmName</span></span><span class="token punctuation">(</span><span>name<span class="token operator"> = </span><span class="breakable-word"><span class="token string">"anyHostIPv4To"</span></span></span><wbr><span class="token punctuation">)</span></div></div><span class="token keyword">fun </span><a href="index.html">OnionAddress</a><span class="token punctuation">.</span><a href="../../io.matthewnelson.kmp.tor.runtime.core.ctrl/-address-mapping/-companion/mapping-to-any-host-i-pv4.html"><span class="token function">mappingToAnyHostIPv4</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../../io.matthewnelson.kmp.tor.runtime.core.ctrl/-address-mapping/index.html">AddressMapping</a></div><div class="brief "><p class="paragraph">Creates a <a href="../../io.matthewnelson.kmp.tor.runtime.core.ctrl/-address-mapping/index.html">AddressMapping</a> that instructs tor to generate a virtual <a href="../-i-p-address/-v4/index.html">IPAddress.V4</a> address and map the provided <a href="index.html">OnionAddress</a> to it.</p></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":library:runtime-core/commonMain"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><span data-unresolved-link="kotlin.jvm/JvmStatic///PointingToDeclaration/"><span class="token annotation builtin">JvmStatic</span></span></div><div class="block"><span class="token annotation builtin">@</span><span data-unresolved-link="kotlin.jvm/JvmName///PointingToDeclaration/"><span class="token annotation builtin">JvmName</span></span><span class="token punctuation">(</span><span>name<span class="token operator"> = </span><span class="breakable-word"><span class="token string">"anyHostIPv4To"</span></span></span><wbr><span class="token punctuation">)</span></div></div><span class="token keyword">fun </span><a href="index.html">OnionAddress</a><span class="token punctuation">.</span><a href="../../io.matthewnelson.kmp.tor.runtime.core.ctrl/-address-mapping/-companion/mapping-to-any-host-i-pv4.html"><span class="token function">mappingToAnyHostIPv4</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../../io.matthewnelson.kmp.tor.runtime.core.ctrl/-address-mapping/index.html">AddressMapping</a></div><div class="brief "><p class="paragraph">Creates a <a href="../../io.matthewnelson.kmp.tor.runtime.core.ctrl/-address-mapping/index.html">AddressMapping</a> that instructs tor to generate a virtual <a href="../-i-p-address/-v4/index.html">IPAddress.V4</a> address and map the provided <a href="index.html">OnionAddress</a> to it.</p></div></div></div>
                 </div>
               </div>
             </div>
           </div>
-<a data-name="942734036%2FFunctions%2F-1857527840" anchor-label="mappingToAnyHostIPv6" id="942734036%2FFunctions%2F-1857527840" data-filterable-set=":library:runtime-core:dokkaHtmlPartial/commonMain"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":library:runtime-core:dokkaHtmlPartial/commonMain" data-filterable-set=":library:runtime-core:dokkaHtmlPartial/commonMain">
+<a data-name="942734036%2FFunctions%2F1051389726" anchor-label="mappingToAnyHostIPv6" id="942734036%2FFunctions%2F1051389726" data-filterable-set=":library:runtime-core/commonMain"></a>
+          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":library:runtime-core/commonMain" data-filterable-set=":library:runtime-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="../../io.matthewnelson.kmp.tor.runtime.core.ctrl/-address-mapping/-companion/mapping-to-any-host-i-pv6.html"><span>mapping</span><wbr><span>To</span><wbr><span>Any</span><wbr><span>Host</span><wbr><span><span>IPv6</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="942734036%2FFunctions%2F-1857527840"></span>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="942734036%2FFunctions%2F1051389726"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":library:runtime-core:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><span data-unresolved-link="kotlin.jvm/JvmStatic///PointingToDeclaration/"><span class="token annotation builtin">JvmStatic</span></span></div><div class="block"><span class="token annotation builtin">@</span><span data-unresolved-link="kotlin.jvm/JvmName///PointingToDeclaration/"><span class="token annotation builtin">JvmName</span></span><span class="token punctuation">(</span><span>name<span class="token operator"> = </span><span class="breakable-word"><span class="token string">"anyHostIPv6To"</span></span></span><wbr><span class="token punctuation">)</span></div></div><span class="token keyword">fun </span><a href="index.html">OnionAddress</a><span class="token punctuation">.</span><a href="../../io.matthewnelson.kmp.tor.runtime.core.ctrl/-address-mapping/-companion/mapping-to-any-host-i-pv6.html"><span class="token function">mappingToAnyHostIPv6</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../../io.matthewnelson.kmp.tor.runtime.core.ctrl/-address-mapping/index.html">AddressMapping</a></div><div class="brief "><p class="paragraph">Creates a <a href="../../io.matthewnelson.kmp.tor.runtime.core.ctrl/-address-mapping/index.html">AddressMapping</a> that instructs tor to generate a virtual <a href="../-i-p-address/-v4/index.html">IPAddress.V4</a> address and map the provided <a href="index.html">OnionAddress</a> to it.</p></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":library:runtime-core/commonMain"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><span data-unresolved-link="kotlin.jvm/JvmStatic///PointingToDeclaration/"><span class="token annotation builtin">JvmStatic</span></span></div><div class="block"><span class="token annotation builtin">@</span><span data-unresolved-link="kotlin.jvm/JvmName///PointingToDeclaration/"><span class="token annotation builtin">JvmName</span></span><span class="token punctuation">(</span><span>name<span class="token operator"> = </span><span class="breakable-word"><span class="token string">"anyHostIPv6To"</span></span></span><wbr><span class="token punctuation">)</span></div></div><span class="token keyword">fun </span><a href="index.html">OnionAddress</a><span class="token punctuation">.</span><a href="../../io.matthewnelson.kmp.tor.runtime.core.ctrl/-address-mapping/-companion/mapping-to-any-host-i-pv6.html"><span class="token function">mappingToAnyHostIPv6</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../../io.matthewnelson.kmp.tor.runtime.core.ctrl/-address-mapping/index.html">AddressMapping</a></div><div class="brief "><p class="paragraph">Creates a <a href="../../io.matthewnelson.kmp.tor.runtime.core.ctrl/-address-mapping/index.html">AddressMapping</a> that instructs tor to generate a virtual <a href="../-i-p-address/-v4/index.html">IPAddress.V4</a> address and map the provided <a href="index.html">OnionAddress</a> to it.</p></div></div></div>
                 </div>
               </div>
             </div>
@@ -172,12 +253,18 @@ string.toOnionAddress()
     </div>
   </div>
 </div>
-      <div class="footer">
-        <span class="go-to-top-icon"><a href="#content" id="go-to-top-link"></a></span><span>© 2025 Copyright</span><span class="pull-right"><span>Generated by </span><a href="https://github.com/Kotlin/dokka"><span>dokka</span><span class="padded-icon"></span></a></span>
-      </div>
+    <div class="footer">
+        <a href="#content" id="go-to-top-link" class="footer--button footer--button_go-to-top"></a>
+        <span>© 2021-2025 Copyright Matthew Nelson</span>
+        <span class="pull-right">
+            <span>Generated by </span>
+            <a class="footer--link footer--link_external" href="https://github.com/Kotlin/dokka">
+                <span>dokka</span>
+            </a>
+        </span>
+    </div>
             </div>
         </div>
     </div>
 </body>
 </html>
-

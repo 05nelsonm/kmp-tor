@@ -25,59 +25,119 @@
 <link href="../../styles/prism.css" rel="Stylesheet">
 <link href="../../styles/logo-styles.css" rel="Stylesheet">
 <link href="../../styles/font-jb-sans-auto.css" rel="Stylesheet">
+<link href="../../ui-kit/ui-kit.min.css" rel="Stylesheet">
 <script type="text/javascript" src="../../scripts/clipboard.js" async></script>
 <script type="text/javascript" src="../../scripts/navigation-loader.js" async></script>
 <script type="text/javascript" src="../../scripts/platform-content-handler.js" async></script>
 <script type="text/javascript" src="../../scripts/main.js" defer></script>
 <script type="text/javascript" src="../../scripts/prism.js" async></script>
+<script type="text/javascript" src="../../ui-kit/ui-kit.min.js" defer></script>
 <script type="text/javascript" src="../../scripts/symbol-parameters-wrapper_deferred.js" defer></script></head>
 <body>
     <div class="root">
-<nav class="navigation" id="navigation-wrapper">
-    <div class="navigation--inner">
-        <div class="navigation-title">
-            <button class="menu-toggle" id="menu-toggle" type="button">toggle menu</button>
-            <div class="library-name">
+    <nav class="navigation theme-dark" id="navigation-wrapper">
 <a class="library-name--link" href="../../index.html">
-                            kmp-tor
-                    </a>            </div>
-            <div class="library-version">2.0.0
+                    kmp-tor
+            </a>        <button class="navigation-controls--btn navigation-controls--btn_toc ui-kit_mobile-only" id="toc-toggle" type="button">Toggle table of contents
+        </button>
+        <div class="navigation-controls--break ui-kit_mobile-only"></div>
+        <div class="library-version" id="library-version">2.1.0
+        </div>
+        <div class="navigation-controls">
+        <div class="filter-section filter-section_loading" id="filter-section">
+                <button class="platform-tag platform-selector common-like" data-active="" data-filter=":library:runtime-core/commonMain">common</button>
+                <button class="platform-tag platform-selector js-like" data-active="" data-filter=":library:runtime-core/jsMain">js</button>
+                <button class="platform-tag platform-selector jvm-like" data-active="" data-filter=":library:runtime-core/jvmMain">jvm</button>
+                <button class="platform-tag platform-selector common-like" data-active="" data-filter=":library:runtime-core/nonJsMain">nonJs</button>
+                <button class="platform-tag platform-selector common-like" data-active="" data-filter=":library:runtime-core/nonJvmMain">nonJvm</button>
+            <div class="dropdown filter-section--dropdown" data-role="dropdown" id="filter-section-dropdown">
+                <button class="button button_dropdown filter-section--dropdown-toggle" role="combobox" data-role="dropdown-toggle" aria-controls="platform-tags-listbox" aria-haspopup="listbox" aria-expanded="false" aria-label="Toggle source sets"></button>
+                <ul role="listbox" id="platform-tags-listbox" class="dropdown--list" data-role="dropdown-listbox">
+                    <div class="dropdown--header"><span>Platform filter</span>
+                        <button class="button" data-role="dropdown-toggle" aria-label="Close platform filter">
+                            <i class="ui-kit-icon ui-kit-icon_cross"></i>
+                        </button>
+                    </div>
+                        <li role="option" class="dropdown--option platform-selector-option common-like" tabindex="0">
+                            <label class="checkbox">
+                                <input type="checkbox" class="checkbox--input" id=":library:runtime-core/commonMain" data-filter=":library:runtime-core/commonMain">
+                                <span class="checkbox--icon"></span>
+                                common
+                            </label>
+                        </li>
+                        <li role="option" class="dropdown--option platform-selector-option js-like" tabindex="0">
+                            <label class="checkbox">
+                                <input type="checkbox" class="checkbox--input" id=":library:runtime-core/jsMain" data-filter=":library:runtime-core/jsMain">
+                                <span class="checkbox--icon"></span>
+                                js
+                            </label>
+                        </li>
+                        <li role="option" class="dropdown--option platform-selector-option jvm-like" tabindex="0">
+                            <label class="checkbox">
+                                <input type="checkbox" class="checkbox--input" id=":library:runtime-core/jvmMain" data-filter=":library:runtime-core/jvmMain">
+                                <span class="checkbox--icon"></span>
+                                jvm
+                            </label>
+                        </li>
+                        <li role="option" class="dropdown--option platform-selector-option common-like" tabindex="0">
+                            <label class="checkbox">
+                                <input type="checkbox" class="checkbox--input" id=":library:runtime-core/nonJsMain" data-filter=":library:runtime-core/nonJsMain">
+                                <span class="checkbox--icon"></span>
+                                nonJs
+                            </label>
+                        </li>
+                        <li role="option" class="dropdown--option platform-selector-option common-like" tabindex="0">
+                            <label class="checkbox">
+                                <input type="checkbox" class="checkbox--input" id=":library:runtime-core/nonJvmMain" data-filter=":library:runtime-core/nonJvmMain">
+                                <span class="checkbox--icon"></span>
+                                nonJvm
+                            </label>
+                        </li>
+                </ul>
+                <div class="dropdown--overlay"></div>
             </div>
         </div>
-        <div class="filter-section" id="filter-section">
-                <button class="platform-tag platform-selector common-like" data-active="" data-filter=":library:runtime-core:dokkaHtmlPartial/commonMain">common</button>
-                <button class="platform-tag platform-selector js-like" data-active="" data-filter=":library:runtime-core:dokkaHtmlPartial/jsMain">js</button>
-                <button class="platform-tag platform-selector jvm-like" data-active="" data-filter=":library:runtime-core:dokkaHtmlPartial/jvmMain">jvm</button>
-                <button class="platform-tag platform-selector common-like" data-active="" data-filter=":library:runtime-core:dokkaHtmlPartial/nonJsMain">nonJs</button>
-                <button class="platform-tag platform-selector common-like" data-active="" data-filter=":library:runtime-core:dokkaHtmlPartial/nonJvmMain">nonJvm</button>
+            <button class="navigation-controls--btn navigation-controls--btn_theme" id="theme-toggle-button" type="button">Switch theme
+            </button>
+            <div class="navigation-controls--btn navigation-controls--btn_search" id="searchBar" role="button">Search in
+                API
+            </div>
         </div>
-    </div>
-    <div class="navigation-controls">
-        <button class="navigation-controls--btn navigation-controls--theme" id="theme-toggle-button" type="button">switch theme</button>
-        <div class="navigation-controls--btn navigation-controls--search" id="searchBar" role="button">search in API</div>
-    </div>
-</nav>
+    </nav>
         <div id="container">
             <div class="sidebar" id="leftColumn">
-                <div class="sidebar--inner" id="sideMenu"></div>
+                <div class="dropdown theme-dark_mobile" data-role="dropdown" id="toc-dropdown">
+                    <ul role="listbox" id="toc-listbox" class="dropdown--list dropdown--list_toc-list" data-role="dropdown-listbox">
+                        <div class="dropdown--header">
+                            <span>
+                                    kmp-tor
+                            </span>
+                            <button class="button" data-role="dropdown-toggle" aria-label="Close table of contents">
+                                <i class="ui-kit-icon ui-kit-icon_cross"></i>
+                            </button>
+                        </div>
+                        <div class="sidebar--inner" id="sideMenu"></div>
+                    </ul>
+                    <div class="dropdown--overlay"></div>
+                </div>
             </div>
             <div id="main">
-<div class="main-content" id="content" pageids="runtime-core::////PointingToDeclaration//-2067068578">
+<div class="main-content" id="content" pageids="runtime-core::////PointingToDeclaration//1018748176">
   <div class="breadcrumbs"></div>
   <div class="cover ">
     <h1 class="cover"><span><span>runtime-core</span></span></h1>
     <div class="platform-hinted UnderCoverText with-platform-tabs" data-platform-hinted="data-platform-hinted">
-      <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":library:runtime-core:dokkaHtmlPartial/commonMain" data-filterable-set=":library:runtime-core:dokkaHtmlPartial/commonMain" data-active="" data-toggle=":library:runtime-core:dokkaHtmlPartial/commonMain">common</button><button class="platform-bookmark" data-filterable-current=":library:runtime-core:dokkaHtmlPartial/jsMain" data-filterable-set=":library:runtime-core:dokkaHtmlPartial/jsMain" data-toggle=":library:runtime-core:dokkaHtmlPartial/jsMain">js</button><button class="platform-bookmark" data-filterable-current=":library:runtime-core:dokkaHtmlPartial/jvmMain" data-filterable-set=":library:runtime-core:dokkaHtmlPartial/jvmMain" data-toggle=":library:runtime-core:dokkaHtmlPartial/jvmMain">jvm</button><button class="platform-bookmark" data-filterable-current=":library:runtime-core:dokkaHtmlPartial/nonJsMain" data-filterable-set=":library:runtime-core:dokkaHtmlPartial/nonJsMain" data-toggle=":library:runtime-core:dokkaHtmlPartial/nonJsMain">nonJs</button><button class="platform-bookmark" data-filterable-current=":library:runtime-core:dokkaHtmlPartial/nonJvmMain" data-filterable-set=":library:runtime-core:dokkaHtmlPartial/nonJvmMain" data-toggle=":library:runtime-core:dokkaHtmlPartial/nonJvmMain">nonJvm</button></div>
-<div class="content sourceset-dependent-content" data-active="" data-togglable=":library:runtime-core:dokkaHtmlPartial/commonMain"><p class="paragraph">Core primitives for kmp-tor operation, serving as the foundation of other higher level  dependencies such as <a href="https://kmp-tor.matthewnelson.io/library/runtime-ctrl/index.html">runtime-ctrl</a> and <a href="https://kmp-tor.matthewnelson.io/library/runtime/index.html">runtime</a>.</p></div><div class="content sourceset-dependent-content" data-togglable=":library:runtime-core:dokkaHtmlPartial/jsMain"><p class="paragraph">Core primitives for kmp-tor operation, serving as the foundation of other higher level  dependencies such as <a href="https://kmp-tor.matthewnelson.io/library/runtime-ctrl/index.html">runtime-ctrl</a> and <a href="https://kmp-tor.matthewnelson.io/library/runtime/index.html">runtime</a>.</p></div><div class="content sourceset-dependent-content" data-togglable=":library:runtime-core:dokkaHtmlPartial/jvmMain"><p class="paragraph">Core primitives for kmp-tor operation, serving as the foundation of other higher level  dependencies such as <a href="https://kmp-tor.matthewnelson.io/library/runtime-ctrl/index.html">runtime-ctrl</a> and <a href="https://kmp-tor.matthewnelson.io/library/runtime/index.html">runtime</a>.</p></div><div class="content sourceset-dependent-content" data-togglable=":library:runtime-core:dokkaHtmlPartial/nonJsMain"><p class="paragraph">Core primitives for kmp-tor operation, serving as the foundation of other higher level  dependencies such as <a href="https://kmp-tor.matthewnelson.io/library/runtime-ctrl/index.html">runtime-ctrl</a> and <a href="https://kmp-tor.matthewnelson.io/library/runtime/index.html">runtime</a>.</p></div><div class="content sourceset-dependent-content" data-togglable=":library:runtime-core:dokkaHtmlPartial/nonJvmMain"><p class="paragraph">Core primitives for kmp-tor operation, serving as the foundation of other higher level  dependencies such as <a href="https://kmp-tor.matthewnelson.io/library/runtime-ctrl/index.html">runtime-ctrl</a> and <a href="https://kmp-tor.matthewnelson.io/library/runtime/index.html">runtime</a>.</p></div>    </div>
+      <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":library:runtime-core/commonMain" data-filterable-set=":library:runtime-core/commonMain" data-active="" data-toggle=":library:runtime-core/commonMain">common</button><button class="platform-bookmark" data-filterable-current=":library:runtime-core/jsMain" data-filterable-set=":library:runtime-core/jsMain" data-toggle=":library:runtime-core/jsMain">js</button><button class="platform-bookmark" data-filterable-current=":library:runtime-core/jvmMain" data-filterable-set=":library:runtime-core/jvmMain" data-toggle=":library:runtime-core/jvmMain">jvm</button><button class="platform-bookmark" data-filterable-current=":library:runtime-core/nonJsMain" data-filterable-set=":library:runtime-core/nonJsMain" data-toggle=":library:runtime-core/nonJsMain">nonJs</button><button class="platform-bookmark" data-filterable-current=":library:runtime-core/nonJvmMain" data-filterable-set=":library:runtime-core/nonJvmMain" data-toggle=":library:runtime-core/nonJvmMain">nonJvm</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":library:runtime-core/commonMain"><p class="paragraph">Core primitives for kmp-tor operation, serving as the foundation of other higher level  dependencies such as <a href="https://kmp-tor.matthewnelson.io/library/runtime-ctrl/index.html">runtime-ctrl</a> and <a href="https://kmp-tor.matthewnelson.io/library/runtime/index.html">runtime</a>.</p></div><div class="content sourceset-dependent-content" data-togglable=":library:runtime-core/jsMain"><p class="paragraph">Core primitives for kmp-tor operation, serving as the foundation of other higher level  dependencies such as <a href="https://kmp-tor.matthewnelson.io/library/runtime-ctrl/index.html">runtime-ctrl</a> and <a href="https://kmp-tor.matthewnelson.io/library/runtime/index.html">runtime</a>.</p></div><div class="content sourceset-dependent-content" data-togglable=":library:runtime-core/jvmMain"><p class="paragraph">Core primitives for kmp-tor operation, serving as the foundation of other higher level  dependencies such as <a href="https://kmp-tor.matthewnelson.io/library/runtime-ctrl/index.html">runtime-ctrl</a> and <a href="https://kmp-tor.matthewnelson.io/library/runtime/index.html">runtime</a>.</p></div><div class="content sourceset-dependent-content" data-togglable=":library:runtime-core/nonJsMain"><p class="paragraph">Core primitives for kmp-tor operation, serving as the foundation of other higher level  dependencies such as <a href="https://kmp-tor.matthewnelson.io/library/runtime-ctrl/index.html">runtime-ctrl</a> and <a href="https://kmp-tor.matthewnelson.io/library/runtime/index.html">runtime</a>.</p></div><div class="content sourceset-dependent-content" data-togglable=":library:runtime-core/nonJvmMain"><p class="paragraph">Core primitives for kmp-tor operation, serving as the foundation of other higher level  dependencies such as <a href="https://kmp-tor.matthewnelson.io/library/runtime-ctrl/index.html">runtime-ctrl</a> and <a href="https://kmp-tor.matthewnelson.io/library/runtime/index.html">runtime</a>.</p></div>    </div>
   </div>
   <h2 class="">Packages</h2>
-  <div class="table"><a data-name="-1714718239%2FPackages%2F-1857527840" anchor-label="io.matthewnelson.kmp.tor.runtime.core" id="-1714718239%2FPackages%2F-1857527840" data-filterable-set=":library:runtime-core:dokkaHtmlPartial/commonMain"></a>
-    <div class="table-row" data-filterable-current=":library:runtime-core:dokkaHtmlPartial/commonMain" data-filterable-set=":library:runtime-core:dokkaHtmlPartial/commonMain">
+  <div class="table"><a data-name="-1714718239%2FPackages%2F1051389726" anchor-label="io.matthewnelson.kmp.tor.runtime.core" id="-1714718239%2FPackages%2F1051389726" data-filterable-set=":library:runtime-core/commonMain"></a>
+    <div class="table-row" data-filterable-current=":library:runtime-core/commonMain" data-filterable-set=":library:runtime-core/commonMain">
       <div>
         <div class="main-subrow ">
           <div class=""><span class="inline-flex">
               <div><a href="io.matthewnelson.kmp.tor.runtime.core/index.html">io.matthewnelson.kmp.tor.runtime.core</a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1714718239%2FPackages%2F-1857527840"></span>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1714718239%2FPackages%2F1051389726"></span>
                 <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
               </span></span></div>
           <div class="pull-right">
@@ -89,13 +149,13 @@
         <div></div>
       </div>
     </div>
-<a data-name="-1193195533%2FPackages%2F-1857527840" anchor-label="io.matthewnelson.kmp.tor.runtime.core.config" id="-1193195533%2FPackages%2F-1857527840" data-filterable-set=":library:runtime-core:dokkaHtmlPartial/commonMain"></a>
-    <div class="table-row" data-filterable-current=":library:runtime-core:dokkaHtmlPartial/commonMain" data-filterable-set=":library:runtime-core:dokkaHtmlPartial/commonMain">
+<a data-name="-1193195533%2FPackages%2F1051389726" anchor-label="io.matthewnelson.kmp.tor.runtime.core.config" id="-1193195533%2FPackages%2F1051389726" data-filterable-set=":library:runtime-core/commonMain"></a>
+    <div class="table-row" data-filterable-current=":library:runtime-core/commonMain" data-filterable-set=":library:runtime-core/commonMain">
       <div>
         <div class="main-subrow ">
           <div class=""><span class="inline-flex">
               <div><a href="io.matthewnelson.kmp.tor.runtime.core.config/index.html">io.matthewnelson.kmp.tor.runtime.core.config</a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1193195533%2FPackages%2F-1857527840"></span>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1193195533%2FPackages%2F1051389726"></span>
                 <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
               </span></span></div>
           <div class="pull-right">
@@ -107,13 +167,13 @@
         <div></div>
       </div>
     </div>
-<a data-name="935278688%2FPackages%2F-1857527840" anchor-label="io.matthewnelson.kmp.tor.runtime.core.config.builder" id="935278688%2FPackages%2F-1857527840" data-filterable-set=":library:runtime-core:dokkaHtmlPartial/commonMain"></a>
-    <div class="table-row" data-filterable-current=":library:runtime-core:dokkaHtmlPartial/commonMain" data-filterable-set=":library:runtime-core:dokkaHtmlPartial/commonMain">
+<a data-name="935278688%2FPackages%2F1051389726" anchor-label="io.matthewnelson.kmp.tor.runtime.core.config.builder" id="935278688%2FPackages%2F1051389726" data-filterable-set=":library:runtime-core/commonMain"></a>
+    <div class="table-row" data-filterable-current=":library:runtime-core/commonMain" data-filterable-set=":library:runtime-core/commonMain">
       <div>
         <div class="main-subrow ">
           <div class=""><span class="inline-flex">
               <div><a href="io.matthewnelson.kmp.tor.runtime.core.config.builder/index.html">io.matthewnelson.kmp.tor.runtime.core.config.builder</a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="935278688%2FPackages%2F-1857527840"></span>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="935278688%2FPackages%2F1051389726"></span>
                 <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
               </span></span></div>
           <div class="pull-right">
@@ -125,13 +185,13 @@
         <div></div>
       </div>
     </div>
-<a data-name="484162972%2FPackages%2F-1857527840" anchor-label="io.matthewnelson.kmp.tor.runtime.core.ctrl" id="484162972%2FPackages%2F-1857527840" data-filterable-set=":library:runtime-core:dokkaHtmlPartial/commonMain"></a>
-    <div class="table-row" data-filterable-current=":library:runtime-core:dokkaHtmlPartial/commonMain" data-filterable-set=":library:runtime-core:dokkaHtmlPartial/commonMain">
+<a data-name="484162972%2FPackages%2F1051389726" anchor-label="io.matthewnelson.kmp.tor.runtime.core.ctrl" id="484162972%2FPackages%2F1051389726" data-filterable-set=":library:runtime-core/commonMain"></a>
+    <div class="table-row" data-filterable-current=":library:runtime-core/commonMain" data-filterable-set=":library:runtime-core/commonMain">
       <div>
         <div class="main-subrow ">
           <div class=""><span class="inline-flex">
               <div><a href="io.matthewnelson.kmp.tor.runtime.core.ctrl/index.html">io.matthewnelson.kmp.tor.runtime.core.ctrl</a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="484162972%2FPackages%2F-1857527840"></span>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="484162972%2FPackages%2F1051389726"></span>
                 <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
               </span></span></div>
           <div class="pull-right">
@@ -143,13 +203,13 @@
         <div></div>
       </div>
     </div>
-<a data-name="698479881%2FPackages%2F-1857527840" anchor-label="io.matthewnelson.kmp.tor.runtime.core.ctrl.builder" id="698479881%2FPackages%2F-1857527840" data-filterable-set=":library:runtime-core:dokkaHtmlPartial/commonMain"></a>
-    <div class="table-row" data-filterable-current=":library:runtime-core:dokkaHtmlPartial/commonMain" data-filterable-set=":library:runtime-core:dokkaHtmlPartial/commonMain">
+<a data-name="698479881%2FPackages%2F1051389726" anchor-label="io.matthewnelson.kmp.tor.runtime.core.ctrl.builder" id="698479881%2FPackages%2F1051389726" data-filterable-set=":library:runtime-core/commonMain"></a>
+    <div class="table-row" data-filterable-current=":library:runtime-core/commonMain" data-filterable-set=":library:runtime-core/commonMain">
       <div>
         <div class="main-subrow ">
           <div class=""><span class="inline-flex">
               <div><a href="io.matthewnelson.kmp.tor.runtime.core.ctrl.builder/index.html">io.matthewnelson.kmp.tor.runtime.core.ctrl.builder</a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="698479881%2FPackages%2F-1857527840"></span>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="698479881%2FPackages%2F1051389726"></span>
                 <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
               </span></span></div>
           <div class="pull-right">
@@ -161,13 +221,13 @@
         <div></div>
       </div>
     </div>
-<a data-name="1821970066%2FPackages%2F1507349794" anchor-label="io.matthewnelson.kmp.tor.runtime.core.key" id="1821970066%2FPackages%2F1507349794" data-filterable-set=":library:runtime-core:dokkaHtmlPartial/commonMain,:library:runtime-core:dokkaHtmlPartial/jvmMain,:library:runtime-core:dokkaHtmlPartial/nonJvmMain"></a>
-    <div class="table-row" data-filterable-current=":library:runtime-core:dokkaHtmlPartial/commonMain,:library:runtime-core:dokkaHtmlPartial/jvmMain,:library:runtime-core:dokkaHtmlPartial/nonJvmMain" data-filterable-set=":library:runtime-core:dokkaHtmlPartial/commonMain,:library:runtime-core:dokkaHtmlPartial/jvmMain,:library:runtime-core:dokkaHtmlPartial/nonJvmMain">
+<a data-name="1821970066%2FPackages%2F728519480" anchor-label="io.matthewnelson.kmp.tor.runtime.core.key" id="1821970066%2FPackages%2F728519480" data-filterable-set=":library:runtime-core/commonMain,:library:runtime-core/jvmMain,:library:runtime-core/nonJvmMain"></a>
+    <div class="table-row" data-filterable-current=":library:runtime-core/commonMain,:library:runtime-core/jvmMain,:library:runtime-core/nonJvmMain" data-filterable-set=":library:runtime-core/commonMain,:library:runtime-core/jvmMain,:library:runtime-core/nonJvmMain">
       <div>
         <div class="main-subrow ">
           <div class=""><span class="inline-flex">
               <div><a href="io.matthewnelson.kmp.tor.runtime.core.key/index.html">io.matthewnelson.kmp.tor.runtime.core.key</a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1821970066%2FPackages%2F1507349794"></span>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1821970066%2FPackages%2F728519480"></span>
                 <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
               </span></span></div>
           <div class="pull-right">
@@ -181,13 +241,13 @@
         <div></div>
       </div>
     </div>
-<a data-name="-906794928%2FPackages%2F-1857527840" anchor-label="io.matthewnelson.kmp.tor.runtime.core.net" id="-906794928%2FPackages%2F-1857527840" data-filterable-set=":library:runtime-core:dokkaHtmlPartial/commonMain"></a>
-    <div class="table-row" data-filterable-current=":library:runtime-core:dokkaHtmlPartial/commonMain" data-filterable-set=":library:runtime-core:dokkaHtmlPartial/commonMain">
+<a data-name="-906794928%2FPackages%2F1051389726" anchor-label="io.matthewnelson.kmp.tor.runtime.core.net" id="-906794928%2FPackages%2F1051389726" data-filterable-set=":library:runtime-core/commonMain"></a>
+    <div class="table-row" data-filterable-current=":library:runtime-core/commonMain" data-filterable-set=":library:runtime-core/commonMain">
       <div>
         <div class="main-subrow ">
           <div class=""><span class="inline-flex">
               <div><a href="io.matthewnelson.kmp.tor.runtime.core.net/index.html">io.matthewnelson.kmp.tor.runtime.core.net</a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-906794928%2FPackages%2F-1857527840"></span>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-906794928%2FPackages%2F1051389726"></span>
                 <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
               </span></span></div>
           <div class="pull-right">
@@ -199,13 +259,13 @@
         <div></div>
       </div>
     </div>
-<a data-name="-1314485133%2FPackages%2F633608622" anchor-label="io.matthewnelson.kmp.tor.runtime.core.util" id="-1314485133%2FPackages%2F633608622" data-filterable-set=":library:runtime-core:dokkaHtmlPartial/commonMain,:library:runtime-core:dokkaHtmlPartial/jsMain,:library:runtime-core:dokkaHtmlPartial/jvmMain,:library:runtime-core:dokkaHtmlPartial/nonJsMain"></a>
-    <div class="table-row" data-filterable-current=":library:runtime-core:dokkaHtmlPartial/commonMain,:library:runtime-core:dokkaHtmlPartial/jsMain,:library:runtime-core:dokkaHtmlPartial/jvmMain,:library:runtime-core:dokkaHtmlPartial/nonJsMain" data-filterable-set=":library:runtime-core:dokkaHtmlPartial/commonMain,:library:runtime-core:dokkaHtmlPartial/jsMain,:library:runtime-core:dokkaHtmlPartial/jvmMain,:library:runtime-core:dokkaHtmlPartial/nonJsMain">
+<a data-name="-1314485133%2FPackages%2F423775774" anchor-label="io.matthewnelson.kmp.tor.runtime.core.util" id="-1314485133%2FPackages%2F423775774" data-filterable-set=":library:runtime-core/commonMain,:library:runtime-core/jsMain,:library:runtime-core/jvmMain,:library:runtime-core/nonJsMain"></a>
+    <div class="table-row" data-filterable-current=":library:runtime-core/commonMain,:library:runtime-core/jsMain,:library:runtime-core/jvmMain,:library:runtime-core/nonJsMain" data-filterable-set=":library:runtime-core/commonMain,:library:runtime-core/jsMain,:library:runtime-core/jvmMain,:library:runtime-core/nonJsMain">
       <div>
         <div class="main-subrow ">
           <div class=""><span class="inline-flex">
               <div><a href="io.matthewnelson.kmp.tor.runtime.core.util/index.html">io.matthewnelson.kmp.tor.runtime.core.util</a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1314485133%2FPackages%2F633608622"></span>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1314485133%2FPackages%2F423775774"></span>
                 <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
               </span></span></div>
           <div class="pull-right">
@@ -222,12 +282,18 @@
     </div>
   </div>
 </div>
-      <div class="footer">
-        <span class="go-to-top-icon"><a href="#content" id="go-to-top-link"></a></span><span>© 2025 Copyright</span><span class="pull-right"><span>Generated by </span><a href="https://github.com/Kotlin/dokka"><span>dokka</span><span class="padded-icon"></span></a></span>
-      </div>
+    <div class="footer">
+        <a href="#content" id="go-to-top-link" class="footer--button footer--button_go-to-top"></a>
+        <span>© 2021-2025 Copyright Matthew Nelson</span>
+        <span class="pull-right">
+            <span>Generated by </span>
+            <a class="footer--link footer--link_external" href="https://github.com/Kotlin/dokka">
+                <span>dokka</span>
+            </a>
+        </span>
+    </div>
             </div>
         </div>
     </div>
 </body>
 </html>
-

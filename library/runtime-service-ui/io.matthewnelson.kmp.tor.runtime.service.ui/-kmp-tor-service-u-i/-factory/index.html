@@ -25,46 +25,78 @@
 <link href="../../../../../styles/prism.css" rel="Stylesheet">
 <link href="../../../../../styles/logo-styles.css" rel="Stylesheet">
 <link href="../../../../../styles/font-jb-sans-auto.css" rel="Stylesheet">
+<link href="../../../../../ui-kit/ui-kit.min.css" rel="Stylesheet">
 <script type="text/javascript" src="../../../../../scripts/clipboard.js" async></script>
 <script type="text/javascript" src="../../../../../scripts/navigation-loader.js" async></script>
 <script type="text/javascript" src="../../../../../scripts/platform-content-handler.js" async></script>
 <script type="text/javascript" src="../../../../../scripts/main.js" defer></script>
 <script type="text/javascript" src="../../../../../scripts/prism.js" async></script>
+<script type="text/javascript" src="../../../../../ui-kit/ui-kit.min.js" defer></script>
 <script type="text/javascript" src="../../../../../scripts/symbol-parameters-wrapper_deferred.js" defer></script></head>
 <body>
     <div class="root">
-<nav class="navigation" id="navigation-wrapper">
-    <div class="navigation--inner">
-        <div class="navigation-title">
-            <button class="menu-toggle" id="menu-toggle" type="button">toggle menu</button>
-            <div class="library-name">
+    <nav class="navigation theme-dark" id="navigation-wrapper">
 <a class="library-name--link" href="../../../../../index.html">
-                            kmp-tor
-                    </a>            </div>
-            <div class="library-version">2.0.0
+                    kmp-tor
+            </a>        <button class="navigation-controls--btn navigation-controls--btn_toc ui-kit_mobile-only" id="toc-toggle" type="button">Toggle table of contents
+        </button>
+        <div class="navigation-controls--break ui-kit_mobile-only"></div>
+        <div class="library-version" id="library-version">2.1.0
+        </div>
+        <div class="navigation-controls">
+        <div class="filter-section filter-section_loading" id="filter-section">
+                <button class="platform-tag platform-selector jvm-like" data-active="" data-filter=":library:runtime-service-ui/androidMain">android</button>
+            <div class="dropdown filter-section--dropdown" data-role="dropdown" id="filter-section-dropdown">
+                <button class="button button_dropdown filter-section--dropdown-toggle" role="combobox" data-role="dropdown-toggle" aria-controls="platform-tags-listbox" aria-haspopup="listbox" aria-expanded="false" aria-label="Toggle source sets"></button>
+                <ul role="listbox" id="platform-tags-listbox" class="dropdown--list" data-role="dropdown-listbox">
+                    <div class="dropdown--header"><span>Platform filter</span>
+                        <button class="button" data-role="dropdown-toggle" aria-label="Close platform filter">
+                            <i class="ui-kit-icon ui-kit-icon_cross"></i>
+                        </button>
+                    </div>
+                        <li role="option" class="dropdown--option platform-selector-option jvm-like" tabindex="0">
+                            <label class="checkbox">
+                                <input type="checkbox" class="checkbox--input" id=":library:runtime-service-ui/androidMain" data-filter=":library:runtime-service-ui/androidMain">
+                                <span class="checkbox--icon"></span>
+                                android
+                            </label>
+                        </li>
+                </ul>
+                <div class="dropdown--overlay"></div>
             </div>
         </div>
-        <div class="filter-section" id="filter-section">
-                <button class="platform-tag platform-selector jvm-like" data-active="" data-filter=":library:runtime-service-ui:dokkaHtmlPartial/androidMain">android</button>
+            <button class="navigation-controls--btn navigation-controls--btn_theme" id="theme-toggle-button" type="button">Switch theme
+            </button>
+            <div class="navigation-controls--btn navigation-controls--btn_search" id="searchBar" role="button">Search in
+                API
+            </div>
         </div>
-    </div>
-    <div class="navigation-controls">
-        <button class="navigation-controls--btn navigation-controls--theme" id="theme-toggle-button" type="button">switch theme</button>
-        <div class="navigation-controls--btn navigation-controls--search" id="searchBar" role="button">search in API</div>
-    </div>
-</nav>
+    </nav>
         <div id="container">
             <div class="sidebar" id="leftColumn">
-                <div class="sidebar--inner" id="sideMenu"></div>
+                <div class="dropdown theme-dark_mobile" data-role="dropdown" id="toc-dropdown">
+                    <ul role="listbox" id="toc-listbox" class="dropdown--list dropdown--list_toc-list" data-role="dropdown-listbox">
+                        <div class="dropdown--header">
+                            <span>
+                                    kmp-tor
+                            </span>
+                            <button class="button" data-role="dropdown-toggle" aria-label="Close table of contents">
+                                <i class="ui-kit-icon ui-kit-icon_cross"></i>
+                            </button>
+                        </div>
+                        <div class="sidebar--inner" id="sideMenu"></div>
+                    </ul>
+                    <div class="dropdown--overlay"></div>
+                </div>
             </div>
             <div id="main">
-<div class="main-content" data-page-type="classlike" id="content" pageids="runtime-service-ui::io.matthewnelson.kmp.tor.runtime.service.ui/KmpTorServiceUI.Factory///PointingToDeclaration//-1920071737">
+<div class="main-content" data-page-type="classlike" id="content" pageids="runtime-service-ui::io.matthewnelson.kmp.tor.runtime.service.ui/KmpTorServiceUI.Factory///PointingToDeclaration//1153838479">
   <div class="breadcrumbs"><a href="../../../index.html">runtime-service-ui</a><span class="delimiter">/</span><a href="../../index.html">io.matthewnelson.kmp.tor.runtime.service.ui</a><span class="delimiter">/</span><a href="../index.html">KmpTorServiceUI</a><span class="delimiter">/</span><span class="current">Factory</span></div>
   <div class="cover ">
     <h1 class="cover"><span><span>Factory</span></span></h1>
     <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
-      <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":library:runtime-service-ui:dokkaHtmlPartial/androidMain" data-filterable-set=":library:runtime-service-ui:dokkaHtmlPartial/androidMain" data-active="" data-toggle=":library:runtime-service-ui:dokkaHtmlPartial/androidMain">android</button></div>
-<div class="content sourceset-dependent-content" data-active="" data-togglable=":library:runtime-service-ui:dokkaHtmlPartial/androidMain"><div class="symbol monospace"><span class="token keyword">class </span><a href="index.html">Factory</a> : <a href="../../../../../library/runtime-service/io.matthewnelson.kmp.tor.runtime.service/-tor-service-u-i/-factory/index.html">TorServiceUI.Factory</a><span class="token operator">&lt;</span><a href="../-config/index.html">KmpTorServiceUI.Config</a><span class="token punctuation">, </span><a href="../../-kmp-tor-service-u-i-instance-state/index.html">KmpTorServiceUIInstanceState</a><span class="token operator">&lt;</span><a href="../-config/index.html">KmpTorServiceUI.Config</a><span class="token operator">&gt;</span><span class="token punctuation">, </span><a href="../index.html">KmpTorServiceUI</a><span class="token operator">&gt; </span><span class="clearfix"><span class="floating-right">(<a href="https://github.com/05nelsonm/kmp-tor/tree/master/library/runtime-service-ui/src/androidMain/kotlin/io/matthewnelson/kmp/tor/runtime/service/ui/KmpTorServiceUI.kt#L425">source</a>)</span></span></div><p class="paragraph">Factory class for <a href="../../../../../library/runtime-service/io.matthewnelson.kmp.tor.runtime.service/-tor-service-config/-foreground/-companion/-builder.html">TorServiceConfig.Foreground.Companion.Builder</a></p><p class="paragraph">e.g.</p><div class="sample-container"><pre><code class="block lang-kotlin" theme="idea">val factory = KmpTorServiceUI.Factory(
+      <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":library:runtime-service-ui/androidMain" data-filterable-set=":library:runtime-service-ui/androidMain" data-active="" data-toggle=":library:runtime-service-ui/androidMain">android</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":library:runtime-service-ui/androidMain"><div class="symbol monospace"><span class="token keyword">class </span><a href="index.html">Factory</a> : <a href="../../../../../library/runtime-service/io.matthewnelson.kmp.tor.runtime.service/-tor-service-u-i/-factory/index.html">TorServiceUI.Factory</a><span class="token operator">&lt;</span><a href="../-config/index.html">KmpTorServiceUI.Config</a><span class="token punctuation">, </span><a href="../../-kmp-tor-service-u-i-instance-state/index.html">KmpTorServiceUIInstanceState</a><span class="token operator">&lt;</span><a href="../-config/index.html">KmpTorServiceUI.Config</a><span class="token operator">&gt;</span><span class="token punctuation">, </span><a href="../index.html">KmpTorServiceUI</a><span class="token operator">&gt; </span><span class="clearfix"><span class="floating-right">(<a href="https://github.com/05nelsonm/kmp-tor/tree/master/library/runtime-service-ui/src/androidMain/kotlin/io/matthewnelson/kmp/tor/runtime/service/ui/KmpTorServiceUI.kt#L425">source</a>)</span></span></div><p class="paragraph">Factory class for <a href="../../../../../library/runtime-service/io.matthewnelson.kmp.tor.runtime.service/-tor-service-config/-foreground/-companion/-builder.html">TorServiceConfig.Foreground.Companion.Builder</a></p><p class="paragraph">e.g.</p><div class="sample-container"><pre><code class="block lang-kotlin" theme="idea">val factory = KmpTorServiceUI.Factory(
     iconReady = R.drawable.my_icon_ready,
     iconNotReady = R.drawable.my_icon_not_ready,
     info = TorServiceUI.NotificationInfo(
@@ -81,26 +113,26 @@
 
 val serviceConfig = TorServiceConfig.Foreground.Builder(factory) {
     // configure...
-}</code></pre><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><h4 class="">See also</h4><div class="table"><div class="table-row" data-filterable-current=":library:runtime-service-ui:dokkaHtmlPartial/androidMain" data-filterable-set=":library:runtime-service-ui:dokkaHtmlPartial/androidMain"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="-builder-scope/index.html"><span>Kmp</span><wbr><span>Tor</span><wbr><span>Service</span><wbr><span>UI.</span><wbr><span>Factory.</span><wbr><span>Builder</span><wbr><span><span>Scope</span></span></a></div></span></div><div></div></div></div><div class="table-row" data-filterable-current=":library:runtime-service-ui:dokkaHtmlPartial/androidMain" data-filterable-set=":library:runtime-service-ui:dokkaHtmlPartial/androidMain"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="../../../../../library/runtime-service/io.matthewnelson.kmp.tor.runtime.service/-tor-service-u-i/-notification-info/index.html"><span>Tor</span><wbr><span>Service</span><wbr><span>UI.</span><wbr><span>Notification</span><wbr><span><span>Info</span></span></a></div></span></div><div></div></div></div></div></div>    </div>
+}</code></pre><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><h4 class="">See also</h4><div class="table"><div class="table-row" data-filterable-current=":library:runtime-service-ui/androidMain" data-filterable-set=":library:runtime-service-ui/androidMain"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="-builder-scope/index.html"><span>Kmp</span><wbr><span>Tor</span><wbr><span>Service</span><wbr><span>UI.</span><wbr><span>Factory.</span><wbr><span>Builder</span><wbr><span><span>Scope</span></span></a></div></span></div><div></div></div></div><div class="table-row" data-filterable-current=":library:runtime-service-ui/androidMain" data-filterable-set=":library:runtime-service-ui/androidMain"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="../../../../../library/runtime-service/io.matthewnelson.kmp.tor.runtime.service/-tor-service-u-i/-notification-info/index.html"><span>Tor</span><wbr><span>Service</span><wbr><span>UI.</span><wbr><span>Notification</span><wbr><span><span>Info</span></span></a></div></span></div><div></div></div></div></div></div>    </div>
   </div>
   <div class="tabbedcontent">
     <div class="tabs-section" tabs-section="tabs-section"><button class="section-tab" data-active="" data-togglable="CONSTRUCTOR,TYPE,PROPERTY,FUNCTION">Members</button></div>
     <div class="tabs-section-body">
       <div data-togglable="CONSTRUCTOR">
         <h2 class="">Constructors</h2>
-        <div class="table"><a data-name="1985908441%2FConstructors%2F-1920071737" anchor-label="Factory" id="1985908441%2FConstructors%2F-1920071737" data-filterable-set=":library:runtime-service-ui:dokkaHtmlPartial/androidMain"></a>
-          <div class="table-row" data-togglable="CONSTRUCTOR" data-filterable-current=":library:runtime-service-ui:dokkaHtmlPartial/androidMain" data-filterable-set=":library:runtime-service-ui:dokkaHtmlPartial/androidMain">
+        <div class="table"><a data-name="1985908441%2FConstructors%2F1153838479" anchor-label="Factory" id="1985908441%2FConstructors%2F1153838479" data-filterable-set=":library:runtime-service-ui/androidMain"></a>
+          <div class="table-row" data-togglable="CONSTRUCTOR" data-filterable-current=":library:runtime-service-ui/androidMain" data-filterable-set=":library:runtime-service-ui/androidMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-factory.html"><span><span>Factory</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1985908441%2FConstructors%2F-1920071737"></span>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1985908441%2FConstructors%2F1153838479"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
               <div>
                 <div class="title">
                   <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
-                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":library:runtime-service-ui:dokkaHtmlPartial/androidMain" data-filterable-set=":library:runtime-service-ui:dokkaHtmlPartial/androidMain" data-active="" data-toggle=":library:runtime-service-ui:dokkaHtmlPartial/androidMain">android</button></div>
-<div class="content sourceset-dependent-content" data-active="" data-togglable=":library:runtime-service-ui:dokkaHtmlPartial/androidMain"><div class="symbol monospace"><span class="token keyword">constructor</span><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">iconReady<span class="token operator">: </span><span data-unresolved-link="kotlin/Int///PointingToDeclaration/">Int</span><span class="token punctuation">, </span></span><span class="parameter ">iconNotReady<span class="token operator">: </span><span data-unresolved-link="kotlin/Int///PointingToDeclaration/">Int</span><span class="token punctuation">, </span></span><span class="parameter ">info<span class="token operator">: </span><a href="../../../../../library/runtime-service/io.matthewnelson.kmp.tor.runtime.service/-tor-service-u-i/-notification-info/index.html">TorServiceUI.NotificationInfo</a></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Create a new <a href="index.html">Factory</a> with the default options.</p></div><div class="symbol monospace"><span class="token keyword">constructor</span><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">iconReady<span class="token operator">: </span><span data-unresolved-link="kotlin/Int///PointingToDeclaration/">Int</span><span class="token punctuation">, </span></span><span class="parameter ">iconNotReady<span class="token operator">: </span><span data-unresolved-link="kotlin/Int///PointingToDeclaration/">Int</span><span class="token punctuation">, </span></span><span class="parameter ">info<span class="token operator">: </span><a href="../../../../../library/runtime-service/io.matthewnelson.kmp.tor.runtime.service/-tor-service-u-i/-notification-info/index.html">TorServiceUI.NotificationInfo</a><span class="token punctuation">, </span></span><span class="parameter ">block<span class="token operator">: </span><a href="../../../../../library/runtime-core/io.matthewnelson.kmp.tor.runtime.core/-this-block/index.html">ThisBlock</a><span class="token operator">&lt;</span><a href="-builder-scope/index.html">KmpTorServiceUI.Factory.BuilderScope</a><span class="token operator">&gt;</span></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Create a new <a href="index.html">Factory</a> and configure options via <a href="../../../../../library/runtime-service-ui/io.matthewnelson.kmp.tor.runtime.service.ui/-kmp-tor-service-u-i/-factory/[60]init[62].html">block</a>.</p></div></div>                  </div>
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":library:runtime-service-ui/androidMain" data-filterable-set=":library:runtime-service-ui/androidMain" data-active="" data-toggle=":library:runtime-service-ui/androidMain">android</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":library:runtime-service-ui/androidMain"><div class="symbol monospace"><span class="token keyword">constructor</span><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">iconReady<span class="token operator">: </span><span data-unresolved-link="kotlin/Int///PointingToDeclaration/">Int</span><span class="token punctuation">, </span></span><span class="parameter ">iconNotReady<span class="token operator">: </span><span data-unresolved-link="kotlin/Int///PointingToDeclaration/">Int</span><span class="token punctuation">, </span></span><span class="parameter ">info<span class="token operator">: </span><a href="../../../../../library/runtime-service/io.matthewnelson.kmp.tor.runtime.service/-tor-service-u-i/-notification-info/index.html">TorServiceUI.NotificationInfo</a></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Create a new <a href="index.html">Factory</a> with the default options.</p></div><div class="symbol monospace"><span class="token keyword">constructor</span><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">iconReady<span class="token operator">: </span><span data-unresolved-link="kotlin/Int///PointingToDeclaration/">Int</span><span class="token punctuation">, </span></span><span class="parameter ">iconNotReady<span class="token operator">: </span><span data-unresolved-link="kotlin/Int///PointingToDeclaration/">Int</span><span class="token punctuation">, </span></span><span class="parameter ">info<span class="token operator">: </span><a href="../../../../../library/runtime-service/io.matthewnelson.kmp.tor.runtime.service/-tor-service-u-i/-notification-info/index.html">TorServiceUI.NotificationInfo</a><span class="token punctuation">, </span></span><span class="parameter ">block<span class="token operator">: </span><a href="../../../../../library/runtime-core/io.matthewnelson.kmp.tor.runtime.core/-this-block/index.html">ThisBlock</a><span class="token operator">&lt;</span><a href="-builder-scope/index.html">KmpTorServiceUI.Factory.BuilderScope</a><span class="token operator">&gt;</span></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Create a new <a href="index.html">Factory</a> and configure options via <a href="../../../../../library/runtime-service-ui/io.matthewnelson.kmp.tor.runtime.service.ui/-kmp-tor-service-u-i/-factory/[60]init[62].html">block</a>.</p></div></div>                  </div>
                 </div>
               </div>
             </div>
@@ -109,19 +141,19 @@ val serviceConfig = TorServiceConfig.Foreground.Builder(factory) {
       </div>
       <div data-togglable="TYPE">
         <h2 class="">Types</h2>
-        <div class="table"><a data-name="-1358105596%2FClasslikes%2F-1920071737" anchor-label="BuilderScope" id="-1358105596%2FClasslikes%2F-1920071737" data-filterable-set=":library:runtime-service-ui:dokkaHtmlPartial/androidMain"></a>
-          <div class="table-row" data-filterable-current=":library:runtime-service-ui:dokkaHtmlPartial/androidMain" data-filterable-set=":library:runtime-service-ui:dokkaHtmlPartial/androidMain">
+        <div class="table"><a data-name="-1358105596%2FClasslikes%2F1153838479" anchor-label="BuilderScope" id="-1358105596%2FClasslikes%2F1153838479" data-filterable-set=":library:runtime-service-ui/androidMain"></a>
+          <div class="table-row" data-filterable-current=":library:runtime-service-ui/androidMain" data-filterable-set=":library:runtime-service-ui/androidMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-builder-scope/index.html"><span>Builder</span><wbr><span><span>Scope</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1358105596%2FClasslikes%2F-1920071737"></span>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1358105596%2FClasslikes%2F1153838479"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
               <div>
                 <div class="title">
                   <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
-                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":library:runtime-service-ui:dokkaHtmlPartial/androidMain" data-filterable-set=":library:runtime-service-ui:dokkaHtmlPartial/androidMain" data-active="" data-toggle=":library:runtime-service-ui:dokkaHtmlPartial/androidMain">android</button></div>
-<div class="content sourceset-dependent-content" data-active="" data-togglable=":library:runtime-service-ui:dokkaHtmlPartial/androidMain"><div class="symbol monospace"><span class="token keyword">class </span><a href="-builder-scope/index.html">BuilderScope</a></div></div>                  </div>
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":library:runtime-service-ui/androidMain" data-filterable-set=":library:runtime-service-ui/androidMain" data-active="" data-toggle=":library:runtime-service-ui/androidMain">android</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":library:runtime-service-ui/androidMain"><div class="symbol monospace"><span class="token keyword">class </span><a href="-builder-scope/index.html">BuilderScope</a></div></div>                  </div>
                 </div>
               </div>
             </div>
@@ -130,36 +162,87 @@ val serviceConfig = TorServiceConfig.Foreground.Builder(factory) {
       </div>
       <div data-togglable="PROPERTY">
         <h2 class="">Properties</h2>
-        <div class="table"><a data-name="-452138154%2FProperties%2F-1920071737" anchor-label="actionIntentPermissionSuffix" id="-452138154%2FProperties%2F-1920071737" data-filterable-set=":library:runtime-service-ui:dokkaHtmlPartial/androidMain"></a>
-          <div class="table-row" data-filterable-current=":library:runtime-service-ui:dokkaHtmlPartial/androidMain" data-filterable-set=":library:runtime-service-ui:dokkaHtmlPartial/androidMain">
+        <div class="table"><a data-name="-452138154%2FProperties%2F1153838479" anchor-label="actionIntentPermissionSuffix" id="-452138154%2FProperties%2F1153838479" data-filterable-set=":library:runtime-service-ui/androidMain"></a>
+          <div class="table-row" data-filterable-current=":library:runtime-service-ui/androidMain" data-filterable-set=":library:runtime-service-ui/androidMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="action-intent-permission-suffix.html"><span>action</span><wbr><span>Intent</span><wbr><span>Permission</span><wbr><span><span>Suffix</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-452138154%2FProperties%2F-1920071737"></span>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-452138154%2FProperties%2F1153838479"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
               <div>
                 <div class="title">
                   <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
-                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":library:runtime-service-ui:dokkaHtmlPartial/androidMain" data-filterable-set=":library:runtime-service-ui:dokkaHtmlPartial/androidMain" data-active="" data-toggle=":library:runtime-service-ui:dokkaHtmlPartial/androidMain">android</button></div>
-<div class="content sourceset-dependent-content" data-active="" data-togglable=":library:runtime-service-ui:dokkaHtmlPartial/androidMain"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><span data-unresolved-link="kotlin.jvm/JvmField///PointingToDeclaration/"><span class="token annotation builtin">JvmField</span></span></div></div><span class="token keyword">val </span><a href="action-intent-permission-suffix.html">actionIntentPermissionSuffix</a><span class="token operator">: </span><span data-unresolved-link="kotlin/String///PointingToDeclaration/">String</span><span class="token operator">?</span></div><div class="brief "><p class="paragraph">See <a href="-builder-scope/action-intent-permission-suffix.html">BuilderScope.actionIntentPermissionSuffix</a></p></div></div>                  </div>
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":library:runtime-service-ui/androidMain" data-filterable-set=":library:runtime-service-ui/androidMain" data-active="" data-toggle=":library:runtime-service-ui/androidMain">android</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":library:runtime-service-ui/androidMain"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><span data-unresolved-link="kotlin.jvm/JvmField///PointingToDeclaration/"><span class="token annotation builtin">JvmField</span></span></div></div><span class="token keyword">val </span><a href="action-intent-permission-suffix.html">actionIntentPermissionSuffix</a><span class="token operator">: </span><span data-unresolved-link="kotlin/String///PointingToDeclaration/">String</span><span class="token operator">?</span></div><div class="brief "><p class="paragraph">See <a href="-builder-scope/action-intent-permission-suffix.html">BuilderScope.actionIntentPermissionSuffix</a></p></div></div>                  </div>
                 </div>
               </div>
             </div>
           </div>
-<a data-name="958981360%2FProperties%2F-1920071737" anchor-label="contentIntentCode" id="958981360%2FProperties%2F-1920071737" data-filterable-set=":library:runtime-service-ui:dokkaHtmlPartial/androidMain"></a>
-          <div class="table-row" data-filterable-current=":library:runtime-service-ui:dokkaHtmlPartial/androidMain" data-filterable-set=":library:runtime-service-ui:dokkaHtmlPartial/androidMain">
+<a data-name="958981360%2FProperties%2F1153838479" anchor-label="contentIntentCode" id="958981360%2FProperties%2F1153838479" data-filterable-set=":library:runtime-service-ui/androidMain"></a>
+          <div class="table-row" data-filterable-current=":library:runtime-service-ui/androidMain" data-filterable-set=":library:runtime-service-ui/androidMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="content-intent-code.html"><span>content</span><wbr><span>Intent</span><wbr><span><span>Code</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="958981360%2FProperties%2F-1920071737"></span>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="958981360%2FProperties%2F1153838479"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
               <div>
                 <div class="title">
                   <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
-                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":library:runtime-service-ui:dokkaHtmlPartial/androidMain" data-filterable-set=":library:runtime-service-ui:dokkaHtmlPartial/androidMain" data-active="" data-toggle=":library:runtime-service-ui:dokkaHtmlPartial/androidMain">android</button></div>
-<div class="content sourceset-dependent-content" data-active="" data-togglable=":library:runtime-service-ui:dokkaHtmlPartial/androidMain"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><span data-unresolved-link="kotlin.jvm/JvmField///PointingToDeclaration/"><span class="token annotation builtin">JvmField</span></span></div></div><span class="token keyword">val </span><a href="content-intent-code.html">contentIntentCode</a><span class="token operator">: </span><span data-unresolved-link="kotlin/Int///PointingToDeclaration/">Int</span></div><div class="brief "><p class="paragraph">See <a href="-builder-scope/content-intent-code.html">BuilderScope.contentIntentCode</a></p></div></div>                  </div>
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":library:runtime-service-ui/androidMain" data-filterable-set=":library:runtime-service-ui/androidMain" data-active="" data-toggle=":library:runtime-service-ui/androidMain">android</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":library:runtime-service-ui/androidMain"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><span data-unresolved-link="kotlin.jvm/JvmField///PointingToDeclaration/"><span class="token annotation builtin">JvmField</span></span></div></div><span class="token keyword">val </span><a href="content-intent-code.html">contentIntentCode</a><span class="token operator">: </span><span data-unresolved-link="kotlin/Int///PointingToDeclaration/">Int</span></div><div class="brief "><p class="paragraph">See <a href="-builder-scope/content-intent-code.html">BuilderScope.contentIntentCode</a></p></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1701181073%2FProperties%2F1153838479" anchor-label="debug" id="-1701181073%2FProperties%2F1153838479" data-filterable-set=":library:runtime-service-ui/androidMain"></a>
+          <div class="table-row" data-filterable-current=":library:runtime-service-ui/androidMain" data-filterable-set=":library:runtime-service-ui/androidMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="index.html#-1701181073%2FProperties%2F1153838479"><span><span>debug</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1701181073%2FProperties%2F1153838479"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":library:runtime-service-ui/androidMain" data-filterable-set=":library:runtime-service-ui/androidMain" data-active="" data-toggle=":library:runtime-service-ui/androidMain">android</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":library:runtime-service-ui/androidMain"><div class="symbol monospace"><span class="token keyword">var </span><a href="index.html#-1701181073%2FProperties%2F1153838479">debug</a><span class="token operator">: </span><span data-unresolved-link="kotlin/Boolean///PointingToDeclaration/">Boolean</span></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1958566879%2FProperties%2F1153838479" anchor-label="defaultConfig" id="1958566879%2FProperties%2F1153838479" data-filterable-set=":library:runtime-service-ui/androidMain"></a>
+          <div class="table-row" data-filterable-current=":library:runtime-service-ui/androidMain" data-filterable-set=":library:runtime-service-ui/androidMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="index.html#1958566879%2FProperties%2F1153838479"><span>default</span><wbr><span><span>Config</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1958566879%2FProperties%2F1153838479"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":library:runtime-service-ui/androidMain" data-filterable-set=":library:runtime-service-ui/androidMain" data-active="" data-toggle=":library:runtime-service-ui/androidMain">android</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":library:runtime-service-ui/androidMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="index.html#1958566879%2FProperties%2F1153838479">defaultConfig</a><span class="token operator">: </span><a href="../-config/index.html">KmpTorServiceUI.Config</a></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1660934200%2FProperties%2F1153838479" anchor-label="info" id="-1660934200%2FProperties%2F1153838479" data-filterable-set=":library:runtime-service-ui/androidMain"></a>
+          <div class="table-row" data-filterable-current=":library:runtime-service-ui/androidMain" data-filterable-set=":library:runtime-service-ui/androidMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="index.html#-1660934200%2FProperties%2F1153838479"><span><span>info</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1660934200%2FProperties%2F1153838479"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":library:runtime-service-ui/androidMain" data-filterable-set=":library:runtime-service-ui/androidMain" data-active="" data-toggle=":library:runtime-service-ui/androidMain">android</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":library:runtime-service-ui/androidMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="index.html#-1660934200%2FProperties%2F1153838479">info</a><span class="token operator">: </span><a href="../../../../../library/runtime-service/io.matthewnelson.kmp.tor.runtime.service/-tor-service-u-i/-notification-info/index.html">TorServiceUI.NotificationInfo</a></div></div>                  </div>
                 </div>
               </div>
             </div>
@@ -168,53 +251,53 @@ val serviceConfig = TorServiceConfig.Foreground.Builder(factory) {
       </div>
       <div data-togglable="FUNCTION">
         <h2 class="">Functions</h2>
-        <div class="table"><a data-name="-1878829664%2FFunctions%2F-1920071737" anchor-label="createProtected" id="-1878829664%2FFunctions%2F-1920071737" data-filterable-set=":library:runtime-service-ui:dokkaHtmlPartial/androidMain"></a>
-          <div class="table-row" data-filterable-current=":library:runtime-service-ui:dokkaHtmlPartial/androidMain" data-filterable-set=":library:runtime-service-ui:dokkaHtmlPartial/androidMain">
+        <div class="table"><a data-name="-1878829664%2FFunctions%2F1153838479" anchor-label="createProtected" id="-1878829664%2FFunctions%2F1153838479" data-filterable-set=":library:runtime-service-ui/androidMain"></a>
+          <div class="table-row" data-filterable-current=":library:runtime-service-ui/androidMain" data-filterable-set=":library:runtime-service-ui/androidMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="create-protected.html"><span>create</span><wbr><span><span>Protected</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1878829664%2FFunctions%2F-1920071737"></span>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1878829664%2FFunctions%2F1153838479"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
               <div>
                 <div class="title">
                   <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
-                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":library:runtime-service-ui:dokkaHtmlPartial/androidMain" data-filterable-set=":library:runtime-service-ui:dokkaHtmlPartial/androidMain" data-active="" data-toggle=":library:runtime-service-ui:dokkaHtmlPartial/androidMain">android</button></div>
-<div class="content sourceset-dependent-content" data-active="" data-togglable=":library:runtime-service-ui:dokkaHtmlPartial/androidMain"><div class="symbol monospace"><span class="token keyword">protected </span><span class="token keyword">open </span><span class="token keyword">override </span><span class="token keyword">fun </span><a href="create-protected.html"><span class="token function">createProtected</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">args<span class="token operator">: </span><a href="../../../../../library/runtime-service/io.matthewnelson.kmp.tor.runtime.service/-tor-service-u-i/-args/index.html">TorServiceUI.Args</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../index.html">KmpTorServiceUI</a></div></div>                  </div>
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":library:runtime-service-ui/androidMain" data-filterable-set=":library:runtime-service-ui/androidMain" data-active="" data-toggle=":library:runtime-service-ui/androidMain">android</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":library:runtime-service-ui/androidMain"><div class="symbol monospace"><span class="token keyword">protected </span><span class="token keyword">open </span><span class="token keyword">override </span><span class="token keyword">fun </span><a href="create-protected.html"><span class="token function">createProtected</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">args<span class="token operator">: </span><a href="../../../../../library/runtime-service/io.matthewnelson.kmp.tor.runtime.service/-tor-service-u-i/-args/index.html">TorServiceUI.Args</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../index.html">KmpTorServiceUI</a></div></div>                  </div>
                 </div>
               </div>
             </div>
           </div>
-<a data-name="1314784309%2FFunctions%2F-1920071737" anchor-label="validate" id="1314784309%2FFunctions%2F-1920071737" data-filterable-set=":library:runtime-service-ui:dokkaHtmlPartial/androidMain"></a>
-          <div class="table-row" data-filterable-current=":library:runtime-service-ui:dokkaHtmlPartial/androidMain" data-filterable-set=":library:runtime-service-ui:dokkaHtmlPartial/androidMain">
+<a data-name="1314784309%2FFunctions%2F1153838479" anchor-label="validate" id="1314784309%2FFunctions%2F1153838479" data-filterable-set=":library:runtime-service-ui/androidMain"></a>
+          <div class="table-row" data-filterable-current=":library:runtime-service-ui/androidMain" data-filterable-set=":library:runtime-service-ui/androidMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="validate.html"><span><span>validate</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1314784309%2FFunctions%2F-1920071737"></span>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1314784309%2FFunctions%2F1153838479"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
               <div>
                 <div class="title">
                   <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
-                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":library:runtime-service-ui:dokkaHtmlPartial/androidMain" data-filterable-set=":library:runtime-service-ui:dokkaHtmlPartial/androidMain" data-active="" data-toggle=":library:runtime-service-ui:dokkaHtmlPartial/androidMain">android</button></div>
-<div class="content sourceset-dependent-content" data-active="" data-togglable=":library:runtime-service-ui:dokkaHtmlPartial/androidMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">override </span><span class="token keyword">fun </span><a href="validate.html"><span class="token function">validate</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">context<span class="token operator">: </span><a href="https://developer.android.com/reference/kotlin/android/content/Context.html">Context</a></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">See <a href="../../../../../library/runtime-service/io.matthewnelson.kmp.tor.runtime.service/-tor-service-u-i/-factory/validate.html">TorServiceUI.Factory.validate</a></p></div></div>                  </div>
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":library:runtime-service-ui/androidMain" data-filterable-set=":library:runtime-service-ui/androidMain" data-active="" data-toggle=":library:runtime-service-ui/androidMain">android</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":library:runtime-service-ui/androidMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">override </span><span class="token keyword">fun </span><a href="validate.html"><span class="token function">validate</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">context<span class="token operator">: </span><a href="https://developer.android.com/reference/kotlin/android/content/Context.html">Context</a></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">See <a href="../../../../../library/runtime-service/io.matthewnelson.kmp.tor.runtime.service/-tor-service-u-i/-factory/validate.html">TorServiceUI.Factory.validate</a></p></div></div>                  </div>
                 </div>
               </div>
             </div>
           </div>
-<a data-name="-433334697%2FFunctions%2F-1920071737" anchor-label="validateConfig" id="-433334697%2FFunctions%2F-1920071737" data-filterable-set=":library:runtime-service-ui:dokkaHtmlPartial/androidMain"></a>
-          <div class="table-row" data-filterable-current=":library:runtime-service-ui:dokkaHtmlPartial/androidMain" data-filterable-set=":library:runtime-service-ui:dokkaHtmlPartial/androidMain">
+<a data-name="-433334697%2FFunctions%2F1153838479" anchor-label="validateConfig" id="-433334697%2FFunctions%2F1153838479" data-filterable-set=":library:runtime-service-ui/androidMain"></a>
+          <div class="table-row" data-filterable-current=":library:runtime-service-ui/androidMain" data-filterable-set=":library:runtime-service-ui/androidMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="validate-config.html"><span>validate</span><wbr><span><span>Config</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-433334697%2FFunctions%2F-1920071737"></span>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-433334697%2FFunctions%2F1153838479"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
               <div>
                 <div class="title">
                   <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
-                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":library:runtime-service-ui:dokkaHtmlPartial/androidMain" data-filterable-set=":library:runtime-service-ui:dokkaHtmlPartial/androidMain" data-active="" data-toggle=":library:runtime-service-ui:dokkaHtmlPartial/androidMain">android</button></div>
-<div class="content sourceset-dependent-content" data-active="" data-togglable=":library:runtime-service-ui:dokkaHtmlPartial/androidMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">override </span><span class="token keyword">fun </span><a href="validate-config.html"><span class="token function">validateConfig</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">context<span class="token operator">: </span><a href="https://developer.android.com/reference/kotlin/android/content/Context.html">Context</a><span class="token punctuation">, </span></span><span class="parameter ">config<span class="token operator">: </span><a href="../-config/index.html">KmpTorServiceUI.Config</a></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">See <a href="../../../../../library/runtime-service/io.matthewnelson.kmp.tor.runtime.service/-tor-service-u-i/-factory/validate-config.html">TorServiceUI.Factory.validateConfig</a></p></div></div>                  </div>
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":library:runtime-service-ui/androidMain" data-filterable-set=":library:runtime-service-ui/androidMain" data-active="" data-toggle=":library:runtime-service-ui/androidMain">android</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":library:runtime-service-ui/androidMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">override </span><span class="token keyword">fun </span><a href="validate-config.html"><span class="token function">validateConfig</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">context<span class="token operator">: </span><a href="https://developer.android.com/reference/kotlin/android/content/Context.html">Context</a><span class="token punctuation">, </span></span><span class="parameter ">config<span class="token operator">: </span><a href="../-config/index.html">KmpTorServiceUI.Config</a></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">See <a href="../../../../../library/runtime-service/io.matthewnelson.kmp.tor.runtime.service/-tor-service-u-i/-factory/validate-config.html">TorServiceUI.Factory.validateConfig</a></p></div></div>                  </div>
                 </div>
               </div>
             </div>
@@ -224,12 +307,18 @@ val serviceConfig = TorServiceConfig.Foreground.Builder(factory) {
     </div>
   </div>
 </div>
-      <div class="footer">
-        <span class="go-to-top-icon"><a href="#content" id="go-to-top-link"></a></span><span>© 2025 Copyright</span><span class="pull-right"><span>Generated by </span><a href="https://github.com/Kotlin/dokka"><span>dokka</span><span class="padded-icon"></span></a></span>
-      </div>
+    <div class="footer">
+        <a href="#content" id="go-to-top-link" class="footer--button footer--button_go-to-top"></a>
+        <span>© 2021-2025 Copyright Matthew Nelson</span>
+        <span class="pull-right">
+            <span>Generated by </span>
+            <a class="footer--link footer--link_external" href="https://github.com/Kotlin/dokka">
+                <span>dokka</span>
+            </a>
+        </span>
+    </div>
             </div>
         </div>
     </div>
 </body>
 </html>
-
