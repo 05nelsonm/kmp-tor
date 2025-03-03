@@ -54,16 +54,36 @@ public expect sealed class Key private constructor() {
     }
 
     public sealed class Private(key: ByteArray): Key, Destroyable {
+
         public final override fun destroy()
         public final override fun isDestroyed(): Boolean
 
-        @Throws(IllegalStateException::class)
+        /**
+         * Returns a copy of the raw key bytes
+         *
+         * @throws [IllegalStateException] when [isDestroyed] is `true`
+         * */
         public fun encoded(): ByteArray
-        @Throws(IllegalStateException::class)
+
+        /**
+         * Returns a copy of the key encoded as base16 text (hex)
+         *
+         * @throws [IllegalStateException] when [isDestroyed] is `true`
+         * */
         public fun base16(): String
-        @Throws(IllegalStateException::class)
+
+        /**
+         * Returns a copy of the key encoded as base32 text
+         *
+         * @throws [IllegalStateException] when [isDestroyed] is `true`
+         * */
         public fun base32(): String
-        @Throws(IllegalStateException::class)
+
+        /**
+         * Returns a copy of the key encoded as base64 text
+         *
+         * @throws [IllegalStateException] when [isDestroyed] is `true`
+         * */
         public fun base64(): String
 
         public final override fun encodedOrNull(): ByteArray?

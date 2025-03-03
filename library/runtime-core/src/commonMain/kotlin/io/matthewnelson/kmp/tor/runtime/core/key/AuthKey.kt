@@ -78,7 +78,6 @@ public class AuthKey private constructor() {
          *   compatible [OnionAddress] for this [algorithm].
          * @throws [IllegalStateException] if [isDestroyed] is `true`.
          * */
-        @Throws(IllegalArgumentException::class, IllegalStateException::class)
         public fun descriptorBase32(
             address: OnionAddress,
         ): String = descriptorBase32(address.asPublicKey())
@@ -92,7 +91,6 @@ public class AuthKey private constructor() {
          *   compatible [AddressKey.Public] for this [algorithm].
          * @throws [IllegalStateException] if [isDestroyed] is `true`.
          * */
-        @Throws(IllegalArgumentException::class, IllegalStateException::class)
         public fun descriptorBase32(
             publicKey: AddressKey.Public,
         ): String {
@@ -142,7 +140,6 @@ public class AuthKey private constructor() {
          *   compatible [OnionAddress] for this [algorithm].
          * @throws [IllegalStateException] if [isDestroyed] is `true`.
          * */
-        @Throws(IllegalArgumentException::class, IllegalStateException::class)
         public fun descriptorBase64(
             address: OnionAddress,
         ): String = descriptorBase64(address.asPublicKey())
@@ -156,7 +153,6 @@ public class AuthKey private constructor() {
          *   compatible [AddressKey.Public] for this [algorithm].
          * @throws [IllegalStateException] if [isDestroyed] is `true`.
          * */
-        @Throws(IllegalArgumentException::class, IllegalStateException::class)
         public fun descriptorBase64(
             publicKey: AddressKey.Public,
         ): String {

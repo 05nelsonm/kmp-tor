@@ -20,11 +20,16 @@ package io.matthewnelson.kmp.tor.runtime.core.key
 import io.matthewnelson.kmp.tor.runtime.core.net.OnionAddress
 import io.matthewnelson.kmp.tor.runtime.core.net.OnionAddress.V3.Companion.toOnionAddressV3OrNull
 import io.matthewnelson.kmp.tor.runtime.core.internal.tryDecodeOrNull
+import io.matthewnelson.kmp.tor.runtime.core.key.ED25519_V3.PrivateKey.Companion.generateED25519KeyPair
 import io.matthewnelson.kmp.tor.runtime.core.key.ED25519_V3.PublicKey.Companion.toED25519_V3PublicKey
 import io.matthewnelson.kmp.tor.runtime.core.key.ED25519_V3.PublicKey.Companion.toED25519_V3PublicKeyOrNull
 import org.kotlincrypto.error.InvalidKeyException
+import org.kotlincrypto.hash.sha2.SHA512
+import org.kotlincrypto.random.CryptoRand
+import org.kotlincrypto.random.RandomnessProcurementException
 import kotlin.jvm.JvmName
 import kotlin.jvm.JvmStatic
+import kotlin.jvm.JvmSynthetic
 
 /**
  * An [ED25519_V3] [KeyType]. Also known as "Version 3 Hidden Services".
@@ -35,6 +40,15 @@ public object ED25519_V3: KeyType.Address<ED25519_V3.PublicKey, ED25519_V3.Priva
      * `ED25519-V3`
      * */
     public override fun algorithm(): String = "ED25519-V3"
+
+    /**
+     * Creates a new [ED25519_V3] key pair, suitable for use with tor APIs.
+     *
+     * @throws [RandomnessProcurementException] if unable to procure cryptographically secure
+     *   random data from system sources
+     * */
+    @JvmStatic
+    public fun generateKeyPair(): Pair<PublicKey, PrivateKey> = CryptoRand.Default.generateED25519KeyPair()
 
     /**
      * The public key of a Hidden Service (i.e. a [OnionAddress.V3] wrapped in
@@ -195,6 +209,21 @@ public object ED25519_V3: KeyType.Address<ED25519_V3.PublicKey, ED25519_V3.Priva
             public fun ByteArray.toED25519_V3PrivateKeyOrNull(): PrivateKey? {
                 if (size != BYTE_SIZE) return null
                 return PrivateKey(copyOf())
+            }
+
+            @JvmSynthetic
+            @Throws(RandomnessProcurementException::class)
+            internal fun CryptoRand.generateED25519KeyPair(): Pair<PublicKey, PrivateKey> {
+                val seed = nextBytes(ByteArray(BYTE_SIZE / 2))
+                // Tor stores ed25519 keys in their 64-byte expanded format
+                val b = SHA512().digest(seed)
+                seed.fill(0)
+                // Clamp
+                b[ 0] = (b[ 0].toUByte() and 248.toUByte()).toByte()
+                b[31] = (b[31].toUByte() and 127.toUByte()).toByte()
+                b[31] = (b[31].toUByte()  or  64.toUByte()).toByte()
+                val private = PrivateKey(b)
+                throw RandomnessProcurementException("Not yet implemented")
             }
 
             private const val BYTE_SIZE = 64

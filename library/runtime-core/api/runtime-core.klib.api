@@ -3814,6 +3814,7 @@ sealed class io.matthewnelson.kmp.tor.runtime.core/TorEvent : io.matthewnelson.k
 
 final object io.matthewnelson.kmp.tor.runtime.core.key/ED25519_V3 : io.matthewnelson.kmp.tor.runtime.core.key/KeyType.Address<io.matthewnelson.kmp.tor.runtime.core.key/ED25519_V3.PublicKey, io.matthewnelson.kmp.tor.runtime.core.key/ED25519_V3.PrivateKey> { // io.matthewnelson.kmp.tor.runtime.core.key/ED25519_V3|null[0]
     final fun algorithm(): kotlin/String // io.matthewnelson.kmp.tor.runtime.core.key/ED25519_V3.algorithm|algorithm(){}[0]
+    final fun generateKeyPair(): kotlin/Pair<io.matthewnelson.kmp.tor.runtime.core.key/ED25519_V3.PublicKey, io.matthewnelson.kmp.tor.runtime.core.key/ED25519_V3.PrivateKey> // io.matthewnelson.kmp.tor.runtime.core.key/ED25519_V3.generateKeyPair|generateKeyPair(){}[0]
 
     final class PrivateKey : io.matthewnelson.kmp.tor.runtime.core.key/AddressKey.Private { // io.matthewnelson.kmp.tor.runtime.core.key/ED25519_V3.PrivateKey|null[0]
         final fun algorithm(): kotlin/String // io.matthewnelson.kmp.tor.runtime.core.key/ED25519_V3.PrivateKey.algorithm|algorithm(){}[0]
@@ -3843,6 +3844,7 @@ final object io.matthewnelson.kmp.tor.runtime.core.key/ED25519_V3 : io.matthewne
 
 final object io.matthewnelson.kmp.tor.runtime.core.key/X25519 : io.matthewnelson.kmp.tor.runtime.core.key/KeyType.Auth<io.matthewnelson.kmp.tor.runtime.core.key/X25519.PublicKey, io.matthewnelson.kmp.tor.runtime.core.key/X25519.PrivateKey> { // io.matthewnelson.kmp.tor.runtime.core.key/X25519|null[0]
     final fun algorithm(): kotlin/String // io.matthewnelson.kmp.tor.runtime.core.key/X25519.algorithm|algorithm(){}[0]
+    final fun generateKeyPair(): kotlin/Pair<io.matthewnelson.kmp.tor.runtime.core.key/X25519.PublicKey, io.matthewnelson.kmp.tor.runtime.core.key/X25519.PrivateKey> // io.matthewnelson.kmp.tor.runtime.core.key/X25519.generateKeyPair|generateKeyPair(){}[0]
 
     final class PrivateKey : io.matthewnelson.kmp.tor.runtime.core.key/AuthKey.Private { // io.matthewnelson.kmp.tor.runtime.core.key/X25519.PrivateKey|null[0]
         final fun algorithm(): kotlin/String // io.matthewnelson.kmp.tor.runtime.core.key/X25519.PrivateKey.algorithm|algorithm(){}[0]

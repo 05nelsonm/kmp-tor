@@ -16,9 +16,12 @@
 package io.matthewnelson.kmp.tor.runtime.core.key
 
 import io.matthewnelson.kmp.tor.runtime.core.internal.tryDecodeOrNull
+import io.matthewnelson.kmp.tor.runtime.core.key.X25519.PrivateKey.Companion.generateX25519KeyPair
 import io.matthewnelson.kmp.tor.runtime.core.key.X25519.PublicKey.Companion.toX25519PublicKey
 import io.matthewnelson.kmp.tor.runtime.core.key.X25519.PublicKey.Companion.toX25519PublicKeyOrNull
 import org.kotlincrypto.error.InvalidKeyException
+import org.kotlincrypto.random.CryptoRand
+import org.kotlincrypto.random.RandomnessProcurementException
 import kotlin.jvm.JvmName
 import kotlin.jvm.JvmStatic
 import kotlin.jvm.JvmSynthetic
@@ -32,6 +35,15 @@ public object X25519: KeyType.Auth<X25519.PublicKey, X25519.PrivateKey>() {
      * `x25519`
      * */
     public override fun algorithm(): String = "x25519"
+
+    /**
+     * Creates a new [X25519] key pair, suitable for use with tor APIs.
+     *
+     * @throws [RandomnessProcurementException] if unable to procure cryptographically secure
+     *   random data from system sources
+     * */
+    @JvmStatic
+    public fun generateKeyPair(): Pair<PublicKey, PrivateKey> = CryptoRand.Default.generateX25519KeyPair()
 
     /**
      * Holder for a public key associated with a [ED25519_V3] Hidden Service's
@@ -191,6 +203,18 @@ public object X25519: KeyType.Auth<X25519.PublicKey, X25519.PrivateKey>() {
             public fun ByteArray.toX25519PrivateKeyOrNull(): PrivateKey? {
                 if (size != BYTE_SIZE) return null
                 return PrivateKey(copyOf())
+            }
+
+            @JvmSynthetic
+            @Throws(RandomnessProcurementException::class)
+            internal fun CryptoRand.generateX25519KeyPair(): Pair<PublicKey, PrivateKey> {
+                val b = nextBytes(ByteArray(BYTE_SIZE))
+                // Clamp
+                b[ 0] = (b[ 0].toUByte() and 248.toUByte()).toByte()
+                b[31] = (b[31].toUByte() and 127.toUByte()).toByte()
+                b[31] = (b[31].toUByte()  or  64.toUByte()).toByte()
+                val private = PrivateKey(b)
+                throw RandomnessProcurementException("Not yet implemented")
             }
         }
 
