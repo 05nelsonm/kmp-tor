@@ -39,6 +39,7 @@ kmpConfiguration {
                     implementation(libs.kmp.tor.common.core)
                     implementation(libs.kotlinx.coroutines.core)
                     api(kotlincrypto.error.error)
+                    api(kotlincrypto.hash.sha3)
                 }
             }
             sourceSetTest {

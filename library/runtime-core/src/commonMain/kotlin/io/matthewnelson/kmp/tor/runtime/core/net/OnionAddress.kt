@@ -19,6 +19,7 @@ import io.matthewnelson.encoding.base32.Base32
 import io.matthewnelson.encoding.base32.Base32Default
 import io.matthewnelson.encoding.core.Decoder.Companion.decodeToByteArray
 import io.matthewnelson.encoding.core.Encoder.Companion.encodeToString
+import io.matthewnelson.encoding.core.EncodingException
 import io.matthewnelson.kmp.tor.runtime.core.net.OnionAddress.OnionString.Companion.toOnionString
 import io.matthewnelson.kmp.tor.runtime.core.net.OnionAddress.V3.Companion.toOnionAddressV3OrNull
 import io.matthewnelson.kmp.tor.runtime.core.internal.HostAndPort
@@ -26,6 +27,9 @@ import io.matthewnelson.kmp.tor.runtime.core.internal.HostAndPort.Companion.find
 import io.matthewnelson.kmp.tor.runtime.core.internal.stripBaseEncoding
 import io.matthewnelson.kmp.tor.runtime.core.key.AddressKey
 import io.matthewnelson.kmp.tor.runtime.core.key.ED25519_V3
+import io.matthewnelson.kmp.tor.runtime.core.net.OnionAddress.Companion.toOnionAddress
+import io.matthewnelson.kmp.tor.runtime.core.net.OnionAddress.V3.Companion.toOnionAddressV3
+import org.kotlincrypto.hash.sha3.SHA3_256
 import kotlin.jvm.JvmInline
 import kotlin.jvm.JvmName
 import kotlin.jvm.JvmStatic
@@ -71,8 +75,8 @@ public sealed class OnionAddress private constructor(value: String): Address(val
         @JvmStatic
         @JvmName("get")
         public fun String.toOnionAddress(): OnionAddress {
-            return toOnionAddressOrNull()
-                ?: throw IllegalArgumentException("$this does not contain an onion address")
+            val onion = findHostnameAndPortFromURL().toOnionString()
+            return onion.toOnionAddressV3()
         }
 
         /**
@@ -86,8 +90,7 @@ public sealed class OnionAddress private constructor(value: String): Address(val
         @JvmStatic
         @JvmName("get")
         public fun ByteArray.toOnionAddress(): OnionAddress {
-            return toOnionAddressOrNull()
-                ?: throw IllegalArgumentException("bytes are not an onion address")
+            return toOnionAddressV3()
         }
 
         /**
@@ -102,8 +105,10 @@ public sealed class OnionAddress private constructor(value: String): Address(val
          * */
         @JvmStatic
         @JvmName("getOrNull")
-        public fun String.toOnionAddressOrNull(): OnionAddress? {
-            return findHostnameAndPortFromURL().toOnionAddressOrNull()
+        public fun String.toOnionAddressOrNull(): OnionAddress? = try {
+            toOnionAddress()
+        } catch (_: IllegalArgumentException) {
+            null
         }
 
         /**
@@ -115,23 +120,15 @@ public sealed class OnionAddress private constructor(value: String): Address(val
          * */
         @JvmStatic
         @JvmName("getOrNull")
-        public fun ByteArray.toOnionAddressOrNull(): OnionAddress? {
-            return toOnionAddressV3OrNull()
-        }
-
-        @JvmSynthetic
-        internal fun HostAndPort.toOnionAddressOrNull(): OnionAddress? {
-            val onion = toOnionString()
-            return onion.toOnionAddressV3OrNull()
+        public fun ByteArray.toOnionAddressOrNull(): OnionAddress? = try {
+            toOnionAddress()
+        } catch (_: IllegalArgumentException) {
+            null
         }
     }
 
     /**
-     * Holder for a 56 character v3 onion address without the scheme or `.onion`
-     * appended.
-     *
-     * This is only a preliminary check for character and length correctness.
-     * Public key validity is **not** checked.
+     * Holder for a 56 character v3 onion address without the scheme or `.onion` appended.
      *
      * @see [toOnionAddressV3]
      * @see [toOnionAddressV3OrNull]
@@ -160,21 +157,32 @@ public sealed class OnionAddress private constructor(value: String): Address(val
             @JvmStatic
             @JvmName("get")
             public fun String.toOnionAddressV3(): V3 {
-                return toOnionAddressV3OrNull()
-                    ?: throw IllegalArgumentException("$this does not contain a v3 onion address")
+                return findHostnameAndPortFromURL()
+                    .toOnionString()
+                    .toOnionAddressV3()
             }
 
             /**
              * Transforms provided bytes into a v3 `.onion` address.
              *
              * @return [OnionAddress.V3]
-             * @throws [IllegalArgumentException] if byte array size is inappropriate
+             * @throws [IllegalArgumentException] when:
+             *   - array size is inappropriate
+             *   - invalid version byte
+             *   - invalid checksum
              * */
             @JvmStatic
             @JvmName("get")
             public fun ByteArray.toOnionAddressV3(): V3 {
-                return toOnionAddressV3OrNull()
-                    ?: throw IllegalArgumentException("bytes are not a v3 onion address")
+                require(size == BYTE_SIZE) { "Invalid array size. expected[$BYTE_SIZE] vs actual[$size]" }
+                require(last() == VERSION_BYTE) { "Invalid version byte. expected[$VERSION_BYTE] vs actual[${last()}]" }
+                val checksum = computeChecksum(this)
+                val a0 = this[BYTE_SIZE - 3]
+                val a1 = this[BYTE_SIZE - 2]
+                val e0 = checksum[0]
+                val e1 = checksum[1]
+                require(a0 == e0 && a1 == e1) { "Invalid checksum byte(s). expected[$e0, $e1] vs actual[$a0, $a1]" }
+                return V3(encodeToString(BASE32))
             }
 
             /**
@@ -187,8 +195,10 @@ public sealed class OnionAddress private constructor(value: String): Address(val
              * */
             @JvmStatic
             @JvmName("getOrNull")
-            public fun String.toOnionAddressV3OrNull(): V3? {
-                return findHostnameAndPortFromURL().toOnionAddressV3OrNull()
+            public fun String.toOnionAddressV3OrNull(): V3? = try {
+                toOnionAddressV3()
+            } catch (_: IllegalArgumentException) {
+                null
             }
 
             /**
@@ -198,28 +208,40 @@ public sealed class OnionAddress private constructor(value: String): Address(val
              * */
             @JvmStatic
             @JvmName("getOrNull")
-            public fun ByteArray.toOnionAddressV3OrNull(): V3? {
-                if (size != BYTE_SIZE) return null
-                return V3(encodeToString(BASE32_ENCODE))
+            public fun ByteArray.toOnionAddressV3OrNull(): V3? = try {
+                toOnionAddressV3()
+            } catch (_: IllegalArgumentException) {
+                null
             }
 
             @JvmSynthetic
-            internal fun HostAndPort.toOnionAddressV3OrNull(): V3? {
-                return toOnionString().toOnionAddressV3OrNull()
+            @Throws(IllegalArgumentException::class)
+            internal fun OnionString.toOnionAddressV3(): V3 {
+                require(value.length == ENCODED_LEN) { "v3 Onion addresses are $ENCODED_LEN characters" }
+                val bytes = try {
+                    value.decodeToByteArray(BASE32)
+                } catch (e: EncodingException) {
+                    throw IllegalArgumentException("v3 Onion addresses are base32 encoded", e)
+                }
+                return bytes.toOnionAddressV3()
             }
 
             @JvmSynthetic
-            internal fun OnionString.toOnionAddressV3OrNull(): V3? {
-                if (!value.matches(REGEX)) return null
-                return V3(value)
-            }
+            @Throws(IllegalArgumentException::class, IndexOutOfBoundsException::class)
+            internal fun computeChecksum(
+                ed25519PublicKey: ByteArray,
+            ): ByteArray = SHA3_256().apply {
+                update(CHECKSUM_PREFIX)
+                update(ed25519PublicKey, 0, 32) // TODO: Move 32 to ED25519_V3.Public.Companion
+                update(VERSION_BYTE)
+            }.digest()
 
             internal const val BYTE_SIZE: Int = 35
-            private val REGEX: Regex = "[${Base32.Default.CHARS_LOWER}]{56}".toRegex()
-            private val BASE32_ENCODE = Base32Default {
-                encodeToLowercase = true
-                padEncoded = false
-            }
+            internal const val ENCODED_LEN: Int = 56
+            internal const val VERSION_BYTE: Byte = 3
+
+            private val BASE32 = Base32Default { encodeToLowercase = true; padEncoded = false }
+            private val CHECKSUM_PREFIX = ".onion checksum".encodeToByteArray()
         }
     }
 
