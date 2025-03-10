@@ -24,6 +24,7 @@ import io.matthewnelson.kmp.tor.runtime.core.ctrl.TorCmd
 import io.matthewnelson.kmp.tor.runtime.core.key.ED25519_V3
 import io.matthewnelson.kmp.tor.runtime.core.key.ED25519_V3.PrivateKey.Companion.toED25519_V3PrivateKey
 import io.matthewnelson.kmp.tor.runtime.core.key.ED25519_V3.PublicKey.Companion.toED25519_V3PublicKey
+import io.matthewnelson.kmp.tor.runtime.core.net.OnionAddress.V3.Companion.toOnionAddressV3
 import io.matthewnelson.kmp.tor.runtime.ctrl.internal.TorCmdJob
 import kotlin.test.*
 
@@ -121,7 +122,7 @@ class TorCmdInterceptorUnitTest {
                 }.also { invocationOnionAdd = true }
 
                 is TorCmd.Onion.Delete -> TorCmd.Onion.Delete(
-                    key = ByteArray(35) { it.toByte() }.toED25519_V3PublicKey()
+                    key = ED25519_V3.PublicKey(ONION_ADDRESS_V3)
                 ).also { invocationOnionDelete = true }
                 else -> cmd
             }
@@ -138,7 +139,7 @@ class TorCmdInterceptorUnitTest {
 
         val jobDelete = newJob(
             TorCmd.Onion.Delete(
-                key = ByteArray(35) { (it + 2).toByte() }.toED25519_V3PublicKey()
+                key = ED25519_V3.PublicKey(ONION_ADDRESS_V3)
             )
         )
 
@@ -155,4 +156,8 @@ class TorCmdInterceptorUnitTest {
         OnFailure.noOp(),
         UncaughtException.Handler.THROW,
     ).apply { if (setExecuting) executing() }
+
+    private companion object {
+        val ONION_ADDRESS_V3 = "6yxtsbpn2k7exxiarcbiet3fsr4komissliojxjlvl7iytacrnvz2uyd".toOnionAddressV3()
+    }
 }

@@ -20,6 +20,7 @@ import io.matthewnelson.kmp.tor.runtime.core.net.OnionAddress.V3.Companion.toOni
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNull
+import kotlin.test.fail
 
 class OnionAddressV3UnitTest {
 
@@ -35,6 +36,38 @@ class OnionAddressV3UnitTest {
         assertNull("".toOnionAddressV3OrNull(), msg)
         assertNull("$ONION_ADDRESS_V3.".toOnionAddressV3OrNull(), msg)
         assertNull(ONION_ADDRESS_V3.dropLast(1).toOnionAddressV3OrNull(), msg)
+    }
+
+    @Test
+    fun givenOnionAddress_whenInvalidVersionByte_thenThrowsException() {
+        val bytes = ONION_ADDRESS_V3.toOnionAddressV3().decode()
+        bytes[OnionAddress.V3.BYTE_SIZE - 1] = 4
+        try {
+            bytes.toOnionAddressV3()
+            fail()
+        } catch (e: IllegalArgumentException) {
+            assertEquals(true, e.message?.contains("Invalid version byte."))
+        }
+    }
+
+    @Test
+    fun givenOnionAddress_whenInvalidChecksumByte_thenThrowsException() {
+        val bytes = ONION_ADDRESS_V3.toOnionAddressV3().decode()
+        bytes[OnionAddress.V3.BYTE_SIZE - 3]++
+        try {
+            bytes.toOnionAddressV3()
+            fail()
+        } catch (e: IllegalArgumentException) {
+            assertEquals(true, e.message?.contains("Invalid checksum byte(s)."))
+        }
+        bytes[OnionAddress.V3.BYTE_SIZE - 3]--
+        bytes[OnionAddress.V3.BYTE_SIZE - 2]++
+        try {
+            bytes.toOnionAddressV3()
+            fail()
+        } catch (e: IllegalArgumentException) {
+            assertEquals(true, e.message?.contains("Invalid checksum byte(s)."))
+        }
     }
 
     @Test
