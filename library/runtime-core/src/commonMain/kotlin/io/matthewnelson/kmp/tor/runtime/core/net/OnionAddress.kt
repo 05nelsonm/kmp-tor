@@ -19,6 +19,7 @@ import io.matthewnelson.encoding.base32.Base32Default
 import io.matthewnelson.encoding.core.Decoder.Companion.decodeToByteArray
 import io.matthewnelson.encoding.core.Encoder.Companion.encodeToString
 import io.matthewnelson.encoding.core.EncodingException
+import io.matthewnelson.encoding.core.use
 import io.matthewnelson.kmp.tor.runtime.core.net.OnionAddress.OnionString.Companion.toOnionString
 import io.matthewnelson.kmp.tor.runtime.core.net.OnionAddress.V3.Companion.toOnionAddressV3OrNull
 import io.matthewnelson.kmp.tor.runtime.core.internal.HostAndPort
@@ -29,6 +30,7 @@ import io.matthewnelson.kmp.tor.runtime.core.key.AddressKey
 import io.matthewnelson.kmp.tor.runtime.core.key.ED25519_V3
 import io.matthewnelson.kmp.tor.runtime.core.net.OnionAddress.Companion.toOnionAddress
 import io.matthewnelson.kmp.tor.runtime.core.net.OnionAddress.V3.Companion.toOnionAddressV3
+import org.kotlincrypto.error.InvalidKeyException
 import org.kotlincrypto.hash.sha3.SHA3_256
 import kotlin.jvm.JvmInline
 import kotlin.jvm.JvmName
@@ -177,11 +179,11 @@ public sealed class OnionAddress private constructor(value: String): Address(val
                 require(last() == VERSION_BYTE) { "Invalid version byte. expected[$VERSION_BYTE] vs actual[${last()}]" }
                 require(containsNon0Byte(ED25519_V3.PublicKey.BYTE_SIZE)) { "ed25519 public key is blank (all 0 bytes)" }
                 val checksum = computeChecksum()
-                val a0 = this[BYTE_SIZE - 3]
-                val a1 = this[BYTE_SIZE - 2]
-                val e0 = checksum[0]
-                val e1 = checksum[1]
-                require(a0 == e0 && a1 == e1) { "Invalid checksum byte(s). expected[$e0, $e1] vs actual[$a0, $a1]" }
+                val ca0 = this[BYTE_SIZE - 3]
+                val ca1 = this[BYTE_SIZE - 2]
+                val ce0 = checksum[0]
+                val ce1 = checksum[1]
+                require(ca0 == ce0 && ca1 == ce1) { "Invalid checksum byte(s). expected[$ce0, $ce1] vs actual[$ca0, $ca1]" }
                 return V3(encodeToString(BASE_32))
             }
 
@@ -227,21 +229,28 @@ public sealed class OnionAddress private constructor(value: String): Address(val
             }
 
             @JvmSynthetic
-            @Throws(IllegalArgumentException::class)
+            @Throws(InvalidKeyException::class)
             internal fun fromED25519(publicKey: ByteArray): V3 {
-                require(publicKey.size == ED25519_V3.PublicKey.BYTE_SIZE) { "Invalid array size" }
-                require(publicKey.containsNon0Byte(ED25519_V3.PublicKey.BYTE_SIZE)) { "Key is blank (all 0 bytes)" }
+                if (publicKey.size != ED25519_V3.PublicKey.BYTE_SIZE) {
+                    throw InvalidKeyException("Invalid array size[${publicKey.size}]")
+                }
+                if (!publicKey.containsNon0Byte(ED25519_V3.PublicKey.BYTE_SIZE)) {
+                    throw InvalidKeyException("Key is blank (all 0 bytes)")
+                }
                 val checksum = publicKey.computeChecksum()
-                val b = publicKey.copyOf(BYTE_SIZE)
-                b[BYTE_SIZE - 3] = checksum[0]
-                b[BYTE_SIZE - 2] = checksum[1]
-                b[BYTE_SIZE - 1] = VERSION_BYTE
-                return V3(b.encodeToString(BASE_32))
+                val s = StringBuilder(ENCODED_LEN)
+                BASE_32.newEncoderFeed(out = { char -> s.append(char) }).use { feed ->
+                    publicKey.forEach { b -> feed.consume(b) }
+                    feed.consume(checksum[0])
+                    feed.consume(checksum[1])
+                    feed.consume(VERSION_BYTE)
+                }
+                return V3(s.toString())
             }
 
             internal const val BYTE_SIZE: Int = 35
-            internal const val ENCODED_LEN: Int = 56
-            internal const val VERSION_BYTE: Byte = 3
+            private const val ENCODED_LEN: Int = 56
+            private const val VERSION_BYTE: Byte = 3
 
             @Suppress("NOTHING_TO_INLINE", "KotlinRedundantDiagnosticSuppress")
             @Throws(IllegalArgumentException::class, IndexOutOfBoundsException::class)

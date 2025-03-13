@@ -156,13 +156,7 @@ public object ED25519_V3: KeyType.Address<ED25519_V3.PublicKey, ED25519_V3.Priva
             @JvmName("get")
             public fun ByteArray.toED25519_V3PublicKey(): PublicKey {
                 val address = when (size) {
-                    BYTE_SIZE -> {
-                        try {
-                            OnionAddress.V3.fromED25519(this)
-                        } catch (e: IllegalArgumentException) {
-                            throw InvalidKeyException(e)
-                        }
-                    }
+                    BYTE_SIZE -> OnionAddress.V3.fromED25519(publicKey = this)
                     OnionAddress.V3.BYTE_SIZE -> {
                         try {
                             toOnionAddressV3()
