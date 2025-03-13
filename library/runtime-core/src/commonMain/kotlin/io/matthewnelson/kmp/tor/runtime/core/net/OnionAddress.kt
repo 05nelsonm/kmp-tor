@@ -23,6 +23,7 @@ import io.matthewnelson.kmp.tor.runtime.core.net.OnionAddress.OnionString.Compan
 import io.matthewnelson.kmp.tor.runtime.core.net.OnionAddress.V3.Companion.toOnionAddressV3OrNull
 import io.matthewnelson.kmp.tor.runtime.core.internal.HostAndPort
 import io.matthewnelson.kmp.tor.runtime.core.internal.HostAndPort.Companion.findHostnameAndPortFromURL
+import io.matthewnelson.kmp.tor.runtime.core.internal.containsNon0Byte
 import io.matthewnelson.kmp.tor.runtime.core.internal.stripBaseEncoding
 import io.matthewnelson.kmp.tor.runtime.core.key.AddressKey
 import io.matthewnelson.kmp.tor.runtime.core.key.ED25519_V3
@@ -174,6 +175,7 @@ public sealed class OnionAddress private constructor(value: String): Address(val
             public fun ByteArray.toOnionAddressV3(): V3 {
                 require(size == BYTE_SIZE) { "Invalid array size. expected[$BYTE_SIZE] vs actual[$size]" }
                 require(last() == VERSION_BYTE) { "Invalid version byte. expected[$VERSION_BYTE] vs actual[${last()}]" }
+                require(containsNon0Byte(ED25519_V3.PublicKey.BYTE_SIZE)) { "ed25519 public key is blank (all 0 bytes)" }
                 val checksum = computeChecksum(this)
                 val a0 = this[BYTE_SIZE - 3]
                 val a1 = this[BYTE_SIZE - 2]

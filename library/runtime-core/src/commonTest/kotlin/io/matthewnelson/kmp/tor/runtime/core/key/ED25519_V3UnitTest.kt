@@ -20,11 +20,11 @@ package io.matthewnelson.kmp.tor.runtime.core.key
 import io.matthewnelson.encoding.base16.Base16
 import io.matthewnelson.encoding.base64.Base64
 import io.matthewnelson.encoding.core.Decoder.Companion.decodeToByteArray
+import io.matthewnelson.encoding.core.Encoder.Companion.encodeToString
 import io.matthewnelson.kmp.tor.runtime.core.net.OnionAddressV3UnitTest
 import io.matthewnelson.kmp.tor.runtime.core.key.ED25519_V3.PrivateKey.Companion.toED25519_V3PrivateKey
 import io.matthewnelson.kmp.tor.runtime.core.key.ED25519_V3.PrivateKey.Companion.toED25519_V3PrivateKeyOrNull
 import io.matthewnelson.kmp.tor.runtime.core.key.ED25519_V3.PublicKey.Companion.toED25519_V3PublicKey
-import org.kotlincrypto.error.InvalidKeyException
 import kotlin.test.*
 
 class ED25519_V3UnitTest: AddressKeyBaseUnitTest<ED25519_V3.PublicKey, ED25519_V3.PrivateKey>(
@@ -95,6 +95,13 @@ class ED25519_V3UnitTest: AddressKeyBaseUnitTest<ED25519_V3.PublicKey, ED25519_V
             ONION_ADDRESS_B16.dropLast(2).decodeToByteArray(Base16).toED25519_V3PublicKey()
         }
 
+        assertInvalidKey(listOf("Key is blank")) {
+            ByteArray(ED25519_V3.PublicKey.BYTE_SIZE).toED25519_V3PublicKey()
+        }
+        assertInvalidKey(listOf("Key is blank")) {
+            ByteArray(ED25519_V3.PublicKey.BYTE_SIZE).encodeToString(Base16()).toED25519_V3PublicKey()
+        }
+
         // 35 byte array tried direct conversion to OnionAddress.V3
         assertInvalidKey(listOf("Invalid version byte")) {
             val b = ONION_ADDRESS_B16.decodeToByteArray(Base16)
@@ -105,29 +112,11 @@ class ED25519_V3UnitTest: AddressKeyBaseUnitTest<ED25519_V3.PublicKey, ED25519_V
 
     @Test
     fun givenInvalidInput_whenToPrivateKey_thenReturnsNull() {
+        val blank = PRIVATE_KEY_B16.toED25519_V3PrivateKey().encoded().apply { fill(0) }
+        assertInvalidKey(listOf("Key is blank")) { blank.toED25519_V3PrivateKey() }
+        assertInvalidKey(listOf("Key is blank")){ blank.encodeToString(Base16()).toED25519_V3PrivateKey() }
         assertNull(PRIVATE_KEY_B16.dropLast(2).toED25519_V3PrivateKeyOrNull())
         assertNull(PRIVATE_KEY_B16.dropLast(2).decodeToByteArray(Base16).toED25519_V3PrivateKeyOrNull())
-    }
-
-    private fun assertInvalidKey(errorContains: List<String> = emptyList(), toKey: () -> Key) {
-        try {
-            toKey()
-            fail("InvalidKeyException was not thrown as expected")
-        } catch (e: InvalidKeyException) {
-            // Also check messages for wrapped IllegalArgumentException (if present)
-            val messages = listOf(e.message, e.cause?.message)
-
-            errorContains.forEach c@ { expected ->
-                messages.forEach m@ { message ->
-                    if (message == null) return@m
-                    if (message.contains(expected)) return@c
-                }
-                fail("""
-                    contains: $expected
-                    messages: $messages
-                """.trimIndent())
-            }
-        }
     }
 
     companion object {

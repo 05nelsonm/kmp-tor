@@ -13,14 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-@file:Suppress("KotlinRedundantDiagnosticSuppress")
+@file:Suppress("KotlinRedundantDiagnosticSuppress", "NOTHING_TO_INLINE")
 
 package io.matthewnelson.kmp.tor.runtime.core.internal
 
-@Suppress("NOTHING_TO_INLINE")
 internal inline val Boolean.byte: Byte get() = if (this) 1 else 0
 
-@Suppress("NOTHING_TO_INLINE")
 internal inline fun Boolean?.configure(
     flags: LinkedHashSet<String>,
     name: String,

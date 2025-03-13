@@ -18,6 +18,7 @@
 package io.matthewnelson.kmp.tor.runtime.core.key
 
 import io.matthewnelson.encoding.core.Decoder.Companion.decodeToByteArrayOrNull
+import io.matthewnelson.kmp.tor.runtime.core.internal.containsNon0Byte
 import io.matthewnelson.kmp.tor.runtime.core.net.OnionAddress
 import io.matthewnelson.kmp.tor.runtime.core.net.OnionAddress.V3.Companion.toOnionAddressV3OrNull
 import io.matthewnelson.kmp.tor.runtime.core.internal.tryDecodeOrNull
@@ -156,7 +157,7 @@ public object ED25519_V3: KeyType.Address<ED25519_V3.PublicKey, ED25519_V3.Priva
             public fun ByteArray.toED25519_V3PublicKey(): PublicKey {
                 val address = when (size) {
                     BYTE_SIZE -> {
-                        // TODO: Check all zero?
+                        if (!containsNon0Byte(BYTE_SIZE)) throw InvalidKeyException("Key is blank (all 0 bytes)")
                         val checksum = OnionAddress.V3.computeChecksum(this)
                         val b = copyOf(OnionAddress.V3.BYTE_SIZE)
                         b[OnionAddress.V3.BYTE_SIZE - 3] = checksum[0]
@@ -166,7 +167,6 @@ public object ED25519_V3: KeyType.Address<ED25519_V3.PublicKey, ED25519_V3.Priva
                         b.toOnionAddressV3()
                     }
                     OnionAddress.V3.BYTE_SIZE -> {
-                        // TODO: Check first 32 bytes for all 0?
                         try {
                             toOnionAddressV3()
                         } catch (e: IllegalArgumentException) {
@@ -240,8 +240,12 @@ public object ED25519_V3: KeyType.Address<ED25519_V3.PublicKey, ED25519_V3.Priva
             @JvmStatic
             @JvmName("get")
             public fun String.toED25519_V3PrivateKey(): PrivateKey {
-                return toED25519_V3PrivateKeyOrNull()
-                    ?: throw InvalidKeyException("Tried base 16/32/64 decoding, but failed to find a $BYTE_SIZE byte key")
+                val decoded = tryDecodeOrNull(
+                    expectedSize = BYTE_SIZE,
+                    decoders = listOf(BASE_64, BASE_32, BASE_16),
+                ) ?: throw InvalidKeyException("Tried base 16/32/64 decoding, but failed to find a $BYTE_SIZE byte key")
+                if (!decoded.containsNon0Byte(BYTE_SIZE)) throw InvalidKeyException("Key is blank (all 0 bytes)")
+                return PrivateKey(decoded)
             }
 
             /**
@@ -253,8 +257,9 @@ public object ED25519_V3: KeyType.Address<ED25519_V3.PublicKey, ED25519_V3.Priva
             @JvmStatic
             @JvmName("get")
             public fun ByteArray.toED25519_V3PrivateKey(): PrivateKey {
-                return toED25519_V3PrivateKeyOrNull()
-                    ?: throw InvalidKeyException("Invalid key size. Must be $BYTE_SIZE bytes")
+                if (size != BYTE_SIZE) throw InvalidKeyException("Invalid array size[$size]")
+                if (!containsNon0Byte(BYTE_SIZE)) throw InvalidKeyException("Key is blank (all 0 bytes)")
+                return PrivateKey(copyOf())
             }
 
             /**
@@ -266,12 +271,10 @@ public object ED25519_V3: KeyType.Address<ED25519_V3.PublicKey, ED25519_V3.Priva
              * */
             @JvmStatic
             @JvmName("getOrNull")
-            public fun String.toED25519_V3PrivateKeyOrNull(): PrivateKey? {
-                val decoded = tryDecodeOrNull(
-                    expectedSize = BYTE_SIZE,
-                    decoders = listOf(BASE_64, BASE_32, BASE_16),
-                ) ?: return null
-                return PrivateKey(decoded)
+            public fun String.toED25519_V3PrivateKeyOrNull(): PrivateKey? = try {
+                toED25519_V3PrivateKey()
+            } catch (_: InvalidKeyException) {
+                null
             }
 
             /**
@@ -281,9 +284,10 @@ public object ED25519_V3: KeyType.Address<ED25519_V3.PublicKey, ED25519_V3.Priva
              * */
             @JvmStatic
             @JvmName("getOrNull")
-            public fun ByteArray.toED25519_V3PrivateKeyOrNull(): PrivateKey? {
-                if (size != BYTE_SIZE) return null
-                return PrivateKey(copyOf())
+            public fun ByteArray.toED25519_V3PrivateKeyOrNull(): PrivateKey? = try {
+                toED25519_V3PrivateKey()
+            } catch (_: InvalidKeyException) {
+                null
             }
 
             private const val BYTE_SIZE = 64

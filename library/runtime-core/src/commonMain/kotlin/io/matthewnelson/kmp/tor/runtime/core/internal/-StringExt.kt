@@ -13,14 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-@file:Suppress("KotlinRedundantDiagnosticSuppress")
+@file:Suppress("KotlinRedundantDiagnosticSuppress", "NOTHING_TO_INLINE")
 
 package io.matthewnelson.kmp.tor.runtime.core.internal
 
 import io.matthewnelson.encoding.core.Decoder
 import io.matthewnelson.encoding.core.Decoder.Companion.decodeToByteArrayOrNull
 
-@Suppress("NOTHING_TO_INLINE")
 internal inline fun String.stripBaseEncoding(): String {
     var limit = length
 
@@ -36,7 +35,6 @@ internal inline fun String.stripBaseEncoding(): String {
     return this.substring(0, limit).trimStart()
 }
 
-@Suppress("NOTHING_TO_INLINE")
 internal inline fun String.tryDecodeOrNull(
     expectedSize: Int,
     decoders: List<Decoder<*>>,
@@ -53,7 +51,6 @@ internal inline fun String.tryDecodeOrNull(
     return null
 }
 
-@Suppress("NOTHING_TO_INLINE")
 internal inline fun String.isSingleLine(): Boolean {
     val i = indexOfFirst { c -> c == '\r' || c == '\n' }
     return i == -1

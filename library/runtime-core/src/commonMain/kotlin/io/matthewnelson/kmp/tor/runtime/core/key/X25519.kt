@@ -15,6 +15,7 @@
  **/
 package io.matthewnelson.kmp.tor.runtime.core.key
 
+import io.matthewnelson.kmp.tor.runtime.core.internal.containsNon0Byte
 import io.matthewnelson.kmp.tor.runtime.core.internal.tryDecodeOrNull
 import io.matthewnelson.kmp.tor.runtime.core.key.X25519.PublicKey.Companion.toX25519PublicKey
 import io.matthewnelson.kmp.tor.runtime.core.key.X25519.PublicKey.Companion.toX25519PublicKeyOrNull
@@ -66,8 +67,12 @@ public object X25519: KeyType.Auth<X25519.PublicKey, X25519.PrivateKey>() {
             @JvmStatic
             @JvmName("get")
             public fun String.toX25519PublicKey(): PublicKey {
-                return toX25519PublicKeyOrNull()
-                    ?: throw InvalidKeyException("Tried base 16/32/64 decoding, but failed to find a $BYTE_SIZE byte key")
+                val decoded = tryDecodeOrNull(
+                    expectedSize = BYTE_SIZE,
+                    decoders = listOf(BASE_64, BASE_32, BASE_16),
+                ) ?: throw InvalidKeyException("Tried base 16/32/64 decoding, but failed to find a $BYTE_SIZE byte key")
+                if (!decoded.containsNon0Byte(BYTE_SIZE)) throw InvalidKeyException("Key is blank (all 0 bytes)")
+                return PublicKey(decoded)
             }
 
             /**
@@ -79,8 +84,9 @@ public object X25519: KeyType.Auth<X25519.PublicKey, X25519.PrivateKey>() {
             @JvmStatic
             @JvmName("get")
             public fun ByteArray.toX25519PublicKey(): PublicKey {
-                return toX25519PublicKeyOrNull()
-                    ?: throw InvalidKeyException("Invalid key size. Must be $BYTE_SIZE bytes")
+                if (size != BYTE_SIZE) throw InvalidKeyException("Invalid array size[$size]")
+                if (!containsNon0Byte(BYTE_SIZE)) throw InvalidKeyException("Key is blank (all 0 bytes)")
+                return PublicKey(copyOf())
             }
 
             /**
@@ -92,12 +98,10 @@ public object X25519: KeyType.Auth<X25519.PublicKey, X25519.PrivateKey>() {
              * */
             @JvmStatic
             @JvmName("getOrNull")
-            public fun String.toX25519PublicKeyOrNull(): PublicKey? {
-                val decoded = tryDecodeOrNull(
-                    expectedSize = BYTE_SIZE,
-                    decoders = listOf(BASE_64, BASE_32, BASE_16),
-                ) ?: return null
-                return PublicKey(decoded)
+            public fun String.toX25519PublicKeyOrNull(): PublicKey? = try {
+                toX25519PublicKey()
+            } catch (_: InvalidKeyException) {
+                null
             }
 
             /**
@@ -107,9 +111,10 @@ public object X25519: KeyType.Auth<X25519.PublicKey, X25519.PrivateKey>() {
              * */
             @JvmStatic
             @JvmName("getOrNull")
-            public fun ByteArray.toX25519PublicKeyOrNull(): PublicKey? {
-                if (size != BYTE_SIZE) return null
-                return PublicKey(copyOf())
+            public fun ByteArray.toX25519PublicKeyOrNull(): PublicKey? = try {
+                toX25519PublicKey()
+            } catch (_: InvalidKeyException) {
+                null
             }
         }
     }
@@ -147,8 +152,12 @@ public object X25519: KeyType.Auth<X25519.PublicKey, X25519.PrivateKey>() {
             @JvmStatic
             @JvmName("get")
             public fun String.toX25519PrivateKey(): PrivateKey {
-                return toX25519PrivateKeyOrNull()
-                    ?: throw InvalidKeyException("Tried base 16/32/64 decoding, but failed to find a $BYTE_SIZE byte key")
+                val decoded = tryDecodeOrNull(
+                    expectedSize = BYTE_SIZE,
+                    decoders = listOf(BASE_64, BASE_32, BASE_16),
+                ) ?: throw InvalidKeyException("Tried base 16/32/64 decoding, but failed to find a $BYTE_SIZE byte key")
+                if (!decoded.containsNon0Byte(BYTE_SIZE)) throw InvalidKeyException("Key is blank (all 0 bytes)")
+                return PrivateKey(decoded)
             }
 
             /**
@@ -160,8 +169,9 @@ public object X25519: KeyType.Auth<X25519.PublicKey, X25519.PrivateKey>() {
             @JvmStatic
             @JvmName("get")
             public fun ByteArray.toX25519PrivateKey(): PrivateKey {
-                return toX25519PrivateKeyOrNull()
-                    ?: throw InvalidKeyException("Invalid key size. Must be $BYTE_SIZE bytes")
+                if (size != BYTE_SIZE) throw InvalidKeyException("Invalid array size[$size]")
+                if (!containsNon0Byte(BYTE_SIZE)) throw InvalidKeyException("Key is blank (all 0 bytes)")
+                return PrivateKey(copyOf())
             }
 
             /**
@@ -173,12 +183,10 @@ public object X25519: KeyType.Auth<X25519.PublicKey, X25519.PrivateKey>() {
              * */
             @JvmStatic
             @JvmName("getOrNull")
-            public fun String.toX25519PrivateKeyOrNull(): PrivateKey? {
-                val decoded = tryDecodeOrNull(
-                    expectedSize = BYTE_SIZE,
-                    decoders = listOf(BASE_64, BASE_32, BASE_16),
-                ) ?: return null
-                return PrivateKey(decoded)
+            public fun String.toX25519PrivateKeyOrNull(): PrivateKey? = try {
+                toX25519PrivateKey()
+            } catch (_: InvalidKeyException) {
+                null
             }
 
             /**
@@ -188,9 +196,10 @@ public object X25519: KeyType.Auth<X25519.PublicKey, X25519.PrivateKey>() {
              * */
             @JvmStatic
             @JvmName("getOrNull")
-            public fun ByteArray.toX25519PrivateKeyOrNull(): PrivateKey? {
-                if (size != BYTE_SIZE) return null
-                return PrivateKey(copyOf())
+            public fun ByteArray.toX25519PrivateKeyOrNull(): PrivateKey? = try {
+                toX25519PrivateKey()
+            } catch (_: InvalidKeyException) {
+                null
             }
         }
 

@@ -18,13 +18,11 @@ package io.matthewnelson.kmp.tor.runtime.core.key
 import io.matthewnelson.encoding.base16.Base16
 import io.matthewnelson.encoding.base64.Base64
 import io.matthewnelson.encoding.core.Decoder.Companion.decodeToByteArray
+import io.matthewnelson.encoding.core.Encoder.Companion.encodeToString
 import io.matthewnelson.kmp.tor.runtime.core.key.X25519.PrivateKey.Companion.toX25519PrivateKey
-import io.matthewnelson.kmp.tor.runtime.core.key.X25519.PrivateKey.Companion.toX25519PrivateKeyOrNull
 import io.matthewnelson.kmp.tor.runtime.core.key.X25519.PublicKey.Companion.toX25519PublicKey
-import io.matthewnelson.kmp.tor.runtime.core.key.X25519.PublicKey.Companion.toX25519PublicKeyOrNull
 import kotlin.test.Test
 import kotlin.test.assertContentEquals
-import kotlin.test.assertNull
 
 class X25519UnitTest: AuthKeyBaseUnitTest<X25519.PublicKey, X25519.PrivateKey>(
     keyType = X25519,
@@ -63,15 +61,21 @@ class X25519UnitTest: AuthKeyBaseUnitTest<X25519.PublicKey, X25519.PrivateKey>(
     }
 
     @Test
-    fun givenInvalidInput_whenToPublicKey_thenReturnsNull() {
-        assertNull(PUBLIC_KEY_B16.dropLast(2).toX25519PublicKeyOrNull())
-        assertNull(PUBLIC_KEY_B16.dropLast(2).decodeToByteArray(Base16).toX25519PublicKeyOrNull())
+    fun givenInvalidInput_whenToPublicKey_thenThrowsException() {
+        val blank = PUBLIC_KEY_B16.toX25519PublicKey().encoded().apply { fill(0) }
+        assertInvalidKey(listOf("Key is blank")) { blank.toX25519PublicKey() }
+        assertInvalidKey(listOf("Key is blank")) { blank.encodeToString(Base16()).toX25519PublicKey() }
+        assertInvalidKey(listOf("Tried base 16/32/64")) { PUBLIC_KEY_B16.dropLast(2).toX25519PublicKey() }
+        assertInvalidKey(listOf("Invalid array size")) { PUBLIC_KEY_B16.dropLast(2).decodeToByteArray(Base16).toX25519PublicKey() }
     }
 
     @Test
     fun givenInvalidInput_whenToPrivateKey_thenReturnsNull() {
-        assertNull(PRIVATE_KEY_B16.dropLast(2).toX25519PrivateKeyOrNull())
-        assertNull(PRIVATE_KEY_B16.dropLast(2).decodeToByteArray(Base16).toX25519PrivateKeyOrNull())
+        val blank = PRIVATE_KEY_B16.toX25519PrivateKey().encoded().apply { fill(0) }
+        assertInvalidKey(listOf("Key is blank")) { blank.toX25519PrivateKey() }
+        assertInvalidKey(listOf("Key is blank")) { blank.encodeToString(Base16()).toX25519PrivateKey() }
+        assertInvalidKey(listOf("Tried base 16/32/64")) { PRIVATE_KEY_B16.dropLast(2).toX25519PrivateKey() }
+        assertInvalidKey(listOf("Invalid array size")) { PRIVATE_KEY_B16.dropLast(2).decodeToByteArray(Base16).toX25519PrivateKey() }
     }
 
     companion object {

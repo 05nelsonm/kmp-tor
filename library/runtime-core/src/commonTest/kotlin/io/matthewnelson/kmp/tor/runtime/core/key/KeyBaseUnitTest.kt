@@ -19,12 +19,34 @@ import io.matthewnelson.encoding.base16.Base16
 import io.matthewnelson.encoding.base32.Base32Default
 import io.matthewnelson.encoding.base64.Base64
 import io.matthewnelson.encoding.core.Encoder.Companion.encodeToString
+import org.kotlincrypto.error.InvalidKeyException
 import kotlin.test.*
 
 abstract class KeyBaseUnitTest(protected val expectedAlgorithm: String) {
 
     protected abstract val publicKey: Key.Public
     protected abstract val privateKey: Key.Private
+
+    protected fun assertInvalidKey(errorContains: List<String> = emptyList(), toKey: () -> Key) {
+        try {
+            toKey()
+            fail("InvalidKeyException was not thrown as expected")
+        } catch (e: InvalidKeyException) {
+            // Also check messages for wrapped IllegalArgumentException (if present)
+            val messages = listOf(e.message, e.cause?.message)
+
+            errorContains.forEach c@ { expected ->
+                messages.forEach m@ { message ->
+                    if (message == null) return@m
+                    if (message.contains(expected)) return@c
+                }
+                fail("""
+                    contains: $expected
+                    messages: $messages
+                """.trimIndent())
+            }
+        }
+    }
 
     @Test
     fun givenKey_whenAlgorithm_thenIsAsExpected() {

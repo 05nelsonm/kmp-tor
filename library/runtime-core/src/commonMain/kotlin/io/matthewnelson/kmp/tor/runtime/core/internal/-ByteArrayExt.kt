@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Matthew Nelson
+ * Copyright (c) 2025 Matthew Nelson
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,26 +17,13 @@
 
 package io.matthewnelson.kmp.tor.runtime.core.internal
 
-import kotlinx.coroutines.*
-import kotlin.contracts.ExperimentalContracts
-import kotlin.contracts.InvocationKind
-import kotlin.contracts.contract
-import kotlin.coroutines.CoroutineContext
-import kotlin.coroutines.cancellation.CancellationException
-
-@OptIn(ExperimentalContracts::class)
-internal inline fun <T: Throwable> CoroutineContext?.cancellationExceptionOr(
-    block: () -> T,
-): Throwable {
-    contract {
-        callsInPlace(block, InvocationKind.AT_MOST_ONCE)
+@Throws(IndexOutOfBoundsException::class)
+internal inline fun ByteArray.containsNon0Byte(limit: Int): Boolean {
+    var containsNon0 = false
+    var i = 0
+    while (i < limit) {
+        if (this[i++] == 0.toByte()) continue
+        containsNon0 = true
     }
-
-    if (this == null) return block()
-
-    return if (get(Job)?.isCancelled == true) {
-        CancellationException("Job was cancelled")
-    } else {
-        block()
-    }
+    return containsNon0
 }
