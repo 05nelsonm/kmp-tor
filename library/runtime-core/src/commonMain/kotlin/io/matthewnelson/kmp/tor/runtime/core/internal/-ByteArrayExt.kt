@@ -19,11 +19,10 @@ package io.matthewnelson.kmp.tor.runtime.core.internal
 
 @Throws(IndexOutOfBoundsException::class)
 internal inline fun ByteArray.containsNon0Byte(limit: Int): Boolean {
-    var containsNon0 = false
+    var z = 0
     var i = 0
     while (i < limit) {
-        if (this[i++] == 0.toByte()) continue
-        containsNon0 = true
+        z += if (this[i++] == 0.toByte()) 1 else 0
     }
-    return containsNon0
+    return z < limit
 }
