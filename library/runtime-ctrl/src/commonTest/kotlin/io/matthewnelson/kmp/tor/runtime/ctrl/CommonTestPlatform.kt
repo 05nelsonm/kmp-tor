@@ -41,7 +41,6 @@ internal expect val LOADER: ResourceLoader.Tor
 
 private object TestBinder: ResourceLoader.RuntimeBinder
 
-@ExperimentalStdlibApi
 internal suspend fun startTor(ctrlPortArgument: String): AutoCloseable {
     val loader = LOADER
     val geoipFiles = loader.extract()
@@ -114,7 +113,6 @@ internal suspend fun startTor(ctrlPortArgument: String): AutoCloseable {
     return result
 }
 
-@ExperimentalStdlibApi
 private fun ResourceLoader.Tor.Exec.start(args: List<String>): AutoCloseable {
     val process = process(TestBinder) { tor, configureEnv ->
         Process.Builder(command = tor.path)
@@ -132,7 +130,6 @@ private fun ResourceLoader.Tor.Exec.start(args: List<String>): AutoCloseable {
     }
 }
 
-@ExperimentalStdlibApi
 private fun ResourceLoader.Tor.NoExec.start(args: List<String>): AutoCloseable {
     return withApi(TestBinder) {
 

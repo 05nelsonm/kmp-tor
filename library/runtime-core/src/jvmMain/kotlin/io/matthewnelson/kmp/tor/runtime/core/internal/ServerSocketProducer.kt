@@ -29,7 +29,6 @@ internal actual value class ServerSocketProducer private actual constructor(
 ) {
 
     @Throws(Exception::class)
-    @OptIn(ExperimentalStdlibApi::class)
     internal actual fun open(port: Int): AutoCloseable {
         return ServerSocket(port, /* backlog */ 1, value as InetAddress)
     }

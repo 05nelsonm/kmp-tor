@@ -20,7 +20,6 @@ package io.matthewnelson.kmp.tor.runtime.core.util
 import io.matthewnelson.kmp.tor.runtime.core.net.IPAddress
 import io.matthewnelson.kmp.tor.runtime.core.internal.ServerSocketProducer.Companion.toServerSocketProducer
 
-@OptIn(ExperimentalStdlibApi::class)
 class PortUtilJvmUnitTest: PortUtilBaseTest() {
 
     override suspend fun openServerSocket(

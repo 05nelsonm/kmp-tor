@@ -24,7 +24,6 @@ import kotlinx.coroutines.withContext
 import kotlin.test.fail
 import kotlin.time.Duration.Companion.milliseconds
 
-@OptIn(ExperimentalStdlibApi::class)
 class PortUtilJsUnitTest: PortUtilBaseTest() {
 
     override val isNodeJs: Boolean = true

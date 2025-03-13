@@ -36,7 +36,7 @@ import kotlin.test.assertTrue
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.minutes
 
-@OptIn(ExperimentalStdlibApi::class, InternalKmpTorApi::class)
+@OptIn(InternalKmpTorApi::class)
 class ProcessorUnitTest {
 
     @Test

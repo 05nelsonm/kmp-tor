@@ -26,7 +26,6 @@ import kotlin.test.*
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
-@OptIn(ExperimentalStdlibApi::class)
 abstract class PortUtilBaseTest {
 
     protected open val isNodeJs: Boolean = false

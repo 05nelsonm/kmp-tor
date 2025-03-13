@@ -21,7 +21,6 @@ import io.matthewnelson.kmp.tor.runtime.core.net.IPAddress
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 
-@OptIn(ExperimentalStdlibApi::class)
 class PortUtilNativeUnitTest: PortUtilBaseTest() {
 
     private lateinit var manager: SelectorManager
