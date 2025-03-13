@@ -24,10 +24,8 @@ import io.matthewnelson.kmp.tor.runtime.core.net.OnionAddressV3UnitTest
 import io.matthewnelson.kmp.tor.runtime.core.key.ED25519_V3.PrivateKey.Companion.toED25519_V3PrivateKey
 import io.matthewnelson.kmp.tor.runtime.core.key.ED25519_V3.PrivateKey.Companion.toED25519_V3PrivateKeyOrNull
 import io.matthewnelson.kmp.tor.runtime.core.key.ED25519_V3.PublicKey.Companion.toED25519_V3PublicKey
-import io.matthewnelson.kmp.tor.runtime.core.key.ED25519_V3.PublicKey.Companion.toED25519_V3PublicKeyOrNull
-import kotlin.test.Test
-import kotlin.test.assertContentEquals
-import kotlin.test.assertNull
+import org.kotlincrypto.error.InvalidKeyException
+import kotlin.test.*
 
 class ED25519_V3UnitTest: AddressKeyBaseUnitTest<ED25519_V3.PublicKey, ED25519_V3.PrivateKey>(
     keyType = ED25519_V3,
@@ -39,11 +37,11 @@ class ED25519_V3UnitTest: AddressKeyBaseUnitTest<ED25519_V3.PublicKey, ED25519_V
 
     @Test
     fun givenED25519V3PublicKey_whenEncodedString_thenToKeyIsSuccessful() {
-        val expected = PUBLIC_KEY_B16.decodeToByteArray(Base16)
+        val expected = ONION_ADDRESS_B16.decodeToByteArray(Base16)
 
-        assertContentEquals(expected, PUBLIC_KEY_B16.toED25519_V3PublicKey().encoded())
-        assertContentEquals(expected, PUBLIC_KEY_B32.toED25519_V3PublicKey().encoded())
-        assertContentEquals(expected, PUBLIC_KEY_B64.toED25519_V3PublicKey().encoded())
+        assertContentEquals(expected, ONION_ADDRESS_B16.toED25519_V3PublicKey().encoded())
+        assertContentEquals(expected, ONION_ADDRESS_B32.toED25519_V3PublicKey().encoded())
+        assertContentEquals(expected, ONION_ADDRESS_B64.toED25519_V3PublicKey().encoded())
     }
 
     @Test
@@ -57,7 +55,7 @@ class ED25519_V3UnitTest: AddressKeyBaseUnitTest<ED25519_V3.PublicKey, ED25519_V
 
     @Test
     fun givenED25519V3PublicKey_whenBytes_thenToKeyIsSuccessful() {
-        PUBLIC_KEY_B64.decodeToByteArray(Base64.Default).toED25519_V3PublicKey()
+        ONION_ADDRESS_B64.decodeToByteArray(Base64.Default).toED25519_V3PublicKey()
     }
 
     @Test
@@ -66,14 +64,34 @@ class ED25519_V3UnitTest: AddressKeyBaseUnitTest<ED25519_V3.PublicKey, ED25519_V
     }
 
     @Test
-    fun givenInvalidInput_whenToPublicKey_thenReturnsNull() {
-        assertNull("".toED25519_V3PublicKeyOrNull())
-        assertNull("ws://".toED25519_V3PublicKeyOrNull())
-        assertNull("wss://".toED25519_V3PublicKeyOrNull())
-        assertNull("http://".toED25519_V3PublicKeyOrNull())
-        assertNull("https://".toED25519_V3PublicKeyOrNull())
-        assertNull(PUBLIC_KEY_B16.dropLast(2).toED25519_V3PublicKeyOrNull())
-        assertNull(PUBLIC_KEY_B16.dropLast(2).decodeToByteArray(Base16).toED25519_V3PublicKeyOrNull())
+    fun givenInvalidInput_whenToPublicKey_thenThrowsException() {
+        // Check minimum length check is happening
+        assertInvalidKey(listOf("Invalid length", "vs min[43]")) { "".toED25519_V3PublicKey() }
+
+        // Check to see if it dropped into url decoding right away b/c presence of colon
+        assertInvalidKey(listOf("v3 Onion addresses are 56 characters")) {
+            "ws://${ONION_ADDRESS_B32.dropLast(1)}".toED25519_V3PublicKey()
+        }
+        assertInvalidKey(listOf("v3 Onion addresses are 56 characters")) {
+            "wss://${ONION_ADDRESS_B32.dropLast(1)}".toED25519_V3PublicKey()
+        }
+        assertInvalidKey(listOf("v3 Onion addresses are 56 characters")) {
+            "http://${ONION_ADDRESS_B32.dropLast(1)}".toED25519_V3PublicKey()
+        }
+        assertInvalidKey(listOf("v3 Onion addresses are 56 characters")) {
+            "https://${ONION_ADDRESS_B32.dropLast(1)}".toED25519_V3PublicKey()
+        }
+
+        assertInvalidKey(listOf("Invalid array size")) {
+            ONION_ADDRESS_B16.dropLast(2).decodeToByteArray(Base16).toED25519_V3PublicKey()
+        }
+
+        // 35 byte array tried direct conversion to OnionAddress.V3
+        assertInvalidKey(listOf("Invalid version byte")) {
+            val b = ONION_ADDRESS_B16.decodeToByteArray(Base16)
+            b[b.lastIndex]++
+            b.toED25519_V3PublicKey()
+        }
     }
 
     @Test
@@ -82,13 +100,34 @@ class ED25519_V3UnitTest: AddressKeyBaseUnitTest<ED25519_V3.PublicKey, ED25519_V
         assertNull(PRIVATE_KEY_B16.dropLast(2).decodeToByteArray(Base16).toED25519_V3PrivateKeyOrNull())
     }
 
+    private fun assertInvalidKey(errorContains: List<String> = emptyList(), toKey: () -> Key) {
+        try {
+            toKey()
+            fail("InvalidKeyException was not thrown as expected")
+        } catch (e: InvalidKeyException) {
+            // Also check messages for wrapped IllegalArgumentException (if present)
+            val messages = listOf(e.message, e.cause?.message)
+
+            errorContains.forEach c@ { expected ->
+                messages.forEach m@ { message ->
+                    if (message == null) return@m
+                    if (message.contains(expected)) return@c
+                }
+                fail("""
+                    contains: $expected
+                    messages: $messages
+                """.trimIndent())
+            }
+        }
+    }
+
     companion object {
         const val PRIVATE_KEY_B16 = "18968BE7C1BA78AA14501A07700EF59C0694B75E788D8987FDE5B221E60690431EDDED6CB13481DB52E9F7E5DB65E1ED375A14EB91D676ACF926370C9F6DD5ED"
         const val PRIVATE_KEY_B32 = "DCLIXZ6BXJ4KUFCQDIDXADXVTQDJJN26PCGYTB754WZCDZQGSBBR5XPNNSYTJAO3KLU7PZO3MXQ62N22CTVZDVTWVT4SMNYMT5W5L3I"
         const val PRIVATE_KEY_B64 = "GJaL58G6eKoUUBoHcA71nAaUt154jYmH/eWyIeYGkEMe3e1ssTSB21Lp9+XbZeHtN1oU65HWdqz5JjcMn23V7Q"
 
-        const val PUBLIC_KEY_B16 = "F62F3905EDD2BE4BDD008882824F659478A7311292D0E4DD2BAAFE8C4C028B6B9D5303"
-        const val PUBLIC_KEY_B32 = OnionAddressV3UnitTest.ONION_ADDRESS_V3
-        const val PUBLIC_KEY_B64 = "9i85Be3SvkvdAIiCgk9llHinMRKS0OTdK6r+jEwCi2udUwM"
+        const val ONION_ADDRESS_B16 = "F62F3905EDD2BE4BDD008882824F659478A7311292D0E4DD2BAAFE8C4C028B6B9D5303"
+        const val ONION_ADDRESS_B32 = OnionAddressV3UnitTest.ONION_ADDRESS_V3
+        const val ONION_ADDRESS_B64 = "9i85Be3SvkvdAIiCgk9llHinMRKS0OTdK6r+jEwCi2udUwM"
     }
 }

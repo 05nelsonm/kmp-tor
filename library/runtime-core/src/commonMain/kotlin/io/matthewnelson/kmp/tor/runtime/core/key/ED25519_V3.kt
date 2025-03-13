@@ -17,6 +17,7 @@
 
 package io.matthewnelson.kmp.tor.runtime.core.key
 
+import io.matthewnelson.encoding.core.Decoder.Companion.decodeToByteArrayOrNull
 import io.matthewnelson.kmp.tor.runtime.core.net.OnionAddress
 import io.matthewnelson.kmp.tor.runtime.core.net.OnionAddress.V3.Companion.toOnionAddressV3OrNull
 import io.matthewnelson.kmp.tor.runtime.core.internal.tryDecodeOrNull
@@ -68,8 +69,80 @@ public object ED25519_V3: KeyType.Address<ED25519_V3.PublicKey, ED25519_V3.Priva
             @JvmStatic
             @JvmName("get")
             public fun String.toED25519_V3PublicKey(): PublicKey {
-                return toED25519_V3PublicKeyOrNull()
-                    ?: throw InvalidKeyException("$this is not an ${algorithm()} public key")
+                // Sanity check for smallest possible input length (a Base64 encoded 32 byte key)
+                BASE_64.config.encodeOutSize(BYTE_SIZE.toLong()).let { minLength ->
+                    if (length >= minLength) return@let
+                    throw InvalidKeyException("Invalid length. actual[$length] vs min[$minLength]")
+                }
+
+                // Peek for a colon, indicative the presence of a URL scheme (ws:// to https://)
+                run {
+                    var i = 2
+                    var hasColon = false
+                    while (!hasColon && i < 6) {
+                        hasColon = this[i++] == ':'
+                    }
+                    if (!hasColon) return@run
+
+                    // Colon present. Base decoding will all fail. Must be a v3 onion address or fail.
+                    try {
+                        return PublicKey(toOnionAddressV3())
+                    } catch (e: IllegalArgumentException) {
+                        throw InvalidKeyException("[$this] is not an ${algorithm()} public key", e)
+                    }
+                }
+
+                // Try Base64 first (most probable encoding)
+                var b = decodeToByteArrayOrNull(BASE_64)
+                b = when (b?.size) {
+                    null -> null
+                    BYTE_SIZE -> b
+                    OnionAddress.V3.BYTE_SIZE -> {
+                        val a = b.toOnionAddressV3OrNull()
+                        if (a != null) return PublicKey(a)
+                        null
+                    }
+                    else -> null
+                }
+                if (b == null) {
+                    // Try Base32 if was not Base64 encoded
+                    b = decodeToByteArrayOrNull(BASE_32)
+                    b = when (b?.size) {
+                        null -> null
+                        BYTE_SIZE -> b
+                        OnionAddress.V3.BYTE_SIZE -> {
+                            val a = b.toOnionAddressV3OrNull()
+                            if (a != null) return PublicKey(a)
+                            null
+                        }
+                        else -> null
+                    }
+                }
+                if (b == null) {
+                    // Lastly, try Base16
+                    b = decodeToByteArrayOrNull(BASE_16)
+                    b = when (b?.size) {
+                        null -> null
+                        BYTE_SIZE -> b
+                        OnionAddress.V3.BYTE_SIZE -> {
+                            val a = b.toOnionAddressV3OrNull()
+                            if (a != null) return PublicKey(a)
+                            null
+                        }
+                        else -> null
+                    }
+                }
+
+                if (b == null) {
+                    // Last resort. Check if it's something like <onion-address>.onion
+                    try {
+                        return PublicKey(toOnionAddressV3())
+                    } catch (e: IllegalArgumentException) {
+                        throw InvalidKeyException("[$this] is not an ${algorithm()} public key", e)
+                    }
+                }
+
+                return b.toED25519_V3PublicKey()
             }
 
             /**
@@ -110,26 +183,16 @@ public object ED25519_V3: KeyType.Address<ED25519_V3.PublicKey, ED25519_V3.Priva
              * Parses a String for an ED25519-V3 public key.
              *
              * String can be a URL containing a v3 `.onion` address, the v3 `.onion`
-             * address itself, or Base 16/32/64 encoded raw value.
+             * address itself, or Base 16/32/64 encoded raw key value.
              *
              * @return [ED25519_V3.PublicKey] or null
              * */
             @JvmStatic
             @JvmName("getOrNull")
-            public fun String.toED25519_V3PublicKeyOrNull(): PublicKey? {
-                var address = toOnionAddressV3OrNull()
-
-                // If it wasn't a URL or base32 encoded, check if it's
-                // formatted as base16 or 64
-                if (address == null) {
-                    address = tryDecodeOrNull(
-                        expectedSize = OnionAddress.V3.BYTE_SIZE,
-                        decoders = listOf(BASE_16, BASE_64),
-                    )?.toOnionAddressV3OrNull()
-                }
-
-                if (address == null) return null
-                return PublicKey(address)
+            public fun String.toED25519_V3PublicKeyOrNull(): PublicKey? = try {
+                toED25519_V3PublicKey()
+            } catch (e: InvalidKeyException) {
+                null
             }
 
             /**

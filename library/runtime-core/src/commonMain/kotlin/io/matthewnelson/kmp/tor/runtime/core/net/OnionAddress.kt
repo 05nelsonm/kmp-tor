@@ -15,7 +15,6 @@
  **/
 package io.matthewnelson.kmp.tor.runtime.core.net
 
-import io.matthewnelson.encoding.base32.Base32
 import io.matthewnelson.encoding.base32.Base32Default
 import io.matthewnelson.encoding.core.Decoder.Companion.decodeToByteArray
 import io.matthewnelson.encoding.core.Encoder.Companion.encodeToString
@@ -135,7 +134,7 @@ public sealed class OnionAddress private constructor(value: String): Address(val
      * */
     public class V3 private constructor(value: String): OnionAddress(value) {
 
-        public override fun decode(): ByteArray = value.decodeToByteArray(Base32.Default)
+        public override fun decode(): ByteArray = value.decodeToByteArray(BASE32)
 
         /**
          * Wraps the [OnionAddress.V3] in its [ED25519_V3.PublicKey] format for extended
