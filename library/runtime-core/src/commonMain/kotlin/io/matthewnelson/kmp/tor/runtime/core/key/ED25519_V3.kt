@@ -269,7 +269,7 @@ public object ED25519_V3: KeyType.Address<ED25519_V3.PublicKey, ED25519_V3.Priva
             public fun String.toED25519_V3PrivateKeyOrNull(): PrivateKey? {
                 val decoded = tryDecodeOrNull(
                     expectedSize = BYTE_SIZE,
-                    decoders = listOf(BASE_16, BASE_32, BASE_64),
+                    decoders = listOf(BASE_64, BASE_32, BASE_16),
                 ) ?: return null
                 return PrivateKey(decoded)
             }
