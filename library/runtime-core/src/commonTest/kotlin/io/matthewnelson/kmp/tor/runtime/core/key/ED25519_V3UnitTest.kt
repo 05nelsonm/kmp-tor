@@ -36,7 +36,7 @@ class ED25519_V3UnitTest: AddressKeyBaseUnitTest<ED25519_V3.PublicKey, ED25519_V
     override val privateKey: ED25519_V3.PrivateKey = PRIVATE_KEY_B64.toED25519_V3PrivateKey()
 
     @Test
-    fun givenED25519V3PublicKey_whenEncodedString_thenToKeyIsSuccessful() {
+    fun givenOnionAddress_whenEncodedString_thenToKeyIsSuccessful() {
         val expected = ONION_ADDRESS_B16.decodeToByteArray(Base16)
 
         assertContentEquals(expected, ONION_ADDRESS_B16.toED25519_V3PublicKey().encoded())
@@ -54,8 +54,16 @@ class ED25519_V3UnitTest: AddressKeyBaseUnitTest<ED25519_V3.PublicKey, ED25519_V
     }
 
     @Test
-    fun givenED25519V3PublicKey_whenBytes_thenToKeyIsSuccessful() {
+    fun givenOnionAddress_whenBytes_thenToKeyIsSuccessful() {
         ONION_ADDRESS_B64.decodeToByteArray(Base64.Default).toED25519_V3PublicKey()
+    }
+
+    @Test
+    fun givenED25519PublicKey_whenToKey_thenComputesOnionAddressChecksum() {
+        val expected = ONION_ADDRESS_B16.toED25519_V3PublicKey().address()
+        val key = ONION_ADDRESS_B16.dropLast(2 * 3) // 3 bytes (2 checksum, 1 version byte)
+        assertEquals(expected, key.toED25519_V3PublicKey().address())
+        assertEquals(expected, key.decodeToByteArray(Base16).toED25519_V3PublicKey().address())
     }
 
     @Test
