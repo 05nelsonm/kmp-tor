@@ -25,7 +25,7 @@ import kotlin.jvm.JvmStatic
 import kotlin.jvm.JvmSynthetic
 
 /**
- * An [X25519] [KeyType.Auth]. Also known as "Version 3 Client Authentication".
+ * An [X25519] [KeyType.Auth], utilized by tor for Version 3 Client Authentication.
  * */
 public object X25519: KeyType.Auth<X25519.PublicKey, X25519.PrivateKey>() {
 
@@ -35,8 +35,7 @@ public object X25519: KeyType.Auth<X25519.PublicKey, X25519.PrivateKey>() {
     public override fun algorithm(): String = "x25519"
 
     /**
-     * Holder for a public key associated with a [ED25519_V3] Hidden Service's
-     * client authentication configuration.
+     * A 32 byte x25519 public key.
      *
      * This would be the key a Hidden Service operator adds, to only allow
      * connections from tor clients who have the [X25519.PrivateKey] associated
@@ -45,9 +44,7 @@ public object X25519: KeyType.Auth<X25519.PublicKey, X25519.PrivateKey>() {
      * @see [toX25519PublicKey]
      * @see [toX25519PublicKeyOrNull]
      * */
-    public class PublicKey private constructor(
-        key: ByteArray
-    ): AuthKey.Public(key) {
+    public class PublicKey private constructor(key: ByteArray): AuthKey.Public(key) {
 
         /**
          * `x25519`
@@ -120,8 +117,7 @@ public object X25519: KeyType.Auth<X25519.PublicKey, X25519.PrivateKey>() {
     }
 
     /**
-     * Holder for a private key associated with a [ED25519_V3] Hidden Service's
-     * client authentication configuration.
+     * A 32 byte x25519 private key.
      *
      * This would be the key added to a tor client by a user who wishes to
      * connect to a Hidden Service that has been configured using the
@@ -130,9 +126,7 @@ public object X25519: KeyType.Auth<X25519.PublicKey, X25519.PrivateKey>() {
      * @see [toX25519PublicKey]
      * @see [toX25519PublicKeyOrNull]
      * */
-    public class PrivateKey private constructor(
-        key: ByteArray
-    ): AuthKey.Private(key) {
+    public class PrivateKey private constructor(key: ByteArray): AuthKey.Private(key) {
 
         /**
          * `x25519`

@@ -34,6 +34,7 @@ public class AddressKey private constructor() {
     public sealed class Public(private val onionAddress: OnionAddress): Key.Public(), Comparable<Public> {
 
         public open fun address(): OnionAddress = onionAddress
+
         public final override fun encoded(): ByteArray = when (this) {
             is ED25519_V3.PublicKey -> ED25519_V3.PublicKey.BYTE_SIZE
         }.let { size -> onionAddress.decode().copyOf(size) }

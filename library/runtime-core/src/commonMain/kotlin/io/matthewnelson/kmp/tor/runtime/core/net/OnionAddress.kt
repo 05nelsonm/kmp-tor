@@ -86,7 +86,7 @@ public sealed class OnionAddress private constructor(value: String): Address(val
          * Currently, only v3 `.onion` addresses are supported.
          *
          * @return [OnionAddress]
-         * @throws [IllegalArgumentException] if byte array size is inappropriate
+         * @throws [IllegalArgumentException] if no `.onion` address is found
          * */
         @JvmStatic
         @JvmName("get")
@@ -129,7 +129,13 @@ public sealed class OnionAddress private constructor(value: String): Address(val
     }
 
     /**
-     * Holder for a 56 character v3 onion address without the scheme or `.onion` appended.
+     * Holder for a 56 character base 32 encoded v3 onion address, without the scheme
+     * or `.onion` appended.
+     *
+     * A v3 onion address consists of its:
+     *  - 32 byte ed25519 public key
+     *  - 2 byte checksum
+     *  - 1 byte version number
      *
      * @see [toOnionAddressV3]
      * @see [toOnionAddressV3OrNull]
@@ -139,8 +145,7 @@ public sealed class OnionAddress private constructor(value: String): Address(val
         public override fun decode(): ByteArray = value.decodeToByteArray(BASE_32)
 
         /**
-         * Wraps the [OnionAddress.V3] in its [ED25519_V3.PublicKey] format for extended
-         * functionality.
+         * Wraps the [OnionAddress.V3] in its [ED25519_V3.PublicKey] format for extended functionality.
          * */
         public override fun asPublicKey(): ED25519_V3.PublicKey = ED25519_V3.PublicKey(this)
 
@@ -153,7 +158,11 @@ public sealed class OnionAddress private constructor(value: String): Address(val
              * v3 `.onion` address itself.
              *
              * @return [OnionAddress.V3]
-             * @throws [IllegalArgumentException] if no v3 `.onion` address is found
+             * @throws [IllegalArgumentException] when:
+             *   - A 56 character base 32 encoded string is not found
+             *   - The version byte is invalid
+             *   - The checksum is invalid
+             *   - The 32 byte ed25519 public key is all 0 bytes (blank)
              * */
             @JvmStatic
             @JvmName("get")
@@ -168,9 +177,10 @@ public sealed class OnionAddress private constructor(value: String): Address(val
              *
              * @return [OnionAddress.V3]
              * @throws [IllegalArgumentException] when:
-             *   - array size is inappropriate
-             *   - invalid version byte
-             *   - invalid checksum
+             *   - Array size is not 35 bytes
+             *   - The version byte is invalid
+             *   - The checksum is invalid
+             *   - The 32 byte ed25519 public key is all 0 bytes (blank)
              * */
             @JvmStatic
             @JvmName("get")
@@ -193,7 +203,7 @@ public sealed class OnionAddress private constructor(value: String): Address(val
              * String can be either a URL containing the v3 `.onion` address, or the
              * v3 `.onion` address itself.
              *
-             * @return [OnionAddress.V3] or null
+             * @return [OnionAddress.V3] or null if [toOnionAddressV3] throws exception
              * */
             @JvmStatic
             @JvmName("getOrNull")
@@ -206,7 +216,7 @@ public sealed class OnionAddress private constructor(value: String): Address(val
             /**
              * Transforms provided bytes into a v3 `.onion` address.
              *
-             * @return [OnionAddress.V3] or null
+             * @return [OnionAddress.V3] or null if [toOnionAddressV3] throws exception
              * */
             @JvmStatic
             @JvmName("getOrNull")

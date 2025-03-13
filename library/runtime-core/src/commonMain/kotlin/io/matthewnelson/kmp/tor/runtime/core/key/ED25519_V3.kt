@@ -30,7 +30,7 @@ import kotlin.jvm.JvmName
 import kotlin.jvm.JvmStatic
 
 /**
- * An [ED25519_V3] [KeyType]. Also known as "Version 3 Hidden Services".
+ * An [ED25519_V3] [KeyType], utilized by tor for Version 3 Hidden Services.
  * */
 public object ED25519_V3: KeyType.Address<ED25519_V3.PublicKey, ED25519_V3.PrivateKey>() {
 
@@ -40,8 +40,7 @@ public object ED25519_V3: KeyType.Address<ED25519_V3.PublicKey, ED25519_V3.Priva
     public override fun algorithm(): String = "ED25519-V3"
 
     /**
-     * The public key of a Hidden Service (i.e. a [OnionAddress.V3] wrapped in
-     * [AddressKey.Public] functionality).
+     * A 32 byte ed25519 public key.
      *
      * @see [OnionAddress.V3]
      * @see [toED25519_V3PublicKey]
@@ -76,7 +75,7 @@ public object ED25519_V3: KeyType.Address<ED25519_V3.PublicKey, ED25519_V3.Priva
                     throw InvalidKeyException("Invalid length. actual[$length] vs min[$minLength]")
                 }
 
-                // Peek for a colon, indicative the presence of a URL scheme (ws:// to https://)
+                // Peek for a colon, indicative of the presence of a URL scheme (ws:// to https://)
                 run {
                     var i = 2
                     var hasColon = false
@@ -133,7 +132,6 @@ public object ED25519_V3: KeyType.Address<ED25519_V3.PublicKey, ED25519_V3.Priva
                         else -> null
                     }
                 }
-
                 if (b == null) {
                     // Last resort. Check if it's something like <onion-address>.onion
                     try {
@@ -150,7 +148,7 @@ public object ED25519_V3: KeyType.Address<ED25519_V3.PublicKey, ED25519_V3.Priva
              * Transforms provided bytes into a ED25519-V3 public key.
              *
              * @return [ED25519_V3.PublicKey]
-             * @throws [InvalidKeyException] if byte array size is inappropriate
+             * @throws [InvalidKeyException] if array size is inappropriate
              * */
             @JvmStatic
             @JvmName("get")
@@ -176,7 +174,7 @@ public object ED25519_V3: KeyType.Address<ED25519_V3.PublicKey, ED25519_V3.Priva
              * String can be a URL containing a v3 `.onion` address, the v3 `.onion`
              * address itself, or Base 16/32/64 encoded raw key value.
              *
-             * @return [ED25519_V3.PublicKey] or null
+             * @return [ED25519_V3.PublicKey] or null if [toED25519_V3PublicKey] throws exception
              * */
             @JvmStatic
             @JvmName("getOrNull")
@@ -189,7 +187,7 @@ public object ED25519_V3: KeyType.Address<ED25519_V3.PublicKey, ED25519_V3.Priva
             /**
              * Transforms provided bytes into a ED25519-V3 public key.
              *
-             * @return [ED25519_V3.PublicKey] or null
+             * @return [ED25519_V3.PublicKey] or null if [toED25519_V3PublicKey] throws exception
              * */
             @JvmStatic
             @JvmName("getOrNull")
@@ -204,14 +202,12 @@ public object ED25519_V3: KeyType.Address<ED25519_V3.PublicKey, ED25519_V3.Priva
     }
 
     /**
-     * The private key of a Hidden Service.
+     * An ed25519 private key in its 64 byte extended key format (as tor expects).
      *
      * @see [toED25519_V3PrivateKey]
      * @see [toED25519_V3PrivateKeyOrNull]
      * */
-    public class PrivateKey private constructor(
-        key: ByteArray,
-    ): AddressKey.Private(key) {
+    public class PrivateKey private constructor(key: ByteArray): AddressKey.Private(key) {
 
         /**
          * `ED25519-V3`
@@ -258,7 +254,7 @@ public object ED25519_V3: KeyType.Address<ED25519_V3.PublicKey, ED25519_V3.Priva
              *
              * String can be a Base 16/32/64 encoded raw value.
              *
-             * @return [ED25519_V3.PrivateKey] or null
+             * @return [ED25519_V3.PrivateKey] or null if [toED25519_V3PrivateKey] throws exception
              * */
             @JvmStatic
             @JvmName("getOrNull")
@@ -271,7 +267,7 @@ public object ED25519_V3: KeyType.Address<ED25519_V3.PublicKey, ED25519_V3.Priva
             /**
              * Transforms provided bytes into a ED25519-V3 private key.
              *
-             * @return [ED25519_V3.PrivateKey] or null
+             * @return [ED25519_V3.PrivateKey] or null if [toED25519_V3PrivateKey] throws exception
              * */
             @JvmStatic
             @JvmName("getOrNull")
