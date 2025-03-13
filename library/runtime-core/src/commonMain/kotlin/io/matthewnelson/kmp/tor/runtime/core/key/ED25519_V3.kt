@@ -157,14 +157,11 @@ public object ED25519_V3: KeyType.Address<ED25519_V3.PublicKey, ED25519_V3.Priva
             public fun ByteArray.toED25519_V3PublicKey(): PublicKey {
                 val address = when (size) {
                     BYTE_SIZE -> {
-                        if (!containsNon0Byte(BYTE_SIZE)) throw InvalidKeyException("Key is blank (all 0 bytes)")
-                        val checksum = OnionAddress.V3.computeChecksum(this)
-                        val b = copyOf(OnionAddress.V3.BYTE_SIZE)
-                        b[OnionAddress.V3.BYTE_SIZE - 3] = checksum[0]
-                        b[OnionAddress.V3.BYTE_SIZE - 2] = checksum[1]
-                        b[OnionAddress.V3.BYTE_SIZE - 1] = OnionAddress.V3.VERSION_BYTE
-                        // TODO: clean up so it's not being calculated twice
-                        b.toOnionAddressV3()
+                        try {
+                            OnionAddress.V3.fromED25519(this)
+                        } catch (e: IllegalArgumentException) {
+                            throw InvalidKeyException(e)
+                        }
                     }
                     OnionAddress.V3.BYTE_SIZE -> {
                         try {

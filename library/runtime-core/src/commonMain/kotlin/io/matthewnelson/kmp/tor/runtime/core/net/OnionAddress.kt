@@ -134,7 +134,7 @@ public sealed class OnionAddress private constructor(value: String): Address(val
      * */
     public class V3 private constructor(value: String): OnionAddress(value) {
 
-        public override fun decode(): ByteArray = value.decodeToByteArray(BASE32)
+        public override fun decode(): ByteArray = value.decodeToByteArray(BASE_32)
 
         /**
          * Wraps the [OnionAddress.V3] in its [ED25519_V3.PublicKey] format for extended
@@ -176,13 +176,13 @@ public sealed class OnionAddress private constructor(value: String): Address(val
                 require(size == BYTE_SIZE) { "Invalid array size. expected[$BYTE_SIZE] vs actual[$size]" }
                 require(last() == VERSION_BYTE) { "Invalid version byte. expected[$VERSION_BYTE] vs actual[${last()}]" }
                 require(containsNon0Byte(ED25519_V3.PublicKey.BYTE_SIZE)) { "ed25519 public key is blank (all 0 bytes)" }
-                val checksum = computeChecksum(this)
+                val checksum = computeChecksum()
                 val a0 = this[BYTE_SIZE - 3]
                 val a1 = this[BYTE_SIZE - 2]
                 val e0 = checksum[0]
                 val e1 = checksum[1]
                 require(a0 == e0 && a1 == e1) { "Invalid checksum byte(s). expected[$e0, $e1] vs actual[$a0, $a1]" }
-                return V3(encodeToString(BASE32))
+                return V3(encodeToString(BASE_32))
             }
 
             /**
@@ -219,7 +219,7 @@ public sealed class OnionAddress private constructor(value: String): Address(val
             internal fun OnionString.toOnionAddressV3(): V3 {
                 require(value.length == ENCODED_LEN) { "v3 Onion addresses are $ENCODED_LEN characters" }
                 val bytes = try {
-                    value.decodeToByteArray(BASE32)
+                    value.decodeToByteArray(BASE_32)
                 } catch (e: EncodingException) {
                     throw IllegalArgumentException("v3 Onion addresses are base32 encoded", e)
                 }
@@ -227,20 +227,31 @@ public sealed class OnionAddress private constructor(value: String): Address(val
             }
 
             @JvmSynthetic
-            @Throws(IllegalArgumentException::class, IndexOutOfBoundsException::class)
-            internal fun computeChecksum(
-                ed25519PublicKey: ByteArray,
-            ): ByteArray = SHA3_256().apply {
-                update(CHECKSUM_PREFIX)
-                update(ed25519PublicKey, 0, ED25519_V3.PublicKey.BYTE_SIZE)
-                update(VERSION_BYTE)
-            }.digest()
+            @Throws(IllegalArgumentException::class)
+            internal fun fromED25519(publicKey: ByteArray): V3 {
+                require(publicKey.size == ED25519_V3.PublicKey.BYTE_SIZE) { "Invalid array size" }
+                require(publicKey.containsNon0Byte(ED25519_V3.PublicKey.BYTE_SIZE)) { "Key is blank (all 0 bytes)" }
+                val checksum = publicKey.computeChecksum()
+                val b = publicKey.copyOf(BYTE_SIZE)
+                b[BYTE_SIZE - 3] = checksum[0]
+                b[BYTE_SIZE - 2] = checksum[1]
+                b[BYTE_SIZE - 1] = VERSION_BYTE
+                return V3(b.encodeToString(BASE_32))
+            }
 
             internal const val BYTE_SIZE: Int = 35
             internal const val ENCODED_LEN: Int = 56
             internal const val VERSION_BYTE: Byte = 3
 
-            private val BASE32 = Base32Default { encodeToLowercase = true; padEncoded = false }
+            @Suppress("NOTHING_TO_INLINE", "KotlinRedundantDiagnosticSuppress")
+            @Throws(IllegalArgumentException::class, IndexOutOfBoundsException::class)
+            private inline fun ByteArray.computeChecksum(): ByteArray = SHA3_256().apply {
+                update(CHECKSUM_PREFIX)
+                update(this@computeChecksum, 0, ED25519_V3.PublicKey.BYTE_SIZE)
+                update(VERSION_BYTE)
+            }.digest()
+
+            private val BASE_32 = Base32Default { encodeToLowercase = true; padEncoded = false }
             private val CHECKSUM_PREFIX = ".onion checksum".encodeToByteArray()
         }
     }
