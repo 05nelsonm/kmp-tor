@@ -53,8 +53,7 @@ public sealed class OnionAddress private constructor(value: String): Address(val
     public abstract fun decode(): ByteArray
 
     /**
-     * Wraps the [OnionAddress] in its [AddressKey.Public] format for extended
-     * functionality.
+     * Wraps the [OnionAddress] in its [AddressKey.Public] format.
      * */
     public abstract fun asPublicKey(): AddressKey.Public
 

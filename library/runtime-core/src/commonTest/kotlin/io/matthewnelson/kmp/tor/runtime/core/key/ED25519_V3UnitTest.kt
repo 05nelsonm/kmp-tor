@@ -37,7 +37,8 @@ class ED25519_V3UnitTest: AddressKeyBaseUnitTest<ED25519_V3.PublicKey, ED25519_V
 
     @Test
     fun givenOnionAddress_whenEncodedString_thenToKeyIsSuccessful() {
-        val expected = ONION_ADDRESS_B16.decodeToByteArray(Base16)
+        // Should be first 32 bytes of an onion address
+        val expected = ONION_ADDRESS_B16.decodeToByteArray(Base16).copyOf(ED25519_V3.PublicKey.BYTE_SIZE)
 
         assertContentEquals(expected, ONION_ADDRESS_B16.toED25519_V3PublicKey().encoded())
         assertContentEquals(expected, ONION_ADDRESS_B32.toED25519_V3PublicKey().encoded())
