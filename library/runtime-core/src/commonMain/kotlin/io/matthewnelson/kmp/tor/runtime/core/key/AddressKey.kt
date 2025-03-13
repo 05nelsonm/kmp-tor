@@ -34,10 +34,12 @@ public class AddressKey private constructor() {
     public sealed class Public(private val onionAddress: OnionAddress): Key.Public(), Comparable<Public> {
 
         public open fun address(): OnionAddress = onionAddress
+        // TODO: Fix. Should be first 32 bytes of a v3 onion address
         public final override fun encoded(): ByteArray = onionAddress.decode()
 
         public final override fun base16(): String = encoded().encodeToString(BASE_16)
         public final override fun base32(): String = when (onionAddress) {
+            // TODO: Fix. Should be first 32 bytes of a v3 onion address
             is OnionAddress.V3 -> onionAddress.value.uppercase()
         }
         public final override fun base64(): String = encoded().encodeToString(BASE_64)

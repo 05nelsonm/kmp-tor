@@ -67,6 +67,11 @@ class ED25519_V3UnitTest: AddressKeyBaseUnitTest<ED25519_V3.PublicKey, ED25519_V
 
     @Test
     fun givenInvalidInput_whenToPublicKey_thenReturnsNull() {
+        assertNull("".toED25519_V3PublicKeyOrNull())
+        assertNull("ws://".toED25519_V3PublicKeyOrNull())
+        assertNull("wss://".toED25519_V3PublicKeyOrNull())
+        assertNull("http://".toED25519_V3PublicKeyOrNull())
+        assertNull("https://".toED25519_V3PublicKeyOrNull())
         assertNull(PUBLIC_KEY_B16.dropLast(2).toED25519_V3PublicKeyOrNull())
         assertNull(PUBLIC_KEY_B16.dropLast(2).decodeToByteArray(Base16).toED25519_V3PublicKeyOrNull())
     }

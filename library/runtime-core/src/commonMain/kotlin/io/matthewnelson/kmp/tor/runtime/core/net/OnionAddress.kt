@@ -232,7 +232,7 @@ public sealed class OnionAddress private constructor(value: String): Address(val
                 ed25519PublicKey: ByteArray,
             ): ByteArray = SHA3_256().apply {
                 update(CHECKSUM_PREFIX)
-                update(ed25519PublicKey, 0, 32) // TODO: Move 32 to ED25519_V3.Public.Companion
+                update(ed25519PublicKey, 0, ED25519_V3.PublicKey.BYTE_SIZE)
                 update(VERSION_BYTE)
             }.digest()
 

@@ -22,6 +22,7 @@ import io.matthewnelson.kmp.tor.runtime.core.net.OnionAddress.V3.Companion.toOni
 import io.matthewnelson.kmp.tor.runtime.core.internal.tryDecodeOrNull
 import io.matthewnelson.kmp.tor.runtime.core.key.ED25519_V3.PublicKey.Companion.toED25519_V3PublicKey
 import io.matthewnelson.kmp.tor.runtime.core.key.ED25519_V3.PublicKey.Companion.toED25519_V3PublicKeyOrNull
+import io.matthewnelson.kmp.tor.runtime.core.net.OnionAddress.V3.Companion.toOnionAddressV3
 import org.kotlincrypto.error.InvalidKeyException
 import kotlin.jvm.JvmName
 import kotlin.jvm.JvmStatic
@@ -50,6 +51,7 @@ public object ED25519_V3: KeyType.Address<ED25519_V3.PublicKey, ED25519_V3.Priva
          * `ED25519-V3`
          * */
         public override fun algorithm(): String = ED25519_V3.algorithm()
+
         public override fun address(): OnionAddress.V3 = super.address() as OnionAddress.V3
 
         public companion object {
@@ -58,7 +60,7 @@ public object ED25519_V3: KeyType.Address<ED25519_V3.PublicKey, ED25519_V3.Priva
              * Parses a String for an ED25519-V3 public key.
              *
              * String can be a URL containing a v3 `.onion` address, the v3 `.onion`
-             * address itself, or Base 16/32/64 encoded raw value.
+             * address itself, or Base 16/32/64 encoded raw key value.
              *
              * @return [ED25519_V3.PublicKey]
              * @throws [InvalidKeyException] if no key is found
@@ -79,8 +81,29 @@ public object ED25519_V3: KeyType.Address<ED25519_V3.PublicKey, ED25519_V3.Priva
             @JvmStatic
             @JvmName("get")
             public fun ByteArray.toED25519_V3PublicKey(): PublicKey {
-                return toED25519_V3PublicKeyOrNull()
-                    ?: throw InvalidKeyException("bytes are not an ${algorithm()} public key")
+                val address = when (size) {
+                    BYTE_SIZE -> {
+                        // TODO: Check all zero?
+                        val checksum = OnionAddress.V3.computeChecksum(this)
+                        val b = copyOf(OnionAddress.V3.BYTE_SIZE)
+                        b[OnionAddress.V3.BYTE_SIZE - 3] = checksum[0]
+                        b[OnionAddress.V3.BYTE_SIZE - 2] = checksum[1]
+                        b[OnionAddress.V3.BYTE_SIZE - 1] = OnionAddress.V3.VERSION_BYTE
+                        // TODO: clean up so it's not being calculated twice
+                        b.toOnionAddressV3()
+                    }
+                    OnionAddress.V3.BYTE_SIZE -> {
+                        // TODO: Check first 32 bytes for all 0?
+                        try {
+                            toOnionAddressV3()
+                        } catch (e: IllegalArgumentException) {
+                            throw InvalidKeyException(e)
+                        }
+                    }
+                    else -> throw InvalidKeyException("Invalid array size[$size]")
+                }
+
+                return PublicKey(address)
             }
 
             /**
@@ -116,10 +139,13 @@ public object ED25519_V3: KeyType.Address<ED25519_V3.PublicKey, ED25519_V3.Priva
              * */
             @JvmStatic
             @JvmName("getOrNull")
-            public fun ByteArray.toED25519_V3PublicKeyOrNull(): PublicKey? {
-                val address = toOnionAddressV3OrNull() ?: return null
-                return PublicKey(address)
+            public fun ByteArray.toED25519_V3PublicKeyOrNull(): PublicKey? = try {
+                toED25519_V3PublicKey()
+            } catch (e: InvalidKeyException) {
+                null
             }
+
+            internal const val BYTE_SIZE: Int = 32
         }
     }
 
