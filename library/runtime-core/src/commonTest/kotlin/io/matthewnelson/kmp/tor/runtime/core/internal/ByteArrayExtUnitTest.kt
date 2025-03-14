@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Matthew Nelson
+ * Copyright (c) 2025 Matthew Nelson
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,16 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-@file:Suppress("KotlinRedundantDiagnosticSuppress", "NOTHING_TO_INLINE")
-
 package io.matthewnelson.kmp.tor.runtime.core.internal
 
-internal inline val Boolean.byte: Byte get() = if (this) 1 else 0
+import kotlin.test.Test
+import kotlin.test.assertFalse
+import kotlin.test.assertTrue
 
-internal inline fun Boolean?.configure(
-    flags: LinkedHashSet<String>,
-    name: String,
-) {
-    val condition = this ?: return
-    if (condition) flags.add(name) else flags.remove(name)
+class ByteArrayExtUnitTest {
+
+    @Test
+    fun givenAll0Bytes_whenContainsNon0Byte_thenReturnsFalse() {
+        val b = ByteArray(35) { 0 }
+        assertFalse(b.containsNon0Byte(limit = b.size))
+    }
+
+    @Test
+    fun givenNotAll0Bytes_whenContainsNon0Byte_thenReturnsFalse() {
+        val b = ByteArray(35) { 0 }
+        b[0] = 5.toByte()
+        assertTrue(b.containsNon0Byte(limit = b.size))
+    }
 }

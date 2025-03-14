@@ -29,7 +29,6 @@ internal expect value class ServerSocketProducer private constructor(
 ) {
 
     @Throws(Exception::class)
-    @OptIn(ExperimentalStdlibApi::class)
     internal fun open(port: Int): AutoCloseable
 
     internal companion object {
@@ -44,7 +43,6 @@ internal expect value class ServerSocketProducer private constructor(
 @Suppress("NOTHING_TO_INLINE")
 internal inline fun ServerSocketProducer.isPortAvailable(port: Int): Boolean {
     try {
-        @OptIn(ExperimentalStdlibApi::class)
         open(port).use {}
         return true
     } catch (t: Throwable) {

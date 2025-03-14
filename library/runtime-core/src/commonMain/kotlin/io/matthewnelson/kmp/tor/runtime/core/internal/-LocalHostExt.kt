@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-@file:Suppress("KotlinRedundantDiagnosticSuppress")
+@file:Suppress("KotlinRedundantDiagnosticSuppress", "NOTHING_TO_INLINE")
 
 package io.matthewnelson.kmp.tor.runtime.core.internal
 
@@ -145,7 +145,6 @@ internal fun LocalHost.Companion.tryParsingEtcHosts(set: LinkedHashSet<IPAddress
     }
 }
 
-@Suppress("NOTHING_TO_INLINE")
 private inline val LinkedHashSet<IPAddress>.hasIPv4IPv6: Boolean get() {
     var hasIPv4 = false
     var hasIPv6 = false

@@ -31,7 +31,7 @@ import org.kotlincrypto.bitops.endian.Endian.Big.bePackIntoUnsafe
 import platform.posix.*
 import kotlin.experimental.ExperimentalNativeApi
 
-@OptIn(ExperimentalForeignApi::class, ExperimentalStdlibApi::class, UnsafeNumber::class)
+@OptIn(ExperimentalForeignApi::class, UnsafeNumber::class)
 internal actual value class ServerSocketProducer private actual constructor(
     private actual val value: Any
 ) {

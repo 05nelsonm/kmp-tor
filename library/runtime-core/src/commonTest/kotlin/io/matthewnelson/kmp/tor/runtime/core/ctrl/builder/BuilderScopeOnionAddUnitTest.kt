@@ -19,6 +19,7 @@ import io.matthewnelson.kmp.tor.runtime.core.ctrl.builder.BuilderScopeOnionAdd.F
 import io.matthewnelson.kmp.tor.runtime.core.ctrl.TorCmd
 import io.matthewnelson.kmp.tor.runtime.core.key.ED25519_V3
 import io.matthewnelson.kmp.tor.runtime.core.key.ED25519_V3.PrivateKey.Companion.toED25519_V3PrivateKey
+import io.matthewnelson.kmp.tor.runtime.core.key.ED25519_V3UnitTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
@@ -56,7 +57,7 @@ class BuilderScopeOnionAddUnitTest {
 
     @Test
     fun givenAddExisting_whenCmdCreated_thenFlagDiscardPKIsPresentByDefault() {
-        val cmd = TorCmd.Onion.Add.existing(ByteArray(64).toED25519_V3PrivateKey()) {}
+        val cmd = TorCmd.Onion.Add.existing(ED25519_V3UnitTest.PRIVATE_KEY_B64.toED25519_V3PrivateKey()) {}
         assertTrue(cmd.flags.contains("DiscardPK"))
     }
 
