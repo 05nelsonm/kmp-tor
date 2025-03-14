@@ -4031,6 +4031,7 @@ public abstract class io/matthewnelson/kmp/tor/runtime/core/key/AuthKey$Public :
 public final class io/matthewnelson/kmp/tor/runtime/core/key/ED25519_V3 : io/matthewnelson/kmp/tor/runtime/core/key/KeyType$Address {
 	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/core/key/ED25519_V3;
 	public fun algorithm ()Ljava/lang/String;
+	public static final fun generateKeyPair ()Lkotlin/Pair;
 }
 
 public final class io/matthewnelson/kmp/tor/runtime/core/key/ED25519_V3$PrivateKey : io/matthewnelson/kmp/tor/runtime/core/key/AddressKey$Private {
@@ -4129,6 +4130,7 @@ public abstract class io/matthewnelson/kmp/tor/runtime/core/key/KeyType$Auth : i
 public final class io/matthewnelson/kmp/tor/runtime/core/key/X25519 : io/matthewnelson/kmp/tor/runtime/core/key/KeyType$Auth {
 	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/core/key/X25519;
 	public fun algorithm ()Ljava/lang/String;
+	public static final fun generateKeyPair ()Lkotlin/Pair;
 }
 
 public final class io/matthewnelson/kmp/tor/runtime/core/key/X25519$PrivateKey : io/matthewnelson/kmp/tor/runtime/core/key/AuthKey$Private {
