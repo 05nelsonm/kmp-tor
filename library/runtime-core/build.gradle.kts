@@ -38,6 +38,7 @@ kmpConfiguration {
                     api(libs.kmp.tor.common.api)
                     implementation(libs.kmp.tor.common.core)
                     implementation(libs.kotlinx.coroutines.core)
+                    implementation(kotlincrypto.bitops.endian)
                     api(kotlincrypto.error.error)
                     implementation(kotlincrypto.hash.sha2)
                     implementation(kotlincrypto.hash.sha3)
@@ -63,11 +64,7 @@ kmpConfiguration {
                     jsMain?.apply { dependsOn(nonNativeMain) }
                 }
 
-                val nativeMain = findByName("nativeMain")?.apply {
-                    dependencies {
-                        implementation(kotlincrypto.bitops.endian)
-                    }
-                }
+                val nativeMain = findByName("nativeMain")
                 val nativeTest = findByName("nativeTest")?.apply {
                     dependencies {
                         implementation(libs.ktor.network)

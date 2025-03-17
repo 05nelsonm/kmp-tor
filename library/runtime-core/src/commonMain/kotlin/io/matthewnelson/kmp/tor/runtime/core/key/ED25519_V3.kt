@@ -26,9 +26,9 @@ import io.matthewnelson.kmp.tor.runtime.core.internal.tryDecodeOrNull
 import io.matthewnelson.kmp.tor.runtime.core.key.ED25519_V3.PublicKey.Companion.toED25519_V3PublicKey
 import io.matthewnelson.kmp.tor.runtime.core.key.ED25519_V3.PublicKey.Companion.toED25519_V3PublicKeyOrNull
 import io.matthewnelson.kmp.tor.runtime.core.net.OnionAddress.V3.Companion.toOnionAddressV3
+import org.kotlincrypto.error.GeneralSecurityException
 import org.kotlincrypto.error.InvalidKeyException
 import org.kotlincrypto.random.CryptoRand
-import org.kotlincrypto.random.RandomnessProcurementException
 import kotlin.jvm.JvmName
 import kotlin.jvm.JvmStatic
 
@@ -45,7 +45,7 @@ public object ED25519_V3: KeyType.Address<ED25519_V3.PublicKey, ED25519_V3.Priva
     /**
      * Generates a new ed25519 key pair, suitable for use with tor hidden services.
      *
-     * @throws [RandomnessProcurementException]
+     * @throws [GeneralSecurityException] if procurement of cryptographically secure random data fails
      * */
     @JvmStatic
     public fun generateKeyPair(): Pair<PublicKey, PrivateKey> = CryptoRand.Default.generateED25519KeyPair()

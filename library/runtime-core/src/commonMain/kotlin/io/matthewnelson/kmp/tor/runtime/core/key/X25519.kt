@@ -20,9 +20,9 @@ import io.matthewnelson.kmp.tor.runtime.core.internal.generateX25519KeyPair
 import io.matthewnelson.kmp.tor.runtime.core.internal.tryDecodeOrNull
 import io.matthewnelson.kmp.tor.runtime.core.key.X25519.PublicKey.Companion.toX25519PublicKey
 import io.matthewnelson.kmp.tor.runtime.core.key.X25519.PublicKey.Companion.toX25519PublicKeyOrNull
+import org.kotlincrypto.error.GeneralSecurityException
 import org.kotlincrypto.error.InvalidKeyException
 import org.kotlincrypto.random.CryptoRand
-import org.kotlincrypto.random.RandomnessProcurementException
 import kotlin.jvm.JvmName
 import kotlin.jvm.JvmStatic
 import kotlin.jvm.JvmSynthetic
@@ -40,7 +40,7 @@ public object X25519: KeyType.Auth<X25519.PublicKey, X25519.PrivateKey>() {
     /**
      * Generates a new x25519 key pair, suitable for use with v3 client authentication.
      *
-     * @throws [RandomnessProcurementException]
+     * @throws [GeneralSecurityException] if procurement of cryptographically secure random data fails
      * */
     @JvmStatic
     public fun generateKeyPair(): Pair<PublicKey, PrivateKey> = CryptoRand.Default.generateX25519KeyPair()
