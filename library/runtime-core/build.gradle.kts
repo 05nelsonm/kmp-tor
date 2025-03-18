@@ -23,6 +23,7 @@ kmpConfiguration {
             sourceSetTest {
                 dependencies {
                     implementation(kotlin("reflect"))
+                    implementation(libs.bouncy.castle)
                 }
             }
         }

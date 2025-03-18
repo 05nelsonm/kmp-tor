@@ -6,6 +6,9 @@ androidx-test-core          = "1.5.0" # Do not upgrade. Next version requires mi
 #noinspection GradleDependency
 androidx-test-runner        = "1.5.2" # Do not upgrade. Next version requires minSdk 19+
 
+# https://repo.maven.apache.org/maven2/org/bouncycastle/bcprov-jdk18on/
+bouncy-castle               = "1.80"
+
 encoding                    = "2.4.0"
 
 gradle-android              = "8.7.3"
@@ -50,6 +53,8 @@ kotlinx-coroutines-android  = { module = "org.jetbrains.kotlinx:kotlinx-coroutin
 # Tests Only
 androidx-test-core          = { module = "androidx.test:core", version.ref = "androidx-test-core" }
 androidx-test-runner        = { module = "androidx.test:runner", version.ref = "androidx-test-runner" }
+
+bouncy-castle               = { module = "org.bouncycastle:bcprov-jdk18on", version.ref = "bouncy-castle" }
 
 kmp-tor-resource-exec-tor   = { module = "io.matthewnelson.kmp-tor:resource-exec-tor", version.ref = "kmp-tor-resource" }
 kmp-tor-resource-noexec-tor = { module = "io.matthewnelson.kmp-tor:resource-noexec-tor", version.ref = "kmp-tor-resource" }
