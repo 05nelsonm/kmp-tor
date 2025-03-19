@@ -16,10 +16,13 @@
 package io.matthewnelson.kmp.tor.runtime.core.key
 
 import io.matthewnelson.kmp.tor.runtime.core.internal.containsNon0Byte
+import io.matthewnelson.kmp.tor.runtime.core.internal.generateX25519KeyPair
 import io.matthewnelson.kmp.tor.runtime.core.internal.tryDecodeOrNull
 import io.matthewnelson.kmp.tor.runtime.core.key.X25519.PublicKey.Companion.toX25519PublicKey
 import io.matthewnelson.kmp.tor.runtime.core.key.X25519.PublicKey.Companion.toX25519PublicKeyOrNull
+import org.kotlincrypto.error.GeneralSecurityException
 import org.kotlincrypto.error.InvalidKeyException
+import org.kotlincrypto.random.CryptoRand
 import kotlin.jvm.JvmName
 import kotlin.jvm.JvmStatic
 import kotlin.jvm.JvmSynthetic
@@ -33,6 +36,14 @@ public object X25519: KeyType.Auth<X25519.PublicKey, X25519.PrivateKey>() {
      * `x25519`
      * */
     public override fun algorithm(): String = "x25519"
+
+    /**
+     * Generates a new x25519 key pair, suitable for use with v3 client authentication.
+     *
+     * @throws [GeneralSecurityException] if procurement of cryptographically secure random data fails
+     * */
+    @JvmStatic
+    public fun generateKeyPair(): Pair<PublicKey, PrivateKey> = CryptoRand.Default.generateX25519KeyPair()
 
     /**
      * A 32 byte x25519 public key.
@@ -113,6 +124,8 @@ public object X25519: KeyType.Auth<X25519.PublicKey, X25519.PrivateKey>() {
             } catch (_: InvalidKeyException) {
                 null
             }
+
+            internal const val BYTE_SIZE = 32
         }
     }
 
@@ -195,6 +208,8 @@ public object X25519: KeyType.Auth<X25519.PublicKey, X25519.PrivateKey>() {
             } catch (_: InvalidKeyException) {
                 null
             }
+
+            internal const val BYTE_SIZE = 32
         }
 
         @JvmSynthetic
@@ -204,6 +219,4 @@ public object X25519: KeyType.Auth<X25519.PublicKey, X25519.PrivateKey>() {
             is ED25519_V3.PublicKey -> true
         }
     }
-
-    private const val BYTE_SIZE = 32
 }

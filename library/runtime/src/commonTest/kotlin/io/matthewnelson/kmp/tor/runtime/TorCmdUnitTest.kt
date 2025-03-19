@@ -385,4 +385,23 @@ class TorCmdUnitTest {
             entries.first().publicKey as ED25519_V3.PublicKey
         )).let { result -> assertEquals(0, result.size)  }
     }
+
+    @Test
+    fun givenOnionAdd_whenFromCurve25519KeyPair_thenPublicKeyMatchesTor() = runTorTest { runtime ->
+        runtime.startDaemonAsync()
+
+        Array(50) { ED25519_V3.generateKeyPair() }.forEach { generated ->
+            // Add existing Hidden Service using generated private key
+            val entry = runtime.executeAsync(TorCmd.Onion.Add.existing(generated.second) {
+                port(Port.HTTP)
+                destroyKeyOnJobCompletion(false)
+            })
+
+            // Shut it down
+            runtime.executeAsync(TorCmd.Onion.Delete(entry.publicKey))
+
+            // Ensure returned onion address matches what was generated
+            assertEquals(entry.publicKey, generated.first)
+        }
+    }
 }

@@ -23,6 +23,7 @@ kmpConfiguration {
             sourceSetTest {
                 dependencies {
                     implementation(kotlin("reflect"))
+                    implementation(libs.bouncy.castle)
                 }
             }
         }
@@ -38,8 +39,11 @@ kmpConfiguration {
                     api(libs.kmp.tor.common.api)
                     implementation(libs.kmp.tor.common.core)
                     implementation(libs.kotlinx.coroutines.core)
+                    implementation(kotlincrypto.bitops.endian)
                     api(kotlincrypto.error.error)
-                    api(kotlincrypto.hash.sha3)
+                    implementation(kotlincrypto.hash.sha2)
+                    implementation(kotlincrypto.hash.sha3)
+                    implementation(kotlincrypto.random.crypto.rand)
                 }
             }
             sourceSetTest {
@@ -61,11 +65,7 @@ kmpConfiguration {
                     jsMain?.apply { dependsOn(nonNativeMain) }
                 }
 
-                val nativeMain = findByName("nativeMain")?.apply {
-                    dependencies {
-                        implementation(kotlincrypto.bitops.endian)
-                    }
-                }
+                val nativeMain = findByName("nativeMain")
                 val nativeTest = findByName("nativeTest")?.apply {
                     dependencies {
                         implementation(libs.ktor.network)
