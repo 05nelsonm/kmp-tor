@@ -4849,7 +4849,6 @@ public abstract class TorOption: Comparable<TorOption>, CharSequence {
          * @throws [IllegalArgumentException] if [name] is unknown.
          * */
         @JvmStatic
-        @Throws(IllegalArgumentException::class)
         public fun valueOf(name: String): TorOption = valueOfOrNull(name)
             ?: throw IllegalArgumentException("Unknown name[$name]")
 

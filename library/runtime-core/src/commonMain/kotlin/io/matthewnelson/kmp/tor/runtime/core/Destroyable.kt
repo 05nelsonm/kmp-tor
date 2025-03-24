@@ -31,7 +31,6 @@ public interface Destroyable {
          * @throws [IllegalStateException] If [isDestroyed] is true.
          * */
         @JvmStatic
-        @Throws(IllegalStateException::class)
         public fun Destroyable.checkIsNotDestroyed() {
             if (!isDestroyed()) return
             throw destroyedException()

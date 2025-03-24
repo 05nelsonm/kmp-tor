@@ -86,24 +86,41 @@ public actual sealed class Key private actual constructor() {
 
         public actual final override fun isDestroyed(): Boolean = _destroyed
 
-        @Throws(IllegalStateException::class)
+        /**
+         * Key bytes
+         *
+         * @throws [IllegalStateException] if [isDestroyed] is `true`
+         * */
         public actual fun encoded(): ByteArray = encodedOrNull() ?: throw destroyedException(algorithm())
-        @Throws(IllegalStateException::class)
+
+        /**
+         * Key bytes formatted in uppercase Base16 (hex)
+         *
+         * @throws [IllegalStateException] if [isDestroyed] is `true`
+         * */
         public actual fun base16(): String = base16OrNull() ?: throw destroyedException(algorithm())
-        @Throws(IllegalStateException::class)
+
+        /**
+         * Key bytes formatted in uppercase Base32 without padding
+         *
+         * @throws [IllegalStateException] if [isDestroyed] is `true`
+         * */
         public actual fun base32(): String = base32OrNull() ?: throw destroyedException(algorithm())
-        @Throws(IllegalStateException::class)
+
+        /**
+         * Key bytes formatted in Base64 without padding
+         *
+         * @throws [IllegalStateException] if [isDestroyed] is `true`
+         * */
         public actual fun base64(): String = base64OrNull() ?: throw destroyedException(algorithm())
 
-        public actual final override fun encodedOrNull(): ByteArray? = withKeyOrNull { it.copyOf() }
-        public actual final override fun base16OrNull(): String? = withKeyOrNull { it.encodeToString(BASE_16) }
-        public actual final override fun base32OrNull(): String? = withKeyOrNull { it.encodeToString(BASE_32) }
-        public actual final override fun base64OrNull(): String? = withKeyOrNull { it.encodeToString(BASE_64) }
+        public actual final override fun encodedOrNull(): ByteArray? = withKeyOrNull { copyOf() }
+        public actual final override fun base16OrNull(): String? = withKeyOrNull { encodeToString(BASE_16) }
+        public actual final override fun base32OrNull(): String? = withKeyOrNull { encodeToString(BASE_32) }
+        public actual final override fun base64OrNull(): String? = withKeyOrNull { encodeToString(BASE_64) }
 
         @OptIn(ExperimentalContracts::class, InternalKmpTorApi::class)
-        private inline fun <T : Any> withKeyOrNull(
-            block: (key: ByteArray) -> T
-        ): T? {
+        private inline fun <T : Any> withKeyOrNull(block: ByteArray.() -> T): T? {
             contract {
                 callsInPlace(block, InvocationKind.AT_MOST_ONCE)
             }

@@ -285,7 +285,6 @@ public fun interface Disposable {
              *   of [Once] or [noOp]
              * */
             @JvmStatic
-            @Throws(IllegalArgumentException::class)
             public fun of(disposable: Disposable): Once = of(false, disposable)
 
             /**
@@ -296,7 +295,6 @@ public fun interface Disposable {
              *   of [Once] or [noOp]
              * */
             @JvmStatic
-            @Throws(IllegalArgumentException::class)
             public fun of(concurrent: Boolean, disposable: Disposable): Once {
                 require(disposable !is Once) { "disposable cannot be an instance of Disposable.Once" }
                 require(disposable !is NOOP) { "disposable cannot be an instance of Disposable.NOOP" }
@@ -380,7 +378,6 @@ public fun interface Executable {
              *   of [Once] or [noOp]
              * */
             @JvmStatic
-            @Throws(IllegalArgumentException::class)
             public fun of(executable: Executable): Once = of(false, executable)
 
             /**
@@ -391,7 +388,6 @@ public fun interface Executable {
              *   of [Once] or [noOp]
              * */
             @JvmStatic
-            @Throws(IllegalArgumentException::class)
             public fun of(concurrent: Boolean, executable: Executable): Once {
                 require(executable !is Once) { "executable cannot be an instance of Executable.Once" }
                 require(executable !is NOOP) { "executable cannot be an instance of Executable.NOOP" }

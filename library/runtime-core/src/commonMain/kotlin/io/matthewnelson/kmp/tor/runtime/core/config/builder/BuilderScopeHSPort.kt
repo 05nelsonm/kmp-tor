@@ -92,7 +92,6 @@ public class BuilderScopeHSPort private constructor(
      *   - Configured path is multiple lines.
      * */
     @KmpTorDsl
-    @Throws(UnsupportedOperationException::class)
     public fun target(
         unixSocket: File,
     ): BuilderScopeHSPort {

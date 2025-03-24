@@ -73,7 +73,6 @@ public actual suspend fun Port.Ephemeral.findNextAvailableAsync(
  * @see [isAvailableAsync]
  * @throws [IOException] if the check fails (e.g. calling from Main thread on Android)
  * */
-@Throws(IOException::class)
 public fun Port.isAvailableSync(
     host: LocalHost,
 ): Boolean = host.resolve()
@@ -96,7 +95,6 @@ public fun Port.isAvailableSync(
  * @throws [IllegalArgumentException] if [limit] is not between 1 and 1_000 (inclusive)
  * @throws [IOException] if the check fails (e.g. calling from Main thread on Android)
  * */
-@Throws(IOException::class)
 public fun Port.Ephemeral.findNextAvailableSync(
     limit: Int,
     host: LocalHost,

@@ -85,7 +85,6 @@ public abstract class BuilderScopePort: TorSetting.BuilderScope {
         ): Control = super.port(value) as Control
 
         @KmpTorDsl
-        @Throws(UnsupportedOperationException::class)
         public override fun unixSocket(
             value: File,
         ): Control = super.unixSocket(value) as Control
@@ -227,7 +226,6 @@ public abstract class BuilderScopePort: TorSetting.BuilderScope {
         ): Socks = super.reassignable(allow) as Socks
 
         @KmpTorDsl
-        @Throws(UnsupportedOperationException::class)
         public override fun unixSocket(
             value: File,
         ): Socks = super.unixSocket(value) as Socks
@@ -403,7 +401,6 @@ public abstract class BuilderScopePort: TorSetting.BuilderScope {
      *   - Configured path is multiple lines.
      * */
     @KmpTorDsl
-    @Throws(UnsupportedOperationException::class)
     protected open fun unixSocket(
         value: File,
     ): BuilderScopePort {

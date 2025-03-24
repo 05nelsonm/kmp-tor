@@ -186,14 +186,14 @@ public sealed class OnionAddress private constructor(value: String): Address(val
             @JvmName("get")
             public fun ByteArray.toOnionAddressV3(): V3 {
                 require(size == BYTE_SIZE) { "Invalid array size. expected[$BYTE_SIZE] vs actual[$size]" }
-                require(last() == VERSION_BYTE) { "Invalid version byte. expected[$VERSION_BYTE] vs actual[${last()}]" }
+                require(this[BYTE_SIZE - 1] == VERSION_BYTE) { "Invalid version byte. expected[$VERSION_BYTE] vs actual[${last()}]" }
                 require(containsNon0Byte(ED25519_V3.PublicKey.BYTE_SIZE)) { "ed25519 public key is blank (all 0 bytes)" }
                 val checksum = computeChecksum()
-                val ca0 = this[BYTE_SIZE - 3]
-                val ca1 = this[BYTE_SIZE - 2]
-                val ce0 = checksum[0]
-                val ce1 = checksum[1]
-                require(ca0 == ce0 && ca1 == ce1) { "Invalid checksum byte(s). expected[$ce0, $ce1] vs actual[$ca0, $ca1]" }
+                val t0 = this[BYTE_SIZE - 3]
+                val t1 = this[BYTE_SIZE - 2]
+                val c0 = checksum[0]
+                val c1 = checksum[1]
+                require(t0 == c0 && t1 == c1) { "Invalid checksum byte(s). expected[$c0, $c1] vs actual[$t0, $t1]" }
                 return V3(encodeToString(BASE_32))
             }
 
