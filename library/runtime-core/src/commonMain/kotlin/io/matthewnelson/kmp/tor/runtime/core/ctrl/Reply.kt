@@ -139,9 +139,13 @@ public open class Reply private constructor(
 
         public companion object {
 
+            /**
+             * Converts replies to [Error]
+             *
+             * @throws [IllegalArgumentException] if list of [Reply] is empty
+             * */
             @JvmStatic
             @JvmName("get")
-            @Throws(IllegalArgumentException::class)
             public fun List<Reply>.toError(jobName: String): Error {
                 require(isNotEmpty()) { "replies cannot be empty" }
                 return Error(jobName, this)
