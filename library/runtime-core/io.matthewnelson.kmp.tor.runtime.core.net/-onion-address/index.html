@@ -41,7 +41,7 @@
             </a>        <button class="navigation-controls--btn navigation-controls--btn_toc ui-kit_mobile-only" id="toc-toggle" type="button">Toggle table of contents
         </button>
         <div class="navigation-controls--break ui-kit_mobile-only"></div>
-        <div class="library-version" id="library-version">2.1.0
+        <div class="library-version" id="library-version">2.2.0
         </div>
         <div class="navigation-controls">
         <div class="filter-section filter-section_loading" id="filter-section">
@@ -94,7 +94,7 @@
   <div class="breadcrumbs"><a href="../../index.html">runtime-core</a><span class="delimiter">/</span><a href="../index.html">io.matthewnelson.kmp.tor.runtime.core.net</a><span class="delimiter">/</span><span class="current">OnionAddress</span></div>
   <div class="cover ">
     <h1 class="cover"><span>Onion</span><wbr><span><span>Address</span></span></h1>
-    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":library:runtime-core/commonMain"><div class="symbol monospace"><span class="token keyword">sealed </span><span class="token keyword">class </span><a href="index.html">OnionAddress</a> : <a href="../-address/index.html">Address</a><span class="clearfix"><span class="floating-right">(<a href="https://github.com/05nelsonm/kmp-tor/tree/master/library/runtime-core/src/commonMain/kotlin/io/matthewnelson/kmp/tor/runtime/core/net/OnionAddress.kt#L48">source</a>)</span></span></div><p class="paragraph">Base abstraction for denoting a String value as a <code class="lang-kotlin">.onion</code> address</p><p class="paragraph">e.g.</p><div class="sample-container"><pre><code class="block lang-kotlin" theme="idea">val string = "2gzyxa5ihm7nsggfxnu52rck2vv4rvmdlkiu3zzui5du4xyclen53wid"
+    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":library:runtime-core/commonMain"><div class="symbol monospace"><span class="token keyword">sealed </span><span class="token keyword">class </span><a href="index.html">OnionAddress</a> : <a href="../-address/index.html">Address</a><span class="clearfix"><span class="floating-right">(<a href="https://github.com/05nelsonm/kmp-tor/tree/master/library/runtime-core/src/commonMain/kotlin/io/matthewnelson/kmp/tor/runtime/core/net/OnionAddress.kt#L54">source</a>)</span></span></div><p class="paragraph">Base abstraction for denoting a String value as a <code class="lang-kotlin">.onion</code> address</p><p class="paragraph">e.g.</p><div class="sample-container"><pre><code class="block lang-kotlin" theme="idea">val string = "2gzyxa5ihm7nsggfxnu52rck2vv4rvmdlkiu3zzui5du4xyclen53wid"
 
 string.toOnionAddress()
 "http://${string}.onion:8080/some/path".toOnionAddress()
@@ -130,7 +130,7 @@ string.toOnionAddress()
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":library:runtime-core/commonMain"><div class="symbol monospace"><span class="token keyword">class </span><a href="-v3/index.html">V3</a> : <a href="index.html">OnionAddress</a></div><div class="brief "><p class="paragraph">Holder for a 56 character v3 onion address without the scheme or <code class="lang-kotlin">.onion</code> appended.</p></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":library:runtime-core/commonMain"><div class="symbol monospace"><span class="token keyword">class </span><a href="-v3/index.html">V3</a> : <a href="index.html">OnionAddress</a></div><div class="brief "><p class="paragraph">Holder for a 56 character base 32 encoded v3 onion address, without the scheme or <code class="lang-kotlin">.onion</code> appended.</p></div></div></div>
                 </div>
               </div>
             </div>
@@ -168,7 +168,7 @@ string.toOnionAddress()
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":library:runtime-core/commonMain"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword">fun </span><a href="as-public-key.html"><span class="token function">asPublicKey</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../../io.matthewnelson.kmp.tor.runtime.core.key/-address-key/-public/index.html">AddressKey.Public</a></div><div class="brief "><p class="paragraph">Wraps the <a href="index.html">OnionAddress</a> in its <a href="../../io.matthewnelson.kmp.tor.runtime.core.key/-address-key/-public/index.html">AddressKey.Public</a> format for extended functionality.</p></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":library:runtime-core/commonMain"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword">fun </span><a href="as-public-key.html"><span class="token function">asPublicKey</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../../io.matthewnelson.kmp.tor.runtime.core.key/-address-key/-public/index.html">AddressKey.Public</a></div><div class="brief "><p class="paragraph">Wraps the <a href="index.html">OnionAddress</a> in its <a href="../../io.matthewnelson.kmp.tor.runtime.core.key/-address-key/-public/index.html">AddressKey.Public</a> format.</p></div></div></div>
                 </div>
               </div>
             </div>
