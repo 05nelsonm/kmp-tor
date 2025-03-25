@@ -1,5 +1,20 @@
 # CHANGELOG
 
+## Version 2.2.0 (2025-03-25)
+ - Adds ability to generate `ED25519_V3` and `X25519` public/private key pairs [[#579]][579]
+ - Improves `OnionAddress.V3` validation [[#576]][576]
+     - `ed25519` public key component (first 32 bytes) of the address are now checked for emptiness (0 byte array)
+     - 2 byte .onion checksum is now validated
+     - version byte is now validated
+ - Improves `ED25519_V3.PublicKey` functionality [[#578]][578]
+     - 32 byte keys (non-onion addresses) are now also accepted by `toED25519_V3PublicKey`
+         - `OnionAddress.V3` checksum and version byte will be automatically computed
+     - `encoded()`, `base16()`, `base32()` and `base64()` functions now return only the 32 byte 
+       `ed25519` public key portion of the underlying `OnionAddress.V3`. Previously, the entire 
+       35 byte `OnionAddress.V3` was being used.
+ - Improves Java API usage by removing `@Throws` annotations from public functions, in favor of expressing 
+   constraints via documentation [[#580]][580]
+
 ## Version 2.1.0 (2025-02-26)
  - Updates `kotlin` to `2.1.10` [[#563]][563]
  - Updates `android-gradle-plugin` to `8.7.3` [[#563]][563]
@@ -14,7 +29,7 @@
  - Adds `UncaughtException.Handler` extension functions `tryCatch2` and `withSuppression2` [[#566]][566]
  - Deprecates `UncaughtException.Handler` extension functions `tryCatch` and `withSuppression` [[#566]][566]
  - Performance improvements to higher order functions via inlining [[#566]][566] [[#569]][569]
- - `X25519` and `ED25519` instantiation extension functions now throw `InvalidKeyException` instead 
+ - `X25519` and `ED25519_V3` instantiation extension functions now throw `InvalidKeyException` instead 
    of `IllegalArgumentException` when raw keys are inappropriate [[#573]][573]
  - `ClientAuthEntry.of` and `HiddenServiceEntry.of` now throw `KeyException` instead 
    of `IllegalArgumentException` when key types are inappropriate [[#573]][573]
@@ -550,6 +565,10 @@
 [566]: https://github.com/05nelsonm/kmp-tor/pull/566
 [569]: https://github.com/05nelsonm/kmp-tor/pull/569
 [573]: https://github.com/05nelsonm/kmp-tor/pull/573
+[576]: https://github.com/05nelsonm/kmp-tor/pull/576
+[578]: https://github.com/05nelsonm/kmp-tor/pull/578
+[579]: https://github.com/05nelsonm/kmp-tor/pull/579
+[580]: https://github.com/05nelsonm/kmp-tor/pull/580
 
 [kmp-tor-binary-66]: https://github.com/05nelsonm/kmp-tor-binary/issues/66
 [kmp-tor-binary-75]: https://github.com/05nelsonm/kmp-tor-binary/pull/75
