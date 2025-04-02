@@ -28,7 +28,6 @@ import io.matthewnelson.kmp.tor.runtime.core.*
 import io.matthewnelson.kmp.tor.runtime.core.net.IPSocketAddress
 import io.matthewnelson.kmp.tor.runtime.core.ctrl.TorCmd
 import io.matthewnelson.kmp.tor.runtime.ctrl.internal.*
-import io.matthewnelson.kmp.tor.runtime.ctrl.internal.Debugger.Companion.d
 import kotlinx.coroutines.*
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.InvocationKind
@@ -86,6 +85,10 @@ public actual interface TorCtrl : Destroyable, TorEvent.Processor, TorCmd.Privil
      * */
     public actual fun invokeOnDestroy(handle: ItBlock<TorCtrl>): Disposable
 
+    public actual abstract class Debugger: ItBlock<String> {
+        public actual abstract fun isEnabled(): Boolean
+    }
+
     /**
      * A factory class for connecting to tor via its control listener.
      *
@@ -110,7 +113,7 @@ public actual interface TorCtrl : Destroyable, TorEvent.Processor, TorCmd.Privil
         observers: Set<TorEvent.Observer>,
         interceptors: Set<TorCmdInterceptor<*>>,
         internal actual val defaultExecutor: OnEvent.Executor,
-        internal actual val debugger: ItBlock<String>?,
+        internal actual val debugger: Debugger?,
         internal actual val handler: UncaughtException.Handler,
     ) {
 
@@ -186,6 +189,24 @@ public actual interface TorCtrl : Destroyable, TorEvent.Processor, TorCmd.Privil
                 connect { path.connect() }
             }
         }
+
+        @JvmOverloads
+        @Deprecated("Use primary constructor with parameter TorCtrl.Debugger defined instead")
+        public actual constructor(
+            staticTag: String?,
+            observers: Set<TorEvent.Observer>,
+            interceptors: Set<TorCmdInterceptor<*>>,
+            defaultExecutor: OnEvent.Executor,
+            debugger: ItBlock<String>?,
+            handler: UncaughtException.Handler,
+        ): this(
+            staticTag,
+            observers,
+            interceptors,
+            defaultExecutor,
+            debugger.asDebugger(),
+            handler,
+        )
 
         @Suppress("NOTHING_TO_INLINE", "LocalVariableName")
         @Throws(CancellationException::class, IOException::class)

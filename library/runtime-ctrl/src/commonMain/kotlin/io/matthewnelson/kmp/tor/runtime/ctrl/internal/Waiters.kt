@@ -20,7 +20,7 @@ package io.matthewnelson.kmp.tor.runtime.ctrl.internal
 import io.matthewnelson.kmp.tor.runtime.core.Destroyable
 import io.matthewnelson.kmp.tor.runtime.core.Destroyable.Companion.checkIsNotDestroyed
 import io.matthewnelson.kmp.tor.runtime.core.ctrl.Reply
-import io.matthewnelson.kmp.tor.runtime.ctrl.internal.Debugger.Companion.d
+import io.matthewnelson.kmp.tor.runtime.ctrl.TorCtrl.Debugger
 import kotlinx.coroutines.delay
 import kotlin.collections.removeFirst as kRemoveFirst
 import kotlin.collections.removeFirstOrNull as kRemoveFirstOrNull

@@ -81,6 +81,10 @@ public actual interface TorCtrl : Destroyable, TorEvent.Processor, TorCmd.Privil
      * */
     public actual fun invokeOnDestroy(handle: ItBlock<TorCtrl>): Disposable
 
+    public actual abstract class Debugger: ItBlock<String> {
+        public actual abstract fun isEnabled(): Boolean
+    }
+
     /**
      * A factory class for connecting to tor via its control listener.
      *
@@ -101,7 +105,7 @@ public actual interface TorCtrl : Destroyable, TorEvent.Processor, TorCmd.Privil
         observers: Set<TorEvent.Observer>,
         interceptors: Set<TorCmdInterceptor<*>>,
         internal actual val defaultExecutor: OnEvent.Executor,
-        internal actual val debugger: ItBlock<String>?,
+        internal actual val debugger: Debugger?,
         internal actual val handler: UncaughtException.Handler,
     ) {
 
@@ -140,6 +144,23 @@ public actual interface TorCtrl : Destroyable, TorEvent.Processor, TorCmd.Privil
             options["path"] = path.path
             return withContext(Dispatchers.Main) { connect(options) }
         }
+
+        @Deprecated("Use primary constructor with parameter TorCtrl.Debugger defined instead")
+        public actual constructor(
+            staticTag: String?,
+            observers: Set<TorEvent.Observer>,
+            interceptors: Set<TorCmdInterceptor<*>>,
+            defaultExecutor: OnEvent.Executor,
+            debugger: ItBlock<String>?,
+            handler: UncaughtException.Handler,
+        ): this(
+            staticTag,
+            observers,
+            interceptors,
+            defaultExecutor,
+            debugger.asDebugger(),
+            handler,
+        )
 
         // @Throws(IOException::class)
         @OptIn(InternalProcessApi::class)

@@ -29,7 +29,6 @@ import io.matthewnelson.kmp.tor.runtime.core.ctrl.Reply
 import io.matthewnelson.kmp.tor.runtime.core.ctrl.TorCmd
 import io.matthewnelson.kmp.tor.runtime.ctrl.TorCmdInterceptor
 import io.matthewnelson.kmp.tor.runtime.ctrl.TorCtrl
-import io.matthewnelson.kmp.tor.runtime.ctrl.internal.Debugger.Companion.d
 import kotlinx.coroutines.*
 import kotlin.concurrent.Volatile
 import kotlin.coroutines.cancellation.CancellationException
@@ -42,7 +41,7 @@ internal class RealTorCtrl private constructor(
     factory: TorCtrl.Factory,
     dispatcher: CoroutineDispatcher,
     private val connection: CtrlConnection,
-    private val closeDispatcher: ((LOG: Debugger?) -> Unit)?,
+    private val closeDispatcher: ((LOG: TorCtrl.Debugger?) -> Unit)?,
 ): AbstractTorCtrl(
     factory.staticTag,
     factory.observers,
@@ -55,7 +54,7 @@ internal class RealTorCtrl private constructor(
 ) {
 
     @Volatile
-    protected override var LOG = factory.debugger?.let { Debugger.of(this, it) }
+    protected override var LOG = factory.debugger?.wrap(prefix = this)
 
     private val scope = CoroutineScope(context =
         CoroutineName(toString())
@@ -361,7 +360,7 @@ internal class RealTorCtrl private constructor(
             factory: TorCtrl.Factory,
             dispatcher: CoroutineDispatcher,
             connection: CtrlConnection,
-            closeDispatcher: ((LOG: Debugger?) -> Unit)?,
+            closeDispatcher: ((LOG: TorCtrl.Debugger?) -> Unit)?,
         ): RealTorCtrl = RealTorCtrl(
             factory,
             dispatcher,

@@ -3,9 +3,8 @@
 package io.matthewnelson.kmp.tor.runtime.ctrl.internal
 
 import io.matthewnelson.kmp.file.SysDirSep
-import io.matthewnelson.kmp.tor.runtime.core.config.TorOption.Attribute
 import io.matthewnelson.kmp.tor.runtime.core.ctrl.TorCmd
-import io.matthewnelson.kmp.tor.runtime.ctrl.internal.Debugger.Companion.d
+import io.matthewnelson.kmp.tor.runtime.ctrl.TorCtrl.Debugger
 
 @Throws(IllegalArgumentException::class, IllegalStateException::class)
 internal fun TorCmd<*>.encodeToByteArray(LOG: Debugger?): ByteArray = when (this) {

@@ -23,7 +23,7 @@ import io.matthewnelson.kmp.tor.runtime.core.Destroyable.Companion.checkIsNotDes
 import io.matthewnelson.kmp.tor.runtime.core.UncaughtException.Handler.Companion.withSuppression2
 import io.matthewnelson.kmp.tor.runtime.core.ctrl.TorCmd
 import io.matthewnelson.kmp.tor.runtime.ctrl.AbstractTorEventProcessor
-import io.matthewnelson.kmp.tor.runtime.ctrl.internal.Debugger.Companion.d
+import io.matthewnelson.kmp.tor.runtime.ctrl.TorCtrl.Debugger
 import kotlin.collections.removeFirst as kRemoveFirst
 import kotlin.concurrent.Volatile
 import kotlin.jvm.JvmSynthetic

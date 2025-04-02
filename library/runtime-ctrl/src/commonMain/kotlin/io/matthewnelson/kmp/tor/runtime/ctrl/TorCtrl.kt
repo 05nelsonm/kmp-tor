@@ -75,6 +75,10 @@ public expect interface TorCtrl: Destroyable, TorEvent.Processor, TorCmd.Privile
      * */
     public fun invokeOnDestroy(handle: ItBlock<TorCtrl>): Disposable
 
+    public abstract class Debugger(): ItBlock<String> {
+        public abstract fun isEnabled(): Boolean
+    }
+
     /**
      * A factory class for connecting to tor via its control listener.
      *
@@ -97,7 +101,7 @@ public expect interface TorCtrl: Destroyable, TorEvent.Processor, TorCmd.Privile
         observers: Set<TorEvent.Observer> = emptySet(),
         interceptors: Set<TorCmdInterceptor<*>> = emptySet(),
         defaultExecutor: OnEvent.Executor = OnEvent.Executor.Immediate,
-        debugger: ItBlock<String>? = null,
+        debugger: Debugger?,
         handler: UncaughtException.Handler,
     ) {
 
@@ -106,7 +110,7 @@ public expect interface TorCtrl: Destroyable, TorEvent.Processor, TorCmd.Privile
         internal val interceptors: Set<TorCmdInterceptor<*>>
         internal val defaultExecutor: OnEvent.Executor
         internal val handler: UncaughtException.Handler
-        internal val debugger: ItBlock<String>?
+        internal val debugger: Debugger?
 
         /**
          * Connects to a tor control listener via TCP socket.
@@ -129,5 +133,15 @@ public expect interface TorCtrl: Destroyable, TorEvent.Processor, TorCmd.Privile
         /** @suppress */
         @InternalKmpTorApi
         public fun tempQueue(): TempTorCmdQueue
+
+        @Deprecated("Use primary constructor with parameter TorCtrl.Debugger defined instead")
+        public constructor(
+            staticTag: String? = null,
+            observers: Set<TorEvent.Observer> = emptySet(),
+            interceptors: Set<TorCmdInterceptor<*>> = emptySet(),
+            defaultExecutor: OnEvent.Executor = OnEvent.Executor.Immediate,
+            debugger: ItBlock<String>? = null,
+            handler: UncaughtException.Handler,
+        )
     }
 }
