@@ -54,7 +54,7 @@ internal class RealTorCtrl private constructor(
 ) {
 
     @Volatile
-    protected override var LOG = factory.debugger?.wrap(prefix = this)
+    protected override var LOG = factory.debug?.wrap(prefix = this)
 
     private val scope = CoroutineScope(context =
         CoroutineName(toString())

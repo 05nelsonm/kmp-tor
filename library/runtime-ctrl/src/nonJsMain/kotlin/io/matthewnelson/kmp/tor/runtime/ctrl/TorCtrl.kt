@@ -34,7 +34,9 @@ import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.cancellation.CancellationException
+import kotlin.jvm.JvmName
 import kotlin.jvm.JvmOverloads
+import kotlin.jvm.JvmStatic
 import kotlin.time.Duration.Companion.milliseconds
 
 /**
@@ -85,8 +87,19 @@ public actual interface TorCtrl : Destroyable, TorEvent.Processor, TorCmd.Privil
      * */
     public actual fun invokeOnDestroy(handle: ItBlock<TorCtrl>): Disposable
 
-    public actual abstract class Debugger: ItBlock<String> {
+    public actual abstract class Debugger {
+
         public actual abstract fun isEnabled(): Boolean
+        public actual abstract operator fun invoke(log: String)
+
+        public actual companion object {
+
+            @JvmStatic
+            @JvmName("from")
+            public actual inline fun ItBlock<String>.asDebugger(
+                crossinline isEnabled: () -> Boolean,
+            ): Debugger = commonAsDebugger(isEnabled)
+        }
     }
 
     /**
@@ -101,7 +114,7 @@ public actual interface TorCtrl : Destroyable, TorEvent.Processor, TorCmd.Privil
      *   the [TorCmd] (if needed).
      * @param [defaultExecutor] The default [OnEvent.Executor] to fall back to
      *   when calling [TorEvent.Observer.notify] if it does not have its own.
-     * @param [debugger] A callback for debugging info. **MUST** be thread
+     * @param [debug] A callback for debugging info. **MUST** be thread
      *   safe. Any non-[UncaughtException] it throws will be swallowed.
      * @param [handler] The [UncaughtException.Handler] to pipe bad behavior
      *   to. It **MUST** be thread-safe.
@@ -113,7 +126,7 @@ public actual interface TorCtrl : Destroyable, TorEvent.Processor, TorCmd.Privil
         observers: Set<TorEvent.Observer>,
         interceptors: Set<TorCmdInterceptor<*>>,
         internal actual val defaultExecutor: OnEvent.Executor,
-        internal actual val debugger: Debugger?,
+        internal actual val debug: Debugger?,
         internal actual val handler: UncaughtException.Handler,
     ) {
 
@@ -191,7 +204,7 @@ public actual interface TorCtrl : Destroyable, TorEvent.Processor, TorCmd.Privil
         }
 
         @JvmOverloads
-        @Deprecated("Use primary constructor with parameter TorCtrl.Debugger defined instead")
+        @Deprecated("Use primary constructor with parameter 'debug: TorCtrl.Debugger' defined instead. See TorCtrl.Debugger.asDebugger()")
         public actual constructor(
             staticTag: String?,
             observers: Set<TorEvent.Observer>,
@@ -204,7 +217,7 @@ public actual interface TorCtrl : Destroyable, TorEvent.Processor, TorCmd.Privil
             observers,
             interceptors,
             defaultExecutor,
-            debugger.asDebugger(),
+            debugger?.commonAsDebugger { true },
             handler,
         )
 

@@ -26,7 +26,7 @@ import io.matthewnelson.kmp.tor.runtime.core.ctrl.Reply
 import io.matthewnelson.kmp.tor.runtime.core.ctrl.TorCmd
 import io.matthewnelson.kmp.tor.runtime.core.util.executeAsync
 import io.matthewnelson.kmp.tor.runtime.core.util.findNextAvailableAsync
-import io.matthewnelson.kmp.tor.runtime.ctrl.internal.asDebugger
+import io.matthewnelson.kmp.tor.runtime.ctrl.TorCtrl.Debugger.Companion.asDebugger
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.test.runTest
@@ -51,16 +51,16 @@ class ProcessorUnitTest {
         var invocationSuccess = 0
 
         val factory = TorCtrl.Factory(
-            debugger = ItBlock<String> { log ->
-//                println(log)
-                if (log.contains("Processor Started")) {
-                    synchronized(lockStarts) { processorStarts++ }
-                }
-            }.asDebugger(),
             interceptors = setOf(TorCmdInterceptor.intercept<TorCmd.Signal.Heartbeat> { _, cmd ->
                 synchronized(lockIntercept) { invocationIntercept++ }
                 cmd
             }),
+            debug = ItBlock<String> { log ->
+//                println(log)
+                if (log.contains("Processor Started")) {
+                    synchronized(lockStarts) { processorStarts++ }
+                }
+            }.asDebugger { true },
             handler = UncaughtException.Handler.THROW,
         )
         val host = LocalHost.IPv4.resolve()

@@ -19,43 +19,42 @@ package io.matthewnelson.kmp.tor.runtime.ctrl.internal
 
 import io.matthewnelson.kmp.tor.runtime.core.ItBlock
 import io.matthewnelson.kmp.tor.runtime.core.UncaughtException
-import io.matthewnelson.kmp.tor.runtime.ctrl.TorCtrl
+import io.matthewnelson.kmp.tor.runtime.ctrl.TorCtrl.Debugger
 
-internal inline fun ItBlock<String>?.asDebugger(): TorCtrl.Debugger? {
-    if (this == null) return null
-    if (this is TorCtrl.Debugger) return this
-    return object : TorCtrl.Debugger(), ItBlock<String> by this {
-        // Default on for compatibility
-        override fun isEnabled(): Boolean = true
-    }
+@PublishedApi
+internal inline fun ItBlock<String>.commonAsDebugger(
+    crossinline isEnabled: () -> Boolean,
+): Debugger = object : Debugger() {
+    override fun isEnabled(): Boolean = isEnabled.invoke()
+    override fun invoke(log: String) { this@commonAsDebugger(log) }
 }
 
-internal inline fun TorCtrl.Debugger?.d(lazyText: () -> String) {
+internal inline fun Debugger?.d(lazyText: () -> String) {
     if (this?.isEnabled() != true) return
     invoke(lazyText())
 }
 
 @Throws(IllegalArgumentException::class)
-internal fun TorCtrl.Debugger.wrap(prefix: Any): TorCtrl.Debugger {
+internal fun Debugger.wrap(prefix: Any): Debugger {
     if (this is DebugWrapper) return this
     return DebugWrapper(this, prefix)
 }
 
 private class DebugWrapper(
-    private val delegate: TorCtrl.Debugger,
+    private val delegate: Debugger,
     private val prefix: Any,
-): TorCtrl.Debugger() {
+): Debugger() {
 
     init {
         require(delegate !is DebugWrapper) { "delegate cannot be an instance of DebugWrapper" }
-        require(prefix !is TorCtrl.Debugger) { "prefix cannot be an instance of TorCtrl.Debugger" }
+        require(prefix !is Debugger) { "prefix cannot be an instance of TorCtrl.Debugger" }
     }
 
     override fun isEnabled(): Boolean = delegate.isEnabled()
 
-    override fun invoke(it: String) {
+    override fun invoke(log: String) {
         try {
-            delegate("$prefix $it")
+            delegate.invoke(log = "$prefix $log")
         } catch (t: Throwable) {
             if (t !is UncaughtException) return
 

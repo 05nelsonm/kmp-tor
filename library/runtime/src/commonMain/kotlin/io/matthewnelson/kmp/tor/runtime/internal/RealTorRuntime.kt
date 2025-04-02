@@ -43,6 +43,7 @@ import io.matthewnelson.kmp.tor.runtime.core.util.executeAsync
 import io.matthewnelson.kmp.tor.runtime.ctrl.TempTorCmdQueue
 import io.matthewnelson.kmp.tor.runtime.ctrl.TorCmdInterceptor
 import io.matthewnelson.kmp.tor.runtime.ctrl.TorCtrl
+import io.matthewnelson.kmp.tor.runtime.ctrl.TorCtrl.Debugger.Companion.asDebugger
 import io.matthewnelson.kmp.tor.runtime.internal.observer.ObserverConfChanged
 import io.matthewnelson.kmp.tor.runtime.internal.observer.ObserverConnectivity
 import io.matthewnelson.kmp.tor.runtime.internal.observer.ObserverNotice
@@ -137,20 +138,17 @@ internal class RealTorRuntime private constructor(
             }),
         ),
         defaultExecutor = OnEvent.Executor.Immediate,
-        debugger = object : TorCtrl.Debugger() {
-            override fun isEnabled(): Boolean = debug
-            override fun invoke(it: String) {
-                // Debug logs are all formatted as RealTorCtrl@<hashCode> <log>
-                val i = it.indexOf('@')
-                val formatted = if (i == -1) {
-                    it
-                } else {
-                    it.substring(0, i) + "[fid=$fidEllipses]" + it.substring(i)
-                }
-
-                LOG.DEBUG.notifyObservers(formatted)
+        debug = ItBlock<String> { log ->
+            // Debug logs are all formatted as RealTorCtrl@<hashCode> <log>
+            val i = log.indexOf('@')
+            val formatted = if (i == -1) {
+                log
+            } else {
+                log.substring(0, i) + "[fid=$fidEllipses]" + log.substring(i)
             }
-        },
+
+            LOG.DEBUG.notifyObservers(formatted)
+        }.asDebugger(isEnabled = ::debug),
         handler = handler,
     )
 
@@ -914,7 +912,7 @@ internal class RealTorRuntime private constructor(
 
                 // Waiting to bind. Create a temporary job to transfer
                 // to RealTorRuntime when bind is finally called or
-                val cmdQueue = TorCtrl.Factory(debugger = null, handler = handler).tempQueue()
+                val cmdQueue = TorCtrl.Factory(debug = null, handler = handler).tempQueue()
                 _cmdQueue = cmdQueue
 
                 // Enqueue here
