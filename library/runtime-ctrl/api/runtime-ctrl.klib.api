@@ -11,8 +11,20 @@ abstract interface io.matthewnelson.kmp.tor.runtime.ctrl/TorCtrl : io.matthewnel
     abstract fun destroy() // io.matthewnelson.kmp.tor.runtime.ctrl/TorCtrl.destroy|destroy(){}[0]
     abstract fun invokeOnDestroy(io.matthewnelson.kmp.tor.runtime.core/ItBlock<io.matthewnelson.kmp.tor.runtime.ctrl/TorCtrl>): io.matthewnelson.kmp.tor.runtime.core/Disposable // io.matthewnelson.kmp.tor.runtime.ctrl/TorCtrl.invokeOnDestroy|invokeOnDestroy(io.matthewnelson.kmp.tor.runtime.core.ItBlock<io.matthewnelson.kmp.tor.runtime.ctrl.TorCtrl>){}[0]
 
+    abstract class Debugger { // io.matthewnelson.kmp.tor.runtime.ctrl/TorCtrl.Debugger|null[0]
+        constructor <init>() // io.matthewnelson.kmp.tor.runtime.ctrl/TorCtrl.Debugger.<init>|<init>(){}[0]
+
+        abstract fun invoke(kotlin/String) // io.matthewnelson.kmp.tor.runtime.ctrl/TorCtrl.Debugger.invoke|invoke(kotlin.String){}[0]
+        abstract fun isEnabled(): kotlin/Boolean // io.matthewnelson.kmp.tor.runtime.ctrl/TorCtrl.Debugger.isEnabled|isEnabled(){}[0]
+
+        final object Companion { // io.matthewnelson.kmp.tor.runtime.ctrl/TorCtrl.Debugger.Companion|null[0]
+            final inline fun (io.matthewnelson.kmp.tor.runtime.core/ItBlock<kotlin/String>).asDebugger(crossinline kotlin/Function0<kotlin/Boolean>): io.matthewnelson.kmp.tor.runtime.ctrl/TorCtrl.Debugger // io.matthewnelson.kmp.tor.runtime.ctrl/TorCtrl.Debugger.Companion.asDebugger|asDebugger@io.matthewnelson.kmp.tor.runtime.core.ItBlock<kotlin.String>(kotlin.Function0<kotlin.Boolean>){}[0]
+        }
+    }
+
     final class Factory { // io.matthewnelson.kmp.tor.runtime.ctrl/TorCtrl.Factory|null[0]
         constructor <init>(kotlin/String? = ..., kotlin.collections/Set<io.matthewnelson.kmp.tor.runtime.core/TorEvent.Observer> = ..., kotlin.collections/Set<io.matthewnelson.kmp.tor.runtime.ctrl/TorCmdInterceptor<*>> = ..., io.matthewnelson.kmp.tor.runtime.core/OnEvent.Executor = ..., io.matthewnelson.kmp.tor.runtime.core/ItBlock<kotlin/String>? = ..., io.matthewnelson.kmp.tor.runtime.core/UncaughtException.Handler) // io.matthewnelson.kmp.tor.runtime.ctrl/TorCtrl.Factory.<init>|<init>(kotlin.String?;kotlin.collections.Set<io.matthewnelson.kmp.tor.runtime.core.TorEvent.Observer>;kotlin.collections.Set<io.matthewnelson.kmp.tor.runtime.ctrl.TorCmdInterceptor<*>>;io.matthewnelson.kmp.tor.runtime.core.OnEvent.Executor;io.matthewnelson.kmp.tor.runtime.core.ItBlock<kotlin.String>?;io.matthewnelson.kmp.tor.runtime.core.UncaughtException.Handler){}[0]
+        constructor <init>(kotlin/String? = ..., kotlin.collections/Set<io.matthewnelson.kmp.tor.runtime.core/TorEvent.Observer> = ..., kotlin.collections/Set<io.matthewnelson.kmp.tor.runtime.ctrl/TorCmdInterceptor<*>> = ..., io.matthewnelson.kmp.tor.runtime.core/OnEvent.Executor = ..., io.matthewnelson.kmp.tor.runtime.ctrl/TorCtrl.Debugger?, io.matthewnelson.kmp.tor.runtime.core/UncaughtException.Handler) // io.matthewnelson.kmp.tor.runtime.ctrl/TorCtrl.Factory.<init>|<init>(kotlin.String?;kotlin.collections.Set<io.matthewnelson.kmp.tor.runtime.core.TorEvent.Observer>;kotlin.collections.Set<io.matthewnelson.kmp.tor.runtime.ctrl.TorCmdInterceptor<*>>;io.matthewnelson.kmp.tor.runtime.core.OnEvent.Executor;io.matthewnelson.kmp.tor.runtime.ctrl.TorCtrl.Debugger?;io.matthewnelson.kmp.tor.runtime.core.UncaughtException.Handler){}[0]
 
         final suspend fun connectAsync(io.matthewnelson.kmp.file/File): io.matthewnelson.kmp.tor.runtime.ctrl/TorCtrl // io.matthewnelson.kmp.tor.runtime.ctrl/TorCtrl.Factory.connectAsync|connectAsync(io.matthewnelson.kmp.file.File){}[0]
         final suspend fun connectAsync(io.matthewnelson.kmp.tor.runtime.core.net/IPSocketAddress): io.matthewnelson.kmp.tor.runtime.ctrl/TorCtrl // io.matthewnelson.kmp.tor.runtime.ctrl/TorCtrl.Factory.connectAsync|connectAsync(io.matthewnelson.kmp.tor.runtime.core.net.IPSocketAddress){}[0]
@@ -97,3 +109,5 @@ final class io.matthewnelson.kmp.tor.runtime.ctrl/TempTorCmdQueue : io.matthewne
     final fun destroy() // io.matthewnelson.kmp.tor.runtime.ctrl/TempTorCmdQueue.destroy|destroy(){}[0]
     final fun isDestroyed(): kotlin/Boolean // io.matthewnelson.kmp.tor.runtime.ctrl/TempTorCmdQueue.isDestroyed|isDestroyed(){}[0]
 }
+
+final inline fun (io.matthewnelson.kmp.tor.runtime.core/ItBlock<kotlin/String>).io.matthewnelson.kmp.tor.runtime.ctrl.internal/commonAsDebugger(crossinline kotlin/Function0<kotlin/Boolean>): io.matthewnelson.kmp.tor.runtime.ctrl/TorCtrl.Debugger // io.matthewnelson.kmp.tor.runtime.ctrl.internal/commonAsDebugger|commonAsDebugger@io.matthewnelson.kmp.tor.runtime.core.ItBlock<kotlin.String>(kotlin.Function0<kotlin.Boolean>){}[0]

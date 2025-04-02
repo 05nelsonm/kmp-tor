@@ -43,6 +43,7 @@ import io.matthewnelson.kmp.tor.runtime.core.util.executeAsync
 import io.matthewnelson.kmp.tor.runtime.ctrl.TempTorCmdQueue
 import io.matthewnelson.kmp.tor.runtime.ctrl.TorCmdInterceptor
 import io.matthewnelson.kmp.tor.runtime.ctrl.TorCtrl
+import io.matthewnelson.kmp.tor.runtime.ctrl.TorCtrl.Debugger.Companion.asDebugger
 import io.matthewnelson.kmp.tor.runtime.internal.observer.ObserverConfChanged
 import io.matthewnelson.kmp.tor.runtime.internal.observer.ObserverConnectivity
 import io.matthewnelson.kmp.tor.runtime.internal.observer.ObserverNotice
@@ -137,9 +138,7 @@ internal class RealTorRuntime private constructor(
             }),
         ),
         defaultExecutor = OnEvent.Executor.Immediate,
-        debugger = ItBlock { log ->
-            if (!debug) return@ItBlock
-
+        debug = ItBlock<String> { log ->
             // Debug logs are all formatted as RealTorCtrl@<hashCode> <log>
             val i = log.indexOf('@')
             val formatted = if (i == -1) {
@@ -149,7 +148,7 @@ internal class RealTorRuntime private constructor(
             }
 
             LOG.DEBUG.notifyObservers(formatted)
-        },
+        }.asDebugger(isEnabled = ::debug),
         handler = handler,
     )
 
@@ -913,7 +912,7 @@ internal class RealTorRuntime private constructor(
 
                 // Waiting to bind. Create a temporary job to transfer
                 // to RealTorRuntime when bind is finally called or
-                val cmdQueue = TorCtrl.Factory(handler = handler).tempQueue()
+                val cmdQueue = TorCtrl.Factory(debug = null, handler = handler).tempQueue()
                 _cmdQueue = cmdQueue
 
                 // Enqueue here
