@@ -89,15 +89,11 @@ abstract class io.matthewnelson.kmp.tor.runtime.ctrl/AbstractTorEventProcessor :
 }
 
 final class <#A: io.matthewnelson.kmp.tor.runtime.core.ctrl/TorCmd<*>> io.matthewnelson.kmp.tor.runtime.ctrl/TorCmdInterceptor { // io.matthewnelson.kmp.tor.runtime.ctrl/TorCmdInterceptor|null[0]
+    constructor <init>(kotlin/Function2<io.matthewnelson.kmp.tor.runtime.core/EnqueuedJob, io.matthewnelson.kmp.tor.runtime.core.ctrl/TorCmd<*>, io.matthewnelson.kmp.tor.runtime.core.ctrl/TorCmd<*>?>) // io.matthewnelson.kmp.tor.runtime.ctrl/TorCmdInterceptor.<init>|<init>(kotlin.Function2<io.matthewnelson.kmp.tor.runtime.core.EnqueuedJob,io.matthewnelson.kmp.tor.runtime.core.ctrl.TorCmd<*>,io.matthewnelson.kmp.tor.runtime.core.ctrl.TorCmd<*>?>){}[0]
+
     final object Companion { // io.matthewnelson.kmp.tor.runtime.ctrl/TorCmdInterceptor.Companion|null[0]
-        final fun <#A2: io.matthewnelson.kmp.tor.runtime.core.ctrl/TorCmd<*>> of(kotlin/Function1<io.matthewnelson.kmp.tor.runtime.ctrl.internal/TorCmdJob<*>, #A2?>): io.matthewnelson.kmp.tor.runtime.ctrl/TorCmdInterceptor<#A2> // io.matthewnelson.kmp.tor.runtime.ctrl/TorCmdInterceptor.Companion.of|of(kotlin.Function1<io.matthewnelson.kmp.tor.runtime.ctrl.internal.TorCmdJob<*>,0:0?>){0§<io.matthewnelson.kmp.tor.runtime.core.ctrl.TorCmd<*>>}[0]
         final inline fun <#A2: reified io.matthewnelson.kmp.tor.runtime.core.ctrl/TorCmd<*>> intercept(crossinline kotlin/Function2<io.matthewnelson.kmp.tor.runtime.core/EnqueuedJob, #A2, #A2>): io.matthewnelson.kmp.tor.runtime.ctrl/TorCmdInterceptor<#A2> // io.matthewnelson.kmp.tor.runtime.ctrl/TorCmdInterceptor.Companion.intercept|intercept(kotlin.Function2<io.matthewnelson.kmp.tor.runtime.core.EnqueuedJob,0:0,0:0>){0§<io.matthewnelson.kmp.tor.runtime.core.ctrl.TorCmd<*>>}[0]
     }
-}
-
-final class <#A: kotlin/Any> io.matthewnelson.kmp.tor.runtime.ctrl.internal/TorCmdJob : io.matthewnelson.kmp.tor.runtime.core/EnqueuedJob { // io.matthewnelson.kmp.tor.runtime.ctrl.internal/TorCmdJob|null[0]
-    final val cmd // io.matthewnelson.kmp.tor.runtime.ctrl.internal/TorCmdJob.cmd|{}cmd[0]
-        final fun <get-cmd>(): io.matthewnelson.kmp.tor.runtime.core.ctrl/TorCmd<#A> // io.matthewnelson.kmp.tor.runtime.ctrl.internal/TorCmdJob.cmd.<get-cmd>|<get-cmd>(){}[0]
 }
 
 final class io.matthewnelson.kmp.tor.runtime.ctrl/TempTorCmdQueue : io.matthewnelson.kmp.tor.runtime.core.ctrl/TorCmd.Unprivileged.Processor, io.matthewnelson.kmp.tor.runtime.core/Destroyable { // io.matthewnelson.kmp.tor.runtime.ctrl/TempTorCmdQueue|null[0]
@@ -109,5 +105,3 @@ final class io.matthewnelson.kmp.tor.runtime.ctrl/TempTorCmdQueue : io.matthewne
     final fun destroy() // io.matthewnelson.kmp.tor.runtime.ctrl/TempTorCmdQueue.destroy|destroy(){}[0]
     final fun isDestroyed(): kotlin/Boolean // io.matthewnelson.kmp.tor.runtime.ctrl/TempTorCmdQueue.isDestroyed|isDestroyed(){}[0]
 }
-
-final inline fun (io.matthewnelson.kmp.tor.runtime.core/ItBlock<kotlin/String>).io.matthewnelson.kmp.tor.runtime.ctrl.internal/commonAsDebugger(crossinline kotlin/Function0<kotlin/Boolean>): io.matthewnelson.kmp.tor.runtime.ctrl/TorCtrl.Debugger // io.matthewnelson.kmp.tor.runtime.ctrl.internal/commonAsDebugger|commonAsDebugger@io.matthewnelson.kmp.tor.runtime.core.ItBlock<kotlin.String>(kotlin.Function0<kotlin.Boolean>){}[0]

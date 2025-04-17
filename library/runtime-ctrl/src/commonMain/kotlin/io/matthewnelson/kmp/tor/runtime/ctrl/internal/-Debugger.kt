@@ -17,17 +17,8 @@
 
 package io.matthewnelson.kmp.tor.runtime.ctrl.internal
 
-import io.matthewnelson.kmp.tor.runtime.core.ItBlock
 import io.matthewnelson.kmp.tor.runtime.core.UncaughtException
 import io.matthewnelson.kmp.tor.runtime.ctrl.TorCtrl.Debugger
-
-@PublishedApi
-internal inline fun ItBlock<String>.commonAsDebugger(
-    crossinline isEnabled: () -> Boolean,
-): Debugger = object : Debugger() {
-    override fun isEnabled(): Boolean = isEnabled.invoke()
-    override fun invoke(log: String) { this@commonAsDebugger(log) }
-}
 
 internal inline fun Debugger?.d(lazyText: () -> String) {
     if (this?.isEnabled() != true) return

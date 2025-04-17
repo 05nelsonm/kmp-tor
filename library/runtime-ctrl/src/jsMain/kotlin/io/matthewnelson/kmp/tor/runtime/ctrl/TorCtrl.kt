@@ -26,6 +26,7 @@ import io.matthewnelson.kmp.tor.runtime.core.*
 import io.matthewnelson.kmp.tor.runtime.core.net.IPAddress
 import io.matthewnelson.kmp.tor.runtime.core.net.IPSocketAddress
 import io.matthewnelson.kmp.tor.runtime.core.ctrl.TorCmd
+import io.matthewnelson.kmp.tor.runtime.ctrl.TorCtrl.Debugger.Companion.asDebugger
 import io.matthewnelson.kmp.tor.runtime.ctrl.internal.*
 import kotlinx.coroutines.*
 import org.khronos.webgl.Uint8Array
@@ -90,7 +91,10 @@ public actual interface TorCtrl : Destroyable, TorEvent.Processor, TorCmd.Privil
 
             public actual inline fun ItBlock<String>.asDebugger(
                 crossinline isEnabled: () -> Boolean,
-            ): Debugger = commonAsDebugger(isEnabled)
+            ): Debugger = object : Debugger() {
+                override fun isEnabled(): Boolean = isEnabled.invoke()
+                override fun invoke(log: String) = this@asDebugger(log)
+            }
         }
     }
 
@@ -167,7 +171,7 @@ public actual interface TorCtrl : Destroyable, TorEvent.Processor, TorCmd.Privil
             observers,
             interceptors,
             defaultExecutor,
-            debugger?.commonAsDebugger { true },
+            debugger?.asDebugger { true },
             handler,
         )
 
