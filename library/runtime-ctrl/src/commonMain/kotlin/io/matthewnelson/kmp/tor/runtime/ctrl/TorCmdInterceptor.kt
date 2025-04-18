@@ -13,6 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
+@file:Suppress("unused")
+
 package io.matthewnelson.kmp.tor.runtime.ctrl
 
 import io.matthewnelson.kmp.tor.runtime.core.EnqueuedJob
@@ -52,15 +54,15 @@ import kotlin.jvm.JvmSynthetic
  *
  * @see [intercept]
  * */
-public class TorCmdInterceptor<C: TorCmd<*>> private constructor(
-    private val _intercept: (job: TorCmdJob<*>) -> C?,
+public class TorCmdInterceptor<C: TorCmd<*>> @PublishedApi internal constructor(
+    private val _intercept: (job: EnqueuedJob, cmd: TorCmd<*>) -> TorCmd<*>?,
 ) {
 
     @JvmSynthetic
     internal fun invoke(job: TorCmdJob<*>): TorCmd<*>? {
         if (job.state != EnqueuedJob.State.Executing) return null
 
-        val result = _intercept(job) ?: return null
+        val result = _intercept(job, job.cmd) ?: return null
 
         if (job.cmd is TorCmd.Onion.Add) return null
         if (job.cmd is TorCmd.Onion.Delete) return null
@@ -81,16 +83,9 @@ public class TorCmdInterceptor<C: TorCmd<*>> private constructor(
          * */
         @JvmStatic
         public inline fun <reified C: TorCmd<*>> intercept(
-            crossinline intercept: (job: EnqueuedJob, cmd: C) -> C
-        ): TorCmdInterceptor<C> = of { job ->
-            if (job.cmd !is C) return@of null
-            intercept(job, job.cmd)
+            crossinline intercept: (job: EnqueuedJob, cmd: C) -> C,
+        ): TorCmdInterceptor<C> = TorCmdInterceptor { job, cmd ->
+            if (cmd !is C) null else intercept(job, cmd)
         }
-
-        @JvmSynthetic
-        @PublishedApi
-        internal fun <C: TorCmd<*>> of(
-            intercept: (job: TorCmdJob<*>) -> C?,
-        ): TorCmdInterceptor<C> = TorCmdInterceptor(intercept)
     }
 }

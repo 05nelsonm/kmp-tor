@@ -27,7 +27,7 @@ import kotlin.test.*
 class ActionJobUnitTest {
 
     private val handler = UncaughtException.Handler.THROW
-    private val tempQueue = TorCtrl.Factory(debugger = null, handler = handler).tempQueue()
+    private val tempQueue = TorCtrl.Factory(debug = null, handler = handler).tempQueue()
 
     @Test
     fun givenStart_whenImmediate_thenIsExecuting() {
