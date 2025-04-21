@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## Version 2.2.1 (2025-04-21)
+ - Fixes `JPMS` module access error [[#585]][585]
+ - Mitigate unnecessary debug log creation [[#582]][582]
+
 ## Version 2.2.0 (2025-03-25)
  - Adds ability to generate `ED25519_V3` and `X25519` public/private key pairs [[#579]][579]
  - Improves `OnionAddress.V3` validation [[#576]][576]
@@ -569,6 +573,8 @@
 [578]: https://github.com/05nelsonm/kmp-tor/pull/578
 [579]: https://github.com/05nelsonm/kmp-tor/pull/579
 [580]: https://github.com/05nelsonm/kmp-tor/pull/580
+[582]: https://github.com/05nelsonm/kmp-tor/pull/582
+[585]: https://github.com/05nelsonm/kmp-tor/pull/585
 
 [kmp-tor-binary-66]: https://github.com/05nelsonm/kmp-tor-binary/issues/66
 [kmp-tor-binary-75]: https://github.com/05nelsonm/kmp-tor-binary/pull/75
