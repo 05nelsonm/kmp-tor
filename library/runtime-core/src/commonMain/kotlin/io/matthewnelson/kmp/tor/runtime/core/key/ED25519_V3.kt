@@ -18,18 +18,18 @@
 package io.matthewnelson.kmp.tor.runtime.core.key
 
 import io.matthewnelson.encoding.core.Decoder.Companion.decodeToByteArrayOrNull
-import io.matthewnelson.kmp.tor.runtime.core.internal.containsNon0Byte
-import io.matthewnelson.kmp.tor.runtime.core.internal.generateED25519KeyPair
+import io.matthewnelson.kmp.tor.runtime.core.internal.*
 import io.matthewnelson.kmp.tor.runtime.core.net.OnionAddress
 import io.matthewnelson.kmp.tor.runtime.core.net.OnionAddress.V3.Companion.toOnionAddressV3OrNull
-import io.matthewnelson.kmp.tor.runtime.core.internal.tryDecodeOrNull
 import io.matthewnelson.kmp.tor.runtime.core.key.ED25519_V3.PublicKey.Companion.toED25519_V3PublicKey
 import io.matthewnelson.kmp.tor.runtime.core.key.ED25519_V3.PublicKey.Companion.toED25519_V3PublicKeyOrNull
 import io.matthewnelson.kmp.tor.runtime.core.net.OnionAddress.V3.Companion.toOnionAddressV3
 import org.kotlincrypto.error.GeneralSecurityException
 import org.kotlincrypto.error.InvalidKeyException
+import org.kotlincrypto.error.KeyException
 import org.kotlincrypto.random.CryptoRand
 import kotlin.jvm.JvmName
+import kotlin.jvm.JvmOverloads
 import kotlin.jvm.JvmStatic
 
 /**
@@ -43,12 +43,34 @@ public object ED25519_V3: KeyType.Address<ED25519_V3.PublicKey, ED25519_V3.Priva
     public override fun algorithm(): String = "ED25519-V3"
 
     /**
-     * Generates a new ed25519 key pair, suitable for use with tor hidden services.
+     * Generates a new ed25519 key pair, suitable for use with tor hidden services. Utilizes
+     * [CryptoRand.Default] as the source for procuring cryptographically secure random data.
      *
      * @throws [GeneralSecurityException] if procurement of cryptographically secure random data fails
      * */
     @JvmStatic
-    public fun generateKeyPair(): Pair<PublicKey, PrivateKey> = CryptoRand.Default.generateED25519KeyPair()
+    public fun generateKeyPair(): Pair<PublicKey, PrivateKey> {
+        val sk = PrivateKey.generate()
+        return sk.generatePublicKey() to sk
+    }
+
+    /**
+     * Generates a new ed25519 key pair, suitable for use with tor hidden services. Utilizes
+     * 32-bytes from provided [seed], starting at index [offset].
+     *
+     * @param [seed] 32-byte (minimum) array to use for generating the [PrivateKey]
+     * @param [offset] the index (inclusive) to start at when copying bytes from [seed]
+     * @param [clear] if `true`, [seed] indices from [offset] to [offset] + 32 (exclusive) will be set to `0`
+     *
+     * @throws [IndexOutOfBoundsException] if [seed] and/or [offset] are inappropriate sizes
+     * @throws [GeneralSecurityException] if generated keys fail checksum validation, or [seed] indices are all 0 bytes
+     * */
+    @JvmStatic
+    @JvmOverloads
+    public fun generateKeyPair(seed: ByteArray, offset: Int, clear: Boolean = true): Pair<PublicKey, PrivateKey> {
+        val sk = PrivateKey.generate(seed, offset, clear)
+        return sk.generatePublicKey() to sk
+    }
 
     /**
      * A 32 byte ed25519 public key.
@@ -225,7 +247,40 @@ public object ED25519_V3: KeyType.Address<ED25519_V3.PublicKey, ED25519_V3.Priva
          * */
         public override fun algorithm(): String = ED25519_V3.algorithm()
 
+        /**
+         * Generates the [PublicKey] associated with this [PrivateKey].
+         *
+         * @throws [IllegalStateException] if [isDestroyed] is `true`
+         * @throws [KeyException] if checksum validation fails
+         * */
+        public fun generatePublicKey(): PublicKey = toPublicKey()
+
         public companion object {
+
+            /**
+             * Generates a new [PrivateKey] using [CryptoRand.Default] as the source for procuring
+             * cryptographically secure random data.
+             *
+             * @throws [GeneralSecurityException] if procurement of cryptographically secure random data fails
+             * */
+            @JvmStatic
+            public fun generate(): PrivateKey = CryptoRand.Default.generateED25519PrivateKey()
+
+            /**
+             * Generates a new [PrivateKey] using 32-bytes from provided [seed], starting at index [offset].
+             *
+             * @param [seed] 32-byte (minimum) array
+             * @param [offset] the index (inclusive) to start at when copying bytes from [seed]
+             * @param [clear] if `true`, [seed] indices from [offset] to [offset] + 32 (exclusive) will be set to `0`
+             *
+             * @throws [IndexOutOfBoundsException] if [seed] and/or [offset] are inappropriate sizes
+             * @throws [GeneralSecurityException] if generated key fail checksum validation, or [seed] indices are all 0 bytes
+             * */
+            @JvmStatic
+            @JvmOverloads
+            public fun generate(seed: ByteArray, offset: Int, clear: Boolean = true): PrivateKey {
+                return seed.asSingleCryptoRand(offset, SEED_SIZE, clear).generateED25519PrivateKey()
+            }
 
             /**
              * Parses a String for an ED25519-V3 private key.

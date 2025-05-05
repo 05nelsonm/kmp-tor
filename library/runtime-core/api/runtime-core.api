@@ -4032,12 +4032,19 @@ public final class io/matthewnelson/kmp/tor/runtime/core/key/ED25519_V3 : io/mat
 	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/core/key/ED25519_V3;
 	public fun algorithm ()Ljava/lang/String;
 	public static final fun generateKeyPair ()Lkotlin/Pair;
+	public static final fun generateKeyPair ([BI)Lkotlin/Pair;
+	public static final fun generateKeyPair ([BIZ)Lkotlin/Pair;
+	public static synthetic fun generateKeyPair$default ([BIZILjava/lang/Object;)Lkotlin/Pair;
 }
 
 public final class io/matthewnelson/kmp/tor/runtime/core/key/ED25519_V3$PrivateKey : io/matthewnelson/kmp/tor/runtime/core/key/AddressKey$Private {
 	public static final field Companion Lio/matthewnelson/kmp/tor/runtime/core/key/ED25519_V3$PrivateKey$Companion;
 	public synthetic fun <init> ([BLkotlin/jvm/internal/DefaultConstructorMarker;)V
 	public fun algorithm ()Ljava/lang/String;
+	public static final fun generate ()Lio/matthewnelson/kmp/tor/runtime/core/key/ED25519_V3$PrivateKey;
+	public static final fun generate ([BI)Lio/matthewnelson/kmp/tor/runtime/core/key/ED25519_V3$PrivateKey;
+	public static final fun generate ([BIZ)Lio/matthewnelson/kmp/tor/runtime/core/key/ED25519_V3$PrivateKey;
+	public final fun generatePublicKey ()Lio/matthewnelson/kmp/tor/runtime/core/key/ED25519_V3$PublicKey;
 	public static final fun get (Ljava/lang/String;)Lio/matthewnelson/kmp/tor/runtime/core/key/ED25519_V3$PrivateKey;
 	public static final fun get ([B)Lio/matthewnelson/kmp/tor/runtime/core/key/ED25519_V3$PrivateKey;
 	public static final fun getOrNull (Ljava/lang/String;)Lio/matthewnelson/kmp/tor/runtime/core/key/ED25519_V3$PrivateKey;
@@ -4045,6 +4052,10 @@ public final class io/matthewnelson/kmp/tor/runtime/core/key/ED25519_V3$PrivateK
 }
 
 public final class io/matthewnelson/kmp/tor/runtime/core/key/ED25519_V3$PrivateKey$Companion {
+	public final fun generate ()Lio/matthewnelson/kmp/tor/runtime/core/key/ED25519_V3$PrivateKey;
+	public final fun generate ([BI)Lio/matthewnelson/kmp/tor/runtime/core/key/ED25519_V3$PrivateKey;
+	public final fun generate ([BIZ)Lio/matthewnelson/kmp/tor/runtime/core/key/ED25519_V3$PrivateKey;
+	public static synthetic fun generate$default (Lio/matthewnelson/kmp/tor/runtime/core/key/ED25519_V3$PrivateKey$Companion;[BIZILjava/lang/Object;)Lio/matthewnelson/kmp/tor/runtime/core/key/ED25519_V3$PrivateKey;
 	public final fun get (Ljava/lang/String;)Lio/matthewnelson/kmp/tor/runtime/core/key/ED25519_V3$PrivateKey;
 	public final fun get ([B)Lio/matthewnelson/kmp/tor/runtime/core/key/ED25519_V3$PrivateKey;
 	public final fun getOrNull (Ljava/lang/String;)Lio/matthewnelson/kmp/tor/runtime/core/key/ED25519_V3$PrivateKey;
@@ -4131,12 +4142,19 @@ public final class io/matthewnelson/kmp/tor/runtime/core/key/X25519 : io/matthew
 	public static final field INSTANCE Lio/matthewnelson/kmp/tor/runtime/core/key/X25519;
 	public fun algorithm ()Ljava/lang/String;
 	public static final fun generateKeyPair ()Lkotlin/Pair;
+	public static final fun generateKeyPair ([BI)Lkotlin/Pair;
+	public static final fun generateKeyPair ([BIZ)Lkotlin/Pair;
+	public static synthetic fun generateKeyPair$default ([BIZILjava/lang/Object;)Lkotlin/Pair;
 }
 
 public final class io/matthewnelson/kmp/tor/runtime/core/key/X25519$PrivateKey : io/matthewnelson/kmp/tor/runtime/core/key/AuthKey$Private {
 	public static final field Companion Lio/matthewnelson/kmp/tor/runtime/core/key/X25519$PrivateKey$Companion;
 	public synthetic fun <init> ([BLkotlin/jvm/internal/DefaultConstructorMarker;)V
 	public fun algorithm ()Ljava/lang/String;
+	public static final fun generate ()Lio/matthewnelson/kmp/tor/runtime/core/key/X25519$PrivateKey;
+	public static final fun generate ([BI)Lio/matthewnelson/kmp/tor/runtime/core/key/X25519$PrivateKey;
+	public static final fun generate ([BIZ)Lio/matthewnelson/kmp/tor/runtime/core/key/X25519$PrivateKey;
+	public final fun generatePublicKey ()Lio/matthewnelson/kmp/tor/runtime/core/key/X25519$PublicKey;
 	public static final fun get (Ljava/lang/String;)Lio/matthewnelson/kmp/tor/runtime/core/key/X25519$PrivateKey;
 	public static final fun get ([B)Lio/matthewnelson/kmp/tor/runtime/core/key/X25519$PrivateKey;
 	public static final fun getOrNull (Ljava/lang/String;)Lio/matthewnelson/kmp/tor/runtime/core/key/X25519$PrivateKey;
@@ -4144,6 +4162,10 @@ public final class io/matthewnelson/kmp/tor/runtime/core/key/X25519$PrivateKey :
 }
 
 public final class io/matthewnelson/kmp/tor/runtime/core/key/X25519$PrivateKey$Companion {
+	public final fun generate ()Lio/matthewnelson/kmp/tor/runtime/core/key/X25519$PrivateKey;
+	public final fun generate ([BI)Lio/matthewnelson/kmp/tor/runtime/core/key/X25519$PrivateKey;
+	public final fun generate ([BIZ)Lio/matthewnelson/kmp/tor/runtime/core/key/X25519$PrivateKey;
+	public static synthetic fun generate$default (Lio/matthewnelson/kmp/tor/runtime/core/key/X25519$PrivateKey$Companion;[BIZILjava/lang/Object;)Lio/matthewnelson/kmp/tor/runtime/core/key/X25519$PrivateKey;
 	public final fun get (Ljava/lang/String;)Lio/matthewnelson/kmp/tor/runtime/core/key/X25519$PrivateKey;
 	public final fun get ([B)Lio/matthewnelson/kmp/tor/runtime/core/key/X25519$PrivateKey;
 	public final fun getOrNull (Ljava/lang/String;)Lio/matthewnelson/kmp/tor/runtime/core/key/X25519$PrivateKey;

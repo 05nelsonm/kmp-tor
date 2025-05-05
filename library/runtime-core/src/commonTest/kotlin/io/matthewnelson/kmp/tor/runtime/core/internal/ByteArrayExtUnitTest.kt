@@ -15,22 +15,69 @@
  **/
 package io.matthewnelson.kmp.tor.runtime.core.internal
 
-import kotlin.test.Test
-import kotlin.test.assertFalse
-import kotlin.test.assertTrue
+import org.kotlincrypto.error.GeneralSecurityException
+import kotlin.test.*
 
 class ByteArrayExtUnitTest {
 
     @Test
     fun givenAll0Bytes_whenContainsNon0Byte_thenReturnsFalse() {
         val b = ByteArray(35) { 0 }
-        assertFalse(b.containsNon0Byte(limit = b.size))
+        assertFalse(b.containsNon0Byte(len = b.size))
     }
 
     @Test
     fun givenNotAll0Bytes_whenContainsNon0Byte_thenReturnsFalse() {
         val b = ByteArray(35) { 0 }
         b[0] = 5.toByte()
-        assertTrue(b.containsNon0Byte(limit = b.size))
+        assertTrue(b.containsNon0Byte(len = b.size))
+        assertFalse(b.containsNon0Byte(offset = 1, len = b.size - 1))
+    }
+
+    @Test
+    fun givenSingleCryptoRand_whenOffsetNegative_thenThrowsException() {
+        assertFailsWith<IndexOutOfBoundsException> {
+            ByteArray(1) { it.toByte() }.asSingleCryptoRand(offset = -1, len = 1, clear = true)
+        }
+    }
+
+    @Test
+    fun givenSingleCryptoRand_whenLenExceedsAvailable_thenThrowsException() {
+        assertFailsWith<IndexOutOfBoundsException> {
+            ByteArray(1) { it.toByte() }.asSingleCryptoRand(offset = 0, len = 2, clear = true)
+        }
+        assertFailsWith<IndexOutOfBoundsException> {
+            ByteArray(2) { it.toByte() }.asSingleCryptoRand(offset = 1, len = 2, clear = true)
+        }
+    }
+
+    @Test
+    fun givenSingleCryptoRand_whenAllZeroBytes_thenThrowsException() {
+        assertFailsWith<GeneralSecurityException> {
+            ByteArray(20).asSingleCryptoRand(offset = 0, len = 1, clear = true)
+        }
+    }
+
+    @Test
+    fun givenSingleCryptoRand_whenBufSizeNotEqualLen_thenThrowsException() {
+        val random = ByteArray(2) { it.toByte() }.asSingleCryptoRand(offset = 0, len = 2, clear = true)
+        assertFailsWith<IllegalArgumentException> { random.nextBytes(ByteArray(1)) }
+    }
+
+    @Test
+    fun givenSingleCryptoRand_whenAlreadyConsumed_thenThrowsException() {
+        val random = ByteArray(2) { it.toByte() }.asSingleCryptoRand(offset = 0, len = 2, clear = true)
+        random.nextBytes(ByteArray(2))
+        assertFailsWith<IllegalStateException> { random.nextBytes(ByteArray(2)) }
+    }
+
+    @Test
+    fun givenSingleCryptoRand_whenClearTrue_thenIndicesAreCleared() {
+        val source = ByteArray(6) { (it + 1).toByte() }
+        val random = source.asSingleCryptoRand(offset = 2, len = 2, clear = true)
+        val actual = random.nextBytes(ByteArray(2))
+        assertContentEquals(byteArrayOf(1, 2, 0, 0, 5, 6), source)
+        assertEquals(3, actual[0])
+        assertEquals(4, actual[1])
     }
 }

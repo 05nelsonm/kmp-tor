@@ -21,6 +21,7 @@ import io.matthewnelson.encoding.base16.Base16
 import io.matthewnelson.encoding.base64.Base64
 import io.matthewnelson.encoding.core.Decoder.Companion.decodeToByteArray
 import io.matthewnelson.encoding.core.Encoder.Companion.encodeToString
+import io.matthewnelson.kmp.tor.runtime.core.internal.containsNon0Byte
 import io.matthewnelson.kmp.tor.runtime.core.net.OnionAddressV3UnitTest
 import io.matthewnelson.kmp.tor.runtime.core.key.ED25519_V3.PrivateKey.Companion.toED25519_V3PrivateKey
 import io.matthewnelson.kmp.tor.runtime.core.key.ED25519_V3.PrivateKey.Companion.toED25519_V3PrivateKeyOrNull
@@ -117,6 +118,14 @@ class ED25519_V3UnitTest: AddressKeyBaseUnitTest<ED25519_V3.PublicKey, ED25519_V
         assertInvalidKey(listOf("Key is blank")){ blank.encodeToString(Base16()).toED25519_V3PrivateKey() }
         assertNull(PRIVATE_KEY_B16.dropLast(2).toED25519_V3PrivateKeyOrNull())
         assertNull(PRIVATE_KEY_B16.dropLast(2).decodeToByteArray(Base16).toED25519_V3PrivateKeyOrNull())
+    }
+
+    @Test
+    fun givenSeed_whenGenerateKeyPair_thenFunctionsAsExpected() {
+        val seed = ByteArray(ED25519_V3.PrivateKey.SEED_SIZE) { it.toByte() }
+        val kp = ED25519_V3.generateKeyPair(seed, offset = 0, clear = true)
+        assertEquals("AOQQPP7TZYIL4HLQ3UMOOS6ATFT6JVRQTOSQ2XY53SDGIESVGG4A", kp.first.base32())
+        assertFalse(seed.containsNon0Byte(ED25519_V3.PrivateKey.SEED_SIZE))
     }
 
     companion object {

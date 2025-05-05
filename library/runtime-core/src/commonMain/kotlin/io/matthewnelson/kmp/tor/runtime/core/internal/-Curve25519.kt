@@ -24,24 +24,33 @@ import io.matthewnelson.kmp.tor.runtime.core.key.X25519
 import io.matthewnelson.kmp.tor.runtime.core.key.X25519.PrivateKey.Companion.toX25519PrivateKey
 import io.matthewnelson.kmp.tor.runtime.core.key.X25519.PublicKey.Companion.toX25519PublicKey
 import org.kotlincrypto.bitops.endian.Endian.Little.lePackIntoUnsafe
-import org.kotlincrypto.error.GeneralSecurityException
 import org.kotlincrypto.error.KeyException
 import org.kotlincrypto.hash.sha2.SHA512
 import org.kotlincrypto.random.CryptoRand
+import org.kotlincrypto.random.RandomnessProcurementException
 import kotlin.LazyThreadSafetyMode.NONE
 import kotlin.jvm.JvmInline
 import kotlin.math.min
 
-@Throws(GeneralSecurityException::class)
-internal fun CryptoRand.generateED25519KeyPair(): Pair<ED25519_V3.PublicKey, ED25519_V3.PrivateKey> {
-    val pk = ByteArray(ED25519_V3.PublicKey.BYTE_SIZE)
+@Throws(RandomnessProcurementException::class)
+internal fun CryptoRand.generateED25519PrivateKey(): ED25519_V3.PrivateKey {
     val sk = ByteArray(ED25519_V3.PrivateKey.BYTE_SIZE)
-
     val seed = ByteArray(ED25519_V3.PrivateKey.SEED_SIZE)
     nextBytes(seed)
     SHA512().apply { update(seed) }.digestInto(sk, 0)
     sk.clampPrivateKey()
-    val privateKey = sk.toED25519_V3PrivateKey()
+    val key = sk.toED25519_V3PrivateKey()
+
+    sk.fill(0)
+    seed.fill(0)
+
+    return key
+}
+
+@Throws(IllegalStateException::class, KeyException::class)
+internal fun ED25519_V3.PrivateKey.toPublicKey(): ED25519_V3.PublicKey {
+    val sk = encoded()
+    val pk = ByteArray(ED25519_V3.PublicKey.BYTE_SIZE)
 
     val p = GE.Accum()
     val q = GE.Affine()
@@ -49,7 +58,7 @@ internal fun CryptoRand.generateED25519KeyPair(): Pair<ED25519_V3.PublicKey, ED2
     GE.normalizeToAffine(p, q)
     if (GE.checkPoint(q) == 0) throw KeyException("checkPoint == 0")
     GE.encodePoint(q, pk)
-    val publicKey = pk.toED25519_V3PublicKey()
+    val key = pk.toED25519_V3PublicKey()
 
     FE.zero(p.x)
     FE.zero(p.y)
@@ -58,20 +67,28 @@ internal fun CryptoRand.generateED25519KeyPair(): Pair<ED25519_V3.PublicKey, ED2
     FE.zero(p.v)
     FE.zero(q.x)
     FE.zero(q.y)
-    seed.fill(0)
     pk.fill(0)
     sk.fill(0)
 
-    return publicKey to privateKey
+    return key
 }
 
-@Throws(GeneralSecurityException::class)
-internal fun CryptoRand.generateX25519KeyPair(): Pair<X25519.PublicKey, X25519.PrivateKey> {
-    val pk = ByteArray(X25519.PublicKey.BYTE_SIZE)
+@Throws(RandomnessProcurementException::class)
+internal fun CryptoRand.generateX25519PrivateKey(): X25519.PrivateKey {
     val sk = ByteArray(X25519.PrivateKey.BYTE_SIZE)
     nextBytes(sk)
     sk.clampPrivateKey()
-    val privateKey = sk.toX25519PrivateKey()
+    val key = sk.toX25519PrivateKey()
+
+    sk.fill(0)
+
+    return key
+}
+
+@Throws(IllegalStateException::class, KeyException::class)
+internal fun X25519.PrivateKey.toPublicKey(): X25519.PublicKey {
+    val sk = encoded()
+    val pk = ByteArray(X25519.PublicKey.BYTE_SIZE)
 
     val p = GE.Accum()
     GE.scalarMultBase(sk, p)
@@ -89,7 +106,7 @@ internal fun CryptoRand.generateX25519KeyPair(): Pair<X25519.PublicKey, X25519.P
         sourceIndexStart = 0,
         sourceIndexEnd = g.data.size,
     )
-    val publicKey = pk.toX25519PublicKey()
+    val key = pk.toX25519PublicKey()
 
     FE.zero(p.x)
     FE.zero(p.y)
@@ -100,7 +117,7 @@ internal fun CryptoRand.generateX25519KeyPair(): Pair<X25519.PublicKey, X25519.P
     pk.fill(0)
     sk.fill(0)
 
-    return publicKey to privateKey
+    return key
 }
 
 private inline fun ByteArray.clampPrivateKey(): ByteArray = apply {
