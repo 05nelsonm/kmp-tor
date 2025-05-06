@@ -19,10 +19,13 @@ import io.matthewnelson.encoding.base16.Base16
 import io.matthewnelson.encoding.base64.Base64
 import io.matthewnelson.encoding.core.Decoder.Companion.decodeToByteArray
 import io.matthewnelson.encoding.core.Encoder.Companion.encodeToString
+import io.matthewnelson.kmp.tor.runtime.core.internal.containsNon0Byte
 import io.matthewnelson.kmp.tor.runtime.core.key.X25519.PrivateKey.Companion.toX25519PrivateKey
 import io.matthewnelson.kmp.tor.runtime.core.key.X25519.PublicKey.Companion.toX25519PublicKey
 import kotlin.test.Test
 import kotlin.test.assertContentEquals
+import kotlin.test.assertEquals
+import kotlin.test.assertFalse
 
 class X25519UnitTest: AuthKeyBaseUnitTest<X25519.PublicKey, X25519.PrivateKey>(
     keyType = X25519,
@@ -76,6 +79,14 @@ class X25519UnitTest: AuthKeyBaseUnitTest<X25519.PublicKey, X25519.PrivateKey>(
         assertInvalidKey(listOf("Key is blank")) { blank.encodeToString(Base16()).toX25519PrivateKey() }
         assertInvalidKey(listOf("Tried base 16/32/64")) { PRIVATE_KEY_B16.dropLast(2).toX25519PrivateKey() }
         assertInvalidKey(listOf("Invalid array size")) { PRIVATE_KEY_B16.dropLast(2).decodeToByteArray(Base16).toX25519PrivateKey() }
+    }
+
+    @Test
+    fun givenSeed_whenGenerateKeyPair_thenFunctionsAsExected() {
+        val seed = ByteArray(X25519.PrivateKey.BYTE_SIZE) { it.toByte() }
+        val kp = X25519.generateKeyPair(seed, offset = 0, clear = true)
+        assertEquals("R5AMLLNWR4SWESXFWIKOU5T2N3EU3AU5HV5V4GWRXJXT4IJYFBPQ", kp.first.base32())
+        assertFalse(seed.containsNon0Byte(X25519.PrivateKey.BYTE_SIZE))
     }
 
     companion object {

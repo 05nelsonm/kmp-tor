@@ -17,12 +17,46 @@
 
 package io.matthewnelson.kmp.tor.runtime.core.internal
 
-@Throws(IndexOutOfBoundsException::class)
-internal inline fun ByteArray.containsNon0Byte(limit: Int): Boolean {
+import org.kotlincrypto.error.GeneralSecurityException
+import org.kotlincrypto.random.CryptoRand
+import org.kotlincrypto.random.DelicateCryptoRandApi
+
+@Throws(IllegalArgumentException::class, IndexOutOfBoundsException::class)
+internal inline fun ByteArray.containsNon0Byte(len: Int): Boolean = containsNon0Byte(offset = 0, len)
+
+@Throws(IllegalArgumentException::class, IndexOutOfBoundsException::class)
+internal inline fun ByteArray.containsNon0Byte(offset: Int, len: Int): Boolean {
+    if (offset < 0) throw IndexOutOfBoundsException("offset[$offset] < 0")
+    if (len <= 0) throw IllegalArgumentException("len[$len] <= 0")
+    if (offset + len > size) throw IndexOutOfBoundsException("offset[$offset] + len[$len] > size[$size]")
+
     var z = 0
     var i = 0
-    while (i < limit) {
-        z += if (this[i++] == 0.toByte()) 1 else 0
+    while (i < len) {
+        z += if (this[offset + i++] == 0.toByte()) 1 else 0
     }
-    return z < limit
+    return z < len
+}
+
+@Throws(GeneralSecurityException::class, IllegalArgumentException::class, IndexOutOfBoundsException::class)
+internal inline fun ByteArray.asSingleCryptoRand(offset: Int, len: Int, clear: Boolean): CryptoRand {
+    if (!containsNon0Byte(offset, len)) throw GeneralSecurityException("array indices are blank (all 0 bytes)")
+
+    val source = this
+    var consumed = false
+
+    @OptIn(DelicateCryptoRandApi::class)
+    return object : CryptoRand() {
+        override fun nextBytes(buf: ByteArray): ByteArray {
+            check(!consumed) { "bytes have already been consumed" }
+            require(buf.size == len) { "buf.size[${buf.size}] != len[$len]" }
+            consumed = true
+            for (i in 0..<len) {
+                buf[i] = source[i + offset]
+                if (!clear) continue
+                source[i + offset] = 0
+            }
+            return buf
+        }
+    }
 }

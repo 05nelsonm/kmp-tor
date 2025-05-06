@@ -3815,15 +3815,19 @@ sealed class io.matthewnelson.kmp.tor.runtime.core/TorEvent : io.matthewnelson.k
 final object io.matthewnelson.kmp.tor.runtime.core.key/ED25519_V3 : io.matthewnelson.kmp.tor.runtime.core.key/KeyType.Address<io.matthewnelson.kmp.tor.runtime.core.key/ED25519_V3.PublicKey, io.matthewnelson.kmp.tor.runtime.core.key/ED25519_V3.PrivateKey> { // io.matthewnelson.kmp.tor.runtime.core.key/ED25519_V3|null[0]
     final fun algorithm(): kotlin/String // io.matthewnelson.kmp.tor.runtime.core.key/ED25519_V3.algorithm|algorithm(){}[0]
     final fun generateKeyPair(): kotlin/Pair<io.matthewnelson.kmp.tor.runtime.core.key/ED25519_V3.PublicKey, io.matthewnelson.kmp.tor.runtime.core.key/ED25519_V3.PrivateKey> // io.matthewnelson.kmp.tor.runtime.core.key/ED25519_V3.generateKeyPair|generateKeyPair(){}[0]
+    final fun generateKeyPair(kotlin/ByteArray, kotlin/Int, kotlin/Boolean = ...): kotlin/Pair<io.matthewnelson.kmp.tor.runtime.core.key/ED25519_V3.PublicKey, io.matthewnelson.kmp.tor.runtime.core.key/ED25519_V3.PrivateKey> // io.matthewnelson.kmp.tor.runtime.core.key/ED25519_V3.generateKeyPair|generateKeyPair(kotlin.ByteArray;kotlin.Int;kotlin.Boolean){}[0]
 
     final class PrivateKey : io.matthewnelson.kmp.tor.runtime.core.key/AddressKey.Private { // io.matthewnelson.kmp.tor.runtime.core.key/ED25519_V3.PrivateKey|null[0]
         final fun algorithm(): kotlin/String // io.matthewnelson.kmp.tor.runtime.core.key/ED25519_V3.PrivateKey.algorithm|algorithm(){}[0]
+        final fun generatePublicKey(): io.matthewnelson.kmp.tor.runtime.core.key/ED25519_V3.PublicKey // io.matthewnelson.kmp.tor.runtime.core.key/ED25519_V3.PrivateKey.generatePublicKey|generatePublicKey(){}[0]
 
         final object Companion { // io.matthewnelson.kmp.tor.runtime.core.key/ED25519_V3.PrivateKey.Companion|null[0]
             final fun (kotlin/ByteArray).toED25519_V3PrivateKey(): io.matthewnelson.kmp.tor.runtime.core.key/ED25519_V3.PrivateKey // io.matthewnelson.kmp.tor.runtime.core.key/ED25519_V3.PrivateKey.Companion.toED25519_V3PrivateKey|toED25519_V3PrivateKey@kotlin.ByteArray(){}[0]
             final fun (kotlin/ByteArray).toED25519_V3PrivateKeyOrNull(): io.matthewnelson.kmp.tor.runtime.core.key/ED25519_V3.PrivateKey? // io.matthewnelson.kmp.tor.runtime.core.key/ED25519_V3.PrivateKey.Companion.toED25519_V3PrivateKeyOrNull|toED25519_V3PrivateKeyOrNull@kotlin.ByteArray(){}[0]
             final fun (kotlin/String).toED25519_V3PrivateKey(): io.matthewnelson.kmp.tor.runtime.core.key/ED25519_V3.PrivateKey // io.matthewnelson.kmp.tor.runtime.core.key/ED25519_V3.PrivateKey.Companion.toED25519_V3PrivateKey|toED25519_V3PrivateKey@kotlin.String(){}[0]
             final fun (kotlin/String).toED25519_V3PrivateKeyOrNull(): io.matthewnelson.kmp.tor.runtime.core.key/ED25519_V3.PrivateKey? // io.matthewnelson.kmp.tor.runtime.core.key/ED25519_V3.PrivateKey.Companion.toED25519_V3PrivateKeyOrNull|toED25519_V3PrivateKeyOrNull@kotlin.String(){}[0]
+            final fun generate(): io.matthewnelson.kmp.tor.runtime.core.key/ED25519_V3.PrivateKey // io.matthewnelson.kmp.tor.runtime.core.key/ED25519_V3.PrivateKey.Companion.generate|generate(){}[0]
+            final fun generate(kotlin/ByteArray, kotlin/Int, kotlin/Boolean = ...): io.matthewnelson.kmp.tor.runtime.core.key/ED25519_V3.PrivateKey // io.matthewnelson.kmp.tor.runtime.core.key/ED25519_V3.PrivateKey.Companion.generate|generate(kotlin.ByteArray;kotlin.Int;kotlin.Boolean){}[0]
         }
     }
 
@@ -3845,15 +3849,19 @@ final object io.matthewnelson.kmp.tor.runtime.core.key/ED25519_V3 : io.matthewne
 final object io.matthewnelson.kmp.tor.runtime.core.key/X25519 : io.matthewnelson.kmp.tor.runtime.core.key/KeyType.Auth<io.matthewnelson.kmp.tor.runtime.core.key/X25519.PublicKey, io.matthewnelson.kmp.tor.runtime.core.key/X25519.PrivateKey> { // io.matthewnelson.kmp.tor.runtime.core.key/X25519|null[0]
     final fun algorithm(): kotlin/String // io.matthewnelson.kmp.tor.runtime.core.key/X25519.algorithm|algorithm(){}[0]
     final fun generateKeyPair(): kotlin/Pair<io.matthewnelson.kmp.tor.runtime.core.key/X25519.PublicKey, io.matthewnelson.kmp.tor.runtime.core.key/X25519.PrivateKey> // io.matthewnelson.kmp.tor.runtime.core.key/X25519.generateKeyPair|generateKeyPair(){}[0]
+    final fun generateKeyPair(kotlin/ByteArray, kotlin/Int, kotlin/Boolean = ...): kotlin/Pair<io.matthewnelson.kmp.tor.runtime.core.key/X25519.PublicKey, io.matthewnelson.kmp.tor.runtime.core.key/X25519.PrivateKey> // io.matthewnelson.kmp.tor.runtime.core.key/X25519.generateKeyPair|generateKeyPair(kotlin.ByteArray;kotlin.Int;kotlin.Boolean){}[0]
 
     final class PrivateKey : io.matthewnelson.kmp.tor.runtime.core.key/AuthKey.Private { // io.matthewnelson.kmp.tor.runtime.core.key/X25519.PrivateKey|null[0]
         final fun algorithm(): kotlin/String // io.matthewnelson.kmp.tor.runtime.core.key/X25519.PrivateKey.algorithm|algorithm(){}[0]
+        final fun generatePublicKey(): io.matthewnelson.kmp.tor.runtime.core.key/X25519.PublicKey // io.matthewnelson.kmp.tor.runtime.core.key/X25519.PrivateKey.generatePublicKey|generatePublicKey(){}[0]
 
         final object Companion { // io.matthewnelson.kmp.tor.runtime.core.key/X25519.PrivateKey.Companion|null[0]
             final fun (kotlin/ByteArray).toX25519PrivateKey(): io.matthewnelson.kmp.tor.runtime.core.key/X25519.PrivateKey // io.matthewnelson.kmp.tor.runtime.core.key/X25519.PrivateKey.Companion.toX25519PrivateKey|toX25519PrivateKey@kotlin.ByteArray(){}[0]
             final fun (kotlin/ByteArray).toX25519PrivateKeyOrNull(): io.matthewnelson.kmp.tor.runtime.core.key/X25519.PrivateKey? // io.matthewnelson.kmp.tor.runtime.core.key/X25519.PrivateKey.Companion.toX25519PrivateKeyOrNull|toX25519PrivateKeyOrNull@kotlin.ByteArray(){}[0]
             final fun (kotlin/String).toX25519PrivateKey(): io.matthewnelson.kmp.tor.runtime.core.key/X25519.PrivateKey // io.matthewnelson.kmp.tor.runtime.core.key/X25519.PrivateKey.Companion.toX25519PrivateKey|toX25519PrivateKey@kotlin.String(){}[0]
             final fun (kotlin/String).toX25519PrivateKeyOrNull(): io.matthewnelson.kmp.tor.runtime.core.key/X25519.PrivateKey? // io.matthewnelson.kmp.tor.runtime.core.key/X25519.PrivateKey.Companion.toX25519PrivateKeyOrNull|toX25519PrivateKeyOrNull@kotlin.String(){}[0]
+            final fun generate(): io.matthewnelson.kmp.tor.runtime.core.key/X25519.PrivateKey // io.matthewnelson.kmp.tor.runtime.core.key/X25519.PrivateKey.Companion.generate|generate(){}[0]
+            final fun generate(kotlin/ByteArray, kotlin/Int, kotlin/Boolean = ...): io.matthewnelson.kmp.tor.runtime.core.key/X25519.PrivateKey // io.matthewnelson.kmp.tor.runtime.core.key/X25519.PrivateKey.Companion.generate|generate(kotlin.ByteArray;kotlin.Int;kotlin.Boolean){}[0]
         }
     }
 

@@ -52,7 +52,8 @@ class Curve25519JvmUnitTest {
     @Test
     fun givenX25519_whenGenerateKeyPair_thenIsExpected() {
         val kps = crands.map { r ->
-            val (p, s) = r.generateX25519KeyPair()
+            val s = r.generateX25519PrivateKey()
+            val p = s.generatePublicKey()
             p.encoded() to s.encoded()
         }
 
@@ -76,7 +77,8 @@ class Curve25519JvmUnitTest {
     @Test
     fun givenED25519_whenGenerateKeyPair_thenIsExpected() {
         val kps = crands.map { r ->
-            val (p, s) = r.generateED25519KeyPair()
+            val s = r.generateED25519PrivateKey()
+            val p = s.generatePublicKey()
             p.encoded() to s.encoded()
         }
 
