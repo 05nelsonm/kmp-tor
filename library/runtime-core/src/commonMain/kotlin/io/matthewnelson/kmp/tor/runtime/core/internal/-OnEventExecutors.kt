@@ -20,33 +20,13 @@ package io.matthewnelson.kmp.tor.runtime.core.internal
 import io.matthewnelson.kmp.tor.common.api.InternalKmpTorApi
 import io.matthewnelson.kmp.tor.runtime.core.Executable
 import io.matthewnelson.kmp.tor.runtime.core.OnEvent
-import kotlinx.coroutines.*
 import kotlin.coroutines.CoroutineContext
-import kotlin.coroutines.EmptyCoroutineContext
 
-internal actual object ExecutorMainInternal: OnEvent.Executor {
-
-    private val MainScope by lazy {
-        val mainDispatcher = run {
-            // Will throw if Missing
-            Dispatchers.Main.isDispatchNeeded(EmptyCoroutineContext)
-
-            try {
-                Dispatchers.Main.immediate
-            } catch (_: UnsupportedOperationException) {
-                Dispatchers.Main
-            }
-        }
-
-        CoroutineScope(context =
-            CoroutineName("OnEvent.Executor.Main")
-            + SupervisorJob()
-            + mainDispatcher
-        )
-    }
+internal expect object ExecutorMainInternal: OnEvent.Executor {
 
     @InternalKmpTorApi
-    actual override fun execute(handler: CoroutineContext, executable: Executable) {
-        MainScope.launch(handler) { executable.execute() }
-    }
+    override fun execute(handler: CoroutineContext, executable: Executable)
 }
+
+@Suppress("NOTHING_TO_INLINE", "KotlinRedundantDiagnosticSuppress")
+internal expect inline fun OnEvent.Executor.isImmediate(): Boolean

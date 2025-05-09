@@ -17,6 +17,7 @@ package io.matthewnelson.kmp.tor.runtime.core
 
 import io.matthewnelson.immutable.collections.toImmutableSet
 import io.matthewnelson.kmp.tor.common.api.InternalKmpTorApi
+import io.matthewnelson.kmp.tor.runtime.core.internal.isImmediate
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
@@ -229,12 +230,14 @@ public abstract class Event<Data: Any?, E: Event<Data, E, O>, O: Event.Observer<
         public fun notify(handler: CoroutineContext, default: OnEvent.Executor, data: Data) {
             val executor = executor ?: default
 
-            val executable = when (executor) {
-                is OnEvent.Executor.Main -> Executable { notify(data) }
-
+            val executable = when {
                 // Mitigate object creation and just execute directly
-                // instead of needlessly calling executor.execute.
-                is OnEvent.Executor.Immediate -> null
+                // instead of needlessly calling executor.execute. Also, we're using
+                // OnEvent.Executor.isImmediate here instead of instance check because
+                // Node.js uses Immediate implementation for Main.
+                executor.isImmediate() -> null
+
+                executor is OnEvent.Executor.Main -> Executable { notify(data) }
 
                 // Externally created OnEvent.Executor not within our control.
                 // Ensure this only can be executed once.

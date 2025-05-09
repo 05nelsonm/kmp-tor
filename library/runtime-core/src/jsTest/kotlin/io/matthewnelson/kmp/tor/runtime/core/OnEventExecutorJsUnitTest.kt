@@ -17,7 +17,27 @@
 
 package io.matthewnelson.kmp.tor.runtime.core
 
+import io.matthewnelson.kmp.tor.common.api.InternalKmpTorApi
+import io.matthewnelson.kmp.tor.runtime.core.internal.isImmediate
+import kotlin.coroutines.EmptyCoroutineContext
+import kotlin.test.Test
+import kotlin.test.assertTrue
+
 actual class OnEventExecutorUnitTest: OnEventExecutorBaseTest() {
     override val expectedIsAvailable: Boolean = true
     override val isMainActuallyImmediate: Boolean = true
+
+    @Test
+    fun givenMain_whenIsImmediate_thenIsTrue() {
+        assertTrue(OnEvent.Executor.Main.isImmediate())
+
+        var wasInvoked: Boolean = false
+
+        @OptIn(InternalKmpTorApi::class)
+        OnEvent.Executor.Main.execute(EmptyCoroutineContext, Executable { wasInvoked = true })
+
+        // Actual implementation of MainExecutorInternal is typealias to Immediate. If execution
+        // were not to have been immediate (a coroutine was launched), then this would be false
+        assertTrue(wasInvoked)
+    }
 }
