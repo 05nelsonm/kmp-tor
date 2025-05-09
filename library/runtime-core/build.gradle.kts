@@ -24,6 +24,7 @@ kmpConfiguration {
                 dependencies {
                     implementation(kotlin("reflect"))
                     implementation(libs.bouncy.castle)
+                    implementation(libs.jetbrains.skiko)
                 }
             }
         }

@@ -17,9 +17,12 @@ package io.matthewnelson.kmp.tor.runtime.core.internal
 
 import io.matthewnelson.kmp.tor.common.api.InternalKmpTorApi
 import io.matthewnelson.kmp.tor.runtime.core.OnEvent
+import kotlinx.coroutines.Dispatchers
 import kotlin.coroutines.EmptyCoroutineContext
 import kotlin.test.Test
 import kotlin.test.assertFailsWith
+import kotlin.test.assertNotNull
+import kotlin.test.assertNull
 
 class MainExecutorJvmUnitTest {
 
@@ -28,6 +31,21 @@ class MainExecutorJvmUnitTest {
         assertFailsWith<IllegalStateException> {
             @OptIn(InternalKmpTorApi::class)
             OnEvent.Executor.Main.execute(EmptyCoroutineContext) {  }
+        }
+    }
+
+    @Test
+    fun givenComposeDesktop_whenConfigureSwingGlobalsPropertyKeyPresent_thenRetrievesMainUIDispatcher() {
+        val key = "compose.application.configure.swing.globals"
+
+        assertNull(System.getProperty(key))
+
+        System.setProperty(key, "true")
+
+        try {
+            assertNotNull(Dispatchers.composeDesktopUIDispatcherOrNull())
+        } finally {
+            System.clearProperty(key)
         }
     }
 }

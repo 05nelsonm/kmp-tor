@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-@file:Suppress("EXPECT_ACTUAL_CLASSIFIERS_ARE_IN_BETA_WARNING", "KotlinRedundantDiagnosticSuppress")
+@file:Suppress("KotlinRedundantDiagnosticSuppress", "NOTHING_TO_INLINE")
 
 package io.matthewnelson.kmp.tor.runtime.core.internal
 
@@ -22,10 +22,6 @@ import io.matthewnelson.kmp.process.InternalProcessApi
 import io.matthewnelson.kmp.tor.common.api.InternalKmpTorApi
 import io.matthewnelson.kmp.tor.common.core.OSHost
 import io.matthewnelson.kmp.tor.common.core.OSInfo
-import io.matthewnelson.kmp.tor.runtime.core.OnEvent
-
-@Suppress("ACTUAL_WITHOUT_EXPECT")
-internal actual typealias ExecutorMainInternal = OnEvent.Executor.Immediate
 
 @OptIn(InternalKmpTorApi::class)
 internal actual val UnixSocketsNotSupportedMessage: String? by lazy {
@@ -41,7 +37,6 @@ internal actual val UnixSocketsNotSupportedMessage: String? by lazy {
     }
 }
 
-@Suppress("NOTHING_TO_INLINE")
 @OptIn(InternalProcessApi::class)
 internal inline fun net_Server.onError(
     noinline callback: (err: dynamic) -> Unit,

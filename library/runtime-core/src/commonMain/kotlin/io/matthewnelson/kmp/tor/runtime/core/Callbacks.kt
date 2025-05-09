@@ -19,6 +19,7 @@ import io.matthewnelson.kmp.tor.common.api.InternalKmpTorApi
 import io.matthewnelson.kmp.tor.common.core.synchronized
 import io.matthewnelson.kmp.tor.common.core.synchronizedObject
 import io.matthewnelson.kmp.tor.runtime.core.internal.ExecutorMainInternal
+import io.matthewnelson.kmp.tor.runtime.core.internal.isUIDispatcherAvailable
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.MainCoroutineDispatcher
 import kotlin.concurrent.Volatile
@@ -164,8 +165,13 @@ public fun interface OnEvent<in Data: Any?>: ItBlock<Data> {
          * `kmp-tor` implementation is entirely asynchronous and runs on the
          * main thread.
          *
-         * **WARNING:** Jvm/Android requires the respective coroutines UI
-         * dependency `kotlinx-coroutines-{android/javafx/swing}`. See [isAvailable].
+         * **NOTE:** Jvm/Android requires the respective coroutines UI dependency
+         * `kotlinx-coroutines-{android/javafx/swing}`, **UNLESS** the following
+         * scenarios are true:
+         *  - Android: You are using the `runtime-service` dependency
+         *  - Java: You are using Compose for Desktop
+         *    - Skiko's MainUIDispatcher will be used in this event. The Swing
+         *      Dispatcher is not necessary.
          *
          * **WARNING:** Non-Darwin native targets do not have [Dispatchers.Main]
          * resulting in an exception when [execute] is invoked.
@@ -180,14 +186,7 @@ public fun interface OnEvent<in Data: Any?>: ItBlock<Data> {
              * are dispatched and **should not** be utilized.
              * */
             @get:JvmName("isAvailable")
-            public val isAvailable: Boolean by lazy {
-                try {
-                    Dispatchers.Main.isDispatchNeeded(EmptyCoroutineContext)
-                    true
-                } catch (_: Throwable) {
-                    false
-                }
-            }
+            public val isAvailable: Boolean by lazy { Dispatchers.isUIDispatcherAvailable() }
 
             /** @suppress */
             public override fun toString(): String = "OnEvent.Executor.Main"

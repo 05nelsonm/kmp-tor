@@ -13,13 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-@file:Suppress("EXPECT_ACTUAL_CLASSIFIERS_ARE_IN_BETA_WARNING")
+@file:Suppress("EXPECT_ACTUAL_CLASSIFIERS_ARE_IN_BETA_WARNING", "NOTHING_TO_INLINE", "KotlinRedundantDiagnosticSuppress")
 
 package io.matthewnelson.kmp.tor.runtime.core.internal
 
 import io.matthewnelson.kmp.tor.common.api.InternalKmpTorApi
 import io.matthewnelson.kmp.tor.runtime.core.Executable
 import io.matthewnelson.kmp.tor.runtime.core.OnEvent
+import kotlinx.coroutines.Dispatchers
 import kotlin.coroutines.CoroutineContext
 
 internal expect object ExecutorMainInternal: OnEvent.Executor {
@@ -27,3 +28,7 @@ internal expect object ExecutorMainInternal: OnEvent.Executor {
     @InternalKmpTorApi
     override fun execute(handler: CoroutineContext, executable: Executable)
 }
+
+internal expect inline fun OnEvent.Executor.isImmediate(): Boolean
+
+internal expect inline fun Dispatchers.isUIDispatcherAvailable(): Boolean

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-@file:Suppress("EXPECT_ACTUAL_CLASSIFIERS_ARE_IN_BETA_WARNING")
+@file:Suppress("EXPECT_ACTUAL_CLASSIFIERS_ARE_IN_BETA_WARNING", "KotlinRedundantDiagnosticSuppress", "NOTHING_TO_INLINE")
 
 package io.matthewnelson.kmp.tor.runtime.core.internal
 
@@ -26,8 +26,9 @@ import kotlin.coroutines.EmptyCoroutineContext
 
 internal actual object ExecutorMainInternal: OnEvent.Executor {
 
-    private val MainScope by lazy {
-        val mainDispatcher = run {
+    private val UIScope by lazy {
+        val uiDispatcher = Dispatchers.composeDesktopUIDispatcherOrNull() ?: run {
+
             // Will throw if Missing
             Dispatchers.Main.isDispatchNeeded(EmptyCoroutineContext)
 
@@ -41,12 +42,16 @@ internal actual object ExecutorMainInternal: OnEvent.Executor {
         CoroutineScope(context =
             CoroutineName("OnEvent.Executor.Main")
             + SupervisorJob()
-            + mainDispatcher
+            + uiDispatcher
         )
     }
 
     @InternalKmpTorApi
     actual override fun execute(handler: CoroutineContext, executable: Executable) {
-        MainScope.launch(handler) { executable.execute() }
+        UIScope.launch(handler) { executable.execute() }
     }
 }
+
+internal actual inline fun OnEvent.Executor.isImmediate(): Boolean = this is OnEvent.Executor.Immediate
+
+internal expect inline fun Dispatchers.composeDesktopUIDispatcherOrNull(): CoroutineDispatcher?

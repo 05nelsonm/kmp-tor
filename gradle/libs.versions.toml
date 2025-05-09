@@ -20,6 +20,8 @@ gradle-publish-maven        = "0.30.0"
 
 immutable                   = "0.2.0"
 
+jetbrains-skiko             = "0.9.4.2"
+
 kmp-process                 = "0.2.1"
 kmp-tor-common              = "2.2.0"
 kmp-tor-resource            = "408.16.0" # Upgrade yarn.lock when updating via `./gradlew kotlinUpgradeYarnLock`
@@ -55,6 +57,8 @@ androidx-test-core          = { module = "androidx.test:core", version.ref = "an
 androidx-test-runner        = { module = "androidx.test:runner", version.ref = "androidx-test-runner" }
 
 bouncy-castle               = { module = "org.bouncycastle:bcprov-jdk18on", version.ref = "bouncy-castle" }
+
+jetbrains-skiko             = { module = "org.jetbrains.skiko:skiko-awt", version.ref = "jetbrains-skiko" }
 
 kmp-tor-resource-exec-tor   = { module = "io.matthewnelson.kmp-tor:resource-exec-tor", version.ref = "kmp-tor-resource" }
 kmp-tor-resource-noexec-tor = { module = "io.matthewnelson.kmp-tor:resource-noexec-tor", version.ref = "kmp-tor-resource" }
