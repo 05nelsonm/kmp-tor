@@ -4708,13 +4708,20 @@ public abstract class TorOption: Comparable<TorOption>, CharSequence {
         isCmdLineArg = true,
         isUnique = true,
     ), ConfigureBuildable<BuilderScopeOwningCtrlProcess> {
+        // Cannot change ConfigureBuildable to ConfigureBuildableTry as that would break the API.
 
+        /**
+         * See [BuilderScopeOwningCtrlProcess]
+         *
+         * @throws [UnsupportedOperationException] if on Java9+ and module 'java.management' is not present
+         * */
         @JvmStatic
         @JvmOverloads
         public fun asSetting(
             block: ThisBlock<BuilderScopeOwningCtrlProcess> = ThisBlock { /* use current process' PID */ },
         ): TorSetting = buildContract(block)
 
+        @Throws(UnsupportedOperationException::class)
         override fun buildable(): BuilderScopeOwningCtrlProcess = BuilderScopeOwningCtrlProcess.get()
     }
 

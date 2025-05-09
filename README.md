@@ -101,6 +101,8 @@ runtime.enqueue(
   }
   ```
 
+- If using Java9+, ensure you have defined module `java.management` for your application.
+
 - Configure tor resources
     - See [kmp-tor-resource#Get Started][url-kmp-tor-resource-start]
 
@@ -120,9 +122,9 @@ See [kmp-tor-samples][url-kmp-tor-samples]
 
 <!-- TAG_DEPENDENCIES -->
 [badge-androidx-startup]: https://img.shields.io/badge/androidx.startup-1.1.1-6EDB8D.svg?logo=android
-[badge-coroutines]: https://img.shields.io/badge/kotlinx.coroutines-1.10.1-blue.svg?logo=kotlin
+[badge-coroutines]: https://img.shields.io/badge/kotlinx.coroutines-1.10.2-blue.svg?logo=kotlin
 [badge-encoding]: https://img.shields.io/badge/encoding-2.4.0-blue.svg?style=flat
-[badge-kmp-process]: https://img.shields.io/badge/kmp--process-0.2.0-blue.svg?style=flat
+[badge-kmp-process]: https://img.shields.io/badge/kmp--process-0.2.1-blue.svg?style=flat
 [badge-kmp-tor-common]: https://img.shields.io/badge/kmp--tor--common-2.2.0-blue.svg?style=flat
 [badge-kotlin]: https://img.shields.io/badge/kotlin-2.1.10-blue.svg?logo=kotlin
 [badge-kotlincrypto-bitops]: https://img.shields.io/badge/kotlincrypto.bitops-0.2.0-blue.svg?style=flat
