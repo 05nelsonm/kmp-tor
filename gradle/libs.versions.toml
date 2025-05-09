@@ -20,7 +20,7 @@ gradle-publish-maven        = "0.30.0"
 
 immutable                   = "0.2.0"
 
-kmp-process                 = "0.2.0"
+kmp-process                 = "0.2.1"
 kmp-tor-common              = "2.2.0"
 kmp-tor-resource            = "408.16.0" # Upgrade yarn.lock when updating via `./gradlew kotlinUpgradeYarnLock`
 kotlincrypto-catalog        = "0.7.0" # Utilized from settings.gradle.kts
