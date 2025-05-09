@@ -19,6 +19,7 @@ import io.matthewnelson.kmp.tor.common.api.InternalKmpTorApi
 import io.matthewnelson.kmp.tor.common.core.synchronized
 import io.matthewnelson.kmp.tor.common.core.synchronizedObject
 import io.matthewnelson.kmp.tor.runtime.core.internal.ExecutorMainInternal
+import io.matthewnelson.kmp.tor.runtime.core.internal.isUIDispatcherAvailable
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.MainCoroutineDispatcher
 import kotlin.concurrent.Volatile
@@ -180,14 +181,7 @@ public fun interface OnEvent<in Data: Any?>: ItBlock<Data> {
              * are dispatched and **should not** be utilized.
              * */
             @get:JvmName("isAvailable")
-            public val isAvailable: Boolean by lazy {
-                try {
-                    Dispatchers.Main.isDispatchNeeded(EmptyCoroutineContext)
-                    true
-                } catch (_: Throwable) {
-                    false
-                }
-            }
+            public val isAvailable: Boolean by lazy { Dispatchers.isUIDispatcherAvailable() }
 
             /** @suppress */
             public override fun toString(): String = "OnEvent.Executor.Main"

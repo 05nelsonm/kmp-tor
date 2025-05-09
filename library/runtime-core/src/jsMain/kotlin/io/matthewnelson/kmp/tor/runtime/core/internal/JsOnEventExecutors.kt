@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Matthew Nelson
+ * Copyright (c) 2025 Matthew Nelson
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,18 +17,12 @@
 
 package io.matthewnelson.kmp.tor.runtime.core.internal
 
-import io.matthewnelson.kmp.tor.common.api.InternalKmpTorApi
-import io.matthewnelson.kmp.tor.runtime.core.Executable
 import io.matthewnelson.kmp.tor.runtime.core.OnEvent
-import kotlinx.coroutines.Dispatchers
-import kotlin.coroutines.CoroutineContext
 
-internal expect object ExecutorMainInternal: OnEvent.Executor {
+@Suppress("ACTUAL_WITHOUT_EXPECT")
+internal actual typealias ExecutorMainInternal = OnEvent.Executor.Immediate
 
-    @InternalKmpTorApi
-    override fun execute(handler: CoroutineContext, executable: Executable)
+internal actual inline fun OnEvent.Executor.isImmediate(): Boolean = when (this) {
+    is OnEvent.Executor.Immediate, OnEvent.Executor.Main -> true
+    else -> false
 }
-
-internal expect inline fun OnEvent.Executor.isImmediate(): Boolean
-
-internal expect inline fun Dispatchers.isUIDispatcherAvailable(): Boolean
