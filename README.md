@@ -101,6 +101,8 @@ runtime.enqueue(
   }
   ```
 
+- If using Java9+, ensure you have defined module `java.management` for your application.
+
 - Configure tor resources
     - See [kmp-tor-resource#Get Started][url-kmp-tor-resource-start]
 

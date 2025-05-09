@@ -28,11 +28,16 @@ import kotlin.jvm.JvmSynthetic
  *
  * By default, the [argument] is set to [Process.Current.pid] upon instantiation.
  *
+ * **NOTE:** Java9+ consumers **must** have module 'java.management' declared when
+ * using this option. Otherwise, an [UnsupportedOperationException] may be thrown
+ * upon class instantiation.
+ *
  * @see [TorOption.__OwningControllerProcess.asSetting]
  * */
 @KmpTorDsl
 public class BuilderScopeOwningCtrlProcess: TorSetting.BuilderScope {
 
+    @Throws(UnsupportedOperationException::class)
     private constructor(): super(TorOption.__OwningControllerProcess, INIT) {
         argument = Process.Current.pid().toString()
     }
@@ -55,6 +60,7 @@ public class BuilderScopeOwningCtrlProcess: TorSetting.BuilderScope {
     internal companion object {
 
         @JvmSynthetic
+        @Throws(UnsupportedOperationException::class)
         internal fun get(): BuilderScopeOwningCtrlProcess {
             return BuilderScopeOwningCtrlProcess()
         }
