@@ -26,6 +26,7 @@ import io.matthewnelson.kmp.tor.runtime.FileID
 import io.matthewnelson.kmp.tor.runtime.FileID.Companion.toFIDString
 import io.matthewnelson.kmp.tor.runtime.RuntimeEvent.*
 import io.matthewnelson.kmp.tor.runtime.RuntimeEvent.Notifier.Companion.d
+import io.matthewnelson.kmp.tor.runtime.RuntimeEvent.Notifier.Companion.e
 import io.matthewnelson.kmp.tor.runtime.RuntimeEvent.Notifier.Companion.w
 import io.matthewnelson.kmp.tor.runtime.TorRuntime
 import io.matthewnelson.kmp.tor.runtime.core.net.IPAddress
@@ -64,6 +65,7 @@ internal class TorConfigGenerator internal constructor(
         val geoipFiles = try {
             environment.loader.extract()
         } catch (_: IOException) {
+            // Sometimes apple targets throw a fit... try again.
             environment.loader.extract()
         }
 
@@ -83,7 +85,15 @@ internal class TorConfigGenerator internal constructor(
 
         // Apply library consumers' configuration(s)
         config.forEach { block -> with(block) { invoke(environment) } }
-        ConfigCallback.Defaults.apply(this, environment, geoipFiles)
+
+        try {
+            ConfigCallback.Defaults.apply(this, environment, geoipFiles)
+        } catch (t: UnsupportedOperationException) {
+            // Java9+ module java.management not found for __OwningControllerProcess
+            // configuration. Recoverable, as tor can be started without the option.
+            // Notify observers of the issue & move on.
+            NOTIFIER.e(t)
+        }
     }
 
     private suspend fun TorConfig.validateTCPPorts(

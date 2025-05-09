@@ -208,7 +208,7 @@ public fun interface ConfigCallback {
          * If [TorOption.DormantCanceledByStartup] is not defined, it is
          * added to the configuration with a value of `true`. The default
          * value for tor is `false`, but that is very problematic as the
-         * for [TorOption.DormantClientTimeout] is `24 hours`. If the
+         * [TorOption.DormantClientTimeout] default is `24 hours`. If the
          * application is running for that long in a dormant state and a
          * restart is performed (e.g. user closes app, opens it up again),
          * then the next startup will sit there in dormant mode. Not a
@@ -220,13 +220,6 @@ public fun interface ConfigCallback {
         protected fun TorConfig.BuilderScope.configureDormancy() {
             @OptIn(InternalKmpTorApi::class)
             if ((this as RealBuilderScopeTorConfig).containsDormantCanceledByStartup) return
-
-            // If not declared specifically, add it. Tor defaults to using
-            // false and that can be very problematic if default timeout of
-            // 24h is reached and a restart is performed (even after application
-            // is re-started)... Not a well thought feature, this smooths it
-            // over while still providing choice by only adding if not declared.
-
             TorOption.DormantCanceledByStartup.configure(true)
         }
 
@@ -237,17 +230,28 @@ public fun interface ConfigCallback {
          *  - [TorOption.RunAsDaemon]
          *  - [TorOption.__OwningControllerProcess]
          *  - [TorOption.__ReloadTorrcOnSIGHUP]
+         *
+         * @throws [UnsupportedOperationException] if on Java9+ and module 'java.management' is not present
          * */
+        @Throws(UnsupportedOperationException::class)
         protected fun TorConfig.BuilderScope.configureRuntimeRequired() {
             TorOption.DisableNetwork.configure(true)
             TorOption.RunAsDaemon.configure(false)
-            TorOption.__OwningControllerProcess.configure { /* default (current pid) */ }
-            TorOption.__ReloadTorrcOnSIGHUP.configure(false)
+
+            try {
+                TorOption.__OwningControllerProcess.configure { /* default (current pid) */ }
+            } finally {
+                // Regardless of __OwningControllerProcess.configure throwing an exception,
+                // configure this option as that is recoverable. Tor will simply be started
+                // without it and notify the RuntimeEvent.ERROR observers.
+                TorOption.__ReloadTorrcOnSIGHUP.configure(false)
+            }
         }
 
         internal companion object {
 
             @JvmSynthetic
+            @Throws(UnsupportedOperationException::class)
             internal fun apply(
                 scope: TorConfig.BuilderScope,
                 environment: TorRuntime.Environment,
