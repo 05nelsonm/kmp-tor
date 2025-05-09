@@ -165,8 +165,13 @@ public fun interface OnEvent<in Data: Any?>: ItBlock<Data> {
          * `kmp-tor` implementation is entirely asynchronous and runs on the
          * main thread.
          *
-         * **WARNING:** Jvm/Android requires the respective coroutines UI
-         * dependency `kotlinx-coroutines-{android/javafx/swing}`. See [isAvailable].
+         * **NOTE:** Jvm/Android requires the respective coroutines UI dependency
+         * `kotlinx-coroutines-{android/javafx/swing}`, **UNLESS** the following
+         * scenarios are true:
+         *  - Android: You are using the `runtime-service` dependency
+         *  - Java: You are using Compose for Desktop
+         *    - Skiko's MainUIDispatcher will be used in this event. The Swing
+         *      Dispatcher is not necessary.
          *
          * **WARNING:** Non-Darwin native targets do not have [Dispatchers.Main]
          * resulting in an exception when [execute] is invoked.
