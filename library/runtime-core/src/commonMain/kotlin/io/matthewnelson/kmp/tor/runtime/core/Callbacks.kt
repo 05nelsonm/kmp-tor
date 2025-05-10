@@ -20,6 +20,7 @@ import io.matthewnelson.kmp.tor.common.core.synchronized
 import io.matthewnelson.kmp.tor.common.core.synchronizedObject
 import io.matthewnelson.kmp.tor.runtime.core.internal.ExecutorMainInternal
 import io.matthewnelson.kmp.tor.runtime.core.internal.isUIDispatcherAvailable
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.MainCoroutineDispatcher
 import kotlin.concurrent.Volatile
@@ -156,25 +157,27 @@ public fun interface OnEvent<in Data: Any?>: ItBlock<Data> {
         public fun execute(handler: CoroutineContext, executable: Executable)
 
         /**
-         * Utilizes [Dispatchers.Main] under the hood to transition events
-         * dispatched from a background thread, to the UI thread. If
-         * [MainCoroutineDispatcher.immediate] is available, that is always
-         * preferred.
+         * Utilizes the UI [CoroutineDispatcher] under the hood to transition events
+         * from a background thread, to the UI thread. For Java Compose Desktop, the
+         * `MainUIDispatcher` is used, otherwise [Dispatchers.Main] (if available).
          *
+         * **NOTE:** Jvm/Android requires the respective coroutines UI dependency
+         * `kotlinx-coroutines-{android/javafx/swing}`, **UNLESS** the following
+         * conditions are met:
+         *  - Android: If you are using the `runtime-service` dependency which already
+         *    has the `kotlinx-coroutines-android` dependency.
+         *  - Java: If you are using Compose for Desktop
+         *    - Skiko's `MainUIDispatcher` will be used in this event. The Swing
+         *    dependency is only necessary for tests if you want them to run
+         *    on `Dispatchers.Main`.
+
          * **NOTE:** On `Node.js` this invokes [Executable] immediately as the
          * `kmp-tor` implementation is entirely asynchronous and runs on the
          * main thread.
          *
-         * **NOTE:** Jvm/Android requires the respective coroutines UI dependency
-         * `kotlinx-coroutines-{android/javafx/swing}`, **UNLESS** the following
-         * scenarios are true:
-         *  - Android: You are using the `runtime-service` dependency
-         *  - Java: You are using Compose for Desktop
-         *    - Skiko's MainUIDispatcher will be used in this event. The Swing
-         *      Dispatcher is not necessary.
-         *
          * **WARNING:** Non-Darwin native targets do not have [Dispatchers.Main]
-         * resulting in an exception when [execute] is invoked.
+         * resulting in an exception when [execute] is invoked, unless you have
+         * implemented [Dispatchers.Main] yourself for those native platforms.
          * */
         public object Main: Executor by ExecutorMainInternal {
 

@@ -27,9 +27,9 @@ import kotlin.coroutines.EmptyCoroutineContext
 internal actual object ExecutorMainInternal: OnEvent.Executor {
 
     private val UIScope by lazy {
-        val uiDispatcher = Dispatchers.composeDesktopUIDispatcherOrNull() ?: run {
+        val dispatcher = Dispatchers.composeDesktopUIDispatcherOrNull() ?: run {
 
-            // Will throw if Missing
+            // Will throw exception if missing
             Dispatchers.Main.isDispatchNeeded(EmptyCoroutineContext)
 
             try {
@@ -42,7 +42,7 @@ internal actual object ExecutorMainInternal: OnEvent.Executor {
         CoroutineScope(context =
             CoroutineName("OnEvent.Executor.Main")
             + SupervisorJob()
-            + uiDispatcher
+            + dispatcher
         )
     }
 

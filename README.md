@@ -103,6 +103,9 @@ runtime.enqueue(
 
 - If using Java9+, ensure you have defined module `java.management` for your application.
 
+- For Java or Android, see the `NOTE` for [OnEvent.Executor.Main][url-executor-main] for when the 
+  `kotlinx-coroutines-{android/javafx/swing}` UI dependency is needed.
+
 - Configure tor resources
     - See [kmp-tor-resource#Get Started][url-kmp-tor-resource-start]
 
@@ -164,3 +167,4 @@ See [kmp-tor-samples][url-kmp-tor-samples]
 [url-kotlincrypto-bitops]: https://github.com/KotlinCrypto/bitops
 [url-kotlincrypto-hash]: https://github.com/KotlinCrypto/hash
 [url-kotlincrypto-random]: https://github.com/KotlinCrypto/random
+[url-executor-main]: https://kmp-tor.matthewnelson.io/library/runtime-core/io.matthewnelson.kmp.tor.runtime.core/-on-event/-executor/-main/index.html
