@@ -27,22 +27,16 @@ import kotlin.coroutines.EmptyCoroutineContext
 internal actual object ExecutorMainInternal: OnEvent.Executor {
 
     private val UIScope by lazy {
-        val uiDispatcher = Dispatchers.composeDesktopUIDispatcherOrNull() ?: run {
-
-            // Will throw if Missing
-            Dispatchers.Main.isDispatchNeeded(EmptyCoroutineContext)
-
-            try {
-                Dispatchers.Main.immediate
-            } catch (_: UnsupportedOperationException) {
-                Dispatchers.Main
+        val dispatcher = Dispatchers.composeDesktopUIDispatcherOrNull()
+            ?: Dispatchers.Main.apply {
+                // Will throw exception if missing
+                isDispatchNeeded(EmptyCoroutineContext)
             }
-        }
 
         CoroutineScope(context =
             CoroutineName("OnEvent.Executor.Main")
             + SupervisorJob()
-            + uiDispatcher
+            + dispatcher
         )
     }
 
