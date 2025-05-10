@@ -245,12 +245,21 @@ public actual interface TorCtrl : Destroyable, TorEvent.Processor, TorCmd.Privil
                 throw t.wrapIOException()
             }
 
+            val close = Executable.Once.of(concurrent = true) { dispatcher.close() }
+
             return RealTorCtrl.of(this, dispatcher, connection, closeDispatcher = { LOG ->
-                @OptIn(DelicateCoroutinesApi::class)
-                GlobalScope.launch(CLOSE_DISPATCHER) {
-                    delay(250.milliseconds)
-                    dispatcher.close()
-                    LOG.d { "Dispatchers Closed" }
+                try {
+                    @OptIn(DelicateCoroutinesApi::class)
+                    GlobalScope.launch(Dispatchers.IO) {
+                        try {
+                            delay(250.milliseconds)
+                        } finally {
+                            close.execute()
+                            LOG.d { "Dispatchers Closed" }
+                        }
+                    }
+                } catch (_: Throwable) {
+                    close.execute()
                 }
             })
         }
@@ -310,16 +319,5 @@ public actual interface TorCtrl : Destroyable, TorEvent.Processor, TorCmd.Privil
         /** @suppress */
         @InternalKmpTorApi
         public actual fun tempQueue(): TempTorCmdQueue = TempTorCmdQueue.of(handler)
-
-        private companion object {
-
-            private val CLOSE_DISPATCHER by lazy {
-                if (OnEvent.Executor.Main.isAvailable) {
-                    Dispatchers.Main
-                } else {
-                    Dispatchers.IO
-                }
-            }
-        }
     }
 }
