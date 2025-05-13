@@ -274,40 +274,40 @@ js-yaml@^4.1.0:
   dependencies:
     argparse "^2.0.1"
 
-kmp-tor.resource-exec-tor.all@408.16.0:
-  version "408.16.0"
-  resolved "https://registry.yarnpkg.com/kmp-tor.resource-exec-tor.all/-/kmp-tor.resource-exec-tor.all-408.16.0.tgz#fdec61089bf8c3a90635fd75c227678dd3cabe4d"
-  integrity sha512-msjNSnOkvfOj5R0O58SfhYU0H5JGwmcjfwggUzTbZwPaG9qJ/R1hoaIi/eR2UHeJFPm3RHhVy8PziFkevOhbjw==
+kmp-tor.resource-exec-tor.all@408.16.1:
+  version "408.16.1"
+  resolved "https://registry.yarnpkg.com/kmp-tor.resource-exec-tor.all/-/kmp-tor.resource-exec-tor.all-408.16.1.tgz#bdc84861f1651c74cd1990ff4a49de7dc6a20f4f"
+  integrity sha512-AepGIGoUS3YhakZJzlm9+87rls2AqqjM0PmLq83h+sSYEbMteWQIm02ac+6OzVkAQfC56nLdtYL93N6zXG8szA==
   dependencies:
-    kmp-tor.resource-exec-tor.linux-android "408.16.0"
-    kmp-tor.resource-exec-tor.linux-libc "408.16.0"
-    kmp-tor.resource-exec-tor.macos "408.16.0"
-    kmp-tor.resource-exec-tor.mingw "408.16.0"
+    kmp-tor.resource-exec-tor.linux-android "408.16.1"
+    kmp-tor.resource-exec-tor.linux-libc "408.16.1"
+    kmp-tor.resource-exec-tor.macos "408.16.1"
+    kmp-tor.resource-exec-tor.mingw "408.16.1"
 
-kmp-tor.resource-exec-tor.linux-android@408.16.0:
-  version "408.16.0"
-  resolved "https://registry.yarnpkg.com/kmp-tor.resource-exec-tor.linux-android/-/kmp-tor.resource-exec-tor.linux-android-408.16.0.tgz#cdff7e14fb34cb910416f1a6cce37c841d8d1dd7"
-  integrity sha512-pXTZIX3agl1cLFGrzCN+x47B8vHQ0Cnk2m3mg91644TW6yZzqB15i31fJBI2it8MRltonVJCWurxYbZvxTb5iQ==
+kmp-tor.resource-exec-tor.linux-android@408.16.1:
+  version "408.16.1"
+  resolved "https://registry.yarnpkg.com/kmp-tor.resource-exec-tor.linux-android/-/kmp-tor.resource-exec-tor.linux-android-408.16.1.tgz#a7fbc5c2a144fa03f86872a4c5d86dc95ff94ab2"
+  integrity sha512-Lx8Lq2AQwjsIwXgb2UDibhk73t/eSVNk4jNjk+fSmW3C+d6Rt9pX1yxH/UqLkwIB6cAKkRorttvD1F1BmvvP8g==
 
-kmp-tor.resource-exec-tor.linux-libc@408.16.0:
-  version "408.16.0"
-  resolved "https://registry.yarnpkg.com/kmp-tor.resource-exec-tor.linux-libc/-/kmp-tor.resource-exec-tor.linux-libc-408.16.0.tgz#677a66ba1b6040a92c5afa54a40ce5e04d770684"
-  integrity sha512-IZYq2HZjCN5kIK0je1xD5KbZWwHtq5/lNB1QMI1vDkgBlIDDCCuqD8XmGnfgt43G4Ngf0cx/cqOv2mSvBiP5yg==
+kmp-tor.resource-exec-tor.linux-libc@408.16.1:
+  version "408.16.1"
+  resolved "https://registry.yarnpkg.com/kmp-tor.resource-exec-tor.linux-libc/-/kmp-tor.resource-exec-tor.linux-libc-408.16.1.tgz#90ae992b915c3145021447a060538b3fed85e384"
+  integrity sha512-wBLj3+ATORrD5cZqOdBZ+olrvm8ElvKASb3n38Q3ekS9/FbVzf7mJHa4rdR1hhZEUBZ6RqyWnfVKrDtPCeXK5A==
 
-kmp-tor.resource-exec-tor.macos@408.16.0:
-  version "408.16.0"
-  resolved "https://registry.yarnpkg.com/kmp-tor.resource-exec-tor.macos/-/kmp-tor.resource-exec-tor.macos-408.16.0.tgz#44f90d06ce923577825aa8f16a6df6cc47e1b1a4"
-  integrity sha512-KjN1gyCAxOfzEi+jlrdUs61HS/YU2fVLiWzUBSOLpyvlloYSG+KRXYz3jI9v+FGPuq+zy46XRysWbOReJXlo4Q==
+kmp-tor.resource-exec-tor.macos@408.16.1:
+  version "408.16.1"
+  resolved "https://registry.yarnpkg.com/kmp-tor.resource-exec-tor.macos/-/kmp-tor.resource-exec-tor.macos-408.16.1.tgz#8ec23ae3c4b2a0a775bc6aeeca53bf2a28e486e9"
+  integrity sha512-Wx5eXJKqst3SJ2T2N3JZ/ZLnvef+IGhYu60kXnMQdbQeJAJARX8wIkDvBpiB0y8IjsL/fY4tcZS9DX6ewdoIcg==
 
-kmp-tor.resource-exec-tor.mingw@408.16.0:
-  version "408.16.0"
-  resolved "https://registry.yarnpkg.com/kmp-tor.resource-exec-tor.mingw/-/kmp-tor.resource-exec-tor.mingw-408.16.0.tgz#d4401bce6eb587e3573f31dd19840a7f7ac8ad8e"
-  integrity sha512-jYOFKC20Wmru7A9sbT6+NRapbwMV6Qr/CmDOqd1Lgv/6cQcRX3c1ES76k9y4C5iPifHriPg38N1JjIc0EpE0yg==
+kmp-tor.resource-exec-tor.mingw@408.16.1:
+  version "408.16.1"
+  resolved "https://registry.yarnpkg.com/kmp-tor.resource-exec-tor.mingw/-/kmp-tor.resource-exec-tor.mingw-408.16.1.tgz#2d0eed2da543695a0c692be6607b5ebb63dc3818"
+  integrity sha512-Wb7yAv1cUtZLLvOPajuEKhKHqrtCQxX0rNZIg3cZtTA+kMe+9y4R1WI2VqSnFoOg1gO7wWd6Tnuuv4gOzpOuSw==
 
-kmp-tor.resource-geoip@408.16.0:
-  version "408.16.0"
-  resolved "https://registry.yarnpkg.com/kmp-tor.resource-geoip/-/kmp-tor.resource-geoip-408.16.0.tgz#2b5ec6a5d122100a59813b1e6bfab0b38fe5ba6c"
-  integrity sha512-7dDlRIj+TlUHx5IN9vkb1c5zBGk6GQiuMzvBrvEJmO3X30j/Fi/v0pe6HK05sc813xlyxTBSx84SM8tx7GDp+A==
+kmp-tor.resource-geoip@408.16.1:
+  version "408.16.1"
+  resolved "https://registry.yarnpkg.com/kmp-tor.resource-geoip/-/kmp-tor.resource-geoip-408.16.1.tgz#759d308a58042e5ffa65d20f471409851687fdfd"
+  integrity sha512-JiNkSOZsQRHfy7VJzy/ofIx2hCPzspgNpWjrOComG5JgwPm/vWq9oG6vZoYashvZMJRN34/iluIBPVY1AYOaWw==
 
 kotlin-web-helpers@2.0.0:
   version "2.0.0"

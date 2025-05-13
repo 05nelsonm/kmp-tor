@@ -1,5 +1,13 @@
 # CHANGELOG
 
+## Version 2.3.0 (2025-05-13)
+ - Updates `kmp-process` to `0.2.1` [[#590]][590]
+ - Updates `kotlinx.coroutines` to `1.10.2` [[#590]][590]
+ - Fixes tor startup error for Java & KotlinMultiplatform/Jvm when module `lang.management` is not available [[#590]][590]
+ - Add ability to generate `x25519` & `ed25519` keys from user-defined 32-byte seed [[#588]][588]
+ - Add support for Compose Desktop's `MainUIDispatcher` when initializing underlying UI `CoroutineDispatcher` 
+   used for `OnEvent.Executor.Main`. [[#592]][592] [[#594]][594]
+
 ## Version 2.2.1 (2025-04-21)
  - Fixes `JPMS` module access error [[#585]][585]
  - Mitigate unnecessary debug log creation [[#582]][582]
@@ -575,6 +583,10 @@
 [580]: https://github.com/05nelsonm/kmp-tor/pull/580
 [582]: https://github.com/05nelsonm/kmp-tor/pull/582
 [585]: https://github.com/05nelsonm/kmp-tor/pull/585
+[588]: https://github.com/05nelsonm/kmp-tor/pull/588
+[590]: https://github.com/05nelsonm/kmp-tor/pull/590
+[592]: https://github.com/05nelsonm/kmp-tor/pull/592
+[594]: https://github.com/05nelsonm/kmp-tor/pull/594
 
 [kmp-tor-binary-66]: https://github.com/05nelsonm/kmp-tor-binary/issues/66
 [kmp-tor-binary-75]: https://github.com/05nelsonm/kmp-tor-binary/pull/75
