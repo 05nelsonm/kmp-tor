@@ -24,7 +24,8 @@ jetbrains-skiko             = "0.9.4.2"
 
 kmp-process                 = "0.3.0-SNAPSHOT"
 kmp-tor-common              = "2.3.0-SNAPSHOT"
-kmp-tor-resource            = "408.16.1" # Upgrade yarn.lock when updating via `./gradlew kotlinUpgradeYarnLock`
+# Upgrade yarn.lock when updating via `./gradlew kotlinUpgradeYarnLock`
+kmp-tor-resource            = "408.16.4-SNAPSHOT" # Once update to non-SNAPSHOT, search & execute >> TODO: REMOVE[kmp-tor-resource]
 kotlincrypto-catalog        = "0.7.1" # Utilized from settings.gradle.kts
 kotlinx-coroutines          = "1.10.2"
 ktor                        = "3.1.3"
