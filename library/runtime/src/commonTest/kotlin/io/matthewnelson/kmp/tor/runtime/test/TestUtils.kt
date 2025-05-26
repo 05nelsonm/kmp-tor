@@ -16,8 +16,8 @@
 package io.matthewnelson.kmp.tor.runtime.test
 
 import io.matthewnelson.kmp.file.File
+import io.matthewnelson.kmp.file.IOException
 import io.matthewnelson.kmp.file.SysTempDir
-import io.matthewnelson.kmp.file.path
 import io.matthewnelson.kmp.file.resolve
 import io.matthewnelson.kmp.tor.common.api.ExperimentalKmpTorApi
 import io.matthewnelson.kmp.tor.common.api.InternalKmpTorApi
@@ -34,8 +34,6 @@ import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.test.TestResult
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runTest
-import okio.FileSystem
-import okio.Path.Companion.toPath
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
 import kotlin.test.fail
@@ -44,7 +42,8 @@ import kotlin.time.Duration.Companion.minutes
 
 private val TEST_DIR = SysTempDir.resolve("kmp_tor_runtime_test")
 
-internal expect fun filesystem(): FileSystem
+@Throws(IOException::class)
+internal expect fun File.recursivelyDelete()
 internal expect fun testLoader(dir: File): ResourceLoader.Tor
 
 private val TEST_ENV: TorRuntime.Environment by lazy {
@@ -163,8 +162,10 @@ internal fun runTorTest(
         TestConfig.clear()
 
         try {
-            filesystem().deleteRecursively(TEST_DIR.path.toPath())
-        } catch (_: Throwable) {}
+            TEST_DIR.recursivelyDelete()
+        } catch (t: Throwable) {
+            t.printStackTrace()
+        }
 
         if (threw == null) return@withLock
 

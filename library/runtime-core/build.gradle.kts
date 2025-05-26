@@ -32,9 +32,6 @@ kmpConfiguration {
             }
         }
 
-        // TODO: Move to configureShared
-        androidNativeAll()
-
         common {
             sourceSetMain {
                 dependencies {

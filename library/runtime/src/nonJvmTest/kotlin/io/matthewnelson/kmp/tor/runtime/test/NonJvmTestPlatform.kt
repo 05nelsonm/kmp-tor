@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Matthew Nelson
+ * Copyright (c) 2025 Matthew Nelson
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,10 +17,20 @@ package io.matthewnelson.kmp.tor.runtime.test
 
 import io.matthewnelson.kmp.file.File
 import io.matthewnelson.kmp.file.IOException
-import io.matthewnelson.kmp.tor.common.api.ResourceLoader
-import io.matthewnelson.kmp.tor.resource.exec.tor.ResourceLoaderTorExec
+import io.matthewnelson.kmp.file.SysDirSep
+import io.matthewnelson.kmp.file.path
+import io.matthewnelson.kmp.process.Process
 
 @Throws(IOException::class)
-internal actual fun File.recursivelyDelete() { deleteRecursively() }
+internal actual fun File.recursivelyDelete() {
+    // lmao...
+    val out = if (SysDirSep == '\\') {
+        Process.Builder(command = "rmdir").args("/s")
+    } else {
+        Process.Builder(command = "rm").args("-r")
+    }.args(path).output { timeoutMillis = 500 }
 
-internal actual fun testLoader(dir: File): ResourceLoader.Tor = ResourceLoaderTorExec.getOrCreate(dir)
+    if (out.processInfo.exitCode == 0 && out.stderr.isBlank()) return
+
+    throw IOException(out.toString() + "\n\n" + out.stdout + "\n\n" + out.stderr)
+}

@@ -31,7 +31,7 @@ class AndroidNativeTest {
 
     @Test
     fun givenAndroidNative_whenExecuteRuntimeTestBinary_thenIsSuccessful() {
-//        run(libName = "libTestRuntime.so", timeout = 5.minutes)
+        run(libName = "libTestRuntime.so", timeout = 5.minutes) { this["LD_LIBRARY_PATH"] = nativeLibraryDir.path }
     }
 
     @Test

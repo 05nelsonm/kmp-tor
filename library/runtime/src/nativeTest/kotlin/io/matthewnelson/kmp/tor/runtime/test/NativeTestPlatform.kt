@@ -18,7 +18,5 @@ package io.matthewnelson.kmp.tor.runtime.test
 import io.matthewnelson.kmp.file.File
 import io.matthewnelson.kmp.tor.common.api.ResourceLoader
 import io.matthewnelson.kmp.tor.resource.noexec.tor.ResourceLoaderTorNoExec
-import okio.FileSystem
 
-internal actual fun filesystem(): FileSystem = FileSystem.SYSTEM
 internal actual fun testLoader(dir: File): ResourceLoader.Tor = ResourceLoaderTorNoExec.getOrCreate(dir)
