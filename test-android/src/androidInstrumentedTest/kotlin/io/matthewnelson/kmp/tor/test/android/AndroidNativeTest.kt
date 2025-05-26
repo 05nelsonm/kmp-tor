@@ -41,7 +41,7 @@ class AndroidNativeTest {
 
     @Test
     fun givenAndroidNative_whenExecuteRuntimeCtrlTestBinary_thenIsSuccessful() {
-//        run(libName = "libTestRuntimeCtrl.so", timeout = 5.minutes)
+        run(libName = "libTestRuntimeCtrl.so", timeout = 3.minutes) { this["LD_LIBRARY_PATH"] = nativeLibraryDir.path }
     }
 
     private fun run(libName: String, timeout: Duration, configureEnv: MutableMap<String, String>.() -> Unit) {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Matthew Nelson
+ * Copyright (c) 2025 Matthew Nelson
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,8 +17,8 @@ package io.matthewnelson.kmp.tor.runtime.ctrl.internal
 
 import io.matthewnelson.kmp.file.File
 import io.matthewnelson.kmp.file.path
+import io.matthewnelson.kmp.tor.runtime.core.internal.sockaddr_un
 import kotlinx.cinterop.*
-import platform.linux.sockaddr_un
 import platform.posix.sockaddr
 import platform.posix.socklen_t
 import platform.posix.strcpy

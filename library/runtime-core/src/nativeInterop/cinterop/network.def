@@ -10,5 +10,4 @@ package = io.matthewnelson.kmp.tor.runtime.core.internal
 #include <sys/un.h>
 #endif
 
-
 #endif /* !defined(KMP_TOR_NETWORK_H) */
