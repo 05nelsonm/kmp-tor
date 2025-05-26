@@ -17,7 +17,6 @@
 
 package io.matthewnelson.kmp.tor.runtime.service.ui.internal
 
-@Suppress("ACTUAL_WITHOUT_EXPECT")
 internal actual typealias NumberFormat = java.text.NumberFormat
 
 internal actual inline fun numberFormat(): NumberFormat {

@@ -13,8 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-@file:Suppress("OPTIONAL_DECLARATION_USAGE_IN_NON_COMMON_SOURCE")
-
 package io.matthewnelson.kmp.tor.runtime.service.ui
 
 import io.matthewnelson.immutable.collections.immutableSetOf

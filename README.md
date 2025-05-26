@@ -129,7 +129,7 @@ See [kmp-tor-samples][url-kmp-tor-samples]
 [badge-encoding]: https://img.shields.io/badge/encoding-2.4.0-blue.svg?style=flat
 [badge-kmp-process]: https://img.shields.io/badge/kmp--process-0.2.1-blue.svg?style=flat
 [badge-kmp-tor-common]: https://img.shields.io/badge/kmp--tor--common-2.2.0-blue.svg?style=flat
-[badge-kotlin]: https://img.shields.io/badge/kotlin-2.1.10-blue.svg?logo=kotlin
+[badge-kotlin]: https://img.shields.io/badge/kotlin-2.1.21-blue.svg?logo=kotlin
 [badge-kotlincrypto-bitops]: https://img.shields.io/badge/kotlincrypto.bitops-0.2.0-blue.svg?style=flat
 [badge-kotlincrypto-hash]: https://img.shields.io/badge/kotlincrypto.hash-0.7.0-blue.svg?style=flat
 [badge-kotlincrypto-random]: https://img.shields.io/badge/kotlincrypto.random-0.5.0-blue.svg?style=flat
