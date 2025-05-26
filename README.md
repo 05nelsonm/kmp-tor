@@ -97,7 +97,7 @@ runtime.enqueue(
 - Add runtime dependency
   ```kotlin
   dependencies {
-      implementation("io.matthewnelson.kmp-tor:runtime:2.3.0")
+      implementation("io.matthewnelson.kmp-tor:runtime:2.4.0-SNAPSHOT")
   }
   ```
 
@@ -120,7 +120,7 @@ runtime.enqueue(
 See [kmp-tor-samples][url-kmp-tor-samples]
 
 <!-- TAG_VERSION -->
-[badge-latest-release]: https://img.shields.io/badge/latest--release-2.3.0-5d2f68.svg?logo=torproject&style=flat&logoColor=5d2f68
+[badge-latest-release]: https://img.shields.io/badge/latest--release-2.4.0--SNAPSHOT-5d2f68.svg?logo=torproject&style=flat&logoColor=5d2f68
 [badge-license]: https://img.shields.io/badge/license-Apache%20License%202.0-blue.svg?style=flat
 
 <!-- TAG_DEPENDENCIES -->
