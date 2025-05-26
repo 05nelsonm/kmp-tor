@@ -19,7 +19,6 @@ package io.matthewnelson.kmp.tor.runtime.ctrl.internal
 
 import kotlin.concurrent.withLock as _withLock
 
-@Suppress("ACTUAL_WITHOUT_EXPECT")
 internal actual typealias ReentrantLock = java.util.concurrent.locks.ReentrantLock
 
 internal actual inline fun reentrantLock(): ReentrantLock = ReentrantLock()
