@@ -17,6 +17,7 @@ package io.matthewnelson.kmp.tor.runtime.ctrl.internal
 
 import io.matthewnelson.kmp.file.File
 import io.matthewnelson.kmp.file.path
+import io.matthewnelson.kmp.tor.runtime.core.internal.sockaddr_un
 import kotlinx.cinterop.*
 import platform.posix.sockaddr
 import platform.posix.socklen_t

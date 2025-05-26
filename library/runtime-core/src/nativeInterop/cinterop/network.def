@@ -1,0 +1,14 @@
+package = io.matthewnelson.kmp.tor.runtime.core.internal
+---
+#ifndef KMP_TOR_NETWORK_H
+#define KMP_TOR_NETWORK_H
+
+#ifdef __ANDROID__
+#include <arpa/inet.h>
+#include <sys/un.h>
+#elif __APPLE__
+#include <sys/un.h>
+#endif
+
+
+#endif /* !defined(KMP_TOR_NETWORK_H) */

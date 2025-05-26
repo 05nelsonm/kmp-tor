@@ -69,30 +69,5 @@ kmpConfiguration {
                 }
             }
         }
-
-        kotlin {
-            val cInteropDir = projectDir
-                .resolve("src")
-                .resolve("nativeInterop")
-                .resolve("cinterop")
-
-            targets.filterIsInstance<KotlinNativeTarget>().forEach target@ { target ->
-                if (target.konanTarget.family != Family.IOS) return@target
-
-                target
-                    .compilations["main"]
-                    .cinterops.create("un")
-                    .defFile(cInteropDir.resolve("un.def"))
-            }
-
-            afterEvaluate {
-                val commonizeTask = tasks.findByName("commonizeCInterop") ?: return@afterEvaluate
-
-                tasks.all {
-                    if (!name.endsWith("MetadataElements")) return@all
-                    dependsOn(commonizeTask)
-                }
-            }
-        }
     }
 }

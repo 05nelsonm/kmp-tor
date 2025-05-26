@@ -36,7 +36,7 @@ class AndroidNativeTest {
 
     @Test
     fun givenAndroidNative_whenExecuteRuntimeCoreTestBinary_thenIsSuccessful() {
-//        run(libName = "libTestRuntimeCore.so", timeout = 2.minutes) {}
+        run(libName = "libTestRuntimeCore.so", timeout = 2.minutes) {}
     }
 
     @Test

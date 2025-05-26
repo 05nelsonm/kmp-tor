@@ -1,3 +1,0 @@
-package = io.matthewnelson.kmp.tor.runtime.ctrl.internal
-headers = sys/un.h
-headerFilter = sys/un.h
