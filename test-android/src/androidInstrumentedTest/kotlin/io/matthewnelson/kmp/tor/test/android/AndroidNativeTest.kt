@@ -51,6 +51,11 @@ class AndroidNativeTest {
             }.stderrFeed { line ->
                 println(line ?: "STDERR: STOPPED")
             }.waitFor(duration = timeout)
+
+            try {
+                Thread.sleep(250)
+            } catch (_: Throwable) {}
+
             process
         }.waitFor()
 
