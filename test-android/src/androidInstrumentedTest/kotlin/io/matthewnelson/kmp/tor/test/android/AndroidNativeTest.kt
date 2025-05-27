@@ -23,6 +23,7 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.minutes
+import kotlin.time.TimeSource
 
 class AndroidNativeTest {
 
@@ -45,6 +46,8 @@ class AndroidNativeTest {
     }
 
     private fun run(libName: String, timeout: Duration) {
+        val mark = TimeSource.Monotonic.markNow()
+
         val exitCode = Process.Builder(nativeLibraryDir.resolve(libName)).spawn { process ->
             process.stdoutFeed { line ->
                 println(line ?: "STDOUT: STOPPED")
@@ -59,6 +62,7 @@ class AndroidNativeTest {
             process
         }.waitFor()
 
+        println("RUN_LENGTH[${mark.elapsedNow().inWholeSeconds}s]")
         assertEquals(0, exitCode)
     }
 }
