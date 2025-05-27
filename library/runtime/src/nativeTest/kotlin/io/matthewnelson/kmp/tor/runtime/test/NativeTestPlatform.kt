@@ -18,5 +18,12 @@ package io.matthewnelson.kmp.tor.runtime.test
 import io.matthewnelson.kmp.file.File
 import io.matthewnelson.kmp.tor.common.api.ResourceLoader
 import io.matthewnelson.kmp.tor.resource.noexec.tor.ResourceLoaderTorNoExec
+import kotlin.experimental.ExperimentalNativeApi
+
+@OptIn(ExperimentalNativeApi::class)
+internal actual val IsDarwinSimulator: Boolean get() = when (Platform.osFamily) {
+    OsFamily.IOS, OsFamily.TVOS, OsFamily.TVOS -> true
+    else -> false
+}
 
 internal actual fun testLoader(dir: File): ResourceLoader.Tor = ResourceLoaderTorNoExec.getOrCreate(dir)

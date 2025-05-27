@@ -20,6 +20,8 @@ import io.matthewnelson.kmp.file.IOException
 import io.matthewnelson.kmp.tor.common.api.ResourceLoader
 import io.matthewnelson.kmp.tor.resource.exec.tor.ResourceLoaderTorExec
 
+internal actual val IsDarwinSimulator: Boolean = false
+
 @Throws(IOException::class)
 internal actual fun File.recursivelyDelete() { deleteRecursively() }
 

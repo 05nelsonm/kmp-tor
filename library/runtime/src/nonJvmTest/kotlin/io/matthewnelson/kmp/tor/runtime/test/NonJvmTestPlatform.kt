@@ -24,10 +24,11 @@ import io.matthewnelson.kmp.process.Process
 @Throws(IOException::class)
 internal actual fun File.recursivelyDelete() {
     // lmao...
-    val out = if (SysDirSep == '\\') {
-        Process.Builder(command = "rmdir").args("/s")
-    } else {
-        Process.Builder(command = "rm").args("-r")
+    val out = when {
+        SysDirSep == '\\' -> Process.Builder(command = "rmdir").args("/s")
+        // Use absolute path so macOS rm is utilized
+        IsDarwinSimulator -> Process.Builder(command = "/bin/rm").args("-r")
+        else -> Process.Builder(command = "rm").args("-r")
     }.args(path).output { timeoutMillis = 500 }
 
     if (out.processInfo.exitCode == 0 && out.stderr.isBlank()) return

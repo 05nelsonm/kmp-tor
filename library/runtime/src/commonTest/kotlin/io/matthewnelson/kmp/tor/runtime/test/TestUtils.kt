@@ -42,6 +42,8 @@ import kotlin.time.Duration.Companion.minutes
 
 private val TEST_DIR = SysTempDir.resolve("kmp_tor_runtime_test")
 
+internal expect val IsDarwinSimulator: Boolean
+
 @Throws(IOException::class)
 internal expect fun File.recursivelyDelete()
 internal expect fun testLoader(dir: File): ResourceLoader.Tor

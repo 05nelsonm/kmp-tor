@@ -19,4 +19,6 @@ import io.matthewnelson.kmp.file.File
 import io.matthewnelson.kmp.tor.common.api.ResourceLoader
 import io.matthewnelson.kmp.tor.resource.exec.tor.ResourceLoaderTorExec
 
+internal actual val IsDarwinSimulator: Boolean = false
+
 internal actual fun testLoader(dir: File): ResourceLoader.Tor = ResourceLoaderTorExec.getOrCreate(dir)
