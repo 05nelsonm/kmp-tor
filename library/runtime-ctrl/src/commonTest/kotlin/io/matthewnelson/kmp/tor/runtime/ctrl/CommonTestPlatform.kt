@@ -15,6 +15,10 @@
  **/
 package io.matthewnelson.kmp.tor.runtime.ctrl
 
+import io.matthewnelson.encoding.base16.Base16
+import io.matthewnelson.encoding.core.Encoder.Companion.encodeToString
+import io.matthewnelson.kmp.file.File
+import io.matthewnelson.kmp.file.IOException
 import io.matthewnelson.kmp.file.SysTempDir
 import io.matthewnelson.kmp.file.path
 import io.matthewnelson.kmp.file.resolve
@@ -23,6 +27,7 @@ import io.matthewnelson.kmp.process.Signal
 import io.matthewnelson.kmp.process.Stdio
 import io.matthewnelson.kmp.tor.common.api.ResourceLoader
 import kotlinx.coroutines.*
+import kotlin.random.Random
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.TimeSource
 
@@ -35,9 +40,14 @@ internal val AUTH_PASS = """
 
         """.trimIndent()
 
-internal val LOADER_DIR = SysTempDir.resolve("kmp_tor_ctrl")
+internal val LOADER_DIR = SysTempDir.resolve("kmp_tor_ctrl_" + Random.Default.nextBytes(8).encodeToString(Base16))
+
+internal expect val IsDarwinSimulator: Boolean
 
 internal expect val LOADER: ResourceLoader.Tor
+
+@Throws(IOException::class)
+internal expect fun File.recursivelyDelete()
 
 private object TestBinder: ResourceLoader.RuntimeBinder
 
@@ -89,6 +99,11 @@ internal suspend fun startTor(ctrlPortArgument: String): AutoCloseable {
     val disposable = currentCoroutineContext().job.invokeOnCompletion {
         result.close()
         ctrlPortTxt.delete()
+        try {
+            LOADER_DIR.recursivelyDelete()
+        } catch (t: Throwable) {
+            t.printStackTrace()
+        }
     }
 
     withContext(Dispatchers.Default) {

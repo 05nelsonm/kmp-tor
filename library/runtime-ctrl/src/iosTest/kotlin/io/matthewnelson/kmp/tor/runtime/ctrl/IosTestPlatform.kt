@@ -18,6 +18,8 @@ package io.matthewnelson.kmp.tor.runtime.ctrl
 import io.matthewnelson.kmp.tor.common.api.ResourceLoader
 import io.matthewnelson.kmp.tor.resource.noexec.tor.ResourceLoaderTorNoExec
 
+internal actual val IsDarwinSimulator: Boolean = true
+
 internal actual val LOADER: ResourceLoader.Tor by lazy {
     ResourceLoaderTorNoExec.getOrCreate(LOADER_DIR)
 }

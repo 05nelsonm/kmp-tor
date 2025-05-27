@@ -19,6 +19,7 @@ import android.app.Application
 import androidx.test.core.app.ApplicationProvider
 import io.matthewnelson.kmp.file.toFile
 import io.matthewnelson.kmp.process.Process
+import io.matthewnelson.kmp.process.Stdio
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.time.Duration
@@ -48,19 +49,11 @@ class AndroidNativeTest {
     private fun run(libName: String, timeout: Duration) {
         val mark = TimeSource.Monotonic.markNow()
 
-        val exitCode = Process.Builder(nativeLibraryDir.resolve(libName)).spawn { process ->
-            process.stdoutFeed { line ->
-                println(line ?: "STDOUT: STOPPED")
-            }.stderrFeed { line ->
-                println(line ?: "STDERR: STOPPED")
-            }.waitFor(duration = timeout)
-
-            try {
-                Thread.sleep(250)
-            } catch (_: Throwable) {}
-
-            process
-        }.waitFor()
+        val exitCode = Process.Builder(nativeLibraryDir.resolve(libName))
+            .stdin(Stdio.Null)
+            .stdout(Stdio.Inherit)
+            .stderr(Stdio.Inherit)
+            .spawn { process -> process.waitFor(duration = timeout); process }.waitFor()
 
         println("RUN_LENGTH[${mark.elapsedNow().inWholeSeconds}s]")
         assertEquals(0, exitCode)

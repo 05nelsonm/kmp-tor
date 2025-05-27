@@ -43,7 +43,7 @@ import kotlin.test.fail
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.minutes
 
-private val TEST_DIR = SysTempDir.resolve("runtime_" + Random.Default.nextBytes(8).encodeToString(Base16))
+private val TEST_DIR = SysTempDir.resolve("kmp_tor_runtime_" + Random.Default.nextBytes(8).encodeToString(Base16))
 
 internal expect val IsDarwinSimulator: Boolean
 
