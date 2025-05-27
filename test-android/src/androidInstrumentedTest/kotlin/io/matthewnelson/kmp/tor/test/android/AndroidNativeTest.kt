@@ -31,31 +31,29 @@ class AndroidNativeTest {
 
     @Test
     fun givenAndroidNative_whenExecuteRuntimeTestBinary_thenIsSuccessful() {
-        run(libName = "libTestRuntime.so", timeout = 5.minutes) { this["LD_LIBRARY_PATH"] = nativeLibraryDir.path }
+        run(libName = "libTestRuntime.so", timeout = 5.minutes)
     }
 
     @Test
     fun givenAndroidNative_whenExecuteRuntimeCoreTestBinary_thenIsSuccessful() {
-        run(libName = "libTestRuntimeCore.so", timeout = 2.minutes) {}
+        run(libName = "libTestRuntimeCore.so", timeout = 2.minutes)
     }
 
     @Test
     fun givenAndroidNative_whenExecuteRuntimeCtrlTestBinary_thenIsSuccessful() {
-        run(libName = "libTestRuntimeCtrl.so", timeout = 3.minutes) { this["LD_LIBRARY_PATH"] = nativeLibraryDir.path }
+        run(libName = "libTestRuntimeCtrl.so", timeout = 3.minutes)
     }
 
-    private fun run(libName: String, timeout: Duration, configureEnv: MutableMap<String, String>.() -> Unit) {
-        val p = Process.Builder(nativeLibraryDir.resolve(libName))
-            .environment(configureEnv)
-            .spawn { process ->
-                process.stdoutFeed { line ->
-                    println(line ?: "STDOUT: STOPPED")
-                }.stderrFeed { line ->
-                    println(line ?: "STDERR: STOPPED")
-                }.waitFor(duration = timeout)
-                process
-            }
+    private fun run(libName: String, timeout: Duration) {
+        val exitCode = Process.Builder(nativeLibraryDir.resolve(libName)).spawn { process ->
+            process.stdoutFeed { line ->
+                println(line ?: "STDOUT: STOPPED")
+            }.stderrFeed { line ->
+                println(line ?: "STDERR: STOPPED")
+            }.waitFor(duration = timeout)
+            process
+        }.waitFor()
 
-        assertEquals(0, p.exitCode())
+        assertEquals(0, exitCode)
     }
 }
