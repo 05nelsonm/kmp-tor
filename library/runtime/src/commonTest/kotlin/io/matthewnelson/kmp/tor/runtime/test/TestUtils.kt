@@ -164,7 +164,9 @@ internal fun runTorTest(
         try {
             TEST_DIR.recursivelyDelete()
         } catch (t: Throwable) {
-            t.printStackTrace()
+            if (t.message?.contains("no such file", ignoreCase = true) != true) {
+                t.printStackTrace()
+            }
         }
 
         if (threw == null) return@withLock
