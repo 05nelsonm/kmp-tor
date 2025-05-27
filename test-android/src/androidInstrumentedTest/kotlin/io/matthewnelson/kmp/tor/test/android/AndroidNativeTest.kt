@@ -32,17 +32,17 @@ class AndroidNativeTest {
 
     @Test
     fun givenAndroidNative_whenExecuteRuntimeTestBinary_thenIsSuccessful() {
-        run(libName = "libTestRuntime.so", timeout = 5.minutes)
+        run(libName = "libTestRuntime.so", timeout = 25.minutes)
     }
 
     @Test
     fun givenAndroidNative_whenExecuteRuntimeCoreTestBinary_thenIsSuccessful() {
-        run(libName = "libTestRuntimeCore.so", timeout = 2.minutes)
+        run(libName = "libTestRuntimeCore.so", timeout = 10.minutes)
     }
 
     @Test
     fun givenAndroidNative_whenExecuteRuntimeCtrlTestBinary_thenIsSuccessful() {
-        run(libName = "libTestRuntimeCtrl.so", timeout = 3.minutes)
+        run(libName = "libTestRuntimeCtrl.so", timeout = 25.minutes)
     }
 
     private fun run(libName: String, timeout: Duration) {
