@@ -79,5 +79,23 @@ kmpConfiguration {
                 }
             }
         }
+
+        kotlin {
+            with(sourceSets) {
+                val testSourceSets = arrayOf(
+                    "androidNative",
+                    "linux",
+                    "macos",
+                    "mingw",
+                ).mapNotNull { name -> findByName("${name}Test") }
+                if (testSourceSets.isEmpty()) return@kotlin
+
+                maybeCreate("nonAppleMobileTest").apply {
+                    dependsOn(getByName("commonTest"))
+
+                    testSourceSets.forEach { it.dependsOn(this) }
+                }
+            }
+        }
     }
 }

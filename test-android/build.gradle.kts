@@ -44,7 +44,7 @@ kmpConfiguration {
                     implementation(libs.androidx.test.core)
                     implementation(libs.androidx.test.runner)
                     implementation(libs.kmp.process)
-                    implementation(libs.kmp.tor.resource.compilation.lib.tor)
+                    implementation(libs.kmp.tor.resource.compilation.exec.tor)
                 }
             }
         }

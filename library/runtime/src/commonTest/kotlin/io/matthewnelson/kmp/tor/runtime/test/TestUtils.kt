@@ -15,6 +15,8 @@
  **/
 package io.matthewnelson.kmp.tor.runtime.test
 
+import io.matthewnelson.encoding.base16.Base16
+import io.matthewnelson.encoding.core.Encoder.Companion.encodeToString
 import io.matthewnelson.kmp.file.File
 import io.matthewnelson.kmp.file.IOException
 import io.matthewnelson.kmp.file.SysTempDir
@@ -36,11 +38,12 @@ import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runTest
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
+import kotlin.random.Random
 import kotlin.test.fail
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.minutes
 
-private val TEST_DIR = SysTempDir.resolve("kmp_tor_runtime_test")
+private val TEST_DIR = SysTempDir.resolve("runtime_" + Random.Default.nextBytes(8).encodeToString(Base16))
 
 internal expect val IsDarwinSimulator: Boolean
 

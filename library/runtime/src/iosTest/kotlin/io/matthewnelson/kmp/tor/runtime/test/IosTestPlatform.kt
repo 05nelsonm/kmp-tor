@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Matthew Nelson
+ * Copyright (c) 2025 Matthew Nelson
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,10 +15,8 @@
  **/
 package io.matthewnelson.kmp.tor.runtime.test
 
-import kotlin.experimental.ExperimentalNativeApi
+import io.matthewnelson.kmp.file.File
+import io.matthewnelson.kmp.tor.common.api.ResourceLoader
+import io.matthewnelson.kmp.tor.resource.noexec.tor.ResourceLoaderTorNoExec
 
-@OptIn(ExperimentalNativeApi::class)
-internal actual val IsDarwinSimulator: Boolean get() = when (Platform.osFamily) {
-    OsFamily.IOS, OsFamily.TVOS, OsFamily.TVOS -> true
-    else -> false
-}
+internal actual fun testLoader(dir: File): ResourceLoader.Tor = ResourceLoaderTorNoExec.getOrCreate(dir)

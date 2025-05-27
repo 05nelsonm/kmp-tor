@@ -13,12 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-package io.matthewnelson.kmp.tor.runtime.test
+package io.matthewnelson.kmp.tor.runtime.ctrl
 
-import kotlin.experimental.ExperimentalNativeApi
+import io.matthewnelson.kmp.tor.common.api.ResourceLoader
+import io.matthewnelson.kmp.tor.resource.exec.tor.ResourceLoaderTorExec
 
-@OptIn(ExperimentalNativeApi::class)
-internal actual val IsDarwinSimulator: Boolean get() = when (Platform.osFamily) {
-    OsFamily.IOS, OsFamily.TVOS, OsFamily.TVOS -> true
-    else -> false
+internal actual val LOADER: ResourceLoader.Tor by lazy {
+    ResourceLoaderTorExec.getOrCreate(LOADER_DIR)
 }
