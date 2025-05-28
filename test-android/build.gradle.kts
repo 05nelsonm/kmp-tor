@@ -36,6 +36,7 @@ kmpConfiguration {
                 defaultConfig {
                     testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
                 }
+                packaging.jniLibs.useLegacyPackaging = true
                 sourceSets["androidTest"].jniLibs.srcDir(jniLibsDir)
             }
 
