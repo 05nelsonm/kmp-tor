@@ -49,9 +49,14 @@ class AndroidNativeTest {
     private fun run(libName: String, timeout: Duration) {
         val process = Process.Builder(nativeLibraryDir.resolve(libName))
             .stdin(Stdio.Null)
-            .stdout(Stdio.Inherit)
-            .stderr(Stdio.Inherit)
-            .spawn { p -> p.waitFor(duration = timeout); p }
+            .spawn { p ->
+                p.stdoutFeed { line ->
+                    println(line ?: "STDOUT: END")
+                }.stderrFeed { line ->
+                    println(line ?: "STDERR: END")
+                }.waitFor(duration = timeout)
+                p
+            }
 
         println("RUN_LENGTH[${process.startTime.elapsedNow().inWholeSeconds}s]")
         val exitCode = process.waitFor()
