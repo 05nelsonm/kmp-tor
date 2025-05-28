@@ -16,7 +16,6 @@
 package io.matthewnelson.kmp.tor.test.android
 
 import android.app.Application
-import android.os.Build
 import androidx.test.core.app.ApplicationProvider
 import io.matthewnelson.kmp.file.toFile
 import io.matthewnelson.kmp.process.Process
@@ -49,21 +48,11 @@ class AndroidNativeTest {
     private fun run(libName: String, timeout: Duration) {
         val process = Process.Builder(nativeLibraryDir.resolve(libName))
             .stdin(Stdio.Null)
-            .spawn { p ->
-                p.stdoutFeed { line ->
-                    println(line ?: "STDOUT: END")
-                }.stderrFeed { line ->
-                    println(line ?: "STDERR: END")
-                }.waitFor(duration = timeout)
-                p
-            }
+            .stdout(Stdio.Inherit)
+            .stderr(Stdio.Inherit)
+            .spawn { p -> p.waitFor(duration = timeout); p }
 
         println("RUN_LENGTH[${process.startTime.elapsedNow().inWholeSeconds}s]")
-        val exitCode = process.waitFor()
-        when (Build.VERSION.SDK_INT) {
-            // TODO: Remove
-            24, 29 -> return
-        }
-        assertEquals(0, exitCode)
+        assertEquals(0, process.waitFor())
     }
 }
