@@ -16,7 +16,6 @@
 package io.matthewnelson.kmp.tor.test.android
 
 import android.app.Application
-import android.system.Os
 import androidx.test.core.app.ApplicationProvider
 import io.matthewnelson.kmp.file.toFile
 import io.matthewnelson.kmp.process.Process
@@ -46,17 +45,10 @@ class AndroidNativeTest {
     }
 
     private fun run(libName: String, timeout: Duration) {
-        val envBeforeOs = osEnvironment()
-        val envBeforeProcess = Process.Current.environment()
-
-        buildString {
-            appendEnvironment(envBeforeProcess, "Process.Current")
-            appendEnvironment(envBeforeOs, "Os.environ")
-        }.let { println(it) }
-
         val process = Process.Builder(nativeLibraryDir.resolve(libName))
             .stdin(Stdio.Null)
             .spawn { p ->
+                // Cannot use Stdio.Inherit. Must use System.out/err so that logcat picks it up
                 p.stdoutFeed { line ->
                     println(line ?: "STDOUT: END")
                 }.stderrFeed { line ->
@@ -65,39 +57,12 @@ class AndroidNativeTest {
                 p
             }
 
-        println("RUN_LENGTH[${process.startTime.elapsedNow().inWholeSeconds}s]")
         if (process.waitFor() == 0) return
 
-        val envNowProcess = Process.Current.environment()
-        val envNowOs = osEnvironment()
-
-        val msg = buildString {
-            appendLine(process.toString())
-            appendLine()
-            appendEnvironment(process.environment, "Process - pid=${process.pid()}")
-            appendEnvironment(envBeforeProcess, "Process.Current - before test")
-            appendEnvironment(envNowProcess, "Process.Current - now")
-            appendEnvironment(envBeforeOs, "Os.environ - before test")
-            appendEnvironment(envNowOs, "Os.environ - now")
-        }
-        throw AssertionError(msg)
-    }
-
-    private fun StringBuilder.appendEnvironment(env: Map<String, String>, header: String) {
-        appendLine("--- ENVIRONMENT[$header] ---")
-        env.forEach { (key, value) ->
-            append("    ").append(key).append('=').appendLine(value)
-        }
-        appendLine("------------------------------")
-    }
-
-    private fun osEnvironment(): Map<String, String> {
-        val env = Os.environ()
-        val map = LinkedHashMap<String, String>(env.size, 1.0f)
-        env.forEach { kvp ->
-            val i = kvp.indexOf('=')
-            map[kvp.substring(0, i)] = kvp.substring(i + 1, kvp.length)
-        }
-        return map
+        buildString {
+            appendLine("--- ENVIRONMENT ---")
+            process.environment.forEach { (key, value) -> appendLine("$key=$value") }
+        }.let { System.err.println(it) }
+        throw AssertionError(process.toString())
     }
 }

@@ -30,6 +30,6 @@ class TorServiceConfigInitializerTest {
     fun givenDependencies_whenKmpTorLibLocatorPresent_thenAddsAsDependency() {
         val deps = TorServiceConfig.Initializer().dependencies()
         assertEquals(1, deps.size)
-        assertEquals(true, deps.first().canonicalName?.endsWith("LibTorInitializer"))
+        assertEquals(true, deps.first().canonicalName?.endsWith("KmpTorResourceInitializer"))
     }
 }

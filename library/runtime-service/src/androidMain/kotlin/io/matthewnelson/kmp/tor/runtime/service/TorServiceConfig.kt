@@ -684,7 +684,7 @@ public open class TorServiceConfig private constructor(
             // KmpTorLibLocator was still being utilized.
             "io.matthewnelson.kmp.tor.common.lib.locator.KmpTorLibLocator\$Initializer",
 
-            "io.matthewnelson.kmp.tor.resource.compilation.lib.tor.LibTorInitializer",
+            "io.matthewnelson.kmp.tor.resource.compilation.lib.tor.KmpTorResourceInitializer",
         ).mapNotNull { className ->
             try {
                 val clazz = Class.forName(className) ?: return@mapNotNull null
