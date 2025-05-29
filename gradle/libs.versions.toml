@@ -60,7 +60,7 @@ bouncy-castle               = { module = "org.bouncycastle:bcprov-jdk18on", vers
 jetbrains-skiko             = { module = "org.jetbrains.skiko:skiko-awt", version.ref = "jetbrains-skiko" }
 
 kmp-tor-resource-android-unit-test-tor = { module = "io.matthewnelson.kmp-tor:resource-android-unit-test-tor", version.ref = "kmp-tor-resource" }
-kmp-tor-resource-compilation-exec-tor   = { module = "io.matthewnelson.kmp-tor:resource-compilation-exec-tor", version.ref = "kmp-tor-resource" }
+kmp-tor-resource-compilation-exec-tor = { module = "io.matthewnelson.kmp-tor:resource-compilation-exec-tor", version.ref = "kmp-tor-resource" }
 kmp-tor-resource-exec-tor   = { module = "io.matthewnelson.kmp-tor:resource-exec-tor", version.ref = "kmp-tor-resource" }
 kmp-tor-resource-noexec-tor = { module = "io.matthewnelson.kmp-tor:resource-noexec-tor", version.ref = "kmp-tor-resource" }
 kotlinx-coroutines-test     = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "kotlinx-coroutines" }

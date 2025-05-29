@@ -1,6 +1,3 @@
-import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
-import org.jetbrains.kotlin.konan.target.Family
-
 /*
  * Copyright (c) 2021 Matthew Nelson
  *
@@ -16,6 +13,9 @@ import org.jetbrains.kotlin.konan.target.Family
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
+import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
+import org.jetbrains.kotlin.konan.target.Family
+
 plugins {
     id("configuration")
 }
