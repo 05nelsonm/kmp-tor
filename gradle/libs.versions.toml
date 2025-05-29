@@ -30,8 +30,6 @@ kotlincrypto-catalog        = "0.7.1" # Utilized from settings.gradle.kts
 kotlinx-coroutines          = "1.10.2"
 ktor                        = "3.1.3"
 
-okio                        = "3.11.0"
-
 [libraries]
 androidx-startup-runtime    = { module = "androidx.startup:startup-runtime", version.ref = "androidx-startup" }
 
@@ -61,14 +59,12 @@ bouncy-castle               = { module = "org.bouncycastle:bcprov-jdk18on", vers
 
 jetbrains-skiko             = { module = "org.jetbrains.skiko:skiko-awt", version.ref = "jetbrains-skiko" }
 
+kmp-tor-resource-android-unit-test-tor = { module = "io.matthewnelson.kmp-tor:resource-android-unit-test-tor", version.ref = "kmp-tor-resource" }
+kmp-tor-resource-compilation-exec-tor = { module = "io.matthewnelson.kmp-tor:resource-compilation-exec-tor", version.ref = "kmp-tor-resource" }
 kmp-tor-resource-exec-tor   = { module = "io.matthewnelson.kmp-tor:resource-exec-tor", version.ref = "kmp-tor-resource" }
 kmp-tor-resource-noexec-tor = { module = "io.matthewnelson.kmp-tor:resource-noexec-tor", version.ref = "kmp-tor-resource" }
-kmp-tor-resource-android-unit-test-tor = { module = "io.matthewnelson.kmp-tor:resource-android-unit-test-tor", version.ref = "kmp-tor-resource" }
 kotlinx-coroutines-test     = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "kotlinx-coroutines" }
 ktor-network                = { module = "io.ktor:ktor-network", version.ref = "ktor" }
-
-okio-okio                   = { module = "com.squareup.okio:okio", version.ref = "okio" }
-okio-node                   = { module = "com.squareup.okio:okio-nodefilesystem", version.ref = "okio" }
 
 [plugins]
 android-library             = { id = "com.android.library", version.ref = "gradle-android" }

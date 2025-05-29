@@ -24,7 +24,7 @@ import platform.posix.socklen_t
 import platform.posix.strcpy
 
 @OptIn(ExperimentalForeignApi::class)
-internal actual fun File.socketAddress(
+internal actual inline fun File.socketAddress(
     family: UShort,
     block: (CValuesRef<sockaddr>, len: socklen_t) -> Unit,
 ) {

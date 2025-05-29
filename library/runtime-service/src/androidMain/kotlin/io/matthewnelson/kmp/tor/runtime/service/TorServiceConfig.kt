@@ -679,15 +679,20 @@ public open class TorServiceConfig private constructor(
             return Companion
         }
 
-        public override fun dependencies(): List<Class<androidx.startup.Initializer<*>>> {
-            return try {
-                val clazz = Class
-                    .forName("io.matthewnelson.kmp.tor.common.lib.locator.KmpTorLibLocator\$Initializer")
+        public override fun dependencies(): List<Class<androidx.startup.Initializer<*>>> = arrayOf(
+            // For kmp-tor-resource 408.16.3 and below where
+            // KmpTorLibLocator was still being utilized.
+            "io.matthewnelson.kmp.tor.common.lib.locator.KmpTorLibLocator\$Initializer",
+
+            "io.matthewnelson.kmp.tor.resource.compilation.lib.tor.KmpTorResourceInitializer",
+        ).mapNotNull { className ->
+            try {
+                val clazz = Class.forName(className) ?: return@mapNotNull null
 
                 @Suppress("UNCHECKED_CAST")
-                listOf((clazz as Class<androidx.startup.Initializer<*>>))
+                clazz as Class<androidx.startup.Initializer<*>>
             } catch (_: Throwable) {
-                emptyList()
+                null
             }
         }
 

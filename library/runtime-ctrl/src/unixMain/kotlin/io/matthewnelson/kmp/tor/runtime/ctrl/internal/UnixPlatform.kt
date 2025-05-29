@@ -40,7 +40,7 @@ internal actual fun File.connect(): CtrlConnection {
 }
 
 @OptIn(ExperimentalForeignApi::class)
-internal expect fun File.socketAddress(
+internal expect inline fun File.socketAddress(
     family: UShort,
     block: (CValuesRef<sockaddr>, len: socklen_t) -> Unit,
 )
