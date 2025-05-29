@@ -19,6 +19,6 @@ import kotlin.experimental.ExperimentalNativeApi
 
 @OptIn(ExperimentalNativeApi::class)
 internal actual val IsDarwinSimulator: Boolean get() = when (Platform.osFamily) {
-    OsFamily.IOS, OsFamily.TVOS, OsFamily.TVOS -> true
+    OsFamily.IOS, OsFamily.TVOS, OsFamily.WATCHOS -> true
     else -> false
 }
