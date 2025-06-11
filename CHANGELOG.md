@@ -1,5 +1,17 @@
 # CHANGELOG
 
+## Version 2.4.0 (2025-06-11)
+ - Updates `kotlin` to `2.1.21` [[#597]][597]
+ - Updates `android-gradle-plugin` to `8.9.3` [[#597]][597]
+ - Updates `kmp-tor-common` to `2.3.0` [[#597]][597] [[#600]][600]
+ - Updates `kmp-process` to `0.3.0` [[#597]][597] [[#600]][600]
+ - Updates `kotlincrypto.random` to `0.5.1` [[#597]][597]
+ - Adds support for the following targets [[#599]][599]
+     - `androidNativeArm32`
+     - `androidNativeArm64`
+     - `androidNativeX64`
+     - `androidNativeX86`
+
 ## Version 2.3.0 (2025-05-13)
  - Updates `kmp-process` to `0.2.1` [[#590]][590]
  - Updates `kotlinx.coroutines` to `1.10.2` [[#590]][590]
@@ -587,6 +599,9 @@
 [590]: https://github.com/05nelsonm/kmp-tor/pull/590
 [592]: https://github.com/05nelsonm/kmp-tor/pull/592
 [594]: https://github.com/05nelsonm/kmp-tor/pull/594
+[597]: https://github.com/05nelsonm/kmp-tor/pull/597
+[599]: https://github.com/05nelsonm/kmp-tor/pull/599
+[600]: https://github.com/05nelsonm/kmp-tor/pull/600
 
 [kmp-tor-binary-66]: https://github.com/05nelsonm/kmp-tor-binary/issues/66
 [kmp-tor-binary-75]: https://github.com/05nelsonm/kmp-tor-binary/pull/75
