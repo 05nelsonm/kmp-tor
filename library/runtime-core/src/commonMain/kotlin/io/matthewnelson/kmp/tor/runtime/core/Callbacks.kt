@@ -25,7 +25,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.MainCoroutineDispatcher
 import kotlin.concurrent.Volatile
 import kotlin.coroutines.CoroutineContext
-import kotlin.coroutines.EmptyCoroutineContext
 import kotlin.jvm.JvmName
 import kotlin.jvm.JvmStatic
 
@@ -37,7 +36,7 @@ import kotlin.jvm.JvmStatic
  * within the [OnSuccess] lambda. If [OnSuccess] is
  * being utilized with `TorRuntime` APIs, it will be
  * treated as an [UncaughtException] and dispatched
- * to [io.matthewnelson.kmp.tor.runtime.RuntimeEvent.ERROR]
+ * to [RuntimeEvent.ERROR](https://kmp-tor.matthewnelson.io/library/runtime/io.matthewnelson.kmp.tor.runtime/-runtime-event/-e-r-r-o-r/index.html)
  * observers.
  *
  * @see [noOp]
@@ -67,7 +66,7 @@ public fun interface OnSuccess<in T: Any?>: ItBlock<T> {
  * within the [OnFailure] lambda. If [OnFailure] is
  * being utilized with `TorRuntime` APIs, it will be
  * treated as an [UncaughtException] and dispatched
- * to [io.matthewnelson.kmp.tor.runtime.RuntimeEvent.ERROR]
+ * to [RuntimeEvent.ERROR](https://kmp-tor.matthewnelson.io/library/runtime/io.matthewnelson.kmp.tor.runtime/-runtime-event/-e-r-r-o-r/index.html)
  * observers.
  *
  * @see [noOp]
@@ -97,7 +96,7 @@ public fun interface OnFailure: ItBlock<Throwable> {
  *
  * **NOTE:** If [OnEvent] is being utilized with `TorRuntime` APIs,
  * exceptions will be treated as an [UncaughtException] and dispatched
- * to [io.matthewnelson.kmp.tor.runtime.RuntimeEvent.ERROR].
+ * to [RuntimeEvent.ERROR](https://kmp-tor.matthewnelson.io/library/runtime/io.matthewnelson.kmp.tor.runtime/-runtime-event/-e-r-r-o-r/index.html).
  *
  * @see [noOp]
  * @see [Executor]
@@ -122,11 +121,11 @@ public fun interface OnEvent<in Data: Any?>: ItBlock<Data> {
      * fine-tuning the context in which that dispatching occurs on
      * several customizable levels.
      *
-     * Both [io.matthewnelson.kmp.tor.runtime.RuntimeEvent] and [TorEvent]
-     * observer APIs allow declaration of a specific [Executor] to be used
-     * for the individual observer. If no [Executor] is specified, then the
-     * [io.matthewnelson.kmp.tor.runtime.RuntimeEvent.Processor] and
-     * [TorEvent.Processor] implementations fallback to using whatever
+     * Both [RuntimeEvent](https://kmp-tor.matthewnelson.io/library/runtime/io.matthewnelson.kmp.tor.runtime/-runtime-event/index.html)
+     * and [TorEvent] observer APIs allow declaration of a specific [Executor] to
+     * be used for the individual observer. If no [Executor] is specified, then the
+     * [RuntimeEvent.Processor](https://kmp-tor.matthewnelson.io/library/runtime/io.matthewnelson.kmp.tor.runtime/-runtime-event/-processor/index.html)
+     * and [TorEvent.Processor] implementations fallback to using whatever
      * [Executor] was declared when they were created. This means that an
      * [Executor] can be set for default behavior of how events get dispatched
      * based off of the needs of the application, and then be selectively

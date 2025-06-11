@@ -49,10 +49,10 @@ import kotlin.collections.removeFirst as kRemoveFirst
  *         // 0:0:0:0:0:0:0:0%1
  *     }
  *
+ * See [toInetAddress](https://kmp-tor.matthewnelson.io/library/runtime-core/io.matthewnelson.kmp.tor.runtime.core.util/to-inet-address.html)
+ * See [toIPAddress](https://kmp-tor.matthewnelson.io/library/runtime-core/io.matthewnelson.kmp.tor.runtime.core.util/to-i-p-address.html)
  * @see [toIPAddress]
  * @see [toIPAddressOrNull]
- * @see [io.matthewnelson.kmp.tor.runtime.core.util.toInetAddress]
- * @see [io.matthewnelson.kmp.tor.runtime.core.util.toIPAddress]
  * */
 public sealed class IPAddress private constructor(
     /** @suppress */
@@ -132,11 +132,11 @@ public sealed class IPAddress private constructor(
     /**
      * Holder for an IPv4 address
      *
+     * See [toInet4Address](https://kmp-tor.matthewnelson.io/library/runtime-core/io.matthewnelson.kmp.tor.runtime.core.util/to-inet4-address.html)
+     * See [toIPAddressV4](https://kmp-tor.matthewnelson.io/library/runtime-core/io.matthewnelson.kmp.tor.runtime.core.util/to-i-p-address-v4.html)
      * @see [AnyHost]
      * @see [toIPAddressV4]
      * @see [toIPAddressV4OrNull]
-     * @see [io.matthewnelson.kmp.tor.runtime.core.util.toInet4Address]
-     * @see [io.matthewnelson.kmp.tor.runtime.core.util.toIPAddressV4]
      * */
     public open class V4 private constructor(bytes: ByteArray, value: String): IPAddress(bytes, value) {
 
@@ -273,13 +273,13 @@ public sealed class IPAddress private constructor(
      * **NOTE:** No resolution of device network interfaces
      * are performed for a non-null [scope].
      *
+     * See [toInet6Address](https://kmp-tor.matthewnelson.io/library/runtime-core/io.matthewnelson.kmp.tor.runtime.core.util/to-inet6-address.html)
+     * See [toIPAddressV6](https://kmp-tor.matthewnelson.io/library/runtime-core/io.matthewnelson.kmp.tor.runtime.core.util/to-i-p-address-v6.html)
      * @param [scope] The network interface name or index
      *   number, or null if no scope was expressed.
      * @see [AnyHost]
      * @see [toIPAddressV6]
      * @see [toIPAddressV6OrNull]
-     * @see [io.matthewnelson.kmp.tor.runtime.core.util.toInet6Address]
-     * @see [io.matthewnelson.kmp.tor.runtime.core.util.toIPAddressV6]
      * */
     public open class V6 private constructor(
         @JvmField

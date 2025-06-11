@@ -500,6 +500,7 @@ public open class TorServiceConfig private constructor(
              * **NOTE:** An [android.app.NotificationChannel] for API 26+ is set up
              * using the provided [TorServiceUI.Factory.info] (emulators & devices only).
              *
+             * See [KmpTorServiceUI](https://kmp-tor.matthewnelson.io/library/runtime-service-ui/io.matthewnelson.kmp.tor.runtime.service.ui/-kmp-tor-service-u-i/index.html
              * @throws [ClassCastException] If an instance of [TorServiceConfig] has
              *   already been instantiated and is unable to be returned because it is
              *   not an instance of [Foreground].
@@ -510,7 +511,6 @@ public open class TorServiceConfig private constructor(
              * @throws [Resources.NotFoundException] If [factory] fails validation
              *   checks (emulators & devices only).
              * @see [TorServiceConfig.Companion.Builder]
-             * @see [io.matthewnelson.kmp.tor.runtime.service.ui.KmpTorServiceUI]
              * */
             @JvmStatic
             public fun <C: AbstractTorServiceUI.Config, F: TorServiceUI.Factory<C, *, *>> Builder(

@@ -22,6 +22,7 @@ import io.matthewnelson.kmp.tor.runtime.core.net.Port.Companion.MIN
 import io.matthewnelson.kmp.tor.runtime.core.net.Port.Ephemeral.Companion.toPortEphemeralOrNull
 import io.matthewnelson.kmp.tor.runtime.core.internal.HostAndPort
 import io.matthewnelson.kmp.tor.runtime.core.internal.HostAndPort.Companion.findHostnameAndPortFromURL
+import io.matthewnelson.kmp.tor.runtime.core.util.findNextAvailableAsync
 import kotlin.jvm.JvmField
 import kotlin.jvm.JvmName
 import kotlin.jvm.JvmStatic
@@ -37,10 +38,10 @@ import kotlin.jvm.JvmSynthetic
  *     "http://example.com:8080".toPort()
  *     "http://[::1]:8181".toPort()
  *
+ * See [isAvailableSync](https://kmp-tor.matthewnelson.io/library/runtime-core/io.matthewnelson.kmp.tor.runtime.core.util/is-available-sync.html)
  * @see [toPort]
  * @see [toPortOrNull]
  * @see [io.matthewnelson.kmp.tor.runtime.core.util.isAvailableAsync]
- * @see [io.matthewnelson.kmp.tor.runtime.core.util.isAvailableSync]
  * */
 public open class Port private constructor(
     @JvmField
@@ -194,12 +195,12 @@ public open class Port private constructor(
      *     "http://example.com:8080".toPortEphemeral()
      *     "http://[::1]:8181".toPortEphemeral()
      *
+     * See [isAvailableSync](https://kmp-tor.matthewnelson.io/library/runtime-core/io.matthewnelson.kmp.tor.runtime.core.util/is-available-sync.html)
+     * See [findNextAvailableSync](https://kmp-tor.matthewnelson.io/library/runtime-core/io.matthewnelson.kmp.tor.runtime.core.util/find-next-available-sync.html)
      * @see [toPortEphemeral]
      * @see [toPortEphemeralOrNull]
      * @see [io.matthewnelson.kmp.tor.runtime.core.util.isAvailableAsync]
-     * @see [io.matthewnelson.kmp.tor.runtime.core.util.isAvailableSync]
      * @see [io.matthewnelson.kmp.tor.runtime.core.util.findNextAvailableAsync]
-     * @see [io.matthewnelson.kmp.tor.runtime.core.util.findAvailableSync]
      * */
     public class Ephemeral private constructor(value: Int): Port(value) {
 

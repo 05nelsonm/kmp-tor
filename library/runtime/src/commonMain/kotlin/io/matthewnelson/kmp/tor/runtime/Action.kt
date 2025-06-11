@@ -103,11 +103,11 @@ public expect enum class Action: EnqueuedJob.Argument {
          * attached as children, completing alongside the job that is
          * executing.
          *
+         * See [Action.Companion.executeSync](https://kmp-tor.matthewnelson.io/library/runtime/io.matthewnelson.kmp.tor.runtime/-action/-companion/execute-sync.html)
          * @return [EnqueuedJob]
          * @see [OnFailure]
          * @see [OnSuccess]
          * @see [executeAsync]
-         * @see [io.matthewnelson.kmp.tor.runtime.Action.Companion.executeSync]
          * */
         public fun enqueue(
             action: Action,
@@ -138,11 +138,11 @@ public expect enum class Action: EnqueuedJob.Argument {
          *         runtime.executeAsync(Action.StartDaemon)
          *     }
          *
+         * See [Action.Companion.executeSync](https://kmp-tor.matthewnelson.io/library/runtime/io.matthewnelson.kmp.tor.runtime/-action/-companion/execute-sync.html)
          * @see [Processor.enqueue]
          * @see [startDaemonAsync]
          * @see [stopDaemonAsync]
          * @see [restartDaemonAsync]
-         * @see [io.matthewnelson.kmp.tor.runtime.Action.Companion.executeSync]
          * */
         @Throws(Throwable::class)
         public suspend fun <T: Processor> T.executeAsync(action: Action): T
@@ -151,10 +151,10 @@ public expect enum class Action: EnqueuedJob.Argument {
          * Starts the tor daemon, suspending the current coroutine
          * until completion or cancellation/error.
          *
+         * See [Action.Companion.startDaemonSync](https://kmp-tor.matthewnelson.io/library/runtime/io.matthewnelson.kmp.tor.runtime/-action/-companion/start-daemon-sync.html)
          * @see [Processor.enqueue]
          * @see [Action.StartDaemon]
          * @see [executeAsync]
-         * @see [io.matthewnelson.kmp.tor.runtime.Action.Companion.startDaemonSync]
          * */
         @Throws(Throwable::class)
         public suspend inline fun <T: Processor> T.startDaemonAsync(): T
@@ -163,10 +163,10 @@ public expect enum class Action: EnqueuedJob.Argument {
          * Stops the tor daemon, suspending the current coroutine
          * until completion or cancellation/error.
          *
+         * See [Action.Companion.stopDaemonSync](https://kmp-tor.matthewnelson.io/library/runtime/io.matthewnelson.kmp.tor.runtime/-action/-companion/stop-daemon-sync.html)
          * @see [Processor.enqueue]
          * @see [Action.StopDaemon]
          * @see [executeAsync]
-         * @see [io.matthewnelson.kmp.tor.runtime.Action.Companion.stopDaemonSync]
          * */
         @Throws(Throwable::class)
         public suspend inline fun <T: Processor> T.stopDaemonAsync(): T
@@ -175,10 +175,10 @@ public expect enum class Action: EnqueuedJob.Argument {
          * Stops and then starts the tor daemon, suspending the
          * current coroutine until completion or cancellation/error.
          *
+         * See [Action.Companion.restartDaemonSync](https://kmp-tor.matthewnelson.io/library/runtime/io.matthewnelson.kmp.tor.runtime/-action/-companion/restart-daemon-sync.html)
          * @see [Processor.enqueue]
          * @see [Action.RestartDaemon]
          * @see [executeAsync]
-         * @see [io.matthewnelson.kmp.tor.runtime.Action.Companion.restartDaemonSync]
          * */
         @Throws(Throwable::class)
         public suspend inline fun <T: Processor> T.restartDaemonAsync(): T

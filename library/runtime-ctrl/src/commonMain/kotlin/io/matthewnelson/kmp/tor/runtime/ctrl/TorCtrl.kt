@@ -64,7 +64,7 @@ public expect interface TorCtrl: Destroyable, TorEvent.Processor, TorCmd.Privile
      * be non-blocking, fast, and thread-safe.
      *
      * Implementations of [TorCtrl] returned by [Factory.connectAsync]
-     * or [io.matthewnelson.kmp.tor.runtime.ctrl.TorCtrl.Factory.connect]
+     * or [TorCtrl.Factory.connect](https://kmp-tor.matthewnelson.io/library/runtime-ctrl/io.matthewnelson.kmp.tor.runtime.ctrl/-tor-ctrl/-factory/connect.html)
      * invoke [handle] from its background thread on Jvm & Native, unless
      * immediate invocation is being had due to [TorCtrl] already being
      * destroyed, in which case it will be invoked from the context of
@@ -91,8 +91,8 @@ public expect interface TorCtrl: Destroyable, TorEvent.Processor, TorCmd.Privile
     /**
      * A factory class for connecting to tor via its control listener.
      *
+     * See [Factory.connect](https://kmp-tor.matthewnelson.io/library/runtime-ctrl/io.matthewnelson.kmp.tor.runtime.ctrl/-tor-ctrl/-factory/connect.html
      * @see [connectAsync]
-     * @see [io.matthewnelson.kmp.tor.runtime.ctrl.TorCtrl.Factory.connect]
      * @param [staticTag] Special string that will exclude [TorEvent.Observer]
      *   with the same tag from removal until destroyed
      * @param [observers] Some initial observers to start with, static or not.

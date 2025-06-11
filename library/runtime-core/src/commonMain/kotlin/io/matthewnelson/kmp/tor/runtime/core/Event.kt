@@ -81,8 +81,8 @@ import kotlin.jvm.JvmField
  *         ): Observer = Observer(event, tag, executor, onEvent)
  *     }
  *
+ * See [RuntimeEvent](https://kmp-tor.matthewnelson.io/library/runtime/io.matthewnelson.kmp.tor.runtime/-runtime-event/index.html)
  * @see [io.matthewnelson.kmp.tor.runtime.core.TorEvent]
- * @see [io.matthewnelson.kmp.tor.runtime.RuntimeEvent]
  * */
 public abstract class Event<Data: Any?, E: Event<Data, E, O>, O: Event.Observer<Data, E>> protected constructor(
     @JvmField
