@@ -17,8 +17,7 @@
 
 package io.matthewnelson.kmp.tor.runtime.core.internal
 
-import io.matthewnelson.kmp.tor.common.api.InternalKmpTorApi
-import io.matthewnelson.kmp.tor.common.core.OSInfo
+import io.matthewnelson.kmp.file.ANDROID
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlin.coroutines.EmptyCoroutineContext
@@ -39,8 +38,7 @@ private val SkikoUIDispatcher: CoroutineDispatcher? by lazy {
 }
 
 internal inline fun isComposeDesktopApplication(): Boolean {
-    @OptIn(InternalKmpTorApi::class)
-    if (OSInfo.INSTANCE.isAndroidRuntime()) return false
+    if (ANDROID.SDK_INT != null) return false
 
     // Compose desktop configures this property. Check for its existence before
     // going to reflection based retrieval of Skiko's MainUIDispatcher.

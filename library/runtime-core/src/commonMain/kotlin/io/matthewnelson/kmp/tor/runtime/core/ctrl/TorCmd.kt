@@ -522,7 +522,7 @@ public sealed class TorCmd<Success: Any> private constructor(
         public data object Debug: Unprivileged<Reply.Success.OK>("SIGNAL")
 
         /**
-         * See [io.matthewnelson.kmp.tor.runtime.RuntimeEvent.EXECUTE.CMD.observeSignalNewNym]
+         * See [RuntimeEvent.EXECUTE.CMD.observeSignalNewNym](https://kmp-tor.matthewnelson.io/library/runtime/io.matthewnelson.kmp.tor.runtime/-runtime-event/-e-x-e-c-u-t-e/-c-m-d/observe-signal-new-nym.html)
          * */
         public data object NewNym: Unprivileged<Reply.Success.OK>("SIGNAL")
 
@@ -585,11 +585,11 @@ public sealed class TorCmd<Success: Any> private constructor(
              * This can occur when the [Processor] implementation is
              * shutdown and the job is awaiting execution.
              *
+             * See [executeSync](https://kmp-tor.matthewnelson.io/library/runtime-core/io.matthewnelson.kmp.tor.runtime.core.util/execute-sync.html)
              * @return [EnqueuedJob]
              * @see [Reply.Error]
              * @see [OnFailure]
              * @see [OnSuccess]
-             * @see [io.matthewnelson.kmp.tor.runtime.core.util.executeSync]
              * @see [io.matthewnelson.kmp.tor.runtime.core.util.executeAsync]
              * */
             public fun <Success: Any> enqueue(
@@ -627,10 +627,10 @@ public sealed class TorCmd<Success: Any> private constructor(
              * This can occur when the [Processor] implementation is
              * shutdown and the job is awaiting execution.
              *
+             * See [executeSync](https://kmp-tor.matthewnelson.io/library/runtime-core/io.matthewnelson.kmp.tor.runtime.core.util/execute-sync.html)
              * @return [EnqueuedJob]
              * @see [OnFailure]
              * @see [OnSuccess]
-             * @see [io.matthewnelson.kmp.tor.runtime.core.util.executeSync]
              * @see [io.matthewnelson.kmp.tor.runtime.core.util.executeAsync]
              * */
             public fun <Success: Any> enqueue(

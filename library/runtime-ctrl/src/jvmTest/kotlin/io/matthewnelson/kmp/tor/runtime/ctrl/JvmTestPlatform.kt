@@ -15,9 +15,16 @@
  **/
 package io.matthewnelson.kmp.tor.runtime.ctrl
 
+import io.matthewnelson.kmp.file.File
+import io.matthewnelson.kmp.file.IOException
 import io.matthewnelson.kmp.tor.common.api.ResourceLoader
 import io.matthewnelson.kmp.tor.resource.exec.tor.ResourceLoaderTorExec
+
+internal actual val IsDarwinSimulator: Boolean = false
 
 internal actual val LOADER: ResourceLoader.Tor by lazy {
     ResourceLoaderTorExec.getOrCreate(LOADER_DIR)
 }
+
+@Throws(IOException::class)
+internal actual fun File.recursivelyDelete() { deleteRecursively() }

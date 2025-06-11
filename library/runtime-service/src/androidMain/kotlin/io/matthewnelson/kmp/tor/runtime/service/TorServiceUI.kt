@@ -63,7 +63,7 @@ import kotlinx.coroutines.CoroutineScope
  * states), so use at your own risk! Prefer using the stable implementation
  * via the `kmp-tor:runtime-service-ui` dependency.
  *
- * @see [io.matthewnelson.kmp.tor.runtime.service.ui.KmpTorServiceUI]
+ * See [KmpTorServiceUI](https://kmp-tor.matthewnelson.io/library/runtime-service-ui/io.matthewnelson.kmp.tor.runtime.service.ui/-kmp-tor-service-u-i/index.html)
  * @throws [IllegalStateException] on instantiation if [args] were not those
  *   which were passed to [Factory.create]. See [Args].
  * */
@@ -353,7 +353,7 @@ protected constructor(
      * Implementations are encouraged to keep it as a subclass within,
      * and use a `private constructor` for, their [UI] implementations.
      *
-     * @see [io.matthewnelson.kmp.tor.runtime.service.ui.KmpTorServiceUI.Factory]
+     * See [KmpTorServiceUI.Factory](https://kmp-tor.matthewnelson.io/library/runtime-service-ui/io.matthewnelson.kmp.tor.runtime.service.ui/-kmp-tor-service-u-i/-factory/index.html)
      * */
     public abstract class Factory<C: Config, IS: InstanceState<C>, UI: TorServiceUI<C, IS>>
     @ExperimentalKmpTorApi

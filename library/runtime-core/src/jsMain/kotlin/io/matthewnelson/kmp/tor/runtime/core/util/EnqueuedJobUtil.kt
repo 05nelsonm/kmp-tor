@@ -32,8 +32,8 @@ import kotlin.contracts.contract
  *
  * **NOTE:** This is an internal API not meant for public consumption.
  *
+ * See [Action.Companion.executeAsync](https://kmp-tor.matthewnelson.io/library/runtime/io.matthewnelson.kmp.tor.runtime/-action/-companion/execute-async.html)
  * @see [io.matthewnelson.kmp.tor.runtime.core.util.executeAsync]
- * @see [io.matthewnelson.kmp.tor.runtime.Action.Companion.executeAsync]
  * @suppress
  * */
 @InternalKmpTorApi

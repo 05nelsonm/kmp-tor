@@ -353,8 +353,7 @@ public abstract class EnqueuedJob protected constructor(
              *
              * If `false`, the public [cancel] function will **not** be
              * allowed to signal for cancellation. This constrains the
-             * functionality to users of the [awaitAsync] and
-             * [io.matthewnelson.kmp.tor.runtime.core.util.awaitSync]
+             * functionality to users of the [awaitAsync] and `awaitSync`
              * APIs (i.e. only the callers of `executeAsync` and
              * `executeSync` extension functions may signal for cancellation).
              *
@@ -749,11 +748,10 @@ public abstract class EnqueuedJob protected constructor(
      * Helper for creating argument based processor agnostic
      * extension functions for Async/Sync APIs.
      *
-     * @see [io.matthewnelson.kmp.tor.runtime.Action.Processor]
+     * See [Action.Processor](https://kmp-tor.matthewnelson.io/library/runtime/io.matthewnelson.kmp.tor.runtime/-action/-processor/index.html)
      * @see [io.matthewnelson.kmp.tor.runtime.core.ctrl.TorCmd.Privileged.Processor]
      * @see [io.matthewnelson.kmp.tor.runtime.core.ctrl.TorCmd.Unprivileged.Processor]
      * @see [io.matthewnelson.kmp.tor.runtime.core.util.awaitAsync]
-     * @see [io.matthewnelson.kmp.tor.runtime.core.util.awaitSync]
      * @suppress
      * */
     @InternalKmpTorApi

@@ -15,13 +15,12 @@
  **/
 package io.matthewnelson.kmp.tor.runtime.ctrl.internal
 
+import io.matthewnelson.kmp.file.ANDROID
 import io.matthewnelson.kmp.file.File
 import io.matthewnelson.kmp.file.IOException
 import io.matthewnelson.kmp.file.wrapIOException
 import io.matthewnelson.kmp.process.InternalProcessApi
 import io.matthewnelson.kmp.process.ReadBuffer
-import io.matthewnelson.kmp.tor.common.api.InternalKmpTorApi
-import io.matthewnelson.kmp.tor.common.core.OSInfo
 import io.matthewnelson.kmp.tor.runtime.core.Disposable
 import io.matthewnelson.kmp.tor.runtime.core.net.IPSocketAddress
 import io.matthewnelson.kmp.tor.runtime.core.util.toInetAddress
@@ -86,8 +85,7 @@ internal actual fun IPSocketAddress.connect(): CtrlConnection {
 
 @Throws(Throwable::class)
 internal actual fun File.connect(): CtrlConnection = with(UnixSocketReflect) {
-    @OptIn(InternalKmpTorApi::class)
-    if (OSInfo.INSTANCE.isAndroidRuntime()) {
+    if (ANDROID.SDK_INT != null) {
         connectAndroid()
     } else {
         connectJvm()

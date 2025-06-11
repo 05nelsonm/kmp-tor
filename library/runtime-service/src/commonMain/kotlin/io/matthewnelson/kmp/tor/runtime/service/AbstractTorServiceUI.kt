@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-@file:Suppress("RemoveRedundantQualifierName", "OPTIONAL_DECLARATION_USAGE_IN_NON_COMMON_SOURCE")
+@file:Suppress("OPTIONAL_DECLARATION_USAGE_IN_NON_COMMON_SOURCE")
 
 package io.matthewnelson.kmp.tor.runtime.service
 
@@ -29,7 +29,6 @@ import io.matthewnelson.kmp.tor.runtime.core.Executable
 import io.matthewnelson.kmp.tor.runtime.core.OnEvent
 import io.matthewnelson.kmp.tor.runtime.core.TorEvent
 import io.matthewnelson.kmp.tor.runtime.core.ctrl.TorCmd
-import io.matthewnelson.kmp.tor.runtime.service.AbstractTorServiceUI.Args
 import io.matthewnelson.kmp.tor.runtime.service.AbstractTorServiceUI.Factory.Companion.unsafeCastAsType
 import kotlinx.coroutines.*
 import kotlin.concurrent.Volatile
@@ -54,8 +53,8 @@ import kotlin.jvm.JvmSynthetic
  *   the service object.
  *      - Context: `INSTANCE`
  *
- * @see [io.matthewnelson.kmp.tor.runtime.service.TorServiceUI]
- * @see [io.matthewnelson.kmp.tor.runtime.service.ui.KmpTorServiceUI]
+ * See [TorServiceUI]
+ * See [ui.KmpTorServiceUI]
  * @throws [IllegalStateException] on instantiation if [args] were not those
  *   which were passed to [Factory.createProtected]. See [Args].
  * */
@@ -219,7 +218,7 @@ internal constructor(
      * an exception is raised when [Factory.createProtected] or [createProtected]
      * is called resulting a service start failure.
      *
-     * @see [io.matthewnelson.kmp.tor.runtime.service.TorServiceUI.Args]
+     * See [TorServiceUI.Args](https://kmp-tor.matthewnelson.io/library/runtime-service/io.matthewnelson.kmp.tor.runtime.service/-tor-service-u-i/-args/index.html)
      * */
     public sealed class Args private constructor(
         private val _config: Config,
@@ -304,10 +303,10 @@ internal constructor(
      * states), so use at your own risk! Prefer using the stable implementation
      * via the `kmp-tor:runtime-service-ui` dependency.
      *
+     * See [KmpTorServiceUI.Config](https://kmp-tor.matthewnelson.io/library/runtime-service-ui/io.matthewnelson.kmp.tor.runtime.service.ui/-kmp-tor-service-u-i/-config/index.html)
      * @param [fields] A map of the field name value pairs.
      *   (e.g. `mapOf("iconOff" to R.drawable.my_icon_off)`)
      * @throws [IllegalArgumentException] if [fields] is empty
-     * @see [io.matthewnelson.kmp.tor.runtime.service.ui.KmpTorServiceUI.Config]
      * */
     public abstract class Config
     @ExperimentalKmpTorApi
@@ -360,8 +359,8 @@ internal constructor(
      * Implementations are encouraged to keep it as a subclass within,
      * and use a `private constructor` for, their [UI] implementations.
      *
-     * @see [io.matthewnelson.kmp.tor.runtime.service.TorServiceUI.Factory]
-     * @see [io.matthewnelson.kmp.tor.runtime.service.ui.KmpTorServiceUI.Factory]
+     * See [TorServiceUI.Factory](https://kmp-tor.matthewnelson.io/library/runtime-service/io.matthewnelson.kmp.tor.runtime.service/-tor-service-u-i/-factory/index.html)
+     * See [KmpTorServiceUI.Factory](https://kmp-tor.matthewnelson.io/library/runtime-service-ui/io.matthewnelson.kmp.tor.runtime.service.ui/-kmp-tor-service-u-i/-factory/index.html)
      * */
     public abstract class Factory<
             A: Args.UI,

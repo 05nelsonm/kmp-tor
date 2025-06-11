@@ -26,9 +26,7 @@ import io.matthewnelson.kmp.tor.runtime.core.OnSuccess
  *
  * **NOTE:** This is an internal API not meant for public consumption.
  *
- * @see [io.matthewnelson.kmp.tor.runtime.core.util.awaitSync]
  * @see [io.matthewnelson.kmp.tor.runtime.core.util.executeAsync]
- * @see [io.matthewnelson.kmp.tor.runtime.Action.Companion.executeAsync]
  * @suppress
  * */
 @InternalKmpTorApi

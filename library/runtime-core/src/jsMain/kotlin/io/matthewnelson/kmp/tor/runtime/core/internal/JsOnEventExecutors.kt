@@ -19,7 +19,6 @@ package io.matthewnelson.kmp.tor.runtime.core.internal
 
 import io.matthewnelson.kmp.tor.runtime.core.OnEvent
 
-@Suppress("ACTUAL_WITHOUT_EXPECT")
 internal actual typealias ExecutorMainInternal = OnEvent.Executor.Immediate
 
 internal actual inline fun OnEvent.Executor.isImmediate(): Boolean = when (this) {

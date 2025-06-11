@@ -30,7 +30,7 @@ import kotlin.jvm.JvmSynthetic
 /**
  * A special exception to indicate something went terribly wrong somewhere.
  *
- * @see [io.matthewnelson.kmp.tor.runtime.RuntimeEvent.ERROR]
+ * See [RuntimeEvent.ERROR](https://kmp-tor.matthewnelson.io/library/runtime/io.matthewnelson.kmp.tor.runtime/-runtime-event/-e-r-r-o-r/index.html)
  * */
 public class UncaughtException private constructor(
 
@@ -106,8 +106,8 @@ public class UncaughtException private constructor(
              *
              * **NOTE:** If [Handler] is null, [Handler.THROW] is used.
              *
+             * See [RuntimeEvent.ERROR](https://kmp-tor.matthewnelson.io/library/runtime/io.matthewnelson.kmp.tor.runtime/-runtime-event/-e-r-r-o-r/index.html)
              * @see [withSuppression2]
-             * @see [io.matthewnelson.kmp.tor.runtime.RuntimeEvent.ERROR]
              *
              * @param [context] Contextual information about where/what [block] is
              *   to include in the [UncaughtException]

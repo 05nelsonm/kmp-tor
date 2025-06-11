@@ -434,7 +434,7 @@ public sealed interface TorRuntime:
              * only Android support is available via the `runtime-service`
              * dependency. This setting is automatically configured if using
              * `runtime-service` dependency and utilizing the extended builder
-             * functions [io.matthewnelson.kmp.tor.runtime.service.TorServiceConfig]
+             * functions [TorServiceConfig](https://kmp-tor.matthewnelson.io/library/runtime-service/io.matthewnelson.kmp.tor.runtime.service/-tor-service-config/index.html)
              * */
             @JvmField
             @ExperimentalKmpTorApi

@@ -31,7 +31,6 @@ kmpConfiguration {
             sourceSetTest {
                 dependencies {
                     implementation(npm("kmp-tor.resource-exec-tor.all", libs.versions.kmp.tor.resource.get()))
-                    implementation(libs.okio.node)
                 }
             }
         }
@@ -56,7 +55,6 @@ kmpConfiguration {
                     implementation(libs.kmp.tor.resource.exec.tor)
                     implementation(libs.kmp.tor.resource.noexec.tor)
                     implementation(libs.kotlinx.coroutines.test)
-                    implementation(libs.okio.okio)
                 }
             }
         }
@@ -77,6 +75,24 @@ kmpConfiguration {
                     findByName("jvmTest")?.apply { dependsOn(nonJsTest) }
                     nativeMain?.apply { dependsOn(nonJsMain) }
                     findByName("nativeTest")?.apply { dependsOn(nonJsTest) }
+                }
+            }
+        }
+
+        kotlin {
+            with(sourceSets) {
+                val testSourceSets = arrayOf(
+                    "androidNative",
+                    "linux",
+                    "macos",
+                    "mingw",
+                ).mapNotNull { name -> findByName("${name}Test") }
+                if (testSourceSets.isEmpty()) return@kotlin
+
+                maybeCreate("nonAppleMobileTest").apply {
+                    dependsOn(getByName("commonTest"))
+
+                    testSourceSets.forEach { it.dependsOn(this) }
                 }
             }
         }

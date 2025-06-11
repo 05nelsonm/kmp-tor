@@ -16,9 +16,13 @@
 package io.matthewnelson.kmp.tor.runtime.test
 
 import io.matthewnelson.kmp.file.File
+import io.matthewnelson.kmp.file.IOException
 import io.matthewnelson.kmp.tor.common.api.ResourceLoader
 import io.matthewnelson.kmp.tor.resource.exec.tor.ResourceLoaderTorExec
-import okio.FileSystem
 
-internal actual fun filesystem(): FileSystem = FileSystem.SYSTEM
+internal actual val IsDarwinSimulator: Boolean = false
+
+@Throws(IOException::class)
+internal actual fun File.recursivelyDelete() { deleteRecursively() }
+
 internal actual fun testLoader(dir: File): ResourceLoader.Tor = ResourceLoaderTorExec.getOrCreate(dir)

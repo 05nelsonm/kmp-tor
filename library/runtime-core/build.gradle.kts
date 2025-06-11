@@ -13,6 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
+import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
+import org.jetbrains.kotlin.konan.target.Family
+
 plugins {
     id("configuration")
 }
@@ -84,6 +87,33 @@ kmpConfiguration {
                     findByName("jvmTest")?.apply { dependsOn(nonJsTest) }
                     nativeMain?.apply { dependsOn(nonJsMain) }
                     nativeTest?.apply { dependsOn(nonJsTest) }
+                }
+            }
+        }
+
+        kotlin {
+            val cInteropDir = projectDir
+                .resolve("src")
+                .resolve("nativeInterop")
+                .resolve("cinterop")
+
+            targets.filterIsInstance<KotlinNativeTarget>().forEach target@ { target ->
+                when (target.konanTarget.family) {
+                    Family.ANDROID, Family.IOS, Family.TVOS, Family.WATCHOS -> {}
+                    else -> return@target
+                }
+
+                target.compilations["main"].cinterops.create("network") {
+                    definitionFile.set(cInteropDir.resolve("$name.def"))
+                }
+            }
+
+            project.afterEvaluate {
+                val commonizeTask = project.tasks.findByName("commonizeCInterop") ?: return@afterEvaluate
+
+                project.tasks.all {
+                    if (!name.endsWith("MetadataElements")) return@all
+                    dependsOn(commonizeTask)
                 }
             }
         }

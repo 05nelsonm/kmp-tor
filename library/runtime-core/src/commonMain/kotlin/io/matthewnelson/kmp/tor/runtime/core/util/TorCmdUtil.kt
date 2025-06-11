@@ -22,8 +22,8 @@ import io.matthewnelson.kmp.tor.runtime.core.ctrl.TorCmd
  * Enqueues the [cmd], suspending the current coroutine until completion
  * or cancellation/error.
  *
+ * See [executeSync](https://kmp-tor.matthewnelson.io/library/runtime-core/io.matthewnelson.kmp.tor.runtime.core.util/execute-sync.html)
  * @see [TorCmd.Privileged.Processor]
- * @see [io.matthewnelson.kmp.tor.runtime.core.util.executeSync]
  * @throws [Throwable] when underlying [OnFailure] callback is invoked.
  * */
 @Throws(Throwable::class)
@@ -35,8 +35,8 @@ public expect suspend fun <Success: Any> TorCmd.Privileged.Processor.executeAsyn
  * Enqueues the [cmd], suspending the current coroutine until completion
  * or cancellation/error.
  *
+ * See [executeSync](https://kmp-tor.matthewnelson.io/library/runtime-core/io.matthewnelson.kmp.tor.runtime.core.util/execute-sync.html)
  * @see [TorCmd.Unprivileged.Processor]
- * @see [io.matthewnelson.kmp.tor.runtime.core.util.executeSync]
  * @throws [Throwable] when underlying [OnFailure] callback is invoked.
  * */
 @Throws(Throwable::class)

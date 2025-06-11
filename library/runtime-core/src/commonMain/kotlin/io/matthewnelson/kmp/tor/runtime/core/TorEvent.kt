@@ -257,8 +257,8 @@ public sealed class TorEvent private constructor(
          * Remove all [Observer] with the given [tag].
          *
          * If the implementin class extends both [Processor]
-         * and [io.matthewnelson.kmp.tor.runtime.RuntimeEvent.Processor],
-         * all [io.matthewnelson.kmp.tor.runtime.RuntimeEvent.Observer]
+         * and [RuntimeEvent.Processor](https://kmp-tor.matthewnelson.io/library/runtime/io.matthewnelson.kmp.tor.runtime/-runtime-event/-processor/index.html),
+         * all [RuntimeEvent.Observer](https://kmp-tor.matthewnelson.io/library/runtime/io.matthewnelson.kmp.tor.runtime/-runtime-event/-observer/index.html)
          * with the given [tag] will also be removed.
          * */
         public fun unsubscribeAll(tag: String)
@@ -268,8 +268,8 @@ public sealed class TorEvent private constructor(
          * registered.
          *
          * If the implementin class extends both [Processor]
-         * and [io.matthewnelson.kmp.tor.runtime.RuntimeEvent.Processor],
-         * all [io.matthewnelson.kmp.tor.runtime.RuntimeEvent.Observer]
+         * and [RuntimeEvent.Processor](https://kmp-tor.matthewnelson.io/library/runtime/io.matthewnelson.kmp.tor.runtime/-runtime-event/-processor/index.html),
+         * all [RuntimeEvent.Observer](https://kmp-tor.matthewnelson.io/library/runtime/io.matthewnelson.kmp.tor.runtime/-runtime-event/-observer/index.html)
          * will also be removed.
          * */
         public fun clearObservers()

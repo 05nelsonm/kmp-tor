@@ -25,11 +25,10 @@ import android.content.res.Resources
 import android.os.Build
 import androidx.startup.AppInitializer
 import io.matthewnelson.kmp.file.*
+import io.matthewnelson.kmp.file.ANDROID
 import io.matthewnelson.kmp.tor.common.api.ExperimentalKmpTorApi
-import io.matthewnelson.kmp.tor.common.api.InternalKmpTorApi
 import io.matthewnelson.kmp.tor.common.api.KmpTorDsl
 import io.matthewnelson.kmp.tor.common.api.ResourceLoader
-import io.matthewnelson.kmp.tor.common.core.OSInfo
 import io.matthewnelson.kmp.tor.runtime.Action
 import io.matthewnelson.kmp.tor.runtime.NetworkObserver
 import io.matthewnelson.kmp.tor.runtime.RuntimeEvent
@@ -500,6 +499,7 @@ public open class TorServiceConfig private constructor(
              * **NOTE:** An [android.app.NotificationChannel] for API 26+ is set up
              * using the provided [TorServiceUI.Factory.info] (emulators & devices only).
              *
+             * See [KmpTorServiceUI](https://kmp-tor.matthewnelson.io/library/runtime-service-ui/io.matthewnelson.kmp.tor.runtime.service.ui/-kmp-tor-service-u-i/index.html
              * @throws [ClassCastException] If an instance of [TorServiceConfig] has
              *   already been instantiated and is unable to be returned because it is
              *   not an instance of [Foreground].
@@ -510,7 +510,6 @@ public open class TorServiceConfig private constructor(
              * @throws [Resources.NotFoundException] If [factory] fails validation
              *   checks (emulators & devices only).
              * @see [TorServiceConfig.Companion.Builder]
-             * @see [io.matthewnelson.kmp.tor.runtime.service.ui.KmpTorServiceUI]
              * */
             @JvmStatic
             public fun <C: AbstractTorServiceUI.Config, F: TorServiceUI.Factory<C, *, *>> Builder(
@@ -617,8 +616,7 @@ public open class TorServiceConfig private constructor(
 
             if (appContext == null) {
                 // Verify not Android runtime.
-                @OptIn(InternalKmpTorApi::class)
-                check(!OSInfo.INSTANCE.isAndroidRuntime()) {
+                check(ANDROID.SDK_INT == null) {
                     // Startup initializer failed???
                     Initializer.errorMsg()
                 }
@@ -679,15 +677,20 @@ public open class TorServiceConfig private constructor(
             return Companion
         }
 
-        public override fun dependencies(): List<Class<androidx.startup.Initializer<*>>> {
-            return try {
-                val clazz = Class
-                    .forName("io.matthewnelson.kmp.tor.common.lib.locator.KmpTorLibLocator\$Initializer")
+        public override fun dependencies(): List<Class<androidx.startup.Initializer<*>>> = arrayOf(
+            // For kmp-tor-resource 408.16.3 and below where
+            // KmpTorLibLocator was still being utilized.
+            "io.matthewnelson.kmp.tor.common.lib.locator.KmpTorLibLocator\$Initializer",
+
+            "io.matthewnelson.kmp.tor.resource.compilation.lib.tor.KmpTorResourceInitializer",
+        ).mapNotNull { className ->
+            try {
+                val clazz = Class.forName(className) ?: return@mapNotNull null
 
                 @Suppress("UNCHECKED_CAST")
-                listOf((clazz as Class<androidx.startup.Initializer<*>>))
+                clazz as Class<androidx.startup.Initializer<*>>
             } catch (_: Throwable) {
-                emptyList()
+                null
             }
         }
 

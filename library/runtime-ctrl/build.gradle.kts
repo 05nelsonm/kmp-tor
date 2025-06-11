@@ -42,6 +42,7 @@ kmpConfiguration {
             }
             sourceSetTest {
                 dependencies {
+                    implementation(libs.encoding.base16)
                     implementation(libs.kmp.tor.resource.exec.tor)
                     implementation(libs.kmp.tor.resource.noexec.tor)
                     implementation(libs.kotlinx.coroutines.test)
@@ -70,26 +71,19 @@ kmpConfiguration {
         }
 
         kotlin {
-            val cInteropDir = projectDir
-                .resolve("src")
-                .resolve("nativeInterop")
-                .resolve("cinterop")
+            with(sourceSets) {
+                val testSourceSets = arrayOf(
+                    "androidNative",
+                    "linux",
+                    "macos",
+                    "mingw",
+                ).mapNotNull { name -> findByName("${name}Test") }
+                if (testSourceSets.isEmpty()) return@kotlin
 
-            targets.filterIsInstance<KotlinNativeTarget>().forEach target@ { target ->
-                if (target.konanTarget.family != Family.IOS) return@target
+                maybeCreate("nonAppleMobileTest").apply {
+                    dependsOn(getByName("commonTest"))
 
-                target
-                    .compilations["main"]
-                    .cinterops.create("un")
-                    .defFile(cInteropDir.resolve("un.def"))
-            }
-
-            afterEvaluate {
-                val commonizeTask = tasks.findByName("commonizeCInterop") ?: return@afterEvaluate
-
-                tasks.all {
-                    if (!name.endsWith("MetadataElements")) return@all
-                    dependsOn(commonizeTask)
+                    testSourceSets.forEach { it.dependsOn(this) }
                 }
             }
         }

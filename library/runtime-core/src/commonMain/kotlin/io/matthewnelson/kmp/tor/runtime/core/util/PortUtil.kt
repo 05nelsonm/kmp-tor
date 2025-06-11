@@ -23,8 +23,8 @@ import kotlin.coroutines.cancellation.CancellationException
 /**
  * Checks if the TCP port is available on [LocalHost] or not.
  *
+ * See [isAvailableSync](https://kmp-tor.matthewnelson.io/library/runtime-core/io.matthewnelson.kmp.tor.runtime.core.util/is-available-sync.html)
  * @param [host] either [LocalHost.IPv4] or [LocalHost.IPv6]
- * @see [io.matthewnelson.kmp.tor.runtime.core.util.isAvailableSync]
  * */
 public expect suspend fun Port.isAvailableAsync(
     host: LocalHost,
@@ -37,9 +37,9 @@ public expect suspend fun Port.isAvailableAsync(
  * If [Port.Ephemeral.MAX] is exceeded while iterating through ports and [limit]
  * has not been exhausted, the remaining checks will start from [Port.Ephemeral.MIN].
  *
+ * See [findNextAvailableSync](https://kmp-tor.matthewnelson.io/library/runtime-core/io.matthewnelson.kmp.tor.runtime.core.util/find-next-available-sync.html)
  * @param [host] either [LocalHost.IPv4] or [LocalHost.IPv6]
  * @param [limit] the number of ports to scan. min: 1, max: 1_000
- * @see [io.matthewnelson.kmp.tor.runtime.core.util.findAvailableSync]
  * @throws [IllegalArgumentException] if [limit] is not between 1 and 1_000 (inclusive)
  * @throws [IOException] if no ports are available
  * @throws [CancellationException] if underlying coroutine was cancelled
