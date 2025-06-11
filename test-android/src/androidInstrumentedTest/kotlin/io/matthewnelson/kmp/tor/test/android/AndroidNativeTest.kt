@@ -47,7 +47,7 @@ class AndroidNativeTest {
     private fun run(libName: String, timeout: Duration) {
         val process = Process.Builder(nativeLibraryDir.resolve(libName))
             .stdin(Stdio.Null)
-            .spawn { p ->
+            .useSpawn { p ->
                 // Cannot use Stdio.Inherit. Must use System.out/err so that logcat picks it up
                 p.stdoutFeed { line ->
                     println(line ?: "STDOUT: END")
