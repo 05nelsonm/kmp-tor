@@ -32,8 +32,29 @@ class ReentrantLockUnitTest {
     fun givenWithLockAsync_whenBlockThrows_thenUnlocks() = runTest {
         val lock = reentrantLock()
 
+        var started = 0
+        val jobs = Array(5) {
+            // Occupy first 5 threads available from Dispatchers.IO
+            launch(Dispatchers.IO) {
+                lock.withLock { started++ }
+                while (true) {
+                    Blocking.threadSleep(5.milliseconds)
+                    if (!isActive) break
+                }
+            }
+        }
+
+        while (true) {
+            if (lock.withLock { started } == jobs.size) break
+            withContext(Dispatchers.IO) { delay(5.milliseconds) }
+        }
+
         val dispatcher = newFixedThreadPoolContext(1, "Test.BG")
-        currentCoroutineContext().job.invokeOnCompletion { dispatcher.close() }
+
+        currentCoroutineContext().job.apply {
+            invokeOnCompletion { dispatcher.close() }
+            invokeOnCompletion { jobs.forEach { it.cancel() } }
+        }
 
         val job = launch(dispatcher) {
 
@@ -67,6 +88,7 @@ class ReentrantLockUnitTest {
             }
         } catch (_: IllegalStateException) {}
 
+        jobs.forEach { it.cancelAndJoin() }
         job.join()
     }
 }
