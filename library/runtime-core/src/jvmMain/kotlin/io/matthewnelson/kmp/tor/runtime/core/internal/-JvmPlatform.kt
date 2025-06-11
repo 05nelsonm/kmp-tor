@@ -15,6 +15,7 @@
  **/
 package io.matthewnelson.kmp.tor.runtime.core.internal
 
+import io.matthewnelson.kmp.file.ANDROID
 import io.matthewnelson.kmp.file.SysDirSep
 import io.matthewnelson.kmp.tor.common.api.InternalKmpTorApi
 import io.matthewnelson.kmp.tor.common.core.OSHost
@@ -23,7 +24,7 @@ import io.matthewnelson.kmp.tor.common.core.OSInfo
 @OptIn(InternalKmpTorApi::class)
 internal actual val UnixSocketsNotSupportedMessage: String? by lazy {
     // Android support via android.net.LocalSocket since API 1
-    if (OSInfo.INSTANCE.isAndroidRuntime()) return@lazy null
+    if (ANDROID.SDK_INT != null) return@lazy null
 
     val host = OSInfo.INSTANCE.osHost
     if (host is OSHost.Windows) {

@@ -30,8 +30,7 @@ kmpConfiguration {
         js {
             sourceSetTest {
                 dependencies {
-                    // TODO: REMOVE[kmp-tor-resource] remove .0 snapshot version
-                    implementation(npm("kmp-tor.resource-exec-tor.all", libs.versions.kmp.tor.resource.get() + ".0"))
+                    implementation(npm("kmp-tor.resource-exec-tor.all", libs.versions.kmp.tor.resource.get()))
                 }
             }
         }

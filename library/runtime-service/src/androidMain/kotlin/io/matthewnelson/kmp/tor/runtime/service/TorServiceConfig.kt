@@ -25,11 +25,10 @@ import android.content.res.Resources
 import android.os.Build
 import androidx.startup.AppInitializer
 import io.matthewnelson.kmp.file.*
+import io.matthewnelson.kmp.file.ANDROID
 import io.matthewnelson.kmp.tor.common.api.ExperimentalKmpTorApi
-import io.matthewnelson.kmp.tor.common.api.InternalKmpTorApi
 import io.matthewnelson.kmp.tor.common.api.KmpTorDsl
 import io.matthewnelson.kmp.tor.common.api.ResourceLoader
-import io.matthewnelson.kmp.tor.common.core.OSInfo
 import io.matthewnelson.kmp.tor.runtime.Action
 import io.matthewnelson.kmp.tor.runtime.NetworkObserver
 import io.matthewnelson.kmp.tor.runtime.RuntimeEvent
@@ -617,8 +616,7 @@ public open class TorServiceConfig private constructor(
 
             if (appContext == null) {
                 // Verify not Android runtime.
-                @OptIn(InternalKmpTorApi::class)
-                check(!OSInfo.INSTANCE.isAndroidRuntime()) {
+                check(ANDROID.SDK_INT == null) {
                     // Startup initializer failed???
                     Initializer.errorMsg()
                 }
