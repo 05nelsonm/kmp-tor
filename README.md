@@ -18,6 +18,7 @@
 ![badge-platform-linux]
 ![badge-platform-ios]
 ![badge-platform-macos]
+![badge-support-android-native]
 ![badge-support-apple-silicon]
 ![badge-support-js-ir]
 ![badge-support-linux-arm]
