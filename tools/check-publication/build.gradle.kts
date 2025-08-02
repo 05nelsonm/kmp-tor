@@ -18,12 +18,12 @@ plugins {
 }
 
 repositories {
-    val host = "https://s01.oss.sonatype.org"
+    google()
 
     if (version.toString().endsWith("-SNAPSHOT")) {
-        maven("$host/content/repositories/snapshots/")
+        maven("https://central.sonatype.com/repository/maven-snapshots/")
     } else {
-        maven("$host/content/groups/staging") {
+        maven("https://ossrh-staging-api.central.sonatype.com/service/local/") {
             val p = rootProject.properties
 
             credentials {

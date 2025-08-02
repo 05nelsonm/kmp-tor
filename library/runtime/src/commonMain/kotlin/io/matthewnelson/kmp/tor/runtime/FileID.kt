@@ -17,7 +17,12 @@ package io.matthewnelson.kmp.tor.runtime
 
 import io.matthewnelson.encoding.base16.Base16
 import io.matthewnelson.encoding.core.Encoder.Companion.encodeToString
-import io.matthewnelson.kmp.file.*
+import io.matthewnelson.kmp.file.File
+import io.matthewnelson.kmp.file.IOException
+import io.matthewnelson.kmp.file.absoluteFile2
+import io.matthewnelson.kmp.file.canonicalPath2
+import io.matthewnelson.kmp.file.normalize
+import io.matthewnelson.kmp.file.path
 import io.matthewnelson.kmp.tor.runtime.core.apply
 import org.kotlincrypto.hash.sha2.SHA256
 import kotlin.jvm.JvmName
@@ -38,20 +43,24 @@ public interface FileID {
     public companion object {
 
         /**
-         * Creates an ID based off of the provided file's [canonicalPath].
+         * Creates an ID based off of the provided file's [canonicalPath2].
          *
          * The resulting string is the product of the path's UTF-8 encoded
          * bytes double hashed using SHA-256, and then Base16 (hex) encoded.
          *
          * @see [fidEllipses]
          * @see [toFIDString]
+         *
+         * @throws [IOException] If [absoluteFile2] has to reference the
+         *   filesystem to construct an absolute path and fails due to a
+         *   filesystem security exception.
          * */
         @JvmStatic
         public fun createFID(file: File): String = SHA256().apply {
             val pathBytes = try {
-                file.canonicalPath()
+                file.canonicalPath2()
             } catch (_: Throwable) {
-                file.absoluteFile.normalize().path
+                file.absoluteFile2().normalize().path
             }.encodeToByteArray()
 
             val h1 = digest(pathBytes)

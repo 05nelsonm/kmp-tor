@@ -20,6 +20,9 @@ import io.matthewnelson.encoding.core.Encoder.Companion.encodeToString
 import io.matthewnelson.kmp.file.File
 import io.matthewnelson.kmp.file.IOException
 import io.matthewnelson.kmp.file.SysTempDir
+import io.matthewnelson.kmp.file.delete2
+import io.matthewnelson.kmp.file.exists2
+import io.matthewnelson.kmp.file.mkdirs2
 import io.matthewnelson.kmp.file.path
 import io.matthewnelson.kmp.file.resolve
 import io.matthewnelson.kmp.process.Process
@@ -63,9 +66,9 @@ internal suspend fun startTor(ctrlPortArgument: String): AutoCloseable {
     val args = ArrayList<String>(25).apply {
         add("--ignore-missing-torrc")
         add("--DataDirectory")
-        add(dataDir.also { it.mkdirs() }.path)
+        add(dataDir.also { it.mkdirs2("700") }.path)
         add("--CacheDirectory")
-        add(cacheDir.also { it.mkdirs() }.path)
+        add(cacheDir.also { it.mkdirs2("700") }.path)
         add("--ControlPortWriteToFile")
         add(ctrlPortTxt.path)
         add("--GeoIPFile")
@@ -98,7 +101,7 @@ internal suspend fun startTor(ctrlPortArgument: String): AutoCloseable {
 
     val disposable = currentCoroutineContext().job.invokeOnCompletion {
         result.close()
-        ctrlPortTxt.delete()
+        ctrlPortTxt.delete2(ignoreReadOnly = true)
         try {
             LOADER_DIR.recursivelyDelete()
         } catch (t: Throwable) {
@@ -113,7 +116,7 @@ internal suspend fun startTor(ctrlPortArgument: String): AutoCloseable {
         var exists = false
         while (!exists && mark.elapsedNow() < timeout) {
             delay(25.milliseconds)
-            exists = ctrlPortTxt.exists()
+            exists = ctrlPortTxt.exists2()
         }
 
         if (!exists) {

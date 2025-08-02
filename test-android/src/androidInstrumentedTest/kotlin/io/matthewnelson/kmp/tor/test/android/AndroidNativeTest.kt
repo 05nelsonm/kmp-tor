@@ -16,7 +16,9 @@
 package io.matthewnelson.kmp.tor.test.android
 
 import android.app.Application
+import android.os.Build
 import androidx.test.core.app.ApplicationProvider
+import io.matthewnelson.kmp.file.absoluteFile2
 import io.matthewnelson.kmp.file.toFile
 import io.matthewnelson.kmp.process.Process
 import io.matthewnelson.kmp.process.Stdio
@@ -27,7 +29,7 @@ import kotlin.time.Duration.Companion.minutes
 class AndroidNativeTest {
 
     private val ctx = ApplicationProvider.getApplicationContext<Application>().applicationContext
-    private val nativeLibraryDir = ctx.applicationInfo.nativeLibraryDir.toFile().absoluteFile
+    private val nativeLibraryDir = ctx.applicationInfo.nativeLibraryDir.toFile().absoluteFile2()
 
     @Test
     fun givenAndroidNative_whenExecuteRuntimeTestBinary_thenIsSuccessful() {
@@ -45,24 +47,25 @@ class AndroidNativeTest {
     }
 
     private fun run(libName: String, timeout: Duration) {
-        val process = Process.Builder(nativeLibraryDir.resolve(libName))
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
+            println("Skipping...")
+            return
+        }
+
+        val out = Process.Builder(executable = nativeLibraryDir.resolve(libName))
             .stdin(Stdio.Null)
-            .useSpawn { p ->
-                // Cannot use Stdio.Inherit. Must use System.out/err so that logcat picks it up
-                p.stdoutFeed { line ->
-                    println(line ?: "STDOUT: END")
-                }.stderrFeed { line ->
-                    System.err.println(line ?: "STDERR: END")
-                }.waitFor(duration = timeout)
-                p
+            .output {
+                maxBuffer = Int.MAX_VALUE / 2
+                timeoutMillis = timeout.inWholeMilliseconds.toInt()
             }
 
-        if (process.waitFor() == 0) return
+        if (out.processInfo.exitCode == 0) return
 
-        buildString {
-            appendLine("--- ENVIRONMENT ---")
-            process.environment.forEach { (key, value) -> appendLine("$key=$value") }
-        }.let { System.err.println(it) }
-        throw AssertionError(process.toString())
+        System.err.println(out.toString())
+        System.err.println(out.stdout)
+        System.err.println(out.stderr)
+        System.err.println("--- ENVIRONMENT ---")
+        out.processInfo.environment.forEach { (key, value) -> System.err.println("$key=$value") }
+        throw AssertionError("Process.exitCode[${out.processInfo.exitCode}] != 0")
     }
 }

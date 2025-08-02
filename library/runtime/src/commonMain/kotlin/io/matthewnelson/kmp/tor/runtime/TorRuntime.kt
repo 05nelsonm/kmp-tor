@@ -19,7 +19,10 @@ package io.matthewnelson.kmp.tor.runtime
 
 import io.matthewnelson.encoding.base16.Base16
 import io.matthewnelson.encoding.core.Encoder.Companion.encodeToString
-import io.matthewnelson.kmp.file.*
+import io.matthewnelson.kmp.file.File
+import io.matthewnelson.kmp.file.IOException
+import io.matthewnelson.kmp.file.absoluteFile2
+import io.matthewnelson.kmp.file.normalize
 import io.matthewnelson.kmp.tor.common.api.ExperimentalKmpTorApi
 import io.matthewnelson.kmp.tor.common.api.InternalKmpTorApi
 import io.matthewnelson.kmp.tor.common.api.KmpTorDsl
@@ -313,7 +316,11 @@ public sealed interface TorRuntime:
         @Volatile
         public var debug: Boolean = false
 
-        public override val fid: String by lazy { FileID.createFID(workDirectory) }
+        public override val fid: String by lazy {
+            // Underlying call to absoluteFile2 will not throw exception
+            // here because workDirectory is already absolute.
+            FileID.createFID(workDirectory)
+        }
 
         public companion object {
 
@@ -342,6 +349,8 @@ public sealed interface TorRuntime:
              *   [BuilderScope.resourceDir]. See [kmp-tor-resource](https://github.com/05nelsonm/kmp-tor-resource)
              * @throws [IllegalArgumentException] when [workDirectory] and [cacheDirectory] are
              *   the same.
+             * @throws [IOException] If [absoluteFile2] has to reference the filesystem to construct
+             *   an absolute path and fails due to a filesystem security exception.
              * */
             @JvmStatic
             public fun Builder(
@@ -376,6 +385,8 @@ public sealed interface TorRuntime:
              * @param [block] optional lambda for modifying default parameters.
              * @throws [IllegalArgumentException] when [workDirectory] and [cacheDirectory] are
              *   the same.
+             * @throws [IOException] If [absoluteFile2] has to reference the filesystem to construct
+             *   an absolute path and fails due to a filesystem security exception.
              * */
             @JvmStatic
             public fun Builder(
@@ -450,7 +461,10 @@ public sealed interface TorRuntime:
                     loader: (resourceDir: File) -> ResourceLoader.Tor,
                     block: ThisBlock<BuilderScope>?,
                 ): Environment {
-                    val b = BuilderScope(workDirectory.absoluteFile.normalize(), cacheDirectory.absoluteFile.normalize())
+                    val b = BuilderScope(
+                        workDirectory.absoluteFile2().normalize(),
+                        cacheDirectory.absoluteFile2().normalize(),
+                    )
 
                     require(b.workDirectory != b.cacheDirectory) {
                         "workDirectory and cacheDirectory cannot be the same locations"
@@ -466,7 +480,7 @@ public sealed interface TorRuntime:
                     val serviceLoader = b.serviceFactoryLoader
                     b.serviceFactoryLoader = null
 
-                    val resourceLoader = loader(b.resourceDir.absoluteFile.normalize())
+                    val resourceLoader = loader(b.resourceDir.absoluteFile2().normalize())
 
                     val key = EnvironmentKey(b.workDirectory, b.cacheDirectory)
 

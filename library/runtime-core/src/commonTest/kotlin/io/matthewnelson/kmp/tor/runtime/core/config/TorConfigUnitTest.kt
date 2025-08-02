@@ -15,7 +15,7 @@
  **/
 package io.matthewnelson.kmp.tor.runtime.core.config
 
-import io.matthewnelson.kmp.file.absoluteFile
+import io.matthewnelson.kmp.file.absoluteFile2
 import io.matthewnelson.kmp.file.path
 import io.matthewnelson.kmp.file.toFile
 import io.matthewnelson.kmp.tor.runtime.core.net.Port.Ephemeral.Companion.toPortEphemeral
@@ -28,7 +28,7 @@ class TorConfigUnitTest {
 
     @Test
     fun givenUniqueOption_whenMultipleConfigured_thenIsReplacedWithLatest() {
-        val expected = "/some/path/2".toFile().absoluteFile
+        val expected = "/some/path/2".toFile().absoluteFile2()
 
         val settings = TorConfig.Builder {
             CacheDirectory.configure("/some/other/path".toFile())

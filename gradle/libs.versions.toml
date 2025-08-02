@@ -7,7 +7,7 @@ androidx-test-core          = "1.5.0" # Do not upgrade. Next version requires mi
 androidx-test-runner        = "1.5.2" # Do not upgrade. Next version requires minSdk 19+
 
 # https://repo.maven.apache.org/maven2/org/bouncycastle/bcprov-jdk18on/
-bouncy-castle               = "1.80"
+bouncy-castle               = "1.81"
 
 encoding                    = "2.4.0"
 
@@ -16,15 +16,16 @@ gradle-binary-compat        = "0.17.0"
 gradle-dokka                = "2.0.0"
 gradle-kmp-configuration    = "0.4.1"
 gradle-kotlin               = "2.1.21"
-gradle-publish-maven        = "0.32.0"
+gradle-publish-maven        = "0.33.0"
 
 immutable                   = "0.2.0"
 
 jetbrains-skiko             = "0.9.4.2"
 
-kmp-process                 = "0.3.0"
-kmp-tor-common              = "2.3.0"
-kmp-tor-resource            = "408.16.4" # Upgrade yarn.lock when updating via `./gradlew kotlinUpgradeYarnLock`
+kmp-process                 = "0.3.2-SNAPSHOT"
+kmp-tor-common              = "2.3.1-SNAPSHOT"
+kmp-tor-resource            = "408.17.0-SNAPSHOT" # Upgrade yarn.lock when updating via `./gradlew kotlinUpgradeYarnLock`
+kmp-tor-resourceNpmSNAPSHOT = ".0"
 kotlincrypto-catalog        = "0.7.1" # Utilized from settings.gradle.kts
 kotlinx-coroutines          = "1.10.2"
 ktor                        = "3.1.3"

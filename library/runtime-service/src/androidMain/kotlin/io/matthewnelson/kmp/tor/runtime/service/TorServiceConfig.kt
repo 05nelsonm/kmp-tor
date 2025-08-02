@@ -24,8 +24,13 @@ import android.content.Context
 import android.content.res.Resources
 import android.os.Build
 import androidx.startup.AppInitializer
-import io.matthewnelson.kmp.file.*
 import io.matthewnelson.kmp.file.ANDROID
+import io.matthewnelson.kmp.file.File
+import io.matthewnelson.kmp.file.IOException
+import io.matthewnelson.kmp.file.SysDirSep
+import io.matthewnelson.kmp.file.SysTempDir
+import io.matthewnelson.kmp.file.absoluteFile2
+import io.matthewnelson.kmp.file.toFile
 import io.matthewnelson.kmp.tor.common.api.ExperimentalKmpTorApi
 import io.matthewnelson.kmp.tor.common.api.KmpTorDsl
 import io.matthewnelson.kmp.tor.common.api.ResourceLoader
@@ -108,6 +113,9 @@ public open class TorServiceConfig private constructor(
      * Directories (android unit tests where [testUseBuildDirectory] = `true`):
      *  - workDirectory: {module}/build/kmp_tor_android_test/torservice/work
      *  - cacheDirectory: {module}/build/kmp_tor_android_test/torservice/cache
+     *
+     * @throws [IOException] If [absoluteFile2] has to reference the filesystem to
+     *   construct an absolute path and fails due to a filesystem security exception.
      * */
     public fun newEnvironment(
         loader: (resourceDir: File) -> ResourceLoader.Tor,
@@ -131,6 +139,9 @@ public open class TorServiceConfig private constructor(
      * Directories (android unit tests where [testUseBuildDirectory] = `true`):
      *  - workDirectory: {module}/build/kmp_tor_android_test/torservice/work
      *  - cacheDirectory: {module}/build/kmp_tor_android_test/torservice/cache
+     *
+     * @throws [IOException] If [absoluteFile2] has to reference the filesystem to
+     *   construct an absolute path and fails due to a filesystem security exception.
      * */
     public fun newEnvironment(
         loader: (resourceDir: File) -> ResourceLoader.Tor,
@@ -157,6 +168,8 @@ public open class TorServiceConfig private constructor(
      *  - cacheDirectory: {module}/build/kmp_tor_android_test/[dirName]/cache
      *
      * @throws [IllegalArgumentException] if [dirName] is an absolute file path
+     * @throws [IOException] If [absoluteFile2] has to reference the filesystem to
+     *   construct an absolute path and fails due to a filesystem security exception.
      * */
     public fun newEnvironment(
         dirName: String,
@@ -183,6 +196,8 @@ public open class TorServiceConfig private constructor(
      *  - cacheDirectory: {module}/build/kmp_tor_android_test/[dirName]/cache
      *
      * @throws [IllegalArgumentException] if [dirName] is an absolute file path
+     * @throws [IOException] If [absoluteFile2] has to reference the filesystem to
+     *   construct an absolute path and fails due to a filesystem security exception.
      * */
     public fun newEnvironment(
         dirName: String,
@@ -368,6 +383,8 @@ public open class TorServiceConfig private constructor(
          * @throws [Resources.NotFoundException] If [instanceConfig] fails validation
          *   checks (emulators & devices only).
          * @throws [IllegalArgumentException] if [instanceConfig] is invalid.
+         * @throws [IOException] If [absoluteFile2] has to reference the filesystem to
+         *   construct an absolute path and fails due to a filesystem security exception.
          * */
         public fun newEnvironment(
             instanceConfig: C,
@@ -400,6 +417,8 @@ public open class TorServiceConfig private constructor(
          * @throws [Resources.NotFoundException] If [instanceConfig] fails validation
          *   checks (emulators & devices only).
          * @throws [IllegalArgumentException] if [instanceConfig] is invalid.
+         * @throws [IOException] If [absoluteFile2] has to reference the filesystem to
+         *   construct an absolute path and fails due to a filesystem security exception.
          * */
         public fun newEnvironment(
             instanceConfig: C,
@@ -435,6 +454,8 @@ public open class TorServiceConfig private constructor(
          *   checks (emulators & devices only).
          * @throws [IllegalArgumentException] if [instanceConfig] is invalid or [dirName]
          *   is an absolute file path (starts with `/`).
+         * @throws [IOException] If [absoluteFile2] has to reference the filesystem to
+         *   construct an absolute path and fails due to a filesystem security exception.
          * */
         public fun newEnvironment(
             dirName: String,
@@ -470,6 +491,8 @@ public open class TorServiceConfig private constructor(
          *   checks (emulators & devices only).
          * @throws [IllegalArgumentException] if [instanceConfig] is invalid or [dirName]
          *   is an absolute file path (starts with `/`).
+         * @throws [IOException] If [absoluteFile2] has to reference the filesystem to
+         *   construct an absolute path and fails due to a filesystem security exception.
          * */
         public fun newEnvironment(
             dirName: String,
@@ -602,6 +625,7 @@ public open class TorServiceConfig private constructor(
             fun newInstance(appContext: ApplicationContext): TorRuntime.ServiceFactory.Loader
         }
 
+        @Throws(IOException::class)
         internal fun ProvideLoader.newEnvironment(
             config: TorServiceConfig,
             dirName: String,
@@ -623,7 +647,7 @@ public open class TorServiceConfig private constructor(
 
                 // Android unit tests
                 val testDir = if (config.testUseBuildDirectory) {
-                    val dir = "".toFile().absoluteFile.resolve("build")
+                    val dir = "".toFile().absoluteFile2().resolve("build")
                     if (dir.exists()) {
                         dir
                     } else {

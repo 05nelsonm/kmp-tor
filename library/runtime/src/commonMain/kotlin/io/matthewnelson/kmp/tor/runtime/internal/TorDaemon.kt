@@ -18,7 +18,19 @@
 package io.matthewnelson.kmp.tor.runtime.internal
 
 import io.matthewnelson.immutable.collections.toImmutableList
-import io.matthewnelson.kmp.file.*
+import io.matthewnelson.kmp.file.File
+import io.matthewnelson.kmp.file.FileAlreadyExistsException
+import io.matthewnelson.kmp.file.IOException
+import io.matthewnelson.kmp.file.InterruptedException
+import io.matthewnelson.kmp.file.chmod2
+import io.matthewnelson.kmp.file.delete2
+import io.matthewnelson.kmp.file.exists2
+import io.matthewnelson.kmp.file.mkdirs2
+import io.matthewnelson.kmp.file.name
+import io.matthewnelson.kmp.file.path
+import io.matthewnelson.kmp.file.readBytes
+import io.matthewnelson.kmp.file.resolve
+import io.matthewnelson.kmp.file.toFile
 import io.matthewnelson.kmp.process.Process
 import io.matthewnelson.kmp.process.Signal
 import io.matthewnelson.kmp.process.Stdio
@@ -106,11 +118,17 @@ internal class TorDaemon private constructor(
             .toFile()
 
         // Delete any remnants from last start (if present)
-        controlPortFile.delete()
+        try {
+            controlPortFile.delete2(ignoreReadOnly = true)
+        } catch (_: IOException) {}
 
         val torJob = startArgs.startTor(checkCancellationOrInterrupt)
 
-        torJob.invokeOnCompletion { controlPortFile.delete() }
+        torJob.invokeOnCompletion {
+            try {
+                controlPortFile.delete2(ignoreReadOnly = true)
+            } catch (_: IOException) {}
+        }
 
         val result = try {
             val connection = awaitCtrlConnection(controlPortFile, checkCancellationOrInterrupt)
@@ -284,7 +302,7 @@ internal class TorDaemon private constructor(
             // UNIX_PORT=/tmp/kmp_tor_ctrl/data/ctrl.sock
             if (line.startsWith("UNIX_PORT")) {
                 val file = argument.toFile()
-                if (!file.exists()) continue
+                if (!file.exists2()) continue
 
                 // Prefer UnixDomainSocket if present
                 return CtrlArguments.Connection(file)
@@ -384,7 +402,7 @@ internal class TorDaemon private constructor(
                         val torrc = env.loader.resourceDir.resolve("__torrc")
                         add(torrc.path)
                         add("--ignore-missing-torrc")
-                        torrc.delete()
+                        torrc.delete2(ignoreReadOnly = true)
                     }
                 }
 
@@ -417,14 +435,10 @@ internal class TorDaemon private constructor(
                 }
 
                 directories.forEach { directory ->
-                    if (!directory.exists() && !directory.mkdirs()) {
-                        throw IOException("Failed to create directory[$directory]")
-                    }
-
                     try {
-                        directory.setDirectoryPermissions()
-                    } catch (t: Throwable) {
-                        throw t.wrapIOException { "Failed to set permissions for directory[$directory]" }
+                        directory.mkdirs2(mode = "700", mustCreate = true)
+                    } catch (_: FileAlreadyExistsException) {
+                        directory.chmod2(mode = "700")
                     }
                 }
 

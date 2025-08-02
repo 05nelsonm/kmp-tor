@@ -20,6 +20,8 @@ package io.matthewnelson.kmp.tor.runtime.core.config
 import io.matthewnelson.immutable.collections.immutableSetOf
 import io.matthewnelson.immutable.collections.toImmutableSet
 import io.matthewnelson.kmp.file.File
+import io.matthewnelson.kmp.file.IOException
+import io.matthewnelson.kmp.file.absoluteFile2
 import io.matthewnelson.kmp.tor.runtime.core.ThisBlock
 import io.matthewnelson.kmp.tor.runtime.core.net.Port
 import io.matthewnelson.kmp.tor.runtime.core.config.builder.*
@@ -117,6 +119,13 @@ public abstract class TorOption: Comparable<TorOption>, CharSequence {
         isUnique = true,
     ), ConfigureDirectory {
 
+        /**
+         * Creates the setting.
+         *
+         * @throws [IOException] If [absoluteFile2] has to reference the
+         *   filesystem to construct an absolute path and fails due to a
+         *   filesystem security exception.
+         * */
         @JvmStatic
         public fun asSetting(directory: File): TorSetting = buildContract(directory)
     }
@@ -195,6 +204,13 @@ public abstract class TorOption: Comparable<TorOption>, CharSequence {
         isUnique = true,
     ), ConfigureDirectory {
 
+        /**
+         * Creates the setting.
+         *
+         * @throws [IOException] If [absoluteFile2] has to reference the
+         *   filesystem to construct an absolute path and fails due to a
+         *   filesystem security exception.
+         * */
         @JvmStatic
         public fun asSetting(directory: File): TorSetting = buildContract(directory)
     }
@@ -343,6 +359,13 @@ public abstract class TorOption: Comparable<TorOption>, CharSequence {
         isUnique = true,
     ), ConfigureFile {
 
+        /**
+         * Creates the setting.
+         *
+         * @throws [IOException] If [absoluteFile2] has to reference the
+         *   filesystem to construct an absolute path and fails due to a
+         *   filesystem security exception.
+         * */
         @JvmStatic
         public fun asSetting(file: File): TorSetting = buildContract(file)
     }
@@ -395,6 +418,13 @@ public abstract class TorOption: Comparable<TorOption>, CharSequence {
         isUnique = true,
     ), ConfigureFile {
 
+        /**
+         * Creates the setting.
+         *
+         * @throws [IOException] If [absoluteFile2] has to reference the
+         *   filesystem to construct an absolute path and fails due to a
+         *   filesystem security exception.
+         * */
         @JvmStatic
         public fun asSetting(file: File): TorSetting = buildContract(file)
     }
@@ -437,6 +467,13 @@ public abstract class TorOption: Comparable<TorOption>, CharSequence {
         isUnique = true,
     ), ConfigureDirectory {
 
+        /**
+         * Creates the setting.
+         *
+         * @throws [IOException] If [absoluteFile2] has to reference the
+         *   filesystem to construct an absolute path and fails due to a
+         *   filesystem security exception.
+         * */
         @JvmStatic
         public fun asSetting(directory: File): TorSetting = buildContract(directory)
     }
@@ -558,6 +595,13 @@ public abstract class TorOption: Comparable<TorOption>, CharSequence {
         isUnique = true,
     ), ConfigureFile {
 
+        /**
+         * Creates the setting.
+         *
+         * @throws [IOException] If [absoluteFile2] has to reference the
+         *   filesystem to construct an absolute path and fails due to a
+         *   filesystem security exception.
+         * */
         @JvmStatic
         public fun asSetting(file: File): TorSetting = buildContract(file)
     }
@@ -913,6 +957,13 @@ public abstract class TorOption: Comparable<TorOption>, CharSequence {
         isUnique = true,
     ), ConfigureFile {
 
+        /**
+         * Creates the setting.
+         *
+         * @throws [IOException] If [absoluteFile2] has to reference the
+         *   filesystem to construct an absolute path and fails due to a
+         *   filesystem security exception.
+         * */
         @JvmStatic
         public fun asSetting(file: File): TorSetting = buildContract(file)
     }
@@ -1314,6 +1365,13 @@ public abstract class TorOption: Comparable<TorOption>, CharSequence {
         isUnique = true,
     ), ConfigureDirectory {
 
+        /**
+         * Creates the setting.
+         *
+         * @throws [IOException] If [absoluteFile2] has to reference the
+         *   filesystem to construct an absolute path and fails due to a
+         *   filesystem security exception.
+         * */
         @JvmStatic
         public fun asSetting(directory: File): TorSetting = buildContract(directory)
     }
@@ -2554,6 +2612,13 @@ public abstract class TorOption: Comparable<TorOption>, CharSequence {
         isUnique = true,
     ), ConfigureFile {
 
+        /**
+         * Creates the setting.
+         *
+         * @throws [IOException] If [absoluteFile2] has to reference the
+         *   filesystem to construct an absolute path and fails due to a
+         *   filesystem security exception.
+         * */
         @JvmStatic
         public fun asSetting(file: File): TorSetting = buildContract(file)
     }
@@ -2568,6 +2633,13 @@ public abstract class TorOption: Comparable<TorOption>, CharSequence {
         isUnique = true,
     ), ConfigureFile {
 
+        /**
+         * Creates the setting.
+         *
+         * @throws [IOException] If [absoluteFile2] has to reference the
+         *   filesystem to construct an absolute path and fails due to a
+         *   filesystem security exception.
+         * */
         @JvmStatic
         public fun asSetting(file: File): TorSetting = buildContract(file)
     }
@@ -2613,6 +2685,13 @@ public abstract class TorOption: Comparable<TorOption>, CharSequence {
         isUnique = true,
     ), ConfigureDirectory {
 
+        /**
+         * Creates the setting.
+         *
+         * @throws [IOException] If [absoluteFile2] has to reference the
+         *   filesystem to construct an absolute path and fails due to a
+         *   filesystem security exception.
+         * */
         @JvmStatic
         public fun asSetting(directory: File): TorSetting = buildContract(directory)
     }
@@ -2840,6 +2919,13 @@ public abstract class TorOption: Comparable<TorOption>, CharSequence {
         isUnique = true,
     ), ConfigureFile {
 
+        /**
+         * Creates the setting.
+         *
+         * @throws [IOException] If [absoluteFile2] has to reference the
+         *   filesystem to construct an absolute path and fails due to a
+         *   filesystem security exception.
+         * */
         @JvmStatic
         public fun asSetting(file: File): TorSetting = buildContract(file)
     }
@@ -3140,6 +3226,13 @@ public abstract class TorOption: Comparable<TorOption>, CharSequence {
         isUnique = true,
     ), ConfigureFile {
 
+        /**
+         * Creates the setting.
+         *
+         * @throws [IOException] If [absoluteFile2] has to reference the
+         *   filesystem to construct an absolute path and fails due to a
+         *   filesystem security exception.
+         * */
         @JvmStatic
         public fun asSetting(file: File): TorSetting = buildContract(file)
     }
@@ -3783,6 +3876,13 @@ public abstract class TorOption: Comparable<TorOption>, CharSequence {
         isUnique = true,
     ), ConfigureFile {
 
+        /**
+         * Creates the setting.
+         *
+         * @throws [IOException] If [absoluteFile2] has to reference the
+         *   filesystem to construct an absolute path and fails due to a
+         *   filesystem security exception.
+         * */
         @JvmStatic
         public fun asSetting(file: File): TorSetting = buildContract(file)
     }
@@ -3922,6 +4022,13 @@ public abstract class TorOption: Comparable<TorOption>, CharSequence {
         isUnique = true,
     ), ConfigureFile {
 
+        /**
+         * Creates the setting.
+         *
+         * @throws [IOException] If [absoluteFile2] has to reference the
+         *   filesystem to construct an absolute path and fails due to a
+         *   filesystem security exception.
+         * */
         @JvmStatic
         public fun asSetting(file: File): TorSetting = buildContract(file)
     }

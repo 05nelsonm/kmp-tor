@@ -18,17 +18,19 @@
 package io.matthewnelson.kmp.tor.runtime.core.internal
 
 import io.matthewnelson.kmp.file.File
-import io.matthewnelson.kmp.file.absoluteFile
+import io.matthewnelson.kmp.file.IOException
+import io.matthewnelson.kmp.file.absoluteFile2
 import io.matthewnelson.kmp.file.normalize
 import io.matthewnelson.kmp.file.path
 
-internal inline val File.absoluteNormalizedFile: File get() = absoluteFile.normalize()
+@Throws(IOException::class)
+internal inline fun File.absoluteNormalizedFile(): File = absoluteFile2().normalize()
 
-@Throws(UnsupportedOperationException::class)
+@Throws(IOException::class, UnsupportedOperationException::class)
 internal fun File.toUnixSocketPath(): String {
     UnixSocketsNotSupportedMessage?.let { throw UnsupportedOperationException(it) }
 
-    val path = absoluteNormalizedFile.path
+    val path = absoluteNormalizedFile().path
 
     // FreeBSD -> MAX 102 chars
     // Darwin  -> MAX 102 chars

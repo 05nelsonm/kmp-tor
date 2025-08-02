@@ -15,7 +15,7 @@
  **/
 package io.matthewnelson.kmp.tor.runtime
 
-import io.matthewnelson.kmp.file.absoluteFile
+import io.matthewnelson.kmp.file.absoluteFile2
 import io.matthewnelson.kmp.file.path
 import io.matthewnelson.kmp.file.resolve
 import io.matthewnelson.kmp.file.toFile
@@ -52,7 +52,7 @@ class EnvironmentUnitTest {
             return@runTorTest
         }
 
-        val rootDir = "".toFile().absoluteFile.resolve("env_instance")
+        val rootDir = "".toFile().absoluteFile2().resolve("env_instance")
 
         val env1 = TorRuntime.Environment.Builder(rootDir.resolve("work"), rootDir.resolve("cache"), ::testLoader)
         val env2 = TorRuntime.Environment.Builder(rootDir.resolve("work"), rootDir.resolve("cache2"), ::testLoader)

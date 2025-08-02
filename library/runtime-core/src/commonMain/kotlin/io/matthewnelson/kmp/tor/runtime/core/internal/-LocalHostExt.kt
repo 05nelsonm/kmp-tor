@@ -103,11 +103,8 @@ internal fun LocalHost.Companion.tryParsingEtcHosts(set: LinkedHashSet<IPAddress
     if (!IsUnixLikeHost) return
     if (set.hasIPv4IPv6) return
 
-    val etcHosts = "/etc/hosts".toFile()
-    if (!etcHosts.exists()) return
-
     val lines = try {
-        etcHosts.readUtf8().lines()
+        "/etc/hosts".toFile().readUtf8().lines()
     } catch (_: Throwable) {
         return
     }

@@ -16,6 +16,7 @@
 package io.matthewnelson.kmp.tor.runtime
 
 import io.matthewnelson.immutable.collections.toImmutableList
+import io.matthewnelson.kmp.file.mkdirs2
 import io.matthewnelson.kmp.file.resolve
 import io.matthewnelson.kmp.tor.common.api.InternalKmpTorApi
 import io.matthewnelson.kmp.tor.common.core.synchronized
@@ -42,7 +43,6 @@ import io.matthewnelson.kmp.tor.runtime.core.net.IPAddress.V6.Companion.toIPAddr
 import io.matthewnelson.kmp.tor.runtime.core.net.OnionAddress
 import io.matthewnelson.kmp.tor.runtime.core.net.Port
 import io.matthewnelson.kmp.tor.runtime.core.util.executeAsync
-import io.matthewnelson.kmp.tor.runtime.internal.setDirectoryPermissions
 import io.matthewnelson.kmp.tor.runtime.test.runTorTest
 import io.matthewnelson.kmp.tor.runtime.test.testClientAuthKeyPairs
 import kotlinx.coroutines.Dispatchers
@@ -304,9 +304,11 @@ class TorCmdUnitTest {
         runtime.startDaemonAsync()
 
         runtime.executeAsync(TorCmd.Config.Set {
-            val dir = runtime.environment().workDirectory.resolve("auth_private_files")
-            dir.mkdirs()
-            dir.setDirectoryPermissions()
+            val dir = runtime
+                .environment()
+                .workDirectory
+                .resolve("auth_private_files")
+                .mkdirs2(mode = "700", mustCreate = false)
 
             TorOption.ClientOnionAuthDir.configure(dir)
         })

@@ -19,7 +19,9 @@ package io.matthewnelson.kmp.tor.runtime.ctrl.internal
 
 import io.matthewnelson.kmp.file.File
 import io.matthewnelson.kmp.file.FileNotFoundException
+import io.matthewnelson.kmp.file.IOException
 import io.matthewnelson.kmp.file.InterruptedException
+import io.matthewnelson.kmp.file.exists2
 import io.matthewnelson.kmp.tor.runtime.core.OnFailure
 import io.matthewnelson.kmp.tor.runtime.core.EnqueuedJob
 import io.matthewnelson.kmp.tor.runtime.core.EnqueuedJob.Companion.toImmediateErrorJob
@@ -31,13 +33,13 @@ import io.matthewnelson.kmp.tor.runtime.core.ctrl.TorCmd
 import kotlin.collections.removeFirst as kRemoveFirst
 
 @Suppress("NOTHING_TO_INLINE")
-@Throws(FileNotFoundException::class, UnsupportedOperationException::class)
+@Throws(IOException::class, UnsupportedOperationException::class)
 internal inline fun File.checkUnixSocketSupport() {
     val path = this
 
     TorOption.__ControlPort.asSetting { unixSocket(path) }
 
-    if (exists()) return
+    if (exists2()) return
     throw FileNotFoundException(path.toString())
 }
 

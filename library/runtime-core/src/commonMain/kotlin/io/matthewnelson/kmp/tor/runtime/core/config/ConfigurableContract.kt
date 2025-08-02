@@ -194,20 +194,20 @@ internal inline fun ConfigureBoolean.buildContract(
 
 @JvmSynthetic
 @Suppress("NOTHING_TO_INLINE")
-@Throws(ClassCastException::class)
+@Throws(IOException::class, ClassCastException::class)
 internal inline fun ConfigureDirectory.buildContract(
     directory: File,
 ): TorSetting = (this as TorOption)
-    .toLineItem(directory.absoluteNormalizedFile.path)
+    .toLineItem(directory.absoluteNormalizedFile().path)
     .toSetting()
 
 @JvmSynthetic
 @Suppress("NOTHING_TO_INLINE")
-@Throws(ClassCastException::class)
+@Throws(IOException::class, ClassCastException::class)
 internal inline fun ConfigureFile.buildContract(
     file: File,
 ): TorSetting = (this as TorOption)
-    .toLineItem(file.absoluteNormalizedFile.path)
+    .toLineItem(file.absoluteNormalizedFile().path)
     .toSetting()
 
 @JvmSynthetic
