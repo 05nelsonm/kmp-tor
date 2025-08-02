@@ -19,6 +19,8 @@ plugins {
     id("configuration")
 }
 
+repositories { google() }
+
 kmpConfiguration {
     configure {
         val jniLibsDir = projectDir
