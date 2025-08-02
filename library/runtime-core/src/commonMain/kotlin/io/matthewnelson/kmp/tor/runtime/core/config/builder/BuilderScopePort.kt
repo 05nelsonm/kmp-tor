@@ -399,6 +399,9 @@ public abstract class BuilderScopePort: TorSetting.BuilderScope {
      *   - Is Java 15 or below (Jvm only, Android is always available).
      *   - Configured path is too long.
      *   - Configured path is multiple lines.
+     * @throws [IOException] If [absoluteFile2] has to reference the
+     *   filesystem to construct an absolute path and fails due to a
+     *   filesystem security exception.
      * */
     @KmpTorDsl
     protected open fun unixSocket(

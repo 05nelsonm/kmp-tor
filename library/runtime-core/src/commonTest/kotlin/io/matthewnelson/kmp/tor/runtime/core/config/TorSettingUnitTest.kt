@@ -15,7 +15,7 @@
  **/
 package io.matthewnelson.kmp.tor.runtime.core.config
 
-import io.matthewnelson.kmp.file.absoluteFile
+import io.matthewnelson.kmp.file.absoluteFile2
 import io.matthewnelson.kmp.file.path
 import io.matthewnelson.kmp.file.resolve
 import io.matthewnelson.kmp.file.toFile
@@ -41,10 +41,10 @@ class TorSettingUnitTest {
     @Test
     fun givenFilterBy_whenNestedInGroupSetting_thenReturnsSetting() {
         val config = TorConfig.Builder {
-            DataDirectory.configure("".toFile().absoluteFile.resolve("data"))
-            CacheDirectory.configure("".toFile().absoluteFile.resolve("cache"))
+            DataDirectory.configure("".toFile().absoluteFile2().resolve("data"))
+            CacheDirectory.configure("".toFile().absoluteFile2().resolve("cache"))
             HiddenServiceDir.tryConfigure {
-                directory("".toFile().absoluteFile.resolve("hs_dir"))
+                directory("".toFile().absoluteFile2().resolve("hs_dir"))
                 version(3)
                 port(virtual = Port.HTTP) {
                     target(port = 8080.toPort())

@@ -15,7 +15,7 @@
  **/
 package io.matthewnelson.kmp.tor.runtime.core.config.builder
 
-import io.matthewnelson.kmp.file.absoluteFile
+import io.matthewnelson.kmp.file.absoluteFile2
 import io.matthewnelson.kmp.file.path
 import io.matthewnelson.kmp.file.resolve
 import io.matthewnelson.kmp.file.toFile
@@ -79,7 +79,7 @@ class BuilderScopeHSUnitTest {
     @Test
     fun givenBuilder_whenDirectory_thenIsAbsoluteNormalized() {
         val expected = "1234else"
-        val absolute = "".toFile().absoluteFile
+        val absolute = "".toFile().absoluteFile2()
         val dir = absolute.resolve("somewhere/$expected/another/../.")
 
         val setting = HiddenServiceDir.asSetting {

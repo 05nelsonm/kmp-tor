@@ -13,11 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-@file:Suppress("KotlinRedundantDiagnosticSuppress")
-
 package io.matthewnelson.kmp.tor.runtime.internal
 
-import io.matthewnelson.kmp.file.File
 import io.matthewnelson.kmp.tor.runtime.TorRuntime
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.delay
@@ -26,9 +23,6 @@ import kotlin.time.TimeSource
 
 @Suppress("NOTHING_TO_INLINE")
 internal expect inline fun TorRuntime.Environment.newRuntimeDispatcher(): CoroutineDispatcher
-
-@Throws(Throwable::class)
-internal expect fun File.setDirectoryPermissions()
 
 // No matter the Delay implementation (Coroutines Test library)
 // Will delay the specified duration using a TimeSource.

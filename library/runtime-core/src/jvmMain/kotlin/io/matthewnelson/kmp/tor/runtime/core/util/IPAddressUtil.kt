@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
+@file:Suppress("REDUNDANT_ELSE_IN_WHEN")
 @file:JvmName("IPAddressUtil")
 
 package io.matthewnelson.kmp.tor.runtime.core.util

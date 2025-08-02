@@ -20,6 +20,8 @@ package io.matthewnelson.kmp.tor.runtime.core.config
 import io.matthewnelson.immutable.collections.immutableSetOf
 import io.matthewnelson.immutable.collections.toImmutableSet
 import io.matthewnelson.kmp.file.File
+import io.matthewnelson.kmp.file.IOException
+import io.matthewnelson.kmp.file.absoluteFile2
 import io.matthewnelson.kmp.tor.common.api.InternalKmpTorApi
 import io.matthewnelson.kmp.tor.common.api.KmpTorDsl
 import io.matthewnelson.kmp.tor.runtime.core.ThisBlock
@@ -231,6 +233,9 @@ public class TorConfig private constructor(settings: Set<TorSetting>): Iterable<
          *
          * @throws [ClassCastException] when [ConfigureDirectory] is not
          *   an instance of [TorOption].
+         * @throws [IOException] If [absoluteFile2] has to reference the
+         *   filesystem to construct an absolute path and fails due to a
+         *   filesystem security exception.
          * */
         @KmpTorDsl
         public fun ConfigureDirectory.configure(
@@ -249,6 +254,9 @@ public class TorConfig private constructor(settings: Set<TorSetting>): Iterable<
          *
          * @throws [ClassCastException] when [ConfigureFile] is not
          *   an instance of [TorOption].
+         * @throws [IOException] If [absoluteFile2] has to reference the
+         *   filesystem to construct an absolute path and fails due to a
+         *   filesystem security exception.
          * */
         @KmpTorDsl
         public fun ConfigureFile.configure(

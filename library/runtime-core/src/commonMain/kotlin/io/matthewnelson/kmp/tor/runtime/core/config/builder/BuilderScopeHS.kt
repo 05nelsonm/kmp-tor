@@ -112,7 +112,7 @@ public class BuilderScopeHS: TorSetting.BuilderScope, BuilderScopeHSPort.DSL<Bui
     public fun directory(
         dir: File,
     ): BuilderScopeHS {
-        argument = dir.absoluteNormalizedFile.path
+        argument = dir.absoluteNormalizedFile().path
         return this
     }
 
