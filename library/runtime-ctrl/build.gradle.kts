@@ -25,7 +25,11 @@ kmpConfiguration {
         js {
             sourceSetTest {
                 dependencies {
-                    implementation(npm("kmp-tor.resource-exec-tor.all", libs.versions.kmp.tor.resource.get()))
+                    var v = libs.versions.kmp.tor.resource.get()
+                    if (v.endsWith("-SNAPSHOT")) {
+                        v += libs.versions.kmp.tor.resourceNpmSNAPSHOT.get()
+                    }
+                    implementation(npm("kmp-tor.resource-exec-tor.all", v))
                 }
             }
         }
