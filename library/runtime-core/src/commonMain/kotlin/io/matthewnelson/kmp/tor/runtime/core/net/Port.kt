@@ -22,7 +22,6 @@ import io.matthewnelson.kmp.tor.runtime.core.net.Port.Companion.MIN
 import io.matthewnelson.kmp.tor.runtime.core.net.Port.Ephemeral.Companion.toPortEphemeralOrNull
 import io.matthewnelson.kmp.tor.runtime.core.internal.HostAndPort
 import io.matthewnelson.kmp.tor.runtime.core.internal.HostAndPort.Companion.findHostnameAndPortFromURL
-import io.matthewnelson.kmp.tor.runtime.core.util.findNextAvailableAsync
 import kotlin.jvm.JvmField
 import kotlin.jvm.JvmName
 import kotlin.jvm.JvmStatic

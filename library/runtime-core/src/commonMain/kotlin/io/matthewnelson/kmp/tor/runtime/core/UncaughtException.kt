@@ -122,6 +122,7 @@ public class UncaughtException private constructor(
                     block()
                 } catch (t: Throwable) {
                     if (this == IGNORE) return
+                    @Suppress("IfThenToElvis")
                     val e = if (t is UncaughtException) t else {
                         UncaughtException.of(context.toString(), t)
                     }
@@ -187,6 +188,7 @@ public class UncaughtException private constructor(
                 var threw: UncaughtException? = null
                 var isActive = true
 
+                @Suppress("IfThenToElvis")
                 val suppressed = if (handler is SuppressedHandler) {
                     // Was still active. Is a nested withSuppression2 invocation
                     handler
@@ -199,6 +201,7 @@ public class UncaughtException private constructor(
                 val result = try {
                     block(suppressed)
                 } finally {
+                    @Suppress("AssignedValueIsNeverRead")
                     isActive = false
                 }
 

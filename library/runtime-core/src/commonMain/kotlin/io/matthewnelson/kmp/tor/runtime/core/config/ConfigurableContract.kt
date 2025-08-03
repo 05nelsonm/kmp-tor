@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-@file:Suppress("KotlinRedundantDiagnosticSuppress")
+@file:Suppress("NOTHING_TO_INLINE")
 
 package io.matthewnelson.kmp.tor.runtime.core.config
 
@@ -156,20 +156,17 @@ public interface ConfigureInterval: ConfigurableContract<ConfigureInterval>
 public interface ConfigureIntervalMsec: ConfigurableContract<ConfigureIntervalMsec>
 
 @JvmSynthetic
-@Suppress("NOTHING_TO_INLINE")
 @Throws(ClassCastException::class)
 internal inline fun <B: TorSetting.BuilderScope> ConfigureBuildable<B>.buildContract(
     block: ThisBlock<B>,
 ): TorSetting = (this as TorOption).buildBuildable(block)
 
 @JvmSynthetic
-@Suppress("NOTHING_TO_INLINE")
 @Throws(ClassCastException::class, UnsupportedOperationException::class)
 internal inline fun <B: TorSetting.BuilderScope> ConfigureBuildableTry<B>.buildContract(
     block: ThisBlock<B>,
 ): TorSetting = (this as TorOption).buildBuildable(block)
 
-@Suppress("NOTHING_TO_INLINE")
 @Throws(ClassCastException::class, UnsupportedOperationException::class)
 private inline fun <B: TorSetting.BuilderScope> TorOption.buildBuildable(
     block: ThisBlock<B>,
@@ -184,7 +181,6 @@ private inline fun <B: TorSetting.BuilderScope> TorOption.buildBuildable(
 }.apply(block).build()
 
 @JvmSynthetic
-@Suppress("NOTHING_TO_INLINE")
 @Throws(ClassCastException::class)
 internal inline fun ConfigureBoolean.buildContract(
     enable: Boolean,
@@ -193,7 +189,6 @@ internal inline fun ConfigureBoolean.buildContract(
     .toSetting()
 
 @JvmSynthetic
-@Suppress("NOTHING_TO_INLINE")
 @Throws(IOException::class, ClassCastException::class)
 internal inline fun ConfigureDirectory.buildContract(
     directory: File,
@@ -202,7 +197,6 @@ internal inline fun ConfigureDirectory.buildContract(
     .toSetting()
 
 @JvmSynthetic
-@Suppress("NOTHING_TO_INLINE")
 @Throws(IOException::class, ClassCastException::class)
 internal inline fun ConfigureFile.buildContract(
     file: File,
@@ -211,7 +205,6 @@ internal inline fun ConfigureFile.buildContract(
     .toSetting()
 
 @JvmSynthetic
-@Suppress("NOTHING_TO_INLINE")
 @Throws(ClassCastException::class)
 internal inline fun ConfigureInterval.buildContract(
     num: Int,
@@ -221,7 +214,6 @@ internal inline fun ConfigureInterval.buildContract(
     .toSetting()
 
 @JvmSynthetic
-@Suppress("NOTHING_TO_INLINE")
 @Throws(ClassCastException::class)
 internal inline fun ConfigureIntervalMsec.buildContract(
     milliseconds: Int,

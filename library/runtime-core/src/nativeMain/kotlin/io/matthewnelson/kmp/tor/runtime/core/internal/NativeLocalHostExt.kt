@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-@file:Suppress("KotlinRedundantDiagnosticSuppress", "FunctionName", "UnnecessaryOptInAnnotation")
+@file:Suppress("NOTHING_TO_INLINE", "FunctionName", "UnnecessaryOptInAnnotation")
 
 package io.matthewnelson.kmp.tor.runtime.core.internal
 
@@ -68,7 +68,6 @@ private fun sockaddr.toIPAddressOrNull(): IPAddress? {
     }
 }
 
-@Suppress("NOTHING_TO_INLINE")
 @OptIn(UnsafeNumber::class, ExperimentalForeignApi::class)
 private inline fun sockaddr_in.toIPAddressV4OrNull(): IPAddress.V4? = memScoped {
     val string = allocArray<ByteVar>(INET_ADDRSTRLEN)
@@ -84,7 +83,6 @@ private inline fun sockaddr_in.toIPAddressV4OrNull(): IPAddress.V4? = memScoped 
     )?.toKString()?.toIPAddressV4OrNull()
 }
 
-@Suppress("NOTHING_TO_INLINE")
 @OptIn(UnsafeNumber::class, ExperimentalForeignApi::class)
 private inline fun sockaddr_in6.toIPAddressV6OrNull(): IPAddress.V6? = memScoped {
     val string = allocArray<ByteVar>(INET6_ADDRSTRLEN)
@@ -97,7 +95,6 @@ private inline fun sockaddr_in6.toIPAddressV6OrNull(): IPAddress.V6? = memScoped
     )?.toKString()?.toIPAddressV6OrNull()
 }
 
-@Suppress("NOTHING_TO_INLINE")
 @OptIn(ExperimentalForeignApi::class)
 internal expect inline fun platform_inet_ntop(
     family: Int,

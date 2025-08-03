@@ -110,7 +110,7 @@ class JobUtilNonJsUnitTest {
                 cancellation = null
             )
             fail()
-        } catch (e: IllegalStateException) {
+        } catch (_: IllegalStateException) {
             // pass
         }
 

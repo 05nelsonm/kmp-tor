@@ -13,13 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-@file:Suppress("UnnecessaryOptInAnnotation")
-
 package io.matthewnelson.kmp.tor.runtime.core.util
 
 import io.matthewnelson.kmp.tor.runtime.core.net.IPAddress
 import io.matthewnelson.kmp.tor.runtime.core.internal.ServerSocketProducer.Companion.toServerSocketProducer
 
+@Suppress("UNUSED")
 class PortUtilJvmUnitTest: PortUtilBaseTest() {
 
     override suspend fun openServerSocket(

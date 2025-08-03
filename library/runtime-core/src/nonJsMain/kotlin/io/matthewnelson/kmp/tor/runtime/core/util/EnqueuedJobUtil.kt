@@ -130,6 +130,7 @@ internal inline fun <Success: Any> EnqueuedJob.awaitSync(
         val cause = try {
             callback() ?: continue
         } catch (t: Throwable) {
+            @Suppress("IfThenToElvis")
             if (t is CancellationException) {
                 t
             } else {

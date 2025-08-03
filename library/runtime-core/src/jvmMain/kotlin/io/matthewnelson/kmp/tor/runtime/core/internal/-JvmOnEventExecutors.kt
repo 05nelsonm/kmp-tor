@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-@file:Suppress("KotlinRedundantDiagnosticSuppress", "NOTHING_TO_INLINE")
+@file:Suppress("NOTHING_TO_INLINE")
 
 package io.matthewnelson.kmp.tor.runtime.core.internal
 
@@ -24,6 +24,7 @@ import kotlin.coroutines.EmptyCoroutineContext
 
 private val SkikoUIDispatcher: CoroutineDispatcher? by lazy {
     try {
+        @Suppress("UNNECESSARY_SAFE_CALL")
         val dispatcher = Class.forName("org.jetbrains.skiko.MainUIDispatcher_awtKt")
             ?.getMethod("getMainUIDispatcher")
             ?.invoke(null) as? CoroutineDispatcher

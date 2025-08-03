@@ -13,6 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
+@file:Suppress("RedundantVisibilityModifier", "UNUSED")
+
 package io.matthewnelson.kmp.tor.runtime.core.ctrl
 
 import io.matthewnelson.encoding.base16.Base16

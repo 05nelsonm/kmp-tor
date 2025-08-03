@@ -31,10 +31,10 @@ actual class OnEventExecutorUnitTest: OnEventExecutorBaseTest() {
     fun givenMain_whenIsImmediate_thenIsTrue() {
         assertTrue(OnEvent.Executor.Main.isImmediate())
 
-        var wasInvoked: Boolean = false
+        var wasInvoked = false
 
         @OptIn(InternalKmpTorApi::class)
-        OnEvent.Executor.Main.execute(EmptyCoroutineContext, Executable { wasInvoked = true })
+        OnEvent.Executor.Main.execute(EmptyCoroutineContext) { wasInvoked = true }
 
         // Actual implementation of MainExecutorInternal is typealias to Immediate. If execution
         // were not to have been immediate (a coroutine was launched), then this would be false

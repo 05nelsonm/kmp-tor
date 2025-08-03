@@ -32,7 +32,7 @@ public expect suspend fun Port.isAvailableAsync(
 
 /**
  * Finds an available TCP port on [LocalHost] starting with the current
- * [Port.Ephemeral.value] and iterating up [limit] times.
+ * [Port.Ephemeral] value and iterating up [limit] times.
  *
  * If [Port.Ephemeral.MAX] is exceeded while iterating through ports and [limit]
  * has not been exhausted, the remaining checks will start from [Port.Ephemeral.MIN].

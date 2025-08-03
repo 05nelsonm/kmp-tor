@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-@file:Suppress("KotlinRedundantDiagnosticSuppress", "FunctionName")
+@file:Suppress("NOTHING_TO_INLINE", "FunctionName")
 
 package io.matthewnelson.kmp.tor.runtime.core
 
@@ -758,7 +758,6 @@ public abstract class EnqueuedJob protected constructor(
     public interface Argument
 }
 
-@Suppress("NOTHING_TO_INLINE")
 private inline fun EnqueuedJob.ExecutionPolicy.privateEquals(
     other: Any?,
 ): Boolean {
@@ -766,14 +765,12 @@ private inline fun EnqueuedJob.ExecutionPolicy.privateEquals(
     && other.cancellation == cancellation
 }
 
-@Suppress("NOTHING_TO_INLINE")
 private inline fun EnqueuedJob.ExecutionPolicy.privateHashCode(): Int {
     var result = 17
     result = result * 42 + cancellation.hashCode()
     return result
 }
 
-@Suppress("NOTHING_TO_INLINE")
 private inline fun EnqueuedJob.ExecutionPolicy.privateToString(): String = buildString {
     appendLine("ExecutionPolicy: [")
     append("    cancellation: [")
@@ -788,7 +785,6 @@ private inline fun EnqueuedJob.ExecutionPolicy.privateToString(): String = build
     append(']')
 }
 
-@Suppress("NOTHING_TO_INLINE")
 private inline fun Cancellation.privateEquals(
     other: Any?,
 ): Boolean {
@@ -798,7 +794,6 @@ private inline fun Cancellation.privateEquals(
     && other.substituteErrorWithAttempt == substituteErrorWithAttempt
 }
 
-@Suppress("NOTHING_TO_INLINE")
 private inline fun Cancellation.privateHashCode(): Int {
     var result = 17
     result = result * 42 + allowAttempts.hashCode()
@@ -807,7 +802,6 @@ private inline fun Cancellation.privateHashCode(): Int {
     return result
 }
 
-@Suppress("NOTHING_TO_INLINE")
 private inline fun Cancellation.privateToString(): String = buildString {
     appendLine("ExecutionPolicy.Cancellation: [")
     append("    allowAttempts: ")
