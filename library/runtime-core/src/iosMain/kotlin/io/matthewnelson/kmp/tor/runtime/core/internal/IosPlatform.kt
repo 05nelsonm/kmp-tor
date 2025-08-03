@@ -17,22 +17,17 @@
 
 package io.matthewnelson.kmp.tor.runtime.core.internal
 
-import kotlin.experimental.ExperimentalNativeApi
+import kotlinx.cinterop.ExperimentalForeignApi
+import kotlinx.cinterop.sizeOf
+import platform.posix.sa_family_tVar
+import platform.posix.u_charVar
 
-internal actual inline val IsAndroidHost: Boolean get() {
-    @OptIn(ExperimentalNativeApi::class)
-    return when (Platform.osFamily) {
-        OsFamily.ANDROID -> true
-        else -> false
-    }
-}
-
-internal actual inline val IsDarwinMobile: Boolean get() {
-    @OptIn(ExperimentalNativeApi::class)
-    return when (Platform.osFamily) {
-        OsFamily.IOS,
-        OsFamily.TVOS,
-        OsFamily.WATCHOS-> true
-        else -> false
-    }
+internal actual inline val AFUnixSunPathSize: Int get() {
+    // struct  sockaddr_un {
+    //	 unsigned char   sun_len;        /* sockaddr len including null */
+    //	 sa_family_t     sun_family;     /* [XSI] AF_UNIX */
+    //	 char            sun_path[104];  /* [XSI] path name (gag) */
+    // };
+    @OptIn(ExperimentalForeignApi::class)
+    return (sizeOf<sockaddr_un>() -  sizeOf<u_charVar>() - sizeOf<sa_family_tVar>()).toInt()
 }

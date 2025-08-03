@@ -13,9 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
+@file:Suppress("NOTHING_TO_INLINE")
+
 package io.matthewnelson.kmp.tor.runtime.core.internal
 
 import kotlinx.cinterop.ExperimentalForeignApi
 
-@OptIn(ExperimentalForeignApi::class)
-internal actual val AFUnixPathBufSize: Int = UNIX_PATH_MAX
+internal actual inline val AFUnixSunPathSize: Int get() {
+    @OptIn(ExperimentalForeignApi::class)
+    return UNIX_PATH_MAX
+}

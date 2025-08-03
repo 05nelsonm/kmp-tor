@@ -29,13 +29,13 @@ import kotlin.coroutines.cancellation.CancellationException
 
 internal expect val UnixSocketsNotSupportedMessage: String?
 
-internal expect val AFUnixPathBufSize: Int
+internal expect inline val AFUnixSunPathSize: Int
 
-internal expect val IsUnixLikeHost: Boolean
+internal expect inline val IsUnixLikeHost: Boolean
 
-internal expect val IsAndroidHost: Boolean
+internal expect inline val IsAndroidHost: Boolean
 
-internal expect val IsDarwinMobile: Boolean
+internal expect inline val IsDarwinMobile: Boolean
 
 @InternalKmpTorApi
 @Throws(Throwable::class)

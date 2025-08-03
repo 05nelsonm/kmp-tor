@@ -13,35 +13,35 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
+@file:Suppress("NOTHING_TO_INLINE")
+
 package io.matthewnelson.kmp.tor.runtime.core.internal
 
 import io.matthewnelson.kmp.file.SysDirSep
 import io.matthewnelson.kmp.tor.common.api.InternalKmpTorApi
 import io.matthewnelson.kmp.tor.common.core.OSHost
 import io.matthewnelson.kmp.tor.common.core.OSInfo
-import kotlin.jvm.JvmSynthetic
 
-@OptIn(InternalKmpTorApi::class)
-internal actual val AFUnixPathBufSize: Int get() {
+internal actual inline val AFUnixSunPathSize: Int get() {
+    @OptIn(InternalKmpTorApi::class)
     return when (OSInfo.INSTANCE.osHost) {
-        // sockaddr_un.sun_path buffer size as defined in sys/un.h
+        // sockaddr_un.sun_path size as defined in sys/un.h
         is OSHost.FreeBSD,
         is OSHost.MacOS -> 104
 
         // UNIX_PATH_MAX as defined in afunix.h
         is OSHost.Windows -> 108
 
-        // sockaddr_un.sun_path buffer size as defined in sys/un.h
+        // sockaddr_un.sun_path size as defined in sys/un.h
         is OSHost.Linux -> 108
 
-        // Unknown (assuming Non-BSD)
-        else -> 108
+        // Unknown (assume some BSD flavor or AIX)
+        else -> 104
     }
 }
 
-@get:JvmSynthetic
-@OptIn(InternalKmpTorApi::class)
-internal actual val IsUnixLikeHost: Boolean get() {
+internal actual inline val IsUnixLikeHost: Boolean get() {
+    @OptIn(InternalKmpTorApi::class)
     return when (OSInfo.INSTANCE.osHost) {
         is OSHost.FreeBSD,
         is OSHost.Linux,
@@ -51,11 +51,9 @@ internal actual val IsUnixLikeHost: Boolean get() {
     }
 }
 
-@get:JvmSynthetic
-@OptIn(InternalKmpTorApi::class)
-internal actual val IsAndroidHost: Boolean get() {
-    // Could be Java running on Android via Termux if JVM
+internal actual inline val IsAndroidHost: Boolean get() {
+    @OptIn(InternalKmpTorApi::class)
     return OSInfo.INSTANCE.osHost is OSHost.Linux.Android
 }
 
-internal actual val IsDarwinMobile: Boolean get() = false
+internal actual inline val IsDarwinMobile: Boolean get() = false

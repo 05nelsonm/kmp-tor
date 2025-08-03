@@ -13,8 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
+@file:Suppress("NOTHING_TO_INLINE")
+
 package io.matthewnelson.kmp.tor.runtime.core.internal
 
 internal actual val UnixSocketsNotSupportedMessage: String? = null
 
-internal actual val IsUnixLikeHost: Boolean get() = true
+internal actual inline val IsUnixLikeHost: Boolean get() = true
