@@ -31,7 +31,7 @@ internal actual inline fun platform_kmptor_socket(domain: Int, type: Int, protoc
     if (fcntl(fd, F_SETFD, FD_CLOEXEC) != 0) {
         val errno = errno
         @OptIn(InternalKmpTorApi::class)
-        kmptor_socket_close(fd)
+        kmptor_socket_close(fd) // ignore close failure (leak)
         set_posix_errno(errno)
         fd = -1
     }

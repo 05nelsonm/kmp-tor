@@ -15,12 +15,13 @@
  **/
 package io.matthewnelson.kmp.tor.runtime.ctrl.internal
 
+import io.matthewnelson.kmp.file.Closeable
 import io.matthewnelson.kmp.file.IOException
 import io.matthewnelson.kmp.tor.runtime.core.TorEvent
 import io.matthewnelson.kmp.tor.runtime.core.ctrl.Reply
 import kotlin.coroutines.cancellation.CancellationException
 
-internal interface CtrlConnection {
+internal interface CtrlConnection: Closeable {
 
     val isReading: Boolean
 
@@ -29,9 +30,6 @@ internal interface CtrlConnection {
 
     @Throws(CancellationException::class, IOException::class)
     suspend fun write(command: ByteArray)
-
-    @Throws(IOException::class)
-    fun close()
 
     /**
      * [Asynchronous Events](https://torproject.gitlab.io/torspec/control-spec/#asynchronous-events)

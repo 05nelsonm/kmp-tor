@@ -19,28 +19,33 @@ package io.matthewnelson.kmp.tor.runtime.ctrl.internal
 
 import io.matthewnelson.kmp.file.File
 import io.matthewnelson.kmp.file.errnoToIOException
+import io.matthewnelson.kmp.tor.common.api.InternalKmpTorApi
+import io.matthewnelson.kmp.tor.runtime.core.internal.kmptor_socket
+import io.matthewnelson.kmp.tor.runtime.core.internal.kmptor_socket_close
 import kotlinx.cinterop.*
 import platform.posix.*
 
 @Throws(Throwable::class)
-@OptIn(ExperimentalForeignApi::class, UnsafeNumber::class)
+@OptIn(ExperimentalForeignApi::class, InternalKmpTorApi::class, UnsafeNumber::class)
 internal actual fun File.connect(): CtrlConnection {
-    val descriptor = socket(AF_UNIX, SOCK_STREAM, 0)
-    if (descriptor < 0) throw errnoToIOException(errno)
+    val sockfd = kmptor_socket(AF_UNIX, SOCK_STREAM, 0)
+    if (sockfd < 0) throw errnoToIOException(errno)
 
-    socketAddress(AF_UNIX.convert()) { pointer, len ->
-        if (connect(descriptor, pointer, len) != 0) {
-            val errno = errno
-            close(descriptor)
-            throw errnoToIOException(errno)
+    socketAddress(AF_UNIX) { pointer, len ->
+        if (connect(sockfd, pointer, len) != 0) {
+            val e = errnoToIOException(errno)
+            if (kmptor_socket_close(sockfd) == -1) {
+                e.addSuppressed(errnoToIOException(errno))
+            }
+            throw e
         }
     }
 
-    return NativeCtrlConnection(descriptor)
+    return NativeCtrlConnection(sockfd)
 }
 
 @OptIn(ExperimentalForeignApi::class)
 internal expect inline fun File.socketAddress(
-    family: UShort,
+    family: Int,
     block: (CValuesRef<sockaddr>, len: socklen_t) -> Unit,
 )

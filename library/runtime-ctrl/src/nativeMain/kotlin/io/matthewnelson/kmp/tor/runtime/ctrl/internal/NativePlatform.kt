@@ -19,6 +19,9 @@ package io.matthewnelson.kmp.tor.runtime.ctrl.internal
 
 import io.matthewnelson.kmp.file.IOException
 import io.matthewnelson.kmp.file.errnoToIOException
+import io.matthewnelson.kmp.tor.common.api.InternalKmpTorApi
+import io.matthewnelson.kmp.tor.runtime.core.internal.kmptor_socket
+import io.matthewnelson.kmp.tor.runtime.core.internal.kmptor_socket_close
 import io.matthewnelson.kmp.tor.runtime.core.net.IPAddress
 import io.matthewnelson.kmp.tor.runtime.core.net.IPSocketAddress
 import io.matthewnelson.kmp.tor.runtime.ctrl.TorCtrl
@@ -35,7 +38,7 @@ internal actual fun TorCtrl.Factory.newTorCtrlDispatcher(): CloseableCoroutineDi
 }
 
 @Throws(Throwable::class)
-@OptIn(ExperimentalForeignApi::class, UnsafeNumber::class)
+@OptIn(ExperimentalForeignApi::class, InternalKmpTorApi::class, UnsafeNumber::class)
 internal actual fun IPSocketAddress.connect(): CtrlConnection = memScoped {
     val (family, len) = when (address) {
         is IPAddress.V4 -> AF_INET to sizeOf<sockaddr_in>()
@@ -59,13 +62,13 @@ internal actual fun IPSocketAddress.connect(): CtrlConnection = memScoped {
     var info: addrinfo? = result.pointed
         ?: throw IOException("Failed to resolve addrinfo for ${this@connect}")
 
-    var descriptor: Int? = null
+    var sockfd: Int? = null
     var lastErrno: Int? = null
-    while (info != null && descriptor == null) {
+    while (info != null && sockfd == null) {
         val sockaddr = info.ai_addr?.pointed
 
         if (sockaddr != null) {
-            val socket = socket(family, SOCK_STREAM, 0)
+            val socket = kmptor_socket(family, SOCK_STREAM, 0)
 
             if (socket < 0) {
                 lastErrno = errno
@@ -76,9 +79,9 @@ internal actual fun IPSocketAddress.connect(): CtrlConnection = memScoped {
                 // the socket and create a new one for reconnecting.
                 if (connect(socket, sockaddr.ptr, len.convert()) != 0) {
                     lastErrno = errno
-                    close(socket)
+                    kmptor_socket_close(socket)
                 } else {
-                    descriptor = socket
+                    sockfd = socket
                 }
             }
         }
@@ -86,10 +89,10 @@ internal actual fun IPSocketAddress.connect(): CtrlConnection = memScoped {
         info = info.ai_next?.pointed
     }
 
-    if (descriptor == null) {
+    if (sockfd == null) {
         throw lastErrno?.let { errnoToIOException(it) }
             ?: IOException("Failed to connect to ${this@connect}")
     }
 
-    NativeCtrlConnection(descriptor)
+    NativeCtrlConnection(sockfd)
 }
