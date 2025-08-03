@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-@file:Suppress("UnnecessaryOptInAnnotation")
+@file:Suppress("UnnecessaryOptInAnnotation", "RedundantVisibilityModifier")
 
 package io.matthewnelson.kmp.tor.runtime.core.internal
 
@@ -81,21 +81,21 @@ internal sealed class InetSocketAddress private constructor(
             when (this@toInetSocketAddress) {
                 is IPAddress.V4 -> {
                     val a = addr.reinterpret<sockaddr_in>()
-                    V4(a.sin_family, a.sin_port.toSinPort().toInt(), a.sin_addr.s_addr)
+                    V4(a.sin_family, a.sin_port.toPort(), a.sin_addr.s_addr)
                 }
                 is IPAddress.V6 -> {
                     val a = addr.reinterpret<sockaddr_in6>()
-                    V6(a.sin6_family, a.sin6_port.toSinPort().toInt(), a.sin6_flowinfo, a.sin6_scope_id)
+                    V6(a.sin6_family, a.sin6_port.toPort(), a.sin6_flowinfo, a.sin6_scope_id)
                 }
             }
         }
 
-        private fun UShort.toSinPort(): UShort {
+        private fun UShort.toPort(): Int {
             @OptIn(ExperimentalNativeApi::class)
-            if (!Platform.isLittleEndian) return this
+            if (!Platform.isLittleEndian) return toInt()
 
             val b = toShort().bePackIntoUnsafe(dest = ByteArray(2), destOffset = 0)
-            return Endian.Little.shortOf(b[1], b[0]).toUShort()
+            return Endian.Little.shortOf(b[1], b[0]).toInt()
         }
     }
 }
