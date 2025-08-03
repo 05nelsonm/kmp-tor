@@ -162,12 +162,12 @@ public actual interface TorCtrl : Destroyable, TorEvent.Processor, TorCmd.Privil
          * */
         @Throws(CancellationException::class, IOException::class, UnsupportedOperationException::class)
         public actual suspend fun connectAsync(path: File): TorCtrl {
-            path.checkUnixSocketSupport()
+            val sanitized = path.sanitizeUnixSocketPath()
 
             return withDelayedReturnAsync {
                 connect { context ->
                     withContext(context) {
-                        path.connect()
+                        sanitized.connect()
                     }
                 }
             }
@@ -200,10 +200,10 @@ public actual interface TorCtrl : Destroyable, TorEvent.Processor, TorCmd.Privil
          * */
         @Throws(IOException::class, UnsupportedOperationException::class)
         public fun connect(path: File): TorCtrl {
-            path.checkUnixSocketSupport()
+            val sanitized = path.sanitizeUnixSocketPath()
 
             return withDelayedReturn {
-                connect { path.connect() }
+                connect { sanitized.connect() }
             }
         }
 

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-@file:Suppress("KotlinRedundantDiagnosticSuppress")
+@file:Suppress("NOTHING_TO_INLINE")
 
 package io.matthewnelson.kmp.tor.runtime.ctrl.internal
 
@@ -22,6 +22,7 @@ import io.matthewnelson.kmp.file.FileNotFoundException
 import io.matthewnelson.kmp.file.IOException
 import io.matthewnelson.kmp.file.InterruptedException
 import io.matthewnelson.kmp.file.exists2
+import io.matthewnelson.kmp.file.toFile
 import io.matthewnelson.kmp.tor.runtime.core.OnFailure
 import io.matthewnelson.kmp.tor.runtime.core.EnqueuedJob
 import io.matthewnelson.kmp.tor.runtime.core.EnqueuedJob.Companion.toImmediateErrorJob
@@ -32,15 +33,20 @@ import io.matthewnelson.kmp.tor.runtime.core.config.TorOption
 import io.matthewnelson.kmp.tor.runtime.core.ctrl.TorCmd
 import kotlin.collections.removeFirst as kRemoveFirst
 
-@Suppress("NOTHING_TO_INLINE")
+private const val UNIX_PREFIX_LEN = "unix:\"".length
+
 @Throws(IOException::class, UnsupportedOperationException::class)
-internal inline fun File.checkUnixSocketSupport() {
-    val path = this
+internal inline fun File.sanitizeUnixSocketPath(): File {
+    var file = this
 
-    TorOption.__ControlPort.asSetting { unixSocket(path) }
+    // Strip prefix && quotes to ensure it's properly formatted.
+    file = TorOption.__ControlPort.asSetting { unixSocket(file) }
+        .items.first().argument
+        .let { it.substring(UNIX_PREFIX_LEN, it.length - 1) }
+        .toFile()
 
-    if (exists2()) return
-    throw FileNotFoundException(path.toString())
+    if (file.exists2()) return file
+    throw FileNotFoundException(file.toString())
 }
 
 // Should only be invoked from OUTSIDE a lock lambda, and on
@@ -61,7 +67,6 @@ internal fun <T: TorCmdJob<*>> MutableList<T>.interruptAndClearAll(
     }
 }
 
-@Suppress("NOTHING_TO_INLINE")
 internal inline fun TorCmd<*>.toDestroyedErrorJob(
     onFailure: OnFailure,
     handler: UncaughtException.Handler,
@@ -72,13 +77,11 @@ internal inline fun TorCmd<*>.toDestroyedErrorJob(
     handler
 ).invokeOnCompletionForCmd(this)
 
-@Suppress("NOTHING_TO_INLINE")
 internal inline fun TorCmd<*>.toJobName(): String {
     val signal = signalNameOrNull() ?: return keyword
     return "$keyword{$signal}"
 }
 
-@Suppress("NOTHING_TO_INLINE")
 internal inline fun <Job: EnqueuedJob> Job.invokeOnCompletionForCmd(
     cmd: TorCmd<*>,
 ): Job = when (cmd) {
