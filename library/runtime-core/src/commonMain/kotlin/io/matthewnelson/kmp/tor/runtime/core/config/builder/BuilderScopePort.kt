@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-@file:Suppress("FunctionName", "PropertyName", "ConvertSecondaryConstructorToPrimary")
+@file:Suppress("FunctionName", "PropertyName", "ConvertSecondaryConstructorToPrimary", "RedundantVisibilityModifier", "UNUSED")
 
 package io.matthewnelson.kmp.tor.runtime.core.config.builder
 

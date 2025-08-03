@@ -13,23 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-@file:Suppress("EXPECT_ACTUAL_CLASSIFIERS_ARE_IN_BETA_WARNING", "KotlinRedundantDiagnosticSuppress")
+@file:Suppress("EXPECT_ACTUAL_CLASSIFIERS_ARE_IN_BETA_WARNING", "NOTHING_TO_INLINE")
 
 package io.matthewnelson.kmp.tor.runtime.core.internal
 
+import io.matthewnelson.kmp.file.Closeable
 import io.matthewnelson.kmp.file.IOException
+import io.matthewnelson.kmp.file.use
 import io.matthewnelson.kmp.file.wrapIOException
 import io.matthewnelson.kmp.tor.runtime.core.net.IPAddress
 import kotlin.jvm.JvmInline
 import kotlin.jvm.JvmSynthetic
 
 @JvmInline
-internal expect value class ServerSocketProducer private constructor(
-    private val value: Any
-) {
+internal expect value class ServerSocketProducer private constructor(private val value: Any) {
 
     @Throws(Exception::class)
-    internal fun open(port: Int): AutoCloseable
+    internal fun open(port: Int): Closeable
 
     internal companion object {
 
@@ -40,11 +40,9 @@ internal expect value class ServerSocketProducer private constructor(
 }
 
 @Throws(IOException::class)
-@Suppress("NOTHING_TO_INLINE")
 internal inline fun ServerSocketProducer.isPortAvailable(port: Int): Boolean {
     try {
-        open(port).use {}
-        return true
+        return open(port).use { true }
     } catch (t: Throwable) {
         // Android will throw NetworkOnMainThreadException here,
         // and if port is invalid an IllegalArgumentException is

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-@file:Suppress("KotlinRedundantDiagnosticSuppress", "NOTHING_TO_INLINE", "UnusedReceiverParameter", "LocalVariableName")
+@file:Suppress("NOTHING_TO_INLINE", "UnusedReceiverParameter", "LocalVariableName")
 
 package io.matthewnelson.kmp.tor.runtime.core.internal
 
@@ -766,6 +766,7 @@ private fun Scalar.Companion.modDivSteps30(ntheta: Int, f0: Int, g0: Int, t: Int
     var f = f0
     var g = g0
 
+    @Suppress("UNUSED")
     for (i in 0..<30) {
         val c1 = theta shr 31
         val c2 = -(g and 1)

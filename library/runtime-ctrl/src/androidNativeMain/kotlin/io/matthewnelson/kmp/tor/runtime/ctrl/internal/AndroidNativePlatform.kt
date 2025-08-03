@@ -25,12 +25,12 @@ import platform.posix.strcpy
 
 @OptIn(ExperimentalForeignApi::class)
 internal actual inline fun File.socketAddress(
-    family: UShort,
+    family: Int,
     block: (CValuesRef<sockaddr>, len: socklen_t) -> Unit,
 ) {
     cValue<sockaddr_un> {
         strcpy(sun_path, path)
-        sun_family = family
+        sun_family = family.convert()
 
         block(ptr.reinterpret(), sizeOf<sockaddr_un>().convert())
     }

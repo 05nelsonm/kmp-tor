@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-@file:Suppress("KotlinRedundantDiagnosticSuppress", "FunctionName")
+@file:Suppress("NOTHING_TO_INLINE", "FunctionName")
 
 package io.matthewnelson.kmp.tor.runtime.core.internal
 
@@ -25,7 +25,6 @@ import kotlinx.cinterop.UnsafeNumber
 import kotlinx.cinterop.convert
 import platform.posix.socklen_t
 
-@Suppress("NOTHING_TO_INLINE")
 @OptIn(ExperimentalForeignApi::class, UnsafeNumber::class)
 internal actual inline fun platform_inet_ntop(
     family: Int,

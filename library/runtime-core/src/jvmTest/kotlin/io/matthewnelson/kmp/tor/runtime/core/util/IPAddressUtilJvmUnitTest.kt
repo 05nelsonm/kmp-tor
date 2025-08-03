@@ -54,7 +54,7 @@ class IPAddressUtilJvmUnitTest {
 
         val localHostScoped = localHost.address().toIPAddressV6(scope = nif.name)
         assertNotNull(localHostScoped.scope)
-        assertNull(localHostScoped.scope?.toIntOrNull())
+        assertNull(localHostScoped.scope.toIntOrNull())
 
         if (IsUnixLikeHost) {
             val inetLocalHost = localHostScoped.toInet6Address()

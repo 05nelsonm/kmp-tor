@@ -80,7 +80,7 @@ internal actual fun IPSocketAddress.connect(): CtrlConnection {
         throw t
     }
 
-    return Disposable.Once.of(concurrent = true, socket::close).toCtrlConnection(input, output)
+    return Disposable.Once.of(socket::close).toCtrlConnection(input, output)
 }
 
 @Throws(Throwable::class)
@@ -95,13 +95,11 @@ internal actual fun File.connect(): CtrlConnection = with(UnixSocketReflect) {
 // Need to wrap close in Disposable b/c LocalSocket does
 // not implement Closeable on Android API 16 and below.
 @Suppress("BlockingMethodInNonBlockingContext")
-private fun Disposable.toCtrlConnection(
+private fun Disposable.Once.toCtrlConnection(
     input: InputStream,
     output: OutputStream,
 ): CtrlConnection = object : CtrlConnection {
 
-    @Volatile
-    private var _isClosed: Boolean = false
     @Volatile
     private var _isReading: Boolean = false
 
@@ -111,7 +109,7 @@ private fun Disposable.toCtrlConnection(
     @OptIn(InternalProcessApi::class)
     override suspend fun startRead(parser: CtrlConnection.Parser) {
         synchronized(this) {
-            check(!_isClosed) { "Connection is closed" }
+            check(!isDisposed) { "Connection is closed" }
             check(!_isReading) { "Already reading input" }
             _isReading = true
         }
@@ -144,13 +142,7 @@ private fun Disposable.toCtrlConnection(
 
     @Throws(IOException::class)
     override fun close() {
-        if (_isClosed) return
-
-        synchronized(this) {
-            if (_isClosed) return
-            _isClosed = true
-            this@toCtrlConnection.dispose()
-        }
+        synchronized(this) { dispose() }
     }
 }
 
@@ -178,7 +170,7 @@ private object UnixSocketReflect {
             throw t
         }
 
-        return Disposable.Once.of(concurrent = true) {
+        return Disposable.Once.of {
             try {
                 A_METHOD_CLOSE.invoke(socket)
             } catch (t: Throwable) {
@@ -253,7 +245,7 @@ private object UnixSocketReflect {
             throw t
         }
 
-        return Disposable.Once.of(concurrent = true, channel::close).toCtrlConnection(input, output)
+        return Disposable.Once.of(channel::close).toCtrlConnection(input, output)
     }
 
     private val J_METHOD_ADDRESS_OF: Method by lazy {

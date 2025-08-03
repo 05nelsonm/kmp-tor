@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-@file:Suppress("KotlinRedundantDiagnosticSuppress")
+@file:Suppress("NOTHING_TO_INLINE")
 
 package io.matthewnelson.kmp.tor.runtime.core
 
@@ -73,13 +73,11 @@ public fun interface ItBlock<in It: Any?> {
     public operator fun invoke(it: It)
 }
 
-@Suppress("NOTHING_TO_INLINE")
 public inline fun <This: Any> This.apply(block: ThisBlock<This>): This {
     with(block) { invoke() }
     return this
 }
 
-@Suppress("NOTHING_TO_INLINE")
 public inline fun <It: Any?> It.apply(block: ItBlock<It>): It {
     block(this)
     return this

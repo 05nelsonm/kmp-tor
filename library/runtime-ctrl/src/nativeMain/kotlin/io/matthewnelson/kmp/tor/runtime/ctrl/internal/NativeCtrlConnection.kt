@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-@file:Suppress("UnnecessaryOptInAnnotation")
+@file:Suppress("UnnecessaryOptInAnnotation", "RemoveRedundantCallsOfConversionMethods")
 
 package io.matthewnelson.kmp.tor.runtime.ctrl.internal
 
@@ -24,18 +24,17 @@ import io.matthewnelson.kmp.process.ReadBuffer
 import io.matthewnelson.kmp.tor.common.api.InternalKmpTorApi
 import io.matthewnelson.kmp.tor.common.core.synchronized
 import io.matthewnelson.kmp.tor.common.core.synchronizedObject
+import io.matthewnelson.kmp.tor.runtime.core.internal.kmptor_socket_close
 import kotlinx.cinterop.*
 import platform.posix.*
 import kotlin.concurrent.Volatile
 import kotlin.coroutines.cancellation.CancellationException
 
 @OptIn(ExperimentalForeignApi::class, InternalKmpTorApi::class, UnsafeNumber::class)
-internal class NativeCtrlConnection internal constructor(
-    private val descriptor: Int
-): CtrlConnection {
+internal class NativeCtrlConnection internal constructor(sockfd: Int): CtrlConnection {
 
     @Volatile
-    private var _isClosed: Boolean = false
+    private var _sockfd: Int? = sockfd
     @Volatile
     private var _isReading: Boolean = false
     private val lock = synchronizedObject()
@@ -46,28 +45,27 @@ internal class NativeCtrlConnection internal constructor(
     @Throws(CancellationException::class, IllegalStateException::class)
     override suspend fun startRead(parser: CtrlConnection.Parser) {
         synchronized(lock) {
-            check(!_isClosed) { "Connection is closed" }
             check(!_isReading) { "Already reading input" }
+            checkNotNull(_sockfd) { "Connection is closed" }
             _isReading = true
         }
 
         val feed = ReadBuffer.lineOutputFeed(parser::parse)
         val buf = ReadBuffer.allocate()
 
-        var interrupted = 0
         while (true) {
+            val sockfd = _sockfd ?: break
             val read = buf.inner().usePinned { pinned ->
                 read(
-                    descriptor,
+                    sockfd,
                     pinned.addressOf(0),
                     buf.inner().size.convert(),
                 ).toInt()
             }
 
-            if (read == -1 && errno == EINTR && !_isClosed && interrupted++ < 3) continue
+            if (read == -1 && errno == EINTR) continue
             if (read <= 0) break
 
-            interrupted = 0
             feed.onData(buf, read)
         }
 
@@ -77,26 +75,25 @@ internal class NativeCtrlConnection internal constructor(
 
     @Throws(CancellationException::class, IOException::class)
     override suspend fun write(command: ByteArray) {
-        if (_isClosed) throw IOException("Connection is closed")
+        if (_sockfd == null) throw IOException("Connection is closed")
         if (command.isEmpty()) return
 
         synchronized(lock) {
-            if (_isClosed) throw IOException("Connection is closed")
+            val sockfd = _sockfd ?: throw IOException("Connection is closed")
 
             command.usePinned { pinned ->
                 var written = 0
-                var interrupted = 0
                 while (written < command.size) {
                     val write = write(
-                        descriptor,
+                        sockfd,
                         pinned.addressOf(written),
                         (command.size - written).convert(),
                     ).toInt()
 
-                    if (write == 0) break
+                    if (write == 0) throw IOException("write == 0")
                     if (write == -1) {
                         val errno = errno
-                        if (errno == EINTR && interrupted++ < 3) continue
+                        if (errno == EINTR) continue
                         throw errnoToIOException(errno)
                     }
 
@@ -108,13 +105,12 @@ internal class NativeCtrlConnection internal constructor(
 
     @Throws(IOException::class)
     override fun close() {
-        if (_isClosed) return
+        val sockfd = synchronized(lock) {
+            val fd = _sockfd
+            _sockfd = null
+            fd
+        } ?: return
 
-        synchronized(lock) {
-            if (_isClosed) return
-            _isClosed = true
-            shutdown(descriptor, SHUT_RDWR)
-            close(descriptor)
-        }
+        kmptor_socket_close(sockfd)
     }
 }

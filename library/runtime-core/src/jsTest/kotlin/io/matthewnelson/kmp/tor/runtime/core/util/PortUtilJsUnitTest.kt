@@ -24,6 +24,7 @@ import kotlinx.coroutines.withContext
 import kotlin.test.fail
 import kotlin.time.Duration.Companion.milliseconds
 
+@Suppress("UNUSED")
 class PortUtilJsUnitTest: PortUtilBaseTest() {
 
     override val isNodeJs: Boolean = true

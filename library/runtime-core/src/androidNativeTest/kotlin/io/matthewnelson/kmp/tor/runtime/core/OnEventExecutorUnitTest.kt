@@ -17,6 +17,7 @@
 
 package io.matthewnelson.kmp.tor.runtime.core
 
+@Suppress("UNUSED")
 actual class OnEventExecutorUnitTest: OnEventExecutorBaseTest() {
     override val expectedIsAvailable: Boolean = false
 }

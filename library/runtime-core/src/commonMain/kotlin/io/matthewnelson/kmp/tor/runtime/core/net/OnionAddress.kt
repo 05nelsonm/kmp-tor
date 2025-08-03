@@ -13,6 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
+@file:Suppress("RedundantVisibilityModifier", "NOTHING_TO_INLINE")
+
 package io.matthewnelson.kmp.tor.runtime.core.net
 
 import io.matthewnelson.encoding.base32.Base32Default
@@ -262,7 +264,6 @@ public sealed class OnionAddress private constructor(value: String): Address(val
             private const val ENCODED_LEN: Int = 56
             private const val VERSION_BYTE: Byte = 3
 
-            @Suppress("NOTHING_TO_INLINE", "KotlinRedundantDiagnosticSuppress")
             @Throws(IllegalArgumentException::class, IndexOutOfBoundsException::class)
             private inline fun ByteArray.computeChecksum(): ByteArray = SHA3_256().apply {
                 update(CHECKSUM_PREFIX)

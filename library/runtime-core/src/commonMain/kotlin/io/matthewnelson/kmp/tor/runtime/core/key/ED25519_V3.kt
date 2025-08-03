@@ -213,7 +213,7 @@ public object ED25519_V3: KeyType.Address<ED25519_V3.PublicKey, ED25519_V3.Priva
             @JvmName("getOrNull")
             public fun String.toED25519_V3PublicKeyOrNull(): PublicKey? = try {
                 toED25519_V3PublicKey()
-            } catch (e: InvalidKeyException) {
+            } catch (_: InvalidKeyException) {
                 null
             }
 
@@ -226,7 +226,7 @@ public object ED25519_V3: KeyType.Address<ED25519_V3.PublicKey, ED25519_V3.Priva
             @JvmName("getOrNull")
             public fun ByteArray.toED25519_V3PublicKeyOrNull(): PublicKey? = try {
                 toED25519_V3PublicKey()
-            } catch (e: InvalidKeyException) {
+            } catch (_: InvalidKeyException) {
                 null
             }
 

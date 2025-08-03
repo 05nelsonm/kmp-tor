@@ -202,7 +202,7 @@ public class AuthKey private constructor() {
     }
 }
 
-@Suppress("NOTHING_TO_INLINE", "KotlinRedundantDiagnosticSuppress")
+@Suppress("NOTHING_TO_INLINE")
 private inline fun Key.toDescriptor(
     address: OnionAddress?,
     encoded: String,

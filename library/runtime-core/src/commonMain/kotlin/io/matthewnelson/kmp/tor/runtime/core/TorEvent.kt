@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-@file:Suppress("SpellCheckingInspection", "ClassName")
+@file:Suppress("SpellCheckingInspection", "ClassName", "RedundantVisibilityModifier")
 
 package io.matthewnelson.kmp.tor.runtime.core
 
@@ -295,14 +295,14 @@ public sealed class TorEvent private constructor(
 
         protected override val lazyEntries: ThisBlock<LinkedHashSet<TorEvent>> = ThisBlock {
             // NOTE: Update numEvents when adding an event
-            add(CIRC); add(STREAM); add(ORCONN); add(BW);
-            add(DEBUG); add(INFO); add(NOTICE); add(WARN);
-            add(ERR); add(NEWDESC); add(ADDRMAP); add(DESCCHANGED);
-            add(STATUS_GENERAL); add(STATUS_CLIENT); add(STATUS_SERVER); add(GUARD);
-            add(NS); add(STREAM_BW); add(CLIENTS_SEEN); add(NEWCONSENSUS);
-            add(BUILDTIMEOUT_SET); add(SIGNAL); add(CONF_CHANGED); add(CIRC_MINOR);
-            add(TRANSPORT_LAUNCHED); add(CONN_BW); add(CIRC_BW); add(CELL_STATS);
-            add(HS_DESC); add(HS_DESC_CONTENT); add(NETWORK_LIVENESS);
+            add(CIRC); add(STREAM); add(ORCONN); add(BW)
+            add(DEBUG); add(INFO); add(NOTICE); add(WARN)
+            add(ERR); add(NEWDESC); add(ADDRMAP); add(DESCCHANGED)
+            add(STATUS_GENERAL); add(STATUS_CLIENT); add(STATUS_SERVER); add(GUARD)
+            add(NS); add(STREAM_BW); add(CLIENTS_SEEN); add(NEWCONSENSUS)
+            add(BUILDTIMEOUT_SET); add(SIGNAL); add(CONF_CHANGED); add(CIRC_MINOR)
+            add(TRANSPORT_LAUNCHED); add(CONN_BW); add(CIRC_BW); add(CELL_STATS)
+            add(HS_DESC); add(HS_DESC_CONTENT); add(NETWORK_LIVENESS)
         }
     }
 

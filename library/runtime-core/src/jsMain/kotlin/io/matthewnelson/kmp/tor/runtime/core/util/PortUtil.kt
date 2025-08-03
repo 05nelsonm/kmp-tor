@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-@file:Suppress("ACTUAL_ANNOTATIONS_NOT_MATCH_EXPECT", "KotlinRedundantDiagnosticSuppress")
+@file:Suppress("ACTUAL_ANNOTATIONS_NOT_MATCH_EXPECT")
 
 package io.matthewnelson.kmp.tor.runtime.core.util
 
@@ -44,7 +44,7 @@ public actual suspend fun Port.isAvailableAsync(
 
 /**
  * Finds an available TCP port on [LocalHost] starting with the current
- * [Port.Ephemeral.value] and iterating up [limit] times.
+ * [Port.Ephemeral] value and iterating up [limit] times.
  *
  * If [Port.Ephemeral.MAX] is exceeded while iterating through ports and [limit]
  * has not been exhausted, the remaining checks will start from [Port.Ephemeral.MIN].

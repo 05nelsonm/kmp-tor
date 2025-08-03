@@ -65,7 +65,7 @@ class JobUtilUnitTest {
         // non-cancellable
         testJob!!.executing()
 
-        testJob!!.invokeOnCompletion {
+        testJob.invokeOnCompletion {
             testJobInvocationCompletion = true
         }
 
@@ -75,8 +75,8 @@ class JobUtilUnitTest {
         withContext(Dispatchers.Default) { delay(25.milliseconds) }
 
         try {
-            assertTrue(testJob!!.isActive)
-            assertFalse(testJob!!.isCompleting)
+            assertTrue(testJob.isActive)
+            assertFalse(testJob.isCompleting)
             assertFalse(coroutineInvocationCompletion)
             assertFalse(testJobInvocationCompletion)
         } catch (t: Throwable) {
@@ -84,18 +84,18 @@ class JobUtilUnitTest {
             throw t
         } finally {
             withContext(NonCancellable + Dispatchers.Default) {
-                testJob!!.completion()
+                testJob.completion()
             }
         }
 
         withContext(Dispatchers.Default) { delay(25.milliseconds) }
 
         try {
-            assertFalse(testJob!!.isActive)
+            assertFalse(testJob.isActive)
             assertTrue(testJobInvocationCompletion)
 
             // All invoke on completion callbacks were all run
-            assertFalse(testJob!!.isCompleting)
+            assertFalse(testJob.isCompleting)
 
             // Coroutine should still be active until
             // testLatch completes
@@ -155,7 +155,7 @@ class JobUtilUnitTest {
         // non-cancellable
         testJob!!.executing()
 
-        testJob!!.invokeOnCompletion { cancellation ->
+        testJob.invokeOnCompletion { cancellation ->
             testJobInvocationCompletion = true
             assertNotNull(cancellation)
         }
@@ -166,28 +166,28 @@ class JobUtilUnitTest {
         withContext(Dispatchers.Default) { delay(25.milliseconds) }
 
         try {
-            assertTrue(testJob!!.isActive)
-            assertFalse(testJob!!.isCompleting)
+            assertTrue(testJob.isActive)
+            assertFalse(testJob.isCompleting)
             assertFalse(coroutineInvocationCompletion)
             assertFalse(testJobInvocationCompletion)
-            assertNotNull(testJob!!.attempt())
+            assertNotNull(testJob.attempt())
         } catch (t: Throwable) {
             testLatch.cancel()
             throw t
         } finally {
             withContext(NonCancellable + Dispatchers.Default) {
-                testJob!!.error(InterruptedException())
+                testJob.error(InterruptedException())
             }
         }
 
         withContext(Dispatchers.Default) { delay(25.milliseconds) }
 
         try {
-            assertFalse(testJob!!.isActive)
+            assertFalse(testJob.isActive)
             assertTrue(testJobInvocationCompletion)
 
             // All invoke on completion callbacks were all run
-            assertFalse(testJob!!.isCompleting)
+            assertFalse(testJob.isCompleting)
 
             // Coroutine should be cancelled
             assertTrue(coroutineInvocationCompletion)
@@ -245,7 +245,7 @@ class JobUtilUnitTest {
         withContext(Dispatchers.Default) { delay(25.milliseconds) }
 
         try {
-            assertTrue(testJob!!.isCancelled)
+            assertTrue(testJob.isCancelled)
             assertTrue(coroutine.isCancelled)
             assertTrue(coroutineInvocationCompletion)
             assertTrue(testJobInvocationCompletion)
@@ -258,7 +258,7 @@ class JobUtilUnitTest {
 
             assertTrue(coroutine.isCompleted)
         } finally {
-            testJob!!.completion()
+            testJob.completion()
         }
 
         coroutine.join()
@@ -303,7 +303,7 @@ class JobUtilUnitTest {
         // non-cancellable
         testJob!!.executing()
 
-        testJob!!.invokeOnCompletion {
+        testJob.invokeOnCompletion {
             testJobInvocationCompletion = true
         }
 
@@ -313,8 +313,8 @@ class JobUtilUnitTest {
         withContext(Dispatchers.Default) { delay(25.milliseconds) }
 
         try {
-            assertTrue(testJob!!.isActive)
-            assertFalse(testJob!!.isCompleting)
+            assertTrue(testJob.isActive)
+            assertFalse(testJob.isCompleting)
             assertFalse(coroutineInvocationCompletion)
             assertFalse(testJobInvocationCompletion)
         } catch (t: Throwable) {
@@ -322,18 +322,18 @@ class JobUtilUnitTest {
             throw t
         } finally {
             withContext(NonCancellable + Dispatchers.Default) {
-                testJob!!.error(InterruptedException())
+                testJob.error(InterruptedException())
             }
         }
 
         withContext(Dispatchers.Default) { delay(25.milliseconds) }
 
         try {
-            assertFalse(testJob!!.isActive)
+            assertFalse(testJob.isActive)
             assertTrue(testJobInvocationCompletion)
 
             // All invoke on completion callbacks were all run
-            assertFalse(testJob!!.isCompleting)
+            assertFalse(testJob.isCompleting)
 
             // Coroutine should still be active until
             // testLatch completes
