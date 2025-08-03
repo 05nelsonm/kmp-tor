@@ -36,8 +36,8 @@ internal fun File.toUnixSocketPath(): String {
     // Darwin  -> MAX 102 chars
     // Linux   -> MAX 106 chars
     // Windows -> MAX 106 chars
-    // else    -> MAX 106 chars
-    if (path.length > (AFUnixPathBufSize - 2)) {
+    // else    -> MAX 104 chars
+    if (path.length > (AFUnixSunPathSize - 2)) {
         throw UnsupportedOperationException("path too long")
     }
 

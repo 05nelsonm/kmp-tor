@@ -13,7 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
+@file:Suppress("NOTHING_TO_INLINE")
+
 package io.matthewnelson.kmp.tor.runtime.core.internal
 
-// sockaddr_un.sun_path buffer size as defined in sys/un.h
-internal actual val AFUnixPathBufSize: Int = 108
+import kotlinx.cinterop.ExperimentalForeignApi
+import kotlinx.cinterop.sizeOf
+import platform.linux.sockaddr_un
+import platform.posix.sa_family_tVar
+
+internal actual inline val AFUnixSunPathSize: Int get() {
+    // struct sockaddr_un
+    //   {
+    //     __SOCKADDR_COMMON (sun_);
+    //     char sun_path[108];		/* Path name.  */
+    //   };
+    @OptIn(ExperimentalForeignApi::class)
+    return (sizeOf<sockaddr_un>() - sizeOf<sa_family_tVar>()).toInt()
+}
