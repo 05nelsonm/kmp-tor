@@ -28,6 +28,9 @@ import org.kotlincrypto.bitops.endian.Endian
 import org.kotlincrypto.bitops.endian.Endian.Big.bePackIntoUnsafe
 import platform.posix.*
 import kotlin.concurrent.AtomicReference
+import kotlin.contracts.ExperimentalContracts
+import kotlin.contracts.InvocationKind
+import kotlin.contracts.contract
 import kotlin.experimental.ExperimentalNativeApi
 
 @OptIn(ExperimentalForeignApi::class, InternalKmpTorApi::class, UnsafeNumber::class)
@@ -71,13 +74,12 @@ internal actual value class ServerSocketProducer private actual constructor(priv
             }
         }
 
-        listen(sockfd, 1).let { result ->
-            if (result == 0) return@let
+        if (listen(sockfd, 1) != 0) {
             val e = errnoToIOException(errno)
             try {
                 closeable.close()
-            } catch (t: IOException) {
-                e.addSuppressed(t)
+            } catch (ee: IOException) {
+                e.addSuppressed(ee)
             }
             throw e
         }
@@ -91,33 +93,39 @@ internal actual value class ServerSocketProducer private actual constructor(priv
         internal actual fun IPAddress.toServerSocketProducer(): ServerSocketProducer {
             return ServerSocketProducer(this)
         }
+    }
+}
 
-        private fun InetSocketAddress.doBind(block: (CPointer<sockaddr>, socklen_t) -> Unit) {
-            when (this) {
-                is InetSocketAddress.V4 -> cValue<sockaddr_in> {
-                    sin_family = family
-                    sin_addr.s_addr = address
-                    sin_port = port.toSinPort()
+@OptIn(ExperimentalContracts::class, ExperimentalForeignApi::class, UnsafeNumber::class)
+private inline fun InetSocketAddress.doBind(block: (CPointer<sockaddr>, socklen_t) -> Unit) {
+    @Suppress("WRONG_INVOCATION_KIND")
+    contract {
+        callsInPlace(block, InvocationKind.EXACTLY_ONCE)
+    }
 
-                    block(ptr.reinterpret(), sizeOf<sockaddr_in>().convert())
-                }
-                is InetSocketAddress.V6 -> cValue<sockaddr_in6> {
-                    sin6_family = family
-                    sin6_flowinfo = flowInfo
-                    sin6_port = port.toSinPort()
-                    sin6_scope_id = scopeId
+    when (this) {
+        is InetSocketAddress.V4 -> cValue<sockaddr_in> {
+            sin_family = family
+            sin_addr.s_addr = address
+            sin_port = port.toSinPort()
 
-                    block(ptr.reinterpret(), sizeOf<sockaddr_in6>().convert())
-                }
-            }
+            block(ptr.reinterpret(), sizeOf<sockaddr_in>().convert())
         }
+        is InetSocketAddress.V6 -> cValue<sockaddr_in6> {
+            sin6_family = family
+            sin6_flowinfo = flowInfo
+            sin6_port = port.toSinPort()
+            sin6_scope_id = scopeId
 
-        private fun Int.toSinPort(): UShort {
-            @OptIn(ExperimentalNativeApi::class)
-            if (!Platform.isLittleEndian) return toUShort()
-
-            val b = toShort().bePackIntoUnsafe(dest = ByteArray(2), destOffset = 0)
-            return Endian.Little.shortOf(b[1], b[0]).toUShort()
+            block(ptr.reinterpret(), sizeOf<sockaddr_in6>().convert())
         }
     }
+}
+
+private fun Int.toSinPort(): UShort {
+    @OptIn(ExperimentalNativeApi::class)
+    if (!Platform.isLittleEndian) return toUShort()
+
+    val b = toShort().bePackIntoUnsafe(dest = ByteArray(2), destOffset = 0)
+    return Endian.Little.shortOf(b[1], b[0]).toUShort()
 }

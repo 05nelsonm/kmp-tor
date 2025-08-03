@@ -70,7 +70,6 @@ internal sealed class InetSocketAddress private constructor(
             if (getaddrinfo(value, port.toString(), hint, result.ptr) != 0) {
                 throw errnoToIOException(errno)
             }
-
             defer { freeaddrinfo(result.value) }
 
             val addr = result.pointed
