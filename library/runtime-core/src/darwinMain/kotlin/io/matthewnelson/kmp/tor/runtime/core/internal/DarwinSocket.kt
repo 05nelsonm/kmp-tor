@@ -17,9 +17,9 @@
 
 package io.matthewnelson.kmp.tor.runtime.core.internal
 
-import io.matthewnelson.kmp.tor.common.api.InternalKmpTorApi
 import platform.posix.FD_CLOEXEC
 import platform.posix.F_SETFD
+import platform.posix.close
 import platform.posix.errno
 import platform.posix.fcntl
 import platform.posix.set_posix_errno
@@ -29,10 +29,8 @@ internal actual inline fun platform_kmptor_socket(domain: Int, type: Int, protoc
     var fd = socket(domain, type, protocol)
     if (fd == -1) return fd
     if (fcntl(fd, F_SETFD, FD_CLOEXEC) != 0) {
-        val errno = errno
-        @OptIn(InternalKmpTorApi::class)
-        kmptor_socket_close(fd) // ignore close failure (leak)
-        set_posix_errno(errno)
+        val errnoBefore = errno
+        if (close(fd) == -1) set_posix_errno(errnoBefore)
         fd = -1
     }
     return fd

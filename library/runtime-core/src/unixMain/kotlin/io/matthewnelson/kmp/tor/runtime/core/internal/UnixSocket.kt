@@ -13,10 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-@file:Suppress("FunctionName", "NOTHING_TO_INLINE")
+@file:Suppress("FunctionName")
 
 package io.matthewnelson.kmp.tor.runtime.core.internal
 
+import io.matthewnelson.kmp.tor.common.api.InternalKmpTorApi
 import platform.posix.close
 
-internal actual inline fun platform_kmptor_socket_close(sockfd: Int): Int = close(sockfd)
+@InternalKmpTorApi
+public actual fun kmptor_socket_close(sockfd: Int): Int = close(sockfd)
