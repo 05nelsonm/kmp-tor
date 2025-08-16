@@ -52,14 +52,11 @@ internal actual value class ServerSocketProducer private actual constructor(priv
             }
         }
 
-        // TODO: Investigate proper address/port re-use settings...
-        // Enable address re-use
-        alloc<IntVar> { this.value = 0 }.let { reuseAddress ->
-            setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, reuseAddress.ptr, sizeOf<IntVar>().convert())
-        }
-        // Disable port re-use
-        alloc<IntVar> { this.value = 0 }.let { reusePort ->
-            setsockopt(sockfd, SOL_SOCKET, SO_REUSEPORT, reusePort.ptr, sizeOf<IntVar>().convert())
+        // Disable address/port re-use
+        alloc<IntVar> { this.value = 0 }.let { struct ->
+            setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, struct.ptr, sizeOf<IntVar>().convert())
+            struct.value = 0
+            setsockopt(sockfd, SOL_SOCKET, SO_REUSEPORT, struct.ptr, sizeOf<IntVar>().convert())
         }
 
         address.doBind { ptr, socklen ->

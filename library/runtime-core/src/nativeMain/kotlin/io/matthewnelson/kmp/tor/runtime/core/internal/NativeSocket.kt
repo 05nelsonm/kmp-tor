@@ -24,25 +24,13 @@ import platform.posix.errno
 @InternalKmpTorApi
 public fun kmptor_socket(domain: Int, type: Int, protocol: Int): Int {
     var ret = -1
-    while (true) {
+    do {
         ret = platform_kmptor_socket(domain, type, protocol)
-        if (ret == -1 && errno == EINTR) continue
-        break
-    }
+    } while (ret == -1 && errno == EINTR)
     return ret
 }
 
 @InternalKmpTorApi
-public fun kmptor_socket_close(sockfd: Int): Int {
-    var ret = -1
-    while (true) {
-        ret = platform_kmptor_socket_close(sockfd)
-        if (ret == -1 && errno == EINTR) continue
-        break
-    }
-    return ret
-}
+public expect fun kmptor_socket_close(sockfd: Int): Int
 
 internal expect inline fun platform_kmptor_socket(domain: Int, type: Int, protocol: Int): Int
-
-internal expect inline fun platform_kmptor_socket_close(sockfd: Int): Int
