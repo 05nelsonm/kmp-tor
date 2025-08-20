@@ -11,6 +11,7 @@ io.matthewnelson.kmp.tor.runtime.core.config
 io.matthewnelson.kmp.tor.runtime.core.config.builder
 io.matthewnelson.kmp.tor.runtime.core.ctrl
 io.matthewnelson.kmp.tor.runtime.core.ctrl.builder
+io.matthewnelson.kmp.tor.runtime.core.internal
 io.matthewnelson.kmp.tor.runtime.core.key
 io.matthewnelson.kmp.tor.runtime.core.net
 io.matthewnelson.kmp.tor.runtime.core.util
