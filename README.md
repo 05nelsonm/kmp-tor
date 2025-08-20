@@ -98,7 +98,7 @@ runtime.enqueue(
 - Add runtime dependency
   ```kotlin
   dependencies {
-      implementation("io.matthewnelson.kmp-tor:runtime:2.4.0")
+      implementation("io.matthewnelson.kmp-tor:runtime:2.4.1")
   }
   ```
 
@@ -121,15 +121,15 @@ runtime.enqueue(
 See [kmp-tor-samples][url-kmp-tor-samples]
 
 <!-- TAG_VERSION -->
-[badge-latest-release]: https://img.shields.io/badge/latest--release-2.4.0-5d2f68.svg?logo=torproject&style=flat&logoColor=5d2f68
+[badge-latest-release]: https://img.shields.io/badge/latest--release-2.4.1-5d2f68.svg?logo=torproject&style=flat&logoColor=5d2f68
 [badge-license]: https://img.shields.io/badge/license-Apache%20License%202.0-blue.svg?style=flat
 
 <!-- TAG_DEPENDENCIES -->
 [badge-androidx-startup]: https://img.shields.io/badge/androidx.startup-1.1.1-6EDB8D.svg?logo=android
 [badge-coroutines]: https://img.shields.io/badge/kotlinx.coroutines-1.10.2-blue.svg?logo=kotlin
 [badge-encoding]: https://img.shields.io/badge/encoding-2.4.0-blue.svg?style=flat
-[badge-kmp-process]: https://img.shields.io/badge/kmp--process-0.3.2--SNAPSHOT-blue.svg?style=flat
-[badge-kmp-tor-common]: https://img.shields.io/badge/kmp--tor--common-2.3.1--SNAPSHOT-blue.svg?style=flat
+[badge-kmp-process]: https://img.shields.io/badge/kmp--process-0.3.2-blue.svg?style=flat
+[badge-kmp-tor-common]: https://img.shields.io/badge/kmp--tor--common-2.3.1-blue.svg?style=flat
 [badge-kotlin]: https://img.shields.io/badge/kotlin-2.1.21-blue.svg?logo=kotlin
 [badge-kotlincrypto-bitops]: https://img.shields.io/badge/kotlincrypto.bitops-0.2.0-blue.svg?style=flat
 [badge-kotlincrypto-hash]: https://img.shields.io/badge/kotlincrypto.hash-0.7.0-blue.svg?style=flat

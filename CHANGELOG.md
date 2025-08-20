@@ -1,5 +1,13 @@
 # CHANGELOG
 
+## Version 2.4.1 (2025-08-20)
+ - Updates `kmp-tor-common` to `2.3.1` [[#602]][602]
+ - Updates `kmp-process` to `0.3.2` [[#602]][602]
+ - Ensure all sockets opened use flag `CLOEXEC` [[#603]][603]
+ - Use `sockaddr_un` struct instead of hard-coded values when calculating Unix Domain Socket max path [[#605]][605]
+ - Ensure `TorCtrl.connect` always sanatizes the `File` argument's path [[#607]][607]
+ - Fixes potential descriptor double-closure [[#608]][608]
+
 ## Version 2.4.0 (2025-06-11)
  - Updates `kotlin` to `2.1.21` [[#597]][597]
  - Updates `android-gradle-plugin` to `8.9.3` [[#597]][597]
@@ -602,6 +610,11 @@
 [597]: https://github.com/05nelsonm/kmp-tor/pull/597
 [599]: https://github.com/05nelsonm/kmp-tor/pull/599
 [600]: https://github.com/05nelsonm/kmp-tor/pull/600
+[602]: https://github.com/05nelsonm/kmp-tor/pull/602
+[603]: https://github.com/05nelsonm/kmp-tor/pull/603
+[605]: https://github.com/05nelsonm/kmp-tor/pull/605
+[607]: https://github.com/05nelsonm/kmp-tor/pull/607
+[608]: https://github.com/05nelsonm/kmp-tor/pull/608
 
 [kmp-tor-binary-66]: https://github.com/05nelsonm/kmp-tor-binary/issues/66
 [kmp-tor-binary-75]: https://github.com/05nelsonm/kmp-tor-binary/pull/75
