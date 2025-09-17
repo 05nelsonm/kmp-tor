@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-@file:Suppress("ClassName", "FunctionName", "UNUSED")
+@file:Suppress("ClassName", "FunctionName", "UNUSED", "DEPRECATION_ERROR")
 @file:JsModule("net")
 @file:JsNonModule
 
@@ -29,7 +29,7 @@ internal external fun net_createServer(connectionListener: (socket: dynamic) -> 
 /** [docs](https://nodejs.org/api/net.html#class-netserver) */
 @JsName("Server")
 @OptIn(InternalProcessApi::class)
-internal external class net_Server: events_EventEmitter {
+internal external class net_Server: events_EventEmitter { // TODO: Replace events_EventEmitter use
     fun close()
     fun listen(options: dynamic, callback: () -> Unit)
     fun unref(): net_Server

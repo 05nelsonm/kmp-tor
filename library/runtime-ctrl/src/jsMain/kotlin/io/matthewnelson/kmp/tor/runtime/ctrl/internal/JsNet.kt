@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-@file:Suppress("FunctionName", "ClassName")
+@file:Suppress("FunctionName", "ClassName", "DEPRECATION_ERROR")
 @file:JsModule("net")
 @file:JsNonModule
 
@@ -33,7 +33,7 @@ internal external fun net_createConnection(
 /** [docs](https://nodejs.org/api/net.html#class-netsocket) */
 @JsName("Socket")
 @OptIn(InternalProcessApi::class)
-internal external class net_Socket: events_EventEmitter {
+internal external class net_Socket: events_EventEmitter { // TODO: Replace events_EventEmitter use
 
     // @Throws(Throwable::class)
     internal fun write(
