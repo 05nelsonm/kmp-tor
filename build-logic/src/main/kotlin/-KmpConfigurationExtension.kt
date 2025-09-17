@@ -17,7 +17,6 @@ import io.matthewnelson.kmp.configuration.extension.KmpConfigurationExtension
 import io.matthewnelson.kmp.configuration.extension.container.target.KmpConfigurationContainerDsl
 import io.matthewnelson.kmp.configuration.extension.container.target.TargetAndroidContainer
 import org.gradle.api.Action
-import org.gradle.api.JavaVersion
 import org.jetbrains.kotlin.konan.target.HostManager
 
 fun KmpConfigurationExtension.configureShared(
@@ -42,10 +41,6 @@ fun KmpConfigurationExtension.configureShared(
         }
 
         jvm {
-            kotlinJvmTarget = JavaVersion.VERSION_1_8
-            compileSourceCompatibility = JavaVersion.VERSION_1_8
-            compileTargetCompatibility = JavaVersion.VERSION_1_8
-
             // windows always throws a fit if not using Java 11. This disables
             // compilations of module-info.java. Nobody deploys from Windows
             // anyway...
@@ -57,10 +52,9 @@ fun KmpConfigurationExtension.configureShared(
         js {
             target {
                 nodejs {
-                    @Suppress("RedundantSamConstructor")
-                    testTask(Action {
+                    testTask {
                         useMocha { timeout = "330s" }
-                    })
+                    }
                 }
             }
         }
@@ -94,7 +88,6 @@ fun KmpConfigurationContainerDsl.androidLibrary(
     buildTools: String? = "35.0.1",
     compileSdk: Int = 35,
     minSdk: Int = 16,
-    javaVersion: JavaVersion = JavaVersion.VERSION_1_8,
     action: (Action<TargetAndroidContainer.Library>)? = null,
 ) {
     androidLibrary {
@@ -109,10 +102,6 @@ fun KmpConfigurationContainerDsl.androidLibrary(
                 testInstrumentationRunnerArguments["disableAnalytics"] = true.toString()
             }
         }
-
-        kotlinJvmTarget = javaVersion
-        compileSourceCompatibility = javaVersion
-        compileTargetCompatibility = javaVersion
 
         action?.execute(this)
     }
