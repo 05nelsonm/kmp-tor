@@ -5,6 +5,7 @@
 [![badge-kotlin]][url-kotlin]
 [![badge-coroutines]][url-coroutines]
 [![badge-encoding]][url-encoding]
+[![badge-immutable]][url-immutable]
 [![badge-kmp-process]][url-kmp-process]
 [![badge-kmp-tor-common]][url-kmp-tor-common]
 [![badge-kotlincrypto-bitops]][url-kotlincrypto-bitops]
@@ -126,6 +127,7 @@ See [kmp-tor-samples][url-kmp-tor-samples]
 [badge-androidx-startup]: https://img.shields.io/badge/androidx.startup-1.1.1-6EDB8D.svg?logo=android
 [badge-coroutines]: https://img.shields.io/badge/kotlinx.coroutines-1.10.2-blue.svg?logo=kotlin
 [badge-encoding]: https://img.shields.io/badge/encoding-2.4.0-blue.svg?style=flat
+[badge-immutable]: https://img.shields.io/badge/immutable-0.3.0--SNAPSHOT-blue.svg?style=flat
 [badge-kmp-process]: https://img.shields.io/badge/kmp--process-0.3.2-blue.svg?style=flat
 [badge-kmp-tor-common]: https://img.shields.io/badge/kmp--tor--common-2.4.0--SNAPSHOT-blue.svg?style=flat
 [badge-kotlin]: https://img.shields.io/badge/kotlin-2.2.20-blue.svg?logo=kotlin
@@ -155,7 +157,8 @@ See [kmp-tor-samples][url-kmp-tor-samples]
 [url-license]: https://www.apache.org/licenses/LICENSE-2.0
 [url-androidx-startup]: https://developer.android.com/jetpack/androidx/releases/startup
 [url-coroutines]: https://github.com/Kotlin/kotlinx.coroutines
-[url-encoding]: https://github.com/05nelsonm/component-encoding
+[url-encoding]: https://github.com/05nelsonm/encoding
+[url-immutable]: https://github.com/05nelsonm/immutable
 [url-kmp-process]: https://github.com/05nelsonm/kmp-process
 [url-kmp-tor-common]: https://github.com/05nelsonm/kmp-tor-common
 [url-kmp-tor-samples]: https://github.com/05nelsonm/kmp-tor-samples
