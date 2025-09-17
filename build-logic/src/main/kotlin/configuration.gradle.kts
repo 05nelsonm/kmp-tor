@@ -20,9 +20,15 @@ import org.gradle.api.tasks.testing.logging.TestLogEvent.SKIPPED
 import org.gradle.api.tasks.testing.logging.TestLogEvent.STANDARD_ERROR
 import org.gradle.api.tasks.testing.logging.TestLogEvent.STANDARD_OUT
 import org.gradle.api.tasks.testing.logging.TestLogEvent.STARTED
+import org.jetbrains.kotlin.gradle.plugin.extraProperties
+import org.jetbrains.kotlin.konan.target.HostManager
 
 plugins {
     id("io.matthewnelson.kmp.configuration")
+}
+
+if (!HostManager.hostIsMac) {
+    project.extraProperties.set("kotlin.native.enableKlibsCrossCompilation", false.toString())
 }
 
 tasks.withType<AbstractTestTask> {

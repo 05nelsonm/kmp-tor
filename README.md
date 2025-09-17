@@ -19,8 +19,6 @@
 ![badge-platform-ios]
 ![badge-platform-macos]
 ![badge-support-android-native]
-![badge-support-apple-silicon]
-![badge-support-js-ir]
 ![badge-support-linux-arm]
 
 Kotlin Multiplatform support for embedding Tor into your application.
@@ -130,7 +128,7 @@ See [kmp-tor-samples][url-kmp-tor-samples]
 [badge-encoding]: https://img.shields.io/badge/encoding-2.4.0-blue.svg?style=flat
 [badge-kmp-process]: https://img.shields.io/badge/kmp--process-0.3.2-blue.svg?style=flat
 [badge-kmp-tor-common]: https://img.shields.io/badge/kmp--tor--common-2.3.1-blue.svg?style=flat
-[badge-kotlin]: https://img.shields.io/badge/kotlin-2.1.21-blue.svg?logo=kotlin
+[badge-kotlin]: https://img.shields.io/badge/kotlin-2.2.20-blue.svg?logo=kotlin
 [badge-kotlincrypto-bitops]: https://img.shields.io/badge/kotlincrypto.bitops-0.2.0-blue.svg?style=flat
 [badge-kotlincrypto-hash]: https://img.shields.io/badge/kotlincrypto.hash-0.7.0-blue.svg?style=flat
 [badge-kotlincrypto-random]: https://img.shields.io/badge/kotlincrypto.random-0.5.1-blue.svg?style=flat
@@ -148,8 +146,6 @@ See [kmp-tor-samples][url-kmp-tor-samples]
 [badge-platform-wasm]: https://img.shields.io/badge/-wasm-624FE8.svg?style=flat
 [badge-platform-windows]: https://img.shields.io/badge/-windows-4D76CD.svg?style=flat
 [badge-support-android-native]: https://img.shields.io/badge/support-[AndroidNative]-6EDB8D.svg?style=flat
-[badge-support-apple-silicon]: https://img.shields.io/badge/support-[AppleSilicon]-43BBFF.svg?style=flat
-[badge-support-js-ir]: https://img.shields.io/badge/support-[js--IR]-AAC4E0.svg?style=flat
 [badge-support-linux-arm]: https://img.shields.io/badge/support-[LinuxArm]-2D3F6C.svg?style=flat
 
 [docs-root]: https://kmp-tor.matthewnelson.io
