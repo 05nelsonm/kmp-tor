@@ -19,4 +19,4 @@ package io.matthewnelson.kmp.tor.runtime.core.internal
 
 internal actual val UnixSocketsNotSupportedMessage: String? = null
 
-internal actual inline val IsUnixLikeHost: Boolean get() = true
+internal actual val IsUnixLikeHost: Boolean get() = true

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-@file:Suppress("NOTHING_TO_INLINE", "FunctionName", "VariableInitializerIsRedundant")
+@file:Suppress("NOTHING_TO_INLINE", "FunctionName")
 
 package io.matthewnelson.kmp.tor.runtime.core.internal
 
@@ -23,7 +23,7 @@ import platform.posix.errno
 
 @InternalKmpTorApi
 public fun kmptor_socket(domain: Int, type: Int, protocol: Int): Int {
-    var ret = -1
+    var ret: Int
     do {
         ret = platform_kmptor_socket(domain, type, protocol)
     } while (ret == -1 && errno == EINTR)

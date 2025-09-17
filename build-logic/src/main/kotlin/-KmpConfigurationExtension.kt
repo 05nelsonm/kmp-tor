@@ -96,6 +96,8 @@ fun KmpConfigurationExtension.configureShared(
         }
 
         action.execute(this)
+
+        configureKotlinVersionCompatibility()
     }
 }
 

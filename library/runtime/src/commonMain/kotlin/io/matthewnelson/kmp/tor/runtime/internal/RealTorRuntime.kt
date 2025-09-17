@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-@file:Suppress("PrivatePropertyName")
+@file:Suppress("LocalVariableName", "PrivatePropertyName", "RedundantVisibilityModifier", "RemoveRedundantQualifierName")
 
 package io.matthewnelson.kmp.tor.runtime.internal
 
@@ -144,7 +144,7 @@ internal class RealTorRuntime private constructor(
             val formatted = if (i == -1) {
                 log
             } else {
-                log.substring(0, i) + "[fid=$fidEllipses]" + log.substring(i)
+                log.take(i) + "[fid=$fidEllipses]" + log.substring(i)
             }
 
             LOG.DEBUG.notifyObservers(formatted)
@@ -693,7 +693,6 @@ internal class RealTorRuntime private constructor(
 
         private inner class ConnectivityObserver(
             ctrl: TorCtrl,
-            @Suppress("LocalVariableName")
             NOTIFIER: RuntimeEvent.Notifier,
             scope: CoroutineScope,
         ): ObserverConnectivity(

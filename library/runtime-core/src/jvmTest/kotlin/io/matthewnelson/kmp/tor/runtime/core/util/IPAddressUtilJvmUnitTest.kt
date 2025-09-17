@@ -13,6 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
+@file:Suppress("UNNECESSARY_NOT_NULL_ASSERTION")
+
 package io.matthewnelson.kmp.tor.runtime.core.util
 
 import io.matthewnelson.kmp.tor.runtime.core.net.IPAddress
@@ -54,7 +56,7 @@ class IPAddressUtilJvmUnitTest {
 
         val localHostScoped = localHost.address().toIPAddressV6(scope = nif.name)
         assertNotNull(localHostScoped.scope)
-        assertNull(localHostScoped.scope.toIntOrNull())
+        assertNull(localHostScoped.scope!!.toIntOrNull())
 
         if (IsUnixLikeHost) {
             val inetLocalHost = localHostScoped.toInet6Address()

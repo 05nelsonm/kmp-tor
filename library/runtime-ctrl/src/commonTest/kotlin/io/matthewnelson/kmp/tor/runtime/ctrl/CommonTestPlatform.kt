@@ -17,6 +17,7 @@ package io.matthewnelson.kmp.tor.runtime.ctrl
 
 import io.matthewnelson.encoding.base16.Base16
 import io.matthewnelson.encoding.core.Encoder.Companion.encodeToString
+import io.matthewnelson.kmp.file.Closeable
 import io.matthewnelson.kmp.file.File
 import io.matthewnelson.kmp.file.IOException
 import io.matthewnelson.kmp.file.SysTempDir
@@ -43,7 +44,7 @@ internal val AUTH_PASS = """
 
         """.trimIndent()
 
-internal val LOADER_DIR = SysTempDir.resolve("kmp_tor_ctrl_" + Random.Default.nextBytes(8).encodeToString(Base16))
+internal val LOADER_DIR = SysTempDir.resolve("kmp_tor_ctrl_" + Random.nextBytes(8).encodeToString(Base16))
 
 internal expect val IsDarwinSimulator: Boolean
 
@@ -54,7 +55,7 @@ internal expect fun File.recursivelyDelete()
 
 private object TestBinder: ResourceLoader.RuntimeBinder
 
-internal suspend fun startTor(ctrlPortArgument: String): AutoCloseable {
+internal suspend fun startTor(ctrlPortArgument: String): Closeable {
     val loader = LOADER
     val geoipFiles = loader.extract()
     val dataDir = loader.resourceDir.resolve("data")
@@ -131,7 +132,7 @@ internal suspend fun startTor(ctrlPortArgument: String): AutoCloseable {
     return result
 }
 
-private fun ResourceLoader.Tor.Exec.start(args: List<String>): AutoCloseable {
+private fun ResourceLoader.Tor.Exec.start(args: List<String>): Closeable {
     val process = process(TestBinder) { tor, configureEnv ->
         Process.Builder(command = tor.path)
             .args(args)
@@ -143,20 +144,12 @@ private fun ResourceLoader.Tor.Exec.start(args: List<String>): AutoCloseable {
             .stderr(Stdio.Inherit)
     }.spawn()
 
-    return object : AutoCloseable {
-        override fun close() { process.destroy() }
-    }
+    return Closeable { process.destroy() }
 }
 
-private fun ResourceLoader.Tor.NoExec.start(args: List<String>): AutoCloseable {
+private fun ResourceLoader.Tor.NoExec.start(args: List<String>): Closeable {
     return withApi(TestBinder) {
-
         torRunMain(args)
-
-        object : AutoCloseable {
-            override fun close() {
-                terminateAndAwaitResult()
-            }
-        }
+        Closeable { terminateAndAwaitResult() }
     }
 }

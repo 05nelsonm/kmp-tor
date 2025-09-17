@@ -22,7 +22,7 @@ import io.matthewnelson.kmp.tor.common.api.InternalKmpTorApi
 import io.matthewnelson.kmp.tor.common.core.OSHost
 import io.matthewnelson.kmp.tor.common.core.OSInfo
 
-internal actual inline val AFUnixSunPathSize: Int get() {
+internal actual val AFUnixSunPathSize: Int get() {
     @OptIn(InternalKmpTorApi::class)
     return when (OSInfo.INSTANCE.osHost) {
         // sockaddr_un.sun_path size as defined in sys/un.h
@@ -40,7 +40,7 @@ internal actual inline val AFUnixSunPathSize: Int get() {
     }
 }
 
-internal actual inline val IsUnixLikeHost: Boolean get() {
+internal actual val IsUnixLikeHost: Boolean get() {
     @OptIn(InternalKmpTorApi::class)
     return when (OSInfo.INSTANCE.osHost) {
         is OSHost.FreeBSD,
@@ -51,9 +51,9 @@ internal actual inline val IsUnixLikeHost: Boolean get() {
     }
 }
 
-internal actual inline val IsAndroidHost: Boolean get() {
+internal actual val IsAndroidHost: Boolean get() {
     @OptIn(InternalKmpTorApi::class)
     return OSInfo.INSTANCE.osHost is OSHost.Linux.Android
 }
 
-internal actual inline val IsDarwinMobile: Boolean get() = false
+internal actual val IsDarwinMobile: Boolean get() = false

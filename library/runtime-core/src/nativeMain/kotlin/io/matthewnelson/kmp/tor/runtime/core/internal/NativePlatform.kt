@@ -19,7 +19,7 @@ package io.matthewnelson.kmp.tor.runtime.core.internal
 
 import kotlin.experimental.ExperimentalNativeApi
 
-internal actual inline val IsAndroidHost: Boolean get() {
+internal actual val IsAndroidHost: Boolean get() {
     @OptIn(ExperimentalNativeApi::class)
     return when (Platform.osFamily) {
         OsFamily.ANDROID -> true
@@ -27,7 +27,7 @@ internal actual inline val IsAndroidHost: Boolean get() {
     }
 }
 
-internal actual inline val IsDarwinMobile: Boolean get() {
+internal actual val IsDarwinMobile: Boolean get() {
     @OptIn(ExperimentalNativeApi::class)
     return when (Platform.osFamily) {
         OsFamily.IOS,

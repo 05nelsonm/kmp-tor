@@ -17,6 +17,7 @@ package io.matthewnelson.kmp.tor.runtime.core.util
 
 import io.ktor.network.selector.*
 import io.ktor.network.sockets.*
+import io.matthewnelson.kmp.file.Closeable
 import io.matthewnelson.kmp.tor.runtime.core.net.IPAddress
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
@@ -38,13 +39,8 @@ class PortUtilNativeUnitTest: PortUtilBaseTest() {
     override suspend fun openServerSocket(
         ipAddress: IPAddress,
         port: Int,
-    ): AutoCloseable {
+    ): Closeable {
         val socket = aSocket(manager).tcp().bind(ipAddress.value, port)
-
-        return object : AutoCloseable {
-            override fun close() {
-                socket.close()
-            }
-        }
+        return Closeable { socket.close() }
     }
 }

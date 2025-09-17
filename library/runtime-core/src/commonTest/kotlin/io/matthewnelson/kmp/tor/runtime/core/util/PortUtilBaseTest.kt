@@ -15,6 +15,7 @@
  **/
 package io.matthewnelson.kmp.tor.runtime.core.util
 
+import io.matthewnelson.kmp.file.Closeable
 import io.matthewnelson.kmp.tor.runtime.core.net.IPAddress
 import io.matthewnelson.kmp.tor.runtime.core.net.LocalHost
 import io.matthewnelson.kmp.tor.runtime.core.net.Port
@@ -33,7 +34,7 @@ abstract class PortUtilBaseTest {
     protected abstract suspend fun openServerSocket(
         ipAddress: IPAddress,
         port: Int,
-    ): AutoCloseable
+    ): Closeable
 
     @Test
     fun givenPort_whenIPv4Unavailable_thenIsAvailableReturnsFalse() = runTest {
@@ -112,7 +113,7 @@ abstract class PortUtilBaseTest {
 
     private suspend fun LocalHost.holdServerSocket(
         port: Port.Ephemeral? = null
-    ): Pair<AutoCloseable, Port.Ephemeral> {
+    ): Pair<Closeable, Port.Ephemeral> {
         val portEphemeral = port ?: Port.Ephemeral.MIN
             .toPortEphemeral()
             .findNextAvailableAsync(1_000, this)
