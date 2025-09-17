@@ -24,11 +24,11 @@ jetbrains-skiko             = "0.9.4.2"
 
 kmp-process                 = "0.4.0-SNAPSHOT"
 kmp-tor-common              = "2.4.0-SNAPSHOT"
-kmp-tor-resource            = "408.17.0" # Upgrade yarn.lock when updating via `./gradlew kotlinUpgradeYarnLock`
+kmp-tor-resource            = "408.17.0"
 kmp-tor-resourceNpmSNAPSHOT = ".0"
 kotlincrypto-catalog        = "0.8.0-SNAPSHOT" # Utilized from settings.gradle.kts
 kotlinx-coroutines          = "1.10.2"
-ktor                        = "3.1.3"
+ktor                        = "3.3.0"
 
 [libraries]
 androidx-startup-runtime    = { module = "androidx.startup:startup-runtime", version.ref = "androidx-startup" }
