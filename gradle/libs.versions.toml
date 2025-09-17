@@ -23,7 +23,7 @@ immutable                   = "0.2.0"
 jetbrains-skiko             = "0.9.4.2"
 
 kmp-process                 = "0.3.2"
-kmp-tor-common              = "2.3.1"
+kmp-tor-common              = "2.4.0-SNAPSHOT"
 kmp-tor-resource            = "408.17.0" # Upgrade yarn.lock when updating via `./gradlew kotlinUpgradeYarnLock`
 kmp-tor-resourceNpmSNAPSHOT = ".0"
 kotlincrypto-catalog        = "0.7.1" # Utilized from settings.gradle.kts
