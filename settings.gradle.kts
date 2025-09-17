@@ -13,6 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
+@file:Suppress("UnstableApiUsage")
+
 rootProject.name = "kmp-tor"
 
 pluginManagement {
@@ -27,7 +29,6 @@ pluginManagement {
 private val VERSION_NAME: String? by settings
 
 dependencyResolutionManagement {
-    @Suppress("UnstableApiUsage")
     repositories {
         mavenCentral()
 
