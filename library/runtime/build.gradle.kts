@@ -27,18 +27,6 @@ kmpConfiguration {
             }
         }
 
-        js {
-            sourceSetTest {
-                dependencies {
-                    var v = libs.versions.kmp.tor.resource.get()
-                    if (v.endsWith("-SNAPSHOT")) {
-                        v += libs.versions.kmp.tor.resourceNpmSNAPSHOT.get()
-                    }
-                    implementation(npm("kmp-tor.resource-exec-tor.all", v))
-                }
-            }
-        }
-
         common {
             sourceSetMain {
                 dependencies {
@@ -65,39 +53,41 @@ kmpConfiguration {
 
         kotlin {
             with(sourceSets) {
-                val jvmMain = findByName("jvmMain")
-                val nativeMain = findByName("nativeMain")
-
-                if (jvmMain != null || nativeMain != null) {
-                    val nonJsMain = maybeCreate("nonJsMain")
-                    val nonJsTest = maybeCreate("nonJsTest")
-
-                    nonJsMain.dependsOn(getByName("commonMain"))
-                    nonJsTest.dependsOn(getByName("commonTest"))
-
-                    jvmMain?.apply { dependsOn(nonJsMain) }
-                    findByName("jvmTest")?.apply { dependsOn(nonJsTest) }
-                    nativeMain?.apply { dependsOn(nonJsMain) }
-                    findByName("nativeTest")?.apply { dependsOn(nonJsTest) }
+                val sets = arrayOf(
+                    "jvm",
+                    "native",
+                ).mapNotNull { name ->
+                    val main = findByName(name + "Main") ?: return@mapNotNull null
+                    main to getByName(name + "Test")
                 }
+                if (sets.isEmpty()) return@kotlin
+                val main = maybeCreate("nonJsMain").apply { dependsOn(getByName("commonMain")) }
+                val test = maybeCreate("nonJsTest").apply { dependsOn(getByName("commonTest")) }
+                sets.forEach { (m, t) -> m.dependsOn(main); t.dependsOn(test) }
             }
         }
 
         kotlin {
             with(sourceSets) {
-                val testSourceSets = arrayOf(
+                val sets = arrayOf(
                     "androidNative",
                     "linux",
                     "macos",
                     "mingw",
-                ).mapNotNull { name -> findByName("${name}Test") }
-                if (testSourceSets.isEmpty()) return@kotlin
+                ).mapNotNull { name -> findByName(name + "Test") }
+                if (sets.isEmpty()) return@kotlin
+                val test = maybeCreate("nonAppleMobileTest").apply { dependsOn(getByName("commonTest")) }
+                sets.forEach { t -> t.dependsOn(test) }
+            }
+        }
 
-                maybeCreate("nonAppleMobileTest").apply {
-                    dependsOn(getByName("commonTest"))
-
-                    testSourceSets.forEach { it.dependsOn(this) }
+        kotlin {
+            sourceSets.findByName("jsWasmJsTest")?.dependencies {
+                var v = libs.versions.kmp.tor.resource.get()
+                if (v.endsWith("-SNAPSHOT")) {
+                    v += libs.versions.kmp.tor.resourceNpmSNAPSHOT.get()
                 }
+                implementation(npm("kmp-tor.resource-exec-tor.all", v))
             }
         }
     }

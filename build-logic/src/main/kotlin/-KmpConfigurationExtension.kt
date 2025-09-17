@@ -79,6 +79,22 @@ fun KmpConfigurationExtension.configureShared(
 
         kotlin { explicitApi() }
 
+        kotlin {
+            with(sourceSets) {
+                val sets = arrayOf(
+                    "js",
+                    "wasmJs",
+                ).mapNotNull { name ->
+                    val main = findByName(name + "Main") ?: return@mapNotNull null
+                    main to getByName(name + "Test")
+                }
+                if (sets.isEmpty()) return@kotlin
+                val main = maybeCreate("jsWasmJsMain").apply { dependsOn(getByName("nonJvmMain")) }
+                val test = maybeCreate("jsWasmJsTest").apply { dependsOn(getByName("nonJvmTest")) }
+                sets.forEach { (m, t) -> m.dependsOn(main); t.dependsOn(test) }
+            }
+        }
+
         action.execute(this)
     }
 }
