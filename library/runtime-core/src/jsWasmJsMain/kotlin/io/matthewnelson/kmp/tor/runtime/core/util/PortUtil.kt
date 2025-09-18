@@ -13,20 +13,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-@file:Suppress("ACTUAL_ANNOTATIONS_NOT_MATCH_EXPECT")
-
 package io.matthewnelson.kmp.tor.runtime.core.util
 
+import io.matthewnelson.kmp.file.DelicateFileApi
 import io.matthewnelson.kmp.file.IOException
-import io.matthewnelson.kmp.process.InternalProcessApi
+import io.matthewnelson.kmp.file.jsExternTryCatch
+import io.matthewnelson.kmp.tor.common.api.InternalKmpTorApi
 import io.matthewnelson.kmp.tor.runtime.core.net.IPAddress
 import io.matthewnelson.kmp.tor.runtime.core.net.LocalHost
 import io.matthewnelson.kmp.tor.runtime.core.net.Port
-import io.matthewnelson.kmp.tor.runtime.core.internal.*
 import io.matthewnelson.kmp.tor.runtime.core.internal.PortEphemeralIterator.Companion.iterator
-import io.matthewnelson.kmp.tor.runtime.core.internal.net_createServer
-import io.matthewnelson.kmp.tor.runtime.core.internal.onError
-import kotlinx.coroutines.*
+import io.matthewnelson.kmp.tor.runtime.core.internal.cancellationExceptionOr
+import io.matthewnelson.kmp.tor.runtime.core.internal.js.JsObject
+import io.matthewnelson.kmp.tor.runtime.core.internal.js.new
+import io.matthewnelson.kmp.tor.runtime.core.internal.js.set
+import io.matthewnelson.kmp.tor.runtime.core.internal.node.node_net
+import io.matthewnelson.kmp.tor.runtime.core.internal.node.onClose
+import io.matthewnelson.kmp.tor.runtime.core.internal.node.onError
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.isActive
+import kotlin.coroutines.cancellation.CancellationException
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.TimeSource
@@ -35,6 +43,7 @@ import kotlin.time.TimeSource
  * Checks if the TCP port is available on [LocalHost] or not.
  *
  * @param [host] either [LocalHost.IPv4] or [LocalHost.IPv6]
+ * @throws [UnsupportedOperationException] On Kotlin/JS-Browser
  * */
 public actual suspend fun Port.isAvailableAsync(
     host: LocalHost,
@@ -54,6 +63,7 @@ public actual suspend fun Port.isAvailableAsync(
  * @throws [IllegalArgumentException] if [limit] is not between 1 and 1_000 (inclusive)
  * @throws [IOException] if no ports are available
  * @throws [CancellationException] if underlying coroutine was cancelled
+ * @throws [UnsupportedOperationException] On Kotlin/JS-Browser
  * */
 public actual suspend fun Port.Ephemeral.findNextAvailableAsync(
     limit: Int,
@@ -73,45 +83,53 @@ public actual suspend fun Port.Ephemeral.findNextAvailableAsync(
     throw ctx.cancellationExceptionOr { i.unavailableException(ipAddress) }
 }
 
-// @Throws(CancellationException::class)
+@Throws(CancellationException::class, UnsupportedOperationException::class)
 private suspend fun IPAddress.isPortAvailableOrNull(
     port: Int,
-    timeout: Duration = 42.milliseconds
+    timeout: Duration = 42.milliseconds,
 ): Boolean? {
+    val net = node_net
     val timeMark = TimeSource.Monotonic.markNow()
     val ctx = currentCoroutineContext()
     val latch = Job(ctx[Job])
     val closure = Job(ctx[Job])
-    val ipAddress = value
 
     var isAvailable: Boolean? = null
 
+    @OptIn(DelicateFileApi::class, InternalKmpTorApi::class)
     try {
-        val server = net_createServer { it.destroy(); it.unref();  Unit }
+        val server = jsExternTryCatch {
+            net.createServer { socket ->
+                socket.destroy()
+                socket.unref()
+            }
+        }
 
         latch.invokeOnCompletion {
-            server.close()
-            server.unref()
+            jsExternTryCatch {
+                server.close()
+                server.unref()
+            }
         }
 
         server.onError {
             isAvailable = false
             latch.complete()
         }
-
-        @OptIn(InternalProcessApi::class)
-        server.on("close") {
+        server.onClose {
             closure.complete()
         }
 
-        val options = js("{}")
+        val options = JsObject.new()
         options["port"] = port
-        options["host"] = ipAddress
+        options["host"] = value
         options["backlog"] = 1
 
-        server.listen(options) {
-            isAvailable = true
-            latch.complete()
+        jsExternTryCatch {
+            server.listen(options) {
+                isAvailable = true
+                latch.complete()
+            }
         }
 
         while (

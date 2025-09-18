@@ -16,9 +16,13 @@
 package io.matthewnelson.kmp.tor.runtime.core.util
 
 import io.matthewnelson.kmp.file.Closeable
+import io.matthewnelson.kmp.tor.common.api.InternalKmpTorApi
+import io.matthewnelson.kmp.tor.runtime.core.internal.js.JsObject
+import io.matthewnelson.kmp.tor.runtime.core.internal.js.new
+import io.matthewnelson.kmp.tor.runtime.core.internal.js.set
 import io.matthewnelson.kmp.tor.runtime.core.net.IPAddress
-import io.matthewnelson.kmp.tor.runtime.core.internal.net_createServer
-import io.matthewnelson.kmp.tor.runtime.core.internal.onError
+import io.matthewnelson.kmp.tor.runtime.core.internal.node.node_net
+import io.matthewnelson.kmp.tor.runtime.core.internal.node.onError
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
@@ -26,6 +30,7 @@ import kotlin.test.fail
 import kotlin.time.Duration.Companion.milliseconds
 
 @Suppress("UNUSED")
+@OptIn(InternalKmpTorApi::class)
 class PortUtilJsUnitTest: PortUtilBaseTest() {
 
     override val isNodeJs: Boolean = true
@@ -34,9 +39,10 @@ class PortUtilJsUnitTest: PortUtilBaseTest() {
         ipAddress: IPAddress,
         port: Int,
     ): Closeable {
-        val server = net_createServer { it.destroy(); Unit }
-        server.onError { err -> fail("$err") }
-        val options = js("{}")
+        val net = node_net
+        val server = net.createServer { socket -> socket.destroy() }
+        server.onError { t -> fail("Server Error", t) }
+        val options = JsObject.new()
         options["port"] = port
         options["host"] = ipAddress.value
         options["backlog"] = 1
