@@ -15,26 +15,32 @@
  **/
 package io.matthewnelson.kmp.tor.runtime.core.internal
 
+import io.matthewnelson.kmp.tor.runtime.core.internal.js.JsObject
+import io.matthewnelson.kmp.tor.runtime.core.internal.js.getBoolean
+import io.matthewnelson.kmp.tor.runtime.core.internal.js.getJsArray
+import io.matthewnelson.kmp.tor.runtime.core.internal.js.getJsObject
+import io.matthewnelson.kmp.tor.runtime.core.internal.js.getString
+import io.matthewnelson.kmp.tor.runtime.core.internal.node.node_os
 import io.matthewnelson.kmp.tor.runtime.core.net.IPAddress
 import io.matthewnelson.kmp.tor.runtime.core.net.IPAddress.Companion.toIPAddress
 import io.matthewnelson.kmp.tor.runtime.core.net.LocalHost
 
-@Suppress("ACTUAL_ANNOTATIONS_NOT_MATCH_EXPECT")
+@Throws(Exception::class)
 internal actual fun LocalHost.Companion.tryPlatformResolve(set: LinkedHashSet<IPAddress>) {
+    val os = node_os
     try {
-        objectValues(os_networkInterfaces()).forEach { values ->
-            values.forEach { entry ->
-                if (entry.internal as Boolean) {
-                    set.add((entry.address as String).toIPAddress())
-                }
+        val interfaces = os.networkInterfaces()
+        val values = JsObject.values(interfaces)
+        for (i in 0 until values.length) {
+            val connections = values.getJsArray(i)
+            for (j in 0 until connections.length) {
+                val connection = connections.getJsObject(j)
+                if (!connection.getBoolean("internal")) continue
+                val address = connection.getString("address").toIPAddress()
+                set.add(address)
             }
         }
     } catch (_: Throwable) {
         return
     }
-}
-
-@Suppress("NOTHING_TO_INLINE")
-private inline fun objectValues(jsObject: dynamic): Array<Array<dynamic>> {
-    return js("Object").values(jsObject).unsafeCast<Array<Array<dynamic>>>()
 }

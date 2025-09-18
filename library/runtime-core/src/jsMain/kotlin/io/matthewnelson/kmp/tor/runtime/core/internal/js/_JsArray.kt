@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Matthew Nelson
+ * Copyright (c) 2025 Matthew Nelson
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,12 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-@file:Suppress("FunctionName")
-@file:JsModule("os")
-@file:JsNonModule
+package io.matthewnelson.kmp.tor.runtime.core.internal.js
 
-package io.matthewnelson.kmp.tor.runtime.core.internal
-
-/** [docs](https://nodejs.org/api/os.html#osnetworkinterfaces) */
-@JsName("networkInterfaces")
-internal external fun os_networkInterfaces(): dynamic
+internal actual fun jsArrayGetJsArray(array: JsArray, index: Int): JsArray = js("array[index]")
+internal actual fun jsArrayGetJsObject(array: JsArray, index: Int): JsObject = js("array[index]")

@@ -46,6 +46,7 @@ public sealed class LocalHost private constructor(): Address("localhost") {
      *
      * @throws [IOException] if there were any errors (e.g. calling
      *   from Main thread on Android)
+     * @throws [UnsupportedOperationException] On Kotlin/JS-Browser
      * */
     public abstract fun resolve(): IPAddress
 
@@ -93,7 +94,7 @@ public sealed class LocalHost private constructor(): Address("localhost") {
             }
 
             @JvmStatic
-            @Throws(IOException::class)
+            @Throws(IOException::class, UnsupportedOperationException::class)
             internal fun resolve(checkCache: Boolean): Set<IPAddress> {
                 if (checkCache) getOrNull()?.let { return it }
 
@@ -102,6 +103,9 @@ public sealed class LocalHost private constructor(): Address("localhost") {
                 try {
                     tryPlatformResolve(addresses)
                 } catch (t: Throwable) {
+                    // Js/Browser
+                    if (t is UnsupportedOperationException) throw t
+
                     // Android can throw if called from Main thread
                     // which we do not want to swallow.
                     throw t.wrapIOException { "Failed to resolve IP addresses for localhost" }
