@@ -13,8 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-@file:Suppress("ACTUAL_ANNOTATIONS_NOT_MATCH_EXPECT")
-
 package io.matthewnelson.kmp.tor.runtime.core.util
 
 import io.matthewnelson.kmp.tor.common.api.InternalKmpTorApi
@@ -28,7 +26,7 @@ import io.matthewnelson.kmp.tor.runtime.core.ctrl.TorCmd
  * @see [TorCmd.Privileged.Processor]
  * @throws [Throwable] when underlying [OnFailure] callback is invoked.
  * */
-// @Throws(Throwable::class)
+@Throws(Throwable::class)
 public actual suspend fun <Success: Any> TorCmd.Privileged.Processor.executeAsync(
     cmd: TorCmd.Privileged<Success>,
 ): Success {
@@ -44,7 +42,7 @@ public actual suspend fun <Success: Any> TorCmd.Privileged.Processor.executeAsyn
  * @see [TorCmd.Unprivileged.Processor]
  * @throws [Throwable] when underlying [OnFailure] callback is invoked.
  * */
-// @Throws(Throwable::class)
+@Throws(Throwable::class)
 public actual suspend fun <Success: Any> TorCmd.Unprivileged.Processor.executeAsync(
     cmd: TorCmd.Unprivileged<Success>,
 ): Success {
