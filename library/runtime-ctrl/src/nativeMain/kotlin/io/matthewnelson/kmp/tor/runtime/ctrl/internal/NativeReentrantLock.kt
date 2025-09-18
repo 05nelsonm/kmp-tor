@@ -19,6 +19,7 @@ package io.matthewnelson.kmp.tor.runtime.ctrl.internal
 
 import kotlinx.atomicfu.locks.withLock as _withLock
 
+@Suppress("ACTUAL_WITHOUT_EXPECT")
 internal actual typealias ReentrantLock = kotlinx.atomicfu.locks.SynchronizedObject
 
 internal actual inline fun reentrantLock(): ReentrantLock = ReentrantLock()

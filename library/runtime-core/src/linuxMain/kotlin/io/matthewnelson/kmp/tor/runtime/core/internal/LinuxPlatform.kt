@@ -22,7 +22,7 @@ import kotlinx.cinterop.sizeOf
 import platform.linux.sockaddr_un
 import platform.posix.sa_family_tVar
 
-internal actual inline val AFUnixSunPathSize: Int get() {
+internal actual val AFUnixSunPathSize: Int get() {
     // struct sockaddr_un
     //   {
     //     __SOCKADDR_COMMON (sun_);

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-@file:Suppress("EXPECT_ACTUAL_CLASSIFIERS_ARE_IN_BETA_WARNING", "ACTUAL_ANNOTATIONS_NOT_MATCH_EXPECT")
+@file:Suppress("EXPECT_ACTUAL_CLASSIFIERS_ARE_IN_BETA_WARNING", "ACTUAL_ANNOTATIONS_NOT_MATCH_EXPECT", "WRONG_INVOCATION_KIND")
 
 package io.matthewnelson.kmp.tor.runtime.core.internal
 
@@ -27,7 +27,7 @@ import kotlinx.cinterop.*
 import org.kotlincrypto.bitops.endian.Endian
 import org.kotlincrypto.bitops.endian.Endian.Big.bePackIntoUnsafe
 import platform.posix.*
-import kotlin.concurrent.AtomicReference
+import kotlin.concurrent.AtomicInt
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
@@ -44,9 +44,11 @@ internal actual value class ServerSocketProducer private actual constructor(priv
         if (sockfd == -1) throw errnoToIOException(errno)
 
         val closeable = object : Closeable {
-            private val once = AtomicReference<Int?>(sockfd)
+            private val once = AtomicInt(sockfd)
             override fun close() {
-                val sockfd = once.getAndSet(null) ?: return
+                @Suppress("NAME_SHADOWING")
+                val sockfd = once.getAndSet(-1)
+                if (sockfd == -1) return
                 if (kmptor_socket_close(sockfd) == 0) return
                 throw errnoToIOException(errno)
             }
@@ -95,7 +97,6 @@ internal actual value class ServerSocketProducer private actual constructor(priv
 
 @OptIn(ExperimentalContracts::class, ExperimentalForeignApi::class, UnsafeNumber::class)
 private inline fun InetSocketAddress.doBind(block: (CPointer<sockaddr>, socklen_t) -> Unit) {
-    @Suppress("WRONG_INVOCATION_KIND")
     contract {
         callsInPlace(block, InvocationKind.EXACTLY_ONCE)
     }

@@ -95,5 +95,7 @@ kmpConfiguration {
         }
 
         kotlin { explicitApi() }
+
+        configureKotlinVersionCompatibility()
     }
 }

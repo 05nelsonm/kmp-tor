@@ -15,6 +15,7 @@
  **/
 package io.matthewnelson.kmp.tor.runtime.core.util
 
+import io.matthewnelson.kmp.file.Closeable
 import io.matthewnelson.kmp.tor.runtime.core.net.IPAddress
 import io.matthewnelson.kmp.tor.runtime.core.internal.net_createServer
 import io.matthewnelson.kmp.tor.runtime.core.internal.onError
@@ -32,7 +33,7 @@ class PortUtilJsUnitTest: PortUtilBaseTest() {
     override suspend fun openServerSocket(
         ipAddress: IPAddress,
         port: Int,
-    ): AutoCloseable {
+    ): Closeable {
         val server = net_createServer { it.destroy(); Unit }
         server.onError { err -> fail("$err") }
         val options = js("{}")
@@ -41,11 +42,9 @@ class PortUtilJsUnitTest: PortUtilBaseTest() {
         options["backlog"] = 1
         server.listen(options) {}
         withContext(Dispatchers.Default) { delay(10.milliseconds) }
-        return object : AutoCloseable {
-            override fun close() {
-                server.close()
-                server.unref()
-            }
+        return Closeable {
+            server.close()
+            server.unref()
         }
     }
 }

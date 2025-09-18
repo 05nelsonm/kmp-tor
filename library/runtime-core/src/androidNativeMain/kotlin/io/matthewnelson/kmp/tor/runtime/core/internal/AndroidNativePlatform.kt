@@ -19,7 +19,7 @@ package io.matthewnelson.kmp.tor.runtime.core.internal
 
 import kotlinx.cinterop.ExperimentalForeignApi
 
-internal actual inline val AFUnixSunPathSize: Int get() {
+internal actual val AFUnixSunPathSize: Int get() {
     @OptIn(ExperimentalForeignApi::class)
     return UNIX_PATH_MAX
 }

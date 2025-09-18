@@ -59,35 +59,39 @@ kmpConfiguration {
 
         kotlin {
             with(sourceSets) {
-                val jsMain = findByName("jsMain")
-                val jvmMain = findByName("jvmMain")
-
-                if (jsMain != null || jvmMain != null) {
-                    val nonNativeMain = maybeCreate("nonNativeMain")
-                    nonNativeMain.dependsOn(getByName("commonMain"))
-                    jvmMain?.apply { dependsOn(nonNativeMain) }
-                    jsMain?.apply { dependsOn(nonNativeMain) }
+                val sets = arrayOf(
+                    "jsWasmJs",
+                    "jvm",
+                ).mapNotNull { name ->
+                    val main = findByName(name + "Main") ?: return@mapNotNull null
+                    main to getByName(name + "Test")
                 }
+                if (sets.isEmpty()) return@kotlin
+                val main = maybeCreate("nonNativeMain").apply { dependsOn(getByName("commonMain")) }
+                val test = maybeCreate("nonNativeTest").apply { dependsOn(getByName("commonTest")) }
+                sets.forEach { (m, t) -> m.dependsOn(main); t.dependsOn(test) }
+            }
+        }
 
-                val nativeMain = findByName("nativeMain")
-                val nativeTest = findByName("nativeTest")?.apply {
-                    dependencies {
-                        implementation(libs.ktor.network)
-                    }
+        kotlin {
+            with(sourceSets) {
+                val sets = arrayOf(
+                    "jvm",
+                    "native",
+                ).mapNotNull { name ->
+                    val main = findByName(name + "Main") ?: return@mapNotNull null
+                    main to getByName(name + "Test")
                 }
+                if (sets.isEmpty()) return@kotlin
+                val main = maybeCreate("nonJsMain").apply { dependsOn(getByName("commonMain")) }
+                val test = maybeCreate("nonJsTest").apply { dependsOn(getByName("commonTest")) }
+                sets.forEach { (m, t) -> m.dependsOn(main); t.dependsOn(test) }
+            }
+        }
 
-                if (jvmMain != null || nativeMain != null) {
-                    val nonJsMain = maybeCreate("nonJsMain")
-                    val nonJsTest = maybeCreate("nonJsTest")
-
-                    nonJsMain.dependsOn(getByName("commonMain"))
-                    nonJsTest.dependsOn(getByName("commonTest"))
-
-                    jvmMain?.apply { dependsOn(nonJsMain) }
-                    findByName("jvmTest")?.apply { dependsOn(nonJsTest) }
-                    nativeMain?.apply { dependsOn(nonJsMain) }
-                    nativeTest?.apply { dependsOn(nonJsTest) }
-                }
+        kotlin {
+            sourceSets.findByName("nativeTest")?.dependencies {
+                implementation(libs.ktor.network)
             }
         }
 

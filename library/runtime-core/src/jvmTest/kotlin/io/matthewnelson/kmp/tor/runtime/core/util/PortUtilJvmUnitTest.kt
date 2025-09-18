@@ -15,6 +15,7 @@
  **/
 package io.matthewnelson.kmp.tor.runtime.core.util
 
+import io.matthewnelson.kmp.file.Closeable
 import io.matthewnelson.kmp.tor.runtime.core.net.IPAddress
 import io.matthewnelson.kmp.tor.runtime.core.internal.ServerSocketProducer.Companion.toServerSocketProducer
 
@@ -24,5 +25,5 @@ class PortUtilJvmUnitTest: PortUtilBaseTest() {
     override suspend fun openServerSocket(
         ipAddress: IPAddress,
         port: Int
-    ): AutoCloseable = ipAddress.toServerSocketProducer().open(port)
+    ): Closeable = ipAddress.toServerSocketProducer().open(port)
 }

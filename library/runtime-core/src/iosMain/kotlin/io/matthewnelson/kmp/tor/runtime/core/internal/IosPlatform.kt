@@ -22,7 +22,7 @@ import kotlinx.cinterop.sizeOf
 import platform.posix.sa_family_tVar
 import platform.posix.u_charVar
 
-internal actual inline val AFUnixSunPathSize: Int get() {
+internal actual val AFUnixSunPathSize: Int get() {
     // struct  sockaddr_un {
     //	 unsigned char   sun_len;        /* sockaddr len including null */
     //	 sa_family_t     sun_family;     /* [XSI] AF_UNIX */
