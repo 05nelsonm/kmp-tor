@@ -25,6 +25,7 @@ import kotlin.coroutines.cancellation.CancellationException
  *
  * See [isAvailableSync](https://kmp-tor.matthewnelson.io/library/runtime-core/io.matthewnelson.kmp.tor.runtime.core.util/is-available-sync.html)
  * @param [host] either [LocalHost.IPv4] or [LocalHost.IPv6]
+ * @throws [UnsupportedOperationException] On Kotlin/JS-Browser
  * */
 public expect suspend fun Port.isAvailableAsync(
     host: LocalHost,
@@ -43,6 +44,7 @@ public expect suspend fun Port.isAvailableAsync(
  * @throws [IllegalArgumentException] if [limit] is not between 1 and 1_000 (inclusive)
  * @throws [IOException] if no ports are available
  * @throws [CancellationException] if underlying coroutine was cancelled
+ * @throws [UnsupportedOperationException] On Kotlin/JS-Browser
  * */
 public expect suspend fun Port.Ephemeral.findNextAvailableAsync(
     limit: Int,

@@ -1,5 +1,5 @@
 // Klib ABI Dump
-// Targets: [androidNativeArm32, androidNativeArm64, androidNativeX64, androidNativeX86, iosArm64, iosSimulatorArm64, iosX64, js, linuxArm64, linuxX64, macosArm64, macosX64]
+// Targets: [androidNativeArm32, androidNativeArm64, androidNativeX64, androidNativeX86, iosArm64, iosSimulatorArm64, iosX64, js, linuxArm64, linuxX64, macosArm64, macosX64, wasmJs]
 // Alias: native => [androidNativeArm32, androidNativeArm64, androidNativeX64, androidNativeX86, iosArm64, iosSimulatorArm64, iosX64, linuxArm64, linuxX64, macosArm64, macosX64]
 // Rendering settings:
 // - Signature version: 2
@@ -132,7 +132,7 @@ abstract class <#A: kotlin/Any?, #B: io.matthewnelson.kmp.tor.runtime.core/Event
         constructor <init>(kotlin/Int) // io.matthewnelson.kmp.tor.runtime.core/Event.Entries.<init>|<init>(kotlin.Int){}[0]
 
         abstract val lazyEntries // io.matthewnelson.kmp.tor.runtime.core/Event.Entries.lazyEntries|{}lazyEntries[0]
-            // Targets: [native]
+            // Targets: [native, wasmJs]
             abstract fun <get-lazyEntries>(): io.matthewnelson.kmp.tor.runtime.core/ThisBlock<kotlin.collections/HashSet<#A1>> // io.matthewnelson.kmp.tor.runtime.core/Event.Entries.lazyEntries.<get-lazyEntries>|<get-lazyEntries>(){}[0]
 
             // Targets: [js]
@@ -2909,7 +2909,7 @@ final class io.matthewnelson.kmp.tor.runtime.core.config/TorSetting { // io.matt
 
     abstract class BuilderScope { // io.matthewnelson.kmp.tor.runtime.core.config/TorSetting.BuilderScope|null[0]
         final val extras // io.matthewnelson.kmp.tor.runtime.core.config/TorSetting.BuilderScope.extras|{}extras[0]
-            // Targets: [native]
+            // Targets: [native, wasmJs]
             final fun <get-extras>(): kotlin.collections/HashMap<kotlin/String, kotlin/Any> // io.matthewnelson.kmp.tor.runtime.core.config/TorSetting.BuilderScope.extras.<get-extras>|<get-extras>(){}[0]
 
             // Targets: [js]
@@ -2917,13 +2917,13 @@ final class io.matthewnelson.kmp.tor.runtime.core.config/TorSetting { // io.matt
         final val option // io.matthewnelson.kmp.tor.runtime.core.config/TorSetting.BuilderScope.option|{}option[0]
             final fun <get-option>(): io.matthewnelson.kmp.tor.runtime.core.config/TorOption // io.matthewnelson.kmp.tor.runtime.core.config/TorSetting.BuilderScope.option.<get-option>|<get-option>(){}[0]
         final val optionals // io.matthewnelson.kmp.tor.runtime.core.config/TorSetting.BuilderScope.optionals|{}optionals[0]
-            // Targets: [native]
+            // Targets: [native, wasmJs]
             final fun <get-optionals>(): kotlin.collections/HashSet<kotlin/String> // io.matthewnelson.kmp.tor.runtime.core.config/TorSetting.BuilderScope.optionals.<get-optionals>|<get-optionals>(){}[0]
 
             // Targets: [js]
             final fun <get-optionals>(): kotlin.collections/LinkedHashSet<kotlin/String> // io.matthewnelson.kmp.tor.runtime.core.config/TorSetting.BuilderScope.optionals.<get-optionals>|<get-optionals>(){}[0]
         final val others // io.matthewnelson.kmp.tor.runtime.core.config/TorSetting.BuilderScope.others|{}others[0]
-            // Targets: [native]
+            // Targets: [native, wasmJs]
             final fun <get-others>(): kotlin.collections/HashSet<io.matthewnelson.kmp.tor.runtime.core.config/TorSetting.LineItem> // io.matthewnelson.kmp.tor.runtime.core.config/TorSetting.BuilderScope.others.<get-others>|<get-others>(){}[0]
 
             // Targets: [js]
