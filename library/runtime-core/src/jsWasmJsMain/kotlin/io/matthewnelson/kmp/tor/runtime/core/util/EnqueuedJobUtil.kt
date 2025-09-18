@@ -13,8 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-@file:Suppress("ACTUAL_ANNOTATIONS_NOT_MATCH_EXPECT")
-
 package io.matthewnelson.kmp.tor.runtime.core.util
 
 import io.matthewnelson.kmp.tor.common.api.InternalKmpTorApi
@@ -37,7 +35,7 @@ import kotlin.contracts.contract
  * @suppress
  * */
 @InternalKmpTorApi
-//@Throws(Throwable::class)
+@Throws(Throwable::class)
 @OptIn(ExperimentalContracts::class)
 @Deprecated("Not meant for public use", level = DeprecationLevel.ERROR)
 public actual suspend fun <Arg: EnqueuedJob.Argument, Success: Any> Arg.awaitAsync(
