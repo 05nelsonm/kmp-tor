@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-@file:Suppress("KotlinRedundantDiagnosticSuppress")
+@file:Suppress("NOTHING_TO_INLINE")
 
 package io.matthewnelson.kmp.tor.runtime.internal
 
@@ -21,5 +21,4 @@ import io.matthewnelson.kmp.tor.runtime.TorRuntime
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 
-@Suppress("NOTHING_TO_INLINE")
 internal actual inline fun TorRuntime.Environment.newRuntimeDispatcher(): CoroutineDispatcher = Dispatchers.Main

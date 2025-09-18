@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-@file:Suppress("EXPECT_ACTUAL_CLASSIFIERS_ARE_IN_BETA_WARNING", "ACTUAL_ANNOTATIONS_NOT_MATCH_EXPECT")
+@file:Suppress("EXPECT_ACTUAL_CLASSIFIERS_ARE_IN_BETA_WARNING")
 
 package io.matthewnelson.kmp.tor.runtime
 
@@ -143,7 +143,7 @@ public actual enum class Action: EnqueuedJob.Argument {
          * @see [stopDaemonAsync]
          * @see [restartDaemonAsync]
          * */
-        //@Throws(Throwable::class)
+        @Throws(Throwable::class)
         public actual suspend fun <T: Processor> T.executeAsync(action: Action): T {
             @Suppress("DEPRECATION_ERROR")
             action.awaitAsync(this::enqueue)
@@ -158,7 +158,7 @@ public actual enum class Action: EnqueuedJob.Argument {
          * @see [executeAsync]
          * @see [Action.StartDaemon]
          * */
-        //@Throws(Throwable::class)
+        @Throws(Throwable::class)
         public actual suspend inline fun <T: Processor> T.startDaemonAsync(): T = executeAsync(StartDaemon)
 
         /**
@@ -169,7 +169,7 @@ public actual enum class Action: EnqueuedJob.Argument {
          * @see [executeAsync]
          * @see [Action.StopDaemon]
          * */
-        //@Throws(Throwable::class)
+        @Throws(Throwable::class)
         public actual suspend inline fun <T: Processor> T.stopDaemonAsync(): T = executeAsync(StopDaemon)
 
         /**
@@ -180,7 +180,7 @@ public actual enum class Action: EnqueuedJob.Argument {
          * @see [executeAsync]
          * @see [Action.RestartDaemon]
          * */
-        //@Throws(Throwable::class)
+        @Throws(Throwable::class)
         public actual suspend inline fun <T: Processor> T.restartDaemonAsync(): T = executeAsync(RestartDaemon)
     }
 }
