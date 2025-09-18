@@ -18,6 +18,7 @@
 package io.matthewnelson.kmp.tor.runtime.ctrl
 
 import io.matthewnelson.immutable.collections.toImmutableSet
+import io.matthewnelson.kmp.file.DelicateFileApi
 import io.matthewnelson.kmp.file.File
 import io.matthewnelson.kmp.file.IOException
 import io.matthewnelson.kmp.file.SysDirSep
@@ -185,8 +186,8 @@ public actual interface TorCtrl : Destroyable, TorEvent.Processor, TorCmd.Privil
             handler,
         )
 
-        // @Throws(IOException::class)
-        @OptIn(InternalKmpTorApi::class, InternalProcessApi::class)
+        @Throws(IOException::class, UnsupportedOperationException::class)
+        @OptIn(DelicateFileApi::class,InternalKmpTorApi::class, InternalProcessApi::class)
         private suspend fun connect(options: Any): TorCtrl {
 
             // Need to potentially catch lines if they come in

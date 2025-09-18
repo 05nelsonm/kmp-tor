@@ -17,6 +17,8 @@
 
 package io.matthewnelson.kmp.tor.runtime.core.internal.js
 
+import kotlin.js.JsName
+
 @JsName("Object")
 internal external class JsObject {
     internal companion object {

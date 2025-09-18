@@ -16,6 +16,7 @@
 ![badge-platform-android]
 ![badge-platform-jvm]
 ![badge-platform-js-node]
+![badge-platform-wasm]
 ![badge-platform-linux]
 ![badge-platform-ios]
 ![badge-platform-macos]

@@ -13,25 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-@file:Suppress("UNUSED")
-
 package io.matthewnelson.kmp.tor.runtime.core.internal.js
 
 import io.matthewnelson.kmp.tor.common.api.InternalKmpTorApi
-import kotlin.js.JsName
-
-@InternalKmpTorApi
-@JsName("Uint8Array")
-public external class JsUint8Array(length: Int) {
-    public val byteLength: Int
-}
-
-@InternalKmpTorApi
-public operator fun JsUint8Array.get(index: Int): Byte = jsArrayGet(this, index)
-@InternalKmpTorApi
-public operator fun JsUint8Array.set(index: Int, value: Byte) { jsArraySet(this, index, value) }
 
 @OptIn(InternalKmpTorApi::class)
-internal expect fun jsArrayGet(array: JsUint8Array, index: Int): Byte
+internal actual fun jsArrayGet(array: JsUint8Array, index: Int): Byte = js("array[index]")
 @OptIn(InternalKmpTorApi::class)
-internal expect fun jsArraySet(array: JsUint8Array, index: Int, value: Byte)
+internal actual fun jsArraySet(array: JsUint8Array, index: Int, value: Byte) { js("array[index] = value") }

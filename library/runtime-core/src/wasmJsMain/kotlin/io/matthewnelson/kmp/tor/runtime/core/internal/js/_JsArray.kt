@@ -13,19 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-@file:Suppress("NOTHING_TO_INLINE")
-
 package io.matthewnelson.kmp.tor.runtime.core.internal.js
 
-import kotlin.js.JsName
-
-@JsName("Array")
-internal external class JsArray {
-    internal val length: Int
-}
-
-internal inline fun JsArray.getJsArray(index: Int): JsArray = jsArrayGetJsArray(this, index)
-internal inline fun JsArray.getJsObject(index: Int): JsObject = jsArrayGetJsObject(this, index)
-
-internal expect fun jsArrayGetJsArray(array: JsArray, index: Int): JsArray
-internal expect fun jsArrayGetJsObject(array: JsArray, index: Int): JsObject
+internal actual fun jsArrayGetJsArray(array: JsArray, index: Int): JsArray = js("array[index]")
+internal actual fun jsArrayGetJsObject(array: JsArray, index: Int): JsObject = js("array[index]")

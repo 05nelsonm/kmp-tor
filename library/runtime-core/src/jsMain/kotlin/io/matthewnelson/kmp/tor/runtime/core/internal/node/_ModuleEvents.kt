@@ -21,14 +21,6 @@ import io.matthewnelson.kmp.tor.common.api.InternalKmpTorApi
 import io.matthewnelson.kmp.tor.runtime.core.Disposable
 
 @InternalKmpTorApi
-public actual fun JsEventEmitter.onClose(block: () -> Unit): Disposable.Once {
-    jsEventEmitterOn(this, "close", block)
-    return Disposable.Once.of {
-        jsEventEmitterRemoveListener(this, "close", block)
-    }
-}
-
-@InternalKmpTorApi
 public actual fun JsEventEmitter.onError(block: (Throwable) -> Unit): Disposable.Once {
     jsEventEmitterOn(this, "error", block)
     return Disposable.Once.of {

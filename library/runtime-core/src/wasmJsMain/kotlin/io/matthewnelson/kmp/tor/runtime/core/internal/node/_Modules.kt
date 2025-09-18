@@ -13,23 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-@file:Suppress("EXPECT_ACTUAL_CLASSIFIERS_ARE_IN_BETA_WARNING")
-
 package io.matthewnelson.kmp.tor.runtime.core.internal.node
 
-import io.matthewnelson.kmp.tor.common.api.InternalKmpTorApi
-import io.matthewnelson.kmp.tor.runtime.core.Disposable
-import kotlin.js.JsName
-
-/** [docs](https://nodejs.org/api/events.html) */
-internal sealed external interface ModuleEvents {
-    // ...
-}
-
-/** [docs](https://nodejs.org/api/events.html#class-eventemitter) */
-@InternalKmpTorApi
-@JsName("EventEmitter")
-public sealed external interface JsEventEmitter
-
-@InternalKmpTorApi
-public expect fun JsEventEmitter.onError(block: (Throwable) -> Unit): Disposable.Once
+internal actual fun nodeModuleEvents(): ModuleEvents = js(CODE_MODULE_EVENTS)
+internal actual fun nodeModuleOs(): ModuleOs = js(CODE_MODULE_OS)
+internal actual fun nodeModuleNet(): ModuleNet = js(CODE_MODULE_NET)

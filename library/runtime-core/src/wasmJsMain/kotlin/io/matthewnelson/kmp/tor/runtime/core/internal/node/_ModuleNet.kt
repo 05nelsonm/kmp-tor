@@ -29,7 +29,7 @@ internal actual fun JsServer.onClose(block: () -> Unit): Disposable.Once {
 
 @InternalKmpTorApi
 public actual fun JsSocket.onData(block: (buf: Buffer) -> Unit): Disposable.Once {
-    val listener: (dynamic) -> Unit = { data ->
+    val listener: (JsAny) -> Unit = { data ->
         val buf = Buffer.wrap(data)
         block(buf)
     }
@@ -57,8 +57,9 @@ public actual fun JsSocket.onceDrain(block: () -> Unit): Disposable.Once {
 
 @InternalKmpTorApi
 public actual fun JsSocket.onceError(block: (Throwable) -> Unit): Disposable.Once {
-    jsEventEmitterOnce(this, "error", block)
+    val listener = jsErrorListener(block)
+    jsEventEmitterOnce(this, "error", listener)
     return Disposable.Once.of {
-        jsEventEmitterRemoveListener(this, "error", block)
+        jsEventEmitterRemoveListener(this, "error", listener)
     }
 }

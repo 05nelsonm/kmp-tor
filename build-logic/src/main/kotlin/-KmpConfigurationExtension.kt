@@ -17,6 +17,7 @@ import io.matthewnelson.kmp.configuration.extension.KmpConfigurationExtension
 import io.matthewnelson.kmp.configuration.extension.container.target.KmpConfigurationContainerDsl
 import io.matthewnelson.kmp.configuration.extension.container.target.TargetAndroidContainer
 import org.gradle.api.Action
+import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
 import org.jetbrains.kotlin.konan.target.HostManager
 
 fun KmpConfigurationExtension.configureShared(
@@ -51,11 +52,27 @@ fun KmpConfigurationExtension.configureShared(
 
         js {
             target {
+                browser {
+                    testTask {
+                        isEnabled = false
+                    }
+                }
                 nodejs {
                     testTask {
                         useMocha { timeout = "330s" }
                     }
                 }
+            }
+        }
+        @OptIn(ExperimentalWasmDsl::class)
+        wasmJs {
+            target {
+                browser {
+                    testTask {
+                        isEnabled = false
+                    }
+                }
+                nodejs()
             }
         }
 

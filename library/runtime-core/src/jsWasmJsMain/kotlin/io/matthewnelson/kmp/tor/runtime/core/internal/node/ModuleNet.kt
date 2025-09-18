@@ -30,6 +30,7 @@ import io.matthewnelson.kmp.tor.runtime.core.internal.js.new
 import io.matthewnelson.kmp.tor.runtime.core.internal.js.set
 import io.matthewnelson.kmp.tor.runtime.core.net.IPAddress
 import io.matthewnelson.kmp.tor.runtime.core.net.IPSocketAddress
+import kotlin.js.JsName
 
 /** [docs](https://nodejs.org/api/net.html#netcreateserveroptions-connectionlistener) */
 internal sealed external interface ModuleNet {
@@ -44,6 +45,9 @@ internal sealed external interface JsServer: JsEventEmitter {
     fun listen(options: JsObject, callback: () -> Unit)
     fun unref(): JsServer
 }
+
+@OptIn(InternalKmpTorApi::class)
+internal expect fun JsServer.onClose(block: () -> Unit): Disposable.Once
 
 /** [docs](https://nodejs.org/api/net.html#class-netsocket) */
 @InternalKmpTorApi
@@ -85,10 +89,10 @@ public fun jsCreateConnection(
 }
 
 @InternalKmpTorApi
-public expect fun JsSocket.onData(block: (Buffer) -> Unit): Disposable.Once
+public expect fun JsSocket.onData(block: (buf: Buffer) -> Unit): Disposable.Once
 
 @InternalKmpTorApi
-public expect fun JsSocket.onceClose(block: (Boolean) -> Unit): Disposable.Once
+public expect fun JsSocket.onceClose(block: (hadError: Boolean) -> Unit): Disposable.Once
 
 @InternalKmpTorApi
 public expect fun JsSocket.onceDrain(block: () -> Unit): Disposable.Once
