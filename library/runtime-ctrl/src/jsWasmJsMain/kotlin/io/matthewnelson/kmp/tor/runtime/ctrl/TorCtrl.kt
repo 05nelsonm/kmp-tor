@@ -13,23 +13,41 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-@file:Suppress("EXPECT_ACTUAL_CLASSIFIERS_ARE_IN_BETA_WARNING", "ACTUAL_ANNOTATIONS_NOT_MATCH_EXPECT")
+@file:Suppress("EXPECT_ACTUAL_CLASSIFIERS_ARE_IN_BETA_WARNING")
 
 package io.matthewnelson.kmp.tor.runtime.ctrl
 
 import io.matthewnelson.immutable.collections.toImmutableSet
-import io.matthewnelson.kmp.file.*
+import io.matthewnelson.kmp.file.File
+import io.matthewnelson.kmp.file.IOException
+import io.matthewnelson.kmp.file.SysDirSep
+import io.matthewnelson.kmp.file.jsExternTryCatch
+import io.matthewnelson.kmp.file.toIOException
 import io.matthewnelson.kmp.process.InternalProcessApi
 import io.matthewnelson.kmp.process.ReadBuffer
 import io.matthewnelson.kmp.tor.common.api.InternalKmpTorApi
 import io.matthewnelson.kmp.tor.runtime.core.*
-import io.matthewnelson.kmp.tor.runtime.core.net.IPAddress
 import io.matthewnelson.kmp.tor.runtime.core.net.IPSocketAddress
 import io.matthewnelson.kmp.tor.runtime.core.ctrl.TorCmd
+import io.matthewnelson.kmp.tor.runtime.core.internal.js.JsUint8Array
+import io.matthewnelson.kmp.tor.runtime.core.internal.js.set
+import io.matthewnelson.kmp.tor.runtime.core.internal.node.jsCreateConnection
+import io.matthewnelson.kmp.tor.runtime.core.internal.node.onData
+import io.matthewnelson.kmp.tor.runtime.core.internal.node.onError
+import io.matthewnelson.kmp.tor.runtime.core.internal.node.onceClose
+import io.matthewnelson.kmp.tor.runtime.core.internal.node.onceDrain
+import io.matthewnelson.kmp.tor.runtime.core.internal.node.onceError
 import io.matthewnelson.kmp.tor.runtime.ctrl.TorCtrl.Debugger.Companion.asDebugger
-import io.matthewnelson.kmp.tor.runtime.ctrl.internal.*
-import kotlinx.coroutines.*
-import org.khronos.webgl.Uint8Array
+import io.matthewnelson.kmp.tor.runtime.ctrl.internal.CtrlConnection
+import io.matthewnelson.kmp.tor.runtime.ctrl.internal.RealTorCtrl
+import io.matthewnelson.kmp.tor.runtime.ctrl.internal.sanitizeUnixSocketPath
+import kotlinx.coroutines.CompletableJob
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.NonCancellable
+import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.withContext
 import kotlin.coroutines.cancellation.CancellationException
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.TimeSource
@@ -129,17 +147,11 @@ public actual interface TorCtrl : Destroyable, TorEvent.Processor, TorCmd.Privil
          * Connects to a tor control listener via TCP socket.
          *
          * @throws [IOException] If connection attempt fails
+         * @throws [UnsupportedOperationException] On Kotlin/Js-Browser
          * */
-        // @Throws(CancellationException::class, IOException::class)
+        @Throws(CancellationException::class, IOException::class)
         public actual suspend fun connectAsync(address: IPSocketAddress): TorCtrl {
-            val options = js("{}")
-            options["port"] = address.port.value
-            options["host"] = address.address.value
-            options["family"] = when (address.address) {
-                is IPAddress.V4 -> 4
-                is IPAddress.V6 -> 6
-            }
-            return withContext(Dispatchers.Main) { connect(options) }
+            return withContext(Dispatchers.Main) { connect(address) }
         }
 
         /**
@@ -148,14 +160,12 @@ public actual interface TorCtrl : Destroyable, TorEvent.Processor, TorCmd.Privil
          * @throws [IOException] If connection attempt fails
          * @throws [UnsupportedOperationException] if tor, or system this is running
          *   on does not support UnixDomainSockets
+         * @throws [UnsupportedOperationException] On Kotlin/Js-Browser
          * */
-        // @Throws(CancellationException::class, IOException::class, UnsupportedOperationException::class)
+        @Throws(CancellationException::class, IOException::class, UnsupportedOperationException::class)
         public actual suspend fun connectAsync(path: File): TorCtrl {
             val sanitized = path.sanitizeUnixSocketPath()
-
-            val options = js("{}")
-            options["path"] = sanitized.path
-            return withContext(Dispatchers.Main) { connect(options) }
+            return withContext(Dispatchers.Main) { connect(sanitized) }
         }
 
         @Deprecated("Use primary constructor with parameter 'debug: TorCtrl.Debugger' defined instead. See TorCtrl.Debugger.asDebugger()")
@@ -176,8 +186,8 @@ public actual interface TorCtrl : Destroyable, TorEvent.Processor, TorCmd.Privil
         )
 
         // @Throws(IOException::class)
-        @OptIn(InternalProcessApi::class)
-        private suspend fun connect(options: dynamic): TorCtrl {
+        @OptIn(InternalKmpTorApi::class, InternalProcessApi::class)
+        private suspend fun connect(options: Any): TorCtrl {
 
             // Need to potentially catch lines if they come in
             // before RealTorCtrl starts and attaches its parser
@@ -190,33 +200,51 @@ public actual interface TorCtrl : Destroyable, TorEvent.Processor, TorCmd.Privil
                 if (parser == null) {
                     bufferedLines.add(line)
                 } else {
-                    parser.first.parse(line)
-                    if (line == null) parser.second.cancel()
+                    try {
+                        parser.first.parse(line)
+                    } finally {
+                        if (line == null) parser.second.cancel()
+                    }
                 }
             }
 
             val socket = run {
                 var isConnected = false
                 val socket = try {
-                    net_createConnection(options) { isConnected = true }
+                    when (options) {
+                        is File -> jsCreateConnection(options) { isConnected = true }
+                        is IPSocketAddress -> jsCreateConnection(options) { isConnected = true    }
+                        else -> null
+                    }
                 } catch (t: Throwable) {
-                    throw t.wrapIOException { "createConnection failure" }
+                    if (t is UnsupportedOperationException) throw t
+                    throw t.toIOException()
                 }
+
+                check(socket != null) { "Unsupported options type[${options::class}]" }
 
                 var threw: IOException? = null
-                val errorDisposable = socket.onceError { error ->
-                    threw = IOException("$error")
-                }
 
-                socket
-                    .onceClose {
-                        feed.close()
+                val errorDisposable = try {
+                    val d = jsExternTryCatch {
+                        socket.onceError { t ->
+                            threw = t.toIOException()
+                        }
                     }
-                    .onData { buf ->
-                        val jsBuf = Buffer.wrap(buf)
-                        val readBuf = ReadBuffer.of(jsBuf)
-                        feed.onData(readBuf, jsBuf.length.toInt())
+                    jsExternTryCatch {
+                        socket.onceClose { feed.close() }
                     }
+                    jsExternTryCatch {
+                        socket.onData { buf ->
+                            val readBuf = ReadBuffer.of(buf)
+                            feed.onData(readBuf, buf.length.toInt())
+                        }
+                    }
+                    d
+                } catch (t: Throwable) {
+                    threw = t.toIOException()
+                    null
+                }
 
                 try {
                     val durationDelay = 10.milliseconds
@@ -234,21 +262,46 @@ public actual interface TorCtrl : Destroyable, TorEvent.Processor, TorCmd.Privil
 
                         if (mark.elapsedNow() < durationTimeout) continue
 
-                        errorDisposable.dispose()
+                        errorDisposable?.dispose()
                         socket.destroy()
                         threw = IOException("Timed out while attempting to connect")
                         break
                     }
                 } catch (e: CancellationException) {
-                    errorDisposable.dispose()
-                    socket.destroy()
+                    try {
+                        errorDisposable?.dispose()
+                    } catch (t: Throwable) {
+                        e.addSuppressed(t)
+                    }
+                    try {
+                        jsExternTryCatch { socket.destroy() }
+                    } catch (t: Throwable) {
+                        e.addSuppressed(t)
+                    }
+                    try {
+                        jsExternTryCatch { socket.unref() }
+                    } catch (t: Throwable) {
+                        e.addSuppressed(t)
+                    }
                     throw e
                 }
 
-                threw?.let { throw it }
+                threw?.let { t ->
+                    try {
+                        jsExternTryCatch { socket.destroy() }
+                    } catch (tt: Throwable) {
+                        t.addSuppressed(tt)
+                    }
+                    try {
+                        jsExternTryCatch { socket.unref() }
+                    } catch (tt: Throwable) {
+                        t.addSuppressed(tt)
+                    }
+                    throw t
+                }
 
                 socket.onError { /* ignore */ }
-                errorDisposable.dispose()
+                errorDisposable?.dispose()
                 socket
             }
 
@@ -256,12 +309,12 @@ public actual interface TorCtrl : Destroyable, TorEvent.Processor, TorCmd.Privil
 
                 override val isReading: Boolean get() = connParser != null
 
-                // @Throws(CancellationException::class, IllegalStateException::class)
+                @Throws(CancellationException::class, IllegalStateException::class)
                 override suspend fun startRead(parser: CtrlConnection.Parser) {
                     check(!socket.destroyed) { "Socket is destroyed" }
                     check(!isReading) { "Already reading input" }
 
-                    val latch = Job(currentCoroutineContext().job)
+                    val latch = Job(currentCoroutineContext()[Job])
                     connParser = Pair(parser, latch)
 
                     // Need to process any lines that may have been
@@ -277,29 +330,31 @@ public actual interface TorCtrl : Destroyable, TorEvent.Processor, TorCmd.Privil
                     latch.join()
                 }
 
-                // @Throws(CancellationException::class, IOException::class)
+                @Throws(CancellationException::class, IOException::class)
                 override suspend fun write(command: ByteArray) {
                     if (command.isEmpty()) return
 
-                    val chunk = Uint8Array(command.size)
-                    @Suppress("LocalVariableName")
-                    val _chunk = chunk.asDynamic()
-                    for (i in command.indices) { _chunk[i] = command[i]  }
+                    val chunk = JsUint8Array(command.size)
+                    for (i in command.indices) { chunk[i] = command[i]  }
 
                     val wLatch: CompletableJob = Job(currentCoroutineContext()[Job])
                     var dLatch: CompletableJob? = null
 
                     try {
-                        val immediate = socket.write(chunk, callback = {
-                            wLatch.complete()
+                        val immediate = jsExternTryCatch {
+                            socket.write(chunk, callback = {
+                                wLatch.complete()
 
-                            // fill
-                            for (i in command.indices) { _chunk[i] = 0 }
-                        })
+                                // fill
+                                for (i in command.indices) {
+                                    chunk[i] = 0
+                                }
+                            })
+                        }
 
                         if (!immediate) {
                             dLatch = Job(wLatch)
-                            socket.once("drain") { dLatch.complete() }
+                            jsExternTryCatch { socket.onceDrain { dLatch.complete() } }
                         }
                     } catch (t: Throwable) {
                         wLatch.cancel()
@@ -311,8 +366,25 @@ public actual interface TorCtrl : Destroyable, TorEvent.Processor, TorCmd.Privil
                     wLatch.join()
                 }
 
-                // @Throws(IOException::class)
-                override fun close() { socket.destroy(); socket.unref() }
+                @Throws(IOException::class)
+                override fun close() {
+                    var threw: IOException? = null
+                    try {
+                        jsExternTryCatch { socket.destroy() }
+                    } catch (t: Throwable) {
+                        threw = t.toIOException()
+                    }
+                    try {
+                        jsExternTryCatch { socket.unref() }
+                    } catch (t: Throwable) {
+                        if (threw == null) {
+                            threw = t.toIOException()
+                        } else {
+                            threw.addSuppressed(t)
+                        }
+                    }
+                    threw?.let { throw it }
+                }
             }
 
             val ctrl = RealTorCtrl.of(this, Dispatchers.Main, connection, null)

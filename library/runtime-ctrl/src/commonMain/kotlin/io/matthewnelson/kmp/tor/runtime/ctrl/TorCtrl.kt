@@ -125,6 +125,7 @@ public expect interface TorCtrl: Destroyable, TorEvent.Processor, TorCmd.Privile
          * Connects to a tor control listener via TCP socket.
          *
          * @throws [IOException] If connection attempt fails
+         * @throws [UnsupportedOperationException] On Kotlin/Js-Browser
          * */
         @Throws(CancellationException::class, IOException::class)
         public suspend fun connectAsync(address: IPSocketAddress): TorCtrl
@@ -135,6 +136,7 @@ public expect interface TorCtrl: Destroyable, TorEvent.Processor, TorCmd.Privile
          * @throws [IOException] If connection attempt fails
          * @throws [UnsupportedOperationException] if tor, or system this is running
          *   on does not support UnixDomainSockets
+         * @throws [UnsupportedOperationException] On Kotlin/Js-Browser
          * */
         @Throws(CancellationException::class, IOException::class, UnsupportedOperationException::class)
         public suspend fun connectAsync(path: File): TorCtrl
