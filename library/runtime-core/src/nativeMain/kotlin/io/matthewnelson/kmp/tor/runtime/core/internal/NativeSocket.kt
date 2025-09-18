@@ -21,6 +21,7 @@ import io.matthewnelson.kmp.tor.common.api.InternalKmpTorApi
 import platform.posix.EINTR
 import platform.posix.errno
 
+/** @suppress */
 @InternalKmpTorApi
 public fun kmptor_socket(domain: Int, type: Int, protocol: Int): Int {
     var ret: Int
@@ -30,6 +31,7 @@ public fun kmptor_socket(domain: Int, type: Int, protocol: Int): Int {
     return ret
 }
 
+/** @suppress */
 @InternalKmpTorApi
 public expect fun kmptor_socket_close(sockfd: Int): Int
 

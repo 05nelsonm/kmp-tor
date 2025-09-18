@@ -5,7 +5,7 @@
  - Updates `kmp-process` to `0.3.2` [[#602]][602]
  - Ensure all sockets opened use flag `CLOEXEC` [[#603]][603]
  - Use `sockaddr_un` struct instead of hard-coded values when calculating Unix Domain Socket max path [[#605]][605]
- - Ensure `TorCtrl.connect` always sanatizes the `File` argument's path [[#607]][607]
+ - Ensure `TorCtrl.connect` always sanitizes the `File` argument's path [[#607]][607]
  - Fixes potential descriptor double-closure [[#608]][608]
 
 ## Version 2.4.0 (2025-06-11)

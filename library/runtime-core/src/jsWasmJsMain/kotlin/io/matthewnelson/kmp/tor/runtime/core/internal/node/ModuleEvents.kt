@@ -26,10 +26,14 @@ internal sealed external interface ModuleEvents {
     // ...
 }
 
-/** [docs](https://nodejs.org/api/events.html#class-eventemitter) */
+/**
+ * [docs](https://nodejs.org/api/events.html#class-eventemitter)
+ * @suppress
+ * */
 @InternalKmpTorApi
 @JsName("EventEmitter")
 public sealed external interface JsEventEmitter
 
+/** @suppress */
 @InternalKmpTorApi
 public expect fun JsEventEmitter.onError(block: (Throwable) -> Unit): Disposable.Once

@@ -20,14 +20,17 @@ package io.matthewnelson.kmp.tor.runtime.core.internal.js
 import io.matthewnelson.kmp.tor.common.api.InternalKmpTorApi
 import kotlin.js.JsName
 
+/** @suppress */
 @InternalKmpTorApi
 @JsName("Uint8Array")
 public external class JsUint8Array(length: Int) {
     public val byteLength: Int
 }
 
+/** @suppress */
 @InternalKmpTorApi
 public operator fun JsUint8Array.get(index: Int): Byte = jsArrayGet(this, index)
+/** @suppress */
 @InternalKmpTorApi
 public operator fun JsUint8Array.set(index: Int, value: Byte) { jsArraySet(this, index, value) }
 

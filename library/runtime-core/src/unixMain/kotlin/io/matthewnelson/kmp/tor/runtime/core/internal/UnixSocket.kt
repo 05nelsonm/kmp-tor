@@ -20,5 +20,6 @@ package io.matthewnelson.kmp.tor.runtime.core.internal
 import io.matthewnelson.kmp.tor.common.api.InternalKmpTorApi
 import platform.posix.close
 
+/** @suppress */
 @InternalKmpTorApi
 public actual fun kmptor_socket_close(sockfd: Int): Int = close(sockfd)

@@ -20,6 +20,7 @@ package io.matthewnelson.kmp.tor.runtime.core.internal.node
 import io.matthewnelson.kmp.tor.common.api.InternalKmpTorApi
 import io.matthewnelson.kmp.tor.runtime.core.Disposable
 
+/** @suppress */
 @InternalKmpTorApi
 public actual fun JsEventEmitter.onError(block: (Throwable) -> Unit): Disposable.Once {
     val listener = jsErrorListener(block)

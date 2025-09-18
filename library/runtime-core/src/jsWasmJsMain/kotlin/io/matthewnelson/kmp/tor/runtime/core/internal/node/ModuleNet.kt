@@ -49,7 +49,10 @@ internal sealed external interface JsServer: JsEventEmitter {
 @OptIn(InternalKmpTorApi::class)
 internal expect fun JsServer.onClose(block: () -> Unit): Disposable.Once
 
-/** [docs](https://nodejs.org/api/net.html#class-netsocket) */
+/**
+ * [docs](https://nodejs.org/api/net.html#class-netsocket)
+ * @suppress
+ * */
 @InternalKmpTorApi
 @JsName("Socket")
 public sealed external interface JsSocket: JsEventEmitter {
@@ -59,6 +62,7 @@ public sealed external interface JsSocket: JsEventEmitter {
     public fun unref(): JsSocket
 }
 
+/** @suppress */
 @InternalKmpTorApi
 @Throws(Throwable::class)
 public fun jsCreateConnection(
@@ -76,6 +80,7 @@ public fun jsCreateConnection(
     return jsExternTryCatch { net.createConnection(options, listener) }
 }
 
+/** @suppress */
 @InternalKmpTorApi
 @Throws(Throwable::class)
 public fun jsCreateConnection(
@@ -88,14 +93,18 @@ public fun jsCreateConnection(
     return jsExternTryCatch { net.createConnection(options, listener) }
 }
 
+/** @suppress */
 @InternalKmpTorApi
 public expect fun JsSocket.onData(block: (buf: Buffer) -> Unit): Disposable.Once
 
+/** @suppress */
 @InternalKmpTorApi
 public expect fun JsSocket.onceClose(block: (hadError: Boolean) -> Unit): Disposable.Once
 
+/** @suppress */
 @InternalKmpTorApi
 public expect fun JsSocket.onceDrain(block: () -> Unit): Disposable.Once
 
+/** @suppress */
 @InternalKmpTorApi
 public expect fun JsSocket.onceError(block: (Throwable) -> Unit): Disposable.Once
