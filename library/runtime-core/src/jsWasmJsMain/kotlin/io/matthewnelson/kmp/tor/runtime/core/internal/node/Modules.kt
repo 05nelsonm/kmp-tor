@@ -17,18 +17,35 @@ package io.matthewnelson.kmp.tor.runtime.core.internal.node
 
 import io.matthewnelson.kmp.file.SysFsInfo
 
-//@get:Throws(UnsupportedOperationException::class)
+@get:Throws(UnsupportedOperationException::class)
+private val node_events: ModuleEvents by lazy {
+    requireNodeJs { "events" }
+    nodeModuleEvents()
+}
+
+@get:Throws(UnsupportedOperationException::class)
 internal val node_os: ModuleOs by lazy {
     requireNodeJs { "os" }
     nodeModuleOs()
 }
 
-internal const val CODE_MODULE_OS: String = "eval('require')('os')"
+@get:Throws(UnsupportedOperationException::class)
+internal val node_net: ModuleNet by lazy {
+    requireNodeJs { "net" }
+    node_events
+    nodeModuleNet()
+}
 
+internal const val CODE_MODULE_EVENTS: String = "eval('require')('events')"
+internal const val CODE_MODULE_OS: String = "eval('require')('os')"
+internal const val CODE_MODULE_NET: String = "eval('require')('net')"
+
+internal expect fun nodeModuleEvents(): ModuleEvents
 internal expect fun nodeModuleOs(): ModuleOs
+internal expect fun nodeModuleNet(): ModuleNet
 
 @Suppress("NOTHING_TO_INLINE")
-//@Throws(UnsupportedOperationException::class)
+@Throws(UnsupportedOperationException::class)
 private inline fun requireNodeJs(module: () -> String) {
     if (SysFsInfo.name == "FsJsNode") return
     val m = module()
