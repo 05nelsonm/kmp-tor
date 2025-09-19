@@ -1,5 +1,18 @@
 # CHANGELOG
 
+## Version 2.5.0 (2025-09-19)
+ - Updates `kotlin` to `2.2.20` [[#610]][610]
+ - Updates `encoding` to `2.5.0` [[#610]][610]
+ - Updates `immutable` to `0.3.0` [[#610]][610]
+ - Updates `kmp-process` to `0.4.0` [[#610]][610]
+ - Updates `kmp-tor-common` to `2.4.0` [[#610]][610]
+ - Updates `kotlincrypto.bitops` to `0.3.0` [[#610]][610]
+ - Updates `kotlincrypto.hash` to `0.8.0` [[#610]][610]
+ - Updates `kotlincrypto.random` to `0.6.0` [[#610]][610]
+ - Adds support for `wasmJs` [[#612]][612]
+ - Lower supported `KotlinVersion` to `1.9` [[#611]][611]
+     - Source sets `js`, `wasmJs`, & `jsWasmJs` require a minimum `KotlinVersion` of `2.0`
+
 ## Version 2.4.1 (2025-08-20)
  - Updates `kmp-tor-common` to `2.3.1` [[#602]][602]
  - Updates `kmp-process` to `0.3.2` [[#602]][602]
@@ -615,6 +628,9 @@
 [605]: https://github.com/05nelsonm/kmp-tor/pull/605
 [607]: https://github.com/05nelsonm/kmp-tor/pull/607
 [608]: https://github.com/05nelsonm/kmp-tor/pull/608
+[610]: https://github.com/05nelsonm/kmp-tor/pull/610
+[611]: https://github.com/05nelsonm/kmp-tor/pull/611
+[612]: https://github.com/05nelsonm/kmp-tor/pull/612
 
 [kmp-tor-binary-66]: https://github.com/05nelsonm/kmp-tor-binary/issues/66
 [kmp-tor-binary-75]: https://github.com/05nelsonm/kmp-tor-binary/pull/75
