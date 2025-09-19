@@ -41,17 +41,15 @@
             </a>        <button class="navigation-controls--btn navigation-controls--btn_toc ui-kit_mobile-only" id="toc-toggle" type="button">Toggle table of contents
         </button>
         <div class="navigation-controls--break ui-kit_mobile-only"></div>
-        <div class="library-version" id="library-version">2.4.1
+        <div class="library-version" id="library-version">2.5.0
         </div>
         <div class="navigation-controls">
         <div class="filter-section filter-section_loading" id="filter-section">
                 <button class="platform-tag platform-selector common-like" data-active="" data-filter=":library:runtime-core/commonMain">common</button>
-                <button class="platform-tag platform-selector js-like" data-active="" data-filter=":library:runtime-core/jsMain">js</button>
+                <button class="platform-tag platform-selector common-like" data-active="" data-filter=":library:runtime-core/jsWasmJsMain">jsWasmJs</button>
                 <button class="platform-tag platform-selector jvm-like" data-active="" data-filter=":library:runtime-core/jvmMain">jvm</button>
-                <button class="platform-tag platform-selector common-like" data-active="" data-filter=":library:runtime-core/nativeMain">native</button>
                 <button class="platform-tag platform-selector common-like" data-active="" data-filter=":library:runtime-core/nonJsMain">nonJs</button>
                 <button class="platform-tag platform-selector common-like" data-active="" data-filter=":library:runtime-core/nonJvmMain">nonJvm</button>
-                <button class="platform-tag platform-selector common-like" data-active="" data-filter=":library:runtime-core/unixMain">unix</button>
             <div class="dropdown filter-section--dropdown" data-role="dropdown" id="filter-section-dropdown">
                 <button class="button button_dropdown filter-section--dropdown-toggle" role="combobox" data-role="dropdown-toggle" aria-controls="platform-tags-listbox" aria-haspopup="listbox" aria-expanded="false" aria-label="Toggle source sets"></button>
                 <ul role="listbox" id="platform-tags-listbox" class="dropdown--list" data-role="dropdown-listbox">
@@ -67,11 +65,11 @@
                                 common
                             </label>
                         </li>
-                        <li role="option" class="dropdown--option platform-selector-option js-like" tabindex="0">
+                        <li role="option" class="dropdown--option platform-selector-option common-like" tabindex="0">
                             <label class="checkbox">
-                                <input type="checkbox" class="checkbox--input" id=":library:runtime-core/jsMain" data-filter=":library:runtime-core/jsMain">
+                                <input type="checkbox" class="checkbox--input" id=":library:runtime-core/jsWasmJsMain" data-filter=":library:runtime-core/jsWasmJsMain">
                                 <span class="checkbox--icon"></span>
-                                js
+                                jsWasmJs
                             </label>
                         </li>
                         <li role="option" class="dropdown--option platform-selector-option jvm-like" tabindex="0">
@@ -79,13 +77,6 @@
                                 <input type="checkbox" class="checkbox--input" id=":library:runtime-core/jvmMain" data-filter=":library:runtime-core/jvmMain">
                                 <span class="checkbox--icon"></span>
                                 jvm
-                            </label>
-                        </li>
-                        <li role="option" class="dropdown--option platform-selector-option common-like" tabindex="0">
-                            <label class="checkbox">
-                                <input type="checkbox" class="checkbox--input" id=":library:runtime-core/nativeMain" data-filter=":library:runtime-core/nativeMain">
-                                <span class="checkbox--icon"></span>
-                                native
                             </label>
                         </li>
                         <li role="option" class="dropdown--option platform-selector-option common-like" tabindex="0">
@@ -100,13 +91,6 @@
                                 <input type="checkbox" class="checkbox--input" id=":library:runtime-core/nonJvmMain" data-filter=":library:runtime-core/nonJvmMain">
                                 <span class="checkbox--icon"></span>
                                 nonJvm
-                            </label>
-                        </li>
-                        <li role="option" class="dropdown--option platform-selector-option common-like" tabindex="0">
-                            <label class="checkbox">
-                                <input type="checkbox" class="checkbox--input" id=":library:runtime-core/unixMain" data-filter=":library:runtime-core/unixMain">
-                                <span class="checkbox--icon"></span>
-                                unix
                             </label>
                         </li>
                 </ul>
@@ -138,13 +122,13 @@
                 </div>
             </div>
             <div id="main">
-<div class="main-content" id="content" pageids="runtime-core::////PointingToDeclaration//-272363564">
+<div class="main-content" id="content" pageids="runtime-core::////PointingToDeclaration//1153783186">
   <div class="breadcrumbs"></div>
   <div class="cover ">
     <h1 class="cover"><span><span>runtime-core</span></span></h1>
     <div class="platform-hinted UnderCoverText with-platform-tabs" data-platform-hinted="data-platform-hinted">
-      <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":library:runtime-core/commonMain" data-filterable-set=":library:runtime-core/commonMain" data-active="" data-toggle=":library:runtime-core/commonMain">common</button><button class="platform-bookmark" data-filterable-current=":library:runtime-core/jsMain" data-filterable-set=":library:runtime-core/jsMain" data-toggle=":library:runtime-core/jsMain">js</button><button class="platform-bookmark" data-filterable-current=":library:runtime-core/jvmMain" data-filterable-set=":library:runtime-core/jvmMain" data-toggle=":library:runtime-core/jvmMain">jvm</button><button class="platform-bookmark" data-filterable-current=":library:runtime-core/nativeMain" data-filterable-set=":library:runtime-core/nativeMain" data-toggle=":library:runtime-core/nativeMain">native</button><button class="platform-bookmark" data-filterable-current=":library:runtime-core/nonJsMain" data-filterable-set=":library:runtime-core/nonJsMain" data-toggle=":library:runtime-core/nonJsMain">nonJs</button><button class="platform-bookmark" data-filterable-current=":library:runtime-core/nonJvmMain" data-filterable-set=":library:runtime-core/nonJvmMain" data-toggle=":library:runtime-core/nonJvmMain">nonJvm</button><button class="platform-bookmark" data-filterable-current=":library:runtime-core/unixMain" data-filterable-set=":library:runtime-core/unixMain" data-toggle=":library:runtime-core/unixMain">unix</button></div>
-<div class="content sourceset-dependent-content" data-active="" data-togglable=":library:runtime-core/commonMain"><p class="paragraph">Core primitives for kmp-tor operation, serving as the foundation of other higher level  dependencies such as <a href="https://kmp-tor.matthewnelson.io/library/runtime-ctrl/index.html">runtime-ctrl</a> and <a href="https://kmp-tor.matthewnelson.io/library/runtime/index.html">runtime</a>.</p></div><div class="content sourceset-dependent-content" data-togglable=":library:runtime-core/jsMain"><p class="paragraph">Core primitives for kmp-tor operation, serving as the foundation of other higher level  dependencies such as <a href="https://kmp-tor.matthewnelson.io/library/runtime-ctrl/index.html">runtime-ctrl</a> and <a href="https://kmp-tor.matthewnelson.io/library/runtime/index.html">runtime</a>.</p></div><div class="content sourceset-dependent-content" data-togglable=":library:runtime-core/jvmMain"><p class="paragraph">Core primitives for kmp-tor operation, serving as the foundation of other higher level  dependencies such as <a href="https://kmp-tor.matthewnelson.io/library/runtime-ctrl/index.html">runtime-ctrl</a> and <a href="https://kmp-tor.matthewnelson.io/library/runtime/index.html">runtime</a>.</p></div><div class="content sourceset-dependent-content" data-togglable=":library:runtime-core/nativeMain"><p class="paragraph">Core primitives for kmp-tor operation, serving as the foundation of other higher level  dependencies such as <a href="https://kmp-tor.matthewnelson.io/library/runtime-ctrl/index.html">runtime-ctrl</a> and <a href="https://kmp-tor.matthewnelson.io/library/runtime/index.html">runtime</a>.</p></div><div class="content sourceset-dependent-content" data-togglable=":library:runtime-core/nonJsMain"><p class="paragraph">Core primitives for kmp-tor operation, serving as the foundation of other higher level  dependencies such as <a href="https://kmp-tor.matthewnelson.io/library/runtime-ctrl/index.html">runtime-ctrl</a> and <a href="https://kmp-tor.matthewnelson.io/library/runtime/index.html">runtime</a>.</p></div><div class="content sourceset-dependent-content" data-togglable=":library:runtime-core/nonJvmMain"><p class="paragraph">Core primitives for kmp-tor operation, serving as the foundation of other higher level  dependencies such as <a href="https://kmp-tor.matthewnelson.io/library/runtime-ctrl/index.html">runtime-ctrl</a> and <a href="https://kmp-tor.matthewnelson.io/library/runtime/index.html">runtime</a>.</p></div><div class="content sourceset-dependent-content" data-togglable=":library:runtime-core/unixMain"><p class="paragraph">Core primitives for kmp-tor operation, serving as the foundation of other higher level  dependencies such as <a href="https://kmp-tor.matthewnelson.io/library/runtime-ctrl/index.html">runtime-ctrl</a> and <a href="https://kmp-tor.matthewnelson.io/library/runtime/index.html">runtime</a>.</p></div>    </div>
+      <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":library:runtime-core/commonMain" data-filterable-set=":library:runtime-core/commonMain" data-active="" data-toggle=":library:runtime-core/commonMain">common</button><button class="platform-bookmark" data-filterable-current=":library:runtime-core/jsWasmJsMain" data-filterable-set=":library:runtime-core/jsWasmJsMain" data-toggle=":library:runtime-core/jsWasmJsMain">jsWasmJs</button><button class="platform-bookmark" data-filterable-current=":library:runtime-core/jvmMain" data-filterable-set=":library:runtime-core/jvmMain" data-toggle=":library:runtime-core/jvmMain">jvm</button><button class="platform-bookmark" data-filterable-current=":library:runtime-core/nonJsMain" data-filterable-set=":library:runtime-core/nonJsMain" data-toggle=":library:runtime-core/nonJsMain">nonJs</button><button class="platform-bookmark" data-filterable-current=":library:runtime-core/nonJvmMain" data-filterable-set=":library:runtime-core/nonJvmMain" data-toggle=":library:runtime-core/nonJvmMain">nonJvm</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":library:runtime-core/commonMain"><p class="paragraph">Core primitives for kmp-tor operation, serving as the foundation of other higher level  dependencies such as <a href="https://kmp-tor.matthewnelson.io/library/runtime-ctrl/index.html">runtime-ctrl</a> and <a href="https://kmp-tor.matthewnelson.io/library/runtime/index.html">runtime</a>.</p></div><div class="content sourceset-dependent-content" data-togglable=":library:runtime-core/jsWasmJsMain"><p class="paragraph">Core primitives for kmp-tor operation, serving as the foundation of other higher level  dependencies such as <a href="https://kmp-tor.matthewnelson.io/library/runtime-ctrl/index.html">runtime-ctrl</a> and <a href="https://kmp-tor.matthewnelson.io/library/runtime/index.html">runtime</a>.</p></div><div class="content sourceset-dependent-content" data-togglable=":library:runtime-core/jvmMain"><p class="paragraph">Core primitives for kmp-tor operation, serving as the foundation of other higher level  dependencies such as <a href="https://kmp-tor.matthewnelson.io/library/runtime-ctrl/index.html">runtime-ctrl</a> and <a href="https://kmp-tor.matthewnelson.io/library/runtime/index.html">runtime</a>.</p></div><div class="content sourceset-dependent-content" data-togglable=":library:runtime-core/nonJsMain"><p class="paragraph">Core primitives for kmp-tor operation, serving as the foundation of other higher level  dependencies such as <a href="https://kmp-tor.matthewnelson.io/library/runtime-ctrl/index.html">runtime-ctrl</a> and <a href="https://kmp-tor.matthewnelson.io/library/runtime/index.html">runtime</a>.</p></div><div class="content sourceset-dependent-content" data-togglable=":library:runtime-core/nonJvmMain"><p class="paragraph">Core primitives for kmp-tor operation, serving as the foundation of other higher level  dependencies such as <a href="https://kmp-tor.matthewnelson.io/library/runtime-ctrl/index.html">runtime-ctrl</a> and <a href="https://kmp-tor.matthewnelson.io/library/runtime/index.html">runtime</a>.</p></div>    </div>
   </div>
   <h2 class="">Packages</h2>
   <div class="table"><a data-name="-1714718239%2FPackages%2F1051389726" anchor-label="io.matthewnelson.kmp.tor.runtime.core" id="-1714718239%2FPackages%2F1051389726" data-filterable-set=":library:runtime-core/commonMain"></a>
@@ -237,25 +221,6 @@
         <div></div>
       </div>
     </div>
-<a data-name="-1724284946%2FPackages%2F-1839250992" anchor-label="io.matthewnelson.kmp.tor.runtime.core.internal" id="-1724284946%2FPackages%2F-1839250992" data-filterable-set=":library:runtime-core/nativeMain,:library:runtime-core/unixMain"></a>
-    <div class="table-row" data-filterable-current=":library:runtime-core/nativeMain,:library:runtime-core/unixMain" data-filterable-set=":library:runtime-core/nativeMain,:library:runtime-core/unixMain">
-      <div>
-        <div class="main-subrow ">
-          <div class=""><span class="inline-flex">
-              <div><a href="io.matthewnelson.kmp.tor.runtime.core.internal/index.html">io.matthewnelson.kmp.tor.runtime.core.internal</a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1724284946%2FPackages%2F-1839250992"></span>
-                <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
-              </span></span></div>
-          <div class="pull-right">
-            <div class="platform-tags no-gutters">
-              <div class="platform-tag common-like">native</div>
-              <div class="platform-tag common-like">unix</div>
-            </div>
-          </div>
-        </div>
-        <div></div>
-      </div>
-    </div>
 <a data-name="1821970066%2FPackages%2F728519480" anchor-label="io.matthewnelson.kmp.tor.runtime.core.key" id="1821970066%2FPackages%2F728519480" data-filterable-set=":library:runtime-core/commonMain,:library:runtime-core/jvmMain,:library:runtime-core/nonJvmMain"></a>
     <div class="table-row" data-filterable-current=":library:runtime-core/commonMain,:library:runtime-core/jvmMain,:library:runtime-core/nonJvmMain" data-filterable-set=":library:runtime-core/commonMain,:library:runtime-core/jvmMain,:library:runtime-core/nonJvmMain">
       <div>
@@ -294,19 +259,19 @@
         <div></div>
       </div>
     </div>
-<a data-name="-1314485133%2FPackages%2F423775774" anchor-label="io.matthewnelson.kmp.tor.runtime.core.util" id="-1314485133%2FPackages%2F423775774" data-filterable-set=":library:runtime-core/commonMain,:library:runtime-core/jsMain,:library:runtime-core/jvmMain,:library:runtime-core/nonJsMain"></a>
-    <div class="table-row" data-filterable-current=":library:runtime-core/commonMain,:library:runtime-core/jsMain,:library:runtime-core/jvmMain,:library:runtime-core/nonJsMain" data-filterable-set=":library:runtime-core/commonMain,:library:runtime-core/jsMain,:library:runtime-core/jvmMain,:library:runtime-core/nonJsMain">
+<a data-name="-1314485133%2FPackages%2F2077812384" anchor-label="io.matthewnelson.kmp.tor.runtime.core.util" id="-1314485133%2FPackages%2F2077812384" data-filterable-set=":library:runtime-core/commonMain,:library:runtime-core/jsWasmJsMain,:library:runtime-core/jvmMain,:library:runtime-core/nonJsMain"></a>
+    <div class="table-row" data-filterable-current=":library:runtime-core/commonMain,:library:runtime-core/jsWasmJsMain,:library:runtime-core/jvmMain,:library:runtime-core/nonJsMain" data-filterable-set=":library:runtime-core/commonMain,:library:runtime-core/jsWasmJsMain,:library:runtime-core/jvmMain,:library:runtime-core/nonJsMain">
       <div>
         <div class="main-subrow ">
           <div class=""><span class="inline-flex">
               <div><a href="io.matthewnelson.kmp.tor.runtime.core.util/index.html">io.matthewnelson.kmp.tor.runtime.core.util</a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1314485133%2FPackages%2F423775774"></span>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1314485133%2FPackages%2F2077812384"></span>
                 <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
               </span></span></div>
           <div class="pull-right">
             <div class="platform-tags no-gutters">
               <div class="platform-tag common-like">common</div>
-              <div class="platform-tag js-like">js</div>
+              <div class="platform-tag common-like">jsWasmJs</div>
               <div class="platform-tag jvm-like">jvm</div>
               <div class="platform-tag common-like">nonJs</div>
             </div>
