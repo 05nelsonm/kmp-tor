@@ -39,7 +39,7 @@ internal fun LocalHost.Companion.tryParsingIfConfig(set: LinkedHashSet<IPAddress
     val out = try {
         Process.Builder(command = "ifconfig")
             .stdin(Stdio.Null)
-            .output()
+            .createOutput()
             .stdout
             .trimIndent()
     } catch (_: IOException) {
