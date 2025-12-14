@@ -23,6 +23,7 @@ kmpConfiguration {
             sourceSetMain {
                 dependencies {
                     api(project(":library:runtime-core"))
+                    implementation(libs.encoding.core) // TODO: utf8
                     implementation(libs.immutable.collections)
                     implementation(libs.kmp.process)
                     implementation(libs.kmp.tor.common.core)

@@ -591,7 +591,7 @@ public sealed class IPAddress private constructor(
 
                     if (isBlockEnd && count < 32) sb.append(':')
                 }).use { feed ->
-                    bytes.forEach { byte -> feed.consume(byte) }
+                    bytes.forEach(feed::consume)
                 }
 
                 return V6(scope, bytes, sb.toString())
@@ -616,7 +616,7 @@ public sealed class IPAddress private constructor(
                 return "Invalid scope. Interface number must be greater than 0."
             }
 
-            private val BASE_16 = Base16 { strict(); encodeToLowercase = true }
+            private val BASE_16 = Base16.Builder { strictSpec(); encodeLowercase(true) }
         }
 
         // Typical IPv6 loopback address of `::1`

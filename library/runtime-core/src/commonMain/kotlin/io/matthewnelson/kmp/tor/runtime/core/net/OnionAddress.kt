@@ -17,7 +17,7 @@
 
 package io.matthewnelson.kmp.tor.runtime.core.net
 
-import io.matthewnelson.encoding.base32.Base32Default
+import io.matthewnelson.encoding.base32.Base32
 import io.matthewnelson.encoding.core.Decoder.Companion.decodeToByteArray
 import io.matthewnelson.encoding.core.Encoder.Companion.encodeToString
 import io.matthewnelson.encoding.core.EncodingException
@@ -250,14 +250,14 @@ public sealed class OnionAddress private constructor(value: String): Address(val
                     throw InvalidKeyException("Key is blank (all 0 bytes)")
                 }
                 val checksum = publicKey.computeChecksum()
-                val s = StringBuilder(ENCODED_LEN)
-                BASE_32.newEncoderFeed(out = { char -> s.append(char) }).use { feed ->
-                    publicKey.forEach { b -> feed.consume(b) }
+                val sb = StringBuilder(ENCODED_LEN)
+                BASE_32.newEncoderFeed(sb::append).use { feed ->
+                    publicKey.forEach(feed::consume)
                     feed.consume(checksum[0])
                     feed.consume(checksum[1])
                     feed.consume(VERSION_BYTE)
                 }
-                return V3(s.toString())
+                return V3(sb.toString())
             }
 
             internal const val BYTE_SIZE: Int = 35
@@ -271,7 +271,7 @@ public sealed class OnionAddress private constructor(value: String): Address(val
                 update(VERSION_BYTE)
             }.digest()
 
-            private val BASE_32 = Base32Default { encodeToLowercase = true; padEncoded = false }
+            private val BASE_32 = Base32.Default.Builder { encodeLowercase(true); padEncoded(false) }
             private val CHECKSUM_PREFIX = ".onion checksum".encodeToByteArray()
         }
     }

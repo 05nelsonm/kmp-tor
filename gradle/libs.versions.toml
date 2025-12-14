@@ -9,7 +9,7 @@ androidx-test-runner        = "1.5.2" # Do not upgrade. Next version requires mi
 # https://repo.maven.apache.org/maven2/org/bouncycastle/bcprov-jdk18on/
 bouncy-castle               = "1.83"
 
-encoding                    = "2.5.0"
+encoding                    = "2.6.0-SNAPSHOT"
 
 gradle-android              = "8.12.3"
 gradle-binary-compat        = "0.18.1"
@@ -33,6 +33,7 @@ ktor                        = "3.3.3"
 [libraries]
 androidx-startup-runtime    = { module = "androidx.startup:startup-runtime", version.ref = "androidx-startup" }
 
+encoding-core               = { module = "io.matthewnelson.encoding:core", version.ref = "encoding" }
 encoding-base16             = { module = "io.matthewnelson.encoding:base16", version.ref = "encoding" }
 encoding-base32             = { module = "io.matthewnelson.encoding:base32", version.ref = "encoding" }
 encoding-base64             = { module = "io.matthewnelson.encoding:base64", version.ref = "encoding" }

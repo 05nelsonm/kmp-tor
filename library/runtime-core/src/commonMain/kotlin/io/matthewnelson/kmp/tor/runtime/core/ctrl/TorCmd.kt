@@ -78,7 +78,7 @@ public sealed class TorCmd<Success: Any> private constructor(
         }
 
         private companion object {
-            private val BASE_16 = Base16()
+            private val BASE_16 = Base16.Builder().build()
             private val NO_PASS = ByteArray(0)
         }
     }
