@@ -97,7 +97,6 @@ class TorOptionEntriesIntegrationTest {
             listOf(
                 "FirewallPorts",                    // deprecated
                 "ReconfigDropsBridgeDescs",
-                "MaxHSDirCacheBytes"                // TODO: Add
             ).forEach { cliActive.remove(it) }
 
             if (cliActive.isEmpty()) return@run
