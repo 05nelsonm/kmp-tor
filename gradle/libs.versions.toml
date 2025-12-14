@@ -28,7 +28,7 @@ kmp-tor-resource            = "408.17.1"
 kmp-tor-resourceNpmSNAPSHOT = ".0"
 kotlincrypto-catalog        = "0.8.0" # Utilized from settings.gradle.kts
 kotlinx-coroutines          = "1.10.2"
-ktor                        = "3.3.0"
+ktor                        = "3.3.3"
 
 [libraries]
 androidx-startup-runtime    = { module = "androidx.startup:startup-runtime", version.ref = "androidx-startup" }
