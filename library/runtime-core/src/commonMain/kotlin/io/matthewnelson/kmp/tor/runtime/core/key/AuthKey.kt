@@ -16,6 +16,7 @@
 package io.matthewnelson.kmp.tor.runtime.core.key
 
 import io.matthewnelson.encoding.core.Encoder.Companion.encodeToString
+import io.matthewnelson.encoding.core.util.wipe
 import io.matthewnelson.kmp.tor.runtime.core.Destroyable.Companion.destroyedException
 import io.matthewnelson.kmp.tor.runtime.core.net.OnionAddress
 import kotlin.jvm.JvmSynthetic
@@ -220,13 +221,6 @@ private inline fun Key.toDescriptor(
     }
 
     val result = sb.toString()
-
-    if (this is Key.Private) {
-        // blank it (sb.clear only resets the internal index)
-        val size = sb.length
-        sb.clear()
-        repeat(size) { sb.append(' ') }
-    }
-
+    if (this is Key.Private) sb.wipe()
     return result
 }

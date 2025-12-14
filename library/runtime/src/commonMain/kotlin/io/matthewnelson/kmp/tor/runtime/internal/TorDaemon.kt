@@ -197,7 +197,7 @@ internal class TorDaemon private constructor(
     }
 
     @Throws(CancellationException::class, InterruptedException::class, IOException::class)
-    private fun StartArgs.startTor(checkCancellationOrInterrupt: () -> Unit): Job {
+    private suspend fun StartArgs.startTor(checkCancellationOrInterrupt: () -> Unit): Job {
         val loader = generator.environment.loader
 
         var process: Process? = null
@@ -210,13 +210,17 @@ internal class TorDaemon private constructor(
                     process = loader.process(TorBinder) { tor, configureEnv ->
                         Process.Builder(command = tor.path)
                             .args(cmdLine)
+                            // TODO: .async
                             .environment(configureEnv)
                             .environment("HOME", generator.environment.workDirectory.path)
                             .stdin(Stdio.Null)
                             .stdout(Stdio.Null)
                             .stderr(Stdio.Null)
                             .destroySignal(Signal.SIGTERM)
-                            .spawn()
+                    }.let { b ->
+                        withContext(NonCancellable) {
+                            b.createProcessAsync()
+                        }
                     }
 
                     suspend { process.waitForAsync() } to process::destroy

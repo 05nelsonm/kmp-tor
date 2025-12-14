@@ -103,7 +103,7 @@ public object ED25519_V3: KeyType.Address<ED25519_V3.PublicKey, ED25519_V3.Priva
             @JvmName("get")
             public fun String.toED25519_V3PublicKey(): PublicKey {
                 // Sanity check for smallest possible input length (a Base64 encoded 32 byte key)
-                BASE_64.config.encodeOutSize(BYTE_SIZE.toLong()).let { minLength ->
+                BASE_64.config.encodeOutMaxSize(BYTE_SIZE).let { minLength ->
                     if (length >= minLength) return@let
                     throw InvalidKeyException("Invalid length. actual[$length] vs min[$minLength]")
                 }
@@ -264,7 +264,7 @@ public object ED25519_V3: KeyType.Address<ED25519_V3.PublicKey, ED25519_V3.Priva
              * @throws [GeneralSecurityException] if procurement of cryptographically secure random data fails
              * */
             @JvmStatic
-            public fun generate(): PrivateKey = CryptoRand.Default.generateED25519PrivateKey()
+            public fun generate(): PrivateKey = CryptoRand.generateED25519PrivateKey()
 
             /**
              * Generates a new [PrivateKey] using 32-bytes from provided [seed], starting at index [offset].

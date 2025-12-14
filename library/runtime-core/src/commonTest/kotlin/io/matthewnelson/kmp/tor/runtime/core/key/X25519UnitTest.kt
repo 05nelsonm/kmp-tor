@@ -67,7 +67,7 @@ class X25519UnitTest: AuthKeyBaseUnitTest<X25519.PublicKey, X25519.PrivateKey>(
     fun givenInvalidInput_whenToPublicKey_thenThrowsException() {
         val blank = PUBLIC_KEY_B16.toX25519PublicKey().encoded().apply { fill(0) }
         assertInvalidKey(listOf("Key is blank")) { blank.toX25519PublicKey() }
-        assertInvalidKey(listOf("Key is blank")) { blank.encodeToString(Base16()).toX25519PublicKey() }
+        assertInvalidKey(listOf("Key is blank")) { blank.encodeToString(Base16.Builder().build()).toX25519PublicKey() }
         assertInvalidKey(listOf("Tried base 16/32/64")) { PUBLIC_KEY_B16.dropLast(2).toX25519PublicKey() }
         assertInvalidKey(listOf("Invalid array size")) { PUBLIC_KEY_B16.dropLast(2).decodeToByteArray(Base16).toX25519PublicKey() }
     }
@@ -76,7 +76,7 @@ class X25519UnitTest: AuthKeyBaseUnitTest<X25519.PublicKey, X25519.PrivateKey>(
     fun givenInvalidInput_whenToPrivateKey_thenReturnsNull() {
         val blank = PRIVATE_KEY_B16.toX25519PrivateKey().encoded().apply { fill(0) }
         assertInvalidKey(listOf("Key is blank")) { blank.toX25519PrivateKey() }
-        assertInvalidKey(listOf("Key is blank")) { blank.encodeToString(Base16()).toX25519PrivateKey() }
+        assertInvalidKey(listOf("Key is blank")) { blank.encodeToString(Base16.Builder().build()).toX25519PrivateKey() }
         assertInvalidKey(listOf("Tried base 16/32/64")) { PRIVATE_KEY_B16.dropLast(2).toX25519PrivateKey() }
         assertInvalidKey(listOf("Invalid array size")) { PRIVATE_KEY_B16.dropLast(2).decodeToByteArray(Base16).toX25519PrivateKey() }
     }

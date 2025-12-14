@@ -19,7 +19,6 @@ package io.matthewnelson.kmp.tor.runtime.core.key
 
 import io.matthewnelson.encoding.base16.Base16
 import io.matthewnelson.encoding.base32.Base32
-import io.matthewnelson.encoding.base32.Base32Default
 import io.matthewnelson.encoding.base64.Base64
 import io.matthewnelson.encoding.core.Encoder.Companion.encodeToString
 import io.matthewnelson.kmp.tor.common.api.InternalKmpTorApi
@@ -37,6 +36,7 @@ import kotlin.contracts.contract
  * */
 public actual sealed class Key private actual constructor(): java.security.Key {
 
+    /** @suppress */ // https://github.com/Kotlin/dokka/issues/4311
     public actual abstract fun algorithm(): String
 
     public actual abstract fun encodedOrNull(): ByteArray?
@@ -91,6 +91,7 @@ public actual sealed class Key private actual constructor(): java.security.Key {
             }
         }
 
+        /** @suppress */ // https://github.com/Kotlin/dokka/issues/4311
         public actual final override fun isDestroyed(): Boolean = _destroyed
 
         /**
@@ -150,8 +151,8 @@ public actual sealed class Key private actual constructor(): java.security.Key {
 
     /** @suppress */
     protected actual companion object {
-        internal actual val BASE_16: Base16 = Base16()
-        internal actual val BASE_32: Base32.Default = Base32Default { padEncoded = false }
-        internal actual val BASE_64: Base64 = Base64 { padEncoded = false }
+        internal actual val BASE_16: Base16 = Base16.Builder().build()
+        internal actual val BASE_32: Base32.Default = Base32.Default.Builder { padEncoded(false) }
+        internal actual val BASE_64: Base64 = Base64.Builder { padEncoded(false) }
     }
 }

@@ -16,7 +16,7 @@
 package io.matthewnelson.kmp.tor.runtime.core.key
 
 import io.matthewnelson.encoding.base16.Base16
-import io.matthewnelson.encoding.base32.Base32Default
+import io.matthewnelson.encoding.base32.Base32
 import io.matthewnelson.encoding.base64.Base64
 import io.matthewnelson.encoding.core.Encoder.Companion.encodeToString
 import org.kotlincrypto.error.InvalidKeyException
@@ -112,18 +112,18 @@ abstract class KeyBaseUnitTest(protected val expectedAlgorithm: String) {
     fun givenPublicKey_whenEncodings_thenAreAsExpected() {
         val bytes = publicKey.encoded()
 
-        assertEquals(bytes.encodeToString(Base16()), publicKey.base16())
-        assertEquals(bytes.encodeToString(Base32Default { padEncoded = false }), publicKey.base32())
-        assertEquals(bytes.encodeToString(Base64 { padEncoded = false }), publicKey.base64())
+        assertEquals(bytes.encodeToString(Base16.Builder().build()), publicKey.base16())
+        assertEquals(bytes.encodeToString(Base32.Default.Builder { padEncoded(false) }), publicKey.base32())
+        assertEquals(bytes.encodeToString(Base64.Builder { padEncoded(false) }), publicKey.base64())
     }
 
     @Test
     fun givenPrivateKey_whenEncodings_thenAreAsExpected() {
         val bytes = privateKey.encoded()
 
-        assertEquals(bytes.encodeToString(Base16()), privateKey.base16())
-        assertEquals(bytes.encodeToString(Base32Default { padEncoded = false }), privateKey.base32())
-        assertEquals(bytes.encodeToString(Base64 { padEncoded = false }), privateKey.base64())
+        assertEquals(bytes.encodeToString(Base16.Builder().build()), privateKey.base16())
+        assertEquals(bytes.encodeToString(Base32.Default.Builder { padEncoded(false) }), privateKey.base32())
+        assertEquals(bytes.encodeToString(Base64.Builder { padEncoded(false) }), privateKey.base64())
     }
 
     @Test

@@ -132,7 +132,7 @@ internal suspend fun startTor(ctrlPortArgument: String): Closeable {
     return result
 }
 
-private fun ResourceLoader.Tor.Exec.start(args: List<String>): Closeable {
+private suspend fun ResourceLoader.Tor.Exec.start(args: List<String>): Closeable {
     val process = process(TestBinder) { tor, configureEnv ->
         Process.Builder(command = tor.path)
             .args(args)
@@ -142,7 +142,7 @@ private fun ResourceLoader.Tor.Exec.start(args: List<String>): Closeable {
             .stdin(Stdio.Null)
             .stdout(Stdio.Inherit)
             .stderr(Stdio.Inherit)
-    }.spawn()
+    }.createProcessAsync()
 
     return Closeable { process.destroy() }
 }

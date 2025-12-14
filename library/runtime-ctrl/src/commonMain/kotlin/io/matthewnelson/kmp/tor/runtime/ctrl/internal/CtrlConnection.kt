@@ -15,6 +15,7 @@
  **/
 package io.matthewnelson.kmp.tor.runtime.ctrl.internal
 
+import io.matthewnelson.encoding.core.util.wipe
 import io.matthewnelson.kmp.file.Closeable
 import io.matthewnelson.kmp.file.IOException
 import io.matthewnelson.kmp.tor.runtime.core.TorEvent
@@ -151,20 +152,19 @@ internal interface CtrlConnection: Closeable {
             // of something like a CONF_CHANGED which started
             // with a delimiter of '-' to indicate multiple
             // configuration changes were made.
-            val sb = StringBuilder()
+            val sb = run {
+                var capacity = replies.size - 1 // new line characters
+                replies.forEach { capacity += it.message.length }
+                StringBuilder(capacity)
+            }
             sb.append(replies.first().message)
 
             for (i in 1 until replies.size) {
                 sb.appendLine().append(replies[i].message)
             }
 
-            val count = sb.count()
             val data = sb.toString()
-
-            // fill before de-referencing
-            sb.clear()
-            repeat(count) { sb.append(' ') }
-
+            sb.wipe()
             event.notify(data)
         }
 
@@ -251,13 +251,8 @@ internal interface CtrlConnection: Closeable {
             }
 
             fun build(): Reply {
-                val count = sb.count()
                 val message = sb.toString()
-
-                // fill before de-referencing
-                sb.clear()
-                repeat(count) { sb.append(' ') }
-
+                sb.wipe()
                 return Reply.of(status, message)
             }
         }

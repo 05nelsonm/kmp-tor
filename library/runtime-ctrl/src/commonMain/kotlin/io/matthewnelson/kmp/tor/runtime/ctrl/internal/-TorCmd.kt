@@ -2,6 +2,7 @@
 
 package io.matthewnelson.kmp.tor.runtime.ctrl.internal
 
+import io.matthewnelson.encoding.core.util.wipe
 import io.matthewnelson.kmp.file.SysDirSep
 import io.matthewnelson.kmp.tor.runtime.core.ctrl.TorCmd
 import io.matthewnelson.kmp.tor.runtime.ctrl.TorCtrl.Debugger
@@ -60,6 +61,7 @@ internal fun TorCmd<*>.signalNameOrNull(): String? = when (this) {
 }
 
 private fun TorCmd.Authenticate.encode(LOG: Debugger?): ByteArray {
+    // TODO: initialize capacity
     return StringBuilder(keyword).apply {
         val redacted = if (hex.isNotEmpty()) {
             SP().append(hex)
@@ -90,6 +92,7 @@ private fun TorCmd.Config.Get.encode(LOG: Debugger?): ByteArray {
 private fun TorCmd.Config.Load.encode(LOG: Debugger?): ByteArray {
     require(config.settings.isNotEmpty()) { "A minimum of 1 setting is required" }
 
+    // TODO: initialize capacity
     return StringBuilder().apply {
         append('+').append(keyword)
 
@@ -143,6 +146,7 @@ private fun TorCmd.Config.Save.encode(LOG: Debugger?): ByteArray {
 private fun TorCmd.Config.Set.encode(LOG: Debugger?): ByteArray {
     require(config.settings.isNotEmpty()) { "A minimum of 1 setting is required" }
 
+    // TODO: initialize capacity
     return StringBuilder(keyword).apply {
         for (setting in config) {
             for (line in setting.items) {
@@ -245,6 +249,7 @@ private fun TorCmd.Onion.Add.encode(LOG: Debugger?): ByteArray {
     require(ports.isNotEmpty()) { "A minimum of 1 port is required" }
     val privateKey = key?.base64()
 
+    // TODO: initialize capacity
     return StringBuilder(keyword).apply {
         SP()
 
@@ -326,6 +331,7 @@ private fun TorCmd.OnionClientAuth.Add.encode(LOG: Debugger?): ByteArray {
 
     val privateKey = key.base64()
 
+    // TODO: initialize capacity
     return StringBuilder(keyword).apply {
         SP().append(address)
         SP().append(key.algorithm()).append(':').append(privateKey)
@@ -423,14 +429,9 @@ private inline fun StringBuilder.CRLF(): StringBuilder = append('\r').append('\n
 
 @Suppress("NOTHING_TO_INLINE")
 private inline fun StringBuilder.encodeToByteArray(fill: Boolean = false): ByteArray {
-    val count = count()
+    // TODO: encoding:utf8
     val s = toString()
-
-    clear()
-    if (fill) {
-        repeat(count) { append(' ') }
-    }
-
+    if (fill) wipe()
     return s.encodeToByteArray()
 }
 

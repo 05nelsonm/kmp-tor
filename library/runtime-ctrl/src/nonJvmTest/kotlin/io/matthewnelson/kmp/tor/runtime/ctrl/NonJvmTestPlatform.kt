@@ -29,7 +29,7 @@ internal actual fun File.recursivelyDelete() {
         // Use absolute path so macOS rm is utilized
         IsDarwinSimulator -> Process.Builder(command = "/bin/rm").args("-r")
         else -> Process.Builder(command = "rm").args("-r")
-    }.args(path).output { timeoutMillis = 500 }
+    }.args(path).createOutput { timeoutMillis = 500 }
 
     if (out.processInfo.exitCode == 0 && out.stderr.isBlank()) return
 

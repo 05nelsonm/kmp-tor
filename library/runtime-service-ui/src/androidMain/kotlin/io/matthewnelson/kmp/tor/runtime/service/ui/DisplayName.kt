@@ -22,8 +22,8 @@ import io.matthewnelson.kmp.tor.runtime.TorRuntime
  * Configuration option types for [KmpTorServiceUI.Config.BuilderScope.displayName].
  *
  * Will be shown below the selector action button icons
- * [R.drawable.ic_kmp_tor_ui_action_previous] and
- * [R.drawable.ic_kmp_tor_ui_action_next]
+ * `R.drawable.ic_kmp_tor_ui_action_previous` and
+ * `R.drawable.ic_kmp_tor_ui_action_next`
  *
  * e.g. (The bottom right corner of the notification)
  *
