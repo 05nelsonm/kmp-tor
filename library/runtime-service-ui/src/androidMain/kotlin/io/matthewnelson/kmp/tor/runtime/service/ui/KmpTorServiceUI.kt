@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-@file:Suppress("PropertyName", "CanBePrimaryConstructorProperty")
+@file:Suppress("CanBePrimaryConstructorProperty", "PropertyName", "UNUSED", "RemoveRedundantQualifierName", "RedundantVisibilityModifier")
 
 package io.matthewnelson.kmp.tor.runtime.service.ui
 
@@ -257,12 +257,12 @@ public class KmpTorServiceUI private constructor(
              * Set to a value less than 1 to disable.
              *
              * **NOTE:** This setting will override whatever may be declared in
-             * your application theme for [R.attr.kmp_tor_ui_color_ready].
+             * your application theme for `R.attr.kmp_tor_ui_color_ready`.
              *
              * Default: `0` (disabled), unless this [BuilderScope] is a result of
              * [Config.newConfig], then whatever [Config.colorReady] is.
              *
-             * @see [R.attr.kmp_tor_ui_color_ready]
+             * See: `R.attr.kmp_tor_ui_color_ready`
              * */
             @JvmField
             public var colorReady: Int = 0
@@ -545,7 +545,7 @@ public class KmpTorServiceUI private constructor(
              *
              * **NOTE:** Icons should be `24dp` x `24dp` for best performance.
              *
-             * Default: `null` (do not override default [R.drawable.ic_kmp_tor_ui_action_newnym])
+             * Default: `null` (do not override default `R.drawable.ic_kmp_tor_ui_action_newnym`)
              * */
             @JvmField
             public var iconActionNewNym: Int? = null
@@ -559,7 +559,7 @@ public class KmpTorServiceUI private constructor(
              *
              * **NOTE:** Icons should be `24dp` x `24dp` for best performance.
              *
-             * Default: `null` (do not override default [R.drawable.ic_kmp_tor_ui_action_restart])
+             * Default: `null` (do not override default `R.drawable.ic_kmp_tor_ui_action_restart`)
              * */
             @JvmField
             public var iconActionRestart: Int? = null
@@ -573,7 +573,7 @@ public class KmpTorServiceUI private constructor(
              *
              * **NOTE:** Icons should be `24dp` x `24dp` for best performance.
              *
-             * Default: `null` (do not override default [R.drawable.ic_kmp_tor_ui_action_stop])
+             * Default: `null` (do not override default `R.drawable.ic_kmp_tor_ui_action_stop`)
              * */
             @JvmField
             public var iconActionStop: Int? = null
@@ -587,7 +587,7 @@ public class KmpTorServiceUI private constructor(
              *
              * **NOTE:** Icons should be `24dp` x `24dp` for best performance.
              *
-             * Default: `null` (do not override default [R.drawable.ic_kmp_tor_ui_action_previous])
+             * Default: `null` (do not override default `R.drawable.ic_kmp_tor_ui_action_previous`)
              * */
             @JvmField
             public var iconActionPrevious: Int? = null
@@ -601,7 +601,7 @@ public class KmpTorServiceUI private constructor(
              *
              * **NOTE:** Icons should be `24dp` x `24dp` for best performance.
              *
-             * Default: `null` (do not override default [R.drawable.ic_kmp_tor_ui_action_next])
+             * Default: `null` (do not override default `R.drawable.ic_kmp_tor_ui_action_next`)
              * */
             @JvmField
             public var iconActionNext: Int? = null

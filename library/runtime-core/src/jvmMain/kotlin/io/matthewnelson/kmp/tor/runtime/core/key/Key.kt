@@ -37,6 +37,7 @@ import kotlin.contracts.contract
  * */
 public actual sealed class Key private actual constructor(): java.security.Key {
 
+    /** @suppress */ // https://github.com/Kotlin/dokka/issues/4311
     public actual abstract fun algorithm(): String
 
     public actual abstract fun encodedOrNull(): ByteArray?
@@ -91,6 +92,7 @@ public actual sealed class Key private actual constructor(): java.security.Key {
             }
         }
 
+        /** @suppress */ // https://github.com/Kotlin/dokka/issues/4311
         public actual final override fun isDestroyed(): Boolean = _destroyed
 
         /**

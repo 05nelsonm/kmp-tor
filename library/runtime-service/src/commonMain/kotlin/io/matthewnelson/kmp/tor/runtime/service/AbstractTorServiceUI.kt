@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-@file:Suppress("OPTIONAL_DECLARATION_USAGE_IN_NON_COMMON_SOURCE")
+@file:Suppress("OPTIONAL_DECLARATION_USAGE_IN_NON_COMMON_SOURCE", "RedundantVisibilityModifier")
 
 package io.matthewnelson.kmp.tor.runtime.service
 
@@ -53,8 +53,8 @@ import kotlin.jvm.JvmSynthetic
  *   the service object.
  *      - Context: `INSTANCE`
  *
- * See [TorServiceUI]
- * See [ui.KmpTorServiceUI]
+ * See: `TorServiceUI`
+ * See: `ui.KmpTorServiceUI`
  * @throws [IllegalStateException] on instantiation if [args] were not those
  *   which were passed to [Factory.createProtected]. See [Args].
  * */
