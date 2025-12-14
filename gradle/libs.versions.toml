@@ -24,7 +24,7 @@ jetbrains-skiko             = "0.9.37.3"
 
 kmp-process                 = "0.5.0-SNAPSHOT"
 kmp-tor-common              = "2.4.2-SNAPSHOT"
-kmp-tor-resource            = "408.17.1"
+kmp-tor-resource            = "408.21.0-SNAPSHOT"
 kmp-tor-resourceNpmSNAPSHOT = ".0"
 kotlincrypto-catalog        = "0.8.0" # Utilized from settings.gradle.kts
 kotlinx-coroutines          = "1.10.2"

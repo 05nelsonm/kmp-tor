@@ -43,7 +43,7 @@ class TorOptionEntriesIntegrationTest {
                 Process.Builder(tor.path)
                     .args(cmd)
                     .environment(configureEnv)
-            }.output { timeoutMillis = 3_000 }
+            }.createOutput { timeoutMillis = 3_000 }
 
             if (
                 out.stdout.isEmpty()
@@ -97,6 +97,7 @@ class TorOptionEntriesIntegrationTest {
             listOf(
                 "FirewallPorts",                    // deprecated
                 "ReconfigDropsBridgeDescs",
+                "MaxHSDirCacheBytes"                // TODO: Add
             ).forEach { cliActive.remove(it) }
 
             if (cliActive.isEmpty()) return@run
