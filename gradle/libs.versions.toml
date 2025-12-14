@@ -7,7 +7,7 @@ androidx-test-core          = "1.5.0" # Do not upgrade. Next version requires mi
 androidx-test-runner        = "1.5.2" # Do not upgrade. Next version requires minSdk 19+
 
 # https://repo.maven.apache.org/maven2/org/bouncycastle/bcprov-jdk18on/
-bouncy-castle               = "1.81"
+bouncy-castle               = "1.83"
 
 encoding                    = "2.5.0"
 
