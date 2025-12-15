@@ -1702,6 +1702,12 @@ abstract class io.matthewnelson.kmp.tor.runtime.core.config/TorOption : kotlin/C
         final fun toString(): kotlin/String // io.matthewnelson.kmp.tor.runtime.core.config/TorOption.MaxConsensusAgeForDiffs.toString|toString(){}[0]
     }
 
+    final object MaxHSDirCacheBytes : io.matthewnelson.kmp.tor.runtime.core.config/TorOption { // io.matthewnelson.kmp.tor.runtime.core.config/TorOption.MaxHSDirCacheBytes|null[0]
+        final fun equals(kotlin/Any?): kotlin/Boolean // io.matthewnelson.kmp.tor.runtime.core.config/TorOption.MaxHSDirCacheBytes.equals|equals(kotlin.Any?){}[0]
+        final fun hashCode(): kotlin/Int // io.matthewnelson.kmp.tor.runtime.core.config/TorOption.MaxHSDirCacheBytes.hashCode|hashCode(){}[0]
+        final fun toString(): kotlin/String // io.matthewnelson.kmp.tor.runtime.core.config/TorOption.MaxHSDirCacheBytes.toString|toString(){}[0]
+    }
+
     final object MaxMemInQueues : io.matthewnelson.kmp.tor.runtime.core.config/TorOption { // io.matthewnelson.kmp.tor.runtime.core.config/TorOption.MaxMemInQueues|null[0]
         final fun equals(kotlin/Any?): kotlin/Boolean // io.matthewnelson.kmp.tor.runtime.core.config/TorOption.MaxMemInQueues.equals|equals(kotlin.Any?){}[0]
         final fun hashCode(): kotlin/Int // io.matthewnelson.kmp.tor.runtime.core.config/TorOption.MaxMemInQueues.hashCode|hashCode(){}[0]

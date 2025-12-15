@@ -2729,6 +2729,16 @@ public abstract class TorOption: Comparable<TorOption>, CharSequence {
     }
 
     /**
+     * [tor-man#MaxHSDirCacheBytes](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#MaxHSDirCacheBytes)
+     * */
+    public data object MaxHSDirCacheBytes: TorOption(
+        default = 0,
+        attributes = emptySet(),
+        isCmdLineArg = false,
+        isUnique = true,
+    )
+
+    /**
      * [tor-man#MaxMemInQueues](https://github.com/05nelsonm/kmp-tor-resource/blob/master/docs/tor-man.adoc#MaxMemInQueues)
      * */
     public data object MaxMemInQueues: TorOption(
@@ -5176,6 +5186,7 @@ public abstract class TorOption: Comparable<TorOption>, CharSequence {
                 KeyDirectory,
                 KeyDirectoryGroupReadable,
                 MainloopStats,
+                MaxHSDirCacheBytes,
                 MaxMemInQueues,
                 MaxOnionQueueDelay,
                 MyFamily,
