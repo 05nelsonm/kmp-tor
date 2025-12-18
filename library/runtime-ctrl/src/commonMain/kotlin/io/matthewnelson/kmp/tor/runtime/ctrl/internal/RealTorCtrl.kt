@@ -284,7 +284,7 @@ internal class RealTorCtrl private constructor(
                         intercepted = result
                     }
 
-                    (intercepted ?: cmdJob.cmd).encodeToByteArray(LOG)
+                    (intercepted ?: cmdJob.cmd).toByteArray(LOG)
                 } catch (t: Throwable) {
                     cmdJob.error(t)
                     continue
