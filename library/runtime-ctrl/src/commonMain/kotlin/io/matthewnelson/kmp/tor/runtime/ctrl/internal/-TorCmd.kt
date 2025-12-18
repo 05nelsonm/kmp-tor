@@ -2,13 +2,15 @@
 
 package io.matthewnelson.kmp.tor.runtime.ctrl.internal
 
+import io.matthewnelson.encoding.core.Decoder.Companion.decodeToByteArray
 import io.matthewnelson.encoding.core.util.wipe
+import io.matthewnelson.encoding.utf8.UTF8
 import io.matthewnelson.kmp.file.SysDirSep
 import io.matthewnelson.kmp.tor.runtime.core.ctrl.TorCmd
 import io.matthewnelson.kmp.tor.runtime.ctrl.TorCtrl.Debugger
 
 @Throws(IllegalArgumentException::class, IllegalStateException::class)
-internal fun TorCmd<*>.encodeToByteArray(LOG: Debugger?): ByteArray = when (this) {
+internal fun TorCmd<*>.toByteArray(LOG: Debugger?): ByteArray = when (this) {
     is TorCmd.Authenticate -> encode(LOG)
     is TorCmd.Config.Get -> encode(LOG)
     is TorCmd.Config.Load -> encode(LOG)
@@ -61,8 +63,16 @@ internal fun TorCmd<*>.signalNameOrNull(): String? = when (this) {
 }
 
 private fun TorCmd.Authenticate.encode(LOG: Debugger?): ByteArray {
-    // TODO: initialize capacity
-    return StringBuilder(keyword).apply {
+    val sb = run {
+        var capacity = keyword.length
+        if (hex.isNotEmpty()) {
+            capacity += 1 // SP
+            capacity += hex.length
+        }
+        capacity += 2 // CRLF
+        StringBuilder(capacity)
+    }
+    return sb.append(keyword).apply {
         val redacted = if (hex.isNotEmpty()) {
             SP().append(hex)
             " [REDACTED]"
@@ -72,7 +82,7 @@ private fun TorCmd.Authenticate.encode(LOG: Debugger?): ByteArray {
 
         LOG.d { ">> $keyword$redacted" }
         CRLF()
-    }.encodeToByteArray(fill = true)
+    }.toUTF8(backFill = true)
 }
 
 @Throws(IllegalArgumentException::class)
@@ -85,14 +95,12 @@ private fun TorCmd.Config.Get.encode(LOG: Debugger?): ByteArray {
         }
         LOG.d { ">> ${toString()}" }
         CRLF()
-    }.encodeToByteArray()
+    }.toUTF8()
 }
 
 @Throws(IllegalArgumentException::class)
 private fun TorCmd.Config.Load.encode(LOG: Debugger?): ByteArray {
     require(config.settings.isNotEmpty()) { "A minimum of 1 setting is required" }
-
-    // TODO: initialize capacity
     return StringBuilder().apply {
         append('+').append(keyword)
 
@@ -116,7 +124,7 @@ private fun TorCmd.Config.Load.encode(LOG: Debugger?): ByteArray {
         LOG.d { ">> ." }
         append('.')
         CRLF()
-    }.encodeToByteArray(fill = true)
+    }.toUTF8(backFill = true)
 }
 
 @Throws(IllegalArgumentException::class)
@@ -129,7 +137,7 @@ private fun TorCmd.Config.Reset.encode(LOG: Debugger?): ByteArray {
         }
         LOG.d { ">> ${toString()}" }
         CRLF()
-    }.encodeToByteArray()
+    }.toUTF8()
 }
 
 private fun TorCmd.Config.Save.encode(LOG: Debugger?): ByteArray {
@@ -139,14 +147,12 @@ private fun TorCmd.Config.Save.encode(LOG: Debugger?): ByteArray {
         }
         LOG.d { ">> ${toString()}" }
         CRLF()
-    }.encodeToByteArray()
+    }.toUTF8()
 }
 
 @Throws(IllegalArgumentException::class)
 private fun TorCmd.Config.Set.encode(LOG: Debugger?): ByteArray {
     require(config.settings.isNotEmpty()) { "A minimum of 1 setting is required" }
-
-    // TODO: initialize capacity
     return StringBuilder(keyword).apply {
         for (setting in config) {
             for (line in setting.items) {
@@ -177,14 +183,14 @@ private fun TorCmd.Config.Set.encode(LOG: Debugger?): ByteArray {
         }
         LOG.d { ">> ${toString()}" }
         CRLF()
-    }.encodeToByteArray(fill = true)
+    }.toUTF8(backFill = true)
 }
 
 private fun TorCmd.DropGuards.encode(LOG: Debugger?): ByteArray {
     return StringBuilder(keyword).apply {
         LOG.d { ">> ${toString()}" }
         CRLF()
-    }.encodeToByteArray()
+    }.toUTF8()
 }
 
 @Throws(IllegalArgumentException::class)
@@ -202,7 +208,7 @@ private fun TorCmd.Hs.Fetch.encode(LOG: Debugger?): ByteArray {
 
         LOG.d { ">> ${toString()}" }
         CRLF()
-    }.encodeToByteArray()
+    }.toUTF8()
 }
 
 @Throws(IllegalArgumentException::class)
@@ -220,7 +226,7 @@ private fun TorCmd.Info.Get.encode(LOG: Debugger?): ByteArray {
 
         LOG.d { ">> ${toString()}" }
         CRLF()
-    }.encodeToByteArray()
+    }.toUTF8()
 }
 
 @Throws(IllegalArgumentException::class)
@@ -241,16 +247,58 @@ private fun TorCmd.MapAddress.encode(LOG: Debugger?): ByteArray {
 
         LOG.d { ">> ${toString()}" }
         CRLF()
-    }.encodeToByteArray()
+    }.toUTF8()
 }
 
 @Throws(IllegalArgumentException::class, IllegalStateException::class)
 private fun TorCmd.Onion.Add.encode(LOG: Debugger?): ByteArray {
     require(ports.isNotEmpty()) { "A minimum of 1 port is required" }
+
+    val prefixUnix = "unix:"
+    // TODO: base64Chars
     val privateKey = key?.base64()
 
-    // TODO: initialize capacity
-    return StringBuilder(keyword).apply {
+    // Pre-calculate capacity so StringBuilder does
+    // not ever resize its backing array.
+    val (sb, cAuth) = run {
+        var capacity = keyword.length
+        capacity++ // SP
+        capacity += keyType.algorithm().length
+        capacity++ // :
+        capacity += privateKey?.length ?: 3 // NEW
+        if (flags.isNotEmpty()) {
+            capacity++ // SP
+            capacity += 6 // Flags=
+            capacity += flags.size - 1 // , separators
+            flags.forEach { flag ->
+                capacity += flag.length
+            }
+        }
+        if (maxStreams != null) {
+            capacity++ // SP
+            capacity += 11 // MaxStreams=
+            capacity += maxStreams.toString().length
+        }
+        ports.forEach { port ->
+            capacity++ // SP
+            capacity += 5 // Port=
+            capacity += port.argument.length
+            if (port.argument.startsWith(prefixUnix)) {
+                capacity -= 2 // Path quotes are removed
+            }
+        }
+        val cAuth = clientAuth.mapTo(ArrayList(clientAuth.size)) { auth ->
+            capacity++ // SP
+            capacity += 13 // ClientAuthV3=
+            val b32 = auth.base32()
+            capacity += b32.length
+            b32
+        }
+        capacity += 2 // CRLF
+        StringBuilder(capacity) to cAuth
+    }
+
+    return sb.append(keyword).apply {
         SP()
 
         if (privateKey != null) {
@@ -272,12 +320,12 @@ private fun TorCmd.Onion.Add.encode(LOG: Debugger?): ByteArray {
             SP().append("Port=")
 
             val i = port.argument.indexOf(' ')
-            val virtual = port.argument.substring(0, i)
+            val virtual = port.argument.take(i)
             var target = port.argument.substring(i + 1)
 
             append(virtual).append(',')
 
-            val prefixUnix = "unix:"
+
             if (target.startsWith(prefixUnix)) {
                 append(prefixUnix)
 
@@ -295,8 +343,8 @@ private fun TorCmd.Onion.Add.encode(LOG: Debugger?): ByteArray {
             append(target)
         }
 
-        for (auth in clientAuth) {
-            SP().append("ClientAuthV3=").append(auth.base32())
+        for (auth in cAuth) {
+            SP().append("ClientAuthV3=").append(auth)
         }
 
         LOG.d {
@@ -309,7 +357,7 @@ private fun TorCmd.Onion.Add.encode(LOG: Debugger?): ByteArray {
         }
 
         CRLF()
-    }.encodeToByteArray(fill = true)
+    }.toUTF8(backFill = true)
 }
 
 private fun TorCmd.Onion.Delete.encode(LOG: Debugger?): ByteArray {
@@ -317,7 +365,7 @@ private fun TorCmd.Onion.Delete.encode(LOG: Debugger?): ByteArray {
         SP().append(address)
         LOG.d { ">> ${toString()}" }
         CRLF()
-    }.encodeToByteArray()
+    }.toUTF8()
 }
 
 @Throws(IllegalArgumentException::class, IllegalStateException::class)
@@ -329,10 +377,37 @@ private fun TorCmd.OnionClientAuth.Add.encode(LOG: Debugger?): ByteArray {
         }
     }
 
+    // TODO: base64Chars
     val privateKey = key.base64()
 
-    // TODO: initialize capacity
-    return StringBuilder(keyword).apply {
+    // Pre-calculate capacity so StringBuilder does
+    // not ever resize its backing array.
+    val sb = run {
+        var capacity = keyword.length
+        capacity++ // SP
+        capacity += address.toString().length
+        capacity++ // SP
+        capacity += key.algorithm().length
+        capacity++ // :
+        capacity += privateKey.length
+        if (nickname != null) {
+            capacity++ // SP
+            capacity += 11 // ClientName=
+            capacity += nickname.length
+        }
+        if (flags.isNotEmpty()) {
+            capacity++ // SP
+            capacity += 6 // Flags=
+            capacity += flags.size - 1 // , separator char
+            flags.forEach { flag ->
+                capacity += flag.length
+            }
+        }
+        capacity += 2 // CRLF
+        StringBuilder(capacity)
+    }
+
+    return sb.append(keyword).apply {
         SP().append(address)
         SP().append(key.algorithm()).append(':').append(privateKey)
         if (nickname != null) {
@@ -349,7 +424,7 @@ private fun TorCmd.OnionClientAuth.Add.encode(LOG: Debugger?): ByteArray {
         }
 
         CRLF()
-    }.encodeToByteArray(fill = true)
+    }.toUTF8(backFill = true)
 }
 
 private fun TorCmd.OnionClientAuth.Remove.encode(LOG: Debugger?): ByteArray {
@@ -357,7 +432,7 @@ private fun TorCmd.OnionClientAuth.Remove.encode(LOG: Debugger?): ByteArray {
         SP().append(address)
         LOG.d { ">> ${toString()}" }
         CRLF()
-    }.encodeToByteArray()
+    }.toUTF8()
 }
 
 private fun TorCmd.OnionClientAuth.View.encode(LOG: Debugger?): ByteArray {
@@ -367,21 +442,21 @@ private fun TorCmd.OnionClientAuth.View.encode(LOG: Debugger?): ByteArray {
         }
         LOG.d { ">> ${toString()}" }
         CRLF()
-    }.encodeToByteArray()
+    }.toUTF8()
 }
 
 private fun TorCmd.Ownership.Drop.encode(LOG: Debugger?): ByteArray {
     return StringBuilder(keyword).apply {
         LOG.d { ">> ${toString()}" }
         CRLF()
-    }.encodeToByteArray()
+    }.toUTF8()
 }
 
 private fun TorCmd.Ownership.Take.encode(LOG: Debugger?): ByteArray {
     return StringBuilder(keyword).apply {
         LOG.d { ">> ${toString()}" }
         CRLF()
-    }.encodeToByteArray()
+    }.toUTF8()
 }
 
 @Throws(IllegalArgumentException::class)
@@ -396,7 +471,7 @@ private fun TorCmd.Resolve.encode(LOG: Debugger?): ByteArray {
         SP().append(hostname)
         LOG.d { ">> ${toString()}" }
         CRLF()
-    }.encodeToByteArray()
+    }.toUTF8()
 }
 
 private fun TorCmd.SetEvents.encode(LOG: Debugger?): ByteArray {
@@ -406,7 +481,7 @@ private fun TorCmd.SetEvents.encode(LOG: Debugger?): ByteArray {
         }
         LOG.d { ">> ${toString()}" }
         CRLF()
-    }.encodeToByteArray()
+    }.toUTF8()
 }
 
 @Throws(IllegalArgumentException::class)
@@ -418,7 +493,7 @@ private fun TorCmd<*>.encodeSignal(LOG: Debugger?): ByteArray {
         SP().append(name)
         LOG.d { ">> ${toString()}" }
         CRLF()
-    }.encodeToByteArray()
+    }.toUTF8()
 }
 
 @Suppress("NOTHING_TO_INLINE", "FunctionName")
@@ -428,11 +503,10 @@ private inline fun StringBuilder.SP(): StringBuilder = append(' ')
 private inline fun StringBuilder.CRLF(): StringBuilder = append('\r').append('\n')
 
 @Suppress("NOTHING_TO_INLINE")
-private inline fun StringBuilder.encodeToByteArray(fill: Boolean = false): ByteArray {
-    // TODO: encoding:utf8
-    val s = toString()
-    if (fill) wipe()
-    return s.encodeToByteArray()
+private inline fun StringBuilder.toUTF8(backFill: Boolean = false): ByteArray {
+    val utf8 = decodeToByteArray(UTF8)
+    if (backFill) wipe()
+    return utf8
 }
 
 @Suppress("NOTHING_TO_INLINE")
