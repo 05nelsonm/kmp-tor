@@ -17,6 +17,7 @@
 
 package io.matthewnelson.kmp.tor.runtime.core.key
 
+import io.matthewnelson.encoding.core.Encoder.Companion.encodeToCharArray
 import io.matthewnelson.encoding.core.Encoder.Companion.encodeToString
 import io.matthewnelson.kmp.tor.runtime.core.net.OnionAddress
 import kotlin.jvm.JvmSynthetic
@@ -44,6 +45,10 @@ public class AddressKey private constructor() {
         public final override fun base16(): String = encoded().encodeToString(BASE_16)
         public final override fun base32(): String = encoded().encodeToString(BASE_32)
         public final override fun base64(): String = encoded().encodeToString(BASE_64)
+
+        public final override fun base16Chars(): CharArray = encoded().encodeToCharArray(BASE_16)
+        public final override fun base32Chars(): CharArray = encoded().encodeToCharArray(BASE_32)
+        public final override fun base64Chars(): CharArray = encoded().encodeToCharArray(BASE_64)
 
         public final override fun compareTo(other: AddressKey.Public): Int = onionAddress.compareTo(other.onionAddress)
     }

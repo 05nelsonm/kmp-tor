@@ -20,6 +20,7 @@ package io.matthewnelson.kmp.tor.runtime.core.key
 import io.matthewnelson.encoding.base16.Base16
 import io.matthewnelson.encoding.base32.Base32
 import io.matthewnelson.encoding.base64.Base64
+import io.matthewnelson.encoding.core.Encoder.Companion.encodeToCharArray
 import io.matthewnelson.encoding.core.Encoder.Companion.encodeToString
 import io.matthewnelson.kmp.tor.common.api.InternalKmpTorApi
 import io.matthewnelson.kmp.tor.common.core.synchronized
@@ -31,9 +32,7 @@ import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
 
-/**
- * Base abstraction for Public/Private keys used in tor.
- * */
+// jvm
 public actual sealed class Key private actual constructor(): java.security.Key {
 
     /** @suppress */ // https://github.com/Kotlin/dokka/issues/4311
@@ -43,6 +42,9 @@ public actual sealed class Key private actual constructor(): java.security.Key {
     public actual abstract fun base16OrNull(): String?
     public actual abstract fun base32OrNull(): String?
     public actual abstract fun base64OrNull(): String?
+    public actual abstract fun base16CharsOrNull(): CharArray?
+    public actual abstract fun base32CharsOrNull(): CharArray?
+    public actual abstract fun base64CharsOrNull(): CharArray?
 
     public final override fun getAlgorithm(): String = algorithm()
     public final override fun getEncoded(): ByteArray? = encodedOrNull()
@@ -56,11 +58,17 @@ public actual sealed class Key private actual constructor(): java.security.Key {
         public actual abstract fun base16(): String
         public actual abstract fun base32(): String
         public actual abstract fun base64(): String
+        public actual abstract fun base16Chars(): CharArray
+        public actual abstract fun base32Chars(): CharArray
+        public actual abstract fun base64Chars(): CharArray
 
         public actual final override fun encodedOrNull(): ByteArray = encoded()
         public actual final override fun base16OrNull(): String = base16()
         public actual final override fun base32OrNull(): String = base32()
         public actual final override fun base64OrNull(): String = base64()
+        public actual final override fun base16CharsOrNull(): CharArray = base16Chars()
+        public actual final override fun base32CharsOrNull(): CharArray = base32Chars()
+        public actual final override fun base64CharsOrNull(): CharArray = base64Chars()
 
         private val _toString by lazy { "${algorithm()}.PublicKey[${base32()}]" }
         /** @suppress */
@@ -80,6 +88,9 @@ public actual sealed class Key private actual constructor(): java.security.Key {
         @OptIn(InternalKmpTorApi::class)
         private val lock = synchronizedObject()
 
+        /** @suppress */ // https://github.com/Kotlin/dokka/issues/4311
+        public actual final override fun isDestroyed(): Boolean = _destroyed
+
         public actual final override fun destroy() {
             if (_destroyed) return
 
@@ -91,41 +102,21 @@ public actual sealed class Key private actual constructor(): java.security.Key {
             }
         }
 
-        /** @suppress */ // https://github.com/Kotlin/dokka/issues/4311
-        public actual final override fun isDestroyed(): Boolean = _destroyed
-
-        /**
-         * Key bytes
-         *
-         * @throws [IllegalStateException] if [isDestroyed] is `true`
-         * */
         public actual fun encoded(): ByteArray = encodedOrNull() ?: throw destroyedException(algorithm())
-
-        /**
-         * Key bytes formatted in uppercase Base16 (hex)
-         *
-         * @throws [IllegalStateException] if [isDestroyed] is `true`
-         * */
         public actual fun base16(): String = base16OrNull() ?: throw destroyedException(algorithm())
-
-        /**
-         * Key bytes formatted in uppercase Base32 without padding
-         *
-         * @throws [IllegalStateException] if [isDestroyed] is `true`
-         * */
         public actual fun base32(): String = base32OrNull() ?: throw destroyedException(algorithm())
-
-        /**
-         * Key bytes formatted in Base64 without padding
-         *
-         * @throws [IllegalStateException] if [isDestroyed] is `true`
-         * */
         public actual fun base64(): String = base64OrNull() ?: throw destroyedException(algorithm())
+        public actual fun base16Chars(): CharArray = base16CharsOrNull() ?: throw destroyedException(algorithm())
+        public actual fun base32Chars(): CharArray = base32CharsOrNull() ?: throw destroyedException(algorithm())
+        public actual fun base64Chars(): CharArray = base64CharsOrNull() ?: throw destroyedException(algorithm())
 
         public actual final override fun encodedOrNull(): ByteArray? = withKeyOrNull { copyOf() }
         public actual final override fun base16OrNull(): String? = withKeyOrNull { encodeToString(BASE_16) }
         public actual final override fun base32OrNull(): String? = withKeyOrNull { encodeToString(BASE_32) }
         public actual final override fun base64OrNull(): String? = withKeyOrNull { encodeToString(BASE_64) }
+        public actual final override fun base16CharsOrNull(): CharArray? = withKeyOrNull { encodeToCharArray(BASE_16) }
+        public actual final override fun base32CharsOrNull(): CharArray? = withKeyOrNull { encodeToCharArray(BASE_32) }
+        public actual final override fun base64CharsOrNull(): CharArray? = withKeyOrNull { encodeToCharArray(BASE_64) }
 
         @OptIn(ExperimentalContracts::class, InternalKmpTorApi::class)
         private inline fun <T : Any> withKeyOrNull(block: ByteArray.() -> T): T? {

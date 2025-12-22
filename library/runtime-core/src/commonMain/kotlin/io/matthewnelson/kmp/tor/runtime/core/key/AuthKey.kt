@@ -15,6 +15,7 @@
  **/
 package io.matthewnelson.kmp.tor.runtime.core.key
 
+import io.matthewnelson.encoding.core.Encoder.Companion.encodeToCharArray
 import io.matthewnelson.encoding.core.Encoder.Companion.encodeToString
 import io.matthewnelson.encoding.core.util.wipe
 import io.matthewnelson.kmp.tor.runtime.core.Destroyable.Companion.destroyedException
@@ -45,6 +46,10 @@ public class AuthKey private constructor() {
         public final override fun base32(): String = key.encodeToString(BASE_32)
         public final override fun base64(): String = key.encodeToString(BASE_64)
 
+        public final override fun base16Chars(): CharArray = key.encodeToCharArray(BASE_16)
+        public final override fun base32Chars(): CharArray = key.encodeToCharArray(BASE_32)
+        public final override fun base64Chars(): CharArray = key.encodeToCharArray(BASE_64)
+
         /**
          * Produces the base 32 descriptor string for this [AuthKey.Public]
          * in the form of `descriptor:{algorithm}:{base-32}`.
@@ -56,6 +61,9 @@ public class AuthKey private constructor() {
          * in the form of `descriptor:{algorithm}:{base-64}`.
          * */
         public fun descriptorBase64(): String = toDescriptor(address = null, base64())
+
+        // TODO: descriptorBase32Utf8(): ByteArray
+        // TODO: descriptorBase64Utf8(): ByteArray
     }
 
     /**
@@ -193,6 +201,12 @@ public class AuthKey private constructor() {
             val encoded = base64OrNull() ?: return null
             return toDescriptor(address = publicKey.address(), encoded)
         }
+
+        // TODO: descriptorBase32Utf8(): ByteArray
+        // TODO: descriptorBase64Utf8(): ByteArray
+
+        // TODO: descriptorBase32Utf8OrNull(): ByteArray?
+        // TODO: descriptorBase64Utf8OrNull(): ByteArray?
 
         @JvmSynthetic
         internal abstract fun isCompatibleWith(addressKey: AddressKey.Public): Boolean
