@@ -22,6 +22,8 @@ import io.matthewnelson.encoding.base32.Base32
 import io.matthewnelson.encoding.base64.Base64
 import io.matthewnelson.encoding.core.Encoder.Companion.encodeToCharArray
 import io.matthewnelson.encoding.core.Encoder.Companion.encodeToString
+import io.matthewnelson.encoding.core.EncoderDecoder
+import io.matthewnelson.immutable.collections.immutableListOf
 import io.matthewnelson.kmp.tor.common.api.InternalKmpTorApi
 import io.matthewnelson.kmp.tor.common.core.synchronized
 import io.matthewnelson.kmp.tor.common.core.synchronizedObject
@@ -145,5 +147,7 @@ public actual sealed class Key private actual constructor(): java.security.Key {
         internal actual val BASE_16: Base16 = Base16.Builder().build()
         internal actual val BASE_32: Base32.Default = Base32.Default.Builder { padEncoded(false) }
         internal actual val BASE_64: Base64 = Base64.Builder { padEncoded(false) }
+
+        internal actual val DECODERS: List<EncoderDecoder<*>> = immutableListOf(BASE_64, BASE_32, BASE_16)
     }
 }

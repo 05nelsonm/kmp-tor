@@ -295,7 +295,7 @@ public object ED25519_V3: KeyType.Address<ED25519_V3.PublicKey, ED25519_V3.Priva
             public fun String.toED25519_V3PrivateKey(): PrivateKey {
                 val decoded = tryDecodeOrNull(
                     expectedSize = BYTE_SIZE,
-                    decoders = listOf(BASE_64, BASE_32, BASE_16),
+                    decoders = DECODERS,
                 ) ?: throw InvalidKeyException("Tried base 16/32/64 decoding, but failed to find a $BYTE_SIZE byte key")
                 if (!decoded.containsNon0Byte(BYTE_SIZE)) throw InvalidKeyException("Key is blank (all 0 bytes)")
                 return PrivateKey(decoded)

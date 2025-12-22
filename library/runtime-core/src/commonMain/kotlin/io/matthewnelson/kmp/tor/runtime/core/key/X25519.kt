@@ -101,7 +101,7 @@ public object X25519: KeyType.Auth<X25519.PublicKey, X25519.PrivateKey>() {
             public fun String.toX25519PublicKey(): PublicKey {
                 val decoded = tryDecodeOrNull(
                     expectedSize = BYTE_SIZE,
-                    decoders = listOf(BASE_64, BASE_32, BASE_16),
+                    decoders = DECODERS,
                 ) ?: throw InvalidKeyException("Tried base 16/32/64 decoding, but failed to find a $BYTE_SIZE byte key")
                 if (!decoded.containsNon0Byte(BYTE_SIZE)) throw InvalidKeyException("Key is blank (all 0 bytes)")
                 return PublicKey(decoded)
@@ -187,7 +187,7 @@ public object X25519: KeyType.Auth<X25519.PublicKey, X25519.PrivateKey>() {
              * @throws [GeneralSecurityException] if procurement of cryptographically secure random data fails
              * */
             @JvmStatic
-            public fun generate(): PrivateKey = CryptoRand.Default.generateX25519PrivateKey()
+            public fun generate(): PrivateKey = CryptoRand.generateX25519PrivateKey()
 
             /**
              * Generates a new [PrivateKey] using 32-bytes from provided [seed], starting at index [offset].
@@ -218,7 +218,7 @@ public object X25519: KeyType.Auth<X25519.PublicKey, X25519.PrivateKey>() {
             public fun String.toX25519PrivateKey(): PrivateKey {
                 val decoded = tryDecodeOrNull(
                     expectedSize = BYTE_SIZE,
-                    decoders = listOf(BASE_64, BASE_32, BASE_16),
+                    decoders = DECODERS,
                 ) ?: throw InvalidKeyException("Tried base 16/32/64 decoding, but failed to find a $BYTE_SIZE byte key")
                 if (!decoded.containsNon0Byte(BYTE_SIZE)) throw InvalidKeyException("Key is blank (all 0 bytes)")
                 return PrivateKey(decoded)

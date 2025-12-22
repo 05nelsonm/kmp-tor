@@ -20,6 +20,7 @@ package io.matthewnelson.kmp.tor.runtime.core.key
 import io.matthewnelson.encoding.base16.Base16
 import io.matthewnelson.encoding.base32.Base32
 import io.matthewnelson.encoding.base64.Base64
+import io.matthewnelson.encoding.core.EncoderDecoder
 import io.matthewnelson.kmp.tor.runtime.core.Destroyable
 
 /**
@@ -188,5 +189,7 @@ public expect sealed class Key private constructor() {
         internal val BASE_16: Base16
         internal val BASE_32: Base32.Default
         internal val BASE_64: Base64
+
+        internal val DECODERS: List<EncoderDecoder<*>>
     }
 }
