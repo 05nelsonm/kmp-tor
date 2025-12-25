@@ -4022,10 +4022,18 @@ public abstract class io/matthewnelson/kmp/tor/runtime/core/key/AuthKey$Private 
 	public final fun descriptorBase32 (Lio/matthewnelson/kmp/tor/runtime/core/net/OnionAddress;)Ljava/lang/String;
 	public final fun descriptorBase32OrNull (Lio/matthewnelson/kmp/tor/runtime/core/key/AddressKey$Public;)Ljava/lang/String;
 	public final fun descriptorBase32OrNull (Lio/matthewnelson/kmp/tor/runtime/core/net/OnionAddress;)Ljava/lang/String;
+	public final fun descriptorBase32Utf8 (Lio/matthewnelson/kmp/tor/runtime/core/key/AddressKey$Public;)[B
+	public final fun descriptorBase32Utf8 (Lio/matthewnelson/kmp/tor/runtime/core/net/OnionAddress;)[B
+	public final fun descriptorBase32Utf8OrNull (Lio/matthewnelson/kmp/tor/runtime/core/key/AddressKey$Public;)[B
+	public final fun descriptorBase32Utf8OrNull (Lio/matthewnelson/kmp/tor/runtime/core/net/OnionAddress;)[B
 	public final fun descriptorBase64 (Lio/matthewnelson/kmp/tor/runtime/core/key/AddressKey$Public;)Ljava/lang/String;
 	public final fun descriptorBase64 (Lio/matthewnelson/kmp/tor/runtime/core/net/OnionAddress;)Ljava/lang/String;
 	public final fun descriptorBase64OrNull (Lio/matthewnelson/kmp/tor/runtime/core/key/AddressKey$Public;)Ljava/lang/String;
 	public final fun descriptorBase64OrNull (Lio/matthewnelson/kmp/tor/runtime/core/net/OnionAddress;)Ljava/lang/String;
+	public final fun descriptorBase64Utf8 (Lio/matthewnelson/kmp/tor/runtime/core/key/AddressKey$Public;)[B
+	public final fun descriptorBase64Utf8 (Lio/matthewnelson/kmp/tor/runtime/core/net/OnionAddress;)[B
+	public final fun descriptorBase64Utf8OrNull (Lio/matthewnelson/kmp/tor/runtime/core/key/AddressKey$Public;)[B
+	public final fun descriptorBase64Utf8OrNull (Lio/matthewnelson/kmp/tor/runtime/core/net/OnionAddress;)[B
 }
 
 public abstract class io/matthewnelson/kmp/tor/runtime/core/key/AuthKey$Public : io/matthewnelson/kmp/tor/runtime/core/key/Key$Public {
@@ -4037,7 +4045,9 @@ public abstract class io/matthewnelson/kmp/tor/runtime/core/key/AuthKey$Public :
 	public final fun base64 ()Ljava/lang/String;
 	public final fun base64Chars ()[C
 	public final fun descriptorBase32 ()Ljava/lang/String;
+	public final fun descriptorBase32Utf8 ()[B
 	public final fun descriptorBase64 ()Ljava/lang/String;
+	public final fun descriptorBase64Utf8 ()[B
 	public final fun encoded ()[B
 }
 

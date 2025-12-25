@@ -3134,10 +3134,18 @@ final class io.matthewnelson.kmp.tor.runtime.core.key/AuthKey { // io.matthewnel
         final fun descriptorBase32(io.matthewnelson.kmp.tor.runtime.core.net/OnionAddress): kotlin/String // io.matthewnelson.kmp.tor.runtime.core.key/AuthKey.Private.descriptorBase32|descriptorBase32(io.matthewnelson.kmp.tor.runtime.core.net.OnionAddress){}[0]
         final fun descriptorBase32OrNull(io.matthewnelson.kmp.tor.runtime.core.key/AddressKey.Public): kotlin/String? // io.matthewnelson.kmp.tor.runtime.core.key/AuthKey.Private.descriptorBase32OrNull|descriptorBase32OrNull(io.matthewnelson.kmp.tor.runtime.core.key.AddressKey.Public){}[0]
         final fun descriptorBase32OrNull(io.matthewnelson.kmp.tor.runtime.core.net/OnionAddress): kotlin/String? // io.matthewnelson.kmp.tor.runtime.core.key/AuthKey.Private.descriptorBase32OrNull|descriptorBase32OrNull(io.matthewnelson.kmp.tor.runtime.core.net.OnionAddress){}[0]
+        final fun descriptorBase32Utf8(io.matthewnelson.kmp.tor.runtime.core.key/AddressKey.Public): kotlin/ByteArray // io.matthewnelson.kmp.tor.runtime.core.key/AuthKey.Private.descriptorBase32Utf8|descriptorBase32Utf8(io.matthewnelson.kmp.tor.runtime.core.key.AddressKey.Public){}[0]
+        final fun descriptorBase32Utf8(io.matthewnelson.kmp.tor.runtime.core.net/OnionAddress): kotlin/ByteArray // io.matthewnelson.kmp.tor.runtime.core.key/AuthKey.Private.descriptorBase32Utf8|descriptorBase32Utf8(io.matthewnelson.kmp.tor.runtime.core.net.OnionAddress){}[0]
+        final fun descriptorBase32Utf8OrNull(io.matthewnelson.kmp.tor.runtime.core.key/AddressKey.Public): kotlin/ByteArray? // io.matthewnelson.kmp.tor.runtime.core.key/AuthKey.Private.descriptorBase32Utf8OrNull|descriptorBase32Utf8OrNull(io.matthewnelson.kmp.tor.runtime.core.key.AddressKey.Public){}[0]
+        final fun descriptorBase32Utf8OrNull(io.matthewnelson.kmp.tor.runtime.core.net/OnionAddress): kotlin/ByteArray? // io.matthewnelson.kmp.tor.runtime.core.key/AuthKey.Private.descriptorBase32Utf8OrNull|descriptorBase32Utf8OrNull(io.matthewnelson.kmp.tor.runtime.core.net.OnionAddress){}[0]
         final fun descriptorBase64(io.matthewnelson.kmp.tor.runtime.core.key/AddressKey.Public): kotlin/String // io.matthewnelson.kmp.tor.runtime.core.key/AuthKey.Private.descriptorBase64|descriptorBase64(io.matthewnelson.kmp.tor.runtime.core.key.AddressKey.Public){}[0]
         final fun descriptorBase64(io.matthewnelson.kmp.tor.runtime.core.net/OnionAddress): kotlin/String // io.matthewnelson.kmp.tor.runtime.core.key/AuthKey.Private.descriptorBase64|descriptorBase64(io.matthewnelson.kmp.tor.runtime.core.net.OnionAddress){}[0]
         final fun descriptorBase64OrNull(io.matthewnelson.kmp.tor.runtime.core.key/AddressKey.Public): kotlin/String? // io.matthewnelson.kmp.tor.runtime.core.key/AuthKey.Private.descriptorBase64OrNull|descriptorBase64OrNull(io.matthewnelson.kmp.tor.runtime.core.key.AddressKey.Public){}[0]
         final fun descriptorBase64OrNull(io.matthewnelson.kmp.tor.runtime.core.net/OnionAddress): kotlin/String? // io.matthewnelson.kmp.tor.runtime.core.key/AuthKey.Private.descriptorBase64OrNull|descriptorBase64OrNull(io.matthewnelson.kmp.tor.runtime.core.net.OnionAddress){}[0]
+        final fun descriptorBase64Utf8(io.matthewnelson.kmp.tor.runtime.core.key/AddressKey.Public): kotlin/ByteArray // io.matthewnelson.kmp.tor.runtime.core.key/AuthKey.Private.descriptorBase64Utf8|descriptorBase64Utf8(io.matthewnelson.kmp.tor.runtime.core.key.AddressKey.Public){}[0]
+        final fun descriptorBase64Utf8(io.matthewnelson.kmp.tor.runtime.core.net/OnionAddress): kotlin/ByteArray // io.matthewnelson.kmp.tor.runtime.core.key/AuthKey.Private.descriptorBase64Utf8|descriptorBase64Utf8(io.matthewnelson.kmp.tor.runtime.core.net.OnionAddress){}[0]
+        final fun descriptorBase64Utf8OrNull(io.matthewnelson.kmp.tor.runtime.core.key/AddressKey.Public): kotlin/ByteArray? // io.matthewnelson.kmp.tor.runtime.core.key/AuthKey.Private.descriptorBase64Utf8OrNull|descriptorBase64Utf8OrNull(io.matthewnelson.kmp.tor.runtime.core.key.AddressKey.Public){}[0]
+        final fun descriptorBase64Utf8OrNull(io.matthewnelson.kmp.tor.runtime.core.net/OnionAddress): kotlin/ByteArray? // io.matthewnelson.kmp.tor.runtime.core.key/AuthKey.Private.descriptorBase64Utf8OrNull|descriptorBase64Utf8OrNull(io.matthewnelson.kmp.tor.runtime.core.net.OnionAddress){}[0]
     }
 
     sealed class Public : io.matthewnelson.kmp.tor.runtime.core.key/Key.Public { // io.matthewnelson.kmp.tor.runtime.core.key/AuthKey.Public|null[0]
@@ -3148,7 +3156,9 @@ final class io.matthewnelson.kmp.tor.runtime.core.key/AuthKey { // io.matthewnel
         final fun base64(): kotlin/String // io.matthewnelson.kmp.tor.runtime.core.key/AuthKey.Public.base64|base64(){}[0]
         final fun base64Chars(): kotlin/CharArray // io.matthewnelson.kmp.tor.runtime.core.key/AuthKey.Public.base64Chars|base64Chars(){}[0]
         final fun descriptorBase32(): kotlin/String // io.matthewnelson.kmp.tor.runtime.core.key/AuthKey.Public.descriptorBase32|descriptorBase32(){}[0]
+        final fun descriptorBase32Utf8(): kotlin/ByteArray // io.matthewnelson.kmp.tor.runtime.core.key/AuthKey.Public.descriptorBase32Utf8|descriptorBase32Utf8(){}[0]
         final fun descriptorBase64(): kotlin/String // io.matthewnelson.kmp.tor.runtime.core.key/AuthKey.Public.descriptorBase64|descriptorBase64(){}[0]
+        final fun descriptorBase64Utf8(): kotlin/ByteArray // io.matthewnelson.kmp.tor.runtime.core.key/AuthKey.Public.descriptorBase64Utf8|descriptorBase64Utf8(){}[0]
         final fun encoded(): kotlin/ByteArray // io.matthewnelson.kmp.tor.runtime.core.key/AuthKey.Public.encoded|encoded(){}[0]
     }
 }
