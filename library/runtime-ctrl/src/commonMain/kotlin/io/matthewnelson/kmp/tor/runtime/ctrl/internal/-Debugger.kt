@@ -19,10 +19,16 @@ package io.matthewnelson.kmp.tor.runtime.ctrl.internal
 
 import io.matthewnelson.kmp.tor.runtime.core.UncaughtException
 import io.matthewnelson.kmp.tor.runtime.ctrl.TorCtrl.Debugger
+import kotlin.contracts.ExperimentalContracts
+import kotlin.contracts.InvocationKind
+import kotlin.contracts.contract
 
+@OptIn(ExperimentalContracts::class)
 internal inline fun Debugger?.d(lazyText: () -> String) {
+    contract { callsInPlace(lazyText, InvocationKind.AT_MOST_ONCE) }
     if (this?.isEnabled() != true) return
-    invoke(lazyText())
+    val t = lazyText()
+    invoke(t)
 }
 
 @Throws(IllegalArgumentException::class)
