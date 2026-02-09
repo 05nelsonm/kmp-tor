@@ -22,6 +22,7 @@ import io.matthewnelson.encoding.core.util.wipe
 import io.matthewnelson.encoding.utf8.UTF8
 import io.matthewnelson.encoding.utf8.UTF8.CharPreProcessor.Companion.sizeUTF8
 import io.matthewnelson.kmp.tor.runtime.core.Destroyable.Companion.destroyedException
+import io.matthewnelson.kmp.tor.runtime.core.config.TorOption
 import io.matthewnelson.kmp.tor.runtime.core.net.OnionAddress
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.InvocationKind
@@ -57,22 +58,40 @@ public class AuthKey private constructor() {
         public final override fun base64Chars(): CharArray = key.encodeToCharArray(BASE_64)
 
         /**
-         * TODO
+         * Produces the descriptor `String` using the Base32 encoding of the
+         * key in the form of `descriptor:{algorithm}:{base32 encoded key}`.
+         *
+         * **NOTE:** This is the output for which would be written to a `{name}.auth`
+         * file in the Hidden Service's `authorized_clients` directory.
+         *
+         * @see [descriptorBase32Utf8]
          * */
         public fun descriptorBase32(): String = toDescriptorString(address = null, base32Chars())
 
         /**
-         * TODO
-         * */
-        public fun descriptorBase64(): String = toDescriptorString(address = null, base64Chars())
-
-        /**
-         * TODO
+         * Produces the descriptor using the Base32 encoding of the key in the
+         * form of `descriptor:{algorithm}:{base32 encoded key}` as UTF-8 bytes.
+         *
+         * **NOTE:** This is the output for which would be written to a `{name}.auth`
+         * file in the Hidden Service's `authorized_clients` directory.
+         *
+         * @see [descriptorBase32]
          * */
         public fun descriptorBase32Utf8(): ByteArray = descriptorBase32().encodeToByteArray()
 
         /**
-         * TODO
+         * Produces the descriptor `String` using the Base64 encoding of the
+         * key in the form of `descriptor:{algorithm}:{base64 encoded key}`.
+         *
+         * @see [descriptorBase64Utf8]
+         * */
+        public fun descriptorBase64(): String = toDescriptorString(address = null, base64Chars())
+
+        /**
+         * Produces the descriptor using the Base64 encoding of the key in the
+         * form of `descriptor:{algorithm}:{base64 encoded key}` as UTF-8 bytes.
+         *
+         * @see [descriptorBase64]
          * */
         public fun descriptorBase64Utf8(): ByteArray = descriptorBase64().encodeToByteArray()
     }
@@ -90,14 +109,38 @@ public class AuthKey private constructor() {
     public sealed class Private(key: ByteArray): Key.Private(key) {
 
         /**
-         * TODO
+         * Produces the descriptor `String` using the Base32 encoding of the key in the form
+         * of `{onion address without .onion}:descriptor:{algorithm}:{base32 encoded key}`.
+         *
+         * **NOTE:** This is the output for which would be written to a `{name}.auth_private`
+         * file in the directory specified by a config's [TorOption.ClientOnionAuthDir].
+         *
+         * **NOTE:** `String` is immutable and thus cannot be back-filled after use. One should
+         * prefer using [descriptorBase32Utf8] instead.
+         *
+         * @see [descriptorBase32Utf8]
+         *
+         * @throws [IllegalArgumentException] If [address] is not compatible with this [algorithm].
+         * @throws [IllegalStateException] If [isDestroyed] is `true`.
          * */
         public fun descriptorBase32(
             address: OnionAddress,
         ): String = descriptorBase32(address.asPublicKey())
 
         /**
-         * TODO
+         * Produces the descriptor `String` using the Base32 encoding of the key in the form
+         * of `{onion address without .onion}:descriptor:{algorithm}:{base32 encoded key}`.
+         *
+         * **NOTE:** This is the output for which would be written to a `{name}.auth_private`
+         * file in the directory specified by a config's [TorOption.ClientOnionAuthDir].
+         *
+         * **NOTE:** `String` is immutable and thus cannot be back-filled after use. One should
+         * prefer using [descriptorBase32Utf8] instead.
+         *
+         * @see [descriptorBase32Utf8]
+         *
+         * @throws [IllegalArgumentException] If [publicKey] is not compatible with this [algorithm].
+         * @throws [IllegalStateException] If [isDestroyed] is `true`.
          * */
         public fun descriptorBase32(
             publicKey: AddressKey.Public,
@@ -111,14 +154,74 @@ public class AuthKey private constructor() {
         }
 
         /**
-         * TODO
+         * Produces the descriptor `String` using the Base32 encoding of the key in the form
+         * of `{onion address without .onion}:descriptor:{algorithm}:{base32 encoded key}`,
+         * or `null` if either the [address] is not compatible with this [algorithm], or
+         * [isDestroyed] is `true`.
+         *
+         * **NOTE:** This is the output for which would be written to a `{name}.auth_private`
+         * file in the directory specified by a config's [TorOption.ClientOnionAuthDir].
+         *
+         * **NOTE:** `String` is immutable and thus cannot be back-filled after use. One should
+         * prefer using [descriptorBase32Utf8OrNull] instead.
+         *
+         * @see [descriptorBase32Utf8OrNull]
+         * */
+        public fun descriptorBase32OrNull(
+            address: OnionAddress,
+        ): String? = descriptorBase32OrNull(address.asPublicKey())
+
+        /**
+         * Produces the descriptor `String` using the Base32 encoding of the key in the form
+         * of `{onion address without .onion}:descriptor:{algorithm}:{base32 encoded key}`,
+         * or `null` if either the [publicKey] is not compatible with this [algorithm], or
+         * [isDestroyed] is `true`.
+         *
+         * **NOTE:** This is the output for which would be written to a `{name}.auth_private`
+         * file in the directory specified by a config's [TorOption.ClientOnionAuthDir].
+         *
+         * **NOTE:** `String` is immutable and thus cannot be back-filled after use. One should
+         * prefer using [descriptorBase32Utf8OrNull] instead.
+         *
+         * @see [descriptorBase32Utf8OrNull]
+         * */
+        public fun descriptorBase32OrNull(
+            publicKey: AddressKey.Public,
+        ): String? {
+            if (!isCompatibleWith(publicKey)) return null
+            val encoded = base32CharsOrNull() ?: return null
+            return toDescriptorString(publicKey.address(), encoded)
+        }
+
+        /**
+         * Produces the descriptor using the Base32 encoding of the key in the form of
+         * `{onion address without .onion}:descriptor:{algorithm}:{base32 encoded key}`
+         * as UTF-8 bytes.
+         *
+         * **NOTE:** This is the output for which would be written to a `{name}.auth_private`
+         * file in the directory specified by a config's [TorOption.ClientOnionAuthDir].
+         *
+         * @see [descriptorBase32]
+         *
+         * @throws [IllegalArgumentException] If [address] is not compatible with this [algorithm].
+         * @throws [IllegalStateException] If [isDestroyed] is `true`.
          * */
         public fun descriptorBase32Utf8(
             address: OnionAddress,
         ): ByteArray = descriptorBase32Utf8(address.asPublicKey())
 
         /**
-         * TODO
+         * Produces the descriptor using the Base32 encoding of the key in the form of
+         * `{onion address without .onion}:descriptor:{algorithm}:{base32 encoded key}`
+         * as UTF-8 bytes.
+         *
+         * **NOTE:** This is the output for which would be written to a `{name}.auth_private`
+         * file in the directory specified by a config's [TorOption.ClientOnionAuthDir].
+         *
+         * @see [descriptorBase32]
+         *
+         * @throws [IllegalArgumentException] If [publicKey] is not compatible with this [algorithm].
+         * @throws [IllegalStateException] If [isDestroyed] is `true`.
          * */
         public fun descriptorBase32Utf8(
             publicKey: AddressKey.Public,
@@ -132,50 +235,66 @@ public class AuthKey private constructor() {
         }
 
         /**
-         * TODO
-         * */
-        public fun descriptorBase32OrNull(
-            address: OnionAddress,
-        ): String? = descriptorBase32OrNull(address.asPublicKey())
-
-        /**
-         * TODO
-         * */
-        public fun descriptorBase32OrNull(
-            publicKey: AddressKey.Public,
-        ): String? {
-            if (!isCompatibleWith(publicKey)) return null
-            val encoded = base32CharsOrNull() ?: return null
-            return toDescriptorString(publicKey.address(), encoded)
-        }
-
-        /**
-         * TODO
+         * Produces the descriptor using the Base32 encoding of the key in the form of
+         * `{onion address without .onion}:descriptor:{algorithm}:{base32 encoded key}`
+         * as UTF-8 bytes, or `null` if either the [address] is not compatible with this
+         * [algorithm], or [isDestroyed] is `true`.
+         *
+         * **NOTE:** This is the output for which would be written to a `{name}.auth_private`
+         * file in the directory specified by a config's [TorOption.ClientOnionAuthDir].
+         *
+         * @see [descriptorBase32OrNull]
          * */
         public fun descriptorBase32Utf8OrNull(
             address: OnionAddress,
         ): ByteArray? = descriptorBase32Utf8OrNull(address.asPublicKey())
 
         /**
-         * TODO
+         * Produces the descriptor using the Base32 encoding of the key in the form of
+         * `{onion address without .onion}:descriptor:{algorithm}:{base32 encoded key}`
+         * as UTF-8 bytes, or `null` if either the [publicKey] is not compatible with this
+         * [algorithm], or [isDestroyed] is `true`.
+         *
+         * **NOTE:** This is the output for which would be written to a `{name}.auth_private`
+         * file in the directory specified by a config's [TorOption.ClientOnionAuthDir].
+         *
+         * @see [descriptorBase32OrNull]
          * */
         public fun descriptorBase32Utf8OrNull(
-            public: AddressKey.Public,
+            publicKey: AddressKey.Public,
         ): ByteArray? {
-            if (!isCompatibleWith(public)) return null
+            if (!isCompatibleWith(publicKey)) return null
             val encoded = base32CharsOrNull() ?: return null
-            return toDescriptorUtf8(public.address(), encoded)
+            return toDescriptorUtf8(publicKey.address(), encoded)
         }
 
         /**
-         * TODO
+         * Produces the descriptor `String` using the Base64 encoding of the key in the form
+         * of `{onion address without .onion}:descriptor:{algorithm}:{base64 encoded key}`.
+         *
+         * **NOTE:** `String` is immutable and thus cannot be back-filled after use. One should
+         * prefer using [descriptorBase64Utf8] instead.
+         *
+         * @see [descriptorBase64Utf8]
+         *
+         * @throws [IllegalArgumentException] If [address] is not compatible with this [algorithm].
+         * @throws [IllegalStateException] If [isDestroyed] is `true`.
          * */
         public fun descriptorBase64(
             address: OnionAddress,
         ): String = descriptorBase64(address.asPublicKey())
 
         /**
-         * TODO
+         * Produces the descriptor `String` using the Base64 encoding of the key in the form
+         * of `{onion address without .onion}:descriptor:{algorithm}:{base64 encoded key}`.
+         *
+         * **NOTE:** `String` is immutable and thus cannot be back-filled after use. One should
+         * prefer using [descriptorBase64Utf8] instead.
+         *
+         * @see [descriptorBase64Utf8]
+         *
+         * @throws [IllegalArgumentException] If [publicKey] is not compatible with this [algorithm].
+         * @throws [IllegalStateException] If [isDestroyed] is `true`.
          * */
         public fun descriptorBase64(
             publicKey: AddressKey.Public,
@@ -189,14 +308,62 @@ public class AuthKey private constructor() {
         }
 
         /**
-         * TODO
+         * Produces the descriptor `String` using the Base64 encoding of the key in the form
+         * of `{onion address without .onion}:descriptor:{algorithm}:{base64 encoded key}`,
+         * or `null` if either the [address] is not compatible with this [algorithm], or
+         * [isDestroyed] is `true`.
+         *
+         * **NOTE:** `String` is immutable and thus cannot be back-filled after use. One should
+         * prefer using [descriptorBase64Utf8OrNull] instead.
+         *
+         * @see [descriptorBase32Utf8OrNull]
+         * */
+        public fun descriptorBase64OrNull(
+            address: OnionAddress,
+        ): String? = descriptorBase64OrNull(address.asPublicKey())
+
+        /**
+         * Produces the descriptor `String` using the Base64 encoding of the key in the form
+         * of `{onion address without .onion}:descriptor:{algorithm}:{base64 encoded key}`,
+         * or `null` if either the [publicKey] is not compatible with this [algorithm], or
+         * [isDestroyed] is `true`.
+         *
+         * **NOTE:** `String` is immutable and thus cannot be back-filled after use. One should
+         * prefer using [descriptorBase64Utf8OrNull] instead.
+         *
+         * @see [descriptorBase32Utf8OrNull]
+         * */
+        public fun descriptorBase64OrNull(
+            publicKey: AddressKey.Public,
+        ): String? {
+            if (!isCompatibleWith(publicKey)) return null
+            val encoded = base64CharsOrNull() ?: return null
+            return toDescriptorString(publicKey.address(), encoded)
+        }
+
+        /**
+         * Produces the descriptor using the Base64 encoding of the key in the form of
+         * `{onion address without .onion}:descriptor:{algorithm}:{base64 encoded key}`
+         * as UTF-8 bytes.
+         *
+         * @see [descriptorBase64]
+         *
+         * @throws [IllegalArgumentException] If [address] is not compatible with this [algorithm].
+         * @throws [IllegalStateException] If [isDestroyed] is `true`.
          * */
         public fun descriptorBase64Utf8(
             address: OnionAddress,
         ): ByteArray = descriptorBase64Utf8(address.asPublicKey())
 
         /**
-         * TODO
+         * Produces the descriptor using the Base64 encoding of the key in the form of
+         * `{onion address without .onion}:descriptor:{algorithm}:{base64 encoded key}`
+         * as UTF-8 bytes.
+         *
+         * @see [descriptorBase64]
+         *
+         * @throws [IllegalArgumentException] If [publicKey] is not compatible with this [algorithm].
+         * @throws [IllegalStateException] If [isDestroyed] is `true`.
          * */
         public fun descriptorBase64Utf8(
             publicKey: AddressKey.Public,
@@ -210,32 +377,24 @@ public class AuthKey private constructor() {
         }
 
         /**
-         * TODO
-         * */
-        public fun descriptorBase64OrNull(
-            address: OnionAddress,
-        ): String? = descriptorBase64OrNull(address.asPublicKey())
-
-        /**
-         * TODO
-         * */
-        public fun descriptorBase64OrNull(
-            publicKey: AddressKey.Public,
-        ): String? {
-            if (!isCompatibleWith(publicKey)) return null
-            val encoded = base64CharsOrNull() ?: return null
-            return toDescriptorString(publicKey.address(), encoded)
-        }
-
-        /**
-         * TODO
+         * Produces the descriptor using the Base64 encoding of the key in the form of
+         * `{onion address without .onion}:descriptor:{algorithm}:{base64 encoded key}`
+         * as UTF-8 bytes, or `null` if either the [address] is not compatible with this
+         * [algorithm], or [isDestroyed] is `true`.
+         *
+         * @see [descriptorBase64OrNull]
          * */
         public fun descriptorBase64Utf8OrNull(
             address: OnionAddress,
         ): ByteArray? = descriptorBase64Utf8OrNull(address.asPublicKey())
 
         /**
-         * TODO
+         * Produces the descriptor using the Base64 encoding of the key in the form of
+         * `{onion address without .onion}:descriptor:{algorithm}:{base64 encoded key}`
+         * as UTF-8 bytes, or `null` if either the [publicKey] is not compatible with this
+         * [algorithm], or [isDestroyed] is `true`.
+         *
+         * @see [descriptorBase64OrNull]
          * */
         public fun descriptorBase64Utf8OrNull(
             publicKey: AddressKey.Public,
@@ -254,8 +413,7 @@ public class AuthKey private constructor() {
     }
 }
 
-@Suppress("NOTHING_TO_INLINE")
-private inline fun Key.toDescriptorString(
+private fun Key.toDescriptorString(
     address: OnionAddress?,
     encoded: CharArray,
 ): String {
@@ -271,8 +429,7 @@ private inline fun Key.toDescriptorString(
     return result
 }
 
-@Suppress("NOTHING_TO_INLINE")
-private inline fun Key.Private.toDescriptorUtf8(
+private fun Key.Private.toDescriptorUtf8(
     address: OnionAddress?,
     encoded: CharArray,
 ): ByteArray {
@@ -285,6 +442,9 @@ private inline fun Key.Private.toDescriptorUtf8(
         _appendString = { s -> s.forEach { c -> set(i++, c) } },
     )
     i = 0
+    // OK to use sizeUTF8 here to mitigate unnecessary array
+    // allocation and copying because the CharArray size is
+    // negligible.
     val utf8 = ByteArray(chars.sizeUTF8(UTF8).toInt())
     UTF8.newDecoderFeed { b -> utf8[i++] = b }.use { feed ->
         chars.forEach(feed::consume)

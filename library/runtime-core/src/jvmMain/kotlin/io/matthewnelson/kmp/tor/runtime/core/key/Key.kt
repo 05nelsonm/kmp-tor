@@ -53,7 +53,7 @@ public actual sealed class Key private actual constructor(): java.security.Key {
 
     // For now keys are always raw but could be bumped up
     // to commonMain if need be
-    public final override fun getFormat(): String = "RAW"
+    public final override fun getFormat(): String = RAW
 
     public actual sealed class Public actual constructor(): Key(), java.security.PublicKey {
         public actual abstract fun encoded(): ByteArray
@@ -149,5 +149,6 @@ public actual sealed class Key private actual constructor(): java.security.Key {
         internal actual val BASE_64: Base64 = Base64.Builder { padEncoded(false) }
 
         internal actual val DECODERS: List<EncoderDecoder<*>> = immutableListOf(BASE_64, BASE_32, BASE_16)
+        private const val RAW = "RAW"
     }
 }

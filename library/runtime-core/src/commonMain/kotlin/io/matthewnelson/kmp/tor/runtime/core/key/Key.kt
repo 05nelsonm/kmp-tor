@@ -29,79 +29,119 @@ import io.matthewnelson.kmp.tor.runtime.core.Destroyable
 public expect sealed class Key private constructor() {
 
     /**
-     * TODO
+     * Returns the algorithm name for this key. For example, `ED25519-V3` or `x25519`
      * */
     public abstract fun algorithm(): String
 
     /**
-     * TODO
+     * Returns the key in its primary encoding, or `null` if the key does not support
+     * encoding or [Key.Private.isDestroyed] is `true`.
      * */
     public abstract fun encodedOrNull(): ByteArray?
 
     /**
-     * TODO
+     * Returns a Base16 (uppercase) encoded `String` of the raw key value, or `null` if
+     * the key does not support encoding or [Key.Private.isDestroyed] is `true`.
+     *
+     * **NOTE:** `String` is immutable and thus cannot be back-filled after
+     * use. For [Key.Private], one should prefer using [base16CharsOrNull] instead.
+     *
+     * @see [base16CharsOrNull]
      * */
     public abstract fun base16OrNull(): String?
 
     /**
-     * TODO
+     * Returns a Base32 (uppercase & no padding) encoded `String` of the raw key value, or
+     * `null` if the key does not support encoding or [Key.Private.isDestroyed] is `true`.
+     *
+     * **NOTE:** `String` is immutable and thus cannot be back-filled after
+     * use. For [Key.Private], one should prefer using [base32CharsOrNull] instead.
+     *
+     * @see [base32CharsOrNull]
      * */
     public abstract fun base32OrNull(): String?
 
     /**
-     * TODO
+     * Returns a Base64 (no padding) encoded `String` of the raw key value, or `null` if
+     * the key does not support encoding or [Key.Private.isDestroyed] is `true`.
+     *
+     * **NOTE:** `String` is immutable and thus cannot be back-filled after
+     * use. For [Key.Private], one should prefer using [base64CharsOrNull] instead.
+     *
+     * @see [base64CharsOrNull]
      * */
     public abstract fun base64OrNull(): String?
 
     /**
-     * TODO
+     * Returns a Base16 (uppercase) encoded `CharArray` of the raw key value, or `null` if
+     * the key does not support encoding or [Key.Private.isDestroyed] is `true`.
+     *
+     * @see [base16OrNull]
      * */
     public abstract fun base16CharsOrNull(): CharArray?
 
     /**
-     * TODO
+     * Returns a Base32 (uppercase & no padding) encoded `CharArray` of the raw key value, or
+     * `null` if the key does not support encoding or [Key.Private.isDestroyed] is `true`.
+     *
+     * @see [base32OrNull]
      * */
     public abstract fun base32CharsOrNull(): CharArray?
 
     /**
-     * TODO
+     * Returns a Base64 (no padding) encoded `CharArray` of the raw key value, or `null` if
+     * the key does not support encoding or [Key.Private.isDestroyed] is `true`.
+     *
+     * @see [base64OrNull]
      * */
     public abstract fun base64CharsOrNull(): CharArray?
 
     public sealed class Public(): Key {
 
         /**
-         * TODO
+         * Returns the key in its primary encoding.
          * */
         public abstract fun encoded(): ByteArray
 
         /**
-         * TODO
+         * Returns a Base16 (uppercase) encoded `String` of the raw key value.
+         *
+         * @see [base16Chars]
          * */
         public abstract fun base16(): String
 
         /**
-         * TODO
+         * Returns a Base32 (uppercase & no padding) encoded `String` of the raw key value.
+         *
+         * @see [base32Chars]
          * */
         public abstract fun base32(): String
 
         /**
-         * TODO
+         * Returns a Base64 (no padding) encoded `String` of the raw key value.
+         *
+         * @see [base64Chars]
          * */
         public abstract fun base64(): String
 
         /**
-         * TODO
+         * Returns a Base16 (uppercase) encoded `CharArray` of the raw key value.
+         *
+         * @see [base16]
          * */
         public abstract fun base16Chars(): CharArray
 
         /**
-         * TODO
+         * Returns a Base32 (uppercase & no padding) encoded `CharArray` of the raw key value.
+         *
+         * @see [base32]
          * */
         public abstract fun base32Chars(): CharArray
 
         /**
-         * TODO
+         * Returns a Base64 (no padding) encoded `CharArray` of the raw key value.
+         *
+         * @see [base64]
          * */
         public abstract fun base64Chars(): CharArray
 
@@ -123,48 +163,80 @@ public expect sealed class Key private constructor() {
 
     public sealed class Private(key: ByteArray): Key, Destroyable {
 
-        /**
-         * TODO
-         * */
         public final override fun isDestroyed(): Boolean
 
         /**
-         * TODO
+         * Destroys the [Key.Private], back-filling the underlying array with `0` bytes.
          * */
         public final override fun destroy()
 
         /**
-         * TODO
+         * Returns the key in its primary encoding.
+         *
+         * @throws [IllegalStateException] If [isDestroyed] is `true`.
          * */
         public fun encoded(): ByteArray
 
         /**
-         * TODO
+         * Returns a Base16 (uppercase) encoded `String` of the raw key value.
+         *
+         * **NOTE:** `String` is immutable and thus cannot be back-filled after
+         * use. One should prefer using [base16Chars] instead.
+         *
+         * @see [base16Chars]
+         *
+         * @throws [IllegalStateException] If [isDestroyed] is `true`.
          * */
         public fun base16(): String
 
         /**
-         * TODO
+         * Returns a Base32 (uppercase & no padding) encoded `String` of the raw key value.
+         *
+         * **NOTE:** `String` is immutable and thus cannot be back-filled after
+         * use. One should prefer using [base32Chars] instead.
+         *
+         * @see [base32Chars]
+         *
+         * @throws [IllegalStateException] If [isDestroyed] is `true`.
          * */
         public fun base32(): String
 
         /**
-         * TODO
+         * Returns a Base64 (no padding) encoded `String` of the raw key value.
+         *
+         * **NOTE:** `String` is immutable and thus cannot be back-filled after
+         * use. One should prefer using [base32Chars] instead.
+         *
+         * @see [base64Chars]
+         *
+         * @throws [IllegalStateException] If [isDestroyed] is `true`.
          * */
         public fun base64(): String
 
         /**
-         * TODO
+         * Returns a Base16 (uppercase) encoded `CharArray` of the raw key value.
+         *
+         * @see [base16]
+         *
+         * @throws [IllegalStateException] If [isDestroyed] is `true`.
          * */
         public fun base16Chars(): CharArray
 
         /**
-         * TODO
+         * Returns a Base32 (uppercase & no padding) encoded `CharArray` of the raw key value.
+         *
+         * @see [base32]
+         *
+         * @throws [IllegalStateException] If [isDestroyed] is `true`.
          * */
         public fun base32Chars(): CharArray
 
         /**
-         * TODO
+         * Returns a Base64 (no padding) encoded `CharArray` of the raw key value.
+         *
+         * @see [base64]
+         *
+         * @throws [IllegalStateException] If [isDestroyed] is `true`.
          * */
         public fun base64Chars(): CharArray
 
