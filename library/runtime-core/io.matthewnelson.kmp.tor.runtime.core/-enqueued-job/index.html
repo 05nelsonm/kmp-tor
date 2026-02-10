@@ -1,22 +1,22 @@
 <!doctype html>
-<html class="no-js">
+<html class="no-js" lang="en">
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1" charset="UTF-8">
     <title>EnqueuedJob</title>
-<link href="../../../../images/logo-icon.svg" rel="icon" type="image/svg">    <script>var pathToRoot = "../../../../";</script>
-    <script>document.documentElement.classList.replace("no-js","js");</script>
+<link href="../../../../images/logo-icon.svg" rel="icon" type="image/svg"><script>var pathToRoot = "../../../../";</script>
+    <script>document.documentElement.classList.replace("no-js", "js");</script>
     <script>const storage = localStorage.getItem("dokka-dark-mode")
-    if (storage == null) {
+      if (storage == null) {
         const osDarkSchemePreferred = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
         if (osDarkSchemePreferred === true) {
-            document.getElementsByTagName("html")[0].classList.add("theme-dark")
+          document.getElementsByTagName("html")[0].classList.add("theme-dark")
         }
-    } else {
+      } else {
         const savedDarkMode = JSON.parse(storage)
-        if(savedDarkMode === true) {
-            document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        if (savedDarkMode === true) {
+          document.getElementsByTagName("html")[0].classList.add("theme-dark")
         }
-    }
+      }
     </script>
 <script type="text/javascript" src="https://unpkg.com/kotlin-playground@1/dist/playground.min.js" async></script>
 <script type="text/javascript" src="../../../../scripts/sourceset_dependencies.js" async></script>
@@ -24,33 +24,31 @@
 <link href="../../../../styles/main.css" rel="Stylesheet">
 <link href="../../../../styles/prism.css" rel="Stylesheet">
 <link href="../../../../styles/logo-styles.css" rel="Stylesheet">
-<link href="../../../../styles/font-jb-sans-auto.css" rel="Stylesheet">
 <link href="../../../../ui-kit/ui-kit.min.css" rel="Stylesheet">
-<script type="text/javascript" src="../../../../scripts/clipboard.js" async></script>
+<script type="text/javascript" src="../../../../scripts/safe-local-storage_blocking.js"></script>
 <script type="text/javascript" src="../../../../scripts/navigation-loader.js" async></script>
 <script type="text/javascript" src="../../../../scripts/platform-content-handler.js" async></script>
 <script type="text/javascript" src="../../../../scripts/main.js" defer></script>
 <script type="text/javascript" src="../../../../scripts/prism.js" async></script>
-<script type="text/javascript" src="../../../../ui-kit/ui-kit.min.js" defer></script>
-<script type="text/javascript" src="../../../../scripts/symbol-parameters-wrapper_deferred.js" defer></script></head>
+<script type="text/javascript" src="../../../../ui-kit/ui-kit.min.js" defer></script></head>
 <body>
-    <div class="root">
-    <nav class="navigation theme-dark" id="navigation-wrapper">
-<a class="library-name--link" href="../../../../index.html">
+<div class="root">
+    <header class="navigation theme-dark" id="navigation-wrapper" role="banner">
+<a class="library-name--link" href="../../../../index.html" tabindex="1">
                     kmp-tor
             </a>        <button class="navigation-controls--btn navigation-controls--btn_toc ui-kit_mobile-only" id="toc-toggle" type="button">Toggle table of contents
         </button>
         <div class="navigation-controls--break ui-kit_mobile-only"></div>
-        <div class="library-version" id="library-version">2.5.0
+        <div class="library-version" id="library-version">2.6.0
         </div>
         <div class="navigation-controls">
-        <div class="filter-section filter-section_loading" id="filter-section">
-                <button class="platform-tag platform-selector common-like" data-active="" data-filter=":library:runtime-core/commonMain">common</button>
+        <ul class="filter-section filter-section_loading" id="filter-section" aria-label="Target filter">
+                <button class="platform-tag platform-selector common-like" data-active="" aria-pressed="true" data-filter=":library:runtime-core/commonMain">common</button>
             <div class="dropdown filter-section--dropdown" data-role="dropdown" id="filter-section-dropdown">
                 <button class="button button_dropdown filter-section--dropdown-toggle" role="combobox" data-role="dropdown-toggle" aria-controls="platform-tags-listbox" aria-haspopup="listbox" aria-expanded="false" aria-label="Toggle source sets"></button>
-                <ul role="listbox" id="platform-tags-listbox" class="dropdown--list" data-role="dropdown-listbox">
-                    <div class="dropdown--header"><span>Platform filter</span>
-                        <button class="button" data-role="dropdown-toggle" aria-label="Close platform filter">
+                <ul role="listbox" id="platform-tags-listbox" class="dropdown--list" data-role="dropdown-listbox" aria-label="Target filter">
+                    <div class="dropdown--header"><span>Target filter</span>
+                        <button class="button" data-role="dropdown-toggle" aria-label="Close target filter">
                             <i class="ui-kit-icon ui-kit-icon_cross"></i>
                         </button>
                     </div>
@@ -64,45 +62,47 @@
                 </ul>
                 <div class="dropdown--overlay"></div>
             </div>
-        </div>
+        </ul>
             <button class="navigation-controls--btn navigation-controls--btn_theme" id="theme-toggle-button" type="button">Switch theme
             </button>
             <div class="navigation-controls--btn navigation-controls--btn_search" id="searchBar" role="button">Search in
                 API
             </div>
         </div>
-    </nav>
-        <div id="container">
-            <div class="sidebar" id="leftColumn">
-                <div class="dropdown theme-dark_mobile" data-role="dropdown" id="toc-dropdown">
-                    <ul role="listbox" id="toc-listbox" class="dropdown--list dropdown--list_toc-list" data-role="dropdown-listbox">
-                        <div class="dropdown--header">
+    </header>
+    <div id="container">
+        <nav id="leftColumn" class="sidebar" data-item-type="SECTION" data-item-config="{&quot;defaultSize&quot;: 280, &quot;minSize&quot;: 200, &quot;maxSize&quot;: 400}">
+            <a class="toc--skip-link" href="#main">Skip to content</a>
+            <div class="dropdown theme-dark_mobile" data-role="dropdown" id="toc-dropdown">
+                <ul role="listbox" id="toc-listbox" class="dropdown--list dropdown--list_toc-list" data-role="dropdown-listbox" aria-label="Table of contents">
+                    <div class="dropdown--header">
                             <span>
                                     kmp-tor
                             </span>
-                            <button class="button" data-role="dropdown-toggle" aria-label="Close table of contents">
-                                <i class="ui-kit-icon ui-kit-icon_cross"></i>
-                            </button>
-                        </div>
-                        <div class="sidebar--inner" id="sideMenu"></div>
-                    </ul>
-                    <div class="dropdown--overlay"></div>
-                </div>
+                        <button class="button" data-role="dropdown-toggle" aria-label="Close table of contents">
+                            <i class="ui-kit-icon ui-kit-icon_cross"></i>
+                        </button>
+                    </div>
+                    <div class="sidebar--inner" id="sideMenu"></div>
+                </ul>
+                <div class="dropdown--overlay"></div>
             </div>
-            <div id="main">
+        </nav>
+        <div id="resizer" class="resizer" data-item-type="BAR"></div>
+        <div id="main" data-item-type="SECTION" role="main">
 <div class="main-content" data-page-type="classlike" id="content" pageids="runtime-core::io.matthewnelson.kmp.tor.runtime.core/EnqueuedJob///PointingToDeclaration//1051389726">
   <div class="breadcrumbs"><a href="../../index.html">runtime-core</a><span class="delimiter">/</span><a href="../index.html">io.matthewnelson.kmp.tor.runtime.core</a><span class="delimiter">/</span><span class="current">EnqueuedJob</span></div>
   <div class="cover ">
     <h1 class="cover"><span>Enqueued</span><wbr><span><span>Job</span></span></h1>
-    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":library:runtime-core/commonMain"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword">class </span><a href="index.html">EnqueuedJob</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter "><span class="token keyword">val </span>name<span class="token operator">: </span><span data-unresolved-link="kotlin/String///PointingToDeclaration/">String</span><span class="token punctuation">, </span></span><span class="parameter ">onFailure<span class="token operator">: </span><a href="../-on-failure/index.html">OnFailure</a><span class="token punctuation">, </span></span><span class="parameter ">handler<span class="token operator">: </span><a href="../-uncaught-exception/-handler/index.html">UncaughtException.Handler</a></span></span><span class="token punctuation">)</span><span class="clearfix"><span class="floating-right">(<a href="https://github.com/05nelsonm/kmp-tor/tree/master/library/runtime-core/src/commonMain/kotlin/io/matthewnelson/kmp/tor/runtime/core/EnqueuedJob.kt#L48">source</a>)</span></span></div><p class="paragraph">Base abstraction for single-use model that tracks the state of a queue-able job. Once completed, either successfully or by cancellation/error, the <a href="index.html">EnqueuedJob</a> is dead and should be discarded.</p><p class="paragraph">Heavily inspired by <span data-unresolved-link="kotlinx.coroutines/Job///PointingToDeclaration/">kotlinx.coroutines.Job</span></p><h4 class="">See also</h4><div class="table"><div class="table-row" data-filterable-current=":library:runtime-core/commonMain" data-filterable-set=":library:runtime-core/commonMain"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="-companion/to-immediate-error-job.html"><span>Enqueued</span><wbr><span>Job.</span><wbr><span>Companion.</span><wbr><span>to</span><wbr><span>Immediate</span><wbr><span>Error</span><wbr><span><span>Job</span></span></a></div></span></div><div></div></div></div><div class="table-row" data-filterable-current=":library:runtime-core/commonMain" data-filterable-set=":library:runtime-core/commonMain"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="-companion/to-immediate-success-job.html"><span>Enqueued</span><wbr><span>Job.</span><wbr><span>Companion.</span><wbr><span>to</span><wbr><span>Immediate</span><wbr><span>Success</span><wbr><span><span>Job</span></span></a></div></span></div><div></div></div></div></div></div></div>
+    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":library:runtime-core/commonMain"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword">class </span><a href="index.html">EnqueuedJob</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter "><span class="token keyword">val </span>name<span class="token operator">: </span><span data-unresolved-link="kotlin/String///PointingToDeclaration/">String</span><span class="token punctuation">, </span></span><span class="parameter ">onFailure<span class="token operator">: </span><a href="../-on-failure/index.html">OnFailure</a><span class="token punctuation">, </span></span><span class="parameter ">handler<span class="token operator">: </span><a href="../-uncaught-exception/-handler/index.html">UncaughtException.Handler</a></span></span><span class="token punctuation">)</span><span class="source-link-wrapper"><span class="source-link" data-element-type="source-link">(<a href="https://github.com/05nelsonm/kmp-tor/tree/master/library/runtime-core/src/commonMain/kotlin/io/matthewnelson/kmp/tor/runtime/core/EnqueuedJob.kt#L48">source</a>)</span></span></div><p class="paragraph">Base abstraction for single-use model that tracks the state of a queue-able job. Once completed, either successfully or by cancellation/error, the <a href="index.html">EnqueuedJob</a> is dead and should be discarded.</p><p class="paragraph">Heavily inspired by <span data-unresolved-link="kotlinx.coroutines/Job///PointingToDeclaration/">kotlinx.coroutines.Job</span></p><h4 class="tableheader">See also</h4><div class="table"><div class="table-row table-row_content" data-filterable-current=":library:runtime-core/commonMain" data-filterable-set=":library:runtime-core/commonMain"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="-companion/to-immediate-error-job.html"><span>Enqueued</span><wbr><span>Job.</span><wbr><span>Companion.</span><wbr><span>to</span><wbr><span>Immediate</span><wbr><span>Error</span><wbr><span><span>Job</span></span></a></div></span></div><div></div></div></div><div class="table-row table-row_content" data-filterable-current=":library:runtime-core/commonMain" data-filterable-set=":library:runtime-core/commonMain"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="-companion/to-immediate-success-job.html"><span>Enqueued</span><wbr><span>Job.</span><wbr><span>Companion.</span><wbr><span>to</span><wbr><span>Immediate</span><wbr><span>Success</span><wbr><span><span>Job</span></span></a></div></span></div><div></div></div></div></div></div></div>
   </div>
   <div class="tabbedcontent">
     <div class="tabs-section" tabs-section="tabs-section"><button class="section-tab" data-active="" data-togglable="CONSTRUCTOR,TYPE,PROPERTY,FUNCTION">Members</button></div>
     <div class="tabs-section-body">
       <div data-togglable="CONSTRUCTOR">
-        <h2 class="">Constructors</h2>
+        <h2 class="tableheader">Constructors</h2>
         <div class="table"><a data-name="1689465901%2FConstructors%2F1051389726" anchor-label="EnqueuedJob" id="1689465901%2FConstructors%2F1051389726" data-filterable-set=":library:runtime-core/commonMain"></a>
-          <div class="table-row" data-togglable="CONSTRUCTOR" data-filterable-current=":library:runtime-core/commonMain" data-filterable-set=":library:runtime-core/commonMain">
+          <div class="table-row table-row_content" data-togglable="CONSTRUCTOR" data-filterable-current=":library:runtime-core/commonMain" data-filterable-set=":library:runtime-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-enqueued-job.html"><span>Enqueued</span><wbr><span><span>Job</span></span></a></div>
@@ -119,9 +119,9 @@
         </div>
       </div>
       <div data-togglable="TYPE">
-        <h2 class="">Types</h2>
+        <h2 class="tableheader">Types</h2>
         <div class="table"><a data-name="168648066%2FClasslikes%2F1051389726" anchor-label="Companion" id="168648066%2FClasslikes%2F1051389726" data-filterable-set=":library:runtime-core/commonMain"></a>
-          <div class="table-row" data-filterable-current=":library:runtime-core/commonMain" data-filterable-set=":library:runtime-core/commonMain">
+          <div class="table-row table-row_content" data-filterable-current=":library:runtime-core/commonMain" data-filterable-set=":library:runtime-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-companion/index.html"><span><span>Companion</span></span></a></div>
@@ -136,7 +136,7 @@
             </div>
           </div>
 <a data-name="1888674340%2FClasslikes%2F1051389726" anchor-label="ExecutionPolicy" id="1888674340%2FClasslikes%2F1051389726" data-filterable-set=":library:runtime-core/commonMain"></a>
-          <div class="table-row" data-filterable-current=":library:runtime-core/commonMain" data-filterable-set=":library:runtime-core/commonMain">
+          <div class="table-row table-row_content" data-filterable-current=":library:runtime-core/commonMain" data-filterable-set=":library:runtime-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-execution-policy/index.html"><span>Execution</span><wbr><span><span>Policy</span></span></a></div>
@@ -151,7 +151,7 @@
             </div>
           </div>
 <a data-name="-1461009891%2FClasslikes%2F1051389726" anchor-label="State" id="-1461009891%2FClasslikes%2F1051389726" data-filterable-set=":library:runtime-core/commonMain"></a>
-          <div class="table-row" data-filterable-current=":library:runtime-core/commonMain" data-filterable-set=":library:runtime-core/commonMain">
+          <div class="table-row table-row_content" data-filterable-current=":library:runtime-core/commonMain" data-filterable-set=":library:runtime-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-state/index.html"><span><span>State</span></span></a></div>
@@ -168,9 +168,9 @@
         </div>
       </div>
       <div data-togglable="PROPERTY">
-        <h2 class="">Properties</h2>
+        <h2 class="tableheader">Properties</h2>
         <div class="table"><a data-name="283014801%2FProperties%2F1051389726" anchor-label="executionPolicy" id="283014801%2FProperties%2F1051389726" data-filterable-set=":library:runtime-core/commonMain"></a>
-          <div class="table-row" data-filterable-current=":library:runtime-core/commonMain" data-filterable-set=":library:runtime-core/commonMain">
+          <div class="table-row table-row_content" data-filterable-current=":library:runtime-core/commonMain" data-filterable-set=":library:runtime-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="execution-policy.html"><span>execution</span><wbr><span><span>Policy</span></span></a></div>
@@ -185,7 +185,7 @@
             </div>
           </div>
 <a data-name="-262812497%2FProperties%2F1051389726" anchor-label="isActive" id="-262812497%2FProperties%2F1051389726" data-filterable-set=":library:runtime-core/commonMain"></a>
-          <div class="table-row" data-filterable-current=":library:runtime-core/commonMain" data-filterable-set=":library:runtime-core/commonMain">
+          <div class="table-row table-row_content" data-filterable-current=":library:runtime-core/commonMain" data-filterable-set=":library:runtime-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="is-active.html"><span>is</span><wbr><span><span>Active</span></span></a></div>
@@ -200,7 +200,7 @@
             </div>
           </div>
 <a data-name="1089955668%2FProperties%2F1051389726" anchor-label="isCancelled" id="1089955668%2FProperties%2F1051389726" data-filterable-set=":library:runtime-core/commonMain"></a>
-          <div class="table-row" data-filterable-current=":library:runtime-core/commonMain" data-filterable-set=":library:runtime-core/commonMain">
+          <div class="table-row table-row_content" data-filterable-current=":library:runtime-core/commonMain" data-filterable-set=":library:runtime-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="is-cancelled.html"><span>is</span><wbr><span><span>Cancelled</span></span></a></div>
@@ -215,7 +215,7 @@
             </div>
           </div>
 <a data-name="-1039420929%2FProperties%2F1051389726" anchor-label="isCompleting" id="-1039420929%2FProperties%2F1051389726" data-filterable-set=":library:runtime-core/commonMain"></a>
-          <div class="table-row" data-filterable-current=":library:runtime-core/commonMain" data-filterable-set=":library:runtime-core/commonMain">
+          <div class="table-row table-row_content" data-filterable-current=":library:runtime-core/commonMain" data-filterable-set=":library:runtime-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="is-completing.html"><span>is</span><wbr><span><span>Completing</span></span></a></div>
@@ -230,7 +230,7 @@
             </div>
           </div>
 <a data-name="-1182183811%2FProperties%2F1051389726" anchor-label="isError" id="-1182183811%2FProperties%2F1051389726" data-filterable-set=":library:runtime-core/commonMain"></a>
-          <div class="table-row" data-filterable-current=":library:runtime-core/commonMain" data-filterable-set=":library:runtime-core/commonMain">
+          <div class="table-row table-row_content" data-filterable-current=":library:runtime-core/commonMain" data-filterable-set=":library:runtime-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="is-error.html"><span>is</span><wbr><span><span>Error</span></span></a></div>
@@ -245,7 +245,7 @@
             </div>
           </div>
 <a data-name="-1531433246%2FProperties%2F1051389726" anchor-label="isSuccess" id="-1531433246%2FProperties%2F1051389726" data-filterable-set=":library:runtime-core/commonMain"></a>
-          <div class="table-row" data-filterable-current=":library:runtime-core/commonMain" data-filterable-set=":library:runtime-core/commonMain">
+          <div class="table-row table-row_content" data-filterable-current=":library:runtime-core/commonMain" data-filterable-set=":library:runtime-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="is-success.html"><span>is</span><wbr><span><span>Success</span></span></a></div>
@@ -260,7 +260,7 @@
             </div>
           </div>
 <a data-name="637324372%2FProperties%2F1051389726" anchor-label="name" id="637324372%2FProperties%2F1051389726" data-filterable-set=":library:runtime-core/commonMain"></a>
-          <div class="table-row" data-filterable-current=":library:runtime-core/commonMain" data-filterable-set=":library:runtime-core/commonMain">
+          <div class="table-row table-row_content" data-filterable-current=":library:runtime-core/commonMain" data-filterable-set=":library:runtime-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="name.html"><span><span>name</span></span></a></div>
@@ -275,7 +275,7 @@
             </div>
           </div>
 <a data-name="55987146%2FProperties%2F1051389726" anchor-label="state" id="55987146%2FProperties%2F1051389726" data-filterable-set=":library:runtime-core/commonMain"></a>
-          <div class="table-row" data-filterable-current=":library:runtime-core/commonMain" data-filterable-set=":library:runtime-core/commonMain">
+          <div class="table-row table-row_content" data-filterable-current=":library:runtime-core/commonMain" data-filterable-set=":library:runtime-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="state.html"><span><span>state</span></span></a></div>
@@ -292,9 +292,9 @@
         </div>
       </div>
       <div data-togglable="FUNCTION">
-        <h2 class="">Functions</h2>
+        <h2 class="tableheader">Functions</h2>
         <div class="table"><a data-name="-513177211%2FFunctions%2F1051389726" anchor-label="cancel" id="-513177211%2FFunctions%2F1051389726" data-filterable-set=":library:runtime-core/commonMain"></a>
-          <div class="table-row" data-filterable-current=":library:runtime-core/commonMain" data-filterable-set=":library:runtime-core/commonMain">
+          <div class="table-row table-row_content" data-filterable-current=":library:runtime-core/commonMain" data-filterable-set=":library:runtime-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="cancel.html"><span><span>cancel</span></span></a></div>
@@ -309,7 +309,7 @@
             </div>
           </div>
 <a data-name="-874429007%2FFunctions%2F1051389726" anchor-label="cancellationAttempt" id="-874429007%2FFunctions%2F1051389726" data-filterable-set=":library:runtime-core/commonMain"></a>
-          <div class="table-row" data-filterable-current=":library:runtime-core/commonMain" data-filterable-set=":library:runtime-core/commonMain">
+          <div class="table-row table-row_content" data-filterable-current=":library:runtime-core/commonMain" data-filterable-set=":library:runtime-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="cancellation-attempt.html"><span>cancellation</span><wbr><span><span>Attempt</span></span></a></div>
@@ -324,7 +324,7 @@
             </div>
           </div>
 <a data-name="-452380001%2FFunctions%2F1051389726" anchor-label="invokeOnCompletion" id="-452380001%2FFunctions%2F1051389726" data-filterable-set=":library:runtime-core/commonMain"></a>
-          <div class="table-row" data-filterable-current=":library:runtime-core/commonMain" data-filterable-set=":library:runtime-core/commonMain">
+          <div class="table-row table-row_content" data-filterable-current=":library:runtime-core/commonMain" data-filterable-set=":library:runtime-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="invoke-on-completion.html"><span>invoke</span><wbr><span>On</span><wbr><span><span>Completion</span></span></a></div>
@@ -339,7 +339,7 @@
             </div>
           </div>
 <a data-name="-1182194803%2FFunctions%2F1051389726" anchor-label="onCancellation" id="-1182194803%2FFunctions%2F1051389726" data-filterable-set=":library:runtime-core/commonMain"></a>
-          <div class="table-row" data-filterable-current=":library:runtime-core/commonMain" data-filterable-set=":library:runtime-core/commonMain">
+          <div class="table-row table-row_content" data-filterable-current=":library:runtime-core/commonMain" data-filterable-set=":library:runtime-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="on-cancellation.html"><span>on</span><wbr><span><span>Cancellation</span></span></a></div>
@@ -354,7 +354,7 @@
             </div>
           </div>
 <a data-name="-812163117%2FFunctions%2F1051389726" anchor-label="onCompletion" id="-812163117%2FFunctions%2F1051389726" data-filterable-set=":library:runtime-core/commonMain"></a>
-          <div class="table-row" data-filterable-current=":library:runtime-core/commonMain" data-filterable-set=":library:runtime-core/commonMain">
+          <div class="table-row table-row_content" data-filterable-current=":library:runtime-core/commonMain" data-filterable-set=":library:runtime-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="on-completion.html"><span>on</span><wbr><span><span>Completion</span></span></a></div>
@@ -369,7 +369,7 @@
             </div>
           </div>
 <a data-name="-423335421%2FFunctions%2F1051389726" anchor-label="onError" id="-423335421%2FFunctions%2F1051389726" data-filterable-set=":library:runtime-core/commonMain"></a>
-          <div class="table-row" data-filterable-current=":library:runtime-core/commonMain" data-filterable-set=":library:runtime-core/commonMain">
+          <div class="table-row table-row_content" data-filterable-current=":library:runtime-core/commonMain" data-filterable-set=":library:runtime-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="on-error.html"><span>on</span><wbr><span><span>Error</span></span></a></div>
@@ -384,7 +384,7 @@
             </div>
           </div>
 <a data-name="-2090696632%2FFunctions%2F1051389726" anchor-label="onExecuting" id="-2090696632%2FFunctions%2F1051389726" data-filterable-set=":library:runtime-core/commonMain"></a>
-          <div class="table-row" data-filterable-current=":library:runtime-core/commonMain" data-filterable-set=":library:runtime-core/commonMain">
+          <div class="table-row table-row_content" data-filterable-current=":library:runtime-core/commonMain" data-filterable-set=":library:runtime-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="on-executing.html"><span>on</span><wbr><span><span>Executing</span></span></a></div>
@@ -404,17 +404,21 @@
   </div>
 </div>
     <div class="footer">
-        <a href="#content" id="go-to-top-link" class="footer--button footer--button_go-to-top"></a>
-        <span>© 2021-2025 Copyright Matthew Nelson</span>
-        <span class="pull-right">
-            <span>Generated by </span>
-            <a class="footer--link footer--link_external" href="https://github.com/Kotlin/dokka">
-                <span>dokka</span>
-            </a>
-        </span>
-    </div>
+        <div class="footer--container">
+            <a href="#content" id="go-to-top-link" class="footer--button footer--button_go-to-top"></a>
+            <div class="footer--content">
+                <div>
+                    <span>Generated by </span>
+                    <a class="footer--link footer--link_external" href="https://github.com/Kotlin/dokka">
+                        Dokka
+                    </a>
+                    <div>© 2021-2026 Copyright Matthew Nelson</div>
+                </div>
             </div>
         </div>
     </div>
+        </div>
+    </div>
+</div>
 </body>
 </html>

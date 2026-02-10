@@ -1,8 +1,10 @@
 $dokka.format:html-v1
 $dokka.linkExtension:html
-$dokka.location:io.matthewnelson.kmp.tor.runtime/Action/entries/#/PointingToDeclaration/runtime/io.matthewnelson.kmp.tor.runtime/-action/[non-js]entries.html
-$dokka.location:io.matthewnelson.kmp.tor.runtime/Action/valueOf/#kotlin.String/PointingToDeclaration/runtime/io.matthewnelson.kmp.tor.runtime/-action/[non-js]value-of.html
-$dokka.location:io.matthewnelson.kmp.tor.runtime/Action/values/#/PointingToDeclaration/runtime/io.matthewnelson.kmp.tor.runtime/-action/[non-js]values.html
+$dokka.location:io.matthewnelson.kmp.tor.runtime.core.key/Key.Private/isDestroyed/#/PointingToDeclaration/runtime-core/io.matthewnelson.kmp.tor.runtime.core.key/-key/-private/[jvm]is-destroyed.html
+$dokka.location:io.matthewnelson.kmp.tor.runtime.core.key/Key/algorithm/#/PointingToDeclaration/runtime-core/io.matthewnelson.kmp.tor.runtime.core.key/-key/[jvm]algorithm.html
+$dokka.location:io.matthewnelson.kmp.tor.runtime/Action/entries/#/PointingToDeclaration/runtime/io.matthewnelson.kmp.tor.runtime/-action/[]entries.html
+$dokka.location:io.matthewnelson.kmp.tor.runtime/Action/valueOf/#kotlin.String/PointingToDeclaration/runtime/io.matthewnelson.kmp.tor.runtime/-action/[]value-of.html
+$dokka.location:io.matthewnelson.kmp.tor.runtime/Action/values/#/PointingToDeclaration/runtime/io.matthewnelson.kmp.tor.runtime/-action/[]values.html
 module:library/runtime
 io.matthewnelson.kmp.tor.runtime
 module:library/runtime-core
