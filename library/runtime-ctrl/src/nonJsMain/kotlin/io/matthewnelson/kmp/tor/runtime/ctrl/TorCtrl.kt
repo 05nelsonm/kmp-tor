@@ -240,17 +240,17 @@ public actual interface TorCtrl : Destroyable, TorEvent.Processor, TorCmd.Privil
             val connection = try {
                 connect(dispatcher)
             } catch (t: Throwable) {
-                dispatcher.close()
+                dispatcher.destroy()
                 if (t is CancellationException) throw t
                 throw t.wrapIOException()
             }
 
-            val close = Executable.Once.of(concurrent = true) { dispatcher.close() }
+            val close = Executable.Once.of(concurrent = true) { dispatcher.destroy() }
 
             return RealTorCtrl.of(this, dispatcher, connection, closeDispatcher = { LOG ->
                 try {
                     @OptIn(DelicateCoroutinesApi::class)
-                    GlobalScope.launch(Dispatchers.IO) {
+                    GlobalScope.launch(Dispatchers.IO, start = CoroutineStart.ATOMIC) {
                         try {
                             delay(250.milliseconds)
                         } finally {

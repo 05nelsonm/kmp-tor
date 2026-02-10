@@ -13,17 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
+@file:Suppress("NOTHING_TO_INLINE")
+
 package io.matthewnelson.kmp.tor.runtime.ctrl.internal
 
 import io.matthewnelson.kmp.file.File
 import io.matthewnelson.kmp.process.ReadBuffer
 import io.matthewnelson.kmp.tor.runtime.core.net.IPSocketAddress
 import io.matthewnelson.kmp.tor.runtime.ctrl.TorCtrl
-import kotlinx.coroutines.CloseableCoroutineDispatcher
-import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.CoroutineDispatcher
 
-@OptIn(ExperimentalCoroutinesApi::class)
-internal expect fun TorCtrl.Factory.newTorCtrlDispatcher(): CloseableCoroutineDispatcher
+internal expect fun TorCtrl.Factory.newTorCtrlDispatcher(): CoroutineDispatcher
+
+internal expect inline fun CoroutineDispatcher.destroy()
 
 @Throws(Throwable::class)
 internal expect fun IPSocketAddress.connect(): CtrlConnection

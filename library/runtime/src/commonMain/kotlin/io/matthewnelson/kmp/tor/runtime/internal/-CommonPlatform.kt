@@ -17,9 +17,5 @@ package io.matthewnelson.kmp.tor.runtime.internal
 
 import io.matthewnelson.kmp.tor.runtime.TorRuntime
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.delay
-import kotlin.time.Duration
-import kotlin.time.TimeSource
 
-@Suppress("NOTHING_TO_INLINE")
-internal expect inline fun TorRuntime.Environment.newRuntimeDispatcher(): CoroutineDispatcher
+internal expect fun TorRuntime.Environment.newRuntimeDispatcher(): CoroutineDispatcher
