@@ -23,17 +23,3 @@ import kotlin.time.TimeSource
 
 @Suppress("NOTHING_TO_INLINE")
 internal expect inline fun TorRuntime.Environment.newRuntimeDispatcher(): CoroutineDispatcher
-
-// No matter the Delay implementation (Coroutines Test library)
-// Will delay the specified duration using a TimeSource.
-internal suspend fun timedDelay(duration: Duration) {
-    if (duration <= Duration.ZERO) return
-
-    var remainder = duration
-    val start = TimeSource.Monotonic.markNow()
-
-    while (remainder > Duration.ZERO) {
-        delay(remainder)
-        remainder = duration - start.elapsedNow()
-    }
-}

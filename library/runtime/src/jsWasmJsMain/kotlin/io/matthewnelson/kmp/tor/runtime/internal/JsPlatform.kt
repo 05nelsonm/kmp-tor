@@ -21,4 +21,4 @@ import io.matthewnelson.kmp.tor.runtime.TorRuntime
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 
-internal actual inline fun TorRuntime.Environment.newRuntimeDispatcher(): CoroutineDispatcher = Dispatchers.Main
+internal actual inline fun TorRuntime.Environment.newRuntimeDispatcher(): CoroutineDispatcher = Dispatchers.Default

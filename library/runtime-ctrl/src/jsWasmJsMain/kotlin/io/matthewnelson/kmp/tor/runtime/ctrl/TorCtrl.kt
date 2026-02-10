@@ -152,7 +152,7 @@ public actual interface TorCtrl : Destroyable, TorEvent.Processor, TorCmd.Privil
          * */
         @Throws(CancellationException::class, IOException::class)
         public actual suspend fun connectAsync(address: IPSocketAddress): TorCtrl {
-            return withContext(Dispatchers.Main) { connect(address) }
+            return withContext(Dispatchers.Default) { connect(address) }
         }
 
         /**
@@ -166,7 +166,7 @@ public actual interface TorCtrl : Destroyable, TorEvent.Processor, TorCmd.Privil
         @Throws(CancellationException::class, IOException::class, UnsupportedOperationException::class)
         public actual suspend fun connectAsync(path: File): TorCtrl {
             val sanitized = path.sanitizeUnixSocketPath()
-            return withContext(Dispatchers.Main) { connect(sanitized) }
+            return withContext(Dispatchers.Default) { connect(sanitized) }
         }
 
         @Deprecated("Use primary constructor with parameter 'debug: TorCtrl.Debugger' defined instead. See TorCtrl.Debugger.asDebugger()")
@@ -388,7 +388,7 @@ public actual interface TorCtrl : Destroyable, TorEvent.Processor, TorCmd.Privil
                 }
             }
 
-            val ctrl = RealTorCtrl.of(this, Dispatchers.Main, connection, null)
+            val ctrl = RealTorCtrl.of(this, Dispatchers.Default, connection, null)
 
             // A slight delay is needed before returning in order
             // to ensure that the coroutine starts before able
