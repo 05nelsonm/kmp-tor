@@ -32,9 +32,9 @@ import io.matthewnelson.kmp.tor.runtime.core.config.TorOption
 import io.matthewnelson.kmp.tor.runtime.core.config.TorSetting.Companion.filterByOption
 import io.matthewnelson.kmp.tor.runtime.core.ctrl.TorCmd
 import io.matthewnelson.kmp.tor.runtime.ctrl.TorCmdInterceptor
-import io.matthewnelson.kmp.tor.runtime.internal.timedDelay
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlin.concurrent.Volatile
 import kotlin.jvm.JvmField
@@ -431,7 +431,7 @@ public class TorListeners private constructor(
             // Wait for all of them come in before notifying.
             _notifyJob?.cancel()
             _notifyJob = scope.launch {
-                timedDelay(notifyDelay)
+                delay(notifyDelay)
                 notify(new)
             }
         }

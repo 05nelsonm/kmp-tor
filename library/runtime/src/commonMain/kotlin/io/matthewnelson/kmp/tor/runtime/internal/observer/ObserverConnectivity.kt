@@ -29,7 +29,6 @@ import io.matthewnelson.kmp.tor.runtime.core.OnEvent
 import io.matthewnelson.kmp.tor.runtime.core.config.TorOption
 import io.matthewnelson.kmp.tor.runtime.core.ctrl.TorCmd
 import io.matthewnelson.kmp.tor.runtime.core.util.executeAsync
-import io.matthewnelson.kmp.tor.runtime.internal.timedDelay
 import kotlinx.coroutines.*
 import kotlin.concurrent.Volatile
 import kotlin.coroutines.cancellation.CancellationException
@@ -65,7 +64,7 @@ internal open class ObserverConnectivity internal constructor(
 
         _job?.cancel()
         _job = scope.launch {
-            timedDelay(executeDelay)
+            delay(executeDelay)
 
             val disabled = when (it) {
                 NetworkObserver.Connectivity.Connected -> false

@@ -72,7 +72,7 @@ internal class TorDaemon private constructor(
     private val _toString by lazy { toFIDString(includeHashCode = true) }
 
     @Throws(Throwable::class)
-    private suspend fun <T: Any?> start(
+    private suspend fun <T> start(
         checkCancellationOrInterrupt: () -> Unit,
         connect: suspend CtrlArguments.() -> T
     ): T = state.lock.withLock {
@@ -287,7 +287,7 @@ internal class TorDaemon private constructor(
         controlPortFile: File,
         checkCancellationOrInterrupt: () -> Unit,
     ): CtrlArguments.Connection {
-        timedDelay(100.milliseconds)
+        delay(100.milliseconds)
 
         val lines = controlPortFile
             .awaitRead(10.seconds, checkCancellationOrInterrupt)
@@ -374,7 +374,7 @@ internal class TorDaemon private constructor(
                 NOTIFIER.d(this@TorDaemon, "Waiting for tor to write to $name")
             }
 
-            timedDelay(50.milliseconds)
+            delay(50.milliseconds)
 
             checkCancellationOrInterrupt()
 
@@ -388,7 +388,7 @@ internal class TorDaemon private constructor(
         throw IOException("$TIMED_OUT after ${timeout.inWholeMilliseconds}ms waiting for tor to write to file[$name]")
     }
 
-    public override fun toString(): String = _toString
+    override fun toString(): String = _toString
 
     private class StartArgs private constructor(val cmdLine: List<String>, val load: TorCmd.Config.Load) {
 

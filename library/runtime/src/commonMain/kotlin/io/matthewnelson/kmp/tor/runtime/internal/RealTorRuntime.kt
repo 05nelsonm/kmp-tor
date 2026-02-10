@@ -19,6 +19,7 @@ package io.matthewnelson.kmp.tor.runtime.internal
 
 import io.matthewnelson.immutable.collections.toImmutableSet
 import io.matthewnelson.kmp.file.InterruptedException
+import io.matthewnelson.kmp.file.InterruptedIOException
 import io.matthewnelson.kmp.tor.common.api.ExperimentalKmpTorApi
 import io.matthewnelson.kmp.tor.common.api.InternalKmpTorApi
 import io.matthewnelson.kmp.tor.common.core.synchronized
@@ -948,25 +949,13 @@ internal class RealTorRuntime private constructor(
                     _failure = t
                 }
 
-                // Wait for service startup
-                TimeSource.Monotonic.markNow().let { mark ->
-                    // Node.js uses Dispatchers.Main so the test coroutine
-                    // library will not wait an actual timeout. Make it so
-                    // there's a delay no matter what.
-                    val interval = 100.milliseconds
-
-                    while (isActive) {
-                        if (_failure != null) break
-                        if (_instance != null) break
-                        delay(interval)
-                        if (_instance != null) break
-                        if (mark.elapsedNow() < TIMEOUT_START_SERVICE) continue
-                        _failure = InterruptedException("${name.name} timed out after 1000ms")
-                    }
-                }
+                if (_failure == null) delay(TIMEOUT_START_SERVICE)
 
                 // Has been started
-                val failure = _failure ?: return@launch
+                val failure = _failure ?: run {
+                    if (_instance != null) return@launch
+                    InterruptedException("${name.name} timed out after ${TIMEOUT_START_SERVICE.inWholeMilliseconds}ms")
+                }
 
                 val executables = synchronized(lock) cancel@ {
                     val executables = ArrayList<Executable>(actionStack.size + 3)
