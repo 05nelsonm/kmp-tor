@@ -22,13 +22,15 @@ import io.matthewnelson.kmp.file.File
 import io.matthewnelson.kmp.file.FileAlreadyExistsException
 import io.matthewnelson.kmp.file.IOException
 import io.matthewnelson.kmp.file.InterruptedException
-import io.matthewnelson.kmp.file.chmod2
+import io.matthewnelson.kmp.file.async.AsyncFs
+import io.matthewnelson.kmp.file.async.chmod2
+import io.matthewnelson.kmp.file.async.delete2
+import io.matthewnelson.kmp.file.async.exists2
+import io.matthewnelson.kmp.file.async.mkdirs2
+import io.matthewnelson.kmp.file.async.readBytes
 import io.matthewnelson.kmp.file.delete2
-import io.matthewnelson.kmp.file.exists2
-import io.matthewnelson.kmp.file.mkdirs2
 import io.matthewnelson.kmp.file.name
 import io.matthewnelson.kmp.file.path
-import io.matthewnelson.kmp.file.readBytes
 import io.matthewnelson.kmp.file.resolve
 import io.matthewnelson.kmp.file.toFile
 import io.matthewnelson.kmp.process.Process
@@ -119,8 +121,8 @@ internal class TorDaemon private constructor(
 
         // Delete any remnants from last start (if present)
         try {
-            controlPortFile.delete2(ignoreReadOnly = true)
-        } catch (_: IOException) {}
+            AsyncFs.Empty.delete2(controlPortFile, ignoreReadOnly = true)
+        } catch (_: Throwable) {}
 
         val torJob = startArgs.startTor(checkCancellationOrInterrupt)
 
@@ -210,7 +212,7 @@ internal class TorDaemon private constructor(
                     process = loader.process(TorBinder) { tor, configureEnv ->
                         Process.Builder(command = tor.path)
                             .args(cmdLine)
-                            // TODO: .async
+                            .async(AsyncFs.Empty.ctx)
                             .environment(configureEnv)
                             .environment("HOME", generator.environment.workDirectory.path)
                             .stdin(Stdio.Null)
@@ -248,11 +250,11 @@ internal class TorDaemon private constructor(
             NOTIFIER.i(this@TorDaemon, process.toString())
         }
 
-        // If scope is cancelled when we go to launch
+        // If scope is canceled when we go to launch
         // the coroutine and await exit, it won't trigger
         // the try/finally block. So, this single callback
         // allows to ensure it is executed either within
-        // the non-cancelled job, or via invokeOnCompletion
+        // the non-canceled job, or via invokeOnCompletion
         // handler (immediately upon handle being set).
         val finalize = Executable.Once.of(concurrent = true, executable = {
             try {
@@ -306,7 +308,7 @@ internal class TorDaemon private constructor(
             // UNIX_PORT=/tmp/kmp_tor_ctrl/data/ctrl.sock
             if (line.startsWith("UNIX_PORT")) {
                 val file = argument.toFile()
-                if (!file.exists2()) continue
+                if (!AsyncFs.Empty.exists2(file)) continue
 
                 // Prefer UnixDomainSocket if present
                 return CtrlArguments.Connection(file)
@@ -358,7 +360,7 @@ internal class TorDaemon private constructor(
         while (true) {
             // Ensure that stdout is flowing, otherwise wait until it is.
             val content = try {
-                readBytes()
+                AsyncFs.Empty.readBytes(this)
             } catch (_: IOException) {
                 null
             }
@@ -394,8 +396,8 @@ internal class TorDaemon private constructor(
 
         companion object {
 
-            @Throws(IOException::class)
-            fun TorConfig.createStartArgs(env: TorRuntime.Environment): StartArgs {
+            @Throws(CancellationException::class, IOException::class)
+            suspend fun TorConfig.createStartArgs(env: TorRuntime.Environment): StartArgs {
                 val cmdLine = mutableListOf<String>().apply {
                     add("--quiet")
                     add("--torrc-file")
@@ -406,7 +408,7 @@ internal class TorDaemon private constructor(
                         val torrc = env.loader.resourceDir.resolve("__torrc")
                         add(torrc.path)
                         add("--ignore-missing-torrc")
-                        torrc.delete2(ignoreReadOnly = true)
+                        AsyncFs.Empty.delete2(torrc, ignoreReadOnly = true)
                     }
                 }
 
@@ -440,9 +442,9 @@ internal class TorDaemon private constructor(
 
                 directories.forEach { directory ->
                     try {
-                        directory.mkdirs2(mode = "700", mustCreate = true)
+                        AsyncFs.Empty.mkdirs2(directory, mode = "700", mustCreate = true)
                     } catch (_: FileAlreadyExistsException) {
-                        directory.chmod2(mode = "700")
+                        AsyncFs.Empty.chmod2(directory, mode = "700")
                     }
                 }
 
