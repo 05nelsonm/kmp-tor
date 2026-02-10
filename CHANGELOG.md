@@ -1,5 +1,20 @@
 # CHANGELOG
 
+## Version 2.6.0 (2026-02-10)
+ - Updates `kotlin` to `2.2.21` [[#613]][613]
+ - Updates `encoding` to `2.6.0` [[#613]][613]
+ - Updates `kmp-process` to `0.5.0` [[#613]][613]
+ - Updates `kmp-tor-common` to `2.4.2` [[#613]][613]
+ - Adds `TorOption.MaxHSDirCacheBytes` [[#617]][617]
+ - Adds `Key` encode APIs for returning `CharArray` [[#620]][620]
+ - Use `encoding:utf8` when converting `TorCmd` to bytes, instead of kotlin's UTF-8 encoder [[#618]][618]
+ - Ensure Unix Domain Socket path is checked for UTF-8 byte length, not String length [[#622]][622]
+ - Use `Dispatchers.Default` instead of `Dispatchers.Main` for Js [[#623]][623]
+ - Remove usage of `ExperimentalCoroutinesApi` by using platform specific `CoroutineDispatcher` 
+   instantiation methods [[#624]][624]
+ - Use `kmp-file:async` to interact with the filesystem via `AsyncFs`, instead of using blocking 
+   functions, whenever starting tor [[#625]][625]
+
 ## Version 2.5.0 (2025-09-19)
  - Updates `kotlin` to `2.2.20` [[#610]][610]
  - Updates `encoding` to `2.5.0` [[#610]][610]
@@ -631,6 +646,13 @@
 [610]: https://github.com/05nelsonm/kmp-tor/pull/610
 [611]: https://github.com/05nelsonm/kmp-tor/pull/611
 [612]: https://github.com/05nelsonm/kmp-tor/pull/612
+[613]: https://github.com/05nelsonm/kmp-tor/pull/613
+[617]: https://github.com/05nelsonm/kmp-tor/pull/617
+[618]: https://github.com/05nelsonm/kmp-tor/pull/618
+[622]: https://github.com/05nelsonm/kmp-tor/pull/622
+[623]: https://github.com/05nelsonm/kmp-tor/pull/623
+[624]: https://github.com/05nelsonm/kmp-tor/pull/624
+[625]: https://github.com/05nelsonm/kmp-tor/pull/625
 
 [kmp-tor-binary-66]: https://github.com/05nelsonm/kmp-tor-binary/issues/66
 [kmp-tor-binary-75]: https://github.com/05nelsonm/kmp-tor-binary/pull/75
