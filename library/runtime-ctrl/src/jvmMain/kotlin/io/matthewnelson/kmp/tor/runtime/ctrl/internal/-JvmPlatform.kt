@@ -13,6 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
+@file:Suppress("NOTHING_TO_INLINE")
+
 package io.matthewnelson.kmp.tor.runtime.ctrl.internal
 
 import io.matthewnelson.kmp.file.ANDROID
@@ -25,8 +27,8 @@ import io.matthewnelson.kmp.tor.runtime.core.Disposable
 import io.matthewnelson.kmp.tor.runtime.core.net.IPSocketAddress
 import io.matthewnelson.kmp.tor.runtime.core.util.toInetAddress
 import io.matthewnelson.kmp.tor.runtime.ctrl.TorCtrl
-import kotlinx.coroutines.CloseableCoroutineDispatcher
-import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.ExecutorCoroutineDispatcher
 import kotlinx.coroutines.asCoroutineDispatcher
 import java.io.InputStream
 import java.io.OutputStream
@@ -45,16 +47,26 @@ import java.util.concurrent.Executors
 import java.util.concurrent.atomic.AtomicLong
 import kotlin.concurrent.Volatile
 
-@OptIn(ExperimentalCoroutinesApi::class)
-internal actual fun TorCtrl.Factory.newTorCtrlDispatcher(): CloseableCoroutineDispatcher {
+private val TOR_CTRL_NO = AtomicLong(0L)
+
+internal actual fun TorCtrl.Factory.newTorCtrlDispatcher(): CoroutineDispatcher {
     val threadNo = AtomicLong()
-    val executor = Executors.newFixedThreadPool(2) { runnable ->
-        val t = Thread(runnable, "TorCtrl-${threadNo.incrementAndGet()}")
+    val torCtrlNo = TOR_CTRL_NO.incrementAndGet()
+    val executor = Executors.newScheduledThreadPool(2) { task ->
+        val t = Thread(task)
         t.isDaemon = true
+        t.name = "TorCtrl{$torCtrlNo}-${threadNo.incrementAndGet()}"
         t.priority = Thread.MAX_PRIORITY
         t
     }
-    return executor.asCoroutineDispatcher()
+    // Before making the Executor unconfigurable, want to ensure
+    // setRemoveOnCancelPolicy(true) is called (if possible).
+    executor.asCoroutineDispatcher()
+    return Executors.unconfigurableScheduledExecutorService(executor).asCoroutineDispatcher()
+}
+
+internal actual inline fun CoroutineDispatcher.destroy() {
+    (this as? ExecutorCoroutineDispatcher)?.close()
 }
 
 @Throws(Throwable::class)

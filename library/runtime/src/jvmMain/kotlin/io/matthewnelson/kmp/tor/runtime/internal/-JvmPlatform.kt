@@ -22,15 +22,18 @@ import kotlinx.coroutines.asCoroutineDispatcher
 import java.util.concurrent.Executors
 import java.util.concurrent.atomic.AtomicLong
 
-@Suppress("NOTHING_TO_INLINE")
-internal actual inline fun TorRuntime.Environment.newRuntimeDispatcher(): CoroutineDispatcher {
+internal actual fun TorRuntime.Environment.newRuntimeDispatcher(): CoroutineDispatcher {
     val threadNo = AtomicLong()
     val name = "Tor[$fidEllipses]"
-    val executor = Executors.newSingleThreadExecutor { runnable ->
-        val t = Thread(runnable, "$name-${threadNo.incrementAndGet()}")
+    val executor = Executors.newScheduledThreadPool(1) { task ->
+        val t = Thread(task)
         t.isDaemon = true
+        t.name = "$name-${threadNo.incrementAndGet()}"
         t.priority = Thread.MAX_PRIORITY
         t
     }
-    return executor.asCoroutineDispatcher()
+    // Before making the Executor unconfigurable, want to ensure
+    // setRemoveOnCancelPolicy(true) is called (if possible).
+    executor.asCoroutineDispatcher()
+    return Executors.unconfigurableScheduledExecutorService(executor).asCoroutineDispatcher()
 }

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-@file:Suppress("UnnecessaryOptInAnnotation")
+@file:Suppress("NOTHING_TO_INLINE")
 
 package io.matthewnelson.kmp.tor.runtime.ctrl.internal
 
@@ -27,14 +27,22 @@ import io.matthewnelson.kmp.tor.runtime.core.net.IPSocketAddress
 import io.matthewnelson.kmp.tor.runtime.ctrl.TorCtrl
 import kotlinx.cinterop.*
 import kotlinx.coroutines.CloseableCoroutineDispatcher
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.DelicateCoroutinesApi
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.newFixedThreadPoolContext
 import platform.posix.*
+import kotlin.concurrent.AtomicLong
 
-@OptIn(DelicateCoroutinesApi::class, ExperimentalCoroutinesApi::class)
-internal actual fun TorCtrl.Factory.newTorCtrlDispatcher(): CloseableCoroutineDispatcher {
-    return newFixedThreadPoolContext(2, "TorCtrl")
+private val TOR_CTRL_NO = AtomicLong(0L)
+
+@OptIn(DelicateCoroutinesApi::class)
+internal actual fun TorCtrl.Factory.newTorCtrlDispatcher(): CoroutineDispatcher {
+    val torCtrlNo = TOR_CTRL_NO.incrementAndGet()
+    return newFixedThreadPoolContext(2, "TorCtrl{$torCtrlNo}")
+}
+
+internal actual inline fun CoroutineDispatcher.destroy() {
+    (this as? CloseableCoroutineDispatcher)?.close()
 }
 
 @Throws(Throwable::class)
