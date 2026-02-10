@@ -17,6 +17,8 @@
 
 package io.matthewnelson.kmp.tor.runtime.core.internal
 
+import io.matthewnelson.encoding.utf8.UTF8
+import io.matthewnelson.encoding.utf8.UTF8.CharPreProcessor.Companion.sizeUTF8
 import io.matthewnelson.kmp.file.File
 import io.matthewnelson.kmp.file.IOException
 import io.matthewnelson.kmp.file.absoluteFile2
@@ -36,8 +38,12 @@ internal fun File.toUnixSocketPath(): String {
     // Darwin  -> MAX 102 chars
     // Linux   -> MAX 106 chars
     // Windows -> MAX 106 chars
-    // else    -> MAX 104 chars
-    if (path.length > (AFUnixSunPathSize - 2)) {
+    // else    -> MAX 102 chars
+    val maxLen = AFUnixSunPathSize - 2
+
+    // Must also check UTF-8 byte size, as if the path contains non-ASCII
+    // characters it may exceed sockaddr_un.sun_path capacity.
+    if (path.length > maxLen || path.sizeUTF8(UTF8).toInt() > maxLen) {
         throw UnsupportedOperationException("path too long")
     }
 

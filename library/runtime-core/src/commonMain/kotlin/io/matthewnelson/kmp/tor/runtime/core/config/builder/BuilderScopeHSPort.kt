@@ -88,7 +88,7 @@ public class BuilderScopeHSPort private constructor(
      *     // HiddenServicePort {virtual} 8080
      *
      * @throws [UnsupportedOperationException] when:
-     *   - Is Windows (tor does not support Unix Sockets on windows).
+     *   - Is Windows (tor does not support Unix Sockets on Windows).
      *   - Is Java 15 or below (Jvm only, Android is always available).
      *   - Configured path is too long.
      *   - Configured path is multiple lines.
