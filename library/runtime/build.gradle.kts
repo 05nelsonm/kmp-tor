@@ -34,6 +34,7 @@ kmpConfiguration {
                     implementation(project(":library:runtime-ctrl"))
                     implementation(libs.encoding.base16)
                     implementation(libs.immutable.collections)
+                    implementation(libs.kmp.file.async)
                     implementation(libs.kmp.process)
                     implementation(libs.kmp.tor.common.core)
                     implementation(kotlincrypto.hash.sha2)

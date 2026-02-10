@@ -22,6 +22,7 @@ immutable                   = "0.3.0"
 
 jetbrains-skiko             = "0.9.37.3"
 
+kmp-file                    = "0.6.0"
 kmp-process                 = "0.5.0"
 kmp-tor-common              = "2.4.2"
 kmp-tor-resource            = "408.21.0"
@@ -46,6 +47,7 @@ gradle-publish-maven        = { module = "com.vanniktech:gradle-maven-publish-pl
 
 immutable-collections       = { module = "io.matthewnelson.immutable:collections", version.ref = "immutable" }
 
+kmp-file-async              = { module = "io.matthewnelson.kmp-file:async", version.ref = "kmp-file" }
 kmp-process                 = { module = "io.matthewnelson.kmp-process:process", version.ref = "kmp-process" }
 kmp-tor-common-api          = { module = "io.matthewnelson.kmp-tor:common-api", version.ref = "kmp-tor-common" }
 kmp-tor-common-core         = { module = "io.matthewnelson.kmp-tor:common-core", version.ref = "kmp-tor-common" }
