@@ -18,6 +18,7 @@ package io.matthewnelson.kmp.tor.runtime.core.key
 import io.matthewnelson.kmp.tor.runtime.core.net.OnionAddress.Companion.toOnionAddress
 import io.matthewnelson.kmp.tor.runtime.core.net.OnionAddressV3UnitTest.Companion.ONION_ADDRESS_V3
 import kotlin.test.Test
+import kotlin.test.assertContentEquals
 import kotlin.test.assertEquals
 
 abstract class AuthKeyBaseUnitTest<T: AuthKey.Public, V: AuthKey.Private>(
@@ -48,13 +49,21 @@ abstract class AuthKeyBaseUnitTest<T: AuthKey.Public, V: AuthKey.Private>(
     @Test
     fun givenPrivateKey_whenBase32Descriptor_thenIsAsExpected() {
         val expected = ONION_ADDRESS_V3 + ":descriptor" + ":" + expectedAlgorithm + ":" + privateKey.base32()
-        assertEquals(expected, privateKey.descriptorBase32(ONION_ADDRESS_V3.toOnionAddress()))
+        val address = ONION_ADDRESS_V3.toOnionAddress()
+        val actual = privateKey.descriptorBase32(address)
+        assertEquals(expected, actual)
+        // This exercises underlying toDescriptorUtf8 implementation which utilizes a CharArray
+        assertContentEquals(actual.encodeToByteArray(), privateKey.descriptorBase32Utf8(address))
     }
 
     @Test
     fun givenPrivateKey_whenBase64Descriptor_thenIsAsExpected() {
         val expected = ONION_ADDRESS_V3 + ":descriptor" + ":" + expectedAlgorithm + ":" + privateKey.base64()
-        assertEquals(expected, privateKey.descriptorBase64(ONION_ADDRESS_V3.toOnionAddress()))
+        val address = ONION_ADDRESS_V3.toOnionAddress()
+        val actual = privateKey.descriptorBase64(address)
+        assertEquals(expected, actual)
+        // This exercises underlying toDescriptorUtf8 implementation which utilizes a CharArray
+        assertContentEquals(expected.encodeToByteArray(), privateKey.descriptorBase64Utf8(address))
     }
 
     // TODO: Factory function tests

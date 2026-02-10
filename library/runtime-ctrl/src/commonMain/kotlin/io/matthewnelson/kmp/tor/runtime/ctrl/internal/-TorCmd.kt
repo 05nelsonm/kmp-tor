@@ -255,8 +255,7 @@ private fun TorCmd.Onion.Add.encode(LOG: Debugger?): ByteArray {
     require(ports.isNotEmpty()) { "A minimum of 1 port is required" }
 
     val prefixUnix = "unix:"
-    // TODO: base64Chars
-    val privateKey = key?.base64()
+    val privateKey = key?.base64Chars()
 
     // Pre-calculate capacity so StringBuilder does
     // not ever resize its backing array.
@@ -265,7 +264,7 @@ private fun TorCmd.Onion.Add.encode(LOG: Debugger?): ByteArray {
         capacity++ // SP
         capacity += keyType.algorithm().length
         capacity++ // :
-        capacity += privateKey?.length ?: 3 // NEW
+        capacity += privateKey?.size ?: 3 // NEW
         if (flags.isNotEmpty()) {
             capacity++ // SP
             capacity += 6 // Flags=
@@ -325,7 +324,6 @@ private fun TorCmd.Onion.Add.encode(LOG: Debugger?): ByteArray {
 
             append(virtual).append(',')
 
-
             if (target.startsWith(prefixUnix)) {
                 append(prefixUnix)
 
@@ -350,11 +348,14 @@ private fun TorCmd.Onion.Add.encode(LOG: Debugger?): ByteArray {
         LOG.d {
             var log = toString()
             if (privateKey != null) {
-                log = log.replace(privateKey, "[REDACTED]")
+                val redact = privateKey.joinToString("")
+                log = log.replace(redact, "[REDACTED]")
             }
 
             ">> $log"
         }
+
+        privateKey?.fill('\u0000')
 
         CRLF()
     }.toUTF8(backFill = true)
@@ -377,8 +378,7 @@ private fun TorCmd.OnionClientAuth.Add.encode(LOG: Debugger?): ByteArray {
         }
     }
 
-    // TODO: base64Chars
-    val privateKey = key.base64()
+    val privateKey = key.base64Chars()
 
     // Pre-calculate capacity so StringBuilder does
     // not ever resize its backing array.
@@ -389,7 +389,7 @@ private fun TorCmd.OnionClientAuth.Add.encode(LOG: Debugger?): ByteArray {
         capacity++ // SP
         capacity += key.algorithm().length
         capacity++ // :
-        capacity += privateKey.length
+        capacity += privateKey.size
         if (nickname != null) {
             capacity++ // SP
             capacity += 11 // ClientName=
@@ -419,9 +419,12 @@ private fun TorCmd.OnionClientAuth.Add.encode(LOG: Debugger?): ByteArray {
         }
 
         LOG.d {
-            val log = toString().replace(privateKey, "[REDACTED]")
+            val redact = privateKey.joinToString("")
+            val log = toString().replace(redact, "[REDACTED]")
             ">> $log"
         }
+
+        privateKey.fill('\u0000')
 
         CRLF()
     }.toUTF8(backFill = true)

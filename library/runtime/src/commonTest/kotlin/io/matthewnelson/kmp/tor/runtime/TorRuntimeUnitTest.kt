@@ -128,7 +128,7 @@ class TorRuntimeUnitTest {
 
         disposable.dispose()
 
-        assertEquals(4, notices.size)
+        assertEquals(4, synchronized(lock) { notices.size })
 
         // Was rate-limited at least 1 time
         //
